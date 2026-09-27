@@ -138,14 +138,22 @@ for those saved revisions.
 ## Revision-derived bounded span semantics
 
 Fixed digest, Base64, ASTC, and XTEA specialization no longer treats English
-documentation as compiler control data. A single compiler-owned recipe module
-combines exact ABI roles and directions with revision-derived identifier and
-enum facts. Its package facts are stable format knowledge: MD5/SHA digest
-widths, Base64 encode/decode behavior, the 16-byte ASTC header bound, XTEA's
-16-byte key bound, and the zero-valued success enum convention selected from
-the revision's actual enum. The package contains no Defold declaration IDs,
-headers, symbols, descriptions, parameter prose, return prose, or expected
-route counts for these families.
+documentation, declaration spelling, or copied numeric constants as compiler
+control data. `generate-dmsdk-source-semantic-facts.mjs` selects structurally
+eligible ABI rows, parses the pinned implementations with Clang's JSON AST, and
+emits a compact authenticated fact graph. It follows same-translation-unit
+helpers and records parameter forwarding, calls, fixed local arrays, literal
+and enum constants, operations, assignments, and returns. The four family
+analyzers recover digest extents, Base64 operation/capacity behavior, ASTC
+header/dimension behavior, and XTEA key/success behavior from those facts.
+
+The compiler-owned package data is now only reusable grammar: ABI-role
+patterns, composable fact queries, transport constructors, emitters, and
+fallback recommendations. It contains no Defold declaration IDs, headers,
+symbols, descriptions, parameter prose, return prose, expected route counts,
+or Defold-derived bounds. Those revision facts travel in the generated policy.
+The fact artifact authenticates the exact SDK IR and ABI-shape inputs as well
+as every implementation source it read.
 
 The generated public includes and native call expressions come from the
 selected revision IR. Current generation remains four fixed digests, two
@@ -156,20 +164,22 @@ rejection vectors, and observe zero warmed C++ allocation calls. These are
 unchanged runtime claims rather than evidence inferred from the new parser.
 
 Semantic specialization is additive. If an ABI-shaped declaration uses an
-unseen digest, codec operation, format operation, or enum convention, the
-generator keeps its universal usage-materialized recipe. Its family report
-adds a machine-readable fallback audit containing the declaration ID, observed
-ABI shape, attempted pattern, missing semantic wiring, owning emitter, and a
-recommendation to extend the stable recipe or identifier grammar. A synthetic
-future digest test exercises this exact path; it does not merely unit-test the
-report formatter.
+unseen implementation shape, the generator keeps its universal
+usage-materialized recipe. A compiler-level audit now accounts for every one
+of the 1,260 universal fallbacks, groups them into 848 structural shapes, names
+the closest optimized patterns and their blockers, and records actionable
+emitter or fact-query recommendations. No fallback can disappear from this
+ledger. The current partition is 101 preferred specializations, 1,260 audited
+universal fallbacks, 537 immediately universal-ready calls, 723 calls requiring
+project usage facts, and zero silent omissions.
 
-The same unmodified compiler package completed a clean derivation of Defold
-`574678c7d44be490d874fbed2d0ae6211feec4d9`. That revision independently
-selected 4/4 fixed digests, 2/2 Base64 operations, 2/2 ASTC probes, and 2/2
-XTEA operations with zero semantic fallbacks. This proves parser and policy
-survival across the revision boundary; current packaged-SDK runtime execution
-remains the runtime evidence for these native implementations.
+The current revision yields 10/10 requested source-fact records and selects 4/4
+fixed digests, 2/2 Base64 operations, 2/2 ASTC probes, and 2/2 XTEA operations.
+Focused exact-call harnesses compile, link, execute success and rejection paths,
+and retain zero warmed C++ allocator calls. Clean-room generation independently
+rebuilds all 1,361 recipes and 115 artifacts byte-for-byte from declared inputs.
+Those are distinct generation, compile/link, runtime, allocation, and
+reproducibility claims; none is promoted into another stage's evidence.
 
 ## Clean-room registry inputs and outputs
 

@@ -88,8 +88,8 @@ test("universal dmSDK recipes cover every declaration and every target", async (
     browserDirectMemoryMetadata: 1361,
     typescriptStableIds: 1361,
     silentlyOmitted: 0,
-    preferredSpecialized: 81,
-    usageMaterializedFallback: 1280,
+    preferredSpecialized: 101,
+    usageMaterializedFallback: 1260,
     universalReadyExactVectors: symbolIndex.universalReadyCount,
   });
   assert.equal(new Set(report.recipes.map(({ numericId }) => numericId)).size, 1361);
@@ -136,10 +136,10 @@ test("generated adapter call plans preserve the callable/provider boundary", () 
   const plans = dmSdkUniversalRecipes
     .map(resolveDmSdkConcreteCallPlan)
     .filter(Boolean);
-  assert.equal(plans.length, 81);
+  assert.equal(plans.length, 101);
   const callable = plans.filter(({ state }) => state === "generated-adapter");
   const providerRequired = plans.filter(({ state }) => state === "specialization-required");
-  assert.equal(callable.length, 74);
+  assert.equal(callable.length, 94);
   assert.equal(providerRequired.length, 7);
   assert.equal(callable.filter(({ adapterKind }) => adapterKind === "named-wrapper").length, 45);
   const cstring = callable.filter(({ family }) => family === "cstringValue");
@@ -157,6 +157,11 @@ test("generated adapter call plans preserve the callable/provider boundary", () 
   assert.deepEqual(hashState.map(({ adapterId }) => adapterId).sort((a, b) => a - b), Array.from({ length: 10 }, (_, index) => index));
   assert.ok(hashState.every(({ adapterKind, symbol }) =>
     adapterKind === "family-dispatch" && symbol === "deherm_dmsdk_hash_state_dispatch"));
+  const namedScalar = callable.filter(({ family }) => family === "namedScalar");
+  assert.equal(namedScalar.length, 20);
+  assert.deepEqual(namedScalar.map(({ adapterId }) => adapterId), Array.from({ length: 20 }, (_, index) => index));
+  assert.ok(namedScalar.every(({ adapterKind, symbol }) =>
+    adapterKind === "family-dispatch" && symbol === "deherm_dmsdk_named_scalar_dispatch"));
   assert.equal(providerRequired.filter(({ family }) => family === "borrowedHandle").length, 0);
   assert.equal(providerRequired.filter(({ family }) => family === "scratchScalarOut").length, 7);
   assert.ok(providerRequired.every(({ requirements, applicability }) =>
@@ -225,15 +230,15 @@ test("all callable generated adapters own same-recipe C ABI and emitted-JSI exac
     await rm(temporary, { recursive: true, force: true });
   }
   const usages = corpus.usages;
-  assert.equal(usages.length, 74);
+  assert.equal(usages.length, 94);
   assert.equal(corpus.report.recipeCount, 1361);
-  assert.equal(corpus.report.generatedAdapterCount, 74);
+  assert.equal(corpus.report.generatedAdapterCount, 94);
   assert.equal(corpus.report.silentlyOmitted, 0);
-  assert.equal(corpus.report.verification.vectorCount, 74);
+  assert.equal(corpus.report.verification.vectorCount, 94);
   assert.equal(corpus.report.verification.jsiVectorCount, 33);
   assert.deepEqual(Object.keys(corpus.report.sourceHashes.familyReports).sort(), [
     "arenaCString", "astcProbe", "base64Span", "cstringValue", "enumValue",
-    "fixedDigest", "hashSpan", "hashState", "scalar", "xteaSpan",
+    "fixedDigest", "hashSpan", "hashState", "namedScalar", "scalar", "xteaSpan",
   ]);
   for (const evidence of Object.values(corpus.report.sourceHashes.familyReports)) {
     assert.match(evidence.sha256, /^[0-9a-f]{64}$/u);
@@ -248,6 +253,7 @@ test("all callable generated adapters own same-recipe C ABI and emitted-JSI exac
     fixedDigest: 4,
     hashSpan: 2,
     hashState: 10,
+    namedScalar: 20,
     scalar: 26,
     xteaSpan: 2,
   });
@@ -262,7 +268,7 @@ test("all callable generated adapters own same-recipe C ABI and emitted-JSI exac
     assert.equal(vector.transports.cAbi.applicability, "callable");
     assert.ok(Number.isSafeInteger(vector.adapterId));
   }
-  assert.equal(new Set(corpus.report.verification.vectors.map(({ vectorSha256 }) => vectorSha256)).size, 74);
+  assert.equal(new Set(corpus.report.verification.vectors.map(({ vectorSha256 }) => vectorSha256)).size, 94);
   assert.deepEqual(
     [...new Set(corpus.report.verification.vectors
       .filter(({ transports }) => transports.dynamicHermesJsi.applicability === "callable")
@@ -295,7 +301,7 @@ test("all callable generated adapters own same-recipe C ABI and emitted-JSI exac
       "-isystem", path.join(sdkRoot, "include"),
       "-isystem", path.join(sdkRoot, "ext/include"),
       ...[
-        "scalar_runtime", "enum_value_runtime", "fixed_digest_runtime", "hash_span_runtime", "base64_span_runtime",
+        "scalar_runtime", "enum_value_runtime", "named_scalar_runtime", "fixed_digest_runtime", "hash_span_runtime", "base64_span_runtime",
         "xtea_span_runtime", "astc_probe_runtime", "cstring_value_runtime", "cstring_value", "arena_cstring", "hash_state",
       ].map((name) => `defold/defold_hermes/src/generated_dmsdk_${name}.cpp`),
       path.join(root, dmSdkGeneratedAdapterCorpusArtifacts.verificationSource), harness,

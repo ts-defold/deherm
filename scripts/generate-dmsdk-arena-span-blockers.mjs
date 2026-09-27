@@ -7,9 +7,9 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import {
   DMSDK_UNIVERSAL_FALLBACK_PATTERN,
   compactDmSdkPatternDecision,
-  defineDmSdkPattern,
   selectDmSdkPattern,
 } from "../packages/compiler/src/dmsdk-pattern-selector.mjs";
+import { arenaCStringPatterns } from "../packages/compiler/src/dmsdk-pattern-catalog.mjs";
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const paths = Object.freeze({
@@ -22,10 +22,10 @@ const paths = Object.freeze({
 const policyVersion = "arena-span-cstring-v3";
 const arenaTranche = "arena-backed-spans";
 const priorWaveReports = Object.freeze([
-  { path: "packages/bindings/generated/defold-dmsdk-fixed-digest-bindings.json", policyVersion: "fixed-digest-v3" },
-  { path: "packages/bindings/generated/defold-dmsdk-base64-span-bindings.json", policyVersion: "base64-span-v3" },
-  { path: "packages/bindings/generated/defold-dmsdk-astc-probe-bindings.json", policyVersion: "astc-probe-v3" },
-  { path: "packages/bindings/generated/defold-dmsdk-xtea-span-bindings.json", policyVersion: "xtea-span-v3" },
+  { path: "packages/bindings/generated/defold-dmsdk-fixed-digest-bindings.json", policyVersion: "fixed-digest-v4" },
+  { path: "packages/bindings/generated/defold-dmsdk-base64-span-bindings.json", policyVersion: "base64-span-v5" },
+  { path: "packages/bindings/generated/defold-dmsdk-astc-probe-bindings.json", policyVersion: "astc-probe-v4" },
+  { path: "packages/bindings/generated/defold-dmsdk-xtea-span-bindings.json", policyVersion: "xtea-span-v4" },
   { path: "packages/bindings/generated/defold-dmsdk-hash-span-bindings.json", policyVersion: "hash-span-v3" },
   { path: "packages/bindings/generated/defold-dmsdk-hash-state-bindings.json", policyVersion: "hash-state-v3" },
 ]);
@@ -91,51 +91,6 @@ function validateRecipe(value) {
   assert(value.recipe.semanticSource === "revision-ir-public-documentation", "arena-cstring semanticSource is unsupported");
   assert(value.recipe.sourceGrouping === "single-revision-derived-translation-unit", "arena-cstring sourceGrouping is unsupported");
   assert(value.recipe.fallback === "universal-recipe", "arena-cstring fallback is unsupported");
-}
-
-function pattern(id, kind, result, positions, semanticTokens) {
-  return defineDmSdkPattern({
-    schemaVersion: 1,
-    id,
-    family: `arena-cstring.${kind}`,
-    emitter: "scripts/generate-dmsdk-arena-span-blockers.mjs",
-    priority: 790,
-    cost: 8,
-    fallback: false,
-    when: {
-      declarationKinds: ["function"],
-      result,
-      parameters: { count: { exact: positions.length }, positions },
-      requireSemanticTokens: semanticTokens,
-    },
-  });
-}
-
-function arenaPatterns() {
-  return [
-    pattern("arena-cstring.error-string", "error-string", { roles: ["scalar:void"] }, [
-      { roles: ["cstring-mutable"], directions: ["out"] },
-      { roles: ["scalar:usize"], directions: ["value"] },
-      { roles: ["scalar:i32"], directions: ["value"] },
-    ], ["bounded-cstring-output", "error-string", "null-terminated-output", "synchronous-noescape"]),
-    pattern("arena-cstring.trimmed-string", "trimmed-string", { roles: ["scalar:usize"] }, [
-      { roles: ["cstring-mutable"], directions: ["out"] },
-      { roles: ["scalar:usize"], directions: ["value"] },
-      { roles: ["cstring-in"], directions: ["in"] },
-    ], ["bounded-cstring-output", "counted-cstring-input", "null-terminated-output", "trimmed-string"]),
-    pattern("arena-cstring.canonical-path", "canonical-path", { roles: ["scalar:u32"] }, [
-      { roles: ["cstring-in"], directions: ["in"] },
-      { roles: ["cstring-mutable"], directions: ["inout"] },
-      { roles: ["scalar:u32"], directions: ["value"] },
-    ], ["bounded-cstring-output", "canonical-path", "counted-cstring-input", "output-length-result"]),
-    pattern("arena-cstring.uri-encode", "uri-encode", { rolePrefixes: ["enum:"] }, [
-      { roles: ["cstring-in"], directions: ["in"] },
-      { roles: ["cstring-mutable"], directions: ["out"] },
-      { roles: ["scalar:u32"], directions: ["value"] },
-      { roles: ["pointer:scalar:u32"], directions: ["inout"] },
-    ], ["bounded-cstring-output", "counted-cstring-input", "output-byte-count", "uri-encode"]),
-    DMSDK_UNIVERSAL_FALLBACK_PATTERN,
-  ];
 }
 
 function patternFacts(row, semanticTokens = []) {
@@ -366,7 +321,7 @@ export function generate(inputs) {
   const selected = available.filter((row) => blockerFor(row) === "cstring-termination-or-capacity-policy");
   const declined = [];
   const entries = [];
-  const patterns = arenaPatterns();
+  const patterns = [...arenaCStringPatterns(), DMSDK_UNIVERSAL_FALLBACK_PATTERN];
   for (const candidate of selected) {
     const semantics = inferArenaCStringSemantics(irById.get(candidate.id), candidate);
     const decision = selectDmSdkPattern(patternFacts(candidate, semantics?.semanticTokens), patterns);

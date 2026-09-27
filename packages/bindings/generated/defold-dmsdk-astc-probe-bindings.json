@@ -1,27 +1,23 @@
 {
   "schemaVersion": 1,
-  "policyVersion": "astc-probe-v3",
+  "policyVersion": "astc-probe-v4",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "sources": {
     "ir": "packages/bindings/generated/defold-sdk-ir.json",
     "shapes": "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
+    "sourceFacts": "packages/bindings/generated/defold-dmsdk-source-semantic-facts.json",
     "policy": "packages/bindings/overrides/dmsdk-astc-probe-bindings.json"
   },
   "sourceHashes": {
     "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
-    "policy": "66712a7b23a221fe1e2a8e3c3049c9894858c5c33f1297057ae9933ac70a0e79"
+    "sourceFacts": "c9120a540a5f993feddb5bcd0e52e77a265e8c29d8614934486a1ee23e76db4a",
+    "policy": "9bb907d3f928ae3e61b1e648e4bb52fa308487e7129a629590259f37b458da9c"
   },
   "policy": {
     "recipe": {
-      "format": "astc",
-      "operations": [
-        "block-size",
-        "dimensions"
-      ],
       "input": "borrowed-counted-bytes",
       "output": "caller-owned-three-u32",
-      "minimumHeaderBytes": 16,
       "ownership": "synchronous-noescape",
       "fallback": "universal-recipe"
     },
@@ -111,7 +107,7 @@
     ],
     "cAbi": "bounded uint8_t input span and caller-owned fixed three-u32 result",
     "ownership": "input is synchronously borrowed; only scalar results return",
-    "safety": "generated preflight rejects null input and spans shorter than the pinned native 16-byte ASTC header minimum",
+    "safety": "generated preflight rejects null input and spans shorter than the implementation-derived 16-byte header minimum",
     "allocation": "no generated or pinned image parser allocation",
     "jsi": "not-generated pending typed-array lifetime and installer policy",
     "html5": "not-claimed pending target compile/link matrix"
@@ -207,13 +203,19 @@
       ],
       "bindingId": 0,
       "mode": "block-size",
+      "minimumHeaderBytes": 16,
       "evidence": {
         "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/image.h",
         "declarationLine": 133,
-        "semanticSource": "revision-ir-abi+identifier-grammar+stable-format-recipe",
-        "format": "astc",
+        "semanticSource": "revision-implementation-ast+abi-shape",
         "operation": "block-size",
-        "minimumHeaderBytes": 16
+        "minimumHeaderBytes": 16,
+        "implementationObservations": [
+          {
+            "source": "upstream/defold/engine/dlib/src/dlib/image.cpp",
+            "line": 237
+          }
+        ]
       },
       "patternDecision": "span.fixed-three-u32-probe",
       "wrapper": "deherm_dmsdk_astc_probe_dm_image_get_astc_block_size",
@@ -289,13 +291,19 @@
       ],
       "bindingId": 1,
       "mode": "dimensions",
+      "minimumHeaderBytes": 16,
       "evidence": {
         "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/image.h",
         "declarationLine": 145,
-        "semanticSource": "revision-ir-abi+identifier-grammar+stable-format-recipe",
-        "format": "astc",
+        "semanticSource": "revision-implementation-ast+abi-shape",
         "operation": "dimensions",
-        "minimumHeaderBytes": 16
+        "minimumHeaderBytes": 16,
+        "implementationObservations": [
+          {
+            "source": "upstream/defold/engine/dlib/src/dlib/image.cpp",
+            "line": 249
+          }
+        ]
       },
       "patternDecision": "span.fixed-three-u32-probe",
       "wrapper": "deherm_dmsdk_astc_probe_dm_image_get_astc_dimensions",

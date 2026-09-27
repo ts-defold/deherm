@@ -1,15 +1,11 @@
 {
   "schemaVersion": 1,
-  "policyVersion": "xtea-span-v3",
+  "policyVersion": "xtea-span-v4",
   "family": "in-place-keyed-transform",
   "recipe": {
-    "algorithm": "xtea",
-    "operations": ["decrypt", "encrypt"],
     "data": "borrowed-mutable-counted-bytes",
     "key": "borrowed-counted-bytes",
-    "maximumKeyBytes": 16,
     "requireSingleAlgorithm": true,
-    "successEnumValue": 0,
     "ownership": "synchronous-noescape",
     "fallback": "universal-recipe"
   }

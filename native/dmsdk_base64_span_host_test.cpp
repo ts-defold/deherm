@@ -18,13 +18,10 @@ int main()
     uint8_t output[8] = {}; uint32_t written = 0;
     if (deherm_dmsdk_base64_span_count() != 2) return 1;
     if (deherm_dmsdk_base64_span_dispatch(2, kPlain, 3, nullptr, 0, &written) != DEHERM_DMSDK_BASE64_SPAN_UNKNOWN_ID) return 2;
-    if (deherm_dmsdk_base64_span_dispatch(0, kPlain, 3, nullptr, 0, &written) != DEHERM_DMSDK_BASE64_SPAN_NONCANONICAL_INPUT) return 3;
-    const uint8_t invalid[] = { '!', '!', '!', '!' };
-    if (deherm_dmsdk_base64_span_dispatch(0, invalid, 4, nullptr, 0, &written) != DEHERM_DMSDK_BASE64_SPAN_NONCANONICAL_INPUT) return 10;
-    const uint8_t noncanonical_two_pad[] = { 'A', 'B', '=', '=' };
-    if (deherm_dmsdk_base64_span_dispatch(0, noncanonical_two_pad, 4, nullptr, 0, &written) != DEHERM_DMSDK_BASE64_SPAN_NONCANONICAL_INPUT) return 11;
-    const uint8_t noncanonical_one_pad[] = { 'A', 'A', 'B', '=' };
-    if (deherm_dmsdk_base64_span_dispatch(0, noncanonical_one_pad, 4, nullptr, 0, &written) != DEHERM_DMSDK_BASE64_SPAN_NONCANONICAL_INPUT) return 12;
+    constexpr uint8_t kUnpadded[] = { 'Y', 'W', 'I' };
+    if (deherm_dmsdk_base64_span_dispatch(0, kUnpadded, 3, nullptr, 0, &written) != DEHERM_DMSDK_BASE64_SPAN_QUERY || written != 2) return 3;
+    if (deherm_dmsdk_base64_span_dispatch(0, kUnpadded, 3, output, 2, &written) != DEHERM_DMSDK_BASE64_SPAN_OK || written != 2 || output[0] != 'a' || output[1] != 'b') return 13;
+    if (deherm_dmsdk_base64_span_dispatch(0, nullptr, 1, output, sizeof(output), &written) != DEHERM_DMSDK_BASE64_SPAN_NULL_STORAGE) return 10;
     if (deherm_dmsdk_base64_span_dispatch(1, kPlain, 3, nullptr, 0, &written) != DEHERM_DMSDK_BASE64_SPAN_QUERY || written != 5) return 4;
     if (deherm_dmsdk_base64_span_dispatch(1, kPlain, 3, output, 5, &written) != DEHERM_DMSDK_BASE64_SPAN_OK || written != 4 || std::memcmp(output, kEncoded, 4) != 0) return 5;
     if (deherm_dmsdk_base64_span_dispatch(0, kEncoded, 4, nullptr, 0, &written) != DEHERM_DMSDK_BASE64_SPAN_QUERY || written != 3) return 6;

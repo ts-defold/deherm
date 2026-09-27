@@ -6,9 +6,9 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import {
   DMSDK_UNIVERSAL_FALLBACK_PATTERN,
   compactDmSdkPatternDecision,
-  defineDmSdkPattern,
   selectDmSdkPattern,
 } from "../packages/compiler/src/dmsdk-pattern-selector.mjs";
+import { fixedWidthHashPattern } from "../packages/compiler/src/dmsdk-pattern-catalog.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const defaults = {
@@ -17,11 +17,7 @@ const defaults = {
   policy: "packages/bindings/overrides/dmsdk-hash-span-bindings.json",
 };
 const previouslyGeneratedAdapters = 43;
-const hashSpanSemanticTokens = Object.freeze([
-  "bounded-input-span",
-  "fixed-width-scalar-result",
-  "synchronous-noescape",
-]);
+const hashSpanSemanticTokens = fixedWidthHashPattern().when.requireSemanticTokens;
 
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 const snake = (value) =>
@@ -48,30 +44,6 @@ function parseArgs(argv) {
   }
   for (const key of Object.keys(defaults)) options[key] = resolve(root, options[key]);
   return options;
-}
-
-function hashSpanPattern(policy) {
-  return defineDmSdkPattern({
-    schemaVersion: 1,
-    id: "span.fixed-width-hash",
-    family: "hash-span",
-    emitter: "scripts/generate-dmsdk-hash-span-bindings.mjs",
-    priority: 860,
-    cost: 4,
-    fallback: false,
-    when: {
-      declarationKinds: ["function"],
-      result: { roles: ["scalar:u32", "scalar:u64"] },
-      parameters: {
-        count: { exact: 2 },
-        positions: [
-          { roles: ["opaque-pointer"], directions: ["in"] },
-          { roles: ["scalar:u32"], directions: ["value"] },
-        ],
-      },
-      requireSemanticTokens: hashSpanSemanticTokens,
-    },
-  });
 }
 
 function patternFacts(row, semanticTokens = []) {
@@ -123,7 +95,7 @@ function validateProvenance(ir, shapes, contents) {
 }
 
 function createEntries(rows, declarations, policy) {
-  const patterns = [hashSpanPattern(policy), DMSDK_UNIVERSAL_FALLBACK_PATTERN];
+  const patterns = [fixedWidthHashPattern(), DMSDK_UNIVERSAL_FALLBACK_PATTERN];
   const entries = [];
   const blocked = [];
   let structurallyEligible = 0;

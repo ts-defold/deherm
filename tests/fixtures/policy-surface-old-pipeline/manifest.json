@@ -2,7 +2,7 @@
   "schemaVersion": 3,
   "kind": "deherm.fixture.old-pipeline-sdk",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "treeSha256": "d7faa230280e57c8784376fcc3cd07219a9c1372402c70374e5abadd33be8e27",
+  "treeSha256": "88099cc713a3c10936879fd1c288ef0d4d14d527d0d6f2d144ad23e1449ffe49",
   "source": "Frozen SHA-256 golden captured from the checkout-backed generated SDK and canonical lowering plan produced by the source pipeline. It catches accidental materializer drift but is not implementation-independent because some source-pipeline and materializer emitters are shared. It changes only through this explicit capture command after reviewed source-pipeline regeneration.",
   "files": {
     "dmsdk/borrowed-handle.ts": {
@@ -11,7 +11,7 @@
     },
     "dmsdk/browser-arena.ts": {
       "bytes": 5513,
-      "sha256": "07de25ee23f17de34c2a3200d00f8299663f76e719feefdbf51ee0ad0fe41b92"
+      "sha256": "4d705ea6b839b30619c96d53504545e5f72c6a95b147e3781f20d261b1621c20"
     },
     "dmsdk/cstring-value.ts": {
       "bytes": 4753,
@@ -47,7 +47,7 @@
     },
     "dmsdk/universal.ts": {
       "bytes": 148212,
-      "sha256": "bf3d78e9700d73d51ddb07c3b0e423d08a64a62613460f6315580818bf69506f"
+      "sha256": "810a7382333209acad0cf6fdcbd03295f520dad8015d45eaf107fec71c0fa6d2"
     },
     "script/browser-target-support.ts": {
       "bytes": 567,
@@ -337,7 +337,7 @@
     },
     "defold/defold_hermes/lib/web/generated_dmsdk_universal.js": {
       "bytes": 390388,
-      "sha256": "0efa2a4750bc97d065deecfa454a75f06a67a7f352544e58df0f9ffc9831c2a0"
+      "sha256": "a9c8003d23da338642ea899b1ca8d09c943d05b87026df4089f0613f63d94d31"
     },
     "defold/defold_hermes/lib/web/generated_modules.js": {
       "bytes": 1814,
@@ -364,8 +364,8 @@
       "sha256": "192e84dec0f93139334f3b42addbafd7331abaa9068b031d1e70d523679d5861"
     },
     "defold/defold_hermes/src/generated_dmsdk_base64_span_runtime.cpp": {
-      "bytes": 2850,
-      "sha256": "1bd742fec714444570d9ebcc1470931e258efecb4e1d2a99332517ed6e2dd4a6"
+      "bytes": 1686,
+      "sha256": "9dd3db339344a5174a85f68b06215ef9e0ae214f5205d139343917efae75da39"
     },
     "defold/defold_hermes/src/generated_dmsdk_borrowed_handle_jsi.cpp": {
       "bytes": 5133,
@@ -461,11 +461,11 @@
     },
     "defold/defold_hermes/src/generated_dmsdk_universal.cpp": {
       "bytes": 78195,
-      "sha256": "39e54be422170351305f89680e7d03df8990029f33b3e122ae6e66a86b05dbaa"
+      "sha256": "1328c3dbc036b7c064ccce3386507075a9223d8e421cbf6cab8a1209b53698bc"
     },
     "defold/defold_hermes/src/generated_dmsdk_universal_jsi.cpp": {
       "bytes": 8394,
-      "sha256": "ab18fd4aa01bf37546e0b9c4c01e429e3efc608986a085efd1a317145b901139"
+      "sha256": "fd30cb49b99059ad3396a8c6bd57447624c45e09e6e1d55bc520921537de0e0a"
     },
     "defold/defold_hermes/src/generated_dmsdk_xtea_span_crypt.cpp": {
       "bytes": 574,
@@ -574,8 +574,8 @@
   },
   "documents": {
     "defold-binding-lowering-plan.json": {
-      "bytes": 17796834,
-      "sha256": "e7c0ff943c78a56dad951ee77ea04cb366b32b11e4236e857d413eb1d9f3eb8e"
+      "bytes": 17803379,
+      "sha256": "a6f915f3ee73b9def6da312efdc0a0a67d53a51f3e6befbd22d76ee3f4367e5d"
     }
   }
 }

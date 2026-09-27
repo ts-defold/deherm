@@ -5,9 +5,9 @@ import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import {
   DMSDK_UNIVERSAL_FALLBACK_PATTERN,
-  defineDmSdkPattern,
   selectDmSdkPattern,
 } from "../packages/compiler/src/dmsdk-pattern-selector.mjs";
+import { cstringValuePatterns } from "../packages/compiler/src/dmsdk-pattern-catalog.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const relative = Object.freeze({
@@ -80,63 +80,6 @@ function validateRecipe(value) {
   assert.equal(value.recipe.candidateSource, "revision-projection-global-cstring-value-abi");
   assert.equal(value.recipe.semanticSource, "revision-ir-public-documentation");
   assert.equal(value.recipe.fallback, "universal-recipe");
-}
-
-function cstringPatterns() {
-  return [
-    defineDmSdkPattern({
-      schemaVersion: 1,
-      id: "cstring-value.enum-literal-result",
-      family: "cstring-value.enum-literal-result",
-      emitter: "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-      priority: 780,
-      cost: 8,
-      fallback: false,
-      when: {
-        declarationKinds: ["function"],
-        result: { roles: ["cstring-result"] },
-        parameters: { count: { exact: 1 }, positions: [{ rolePrefixes: ["enum:"], directions: ["value"] }] },
-        requireSemanticTokens: ["enum-string-representation", "non-null-cstring-result"],
-      },
-    }),
-    defineDmSdkPattern({
-      schemaVersion: 1,
-      id: "cstring-value.nullable-input-slice",
-      family: "cstring-value.nullable-input-slice",
-      emitter: "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-      priority: 780,
-      cost: 8,
-      fallback: false,
-      when: {
-        declarationKinds: ["function"],
-        result: { roles: ["cstring-result"] },
-        parameters: { count: { exact: 1 }, positions: [{ roles: ["cstring-in"], directions: ["in"] }] },
-        requireSemanticTokens: ["nullable-cstring-result", "safe-utf8-cstring-input"],
-      },
-    }),
-    defineDmSdkPattern({
-      schemaVersion: 1,
-      id: "cstring-value.input-transform",
-      family: "cstring-value.input-transform",
-      emitter: "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-      priority: 770,
-      cost: 6,
-      fallback: false,
-      when: {
-        declarationKinds: ["function"],
-        result: { roles: ["scalar:void"], rolePrefixes: ["scalar:", "enum:"] },
-        parameters: {
-          every: [
-            { roles: ["cstring-in"], directions: ["in"] },
-            { rolePrefixes: ["enum:", "scalar:"], directions: ["value"] },
-          ],
-          some: [{ roles: ["cstring-in"], directions: ["in"] }],
-        },
-        requireSemanticTokens: ["safe-utf8-cstring-input"],
-      },
-    }),
-    DMSDK_UNIVERSAL_FALLBACK_PATTERN,
-  ];
 }
 
 function role(type, result = false) {
@@ -218,7 +161,7 @@ export function inferCStringSemantics(declaration, row, recipe) {
 export function resolveCStringContracts(rows, recipeDocument, sdkIr) {
   validateRecipe(recipeDocument);
   const declarations = new Map(sdkIr.declarations.map((declaration) => [declaration.id, declaration]));
-  const patterns = cstringPatterns();
+  const patterns = [...cstringValuePatterns(), DMSDK_UNIVERSAL_FALLBACK_PATTERN];
   return rows.map((row) => {
     const semantics = inferCStringSemantics(declarations.get(row.id), row, recipeDocument.recipe);
     const decision = selectDmSdkPattern(facts(row, semantics.semanticTokens), patterns);

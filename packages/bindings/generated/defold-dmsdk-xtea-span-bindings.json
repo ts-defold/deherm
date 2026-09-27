@@ -1,29 +1,24 @@
 {
   "schemaVersion": 1,
-  "policyVersion": "xtea-span-v3",
+  "policyVersion": "xtea-span-v4",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "sources": {
     "ir": "packages/bindings/generated/defold-sdk-ir.json",
     "shapes": "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
+    "sourceFacts": "packages/bindings/generated/defold-dmsdk-source-semantic-facts.json",
     "policy": "packages/bindings/overrides/dmsdk-xtea-span-bindings.json"
   },
   "sourceHashes": {
     "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
-    "policy": "339fc98591a758bfeaa4c0e16c04d241a56583c5468d7829d8a6aebd80f2eaa9"
+    "sourceFacts": "c9120a540a5f993feddb5bcd0e52e77a265e8c29d8614934486a1ee23e76db4a",
+    "policy": "d8892d2c631b3e35ca535724b82b81fe12a0ff6c3c619456f617417adabe9625"
   },
   "policy": {
     "recipe": {
-      "algorithm": "xtea",
-      "operations": [
-        "decrypt",
-        "encrypt"
-      ],
       "data": "borrowed-mutable-counted-bytes",
       "key": "borrowed-counted-bytes",
-      "maximumKeyBytes": 16,
       "requireSingleAlgorithm": true,
-      "successEnumValue": 0,
       "ownership": "synchronous-noescape",
       "fallback": "universal-recipe"
     },
@@ -203,12 +198,14 @@
         "span-element-unit-and-copy-policy"
       ],
       "bindingId": 0,
-      "mode": "decrypt",
+      "mode": "symmetric-in-place-transform",
+      "maximumKeyBytes": 16,
       "evidence": {
         "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
         "declarationLine": 76,
-        "semanticSource": "revision-ir-abi+identifier-grammar+stable-format-recipe",
-        "operation": "decrypt",
+        "semanticSource": "revision-implementation-ast+abi-shape",
+        "operation": "symmetric-in-place-transform",
+        "maximumKeyBytes": 16,
         "algorithmType": "dmCrypt::Algorithm",
         "algorithmMember": {
           "name": "ALGORITHM_XTEA",
@@ -218,7 +215,13 @@
         "successMember": {
           "name": "RESULT_OK",
           "value": 0
-        }
+        },
+        "implementationObservations": [
+          {
+            "source": "upstream/defold/engine/dlib/src/dlib/crypt.cpp",
+            "line": 80
+          }
+        ]
       },
       "patternDecision": "span.in-place-keyed-transform",
       "wrapper": "deherm_dmsdk_xtea_span_dm_crypt_decrypt",
@@ -293,12 +296,14 @@
         "span-element-unit-and-copy-policy"
       ],
       "bindingId": 1,
-      "mode": "encrypt",
+      "mode": "symmetric-in-place-transform",
+      "maximumKeyBytes": 16,
       "evidence": {
         "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
         "declarationLine": 65,
-        "semanticSource": "revision-ir-abi+identifier-grammar+stable-format-recipe",
-        "operation": "encrypt",
+        "semanticSource": "revision-implementation-ast+abi-shape",
+        "operation": "symmetric-in-place-transform",
+        "maximumKeyBytes": 16,
         "algorithmType": "dmCrypt::Algorithm",
         "algorithmMember": {
           "name": "ALGORITHM_XTEA",
@@ -308,7 +313,13 @@
         "successMember": {
           "name": "RESULT_OK",
           "value": 0
-        }
+        },
+        "implementationObservations": [
+          {
+            "source": "upstream/defold/engine/dlib/src/dlib/crypt.cpp",
+            "line": 74
+          }
+        ]
       },
       "patternDecision": "span.in-place-keyed-transform",
       "wrapper": "deherm_dmsdk_xtea_span_dm_crypt_encrypt",

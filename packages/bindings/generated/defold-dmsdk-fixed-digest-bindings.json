@@ -1,16 +1,18 @@
 {
   "schemaVersion": 1,
-  "policyVersion": "fixed-digest-v3",
+  "policyVersion": "fixed-digest-v4",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "sources": {
     "ir": "packages/bindings/generated/defold-sdk-ir.json",
     "shapes": "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
-    "policy": "packages/bindings/overrides/dmsdk-fixed-digest-bindings.json"
+    "policy": "packages/bindings/overrides/dmsdk-fixed-digest-bindings.json",
+    "sourceFacts": "packages/bindings/generated/defold-dmsdk-source-semantic-facts.json"
   },
   "sourceHashes": {
     "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
-    "policy": "120b0daa72f1be32a2f93707079d94c622254c4a25c773899857f95d6ed38634"
+    "sourceFacts": "c9120a540a5f993feddb5bcd0e52e77a265e8c29d8614934486a1ee23e76db4a",
+    "policy": "9e5447e859698463cc676be96b454fa19871d17e265adf16e93eb3844595cf70"
   },
   "patternRegistry": [
     {
@@ -84,12 +86,6 @@
     "recipe": {
       "input": "borrowed-counted-bytes",
       "output": "caller-owned-fixed-size-bytes",
-      "algorithms": [
-        "md5",
-        "sha1",
-        "sha256",
-        "sha512"
-      ],
       "ownership": "synchronous-noescape",
       "fallback": "universal-recipe"
     },
@@ -176,14 +172,21 @@
       ],
       "bindingId": 0,
       "wrapper": "deherm_dmsdk_fixed_digest_dm_crypt_hash_md5",
-      "algorithm": "md5",
+      "algorithm": "MBEDTLS_MD_MD5",
       "digestBytes": 16,
       "evidence": {
         "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
         "declarationLine": 108,
-        "semanticSource": "revision-ir-abi+identifier-grammar+stable-format-recipe",
-        "algorithm": "md5",
-        "digestBytes": 16
+        "semanticSource": "revision-implementation-ast+abi-shape",
+        "digestBytes": 16,
+        "implementationObservations": [
+          {
+            "bytes": 16,
+            "source": "upstream/defold/engine/dlib/src/dlib/crypt_mbedtls.cpp",
+            "line": 49,
+            "callee": "HashMbedTLS"
+          }
+        ]
       },
       "patternDecision": "span.fixed-output-digest",
       "stages": {
@@ -244,14 +247,21 @@
       ],
       "bindingId": 1,
       "wrapper": "deherm_dmsdk_fixed_digest_dm_crypt_hash_sha1",
-      "algorithm": "sha1",
+      "algorithm": "MBEDTLS_MD_SHA1",
       "digestBytes": 20,
       "evidence": {
         "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
         "declarationLine": 84,
-        "semanticSource": "revision-ir-abi+identifier-grammar+stable-format-recipe",
-        "algorithm": "sha1",
-        "digestBytes": 20
+        "semanticSource": "revision-implementation-ast+abi-shape",
+        "digestBytes": 20,
+        "implementationObservations": [
+          {
+            "bytes": 20,
+            "source": "upstream/defold/engine/dlib/src/dlib/crypt_mbedtls.cpp",
+            "line": 34,
+            "callee": "HashMbedTLS"
+          }
+        ]
       },
       "patternDecision": "span.fixed-output-digest",
       "stages": {
@@ -312,14 +322,21 @@
       ],
       "bindingId": 2,
       "wrapper": "deherm_dmsdk_fixed_digest_dm_crypt_hash_sha256",
-      "algorithm": "sha256",
+      "algorithm": "MBEDTLS_MD_SHA256",
       "digestBytes": 32,
       "evidence": {
         "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
         "declarationLine": 92,
-        "semanticSource": "revision-ir-abi+identifier-grammar+stable-format-recipe",
-        "algorithm": "sha256",
-        "digestBytes": 32
+        "semanticSource": "revision-implementation-ast+abi-shape",
+        "digestBytes": 32,
+        "implementationObservations": [
+          {
+            "bytes": 32,
+            "source": "upstream/defold/engine/dlib/src/dlib/crypt_mbedtls.cpp",
+            "line": 39,
+            "callee": "HashMbedTLS"
+          }
+        ]
       },
       "patternDecision": "span.fixed-output-digest",
       "stages": {
@@ -380,14 +397,21 @@
       ],
       "bindingId": 3,
       "wrapper": "deherm_dmsdk_fixed_digest_dm_crypt_hash_sha512",
-      "algorithm": "sha512",
+      "algorithm": "MBEDTLS_MD_SHA512",
       "digestBytes": 64,
       "evidence": {
         "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
         "declarationLine": 100,
-        "semanticSource": "revision-ir-abi+identifier-grammar+stable-format-recipe",
-        "algorithm": "sha512",
-        "digestBytes": 64
+        "semanticSource": "revision-implementation-ast+abi-shape",
+        "digestBytes": 64,
+        "implementationObservations": [
+          {
+            "bytes": 64,
+            "source": "upstream/defold/engine/dlib/src/dlib/crypt_mbedtls.cpp",
+            "line": 44,
+            "callee": "HashMbedTLS"
+          }
+        ]
       },
       "patternDecision": "span.fixed-output-digest",
       "stages": {

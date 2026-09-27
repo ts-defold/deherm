@@ -50,10 +50,13 @@ test("astc-probe generation is deterministic, census-complete, and evidence-boun
     await rm(out, { recursive: true, force: true });
   }
 });
-test("astc-probe semantics come from ABI plus format identifier grammar, not documentation prose", async () => {
-  const [ir, shapes] = await Promise.all([
+test("astc-probe semantics come from implementation dataflow plus ABI, not names or documentation prose", async () => {
+  const [ir, shapes, sourceFacts] = await Promise.all([
     readFile(join(root, "packages/bindings/generated/defold-sdk-ir.json"), "utf8").then(JSON.parse),
     readFile(join(root, "packages/bindings/generated/defold-dmsdk-abi-shapes.json"), "utf8").then(JSON.parse),
+    readFile(join(root, "packages/bindings/generated/defold-dmsdk-source-semantic-facts.json"), "utf8").then(
+      JSON.parse,
+    ),
   ]);
   const policyText = await readFile(join(root, "packages/bindings/overrides/dmsdk-astc-probe-bindings.json"), "utf8");
   const policy = JSON.parse(policyText);
@@ -62,10 +65,12 @@ test("astc-probe semantics come from ABI plus format identifier grammar, not doc
     /documentationContract|description|symbolPrefix|candidateSelector|image\.h|"entries"/u,
   );
   const declarations = ir.declarations.filter(({ name }) => /GetAstc(?:BlockSize|Dimensions)$/u.test(name));
+  const factsById = new Map(sourceFacts.declarations.map((entry) => [entry.declarationId, entry]));
   assert.equal(declarations.length, 2);
   for (const declaration of declarations) {
     const candidate = shapes.rows.find(({ id }) => id === declaration.id);
-    assert.ok(extractAstcProbeSemantics(declaration, candidate, policy.recipe), declaration.id);
+    const facts = factsById.get(declaration.id);
+    assert.ok(extractAstcProbeSemantics(declaration, candidate, policy.recipe, facts), declaration.id);
     assert.ok(
       extractAstcProbeSemantics(
         {
@@ -76,9 +81,11 @@ test("astc-probe semantics come from ABI plus format identifier grammar, not doc
         },
         candidate,
         policy.recipe,
+        facts,
       ),
     );
-    assert.equal(extractAstcProbeSemantics({ ...declaration, name: "dmImage::Probe" }, candidate, policy.recipe), null);
+    assert.ok(extractAstcProbeSemantics({ ...declaration, name: "dmImage::Probe" }, candidate, policy.recipe, facts));
+    assert.equal(extractAstcProbeSemantics(declaration, candidate, policy.recipe, { definitions: [] }), null);
   }
 });
 test("astc C ABI and bounded runtime compile, link to pinned parser source, behave, and allocate nothing warmed", async () => {

@@ -6,20 +6,20 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import {
   DMSDK_UNIVERSAL_FALLBACK_PATTERN,
   compactDmSdkPatternDecision,
-  defineDmSdkPattern,
   selectDmSdkPattern,
 } from "../packages/compiler/src/dmsdk-pattern-selector.mjs";
 import {
   analyzeFixedDigestRecipe,
-  BOUNDED_SPAN_SEMANTIC_TOKENS,
   createDmSdkFallbackAudit,
   publicDmSdkHeader,
 } from "../packages/compiler/src/dmsdk-bounded-span-recipes.mjs";
+import { fixedDigestPattern } from "../packages/compiler/src/dmsdk-pattern-catalog.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const defaults = {
   ir: "packages/bindings/generated/defold-sdk-ir.json",
   shapes: "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
+  sourceFacts: "packages/bindings/generated/defold-dmsdk-source-semantic-facts.json",
   policy: "packages/bindings/overrides/dmsdk-fixed-digest-bindings.json",
 };
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
@@ -34,37 +34,12 @@ function parseArgs(argv) {
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
     if (argument === "--check") options.check = true;
-    else if (["--ir", "--shapes", "--policy", "--out-root"].includes(argument))
+    else if (["--ir", "--shapes", "--source-facts", "--policy", "--out-root"].includes(argument))
       options[argument.slice(2).replace(/-([a-z])/g, (_, c) => c.toUpperCase())] = resolve(argv[++index]);
     else throw new Error(`Unknown argument ${argument}`);
   }
-  for (const key of ["ir", "shapes", "policy"]) options[key] = resolve(root, options[key]);
+  for (const key of ["ir", "shapes", "sourceFacts", "policy"]) options[key] = resolve(root, options[key]);
   return options;
-}
-
-function fixedDigestPattern() {
-  return defineDmSdkPattern({
-    schemaVersion: 1,
-    id: "span.fixed-output-digest",
-    family: "fixed-digest",
-    emitter: "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
-    priority: 900,
-    cost: 5,
-    fallback: false,
-    when: {
-      declarationKinds: ["function"],
-      result: { roles: ["scalar:void"] },
-      parameters: {
-        count: { exact: 3 },
-        positions: [
-          { roles: ["pointer:scalar:u8"], directions: ["in"] },
-          { roles: ["scalar:u32"], directions: ["value"] },
-          { roles: ["pointer:scalar:u8"], directions: ["out", "inout"] },
-        ],
-      },
-      requireSemanticTokens: BOUNDED_SPAN_SEMANTIC_TOKENS.fixedDigest,
-    },
-  });
 }
 
 function patternFacts(row, semanticTokens = []) {
@@ -78,8 +53,8 @@ function patternFacts(row, semanticTokens = []) {
   };
 }
 
-export function extractFixedDigestSemantics(declaration, candidate, recipe) {
-  return analyzeFixedDigestRecipe(declaration, candidate, recipe).semantics;
+export function extractFixedDigestSemantics(declaration, candidate, recipe, sourceFacts) {
+  return analyzeFixedDigestRecipe(declaration, candidate, recipe, sourceFacts).semantics;
 }
 
 function renderHeader(entries) {
@@ -132,23 +107,28 @@ async function build(options) {
   );
   const ir = JSON.parse(contents.ir);
   const shapes = JSON.parse(contents.shapes);
+  const sourceFacts = JSON.parse(contents.sourceFacts);
   const policy = JSON.parse(contents.policy);
-  if (ir.defoldRevision !== shapes.defoldRevision)
+  if (ir.defoldRevision !== shapes.defoldRevision || ir.defoldRevision !== sourceFacts.defoldRevision)
     throw new Error("Defold revisions differ between IR and ABI-shape census");
   if (sha256(contents.ir) !== shapes.sourceHashes.ir)
     throw new Error("IR hash does not match ABI-shape census provenance");
+  if (sha256(contents.ir) !== sourceFacts.sourceHashes.ir || sha256(contents.shapes) !== sourceFacts.sourceHashes.shapes)
+    throw new Error("Source semantic facts do not match their IR and ABI-shape provenance");
   if (
     policy.schemaVersion !== 1 ||
-    policy.policyVersion !== "fixed-digest-v3" ||
+    policy.policyVersion !== "fixed-digest-v4" ||
     policy.family !== "fixed-output-digest" ||
     policy.recipe?.input !== "borrowed-counted-bytes" ||
     policy.recipe?.output !== "caller-owned-fixed-size-bytes" ||
-    JSON.stringify(policy.recipe?.algorithms) !== JSON.stringify(["md5", "sha1", "sha256", "sha512"]) ||
     policy.recipe?.ownership !== "synchronous-noescape" ||
     policy.recipe?.fallback !== "universal-recipe"
   )
     throw new Error("Unsupported fixed-digest semantic policy");
   const declarations = new Map(ir.declarations.map((declaration) => [declaration.id, declaration]));
+  const implementationFacts = new Map(
+    sourceFacts.declarations.map((declaration) => [declaration.declarationId, declaration]),
+  );
   if (
     declarations.size !== ir.declarations.length ||
     new Set(shapes.rows.map(({ id }) => id)).size !== shapes.rows.length
@@ -165,7 +145,12 @@ async function build(options) {
     structurallyEligible += 1;
     const declaration = declarations.get(candidate.id);
     if (!declaration) throw new Error(`Fixed-digest structural candidate has no source declaration: ${candidate.id}`);
-    const analysis = analyzeFixedDigestRecipe(declaration, candidate, policy.recipe);
+    const analysis = analyzeFixedDigestRecipe(
+      declaration,
+      candidate,
+      policy.recipe,
+      implementationFacts.get(candidate.id),
+    );
     const semantics = analysis.semantics;
     if (!semantics) {
       blocked.push({
@@ -211,6 +196,7 @@ async function build(options) {
       ir: "packages/bindings/generated/defold-sdk-ir.json",
       shapes: "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
       policy: "packages/bindings/overrides/dmsdk-fixed-digest-bindings.json",
+      sourceFacts: "packages/bindings/generated/defold-dmsdk-source-semantic-facts.json",
     },
     sourceHashes: {
       ...Object.fromEntries(Object.entries(contents).map(([key, value]) => [key, sha256(value)])),

@@ -5,9 +5,9 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import {
   DMSDK_UNIVERSAL_FALLBACK_PATTERN,
   compactDmSdkPatternDecision,
-  defineDmSdkPattern,
   selectDmSdkPattern,
 } from "../packages/compiler/src/dmsdk-pattern-selector.mjs";
+import { directPrimitiveScalarPattern } from "../packages/compiler/src/dmsdk-pattern-catalog.mjs";
 
 const scriptDirectory = dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = resolve(scriptDirectory, "..");
@@ -101,24 +101,6 @@ function publicInclude(header) {
   const index = header.indexOf(marker);
   if (index < 0) throw new Error(`No public dmSDK include path in ${header}`);
   return `dmsdk/${header.slice(index + marker.length)}`;
-}
-
-function scalarPattern() {
-  return defineDmSdkPattern({
-    schemaVersion: 1,
-    id: "value.direct-primitive-scalar",
-    family: "scalar-thunk",
-    emitter: "scripts/generate-dmsdk-scalar-thunks.mjs",
-    priority: 820,
-    cost: 4,
-    fallback: false,
-    when: {
-      declarationKinds: ["function"],
-      result: { rolePrefixes: ["scalar:"] },
-      parameters: { every: [{ rolePrefixes: ["scalar:"], directions: ["value"] }] },
-      requireSemanticTokens: ["direct-native-primitive", "fixed-width-cell-codec", "synchronous-noescape"],
-    },
-  });
 }
 
 export function inferScalarThunkSemantics(declaration, row) {
@@ -376,7 +358,7 @@ export async function build() {
   const shapes = JSON.parse(contents.shapes);
   const recipe = JSON.parse(contents.recipe);
   const declarationsById = new Map(ir.declarations.map((declaration) => [declaration.id, declaration]));
-  const patterns = [scalarPattern(), DMSDK_UNIVERSAL_FALLBACK_PATTERN];
+  const patterns = [directPrimitiveScalarPattern(), DMSDK_UNIVERSAL_FALLBACK_PATTERN];
   const candidates = shapes.rows
     .map((row) => {
       const declaration = declarationsById.get(row.id);

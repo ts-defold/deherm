@@ -34,6 +34,13 @@ const scalarImplementationEvidence = Object.freeze([
   "upstream/defold/engine/graphics/src/graphics.cpp",
 ]);
 
+const semanticImplementationIncludeTrees = Object.freeze([
+  "upstream/defold/engine/dlib/src/dlib",
+  "upstream/defold/engine/dlib/src/stb",
+  "upstream/defold/engine/dlib/src/mbedtls/tf-psa-crypto/include",
+  "upstream/defold/engine/dlib/src/mbedtls/tf-psa-crypto/drivers/builtin/include",
+]);
+
 function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
@@ -127,6 +134,24 @@ export async function dmSdkCleanRoomEvidencePaths(repositoryRoot, defoldRevision
     if (declaration.disposition === "generated-raw-call")
       result.add(confined(declaration.header, `${declaration.id}.header`));
   }
+  const sourceFacts = JSON.parse(
+    await readFile(
+      path.join(repositoryRoot, "packages/bindings/generated/defold-dmsdk-source-semantic-facts.json"),
+      "utf8",
+    ),
+  );
+  assert(
+    sourceFacts.defoldRevision === defoldRevision,
+    `dmSDK source-fact revision ${sourceFacts.defoldRevision} does not match upstream.lock ${defoldRevision}`,
+  );
+  for (const source of sourceFacts.sources ?? []) {
+    result.add(confined(source.path, `${source.path}.source-fact`));
+  }
+  for (const directory of semanticImplementationIncludeTrees) {
+    for (const header of await walk(repositoryRoot, directory)) {
+      if (/\.(?:h|hpp|inl)$/u.test(header)) result.add(header);
+    }
+  }
   const sdkRoot = `upstream/extender/server/app/sdk/${defoldRevision}/defoldsdk`;
   // The universal recipe classifier is deliberately constrained by the public
   // SDK shipped for this exact Defold revision. Copy the complete public include
@@ -198,7 +223,7 @@ export async function discoverGeneratedDmSdkArtifacts(repositoryRoot = repositor
   const result = new Set();
   for (const file of await walk(path.join(repositoryRoot, "packages/bindings/generated"))) {
     if (
-      /^defold-dmsdk-(?:target-conditionals|binding-patterns|scalar-thunks|abi-shapes|enum-value-bindings|named-scalar-bindings|fixed-digest-bindings|base64-span-bindings|astc-probe-bindings|xtea-span-bindings|hash-span-bindings|hash-state-bindings|arena-span-blockers|projection-ir|borrowed-handle-bindings|scratch-scalar-out-bindings|cstring-value-bindings|universal-bindings|universal-ready-exact-plan|generated-adapter-exact-plan)\.json$/.test(
+      /^defold-dmsdk-(?:target-conditionals|binding-patterns|scalar-thunks|abi-shapes|source-semantic-facts|enum-value-bindings|named-scalar-bindings|fixed-digest-bindings|base64-span-bindings|astc-probe-bindings|xtea-span-bindings|hash-span-bindings|hash-state-bindings|arena-span-blockers|projection-ir|borrowed-handle-bindings|scratch-scalar-out-bindings|cstring-value-bindings|universal-bindings|fallback-audit|universal-ready-exact-plan|generated-adapter-exact-plan)\.json$/.test(
         file,
       )
     ) {
@@ -391,6 +416,7 @@ async function validateReports(root) {
     scratchScalarOut,
     cstringValue,
     universal,
+    fallbackAudit,
     readyExact,
     generatedExact,
   ] = await Promise.all([
@@ -411,6 +437,7 @@ async function validateReports(root) {
     load("packages/bindings/generated/defold-dmsdk-scratch-scalar-out-bindings.json"),
     load("packages/bindings/generated/defold-dmsdk-cstring-value-bindings.json"),
     load("packages/bindings/generated/defold-dmsdk-universal-bindings.json"),
+    load("packages/bindings/generated/defold-dmsdk-fallback-audit.json"),
     load("packages/bindings/generated/defold-dmsdk-universal-ready-exact-plan.json"),
     load("packages/bindings/generated/defold-dmsdk-generated-adapter-exact-plan.json"),
   ]);
@@ -510,10 +537,19 @@ async function validateReports(root) {
     "hash-state report does not have the pinned 10/10 lifecycle disposition",
   );
   assert(
-    generatedExact.generatedAdapterCount === 74 &&
+    generatedExact.generatedAdapterCount === 94 &&
       generatedExact.specializationRequiredCount ===
         runtimePendingCount - generatedExact.generatedAdapterCount - readyExact.universalReadyCount,
     "generated-adapter exact plan does not preserve the complete generated/universal/specialization partition",
+  );
+  assert(
+    fallbackAudit.coverage?.declarations === runtimePendingCount &&
+      fallbackAudit.coverage?.preferredSpecialized === universal.coverage?.preferredSpecialized &&
+      fallbackAudit.coverage?.universalFallback === universal.coverage?.usageMaterializedFallback &&
+      fallbackAudit.coverage?.auditedFallback === fallbackAudit.coverage?.universalFallback &&
+      fallbackAudit.coverage?.silentlyOmitted === 0 &&
+      universal.fallbackAudit?.reportSha256 === fallbackAudit.reportSha256,
+    "universal fallback audit does not account for every retained base path",
   );
   assert(
     arenaSpan.coverage.arenaSpanCensus === 79 &&

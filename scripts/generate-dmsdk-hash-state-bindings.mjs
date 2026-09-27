@@ -8,9 +8,9 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import {
   DMSDK_UNIVERSAL_FALLBACK_PATTERN,
   compactDmSdkPatternDecision,
-  defineDmSdkPattern,
   selectDmSdkPattern,
 } from "../packages/compiler/src/dmsdk-pattern-selector.mjs";
+import { incrementalHashStatePattern } from "../packages/compiler/src/dmsdk-pattern-catalog.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const defaults = Object.freeze({
@@ -27,11 +27,7 @@ const artifactPaths = Object.freeze({
 });
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 const compareCodeUnits = (left, right) => (left < right ? -1 : left > right ? 1 : 0);
-const hashStateSemanticTokens = Object.freeze([
-  "generation-checked-state",
-  "incremental-hash-lifecycle",
-  "synchronous-noescape",
-]);
+const hashStateSemanticTokens = incrementalHashStatePattern().when.requireSemanticTokens;
 const exactKeys = (value, expected, label) => {
   const actual = Object.keys(value ?? {}).sort(compareCodeUnits);
   const wanted = [...expected].sort(compareCodeUnits);
@@ -50,24 +46,6 @@ function parseArgs(argv) {
   }
   for (const key of Object.keys(defaults)) options[key] = path.resolve(root, options[key]);
   return options;
-}
-
-function hashStatePattern(policy) {
-  return defineDmSdkPattern({
-    schemaVersion: 1,
-    id: "state.incremental-hash-lifecycle",
-    family: "hash-state",
-    emitter: "scripts/generate-dmsdk-hash-state-bindings.mjs",
-    priority: 850,
-    cost: 12,
-    fallback: false,
-    when: {
-      declarationKinds: ["function"],
-      result: { rolePrefixes: ["scalar:"] },
-      parameters: { some: [{ rolePrefixes: ["pointer:record:"], directions: ["in", "inout"] }] },
-      requireSemanticTokens: hashStateSemanticTokens,
-    },
-  });
 }
 
 function patternFacts(row, semanticTokens = []) {
@@ -210,7 +188,7 @@ function validate(inputs, parsed) {
     policy.registry.capacityPerWidth < 1
   )
     throw new Error("hash-state semantic policy is unsupported");
-  const patterns = [hashStatePattern(policy), DMSDK_UNIVERSAL_FALLBACK_PATTERN];
+  const patterns = [incrementalHashStatePattern(), DMSDK_UNIVERSAL_FALLBACK_PATTERN];
   const declarations = new Map(ir.declarations.map((entry) => [entry.id, entry]));
   const inferred = new Map();
   const lifecycle = new Map();

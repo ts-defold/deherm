@@ -6,9 +6,9 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import {
   DMSDK_UNIVERSAL_FALLBACK_PATTERN,
   compactDmSdkPatternDecision,
-  defineDmSdkPattern,
   selectDmSdkPattern,
 } from "../packages/compiler/src/dmsdk-pattern-selector.mjs";
+import { enumValuePattern } from "../packages/compiler/src/dmsdk-pattern-catalog.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const paths = {
@@ -95,24 +95,6 @@ function sourceGroup(header) {
     .toLowerCase();
   if (!name) throw new Error(`No deterministic enum-value source group for ${header}`);
   return { name, include };
-}
-
-function enumValuePattern() {
-  return defineDmSdkPattern({
-    schemaVersion: 1,
-    id: "value.enum-domain-direct",
-    family: "enum-value",
-    emitter: "scripts/generate-dmsdk-enum-value-bindings.mjs",
-    priority: 810,
-    cost: 6,
-    fallback: false,
-    when: {
-      declarationKinds: ["function"],
-      result: { rolePrefixes: ["scalar:", "enum:"] },
-      parameters: { every: [{ rolePrefixes: ["scalar:", "enum:"], directions: ["value"] }] },
-      requireSemanticTokens: ["declared-enum-domain", "fixed-width-cell-codec", "synchronous-noescape"],
-    },
-  });
 }
 
 export function inferEnumValueSemantics(declaration, row) {

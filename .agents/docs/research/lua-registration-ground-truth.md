@@ -497,6 +497,14 @@ disagree only on result arity, because both return `0` on their guard path.
 
 # Boundary
 
+This frontend reads Lua-shaped APIs from two complementary inputs. Ref-doc
+`.lua` stubs provide public names, descriptions, and authored type intent; the
+authoritative route and transport facts come from C/C++ `luaL_Reg` registration
+tables, registration calls, Lua-stack reads, pushes, returns, and reachable
+helpers. It therefore finds routes that documentation omitted and refuses to
+invent a registered route merely because prose names one. It is not a general
+parser for arbitrary game-authored or extension-authored `.lua` bodies yet.
+
 This is **generation and static-analysis evidence only**. Nothing here was
 compiled, linked, or executed. The verifier reads C source; it does not prove
 that a registered route behaves as its body suggests at runtime, and a

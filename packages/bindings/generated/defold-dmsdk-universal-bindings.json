@@ -2,14 +2,27 @@
   "schemaVersion": 1,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "sourceHashes": {
-    "projection": "c21f68ff2f76a3484bc09e0ad5bb78bed29b636ea92042319d19dca229c05bb4",
+    "projection": "0ddec1a1a7d381f341caede4d19115fe51bc2f2d534cdae1cb0840be9f140a07",
     "sdkIr": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
+    "abiShapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
     "specialized": {
-      "arenaCString": "ece3bb7211b602d0ceefbd74b482c0d6fef7bed133e7d6f763e630baf996db24",
-      "borrowedHandle": "cc1962bc425d24b65fc5481b64eefaf03ce4bd7f12e5936a8b35e53b251ccb38",
-      "scratchScalarOut": "4ae4ccc1a4875804a82eab3fabec861946ef5b470671b6b827036bd3a20c12b0",
-      "cstringValue": "1f3587099d355d2b1c9fc074b83d726ac24ff90bfe5f540eb9130998c41e33b0",
+      "scalar": "5118cca8108704a921b1978f79098a0d01ed1ecb6380181664b66b887daddaf0",
+      "enumValue": "1b496dcd15611f07b7c142d8dcf7df54e318d1917420792809e1b526657341e6",
+      "namedScalar": "fcf97a985ce897a14e1c42832c8197bc040414e9bcb0eeb97885c88d3334a549",
+      "fixedDigest": "486894b57c9ec8527a8591a07d4ee407ad0656da7b37693a108f7235940c58b1",
+      "base64Span": "9e9fe4932de351903548a26044af965496fdc7109b3951fe7873543ab545e4d2",
+      "astcProbe": "a670930588a6e08ae3f5f358ae968558b5a83e578a5757fb3207bf9384a8db98",
+      "xteaSpan": "2519ebb56400f587e55a944d29a735f70c14eff3c7d0ccf76a8cb33f1c56ffeb",
+      "hashSpan": "140976814df7caec7d86490699db79723c4e028d3d4856fac91c084ac06f73cc",
+      "arenaCString": "3a9f8cea273ef3baa6d79c4178aa919f8cdee3a7f1eac3aa0da98b4711a6b4dc",
+      "borrowedHandle": "b226d42b363fa13ee25b3163c5c41f496300315b9978304dcf2953f0c84670fb",
+      "scratchScalarOut": "8ed0c44444f9982bd4da5865d3e54f1fe1cbf7843998a4d86a3357a2b5d41e84",
+      "cstringValue": "bb20eb817da027055ff5193767e3b6d3eb5befea2d677e6d7726d8357a72bdd7",
       "hashState": "10c311d6ded6edb05f00b39f7cc781a0d2c2b81fc2e25e6e5b94d9114a78df32"
+    },
+    "patternPolicies": {
+      "borrowedHandle": "48b9913d92f5ccbc39f9136c7cd28430443066f2527d69cbbb3ffecf39198f73",
+      "scratchScalarOut": "9d2a8a95e9f918bcc517cb2a702df912a067e6a941ef3f4291f96ddd568b3099"
     },
     "publicSdk": {
       "revision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
@@ -470,8 +483,8 @@
       ],
       "requiredHeadersSha256": "b332e968c991eec3d9ef64f504264c500efa2dddc8a035445b26e676b3c90d2c"
     },
-    "aggregate": "ffa82d18660cb33b8bb6b58ed1691f3b8b9fe46d5a646a67a2663d20cb14a847",
-    "catalog": "d597cf86477719a5115004b5aee863916bbd779494d41e11692058a45526a4cc"
+    "aggregate": "22a261d126d550e7ea898fff35adaec02e3dfbeeab6b52b2d13c4906f7a1a90e",
+    "catalog": "f2249952077681a6945069a2b75aae050bfb1a11e2288fe60d771f11fd65ccbf"
   },
   "coverage": {
     "declarations": 1361,
@@ -482,9 +495,9 @@
     "browserDirectMemoryMetadata": 1361,
     "typescriptStableIds": 1361,
     "silentlyOmitted": 0,
-    "preferredSpecialized": 81,
-    "usageMaterializedFallback": 1280,
-    "universalReadyExactVectors": 557
+    "preferredSpecialized": 101,
+    "usageMaterializedFallback": 1260,
+    "universalReadyExactVectors": 537
   },
   "abi": {
     "schema": "DehermDmSdkUniversalFrame/v1",
@@ -509,7 +522,8 @@
     "defold/defold_hermes/src/generated_dmsdk_universal_static_frame.cpp",
     "packages/bindings/generated/defold-dmsdk-universal-ready-exact-plan.json",
     "tests/fixtures/generated_dmsdk_universal_ready_provider.cpp",
-    "tests/fixtures/generated_dmsdk_universal_ready_verification.cpp"
+    "tests/fixtures/generated_dmsdk_universal_ready_verification.cpp",
+    "packages/bindings/generated/defold-dmsdk-fallback-audit.json"
   ],
   "recipes": [
     {
@@ -22264,7 +22278,26 @@
         "header": "dmsdk/dlib/buffer.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 0,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 182,
@@ -22928,7 +22961,26 @@
         "header": "dmsdk/dlib/condition_variable.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 1,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 186,
@@ -23211,7 +23263,26 @@
         "header": "dmsdk/dlib/condition_variable.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 2,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 189,
@@ -23335,7 +23406,26 @@
         "header": "dmsdk/dlib/condition_variable.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 3,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 190,
@@ -24587,7 +24677,26 @@
         "header": "dmsdk/dlib/connection_pool.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 4,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 198,
@@ -25195,7 +25304,26 @@
         "header": "dmsdk/dlib/connection_pool.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 5,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 203,
@@ -33345,7 +33473,26 @@
         "header": "dmsdk/gameobject/gameobject.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 6,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 270,
@@ -33456,7 +33603,26 @@
         "header": "dmsdk/gameobject/gameobject.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 7,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 271,
@@ -33769,7 +33935,26 @@
         "header": "dmsdk/gameobject/component.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 8,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 274,
@@ -35276,7 +35461,26 @@
         "header": "dmsdk/gameobject/component.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 9,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 285,
@@ -36365,7 +36569,26 @@
         "header": "dmsdk/gameobject/component.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 10,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 293,
@@ -36622,7 +36845,26 @@
         "header": "dmsdk/gameobject/component.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 11,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 295,
@@ -37247,8 +37489,16 @@
         }
       },
       "preferredLowering": {
-        "state": "universal-fallback",
-        "family": "universal-recipe"
+        "state": "generated-adapter",
+        "family": "namedScalar",
+        "wrapper": "deherm_dmsdk_named_scalar_dm_game_object_create_instance_id",
+        "adapter": {
+          "applicability": "callable",
+          "kind": "family-dispatch",
+          "id": 0,
+          "dispatcher": "deherm_dmsdk_named_scalar_dispatch",
+          "blockers": []
+        }
       },
       "fallback": {
         "state": "materializable",
@@ -38473,7 +38723,26 @@
         "header": "dmsdk/gameobject/gameobject.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 12,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 308,
@@ -38690,7 +38959,26 @@
         "header": "dmsdk/gameobject/gameobject.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 13,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 310,
@@ -38794,7 +39082,26 @@
         "header": "dmsdk/gameobject/gameobject.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 14,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 311,
@@ -41395,7 +41702,26 @@
         "header": "dmsdk/gameobject/gameobject.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 15,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 325,
@@ -42139,7 +42465,26 @@
         "header": "dmsdk/gameobject/gameobject.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 16,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 330,
@@ -42895,7 +43240,26 @@
         "header": "dmsdk/gameobject/gameobject.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 17,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 337,
@@ -43074,7 +43438,26 @@
         "header": "dmsdk/gameobject/gameobject.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 18,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 339,
@@ -44373,7 +44756,26 @@
         "header": "dmsdk/gameobject/gameobject_props.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 19,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 349,
@@ -44636,7 +45038,26 @@
         "header": "dmsdk/gameobject/gameobject_props.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 20,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 351,
@@ -44763,7 +45184,26 @@
         "header": "dmsdk/gameobject/gameobject_props.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 21,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 352,
@@ -44894,7 +45334,26 @@
         "header": "dmsdk/gameobject/gameobject_props.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 22,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 353,
@@ -47327,7 +47786,26 @@
         "header": "dmsdk/gameobject/gameobject.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 23,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 374,
@@ -50199,7 +50677,26 @@
         "header": "dmsdk/gameobject/gameobject.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 24,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 389,
@@ -50442,7 +50939,26 @@
         "header": "dmsdk/gameobject/gameobject.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 25,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 391,
@@ -51400,7 +51916,26 @@
         "header": "dmsdk/gamesys/render_constants.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 26,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 399,
@@ -51516,7 +52051,26 @@
         "header": "dmsdk/gamesys/render_constants.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 27,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 400,
@@ -54464,7 +55018,26 @@
         "header": "dmsdk/gamesys/components/comp_factory.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 28,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 415,
@@ -54589,7 +55162,26 @@
         "header": "dmsdk/gamesys/components/comp_factory.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 29,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 416,
@@ -58939,7 +59531,26 @@
         "header": "dmsdk/gamesys/render_constants.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 30,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 444,
@@ -65243,7 +65854,26 @@
         "header": "dmsdk/graphics/graphics.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 31,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 480,
@@ -65426,7 +66056,26 @@
         "header": "dmsdk/graphics/graphics.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 32,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 481,
@@ -66540,7 +67189,26 @@
         "header": "dmsdk/graphics/graphics.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 33,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 492,
@@ -66823,7 +67491,26 @@
         "header": "dmsdk/graphics/graphics.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 34,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 494,
@@ -66941,7 +67628,26 @@
         "header": "dmsdk/graphics/graphics.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 35,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 495,
@@ -67065,7 +67771,26 @@
         "header": "dmsdk/graphics/graphics.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 36,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 496,
@@ -67665,7 +68390,26 @@
         "header": "dmsdk/graphics/graphics.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 37,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 499,
@@ -67960,7 +68704,26 @@
         "header": "dmsdk/graphics/graphics.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 38,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 501,
@@ -68090,7 +68853,26 @@
         "header": "dmsdk/graphics/graphics.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 39,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 502,
@@ -68257,7 +69039,26 @@
         "header": "dmsdk/graphics/graphics.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 40,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 503,
@@ -68658,7 +69459,26 @@
         "header": "dmsdk/graphics/graphics.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 41,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 507,
@@ -68895,7 +69715,26 @@
         "header": "dmsdk/graphics/graphics.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 42,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 509,
@@ -68995,7 +69834,26 @@
         "header": "dmsdk/graphics/graphics.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 43,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 510,
@@ -69313,7 +70171,26 @@
         "header": "dmsdk/graphics/graphics.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 44,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 513,
@@ -69413,7 +70290,26 @@
         "header": "dmsdk/graphics/graphics.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 45,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 514,
@@ -69513,7 +70409,26 @@
         "header": "dmsdk/graphics/graphics.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 46,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 515,
@@ -71155,7 +72070,26 @@
         "header": "dmsdk/graphics/graphics.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 47,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 531,
@@ -71274,7 +72208,26 @@
         "header": "dmsdk/graphics/graphics.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 48,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 532,
@@ -71393,7 +72346,26 @@
         "header": "dmsdk/graphics/graphics.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 49,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 533,
@@ -71512,7 +72484,26 @@
         "header": "dmsdk/graphics/graphics.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 50,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 534,
@@ -71896,7 +72887,26 @@
         "header": "dmsdk/graphics/graphics.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 51,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 537,
@@ -72502,7 +73512,26 @@
         "header": "dmsdk/graphics/graphics.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 52,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 541,
@@ -73057,7 +74086,26 @@
         "header": "dmsdk/graphics/graphics.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 53,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 544,
@@ -73176,7 +74224,26 @@
         "header": "dmsdk/graphics/graphics.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 54,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 545,
@@ -73295,7 +74362,26 @@
         "header": "dmsdk/graphics/graphics.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 55,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 546,
@@ -73414,7 +74500,26 @@
         "header": "dmsdk/graphics/graphics.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 56,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 547,
@@ -73857,7 +74962,26 @@
         "header": "dmsdk/graphics/graphics.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 57,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 550,
@@ -73976,7 +75100,26 @@
         "header": "dmsdk/graphics/graphics.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 58,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 551,
@@ -74092,7 +75235,26 @@
         "header": "dmsdk/graphics/graphics.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 59,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 552,
@@ -74370,7 +75532,26 @@
         "header": "dmsdk/graphics/graphics.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 60,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 554,
@@ -74470,7 +75651,26 @@
         "header": "dmsdk/graphics/graphics.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 61,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 555,
@@ -74570,7 +75770,26 @@
         "header": "dmsdk/graphics/graphics.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 62,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 556,
@@ -78207,7 +79426,26 @@
         "header": "dmsdk/graphics/graphics.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 63,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 578,
@@ -78918,7 +80156,26 @@
         "header": "dmsdk/graphics/graphics.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 64,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 583,
@@ -79348,7 +80605,26 @@
         "header": "dmsdk/graphics/graphics.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 65,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 586,
@@ -79490,7 +80766,26 @@
         "header": "dmsdk/graphics/graphics.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 66,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 587,
@@ -79620,7 +80915,26 @@
         "header": "dmsdk/graphics/graphics.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 67,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 588,
@@ -79767,7 +81081,26 @@
         "header": "dmsdk/graphics/graphics.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 68,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 589,
@@ -80265,7 +81598,26 @@
         "header": "dmsdk/graphics/graphics.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 69,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 592,
@@ -82245,7 +83597,26 @@
         "header": "dmsdk/graphics/graphics.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 70,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 601,
@@ -86101,7 +87472,26 @@
         "header": "dmsdk/gui/gui.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 71,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 632,
@@ -86224,7 +87614,26 @@
         "header": "dmsdk/gui/gui.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 72,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 633,
@@ -86343,7 +87752,26 @@
         "header": "dmsdk/gui/gui.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 73,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 634,
@@ -86790,7 +88218,26 @@
         "header": "dmsdk/gui/gui.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 74,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 637,
@@ -88000,7 +89447,26 @@
         "header": "dmsdk/gui/gui.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 75,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 645,
@@ -88130,7 +89596,26 @@
         "header": "dmsdk/gui/gui.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 76,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 646,
@@ -89307,7 +90792,7 @@
       "preferredLowering": {
         "state": "generated-adapter",
         "family": "hashState",
-        "wrapper": null,
+        "wrapper": "dmHashClone32",
         "adapter": {
           "applicability": "callable",
           "kind": "family-dispatch",
@@ -89443,7 +90928,7 @@
       "preferredLowering": {
         "state": "generated-adapter",
         "family": "hashState",
-        "wrapper": null,
+        "wrapper": "dmHashClone64",
         "adapter": {
           "applicability": "callable",
           "kind": "family-dispatch",
@@ -89548,7 +91033,7 @@
       "preferredLowering": {
         "state": "generated-adapter",
         "family": "hashState",
-        "wrapper": null,
+        "wrapper": "dmHashFinal32",
         "adapter": {
           "applicability": "callable",
           "kind": "family-dispatch",
@@ -89653,7 +91138,7 @@
       "preferredLowering": {
         "state": "generated-adapter",
         "family": "hashState",
-        "wrapper": null,
+        "wrapper": "dmHashFinal64",
         "adapter": {
           "applicability": "callable",
           "kind": "family-dispatch",
@@ -89769,7 +91254,7 @@
       "preferredLowering": {
         "state": "generated-adapter",
         "family": "hashState",
-        "wrapper": null,
+        "wrapper": "dmHashInit32",
         "adapter": {
           "applicability": "callable",
           "kind": "family-dispatch",
@@ -89885,7 +91370,7 @@
       "preferredLowering": {
         "state": "generated-adapter",
         "family": "hashState",
-        "wrapper": null,
+        "wrapper": "dmHashInit64",
         "adapter": {
           "applicability": "callable",
           "kind": "family-dispatch",
@@ -89989,7 +91474,7 @@
       "preferredLowering": {
         "state": "generated-adapter",
         "family": "hashState",
-        "wrapper": null,
+        "wrapper": "dmHashRelease32",
         "adapter": {
           "applicability": "callable",
           "kind": "family-dispatch",
@@ -90093,7 +91578,7 @@
       "preferredLowering": {
         "state": "generated-adapter",
         "family": "hashState",
-        "wrapper": null,
+        "wrapper": "dmHashRelease64",
         "adapter": {
           "applicability": "callable",
           "kind": "family-dispatch",
@@ -93308,7 +94793,7 @@
       "preferredLowering": {
         "state": "generated-adapter",
         "family": "hashState",
-        "wrapper": null,
+        "wrapper": "dmHashUpdateBuffer32",
         "adapter": {
           "applicability": "callable",
           "kind": "family-dispatch",
@@ -93443,7 +94928,7 @@
       "preferredLowering": {
         "state": "generated-adapter",
         "family": "hashState",
-        "wrapper": null,
+        "wrapper": "dmHashUpdateBuffer64",
         "adapter": {
           "applicability": "callable",
           "kind": "family-dispatch",
@@ -93581,7 +95066,26 @@
         "header": "dmsdk/hid/hid.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 77,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 695,
@@ -95585,7 +97089,26 @@
         "header": "dmsdk/hid/hid.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 78,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 710,
@@ -95708,7 +97231,26 @@
         "header": "dmsdk/hid/hid.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 79,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 711,
@@ -96649,7 +98191,26 @@
         "header": "dmsdk/hid/hid.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 80,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 714,
@@ -96760,7 +98321,26 @@
         "header": "dmsdk/hid/hid.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 81,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 715,
@@ -97689,7 +99269,26 @@
         "header": "dmsdk/dlib/image.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 82,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 721,
@@ -97915,7 +99514,26 @@
         "header": "dmsdk/dlib/image.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 83,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 723,
@@ -101694,7 +103312,26 @@
         "header": "dmsdk/dlib/message.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 84,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 757,
@@ -101792,7 +103429,26 @@
         "header": "dmsdk/dlib/message.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 85,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 758,
@@ -103200,7 +104856,26 @@
         "header": "dmsdk/dlib/mutex.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 86,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 770,
@@ -103757,7 +105432,26 @@
         "header": "dmsdk/dlib/mutex.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 87,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 776,
@@ -103856,7 +105550,26 @@
         "header": "dmsdk/dlib/mutex.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 88,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 777,
@@ -105450,7 +107163,26 @@
         "header": "dmsdk/render/render.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 89,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 792,
@@ -105549,7 +107281,26 @@
         "header": "dmsdk/render/render.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 90,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 793,
@@ -105648,7 +107399,26 @@
         "header": "dmsdk/render/render.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 91,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 794,
@@ -106179,7 +107949,26 @@
         "header": "dmsdk/render/render.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 92,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 799,
@@ -106732,7 +108521,26 @@
         "header": "dmsdk/render/render.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 93,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 803,
@@ -106848,7 +108656,26 @@
         "header": "dmsdk/render/render.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 94,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 804,
@@ -106948,7 +108775,26 @@
         "header": "dmsdk/render/render.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 95,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 805,
@@ -107522,7 +109368,26 @@
         "header": "dmsdk/render/render.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 96,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 809,
@@ -108225,7 +110090,26 @@
         "header": "dmsdk/render/render.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 97,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 815,
@@ -109114,7 +110998,26 @@
         "header": "dmsdk/render/render.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 98,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 822,
@@ -109229,7 +111132,26 @@
         "header": "dmsdk/render/render.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 99,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 823,
@@ -113492,7 +115414,7 @@
       "preferredLowering": {
         "state": "generated-adapter",
         "family": "arenaCString",
-        "wrapper": null,
+        "wrapper": "deherm_dmsdk_arena_cstring_dispatch",
         "adapter": {
           "applicability": "callable",
           "kind": "family-dispatch",
@@ -114446,7 +116368,26 @@
         "header": "dmsdk/resource/resource_gen.hpp",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 100,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 850,
@@ -114550,7 +116491,26 @@
         "header": "dmsdk/resource/resource.hpp",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 101,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 851,
@@ -115624,7 +117584,26 @@
         "header": "dmsdk/resource/resource_gen.hpp",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 102,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 857,
@@ -117001,7 +118980,26 @@
         "header": "dmsdk/resource/resource.hpp",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 103,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 864,
@@ -119106,7 +121104,26 @@
         "header": "dmsdk/resource/resource_gen.hpp",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 104,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 877,
@@ -120795,7 +122812,26 @@
         "header": "dmsdk/rig/rig.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 105,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 886,
@@ -120895,7 +122931,26 @@
         "header": "dmsdk/rig/rig.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 106,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 887,
@@ -121007,7 +123062,26 @@
         "header": "dmsdk/rig/rig.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 107,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 888,
@@ -121107,7 +123181,26 @@
         "header": "dmsdk/rig/rig.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 108,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 889,
@@ -121331,7 +123424,26 @@
         "header": "dmsdk/rig/rig.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 109,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 891,
@@ -121435,7 +123547,26 @@
         "header": "dmsdk/rig/rig.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 110,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 892,
@@ -121673,7 +123804,26 @@
         "header": "dmsdk/rig/rig.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 111,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 894,
@@ -121891,7 +124041,26 @@
         "header": "dmsdk/rig/rig.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 112,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 896,
@@ -121991,7 +124160,26 @@
         "header": "dmsdk/rig/rig.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 113,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 897,
@@ -122429,7 +124617,26 @@
         "header": "dmsdk/rig/rig.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 114,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 900,
@@ -122937,7 +125144,26 @@
         "header": "dmsdk/rig/rig.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 115,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 903,
@@ -123202,7 +125428,26 @@
         "header": "dmsdk/rig/rig.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 116,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 905,
@@ -133888,7 +136133,26 @@
         "header": "dmsdk/dlib/socket.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 117,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 990,
@@ -138583,8 +140847,16 @@
         }
       },
       "preferredLowering": {
-        "state": "universal-fallback",
-        "family": "universal-recipe"
+        "state": "generated-adapter",
+        "family": "namedScalar",
+        "wrapper": "deherm_dmsdk_named_scalar_dm_sound_is_group_muted",
+        "adapter": {
+          "applicability": "callable",
+          "kind": "family-dispatch",
+          "id": 1,
+          "dispatcher": "deherm_dmsdk_named_scalar_dispatch",
+          "blockers": []
+        }
       },
       "fallback": {
         "state": "materializable",
@@ -140967,7 +143239,7 @@
       "preferredLowering": {
         "state": "generated-adapter",
         "family": "arenaCString",
-        "wrapper": null,
+        "wrapper": "deherm_dmsdk_arena_cstring_dispatch",
         "adapter": {
           "applicability": "callable",
           "kind": "family-dispatch",
@@ -141470,7 +143742,7 @@
       "preferredLowering": {
         "state": "generated-adapter",
         "family": "arenaCString",
-        "wrapper": null,
+        "wrapper": "deherm_dmsdk_arena_cstring_dispatch",
         "adapter": {
           "applicability": "callable",
           "kind": "family-dispatch",
@@ -142612,8 +144884,16 @@
         }
       },
       "preferredLowering": {
-        "state": "universal-fallback",
-        "family": "universal-recipe"
+        "state": "generated-adapter",
+        "family": "namedScalar",
+        "wrapper": "deherm_dmsdk_named_scalar_dm_thread_alloc_tls",
+        "adapter": {
+          "applicability": "callable",
+          "kind": "family-dispatch",
+          "id": 2,
+          "dispatcher": "deherm_dmsdk_named_scalar_dispatch",
+          "blockers": []
+        }
       },
       "fallback": {
         "state": "materializable",
@@ -142700,8 +144980,16 @@
         }
       },
       "preferredLowering": {
-        "state": "universal-fallback",
-        "family": "universal-recipe"
+        "state": "generated-adapter",
+        "family": "namedScalar",
+        "wrapper": "deherm_dmsdk_named_scalar_dm_thread_detach",
+        "adapter": {
+          "applicability": "callable",
+          "kind": "family-dispatch",
+          "id": 3,
+          "dispatcher": "deherm_dmsdk_named_scalar_dispatch",
+          "blockers": []
+        }
       },
       "fallback": {
         "state": "materializable",
@@ -142788,8 +145076,16 @@
         }
       },
       "preferredLowering": {
-        "state": "universal-fallback",
-        "family": "universal-recipe"
+        "state": "generated-adapter",
+        "family": "namedScalar",
+        "wrapper": "deherm_dmsdk_named_scalar_dm_thread_free_tls",
+        "adapter": {
+          "applicability": "callable",
+          "kind": "family-dispatch",
+          "id": 4,
+          "dispatcher": "deherm_dmsdk_named_scalar_dispatch",
+          "blockers": []
+        }
       },
       "fallback": {
         "state": "materializable",
@@ -142864,8 +145160,16 @@
         }
       },
       "preferredLowering": {
-        "state": "universal-fallback",
-        "family": "universal-recipe"
+        "state": "generated-adapter",
+        "family": "namedScalar",
+        "wrapper": "deherm_dmsdk_named_scalar_dm_thread_get_current_thread",
+        "adapter": {
+          "applicability": "callable",
+          "kind": "family-dispatch",
+          "id": 5,
+          "dispatcher": "deherm_dmsdk_named_scalar_dispatch",
+          "blockers": []
+        }
       },
       "fallback": {
         "state": "materializable",
@@ -143047,8 +145351,16 @@
         }
       },
       "preferredLowering": {
-        "state": "universal-fallback",
-        "family": "universal-recipe"
+        "state": "generated-adapter",
+        "family": "namedScalar",
+        "wrapper": "deherm_dmsdk_named_scalar_dm_thread_join",
+        "adapter": {
+          "applicability": "callable",
+          "kind": "family-dispatch",
+          "id": 6,
+          "dispatcher": "deherm_dmsdk_named_scalar_dispatch",
+          "blockers": []
+        }
       },
       "fallback": {
         "state": "materializable",
@@ -146901,7 +149213,7 @@
       "preferredLowering": {
         "state": "generated-adapter",
         "family": "arenaCString",
-        "wrapper": null,
+        "wrapper": "deherm_dmsdk_arena_cstring_dispatch",
         "adapter": {
           "applicability": "callable",
           "kind": "family-dispatch",
@@ -156613,7 +158925,26 @@
         "header": "dmsdk/font/fontcollection.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 118,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 1160,
@@ -156836,7 +159167,26 @@
         "header": "dmsdk/font/fontcollection.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 119,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 1162,
@@ -157082,7 +159432,26 @@
         "header": "dmsdk/font/font.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 120,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 1164,
@@ -157339,7 +159708,26 @@
         "header": "dmsdk/font/font.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 121,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 1166,
@@ -157451,7 +159839,26 @@
         "header": "dmsdk/font/font.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 122,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 1167,
@@ -157917,7 +160324,26 @@
         "header": "dmsdk/font/font.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 123,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 1170,
@@ -158029,7 +160455,26 @@
         "header": "dmsdk/font/font.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 124,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 1171,
@@ -158232,7 +160677,26 @@
         "header": "dmsdk/font/font.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 125,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 1173,
@@ -158332,7 +160796,26 @@
         "header": "dmsdk/font/font.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 126,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 1174,
@@ -158444,7 +160927,26 @@
         "header": "dmsdk/font/font.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 127,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 1175,
@@ -164331,7 +166833,26 @@
         "header": "dmsdk/dlib/jobsystem.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 128,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 1220,
@@ -164679,7 +167200,26 @@
         "header": "dmsdk/dlib/jobsystem.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 129,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 1223,
@@ -165107,7 +167647,26 @@
         "header": "dmsdk/dlib/jobsystem.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 130,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 1226,
@@ -167714,8 +170273,16 @@
         }
       },
       "preferredLowering": {
-        "state": "universal-fallback",
-        "family": "universal-recipe"
+        "state": "generated-adapter",
+        "family": "namedScalar",
+        "wrapper": "deherm_dmsdk_named_scalar_profile_property_add_f32",
+        "adapter": {
+          "applicability": "callable",
+          "kind": "family-dispatch",
+          "id": 7,
+          "dispatcher": "deherm_dmsdk_named_scalar_dispatch",
+          "blockers": []
+        }
       },
       "fallback": {
         "state": "materializable",
@@ -167814,8 +170381,16 @@
         }
       },
       "preferredLowering": {
-        "state": "universal-fallback",
-        "family": "universal-recipe"
+        "state": "generated-adapter",
+        "family": "namedScalar",
+        "wrapper": "deherm_dmsdk_named_scalar_profile_property_add_f64",
+        "adapter": {
+          "applicability": "callable",
+          "kind": "family-dispatch",
+          "id": 8,
+          "dispatcher": "deherm_dmsdk_named_scalar_dispatch",
+          "blockers": []
+        }
       },
       "fallback": {
         "state": "materializable",
@@ -167914,8 +170489,16 @@
         }
       },
       "preferredLowering": {
-        "state": "universal-fallback",
-        "family": "universal-recipe"
+        "state": "generated-adapter",
+        "family": "namedScalar",
+        "wrapper": "deherm_dmsdk_named_scalar_profile_property_add_s32",
+        "adapter": {
+          "applicability": "callable",
+          "kind": "family-dispatch",
+          "id": 9,
+          "dispatcher": "deherm_dmsdk_named_scalar_dispatch",
+          "blockers": []
+        }
       },
       "fallback": {
         "state": "materializable",
@@ -168014,8 +170597,16 @@
         }
       },
       "preferredLowering": {
-        "state": "universal-fallback",
-        "family": "universal-recipe"
+        "state": "generated-adapter",
+        "family": "namedScalar",
+        "wrapper": "deherm_dmsdk_named_scalar_profile_property_add_s64",
+        "adapter": {
+          "applicability": "callable",
+          "kind": "family-dispatch",
+          "id": 10,
+          "dispatcher": "deherm_dmsdk_named_scalar_dispatch",
+          "blockers": []
+        }
       },
       "fallback": {
         "state": "materializable",
@@ -168114,8 +170705,16 @@
         }
       },
       "preferredLowering": {
-        "state": "universal-fallback",
-        "family": "universal-recipe"
+        "state": "generated-adapter",
+        "family": "namedScalar",
+        "wrapper": "deherm_dmsdk_named_scalar_profile_property_add_u32",
+        "adapter": {
+          "applicability": "callable",
+          "kind": "family-dispatch",
+          "id": 11,
+          "dispatcher": "deherm_dmsdk_named_scalar_dispatch",
+          "blockers": []
+        }
       },
       "fallback": {
         "state": "materializable",
@@ -168214,8 +170813,16 @@
         }
       },
       "preferredLowering": {
-        "state": "universal-fallback",
-        "family": "universal-recipe"
+        "state": "generated-adapter",
+        "family": "namedScalar",
+        "wrapper": "deherm_dmsdk_named_scalar_profile_property_add_u64",
+        "adapter": {
+          "applicability": "callable",
+          "kind": "family-dispatch",
+          "id": 12,
+          "dispatcher": "deherm_dmsdk_named_scalar_dispatch",
+          "blockers": []
+        }
       },
       "fallback": {
         "state": "materializable",
@@ -168314,8 +170921,16 @@
         }
       },
       "preferredLowering": {
-        "state": "universal-fallback",
-        "family": "universal-recipe"
+        "state": "generated-adapter",
+        "family": "namedScalar",
+        "wrapper": "deherm_dmsdk_named_scalar_profile_property_set_bool",
+        "adapter": {
+          "applicability": "callable",
+          "kind": "family-dispatch",
+          "id": 13,
+          "dispatcher": "deherm_dmsdk_named_scalar_dispatch",
+          "blockers": []
+        }
       },
       "fallback": {
         "state": "materializable",
@@ -168414,8 +171029,16 @@
         }
       },
       "preferredLowering": {
-        "state": "universal-fallback",
-        "family": "universal-recipe"
+        "state": "generated-adapter",
+        "family": "namedScalar",
+        "wrapper": "deherm_dmsdk_named_scalar_profile_property_set_f32",
+        "adapter": {
+          "applicability": "callable",
+          "kind": "family-dispatch",
+          "id": 14,
+          "dispatcher": "deherm_dmsdk_named_scalar_dispatch",
+          "blockers": []
+        }
       },
       "fallback": {
         "state": "materializable",
@@ -168514,8 +171137,16 @@
         }
       },
       "preferredLowering": {
-        "state": "universal-fallback",
-        "family": "universal-recipe"
+        "state": "generated-adapter",
+        "family": "namedScalar",
+        "wrapper": "deherm_dmsdk_named_scalar_profile_property_set_f64",
+        "adapter": {
+          "applicability": "callable",
+          "kind": "family-dispatch",
+          "id": 15,
+          "dispatcher": "deherm_dmsdk_named_scalar_dispatch",
+          "blockers": []
+        }
       },
       "fallback": {
         "state": "materializable",
@@ -168614,8 +171245,16 @@
         }
       },
       "preferredLowering": {
-        "state": "universal-fallback",
-        "family": "universal-recipe"
+        "state": "generated-adapter",
+        "family": "namedScalar",
+        "wrapper": "deherm_dmsdk_named_scalar_profile_property_set_s32",
+        "adapter": {
+          "applicability": "callable",
+          "kind": "family-dispatch",
+          "id": 16,
+          "dispatcher": "deherm_dmsdk_named_scalar_dispatch",
+          "blockers": []
+        }
       },
       "fallback": {
         "state": "materializable",
@@ -168714,8 +171353,16 @@
         }
       },
       "preferredLowering": {
-        "state": "universal-fallback",
-        "family": "universal-recipe"
+        "state": "generated-adapter",
+        "family": "namedScalar",
+        "wrapper": "deherm_dmsdk_named_scalar_profile_property_set_s64",
+        "adapter": {
+          "applicability": "callable",
+          "kind": "family-dispatch",
+          "id": 17,
+          "dispatcher": "deherm_dmsdk_named_scalar_dispatch",
+          "blockers": []
+        }
       },
       "fallback": {
         "state": "materializable",
@@ -168814,8 +171461,16 @@
         }
       },
       "preferredLowering": {
-        "state": "universal-fallback",
-        "family": "universal-recipe"
+        "state": "generated-adapter",
+        "family": "namedScalar",
+        "wrapper": "deherm_dmsdk_named_scalar_profile_property_set_u32",
+        "adapter": {
+          "applicability": "callable",
+          "kind": "family-dispatch",
+          "id": 18,
+          "dispatcher": "deherm_dmsdk_named_scalar_dispatch",
+          "blockers": []
+        }
       },
       "fallback": {
         "state": "materializable",
@@ -168914,8 +171569,16 @@
         }
       },
       "preferredLowering": {
-        "state": "universal-fallback",
-        "family": "universal-recipe"
+        "state": "generated-adapter",
+        "family": "namedScalar",
+        "wrapper": "deherm_dmsdk_named_scalar_profile_property_set_u64",
+        "adapter": {
+          "applicability": "callable",
+          "kind": "family-dispatch",
+          "id": 19,
+          "dispatcher": "deherm_dmsdk_named_scalar_dispatch",
+          "blockers": []
+        }
       },
       "fallback": {
         "state": "materializable",
@@ -171974,7 +174637,26 @@
         "header": "dmsdk/resource/resource.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 131,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 1281,
@@ -172284,7 +174966,26 @@
         "header": "dmsdk/resource/resource.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 132,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 1284,
@@ -172519,7 +175220,26 @@
         "header": "dmsdk/resource/resource.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 133,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 1286,
@@ -172868,7 +175588,26 @@
         "header": "dmsdk/resource/resource.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 134,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 1289,
@@ -173716,7 +176455,7 @@
       "preferredLowering": {
         "state": "generated-adapter",
         "family": "arenaCString",
-        "wrapper": null,
+        "wrapper": "deherm_dmsdk_arena_cstring_dispatch",
         "adapter": {
           "applicability": "callable",
           "kind": "family-dispatch",
@@ -177392,7 +180131,26 @@
         "header": "dmsdk/resource/resource.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 135,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 1313,
@@ -177492,7 +180250,26 @@
         "header": "dmsdk/resource/resource.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 136,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 1314,
@@ -177592,7 +180369,26 @@
         "header": "dmsdk/resource/resource.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 137,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 1315,
@@ -177691,7 +180487,26 @@
         "header": "dmsdk/resource/resource.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 138,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 1316,
@@ -178621,7 +181436,26 @@
         "header": "dmsdk/resource/resource.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 139,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 1323,
@@ -179396,7 +182230,26 @@
         "header": "dmsdk/font/text_layout.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 140,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 1330,
@@ -179838,7 +182691,26 @@
         "header": "dmsdk/font/text_layout.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 141,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 1333,
@@ -180046,7 +182918,26 @@
         "header": "dmsdk/font/text_layout.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 142,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 1335,
@@ -180254,7 +183145,26 @@
         "header": "dmsdk/font/text_layout.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 143,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 1337,
@@ -180570,7 +183480,26 @@
         "header": "dmsdk/font/text_layout.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 144,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 1340,
@@ -181078,7 +184007,26 @@
         "header": "dmsdk/font/text_layout.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 145,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 1344,
@@ -181285,7 +184233,26 @@
         "header": "dmsdk/font/text_layout.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 146,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 1346,
@@ -181413,7 +184380,26 @@
         "header": "dmsdk/font/text_layout.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 147,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 1347,
@@ -181524,7 +184510,26 @@
         "header": "dmsdk/font/text_layout.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 148,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 1348,
@@ -181623,7 +184628,26 @@
         "header": "dmsdk/platform/window.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 149,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 1349,
@@ -181818,7 +184842,26 @@
         "header": "dmsdk/platform/window.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 150,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 1351,
@@ -181918,7 +184961,26 @@
         "header": "dmsdk/platform/window.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 151,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 1352,
@@ -182018,7 +185080,26 @@
         "header": "dmsdk/platform/window.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 152,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 1353,
@@ -182328,7 +185409,26 @@
         "header": "dmsdk/platform/window.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 153,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 1355,
@@ -182427,7 +185527,26 @@
         "header": "dmsdk/platform/window.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 154,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 1356,
@@ -182755,7 +185874,26 @@
         "header": "dmsdk/platform/window.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 155,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 1359,
@@ -182878,7 +186016,26 @@
         "header": "dmsdk/platform/window.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 156,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     },
     {
       "numericId": 1360,
@@ -182977,7 +186134,43 @@
         "header": "dmsdk/platform/window.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      }
+      },
+      "alternativeLowerings": [
+        {
+          "state": "generated-adapter",
+          "family": "borrowedHandle",
+          "wrapper": null,
+          "adapter": {
+            "applicability": "provider-required",
+            "kind": "provider-boundary",
+            "id": 157,
+            "dispatcher": null,
+            "blockers": [
+              "call-thread-affinity-unresolved",
+              "handle-ownership-nullability-lifetime-unresolved",
+              "native-symbol-linkage-unverified",
+              "target-feature-symbol-matrix-unverified"
+            ]
+          }
+        }
+      ]
     }
-  ]
+  ],
+  "fallbackAudit": {
+    "artifact": "packages/bindings/generated/defold-dmsdk-fallback-audit.json",
+    "reportSha256": "7a8f6eb050e795b23dd17427340d84fa8187ee23b9f7c551a5ea77452d26bc3e",
+    "coverage": {
+      "declarations": 1361,
+      "preferredSpecialized": 101,
+      "universalFallback": 1260,
+      "auditedFallback": 1260,
+      "silentlyOmitted": 0,
+      "shapeGroups": 848,
+      "universalReady": 537,
+      "usageFactsRequired": 723,
+      "existingAuxiliarySpecialization": 158,
+      "semanticRecipeCandidates": 267,
+      "composableUniversalOnly": 835
+    }
+  }
 }

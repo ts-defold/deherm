@@ -3,11 +3,11 @@
   "source": "deherm-dmsdk-generated-adapter-exact-corpus",
   "ordering": "numeric-id-ascending",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0",
-  "symbolIndexSha256": "8fd5b0d8201065b4430944ca0647d0a151a52042ff438950efca4bb5effa9bbf",
+  "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64",
+  "symbolIndexSha256": "5029b54fa94caddab9ca27b65c664e321eabe05f9b3298b5fb567e5a6f5d1218",
   "recipeCount": 1361,
-  "generatedAdapterCount": 74,
-  "universalReadyCount": 557,
+  "generatedAdapterCount": 94,
+  "universalReadyCount": 537,
   "specializationRequiredCount": 730,
   "silentlyOmitted": 0,
   "familyCounts": {
@@ -19,6 +19,7 @@
     "fixedDigest": 4,
     "hashSpan": 2,
     "hashState": 10,
+    "namedScalar": 20,
     "scalar": 26,
     "xteaSpan": 2
   },
@@ -26,9 +27,9 @@
     "schemaVersion": 1,
     "source": "deherm-dmsdk-generated-adapter-call-plan",
     "evidenceBoundary": "Each exact vector is derived from the same authenticated recipe and concrete family-dispatch plan as the production relocation. It fixes the production C ABI symbol, family-local adapter id, ordered native ABI, result contract, and emitted JSI module where one exists. Family runtime tests execute the C ABI vectors; JSI is applicable only to families that emit a production JSI module. Provider-boundary families remain excluded until their policy providers exist.",
-    "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0",
+    "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64",
     "retain": "deherm_dmsdk_generated_adapter_corpus_retain_generated_adapters",
-    "callCount": 74,
+    "callCount": 94,
     "calls": [
       {
         "declarationId": "dmsdk:dmBuffer::GetResultString@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:373:100",
@@ -48,7 +49,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmBuffer::GetSizeForValueType@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:363:99",
@@ -70,7 +71,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmBuffer::GetValueTypeString@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:383:101",
@@ -90,7 +91,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmCrypt::Base64Decode@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:133:162",
@@ -110,7 +111,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmCrypt::Base64Encode@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:120:161",
@@ -130,7 +131,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmCrypt::Decrypt@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:76:156",
@@ -150,7 +151,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmCrypt::Encrypt@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:65:155",
@@ -170,7 +171,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmCrypt::HashMd5@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:108:160",
@@ -190,7 +191,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmCrypt::HashSha1@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:84:157",
@@ -210,7 +211,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmCrypt::HashSha256@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:92:158",
@@ -230,7 +231,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmCrypt::HashSha512@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:100:159",
@@ -250,7 +251,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmEndian::ByteSwap@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:36:194",
@@ -272,7 +273,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmEndian::ByteSwap@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:46:195",
@@ -294,7 +295,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmEndian::ByteSwap@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:56:196",
@@ -316,7 +317,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmEndian::ToHost@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:104:200",
@@ -338,7 +339,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmEndian::ToHost@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:128:202",
@@ -360,7 +361,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmEndian::ToHost@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:80:198",
@@ -382,7 +383,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmEndian::ToNetwork@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:116:201",
@@ -404,7 +405,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmEndian::ToNetwork@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:68:197",
@@ -426,7 +427,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmEndian::ToNetwork@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:92:199",
@@ -448,7 +449,27 @@
             "method": "call"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+      },
+      {
+        "declarationId": "dmsdk:dmGameObject::CreateInstanceId@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:598:1005",
+        "numericId": 299,
+        "recipeId": "dmsdk-projection:9c1f4472b45999285539427e",
+        "family": "namedScalar",
+        "adapterKind": "family-dispatch",
+        "adapterId": 0,
+        "symbol": "deherm_dmsdk_named_scalar_dispatch",
+        "planSha256": "0fdb9b8e27d3a77a77313c890aff1f7afdccb114acfdc72f9e54b5e2483a3f8b",
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_named_scalar_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmGraphics::GetInstalledAdapterFamily@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1159:1398",
@@ -470,7 +491,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmGraphics::GetTextureFormatLiteral@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1388:1420",
@@ -490,7 +511,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmGraphics::GetTextureTypeLiteral@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1380:1419",
@@ -510,7 +531,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmHashBuffer32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:69:212",
@@ -530,7 +551,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmHashBuffer64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:79:213",
@@ -550,7 +571,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmHashClone32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:214:233",
@@ -560,7 +581,7 @@
         "adapterKind": "family-dispatch",
         "adapterId": 0,
         "symbol": "deherm_dmsdk_hash_state_dispatch",
-        "planSha256": "103c1d066321c0846e44e81be0ff43c13b14022ae17fc5d51346ea6d38b07558",
+        "planSha256": "ef44a0293c709ae2b8c9c8c2c91d5ab60466ddd00c429ae08e5fc61bc2e56ece",
         "transports": {
           "cAbi": {
             "applicability": "callable",
@@ -570,7 +591,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmHashClone64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:256:238",
@@ -580,7 +601,7 @@
         "adapterKind": "family-dispatch",
         "adapterId": 1,
         "symbol": "deherm_dmsdk_hash_state_dispatch",
-        "planSha256": "3b93b7daf644fb113faa903715f8938d8a8e6b635c35b1ab23e52abc559fc301",
+        "planSha256": "8a72d732dfd1cd1de0a0d8b92bfafd4ef8d0c9fb12edb4d6ffa75baba4f9fc8c",
         "transports": {
           "cAbi": {
             "applicability": "callable",
@@ -590,7 +611,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmHashFinal32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:231:235",
@@ -600,7 +621,7 @@
         "adapterKind": "family-dispatch",
         "adapterId": 2,
         "symbol": "deherm_dmsdk_hash_state_dispatch",
-        "planSha256": "a7238f7d8bfaca1cdddfb385ef1d07b769fdfc06349bf0ce0152e3e75d47bc2a",
+        "planSha256": "3b2e92b15e6777866cf203fc55d1bfb3329cf6fb8f902e5c6c952ecfae8c3a7b",
         "transports": {
           "cAbi": {
             "applicability": "callable",
@@ -610,7 +631,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmHashFinal64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:273:240",
@@ -620,7 +641,7 @@
         "adapterKind": "family-dispatch",
         "adapterId": 3,
         "symbol": "deherm_dmsdk_hash_state_dispatch",
-        "planSha256": "47925ce025a6bc13c6be1bb5503115f404e7928a8d169dd46dee5bb1d4ea4ee9",
+        "planSha256": "73608c43362cf90e49849e6349c75e8d6a1b4f0efec0f5c9a6a20b64554c59b8",
         "transports": {
           "cAbi": {
             "applicability": "callable",
@@ -630,7 +651,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmHashInit32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:204:232",
@@ -640,7 +661,7 @@
         "adapterKind": "family-dispatch",
         "adapterId": 4,
         "symbol": "deherm_dmsdk_hash_state_dispatch",
-        "planSha256": "f214cdd005c29d87d42778c6825558adacf6c5a4d0f42150fee3626ab2dcb4d1",
+        "planSha256": "6f74a09481023572ce630fd2b803154afaf23873cbf20a3de31b09cf678cfee1",
         "transports": {
           "cAbi": {
             "applicability": "callable",
@@ -650,7 +671,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmHashInit64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:247:237",
@@ -660,7 +681,7 @@
         "adapterKind": "family-dispatch",
         "adapterId": 5,
         "symbol": "deherm_dmsdk_hash_state_dispatch",
-        "planSha256": "5e4e4efe41dc0d98317f943f0df1500a106574954d7af6656558fbc63e777024",
+        "planSha256": "8a80eb5edbb74b7e8fb05e3a4b9edd6eba08cafb1cf3996abcdfa0efe3385c8e",
         "transports": {
           "cAbi": {
             "applicability": "callable",
@@ -670,7 +691,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmHashRelease32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:239:236",
@@ -680,7 +701,7 @@
         "adapterKind": "family-dispatch",
         "adapterId": 6,
         "symbol": "deherm_dmsdk_hash_state_dispatch",
-        "planSha256": "9e5701c19d3b4aec3e749408966ac0827128ced8af55e5515bf9360ba2236291",
+        "planSha256": "d3d9f649a2cfc1cbf1ad29155f0b73e2567a27807303edde8dca8ff14c00983f",
         "transports": {
           "cAbi": {
             "applicability": "callable",
@@ -690,7 +711,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmHashRelease64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:281:241",
@@ -700,7 +721,7 @@
         "adapterKind": "family-dispatch",
         "adapterId": 7,
         "symbol": "deherm_dmsdk_hash_state_dispatch",
-        "planSha256": "cbf559c3f1766261d18ae0dda5c84f9a53472f2174ea9d60039e4dfef5019ec0",
+        "planSha256": "9fb11096b8bd0780c3a04c887d679c39e36b28306864f393852a09eab0ed1ad3",
         "transports": {
           "cAbi": {
             "applicability": "callable",
@@ -710,7 +731,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmHashString32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:88:214",
@@ -730,7 +751,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmHashString64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:97:215",
@@ -750,7 +771,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmHashUpdateBuffer32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:223:234",
@@ -760,7 +781,7 @@
         "adapterKind": "family-dispatch",
         "adapterId": 8,
         "symbol": "deherm_dmsdk_hash_state_dispatch",
-        "planSha256": "94e2f18ca59b1dfeb2ba9837d9e85ee6da56890ab62d3b124fd7691445252fb8",
+        "planSha256": "18e60e46cf351dca9783cfdc8522ef56c8881c52077568a8bb196c7368d55d62",
         "transports": {
           "cAbi": {
             "applicability": "callable",
@@ -770,7 +791,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmHashUpdateBuffer64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:265:239",
@@ -780,7 +801,7 @@
         "adapterKind": "family-dispatch",
         "adapterId": 9,
         "symbol": "deherm_dmsdk_hash_state_dispatch",
-        "planSha256": "1a3fdd53a5dc648a62743be691519fc5f53b52fa94bfc045af93cab3f76a2a7c",
+        "planSha256": "6722faf28f7f2c4d1e0ed96e77a0bad56048138eafd8d5f4f422d13657f76fd8",
         "transports": {
           "cAbi": {
             "applicability": "callable",
@@ -790,7 +811,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmImage::GetAstcBlockSize@upstream/defold/engine/dlib/src/dmsdk/dlib/image.h:133:349",
@@ -810,7 +831,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmImage::GetAstcDimensions@upstream/defold/engine/dlib/src/dmsdk/dlib/image.h:145:350",
@@ -830,7 +851,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmLog::Setlevel@upstream/defold/engine/dlib/src/dmsdk/dlib/log.h:339:397",
@@ -852,7 +873,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmLogGetLevel@upstream/defold/engine/dlib/src/dmsdk/dlib/log.h:310:391",
@@ -874,7 +895,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmLogSetLevel@upstream/defold/engine/dlib/src/dmsdk/dlib/log.h:300:390",
@@ -896,7 +917,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmResource::GetCanonicalPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:151:1970",
@@ -906,7 +927,7 @@
         "adapterKind": "family-dispatch",
         "adapterId": 0,
         "symbol": "deherm_dmsdk_arena_cstring_dispatch",
-        "planSha256": "59b850c57ac8b686b03c0e1438fae6e229eaa5b11afafb572d0cff0d9369cd3e",
+        "planSha256": "522c8b019e9082388f77cbf3d9afa13ac36ffd5bc8311a9a963da29be35a6228",
         "transports": {
           "cAbi": {
             "applicability": "callable",
@@ -916,7 +937,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmResource::GetExtFromPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:141:1969",
@@ -936,7 +957,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmSocket::ResultToString@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:388:568",
@@ -956,7 +977,27 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+      },
+      {
+        "declarationId": "dmsdk:dmSound::IsGroupMuted@upstream/defold/engine/sound/src/dmsdk/sound/sound.h:108:2140",
+        "numericId": 1010,
+        "recipeId": "dmsdk-projection:c178e7a6821d475859d8fadb",
+        "family": "namedScalar",
+        "adapterKind": "family-dispatch",
+        "adapterId": 1,
+        "symbol": "deherm_dmsdk_named_scalar_dispatch",
+        "planSha256": "77724739bb77aa7e8b571dc576d94600696f6db72961cd5b1d9699ac850654e2",
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_named_scalar_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmSound::SetGroupMute@upstream/defold/engine/sound/src/dmsdk/sound/sound.h:92:2138",
@@ -978,7 +1019,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmSound::ToggleGroupMute@upstream/defold/engine/sound/src/dmsdk/sound/sound.h:101:2139",
@@ -1000,7 +1041,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmStrCaseCmp@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:155:183",
@@ -1020,7 +1061,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmStrError@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:174:184",
@@ -1030,7 +1071,7 @@
         "adapterKind": "family-dispatch",
         "adapterId": 1,
         "symbol": "deherm_dmsdk_arena_cstring_dispatch",
-        "planSha256": "ffd9b6e8ba5f8c61d989ea49a4427c0b58abaeb0d3111aa1116374b2fa415833",
+        "planSha256": "b59795bffa516902ec85e7d3ccfa1c2f4ec5eef02c4de4facc4f8387728d3f45",
         "transports": {
           "cAbi": {
             "applicability": "callable",
@@ -1040,7 +1081,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmStrTrim@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:137:182",
@@ -1050,7 +1091,7 @@
         "adapterKind": "family-dispatch",
         "adapterId": 2,
         "symbol": "deherm_dmsdk_arena_cstring_dispatch",
-        "planSha256": "2e759c7048d4a6cab7ee94fac2c3e4ed0f3ae9a808d5983a1bb12c647d9d613a",
+        "planSha256": "c44ff222648864bf748b95e3e830fd42b0c80191621bbe7cb6e6ae84dd8d5389",
         "transports": {
           "cAbi": {
             "applicability": "callable",
@@ -1060,7 +1101,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmSys::Exists@upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h:117:595",
@@ -1080,7 +1121,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmSys::Rename@upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h:135:597",
@@ -1100,7 +1141,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmSys::Unlink@upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h:125:596",
@@ -1120,7 +1161,107 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+      },
+      {
+        "declarationId": "dmsdk:dmThread::AllocTls@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:119:608",
+        "numericId": 1036,
+        "recipeId": "dmsdk-projection:bd0045d4518b802b736ae931",
+        "family": "namedScalar",
+        "adapterKind": "family-dispatch",
+        "adapterId": 2,
+        "symbol": "deherm_dmsdk_named_scalar_dispatch",
+        "planSha256": "07a25b45df126d3bd768d98fbeb80f0d1dcc661f493e125c361630bdcdf0dda9",
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_named_scalar_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+      },
+      {
+        "declarationId": "dmsdk:dmThread::Detach@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:112:607",
+        "numericId": 1037,
+        "recipeId": "dmsdk-projection:20f7a7de092d36cde0bcaccd",
+        "family": "namedScalar",
+        "adapterKind": "family-dispatch",
+        "adapterId": 3,
+        "symbol": "deherm_dmsdk_named_scalar_dispatch",
+        "planSha256": "a8a529aa7310db8aaee2f2d00b56e074cc342b6434f5cae88f53a503499eadda",
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_named_scalar_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+      },
+      {
+        "declarationId": "dmsdk:dmThread::FreeTls@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:126:609",
+        "numericId": 1038,
+        "recipeId": "dmsdk-projection:091fc5e50be7f83b45f46500",
+        "family": "namedScalar",
+        "adapterKind": "family-dispatch",
+        "adapterId": 4,
+        "symbol": "deherm_dmsdk_named_scalar_dispatch",
+        "planSha256": "1ebd22bbcf796280c0b1a1eebd03b6b01ed43edcfc608d63cdb2ca24306e8a69",
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_named_scalar_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+      },
+      {
+        "declarationId": "dmsdk:dmThread::GetCurrentThread@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:148:612",
+        "numericId": 1039,
+        "recipeId": "dmsdk-projection:9b4754cedf9fd8135209ff14",
+        "family": "namedScalar",
+        "adapterKind": "family-dispatch",
+        "adapterId": 5,
+        "symbol": "deherm_dmsdk_named_scalar_dispatch",
+        "planSha256": "253183fe058a3aba891d81591a7a8646cbc1b5e2da8fb2a3c6b4dd0ee0aeebb5",
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_named_scalar_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+      },
+      {
+        "declarationId": "dmsdk:dmThread::Join@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:102:606",
+        "numericId": 1041,
+        "recipeId": "dmsdk-projection:a78d4a8f56e9a71b263e97c8",
+        "family": "namedScalar",
+        "adapterKind": "family-dispatch",
+        "adapterId": 6,
+        "symbol": "deherm_dmsdk_named_scalar_dispatch",
+        "planSha256": "e2a24a4b6fb422eaa3f445f20e269dc4724169a49fd9620335fdc16ef6db7699",
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_named_scalar_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmTime::GetMonotonicTime@upstream/defold/engine/dlib/src/dmsdk/dlib/time.h:56:615",
@@ -1142,7 +1283,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmTime::GetTime@upstream/defold/engine/dlib/src/dmsdk/dlib/time.h:38:614",
@@ -1164,7 +1305,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmTime::Sleep@upstream/defold/engine/dlib/src/dmsdk/dlib/time.h:64:616",
@@ -1186,7 +1327,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmTrigLookup::Cos@upstream/defold/engine/dlib/src/dmsdk/dlib/trig_lookup.h:54:646",
@@ -1208,7 +1349,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmTrigLookup::Sin@upstream/defold/engine/dlib/src/dmsdk/dlib/trig_lookup.h:76:647",
@@ -1230,7 +1371,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmURI::Encode@upstream/defold/engine/dlib/src/dmsdk/dlib/uri.h:96:655",
@@ -1240,7 +1381,7 @@
         "adapterKind": "family-dispatch",
         "adapterId": 3,
         "symbol": "deherm_dmsdk_arena_cstring_dispatch",
-        "planSha256": "fc5cbb8f3466f56fc1e70380bcd7c4384a72101681d29bd5f9eb6181d9d5eb5a",
+        "planSha256": "8cb1f0be86a8577bc8d4ce37f2feb27415568f2d803b947e98080c43a27086a6",
         "transports": {
           "cAbi": {
             "applicability": "callable",
@@ -1250,7 +1391,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmUtf8::IsBreaking@upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h:103:668",
@@ -1272,7 +1413,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmUtf8::IsWhiteSpace@upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h:86:667",
@@ -1294,7 +1435,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:dmUtf8::StrLen@upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h:41:657",
@@ -1314,7 +1455,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:EndianSwap16@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:65:185",
@@ -1336,7 +1477,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:EndianSwap32@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:81:186",
@@ -1358,7 +1499,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:EndianSwap64@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:100:187",
@@ -1380,7 +1521,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:EndianToHost16@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:141:189",
@@ -1402,7 +1543,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:EndianToHost32@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:169:191",
@@ -1424,7 +1565,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:EndianToHost64@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:197:193",
@@ -1446,7 +1587,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:EndianToNetwork16@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:125:188",
@@ -1468,7 +1609,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:EndianToNetwork32@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:153:190",
@@ -1490,7 +1631,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:EndianToNetwork64@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:181:192",
@@ -1512,7 +1653,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:ProfileIsInitialized@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:340:531",
@@ -1534,7 +1675,267 @@
             "method": "call"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+      },
+      {
+        "declarationId": "dmsdk:ProfilePropertyAddF32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:480",
+        "numericId": 1247,
+        "recipeId": "dmsdk-projection:a9805cbed2891d3dddf6ea39",
+        "family": "namedScalar",
+        "adapterKind": "family-dispatch",
+        "adapterId": 7,
+        "symbol": "deherm_dmsdk_named_scalar_dispatch",
+        "planSha256": "a0674dc98f62709e0fbc6d7e797ce66d7587fce6036647a7cf487326994c11d8",
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_named_scalar_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+      },
+      {
+        "declarationId": "dmsdk:ProfilePropertyAddF64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:492",
+        "numericId": 1248,
+        "recipeId": "dmsdk-projection:2234bdff15e7a6659a315b59",
+        "family": "namedScalar",
+        "adapterKind": "family-dispatch",
+        "adapterId": 8,
+        "symbol": "deherm_dmsdk_named_scalar_dispatch",
+        "planSha256": "f8c42fd42e97a50014b831dba9adf31b8d34a18fb157d71fe071be6325d4acf8",
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_named_scalar_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+      },
+      {
+        "declarationId": "dmsdk:ProfilePropertyAddS32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:472",
+        "numericId": 1249,
+        "recipeId": "dmsdk-projection:2a383419d5eefdb126fc594c",
+        "family": "namedScalar",
+        "adapterKind": "family-dispatch",
+        "adapterId": 9,
+        "symbol": "deherm_dmsdk_named_scalar_dispatch",
+        "planSha256": "24892f0d6bc22e87c0429922055ae452d029a640449017c9901ccadc1dbe7e38",
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_named_scalar_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+      },
+      {
+        "declarationId": "dmsdk:ProfilePropertyAddS64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:484",
+        "numericId": 1250,
+        "recipeId": "dmsdk-projection:1bc246c31746c11fd9567a80",
+        "family": "namedScalar",
+        "adapterKind": "family-dispatch",
+        "adapterId": 10,
+        "symbol": "deherm_dmsdk_named_scalar_dispatch",
+        "planSha256": "54d919627e77a168d21eec6dfcb8f99f0d52d7fbc32fcd34cda9ba34dba01000",
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_named_scalar_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+      },
+      {
+        "declarationId": "dmsdk:ProfilePropertyAddU32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:476",
+        "numericId": 1251,
+        "recipeId": "dmsdk-projection:c87a37c7578cedcf5b03bc93",
+        "family": "namedScalar",
+        "adapterKind": "family-dispatch",
+        "adapterId": 11,
+        "symbol": "deherm_dmsdk_named_scalar_dispatch",
+        "planSha256": "8cdc09dc1023428d475900a33921f47c7ae4c5b424aae8567d57743016302bda",
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_named_scalar_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+      },
+      {
+        "declarationId": "dmsdk:ProfilePropertyAddU64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:488",
+        "numericId": 1252,
+        "recipeId": "dmsdk-projection:3b0943811a131c0733ffb35f",
+        "family": "namedScalar",
+        "adapterKind": "family-dispatch",
+        "adapterId": 12,
+        "symbol": "deherm_dmsdk_named_scalar_dispatch",
+        "planSha256": "86113eb4bad1ef39a18a16e042dcf35f534e670c5f55ea7744e175272d949a37",
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_named_scalar_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+      },
+      {
+        "declarationId": "dmsdk:ProfilePropertySetBool@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:467",
+        "numericId": 1253,
+        "recipeId": "dmsdk-projection:cda493a2d44bcfd656b0eda7",
+        "family": "namedScalar",
+        "adapterKind": "family-dispatch",
+        "adapterId": 13,
+        "symbol": "deherm_dmsdk_named_scalar_dispatch",
+        "planSha256": "6728edddd2473cdc485fcaa6785477bd15c06ddf0b8b165e1c87ff3a43952fbd",
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_named_scalar_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+      },
+      {
+        "declarationId": "dmsdk:ProfilePropertySetF32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:479",
+        "numericId": 1254,
+        "recipeId": "dmsdk-projection:c41d9e6f591fd4b550e652c3",
+        "family": "namedScalar",
+        "adapterKind": "family-dispatch",
+        "adapterId": 14,
+        "symbol": "deherm_dmsdk_named_scalar_dispatch",
+        "planSha256": "9027c1587f7e2374d966312c376f1c8cf409f9f7d2235025215cc554c4eafe7f",
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_named_scalar_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+      },
+      {
+        "declarationId": "dmsdk:ProfilePropertySetF64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:491",
+        "numericId": 1255,
+        "recipeId": "dmsdk-projection:723e6f7396c1806a8b49280c",
+        "family": "namedScalar",
+        "adapterKind": "family-dispatch",
+        "adapterId": 15,
+        "symbol": "deherm_dmsdk_named_scalar_dispatch",
+        "planSha256": "ab3eb8aaeedd27f15ea39ebbdf007f900b6aefe4c8c1c0334a9e98cb69233bbc",
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_named_scalar_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+      },
+      {
+        "declarationId": "dmsdk:ProfilePropertySetS32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:471",
+        "numericId": 1256,
+        "recipeId": "dmsdk-projection:d948149d18f6dbe10878b182",
+        "family": "namedScalar",
+        "adapterKind": "family-dispatch",
+        "adapterId": 16,
+        "symbol": "deherm_dmsdk_named_scalar_dispatch",
+        "planSha256": "8f83f6d6eb1683fee41842dbfeee236ec6fe31f7e1cd179852265607730abc55",
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_named_scalar_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+      },
+      {
+        "declarationId": "dmsdk:ProfilePropertySetS64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:483",
+        "numericId": 1257,
+        "recipeId": "dmsdk-projection:9b7ba515f6edf294e1b2bb88",
+        "family": "namedScalar",
+        "adapterKind": "family-dispatch",
+        "adapterId": 17,
+        "symbol": "deherm_dmsdk_named_scalar_dispatch",
+        "planSha256": "5d057bf3c1dc255f6b50599eac395c13aa8bb0451e559776134344b73b6fb8b5",
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_named_scalar_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+      },
+      {
+        "declarationId": "dmsdk:ProfilePropertySetU32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:475",
+        "numericId": 1258,
+        "recipeId": "dmsdk-projection:bd6d1d92845c5b17526f04af",
+        "family": "namedScalar",
+        "adapterKind": "family-dispatch",
+        "adapterId": 18,
+        "symbol": "deherm_dmsdk_named_scalar_dispatch",
+        "planSha256": "6366cf97c4e0b80a4a4583c188507533e497c695e6e376a38e4b595644db684a",
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_named_scalar_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+      },
+      {
+        "declarationId": "dmsdk:ProfilePropertySetU64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:487",
+        "numericId": 1259,
+        "recipeId": "dmsdk-projection:d3db874e0c64a8444bdc7367",
+        "family": "namedScalar",
+        "adapterKind": "family-dispatch",
+        "adapterId": 19,
+        "symbol": "deherm_dmsdk_named_scalar_dispatch",
+        "planSha256": "6b7f04c8b95351f2d5376617dc7107a5947c41ab10ad468cf00296317733e882",
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_named_scalar_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:ResourceGetCanonicalPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:324:1907",
@@ -1544,7 +1945,7 @@
         "adapterKind": "family-dispatch",
         "adapterId": 4,
         "symbol": "deherm_dmsdk_arena_cstring_dispatch",
-        "planSha256": "a96db86c63a1b93cb77bac6cab156bc62dfde65ab58ce83010e9fb4c8bc57c60",
+        "planSha256": "8ab9db1fdda684a396e8c1e00ea85d5f53a0ff4fb178f1e774cb5ad3db8dc7a8",
         "transports": {
           "cAbi": {
             "applicability": "callable",
@@ -1554,7 +1955,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       },
       {
         "declarationId": "dmsdk:ResourceGetExtFromPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:314:1906",
@@ -1574,10 +1975,10 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
+        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
       }
     ],
-    "vectorCount": 74,
+    "vectorCount": 94,
     "jsiVectorCount": 33,
     "vectors": [
       {
@@ -1590,6 +1991,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_cstring_value_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_cstring_value.h",
+        "nativeHeader": "dmsdk/dlib/buffer.h",
         "exactCallee": "dmBuffer::GetResultString",
         "familyContract": {
           "digestBytes": null,
@@ -1709,7 +2111,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "1f3e7486bd57aadf3c0672557b29ba2f9248d1e9746d97cfb40d2f7b68f496fb"
+        "vectorSha256": "d4fa99f479df7f7d87ad6b38537e876539662012249bb8c6c8e5adfdb75acde5"
       },
       {
         "schemaVersion": 1,
@@ -1721,6 +2123,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_enum_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_enum_value_runtime.h",
+        "nativeHeader": "dmsdk/dlib/buffer.h",
         "exactCallee": "deherm_dmsdk_enum_dm_buffer_get_size_for_value_type_i32",
         "familyContract": {
           "digestBytes": null,
@@ -1832,7 +2235,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "fb0e3cf280b100e5cb57c9c159c4f1bb5372bfde309cf6a1f5e042524d99c1d1"
+        "vectorSha256": "267953b407b5929a0d1bf10ae04a0b58b0cb8c624c44c6fe9394fc6333be6f99"
       },
       {
         "schemaVersion": 1,
@@ -1844,6 +2247,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_cstring_value_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_cstring_value.h",
+        "nativeHeader": "dmsdk/dlib/buffer.h",
         "exactCallee": "dmBuffer::GetValueTypeString",
         "familyContract": {
           "digestBytes": null,
@@ -1955,7 +2359,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "0c5c31feace0ff8dc9961dd0d7d0f76ffff227887906788edaf5c3ea2091b884"
+        "vectorSha256": "73e02f80b073230d01d226192ff112ef6b62b43a055766b2b9a445f0a0c9a042"
       },
       {
         "schemaVersion": 1,
@@ -1967,6 +2371,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_base64_span_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_base64_span_runtime.h",
+        "nativeHeader": "dmsdk/dlib/crypt.h",
         "exactCallee": "deherm_dmsdk_base64_span_dm_crypt_base64_decode",
         "familyContract": {
           "digestBytes": null,
@@ -2084,7 +2489,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "11ff047c8b27904f393ff9eee5acb10f607e83c7ed764bff6de2a36082112391"
+        "vectorSha256": "b1b333aea5c670f0a214136fbe7e9733b5a441ee6a9fc5e46dbea9c0348eed24"
       },
       {
         "schemaVersion": 1,
@@ -2096,6 +2501,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_base64_span_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_base64_span_runtime.h",
+        "nativeHeader": "dmsdk/dlib/crypt.h",
         "exactCallee": "deherm_dmsdk_base64_span_dm_crypt_base64_encode",
         "familyContract": {
           "digestBytes": null,
@@ -2213,7 +2619,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "418b66cd4e72d450906f68a4d46c29350b1c9fb492e95d06a0b926cb89d417bc"
+        "vectorSha256": "ab7b2c35eafab09bf32fe580f89db5df6f1d14558eeb78df2e951b68e85a9491"
       },
       {
         "schemaVersion": 1,
@@ -2225,11 +2631,12 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_xtea_span_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_xtea_span_runtime.h",
+        "nativeHeader": "dmsdk/dlib/crypt.h",
         "exactCallee": "deherm_dmsdk_xtea_span_dm_crypt_decrypt",
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": "decrypt",
+          "mode": "symmetric-in-place-transform",
           "operation": null,
           "width": null
         },
@@ -2377,7 +2784,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "b7f1da977773769c900fa44f8b1ab188a1d6e08fbb53c029bbb0eab8f6e9054a"
+        "vectorSha256": "61ecc9c452eb916692534854b2d571a92aa962b867723a5bed57480939f1e0e4"
       },
       {
         "schemaVersion": 1,
@@ -2389,11 +2796,12 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_xtea_span_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_xtea_span_runtime.h",
+        "nativeHeader": "dmsdk/dlib/crypt.h",
         "exactCallee": "deherm_dmsdk_xtea_span_dm_crypt_encrypt",
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": "encrypt",
+          "mode": "symmetric-in-place-transform",
           "operation": null,
           "width": null
         },
@@ -2541,7 +2949,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "a881041f5d3417bcda11edb5d37e37e8e62812dc04a032bd91d7f85fbd736090"
+        "vectorSha256": "2c5c6699d7cf0df9fca09a0e550f9adef49482a7649922afc11be03d753813dd"
       },
       {
         "schemaVersion": 1,
@@ -2553,6 +2961,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_fixed_digest_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_fixed_digest_runtime.h",
+        "nativeHeader": "dmsdk/dlib/crypt.h",
         "exactCallee": "deherm_dmsdk_fixed_digest_dm_crypt_hash_md5",
         "familyContract": {
           "digestBytes": 16,
@@ -2650,7 +3059,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "c72268de6b33739152b0cffcbf8611183f9a595e72533507a7b5e21741d7df0a"
+        "vectorSha256": "c75c0f00642021c3c49f51f9050c1dd87553f9b4cb1e7ec90b25e42069fb8fcb"
       },
       {
         "schemaVersion": 1,
@@ -2662,6 +3071,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_fixed_digest_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_fixed_digest_runtime.h",
+        "nativeHeader": "dmsdk/dlib/crypt.h",
         "exactCallee": "deherm_dmsdk_fixed_digest_dm_crypt_hash_sha1",
         "familyContract": {
           "digestBytes": 20,
@@ -2759,7 +3169,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "7d6dcf3cd2d1735c2c131fdad41f68c7785dd5317c67643e691e0bb78f6a7122"
+        "vectorSha256": "4407182131d8709cfb37e4af0f67523d9f3fa12305e38d964043e00bb6efd555"
       },
       {
         "schemaVersion": 1,
@@ -2771,6 +3181,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_fixed_digest_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_fixed_digest_runtime.h",
+        "nativeHeader": "dmsdk/dlib/crypt.h",
         "exactCallee": "deherm_dmsdk_fixed_digest_dm_crypt_hash_sha256",
         "familyContract": {
           "digestBytes": 32,
@@ -2868,7 +3279,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "69f6d2544c54eff6f5559e234184f49e768e8cb36db7f95174563016e656e2c3"
+        "vectorSha256": "cc8517a2a74ee0e8437e4418e4b7e6fc29c09cf551e0232178ba094fdcde5806"
       },
       {
         "schemaVersion": 1,
@@ -2880,6 +3291,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_fixed_digest_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_fixed_digest_runtime.h",
+        "nativeHeader": "dmsdk/dlib/crypt.h",
         "exactCallee": "deherm_dmsdk_fixed_digest_dm_crypt_hash_sha512",
         "familyContract": {
           "digestBytes": 64,
@@ -2977,7 +3389,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "699d21f2f6f104b1b14f1ebd0cc2a7477f6ca93f816901bbb900362612d05ac3"
+        "vectorSha256": "1e872e8196a18f1bb6cc88bd2d474b7c286c71a188385ad43ffb8e6d76bff0b7"
       },
       {
         "schemaVersion": 1,
@@ -2989,6 +3401,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
+        "nativeHeader": "dmsdk/dlib/endian.hpp",
         "exactCallee": "deherm_dmsdk_dm_endian_byte_swap_u16",
         "familyContract": {
           "digestBytes": null,
@@ -3051,7 +3464,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "0b85ce0618b06c4cc704ade0120c2b8d6b3dcb6f4b245df3cdb0792a29637a1d"
+        "vectorSha256": "876d29154997c0be0ebc84a24aa0a668917394a6b3b0b448921a355ed6aac037"
       },
       {
         "schemaVersion": 1,
@@ -3063,6 +3476,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
+        "nativeHeader": "dmsdk/dlib/endian.hpp",
         "exactCallee": "deherm_dmsdk_dm_endian_byte_swap_u32",
         "familyContract": {
           "digestBytes": null,
@@ -3125,7 +3539,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "5ed2cf7476ea8acbfe50186f9b81fb1a3e60d24e3b41ac0002e0207f018149c7"
+        "vectorSha256": "b624732e3309b0f84fb3b36c0c594d443cf9d0f21987fb0e2f558709bbdfa086"
       },
       {
         "schemaVersion": 1,
@@ -3137,6 +3551,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
+        "nativeHeader": "dmsdk/dlib/endian.hpp",
         "exactCallee": "deherm_dmsdk_dm_endian_byte_swap_u64",
         "familyContract": {
           "digestBytes": null,
@@ -3199,7 +3614,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "df664d0de5e27767686f6db980d0b776a92b818b7f84a9dc14b208c1197b2552"
+        "vectorSha256": "90f99e00d31a7144d6183a831a461c1c2515794ed074d2fbcad7d48a09021e56"
       },
       {
         "schemaVersion": 1,
@@ -3211,6 +3626,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
+        "nativeHeader": "dmsdk/dlib/endian.hpp",
         "exactCallee": "deherm_dmsdk_dm_endian_to_host_u32",
         "familyContract": {
           "digestBytes": null,
@@ -3273,7 +3689,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "f90ef312eacdb34167163563abebe35a5157c1ba437e250cd210a17ab06b9250"
+        "vectorSha256": "dd062471ab992db7ca7bd72e3557ac65690d2068bb0b4b8bd17d6e5bbbb7e8c1"
       },
       {
         "schemaVersion": 1,
@@ -3285,6 +3701,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
+        "nativeHeader": "dmsdk/dlib/endian.hpp",
         "exactCallee": "deherm_dmsdk_dm_endian_to_host_u64",
         "familyContract": {
           "digestBytes": null,
@@ -3347,7 +3764,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "890d05313cd86f55b04f222602dab36a25193fed38b089db80a882824e28e708"
+        "vectorSha256": "e51e36c9034b610791852ca299b0545f7f8091195d405e2daf79392b5eea8ffa"
       },
       {
         "schemaVersion": 1,
@@ -3359,6 +3776,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
+        "nativeHeader": "dmsdk/dlib/endian.hpp",
         "exactCallee": "deherm_dmsdk_dm_endian_to_host_u16",
         "familyContract": {
           "digestBytes": null,
@@ -3421,7 +3839,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "4a209b0f094a13f458ac59be0ce631a653cc20d24e079ed3acc6de3770341a6d"
+        "vectorSha256": "306d7277c4daa9f763ab5846fd5d658eacbe9b87bc1066d30404845dc002fa5d"
       },
       {
         "schemaVersion": 1,
@@ -3433,6 +3851,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
+        "nativeHeader": "dmsdk/dlib/endian.hpp",
         "exactCallee": "deherm_dmsdk_dm_endian_to_network_u64",
         "familyContract": {
           "digestBytes": null,
@@ -3495,7 +3914,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "e3624750339a500bd576d32f8d580739fae4f50de940022c7776b4bd25c03b9e"
+        "vectorSha256": "ab99f41d2dccde87055363e9426c2f4ea5e2fa41f27c3f5748a3fcb4486013e8"
       },
       {
         "schemaVersion": 1,
@@ -3507,6 +3926,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
+        "nativeHeader": "dmsdk/dlib/endian.hpp",
         "exactCallee": "deherm_dmsdk_dm_endian_to_network_u16",
         "familyContract": {
           "digestBytes": null,
@@ -3569,7 +3989,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "8bd3321041402a3d4ba0e824190f29309e14f3810965a8f5b2848d053fdc275e"
+        "vectorSha256": "d1e77e9284cf77d22eb4b0039bdb4b094e5fa0b8d7f05df77fb7fc6754abc212"
       },
       {
         "schemaVersion": 1,
@@ -3581,6 +4001,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
+        "nativeHeader": "dmsdk/dlib/endian.hpp",
         "exactCallee": "deherm_dmsdk_dm_endian_to_network_u32",
         "familyContract": {
           "digestBytes": null,
@@ -3643,7 +4064,71 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "2bc3ac6f810dbd7fc674c39573c0ded9f5dd24de4f1ddff0eaab605c188b6662"
+        "vectorSha256": "c4a9cfee09c3702c33277a2e7a496b303f3005f3beaefe5e751a61d1ba159944"
+      },
+      {
+        "schemaVersion": 1,
+        "declarationId": "dmsdk:dmGameObject::CreateInstanceId@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:598:1005",
+        "numericId": 299,
+        "recipeId": "dmsdk-projection:9c1f4472b45999285539427e",
+        "family": "namedScalar",
+        "adapterId": 0,
+        "adapterKind": "family-dispatch",
+        "productionSymbol": "deherm_dmsdk_named_scalar_dispatch",
+        "productionHeader": "defold_hermes/generated_dmsdk_named_scalar_runtime.h",
+        "nativeHeader": "dmsdk/gameobject/gameobject.h",
+        "exactCallee": "deherm_dmsdk_named_scalar_dm_game_object_create_instance_id",
+        "familyContract": {
+          "digestBytes": null,
+          "resultBits": null,
+          "mode": null,
+          "operation": null,
+          "width": null
+        },
+        "invocation": {
+          "kind": "direct-function",
+          "nativeSymbol": "dmGameObject::CreateInstanceId",
+          "sourceDefined": false,
+          "member": null,
+          "receiver": null,
+          "templateArguments": {
+            "names": [],
+            "source": "usage-required-when-unresolved"
+          },
+          "monomorphization": null
+        },
+        "abi": {
+          "argumentOffset": 0,
+          "argumentCount": 0,
+          "resultKind": "named",
+          "resultNativeType": "dmhash_t",
+          "resultShape": {
+            "kind": "named",
+            "name": "dmhash_t",
+            "target": {
+              "kind": "scalar",
+              "name": "u64"
+            }
+          },
+          "parameters": [],
+          "frame": "DehermDmSdkUniversalFrame/v1"
+        },
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_named_scalar_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "expectations": {
+          "selection": "exact-family-adapter-id",
+          "arguments": "ordered-native-abi",
+          "result": "family-adapter-result-contract",
+          "failClosed": true
+        },
+        "vectorSha256": "c4f34e9a5844202b78d993cb2f10e4f4b405310896f02f007cb4238b62a60d45"
       },
       {
         "schemaVersion": 1,
@@ -3655,6 +4140,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_enum_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_enum_value_runtime.h",
+        "nativeHeader": "dmsdk/graphics/graphics.h",
         "exactCallee": "deherm_dmsdk_enum_dm_graphics_get_installed_adapter_family_v",
         "familyContract": {
           "digestBytes": null,
@@ -3749,7 +4235,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "51190c83bf8489c563da9f203912fefbc2fe58bfe1803f0074fe1a68498b0ca6"
+        "vectorSha256": "f521962f6e1b9a63d1276dc5cd5f190a508b253fe3431610c1408ad7f27025f6"
       },
       {
         "schemaVersion": 1,
@@ -3761,6 +4247,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_cstring_value_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_cstring_value.h",
+        "nativeHeader": "dmsdk/graphics/graphics.h",
         "exactCallee": "dmGraphics::GetTextureFormatLiteral",
         "familyContract": {
           "digestBytes": null,
@@ -4020,7 +4507,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "c9a438d47fd32daf402475ece7988bd3f93ecde12b3ce079fcdd499349fef433"
+        "vectorSha256": "4216f1f23fa08797a92e265b41b66421e612eb5a0d1d8a6809aa6e81c279bb01"
       },
       {
         "schemaVersion": 1,
@@ -4032,6 +4519,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_cstring_value_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_cstring_value.h",
+        "nativeHeader": "dmsdk/graphics/graphics.h",
         "exactCallee": "dmGraphics::GetTextureTypeLiteral",
         "familyContract": {
           "digestBytes": null,
@@ -4147,7 +4635,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "9629ab7b194c825d16c621d420690e8839ca4e0d87a24f045dfeef3a1b1c0854"
+        "vectorSha256": "587a287a640901a6d5db6066be6fab44bf1bb3e67f55e8b04222f3c1c48d68ba"
       },
       {
         "schemaVersion": 1,
@@ -4159,6 +4647,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_hash_span_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_hash_span_runtime.h",
+        "nativeHeader": "dmsdk/dlib/hash.h",
         "exactCallee": "deherm_dmsdk_hash_span_dm_hash_buffer32",
         "familyContract": {
           "digestBytes": null,
@@ -4237,7 +4726,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "992022e12b5bca158d4710cd500722ccb00d5af969b0480e71b1cc9a3602deb5"
+        "vectorSha256": "0c124d38c7930736dd542b21f5e238c89af154f4a633e99a2a3867c4c89d2f13"
       },
       {
         "schemaVersion": 1,
@@ -4249,6 +4738,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_hash_span_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_hash_span_runtime.h",
+        "nativeHeader": "dmsdk/dlib/hash.h",
         "exactCallee": "deherm_dmsdk_hash_span_dm_hash_buffer64",
         "familyContract": {
           "digestBytes": null,
@@ -4327,7 +4817,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "c0b29b458d289dd2cb919992d48d72d3c299c7bec4ad4c38eb5ce315ac73763f"
+        "vectorSha256": "85723942de5f00cabfb5e9827d3b29ba1b52c4e2071f1cb5016e650ed398bcf4"
       },
       {
         "schemaVersion": 1,
@@ -4339,6 +4829,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_hash_state_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_hash_state.h",
+        "nativeHeader": "dmsdk/dlib/hash.h",
         "exactCallee": "dmHashClone32",
         "familyContract": {
           "digestBytes": null,
@@ -4438,7 +4929,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "d74f3cc9c4594dfbc7840855c45485ac5f9b32967a99a209bacf3fe4a14f300e"
+        "vectorSha256": "b84c0bf9a6f2fc20f35b65ed96162f1094c690418f696ed94ebd60aa0f91afed"
       },
       {
         "schemaVersion": 1,
@@ -4450,6 +4941,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_hash_state_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_hash_state.h",
+        "nativeHeader": "dmsdk/dlib/hash.h",
         "exactCallee": "dmHashClone64",
         "familyContract": {
           "digestBytes": null,
@@ -4549,7 +5041,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "d3ace7251b449eaf57fc1c54b11940d309f624ec46800812534845caa804c9ae"
+        "vectorSha256": "abaa4db6d995c32230a80016b2ca74a53a0742443302f9e82f5aefc1777fe425"
       },
       {
         "schemaVersion": 1,
@@ -4561,6 +5053,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_hash_state_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_hash_state.h",
+        "nativeHeader": "dmsdk/dlib/hash.h",
         "exactCallee": "dmHashFinal32",
         "familyContract": {
           "digestBytes": null,
@@ -4629,7 +5122,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "2f2e03ac118cb0a017b4637e00d0735a022a5ba61e46e3c13714ea78f86b8a8c"
+        "vectorSha256": "b16659974f9aa8668917dad8ee20597be8ad32eca10696b3bdf159ea328e5d15"
       },
       {
         "schemaVersion": 1,
@@ -4641,6 +5134,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_hash_state_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_hash_state.h",
+        "nativeHeader": "dmsdk/dlib/hash.h",
         "exactCallee": "dmHashFinal64",
         "familyContract": {
           "digestBytes": null,
@@ -4709,7 +5203,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "94100b43489ccf8e22580e9c3ccc89ab4dec39fb9565e7114ec63ebe3e708206"
+        "vectorSha256": "351d5c0d31aeeaff5f00fd79ce58a1674246c9b29b62b0bab94f832e04c56456"
       },
       {
         "schemaVersion": 1,
@@ -4721,6 +5215,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_hash_state_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_hash_state.h",
+        "nativeHeader": "dmsdk/dlib/hash.h",
         "exactCallee": "dmHashInit32",
         "familyContract": {
           "digestBytes": null,
@@ -4800,7 +5295,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "3305f02dd6791f56d30e396ff5dc95238578be236b49f8b5e9b8f39bc988365d"
+        "vectorSha256": "b9e8ca840b6f8fe8b64ff8e72c338ad8c8bb1a629f3c2cc256dc83325e5605a1"
       },
       {
         "schemaVersion": 1,
@@ -4812,6 +5307,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_hash_state_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_hash_state.h",
+        "nativeHeader": "dmsdk/dlib/hash.h",
         "exactCallee": "dmHashInit64",
         "familyContract": {
           "digestBytes": null,
@@ -4891,7 +5387,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "5a1495ba8056d102e42f6e9cd52c91328379ceb571b4d28f70e625a2c46cce10"
+        "vectorSha256": "7bc72226e4fe0de0f30a6fe523b09092306df7dacb79fa919afcc20ff1b5483d"
       },
       {
         "schemaVersion": 1,
@@ -4903,6 +5399,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_hash_state_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_hash_state.h",
+        "nativeHeader": "dmsdk/dlib/hash.h",
         "exactCallee": "dmHashRelease32",
         "familyContract": {
           "digestBytes": null,
@@ -4970,7 +5467,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "71ee5271d26fb708ad1edcdd930818ff089a96b9e7efd3a952be94d6b2a6a931"
+        "vectorSha256": "fb71c3cb0c187ecf236a8acf956128fa3ac03b6e563e90eaf3ace8a290db1006"
       },
       {
         "schemaVersion": 1,
@@ -4982,6 +5479,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_hash_state_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_hash_state.h",
+        "nativeHeader": "dmsdk/dlib/hash.h",
         "exactCallee": "dmHashRelease64",
         "familyContract": {
           "digestBytes": null,
@@ -5049,7 +5547,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "2596483d4e9a98965f1404f3a56eae3b0a1b43e74803e7b5bb6feb6ebaedd964"
+        "vectorSha256": "fb51bad5c0dde87ad8e737b3232f9cb51814b5ff30a52b16324afa22b4c1dffb"
       },
       {
         "schemaVersion": 1,
@@ -5061,6 +5559,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_cstring_value_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_cstring_value.h",
+        "nativeHeader": "dmsdk/dlib/hash.h",
         "exactCallee": "dmHashString32",
         "familyContract": {
           "digestBytes": null,
@@ -5125,7 +5624,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "34d21fa0d5e22cdf1008ac0961299e51d5946f6b95fcb5a40d93c1e744752ba5"
+        "vectorSha256": "dd3603434eed0885e755c7d42783e0213ac6aef0f782d7a92b7abee5e866d33c"
       },
       {
         "schemaVersion": 1,
@@ -5137,6 +5636,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_cstring_value_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_cstring_value.h",
+        "nativeHeader": "dmsdk/dlib/hash.h",
         "exactCallee": "dmHashString64",
         "familyContract": {
           "digestBytes": null,
@@ -5201,7 +5701,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "bc12c56a9bf7fb9e2055dba8bbab8760177b2d4d299177c5324e1ec51c542617"
+        "vectorSha256": "e678583725808c9c31a2fba449b5b54ee8e437aeac1f00fedbb230f8e72f7b38"
       },
       {
         "schemaVersion": 1,
@@ -5213,6 +5713,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_hash_state_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_hash_state.h",
+        "nativeHeader": "dmsdk/dlib/hash.h",
         "exactCallee": "dmHashUpdateBuffer32",
         "familyContract": {
           "digestBytes": null,
@@ -5310,7 +5811,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "1a80a0cdde3d00af15c518f560d92472cd1839d8d94f5a3a7745d0c955fc8d7a"
+        "vectorSha256": "a88d11a708910a39f5f5b5930de47aeec84c806b07cec4feffc78000e0aa571b"
       },
       {
         "schemaVersion": 1,
@@ -5322,6 +5823,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_hash_state_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_hash_state.h",
+        "nativeHeader": "dmsdk/dlib/hash.h",
         "exactCallee": "dmHashUpdateBuffer64",
         "familyContract": {
           "digestBytes": null,
@@ -5419,7 +5921,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "1c3063509e4b675b2c5b36bb4a67e67e33fc385e0624309fb16b1db321479753"
+        "vectorSha256": "157010e41590d669f4d2390ce9585d5cebe52f19dc5017f2fe17c33f55032679"
       },
       {
         "schemaVersion": 1,
@@ -5431,6 +5933,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_astc_probe_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_astc_probe_runtime.h",
+        "nativeHeader": "dmsdk/dlib/image.h",
         "exactCallee": "deherm_dmsdk_astc_probe_dm_image_get_astc_block_size",
         "familyContract": {
           "digestBytes": null,
@@ -5566,7 +6069,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "c5b7afa9cf228404cc03c35f91d62b59e93287034d31418ec4057ea5de22f9a2"
+        "vectorSha256": "6ca0a9c195bd4290989c24bdb536553427c7010bdc74cff8838ddb6eef43d6e3"
       },
       {
         "schemaVersion": 1,
@@ -5578,6 +6081,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_astc_probe_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_astc_probe_runtime.h",
+        "nativeHeader": "dmsdk/dlib/image.h",
         "exactCallee": "deherm_dmsdk_astc_probe_dm_image_get_astc_dimensions",
         "familyContract": {
           "digestBytes": null,
@@ -5713,7 +6217,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "94797289a3253f3c494cda3b56939358455340628b6cb529921930d508beb5dc"
+        "vectorSha256": "7a7e0673714e53c44de51e5d3e396c642d35c82f591875026205917a7cef6107"
       },
       {
         "schemaVersion": 1,
@@ -5725,6 +6229,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_enum_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_enum_value_runtime.h",
+        "nativeHeader": "dmsdk/dlib/log.h",
         "exactCallee": "deherm_dmsdk_enum_dm_log_setlevel_i32",
         "familyContract": {
           "digestBytes": null,
@@ -5819,7 +6324,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "913d3333fe207e7a4c16877fcc4d1d6462dd14842a227d7a039e9a58a222bf53"
+        "vectorSha256": "41ab559b13c9e89b16d5168617a8f59bffc6eb4b098acc9cc433c8c56341384c"
       },
       {
         "schemaVersion": 1,
@@ -5831,6 +6336,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_enum_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_enum_value_runtime.h",
+        "nativeHeader": "dmsdk/dlib/log.h",
         "exactCallee": "deherm_dmsdk_enum_dm_log_get_level_v",
         "familyContract": {
           "digestBytes": null,
@@ -5913,7 +6419,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "0b46993bfa1bc58448af7ae88463edd39e553187df5c1276d58010e77614af4c"
+        "vectorSha256": "c6f3f1d0a8359f816d6511cb70709bb4b82e8871fcde5edff197df8cf1cab80a"
       },
       {
         "schemaVersion": 1,
@@ -5925,6 +6431,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_enum_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_enum_value_runtime.h",
+        "nativeHeader": "dmsdk/dlib/log.h",
         "exactCallee": "deherm_dmsdk_enum_dm_log_set_level_i32",
         "familyContract": {
           "digestBytes": null,
@@ -6019,7 +6526,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "20f038c4904981172fafd5bd47e0a09828fec83020d72641569069c427bbdd81"
+        "vectorSha256": "3f0545194ddc2a48c01a6454c74771f9fff4dc8066d9f37a06eb0bbdec3f3944"
       },
       {
         "schemaVersion": 1,
@@ -6031,6 +6538,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_arena_cstring_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_arena_cstring.h",
+        "nativeHeader": "dmsdk/resource/resource.hpp",
         "exactCallee": "dmResource::GetCanonicalPath",
         "familyContract": {
           "digestBytes": null,
@@ -6123,7 +6631,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "004c8a3ef13b56bb4228c76d021dcc7f9ece164f2b163544e52fec2e9835aabd"
+        "vectorSha256": "fb1df32e8ccf631949896ec4e292d667af42c8a2791c442a77bf026e71bf218c"
       },
       {
         "schemaVersion": 1,
@@ -6135,6 +6643,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_cstring_value_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_cstring_value.h",
+        "nativeHeader": "dmsdk/resource/resource.hpp",
         "exactCallee": "dmResource::GetExtFromPath",
         "familyContract": {
           "digestBytes": null,
@@ -6201,7 +6710,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "c5c965b467411b975bc4430a4dc85a2f0df0e7ba1ed9dc7d23790b3610ca72e8"
+        "vectorSha256": "a990c477b414b0e38a40e679f1ab2f925a36ebb9a2864bb99bac5e3348da00e6"
       },
       {
         "schemaVersion": 1,
@@ -6213,6 +6722,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_cstring_value_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_cstring_value.h",
+        "nativeHeader": "dmsdk/dlib/socket.h",
         "exactCallee": "dmSocket::ResultToString",
         "familyContract": {
           "digestBytes": null,
@@ -6420,7 +6930,84 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "b41631e37aad0ec92469f2559bfb1b9c8eec41b2cf6e029e01d06a56bf06c517"
+        "vectorSha256": "a9e90c77718d7c7885a547255848b4ddc1707ddd4f5d9aa9b19debc143ef32f9"
+      },
+      {
+        "schemaVersion": 1,
+        "declarationId": "dmsdk:dmSound::IsGroupMuted@upstream/defold/engine/sound/src/dmsdk/sound/sound.h:108:2140",
+        "numericId": 1010,
+        "recipeId": "dmsdk-projection:c178e7a6821d475859d8fadb",
+        "family": "namedScalar",
+        "adapterId": 1,
+        "adapterKind": "family-dispatch",
+        "productionSymbol": "deherm_dmsdk_named_scalar_dispatch",
+        "productionHeader": "defold_hermes/generated_dmsdk_named_scalar_runtime.h",
+        "nativeHeader": "dmsdk/sound/sound.h",
+        "exactCallee": "deherm_dmsdk_named_scalar_dm_sound_is_group_muted",
+        "familyContract": {
+          "digestBytes": null,
+          "resultBits": null,
+          "mode": null,
+          "operation": null,
+          "width": null
+        },
+        "invocation": {
+          "kind": "direct-function",
+          "nativeSymbol": "dmSound::IsGroupMuted",
+          "sourceDefined": false,
+          "member": null,
+          "receiver": null,
+          "templateArguments": {
+            "names": [],
+            "source": "usage-required-when-unresolved"
+          },
+          "monomorphization": null
+        },
+        "abi": {
+          "argumentOffset": 0,
+          "argumentCount": 1,
+          "resultKind": "scalar",
+          "resultNativeType": "bool",
+          "resultShape": {
+            "kind": "scalar",
+            "name": "bool"
+          },
+          "parameters": [
+            {
+              "position": 0,
+              "name": "group",
+              "nativeType": "dmhash_t",
+              "direction": "value",
+              "cellKind": "named",
+              "shape": {
+                "kind": "named",
+                "name": "dmhash_t",
+                "target": {
+                  "kind": "scalar",
+                  "name": "u64"
+                }
+              },
+              "requirements": []
+            }
+          ],
+          "frame": "DehermDmSdkUniversalFrame/v1"
+        },
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_named_scalar_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "expectations": {
+          "selection": "exact-family-adapter-id",
+          "arguments": "ordered-native-abi",
+          "result": "family-adapter-result-contract",
+          "failClosed": true
+        },
+        "vectorSha256": "44b1459bb90912917cd1eb5f13b1a157af9f695514e367910cc6cad8a5101394"
       },
       {
         "schemaVersion": 1,
@@ -6432,6 +7019,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_enum_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_enum_value_runtime.h",
+        "nativeHeader": "dmsdk/sound/sound.h",
         "exactCallee": "deherm_dmsdk_enum_dm_sound_set_group_mute_u64_bool",
         "familyContract": {
           "digestBytes": null,
@@ -6607,7 +7195,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "6da75ff1635784b755528a136688c621986c6706347f2ae7cd4e6476744b54c8"
+        "vectorSha256": "18d2907eb834fbf12aed0b25aed141090b5b9d82e2bfb5122e2d37d6f49a7144"
       },
       {
         "schemaVersion": 1,
@@ -6619,6 +7207,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_enum_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_enum_value_runtime.h",
+        "nativeHeader": "dmsdk/sound/sound.h",
         "exactCallee": "deherm_dmsdk_enum_dm_sound_toggle_group_mute_u64",
         "familyContract": {
           "digestBytes": null,
@@ -6782,7 +7371,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "64588dcf5a01e927dcc6c859dafb2a15a7094214e817cd011dba82aa6ff90fa2"
+        "vectorSha256": "693934471fe4a687f70a0ebdc291baf2b6fd8c0d7acd29f44f0583ec38007815"
       },
       {
         "schemaVersion": 1,
@@ -6794,6 +7383,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_cstring_value_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_cstring_value.h",
+        "nativeHeader": "dmsdk/dlib/dstrings.h",
         "exactCallee": "dmStrCaseCmp",
         "familyContract": {
           "digestBytes": null,
@@ -6874,7 +7464,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "9c2f231bd16fc35ec5dc3410240ffb84d51bff17df553518aba1e0217d80b152"
+        "vectorSha256": "9a81d19ee8281032a3a5e155a1b0ee743ebd7101d344270453b653c2b82b4dbe"
       },
       {
         "schemaVersion": 1,
@@ -6886,6 +7476,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_arena_cstring_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_arena_cstring.h",
+        "nativeHeader": "dmsdk/dlib/dstrings.h",
         "exactCallee": "dmStrError",
         "familyContract": {
           "digestBytes": null,
@@ -6973,7 +7564,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "58d176d0c3ceda7e81820d9b1f1e510636b1afd044e590fbf34be371c1f27302"
+        "vectorSha256": "74940ceff022885a96ad0847b02a8e9e034a54e4432b4a70ec803734a6214be9"
       },
       {
         "schemaVersion": 1,
@@ -6985,6 +7576,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_arena_cstring_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_arena_cstring.h",
+        "nativeHeader": "dmsdk/dlib/dstrings.h",
         "exactCallee": "dmStrTrim",
         "familyContract": {
           "digestBytes": null,
@@ -7077,7 +7669,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "b52f06fb853abb0253de3703fa5f3e4ac84e3fc9f562ec33873d9369b9b2f02f"
+        "vectorSha256": "024c6a1a6b515c2313d5869423c8890c98644f30b9c7b05dd766ba417e81d27e"
       },
       {
         "schemaVersion": 1,
@@ -7089,6 +7681,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_cstring_value_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_cstring_value.h",
+        "nativeHeader": "dmsdk/dlib/sys.h",
         "exactCallee": "dmSys::Exists",
         "familyContract": {
           "digestBytes": null,
@@ -7153,7 +7746,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "8c0477bef7ec47afe0bf1dcdd8c7011536b9e82f8d89fcb1dac6880c33eca8ad"
+        "vectorSha256": "863641983526ddc1db4494abb3e1219de0b5df43c58b43101781c7f6aa0cb994"
       },
       {
         "schemaVersion": 1,
@@ -7165,6 +7758,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_cstring_value_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_cstring_value.h",
+        "nativeHeader": "dmsdk/dlib/sys.h",
         "exactCallee": "dmSys::Rename",
         "familyContract": {
           "digestBytes": null,
@@ -7390,7 +7984,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "e05b318f08b73ae295417913a5160e80e7a8bb75f24016bed533f7b4ff679f6b"
+        "vectorSha256": "8c04d20537f91bf6a46f37507ba2130de8261720557a75b0e6caecd7af0e54fc"
       },
       {
         "schemaVersion": 1,
@@ -7402,6 +7996,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_cstring_value_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_cstring_value.h",
+        "nativeHeader": "dmsdk/dlib/sys.h",
         "exactCallee": "dmSys::Unlink",
         "familyContract": {
           "digestBytes": null,
@@ -7611,7 +8206,363 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "06e7a1e4cd2324433e9edd327dcf11e642d95682ad7d7195a9553f32b9596131"
+        "vectorSha256": "5d5a8f4f511c531bd501fe1c12b591d506730e59691a2f8917242e883c0690f4"
+      },
+      {
+        "schemaVersion": 1,
+        "declarationId": "dmsdk:dmThread::AllocTls@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:119:608",
+        "numericId": 1036,
+        "recipeId": "dmsdk-projection:bd0045d4518b802b736ae931",
+        "family": "namedScalar",
+        "adapterId": 2,
+        "adapterKind": "family-dispatch",
+        "productionSymbol": "deherm_dmsdk_named_scalar_dispatch",
+        "productionHeader": "defold_hermes/generated_dmsdk_named_scalar_runtime.h",
+        "nativeHeader": "dmsdk/dlib/thread.h",
+        "exactCallee": "deherm_dmsdk_named_scalar_dm_thread_alloc_tls",
+        "familyContract": {
+          "digestBytes": null,
+          "resultBits": null,
+          "mode": null,
+          "operation": null,
+          "width": null
+        },
+        "invocation": {
+          "kind": "direct-function",
+          "nativeSymbol": "dmThread::AllocTls",
+          "sourceDefined": false,
+          "member": null,
+          "receiver": null,
+          "templateArguments": {
+            "names": [],
+            "source": "usage-required-when-unresolved"
+          },
+          "monomorphization": null
+        },
+        "abi": {
+          "argumentOffset": 0,
+          "argumentCount": 0,
+          "resultKind": "named",
+          "resultNativeType": "TlsKey",
+          "resultShape": {
+            "kind": "named",
+            "name": "dmThread::TlsKey",
+            "target": {
+              "kind": "scalar",
+              "name": "usize"
+            }
+          },
+          "parameters": [],
+          "frame": "DehermDmSdkUniversalFrame/v1"
+        },
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_named_scalar_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "expectations": {
+          "selection": "exact-family-adapter-id",
+          "arguments": "ordered-native-abi",
+          "result": "family-adapter-result-contract",
+          "failClosed": true
+        },
+        "vectorSha256": "b9f7bebd1c1731ea54ed04580088c6643dd3497cf63739914970c47a7f8ce116"
+      },
+      {
+        "schemaVersion": 1,
+        "declarationId": "dmsdk:dmThread::Detach@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:112:607",
+        "numericId": 1037,
+        "recipeId": "dmsdk-projection:20f7a7de092d36cde0bcaccd",
+        "family": "namedScalar",
+        "adapterId": 3,
+        "adapterKind": "family-dispatch",
+        "productionSymbol": "deherm_dmsdk_named_scalar_dispatch",
+        "productionHeader": "defold_hermes/generated_dmsdk_named_scalar_runtime.h",
+        "nativeHeader": "dmsdk/dlib/thread.h",
+        "exactCallee": "deherm_dmsdk_named_scalar_dm_thread_detach",
+        "familyContract": {
+          "digestBytes": null,
+          "resultBits": null,
+          "mode": null,
+          "operation": null,
+          "width": null
+        },
+        "invocation": {
+          "kind": "direct-function",
+          "nativeSymbol": "dmThread::Detach",
+          "sourceDefined": false,
+          "member": null,
+          "receiver": null,
+          "templateArguments": {
+            "names": [],
+            "source": "usage-required-when-unresolved"
+          },
+          "monomorphization": null
+        },
+        "abi": {
+          "argumentOffset": 0,
+          "argumentCount": 1,
+          "resultKind": "void",
+          "resultNativeType": "void",
+          "resultShape": {
+            "kind": "void"
+          },
+          "parameters": [
+            {
+              "position": 0,
+              "name": "thread",
+              "nativeType": "Thread",
+              "direction": "value",
+              "cellKind": "named",
+              "shape": {
+                "kind": "named",
+                "name": "dmThread::Thread",
+                "target": {
+                  "kind": "scalar",
+                  "name": "usize"
+                }
+              },
+              "requirements": []
+            }
+          ],
+          "frame": "DehermDmSdkUniversalFrame/v1"
+        },
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_named_scalar_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "expectations": {
+          "selection": "exact-family-adapter-id",
+          "arguments": "ordered-native-abi",
+          "result": "family-adapter-result-contract",
+          "failClosed": true
+        },
+        "vectorSha256": "b069f79e9cf265c7a4fa4dc59373923c4b36f7ee224104d4c66a74617a976a4c"
+      },
+      {
+        "schemaVersion": 1,
+        "declarationId": "dmsdk:dmThread::FreeTls@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:126:609",
+        "numericId": 1038,
+        "recipeId": "dmsdk-projection:091fc5e50be7f83b45f46500",
+        "family": "namedScalar",
+        "adapterId": 4,
+        "adapterKind": "family-dispatch",
+        "productionSymbol": "deherm_dmsdk_named_scalar_dispatch",
+        "productionHeader": "defold_hermes/generated_dmsdk_named_scalar_runtime.h",
+        "nativeHeader": "dmsdk/dlib/thread.h",
+        "exactCallee": "deherm_dmsdk_named_scalar_dm_thread_free_tls",
+        "familyContract": {
+          "digestBytes": null,
+          "resultBits": null,
+          "mode": null,
+          "operation": null,
+          "width": null
+        },
+        "invocation": {
+          "kind": "direct-function",
+          "nativeSymbol": "dmThread::FreeTls",
+          "sourceDefined": false,
+          "member": null,
+          "receiver": null,
+          "templateArguments": {
+            "names": [],
+            "source": "usage-required-when-unresolved"
+          },
+          "monomorphization": null
+        },
+        "abi": {
+          "argumentOffset": 0,
+          "argumentCount": 1,
+          "resultKind": "void",
+          "resultNativeType": "void",
+          "resultShape": {
+            "kind": "void"
+          },
+          "parameters": [
+            {
+              "position": 0,
+              "name": "key",
+              "nativeType": "TlsKey",
+              "direction": "value",
+              "cellKind": "named",
+              "shape": {
+                "kind": "named",
+                "name": "dmThread::TlsKey",
+                "target": {
+                  "kind": "scalar",
+                  "name": "usize"
+                }
+              },
+              "requirements": []
+            }
+          ],
+          "frame": "DehermDmSdkUniversalFrame/v1"
+        },
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_named_scalar_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "expectations": {
+          "selection": "exact-family-adapter-id",
+          "arguments": "ordered-native-abi",
+          "result": "family-adapter-result-contract",
+          "failClosed": true
+        },
+        "vectorSha256": "98acab0b847405a686f9bbd851cf47408123cb5e0598894ca09803ea4e475e67"
+      },
+      {
+        "schemaVersion": 1,
+        "declarationId": "dmsdk:dmThread::GetCurrentThread@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:148:612",
+        "numericId": 1039,
+        "recipeId": "dmsdk-projection:9b4754cedf9fd8135209ff14",
+        "family": "namedScalar",
+        "adapterId": 5,
+        "adapterKind": "family-dispatch",
+        "productionSymbol": "deherm_dmsdk_named_scalar_dispatch",
+        "productionHeader": "defold_hermes/generated_dmsdk_named_scalar_runtime.h",
+        "nativeHeader": "dmsdk/dlib/thread.h",
+        "exactCallee": "deherm_dmsdk_named_scalar_dm_thread_get_current_thread",
+        "familyContract": {
+          "digestBytes": null,
+          "resultBits": null,
+          "mode": null,
+          "operation": null,
+          "width": null
+        },
+        "invocation": {
+          "kind": "direct-function",
+          "nativeSymbol": "dmThread::GetCurrentThread",
+          "sourceDefined": false,
+          "member": null,
+          "receiver": null,
+          "templateArguments": {
+            "names": [],
+            "source": "usage-required-when-unresolved"
+          },
+          "monomorphization": null
+        },
+        "abi": {
+          "argumentOffset": 0,
+          "argumentCount": 0,
+          "resultKind": "named",
+          "resultNativeType": "Thread",
+          "resultShape": {
+            "kind": "named",
+            "name": "dmThread::Thread",
+            "target": {
+              "kind": "scalar",
+              "name": "usize"
+            }
+          },
+          "parameters": [],
+          "frame": "DehermDmSdkUniversalFrame/v1"
+        },
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_named_scalar_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "expectations": {
+          "selection": "exact-family-adapter-id",
+          "arguments": "ordered-native-abi",
+          "result": "family-adapter-result-contract",
+          "failClosed": true
+        },
+        "vectorSha256": "29689f0ab4c1e2c7a3e5a76701e559d42bc4c41924edad322eb37aa254016c71"
+      },
+      {
+        "schemaVersion": 1,
+        "declarationId": "dmsdk:dmThread::Join@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:102:606",
+        "numericId": 1041,
+        "recipeId": "dmsdk-projection:a78d4a8f56e9a71b263e97c8",
+        "family": "namedScalar",
+        "adapterId": 6,
+        "adapterKind": "family-dispatch",
+        "productionSymbol": "deherm_dmsdk_named_scalar_dispatch",
+        "productionHeader": "defold_hermes/generated_dmsdk_named_scalar_runtime.h",
+        "nativeHeader": "dmsdk/dlib/thread.h",
+        "exactCallee": "deherm_dmsdk_named_scalar_dm_thread_join",
+        "familyContract": {
+          "digestBytes": null,
+          "resultBits": null,
+          "mode": null,
+          "operation": null,
+          "width": null
+        },
+        "invocation": {
+          "kind": "direct-function",
+          "nativeSymbol": "dmThread::Join",
+          "sourceDefined": false,
+          "member": null,
+          "receiver": null,
+          "templateArguments": {
+            "names": [],
+            "source": "usage-required-when-unresolved"
+          },
+          "monomorphization": null
+        },
+        "abi": {
+          "argumentOffset": 0,
+          "argumentCount": 1,
+          "resultKind": "void",
+          "resultNativeType": "void",
+          "resultShape": {
+            "kind": "void"
+          },
+          "parameters": [
+            {
+              "position": 0,
+              "name": "thread",
+              "nativeType": "Thread",
+              "direction": "value",
+              "cellKind": "named",
+              "shape": {
+                "kind": "named",
+                "name": "dmThread::Thread",
+                "target": {
+                  "kind": "scalar",
+                  "name": "usize"
+                }
+              },
+              "requirements": []
+            }
+          ],
+          "frame": "DehermDmSdkUniversalFrame/v1"
+        },
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_named_scalar_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "expectations": {
+          "selection": "exact-family-adapter-id",
+          "arguments": "ordered-native-abi",
+          "result": "family-adapter-result-contract",
+          "failClosed": true
+        },
+        "vectorSha256": "a7056e1f2da9b944e6ad462dd04fb6eb8e3c1b037f62b60ffc7f4d7bcbdc3ea3"
       },
       {
         "schemaVersion": 1,
@@ -7623,6 +8574,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
+        "nativeHeader": "dmsdk/dlib/time.h",
         "exactCallee": "deherm_dmsdk_dm_time_get_monotonic_time_v",
         "familyContract": {
           "digestBytes": null,
@@ -7672,7 +8624,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "0999582790485ff4ad9f47b0bf7acc02dd56a6487482358b2dfc5ecb8eafcf7b"
+        "vectorSha256": "def2766ddb9a434cce6c4c930423e0735baa606fae92bac6f15e75353d0bcc04"
       },
       {
         "schemaVersion": 1,
@@ -7684,6 +8636,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
+        "nativeHeader": "dmsdk/dlib/time.h",
         "exactCallee": "deherm_dmsdk_dm_time_get_time_v",
         "familyContract": {
           "digestBytes": null,
@@ -7733,7 +8686,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "21d1c641f3ac78549bca3a0a3a7fe351e6be9a3358f10b7f554455e60b7be649"
+        "vectorSha256": "160bfc68af4eb63e2949f1d9de2b0d40c77ccb09fb61333319a62ef4b1ab9d04"
       },
       {
         "schemaVersion": 1,
@@ -7745,6 +8698,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
+        "nativeHeader": "dmsdk/dlib/time.h",
         "exactCallee": "deherm_dmsdk_dm_time_sleep_u32",
         "familyContract": {
           "digestBytes": null,
@@ -7806,7 +8760,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "66053a20acd7f0d1c47e97bb61e471dcf79f99375028189a4082e156733a4637"
+        "vectorSha256": "74f89dd521470b108aa784dbbe9fcf193148754454c8e3f26031b1e625bae65f"
       },
       {
         "schemaVersion": 1,
@@ -7818,6 +8772,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
+        "nativeHeader": "dmsdk/dlib/trig_lookup.h",
         "exactCallee": "deherm_dmsdk_dm_trig_lookup_cos_f32",
         "familyContract": {
           "digestBytes": null,
@@ -7880,7 +8835,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "d3bceb01a48b4fd6ae983aae5ace02aaccf6589a83046a5bbd548998d76d1f37"
+        "vectorSha256": "306b5d36da5506b3da3ce0926d93f1bea4aa684b4d187e6bd95007a1b6f16f2a"
       },
       {
         "schemaVersion": 1,
@@ -7892,6 +8847,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
+        "nativeHeader": "dmsdk/dlib/trig_lookup.h",
         "exactCallee": "deherm_dmsdk_dm_trig_lookup_sin_f32",
         "familyContract": {
           "digestBytes": null,
@@ -7954,7 +8910,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "69e3fa7e5181e1b6e2a242f77cdb039e5f33bcb567eaef31f5ba85b1d16d06e8"
+        "vectorSha256": "468280aa68dcf0a72a2f8c309d00b9a90e593a41f696e55f8b35117ba297bd56"
       },
       {
         "schemaVersion": 1,
@@ -7966,6 +8922,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_arena_cstring_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_arena_cstring.h",
+        "nativeHeader": "dmsdk/dlib/uri.h",
         "exactCallee": "dmURI::Encode",
         "familyContract": {
           "digestBytes": null,
@@ -8094,7 +9051,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "8d086552932e78bd3733d0b9199986a0d6d317a672a4ad8063d768b27dcc1193"
+        "vectorSha256": "e53d569825102d7b2523e36b745eed0c8d5c1050253144379522abc914bd02e0"
       },
       {
         "schemaVersion": 1,
@@ -8106,6 +9063,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
+        "nativeHeader": "dmsdk/dlib/utf8.h",
         "exactCallee": "deherm_dmsdk_dm_utf8_is_breaking_u32",
         "familyContract": {
           "digestBytes": null,
@@ -8168,7 +9126,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "edd250e62436e0bf7537d4887f7f36b0bc122fe5bf08f6ef3082c4537c4358a3"
+        "vectorSha256": "8c3b33d4b91a22fc3b82499174c335ea0a3d02fe3d932ef48373467fb1498a80"
       },
       {
         "schemaVersion": 1,
@@ -8180,6 +9138,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
+        "nativeHeader": "dmsdk/dlib/utf8.h",
         "exactCallee": "deherm_dmsdk_dm_utf8_is_white_space_u32",
         "familyContract": {
           "digestBytes": null,
@@ -8242,7 +9201,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "571ef9756272d5e3a9745b12166cc836e2cc841c6fd8135b31fdd0ffdd4c54bf"
+        "vectorSha256": "1e625e05fcef7d085881d2edb95366f356619e214f53cf950c6312562de31baa"
       },
       {
         "schemaVersion": 1,
@@ -8254,6 +9213,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_cstring_value_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_cstring_value.h",
+        "nativeHeader": "dmsdk/dlib/utf8.h",
         "exactCallee": "dmUtf8::StrLen",
         "familyContract": {
           "digestBytes": null,
@@ -8318,7 +9278,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "dc422be9526af0a9a94d99a4ead1fe242ba4f97852c138bb55406fed83edb733"
+        "vectorSha256": "14315dea8a4fb6c6ed0c24b92ce97b116471ab27ca156fe77b9a9274dc1f57ec"
       },
       {
         "schemaVersion": 1,
@@ -8330,6 +9290,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
+        "nativeHeader": "dmsdk/dlib/endian.h",
         "exactCallee": "deherm_dmsdk_endian_swap16_u16",
         "familyContract": {
           "digestBytes": null,
@@ -8392,7 +9353,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "9dc067bfe20c5db71e56b2919a03a8a4a18ea715b01f9e1544c6788bc11aa556"
+        "vectorSha256": "276bb7c8b3747c0e6088298bf7306d5910aea8a13398a0bdccd598d84f31ac9d"
       },
       {
         "schemaVersion": 1,
@@ -8404,6 +9365,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
+        "nativeHeader": "dmsdk/dlib/endian.h",
         "exactCallee": "deherm_dmsdk_endian_swap32_u32",
         "familyContract": {
           "digestBytes": null,
@@ -8466,7 +9428,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "62a75ff2fd79a65e5eab5783010452d8a916c416ca59f86eac8cc123d694f42a"
+        "vectorSha256": "2588c48a58818dffe22caa632009ece9aae9c40dcfa280b50283f08c2e4da03e"
       },
       {
         "schemaVersion": 1,
@@ -8478,6 +9440,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
+        "nativeHeader": "dmsdk/dlib/endian.h",
         "exactCallee": "deherm_dmsdk_endian_swap64_u64",
         "familyContract": {
           "digestBytes": null,
@@ -8540,7 +9503,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "ce19ac0645b792834dd27a7ac425e112059db0f85a2e52205510302165fcc780"
+        "vectorSha256": "a7d14df7a50159018a24f76accebf7e0ad15f91e3e64fe914fd7ea5141e2adef"
       },
       {
         "schemaVersion": 1,
@@ -8552,6 +9515,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
+        "nativeHeader": "dmsdk/dlib/endian.h",
         "exactCallee": "deherm_dmsdk_endian_to_host16_u16",
         "familyContract": {
           "digestBytes": null,
@@ -8614,7 +9578,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "1a487139cdd7b1f9d4912f104d07168fce1bb996c42be948cee914e782dd29db"
+        "vectorSha256": "314fdd87920300a1dc2f7e329848489a5525a84982fe3f9cbc73a8eb3ff349e9"
       },
       {
         "schemaVersion": 1,
@@ -8626,6 +9590,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
+        "nativeHeader": "dmsdk/dlib/endian.h",
         "exactCallee": "deherm_dmsdk_endian_to_host32_u32",
         "familyContract": {
           "digestBytes": null,
@@ -8688,7 +9653,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "79db210e274db7d2d1f17aecd76b427a0f649eb6afc159a3a0f4d8c47ce4c177"
+        "vectorSha256": "4fdc16de909b791f7c2e207bee289b254e395f3062c2665a75e24fa6ea6635b8"
       },
       {
         "schemaVersion": 1,
@@ -8700,6 +9665,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
+        "nativeHeader": "dmsdk/dlib/endian.h",
         "exactCallee": "deherm_dmsdk_endian_to_host64_u64",
         "familyContract": {
           "digestBytes": null,
@@ -8762,7 +9728,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "c1863a0993b9a55e8cc8ccb819a116651204b768b5d14b65aca298b934437fad"
+        "vectorSha256": "16b7ac65af833594d20dbe6a076eb54dc600c7116a00b4b231f312f1aaf37e7f"
       },
       {
         "schemaVersion": 1,
@@ -8774,6 +9740,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
+        "nativeHeader": "dmsdk/dlib/endian.h",
         "exactCallee": "deherm_dmsdk_endian_to_network16_u16",
         "familyContract": {
           "digestBytes": null,
@@ -8836,7 +9803,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "7273bf9d726e40f5b9a6345d999a4006c58cb8dea0fe7a60ee856d61bd830e01"
+        "vectorSha256": "d6ac4e48d9a44e4241d89933596aae4df49502730b589b458bc528cdc07a4fa2"
       },
       {
         "schemaVersion": 1,
@@ -8848,6 +9815,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
+        "nativeHeader": "dmsdk/dlib/endian.h",
         "exactCallee": "deherm_dmsdk_endian_to_network32_u32",
         "familyContract": {
           "digestBytes": null,
@@ -8910,7 +9878,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "5eec48a34f230f37cbf0cd0a9a8240dd38c7076e5a76543873b343a0048989e3"
+        "vectorSha256": "d460d4a00500d5beb77d343bd895045a2f6bc6babf9826ef7f800e33cc477c12"
       },
       {
         "schemaVersion": 1,
@@ -8922,6 +9890,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
+        "nativeHeader": "dmsdk/dlib/endian.h",
         "exactCallee": "deherm_dmsdk_endian_to_network64_u64",
         "familyContract": {
           "digestBytes": null,
@@ -8984,7 +9953,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "e8195f54ad61b590f32149db1d4b86fef31e678d620b0527bfbe35a007189ae7"
+        "vectorSha256": "2a0e153dfbc7def25bbdd82ac949c95f46df2ee8817490ae1518c7ea00605ecc"
       },
       {
         "schemaVersion": 1,
@@ -8996,6 +9965,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
+        "nativeHeader": "dmsdk/dlib/profile.h",
         "exactCallee": "deherm_dmsdk_profile_is_initialized_v",
         "familyContract": {
           "digestBytes": null,
@@ -9045,7 +10015,1151 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "65e2f36742e52bee3036627f2524ddd1ca9ec927b436308437471c9563bac7c0"
+        "vectorSha256": "fe6eae7277a39dd18a430d7ccad1950a5d04d458846c0a9a8d407ea040d8c7fc"
+      },
+      {
+        "schemaVersion": 1,
+        "declarationId": "dmsdk:ProfilePropertyAddF32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:480",
+        "numericId": 1247,
+        "recipeId": "dmsdk-projection:a9805cbed2891d3dddf6ea39",
+        "family": "namedScalar",
+        "adapterId": 7,
+        "adapterKind": "family-dispatch",
+        "productionSymbol": "deherm_dmsdk_named_scalar_dispatch",
+        "productionHeader": "defold_hermes/generated_dmsdk_named_scalar_runtime.h",
+        "nativeHeader": "dmsdk/dlib/profile.h",
+        "exactCallee": "deherm_dmsdk_named_scalar_profile_property_add_f32",
+        "familyContract": {
+          "digestBytes": null,
+          "resultBits": null,
+          "mode": null,
+          "operation": null,
+          "width": null
+        },
+        "invocation": {
+          "kind": "direct-function",
+          "nativeSymbol": "ProfilePropertyAddF32",
+          "sourceDefined": false,
+          "member": null,
+          "receiver": null,
+          "templateArguments": {
+            "names": [],
+            "source": "usage-required-when-unresolved"
+          },
+          "monomorphization": null
+        },
+        "abi": {
+          "argumentOffset": 0,
+          "argumentCount": 2,
+          "resultKind": "void",
+          "resultNativeType": "void",
+          "resultShape": {
+            "kind": "void"
+          },
+          "parameters": [
+            {
+              "position": 0,
+              "name": "idx",
+              "nativeType": "ProfileIdx",
+              "direction": "value",
+              "cellKind": "named",
+              "shape": {
+                "kind": "named",
+                "name": "ProfileIdx",
+                "target": {
+                  "kind": "scalar",
+                  "name": "u64"
+                }
+              },
+              "requirements": []
+            },
+            {
+              "position": 1,
+              "name": "v",
+              "nativeType": "float",
+              "direction": "value",
+              "cellKind": "scalar",
+              "shape": {
+                "kind": "scalar",
+                "name": "f32"
+              },
+              "requirements": []
+            }
+          ],
+          "frame": "DehermDmSdkUniversalFrame/v1"
+        },
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_named_scalar_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "expectations": {
+          "selection": "exact-family-adapter-id",
+          "arguments": "ordered-native-abi",
+          "result": "family-adapter-result-contract",
+          "failClosed": true
+        },
+        "vectorSha256": "b7b7d15b402e9c0842919010b21081c6658fd6eb2788faedf58c5ddd992fe3ef"
+      },
+      {
+        "schemaVersion": 1,
+        "declarationId": "dmsdk:ProfilePropertyAddF64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:492",
+        "numericId": 1248,
+        "recipeId": "dmsdk-projection:2234bdff15e7a6659a315b59",
+        "family": "namedScalar",
+        "adapterId": 8,
+        "adapterKind": "family-dispatch",
+        "productionSymbol": "deherm_dmsdk_named_scalar_dispatch",
+        "productionHeader": "defold_hermes/generated_dmsdk_named_scalar_runtime.h",
+        "nativeHeader": "dmsdk/dlib/profile.h",
+        "exactCallee": "deherm_dmsdk_named_scalar_profile_property_add_f64",
+        "familyContract": {
+          "digestBytes": null,
+          "resultBits": null,
+          "mode": null,
+          "operation": null,
+          "width": null
+        },
+        "invocation": {
+          "kind": "direct-function",
+          "nativeSymbol": "ProfilePropertyAddF64",
+          "sourceDefined": false,
+          "member": null,
+          "receiver": null,
+          "templateArguments": {
+            "names": [],
+            "source": "usage-required-when-unresolved"
+          },
+          "monomorphization": null
+        },
+        "abi": {
+          "argumentOffset": 0,
+          "argumentCount": 2,
+          "resultKind": "void",
+          "resultNativeType": "void",
+          "resultShape": {
+            "kind": "void"
+          },
+          "parameters": [
+            {
+              "position": 0,
+              "name": "idx",
+              "nativeType": "ProfileIdx",
+              "direction": "value",
+              "cellKind": "named",
+              "shape": {
+                "kind": "named",
+                "name": "ProfileIdx",
+                "target": {
+                  "kind": "scalar",
+                  "name": "u64"
+                }
+              },
+              "requirements": []
+            },
+            {
+              "position": 1,
+              "name": "v",
+              "nativeType": "double",
+              "direction": "value",
+              "cellKind": "scalar",
+              "shape": {
+                "kind": "scalar",
+                "name": "f64"
+              },
+              "requirements": []
+            }
+          ],
+          "frame": "DehermDmSdkUniversalFrame/v1"
+        },
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_named_scalar_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "expectations": {
+          "selection": "exact-family-adapter-id",
+          "arguments": "ordered-native-abi",
+          "result": "family-adapter-result-contract",
+          "failClosed": true
+        },
+        "vectorSha256": "dadd86f92cebe3ac050d54c253f1504de3f61c58eefe08b0e21ec9b5d0ef3193"
+      },
+      {
+        "schemaVersion": 1,
+        "declarationId": "dmsdk:ProfilePropertyAddS32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:472",
+        "numericId": 1249,
+        "recipeId": "dmsdk-projection:2a383419d5eefdb126fc594c",
+        "family": "namedScalar",
+        "adapterId": 9,
+        "adapterKind": "family-dispatch",
+        "productionSymbol": "deherm_dmsdk_named_scalar_dispatch",
+        "productionHeader": "defold_hermes/generated_dmsdk_named_scalar_runtime.h",
+        "nativeHeader": "dmsdk/dlib/profile.h",
+        "exactCallee": "deherm_dmsdk_named_scalar_profile_property_add_s32",
+        "familyContract": {
+          "digestBytes": null,
+          "resultBits": null,
+          "mode": null,
+          "operation": null,
+          "width": null
+        },
+        "invocation": {
+          "kind": "direct-function",
+          "nativeSymbol": "ProfilePropertyAddS32",
+          "sourceDefined": false,
+          "member": null,
+          "receiver": null,
+          "templateArguments": {
+            "names": [],
+            "source": "usage-required-when-unresolved"
+          },
+          "monomorphization": null
+        },
+        "abi": {
+          "argumentOffset": 0,
+          "argumentCount": 2,
+          "resultKind": "void",
+          "resultNativeType": "void",
+          "resultShape": {
+            "kind": "void"
+          },
+          "parameters": [
+            {
+              "position": 0,
+              "name": "idx",
+              "nativeType": "ProfileIdx",
+              "direction": "value",
+              "cellKind": "named",
+              "shape": {
+                "kind": "named",
+                "name": "ProfileIdx",
+                "target": {
+                  "kind": "scalar",
+                  "name": "u64"
+                }
+              },
+              "requirements": []
+            },
+            {
+              "position": 1,
+              "name": "v",
+              "nativeType": "int32_t",
+              "direction": "value",
+              "cellKind": "scalar",
+              "shape": {
+                "kind": "scalar",
+                "name": "i32"
+              },
+              "requirements": []
+            }
+          ],
+          "frame": "DehermDmSdkUniversalFrame/v1"
+        },
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_named_scalar_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "expectations": {
+          "selection": "exact-family-adapter-id",
+          "arguments": "ordered-native-abi",
+          "result": "family-adapter-result-contract",
+          "failClosed": true
+        },
+        "vectorSha256": "451dc827f7c74406011dbe764e8cb2ce263963cd61589731556a7b1ab8ceffc3"
+      },
+      {
+        "schemaVersion": 1,
+        "declarationId": "dmsdk:ProfilePropertyAddS64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:484",
+        "numericId": 1250,
+        "recipeId": "dmsdk-projection:1bc246c31746c11fd9567a80",
+        "family": "namedScalar",
+        "adapterId": 10,
+        "adapterKind": "family-dispatch",
+        "productionSymbol": "deherm_dmsdk_named_scalar_dispatch",
+        "productionHeader": "defold_hermes/generated_dmsdk_named_scalar_runtime.h",
+        "nativeHeader": "dmsdk/dlib/profile.h",
+        "exactCallee": "deherm_dmsdk_named_scalar_profile_property_add_s64",
+        "familyContract": {
+          "digestBytes": null,
+          "resultBits": null,
+          "mode": null,
+          "operation": null,
+          "width": null
+        },
+        "invocation": {
+          "kind": "direct-function",
+          "nativeSymbol": "ProfilePropertyAddS64",
+          "sourceDefined": false,
+          "member": null,
+          "receiver": null,
+          "templateArguments": {
+            "names": [],
+            "source": "usage-required-when-unresolved"
+          },
+          "monomorphization": null
+        },
+        "abi": {
+          "argumentOffset": 0,
+          "argumentCount": 2,
+          "resultKind": "void",
+          "resultNativeType": "void",
+          "resultShape": {
+            "kind": "void"
+          },
+          "parameters": [
+            {
+              "position": 0,
+              "name": "idx",
+              "nativeType": "ProfileIdx",
+              "direction": "value",
+              "cellKind": "named",
+              "shape": {
+                "kind": "named",
+                "name": "ProfileIdx",
+                "target": {
+                  "kind": "scalar",
+                  "name": "u64"
+                }
+              },
+              "requirements": []
+            },
+            {
+              "position": 1,
+              "name": "v",
+              "nativeType": "int64_t",
+              "direction": "value",
+              "cellKind": "scalar",
+              "shape": {
+                "kind": "scalar",
+                "name": "i64"
+              },
+              "requirements": []
+            }
+          ],
+          "frame": "DehermDmSdkUniversalFrame/v1"
+        },
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_named_scalar_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "expectations": {
+          "selection": "exact-family-adapter-id",
+          "arguments": "ordered-native-abi",
+          "result": "family-adapter-result-contract",
+          "failClosed": true
+        },
+        "vectorSha256": "52278d1bda25e626a3d2ce2bb04116f42c5c17de16fa792a1de35e82c4733579"
+      },
+      {
+        "schemaVersion": 1,
+        "declarationId": "dmsdk:ProfilePropertyAddU32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:476",
+        "numericId": 1251,
+        "recipeId": "dmsdk-projection:c87a37c7578cedcf5b03bc93",
+        "family": "namedScalar",
+        "adapterId": 11,
+        "adapterKind": "family-dispatch",
+        "productionSymbol": "deherm_dmsdk_named_scalar_dispatch",
+        "productionHeader": "defold_hermes/generated_dmsdk_named_scalar_runtime.h",
+        "nativeHeader": "dmsdk/dlib/profile.h",
+        "exactCallee": "deherm_dmsdk_named_scalar_profile_property_add_u32",
+        "familyContract": {
+          "digestBytes": null,
+          "resultBits": null,
+          "mode": null,
+          "operation": null,
+          "width": null
+        },
+        "invocation": {
+          "kind": "direct-function",
+          "nativeSymbol": "ProfilePropertyAddU32",
+          "sourceDefined": false,
+          "member": null,
+          "receiver": null,
+          "templateArguments": {
+            "names": [],
+            "source": "usage-required-when-unresolved"
+          },
+          "monomorphization": null
+        },
+        "abi": {
+          "argumentOffset": 0,
+          "argumentCount": 2,
+          "resultKind": "void",
+          "resultNativeType": "void",
+          "resultShape": {
+            "kind": "void"
+          },
+          "parameters": [
+            {
+              "position": 0,
+              "name": "idx",
+              "nativeType": "ProfileIdx",
+              "direction": "value",
+              "cellKind": "named",
+              "shape": {
+                "kind": "named",
+                "name": "ProfileIdx",
+                "target": {
+                  "kind": "scalar",
+                  "name": "u64"
+                }
+              },
+              "requirements": []
+            },
+            {
+              "position": 1,
+              "name": "v",
+              "nativeType": "uint32_t",
+              "direction": "value",
+              "cellKind": "scalar",
+              "shape": {
+                "kind": "scalar",
+                "name": "u32"
+              },
+              "requirements": []
+            }
+          ],
+          "frame": "DehermDmSdkUniversalFrame/v1"
+        },
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_named_scalar_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "expectations": {
+          "selection": "exact-family-adapter-id",
+          "arguments": "ordered-native-abi",
+          "result": "family-adapter-result-contract",
+          "failClosed": true
+        },
+        "vectorSha256": "2e03c0c531d8ba688755d2ef1f2940773bc580cf3c63fbc9965e0bdf3e487f80"
+      },
+      {
+        "schemaVersion": 1,
+        "declarationId": "dmsdk:ProfilePropertyAddU64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:488",
+        "numericId": 1252,
+        "recipeId": "dmsdk-projection:3b0943811a131c0733ffb35f",
+        "family": "namedScalar",
+        "adapterId": 12,
+        "adapterKind": "family-dispatch",
+        "productionSymbol": "deherm_dmsdk_named_scalar_dispatch",
+        "productionHeader": "defold_hermes/generated_dmsdk_named_scalar_runtime.h",
+        "nativeHeader": "dmsdk/dlib/profile.h",
+        "exactCallee": "deherm_dmsdk_named_scalar_profile_property_add_u64",
+        "familyContract": {
+          "digestBytes": null,
+          "resultBits": null,
+          "mode": null,
+          "operation": null,
+          "width": null
+        },
+        "invocation": {
+          "kind": "direct-function",
+          "nativeSymbol": "ProfilePropertyAddU64",
+          "sourceDefined": false,
+          "member": null,
+          "receiver": null,
+          "templateArguments": {
+            "names": [],
+            "source": "usage-required-when-unresolved"
+          },
+          "monomorphization": null
+        },
+        "abi": {
+          "argumentOffset": 0,
+          "argumentCount": 2,
+          "resultKind": "void",
+          "resultNativeType": "void",
+          "resultShape": {
+            "kind": "void"
+          },
+          "parameters": [
+            {
+              "position": 0,
+              "name": "idx",
+              "nativeType": "ProfileIdx",
+              "direction": "value",
+              "cellKind": "named",
+              "shape": {
+                "kind": "named",
+                "name": "ProfileIdx",
+                "target": {
+                  "kind": "scalar",
+                  "name": "u64"
+                }
+              },
+              "requirements": []
+            },
+            {
+              "position": 1,
+              "name": "v",
+              "nativeType": "uint64_t",
+              "direction": "value",
+              "cellKind": "scalar",
+              "shape": {
+                "kind": "scalar",
+                "name": "u64"
+              },
+              "requirements": []
+            }
+          ],
+          "frame": "DehermDmSdkUniversalFrame/v1"
+        },
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_named_scalar_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "expectations": {
+          "selection": "exact-family-adapter-id",
+          "arguments": "ordered-native-abi",
+          "result": "family-adapter-result-contract",
+          "failClosed": true
+        },
+        "vectorSha256": "32f9895d70929f622afd05b62e98f97b9fd64a4eca5f7d5817225f548435a1a7"
+      },
+      {
+        "schemaVersion": 1,
+        "declarationId": "dmsdk:ProfilePropertySetBool@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:467",
+        "numericId": 1253,
+        "recipeId": "dmsdk-projection:cda493a2d44bcfd656b0eda7",
+        "family": "namedScalar",
+        "adapterId": 13,
+        "adapterKind": "family-dispatch",
+        "productionSymbol": "deherm_dmsdk_named_scalar_dispatch",
+        "productionHeader": "defold_hermes/generated_dmsdk_named_scalar_runtime.h",
+        "nativeHeader": "dmsdk/dlib/profile.h",
+        "exactCallee": "deherm_dmsdk_named_scalar_profile_property_set_bool",
+        "familyContract": {
+          "digestBytes": null,
+          "resultBits": null,
+          "mode": null,
+          "operation": null,
+          "width": null
+        },
+        "invocation": {
+          "kind": "direct-function",
+          "nativeSymbol": "ProfilePropertySetBool",
+          "sourceDefined": false,
+          "member": null,
+          "receiver": null,
+          "templateArguments": {
+            "names": [],
+            "source": "usage-required-when-unresolved"
+          },
+          "monomorphization": null
+        },
+        "abi": {
+          "argumentOffset": 0,
+          "argumentCount": 2,
+          "resultKind": "void",
+          "resultNativeType": "void",
+          "resultShape": {
+            "kind": "void"
+          },
+          "parameters": [
+            {
+              "position": 0,
+              "name": "idx",
+              "nativeType": "ProfileIdx",
+              "direction": "value",
+              "cellKind": "named",
+              "shape": {
+                "kind": "named",
+                "name": "ProfileIdx",
+                "target": {
+                  "kind": "scalar",
+                  "name": "u64"
+                }
+              },
+              "requirements": []
+            },
+            {
+              "position": 1,
+              "name": "v",
+              "nativeType": "int",
+              "direction": "value",
+              "cellKind": "scalar",
+              "shape": {
+                "kind": "scalar",
+                "name": "i32"
+              },
+              "requirements": []
+            }
+          ],
+          "frame": "DehermDmSdkUniversalFrame/v1"
+        },
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_named_scalar_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "expectations": {
+          "selection": "exact-family-adapter-id",
+          "arguments": "ordered-native-abi",
+          "result": "family-adapter-result-contract",
+          "failClosed": true
+        },
+        "vectorSha256": "081ee8a00df5e6d8641361b6ebc9182127eb38999fe16330a57ec373b0a93a83"
+      },
+      {
+        "schemaVersion": 1,
+        "declarationId": "dmsdk:ProfilePropertySetF32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:479",
+        "numericId": 1254,
+        "recipeId": "dmsdk-projection:c41d9e6f591fd4b550e652c3",
+        "family": "namedScalar",
+        "adapterId": 14,
+        "adapterKind": "family-dispatch",
+        "productionSymbol": "deherm_dmsdk_named_scalar_dispatch",
+        "productionHeader": "defold_hermes/generated_dmsdk_named_scalar_runtime.h",
+        "nativeHeader": "dmsdk/dlib/profile.h",
+        "exactCallee": "deherm_dmsdk_named_scalar_profile_property_set_f32",
+        "familyContract": {
+          "digestBytes": null,
+          "resultBits": null,
+          "mode": null,
+          "operation": null,
+          "width": null
+        },
+        "invocation": {
+          "kind": "direct-function",
+          "nativeSymbol": "ProfilePropertySetF32",
+          "sourceDefined": false,
+          "member": null,
+          "receiver": null,
+          "templateArguments": {
+            "names": [],
+            "source": "usage-required-when-unresolved"
+          },
+          "monomorphization": null
+        },
+        "abi": {
+          "argumentOffset": 0,
+          "argumentCount": 2,
+          "resultKind": "void",
+          "resultNativeType": "void",
+          "resultShape": {
+            "kind": "void"
+          },
+          "parameters": [
+            {
+              "position": 0,
+              "name": "idx",
+              "nativeType": "ProfileIdx",
+              "direction": "value",
+              "cellKind": "named",
+              "shape": {
+                "kind": "named",
+                "name": "ProfileIdx",
+                "target": {
+                  "kind": "scalar",
+                  "name": "u64"
+                }
+              },
+              "requirements": []
+            },
+            {
+              "position": 1,
+              "name": "v",
+              "nativeType": "float",
+              "direction": "value",
+              "cellKind": "scalar",
+              "shape": {
+                "kind": "scalar",
+                "name": "f32"
+              },
+              "requirements": []
+            }
+          ],
+          "frame": "DehermDmSdkUniversalFrame/v1"
+        },
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_named_scalar_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "expectations": {
+          "selection": "exact-family-adapter-id",
+          "arguments": "ordered-native-abi",
+          "result": "family-adapter-result-contract",
+          "failClosed": true
+        },
+        "vectorSha256": "743a2b268d37f6efe1fbf1619b793e472f428035fcf03e7cf46c8fe7371e2faf"
+      },
+      {
+        "schemaVersion": 1,
+        "declarationId": "dmsdk:ProfilePropertySetF64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:491",
+        "numericId": 1255,
+        "recipeId": "dmsdk-projection:723e6f7396c1806a8b49280c",
+        "family": "namedScalar",
+        "adapterId": 15,
+        "adapterKind": "family-dispatch",
+        "productionSymbol": "deherm_dmsdk_named_scalar_dispatch",
+        "productionHeader": "defold_hermes/generated_dmsdk_named_scalar_runtime.h",
+        "nativeHeader": "dmsdk/dlib/profile.h",
+        "exactCallee": "deherm_dmsdk_named_scalar_profile_property_set_f64",
+        "familyContract": {
+          "digestBytes": null,
+          "resultBits": null,
+          "mode": null,
+          "operation": null,
+          "width": null
+        },
+        "invocation": {
+          "kind": "direct-function",
+          "nativeSymbol": "ProfilePropertySetF64",
+          "sourceDefined": false,
+          "member": null,
+          "receiver": null,
+          "templateArguments": {
+            "names": [],
+            "source": "usage-required-when-unresolved"
+          },
+          "monomorphization": null
+        },
+        "abi": {
+          "argumentOffset": 0,
+          "argumentCount": 2,
+          "resultKind": "void",
+          "resultNativeType": "void",
+          "resultShape": {
+            "kind": "void"
+          },
+          "parameters": [
+            {
+              "position": 0,
+              "name": "idx",
+              "nativeType": "ProfileIdx",
+              "direction": "value",
+              "cellKind": "named",
+              "shape": {
+                "kind": "named",
+                "name": "ProfileIdx",
+                "target": {
+                  "kind": "scalar",
+                  "name": "u64"
+                }
+              },
+              "requirements": []
+            },
+            {
+              "position": 1,
+              "name": "v",
+              "nativeType": "double",
+              "direction": "value",
+              "cellKind": "scalar",
+              "shape": {
+                "kind": "scalar",
+                "name": "f64"
+              },
+              "requirements": []
+            }
+          ],
+          "frame": "DehermDmSdkUniversalFrame/v1"
+        },
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_named_scalar_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "expectations": {
+          "selection": "exact-family-adapter-id",
+          "arguments": "ordered-native-abi",
+          "result": "family-adapter-result-contract",
+          "failClosed": true
+        },
+        "vectorSha256": "7460755f8d8c5c3ef63f9af2a822d26085bb653329ce5fa6c8d68e280a72d08f"
+      },
+      {
+        "schemaVersion": 1,
+        "declarationId": "dmsdk:ProfilePropertySetS32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:471",
+        "numericId": 1256,
+        "recipeId": "dmsdk-projection:d948149d18f6dbe10878b182",
+        "family": "namedScalar",
+        "adapterId": 16,
+        "adapterKind": "family-dispatch",
+        "productionSymbol": "deherm_dmsdk_named_scalar_dispatch",
+        "productionHeader": "defold_hermes/generated_dmsdk_named_scalar_runtime.h",
+        "nativeHeader": "dmsdk/dlib/profile.h",
+        "exactCallee": "deherm_dmsdk_named_scalar_profile_property_set_s32",
+        "familyContract": {
+          "digestBytes": null,
+          "resultBits": null,
+          "mode": null,
+          "operation": null,
+          "width": null
+        },
+        "invocation": {
+          "kind": "direct-function",
+          "nativeSymbol": "ProfilePropertySetS32",
+          "sourceDefined": false,
+          "member": null,
+          "receiver": null,
+          "templateArguments": {
+            "names": [],
+            "source": "usage-required-when-unresolved"
+          },
+          "monomorphization": null
+        },
+        "abi": {
+          "argumentOffset": 0,
+          "argumentCount": 2,
+          "resultKind": "void",
+          "resultNativeType": "void",
+          "resultShape": {
+            "kind": "void"
+          },
+          "parameters": [
+            {
+              "position": 0,
+              "name": "idx",
+              "nativeType": "ProfileIdx",
+              "direction": "value",
+              "cellKind": "named",
+              "shape": {
+                "kind": "named",
+                "name": "ProfileIdx",
+                "target": {
+                  "kind": "scalar",
+                  "name": "u64"
+                }
+              },
+              "requirements": []
+            },
+            {
+              "position": 1,
+              "name": "v",
+              "nativeType": "int32_t",
+              "direction": "value",
+              "cellKind": "scalar",
+              "shape": {
+                "kind": "scalar",
+                "name": "i32"
+              },
+              "requirements": []
+            }
+          ],
+          "frame": "DehermDmSdkUniversalFrame/v1"
+        },
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_named_scalar_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "expectations": {
+          "selection": "exact-family-adapter-id",
+          "arguments": "ordered-native-abi",
+          "result": "family-adapter-result-contract",
+          "failClosed": true
+        },
+        "vectorSha256": "f2239292c03a43847cbe74558d94feee42dbc8eebb33d663fe894d78fee622a2"
+      },
+      {
+        "schemaVersion": 1,
+        "declarationId": "dmsdk:ProfilePropertySetS64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:483",
+        "numericId": 1257,
+        "recipeId": "dmsdk-projection:9b7ba515f6edf294e1b2bb88",
+        "family": "namedScalar",
+        "adapterId": 17,
+        "adapterKind": "family-dispatch",
+        "productionSymbol": "deherm_dmsdk_named_scalar_dispatch",
+        "productionHeader": "defold_hermes/generated_dmsdk_named_scalar_runtime.h",
+        "nativeHeader": "dmsdk/dlib/profile.h",
+        "exactCallee": "deherm_dmsdk_named_scalar_profile_property_set_s64",
+        "familyContract": {
+          "digestBytes": null,
+          "resultBits": null,
+          "mode": null,
+          "operation": null,
+          "width": null
+        },
+        "invocation": {
+          "kind": "direct-function",
+          "nativeSymbol": "ProfilePropertySetS64",
+          "sourceDefined": false,
+          "member": null,
+          "receiver": null,
+          "templateArguments": {
+            "names": [],
+            "source": "usage-required-when-unresolved"
+          },
+          "monomorphization": null
+        },
+        "abi": {
+          "argumentOffset": 0,
+          "argumentCount": 2,
+          "resultKind": "void",
+          "resultNativeType": "void",
+          "resultShape": {
+            "kind": "void"
+          },
+          "parameters": [
+            {
+              "position": 0,
+              "name": "idx",
+              "nativeType": "ProfileIdx",
+              "direction": "value",
+              "cellKind": "named",
+              "shape": {
+                "kind": "named",
+                "name": "ProfileIdx",
+                "target": {
+                  "kind": "scalar",
+                  "name": "u64"
+                }
+              },
+              "requirements": []
+            },
+            {
+              "position": 1,
+              "name": "v",
+              "nativeType": "int64_t",
+              "direction": "value",
+              "cellKind": "scalar",
+              "shape": {
+                "kind": "scalar",
+                "name": "i64"
+              },
+              "requirements": []
+            }
+          ],
+          "frame": "DehermDmSdkUniversalFrame/v1"
+        },
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_named_scalar_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "expectations": {
+          "selection": "exact-family-adapter-id",
+          "arguments": "ordered-native-abi",
+          "result": "family-adapter-result-contract",
+          "failClosed": true
+        },
+        "vectorSha256": "3744bafc6b68d7808c735f1a9f1e1adc25d4bf59aa231b6ee47fd6ef4562916c"
+      },
+      {
+        "schemaVersion": 1,
+        "declarationId": "dmsdk:ProfilePropertySetU32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:475",
+        "numericId": 1258,
+        "recipeId": "dmsdk-projection:bd6d1d92845c5b17526f04af",
+        "family": "namedScalar",
+        "adapterId": 18,
+        "adapterKind": "family-dispatch",
+        "productionSymbol": "deherm_dmsdk_named_scalar_dispatch",
+        "productionHeader": "defold_hermes/generated_dmsdk_named_scalar_runtime.h",
+        "nativeHeader": "dmsdk/dlib/profile.h",
+        "exactCallee": "deherm_dmsdk_named_scalar_profile_property_set_u32",
+        "familyContract": {
+          "digestBytes": null,
+          "resultBits": null,
+          "mode": null,
+          "operation": null,
+          "width": null
+        },
+        "invocation": {
+          "kind": "direct-function",
+          "nativeSymbol": "ProfilePropertySetU32",
+          "sourceDefined": false,
+          "member": null,
+          "receiver": null,
+          "templateArguments": {
+            "names": [],
+            "source": "usage-required-when-unresolved"
+          },
+          "monomorphization": null
+        },
+        "abi": {
+          "argumentOffset": 0,
+          "argumentCount": 2,
+          "resultKind": "void",
+          "resultNativeType": "void",
+          "resultShape": {
+            "kind": "void"
+          },
+          "parameters": [
+            {
+              "position": 0,
+              "name": "idx",
+              "nativeType": "ProfileIdx",
+              "direction": "value",
+              "cellKind": "named",
+              "shape": {
+                "kind": "named",
+                "name": "ProfileIdx",
+                "target": {
+                  "kind": "scalar",
+                  "name": "u64"
+                }
+              },
+              "requirements": []
+            },
+            {
+              "position": 1,
+              "name": "v",
+              "nativeType": "uint32_t",
+              "direction": "value",
+              "cellKind": "scalar",
+              "shape": {
+                "kind": "scalar",
+                "name": "u32"
+              },
+              "requirements": []
+            }
+          ],
+          "frame": "DehermDmSdkUniversalFrame/v1"
+        },
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_named_scalar_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "expectations": {
+          "selection": "exact-family-adapter-id",
+          "arguments": "ordered-native-abi",
+          "result": "family-adapter-result-contract",
+          "failClosed": true
+        },
+        "vectorSha256": "c1f8cc42ec9a57f4755977993aea6e5847d4a6223f282b81bc5c55212cd9b6d9"
+      },
+      {
+        "schemaVersion": 1,
+        "declarationId": "dmsdk:ProfilePropertySetU64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:487",
+        "numericId": 1259,
+        "recipeId": "dmsdk-projection:d3db874e0c64a8444bdc7367",
+        "family": "namedScalar",
+        "adapterId": 19,
+        "adapterKind": "family-dispatch",
+        "productionSymbol": "deherm_dmsdk_named_scalar_dispatch",
+        "productionHeader": "defold_hermes/generated_dmsdk_named_scalar_runtime.h",
+        "nativeHeader": "dmsdk/dlib/profile.h",
+        "exactCallee": "deherm_dmsdk_named_scalar_profile_property_set_u64",
+        "familyContract": {
+          "digestBytes": null,
+          "resultBits": null,
+          "mode": null,
+          "operation": null,
+          "width": null
+        },
+        "invocation": {
+          "kind": "direct-function",
+          "nativeSymbol": "ProfilePropertySetU64",
+          "sourceDefined": false,
+          "member": null,
+          "receiver": null,
+          "templateArguments": {
+            "names": [],
+            "source": "usage-required-when-unresolved"
+          },
+          "monomorphization": null
+        },
+        "abi": {
+          "argumentOffset": 0,
+          "argumentCount": 2,
+          "resultKind": "void",
+          "resultNativeType": "void",
+          "resultShape": {
+            "kind": "void"
+          },
+          "parameters": [
+            {
+              "position": 0,
+              "name": "idx",
+              "nativeType": "ProfileIdx",
+              "direction": "value",
+              "cellKind": "named",
+              "shape": {
+                "kind": "named",
+                "name": "ProfileIdx",
+                "target": {
+                  "kind": "scalar",
+                  "name": "u64"
+                }
+              },
+              "requirements": []
+            },
+            {
+              "position": 1,
+              "name": "v",
+              "nativeType": "uint64_t",
+              "direction": "value",
+              "cellKind": "scalar",
+              "shape": {
+                "kind": "scalar",
+                "name": "u64"
+              },
+              "requirements": []
+            }
+          ],
+          "frame": "DehermDmSdkUniversalFrame/v1"
+        },
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_named_scalar_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "expectations": {
+          "selection": "exact-family-adapter-id",
+          "arguments": "ordered-native-abi",
+          "result": "family-adapter-result-contract",
+          "failClosed": true
+        },
+        "vectorSha256": "7abf94e0045fefeca949f37ef0e7a18f50d735e9b7bc436e9f9ed747c34d27ad"
       },
       {
         "schemaVersion": 1,
@@ -9057,6 +11171,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_arena_cstring_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_arena_cstring.h",
+        "nativeHeader": "dmsdk/resource/resource.h",
         "exactCallee": "ResourceGetCanonicalPath",
         "familyContract": {
           "digestBytes": null,
@@ -9149,7 +11264,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "b473f67331549954522ad856bbac2943c1ac4f8e0788a96aa0a227e7522afece"
+        "vectorSha256": "43894fc07be20d37f89b43d3f4ed0b0b19ffa9d93d87910d2e41227cbe8d8a2d"
       },
       {
         "schemaVersion": 1,
@@ -9161,6 +11276,7 @@
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_cstring_value_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_cstring_value.h",
+        "nativeHeader": "dmsdk/resource/resource.h",
         "exactCallee": "ResourceGetExtFromPath",
         "familyContract": {
           "digestBytes": null,
@@ -9227,30 +11343,30 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "b4e8f9abe735d11654401dd2c23c1e9e4167592f333993ae2c4ebb2d6eebf9ef"
+        "vectorSha256": "977c9558875f63c1b0257bc26b84ca358ea2a1319ee2557c083d9fb066700198"
       }
     ],
-    "manifestSha256": "8afb8c1589279b65dc8c8971eec0d29eb14acae2f73c9648cc1377d785c47101"
+    "manifestSha256": "a8266cb98addd9410e6c8117465e400e4d3eedb39b868bb396ec216475cbfdef"
   },
   "artifacts": {
     "verificationSource": {
       "path": "tests/fixtures/generated_dmsdk_adapter_exact_verification.cpp",
-      "sha256": "875a28d9658501163161be0f0869a3ef2a1f00bceb9b1597a26d7998632cca0f"
+      "sha256": "40d2ae3e9cb4ba2e9394da8782fb05d4b5f632b37d5a11b9a26ab0f959eca18c"
     },
     "jsiVerificationSource": {
       "path": "tests/fixtures/generated_dmsdk_adapter_jsi_exact_verification.cpp",
       "sha256": "87595c3faa252f39759aef1032ddb1126c22d5926fa7fb679c30d6069fabd8b2"
     }
   },
-  "productionCatalogSha256": "d597cf86477719a5115004b5aee863916bbd779494d41e11692058a45526a4cc",
-  "exactCatalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0",
+  "productionCatalogSha256": "f2249952077681a6945069a2b75aae050bfb1a11e2288fe60d771f11fd65ccbf",
+  "exactCatalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64",
   "sourceHashes": {
-    "productionCatalog": "bc7fa43f5813292f4c01b354369478337d6d094c306300d8306afd0cdbc36ff5",
+    "productionCatalog": "e704f708074a02f9f8697722d610a26f58e4d02e95adde5fe06ca9729c88972e",
     "sdkIr": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "familyReports": {
       "arenaCString": {
         "path": "packages/bindings/generated/defold-dmsdk-arena-span-blockers.json",
-        "sha256": "ece3bb7211b602d0ceefbd74b482c0d6fef7bed133e7d6f763e630baf996db24"
+        "sha256": "3a9f8cea273ef3baa6d79c4178aa919f8cdee3a7f1eac3aa0da98b4711a6b4dc"
       },
       "scalar": {
         "path": "packages/bindings/generated/defold-dmsdk-scalar-thunks.json",
@@ -9260,9 +11376,13 @@
         "path": "packages/bindings/generated/defold-dmsdk-enum-value-bindings.json",
         "sha256": "1b496dcd15611f07b7c142d8dcf7df54e318d1917420792809e1b526657341e6"
       },
+      "namedScalar": {
+        "path": "packages/bindings/generated/defold-dmsdk-named-scalar-bindings.json",
+        "sha256": "fcf97a985ce897a14e1c42832c8197bc040414e9bcb0eeb97885c88d3334a549"
+      },
       "fixedDigest": {
         "path": "packages/bindings/generated/defold-dmsdk-fixed-digest-bindings.json",
-        "sha256": "8eb8c44c17400d23480df6ace4394fc3df50a7cd05aaec34581822d6a1601bcc"
+        "sha256": "486894b57c9ec8527a8591a07d4ee407ad0656da7b37693a108f7235940c58b1"
       },
       "hashSpan": {
         "path": "packages/bindings/generated/defold-dmsdk-hash-span-bindings.json",
@@ -9270,19 +11390,19 @@
       },
       "base64Span": {
         "path": "packages/bindings/generated/defold-dmsdk-base64-span-bindings.json",
-        "sha256": "c61ccb5e00e72eca4aabbf07e4e9d57d8d9bdc56a8b045f4882f13a5654ea749"
+        "sha256": "9e9fe4932de351903548a26044af965496fdc7109b3951fe7873543ab545e4d2"
       },
       "xteaSpan": {
         "path": "packages/bindings/generated/defold-dmsdk-xtea-span-bindings.json",
-        "sha256": "b9f5d4175eec2e6a7c8da66c430e51659ac0774cfc70fa79ec9649cec30912e8"
+        "sha256": "2519ebb56400f587e55a944d29a735f70c14eff3c7d0ccf76a8cb33f1c56ffeb"
       },
       "astcProbe": {
         "path": "packages/bindings/generated/defold-dmsdk-astc-probe-bindings.json",
-        "sha256": "11ad5b05949c4a707d9847d27493cdd0b9576b5043a209366b432f6209898f30"
+        "sha256": "a670930588a6e08ae3f5f358ae968558b5a83e578a5757fb3207bf9384a8db98"
       },
       "cstringValue": {
         "path": "packages/bindings/generated/defold-dmsdk-cstring-value-bindings.json",
-        "sha256": "1f3587099d355d2b1c9fc074b83d726ac24ff90bfe5f540eb9130998c41e33b0"
+        "sha256": "bb20eb817da027055ff5193767e3b6d3eb5befea2d677e6d7726d8357a72bdd7"
       },
       "hashState": {
         "path": "packages/bindings/generated/defold-dmsdk-hash-state-bindings.json",
@@ -9290,5 +11410,5 @@
       }
     }
   },
-  "corpusSha256": "47aa05a9a569e7cfe5d46210c7a62cf652637f78ad7ae64f9846deffb44d8cec"
+  "corpusSha256": "5e339de4288e56b9cea65b4b2b7e80b3624212b3e7d6b00762243103a8e14b05"
 }

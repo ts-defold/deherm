@@ -6,20 +6,21 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import {
   DMSDK_UNIVERSAL_FALLBACK_PATTERN,
   compactDmSdkPatternDecision,
-  defineDmSdkPattern,
   selectDmSdkPattern,
 } from "../packages/compiler/src/dmsdk-pattern-selector.mjs";
 import {
   analyzeXteaSpanRecipe,
-  BOUNDED_SPAN_SEMANTIC_TOKENS,
   createDmSdkFallbackAudit,
   publicDmSdkHeader,
 } from "../packages/compiler/src/dmsdk-bounded-span-recipes.mjs";
+import { xteaSpanPattern } from "../packages/compiler/src/dmsdk-pattern-catalog.mjs";
+import { indexCppSemanticFactArtifact } from "../packages/compiler/src/cpp-semantic-facts.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const defaults = {
   ir: "packages/bindings/generated/defold-sdk-ir.json",
   shapes: "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
+  sourceFacts: "packages/bindings/generated/defold-dmsdk-source-semantic-facts.json",
   policy: "packages/bindings/overrides/dmsdk-xtea-span-bindings.json",
 };
 
@@ -37,7 +38,7 @@ function parseArgs(argv) {
     const argument = argv[index];
     if (argument === "--check") {
       options.check = true;
-    } else if (["--ir", "--shapes", "--policy", "--out-root"].includes(argument)) {
+    } else if (["--ir", "--shapes", "--source-facts", "--policy", "--out-root"].includes(argument)) {
       const key = argument.slice(2).replace(/-([a-z])/g, (_, character) => character.toUpperCase());
       options[key] = resolve(argv[++index]);
     } else {
@@ -51,33 +52,6 @@ function parseArgs(argv) {
   return options;
 }
 
-function xteaSpanPattern() {
-  return defineDmSdkPattern({
-    schemaVersion: 1,
-    id: "span.in-place-keyed-transform",
-    family: "xtea-span",
-    emitter: "scripts/generate-dmsdk-xtea-span-bindings.mjs",
-    priority: 870,
-    cost: 9,
-    fallback: false,
-    when: {
-      declarationKinds: ["function"],
-      result: { rolePrefixes: ["enum:"] },
-      parameters: {
-        count: { exact: 5 },
-        positions: [
-          { rolePrefixes: ["enum:"], directions: ["value"] },
-          { roles: ["pointer:scalar:u8"], directions: ["out", "inout"] },
-          { roles: ["scalar:u32"], directions: ["value"] },
-          { roles: ["pointer:scalar:u8"], directions: ["in"] },
-          { roles: ["scalar:u32"], directions: ["value"] },
-        ],
-      },
-      requireSemanticTokens: BOUNDED_SPAN_SEMANTIC_TOKENS.xtea,
-    },
-  });
-}
-
 function patternFacts(row, semanticTokens = []) {
   return {
     id: row.id,
@@ -89,8 +63,8 @@ function patternFacts(row, semanticTokens = []) {
   };
 }
 
-export function extractXteaSpanSemantics(declaration, candidate, enumDeclarations, recipe) {
-  return analyzeXteaSpanRecipe(declaration, candidate, enumDeclarations, recipe).semantics;
+export function extractXteaSpanSemantics(declaration, candidate, enumDeclarations, recipe, sourceFacts) {
+  return analyzeXteaSpanRecipe(declaration, candidate, enumDeclarations, recipe, sourceFacts).semantics;
 }
 
 function renderHeader(entries) {
@@ -150,7 +124,7 @@ function validateProvenance(ir, shapes, irText) {
   }
 }
 
-function createEntries(rows, declarations, enumDeclarations, policy) {
+function createEntries(rows, declarations, enumDeclarations, sourceFactsById, policy) {
   const patterns = [xteaSpanPattern(), DMSDK_UNIVERSAL_FALLBACK_PATTERN];
   const entries = [];
   const blocked = [];
@@ -162,7 +136,13 @@ function createEntries(rows, declarations, enumDeclarations, policy) {
     structurallyEligible += 1;
     const declaration = declarations.get(candidate.id);
     if (!declaration) throw new Error(`XTEA-span candidate is absent from dmSDK IR: ${candidate.id}`);
-    const analysis = analyzeXteaSpanRecipe(declaration, candidate, enumDeclarations, policy.recipe);
+    const analysis = analyzeXteaSpanRecipe(
+      declaration,
+      candidate,
+      enumDeclarations,
+      policy.recipe,
+      sourceFactsById.get(candidate.id),
+    );
     const semantics = analysis.semantics;
     const decision = selectDmSdkPattern(patternFacts(candidate, semantics?.semanticTokens), patterns);
     if (decision.patternId !== "span.in-place-keyed-transform") {
@@ -189,6 +169,7 @@ function createEntries(rows, declarations, enumDeclarations, policy) {
       mode: semantics.mode,
       algorithmExpression: semantics.algorithmExpression,
       successExpression: semantics.successExpression,
+      maximumKeyBytes: semantics.maximumKeyBytes,
       evidence: semantics.evidence,
       patternDecision: compactDmSdkPatternDecision(decision),
     });
@@ -196,17 +177,24 @@ function createEntries(rows, declarations, enumDeclarations, policy) {
   return { entries, blocked, structurallyEligible, patterns };
 }
 
-function createReport(contents, ir, shapes, policy, entries, blocked, structurallyEligible, patterns, artifacts) {
+function createReport(
+  contents,
+  ir,
+  shapes,
+  policy,
+  entries,
+  blocked,
+  structurallyEligible,
+  patterns,
+  artifacts,
+  maximumKeyBytes,
+) {
   return {
     schemaVersion: 1,
     policyVersion: policy.policyVersion,
     defoldRevision: ir.defoldRevision,
     sources: defaults,
-    sourceHashes: {
-      ir: sha256(contents.ir),
-      shapes: sha256(contents.shapes),
-      policy: sha256(contents.policy),
-    },
+    sourceHashes: Object.fromEntries(Object.entries(contents).map(([key, value]) => [key, sha256(value)])),
     policy: {
       recipe: policy.recipe,
       patternRegistry: patterns.map(({ id, family, emitter, priority, cost, fallback, when }) => ({
@@ -219,7 +207,7 @@ function createReport(contents, ir, shapes, policy, entries, blocked, structural
         when,
       })),
       algorithm: "the revision's sole algorithm enum member",
-      keyLength: `0..${policy.recipe.maximumKeyBytes} bytes checked before the native call`,
+      keyLength: `0..${maximumKeyBytes} bytes checked before the native call`,
     },
     coverage: {
       baselineRuntimePending: shapes.coverage.runtimePending,
@@ -238,10 +226,11 @@ function createReport(contents, ir, shapes, policy, entries, blocked, structural
       entries: blocked.map(({ fallbackAudit }) => fallbackAudit),
     },
     declarations: [
-      ...entries.map(({ id, candidate, wrapper, mode, evidence, patternDecision }) => ({
+      ...entries.map(({ id, candidate, wrapper, mode, maximumKeyBytes: entryMaximum, evidence, patternDecision }) => ({
         ...candidate,
         bindingId: id,
         mode,
+        maximumKeyBytes: entryMaximum,
         evidence,
         patternDecision,
         wrapper,
@@ -273,27 +262,30 @@ async function writeOrCheck(options, relative, content) {
 
 export async function run(argv = process.argv.slice(2)) {
   const options = parseArgs(argv);
-  const [irText, shapesText, policyText] = await Promise.all([
+  const [irText, shapesText, sourceFactsText, policyText] = await Promise.all([
     readFile(options.ir, "utf8"),
     readFile(options.shapes, "utf8"),
+    readFile(options.sourceFacts, "utf8"),
     readFile(options.policy, "utf8"),
   ]);
-  const contents = { ir: irText, shapes: shapesText, policy: policyText };
+  const contents = { ir: irText, shapes: shapesText, sourceFacts: sourceFactsText, policy: policyText };
   const ir = JSON.parse(irText);
   const shapes = JSON.parse(shapesText);
+  const sourceFacts = JSON.parse(sourceFactsText);
   const policy = JSON.parse(policyText);
   validateProvenance(ir, shapes, irText);
+  const sourceFactsById = indexCppSemanticFactArtifact(sourceFacts, {
+    revision: ir.defoldRevision,
+    irText,
+    shapesText,
+  });
   if (
     policy.schemaVersion !== 1 ||
-    policy.policyVersion !== "xtea-span-v3" ||
+    policy.policyVersion !== "xtea-span-v4" ||
     policy.family !== "in-place-keyed-transform" ||
-    policy.recipe?.algorithm !== "xtea" ||
-    JSON.stringify(policy.recipe?.operations) !== JSON.stringify(["decrypt", "encrypt"]) ||
     policy.recipe?.data !== "borrowed-mutable-counted-bytes" ||
     policy.recipe?.key !== "borrowed-counted-bytes" ||
-    policy.recipe?.maximumKeyBytes !== 16 ||
     policy.recipe?.requireSingleAlgorithm !== true ||
-    policy.recipe?.successEnumValue !== 0 ||
     policy.recipe?.ownership !== "synchronous-noescape" ||
     policy.recipe?.fallback !== "universal-recipe"
   ) {
@@ -308,9 +300,17 @@ export async function run(argv = process.argv.slice(2)) {
     shapes.rows,
     declarations,
     enumDeclarations,
+    sourceFactsById,
     policy,
   );
-  const artifacts = renderArtifacts(entries, policy.recipe.maximumKeyBytes);
+  const keyMaximums = [...new Set(entries.map(({ maximumKeyBytes }) => maximumKeyBytes))].sort(
+    (left, right) => left - right,
+  );
+  if (keyMaximums.length > 1) {
+    throw new Error(`XTEA transforms disagree on the implementation-derived key maximum: ${keyMaximums.join(", ")}`);
+  }
+  const maximumKeyBytes = keyMaximums[0] ?? 0;
+  const artifacts = renderArtifacts(entries, maximumKeyBytes);
   const report = createReport(
     contents,
     ir,
@@ -321,6 +321,7 @@ export async function run(argv = process.argv.slice(2)) {
     structurallyEligible,
     patterns,
     artifacts,
+    maximumKeyBytes,
   );
   artifacts.set(
     "packages/bindings/generated/defold-dmsdk-xtea-span-bindings.json",

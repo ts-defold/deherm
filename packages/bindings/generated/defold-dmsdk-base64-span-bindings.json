@@ -1,27 +1,24 @@
 {
   "schemaVersion": 1,
-  "policyVersion": "base64-span-v3",
+  "policyVersion": "base64-span-v5",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "sources": {
     "ir": "packages/bindings/generated/defold-sdk-ir.json",
     "shapes": "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
+    "sourceFacts": "packages/bindings/generated/defold-dmsdk-source-semantic-facts.json",
     "policy": "packages/bindings/overrides/dmsdk-base64-span-bindings.json"
   },
   "sourceHashes": {
     "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
-    "policy": "592ab99764296fd8c42d2454541d04615986db77aa3ce95212cd4d2049f43562"
+    "sourceFacts": "c9120a540a5f993feddb5bcd0e52e77a265e8c29d8614934486a1ee23e76db4a",
+    "policy": "52a25ca0a83b7410dd0dbadb4847c4de8e922a56c93b46857c37f2696de2e31c"
   },
   "policy": {
     "recipe": {
-      "codec": "base64",
-      "operations": [
-        "decode",
-        "encode"
-      ],
       "input": "borrowed-counted-bytes",
       "output": "caller-owned-capacity-inout",
-      "decodeInput": "canonical-padded",
+      "decodeInput": "derive-from-implementation",
       "sizeQuery": "zero-output-capacity",
       "ownership": "synchronous-noescape",
       "fallback": "universal-recipe"
@@ -103,7 +100,7 @@
     ],
     "cAbi": "const uint8_t* plus uint32_t input length; caller-owned uint8_t* plus explicit uint32_t capacity/output length",
     "ownership": "both spans are borrowed only for the synchronous call; no pointer escapes",
-    "decode": "strict padded Base64 syntax is validated before calling the platform decoder",
+    "decode": "unpadded-input support is derived from the revision implementation; otherwise glue conservatively requires canonical padding",
     "query": "zero output capacity preserves the documented size-query protocol but does not claim input validity",
     "allocation": "generated glue has no heap primitive; the warmed harness observes zero C++ operator new calls, while native and Objective-C allocations are unmeasured",
     "jsi": "not-generated pending typed-array lifetime and installer policy",
@@ -122,7 +119,7 @@
     "defold/defold_hermes/include/defold_hermes/generated_dmsdk_base64_span_runtime.h": "44e79f513d5a7133e243ad40341bdf69793201e2447a0a76ad387509d7092c8f",
     "defold/defold_hermes/include/defold_hermes/generated_dmsdk_base64_span.h": "85762f2c7471fc0b3ecaecafe6eb2226083186e8c82033499ecf4dceeb60ab18",
     "defold/defold_hermes/src/generated_dmsdk_base64_span_crypt.cpp": "192e84dec0f93139334f3b42addbafd7331abaa9068b031d1e70d523679d5861",
-    "defold/defold_hermes/src/generated_dmsdk_base64_span_runtime.cpp": "1bd742fec714444570d9ebcc1470931e258efecb4e1d2a99332517ed6e2dd4a6"
+    "defold/defold_hermes/src/generated_dmsdk_base64_span_runtime.cpp": "9dd3db339344a5174a85f68b06215ef9e0ae214f5205d139343917efae75da39"
   },
   "artifacts": [
     "defold/defold_hermes/include/defold_hermes/generated_dmsdk_base64_span.h",
@@ -193,13 +190,28 @@
       ],
       "bindingId": 0,
       "mode": "decode",
-      "requirePaddedInput": true,
+      "requirePaddedInput": false,
       "evidence": {
         "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
         "declarationLine": 133,
-        "semanticSource": "revision-ir-abi+identifier-grammar+stable-format-recipe",
-        "codec": "base64",
-        "operation": "decode"
+        "semanticSource": "revision-implementation-ast+abi-shape",
+        "operation": "decode",
+        "capacityQuery": "dereferenced-capacity-equals-zero",
+        "unpaddedInput": "accepted-by-padding-adapter",
+        "implementationObservations": [
+          {
+            "source": "upstream/defold/engine/dlib/src/dlib/crypt_mbedtls.cpp",
+            "line": 89,
+            "callee": "mbedtls_base64_decode",
+            "mode": "decode"
+          }
+        ],
+        "paddingAdapterObservations": [
+          {
+            "source": "upstream/defold/engine/dlib/src/dlib/crypt_mbedtls.cpp",
+            "line": 89
+          }
+        ]
       },
       "patternDecision": "span.bounded-byte-transform",
       "wrapper": "deherm_dmsdk_base64_span_dm_crypt_base64_decode",
@@ -272,9 +284,19 @@
       "evidence": {
         "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
         "declarationLine": 120,
-        "semanticSource": "revision-ir-abi+identifier-grammar+stable-format-recipe",
-        "codec": "base64",
-        "operation": "encode"
+        "semanticSource": "revision-implementation-ast+abi-shape",
+        "operation": "encode",
+        "capacityQuery": "dereferenced-capacity-equals-zero",
+        "unpaddedInput": "not-applicable",
+        "implementationObservations": [
+          {
+            "source": "upstream/defold/engine/dlib/src/dlib/crypt_mbedtls.cpp",
+            "line": 54,
+            "callee": "mbedtls_base64_encode",
+            "mode": "encode"
+          }
+        ],
+        "paddingAdapterObservations": []
       },
       "patternDecision": "span.bounded-byte-transform",
       "wrapper": "deherm_dmsdk_base64_span_dm_crypt_base64_encode",

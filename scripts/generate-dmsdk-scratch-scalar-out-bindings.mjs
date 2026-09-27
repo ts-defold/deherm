@@ -6,9 +6,9 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import {
   DMSDK_UNIVERSAL_FALLBACK_PATTERN,
   compactDmSdkPatternDecision,
-  defineDmSdkPattern,
   selectDmSdkPattern,
 } from "../packages/compiler/src/dmsdk-pattern-selector.mjs";
+import { scratchScalarOutPattern } from "../packages/compiler/src/dmsdk-pattern-catalog.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const paths = Object.freeze({
@@ -66,29 +66,6 @@ function roleKind(role) {
 function handleName(role) {
   if (!role.startsWith("handle:")) return undefined;
   return role.split(":").slice(1, -1).join(":");
-}
-
-function scratchScalarOutPattern(policy) {
-  return defineDmSdkPattern({
-    schemaVersion: 1,
-    id: "pointer.scratch-scalar-out-provider-boundary",
-    family: "scratch-scalar-out",
-    emitter: "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
-    priority: 800,
-    cost: 25,
-    fallback: false,
-    when: {
-      result: { rolePrefixes: policy.selection.resultRolePrefixes },
-      parameters: {
-        every: [
-          { rolePrefixes: policy.selection.valueRolePrefixes, directions: ["value"] },
-          { rolePrefixes: policy.selection.pointerRolePrefixes, directions: policy.selection.pointerDirections },
-        ],
-        some: [{ rolePrefixes: policy.selection.pointerRolePrefixes, directions: ["out", "inout"] }],
-      },
-      rejectFamilies: policy.selection.rejectedFamilies,
-    },
-  });
 }
 
 function patternFacts(shape, projected) {
@@ -352,7 +329,7 @@ export async function build(overrides = {}) {
   const declarationById = new Map(ir.declarations.map((row) => [row.id, row]));
   const entries = [];
   const rows = [];
-  const patterns = [scratchScalarOutPattern(policy), DMSDK_UNIVERSAL_FALLBACK_PATTERN];
+  const patterns = [scratchScalarOutPattern(policy.selection), DMSDK_UNIVERSAL_FALLBACK_PATTERN];
   for (const shape of candidates) {
     const projected = projectionById.get(shape.id);
     const declaration = declarationById.get(shape.id);

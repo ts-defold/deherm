@@ -1,12 +1,42 @@
 # Defold Hermes knowledge log
 
+## 2026-09-27 - Implementation AST facts close the bounded-span semantic wave
+
+- Replaced the last Defold-derived bounded-span constants and identifier rules
+  in the package with compact facts parsed from the pinned C/C++ implementation
+  AST. Stable package code now owns only structural queries, patterns, emitters,
+  and audit recommendations.
+- Current derivation observes 10/10 requested implementation records and emits
+  4/4 fixed-digest, 2/2 Base64, 2/2 ASTC, and 2/2 XTEA optimized adapters.
+  Their focused native suite passes 22/22 tests with compile/link, success,
+  rejection, and zero-warmed-allocation evidence.
+- The global fallback ledger accounts for all 1,260 universal routes across
+  848 structural groups; 101 declarations prefer a specialization and no
+  declaration is silently omitted. The generated exact-call corpus now includes
+  all 20 callable named-scalar routes, for 94 exact specialized vectors.
+- Removed checkout-dependent include-root discovery and normalized Clang
+  diagnostics before hashing. The synthetic clean room now regenerates all
+  1,361 declarations and 115 artifacts byte-for-byte from its declared source,
+  header, SDK, policy, and compiler inputs.
+- Evidence boundary: the source facts prove what the pinned implementations
+  contain; exact native harnesses prove the generated ABI calls execute; the
+  clean room proves deterministic regeneration. None alone proves packaged
+  engine behavior on every Defold target.
+- A final source-truth audit removed one package-authored semantic restriction:
+  Defold's implementation pads non-multiple-of-four Base64 input before decode,
+  and its pinned tests require unpadded JWT-style input to work. The compiler
+  now derives that behavior from the implementation AST, the generated adapter
+  accepts and executes an unpadded fixture, and the warmed allocation claim
+  remains explicitly limited to the canonical-input path because Defold itself
+  allocates its temporary padding buffer for unpadded input.
+
 ## 2026-09-27 - Bounded span semantics are stable recipes, not copied prose
 
 - Replaced the remaining fixed-digest, Base64, ASTC, and XTEA description
-  matchers with one compiler-owned semantic recipe module. Revision IR supplies
-  exact ABI shapes, identifiers, enums, headers, and symbols; stable recipes
-  supply digest standards, codec/format operations, bounds, ownership, and
-  fallback contracts.
+  matchers with one compiler-owned semantic recipe module. This intermediate
+  wave proved the structural family split and universal fallback contract; the
+  implementation-AST wave above subsequently moved the remaining
+  revision-derived operations and bounds out of the package.
 - All ten optimized adapters regenerate with byte-identical C/C++ output. Their
   packaged-SDK or pinned-source compile, link, rejection, behavior, and warmed
   zero-C++-allocation harnesses pass.

@@ -87,10 +87,14 @@ test("base64-span generator rejects mixed provenance", async () => {
   }
 });
 
-test("base64-span semantics come from ABI plus codec identifier grammar, not documentation prose", async () => {
-  const [ir, shapes] = await Promise.all([
+test("base64-span semantics come from implementation dataflow plus ABI, not names or documentation prose", async () => {
+  const [ir, shapes, sourceFacts] = await Promise.all([
     readFile(join(repositoryRoot, "packages/bindings/generated/defold-sdk-ir.json"), "utf8").then(JSON.parse),
     readFile(join(repositoryRoot, "packages/bindings/generated/defold-dmsdk-abi-shapes.json"), "utf8").then(JSON.parse),
+    readFile(
+      join(repositoryRoot, "packages/bindings/generated/defold-dmsdk-source-semantic-facts.json"),
+      "utf8",
+    ).then(JSON.parse),
   ]);
   const policyText = await readFile(
     join(repositoryRoot, "packages/bindings/overrides/dmsdk-base64-span-bindings.json"),
@@ -102,12 +106,19 @@ test("base64-span semantics come from ABI plus codec identifier grammar, not doc
     /documentationContract|description|symbolPrefix|candidateSelector|crypt\.h|"entries"/u,
   );
   const declarations = ir.declarations.filter(({ name }) => /Base64(?:Encode|Decode)$/u.test(name));
+  const factsById = new Map(sourceFacts.declarations.map((entry) => [entry.declarationId, entry]));
   assert.equal(declarations.length, 2);
   for (const declaration of declarations) {
     const candidate = shapes.rows.find(({ id }) => id === declaration.id);
-    const semantics = extractBase64SpanSemantics(declaration, candidate, policy.recipe);
+    const facts = factsById.get(declaration.id);
+    const semantics = extractBase64SpanSemantics(declaration, candidate, policy.recipe, facts);
     assert.ok(semantics, declaration.id);
     assert.equal(semantics.mode, declaration.name.endsWith("Encode") ? "encode" : "decode");
+    assert.equal(semantics.requirePaddedInput, false);
+    assert.equal(
+      semantics.evidence.unpaddedInput,
+      declaration.name.endsWith("Decode") ? "accepted-by-padding-adapter" : "not-applicable",
+    );
     assert.ok(
       extractBase64SpanSemantics(
         {
@@ -118,16 +129,22 @@ test("base64-span semantics come from ABI plus codec identifier grammar, not doc
         },
         candidate,
         policy.recipe,
+        facts,
       ),
     );
-    assert.equal(
-      extractBase64SpanSemantics({ ...declaration, name: "dmCrypt::Transform" }, candidate, policy.recipe),
-      null,
+    assert.ok(
+      extractBase64SpanSemantics(
+        { ...declaration, name: "dmCrypt::Transform" },
+        candidate,
+        policy.recipe,
+        facts,
+      ),
     );
+    assert.equal(extractBase64SpanSemantics(declaration, candidate, policy.recipe, { definitions: [] }), null);
   }
 });
 
-test("base64 C ABI links, rejects unsafe input, and observes zero warmed C++ operator new calls", async (context) => {
+test("base64 C ABI links, preserves native acceptance, and observes zero warmed C++ operator new calls", async (context) => {
   if (process.platform !== "darwin" || process.arch !== "arm64") {
     context.skip(
       `pinned packaged-library runtime harness requires arm64-macos, got ${process.arch}-${process.platform}`,

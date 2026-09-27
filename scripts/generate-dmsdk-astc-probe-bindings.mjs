@@ -6,20 +6,21 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import {
   DMSDK_UNIVERSAL_FALLBACK_PATTERN,
   compactDmSdkPatternDecision,
-  defineDmSdkPattern,
   selectDmSdkPattern,
 } from "../packages/compiler/src/dmsdk-pattern-selector.mjs";
 import {
   analyzeAstcProbeRecipe,
-  BOUNDED_SPAN_SEMANTIC_TOKENS,
   createDmSdkFallbackAudit,
   publicDmSdkHeader,
 } from "../packages/compiler/src/dmsdk-bounded-span-recipes.mjs";
+import { astcProbePattern } from "../packages/compiler/src/dmsdk-pattern-catalog.mjs";
+import { indexCppSemanticFactArtifact } from "../packages/compiler/src/cpp-semantic-facts.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const defaults = {
   ir: "packages/bindings/generated/defold-sdk-ir.json",
   shapes: "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
+  sourceFacts: "packages/bindings/generated/defold-dmsdk-source-semantic-facts.json",
   policy: "packages/bindings/overrides/dmsdk-astc-probe-bindings.json",
 };
 
@@ -37,7 +38,7 @@ function parseArgs(argv) {
     const argument = argv[index];
     if (argument === "--check") {
       options.check = true;
-    } else if (["--ir", "--shapes", "--policy", "--out-root"].includes(argument)) {
+    } else if (["--ir", "--shapes", "--source-facts", "--policy", "--out-root"].includes(argument)) {
       const key = argument.slice(2).replace(/-([a-z])/g, (_, character) => character.toUpperCase());
       options[key] = resolve(argv[++index]);
     } else {
@@ -45,38 +46,11 @@ function parseArgs(argv) {
     }
   }
 
-  for (const key of ["ir", "shapes", "policy"]) {
+  for (const key of Object.keys(defaults)) {
     options[key] = resolve(root, options[key]);
   }
 
   return options;
-}
-
-function astcProbePattern() {
-  return defineDmSdkPattern({
-    schemaVersion: 1,
-    id: "span.fixed-three-u32-probe",
-    family: "astc-probe",
-    emitter: "scripts/generate-dmsdk-astc-probe-bindings.mjs",
-    priority: 880,
-    cost: 8,
-    fallback: false,
-    when: {
-      declarationKinds: ["function"],
-      result: { roles: ["scalar:bool"] },
-      parameters: {
-        count: { exact: 5 },
-        positions: [
-          { roles: ["opaque-pointer"], directions: ["in"] },
-          { roles: ["scalar:u32"], directions: ["value"] },
-          { roles: ["pointer:scalar:u32"], directions: ["out", "inout"] },
-          { roles: ["pointer:scalar:u32"], directions: ["out", "inout"] },
-          { roles: ["pointer:scalar:u32"], directions: ["out", "inout"] },
-        ],
-      },
-      requireSemanticTokens: BOUNDED_SPAN_SEMANTIC_TOKENS.astc,
-    },
-  });
 }
 
 function patternFacts(row, semanticTokens = []) {
@@ -90,8 +64,8 @@ function patternFacts(row, semanticTokens = []) {
   };
 }
 
-export function extractAstcProbeSemantics(declaration, candidate, recipe) {
-  return analyzeAstcProbeRecipe(declaration, candidate, recipe).semantics;
+export function extractAstcProbeSemantics(declaration, candidate, recipe, sourceFacts) {
+  return analyzeAstcProbeRecipe(declaration, candidate, recipe, sourceFacts).semantics;
 }
 
 function renderHeader(entries) {
@@ -141,6 +115,7 @@ async function build(options) {
   );
   const ir = JSON.parse(contents.ir);
   const shapes = JSON.parse(contents.shapes);
+  const sourceFacts = JSON.parse(contents.sourceFacts);
   const policy = JSON.parse(contents.policy);
 
   if (ir.defoldRevision !== shapes.defoldRevision) {
@@ -149,15 +124,17 @@ async function build(options) {
   if (sha256(contents.ir) !== shapes.sourceHashes.ir) {
     throw new Error("IR hash does not match ABI-shape census provenance");
   }
+  const sourceFactsById = indexCppSemanticFactArtifact(sourceFacts, {
+    revision: ir.defoldRevision,
+    irText: contents.ir,
+    shapesText: contents.shapes,
+  });
   if (
     policy.schemaVersion !== 1 ||
-    policy.policyVersion !== "astc-probe-v3" ||
+    policy.policyVersion !== "astc-probe-v4" ||
     policy.family !== "bounded-three-scalar-probe" ||
-    policy.recipe?.format !== "astc" ||
-    JSON.stringify(policy.recipe?.operations) !== JSON.stringify(["block-size", "dimensions"]) ||
     policy.recipe?.input !== "borrowed-counted-bytes" ||
     policy.recipe?.output !== "caller-owned-three-u32" ||
-    policy.recipe?.minimumHeaderBytes !== 16 ||
     policy.recipe?.ownership !== "synchronous-noescape" ||
     policy.recipe?.fallback !== "universal-recipe"
   ) {
@@ -177,7 +154,12 @@ async function build(options) {
     structurallyEligible += 1;
     const declaration = declarationsById.get(candidate.id);
     if (!declaration) throw new Error(`ASTC-probe candidate is absent from dmSDK IR: ${candidate.id}`);
-    const analysis = analyzeAstcProbeRecipe(declaration, candidate, policy.recipe);
+    const analysis = analyzeAstcProbeRecipe(
+      declaration,
+      candidate,
+      policy.recipe,
+      sourceFactsById.get(candidate.id),
+    );
     const semantics = analysis.semantics;
     const decision = selectDmSdkPattern(patternFacts(candidate, semantics?.semanticTokens), patterns);
     if (decision.patternId !== "span.fixed-three-u32-probe") {
@@ -202,22 +184,31 @@ async function build(options) {
       candidate,
       declaration,
       mode: semantics.mode,
+      minimumHeaderBytes: semantics.minimumHeaderBytes,
       evidence: semantics.evidence,
       patternDecision: compactDmSdkPatternDecision(decision),
       wrapper: `deherm_dmsdk_astc_probe_${snake(declaration.name)}`,
     });
   }
 
+  const headerMinimums = [...new Set(entries.map(({ minimumHeaderBytes }) => minimumHeaderBytes))].sort(
+    (left, right) => left - right,
+  );
+  if (headerMinimums.length > 1) {
+    throw new Error(`ASTC probes disagree on the implementation-derived header minimum: ${headerMinimums.join(", ")}`);
+  }
+  const minimumHeaderBytes = headerMinimums[0] ?? 0;
+
   const artifacts = new Map([
     ["defold/defold_hermes/include/defold_hermes/generated_dmsdk_astc_probe.h", renderHeader(entries)],
     ["defold/defold_hermes/include/defold_hermes/generated_dmsdk_astc_probe_runtime.h", renderRuntimeHeader()],
     [
       "defold/defold_hermes/src/generated_dmsdk_astc_probe_image.cpp",
-      renderSource(entries, policy.recipe.minimumHeaderBytes),
+      renderSource(entries, minimumHeaderBytes),
     ],
     [
       "defold/defold_hermes/src/generated_dmsdk_astc_probe_runtime.cpp",
-      renderRuntime(entries, policy.recipe.minimumHeaderBytes),
+      renderRuntime(entries, minimumHeaderBytes),
     ],
   ]);
   const report = {
@@ -242,7 +233,7 @@ async function build(options) {
       cAbi: "bounded uint8_t input span and caller-owned fixed three-u32 result",
       ownership: "input is synchronously borrowed; only scalar results return",
       safety:
-        "generated preflight rejects null input and spans shorter than the pinned native 16-byte ASTC header minimum",
+        `generated preflight rejects null input and spans shorter than the implementation-derived ${minimumHeaderBytes}-byte header minimum`,
       allocation: "no generated or pinned image parser allocation",
       jsi: "not-generated pending typed-array lifetime and installer policy",
       html5: "not-claimed pending target compile/link matrix",
@@ -268,6 +259,7 @@ async function build(options) {
         ...entry.candidate,
         bindingId: entry.id,
         mode: entry.mode,
+        minimumHeaderBytes: entry.minimumHeaderBytes,
         evidence: entry.evidence,
         patternDecision: entry.patternDecision,
         wrapper: entry.wrapper,

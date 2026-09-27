@@ -28,19 +28,19 @@
     "scriptUniversalValue": "a335c0cff8f6f96aefbc889168e03ec4126c461c00c165cfbe84aa2843621b5c",
     "scriptConstantLowering": "53815679718931177edd274504ea8f2decba28f6dac328f27a039070a2c82198",
     "defoldValueLayouts": "a905f72450a2164d414d90e37359ea9b0207609ead5c16e928b39400c32f3d5b",
-    "dmsdkProjection": "c21f68ff2f76a3484bc09e0ad5bb78bed29b636ea92042319d19dca229c05bb4",
-    "dmsdkUniversal": "bc7fa43f5813292f4c01b354369478337d6d094c306300d8306afd0cdbc36ff5",
+    "dmsdkProjection": "0ddec1a1a7d381f341caede4d19115fe51bc2f2d534cdae1cb0840be9f140a07",
+    "dmsdkUniversal": "e704f708074a02f9f8697722d610a26f58e4d02e95adde5fe06ca9729c88972e",
     "dmsdkScalarThunks": "5118cca8108704a921b1978f79098a0d01ed1ecb6380181664b66b887daddaf0",
     "dmsdkEnumValues": "1b496dcd15611f07b7c142d8dcf7df54e318d1917420792809e1b526657341e6",
     "dmsdkNamedScalars": "fcf97a985ce897a14e1c42832c8197bc040414e9bcb0eeb97885c88d3334a549",
-    "dmsdkFixedDigests": "8eb8c44c17400d23480df6ace4394fc3df50a7cd05aaec34581822d6a1601bcc",
-    "dmsdkBase64Spans": "c61ccb5e00e72eca4aabbf07e4e9d57d8d9bdc56a8b045f4882f13a5654ea749",
-    "dmsdkAstcProbes": "11ad5b05949c4a707d9847d27493cdd0b9576b5043a209366b432f6209898f30",
-    "dmsdkXteaSpans": "b9f5d4175eec2e6a7c8da66c430e51659ac0774cfc70fa79ec9649cec30912e8",
+    "dmsdkFixedDigests": "486894b57c9ec8527a8591a07d4ee407ad0656da7b37693a108f7235940c58b1",
+    "dmsdkBase64Spans": "9e9fe4932de351903548a26044af965496fdc7109b3951fe7873543ab545e4d2",
+    "dmsdkAstcProbes": "a670930588a6e08ae3f5f358ae968558b5a83e578a5757fb3207bf9384a8db98",
+    "dmsdkXteaSpans": "2519ebb56400f587e55a944d29a735f70c14eff3c7d0ccf76a8cb33f1c56ffeb",
     "dmsdkHashSpans": "140976814df7caec7d86490699db79723c4e028d3d4856fac91c084ac06f73cc",
-    "dmsdkArenaSpanBlockers": "ece3bb7211b602d0ceefbd74b482c0d6fef7bed133e7d6f763e630baf996db24",
-    "dmsdkCStringValue": "1f3587099d355d2b1c9fc074b83d726ac24ff90bfe5f540eb9130998c41e33b0",
-    "dmsdkBorrowedHandle": "cc1962bc425d24b65fc5481b64eefaf03ce4bd7f12e5936a8b35e53b251ccb38",
+    "dmsdkArenaSpanBlockers": "3a9f8cea273ef3baa6d79c4178aa919f8cdee3a7f1eac3aa0da98b4711a6b4dc",
+    "dmsdkCStringValue": "bb20eb817da027055ff5193767e3b6d3eb5befea2d677e6d7726d8357a72bdd7",
+    "dmsdkBorrowedHandle": "b226d42b363fa13ee25b3163c5c41f496300315b9978304dcf2953f0c84670fb",
     "dmsdkTargetConditionals": "e743b8b82ba78fb8d6c6f49973493f69e3ae53ea3cea05a02ae42bbf8647cdbf",
     "semanticPolicies": "d49b82277fc9267ec3868530dce2d87777108754ac1854c1b21596e8110908f6",
     "typescriptSdk": "81b1278970b1a6efa11c533a979adf61a93174cb9f268cab7bb618a3465a3ec7",
@@ -66,19 +66,19 @@
     "scriptUniversalValue": "28bafa01bbfade3c7fbfb88412973091fc961549dec9529432a36bf998945328",
     "scriptConstantLowering": "cf923dc81d26c2d45a21fe9b3691c65d69950adda5fbcb68bbae0331704f4154",
     "defoldValueLayouts": "eac699e8e10722490bda1981edfa002e4b5fe9ac8b1eb1a12898abc5689708ca",
-    "dmsdkProjection": "103ef6c48749ef4fbbd1fd411eaed7e59b3b32ff11c89ed5d9cbd0c9d4b5c95a",
-    "dmsdkUniversal": "89fb6716a650015997f0bdb4f457fdcd54157630dd1a8f3fbddeec95b9d88d53",
+    "dmsdkProjection": "2e864843728b33869fb76174258a22e2d65cceeac7075517e34049253eb737f4",
+    "dmsdkUniversal": "193be2aee5333c8cdc2adc226926afe637e81f7b461d0510d124149529206dd1",
     "dmsdkScalarThunks": "932a8bf0f5b8e4de10320fcf2f238d6463e20b3acc4e143c59f28442ca12f2c1",
     "dmsdkEnumValues": "4340c7b511a1e03cfde725b739e926a27345502f9d898b6b0e60c7f7c83d6c9e",
     "dmsdkNamedScalars": "858e5d03cc52e5cdad39775380e5087f02ec0976cf19ac94f44c671a2349ebfb",
-    "dmsdkFixedDigests": "e0d3caf10408a059905dd34c61dbefe880ba520d16efe6f706d0533bc0b134a5",
-    "dmsdkBase64Spans": "79e82add50c529abdd8b4323cc11335bad1d9f9953a53c1185e46db91f5b9eca",
-    "dmsdkAstcProbes": "241f727d13a9f4b759cfaafbf0a50245db4950da4d461b32077c2be82343cba2",
-    "dmsdkXteaSpans": "1bda5aaa12fe04b573d4a3bb57c0259f7447ef4946199413b44a005d0bee4efa",
+    "dmsdkFixedDigests": "e23c0579e5b368186ec8a8e9452be87ddb3ff7b7a55ea1b0a0df5e74e049ac4b",
+    "dmsdkBase64Spans": "e51c28b819a4da66edd528be471d30753a06e5124bf38741849f7dd8ece25c9e",
+    "dmsdkAstcProbes": "def9a46d85b10767f441252b68eaf0d5285019737d2c4f8f9e9d68da037aabd1",
+    "dmsdkXteaSpans": "d45de65dc602eeb229ce3bf936a695eeaae7bf42a3c751f0030fc17b130c087f",
     "dmsdkHashSpans": "fd62a84943c0b7ac4decae162613457660d4f9a66ff67389f4bcb5b79498c7e3",
-    "dmsdkArenaSpanBlockers": "677f1d234443527b8638074840597fc144dfc937f167ca9e83e4cadac8fa4a76",
-    "dmsdkCStringValue": "57164b836424f486f1349ab21dd75f548c55a2a8d688cef9810e083ab8ef3856",
-    "dmsdkBorrowedHandle": "990f750ad6668d2003c2a3d9ead07bd50f5f9b40d602a61588e448afffef7dee",
+    "dmsdkArenaSpanBlockers": "c9ff248569cf43ab4d9c6c71592455ee72555fa4993787e0c31e7c78b89ed14c",
+    "dmsdkCStringValue": "27a5a7554840a9541559442d52e2dcd3955cb703ef9aee685987058382068bc2",
+    "dmsdkBorrowedHandle": "e5789642f0de678841f3661c12f85acbf4ed09f47accb3e91bf805a1d1bcb42b",
     "dmsdkTargetConditionals": "1391e027f73394ee1838287a25e0a244fd9a0d291ce6b585553164af39d9e005",
     "semanticPolicies": "3336271187d4bf1b9d3c0c45efe68a9c9c3710d71fef1a09c5f37973fd52e0f8",
     "typescriptSdk": "9011d6e158517ee59b5da64050507ddcd756a0d69277d9222f9a9c7644b514a3",
@@ -46786,8 +46786,16 @@
             }
           },
           "preferredLowering": {
-            "state": "universal-fallback",
-            "family": "universal-recipe"
+            "state": "generated-adapter",
+            "family": "namedScalar",
+            "wrapper": "deherm_dmsdk_named_scalar_profile_property_add_f32",
+            "adapter": {
+              "applicability": "callable",
+              "kind": "family-dispatch",
+              "id": 7,
+              "dispatcher": "deherm_dmsdk_named_scalar_dispatch",
+              "blockers": []
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -46909,8 +46917,16 @@
             }
           },
           "preferredLowering": {
-            "state": "universal-fallback",
-            "family": "universal-recipe"
+            "state": "generated-adapter",
+            "family": "namedScalar",
+            "wrapper": "deherm_dmsdk_named_scalar_profile_property_add_f64",
+            "adapter": {
+              "applicability": "callable",
+              "kind": "family-dispatch",
+              "id": 8,
+              "dispatcher": "deherm_dmsdk_named_scalar_dispatch",
+              "blockers": []
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -47032,8 +47048,16 @@
             }
           },
           "preferredLowering": {
-            "state": "universal-fallback",
-            "family": "universal-recipe"
+            "state": "generated-adapter",
+            "family": "namedScalar",
+            "wrapper": "deherm_dmsdk_named_scalar_profile_property_add_s32",
+            "adapter": {
+              "applicability": "callable",
+              "kind": "family-dispatch",
+              "id": 9,
+              "dispatcher": "deherm_dmsdk_named_scalar_dispatch",
+              "blockers": []
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -47155,8 +47179,16 @@
             }
           },
           "preferredLowering": {
-            "state": "universal-fallback",
-            "family": "universal-recipe"
+            "state": "generated-adapter",
+            "family": "namedScalar",
+            "wrapper": "deherm_dmsdk_named_scalar_profile_property_add_s64",
+            "adapter": {
+              "applicability": "callable",
+              "kind": "family-dispatch",
+              "id": 10,
+              "dispatcher": "deherm_dmsdk_named_scalar_dispatch",
+              "blockers": []
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -47278,8 +47310,16 @@
             }
           },
           "preferredLowering": {
-            "state": "universal-fallback",
-            "family": "universal-recipe"
+            "state": "generated-adapter",
+            "family": "namedScalar",
+            "wrapper": "deherm_dmsdk_named_scalar_profile_property_add_u32",
+            "adapter": {
+              "applicability": "callable",
+              "kind": "family-dispatch",
+              "id": 11,
+              "dispatcher": "deherm_dmsdk_named_scalar_dispatch",
+              "blockers": []
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -47401,8 +47441,16 @@
             }
           },
           "preferredLowering": {
-            "state": "universal-fallback",
-            "family": "universal-recipe"
+            "state": "generated-adapter",
+            "family": "namedScalar",
+            "wrapper": "deherm_dmsdk_named_scalar_profile_property_add_u64",
+            "adapter": {
+              "applicability": "callable",
+              "kind": "family-dispatch",
+              "id": 12,
+              "dispatcher": "deherm_dmsdk_named_scalar_dispatch",
+              "blockers": []
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -47524,8 +47572,16 @@
             }
           },
           "preferredLowering": {
-            "state": "universal-fallback",
-            "family": "universal-recipe"
+            "state": "generated-adapter",
+            "family": "namedScalar",
+            "wrapper": "deherm_dmsdk_named_scalar_profile_property_set_bool",
+            "adapter": {
+              "applicability": "callable",
+              "kind": "family-dispatch",
+              "id": 13,
+              "dispatcher": "deherm_dmsdk_named_scalar_dispatch",
+              "blockers": []
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -47647,8 +47703,16 @@
             }
           },
           "preferredLowering": {
-            "state": "universal-fallback",
-            "family": "universal-recipe"
+            "state": "generated-adapter",
+            "family": "namedScalar",
+            "wrapper": "deherm_dmsdk_named_scalar_profile_property_set_f32",
+            "adapter": {
+              "applicability": "callable",
+              "kind": "family-dispatch",
+              "id": 14,
+              "dispatcher": "deherm_dmsdk_named_scalar_dispatch",
+              "blockers": []
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -47770,8 +47834,16 @@
             }
           },
           "preferredLowering": {
-            "state": "universal-fallback",
-            "family": "universal-recipe"
+            "state": "generated-adapter",
+            "family": "namedScalar",
+            "wrapper": "deherm_dmsdk_named_scalar_profile_property_set_f64",
+            "adapter": {
+              "applicability": "callable",
+              "kind": "family-dispatch",
+              "id": 15,
+              "dispatcher": "deherm_dmsdk_named_scalar_dispatch",
+              "blockers": []
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -47893,8 +47965,16 @@
             }
           },
           "preferredLowering": {
-            "state": "universal-fallback",
-            "family": "universal-recipe"
+            "state": "generated-adapter",
+            "family": "namedScalar",
+            "wrapper": "deherm_dmsdk_named_scalar_profile_property_set_s32",
+            "adapter": {
+              "applicability": "callable",
+              "kind": "family-dispatch",
+              "id": 16,
+              "dispatcher": "deherm_dmsdk_named_scalar_dispatch",
+              "blockers": []
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -48016,8 +48096,16 @@
             }
           },
           "preferredLowering": {
-            "state": "universal-fallback",
-            "family": "universal-recipe"
+            "state": "generated-adapter",
+            "family": "namedScalar",
+            "wrapper": "deherm_dmsdk_named_scalar_profile_property_set_s64",
+            "adapter": {
+              "applicability": "callable",
+              "kind": "family-dispatch",
+              "id": 17,
+              "dispatcher": "deherm_dmsdk_named_scalar_dispatch",
+              "blockers": []
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -48139,8 +48227,16 @@
             }
           },
           "preferredLowering": {
-            "state": "universal-fallback",
-            "family": "universal-recipe"
+            "state": "generated-adapter",
+            "family": "namedScalar",
+            "wrapper": "deherm_dmsdk_named_scalar_profile_property_set_u32",
+            "adapter": {
+              "applicability": "callable",
+              "kind": "family-dispatch",
+              "id": 18,
+              "dispatcher": "deherm_dmsdk_named_scalar_dispatch",
+              "blockers": []
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -48262,8 +48358,16 @@
             }
           },
           "preferredLowering": {
-            "state": "universal-fallback",
-            "family": "universal-recipe"
+            "state": "generated-adapter",
+            "family": "namedScalar",
+            "wrapper": "deherm_dmsdk_named_scalar_profile_property_set_u64",
+            "adapter": {
+              "applicability": "callable",
+              "kind": "family-dispatch",
+              "id": 19,
+              "dispatcher": "deherm_dmsdk_named_scalar_dispatch",
+              "blockers": []
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -53534,7 +53638,7 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "arenaCString",
-            "wrapper": null,
+            "wrapper": "deherm_dmsdk_arena_cstring_dispatch",
             "adapter": {
               "applicability": "callable",
               "kind": "family-dispatch",
@@ -87317,8 +87421,16 @@
             }
           },
           "preferredLowering": {
-            "state": "universal-fallback",
-            "family": "universal-recipe"
+            "state": "generated-adapter",
+            "family": "namedScalar",
+            "wrapper": "deherm_dmsdk_named_scalar_dm_game_object_create_instance_id",
+            "adapter": {
+              "applicability": "callable",
+              "kind": "family-dispatch",
+              "id": 0,
+              "dispatcher": "deherm_dmsdk_named_scalar_dispatch",
+              "blockers": []
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -149100,7 +149212,7 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "hashState",
-            "wrapper": null,
+            "wrapper": "dmHashClone32",
             "adapter": {
               "applicability": "callable",
               "kind": "family-dispatch",
@@ -149238,7 +149350,7 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "hashState",
-            "wrapper": null,
+            "wrapper": "dmHashClone64",
             "adapter": {
               "applicability": "callable",
               "kind": "family-dispatch",
@@ -149345,7 +149457,7 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "hashState",
-            "wrapper": null,
+            "wrapper": "dmHashFinal32",
             "adapter": {
               "applicability": "callable",
               "kind": "family-dispatch",
@@ -149452,7 +149564,7 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "hashState",
-            "wrapper": null,
+            "wrapper": "dmHashFinal64",
             "adapter": {
               "applicability": "callable",
               "kind": "family-dispatch",
@@ -149570,7 +149682,7 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "hashState",
-            "wrapper": null,
+            "wrapper": "dmHashInit32",
             "adapter": {
               "applicability": "callable",
               "kind": "family-dispatch",
@@ -149688,7 +149800,7 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "hashState",
-            "wrapper": null,
+            "wrapper": "dmHashInit64",
             "adapter": {
               "applicability": "callable",
               "kind": "family-dispatch",
@@ -149794,7 +149906,7 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "hashState",
-            "wrapper": null,
+            "wrapper": "dmHashRelease32",
             "adapter": {
               "applicability": "callable",
               "kind": "family-dispatch",
@@ -149900,7 +150012,7 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "hashState",
-            "wrapper": null,
+            "wrapper": "dmHashRelease64",
             "adapter": {
               "applicability": "callable",
               "kind": "family-dispatch",
@@ -153389,7 +153501,7 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "hashState",
-            "wrapper": null,
+            "wrapper": "dmHashUpdateBuffer32",
             "adapter": {
               "applicability": "callable",
               "kind": "family-dispatch",
@@ -153526,7 +153638,7 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "hashState",
-            "wrapper": null,
+            "wrapper": "dmHashUpdateBuffer64",
             "adapter": {
               "applicability": "callable",
               "kind": "family-dispatch",
@@ -172130,7 +172242,7 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "arenaCString",
-            "wrapper": null,
+            "wrapper": "deherm_dmsdk_arena_cstring_dispatch",
             "adapter": {
               "applicability": "callable",
               "kind": "family-dispatch",
@@ -200889,8 +201001,16 @@
             }
           },
           "preferredLowering": {
-            "state": "universal-fallback",
-            "family": "universal-recipe"
+            "state": "generated-adapter",
+            "family": "namedScalar",
+            "wrapper": "deherm_dmsdk_named_scalar_dm_sound_is_group_muted",
+            "adapter": {
+              "applicability": "callable",
+              "kind": "family-dispatch",
+              "id": 1,
+              "dispatcher": "deherm_dmsdk_named_scalar_dispatch",
+              "blockers": []
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -202217,7 +202337,7 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "arenaCString",
-            "wrapper": null,
+            "wrapper": "deherm_dmsdk_arena_cstring_dispatch",
             "adapter": {
               "applicability": "callable",
               "kind": "family-dispatch",
@@ -202484,7 +202604,7 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "arenaCString",
-            "wrapper": null,
+            "wrapper": "deherm_dmsdk_arena_cstring_dispatch",
             "adapter": {
               "applicability": "callable",
               "kind": "family-dispatch",
@@ -204036,8 +204156,16 @@
             }
           },
           "preferredLowering": {
-            "state": "universal-fallback",
-            "family": "universal-recipe"
+            "state": "generated-adapter",
+            "family": "namedScalar",
+            "wrapper": "deherm_dmsdk_named_scalar_dm_thread_alloc_tls",
+            "adapter": {
+              "applicability": "callable",
+              "kind": "family-dispatch",
+              "id": 2,
+              "dispatcher": "deherm_dmsdk_named_scalar_dispatch",
+              "blockers": []
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -204147,8 +204275,16 @@
             }
           },
           "preferredLowering": {
-            "state": "universal-fallback",
-            "family": "universal-recipe"
+            "state": "generated-adapter",
+            "family": "namedScalar",
+            "wrapper": "deherm_dmsdk_named_scalar_dm_thread_detach",
+            "adapter": {
+              "applicability": "callable",
+              "kind": "family-dispatch",
+              "id": 3,
+              "dispatcher": "deherm_dmsdk_named_scalar_dispatch",
+              "blockers": []
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -204258,8 +204394,16 @@
             }
           },
           "preferredLowering": {
-            "state": "universal-fallback",
-            "family": "universal-recipe"
+            "state": "generated-adapter",
+            "family": "namedScalar",
+            "wrapper": "deherm_dmsdk_named_scalar_dm_thread_free_tls",
+            "adapter": {
+              "applicability": "callable",
+              "kind": "family-dispatch",
+              "id": 4,
+              "dispatcher": "deherm_dmsdk_named_scalar_dispatch",
+              "blockers": []
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -204357,8 +204501,16 @@
             }
           },
           "preferredLowering": {
-            "state": "universal-fallback",
-            "family": "universal-recipe"
+            "state": "generated-adapter",
+            "family": "namedScalar",
+            "wrapper": "deherm_dmsdk_named_scalar_dm_thread_get_current_thread",
+            "adapter": {
+              "applicability": "callable",
+              "kind": "family-dispatch",
+              "id": 5,
+              "dispatcher": "deherm_dmsdk_named_scalar_dispatch",
+              "blockers": []
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -204565,8 +204717,16 @@
             }
           },
           "preferredLowering": {
-            "state": "universal-fallback",
-            "family": "universal-recipe"
+            "state": "generated-adapter",
+            "family": "namedScalar",
+            "wrapper": "deherm_dmsdk_named_scalar_dm_thread_join",
+            "adapter": {
+              "applicability": "callable",
+              "kind": "family-dispatch",
+              "id": 6,
+              "dispatcher": "deherm_dmsdk_named_scalar_dispatch",
+              "blockers": []
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -208598,7 +208758,7 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "arenaCString",
-            "wrapper": null,
+            "wrapper": "deherm_dmsdk_arena_cstring_dispatch",
             "adapter": {
               "applicability": "callable",
               "kind": "family-dispatch",
@@ -517329,5 +517489,5 @@
       }
     }
   ],
-  "planSha256": "d1e405fc09e707715dafa874f0d5c0a4f9937325e6bb3db8086471b30514c2a4"
+  "planSha256": "95b8be375e1f9e8cadb61a1a4b5b0f1f5b6527600ba7f0a9a38cc025bc76a9b2"
 }

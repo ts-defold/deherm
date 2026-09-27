@@ -1,11 +1,10 @@
 {
   "schemaVersion": 1,
-  "policyVersion": "fixed-digest-v3",
+  "policyVersion": "fixed-digest-v4",
   "family": "fixed-output-digest",
   "recipe": {
     "input": "borrowed-counted-bytes",
     "output": "caller-owned-fixed-size-bytes",
-    "algorithms": ["md5", "sha1", "sha256", "sha512"],
     "ownership": "synchronous-noescape",
     "fallback": "universal-recipe"
   }

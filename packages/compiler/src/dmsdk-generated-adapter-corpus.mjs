@@ -16,6 +16,7 @@ const familyDescriptor = Object.freeze({
   fixedDigest: { count: "deherm_dmsdk_fixed_digest_count", descriptors: "deherm_dmsdk_fixed_digest_descriptors", id: "id", declaration: "declaration_id" },
   hashSpan: { count: "deherm_dmsdk_hash_span_count", descriptors: "deherm_dmsdk_hash_span_descriptors", id: "id", declaration: "declaration_id" },
   hashState: { count: "deherm_dmsdk_hash_state_count", descriptors: "deherm_dmsdk_hash_state_descriptors", id: "id", declaration: "declaration_id" },
+  namedScalar: { count: "deherm_dmsdk_named_scalar_count", descriptors: "deherm_dmsdk_named_scalar_descriptors", id: "id", declaration: "declaration_id" },
   base64Span: { count: "deherm_dmsdk_base64_span_count", descriptors: "deherm_dmsdk_base64_span_descriptors", id: "id", declaration: "declaration_id" },
   astcProbe: { count: "deherm_dmsdk_astc_probe_count", descriptors: "deherm_dmsdk_astc_probe_descriptors", id: "id", declaration: "declaration_id" },
   cstringValue: { count: "deherm_dmsdk_cstring_value_count", descriptors: "deherm_dmsdk_cstring_value_descriptors", id: null, declaration: "source_id" },
@@ -71,6 +72,7 @@ const familyCode = Object.freeze({
   base64Span: 4, xteaSpan: 5, astcProbe: 6, cstringValue: 7,
   arenaCString: 8,
   hashState: 9,
+  namedScalar: 10,
 });
 
 function enumValue(parameter, seed) {
@@ -94,6 +96,10 @@ function scalarSentinel(shape, id, position, result = false) {
     const value = `${100 + id + (result ? 0.75 : 0.25)}f`;
     return { raw: `pack_f32(${value})`, native: value };
   }
+  if (shape.name === "f64") {
+    const value = `${100 + id + (result ? 0.875 : 0.375)}`;
+    return { raw: `pack_f64(${value})`, native: value };
+  }
   if (shape.name === "bool") return { raw: "UINT64_C(1)", native: "UINT8_C(1)" };
   return { raw: `UINT64_C(${seed})`, native: `${seed}` };
 }
@@ -103,7 +109,7 @@ function wrapperType(shape, family) {
   if (family === "enumValue" && shape.kind === "enum") return "int32_t";
   if (shape.kind === "named" || shape.name === "u64") return "uint64_t";
   if (shape.name === "bool") return "uint8_t";
-  return ({ u16: "uint16_t", u32: "uint32_t", f32: "float", i32: "int32_t" })[shape.name] ?? "int32_t";
+  return ({ u16: "uint16_t", u32: "uint32_t", f32: "float", f64: "double", i32: "int32_t" })[shape.name] ?? "int32_t";
 }
 
 function renderScalarFake(vector) {
@@ -127,6 +133,25 @@ function renderScalarFake(vector) {
     returned = `return static_cast<${resultType}>(${value});`;
   }
   return `extern \"C\" ${resultType} ${vector.exactCallee}(${parameters.join(",")}){++g_calls[${code}][${vector.adapterId}];${validations}${returned}}`;
+}
+
+function renderNamedScalarNativeFake(vector) {
+  const code = familyCode.namedScalar;
+  const parameters = vector.abi.parameters.map(
+    (parameter, position) => `${parameter.nativeType} a${position}`,
+  );
+  const validations = vector.abi.parameters.map((parameter, position) => {
+    const expected = scalarSentinel(parameter.shape, vector.adapterId, position).native;
+    return `if(a${position}!=static_cast<${parameter.nativeType}>(${expected}))++g_failures[${code}][${vector.adapterId}];`;
+  }).join("");
+  const resultType = vector.abi.resultNativeType;
+  const returned = vector.abi.resultShape.kind === "void"
+    ? ""
+    : `return static_cast<${resultType}>(${scalarSentinel(vector.abi.resultShape, vector.adapterId, 0, true).native});`;
+  const qualified = vector.invocation.nativeSymbol.split("::");
+  const name = qualified.pop();
+  const definition = `${resultType} ${name}(${parameters.join(",")}){++g_calls[${code}][${vector.adapterId}];${validations}${returned}}`;
+  return qualified.length ? `namespace ${qualified.join("::")}{${definition}}` : definition;
 }
 
 function cstringNativeType(parameter) {
@@ -210,6 +235,7 @@ function renderFamilyFake(vector) {
   if (vector.family === "astcProbe") {
     return `extern \"C\" uint8_t ${name}(const uint8_t* input,uint32_t length,DehermDmSdkAstcProbeResult* output){++g_calls[${code}][${id}];if(!input||length!=UINT32_C(${16 + id})||input[0]!=UINT8_C(${0x51 + id})||!output)++g_failures[${code}][${id}];if(output){output->width=UINT32_C(${101 + id});output->height=UINT32_C(${201 + id});output->depth=UINT32_C(${301 + id});}return UINT8_C(1);}`;
   }
+  if (vector.family === "namedScalar") return renderNamedScalarNativeFake(vector);
   return renderScalarFake(vector);
 }
 
@@ -226,7 +252,7 @@ function renderDispatchCheck(vector, failure) {
     const requiredLength = mode === "error-string" ? 0 : mode === "uri-encode" ? `result_${id}`.length + 1 : 500 + id;
     return `{const uint8_t* input=${needsInput ? `reinterpret_cast<const uint8_t*>(${JSON.stringify(input)})` : "nullptr"};uint8_t output[64]={};DehermDmSdkArenaCStringResult result{};if(deherm_dmsdk_arena_cstring_dispatch(UINT16_C(${id}),input,UINT32_C(${needsInput ? input.length : 0}),UINT64_C(${scalar}),reinterpret_cast<char*>(output),UINT32_C(64),&result)!=DEHERM_DMSDK_ARENA_CSTRING_OK)return ${failure};${common}if(strcmp(reinterpret_cast<const char*>(output),${JSON.stringify(`result_${id}`)})!=0||result.output_length!=UINT32_C(${`result_${id}`.length})||result.required_length!=UINT32_C(${requiredLength})||result.native_result!=UINT64_C(${nativeResult}))return ${failure};}`;
   }
-  if (vector.family === "scalar" || vector.family === "enumValue") {
+  if (["scalar", "enumValue", "namedScalar"].includes(vector.family)) {
     const isScalar = vector.family === "scalar";
     const args = vector.abi.parameters.map((parameter, position) => parameter.shape.kind === "enum"
       ? signedRaw(enumValue(parameter, id + position))
@@ -234,8 +260,10 @@ function renderDispatchCheck(vector, failure) {
     let expected = "UINT64_C(0)";
     if (vector.abi.resultShape.kind === "enum") expected = signedRaw(enumValue({ enumeration: vector.abi.resultEnumeration, shape: vector.abi.resultShape }, id + 1));
     else if (vector.abi.resultShape.kind !== "void") expected = scalarSentinel(vector.abi.resultShape, id, 0, true).raw;
-    const prefix = isScalar ? "scalar" : "enum";
-    const status = isScalar ? "DEHERM_DMSDK_SCALAR_OK" : "DEHERM_DMSDK_ENUM_OK";
+    const prefix = isScalar ? "scalar" : vector.family === "enumValue" ? "enum" : "named_scalar";
+    const status = isScalar
+      ? "DEHERM_DMSDK_SCALAR_OK"
+      : vector.family === "enumValue" ? "DEHERM_DMSDK_ENUM_OK" : "DEHERM_DMSDK_NAMED_SCALAR_OK";
     return `{uint64_t arguments[2]={${args.join(",") || "UINT64_C(0)"}};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_${prefix}_dispatch(UINT16_C(${id}),arguments,UINT32_C(${args.length}),&result)!=${status})return ${failure};${common}if(result!=${expected})return ${failure};}`;
   }
   if (vector.family === "fixedDigest") {
@@ -280,8 +308,25 @@ function renderDispatchCheck(vector, failure) {
 
 function renderVerificationSource(generated) {
   const vectors = generated.verification.vectors;
-  const headers = [...new Set(vectors.flatMap(({ productionHeader, family }) => [productionHeader, `defold_hermes/generated_dmsdk_${({ arenaCString: "arena_cstring", enumValue: "enum_value", fixedDigest: "fixed_digest", hashSpan: "hash_span", hashState: "hash_state", base64Span: "base64_span", xteaSpan: "xtea_span", astcProbe: "astc_probe", scalar: "scalar", cstringValue: "cstring_value" })[family]}.h`]))].sort(compareCodeUnits);
-  const sdkHeaders = ["dmsdk/dlib/buffer.h", "dmsdk/dlib/dstrings.h", "dmsdk/dlib/hash.h", "dmsdk/dlib/socket.h", "dmsdk/dlib/sys.h", "dmsdk/dlib/uri.h", "dmsdk/dlib/utf8.h", "dmsdk/graphics/graphics.h", "dmsdk/resource/resource.h", "dmsdk/resource/resource.hpp"];
+  const runtimeHeaderStem = {
+    arenaCString: "arena_cstring",
+    astcProbe: "astc_probe",
+    base64Span: "base64_span",
+    cstringValue: "cstring_value",
+    enumValue: "enum_value",
+    fixedDigest: "fixed_digest",
+    hashSpan: "hash_span",
+    hashState: "hash_state",
+    namedScalar: "named_scalar_runtime",
+    scalar: "scalar",
+    xteaSpan: "xtea_span",
+  };
+  const headers = [...new Set(vectors.flatMap(({ productionHeader, family }) => [
+    productionHeader,
+    `defold_hermes/generated_dmsdk_${runtimeHeaderStem[family]}.h`,
+  ]))].sort(compareCodeUnits);
+  const sdkHeaders = [...new Set(vectors.map(({ nativeHeader }) => nativeHeader).filter(Boolean))]
+    .sort(compareCodeUnits);
   const descriptorChecks = [];
   let failure = 1;
   for (const [family, descriptor] of Object.entries(familyDescriptor)) {
@@ -301,11 +346,14 @@ function renderVerificationSource(generated) {
   const vectorRows = vectors.map((vector) => ` {UINT32_C(${vector.numericId}),UINT16_C(${vector.adapterId}),${JSON.stringify(vector.family)},${JSON.stringify(vector.vectorSha256)}}`).join(",\n");
   const fakes = vectors.map((vector) => vector.family === "cstringValue" ? renderCStringFake(vector) : renderFamilyFake(vector)).join("\n");
   return `// Generated by @deherm/compiler dmSDK generated-adapter exact corpus. Do not edit.
+#ifndef DLIB_LOG_DOMAIN
+#define DLIB_LOG_DOMAIN "deherm"
+#endif
 ${headers.map((header) => `#include <${header}>`).join("\n")}
 ${sdkHeaders.map((header) => `#include <${header}>`).join("\n")}
 #include <stdint.h>
 #include <string.h>
-namespace {uint32_t g_calls[10][32]{};uint32_t g_failures[10][32]{};[[maybe_unused]] bool g_arena_uri_failure=false;[[maybe_unused]] uint64_t pack_f32(float value){uint32_t bits=0;memcpy(&bits,&value,sizeof(bits));return bits;}}
+namespace {uint32_t g_calls[11][32]{};uint32_t g_failures[11][32]{};[[maybe_unused]] bool g_arena_uri_failure=false;[[maybe_unused]] uint64_t pack_f32(float value){uint32_t bits=0;memcpy(&bits,&value,sizeof(bits));return bits;}[[maybe_unused]] uint64_t pack_f64(double value){uint64_t bits=0;memcpy(&bits,&value,sizeof(bits));return bits;}}
 ${fakes}
 struct DehermDmSdkAdapterExactVector{uint32_t recipe_id;uint16_t adapter_id;const char* family;const char* sha256;};
 static const DehermDmSdkAdapterExactVector kVectors[]={

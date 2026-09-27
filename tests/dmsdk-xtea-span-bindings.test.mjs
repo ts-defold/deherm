@@ -39,7 +39,7 @@ test("xtea generation is deterministic and evidence-bound", async () => {
     for (const d of r.declarations) {
       assert.equal(typeof d.bindingId, "number");
       assert.equal(d.patternDecision, "span.in-place-keyed-transform");
-      assert.equal(d.evidence.semanticSource, "revision-ir-abi+identifier-grammar+stable-format-recipe");
+      assert.equal(d.evidence.semanticSource, "revision-implementation-ast+abi-shape");
       assert.equal(d.stages.runtime, "packaged-sdk-host-behavior-test");
     }
     for (const f of [...r.artifacts, "packages/bindings/generated/defold-dmsdk-xtea-span-bindings.json"])
@@ -48,16 +48,20 @@ test("xtea generation is deterministic and evidence-bound", async () => {
     await rm(o, { recursive: true, force: true });
   }
 });
-test("xtea span derives callable enum tokens and modes without route allowlists", async () => {
-  const ir = JSON.parse(await readFile(join(root, "packages/bindings/generated/defold-sdk-ir.json"), "utf8"));
-  const shapes = JSON.parse(
-    await readFile(join(root, "packages/bindings/generated/defold-dmsdk-abi-shapes.json"), "utf8"),
-  );
+test("xtea span derives bounds and results from implementation dataflow without route allowlists", async () => {
+  const [ir, shapes, sourceFacts] = await Promise.all([
+    readFile(join(root, "packages/bindings/generated/defold-sdk-ir.json"), "utf8").then(JSON.parse),
+    readFile(join(root, "packages/bindings/generated/defold-dmsdk-abi-shapes.json"), "utf8").then(JSON.parse),
+    readFile(join(root, "packages/bindings/generated/defold-dmsdk-source-semantic-facts.json"), "utf8").then(
+      JSON.parse,
+    ),
+  ]);
   const policyText = await readFile(join(root, "packages/bindings/overrides/dmsdk-xtea-span-bindings.json"), "utf8");
   const policy = JSON.parse(policyText);
   assert.doesNotMatch(policyText, /documentationContract|description|candidateSelector|crypt\.h|"entries"|"symbols"/u);
   const enums = new Map(ir.declarations.filter(({ kind }) => kind === "enum").map((item) => [item.name, item]));
   const declarations = new Map(ir.declarations.map((item) => [item.id, item]));
+  const factsById = new Map(sourceFacts.declarations.map((entry) => [entry.declarationId, entry]));
   const candidates = shapes.rows.filter(
     ({ shape }) =>
       shape ===
@@ -66,7 +70,8 @@ test("xtea span derives callable enum tokens and modes without route allowlists"
   assert.equal(candidates.length, 2);
   for (const candidate of candidates) {
     const declaration = declarations.get(candidate.id);
-    const semantics = extractXteaSpanSemantics(declaration, candidate, enums, policy.recipe);
+    const facts = factsById.get(candidate.id);
+    const semantics = extractXteaSpanSemantics(declaration, candidate, enums, policy.recipe, facts);
     assert.ok(semantics, candidate.id);
     assert.match(semantics.algorithmExpression, /::ALGORITHM_XTEA$/u);
     assert.match(semantics.successExpression, /::RESULT_OK$/u);
@@ -81,12 +86,19 @@ test("xtea span derives callable enum tokens and modes without route allowlists"
         candidate,
         enums,
         policy.recipe,
+        facts,
       ),
     );
-    assert.equal(
-      extractXteaSpanSemantics({ ...declaration, name: "dmCrypt::Transform" }, candidate, enums, policy.recipe),
-      null,
+    assert.ok(
+      extractXteaSpanSemantics(
+        { ...declaration, name: "dmCrypt::Transform" },
+        candidate,
+        enums,
+        policy.recipe,
+        facts,
+      ),
     );
+    assert.equal(extractXteaSpanSemantics(declaration, candidate, enums, policy.recipe, { definitions: [] }), null);
   }
 });
 test("xtea packaged link, bounds, behavior, and warmed allocation gate", async () => {

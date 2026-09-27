@@ -39,8 +39,8 @@
   "minimumInputsSent": 3,
   "observedSnapshotsApplied": 3,
   "observedInputsSent": 11,
-  "lastServerTick": 114,
-  "lastLocalTick": 125,
+  "lastServerTick": 102,
+  "lastLocalTick": 112,
   "input": {
     "moveX": 1,
     "moveY": 0,
@@ -50,12 +50,12 @@
   },
   "inputsDropped": 0,
   "presentation": {
-    "localCorrectionMagnitude": 9,
-    "maximumLocalCorrectionMagnitude": 4437,
+    "localCorrectionMagnitude": 20,
+    "maximumLocalCorrectionMagnitude": 4487,
     "remoteInterpolationRebases": 0,
     "maximumRemoteInterpolationRebaseDistance": 0,
     "maximumRemoteInterpolationDiscontinuity": 0,
-    "remoteLifecycleHardSnaps": 0
+    "remoteLifecycleHardSnaps": 1
   },
   "prediction": {
     "inputLeadTicks": 4,
@@ -65,7 +65,7 @@
     "inputsAcceptedAtLeast": 3,
     "markers": [
       "war-battles-server:listening:https://localhost:<port>",
-      "war-battles-server:health:http://localhost:63112",
+      "war-battles-server:health:http://localhost:58203",
       "war-battles-server:roster:32:bots:2",
       "war-battles-server:incoming:id=1",
       "war-battles-server:quic-accepted:id=1",
@@ -121,8 +121,8 @@
     {
       "path": "package.json",
       "kind": "file",
-      "bytes": 52315,
-      "sha256": "a3a54d17c56dbde222ecdf8bee3b98e1171f21e24c522e9b5b80f627c92fe0b9"
+      "bytes": 52599,
+      "sha256": "6f2b9be5c3c27c809762a55738cabdb7ce6e16fe3fa4a1919dad6d714eb5f3de"
     },
     {
       "path": "pnpm-lock.yaml",
@@ -137,6 +137,6 @@
       "sha256": "6fd5533ae7b9ebb266685f8319dc4bcad914fbba15a26859921d8518ba6536b8"
     }
   ],
-  "sourceKey": "9d3ed856e7f5f176fa197d8bea538ab5cf0c79f42d4841ec63b657848732cc96",
+  "sourceKey": "6615ee955857d15510893d4841e633c68871402ef85bc3fc5dc542ea118b0b0d",
   "evidenceBoundary": "Real loopback Chrome-to-Deno HTTP/3/WebTransport transport, authoritative welcome/snapshot/input and scalar client-presentation telemetry; server input acceptance is observed from MatchServer stats; the telemetry describes this bounded loopback trace and is not a visual-quality, WAN, ingress, native Defold, allocation, or reliable-lane-persistence claim."
 }

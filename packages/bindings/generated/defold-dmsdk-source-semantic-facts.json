@@ -1,0 +1,4849 @@
+{
+  "schemaVersion": 1,
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "extraction": "clang-json-ast/compact-dataflow-v1",
+  "scope": "structurally eligible bounded-span declarations",
+  "sources": [
+    {
+      "path": "upstream/defold/engine/dlib/src/dlib/crypt.cpp",
+      "sha256": "7658f658f3d94b903149a14221962c114f8f7308b503f94a658f3f89da72cdd3",
+      "astState": "complete",
+      "diagnosticsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "upstream/defold/engine/dlib/src/dlib/crypt_apple.mm",
+      "sha256": "2d600da57bcb747af79de9ab0f96553f2183b7b5b7648ceffaea0a6e668e23d9",
+      "astState": "partial-with-diagnostics",
+      "diagnosticsSha256": "366d197b980c077648ffa62c5028dc63e9d9e74b38de0fd0617b6da68d54d23e"
+    },
+    {
+      "path": "upstream/defold/engine/dlib/src/dlib/crypt_mbedtls.cpp",
+      "sha256": "9171003669177cf026bc708b68fc3118ab75f113e57f0077ff5214662454b00f",
+      "astState": "complete",
+      "diagnosticsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "upstream/defold/engine/dlib/src/dlib/image.cpp",
+      "sha256": "4d1e6532b053eaa26689dc0df4b02da28c604042e50d30d14109c9bdf6280733",
+      "astState": "complete",
+      "diagnosticsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "upstream/defold/engine/dlib/src/dlib/image_null.cpp",
+      "sha256": "d2f01a3cfe034aba8fdab534e40db0dc06b42f9548a997467d982858891efeab",
+      "astState": "complete",
+      "diagnosticsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "sourceHashes": {
+    "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
+    "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a"
+  },
+  "coverage": {
+    "requested": 10,
+    "observed": 10,
+    "missing": 0
+  },
+  "declarations": [
+    {
+      "declarationId": "dmsdk:dmCrypt::Base64Decode@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:133:162",
+      "name": "dmCrypt::Base64Decode",
+      "shape": "scalar:bool(in:pointer:scalar:u8,value:scalar:u32,out:pointer:scalar:u8,out:pointer:scalar:u32)",
+      "state": "observed",
+      "definitions": [
+        {
+          "name": "dmCrypt::Base64Decode",
+          "type": "bool (const uint8_t *, uint32_t, uint8_t *, uint32_t *)",
+          "source": "upstream/defold/engine/dlib/src/dlib/crypt_apple.mm",
+          "line": 79,
+          "calls": [],
+          "fixedArrays": [],
+          "operations": [
+            {
+              "operator": "==",
+              "left": {
+                "kind": "parameter",
+                "index": 1,
+                "name": "src_len"
+              },
+              "right": {
+                "kind": "integer",
+                "value": 0
+              }
+            },
+            {
+              "operator": "=",
+              "left": {
+                "kind": "unary",
+                "operator": "*",
+                "operand": {
+                  "kind": "parameter",
+                  "index": 3,
+                  "name": "dst_len"
+                }
+              },
+              "right": {
+                "kind": "integer",
+                "value": 0
+              }
+            }
+          ],
+          "returns": [
+            {
+              "kind": "boolean",
+              "value": true
+            }
+          ],
+          "reachableDefinitions": []
+        },
+        {
+          "name": "dmCrypt::Base64Decode",
+          "type": "bool (const uint8_t *, uint32_t, uint8_t *, uint32_t *)",
+          "source": "upstream/defold/engine/dlib/src/dlib/crypt_mbedtls.cpp",
+          "line": 89,
+          "calls": [
+            {
+              "callee": "memcpy",
+              "arguments": [
+                {
+                  "kind": "variable",
+                  "name": "padded_src"
+                },
+                {
+                  "kind": "parameter",
+                  "index": 0,
+                  "name": "src"
+                },
+                {
+                  "kind": "parameter",
+                  "index": 1,
+                  "name": "src_len"
+                }
+              ]
+            },
+            {
+              "callee": "memset",
+              "arguments": [
+                {
+                  "kind": "binary",
+                  "operator": "+",
+                  "left": {
+                    "kind": "variable",
+                    "name": "padded_src"
+                  },
+                  "right": {
+                    "kind": "parameter",
+                    "index": 1,
+                    "name": "src_len"
+                  }
+                },
+                {
+                  "kind": "character",
+                  "value": 61
+                },
+                {
+                  "kind": "variable",
+                  "name": "padding_needed"
+                }
+              ]
+            },
+            {
+              "callee": "mbedtls_base64_decode",
+              "arguments": [
+                {
+                  "kind": "parameter",
+                  "index": 2,
+                  "name": "dst"
+                },
+                {
+                  "kind": "unary",
+                  "operator": "*",
+                  "operand": {
+                    "kind": "parameter",
+                    "index": 3,
+                    "name": "dst_len"
+                  }
+                },
+                {
+                  "kind": "unary",
+                  "operator": "&",
+                  "operand": {
+                    "kind": "variable",
+                    "name": "out_len"
+                  }
+                },
+                {
+                  "kind": "parameter",
+                  "index": 0,
+                  "name": "src"
+                },
+                {
+                  "kind": "parameter",
+                  "index": 1,
+                  "name": "src_len"
+                }
+              ]
+            }
+          ],
+          "fixedArrays": [],
+          "operations": [
+            {
+              "operator": "==",
+              "left": {
+                "kind": "parameter",
+                "index": 1,
+                "name": "src_len"
+              },
+              "right": {
+                "kind": "integer",
+                "value": 0
+              }
+            },
+            {
+              "operator": "=",
+              "left": {
+                "kind": "unary",
+                "operator": "*",
+                "operand": {
+                  "kind": "parameter",
+                  "index": 3,
+                  "name": "dst_len"
+                }
+              },
+              "right": {
+                "kind": "integer",
+                "value": 0
+              }
+            },
+            {
+              "operator": "%",
+              "left": {
+                "kind": "binary",
+                "operator": "-",
+                "left": {
+                  "kind": "integer",
+                  "value": 4
+                },
+                "right": {
+                  "kind": "binary",
+                  "operator": "%",
+                  "left": {
+                    "kind": "parameter",
+                    "index": 1,
+                    "name": "src_len"
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 4
+                  }
+                }
+              },
+              "right": {
+                "kind": "integer",
+                "value": 4
+              }
+            },
+            {
+              "operator": "-",
+              "left": {
+                "kind": "integer",
+                "value": 4
+              },
+              "right": {
+                "kind": "binary",
+                "operator": "%",
+                "left": {
+                  "kind": "parameter",
+                  "index": 1,
+                  "name": "src_len"
+                },
+                "right": {
+                  "kind": "integer",
+                  "value": 4
+                }
+              }
+            },
+            {
+              "operator": "%",
+              "left": {
+                "kind": "parameter",
+                "index": 1,
+                "name": "src_len"
+              },
+              "right": {
+                "kind": "integer",
+                "value": 4
+              }
+            },
+            {
+              "operator": "&&",
+              "left": {
+                "kind": "binary",
+                "operator": ">",
+                "left": {
+                  "kind": "variable",
+                  "name": "padding_needed"
+                },
+                "right": {
+                  "kind": "integer",
+                  "value": 0
+                }
+              },
+              "right": {
+                "kind": "binary",
+                "operator": ">",
+                "left": {
+                  "kind": "parameter",
+                  "index": 1,
+                  "name": "src_len"
+                },
+                "right": {
+                  "kind": "integer",
+                  "value": 0
+                }
+              }
+            },
+            {
+              "operator": ">",
+              "left": {
+                "kind": "variable",
+                "name": "padding_needed"
+              },
+              "right": {
+                "kind": "integer",
+                "value": 0
+              }
+            },
+            {
+              "operator": ">",
+              "left": {
+                "kind": "parameter",
+                "index": 1,
+                "name": "src_len"
+              },
+              "right": {
+                "kind": "integer",
+                "value": 0
+              }
+            },
+            {
+              "operator": "=",
+              "left": {
+                "kind": "variable",
+                "name": "padded_src"
+              },
+              "right": {
+                "kind": "expression",
+                "expressionKind": "CXXNewExpr"
+              }
+            },
+            {
+              "operator": "+",
+              "left": {
+                "kind": "parameter",
+                "index": 1,
+                "name": "src_len"
+              },
+              "right": {
+                "kind": "variable",
+                "name": "padding_needed"
+              }
+            },
+            {
+              "operator": "+",
+              "left": {
+                "kind": "variable",
+                "name": "padded_src"
+              },
+              "right": {
+                "kind": "parameter",
+                "index": 1,
+                "name": "src_len"
+              }
+            },
+            {
+              "operator": "=",
+              "left": {
+                "kind": "parameter",
+                "index": 1,
+                "name": "src_len"
+              },
+              "right": {
+                "kind": "binary",
+                "operator": "+",
+                "left": {
+                  "kind": "parameter",
+                  "index": 1,
+                  "name": "src_len"
+                },
+                "right": {
+                  "kind": "variable",
+                  "name": "padding_needed"
+                }
+              }
+            },
+            {
+              "operator": "+",
+              "left": {
+                "kind": "parameter",
+                "index": 1,
+                "name": "src_len"
+              },
+              "right": {
+                "kind": "variable",
+                "name": "padding_needed"
+              }
+            },
+            {
+              "operator": "=",
+              "left": {
+                "kind": "parameter",
+                "index": 0,
+                "name": "src"
+              },
+              "right": {
+                "kind": "variable",
+                "name": "padded_src"
+              }
+            },
+            {
+              "operator": "!=",
+              "left": {
+                "kind": "variable",
+                "name": "r"
+              },
+              "right": {
+                "kind": "integer",
+                "value": 0
+              }
+            },
+            {
+              "operator": "==",
+              "left": {
+                "kind": "unary",
+                "operator": "*",
+                "operand": {
+                  "kind": "parameter",
+                  "index": 3,
+                  "name": "dst_len"
+                }
+              },
+              "right": {
+                "kind": "integer",
+                "value": 0
+              }
+            },
+            {
+              "operator": "=",
+              "left": {
+                "kind": "unary",
+                "operator": "*",
+                "operand": {
+                  "kind": "parameter",
+                  "index": 3,
+                  "name": "dst_len"
+                }
+              },
+              "right": {
+                "kind": "variable",
+                "name": "out_len"
+              }
+            },
+            {
+              "operator": "=",
+              "left": {
+                "kind": "unary",
+                "operator": "*",
+                "operand": {
+                  "kind": "parameter",
+                  "index": 3,
+                  "name": "dst_len"
+                }
+              },
+              "right": {
+                "kind": "integer",
+                "value": 4294967295
+              }
+            },
+            {
+              "operator": "=",
+              "left": {
+                "kind": "unary",
+                "operator": "*",
+                "operand": {
+                  "kind": "parameter",
+                  "index": 3,
+                  "name": "dst_len"
+                }
+              },
+              "right": {
+                "kind": "variable",
+                "name": "out_len"
+              }
+            }
+          ],
+          "returns": [
+            {
+              "kind": "boolean",
+              "value": true
+            },
+            {
+              "kind": "boolean",
+              "value": false
+            },
+            {
+              "kind": "boolean",
+              "value": true
+            }
+          ],
+          "reachableDefinitions": []
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmCrypt::Base64Encode@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:120:161",
+      "name": "dmCrypt::Base64Encode",
+      "shape": "scalar:bool(in:pointer:scalar:u8,value:scalar:u32,out:pointer:scalar:u8,out:pointer:scalar:u32)",
+      "state": "observed",
+      "definitions": [
+        {
+          "name": "dmCrypt::Base64Encode",
+          "type": "bool (const uint8_t *, uint32_t, uint8_t *, uint32_t *)",
+          "source": "upstream/defold/engine/dlib/src/dlib/crypt_apple.mm",
+          "line": 51,
+          "calls": [],
+          "fixedArrays": [],
+          "operations": [],
+          "returns": [],
+          "reachableDefinitions": []
+        },
+        {
+          "name": "dmCrypt::Base64Encode",
+          "type": "bool (const uint8_t *, uint32_t, uint8_t *, uint32_t *)",
+          "source": "upstream/defold/engine/dlib/src/dlib/crypt_mbedtls.cpp",
+          "line": 54,
+          "calls": [
+            {
+              "callee": "mbedtls_base64_encode",
+              "arguments": [
+                {
+                  "kind": "parameter",
+                  "index": 2,
+                  "name": "dst"
+                },
+                {
+                  "kind": "unary",
+                  "operator": "*",
+                  "operand": {
+                    "kind": "parameter",
+                    "index": 3,
+                    "name": "dst_len"
+                  }
+                },
+                {
+                  "kind": "unary",
+                  "operator": "&",
+                  "operand": {
+                    "kind": "variable",
+                    "name": "out_len"
+                  }
+                },
+                {
+                  "kind": "parameter",
+                  "index": 0,
+                  "name": "src"
+                },
+                {
+                  "kind": "parameter",
+                  "index": 1,
+                  "name": "src_len"
+                }
+              ]
+            }
+          ],
+          "fixedArrays": [],
+          "operations": [
+            {
+              "operator": "==",
+              "left": {
+                "kind": "parameter",
+                "index": 1,
+                "name": "src_len"
+              },
+              "right": {
+                "kind": "integer",
+                "value": 0
+              }
+            },
+            {
+              "operator": "==",
+              "left": {
+                "kind": "unary",
+                "operator": "*",
+                "operand": {
+                  "kind": "parameter",
+                  "index": 3,
+                  "name": "dst_len"
+                }
+              },
+              "right": {
+                "kind": "integer",
+                "value": 0
+              }
+            },
+            {
+              "operator": "=",
+              "left": {
+                "kind": "unary",
+                "operator": "*",
+                "operand": {
+                  "kind": "parameter",
+                  "index": 3,
+                  "name": "dst_len"
+                }
+              },
+              "right": {
+                "kind": "integer",
+                "value": 1
+              }
+            },
+            {
+              "operator": "=",
+              "left": {
+                "kind": "subscript",
+                "base": {
+                  "kind": "parameter",
+                  "index": 2,
+                  "name": "dst"
+                },
+                "index": {
+                  "kind": "integer",
+                  "value": 0
+                }
+              },
+              "right": {
+                "kind": "integer",
+                "value": 0
+              }
+            },
+            {
+              "operator": "=",
+              "left": {
+                "kind": "unary",
+                "operator": "*",
+                "operand": {
+                  "kind": "parameter",
+                  "index": 3,
+                  "name": "dst_len"
+                }
+              },
+              "right": {
+                "kind": "integer",
+                "value": 0
+              }
+            },
+            {
+              "operator": "!=",
+              "left": {
+                "kind": "variable",
+                "name": "r"
+              },
+              "right": {
+                "kind": "integer",
+                "value": 0
+              }
+            },
+            {
+              "operator": "==",
+              "left": {
+                "kind": "unary",
+                "operator": "*",
+                "operand": {
+                  "kind": "parameter",
+                  "index": 3,
+                  "name": "dst_len"
+                }
+              },
+              "right": {
+                "kind": "integer",
+                "value": 0
+              }
+            },
+            {
+              "operator": "=",
+              "left": {
+                "kind": "unary",
+                "operator": "*",
+                "operand": {
+                  "kind": "parameter",
+                  "index": 3,
+                  "name": "dst_len"
+                }
+              },
+              "right": {
+                "kind": "variable",
+                "name": "out_len"
+              }
+            },
+            {
+              "operator": "=",
+              "left": {
+                "kind": "unary",
+                "operator": "*",
+                "operand": {
+                  "kind": "parameter",
+                  "index": 3,
+                  "name": "dst_len"
+                }
+              },
+              "right": {
+                "kind": "integer",
+                "value": 4294967295
+              }
+            },
+            {
+              "operator": "=",
+              "left": {
+                "kind": "unary",
+                "operator": "*",
+                "operand": {
+                  "kind": "parameter",
+                  "index": 3,
+                  "name": "dst_len"
+                }
+              },
+              "right": {
+                "kind": "variable",
+                "name": "out_len"
+              }
+            }
+          ],
+          "returns": [
+            {
+              "kind": "boolean",
+              "value": false
+            },
+            {
+              "kind": "boolean",
+              "value": true
+            },
+            {
+              "kind": "boolean",
+              "value": false
+            },
+            {
+              "kind": "boolean",
+              "value": true
+            }
+          ],
+          "reachableDefinitions": []
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmCrypt::Decrypt@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:76:156",
+      "name": "dmCrypt::Decrypt",
+      "shape": "enum:dmCrypt::Result(value:enum:dmCrypt::Algorithm,inout:pointer:scalar:u8,value:scalar:u32,in:pointer:scalar:u8,value:scalar:u32)",
+      "state": "observed",
+      "definitions": [
+        {
+          "name": "dmCrypt::Decrypt",
+          "type": "Result (Algorithm, uint8_t *, uint32_t, const uint8_t *, uint32_t)",
+          "source": "upstream/defold/engine/dlib/src/dlib/crypt.cpp",
+          "line": 80,
+          "calls": [
+            {
+              "callee": "EncryptXTeaCTR",
+              "arguments": [
+                {
+                  "kind": "parameter",
+                  "index": 1,
+                  "name": "data"
+                },
+                {
+                  "kind": "parameter",
+                  "index": 2,
+                  "name": "datalen"
+                },
+                {
+                  "kind": "parameter",
+                  "index": 3,
+                  "name": "key"
+                },
+                {
+                  "kind": "parameter",
+                  "index": 4,
+                  "name": "keylen"
+                }
+              ]
+            }
+          ],
+          "fixedArrays": [],
+          "operations": [],
+          "returns": [
+            {
+              "kind": "enum-constant",
+              "name": "RESULT_OK"
+            }
+          ],
+          "reachableDefinitions": [
+            {
+              "name": "dmCrypt::EncryptXTea",
+              "type": "uint64_t (uint64_t, const uint32_t *)",
+              "source": "upstream/defold/engine/dlib/src/dlib/crypt.cpp",
+              "line": 26,
+              "calls": [
+                {
+                  "callee": "ToHost",
+                  "arguments": [
+                    {
+                      "kind": "subscript",
+                      "base": {
+                        "kind": "parameter",
+                        "index": 1,
+                        "name": "key"
+                      },
+                      "index": {
+                        "kind": "binary",
+                        "operator": "&",
+                        "left": {
+                          "kind": "variable",
+                          "name": "sum"
+                        },
+                        "right": {
+                          "kind": "integer",
+                          "value": 3
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "callee": "ToHost",
+                  "arguments": [
+                    {
+                      "kind": "subscript",
+                      "base": {
+                        "kind": "parameter",
+                        "index": 1,
+                        "name": "key"
+                      },
+                      "index": {
+                        "kind": "binary",
+                        "operator": "&",
+                        "left": {
+                          "kind": "binary",
+                          "operator": ">>",
+                          "left": {
+                            "kind": "variable",
+                            "name": "sum"
+                          },
+                          "right": {
+                            "kind": "integer",
+                            "value": 11
+                          }
+                        },
+                        "right": {
+                          "kind": "integer",
+                          "value": 3
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "callee": "ToHost",
+                  "arguments": [
+                    {
+                      "kind": "binary",
+                      "operator": "|",
+                      "left": {
+                        "kind": "binary",
+                        "operator": "<<",
+                        "left": {
+                          "kind": "variable",
+                          "name": "v0"
+                        },
+                        "right": {
+                          "kind": "integer",
+                          "value": 32
+                        }
+                      },
+                      "right": {
+                        "kind": "variable",
+                        "name": "v1"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "fixedArrays": [],
+              "operations": [
+                {
+                  "operator": ">>",
+                  "left": {
+                    "kind": "parameter",
+                    "index": 0,
+                    "name": "v"
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 32
+                  }
+                },
+                {
+                  "operator": "&",
+                  "left": {
+                    "kind": "parameter",
+                    "index": 0,
+                    "name": "v"
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 4294967295
+                  }
+                },
+                {
+                  "operator": "<",
+                  "left": {
+                    "kind": "variable",
+                    "name": "i"
+                  },
+                  "right": {
+                    "kind": "variable",
+                    "name": "NUM_ROUNDS"
+                  }
+                },
+                {
+                  "operator": "^",
+                  "left": {
+                    "kind": "binary",
+                    "operator": "+",
+                    "left": {
+                      "kind": "binary",
+                      "operator": "^",
+                      "left": {
+                        "kind": "binary",
+                        "operator": "<<",
+                        "left": {
+                          "kind": "variable",
+                          "name": "v1"
+                        },
+                        "right": {
+                          "kind": "integer",
+                          "value": 4
+                        }
+                      },
+                      "right": {
+                        "kind": "binary",
+                        "operator": ">>",
+                        "left": {
+                          "kind": "variable",
+                          "name": "v1"
+                        },
+                        "right": {
+                          "kind": "integer",
+                          "value": 5
+                        }
+                      }
+                    },
+                    "right": {
+                      "kind": "variable",
+                      "name": "v1"
+                    }
+                  },
+                  "right": {
+                    "kind": "binary",
+                    "operator": "+",
+                    "left": {
+                      "kind": "variable",
+                      "name": "sum"
+                    },
+                    "right": {
+                      "kind": "expression",
+                      "expressionKind": "CallExpr"
+                    }
+                  }
+                },
+                {
+                  "operator": "+",
+                  "left": {
+                    "kind": "binary",
+                    "operator": "^",
+                    "left": {
+                      "kind": "binary",
+                      "operator": "<<",
+                      "left": {
+                        "kind": "variable",
+                        "name": "v1"
+                      },
+                      "right": {
+                        "kind": "integer",
+                        "value": 4
+                      }
+                    },
+                    "right": {
+                      "kind": "binary",
+                      "operator": ">>",
+                      "left": {
+                        "kind": "variable",
+                        "name": "v1"
+                      },
+                      "right": {
+                        "kind": "integer",
+                        "value": 5
+                      }
+                    }
+                  },
+                  "right": {
+                    "kind": "variable",
+                    "name": "v1"
+                  }
+                },
+                {
+                  "operator": "^",
+                  "left": {
+                    "kind": "binary",
+                    "operator": "<<",
+                    "left": {
+                      "kind": "variable",
+                      "name": "v1"
+                    },
+                    "right": {
+                      "kind": "integer",
+                      "value": 4
+                    }
+                  },
+                  "right": {
+                    "kind": "binary",
+                    "operator": ">>",
+                    "left": {
+                      "kind": "variable",
+                      "name": "v1"
+                    },
+                    "right": {
+                      "kind": "integer",
+                      "value": 5
+                    }
+                  }
+                },
+                {
+                  "operator": "<<",
+                  "left": {
+                    "kind": "variable",
+                    "name": "v1"
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 4
+                  }
+                },
+                {
+                  "operator": ">>",
+                  "left": {
+                    "kind": "variable",
+                    "name": "v1"
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 5
+                  }
+                },
+                {
+                  "operator": "+",
+                  "left": {
+                    "kind": "variable",
+                    "name": "sum"
+                  },
+                  "right": {
+                    "kind": "expression",
+                    "expressionKind": "CallExpr"
+                  }
+                },
+                {
+                  "operator": "&",
+                  "left": {
+                    "kind": "variable",
+                    "name": "sum"
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 3
+                  }
+                },
+                {
+                  "operator": "^",
+                  "left": {
+                    "kind": "binary",
+                    "operator": "+",
+                    "left": {
+                      "kind": "binary",
+                      "operator": "^",
+                      "left": {
+                        "kind": "binary",
+                        "operator": "<<",
+                        "left": {
+                          "kind": "variable",
+                          "name": "v0"
+                        },
+                        "right": {
+                          "kind": "integer",
+                          "value": 4
+                        }
+                      },
+                      "right": {
+                        "kind": "binary",
+                        "operator": ">>",
+                        "left": {
+                          "kind": "variable",
+                          "name": "v0"
+                        },
+                        "right": {
+                          "kind": "integer",
+                          "value": 5
+                        }
+                      }
+                    },
+                    "right": {
+                      "kind": "variable",
+                      "name": "v0"
+                    }
+                  },
+                  "right": {
+                    "kind": "binary",
+                    "operator": "+",
+                    "left": {
+                      "kind": "variable",
+                      "name": "sum"
+                    },
+                    "right": {
+                      "kind": "expression",
+                      "expressionKind": "CallExpr"
+                    }
+                  }
+                },
+                {
+                  "operator": "+",
+                  "left": {
+                    "kind": "binary",
+                    "operator": "^",
+                    "left": {
+                      "kind": "binary",
+                      "operator": "<<",
+                      "left": {
+                        "kind": "variable",
+                        "name": "v0"
+                      },
+                      "right": {
+                        "kind": "integer",
+                        "value": 4
+                      }
+                    },
+                    "right": {
+                      "kind": "binary",
+                      "operator": ">>",
+                      "left": {
+                        "kind": "variable",
+                        "name": "v0"
+                      },
+                      "right": {
+                        "kind": "integer",
+                        "value": 5
+                      }
+                    }
+                  },
+                  "right": {
+                    "kind": "variable",
+                    "name": "v0"
+                  }
+                },
+                {
+                  "operator": "^",
+                  "left": {
+                    "kind": "binary",
+                    "operator": "<<",
+                    "left": {
+                      "kind": "variable",
+                      "name": "v0"
+                    },
+                    "right": {
+                      "kind": "integer",
+                      "value": 4
+                    }
+                  },
+                  "right": {
+                    "kind": "binary",
+                    "operator": ">>",
+                    "left": {
+                      "kind": "variable",
+                      "name": "v0"
+                    },
+                    "right": {
+                      "kind": "integer",
+                      "value": 5
+                    }
+                  }
+                },
+                {
+                  "operator": "<<",
+                  "left": {
+                    "kind": "variable",
+                    "name": "v0"
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 4
+                  }
+                },
+                {
+                  "operator": ">>",
+                  "left": {
+                    "kind": "variable",
+                    "name": "v0"
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 5
+                  }
+                },
+                {
+                  "operator": "+",
+                  "left": {
+                    "kind": "variable",
+                    "name": "sum"
+                  },
+                  "right": {
+                    "kind": "expression",
+                    "expressionKind": "CallExpr"
+                  }
+                },
+                {
+                  "operator": "&",
+                  "left": {
+                    "kind": "binary",
+                    "operator": ">>",
+                    "left": {
+                      "kind": "variable",
+                      "name": "sum"
+                    },
+                    "right": {
+                      "kind": "integer",
+                      "value": 11
+                    }
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 3
+                  }
+                },
+                {
+                  "operator": ">>",
+                  "left": {
+                    "kind": "variable",
+                    "name": "sum"
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 11
+                  }
+                },
+                {
+                  "operator": "|",
+                  "left": {
+                    "kind": "binary",
+                    "operator": "<<",
+                    "left": {
+                      "kind": "variable",
+                      "name": "v0"
+                    },
+                    "right": {
+                      "kind": "integer",
+                      "value": 32
+                    }
+                  },
+                  "right": {
+                    "kind": "variable",
+                    "name": "v1"
+                  }
+                },
+                {
+                  "operator": "<<",
+                  "left": {
+                    "kind": "variable",
+                    "name": "v0"
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 32
+                  }
+                }
+              ],
+              "returns": [
+                {
+                  "kind": "variable",
+                  "name": "ret"
+                }
+              ]
+            },
+            {
+              "name": "dmCrypt::EncryptXTeaCTR",
+              "type": "void (uint8_t *, uint32_t, const uint8_t *, uint32_t)",
+              "source": "upstream/defold/engine/dlib/src/dlib/crypt.cpp",
+              "line": 42,
+              "calls": [
+                {
+                  "callee": "__builtin_expect",
+                  "arguments": [
+                    {
+                      "kind": "unary",
+                      "operator": "!",
+                      "operand": {
+                        "kind": "binary",
+                        "operator": "<=",
+                        "left": {
+                          "kind": "parameter",
+                          "index": 3,
+                          "name": "keylen"
+                        },
+                        "right": {
+                          "kind": "integer",
+                          "value": 16
+                        }
+                      }
+                    },
+                    {
+                      "kind": "integer",
+                      "value": 0
+                    }
+                  ]
+                },
+                {
+                  "callee": "__assert_rtn",
+                  "arguments": [
+                    {
+                      "kind": "expression",
+                      "expressionKind": "PredefinedExpr"
+                    },
+                    {
+                      "kind": "string",
+                      "value": "\"crypt.cpp\""
+                    },
+                    {
+                      "kind": "integer",
+                      "value": 44
+                    },
+                    {
+                      "kind": "string",
+                      "value": "\"keylen <= 16\""
+                    }
+                  ]
+                },
+                {
+                  "callee": "memcpy",
+                  "arguments": [
+                    {
+                      "kind": "variable",
+                      "name": "paddedkey"
+                    },
+                    {
+                      "kind": "parameter",
+                      "index": 2,
+                      "name": "key"
+                    },
+                    {
+                      "kind": "parameter",
+                      "index": 3,
+                      "name": "keylen"
+                    }
+                  ]
+                },
+                {
+                  "callee": "memcpy",
+                  "arguments": [
+                    {
+                      "kind": "variable",
+                      "name": "key_words"
+                    },
+                    {
+                      "kind": "variable",
+                      "name": "paddedkey"
+                    },
+                    {
+                      "kind": "sizeof",
+                      "type": null
+                    }
+                  ]
+                },
+                {
+                  "callee": "EncryptXTea",
+                  "arguments": [
+                    {
+                      "kind": "variable",
+                      "name": "counter"
+                    },
+                    {
+                      "kind": "variable",
+                      "name": "key_words"
+                    }
+                  ]
+                },
+                {
+                  "callee": "memcpy",
+                  "arguments": [
+                    {
+                      "kind": "unary",
+                      "operator": "&",
+                      "operand": {
+                        "kind": "variable",
+                        "name": "block"
+                      }
+                    },
+                    {
+                      "kind": "parameter",
+                      "index": 0,
+                      "name": "data"
+                    },
+                    {
+                      "kind": "sizeof",
+                      "type": null
+                    }
+                  ]
+                },
+                {
+                  "callee": "memcpy",
+                  "arguments": [
+                    {
+                      "kind": "parameter",
+                      "index": 0,
+                      "name": "data"
+                    },
+                    {
+                      "kind": "unary",
+                      "operator": "&",
+                      "operand": {
+                        "kind": "variable",
+                        "name": "block"
+                      }
+                    },
+                    {
+                      "kind": "sizeof",
+                      "type": null
+                    }
+                  ]
+                },
+                {
+                  "callee": "EncryptXTea",
+                  "arguments": [
+                    {
+                      "kind": "variable",
+                      "name": "counter"
+                    },
+                    {
+                      "kind": "variable",
+                      "name": "key_words"
+                    }
+                  ]
+                }
+              ],
+              "fixedArrays": [
+                {
+                  "name": "paddedkey",
+                  "type": "uint8_t[16]",
+                  "elementType": "uint8_t",
+                  "extent": 16,
+                  "byteExtent": 16
+                },
+                {
+                  "name": "key_words",
+                  "type": "uint32_t[4]",
+                  "elementType": "uint32_t",
+                  "extent": 4,
+                  "byteExtent": 16
+                }
+              ],
+              "operations": [
+                {
+                  "operator": "<=",
+                  "left": {
+                    "kind": "parameter",
+                    "index": 3,
+                    "name": "keylen"
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 16
+                  }
+                },
+                {
+                  "operator": "=",
+                  "left": {
+                    "kind": "variable",
+                    "name": "i"
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 0
+                  }
+                },
+                {
+                  "operator": "<",
+                  "left": {
+                    "kind": "variable",
+                    "name": "i"
+                  },
+                  "right": {
+                    "kind": "binary",
+                    "operator": "/",
+                    "left": {
+                      "kind": "parameter",
+                      "index": 1,
+                      "name": "datalen"
+                    },
+                    "right": {
+                      "kind": "variable",
+                      "name": "block_len"
+                    }
+                  }
+                },
+                {
+                  "operator": "/",
+                  "left": {
+                    "kind": "parameter",
+                    "index": 1,
+                    "name": "datalen"
+                  },
+                  "right": {
+                    "kind": "variable",
+                    "name": "block_len"
+                  }
+                },
+                {
+                  "operator": "&",
+                  "left": {
+                    "kind": "parameter",
+                    "index": 1,
+                    "name": "datalen"
+                  },
+                  "right": {
+                    "kind": "binary",
+                    "operator": "-",
+                    "left": {
+                      "kind": "variable",
+                      "name": "block_len"
+                    },
+                    "right": {
+                      "kind": "integer",
+                      "value": 1
+                    }
+                  }
+                },
+                {
+                  "operator": "-",
+                  "left": {
+                    "kind": "variable",
+                    "name": "block_len"
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 1
+                  }
+                },
+                {
+                  "operator": "<",
+                  "left": {
+                    "kind": "variable",
+                    "name": "j"
+                  },
+                  "right": {
+                    "kind": "variable",
+                    "name": "rest"
+                  }
+                }
+              ],
+              "returns": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmCrypt::Encrypt@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:65:155",
+      "name": "dmCrypt::Encrypt",
+      "shape": "enum:dmCrypt::Result(value:enum:dmCrypt::Algorithm,inout:pointer:scalar:u8,value:scalar:u32,in:pointer:scalar:u8,value:scalar:u32)",
+      "state": "observed",
+      "definitions": [
+        {
+          "name": "dmCrypt::Encrypt",
+          "type": "Result (Algorithm, uint8_t *, uint32_t, const uint8_t *, uint32_t)",
+          "source": "upstream/defold/engine/dlib/src/dlib/crypt.cpp",
+          "line": 74,
+          "calls": [
+            {
+              "callee": "EncryptXTeaCTR",
+              "arguments": [
+                {
+                  "kind": "parameter",
+                  "index": 1,
+                  "name": "data"
+                },
+                {
+                  "kind": "parameter",
+                  "index": 2,
+                  "name": "datalen"
+                },
+                {
+                  "kind": "parameter",
+                  "index": 3,
+                  "name": "key"
+                },
+                {
+                  "kind": "parameter",
+                  "index": 4,
+                  "name": "keylen"
+                }
+              ]
+            }
+          ],
+          "fixedArrays": [],
+          "operations": [],
+          "returns": [
+            {
+              "kind": "enum-constant",
+              "name": "RESULT_OK"
+            }
+          ],
+          "reachableDefinitions": [
+            {
+              "name": "dmCrypt::EncryptXTea",
+              "type": "uint64_t (uint64_t, const uint32_t *)",
+              "source": "upstream/defold/engine/dlib/src/dlib/crypt.cpp",
+              "line": 26,
+              "calls": [
+                {
+                  "callee": "ToHost",
+                  "arguments": [
+                    {
+                      "kind": "subscript",
+                      "base": {
+                        "kind": "parameter",
+                        "index": 1,
+                        "name": "key"
+                      },
+                      "index": {
+                        "kind": "binary",
+                        "operator": "&",
+                        "left": {
+                          "kind": "variable",
+                          "name": "sum"
+                        },
+                        "right": {
+                          "kind": "integer",
+                          "value": 3
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "callee": "ToHost",
+                  "arguments": [
+                    {
+                      "kind": "subscript",
+                      "base": {
+                        "kind": "parameter",
+                        "index": 1,
+                        "name": "key"
+                      },
+                      "index": {
+                        "kind": "binary",
+                        "operator": "&",
+                        "left": {
+                          "kind": "binary",
+                          "operator": ">>",
+                          "left": {
+                            "kind": "variable",
+                            "name": "sum"
+                          },
+                          "right": {
+                            "kind": "integer",
+                            "value": 11
+                          }
+                        },
+                        "right": {
+                          "kind": "integer",
+                          "value": 3
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "callee": "ToHost",
+                  "arguments": [
+                    {
+                      "kind": "binary",
+                      "operator": "|",
+                      "left": {
+                        "kind": "binary",
+                        "operator": "<<",
+                        "left": {
+                          "kind": "variable",
+                          "name": "v0"
+                        },
+                        "right": {
+                          "kind": "integer",
+                          "value": 32
+                        }
+                      },
+                      "right": {
+                        "kind": "variable",
+                        "name": "v1"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "fixedArrays": [],
+              "operations": [
+                {
+                  "operator": ">>",
+                  "left": {
+                    "kind": "parameter",
+                    "index": 0,
+                    "name": "v"
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 32
+                  }
+                },
+                {
+                  "operator": "&",
+                  "left": {
+                    "kind": "parameter",
+                    "index": 0,
+                    "name": "v"
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 4294967295
+                  }
+                },
+                {
+                  "operator": "<",
+                  "left": {
+                    "kind": "variable",
+                    "name": "i"
+                  },
+                  "right": {
+                    "kind": "variable",
+                    "name": "NUM_ROUNDS"
+                  }
+                },
+                {
+                  "operator": "^",
+                  "left": {
+                    "kind": "binary",
+                    "operator": "+",
+                    "left": {
+                      "kind": "binary",
+                      "operator": "^",
+                      "left": {
+                        "kind": "binary",
+                        "operator": "<<",
+                        "left": {
+                          "kind": "variable",
+                          "name": "v1"
+                        },
+                        "right": {
+                          "kind": "integer",
+                          "value": 4
+                        }
+                      },
+                      "right": {
+                        "kind": "binary",
+                        "operator": ">>",
+                        "left": {
+                          "kind": "variable",
+                          "name": "v1"
+                        },
+                        "right": {
+                          "kind": "integer",
+                          "value": 5
+                        }
+                      }
+                    },
+                    "right": {
+                      "kind": "variable",
+                      "name": "v1"
+                    }
+                  },
+                  "right": {
+                    "kind": "binary",
+                    "operator": "+",
+                    "left": {
+                      "kind": "variable",
+                      "name": "sum"
+                    },
+                    "right": {
+                      "kind": "expression",
+                      "expressionKind": "CallExpr"
+                    }
+                  }
+                },
+                {
+                  "operator": "+",
+                  "left": {
+                    "kind": "binary",
+                    "operator": "^",
+                    "left": {
+                      "kind": "binary",
+                      "operator": "<<",
+                      "left": {
+                        "kind": "variable",
+                        "name": "v1"
+                      },
+                      "right": {
+                        "kind": "integer",
+                        "value": 4
+                      }
+                    },
+                    "right": {
+                      "kind": "binary",
+                      "operator": ">>",
+                      "left": {
+                        "kind": "variable",
+                        "name": "v1"
+                      },
+                      "right": {
+                        "kind": "integer",
+                        "value": 5
+                      }
+                    }
+                  },
+                  "right": {
+                    "kind": "variable",
+                    "name": "v1"
+                  }
+                },
+                {
+                  "operator": "^",
+                  "left": {
+                    "kind": "binary",
+                    "operator": "<<",
+                    "left": {
+                      "kind": "variable",
+                      "name": "v1"
+                    },
+                    "right": {
+                      "kind": "integer",
+                      "value": 4
+                    }
+                  },
+                  "right": {
+                    "kind": "binary",
+                    "operator": ">>",
+                    "left": {
+                      "kind": "variable",
+                      "name": "v1"
+                    },
+                    "right": {
+                      "kind": "integer",
+                      "value": 5
+                    }
+                  }
+                },
+                {
+                  "operator": "<<",
+                  "left": {
+                    "kind": "variable",
+                    "name": "v1"
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 4
+                  }
+                },
+                {
+                  "operator": ">>",
+                  "left": {
+                    "kind": "variable",
+                    "name": "v1"
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 5
+                  }
+                },
+                {
+                  "operator": "+",
+                  "left": {
+                    "kind": "variable",
+                    "name": "sum"
+                  },
+                  "right": {
+                    "kind": "expression",
+                    "expressionKind": "CallExpr"
+                  }
+                },
+                {
+                  "operator": "&",
+                  "left": {
+                    "kind": "variable",
+                    "name": "sum"
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 3
+                  }
+                },
+                {
+                  "operator": "^",
+                  "left": {
+                    "kind": "binary",
+                    "operator": "+",
+                    "left": {
+                      "kind": "binary",
+                      "operator": "^",
+                      "left": {
+                        "kind": "binary",
+                        "operator": "<<",
+                        "left": {
+                          "kind": "variable",
+                          "name": "v0"
+                        },
+                        "right": {
+                          "kind": "integer",
+                          "value": 4
+                        }
+                      },
+                      "right": {
+                        "kind": "binary",
+                        "operator": ">>",
+                        "left": {
+                          "kind": "variable",
+                          "name": "v0"
+                        },
+                        "right": {
+                          "kind": "integer",
+                          "value": 5
+                        }
+                      }
+                    },
+                    "right": {
+                      "kind": "variable",
+                      "name": "v0"
+                    }
+                  },
+                  "right": {
+                    "kind": "binary",
+                    "operator": "+",
+                    "left": {
+                      "kind": "variable",
+                      "name": "sum"
+                    },
+                    "right": {
+                      "kind": "expression",
+                      "expressionKind": "CallExpr"
+                    }
+                  }
+                },
+                {
+                  "operator": "+",
+                  "left": {
+                    "kind": "binary",
+                    "operator": "^",
+                    "left": {
+                      "kind": "binary",
+                      "operator": "<<",
+                      "left": {
+                        "kind": "variable",
+                        "name": "v0"
+                      },
+                      "right": {
+                        "kind": "integer",
+                        "value": 4
+                      }
+                    },
+                    "right": {
+                      "kind": "binary",
+                      "operator": ">>",
+                      "left": {
+                        "kind": "variable",
+                        "name": "v0"
+                      },
+                      "right": {
+                        "kind": "integer",
+                        "value": 5
+                      }
+                    }
+                  },
+                  "right": {
+                    "kind": "variable",
+                    "name": "v0"
+                  }
+                },
+                {
+                  "operator": "^",
+                  "left": {
+                    "kind": "binary",
+                    "operator": "<<",
+                    "left": {
+                      "kind": "variable",
+                      "name": "v0"
+                    },
+                    "right": {
+                      "kind": "integer",
+                      "value": 4
+                    }
+                  },
+                  "right": {
+                    "kind": "binary",
+                    "operator": ">>",
+                    "left": {
+                      "kind": "variable",
+                      "name": "v0"
+                    },
+                    "right": {
+                      "kind": "integer",
+                      "value": 5
+                    }
+                  }
+                },
+                {
+                  "operator": "<<",
+                  "left": {
+                    "kind": "variable",
+                    "name": "v0"
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 4
+                  }
+                },
+                {
+                  "operator": ">>",
+                  "left": {
+                    "kind": "variable",
+                    "name": "v0"
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 5
+                  }
+                },
+                {
+                  "operator": "+",
+                  "left": {
+                    "kind": "variable",
+                    "name": "sum"
+                  },
+                  "right": {
+                    "kind": "expression",
+                    "expressionKind": "CallExpr"
+                  }
+                },
+                {
+                  "operator": "&",
+                  "left": {
+                    "kind": "binary",
+                    "operator": ">>",
+                    "left": {
+                      "kind": "variable",
+                      "name": "sum"
+                    },
+                    "right": {
+                      "kind": "integer",
+                      "value": 11
+                    }
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 3
+                  }
+                },
+                {
+                  "operator": ">>",
+                  "left": {
+                    "kind": "variable",
+                    "name": "sum"
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 11
+                  }
+                },
+                {
+                  "operator": "|",
+                  "left": {
+                    "kind": "binary",
+                    "operator": "<<",
+                    "left": {
+                      "kind": "variable",
+                      "name": "v0"
+                    },
+                    "right": {
+                      "kind": "integer",
+                      "value": 32
+                    }
+                  },
+                  "right": {
+                    "kind": "variable",
+                    "name": "v1"
+                  }
+                },
+                {
+                  "operator": "<<",
+                  "left": {
+                    "kind": "variable",
+                    "name": "v0"
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 32
+                  }
+                }
+              ],
+              "returns": [
+                {
+                  "kind": "variable",
+                  "name": "ret"
+                }
+              ]
+            },
+            {
+              "name": "dmCrypt::EncryptXTeaCTR",
+              "type": "void (uint8_t *, uint32_t, const uint8_t *, uint32_t)",
+              "source": "upstream/defold/engine/dlib/src/dlib/crypt.cpp",
+              "line": 42,
+              "calls": [
+                {
+                  "callee": "__builtin_expect",
+                  "arguments": [
+                    {
+                      "kind": "unary",
+                      "operator": "!",
+                      "operand": {
+                        "kind": "binary",
+                        "operator": "<=",
+                        "left": {
+                          "kind": "parameter",
+                          "index": 3,
+                          "name": "keylen"
+                        },
+                        "right": {
+                          "kind": "integer",
+                          "value": 16
+                        }
+                      }
+                    },
+                    {
+                      "kind": "integer",
+                      "value": 0
+                    }
+                  ]
+                },
+                {
+                  "callee": "__assert_rtn",
+                  "arguments": [
+                    {
+                      "kind": "expression",
+                      "expressionKind": "PredefinedExpr"
+                    },
+                    {
+                      "kind": "string",
+                      "value": "\"crypt.cpp\""
+                    },
+                    {
+                      "kind": "integer",
+                      "value": 44
+                    },
+                    {
+                      "kind": "string",
+                      "value": "\"keylen <= 16\""
+                    }
+                  ]
+                },
+                {
+                  "callee": "memcpy",
+                  "arguments": [
+                    {
+                      "kind": "variable",
+                      "name": "paddedkey"
+                    },
+                    {
+                      "kind": "parameter",
+                      "index": 2,
+                      "name": "key"
+                    },
+                    {
+                      "kind": "parameter",
+                      "index": 3,
+                      "name": "keylen"
+                    }
+                  ]
+                },
+                {
+                  "callee": "memcpy",
+                  "arguments": [
+                    {
+                      "kind": "variable",
+                      "name": "key_words"
+                    },
+                    {
+                      "kind": "variable",
+                      "name": "paddedkey"
+                    },
+                    {
+                      "kind": "sizeof",
+                      "type": null
+                    }
+                  ]
+                },
+                {
+                  "callee": "EncryptXTea",
+                  "arguments": [
+                    {
+                      "kind": "variable",
+                      "name": "counter"
+                    },
+                    {
+                      "kind": "variable",
+                      "name": "key_words"
+                    }
+                  ]
+                },
+                {
+                  "callee": "memcpy",
+                  "arguments": [
+                    {
+                      "kind": "unary",
+                      "operator": "&",
+                      "operand": {
+                        "kind": "variable",
+                        "name": "block"
+                      }
+                    },
+                    {
+                      "kind": "parameter",
+                      "index": 0,
+                      "name": "data"
+                    },
+                    {
+                      "kind": "sizeof",
+                      "type": null
+                    }
+                  ]
+                },
+                {
+                  "callee": "memcpy",
+                  "arguments": [
+                    {
+                      "kind": "parameter",
+                      "index": 0,
+                      "name": "data"
+                    },
+                    {
+                      "kind": "unary",
+                      "operator": "&",
+                      "operand": {
+                        "kind": "variable",
+                        "name": "block"
+                      }
+                    },
+                    {
+                      "kind": "sizeof",
+                      "type": null
+                    }
+                  ]
+                },
+                {
+                  "callee": "EncryptXTea",
+                  "arguments": [
+                    {
+                      "kind": "variable",
+                      "name": "counter"
+                    },
+                    {
+                      "kind": "variable",
+                      "name": "key_words"
+                    }
+                  ]
+                }
+              ],
+              "fixedArrays": [
+                {
+                  "name": "paddedkey",
+                  "type": "uint8_t[16]",
+                  "elementType": "uint8_t",
+                  "extent": 16,
+                  "byteExtent": 16
+                },
+                {
+                  "name": "key_words",
+                  "type": "uint32_t[4]",
+                  "elementType": "uint32_t",
+                  "extent": 4,
+                  "byteExtent": 16
+                }
+              ],
+              "operations": [
+                {
+                  "operator": "<=",
+                  "left": {
+                    "kind": "parameter",
+                    "index": 3,
+                    "name": "keylen"
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 16
+                  }
+                },
+                {
+                  "operator": "=",
+                  "left": {
+                    "kind": "variable",
+                    "name": "i"
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 0
+                  }
+                },
+                {
+                  "operator": "<",
+                  "left": {
+                    "kind": "variable",
+                    "name": "i"
+                  },
+                  "right": {
+                    "kind": "binary",
+                    "operator": "/",
+                    "left": {
+                      "kind": "parameter",
+                      "index": 1,
+                      "name": "datalen"
+                    },
+                    "right": {
+                      "kind": "variable",
+                      "name": "block_len"
+                    }
+                  }
+                },
+                {
+                  "operator": "/",
+                  "left": {
+                    "kind": "parameter",
+                    "index": 1,
+                    "name": "datalen"
+                  },
+                  "right": {
+                    "kind": "variable",
+                    "name": "block_len"
+                  }
+                },
+                {
+                  "operator": "&",
+                  "left": {
+                    "kind": "parameter",
+                    "index": 1,
+                    "name": "datalen"
+                  },
+                  "right": {
+                    "kind": "binary",
+                    "operator": "-",
+                    "left": {
+                      "kind": "variable",
+                      "name": "block_len"
+                    },
+                    "right": {
+                      "kind": "integer",
+                      "value": 1
+                    }
+                  }
+                },
+                {
+                  "operator": "-",
+                  "left": {
+                    "kind": "variable",
+                    "name": "block_len"
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 1
+                  }
+                },
+                {
+                  "operator": "<",
+                  "left": {
+                    "kind": "variable",
+                    "name": "j"
+                  },
+                  "right": {
+                    "kind": "variable",
+                    "name": "rest"
+                  }
+                }
+              ],
+              "returns": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmCrypt::HashMd5@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:108:160",
+      "name": "dmCrypt::HashMd5",
+      "shape": "scalar:void(in:pointer:scalar:u8,value:scalar:u32,inout:pointer:scalar:u8)",
+      "state": "observed",
+      "definitions": [
+        {
+          "name": "dmCrypt::HashMd5",
+          "type": "void (const uint8_t *, uint32_t, uint8_t *)",
+          "source": "upstream/defold/engine/dlib/src/dlib/crypt_apple.mm",
+          "line": 39,
+          "calls": [
+            {
+              "callee": "CC_MD5",
+              "arguments": [
+                {
+                  "kind": "parameter",
+                  "index": 0,
+                  "name": "buf"
+                },
+                {
+                  "kind": "parameter",
+                  "index": 1,
+                  "name": "buflen"
+                },
+                {
+                  "kind": "parameter",
+                  "index": 2,
+                  "name": "digest"
+                }
+              ]
+            }
+          ],
+          "fixedArrays": [],
+          "operations": [],
+          "returns": [],
+          "reachableDefinitions": []
+        },
+        {
+          "name": "dmCrypt::HashMd5",
+          "type": "void (const uint8_t *, uint32_t, uint8_t *)",
+          "source": "upstream/defold/engine/dlib/src/dlib/crypt_mbedtls.cpp",
+          "line": 49,
+          "calls": [
+            {
+              "callee": "HashMbedTLS",
+              "arguments": [
+                {
+                  "kind": "enum-constant",
+                  "name": "MBEDTLS_MD_MD5"
+                },
+                {
+                  "kind": "parameter",
+                  "index": 0,
+                  "name": "buf"
+                },
+                {
+                  "kind": "parameter",
+                  "index": 1,
+                  "name": "buflen"
+                },
+                {
+                  "kind": "parameter",
+                  "index": 2,
+                  "name": "digest"
+                },
+                {
+                  "kind": "integer",
+                  "value": 16
+                }
+              ]
+            }
+          ],
+          "fixedArrays": [],
+          "operations": [],
+          "returns": [],
+          "reachableDefinitions": [
+            {
+              "name": "dmCrypt::HashMbedTLS",
+              "type": "void (mbedtls_md_type_t, const uint8_t *, uint32_t, uint8_t *, uint32_t)",
+              "source": "upstream/defold/engine/dlib/src/dlib/crypt_mbedtls.cpp",
+              "line": 24,
+              "calls": [
+                {
+                  "callee": "mbedtls_md_info_from_type",
+                  "arguments": [
+                    {
+                      "kind": "parameter",
+                      "index": 0,
+                      "name": "type"
+                    }
+                  ]
+                },
+                {
+                  "callee": "mbedtls_md",
+                  "arguments": [
+                    {
+                      "kind": "variable",
+                      "name": "md_info"
+                    },
+                    {
+                      "kind": "parameter",
+                      "index": 1,
+                      "name": "buf"
+                    },
+                    {
+                      "kind": "parameter",
+                      "index": 2,
+                      "name": "buflen"
+                    },
+                    {
+                      "kind": "parameter",
+                      "index": 3,
+                      "name": "digest"
+                    }
+                  ]
+                },
+                {
+                  "callee": "memset",
+                  "arguments": [
+                    {
+                      "kind": "parameter",
+                      "index": 3,
+                      "name": "digest"
+                    },
+                    {
+                      "kind": "integer",
+                      "value": 0
+                    },
+                    {
+                      "kind": "parameter",
+                      "index": 4,
+                      "name": "digest_len"
+                    }
+                  ]
+                }
+              ],
+              "fixedArrays": [],
+              "operations": [
+                {
+                  "operator": "!=",
+                  "left": {
+                    "kind": "variable",
+                    "name": "ret"
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 0
+                  }
+                }
+              ],
+              "returns": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmCrypt::HashSha1@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:84:157",
+      "name": "dmCrypt::HashSha1",
+      "shape": "scalar:void(in:pointer:scalar:u8,value:scalar:u32,inout:pointer:scalar:u8)",
+      "state": "observed",
+      "definitions": [
+        {
+          "name": "dmCrypt::HashSha1",
+          "type": "void (const uint8_t *, uint32_t, uint8_t *)",
+          "source": "upstream/defold/engine/dlib/src/dlib/crypt_apple.mm",
+          "line": 24,
+          "calls": [
+            {
+              "callee": "CC_SHA1",
+              "arguments": [
+                {
+                  "kind": "parameter",
+                  "index": 0,
+                  "name": "buf"
+                },
+                {
+                  "kind": "parameter",
+                  "index": 1,
+                  "name": "buflen"
+                },
+                {
+                  "kind": "parameter",
+                  "index": 2,
+                  "name": "digest"
+                }
+              ]
+            }
+          ],
+          "fixedArrays": [],
+          "operations": [],
+          "returns": [],
+          "reachableDefinitions": []
+        },
+        {
+          "name": "dmCrypt::HashSha1",
+          "type": "void (const uint8_t *, uint32_t, uint8_t *)",
+          "source": "upstream/defold/engine/dlib/src/dlib/crypt_mbedtls.cpp",
+          "line": 34,
+          "calls": [
+            {
+              "callee": "HashMbedTLS",
+              "arguments": [
+                {
+                  "kind": "enum-constant",
+                  "name": "MBEDTLS_MD_SHA1"
+                },
+                {
+                  "kind": "parameter",
+                  "index": 0,
+                  "name": "buf"
+                },
+                {
+                  "kind": "parameter",
+                  "index": 1,
+                  "name": "buflen"
+                },
+                {
+                  "kind": "parameter",
+                  "index": 2,
+                  "name": "digest"
+                },
+                {
+                  "kind": "integer",
+                  "value": 20
+                }
+              ]
+            }
+          ],
+          "fixedArrays": [],
+          "operations": [],
+          "returns": [],
+          "reachableDefinitions": [
+            {
+              "name": "dmCrypt::HashMbedTLS",
+              "type": "void (mbedtls_md_type_t, const uint8_t *, uint32_t, uint8_t *, uint32_t)",
+              "source": "upstream/defold/engine/dlib/src/dlib/crypt_mbedtls.cpp",
+              "line": 24,
+              "calls": [
+                {
+                  "callee": "mbedtls_md_info_from_type",
+                  "arguments": [
+                    {
+                      "kind": "parameter",
+                      "index": 0,
+                      "name": "type"
+                    }
+                  ]
+                },
+                {
+                  "callee": "mbedtls_md",
+                  "arguments": [
+                    {
+                      "kind": "variable",
+                      "name": "md_info"
+                    },
+                    {
+                      "kind": "parameter",
+                      "index": 1,
+                      "name": "buf"
+                    },
+                    {
+                      "kind": "parameter",
+                      "index": 2,
+                      "name": "buflen"
+                    },
+                    {
+                      "kind": "parameter",
+                      "index": 3,
+                      "name": "digest"
+                    }
+                  ]
+                },
+                {
+                  "callee": "memset",
+                  "arguments": [
+                    {
+                      "kind": "parameter",
+                      "index": 3,
+                      "name": "digest"
+                    },
+                    {
+                      "kind": "integer",
+                      "value": 0
+                    },
+                    {
+                      "kind": "parameter",
+                      "index": 4,
+                      "name": "digest_len"
+                    }
+                  ]
+                }
+              ],
+              "fixedArrays": [],
+              "operations": [
+                {
+                  "operator": "!=",
+                  "left": {
+                    "kind": "variable",
+                    "name": "ret"
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 0
+                  }
+                }
+              ],
+              "returns": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmCrypt::HashSha256@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:92:158",
+      "name": "dmCrypt::HashSha256",
+      "shape": "scalar:void(in:pointer:scalar:u8,value:scalar:u32,inout:pointer:scalar:u8)",
+      "state": "observed",
+      "definitions": [
+        {
+          "name": "dmCrypt::HashSha256",
+          "type": "void (const uint8_t *, uint32_t, uint8_t *)",
+          "source": "upstream/defold/engine/dlib/src/dlib/crypt_apple.mm",
+          "line": 29,
+          "calls": [
+            {
+              "callee": "CC_SHA256",
+              "arguments": [
+                {
+                  "kind": "parameter",
+                  "index": 0,
+                  "name": "buf"
+                },
+                {
+                  "kind": "parameter",
+                  "index": 1,
+                  "name": "buflen"
+                },
+                {
+                  "kind": "parameter",
+                  "index": 2,
+                  "name": "digest"
+                }
+              ]
+            }
+          ],
+          "fixedArrays": [],
+          "operations": [],
+          "returns": [],
+          "reachableDefinitions": []
+        },
+        {
+          "name": "dmCrypt::HashSha256",
+          "type": "void (const uint8_t *, uint32_t, uint8_t *)",
+          "source": "upstream/defold/engine/dlib/src/dlib/crypt_mbedtls.cpp",
+          "line": 39,
+          "calls": [
+            {
+              "callee": "HashMbedTLS",
+              "arguments": [
+                {
+                  "kind": "enum-constant",
+                  "name": "MBEDTLS_MD_SHA256"
+                },
+                {
+                  "kind": "parameter",
+                  "index": 0,
+                  "name": "buf"
+                },
+                {
+                  "kind": "parameter",
+                  "index": 1,
+                  "name": "buflen"
+                },
+                {
+                  "kind": "parameter",
+                  "index": 2,
+                  "name": "digest"
+                },
+                {
+                  "kind": "integer",
+                  "value": 32
+                }
+              ]
+            }
+          ],
+          "fixedArrays": [],
+          "operations": [],
+          "returns": [],
+          "reachableDefinitions": [
+            {
+              "name": "dmCrypt::HashMbedTLS",
+              "type": "void (mbedtls_md_type_t, const uint8_t *, uint32_t, uint8_t *, uint32_t)",
+              "source": "upstream/defold/engine/dlib/src/dlib/crypt_mbedtls.cpp",
+              "line": 24,
+              "calls": [
+                {
+                  "callee": "mbedtls_md_info_from_type",
+                  "arguments": [
+                    {
+                      "kind": "parameter",
+                      "index": 0,
+                      "name": "type"
+                    }
+                  ]
+                },
+                {
+                  "callee": "mbedtls_md",
+                  "arguments": [
+                    {
+                      "kind": "variable",
+                      "name": "md_info"
+                    },
+                    {
+                      "kind": "parameter",
+                      "index": 1,
+                      "name": "buf"
+                    },
+                    {
+                      "kind": "parameter",
+                      "index": 2,
+                      "name": "buflen"
+                    },
+                    {
+                      "kind": "parameter",
+                      "index": 3,
+                      "name": "digest"
+                    }
+                  ]
+                },
+                {
+                  "callee": "memset",
+                  "arguments": [
+                    {
+                      "kind": "parameter",
+                      "index": 3,
+                      "name": "digest"
+                    },
+                    {
+                      "kind": "integer",
+                      "value": 0
+                    },
+                    {
+                      "kind": "parameter",
+                      "index": 4,
+                      "name": "digest_len"
+                    }
+                  ]
+                }
+              ],
+              "fixedArrays": [],
+              "operations": [
+                {
+                  "operator": "!=",
+                  "left": {
+                    "kind": "variable",
+                    "name": "ret"
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 0
+                  }
+                }
+              ],
+              "returns": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmCrypt::HashSha512@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:100:159",
+      "name": "dmCrypt::HashSha512",
+      "shape": "scalar:void(in:pointer:scalar:u8,value:scalar:u32,inout:pointer:scalar:u8)",
+      "state": "observed",
+      "definitions": [
+        {
+          "name": "dmCrypt::HashSha512",
+          "type": "void (const uint8_t *, uint32_t, uint8_t *)",
+          "source": "upstream/defold/engine/dlib/src/dlib/crypt_apple.mm",
+          "line": 34,
+          "calls": [
+            {
+              "callee": "CC_SHA512",
+              "arguments": [
+                {
+                  "kind": "parameter",
+                  "index": 0,
+                  "name": "buf"
+                },
+                {
+                  "kind": "parameter",
+                  "index": 1,
+                  "name": "buflen"
+                },
+                {
+                  "kind": "parameter",
+                  "index": 2,
+                  "name": "digest"
+                }
+              ]
+            }
+          ],
+          "fixedArrays": [],
+          "operations": [],
+          "returns": [],
+          "reachableDefinitions": []
+        },
+        {
+          "name": "dmCrypt::HashSha512",
+          "type": "void (const uint8_t *, uint32_t, uint8_t *)",
+          "source": "upstream/defold/engine/dlib/src/dlib/crypt_mbedtls.cpp",
+          "line": 44,
+          "calls": [
+            {
+              "callee": "HashMbedTLS",
+              "arguments": [
+                {
+                  "kind": "enum-constant",
+                  "name": "MBEDTLS_MD_SHA512"
+                },
+                {
+                  "kind": "parameter",
+                  "index": 0,
+                  "name": "buf"
+                },
+                {
+                  "kind": "parameter",
+                  "index": 1,
+                  "name": "buflen"
+                },
+                {
+                  "kind": "parameter",
+                  "index": 2,
+                  "name": "digest"
+                },
+                {
+                  "kind": "integer",
+                  "value": 64
+                }
+              ]
+            }
+          ],
+          "fixedArrays": [],
+          "operations": [],
+          "returns": [],
+          "reachableDefinitions": [
+            {
+              "name": "dmCrypt::HashMbedTLS",
+              "type": "void (mbedtls_md_type_t, const uint8_t *, uint32_t, uint8_t *, uint32_t)",
+              "source": "upstream/defold/engine/dlib/src/dlib/crypt_mbedtls.cpp",
+              "line": 24,
+              "calls": [
+                {
+                  "callee": "mbedtls_md_info_from_type",
+                  "arguments": [
+                    {
+                      "kind": "parameter",
+                      "index": 0,
+                      "name": "type"
+                    }
+                  ]
+                },
+                {
+                  "callee": "mbedtls_md",
+                  "arguments": [
+                    {
+                      "kind": "variable",
+                      "name": "md_info"
+                    },
+                    {
+                      "kind": "parameter",
+                      "index": 1,
+                      "name": "buf"
+                    },
+                    {
+                      "kind": "parameter",
+                      "index": 2,
+                      "name": "buflen"
+                    },
+                    {
+                      "kind": "parameter",
+                      "index": 3,
+                      "name": "digest"
+                    }
+                  ]
+                },
+                {
+                  "callee": "memset",
+                  "arguments": [
+                    {
+                      "kind": "parameter",
+                      "index": 3,
+                      "name": "digest"
+                    },
+                    {
+                      "kind": "integer",
+                      "value": 0
+                    },
+                    {
+                      "kind": "parameter",
+                      "index": 4,
+                      "name": "digest_len"
+                    }
+                  ]
+                }
+              ],
+              "fixedArrays": [],
+              "operations": [
+                {
+                  "operator": "!=",
+                  "left": {
+                    "kind": "variable",
+                    "name": "ret"
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 0
+                  }
+                }
+              ],
+              "returns": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmImage::GetAstcBlockSize@upstream/defold/engine/dlib/src/dmsdk/dlib/image.h:133:349",
+      "name": "dmImage::GetAstcBlockSize",
+      "shape": "scalar:bool(in:opaque-pointer,value:scalar:u32,inout:pointer:scalar:u32,inout:pointer:scalar:u32,inout:pointer:scalar:u32)",
+      "state": "observed",
+      "definitions": [
+        {
+          "name": "dmImage::GetAstcBlockSize",
+          "type": "bool (const void *, uint32_t, uint32_t *, uint32_t *, uint32_t *)",
+          "source": "upstream/defold/engine/dlib/src/dlib/image.cpp",
+          "line": 237,
+          "calls": [
+            {
+              "callee": "IsAstc",
+              "arguments": [
+                {
+                  "kind": "parameter",
+                  "index": 0,
+                  "name": "mem"
+                },
+                {
+                  "kind": "parameter",
+                  "index": 1,
+                  "name": "memsize"
+                }
+              ]
+            }
+          ],
+          "fixedArrays": [],
+          "operations": [
+            {
+              "operator": "=",
+              "left": {
+                "kind": "unary",
+                "operator": "*",
+                "operand": {
+                  "kind": "parameter",
+                  "index": 2,
+                  "name": "width"
+                }
+              },
+              "right": {
+                "kind": "subscript",
+                "base": {
+                  "kind": "member",
+                  "name": "m_BlockSizes",
+                  "base": {
+                    "kind": "variable",
+                    "name": "header"
+                  }
+                },
+                "index": {
+                  "kind": "integer",
+                  "value": 0
+                }
+              }
+            },
+            {
+              "operator": "=",
+              "left": {
+                "kind": "unary",
+                "operator": "*",
+                "operand": {
+                  "kind": "parameter",
+                  "index": 3,
+                  "name": "height"
+                }
+              },
+              "right": {
+                "kind": "subscript",
+                "base": {
+                  "kind": "member",
+                  "name": "m_BlockSizes",
+                  "base": {
+                    "kind": "variable",
+                    "name": "header"
+                  }
+                },
+                "index": {
+                  "kind": "integer",
+                  "value": 1
+                }
+              }
+            },
+            {
+              "operator": "=",
+              "left": {
+                "kind": "unary",
+                "operator": "*",
+                "operand": {
+                  "kind": "parameter",
+                  "index": 4,
+                  "name": "depth"
+                }
+              },
+              "right": {
+                "kind": "subscript",
+                "base": {
+                  "kind": "member",
+                  "name": "m_BlockSizes",
+                  "base": {
+                    "kind": "variable",
+                    "name": "header"
+                  }
+                },
+                "index": {
+                  "kind": "integer",
+                  "value": 2
+                }
+              }
+            }
+          ],
+          "returns": [
+            {
+              "kind": "boolean",
+              "value": false
+            },
+            {
+              "kind": "boolean",
+              "value": true
+            }
+          ],
+          "reachableDefinitions": [
+            {
+              "name": "dmImage::IsAstc",
+              "type": "bool (const void *, uint32_t)",
+              "source": "upstream/defold/engine/dlib/src/dlib/image.cpp",
+              "line": 223,
+              "calls": [],
+              "fixedArrays": [],
+              "operations": [
+                {
+                  "operator": "==",
+                  "left": {
+                    "kind": "sizeof",
+                    "type": "struct AstcHeader"
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 16
+                  }
+                },
+                {
+                  "operator": "<",
+                  "left": {
+                    "kind": "parameter",
+                    "index": 1,
+                    "name": "memsize"
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 16
+                  }
+                },
+                {
+                  "operator": "&&",
+                  "left": {
+                    "kind": "binary",
+                    "operator": "&&",
+                    "left": {
+                      "kind": "binary",
+                      "operator": "&&",
+                      "left": {
+                        "kind": "binary",
+                        "operator": "==",
+                        "left": {
+                          "kind": "subscript",
+                          "base": {
+                            "kind": "member",
+                            "name": "m_Magic",
+                            "base": {
+                              "kind": "variable",
+                              "name": "header"
+                            }
+                          },
+                          "index": {
+                            "kind": "integer",
+                            "value": 0
+                          }
+                        },
+                        "right": {
+                          "kind": "integer",
+                          "value": 19
+                        }
+                      },
+                      "right": {
+                        "kind": "binary",
+                        "operator": "==",
+                        "left": {
+                          "kind": "subscript",
+                          "base": {
+                            "kind": "member",
+                            "name": "m_Magic",
+                            "base": {
+                              "kind": "variable",
+                              "name": "header"
+                            }
+                          },
+                          "index": {
+                            "kind": "integer",
+                            "value": 1
+                          }
+                        },
+                        "right": {
+                          "kind": "integer",
+                          "value": 171
+                        }
+                      }
+                    },
+                    "right": {
+                      "kind": "binary",
+                      "operator": "==",
+                      "left": {
+                        "kind": "subscript",
+                        "base": {
+                          "kind": "member",
+                          "name": "m_Magic",
+                          "base": {
+                            "kind": "variable",
+                            "name": "header"
+                          }
+                        },
+                        "index": {
+                          "kind": "integer",
+                          "value": 2
+                        }
+                      },
+                      "right": {
+                        "kind": "integer",
+                        "value": 161
+                      }
+                    }
+                  },
+                  "right": {
+                    "kind": "binary",
+                    "operator": "==",
+                    "left": {
+                      "kind": "subscript",
+                      "base": {
+                        "kind": "member",
+                        "name": "m_Magic",
+                        "base": {
+                          "kind": "variable",
+                          "name": "header"
+                        }
+                      },
+                      "index": {
+                        "kind": "integer",
+                        "value": 3
+                      }
+                    },
+                    "right": {
+                      "kind": "integer",
+                      "value": 92
+                    }
+                  }
+                },
+                {
+                  "operator": "&&",
+                  "left": {
+                    "kind": "binary",
+                    "operator": "&&",
+                    "left": {
+                      "kind": "binary",
+                      "operator": "==",
+                      "left": {
+                        "kind": "subscript",
+                        "base": {
+                          "kind": "member",
+                          "name": "m_Magic",
+                          "base": {
+                            "kind": "variable",
+                            "name": "header"
+                          }
+                        },
+                        "index": {
+                          "kind": "integer",
+                          "value": 0
+                        }
+                      },
+                      "right": {
+                        "kind": "integer",
+                        "value": 19
+                      }
+                    },
+                    "right": {
+                      "kind": "binary",
+                      "operator": "==",
+                      "left": {
+                        "kind": "subscript",
+                        "base": {
+                          "kind": "member",
+                          "name": "m_Magic",
+                          "base": {
+                            "kind": "variable",
+                            "name": "header"
+                          }
+                        },
+                        "index": {
+                          "kind": "integer",
+                          "value": 1
+                        }
+                      },
+                      "right": {
+                        "kind": "integer",
+                        "value": 171
+                      }
+                    }
+                  },
+                  "right": {
+                    "kind": "binary",
+                    "operator": "==",
+                    "left": {
+                      "kind": "subscript",
+                      "base": {
+                        "kind": "member",
+                        "name": "m_Magic",
+                        "base": {
+                          "kind": "variable",
+                          "name": "header"
+                        }
+                      },
+                      "index": {
+                        "kind": "integer",
+                        "value": 2
+                      }
+                    },
+                    "right": {
+                      "kind": "integer",
+                      "value": 161
+                    }
+                  }
+                },
+                {
+                  "operator": "&&",
+                  "left": {
+                    "kind": "binary",
+                    "operator": "==",
+                    "left": {
+                      "kind": "subscript",
+                      "base": {
+                        "kind": "member",
+                        "name": "m_Magic",
+                        "base": {
+                          "kind": "variable",
+                          "name": "header"
+                        }
+                      },
+                      "index": {
+                        "kind": "integer",
+                        "value": 0
+                      }
+                    },
+                    "right": {
+                      "kind": "integer",
+                      "value": 19
+                    }
+                  },
+                  "right": {
+                    "kind": "binary",
+                    "operator": "==",
+                    "left": {
+                      "kind": "subscript",
+                      "base": {
+                        "kind": "member",
+                        "name": "m_Magic",
+                        "base": {
+                          "kind": "variable",
+                          "name": "header"
+                        }
+                      },
+                      "index": {
+                        "kind": "integer",
+                        "value": 1
+                      }
+                    },
+                    "right": {
+                      "kind": "integer",
+                      "value": 171
+                    }
+                  }
+                },
+                {
+                  "operator": "==",
+                  "left": {
+                    "kind": "subscript",
+                    "base": {
+                      "kind": "member",
+                      "name": "m_Magic",
+                      "base": {
+                        "kind": "variable",
+                        "name": "header"
+                      }
+                    },
+                    "index": {
+                      "kind": "integer",
+                      "value": 0
+                    }
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 19
+                  }
+                },
+                {
+                  "operator": "==",
+                  "left": {
+                    "kind": "subscript",
+                    "base": {
+                      "kind": "member",
+                      "name": "m_Magic",
+                      "base": {
+                        "kind": "variable",
+                        "name": "header"
+                      }
+                    },
+                    "index": {
+                      "kind": "integer",
+                      "value": 1
+                    }
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 171
+                  }
+                },
+                {
+                  "operator": "==",
+                  "left": {
+                    "kind": "subscript",
+                    "base": {
+                      "kind": "member",
+                      "name": "m_Magic",
+                      "base": {
+                        "kind": "variable",
+                        "name": "header"
+                      }
+                    },
+                    "index": {
+                      "kind": "integer",
+                      "value": 2
+                    }
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 161
+                  }
+                },
+                {
+                  "operator": "==",
+                  "left": {
+                    "kind": "subscript",
+                    "base": {
+                      "kind": "member",
+                      "name": "m_Magic",
+                      "base": {
+                        "kind": "variable",
+                        "name": "header"
+                      }
+                    },
+                    "index": {
+                      "kind": "integer",
+                      "value": 3
+                    }
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 92
+                  }
+                }
+              ],
+              "returns": [
+                {
+                  "kind": "boolean",
+                  "value": false
+                },
+                {
+                  "kind": "binary",
+                  "operator": "&&",
+                  "left": {
+                    "kind": "binary",
+                    "operator": "&&",
+                    "left": {
+                      "kind": "binary",
+                      "operator": "&&",
+                      "left": {
+                        "kind": "binary",
+                        "operator": "==",
+                        "left": {
+                          "kind": "subscript",
+                          "base": {
+                            "kind": "member",
+                            "name": "m_Magic",
+                            "base": {
+                              "kind": "variable",
+                              "name": "header"
+                            }
+                          },
+                          "index": {
+                            "kind": "integer",
+                            "value": 0
+                          }
+                        },
+                        "right": {
+                          "kind": "integer",
+                          "value": 19
+                        }
+                      },
+                      "right": {
+                        "kind": "binary",
+                        "operator": "==",
+                        "left": {
+                          "kind": "subscript",
+                          "base": {
+                            "kind": "member",
+                            "name": "m_Magic",
+                            "base": {
+                              "kind": "variable",
+                              "name": "header"
+                            }
+                          },
+                          "index": {
+                            "kind": "integer",
+                            "value": 1
+                          }
+                        },
+                        "right": {
+                          "kind": "integer",
+                          "value": 171
+                        }
+                      }
+                    },
+                    "right": {
+                      "kind": "binary",
+                      "operator": "==",
+                      "left": {
+                        "kind": "subscript",
+                        "base": {
+                          "kind": "member",
+                          "name": "m_Magic",
+                          "base": {
+                            "kind": "variable",
+                            "name": "header"
+                          }
+                        },
+                        "index": {
+                          "kind": "integer",
+                          "value": 2
+                        }
+                      },
+                      "right": {
+                        "kind": "integer",
+                        "value": 161
+                      }
+                    }
+                  },
+                  "right": {
+                    "kind": "binary",
+                    "operator": "==",
+                    "left": {
+                      "kind": "subscript",
+                      "base": {
+                        "kind": "member",
+                        "name": "m_Magic",
+                        "base": {
+                          "kind": "variable",
+                          "name": "header"
+                        }
+                      },
+                      "index": {
+                        "kind": "integer",
+                        "value": 3
+                      }
+                    },
+                    "right": {
+                      "kind": "integer",
+                      "value": 92
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "dmImage::GetAstcBlockSize",
+          "type": "bool (const void *, uint32_t, uint32_t *, uint32_t *, uint32_t *)",
+          "source": "upstream/defold/engine/dlib/src/dlib/image_null.cpp",
+          "line": 60,
+          "calls": [],
+          "fixedArrays": [],
+          "operations": [],
+          "returns": [
+            {
+              "kind": "boolean",
+              "value": false
+            }
+          ],
+          "reachableDefinitions": []
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmImage::GetAstcDimensions@upstream/defold/engine/dlib/src/dmsdk/dlib/image.h:145:350",
+      "name": "dmImage::GetAstcDimensions",
+      "shape": "scalar:bool(in:opaque-pointer,value:scalar:u32,inout:pointer:scalar:u32,inout:pointer:scalar:u32,inout:pointer:scalar:u32)",
+      "state": "observed",
+      "definitions": [
+        {
+          "name": "dmImage::GetAstcDimensions",
+          "type": "bool (const void *, uint32_t, uint32_t *, uint32_t *, uint32_t *)",
+          "source": "upstream/defold/engine/dlib/src/dlib/image.cpp",
+          "line": 249,
+          "calls": [
+            {
+              "callee": "IsAstc",
+              "arguments": [
+                {
+                  "kind": "parameter",
+                  "index": 0,
+                  "name": "mem"
+                },
+                {
+                  "kind": "parameter",
+                  "index": 1,
+                  "name": "memsize"
+                }
+              ]
+            }
+          ],
+          "fixedArrays": [],
+          "operations": [
+            {
+              "operator": "=",
+              "left": {
+                "kind": "unary",
+                "operator": "*",
+                "operand": {
+                  "kind": "parameter",
+                  "index": 2,
+                  "name": "width"
+                }
+              },
+              "right": {
+                "kind": "binary",
+                "operator": "+",
+                "left": {
+                  "kind": "binary",
+                  "operator": "+",
+                  "left": {
+                    "kind": "subscript",
+                    "base": {
+                      "kind": "member",
+                      "name": "m_DimensionX",
+                      "base": {
+                        "kind": "variable",
+                        "name": "header"
+                      }
+                    },
+                    "index": {
+                      "kind": "integer",
+                      "value": 0
+                    }
+                  },
+                  "right": {
+                    "kind": "binary",
+                    "operator": "<<",
+                    "left": {
+                      "kind": "subscript",
+                      "base": {
+                        "kind": "member",
+                        "name": "m_DimensionX",
+                        "base": {
+                          "kind": "variable",
+                          "name": "header"
+                        }
+                      },
+                      "index": {
+                        "kind": "integer",
+                        "value": 1
+                      }
+                    },
+                    "right": {
+                      "kind": "integer",
+                      "value": 8
+                    }
+                  }
+                },
+                "right": {
+                  "kind": "binary",
+                  "operator": "<<",
+                  "left": {
+                    "kind": "subscript",
+                    "base": {
+                      "kind": "member",
+                      "name": "m_DimensionX",
+                      "base": {
+                        "kind": "variable",
+                        "name": "header"
+                      }
+                    },
+                    "index": {
+                      "kind": "integer",
+                      "value": 2
+                    }
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 16
+                  }
+                }
+              }
+            },
+            {
+              "operator": "+",
+              "left": {
+                "kind": "binary",
+                "operator": "+",
+                "left": {
+                  "kind": "subscript",
+                  "base": {
+                    "kind": "member",
+                    "name": "m_DimensionX",
+                    "base": {
+                      "kind": "variable",
+                      "name": "header"
+                    }
+                  },
+                  "index": {
+                    "kind": "integer",
+                    "value": 0
+                  }
+                },
+                "right": {
+                  "kind": "binary",
+                  "operator": "<<",
+                  "left": {
+                    "kind": "subscript",
+                    "base": {
+                      "kind": "member",
+                      "name": "m_DimensionX",
+                      "base": {
+                        "kind": "variable",
+                        "name": "header"
+                      }
+                    },
+                    "index": {
+                      "kind": "integer",
+                      "value": 1
+                    }
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 8
+                  }
+                }
+              },
+              "right": {
+                "kind": "binary",
+                "operator": "<<",
+                "left": {
+                  "kind": "subscript",
+                  "base": {
+                    "kind": "member",
+                    "name": "m_DimensionX",
+                    "base": {
+                      "kind": "variable",
+                      "name": "header"
+                    }
+                  },
+                  "index": {
+                    "kind": "integer",
+                    "value": 2
+                  }
+                },
+                "right": {
+                  "kind": "integer",
+                  "value": 16
+                }
+              }
+            },
+            {
+              "operator": "+",
+              "left": {
+                "kind": "subscript",
+                "base": {
+                  "kind": "member",
+                  "name": "m_DimensionX",
+                  "base": {
+                    "kind": "variable",
+                    "name": "header"
+                  }
+                },
+                "index": {
+                  "kind": "integer",
+                  "value": 0
+                }
+              },
+              "right": {
+                "kind": "binary",
+                "operator": "<<",
+                "left": {
+                  "kind": "subscript",
+                  "base": {
+                    "kind": "member",
+                    "name": "m_DimensionX",
+                    "base": {
+                      "kind": "variable",
+                      "name": "header"
+                    }
+                  },
+                  "index": {
+                    "kind": "integer",
+                    "value": 1
+                  }
+                },
+                "right": {
+                  "kind": "integer",
+                  "value": 8
+                }
+              }
+            },
+            {
+              "operator": "<<",
+              "left": {
+                "kind": "subscript",
+                "base": {
+                  "kind": "member",
+                  "name": "m_DimensionX",
+                  "base": {
+                    "kind": "variable",
+                    "name": "header"
+                  }
+                },
+                "index": {
+                  "kind": "integer",
+                  "value": 1
+                }
+              },
+              "right": {
+                "kind": "integer",
+                "value": 8
+              }
+            },
+            {
+              "operator": "<<",
+              "left": {
+                "kind": "subscript",
+                "base": {
+                  "kind": "member",
+                  "name": "m_DimensionX",
+                  "base": {
+                    "kind": "variable",
+                    "name": "header"
+                  }
+                },
+                "index": {
+                  "kind": "integer",
+                  "value": 2
+                }
+              },
+              "right": {
+                "kind": "integer",
+                "value": 16
+              }
+            },
+            {
+              "operator": "=",
+              "left": {
+                "kind": "unary",
+                "operator": "*",
+                "operand": {
+                  "kind": "parameter",
+                  "index": 3,
+                  "name": "height"
+                }
+              },
+              "right": {
+                "kind": "binary",
+                "operator": "+",
+                "left": {
+                  "kind": "binary",
+                  "operator": "+",
+                  "left": {
+                    "kind": "subscript",
+                    "base": {
+                      "kind": "member",
+                      "name": "m_DimensionY",
+                      "base": {
+                        "kind": "variable",
+                        "name": "header"
+                      }
+                    },
+                    "index": {
+                      "kind": "integer",
+                      "value": 0
+                    }
+                  },
+                  "right": {
+                    "kind": "binary",
+                    "operator": "<<",
+                    "left": {
+                      "kind": "subscript",
+                      "base": {
+                        "kind": "member",
+                        "name": "m_DimensionY",
+                        "base": {
+                          "kind": "variable",
+                          "name": "header"
+                        }
+                      },
+                      "index": {
+                        "kind": "integer",
+                        "value": 1
+                      }
+                    },
+                    "right": {
+                      "kind": "integer",
+                      "value": 8
+                    }
+                  }
+                },
+                "right": {
+                  "kind": "binary",
+                  "operator": "<<",
+                  "left": {
+                    "kind": "subscript",
+                    "base": {
+                      "kind": "member",
+                      "name": "m_DimensionY",
+                      "base": {
+                        "kind": "variable",
+                        "name": "header"
+                      }
+                    },
+                    "index": {
+                      "kind": "integer",
+                      "value": 2
+                    }
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 16
+                  }
+                }
+              }
+            },
+            {
+              "operator": "+",
+              "left": {
+                "kind": "binary",
+                "operator": "+",
+                "left": {
+                  "kind": "subscript",
+                  "base": {
+                    "kind": "member",
+                    "name": "m_DimensionY",
+                    "base": {
+                      "kind": "variable",
+                      "name": "header"
+                    }
+                  },
+                  "index": {
+                    "kind": "integer",
+                    "value": 0
+                  }
+                },
+                "right": {
+                  "kind": "binary",
+                  "operator": "<<",
+                  "left": {
+                    "kind": "subscript",
+                    "base": {
+                      "kind": "member",
+                      "name": "m_DimensionY",
+                      "base": {
+                        "kind": "variable",
+                        "name": "header"
+                      }
+                    },
+                    "index": {
+                      "kind": "integer",
+                      "value": 1
+                    }
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 8
+                  }
+                }
+              },
+              "right": {
+                "kind": "binary",
+                "operator": "<<",
+                "left": {
+                  "kind": "subscript",
+                  "base": {
+                    "kind": "member",
+                    "name": "m_DimensionY",
+                    "base": {
+                      "kind": "variable",
+                      "name": "header"
+                    }
+                  },
+                  "index": {
+                    "kind": "integer",
+                    "value": 2
+                  }
+                },
+                "right": {
+                  "kind": "integer",
+                  "value": 16
+                }
+              }
+            },
+            {
+              "operator": "+",
+              "left": {
+                "kind": "subscript",
+                "base": {
+                  "kind": "member",
+                  "name": "m_DimensionY",
+                  "base": {
+                    "kind": "variable",
+                    "name": "header"
+                  }
+                },
+                "index": {
+                  "kind": "integer",
+                  "value": 0
+                }
+              },
+              "right": {
+                "kind": "binary",
+                "operator": "<<",
+                "left": {
+                  "kind": "subscript",
+                  "base": {
+                    "kind": "member",
+                    "name": "m_DimensionY",
+                    "base": {
+                      "kind": "variable",
+                      "name": "header"
+                    }
+                  },
+                  "index": {
+                    "kind": "integer",
+                    "value": 1
+                  }
+                },
+                "right": {
+                  "kind": "integer",
+                  "value": 8
+                }
+              }
+            },
+            {
+              "operator": "<<",
+              "left": {
+                "kind": "subscript",
+                "base": {
+                  "kind": "member",
+                  "name": "m_DimensionY",
+                  "base": {
+                    "kind": "variable",
+                    "name": "header"
+                  }
+                },
+                "index": {
+                  "kind": "integer",
+                  "value": 1
+                }
+              },
+              "right": {
+                "kind": "integer",
+                "value": 8
+              }
+            },
+            {
+              "operator": "<<",
+              "left": {
+                "kind": "subscript",
+                "base": {
+                  "kind": "member",
+                  "name": "m_DimensionY",
+                  "base": {
+                    "kind": "variable",
+                    "name": "header"
+                  }
+                },
+                "index": {
+                  "kind": "integer",
+                  "value": 2
+                }
+              },
+              "right": {
+                "kind": "integer",
+                "value": 16
+              }
+            },
+            {
+              "operator": "=",
+              "left": {
+                "kind": "unary",
+                "operator": "*",
+                "operand": {
+                  "kind": "parameter",
+                  "index": 4,
+                  "name": "depth"
+                }
+              },
+              "right": {
+                "kind": "binary",
+                "operator": "+",
+                "left": {
+                  "kind": "binary",
+                  "operator": "+",
+                  "left": {
+                    "kind": "subscript",
+                    "base": {
+                      "kind": "member",
+                      "name": "m_DimensionZ",
+                      "base": {
+                        "kind": "variable",
+                        "name": "header"
+                      }
+                    },
+                    "index": {
+                      "kind": "integer",
+                      "value": 0
+                    }
+                  },
+                  "right": {
+                    "kind": "binary",
+                    "operator": "<<",
+                    "left": {
+                      "kind": "subscript",
+                      "base": {
+                        "kind": "member",
+                        "name": "m_DimensionZ",
+                        "base": {
+                          "kind": "variable",
+                          "name": "header"
+                        }
+                      },
+                      "index": {
+                        "kind": "integer",
+                        "value": 1
+                      }
+                    },
+                    "right": {
+                      "kind": "integer",
+                      "value": 8
+                    }
+                  }
+                },
+                "right": {
+                  "kind": "binary",
+                  "operator": "<<",
+                  "left": {
+                    "kind": "subscript",
+                    "base": {
+                      "kind": "member",
+                      "name": "m_DimensionZ",
+                      "base": {
+                        "kind": "variable",
+                        "name": "header"
+                      }
+                    },
+                    "index": {
+                      "kind": "integer",
+                      "value": 2
+                    }
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 16
+                  }
+                }
+              }
+            },
+            {
+              "operator": "+",
+              "left": {
+                "kind": "binary",
+                "operator": "+",
+                "left": {
+                  "kind": "subscript",
+                  "base": {
+                    "kind": "member",
+                    "name": "m_DimensionZ",
+                    "base": {
+                      "kind": "variable",
+                      "name": "header"
+                    }
+                  },
+                  "index": {
+                    "kind": "integer",
+                    "value": 0
+                  }
+                },
+                "right": {
+                  "kind": "binary",
+                  "operator": "<<",
+                  "left": {
+                    "kind": "subscript",
+                    "base": {
+                      "kind": "member",
+                      "name": "m_DimensionZ",
+                      "base": {
+                        "kind": "variable",
+                        "name": "header"
+                      }
+                    },
+                    "index": {
+                      "kind": "integer",
+                      "value": 1
+                    }
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 8
+                  }
+                }
+              },
+              "right": {
+                "kind": "binary",
+                "operator": "<<",
+                "left": {
+                  "kind": "subscript",
+                  "base": {
+                    "kind": "member",
+                    "name": "m_DimensionZ",
+                    "base": {
+                      "kind": "variable",
+                      "name": "header"
+                    }
+                  },
+                  "index": {
+                    "kind": "integer",
+                    "value": 2
+                  }
+                },
+                "right": {
+                  "kind": "integer",
+                  "value": 16
+                }
+              }
+            },
+            {
+              "operator": "+",
+              "left": {
+                "kind": "subscript",
+                "base": {
+                  "kind": "member",
+                  "name": "m_DimensionZ",
+                  "base": {
+                    "kind": "variable",
+                    "name": "header"
+                  }
+                },
+                "index": {
+                  "kind": "integer",
+                  "value": 0
+                }
+              },
+              "right": {
+                "kind": "binary",
+                "operator": "<<",
+                "left": {
+                  "kind": "subscript",
+                  "base": {
+                    "kind": "member",
+                    "name": "m_DimensionZ",
+                    "base": {
+                      "kind": "variable",
+                      "name": "header"
+                    }
+                  },
+                  "index": {
+                    "kind": "integer",
+                    "value": 1
+                  }
+                },
+                "right": {
+                  "kind": "integer",
+                  "value": 8
+                }
+              }
+            },
+            {
+              "operator": "<<",
+              "left": {
+                "kind": "subscript",
+                "base": {
+                  "kind": "member",
+                  "name": "m_DimensionZ",
+                  "base": {
+                    "kind": "variable",
+                    "name": "header"
+                  }
+                },
+                "index": {
+                  "kind": "integer",
+                  "value": 1
+                }
+              },
+              "right": {
+                "kind": "integer",
+                "value": 8
+              }
+            },
+            {
+              "operator": "<<",
+              "left": {
+                "kind": "subscript",
+                "base": {
+                  "kind": "member",
+                  "name": "m_DimensionZ",
+                  "base": {
+                    "kind": "variable",
+                    "name": "header"
+                  }
+                },
+                "index": {
+                  "kind": "integer",
+                  "value": 2
+                }
+              },
+              "right": {
+                "kind": "integer",
+                "value": 16
+              }
+            }
+          ],
+          "returns": [
+            {
+              "kind": "boolean",
+              "value": false
+            },
+            {
+              "kind": "boolean",
+              "value": true
+            }
+          ],
+          "reachableDefinitions": [
+            {
+              "name": "dmImage::IsAstc",
+              "type": "bool (const void *, uint32_t)",
+              "source": "upstream/defold/engine/dlib/src/dlib/image.cpp",
+              "line": 223,
+              "calls": [],
+              "fixedArrays": [],
+              "operations": [
+                {
+                  "operator": "==",
+                  "left": {
+                    "kind": "sizeof",
+                    "type": "struct AstcHeader"
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 16
+                  }
+                },
+                {
+                  "operator": "<",
+                  "left": {
+                    "kind": "parameter",
+                    "index": 1,
+                    "name": "memsize"
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 16
+                  }
+                },
+                {
+                  "operator": "&&",
+                  "left": {
+                    "kind": "binary",
+                    "operator": "&&",
+                    "left": {
+                      "kind": "binary",
+                      "operator": "&&",
+                      "left": {
+                        "kind": "binary",
+                        "operator": "==",
+                        "left": {
+                          "kind": "subscript",
+                          "base": {
+                            "kind": "member",
+                            "name": "m_Magic",
+                            "base": {
+                              "kind": "variable",
+                              "name": "header"
+                            }
+                          },
+                          "index": {
+                            "kind": "integer",
+                            "value": 0
+                          }
+                        },
+                        "right": {
+                          "kind": "integer",
+                          "value": 19
+                        }
+                      },
+                      "right": {
+                        "kind": "binary",
+                        "operator": "==",
+                        "left": {
+                          "kind": "subscript",
+                          "base": {
+                            "kind": "member",
+                            "name": "m_Magic",
+                            "base": {
+                              "kind": "variable",
+                              "name": "header"
+                            }
+                          },
+                          "index": {
+                            "kind": "integer",
+                            "value": 1
+                          }
+                        },
+                        "right": {
+                          "kind": "integer",
+                          "value": 171
+                        }
+                      }
+                    },
+                    "right": {
+                      "kind": "binary",
+                      "operator": "==",
+                      "left": {
+                        "kind": "subscript",
+                        "base": {
+                          "kind": "member",
+                          "name": "m_Magic",
+                          "base": {
+                            "kind": "variable",
+                            "name": "header"
+                          }
+                        },
+                        "index": {
+                          "kind": "integer",
+                          "value": 2
+                        }
+                      },
+                      "right": {
+                        "kind": "integer",
+                        "value": 161
+                      }
+                    }
+                  },
+                  "right": {
+                    "kind": "binary",
+                    "operator": "==",
+                    "left": {
+                      "kind": "subscript",
+                      "base": {
+                        "kind": "member",
+                        "name": "m_Magic",
+                        "base": {
+                          "kind": "variable",
+                          "name": "header"
+                        }
+                      },
+                      "index": {
+                        "kind": "integer",
+                        "value": 3
+                      }
+                    },
+                    "right": {
+                      "kind": "integer",
+                      "value": 92
+                    }
+                  }
+                },
+                {
+                  "operator": "&&",
+                  "left": {
+                    "kind": "binary",
+                    "operator": "&&",
+                    "left": {
+                      "kind": "binary",
+                      "operator": "==",
+                      "left": {
+                        "kind": "subscript",
+                        "base": {
+                          "kind": "member",
+                          "name": "m_Magic",
+                          "base": {
+                            "kind": "variable",
+                            "name": "header"
+                          }
+                        },
+                        "index": {
+                          "kind": "integer",
+                          "value": 0
+                        }
+                      },
+                      "right": {
+                        "kind": "integer",
+                        "value": 19
+                      }
+                    },
+                    "right": {
+                      "kind": "binary",
+                      "operator": "==",
+                      "left": {
+                        "kind": "subscript",
+                        "base": {
+                          "kind": "member",
+                          "name": "m_Magic",
+                          "base": {
+                            "kind": "variable",
+                            "name": "header"
+                          }
+                        },
+                        "index": {
+                          "kind": "integer",
+                          "value": 1
+                        }
+                      },
+                      "right": {
+                        "kind": "integer",
+                        "value": 171
+                      }
+                    }
+                  },
+                  "right": {
+                    "kind": "binary",
+                    "operator": "==",
+                    "left": {
+                      "kind": "subscript",
+                      "base": {
+                        "kind": "member",
+                        "name": "m_Magic",
+                        "base": {
+                          "kind": "variable",
+                          "name": "header"
+                        }
+                      },
+                      "index": {
+                        "kind": "integer",
+                        "value": 2
+                      }
+                    },
+                    "right": {
+                      "kind": "integer",
+                      "value": 161
+                    }
+                  }
+                },
+                {
+                  "operator": "&&",
+                  "left": {
+                    "kind": "binary",
+                    "operator": "==",
+                    "left": {
+                      "kind": "subscript",
+                      "base": {
+                        "kind": "member",
+                        "name": "m_Magic",
+                        "base": {
+                          "kind": "variable",
+                          "name": "header"
+                        }
+                      },
+                      "index": {
+                        "kind": "integer",
+                        "value": 0
+                      }
+                    },
+                    "right": {
+                      "kind": "integer",
+                      "value": 19
+                    }
+                  },
+                  "right": {
+                    "kind": "binary",
+                    "operator": "==",
+                    "left": {
+                      "kind": "subscript",
+                      "base": {
+                        "kind": "member",
+                        "name": "m_Magic",
+                        "base": {
+                          "kind": "variable",
+                          "name": "header"
+                        }
+                      },
+                      "index": {
+                        "kind": "integer",
+                        "value": 1
+                      }
+                    },
+                    "right": {
+                      "kind": "integer",
+                      "value": 171
+                    }
+                  }
+                },
+                {
+                  "operator": "==",
+                  "left": {
+                    "kind": "subscript",
+                    "base": {
+                      "kind": "member",
+                      "name": "m_Magic",
+                      "base": {
+                        "kind": "variable",
+                        "name": "header"
+                      }
+                    },
+                    "index": {
+                      "kind": "integer",
+                      "value": 0
+                    }
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 19
+                  }
+                },
+                {
+                  "operator": "==",
+                  "left": {
+                    "kind": "subscript",
+                    "base": {
+                      "kind": "member",
+                      "name": "m_Magic",
+                      "base": {
+                        "kind": "variable",
+                        "name": "header"
+                      }
+                    },
+                    "index": {
+                      "kind": "integer",
+                      "value": 1
+                    }
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 171
+                  }
+                },
+                {
+                  "operator": "==",
+                  "left": {
+                    "kind": "subscript",
+                    "base": {
+                      "kind": "member",
+                      "name": "m_Magic",
+                      "base": {
+                        "kind": "variable",
+                        "name": "header"
+                      }
+                    },
+                    "index": {
+                      "kind": "integer",
+                      "value": 2
+                    }
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 161
+                  }
+                },
+                {
+                  "operator": "==",
+                  "left": {
+                    "kind": "subscript",
+                    "base": {
+                      "kind": "member",
+                      "name": "m_Magic",
+                      "base": {
+                        "kind": "variable",
+                        "name": "header"
+                      }
+                    },
+                    "index": {
+                      "kind": "integer",
+                      "value": 3
+                    }
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 92
+                  }
+                }
+              ],
+              "returns": [
+                {
+                  "kind": "boolean",
+                  "value": false
+                },
+                {
+                  "kind": "binary",
+                  "operator": "&&",
+                  "left": {
+                    "kind": "binary",
+                    "operator": "&&",
+                    "left": {
+                      "kind": "binary",
+                      "operator": "&&",
+                      "left": {
+                        "kind": "binary",
+                        "operator": "==",
+                        "left": {
+                          "kind": "subscript",
+                          "base": {
+                            "kind": "member",
+                            "name": "m_Magic",
+                            "base": {
+                              "kind": "variable",
+                              "name": "header"
+                            }
+                          },
+                          "index": {
+                            "kind": "integer",
+                            "value": 0
+                          }
+                        },
+                        "right": {
+                          "kind": "integer",
+                          "value": 19
+                        }
+                      },
+                      "right": {
+                        "kind": "binary",
+                        "operator": "==",
+                        "left": {
+                          "kind": "subscript",
+                          "base": {
+                            "kind": "member",
+                            "name": "m_Magic",
+                            "base": {
+                              "kind": "variable",
+                              "name": "header"
+                            }
+                          },
+                          "index": {
+                            "kind": "integer",
+                            "value": 1
+                          }
+                        },
+                        "right": {
+                          "kind": "integer",
+                          "value": 171
+                        }
+                      }
+                    },
+                    "right": {
+                      "kind": "binary",
+                      "operator": "==",
+                      "left": {
+                        "kind": "subscript",
+                        "base": {
+                          "kind": "member",
+                          "name": "m_Magic",
+                          "base": {
+                            "kind": "variable",
+                            "name": "header"
+                          }
+                        },
+                        "index": {
+                          "kind": "integer",
+                          "value": 2
+                        }
+                      },
+                      "right": {
+                        "kind": "integer",
+                        "value": 161
+                      }
+                    }
+                  },
+                  "right": {
+                    "kind": "binary",
+                    "operator": "==",
+                    "left": {
+                      "kind": "subscript",
+                      "base": {
+                        "kind": "member",
+                        "name": "m_Magic",
+                        "base": {
+                          "kind": "variable",
+                          "name": "header"
+                        }
+                      },
+                      "index": {
+                        "kind": "integer",
+                        "value": 3
+                      }
+                    },
+                    "right": {
+                      "kind": "integer",
+                      "value": 92
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "dmImage::GetAstcDimensions",
+          "type": "bool (const void *, uint32_t, uint32_t *, uint32_t *, uint32_t *)",
+          "source": "upstream/defold/engine/dlib/src/dlib/image_null.cpp",
+          "line": 65,
+          "calls": [],
+          "fixedArrays": [],
+          "operations": [],
+          "returns": [
+            {
+              "kind": "boolean",
+              "value": false
+            }
+          ],
+          "reachableDefinitions": []
+        }
+      ]
+    }
+  ]
+}

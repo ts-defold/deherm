@@ -10,6 +10,7 @@ const adapterWrapperHeaders = Object.freeze({
   fixedDigest: "defold_hermes/generated_dmsdk_fixed_digest.h",
   hashSpan: "defold_hermes/generated_dmsdk_hash_span.h",
   hashState: "defold_hermes/generated_dmsdk_hash_state.h",
+  namedScalar: "defold_hermes/generated_dmsdk_named_scalar.h",
   scalar: "defold_hermes/generated_dmsdk_scalar.h",
   xteaSpan: "defold_hermes/generated_dmsdk_xtea_span.h",
 });
@@ -23,6 +24,7 @@ const adapterRuntimeHeaders = Object.freeze({
   fixedDigest: "defold_hermes/generated_dmsdk_fixed_digest_runtime.h",
   hashSpan: "defold_hermes/generated_dmsdk_hash_span_runtime.h",
   hashState: "defold_hermes/generated_dmsdk_hash_state.h",
+  namedScalar: "defold_hermes/generated_dmsdk_named_scalar_runtime.h",
   scalar: "defold_hermes/generated_dmsdk_scalar_runtime.h",
   xteaSpan: "defold_hermes/generated_dmsdk_xtea_span_runtime.h",
 });
@@ -233,6 +235,7 @@ export function materializeDmSdkGeneratedAdapterUsages(usages, options = {}) {
       adapterKind: exactAdapter ? exactAdapter.kind : plan.adapterKind,
       productionSymbol: exactAdapter ? exactAdapter.dispatcher : plan.symbol,
       productionHeader: verificationHeader,
+      nativeHeader: recipe.include,
       exactCallee: verificationAdapter.callee ?? recipe.preferredLowering.wrapper ?? recipe.invocation.nativeSymbol,
       familyContract: {
         digestBytes: verificationAdapter.digestBytes ?? null,

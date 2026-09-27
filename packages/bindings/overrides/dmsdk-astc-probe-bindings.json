@@ -1,13 +1,10 @@
 {
   "schemaVersion": 1,
-  "policyVersion": "astc-probe-v3",
+  "policyVersion": "astc-probe-v4",
   "family": "bounded-three-scalar-probe",
   "recipe": {
-    "format": "astc",
-    "operations": ["block-size", "dimensions"],
     "input": "borrowed-counted-bytes",
     "output": "caller-owned-three-u32",
-    "minimumHeaderBytes": 16,
     "ownership": "synchronous-noescape",
     "fallback": "universal-recipe"
   }

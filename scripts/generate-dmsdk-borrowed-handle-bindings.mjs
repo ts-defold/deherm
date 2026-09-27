@@ -6,9 +6,9 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import {
   DMSDK_UNIVERSAL_FALLBACK_PATTERN,
   compactDmSdkPatternDecision,
-  defineDmSdkPattern,
   selectDmSdkPattern,
 } from "../packages/compiler/src/dmsdk-pattern-selector.mjs";
+import { borrowedHandlePattern } from "../packages/compiler/src/dmsdk-pattern-catalog.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const paths = Object.freeze({
@@ -63,27 +63,6 @@ function handleName(role) {
   if (!role.startsWith("handle:")) return undefined;
   const pieces = role.split(":");
   return pieces.slice(1, -1).join(":");
-}
-
-function borrowedHandlePattern(policy) {
-  return defineDmSdkPattern({
-    schemaVersion: 1,
-    id: "handle.borrowed-provider-boundary",
-    family: "borrowed-handle",
-    emitter: "scripts/generate-dmsdk-borrowed-handle-bindings.mjs",
-    priority: 700,
-    cost: 20,
-    fallback: false,
-    when: {
-      declarationKinds: policy.selection.declarationKinds,
-      result: { roles: policy.selection.resultRoles },
-      parameters: {
-        every: [{ rolePrefixes: [policy.selection.handleRolePrefix] }, { roles: policy.selection.parameterRoles }],
-        some: [{ rolePrefixes: [policy.selection.handleRolePrefix] }],
-      },
-      rejectFamilies: policy.selection.rejectedFamilies,
-    },
-  });
 }
 
 function patternFacts(shape, projected) {
@@ -530,7 +509,7 @@ export async function build(inputs = undefined) {
     throw new Error("borrowed-handle input contains duplicate declaration IDs");
   const entries = [];
   const rows = [];
-  const patterns = [borrowedHandlePattern(policy), DMSDK_UNIVERSAL_FALLBACK_PATTERN];
+  const patterns = [borrowedHandlePattern(policy.selection), DMSDK_UNIVERSAL_FALLBACK_PATTERN];
   for (const shape of candidates) {
     const projected = projectionById.get(shape.id);
     const declaration = declarationById.get(shape.id);

@@ -10,9 +10,9 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import {
   DMSDK_UNIVERSAL_FALLBACK_PATTERN,
   compactDmSdkPatternDecision,
-  defineDmSdkPattern,
   selectDmSdkPattern,
 } from "../packages/compiler/src/dmsdk-pattern-selector.mjs";
+import { namedScalarPattern } from "../packages/compiler/src/dmsdk-pattern-catalog.mjs";
 
 const scriptDirectory = dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = resolve(scriptDirectory, "..");
@@ -194,24 +194,6 @@ function namedScalarSemantics(declaration, row, typeIndex) {
     semanticTokens: ["fixed-width-cell-codec", "source-resolved-named-scalar", "synchronous-noescape"],
     aliases: [...new Set(aliases.map(({ id }) => id))].sort(),
   };
-}
-
-function namedScalarPattern() {
-  return defineDmSdkPattern({
-    schemaVersion: 1,
-    id: "value.named-scalar-direct",
-    family: "named-scalar",
-    emitter: "scripts/generate-dmsdk-named-scalar-bindings.mjs",
-    priority: 820,
-    cost: 5,
-    fallback: false,
-    when: {
-      declarationKinds: ["function"],
-      result: { rolePrefixes: ["scalar:"] },
-      parameters: { every: [{ rolePrefixes: ["scalar:"], directions: ["value"] }] },
-      requireSemanticTokens: ["fixed-width-cell-codec", "source-resolved-named-scalar", "synchronous-noescape"],
-    },
-  });
 }
 
 function publicDeclaration(entry) {

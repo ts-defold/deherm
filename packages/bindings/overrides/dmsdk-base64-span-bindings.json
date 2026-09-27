@@ -1,13 +1,11 @@
 {
   "schemaVersion": 1,
-  "policyVersion": "base64-span-v3",
+  "policyVersion": "base64-span-v5",
   "family": "bounded-byte-transform",
   "recipe": {
-    "codec": "base64",
-    "operations": ["decode", "encode"],
     "input": "borrowed-counted-bytes",
     "output": "caller-owned-capacity-inout",
-    "decodeInput": "canonical-padded",
+    "decodeInput": "derive-from-implementation",
     "sizeQuery": "zero-output-capacity",
     "ownership": "synchronous-noescape",
     "fallback": "universal-recipe"

@@ -61,9 +61,9 @@ those facts the sole authority and make every later artifact disposable.
 ```text
 Defold source, ref-doc, SDK headers and toolchain declarations
     |
-    +-- Clang AST frontend
+    +-- Clang declaration + implementation-fact frontend
     +-- script/ref-doc frontend
-    +-- Lua registration frontend
+    +-- C/C++ Lua registration + stack-semantics frontend
     +-- resource/protobuf frontend
     |
     v
@@ -185,12 +185,20 @@ identity. P0 is complete.
 
 ## 2. Normalize every frontend into the same model
 
-- [ ] Clang/dmSDK declarations and target conditions.
-- [ ] Script annotations and documentation.
-- [ ] Lua registration, constants and context availability.
+- [x] Clang/dmSDK declarations, target conditions, and compact implementation
+  facts for the bounded-span families.
+- [x] Script annotations and documentation for the current engine surface.
+- [x] Lua registration, constants, stack-derived arity/types, and context
+  availability for the current engine surface.
 - [ ] Resources and protobuf declarations.
 - [ ] Local and dependency extensions, using the same applicable schema plus
   their independent content identity.
+
+The completed Lua frontend parses the C/C++ code that constructs Lua modules
+and reads/writes the Lua stack. It does not yet parse arbitrary runtime `.lua`
+implementation bodies into `SurfaceIR`; documented `.lua` stubs remain a
+documentation/type input, while registration and callable semantics come from
+the native implementation that Defold actually compiles.
 
 ## 3. Implement the total pattern selector
 
