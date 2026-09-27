@@ -11,7 +11,7 @@
   "sourceHashes": {
     "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
-    "sourceFacts": "9a02028adea9918b39114e0de7f2a9445ebcd5e311ad27ccec3770b8a171c9a4",
+    "sourceFacts": "94bcdd1afd3f40212f8d65f38de6069f0fcf7cdd146e844f3129ad29a0900c73",
     "policy": "52a25ca0a83b7410dd0dbadb4847c4de8e922a56c93b46857c37f2696de2e31c"
   },
   "policy": {
@@ -203,13 +203,17 @@
             "source": "upstream/defold/engine/dlib/src/dlib/crypt_mbedtls.cpp",
             "line": 89,
             "callee": "mbedtls_base64_decode",
+            "calleeIdentity": "external:mbedtls_base64_decode|int (unsigned char *, size_t, size_t *, const unsigned char *, size_t)",
+            "calleeType": "int (unsigned char *, size_t, size_t *, const unsigned char *, size_t)",
+            "resultVariable": "r",
             "mode": "decode"
           }
         ],
         "paddingAdapterObservations": [
           {
             "source": "upstream/defold/engine/dlib/src/dlib/crypt_mbedtls.cpp",
-            "line": 89
+            "line": 89,
+            "paddingVariable": "padding_needed"
           }
         ]
       },
@@ -293,6 +297,9 @@
             "source": "upstream/defold/engine/dlib/src/dlib/crypt_mbedtls.cpp",
             "line": 54,
             "callee": "mbedtls_base64_encode",
+            "calleeIdentity": "external:mbedtls_base64_encode|int (unsigned char *, size_t, size_t *, const unsigned char *, size_t)",
+            "calleeType": "int (unsigned char *, size_t, size_t *, const unsigned char *, size_t)",
+            "resultVariable": "r",
             "mode": "encode"
           }
         ],

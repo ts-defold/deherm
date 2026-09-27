@@ -138,6 +138,19 @@ removals, renames, and rejected translation units therefore change the proof
 inputs without relying on a prior generated result. Extra candidate files are
 safe and only increase proof cost; a missing candidate would be unsound.
 
+Implementation observations are causal records, not bags of syntax. Calls
+retain their resolved Clang declaration identity and signature; local values
+retain initializers; operations and returns retain their controlling branches;
+and helper traversal follows resolved call edges before using a leaf-name
+fallback. A specialized recipe must join the facts that establish its contract:
+the fixed digest extent reaches the helper that consumes the output and extent,
+the Base64 capacity query controls the write/failure path of the selected codec
+call, the ASTC minimum comes from the parser helper actually called by the
+three-output wrapper, and the XTEA key capacity belongs to the called helper's
+key copy, guard, and in-place data mutation. Unrelated calls, constants, arrays,
+comparisons, dead helpers, and output writes are negative metamorphic fixtures
+and cannot change pattern selection.
+
 # Claim protocol
 
 Every material review claim follows `observe -> reproduce -> classify -> act`:

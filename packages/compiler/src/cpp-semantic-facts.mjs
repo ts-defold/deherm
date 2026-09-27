@@ -65,6 +65,17 @@ function declarationReference(node, parameters) {
       index: declarationReference(current.inner[1], parameters),
     };
   }
+  if (current.kind === "CallExpr" || current.kind === "CXXMemberCallExpr") {
+    const [callee, ...arguments_] = current.inner ?? [];
+    const identity = calleeIdentity(callee);
+    return {
+      kind: "call",
+      callee: identity?.name ?? "",
+      ...(identity?.rawDeclarationId ? { _calleeDeclarationId: identity.rawDeclarationId } : {}),
+      ...(identity?.type ? { calleeType: identity.type } : {}),
+      arguments: arguments_.map((argument) => declarationReference(argument, parameters)),
+    };
+  }
   if (current.kind === "BinaryOperator" && current.inner?.length === 2) {
     return {
       kind: "binary",
@@ -94,15 +105,57 @@ function calleeName(node) {
   return null;
 }
 
+function calleeIdentity(node) {
+  const current = unwrap(node);
+  if (!current) return null;
+  if (current.kind === "DeclRefExpr" && current.referencedDecl?.kind === "FunctionDecl") {
+    return {
+      name: current.referencedDecl.name ?? null,
+      rawDeclarationId: current.referencedDecl.id ?? null,
+      type: current.referencedDecl.type?.qualType ?? current.type?.qualType ?? null,
+    };
+  }
+  if (current.kind === "MemberExpr") {
+    return {
+      name: current.name ?? null,
+      rawDeclarationId: current.referencedMemberDecl ?? null,
+      type: current.type?.qualType ?? null,
+    };
+  }
+  for (const child of current.inner ?? []) {
+    const identity = calleeIdentity(child);
+    if (identity?.name) return identity;
+  }
+  const name = calleeName(current);
+  return name ? { name, rawDeclarationId: null, type: current.type?.qualType ?? null } : null;
+}
+
+function controlChildren(node, parameters, conditions, visit) {
+  if (node.kind !== "IfStmt" || !node.inner?.length) return false;
+  const [condition, thenBranch, elseBranch] = node.inner;
+  visit(condition, conditions);
+  const expression = declarationReference(condition, parameters);
+  if (thenBranch) visit(thenBranch, [...conditions, { expression, branch: true }]);
+  if (elseBranch) visit(elseBranch, [...conditions, { expression, branch: false }]);
+  return true;
+}
+
 function callFacts(body, parameters) {
   const calls = [];
-  function visit(node) {
+  function visit(node, conditions = []) {
     if (node.kind === "CallExpr" || node.kind === "CXXMemberCallExpr" || node.kind === "RecoveryExpr") {
       const [callee, ...arguments_] = node.inner ?? [];
-      const name = calleeName(callee);
-      if (name) calls.push({ callee: name, arguments: arguments_.map((argument) => declarationReference(argument, parameters)) });
+      const identity = calleeIdentity(callee);
+      if (identity?.name) calls.push({
+        callee: identity.name,
+        ...(identity.rawDeclarationId ? { _calleeDeclarationId: identity.rawDeclarationId } : {}),
+        ...(identity.type ? { calleeType: identity.type } : {}),
+        arguments: arguments_.map((argument) => declarationReference(argument, parameters)),
+        conditions,
+      });
     }
-    for (const child of node.inner ?? []) visit(child);
+    if (controlChildren(node, parameters, conditions, visit)) return;
+    for (const child of node.inner ?? []) visit(child, conditions);
   }
   visit(body);
   return calls;
@@ -136,20 +189,45 @@ function localFixedArrays(body) {
   return arrays;
 }
 
+function localVariables(body, parameters) {
+  const variables = [];
+  function visit(node, conditions = []) {
+    if (node.kind === "VarDecl") {
+      variables.push({
+        name: node.name ?? "",
+        type: node.type?.qualType ?? "",
+        initializer: node.inner?.length
+          ? declarationReference(node.inner.at(-1), parameters)
+          : { kind: "uninitialized" },
+        conditions,
+      });
+    }
+    if (controlChildren(node, parameters, conditions, visit)) return;
+    for (const child of node.inner ?? []) visit(child, conditions);
+  }
+  visit(body);
+  return variables;
+}
+
 function operationFacts(body, parameters) {
   const operations = [];
   const returns = [];
-  function visit(node) {
-    if (node.kind === "BinaryOperator" && node.inner?.length === 2) {
+  function visit(node, conditions = []) {
+    if ((node.kind === "BinaryOperator" || node.kind === "CompoundAssignOperator") && node.inner?.length === 2) {
       operations.push({
         operator: node.opcode ?? "",
         left: declarationReference(node.inner[0], parameters),
         right: declarationReference(node.inner[1], parameters),
+        conditions,
       });
     } else if (node.kind === "ReturnStmt") {
-      returns.push(node.inner?.length ? declarationReference(node.inner[0], parameters) : { kind: "void" });
+      returns.push({
+        ...(node.inner?.length ? declarationReference(node.inner[0], parameters) : { kind: "void" }),
+        conditions,
+      });
     }
-    for (const child of node.inner ?? []) visit(child);
+    if (controlChildren(node, parameters, conditions, visit)) return;
+    for (const child of node.inner ?? []) visit(child, conditions);
   }
   visit(body);
   return { operations, returns };
@@ -177,11 +255,14 @@ export function extractCppImplementationFacts(ast, requestedNames, source) {
         const operation = operationFacts(body, parameters);
         allDefinitions.push({
           name: qualifiedName,
+          _declarationId: node.id ?? null,
           type: node.type?.qualType ?? "",
+          parameterCount: parameterNodes.length,
           source,
           line: node.loc?.line ?? node.range?.begin?.line ?? null,
           calls: callFacts(body, parameters),
           fixedArrays: localFixedArrays(body),
+          variables: localVariables(body, parameters),
           operations: operation.operations,
           returns: operation.returns,
         });
@@ -191,6 +272,36 @@ export function extractCppImplementationFacts(ast, requestedNames, source) {
   }
 
   visit(ast);
+  const stableIdentity = (definition) =>
+    `${definition.name}|${definition.type}|${definition.source}|${definition.line ?? 0}`;
+  const definitionsByRawId = new Map(allDefinitions.flatMap((definition) =>
+    definition._declarationId ? [[definition._declarationId, definition]] : [],
+  ));
+  for (const definition of allDefinitions) definition.identity = stableIdentity(definition);
+  function normalizeExpressionIdentities(value) {
+    if (!value || typeof value !== "object") return;
+    if (value.kind === "call") {
+      const target = definitionsByRawId.get(value._calleeDeclarationId);
+      value.calleeIdentity = target?.identity ?? `external:${value.callee}|${value.calleeType ?? ""}`;
+      delete value._calleeDeclarationId;
+    }
+    for (const child of Object.values(value)) {
+      if (Array.isArray(child)) child.forEach(normalizeExpressionIdentities);
+      else normalizeExpressionIdentities(child);
+    }
+  }
+  for (const definition of allDefinitions) {
+    for (const call of definition.calls) {
+      const target = definitionsByRawId.get(call._calleeDeclarationId);
+      call.calleeIdentity = target?.identity ?? `external:${call.callee}|${call.calleeType ?? ""}`;
+      delete call._calleeDeclarationId;
+    }
+    normalizeExpressionIdentities(definition.variables);
+    normalizeExpressionIdentities(definition.operations);
+    normalizeExpressionIdentities(definition.returns);
+    normalizeExpressionIdentities(definition.calls);
+    delete definition._declarationId;
+  }
   const definitionsByLeaf = new Map();
   for (const definition of allDefinitions) {
     const leaf = definition.name.split("::").at(-1);
@@ -200,16 +311,18 @@ export function extractCppImplementationFacts(ast, requestedNames, source) {
   }
   function reachableFrom(root) {
     const namespace = root.name.split("::").slice(0, -1).join("::");
-    const visited = new Set([root.name]);
+    const visited = new Set([root.identity]);
     const queue = [...root.calls];
     const reachable = [];
+    const definitionsByIdentity = new Map(allDefinitions.map((definition) => [definition.identity, definition]));
     while (queue.length) {
       const call = queue.shift();
       const matches = definitionsByLeaf.get(call.callee) ?? [];
       const sameNamespace = matches.filter(({ name }) => name.split("::").slice(0, -1).join("::") === namespace);
-      const selected = sameNamespace.length === 1 ? sameNamespace[0] : matches.length === 1 ? matches[0] : null;
-      if (!selected || visited.has(selected.name)) continue;
-      visited.add(selected.name);
+      const selected = definitionsByIdentity.get(call.calleeIdentity) ??
+        (sameNamespace.length === 1 ? sameNamespace[0] : matches.length === 1 ? matches[0] : null);
+      if (!selected || visited.has(selected.identity)) continue;
+      visited.add(selected.identity);
       reachable.push(selected);
       queue.push(...selected.calls);
     }
@@ -238,6 +351,26 @@ function forwardedSuffix(call, parameterCount) {
   return null;
 }
 
+function callTarget(definition, call) {
+  const reachable = definition.reachableDefinitions ?? [];
+  return reachable.find(({ identity }) =>
+    identity && identity === call.calleeIdentity,
+  ) ?? (() => {
+    const matches = reachable.filter(({ name }) => name.split("::").at(-1) === call.callee);
+    return matches.length === 1 ? matches[0] : null;
+  })();
+}
+
+function helperConsumesForwardedOutputAndExtent(helper, outputIndex, extentIndex) {
+  if (!helper) return false;
+  return (helper.calls ?? []).some(({ arguments: arguments_ = [] }) => {
+    const referenced = new Set(arguments_.flatMap((argument) =>
+      argument.kind === "parameter" ? [argument.index] : [],
+    ));
+    return referenced.has(outputIndex) && referenced.has(extentIndex);
+  });
+}
+
 /**
  * Resolve a fixed byte extent from implementation dataflow. A qualifying body
  * forwards every public parameter, in order, to a helper and supplies exactly
@@ -250,6 +383,10 @@ export function inferForwardedFixedOutputExtent(definitions, parameterCount) {
     for (const call of definition.calls ?? []) {
       const forwarding = forwardedSuffix(call, parameterCount);
       if (!forwarding || forwarding.after.length !== 1 || forwarding.after[0].kind !== "integer") continue;
+      const helper = callTarget(definition, call);
+      const outputIndex = forwarding.start + parameterCount - 1;
+      const extentIndex = forwarding.start + parameterCount;
+      if (!helperConsumesForwardedOutputAndExtent(helper, outputIndex, extentIndex)) continue;
       const bytes = Number(forwarding.after[0].value);
       if (!Number.isSafeInteger(bytes) || bytes <= 0) continue;
       observations.push({
@@ -257,6 +394,7 @@ export function inferForwardedFixedOutputExtent(definitions, parameterCount) {
         source: definition.source,
         line: definition.line,
         callee: call.callee,
+        calleeIdentity: call.calleeIdentity ?? null,
         leadingArguments: forwarding.before,
       });
     }

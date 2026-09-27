@@ -10,7 +10,7 @@
   "sourceHashes": {
     "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
-    "projection": "f7b9581ccacf44ef7b643ea5fa61186190d52cb4f16c8b8bb4216ffb5aa8b085",
+    "projection": "701b44f6a625d7f14eda96ad1027b45a811226f84a81adf5e278e42887ac172a",
     "policy": "9d2a8a95e9f918bcc517cb2a702df912a067e6a941ef3f4291f96ddd568b3099"
   },
   "selector": "complete scratch-out-parameters partition using only result roles, parameter roles/directions, and platform family; no symbol allowlist",

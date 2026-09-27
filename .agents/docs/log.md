@@ -4078,3 +4078,13 @@ so a clean-room translation unit has the same admission outcome as the source
 checkout. Synthetic add, remove, rename, ignored-test, and forged-generated-
 report cases pass, followed by byte-identical regeneration of every owned
 dmSDK artifact.
+
+The bounded-span semantic extractor now preserves resolved call identities,
+local initializers, controlling branches, compound writes, and call-graph
+edges. Fixed digest, Base64, ASTC, and XTEA selection join those relations
+instead of accepting independent syntax that merely appears in the same body.
+New blocking metamorphic tests inject a codec-looking telemetry call, a false
+ASTC minimum and output writes, and a 999-byte XTEA scratch array; none changes
+the selected production recipe. Removing the actual controlled capacity query,
+called parser edge, or key copy forces universal fallback. The causality suite
+is now part of the root `pnpm check` graph.

@@ -43,13 +43,6 @@ function matchesAbi(candidate, resultRoles, parameters) {
   );
 }
 
-function allDefinitions(sourceFacts) {
-  return (sourceFacts?.definitions ?? []).flatMap((definition) => [
-    definition,
-    ...(definition.reachableDefinitions ?? []),
-  ]);
-}
-
 function expressionContains(value, predicate) {
   if (!value || typeof value !== "object") return false;
   if (predicate(value)) return true;
@@ -58,6 +51,16 @@ function expressionContains(value, predicate) {
       ? child.some((entry) => expressionContains(entry, predicate))
       : expressionContains(child, predicate),
   );
+}
+
+function expressionValues(value, predicate, select) {
+  if (!value || typeof value !== "object") return [];
+  const own = predicate(value) ? [select(value)] : [];
+  return own.concat(...Object.values(value).map((child) =>
+    Array.isArray(child)
+      ? child.flatMap((entry) => expressionValues(entry, predicate, select))
+      : expressionValues(child, predicate, select),
+  ));
 }
 
 function dereferencedParameter(expression, index) {
@@ -69,18 +72,67 @@ function sourceEvidence(definition, detail = {}) {
   return { source: definition.source, line: definition.line, ...detail };
 }
 
+function resolvedCallTarget(definition, call) {
+  const reachable = definition.reachableDefinitions ?? [];
+  const byId = reachable.find(({ identity }) =>
+    identity && identity === call.calleeIdentity,
+  );
+  if (byId) return byId;
+  const byLeaf = reachable.filter(({ name }) => name.split("::").at(-1) === call.callee);
+  return byLeaf.length === 1 ? byLeaf[0] : null;
+}
+
+function exactParameterArguments(call, indices) {
+  return call.arguments?.length === indices.length && call.arguments.every(
+    (argument, index) => argument.kind === "parameter" && argument.index === indices[index],
+  );
+}
+
+function conditionContains(conditions, predicate) {
+  return (conditions ?? []).some(({ expression }) => expressionContains(expression, predicate));
+}
+
+function zeroCapacityQuery(definition, index) {
+  return (definition.operations ?? []).some(({ operator, left, conditions }) =>
+    operator === "=" && dereferencedParameter(left, index) && conditionContains(conditions, (expression) =>
+      expression.kind === "binary" && expression.operator === "==" &&
+      dereferencedParameter(expression.left, index) && expression.right?.kind === "integer" &&
+      expression.right.value === 0,
+    ),
+  );
+}
+
+function falseReturnControlledByVariable(definition, name) {
+  return (definition.returns ?? []).some(({ kind, value, conditions }) =>
+    kind === "boolean" && value === false && conditionContains(conditions, (expression) =>
+      expression.kind === "binary" && ["!=", "=="].includes(expression.operator) &&
+      expression.left?.kind === "variable" && expression.left.name === name &&
+      expression.right?.kind === "integer" && expression.right.value === 0,
+    ),
+  );
+}
+
+function variableInitializer(definition, name) {
+  const matches = (definition.variables ?? []).filter((variable) => variable.name === name);
+  return matches.length === 1 ? matches[0].initializer : null;
+}
+
 function base64PaddingAdapters(definitions) {
   return definitions.flatMap((definition) => {
-    const computesPadding = (definition.operations ?? []).some((operation) =>
-      expressionContains(operation, ({ kind, operator, left, right }) =>
+    const adapters = (definition.calls ?? []).filter(({ callee, arguments: args }) =>
+      callee === "memset" && args?.[1]?.kind === "character" && args[1].value === 61 &&
+      args[2]?.kind === "variable",
+    );
+    return adapters.flatMap(({ arguments: args }) => {
+      const initializer = variableInitializer(definition, args[2].name);
+      const derivesPadding = expressionContains(initializer, ({ kind, operator, left, right }) =>
         kind === "binary" && operator === "%" && left?.kind === "parameter" && left.index === 1 &&
         right?.kind === "integer" && right.value === 4,
-      ),
-    );
-    const appendsPadding = (definition.calls ?? []).some(({ callee, arguments: args }) =>
-      callee === "memset" && args?.[1]?.kind === "character" && args[1].value === 61,
-    );
-    return computesPadding && appendsPadding ? [sourceEvidence(definition)] : [];
+      );
+      return derivesPadding
+        ? [sourceEvidence(definition, { paddingVariable: args[2].name })]
+        : [];
+    });
   });
 }
 
@@ -142,7 +194,10 @@ export function analyzeBase64SpanRecipe(declaration, candidate, recipe, sourceFa
     return result(null, ["base64-span-abi-shape"]);
   const observations = [];
   for (const definition of sourceFacts?.definitions ?? []) {
-    for (const call of definition.calls ?? []) {
+    if (!zeroCapacityQuery(definition, 3)) continue;
+    for (const variable of definition.variables ?? []) {
+      const call = variable.initializer;
+      if (call?.kind !== "call" || !falseReturnControlledByVariable(definition, variable.name)) continue;
       const callee = String(call.callee ?? "").toLowerCase();
       const mode = callee.includes("base64") && callee.includes("encode")
         ? "encode"
@@ -154,16 +209,18 @@ export function analyzeBase64SpanRecipe(declaration, candidate, recipe, sourceFa
       const inputLength = call.arguments?.at(-1);
       if (!dereferencedParameter(capacity, 3) || output?.kind !== "parameter" || output.index !== 2 ||
           input?.kind !== "parameter" || input.index !== 0 || inputLength?.kind !== "parameter" || inputLength.index !== 1) continue;
-      observations.push(sourceEvidence(definition, { callee: call.callee, mode }));
+      observations.push(sourceEvidence(definition, {
+        callee: call.callee,
+        calleeIdentity: call.calleeIdentity ?? null,
+        calleeType: call.calleeType ?? null,
+        resultVariable: variable.name,
+        mode,
+      }));
     }
   }
   const modes = [...new Set(observations.map(({ mode }) => mode))].sort();
   if (modes.length !== 1) return result(null, [modes.length ? "implementation-codec-operation-conflict" : "implementation-codec-operation"]);
-  const capacityQuery = (sourceFacts?.definitions ?? []).some((definition) =>
-    (definition.operations ?? []).some(({ operator, left, right }) =>
-      operator === "==" && dereferencedParameter(left, 3) && right?.kind === "integer" && right.value === 0,
-    ),
-  );
+  const capacityQuery = (sourceFacts?.definitions ?? []).some((definition) => zeroCapacityQuery(definition, 3));
   if (!capacityQuery) return result(null, ["implementation-zero-capacity-query"]);
   const [mode] = modes;
   const paddingAdapters = mode === "decode" ? base64PaddingAdapters(sourceFacts?.definitions ?? []) : [];
@@ -203,16 +260,26 @@ export function analyzeAstcProbeRecipe(declaration, candidate, recipe, sourceFac
     )
   )
     return result(null, ["astc-probe-abi-shape"]);
+  const astcWrites = new Map();
   const informative = (sourceFacts?.definitions ?? []).filter((definition) => {
-    const written = new Set((definition.operations ?? []).filter(({ operator, left }) =>
+    const probeCalls = (definition.calls ?? []).filter((call) => exactParameterArguments(call, [0, 1]));
+    const probes = probeCalls.map((call) => resolvedCallTarget(definition, call)).filter(Boolean);
+    if (probes.length !== 1) return false;
+    const headerVariables = new Set((definition.variables ?? []).filter(({ initializer }) =>
+      expressionContains(initializer, ({ kind, index }) => kind === "parameter" && index === 0),
+    ).map(({ name }) => name));
+    if (headerVariables.size === 0) return false;
+    const writes = (definition.operations ?? []).filter(({ operator, left }) =>
       operator === "=" && [2, 3, 4].some((index) => dereferencedParameter(left, index)),
-    ).map(({ left }) => left.operand.index));
+    ).filter(({ right }) => expressionContains(right, ({ kind, name }) =>
+      kind === "variable" && headerVariables.has(name),
+    ));
+    astcWrites.set(definition, writes);
+    const written = new Set(writes.map(({ left }) => left.operand.index));
     return written.size === 3;
   });
   const operations = informative.map((definition) => {
-    const writes = definition.operations.filter(({ operator, left }) =>
-      operator === "=" && [2, 3, 4].some((index) => dereferencedParameter(left, index)),
-    );
+    const writes = astcWrites.get(definition) ?? [];
     const packed = writes.every(({ right }) =>
       expressionContains(right, ({ kind, operator, right: shift }) =>
         kind === "binary" && operator === "<<" && shift?.kind === "integer" && [8, 16].includes(shift.value),
@@ -222,10 +289,22 @@ export function analyzeAstcProbeRecipe(declaration, candidate, recipe, sourceFac
   });
   const modes = [...new Set(operations.map(({ mode }) => mode))];
   if (modes.length !== 1) return result(null, [modes.length ? "implementation-three-u32-operation-conflict" : "implementation-three-u32-operation"]);
-  const minimums = [...new Set(allDefinitions(sourceFacts).flatMap((definition) =>
-    (definition.operations ?? []).flatMap(({ operator, left, right }) =>
-      operator === "<" && left?.kind === "parameter" && left.index === 1 && right?.kind === "integer"
-        ? [right.value]
+  const probeHelpers = informative.flatMap((definition) =>
+    (definition.calls ?? []).filter((call) => exactParameterArguments(call, [0, 1]))
+      .map((call) => resolvedCallTarget(definition, call)).filter(Boolean),
+  );
+  const minimums = [...new Set(probeHelpers.flatMap((definition) =>
+    (definition.returns ?? []).flatMap(({ kind, value, conditions }) =>
+      kind === "boolean" && value === false
+        ? (conditions ?? []).flatMap(({ expression }) =>
+            expressionValues(
+              expression,
+              ({ kind: expressionKind, operator, left, right }) =>
+                expressionKind === "binary" && operator === "<" && left?.kind === "parameter" &&
+                left.index === 1 && right?.kind === "integer",
+              ({ right }) => right.value,
+            )
+          )
         : [],
     ),
   ))].filter((value) => Number.isSafeInteger(value) && value > 0).sort((left, right) => left - right);
@@ -264,13 +343,28 @@ export function analyzeXteaSpanRecipe(declaration, candidate, enumDeclarations, 
   if (returnedConstants.length !== 1) return result(null, [returnedConstants.length ? "implementation-success-enum-conflict" : "implementation-success-enum"]);
   const success = resultEnum.members?.filter(({ name }) => name === returnedConstants[0]) ?? [];
   if (success.length !== 1) return result(null, ["implementation-success-enum-domain"]);
-  const helpers = (sourceFacts?.definitions ?? []).flatMap(({ reachableDefinitions = [] }) => reachableDefinitions);
-  const capacityCandidates = [...new Set(helpers.flatMap((definition) => [
-    ...(definition.fixedArrays ?? []).flatMap(({ byteExtent }) => Number.isSafeInteger(byteExtent) ? [byteExtent] : []),
-    ...(definition.operations ?? []).flatMap(({ operator, left, right }) =>
-      operator === "<=" && left?.kind === "parameter" && right?.kind === "integer" ? [right.value] : [],
-    ),
-  ]))].filter((value) => value > 0).sort((left, right) => left - right);
+  const helpers = (sourceFacts?.definitions ?? []).flatMap((definition) =>
+    (definition.calls ?? []).filter((call) => exactParameterArguments(call, [1, 2, 3, 4]))
+      .map((call) => resolvedCallTarget(definition, call)).filter(Boolean),
+  );
+  const capacityCandidates = [...new Set(helpers.flatMap((definition) =>
+    (definition.fixedArrays ?? []).flatMap(({ name, byteExtent }) => {
+      if (!Number.isSafeInteger(byteExtent)) return [];
+      const copiesKey = (definition.calls ?? []).some(({ callee, arguments: args }) =>
+        callee === "memcpy" && args?.[0]?.kind === "variable" && args[0].name === name &&
+        args[1]?.kind === "parameter" && args[1].index === 2 &&
+        args[2]?.kind === "parameter" && args[2].index === 3,
+      );
+      const guardsCapacity = (definition.operations ?? []).some(({ operator, left, right }) =>
+        operator === "<=" && left?.kind === "parameter" && left.index === 3 &&
+        right?.kind === "integer" && right.value === byteExtent,
+      );
+      const mutatesData = (definition.operations ?? []).some(({ left }) =>
+        expressionContains(left, ({ kind, index }) => kind === "parameter" && index === 0),
+      );
+      return copiesKey && guardsCapacity && mutatesData ? [byteExtent] : [];
+    }),
+  ))].filter((value) => value > 0).sort((left, right) => left - right);
   if (capacityCandidates.length !== 1) return result(null, [capacityCandidates.length ? "implementation-key-capacity-conflict" : "implementation-key-capacity"]);
   const [maximumKeyBytes] = capacityCandidates;
 
