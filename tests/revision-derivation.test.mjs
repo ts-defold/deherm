@@ -384,7 +384,8 @@ test("Defold SDK bootstrap derives and requires an archive extraction manifest",
 
 test("package-owned dmSDK scalar emission resolves SDK evidence from the derived revision", async () => {
   const source = await readFile(path.join(repositoryRoot, "scripts/generate-dmsdk-scalar-thunks.mjs"), "utf8");
-  assert.match(source, /sdk\/\$\{defoldRevision\}\/defoldsdk/);
+  assert.match(source, /readFile\(resolve\(repositoryRoot, declaration\.header\)/);
+  assert.match(source, /publicInclude\(declaration\.header\)/);
   assert.doesNotMatch(source, /sdk\/[0-9a-f]{40}\/defoldsdk/);
 });
 

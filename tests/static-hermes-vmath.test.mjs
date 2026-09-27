@@ -66,7 +66,7 @@ test("Static Hermes vmath generation is deterministic", async () => {
   }
 });
 
-test("Static Hermes vmath generation rejects descriptor drift before emitting", async () => {
+test("Static Hermes vmath generation rejects executable descriptor drift structurally", async () => {
   const temporary = await mkdtemp(path.join(tmpdir(), "deherm-static-vmath-drift-"));
   try {
     const descriptor = JSON.parse(await readFile(descriptorPath, "utf8"));
@@ -78,7 +78,7 @@ test("Static Hermes vmath generation rejects descriptor drift before emitting", 
       "--output-root", path.join(temporary, "output")
     ]);
     assert.notEqual(result.status, 0);
-    assert.match(`${result.stderr}${result.stdout}`, /value-binding descriptor sha256 expected/);
+    assert.match(`${result.stderr}${result.stdout}`, /invalid source-generated stable ID/);
   } finally {
     await rm(temporary, { recursive: true, force: true });
   }

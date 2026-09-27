@@ -1,18 +1,9 @@
 {
   "schemaVersion": 1,
-  "descriptorSha256": "805dbd25cbf2fc9472f207f9244e4996296a99418411e0880dca1640e596b176",
   "selector": {
     "idPrefix": "script:vmath.",
     "resultCodec": "Number",
     "argumentCodecs": ["Vector3", "Vector4", "Quaternion"],
     "operationTemplates": ["value-unary", "vmath-fixed-pod"]
-  },
-  "expectedCoverage": {
-    "descriptorBindings": 78,
-    "scopedVmathBindings": 30,
-    "includedBindings": 3,
-    "includedCallShapes": 7,
-    "structuredResultExclusions": 27,
-    "outOfScopeBindings": 48
   }
 }

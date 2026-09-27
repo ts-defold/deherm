@@ -1,0 +1,36 @@
+# BEGIN deherm managed Bob exclusions
+/node_modules
+/.deherm
+/.internal
+/build
+/.git
+/.github
+/.vscode
+/.idea
+/.agents
+/package.json
+/package-lock.json
+/npm-shrinkwrap.json
+/pnpm-lock.yaml
+/pnpm-workspace.yaml
+/yarn.lock
+/bun.lock
+/bun.lockb
+/.npmrc
+/.nvmrc
+/.node-version
+/tsconfig.json
+/tsconfig.deherm.json
+/tsconfig.deherm.base.json
+/tsconfig.deherm.shared.json
+/tsconfig.deherm.game-object.json
+/tsconfig.deherm.gui.json
+/tsconfig.deherm.render.json
+/tsconfig.deherm.bundle.json
+/tsconfig.deherm.release.json
+/deherm.lock
+/AGENTS.md
+/CHANGELOG.md
+/LICENSE
+/README.md
+# END deherm managed Bob exclusions

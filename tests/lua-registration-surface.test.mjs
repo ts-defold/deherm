@@ -16,6 +16,7 @@ import {
   interpretRegistrations
 } from "../scripts/lib/lua-c-registration.mjs";
 import { luaRegistrationSurfaceGenerator } from "../scripts/lib/script-generator-pipeline.mjs";
+import { buildRouteAuthority } from "../scripts/generate-lua-registration-surface.mjs";
 import { materializeIngestionProject } from "./fixtures/defold-extension-ingestion/materialize.mjs";
 
 const execFileAsync = promisify(execFile);
@@ -35,6 +36,41 @@ function analyze(sources, headers = []) {
   const helpers = collectBodyDerivedHelpers(project, declared, collectUserTypes(project));
   return { project, helpers, interpretation: interpretRegistrations(project) };
 }
+
+test("route authority is total and only positive C registration earns registered state", () => {
+  const registration = (name, line) => ({
+    name,
+    cFunction: `Lua_${name.replaceAll(".", "_")}`,
+    registration: { path: "engine/script.cpp", line, array: "Methods" },
+  });
+  const targets = {
+    alpha: {
+      status: "verified",
+      routes: [registration("demo.shared", 10), registration("demo.alpha_only", 11), registration("demo.c_only", 12)],
+      declaredButUnregistered: [
+        { name: "demo.docs_only", source: "doc/demo.lua:1", commentedOutRegistration: null },
+        { name: "demo.disabled", source: "doc/demo.lua:2", commentedOutRegistration: { path: "engine/script.cpp", line: 20, array: "Methods" } },
+      ],
+    },
+    beta: {
+      status: "verified",
+      routes: [registration("demo.shared", 30)],
+      declaredButUnregistered: [
+        { name: "demo.alpha_only", source: "doc/demo.lua:3", commentedOutRegistration: null },
+        { name: "demo.docs_only", source: "doc/demo.lua:1", commentedOutRegistration: null },
+        { name: "demo.disabled", source: "doc/demo.lua:2", commentedOutRegistration: { path: "engine/script.cpp", line: 40, array: "Methods" } },
+      ],
+    },
+  };
+  const authority = new Map(buildRouteAuthority(targets, ["alpha", "beta"])
+    .map((row) => [row.route, row]));
+  assert.equal(authority.get("demo.shared").state, "registered");
+  assert.equal(authority.get("demo.alpha_only").state, "target-variant");
+  assert.equal(authority.get("demo.c_only").state, "target-variant", "C-only routes remain source-observed rather than disappearing");
+  assert.equal(authority.get("demo.disabled").state, "positive-unavailability-observed");
+  assert.equal(authority.get("demo.docs_only").state, "documentation-only");
+  assert.equal(authority.get("demo.docs_only").targetStates.every((state) => state === "unresolved"), true);
+});
 
 test("the lane owns its generator, pinned inputs, and artifact", () => {
   const registry = luaRegistrationSurfaceGenerator;
@@ -466,6 +502,15 @@ test("the gate carries only findings with positive source evidence in every engi
   assert.equal(gate.sourceReport, luaRegistrationSurfaceGenerator.artifacts[0]);
   assert.deepEqual(gate.engineTargets, ["defold-engine-box2d-v2", "defold-engine-box2d-v3"]);
   assert.ok(gate.findings.length > 0);
+  assert.equal(gate.routeAuthority.length, report.targets[gate.engineTargets[0]].summary.declaredRoutes);
+  assert.equal(new Set(gate.routeAuthority.map(({ route }) => route)).size, gate.routeAuthority.length);
+  assert.equal(Object.values(gate.counts.authority).reduce((sum, count) => sum + count, 0), gate.routeAuthority.length);
+  for (const authority of gate.routeAuthority) {
+    assert.equal(authority.targetStates.length, gate.engineTargets.length, authority.route);
+    const registered = authority.targetStates.filter((state) => state === "registered");
+    if (authority.state === "registered") assert.equal(registered.length, gate.engineTargets.length, authority.route);
+    if (authority.state === "documentation-only") assert.equal(registered.length, 0, authority.route);
+  }
   assert.equal(gate.findings.some((finding) => finding.route === "go.set_parent"), false,
     "go.set_parent must not be narrowed after real-engine zero-argument evidence");
 

@@ -103,6 +103,23 @@ test("uses the source-registered Lua spelling without suppressing the documented
   assert.equal(route.generation.semanticHoles.some((hole) => hole.startsWith("registration:")), false);
 });
 
+test("never promotes absence of a gate correction into source verification", () => {
+  const sourceObserved = generated.rows.find(({ registration }) =>
+    registration.token === "registration-source-observed");
+  const documentationOnly = generated.rows.find(({ registration }) =>
+    registration.token === "registration-documentation-only");
+  const variant = generated.rows.find(({ registration }) =>
+    registration.token === "registration-source-variant");
+  assert.ok(sourceObserved);
+  assert.equal(sourceObserved.registration.authority.targetStates.every((state) => state === "registered"), true);
+  assert.ok(documentationOnly);
+  assert.equal(documentationOnly.registration.authority.targetStates.some((state) => state === "registered"), false);
+  assert.ok(variant);
+  assert.equal(variant.registration.authority.targetStates.some((state) => state === "registered"), true);
+  assert.equal(variant.registration.authority.targetStates.some((state) => state !== "registered"), true);
+  assert.equal(generated.rows.some(({ registration }) => registration.token === "registration-verified"), false);
+});
+
 test("rejects omitted, duplicated, foreign, and stale route inputs", () => {
   const omitted = structuredClone(inputs);
   omitted.patterns = replaceJson(omitted.patterns, (value) => {
@@ -154,6 +171,13 @@ test("derives add/remove route drift from the current IR and accounting inputs",
   added.accounting = replaceJson(added.accounting, (value) => {
     value.rows.push({ ...separate, id: syntheticId });
     value.functionCount += 1;
+  });
+  added.registrationGate = replaceJson(added.registrationGate, (value) => {
+    value.routeAuthority.push({
+      route: `${sourceFunction.rawName}.synthetic_drift`,
+      state: "documentation-only",
+      targetStates: value.engineTargets.map(() => "unresolved"),
+    });
   });
   const addedProjection = generateScriptProjectionIr(added);
   assert.equal(addedProjection.routeCount, ir.functions.length + 1);

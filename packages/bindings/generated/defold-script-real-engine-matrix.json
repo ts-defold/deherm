@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "target": "arm64-macos-dynamic-hermes",
-  "inputSha256": "ac2c806f669081747ec8966fcf3443b89f733073578d53ef7db87c7c4e42fa13",
+  "inputSha256": "71bd09b614b106b603475353901155c445e536649445c24079fefaa374ee4f4d",
   "evidencePolicy": "Scenario state records planning/instrumentation only. A route stage is verified exclusively by an explicit, passed, target-matched observation whose repository-confined evidence artifact matches its declared SHA-256. Runtime requires the current probe-set fingerprint and an exact line or explicitly declared line prefix for every scenario.",
   "coverageClaim": "All 296 generated executable script routes have at least one deterministic scenario. No compile, link, or runtime behavior is claimed without a verified observation.",
   "routeCount": 296,
@@ -91,7 +91,7 @@
       "setupId": "global-runtime",
       "probeSource": "scalar",
       "probeKey": "bit.lshift.number",
-      "probeSetInputMarker": "INFO:DEFOLD_HERMES: script-api-probes:a87e416ae1cc9fdc57faa161f18e6efd20d1676ed3a2d190e39b4a67bad9937d",
+      "probeSetInputMarker": "INFO:DEFOLD_HERMES: script-api-probes:1f1a77bf3551d933deb18869d765568f6a66f06301de93d20adcae891744ec0d",
       "markerKind": "exact-line",
       "expectedMarker": "INFO:DEFOLD_HERMES: script-api:bit.lshift.number:256",
       "expectation": {
@@ -134,7 +134,7 @@
       "setupId": "global-runtime",
       "probeSource": "scalar",
       "probeKey": "bit.tohex.default-width",
-      "probeSetInputMarker": "INFO:DEFOLD_HERMES: script-api-probes:a87e416ae1cc9fdc57faa161f18e6efd20d1676ed3a2d190e39b4a67bad9937d",
+      "probeSetInputMarker": "INFO:DEFOLD_HERMES: script-api-probes:1f1a77bf3551d933deb18869d765568f6a66f06301de93d20adcae891744ec0d",
       "markerKind": "exact-line",
       "expectedMarker": "INFO:DEFOLD_HERMES: script-api:bit.tohex.default-width:00000021",
       "expectation": {
@@ -149,7 +149,7 @@
       "setupId": "global-runtime",
       "probeSource": "scalar",
       "probeKey": "bit.tohex.explicit-width",
-      "probeSetInputMarker": "INFO:DEFOLD_HERMES: script-api-probes:a87e416ae1cc9fdc57faa161f18e6efd20d1676ed3a2d190e39b4a67bad9937d",
+      "probeSetInputMarker": "INFO:DEFOLD_HERMES: script-api-probes:1f1a77bf3551d933deb18869d765568f6a66f06301de93d20adcae891744ec0d",
       "markerKind": "exact-line",
       "expectedMarker": "INFO:DEFOLD_HERMES: script-api:bit.tohex.explicit-width:0021",
       "expectation": {
@@ -1597,7 +1597,7 @@
       "setupId": "global-runtime",
       "probeSource": "scalar",
       "probeKey": "profiler.scope_begin.void",
-      "probeSetInputMarker": "INFO:DEFOLD_HERMES: script-api-probes:a87e416ae1cc9fdc57faa161f18e6efd20d1676ed3a2d190e39b4a67bad9937d",
+      "probeSetInputMarker": "INFO:DEFOLD_HERMES: script-api-probes:1f1a77bf3551d933deb18869d765568f6a66f06301de93d20adcae891744ec0d",
       "markerKind": "exact-line",
       "expectedMarker": "INFO:DEFOLD_HERMES: script-api:profiler.scope_begin.void:undefined",
       "expectation": {
@@ -1611,7 +1611,7 @@
       "setupId": "global-runtime",
       "probeSource": "scalar",
       "probeKey": "profiler.scope_end.void",
-      "probeSetInputMarker": "INFO:DEFOLD_HERMES: script-api-probes:a87e416ae1cc9fdc57faa161f18e6efd20d1676ed3a2d190e39b4a67bad9937d",
+      "probeSetInputMarker": "INFO:DEFOLD_HERMES: script-api-probes:1f1a77bf3551d933deb18869d765568f6a66f06301de93d20adcae891744ec0d",
       "markerKind": "exact-line",
       "expectedMarker": "INFO:DEFOLD_HERMES: script-api:profiler.scope_end.void:undefined",
       "expectation": {
@@ -1933,7 +1933,7 @@
       "setupId": "global-runtime",
       "probeSource": "scalar",
       "probeKey": "sys.exists.false",
-      "probeSetInputMarker": "INFO:DEFOLD_HERMES: script-api-probes:a87e416ae1cc9fdc57faa161f18e6efd20d1676ed3a2d190e39b4a67bad9937d",
+      "probeSetInputMarker": "INFO:DEFOLD_HERMES: script-api-probes:1f1a77bf3551d933deb18869d765568f6a66f06301de93d20adcae891744ec0d",
       "markerKind": "exact-line",
       "expectedMarker": "INFO:DEFOLD_HERMES: script-api:sys.exists.false:false",
       "expectation": {
@@ -1955,7 +1955,7 @@
       "setupId": "global-runtime",
       "probeSource": "scalar",
       "probeKey": "sys.get_application_path",
-      "probeSetInputMarker": "INFO:DEFOLD_HERMES: script-api-probes:a87e416ae1cc9fdc57faa161f18e6efd20d1676ed3a2d190e39b4a67bad9937d",
+      "probeSetInputMarker": "INFO:DEFOLD_HERMES: script-api-probes:1f1a77bf3551d933deb18869d765568f6a66f06301de93d20adcae891744ec0d",
       "markerKind": "line-prefix",
       "expectedMarker": "INFO:DEFOLD_HERMES: script-api:sys.get_application_path:",
       "expectation": {
@@ -1969,7 +1969,7 @@
       "setupId": "configured-project",
       "probeSource": "scalar",
       "probeKey": "sys.get_config_boolean",
-      "probeSetInputMarker": "INFO:DEFOLD_HERMES: script-api-probes:a87e416ae1cc9fdc57faa161f18e6efd20d1676ed3a2d190e39b4a67bad9937d",
+      "probeSetInputMarker": "INFO:DEFOLD_HERMES: script-api-probes:1f1a77bf3551d933deb18869d765568f6a66f06301de93d20adcae891744ec0d",
       "markerKind": "exact-line",
       "expectedMarker": "INFO:DEFOLD_HERMES: script-api:sys.get_config_boolean:true",
       "expectation": {
@@ -1984,7 +1984,7 @@
       "setupId": "configured-project",
       "probeSource": "scalar",
       "probeKey": "sys.get_config_int",
-      "probeSetInputMarker": "INFO:DEFOLD_HERMES: script-api-probes:a87e416ae1cc9fdc57faa161f18e6efd20d1676ed3a2d190e39b4a67bad9937d",
+      "probeSetInputMarker": "INFO:DEFOLD_HERMES: script-api-probes:1f1a77bf3551d933deb18869d765568f6a66f06301de93d20adcae891744ec0d",
       "markerKind": "exact-line",
       "expectedMarker": "INFO:DEFOLD_HERMES: script-api:sys.get_config_int:37",
       "expectation": {
@@ -1999,7 +1999,7 @@
       "setupId": "configured-project",
       "probeSource": "scalar",
       "probeKey": "sys.get_config_number",
-      "probeSetInputMarker": "INFO:DEFOLD_HERMES: script-api-probes:a87e416ae1cc9fdc57faa161f18e6efd20d1676ed3a2d190e39b4a67bad9937d",
+      "probeSetInputMarker": "INFO:DEFOLD_HERMES: script-api-probes:1f1a77bf3551d933deb18869d765568f6a66f06301de93d20adcae891744ec0d",
       "markerKind": "exact-line",
       "expectedMarker": "INFO:DEFOLD_HERMES: script-api:sys.get_config_number:12.5",
       "expectation": {
@@ -2014,7 +2014,7 @@
       "setupId": "configured-project",
       "probeSource": "scalar",
       "probeKey": "sys.get_config_string.nullable",
-      "probeSetInputMarker": "INFO:DEFOLD_HERMES: script-api-probes:a87e416ae1cc9fdc57faa161f18e6efd20d1676ed3a2d190e39b4a67bad9937d",
+      "probeSetInputMarker": "INFO:DEFOLD_HERMES: script-api-probes:1f1a77bf3551d933deb18869d765568f6a66f06301de93d20adcae891744ec0d",
       "markerKind": "exact-line",
       "expectedMarker": "INFO:DEFOLD_HERMES: script-api:sys.get_config_string.nullable:null",
       "expectation": {
@@ -2029,7 +2029,7 @@
       "setupId": "configured-project",
       "probeSource": "scalar",
       "probeKey": "sys.get_config_string.present",
-      "probeSetInputMarker": "INFO:DEFOLD_HERMES: script-api-probes:a87e416ae1cc9fdc57faa161f18e6efd20d1676ed3a2d190e39b4a67bad9937d",
+      "probeSetInputMarker": "INFO:DEFOLD_HERMES: script-api-probes:1f1a77bf3551d933deb18869d765568f6a66f06301de93d20adcae891744ec0d",
       "markerKind": "exact-line",
       "expectedMarker": "INFO:DEFOLD_HERMES: script-api:sys.get_config_string.present:Defold Hermes Spike",
       "expectation": {
@@ -2044,7 +2044,7 @@
       "setupId": "global-runtime",
       "probeSource": "scalar",
       "probeKey": "sys.get_connectivity.integer-enum",
-      "probeSetInputMarker": "INFO:DEFOLD_HERMES: script-api-probes:a87e416ae1cc9fdc57faa161f18e6efd20d1676ed3a2d190e39b4a67bad9937d",
+      "probeSetInputMarker": "INFO:DEFOLD_HERMES: script-api-probes:1f1a77bf3551d933deb18869d765568f6a66f06301de93d20adcae891744ec0d",
       "markerKind": "line-prefix",
       "expectedMarker": "INFO:DEFOLD_HERMES: script-api:sys.get_connectivity.integer-enum:",
       "expectation": {
@@ -2067,7 +2067,7 @@
       "setupId": "global-runtime",
       "probeSource": "scalar",
       "probeKey": "sys.get_save_file",
-      "probeSetInputMarker": "INFO:DEFOLD_HERMES: script-api-probes:a87e416ae1cc9fdc57faa161f18e6efd20d1676ed3a2d190e39b4a67bad9937d",
+      "probeSetInputMarker": "INFO:DEFOLD_HERMES: script-api-probes:1f1a77bf3551d933deb18869d765568f6a66f06301de93d20adcae891744ec0d",
       "markerKind": "line-prefix",
       "expectedMarker": "INFO:DEFOLD_HERMES: script-api:sys.get_save_file:",
       "expectation": {
@@ -3081,7 +3081,7 @@
       "target": "arm64-macos-dynamic-hermes",
       "result": "passed",
       "command": "node scripts/check-native-defold-runtime.mjs --record-evidence",
-      "observedAt": "2026-09-20T08:00:31.782Z",
+      "observedAt": "2026-09-27T11:24:19.456Z",
       "routeIds": [
         "script:bit.lshift",
         "script:bit.tohex",
@@ -3164,7 +3164,7 @@
       ],
       "artifact": {
         "path": ".agents/docs/data/native-defold-runtime.log",
-        "sha256": "7ee35ece2c7f5870e84f49cce107c71da8851cadc4357f0f4e8de1fb36646ae8"
+        "sha256": "665b3e1517632e0ac9e16382f2c8349a36cac7c2316eeef0dbfe9aac8f112b67"
       },
       "requiredMarkers": [
         "INFO:DEFOLD_HERMES: final:ok",

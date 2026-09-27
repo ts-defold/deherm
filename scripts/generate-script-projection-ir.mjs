@@ -287,7 +287,22 @@ function buildRegistrationGate(gate, defoldRevision) {
     if (!finding.route) throw new Error("Lua registration gate contains a finding without a route");
     byRoute.set(finding.route, [...(byRoute.get(finding.route) ?? []), finding]);
   }
-  return { sourceReportSha256: gate.sourceReportSha256, byRoute };
+  const authorityByRoute = new Map();
+  for (const authority of gate.routeAuthority ?? []) {
+    if (!authority.route) throw new Error("Lua registration gate contains authority without a route");
+    if (authorityByRoute.has(authority.route)) throw new Error(`Lua registration gate duplicates authority for '${authority.route}'`);
+    if (!["registered", "target-variant", "positive-unavailability-observed", "documentation-only"].includes(authority.state)) {
+      throw new Error(`Lua registration gate has unknown authority state '${authority.state}' for '${authority.route}'`);
+    }
+    if (!Array.isArray(authority.targetStates) || authority.targetStates.length !== gate.engineTargets?.length) {
+      throw new Error(`Lua registration gate has incomplete target states for '${authority.route}'`);
+    }
+    if (authority.targetStates.some((state) => !["registered", "positively-unavailable", "unresolved"].includes(state))) {
+      throw new Error(`Lua registration gate has an unknown target state for '${authority.route}'`);
+    }
+    authorityByRoute.set(authority.route, authority);
+  }
+  return { sourceReportSha256: gate.sourceReportSha256, byRoute, authorityByRoute };
 }
 
 // Apply source-derived corrections without suppressing the documented API.
@@ -296,10 +311,23 @@ function buildRegistrationGate(gate, defoldRevision) {
 // changes only the Lua lookup used at runtime; a positively absent source route
 // is carried as availability evidence, not erased from the SDK.
 function applyRegistrationGate(gate, fn, parameters) {
+  const authority = gate.authorityByRoute.get(fn.rawName);
+  if (!authority) throw new Error(`${fn.rawName}: Lua registration gate has no total authority row`);
   const findings = gate.byRoute.get(fn.rawName) ?? [];
   if (!findings.length) {
+    const tokens = {
+      registered: "registration-source-observed",
+      "target-variant": "registration-source-variant",
+      "positive-unavailability-observed": "registration-source-unavailable",
+      "documentation-only": "registration-documentation-only",
+    };
     return {
-      registration: { token: "registration-verified", sourceReportSha256: gate.sourceReportSha256, findings: [] },
+      registration: {
+        token: tokens[authority.state],
+        authority: { state: authority.state, targetStates: authority.targetStates },
+        sourceReportSha256: gate.sourceReportSha256,
+        findings: [],
+      },
       runtimeRawName: fn.rawName,
       holes: []
     };
@@ -337,6 +365,7 @@ function applyRegistrationGate(gate, fn, parameters) {
   return {
     registration: {
       token: holes.length ? "registration-source-unavailable" : "registration-corrected",
+      authority: { state: authority.state, targetStates: authority.targetStates },
       sourceReportSha256: gate.sourceReportSha256,
       findings: applied
     },

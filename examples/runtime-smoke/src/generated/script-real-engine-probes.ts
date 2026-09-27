@@ -4,7 +4,7 @@ import { bit, profiler, sys } from "@ts-defold/deherm";
 export type ScriptRealEngineProbeLog = (message: string) => void;
 
 export function runScriptRealEngineProbes(log: ScriptRealEngineProbeLog): void {
-  log("script-api-probes:a87e416ae1cc9fdc57faa161f18e6efd20d1676ed3a2d190e39b4a67bad9937d");
+  log("script-api-probes:1f1a77bf3551d933deb18869d765568f6a66f06301de93d20adcae891744ec0d");
   const bit_tohex_explicit_width_0 = bit.tohex(33, 4);
   if (!(Object.is(bit_tohex_explicit_width_0, "0021"))) {
     throw new Error("script:bit.tohex probe bit.tohex.explicit-width failed; received " + String(bit_tohex_explicit_width_0));

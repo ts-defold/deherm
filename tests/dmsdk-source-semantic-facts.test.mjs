@@ -1,10 +1,15 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
+
+import {
+  clangAst,
+  clangInvocation,
+} from "../scripts/generate-dmsdk-source-semantic-facts.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const artifact = "packages/bindings/generated/defold-dmsdk-source-semantic-facts.json";
@@ -33,5 +38,32 @@ test("bounded-span source facts regenerate deterministically from pinned C/C++ i
     run(["--out-root", output, "--check"]);
   } finally {
     await rm(output, { recursive: true, force: true });
+  }
+});
+
+test("translation-unit language follows the source language instead of forcing C++", () => {
+  assert.deepEqual(clangInvocation("source.c", []).slice(0, 4), ["-x", "c", "-std=c11", "-fsyntax-only"]);
+  assert.deepEqual(clangInvocation("source.cpp", []).slice(0, 4), ["-x", "c++", "-std=c++17", "-fsyntax-only"]);
+  assert.deepEqual(clangInvocation("source.mm", []).slice(0, 4), ["-x", "objective-c++", "-std=c++17", "-fsyntax-only"]);
+});
+
+test("errored recovery ASTs are categorically unavailable as positive semantic evidence", async () => {
+  const workspace = await mkdtemp(path.join(tmpdir(), "deherm-recovery-ast-"));
+  try {
+    const cases = [
+      ["before.cpp", "this is not C++;\nint Target(int value) { return value; }\n"],
+      ["inside.c", "int Target(int value) { int broken[; return value; }\n"],
+      ["after.mm", "int Target(int value) { return value; }\n@interface Broken\n"],
+    ];
+    for (const [name, source] of cases) {
+      const file = path.join(workspace, name);
+      await writeFile(file, source);
+      const result = await clangAst(file, [], workspace);
+      assert.equal(result.complete, false, name);
+      assert.equal(result.ast, null, `${name}: recovery AST must not cross the admission boundary`);
+      assert.notEqual(result.diagnostics.length, 0, name);
+    }
+  } finally {
+    await rm(workspace, { recursive: true, force: true });
   }
 });

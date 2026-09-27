@@ -9,6 +9,9 @@ height = 640
 title = Defold Hermes Spike
 custom_resources = /deherm
 
+[script]
+shared_state = 1
+
 [library]
 include_dirs = defold_hermes
 

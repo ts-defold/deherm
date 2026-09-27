@@ -93,6 +93,51 @@ resolved; it does not silently choose either. Reading `luaL_check*`,
 mechanical evidence extractor, but interpreting those branches as an idiomatic
 overload remains a reviewed semantic step.
 
+# Defold trust boundary and optimization authority
+
+Déherm does not attempt to prove Defold down to CPU execution. The exact pinned
+Defold revision is the product authority. Its public headers, generated public
+declarations, build-selected platform guards, and positive Lua registration
+entries determine which APIs exist, their names, their ABI declarations, and
+their target availability. A complete, error-free compiler AST produced with
+the source language and build inputs selected by Defold is trusted as the
+structural representation of that source.
+
+This authority is deliberately split from déherm's optimization evidence:
+
+1. a discovered public declaration is always emitted exactly once;
+2. a positive Lua registration is source-observed evidence, while absence of a
+   parsed registration is unresolved rather than proof of either presence or
+   absence;
+3. implementation facts may select a faster transport only when they satisfy a
+   structural pattern's complete causal contract;
+4. an errored or recovery compiler AST can contribute diagnostics but can
+   contribute no positive semantic facts;
+5. a route without sufficient optimization evidence uses the generated
+   universal implementation and retains a machine-readable selection trace;
+6. failure to specialize never removes an API from the generated product.
+
+Déherm owns the bridge: exact symbol/member selection, native signature,
+argument and result order, representation, bounds, ownership, compilation, and
+linkage. Defold owns the implementation semantics behind the selected call.
+Conformance probes refine contradictions and portability claims; they are not a
+license to withhold an otherwise authoritative Defold API.
+
+The integrated anti-regression contract is relational rather than a frozen
+route count. Source IDs and emitted IDs must be equal sets; every ID has exactly
+one preferred selection and one universal base recipe; every structurally
+compatible fact selects its specialization; rejected ASTs produce no facts;
+and a same-revision, same-input specialization cannot silently fall back.
+
+Clean-room evidence follows the same boundary. A generated semantic-fact
+report can never select the source files used to regenerate itself. The dmSDK
+clean room derives a conservative implementation-source closure from the
+pinned SDK IR, copies the complete engine and SDK include closures used by the
+compiler, and only then runs semantic extraction. Candidate additions,
+removals, renames, and rejected translation units therefore change the proof
+inputs without relying on a prior generated result. Extra candidate files are
+safe and only increase proof cost; a missing candidate would be unsound.
+
 # Claim protocol
 
 Every material review claim follows `observe -> reproduce -> classify -> act`:

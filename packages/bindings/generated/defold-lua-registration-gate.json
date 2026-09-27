@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "generator": "scripts/generate-lua-registration-surface.mjs",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "scope": "The subset of the registered-vs-declared findings that a downstream generator may act on: each one is backed by positive evidence in C source and holds in every mutually exclusive engine build variant. Absence of a registration is reported in the surface report and never gated.",
+  "scope": "A total authority ledger for every documented engine route plus the source-backed corrections a downstream generator may act on. Positive C registration is distinct from unresolved absence and documentation-only declaration.",
   "actions": {
     "use-registered-name": "The engine source registers this function under a different name. Emit the documented TypeScript surface and dispatch it through the registered source name.",
     "mark-source-unavailable": "Positive source evidence says this route is not registered in every selected engine variant. Keep the API and machinery emitted, but mark the affected profile unavailable.",
@@ -26,8 +26,7424 @@
     "byAction": {
       "require-parameter": 10,
       "use-registered-name": 1
+    },
+    "authority": {
+      "documentation-only": 13,
+      "positive-unavailability-observed": 2,
+      "registered": 765,
+      "target-variant": 146
     }
   },
+  "routeAuthority": [
+    {
+      "route": "b2d.body.apply_angular_impulse",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.apply_force",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.apply_force_to_center",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.apply_linear_impulse",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.apply_linear_impulse_to_center",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.apply_torque",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.compute_aabb",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.create_chain",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.create_fixture",
+      "state": "target-variant",
+      "targetStates": [
+        "registered",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "b2d.body.create_shape",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.destroy_fixture",
+      "state": "target-variant",
+      "targetStates": [
+        "registered",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "b2d.body.destroy_shape",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.dump",
+      "state": "target-variant",
+      "targetStates": [
+        "registered",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "b2d.body.enable_contact_events",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.enable_hit_events",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.enable_sleep",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.get_angle",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.get_angular_damping",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.get_angular_velocity",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.get_contact_data",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.get_fixtures",
+      "state": "target-variant",
+      "targetStates": [
+        "registered",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "b2d.body.get_force",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.get_gravity_scale",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.get_inertia",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.get_joints",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.get_linear_damping",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.get_linear_velocity",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.get_linear_velocity_from_local_point",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.get_linear_velocity_from_world_point",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.get_local_center",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.get_local_center_of_mass",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.get_local_point",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.get_local_vector",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.get_mass",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.get_mass_data",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.get_name",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.get_next",
+      "state": "target-variant",
+      "targetStates": [
+        "registered",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "b2d.body.get_position",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.get_rotational_inertia",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.get_shapes",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.get_sleep_threshold",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.get_transform",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.get_type",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.get_user_data",
+      "state": "positive-unavailability-observed",
+      "targetStates": [
+        "unresolved",
+        "positively-unavailable"
+      ]
+    },
+    {
+      "route": "b2d.body.get_world",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.get_world_center",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.get_world_center_of_mass",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.get_world_point",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.get_world_vector",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.is_active",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.is_awake",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.is_bullet",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.is_fixed_rotation",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.is_sleeping_allowed",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.is_sleeping_enabled",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.is_valid",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.reset_mass_data",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.set_active",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.set_angular_damping",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.set_angular_velocity",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.set_awake",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.set_bullet",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.set_fixed_rotation",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.set_gravity_scale",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.set_linear_damping",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.set_linear_velocity",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.set_mass_data",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.set_name",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.set_sleep_threshold",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.set_sleeping_allowed",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.set_target_transform",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.set_transform",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.set_type",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.body.set_user_data",
+      "state": "positive-unavailability-observed",
+      "targetStates": [
+        "unresolved",
+        "positively-unavailable"
+      ]
+    },
+    {
+      "route": "b2d.chain.destroy",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.chain.from_shape",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.chain.get_friction",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.chain.get_geometry",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.chain.get_material",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.chain.get_restitution",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.chain.get_segment_count",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.chain.get_segments",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.chain.get_world",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.chain.is_valid",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.chain.set_friction",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.chain.set_material",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.chain.set_restitution",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.fixture.get_aabb",
+      "state": "target-variant",
+      "targetStates": [
+        "registered",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "b2d.fixture.get_density",
+      "state": "target-variant",
+      "targetStates": [
+        "registered",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "b2d.fixture.get_filter_data",
+      "state": "target-variant",
+      "targetStates": [
+        "registered",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "b2d.fixture.get_friction",
+      "state": "target-variant",
+      "targetStates": [
+        "registered",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "b2d.fixture.get_restitution",
+      "state": "target-variant",
+      "targetStates": [
+        "registered",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "b2d.fixture.get_shape",
+      "state": "target-variant",
+      "targetStates": [
+        "registered",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "b2d.fixture.get_type",
+      "state": "target-variant",
+      "targetStates": [
+        "registered",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "b2d.fixture.is_sensor",
+      "state": "target-variant",
+      "targetStates": [
+        "registered",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "b2d.fixture.refilter",
+      "state": "target-variant",
+      "targetStates": [
+        "registered",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "b2d.fixture.set_density",
+      "state": "target-variant",
+      "targetStates": [
+        "registered",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "b2d.fixture.set_filter_data",
+      "state": "target-variant",
+      "targetStates": [
+        "registered",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "b2d.fixture.set_friction",
+      "state": "target-variant",
+      "targetStates": [
+        "registered",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "b2d.fixture.set_restitution",
+      "state": "target-variant",
+      "targetStates": [
+        "registered",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "b2d.fixture.set_sensor",
+      "state": "target-variant",
+      "targetStates": [
+        "registered",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "b2d.fixture.set_shape",
+      "state": "target-variant",
+      "targetStates": [
+        "registered",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "b2d.fixture.test_point",
+      "state": "target-variant",
+      "targetStates": [
+        "registered",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "b2d.get_body",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.get_version",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.get_world",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.create_distance",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.create_filter",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.create_friction",
+      "state": "target-variant",
+      "targetStates": [
+        "registered",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "b2d.joint.create_gear",
+      "state": "target-variant",
+      "targetStates": [
+        "registered",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "b2d.joint.create_motor",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.create_mouse",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.create_prismatic",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.create_pulley",
+      "state": "target-variant",
+      "targetStates": [
+        "registered",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "b2d.joint.create_revolute",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.create_rope",
+      "state": "target-variant",
+      "targetStates": [
+        "registered",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "b2d.joint.create_weld",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.create_wheel",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.destroy",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.enable_limit",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.enable_motor",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.enable_spring",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_anchor_a",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_anchor_b",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_angular_damping_ratio",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_angular_hertz",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_angular_offset",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_body_a",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_body_b",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_collide_connected",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_correction_factor",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_current_length",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_damping_ratio",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_frequency",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_ground_anchor_a",
+      "state": "target-variant",
+      "targetStates": [
+        "registered",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_ground_anchor_b",
+      "state": "target-variant",
+      "targetStates": [
+        "registered",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_hertz",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_joint1",
+      "state": "target-variant",
+      "targetStates": [
+        "registered",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_joint2",
+      "state": "target-variant",
+      "targetStates": [
+        "registered",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_joint_angle",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_joint_speed",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_joint_translation",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_length",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_length_a",
+      "state": "target-variant",
+      "targetStates": [
+        "registered",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_length_b",
+      "state": "target-variant",
+      "targetStates": [
+        "registered",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_limit_state",
+      "state": "target-variant",
+      "targetStates": [
+        "registered",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_linear_damping_ratio",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_linear_hertz",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_linear_offset",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_local_anchor_a",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_local_anchor_b",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_local_axis_a",
+      "state": "target-variant",
+      "targetStates": [
+        "registered",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_lower_limit",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_max_force",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_max_length",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_max_motor_force",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_max_motor_torque",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_max_torque",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_min_length",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_motor_force",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_motor_speed",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_motor_torque",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_mouse_target",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_ratio",
+      "state": "target-variant",
+      "targetStates": [
+        "registered",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_reaction_force",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_reaction_torque",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_reference_angle",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_spring_damping_ratio",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_spring_hertz",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_type",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_upper_limit",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.get_world",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.is_active",
+      "state": "target-variant",
+      "targetStates": [
+        "registered",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "b2d.joint.is_limit_enabled",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.is_motor_enabled",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.is_spring_enabled",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.is_valid",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.set_angular_damping_ratio",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.set_angular_hertz",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.set_angular_offset",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.set_collide_connected",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.set_correction_factor",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.set_damping_ratio",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.set_frequency",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.set_hertz",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.set_length",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.set_length_range",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.set_limits",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.set_linear_damping_ratio",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.set_linear_hertz",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.set_linear_offset",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.set_max_force",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.set_max_length",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.set_max_motor_force",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.set_max_motor_torque",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.set_max_torque",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.set_min_length",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.set_motor_speed",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.set_mouse_target",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.set_ratio",
+      "state": "target-variant",
+      "targetStates": [
+        "registered",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "b2d.joint.set_reference_angle",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.set_spring_damping_ratio",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.set_spring_hertz",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.joint.wake_bodies",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.shape.are_contact_events_enabled",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.shape.are_hit_events_enabled",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.shape.are_pre_solve_events_enabled",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.shape.are_sensor_events_enabled",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.shape.enable_contact_events",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.shape.enable_hit_events",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.shape.enable_pre_solve_events",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.shape.enable_sensor_events",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.shape.get_body",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.shape.get_closest_point",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.shape.get_contact_capacity",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.shape.get_contact_data",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.shape.get_mass_data",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.shape.get_material",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.shape.get_sensor_capacity",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.shape.get_sensor_overlaps",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.shape.get_shape",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.shape.get_world",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.shape.is_valid",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.shape.ray_cast",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.shape.set_material",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.shape.set_shape",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.world.cast_mover",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.world.cast_ray",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.world.cast_ray_closest",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.world.cast_shape",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.world.collide_mover",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.world.enable_continuous",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.world.enable_sleeping",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.world.enable_speculative",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.world.enable_warm_starting",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.world.explode",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.world.get_awake_body_count",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.world.get_counters",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.world.get_gravity",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.world.get_hit_event_threshold",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.world.get_maximum_linear_speed",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.world.get_profile",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.world.get_restitution_threshold",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.world.is_continuous_enabled",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.world.is_locked",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.world.is_sleeping_enabled",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.world.is_valid",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.world.is_warm_starting_enabled",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.world.overlap_aabb",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.world.overlap_shape",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.world.rebuild_static_tree",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.world.set_contact_tuning",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.world.set_gravity",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.world.set_hit_event_threshold",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.world.set_joint_tuning",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.world.set_maximum_linear_speed",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "b2d.world.set_restitution_threshold",
+      "state": "target-variant",
+      "targetStates": [
+        "unresolved",
+        "registered"
+      ]
+    },
+    {
+      "route": "bit.arshift",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bit.band",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bit.bnot",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bit.bor",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bit.bswap",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bit.bxor",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bit.lshift",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bit.rol",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bit.ror",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bit.rshift",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bit.tobit",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bit.tohex",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "buffer.copy_buffer",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "buffer.copy_stream",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "buffer.create",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "buffer.get_bytes",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "buffer.get_metadata",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "buffer.get_stream",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "buffer.set_metadata",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.collision_object.activate",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.collision_object.force_activation_state",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.collision_object.get_activation_state",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.collision_object.get_ccd_motion_threshold",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.collision_object.get_ccd_swept_sphere_radius",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.collision_object.get_collision_filter_group",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.collision_object.get_collision_filter_mask",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.collision_object.get_collision_flags",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.collision_object.get_contact_processing_threshold",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.collision_object.get_deactivation_time",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.collision_object.get_friction",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.collision_object.get_internal_type",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.collision_object.get_position",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.collision_object.get_restitution",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.collision_object.get_rotation",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.collision_object.get_shape",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.collision_object.get_shape_count",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.collision_object.get_shapes",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.collision_object.get_world_transform",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.collision_object.has_collision_flag",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.collision_object.has_contact_response",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.collision_object.is_active",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.collision_object.is_awake",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.collision_object.is_ghost_object",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.collision_object.is_kinematic",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.collision_object.is_rigid_body",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.collision_object.is_static",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.collision_object.is_static_or_kinematic",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.collision_object.is_valid",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.collision_object.set_activation_state",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.collision_object.set_awake",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.collision_object.set_ccd_motion_threshold",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.collision_object.set_ccd_swept_sphere_radius",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.collision_object.set_contact_processing_threshold",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.collision_object.set_deactivation_time",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.collision_object.set_friction",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.collision_object.set_position",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.collision_object.set_restitution",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.collision_object.set_rotation",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.collision_object.set_world_transform",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.create_cone_twist",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.create_generic_6dof",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.create_generic_6dof_spring",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.create_hinge",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.create_hinge2",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.create_point_to_point",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.create_slider",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.create_universal",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.destroy",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.enable_cone_twist_motor",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.enable_spring",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.get_6dof_angle",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.get_6dof_axis",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.get_6dof_motor",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.get_6dof_position",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.get_anchors",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.get_angles",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.get_axes",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.get_body_a",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.get_body_b",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.get_collide_connected",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.get_cone_twist_limits",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.get_frame_a",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.get_frame_b",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.get_hinge_angle",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.get_hinge_limits",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.get_hinge_motor",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.get_limit",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.get_pivots",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.get_slider_limits",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.get_slider_motor",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.get_slider_position",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.get_twist_angle",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.get_type",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.get_type_name",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.get_use_linear_reference_frame_a",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.get_world",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.is_active",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.is_angular_only",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.is_limited",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.is_past_swing_limit",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.is_valid",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.set_6dof_motor",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.set_angular_only",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.set_cone_twist_limits",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.set_cone_twist_motor_target",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.set_frame_a",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.set_frame_b",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.set_hinge_axis",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.set_hinge_limits",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.set_hinge_motor",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.set_hinge_motor_target",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.set_limit",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.set_pivots",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.set_slider_limits",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.set_slider_motor",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.set_spring_damping",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.set_spring_equilibrium_point",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.constraint.set_spring_stiffness",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.get_collision_object",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.get_rigid_body",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.get_version",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.get_world",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.apply_central_force",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.apply_central_impulse",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.apply_force",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.apply_force_at_relative_position",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.apply_impulse",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.apply_linear_impulse",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.apply_torque",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.apply_torque_impulse",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.clear_forces",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.compute_aabb",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.get_angular_damping",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.get_angular_factor",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.get_angular_sleeping_threshold",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.get_angular_velocity",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.get_center_of_mass_position",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.get_damping",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.get_flags",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.get_gravity",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.get_inverse_mass",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.get_linear_damping",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.get_linear_factor",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.get_linear_sleeping_threshold",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.get_linear_velocity",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.get_linear_velocity_from_local_point",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.get_linear_velocity_from_world_point",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.get_local_inertia",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.get_mass",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.get_total_force",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.get_total_torque",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.get_velocity_in_local_point",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.get_world",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.has_flag",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.is_valid",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.set_angular_damping",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.set_angular_factor",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.set_angular_velocity",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.set_damping",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.set_flags",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.set_gravity",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.set_linear_damping",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.set_linear_factor",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.set_linear_velocity",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.set_mass",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.set_mass_properties",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.rigid_body.set_sleeping_thresholds",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.shape.get_collision_object",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.shape.get_index",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.shape.get_local_transform",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.shape.get_shape",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.shape.get_type",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.shape.is_valid",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.shape.set_local_transform",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.shape.set_shape",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.world.cast_ray",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.world.cast_ray_async",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.world.cast_ray_closest",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.world.cast_shape",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.world.cast_shape_async",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.world.cast_shape_closest",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.world.contact_pair_test",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.world.contact_test",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.world.get_collision_object_count",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.world.get_collision_objects",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.world.get_gravity",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.world.is_valid",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.world.overlap_aabb",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.world.overlap_point",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.world.overlap_shape",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "bullet3d.world.set_gravity",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "camera.get_aspect_ratio",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "camera.get_auto_aspect_ratio",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "camera.get_cameras",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "camera.get_enabled",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "camera.get_far_z",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "camera.get_fov",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "camera.get_near_z",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "camera.get_orthographic_auto_zoom",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "camera.get_orthographic_mode",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "camera.get_orthographic_zoom",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "camera.get_projection",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "camera.get_view",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "camera.screen_to_world",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "camera.screen_xy_to_world",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "camera.set_aspect_ratio",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "camera.set_auto_aspect_ratio",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "camera.set_far_z",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "camera.set_fov",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "camera.set_near_z",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "camera.set_orthographic_mode",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "camera.set_orthographic_zoom",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "camera.world_to_screen",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "collectionfactory.create",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "collectionfactory.get_status",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "collectionfactory.load",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "collectionfactory.set_prototype",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "collectionfactory.unload",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "collectionproxy.get_resources",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "collectionproxy.load",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "collectionproxy.set_collection",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "compute.get_constants",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "compute.get_samplers",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "compute.get_textures",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "compute.set_constants",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "compute.set_samplers",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "compute.set_textures",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "crash.get_backtrace",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "crash.get_extra_data",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "crash.get_modules",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "crash.get_signum",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "crash.get_sys_field",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "crash.get_user_field",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "crash.load_previous",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "crash.release",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "crash.set_file_path",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "crash.set_user_field",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "crash.write_dump",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "factory.create",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "factory.get_status",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "factory.load",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "factory.set_prototype",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "factory.unload",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "font.add_font",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "font.get_info",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "font.prewarm_text",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "font.remove_font",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "font.set_style",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "go.animate",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "go.cancel_animations",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "go.delete",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "go.exists",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "go.get",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "go.get_id",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "go.get_parent",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "go.get_position",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "go.get_rotation",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "go.get_scale",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "go.get_scale_uniform",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "go.get_world_position",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "go.get_world_rotation",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "go.get_world_scale",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "go.get_world_scale_uniform",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "go.get_world_transform",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "go.property",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "go.set",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "go.set_parent",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "go.set_position",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "go.set_rotation",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "go.set_scale",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "go.set_scale_xy",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "go.update_world_transform",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "go.world_to_local_position",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "go.world_to_local_transform",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "graphics.get_adapter_info",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "graphics.get_engine_adapters",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.animate",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.cancel_animations",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.cancel_flipbook",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.clone",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.clone_tree",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.delete_node",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.delete_texture",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_adjust_mode",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_alpha",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_blend_mode",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_clipping_inverted",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_clipping_mode",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_clipping_visible",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_color",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_euler",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_fill_angle",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_flipbook",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_flipbook_cursor",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_flipbook_playback_rate",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_font",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_font_resource",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_height",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_id",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_index",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_inherit_alpha",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_inner_radius",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_layer",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_layout",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_layout_objects",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_layouts",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_leading",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_line_break",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_material",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_node",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_outer_bounds",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_outline",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_parent",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_particlefx",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_perimeter_vertices",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_pivot",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_position",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_rotation",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_scale",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_screen_position",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_shadow",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_size",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_size_mode",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_slice9",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_text",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_texture",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_tracking",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_tree",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_type",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_visible",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_width",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_xanchor",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.get_yanchor",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.hide_keyboard",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.is_enabled",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.move_above",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.move_below",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.new_box_node",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.new_particlefx_node",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.new_pie_node",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.new_text_node",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.new_texture",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.pick_node",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.play_flipbook",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.play_particlefx",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.reset_keyboard",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.reset_material",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.reset_nodes",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.screen_to_local",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set_adjust_mode",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set_alpha",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set_blend_mode",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set_clipping_inverted",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set_clipping_mode",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set_clipping_visible",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set_color",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set_enabled",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set_euler",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set_fill_angle",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set_flipbook_cursor",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set_flipbook_playback_rate",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set_font",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set_id",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set_inherit_alpha",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set_inner_radius",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set_layer",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set_layout",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set_leading",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set_line_break",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set_material",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set_outer_bounds",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set_outline",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set_parent",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set_particlefx",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set_perimeter_vertices",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set_pivot",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set_position",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set_render_order",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set_rotation",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set_safe_area_mode",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set_scale",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set_screen_position",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set_shadow",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set_size",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set_size_mode",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set_slice9",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set_text",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set_texture",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set_texture_data",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set_tracking",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set_visible",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set_xanchor",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.set_yanchor",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.show_keyboard",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "gui.stop_particlefx",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "hash",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "hash_to_hex",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "html5.run",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "html5.set_interaction_listener",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "http.request",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "image.get_astc_header",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "image.load",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "image.load_buffer",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "json.decode",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "json.encode",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "label.get_layout_objects",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "label.get_text",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "label.set_text",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "liveupdate.add_mount",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "liveupdate.get_mounts",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "liveupdate.is_built_with_excluded_files",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "liveupdate.remove_mount",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "material.get_constants",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "material.get_samplers",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "material.get_textures",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "material.get_vertex_attributes",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "material.set_constants",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "material.set_samplers",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "material.set_textures",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "material.set_vertex_attributes",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "model.cancel",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "model.get_aabb",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "model.get_blend_weights",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "model.get_go",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "model.get_mesh_aabb",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "model.get_mesh_enabled",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "model.play_anim",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "model.reset_constant",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "model.set_blend_weights",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "model.set_mesh_enabled",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "msg.post",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "msg.url",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "particlefx.play",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "particlefx.reset_constant",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "particlefx.set_constant",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "particlefx.stop",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "physics.create_joint",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "physics.destroy_joint",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "physics.get_gravity",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "physics.get_group",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "physics.get_joint_properties",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "physics.get_joint_reaction_force",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "physics.get_joint_reaction_torque",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "physics.get_maskbit",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "physics.get_shape",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "physics.raycast",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "physics.raycast_async",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "physics.set_event_listener",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "physics.set_gravity",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "physics.set_group",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "physics.set_hflip",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "physics.set_joint_properties",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "physics.set_maskbit",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "physics.set_shape",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "physics.set_vflip",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "physics.update_mass",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "physics.wakeup",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "pprint",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "profiler.dump_frame",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "profiler.enable",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "profiler.enable_ui",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "profiler.get_cpu_usage",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "profiler.get_memory_usage",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "profiler.log_text",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "profiler.recorded_frame_count",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "profiler.scope_begin",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "profiler.scope_end",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "profiler.set_ui_mode",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "profiler.set_ui_view_mode",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "profiler.set_ui_vsync_wait_visible",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "profiler.view_recorded_frame",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "render.clear",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "render.constant_buffer",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "render.delete_render_target",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "render.disable_material",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "render.disable_state",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "render.disable_texture",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "render.dispatch_compute",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "render.draw",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "render.draw_debug3d",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "render.enable_material",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "render.enable_state",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "render.enable_texture",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "render.get_height",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "render.get_render_target_height",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "render.get_render_target_width",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "render.get_width",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "render.get_window_height",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "render.get_window_width",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "render.predicate",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "render.render_target",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "render.set_blend_equation_separate",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "render.set_blend_func",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "render.set_blend_func_separate",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "render.set_camera",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "render.set_color_mask",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "render.set_compute",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "render.set_cull_face",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "render.set_depth_func",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "render.set_depth_mask",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "render.set_listener",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "render.set_polygon_offset",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "render.set_projection",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "render.set_render_target",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "render.set_render_target_size",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "render.set_stencil_func",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "render.set_stencil_mask",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "render.set_stencil_op",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "render.set_view",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "render.set_viewport",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "resource.atlas",
+      "state": "documentation-only",
+      "targetStates": [
+        "unresolved",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "resource.buffer",
+      "state": "documentation-only",
+      "targetStates": [
+        "unresolved",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "resource.create_atlas",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "resource.create_buffer",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "resource.create_sound_data",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "resource.create_texture",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "resource.create_texture_async",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "resource.font",
+      "state": "documentation-only",
+      "targetStates": [
+        "unresolved",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "resource.get_atlas",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "resource.get_buffer",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "resource.get_render_target_info",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "resource.get_text_metrics",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "resource.get_texture_info",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "resource.load",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "resource.material",
+      "state": "documentation-only",
+      "targetStates": [
+        "unresolved",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "resource.release",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "resource.render_target",
+      "state": "documentation-only",
+      "targetStates": [
+        "unresolved",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "resource.set",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "resource.set_atlas",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "resource.set_buffer",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "resource.set_sound",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "resource.set_texture",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "resource.texture",
+      "state": "documentation-only",
+      "targetStates": [
+        "unresolved",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "resource.tile_source",
+      "state": "documentation-only",
+      "targetStates": [
+        "unresolved",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "socket.connect",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "socket.dns.getaddrinfo",
+      "state": "documentation-only",
+      "targetStates": [
+        "unresolved",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "socket.dns.gethostname",
+      "state": "documentation-only",
+      "targetStates": [
+        "unresolved",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "socket.dns.getnameinfo",
+      "state": "documentation-only",
+      "targetStates": [
+        "unresolved",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "socket.dns.tohostname",
+      "state": "documentation-only",
+      "targetStates": [
+        "unresolved",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "socket.dns.toip",
+      "state": "documentation-only",
+      "targetStates": [
+        "unresolved",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "socket.gettime",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "socket.newtry",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "socket.protect",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "socket.select",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "socket.skip",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "socket.sleep",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "socket.tcp",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "socket.tcp6",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "socket.udp",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "socket.udp6",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sound.get_group_gain",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sound.get_group_name",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sound.get_groups",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sound.get_peak",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sound.get_rms",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sound.is_music_playing",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sound.is_phone_call_active",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sound.pause",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sound.play",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sound.set_gain",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sound.set_group_gain",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sound.set_pan",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sound.stop",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sprite.play_flipbook",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sprite.reset_constant",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sprite.set_hflip",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sprite.set_vflip",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sys.deserialize",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sys.exists",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sys.exit",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sys.get_application_info",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sys.get_application_path",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sys.get_config_boolean",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sys.get_config_int",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sys.get_config_number",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sys.get_config_string",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sys.get_connectivity",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sys.get_engine_info",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sys.get_host_path",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sys.get_ifaddrs",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sys.get_save_file",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sys.get_sys_info",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sys.load",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sys.load_buffer",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sys.load_buffer_async",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sys.load_resource",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sys.open_url",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sys.reboot",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sys.save",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sys.serialize",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sys.set_connectivity_host",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sys.set_engine_throttle",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sys.set_error_handler",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sys.set_render_enable",
+      "state": "documentation-only",
+      "targetStates": [
+        "unresolved",
+        "unresolved"
+      ]
+    },
+    {
+      "route": "sys.set_update_frequency",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "sys.set_vsync_swap_interval",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "tilemap.get_bounds",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "tilemap.get_tile",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "tilemap.get_tile_info",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "tilemap.get_tiles",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "tilemap.reset_constant",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "tilemap.set_tile",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "tilemap.set_visible",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "timer.cancel",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "timer.delay",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "timer.get_info",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "timer.trigger",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "types.is_hash",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "types.is_matrix4",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "types.is_quat",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "types.is_url",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "types.is_vector",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "types.is_vector3",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "types.is_vector4",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "vmath.clamp",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "vmath.conj",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "vmath.cross",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "vmath.dot",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "vmath.euler_to_quat",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "vmath.inv",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "vmath.length",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "vmath.length_sqr",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "vmath.lerp",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "vmath.matrix4",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "vmath.matrix4_axis_angle",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "vmath.matrix4_compose",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "vmath.matrix4_frustum",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "vmath.matrix4_look_at",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "vmath.matrix4_orthographic",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "vmath.matrix4_perspective",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "vmath.matrix4_quat",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "vmath.matrix4_rotation_x",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "vmath.matrix4_rotation_y",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "vmath.matrix4_rotation_z",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "vmath.matrix4_scale",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "vmath.matrix4_translation",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "vmath.mul_per_elem",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "vmath.normalize",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "vmath.ortho_inv",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "vmath.project",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "vmath.quat",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "vmath.quat_axis_angle",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "vmath.quat_basis",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "vmath.quat_from_to",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "vmath.quat_matrix4",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "vmath.quat_rotation_x",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "vmath.quat_rotation_y",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "vmath.quat_rotation_z",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "vmath.quat_to_euler",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "vmath.rotate",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "vmath.slerp",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "vmath.vector",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "vmath.vector3",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "vmath.vector4",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "window.get_dim_mode",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "window.get_display_scale",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "window.get_mouse_lock",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "window.get_safe_area",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "window.get_size",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "window.set_dim_mode",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "window.set_listener",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "window.set_mouse_lock",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "window.set_position",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "window.set_size",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "window.set_title",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "zlib.deflate",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    },
+    {
+      "route": "zlib.inflate",
+      "state": "registered",
+      "targetStates": [
+        "registered",
+        "registered"
+      ]
+    }
+  ],
   "findings": [
     {
       "route": "go.animate",

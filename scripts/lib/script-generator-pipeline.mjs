@@ -241,8 +241,8 @@ export const scriptGenerationSteps = Object.freeze([
   Object.freeze({ runtime: "node", script: "scripts/generate-script-projection-ir.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-defold-value-layouts.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-script-universal-value-bindings.mjs" }),
-  Object.freeze({ runtime: "node", script: "scripts/generate-typed-native-bridge.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-script-handle-lowering.mjs" }),
+  Object.freeze({ runtime: "node", script: "scripts/generate-typed-native-bridge.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-script-recording-engine.mjs" })
 ]);
 

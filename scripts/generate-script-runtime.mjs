@@ -19,7 +19,20 @@ function parseArguments(argv) {
 
 export async function runScriptGeneration({ check = false, root = repositoryRoot } = {}) {
   const results = [];
+  let loweringPlanChecked = false;
   for (const step of scriptGenerationSteps) {
+    // The typed-native bridge and recording engine consume the canonical plan,
+    // while the plan consumes the script reports emitted above them. Materialize
+    // that join exactly once before its first consumer so a clean generation is
+    // a single pass rather than "generate, discover staleness, generate again".
+    if (!loweringPlanChecked && step.script === "scripts/generate-typed-native-bridge.mjs") {
+      const planResult = await execFileAsync(process.execPath, [
+        "scripts/ensure-binding-lowering-plan.mjs",
+        ...(check ? ["--check"] : []),
+      ], { cwd: root, maxBuffer: 16 * 1024 * 1024 });
+      results.push({ runtime: "node", script: "scripts/ensure-binding-lowering-plan.mjs", ...planResult });
+      loweringPlanChecked = true;
+    }
     const command = step.runtime === "node" ? process.execPath : step.runtime;
     const args = [step.script, ...(check ? ["--check"] : [])];
     const result = await execFileAsync(command, args, {

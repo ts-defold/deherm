@@ -6,8 +6,421 @@
     "package": "@ts-defold/deherm",
     "version": "0.0.0"
   },
+  "toolchain": {
+    "pins": {
+      "ANDROID_64_NDK_API_VERSION": "21",
+      "ANDROID_BUILD_TOOLS_VERSION": "36.1.0",
+      "ANDROID_NDK_API_VERSION": "19",
+      "ANDROID_NDK_VERSION": "25b",
+      "ANDROID_PACKAGE": "android-36",
+      "ANDROID_TARGET_API_LEVEL": "36",
+      "EMSCRIPTEN_SDK": "sdk-4.0.6-64bit",
+      "EMSCRIPTEN_VERSION_STR": "4.0.6",
+      "MACOS_ASAN_PATH": "usr/lib/clang/%s/lib/darwin/libclang_rt.asan_osx_dynamic.dylib",
+      "PACKAGES_EMSCRIPTEN_SDK": "emsdk-4.0.6",
+      "PACKAGES_IOS_SDK": "iPhoneOS26.5.sdk",
+      "PACKAGES_IOS_SIMULATOR_SDK": "iPhoneSimulator26.5.sdk",
+      "PACKAGES_MACOS_SDK": "MacOSX26.5.sdk",
+      "PACKAGES_WIN32_SDK": "WindowsKits-10.0.28000.0",
+      "PACKAGES_WIN32_TOOLCHAIN": "Microsoft-Visual-Studio-2026-14.51.36231",
+      "PACKAGES_XCODE_TOOLCHAIN": "XcodeDefault26.5.xctoolchain",
+      "SWIFT_VERSION": "6.2",
+      "VERSION_EDITOR_JDK": "25.0.4.1+1",
+      "VERSION_IPHONEOS": "26.5",
+      "VERSION_IPHONEOS_MIN": "11.0",
+      "VERSION_IPHONESIMULATOR": "26.5",
+      "VERSION_LINUX_CLANG": "20.1.8",
+      "VERSION_MACOSX": "26.5",
+      "VERSION_MACOSX_MIN": "10.15",
+      "VERSION_WINDOWS_MSVC": "14.51.36231",
+      "VERSION_WINDOWS_SDK": "10.0.28000.0",
+      "VERSION_XCODE": "26.5",
+      "VERSION_XCODE_CLANG": "21.0.0",
+      "VISUAL_STUDIO_VERSION": "2026"
+    },
+    "targetMatrix": {
+      "authority": {
+        "pairs": "upstream/defold/com.dynamo.cr/com.dynamo.cr.bob/src/com/dynamo/bob/Platform.java",
+        "targets": "upstream/defold/share/extender/build_input.yml"
+      },
+      "platformPairs": [
+        {
+          "bobPlatform": "arm64_sim-ios",
+          "extenderTarget": "arm64_sim-ios"
+        },
+        {
+          "bobPlatform": "arm64-android",
+          "extenderTarget": "arm64-android"
+        },
+        {
+          "bobPlatform": "arm64-ios",
+          "extenderTarget": "arm64-ios"
+        },
+        {
+          "bobPlatform": "arm64-linux",
+          "extenderTarget": "arm64-linux"
+        },
+        {
+          "bobPlatform": "arm64-macos",
+          "extenderTarget": "arm64-osx"
+        },
+        {
+          "bobPlatform": "armv7-android",
+          "extenderTarget": "armv7-android"
+        },
+        {
+          "bobPlatform": "wasm_pthread-web",
+          "extenderTarget": "wasm_pthread-web"
+        },
+        {
+          "bobPlatform": "wasm-web",
+          "extenderTarget": "wasm-web"
+        },
+        {
+          "bobPlatform": "x86_64-android",
+          "extenderTarget": "x86_64-android"
+        },
+        {
+          "bobPlatform": "x86_64-linux",
+          "extenderTarget": "x86_64-linux"
+        },
+        {
+          "bobPlatform": "x86_64-macos",
+          "extenderTarget": "x86_64-osx"
+        },
+        {
+          "bobPlatform": "x86_64-win32",
+          "extenderTarget": "x86_64-win32"
+        }
+      ],
+      "targets": [
+        {
+          "architecture": "arm64_sim",
+          "group": "ios",
+          "kind": "bundle",
+          "target": "arm64_sim-ios"
+        },
+        {
+          "architecture": "arm64",
+          "group": "android",
+          "kind": "bundle",
+          "target": "arm64-android"
+        },
+        {
+          "architecture": "arm64",
+          "group": "ios",
+          "kind": "bundle",
+          "target": "arm64-ios"
+        },
+        {
+          "architecture": "arm64",
+          "group": "linux",
+          "kind": "bundle",
+          "target": "arm64-linux"
+        },
+        {
+          "architecture": "arm64",
+          "group": "osx",
+          "kind": "bundle",
+          "target": "arm64-osx"
+        },
+        {
+          "architecture": "armv7",
+          "group": "android",
+          "kind": "bundle",
+          "target": "armv7-android"
+        },
+        {
+          "architecture": "wasm_pthread",
+          "group": "web",
+          "kind": "bundle",
+          "target": "wasm_pthread-web"
+        },
+        {
+          "architecture": "wasm",
+          "group": "web",
+          "kind": "bundle",
+          "target": "wasm-web"
+        },
+        {
+          "architecture": "x86_64",
+          "group": "android",
+          "kind": "bundle",
+          "target": "x86_64-android"
+        },
+        {
+          "architecture": "x86_64",
+          "group": "linux",
+          "kind": "bundle",
+          "target": "x86_64-linux"
+        },
+        {
+          "architecture": "x86_64",
+          "group": "osx",
+          "kind": "bundle",
+          "target": "x86_64-osx"
+        },
+        {
+          "architecture": "x86_64",
+          "group": "win32",
+          "kind": "bundle",
+          "target": "x86_64-win32"
+        },
+        {
+          "architecture": "x86",
+          "group": "osx",
+          "kind": "retired",
+          "target": "x86-osx"
+        }
+      ]
+    },
+    "bob": {
+      "url": "https://d.defold.com/archive/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/bob/bob.jar",
+      "sha256": "8a8a8c4ebc725279d8ddae17c4eb3d72d6db90a498302960ca341e61fa489cb8"
+    }
+  },
+  "artifacts": {
+    "schemaVersion": 1,
+    "kind": "deherm.policy.artifacts",
+    "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+    "artifacts": {
+      "hermes-host": {
+        "tag": "hermes-7d678790fcd9",
+        "fingerprint": "7d678790fcd918420ac4a79e956d3bfc1c3423d3b8dd5c872c91c935d84dd583",
+        "indexedBy": "host",
+        "summary": "hermesc and shermes, per user host",
+        "assets": {
+          "darwin-arm64": "hermes-host-darwin-arm64.tar.gz",
+          "darwin-x64": "hermes-host-darwin-x64.tar.gz",
+          "linux-arm64": "hermes-host-linux-arm64.tar.gz",
+          "linux-x64": "hermes-host-linux-x64.tar.gz",
+          "win32-x64": "hermes-host-win32-x64.tar.gz"
+        },
+        "contents": {
+          "darwin-arm64": [
+            "hermesc",
+            "shermes"
+          ],
+          "darwin-x64": [
+            "hermesc",
+            "shermes"
+          ],
+          "linux-arm64": [
+            "hermesc",
+            "shermes"
+          ],
+          "linux-x64": [
+            "hermesc",
+            "shermes"
+          ],
+          "win32-x64": [
+            "hermesc.exe",
+            "shermes.exe"
+          ]
+        }
+      },
+      "dehermc": {
+        "tag": "tools-636828df1c50",
+        "fingerprint": "636828df1c508bd99aff1478e68ccd2ea563f996dda5003c2211603ff5e15e15",
+        "indexedBy": "host",
+        "summary": "dehermc, déherm's TypeScript transform compiler, per user host",
+        "assets": {
+          "darwin-arm64": "dehermc-darwin-arm64.tar.gz",
+          "darwin-x64": "dehermc-darwin-x64.tar.gz",
+          "linux-arm64": "dehermc-linux-arm64.tar.gz",
+          "linux-x64": "dehermc-linux-x64.tar.gz",
+          "win32-x64": "dehermc-win32-x64.tar.gz"
+        },
+        "contents": {
+          "darwin-arm64": [
+            "dehermc"
+          ],
+          "darwin-x64": [
+            "dehermc"
+          ],
+          "linux-arm64": [
+            "dehermc"
+          ],
+          "linux-x64": [
+            "dehermc"
+          ],
+          "win32-x64": [
+            "dehermc.exe"
+          ]
+        }
+      },
+      "native-artifacts": {
+        "tag": "libs-52a1faec5d17",
+        "fingerprint": "52a1faec5d177f7df14b4d76b33336b9c2db07f0c5e179febc765a612ae1df98",
+        "indexedBy": "bundleTarget",
+        "summary": "Hermes release/debug libraries plus generated target config, per Defold bundle target",
+        "assets": {
+          "arm64_sim-ios": "hermes-arm64_sim-ios.tar.gz",
+          "arm64-android": "hermes-arm64-android.tar.gz",
+          "arm64-ios": "hermes-arm64-ios.tar.gz",
+          "arm64-linux": "hermes-arm64-linux.tar.gz",
+          "arm64-osx": "hermes-arm64-osx.tar.gz",
+          "armv7-android": "hermes-armv7-android.tar.gz",
+          "x86_64-android": "hermes-x86_64-android.tar.gz",
+          "x86_64-linux": "hermes-x86_64-linux.tar.gz",
+          "x86_64-osx": "hermes-x86_64-osx.tar.gz",
+          "x86_64-win32": "hermes-x86_64-win32.tar.gz"
+        },
+        "contents": {
+          "arm64_sim-ios": [
+            "libhermes.a",
+            "libhermes.debug.a",
+            "libhermesvm-config.h"
+          ],
+          "arm64-android": [
+            "libhermes.a",
+            "libhermes.debug.a",
+            "libhermesvm-config.h"
+          ],
+          "arm64-ios": [
+            "libhermes.a",
+            "libhermes.debug.a",
+            "libhermesvm-config.h"
+          ],
+          "arm64-linux": [
+            "libhermes.a",
+            "libhermes.debug.a",
+            "libhermesvm-config.h"
+          ],
+          "arm64-osx": [
+            "libhermes.a",
+            "libhermes.debug.a",
+            "libhermesvm-config.h"
+          ],
+          "armv7-android": [
+            "libhermes.a",
+            "libhermes.debug.a",
+            "libhermesvm-config.h"
+          ],
+          "x86_64-android": [
+            "libhermes.a",
+            "libhermes.debug.a",
+            "libhermesvm-config.h"
+          ],
+          "x86_64-linux": [
+            "libhermes.a",
+            "libhermes.debug.a",
+            "libhermesvm-config.h"
+          ],
+          "x86_64-osx": [
+            "libhermes.a",
+            "libhermes.debug.a",
+            "libhermesvm-config.h"
+          ],
+          "x86_64-win32": [
+            "hermes.lib",
+            "hermes.debug.lib",
+            "libhermesvm-config.h"
+          ]
+        },
+        "compatibility": {
+          "kind": "deherm.native-artifact-compatibility",
+          "sha256": "201a2a3626b57fa786ff71b3a0966bbcf21943ef5f1ed02d2880c18e4920a584"
+        }
+      }
+    },
+    "releaseAsset": "https://github.com/ts-defold/deherm/releases/download/{tag}/{asset}"
+  },
+  "generation": {
+    "schemaVersion": 1,
+    "projectGeneratorSha256": "8f16d851ed7db10a7eb88be741b19c4f9842a469279be4dcb512eae31e9639a7",
+    "nativeExtensionGeneratorSha256": "1494c6ff4296f9684764a8cd41c49462cf666b39c6372dbe94b484851e479646",
+    "nativeExtensionClang": {
+      "required": false
+    },
+    "staticHermesInputs": {
+      "outputs": {
+        "script-universal-value.ts": "33c9581fe6ea668cd266dbfcd3cf905f2f84277d775ef23d65d7c366c9a245b0",
+        "script-typed-native-bridge.ts": "d8b7183d3f003300e068f840673221d15dae9d68be9f98310ec993fd9fb3eb1f"
+      }
+    },
+    "cacheKey": "bd27691a206d1ef15532ca7d62fe09ee44bf3a3c40c56010f5b24cf7880d13f6"
+  },
+  "defoldResolution": {
+    "schemaVersion": 1,
+    "revision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+    "source": "extender-build",
+    "authority": "historical",
+    "evidence": {
+      "archive": ".internal/cache/arm64-osx/build.zip",
+      "platform": "arm64-osx",
+      "size": 7775363,
+      "modifiedMs": 1789891165328
+    }
+  },
+  "defoldSurface": {
+    "layer": "user-cache"
+  },
+  "generationMerkle": {
+    "schemaVersion": 1,
+    "engineRoot": "2d52d14882e19aa0dec618d4f6674001298162724ab4298aeef712137e6f24dc",
+    "nativeRoot": "e1ef977771a80e832996946b7ece4f24713eee7f9a0710da293520cbe24f827a",
+    "root": "fe9fceac05fc7fefc3b1966db9f5dd5c204f8af9a034b8ade614bde10fab70c7"
+  },
   "inputs": {
-    "scriptIrSha256": "a5603ef4b7c2ef94a5503693cc5692cc4f0e165d11a4ee8b44453093eef33f89",
-    "dmsdkIrSha256": "70cb64c1c6177ca32bcfe10bb87f99ec77d6d91cea455c33d9aaafdf3df90d87"
+    "valueLayoutsSha256": "a70876547c5c36d0dde6d6a3bf2e51c46dc0d00de6e46918eb01f82b149c7de3",
+    "componentContractSha256": "68d10d5b9d1611c63ed63fcf7e3a107d20a3ed6ba3ccdf3df409466595289032",
+    "scriptIrSha256": "178b8be87bf00c549462c55857901fdc709c231a59fe218a6f5d974fc210c2a3",
+    "dmsdkIrSha256": "c6736591d3336bb0bfef8902fab4ea17b7883c44c35d04bce1dd256e5c2969b5",
+    "scriptDispatchSha256": "dc668e3d12967ddb57a06d73b871365273c6a1560c85eef2d69ce8bd31fab02b",
+    "scriptPatternsSha256": "dfc33630937b6c1e5982c64f3e42262c5f637c210c5c4e0af429dd5efab29a5b",
+    "dmsdkPatternsSha256": "f82185471cccd913c313c25f9c075c495daccab8cb5d1135e2ffd0ec73d47a17",
+    "scriptProbesSha256": "e0fa344053537521bd254b2bd38bf85f8b9b1304c4d4fd0d6d64db166c705ac7",
+    "scriptAccountingSha256": "4737d5e663cd1e0e77924a77f0d2f0d93bddfc95a49246de6a0aa720ef586f88",
+    "scriptUniversalSha256": "6334b454c2c3172030396dc2ff95721fd226f229b3c337ece99a2dd670b6d3b0",
+    "scriptProfilesSha256": "5d03862ee902d5ef1c1bb7b3187873616a76608a45bdcc862269e4632b3ec188",
+    "loweringPlanSha256": "5d4b93e60d6393840da5b02271ba42978d685a59c59464eea234fd592f837195",
+    "loweringPlanSentinelSha256": "3ffc751f1736e1c9a32d1e9ebec012afeaaff89e8d64c28a099ddf27f7544a31",
+    "dmsdkThunksSha256": "c20f04ba8a87115b34d260e5e1c114b9f1e3c5094cd28d5de4a40c3519278f09",
+    "dmsdkUniversalSha256": "6aef97c1e3c1046f7170afae133500da4e488e6a84ddee5d69270da40a0df239",
+    "resourceSchemaSha256": "8115043c9dc8626b254bca01ddbae853a1a4ebfec709d703eacee770ffc7c970",
+    "resourceNamespacesSha256": "9893e932b1e41d3064e95c12812884b62456857c27e16274fba3671941e2b728",
+    "toolchainSha256": "589ef36b86889b849de798c841ca64230c1729c64252ed040d8df272c2c549a9",
+    "sdkSourceSha256": "a172f299dcc5f0d7cb97c024dc3fdf1f0dfc5e0195ab37e7d30e197075b81538",
+    "repositorySourceSha256": "033cde532213b4738604bc213e62c97710793c128085a81d87cdc5ec6b86f645"
+  },
+  "generatedOutputs": {
+    "output": {
+      "script-contexts.json": "a9c779af4cc475a3f84e25b4896a4a4e295c18569cba912d8e36c334f4c7c513",
+      "generated/native-extensions/index.json": "aa831229383d81abe814638ae89aa329981684aeb0327a15fbc2c3df58a6b6cd",
+      "sdk/contexts/shared.ts": "0b612c063a73f6d63187bc6da786f50e67e1a25376a8f0e0d155d1e0bc7fdf8e",
+      "sdk/contexts/game-object.ts": "6e9873278c111dd83a683a0d0bca97304c769d0e9463dc40cb75a2fe223b17ae",
+      "sdk/contexts/gui.ts": "d3c8d111a6ded9f87c1b92a7c91df5c32bf7b77e3c50a910df08427a5515bec7",
+      "sdk/contexts/render.ts": "50c7483fe4752044b89d429128672473dddc257c936756c1f7549ffc6c0e51bb",
+      "static-hermes/generated/script-universal-value.ts": "33c9581fe6ea668cd266dbfcd3cf905f2f84277d775ef23d65d7c366c9a245b0",
+      "static-hermes/generated/script-typed-native-bridge.ts": "d8b7183d3f003300e068f840673221d15dae9d68be9f98310ec993fd9fb3eb1f"
+    },
+    "project": {
+      "tsconfig.deherm.base.json": "0c877d4615c6356293850c647d0f603d348803b80030dace8bf8f887c7c26b36",
+      "tsconfig.deherm.shared.json": "c1abd07b75316b466213efac678d62ae16c6ef95d5cc40fdf721a0c21751ea1c",
+      "tsconfig.deherm.game-object.json": "1103efbc8ca1f45768d3841fa3c83501a18e773c3745c792ddd6ab3765dbd624",
+      "tsconfig.deherm.gui.json": "f12c57e721ce25ac0832c171464ac6e63bba017b63da0c8c49825f1ef1d3f5e5",
+      "tsconfig.deherm.render.json": "cb97f40d49756018a8a4f9f9942856cdbdf31cb486a53f1c9e839cfc695b4eef",
+      "tsconfig.deherm.bundle.json": "f70afddaa7bbe5e3a397230dac668ddbbcfad363ef45f4877a555ba323b6e3bd",
+      "tsconfig.deherm.release.json": "1b320cef3a946c32a3be59027fc06f3e9707e946a8680a344d97e14d651f0ec5",
+      "tsconfig.deherm.json": "0666a9440af963a2797ddb9ecea8cebd95783bfe0ce2f6a6b8c614b25ce4c6ba"
+    }
+  },
+  "generatedSdkSha256": "979ce2d65de1c5f6ae5e613ef5aee2b93dacd4012ddb0afcf8dbe050a3c05a74",
+  "nativeExtensions": {
+    "headerCount": 0,
+    "generatedRouteCount": 0,
+    "blockedRouteCount": 0,
+    "keyedOutput": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05/bd27691a206d1ef15532ca7d62fe09ee44bf3a3c40c56010f5b24cf7880d13f6",
+    "treeSha256": "c1d01a197726bb1fef8130098bdf736bf6976104279a0cffe85f374d6a0a04bf"
+  },
+  "engineProfiles": {
+    "source": "defold-default",
+    "manifest": null,
+    "manifestSha256": null,
+    "defaultProfileId": "default-legacy-bullet",
+    "platforms": {},
+    "catalogSha256": "33ab628fb2dc8e58b5296346f189892f54fa2a23ee3f4c5b063300299066936b",
+    "handshakeSchema": "deherm.script-route-capabilities/v1"
   }
 }

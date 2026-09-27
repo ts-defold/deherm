@@ -4033,3 +4033,48 @@ gated); 1.12.0 selected eight (six emitted, two gated); 1.11.0 selected seven
 lane completed policy materialization and compile verification. The differing
 counts are direct evidence that package code is not replaying the current
 revision's route inventory.
+
+## 2026-09-27 - Explicit Defold trust boundary and sound evidence admission
+
+The binding compiler now distinguishes authoritative product existence from
+optimization proof. Pinned Defold declarations, build selection, and positive
+Lua registrations authorize total API emission. Implementation analysis only
+authorizes a specialized transport; insufficient evidence retains the
+universal recipe rather than suppressing the API.
+
+An adversarial audit falsified the prior `registration-verified` default and
+the admission of partial Clang recovery trees. The corrective wave replaces
+absence-based registration claims with a total per-route, per-engine-variant
+authority ledger and makes errored translation units incapable of contributing
+positive facts. Objective-C++ sources are parsed as Objective-C++ rather than
+forced through C++. Synthetic authority-state cases and compiler-error cases
+exercise the capability boundary instead of pinning individual Defold symbols.
+
+The remaining soundness work is explicit: make semantic facts causal rather
+than co-occurrence based, make one compiler-owned selection plan authoritative
+for every family emitter, make clean-room source closure independent of
+generated outputs, and put fresh cross-revision relational checks in the
+blocking verification graph.
+
+The same wave removed two provenance-only invalidation edges. Static Hermes
+vmath now checks a relational partition instead of a reviewed whole-descriptor
+hash and frozen current-revision counts. Native probe identity hashes the
+executable call plan rather than upstream reporting metadata. A fresh packaged
+arm64-macOS Defold 1.14.0 run executed all 14 scalar probes, all 49 value probes,
+lifecycle update, and clean shutdown; the evidence log and its authenticated
+manifest were recorded from that run.
+
+Generation also exposed and closed a hidden two-pass cycle. Script handle and
+universal reports now precede the canonical lowering-plan checkpoint, and
+typed-native plus recording-engine consumers run only after that checkpoint.
+One generation immediately followed by check-mode succeeds without a second
+repair pass.
+
+The dmSDK clean-room proof is no longer circular. Its source closure is now
+derived conservatively from all pinned public dmSDK function names and the
+Defold engine tree, rather than from the generated semantic-fact artifact being
+verified. The proof also carries the complete engine and SDK include closure,
+so a clean-room translation unit has the same admission outcome as the source
+checkout. Synthetic add, remove, rename, ignored-test, and forged-generated-
+report cases pass, followed by byte-identical regeneration of every owned
+dmSDK artifact.

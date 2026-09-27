@@ -18,29 +18,6 @@ import {
 const execFileAsync = promisify(execFile);
 const repositoryRootDefault = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
-const scalarImplementationEvidence = Object.freeze([
-  "upstream/defold/engine/dlib/src/dlib/log.cpp",
-  "upstream/defold/engine/dlib/src/dlib/profile/profile.cpp",
-  "upstream/defold/engine/dlib/src/dlib/profile/profile_null.cpp",
-  "upstream/defold/engine/dlib/src/dlib/time_apple.cpp",
-  "upstream/defold/engine/dlib/src/dlib/time_posix.cpp",
-  "upstream/defold/engine/dlib/src/dlib/time_win32.cpp",
-  "upstream/defold/engine/dlib/src/dlib/trig_lookup.cpp",
-  "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
-  "upstream/defold/engine/dlib/src/dlib/crypt.cpp",
-  "upstream/defold/engine/dlib/src/dmsdk/dlib/image.h",
-  "upstream/defold/engine/dlib/src/dlib/image.cpp",
-  "upstream/defold/engine/dlib/src/dlib/hash.cpp",
-  "upstream/defold/engine/graphics/src/graphics.cpp",
-]);
-
-const semanticImplementationIncludeTrees = Object.freeze([
-  "upstream/defold/engine/dlib/src/dlib",
-  "upstream/defold/engine/dlib/src/stb",
-  "upstream/defold/engine/dlib/src/mbedtls/tf-psa-crypto/include",
-  "upstream/defold/engine/dlib/src/mbedtls/tf-psa-crypto/drivers/builtin/include",
-]);
-
 function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
@@ -64,6 +41,43 @@ function confined(relativePath, label) {
   const normalized = relativePath.replaceAll("\\", "/");
   assert(!normalized.split("/").includes(".."), `${label} must not escape the repository`);
   return normalized;
+}
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
+}
+
+function implementationTokenPattern(ir) {
+  const names = [
+    ...new Set(
+      (ir.declarations ?? [])
+        .filter(({ kind, name }) => kind === "function" && typeof name === "string")
+        .map(({ name }) => name.split("::").at(-1))
+        .filter(Boolean),
+    ),
+  ].sort((left, right) => right.length - left.length || left.localeCompare(right, "en"));
+  assert(names.length > 0, "dmSDK IR contains no function declarations for implementation discovery");
+  return new RegExp(`\\b(?:${names.map(escapeRegExp).join("|")})\\s*\\(`, "u");
+}
+
+/**
+ * Compute a conservative implementation-source closure from pinned SDK IR.
+ *
+ * This deliberately does not read any generated semantic-fact report. The
+ * clean room must contain every translation unit that could contribute a fact
+ * (including a rejected unit), before that report exists. False positives only
+ * make the clean room larger; false negatives would make the proof unsound.
+ */
+export async function discoverDmSdkImplementationEvidence(repositoryRoot, ir) {
+  const pattern = implementationTokenPattern(ir);
+  const extensions = new Set([".c", ".cc", ".cpp", ".cxx", ".mm"]);
+  const result = [];
+  for (const relative of await walk(repositoryRoot, "upstream/defold/engine")) {
+    if (!extensions.has(path.extname(relative)) || /(?:^|\/)test(?:s)?\//u.test(relative)) continue;
+    const source = await readFile(path.join(repositoryRoot, relative), "utf8");
+    if (pattern.test(source)) result.push(relative);
+  }
+  return result;
 }
 
 async function copyRelative(sourceRoot, targetRoot, relativePath) {
@@ -121,9 +135,14 @@ export async function dmSdkCleanRoomEvidencePaths(repositoryRoot, defoldRevision
     inventory.defoldRevision === defoldRevision,
     `dmSDK inventory revision ${inventory.defoldRevision} does not match upstream.lock ${defoldRevision}`,
   );
-  const result = new Set(scalarImplementationEvidence);
+  const result = new Set(await discoverDmSdkImplementationEvidence(repositoryRoot, ir));
+  // The selected translation units are compiled with the engine root as an
+  // include root. Their complete header closure therefore belongs to the proof
+  // input, not just headers whose path happens to contain `dmsdk`. Copying all
+  // engine headers is a deterministic 14 MiB correctness-first closure and
+  // prevents missing clean-room includes from changing AST/error admission.
   for (const header of await walk(repositoryRoot, "upstream/defold/engine")) {
-    if (header.split("/").includes("dmsdk") && /\.(?:h|hpp)$/u.test(header)) result.add(header);
+    if (/\.(?:h|hpp|inl|inc)$/u.test(header)) result.add(header);
   }
   for (const declaration of [...(inventory.declarations ?? []), ...(inventory.typeSupportDeclarations ?? [])]) {
     if (declaration.header?.startsWith("upstream/defold/engine/")) {
@@ -134,24 +153,6 @@ export async function dmSdkCleanRoomEvidencePaths(repositoryRoot, defoldRevision
     if (declaration.disposition === "generated-raw-call")
       result.add(confined(declaration.header, `${declaration.id}.header`));
   }
-  const sourceFacts = JSON.parse(
-    await readFile(
-      path.join(repositoryRoot, "packages/bindings/generated/defold-dmsdk-source-semantic-facts.json"),
-      "utf8",
-    ),
-  );
-  assert(
-    sourceFacts.defoldRevision === defoldRevision,
-    `dmSDK source-fact revision ${sourceFacts.defoldRevision} does not match upstream.lock ${defoldRevision}`,
-  );
-  for (const source of sourceFacts.sources ?? []) {
-    result.add(confined(source.path, `${source.path}.source-fact`));
-  }
-  for (const directory of semanticImplementationIncludeTrees) {
-    for (const header of await walk(repositoryRoot, directory)) {
-      if (/\.(?:h|hpp|inl)$/u.test(header)) result.add(header);
-    }
-  }
   const sdkRoot = `upstream/extender/server/app/sdk/${defoldRevision}/defoldsdk`;
   // The universal recipe classifier is deliberately constrained by the public
   // SDK shipped for this exact Defold revision. Copy the complete public include
@@ -159,10 +160,11 @@ export async function dmSdkCleanRoomEvidencePaths(repositoryRoot, defoldRevision
   // turns an absent clean-room input into a false "not publicly callable" fact.
   result.add(`${sdkRoot}/.deherm-sdk-sha256`);
   result.add(`${sdkRoot}/.deherm-sdk-extraction-manifest.json`);
-  for (const header of await walk(repositoryRoot, `${sdkRoot}/sdk/include`)) {
-    if (/\.(?:h|hpp)$/u.test(header)) result.add(header);
+  for (const includeRoot of ["sdk/include", "include", "ext/include"]) {
+    for (const header of await walk(repositoryRoot, `${sdkRoot}/${includeRoot}`)) {
+      if (/\.(?:h|hpp|inl|inc)$/u.test(header)) result.add(header);
+    }
   }
-  result.add(`${sdkRoot}/include/graphics/graphics_ddf.h`);
   const namedScalarPolicy = JSON.parse(
     await readFile(path.join(repositoryRoot, "packages/bindings/overrides/dmsdk-named-scalar-policies.json"), "utf8"),
   );

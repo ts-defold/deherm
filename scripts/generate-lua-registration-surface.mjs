@@ -15,7 +15,7 @@
 import { createHash } from "node:crypto";
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { dirname, isAbsolute, join, posix, relative, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { unzipSync } from "fflate";
 import { parse as parseYaml } from "yaml";
@@ -850,7 +850,41 @@ async function analyzeTarget(target, policy) {
 // Findings must hold in every engine target. The two Box2D builds are mutually
 // exclusive link-time variants, so a route present in one and absent in the
 // other is a variant fact, not a defect, and must not gate anything.
-function buildGate(targets, engineTargetIds) {
+export function buildRouteAuthority(targets, engineTargetIds) {
+  const names = new Set();
+  for (const id of engineTargetIds) {
+    const target = targets[id];
+    for (const route of target.routes ?? []) names.add(route.name);
+    for (const route of target.declaredButUnregistered ?? []) names.add(route.name);
+  }
+  const routes = [...names].sort(compareText).map((route) => {
+    const targetStates = engineTargetIds.map((targetId) => {
+      const target = targets[targetId];
+      if (target.status !== "verified") return "unresolved";
+      const registered = target.routes.find(({ name }) => name === route);
+      if (registered) return "registered";
+      const unregistered = target.declaredButUnregistered.find(({ name }) => name === route);
+      if (unregistered?.commentedOutRegistration) return "positively-unavailable";
+      return "unresolved";
+    });
+    const registered = targetStates.filter((state) => state === "registered").length;
+    const positivelyUnavailable = targetStates.filter((state) => state === "positively-unavailable").length;
+    const state = registered === targetStates.length
+      ? "registered"
+      : registered > 0
+        ? "target-variant"
+        : positivelyUnavailable > 0
+          ? "positive-unavailability-observed"
+          : "documentation-only";
+    // Detailed paths/functions remain in the content-addressed source report.
+    // The gate carries only the compact decision plus states aligned with
+    // `engineTargets`, avoiding a second copy of the complete source evidence.
+    return { route, state, targetStates };
+  });
+  return routes;
+}
+
+export function buildGate(targets, engineTargetIds) {
   const perTarget = engineTargetIds.map((id) => {
     const target = targets[id];
     const unregistered = new Map(target.declaredButUnregistered.map((row) => [row.name, row]));
@@ -947,20 +981,25 @@ function buildGate(targets, engineTargetIds) {
     for (const finding of findings) counts[selector(finding)] = (counts[selector(finding)] ?? 0) + 1;
     return Object.fromEntries(Object.entries(counts).sort(([left], [right]) => compareText(left, right)));
   };
+  const routeAuthority = buildRouteAuthority(targets, engineTargetIds);
   return {
     findings,
+    routeAuthority,
     counts: {
       findings: findings.length,
       routesRemapped: new Set(findings.filter((item) => item.action === "use-registered-name").map((item) => item.route)).size,
       routesSourceUnavailable: new Set(findings.filter((item) => item.action === "mark-source-unavailable").map((item) => item.route)).size,
       parametersCorrected: findings.filter((item) => item.action === "require-parameter").length,
       byKind: countBy((item) => item.kind),
-      byAction: countBy((item) => item.action)
+      byAction: countBy((item) => item.action),
+      authority: Object.fromEntries([...new Set(routeAuthority.map(({ state }) => state))]
+        .sort(compareText)
+        .map((state) => [state, routeAuthority.filter((route) => route.state === state).length]))
     }
   };
 }
 
-async function generate(options) {
+export async function generateLuaRegistrationSurface(options) {
   const policyText = await readFile(inputPath(options.policy), "utf8");
   const policy = JSON.parse(policyText);
   assert(policy.schemaVersion === 1, "unsupported policy schema");
@@ -1024,12 +1063,12 @@ async function generate(options) {
     .filter(([, target]) => target.kind === "engine-tree" && target.status === "verified")
     .map(([id]) => id)
     .sort(compareText);
-  const gated = engineTargetIds.length ? buildGate(targets, engineTargetIds) : { findings: [], counts: null };
+  const gated = engineTargetIds.length ? buildGate(targets, engineTargetIds) : { findings: [], routeAuthority: [], counts: null };
   const gate = {
     schemaVersion: 1,
     generator: "scripts/generate-lua-registration-surface.mjs",
     defoldRevision,
-    scope: "The subset of the registered-vs-declared findings that a downstream generator may act on: each one is backed by positive evidence in C source and holds in every mutually exclusive engine build variant. Absence of a registration is reported in the surface report and never gated.",
+    scope: "A total authority ledger for every documented engine route plus the source-backed corrections a downstream generator may act on. Positive C registration is distinct from unresolved absence and documentation-only declaration.",
     actions: {
       "use-registered-name": "The engine source registers this function under a different name. Emit the documented TypeScript surface and dispatch it through the registered source name.",
       "mark-source-unavailable": "Positive source evidence says this route is not registered in every selected engine variant. Keep the API and machinery emitted, but mark the affected profile unavailable.",
@@ -1039,21 +1078,24 @@ async function generate(options) {
     sourceReportSha256: sha256(`${JSON.stringify(gateSourceReport, null, 2)}\n`),
     engineTargets: engineTargetIds,
     counts: gated.counts,
+    routeAuthority: gated.routeAuthority,
     findings: gated.findings
   };
   return { surface, gate: `${JSON.stringify(gate, null, 2)}\n` };
 }
 
-const options = parseArgs(process.argv.slice(2));
-const generated = await generate(options);
-const outputs = [[defaultOutput, generated.surface], [gateOutput, generated.gate]];
-for (const [relativePath, text] of outputs) {
-  const destination = join(options.outRoot, relativePath);
-  if (options.check) {
-    const current = await readFile(destination, "utf8");
-    assert(current === text, `${relativePath} is stale; regenerate it`);
-    continue;
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  const options = parseArgs(process.argv.slice(2));
+  const generated = await generateLuaRegistrationSurface(options);
+  const outputs = [[defaultOutput, generated.surface], [gateOutput, generated.gate]];
+  for (const [relativePath, text] of outputs) {
+    const destination = join(options.outRoot, relativePath);
+    if (options.check) {
+      const current = await readFile(destination, "utf8");
+      assert(current === text, `${relativePath} is stale; regenerate it`);
+      continue;
+    }
+    await mkdir(dirname(destination), { recursive: true });
+    await writeFile(destination, text);
   }
-  await mkdir(dirname(destination), { recursive: true });
-  await writeFile(destination, text);
 }

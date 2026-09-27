@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
@@ -7,12 +8,44 @@ import { fileURLToPath } from "node:url";
 import {
   assertGeneratedDmSdkArtifactInventory,
   assertDmSdkSourceCensus,
+  discoverDmSdkImplementationEvidence,
   dmSdkCleanRoomEvidencePaths,
   runDmSdkCleanRoomRegeneration
 } from "../scripts/check-dmsdk-clean-room-regeneration.mjs";
 import { dmSdkGeneratorSources, generatedDmSdkArtifacts } from "../scripts/lib/dmsdk-generator-pipeline.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+
+test("dmSDK implementation evidence is derived from IR rather than generated facts", async (context) => {
+  const root = await mkdtemp(path.join(tmpdir(), "deherm-dmsdk-evidence-"));
+  context.after(() => rm(root, { recursive: true, force: true }));
+  const engine = path.join(root, "upstream/defold/engine/dlib/src");
+  await mkdir(path.join(engine, "tests"), { recursive: true });
+  await mkdir(path.join(root, "packages/bindings/generated"), { recursive: true });
+  await writeFile(path.join(engine, "match.cpp"), "int dmExample::Compute(int value) { return value; }\n");
+  await writeFile(path.join(engine, "unrelated.cpp"), "int Unrelated() { return 0; }\n");
+  await writeFile(path.join(engine, "tests/ignored.cpp"), "int Compute() { return 0; }\n");
+  const ir = { declarations: [{ kind: "function", name: "dmExample::Compute" }] };
+
+  const initial = await discoverDmSdkImplementationEvidence(root, ir);
+  assert.deepEqual(initial, ["upstream/defold/engine/dlib/src/match.cpp"]);
+
+  await writeFile(
+    path.join(root, "packages/bindings/generated/defold-dmsdk-source-semantic-facts.json"),
+    JSON.stringify({ sources: [{ path: "upstream/defold/engine/dlib/src/unrelated.cpp" }] }),
+  );
+  assert.deepEqual(await discoverDmSdkImplementationEvidence(root, ir), initial);
+
+  await writeFile(path.join(engine, "second.mm"), "int dmExample::Compute(int value) { return value + 1; }\n");
+  assert.deepEqual(await discoverDmSdkImplementationEvidence(root, ir), [
+    "upstream/defold/engine/dlib/src/match.cpp",
+    "upstream/defold/engine/dlib/src/second.mm",
+  ]);
+  await writeFile(path.join(engine, "match.cpp"), "int Different(int value) { return value; }\n");
+  assert.deepEqual(await discoverDmSdkImplementationEvidence(root, ir), [
+    "upstream/defold/engine/dlib/src/second.mm",
+  ]);
+});
 
 test("the clean room owns the SDK extraction manifest and its verifier", async () => {
   const lock = Object.fromEntries((await readFile(path.join(repositoryRoot, "upstream.lock"), "utf8"))

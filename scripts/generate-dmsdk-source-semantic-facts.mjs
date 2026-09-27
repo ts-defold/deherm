@@ -87,7 +87,7 @@ function tokenPattern(names) {
   return new RegExp(`\\b(?:${escaped.join("|")})\\s*\\(`, "u");
 }
 
-async function discoverSources(engineRoot, names) {
+export async function discoverSources(engineRoot, names) {
   const pattern = tokenPattern(names);
   const extensions = new Set([".c", ".cc", ".cpp", ".cxx", ".mm"]);
   const files = await filesBelow(engineRoot);
@@ -124,23 +124,39 @@ function normalizeDiagnostics(diagnostics, repositoryRoot) {
   return diagnostics.replaceAll(repositoryRoot, "<repository>");
 }
 
-function clangAst(file, roots, repositoryRoot) {
-  const args = [
-    "-x", "c++", "-std=c++17", "-fsyntax-only", "-Wno-everything", "-ferror-limit=0",
+export function clangInvocation(file, roots) {
+  const extension = path.extname(file).toLowerCase();
+  const language = extension === ".mm" ? "objective-c++" : extension === ".c" ? "c" : "c++";
+  const standard = language === "c" ? "c11" : "c++17";
+  return [
+    "-x", language, `-std=${standard}`, "-fsyntax-only", "-Wno-everything", "-ferror-limit=0",
     "-Xclang", "-ast-dump=json",
     ...roots.map((directory) => `-I${directory}`),
     file,
   ];
+}
+
+// A recovery AST is useful for diagnostics, but it is not semantic evidence.
+// Clang deliberately emits a partial tree after many parse/type errors. Admitting
+// that tree would let unrelated or ill-typed syntax manufacture positive facts.
+// This function therefore returns an AST only for an error-free translation unit.
+export function clangAst(file, roots, repositoryRoot) {
+  const args = clangInvocation(file, roots);
   return new Promise((resolve, reject) => {
     execFile("clang++", args, { cwd: repositoryRoot, encoding: "utf8", maxBuffer: 512 * 1024 * 1024 }, (error, stdout, stderr) => {
+      const diagnostics = normalizeDiagnostics(stderr, repositoryRoot);
+      if (error) {
+        resolve({ ast: null, diagnostics, complete: false });
+        return;
+      }
       if (!stdout.trim()) {
-        reject(new Error(`clang produced no AST for ${path.relative(root, file)}: ${stderr.trim().split("\n").at(-1) ?? error}`));
+        reject(new Error(`clang produced no AST for ${path.relative(repositoryRoot, file)}: ${stderr.trim().split("\n").at(-1) ?? "no diagnostics"}`));
         return;
       }
       try {
-        resolve({ ast: JSON.parse(stdout), diagnostics: normalizeDiagnostics(stderr, repositoryRoot), complete: !error });
+        resolve({ ast: JSON.parse(stdout), diagnostics, complete: true });
       } catch (parseError) {
-        reject(new Error(`clang produced invalid AST JSON for ${path.relative(root, file)}: ${parseError.message}`));
+        reject(new Error(`clang produced invalid AST JSON for ${path.relative(repositoryRoot, file)}: ${parseError.message}`));
       }
     });
   });
@@ -177,15 +193,27 @@ export async function buildDmSdkSourceSemanticFacts(options = {}) {
   const roots = await includeRoots(engineRoot);
   const requestedNames = new Set(candidates.map(({ declaration }) => declaration.name));
   const parsed = [];
+  const rejectedSources = [];
   for (const { file, source } of sources) {
     const relative = path.relative(repositoryRoot, file).replaceAll(path.sep, "/");
     const result = await clangAst(file, roots, repositoryRoot);
-    const definitions = extractCppImplementationFacts(result.ast, requestedNames, relative);
+    if (!result.complete) {
+      rejectedSources.push({
+        path: relative,
+        sha256: sha256(source),
+        astState: "rejected-with-diagnostics",
+        diagnosticsSha256: sha256(result.diagnostics),
+      });
+      continue;
+    }
+    const definitions = result.complete
+      ? extractCppImplementationFacts(result.ast, requestedNames, relative)
+      : [];
     if (definitions.length) {
       parsed.push({
         path: relative,
         sha256: sha256(source),
-        astState: result.complete ? "complete" : "partial-with-diagnostics",
+        astState: "complete",
         diagnosticsSha256: sha256(result.diagnostics),
         definitions,
       });
@@ -215,6 +243,7 @@ export async function buildDmSdkSourceSemanticFacts(options = {}) {
     extraction: "clang-json-ast/compact-dataflow-v1",
     scope: "structurally eligible bounded-span declarations",
     sources: parsed.map(({ definitions: _definitions, ...source }) => source).sort((left, right) => compareCodeUnits(left.path, right.path)),
+    rejectedSources: rejectedSources.sort((left, right) => compareCodeUnits(left.path, right.path)),
     sourceHashes: { ir: sha256(irContent), shapes: sha256(shapesContent) },
     coverage: {
       requested: entries.length,

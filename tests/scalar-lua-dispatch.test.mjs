@@ -3,6 +3,7 @@ import { execFileSync } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { stableBindingId } from "../scripts/lib/binding-identity.mjs";
+import { buildOutputs } from "../scripts/generate-script-real-engine-probes.mjs";
 
 const root = new URL("../", import.meta.url);
 
@@ -81,6 +82,26 @@ test("real-engine probes are deterministic and descriptor validated", async () =
   assert.match(generated, /sys\.getConfigString\("deherm_conformance\.missing"\)/);
   assert.match(generated, /profiler\.scopeBegin\("deherm-script-api-proof"\)/);
   assert.doesNotMatch(generated, /__defoldScriptBridgeV1|callScriptApi\(/);
+});
+
+test("probe evidence identity tracks executable calls rather than descriptor metadata", async () => {
+  const [sourceText, descriptorText, irText] = await Promise.all([
+    readFile(new URL("packages/bindings/probes/defold-script-real-engine-probes.json", root), "utf8"),
+    readFile(new URL("packages/bindings/generated/defold-script-scalar-dispatch.json", root), "utf8"),
+    readFile(new URL("packages/bindings/generated/defold-script-api-ir.json", root), "utf8"),
+  ]);
+  const baseline = JSON.parse(buildOutputs(sourceText, descriptorText, irText).report);
+  const descriptor = JSON.parse(descriptorText);
+  descriptor.inputSha256 = "evidence-metadata-changed";
+  descriptor.nonExecutableAudit = { note: "must not invalidate runtime evidence" };
+  const metadataOnly = JSON.parse(buildOutputs(sourceText, JSON.stringify(descriptor), irText).report);
+  assert.equal(metadataOnly.expectedInputMarker, baseline.expectedInputMarker);
+
+  const changed = structuredClone(descriptor);
+  const probed = changed.bindings.find(({ id }) => id === baseline.probes[0].id);
+  probed.rawName = `${probed.rawName}_different_call`;
+  const executableChange = JSON.parse(buildOutputs(sourceText, JSON.stringify(changed), irText).report);
+  assert.notEqual(executableChange.expectedInputMarker, baseline.expectedInputMarker);
 });
 
 test("all generated TypeScript script wrappers use the descriptor stable-ID scheme", async () => {

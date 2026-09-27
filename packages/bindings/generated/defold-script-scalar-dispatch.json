@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "inputSha256": "e09c838ded52d8efd0b1652b355ad7d8d3e22d3e8ee6a990a431899eb96f1c5d",
+  "inputSha256": "5dba42234210cc3ea0dbc5db4bdec6352ede0a2e0dc6f643ca0d13942acf247b",
   "stableIdAlgorithm": "FNV-1a 32-bit over canonical script:<module>.<member> id; collisions fail generation",
   "coverageClaim": "Stable-ID runtime dispatch is installed for all 90 scalar-classified functions; representative mock execution is proven, but per-function real-engine conformance is not claimed.",
   "allocationClaim": "Generated tables and native dispatch use fixed storage. Lua may allocate while interning new strings, formatting errors, or inside called engine functions.",

@@ -13,8 +13,8 @@
     {
       "path": "upstream/defold/engine/dlib/src/dlib/crypt_apple.mm",
       "sha256": "2d600da57bcb747af79de9ab0f96553f2183b7b5b7648ceffaea0a6e668e23d9",
-      "astState": "partial-with-diagnostics",
-      "diagnosticsSha256": "366d197b980c077648ffa62c5028dc63e9d9e74b38de0fd0617b6da68d54d23e"
+      "astState": "complete",
+      "diagnosticsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
       "path": "upstream/defold/engine/dlib/src/dlib/crypt_mbedtls.cpp",
@@ -33,6 +33,32 @@
       "sha256": "d2f01a3cfe034aba8fdab534e40db0dc06b42f9548a997467d982858891efeab",
       "astState": "complete",
       "diagnosticsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "rejectedSources": [
+    {
+      "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_image.cpp",
+      "sha256": "0ef39bda9de2db39ec59f97ffb04d916b522b80bd1a51a3cfdc8d07f23f0d281",
+      "astState": "rejected-with-diagnostics",
+      "diagnosticsSha256": "9732ffbb7e1bd895035c1d68d735af3836693c009f287f7e608e98fd4b16b504"
+    },
+    {
+      "path": "upstream/defold/engine/graphics/src/graphics.cpp",
+      "sha256": "452da12536a6fc2b9c25db8a9091dd919705f7ed01ca8bf9045a9e3572c1516b",
+      "astState": "rejected-with-diagnostics",
+      "diagnosticsSha256": "c736994b22b42bf7e1fbeb77488b2b00224c1b7928f52dbe915114c803362dc0"
+    },
+    {
+      "path": "upstream/defold/engine/gui/src/gui.cpp",
+      "sha256": "09e198339463070e61431f53699736db09a28aeeb6c196f941a28663f45a6a7c",
+      "astState": "rejected-with-diagnostics",
+      "diagnosticsSha256": "fc53c06b33aebd62e2184f0677ceab4fc0820ce732d0a102f3e9d251f940fdd6"
+    },
+    {
+      "path": "upstream/defold/engine/script/src/script_hash.cpp",
+      "sha256": "0d76c65543191cc9866615ba37109e77f430a216c98dedf474d4f546f9f9ed10",
+      "astState": "rejected-with-diagnostics",
+      "diagnosticsSha256": "0afd2d11662b401643cb0b005d5799ea854620a90cc8d914c1be6984504a9bc6"
     }
   ],
   "sourceHashes": {
@@ -56,8 +82,34 @@
           "type": "bool (const uint8_t *, uint32_t, uint8_t *, uint32_t *)",
           "source": "upstream/defold/engine/dlib/src/dlib/crypt_apple.mm",
           "line": 79,
-          "calls": [],
-          "fixedArrays": [],
+          "calls": [
+            {
+              "callee": "memcpy",
+              "arguments": [
+                {
+                  "kind": "parameter",
+                  "index": 2,
+                  "name": "dst"
+                },
+                {
+                  "kind": "expression",
+                  "expressionKind": "ObjCMessageExpr"
+                },
+                {
+                  "kind": "variable",
+                  "name": "decoded_len"
+                }
+              ]
+            }
+          ],
+          "fixedArrays": [
+            {
+              "name": "padding",
+              "type": "const uint8_t[3]",
+              "elementType": "const uint8_t",
+              "extent": 3
+            }
+          ],
           "operations": [
             {
               "operator": "==",
@@ -86,9 +138,264 @@
                 "kind": "integer",
                 "value": 0
               }
+            },
+            {
+              "operator": "%",
+              "left": {
+                "kind": "binary",
+                "operator": "-",
+                "left": {
+                  "kind": "integer",
+                  "value": 4
+                },
+                "right": {
+                  "kind": "binary",
+                  "operator": "%",
+                  "left": {
+                    "kind": "parameter",
+                    "index": 1,
+                    "name": "src_len"
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 4
+                  }
+                }
+              },
+              "right": {
+                "kind": "integer",
+                "value": 4
+              }
+            },
+            {
+              "operator": "-",
+              "left": {
+                "kind": "integer",
+                "value": 4
+              },
+              "right": {
+                "kind": "binary",
+                "operator": "%",
+                "left": {
+                  "kind": "parameter",
+                  "index": 1,
+                  "name": "src_len"
+                },
+                "right": {
+                  "kind": "integer",
+                  "value": 4
+                }
+              }
+            },
+            {
+              "operator": "%",
+              "left": {
+                "kind": "parameter",
+                "index": 1,
+                "name": "src_len"
+              },
+              "right": {
+                "kind": "integer",
+                "value": 4
+              }
+            },
+            {
+              "operator": "&&",
+              "left": {
+                "kind": "binary",
+                "operator": ">",
+                "left": {
+                  "kind": "variable",
+                  "name": "padding_needed"
+                },
+                "right": {
+                  "kind": "integer",
+                  "value": 0
+                }
+              },
+              "right": {
+                "kind": "binary",
+                "operator": ">",
+                "left": {
+                  "kind": "parameter",
+                  "index": 1,
+                  "name": "src_len"
+                },
+                "right": {
+                  "kind": "integer",
+                  "value": 0
+                }
+              }
+            },
+            {
+              "operator": ">",
+              "left": {
+                "kind": "variable",
+                "name": "padding_needed"
+              },
+              "right": {
+                "kind": "integer",
+                "value": 0
+              }
+            },
+            {
+              "operator": ">",
+              "left": {
+                "kind": "parameter",
+                "index": 1,
+                "name": "src_len"
+              },
+              "right": {
+                "kind": "integer",
+                "value": 0
+              }
+            },
+            {
+              "operator": "=",
+              "left": {
+                "kind": "variable",
+                "name": "data"
+              },
+              "right": {
+                "kind": "variable",
+                "name": "padded_data"
+              }
+            },
+            {
+              "operator": "=",
+              "left": {
+                "kind": "variable",
+                "name": "data"
+              },
+              "right": {
+                "kind": "expression",
+                "expressionKind": "ObjCMessageExpr"
+              }
+            },
+            {
+              "operator": "==",
+              "left": {
+                "kind": "variable",
+                "name": "decoded"
+              },
+              "right": {
+                "kind": "null"
+              }
+            },
+            {
+              "operator": "=",
+              "left": {
+                "kind": "unary",
+                "operator": "*",
+                "operand": {
+                  "kind": "parameter",
+                  "index": 3,
+                  "name": "dst_len"
+                }
+              },
+              "right": {
+                "kind": "integer",
+                "value": 4294967295
+              }
+            },
+            {
+              "operator": "==",
+              "left": {
+                "kind": "unary",
+                "operator": "*",
+                "operand": {
+                  "kind": "parameter",
+                  "index": 3,
+                  "name": "dst_len"
+                }
+              },
+              "right": {
+                "kind": "integer",
+                "value": 0
+              }
+            },
+            {
+              "operator": "=",
+              "left": {
+                "kind": "unary",
+                "operator": "*",
+                "operand": {
+                  "kind": "parameter",
+                  "index": 3,
+                  "name": "dst_len"
+                }
+              },
+              "right": {
+                "kind": "variable",
+                "name": "decoded_len"
+              }
+            },
+            {
+              "operator": "<",
+              "left": {
+                "kind": "unary",
+                "operator": "*",
+                "operand": {
+                  "kind": "parameter",
+                  "index": 3,
+                  "name": "dst_len"
+                }
+              },
+              "right": {
+                "kind": "variable",
+                "name": "decoded_len"
+              }
+            },
+            {
+              "operator": "=",
+              "left": {
+                "kind": "unary",
+                "operator": "*",
+                "operand": {
+                  "kind": "parameter",
+                  "index": 3,
+                  "name": "dst_len"
+                }
+              },
+              "right": {
+                "kind": "integer",
+                "value": 4294967295
+              }
+            },
+            {
+              "operator": "=",
+              "left": {
+                "kind": "unary",
+                "operator": "*",
+                "operand": {
+                  "kind": "parameter",
+                  "index": 3,
+                  "name": "dst_len"
+                }
+              },
+              "right": {
+                "kind": "variable",
+                "name": "decoded_len"
+              }
             }
           ],
           "returns": [
+            {
+              "kind": "boolean",
+              "value": true
+            },
+            {
+              "kind": "boolean",
+              "value": false
+            },
+            {
+              "kind": "boolean",
+              "value": false
+            },
+            {
+              "kind": "boolean",
+              "value": false
+            },
             {
               "kind": "boolean",
               "value": true
@@ -511,10 +818,153 @@
           "type": "bool (const uint8_t *, uint32_t, uint8_t *, uint32_t *)",
           "source": "upstream/defold/engine/dlib/src/dlib/crypt_apple.mm",
           "line": 51,
-          "calls": [],
+          "calls": [
+            {
+              "callee": "memcpy",
+              "arguments": [
+                {
+                  "kind": "parameter",
+                  "index": 2,
+                  "name": "dst"
+                },
+                {
+                  "kind": "expression",
+                  "expressionKind": "ObjCMessageExpr"
+                },
+                {
+                  "kind": "variable",
+                  "name": "encoded_len"
+                }
+              ]
+            }
+          ],
           "fixedArrays": [],
-          "operations": [],
-          "returns": [],
+          "operations": [
+            {
+              "operator": "+",
+              "left": {
+                "kind": "variable",
+                "name": "encoded_len"
+              },
+              "right": {
+                "kind": "integer",
+                "value": 1
+              }
+            },
+            {
+              "operator": "==",
+              "left": {
+                "kind": "unary",
+                "operator": "*",
+                "operand": {
+                  "kind": "parameter",
+                  "index": 3,
+                  "name": "dst_len"
+                }
+              },
+              "right": {
+                "kind": "integer",
+                "value": 0
+              }
+            },
+            {
+              "operator": "=",
+              "left": {
+                "kind": "unary",
+                "operator": "*",
+                "operand": {
+                  "kind": "parameter",
+                  "index": 3,
+                  "name": "dst_len"
+                }
+              },
+              "right": {
+                "kind": "variable",
+                "name": "required_len"
+              }
+            },
+            {
+              "operator": "<",
+              "left": {
+                "kind": "unary",
+                "operator": "*",
+                "operand": {
+                  "kind": "parameter",
+                  "index": 3,
+                  "name": "dst_len"
+                }
+              },
+              "right": {
+                "kind": "variable",
+                "name": "required_len"
+              }
+            },
+            {
+              "operator": "=",
+              "left": {
+                "kind": "unary",
+                "operator": "*",
+                "operand": {
+                  "kind": "parameter",
+                  "index": 3,
+                  "name": "dst_len"
+                }
+              },
+              "right": {
+                "kind": "integer",
+                "value": 4294967295
+              }
+            },
+            {
+              "operator": "=",
+              "left": {
+                "kind": "subscript",
+                "base": {
+                  "kind": "parameter",
+                  "index": 2,
+                  "name": "dst"
+                },
+                "index": {
+                  "kind": "variable",
+                  "name": "encoded_len"
+                }
+              },
+              "right": {
+                "kind": "integer",
+                "value": 0
+              }
+            },
+            {
+              "operator": "=",
+              "left": {
+                "kind": "unary",
+                "operator": "*",
+                "operand": {
+                  "kind": "parameter",
+                  "index": 3,
+                  "name": "dst_len"
+                }
+              },
+              "right": {
+                "kind": "variable",
+                "name": "encoded_len"
+              }
+            }
+          ],
+          "returns": [
+            {
+              "kind": "boolean",
+              "value": false
+            },
+            {
+              "kind": "boolean",
+              "value": false
+            },
+            {
+              "kind": "boolean",
+              "value": true
+            }
+          ],
           "reachableDefinitions": []
         },
         {
