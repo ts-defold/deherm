@@ -9,23 +9,30 @@ generated: { by: codex/gpt-5, at: 2026-09-18T20:00:00-04:00 }
 
 # Outcome
 
-The pinned dmSDK ABI-shape report contains 348 declarations in the
-`borrowed-handle-consumers` tranche. The new generator partitions that complete
-family without symbol-name allowlists:
+The compiler-owned borrowed-handle plan now evaluates the complete global ABI
+envelope rather than the historical `borrowed-handle-consumers` tranche. The
+pinned revision has 182 structurally compatible declarations:
 
 | Disposition | Count | Rule |
 | --- | ---: | --- |
-| provider-gated handle/scalar ABI | 158 | Direct-function result is `void`, `bool`, `f32`, `i32`, `u8`, `u16`, `u32`, or `u64`; every argument is a handle or the same bounded scalar algebra; at least one argument is a handle; no `platform-gated` family marker. |
-| blocked with row-local tokens | 190 | Constructor/member invocation, pointer, record, enum, callback, handle/pointer result, unresolved value, or platform-specific ABI remains. |
+| provider-gated handle/scalar ABI | 147 | The structural contract matches and the revision contains no ownership, lifecycle, lease, retention, transfer, or deferred-use contradiction to Defold's public by-value-resource borrow convention. |
+| universal fallback | 35 | Twenty-three historical finalizers, `AcquireInstanceIndex`, and eleven routes previously misclassified as borrowed have explicit lifecycle, refcount, lease, or state-transition contradictions. |
 
 The generated report is
 `packages/bindings/generated/defold-dmsdk-borrowed-handle-bindings.json`. It retains all
-348 stable declaration and projection identities. Every rejected row records
-its structural blockers plus explicit ownership/nullability/lifetime, thread,
-symbol-linkage, and target-matrix blockers. The selection policy in
+182 stable declaration and projection identities. Every rejected row records
+its effect evidence and keeps the universal route. The selection policy in
 `packages/bindings/overrides/dmsdk-borrowed-handle-bindings.json` contains only shape
-rules and expected census values; it has no declaration list or per-symbol
-exception.
+rules; it has no declaration list, expected count, or per-symbol exception.
+
+This is an immediate soundness repair, not a claim that absence of a
+contradiction is implementation proof. Positive rows record
+`trusted-defold-default` and the exact convention they rely on. The compiler's
+new C++ ownership/effect extractor derives ownership, escape, completion,
+result provenance, pointer memory effects, and write predicates from Clang AST
+declaration identities and passes alpha-renaming, finalizer, refcount, escape,
+indirect-call, span, atomic, and persistent-rebind fixtures. Wiring those facts
+into the revision policy is the next migration step.
 
 # Provider boundary
 
@@ -89,13 +96,14 @@ byte-for-byte from pinned inputs.
 
 # Evidence boundary
 
-The runtime harness uses a deterministic fake provider. It proves descriptor
-layout, error ordering, provider callbacks, thread rejection, handle rejection,
+The runtime harness uses a deterministic fake provider. It proves all 147
+selected descriptors' layout, error ordering, provider callbacks, thread rejection, handle rejection,
 linkage of the generic bridge, sanitizer cleanliness, and warmed glue
 allocation behavior. It does not supply real Defold handles, link the 158 engine
 symbols, establish real subsystem thread policies, or prove packaged-engine
 behavior. Consequently the generated report records zero packaged-engine
-runtime verifications.
+runtime verifications. The withdrawal is an atomic private pre-release provider
+ABI v2 migration; all generated consumers use the same plan-owned dense IDs.
 
 The native C ABI and Dynamic Hermes module are compiled into the production
 runtime, and the Static Hermes entry point is exported from its package. They
@@ -103,14 +111,12 @@ remain fail-closed until an engine provider is installed. The nominal
 TypeScript helper is generated but is not re-exported from the high-level SDK
 barrel, because doing that before provider installation and target
 feature/symbol selection would make the optional fast path appear universally
-available. All 158 declarations retain the working universal recipe as their
-preferred route; this provider boundary is additive and cannot suppress it.
+available. All 182 structural candidates retain the working universal recipe
+beneath the optional provider specialization, including the 35 fallback rows.
+The 147 selected routes retain the universal base recipe as well; this provider
+boundary is additive and cannot suppress it.
 
-The 190 blocked declarations remain intentionally ungenerated. Two are
-`GetConstantType` and `GetMaterialVertexSpace`, which exact SDK support facts
-correctly classify as nested-enum results instead of scalar results; no dmSDK
-declaration disappeared. Unlocking the remaining rows
-requires reusable policies for enum domains, output initialization/failure,
-pointer bounds and nullability, record layout/copying, returned-handle
-ownership, callbacks, or per-target availability. Adding a one-off wrapper or
-symbol allowlist is not an accepted substitute.
+No dmSDK declaration disappeared: every withdrawn specialization is realized
+through the generated universal machinery. Unlocking a fallback row requires
+revision-derived effect evidence satisfying the same compiler-owned taxonomy;
+a one-off wrapper or declaration allowlist is not an accepted substitute.

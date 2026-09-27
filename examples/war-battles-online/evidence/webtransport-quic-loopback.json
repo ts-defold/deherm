@@ -38,9 +38,9 @@
   "minimumSnapshotsApplied": 3,
   "minimumInputsSent": 3,
   "observedSnapshotsApplied": 3,
-  "observedInputsSent": 15,
-  "lastServerTick": 108,
-  "lastLocalTick": 121,
+  "observedInputsSent": 13,
+  "lastServerTick": 102,
+  "lastLocalTick": 113,
   "input": {
     "moveX": 1,
     "moveY": 0,
@@ -50,22 +50,22 @@
   },
   "inputsDropped": 0,
   "presentation": {
-    "localCorrectionMagnitude": 13,
-    "maximumLocalCorrectionMagnitude": 4418,
+    "localCorrectionMagnitude": 8,
+    "maximumLocalCorrectionMagnitude": 4239,
     "remoteInterpolationRebases": 0,
     "maximumRemoteInterpolationRebaseDistance": 0,
     "maximumRemoteInterpolationDiscontinuity": 0,
     "remoteLifecycleHardSnaps": 1
   },
   "prediction": {
-    "inputLeadTicks": 5,
+    "inputLeadTicks": 4,
     "inputLeadDecreases": 0
   },
   "server": {
     "inputsAcceptedAtLeast": 3,
     "markers": [
       "war-battles-server:listening:https://localhost:<port>",
-      "war-battles-server:health:http://localhost:52003",
+      "war-battles-server:health:http://localhost:54434",
       "war-battles-server:roster:32:bots:2",
       "war-battles-server:incoming:id=1",
       "war-battles-server:quic-accepted:id=1",
@@ -121,8 +121,8 @@
     {
       "path": "package.json",
       "kind": "file",
-      "bytes": 53607,
-      "sha256": "fa6fd10b3e1c81e7b96beeccf1ca73b43a3cbc0e653794954725828ff76cee99"
+      "bytes": 53978,
+      "sha256": "d3bb91ae39f65d4f987d68c698cf791f4520664613aa472ee38f0d6af93409f8"
     },
     {
       "path": "pnpm-lock.yaml",
@@ -137,6 +137,6 @@
       "sha256": "6fd5533ae7b9ebb266685f8319dc4bcad914fbba15a26859921d8518ba6536b8"
     }
   ],
-  "sourceKey": "7e2a964ffeeef2ab5b12ad3bd368ecadf32f7b63384fd5834bcc5582e2677ab7",
+  "sourceKey": "652defd33a0b188d1ea3779cd5e959105460c1d899ca89144a942b48328520eb",
   "evidenceBoundary": "Real loopback Chrome-to-Deno HTTP/3/WebTransport transport, authoritative welcome/snapshot/input and scalar client-presentation telemetry; server input acceptance is observed from MatchServer stats; the telemetry describes this bounded loopback trace and is not a visual-quality, WAN, ingress, native Defold, allocation, or reliable-lane-persistence claim."
 }

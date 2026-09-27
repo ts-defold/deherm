@@ -171,12 +171,18 @@ Compiler-owned fact requests precede a plan without becoming a second
 selection authority. The bounded C/C++ implementation collector consumes the
 planner's exported structural candidate predicate; it neither carries a
 private family catalog nor reads the final plan whose inputs it produces.
-Provider-boundary migration remains deliberately separate: borrowed handles
-and scratch scalar-outs still use historical tranche labels to exclude owned
-finalizers, producers, atomics, and persistent pointers that share their raw
-ABI shapes. Those families may move to a shared plan only after ownership and
-effect facts replace that label dependency; scanning the broad shape alone is
-not sufficient evidence.
+The borrowed-handle provider boundary now has its own authenticated
+compiler-owned plan over the complete global ABI envelope. That migration
+found eleven lifecycle/refcount/state-transition routes inside the former
+"borrowed" tranche and withdrew their specializations without removing their
+universal APIs. Positive rows are explicitly labeled as a trusted Defold
+public by-value-resource convention, not implementation proof. A separate
+compiler-owned C++ ownership/effect extractor now provides the causal taxonomy
+and alpha-renaming fixtures needed to replace that trust default incrementally.
+Scratch scalar-outs still use their historical tranche label because atomics,
+spans, persistent rebinding, owned-resource outputs, and exact-one scalar slots
+share the same raw ABI. Scanning that broad shape alone is not sufficient
+evidence.
 
 Generated-family census checks are structural, not optimization-count locks.
 For a family report, `declarations.length` must equal the revision's

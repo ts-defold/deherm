@@ -4225,3 +4225,38 @@ the real HTTP/3 WebTransport loopback, the deterministic 32-player impairment
 matrix, 131 War Battles session tests, TypeScript checks, and the OKF graph.
 The refreshed runtime evidence proves those named scenarios only; it does not
 promote the remaining packaged-engine or cross-target lanes to runtime-proven.
+
+## 2026-09-27 - Borrowed-handle plan and ownership-effect foundation
+
+An adversarial review found that the historical 158-route borrowed-handle
+specialization contained eleven lifecycle, refcount, lease-return, and state-
+transition operations, including property/font/job-system destruction,
+text-layout acquire/release, resource reference increments, connection-pool
+return, and window close/delete. The universal dmSDK route remained present, so
+the defect affected the optional fast provider contract rather than API
+availability.
+
+A fifth authenticated compiler-owned plan now owns the complete 182-route
+global borrowed-handle ABI envelope. It selects 147 routes under an explicitly
+labeled Defold public by-value-resource trust default and sends 35 revision
+contradictions to universal fallback. The emitter no longer imports the pattern
+selector or catalog, and exact report-to-plan/source authentication replaces
+the circular tranche/count test. Because withdrawing unsafe routes changes the
+dense private provider IDs, all generated consumers moved atomically to
+provider ABI v2.
+
+The focused plan, emitter, native compile, ASan/UBSan fake-provider runtime,
+and warmed zero-allocation tests pass. The full dmSDK generator reproduced all
+1,361 universal recipes and the clean room reproduced 120 byte-identical
+artifacts. This proves plan ownership, generation, compilation, fake-provider
+behavior, sanitizer cleanliness, and the named allocation assertion; it does
+not prove a packaged-engine provider or every target.
+
+The compiler also gained a body-derived C++ ownership/effect fact foundation.
+It records ownership, escape, completion, result provenance, pointer memory
+effects, and write predicates by Clang declaration identity and passes
+alpha-renaming, finalizer, refcount, escape, indirect-call, lease, exact-write,
+span, atomic, loop, and persistent-rebind fixtures. It is not yet carried in a
+published revision policy or consumed by the borrowed/scratch plans. Until that
+integration lands, the 147 positive borrowed rows remain trust-default
+admissions rather than source-proven ownership facts.

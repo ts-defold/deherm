@@ -223,8 +223,9 @@ pure dmSDK pattern selector with structural role/direction/arity predicates,
 explicit semantic-token requirements, ranked priority/cost selection, one
 mandatory universal fallback, deterministic equal-rank ambiguity rejection,
 and bounded decision traces. Its schema rejects symbol, header, and route-id
-conditions. Borrowed-handle and scratch-scalar-out generation now use it as the
-selection authority while retaining their existing allocation-free C ABI, JSI,
+conditions. Scratch-scalar-out generation still invokes it behind a historical
+tranche gate. Borrowed-handle generation now consumes a compiler-owned plan
+instead of invoking it. Both retain their existing allocation-free C ABI, JSI,
 Static Hermes typed-native, browser direct-memory, TypeScript, and exact-call
 emitters.
 
@@ -254,7 +255,7 @@ lifecycle operation withdraws that optimized family as a unit; the universal
 recipe remains available. The package retains only the stable generation-token,
 bounded-registry, counted-byte-input, and consume-operation recipe.
 
-The compiler now materializes four authenticated decision products before any
+The compiler now materializes five authenticated decision products before any
 covered emitter runs. The bounded-span plan owns fixed digest, Base64, ASTC,
 XTEA, and fixed-width buffer hashes. The value plan owns direct primitive
 scalars, declared enum domains, and source-resolved named scalar aliases. The
@@ -265,9 +266,12 @@ or linkage loss sends every member of that state lifecycle to the universal
 fallback instead of leaving a partial fast path. The C-string/value plan owns
 its complete global ABI candidate envelope, documentation-derived string
 contracts, explicit universal fallbacks, and collision-free TypeScript route
-identity while preserving the canonical pre-migration dispatch order. The ten
-emitters consume their plan rows and cannot import the selector or define a
-private registry.
+identity while preserving the canonical pre-migration dispatch order. The
+borrowed-handle plan owns the complete 182-route structural envelope, records
+Defold trust-default admission separately from lifecycle contradiction
+evidence, and routes 35 unsafe or ownership-bearing operations to the
+universal implementation. The eleven emitters consume their plan rows and
+cannot import the selector or define a private registry.
 Plan tests canonicalize unordered inputs or preserve an explicitly canonical
 projection order, withdraw semantic facts to the universal fallback, reject
 forged owners, and join every emitted row back to its authenticated decision.
@@ -276,11 +280,14 @@ One compiler rebuilt current, 1.13.1, 1.12.0, and
 TypeScript and native generation, compilation, linkage, and exact-call harness
 execution.
 
-Borrowed-handle and scratch-scalar-out planning is intentionally not included
-in that claim. Removing their current tranche prefilter exposes structurally
-similar owned finalizers/producers and atomics. Their next prerequisite is a
-revision-derived ownership/effect taxonomy plus negative synthetic fixtures;
-moving the selector first would broaden the fast path unsafely.
+Borrowed-handle planning is now included in the current-revision plan-owned
+claim, but not yet in the four-revision matrix claim above. Its positive
+admission remains an explicitly named Defold trust default until the new
+body-derived C++ ownership/effect facts are carried in each revision policy.
+Scratch-scalar-out planning is still excluded: removing its tranche prefilter
+exposes structurally similar atomics, spans, persistent rebinding, and owned
+resource outputs. Its next prerequisite is to wire the same effect facts into a
+combined plan and negative multi-target fixtures.
 
 ## 4. Make every product a projection
 

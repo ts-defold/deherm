@@ -17,6 +17,8 @@ export * from "./dmsdk-bounded-span-plan.mjs";
 export * from "./dmsdk-value-plan.mjs";
 export * from "./dmsdk-hash-state-plan.mjs";
 export * from "./dmsdk-cstring-value-plan.mjs";
+export * from "./dmsdk-borrowed-handle-plan.mjs";
+export * from "./cpp-ownership-effect-facts.mjs";
 export * from "./api-policy.mjs";
 export * from "./policy-surface-materializer.mjs";
 export * from "./names.mjs";
@@ -26,12 +28,12 @@ export {
   generateIndex as generateScriptIndex,
   generateModules as generateScriptModules,
   generateRuntime as generateScriptRuntime,
-  generateTypes as generateScriptTypes
+  generateTypes as generateScriptTypes,
 } from "./sdk/script-sdk.mjs";
 export {
   createTypeRenderer as createDmSdkTypeRenderer,
   generateRuntime as generateDmSdkRuntime,
-  generateTypes as generateDmSdkTypes
+  generateTypes as generateDmSdkTypes,
 } from "./sdk/dmsdk-sdk.mjs";
 export {
   generateDmSdkBrowserArena,
@@ -39,5 +41,5 @@ export {
   generateDmSdkUniversal,
   generateScriptBrowserTargetSupport,
   generateScriptHandleLowering,
-  generateScriptUniversalValue
+  generateScriptUniversalValue,
 } from "./sdk/support-sdk.mjs";

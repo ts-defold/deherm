@@ -120,6 +120,7 @@ test("a fixed-digest shape without recoverable implementation extent retains the
       ["base64", "dmsdk-base64-span-bindings.json"],
       ["astc", "dmsdk-astc-probe-bindings.json"],
       ["xtea", "dmsdk-xtea-span-bindings.json"],
+      ["hashSpan", "dmsdk-hash-span-bindings.json"],
     ].map(async ([key, name]) => [key, await readFile(join(repositoryRoot, "packages/bindings/overrides", name), "utf8")])));
     const sourceFactsText = `${JSON.stringify(sourceFacts, null, 2)}\n`;
     await writeFile(irPath, irText);

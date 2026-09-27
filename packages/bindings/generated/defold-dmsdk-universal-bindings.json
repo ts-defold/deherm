@@ -15,7 +15,7 @@
       "xteaSpan": "73c8d977ab6c9e5a8599c07262da34105ddf2988e1009c5cfe46eaa502370634",
       "hashSpan": "1ac8e9330772346282796b058505eadb88f7f8cf878532f7a387c85bafd7cc72",
       "arenaCString": "701b3d52ba6bc2227a4b8a82d458bce2213fba0384b632304842466c6a55ecb7",
-      "borrowedHandle": "a6346082ba0bd078badbd358f46b79c39d81e958dc7d3df7203d138d697b400d",
+      "borrowedHandle": "11d2ee221d5379b8b412101ef5f559a00c3db80bca5d88858337f662ffe547d4",
       "scratchScalarOut": "97ff8f4f30737a138cf8f6562e545af8a14114f0d20988448841971538e1a4d0",
       "cstringValue": "3c84bc89fd1185bebee73a44d362340fb511fbe5fe4fa9cc6b0ccdebe6a4ea66",
       "hashState": "fb8bb8a49e30b7ba572d3b0ddd0b165e3ab0190969216637a92b45515065871c"
@@ -483,8 +483,8 @@
       ],
       "requiredHeadersSha256": "b332e968c991eec3d9ef64f504264c500efa2dddc8a035445b26e676b3c90d2c"
     },
-    "aggregate": "d7206d37e37fbb016082d486946433482f687b1d78fde8d1bc4986b35ebd930d",
-    "catalog": "f2249952077681a6945069a2b75aae050bfb1a11e2288fe60d771f11fd65ccbf"
+    "aggregate": "fc050953593f60432e7d6e2db50a899e83b7cca821024fe47e4aef7e64211750",
+    "catalog": "65cad4b62ffb26081b7380b75ef0ca9a54b8511055adef74a40758863b907556"
   },
   "coverage": {
     "declarations": 1361,
@@ -22970,7 +22970,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 1,
+            "id": 3,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -23415,7 +23415,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 3,
+            "id": 1,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -25304,26 +25304,7 @@
         "header": "dmsdk/dlib/connection_pool.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      },
-      "alternativeLowerings": [
-        {
-          "state": "generated-adapter",
-          "family": "borrowedHandle",
-          "wrapper": null,
-          "adapter": {
-            "applicability": "provider-required",
-            "kind": "provider-boundary",
-            "id": 5,
-            "dispatcher": null,
-            "blockers": [
-              "call-thread-affinity-unresolved",
-              "handle-ownership-nullability-lifetime-unresolved",
-              "native-symbol-linkage-unverified",
-              "target-feature-symbol-matrix-unverified"
-            ]
-          }
-        }
-      ]
+      }
     },
     {
       "numericId": 203,
@@ -33482,7 +33463,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 6,
+            "id": 44,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -33612,7 +33593,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 7,
+            "id": 34,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -33944,7 +33925,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 8,
+            "id": 30,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -35470,7 +35451,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 9,
+            "id": 33,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -36578,7 +36559,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 10,
+            "id": 32,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -36854,7 +36835,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 11,
+            "id": 31,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -38732,7 +38713,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 12,
+            "id": 43,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -38968,7 +38949,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 13,
+            "id": 36,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -39091,7 +39072,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 14,
+            "id": 35,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -41711,7 +41692,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 15,
+            "id": 45,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -42474,7 +42455,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 16,
+            "id": 39,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -43249,7 +43230,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 17,
+            "id": 40,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -43447,7 +43428,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 18,
+            "id": 42,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -44756,26 +44737,7 @@
         "header": "dmsdk/gameobject/gameobject_props.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      },
-      "alternativeLowerings": [
-        {
-          "state": "generated-adapter",
-          "family": "borrowedHandle",
-          "wrapper": null,
-          "adapter": {
-            "applicability": "provider-required",
-            "kind": "provider-boundary",
-            "id": 19,
-            "dispatcher": null,
-            "blockers": [
-              "call-thread-affinity-unresolved",
-              "handle-ownership-nullability-lifetime-unresolved",
-              "native-symbol-linkage-unverified",
-              "target-feature-symbol-matrix-unverified"
-            ]
-          }
-        }
-      ]
+      }
     },
     {
       "numericId": 349,
@@ -45047,7 +45009,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 20,
+            "id": 47,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -45193,7 +45155,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 21,
+            "id": 46,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -45343,7 +45305,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 22,
+            "id": 48,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -47795,7 +47757,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 23,
+            "id": 41,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -50686,7 +50648,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 24,
+            "id": 37,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -50948,7 +50910,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 25,
+            "id": 38,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -51925,7 +51887,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 26,
+            "id": 53,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -52060,7 +52022,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 27,
+            "id": 52,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -55027,7 +54989,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 28,
+            "id": 50,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -55171,7 +55133,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 29,
+            "id": 49,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -59540,7 +59502,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 30,
+            "id": 51,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -65863,7 +65825,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 31,
+            "id": 82,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -66065,7 +66027,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 32,
+            "id": 93,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -67198,7 +67160,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 33,
+            "id": 87,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -67500,7 +67462,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 34,
+            "id": 69,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -67637,7 +67599,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 35,
+            "id": 91,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -67780,7 +67742,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 36,
+            "id": 89,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -68399,7 +68361,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 37,
+            "id": 86,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -68713,7 +68675,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 38,
+            "id": 68,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -68862,7 +68824,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 39,
+            "id": 90,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -69048,7 +69010,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 40,
+            "id": 88,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -69468,7 +69430,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 41,
+            "id": 83,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -69724,7 +69686,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 42,
+            "id": 81,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -69843,7 +69805,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 43,
+            "id": 74,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -70180,7 +70142,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 44,
+            "id": 56,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -70299,7 +70261,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 45,
+            "id": 55,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -70418,7 +70380,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 46,
+            "id": 70,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -72079,7 +72041,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 47,
+            "id": 57,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -72217,7 +72179,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 48,
+            "id": 65,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -72355,7 +72317,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 49,
+            "id": 63,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -72493,7 +72455,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 50,
+            "id": 62,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -72896,7 +72858,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 51,
+            "id": 79,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -73521,7 +73483,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 52,
+            "id": 61,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -74095,7 +74057,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 53,
+            "id": 60,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -74233,7 +74195,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 54,
+            "id": 64,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -74371,7 +74333,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 55,
+            "id": 58,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -74509,7 +74471,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 56,
+            "id": 67,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -74971,7 +74933,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 57,
+            "id": 66,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -75109,7 +75071,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 58,
+            "id": 59,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -75244,7 +75206,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 59,
+            "id": 54,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -75541,7 +75503,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 60,
+            "id": 73,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -75660,7 +75622,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 61,
+            "id": 72,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -75779,7 +75741,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 62,
+            "id": 71,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -79435,7 +79397,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 63,
+            "id": 76,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -80165,7 +80127,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 64,
+            "id": 77,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -80614,7 +80576,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 65,
+            "id": 78,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -80775,7 +80737,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 66,
+            "id": 80,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -80924,7 +80886,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 67,
+            "id": 92,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -81090,7 +81052,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 68,
+            "id": 85,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -81607,7 +81569,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 69,
+            "id": 75,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -83606,7 +83568,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 70,
+            "id": 84,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -87481,7 +87443,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 71,
+            "id": 98,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -87623,7 +87585,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 72,
+            "id": 95,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -87761,7 +87723,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 73,
+            "id": 96,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -88227,7 +88189,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 74,
+            "id": 99,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -89456,7 +89418,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 75,
+            "id": 94,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -89605,7 +89567,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 76,
+            "id": 97,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -95075,7 +95037,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 77,
+            "id": 104,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -97098,7 +97060,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 78,
+            "id": 101,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -97240,7 +97202,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 79,
+            "id": 100,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -98200,7 +98162,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 80,
+            "id": 102,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -98330,7 +98292,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 81,
+            "id": 103,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -99278,7 +99240,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 82,
+            "id": 6,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -99523,7 +99485,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 83,
+            "id": 5,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -103321,7 +103283,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 84,
+            "id": 10,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -103438,7 +103400,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 85,
+            "id": 9,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -104865,7 +104827,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 86,
+            "id": 11,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -105441,7 +105403,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 87,
+            "id": 12,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -105559,7 +105521,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 88,
+            "id": 13,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -107172,7 +107134,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 89,
+            "id": 122,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -107290,7 +107252,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 90,
+            "id": 119,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -107408,7 +107370,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 91,
+            "id": 116,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -107958,7 +107920,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 92,
+            "id": 113,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -108530,7 +108492,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 93,
+            "id": 120,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -108665,7 +108627,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 94,
+            "id": 121,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -108784,7 +108746,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 95,
+            "id": 112,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -109377,7 +109339,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 96,
+            "id": 118,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -110099,7 +110061,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 97,
+            "id": 117,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -111007,7 +110969,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 98,
+            "id": 115,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -111141,7 +111103,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 99,
+            "id": 114,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -116377,7 +116339,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 100,
+            "id": 132,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -116500,7 +116462,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 101,
+            "id": 131,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -117593,7 +117555,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 102,
+            "id": 134,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -118980,26 +118942,7 @@
         "header": "dmsdk/resource/resource.hpp",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      },
-      "alternativeLowerings": [
-        {
-          "state": "generated-adapter",
-          "family": "borrowedHandle",
-          "wrapper": null,
-          "adapter": {
-            "applicability": "provider-required",
-            "kind": "provider-boundary",
-            "id": 103,
-            "dispatcher": null,
-            "blockers": [
-              "call-thread-affinity-unresolved",
-              "handle-ownership-nullability-lifetime-unresolved",
-              "native-symbol-linkage-unverified",
-              "target-feature-symbol-matrix-unverified"
-            ]
-          }
-        }
-      ]
+      }
     },
     {
       "numericId": 864,
@@ -121113,7 +121056,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 104,
+            "id": 133,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -122821,7 +122764,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 105,
+            "id": 135,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -122940,7 +122883,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 106,
+            "id": 144,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -123071,7 +123014,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 107,
+            "id": 138,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -123190,7 +123133,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 108,
+            "id": 142,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -123433,7 +123376,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 109,
+            "id": 145,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -123556,7 +123499,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 110,
+            "id": 137,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -123813,7 +123756,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 111,
+            "id": 139,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -124050,7 +123993,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 112,
+            "id": 136,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -124169,7 +124112,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 113,
+            "id": 146,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -124626,7 +124569,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 114,
+            "id": 143,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -125153,7 +125096,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 115,
+            "id": 140,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -125437,7 +125380,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 116,
+            "id": 141,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -136142,7 +136085,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 117,
+            "id": 14,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -158925,26 +158868,7 @@
         "header": "dmsdk/font/fontcollection.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      },
-      "alternativeLowerings": [
-        {
-          "state": "generated-adapter",
-          "family": "borrowedHandle",
-          "wrapper": null,
-          "adapter": {
-            "applicability": "provider-required",
-            "kind": "provider-boundary",
-            "id": 118,
-            "dispatcher": null,
-            "blockers": [
-              "call-thread-affinity-unresolved",
-              "handle-ownership-nullability-lifetime-unresolved",
-              "native-symbol-linkage-unverified",
-              "target-feature-symbol-matrix-unverified"
-            ]
-          }
-        }
-      ]
+      }
     },
     {
       "numericId": 1160,
@@ -159176,7 +159100,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 119,
+            "id": 22,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -159432,26 +159356,7 @@
         "header": "dmsdk/font/font.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      },
-      "alternativeLowerings": [
-        {
-          "state": "generated-adapter",
-          "family": "borrowedHandle",
-          "wrapper": null,
-          "adapter": {
-            "applicability": "provider-required",
-            "kind": "provider-boundary",
-            "id": 120,
-            "dispatcher": null,
-            "blockers": [
-              "call-thread-affinity-unresolved",
-              "handle-ownership-nullability-lifetime-unresolved",
-              "native-symbol-linkage-unverified",
-              "target-feature-symbol-matrix-unverified"
-            ]
-          }
-        }
-      ]
+      }
     },
     {
       "numericId": 1164,
@@ -159717,7 +159622,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 121,
+            "id": 17,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -159848,7 +159753,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 122,
+            "id": 18,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -160333,7 +160238,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 123,
+            "id": 21,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -160464,7 +160369,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 124,
+            "id": 19,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -160686,7 +160591,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 125,
+            "id": 15,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -160805,7 +160710,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 126,
+            "id": 20,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -160936,7 +160841,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 127,
+            "id": 16,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -166833,26 +166738,7 @@
         "header": "dmsdk/dlib/jobsystem.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      },
-      "alternativeLowerings": [
-        {
-          "state": "generated-adapter",
-          "family": "borrowedHandle",
-          "wrapper": null,
-          "adapter": {
-            "applicability": "provider-required",
-            "kind": "provider-boundary",
-            "id": 128,
-            "dispatcher": null,
-            "blockers": [
-              "call-thread-affinity-unresolved",
-              "handle-ownership-nullability-lifetime-unresolved",
-              "native-symbol-linkage-unverified",
-              "target-feature-symbol-matrix-unverified"
-            ]
-          }
-        }
-      ]
+      }
     },
     {
       "numericId": 1220,
@@ -167209,7 +167095,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 129,
+            "id": 8,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -167656,7 +167542,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 130,
+            "id": 7,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -174646,7 +174532,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 131,
+            "id": 123,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -174975,7 +174861,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 132,
+            "id": 125,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -175220,26 +175106,7 @@
         "header": "dmsdk/resource/resource.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      },
-      "alternativeLowerings": [
-        {
-          "state": "generated-adapter",
-          "family": "borrowedHandle",
-          "wrapper": null,
-          "adapter": {
-            "applicability": "provider-required",
-            "kind": "provider-boundary",
-            "id": 133,
-            "dispatcher": null,
-            "blockers": [
-              "call-thread-affinity-unresolved",
-              "handle-ownership-nullability-lifetime-unresolved",
-              "native-symbol-linkage-unverified",
-              "target-feature-symbol-matrix-unverified"
-            ]
-          }
-        }
-      ]
+      }
     },
     {
       "numericId": 1286,
@@ -175597,7 +175464,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 134,
+            "id": 124,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -180140,7 +180007,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 135,
+            "id": 126,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -180259,7 +180126,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 136,
+            "id": 129,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -180378,7 +180245,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 137,
+            "id": 128,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -180496,7 +180363,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 138,
+            "id": 130,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -181445,7 +181312,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 139,
+            "id": 127,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -182230,26 +182097,7 @@
         "header": "dmsdk/font/text_layout.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      },
-      "alternativeLowerings": [
-        {
-          "state": "generated-adapter",
-          "family": "borrowedHandle",
-          "wrapper": null,
-          "adapter": {
-            "applicability": "provider-required",
-            "kind": "provider-boundary",
-            "id": 140,
-            "dispatcher": null,
-            "blockers": [
-              "call-thread-affinity-unresolved",
-              "handle-ownership-nullability-lifetime-unresolved",
-              "native-symbol-linkage-unverified",
-              "target-feature-symbol-matrix-unverified"
-            ]
-          }
-        }
-      ]
+      }
     },
     {
       "numericId": 1330,
@@ -182700,7 +182548,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 141,
+            "id": 27,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -182927,7 +182775,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 142,
+            "id": 24,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -183154,7 +183002,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 143,
+            "id": 25,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -183489,7 +183337,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 144,
+            "id": 28,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -184016,7 +183864,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 145,
+            "id": 26,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -184233,26 +184081,7 @@
         "header": "dmsdk/font/text_layout.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      },
-      "alternativeLowerings": [
-        {
-          "state": "generated-adapter",
-          "family": "borrowedHandle",
-          "wrapper": null,
-          "adapter": {
-            "applicability": "provider-required",
-            "kind": "provider-boundary",
-            "id": 146,
-            "dispatcher": null,
-            "blockers": [
-              "call-thread-affinity-unresolved",
-              "handle-ownership-nullability-lifetime-unresolved",
-              "native-symbol-linkage-unverified",
-              "target-feature-symbol-matrix-unverified"
-            ]
-          }
-        }
-      ]
+      }
     },
     {
       "numericId": 1346,
@@ -184389,7 +184218,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 147,
+            "id": 29,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -184519,7 +184348,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 148,
+            "id": 23,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -184628,26 +184457,7 @@
         "header": "dmsdk/platform/window.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      },
-      "alternativeLowerings": [
-        {
-          "state": "generated-adapter",
-          "family": "borrowedHandle",
-          "wrapper": null,
-          "adapter": {
-            "applicability": "provider-required",
-            "kind": "provider-boundary",
-            "id": 149,
-            "dispatcher": null,
-            "blockers": [
-              "call-thread-affinity-unresolved",
-              "handle-ownership-nullability-lifetime-unresolved",
-              "native-symbol-linkage-unverified",
-              "target-feature-symbol-matrix-unverified"
-            ]
-          }
-        }
-      ]
+      }
     },
     {
       "numericId": 1349,
@@ -184842,26 +184652,7 @@
         "header": "dmsdk/platform/window.h",
         "callable": true,
         "reason": "public-sdk-declaration-visible"
-      },
-      "alternativeLowerings": [
-        {
-          "state": "generated-adapter",
-          "family": "borrowedHandle",
-          "wrapper": null,
-          "adapter": {
-            "applicability": "provider-required",
-            "kind": "provider-boundary",
-            "id": 150,
-            "dispatcher": null,
-            "blockers": [
-              "call-thread-affinity-unresolved",
-              "handle-ownership-nullability-lifetime-unresolved",
-              "native-symbol-linkage-unverified",
-              "target-feature-symbol-matrix-unverified"
-            ]
-          }
-        }
-      ]
+      }
     },
     {
       "numericId": 1351,
@@ -184970,7 +184761,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 151,
+            "id": 109,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -185089,7 +184880,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 152,
+            "id": 108,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -185418,7 +185209,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 153,
+            "id": 107,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -185536,7 +185327,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 154,
+            "id": 106,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -185883,7 +185674,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 155,
+            "id": 111,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -186025,7 +185816,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 156,
+            "id": 110,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -186143,7 +185934,7 @@
           "adapter": {
             "applicability": "provider-required",
             "kind": "provider-boundary",
-            "id": 157,
+            "id": 105,
             "dispatcher": null,
             "blockers": [
               "call-thread-affinity-unresolved",
@@ -186158,7 +185949,7 @@
   ],
   "fallbackAudit": {
     "artifact": "packages/bindings/generated/defold-dmsdk-fallback-audit.json",
-    "reportSha256": "52d6d8e73ceea5e33fd7eaf4104ddddd87ed8e0683ffc814ddc03d7b5b0ced35",
+    "reportSha256": "5d4126b2774532e4a0190940c619b6faa2c43c3891143613977f2c656f8d7dc7",
     "coverage": {
       "declarations": 1361,
       "preferredSpecialized": 101,
@@ -186168,8 +185959,8 @@
       "shapeGroups": 848,
       "universalReady": 537,
       "usageFactsRequired": 723,
-      "existingAuxiliarySpecialization": 158,
-      "semanticRecipeCandidates": 261,
+      "existingAuxiliarySpecialization": 147,
+      "semanticRecipeCandidates": 272,
       "composableUniversalOnly": 841
     }
   }

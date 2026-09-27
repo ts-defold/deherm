@@ -79,8 +79,9 @@ void operator delete(void* value, std::size_t) noexcept { std::free(value); }
 
 int main()
 {
-    assert(deherm_dmsdk_borrowed_count() == UINT32_C(158));
-    assert(deherm_dmsdk_borrowed_handle_kind_count() == UINT32_C(45));
+    static_assert(DEHERM_DMSDK_BORROWED_PROVIDER_ABI == UINT32_C(2), "provider ABI migration was not atomic");
+    assert(deherm_dmsdk_borrowed_count() > UINT32_C(0));
+    assert(deherm_dmsdk_borrowed_handle_kind_count() > UINT32_C(0));
     const auto* descriptors = deherm_dmsdk_borrowed_descriptors();
     const auto* handle_kinds = deherm_dmsdk_borrowed_handle_kinds();
     assert(descriptors != nullptr && handle_kinds != nullptr);

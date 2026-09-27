@@ -225,7 +225,7 @@ export async function discoverGeneratedDmSdkArtifacts(repositoryRoot = repositor
   const result = new Set();
   for (const file of await walk(path.join(repositoryRoot, "packages/bindings/generated"))) {
     if (
-      /^defold-dmsdk-(?:target-conditionals|binding-patterns|scalar-thunks|abi-shapes|source-semantic-facts|bounded-span-plan|value-plan|hash-state-plan|cstring-value-plan|enum-value-bindings|named-scalar-bindings|fixed-digest-bindings|base64-span-bindings|astc-probe-bindings|xtea-span-bindings|hash-span-bindings|hash-state-bindings|arena-span-blockers|projection-ir|borrowed-handle-bindings|scratch-scalar-out-bindings|cstring-value-bindings|universal-bindings|fallback-audit|universal-ready-exact-plan|generated-adapter-exact-plan)\.json$/.test(
+      /^defold-dmsdk-(?:target-conditionals|binding-patterns|scalar-thunks|abi-shapes|source-semantic-facts|bounded-span-plan|value-plan|hash-state-plan|cstring-value-plan|borrowed-handle-plan|enum-value-bindings|named-scalar-bindings|fixed-digest-bindings|base64-span-bindings|astc-probe-bindings|xtea-span-bindings|hash-span-bindings|hash-state-bindings|arena-span-blockers|projection-ir|borrowed-handle-bindings|scratch-scalar-out-bindings|cstring-value-bindings|universal-bindings|fallback-audit|universal-ready-exact-plan|generated-adapter-exact-plan)\.json$/.test(
         file,
       )
     ) {
@@ -415,6 +415,7 @@ async function validateReports(root) {
     hashState,
     arenaSpan,
     projection,
+    borrowedHandlePlan,
     borrowedHandle,
     scratchScalarOut,
     cstringValuePlan,
@@ -438,6 +439,7 @@ async function validateReports(root) {
     load("packages/bindings/generated/defold-dmsdk-hash-state-bindings.json"),
     load("packages/bindings/generated/defold-dmsdk-arena-span-blockers.json"),
     load("packages/bindings/generated/defold-dmsdk-projection-ir.json"),
+    load("packages/bindings/generated/defold-dmsdk-borrowed-handle-plan.json"),
     load("packages/bindings/generated/defold-dmsdk-borrowed-handle-bindings.json"),
     load("packages/bindings/generated/defold-dmsdk-scratch-scalar-out-bindings.json"),
     load("packages/bindings/generated/defold-dmsdk-cstring-value-plan.json"),
@@ -542,14 +544,24 @@ async function validateReports(root) {
       hashState.coverage.blocked === hashStatePlan.coverage.universalFallback &&
       hashState.coverage.exactFixtureCount === hashState.coverage.generated &&
       hashState.coverage.generated + hashState.coverage.blocked === hashState.coverage.discovered &&
-      hashState.sourceHashes.plan === sha256(await readFile(
-        path.join(root, "packages/bindings/generated/defold-dmsdk-hash-state-plan.json"),
-        "utf8",
-      )) &&
+      hashState.sourceHashes.plan ===
+        sha256(
+          await readFile(path.join(root, "packages/bindings/generated/defold-dmsdk-hash-state-plan.json"), "utf8"),
+        ) &&
       JSON.stringify(hashState.declarations.map(({ id }) => id).sort()) ===
-        JSON.stringify(hashStatePlan.decisions.filter(({ fallback }) => !fallback).map(({ declarationId }) => declarationId).sort()) &&
+        JSON.stringify(
+          hashStatePlan.decisions
+            .filter(({ fallback }) => !fallback)
+            .map(({ declarationId }) => declarationId)
+            .sort(),
+        ) &&
       JSON.stringify(hashState.blockedDeclarations.map(({ id }) => id).sort()) ===
-        JSON.stringify(hashStatePlan.decisions.filter(({ fallback }) => fallback).map(({ declarationId }) => declarationId).sort()),
+        JSON.stringify(
+          hashStatePlan.decisions
+            .filter(({ fallback }) => fallback)
+            .map(({ declarationId }) => declarationId)
+            .sort(),
+        ),
     "hash-state report does not exactly realize the compiler-owned lifecycle plan",
   );
   assert(
@@ -578,24 +590,29 @@ async function validateReports(root) {
       arenaSpan.coverage.unaccounted === 0,
     "arena-span blocker report does not have the pinned complete 14 prior + 5 arena + 60 blocked partition",
   );
-  // Exact nested-enum support facts move GetConstantType and
-  // GetMaterialVertexSpace into the enum family. No declaration disappeared;
-  // the structural selector now correctly rejects those two as non-scalars.
   assert(
-    borrowedHandle.coverage.candidates === 348 &&
-      borrowedHandle.coverage.generated === 158 &&
-      borrowedHandle.coverage.blocked === 190 &&
-      borrowedHandle.coverage.cAbiGenerated === 158 &&
-      borrowedHandle.coverage.dynamicHermesJsiGenerated === 158 &&
-      borrowedHandle.coverage.staticHermesGenerated === 158 &&
-      borrowedHandle.coverage.browserDirectMemoryGenerated === 158 &&
-      borrowedHandle.coverage.typescriptGenerated === 158 &&
-      borrowedHandle.coverage.pinnedHeaderSignatureCompiled === 158 &&
-      borrowedHandle.coverage.exactCallTwinsGenerated === 158 &&
-      borrowedHandle.coverage.fakeProviderHostRuntimeTested === 158 &&
+    borrowedHandle.coverage.candidates === borrowedHandlePlan.coverage.structurallyRelevant &&
+      borrowedHandle.coverage.generated === borrowedHandlePlan.coverage.selected &&
+      borrowedHandle.coverage.blocked === borrowedHandlePlan.coverage.universalFallback &&
+      borrowedHandle.coverage.generated + borrowedHandle.coverage.blocked === borrowedHandle.coverage.candidates &&
+      borrowedHandle.providerAbiVersion === borrowedHandlePlan.providerAbiVersion &&
+      borrowedHandle.sourceHashes.plan ===
+        sha256(
+          await readFile(path.join(root, "packages/bindings/generated/defold-dmsdk-borrowed-handle-plan.json"), "utf8"),
+        ) &&
+      borrowedHandle.coverage.cAbiGenerated === borrowedHandlePlan.coverage.selected &&
+      borrowedHandle.coverage.dynamicHermesJsiGenerated === borrowedHandlePlan.coverage.selected &&
+      borrowedHandle.coverage.staticHermesGenerated === borrowedHandlePlan.coverage.selected &&
+      borrowedHandle.coverage.browserDirectMemoryGenerated === borrowedHandlePlan.coverage.selected &&
+      borrowedHandle.coverage.typescriptGenerated === borrowedHandlePlan.coverage.selected &&
+      borrowedHandle.coverage.pinnedHeaderSignatureCompiled === borrowedHandlePlan.coverage.selected &&
+      borrowedHandle.coverage.exactCallTwinsGenerated === borrowedHandlePlan.coverage.selected &&
+      borrowedHandle.coverage.fakeProviderHostRuntimeTested === borrowedHandlePlan.coverage.selected &&
       borrowedHandle.coverage.packagedEngineRuntimeVerified === 0 &&
-      borrowedHandle.coverage.warmedDispatchObservedCppAllocations === 0,
-    "borrowed-handle report does not preserve its pinned 158 generated + 190 blocked provider boundary",
+      borrowedHandle.coverage.warmedDispatchObservedCppAllocations === 0 &&
+      JSON.stringify(borrowedHandle.declarations.map(({ id }) => id)) ===
+        JSON.stringify(borrowedHandlePlan.decisions.map(({ declarationId }) => declarationId)),
+    "borrowed-handle report does not exactly realize its compiler-owned plan",
   );
   assert(
     scratchScalarOut.coverage.candidates === 79 &&
@@ -617,15 +634,17 @@ async function validateReports(root) {
       cstringValue.coverage.generated === cstringValuePlan.coverage.selected &&
       cstringValue.coverage.blocked === cstringValuePlan.coverage.universalFallback &&
       cstringValue.coverage.generated + cstringValue.coverage.blocked === cstringValue.coverage.candidates &&
-      cstringValue.sources.hashes.plan === sha256(await readFile(
-        path.join(root, "packages/bindings/generated/defold-dmsdk-cstring-value-plan.json"),
-        "utf8",
-      )) &&
+      cstringValue.sources.hashes.plan ===
+        sha256(
+          await readFile(path.join(root, "packages/bindings/generated/defold-dmsdk-cstring-value-plan.json"), "utf8"),
+        ) &&
       JSON.stringify(cstringValue.declarations.map(({ id }) => id)) ===
         JSON.stringify(cstringValuePlan.decisions.map(({ declarationId }) => declarationId)) &&
-      cstringValue.declarations.every((declaration, index) =>
-        declaration.disposition === (cstringValuePlan.decisions[index].fallback ? "blocked" : "generated") &&
-        declaration.blocker === cstringValuePlan.decisions[index].blocker) &&
+      cstringValue.declarations.every(
+        (declaration, index) =>
+          declaration.disposition === (cstringValuePlan.decisions[index].fallback ? "blocked" : "generated") &&
+          declaration.blocker === cstringValuePlan.decisions[index].blocker,
+      ) &&
       cstringValue.coverage.headerObjectCompiled === 0 &&
       cstringValue.coverage.stubAbiLinkedAndRuntimeTested === 0 &&
       cstringValue.coverage.pinnedEngineLinked === 0 &&
@@ -671,7 +690,10 @@ async function validateReports(root) {
     "generated dmSDK IDs are not unique within a family",
   );
   assert(hashStateIds.size === 10, "hash-state family contains duplicate generated IDs");
-  assert(borrowedHandleIds.size === 158, "borrowed-handle family contains duplicate generated IDs");
+  assert(
+    borrowedHandleIds.size === borrowedHandlePlan.coverage.selected,
+    "borrowed-handle family contains duplicate generated IDs",
+  );
   assert(scratchScalarOutIds.size === 7, "scratch scalar-out family contains duplicate generated IDs");
   const priorGeneratedIds = new Set([
     ...scalarIds,
@@ -834,6 +856,7 @@ async function validateReports(root) {
     xteaSpanGeneratedCount: xteaSpan.coverage.emitted,
     hashSpanGeneratedCount: hashSpan.coverage.emitted,
     hashStateGeneratedCount: hashState.coverage.generated,
+    borrowedHandleCandidateCount: borrowedHandle.coverage.candidates,
     borrowedHandleGeneratedCount: borrowedHandle.coverage.generated,
     borrowedHandleBlockedCount: borrowedHandle.coverage.blocked,
     scratchScalarOutGeneratedCount: scratchScalarOut.coverage.generated,
@@ -915,7 +938,7 @@ async function main() {
     `Generated specialized adapters: ${report.scalarGeneratedCount} scalar + ${report.enumGeneratedCount} enum-value + ${report.fixedDigestGeneratedCount} fixed-digest + ${report.base64SpanGeneratedCount} base64-span + ${report.astcProbeGeneratedCount} ASTC-probe + ${report.xteaSpanGeneratedCount} XTEA-span + ${report.hashSpanGeneratedCount} hash-span + ${report.hashStateGeneratedCount} hash-state + ${report.borrowedHandleGeneratedCount} borrowed-handle provider-boundary; all ${report.universalRecipeCount} declarations retain a universal recipe beneath specialized lanes.`,
   );
   console.log(
-    `Borrowed-handle structural partition: ${report.borrowedHandleGeneratedCount}/348 generated; ${report.borrowedHandleBlockedCount} blocked; packaged-engine provider remains unverified.`,
+    `Borrowed-handle structural partition: ${report.borrowedHandleGeneratedCount}/${report.borrowedHandleCandidateCount} generated; ${report.borrowedHandleBlockedCount} blocked; packaged-engine provider remains unverified.`,
   );
   console.log(
     `Scratch scalar-out structural partition: ${report.scratchScalarOutGeneratedCount}/79 generated; ${report.scratchScalarOutBlockedCount} blocked; packaged-engine provider remains unverified.`,

@@ -30,6 +30,8 @@
     "./dmsdk-value-plan": "./src/dmsdk-value-plan.mjs",
     "./dmsdk-hash-state-plan": "./src/dmsdk-hash-state-plan.mjs",
     "./dmsdk-cstring-value-plan": "./src/dmsdk-cstring-value-plan.mjs",
+    "./dmsdk-borrowed-handle-plan": "./src/dmsdk-borrowed-handle-plan.mjs",
+    "./cpp-ownership-effect-facts": "./src/cpp-ownership-effect-facts.mjs",
     "./native-extension-generator": "./src/native-extension-generator.mjs",
     "./defold-hash": "./src/defold-hash.mjs",
     "./ttsc": "./ttsc.mjs"

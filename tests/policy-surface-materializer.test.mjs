@@ -148,7 +148,7 @@ test("authenticated policy materializes the complete generated SDK without a Def
   }
   assert.deepEqual(
     bytesByMode,
-    { rendered: 3_908_177, snapshots: 105_573 },
+    { rendered: 3_908_177, snapshots: 102_373 },
     "the local-emitter versus compatibility-snapshot migration debt changed",
   );
 

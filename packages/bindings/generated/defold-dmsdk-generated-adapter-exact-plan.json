@@ -3,8 +3,8 @@
   "source": "deherm-dmsdk-generated-adapter-exact-corpus",
   "ordering": "numeric-id-ascending",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64",
-  "symbolIndexSha256": "5029b54fa94caddab9ca27b65c664e321eabe05f9b3298b5fb567e5a6f5d1218",
+  "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7",
+  "symbolIndexSha256": "e5f0c55ef396349cc6c6044f2f6a8a657f13d837804ae0c41f3abd70ae8ba5b6",
   "recipeCount": 1361,
   "generatedAdapterCount": 94,
   "universalReadyCount": 537,
@@ -27,7 +27,7 @@
     "schemaVersion": 1,
     "source": "deherm-dmsdk-generated-adapter-call-plan",
     "evidenceBoundary": "Each exact vector is derived from the same authenticated recipe and concrete family-dispatch plan as the production relocation. It fixes the production C ABI symbol, family-local adapter id, ordered native ABI, result contract, and emitted JSI module where one exists. Family runtime tests execute the C ABI vectors; JSI is applicable only to families that emit a production JSI module. Provider-boundary families remain excluded until their policy providers exist.",
-    "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64",
+    "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7",
     "retain": "deherm_dmsdk_generated_adapter_corpus_retain_generated_adapters",
     "callCount": 94,
     "calls": [
@@ -49,7 +49,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmBuffer::GetSizeForValueType@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:363:99",
@@ -71,7 +71,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmBuffer::GetValueTypeString@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:383:101",
@@ -91,7 +91,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmCrypt::Base64Decode@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:133:162",
@@ -111,7 +111,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmCrypt::Base64Encode@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:120:161",
@@ -131,7 +131,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmCrypt::Decrypt@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:76:156",
@@ -151,7 +151,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmCrypt::Encrypt@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:65:155",
@@ -171,7 +171,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmCrypt::HashMd5@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:108:160",
@@ -191,7 +191,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmCrypt::HashSha1@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:84:157",
@@ -211,7 +211,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmCrypt::HashSha256@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:92:158",
@@ -231,7 +231,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmCrypt::HashSha512@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:100:159",
@@ -251,7 +251,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmEndian::ByteSwap@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:36:194",
@@ -273,7 +273,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmEndian::ByteSwap@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:46:195",
@@ -295,7 +295,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmEndian::ByteSwap@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:56:196",
@@ -317,7 +317,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmEndian::ToHost@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:104:200",
@@ -339,7 +339,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmEndian::ToHost@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:128:202",
@@ -361,7 +361,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmEndian::ToHost@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:80:198",
@@ -383,7 +383,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmEndian::ToNetwork@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:116:201",
@@ -405,7 +405,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmEndian::ToNetwork@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:68:197",
@@ -427,7 +427,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmEndian::ToNetwork@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:92:199",
@@ -449,7 +449,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmGameObject::CreateInstanceId@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:598:1005",
@@ -469,7 +469,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmGraphics::GetInstalledAdapterFamily@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1159:1398",
@@ -491,7 +491,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmGraphics::GetTextureFormatLiteral@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1388:1420",
@@ -511,7 +511,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmGraphics::GetTextureTypeLiteral@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1380:1419",
@@ -531,7 +531,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmHashBuffer32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:69:212",
@@ -551,7 +551,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmHashBuffer64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:79:213",
@@ -571,7 +571,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmHashClone32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:214:233",
@@ -591,7 +591,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmHashClone64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:256:238",
@@ -611,7 +611,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmHashFinal32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:231:235",
@@ -631,7 +631,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmHashFinal64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:273:240",
@@ -651,7 +651,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmHashInit32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:204:232",
@@ -671,7 +671,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmHashInit64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:247:237",
@@ -691,7 +691,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmHashRelease32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:239:236",
@@ -711,7 +711,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmHashRelease64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:281:241",
@@ -731,7 +731,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmHashString32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:88:214",
@@ -751,7 +751,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmHashString64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:97:215",
@@ -771,7 +771,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmHashUpdateBuffer32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:223:234",
@@ -791,7 +791,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmHashUpdateBuffer64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:265:239",
@@ -811,7 +811,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmImage::GetAstcBlockSize@upstream/defold/engine/dlib/src/dmsdk/dlib/image.h:133:349",
@@ -831,7 +831,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmImage::GetAstcDimensions@upstream/defold/engine/dlib/src/dmsdk/dlib/image.h:145:350",
@@ -851,7 +851,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmLog::Setlevel@upstream/defold/engine/dlib/src/dmsdk/dlib/log.h:339:397",
@@ -873,7 +873,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmLogGetLevel@upstream/defold/engine/dlib/src/dmsdk/dlib/log.h:310:391",
@@ -895,7 +895,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmLogSetLevel@upstream/defold/engine/dlib/src/dmsdk/dlib/log.h:300:390",
@@ -917,7 +917,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmResource::GetCanonicalPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:151:1970",
@@ -937,7 +937,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmResource::GetExtFromPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:141:1969",
@@ -957,7 +957,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmSocket::ResultToString@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:388:568",
@@ -977,7 +977,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmSound::IsGroupMuted@upstream/defold/engine/sound/src/dmsdk/sound/sound.h:108:2140",
@@ -997,7 +997,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmSound::SetGroupMute@upstream/defold/engine/sound/src/dmsdk/sound/sound.h:92:2138",
@@ -1019,7 +1019,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmSound::ToggleGroupMute@upstream/defold/engine/sound/src/dmsdk/sound/sound.h:101:2139",
@@ -1041,7 +1041,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmStrCaseCmp@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:155:183",
@@ -1061,7 +1061,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmStrError@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:174:184",
@@ -1081,7 +1081,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmStrTrim@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:137:182",
@@ -1101,7 +1101,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmSys::Exists@upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h:117:595",
@@ -1121,7 +1121,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmSys::Rename@upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h:135:597",
@@ -1141,7 +1141,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmSys::Unlink@upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h:125:596",
@@ -1161,7 +1161,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmThread::AllocTls@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:119:608",
@@ -1181,7 +1181,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmThread::Detach@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:112:607",
@@ -1201,7 +1201,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmThread::FreeTls@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:126:609",
@@ -1221,7 +1221,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmThread::GetCurrentThread@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:148:612",
@@ -1241,7 +1241,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmThread::Join@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:102:606",
@@ -1261,7 +1261,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmTime::GetMonotonicTime@upstream/defold/engine/dlib/src/dmsdk/dlib/time.h:56:615",
@@ -1283,7 +1283,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmTime::GetTime@upstream/defold/engine/dlib/src/dmsdk/dlib/time.h:38:614",
@@ -1305,7 +1305,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmTime::Sleep@upstream/defold/engine/dlib/src/dmsdk/dlib/time.h:64:616",
@@ -1327,7 +1327,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmTrigLookup::Cos@upstream/defold/engine/dlib/src/dmsdk/dlib/trig_lookup.h:54:646",
@@ -1349,7 +1349,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmTrigLookup::Sin@upstream/defold/engine/dlib/src/dmsdk/dlib/trig_lookup.h:76:647",
@@ -1371,7 +1371,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmURI::Encode@upstream/defold/engine/dlib/src/dmsdk/dlib/uri.h:96:655",
@@ -1391,7 +1391,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmUtf8::IsBreaking@upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h:103:668",
@@ -1413,7 +1413,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmUtf8::IsWhiteSpace@upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h:86:667",
@@ -1435,7 +1435,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:dmUtf8::StrLen@upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h:41:657",
@@ -1455,7 +1455,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:EndianSwap16@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:65:185",
@@ -1477,7 +1477,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:EndianSwap32@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:81:186",
@@ -1499,7 +1499,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:EndianSwap64@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:100:187",
@@ -1521,7 +1521,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:EndianToHost16@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:141:189",
@@ -1543,7 +1543,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:EndianToHost32@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:169:191",
@@ -1565,7 +1565,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:EndianToHost64@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:197:193",
@@ -1587,7 +1587,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:EndianToNetwork16@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:125:188",
@@ -1609,7 +1609,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:EndianToNetwork32@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:153:190",
@@ -1631,7 +1631,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:EndianToNetwork64@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:181:192",
@@ -1653,7 +1653,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:ProfileIsInitialized@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:340:531",
@@ -1675,7 +1675,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:ProfilePropertyAddF32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:480",
@@ -1695,7 +1695,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:ProfilePropertyAddF64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:492",
@@ -1715,7 +1715,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:ProfilePropertyAddS32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:472",
@@ -1735,7 +1735,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:ProfilePropertyAddS64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:484",
@@ -1755,7 +1755,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:ProfilePropertyAddU32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:476",
@@ -1775,7 +1775,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:ProfilePropertyAddU64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:488",
@@ -1795,7 +1795,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:ProfilePropertySetBool@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:467",
@@ -1815,7 +1815,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:ProfilePropertySetF32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:479",
@@ -1835,7 +1835,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:ProfilePropertySetF64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:491",
@@ -1855,7 +1855,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:ProfilePropertySetS32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:471",
@@ -1875,7 +1875,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:ProfilePropertySetS64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:483",
@@ -1895,7 +1895,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:ProfilePropertySetU32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:475",
@@ -1915,7 +1915,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:ProfilePropertySetU64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:487",
@@ -1935,7 +1935,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:ResourceGetCanonicalPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:324:1907",
@@ -1955,7 +1955,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       },
       {
         "declarationId": "dmsdk:ResourceGetExtFromPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:314:1906",
@@ -1975,7 +1975,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64"
+        "catalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7"
       }
     ],
     "vectorCount": 94,
@@ -11346,7 +11346,7 @@
         "vectorSha256": "977c9558875f63c1b0257bc26b84ca358ea2a1319ee2557c083d9fb066700198"
       }
     ],
-    "manifestSha256": "a8266cb98addd9410e6c8117465e400e4d3eedb39b868bb396ec216475cbfdef"
+    "manifestSha256": "6fdde4918143594add8ee7ce2a2c7749b298ef27f6a577d2fdd21b43ffb67238"
   },
   "artifacts": {
     "verificationSource": {
@@ -11358,10 +11358,10 @@
       "sha256": "87595c3faa252f39759aef1032ddb1126c22d5926fa7fb679c30d6069fabd8b2"
     }
   },
-  "productionCatalogSha256": "f2249952077681a6945069a2b75aae050bfb1a11e2288fe60d771f11fd65ccbf",
-  "exactCatalogSha256": "97003166b2d52dc64f0208277c9f71283596ecf610e34a5f75575a6c5ac55d64",
+  "productionCatalogSha256": "65cad4b62ffb26081b7380b75ef0ca9a54b8511055adef74a40758863b907556",
+  "exactCatalogSha256": "4a8116abe6dfa99482f0d899398e9a059578f10ea3311dcbb5b761bedef811a7",
   "sourceHashes": {
-    "productionCatalog": "67daad846b686c90e7aefdd06310a2f23ccf8111437c3894007336a9aca0171c",
+    "productionCatalog": "6a6c417fac03256dcf221c56f8cbb9d4c23bd42efa14a9f011fd585af653c212",
     "sdkIr": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "familyReports": {
       "arenaCString": {
@@ -11410,5 +11410,5 @@
       }
     }
   },
-  "corpusSha256": "94ff23c69b3ca429e4d378daa4fd406ea6ea2e12d39ad8fa824a996f3c848f08"
+  "corpusSha256": "a5d30d3b422a5cf38735436828f3e9f1a1794a92e06004b8a69a0e0a112a6463"
 }
