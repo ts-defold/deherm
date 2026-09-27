@@ -3,24 +3,21 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import {
-  DMSDK_UNIVERSAL_FALLBACK_PATTERN,
-  compactDmSdkPatternDecision,
-  selectDmSdkPattern,
-} from "../packages/compiler/src/dmsdk-pattern-selector.mjs";
+import { DMSDK_UNIVERSAL_FALLBACK_PATTERN } from "../packages/compiler/src/dmsdk-pattern-selector.mjs";
+import { indexDmSdkBoundedSpanPlan } from "../packages/compiler/src/dmsdk-bounded-span-plan.mjs";
 import {
   analyzeBase64SpanRecipe,
   createDmSdkFallbackAudit,
   publicDmSdkHeader,
 } from "../packages/compiler/src/dmsdk-bounded-span-recipes.mjs";
 import { base64SpanPattern } from "../packages/compiler/src/dmsdk-pattern-catalog.mjs";
-import { indexCppSemanticFactArtifact } from "../packages/compiler/src/cpp-semantic-facts.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const defaults = {
   ir: "packages/bindings/generated/defold-sdk-ir.json",
   shapes: "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
   sourceFacts: "packages/bindings/generated/defold-dmsdk-source-semantic-facts.json",
+  plan: "packages/bindings/generated/defold-dmsdk-bounded-span-plan.json",
   policy: "packages/bindings/overrides/dmsdk-base64-span-bindings.json",
 };
 
@@ -38,7 +35,7 @@ function parseArgs(argv) {
     const argument = argv[index];
     if (argument === "--check") {
       options.check = true;
-    } else if (["--ir", "--shapes", "--source-facts", "--policy", "--out-root"].includes(argument)) {
+    } else if (["--ir", "--shapes", "--source-facts", "--plan", "--policy", "--out-root"].includes(argument)) {
       const key = argument.slice(2).replace(/-([a-z])/g, (_, character) => character.toUpperCase());
       options[key] = resolve(argv[++index]);
     } else {
@@ -50,17 +47,6 @@ function parseArgs(argv) {
     options[key] = resolve(root, options[key]);
   }
   return options;
-}
-
-function patternFacts(row, semanticTokens = []) {
-  return {
-    id: row.id,
-    kind: row.kind,
-    result: row.result,
-    parameters: row.parameters,
-    families: row.families,
-    semanticTokens,
-  };
 }
 
 function renderHeader(entries) {
@@ -163,38 +149,30 @@ export function extractBase64SpanSemantics(declaration, candidate, recipe, sourc
   return analyzeBase64SpanRecipe(declaration, candidate, recipe, sourceFacts).semantics;
 }
 
-function createEntries(rows, declarations, sourceFactsById, policy) {
+function createEntries(rows, declarations, planById) {
   const patterns = [base64SpanPattern(), DMSDK_UNIVERSAL_FALLBACK_PATTERN];
   const entries = [];
   const blocked = [];
   let structurallyEligible = 0;
   for (const candidate of [...rows].sort((left, right) => left.id.localeCompare(right.id))) {
-    const initial = selectDmSdkPattern(patternFacts(candidate), patterns);
-    const trace = initial.trace.find(({ patternId }) => patternId === "span.bounded-byte-transform");
-    if (!trace || trace.blockers.some((blocker) => !blocker.startsWith("semantic-token-missing:"))) continue;
+    const decision = planById.get(candidate.id);
+    if (!decision?.structuralCandidates.includes("span.bounded-byte-transform")) continue;
     structurallyEligible += 1;
     const declaration = declarations.get(candidate.id);
     if (!declaration) throw new Error(`Base64-span candidate is absent from dmSDK IR: ${candidate.id}`);
-    const analysis = analyzeBase64SpanRecipe(
-      declaration,
-      candidate,
-      policy.recipe,
-      sourceFactsById.get(candidate.id),
-    );
-    const semantics = analysis.semantics;
-    const decision = selectDmSdkPattern(patternFacts(candidate, semantics?.semanticTokens), patterns);
+    const semantics = decision.patternId === "span.bounded-byte-transform" ? decision.semantics : null;
     if (decision.patternId !== "span.bounded-byte-transform") {
       blocked.push({
         ...candidate,
         emitted: false,
         blocker: "base64-span-evidence-withdrawn",
-        patternDecision: compactDmSdkPatternDecision(decision),
+        patternDecision: decision.patternId,
         fallbackAudit: createDmSdkFallbackAudit({
           candidate,
           family: "base64-span",
           patternId: "span.bounded-byte-transform",
           emitter: "scripts/generate-dmsdk-base64-span-bindings.mjs",
-          missingFacts: analysis.missingFacts,
+          missingFacts: decision.missingFacts,
         }),
       });
       continue;
@@ -206,7 +184,7 @@ function createEntries(rows, declarations, sourceFactsById, policy) {
       mode: semantics.mode,
       requirePaddedInput: semantics.requirePaddedInput,
       evidence: semantics.evidence,
-      patternDecision: compactDmSdkPatternDecision(decision),
+      patternDecision: decision.patternId,
       wrapper: `deherm_dmsdk_base64_span_${snake(declaration.name)}`,
     });
   }
@@ -288,13 +266,17 @@ async function build(options) {
   const contents = await readInputs(options);
   const ir = JSON.parse(contents.ir);
   const shapes = JSON.parse(contents.shapes);
-  const sourceFacts = JSON.parse(contents.sourceFacts);
+  const plan = JSON.parse(contents.plan);
   const policy = JSON.parse(contents.policy);
   validateProvenance(ir, shapes, contents);
-  const sourceFactsById = indexCppSemanticFactArtifact(sourceFacts, {
+  const planById = indexDmSdkBoundedSpanPlan(plan, {
     revision: ir.defoldRevision,
-    irText: contents.ir,
-    shapesText: contents.shapes,
+    sourceHashes: {
+      ir: sha256(contents.ir),
+      shapes: sha256(contents.shapes),
+      sourceFacts: sha256(contents.sourceFacts),
+      base64: sha256(contents.policy),
+    },
   });
 
   const declarations = new Map(ir.declarations.map((declaration) => [declaration.id, declaration]));
@@ -314,8 +296,7 @@ async function build(options) {
   const { entries, blocked, structurallyEligible, patterns } = createEntries(
     shapes.rows,
     declarations,
-    sourceFactsById,
-    policy,
+    planById,
   );
   const artifacts = new Map([
     ["defold/defold_hermes/include/defold_hermes/generated_dmsdk_base64_span.h", renderHeader(entries)],

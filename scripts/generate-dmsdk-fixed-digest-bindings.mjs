@@ -3,11 +3,8 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import {
-  DMSDK_UNIVERSAL_FALLBACK_PATTERN,
-  compactDmSdkPatternDecision,
-  selectDmSdkPattern,
-} from "../packages/compiler/src/dmsdk-pattern-selector.mjs";
+import { DMSDK_UNIVERSAL_FALLBACK_PATTERN } from "../packages/compiler/src/dmsdk-pattern-selector.mjs";
+import { indexDmSdkBoundedSpanPlan } from "../packages/compiler/src/dmsdk-bounded-span-plan.mjs";
 import {
   analyzeFixedDigestRecipe,
   createDmSdkFallbackAudit,
@@ -20,6 +17,7 @@ const defaults = {
   ir: "packages/bindings/generated/defold-sdk-ir.json",
   shapes: "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
   sourceFacts: "packages/bindings/generated/defold-dmsdk-source-semantic-facts.json",
+  plan: "packages/bindings/generated/defold-dmsdk-bounded-span-plan.json",
   policy: "packages/bindings/overrides/dmsdk-fixed-digest-bindings.json",
 };
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
@@ -34,23 +32,12 @@ function parseArgs(argv) {
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
     if (argument === "--check") options.check = true;
-    else if (["--ir", "--shapes", "--source-facts", "--policy", "--out-root"].includes(argument))
+    else if (["--ir", "--shapes", "--source-facts", "--plan", "--policy", "--out-root"].includes(argument))
       options[argument.slice(2).replace(/-([a-z])/g, (_, c) => c.toUpperCase())] = resolve(argv[++index]);
     else throw new Error(`Unknown argument ${argument}`);
   }
   for (const key of ["ir", "shapes", "sourceFacts", "policy"]) options[key] = resolve(root, options[key]);
   return options;
-}
-
-function patternFacts(row, semanticTokens = []) {
-  return {
-    id: row.id,
-    kind: row.kind,
-    result: row.result,
-    parameters: row.parameters,
-    families: row.families,
-    semanticTokens,
-  };
 }
 
 export function extractFixedDigestSemantics(declaration, candidate, recipe, sourceFacts) {
@@ -108,6 +95,7 @@ async function build(options) {
   const ir = JSON.parse(contents.ir);
   const shapes = JSON.parse(contents.shapes);
   const sourceFacts = JSON.parse(contents.sourceFacts);
+  const plan = JSON.parse(contents.plan);
   const policy = JSON.parse(contents.policy);
   if (ir.defoldRevision !== shapes.defoldRevision || ir.defoldRevision !== sourceFacts.defoldRevision)
     throw new Error("Defold revisions differ between IR and ABI-shape census");
@@ -126,32 +114,31 @@ async function build(options) {
   )
     throw new Error("Unsupported fixed-digest semantic policy");
   const declarations = new Map(ir.declarations.map((declaration) => [declaration.id, declaration]));
-  const implementationFacts = new Map(
-    sourceFacts.declarations.map((declaration) => [declaration.declarationId, declaration]),
-  );
   if (
     declarations.size !== ir.declarations.length ||
     new Set(shapes.rows.map(({ id }) => id)).size !== shapes.rows.length
   )
     throw new Error("IR or ABI-shape census contains duplicate declaration ids");
   const patterns = [fixedDigestPattern(), DMSDK_UNIVERSAL_FALLBACK_PATTERN];
+  const planById = indexDmSdkBoundedSpanPlan(plan, {
+    revision: ir.defoldRevision,
+    sourceHashes: {
+      ir: sha256(contents.ir),
+      shapes: sha256(contents.shapes),
+      sourceFacts: sha256(contents.sourceFacts),
+      fixedDigest: sha256(contents.policy),
+    },
+  });
   const selected = [];
   const blocked = [];
   let structurallyEligible = 0;
   for (const candidate of [...shapes.rows].sort((left, right) => left.id.localeCompare(right.id))) {
-    const initial = selectDmSdkPattern(patternFacts(candidate), patterns);
-    const trace = initial.trace.find(({ patternId }) => patternId === "span.fixed-output-digest");
-    if (!trace || trace.blockers.some((blocker) => !blocker.startsWith("semantic-token-missing:"))) continue;
+    const patternDecision = planById.get(candidate.id);
+    if (!patternDecision?.structuralCandidates.includes("span.fixed-output-digest")) continue;
     structurallyEligible += 1;
     const declaration = declarations.get(candidate.id);
     if (!declaration) throw new Error(`Fixed-digest structural candidate has no source declaration: ${candidate.id}`);
-    const analysis = analyzeFixedDigestRecipe(
-      declaration,
-      candidate,
-      policy.recipe,
-      implementationFacts.get(candidate.id),
-    );
-    const semantics = analysis.semantics;
+    const semantics = patternDecision.patternId === "span.fixed-output-digest" ? patternDecision.semantics : null;
     if (!semantics) {
       blocked.push({
         ...candidate,
@@ -162,18 +149,15 @@ async function build(options) {
           family: "fixed-digest",
           patternId: "span.fixed-output-digest",
           emitter: "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
-          missingFacts: analysis.missingFacts,
+          missingFacts: patternDecision.missingFacts,
         }),
       });
       continue;
     }
-    const patternDecision = selectDmSdkPattern(patternFacts(candidate, semantics.semanticTokens), patterns);
-    if (patternDecision.fallback || patternDecision.patternId !== "span.fixed-output-digest")
-      throw new Error(`Fixed-digest semantic facts failed their structural pattern: ${candidate.id}`);
     selected.push({
       candidate,
       declaration,
-      patternDecision: compactDmSdkPatternDecision(patternDecision),
+      patternDecision: patternDecision.patternId,
       ...semantics,
     });
   }

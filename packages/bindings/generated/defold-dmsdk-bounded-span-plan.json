@@ -1,0 +1,1165 @@
+{
+  "schemaVersion": 1,
+  "kind": "deherm.dmsdk-bounded-span-plan",
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "sources": {
+    "ir": "packages/bindings/generated/defold-sdk-ir.json",
+    "shapes": "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
+    "sourceFacts": "packages/bindings/generated/defold-dmsdk-source-semantic-facts.json",
+    "policies": {
+      "fixedDigest": "packages/bindings/overrides/dmsdk-fixed-digest-bindings.json",
+      "base64": "packages/bindings/overrides/dmsdk-base64-span-bindings.json",
+      "astc": "packages/bindings/overrides/dmsdk-astc-probe-bindings.json",
+      "xtea": "packages/bindings/overrides/dmsdk-xtea-span-bindings.json"
+    }
+  },
+  "sourceHashes": {
+    "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
+    "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
+    "sourceFacts": "94bcdd1afd3f40212f8d65f38de6069f0fcf7cdd146e844f3129ad29a0900c73",
+    "fixedDigest": "9e5447e859698463cc676be96b454fa19871d17e265adf16e93eb3844595cf70",
+    "base64": "52a25ca0a83b7410dd0dbadb4847c4de8e922a56c93b46857c37f2696de2e31c",
+    "astc": "9bb907d3f928ae3e61b1e648e4bb52fa308487e7129a629590259f37b458da9c",
+    "xtea": "d8892d2c631b3e35ca535724b82b81fe12a0ff6c3c619456f617417adabe9625"
+  },
+  "patternRegistry": [
+    {
+      "schemaVersion": 1,
+      "id": "span.fixed-output-digest",
+      "family": "fixed-digest",
+      "emitter": "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
+      "priority": 900,
+      "cost": 5,
+      "fallback": false,
+      "when": {
+        "declarationKinds": [
+          "function"
+        ],
+        "result": {
+          "roles": [
+            "scalar:void"
+          ]
+        },
+        "parameters": {
+          "count": {
+            "exact": 3
+          },
+          "positions": [
+            {
+              "roles": [
+                "pointer:scalar:u8"
+              ],
+              "directions": [
+                "in"
+              ]
+            },
+            {
+              "roles": [
+                "scalar:u32"
+              ],
+              "directions": [
+                "value"
+              ]
+            },
+            {
+              "roles": [
+                "pointer:scalar:u8"
+              ],
+              "directions": [
+                "inout",
+                "out"
+              ]
+            }
+          ]
+        },
+        "requireSemanticTokens": [
+          "fixed-output-byte-count",
+          "synchronous-noescape"
+        ]
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "id": "span.bounded-byte-transform",
+      "family": "base64-span",
+      "emitter": "scripts/generate-dmsdk-base64-span-bindings.mjs",
+      "priority": 890,
+      "cost": 7,
+      "fallback": false,
+      "when": {
+        "declarationKinds": [
+          "function"
+        ],
+        "result": {
+          "roles": [
+            "scalar:bool"
+          ]
+        },
+        "parameters": {
+          "count": {
+            "exact": 4
+          },
+          "positions": [
+            {
+              "roles": [
+                "pointer:scalar:u8"
+              ],
+              "directions": [
+                "in"
+              ]
+            },
+            {
+              "roles": [
+                "scalar:u32"
+              ],
+              "directions": [
+                "value"
+              ]
+            },
+            {
+              "roles": [
+                "pointer:scalar:u8"
+              ],
+              "directions": [
+                "inout",
+                "out"
+              ]
+            },
+            {
+              "roles": [
+                "pointer:scalar:u32"
+              ],
+              "directions": [
+                "inout",
+                "out"
+              ]
+            }
+          ]
+        },
+        "requireSemanticTokens": [
+          "bounded-output-capacity",
+          "synchronous-noescape",
+          "zero-capacity-size-query"
+        ]
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "id": "span.fixed-three-u32-probe",
+      "family": "astc-probe",
+      "emitter": "scripts/generate-dmsdk-astc-probe-bindings.mjs",
+      "priority": 880,
+      "cost": 8,
+      "fallback": false,
+      "when": {
+        "declarationKinds": [
+          "function"
+        ],
+        "result": {
+          "roles": [
+            "scalar:bool"
+          ]
+        },
+        "parameters": {
+          "count": {
+            "exact": 5
+          },
+          "positions": [
+            {
+              "roles": [
+                "opaque-pointer"
+              ],
+              "directions": [
+                "in"
+              ]
+            },
+            {
+              "roles": [
+                "scalar:u32"
+              ],
+              "directions": [
+                "value"
+              ]
+            },
+            {
+              "roles": [
+                "pointer:scalar:u32"
+              ],
+              "directions": [
+                "inout",
+                "out"
+              ]
+            },
+            {
+              "roles": [
+                "pointer:scalar:u32"
+              ],
+              "directions": [
+                "inout",
+                "out"
+              ]
+            },
+            {
+              "roles": [
+                "pointer:scalar:u32"
+              ],
+              "directions": [
+                "inout",
+                "out"
+              ]
+            }
+          ]
+        },
+        "requireSemanticTokens": [
+          "bounded-input-span",
+          "fixed-three-u32-output",
+          "synchronous-noescape"
+        ]
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "id": "span.in-place-keyed-transform",
+      "family": "xtea-span",
+      "emitter": "scripts/generate-dmsdk-xtea-span-bindings.mjs",
+      "priority": 870,
+      "cost": 9,
+      "fallback": false,
+      "when": {
+        "declarationKinds": [
+          "function"
+        ],
+        "result": {
+          "rolePrefixes": [
+            "enum:"
+          ]
+        },
+        "parameters": {
+          "count": {
+            "exact": 5
+          },
+          "positions": [
+            {
+              "rolePrefixes": [
+                "enum:"
+              ],
+              "directions": [
+                "value"
+              ]
+            },
+            {
+              "roles": [
+                "pointer:scalar:u8"
+              ],
+              "directions": [
+                "inout",
+                "out"
+              ]
+            },
+            {
+              "roles": [
+                "scalar:u32"
+              ],
+              "directions": [
+                "value"
+              ]
+            },
+            {
+              "roles": [
+                "pointer:scalar:u8"
+              ],
+              "directions": [
+                "in"
+              ]
+            },
+            {
+              "roles": [
+                "scalar:u32"
+              ],
+              "directions": [
+                "value"
+              ]
+            }
+          ]
+        },
+        "requireSemanticTokens": [
+          "bounded-key-span",
+          "in-place-byte-transform",
+          "single-algorithm-enum",
+          "synchronous-noescape"
+        ]
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "id": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "priority": 0,
+      "cost": 1000,
+      "fallback": true,
+      "when": null
+    }
+  ],
+  "coverage": {
+    "structurallyRelevant": 10,
+    "selected": 10,
+    "universalFallback": 0
+  },
+  "decisions": [
+    {
+      "declarationId": "dmsdk:dmCrypt::Base64Decode@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:133:162",
+      "patternId": "span.bounded-byte-transform",
+      "family": "base64-span",
+      "emitter": "scripts/generate-dmsdk-base64-span-bindings.mjs",
+      "fallback": false,
+      "priority": 890,
+      "cost": 7,
+      "semanticTokens": [
+        "bounded-output-capacity",
+        "synchronous-noescape",
+        "zero-capacity-size-query"
+      ],
+      "semantics": {
+        "mode": "decode",
+        "requirePaddedInput": false,
+        "semanticTokens": [
+          "bounded-output-capacity",
+          "synchronous-noescape",
+          "zero-capacity-size-query"
+        ],
+        "evidence": {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
+          "declarationLine": 133,
+          "semanticSource": "revision-implementation-ast+abi-shape",
+          "operation": "decode",
+          "capacityQuery": "dereferenced-capacity-equals-zero",
+          "unpaddedInput": "accepted-by-padding-adapter",
+          "implementationObservations": [
+            {
+              "source": "upstream/defold/engine/dlib/src/dlib/crypt_mbedtls.cpp",
+              "line": 89,
+              "callee": "mbedtls_base64_decode",
+              "calleeIdentity": "external:mbedtls_base64_decode|int (unsigned char *, size_t, size_t *, const unsigned char *, size_t)",
+              "calleeType": "int (unsigned char *, size_t, size_t *, const unsigned char *, size_t)",
+              "resultVariable": "r",
+              "mode": "decode"
+            }
+          ],
+          "paddingAdapterObservations": [
+            {
+              "source": "upstream/defold/engine/dlib/src/dlib/crypt_mbedtls.cpp",
+              "line": 89,
+              "paddingVariable": "padding_needed"
+            }
+          ]
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "span.bounded-byte-transform"
+      ],
+      "trace": [
+        {
+          "patternId": "span.fixed-output-digest",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:4",
+            "parameter-position-count:4",
+            "result-role:scalar:bool",
+            "semantic-token-missing:fixed-output-byte-count"
+          ]
+        },
+        {
+          "patternId": "span.bounded-byte-transform",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "span.fixed-three-u32-probe",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:4",
+            "parameter-position-count:4",
+            "semantic-token-missing:bounded-input-span",
+            "semantic-token-missing:fixed-three-u32-output"
+          ]
+        },
+        {
+          "patternId": "span.in-place-keyed-transform",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:4",
+            "parameter-position-count:4",
+            "result-role:scalar:bool",
+            "semantic-token-missing:bounded-key-span",
+            "semantic-token-missing:in-place-byte-transform",
+            "semantic-token-missing:single-algorithm-enum"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmCrypt::Base64Encode@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:120:161",
+      "patternId": "span.bounded-byte-transform",
+      "family": "base64-span",
+      "emitter": "scripts/generate-dmsdk-base64-span-bindings.mjs",
+      "fallback": false,
+      "priority": 890,
+      "cost": 7,
+      "semanticTokens": [
+        "bounded-output-capacity",
+        "synchronous-noescape",
+        "zero-capacity-size-query"
+      ],
+      "semantics": {
+        "mode": "encode",
+        "requirePaddedInput": false,
+        "semanticTokens": [
+          "bounded-output-capacity",
+          "synchronous-noescape",
+          "zero-capacity-size-query"
+        ],
+        "evidence": {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
+          "declarationLine": 120,
+          "semanticSource": "revision-implementation-ast+abi-shape",
+          "operation": "encode",
+          "capacityQuery": "dereferenced-capacity-equals-zero",
+          "unpaddedInput": "not-applicable",
+          "implementationObservations": [
+            {
+              "source": "upstream/defold/engine/dlib/src/dlib/crypt_mbedtls.cpp",
+              "line": 54,
+              "callee": "mbedtls_base64_encode",
+              "calleeIdentity": "external:mbedtls_base64_encode|int (unsigned char *, size_t, size_t *, const unsigned char *, size_t)",
+              "calleeType": "int (unsigned char *, size_t, size_t *, const unsigned char *, size_t)",
+              "resultVariable": "r",
+              "mode": "encode"
+            }
+          ],
+          "paddingAdapterObservations": []
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "span.bounded-byte-transform"
+      ],
+      "trace": [
+        {
+          "patternId": "span.fixed-output-digest",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:4",
+            "parameter-position-count:4",
+            "result-role:scalar:bool",
+            "semantic-token-missing:fixed-output-byte-count"
+          ]
+        },
+        {
+          "patternId": "span.bounded-byte-transform",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "span.fixed-three-u32-probe",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:4",
+            "parameter-position-count:4",
+            "semantic-token-missing:bounded-input-span",
+            "semantic-token-missing:fixed-three-u32-output"
+          ]
+        },
+        {
+          "patternId": "span.in-place-keyed-transform",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:4",
+            "parameter-position-count:4",
+            "result-role:scalar:bool",
+            "semantic-token-missing:bounded-key-span",
+            "semantic-token-missing:in-place-byte-transform",
+            "semantic-token-missing:single-algorithm-enum"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmCrypt::Decrypt@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:76:156",
+      "patternId": "span.in-place-keyed-transform",
+      "family": "xtea-span",
+      "emitter": "scripts/generate-dmsdk-xtea-span-bindings.mjs",
+      "fallback": false,
+      "priority": 870,
+      "cost": 9,
+      "semanticTokens": [
+        "bounded-key-span",
+        "in-place-byte-transform",
+        "single-algorithm-enum",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "mode": "symmetric-in-place-transform",
+        "maximumKeyBytes": 16,
+        "algorithmExpression": "dmCrypt::ALGORITHM_XTEA",
+        "successExpression": "dmCrypt::RESULT_OK",
+        "semanticTokens": [
+          "bounded-key-span",
+          "in-place-byte-transform",
+          "single-algorithm-enum",
+          "synchronous-noescape"
+        ],
+        "evidence": {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
+          "declarationLine": 76,
+          "semanticSource": "revision-implementation-ast+abi-shape",
+          "operation": "symmetric-in-place-transform",
+          "maximumKeyBytes": 16,
+          "algorithmType": "dmCrypt::Algorithm",
+          "algorithmMember": {
+            "name": "ALGORITHM_XTEA",
+            "value": 0
+          },
+          "resultType": "dmCrypt::Result",
+          "successMember": {
+            "name": "RESULT_OK",
+            "value": 0
+          },
+          "implementationObservations": [
+            {
+              "source": "upstream/defold/engine/dlib/src/dlib/crypt.cpp",
+              "line": 80
+            }
+          ]
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "span.in-place-keyed-transform"
+      ],
+      "trace": [
+        {
+          "patternId": "span.fixed-output-digest",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:5",
+            "parameter-position-count:5",
+            "result-role:enum:dmCrypt::Result",
+            "semantic-token-missing:fixed-output-byte-count"
+          ]
+        },
+        {
+          "patternId": "span.bounded-byte-transform",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:5",
+            "parameter-position-count:5",
+            "result-role:enum:dmCrypt::Result",
+            "semantic-token-missing:bounded-output-capacity",
+            "semantic-token-missing:zero-capacity-size-query"
+          ]
+        },
+        {
+          "patternId": "span.fixed-three-u32-probe",
+          "applicable": false,
+          "blockers": [
+            "parameter-position:0:value:enum:dmCrypt::Algorithm",
+            "parameter-position:1:inout:pointer:scalar:u8",
+            "parameter-position:2:value:scalar:u32",
+            "parameter-position:3:in:pointer:scalar:u8",
+            "parameter-position:4:value:scalar:u32",
+            "result-role:enum:dmCrypt::Result",
+            "semantic-token-missing:bounded-input-span",
+            "semantic-token-missing:fixed-three-u32-output"
+          ]
+        },
+        {
+          "patternId": "span.in-place-keyed-transform",
+          "applicable": true,
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmCrypt::Encrypt@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:65:155",
+      "patternId": "span.in-place-keyed-transform",
+      "family": "xtea-span",
+      "emitter": "scripts/generate-dmsdk-xtea-span-bindings.mjs",
+      "fallback": false,
+      "priority": 870,
+      "cost": 9,
+      "semanticTokens": [
+        "bounded-key-span",
+        "in-place-byte-transform",
+        "single-algorithm-enum",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "mode": "symmetric-in-place-transform",
+        "maximumKeyBytes": 16,
+        "algorithmExpression": "dmCrypt::ALGORITHM_XTEA",
+        "successExpression": "dmCrypt::RESULT_OK",
+        "semanticTokens": [
+          "bounded-key-span",
+          "in-place-byte-transform",
+          "single-algorithm-enum",
+          "synchronous-noescape"
+        ],
+        "evidence": {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
+          "declarationLine": 65,
+          "semanticSource": "revision-implementation-ast+abi-shape",
+          "operation": "symmetric-in-place-transform",
+          "maximumKeyBytes": 16,
+          "algorithmType": "dmCrypt::Algorithm",
+          "algorithmMember": {
+            "name": "ALGORITHM_XTEA",
+            "value": 0
+          },
+          "resultType": "dmCrypt::Result",
+          "successMember": {
+            "name": "RESULT_OK",
+            "value": 0
+          },
+          "implementationObservations": [
+            {
+              "source": "upstream/defold/engine/dlib/src/dlib/crypt.cpp",
+              "line": 74
+            }
+          ]
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "span.in-place-keyed-transform"
+      ],
+      "trace": [
+        {
+          "patternId": "span.fixed-output-digest",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:5",
+            "parameter-position-count:5",
+            "result-role:enum:dmCrypt::Result",
+            "semantic-token-missing:fixed-output-byte-count"
+          ]
+        },
+        {
+          "patternId": "span.bounded-byte-transform",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:5",
+            "parameter-position-count:5",
+            "result-role:enum:dmCrypt::Result",
+            "semantic-token-missing:bounded-output-capacity",
+            "semantic-token-missing:zero-capacity-size-query"
+          ]
+        },
+        {
+          "patternId": "span.fixed-three-u32-probe",
+          "applicable": false,
+          "blockers": [
+            "parameter-position:0:value:enum:dmCrypt::Algorithm",
+            "parameter-position:1:inout:pointer:scalar:u8",
+            "parameter-position:2:value:scalar:u32",
+            "parameter-position:3:in:pointer:scalar:u8",
+            "parameter-position:4:value:scalar:u32",
+            "result-role:enum:dmCrypt::Result",
+            "semantic-token-missing:bounded-input-span",
+            "semantic-token-missing:fixed-three-u32-output"
+          ]
+        },
+        {
+          "patternId": "span.in-place-keyed-transform",
+          "applicable": true,
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmCrypt::HashMd5@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:108:160",
+      "patternId": "span.fixed-output-digest",
+      "family": "fixed-digest",
+      "emitter": "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
+      "fallback": false,
+      "priority": 900,
+      "cost": 5,
+      "semanticTokens": [
+        "fixed-output-byte-count",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "digestBytes": 16,
+        "algorithm": "MBEDTLS_MD_MD5",
+        "semanticTokens": [
+          "fixed-output-byte-count",
+          "synchronous-noescape"
+        ],
+        "evidence": {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
+          "declarationLine": 108,
+          "semanticSource": "revision-implementation-ast+abi-shape",
+          "digestBytes": 16,
+          "implementationObservations": [
+            {
+              "bytes": 16,
+              "source": "upstream/defold/engine/dlib/src/dlib/crypt_mbedtls.cpp",
+              "line": 49,
+              "callee": "HashMbedTLS"
+            }
+          ]
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "span.fixed-output-digest"
+      ],
+      "trace": [
+        {
+          "patternId": "span.fixed-output-digest",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "span.bounded-byte-transform",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:3",
+            "parameter-position-count:3",
+            "result-role:scalar:void",
+            "semantic-token-missing:bounded-output-capacity",
+            "semantic-token-missing:zero-capacity-size-query"
+          ]
+        },
+        {
+          "patternId": "span.fixed-three-u32-probe",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:3",
+            "parameter-position-count:3",
+            "result-role:scalar:void",
+            "semantic-token-missing:bounded-input-span",
+            "semantic-token-missing:fixed-three-u32-output"
+          ]
+        },
+        {
+          "patternId": "span.in-place-keyed-transform",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:3",
+            "parameter-position-count:3",
+            "result-role:scalar:void",
+            "semantic-token-missing:bounded-key-span",
+            "semantic-token-missing:in-place-byte-transform",
+            "semantic-token-missing:single-algorithm-enum"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmCrypt::HashSha1@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:84:157",
+      "patternId": "span.fixed-output-digest",
+      "family": "fixed-digest",
+      "emitter": "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
+      "fallback": false,
+      "priority": 900,
+      "cost": 5,
+      "semanticTokens": [
+        "fixed-output-byte-count",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "digestBytes": 20,
+        "algorithm": "MBEDTLS_MD_SHA1",
+        "semanticTokens": [
+          "fixed-output-byte-count",
+          "synchronous-noescape"
+        ],
+        "evidence": {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
+          "declarationLine": 84,
+          "semanticSource": "revision-implementation-ast+abi-shape",
+          "digestBytes": 20,
+          "implementationObservations": [
+            {
+              "bytes": 20,
+              "source": "upstream/defold/engine/dlib/src/dlib/crypt_mbedtls.cpp",
+              "line": 34,
+              "callee": "HashMbedTLS"
+            }
+          ]
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "span.fixed-output-digest"
+      ],
+      "trace": [
+        {
+          "patternId": "span.fixed-output-digest",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "span.bounded-byte-transform",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:3",
+            "parameter-position-count:3",
+            "result-role:scalar:void",
+            "semantic-token-missing:bounded-output-capacity",
+            "semantic-token-missing:zero-capacity-size-query"
+          ]
+        },
+        {
+          "patternId": "span.fixed-three-u32-probe",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:3",
+            "parameter-position-count:3",
+            "result-role:scalar:void",
+            "semantic-token-missing:bounded-input-span",
+            "semantic-token-missing:fixed-three-u32-output"
+          ]
+        },
+        {
+          "patternId": "span.in-place-keyed-transform",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:3",
+            "parameter-position-count:3",
+            "result-role:scalar:void",
+            "semantic-token-missing:bounded-key-span",
+            "semantic-token-missing:in-place-byte-transform",
+            "semantic-token-missing:single-algorithm-enum"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmCrypt::HashSha256@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:92:158",
+      "patternId": "span.fixed-output-digest",
+      "family": "fixed-digest",
+      "emitter": "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
+      "fallback": false,
+      "priority": 900,
+      "cost": 5,
+      "semanticTokens": [
+        "fixed-output-byte-count",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "digestBytes": 32,
+        "algorithm": "MBEDTLS_MD_SHA256",
+        "semanticTokens": [
+          "fixed-output-byte-count",
+          "synchronous-noescape"
+        ],
+        "evidence": {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
+          "declarationLine": 92,
+          "semanticSource": "revision-implementation-ast+abi-shape",
+          "digestBytes": 32,
+          "implementationObservations": [
+            {
+              "bytes": 32,
+              "source": "upstream/defold/engine/dlib/src/dlib/crypt_mbedtls.cpp",
+              "line": 39,
+              "callee": "HashMbedTLS"
+            }
+          ]
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "span.fixed-output-digest"
+      ],
+      "trace": [
+        {
+          "patternId": "span.fixed-output-digest",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "span.bounded-byte-transform",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:3",
+            "parameter-position-count:3",
+            "result-role:scalar:void",
+            "semantic-token-missing:bounded-output-capacity",
+            "semantic-token-missing:zero-capacity-size-query"
+          ]
+        },
+        {
+          "patternId": "span.fixed-three-u32-probe",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:3",
+            "parameter-position-count:3",
+            "result-role:scalar:void",
+            "semantic-token-missing:bounded-input-span",
+            "semantic-token-missing:fixed-three-u32-output"
+          ]
+        },
+        {
+          "patternId": "span.in-place-keyed-transform",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:3",
+            "parameter-position-count:3",
+            "result-role:scalar:void",
+            "semantic-token-missing:bounded-key-span",
+            "semantic-token-missing:in-place-byte-transform",
+            "semantic-token-missing:single-algorithm-enum"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmCrypt::HashSha512@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:100:159",
+      "patternId": "span.fixed-output-digest",
+      "family": "fixed-digest",
+      "emitter": "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
+      "fallback": false,
+      "priority": 900,
+      "cost": 5,
+      "semanticTokens": [
+        "fixed-output-byte-count",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "digestBytes": 64,
+        "algorithm": "MBEDTLS_MD_SHA512",
+        "semanticTokens": [
+          "fixed-output-byte-count",
+          "synchronous-noescape"
+        ],
+        "evidence": {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
+          "declarationLine": 100,
+          "semanticSource": "revision-implementation-ast+abi-shape",
+          "digestBytes": 64,
+          "implementationObservations": [
+            {
+              "bytes": 64,
+              "source": "upstream/defold/engine/dlib/src/dlib/crypt_mbedtls.cpp",
+              "line": 44,
+              "callee": "HashMbedTLS"
+            }
+          ]
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "span.fixed-output-digest"
+      ],
+      "trace": [
+        {
+          "patternId": "span.fixed-output-digest",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "span.bounded-byte-transform",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:3",
+            "parameter-position-count:3",
+            "result-role:scalar:void",
+            "semantic-token-missing:bounded-output-capacity",
+            "semantic-token-missing:zero-capacity-size-query"
+          ]
+        },
+        {
+          "patternId": "span.fixed-three-u32-probe",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:3",
+            "parameter-position-count:3",
+            "result-role:scalar:void",
+            "semantic-token-missing:bounded-input-span",
+            "semantic-token-missing:fixed-three-u32-output"
+          ]
+        },
+        {
+          "patternId": "span.in-place-keyed-transform",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:3",
+            "parameter-position-count:3",
+            "result-role:scalar:void",
+            "semantic-token-missing:bounded-key-span",
+            "semantic-token-missing:in-place-byte-transform",
+            "semantic-token-missing:single-algorithm-enum"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmImage::GetAstcBlockSize@upstream/defold/engine/dlib/src/dmsdk/dlib/image.h:133:349",
+      "patternId": "span.fixed-three-u32-probe",
+      "family": "astc-probe",
+      "emitter": "scripts/generate-dmsdk-astc-probe-bindings.mjs",
+      "fallback": false,
+      "priority": 880,
+      "cost": 8,
+      "semanticTokens": [
+        "bounded-input-span",
+        "fixed-three-u32-output",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "mode": "block-size",
+        "minimumHeaderBytes": 16,
+        "semanticTokens": [
+          "bounded-input-span",
+          "fixed-three-u32-output",
+          "synchronous-noescape"
+        ],
+        "evidence": {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/image.h",
+          "declarationLine": 133,
+          "semanticSource": "revision-implementation-ast+abi-shape",
+          "operation": "block-size",
+          "minimumHeaderBytes": 16,
+          "implementationObservations": [
+            {
+              "source": "upstream/defold/engine/dlib/src/dlib/image.cpp",
+              "line": 237
+            }
+          ]
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "span.fixed-three-u32-probe"
+      ],
+      "trace": [
+        {
+          "patternId": "span.fixed-output-digest",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:5",
+            "parameter-position-count:5",
+            "result-role:scalar:bool",
+            "semantic-token-missing:fixed-output-byte-count"
+          ]
+        },
+        {
+          "patternId": "span.bounded-byte-transform",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:5",
+            "parameter-position-count:5",
+            "semantic-token-missing:bounded-output-capacity",
+            "semantic-token-missing:zero-capacity-size-query"
+          ]
+        },
+        {
+          "patternId": "span.fixed-three-u32-probe",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "span.in-place-keyed-transform",
+          "applicable": false,
+          "blockers": [
+            "parameter-position:0:in:opaque-pointer",
+            "parameter-position:1:value:scalar:u32",
+            "parameter-position:2:inout:pointer:scalar:u32",
+            "parameter-position:3:inout:pointer:scalar:u32",
+            "parameter-position:4:inout:pointer:scalar:u32",
+            "result-role:scalar:bool",
+            "semantic-token-missing:bounded-key-span",
+            "semantic-token-missing:in-place-byte-transform",
+            "semantic-token-missing:single-algorithm-enum"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmImage::GetAstcDimensions@upstream/defold/engine/dlib/src/dmsdk/dlib/image.h:145:350",
+      "patternId": "span.fixed-three-u32-probe",
+      "family": "astc-probe",
+      "emitter": "scripts/generate-dmsdk-astc-probe-bindings.mjs",
+      "fallback": false,
+      "priority": 880,
+      "cost": 8,
+      "semanticTokens": [
+        "bounded-input-span",
+        "fixed-three-u32-output",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "mode": "dimensions",
+        "minimumHeaderBytes": 16,
+        "semanticTokens": [
+          "bounded-input-span",
+          "fixed-three-u32-output",
+          "synchronous-noescape"
+        ],
+        "evidence": {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/image.h",
+          "declarationLine": 145,
+          "semanticSource": "revision-implementation-ast+abi-shape",
+          "operation": "dimensions",
+          "minimumHeaderBytes": 16,
+          "implementationObservations": [
+            {
+              "source": "upstream/defold/engine/dlib/src/dlib/image.cpp",
+              "line": 249
+            }
+          ]
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "span.fixed-three-u32-probe"
+      ],
+      "trace": [
+        {
+          "patternId": "span.fixed-output-digest",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:5",
+            "parameter-position-count:5",
+            "result-role:scalar:bool",
+            "semantic-token-missing:fixed-output-byte-count"
+          ]
+        },
+        {
+          "patternId": "span.bounded-byte-transform",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:5",
+            "parameter-position-count:5",
+            "semantic-token-missing:bounded-output-capacity",
+            "semantic-token-missing:zero-capacity-size-query"
+          ]
+        },
+        {
+          "patternId": "span.fixed-three-u32-probe",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "span.in-place-keyed-transform",
+          "applicable": false,
+          "blockers": [
+            "parameter-position:0:in:opaque-pointer",
+            "parameter-position:1:value:scalar:u32",
+            "parameter-position:2:inout:pointer:scalar:u32",
+            "parameter-position:3:inout:pointer:scalar:u32",
+            "parameter-position:4:inout:pointer:scalar:u32",
+            "result-role:scalar:bool",
+            "semantic-token-missing:bounded-key-span",
+            "semantic-token-missing:in-place-byte-transform",
+            "semantic-token-missing:single-algorithm-enum"
+          ]
+        }
+      ]
+    }
+  ]
+}

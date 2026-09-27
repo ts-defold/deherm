@@ -4088,3 +4088,20 @@ ASTC minimum and output writes, and a 999-byte XTEA scratch array; none changes
 the selected production recipe. Removing the actual controlled capacity query,
 called parser edge, or key copy forces universal fallback. The causality suite
 is now part of the root `pnpm check` graph.
+
+## 2026-09-27 - Compiler-owned bounded-span selection plan
+
+The first four prose-sensitive dmSDK families now share one authenticated
+selection plan. The compiler reads the revision IR, ABI shapes, causal Clang
+facts, and stable fixed-digest/Base64/ASTC/XTEA recipes, evaluates every
+structurally relevant declaration, and records one ranked winner or universal
+fallback. The four family generators no longer import or invoke the pattern
+selector; they authenticate and consume the plan.
+
+The current revision selects the same ten optimized routes (4 + 2 + 2 + 2), so
+the transport and allocation behavior did not regress. New gates reject forged
+pattern/family/rank relationships, prove every emitted family row is owned by
+the plan, and prevent the four emitters from silently reintroducing independent
+selection. The dmSDK clean room owns the new plan and reproduced 116 artifacts
+byte-for-byte; focused compile, link, behavior, and zero-warmed-allocation tests
+remain unchanged.

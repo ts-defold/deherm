@@ -12,6 +12,7 @@ import {
   analyzeFixedDigestRecipe,
   createDmSdkFallbackAudit,
 } from "../packages/compiler/src/dmsdk-bounded-span-recipes.mjs";
+import { buildDmSdkBoundedSpanPlan } from "../packages/compiler/src/dmsdk-bounded-span-plan.mjs";
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const reportPath = join(repositoryRoot, "packages/bindings/generated/defold-dmsdk-fixed-digest-bindings.json");
@@ -113,9 +114,25 @@ test("a fixed-digest shape without recoverable implementation extent retains the
     const irPath = join(output, "ir.json");
     const shapesPath = join(output, "shapes.json");
     const sourceFactsPath = join(output, "source-facts.json");
+    const planPath = join(output, "bounded-span-plan.json");
+    const policyTexts = Object.fromEntries(await Promise.all([
+      ["fixedDigest", "dmsdk-fixed-digest-bindings.json"],
+      ["base64", "dmsdk-base64-span-bindings.json"],
+      ["astc", "dmsdk-astc-probe-bindings.json"],
+      ["xtea", "dmsdk-xtea-span-bindings.json"],
+    ].map(async ([key, name]) => [key, await readFile(join(repositoryRoot, "packages/bindings/overrides", name), "utf8")])));
+    const sourceFactsText = `${JSON.stringify(sourceFacts, null, 2)}\n`;
     await writeFile(irPath, irText);
     await writeFile(shapesPath, shapesText);
-    await writeFile(sourceFactsPath, `${JSON.stringify(sourceFacts, null, 2)}\n`);
+    await writeFile(sourceFactsPath, sourceFactsText);
+    const plan = buildDmSdkBoundedSpanPlan({
+      ir,
+      shapes,
+      sourceFacts,
+      policies: Object.fromEntries(Object.entries(policyTexts).map(([key, text]) => [key, JSON.parse(text)])),
+      texts: { ir: irText, shapes: shapesText, sourceFacts: sourceFactsText, ...policyTexts },
+    });
+    await writeFile(planPath, `${JSON.stringify(plan, null, 2)}\n`);
 
     run(process.execPath, [
       "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
@@ -125,6 +142,8 @@ test("a fixed-digest shape without recoverable implementation extent retains the
       shapesPath,
       "--source-facts",
       sourceFactsPath,
+      "--plan",
+      planPath,
       "--out-root",
       join(output, "out"),
     ]);

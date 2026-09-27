@@ -3,24 +3,21 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import {
-  DMSDK_UNIVERSAL_FALLBACK_PATTERN,
-  compactDmSdkPatternDecision,
-  selectDmSdkPattern,
-} from "../packages/compiler/src/dmsdk-pattern-selector.mjs";
+import { DMSDK_UNIVERSAL_FALLBACK_PATTERN } from "../packages/compiler/src/dmsdk-pattern-selector.mjs";
+import { indexDmSdkBoundedSpanPlan } from "../packages/compiler/src/dmsdk-bounded-span-plan.mjs";
 import {
   analyzeXteaSpanRecipe,
   createDmSdkFallbackAudit,
   publicDmSdkHeader,
 } from "../packages/compiler/src/dmsdk-bounded-span-recipes.mjs";
 import { xteaSpanPattern } from "../packages/compiler/src/dmsdk-pattern-catalog.mjs";
-import { indexCppSemanticFactArtifact } from "../packages/compiler/src/cpp-semantic-facts.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const defaults = {
   ir: "packages/bindings/generated/defold-sdk-ir.json",
   shapes: "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
   sourceFacts: "packages/bindings/generated/defold-dmsdk-source-semantic-facts.json",
+  plan: "packages/bindings/generated/defold-dmsdk-bounded-span-plan.json",
   policy: "packages/bindings/overrides/dmsdk-xtea-span-bindings.json",
 };
 
@@ -38,7 +35,7 @@ function parseArgs(argv) {
     const argument = argv[index];
     if (argument === "--check") {
       options.check = true;
-    } else if (["--ir", "--shapes", "--source-facts", "--policy", "--out-root"].includes(argument)) {
+    } else if (["--ir", "--shapes", "--source-facts", "--plan", "--policy", "--out-root"].includes(argument)) {
       const key = argument.slice(2).replace(/-([a-z])/g, (_, character) => character.toUpperCase());
       options[key] = resolve(argv[++index]);
     } else {
@@ -50,17 +47,6 @@ function parseArgs(argv) {
     options[key] = resolve(root, options[key]);
   }
   return options;
-}
-
-function patternFacts(row, semanticTokens = []) {
-  return {
-    id: row.id,
-    kind: row.kind,
-    result: row.result,
-    parameters: row.parameters,
-    families: row.families,
-    semanticTokens,
-  };
 }
 
 export function extractXteaSpanSemantics(declaration, candidate, enumDeclarations, recipe, sourceFacts) {
@@ -124,39 +110,30 @@ function validateProvenance(ir, shapes, irText) {
   }
 }
 
-function createEntries(rows, declarations, enumDeclarations, sourceFactsById, policy) {
+function createEntries(rows, declarations, planById) {
   const patterns = [xteaSpanPattern(), DMSDK_UNIVERSAL_FALLBACK_PATTERN];
   const entries = [];
   const blocked = [];
   let structurallyEligible = 0;
   for (const candidate of [...rows].sort((left, right) => left.id.localeCompare(right.id))) {
-    const initial = selectDmSdkPattern(patternFacts(candidate), patterns);
-    const trace = initial.trace.find(({ patternId }) => patternId === "span.in-place-keyed-transform");
-    if (!trace || trace.blockers.some((blocker) => !blocker.startsWith("semantic-token-missing:"))) continue;
+    const decision = planById.get(candidate.id);
+    if (!decision?.structuralCandidates.includes("span.in-place-keyed-transform")) continue;
     structurallyEligible += 1;
     const declaration = declarations.get(candidate.id);
     if (!declaration) throw new Error(`XTEA-span candidate is absent from dmSDK IR: ${candidate.id}`);
-    const analysis = analyzeXteaSpanRecipe(
-      declaration,
-      candidate,
-      enumDeclarations,
-      policy.recipe,
-      sourceFactsById.get(candidate.id),
-    );
-    const semantics = analysis.semantics;
-    const decision = selectDmSdkPattern(patternFacts(candidate, semantics?.semanticTokens), patterns);
+    const semantics = decision.patternId === "span.in-place-keyed-transform" ? decision.semantics : null;
     if (decision.patternId !== "span.in-place-keyed-transform") {
       blocked.push({
         ...candidate,
         emitted: false,
         blocker: "xtea-span-evidence-withdrawn",
-        patternDecision: compactDmSdkPatternDecision(decision),
+        patternDecision: decision.patternId,
         fallbackAudit: createDmSdkFallbackAudit({
           candidate,
           family: "xtea-span",
           patternId: "span.in-place-keyed-transform",
           emitter: "scripts/generate-dmsdk-xtea-span-bindings.mjs",
-          missingFacts: analysis.missingFacts,
+          missingFacts: decision.missingFacts,
         }),
       });
       continue;
@@ -171,7 +148,7 @@ function createEntries(rows, declarations, enumDeclarations, sourceFactsById, po
       successExpression: semantics.successExpression,
       maximumKeyBytes: semantics.maximumKeyBytes,
       evidence: semantics.evidence,
-      patternDecision: compactDmSdkPatternDecision(decision),
+      patternDecision: decision.patternId,
     });
   }
   return { entries, blocked, structurallyEligible, patterns };
@@ -262,22 +239,27 @@ async function writeOrCheck(options, relative, content) {
 
 export async function run(argv = process.argv.slice(2)) {
   const options = parseArgs(argv);
-  const [irText, shapesText, sourceFactsText, policyText] = await Promise.all([
+  const [irText, shapesText, sourceFactsText, planText, policyText] = await Promise.all([
     readFile(options.ir, "utf8"),
     readFile(options.shapes, "utf8"),
     readFile(options.sourceFacts, "utf8"),
+    readFile(options.plan, "utf8"),
     readFile(options.policy, "utf8"),
   ]);
-  const contents = { ir: irText, shapes: shapesText, sourceFacts: sourceFactsText, policy: policyText };
+  const contents = { ir: irText, shapes: shapesText, sourceFacts: sourceFactsText, plan: planText, policy: policyText };
   const ir = JSON.parse(irText);
   const shapes = JSON.parse(shapesText);
-  const sourceFacts = JSON.parse(sourceFactsText);
+  const plan = JSON.parse(planText);
   const policy = JSON.parse(policyText);
   validateProvenance(ir, shapes, irText);
-  const sourceFactsById = indexCppSemanticFactArtifact(sourceFacts, {
+  const planById = indexDmSdkBoundedSpanPlan(plan, {
     revision: ir.defoldRevision,
-    irText,
-    shapesText,
+    sourceHashes: {
+      ir: sha256(irText),
+      shapes: sha256(shapesText),
+      sourceFacts: sha256(sourceFactsText),
+      xtea: sha256(policyText),
+    },
   });
   if (
     policy.schemaVersion !== 1 ||
@@ -293,15 +275,10 @@ export async function run(argv = process.argv.slice(2)) {
   }
 
   const declarations = new Map(ir.declarations.map((declaration) => [declaration.id, declaration]));
-  const enumDeclarations = new Map(
-    ir.declarations.filter(({ kind }) => kind === "enum").map((declaration) => [declaration.name, declaration]),
-  );
   const { entries, blocked, structurallyEligible, patterns } = createEntries(
     shapes.rows,
     declarations,
-    enumDeclarations,
-    sourceFactsById,
-    policy,
+    planById,
   );
   const keyMaximums = [...new Set(entries.map(({ maximumKeyBytes }) => maximumKeyBytes))].sort(
     (left, right) => left - right,

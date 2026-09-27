@@ -151,6 +151,17 @@ key copy, guard, and in-place data mutation. Unrelated calls, constants, arrays,
 comparisons, dead helpers, and output writes are negative metamorphic fixtures
 and cannot change pattern selection.
 
+Pattern selection is a compiler-owned phase, not an emitter side effect. The
+bounded-span planner authenticates the ABI census, implementation-fact graph,
+and all four stable recipes; joins their structural and causal facts; and emits
+one ranked decision per relevant declaration. Fixed digest, Base64, ASTC, and
+XTEA emitters consume that decision and cannot invoke the selector themselves.
+The plan retains the complete rejection trace and universal fallback, so a
+withdrawn source fact changes one explicit decision without suppressing the
+public API. The same contract is the migration target for the remaining dmSDK
+families: collect facts first, select once, then let each emitter render only
+the declarations assigned to it.
+
 # Claim protocol
 
 Every material review claim follows `observe -> reproduce -> classify -> act`:

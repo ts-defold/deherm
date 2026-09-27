@@ -3,24 +3,21 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import {
-  DMSDK_UNIVERSAL_FALLBACK_PATTERN,
-  compactDmSdkPatternDecision,
-  selectDmSdkPattern,
-} from "../packages/compiler/src/dmsdk-pattern-selector.mjs";
+import { DMSDK_UNIVERSAL_FALLBACK_PATTERN } from "../packages/compiler/src/dmsdk-pattern-selector.mjs";
+import { indexDmSdkBoundedSpanPlan } from "../packages/compiler/src/dmsdk-bounded-span-plan.mjs";
 import {
   analyzeAstcProbeRecipe,
   createDmSdkFallbackAudit,
   publicDmSdkHeader,
 } from "../packages/compiler/src/dmsdk-bounded-span-recipes.mjs";
 import { astcProbePattern } from "../packages/compiler/src/dmsdk-pattern-catalog.mjs";
-import { indexCppSemanticFactArtifact } from "../packages/compiler/src/cpp-semantic-facts.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const defaults = {
   ir: "packages/bindings/generated/defold-sdk-ir.json",
   shapes: "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
   sourceFacts: "packages/bindings/generated/defold-dmsdk-source-semantic-facts.json",
+  plan: "packages/bindings/generated/defold-dmsdk-bounded-span-plan.json",
   policy: "packages/bindings/overrides/dmsdk-astc-probe-bindings.json",
 };
 
@@ -38,7 +35,7 @@ function parseArgs(argv) {
     const argument = argv[index];
     if (argument === "--check") {
       options.check = true;
-    } else if (["--ir", "--shapes", "--source-facts", "--policy", "--out-root"].includes(argument)) {
+    } else if (["--ir", "--shapes", "--source-facts", "--plan", "--policy", "--out-root"].includes(argument)) {
       const key = argument.slice(2).replace(/-([a-z])/g, (_, character) => character.toUpperCase());
       options[key] = resolve(argv[++index]);
     } else {
@@ -51,17 +48,6 @@ function parseArgs(argv) {
   }
 
   return options;
-}
-
-function patternFacts(row, semanticTokens = []) {
-  return {
-    id: row.id,
-    kind: row.kind,
-    result: row.result,
-    parameters: row.parameters,
-    families: row.families,
-    semanticTokens,
-  };
 }
 
 export function extractAstcProbeSemantics(declaration, candidate, recipe, sourceFacts) {
@@ -115,7 +101,7 @@ async function build(options) {
   );
   const ir = JSON.parse(contents.ir);
   const shapes = JSON.parse(contents.shapes);
-  const sourceFacts = JSON.parse(contents.sourceFacts);
+  const plan = JSON.parse(contents.plan);
   const policy = JSON.parse(contents.policy);
 
   if (ir.defoldRevision !== shapes.defoldRevision) {
@@ -124,10 +110,14 @@ async function build(options) {
   if (sha256(contents.ir) !== shapes.sourceHashes.ir) {
     throw new Error("IR hash does not match ABI-shape census provenance");
   }
-  const sourceFactsById = indexCppSemanticFactArtifact(sourceFacts, {
+  const planById = indexDmSdkBoundedSpanPlan(plan, {
     revision: ir.defoldRevision,
-    irText: contents.ir,
-    shapesText: contents.shapes,
+    sourceHashes: {
+      ir: sha256(contents.ir),
+      shapes: sha256(contents.shapes),
+      sourceFacts: sha256(contents.sourceFacts),
+      astc: sha256(contents.policy),
+    },
   });
   if (
     policy.schemaVersion !== 1 ||
@@ -148,32 +138,24 @@ async function build(options) {
   const blocked = [];
   let structurallyEligible = 0;
   for (const candidate of [...shapes.rows].sort((left, right) => left.id.localeCompare(right.id))) {
-    const initial = selectDmSdkPattern(patternFacts(candidate), patterns);
-    const trace = initial.trace.find(({ patternId }) => patternId === "span.fixed-three-u32-probe");
-    if (!trace || trace.blockers.some((blocker) => !blocker.startsWith("semantic-token-missing:"))) continue;
+    const decision = planById.get(candidate.id);
+    if (!decision?.structuralCandidates.includes("span.fixed-three-u32-probe")) continue;
     structurallyEligible += 1;
     const declaration = declarationsById.get(candidate.id);
     if (!declaration) throw new Error(`ASTC-probe candidate is absent from dmSDK IR: ${candidate.id}`);
-    const analysis = analyzeAstcProbeRecipe(
-      declaration,
-      candidate,
-      policy.recipe,
-      sourceFactsById.get(candidate.id),
-    );
-    const semantics = analysis.semantics;
-    const decision = selectDmSdkPattern(patternFacts(candidate, semantics?.semanticTokens), patterns);
+    const semantics = decision.patternId === "span.fixed-three-u32-probe" ? decision.semantics : null;
     if (decision.patternId !== "span.fixed-three-u32-probe") {
       blocked.push({
         ...candidate,
         emitted: false,
         blocker: "astc-probe-evidence-withdrawn",
-        patternDecision: compactDmSdkPatternDecision(decision),
+        patternDecision: decision.patternId,
         fallbackAudit: createDmSdkFallbackAudit({
           candidate,
           family: "astc-probe",
           patternId: "span.fixed-three-u32-probe",
           emitter: "scripts/generate-dmsdk-astc-probe-bindings.mjs",
-          missingFacts: analysis.missingFacts,
+          missingFacts: decision.missingFacts,
         }),
       });
       continue;
@@ -186,7 +168,7 @@ async function build(options) {
       mode: semantics.mode,
       minimumHeaderBytes: semantics.minimumHeaderBytes,
       evidence: semantics.evidence,
-      patternDecision: compactDmSdkPatternDecision(decision),
+      patternDecision: decision.patternId,
       wrapper: `deherm_dmsdk_astc_probe_${snake(declaration.name)}`,
     });
   }

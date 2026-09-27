@@ -5,7 +5,7 @@
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "canonicalPlanRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "inputHashes": {
-    "packages/bindings/generated/defold-binding-lowering-plan.json": "c1ca69e16983ee0ff7d25373260f11967ecd9c1fdb02ce4bbb338be6ad9be300",
+    "packages/bindings/generated/defold-binding-lowering-plan.json": "e5d120b9866976b007909d3b373dd16b0a8380f4c0245b20b0b9c35d70c3af9b",
     "packages/bindings/generated/defold-script-universal-value-bindings.json": "f36e57acde9e53f614b1f759fa34b2b69cb53d57ba2b602af6df7c0edd769df8",
     "defold/defold_hermes/include/defold_hermes/script_bridge_capi.hpp": "5abcca927b7d97ca7e1e07103f490d485c345ba9072db64e93ffe328e580267c"
   },
@@ -2617,5 +2617,5 @@
     "linkage": "not-claimed",
     "runtime": "not-claimed"
   },
-  "reportSha256": "2b2a217e48090f6d5fd89ad461952ca73d2a4bf62f2c3172205703187524fbf8"
+  "reportSha256": "7840daac46b0d46ea072081bd06ac3c199c1a9f237e898aad836cdceb394d5b1"
 }
