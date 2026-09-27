@@ -1,13 +1,11 @@
 {
-  "schemaVersion": 2,
-  "policyVersion": "hash-span-v2",
-  "family": "arena-backed-spans",
-  "documentationContract": {
-    "summaryPattern": "^[Cc]alculate (32|64)-bit hash value from buffer$",
-    "bufferDescription": "Buffer",
-    "lengthDescription": "Length of buffer",
-    "returnDescription": "hash value",
-    "semantics": ["bounded-input-span", "fixed-width-scalar-result", "synchronous-noescape"],
-    "rationale": "The pinned public API describes a synchronous borrowed byte span paired with an explicit byte length and a fixed-width scalar result. Selection uses the ABI plus those documentation facts, never a header, symbol, regex over names, or route allowlist."
+  "schemaVersion": 1,
+  "policyVersion": "hash-span-v3",
+  "family": "fixed-width-buffer-hash",
+  "recipe": {
+    "input": "borrowed-counted-bytes",
+    "resultWidths": [32, 64],
+    "ownership": "synchronous-noescape",
+    "fallback": "universal-recipe"
   }
 }

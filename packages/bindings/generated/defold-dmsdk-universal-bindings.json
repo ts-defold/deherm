@@ -2,13 +2,13 @@
   "schemaVersion": 1,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "sourceHashes": {
-    "projection": "f5192803d79ee0599a7132c25ec4ad0fcaf1e22cf2901e18525feb941c5fc3e2",
+    "projection": "993da1fc4915a73db78de827c25f8cd585e7fca10ec67f53f73d5eb1ac89f875",
     "sdkIr": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "specialized": {
-      "arenaCString": "84a12990ccdb56eb2cdabdf4c3c518139ee456d7fc2fffe5a51f0007bce03f65",
-      "borrowedHandle": "90bd61f21c944bc9bb2ed06fc67b7d7bc4b0b1020aed050f4d1d8ed44d305927",
-      "scratchScalarOut": "4cddcb72800f5d69482a496a30b649687b6451ca3b9f4c2807456a0172d5d9d0",
-      "cstringValue": "07bf851562791fe97cac9640b5f54d1f90304b7cd445bbdc4fd1bb69534aa775",
+      "arenaCString": "4e18c848b5e425388a7c501c0b6b57c31194acbd180649aacda641a03960190c",
+      "borrowedHandle": "79f244fb293be6806eef6cfb4ee089eaba02940bc834f564cfcc333da578ff3c",
+      "scratchScalarOut": "39b903c3ee6eeb60ed411cb1a4b1624c6ba66213755e7f1083c64f28599fffec",
+      "cstringValue": "6321ae406e34dc04946bb317c892af65f0200d5aa24a4a9e010017f11de664c0",
       "hashState": "10c311d6ded6edb05f00b39f7cc781a0d2c2b81fc2e25e6e5b94d9114a78df32"
     },
     "publicSdk": {
@@ -470,7 +470,7 @@
       ],
       "requiredHeadersSha256": "b332e968c991eec3d9ef64f504264c500efa2dddc8a035445b26e676b3c90d2c"
     },
-    "aggregate": "de24f1823ca8edeefdbdd2495943448e981cc80d0a45096a71076d20426503f2",
+    "aggregate": "d113d4b1443448183195da8a47c1b348338a21d24ac04962283d8c386b61373d",
     "catalog": "d597cf86477719a5115004b5aee863916bbd779494d41e11692058a45526a4cc"
   },
   "coverage": {

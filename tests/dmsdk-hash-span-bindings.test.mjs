@@ -88,7 +88,7 @@ test("hash-span generation rejects mixed provenance", async () => {
   }
 });
 
-test("hash-span semantics come from source documentation rather than route names", async () => {
+test("hash-span semantics come from ABI shape rather than names or documentation", async () => {
   const ir = JSON.parse(await readFile(join(repositoryRoot, "packages/bindings/generated/defold-sdk-ir.json"), "utf8"));
   const shapes = JSON.parse(
     await readFile(join(repositoryRoot, "packages/bindings/generated/defold-dmsdk-abi-shapes.json"), "utf8"),
@@ -98,12 +98,15 @@ test("hash-span semantics come from source documentation rather than route names
     "utf8",
   );
   const policy = JSON.parse(policyText);
-  assert.doesNotMatch(policyText, /candidateSelector|symbolPattern|hash\.h|"entries"/u);
+  assert.doesNotMatch(
+    policyText,
+    /candidateSelector|symbolPattern|hash\.h|"entries"|documentationContract|declaration|header|symbol/u,
+  );
   const declarations = new Map(ir.declarations.map((item) => [item.id, item]));
   const selected = shapes.rows
     .map((candidate) => ({
       candidate,
-      semantics: extractHashSpanSemantics(declarations.get(candidate.id), candidate, policy.documentationContract),
+      semantics: extractHashSpanSemantics(declarations.get(candidate.id), candidate, policy.recipe),
     }))
     .filter(({ semantics }) => semantics);
   assert.equal(selected.length, 2);
@@ -111,11 +114,21 @@ test("hash-span semantics come from source documentation rather than route names
     assert.equal(candidate.result.role, `scalar:u${semantics.resultBits}`);
     assert.equal(
       extractHashSpanSemantics(
-        { ...declarations.get(candidate.id), returnDescription: "documentation drifted" },
+        {
+          ...declarations.get(candidate.id),
+          name: "renamed",
+          description: "",
+          returnDescription: "",
+          parameters: declarations.get(candidate.id).parameters.map((parameter) => ({
+            ...parameter,
+            name: "value",
+            description: "",
+          })),
+        },
         candidate,
-        policy.documentationContract,
-      ),
-      null,
+        policy.recipe,
+      )?.resultBits,
+      semantics.resultBits,
     );
   }
 });

@@ -117,6 +117,24 @@ derive the same ten structural candidates, but their saved symbol census does
 not prove all-target/all-variant linkage, so the optimized family stays
 withheld and every operation remains callable through its universal recipe.
 
+## Revision-derived fixed-width buffer hashes
+
+The two fixed-width buffer hash routes no longer depend on copied Defold
+descriptions, a summary regular expression, parameter prose, a fixed `hash.h`
+include, callable names, or route IDs. The compiler selects the exact
+`const void*` plus `uint32_t` counted-input ABI with a `uint32_t` or `uint64_t`
+result, obtains its public include and linker symbol from the revision IR, and
+retains the universal recipe beneath it. The package policy is now only the
+stable borrowed-counted-byte transport, supported result widths, synchronous
+ownership, and fallback contract.
+
+Current host compilation and behavior vectors still pass against the packaged
+SDK, including embedded NUL input, invalid storage rejection, and zero warmed
+C++ allocations with Defold reverse hashing left at its default-disabled state.
+Defold 1.11.0, 1.12.0, and 1.13.1 each independently derive the same two ABI
+shapes; that is derivation evidence only, not a retroactive host-runtime claim
+for those saved revisions.
+
 ## Clean-room registry inputs and outputs
 
 `scripts/lib/dmsdk-generator-pipeline.mjs` is the single ownership and ordering

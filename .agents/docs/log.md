@@ -1,5 +1,16 @@
 # Defold Hermes knowledge log
 
+## 2026-09-27 - Fixed-width buffer hashes no longer depend on Defold prose
+
+- Reduced the hash-span package policy to a borrowed counted-byte recipe with
+  32- and 64-bit result lanes, synchronous ownership, and universal fallback.
+- Removed copied summaries, parameter/return descriptions, regular expressions,
+  and the fixed dmSDK include from selection and emission.
+- Current packaged-SDK compile/link/behavior tests pass for both routes. Defold
+  1.11.0, 1.12.0, and 1.13.1 each derive the same two shapes without package
+  changes; no historical runtime evidence is claimed.
+- The refreshed current policy root is `001f64c28f00`.
+
 ## 2026-09-27 - Hash-state lifecycle derived as a closed ABI family
 
 - Replaced copied descriptions, regular expressions, fixed record/header names,

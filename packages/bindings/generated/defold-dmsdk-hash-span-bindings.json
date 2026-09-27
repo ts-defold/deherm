@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "policyVersion": "hash-span-v2",
+  "policyVersion": "hash-span-v3",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "sources": {
     "ir": "packages/bindings/generated/defold-sdk-ir.json",
@@ -10,20 +10,17 @@
   "sourceHashes": {
     "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
-    "policy": "ea7b7e7621eb05f52c75ce243cc671742c844b505bcfe43753b61fff98a78ea4"
+    "policy": "780a70923ff79376373288e54c735559bd595811b718ec8f06dfca728d1732de"
   },
   "policy": {
-    "documentationContract": {
-      "summaryPattern": "^[Cc]alculate (32|64)-bit hash value from buffer$",
-      "bufferDescription": "Buffer",
-      "lengthDescription": "Length of buffer",
-      "returnDescription": "hash value",
-      "semantics": [
-        "bounded-input-span",
-        "fixed-width-scalar-result",
-        "synchronous-noescape"
+    "recipe": {
+      "input": "borrowed-counted-bytes",
+      "resultWidths": [
+        32,
+        64
       ],
-      "rationale": "The pinned public API describes a synchronous borrowed byte span paired with an explicit byte length and a fixed-width scalar result. Selection uses the ABI plus those documentation facts, never a header, symbol, regex over names, or route allowlist."
+      "ownership": "synchronous-noescape",
+      "fallback": "universal-recipe"
     },
     "patternRegistry": [
       {
@@ -155,11 +152,7 @@
       "resultBits": 32,
       "evidence": {
         "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
-        "summary": "Calculate 32-bit hash value from buffer",
-        "buffer": "Buffer",
-        "length": "Length of buffer",
-        "result": "hash value",
-        "documentationSource": "clang-comment-ast",
+        "semanticSource": "revision-ir-abi-shape",
         "declarationLine": 69
       },
       "patternDecision": "span.fixed-width-hash",
@@ -215,11 +208,7 @@
       "resultBits": 64,
       "evidence": {
         "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
-        "summary": "calculate 64-bit hash value from buffer",
-        "buffer": "Buffer",
-        "length": "Length of buffer",
-        "result": "hash value",
-        "documentationSource": "clang-comment-ast",
+        "semanticSource": "revision-ir-abi-shape",
         "declarationLine": 79
       },
       "patternDecision": "span.fixed-width-hash",
