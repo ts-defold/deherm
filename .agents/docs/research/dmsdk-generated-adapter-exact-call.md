@@ -25,17 +25,16 @@ probe vectors. No recipe is removed: the source catalog remains 1,361 recipes,
 with 74 callable generated adapters, 566 universal-ready rows, and 721 rows
 that still fail closed pending specialization.
 
-The separate named-scalar family reviews 21 structural candidates and derives
-20 typed C wrappers, raw-cell dispatcher cases, descriptors, and exact-call
-fake callees from one structural recipe per admitted declaration. Its earlier
-21 policy blockers were semantic prose over fully known scalar ABIs. The
-generator resolves `dmhash_t` and
-`ProfileIdx` to `uint64_t`, `Thread` and `TlsKey` to `uintptr_t`, and admits the
-built-in signed, unsigned, boolean, float, double, and void lanes only when the
-pinned symbol-evidence pass also proves the native symbol is header-only or
-external in every target and build variant. This sibling family deliberately
-leaves all 21 universal recipes on their universal fallback and therefore does
-not alter the 74-row generated-adapter corpus above.
+The separate named-scalar family discovers every function whose result and
+arguments resolve through the revision IR to fixed-width scalar cells and
+contain at least one type alias. It currently derives 20 typed C wrappers,
+raw-cell dispatcher cases, descriptors, and exact-call fake callees from 21
+structural candidates. Alias width, qualification, declaration location, and
+header identity now come from the revision IR and header digests; the package
+recipe contains no Defold typedef names, symbol regexes, line-bearing IDs, or
+expected counts. Admission additionally requires the pinned symbol census to
+prove the native symbol is header-only or external in every target and build
+variant. This sibling family deliberately leaves every universal recipe intact.
 
 The remaining candidate, `ProfilePropertyAddBool`, exposes a pinned-source
 contradiction: `profile.h` macro-expands its declaration, but neither
@@ -43,10 +42,9 @@ contradiction: `profile.h` macro-expands its declaration, but neither
 records `linkage: absent`, `availability: unlinked`. The specialized adapter
 therefore fails closed as `native-symbol-absent`; the universal recipe and its
 public TypeScript stable-ID route remain present rather than being silently
-removed from the catalog. The stable named-scalar policy input attaches
-[issue #117](https://github.com/ts-defold/deherm/issues/117) to this blocker,
-and the generated declaration report carries that URL without embedding issue
-identity in generated source.
+removed from the catalog. [Issue #117](https://github.com/ts-defold/deherm/issues/117)
+tracks that source/linkage contradiction in the knowledge base rather than
+making its revision-specific declaration ID an npm-package input.
 
 # Production boundaries
 

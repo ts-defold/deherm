@@ -3857,3 +3857,21 @@ zero observed allocations. The public report records the structural selector
 decision and source-derived documentation evidence per operation. This is a
 specialized overlay only; all 10 declarations retain their universal and Static
 Hermes recipes beneath it.
+
+## 2026-09-27 - Revision-derived named scalars
+
+The named-scalar generator no longer carries `dmhash_t`, `ProfileIdx`,
+`Thread`, or `TlsKey` definitions, profiler macro symbol regexes, a pinned
+candidate count, or a current-revision declaration ID in its package recipe.
+It discovers functions structurally from fixed-width scalar ABI roles plus a
+named alias resolved from the revision IR. Alias width, namespace
+qualification, declaration location, and header digest are revision inputs;
+the compiler-owned pattern and cell codec are stable package machinery.
+
+The current revision still produces 21 candidates, 20 allocation-free exact
+wrappers, and one archive-evidence blocker. A mutation test removes the
+historical ABI-tranche label without changing discovery, and the clean-room
+gate now verifies relational completeness rather than the current 20/21 count.
+The exact-call runtime remains zero-allocation when warm. Every declaration,
+including the blocked specialized route, retains its universal and Static
+Hermes recipe.

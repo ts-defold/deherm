@@ -1,9 +1,55 @@
 {
   "schemaVersion": 1,
-  "policyVersion": "2026-09-21.1",
+  "policyVersion": "named-scalar-v3",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "sourceShapeCensus": "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
-  "scope": "All declarations structurally classified as next-named-scalar-direct. Admission requires source-resolved scalar ABI facts and a symbol that the pinned Defold target archives expose across all build variants; absent or target-partial symbols fail closed.",
+  "scope": "Every function whose result and parameters resolve through the revision IR to fixed-width scalar cells and which contains at least one named scalar alias. Admission also requires a symbol that the pinned Defold target archives expose across all build variants; absent or target-partial symbols fail closed.",
+  "patternRegistry": [
+    {
+      "id": "value.named-scalar-direct",
+      "family": "named-scalar",
+      "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
+      "priority": 820,
+      "cost": 5,
+      "fallback": false,
+      "when": {
+        "declarationKinds": [
+          "function"
+        ],
+        "result": {
+          "rolePrefixes": [
+            "scalar:"
+          ]
+        },
+        "parameters": {
+          "every": [
+            {
+              "rolePrefixes": [
+                "scalar:"
+              ],
+              "directions": [
+                "value"
+              ]
+            }
+          ]
+        },
+        "requireSemanticTokens": [
+          "fixed-width-cell-codec",
+          "source-resolved-named-scalar",
+          "synchronous-noescape"
+        ]
+      }
+    },
+    {
+      "id": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "priority": 0,
+      "cost": 1000,
+      "fallback": true,
+      "when": null
+    }
+  ],
   "universalFallback": {
     "preserved": true,
     "catalog": "packages/bindings/generated/defold-dmsdk-universal-bindings.json",
@@ -25,7 +71,7 @@
     "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
     "symbolEvidence": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
-    "policy": "0995b6972b4a145fb94f8079e31f21a630b95239ff21abcf7c284f6a0de3500d"
+    "policy": "0993c36e00a02fa1547d344365b3b2e64eb0362d1479ddee34a4ad1dff01e586"
   },
   "artifactHashes": {
     "defold/defold_hermes/include/defold_hermes/generated_dmsdk_named_scalar_jsi.hpp": "395c2380c5c6c7de863cca44e4a0bed822b381bac73226ceaabba40d23b3b254",
@@ -55,6 +101,10 @@
       "bindingId": 0,
       "wrapper": "deherm_dmsdk_named_scalar_dm_game_object_create_instance_id",
       "preferredLowering": false,
+      "aliases": [
+        "dmsdk:dmhash_t@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:56:211"
+      ],
+      "patternDecision": "value.named-scalar-direct",
       "recipe": {
         "include": "dmsdk/gameobject/gameobject.h",
         "result": {
@@ -64,6 +114,7 @@
           "underlying": "uint64_t",
           "native": "dmhash_t",
           "evidence": {
+            "declarationId": "dmsdk:dmhash_t@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:56:211",
             "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
             "line": 56,
             "text": "typedef uint64_t dmhash_t;",
@@ -71,12 +122,13 @@
           }
         },
         "parameters": [],
-        "exactVectorSha256": "ffd7f882a76be0b8bf4d55bea72a6f529b9622600f5ba6211879cf189025e716"
+        "exactVectorSha256": "1bb8632f75a3d8abada9d1f8bd4651b326e34f11a2fc06806bf0ec6896c05ada"
       },
       "headerEvidence": {
         "path": "upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h",
         "line": 598,
         "text": "dmhash_t CreateInstanceId();",
+        "source": "ir-source-location",
         "sha256": "701956b449821267f15db3bef2bf83a606c471e2f1b3efc1f9be9809443b0d62"
       },
       "symbolEvidence": {
@@ -165,6 +217,10 @@
       "bindingId": 1,
       "wrapper": "deherm_dmsdk_named_scalar_dm_sound_is_group_muted",
       "preferredLowering": false,
+      "aliases": [
+        "dmsdk:dmhash_t@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:56:211"
+      ],
+      "patternDecision": "value.named-scalar-direct",
       "recipe": {
         "include": "dmsdk/sound/sound.h",
         "result": {
@@ -183,6 +239,7 @@
             "underlying": "uint64_t",
             "native": "dmhash_t",
             "evidence": {
+              "declarationId": "dmsdk:dmhash_t@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:56:211",
               "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
               "line": 56,
               "text": "typedef uint64_t dmhash_t;",
@@ -191,12 +248,13 @@
             "name": "group"
           }
         ],
-        "exactVectorSha256": "4aac9dbaa1c78672e5c185f714c5faecfff423d5b165dd7f9d76588724de769e"
+        "exactVectorSha256": "cf39f1ab738da3da0742dcf07aadb18df82d13aeced1a214777093de60313679"
       },
       "headerEvidence": {
         "path": "upstream/defold/engine/sound/src/dmsdk/sound/sound.h",
         "line": 108,
         "text": "bool IsGroupMuted(dmhash_t group);",
+        "source": "ir-source-location",
         "sha256": "8a2ddebd25f8de8ccc54637cef5c0e5908e89616d55137120c1c83a02fb04c17"
       },
       "symbolEvidence": {
@@ -285,6 +343,10 @@
       "bindingId": 2,
       "wrapper": "deherm_dmsdk_named_scalar_dm_thread_alloc_tls",
       "preferredLowering": false,
+      "aliases": [
+        "dmsdk:dmThread::TlsKey@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:33:603"
+      ],
+      "patternDecision": "value.named-scalar-direct",
       "recipe": {
         "include": "dmsdk/dlib/thread.h",
         "result": {
@@ -294,6 +356,7 @@
           "underlying": "uintptr_t",
           "native": "dmThread::TlsKey",
           "evidence": {
+            "declarationId": "dmsdk:dmThread::TlsKey@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:33:603",
             "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h",
             "line": 33,
             "text": "typedef uintptr_t TlsKey;",
@@ -301,12 +364,13 @@
           }
         },
         "parameters": [],
-        "exactVectorSha256": "e8089cc3859af7c96bc0cc26886599b521025acaf997b47ca780e37d699919d1"
+        "exactVectorSha256": "d748edda8722de2e01980e8a720cc975747feadc31047a4801cbf3a4334a00fe"
       },
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h",
         "line": 119,
         "text": "TlsKey AllocTls();",
+        "source": "ir-source-location",
         "sha256": "0f2f1f3c9de645fb3cc9a06e1b744f5dbacc2d222382c41996901e33d9a005e3"
       },
       "symbolEvidence": {
@@ -395,6 +459,10 @@
       "bindingId": 3,
       "wrapper": "deherm_dmsdk_named_scalar_dm_thread_detach",
       "preferredLowering": false,
+      "aliases": [
+        "dmsdk:dmThread::Thread@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:32:602"
+      ],
+      "patternDecision": "value.named-scalar-direct",
       "recipe": {
         "include": "dmsdk/dlib/thread.h",
         "result": {
@@ -413,6 +481,7 @@
             "underlying": "uintptr_t",
             "native": "dmThread::Thread",
             "evidence": {
+              "declarationId": "dmsdk:dmThread::Thread@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:32:602",
               "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h",
               "line": 32,
               "text": "typedef uintptr_t Thread;",
@@ -421,12 +490,13 @@
             "name": "thread"
           }
         ],
-        "exactVectorSha256": "08ffbcb2afe20c031cf8561705ea7543d8e477eed9601403395263f5ed1b0a8e"
+        "exactVectorSha256": "7b873ec3c14275ba338f7ac62d79547043eacf80810a706ce8d574f3fceddff4"
       },
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h",
-        "line": 98,
-        "text": "* thread specified by thread must be joinable (see Detach()).",
+        "line": 112,
+        "text": "void Detach(Thread thread);",
+        "source": "ir-source-location",
         "sha256": "0f2f1f3c9de645fb3cc9a06e1b744f5dbacc2d222382c41996901e33d9a005e3"
       },
       "symbolEvidence": {
@@ -515,6 +585,10 @@
       "bindingId": 4,
       "wrapper": "deherm_dmsdk_named_scalar_dm_thread_free_tls",
       "preferredLowering": false,
+      "aliases": [
+        "dmsdk:dmThread::TlsKey@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:33:603"
+      ],
+      "patternDecision": "value.named-scalar-direct",
       "recipe": {
         "include": "dmsdk/dlib/thread.h",
         "result": {
@@ -533,6 +607,7 @@
             "underlying": "uintptr_t",
             "native": "dmThread::TlsKey",
             "evidence": {
+              "declarationId": "dmsdk:dmThread::TlsKey@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:33:603",
               "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h",
               "line": 33,
               "text": "typedef uintptr_t TlsKey;",
@@ -541,12 +616,13 @@
             "name": "key"
           }
         ],
-        "exactVectorSha256": "3a25e9fef19e8e8b4449eb0a7768aea1d1967adc5271c393afd53d899abe76f1"
+        "exactVectorSha256": "2c95796cb65e874766f4f2069ca4028ab64cf90f5b57a846b7d4170414151287"
       },
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h",
         "line": 126,
         "text": "void FreeTls(TlsKey key);",
+        "source": "ir-source-location",
         "sha256": "0f2f1f3c9de645fb3cc9a06e1b744f5dbacc2d222382c41996901e33d9a005e3"
       },
       "symbolEvidence": {
@@ -635,6 +711,10 @@
       "bindingId": 5,
       "wrapper": "deherm_dmsdk_named_scalar_dm_thread_get_current_thread",
       "preferredLowering": false,
+      "aliases": [
+        "dmsdk:dmThread::Thread@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:32:602"
+      ],
+      "patternDecision": "value.named-scalar-direct",
       "recipe": {
         "include": "dmsdk/dlib/thread.h",
         "result": {
@@ -644,6 +724,7 @@
           "underlying": "uintptr_t",
           "native": "dmThread::Thread",
           "evidence": {
+            "declarationId": "dmsdk:dmThread::Thread@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:32:602",
             "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h",
             "line": 32,
             "text": "typedef uintptr_t Thread;",
@@ -651,12 +732,13 @@
           }
         },
         "parameters": [],
-        "exactVectorSha256": "0977f1fd7395bc0839010d4c7adce035628d9e3526b9ad094ca3a77099768036"
+        "exactVectorSha256": "3975b39e11ad3dd7010772141418e9ba40bc695232d559f15615d69a1567e92c"
       },
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h",
         "line": 148,
         "text": "Thread GetCurrentThread();",
+        "source": "ir-source-location",
         "sha256": "0f2f1f3c9de645fb3cc9a06e1b744f5dbacc2d222382c41996901e33d9a005e3"
       },
       "symbolEvidence": {
@@ -745,6 +827,10 @@
       "bindingId": 6,
       "wrapper": "deherm_dmsdk_named_scalar_dm_thread_join",
       "preferredLowering": false,
+      "aliases": [
+        "dmsdk:dmThread::Thread@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:32:602"
+      ],
+      "patternDecision": "value.named-scalar-direct",
       "recipe": {
         "include": "dmsdk/dlib/thread.h",
         "result": {
@@ -763,6 +849,7 @@
             "underlying": "uintptr_t",
             "native": "dmThread::Thread",
             "evidence": {
+              "declarationId": "dmsdk:dmThread::Thread@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:32:602",
               "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h",
               "line": 32,
               "text": "typedef uintptr_t Thread;",
@@ -771,12 +858,13 @@
             "name": "thread"
           }
         ],
-        "exactVectorSha256": "4553eeeedbc9046c4955a64afd44d5b75a0d1ec83e59835462fa569c2f7ffdbf"
+        "exactVectorSha256": "b22a81b02f109ba871159a41f25e06a51a4bbe2956dced809c8e51227f8f747a"
       },
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h",
-        "line": 86,
-        "text": "*     dmThread::Join(thread);",
+        "line": 102,
+        "text": "void Join(Thread thread);",
+        "source": "ir-source-location",
         "sha256": "0f2f1f3c9de645fb3cc9a06e1b744f5dbacc2d222382c41996901e33d9a005e3"
       },
       "symbolEvidence": {
@@ -865,6 +953,10 @@
       "bindingId": 7,
       "wrapper": "deherm_dmsdk_named_scalar_profile_property_add_f32",
       "preferredLowering": false,
+      "aliases": [
+        "dmsdk:ProfileIdx@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:33:457"
+      ],
+      "patternDecision": "value.named-scalar-direct",
       "recipe": {
         "include": "dmsdk/dlib/profile.h",
         "result": {
@@ -883,6 +975,7 @@
             "underlying": "uint64_t",
             "native": "ProfileIdx",
             "evidence": {
+              "declarationId": "dmsdk:ProfileIdx@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:33:457",
               "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
               "line": 33,
               "text": "typedef uint64_t ProfileIdx;",
@@ -900,12 +993,13 @@
             "name": "v"
           }
         ],
-        "exactVectorSha256": "471b9be6203703f1cc4d7a968b50347e4c1deb4df24ad1a9d652f10ffecb1b51"
+        "exactVectorSha256": "42100f4ee9598b04e6dada3e1c008b455baeddf4eda2b7063266bc59a2988d5a"
       },
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
-        "line": 215,
-        "text": "#define DM_PROPERTY_ADD_F32(name, add_value)    ProfilePropertyAddF32(*name##_p, add_value)",
+        "line": 0,
+        "text": null,
+        "source": "preprocessor-expanded-ir",
         "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
       },
       "symbolEvidence": {
@@ -994,6 +1088,10 @@
       "bindingId": 8,
       "wrapper": "deherm_dmsdk_named_scalar_profile_property_add_f64",
       "preferredLowering": false,
+      "aliases": [
+        "dmsdk:ProfileIdx@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:33:457"
+      ],
+      "patternDecision": "value.named-scalar-direct",
       "recipe": {
         "include": "dmsdk/dlib/profile.h",
         "result": {
@@ -1012,6 +1110,7 @@
             "underlying": "uint64_t",
             "native": "ProfileIdx",
             "evidence": {
+              "declarationId": "dmsdk:ProfileIdx@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:33:457",
               "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
               "line": 33,
               "text": "typedef uint64_t ProfileIdx;",
@@ -1029,12 +1128,13 @@
             "name": "v"
           }
         ],
-        "exactVectorSha256": "10474f23104a971f9165f6c4f8b52831bc1d15fb52cf0cbe076ce2c30bf92452"
+        "exactVectorSha256": "cefd4e440f3d726e6425c6b13632e12f7940ebbe1439e7ef7ce6da0782029c0a"
       },
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
-        "line": 218,
-        "text": "#define DM_PROPERTY_ADD_F64(name, add_value)    ProfilePropertyAddF64(*name##_p, add_value)",
+        "line": 0,
+        "text": null,
+        "source": "preprocessor-expanded-ir",
         "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
       },
       "symbolEvidence": {
@@ -1123,6 +1223,10 @@
       "bindingId": 9,
       "wrapper": "deherm_dmsdk_named_scalar_profile_property_add_s32",
       "preferredLowering": false,
+      "aliases": [
+        "dmsdk:ProfileIdx@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:33:457"
+      ],
+      "patternDecision": "value.named-scalar-direct",
       "recipe": {
         "include": "dmsdk/dlib/profile.h",
         "result": {
@@ -1141,6 +1245,7 @@
             "underlying": "uint64_t",
             "native": "ProfileIdx",
             "evidence": {
+              "declarationId": "dmsdk:ProfileIdx@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:33:457",
               "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
               "line": 33,
               "text": "typedef uint64_t ProfileIdx;",
@@ -1158,12 +1263,13 @@
             "name": "v"
           }
         ],
-        "exactVectorSha256": "d94b50e4176a8fbdbf871c56d132810068f02bb25c0b7183704319fdbbb86549"
+        "exactVectorSha256": "a0b088a4eef99254e1ece7cd6bc1a231955cacd7e87d7e99d6177a6d028e0450"
       },
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
-        "line": 213,
-        "text": "#define DM_PROPERTY_ADD_S32(name, add_value)    ProfilePropertyAddS32(*name##_p, add_value)",
+        "line": 0,
+        "text": null,
+        "source": "preprocessor-expanded-ir",
         "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
       },
       "symbolEvidence": {
@@ -1252,6 +1358,10 @@
       "bindingId": 10,
       "wrapper": "deherm_dmsdk_named_scalar_profile_property_add_s64",
       "preferredLowering": false,
+      "aliases": [
+        "dmsdk:ProfileIdx@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:33:457"
+      ],
+      "patternDecision": "value.named-scalar-direct",
       "recipe": {
         "include": "dmsdk/dlib/profile.h",
         "result": {
@@ -1270,6 +1380,7 @@
             "underlying": "uint64_t",
             "native": "ProfileIdx",
             "evidence": {
+              "declarationId": "dmsdk:ProfileIdx@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:33:457",
               "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
               "line": 33,
               "text": "typedef uint64_t ProfileIdx;",
@@ -1287,12 +1398,13 @@
             "name": "v"
           }
         ],
-        "exactVectorSha256": "f853954e54638e871a6da7f9b8f694045eb3f8456f9ab3ea810e0bb940645306"
+        "exactVectorSha256": "c2937223cbe700cf0420c2c0926d62194c6034b24f0fd8885401d6d8831a8489"
       },
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
-        "line": 216,
-        "text": "#define DM_PROPERTY_ADD_S64(name, add_value)    ProfilePropertyAddS64(*name##_p, add_value)",
+        "line": 0,
+        "text": null,
+        "source": "preprocessor-expanded-ir",
         "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
       },
       "symbolEvidence": {
@@ -1381,6 +1493,10 @@
       "bindingId": 11,
       "wrapper": "deherm_dmsdk_named_scalar_profile_property_add_u32",
       "preferredLowering": false,
+      "aliases": [
+        "dmsdk:ProfileIdx@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:33:457"
+      ],
+      "patternDecision": "value.named-scalar-direct",
       "recipe": {
         "include": "dmsdk/dlib/profile.h",
         "result": {
@@ -1399,6 +1515,7 @@
             "underlying": "uint64_t",
             "native": "ProfileIdx",
             "evidence": {
+              "declarationId": "dmsdk:ProfileIdx@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:33:457",
               "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
               "line": 33,
               "text": "typedef uint64_t ProfileIdx;",
@@ -1416,12 +1533,13 @@
             "name": "v"
           }
         ],
-        "exactVectorSha256": "695d260aaf3c4472ca38b150b9daed5aeb2696a0597da1dbefe0a7b0fa4b2250"
+        "exactVectorSha256": "a57053ad6cac65115d7f048607e4946d86f03bcbcd0275ae4ebb376a06618222"
       },
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
-        "line": 214,
-        "text": "#define DM_PROPERTY_ADD_U32(name, add_value)    ProfilePropertyAddU32(*name##_p, add_value)",
+        "line": 0,
+        "text": null,
+        "source": "preprocessor-expanded-ir",
         "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
       },
       "symbolEvidence": {
@@ -1510,6 +1628,10 @@
       "bindingId": 12,
       "wrapper": "deherm_dmsdk_named_scalar_profile_property_add_u64",
       "preferredLowering": false,
+      "aliases": [
+        "dmsdk:ProfileIdx@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:33:457"
+      ],
+      "patternDecision": "value.named-scalar-direct",
       "recipe": {
         "include": "dmsdk/dlib/profile.h",
         "result": {
@@ -1528,6 +1650,7 @@
             "underlying": "uint64_t",
             "native": "ProfileIdx",
             "evidence": {
+              "declarationId": "dmsdk:ProfileIdx@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:33:457",
               "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
               "line": 33,
               "text": "typedef uint64_t ProfileIdx;",
@@ -1545,12 +1668,13 @@
             "name": "v"
           }
         ],
-        "exactVectorSha256": "2edf52e250d95c5e650d3c4afa6438a7f1ae43ab74be84e7c4a494b03d01c14b"
+        "exactVectorSha256": "97e8178dad9cc22528b2a0b1ff76b54f3b7bfc5df474293d27900b330d0e42f6"
       },
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
-        "line": 217,
-        "text": "#define DM_PROPERTY_ADD_U64(name, add_value)    ProfilePropertyAddU64(*name##_p, add_value)",
+        "line": 0,
+        "text": null,
+        "source": "preprocessor-expanded-ir",
         "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
       },
       "symbolEvidence": {
@@ -1639,6 +1763,10 @@
       "bindingId": 13,
       "wrapper": "deherm_dmsdk_named_scalar_profile_property_set_bool",
       "preferredLowering": false,
+      "aliases": [
+        "dmsdk:ProfileIdx@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:33:457"
+      ],
+      "patternDecision": "value.named-scalar-direct",
       "recipe": {
         "include": "dmsdk/dlib/profile.h",
         "result": {
@@ -1657,6 +1785,7 @@
             "underlying": "uint64_t",
             "native": "ProfileIdx",
             "evidence": {
+              "declarationId": "dmsdk:ProfileIdx@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:33:457",
               "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
               "line": 33,
               "text": "typedef uint64_t ProfileIdx;",
@@ -1674,12 +1803,13 @@
             "name": "v"
           }
         ],
-        "exactVectorSha256": "50ab85193bea75294f7d627eb4cf186bdeeaa3197a743afa16a2f6dc23cf5d36"
+        "exactVectorSha256": "6f6adb8e1ebf0a022a7d6d38a32184818c3989d23eb214a46f231ffe0798f1e3"
       },
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
-        "line": 204,
-        "text": "#define DM_PROPERTY_SET_BOOL(name, set_value)   ProfilePropertySetBool(*name##_p, set_value)",
+        "line": 0,
+        "text": null,
+        "source": "preprocessor-expanded-ir",
         "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
       },
       "symbolEvidence": {
@@ -1768,6 +1898,10 @@
       "bindingId": 14,
       "wrapper": "deherm_dmsdk_named_scalar_profile_property_set_f32",
       "preferredLowering": false,
+      "aliases": [
+        "dmsdk:ProfileIdx@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:33:457"
+      ],
+      "patternDecision": "value.named-scalar-direct",
       "recipe": {
         "include": "dmsdk/dlib/profile.h",
         "result": {
@@ -1786,6 +1920,7 @@
             "underlying": "uint64_t",
             "native": "ProfileIdx",
             "evidence": {
+              "declarationId": "dmsdk:ProfileIdx@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:33:457",
               "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
               "line": 33,
               "text": "typedef uint64_t ProfileIdx;",
@@ -1803,12 +1938,13 @@
             "name": "v"
           }
         ],
-        "exactVectorSha256": "4faac7a30bc00390745a8e7e6b4712057ce285347c5651b467332efb385218a4"
+        "exactVectorSha256": "13943510855e8ca3fe1c5da576da913dbea6e470df14d8b7c546f0b236ac66fc"
       },
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
-        "line": 207,
-        "text": "#define DM_PROPERTY_SET_F32(name, set_value)    ProfilePropertySetF32(*name##_p, set_value)",
+        "line": 0,
+        "text": null,
+        "source": "preprocessor-expanded-ir",
         "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
       },
       "symbolEvidence": {
@@ -1897,6 +2033,10 @@
       "bindingId": 15,
       "wrapper": "deherm_dmsdk_named_scalar_profile_property_set_f64",
       "preferredLowering": false,
+      "aliases": [
+        "dmsdk:ProfileIdx@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:33:457"
+      ],
+      "patternDecision": "value.named-scalar-direct",
       "recipe": {
         "include": "dmsdk/dlib/profile.h",
         "result": {
@@ -1915,6 +2055,7 @@
             "underlying": "uint64_t",
             "native": "ProfileIdx",
             "evidence": {
+              "declarationId": "dmsdk:ProfileIdx@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:33:457",
               "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
               "line": 33,
               "text": "typedef uint64_t ProfileIdx;",
@@ -1932,12 +2073,13 @@
             "name": "v"
           }
         ],
-        "exactVectorSha256": "0c239ef147df879ffaa7d1aac4271734b1daa5c1d6913a57e730c23662a36d4d"
+        "exactVectorSha256": "b6ad9c0f1bcd19eeb71b1bb94f94c66369ff4ab1bd694405bc2e229e5df76377"
       },
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
-        "line": 210,
-        "text": "#define DM_PROPERTY_SET_F64(name, set_value)    ProfilePropertySetF64(*name##_p, set_value)",
+        "line": 0,
+        "text": null,
+        "source": "preprocessor-expanded-ir",
         "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
       },
       "symbolEvidence": {
@@ -2026,6 +2168,10 @@
       "bindingId": 16,
       "wrapper": "deherm_dmsdk_named_scalar_profile_property_set_s32",
       "preferredLowering": false,
+      "aliases": [
+        "dmsdk:ProfileIdx@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:33:457"
+      ],
+      "patternDecision": "value.named-scalar-direct",
       "recipe": {
         "include": "dmsdk/dlib/profile.h",
         "result": {
@@ -2044,6 +2190,7 @@
             "underlying": "uint64_t",
             "native": "ProfileIdx",
             "evidence": {
+              "declarationId": "dmsdk:ProfileIdx@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:33:457",
               "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
               "line": 33,
               "text": "typedef uint64_t ProfileIdx;",
@@ -2061,12 +2208,13 @@
             "name": "v"
           }
         ],
-        "exactVectorSha256": "677cc29ce9223ba27d48b073242c662dd529109c3ac9d2dc60f8d7430992369f"
+        "exactVectorSha256": "83face2a79a2ccd92ab5af69010580bdfc3783e7d382ccb0dffaa95f431caadf"
       },
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
-        "line": 205,
-        "text": "#define DM_PROPERTY_SET_S32(name, set_value)    ProfilePropertySetS32(*name##_p, set_value)",
+        "line": 0,
+        "text": null,
+        "source": "preprocessor-expanded-ir",
         "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
       },
       "symbolEvidence": {
@@ -2155,6 +2303,10 @@
       "bindingId": 17,
       "wrapper": "deherm_dmsdk_named_scalar_profile_property_set_s64",
       "preferredLowering": false,
+      "aliases": [
+        "dmsdk:ProfileIdx@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:33:457"
+      ],
+      "patternDecision": "value.named-scalar-direct",
       "recipe": {
         "include": "dmsdk/dlib/profile.h",
         "result": {
@@ -2173,6 +2325,7 @@
             "underlying": "uint64_t",
             "native": "ProfileIdx",
             "evidence": {
+              "declarationId": "dmsdk:ProfileIdx@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:33:457",
               "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
               "line": 33,
               "text": "typedef uint64_t ProfileIdx;",
@@ -2190,12 +2343,13 @@
             "name": "v"
           }
         ],
-        "exactVectorSha256": "f6330c1275088c8824e0b9e723e048200ce51a612c686e0199f55fb937ad9b77"
+        "exactVectorSha256": "ceef7ea1c0eac03af41a428a288773d24ced7f720bc10679144649b1723079aa"
       },
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
-        "line": 208,
-        "text": "#define DM_PROPERTY_SET_S64(name, set_value)    ProfilePropertySetS64(*name##_p, set_value)",
+        "line": 0,
+        "text": null,
+        "source": "preprocessor-expanded-ir",
         "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
       },
       "symbolEvidence": {
@@ -2284,6 +2438,10 @@
       "bindingId": 18,
       "wrapper": "deherm_dmsdk_named_scalar_profile_property_set_u32",
       "preferredLowering": false,
+      "aliases": [
+        "dmsdk:ProfileIdx@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:33:457"
+      ],
+      "patternDecision": "value.named-scalar-direct",
       "recipe": {
         "include": "dmsdk/dlib/profile.h",
         "result": {
@@ -2302,6 +2460,7 @@
             "underlying": "uint64_t",
             "native": "ProfileIdx",
             "evidence": {
+              "declarationId": "dmsdk:ProfileIdx@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:33:457",
               "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
               "line": 33,
               "text": "typedef uint64_t ProfileIdx;",
@@ -2319,12 +2478,13 @@
             "name": "v"
           }
         ],
-        "exactVectorSha256": "8bdb81fd66286f766b94b48de57b3ea6b1b4b3aa226ccbc1584dc450ca27e48d"
+        "exactVectorSha256": "19b304c3c7b2c82c4479403e2324673d074d5bcca7cc4f3374c22a36603c5b27"
       },
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
-        "line": 206,
-        "text": "#define DM_PROPERTY_SET_U32(name, set_value)    ProfilePropertySetU32(*name##_p, set_value)",
+        "line": 0,
+        "text": null,
+        "source": "preprocessor-expanded-ir",
         "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
       },
       "symbolEvidence": {
@@ -2413,6 +2573,10 @@
       "bindingId": 19,
       "wrapper": "deherm_dmsdk_named_scalar_profile_property_set_u64",
       "preferredLowering": false,
+      "aliases": [
+        "dmsdk:ProfileIdx@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:33:457"
+      ],
+      "patternDecision": "value.named-scalar-direct",
       "recipe": {
         "include": "dmsdk/dlib/profile.h",
         "result": {
@@ -2431,6 +2595,7 @@
             "underlying": "uint64_t",
             "native": "ProfileIdx",
             "evidence": {
+              "declarationId": "dmsdk:ProfileIdx@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:33:457",
               "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
               "line": 33,
               "text": "typedef uint64_t ProfileIdx;",
@@ -2448,12 +2613,13 @@
             "name": "v"
           }
         ],
-        "exactVectorSha256": "f99baaf541552ecd528c885f619548098ce4dba5c129a4ce7a10a7e025c5fb72"
+        "exactVectorSha256": "9fee09432d7db853289f5169516c448cb5106037db21804471d9f8ef6e2b065d"
       },
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
-        "line": 209,
-        "text": "#define DM_PROPERTY_SET_U64(name, set_value)    ProfilePropertySetU64(*name##_p, set_value)",
+        "line": 0,
+        "text": null,
+        "source": "preprocessor-expanded-ir",
         "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
       },
       "symbolEvidence": {
@@ -2540,11 +2706,15 @@
       "shape": "scalar:void(value:scalar:u64,value:scalar:i32)",
       "emitted": false,
       "blocker": "native-symbol-absent",
-      "issue": "https://github.com/ts-defold/deherm/issues/117",
+      "aliases": [
+        "dmsdk:ProfileIdx@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:33:457"
+      ],
+      "patternDecision": "value.named-scalar-direct",
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
-        "line": 166,
-        "text": "void ProfilePropertyAdd##stype(ProfileIdx idx, type v);",
+        "line": 0,
+        "text": null,
+        "source": "preprocessor-expanded-ir",
         "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
       },
       "symbolEvidence": {

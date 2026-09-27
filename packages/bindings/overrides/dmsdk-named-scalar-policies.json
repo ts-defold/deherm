@@ -1,36 +1,11 @@
 {
-  "schemaVersion": 2,
-  "policyVersion": "2026-09-21.1",
-  "expectedCoverage": { "candidates": 21, "generated": 20, "blocked": 1 },
-  "declarationEvidenceRules": [
-    { "symbolPattern": "^ProfilePropertySet", "anchor": "void ProfilePropertySet##stype" },
-    { "symbolPattern": "^ProfilePropertyAdd", "anchor": "void ProfilePropertyAdd##stype" }
-  ],
-  "symbolEvidenceBlockers": [
-    {
-      "declarationId": "dmsdk:ProfilePropertyAddBool@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:468",
-      "blocker": "native-symbol-absent",
-      "issue": "https://github.com/ts-defold/deherm/issues/117"
-    }
-  ],
-  "namedTypes": {
-    "dmhash_t": {
-      "underlying": "uint64_t",
-      "evidence": ["upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h", "typedef uint64_t dmhash_t;"]
-    },
-    "ProfileIdx": {
-      "underlying": "uint64_t",
-      "evidence": ["upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h", "typedef uint64_t ProfileIdx;"]
-    },
-    "Thread": {
-      "underlying": "uintptr_t",
-      "qualification": "declaration-namespace",
-      "evidence": ["upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h", "typedef uintptr_t Thread;"]
-    },
-    "TlsKey": {
-      "underlying": "uintptr_t",
-      "qualification": "declaration-namespace",
-      "evidence": ["upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h", "typedef uintptr_t TlsKey;"]
-    }
+  "schemaVersion": 3,
+  "policyVersion": "named-scalar-v3",
+  "family": "named-scalar",
+  "recipe": {
+    "transport": "fixed-width-cell-codec",
+    "aliasSource": "revision-ir",
+    "linkageSource": "revision-symbol-evidence",
+    "fallback": "universal-recipe"
   }
 }

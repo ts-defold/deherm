@@ -212,11 +212,12 @@ selection authority while retaining their existing allocation-free C ABI, JSI,
 Static Hermes typed-native, browser direct-memory, TypeScript, and exact-call
 emitters.
 
-Six former name-selected families have moved onto it: fixed-output
+Seven former name- or revision-fact-selected families have moved onto it: fixed-output
 digests, bounded Base64 transforms, fixed-three-scalar ASTC probes, in-place
 XTEA transforms, fixed-width buffer hashes, and generation-checked incremental
-hash-state lifecycles. Selection is driven by each callable's ABI shape plus
-semantic facts extracted from the pinned public comments and enum metadata.
+hash-state lifecycles, plus named scalar aliases. Selection is driven by each
+callable's ABI shape plus semantic facts extracted from the revision IR, pinned
+public comments, enum metadata, and symbol census.
 Exact digest sizes, capacity-query semantics, ASTC's stable 16-byte format
 preflight, XTEA's 128-bit key recipe, result widths, and hash-state lifecycle
 operations remain explicit compiler recipes instead of route lists. Callable
@@ -224,8 +225,7 @@ and enum member spellings are read from that revision's IR and emitted verbatim.
 Those policies contain no header, symbol, prefix, regex-over-symbol, or route
 entries. Documentation drift withdraws the fast path and retains the universal
 recipe. This proves the intended migration shape but does not complete the
-checklist for named-scalar, enum-value, scalar-thunk, arena-cstring, or every
-callable.
+checklist for enum-value, scalar-thunk, arena-cstring, or every callable.
 
 ## 4. Make every product a projection
 

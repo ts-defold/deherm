@@ -3,7 +3,7 @@
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "scope": "generated-script-recording-engine",
   "evidenceBoundary": "This harness proves only that the generated binding stack matches this repository's declared contract for each route. It is a null/observer engine: it is not Defold, and nothing here is engine conformance evidence. Trace records are keyed by the canonical lowering plan's interned contract index so a later real-engine differential can diff against them per contract.",
-  "planSha256": "6efb4e74fa7714721d0ad1dc82f9cbe849dd98be5d227f1dba4addc81019974a",
+  "planSha256": "f96f7212bd2d2e7f0930e2fa0ac9ee4fd094e5caf67fff539d1508d2b881563d",
   "planFallback": null,
   "inputHashes": {
     "projection": "08ab33d3b4c79299398281dc3846f4bd6fd9d8f37380894dd5d3dda379bbe8a8",
@@ -13,7 +13,7 @@
     "tableRecords": "ef7e3061aaa1ff03e37f121290993bb7114b351dd98be15a7c4a53b5dbf24f94",
     "valueBindings": "805dbd25cbf2fc9472f207f9244e4996296a99418411e0880dca1640e596b176",
     "overloadDispatch": "829f556760905005f05f0757eaa244d86c6e6af047d50ece033662344fe48d39",
-    "loweringPlan": "090d57a4d1246bbb0f802dd2e0f51f029a1e319ecd5b52e03919e135ac010b41"
+    "loweringPlan": "44608b95675a9a311a671f862277fabb72b6a26ffea8f71eb9e0b9437c2044f6"
   },
   "planInputDrift": [],
   "transports": {
@@ -97341,7 +97341,7 @@
     "expectedTrace": "tests/fixtures/generated_script_recording_expected_trace.txt"
   },
   "artifactHashes": {
-    "header": "9745382dd0d3b601f09438b5e6c792b08697dc1512fd68a04770b3ad5fdfc5a4",
+    "header": "b823542613fa855332b5d4ce61569d5bca11e1403761082b8e004c1466aae830",
     "tables": "56b71c87969369afb3c792cc884e6687a688b9e5ce522760237deece654b30b5",
     "provider": "365eb33c7adda67d2390ac911cd21e28bf9014ef91a6151f7854082db9ac5acd",
     "luaAdapter": "e8429156d7c289fd90125ab5daeeb8ce1427fc878be61d44cb6a3cf022175862",
@@ -97351,6 +97351,6 @@
     "browserCallbackDriverJs": "46d940a2660dbbf187016d2be178dbb69b3127f17ccb897c12b00dbc024ec92c",
     "driver": "a0a2dc3a70dc4dad47cd197d1c0e57da8873be95d72228c2f33f74066ae71630",
     "driverJs": "45e96075867bdf777c8f5c97d6416acc5025775ee877b6f55ebdb0d44fc0a523",
-    "expectedTrace": "6b0083d7068d5cf880f9d5c2b60c392b45d922236a210d729ace8287a543e282"
+    "expectedTrace": "4b0b414bd9138c7a5fc728ebbf95986a30ef8862c913b510da36c980cc2a6b45"
   }
 }
