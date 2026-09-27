@@ -574,8 +574,8 @@
   },
   "documents": {
     "defold-binding-lowering-plan.json": {
-      "bytes": 17792204,
-      "sha256": "10943bb84e4ef02d9fe525913f8ba47b3792804353692582f63d763f805314c0"
+      "bytes": 17796834,
+      "sha256": "500bcafd111a7b445090a2a6504ac0ca187f85aaeb9230cdf67ccfd0b842b811"
     }
   }
 }

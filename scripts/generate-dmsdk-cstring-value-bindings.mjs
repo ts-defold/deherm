@@ -3,6 +3,11 @@ import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import {
+  DMSDK_UNIVERSAL_FALLBACK_PATTERN,
+  defineDmSdkPattern,
+  selectDmSdkPattern,
+} from "../packages/compiler/src/dmsdk-pattern-selector.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const relative = Object.freeze({
@@ -35,14 +40,6 @@ function options(argv) {
 
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 const quote = (value) => JSON.stringify(value);
-const supportedInputContractTokens = Object.freeze({
-  nullability: Object.freeze(["non-null"]),
-  encoding: Object.freeze(["js-string-utf8-no-embedded-nul"])
-});
-const supportedResultContractTokens = Object.freeze({
-  nullability: Object.freeze(["non-null", "nullable"]),
-  encoding: Object.freeze(["native-null-terminated-bytes-decoded-as-utf8"])
-});
 const pascal = (value) => value.split(/[^A-Za-z0-9]+/).filter(Boolean)
   .map((part) => `${part[0].toUpperCase()}${part.slice(1)}`).join("");
 const camel = (value) => {
@@ -71,91 +68,162 @@ function candidate(row) {
       .every(({ direction, type }) => direction === "in" && type.mutable === false);
 }
 
-function blocker(row, policy) {
-  const matches = policy.blockerRules.filter((rule) =>
-    (!rule.symbolPattern || new RegExp(rule.symbolPattern).test(row.symbol)) &&
-    (!rule.headerPattern || new RegExp(rule.headerPattern).test(row.provenance.header)));
-  assert.ok(matches.length <= 1, `${row.id} matches overlapping C-string blocker rules`);
-  return matches[0];
+function validateRecipe(value) {
+  assert.deepEqual(Object.keys(value).sort(), ["family", "recipe", "schemaVersion"], "C-string recipe has unsupported top-level keys");
+  assert.equal(value.schemaVersion, 1, "C-string recipe schemaVersion must be 1");
+  assert.equal(value.family, "cstring-value", "C-string recipe family is unsupported");
+  assert.deepEqual(Object.keys(value.recipe).sort(), ["candidateSource", "fallback", "input", "result", "scratchCapacity", "semanticSource", "transport"], "C-string recipe has unsupported keys");
+  assert.equal(value.recipe.transport, "bounded-utf8-cstring-value");
+  assert.ok(Number.isSafeInteger(value.recipe.scratchCapacity) && value.recipe.scratchCapacity > 0);
+  assert.deepEqual(value.recipe.input, { nullability: "non-null", encoding: "js-string-utf8-no-embedded-nul" });
+  assert.deepEqual(value.recipe.result, { encoding: "native-null-terminated-bytes-decoded-as-utf8" });
+  assert.equal(value.recipe.candidateSource, "revision-projection-global-cstring-value-abi");
+  assert.equal(value.recipe.semanticSource, "revision-ir-public-documentation");
+  assert.equal(value.recipe.fallback, "universal-recipe");
 }
 
-function semanticIdentityFromDeclarationId(id) {
-  if (typeof id !== "string" || !id.startsWith("dmsdk:")) return null;
-  const at = id.indexOf("@");
-  if (at < 0) return null;
-  const source = id.slice(at + 1);
-  const lastColon = source.lastIndexOf(":");
-  const previousColon = source.lastIndexOf(":", lastColon - 1);
-  if (lastColon < 0 || previousColon < 0) return null;
-  return { symbol: id.slice("dmsdk:".length, at), header: source.slice(0, previousColon) };
+function cstringPatterns() {
+  return [
+    defineDmSdkPattern({
+      schemaVersion: 1,
+      id: "cstring-value.enum-literal-result",
+      family: "cstring-value.enum-literal-result",
+      emitter: "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+      priority: 780,
+      cost: 8,
+      fallback: false,
+      when: {
+        declarationKinds: ["function"],
+        result: { roles: ["cstring-result"] },
+        parameters: { count: { exact: 1 }, positions: [{ rolePrefixes: ["enum:"], directions: ["value"] }] },
+        requireSemanticTokens: ["enum-string-representation", "non-null-cstring-result"],
+      },
+    }),
+    defineDmSdkPattern({
+      schemaVersion: 1,
+      id: "cstring-value.nullable-input-slice",
+      family: "cstring-value.nullable-input-slice",
+      emitter: "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+      priority: 780,
+      cost: 8,
+      fallback: false,
+      when: {
+        declarationKinds: ["function"],
+        result: { roles: ["cstring-result"] },
+        parameters: { count: { exact: 1 }, positions: [{ roles: ["cstring-in"], directions: ["in"] }] },
+        requireSemanticTokens: ["nullable-cstring-result", "safe-utf8-cstring-input"],
+      },
+    }),
+    defineDmSdkPattern({
+      schemaVersion: 1,
+      id: "cstring-value.input-transform",
+      family: "cstring-value.input-transform",
+      emitter: "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+      priority: 770,
+      cost: 6,
+      fallback: false,
+      when: {
+        declarationKinds: ["function"],
+        result: { roles: ["scalar:void"], rolePrefixes: ["scalar:", "enum:"] },
+        parameters: {
+          every: [
+            { roles: ["cstring-in"], directions: ["in"] },
+            { rolePrefixes: ["enum:", "scalar:"], directions: ["value"] },
+          ],
+          some: [{ roles: ["cstring-in"], directions: ["in"] }],
+        },
+        requireSemanticTokens: ["safe-utf8-cstring-input"],
+      },
+    }),
+    DMSDK_UNIVERSAL_FALLBACK_PATTERN,
+  ];
 }
 
-function semanticIdentity(row) {
-  return { symbol: row.symbol, header: row.provenance.header };
+function role(type, result = false) {
+  if (type.kind === "cstring") return result ? "cstring-result" : "cstring-in";
+  if (type.kind === "void") return "scalar:void";
+  if (type.kind === "enum") return `enum:${type.name}`;
+  return `scalar:${type.name}`;
 }
 
-function sameSemanticIdentity(left, right) {
-  return left?.symbol === right?.symbol && left?.header === right?.header;
-}
-
-function validateContractShape(row, contract, policy) {
-  const hasInput = row.signature.parameters.some(({ type }) => type.kind === "cstring");
-  const hasResult = row.signature.result.kind === "cstring";
-  if (Boolean(contract.input) !== hasInput || Boolean(contract.result) !== hasResult) return false;
-  if (contract.input) {
-    assert.ok(supportedInputContractTokens.nullability.includes(contract.input.nullability), `${contract.id}: unsupported input nullability token`);
-    assert.ok(supportedInputContractTokens.encoding.includes(contract.input.encoding), `${contract.id}: unsupported input encoding token`);
-  }
-  if (contract.result) {
-    assert.ok(supportedResultContractTokens.nullability.includes(contract.result.nullability), `${contract.id}: unsupported result nullability token`);
-    assert.ok(supportedResultContractTokens.encoding.includes(contract.result.encoding), `${contract.id}: unsupported result encoding token`);
-  }
-  return true;
-}
-
-export function resolveCStringContracts(rows, policy) {
-  assert.deepEqual(policy.inputContractTokens, supportedInputContractTokens, "C-string input token catalog differs from generator capabilities");
-  assert.deepEqual(policy.resultContractTokens, supportedResultContractTokens, "C-string result token catalog differs from generator capabilities");
-  const seenRuleIds = new Set();
-  for (const contract of policy.stringContractRules) {
-    assert.ok(typeof contract.id === "string" && contract.id, "C-string contract rule has no id");
-    assert.ok(!seenRuleIds.has(contract.id), `duplicate C-string contract rule id: ${contract.id}`);
-    seenRuleIds.add(contract.id);
-    assert.ok(Array.isArray(contract.declarationIds) && contract.declarationIds.length > 0, `${contract.id}: no declaration IDs`);
-  }
-
-  // Declaration IDs contain source offsets and an IR-local ordinal. They are
-  // useful as an exact match when a revision is unchanged, but must not be an
-  // admission gate when a pinned Defold revision moves a declaration. A
-  // semantic fallback is accepted only when it identifies one current row;
-  // ambiguity remains fail-closed as an unresolved specialization.
-  const semanticRows = new Map();
-  for (const row of rows) {
-    const key = JSON.stringify(semanticIdentity(row));
-    const bucket = semanticRows.get(key) ?? [];
-    bucket.push(row);
-    semanticRows.set(key, bucket);
-  }
-  const matchesFor = (contract, row) => {
-    if (contract.declarationIds.includes(row.id)) return true;
-    const identities = contract.declarationIds.map(semanticIdentityFromDeclarationId).filter(Boolean);
-    if (!identities.some((identity) => sameSemanticIdentity(identity, semanticIdentity(row)))) return false;
-    const key = JSON.stringify(semanticIdentity(row));
-    return (semanticRows.get(key) ?? []).length === 1;
+function facts(row, semanticTokens = []) {
+  return {
+    id: row.id,
+    kind: row.provenance.declarationKind,
+    result: { role: role(row.signature.result, true), direction: "value" },
+    parameters: row.signature.parameters.map((parameter) => ({ role: role(parameter.type), direction: parameter.direction })),
+    families: [row.provenance.primaryFamily],
+    semanticTokens,
   };
+}
 
-  return rows.map((row) => {
-    const rule = blocker(row, policy);
-    const matches = policy.stringContractRules.filter((contract) => matchesFor(contract, row));
-    assert.ok(matches.length <= 1, `${row.id} matches overlapping C-string contract rules`);
-    assert.ok(!(rule && matches.length), `${row.id} is both policy-blocked and assigned a C-string contract`);
-    const contract = matches[0] ?? null;
-    const contractShapeValid = contract ? validateContractShape(row, contract, policy) : false;
+const normalizedText = (value) => String(value ?? "").replace(/<[^>]+>/gu, " ").replace(/\s+/gu, " ").trim().toLowerCase();
+
+export function inferCStringSemantics(declaration, row, recipe) {
+  if (!declaration || declaration.kind !== "function") return { blocker: "cstring-semantic-contract-unresolved", semanticTokens: [], contract: null, evidence: null };
+  const description = normalizedText(declaration.description);
+  const returnDescription = normalizedText(declaration.returnDescription);
+  const parameterDescriptions = declaration.parameters.map((parameter) => normalizedText(parameter.description));
+  const evidence = {
+    source: "revision-ir-public-documentation",
+    description: declaration.description ?? null,
+    returnDescription: declaration.returnDescription ?? null,
+    parameters: declaration.parameters.map(({ name, description: detail }) => ({ name, description: detail ?? null })),
+  };
+  if (row.signature.result.kind === "cstring" && description.includes("original string used to produce a hash")) {
+    return { blocker: "borrowed-registry-result-has-no-atomic-copy-contract", semanticTokens: [], contract: null, evidence };
+  }
+  if (description.includes("adapter family") && description.includes("string identifier") && row.signature.result.kind === "enum") {
+    return { blocker: "restricted-string-domain-requires-validator", semanticTokens: [], contract: null, evidence };
+  }
+  if (description.includes("profiler") || description.includes("last added scope") || description.includes("current thread name")) {
+    return { blocker: "profiler-logical-context-unresolved", semanticTokens: [], contract: null, evidence };
+  }
+  if (row.signature.result.kind === "cstring"
+      && row.signature.parameters.length === 1
+      && row.signature.parameters[0].type.kind === "enum"
+      && (description.includes("to string") || description.includes("string representation") || returnDescription.includes("as a string"))) {
     return {
-      row,
-      rule: rule ?? (contract ? (contractShapeValid ? null : { id: "cstring-contract-shape-drifted" }) : { id: "cstring-semantic-contract-unresolved" }),
-      contract
+      blocker: null,
+      semanticTokens: ["enum-string-representation", "non-null-cstring-result"],
+      contract: { id: "enum-literal-result-utf8", input: null, result: { nullability: "non-null", ...recipe.result } },
+      evidence,
     };
+  }
+  if (row.signature.result.kind === "cstring"
+      && row.signature.parameters.length === 1
+      && row.signature.parameters[0].type.kind === "cstring"
+      && returnDescription.includes("0 otherwise")) {
+    return {
+      blocker: null,
+      semanticTokens: ["nullable-cstring-result", "safe-utf8-cstring-input"],
+      contract: { id: "nullable-input-slice-utf8", input: recipe.input, result: { nullability: "nullable", ...recipe.result } },
+      evidence,
+    };
+  }
+  if (row.signature.parameters.some(({ type }) => type.kind === "cstring")
+      && row.signature.result.kind !== "cstring"
+      && declaration.parameters.every((_, index) => row.signature.parameters[index]?.type.kind !== "cstring"
+        || /(?:string|path|utf-?8)/u.test(parameterDescriptions[index]))) {
+    return {
+      blocker: null,
+      semanticTokens: ["safe-utf8-cstring-input"],
+      contract: { id: "input-js-utf8", input: recipe.input, result: null },
+      evidence,
+    };
+  }
+  return { blocker: "cstring-semantic-contract-unresolved", semanticTokens: [], contract: null, evidence };
+}
+
+export function resolveCStringContracts(rows, recipeDocument, sdkIr) {
+  validateRecipe(recipeDocument);
+  const declarations = new Map(sdkIr.declarations.map((declaration) => [declaration.id, declaration]));
+  const patterns = cstringPatterns();
+  return rows.map((row) => {
+    const semantics = inferCStringSemantics(declarations.get(row.id), row, recipeDocument.recipe);
+    const decision = selectDmSdkPattern(facts(row, semantics.semanticTokens), patterns);
+    const rule = semantics.blocker ? { id: semantics.blocker } : decision.fallback ? { id: "cstring-semantic-contract-unresolved" } : null;
+    return { row, rule, contract: rule ? null : semantics.contract, semantics, patternDecision: decision };
   });
 }
 
@@ -272,7 +340,7 @@ function storageShape(entries) {
   };
 }
 
-function renderHeader(entries, policy) {
+function renderHeader(entries, recipe) {
   return `// Generated by scripts/generate-dmsdk-cstring-value-bindings.mjs. Do not edit.
 #ifndef DEFOLD_HERMES_GENERATED_DMSDK_CSTRING_VALUE_H
 #define DEFOLD_HERMES_GENERATED_DMSDK_CSTRING_VALUE_H
@@ -303,7 +371,7 @@ typedef struct DehermDmSdkCStringDescriptor {
   uint32_t stable_id; uint8_t string_count; uint8_t scalar_count; uint8_t result_kind; uint8_t nullable_result;
   const char* projection_id; const char* source_id;
 } DehermDmSdkCStringDescriptor;
-#define DEHERM_DMSDK_CSTRING_TLS_SCRATCH_CAPACITY UINT32_C(${policy.scratchCapacity})
+#define DEHERM_DMSDK_CSTRING_TLS_SCRATCH_CAPACITY UINT32_C(${recipe.scratchCapacity})
 uint32_t deherm_dmsdk_cstring_value_count(void);
 const DehermDmSdkCStringDescriptor* deherm_dmsdk_cstring_value_descriptors(void);
 DehermDmSdkCStringStatus deherm_dmsdk_cstring_frame_begin(DehermDmSdkCStringScratch*, DehermDmSdkCStringFrame*);
@@ -517,27 +585,6 @@ async function writeOrCheck(outputRoot, name, content, check) {
   else { await mkdir(path.dirname(target), { recursive: true }); await writeFile(target, content); }
 }
 
-async function inspectEvidence(entries, { anchors = false } = {}) {
-  const reports = {};
-  const issues = new Map();
-  for (const evidence of entries) {
-    assert.ok(typeof evidence.id === "string" && evidence.id, "C-string evidence has no id");
-    if (reports[evidence.id] || issues.has(evidence.id)) throw new Error(`duplicate C-string evidence id: ${evidence.id}`);
-    try {
-      const content = await readFile(path.join(root, evidence.path), "utf8");
-      const actualHash = sha256(content);
-      const missingAnchors = anchors ? (evidence.anchors ?? []).filter((anchor) => !content.includes(anchor)) :
-        (content.includes(evidence.contains) ? [] : [evidence.contains]);
-      reports[evidence.id] = { ...evidence, sha256: actualHash };
-      if (missingAnchors.length) issues.set(evidence.id, { id: "cstring-source-evidence-drifted", missingAnchors });
-    } catch (error) {
-      reports[evidence.id] = { ...evidence, sha256: null };
-      issues.set(evidence.id, { id: "cstring-source-evidence-missing", error: error.code ?? "read-failed" });
-    }
-  }
-  return { reports, issues };
-}
-
 async function main() {
   const opt = options(process.argv.slice(2));
   const inputPath = (value) => path.isAbsolute(value) ? value : path.join(root, value);
@@ -548,62 +595,40 @@ async function main() {
   assert.equal(projection.schemaVersion, 1, "C-string projection schema drifted");
   assert.equal(sdkIr.schemaVersion, 1, "C-string SDK IR schema drifted");
   assert.equal(projection.defoldRevision, sdkIr.defoldRevision, "C-string projection and SDK IR revisions differ");
-  assert.equal(policy.schemaVersion, 2);
+  validateRecipe(policy);
+  const recipe = policy.recipe;
   const candidates = projection.rows.filter(candidate);
-  const { reports: semanticEvidence, issues: semanticEvidenceIssues } = await inspectEvidence(policy.sourceEvidence, { anchors: true });
-  const semanticEvidenceIds = new Set(policy.sourceEvidence.map(({ id }) => id));
-  const blockerEvidenceById = new Map(policy.blockerSourceEvidence.map((evidence) => [evidence.id, evidence]));
-  assert.equal(blockerEvidenceById.size, policy.blockerSourceEvidence.length, "duplicate C-string blocker evidence id");
-  const { reports: blockerEvidence, issues: blockerEvidenceIssues } = await inspectEvidence(policy.blockerSourceEvidence);
-  for (const contract of policy.stringContractRules) {
-    for (const evidenceId of contract.sourceEvidence) {
-      if (!semanticEvidenceIds.has(evidenceId)) semanticEvidenceIssues.set(evidenceId, { id: "cstring-source-evidence-missing", owner: contract.id });
-    }
-  }
-  for (const rule of policy.blockerRules) {
-    for (const evidenceId of rule.sourceEvidence) {
-      if (!blockerEvidenceById.has(evidenceId)) blockerEvidenceIssues.set(evidenceId, { id: "cstring-source-evidence-missing", owner: rule.id });
-    }
-  }
-  const classified = resolveCStringContracts(candidates, policy).map((entry) => {
-    let rule = entry.rule;
-    if (entry.contract) {
-      const drifted = entry.contract.sourceEvidence.filter((id) => semanticEvidenceIssues.has(id));
-      if (drifted.length) rule = { id: "cstring-source-evidence-drifted", sourceEvidence: drifted };
-    }
-    if (rule?.sourceEvidence) {
-      const drifted = rule.sourceEvidence.filter((id) => blockerEvidenceIssues.has(id));
-      if (drifted.length) rule = { id: "cstring-blocker-evidence-drifted", sourceEvidence: drifted };
-    }
-    return { ...entry, rule, stableId: stableId(entry.row) };
-  });
+  const classified = resolveCStringContracts(candidates, policy, sdkIr)
+    .map((entry) => ({ ...entry, stableId: stableId(entry.row) }));
   const entries = classified.filter(({ rule }) => !rule);
   const blocked = classified.filter(({ rule }) => rule);
   assert.equal(new Set(classified.map(({ stableId: value }) => value)).size, classified.length, "Stable ID collision");
   const storage = storageShape(entries);
   const domains = enumDomains(entries, sdkIr);
   const artifacts = new Map([
-    [relative.header, renderHeader(entries, policy)], [relative.runtime, renderRuntime()], [relative.native, renderNative(entries, storage, domains)],
+    [relative.header, renderHeader(entries, recipe)], [relative.runtime, renderRuntime()], [relative.native, renderNative(entries, storage, domains)],
     [relative.jsiHeader, renderJsiHeader()], [relative.jsi, renderJsi(entries, storage)], [relative.browser, renderBrowser(entries)],
     [relative.typescript, renderTypescript(entries)], [relative.staticHermes, renderStaticHermes()]
   ]);
   const report = {
     schemaVersion: 1, defoldRevision: projection.defoldRevision,
-    sources: { projection: relative.projection, sdkIr: relative.sdkIr, policy: relative.policy, hashes: { projection: sha256(projectionRaw), sdkIr: sha256(irRaw), policy: sha256(policyRaw), semanticEvidence, blockerEvidence } },
+    sources: { projection: relative.projection, sdkIr: relative.sdkIr, policy: relative.policy, hashes: { projection: sha256(projectionRaw), sdkIr: sha256(irRaw), policy: sha256(policyRaw) } },
     selector: "global pointer-family function + nonvariadic + no callback/record/template/span + const input cstrings + exact result {void,cstring,enum,bool,i32,u32,u64} + exact parameter {cstring,enum,u32,u64}; independent of lowering/evidence disposition",
     coverage: { candidates: candidates.length, generated: entries.length, blocked: blocked.length, nativeAbiGenerated: entries.length, headerObjectCompiled: 0, pinnedEngineLinked: 0, stubAbiLinkedAndRuntimeTested: 0, nativeDynamicHermesAdapterGenerated: entries.length, nativeStaticHermesDirectMemoryAbiGenerated: entries.length, browserDirectMemoryDescriptorGenerated: entries.length, allTargetConformant: 0 },
     stringPolicy: {
       input: "The staged JavaScript adapter deliberately narrows const char* inputs to non-null JavaScript strings, uses the host JSI UTF-8 conversion, rejects embedded NUL, and synthesizes the terminator. Lone-surrogate handling therefore follows the selected JSI engine and remains outside cross-target conformance until a shared UTF-16-to-UTF-8 policy is generated. The C ABI itself continues to accept exact caller-provided non-NUL byte views; this policy does not claim every native byte domain is intrinsically UTF-8.",
-      result: "Reviewed result contracts explicitly choose nullable or non-null and decode copied null-terminated native bytes as UTF-8. Source hashes and anchors pin the declaration evidence; they do not prove arbitrary engine-returned bytes are valid Unicode.",
-      unresolved: "A candidate without exactly one non-overlapping reviewed contract is blocked as cstring-semantic-contract-unresolved."
+      result: "Revision-derived result contracts explicitly choose nullable or non-null and decode copied null-terminated native bytes as UTF-8. Public IR documentation supplies the semantic evidence; it does not prove arbitrary engine-returned bytes are valid Unicode.",
+      unresolved: "A candidate whose revision documentation and ABI shape do not select one structural recipe is blocked as cstring-semantic-contract-unresolved."
     },
-    abi: { input: "exact byte view; null data is valid only with zero length and means an empty string; embedded NUL rejected; terminator synthesized in bounded caller/TLS scratch", enumInput: "exact declared-value membership generated from pinned SDK IR; sentinel COUNT/MAX/NUM enumerators are rejected", enumDomains: Object.fromEntries(domains.map(({ name, members }) => [name, members])), output: "immediate overlap-safe copy to caller-owned dst/capacity/out_required/present; capacity includes the required trailing NUL, so capacity == required is too small for a present result", browserDescriptor: "route-specific scalar/enum input kinds, exact result lane width, result nullability, memory layouts, and string policy are generated; the descriptor remains private and unregistered", status: "fixed-width uint32_t / Static Hermes c_uint", storage, tlsScratchCapacity: policy.scratchCapacity, reentrant: "mark/reset frames on thread-local or caller-owned scratch", allocation: "generated C ABI contains no explicit allocation primitive; an independent test observes zero warmed C++ operator-new calls. Caller-owned scratch is the strict caller-controlled capacity path; TLS scratch is a bounded convenience path. Engine implementations and JS string conversion are outside this claim" },
+    abi: { input: "exact byte view; null data is valid only with zero length and means an empty string; embedded NUL rejected; terminator synthesized in bounded caller/TLS scratch", enumInput: "exact declared-value membership generated from pinned SDK IR; sentinel COUNT/MAX/NUM enumerators are rejected", enumDomains: Object.fromEntries(domains.map(({ name, members }) => [name, members])), output: "immediate overlap-safe copy to caller-owned dst/capacity/out_required/present; capacity includes the required trailing NUL, so capacity == required is too small for a present result", browserDescriptor: "route-specific scalar/enum input kinds, exact result lane width, result nullability, memory layouts, and string policy are generated; the descriptor remains private and unregistered", status: "fixed-width uint32_t / Static Hermes c_uint", storage, tlsScratchCapacity: recipe.scratchCapacity, reentrant: "mark/reset frames on thread-local or caller-owned scratch", allocation: "generated C ABI contains no explicit allocation primitive; an independent test observes zero warmed C++ operator-new calls. Caller-owned scratch is the strict caller-controlled capacity path; TLS scratch is a bounded convenience path. Engine implementations and JS string conversion are outside this claim" },
     truthBoundary: "Private staging only: the TypeScript wrapper is not exported from the SDK barrel, the JSI installer is not registered, the Static Hermes artifact is not compiled into an application, the browser descriptor is not installed by a public module, and the guarded native sources are not linked into a production runtime target. This generated report claims generation only and intentionally records compile/link/runtime evidence as zero. tests/dmsdk-cstring-value-bindings.test.mjs independently object-compiles the generated native, runtime, and JSI units against pinned headers and links/runs every native adapter against ABI-compatible stubs. Pinned Defold engine linkage, extension retention, target execution, and engine-allocation observations remain unproven; generated does not mean engine-proven.",
-    declarations: classified.map(({ row, rule, contract, stableId: value }) => ({
+    declarations: classified.map(({ row, rule, contract, semantics, patternDecision, stableId: value }) => ({
       id: row.id, projectionId: row.projectionId, stableId: value, denseId: rule ? null : entries.findIndex(({ row: candidateRow }) => candidateRow.id === row.id), symbol: row.symbol,
       provenance: row.provenance, disposition: rule ? "blocked" : "generated", blocker: rule?.id ?? null,
       universalFallback: rule ? "retained" : "retained-usage-materialized-recipe",
-      stringContract: contract ? { id: contract.id, input: contract.input, result: contract.result, sourceEvidence: contract.sourceEvidence } : null,
+      stringContract: contract ? { ...contract, semanticEvidence: semantics.evidence } : null,
+      blockerEvidence: rule ? semantics.evidence : null,
+      patternDecision,
       targetDisposition: rule ? { nativeDynamicHermes: "blocked", nativeStaticHermes: "blocked", html5BrowserHost: "blocked" } : { typescriptSdk: "staged-private-not-barrel-exported", nativeDynamicHermes: "staged-private-jsi-unregistered-unlinked", nativeStaticHermes: "staged-private-c-abi-uncompiled-unlinked", html5BrowserHost: "staged-private-descriptor-unregistered-unlinked" }
     })),
     artifacts: [...artifacts.keys()], artifactHashes: Object.fromEntries([...artifacts].map(([name, content]) => [name, sha256(content)]))

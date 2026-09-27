@@ -37,85 +37,63 @@ test("C-string/value selection is exhaustive, mechanical, and fail-closed",async
   assert.equal(report.coverage.headerObjectCompiled,0);assert.equal(report.coverage.stubAbiLinkedAndRuntimeTested,0);assert.equal(report.coverage.pinnedEngineLinked,0);assert.equal(report.coverage.allTargetConformant,0);
 });
 
-test("C-string semantic contracts fail closed on unresolved rows, overlap, and declaration drift",async()=>{
-  const [report,projection,policy]=await Promise.all([
+test("C-string policy contains codecs, not Defold revision facts",async()=>{
+  const text=await readFile(path.join(root,"packages/bindings/overrides/dmsdk-cstring-value-bindings.json"),"utf8");
+  const policy=JSON.parse(text);
+  assert.deepEqual(Object.keys(policy).sort(),["family","recipe","schemaVersion"]);
+  assert.deepEqual(Object.keys(policy.recipe).sort(),["candidateSource","fallback","input","result","scratchCapacity","semanticSource","transport"]);
+  assert.doesNotMatch(text,/(?:defoldRevision|upstream\/defold|dmsdk:|declarationIds|symbolPattern|headerPattern|sourceEvidence|sha256|anchors)/u);
+});
+
+test("C-string semantic contracts fail closed when revision documentation withdraws the proof",async()=>{
+  const [report,projection,policy,sdkIr]=await Promise.all([
     readFile(reportPath,"utf8").then(JSON.parse),
     readFile(path.join(root,"packages/bindings/generated/defold-dmsdk-projection-ir.json"),"utf8").then(JSON.parse),
-    readFile(path.join(root,"packages/bindings/overrides/dmsdk-cstring-value-bindings.json"),"utf8").then(JSON.parse)
+    readFile(path.join(root,"packages/bindings/overrides/dmsdk-cstring-value-bindings.json"),"utf8").then(JSON.parse),
+    readFile(path.join(root,"packages/bindings/generated/defold-sdk-ir.json"),"utf8").then(JSON.parse)
   ]);
   const ids=new Set(report.declarations.map(({id})=>id));
   const candidates=projection.rows.filter(({id})=>ids.has(id));
-
-  const unresolved=structuredClone(policy);
-  unresolved.stringContractRules=unresolved.stringContractRules.filter(({id})=>id!=="hash-input-js-utf8");
-  const unresolvedRows=resolveCStringContracts(candidates,unresolved);
+  const changed=structuredClone(sdkIr);
+  for(const declaration of changed.declarations.filter(({id,description})=>ids.has(id)&&/hash value from string/iu.test(description??""))){
+    declaration.description="The revision no longer documents the string input contract.";
+    for(const parameter of declaration.parameters)parameter.description="";
+  }
+  const unresolvedRows=resolveCStringContracts(candidates,policy,changed);
   assert.equal(unresolvedRows.filter(({rule})=>rule?.id==="cstring-semantic-contract-unresolved").length,2);
-
-  const overlap=structuredClone(policy);
-  overlap.stringContractRules.push({...structuredClone(overlap.stringContractRules[0]),id:"overlapping-contract"});
-  assert.throws(()=>resolveCStringContracts(candidates,overlap),/overlapping C-string contract rules/);
-
-  const drift=structuredClone(policy);
-  drift.stringContractRules[0].declarationIds[0]="dmsdk:removed-or-renamed-declaration";
-  const drifted=resolveCStringContracts(candidates,drift);
-  assert.equal(drifted.filter(({rule})=>rule?.id==="cstring-semantic-contract-unresolved").length,1);
-
-  const unsupported=structuredClone(policy);
-  unsupported.inputContractTokens.encoding=["unchecked-native-bytes"];
-  unsupported.stringContractRules.find(({input})=>input).input.encoding="unchecked-native-bytes";
-  assert.throws(()=>resolveCStringContracts(candidates,unsupported),/token catalog differs from generator capabilities/);
+  assert.equal(unresolvedRows.filter(({rule})=>!rule).length,12);
 });
 
-test("C-string reviewed recipes follow semantic identity when declaration ordinals move",async()=>{
-  const [projection,policy]=await Promise.all([
+test("C-string patterns do not depend on callable names, headers, or declaration ordinals",async()=>{
+  const [report,projection,policy,sdkIr]=await Promise.all([
+    readFile(reportPath,"utf8").then(JSON.parse),
     readFile(path.join(root,"packages/bindings/generated/defold-dmsdk-projection-ir.json"),"utf8").then(JSON.parse),
-    readFile(path.join(root,"packages/bindings/overrides/dmsdk-cstring-value-bindings.json"),"utf8").then(JSON.parse)
+    readFile(path.join(root,"packages/bindings/overrides/dmsdk-cstring-value-bindings.json"),"utf8").then(JSON.parse),
+    readFile(path.join(root,"packages/bindings/generated/defold-sdk-ir.json"),"utf8").then(JSON.parse)
   ]);
-  const reviewedIds=new Set(policy.stringContractRules.flatMap(({declarationIds})=>declarationIds));
-  const shifted=projection.rows.filter(({id})=>reviewedIds.has(id)).map((row,index)=>({
-    ...row,
-    id: row.id.replace(/:\d+:\d+$/u, `:${row.provenance.line ?? 0}:${9000 + index}`)
+  const ids=new Set(report.declarations.map(({id})=>id));
+  const shifted=projection.rows.filter(({id})=>ids.has(id)).map((row,index)=>({
+    ...row,symbol:`RevisionCallable${index}`,provenance:{...row.provenance,header:`revision/header_${index}.h`}
   }));
-  const resolved=resolveCStringContracts(shifted,policy);
+  const renamed=structuredClone(sdkIr);
+  for(const [index,declaration] of renamed.declarations.filter(({id})=>ids.has(id)).entries()){
+    declaration.name=`RevisionCallable${index}`;declaration.header=`revision/header_${index}.h`;declaration.line=9000+index;
+  }
+  const resolved=resolveCStringContracts(shifted,policy,renamed);
   assert.equal(resolved.filter(({rule})=>!rule).length,14);
-  assert.equal(resolved.filter(({rule})=>rule?.id==="cstring-semantic-contract-unresolved").length,0);
+  assert.equal(resolved.filter(({rule})=>rule).length,6);
 });
 
-async function generateWithPolicy(mutator) {
-  const directory=await mkdtemp(path.join(tmpdir(),"deherm-cstring-policy-"));
-  const policyPath=path.join(directory,"policy.json");
-  const policy=JSON.parse(await readFile(path.join(root,"packages/bindings/overrides/dmsdk-cstring-value-bindings.json"),"utf8"));
-  await mutator(policy);
-  await writeFile(policyPath,`${JSON.stringify(policy,null,2)}\n`);
-  const output=path.join(directory,"out");
-  run(process.execPath,["scripts/generate-dmsdk-cstring-value-bindings.mjs","--output-root",output,"--projection",path.join(root,"packages/bindings/generated/defold-dmsdk-projection-ir.json"),"--sdk-ir",path.join(root,"packages/bindings/generated/defold-sdk-ir.json"),"--policy",policyPath]);
-  const report=JSON.parse(await readFile(path.join(output,"packages/bindings/generated/defold-dmsdk-cstring-value-bindings.json"),"utf8"));
-  return { directory, report };
-}
-
-test("expected counts and recorded hashes do not gate a current revision",async()=>{
-  const {directory,report}=await generateWithPolicy((policy)=>{
-    policy.expectedCoverage={candidates:1,generated:1,blocked:0};
-    policy.sourceEvidence[0].sha256="stale-revision-hash";
-  });
-  try {
-    assert.deepEqual({candidates:report.coverage.candidates,generated:report.coverage.generated,blocked:report.coverage.blocked},{candidates:20,generated:14,blocked:6});
-  } finally { await rm(directory,{recursive:true,force:true}); }
-});
-
-test("drifted semantic evidence blocks only its reviewed specialization",async()=>{
-  const {directory,report}=await generateWithPolicy((policy)=>{
-    policy.sourceEvidence.find(({id})=>id==="hash-null-terminated-input").anchors=["anchor from a future revision"];
-  });
-  try {
-    assert.equal(report.coverage.generated,12);
-    assert.equal(report.coverage.blocked,8);
-    for(const row of report.declarations.filter(({symbol})=>["dmHashString32","dmHashString64"].includes(symbol))) {
-      assert.equal(row.disposition,"blocked");
-      assert.equal(row.blocker,"cstring-source-evidence-drifted");
-    }
-    assert.equal(report.declarations.filter(({disposition})=>disposition==="generated").length,12);
-  } finally { await rm(directory,{recursive:true,force:true}); }
+test("C-string recipe schema rejects revision-specific additions and unsupported codecs",async()=>{
+  const [report,projection,policy,sdkIr]=await Promise.all([
+    readFile(reportPath,"utf8").then(JSON.parse),readFile(path.join(root,"packages/bindings/generated/defold-dmsdk-projection-ir.json"),"utf8").then(JSON.parse),
+    readFile(path.join(root,"packages/bindings/overrides/dmsdk-cstring-value-bindings.json"),"utf8").then(JSON.parse),readFile(path.join(root,"packages/bindings/generated/defold-sdk-ir.json"),"utf8").then(JSON.parse)
+  ]);
+  const ids=new Set(report.declarations.map(({id})=>id));const candidates=projection.rows.filter(({id})=>ids.has(id));
+  const revisionSpecific=structuredClone(policy);revisionSpecific.defoldRevision="0".repeat(40);
+  assert.throws(()=>resolveCStringContracts(candidates,revisionSpecific,sdkIr),/unsupported top-level keys/);
+  const unsupported=structuredClone(policy);unsupported.recipe.input.encoding="unchecked-native-bytes";
+  assert.throws(()=>resolveCStringContracts(candidates,unsupported,sdkIr),/Expected values to be strictly deep-equal/);
 });
 
 test("mixed projection and SDK revisions remain a hard provenance failure",async()=>{

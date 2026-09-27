@@ -76,6 +76,27 @@ optimized adapters stayed fail-closed. The universal recipes still materialized
 and compiled. That is a version-survival result, not a claim that the historical
 specialized lanes are engine-linked.
 
+## Revision-derived C-string/value contracts
+
+The C-string/value package recipe has been reduced from a 7.7 KB table of
+current-revision declaration IDs, symbols, headers, hashes, regexes, and copied
+anchors to the stable 64 KiB scratch bound and UTF-8/nullability codecs. Three
+compiler patterns now cover enum-to-string literals, nullable slices borrowed
+from an input path, and input-string transforms. Restricted string domains,
+reverse-hash registry lifetimes, profiler context, and missing documentation
+remain explicit universal fallbacks.
+
+The current and 1.13.1 revisions each discover 20 candidates and select 14;
+1.12.0 discovers 19 and selects 13; 1.11.0 discovers 15 and selects 10. The
+1.12.0 C++ resource helper has no public documentation in that revision, so it
+correctly remains universal-only instead of inheriting the documented C helper's
+nullable contract. Every lane completed policy materialization and compile
+verification with the same compiler package. Current generated C ABI, JSI,
+Static Hermes direct-memory, browser descriptor, TypeScript surface, exact
+stub runtime, overlap/reentrancy checks, and zero-warmed-allocation evidence are
+unchanged; the specialized family remains private staging until its product
+backends are deliberately promoted.
+
 ## Clean-room registry inputs and outputs
 
 `scripts/lib/dmsdk-generator-pipeline.mjs` is the single ownership and ordering

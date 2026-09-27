@@ -212,11 +212,12 @@ selection authority while retaining their existing allocation-free C ABI, JSI,
 Static Hermes typed-native, browser direct-memory, TypeScript, and exact-call
 emitters.
 
-Ten former name- or revision-fact-selected families have moved onto it: fixed-output
+Eleven former name- or revision-fact-selected families have moved onto it: fixed-output
 digests, bounded Base64 transforms, fixed-three-scalar ASTC probes, in-place
 XTEA transforms, fixed-width buffer hashes, and generation-checked incremental
 hash-state lifecycles, named scalar aliases, declared-domain enum values,
-direct primitive scalar thunks, and bounded arena-backed cstring transforms.
+direct primitive scalar thunks, bounded arena-backed cstring transforms, and
+UTF-8 C-string/value transforms.
 Selection is driven by each
 callable's ABI shape plus semantic facts extracted from the revision IR, pinned
 public comments, enum metadata, and symbol census.

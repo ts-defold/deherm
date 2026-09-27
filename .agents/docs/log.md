@@ -1,5 +1,20 @@
 # Defold Hermes knowledge log
 
+## 2026-09-27 - C-string/value policy reduced to stable codecs
+
+- Replaced the 7.7 KB reviewed table of current Defold IDs, symbols, headers,
+  hashes, regexes, and source anchors with one stable scratch/UTF-8/nullability
+  recipe.
+- Added three structural compiler patterns and revision-IR semantic inference.
+  Current generation remains 20 candidates, 14 adapters, and six explicit
+  universal fallbacks; all existing ABI and allocation behavior is unchanged.
+- The same package verified current and Defold 1.13.1 at 14/20, 1.12.0 at
+  13/19, and 1.11.0 at 10/15. The 1.12.0 undocumented C++ resource helper
+  remains universal-only rather than borrowing a contract from a sibling name.
+- Focused compile/runtime, the four-revision policy/compile matrix, and the full
+  `pnpm check` repository gate pass. The refreshed current policy root is
+  `052d529141b4`.
+
 ## 2026-09-27 - Arena cstring policy reduced to a stable transport recipe
 
 - Removed the pinned Defold revision, six report identities, four concrete ABI
