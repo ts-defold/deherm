@@ -15,6 +15,7 @@ const sources = Object.freeze({
   shapes: "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
   projection: "packages/bindings/generated/defold-dmsdk-projection-ir.json",
   policy: "packages/bindings/overrides/dmsdk-borrowed-handle-bindings.json",
+  effectFacts: "packages/bindings/generated/defold-dmsdk-cpp-ownership-effect-facts.json",
 });
 const planUrl = new URL("packages/bindings/generated/defold-dmsdk-borrowed-handle-plan.json", root);
 
@@ -30,6 +31,7 @@ async function loadInputs() {
     shapes: JSON.parse(texts.shapes),
     projection: JSON.parse(texts.projection),
     policy: JSON.parse(texts.policy),
+    effectFacts: JSON.parse(texts.effectFacts),
   };
 }
 
@@ -39,12 +41,18 @@ function refreshTexts(inputs) {
     shapes: `${JSON.stringify(inputs.shapes)}\n`,
     projection: `${JSON.stringify(inputs.projection)}\n`,
     policy: `${JSON.stringify(inputs.policy)}\n`,
+    effectFacts: `${JSON.stringify(inputs.effectFacts)}\n`,
   };
   const digest = createHash("sha256").update(inputs.texts.ir).digest("hex");
   inputs.shapes.sourceHashes.ir = digest;
   inputs.projection.sources.hashes.ir = digest;
+  inputs.effectFacts.inputs.ir = digest;
+  inputs.effectFacts.inputs.shapes = createHash("sha256").update(inputs.texts.shapes).digest("hex");
+  inputs.effectFacts.inputs.policy = createHash("sha256").update(inputs.texts.policy).digest("hex");
   inputs.texts.shapes = `${JSON.stringify(inputs.shapes)}\n`;
   inputs.texts.projection = `${JSON.stringify(inputs.projection)}\n`;
+  inputs.effectFacts.inputs.shapes = createHash("sha256").update(inputs.texts.shapes).digest("hex");
+  inputs.texts.effectFacts = `${JSON.stringify(inputs.effectFacts)}\n`;
   return inputs;
 }
 
@@ -60,10 +68,16 @@ test("global borrowed-handle planning selects only synchronous borrowed consumer
   assert.equal(committed.coverage.structurallyRelevant, 182);
   assert.equal(committed.coverage.selected, 147);
   assert.equal(committed.coverage.universalFallback, 35);
+  assert.equal(committed.coverage.sourceDerived, 73);
+  assert.equal(committed.coverage.compatibilityPreserved, 74);
   assert.equal(committed.providerAbiVersion, 2);
   assert.equal(committed.abi.reason, "withdrawal renumbers private pre-release version-one IDs atomically");
   assert.equal(decisionByLeaf(committed, "dmGraphics::GetWindowWidth").fallback, false);
-  assert.equal(decisionByLeaf(committed, "dmGraphics::GetWindowWidth").effect.admission.kind, "trusted-defold-default");
+  assert.equal(
+    decisionByLeaf(committed, "dmGraphics::GetWindowWidth").effect.admission.kind,
+    "compatibility-preserved",
+  );
+  assert.equal(decisionByLeaf(committed, "dmImage::GetWidth").effect.admission.kind, "source-derived");
   for (const leaf of [
     "dmBuffer::Destroy",
     "dmGameObject::AcquireInstanceIndex",
@@ -89,7 +103,9 @@ test("global borrowed-handle planning selects only synchronous borrowed consumer
 test("effect semantics dominate the borrowed default", async () => {
   const base = await loadInputs();
   const baseline = buildDmSdkBorrowedHandlePlan(base);
-  const selected = baseline.decisions.find(({ fallback }) => !fallback);
+  const selected = baseline.decisions.find(
+    ({ fallback, effect }) => !fallback && effect.admission.kind === "source-derived",
+  );
   const cases = [
     {
       label: "finalizer",
@@ -138,6 +154,31 @@ test("effect semantics dominate the borrowed default", async () => {
     assert.equal(decision.effect.admission.kind, "revision-contradiction", fixture.label);
     assert.ok(decision.effect.signals.length > 0, fixture.label);
   }
+});
+
+test("withdrawing source proof preserves the trusted compatibility route without mislabeling it", async () => {
+  const inputs = await loadInputs();
+  const baseline = buildDmSdkBorrowedHandlePlan(inputs);
+  const selected = baseline.decisions.find(
+    ({ fallback, effect }) => !fallback && effect.admission.kind === "source-derived",
+  );
+  assert.ok(selected, "fixture contains a source-derived borrowed route");
+  const effect = inputs.effectFacts.functions.find(({ declarationId }) => declarationId === selected.declarationId);
+  assert.equal(effect.state, "observed");
+  effect.state = "unknown";
+  effect.fact = null;
+  effect.diagnostics = ["fixture-source-proof-withdrawn"];
+  inputs.effectFacts.coverage.observed -= 1;
+  inputs.effectFacts.coverage.unknown += 1;
+  inputs.effectFacts.coverage.envelopes["borrowed-handle"].observed -= 1;
+  inputs.effectFacts.coverage.envelopes["borrowed-handle"].unknown += 1;
+  refreshTexts(inputs);
+  const decision = buildDmSdkBorrowedHandlePlan(inputs).decisions.find(
+    ({ declarationId }) => declarationId === selected.declarationId,
+  );
+  assert.equal(decision.fallback, false);
+  assert.equal(decision.effect.admission.kind, "compatibility-preserved");
+  assert.deepEqual(decision.effect.sourceProof.evidenceGaps, ["cpp-effect:fixture-source-proof-withdrawn"]);
 });
 
 test("borrowed-handle decisions are canonical across reordered source arrays", async () => {

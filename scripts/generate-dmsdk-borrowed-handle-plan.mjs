@@ -15,6 +15,7 @@ const sources = Object.freeze({
   shapes: "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
   projection: "packages/bindings/generated/defold-dmsdk-projection-ir.json",
   policy: "packages/bindings/overrides/dmsdk-borrowed-handle-bindings.json",
+  effectFacts: "packages/bindings/generated/defold-dmsdk-cpp-ownership-effect-facts.json",
 });
 const output = "packages/bindings/generated/defold-dmsdk-borrowed-handle-plan.json";
 
@@ -30,6 +31,7 @@ export async function generateDmSdkBorrowedHandlePlan({ root: outputRoot = root,
     shapes: JSON.parse(texts.shapes),
     projection: JSON.parse(texts.projection),
     policy: JSON.parse(texts.policy),
+    effectFacts: JSON.parse(texts.effectFacts),
   };
   const plan = buildDmSdkBorrowedHandlePlan(inputs);
   indexDmSdkBorrowedHandlePlan(plan, inputs);

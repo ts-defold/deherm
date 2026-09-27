@@ -4354,3 +4354,50 @@ reentrancy, and 100,000 warmed calls with zero observed C++ allocations. This
 is compiler, generated-projection, header-compile, and fake-provider runtime
 evidence. It is not a production-provider, packaged-engine, or browser-export
 claim; `packagedEngineRuntimeVerified` remains zero.
+
+## 2026-09-27 - Source semantics and target availability become separate evidence scopes
+
+The shared C++ ownership/effect artifact no longer describes itself globally
+as `audit-only-single-profile` while the production scratch planner consumes
+its body facts. Schema version 4 carries two explicit claims instead:
+diagnostic-free facts extracted from the exact pinned Defold implementation are
+revision-authoritative source semantics, while symbol linkage and packaged
+engine availability remain unproven by source analysis and require their own
+provider/link/runtime evidence. The compiler-owned scratch planner validates
+that complete contract before source-derived admission.
+
+The pinned report still covers 212 structural rows (198 observed, 14 unknown),
+and the generated result is unchanged semantically: 30 scratch candidates,
+six source-derived routes, five compatibility-preserved routes, and nineteen
+universal fallbacks. Focused frontend and plan tests pass after regeneration.
+This wave changes evidence labeling and validation, not target linkage or
+packaged-engine runtime status.
+
+## 2026-09-27 - Borrowed handles join authenticated implementation facts
+
+The compiler-owned borrowed-handle plan now authenticates the shared C++
+ownership/effect artifact alongside IR, ABI shapes, projection, and the stable
+package recipe. Its generated ABI and route census are unchanged: 182
+structural candidates, 147 selected routes, and 35 universal fallbacks. Within
+the selected set, 73 routes now carry diagnostic-free source proof for
+non-owning, synchronous, non-escaping handle use; 74 retain the explicit
+Defold public by-value-resource compatibility convention and machine-readable
+source-proof gaps.
+
+The existing lifecycle, refcount, lease, transfer, and state-transition
+contradictions continue to dominate source or compatibility admission. Tests
+prove that a contradiction withdraws a source-derived fast path, while source
+proof withdrawal alone preserves the previously shipped route but relabels it
+as compatibility-preserved. This is source/planner evidence and unchanged
+generated transport output, not new target-link or packaged-engine runtime
+evidence.
+
+Repository-wide verification passed after regenerating the lowering plan,
+typed-native bridge, recording-engine fixtures, War Battles Static Hermes
+projection, and content-addressed policy through their owning generators.
+`pnpm check` completed green; dmSDK clean-room regeneration reproduced 122
+artifacts for all 1,361 universal recipes, borrowed-handle ASan/UBSan exact
+calls still covered all 147 selected routes with zero warmed C++ allocations,
+and policy-only materialization passed at root `9545b27ddb55` (52 namespaces,
+189 subtrees, 25.26 MB). These are generation, compilation, fake-provider
+runtime, sanitizer, allocation-observation, and materialization claims only.

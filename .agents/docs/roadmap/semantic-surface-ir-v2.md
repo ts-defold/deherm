@@ -280,14 +280,15 @@ One compiler rebuilt current, 1.13.1, 1.12.0, and
 TypeScript and native generation, compilation, linkage, and exact-call harness
 execution.
 
-Borrowed-handle planning is now included in the current-revision plan-owned
-claim, but not yet in the four-revision matrix claim above. Its positive
-admission remains an explicitly named Defold trust default until the new
-body-derived C++ ownership/effect facts are carried in each revision policy.
-Scratch-scalar-out planning is still excluded: removing its tranche prefilter
-exposes structurally similar atomics, spans, persistent rebinding, and owned
-resource outputs. Its next prerequisite is to wire the same effect facts into a
-combined plan and negative multi-target fixtures.
+Borrowed-handle and scratch-scalar-out planning now both authenticate and join
+the shared body-derived C++ ownership/effect artifact. Borrowed handles retain
+147 selected routes as 73 source-derived plus 74 explicitly compatible trusted
+Defold conventions; 35 contradictions use the universal route. Scratch scalar
+outputs derive candidates from the complete structural envelope, select six
+source-derived plus five compatibility-preserved routes, and keep nineteen
+universal fallbacks. Neither emitter owns a private selector. Source semantics
+and target symbol/link availability are separate schema fields, so this
+progress does not claim packaged-engine or all-target runtime proof.
 
 ## 4. Make every product a projection
 

@@ -15,6 +15,7 @@ const sourcePaths = Object.freeze({
   shapes: "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
   projection: "packages/bindings/generated/defold-dmsdk-projection-ir.json",
   policy: "packages/bindings/overrides/dmsdk-borrowed-handle-bindings.json",
+  effectFacts: "packages/bindings/generated/defold-dmsdk-cpp-ownership-effect-facts.json",
 });
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 const readJson = async (relative) => JSON.parse(await readFile(new URL(relative, root), "utf8"));
@@ -34,6 +35,7 @@ async function borrowedInputs() {
     shapes: JSON.parse(texts.shapes),
     projection: JSON.parse(texts.projection),
     policy: JSON.parse(texts.policy),
+    effectFacts: JSON.parse(texts.effectFacts),
   };
 }
 
@@ -42,11 +44,16 @@ function refreshInputTexts(input) {
   input.texts.policy = `${JSON.stringify(input.policy)}\n`;
   input.texts.shapes = `${JSON.stringify(input.shapes)}\n`;
   input.texts.projection = `${JSON.stringify(input.projection)}\n`;
+  input.texts.effectFacts = `${JSON.stringify(input.effectFacts)}\n`;
   const irHash = sha256(input.texts.ir);
   input.shapes.sourceHashes.ir = irHash;
   input.projection.sources.hashes.ir = irHash;
   input.texts.shapes = `${JSON.stringify(input.shapes)}\n`;
   input.texts.projection = `${JSON.stringify(input.projection)}\n`;
+  input.effectFacts.inputs.ir = irHash;
+  input.effectFacts.inputs.shapes = sha256(input.texts.shapes);
+  input.effectFacts.inputs.policy = sha256(input.texts.policy);
+  input.texts.effectFacts = `${JSON.stringify(input.effectFacts)}\n`;
 }
 
 function planDecisionShape(decision) {
@@ -85,6 +92,19 @@ function appendRetaggedRows(input, sourceId, replacementId) {
     if (row.provenance?.sourceId === sourceId) row.provenance.sourceId = replacementId;
     collection.push(row);
   }
+  const sourceEffect = input.effectFacts.functions.find(({ declarationId }) => declarationId === sourceId);
+  assert.ok(sourceEffect, `fixture effect row ${sourceId} exists`);
+  const effect = structuredClone(sourceEffect);
+  effect.declarationId = replacementId;
+  effect.name = "synthetic::Opaque";
+  input.effectFacts.functions.push(effect);
+  input.effectFacts.functions.sort((left, right) =>
+    left.declarationId < right.declarationId ? -1 : left.declarationId > right.declarationId ? 1 : 0,
+  );
+  input.effectFacts.coverage.requested += 1;
+  input.effectFacts.coverage[effect.state] += 1;
+  input.effectFacts.coverage.envelopes["borrowed-handle"].requested += 1;
+  input.effectFacts.coverage.envelopes["borrowed-handle"][effect.state] += 1;
 }
 
 function assertSelectedOrder(plan) {
@@ -147,6 +167,7 @@ test("borrowed decisions are invariant across the available revision envelopes",
     input.ir.defoldRevision = lane.revision;
     input.shapes.defoldRevision = lane.revision;
     input.projection.defoldRevision = lane.revision;
+    input.effectFacts.defoldRevision = lane.revision;
     refreshInputTexts(input);
     const derived = buildDmSdkBorrowedHandlePlan(input);
     indexDmSdkBorrowedHandlePlan(derived, input);

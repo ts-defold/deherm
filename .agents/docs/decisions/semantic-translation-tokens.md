@@ -191,14 +191,16 @@ Compiler-owned fact requests precede a plan without becoming a second
 selection authority. The bounded C/C++ implementation collector consumes the
 planner's exported structural candidate predicate; it neither carries a
 private family catalog nor reads the final plan whose inputs it produces.
-The borrowed-handle provider boundary now has its own authenticated
-compiler-owned plan over the complete global ABI envelope. That migration
-found eleven lifecycle/refcount/state-transition routes inside the former
-"borrowed" tranche and withdrew their specializations without removing their
-universal APIs. Positive rows are explicitly labeled as a trusted Defold
-public by-value-resource convention, not implementation proof. A separate
-compiler-owned C++ ownership/effect extractor now provides the causal taxonomy
-and alpha-renaming fixtures needed to replace that trust default incrementally.
+The borrowed-handle provider boundary has its own authenticated compiler-owned
+plan over the complete global ABI envelope. That migration found eleven
+lifecycle/refcount/state-transition routes inside the former "borrowed"
+tranche and withdrew their specializations without removing their universal
+APIs. The same plan now authenticates and joins the shared C++
+ownership/effect artifact: 73 selected routes are source-derived and 74 retain
+the explicit Defold public by-value-resource compatibility convention with
+machine-readable proof gaps. A source-proof withdrawal changes only that
+admission label; lifecycle/refcount contradictions still dominate and select
+the universal route. The emitter never performs either selection.
 The scratch scalar-out plan applies that extractor over the complete structural
 envelope and is the sole selection authority consumed by the production
 emitter. New admissions require diagnostic-free exact-one, success-written,
@@ -228,14 +230,13 @@ recipe and current policy, and asserts that selected/fallback totals and dense
 selected ordering are complete. It also runs the same planner over every
 revision identity in `defold-revision-matrix.json` using the current source
 fixture as a revision envelope. Those cases prove that the planner does not
-key its result to a revision string; they are not historical source evidence,
-because no historical borrowed-handle policy snapshots are checked in. Small
+key its result to a revision string; the separate four-revision derivation
+matrix supplies historical source evidence. Small
 metamorphic cases then rename a contradiction-free route, add a structurally
 valid route, and introduce an unresolved lifetime fact. Existing decisions stay
 stable, totals change mechanically, and the unresolved route is retained by
-the universal fallback. The test deliberately does not claim that the
-borrowed-handle trust default is body-derived proof; that remains a separate
-effect-facts migration boundary.
+the universal fallback. Source-proof withdrawal also preserves the explicit
+compatibility route without relabeling it as source-derived.
 
 # Claim protocol
 

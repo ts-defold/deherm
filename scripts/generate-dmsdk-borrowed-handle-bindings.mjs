@@ -14,6 +14,7 @@ const paths = Object.freeze({
   shapes: "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
   projection: "packages/bindings/generated/defold-dmsdk-projection-ir.json",
   policy: "packages/bindings/overrides/dmsdk-borrowed-handle-bindings.json",
+  effectFacts: "packages/bindings/generated/defold-dmsdk-cpp-ownership-effect-facts.json",
   plan: "packages/bindings/generated/defold-dmsdk-borrowed-handle-plan.json",
 });
 const artifacts = Object.freeze({
@@ -433,7 +434,14 @@ export async function build(inputs = undefined) {
     shapes,
     projection,
     policy,
-    texts: { ir: contents.ir, shapes: contents.shapes, projection: contents.projection, policy: contents.policy },
+    effectFacts: JSON.parse(contents.effectFacts),
+    texts: {
+      ir: contents.ir,
+      shapes: contents.shapes,
+      projection: contents.projection,
+      policy: contents.policy,
+      effectFacts: contents.effectFacts,
+    },
   };
   const planById = indexDmSdkBorrowedHandlePlan(plan, planInputs);
   const rebuiltPlan = buildDmSdkBorrowedHandlePlan(planInputs);

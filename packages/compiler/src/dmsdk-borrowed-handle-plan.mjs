@@ -1,13 +1,17 @@
 import { createHash } from "node:crypto";
 import { isDeepStrictEqual } from "node:util";
 
+import {
+  DMSDK_CPP_SOURCE_SEMANTIC_ADMISSION,
+  validateDmSdkCppOwnershipEffectReport,
+} from "./dmsdk-cpp-ownership-effect-frontend.mjs";
 import { borrowedHandlePattern } from "./dmsdk-pattern-catalog.mjs";
 import { defineDmSdkPattern, DMSDK_UNIVERSAL_FALLBACK_PATTERN, selectDmSdkPattern } from "./dmsdk-pattern-selector.mjs";
 
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 const compareCodeUnits = (left, right) => (left < right ? -1 : left > right ? 1 : 0);
 const object = (value) => value !== null && typeof value === "object" && !Array.isArray(value);
-const SOURCE_KEYS = Object.freeze(["ir", "shapes", "projection", "policy"]);
+const SOURCE_KEYS = Object.freeze(["ir", "shapes", "projection", "policy", "effectFacts"]);
 
 export const DMSDK_BORROWED_HANDLE_PLAN_KIND = "deherm.dmsdk-borrowed-handle-plan";
 
@@ -219,12 +223,54 @@ export function inferDmSdkBorrowedHandleEffect(declaration, projection, handlePo
   return {
     classification,
     admission: {
-      kind: signals.length ? "revision-contradiction" : "trusted-defold-default",
+      kind: signals.length ? "revision-contradiction" : "compatibility-preserved",
       trustDefault: DMSDK_BORROWED_HANDLE_ELIGIBILITY.trustDefault.id,
     },
     taxonomy: effectTaxonomy(classification, handlePositions),
     sources: sortedUnique(signals.map(({ source }) => source)),
     signals,
+  };
+}
+
+function sourceEffectProof(effectFacts, declarationId, handlePositions) {
+  const row = effectFacts.functions.find(({ declarationId: candidate }) => candidate === declarationId);
+  if (!row)
+    return {
+      state: "unknown",
+      evidenceGaps: ["cpp-effect:declaration-not-observed"],
+    };
+  if (row.state !== "observed" || !object(row.fact))
+    return {
+      state: "unknown",
+      evidenceGaps: sortedUnique(
+        row.diagnostics.length > 0
+          ? row.diagnostics.map((diagnostic) => `cpp-effect:${diagnostic}`)
+          : ["cpp-effect:fact-unavailable"],
+      ),
+    };
+
+  const fact = row.fact;
+  const gaps = [];
+  if (fact.diagnostics.length > 0) gaps.push("cpp-effect:compiler-diagnostics");
+  if (fact.ownershipEffect !== "none") gaps.push("cpp-effect:function-ownership-unresolved");
+  if (fact.resultProvenance !== "plain-value") gaps.push("cpp-effect:result-provenance-unresolved");
+  if (fact.completion !== "synchronous") gaps.push("cpp-effect:completion-unresolved");
+  if (fact.escape !== "noescape") gaps.push("cpp-effect:escape-unresolved");
+  const parameters = new Map(fact.parameters.map((parameter) => [parameter.index, parameter]));
+  for (const position of handlePositions) {
+    const parameter = parameters.get(position);
+    if (!parameter) {
+      gaps.push(`cpp-effect:parameter-${position}-unavailable`);
+      continue;
+    }
+    if (!["none", "borrowed"].includes(parameter.ownershipEffect))
+      gaps.push(`cpp-effect:parameter-${position}-ownership-unresolved`);
+    if (parameter.completion !== "synchronous") gaps.push(`cpp-effect:parameter-${position}-completion-unresolved`);
+    if (parameter.escape !== "noescape") gaps.push(`cpp-effect:parameter-${position}-escape-unresolved`);
+  }
+  return {
+    state: gaps.length === 0 ? "proven" : "unknown",
+    evidenceGaps: sortedUnique(gaps),
   };
 }
 
@@ -259,11 +305,11 @@ function validatePolicy(policy) {
   borrowedHandlePattern(policy.selection);
 }
 
-function validateInputs({ ir, shapes, projection, policy, texts }) {
+function validateInputs({ ir, shapes, projection, policy, effectFacts, texts }) {
   for (const key of SOURCE_KEYS) {
     assert(typeof texts?.[key] === "string", `borrowed-handle plan is missing exact ${key} source text`);
     assert(
-      isDeepStrictEqual(JSON.parse(texts[key]), { ir, shapes, projection, policy }[key]),
+      isDeepStrictEqual(JSON.parse(texts[key]), { ir, shapes, projection, policy, effectFacts }[key]),
       `borrowed-handle plan ${key} object differs from its source text`,
     );
   }
@@ -273,14 +319,27 @@ function validateInputs({ ir, shapes, projection, policy, texts }) {
     projection?.schemaVersion === 1 && Array.isArray(projection.rows),
     "borrowed-handle plan has invalid projection IR",
   );
+  validateDmSdkCppOwnershipEffectReport(effectFacts);
   assert(
-    ir.defoldRevision === shapes.defoldRevision && ir.defoldRevision === projection.defoldRevision,
+    isDeepStrictEqual(effectFacts.semanticAdmission, DMSDK_CPP_SOURCE_SEMANTIC_ADMISSION),
+    "borrowed-handle plan requires revision-authoritative source semantics",
+  );
+  assert(
+    ir.defoldRevision === shapes.defoldRevision &&
+      ir.defoldRevision === projection.defoldRevision &&
+      ir.defoldRevision === effectFacts.defoldRevision,
     "borrowed-handle plan inputs use different Defold revisions",
   );
   assert(shapes.sourceHashes?.ir === sha256(texts.ir), "borrowed-handle shapes do not authenticate the IR");
   assert(
     projection.sources?.hashes?.ir === sha256(texts.ir),
     "borrowed-handle projection does not authenticate the IR",
+  );
+  assert(
+    effectFacts.inputs?.ir === sha256(texts.ir) &&
+      effectFacts.inputs?.shapes === sha256(texts.shapes) &&
+      effectFacts.inputs?.policy === sha256(texts.policy),
+    "borrowed-handle effect facts do not authenticate their plan inputs",
   );
   for (const [label, rows] of [
     ["IR", ir.declarations],
@@ -295,8 +354,8 @@ function validateInputs({ ir, shapes, projection, policy, texts }) {
   validatePolicy(policy);
 }
 
-export function buildDmSdkBorrowedHandlePlan({ ir, shapes, projection, policy, texts }) {
-  validateInputs({ ir, shapes, projection, policy, texts });
+export function buildDmSdkBorrowedHandlePlan({ ir, shapes, projection, policy, effectFacts, texts }) {
+  validateInputs({ ir, shapes, projection, policy, effectFacts, texts });
   const declarations = new Map(ir.declarations.map((row) => [row.id, row]));
   const projections = new Map(projection.rows.map((row) => [row.id, row]));
   const structural = borrowedHandlePattern(policy.selection);
@@ -318,8 +377,22 @@ export function buildDmSdkBorrowedHandlePlan({ ir, shapes, projection, policy, t
     const handleParameterPositions = shape.parameters
       .map(({ role }, position) => (role.startsWith(policy.selection.handleRolePrefix) ? position : null))
       .filter((position) => position !== null);
-    const effect = inferDmSdkBorrowedHandleEffect(declaration, projected, handleParameterPositions);
-    const safe = effect.classification === "trusted-borrowed-default";
+    const inferredEffect = inferDmSdkBorrowedHandleEffect(declaration, projected, handleParameterPositions);
+    const sourceProof = sourceEffectProof(effectFacts, shape.id, handleParameterPositions);
+    const safe = inferredEffect.classification === "trusted-borrowed-default";
+    const admissionKind = !safe
+      ? "revision-contradiction"
+      : sourceProof.state === "proven"
+        ? "source-derived"
+        : "compatibility-preserved";
+    const effect = {
+      ...inferredEffect,
+      admission: {
+        ...inferredEffect.admission,
+        kind: admissionKind,
+      },
+      sourceProof,
+    };
     const semanticTokens = safe ? [...DMSDK_BORROWED_HANDLE_ELIGIBILITY.requiredSemanticTokens] : [];
     const decision = selectDmSdkPattern(patternFacts(shape, semanticTokens), registry);
     const blockers = safe
@@ -332,7 +405,10 @@ export function buildDmSdkBorrowedHandlePlan({ ir, shapes, projection, policy, t
           lifetime: "synchronous-call-only",
           thread: "provider-current-thread",
           handleParameterPositions,
-          evidenceBasis: DMSDK_BORROWED_HANDLE_ELIGIBILITY.trustDefault.id,
+          evidenceBasis:
+            admissionKind === "source-derived"
+              ? "cpp-ownership-effect-facts"
+              : DMSDK_BORROWED_HANDLE_ELIGIBILITY.trustDefault.id,
         }
       : null;
     return {
@@ -353,7 +429,7 @@ export function buildDmSdkBorrowedHandlePlan({ ir, shapes, projection, policy, t
   });
 
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     kind: DMSDK_BORROWED_HANDLE_PLAN_KIND,
     defoldRevision: ir.defoldRevision,
     providerAbiVersion: 2,
@@ -368,6 +444,7 @@ export function buildDmSdkBorrowedHandlePlan({ ir, shapes, projection, policy, t
       shapes: "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
       projection: "packages/bindings/generated/defold-dmsdk-projection-ir.json",
       policy: "packages/bindings/overrides/dmsdk-borrowed-handle-bindings.json",
+      effectFacts: "packages/bindings/generated/defold-dmsdk-cpp-ownership-effect-facts.json",
     },
     sourceHashes: Object.fromEntries(SOURCE_KEYS.map((key) => [key, sha256(texts[key])])),
     eligibility: DMSDK_BORROWED_HANDLE_ELIGIBILITY,
@@ -376,6 +453,11 @@ export function buildDmSdkBorrowedHandlePlan({ ir, shapes, projection, policy, t
       structurallyRelevant: decisions.length,
       selected: decisions.filter(({ fallback }) => !fallback).length,
       universalFallback: decisions.filter(({ fallback }) => fallback).length,
+      sourceDerived: decisions.filter(({ fallback, effect }) => !fallback && effect.admission.kind === "source-derived")
+        .length,
+      compatibilityPreserved: decisions.filter(
+        ({ fallback, effect }) => !fallback && effect.admission.kind === "compatibility-preserved",
+      ).length,
       effectBlockers: Object.fromEntries(
         DMSDK_BORROWED_HANDLE_ELIGIBILITY.effectPrecedence.map((category) => [
           category,
@@ -406,7 +488,7 @@ function validatePlan(plan) {
     "borrowed-handle plan",
   );
   assert(
-    plan.schemaVersion === 1 && plan.kind === DMSDK_BORROWED_HANDLE_PLAN_KIND,
+    plan.schemaVersion === 2 && plan.kind === DMSDK_BORROWED_HANDLE_PLAN_KIND,
     "invalid borrowed-handle plan identity",
   );
   assert(plan.providerAbiVersion === 2, "borrowed-handle provider ABI version differs");
@@ -502,10 +584,11 @@ function validatePlan(plan) {
     );
     exactKeys(
       decision.effect,
-      ["classification", "admission", "taxonomy", "sources", "signals"],
+      ["classification", "admission", "taxonomy", "sources", "signals", "sourceProof"],
       `${decision.declarationId}: borrowed-handle effect`,
     );
     exactKeys(decision.effect.admission, ["kind", "trustDefault"], `${decision.declarationId}: effect admission`);
+    exactKeys(decision.effect.sourceProof, ["state", "evidenceGaps"], `${decision.declarationId}: source proof`);
     exactKeys(
       decision.effect.taxonomy,
       ["resourceArguments", "result", "completion"],
@@ -514,6 +597,15 @@ function validatePlan(plan) {
     assert(
       Array.isArray(decision.effect.sources) && Array.isArray(decision.effect.signals),
       `${decision.declarationId}: borrowed-handle effect evidence is invalid`,
+    );
+    assert(
+      ["proven", "unknown"].includes(decision.effect.sourceProof.state) &&
+        isDeepStrictEqual(
+          decision.effect.sourceProof.evidenceGaps,
+          sortedUnique(decision.effect.sourceProof.evidenceGaps),
+        ) &&
+        (decision.effect.sourceProof.state === "proven") === (decision.effect.sourceProof.evidenceGaps.length === 0),
+      `${decision.declarationId}: borrowed-handle source proof is invalid`,
     );
     assert(
       Array.isArray(decision.effect.taxonomy.resourceArguments),
@@ -562,8 +654,12 @@ function validatePlan(plan) {
         `${decision.declarationId}: unsafe effect was selected`,
       );
       assert(
-        decision.effect.admission.kind === "trusted-defold-default",
-        `${decision.declarationId}: trust basis differs`,
+        ["source-derived", "compatibility-preserved"].includes(decision.effect.admission.kind),
+        `${decision.declarationId}: source/compatibility admission differs`,
+      );
+      assert(
+        (decision.effect.admission.kind === "source-derived") === (decision.effect.sourceProof.state === "proven"),
+        `${decision.declarationId}: source proof differs from admission`,
       );
       assert(
         decision.effect.signals.length === 0,
@@ -579,7 +675,14 @@ function validatePlan(plan) {
   }
   exactKeys(
     plan.coverage,
-    ["structurallyRelevant", "selected", "universalFallback", "effectBlockers"],
+    [
+      "structurallyRelevant",
+      "selected",
+      "universalFallback",
+      "sourceDerived",
+      "compatibilityPreserved",
+      "effectBlockers",
+    ],
     "borrowed-handle coverage",
   );
   exactKeys(
@@ -592,6 +695,17 @@ function validatePlan(plan) {
   assert(
     plan.coverage.universalFallback === plan.decisions.length - selectedOrder,
     "borrowed-handle fallback coverage differs",
+  );
+  assert(
+    plan.coverage.sourceDerived ===
+      plan.decisions.filter(({ fallback, effect }) => !fallback && effect.admission.kind === "source-derived").length,
+    "borrowed-handle source-derived coverage differs",
+  );
+  assert(
+    plan.coverage.compatibilityPreserved ===
+      plan.decisions.filter(({ fallback, effect }) => !fallback && effect.admission.kind === "compatibility-preserved")
+        .length,
+    "borrowed-handle compatibility coverage differs",
   );
   for (const category of DMSDK_BORROWED_HANDLE_ELIGIBILITY.effectPrecedence) {
     const count = plan.decisions.filter(({ effect }) =>

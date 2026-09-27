@@ -1,6 +1,10 @@
 import { createHash } from "node:crypto";
 import { isDeepStrictEqual } from "node:util";
 
+import {
+  DMSDK_CPP_SOURCE_SEMANTIC_ADMISSION,
+  validateDmSdkCppOwnershipEffectReport,
+} from "./dmsdk-cpp-ownership-effect-frontend.mjs";
 import { DMSDK_UNIVERSAL_FALLBACK_PATTERN, selectDmSdkPattern } from "./dmsdk-pattern-selector.mjs";
 import { scratchScalarOutPattern } from "./dmsdk-pattern-catalog.mjs";
 
@@ -103,9 +107,10 @@ function validateInputs({ ir, shapes, projection, policy, effectFacts, texts }) 
   assert(ir?.schemaVersion === 1 && Array.isArray(ir.declarations), "scratch plan has invalid dmSDK IR");
   assert(shapes?.schemaVersion === 1 && Array.isArray(shapes.rows), "scratch plan has invalid ABI shapes");
   assert(projection?.schemaVersion === 1 && Array.isArray(projection.rows), "scratch plan has invalid projection IR");
+  validateDmSdkCppOwnershipEffectReport(effectFacts);
   assert(
-    effectFacts?.schemaVersion === 3 && Array.isArray(effectFacts.functions),
-    "scratch plan has invalid C++ effect facts",
+    isDeepStrictEqual(effectFacts.semanticAdmission, DMSDK_CPP_SOURCE_SEMANTIC_ADMISSION),
+    "scratch plan requires revision-authoritative source semantics",
   );
   assert(
     ir.defoldRevision === shapes.defoldRevision && ir.defoldRevision === projection.defoldRevision,

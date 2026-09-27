@@ -108,7 +108,12 @@ source profile observes all 30 scratch structural rows. These body facts can
 admit target-independent provider-boundary code generation because the Defold
 source owns those semantics. They do not prove that a symbol exists, links, or
 behaves under every target feature matrix; those remain separate provider and
-packaged-engine gates.
+packaged-engine gates. The artifact makes that partition executable:
+`semanticAdmission` is `defold-revision-source` with the pinned implementation
+as authority, while `targetAvailability` is explicitly
+`not-established-by-source-analysis`. The scratch planner validates the whole
+artifact contract before consuming a fact, so the generator cannot silently
+reinterpret target availability as source-semantic evidence or vice versa.
 
 ## Compiler-owned authenticated plan
 

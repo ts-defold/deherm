@@ -163,7 +163,7 @@ test("forced-header identity is not a global same-spelling admission", () => {
   assert.deepEqual(artifact.functions[0].diagnostics, ["implementation-ambiguous"]);
 });
 
-test("generated revision artifact is authenticated, exhaustive, and remains audit-only", async () => {
+test("generated revision artifact separates source semantics from target availability", async () => {
   const report = JSON.parse(
     await readFile(
       new URL("../packages/bindings/generated/defold-dmsdk-cpp-ownership-effect-facts.json", import.meta.url),
@@ -171,8 +171,17 @@ test("generated revision artifact is authenticated, exhaustive, and remains audi
     ),
   );
   validateDmSdkCppOwnershipEffectReport(report);
-  assert.equal(report.schemaVersion, 3);
-  assert.equal(report.admission, "audit-only-single-profile");
+  assert.equal(report.schemaVersion, 4);
+  assert.deepEqual(report.semanticAdmission, {
+    scope: "defold-revision-source",
+    authority: "pinned-defold-implementation",
+    extractionProfile: "host-clang-c++17",
+    unknownPolicy: "universal-fallback",
+  });
+  assert.deepEqual(report.targetAvailability, {
+    state: "not-established-by-source-analysis",
+    requiredEvidence: "provider-link-and-packaged-engine",
+  });
   assert.deepEqual(report.coverage, {
     requested: 212,
     observed: 198,

@@ -107,6 +107,7 @@ test("borrowed-handle generation is clean-room deterministic and treats historic
       shapes: await readFile(path.join(root, report.sources.shapes), "utf8"),
       projection: await readFile(path.join(root, report.sources.projection), "utf8"),
       policy: await readFile(path.join(root, report.sources.policy), "utf8"),
+      effectFacts: await readFile(path.join(root, report.sources.effectFacts), "utf8"),
       plan: await readFile(path.join(root, report.sources.plan), "utf8"),
     };
     const observed = await build(contents);
@@ -126,6 +127,7 @@ test("borrowed-handle emitter rejects stale source/plan combinations instead of 
         ["shapes", path.join(root, "packages/bindings/generated/defold-dmsdk-abi-shapes.json")],
         ["projection", path.join(root, "packages/bindings/generated/defold-dmsdk-projection-ir.json")],
         ["policy", path.join(root, "packages/bindings/overrides/dmsdk-borrowed-handle-bindings.json")],
+        ["effectFacts", path.join(root, "packages/bindings/generated/defold-dmsdk-cpp-ownership-effect-facts.json")],
         ["plan", path.join(root, "packages/bindings/generated/defold-dmsdk-borrowed-handle-plan.json")],
       ].map(async ([key, source]) => [key, await readFile(source, "utf8")]),
     ),
@@ -134,7 +136,10 @@ test("borrowed-handle emitter rejects stale source/plan combinations instead of 
   const candidate = shapes.rows.find((row) => row.symbol === "dmBuffer::IsBufferValid");
   assert.ok(candidate);
   candidate.result.role = "scalar:future-lane";
-  await assert.rejects(() => build({ ...contents, shapes: JSON.stringify(shapes) }), /strict source re-derivation/u);
+  await assert.rejects(
+    () => build({ ...contents, shapes: JSON.stringify(shapes) }),
+    /effect facts do not authenticate|strict source re-derivation/u,
+  );
 });
 
 test("all planned selected signatures compile against the complete pinned SDK projection", async () => {

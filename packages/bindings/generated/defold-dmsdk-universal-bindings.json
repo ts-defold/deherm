@@ -15,8 +15,8 @@
       "xteaSpan": "73c8d977ab6c9e5a8599c07262da34105ddf2988e1009c5cfe46eaa502370634",
       "hashSpan": "1ac8e9330772346282796b058505eadb88f7f8cf878532f7a387c85bafd7cc72",
       "arenaCString": "701b3d52ba6bc2227a4b8a82d458bce2213fba0384b632304842466c6a55ecb7",
-      "borrowedHandle": "11d2ee221d5379b8b412101ef5f559a00c3db80bca5d88858337f662ffe547d4",
-      "scratchScalarOut": "02a14e57233e0d6a53b7f0724ea3d027b842f2580b81a6fc9020211314a0eff7",
+      "borrowedHandle": "62acd3320638f270fd3f2f11530d74559c6577635cf3e2cbbf65e7c9e301ce08",
+      "scratchScalarOut": "1b9a5f2c3621e0e628b91bf08729e1069dccf31bd428a2780b0d11d8acfe9588",
       "cstringValue": "3c84bc89fd1185bebee73a44d362340fb511fbe5fe4fa9cc6b0ccdebe6a4ea66",
       "hashState": "fb8bb8a49e30b7ba572d3b0ddd0b165e3ab0190969216637a92b45515065871c"
     },
@@ -483,7 +483,7 @@
       ],
       "requiredHeadersSha256": "b332e968c991eec3d9ef64f504264c500efa2dddc8a035445b26e676b3c90d2c"
     },
-    "aggregate": "669582b1bbb13eab6556991be8339c9495e8f4d12819e7304acef6c8311e7d1a",
+    "aggregate": "140f832caeb12728d1b853f0b5be5188a439bfdecd52d6371c8c8c5063fff426",
     "catalog": "5519c6a1d213cb6c3c0836aea9b0fce2e3136be58fdb74d9b3bed05bca053409"
   },
   "coverage": {
@@ -186005,7 +186005,7 @@
   ],
   "fallbackAudit": {
     "artifact": "packages/bindings/generated/defold-dmsdk-fallback-audit.json",
-    "reportSha256": "4f39643b332da1e61f037c065d61d368fd36aa46d11d9c378ac7e4d225b27a3e",
+    "reportSha256": "e30c0daddca76613508038329eea77516413f3dd638e53dc911008917990e030",
     "coverage": {
       "declarations": 1361,
       "preferredSpecialized": 105,

@@ -8,6 +8,8 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { promisify } from "node:util";
 
 import {
+  DMSDK_CPP_SOURCE_SEMANTIC_ADMISSION,
+  DMSDK_CPP_TARGET_AVAILABILITY,
   deriveDmSdkCppOwnershipEffectFacts,
   validateDmSdkCppOwnershipEffectReport,
 } from "../packages/compiler/src/dmsdk-cpp-ownership-effect-frontend.mjs";
@@ -175,7 +177,9 @@ async function clangAst(file, roots, quoteRoots, vfsOverlay = null, headers = []
     const diagnostics = String(error.stderr ?? error.message ?? "clang failed");
     const capacityFailure =
       error.code === "ERR_CHILD_PROCESS_STDIO_MAXBUFFER" ||
-      /maxBuffer|stdout maxBuffer|ENOBUFS|too large|Invalid string length/iu.test(`${error.message ?? ""}\n${diagnostics}`);
+      /maxBuffer|stdout maxBuffer|ENOBUFS|too large|Invalid string length/iu.test(
+        `${error.message ?? ""}\n${diagnostics}`,
+      );
     const toolFailure = !/(?:^|\n)[^\n]*error:/u.test(diagnostics);
     if (declarations.length > 0 && (capacityFailure || toolFailure)) {
       try {
@@ -215,9 +219,9 @@ async function clangAst(file, roots, quoteRoots, vfsOverlay = null, headers = []
 
 function translationUnitBlockers(result) {
   if (result.complete) return [];
-  const missing = [
-    ...String(result.diagnostics).matchAll(/fatal error: ['<]([^'">]+)['>] file not found/gu),
-  ].map((match) => `missing-include:${match[1]}`);
+  const missing = [...String(result.diagnostics).matchAll(/fatal error: ['<]([^'">]+)['>] file not found/gu)].map(
+    (match) => `missing-include:${match[1]}`,
+  );
   if (missing.length > 0) return [...new Set(missing)].sort(compareCodeUnits);
   if (/invalid or unsupported -std value|unsupported option|unknown target triple/iu.test(result.diagnostics)) {
     return ["unsupported-compiler-profile"];
@@ -464,12 +468,13 @@ export async function generateDmSdkCppOwnershipEffectFacts({ root: outputRoot = 
     }),
   );
   const report = {
-    schemaVersion: 3,
+    schemaVersion: 4,
     kind: "deherm.dmsdk-cpp-ownership-effect-facts",
     defoldRevision: revision,
     extraction: "clang-json-ast/cpp-ownership-effect-v3",
-    admission: "audit-only-single-profile",
-    targetProfiles: [{ id: "host-clang-c++17", defines: [], compiler: "clang++" }],
+    semanticAdmission: DMSDK_CPP_SOURCE_SEMANTIC_ADMISSION,
+    extractionProfiles: [{ id: "host-clang-c++17", defines: [], compiler: "clang++" }],
+    targetAvailability: DMSDK_CPP_TARGET_AVAILABILITY,
     inputs: {
       ir: sha256(irText),
       shapes: sha256(shapesText),

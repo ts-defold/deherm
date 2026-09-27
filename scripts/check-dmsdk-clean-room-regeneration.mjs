@@ -493,8 +493,10 @@ async function validateReports(root) {
       cppOwnershipEffects.coverage.requested === 212 &&
       cppOwnershipEffects.coverage.observed === 198 &&
       cppOwnershipEffects.coverage.unknown === 14 &&
-      cppOwnershipEffects.admission === "audit-only-single-profile",
-    "C++ ownership/effect report does not preserve its exhaustive audit-only partition",
+      cppOwnershipEffects.semanticAdmission.scope === "defold-revision-source" &&
+      cppOwnershipEffects.semanticAdmission.authority === "pinned-defold-implementation" &&
+      cppOwnershipEffects.targetAvailability.state === "not-established-by-source-analysis",
+    "C++ ownership/effect report does not preserve its source-semantics/target-availability partition",
   );
   for (const source of cppOwnershipEffects.sources) {
     assert(

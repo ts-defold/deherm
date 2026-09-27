@@ -4,6 +4,16 @@ import { extractCppOwnershipEffectFacts, validateCppOwnershipEffectFact } from "
 
 export const DMSDK_CPP_OWNERSHIP_EFFECT_FRONTEND_KIND = "deherm.dmsdk-cpp-ownership-effect-frontend";
 export const DMSDK_CPP_OWNERSHIP_EFFECT_REPORT_KIND = "deherm.dmsdk-cpp-ownership-effect-facts";
+export const DMSDK_CPP_SOURCE_SEMANTIC_ADMISSION = Object.freeze({
+  scope: "defold-revision-source",
+  authority: "pinned-defold-implementation",
+  extractionProfile: "host-clang-c++17",
+  unknownPolicy: "universal-fallback",
+});
+export const DMSDK_CPP_TARGET_AVAILABILITY = Object.freeze({
+  state: "not-established-by-source-analysis",
+  requiredEvidence: "provider-link-and-packaged-engine",
+});
 
 const CALLABLE_KINDS = new Set(["FunctionDecl", "CXXMethodDecl", "CXXConstructorDecl", "CXXDestructorDecl"]);
 const compareCodeUnits = (left, right) => (left < right ? -1 : left > right ? 1 : 0);
@@ -35,7 +45,11 @@ function canonicalEvidencePath(value, fallback) {
   const aliasMarker = "/.deherm/cache/dmsdk-semantic-includes/";
   const aliasIndex = normalized.lastIndexOf(aliasMarker);
   if (aliasIndex >= 0) {
-    const relative = normalized.slice(aliasIndex + aliasMarker.length).split("/").slice(1).join("/");
+    const relative = normalized
+      .slice(aliasIndex + aliasMarker.length)
+      .split("/")
+      .slice(1)
+      .join("/");
     return `<source-alias-overlay>/${relative}`;
   }
   for (const marker of ["/upstream/", "/packages/"]) {
@@ -123,9 +137,7 @@ function candidateRows(callables, declaration, sourcePath, includedHeaders = [])
   const declaredSymbols = new Set(
     [declaration.mangledName, ...Object.values(declaration.mangledNames ?? {})].filter(Boolean),
   );
-  const symbolDefinitions = definitions.filter(
-    (row) => row.mangledName && declaredSymbols.has(row.mangledName),
-  );
+  const symbolDefinitions = definitions.filter((row) => row.mangledName && declaredSymbols.has(row.mangledName));
   return { matching, headerDeclarations, definitions, symbolDefinitions };
 }
 
@@ -188,13 +200,7 @@ export function deriveDmSdkCppOwnershipEffectFacts({
       includedHeaders,
     );
     if (headerDeclarations.length > 1) {
-      functions.push(
-        unknownRow(
-          declaration,
-          sourcePath,
-          ["header-declaration-ambiguous"],
-        ),
-      );
+      functions.push(unknownRow(declaration, sourcePath, ["header-declaration-ambiguous"]));
       continue;
     }
     const joinedDefinitions = headerDeclarations.length === 1 ? definitions : symbolDefinitions;
@@ -311,8 +317,9 @@ export function validateDmSdkCppOwnershipEffectReport(report) {
       "kind",
       "defoldRevision",
       "extraction",
-      "admission",
-      "targetProfiles",
+      "semanticAdmission",
+      "extractionProfiles",
+      "targetAvailability",
       "inputs",
       "sources",
       "coverage",
@@ -321,16 +328,26 @@ export function validateDmSdkCppOwnershipEffectReport(report) {
     "dmSDK C++ ownership/effect report",
   );
   assert(
-    report.schemaVersion === 3 && report.kind === DMSDK_CPP_OWNERSHIP_EFFECT_REPORT_KIND,
+    report.schemaVersion === 4 && report.kind === DMSDK_CPP_OWNERSHIP_EFFECT_REPORT_KIND,
     "invalid ownership/effect report identity",
   );
-  assert(
-    report.admission === "audit-only-single-profile",
-    "ownership/effect report must remain audit-only until target profiles join",
+  exactKeys(
+    report.semanticAdmission,
+    ["scope", "authority", "extractionProfile", "unknownPolicy"],
+    "ownership/effect semantic admission",
   );
   assert(
-    Array.isArray(report.targetProfiles) && report.targetProfiles.length > 0,
-    "ownership/effect target profile evidence is missing",
+    JSON.stringify(report.semanticAdmission) === JSON.stringify(DMSDK_CPP_SOURCE_SEMANTIC_ADMISSION),
+    "ownership/effect source-semantic admission is invalid",
+  );
+  assert(
+    Array.isArray(report.extractionProfiles) && report.extractionProfiles.length > 0,
+    "ownership/effect extraction profile evidence is missing",
+  );
+  exactKeys(report.targetAvailability, ["state", "requiredEvidence"], "ownership/effect target availability");
+  assert(
+    JSON.stringify(report.targetAvailability) === JSON.stringify(DMSDK_CPP_TARGET_AVAILABILITY),
+    "ownership/effect source analysis must not claim target availability",
   );
   exactKeys(
     report.inputs,
@@ -360,10 +377,7 @@ export function validateDmSdkCppOwnershipEffectReport(report) {
       "ownership/effect source",
     );
     assert(/^[a-f0-9]{64}$/u.test(source.sourceSha256), "ownership/effect source hash is invalid");
-    assert(
-      /^[a-f0-9]{64}$/u.test(source.translationUnitSha256),
-      "ownership/effect translation-unit hash is invalid",
-    );
+    assert(/^[a-f0-9]{64}$/u.test(source.translationUnitSha256), "ownership/effect translation-unit hash is invalid");
     assert(
       ["complete", "rejected-with-diagnostics"].includes(source.astState),
       "ownership/effect source state is invalid",

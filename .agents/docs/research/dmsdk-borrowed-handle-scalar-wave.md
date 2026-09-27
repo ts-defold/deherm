@@ -25,14 +25,17 @@ its effect evidence and keeps the universal route. The selection policy in
 `packages/bindings/overrides/dmsdk-borrowed-handle-bindings.json` contains only shape
 rules; it has no declaration list, expected count, or per-symbol exception.
 
-This is an immediate soundness repair, not a claim that absence of a
-contradiction is implementation proof. Positive rows record
-`trusted-defold-default` and the exact convention they rely on. The compiler's
-new C++ ownership/effect extractor derives ownership, escape, completion,
-result provenance, pointer memory effects, and write predicates from Clang AST
-declaration identities and passes alpha-renaming, finalizer, refcount, escape,
-indirect-call, span, atomic, and persistent-rebind fixtures. Wiring those facts
-into the revision policy is the next migration step.
+This remains a soundness repair, not a claim that absence of a contradiction is
+implementation proof. The authenticated plan now joins the compiler's C++
+ownership/effect artifact directly. Of the 147 selected routes, 73 have
+diagnostic-free source proof for non-owning, synchronous, non-escaping handle
+use; 74 retain the exact `defold-public-by-value-resource-borrow`
+compatibility convention and carry their source-proof gaps. The 35 explicit
+lifecycle/refcount/state-transition contradictions still dominate either
+admission and remain on the universal route. Withdrawing a source fact changes
+`source-derived` to `compatibility-preserved` without changing emitted ABI or
+mislabeling the evidence; adding a contradiction still withdraws the fast
+path.
 
 # Provider boundary
 
@@ -79,7 +82,8 @@ node --test \
   tests/dmsdk-generator-pipeline.test.mjs
 ```
 
-The tests independently rederive the 182/147/35 plan census, regenerate every
+The tests independently rederive the 182/147/35 plan census and its 73/74
+source-derived/compatibility-preserved selected partition, regenerate every
 artifact into a clean temporary directory, reject source/census drift, compile
 all selected signatures against the complete pinned SDK include projection,
 compile the C and JSI adapters, type-check the Dynamic/Static TypeScript
@@ -155,8 +159,13 @@ The 14 unknowns remain explicit target/backend conflicts or missing/rejected
 implementation joins; they are not hidden by a route allowlist. The
 authenticated artifact is approximately 731 KB rather than the earlier
 multi-megabyte Cartesian source/route join because a route now retains only
-lexically relevant source observations. This artifact is
-currently marked `audit-only-single-profile`; it is not evidence for a
-cross-target release policy until target/build macro profiles are joined with
-unknown-dominates semantics. Inline/header observations are nevertheless
-available to the next policy migration, including the `dmAtomic` family.
+lexically relevant source observations. The artifact states its two evidence
+scopes independently. Its `semanticAdmission` accepts diagnostic-free facts
+from the pinned Defold implementation as revision-authoritative source
+semantics, with unknown rows falling back universally. Its
+`targetAvailability` remains `not-established-by-source-analysis`: the host
+extraction profile does not prove that a symbol links or ships in any target
+engine. Provider-link and packaged-engine evidence own that later claim.
+Inline/header observations are available to the next policy migration,
+including the `dmAtomic` family, without promoting source semantics into
+target availability.

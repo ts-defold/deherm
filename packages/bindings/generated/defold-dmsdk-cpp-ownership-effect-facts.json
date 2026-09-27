@@ -1,16 +1,25 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "kind": "deherm.dmsdk-cpp-ownership-effect-facts",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "extraction": "clang-json-ast/cpp-ownership-effect-v3",
-  "admission": "audit-only-single-profile",
-  "targetProfiles": [
+  "semanticAdmission": {
+    "scope": "defold-revision-source",
+    "authority": "pinned-defold-implementation",
+    "extractionProfile": "host-clang-c++17",
+    "unknownPolicy": "universal-fallback"
+  },
+  "extractionProfiles": [
     {
       "id": "host-clang-c++17",
       "defines": [],
       "compiler": "clang++"
     }
   ],
+  "targetAvailability": {
+    "state": "not-established-by-source-analysis",
+    "requiredEvidence": "provider-link-and-packaged-engine"
+  },
   "inputs": {
     "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
