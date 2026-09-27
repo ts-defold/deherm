@@ -202,6 +202,26 @@ identity. P0 is complete.
 - [ ] Emit a compact decision trace for every callable.
 - [ ] Generate pattern exhaustiveness and exact-call tests from the same IR.
 
+Implementation progress (2026-09-27): `@deherm/compiler` now owns a versioned,
+pure dmSDK pattern selector with structural role/direction/arity predicates,
+explicit semantic-token requirements, ranked priority/cost selection, one
+mandatory universal fallback, deterministic equal-rank ambiguity rejection,
+and bounded decision traces. Its schema rejects symbol, header, and route-id
+conditions. Borrowed-handle and scratch-scalar-out generation now use it as the
+selection authority while retaining their existing allocation-free C ABI, JSI,
+Static Hermes typed-native, browser direct-memory, TypeScript, and exact-call
+emitters.
+
+The fixed-output digest family is the first former name-selected family moved
+onto it. Selection is now driven by its three-parameter ABI shape plus semantic
+facts already extracted by the Clang frontend from the pinned public comments:
+hash-buffer operation, source byte span, exact destination byte count, and the
+matching inline declaration contract. The policy contains no `dmCrypt`, header,
+symbol, prefix, or route entries. Documentation drift withdraws the fast path
+and retains the universal recipe. This proves the intended migration shape but
+does not complete the checklist for the other family generators or every
+callable.
+
 ## 4. Make every product a projection
 
 - [ ] Emit TypeScript SDK and TSDoc.

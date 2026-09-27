@@ -10,10 +10,79 @@
   "sourceHashes": {
     "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
-    "projection": "8a6c5af275b7c1e648d6cea1290e6b62c218e64b7df490c64ef66aaca1bb5e9d",
+    "projection": "8786d8fbb1bb15c994eb1daa6766c90753ac0259d9aa1868295015797eca6ed8",
     "policy": "9d2a8a95e9f918bcc517cb2a702df912a067e6a941ef3f4291f96ddd568b3099"
   },
   "selector": "complete scratch-out-parameters partition using only result roles, parameter roles/directions, and platform family; no symbol allowlist",
+  "patternRegistry": [
+    {
+      "schemaVersion": 1,
+      "id": "pointer.scratch-scalar-out-provider-boundary",
+      "family": "scratch-scalar-out",
+      "emitter": "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
+      "priority": 800,
+      "cost": 25,
+      "fallback": false,
+      "when": {
+        "result": {
+          "rolePrefixes": [
+            "enum:",
+            "scalar:"
+          ]
+        },
+        "parameters": {
+          "every": [
+            {
+              "rolePrefixes": [
+                "enum:",
+                "handle:",
+                "scalar:"
+              ],
+              "directions": [
+                "value"
+              ]
+            },
+            {
+              "rolePrefixes": [
+                "pointer:enum:",
+                "pointer:scalar:"
+              ],
+              "directions": [
+                "in",
+                "inout",
+                "out"
+              ]
+            }
+          ],
+          "some": [
+            {
+              "rolePrefixes": [
+                "pointer:enum:",
+                "pointer:scalar:"
+              ],
+              "directions": [
+                "inout",
+                "out"
+              ]
+            }
+          ]
+        },
+        "rejectFamilies": [
+          "platform-gated"
+        ]
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "id": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "priority": 0,
+      "cost": 1000,
+      "fallback": true,
+      "when": null
+    }
+  ],
   "policy": {
     "layout": "one-caller-owned-u64-slot-per-native-parameter",
     "outInitialization": "dispatcher-zeroes-every-out-slot-before-provider",
@@ -139,7 +208,8 @@
         ],
         "preserved": true
       },
-      "shape": "template:T(inout:template:T)"
+      "shape": "template:T(inout:template:T)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmArray::dmArray::Swap@upstream/defold/engine/dlib/src/dmsdk/dlib/array.h:368:43",
@@ -177,7 +247,8 @@
         ],
         "preserved": true
       },
-      "shape": "scalar:void(inout:template:dmArray<T>)"
+      "shape": "scalar:void(inout:template:dmArray<T>)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmBuffer::GetBytes@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:317:96",
@@ -211,7 +282,8 @@
         ],
         "preserved": true
       },
-      "shape": "enum:dmBuffer::Result(value:handle:dmBuffer::HBuffer:u32,out:opaque-pointer-out,out:pointer:scalar:u32)"
+      "shape": "enum:dmBuffer::Result(value:handle:dmBuffer::HBuffer:u32,out:opaque-pointer-out,out:pointer:scalar:u32)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmConnectionPool::Dial@upstream/defold/engine/dlib/src/dmsdk/dlib/connection_pool.h:120:139",
@@ -245,7 +317,8 @@
         ],
         "preserved": true
       },
-      "shape": "enum:dmConnectionPool::Result(value:handle:dmConnectionPool::HPool:opaque,in:cstring-in,value:scalar:u16,value:scalar:bool,value:scalar:i32,inout:pointer:scalar:u32,inout:pointer:enum:dmSocket::Result)"
+      "shape": "enum:dmConnectionPool::Result(value:handle:dmConnectionPool::HPool:opaque,in:cstring-in,value:scalar:u16,value:scalar:bool,value:scalar:i32,inout:pointer:scalar:u32,inout:pointer:enum:dmSocket::Result)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmConnectionPool::Dial@upstream/defold/engine/dlib/src/dmsdk/dlib/connection_pool.h:135:140",
@@ -279,7 +352,8 @@
         ],
         "preserved": true
       },
-      "shape": "enum:dmConnectionPool::Result(value:handle:dmConnectionPool::HPool:opaque,in:cstring-in,value:scalar:u16,value:scalar:bool,value:scalar:i32,inout:pointer:scalar:i32,inout:pointer:scalar:u32,inout:pointer:enum:dmSocket::Result)"
+      "shape": "enum:dmConnectionPool::Result(value:handle:dmConnectionPool::HPool:opaque,in:cstring-in,value:scalar:u16,value:scalar:bool,value:scalar:i32,inout:pointer:scalar:i32,inout:pointer:scalar:u32,inout:pointer:enum:dmSocket::Result)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmConnectionPool::New@upstream/defold/engine/dlib/src/dmsdk/dlib/connection_pool.h:98:137",
@@ -321,7 +395,8 @@
         ],
         "preserved": true
       },
-      "shape": "enum:dmConnectionPool::Result(in:pointer:record:dmConnectionPool::Params,inout:pointer:unknown:HPool)"
+      "shape": "enum:dmConnectionPool::Result(in:pointer:record:dmConnectionPool::Params,inout:pointer:unknown:HPool)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmDDF::LoadMessageFromFile@upstream/defold/engine/ddf/src/dmsdk/ddf/ddf.h:136:8",
@@ -365,7 +440,8 @@
         ],
         "preserved": true
       },
-      "shape": "enum:dmDDF::Result(in:cstring-in,in:pointer:record:dmDDF::Descriptor,out:opaque-pointer-out)"
+      "shape": "enum:dmDDF::Result(in:cstring-in,in:pointer:record:dmDDF::Descriptor,out:opaque-pointer-out)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmDDF::ResolvePointers@upstream/defold/engine/ddf/src/dmsdk/ddf/ddf.h:146:9",
@@ -405,7 +481,8 @@
         ],
         "preserved": true
       },
-      "shape": "enum:dmDDF::Result(in:pointer:record:dmDDF::Descriptor,inout:opaque-pointer)"
+      "shape": "enum:dmDDF::Result(in:pointer:record:dmDDF::Descriptor,inout:opaque-pointer)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmDDF::SaveMessageToArray@upstream/defold/engine/ddf/src/dmsdk/ddf/ddf.h:111:6",
@@ -451,7 +528,8 @@
         ],
         "preserved": true
       },
-      "shape": "enum:dmDDF::Result(in:opaque-pointer,in:pointer:record:dmDDF::Descriptor,inout:template:dmArray<uint8_t>)"
+      "shape": "enum:dmDDF::Result(in:opaque-pointer,in:pointer:record:dmDDF::Descriptor,inout:template:dmArray<uint8_t>)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameObject::GetComponent@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:685:1014",
@@ -489,7 +567,8 @@
         ],
         "preserved": true
       },
-      "shape": "enum:dmGameObject::Result(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,inout:pointer:scalar:u32,inout:pointer:unknown:HComponent,out:pointer:unknown:HComponentWorld)"
+      "shape": "enum:dmGameObject::Result(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,inout:pointer:scalar:u32,inout:pointer:unknown:HComponent,out:pointer:unknown:HComponentWorld)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameObject::GetComponentId@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:673:1013",
@@ -498,6 +577,7 @@
       "disposition": "generated-provider-boundary",
       "bindingId": 0,
       "shape": "enum:dmGameObject::Result(value:handle:dmGameObject::HInstance:opaque,value:scalar:u16,inout:pointer:scalar:u64)",
+      "patternDecision": "pointer.scratch-scalar-out-provider-boundary",
       "resolvedPolicies": {
         "layout": "one-caller-owned-u64-slot-per-native-parameter",
         "outInitialization": "dispatcher-zeroes-every-out-slot-before-provider",
@@ -531,6 +611,7 @@
       "disposition": "generated-provider-boundary",
       "bindingId": 1,
       "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,out:pointer:scalar:bool)",
+      "patternDecision": "pointer.scratch-scalar-out-provider-boundary",
       "resolvedPolicies": {
         "layout": "one-caller-owned-u64-slot-per-native-parameter",
         "outInitialization": "dispatcher-zeroes-every-out-slot-before-provider",
@@ -564,6 +645,7 @@
       "disposition": "generated-provider-boundary",
       "bindingId": 2,
       "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,out:pointer:scalar:f32)",
+      "patternDecision": "pointer.scratch-scalar-out-provider-boundary",
       "resolvedPolicies": {
         "layout": "one-caller-owned-u64-slot-per-native-parameter",
         "outInitialization": "dispatcher-zeroes-every-out-slot-before-provider",
@@ -597,6 +679,7 @@
       "disposition": "generated-provider-boundary",
       "bindingId": 3,
       "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,out:pointer:scalar:u64)",
+      "patternDecision": "pointer.scratch-scalar-out-provider-boundary",
       "resolvedPolicies": {
         "layout": "one-caller-owned-u64-slot-per-native-parameter",
         "outInitialization": "dispatcher-zeroes-every-out-slot-before-provider",
@@ -659,7 +742,8 @@
         ],
         "preserved": true
       },
-      "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,out:pointer:unknown:dmVMath::Matrix4)"
+      "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,out:pointer:unknown:dmVMath::Matrix4)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameObject::GetPropertyAsQuat@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:982:1047",
@@ -697,7 +781,8 @@
         ],
         "preserved": true
       },
-      "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,out:pointer:unknown:dmVMath::Quat)"
+      "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,out:pointer:unknown:dmVMath::Quat)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameObject::GetPropertyAsText@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:1016:1050",
@@ -731,7 +816,8 @@
         ],
         "preserved": true
       },
-      "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,in:pointer-out:scalar:i8)"
+      "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,in:pointer-out:scalar:i8)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameObject::GetPropertyAsURL@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:1004:1049",
@@ -769,7 +855,8 @@
         ],
         "preserved": true
       },
-      "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,out:pointer:record:dmMessage::URL)"
+      "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,out:pointer:record:dmMessage::URL)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameObject::GetPropertyAsVector3@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:960:1045",
@@ -807,7 +894,8 @@
         ],
         "preserved": true
       },
-      "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,out:pointer:unknown:dmVMath::Vector3)"
+      "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,out:pointer:unknown:dmVMath::Vector3)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameObject::GetPropertyAsVector4@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:971:1046",
@@ -845,7 +933,8 @@
         ],
         "preserved": true
       },
-      "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,out:pointer:unknown:dmVMath::Vector4)"
+      "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,out:pointer:unknown:dmVMath::Vector4)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameObject::GetPropertyOptionsIndex@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:917:1041",
@@ -854,6 +943,7 @@
       "disposition": "generated-provider-boundary",
       "bindingId": 4,
       "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HPropertyOptions:opaque,value:scalar:u32,out:pointer:scalar:i32)",
+      "patternDecision": "pointer.scratch-scalar-out-provider-boundary",
       "resolvedPolicies": {
         "layout": "one-caller-owned-u64-slot-per-native-parameter",
         "outInitialization": "dispatcher-zeroes-every-out-slot-before-provider",
@@ -887,6 +977,7 @@
       "disposition": "generated-provider-boundary",
       "bindingId": 5,
       "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HPropertyOptions:opaque,value:scalar:u32,out:pointer:scalar:u64)",
+      "patternDecision": "pointer.scratch-scalar-out-provider-boundary",
       "resolvedPolicies": {
         "layout": "one-caller-owned-u64-slot-per-native-parameter",
         "outInitialization": "dispatcher-zeroes-every-out-slot-before-provider",
@@ -971,7 +1062,8 @@
         ],
         "preserved": true
       },
-      "shape": "enum:dmGameObject::Result(value:handle:dmGameSystem::HCollectionFactoryWorld:opaque,value:handle:dmGameSystem::HCollectionFactoryComponent:opaque,value:handle:dmGameObject::HCollection:opaque,in:cstring-in,in:unknown:dmVMath::Point3,in:unknown:dmVMath::Quat,in:unknown:dmVMath::Vector3,inout:pointer:unknown:dmGameObject::InstancePropertyContainers,out:pointer:unknown:dmGameObject::InstanceIdMap)"
+      "shape": "enum:dmGameObject::Result(value:handle:dmGameSystem::HCollectionFactoryWorld:opaque,value:handle:dmGameSystem::HCollectionFactoryComponent:opaque,value:handle:dmGameObject::HCollection:opaque,in:cstring-in,in:unknown:dmVMath::Point3,in:unknown:dmVMath::Quat,in:unknown:dmVMath::Vector3,inout:pointer:unknown:dmGameObject::InstancePropertyContainers,out:pointer:unknown:dmGameObject::InstanceIdMap)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameSystem::CompFactorySpawn@upstream/defold/engine/gamesys/src/dmsdk/gamesys/components/comp_factory.h:72:1140",
@@ -1021,7 +1113,8 @@
         ],
         "preserved": true
       },
-      "shape": "enum:dmGameObject::Result(value:handle:dmGameSystem::HFactoryWorld:opaque,value:handle:dmGameSystem::HFactoryComponent:opaque,value:handle:dmGameObject::HCollection:opaque,value:scalar:u64,in:unknown:dmVMath::Point3,in:unknown:dmVMath::Quat,in:unknown:dmVMath::Vector3,value:handle:dmGameObject::HPropertyContainer:opaque,out:pointer:unknown:dmGameObject::HInstance)"
+      "shape": "enum:dmGameObject::Result(value:handle:dmGameSystem::HFactoryWorld:opaque,value:handle:dmGameSystem::HFactoryComponent:opaque,value:handle:dmGameObject::HCollection:opaque,value:scalar:u64,in:unknown:dmVMath::Point3,in:unknown:dmVMath::Quat,in:unknown:dmVMath::Vector3,value:handle:dmGameObject::HPropertyContainer:opaque,out:pointer:unknown:dmGameObject::HInstance)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameSystem::GetRenderConstant@upstream/defold/engine/gamesys/src/dmsdk/gamesys/render_constants.h:82:1201",
@@ -1055,7 +1148,8 @@
         ],
         "preserved": true
       },
-      "shape": "scalar:bool(value:handle:dmGameSystem::HComponentRenderConstants:opaque,value:scalar:u64,out:pointer:unknown:dmRender::HConstant)"
+      "shape": "scalar:bool(value:handle:dmGameSystem::HComponentRenderConstants:opaque,value:scalar:u64,out:pointer:unknown:dmRender::HConstant)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameSystem::ResCollectionFactoryLoadResource@upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_collection_factory.h:39:1219",
@@ -1097,7 +1191,8 @@
         ],
         "preserved": true
       },
-      "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,in:cstring-in,value:scalar:bool,value:scalar:bool,out:pointer-out:record:dmGameSystem::CollectionFactoryResource)"
+      "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,in:cstring-in,value:scalar:bool,value:scalar:bool,out:pointer-out:record:dmGameSystem::CollectionFactoryResource)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameSystem::ResFactoryLoadResource@upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_factory.h:36:1235",
@@ -1139,7 +1234,8 @@
         ],
         "preserved": true
       },
-      "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,in:cstring-in,value:scalar:bool,value:scalar:bool,out:pointer-out:record:dmGameSystem::FactoryResource)"
+      "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,in:cstring-in,value:scalar:bool,value:scalar:bool,out:pointer-out:record:dmGameSystem::FactoryResource)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameSystem::ResFontGetInfo@upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_font.h:145:1248",
@@ -1179,7 +1275,8 @@
         ],
         "preserved": true
       },
-      "shape": "enum:dmResource::Result(inout:pointer:record:dmGameSystem::FontResource,inout:pointer:record:dmGameSystem::FontInfo)"
+      "shape": "enum:dmResource::Result(inout:pointer:record:dmGameSystem::FontResource,inout:pointer:record:dmGameSystem::FontInfo)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGraphics::GetRenderTargetSize@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1588:1444",
@@ -1217,7 +1314,8 @@
         ],
         "preserved": true
       },
-      "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HRenderTarget:u64,value:enum:dmGraphics::BufferType,inout:scalar:u32,inout:scalar:u32)"
+      "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HRenderTarget:u64,value:enum:dmGraphics::BufferType,inout:scalar:u32,inout:scalar:u32)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGraphics::GetTextureHandle@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:344:1348",
@@ -1253,7 +1351,8 @@
         ],
         "preserved": true
       },
-      "shape": "enum:dmGraphics::HandleResult(value:handle:dmGraphics::HTexture:u64,out:opaque-pointer-out)"
+      "shape": "enum:dmGraphics::HandleResult(value:handle:dmGraphics::HTexture:u64,out:opaque-pointer-out)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGraphics::VulkanCreateDescriptorPool@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:155:1518",
@@ -1293,7 +1392,8 @@
         ],
         "preserved": true
       },
-      "shape": "scalar:bool(value:unknown:VkDevice,value:scalar:u16,out:pointer:unknown:VkDescriptorPool)"
+      "shape": "scalar:bool(value:unknown:VkDevice,value:scalar:u16,out:pointer:unknown:VkDescriptorPool)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGui::GetNodeCustomProperty@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:383:1566",
@@ -1331,7 +1431,8 @@
         ],
         "preserved": true
       },
-      "shape": "enum:dmGui::Result(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32,value:scalar:u64,inout:pointer:record:dmGui::CustomProperty)"
+      "shape": "enum:dmGui::Result(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32,value:scalar:u64,inout:pointer:record:dmGui::CustomProperty)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmHashTable::dmHashTable::Iterator::Iterator@upstream/defold/engine/dlib/src/dmsdk/dlib/hashtable.h:457:274",
@@ -1369,7 +1470,8 @@
         ],
         "preserved": true
       },
-      "shape": "scalar:void(inout:template:dmHashTable<KEY, T>)"
+      "shape": "scalar:void(inout:template:dmHashTable<KEY, T>)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmHashTable::dmHashTable::Swap@upstream/defold/engine/dlib/src/dmsdk/dlib/hashtable.h:246:263",
@@ -1407,7 +1509,8 @@
         ],
         "preserved": true
       },
-      "shape": "scalar:void(inout:template:dmHashTable<KEY, T>)"
+      "shape": "scalar:void(inout:template:dmHashTable<KEY, T>)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmHID::FormatGamepadGuid@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:649:1619",
@@ -1447,7 +1550,8 @@
         ],
         "preserved": true
       },
-      "shape": "scalar:void(in:pointer:record:dmHID::GamepadGuid,inout:cstring-mutable)"
+      "shape": "scalar:void(in:pointer:record:dmHID::GamepadGuid,inout:cstring-mutable)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmHID::GetGamepadDeviceGuid@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:640:1618",
@@ -1483,7 +1587,8 @@
         ],
         "preserved": true
       },
-      "shape": "scalar:bool(value:handle:dmHID::HContext:opaque,value:handle:dmHID::HGamepad:opaque,inout:pointer:record:dmHID::GamepadGuid)"
+      "shape": "scalar:bool(value:handle:dmHID::HContext:opaque,value:handle:dmHID::HGamepad:opaque,inout:pointer:record:dmHID::GamepadGuid)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmHID::GetGamepadHat@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:761:1632",
@@ -1517,7 +1622,8 @@
         ],
         "preserved": true
       },
-      "shape": "scalar:bool(inout:pointer:record:dmHID::GamepadPacket,value:scalar:u32,out:pointer:scalar:u8)"
+      "shape": "scalar:bool(inout:pointer:record:dmHID::GamepadPacket,value:scalar:u32,out:pointer:scalar:u8)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmHID::GetGamepadPacket@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:742:1630",
@@ -1553,7 +1659,8 @@
         ],
         "preserved": true
       },
-      "shape": "scalar:bool(value:handle:dmHID::HGamepad:opaque,out:pointer:record:dmHID::GamepadPacket)"
+      "shape": "scalar:bool(value:handle:dmHID::HGamepad:opaque,out:pointer:record:dmHID::GamepadPacket)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmHID::GetGamepadUserId@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:619:1616",
@@ -1562,6 +1669,7 @@
       "disposition": "generated-provider-boundary",
       "bindingId": 6,
       "shape": "scalar:bool(value:handle:dmHID::HContext:opaque,value:handle:dmHID::HGamepad:opaque,out:pointer:scalar:u32)",
+      "patternDecision": "pointer.scratch-scalar-out-provider-boundary",
       "resolvedPolicies": {
         "layout": "one-caller-owned-u64-slot-per-native-parameter",
         "outInitialization": "dispatcher-zeroes-every-out-slot-before-provider",
@@ -1622,7 +1730,8 @@
         ],
         "preserved": true
       },
-      "shape": "scalar:bool(value:handle:dmHID::HMouse:opaque,out:pointer:record:dmHID::MousePacket)"
+      "shape": "scalar:bool(value:handle:dmHID::HMouse:opaque,out:pointer:record:dmHID::MousePacket)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmMessage::ParseURL@upstream/defold/engine/dlib/src/dmsdk/dlib/message.h:299:427",
@@ -1662,7 +1771,8 @@
         ],
         "preserved": true
       },
-      "shape": "enum:dmMessage::Result(in:cstring-in,out:pointer:record:dmMessage::StringURL)"
+      "shape": "enum:dmMessage::Result(in:cstring-in,out:pointer:record:dmMessage::StringURL)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmObjectPool::dmObjectPool::Set@upstream/defold/engine/dlib/src/dmsdk/dlib/object_pool.h:227:456",
@@ -1700,7 +1810,8 @@
         ],
         "preserved": true
       },
-      "shape": "scalar:void(value:scalar:u32,inout:template:T)"
+      "shape": "scalar:void(value:scalar:u32,inout:template:T)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmRender::GetConstantValues@upstream/defold/engine/render/src/dmsdk/render/render.h:479:1839",
@@ -1734,7 +1845,8 @@
         ],
         "preserved": true
       },
-      "shape": "pointer:unknown:dmVMath::Vector4(value:handle:dmRender::HConstant:opaque,inout:pointer:scalar:u32)"
+      "shape": "pointer:unknown:dmVMath::Vector4(value:handle:dmRender::HConstant:opaque,inout:pointer:scalar:u32)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmRender::GetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:621:1855",
@@ -1768,7 +1880,8 @@
         ],
         "preserved": true
       },
-      "shape": "scalar:bool(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64,out:pointer-out:unknown:dmVMath::Vector4,inout:pointer:scalar:u32)"
+      "shape": "scalar:bool(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64,out:pointer-out:unknown:dmVMath::Vector4,inout:pointer:scalar:u32)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmRender::GetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:634:1856",
@@ -1808,7 +1921,8 @@
         ],
         "preserved": true
       },
-      "shape": "scalar:bool(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64,out:pointer-out:unknown:dmVMath::Vector4,inout:pointer:scalar:u32,inout:pointer:unknown:dmRenderDDF::MaterialDesc::ConstantType)"
+      "shape": "scalar:bool(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64,out:pointer-out:unknown:dmVMath::Vector4,inout:pointer:scalar:u32,inout:pointer:unknown:dmRenderDDF::MaterialDesc::ConstantType)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmResource::Get@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:146:2002",
@@ -1848,7 +1962,8 @@
         ],
         "preserved": true
       },
-      "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,in:cstring-in,out:opaque-pointer-out)"
+      "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,in:cstring-in,out:opaque-pointer-out)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmResource::Get@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:56:1961",
@@ -1888,7 +2003,8 @@
         ],
         "preserved": true
       },
-      "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,in:cstring-in,out:opaque-pointer-out)"
+      "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,in:cstring-in,out:opaque-pointer-out)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmResource::Get@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:78:1963",
@@ -1924,7 +2040,8 @@
         ],
         "preserved": true
       },
-      "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,value:scalar:u64,out:opaque-pointer-out)"
+      "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,value:scalar:u64,out:opaque-pointer-out)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmResource::GetByHash@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:157:2003",
@@ -1960,7 +2077,8 @@
         ],
         "preserved": true
       },
-      "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,value:scalar:u64,out:opaque-pointer-out)"
+      "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,value:scalar:u64,out:opaque-pointer-out)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmResource::GetPath@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:215:2009",
@@ -1994,7 +2112,8 @@
         ],
         "preserved": true
       },
-      "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,in:opaque-pointer,inout:pointer:scalar:u64)"
+      "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,in:opaque-pointer,inout:pointer:scalar:u64)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmResource::GetWithExt@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:68:1962",
@@ -2038,7 +2157,8 @@
         ],
         "preserved": true
       },
-      "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,in:cstring-in,in:cstring-in,out:opaque-pointer-out)"
+      "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,in:cstring-in,in:cstring-in,out:opaque-pointer-out)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmResource::GetWithExt@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:90:1964",
@@ -2074,7 +2194,8 @@
         ],
         "preserved": true
       },
-      "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,value:scalar:u64,value:scalar:u64,out:opaque-pointer-out)"
+      "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,value:scalar:u64,value:scalar:u64,out:opaque-pointer-out)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmRig::CopyBindPose@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:224:2074",
@@ -2116,7 +2237,8 @@
         ],
         "preserved": true
       },
-      "shape": "scalar:void(inout:unknown:dmRigDDF::Skeleton,inout:template:dmArray<RigBone>)"
+      "shape": "scalar:void(inout:unknown:dmRigDDF::Skeleton,inout:template:dmArray<RigBone>)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmRig::GenerateVertexData@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:196:2054",
@@ -2164,7 +2286,8 @@
         ],
         "preserved": true
       },
-      "shape": "pointer:record:dmRig::RigModelVertex(value:handle:dmRig::HRigContext:opaque,value:handle:dmRig::HRigInstance:opaque,inout:pointer:record:dmRigDDF::Mesh,in:unknown:dmVMath::Matrix4,out:pointer:record:dmRig::RigModelVertex)"
+      "shape": "pointer:record:dmRig::RigModelVertex(value:handle:dmRig::HRigContext:opaque,value:handle:dmRig::HRigInstance:opaque,inout:pointer:record:dmRigDDF::Mesh,in:unknown:dmVMath::Matrix4,out:pointer:record:dmRig::RigModelVertex)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmRig::GetMorphWeights@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:217:2071",
@@ -2194,7 +2317,8 @@
         ],
         "preserved": true
       },
-      "shape": "pointer:scalar:f32(value:handle:dmRig::HRigInstance:opaque,value:scalar:u64,out:pointer:scalar:u32)"
+      "shape": "pointer:scalar:f32(value:handle:dmRig::HRigInstance:opaque,value:scalar:u64,out:pointer:scalar:u32)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmScript::CheckURL@upstream/defold/engine/script/src/dmsdk/script/script.h:517:2115",
@@ -2232,7 +2356,8 @@
         ],
         "preserved": true
       },
-      "shape": "scalar:bool(inout:pointer:record:lua_State,out:pointer:record:dmMessage::URL)"
+      "shape": "scalar:bool(inout:pointer:record:lua_State,out:pointer:record:dmMessage::URL)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmScript::GetComponentFromLua@upstream/defold/engine/gamesys/src/dmsdk/gamesys/script.h:106:1311",
@@ -2286,7 +2411,8 @@
         ],
         "preserved": true
       },
-      "shape": "scalar:void(inout:pointer:record:lua_State,value:scalar:i32,in:cstring-in,out:pointer:unknown:dmGameObject::HComponentWorld,inout:pointer:unknown:dmGameObject::HComponent,inout:pointer:record:dmMessage::URL)"
+      "shape": "scalar:void(inout:pointer:record:lua_State,value:scalar:i32,in:cstring-in,out:pointer:unknown:dmGameObject::HComponentWorld,inout:pointer:unknown:dmGameObject::HComponent,inout:pointer:record:dmMessage::URL)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmScript::ResolveURL@upstream/defold/engine/script/src/dmsdk/script/script.h:719:2131",
@@ -2328,7 +2454,8 @@
         ],
         "preserved": true
       },
-      "shape": "scalar:i32(inout:pointer:record:lua_State,value:scalar:i32,out:pointer:record:dmMessage::URL,out:pointer:record:dmMessage::URL)"
+      "shape": "scalar:i32(inout:pointer:record:lua_State,value:scalar:i32,out:pointer:record:dmMessage::URL,out:pointer:record:dmMessage::URL)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmScript::ResolveURL@upstream/defold/engine/script/src/dmsdk/script/script.h:735:2132",
@@ -2376,7 +2503,8 @@
         ],
         "preserved": true
       },
-      "shape": "enum:dmMessage::Result(inout:pointer:record:lua_State,in:cstring-in,out:pointer:record:dmMessage::URL,inout:pointer:record:dmMessage::URL)"
+      "shape": "enum:dmMessage::Result(inout:pointer:record:lua_State,in:cstring-in,out:pointer:record:dmMessage::URL,inout:pointer:record:dmMessage::URL)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmStrlCat@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:116:181",
@@ -2416,7 +2544,8 @@
         ],
         "preserved": true
       },
-      "shape": "scalar:usize(out:cstring-mutable,in:cstring-in,value:scalar:usize)"
+      "shape": "scalar:usize(out:cstring-mutable,in:cstring-in,value:scalar:usize)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmStrlCpy@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:94:180",
@@ -2456,7 +2585,8 @@
         ],
         "preserved": true
       },
-      "shape": "scalar:usize(out:cstring-mutable,in:cstring-in,value:scalar:usize)"
+      "shape": "scalar:usize(out:cstring-mutable,in:cstring-in,value:scalar:usize)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmStrTok@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:73:179",
@@ -2500,7 +2630,8 @@
         ],
         "preserved": true
       },
-      "shape": "cstring-mutable(inout:cstring-mutable,in:cstring-in,out:pointer-out:scalar:i8)"
+      "shape": "cstring-mutable(inout:cstring-mutable,in:cstring-in,out:pointer-out:scalar:i8)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmURI::Decode@upstream/defold/engine/dlib/src/dmsdk/dlib/uri.h:105:656",
@@ -2538,7 +2669,8 @@
         ],
         "preserved": true
       },
-      "shape": "scalar:void(in:cstring-in,out:cstring-mutable)"
+      "shape": "scalar:void(in:cstring-in,out:cstring-mutable)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmUtf8::NextChar@upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h:59:658",
@@ -2568,7 +2700,8 @@
         ],
         "preserved": true
       },
-      "shape": "scalar:u32(in:pointer-out:scalar:i8)"
+      "shape": "scalar:u32(in:pointer-out:scalar:i8)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmUtf8::ToUtf8@upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h:69:659",
@@ -2600,7 +2733,8 @@
         ],
         "preserved": true
       },
-      "shape": "scalar:u32(value:scalar:u16,inout:cstring-mutable)"
+      "shape": "scalar:u32(value:scalar:u16,inout:cstring-mutable)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:EraseSwapRef@upstream/defold/engine/dlib/src/dmsdk/dlib/array.h:564:72",
@@ -2640,7 +2774,8 @@
         ],
         "preserved": true
       },
-      "shape": "template:T(inout:template:T)"
+      "shape": "template:T(inout:template:T)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:FontGetGlyph@upstream/defold/engine/font/src/dmsdk/font/font.h:278:818",
@@ -2682,7 +2817,8 @@
         ],
         "preserved": true
       },
-      "shape": "enum:FontResult(value:handle:HFont:opaque,value:scalar:u32,inout:pointer:record:FontGlyphOptions,inout:pointer:record:FontGlyph)"
+      "shape": "enum:FontResult(value:handle:HFont:opaque,value:scalar:u32,inout:pointer:record:FontGlyphOptions,inout:pointer:record:FontGlyph)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:FontGetGlyphByIndex@upstream/defold/engine/font/src/dmsdk/font/font.h:289:819",
@@ -2724,7 +2860,8 @@
         ],
         "preserved": true
       },
-      "shape": "enum:FontResult(value:handle:HFont:opaque,value:scalar:u32,inout:pointer:record:FontGlyphOptions,inout:pointer:record:FontGlyph)"
+      "shape": "enum:FontResult(value:handle:HFont:opaque,value:scalar:u32,inout:pointer:record:FontGlyphOptions,inout:pointer:record:FontGlyph)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:HttpNewRequest@upstream/defold/engine/dlib/src/dmsdk/dlib/http.h:351:319",
@@ -2760,7 +2897,8 @@
         ],
         "preserved": true
       },
-      "shape": "enum:HttpResult(out:pointer-out:record:HttpRequest)"
+      "shape": "enum:HttpResult(out:pointer-out:record:HttpRequest)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:ResourceGet@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:199:1895",
@@ -2800,7 +2938,8 @@
         ],
         "preserved": true
       },
-      "shape": "enum:ResourceResult(value:handle:HResourceFactory:opaque,in:cstring-in,out:opaque-pointer-out)"
+      "shape": "enum:ResourceResult(value:handle:HResourceFactory:opaque,in:cstring-in,out:opaque-pointer-out)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:ResourceGetByHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:224:1897",
@@ -2836,7 +2975,8 @@
         ],
         "preserved": true
       },
-      "shape": "enum:ResourceResult(value:handle:HResourceFactory:opaque,value:scalar:u64,out:opaque-pointer-out)"
+      "shape": "enum:ResourceResult(value:handle:HResourceFactory:opaque,value:scalar:u64,out:opaque-pointer-out)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:ResourceGetByHashAndExt@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:236:1898",
@@ -2872,7 +3012,8 @@
         ],
         "preserved": true
       },
-      "shape": "enum:ResourceResult(value:handle:HResourceFactory:opaque,value:scalar:u64,value:scalar:u64,out:opaque-pointer-out)"
+      "shape": "enum:ResourceResult(value:handle:HResourceFactory:opaque,value:scalar:u64,value:scalar:u64,out:opaque-pointer-out)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:ResourceGetPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:306:1905",
@@ -2906,7 +3047,8 @@
         ],
         "preserved": true
       },
-      "shape": "enum:ResourceResult(value:handle:HResourceFactory:opaque,in:opaque-pointer,inout:pointer:scalar:u64)"
+      "shape": "enum:ResourceResult(value:handle:HResourceFactory:opaque,in:opaque-pointer,inout:pointer:scalar:u64)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:ResourceGetTypeFromExtension@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:372:1911",
@@ -2946,7 +3088,8 @@
         ],
         "preserved": true
       },
-      "shape": "enum:ResourceResult(value:handle:HResourceFactory:opaque,in:cstring-in,inout:pointer:unknown:HResourceType)"
+      "shape": "enum:ResourceResult(value:handle:HResourceFactory:opaque,in:cstring-in,inout:pointer:unknown:HResourceType)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:ResourceGetTypeFromExtensionHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:382:1912",
@@ -2982,7 +3125,8 @@
         ],
         "preserved": true
       },
-      "shape": "enum:ResourceResult(value:handle:HResourceFactory:opaque,value:scalar:u64,inout:pointer:unknown:HResourceType)"
+      "shape": "enum:ResourceResult(value:handle:HResourceFactory:opaque,value:scalar:u64,inout:pointer:unknown:HResourceType)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:ResourceGetWithExt@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:212:1896",
@@ -3026,7 +3170,8 @@
         ],
         "preserved": true
       },
-      "shape": "enum:ResourceResult(value:handle:HResourceFactory:opaque,in:cstring-in,in:cstring-in,out:opaque-pointer-out)"
+      "shape": "enum:ResourceResult(value:handle:HResourceFactory:opaque,in:cstring-in,in:cstring-in,out:opaque-pointer-out)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:ResourceRegisterType@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:611:1943",
@@ -3070,7 +3215,8 @@
         ],
         "preserved": true
       },
-      "shape": "enum:ResourceResult(value:handle:HResourceFactory:opaque,in:cstring-in,inout:opaque-pointer,inout:pointer:unknown:HResourceType)"
+      "shape": "enum:ResourceResult(value:handle:HResourceFactory:opaque,in:cstring-in,inout:opaque-pointer,inout:pointer:unknown:HResourceType)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:Swap@upstream/defold/engine/dlib/src/dmsdk/dlib/array.h:603:76",
@@ -3108,7 +3254,8 @@
         ],
         "preserved": true
       },
-      "shape": "scalar:void(inout:template:dmArray<T>)"
+      "shape": "scalar:void(inout:template:dmArray<T>)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:TextLayoutGetObjectPosition@upstream/defold/engine/font/src/dmsdk/font/text_layout.h:488:863",
@@ -3144,7 +3291,8 @@
         ],
         "preserved": true
       },
-      "shape": "scalar:u8(value:handle:HTextLayout:opaque,in:pointer:record:TextLayoutObject,value:scalar:f32,value:scalar:f32,value:scalar:f32,inout:pointer:scalar:f32,inout:pointer:scalar:f32)"
+      "shape": "scalar:u8(value:handle:HTextLayout:opaque,in:pointer:record:TextLayoutObject,value:scalar:f32,value:scalar:f32,value:scalar:f32,inout:pointer:scalar:f32,inout:pointer:scalar:f32)",
+      "patternDecision": "universal.default"
     }
   ]
 }

@@ -3,7 +3,12 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import { semanticDeclarationId, semanticEntryMap } from "./lib/dmsdk-semantic-id.mjs";
+import {
+  DMSDK_UNIVERSAL_FALLBACK_PATTERN,
+  compactDmSdkPatternDecision,
+  defineDmSdkPattern,
+  selectDmSdkPattern,
+} from "../packages/compiler/src/dmsdk-pattern-selector.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const defaults = {
@@ -12,38 +17,112 @@ const defaults = {
   policy: "packages/bindings/overrides/dmsdk-fixed-digest-bindings.json",
 };
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
-const snake = (value) => value.replace(/::/g, "_").replace(/([a-z0-9])([A-Z])/g, "$1_$2").toLowerCase();
+const snake = (value) =>
+  value
+    .replace(/::/g, "_")
+    .replace(/([a-z0-9])([A-Z])/g, "$1_$2")
+    .toLowerCase();
 
 function parseArgs(argv) {
   const options = { ...defaults, outRoot: root, check: false };
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
     if (argument === "--check") options.check = true;
-    else if (["--ir", "--shapes", "--policy", "--out-root"].includes(argument)) options[argument.slice(2).replace(/-([a-z])/g, (_, c) => c.toUpperCase())] = resolve(argv[++index]);
+    else if (["--ir", "--shapes", "--policy", "--out-root"].includes(argument))
+      options[argument.slice(2).replace(/-([a-z])/g, (_, c) => c.toUpperCase())] = resolve(argv[++index]);
     else throw new Error(`Unknown argument ${argument}`);
   }
   for (const key of ["ir", "shapes", "policy"]) options[key] = resolve(root, options[key]);
   return options;
 }
 
-function selectedCandidates(shapes, selector) {
-  return shapes.rows.filter((row) => row.tranche === "arena-backed-spans"
-    && row.header === selector.header
-    && row.symbol.startsWith(selector.symbolPrefix)
-    && row.shape === selector.shape).sort((left, right) => left.id.localeCompare(right.id));
+function fixedDigestPattern(policy) {
+  return defineDmSdkPattern({
+    schemaVersion: 1,
+    id: "span.fixed-output-digest",
+    family: "fixed-digest",
+    emitter: "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
+    priority: 900,
+    cost: 5,
+    fallback: false,
+    when: {
+      declarationKinds: ["function"],
+      result: { roles: ["scalar:void"] },
+      parameters: {
+        count: { exact: 3 },
+        positions: [
+          { roles: ["pointer:scalar:u8"], directions: ["in"] },
+          { roles: ["scalar:u32"], directions: ["value"] },
+          { roles: ["pointer:scalar:u8"], directions: ["out", "inout"] },
+        ],
+      },
+      requireSemanticTokens: policy.documentationContract.semantics,
+    },
+  });
+}
+
+function patternFacts(row, semanticTokens = []) {
+  return {
+    id: row.id,
+    kind: row.kind,
+    result: row.result,
+    parameters: row.parameters,
+    families: row.families,
+    semanticTokens,
+  };
 }
 
 export function nearestEvidenceLine(header, text, hintLine) {
   const needle = text.trim();
-  const matches = header.split(/\r?\n/u)
-    .flatMap((line, index) => line.trim() === needle ? [index + 1] : []);
+  const matches = header.split(/\r?\n/u).flatMap((line, index) => (line.trim() === needle ? [index + 1] : []));
   if (!matches.length) return 0;
-  return matches.sort((left, right) =>
-    Math.abs(left - hintLine) - Math.abs(right - hintLine) || left - right)[0];
+  return matches.sort((left, right) => Math.abs(left - hintLine) - Math.abs(right - hintLine) || left - right)[0];
+}
+
+export function extractFixedDigestSemantics(header, declaration, contract) {
+  if (
+    !declaration ||
+    !Number.isSafeInteger(declaration.line) ||
+    !Array.isArray(declaration.parameters) ||
+    declaration.parameters.length !== 3
+  )
+    return null;
+  const lines = header.split(/\r?\n/u);
+  const declarationText = lines[declaration.line - 1] ?? "";
+  const inline = declarationText.match(new RegExp(contract.inlineOutputPattern, "u"));
+  if (!inline) return null;
+  const summary = declaration.description ?? "";
+  if (!summary.startsWith(contract.summaryPrefix)) return null;
+  const input = declaration.parameters[0].description ?? "";
+  const outputDescription = declaration.parameters[2].description ?? "";
+  if (input !== contract.inputDescription) return null;
+  const documented = outputDescription.match(new RegExp(contract.outputDescriptionPattern, "u"));
+  if (!documented) return null;
+  const inlineBytes = Number(inline[1]);
+  const documentedBytes = Number(documented[1]);
+  if (!Number.isSafeInteger(inlineBytes) || inlineBytes <= 0 || inlineBytes !== documentedBytes) return null;
+  return {
+    digestBytes: inlineBytes,
+    semanticTokens: [...contract.semantics].sort(),
+    evidence: {
+      header: declaration.header,
+      summary,
+      input,
+      output: outputDescription,
+      declaration: declarationText.trim(),
+      documentationSource: "clang-comment-ast",
+      declarationLine: declaration.line,
+    },
+  };
 }
 
 function renderHeader(entries) {
-  const declarations = entries.map(({ wrapper, digestBytes }) => `uint8_t ${wrapper}(const uint8_t* input, uint32_t input_length, uint8_t output[${digestBytes}], uint32_t output_capacity);`).join("\n");
+  const declarations = entries
+    .map(
+      ({ wrapper, digestBytes }) =>
+        `uint8_t ${wrapper}(const uint8_t* input, uint32_t input_length, uint8_t output[${digestBytes}], uint32_t output_capacity);`,
+    )
+    .join("\n");
   return `// Generated by scripts/generate-dmsdk-fixed-digest-bindings.mjs. Do not edit.\n#ifndef DEFOLD_HERMES_GENERATED_DMSDK_FIXED_DIGEST_H\n#define DEFOLD_HERMES_GENERATED_DMSDK_FIXED_DIGEST_H\n#include <stdint.h>\n#ifdef __cplusplus\nextern \"C\" {\n#endif\n${declarations}\n#ifdef __cplusplus\n}\n#endif\n#endif\n`;
 }
 
@@ -57,31 +136,81 @@ function renderRuntimeHeader(entries) {
 }
 
 function renderRuntime(entries) {
-  const descriptors = entries.map(({ id, digestBytes, declaration }) => `  { UINT16_C(${id}), UINT16_C(${digestBytes}), ${JSON.stringify(declaration.id)} }`).join(",\n");
-  const cases = entries.map(({ id, wrapper }) => `    case ${id}: if(!${wrapper}(input, input_length, output, output_capacity)) return DEHERM_DMSDK_FIXED_DIGEST_NULL_STORAGE; break;`).join("\n");
+  const descriptors = entries
+    .map(
+      ({ id, digestBytes, declaration }) =>
+        `  { UINT16_C(${id}), UINT16_C(${digestBytes}), ${JSON.stringify(declaration.id)} }`,
+    )
+    .join(",\n");
+  const cases = entries
+    .map(
+      ({ id, wrapper }) =>
+        `    case ${id}: if(!${wrapper}(input, input_length, output, output_capacity)) return DEHERM_DMSDK_FIXED_DIGEST_NULL_STORAGE; break;`,
+    )
+    .join("\n");
   return `// Generated by scripts/generate-dmsdk-fixed-digest-bindings.mjs. Do not edit.\n#include <defold_hermes/generated_dmsdk_fixed_digest.h>\n#include <defold_hermes/generated_dmsdk_fixed_digest_runtime.h>\nnamespace { const DehermDmSdkFixedDigestDescriptor kDescriptors[] = {\n${descriptors}\n}; }\nextern \"C\" {\nuint32_t deherm_dmsdk_fixed_digest_count(void) { return UINT32_C(${entries.length}); }\nconst DehermDmSdkFixedDigestDescriptor* deherm_dmsdk_fixed_digest_descriptors(void) { return kDescriptors; }\nDehermDmSdkFixedDigestStatus deherm_dmsdk_fixed_digest_dispatch(uint16_t id, const uint8_t* input, uint32_t input_length, uint8_t* output, uint32_t output_capacity, uint32_t* out_written) {\n  if (id >= deherm_dmsdk_fixed_digest_count()) return DEHERM_DMSDK_FIXED_DIGEST_UNKNOWN_ID;\n  if (out_written == nullptr || output == nullptr || (input_length != 0 && input == nullptr)) return DEHERM_DMSDK_FIXED_DIGEST_NULL_STORAGE;\n  const uint32_t digest_bytes=kDescriptors[id].digest_bytes;\n  if (output_capacity < digest_bytes) return DEHERM_DMSDK_FIXED_DIGEST_OUTPUT_TOO_SMALL;\n  switch (id) {\n${cases}\n    default: return DEHERM_DMSDK_FIXED_DIGEST_UNKNOWN_ID;\n  }\n  *out_written=digest_bytes; return DEHERM_DMSDK_FIXED_DIGEST_OK;\n}\n}\n`;
 }
 
 async function build(options) {
-  const contents = Object.fromEntries(await Promise.all(Object.entries(defaults).map(async ([key, relative]) => [key, await readFile(options[key] ?? resolve(root, relative), "utf8")] )));
-  const ir = JSON.parse(contents.ir); const shapes = JSON.parse(contents.shapes); const policy = JSON.parse(contents.policy);
-  if (ir.defoldRevision !== shapes.defoldRevision) throw new Error("Defold revisions differ between IR and ABI-shape census");
-  if (sha256(contents.ir) !== shapes.sourceHashes.ir) throw new Error("IR hash does not match ABI-shape census provenance");
+  const contents = Object.fromEntries(
+    await Promise.all(
+      Object.entries(defaults).map(async ([key, relative]) => [
+        key,
+        await readFile(options[key] ?? resolve(root, relative), "utf8"),
+      ]),
+    ),
+  );
+  const ir = JSON.parse(contents.ir);
+  const shapes = JSON.parse(contents.shapes);
+  const policy = JSON.parse(contents.policy);
+  if (ir.defoldRevision !== shapes.defoldRevision)
+    throw new Error("Defold revisions differ between IR and ABI-shape census");
+  if (sha256(contents.ir) !== shapes.sourceHashes.ir)
+    throw new Error("IR hash does not match ABI-shape census provenance");
+  if (
+    policy.schemaVersion !== 2 ||
+    !policy.documentationContract ||
+    !Array.isArray(policy.documentationContract.semantics)
+  )
+    throw new Error("Unsupported fixed-digest semantic policy");
   const declarations = new Map(ir.declarations.map((declaration) => [declaration.id, declaration]));
-  if (declarations.size !== ir.declarations.length || new Set(shapes.rows.map(({ id }) => id)).size !== shapes.rows.length) throw new Error("IR or ABI-shape census contains duplicate declaration ids");
-  const candidates = selectedCandidates(shapes, policy.candidateSelector);
-  const policiesBySemanticId = semanticEntryMap(policy.entries, "fixed-digest policy");
+  if (
+    declarations.size !== ir.declarations.length ||
+    new Set(shapes.rows.map(({ id }) => id)).size !== shapes.rows.length
+  )
+    throw new Error("IR or ABI-shape census contains duplicate declaration ids");
+  const patterns = [fixedDigestPattern(policy), DMSDK_UNIVERSAL_FALLBACK_PATTERN];
   const evidenceHeaders = new Map();
-  const entries = await Promise.all(candidates.map(async (candidate, id) => {
-    const declaration = declarations.get(candidate.id); const entry = policiesBySemanticId.get(semanticDeclarationId(candidate.id));
-    if (!declaration || entry.status !== "emit" || !Number.isInteger(entry.digestBytes) || entry.digestBytes <= 0 || !entry.evidence) throw new Error(`Invalid fixed-digest policy for ${candidate.id}`);
-    if (entry.evidence.header !== declaration.header || typeof entry.evidence.text !== "string") throw new Error(`Fixed-digest evidence does not match census header for ${candidate.id}`);
-    let header = evidenceHeaders.get(entry.evidence.header);
-    if (!header) { header = await readFile(resolve(root, entry.evidence.header), "utf8"); evidenceHeaders.set(entry.evidence.header, header); }
-    const evidenceLine = nearestEvidenceLine(header, entry.evidence.text, declaration.line);
-    if (evidenceLine === 0) throw new Error(`Fixed-digest evidence drifted for ${candidate.id}`);
-    if (!entry.evidence.text.includes(`output is ${entry.digestBytes} bytes`)) throw new Error(`Fixed-digest byte count lacks pinned-header evidence for ${candidate.id}`);
-    return { id, candidate, declaration, digestBytes: entry.digestBytes, evidence: { ...entry.evidence, line: evidenceLine }, wrapper: `deherm_dmsdk_fixed_digest_${snake(declaration.name)}` };
+  const selected = [];
+  let structurallyEligible = 0;
+  for (const candidate of [...shapes.rows].sort((left, right) => left.id.localeCompare(right.id))) {
+    const initial = selectDmSdkPattern(patternFacts(candidate), patterns);
+    const trace = initial.trace.find(({ patternId }) => patternId === "span.fixed-output-digest");
+    if (!trace || trace.blockers.some((blocker) => !blocker.startsWith("semantic-token-missing:"))) continue;
+    structurallyEligible += 1;
+    const declaration = declarations.get(candidate.id);
+    if (!declaration) throw new Error(`Fixed-digest structural candidate has no source declaration: ${candidate.id}`);
+    let header = evidenceHeaders.get(declaration.header);
+    if (!header) {
+      header = await readFile(resolve(root, declaration.header), "utf8");
+      evidenceHeaders.set(declaration.header, header);
+    }
+    const semantics = extractFixedDigestSemantics(header, declaration, policy.documentationContract);
+    if (!semantics) continue;
+    const patternDecision = selectDmSdkPattern(patternFacts(candidate, semantics.semanticTokens), patterns);
+    if (patternDecision.fallback || patternDecision.patternId !== "span.fixed-output-digest")
+      throw new Error(`Fixed-digest semantic facts failed their structural pattern: ${candidate.id}`);
+    selected.push({
+      candidate,
+      declaration,
+      patternDecision: compactDmSdkPatternDecision(patternDecision),
+      ...semantics,
+    });
+  }
+  const entries = selected.map((entry, id) => ({
+    id,
+    ...entry,
+    wrapper: `deherm_dmsdk_fixed_digest_${snake(entry.declaration.name)}`,
   }));
   const artifacts = new Map([
     ["defold/defold_hermes/include/defold_hermes/generated_dmsdk_fixed_digest.h", renderHeader(entries)],
@@ -90,18 +219,82 @@ async function build(options) {
     ["defold/defold_hermes/src/generated_dmsdk_fixed_digest_runtime.cpp", renderRuntime(entries)],
   ]);
   const report = {
-    schemaVersion: 1, policyVersion: policy.policyVersion, defoldRevision: ir.defoldRevision,
-    sources: { ir: "packages/bindings/generated/defold-sdk-ir.json", shapes: "packages/bindings/generated/defold-dmsdk-abi-shapes.json", policy: "packages/bindings/overrides/dmsdk-fixed-digest-bindings.json" },
-    sourceHashes: { ...Object.fromEntries(Object.entries(contents).map(([key, value]) => [key, sha256(value)])), headers: Object.fromEntries([...evidenceHeaders].sort(([a], [b]) => a.localeCompare(b)).map(([path, content]) => [path, sha256(content)])) },
-    policy: { candidateSelector: policy.candidateSelector, cAbi: "const uint8_t* plus uint32_t input length; caller-owned uint8_t* output plus validated uint32_t capacity", ownership: "input is borrowed for the synchronous call; output is caller-owned; no native pointer escapes", allocation: "generated wrappers and dispatcher use no allocation or ownership primitive", jsi: "not-generated: zero-copy typed-array lifetime and module installation remain an explicit later policy", html5: "not-claimed pending target compile/link matrix" },
-    coverage: { baselineRuntimePending: shapes.coverage.runtimePending, discovered: candidates.length, emitted: entries.length, policyBlocked: 0, hostBehaviorVerified: entries.length, remainingWithoutGeneratedAdapters: shapes.coverage.runtimePending - 26 - 7 - entries.length },
-    artifactHashes: Object.fromEntries([...artifacts].sort(([a], [b]) => a.localeCompare(b)).map(([path, content]) => [path, sha256(content)])), artifacts: [...artifacts.keys()].sort(),
-    declarations: entries.map(({ id, candidate, declaration, digestBytes, evidence, wrapper }) => ({ ...candidate, bindingId: id, wrapper, digestBytes, evidence, stages: { generated: "complete", compiled: "packaged-sdk-object-test", linked: "packaged-sdk-host-link-test", runtime: "packaged-sdk-host-behavior-test", allocation: "100000-warmed-dispatch-zero-cpp-allocations" } }))
+    schemaVersion: 1,
+    policyVersion: policy.policyVersion,
+    defoldRevision: ir.defoldRevision,
+    sources: {
+      ir: "packages/bindings/generated/defold-sdk-ir.json",
+      shapes: "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
+      policy: "packages/bindings/overrides/dmsdk-fixed-digest-bindings.json",
+    },
+    sourceHashes: {
+      ...Object.fromEntries(Object.entries(contents).map(([key, value]) => [key, sha256(value)])),
+      headers: Object.fromEntries(
+        [...evidenceHeaders].sort(([a], [b]) => a.localeCompare(b)).map(([path, content]) => [path, sha256(content)]),
+      ),
+    },
+    patternRegistry: patterns,
+    policy: {
+      pattern: "span.fixed-output-digest",
+      documentationContract: policy.documentationContract,
+      cAbi: "const uint8_t* plus uint32_t input length; caller-owned uint8_t* output plus validated uint32_t capacity",
+      ownership: "input is borrowed for the synchronous call; output is caller-owned; no native pointer escapes",
+      allocation: "generated wrappers and dispatcher use no allocation or ownership primitive",
+      jsi: "not-generated: zero-copy typed-array lifetime and module installation remain an explicit later policy",
+      html5: "not-claimed pending target compile/link matrix",
+    },
+    coverage: {
+      baselineRuntimePending: shapes.coverage.runtimePending,
+      structurallyEligible,
+      discovered: entries.length,
+      emitted: entries.length,
+      policyBlocked: structurallyEligible - entries.length,
+      hostBehaviorVerified: entries.length,
+      remainingWithoutGeneratedAdapters: shapes.coverage.runtimePending - 26 - 7 - entries.length,
+    },
+    artifactHashes: Object.fromEntries(
+      [...artifacts].sort(([a], [b]) => a.localeCompare(b)).map(([path, content]) => [path, sha256(content)]),
+    ),
+    artifacts: [...artifacts.keys()].sort(),
+    declarations: entries.map(({ id, candidate, digestBytes, evidence, patternDecision, wrapper }) => ({
+      ...candidate,
+      bindingId: id,
+      wrapper,
+      digestBytes,
+      evidence,
+      patternDecision,
+      stages: {
+        generated: "complete",
+        compiled: "packaged-sdk-object-test",
+        linked: "packaged-sdk-host-link-test",
+        runtime: "packaged-sdk-host-behavior-test",
+        allocation: "100000-warmed-dispatch-zero-cpp-allocations",
+      },
+    })),
   };
-  artifacts.set("packages/bindings/generated/defold-dmsdk-fixed-digest-bindings.json", `${JSON.stringify(report, null, 2)}\n`);
+  artifacts.set(
+    "packages/bindings/generated/defold-dmsdk-fixed-digest-bindings.json",
+    `${JSON.stringify(report, null, 2)}\n`,
+  );
   return { artifacts, report };
 }
 
-async function writeOrCheck(rootPath, relative, content, check) { const path = resolve(rootPath, relative); if (check) { if (await readFile(path, "utf8") !== content) throw new Error(`${relative} is stale`); } else { await mkdir(dirname(path), { recursive: true }); await writeFile(path, content); } }
-export async function run(argv = process.argv.slice(2)) { const options = parseArgs(argv); const { artifacts, report } = await build(options); for (const [path, content] of artifacts) await writeOrCheck(options.outRoot, path, content, options.check); process.stdout.write(`${options.check ? "Verified" : "Generated"} ${report.coverage.emitted}/${report.coverage.discovered} fixed-digest dmSDK bindings.\n`); return report; }
+async function writeOrCheck(rootPath, relative, content, check) {
+  const path = resolve(rootPath, relative);
+  if (check) {
+    if ((await readFile(path, "utf8")) !== content) throw new Error(`${relative} is stale`);
+  } else {
+    await mkdir(dirname(path), { recursive: true });
+    await writeFile(path, content);
+  }
+}
+export async function run(argv = process.argv.slice(2)) {
+  const options = parseArgs(argv);
+  const { artifacts, report } = await build(options);
+  for (const [path, content] of artifacts) await writeOrCheck(options.outRoot, path, content, options.check);
+  process.stdout.write(
+    `${options.check ? "Verified" : "Generated"} ${report.coverage.emitted}/${report.coverage.discovered} fixed-digest dmSDK bindings.\n`,
+  );
+  return report;
+}
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) await run();

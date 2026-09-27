@@ -21,6 +21,7 @@
     "./dmsdk-universal-static-frame": "./src/dmsdk-universal-static-frame.mjs",
     "./dmsdk-call-symbol-index": "./src/dmsdk-call-symbol-index.mjs",
     "./dmsdk-concrete-call-plan": "./src/dmsdk-concrete-call-plan.mjs",
+    "./dmsdk-pattern-selector": "./src/dmsdk-pattern-selector.mjs",
     "./native-extension-generator": "./src/native-extension-generator.mjs",
     "./defold-hash": "./src/defold-hash.mjs",
     "./ttsc": "./ttsc.mjs"

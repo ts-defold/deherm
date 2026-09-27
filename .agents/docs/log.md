@@ -3788,3 +3788,29 @@ the universal C ABI and public-SDK-callable exact twins. This establishes
 generation, deterministic materialization, compilation, linkage, and exact-call
 execution. It does not promote those results into packaged-engine, every-target,
 or performance evidence; those remain separate gates.
+
+## 2026-09-27 - First total semantic-pattern selector wave
+
+The compiler now has a revision-neutral dmSDK pattern selector rather than
+requiring each family generator to perform an unrelated route search. Patterns
+are declarative structural predicates over declaration kind, ABI roles,
+directions, arity, family exclusions, and required semantic tokens. They are
+ranked by explicit priority and cost; equal-ranked matches fail closed; exactly
+one universal fallback is mandatory. The schema rejects route, symbol, and
+header selectors, and every decision carries a compact trace.
+
+Borrowed-handle and scratch-scalar-out generation were migrated without
+changing their selected census: 158/348 and 7/79 respectively. Their existing
+C ABI, Dynamic Hermes/JSI, Static Hermes typed-native, browser direct-memory,
+TypeScript, sanitizer, reentrancy, and warmed zero-allocation tests remain the
+evidence boundary. Static Hermes remains a direct `$SHBuiltin.extern_c` target,
+not a JSI alias.
+
+The fixed-digest family no longer contains four handwritten `dmCrypt` route
+entries or a `crypt.h`/symbol-prefix selector. The same structural selector now
+discovers the four routes from their ABI shape and admits them only when the
+pinned Clang comment AST and declaration line agree on a synchronous hash
+buffer contract and exact output byte count. Focused generation, clean-room
+comparison, native compile/link/runtime hashing, bounds rejection, and warmed
+zero-allocation tests pass. This is generator architecture evidence, not proof
+that every remaining name-selected family has already migrated.

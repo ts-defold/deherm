@@ -12,6 +12,7 @@ export * from "./native-extension-generator.mjs";
 export * from "./defold-hash.mjs";
 export * from "./dmsdk-call-symbol-index.mjs";
 export * from "./dmsdk-concrete-call-plan.mjs";
+export * from "./dmsdk-pattern-selector.mjs";
 export * from "./api-policy.mjs";
 export * from "./policy-surface-materializer.mjs";
 export * from "./names.mjs";

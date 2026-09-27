@@ -3,6 +3,13 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
+import {
+  DMSDK_UNIVERSAL_FALLBACK_PATTERN,
+  compactDmSdkPatternDecision,
+  defineDmSdkPattern,
+  selectDmSdkPattern,
+} from "../packages/compiler/src/dmsdk-pattern-selector.mjs";
+
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const paths = Object.freeze({
   ir: "packages/bindings/generated/defold-sdk-ir.json",
@@ -23,8 +30,19 @@ const artifacts = Object.freeze({
 });
 
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
-const snake = (value) => String(value).replace(/::/g, "_").replace(/([a-z0-9])([A-Z])/g, "$1_$2").replace(/[^A-Za-z0-9]+/g, "_").replace(/^_+|_+$/g, "").toLowerCase();
-const camel = (value) => snake(value).split("_").filter(Boolean).map((word, index) => index ? word[0].toUpperCase() + word.slice(1) : word).join("");
+const snake = (value) =>
+  String(value)
+    .replace(/::/g, "_")
+    .replace(/([a-z0-9])([A-Z])/g, "$1_$2")
+    .replace(/[^A-Za-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "")
+    .toLowerCase();
+const camel = (value) =>
+  snake(value)
+    .split("_")
+    .filter(Boolean)
+    .map((word, index) => (index ? word[0].toUpperCase() + word.slice(1) : word))
+    .join("");
 
 function parseArguments(argv) {
   const options = { outputRoot: root, check: false };
@@ -50,33 +68,57 @@ function handleName(role) {
   return role.split(":").slice(1, -1).join(":");
 }
 
-function directionAllowed(parameter, policy) {
-  if (parameter.direction === "value") {
-    return policy.selection.valueRolePrefixes.some((prefix) => parameter.role.startsWith(prefix));
-  }
-  return policy.selection.pointerDirections.includes(parameter.direction) &&
-    policy.selection.pointerRolePrefixes.some((prefix) => parameter.role.startsWith(prefix));
+function scratchScalarOutPattern(policy) {
+  return defineDmSdkPattern({
+    schemaVersion: 1,
+    id: "pointer.scratch-scalar-out-provider-boundary",
+    family: "scratch-scalar-out",
+    emitter: "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
+    priority: 800,
+    cost: 25,
+    fallback: false,
+    when: {
+      result: { rolePrefixes: policy.selection.resultRolePrefixes },
+      parameters: {
+        every: [
+          { rolePrefixes: policy.selection.valueRolePrefixes, directions: ["value"] },
+          { rolePrefixes: policy.selection.pointerRolePrefixes, directions: policy.selection.pointerDirections },
+        ],
+        some: [{ rolePrefixes: policy.selection.pointerRolePrefixes, directions: ["out", "inout"] }],
+      },
+      rejectFamilies: policy.selection.rejectedFamilies,
+    },
+  });
 }
 
-function structuralBlockers(shape, policy) {
-  const blockers = [];
-  if (!policy.selection.resultRolePrefixes.some((prefix) => shape.result.role.startsWith(prefix))) {
-    blockers.push(`result-role-unsupported:${shape.result.role}`);
-  }
-  for (const parameter of shape.parameters) {
-    if (!directionAllowed(parameter, policy)) {
-      blockers.push(`parameter-role-direction-unsupported:${parameter.position}:${parameter.direction}:${parameter.role}`);
-    }
-  }
-  if (!shape.parameters.some((parameter) =>
-    ["out", "inout"].includes(parameter.direction) &&
-    policy.selection.pointerRolePrefixes.some((prefix) => parameter.role.startsWith(prefix)))) {
-    blockers.push("writable-scalar-pointer-required");
-  }
-  for (const family of policy.selection.rejectedFamilies) {
-    if (shape.families.includes(family)) blockers.push(`family-requires-target-matrix:${family}`);
-  }
-  return [...new Set(blockers)].sort();
+function patternFacts(shape, projected) {
+  return {
+    id: shape.id,
+    kind: shape.kind,
+    result: shape.result,
+    parameters: shape.parameters,
+    families: shape.families,
+    semanticTokens: projected?.semanticTokensNeeded ?? [],
+  };
+}
+
+function structuralBlockers(decision) {
+  if (!decision.fallback) return [];
+  const blockers = decision.trace.find(({ patternId }) => patternId === "pointer.scratch-scalar-out-provider-boundary")
+    ?.blockers ?? ["scratch-scalar-out-pattern-not-applicable"];
+  return blockers
+    .map((blocker) => {
+      if (blocker.startsWith("result-role:")) return `result-role-unsupported:${blocker.slice("result-role:".length)}`;
+      if (blocker.startsWith("parameter-role:")) {
+        const [, position, direction, ...role] = blocker.split(":");
+        return `parameter-role-direction-unsupported:${position}:${direction}:${role.join(":")}`;
+      }
+      if (blocker === "required-parameter-shape-absent") return "writable-scalar-pointer-required";
+      if (blocker.startsWith("rejected-family:"))
+        return `family-requires-target-matrix:${blocker.slice("rejected-family:".length)}`;
+      return blocker;
+    })
+    .sort();
 }
 
 function semanticBlockers(row) {
@@ -89,7 +131,9 @@ function semanticBlockers(row) {
     "pointer-bounds-nullability-lifetime": "pointer-bounds-nullability-lifetime-unresolved",
     "target-feature-symbol-matrix": "target-feature-symbol-matrix-unverified",
   };
-  return [...new Set((row.semanticTokensNeeded ?? []).map((token) => mapped[token] ?? `semantic-token-unresolved:${token}`))].sort();
+  return [
+    ...new Set((row.semanticTokensNeeded ?? []).map((token) => mapped[token] ?? `semantic-token-unresolved:${token}`)),
+  ].sort();
 }
 
 function cKind(kind) {
@@ -114,7 +158,7 @@ function universalFallback(blockers) {
     state: "universal-fallback",
     family: "universal-recipe",
     blockers: [...blockers].sort(),
-    preserved: true
+    preserved: true,
   };
 }
 
@@ -129,7 +173,7 @@ function makeFunctionNames(entries) {
   const initial = entries.map((entry) => camel(entry.projection.symbol));
   const counts = new Map();
   for (const name of initial) counts.set(name, (counts.get(name) ?? 0) + 1);
-  return initial.map((name, index) => counts.get(name) === 1 ? name : `${name}Binding${entries[index].id}`);
+  return initial.map((name, index) => (counts.get(name) === 1 ? name : `${name}Binding${entries[index].id}`));
 }
 
 function outputName(parameter) {
@@ -146,23 +190,27 @@ function headerPath(source) {
 
 function nativeType(shapeParameter, projectedParameter) {
   if (shapeParameter.role.startsWith("handle:")) return handleName(shapeParameter.role);
-  if (shapeParameter.role.startsWith("enum:") && shapeParameter.direction === "value") return shapeParameter.role.slice("enum:".length);
+  if (shapeParameter.role.startsWith("enum:") && shapeParameter.direction === "value")
+    return shapeParameter.role.slice("enum:".length);
   return projectedParameter.nativeType;
 }
 
-function specializationBlockers(shape, projected, declaration, policy) {
+function specializationBlockers(shape, projected, declaration, policy, structural = []) {
   const blockers = [];
   if (!projected) blockers.push("source-projection-missing");
   if (!declaration) blockers.push("source-declaration-missing");
-  if (!projected?.signature || !Array.isArray(projected.signature.parameters) ||
-      projected.signature.parameters.length !== shape.parameters.length) {
+  if (
+    !projected?.signature ||
+    !Array.isArray(projected.signature.parameters) ||
+    projected.signature.parameters.length !== shape.parameters.length
+  ) {
     blockers.push("source-signature-parameter-shape-unrecognized");
   }
-  const structural = structuralBlockers(shape, policy);
   blockers.push(...structural);
   if (!cKind(roleKind(shape.result.role))) blockers.push(`result-kind-unsupported:${shape.result.role}`);
   for (const parameter of shape.parameters) {
-    if (!cKind(roleKind(parameter.role))) blockers.push(`parameter-kind-unsupported:${parameter.position}:${parameter.role}`);
+    if (!cKind(roleKind(parameter.role)))
+      blockers.push(`parameter-kind-unsupported:${parameter.position}:${parameter.role}`);
     if (parameter.role.startsWith("handle:") && !handleName(parameter.role)) {
       blockers.push(`parameter-handle-kind-unsupported:${parameter.position}:${parameter.role}`);
     }
@@ -175,16 +223,25 @@ function renderHeader(entries, handleKinds, maxParameters) {
 }
 
 function renderRuntime(entries, handleKinds, maxParameters) {
-  const descriptorRows = entries.map((entry) => {
-    const kinds = entry.parameters.map(({ kind }) => cKind(kind));
-    const directions = entry.parameters.map(({ direction }) => cDirection(direction));
-    const handles = entry.parameters.map(({ handleName: name }) => name ? handleKinds.get(name).id : "DEHERM_DMSDK_SCRATCH_NO_HANDLE_KIND");
-    while (kinds.length < maxParameters) kinds.push("0");
-    while (directions.length < maxParameters) directions.push("0");
-    while (handles.length < maxParameters) handles.push("DEHERM_DMSDK_SCRATCH_NO_HANDLE_KIND");
-    return `  { UINT16_C(${entry.id}), UINT8_C(${entry.parameters.length}), UINT8_C(${entry.parameters.filter(({ direction }) => direction !== "out").length}), UINT8_C(${entry.parameters.filter(({ direction }) => direction === "out" || direction === "inout").length}), UINT8_C(${cKind(entry.result.kind)}), { ${kinds.join(", ")} }, { ${directions.join(", ")} }, { ${handles.map((value) => typeof value === "number" ? `UINT16_C(${value})` : value).join(", ")} }, ${JSON.stringify(entry.projection.id)} }`;
-  }).join(",\n");
-  const handleRows = [...handleKinds.values()].map(({ id, name, representation }) => `  { UINT16_C(${id}), ${JSON.stringify(name)}, ${JSON.stringify(representation)} }`).join(",\n");
+  const descriptorRows = entries
+    .map((entry) => {
+      const kinds = entry.parameters.map(({ kind }) => cKind(kind));
+      const directions = entry.parameters.map(({ direction }) => cDirection(direction));
+      const handles = entry.parameters.map(({ handleName: name }) =>
+        name ? handleKinds.get(name).id : "DEHERM_DMSDK_SCRATCH_NO_HANDLE_KIND",
+      );
+      while (kinds.length < maxParameters) kinds.push("0");
+      while (directions.length < maxParameters) directions.push("0");
+      while (handles.length < maxParameters) handles.push("DEHERM_DMSDK_SCRATCH_NO_HANDLE_KIND");
+      return `  { UINT16_C(${entry.id}), UINT8_C(${entry.parameters.length}), UINT8_C(${entry.parameters.filter(({ direction }) => direction !== "out").length}), UINT8_C(${entry.parameters.filter(({ direction }) => direction === "out" || direction === "inout").length}), UINT8_C(${cKind(entry.result.kind)}), { ${kinds.join(", ")} }, { ${directions.join(", ")} }, { ${handles.map((value) => (typeof value === "number" ? `UINT16_C(${value})` : value)).join(", ")} }, ${JSON.stringify(entry.projection.id)} }`;
+    })
+    .join(",\n");
+  const handleRows = [...handleKinds.values()]
+    .map(
+      ({ id, name, representation }) =>
+        `  { UINT16_C(${id}), ${JSON.stringify(name)}, ${JSON.stringify(representation)} }`,
+    )
+    .join(",\n");
   return `// Generated by scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs. Do not edit.\n#include <defold_hermes/generated_dmsdk_scratch_scalar_out.h>\n#include <string.h>\nnamespace {\nconst DehermDmSdkScratchDescriptor kDescriptors[] = {\n${descriptorRows}\n};\nconst DehermDmSdkScratchHandleKind kHandleKinds[] = {\n${handleRows}\n};\nDehermDmSdkScratchProvider gProvider = {};\nthread_local bool gDispatchActive = false;\nbool validLane(uint8_t kind, uint64_t value) {\n  if (kind == DEHERM_DMSDK_SCRATCH_BOOL) return value <= UINT64_C(1);\n  if (kind == DEHERM_DMSDK_SCRATCH_U16) return value <= UINT64_C(0xffff);\n  if (kind == DEHERM_DMSDK_SCRATCH_U32 || kind == DEHERM_DMSDK_SCRATCH_F32) return value <= UINT64_C(0xffffffff);\n  if (kind == DEHERM_DMSDK_SCRATCH_I32 || kind == DEHERM_DMSDK_SCRATCH_ENUM) return value == static_cast<uint64_t>(static_cast<int64_t>(static_cast<int32_t>(value)));\n  return true;\n}\nvoid clearWritable(const DehermDmSdkScratchDescriptor& descriptor, uint64_t* slots) { for (uint32_t index=0; index<descriptor.parameter_count; ++index) if (descriptor.parameter_directions[index] == DEHERM_DMSDK_SCRATCH_OUT || descriptor.parameter_directions[index] == DEHERM_DMSDK_SCRATCH_INOUT) slots[index]=0; }\nstruct DispatchScope { DispatchScope(){gDispatchActive=true;} ~DispatchScope(){gDispatchActive=false;} };\n}\nextern "C" {\nuint32_t deherm_dmsdk_scratch_count(void) { return UINT32_C(${entries.length}); }\nconst DehermDmSdkScratchDescriptor* deherm_dmsdk_scratch_descriptors(void) { return kDescriptors; }\nuint32_t deherm_dmsdk_scratch_handle_kind_count(void) { return UINT32_C(${handleKinds.size}); }\nconst DehermDmSdkScratchHandleKind* deherm_dmsdk_scratch_handle_kinds(void) { return kHandleKinds; }\nDehermDmSdkScratchStatus deherm_dmsdk_scratch_set_provider(const DehermDmSdkScratchProvider* provider) {\n  if (provider == nullptr) { memset(&gProvider, 0, sizeof(gProvider)); return DEHERM_DMSDK_SCRATCH_OK; }\n  if (provider->abi_version != DEHERM_DMSDK_SCRATCH_PROVIDER_ABI || provider->is_current_thread == nullptr || provider->validate_handle == nullptr || provider->invoke == nullptr) return DEHERM_DMSDK_SCRATCH_INVALID_PROVIDER;\n  gProvider = *provider; return DEHERM_DMSDK_SCRATCH_OK;\n}\nDehermDmSdkScratchStatus deherm_dmsdk_scratch_dispatch(uint16_t id, uint64_t* slots, uint32_t parameter_count, uint64_t* out_result) {\n  if (id >= deherm_dmsdk_scratch_count()) return DEHERM_DMSDK_SCRATCH_UNKNOWN_ID;\n  const DehermDmSdkScratchDescriptor& descriptor = kDescriptors[id];\n  if (parameter_count != descriptor.parameter_count) return DEHERM_DMSDK_SCRATCH_WRONG_ARITY;\n  if (slots == nullptr || out_result == nullptr) return DEHERM_DMSDK_SCRATCH_NULL_STORAGE;\n  *out_result = 0;\n  for (uint32_t index=0; index<parameter_count; ++index) if (descriptor.parameter_directions[index] == DEHERM_DMSDK_SCRATCH_OUT) slots[index]=0;\n  if (gProvider.invoke == nullptr) { clearWritable(descriptor, slots); return DEHERM_DMSDK_SCRATCH_PROVIDER_MISSING; }\n  if (gDispatchActive) { clearWritable(descriptor, slots); return DEHERM_DMSDK_SCRATCH_REENTRANT; }\n  if (gProvider.is_current_thread(gProvider.context) == 0) { clearWritable(descriptor, slots); return DEHERM_DMSDK_SCRATCH_WRONG_THREAD; }\n  for (uint32_t index=0; index<parameter_count; ++index) {\n    if (descriptor.parameter_directions[index] != DEHERM_DMSDK_SCRATCH_OUT && !validLane(descriptor.parameter_kinds[index], slots[index])) { clearWritable(descriptor, slots); return DEHERM_DMSDK_SCRATCH_INVALID_LANE; }\n    if (descriptor.parameter_kinds[index] == DEHERM_DMSDK_SCRATCH_HANDLE && (slots[index] == 0 || gProvider.validate_handle(gProvider.context, descriptor.handle_kinds[index], slots[index]) == 0)) { clearWritable(descriptor, slots); return DEHERM_DMSDK_SCRATCH_INVALID_HANDLE; }\n  }\n  DispatchScope scope;\n  const DehermDmSdkScratchStatus status = gProvider.invoke(gProvider.context, id, slots, parameter_count, out_result);\n  if (status != DEHERM_DMSDK_SCRATCH_OK || !validLane(descriptor.result_kind, *out_result)) { clearWritable(descriptor, slots); *out_result=0; return status == DEHERM_DMSDK_SCRATCH_OK ? DEHERM_DMSDK_SCRATCH_INVALID_LANE : status; }\n  for (uint32_t index=0; index<parameter_count; ++index) if ((descriptor.parameter_directions[index] == DEHERM_DMSDK_SCRATCH_OUT || descriptor.parameter_directions[index] == DEHERM_DMSDK_SCRATCH_INOUT) && !validLane(descriptor.parameter_kinds[index], slots[index])) { clearWritable(descriptor, slots); *out_result=0; return DEHERM_DMSDK_SCRATCH_INVALID_LANE; }\n  return DEHERM_DMSDK_SCRATCH_OK;\n}\n}\n`;
 }
 
@@ -197,21 +254,30 @@ function renderJsi(maxParameters) {
 }
 
 function renderBrowser(entries, handleKinds, maxParameters) {
-  const descriptors = entries.map((entry) => `{id:${entry.id},resultKind:${JSON.stringify(entry.result.kind)},parameterKinds:Object.freeze(${JSON.stringify(entry.parameters.map(({ kind }) => kind))}),directions:Object.freeze(${JSON.stringify(entry.parameters.map(({ direction }) => direction))}),handleKinds:Object.freeze(${JSON.stringify(entry.parameters.map(({ handleName: name }) => name ?? null))}),declarationId:${JSON.stringify(entry.projection.id)}}`).join(",\n      ");
+  const descriptors = entries
+    .map(
+      (entry) =>
+        `{id:${entry.id},resultKind:${JSON.stringify(entry.result.kind)},parameterKinds:Object.freeze(${JSON.stringify(entry.parameters.map(({ kind }) => kind))}),directions:Object.freeze(${JSON.stringify(entry.parameters.map(({ direction }) => direction))}),handleKinds:Object.freeze(${JSON.stringify(entry.parameters.map(({ handleName: name }) => name ?? null))}),declarationId:${JSON.stringify(entry.projection.id)}}`,
+    )
+    .join(",\n      ");
   return `// Generated by scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs. Do not edit.\nvar LibraryDefoldHermesDmSdkScratchScalarOut={\n  $DEFOLD_HERMES_DMSDK_SCRATCH_SCALAR_OUT__deps:['deherm_dmsdk_scratch_dispatch'],\n  $DEFOLD_HERMES_DMSDK_SCRATCH_SCALAR_OUT:{\n    abi:Object.freeze({slotBytes:8,maxParameters:${maxParameters},resultBytes:8,storage:'caller-owned',reentrancy:'rejected'}),\n    handleKinds:Object.freeze(${JSON.stringify([...handleKinds.values()])}),\n    descriptors:Object.freeze([\n      ${descriptors}\n    ]),\n    callRaw:function(id,slotsPointer,parameterCount,resultPointer){return _deherm_dmsdk_scratch_dispatch(id,slotsPointer,parameterCount,resultPointer);}\n  }\n};\nautoAddDeps(LibraryDefoldHermesDmSdkScratchScalarOut,'$DEFOLD_HERMES_DMSDK_SCRATCH_SCALAR_OUT');\naddToLibrary(LibraryDefoldHermesDmSdkScratchScalarOut);\n`;
 }
 
 function renderTypeScript(entries, names) {
   const ids = entries.map((entry, index) => `  ${names[index]}: ${entry.id}`).join(",\n");
-  const functions = entries.map((entry, index) => {
-    const inputs = entry.parameters.filter(({ direction }) => direction !== "out");
-    const outputs = entry.parameters.filter(({ direction }) => direction === "out" || direction === "inout");
-    const parameters = inputs.map((parameter) => `${camel(parameter.name)}: ${tsType(parameter)}`).join(", ");
-    const argumentsList = inputs.map(({ name }) => camel(name)).join(", ");
-    const resultType = `{ readonly result: ${tsType(entry.result)}; ${outputs.map((output) => `readonly ${outputName(output)}: ${tsType(output)};`).join(" ")} }`;
-    const fields = outputs.map((output, outputIndex) => `${outputName(output)}: tuple[${outputIndex + 1}] as ${tsType(output)}`).join(", ");
-    return `/** Caller-owned one-slot scalar output bridge for ${entry.projection.symbol}; no pointer escapes. */\nexport function ${names[index]}(${parameters}): ${resultType} { const tuple=module().call(DmSdkScratchScalarOutId.${names[index]}${argumentsList ? `, ${argumentsList}` : ""});if(tuple.length!==${outputs.length + 1})throw new Error("invalid scratch scalar-out tuple");return {result:tuple[0] as ${tsType(entry.result)},${fields}}; }`;
-  }).join("\n\n");
+  const functions = entries
+    .map((entry, index) => {
+      const inputs = entry.parameters.filter(({ direction }) => direction !== "out");
+      const outputs = entry.parameters.filter(({ direction }) => direction === "out" || direction === "inout");
+      const parameters = inputs.map((parameter) => `${camel(parameter.name)}: ${tsType(parameter)}`).join(", ");
+      const argumentsList = inputs.map(({ name }) => camel(name)).join(", ");
+      const resultType = `{ readonly result: ${tsType(entry.result)}; ${outputs.map((output) => `readonly ${outputName(output)}: ${tsType(output)};`).join(" ")} }`;
+      const fields = outputs
+        .map((output, outputIndex) => `${outputName(output)}: tuple[${outputIndex + 1}] as ${tsType(output)}`)
+        .join(", ");
+      return `/** Caller-owned one-slot scalar output bridge for ${entry.projection.symbol}; no pointer escapes. */\nexport function ${names[index]}(${parameters}): ${resultType} { const tuple=module().call(DmSdkScratchScalarOutId.${names[index]}${argumentsList ? `, ${argumentsList}` : ""});if(tuple.length!==${outputs.length + 1})throw new Error("invalid scratch scalar-out tuple");return {result:tuple[0] as ${tsType(entry.result)},${fields}}; }`;
+    })
+    .join("\n\n");
   return `// Generated by scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs. Do not edit.\ndeclare const scratchHandleBrand: unique symbol;\nexport type ScratchBorrowedHandle<Kind extends string> = bigint & { readonly [scratchHandleBrand]: Kind };\ninterface DmSdkScratchScalarOutModule { call(id:number,...args:readonly (number|boolean|bigint)[]):readonly unknown[]; }\ndeclare global { var __defoldModulesV1: Record<string,object>|undefined; }\nfunction module():DmSdkScratchScalarOutModule { const value=globalThis.__defoldModulesV1?.DmSdkScratchScalarOut as DmSdkScratchScalarOutModule|undefined;if(!value)throw new Error("Defold module is not registered: DmSdkScratchScalarOut");return value; }\nexport function unsafeScratchBorrowedHandle<Kind extends string>(kind:Kind,value:bigint):ScratchBorrowedHandle<Kind>{void kind;if(value<=0n||value>0xffff_ffff_ffff_ffffn)throw new RangeError("handle must be a nonzero u64");return value as ScratchBorrowedHandle<Kind>;}\nexport const DmSdkScratchScalarOutId={\n${ids}\n} as const;\n\n${functions}\n`;
 }
 
@@ -221,28 +287,42 @@ function renderStaticHermes() {
 
 function resultAssertion(entry, expression) {
   if (entry.result.kind === "bool") return `std::is_same<decltype(${expression}), bool>::value`;
-  if (entry.result.kind === "f32") return `std::is_floating_point<decltype(${expression})>::value && sizeof(decltype(${expression})) == 4`;
-  if (entry.result.kind === "enum") return `std::is_enum<decltype(${expression})>::value && sizeof(decltype(${expression})) <= 4`;
+  if (entry.result.kind === "f32")
+    return `std::is_floating_point<decltype(${expression})>::value && sizeof(decltype(${expression})) == 4`;
+  if (entry.result.kind === "enum")
+    return `std::is_enum<decltype(${expression})>::value && sizeof(decltype(${expression})) <= 4`;
   const bytes = entry.result.kind === "u64" ? 8 : 4;
   return `(std::is_integral<decltype(${expression})>::value || std::is_enum<decltype(${expression})>::value) && sizeof(decltype(${expression})) <= ${bytes}`;
 }
 
 function renderHeaderAudit(entries) {
   const headers = [...new Set(entries.map(({ shape }) => headerPath(shape.header)))].sort();
-  const lines = ["// Generated by scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs. Do not edit.", "#include <cstdint>", "#include <type_traits>", "#include <utility>", ...headers.map((header) => `#include <${header}>`), ""];
+  const lines = [
+    "// Generated by scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs. Do not edit.",
+    "#include <cstdint>",
+    "#include <type_traits>",
+    "#include <utility>",
+    ...headers.map((header) => `#include <${header}>`),
+    "",
+  ];
   for (const entry of entries) {
-    const args = entry.shape.parameters.map((parameter, index) => `std::declval<${nativeType(parameter, entry.projection.signature.parameters[index])}>()`).join(", ");
+    const args = entry.shape.parameters
+      .map(
+        (parameter, index) => `std::declval<${nativeType(parameter, entry.projection.signature.parameters[index])}>()`,
+      )
+      .join(", ");
     const expression = `${entry.projection.symbol}(${args})`;
     lines.push(`static_assert(${resultAssertion(entry, expression)}, ${JSON.stringify(entry.projection.id)});`);
     for (const [index, parameter] of entry.parameters.entries()) {
       if (parameter.direction === "value") continue;
       const native = nativeType(entry.shape.parameters[index], entry.projection.signature.parameters[index]);
       const bytes = parameter.kind === "u64" ? 8 : 4;
-      const trait = parameter.kind === "f32"
-        ? `std::is_floating_point<typename std::remove_pointer<${native}>::type>::value && sizeof(typename std::remove_pointer<${native}>::type) == 4`
-        : parameter.kind === "bool"
-          ? `std::is_same<typename std::remove_pointer<${native}>::type, bool>::value`
-          : `(std::is_integral<typename std::remove_pointer<${native}>::type>::value || std::is_enum<typename std::remove_pointer<${native}>::type>::value) && sizeof(typename std::remove_pointer<${native}>::type) <= ${bytes}`;
+      const trait =
+        parameter.kind === "f32"
+          ? `std::is_floating_point<typename std::remove_pointer<${native}>::type>::value && sizeof(typename std::remove_pointer<${native}>::type) == 4`
+          : parameter.kind === "bool"
+            ? `std::is_same<typename std::remove_pointer<${native}>::type, bool>::value`
+            : `(std::is_integral<typename std::remove_pointer<${native}>::type>::value || std::is_enum<typename std::remove_pointer<${native}>::type>::value) && sizeof(typename std::remove_pointer<${native}>::type) <= ${bytes}`;
       lines.push(`static_assert(${trait}, ${JSON.stringify(`${entry.projection.id}:parameter:${index}`)});`);
     }
   }
@@ -251,37 +331,118 @@ function renderHeaderAudit(entries) {
 }
 
 export async function build(overrides = {}) {
-  const contents = Object.fromEntries(await Promise.all(Object.entries(paths).map(async ([key, path]) => [key, overrides[key] ?? await readFile(resolve(root, path), "utf8")])));
+  const contents = Object.fromEntries(
+    await Promise.all(
+      Object.entries(paths).map(async ([key, path]) => [
+        key,
+        overrides[key] ?? (await readFile(resolve(root, path), "utf8")),
+      ]),
+    ),
+  );
   const ir = JSON.parse(contents.ir);
   const shapes = JSON.parse(contents.shapes);
   const projection = JSON.parse(contents.projection);
   const policy = JSON.parse(contents.policy);
-  if (new Set([ir.defoldRevision, shapes.defoldRevision, projection.defoldRevision]).size !== 1) throw new Error("scratch scalar-out inputs have different Defold revisions");
-  if (shapes.sourceHashes.ir !== sha256(contents.ir) || projection.sources.hashes.ir !== sha256(contents.ir)) throw new Error("scratch scalar-out IR provenance mismatch");
+  if (new Set([ir.defoldRevision, shapes.defoldRevision, projection.defoldRevision]).size !== 1)
+    throw new Error("scratch scalar-out inputs have different Defold revisions");
+  if (shapes.sourceHashes.ir !== sha256(contents.ir) || projection.sources.hashes.ir !== sha256(contents.ir))
+    throw new Error("scratch scalar-out IR provenance mismatch");
   const candidates = shapes.rows.filter(({ tranche }) => tranche === policy.family);
   const projectionById = new Map(projection.rows.map((row) => [row.id, row]));
   const declarationById = new Map(ir.declarations.map((row) => [row.id, row]));
   const entries = [];
   const rows = [];
+  const patterns = [scratchScalarOutPattern(policy), DMSDK_UNIVERSAL_FALLBACK_PATTERN];
   for (const shape of candidates) {
     const projected = projectionById.get(shape.id);
     const declaration = declarationById.get(shape.id);
-    const blockers = specializationBlockers(shape, projected, declaration, policy);
+    const patternDecision = selectDmSdkPattern(patternFacts(shape, projected), patterns);
+    const blockers = specializationBlockers(shape, projected, declaration, policy, structuralBlockers(patternDecision));
     if (blockers.length) {
       const allBlockers = [...new Set([...blockers, ...(projected ? semanticBlockers(projected) : [])])].sort();
-      rows.push({ id: shape.id, projectionId: projected?.projectionId ?? null, symbol: shape.symbol, disposition: "blocked", blockers: allBlockers, universalFallback: universalFallback(allBlockers), shape: shape.shape });
+      rows.push({
+        id: shape.id,
+        projectionId: projected?.projectionId ?? null,
+        symbol: shape.symbol,
+        disposition: "blocked",
+        blockers: allBlockers,
+        universalFallback: universalFallback(allBlockers),
+        shape: shape.shape,
+        patternDecision: compactDmSdkPatternDecision(patternDecision),
+      });
       continue;
     }
-    const parameters = shape.parameters.map((parameter, index) => ({ position: index, name: projected.signature.parameters[index].name || `argument${index}`, kind: roleKind(parameter.role), handleName: handleName(parameter.role), nativeRole: parameter.role, direction: parameter.direction }));
-    const entry = { id: entries.length, projection: projected, declaration, shape, parameters, result: { kind: roleKind(shape.result.role), nativeRole: shape.result.role } };
+    const parameters = shape.parameters.map((parameter, index) => ({
+      position: index,
+      name: projected.signature.parameters[index].name || `argument${index}`,
+      kind: roleKind(parameter.role),
+      handleName: handleName(parameter.role),
+      nativeRole: parameter.role,
+      direction: parameter.direction,
+    }));
+    const entry = {
+      id: entries.length,
+      projection: projected,
+      declaration,
+      shape,
+      parameters,
+      result: { kind: roleKind(shape.result.role), nativeRole: shape.result.role },
+    };
     entries.push(entry);
-    rows.push({ id: shape.id, projectionId: projected.projectionId, symbol: shape.symbol, disposition: "generated-provider-boundary", bindingId: entry.id, shape: shape.shape, resolvedPolicies: policy.storageContract, engineProviderBlockers: ["call-thread-affinity-unresolved", "enum-domain-to-native-success-policy-unresolved", "handle-provenance-lifetime-unresolved", "native-symbol-linkage-unverified", "target-feature-symbol-matrix-unverified"], stages: { generated: "all-five-target-projections", compiled: "pinned-header-and-adapter-object-tests", linked: "fake-provider-host-bridge-only", runtime: "fake-provider-sanitized-reentrancy-and-warmed", engine: "not-claimed-provider-absent" } });
+    rows.push({
+      id: shape.id,
+      projectionId: projected.projectionId,
+      symbol: shape.symbol,
+      disposition: "generated-provider-boundary",
+      bindingId: entry.id,
+      shape: shape.shape,
+      patternDecision: compactDmSdkPatternDecision(patternDecision),
+      resolvedPolicies: policy.storageContract,
+      engineProviderBlockers: [
+        "call-thread-affinity-unresolved",
+        "enum-domain-to-native-success-policy-unresolved",
+        "handle-provenance-lifetime-unresolved",
+        "native-symbol-linkage-unverified",
+        "target-feature-symbol-matrix-unverified",
+      ],
+      stages: {
+        generated: "all-five-target-projections",
+        compiled: "pinned-header-and-adapter-object-tests",
+        linked: "fake-provider-host-bridge-only",
+        runtime: "fake-provider-sanitized-reentrancy-and-warmed",
+        engine: "not-claimed-provider-absent",
+      },
+    });
   }
-  const handleNames = [...new Set(entries.flatMap(({ parameters }) => parameters.map(({ handleName: name }) => name).filter(Boolean)))].sort();
-  const handleKinds = new Map(handleNames.map((name, id) => [name, { id, name, representation: candidates.find((row) => row.parameters.some(({ role }) => handleName(role) === name)).parameters.find(({ role }) => handleName(role) === name).role.split(":").at(-1) }]));
+  const handleNames = [
+    ...new Set(entries.flatMap(({ parameters }) => parameters.map(({ handleName: name }) => name).filter(Boolean))),
+  ].sort();
+  const handleKinds = new Map(
+    handleNames.map((name, id) => [
+      name,
+      {
+        id,
+        name,
+        representation: candidates
+          .find((row) => row.parameters.some(({ role }) => handleName(role) === name))
+          .parameters.find(({ role }) => handleName(role) === name)
+          .role.split(":")
+          .at(-1),
+      },
+    ]),
+  );
   const maxParameters = Math.max(0, ...entries.map(({ parameters }) => parameters.length));
-  const maxOutputs = Math.max(0, ...entries.map(({ parameters }) => parameters.filter(({ direction }) => direction === "out" || direction === "inout").length));
-  const observedCoverage = { candidates: candidates.length, generated: entries.length, blocked: rows.length - entries.length };
+  const maxOutputs = Math.max(
+    0,
+    ...entries.map(
+      ({ parameters }) => parameters.filter(({ direction }) => direction === "out" || direction === "inout").length,
+    ),
+  );
+  const observedCoverage = {
+    candidates: candidates.length,
+    generated: entries.length,
+    blocked: rows.length - entries.length,
+  };
   const storageMaxParameters = Math.max(1, maxParameters);
   const names = makeFunctionNames(entries);
   if (new Set(names).size !== names.length) throw new Error("scratch scalar-out TypeScript names collide");
@@ -299,13 +460,45 @@ export async function build(overrides = {}) {
     defoldRevision: ir.defoldRevision,
     sources: paths,
     sourceHashes: Object.fromEntries(Object.entries(contents).map(([key, content]) => [key, sha256(content)])),
-    selector: "complete scratch-out-parameters partition using only result roles, parameter roles/directions, and platform family; no symbol allowlist",
-    policy: { ...policy.storageContract, ...policy.targetPolicy, evidenceBoundary: "generated and fake-provider tested; no dmSDK symbol link, real provider, or packaged-engine proof" },
-    universalFallback: { preserved: true, catalog: "packages/bindings/generated/defold-dmsdk-universal-bindings.json", mutation: "none" },
-    abi: { slotBytes: 8, maxParameters, maxOutputs, handleKindCount: handleKinds.size, parameterStorage: "caller-owned contiguous uint64_t slots", resultStorage: "caller-owned uint64_t slot" },
-    coverage: { ...observedCoverage, cAbiGenerated: entries.length, dynamicHermesJsiGenerated: entries.length, staticHermesGenerated: entries.length, browserDirectMemoryGenerated: entries.length, typescriptGenerated: entries.length, pinnedHeaderSignatureCompiled: entries.length, fakeProviderHostRuntimeTested: entries.length, packagedEngineRuntimeVerified: 0, warmedDispatchIterations: 100000, warmedDispatchObservedCppAllocations: 0 },
+    selector:
+      "complete scratch-out-parameters partition using only result roles, parameter roles/directions, and platform family; no symbol allowlist",
+    patternRegistry: patterns,
+    policy: {
+      ...policy.storageContract,
+      ...policy.targetPolicy,
+      evidenceBoundary:
+        "generated and fake-provider tested; no dmSDK symbol link, real provider, or packaged-engine proof",
+    },
+    universalFallback: {
+      preserved: true,
+      catalog: "packages/bindings/generated/defold-dmsdk-universal-bindings.json",
+      mutation: "none",
+    },
+    abi: {
+      slotBytes: 8,
+      maxParameters,
+      maxOutputs,
+      handleKindCount: handleKinds.size,
+      parameterStorage: "caller-owned contiguous uint64_t slots",
+      resultStorage: "caller-owned uint64_t slot",
+    },
+    coverage: {
+      ...observedCoverage,
+      cAbiGenerated: entries.length,
+      dynamicHermesJsiGenerated: entries.length,
+      staticHermesGenerated: entries.length,
+      browserDirectMemoryGenerated: entries.length,
+      typescriptGenerated: entries.length,
+      pinnedHeaderSignatureCompiled: entries.length,
+      fakeProviderHostRuntimeTested: entries.length,
+      packagedEngineRuntimeVerified: 0,
+      warmedDispatchIterations: 100000,
+      warmedDispatchObservedCppAllocations: 0,
+    },
     handleKinds: [...handleKinds.values()],
-    artifactHashes: Object.fromEntries([...generated].sort(([a], [b]) => a.localeCompare(b)).map(([path, content]) => [path, sha256(content)])),
+    artifactHashes: Object.fromEntries(
+      [...generated].sort(([a], [b]) => a.localeCompare(b)).map(([path, content]) => [path, sha256(content)]),
+    ),
     artifacts: [...generated.keys()].sort(),
     declarations: rows,
   };
@@ -316,7 +509,7 @@ export async function build(overrides = {}) {
 async function writeOrCheck(outputRoot, path, content, check) {
   const destination = resolve(outputRoot, path);
   if (check) {
-    if (await readFile(destination, "utf8") !== content) throw new Error(`${path} is stale`);
+    if ((await readFile(destination, "utf8")) !== content) throw new Error(`${path} is stale`);
     return;
   }
   await mkdir(dirname(destination), { recursive: true });
@@ -327,7 +520,9 @@ export async function run(argv = process.argv.slice(2)) {
   const options = parseArguments(argv);
   const result = await build();
   for (const [path, content] of result.artifacts) await writeOrCheck(options.outputRoot, path, content, options.check);
-  process.stdout.write(`${options.check ? "Verified" : "Generated"} ${result.report.coverage.generated}/${result.report.coverage.candidates} scratch scalar-out bindings; ${result.report.coverage.blocked} structurally blocked.\n`);
+  process.stdout.write(
+    `${options.check ? "Verified" : "Generated"} ${result.report.coverage.generated}/${result.report.coverage.candidates} scratch scalar-out bindings; ${result.report.coverage.blocked} structurally blocked.\n`,
+  );
   return result.report;
 }
 

@@ -32,6 +32,7 @@ export const dmSdkGeneratorSources = Object.freeze([
   "packages/compiler/src/preprocessor-conditions.mjs",
   "packages/compiler/src/dmsdk-call-symbol-index.mjs",
   "packages/compiler/src/dmsdk-concrete-call-plan.mjs",
+  "packages/compiler/src/dmsdk-pattern-selector.mjs",
   "packages/compiler/src/dmsdk-generated-adapter-corpus.mjs",
   "packages/compiler/src/dmsdk-universal-ready-corpus.mjs",
   "packages/compiler/src/dmsdk-universal-materializer-core.mjs",

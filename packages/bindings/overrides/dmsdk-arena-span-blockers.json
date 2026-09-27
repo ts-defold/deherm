@@ -6,7 +6,7 @@
   "priorWaveReports": [
     {
       "path": "packages/bindings/generated/defold-dmsdk-fixed-digest-bindings.json",
-      "policyVersion": "fixed-digest-v1"
+      "policyVersion": "fixed-digest-v2"
     },
     {
       "path": "packages/bindings/generated/defold-dmsdk-base64-span-bindings.json",

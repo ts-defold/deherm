@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "policyVersion": "fixed-digest-v1",
+  "policyVersion": "fixed-digest-v2",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "sources": {
     "ir": "packages/bindings/generated/defold-sdk-ir.json",
@@ -10,17 +10,90 @@
   "sourceHashes": {
     "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
-    "policy": "5931ce4592554bb38dc0ebc066d849a09b75e57ae13bd9710707706d937a4781",
+    "policy": "e52d77a21b4ed4a4d7033c89717cc0ca0ebd320938fa24f38b86c91ffe54574f",
     "headers": {
       "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h": "ae6dce231e90fbde3642399b52ed2299b3c8488632492b811af7a2dd38eff560"
     }
   },
+  "patternRegistry": [
+    {
+      "schemaVersion": 1,
+      "id": "span.fixed-output-digest",
+      "family": "fixed-digest",
+      "emitter": "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
+      "priority": 900,
+      "cost": 5,
+      "fallback": false,
+      "when": {
+        "declarationKinds": [
+          "function"
+        ],
+        "result": {
+          "roles": [
+            "scalar:void"
+          ]
+        },
+        "parameters": {
+          "count": {
+            "exact": 3
+          },
+          "positions": [
+            {
+              "roles": [
+                "pointer:scalar:u8"
+              ],
+              "directions": [
+                "in"
+              ]
+            },
+            {
+              "roles": [
+                "scalar:u32"
+              ],
+              "directions": [
+                "value"
+              ]
+            },
+            {
+              "roles": [
+                "pointer:scalar:u8"
+              ],
+              "directions": [
+                "inout",
+                "out"
+              ]
+            }
+          ]
+        },
+        "requireSemanticTokens": [
+          "fixed-output-byte-count",
+          "synchronous-noescape"
+        ]
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "id": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "priority": 0,
+      "cost": 1000,
+      "fallback": true,
+      "when": null
+    }
+  ],
   "policy": {
-    "candidateSelector": {
-      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
-      "symbolPrefix": "dmCrypt::Hash",
-      "shape": "scalar:void(in:pointer:scalar:u8,value:scalar:u32,inout:pointer:scalar:u8)",
-      "rationale": "A context-free byte span is read once and written to a fixed-size digest specified in the pinned header. No native pointer, handle, callback, record, allocator, or engine context crosses the ABI."
+    "pattern": "span.fixed-output-digest",
+    "documentationContract": {
+      "summaryPrefix": "Hash buffer using ",
+      "inputDescription": "The source data to hash",
+      "outputDescriptionPattern": "^The destination buffer \\(([1-9][0-9]*) bytes\\)$",
+      "inlineOutputPattern": "output is ([1-9][0-9]*) bytes",
+      "semantics": [
+        "fixed-output-byte-count",
+        "synchronous-noescape"
+      ],
+      "rationale": "The pinned public API documents a synchronous hash operation over a source byte span and a caller-owned destination buffer with an exact byte count. Selection uses ABI shape plus these structured documentation facts, never a header, symbol, prefix, or route allowlist."
     },
     "cAbi": "const uint8_t* plus uint32_t input length; caller-owned uint8_t* output plus validated uint32_t capacity",
     "ownership": "input is borrowed for the synchronous call; output is caller-owned; no native pointer escapes",
@@ -30,6 +103,7 @@
   },
   "coverage": {
     "baselineRuntimePending": 1361,
+    "structurallyEligible": 4,
     "discovered": 4,
     "emitted": 4,
     "policyBlocked": 0,
@@ -102,9 +176,14 @@
       "digestBytes": 16,
       "evidence": {
         "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
-        "line": 108,
-        "text": "    void HashMd5(const uint8_t* buf, uint32_t buflen, uint8_t* digest);       // output is 16 bytes"
+        "summary": "Hash buffer using MD5",
+        "input": "The source data to hash",
+        "output": "The destination buffer (16 bytes)",
+        "declaration": "void HashMd5(const uint8_t* buf, uint32_t buflen, uint8_t* digest);       // output is 16 bytes",
+        "documentationSource": "clang-comment-ast",
+        "declarationLine": 108
       },
+      "patternDecision": "span.fixed-output-digest",
       "stages": {
         "generated": "complete",
         "compiled": "packaged-sdk-object-test",
@@ -166,9 +245,14 @@
       "digestBytes": 20,
       "evidence": {
         "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
-        "line": 84,
-        "text": "    void HashSha1(const uint8_t* buf, uint32_t buflen, uint8_t* digest);      // output is 20 bytes"
+        "summary": "Hash buffer using SHA1",
+        "input": "The source data to hash",
+        "output": "The destination buffer (20 bytes)",
+        "declaration": "void HashSha1(const uint8_t* buf, uint32_t buflen, uint8_t* digest);      // output is 20 bytes",
+        "documentationSource": "clang-comment-ast",
+        "declarationLine": 84
       },
+      "patternDecision": "span.fixed-output-digest",
       "stages": {
         "generated": "complete",
         "compiled": "packaged-sdk-object-test",
@@ -230,9 +314,14 @@
       "digestBytes": 32,
       "evidence": {
         "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
-        "line": 92,
-        "text": "    void HashSha256(const uint8_t* buf, uint32_t buflen, uint8_t* digest);    // output is 32 bytes"
+        "summary": "Hash buffer using SHA256",
+        "input": "The source data to hash",
+        "output": "The destination buffer (32 bytes)",
+        "declaration": "void HashSha256(const uint8_t* buf, uint32_t buflen, uint8_t* digest);    // output is 32 bytes",
+        "documentationSource": "clang-comment-ast",
+        "declarationLine": 92
       },
+      "patternDecision": "span.fixed-output-digest",
       "stages": {
         "generated": "complete",
         "compiled": "packaged-sdk-object-test",
@@ -294,9 +383,14 @@
       "digestBytes": 64,
       "evidence": {
         "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
-        "line": 100,
-        "text": "    void HashSha512(const uint8_t* buf, uint32_t buflen, uint8_t* digest);    // output is 64 bytes"
+        "summary": "Hash buffer using SHA512",
+        "input": "The source data to hash",
+        "output": "The destination buffer (64 bytes)",
+        "declaration": "void HashSha512(const uint8_t* buf, uint32_t buflen, uint8_t* digest);    // output is 64 bytes",
+        "documentationSource": "clang-comment-ast",
+        "declarationLine": 100
       },
+      "patternDecision": "span.fixed-output-digest",
       "stages": {
         "generated": "complete",
         "compiled": "packaged-sdk-object-test",

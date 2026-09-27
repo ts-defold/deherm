@@ -10,10 +10,78 @@
   "sourceHashes": {
     "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
-    "projection": "8a6c5af275b7c1e648d6cea1290e6b62c218e64b7df490c64ef66aaca1bb5e9d",
+    "projection": "8786d8fbb1bb15c994eb1daa6766c90753ac0259d9aa1868295015797eca6ed8",
     "policy": "48b9913d92f5ccbc39f9136c7cd28430443066f2527d69cbbb3ffecf39198f73"
   },
   "selector": "all borrowed-handle-consumers are partitioned by ABI roles and platform family; no symbol allowlist",
+  "patternRegistry": [
+    {
+      "schemaVersion": 1,
+      "id": "handle.borrowed-provider-boundary",
+      "family": "borrowed-handle",
+      "emitter": "scripts/generate-dmsdk-borrowed-handle-bindings.mjs",
+      "priority": 700,
+      "cost": 20,
+      "fallback": false,
+      "when": {
+        "declarationKinds": [
+          "function"
+        ],
+        "result": {
+          "roles": [
+            "scalar:bool",
+            "scalar:f32",
+            "scalar:i32",
+            "scalar:u16",
+            "scalar:u32",
+            "scalar:u64",
+            "scalar:u8",
+            "scalar:void"
+          ]
+        },
+        "parameters": {
+          "every": [
+            {
+              "rolePrefixes": [
+                "handle:"
+              ]
+            },
+            {
+              "roles": [
+                "scalar:bool",
+                "scalar:f32",
+                "scalar:i32",
+                "scalar:u16",
+                "scalar:u32",
+                "scalar:u64",
+                "scalar:u8"
+              ]
+            }
+          ],
+          "some": [
+            {
+              "rolePrefixes": [
+                "handle:"
+              ]
+            }
+          ]
+        },
+        "rejectFamilies": [
+          "platform-gated"
+        ]
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "id": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "priority": 0,
+      "cost": 1000,
+      "fallback": true,
+      "when": null
+    }
+  ],
   "policy": {
     "ownership": "borrowed-only-no-transfer-no-release",
     "nullability": "zero-handle-rejected-before-provider",
@@ -326,7 +394,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "opaque-pointer(value:handle:HContextRegistry:opaque,value:scalar:u64)"
+      "shape": "opaque-pointer(value:handle:HContextRegistry:opaque,value:scalar:u64)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:ContextRegistrySetByHash@upstream/defold/engine/dlib/src/dmsdk/dlib/context_registry.h:58:150",
@@ -349,7 +418,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:i32(value:handle:HContextRegistry:opaque,value:scalar:u64,inout:opaque-pointer)"
+      "shape": "scalar:i32(value:handle:HContextRegistry:opaque,value:scalar:u64,inout:opaque-pointer)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmBuffer::Copy@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:194:91",
@@ -371,7 +441,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmBuffer::Result(value:handle:dmBuffer::HBuffer:u32,value:handle:dmBuffer::HBuffer:u32)"
+      "shape": "enum:dmBuffer::Result(value:handle:dmBuffer::HBuffer:u32,value:handle:dmBuffer::HBuffer:u32)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmBuffer::GetContentVersion@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:392:102",
@@ -396,7 +467,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmBuffer::Result(value:handle:dmBuffer::HBuffer:u32,inout:pointer:scalar:u32)"
+      "shape": "enum:dmBuffer::Result(value:handle:dmBuffer::HBuffer:u32,inout:pointer:scalar:u32)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmBuffer::GetStreamType@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:353:98",
@@ -422,7 +494,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmBuffer::Result(value:handle:dmBuffer::HBuffer:u32,value:scalar:u64,inout:pointer:enum:dmBuffer::ValueType,inout:pointer:scalar:u32)"
+      "shape": "enum:dmBuffer::Result(value:handle:dmBuffer::HBuffer:u32,value:scalar:u64,inout:pointer:enum:dmBuffer::ValueType,inout:pointer:scalar:u32)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmBuffer::IsBufferValid@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:227:93",
@@ -432,6 +505,7 @@
       "preferredLowering": false,
       "bindingId": 0,
       "shape": "scalar:bool(value:handle:dmBuffer::HBuffer:u32)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -474,7 +548,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmBuffer::Result(value:handle:dmBuffer::HBuffer:u32)"
+      "shape": "enum:dmBuffer::Result(value:handle:dmBuffer::HBuffer:u32)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmBuffer::ValidateBuffer@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:249:94",
@@ -496,7 +571,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmBuffer::Result(value:handle:dmBuffer::HBuffer:u32)"
+      "shape": "enum:dmBuffer::Result(value:handle:dmBuffer::HBuffer:u32)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmConditionVariable::Broadcast@upstream/defold/engine/dlib/src/dmsdk/dlib/condition_variable.h:91:112",
@@ -506,6 +582,7 @@
       "preferredLowering": false,
       "bindingId": 1,
       "shape": "scalar:void(value:handle:dmConditionVariable::HConditionVariable:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -536,6 +613,7 @@
       "preferredLowering": false,
       "bindingId": 2,
       "shape": "scalar:void(value:handle:dmConditionVariable::HConditionVariable:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -566,6 +644,7 @@
       "preferredLowering": false,
       "bindingId": 3,
       "shape": "scalar:void(value:handle:dmConditionVariable::HConditionVariable:opaque,value:handle:dmMutex::HMutex:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -596,6 +675,7 @@
       "preferredLowering": false,
       "bindingId": 4,
       "shape": "scalar:u32(value:handle:dmConnectionPool::HPool:opaque,value:handle:dmConnectionPool::HConnection:u32)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -626,6 +706,7 @@
       "preferredLowering": false,
       "bindingId": 5,
       "shape": "scalar:void(value:handle:dmConnectionPool::HPool:opaque,value:handle:dmConnectionPool::HConnection:u32)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -668,7 +749,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:u32(value:handle:dmConnectionPool::HPool:opaque,value:enum:dmSocket::ShutdownType)"
+      "shape": "scalar:u32(value:handle:dmConnectionPool::HPool:opaque,value:enum:dmSocket::ShutdownType)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameObject::AddDynamicResourceHash@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:899:1039",
@@ -678,6 +760,7 @@
       "preferredLowering": false,
       "bindingId": 6,
       "shape": "scalar:void(value:handle:dmGameObject::HCollection:opaque,value:scalar:u64)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -708,6 +791,7 @@
       "preferredLowering": false,
       "bindingId": 7,
       "shape": "scalar:void(value:scalar:u32,value:handle:dmGameObject::HInstance:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -750,7 +834,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "opaque-pointer(value:handle:dmGameObject::HComponentType:opaque)"
+      "shape": "opaque-pointer(value:handle:dmGameObject::HComponentType:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameObject::ComponentTypeGetTypeIndex@upstream/defold/engine/gameobject/src/dmsdk/gameobject/component.h:545:907",
@@ -760,6 +845,7 @@
       "preferredLowering": false,
       "bindingId": 8,
       "shape": "scalar:u32(value:handle:dmGameObject::HComponentType:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -803,7 +889,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmGameObject::HComponentType:opaque,inout:opaque-pointer)"
+      "shape": "scalar:void(value:handle:dmGameObject::HComponentType:opaque,inout:opaque-pointer)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameObject::ComponentTypeSetHasUserData@upstream/defold/engine/gameobject/src/dmsdk/gameobject/component.h:739:931",
@@ -813,6 +900,7 @@
       "preferredLowering": false,
       "bindingId": 9,
       "shape": "scalar:void(value:handle:dmGameObject::HComponentType:opaque,value:scalar:bool)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -843,6 +931,7 @@
       "preferredLowering": false,
       "bindingId": 10,
       "shape": "scalar:void(value:handle:dmGameObject::HComponentType:opaque,value:scalar:u16)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -873,6 +962,7 @@
       "preferredLowering": false,
       "bindingId": 11,
       "shape": "scalar:void(value:handle:dmGameObject::HComponentType:opaque,value:scalar:bool)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -903,6 +993,7 @@
       "preferredLowering": false,
       "bindingId": 12,
       "shape": "scalar:u32(value:handle:dmGameObject::HCollection:opaque,value:scalar:u64)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -945,7 +1036,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "opaque-pointer(value:handle:dmGameObject::HCollection:opaque,value:scalar:u32)"
+      "shape": "opaque-pointer(value:handle:dmGameObject::HCollection:opaque,value:scalar:u32)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameObject::GetGeneration@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:631:1009",
@@ -955,6 +1047,7 @@
       "preferredLowering": false,
       "bindingId": 13,
       "shape": "scalar:u32(value:handle:dmGameObject::HInstance:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -985,6 +1078,7 @@
       "preferredLowering": false,
       "bindingId": 14,
       "shape": "scalar:u64(value:handle:dmGameObject::HInstance:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -1029,7 +1123,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "unknown:dmVMath::Point3(value:handle:dmGameObject::HInstance:opaque)"
+      "shape": "unknown:dmVMath::Point3(value:handle:dmGameObject::HInstance:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameObject::GetPropertyOptionsCount@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:907:1040",
@@ -1039,6 +1134,7 @@
       "preferredLowering": false,
       "bindingId": 15,
       "shape": "scalar:u32(value:handle:dmGameObject::HPropertyOptions:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -1083,7 +1179,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "unknown:dmVMath::Quat(value:handle:dmGameObject::HInstance:opaque)"
+      "shape": "unknown:dmVMath::Quat(value:handle:dmGameObject::HInstance:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameObject::GetScale@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:758:1023",
@@ -1107,7 +1204,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "unknown:dmVMath::Vector3(value:handle:dmGameObject::HInstance:opaque)"
+      "shape": "unknown:dmVMath::Vector3(value:handle:dmGameObject::HInstance:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameObject::GetUniformScale@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:750:1022",
@@ -1117,6 +1215,7 @@
       "preferredLowering": false,
       "bindingId": 16,
       "shape": "scalar:f32(value:handle:dmGameObject::HInstance:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -1162,7 +1261,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "unknown:dmVMath::Matrix4(value:handle:dmGameObject::HInstance:opaque)"
+      "shape": "unknown:dmVMath::Matrix4(value:handle:dmGameObject::HInstance:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameObject::GetWorldPosition@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:766:1024",
@@ -1186,7 +1286,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "unknown:dmVMath::Point3(value:handle:dmGameObject::HInstance:opaque)"
+      "shape": "unknown:dmVMath::Point3(value:handle:dmGameObject::HInstance:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameObject::GetWorldRotation@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:774:1025",
@@ -1210,7 +1311,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "unknown:dmVMath::Quat(value:handle:dmGameObject::HInstance:opaque)"
+      "shape": "unknown:dmVMath::Quat(value:handle:dmGameObject::HInstance:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameObject::GetWorldScale@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:782:1026",
@@ -1234,7 +1336,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "unknown:dmVMath::Vector3(value:handle:dmGameObject::HInstance:opaque)"
+      "shape": "unknown:dmVMath::Vector3(value:handle:dmGameObject::HInstance:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameObject::GetWorldUniformScale@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:790:1027",
@@ -1244,6 +1347,7 @@
       "preferredLowering": false,
       "bindingId": 17,
       "shape": "scalar:f32(value:handle:dmGameObject::HInstance:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -1274,6 +1378,7 @@
       "preferredLowering": false,
       "bindingId": 18,
       "shape": "scalar:bool(value:handle:dmGameObject::HInstance:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -1304,6 +1409,7 @@
       "preferredLowering": false,
       "bindingId": 19,
       "shape": "scalar:void(value:handle:dmGameObject::HPropertyContainer:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -1334,6 +1440,7 @@
       "preferredLowering": false,
       "bindingId": 20,
       "shape": "scalar:void(value:handle:dmGameObject::HPropertyContainerBuilder:opaque,value:scalar:u64,value:scalar:bool)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -1364,6 +1471,7 @@
       "preferredLowering": false,
       "bindingId": 21,
       "shape": "scalar:void(value:handle:dmGameObject::HPropertyContainerBuilder:opaque,value:scalar:u64,value:scalar:f32)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -1394,6 +1502,7 @@
       "preferredLowering": false,
       "bindingId": 22,
       "shape": "scalar:void(value:handle:dmGameObject::HPropertyContainerBuilder:opaque,value:scalar:u64,value:scalar:u64)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -1436,7 +1545,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmGameObject::HPropertyContainerBuilder:opaque,value:scalar:u64,in:pointer:scalar:f32)"
+      "shape": "scalar:void(value:handle:dmGameObject::HPropertyContainerBuilder:opaque,value:scalar:u64,in:pointer:scalar:f32)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameObject::PropertyContainerPushVector3@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject_props.h:110:1087",
@@ -1458,7 +1568,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmGameObject::HPropertyContainerBuilder:opaque,value:scalar:u64,in:pointer:scalar:f32)"
+      "shape": "scalar:void(value:handle:dmGameObject::HPropertyContainerBuilder:opaque,value:scalar:u64,in:pointer:scalar:f32)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameObject::PropertyContainerPushVector4@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject_props.h:119:1088",
@@ -1480,7 +1591,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmGameObject::HPropertyContainerBuilder:opaque,value:scalar:u64,in:pointer:scalar:f32)"
+      "shape": "scalar:void(value:handle:dmGameObject::HPropertyContainerBuilder:opaque,value:scalar:u64,in:pointer:scalar:f32)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameObject::SetBone@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:816:1030",
@@ -1490,6 +1602,7 @@
       "preferredLowering": false,
       "bindingId": 23,
       "shape": "scalar:void(value:handle:dmGameObject::HInstance:opaque,value:scalar:bool)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -1532,7 +1645,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmGameObject::Result(value:handle:dmGameObject::HCollection:opaque,value:handle:dmGameObject::HInstance:opaque,value:scalar:u64)"
+      "shape": "enum:dmGameObject::Result(value:handle:dmGameObject::HCollection:opaque,value:handle:dmGameObject::HInstance:opaque,value:scalar:u64)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameObject::SetParent@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:854:1034",
@@ -1554,7 +1668,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmGameObject::Result(value:handle:dmGameObject::HInstance:opaque,value:handle:dmGameObject::HInstance:opaque)"
+      "shape": "enum:dmGameObject::Result(value:handle:dmGameObject::HInstance:opaque,value:handle:dmGameObject::HInstance:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameObject::SetPosition@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:693:1015",
@@ -1578,7 +1693,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmGameObject::HInstance:opaque,value:unknown:dmVMath::Point3)"
+      "shape": "scalar:void(value:handle:dmGameObject::HInstance:opaque,value:unknown:dmVMath::Point3)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameObject::SetPropertyFromBool@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:1093:1057",
@@ -1600,7 +1716,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,value:scalar:bool)"
+      "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,value:scalar:bool)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameObject::SetPropertyFromFloat@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:1049:1053",
@@ -1622,7 +1739,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,value:scalar:f32)"
+      "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,value:scalar:f32)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameObject::SetPropertyFromHash@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:1038:1052",
@@ -1644,7 +1762,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,value:scalar:u64)"
+      "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,value:scalar:u64)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameObject::SetPropertyFromMatrix4@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:1127:1060",
@@ -1671,7 +1790,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,in:unknown:dmVMath::Matrix4)"
+      "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,in:unknown:dmVMath::Matrix4)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameObject::SetPropertyFromQuat@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:1082:1056",
@@ -1697,7 +1817,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,value:unknown:dmVMath::Quat)"
+      "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,value:unknown:dmVMath::Quat)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameObject::SetPropertyFromVector3@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:1060:1054",
@@ -1723,7 +1844,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,value:unknown:dmVMath::Vector3)"
+      "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,value:unknown:dmVMath::Vector3)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameObject::SetPropertyFromVector4@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:1071:1055",
@@ -1749,7 +1871,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,value:unknown:dmVMath::Vector4)"
+      "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,value:unknown:dmVMath::Vector4)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameObject::SetRotation@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:709:1017",
@@ -1773,7 +1896,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmGameObject::HInstance:opaque,value:unknown:dmVMath::Quat)"
+      "shape": "scalar:void(value:handle:dmGameObject::HInstance:opaque,value:unknown:dmVMath::Quat)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameObject::SetScale@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:725:1019",
@@ -1783,6 +1907,7 @@
       "preferredLowering": false,
       "bindingId": 24,
       "shape": "scalar:void(value:handle:dmGameObject::HInstance:opaque,value:scalar:f32)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -1827,7 +1952,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmGameObject::HInstance:opaque,value:unknown:dmVMath::Vector3)"
+      "shape": "scalar:void(value:handle:dmGameObject::HInstance:opaque,value:unknown:dmVMath::Vector3)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameObject::SetScaleXY@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:742:1021",
@@ -1837,6 +1963,7 @@
       "preferredLowering": false,
       "bindingId": 25,
       "shape": "scalar:void(value:handle:dmGameObject::HInstance:opaque,value:scalar:f32,value:scalar:f32)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -1881,7 +2008,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:bool(value:handle:dmGameObject::HRegister:opaque,inout:pointer:record:dmGameObject::SceneNode)"
+      "shape": "scalar:bool(value:handle:dmGameObject::HRegister:opaque,inout:pointer:record:dmGameObject::SceneNode)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameSystem::AreRenderConstantsUpdated@upstream/defold/engine/gamesys/src/dmsdk/gamesys/render_constants.h:146:1208",
@@ -1891,6 +2019,7 @@
       "preferredLowering": false,
       "bindingId": 26,
       "shape": "scalar:i32(value:handle:dmGameSystem::HComponentRenderConstants:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -1921,6 +2050,7 @@
       "preferredLowering": false,
       "bindingId": 27,
       "shape": "scalar:i32(value:handle:dmGameSystem::HComponentRenderConstants:opaque,value:scalar:u64)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -1963,7 +2093,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmGameObject::Result(value:handle:dmGameSystem::HCollectionProxyWorld:opaque,value:handle:dmGameSystem::HCollectionProxyComponent:opaque)"
+      "shape": "enum:dmGameObject::Result(value:handle:dmGameSystem::HCollectionProxyWorld:opaque,value:handle:dmGameSystem::HCollectionProxyComponent:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameSystem::CompCollectionProxyEnable@upstream/defold/engine/gamesys/src/dmsdk/gamesys/components/comp_collection_proxy.h:37:1127",
@@ -1985,7 +2116,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmGameObject::Result(value:handle:dmGameSystem::HCollectionProxyWorld:opaque,value:handle:dmGameSystem::HCollectionProxyComponent:opaque)"
+      "shape": "enum:dmGameObject::Result(value:handle:dmGameSystem::HCollectionProxyWorld:opaque,value:handle:dmGameSystem::HCollectionProxyComponent:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameSystem::CompCollectionProxyFinalize@upstream/defold/engine/gamesys/src/dmsdk/gamesys/components/comp_collection_proxy.h:35:1126",
@@ -2007,7 +2139,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmGameObject::Result(value:handle:dmGameSystem::HCollectionProxyWorld:opaque,value:handle:dmGameSystem::HCollectionProxyComponent:opaque)"
+      "shape": "enum:dmGameObject::Result(value:handle:dmGameSystem::HCollectionProxyWorld:opaque,value:handle:dmGameSystem::HCollectionProxyComponent:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameSystem::CompCollectionProxyInitialize@upstream/defold/engine/gamesys/src/dmsdk/gamesys/components/comp_collection_proxy.h:33:1125",
@@ -2029,7 +2162,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmGameObject::Result(value:handle:dmGameSystem::HCollectionProxyWorld:opaque,value:handle:dmGameSystem::HCollectionProxyComponent:opaque)"
+      "shape": "enum:dmGameObject::Result(value:handle:dmGameSystem::HCollectionProxyWorld:opaque,value:handle:dmGameSystem::HCollectionProxyComponent:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameSystem::CompCollectionProxySetTimeStep@upstream/defold/engine/gamesys/src/dmsdk/gamesys/components/comp_collection_proxy.h:44:1129",
@@ -2051,7 +2185,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmGameObject::Result(value:handle:dmGameSystem::HCollectionProxyWorld:opaque,value:handle:dmGameSystem::HCollectionProxyComponent:opaque,value:scalar:f32,value:scalar:i32)"
+      "shape": "enum:dmGameObject::Result(value:handle:dmGameSystem::HCollectionProxyWorld:opaque,value:handle:dmGameSystem::HCollectionProxyComponent:opaque,value:scalar:f32,value:scalar:i32)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameSystem::CompFactoryGetStatus@upstream/defold/engine/gamesys/src/dmsdk/gamesys/components/comp_factory.h:54:1137",
@@ -2073,7 +2208,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmGameSystem::CompFactoryStatus(value:handle:dmGameSystem::HFactoryWorld:opaque,value:handle:dmGameSystem::HFactoryComponent:opaque)"
+      "shape": "enum:dmGameSystem::CompFactoryStatus(value:handle:dmGameSystem::HFactoryWorld:opaque,value:handle:dmGameSystem::HFactoryComponent:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameSystem::CompFactoryIsDynamicPrototype@upstream/defold/engine/gamesys/src/dmsdk/gamesys/components/comp_factory.h:56:1139",
@@ -2083,6 +2219,7 @@
       "preferredLowering": false,
       "bindingId": 28,
       "shape": "scalar:bool(value:handle:dmGameSystem::HFactoryWorld:opaque,value:handle:dmGameSystem::HFactoryComponent:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -2113,6 +2250,7 @@
       "preferredLowering": false,
       "bindingId": 29,
       "shape": "scalar:bool(value:handle:dmGameSystem::HFactoryWorld:opaque,value:handle:dmGameSystem::HFactoryComponent:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -2157,7 +2295,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(inout:pointer:record:dmRender::RenderObject,value:handle:dmGameSystem::HComponentRenderConstants:opaque)"
+      "shape": "scalar:void(inout:pointer:record:dmRender::RenderObject,value:handle:dmGameSystem::HComponentRenderConstants:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameSystem::GetRenderConstantCount@upstream/defold/engine/gamesys/src/dmsdk/gamesys/render_constants.h:90:1202",
@@ -2167,6 +2306,7 @@
       "preferredLowering": false,
       "bindingId": 30,
       "shape": "scalar:u32(value:handle:dmGameSystem::HComponentRenderConstants:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -2211,7 +2351,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmGameSystem::HComponentRenderConstants:opaque,inout:pointer:record:HashState32)"
+      "shape": "scalar:void(value:handle:dmGameSystem::HComponentRenderConstants:opaque,inout:pointer:record:HashState32)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameSystem::ResCollectionFactoryDestroyResource@upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_collection_factory.h:41:1220",
@@ -2235,7 +2376,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmResource::HFactory:opaque,inout:pointer:record:dmGameSystem::CollectionFactoryResource)"
+      "shape": "scalar:void(value:handle:dmResource::HFactory:opaque,inout:pointer:record:dmGameSystem::CollectionFactoryResource)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameSystem::ResFactoryDestroyResource@upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_factory.h:38:1236",
@@ -2259,7 +2401,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmResource::HFactory:opaque,inout:pointer:record:dmGameSystem::FactoryResource)"
+      "shape": "scalar:void(value:handle:dmResource::HFactory:opaque,inout:pointer:record:dmGameSystem::FactoryResource)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameSystem::ResFontAddFontByPathHash@upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_font.h:183:1252",
@@ -2285,7 +2428,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,inout:pointer:record:dmGameSystem::FontResource,value:scalar:u64)"
+      "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,inout:pointer:record:dmGameSystem::FontResource,value:scalar:u64)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameSystem::ResFontAddGlyph@upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_font.h:163:1250",
@@ -2312,7 +2456,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmResource::Result(inout:pointer:record:dmGameSystem::FontResource,value:handle:HFont:opaque,inout:pointer:record:FontGlyph)"
+      "shape": "enum:dmResource::Result(inout:pointer:record:dmGameSystem::FontResource,value:handle:HFont:opaque,inout:pointer:record:FontGlyph)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameSystem::ResFontGetPathHashFromFont@upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_font.h:128:1246",
@@ -2336,7 +2481,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:u64(inout:pointer:record:dmGameSystem::FontResource,value:handle:HFont:opaque)"
+      "shape": "scalar:u64(inout:pointer:record:dmGameSystem::FontResource,value:handle:HFont:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameSystem::ResFontGetTTFResourceFromFont@upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_font.h:120:1245",
@@ -2361,7 +2507,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "pointer:record:dmGameSystem::TTFResource(inout:pointer:record:dmGameSystem::FontResource,value:handle:HFont:opaque)"
+      "shape": "pointer:record:dmGameSystem::TTFResource(inout:pointer:record:dmGameSystem::FontResource,value:handle:HFont:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameSystem::ResFontIsGlyphIndexCached@upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_font.h:154:1249",
@@ -2385,7 +2532,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:bool(inout:pointer:record:dmGameSystem::FontResource,value:handle:HFont:opaque,value:scalar:u32)"
+      "shape": "scalar:bool(inout:pointer:record:dmGameSystem::FontResource,value:handle:HFont:opaque,value:scalar:u32)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameSystem::ResFontRemoveFont@upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_font.h:192:1253",
@@ -2411,7 +2559,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,inout:pointer:record:dmGameSystem::FontResource,value:scalar:u64)"
+      "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,inout:pointer:record:dmGameSystem::FontResource,value:scalar:u64)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameSystem::SetRenderConstant@upstream/defold/engine/gamesys/src/dmsdk/gamesys/render_constants.h:121:1205",
@@ -2435,7 +2584,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmGameSystem::HComponentRenderConstants:opaque,value:scalar:u64,inout:pointer:unknown:dmVMath::Vector4,value:scalar:u32)"
+      "shape": "scalar:void(value:handle:dmGameSystem::HComponentRenderConstants:opaque,value:scalar:u64,inout:pointer:unknown:dmVMath::Vector4,value:scalar:u32)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGraphics::AddVertexStream@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:952:1375",
@@ -2457,7 +2607,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmGraphics::HVertexStreamDeclaration:opaque,value:scalar:u64,value:scalar:u32,value:enum:dmGraphics::Type,value:scalar:bool)"
+      "shape": "scalar:void(value:handle:dmGraphics::HVertexStreamDeclaration:opaque,value:scalar:u64,value:scalar:u32,value:enum:dmGraphics::Type,value:scalar:bool)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGraphics::BeginFrame@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1731:1457",
@@ -2467,6 +2618,7 @@
       "preferredLowering": false,
       "bindingId": 31,
       "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -2497,6 +2649,7 @@
       "preferredLowering": false,
       "bindingId": 32,
       "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:scalar:u32,value:scalar:u8,value:scalar:u8,value:scalar:u8,value:scalar:u8,value:scalar:f32,value:scalar:u32)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -2527,6 +2680,7 @@
       "preferredLowering": false,
       "bindingId": 33,
       "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -2569,7 +2723,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::State)"
+      "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::State)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGraphics::DisableTexture@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1372:1418",
@@ -2579,6 +2734,7 @@
       "preferredLowering": false,
       "bindingId": 34,
       "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:scalar:u32,value:handle:dmGraphics::HTexture:u64)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -2609,6 +2765,7 @@
       "preferredLowering": false,
       "bindingId": 35,
       "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HVertexBuffer:usize)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -2639,6 +2796,7 @@
       "preferredLowering": false,
       "bindingId": 36,
       "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HVertexDeclaration:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -2681,7 +2839,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::PrimitiveType,value:scalar:u32,value:scalar:u32,value:scalar:u32)"
+      "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::PrimitiveType,value:scalar:u32,value:scalar:u32,value:scalar:u32)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGraphics::DrawElements@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1888:1470",
@@ -2704,7 +2863,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::PrimitiveType,value:scalar:u32,value:scalar:u32,value:enum:dmGraphics::Type,value:handle:dmGraphics::HIndexBuffer:usize,value:scalar:u32)"
+      "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::PrimitiveType,value:scalar:u32,value:scalar:u32,value:enum:dmGraphics::Type,value:handle:dmGraphics::HIndexBuffer:usize,value:scalar:u32)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGraphics::EnableProgram@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1798:1463",
@@ -2714,6 +2874,7 @@
       "preferredLowering": false,
       "bindingId": 37,
       "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HProgram:usize)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -2756,7 +2917,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::State)"
+      "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::State)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGraphics::EnableTexture@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1358:1417",
@@ -2766,6 +2928,7 @@
       "preferredLowering": false,
       "bindingId": 38,
       "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:scalar:u32,value:scalar:u8,value:handle:dmGraphics::HTexture:u64)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -2796,6 +2959,7 @@
       "preferredLowering": false,
       "bindingId": 39,
       "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HVertexBuffer:usize,value:scalar:u32)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -2826,6 +2990,7 @@
       "preferredLowering": false,
       "bindingId": 40,
       "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HVertexDeclaration:opaque,value:scalar:u32,value:scalar:u32,value:handle:dmGraphics::HProgram:usize)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -2856,6 +3021,7 @@
       "preferredLowering": false,
       "bindingId": 41,
       "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -2886,6 +3052,7 @@
       "preferredLowering": false,
       "bindingId": 42,
       "shape": "scalar:f32(value:handle:dmGraphics::HContext:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -2916,6 +3083,7 @@
       "preferredLowering": false,
       "bindingId": 43,
       "shape": "scalar:u32(value:handle:dmGraphics::HContext:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -2946,6 +3114,7 @@
       "preferredLowering": false,
       "bindingId": 44,
       "shape": "scalar:u32(value:handle:dmGraphics::HContext:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -2976,6 +3145,7 @@
       "preferredLowering": false,
       "bindingId": 45,
       "shape": "scalar:u32(value:handle:dmGraphics::HContext:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -3006,6 +3176,7 @@
       "preferredLowering": false,
       "bindingId": 46,
       "shape": "scalar:u32(value:handle:dmGraphics::HContext:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -3036,6 +3207,7 @@
       "preferredLowering": false,
       "bindingId": 47,
       "shape": "scalar:u32(value:handle:dmGraphics::HContext:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -3066,6 +3238,7 @@
       "preferredLowering": false,
       "bindingId": 48,
       "shape": "scalar:u8(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -3096,6 +3269,7 @@
       "preferredLowering": false,
       "bindingId": 49,
       "shape": "scalar:u16(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -3126,6 +3300,7 @@
       "preferredLowering": false,
       "bindingId": 50,
       "shape": "scalar:u16(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -3156,6 +3331,7 @@
       "preferredLowering": false,
       "bindingId": 51,
       "shape": "scalar:u32(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HRenderTarget:u64)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -3186,6 +3362,7 @@
       "preferredLowering": false,
       "bindingId": 52,
       "shape": "scalar:u16(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -3216,6 +3393,7 @@
       "preferredLowering": false,
       "bindingId": 53,
       "shape": "scalar:u16(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -3246,6 +3424,7 @@
       "preferredLowering": false,
       "bindingId": 54,
       "shape": "scalar:u8(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -3276,6 +3455,7 @@
       "preferredLowering": false,
       "bindingId": 55,
       "shape": "scalar:u32(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -3306,6 +3486,7 @@
       "preferredLowering": false,
       "bindingId": 56,
       "shape": "scalar:u32(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -3348,7 +3529,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmGraphics::TextureType(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)"
+      "shape": "enum:dmGraphics::TextureType(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGraphics::GetTextureUsageHintFlags@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1332:1415",
@@ -3358,6 +3540,7 @@
       "preferredLowering": false,
       "bindingId": 57,
       "shape": "scalar:u32(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -3388,6 +3571,7 @@
       "preferredLowering": false,
       "bindingId": 58,
       "shape": "scalar:u16(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -3418,6 +3602,7 @@
       "preferredLowering": false,
       "bindingId": 59,
       "shape": "scalar:u32(value:handle:dmGraphics::HVertexDeclaration:opaque,value:scalar:u64)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -3448,6 +3633,7 @@
       "preferredLowering": false,
       "bindingId": 60,
       "shape": "scalar:u32(value:handle:dmGraphics::HContext:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -3478,6 +3664,7 @@
       "preferredLowering": false,
       "bindingId": 61,
       "shape": "scalar:u32(value:handle:dmGraphics::HContext:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -3508,6 +3695,7 @@
       "preferredLowering": false,
       "bindingId": 62,
       "shape": "scalar:u32(value:handle:dmGraphics::HContext:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -3550,7 +3738,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:bool(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::IndexBufferFormat)"
+      "shape": "scalar:bool(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::IndexBufferFormat)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGraphics::IsTextureFormatSupported@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1113:1393",
@@ -3572,7 +3761,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:bool(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::TextureFormat)"
+      "shape": "scalar:bool(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::TextureFormat)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGraphics::SetBlendEquationSeparate@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1515:1435",
@@ -3595,7 +3785,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::BlendEquation,value:enum:dmGraphics::BlendEquation)"
+      "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::BlendEquation,value:enum:dmGraphics::BlendEquation)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGraphics::SetBlendFunc@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1495:1433",
@@ -3618,7 +3809,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::BlendFactor,value:enum:dmGraphics::BlendFactor)"
+      "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::BlendFactor,value:enum:dmGraphics::BlendFactor)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGraphics::SetBlendFuncSeparate@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1506:1434",
@@ -3643,7 +3835,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::BlendFactor,value:enum:dmGraphics::BlendFactor,value:enum:dmGraphics::BlendFactor,value:enum:dmGraphics::BlendFactor)"
+      "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::BlendFactor,value:enum:dmGraphics::BlendFactor,value:enum:dmGraphics::BlendFactor,value:enum:dmGraphics::BlendFactor)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGraphics::SetColorMask@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1525:1436",
@@ -3653,6 +3846,7 @@
       "preferredLowering": false,
       "bindingId": 63,
       "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:scalar:bool,value:scalar:bool,value:scalar:bool,value:scalar:bool)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -3695,7 +3889,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::FaceType)"
+      "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::FaceType)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGraphics::SetDepthFunc@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1539:1438",
@@ -3717,7 +3912,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::CompareFunc)"
+      "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::CompareFunc)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGraphics::SetDepthMask@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1532:1437",
@@ -3727,6 +3923,7 @@
       "preferredLowering": false,
       "bindingId": 64,
       "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:scalar:bool)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -3757,6 +3954,7 @@
       "preferredLowering": false,
       "bindingId": 65,
       "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HRenderTarget:u64,value:scalar:u32)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -3787,6 +3985,7 @@
       "preferredLowering": false,
       "bindingId": 66,
       "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HRenderTarget:u64,value:scalar:u32,value:scalar:u32)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -3817,6 +4016,7 @@
       "preferredLowering": false,
       "bindingId": 67,
       "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HUniformLocation:i64,value:scalar:i32)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -3847,6 +4047,7 @@
       "preferredLowering": false,
       "bindingId": 68,
       "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:scalar:i32,value:scalar:i32,value:scalar:i32,value:scalar:i32)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -3889,7 +4090,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::CompareFunc,value:scalar:u32,value:scalar:u32)"
+      "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::CompareFunc,value:scalar:u32,value:scalar:u32)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGraphics::SetStencilFuncSeparate@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1454:1428",
@@ -3912,7 +4114,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::FaceType,value:enum:dmGraphics::CompareFunc,value:scalar:u32,value:scalar:u32)"
+      "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::FaceType,value:enum:dmGraphics::CompareFunc,value:scalar:u32,value:scalar:u32)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGraphics::SetStencilMask@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1435:1426",
@@ -3922,6 +4125,7 @@
       "preferredLowering": false,
       "bindingId": 69,
       "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:scalar:u32)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -3966,7 +4170,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::StencilOp,value:enum:dmGraphics::StencilOp,value:enum:dmGraphics::StencilOp)"
+      "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::StencilOp,value:enum:dmGraphics::StencilOp,value:enum:dmGraphics::StencilOp)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGraphics::SetStencilOpSeparate@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1473:1430",
@@ -3991,7 +4196,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::FaceType,value:enum:dmGraphics::StencilOp,value:enum:dmGraphics::StencilOp,value:enum:dmGraphics::StencilOp)"
+      "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::FaceType,value:enum:dmGraphics::StencilOp,value:enum:dmGraphics::StencilOp,value:enum:dmGraphics::StencilOp)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGraphics::SetTextureParams@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1221:1404",
@@ -4017,7 +4223,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64,value:enum:dmGraphics::TextureFilter,value:enum:dmGraphics::TextureFilter,value:enum:dmGraphics::TextureWrap,value:enum:dmGraphics::TextureWrap,value:enum:dmGraphics::TextureWrap,value:scalar:f32)"
+      "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64,value:enum:dmGraphics::TextureFilter,value:enum:dmGraphics::TextureFilter,value:enum:dmGraphics::TextureWrap,value:enum:dmGraphics::TextureWrap,value:enum:dmGraphics::TextureWrap,value:scalar:f32)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGraphics::SetTextureParams@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1235:1405",
@@ -4042,7 +4249,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64,value:enum:dmGraphics::TextureFilter,value:enum:dmGraphics::TextureFilter,value:enum:dmGraphics::TextureWrap,value:enum:dmGraphics::TextureWrap,value:scalar:f32)"
+      "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64,value:enum:dmGraphics::TextureFilter,value:enum:dmGraphics::TextureFilter,value:enum:dmGraphics::TextureWrap,value:enum:dmGraphics::TextureWrap,value:scalar:f32)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGraphics::SetViewport@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1773:1461",
@@ -4052,6 +4260,7 @@
       "preferredLowering": false,
       "bindingId": 70,
       "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:scalar:i32,value:scalar:i32,value:scalar:i32,value:scalar:i32)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -4096,7 +4305,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "unknown:VkCommandBuffer(value:handle:dmGraphics::HContext:opaque)"
+      "shape": "unknown:VkCommandBuffer(value:handle:dmGraphics::HContext:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGraphics::VulkanGetDevice@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:75:1509",
@@ -4120,7 +4330,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "unknown:VkDevice(value:handle:dmGraphics::HContext:opaque)"
+      "shape": "unknown:VkDevice(value:handle:dmGraphics::HContext:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGraphics::VulkanGetGraphicsQueue@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:107:1513",
@@ -4144,7 +4355,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "unknown:VkQueue(value:handle:dmGraphics::HContext:opaque)"
+      "shape": "unknown:VkQueue(value:handle:dmGraphics::HContext:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGraphics::VulkanGetGraphicsQueueFamily@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:99:1512",
@@ -4165,7 +4377,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:u16(value:handle:dmGraphics::HContext:opaque)"
+      "shape": "scalar:u16(value:handle:dmGraphics::HContext:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGraphics::VulkanGetImage@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:133:1516",
@@ -4189,7 +4402,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "unknown:VkImage(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)"
+      "shape": "unknown:VkImage(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGraphics::VulkanGetImageView@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:143:1517",
@@ -4213,7 +4427,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "unknown:VkImageView(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)"
+      "shape": "unknown:VkImageView(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGraphics::VulkanGetInstance@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:91:1511",
@@ -4237,7 +4452,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "unknown:VkInstance(value:handle:dmGraphics::HContext:opaque)"
+      "shape": "unknown:VkInstance(value:handle:dmGraphics::HContext:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGraphics::VulkanGetPhysicalDevice@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:83:1510",
@@ -4261,7 +4477,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "unknown:VkPhysicalDevice(value:handle:dmGraphics::HContext:opaque)"
+      "shape": "unknown:VkPhysicalDevice(value:handle:dmGraphics::HContext:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGraphics::VulkanGetRenderPass@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:115:1514",
@@ -4285,7 +4502,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "unknown:VkRenderPass(value:handle:dmGraphics::HContext:opaque)"
+      "shape": "unknown:VkRenderPass(value:handle:dmGraphics::HContext:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGraphics::VulkanGraphicsCommandQueueToMetal@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:67:1508",
@@ -4308,7 +4526,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "opaque-pointer(value:handle:dmGraphics::HContext:opaque)"
+      "shape": "opaque-pointer(value:handle:dmGraphics::HContext:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGraphics::VulkanTextureToMetal@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:59:1507",
@@ -4331,7 +4550,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "opaque-pointer(value:handle:dmGraphics::HContext:opaque,in:handle:dmGraphics::HTexture:u64)"
+      "shape": "opaque-pointer(value:handle:dmGraphics::HContext:opaque,in:handle:dmGraphics::HTexture:u64)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGraphics::WebGPUGetActiveCommandEncoder@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:57:1534",
@@ -4353,7 +4573,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque)"
+      "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGraphics::WebGPUGetAdapter@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:51:1528",
@@ -4375,7 +4596,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque)"
+      "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGraphics::WebGPUGetDevice@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:52:1529",
@@ -4397,7 +4619,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque)"
+      "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGraphics::WebGPUGetInstance@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:50:1527",
@@ -4419,7 +4642,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque)"
+      "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGraphics::WebGPUGetQueue@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:53:1530",
@@ -4441,7 +4665,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque)"
+      "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGraphics::WebGPUGetTexture@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:55:1532",
@@ -4463,7 +4688,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)"
+      "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGraphics::WebGPUGetTextureView@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:54:1531",
@@ -4485,7 +4711,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)"
+      "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGraphics::WebGPURenderPassBegin@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:60:1536",
@@ -4506,7 +4733,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque)"
+      "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGraphics::WebGPURenderPassEnd@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:59:1535",
@@ -4527,7 +4755,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque)"
+      "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGui::GetNodeCustomData@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:437:1571",
@@ -4549,7 +4778,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "opaque-pointer(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32)"
+      "shape": "opaque-pointer(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGui::GetNodeCustomType@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:429:1570",
@@ -4559,6 +4789,7 @@
       "preferredLowering": false,
       "bindingId": 71,
       "shape": "scalar:u32(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -4589,6 +4820,7 @@
       "preferredLowering": false,
       "bindingId": 72,
       "shape": "scalar:u64(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -4619,6 +4851,7 @@
       "preferredLowering": false,
       "bindingId": 73,
       "shape": "scalar:bool(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -4665,7 +4898,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "unknown:dmVMath::Vector4(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32,value:enum:dmGui::Property)"
+      "shape": "unknown:dmVMath::Vector4(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32,value:enum:dmGui::Property)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGui::GetNodeTextureId@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:445:1572",
@@ -4675,6 +4909,7 @@
       "preferredLowering": false,
       "bindingId": 74,
       "shape": "scalar:u64(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -4717,7 +4952,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "opaque-pointer(value:handle:dmGui::HScene:opaque,value:scalar:u64,value:scalar:u64)"
+      "shape": "opaque-pointer(value:handle:dmGui::HScene:opaque,value:scalar:u64,value:scalar:u64)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGui::LuaPushNode@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:485:1576",
@@ -4741,7 +4977,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(inout:pointer:record:lua_State,value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32)"
+      "shape": "scalar:void(inout:pointer:record:lua_State,value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGui::SetNodeAdjustMode@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:421:1569",
@@ -4763,7 +5000,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32,value:enum:dmGui::AdjustMode)"
+      "shape": "scalar:void(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32,value:enum:dmGui::AdjustMode)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGui::SetNodeCustomProperty@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:396:1567",
@@ -4788,7 +5026,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmGui::Result(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32,value:scalar:u64,in:pointer:record:dmGui::CustomProperty)"
+      "shape": "enum:dmGui::Result(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32,value:scalar:u64,in:pointer:record:dmGui::CustomProperty)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGui::SetNodeId@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:252:1555",
@@ -4798,6 +5037,7 @@
       "preferredLowering": false,
       "bindingId": 75,
       "shape": "scalar:void(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32,value:scalar:u64)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -4828,6 +5068,7 @@
       "preferredLowering": false,
       "bindingId": 76,
       "shape": "scalar:void(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32,value:scalar:bool)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -4870,7 +5111,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmGui::Result(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32,value:handle:dmGui::HNode:u32,value:scalar:bool)"
+      "shape": "enum:dmGui::Result(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32,value:handle:dmGui::HNode:u32,value:scalar:bool)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGui::SetNodeProperty@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:370:1565",
@@ -4897,7 +5139,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32,value:enum:dmGui::Property,in:unknown:dmVMath::Vector4)"
+      "shape": "scalar:void(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32,value:enum:dmGui::Property,in:unknown:dmVMath::Vector4)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGui::SetNodeTexture@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:453:1573",
@@ -4919,7 +5162,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmGui::Result(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32,value:scalar:u64)"
+      "shape": "enum:dmGui::Result(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32,value:scalar:u64)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGui::SetNodeTexture@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:462:1574",
@@ -4942,7 +5186,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmGui::Result(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32,value:enum:dmGui::NodeTextureType,value:handle:dmGui::HTextureSource:u64)"
+      "shape": "enum:dmGui::Result(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32,value:enum:dmGui::NodeTextureType,value:handle:dmGui::HTextureSource:u64)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmHID::AddKeyboardChar@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:733:1629",
@@ -4952,6 +5197,7 @@
       "preferredLowering": false,
       "bindingId": 77,
       "shape": "scalar:void(value:handle:dmHID::HContext:opaque,value:scalar:i32)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -4994,7 +5240,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmHID::HTouchDevice:opaque,value:scalar:i32,value:scalar:i32,value:scalar:u32,value:enum:dmHID::Phase)"
+      "shape": "scalar:void(value:handle:dmHID::HTouchDevice:opaque,value:scalar:i32,value:scalar:i32,value:scalar:u32,value:enum:dmHID::Phase)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmHID::SetGamepadAxis@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:675:1622",
@@ -5004,6 +5251,7 @@
       "preferredLowering": false,
       "bindingId": 78,
       "shape": "scalar:void(value:handle:dmHID::HGamepad:opaque,value:scalar:u32,value:scalar:f32)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -5034,6 +5282,7 @@
       "preferredLowering": false,
       "bindingId": 79,
       "shape": "scalar:void(value:handle:dmHID::HGamepad:opaque,value:scalar:u32,value:scalar:bool)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -5076,7 +5325,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmHID::HKeyboard:opaque,value:enum:dmHID::Key,value:scalar:bool)"
+      "shape": "scalar:void(value:handle:dmHID::HKeyboard:opaque,value:enum:dmHID::Key,value:scalar:bool)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmHID::SetMouseButton@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:683:1623",
@@ -5098,7 +5348,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmHID::HMouse:opaque,value:enum:dmHID::MouseButton,value:scalar:bool)"
+      "shape": "scalar:void(value:handle:dmHID::HMouse:opaque,value:enum:dmHID::MouseButton,value:scalar:bool)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmHID::SetMousePosition@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:691:1624",
@@ -5108,6 +5359,7 @@
       "preferredLowering": false,
       "bindingId": 80,
       "shape": "scalar:void(value:handle:dmHID::HMouse:opaque,value:scalar:i32,value:scalar:i32)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -5138,6 +5390,7 @@
       "preferredLowering": false,
       "bindingId": 81,
       "shape": "scalar:void(value:handle:dmHID::HMouse:opaque,value:scalar:i32)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -5180,7 +5433,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "opaque-pointer(value:handle:dmImage::HImage:opaque)"
+      "shape": "opaque-pointer(value:handle:dmImage::HImage:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmImage::GetHeight@upstream/defold/engine/dlib/src/dmsdk/dlib/image.h:114:347",
@@ -5190,6 +5444,7 @@
       "preferredLowering": false,
       "bindingId": 82,
       "shape": "scalar:u32(value:handle:dmImage::HImage:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -5232,7 +5487,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmImage::Type(value:handle:dmImage::HImage:opaque)"
+      "shape": "enum:dmImage::Type(value:handle:dmImage::HImage:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmImage::GetWidth@upstream/defold/engine/dlib/src/dmsdk/dlib/image.h:107:346",
@@ -5242,6 +5498,7 @@
       "preferredLowering": false,
       "bindingId": 83,
       "shape": "scalar:u32(value:handle:dmImage::HImage:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -5272,6 +5529,7 @@
       "preferredLowering": false,
       "bindingId": 84,
       "shape": "scalar:u64(value:handle:dmMessage::HSocket:u64)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -5302,6 +5560,7 @@
       "preferredLowering": false,
       "bindingId": 85,
       "shape": "scalar:bool(value:handle:dmMessage::HSocket:u64)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -5346,7 +5605,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(inout:pointer:record:dmMessage::URL,value:handle:dmMessage::HSocket:u64)"
+      "shape": "scalar:void(inout:pointer:record:dmMessage::URL,value:handle:dmMessage::HSocket:u64)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmMutex::GetNativeHandle@upstream/defold/engine/dlib/src/dmsdk/dlib/mutex.h:97:435",
@@ -5368,7 +5628,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "opaque-pointer(value:handle:dmMutex::HMutex:opaque)"
+      "shape": "opaque-pointer(value:handle:dmMutex::HMutex:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmMutex::Lock@upstream/defold/engine/dlib/src/dmsdk/dlib/mutex.h:67:432",
@@ -5378,6 +5639,7 @@
       "preferredLowering": false,
       "bindingId": 86,
       "shape": "scalar:void(value:handle:dmMutex::HMutex:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -5420,7 +5682,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmMutex::HMutex:opaque)"
+      "shape": "scalar:void(value:handle:dmMutex::HMutex:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmMutex::ScopedLock::ScopedLock@upstream/defold/engine/dlib/src/dmsdk/dlib/mutex.h:102:437",
@@ -5442,7 +5705,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmMutex::HMutex:opaque)"
+      "shape": "scalar:void(value:handle:dmMutex::HMutex:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmMutex::TryLock@upstream/defold/engine/dlib/src/dmsdk/dlib/mutex.h:78:433",
@@ -5452,6 +5716,7 @@
       "preferredLowering": false,
       "bindingId": 87,
       "shape": "scalar:bool(value:handle:dmMutex::HMutex:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -5482,6 +5747,7 @@
       "preferredLowering": false,
       "bindingId": 88,
       "shape": "scalar:void(value:handle:dmMutex::HMutex:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -5528,7 +5794,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmRender::Result(value:handle:dmRender::HRenderContext:opaque,inout:pointer:record:dmRender::RenderObject)"
+      "shape": "enum:dmRender::Result(value:handle:dmRender::HRenderContext:opaque,inout:pointer:record:dmRender::RenderObject)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmRender::ApplyMaterialConstants@upstream/defold/engine/render/src/dmsdk/render/render.h:755:1870",
@@ -5551,7 +5818,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmRender::HRenderContext:opaque,value:handle:dmRender::HMaterial:opaque,in:pointer:record:dmRender::RenderObject)"
+      "shape": "scalar:void(value:handle:dmRender::HRenderContext:opaque,value:handle:dmRender::HMaterial:opaque,in:pointer:record:dmRender::RenderObject)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmRender::ApplyMaterialSampler@upstream/defold/engine/render/src/dmsdk/render/render.h:766:1871",
@@ -5561,6 +5829,7 @@
       "preferredLowering": false,
       "bindingId": 89,
       "shape": "scalar:void(value:handle:dmRender::HRenderContext:opaque,value:handle:dmRender::HMaterial:opaque,value:handle:dmRender::HSampler:opaque,value:scalar:u8,value:handle:dmGraphics::HTexture:u64)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -5591,6 +5860,7 @@
       "preferredLowering": false,
       "bindingId": 90,
       "shape": "scalar:void(value:handle:dmRender::HMaterial:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -5621,6 +5891,7 @@
       "preferredLowering": false,
       "bindingId": 91,
       "shape": "scalar:void(value:handle:dmRender::HNamedConstantBuffer:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -5651,6 +5922,7 @@
       "preferredLowering": false,
       "bindingId": 92,
       "shape": "scalar:u64(value:handle:dmRender::HConstant:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -5695,7 +5967,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "unknown:dmRenderDDF::MaterialDesc::ConstantType(value:handle:dmRender::HConstant:opaque)"
+      "shape": "unknown:dmRenderDDF::MaterialDesc::ConstantType(value:handle:dmRender::HConstant:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmRender::GetMaterialSamplerNameHash@upstream/defold/engine/render/src/dmsdk/render/render.h:739:1868",
@@ -5705,6 +5978,7 @@
       "preferredLowering": false,
       "bindingId": 93,
       "shape": "scalar:u64(value:handle:dmRender::HMaterial:opaque,value:scalar:u32)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -5735,6 +6009,7 @@
       "preferredLowering": false,
       "bindingId": 94,
       "shape": "scalar:u32(value:handle:dmRender::HMaterial:opaque,value:scalar:u64)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -5765,6 +6040,7 @@
       "preferredLowering": false,
       "bindingId": 95,
       "shape": "scalar:u32(value:handle:dmRender::HMaterial:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -5809,7 +6085,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "unknown:dmRenderDDF::MaterialDesc::VertexSpace(value:handle:dmRender::HMaterial:opaque)"
+      "shape": "unknown:dmRenderDDF::MaterialDesc::VertexSpace(value:handle:dmRender::HMaterial:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmRender::GetNamedConstantCount@upstream/defold/engine/render/src/dmsdk/render/render.h:642:1857",
@@ -5819,6 +6096,7 @@
       "preferredLowering": false,
       "bindingId": 96,
       "shape": "scalar:u32(value:handle:dmRender::HNamedConstantBuffer:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -5864,7 +6142,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "unknown:dmVMath::Matrix4(value:handle:dmRender::HRenderContext:opaque)"
+      "shape": "unknown:dmVMath::Matrix4(value:handle:dmRender::HRenderContext:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmRender::RemoveNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:566:1850",
@@ -5874,6 +6153,7 @@
       "preferredLowering": false,
       "bindingId": 97,
       "shape": "scalar:void(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -5917,7 +6197,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "pointer:record:dmRender::RenderListEntry(value:handle:dmRender::HRenderContext:opaque,value:scalar:u32)"
+      "shape": "pointer:record:dmRender::RenderListEntry(value:handle:dmRender::HRenderContext:opaque,value:scalar:u32)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmRender::RenderListSubmit@upstream/defold/engine/render/src/dmsdk/render/render.h:438:1834",
@@ -5942,7 +6223,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmRender::HRenderContext:opaque,inout:pointer:record:dmRender::RenderListEntry,inout:pointer:record:dmRender::RenderListEntry)"
+      "shape": "scalar:void(value:handle:dmRender::HRenderContext:opaque,inout:pointer:record:dmRender::RenderListEntry,inout:pointer:record:dmRender::RenderListEntry)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmRender::SetConstantLocation@upstream/defold/engine/render/src/dmsdk/render/render.h:521:1844",
@@ -5952,6 +6234,7 @@
       "preferredLowering": false,
       "bindingId": 98,
       "shape": "scalar:void(value:handle:dmRender::HConstant:opaque,value:handle:dmGraphics::HUniformLocation:i64)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -5982,6 +6265,7 @@
       "preferredLowering": false,
       "bindingId": 99,
       "shape": "scalar:void(value:handle:dmRender::HConstant:opaque,value:scalar:u64)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -6026,7 +6310,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmRender::HConstant:opaque,value:unknown:dmRenderDDF::MaterialDesc::ConstantType)"
+      "shape": "scalar:void(value:handle:dmRender::HConstant:opaque,value:unknown:dmRenderDDF::MaterialDesc::ConstantType)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmRender::SetConstantValues@upstream/defold/engine/render/src/dmsdk/render/render.h:489:1840",
@@ -6052,7 +6337,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmRender::Result(value:handle:dmRender::HConstant:opaque,inout:pointer:unknown:dmVMath::Vector4,value:scalar:u32)"
+      "shape": "enum:dmRender::Result(value:handle:dmRender::HConstant:opaque,inout:pointer:unknown:dmVMath::Vector4,value:scalar:u32)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmRender::SetMaterialSampler@upstream/defold/engine/render/src/dmsdk/render/render.h:711:1865",
@@ -6078,7 +6364,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:bool(value:handle:dmRender::HMaterial:opaque,value:scalar:u64,value:scalar:u32,value:enum:dmGraphics::TextureWrap,value:enum:dmGraphics::TextureWrap,value:enum:dmGraphics::TextureWrap,value:enum:dmGraphics::TextureFilter,value:enum:dmGraphics::TextureFilter,value:scalar:f32)"
+      "shape": "scalar:bool(value:handle:dmRender::HMaterial:opaque,value:scalar:u64,value:scalar:u32,value:enum:dmGraphics::TextureWrap,value:enum:dmGraphics::TextureWrap,value:enum:dmGraphics::TextureWrap,value:enum:dmGraphics::TextureFilter,value:enum:dmGraphics::TextureFilter,value:scalar:f32)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmRender::SetMaterialSampler@upstream/defold/engine/render/src/dmsdk/render/render.h:725:1866",
@@ -6103,7 +6390,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:bool(value:handle:dmRender::HMaterial:opaque,value:scalar:u64,value:scalar:u32,value:enum:dmGraphics::TextureWrap,value:enum:dmGraphics::TextureWrap,value:enum:dmGraphics::TextureFilter,value:enum:dmGraphics::TextureFilter,value:scalar:f32)"
+      "shape": "scalar:bool(value:handle:dmRender::HMaterial:opaque,value:scalar:u64,value:scalar:u32,value:enum:dmGraphics::TextureWrap,value:enum:dmGraphics::TextureWrap,value:enum:dmGraphics::TextureFilter,value:enum:dmGraphics::TextureFilter,value:scalar:f32)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmRender::SetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:576:1851",
@@ -6127,7 +6415,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64,inout:pointer:unknown:dmVMath::Vector4,value:scalar:u32)"
+      "shape": "scalar:void(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64,inout:pointer:unknown:dmVMath::Vector4,value:scalar:u32)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmRender::SetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:589:1852",
@@ -6155,7 +6444,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64,inout:pointer:unknown:dmVMath::Vector4,value:scalar:u32,value:unknown:dmRenderDDF::MaterialDesc::ConstantType)"
+      "shape": "scalar:void(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64,inout:pointer:unknown:dmVMath::Vector4,value:scalar:u32,value:unknown:dmRenderDDF::MaterialDesc::ConstantType)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmRender::SetNamedConstantAtIndex@upstream/defold/engine/render/src/dmsdk/render/render.h:609:1854",
@@ -6184,7 +6474,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmRender::Result(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64,inout:pointer:unknown:dmVMath::Vector4,value:scalar:u32,value:scalar:u32,value:unknown:dmRenderDDF::MaterialDesc::ConstantType)"
+      "shape": "enum:dmRender::Result(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64,inout:pointer:unknown:dmVMath::Vector4,value:scalar:u32,value:scalar:u32,value:unknown:dmRenderDDF::MaterialDesc::ConstantType)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmRender::SetNamedConstants@upstream/defold/engine/render/src/dmsdk/render/render.h:598:1853",
@@ -6207,7 +6498,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmRender::HNamedConstantBuffer:opaque,inout:pointer:unknown:HConstant,value:scalar:u32)"
+      "shape": "scalar:void(value:handle:dmRender::HNamedConstantBuffer:opaque,inout:pointer:unknown:HConstant,value:scalar:u32)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmResource::GetContext@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:316:1992",
@@ -6229,7 +6521,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "opaque-pointer(value:handle:HResourceType:opaque)"
+      "shape": "opaque-pointer(value:handle:HResourceType:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmResource::GetDescriptorByHash@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:182:2006",
@@ -6254,7 +6547,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,value:scalar:u64,inout:pointer:unknown:HDescriptor)"
+      "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,value:scalar:u64,inout:pointer:unknown:HDescriptor)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmResource::GetNameHash@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:246:2012",
@@ -6264,6 +6558,7 @@
       "preferredLowering": false,
       "bindingId": 100,
       "shape": "scalar:u64(value:handle:dmResource::HDescriptor:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -6294,6 +6589,7 @@
       "preferredLowering": false,
       "bindingId": 101,
       "shape": "scalar:u64(value:handle:HResourceType:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -6340,7 +6636,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,in:opaque-pointer,inout:pointer:scalar:u64)"
+      "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,in:opaque-pointer,inout:pointer:scalar:u64)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmResource::GetPrevResource@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:270:2016",
@@ -6362,7 +6659,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "opaque-pointer(value:handle:dmResource::HDescriptor:opaque)"
+      "shape": "opaque-pointer(value:handle:dmResource::HDescriptor:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmResource::GetResource@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:258:2014",
@@ -6384,7 +6682,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "opaque-pointer(value:handle:dmResource::HDescriptor:opaque)"
+      "shape": "opaque-pointer(value:handle:dmResource::HDescriptor:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmResource::GetResourceSize@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:282:2018",
@@ -6394,6 +6693,7 @@
       "preferredLowering": false,
       "bindingId": 102,
       "shape": "scalar:u32(value:handle:dmResource::HDescriptor:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -6439,7 +6739,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,value:scalar:u64,inout:pointer:unknown:HResourceType)"
+      "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,value:scalar:u64,inout:pointer:unknown:HResourceType)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmResource::IncRef@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:221:1977",
@@ -6462,7 +6763,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmResource::HFactory:opaque,inout:opaque-pointer)"
+      "shape": "scalar:void(value:handle:dmResource::HFactory:opaque,inout:opaque-pointer)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmResource::IncRef@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:229:1978",
@@ -6472,6 +6774,7 @@
       "preferredLowering": false,
       "bindingId": 103,
       "shape": "scalar:void(value:handle:dmResource::HFactory:opaque,value:handle:HResourceDescriptor:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -6515,7 +6818,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:HResourceType:opaque,inout:opaque-pointer)"
+      "shape": "scalar:void(value:handle:HResourceType:opaque,inout:opaque-pointer)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmResource::SetPrevResource@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:264:2015",
@@ -6538,7 +6842,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmResource::HDescriptor:opaque,inout:opaque-pointer)"
+      "shape": "scalar:void(value:handle:dmResource::HDescriptor:opaque,inout:opaque-pointer)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmResource::SetResource@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:252:2013",
@@ -6561,7 +6866,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmResource::HDescriptor:opaque,inout:opaque-pointer)"
+      "shape": "scalar:void(value:handle:dmResource::HDescriptor:opaque,inout:opaque-pointer)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmResource::SetResourceSize@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:276:2017",
@@ -6571,6 +6877,7 @@
       "preferredLowering": false,
       "bindingId": 104,
       "shape": "scalar:void(value:handle:dmResource::HDescriptor:opaque,value:scalar:u32)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -6613,7 +6920,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmResource::Result(value:handle:HResourceType:opaque)"
+      "shape": "enum:dmResource::Result(value:handle:HResourceType:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmRig::CancelAnimation@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:175:2050",
@@ -6635,7 +6943,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmRig::Result(value:handle:dmRig::HRigInstance:opaque)"
+      "shape": "enum:dmRig::Result(value:handle:dmRig::HRigInstance:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmRig::GetAnimation@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:176:2051",
@@ -6645,6 +6954,7 @@
       "preferredLowering": false,
       "bindingId": 105,
       "shape": "scalar:u64(value:handle:dmRig::HRigInstance:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -6675,6 +6985,7 @@
       "preferredLowering": false,
       "bindingId": 106,
       "shape": "scalar:u32(value:handle:dmRig::HRigInstance:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -6705,6 +7016,7 @@
       "preferredLowering": false,
       "bindingId": 107,
       "shape": "scalar:f32(value:handle:dmRig::HRigInstance:opaque,value:scalar:bool)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -6735,6 +7047,7 @@
       "preferredLowering": false,
       "bindingId": 108,
       "shape": "scalar:bool(value:handle:dmRig::HRigInstance:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -6778,7 +7091,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "pointer:record:dmRig::IKTarget(value:handle:dmRig::HRigInstance:opaque,value:scalar:u64)"
+      "shape": "pointer:record:dmRig::IKTarget(value:handle:dmRig::HRigInstance:opaque,value:scalar:u64)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmRig::GetMaxBoneCount@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:213:2069",
@@ -6788,6 +7102,7 @@
       "preferredLowering": false,
       "bindingId": 109,
       "shape": "scalar:u32(value:handle:dmRig::HRigInstance:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -6818,6 +7133,7 @@
       "preferredLowering": false,
       "bindingId": 110,
       "shape": "scalar:u64(value:handle:dmRig::HRigInstance:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -6848,6 +7164,7 @@
       "preferredLowering": false,
       "bindingId": 111,
       "shape": "scalar:f32(value:handle:dmRig::HRigInstance:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -6892,7 +7209,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "pointer:unknown:dmArray<BonePose>(value:handle:dmRig::HRigInstance:opaque)"
+      "shape": "pointer:unknown:dmArray<BonePose>(value:handle:dmRig::HRigInstance:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmRig::GetVertexCount@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:197:2055",
@@ -6902,6 +7220,7 @@
       "preferredLowering": false,
       "bindingId": 112,
       "shape": "scalar:u32(value:handle:dmRig::HRigInstance:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -6932,6 +7251,7 @@
       "preferredLowering": false,
       "bindingId": 113,
       "shape": "scalar:bool(value:handle:dmRig::HRigInstance:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -6974,7 +7294,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmRig::Result(value:handle:dmRig::HRigContext:opaque,value:handle:dmRig::HRigInstance:opaque)"
+      "shape": "enum:dmRig::Result(value:handle:dmRig::HRigContext:opaque,value:handle:dmRig::HRigInstance:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmRig::IsValid@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:211:2067",
@@ -6984,6 +7305,7 @@
       "preferredLowering": false,
       "bindingId": 114,
       "shape": "scalar:bool(value:handle:dmRig::HRigInstance:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -7027,7 +7349,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmRig::Result(value:handle:dmRig::HRigInstance:opaque,value:scalar:u64,value:enum:dmRig::RigPlayback,value:scalar:f32,value:scalar:f32,value:scalar:f32)"
+      "shape": "enum:dmRig::Result(value:handle:dmRig::HRigInstance:opaque,value:scalar:u64,value:enum:dmRig::RigPlayback,value:scalar:f32,value:scalar:f32,value:scalar:f32)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmRig::ResetIKTarget@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:208:2064",
@@ -7037,6 +7360,7 @@
       "preferredLowering": false,
       "bindingId": 115,
       "shape": "scalar:bool(value:handle:dmRig::HRigInstance:opaque,value:scalar:u64)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -7079,7 +7403,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmRig::Result(value:handle:dmRig::HRigInstance:opaque,value:scalar:f32,value:scalar:bool)"
+      "shape": "enum:dmRig::Result(value:handle:dmRig::HRigInstance:opaque,value:scalar:f32,value:scalar:bool)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmRig::SetEnabled@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:209:2065",
@@ -7089,6 +7414,7 @@
       "preferredLowering": false,
       "bindingId": 116,
       "shape": "scalar:void(value:handle:dmRig::HRigInstance:opaque,value:scalar:bool)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -7131,7 +7457,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmRig::Result(value:handle:dmRig::HRigInstance:opaque,value:scalar:u64)"
+      "shape": "enum:dmRig::Result(value:handle:dmRig::HRigInstance:opaque,value:scalar:u64)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmRig::SetPlaybackRate@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:205:2061",
@@ -7153,7 +7480,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmRig::Result(value:handle:dmRig::HRigInstance:opaque,value:scalar:f32)"
+      "shape": "enum:dmRig::Result(value:handle:dmRig::HRigInstance:opaque,value:scalar:f32)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmRig::Update@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:169:2046",
@@ -7175,7 +7503,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmRig::Result(value:handle:dmRig::HRigContext:opaque,value:scalar:f32)"
+      "shape": "enum:dmRig::Result(value:handle:dmRig::HRigContext:opaque,value:scalar:f32)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmScript::GetLuaState@upstream/defold/engine/script/src/dmsdk/script/script.h:267:2088",
@@ -7198,7 +7527,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "pointer:record:lua_State(value:handle:dmScript::HContext:opaque)"
+      "shape": "pointer:record:lua_State(value:handle:dmScript::HContext:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmScript::LuaHBuffer::LuaHBuffer@upstream/defold/engine/gamesys/src/dmsdk/gamesys/script.h:162:1315",
@@ -7222,7 +7552,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmBuffer::HBuffer:u32,value:enum:dmScript::LuaBufferOwnership)"
+      "shape": "scalar:void(value:handle:dmBuffer::HBuffer:u32,value:enum:dmScript::LuaBufferOwnership)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmScript::LuaHBuffer::LuaHBuffer@upstream/defold/engine/gamesys/src/dmsdk/gamesys/script.h:163:1316",
@@ -7247,7 +7578,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmResource::HFactory:opaque,inout:opaque-pointer)"
+      "shape": "scalar:void(value:handle:dmResource::HFactory:opaque,inout:opaque-pointer)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmScript::LuaHBuffer::LuaHBuffer@upstream/defold/engine/gamesys/src/dmsdk/gamesys/script.h:165:1317",
@@ -7269,7 +7601,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:dmBuffer::HBuffer:u32,value:scalar:bool)"
+      "shape": "scalar:void(value:handle:dmBuffer::HBuffer:u32,value:scalar:bool)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmSocket::GetFD@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:264:556",
@@ -7279,6 +7612,7 @@
       "preferredLowering": false,
       "bindingId": 117,
       "shape": "scalar:i32(value:handle:dmSocket::Socket:i32)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -7325,7 +7659,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(inout:pointer:record:dmSocket::Selector,value:enum:dmSocket::SelectorKind,value:handle:dmSocket::Socket:i32)"
+      "shape": "scalar:void(inout:pointer:record:dmSocket::Selector,value:enum:dmSocket::SelectorKind,value:handle:dmSocket::Socket:i32)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmSocket::SelectorIsSet@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:444:574",
@@ -7351,7 +7686,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:bool(inout:pointer:record:dmSocket::Selector,value:enum:dmSocket::SelectorKind,value:handle:dmSocket::Socket:i32)"
+      "shape": "scalar:bool(inout:pointer:record:dmSocket::Selector,value:enum:dmSocket::SelectorKind,value:handle:dmSocket::Socket:i32)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmSocket::SelectorSet@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:434:573",
@@ -7377,7 +7713,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(inout:pointer:record:dmSocket::Selector,value:enum:dmSocket::SelectorKind,value:handle:dmSocket::Socket:i32)"
+      "shape": "scalar:void(inout:pointer:record:dmSocket::Selector,value:enum:dmSocket::SelectorKind,value:handle:dmSocket::Socket:i32)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmSocket::SetBlocking@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:291:559",
@@ -7399,7 +7736,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmSocket::Result(value:handle:dmSocket::Socket:i32,value:scalar:bool)"
+      "shape": "enum:dmSocket::Result(value:handle:dmSocket::Socket:i32,value:scalar:bool)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmSocket::SetBroadcast@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:282:558",
@@ -7421,7 +7759,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmSocket::Result(value:handle:dmSocket::Socket:i32,value:scalar:bool)"
+      "shape": "enum:dmSocket::Result(value:handle:dmSocket::Socket:i32,value:scalar:bool)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmSocket::SetNoDelay@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:300:560",
@@ -7443,7 +7782,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmSocket::Result(value:handle:dmSocket::Socket:i32,value:scalar:bool)"
+      "shape": "enum:dmSocket::Result(value:handle:dmSocket::Socket:i32,value:scalar:bool)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmSocket::SetQuickAck@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:310:561",
@@ -7465,7 +7805,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmSocket::Result(value:handle:dmSocket::Socket:i32,value:scalar:bool)"
+      "shape": "enum:dmSocket::Result(value:handle:dmSocket::Socket:i32,value:scalar:bool)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmSocket::SetReceiveTimeout@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:332:563",
@@ -7487,7 +7828,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmSocket::Result(value:handle:dmSocket::Socket:i32,value:scalar:u64)"
+      "shape": "enum:dmSocket::Result(value:handle:dmSocket::Socket:i32,value:scalar:u64)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmSocket::SetReuseAddress@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:273:557",
@@ -7509,7 +7851,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmSocket::Result(value:handle:dmSocket::Socket:i32,value:scalar:bool)"
+      "shape": "enum:dmSocket::Result(value:handle:dmSocket::Socket:i32,value:scalar:bool)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmSocket::SetSendTimeout@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:321:562",
@@ -7531,7 +7874,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmSocket::Result(value:handle:dmSocket::Socket:i32,value:scalar:u64)"
+      "shape": "enum:dmSocket::Result(value:handle:dmSocket::Socket:i32,value:scalar:u64)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmSocket::Shutdown@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:256:555",
@@ -7554,7 +7898,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmSocket::Result(value:handle:dmSocket::Socket:i32,value:enum:dmSocket::ShutdownType)"
+      "shape": "enum:dmSocket::Result(value:handle:dmSocket::Socket:i32,value:enum:dmSocket::ShutdownType)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmSSLSocket::SetReceiveTimeout@upstream/defold/engine/dlib/src/dmsdk/dlib/sslsocket.h:136:593",
@@ -7576,7 +7921,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:dmSocket::Result(value:handle:dmSSLSocket::Socket:opaque,value:scalar:u64)"
+      "shape": "enum:dmSocket::Result(value:handle:dmSSLSocket::Socket:opaque,value:scalar:u64)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:FontCollectionAddFont@upstream/defold/engine/font/src/dmsdk/font/fontcollection.h:58:825",
@@ -7598,7 +7944,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:FontResult(value:handle:HFontCollection:opaque,value:handle:HFont:opaque)"
+      "shape": "enum:FontResult(value:handle:HFontCollection:opaque,value:handle:HFont:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:FontCollectionDestroy@upstream/defold/engine/font/src/dmsdk/font/fontcollection.h:49:824",
@@ -7608,6 +7955,7 @@
       "preferredLowering": false,
       "bindingId": 118,
       "shape": "scalar:void(value:handle:HFontCollection:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -7638,6 +7986,7 @@
       "preferredLowering": false,
       "bindingId": 119,
       "shape": "scalar:u32(value:handle:HFontCollection:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -7680,7 +8029,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:FontResult(value:handle:HFontCollection:opaque,value:handle:HFont:opaque)"
+      "shape": "enum:FontResult(value:handle:HFontCollection:opaque,value:handle:HFont:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:FontDestroy@upstream/defold/engine/font/src/dmsdk/font/font.h:157:806",
@@ -7690,6 +8040,7 @@
       "preferredLowering": false,
       "bindingId": 120,
       "shape": "scalar:void(value:handle:HFont:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -7736,7 +8087,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:FontResult(value:handle:HFont:opaque,inout:pointer:record:FontGlyph)"
+      "shape": "enum:FontResult(value:handle:HFont:opaque,inout:pointer:record:FontGlyph)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:FontGetAscent@upstream/defold/engine/font/src/dmsdk/font/font.h:201:811",
@@ -7746,6 +8098,7 @@
       "preferredLowering": false,
       "bindingId": 121,
       "shape": "scalar:f32(value:handle:HFont:opaque,value:scalar:f32)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -7776,6 +8129,7 @@
       "preferredLowering": false,
       "bindingId": 122,
       "shape": "scalar:f32(value:handle:HFont:opaque,value:scalar:f32)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -7806,6 +8160,7 @@
       "preferredLowering": false,
       "bindingId": 123,
       "shape": "scalar:u32(value:handle:HFont:opaque,value:scalar:u32)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -7836,6 +8191,7 @@
       "preferredLowering": false,
       "bindingId": 124,
       "shape": "scalar:f32(value:handle:HFont:opaque,value:scalar:f32)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -7866,6 +8222,7 @@
       "preferredLowering": false,
       "bindingId": 125,
       "shape": "scalar:u32(value:handle:HFont:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -7896,6 +8253,7 @@
       "preferredLowering": false,
       "bindingId": 126,
       "shape": "scalar:u32(value:handle:HFont:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -7926,6 +8284,7 @@
       "preferredLowering": false,
       "bindingId": 127,
       "shape": "scalar:f32(value:handle:HFont:opaque,value:scalar:f32)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -7968,7 +8327,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:FontType(value:handle:HFont:opaque)"
+      "shape": "enum:FontType(value:handle:HFont:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:HttpCancelRequest@upstream/defold/engine/dlib/src/dmsdk/dlib/http.h:490:335",
@@ -7994,7 +8354,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:HttpResult(inout:pointer:record:HttpService,value:handle:HttpRequestHandle:u32)"
+      "shape": "enum:HttpResult(inout:pointer:record:HttpService,value:handle:HttpRequestHandle:u32)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:JobSystemCancelJob@upstream/defold/engine/dlib/src/dmsdk/dlib/jobsystem.h:234:377",
@@ -8016,7 +8377,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:JobSystemResult(value:handle:HJobContext:opaque,value:handle:HJob:u64)"
+      "shape": "enum:JobSystemResult(value:handle:HJobContext:opaque,value:handle:HJob:u64)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:JobSystemDestroy@upstream/defold/engine/dlib/src/dmsdk/dlib/jobsystem.h:169:371",
@@ -8026,6 +8388,7 @@
       "preferredLowering": false,
       "bindingId": 128,
       "shape": "scalar:void(value:handle:HJobContext:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -8068,7 +8431,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "opaque-pointer(value:handle:HJobContext:opaque,value:handle:HJob:u64)"
+      "shape": "opaque-pointer(value:handle:HJobContext:opaque,value:handle:HJob:u64)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:JobSystemGetData@upstream/defold/engine/dlib/src/dmsdk/dlib/jobsystem.h:242:378",
@@ -8090,7 +8454,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "opaque-pointer(value:handle:HJobContext:opaque,value:handle:HJob:u64)"
+      "shape": "opaque-pointer(value:handle:HJobContext:opaque,value:handle:HJob:u64)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:JobSystemGetWorkerCount@upstream/defold/engine/dlib/src/dmsdk/dlib/jobsystem.h:185:373",
@@ -8100,6 +8465,7 @@
       "preferredLowering": false,
       "bindingId": 129,
       "shape": "scalar:u32(value:handle:HJobContext:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -8142,7 +8508,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:JobSystemResult(value:handle:HJobContext:opaque,value:handle:HJob:u64)"
+      "shape": "enum:JobSystemResult(value:handle:HJobContext:opaque,value:handle:HJob:u64)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:JobSystemSetParent@upstream/defold/engine/dlib/src/dmsdk/dlib/jobsystem.h:204:375",
@@ -8164,7 +8531,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:JobSystemResult(value:handle:HJobContext:opaque,value:handle:HJob:u64,value:handle:HJob:u64)"
+      "shape": "enum:JobSystemResult(value:handle:HJobContext:opaque,value:handle:HJob:u64,value:handle:HJob:u64)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:JobSystemUpdate@upstream/defold/engine/dlib/src/dmsdk/dlib/jobsystem.h:178:372",
@@ -8174,6 +8542,7 @@
       "preferredLowering": false,
       "bindingId": 130,
       "shape": "scalar:void(value:handle:HJobContext:opaque,value:scalar:u64)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -8216,7 +8585,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:ProfileResult(value:handle:HProfile:u32)"
+      "shape": "enum:ProfileResult(value:handle:HProfile:u32)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:ResourceDescriptorGetNameHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:393:1913",
@@ -8226,6 +8596,7 @@
       "preferredLowering": false,
       "bindingId": 131,
       "shape": "scalar:u64(value:handle:HResourceDescriptor:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -8268,7 +8639,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "opaque-pointer(value:handle:HResourceDescriptor:opaque)"
+      "shape": "opaque-pointer(value:handle:HResourceDescriptor:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:ResourceDescriptorGetResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:407:1915",
@@ -8290,7 +8662,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "opaque-pointer(value:handle:HResourceDescriptor:opaque)"
+      "shape": "opaque-pointer(value:handle:HResourceDescriptor:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:ResourceDescriptorGetResourceSize@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:437:1919",
@@ -8300,6 +8673,7 @@
       "preferredLowering": false,
       "bindingId": 132,
       "shape": "scalar:u32(value:handle:HResourceDescriptor:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -8330,6 +8704,7 @@
       "preferredLowering": false,
       "bindingId": 133,
       "shape": "scalar:void(value:handle:HResourceFactory:opaque,value:handle:HResourceDescriptor:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -8373,7 +8748,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:HResourceDescriptor:opaque,inout:opaque-pointer)"
+      "shape": "scalar:void(value:handle:HResourceDescriptor:opaque,inout:opaque-pointer)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:ResourceDescriptorSetResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:400:1914",
@@ -8396,7 +8772,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:HResourceDescriptor:opaque,inout:opaque-pointer)"
+      "shape": "scalar:void(value:handle:HResourceDescriptor:opaque,inout:opaque-pointer)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:ResourceDescriptorSetResourceSize@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:430:1918",
@@ -8406,6 +8783,7 @@
       "preferredLowering": false,
       "bindingId": 134,
       "shape": "scalar:void(value:handle:HResourceDescriptor:opaque,value:scalar:u32)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -8451,7 +8829,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:ResourceResult(value:handle:HResourceFactory:opaque,value:scalar:u64,inout:pointer:unknown:HResourceDescriptor)"
+      "shape": "enum:ResourceResult(value:handle:HResourceFactory:opaque,value:scalar:u64,inout:pointer:unknown:HResourceDescriptor)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:ResourceIncRef@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:244:1899",
@@ -8474,7 +8853,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:HResourceFactory:opaque,inout:opaque-pointer)"
+      "shape": "scalar:void(value:handle:HResourceFactory:opaque,inout:opaque-pointer)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:ResourceRelease@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:285:1903",
@@ -8497,7 +8877,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:HResourceFactory:opaque,inout:opaque-pointer)"
+      "shape": "scalar:void(value:handle:HResourceFactory:opaque,inout:opaque-pointer)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:ResourceTypeContextGetContextByHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:457:1922",
@@ -8519,7 +8900,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "opaque-pointer(value:handle:HResourceTypeContext:opaque,value:scalar:u64)"
+      "shape": "opaque-pointer(value:handle:HResourceTypeContext:opaque,value:scalar:u64)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:ResourceTypeGetContext@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:537:1930",
@@ -8541,7 +8923,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "opaque-pointer(value:handle:HResourceType:opaque)"
+      "shape": "opaque-pointer(value:handle:HResourceType:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:ResourceTypeGetNameHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:558:1933",
@@ -8551,6 +8934,7 @@
       "preferredLowering": false,
       "bindingId": 135,
       "shape": "scalar:u64(value:handle:HResourceType:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -8581,6 +8965,7 @@
       "preferredLowering": false,
       "bindingId": 136,
       "shape": "scalar:u32(value:handle:HResourceType:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -8611,6 +8996,7 @@
       "preferredLowering": false,
       "bindingId": 137,
       "shape": "scalar:bool(value:handle:HResourceType:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -8641,6 +9027,7 @@
       "preferredLowering": false,
       "bindingId": 138,
       "shape": "scalar:void(value:handle:HResourceType:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -8684,7 +9071,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:HResourceType:opaque,inout:opaque-pointer)"
+      "shape": "scalar:void(value:handle:HResourceType:opaque,inout:opaque-pointer)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:ResourceTypeSetStreaming@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:595:1939",
@@ -8694,6 +9082,7 @@
       "preferredLowering": false,
       "bindingId": 139,
       "shape": "scalar:void(value:handle:HResourceType:opaque,value:scalar:u32)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -8724,6 +9113,7 @@
       "preferredLowering": false,
       "bindingId": 140,
       "shape": "scalar:void(value:handle:HTextLayout:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -8768,7 +9158,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:void(value:handle:HTextLayout:opaque,inout:pointer:scalar:f32,inout:pointer:scalar:f32)"
+      "shape": "scalar:void(value:handle:HTextLayout:opaque,inout:pointer:scalar:f32,inout:pointer:scalar:f32)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:TextLayoutGetDecorationCount@upstream/defold/engine/font/src/dmsdk/font/text_layout.h:445:859",
@@ -8778,6 +9169,7 @@
       "preferredLowering": false,
       "bindingId": 141,
       "shape": "scalar:u32(value:handle:HTextLayout:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -8821,7 +9213,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "pointer:record:TextDecoration(value:handle:HTextLayout:opaque)"
+      "shape": "pointer:record:TextDecoration(value:handle:HTextLayout:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:TextLayoutGetGlyphCount@upstream/defold/engine/font/src/dmsdk/font/text_layout.h:398:853",
@@ -8831,6 +9224,7 @@
       "preferredLowering": false,
       "bindingId": 142,
       "shape": "scalar:u32(value:handle:HTextLayout:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -8874,7 +9268,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "pointer:record:TextGlyph(value:handle:HTextLayout:opaque)"
+      "shape": "pointer:record:TextGlyph(value:handle:HTextLayout:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:TextLayoutGetLineCount@upstream/defold/engine/font/src/dmsdk/font/text_layout.h:414:855",
@@ -8884,6 +9279,7 @@
       "preferredLowering": false,
       "bindingId": 143,
       "shape": "scalar:u32(value:handle:HTextLayout:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -8927,7 +9323,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "pointer:record:TextLine(value:handle:HTextLayout:opaque)"
+      "shape": "pointer:record:TextLine(value:handle:HTextLayout:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:TextLayoutGetObjectAttributes@upstream/defold/engine/font/src/dmsdk/font/text_layout.h:495:864",
@@ -8950,7 +9347,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "pointer:record:TextLayoutObjectAttribute(value:handle:HTextLayout:opaque)"
+      "shape": "pointer:record:TextLayoutObjectAttribute(value:handle:HTextLayout:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:TextLayoutGetObjectCount@upstream/defold/engine/font/src/dmsdk/font/text_layout.h:459:861",
@@ -8960,6 +9358,7 @@
       "preferredLowering": false,
       "bindingId": 144,
       "shape": "scalar:u32(value:handle:HTextLayout:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -9003,7 +9402,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "pointer:record:TextLayoutObject(value:handle:HTextLayout:opaque)"
+      "shape": "pointer:record:TextLayoutObject(value:handle:HTextLayout:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:TextLayoutGetParagraphCount@upstream/defold/engine/font/src/dmsdk/font/text_layout.h:430:857",
@@ -9013,6 +9413,7 @@
       "preferredLowering": false,
       "bindingId": 145,
       "shape": "scalar:u32(value:handle:HTextLayout:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -9056,7 +9457,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "pointer:record:TextParagraph(value:handle:HTextLayout:opaque)"
+      "shape": "pointer:record:TextParagraph(value:handle:HTextLayout:opaque)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:TextLayoutRelease@upstream/defold/engine/font/src/dmsdk/font/text_layout.h:375:851",
@@ -9066,6 +9468,7 @@
       "preferredLowering": false,
       "bindingId": 146,
       "shape": "scalar:void(value:handle:HTextLayout:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -9096,6 +9499,7 @@
       "preferredLowering": false,
       "bindingId": 147,
       "shape": "scalar:u8(value:handle:HTextLayout:opaque,value:scalar:u64,value:scalar:u64)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -9126,6 +9530,7 @@
       "preferredLowering": false,
       "bindingId": 148,
       "shape": "scalar:void(value:handle:HTextLayout:opaque,value:scalar:f32)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -9156,6 +9561,7 @@
       "preferredLowering": false,
       "bindingId": 149,
       "shape": "scalar:void(value:handle:HWindow:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -9186,6 +9592,7 @@
       "preferredLowering": false,
       "bindingId": 150,
       "shape": "scalar:void(value:handle:HWindow:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -9216,6 +9623,7 @@
       "preferredLowering": false,
       "bindingId": 151,
       "shape": "scalar:f32(value:handle:HWindow:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -9246,6 +9654,7 @@
       "preferredLowering": false,
       "bindingId": 152,
       "shape": "scalar:u32(value:handle:HWindow:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -9288,7 +9697,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "scalar:u32(value:handle:HWindow:opaque,value:enum:WindowState)"
+      "shape": "scalar:u32(value:handle:HWindow:opaque,value:enum:WindowState)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:WindowGetWidth@upstream/defold/engine/platform/src/dmsdk/platform/window.h:286:1789",
@@ -9298,6 +9708,7 @@
       "preferredLowering": false,
       "bindingId": 153,
       "shape": "scalar:u32(value:handle:HWindow:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -9328,6 +9739,7 @@
       "preferredLowering": false,
       "bindingId": 154,
       "shape": "scalar:void(value:handle:HWindow:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -9373,7 +9785,8 @@
         "linked": "not-applicable",
         "runtime": "not-applicable"
       },
-      "shape": "enum:WindowResult(value:handle:HWindow:opaque,in:pointer:record:WindowCreateParams)"
+      "shape": "enum:WindowResult(value:handle:HWindow:opaque,in:pointer:record:WindowCreateParams)",
+      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:WindowPollEvents@upstream/defold/engine/platform/src/dmsdk/platform/window.h:322:1794",
@@ -9383,6 +9796,7 @@
       "preferredLowering": false,
       "bindingId": 155,
       "shape": "scalar:void(value:handle:HWindow:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -9413,6 +9827,7 @@
       "preferredLowering": false,
       "bindingId": 156,
       "shape": "scalar:void(value:handle:HWindow:opaque,value:scalar:u32,value:scalar:u32)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
@@ -9443,6 +9858,7 @@
       "preferredLowering": false,
       "bindingId": 157,
       "shape": "scalar:void(value:handle:HWindow:opaque)",
+      "patternDecision": "handle.borrowed-provider-boundary",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
         "nullability": "zero-handle-rejected-before-provider",
