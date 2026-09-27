@@ -1,15 +1,14 @@
 {
-  "schemaVersion": 2,
-  "policyVersion": "astc-probe-v2",
-  "family": "arena-backed-spans",
-  "documentationContract": {
-    "summaryPattern": "^Get the (block|astc image) size$",
-    "inputDescription": "the .astc memory (including the header)",
-    "inputLengthDescription": "the length of the memory blob",
-    "outputDescriptions": ["(out) the block width", "(out) the block height", "(out) the block depth"],
-    "returnDescription": "true if it's an astc file",
+  "schemaVersion": 1,
+  "policyVersion": "astc-probe-v3",
+  "family": "bounded-three-scalar-probe",
+  "recipe": {
+    "format": "astc",
+    "operations": ["block-size", "dimensions"],
+    "input": "borrowed-counted-bytes",
+    "output": "caller-owned-three-u32",
     "minimumHeaderBytes": 16,
-    "semantics": ["bounded-input-span", "fixed-three-u32-output", "synchronous-noescape"],
-    "rationale": "The pinned public API describes a synchronous bounded ASTC memory probe with three caller-owned scalar outputs. The 16-byte preflight is a stable ASTC container-format recipe. Selection uses ABI shape plus structured documentation facts, never a header, symbol, prefix, or route allowlist."
+    "ownership": "synchronous-noescape",
+    "fallback": "universal-recipe"
   }
 }

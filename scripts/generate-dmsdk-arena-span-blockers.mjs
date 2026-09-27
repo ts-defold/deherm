@@ -22,10 +22,10 @@ const paths = Object.freeze({
 const policyVersion = "arena-span-cstring-v3";
 const arenaTranche = "arena-backed-spans";
 const priorWaveReports = Object.freeze([
-  { path: "packages/bindings/generated/defold-dmsdk-fixed-digest-bindings.json", policyVersion: "fixed-digest-v2" },
-  { path: "packages/bindings/generated/defold-dmsdk-base64-span-bindings.json", policyVersion: "base64-span-v2" },
-  { path: "packages/bindings/generated/defold-dmsdk-astc-probe-bindings.json", policyVersion: "astc-probe-v2" },
-  { path: "packages/bindings/generated/defold-dmsdk-xtea-span-bindings.json", policyVersion: "xtea-span-v2" },
+  { path: "packages/bindings/generated/defold-dmsdk-fixed-digest-bindings.json", policyVersion: "fixed-digest-v3" },
+  { path: "packages/bindings/generated/defold-dmsdk-base64-span-bindings.json", policyVersion: "base64-span-v3" },
+  { path: "packages/bindings/generated/defold-dmsdk-astc-probe-bindings.json", policyVersion: "astc-probe-v3" },
+  { path: "packages/bindings/generated/defold-dmsdk-xtea-span-bindings.json", policyVersion: "xtea-span-v3" },
   { path: "packages/bindings/generated/defold-dmsdk-hash-span-bindings.json", policyVersion: "hash-span-v3" },
   { path: "packages/bindings/generated/defold-dmsdk-hash-state-bindings.json", policyVersion: "hash-state-v3" },
 ]);

@@ -34,11 +34,12 @@ test("xtea generation is deterministic and evidence-bound", async () => {
       remainingWithoutGeneratedAdapters: 1318,
     });
     assert.equal(r.declarations.length, 2);
+    assert.equal(r.fallbackAudit.count, 0);
     assert.equal(Object.keys(r.artifactHashes).length, r.artifacts.length);
     for (const d of r.declarations) {
       assert.equal(typeof d.bindingId, "number");
       assert.equal(d.patternDecision, "span.in-place-keyed-transform");
-      assert.equal(d.evidence.documentationSource, "clang-comment-ast+enum-metadata+xtea-format-recipe");
+      assert.equal(d.evidence.semanticSource, "revision-ir-abi+identifier-grammar+stable-format-recipe");
       assert.equal(d.stages.runtime, "packaged-sdk-host-behavior-test");
     }
     for (const f of [...r.artifacts, "packages/bindings/generated/defold-dmsdk-xtea-span-bindings.json"])
@@ -54,7 +55,7 @@ test("xtea span derives callable enum tokens and modes without route allowlists"
   );
   const policyText = await readFile(join(root, "packages/bindings/overrides/dmsdk-xtea-span-bindings.json"), "utf8");
   const policy = JSON.parse(policyText);
-  assert.doesNotMatch(policyText, /candidateSelector|crypt\.h|"entries"|"symbols"/u);
+  assert.doesNotMatch(policyText, /documentationContract|description|candidateSelector|crypt\.h|"entries"|"symbols"/u);
   const enums = new Map(ir.declarations.filter(({ kind }) => kind === "enum").map((item) => [item.name, item]));
   const declarations = new Map(ir.declarations.map((item) => [item.id, item]));
   const candidates = shapes.rows.filter(
@@ -65,17 +66,25 @@ test("xtea span derives callable enum tokens and modes without route allowlists"
   assert.equal(candidates.length, 2);
   for (const candidate of candidates) {
     const declaration = declarations.get(candidate.id);
-    const semantics = extractXteaSpanSemantics(declaration, candidate, enums, policy.documentationContract);
+    const semantics = extractXteaSpanSemantics(declaration, candidate, enums, policy.recipe);
     assert.ok(semantics, candidate.id);
     assert.match(semantics.algorithmExpression, /::ALGORITHM_XTEA$/u);
     assert.match(semantics.successExpression, /::RESULT_OK$/u);
-    assert.equal(
+    assert.ok(
       extractXteaSpanSemantics(
-        { ...declaration, returnDescription: "documentation drifted" },
+        {
+          ...declaration,
+          description: "",
+          returnDescription: "",
+          parameters: declaration.parameters.map((parameter) => ({ ...parameter, description: "" })),
+        },
         candidate,
         enums,
-        policy.documentationContract,
+        policy.recipe,
       ),
+    );
+    assert.equal(
+      extractXteaSpanSemantics({ ...declaration, name: "dmCrypt::Transform" }, candidate, enums, policy.recipe),
       null,
     );
   }

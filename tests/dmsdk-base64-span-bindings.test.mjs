@@ -43,6 +43,7 @@ test("base64-span generator is deterministic, census-derived, and policy complet
       hostBehaviorVerified: 2,
       remainingWithoutGeneratedAdapters: 1322,
     });
+    assert.equal(report.fallbackAudit.count, 0);
     assert.deepEqual(
       report.declarations.map(({ mode, patternDecision }) => ({ mode, patternDecision })),
       [
@@ -86,27 +87,41 @@ test("base64-span generator rejects mixed provenance", async () => {
   }
 });
 
-test("base64-span semantics come from ABI and source documentation rather than route names", async () => {
-  const ir = JSON.parse(await readFile(join(repositoryRoot, "packages/bindings/generated/defold-sdk-ir.json"), "utf8"));
+test("base64-span semantics come from ABI plus codec identifier grammar, not documentation prose", async () => {
+  const [ir, shapes] = await Promise.all([
+    readFile(join(repositoryRoot, "packages/bindings/generated/defold-sdk-ir.json"), "utf8").then(JSON.parse),
+    readFile(join(repositoryRoot, "packages/bindings/generated/defold-dmsdk-abi-shapes.json"), "utf8").then(JSON.parse),
+  ]);
   const policyText = await readFile(
     join(repositoryRoot, "packages/bindings/overrides/dmsdk-base64-span-bindings.json"),
     "utf8",
   );
   const policy = JSON.parse(policyText);
-  assert.doesNotMatch(policyText, /symbolPrefix|candidateSelector|crypt\.h|"entries"/u);
-  for (const declaration of ir.declarations.filter(({ description }) =>
-    /^Base64 (?:encode|decode) a buffer$/u.test(description ?? ""),
-  )) {
-    const header = await readFile(join(repositoryRoot, declaration.header), "utf8");
-    const semantics = extractBase64SpanSemantics(header, declaration, policy.documentationContract);
+  assert.doesNotMatch(
+    policyText,
+    /documentationContract|description|symbolPrefix|candidateSelector|crypt\.h|"entries"/u,
+  );
+  const declarations = ir.declarations.filter(({ name }) => /Base64(?:Encode|Decode)$/u.test(name));
+  assert.equal(declarations.length, 2);
+  for (const declaration of declarations) {
+    const candidate = shapes.rows.find(({ id }) => id === declaration.id);
+    const semantics = extractBase64SpanSemantics(declaration, candidate, policy.recipe);
     assert.ok(semantics, declaration.id);
-    assert.equal(semantics.mode, declaration.description.includes("encode") ? "encode" : "decode");
-    assert.equal(
+    assert.equal(semantics.mode, declaration.name.endsWith("Encode") ? "encode" : "decode");
+    assert.ok(
       extractBase64SpanSemantics(
-        header.replaceAll(policy.documentationContract.queryNote, "query semantics drifted"),
-        declaration,
-        policy.documentationContract,
+        {
+          ...declaration,
+          description: "",
+          returnDescription: "",
+          parameters: declaration.parameters.map((parameter) => ({ ...parameter, description: "" })),
+        },
+        candidate,
+        policy.recipe,
       ),
+    );
+    assert.equal(
+      extractBase64SpanSemantics({ ...declaration, name: "dmCrypt::Transform" }, candidate, policy.recipe),
       null,
     );
   }

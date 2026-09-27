@@ -13,7 +13,7 @@ The dmSDK runtime queue is now decomposed mechanically rather than by a hand-wri
 The enum-value family discovers functions whose arguments and results contain only ABI scalars or resolved enums and require at least one declared enum domain. Generic source-semantic inference retains universal fallback for registry-unregister and documented pre-context adapter-install operations; the package policy has no callable IDs, source paths, expected counts, or emit list. The current revision discovers ten candidates, blocks three lifecycle/registry mutations, and emits seven normal calls. The generated ABI uses `int32_t` for enums, exact generated input-domain checks, `uint64_t` plus JSI `bigint` for hashes, dense integer IDs, and stack-only fixed slots. Four buffer/log calls link and execute against the pinned packaged dmSDK. Three graphics/sound calls compile against the complete SDK but remain `engine-context-pending` until exercised in a real Defold process.
 
 Four additional context-free families are now generated from exact ABI-census
-selectors plus source-pinned semantic policies:
+selectors plus stable format recipes:
 
 - four fixed digests with caller-provided capacity and fixed 16/20/32/64-byte outputs;
 - two Base64 span operations with explicit capacity/query semantics and strict
@@ -135,6 +135,42 @@ Defold 1.11.0, 1.12.0, and 1.13.1 each independently derive the same two ABI
 shapes; that is derivation evidence only, not a retroactive host-runtime claim
 for those saved revisions.
 
+## Revision-derived bounded span semantics
+
+Fixed digest, Base64, ASTC, and XTEA specialization no longer treats English
+documentation as compiler control data. A single compiler-owned recipe module
+combines exact ABI roles and directions with revision-derived identifier and
+enum facts. Its package facts are stable format knowledge: MD5/SHA digest
+widths, Base64 encode/decode behavior, the 16-byte ASTC header bound, XTEA's
+16-byte key bound, and the zero-valued success enum convention selected from
+the revision's actual enum. The package contains no Defold declaration IDs,
+headers, symbols, descriptions, parameter prose, return prose, or expected
+route counts for these families.
+
+The generated public includes and native call expressions come from the
+selected revision IR. Current generation remains four fixed digests, two
+Base64 operations, two ASTC probes, and two XTEA operations; the generated
+C/C++ transport is byte-identical to the previous optimized implementation.
+Focused harnesses compile and link the exact calls, execute success and
+rejection vectors, and observe zero warmed C++ allocation calls. These are
+unchanged runtime claims rather than evidence inferred from the new parser.
+
+Semantic specialization is additive. If an ABI-shaped declaration uses an
+unseen digest, codec operation, format operation, or enum convention, the
+generator keeps its universal usage-materialized recipe. Its family report
+adds a machine-readable fallback audit containing the declaration ID, observed
+ABI shape, attempted pattern, missing semantic wiring, owning emitter, and a
+recommendation to extend the stable recipe or identifier grammar. A synthetic
+future digest test exercises this exact path; it does not merely unit-test the
+report formatter.
+
+The same unmodified compiler package completed a clean derivation of Defold
+`574678c7d44be490d874fbed2d0ae6211feec4d9`. That revision independently
+selected 4/4 fixed digests, 2/2 Base64 operations, 2/2 ASTC probes, and 2/2
+XTEA operations with zero semantic fallbacks. This proves parser and policy
+survival across the revision boundary; current packaged-SDK runtime execution
+remains the runtime evidence for these native implementations.
+
 ## Clean-room registry inputs and outputs
 
 `scripts/lib/dmsdk-generator-pipeline.mjs` is the single ownership and ordering
@@ -178,7 +214,7 @@ The registered steps are:
 Focused gates are `npm run check:dmsdk-runtime`,
 `npm run check:dmsdk-clean-room`, `npm run test:dmsdk-runtime-codegen`, and
 `npm run test:dmsdk-clean-room`. The clean-room input fingerprint for this
-wave is `084e8e8598a175851932f16ebaca12311a8be510ada183f0a6c7340addab21d1`.
+wave is `f534e54945a92f821b75272e40973ca8060d885d4c8774002dc9ec635fa28eeb`.
 
 The enum-value runtime and JSI dispatcher are now installed by the generated
 module installer and exported by the generated SDK barrel. The standalone host

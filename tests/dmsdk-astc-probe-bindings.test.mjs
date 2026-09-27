@@ -36,6 +36,7 @@ test("astc-probe generation is deterministic, census-complete, and evidence-boun
       hostBehaviorVerified: 2,
       remainingWithoutGeneratedAdapters: 1320,
     });
+    assert.equal(report.fallbackAudit.count, 0);
     for (const f of [...report.artifacts, "packages/bindings/generated/defold-dmsdk-astc-probe-bindings.json"])
       assert.equal(await readFile(join(out, f), "utf8"), await readFile(join(root, f), "utf8"));
     assert.deepEqual(
@@ -49,25 +50,35 @@ test("astc-probe generation is deterministic, census-complete, and evidence-boun
     await rm(out, { recursive: true, force: true });
   }
 });
-test("astc-probe semantics come from source documentation rather than route names", async () => {
-  const ir = JSON.parse(await readFile(join(root, "packages/bindings/generated/defold-sdk-ir.json"), "utf8"));
+test("astc-probe semantics come from ABI plus format identifier grammar, not documentation prose", async () => {
+  const [ir, shapes] = await Promise.all([
+    readFile(join(root, "packages/bindings/generated/defold-sdk-ir.json"), "utf8").then(JSON.parse),
+    readFile(join(root, "packages/bindings/generated/defold-dmsdk-abi-shapes.json"), "utf8").then(JSON.parse),
+  ]);
   const policyText = await readFile(join(root, "packages/bindings/overrides/dmsdk-astc-probe-bindings.json"), "utf8");
   const policy = JSON.parse(policyText);
-  assert.doesNotMatch(policyText, /symbolPrefix|candidateSelector|image\.h|"entries"/u);
-  const declarations = ir.declarations.filter(
-    ({ returnDescription, parameters }) =>
-      returnDescription === policy.documentationContract.returnDescription && parameters?.length === 5,
+  assert.doesNotMatch(
+    policyText,
+    /documentationContract|description|symbolPrefix|candidateSelector|image\.h|"entries"/u,
   );
+  const declarations = ir.declarations.filter(({ name }) => /GetAstc(?:BlockSize|Dimensions)$/u.test(name));
   assert.equal(declarations.length, 2);
   for (const declaration of declarations) {
-    assert.ok(extractAstcProbeSemantics(declaration, policy.documentationContract), declaration.id);
-    assert.equal(
+    const candidate = shapes.rows.find(({ id }) => id === declaration.id);
+    assert.ok(extractAstcProbeSemantics(declaration, candidate, policy.recipe), declaration.id);
+    assert.ok(
       extractAstcProbeSemantics(
-        { ...declaration, returnDescription: "documentation drifted" },
-        policy.documentationContract,
+        {
+          ...declaration,
+          description: "",
+          returnDescription: "",
+          parameters: declaration.parameters.map((parameter) => ({ ...parameter, description: "" })),
+        },
+        candidate,
+        policy.recipe,
       ),
-      null,
     );
+    assert.equal(extractAstcProbeSemantics({ ...declaration, name: "dmImage::Probe" }, candidate, policy.recipe), null);
   }
 });
 test("astc C ABI and bounded runtime compile, link to pinned parser source, behave, and allocate nothing warmed", async () => {

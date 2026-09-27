@@ -1,16 +1,12 @@
 {
-  "schemaVersion": 2,
-  "policyVersion": "fixed-digest-v2",
-  "family": "arena-backed-spans",
-  "documentationContract": {
-    "summaryPrefix": "Hash buffer using ",
-    "inputDescription": "The source data to hash",
-    "outputDescriptionPattern": "^The destination buffer \\(([1-9][0-9]*) bytes\\)$",
-    "inlineOutputPattern": "output is ([1-9][0-9]*) bytes",
-    "semantics": [
-      "fixed-output-byte-count",
-      "synchronous-noescape"
-    ],
-    "rationale": "The pinned public API documents a synchronous hash operation over a source byte span and a caller-owned destination buffer with an exact byte count. Selection uses ABI shape plus these structured documentation facts, never a header, symbol, prefix, or route allowlist."
+  "schemaVersion": 1,
+  "policyVersion": "fixed-digest-v3",
+  "family": "fixed-output-digest",
+  "recipe": {
+    "input": "borrowed-counted-bytes",
+    "output": "caller-owned-fixed-size-bytes",
+    "algorithms": ["md5", "sha1", "sha256", "sha512"],
+    "ownership": "synchronous-noescape",
+    "fallback": "universal-recipe"
   }
 }

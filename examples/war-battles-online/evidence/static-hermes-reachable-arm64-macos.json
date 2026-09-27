@@ -41,9 +41,9 @@
     ],
     "authoredSourceTreeSha256": "78ad56668c71de1136933b3f2c82949f53ab60d8fe4dc2aa281f044429795244",
     "loweringPlan": "packages/bindings/generated/defold-binding-lowering-plan.json",
-    "loweringPlanSha256": "d253065c4031836ddb26a5765ee470f167ecd67901bbb705271c91cf50cc261f",
+    "loweringPlanSha256": "e7c0ff943c78a56dad951ee77ea04cb366b32b11e4236e857d413eb1d9f3eb8e",
     "typedNativeBridge": "packages/bindings/generated/defold-typed-native-bridge.json",
-    "typedNativeBridgeSha256": "81439b37901358286e71465d8cda95c9890568250a7be348e38223cc1d351535",
+    "typedNativeBridgeSha256": "b0ae2842aea8681934eab9dd97ec75caf9ae3049a65f470651d29f4b4ecb5905",
     "typedNativeSource": "examples/war-battles-online/defold/.deherm/static-hermes/generated/script-typed-native-bridge.ts",
     "typedNativeSourceSha256": "d8b7183d3f003300e068f840673221d15dae9d68be9f98310ec993fd9fb3eb1f",
     "adapterEvidence": "examples/war-battles-online/evidence/packaged-typed-native-transport-arm64-macos.json",
@@ -241,5 +241,5 @@
     "gameplay": "not-claimed; packaged gameplay belongs to the native Dynamic Hermes projection",
     "blockers": "blocked reachable routes remain explicit and fail closed"
   },
-  "recordSha256": "9be25a8e78acbc9dd01cb923647f6ab629526659e175ba1aa9cf43d6d7c25c82"
+  "recordSha256": "f7617369476825e68fdecd99d101cb009f8ed9f20b245b846f6f87caf0d5e169"
 }

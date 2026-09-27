@@ -1,15 +1,15 @@
 {
-  "schemaVersion": 2,
-  "policyVersion": "base64-span-v2",
-  "family": "arena-backed-spans",
-  "documentationContract": {
-    "summaryPattern": "^Base64 (encode|decode) a buffer$",
-    "sourceDescriptionPattern": "^The source data to (encode|decode)$",
-    "sourceLengthDescription": "key The length of source data in bytes",
-    "destinationDescription": "The destination buffer",
-    "capacityAnnotationPattern": "@param dst_len\\[in,out\\].*In: The length of the destination in bytes\\. Out: The length of the (encoded|decoded) string\\.",
-    "queryNote": "Call this function with *dst_len = 0 to obtain the required buffer size in *dst_len",
-    "semantics": ["bounded-output-capacity", "synchronous-noescape", "zero-capacity-size-query"],
-    "rationale": "The pinned public API describes a synchronous byte-span transform with explicit caller-owned input, output, capacity, and zero-capacity query semantics. Selection uses ABI shape plus those structured documentation facts, never a header, symbol, prefix, or route allowlist."
+  "schemaVersion": 1,
+  "policyVersion": "base64-span-v3",
+  "family": "bounded-byte-transform",
+  "recipe": {
+    "codec": "base64",
+    "operations": ["decode", "encode"],
+    "input": "borrowed-counted-bytes",
+    "output": "caller-owned-capacity-inout",
+    "decodeInput": "canonical-padded",
+    "sizeQuery": "zero-output-capacity",
+    "ownership": "synchronous-noescape",
+    "fallback": "universal-recipe"
   }
 }

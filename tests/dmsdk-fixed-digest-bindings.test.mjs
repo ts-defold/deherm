@@ -1,12 +1,17 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 
-import { extractFixedDigestSemantics, nearestEvidenceLine } from "../scripts/generate-dmsdk-fixed-digest-bindings.mjs";
+import { extractFixedDigestSemantics } from "../scripts/generate-dmsdk-fixed-digest-bindings.mjs";
+import {
+  analyzeFixedDigestRecipe,
+  createDmSdkFallbackAudit,
+} from "../packages/compiler/src/dmsdk-bounded-span-recipes.mjs";
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const reportPath = join(repositoryRoot, "packages/bindings/generated/defold-dmsdk-fixed-digest-bindings.json");
@@ -29,19 +34,6 @@ function includeArgs() {
   ];
 }
 
-test("fixed-digest evidence resolves the occurrence nearest the current declaration", () => {
-  const header = [
-    "/** output is 32 bytes */",
-    "void Unrelated();",
-    "",
-    "",
-    "/** output is 32 bytes */",
-    "void HashSha256();",
-  ].join("\n");
-  assert.equal(nearestEvidenceLine(header, "/** output is 32 bytes */", 6), 5);
-  assert.equal(nearestEvidenceLine(header, "/** missing */", 6), 0);
-});
-
 test("fixed-digest generator is deterministic and provenance-bound to the IR census", async () => {
   const output = await mkdtemp(join(tmpdir(), "deherm-dmsdk-fixed-digest-"));
   try {
@@ -55,6 +47,11 @@ test("fixed-digest generator is deterministic and provenance-bound to the IR cen
       policyBlocked: 0,
       hostBehaviorVerified: 4,
       remainingWithoutGeneratedAdapters: 1324,
+    });
+    assert.deepEqual(report.fallbackAudit, {
+      retainedImplementation: "@deherm/compiler/dmsdk-universal-materializer",
+      count: 0,
+      entries: [],
     });
     for (const artifact of [...report.artifacts, "packages/bindings/generated/defold-dmsdk-fixed-digest-bindings.json"])
       assert.equal(
@@ -92,49 +89,92 @@ test("fixed-digest generation fails closed when ABI-shape provenance no longer n
   }
 });
 
-test("fixed-digest semantics are source-derived and fail closed on documentation drift", async () => {
-  const [ir, policy] = await Promise.all([
+test("an unseen fixed-digest semantic shape retains the universal path and emits an actionable audit", async () => {
+  const output = await mkdtemp(join(tmpdir(), "deherm-dmsdk-fixed-digest-fallback-"));
+  try {
+    const ir = JSON.parse(
+      await readFile(join(repositoryRoot, "packages/bindings/generated/defold-sdk-ir.json"), "utf8"),
+    );
+    const shapes = JSON.parse(
+      await readFile(join(repositoryRoot, "packages/bindings/generated/defold-dmsdk-abi-shapes.json"), "utf8"),
+    );
+    const declaration = ir.declarations.find(({ name }) => name === "dmCrypt::HashSha256");
+    declaration.name = "dmCrypt::HashFuture";
+    const irText = `${JSON.stringify(ir, null, 2)}\n`;
+    shapes.sourceHashes.ir = createHash("sha256").update(irText).digest("hex");
+    const irPath = join(output, "ir.json");
+    const shapesPath = join(output, "shapes.json");
+    await writeFile(irPath, irText);
+    await writeFile(shapesPath, `${JSON.stringify(shapes, null, 2)}\n`);
+
+    run(process.execPath, [
+      "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
+      "--ir",
+      irPath,
+      "--shapes",
+      shapesPath,
+      "--out-root",
+      join(output, "out"),
+    ]);
+    const report = JSON.parse(
+      await readFile(join(output, "out/packages/bindings/generated/defold-dmsdk-fixed-digest-bindings.json"), "utf8"),
+    );
+    assert.equal(report.coverage.emitted, 3);
+    assert.equal(report.coverage.policyBlocked, 1);
+    assert.equal(report.fallbackAudit.count, 1);
+    assert.equal(report.fallbackAudit.entries[0].state, "universal-fallback");
+    assert.equal(
+      report.fallbackAudit.entries[0].observedShape,
+      shapes.rows.find(({ id }) => id === declaration.id).shape,
+    );
+    assert.deepEqual(report.fallbackAudit.entries[0].missingWiring, ["standard-digest-identifier"]);
+    assert.equal(report.fallbackAudit.entries[0].recommendation.preserveFallbackUntilSpecialized, true);
+  } finally {
+    await rm(output, { recursive: true, force: true });
+  }
+});
+
+test("fixed-digest semantics come from ABI, identifier grammar, and stable digest standards", async () => {
+  const [ir, shapes, policyText] = await Promise.all([
     readFile(join(repositoryRoot, "packages/bindings/generated/defold-sdk-ir.json"), "utf8").then(JSON.parse),
-    readFile(join(repositoryRoot, "packages/bindings/overrides/dmsdk-fixed-digest-bindings.json"), "utf8").then(
-      JSON.parse,
-    ),
+    readFile(join(repositoryRoot, "packages/bindings/generated/defold-dmsdk-abi-shapes.json"), "utf8").then(JSON.parse),
+    readFile(join(repositoryRoot, "packages/bindings/overrides/dmsdk-fixed-digest-bindings.json"), "utf8"),
   ]);
+  const policy = JSON.parse(policyText);
   const declaration = ir.declarations.find(({ name }) => name === "dmCrypt::HashSha256");
-  const header = await readFile(join(repositoryRoot, declaration.header), "utf8");
-  const semantics = extractFixedDigestSemantics(header, declaration, policy.documentationContract);
+  const candidate = shapes.rows.find(({ id }) => id === declaration.id);
+  const semantics = extractFixedDigestSemantics(declaration, candidate, policy.recipe);
   assert.equal(semantics.digestBytes, 32);
+  assert.equal(semantics.algorithm, "sha256");
   assert.deepEqual(semantics.semanticTokens, ["fixed-output-byte-count", "synchronous-noescape"]);
-  assert.equal(semantics.evidence.documentationSource, "clang-comment-ast");
+  assert.equal(semantics.evidence.semanticSource, "revision-ir-abi+identifier-grammar+stable-format-recipe");
   assert.equal(
     extractFixedDigestSemantics(
-      header,
-      { ...declaration, description: "Transform bytes" },
-      policy.documentationContract,
-    ),
-    null,
-  );
-  assert.equal(
-    extractFixedDigestSemantics(
-      header.replace("output is 32 bytes", "output is 31 bytes"),
-      declaration,
-      policy.documentationContract,
-    ),
-    null,
-  );
-  assert.equal(
-    extractFixedDigestSemantics(
-      header,
       {
         ...declaration,
-        parameters: declaration.parameters.map((parameter, index) =>
-          index === 2 ? { ...parameter, description: "The destination buffer" } : parameter,
-        ),
+        description: "",
+        returnDescription: "",
+        parameters: declaration.parameters.map((parameter) => ({ ...parameter, description: "" })),
       },
-      policy.documentationContract,
-    ),
-    null,
+      candidate,
+      policy.recipe,
+    )?.digestBytes,
+    32,
   );
-  assert.doesNotMatch(JSON.stringify(policy), /dmCrypt|crypt\.h|HashSha|HashMd5|"entries"/);
+  const unknown = analyzeFixedDigestRecipe({ ...declaration, name: "dmCrypt::HashFuture" }, candidate, policy.recipe);
+  assert.equal(unknown.semantics, null);
+  assert.deepEqual(unknown.missingFacts, ["standard-digest-identifier"]);
+  const audit = createDmSdkFallbackAudit({
+    candidate,
+    family: "fixed-digest",
+    patternId: "span.fixed-output-digest",
+    emitter: "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
+    missingFacts: unknown.missingFacts,
+  });
+  assert.equal(audit.retainedImplementation, "@deherm/compiler/dmsdk-universal-materializer");
+  assert.equal(audit.observedShape, candidate.shape);
+  assert.deepEqual(audit.recommendation.requiredFacts, ["standard-digest-identifier"]);
+  assert.doesNotMatch(policyText, /documentationContract|description|dmCrypt|crypt\.h|HashSha|HashMd5|"entries"/u);
 });
 
 test("fixed-digest C ABI compiles, links, hashes known input, rejects invalid bounds, and allocates nothing warmed", async (context) => {

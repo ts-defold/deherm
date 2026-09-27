@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "policyVersion": "xtea-span-v2",
+  "policyVersion": "xtea-span-v3",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "sources": {
     "ir": "packages/bindings/generated/defold-sdk-ir.json",
@@ -10,30 +10,22 @@
   "sourceHashes": {
     "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
-    "policy": "0063cd85604d3827adf0335bb72703cf12403d6534da589c381464657e807937"
+    "policy": "339fc98591a758bfeaa4c0e16c04d241a56583c5468d7829d8a6aebd80f2eaa9"
   },
   "policy": {
-    "documentationContract": {
-      "summaryPattern": "^(Encrypt|Decrypt) data in place$",
-      "parameterDescriptions": [
-        "algorithm",
-        "data",
-        "data length in bytes",
-        "key",
-        "key length"
-      ],
-      "returnPattern": "^the (encryption|decryption) result$",
-      "semantics": [
-        "bounded-key-span",
-        "in-place-byte-transform",
-        "single-algorithm-enum",
-        "synchronous-noescape"
-      ],
-      "rationale": "The pinned API describes an in-place byte transform with explicit data and key lengths. The algorithm enum has one value and the success result is the zero-valued enum member; both names are derived from that revision's type metadata instead of package constants."
-    },
     "recipe": {
+      "algorithm": "xtea",
+      "operations": [
+        "decrypt",
+        "encrypt"
+      ],
+      "data": "borrowed-mutable-counted-bytes",
+      "key": "borrowed-counted-bytes",
       "maximumKeyBytes": 16,
-      "rationale": "XTEA consumes a 128-bit key. The adapter checks the format bound before entering Defold's implementation."
+      "requireSingleAlgorithm": true,
+      "successEnumValue": 0,
+      "ownership": "synchronous-noescape",
+      "fallback": "universal-recipe"
     },
     "patternRegistry": [
       {
@@ -142,6 +134,11 @@
     "defold/defold_hermes/src/generated_dmsdk_xtea_span_crypt.cpp",
     "defold/defold_hermes/src/generated_dmsdk_xtea_span_runtime.cpp"
   ],
+  "fallbackAudit": {
+    "retainedImplementation": "@deherm/compiler/dmsdk-universal-materializer",
+    "count": 0,
+    "entries": []
+  },
   "declarations": [
     {
       "id": "dmsdk:dmCrypt::Decrypt@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:76:156",
@@ -209,15 +206,9 @@
       "mode": "decrypt",
       "evidence": {
         "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
-        "summary": "Decrypt data in place",
-        "parameters": [
-          "algorithm",
-          "data",
-          "data length in bytes",
-          "key",
-          "key length"
-        ],
-        "result": "the decryption result",
+        "declarationLine": 76,
+        "semanticSource": "revision-ir-abi+identifier-grammar+stable-format-recipe",
+        "operation": "decrypt",
         "algorithmType": "dmCrypt::Algorithm",
         "algorithmMember": {
           "name": "ALGORITHM_XTEA",
@@ -227,9 +218,7 @@
         "successMember": {
           "name": "RESULT_OK",
           "value": 0
-        },
-        "documentationSource": "clang-comment-ast+enum-metadata+xtea-format-recipe",
-        "declarationLine": 76
+        }
       },
       "patternDecision": "span.in-place-keyed-transform",
       "wrapper": "deherm_dmsdk_xtea_span_dm_crypt_decrypt",
@@ -307,15 +296,9 @@
       "mode": "encrypt",
       "evidence": {
         "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
-        "summary": "Encrypt data in place",
-        "parameters": [
-          "algorithm",
-          "data",
-          "data length in bytes",
-          "key",
-          "key length"
-        ],
-        "result": "the encryption result",
+        "declarationLine": 65,
+        "semanticSource": "revision-ir-abi+identifier-grammar+stable-format-recipe",
+        "operation": "encrypt",
         "algorithmType": "dmCrypt::Algorithm",
         "algorithmMember": {
           "name": "ALGORITHM_XTEA",
@@ -325,9 +308,7 @@
         "successMember": {
           "name": "RESULT_OK",
           "value": 0
-        },
-        "documentationSource": "clang-comment-ast+enum-metadata+xtea-format-recipe",
-        "declarationLine": 65
+        }
       },
       "patternDecision": "span.in-place-keyed-transform",
       "wrapper": "deherm_dmsdk_xtea_span_dm_crypt_encrypt",

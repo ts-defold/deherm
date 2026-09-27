@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "policyVersion": "astc-probe-v2",
+  "policyVersion": "astc-probe-v3",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "sources": {
     "ir": "packages/bindings/generated/defold-sdk-ir.json",
@@ -10,26 +10,20 @@
   "sourceHashes": {
     "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
-    "policy": "a340bcfde2de0c0c46715e45c8eaa2b56972fb320ca173b042f316cc4c7cdccc"
+    "policy": "66712a7b23a221fe1e2a8e3c3049c9894858c5c33f1297057ae9933ac70a0e79"
   },
   "policy": {
-    "documentationContract": {
-      "summaryPattern": "^Get the (block|astc image) size$",
-      "inputDescription": "the .astc memory (including the header)",
-      "inputLengthDescription": "the length of the memory blob",
-      "outputDescriptions": [
-        "(out) the block width",
-        "(out) the block height",
-        "(out) the block depth"
+    "recipe": {
+      "format": "astc",
+      "operations": [
+        "block-size",
+        "dimensions"
       ],
-      "returnDescription": "true if it's an astc file",
+      "input": "borrowed-counted-bytes",
+      "output": "caller-owned-three-u32",
       "minimumHeaderBytes": 16,
-      "semantics": [
-        "bounded-input-span",
-        "fixed-three-u32-output",
-        "synchronous-noescape"
-      ],
-      "rationale": "The pinned public API describes a synchronous bounded ASTC memory probe with three caller-owned scalar outputs. The 16-byte preflight is a stable ASTC container-format recipe. Selection uses ABI shape plus structured documentation facts, never a header, symbol, prefix, or route allowlist."
+      "ownership": "synchronous-noescape",
+      "fallback": "universal-recipe"
     },
     "patternRegistry": [
       {
@@ -143,6 +137,11 @@
     "defold/defold_hermes/src/generated_dmsdk_astc_probe_image.cpp",
     "defold/defold_hermes/src/generated_dmsdk_astc_probe_runtime.cpp"
   ],
+  "fallbackAudit": {
+    "retainedImplementation": "@deherm/compiler/dmsdk-universal-materializer",
+    "count": 0,
+    "entries": []
+  },
   "declarations": [
     {
       "id": "dmsdk:dmImage::GetAstcBlockSize@upstream/defold/engine/dlib/src/dmsdk/dlib/image.h:133:349",
@@ -210,18 +209,11 @@
       "mode": "block-size",
       "evidence": {
         "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/image.h",
-        "summary": "Get the block size",
-        "input": "the .astc memory (including the header)",
-        "inputLength": "the length of the memory blob",
-        "outputs": [
-          "(out) the block width",
-          "(out) the block height",
-          "(out) the block depth"
-        ],
-        "result": "true if it's an astc file",
-        "minimumHeaderBytes": 16,
-        "documentationSource": "clang-comment-ast+astc-format-recipe",
-        "declarationLine": 133
+        "declarationLine": 133,
+        "semanticSource": "revision-ir-abi+identifier-grammar+stable-format-recipe",
+        "format": "astc",
+        "operation": "block-size",
+        "minimumHeaderBytes": 16
       },
       "patternDecision": "span.fixed-three-u32-probe",
       "wrapper": "deherm_dmsdk_astc_probe_dm_image_get_astc_block_size",
@@ -299,18 +291,11 @@
       "mode": "dimensions",
       "evidence": {
         "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/image.h",
-        "summary": "Get the astc image size",
-        "input": "the .astc memory (including the header)",
-        "inputLength": "the length of the memory blob",
-        "outputs": [
-          "(out) the block width",
-          "(out) the block height",
-          "(out) the block depth"
-        ],
-        "result": "true if it's an astc file",
-        "minimumHeaderBytes": 16,
-        "documentationSource": "clang-comment-ast+astc-format-recipe",
-        "declarationLine": 145
+        "declarationLine": 145,
+        "semanticSource": "revision-ir-abi+identifier-grammar+stable-format-recipe",
+        "format": "astc",
+        "operation": "dimensions",
+        "minimumHeaderBytes": 16
       },
       "patternDecision": "span.fixed-three-u32-probe",
       "wrapper": "deherm_dmsdk_astc_probe_dm_image_get_astc_dimensions",

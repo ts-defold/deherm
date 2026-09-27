@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "policyVersion": "base64-span-v2",
+  "policyVersion": "base64-span-v3",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "sources": {
     "ir": "packages/bindings/generated/defold-sdk-ir.json",
@@ -10,25 +10,21 @@
   "sourceHashes": {
     "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
-    "policy": "74c32554dd209a231e8121c54de7c141b991fbc91e165b9bb4e96e0bd83776df",
-    "headers": {
-      "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h": "ae6dce231e90fbde3642399b52ed2299b3c8488632492b811af7a2dd38eff560"
-    }
+    "policy": "592ab99764296fd8c42d2454541d04615986db77aa3ce95212cd4d2049f43562"
   },
   "policy": {
-    "documentationContract": {
-      "summaryPattern": "^Base64 (encode|decode) a buffer$",
-      "sourceDescriptionPattern": "^The source data to (encode|decode)$",
-      "sourceLengthDescription": "key The length of source data in bytes",
-      "destinationDescription": "The destination buffer",
-      "capacityAnnotationPattern": "@param dst_len\\[in,out\\].*In: The length of the destination in bytes\\. Out: The length of the (encoded|decoded) string\\.",
-      "queryNote": "Call this function with *dst_len = 0 to obtain the required buffer size in *dst_len",
-      "semantics": [
-        "bounded-output-capacity",
-        "synchronous-noescape",
-        "zero-capacity-size-query"
+    "recipe": {
+      "codec": "base64",
+      "operations": [
+        "decode",
+        "encode"
       ],
-      "rationale": "The pinned public API describes a synchronous byte-span transform with explicit caller-owned input, output, capacity, and zero-capacity query semantics. Selection uses ABI shape plus those structured documentation facts, never a header, symbol, prefix, or route allowlist."
+      "input": "borrowed-counted-bytes",
+      "output": "caller-owned-capacity-inout",
+      "decodeInput": "canonical-padded",
+      "sizeQuery": "zero-output-capacity",
+      "ownership": "synchronous-noescape",
+      "fallback": "universal-recipe"
     },
     "patternRegistry": [
       {
@@ -134,6 +130,11 @@
     "defold/defold_hermes/src/generated_dmsdk_base64_span_crypt.cpp",
     "defold/defold_hermes/src/generated_dmsdk_base64_span_runtime.cpp"
   ],
+  "fallbackAudit": {
+    "retainedImplementation": "@deherm/compiler/dmsdk-universal-materializer",
+    "count": 0,
+    "entries": []
+  },
   "declarations": [
     {
       "id": "dmsdk:dmCrypt::Base64Decode@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:133:162",
@@ -195,12 +196,10 @@
       "requirePaddedInput": true,
       "evidence": {
         "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
-        "summary": "Base64 decode a buffer",
-        "source": "The source data to encode",
-        "capacity": "@param dst_len[in,out]   [type:uint32_t*] In: The length of the destination in bytes. Out: The length of the decoded string.",
-        "query": "Call this function with *dst_len = 0 to obtain the required buffer size in *dst_len",
-        "documentationSource": "clang-comment-ast+public-header-comment",
-        "declarationLine": 133
+        "declarationLine": 133,
+        "semanticSource": "revision-ir-abi+identifier-grammar+stable-format-recipe",
+        "codec": "base64",
+        "operation": "decode"
       },
       "patternDecision": "span.bounded-byte-transform",
       "wrapper": "deherm_dmsdk_base64_span_dm_crypt_base64_decode",
@@ -272,12 +271,10 @@
       "requirePaddedInput": false,
       "evidence": {
         "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
-        "summary": "Base64 encode a buffer",
-        "source": "The source data to encode",
-        "capacity": "@param dst_len[in,out]   [type:uint32_t*] In: The length of the destination in bytes. Out: The length of the encoded string.",
-        "query": "Call this function with *dst_len = 0 to obtain the required buffer size in *dst_len",
-        "documentationSource": "clang-comment-ast+public-header-comment",
-        "declarationLine": 120
+        "declarationLine": 120,
+        "semanticSource": "revision-ir-abi+identifier-grammar+stable-format-recipe",
+        "codec": "base64",
+        "operation": "encode"
       },
       "patternDecision": "span.bounded-byte-transform",
       "wrapper": "deherm_dmsdk_base64_span_dm_crypt_base64_encode",

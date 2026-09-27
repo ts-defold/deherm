@@ -1,5 +1,22 @@
 # Defold Hermes knowledge log
 
+## 2026-09-27 - Bounded span semantics are stable recipes, not copied prose
+
+- Replaced the remaining fixed-digest, Base64, ASTC, and XTEA description
+  matchers with one compiler-owned semantic recipe module. Revision IR supplies
+  exact ABI shapes, identifiers, enums, headers, and symbols; stable recipes
+  supply digest standards, codec/format operations, bounds, ownership, and
+  fallback contracts.
+- All ten optimized adapters regenerate with byte-identical C/C++ output. Their
+  packaged-SDK or pinned-source compile, link, rejection, behavior, and warmed
+  zero-C++-allocation harnesses pass.
+- Every structural candidate that lacks a semantic recipe now retains the
+  universal materializer and receives a machine-readable audit containing its
+  observed ABI shape, missing facts, emitter, and recommended wiring. A
+  synthetic unseen digest proves this path emits three known optimizations,
+  retains the unknown route, and reports the missing digest grammar rather than
+  failing generation.
+
 ## 2026-09-27 - Fixed-width buffer hashes no longer depend on Defold prose
 
 - Reduced the hash-span package policy to a borrowed counted-byte recipe with
