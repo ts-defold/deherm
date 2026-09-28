@@ -408,7 +408,7 @@ export async function build(overrides = {}) {
     generated: entries.length,
     blocked: rows.length - entries.length,
     sourceDerived: plan.coverage.sourceDerived,
-    compatibilityPreserved: plan.coverage.compatibilityPreserved,
+    defoldContractTrusted: plan.coverage.defoldContractTrusted,
   };
   const storageMaxParameters = Math.max(1, maxParameters);
   const names = makeFunctionNames(entries);
@@ -423,7 +423,7 @@ export async function build(overrides = {}) {
   generated.set(artifacts.staticHermes, renderStaticHermes());
   generated.set(artifacts.headerAudit, renderHeaderAudit(entries));
   const report = {
-    schemaVersion: 2,
+    schemaVersion: 3,
     defoldRevision: ir.defoldRevision,
     sources: paths,
     sourceHashes: Object.fromEntries(Object.entries(contents).map(([key, content]) => [key, sha256(content)])),

@@ -38,6 +38,7 @@ test("borrowed-handle emission exactly projects the authenticated plan and retai
     readFile(path.join(root, "scripts/generate-dmsdk-borrowed-handle-bindings.mjs"), "utf8"),
   ]);
   assert.equal(report.providerAbiVersion, plan.providerAbiVersion);
+  assert.equal(report.schemaVersion, 2);
   assert.equal(report.coverage.candidates, plan.coverage.structurallyRelevant);
   assert.equal(report.coverage.generated, plan.coverage.selected);
   assert.equal(report.coverage.blocked, plan.coverage.universalFallback);
@@ -45,6 +46,7 @@ test("borrowed-handle emission exactly projects the authenticated plan and retai
     candidates: plan.coverage.structurallyRelevant,
     generated: plan.coverage.selected,
     blocked: plan.coverage.universalFallback,
+    lifecycleGenerated: plan.coverage.lifecycleSelected,
     cAbiGenerated: plan.coverage.selected,
     dynamicHermesJsiGenerated: plan.coverage.selected,
     staticHermesGenerated: plan.coverage.selected,
@@ -64,6 +66,8 @@ test("borrowed-handle emission exactly projects the authenticated plan and retai
   assert.equal(new Set(report.declarations.map(({ id }) => id)).size, plan.decisions.length);
   assert.equal(report.handleKinds.length, report.abi.handleKindCount);
   assert.equal(report.abi.maxArguments, 8);
+  assert.deepEqual(report.abi.lifecycleEffects, ["borrow", "retain", "release", "finalize"]);
+  assert.match(report.abi.lifecycleCommit, /after successful invoke/u);
   assert.deepEqual(report.selector, plan.eligibility);
   assert.equal(Object.hasOwn(policy, "entries"), false);
   assert.doesNotMatch(
@@ -228,6 +232,8 @@ test("C ABI, Dynamic Hermes adapter, browser descriptor, and TypeScript projecti
       "utf8",
     );
     assert.match(browser, /slotBytes:8,maxArguments:8,resultBytes:8/);
+    assert.match(browser, /per-argument-lifecycle-effects/);
+    assert.match(browser, /argumentEffects:Object\.freeze/);
     assert.match(browser, /callRaw:function\(id,argumentsPointer,argumentCount,resultPointer\)/);
   } finally {
     await rm(directory, { recursive: true, force: true });
@@ -274,6 +280,8 @@ test("generated runtime remains allocation-free and does not embed dmSDK symbol 
   assert.doesNotMatch(runtime, /\b(?:dmGraphics|dmGameObject|dmResource)::[A-Za-z0-9_]+\s*\(/);
   assert.match(runtime, /validate_handle/);
   assert.match(runtime, /is_current_thread/);
+  assert.match(runtime, /transition_handle/);
+  assert.match(runtime, /argument_effects/);
 });
 
 test("Dynamic Hermes f32 admission rejects finite doubles that overflow the native lane", async () => {

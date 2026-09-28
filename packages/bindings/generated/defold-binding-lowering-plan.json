@@ -29,7 +29,7 @@
     "scriptConstantLowering": "53815679718931177edd274504ea8f2decba28f6dac328f27a039070a2c82198",
     "defoldValueLayouts": "a905f72450a2164d414d90e37359ea9b0207609ead5c16e928b39400c32f3d5b",
     "dmsdkProjection": "71b49d4aac3b9aafffe8680a95ed08bc8fc46a2c7ffeceb5b6c303d9ce4685ba",
-    "dmsdkUniversal": "2a733eb2d6da4dccca344bd42ac85f1fb273da5e37777426c4d2f9abdc355d34",
+    "dmsdkUniversal": "047946a2d49656055ed2d4dfae669ce40d5040fd26cb517b5d4f1b6bd2d04ce5",
     "dmsdkScalarThunks": "9c4621db3613a53b7a470d249d06e25787b3bf917f32e4840315bc2efdc4d291",
     "dmsdkEnumValues": "52e9533abdb4b76dccfbae10f7f9e954003ba5755d9a255be8b5a66198d616a4",
     "dmsdkNamedScalars": "8e9b149acbf3ab77cb7835329cac4f9f5deed61c1b1a64e113247159dfc6b5cc",
@@ -40,7 +40,7 @@
     "dmsdkHashSpans": "1ac8e9330772346282796b058505eadb88f7f8cf878532f7a387c85bafd7cc72",
     "dmsdkArenaSpanBlockers": "701b3d52ba6bc2227a4b8a82d458bce2213fba0384b632304842466c6a55ecb7",
     "dmsdkCStringValue": "3c84bc89fd1185bebee73a44d362340fb511fbe5fe4fa9cc6b0ccdebe6a4ea66",
-    "dmsdkBorrowedHandle": "62acd3320638f270fd3f2f11530d74559c6577635cf3e2cbbf65e7c9e301ce08",
+    "dmsdkBorrowedHandle": "69c2835ad02648a4598c3cad6d3a83a09854d5ba18212fa8be38e03d62874008",
     "dmsdkTargetConditionals": "e743b8b82ba78fb8d6c6f49973493f69e3ae53ea3cea05a02ae42bbf8647cdbf",
     "semanticPolicies": "d49b82277fc9267ec3868530dce2d87777108754ac1854c1b21596e8110908f6",
     "typescriptSdk": "81b1278970b1a6efa11c533a979adf61a93174cb9f268cab7bb618a3465a3ec7",
@@ -67,7 +67,7 @@
     "scriptConstantLowering": "cf923dc81d26c2d45a21fe9b3691c65d69950adda5fbcb68bbae0331704f4154",
     "defoldValueLayouts": "eac699e8e10722490bda1981edfa002e4b5fe9ac8b1eb1a12898abc5689708ca",
     "dmsdkProjection": "efd1eb31455d30df7d5519d699c6bc95724571439a9c558761192f889bb68548",
-    "dmsdkUniversal": "acc9aff190f7423e10297ce297560f6fe6056f6ed5dfb4aa55e55bca58291425",
+    "dmsdkUniversal": "bfeb68b4c86cb0f8b1732eb31b2807d70fbfa8b6dad3abd2d2133327e0254a0d",
     "dmsdkScalarThunks": "e832908ae5fecf0e2887b8b03a48076913400f231b2c87f51ccdb5f7b5a39024",
     "dmsdkEnumValues": "bfbbdb3538ef0ada792246dcdbca2854da3988a1fd469006f13ba1b4f411e234",
     "dmsdkNamedScalars": "2a729adf168ae3b467638b049f3919feb6f4c7280a9abf2b026c70974c0836f4",
@@ -78,7 +78,7 @@
     "dmsdkHashSpans": "c366b7632517795f5daea01941885b88e221d12c8c8cf17d01218dd4fd528fe3",
     "dmsdkArenaSpanBlockers": "4cb27ed7bee7796ed077fa238a930a94587a1e2bb298d564f49d739fe9bcff6f",
     "dmsdkCStringValue": "06ad7137c7fa070d2b635f8e1e1baf88ad5a51ae9b59adaab6d727756dfbc446",
-    "dmsdkBorrowedHandle": "d10c755c29e16ccb29042eb9ebfa0c30d465a1ad4bb901502bcdd18a6b1a799b",
+    "dmsdkBorrowedHandle": "83e7c51be905dc16c494e9f39a3acf2cc72187a01cae83310809e94af39f1d66",
     "dmsdkTargetConditionals": "1391e027f73394ee1838287a25e0a244fd9a0d291ce6b585553164af39d9e005",
     "semanticPolicies": "3336271187d4bf1b9d3c0c45efe68a9c9c3710d71fef1a09c5f37973fd52e0f8",
     "typescriptSdk": "9011d6e158517ee59b5da64050507ddcd756a0d69277d9222f9a9c7644b514a3",
@@ -34659,21 +34659,47 @@
         {
           "lane": "dmsdk-borrowed-handle",
           "reportRow": 30,
-          "disposition": "blocked",
-          "semanticState": "blocked-by-structural-or-semantic-policy",
+          "disposition": "generated-provider-boundary",
+          "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:354996858556b11f7ee1f9bc",
+            "bindingId": 30,
             "symbol": "FontCollectionDestroy",
             "shape": "scalar:void(value:handle:HFontCollection:opaque)"
           },
           "blockers": [
-            "borrowed-handle-effect:destructive"
+            "call-thread-affinity-unresolved",
+            "handle-ownership-nullability-lifetime-unresolved",
+            "native-symbol-linkage-unverified",
+            "target-feature-symbol-matrix-unverified"
           ],
+          "resolvedPolicies": {
+            "transport": "provider-validated-u64-handle",
+            "ownership": "generated-per-argument-lifecycle-transitions",
+            "lifetime": "synchronous-transition-committed-after-success",
+            "thread": "provider-current-thread",
+            "handleParameterPositions": [
+              0
+            ],
+            "lifecycle": {
+              "resourceArguments": [
+                {
+                  "position": 0,
+                  "effect": "finalize"
+                }
+              ],
+              "result": "none",
+              "completion": "synchronous-noescape",
+              "nonLocalEffects": []
+            },
+            "evidenceBasis": "pinned-defold-declaration-and-source-semantics"
+          },
           "evidenceClaims": {
-            "generated": "universal-fallback-retained",
-            "compiled": "not-applicable",
-            "linked": "not-applicable",
-            "runtime": "not-applicable"
+            "generated": "all-five-target-projections-and-exact-call-twin",
+            "compiled": "pinned-header-adapter-and-exact-twin",
+            "linked": "generated-exact-provider-host-bridge-only",
+            "runtime": "generated-exact-provider-sanitized-and-warmed",
+            "engine": "not-claimed-provider-absent"
           }
         },
         {
@@ -34911,7 +34937,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:a0bb1864bae788d8b4b0a907",
-            "bindingId": 22,
+            "bindingId": 31,
             "symbol": "FontCollectionGetFontCount",
             "shape": "scalar:u32(value:handle:HFontCollection:opaque)"
           },
@@ -35195,21 +35221,47 @@
         {
           "lane": "dmsdk-borrowed-handle",
           "reportRow": 22,
-          "disposition": "blocked",
-          "semanticState": "blocked-by-structural-or-semantic-policy",
+          "disposition": "generated-provider-boundary",
+          "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:53c207d188785b43df0702d8",
+            "bindingId": 22,
             "symbol": "FontDestroy",
             "shape": "scalar:void(value:handle:HFont:opaque)"
           },
           "blockers": [
-            "borrowed-handle-effect:destructive"
+            "call-thread-affinity-unresolved",
+            "handle-ownership-nullability-lifetime-unresolved",
+            "native-symbol-linkage-unverified",
+            "target-feature-symbol-matrix-unverified"
           ],
+          "resolvedPolicies": {
+            "transport": "provider-validated-u64-handle",
+            "ownership": "generated-per-argument-lifecycle-transitions",
+            "lifetime": "synchronous-transition-committed-after-success",
+            "thread": "provider-current-thread",
+            "handleParameterPositions": [
+              0
+            ],
+            "lifecycle": {
+              "resourceArguments": [
+                {
+                  "position": 0,
+                  "effect": "finalize"
+                }
+              ],
+              "result": "none",
+              "completion": "synchronous-noescape",
+              "nonLocalEffects": []
+            },
+            "evidenceBasis": "pinned-defold-declaration-and-source-semantics"
+          },
           "evidenceClaims": {
-            "generated": "universal-fallback-retained",
-            "compiled": "not-applicable",
-            "linked": "not-applicable",
-            "runtime": "not-applicable"
+            "generated": "all-five-target-projections-and-exact-call-twin",
+            "compiled": "pinned-header-adapter-and-exact-twin",
+            "linked": "generated-exact-provider-host-bridge-only",
+            "runtime": "generated-exact-provider-sanitized-and-warmed",
+            "engine": "not-claimed-provider-absent"
           }
         },
         {
@@ -35469,7 +35521,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:f5e3c24d652e07a71d73d9c7",
-            "bindingId": 17,
+            "bindingId": 25,
             "symbol": "FontGetAscent",
             "shape": "scalar:f32(value:handle:HFont:opaque,value:scalar:f32)"
           },
@@ -35620,7 +35672,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:6005b12f92556550cb85a835",
-            "bindingId": 18,
+            "bindingId": 26,
             "symbol": "FontGetDescent",
             "shape": "scalar:f32(value:handle:HFont:opaque,value:scalar:f32)"
           },
@@ -36129,7 +36181,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:5a5f44cde62b186ac83277bf",
-            "bindingId": 21,
+            "bindingId": 29,
             "symbol": "FontGetGlyphIndex",
             "shape": "scalar:u32(value:handle:HFont:opaque,value:scalar:u32)"
           },
@@ -36280,7 +36332,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:c00452c673673d805ad99f8c",
-            "bindingId": 19,
+            "bindingId": 27,
             "symbol": "FontGetLineGap",
             "shape": "scalar:f32(value:handle:HFont:opaque,value:scalar:f32)"
           },
@@ -36536,7 +36588,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:4474eb01f282c6365d2c0c26",
-            "bindingId": 15,
+            "bindingId": 23,
             "symbol": "FontGetPathHash",
             "shape": "scalar:u32(value:handle:HFont:opaque)"
           },
@@ -36675,7 +36727,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:4e5026112063da0eec3f396e",
-            "bindingId": 20,
+            "bindingId": 28,
             "symbol": "FontGetResourceSize",
             "shape": "scalar:u32(value:handle:HFont:opaque)"
           },
@@ -36814,7 +36866,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:feea0b63ba065e7a4b65e368",
-            "bindingId": 16,
+            "bindingId": 24,
             "symbol": "FontGetScaleFromSize",
             "shape": "scalar:f32(value:handle:HFont:opaque,value:scalar:f32)"
           },
@@ -42887,21 +42939,47 @@
         {
           "lane": "dmsdk-borrowed-handle",
           "reportRow": 12,
-          "disposition": "blocked",
-          "semanticState": "blocked-by-structural-or-semantic-policy",
+          "disposition": "generated-provider-boundary",
+          "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:446c716ee38c7571068bedb3",
+            "bindingId": 12,
             "symbol": "JobSystemDestroy",
             "shape": "scalar:void(value:handle:HJobContext:opaque)"
           },
           "blockers": [
-            "borrowed-handle-effect:destructive"
+            "call-thread-affinity-unresolved",
+            "handle-ownership-nullability-lifetime-unresolved",
+            "native-symbol-linkage-unverified",
+            "target-feature-symbol-matrix-unverified"
           ],
+          "resolvedPolicies": {
+            "transport": "provider-validated-u64-handle",
+            "ownership": "generated-per-argument-lifecycle-transitions",
+            "lifetime": "synchronous-transition-committed-after-success",
+            "thread": "provider-current-thread",
+            "handleParameterPositions": [
+              0
+            ],
+            "lifecycle": {
+              "resourceArguments": [
+                {
+                  "position": 0,
+                  "effect": "finalize"
+                }
+              ],
+              "result": "none",
+              "completion": "synchronous-noescape",
+              "nonLocalEffects": []
+            },
+            "evidenceBasis": "pinned-defold-declaration-and-source-semantics"
+          },
           "evidenceClaims": {
-            "generated": "universal-fallback-retained",
-            "compiled": "not-applicable",
-            "linked": "not-applicable",
-            "runtime": "not-applicable"
+            "generated": "all-five-target-projections-and-exact-call-twin",
+            "compiled": "pinned-header-adapter-and-exact-twin",
+            "linked": "generated-exact-provider-host-bridge-only",
+            "runtime": "generated-exact-provider-sanitized-and-warmed",
+            "engine": "not-claimed-provider-absent"
           }
         },
         {
@@ -43266,7 +43344,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:37985a1c89401090944a59dd",
-            "bindingId": 8,
+            "bindingId": 14,
             "symbol": "JobSystemGetWorkerCount",
             "shape": "scalar:u32(value:handle:HJobContext:opaque)"
           },
@@ -43726,7 +43804,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:0f1c6dfe2af6ac4404614af4",
-            "bindingId": 7,
+            "bindingId": 13,
             "symbol": "JobSystemUpdate",
             "shape": "scalar:void(value:handle:HJobContext:opaque,value:scalar:u64)"
           },
@@ -51144,7 +51222,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:97ac61659bfc8559a0bae82c",
-            "bindingId": 123,
+            "bindingId": 154,
             "symbol": "ResourceDescriptorGetNameHash",
             "shape": "scalar:u64(value:handle:HResourceDescriptor:opaque)"
           },
@@ -51501,7 +51579,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:ade1dccd420283cfe1557be8",
-            "bindingId": 125,
+            "bindingId": 156,
             "symbol": "ResourceDescriptorGetResourceSize",
             "shape": "scalar:u32(value:handle:HResourceDescriptor:opaque)"
           },
@@ -51749,21 +51827,52 @@
         {
           "lane": "dmsdk-borrowed-handle",
           "reportRow": 157,
-          "disposition": "blocked",
-          "semanticState": "blocked-by-structural-or-semantic-policy",
+          "disposition": "generated-provider-boundary",
+          "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:0cc1e37032a6f7723fa075ef",
+            "bindingId": 157,
             "symbol": "ResourceDescriptorIncRef",
             "shape": "scalar:void(value:handle:HResourceFactory:opaque,value:handle:HResourceDescriptor:opaque)"
           },
           "blockers": [
-            "borrowed-handle-effect:retained"
+            "call-thread-affinity-unresolved",
+            "handle-ownership-nullability-lifetime-unresolved",
+            "native-symbol-linkage-unverified",
+            "target-feature-symbol-matrix-unverified"
           ],
+          "resolvedPolicies": {
+            "transport": "provider-validated-u64-handle",
+            "ownership": "generated-per-argument-lifecycle-transitions",
+            "lifetime": "synchronous-transition-committed-after-success",
+            "thread": "provider-current-thread",
+            "handleParameterPositions": [
+              0,
+              1
+            ],
+            "lifecycle": {
+              "resourceArguments": [
+                {
+                  "position": 0,
+                  "effect": "borrow"
+                },
+                {
+                  "position": 1,
+                  "effect": "retain"
+                }
+              ],
+              "result": "none",
+              "completion": "synchronous-noescape",
+              "nonLocalEffects": []
+            },
+            "evidenceBasis": "pinned-defold-declaration-and-source-semantics"
+          },
           "evidenceClaims": {
-            "generated": "universal-fallback-retained",
-            "compiled": "not-applicable",
-            "linked": "not-applicable",
-            "runtime": "not-applicable"
+            "generated": "all-five-target-projections-and-exact-call-twin",
+            "compiled": "pinned-header-adapter-and-exact-twin",
+            "linked": "generated-exact-provider-host-bridge-only",
+            "runtime": "generated-exact-provider-sanitized-and-warmed",
+            "engine": "not-claimed-provider-absent"
           }
         },
         {
@@ -52143,7 +52252,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:b4b06412e32d3cbd216566f8",
-            "bindingId": 124,
+            "bindingId": 155,
             "symbol": "ResourceDescriptorSetResourceSize",
             "shape": "scalar:void(value:handle:HResourceDescriptor:opaque,value:scalar:u32)"
           },
@@ -56832,7 +56941,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:83197af5850af5e7bc7a272a",
-            "bindingId": 126,
+            "bindingId": 158,
             "symbol": "ResourceTypeGetNameHash",
             "shape": "scalar:u64(value:handle:HResourceType:opaque)"
           },
@@ -56975,7 +57084,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:897d13d8cdc65e290932b221",
-            "bindingId": 129,
+            "bindingId": 161,
             "symbol": "ResourceTypeGetPreloadSize",
             "shape": "scalar:u32(value:handle:HResourceType:opaque)"
           },
@@ -57114,7 +57223,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:b15ef25d057495d92fca902b",
-            "bindingId": 128,
+            "bindingId": 160,
             "symbol": "ResourceTypeIsStreaming",
             "shape": "scalar:bool(value:handle:HResourceType:opaque)"
           },
@@ -57253,7 +57362,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:91d53d57f8a177db7c75413b",
-            "bindingId": 130,
+            "bindingId": 162,
             "symbol": "ResourceTypeReset",
             "shape": "scalar:void(value:handle:HResourceType:opaque)"
           },
@@ -58222,7 +58331,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:b7519de95a53baf5137cd472",
-            "bindingId": 127,
+            "bindingId": 159,
             "symbol": "ResourceTypeSetStreaming",
             "shape": "scalar:void(value:handle:HResourceType:opaque,value:scalar:u32)"
           },
@@ -59080,22 +59189,47 @@
         {
           "lane": "dmsdk-borrowed-handle",
           "reportRow": 32,
-          "disposition": "blocked",
-          "semanticState": "blocked-by-structural-or-semantic-policy",
+          "disposition": "generated-provider-boundary",
+          "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:2fdf3b544f41cc6c6a13d725",
+            "bindingId": 32,
             "symbol": "TextLayoutAcquire",
             "shape": "scalar:void(value:handle:HTextLayout:opaque)"
           },
           "blockers": [
-            "borrowed-handle-effect:acquired-or-leased",
-            "borrowed-handle-effect:retained"
+            "call-thread-affinity-unresolved",
+            "handle-ownership-nullability-lifetime-unresolved",
+            "native-symbol-linkage-unverified",
+            "target-feature-symbol-matrix-unverified"
           ],
+          "resolvedPolicies": {
+            "transport": "provider-validated-u64-handle",
+            "ownership": "generated-per-argument-lifecycle-transitions",
+            "lifetime": "synchronous-transition-committed-after-success",
+            "thread": "provider-current-thread",
+            "handleParameterPositions": [
+              0
+            ],
+            "lifecycle": {
+              "resourceArguments": [
+                {
+                  "position": 0,
+                  "effect": "retain"
+                }
+              ],
+              "result": "none",
+              "completion": "synchronous-noescape",
+              "nonLocalEffects": []
+            },
+            "evidenceBasis": "pinned-defold-declaration-and-source-semantics"
+          },
           "evidenceClaims": {
-            "generated": "universal-fallback-retained",
-            "compiled": "not-applicable",
-            "linked": "not-applicable",
-            "runtime": "not-applicable"
+            "generated": "all-five-target-projections-and-exact-call-twin",
+            "compiled": "pinned-header-adapter-and-exact-twin",
+            "linked": "generated-exact-provider-host-bridge-only",
+            "runtime": "generated-exact-provider-sanitized-and-warmed",
+            "engine": "not-claimed-provider-absent"
           }
         },
         {
@@ -59568,7 +59702,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:4310c7163f7e68a1ed332e60",
-            "bindingId": 27,
+            "bindingId": 38,
             "symbol": "TextLayoutGetDecorationCount",
             "shape": "scalar:u32(value:handle:HTextLayout:opaque)"
           },
@@ -59817,7 +59951,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:3e93e31c94c21192b6d531f9",
-            "bindingId": 24,
+            "bindingId": 35,
             "symbol": "TextLayoutGetGlyphCount",
             "shape": "scalar:u32(value:handle:HTextLayout:opaque)"
           },
@@ -60066,7 +60200,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:305b8385a4bc0cef70739ce5",
-            "bindingId": 25,
+            "bindingId": 36,
             "symbol": "TextLayoutGetLineCount",
             "shape": "scalar:u32(value:handle:HTextLayout:opaque)"
           },
@@ -60425,7 +60559,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:32db75e16c61bc5e8c1de036",
-            "bindingId": 28,
+            "bindingId": 39,
             "symbol": "TextLayoutGetObjectCount",
             "shape": "scalar:u32(value:handle:HTextLayout:opaque)"
           },
@@ -60978,7 +61112,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:b96df7f7dcd7cf7f40fef7d4",
-            "bindingId": 26,
+            "bindingId": 37,
             "symbol": "TextLayoutGetParagraphCount",
             "shape": "scalar:u32(value:handle:HTextLayout:opaque)"
           },
@@ -61223,22 +61357,47 @@
         {
           "lane": "dmsdk-borrowed-handle",
           "reportRow": 33,
-          "disposition": "blocked",
-          "semanticState": "blocked-by-structural-or-semantic-policy",
+          "disposition": "generated-provider-boundary",
+          "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:f9c8da9fde737a0c942230b3",
+            "bindingId": 33,
             "symbol": "TextLayoutRelease",
             "shape": "scalar:void(value:handle:HTextLayout:opaque)"
           },
           "blockers": [
-            "borrowed-handle-effect:acquired-or-leased",
-            "borrowed-handle-effect:returned-to-owner"
+            "call-thread-affinity-unresolved",
+            "handle-ownership-nullability-lifetime-unresolved",
+            "native-symbol-linkage-unverified",
+            "target-feature-symbol-matrix-unverified"
           ],
+          "resolvedPolicies": {
+            "transport": "provider-validated-u64-handle",
+            "ownership": "generated-per-argument-lifecycle-transitions",
+            "lifetime": "synchronous-transition-committed-after-success",
+            "thread": "provider-current-thread",
+            "handleParameterPositions": [
+              0
+            ],
+            "lifecycle": {
+              "resourceArguments": [
+                {
+                  "position": 0,
+                  "effect": "release"
+                }
+              ],
+              "result": "none",
+              "completion": "synchronous-noescape",
+              "nonLocalEffects": []
+            },
+            "evidenceBasis": "pinned-defold-declaration-and-source-semantics"
+          },
           "evidenceClaims": {
-            "generated": "universal-fallback-retained",
-            "compiled": "not-applicable",
-            "linked": "not-applicable",
-            "runtime": "not-applicable"
+            "generated": "all-five-target-projections-and-exact-call-twin",
+            "compiled": "pinned-header-adapter-and-exact-twin",
+            "linked": "generated-exact-provider-host-bridge-only",
+            "runtime": "generated-exact-provider-sanitized-and-warmed",
+            "engine": "not-claimed-provider-absent"
           }
         },
         {
@@ -61351,7 +61510,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:974e9203430bd451f145f2f5",
-            "bindingId": 29,
+            "bindingId": 40,
             "symbol": "TextLayoutSetObjectStyle",
             "shape": "scalar:u8(value:handle:HTextLayout:opaque,value:scalar:u64,value:scalar:u64)"
           },
@@ -61518,7 +61677,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:d431b0f3552fdd067588d21e",
-            "bindingId": 23,
+            "bindingId": 34,
             "symbol": "TextLayoutUpdate",
             "shape": "scalar:void(value:handle:HTextLayout:opaque,value:scalar:f32)"
           },
@@ -61664,21 +61823,49 @@
         {
           "lane": "dmsdk-borrowed-handle",
           "reportRow": 132,
-          "disposition": "blocked",
-          "semanticState": "blocked-by-structural-or-semantic-policy",
+          "disposition": "generated-provider-boundary",
+          "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:7474268b57667f5ad83f00ff",
+            "bindingId": 132,
             "symbol": "WindowClose",
             "shape": "scalar:void(value:handle:HWindow:opaque)"
           },
           "blockers": [
-            "borrowed-handle-effect:destructive"
+            "call-thread-affinity-unresolved",
+            "handle-ownership-nullability-lifetime-unresolved",
+            "native-symbol-linkage-unverified",
+            "target-feature-symbol-matrix-unverified"
           ],
+          "resolvedPolicies": {
+            "transport": "provider-validated-u64-handle",
+            "ownership": "generated-per-argument-lifecycle-transitions",
+            "lifetime": "synchronous-transition-committed-after-success",
+            "thread": "provider-current-thread",
+            "handleParameterPositions": [
+              0
+            ],
+            "lifecycle": {
+              "resourceArguments": [
+                {
+                  "position": 0,
+                  "effect": "borrow"
+                }
+              ],
+              "result": "none",
+              "completion": "synchronous-noescape",
+              "nonLocalEffects": [
+                "associated-window-closed"
+              ]
+            },
+            "evidenceBasis": "pinned-defold-declaration-and-source-semantics"
+          },
           "evidenceClaims": {
-            "generated": "universal-fallback-retained",
-            "compiled": "not-applicable",
-            "linked": "not-applicable",
-            "runtime": "not-applicable"
+            "generated": "all-five-target-projections-and-exact-call-twin",
+            "compiled": "pinned-header-adapter-and-exact-twin",
+            "linked": "generated-exact-provider-host-bridge-only",
+            "runtime": "generated-exact-provider-sanitized-and-warmed",
+            "engine": "not-claimed-provider-absent"
           }
         },
         {
@@ -61885,21 +62072,47 @@
         {
           "lane": "dmsdk-borrowed-handle",
           "reportRow": 131,
-          "disposition": "blocked",
-          "semanticState": "blocked-by-structural-or-semantic-policy",
+          "disposition": "generated-provider-boundary",
+          "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:a6b28936c1c250d52df5f946",
+            "bindingId": 131,
             "symbol": "WindowDelete",
             "shape": "scalar:void(value:handle:HWindow:opaque)"
           },
           "blockers": [
-            "borrowed-handle-effect:destructive"
+            "call-thread-affinity-unresolved",
+            "handle-ownership-nullability-lifetime-unresolved",
+            "native-symbol-linkage-unverified",
+            "target-feature-symbol-matrix-unverified"
           ],
+          "resolvedPolicies": {
+            "transport": "provider-validated-u64-handle",
+            "ownership": "generated-per-argument-lifecycle-transitions",
+            "lifetime": "synchronous-transition-committed-after-success",
+            "thread": "provider-current-thread",
+            "handleParameterPositions": [
+              0
+            ],
+            "lifecycle": {
+              "resourceArguments": [
+                {
+                  "position": 0,
+                  "effect": "finalize"
+                }
+              ],
+              "result": "none",
+              "completion": "synchronous-noescape",
+              "nonLocalEffects": []
+            },
+            "evidenceBasis": "pinned-defold-declaration-and-source-semantics"
+          },
           "evidenceClaims": {
-            "generated": "universal-fallback-retained",
-            "compiled": "not-applicable",
-            "linked": "not-applicable",
-            "runtime": "not-applicable"
+            "generated": "all-five-target-projections-and-exact-call-twin",
+            "compiled": "pinned-header-adapter-and-exact-twin",
+            "linked": "generated-exact-provider-host-bridge-only",
+            "runtime": "generated-exact-provider-sanitized-and-warmed",
+            "engine": "not-claimed-provider-absent"
           }
         },
         {
@@ -62012,7 +62225,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:427256acf6bff8a6c2c44d3b",
-            "bindingId": 109,
+            "bindingId": 137,
             "symbol": "WindowGetDisplayScaleFactor",
             "shape": "scalar:f32(value:handle:HWindow:opaque)"
           },
@@ -62151,7 +62364,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:75cb58a9a0fb8f617ca40694",
-            "bindingId": 108,
+            "bindingId": 136,
             "symbol": "WindowGetHeight",
             "shape": "scalar:u32(value:handle:HWindow:opaque)"
           },
@@ -62502,7 +62715,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:15868fc9e6185e21868fbc3b",
-            "bindingId": 107,
+            "bindingId": 135,
             "symbol": "WindowGetWidth",
             "shape": "scalar:u32(value:handle:HWindow:opaque)"
           },
@@ -62641,7 +62854,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:fb4ccb237e3d4a7dd1fb7775",
-            "bindingId": 106,
+            "bindingId": 134,
             "symbol": "WindowIconify",
             "shape": "scalar:void(value:handle:HWindow:opaque)"
           },
@@ -63012,7 +63225,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:18840cda8f4e4646e7a110c9",
-            "bindingId": 111,
+            "bindingId": 139,
             "symbol": "WindowPollEvents",
             "shape": "scalar:void(value:handle:HWindow:opaque)"
           },
@@ -63150,7 +63363,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:a74b60b581bbf0f255e3e68d",
-            "bindingId": 110,
+            "bindingId": 138,
             "symbol": "WindowSetSize",
             "shape": "scalar:void(value:handle:HWindow:opaque,value:scalar:u32,value:scalar:u32)"
           },
@@ -63312,7 +63525,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:a6e40a61afed860798e98ac5",
-            "bindingId": 105,
+            "bindingId": 133,
             "symbol": "WindowShow",
             "shape": "scalar:void(value:handle:HWindow:opaque)"
           },
@@ -68062,21 +68275,47 @@
         {
           "lane": "dmsdk-borrowed-handle",
           "reportRow": 0,
-          "disposition": "blocked",
-          "semanticState": "blocked-by-structural-or-semantic-policy",
+          "disposition": "generated-provider-boundary",
+          "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:2a65e39d8bc3cda1bcce228f",
+            "bindingId": 0,
             "symbol": "dmBuffer::Destroy",
             "shape": "scalar:void(value:handle:dmBuffer::HBuffer:u32)"
           },
           "blockers": [
-            "borrowed-handle-effect:destructive"
+            "call-thread-affinity-unresolved",
+            "handle-ownership-nullability-lifetime-unresolved",
+            "native-symbol-linkage-unverified",
+            "target-feature-symbol-matrix-unverified"
           ],
+          "resolvedPolicies": {
+            "transport": "provider-validated-u64-handle",
+            "ownership": "generated-per-argument-lifecycle-transitions",
+            "lifetime": "synchronous-transition-committed-after-success",
+            "thread": "provider-current-thread",
+            "handleParameterPositions": [
+              0
+            ],
+            "lifecycle": {
+              "resourceArguments": [
+                {
+                  "position": 0,
+                  "effect": "finalize"
+                }
+              ],
+              "result": "none",
+              "completion": "synchronous-noescape",
+              "nonLocalEffects": []
+            },
+            "evidenceBasis": "pinned-defold-declaration-and-source-semantics"
+          },
           "evidenceClaims": {
-            "generated": "universal-fallback-retained",
-            "compiled": "not-applicable",
-            "linked": "not-applicable",
-            "runtime": "not-applicable"
+            "generated": "all-five-target-projections-and-exact-call-twin",
+            "compiled": "pinned-header-adapter-and-exact-twin",
+            "linked": "generated-exact-provider-host-bridge-only",
+            "runtime": "generated-exact-provider-sanitized-and-warmed",
+            "engine": "not-claimed-provider-absent"
           }
         },
         {
@@ -70123,7 +70362,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:988ee094fbf8b9917b84309b",
-            "bindingId": 0,
+            "bindingId": 1,
             "symbol": "dmBuffer::IsBufferValid",
             "shape": "scalar:bool(value:handle:dmBuffer::HBuffer:u32)"
           },
@@ -70853,7 +71092,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:b9742b7ef4544d6695540e6c",
-            "bindingId": 3,
+            "bindingId": 5,
             "symbol": "dmConditionVariable::Broadcast",
             "shape": "scalar:void(value:handle:dmConditionVariable::HConditionVariable:opaque)"
           },
@@ -70987,21 +71226,47 @@
         {
           "lane": "dmsdk-borrowed-handle",
           "reportRow": 2,
-          "disposition": "blocked",
-          "semanticState": "blocked-by-structural-or-semantic-policy",
+          "disposition": "generated-provider-boundary",
+          "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:27f7d09d2d90315366799a3f",
+            "bindingId": 2,
             "symbol": "dmConditionVariable::Delete",
             "shape": "scalar:void(value:handle:dmConditionVariable::HConditionVariable:opaque)"
           },
           "blockers": [
-            "borrowed-handle-effect:destructive"
+            "call-thread-affinity-unresolved",
+            "handle-ownership-nullability-lifetime-unresolved",
+            "native-symbol-linkage-unverified",
+            "target-feature-symbol-matrix-unverified"
           ],
+          "resolvedPolicies": {
+            "transport": "provider-validated-u64-handle",
+            "ownership": "generated-per-argument-lifecycle-transitions",
+            "lifetime": "synchronous-transition-committed-after-success",
+            "thread": "provider-current-thread",
+            "handleParameterPositions": [
+              0
+            ],
+            "lifecycle": {
+              "resourceArguments": [
+                {
+                  "position": 0,
+                  "effect": "finalize"
+                }
+              ],
+              "result": "none",
+              "completion": "synchronous-noescape",
+              "nonLocalEffects": []
+            },
+            "evidenceBasis": "pinned-defold-declaration-and-source-semantics"
+          },
           "evidenceClaims": {
-            "generated": "universal-fallback-retained",
-            "compiled": "not-applicable",
-            "linked": "not-applicable",
-            "runtime": "not-applicable"
+            "generated": "all-five-target-projections-and-exact-call-twin",
+            "compiled": "pinned-header-adapter-and-exact-twin",
+            "linked": "generated-exact-provider-host-bridge-only",
+            "runtime": "generated-exact-provider-sanitized-and-warmed",
+            "engine": "not-claimed-provider-absent"
           }
         },
         {
@@ -71201,7 +71466,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:5796eaefa1c5400689fbd8bd",
-            "bindingId": 2,
+            "bindingId": 4,
             "symbol": "dmConditionVariable::Signal",
             "shape": "scalar:void(value:handle:dmConditionVariable::HConditionVariable:opaque)"
           },
@@ -71339,7 +71604,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:00f4f035abd90dd53cfcf114",
-            "bindingId": 1,
+            "bindingId": 3,
             "symbol": "dmConditionVariable::Wait",
             "shape": "scalar:void(value:handle:dmConditionVariable::HConditionVariable:opaque,value:handle:dmMutex::HMutex:opaque)"
           },
@@ -71913,21 +72178,55 @@
         {
           "lane": "dmsdk-borrowed-handle",
           "reportRow": 7,
-          "disposition": "blocked",
-          "semanticState": "blocked-by-structural-or-semantic-policy",
+          "disposition": "generated-provider-boundary",
+          "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:d3566b2b3e1d1fed3b98fb11",
+            "bindingId": 7,
             "symbol": "dmConnectionPool::Close",
             "shape": "scalar:void(value:handle:dmConnectionPool::HPool:opaque,value:handle:dmConnectionPool::HConnection:u32)"
           },
           "blockers": [
-            "borrowed-handle-effect:destructive"
+            "call-thread-affinity-unresolved",
+            "handle-ownership-nullability-lifetime-unresolved",
+            "native-symbol-linkage-unverified",
+            "target-feature-symbol-matrix-unverified"
           ],
+          "resolvedPolicies": {
+            "transport": "provider-validated-u64-handle",
+            "ownership": "generated-per-argument-lifecycle-transitions",
+            "lifetime": "synchronous-transition-committed-after-success",
+            "thread": "provider-current-thread",
+            "handleParameterPositions": [
+              0,
+              1
+            ],
+            "lifecycle": {
+              "resourceArguments": [
+                {
+                  "position": 0,
+                  "effect": "borrow"
+                },
+                {
+                  "position": 1,
+                  "effect": "release"
+                }
+              ],
+              "result": "none",
+              "completion": "synchronous-noescape",
+              "nonLocalEffects": [
+                "connection-closed",
+                "pool-slot-invalidated"
+              ]
+            },
+            "evidenceBasis": "pinned-defold-declaration-and-source-semantics"
+          },
           "evidenceClaims": {
-            "generated": "universal-fallback-retained",
-            "compiled": "not-applicable",
-            "linked": "not-applicable",
-            "runtime": "not-applicable"
+            "generated": "all-five-target-projections-and-exact-call-twin",
+            "compiled": "pinned-header-adapter-and-exact-twin",
+            "linked": "generated-exact-provider-host-bridge-only",
+            "runtime": "generated-exact-provider-sanitized-and-warmed",
+            "engine": "not-claimed-provider-absent"
           }
         },
         {
@@ -72672,7 +72971,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:ab871d1585caa31a36a26bb6",
-            "bindingId": 4,
+            "bindingId": 8,
             "symbol": "dmConnectionPool::GetReuseCount",
             "shape": "scalar:u32(value:handle:dmConnectionPool::HPool:opaque,value:handle:dmConnectionPool::HConnection:u32)"
           },
@@ -73325,21 +73624,52 @@
         {
           "lane": "dmsdk-borrowed-handle",
           "reportRow": 6,
-          "disposition": "blocked",
-          "semanticState": "blocked-by-structural-or-semantic-policy",
+          "disposition": "generated-provider-boundary",
+          "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:c30e6ac37bc7bc68644fa60e",
+            "bindingId": 6,
             "symbol": "dmConnectionPool::Return",
             "shape": "scalar:void(value:handle:dmConnectionPool::HPool:opaque,value:handle:dmConnectionPool::HConnection:u32)"
           },
           "blockers": [
-            "borrowed-handle-effect:returned-to-owner"
+            "call-thread-affinity-unresolved",
+            "handle-ownership-nullability-lifetime-unresolved",
+            "native-symbol-linkage-unverified",
+            "target-feature-symbol-matrix-unverified"
           ],
+          "resolvedPolicies": {
+            "transport": "provider-validated-u64-handle",
+            "ownership": "generated-per-argument-lifecycle-transitions",
+            "lifetime": "synchronous-transition-committed-after-success",
+            "thread": "provider-current-thread",
+            "handleParameterPositions": [
+              0,
+              1
+            ],
+            "lifecycle": {
+              "resourceArguments": [
+                {
+                  "position": 0,
+                  "effect": "borrow"
+                },
+                {
+                  "position": 1,
+                  "effect": "release"
+                }
+              ],
+              "result": "none",
+              "completion": "synchronous-noescape",
+              "nonLocalEffects": []
+            },
+            "evidenceBasis": "pinned-defold-declaration-and-source-semantics"
+          },
           "evidenceClaims": {
-            "generated": "universal-fallback-retained",
-            "compiled": "not-applicable",
-            "linked": "not-applicable",
-            "runtime": "not-applicable"
+            "generated": "all-five-target-projections-and-exact-call-twin",
+            "compiled": "pinned-header-adapter-and-exact-twin",
+            "linked": "generated-exact-provider-host-bridge-only",
+            "runtime": "generated-exact-provider-sanitized-and-warmed",
+            "engine": "not-claimed-provider-absent"
           }
         },
         {
@@ -81981,21 +82311,36 @@
         {
           "lane": "dmsdk-borrowed-handle",
           "reportRow": 46,
-          "disposition": "blocked",
-          "semanticState": "blocked-by-structural-or-semantic-policy",
+          "disposition": "generated-provider-boundary",
+          "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:177628dc08870d543e316b78",
+            "bindingId": 46,
             "symbol": "dmGameObject::AcquireInstanceIndex",
             "shape": "scalar:u32(value:handle:dmGameObject::HCollection:opaque)"
           },
           "blockers": [
-            "borrowed-handle-effect:acquired-or-leased"
+            "call-thread-affinity-unresolved",
+            "handle-ownership-nullability-lifetime-unresolved",
+            "native-symbol-linkage-unverified",
+            "target-feature-symbol-matrix-unverified"
           ],
+          "resolvedPolicies": {
+            "transport": "provider-validated-u64-handle",
+            "ownership": "borrowed-only-no-transfer-no-release",
+            "lifetime": "synchronous-call-only",
+            "thread": "provider-current-thread",
+            "handleParameterPositions": [
+              0
+            ],
+            "evidenceBasis": "cpp-ownership-effect-facts"
+          },
           "evidenceClaims": {
-            "generated": "universal-fallback-retained",
-            "compiled": "not-applicable",
-            "linked": "not-applicable",
-            "runtime": "not-applicable"
+            "generated": "all-five-target-projections-and-exact-call-twin",
+            "compiled": "pinned-header-adapter-and-exact-twin",
+            "linked": "generated-exact-provider-host-bridge-only",
+            "runtime": "generated-exact-provider-sanitized-and-warmed",
+            "engine": "not-claimed-provider-absent"
           }
         },
         {
@@ -82109,7 +82454,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:43d8105167ad144ba59496cd",
-            "bindingId": 44,
+            "bindingId": 58,
             "symbol": "dmGameObject::AddDynamicResourceHash",
             "shape": "scalar:void(value:handle:dmGameObject::HCollection:opaque,value:scalar:u64)"
           },
@@ -82263,7 +82608,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:4a444888c8e549e425ad5aa4",
-            "bindingId": 34,
+            "bindingId": 47,
             "symbol": "dmGameObject::AssignInstanceIndex",
             "shape": "scalar:void(value:scalar:u32,value:handle:dmGameObject::HInstance:opaque)"
           },
@@ -82630,7 +82975,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:47f0b9138cb62da82ec3e271",
-            "bindingId": 30,
+            "bindingId": 41,
             "symbol": "dmGameObject::ComponentTypeGetTypeIndex",
             "shape": "scalar:u32(value:handle:dmGameObject::HComponentType:opaque)"
           },
@@ -84185,7 +84530,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:5856eae979c87cee01d7b666",
-            "bindingId": 33,
+            "bindingId": 44,
             "symbol": "dmGameObject::ComponentTypeSetHasUserData",
             "shape": "scalar:void(value:handle:dmGameObject::HComponentType:opaque,value:scalar:bool)"
           },
@@ -85327,7 +85672,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:b474b633b73dc2dbf4a75c1e",
-            "bindingId": 32,
+            "bindingId": 43,
             "symbol": "dmGameObject::ComponentTypeSetPrio",
             "shape": "scalar:void(value:handle:dmGameObject::HComponentType:opaque,value:scalar:u16)"
           },
@@ -85625,7 +85970,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:583938ebb17a791d664c1c98",
-            "bindingId": 31,
+            "bindingId": 42,
             "symbol": "dmGameObject::ComponentTypeSetReadsTransforms",
             "shape": "scalar:void(value:handle:dmGameObject::HComponentType:opaque,value:scalar:bool)"
           },
@@ -86451,21 +86796,52 @@
         {
           "lane": "dmsdk-borrowed-handle",
           "reportRow": 45,
-          "disposition": "blocked",
-          "semanticState": "blocked-by-structural-or-semantic-policy",
+          "disposition": "generated-provider-boundary",
+          "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:a3809edd261c3a72087b0c19",
+            "bindingId": 45,
             "symbol": "dmGameObject::Delete",
             "shape": "scalar:void(value:handle:dmGameObject::HCollection:opaque,value:handle:dmGameObject::HInstance:opaque,value:scalar:bool)"
           },
           "blockers": [
-            "borrowed-handle-effect:destructive"
+            "call-thread-affinity-unresolved",
+            "handle-ownership-nullability-lifetime-unresolved",
+            "native-symbol-linkage-unverified",
+            "target-feature-symbol-matrix-unverified"
           ],
+          "resolvedPolicies": {
+            "transport": "provider-validated-u64-handle",
+            "ownership": "generated-per-argument-lifecycle-transitions",
+            "lifetime": "synchronous-transition-committed-after-success",
+            "thread": "provider-current-thread",
+            "handleParameterPositions": [
+              0,
+              1
+            ],
+            "lifecycle": {
+              "resourceArguments": [
+                {
+                  "position": 0,
+                  "effect": "borrow"
+                },
+                {
+                  "position": 1,
+                  "effect": "finalize"
+                }
+              ],
+              "result": "none",
+              "completion": "synchronous-noescape",
+              "nonLocalEffects": []
+            },
+            "evidenceBasis": "pinned-defold-declaration-and-source-semantics"
+          },
           "evidenceClaims": {
-            "generated": "universal-fallback-retained",
-            "compiled": "not-applicable",
-            "linked": "not-applicable",
-            "runtime": "not-applicable"
+            "generated": "all-five-target-projections-and-exact-call-twin",
+            "compiled": "pinned-header-adapter-and-exact-twin",
+            "linked": "generated-exact-provider-host-bridge-only",
+            "runtime": "generated-exact-provider-sanitized-and-warmed",
+            "engine": "not-claimed-provider-absent"
           }
         },
         {
@@ -86611,21 +86987,49 @@
         {
           "lane": "dmsdk-borrowed-handle",
           "reportRow": 56,
-          "disposition": "blocked",
-          "semanticState": "blocked-by-structural-or-semantic-policy",
+          "disposition": "generated-provider-boundary",
+          "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:a013748915d3456b74b0aa03",
+            "bindingId": 56,
             "symbol": "dmGameObject::DeleteBones",
             "shape": "scalar:void(value:handle:dmGameObject::HInstance:opaque)"
           },
           "blockers": [
-            "borrowed-handle-effect:destructive"
+            "call-thread-affinity-unresolved",
+            "handle-ownership-nullability-lifetime-unresolved",
+            "native-symbol-linkage-unverified",
+            "target-feature-symbol-matrix-unverified"
           ],
+          "resolvedPolicies": {
+            "transport": "provider-validated-u64-handle",
+            "ownership": "generated-per-argument-lifecycle-transitions",
+            "lifetime": "synchronous-transition-committed-after-success",
+            "thread": "provider-current-thread",
+            "handleParameterPositions": [
+              0
+            ],
+            "lifecycle": {
+              "resourceArguments": [
+                {
+                  "position": 0,
+                  "effect": "borrow"
+                }
+              ],
+              "result": "none",
+              "completion": "synchronous-noescape",
+              "nonLocalEffects": [
+                "descendant-finalize"
+              ]
+            },
+            "evidenceBasis": "pinned-defold-declaration-and-source-semantics"
+          },
           "evidenceClaims": {
-            "generated": "universal-fallback-retained",
-            "compiled": "not-applicable",
-            "linked": "not-applicable",
-            "runtime": "not-applicable"
+            "generated": "all-five-target-projections-and-exact-call-twin",
+            "compiled": "pinned-header-adapter-and-exact-twin",
+            "linked": "generated-exact-provider-host-bridge-only",
+            "runtime": "generated-exact-provider-sanitized-and-warmed",
+            "engine": "not-claimed-provider-absent"
           }
         },
         {
@@ -87607,7 +88011,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:6a1980199f2068f4abec0ebf",
-            "bindingId": 43,
+            "bindingId": 57,
             "symbol": "dmGameObject::GetComponentTypeIndex",
             "shape": "scalar:u32(value:handle:dmGameObject::HCollection:opaque,value:scalar:u64)"
           },
@@ -87881,7 +88285,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:ba6fbc75346385060c9a3c26",
-            "bindingId": 36,
+            "bindingId": 49,
             "symbol": "dmGameObject::GetGeneration",
             "shape": "scalar:u32(value:handle:dmGameObject::HInstance:opaque)"
           },
@@ -88020,7 +88424,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:7a2621cf0209ec625247d7c2",
-            "bindingId": 35,
+            "bindingId": 48,
             "symbol": "dmGameObject::GetIdentifier",
             "shape": "scalar:u64(value:handle:dmGameObject::HInstance:opaque)"
           },
@@ -90690,7 +91094,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:be999bf8cc86eace067bf269",
-            "bindingId": 45,
+            "bindingId": 59,
             "symbol": "dmGameObject::GetPropertyOptionsCount",
             "shape": "scalar:u32(value:handle:dmGameObject::HPropertyOptions:opaque)"
           },
@@ -91481,7 +91885,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:6c406f44b2fb42394e2d1565",
-            "bindingId": 39,
+            "bindingId": 52,
             "symbol": "dmGameObject::GetUniformScale",
             "shape": "scalar:f32(value:handle:dmGameObject::HInstance:opaque)"
           },
@@ -92288,7 +92692,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:f2e42605b18a8c14296402b0",
-            "bindingId": 40,
+            "bindingId": 53,
             "symbol": "dmGameObject::GetWorldUniformScale",
             "shape": "scalar:f32(value:handle:dmGameObject::HInstance:opaque)"
           },
@@ -92508,7 +92912,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:c1ab303c2264f87938208a41",
-            "bindingId": 42,
+            "bindingId": 55,
             "symbol": "dmGameObject::IsBone",
             "shape": "scalar:bool(value:handle:dmGameObject::HInstance:opaque)"
           },
@@ -93886,21 +94290,47 @@
         {
           "lane": "dmsdk-borrowed-handle",
           "reportRow": 63,
-          "disposition": "blocked",
-          "semanticState": "blocked-by-structural-or-semantic-policy",
+          "disposition": "generated-provider-boundary",
+          "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:7d9052c3bdc5fea16d9a3d37",
+            "bindingId": 63,
             "symbol": "dmGameObject::PropertyContainerDestroy",
             "shape": "scalar:void(value:handle:dmGameObject::HPropertyContainer:opaque)"
           },
           "blockers": [
-            "borrowed-handle-effect:destructive"
+            "call-thread-affinity-unresolved",
+            "handle-ownership-nullability-lifetime-unresolved",
+            "native-symbol-linkage-unverified",
+            "target-feature-symbol-matrix-unverified"
           ],
+          "resolvedPolicies": {
+            "transport": "provider-validated-u64-handle",
+            "ownership": "generated-per-argument-lifecycle-transitions",
+            "lifetime": "synchronous-transition-committed-after-success",
+            "thread": "provider-current-thread",
+            "handleParameterPositions": [
+              0
+            ],
+            "lifecycle": {
+              "resourceArguments": [
+                {
+                  "position": 0,
+                  "effect": "finalize"
+                }
+              ],
+              "result": "none",
+              "completion": "synchronous-noescape",
+              "nonLocalEffects": []
+            },
+            "evidenceBasis": "pinned-defold-declaration-and-source-semantics"
+          },
           "evidenceClaims": {
-            "generated": "universal-fallback-retained",
-            "compiled": "not-applicable",
-            "linked": "not-applicable",
-            "runtime": "not-applicable"
+            "generated": "all-five-target-projections-and-exact-call-twin",
+            "compiled": "pinned-header-adapter-and-exact-twin",
+            "linked": "generated-exact-provider-host-bridge-only",
+            "runtime": "generated-exact-provider-sanitized-and-warmed",
+            "engine": "not-claimed-provider-absent"
           }
         },
         {
@@ -94151,7 +94581,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:cefe4b23eb3ee984bb239014",
-            "bindingId": 47,
+            "bindingId": 61,
             "symbol": "dmGameObject::PropertyContainerPushBool",
             "shape": "scalar:void(value:handle:dmGameObject::HPropertyContainerBuilder:opaque,value:scalar:u64,value:scalar:bool)"
           },
@@ -94317,7 +94747,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:3687939ee2a18694a886d1ea",
-            "bindingId": 46,
+            "bindingId": 60,
             "symbol": "dmGameObject::PropertyContainerPushFloat",
             "shape": "scalar:void(value:handle:dmGameObject::HPropertyContainerBuilder:opaque,value:scalar:u64,value:scalar:f32)"
           },
@@ -94483,7 +94913,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:3af2202ae708d82e2419bc6a",
-            "bindingId": 48,
+            "bindingId": 62,
             "symbol": "dmGameObject::PropertyContainerPushHash",
             "shape": "scalar:void(value:handle:dmGameObject::HPropertyContainerBuilder:opaque,value:scalar:u64,value:scalar:u64)"
           },
@@ -97039,7 +97469,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:baf1a92dd6395463b931ac13",
-            "bindingId": 41,
+            "bindingId": 54,
             "symbol": "dmGameObject::SetBone",
             "shape": "scalar:void(value:handle:dmGameObject::HInstance:opaque,value:scalar:bool)"
           },
@@ -99978,7 +100408,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:f25c3c908877accad4285aa4",
-            "bindingId": 37,
+            "bindingId": 50,
             "symbol": "dmGameObject::SetScale",
             "shape": "scalar:void(value:handle:dmGameObject::HInstance:opaque,value:scalar:f32)"
           },
@@ -100250,7 +100680,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:d3a4edd42975198c2495033b",
-            "bindingId": 38,
+            "bindingId": 51,
             "symbol": "dmGameObject::SetScaleXY",
             "shape": "scalar:void(value:handle:dmGameObject::HInstance:opaque,value:scalar:f32,value:scalar:f32)"
           },
@@ -101284,7 +101714,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:3d2660e5124e767198032324",
-            "bindingId": 53,
+            "bindingId": 69,
             "symbol": "dmGameSystem::AreRenderConstantsUpdated",
             "shape": "scalar:i32(value:handle:dmGameSystem::HComponentRenderConstants:opaque)"
           },
@@ -101423,7 +101853,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:4ae18c924e3a795f8ef3cb42",
-            "bindingId": 52,
+            "bindingId": 68,
             "symbol": "dmGameSystem::ClearRenderConstant",
             "shape": "scalar:i32(value:handle:dmGameSystem::HComponentRenderConstants:opaque,value:scalar:u64)"
           },
@@ -104429,7 +104859,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:aa2841e7d926f20fc752b05e",
-            "bindingId": 50,
+            "bindingId": 65,
             "symbol": "dmGameSystem::CompFactoryIsDynamicPrototype",
             "shape": "scalar:bool(value:handle:dmGameSystem::HFactoryWorld:opaque,value:handle:dmGameSystem::HFactoryComponent:opaque)"
           },
@@ -104594,7 +105024,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:155a518bd38118703cab4898",
-            "bindingId": 49,
+            "bindingId": 64,
             "symbol": "dmGameSystem::CompFactoryIsLoading",
             "shape": "scalar:bool(value:handle:dmGameSystem::HFactoryWorld:opaque,value:handle:dmGameSystem::HFactoryComponent:opaque)"
           },
@@ -107530,21 +107960,47 @@
         {
           "lane": "dmsdk-borrowed-handle",
           "reportRow": 66,
-          "disposition": "blocked",
-          "semanticState": "blocked-by-structural-or-semantic-policy",
+          "disposition": "generated-provider-boundary",
+          "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:ff2b9e1f976ebb38dd46c56a",
+            "bindingId": 66,
             "symbol": "dmGameSystem::DestroyRenderConstants",
             "shape": "scalar:void(value:handle:dmGameSystem::HComponentRenderConstants:opaque)"
           },
           "blockers": [
-            "borrowed-handle-effect:destructive"
+            "call-thread-affinity-unresolved",
+            "handle-ownership-nullability-lifetime-unresolved",
+            "native-symbol-linkage-unverified",
+            "target-feature-symbol-matrix-unverified"
           ],
+          "resolvedPolicies": {
+            "transport": "provider-validated-u64-handle",
+            "ownership": "generated-per-argument-lifecycle-transitions",
+            "lifetime": "synchronous-transition-committed-after-success",
+            "thread": "provider-current-thread",
+            "handleParameterPositions": [
+              0
+            ],
+            "lifecycle": {
+              "resourceArguments": [
+                {
+                  "position": 0,
+                  "effect": "finalize"
+                }
+              ],
+              "result": "none",
+              "completion": "synchronous-noescape",
+              "nonLocalEffects": []
+            },
+            "evidenceBasis": "pinned-defold-declaration-and-source-semantics"
+          },
           "evidenceClaims": {
-            "generated": "universal-fallback-retained",
-            "compiled": "not-applicable",
-            "linked": "not-applicable",
-            "runtime": "not-applicable"
+            "generated": "all-five-target-projections-and-exact-call-twin",
+            "compiled": "pinned-header-adapter-and-exact-twin",
+            "linked": "generated-exact-provider-host-bridge-only",
+            "runtime": "generated-exact-provider-sanitized-and-warmed",
+            "engine": "not-claimed-provider-absent"
           }
         },
         {
@@ -109129,7 +109585,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:7710a34c53e9f0cbb4b94fec",
-            "bindingId": 51,
+            "bindingId": 67,
             "symbol": "dmGameSystem::GetRenderConstantCount",
             "shape": "scalar:u32(value:handle:dmGameSystem::HComponentRenderConstants:opaque)"
           },
@@ -115568,7 +116024,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:6f36b5920b4aff9cb2c98d1d",
-            "bindingId": 82,
+            "bindingId": 105,
             "symbol": "dmGraphics::BeginFrame",
             "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque)"
           },
@@ -115706,7 +116162,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:7f7e0cda418160cc367d7b3a",
-            "bindingId": 93,
+            "bindingId": 118,
             "symbol": "dmGraphics::Clear",
             "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:scalar:u32,value:scalar:u8,value:scalar:u8,value:scalar:u8,value:scalar:u8,value:scalar:f32,value:scalar:u32)"
           },
@@ -115924,21 +116380,49 @@
         {
           "lane": "dmsdk-borrowed-handle",
           "reportRow": 107,
-          "disposition": "blocked",
-          "semanticState": "blocked-by-structural-or-semantic-policy",
+          "disposition": "generated-provider-boundary",
+          "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:252d4ba98dca7f68e0b8ad5e",
+            "bindingId": 107,
             "symbol": "dmGraphics::CloseWindow",
             "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque)"
           },
           "blockers": [
-            "borrowed-handle-effect:destructive"
+            "call-thread-affinity-unresolved",
+            "handle-ownership-nullability-lifetime-unresolved",
+            "native-symbol-linkage-unverified",
+            "target-feature-symbol-matrix-unverified"
           ],
+          "resolvedPolicies": {
+            "transport": "provider-validated-u64-handle",
+            "ownership": "generated-per-argument-lifecycle-transitions",
+            "lifetime": "synchronous-transition-committed-after-success",
+            "thread": "provider-current-thread",
+            "handleParameterPositions": [
+              0
+            ],
+            "lifecycle": {
+              "resourceArguments": [
+                {
+                  "position": 0,
+                  "effect": "borrow"
+                }
+              ],
+              "result": "none",
+              "completion": "synchronous-noescape",
+              "nonLocalEffects": [
+                "associated-window-closed"
+              ]
+            },
+            "evidenceBasis": "pinned-defold-declaration-and-source-semantics"
+          },
           "evidenceClaims": {
-            "generated": "universal-fallback-retained",
-            "compiled": "not-applicable",
-            "linked": "not-applicable",
-            "runtime": "not-applicable"
+            "generated": "all-five-target-projections-and-exact-call-twin",
+            "compiled": "pinned-header-adapter-and-exact-twin",
+            "linked": "generated-exact-provider-host-bridge-only",
+            "runtime": "generated-exact-provider-sanitized-and-warmed",
+            "engine": "not-claimed-provider-absent"
           }
         },
         {
@@ -116128,21 +116612,49 @@
         {
           "lane": "dmsdk-borrowed-handle",
           "reportRow": 104,
-          "disposition": "blocked",
-          "semanticState": "blocked-by-structural-or-semantic-policy",
+          "disposition": "generated-provider-boundary",
+          "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:fe0575ac0acb0540cd282d1b",
+            "bindingId": 104,
             "symbol": "dmGraphics::DeleteContext",
             "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque)"
           },
           "blockers": [
-            "borrowed-handle-effect:destructive"
+            "call-thread-affinity-unresolved",
+            "handle-ownership-nullability-lifetime-unresolved",
+            "native-symbol-linkage-unverified",
+            "target-feature-symbol-matrix-unverified"
           ],
+          "resolvedPolicies": {
+            "transport": "provider-validated-u64-handle",
+            "ownership": "generated-per-argument-lifecycle-transitions",
+            "lifetime": "synchronous-transition-committed-after-success",
+            "thread": "provider-current-thread",
+            "handleParameterPositions": [
+              0
+            ],
+            "lifecycle": {
+              "resourceArguments": [
+                {
+                  "position": 0,
+                  "effect": "finalize"
+                }
+              ],
+              "result": "none",
+              "completion": "synchronous-noescape",
+              "nonLocalEffects": [
+                "owned-descendants-finalized"
+              ]
+            },
+            "evidenceBasis": "pinned-defold-declaration-and-source-semantics"
+          },
           "evidenceClaims": {
-            "generated": "universal-fallback-retained",
-            "compiled": "not-applicable",
-            "linked": "not-applicable",
-            "runtime": "not-applicable"
+            "generated": "all-five-target-projections-and-exact-call-twin",
+            "compiled": "pinned-header-adapter-and-exact-twin",
+            "linked": "generated-exact-provider-host-bridge-only",
+            "runtime": "generated-exact-provider-sanitized-and-warmed",
+            "engine": "not-claimed-provider-absent"
           }
         },
         {
@@ -116251,21 +116763,47 @@
         {
           "lane": "dmsdk-borrowed-handle",
           "reportRow": 75,
-          "disposition": "blocked",
-          "semanticState": "blocked-by-structural-or-semantic-policy",
+          "disposition": "generated-provider-boundary",
+          "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:b1c963dd8fb8665b3a18d2d3",
+            "bindingId": 75,
             "symbol": "dmGraphics::DeleteIndexBuffer",
             "shape": "scalar:void(value:handle:dmGraphics::HIndexBuffer:usize)"
           },
           "blockers": [
-            "borrowed-handle-effect:destructive"
+            "call-thread-affinity-unresolved",
+            "handle-ownership-nullability-lifetime-unresolved",
+            "native-symbol-linkage-unverified",
+            "target-feature-symbol-matrix-unverified"
           ],
+          "resolvedPolicies": {
+            "transport": "provider-validated-u64-handle",
+            "ownership": "generated-per-argument-lifecycle-transitions",
+            "lifetime": "synchronous-transition-committed-after-success",
+            "thread": "provider-current-thread",
+            "handleParameterPositions": [
+              0
+            ],
+            "lifecycle": {
+              "resourceArguments": [
+                {
+                  "position": 0,
+                  "effect": "finalize"
+                }
+              ],
+              "result": "none",
+              "completion": "synchronous-noescape",
+              "nonLocalEffects": []
+            },
+            "evidenceBasis": "pinned-defold-declaration-and-source-semantics"
+          },
           "evidenceClaims": {
-            "generated": "universal-fallback-retained",
-            "compiled": "not-applicable",
-            "linked": "not-applicable",
-            "runtime": "not-applicable"
+            "generated": "all-five-target-projections-and-exact-call-twin",
+            "compiled": "pinned-header-adapter-and-exact-twin",
+            "linked": "generated-exact-provider-host-bridge-only",
+            "runtime": "generated-exact-provider-sanitized-and-warmed",
+            "engine": "not-claimed-provider-absent"
           }
         },
         {
@@ -116368,21 +116906,54 @@
         {
           "lane": "dmsdk-borrowed-handle",
           "reportRow": 117,
-          "disposition": "blocked",
-          "semanticState": "blocked-by-structural-or-semantic-policy",
+          "disposition": "generated-provider-boundary",
+          "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:1ebb4b8da40c72e4f59e22c6",
+            "bindingId": 117,
             "symbol": "dmGraphics::DeleteProgram",
             "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HProgram:usize)"
           },
           "blockers": [
-            "borrowed-handle-effect:destructive"
+            "call-thread-affinity-unresolved",
+            "handle-ownership-nullability-lifetime-unresolved",
+            "native-symbol-linkage-unverified",
+            "target-feature-symbol-matrix-unverified"
           ],
+          "resolvedPolicies": {
+            "transport": "provider-validated-u64-handle",
+            "ownership": "generated-per-argument-lifecycle-transitions",
+            "lifetime": "synchronous-transition-committed-after-success",
+            "thread": "provider-current-thread",
+            "handleParameterPositions": [
+              0,
+              1
+            ],
+            "lifecycle": {
+              "resourceArguments": [
+                {
+                  "position": 0,
+                  "effect": "borrow"
+                },
+                {
+                  "position": 1,
+                  "effect": "finalize"
+                }
+              ],
+              "result": "none",
+              "completion": "synchronous-noescape",
+              "nonLocalEffects": [
+                "owned-descendants-finalized"
+              ]
+            },
+            "evidenceBasis": "pinned-defold-declaration-and-source-semantics"
+          },
           "evidenceClaims": {
-            "generated": "universal-fallback-retained",
-            "compiled": "not-applicable",
-            "linked": "not-applicable",
-            "runtime": "not-applicable"
+            "generated": "all-five-target-projections-and-exact-call-twin",
+            "compiled": "pinned-header-adapter-and-exact-twin",
+            "linked": "generated-exact-provider-host-bridge-only",
+            "runtime": "generated-exact-provider-sanitized-and-warmed",
+            "engine": "not-claimed-provider-absent"
           }
         },
         {
@@ -116510,21 +117081,52 @@
         {
           "lane": "dmsdk-borrowed-handle",
           "reportRow": 99,
-          "disposition": "blocked",
-          "semanticState": "blocked-by-structural-or-semantic-policy",
+          "disposition": "generated-provider-boundary",
+          "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:1ee92021ce27b624a74019da",
+            "bindingId": 99,
             "symbol": "dmGraphics::DeleteRenderTarget",
             "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HRenderTarget:u64)"
           },
           "blockers": [
-            "borrowed-handle-effect:destructive"
+            "call-thread-affinity-unresolved",
+            "handle-ownership-nullability-lifetime-unresolved",
+            "native-symbol-linkage-unverified",
+            "target-feature-symbol-matrix-unverified"
           ],
+          "resolvedPolicies": {
+            "transport": "provider-validated-u64-handle",
+            "ownership": "generated-per-argument-lifecycle-transitions",
+            "lifetime": "synchronous-transition-committed-after-success",
+            "thread": "provider-current-thread",
+            "handleParameterPositions": [
+              0,
+              1
+            ],
+            "lifecycle": {
+              "resourceArguments": [
+                {
+                  "position": 0,
+                  "effect": "borrow"
+                },
+                {
+                  "position": 1,
+                  "effect": "finalize"
+                }
+              ],
+              "result": "none",
+              "completion": "synchronous-noescape",
+              "nonLocalEffects": []
+            },
+            "evidenceBasis": "pinned-defold-declaration-and-source-semantics"
+          },
           "evidenceClaims": {
-            "generated": "universal-fallback-retained",
-            "compiled": "not-applicable",
-            "linked": "not-applicable",
-            "runtime": "not-applicable"
+            "generated": "all-five-target-projections-and-exact-call-twin",
+            "compiled": "pinned-header-adapter-and-exact-twin",
+            "linked": "generated-exact-provider-host-bridge-only",
+            "runtime": "generated-exact-provider-sanitized-and-warmed",
+            "engine": "not-claimed-provider-absent"
           }
         },
         {
@@ -116652,21 +117254,52 @@
         {
           "lane": "dmsdk-borrowed-handle",
           "reportRow": 78,
-          "disposition": "blocked",
-          "semanticState": "blocked-by-structural-or-semantic-policy",
+          "disposition": "generated-provider-boundary",
+          "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:0cdb1cd4e180ac2de564608e",
+            "bindingId": 78,
             "symbol": "dmGraphics::DeleteTexture",
             "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)"
           },
           "blockers": [
-            "borrowed-handle-effect:destructive"
+            "call-thread-affinity-unresolved",
+            "handle-ownership-nullability-lifetime-unresolved",
+            "native-symbol-linkage-unverified",
+            "target-feature-symbol-matrix-unverified"
           ],
+          "resolvedPolicies": {
+            "transport": "provider-validated-u64-handle",
+            "ownership": "generated-per-argument-lifecycle-transitions",
+            "lifetime": "synchronous-transition-committed-after-success",
+            "thread": "provider-current-thread",
+            "handleParameterPositions": [
+              0,
+              1
+            ],
+            "lifecycle": {
+              "resourceArguments": [
+                {
+                  "position": 0,
+                  "effect": "borrow"
+                },
+                {
+                  "position": 1,
+                  "effect": "finalize"
+                }
+              ],
+              "result": "none",
+              "completion": "synchronous-noescape",
+              "nonLocalEffects": []
+            },
+            "evidenceBasis": "pinned-defold-declaration-and-source-semantics"
+          },
           "evidenceClaims": {
-            "generated": "universal-fallback-retained",
-            "compiled": "not-applicable",
-            "linked": "not-applicable",
-            "runtime": "not-applicable"
+            "generated": "all-five-target-projections-and-exact-call-twin",
+            "compiled": "pinned-header-adapter-and-exact-twin",
+            "linked": "generated-exact-provider-host-bridge-only",
+            "runtime": "generated-exact-provider-sanitized-and-warmed",
+            "engine": "not-claimed-provider-absent"
           }
         },
         {
@@ -116794,21 +117427,47 @@
         {
           "lane": "dmsdk-borrowed-handle",
           "reportRow": 73,
-          "disposition": "blocked",
-          "semanticState": "blocked-by-structural-or-semantic-policy",
+          "disposition": "generated-provider-boundary",
+          "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:b1d5e51a047b3865930931a4",
+            "bindingId": 73,
             "symbol": "dmGraphics::DeleteVertexBuffer",
             "shape": "scalar:void(value:handle:dmGraphics::HVertexBuffer:usize)"
           },
           "blockers": [
-            "borrowed-handle-effect:destructive"
+            "call-thread-affinity-unresolved",
+            "handle-ownership-nullability-lifetime-unresolved",
+            "native-symbol-linkage-unverified",
+            "target-feature-symbol-matrix-unverified"
           ],
+          "resolvedPolicies": {
+            "transport": "provider-validated-u64-handle",
+            "ownership": "generated-per-argument-lifecycle-transitions",
+            "lifetime": "synchronous-transition-committed-after-success",
+            "thread": "provider-current-thread",
+            "handleParameterPositions": [
+              0
+            ],
+            "lifecycle": {
+              "resourceArguments": [
+                {
+                  "position": 0,
+                  "effect": "finalize"
+                }
+              ],
+              "result": "none",
+              "completion": "synchronous-noescape",
+              "nonLocalEffects": []
+            },
+            "evidenceBasis": "pinned-defold-declaration-and-source-semantics"
+          },
           "evidenceClaims": {
-            "generated": "universal-fallback-retained",
-            "compiled": "not-applicable",
-            "linked": "not-applicable",
-            "runtime": "not-applicable"
+            "generated": "all-five-target-projections-and-exact-call-twin",
+            "compiled": "pinned-header-adapter-and-exact-twin",
+            "linked": "generated-exact-provider-host-bridge-only",
+            "runtime": "generated-exact-provider-sanitized-and-warmed",
+            "engine": "not-claimed-provider-absent"
           }
         },
         {
@@ -116911,21 +117570,47 @@
         {
           "lane": "dmsdk-borrowed-handle",
           "reportRow": 71,
-          "disposition": "blocked",
-          "semanticState": "blocked-by-structural-or-semantic-policy",
+          "disposition": "generated-provider-boundary",
+          "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:01588e0f148ba7405e0f31b9",
+            "bindingId": 71,
             "symbol": "dmGraphics::DeleteVertexDeclaration",
             "shape": "scalar:void(value:handle:dmGraphics::HVertexDeclaration:opaque)"
           },
           "blockers": [
-            "borrowed-handle-effect:destructive"
+            "call-thread-affinity-unresolved",
+            "handle-ownership-nullability-lifetime-unresolved",
+            "native-symbol-linkage-unverified",
+            "target-feature-symbol-matrix-unverified"
           ],
+          "resolvedPolicies": {
+            "transport": "provider-validated-u64-handle",
+            "ownership": "generated-per-argument-lifecycle-transitions",
+            "lifetime": "synchronous-transition-committed-after-success",
+            "thread": "provider-current-thread",
+            "handleParameterPositions": [
+              0
+            ],
+            "lifecycle": {
+              "resourceArguments": [
+                {
+                  "position": 0,
+                  "effect": "finalize"
+                }
+              ],
+              "result": "none",
+              "completion": "synchronous-noescape",
+              "nonLocalEffects": []
+            },
+            "evidenceBasis": "pinned-defold-declaration-and-source-semantics"
+          },
           "evidenceClaims": {
-            "generated": "universal-fallback-retained",
-            "compiled": "not-applicable",
-            "linked": "not-applicable",
-            "runtime": "not-applicable"
+            "generated": "all-five-target-projections-and-exact-call-twin",
+            "compiled": "pinned-header-adapter-and-exact-twin",
+            "linked": "generated-exact-provider-host-bridge-only",
+            "runtime": "generated-exact-provider-sanitized-and-warmed",
+            "engine": "not-claimed-provider-absent"
           }
         },
         {
@@ -117034,21 +117719,47 @@
         {
           "lane": "dmsdk-borrowed-handle",
           "reportRow": 70,
-          "disposition": "blocked",
-          "semanticState": "blocked-by-structural-or-semantic-policy",
+          "disposition": "generated-provider-boundary",
+          "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:e61277c85ddbf6a0467a8e42",
+            "bindingId": 70,
             "symbol": "dmGraphics::DeleteVertexStreamDeclaration",
             "shape": "scalar:void(value:handle:dmGraphics::HVertexStreamDeclaration:opaque)"
           },
           "blockers": [
-            "borrowed-handle-effect:destructive"
+            "call-thread-affinity-unresolved",
+            "handle-ownership-nullability-lifetime-unresolved",
+            "native-symbol-linkage-unverified",
+            "target-feature-symbol-matrix-unverified"
           ],
+          "resolvedPolicies": {
+            "transport": "provider-validated-u64-handle",
+            "ownership": "generated-per-argument-lifecycle-transitions",
+            "lifetime": "synchronous-transition-committed-after-success",
+            "thread": "provider-current-thread",
+            "handleParameterPositions": [
+              0
+            ],
+            "lifecycle": {
+              "resourceArguments": [
+                {
+                  "position": 0,
+                  "effect": "finalize"
+                }
+              ],
+              "result": "none",
+              "completion": "synchronous-noescape",
+              "nonLocalEffects": []
+            },
+            "evidenceBasis": "pinned-defold-declaration-and-source-semantics"
+          },
           "evidenceClaims": {
-            "generated": "universal-fallback-retained",
-            "compiled": "not-applicable",
-            "linked": "not-applicable",
-            "runtime": "not-applicable"
+            "generated": "all-five-target-projections-and-exact-call-twin",
+            "compiled": "pinned-header-adapter-and-exact-twin",
+            "linked": "generated-exact-provider-host-bridge-only",
+            "runtime": "generated-exact-provider-sanitized-and-warmed",
+            "engine": "not-claimed-provider-absent"
           }
         },
         {
@@ -117161,7 +117872,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:6f0ddcf2bfb3f5cbbe1a7cc5",
-            "bindingId": 87,
+            "bindingId": 111,
             "symbol": "dmGraphics::DisableProgram",
             "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque)"
           },
@@ -117454,7 +118165,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:c5f3ee099ad453eac62dc647",
-            "bindingId": 69,
+            "bindingId": 90,
             "symbol": "dmGraphics::DisableTexture",
             "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:scalar:u32,value:handle:dmGraphics::HTexture:u64)"
           },
@@ -117624,7 +118335,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:c6944c696eeacdb401a05457",
-            "bindingId": 91,
+            "bindingId": 115,
             "symbol": "dmGraphics::DisableVertexBuffer",
             "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HVertexBuffer:usize)"
           },
@@ -117782,7 +118493,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:00cc32e50707b48964ac84a0",
-            "bindingId": 89,
+            "bindingId": 113,
             "symbol": "dmGraphics::DisableVertexDeclaration",
             "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HVertexDeclaration:opaque)"
           },
@@ -118432,7 +119143,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:9470e980bda144922b475930",
-            "bindingId": 86,
+            "bindingId": 110,
             "symbol": "dmGraphics::EnableProgram",
             "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HProgram:usize)"
           },
@@ -118745,7 +119456,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:6ce05f3a270a3babffcd43dc",
-            "bindingId": 68,
+            "bindingId": 89,
             "symbol": "dmGraphics::EnableTexture",
             "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:scalar:u32,value:scalar:u8,value:handle:dmGraphics::HTexture:u64)"
           },
@@ -118927,7 +119638,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:c78ccd163484eed2a4fce134",
-            "bindingId": 90,
+            "bindingId": 114,
             "symbol": "dmGraphics::EnableVertexBuffer",
             "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HVertexBuffer:usize,value:scalar:u32)"
           },
@@ -119097,7 +119808,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:82bb9d90aa4884e27766111a",
-            "bindingId": 88,
+            "bindingId": 112,
             "symbol": "dmGraphics::EnableVertexDeclaration",
             "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HVertexDeclaration:opaque,value:scalar:u32,value:scalar:u32,value:handle:dmGraphics::HProgram:usize)"
           },
@@ -119636,7 +120347,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:54edaded7fa1efc070883299",
-            "bindingId": 83,
+            "bindingId": 106,
             "symbol": "dmGraphics::Flip",
             "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque)"
           },
@@ -119938,7 +120649,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:4775723d63702d6738ae2080",
-            "bindingId": 81,
+            "bindingId": 103,
             "symbol": "dmGraphics::GetDisplayScaleFactor",
             "shape": "scalar:f32(value:handle:dmGraphics::HContext:opaque)"
           },
@@ -120077,7 +120788,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:554983d3f01df3f2806e38b9",
-            "bindingId": 74,
+            "bindingId": 95,
             "symbol": "dmGraphics::GetHeight",
             "shape": "scalar:u32(value:handle:dmGraphics::HContext:opaque)"
           },
@@ -120462,7 +121173,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:eac86d9ca66ea8a6647e9d9c",
-            "bindingId": 56,
+            "bindingId": 76,
             "symbol": "dmGraphics::GetMaxElementsIndices",
             "shape": "scalar:u32(value:handle:dmGraphics::HContext:opaque)"
           },
@@ -120601,7 +121312,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:b588e6066963f1af2529ee2c",
-            "bindingId": 55,
+            "bindingId": 74,
             "symbol": "dmGraphics::GetMaxElementsVertices",
             "shape": "scalar:u32(value:handle:dmGraphics::HContext:opaque)"
           },
@@ -120740,7 +121451,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:87bafd5a32cfe4b4de6333bb",
-            "bindingId": 70,
+            "bindingId": 91,
             "symbol": "dmGraphics::GetMaxTextureSize",
             "shape": "scalar:u32(value:handle:dmGraphics::HContext:opaque)"
           },
@@ -122451,7 +123162,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:cd9ee4b78bd407516092d079",
-            "bindingId": 57,
+            "bindingId": 77,
             "symbol": "dmGraphics::GetNumSupportedExtensions",
             "shape": "scalar:u32(value:handle:dmGraphics::HContext:opaque)"
           },
@@ -122590,7 +123301,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:121197b6f083b65368804ef3",
-            "bindingId": 65,
+            "bindingId": 86,
             "symbol": "dmGraphics::GetNumTextureHandles",
             "shape": "scalar:u8(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)"
           },
@@ -122749,7 +123460,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:062496fb5c76b2109a5ac08d",
-            "bindingId": 63,
+            "bindingId": 84,
             "symbol": "dmGraphics::GetOriginalTextureHeight",
             "shape": "scalar:u16(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)"
           },
@@ -122908,7 +123619,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:a56db30adaf52cd63d2c003f",
-            "bindingId": 62,
+            "bindingId": 83,
             "symbol": "dmGraphics::GetOriginalTextureWidth",
             "shape": "scalar:u16(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)"
           },
@@ -123336,7 +124047,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:3440cd87c4db76e186a1ec08",
-            "bindingId": 79,
+            "bindingId": 101,
             "symbol": "dmGraphics::GetRenderTargetSampleCount",
             "shape": "scalar:u32(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HRenderTarget:u64)"
           },
@@ -123988,7 +124699,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:ecbfb75f9a16ccca5e2d47ac",
-            "bindingId": 61,
+            "bindingId": 82,
             "symbol": "dmGraphics::GetTextureDepth",
             "shape": "scalar:u16(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)"
           },
@@ -124630,7 +125341,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:88796e0e5eadbfe01766b598",
-            "bindingId": 60,
+            "bindingId": 81,
             "symbol": "dmGraphics::GetTextureHeight",
             "shape": "scalar:u16(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)"
           },
@@ -124789,7 +125500,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:d0f2d8fcfd2f3ce950cc88f5",
-            "bindingId": 64,
+            "bindingId": 85,
             "symbol": "dmGraphics::GetTextureMipmapCount",
             "shape": "scalar:u8(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)"
           },
@@ -124948,7 +125659,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:99b07a3882c1b88d393c997b",
-            "bindingId": 58,
+            "bindingId": 79,
             "symbol": "dmGraphics::GetTextureResourceSize",
             "shape": "scalar:u32(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)"
           },
@@ -125107,7 +125818,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:38d93a9c7f443650a68838fd",
-            "bindingId": 67,
+            "bindingId": 88,
             "symbol": "dmGraphics::GetTextureStatusFlags",
             "shape": "scalar:u32(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)"
           },
@@ -125637,7 +126348,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:9930d392fb4a37c936911e82",
-            "bindingId": 66,
+            "bindingId": 87,
             "symbol": "dmGraphics::GetTextureUsageHintFlags",
             "shape": "scalar:u32(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)"
           },
@@ -125796,7 +126507,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:01b51b04c2e56192c21d0975",
-            "bindingId": 59,
+            "bindingId": 80,
             "symbol": "dmGraphics::GetTextureWidth",
             "shape": "scalar:u16(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)"
           },
@@ -125955,7 +126666,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:d67a8172d50309d74631f4f3",
-            "bindingId": 54,
+            "bindingId": 72,
             "symbol": "dmGraphics::GetVertexStreamOffset",
             "shape": "scalar:u32(value:handle:dmGraphics::HVertexDeclaration:opaque,value:scalar:u64)"
           },
@@ -126315,7 +127026,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:7a349b4881bb726a765e3ee1",
-            "bindingId": 73,
+            "bindingId": 94,
             "symbol": "dmGraphics::GetWidth",
             "shape": "scalar:u32(value:handle:dmGraphics::HContext:opaque)"
           },
@@ -126454,7 +127165,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:95a3139f1b9e540b78777019",
-            "bindingId": 72,
+            "bindingId": 93,
             "symbol": "dmGraphics::GetWindowHeight",
             "shape": "scalar:u32(value:handle:dmGraphics::HContext:opaque)"
           },
@@ -126593,7 +127304,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:bf29e719b8ed0ea3f20eafaf",
-            "bindingId": 71,
+            "bindingId": 92,
             "symbol": "dmGraphics::GetWindowWidth",
             "shape": "scalar:u32(value:handle:dmGraphics::HContext:opaque)"
           },
@@ -130388,7 +131099,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:31377fed6d83b0505b1169b5",
-            "bindingId": 76,
+            "bindingId": 97,
             "symbol": "dmGraphics::SetColorMask",
             "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:scalar:bool,value:scalar:bool,value:scalar:bool,value:scalar:bool)"
           },
@@ -131232,7 +131943,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:9c7163961d0333636040df15",
-            "bindingId": 77,
+            "bindingId": 98,
             "symbol": "dmGraphics::SetDepthMask",
             "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:scalar:bool)"
           },
@@ -131737,7 +132448,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:0154e7b1981e80cc69665681",
-            "bindingId": 78,
+            "bindingId": 100,
             "symbol": "dmGraphics::SetRenderTarget",
             "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HRenderTarget:u64,value:scalar:u32)"
           },
@@ -131907,7 +132618,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:dad578a4daacfd5544018c85",
-            "bindingId": 80,
+            "bindingId": 102,
             "symbol": "dmGraphics::SetRenderTargetSize",
             "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HRenderTarget:u64,value:scalar:u32,value:scalar:u32)"
           },
@@ -132089,7 +132800,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:b17c8012ddac53eff7023db2",
-            "bindingId": 92,
+            "bindingId": 116,
             "symbol": "dmGraphics::SetSampler",
             "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HUniformLocation:i64,value:scalar:i32)"
           },
@@ -132259,7 +132970,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:fafef1bb3db6a9931f55631e",
-            "bindingId": 85,
+            "bindingId": 109,
             "symbol": "dmGraphics::SetScissor",
             "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:scalar:i32,value:scalar:i32,value:scalar:i32,value:scalar:i32)"
           },
@@ -132836,7 +133547,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:11dd44072e4d2b6d19f0e3fd",
-            "bindingId": 75,
+            "bindingId": 96,
             "symbol": "dmGraphics::SetStencilMask",
             "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:scalar:u32)"
           },
@@ -134886,7 +135597,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:b1ec4022267c4a1ca7e8db97",
-            "bindingId": 84,
+            "bindingId": 108,
             "symbol": "dmGraphics::SetViewport",
             "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:scalar:i32,value:scalar:i32,value:scalar:i32,value:scalar:i32)"
           },
@@ -138157,21 +138868,52 @@
         {
           "lane": "dmsdk-borrowed-handle",
           "reportRow": 119,
-          "disposition": "blocked",
-          "semanticState": "blocked-by-structural-or-semantic-policy",
+          "disposition": "generated-provider-boundary",
+          "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:0b96f6254da60af8b56dc594",
+            "bindingId": 119,
             "symbol": "dmGui::DeleteNode",
             "shape": "scalar:void(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32)"
           },
           "blockers": [
-            "borrowed-handle-effect:destructive"
+            "call-thread-affinity-unresolved",
+            "handle-ownership-nullability-lifetime-unresolved",
+            "native-symbol-linkage-unverified",
+            "target-feature-symbol-matrix-unverified"
           ],
+          "resolvedPolicies": {
+            "transport": "provider-validated-u64-handle",
+            "ownership": "generated-per-argument-lifecycle-transitions",
+            "lifetime": "synchronous-transition-committed-after-success",
+            "thread": "provider-current-thread",
+            "handleParameterPositions": [
+              0,
+              1
+            ],
+            "lifecycle": {
+              "resourceArguments": [
+                {
+                  "position": 0,
+                  "effect": "borrow"
+                },
+                {
+                  "position": 1,
+                  "effect": "finalize"
+                }
+              ],
+              "result": "none",
+              "completion": "synchronous-noescape",
+              "nonLocalEffects": []
+            },
+            "evidenceBasis": "pinned-defold-declaration-and-source-semantics"
+          },
           "evidenceClaims": {
-            "generated": "universal-fallback-retained",
-            "compiled": "not-applicable",
-            "linked": "not-applicable",
-            "runtime": "not-applicable"
+            "generated": "all-five-target-projections-and-exact-call-twin",
+            "compiled": "pinned-header-adapter-and-exact-twin",
+            "linked": "generated-exact-provider-host-bridge-only",
+            "runtime": "generated-exact-provider-sanitized-and-warmed",
+            "engine": "not-claimed-provider-absent"
           }
         },
         {
@@ -138891,7 +139633,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:cb9aee0037ab69eedc5bf260",
-            "bindingId": 98,
+            "bindingId": 124,
             "symbol": "dmGui::GetNodeCustomType",
             "shape": "scalar:u32(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32)"
           },
@@ -139050,7 +139792,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:236c9588b516af72b5c39292",
-            "bindingId": 95,
+            "bindingId": 121,
             "symbol": "dmGui::GetNodeId",
             "shape": "scalar:u64(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32)"
           },
@@ -139213,7 +139955,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:497165d0973a7518fbd648a1",
-            "bindingId": 96,
+            "bindingId": 122,
             "symbol": "dmGui::GetNodeIsBone",
             "shape": "scalar:bool(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32)"
           },
@@ -139700,7 +140442,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:5f229173c006b17ecbc0a5cd",
-            "bindingId": 99,
+            "bindingId": 125,
             "symbol": "dmGui::GetNodeTextureId",
             "shape": "scalar:u64(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32)"
           },
@@ -140953,7 +141695,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:8419b586e2d9a5039fbd1e49",
-            "bindingId": 94,
+            "bindingId": 120,
             "symbol": "dmGui::SetNodeId",
             "shape": "scalar:void(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32,value:scalar:u64)"
           },
@@ -141127,7 +141869,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:ca081c5c9bec46675f029825",
-            "bindingId": 97,
+            "bindingId": 123,
             "symbol": "dmGui::SetNodeIsBone",
             "shape": "scalar:void(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32,value:scalar:bool)"
           },
@@ -142128,7 +142870,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:6112eaebadce97acb425c008",
-            "bindingId": 104,
+            "bindingId": 130,
             "symbol": "dmHID::AddKeyboardChar",
             "shape": "scalar:void(value:handle:dmHID::HContext:opaque,value:scalar:i32)"
           },
@@ -144187,7 +144929,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:7521b2eeb30b3f60896f4bb8",
-            "bindingId": 101,
+            "bindingId": 127,
             "symbol": "dmHID::SetGamepadAxis",
             "shape": "scalar:void(value:handle:dmHID::HGamepad:opaque,value:scalar:u32,value:scalar:f32)"
           },
@@ -144349,7 +145091,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:6530b084c152e23e5f5823a5",
-            "bindingId": 100,
+            "bindingId": 126,
             "symbol": "dmHID::SetGamepadButton",
             "shape": "scalar:void(value:handle:dmHID::HGamepad:opaque,value:scalar:u32,value:scalar:bool)"
           },
@@ -145333,7 +146075,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:814685c126f7da1fe62e5c26",
-            "bindingId": 102,
+            "bindingId": 128,
             "symbol": "dmHID::SetMousePosition",
             "shape": "scalar:void(value:handle:dmHID::HMouse:opaque,value:scalar:i32,value:scalar:i32)"
           },
@@ -145495,7 +146237,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:ade2fe64d4a63845b51965fc",
-            "bindingId": 103,
+            "bindingId": 129,
             "symbol": "dmHID::SetMouseWheel",
             "shape": "scalar:void(value:handle:dmHID::HMouse:opaque,value:scalar:i32)"
           },
@@ -150771,21 +151513,47 @@
         {
           "lane": "dmsdk-borrowed-handle",
           "reportRow": 9,
-          "disposition": "blocked",
-          "semanticState": "blocked-by-structural-or-semantic-policy",
+          "disposition": "generated-provider-boundary",
+          "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:2a305a1def5433d4ad777393",
+            "bindingId": 9,
             "symbol": "dmImage::DeleteImage",
             "shape": "scalar:void(value:handle:dmImage::HImage:opaque)"
           },
           "blockers": [
-            "borrowed-handle-effect:destructive"
+            "call-thread-affinity-unresolved",
+            "handle-ownership-nullability-lifetime-unresolved",
+            "native-symbol-linkage-unverified",
+            "target-feature-symbol-matrix-unverified"
           ],
+          "resolvedPolicies": {
+            "transport": "provider-validated-u64-handle",
+            "ownership": "generated-per-argument-lifecycle-transitions",
+            "lifetime": "synchronous-transition-committed-after-success",
+            "thread": "provider-current-thread",
+            "handleParameterPositions": [
+              0
+            ],
+            "lifecycle": {
+              "resourceArguments": [
+                {
+                  "position": 0,
+                  "effect": "finalize"
+                }
+              ],
+              "result": "none",
+              "completion": "synchronous-noescape",
+              "nonLocalEffects": []
+            },
+            "evidenceBasis": "pinned-defold-declaration-and-source-semantics"
+          },
           "evidenceClaims": {
-            "generated": "universal-fallback-retained",
-            "compiled": "not-applicable",
-            "linked": "not-applicable",
-            "runtime": "not-applicable"
+            "generated": "all-five-target-projections-and-exact-call-twin",
+            "compiled": "pinned-header-adapter-and-exact-twin",
+            "linked": "generated-exact-provider-host-bridge-only",
+            "runtime": "generated-exact-provider-sanitized-and-warmed",
+            "engine": "not-claimed-provider-absent"
           }
         },
         {
@@ -151421,7 +152189,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:f84f01dea0412f0a0bd80666",
-            "bindingId": 6,
+            "bindingId": 11,
             "symbol": "dmImage::GetHeight",
             "shape": "scalar:u32(value:handle:dmImage::HImage:opaque)"
           },
@@ -151688,7 +152456,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:d41399033e5133bb81d1d5db",
-            "bindingId": 5,
+            "bindingId": 10,
             "symbol": "dmImage::GetWidth",
             "shape": "scalar:u32(value:handle:dmImage::HImage:opaque)"
           },
@@ -155763,7 +156531,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:9837ee2dba1fc3e188496198",
-            "bindingId": 10,
+            "bindingId": 16,
             "symbol": "dmMessage::GetSocketNameHash",
             "shape": "scalar:u64(value:handle:dmMessage::HSocket:u64)"
           },
@@ -155904,7 +156672,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:aecae44dd981ebebc32a7890",
-            "bindingId": 9,
+            "bindingId": 15,
             "symbol": "dmMessage::IsSocketValid",
             "shape": "scalar:bool(value:handle:dmMessage::HSocket:u64)"
           },
@@ -157160,21 +157928,47 @@
         {
           "lane": "dmsdk-borrowed-handle",
           "reportRow": 17,
-          "disposition": "blocked",
-          "semanticState": "blocked-by-structural-or-semantic-policy",
+          "disposition": "generated-provider-boundary",
+          "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:7603a0a91f3c1bfd7be27448",
+            "bindingId": 17,
             "symbol": "dmMutex::Delete",
             "shape": "scalar:void(value:handle:dmMutex::HMutex:opaque)"
           },
           "blockers": [
-            "borrowed-handle-effect:destructive"
+            "call-thread-affinity-unresolved",
+            "handle-ownership-nullability-lifetime-unresolved",
+            "native-symbol-linkage-unverified",
+            "target-feature-symbol-matrix-unverified"
           ],
+          "resolvedPolicies": {
+            "transport": "provider-validated-u64-handle",
+            "ownership": "generated-per-argument-lifecycle-transitions",
+            "lifetime": "synchronous-transition-committed-after-success",
+            "thread": "provider-current-thread",
+            "handleParameterPositions": [
+              0
+            ],
+            "lifecycle": {
+              "resourceArguments": [
+                {
+                  "position": 0,
+                  "effect": "finalize"
+                }
+              ],
+              "result": "none",
+              "completion": "synchronous-noescape",
+              "nonLocalEffects": []
+            },
+            "evidenceBasis": "pinned-defold-declaration-and-source-semantics"
+          },
           "evidenceClaims": {
-            "generated": "universal-fallback-retained",
-            "compiled": "not-applicable",
-            "linked": "not-applicable",
-            "runtime": "not-applicable"
+            "generated": "all-five-target-projections-and-exact-call-twin",
+            "compiled": "pinned-header-adapter-and-exact-twin",
+            "linked": "generated-exact-provider-host-bridge-only",
+            "runtime": "generated-exact-provider-sanitized-and-warmed",
+            "engine": "not-claimed-provider-absent"
           }
         },
         {
@@ -157394,7 +158188,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:7ce968c896920dc912ba9855",
-            "bindingId": 11,
+            "bindingId": 18,
             "symbol": "dmMutex::Lock",
             "shape": "scalar:void(value:handle:dmMutex::HMutex:opaque)"
           },
@@ -157999,7 +158793,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:7df60c7fc819c2c364e59765",
-            "bindingId": 12,
+            "bindingId": 19,
             "symbol": "dmMutex::TryLock",
             "shape": "scalar:bool(value:handle:dmMutex::HMutex:opaque)"
           },
@@ -158138,7 +158932,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:6d412a3ceb8883e724df9d89",
-            "bindingId": 13,
+            "bindingId": 20,
             "symbol": "dmMutex::Unlock",
             "shape": "scalar:void(value:handle:dmMutex::HMutex:opaque)"
           },
@@ -159718,7 +160512,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:ce450968c08bb769da046142",
-            "bindingId": 122,
+            "bindingId": 153,
             "symbol": "dmRender::ApplyMaterialSampler",
             "shape": "scalar:void(value:handle:dmRender::HRenderContext:opaque,value:handle:dmRender::HMaterial:opaque,value:handle:dmRender::HSampler:opaque,value:scalar:u8,value:handle:dmGraphics::HTexture:u64)"
           },
@@ -159940,7 +160734,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:a953ee2cf222654f1336804d",
-            "bindingId": 119,
+            "bindingId": 150,
             "symbol": "dmRender::ClearMaterialTags",
             "shape": "scalar:void(value:handle:dmRender::HMaterial:opaque)"
           },
@@ -160078,7 +160872,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:dda95596d3e3c3655ddf655f",
-            "bindingId": 116,
+            "bindingId": 146,
             "symbol": "dmRender::ClearNamedConstantBuffer",
             "shape": "scalar:void(value:handle:dmRender::HNamedConstantBuffer:opaque)"
           },
@@ -160212,21 +161006,47 @@
         {
           "lane": "dmsdk-borrowed-handle",
           "reportRow": 141,
-          "disposition": "blocked",
-          "semanticState": "blocked-by-structural-or-semantic-policy",
+          "disposition": "generated-provider-boundary",
+          "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:0edc5fc3aaa03b52288defc1",
+            "bindingId": 141,
             "symbol": "dmRender::DeleteConstant",
             "shape": "scalar:void(value:handle:dmRender::HConstant:opaque)"
           },
           "blockers": [
-            "borrowed-handle-effect:destructive"
+            "call-thread-affinity-unresolved",
+            "handle-ownership-nullability-lifetime-unresolved",
+            "native-symbol-linkage-unverified",
+            "target-feature-symbol-matrix-unverified"
           ],
+          "resolvedPolicies": {
+            "transport": "provider-validated-u64-handle",
+            "ownership": "generated-per-argument-lifecycle-transitions",
+            "lifetime": "synchronous-transition-committed-after-success",
+            "thread": "provider-current-thread",
+            "handleParameterPositions": [
+              0
+            ],
+            "lifecycle": {
+              "resourceArguments": [
+                {
+                  "position": 0,
+                  "effect": "finalize"
+                }
+              ],
+              "result": "none",
+              "completion": "synchronous-noescape",
+              "nonLocalEffects": []
+            },
+            "evidenceBasis": "pinned-defold-declaration-and-source-semantics"
+          },
           "evidenceClaims": {
-            "generated": "universal-fallback-retained",
-            "compiled": "not-applicable",
-            "linked": "not-applicable",
-            "runtime": "not-applicable"
+            "generated": "all-five-target-projections-and-exact-call-twin",
+            "compiled": "pinned-header-adapter-and-exact-twin",
+            "linked": "generated-exact-provider-host-bridge-only",
+            "runtime": "generated-exact-provider-sanitized-and-warmed",
+            "engine": "not-claimed-provider-absent"
           }
         },
         {
@@ -160335,21 +161155,52 @@
         {
           "lane": "dmsdk-borrowed-handle",
           "reportRow": 149,
-          "disposition": "blocked",
-          "semanticState": "blocked-by-structural-or-semantic-policy",
+          "disposition": "generated-provider-boundary",
+          "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:f2f677ce3055069675ec822c",
+            "bindingId": 149,
             "symbol": "dmRender::DeleteMaterial",
             "shape": "scalar:void(value:handle:dmRender::HRenderContext:opaque,value:handle:dmRender::HMaterial:opaque)"
           },
           "blockers": [
-            "borrowed-handle-effect:destructive"
+            "call-thread-affinity-unresolved",
+            "handle-ownership-nullability-lifetime-unresolved",
+            "native-symbol-linkage-unverified",
+            "target-feature-symbol-matrix-unverified"
           ],
+          "resolvedPolicies": {
+            "transport": "provider-validated-u64-handle",
+            "ownership": "generated-per-argument-lifecycle-transitions",
+            "lifetime": "synchronous-transition-committed-after-success",
+            "thread": "provider-current-thread",
+            "handleParameterPositions": [
+              0,
+              1
+            ],
+            "lifecycle": {
+              "resourceArguments": [
+                {
+                  "position": 0,
+                  "effect": "borrow"
+                },
+                {
+                  "position": 1,
+                  "effect": "finalize"
+                }
+              ],
+              "result": "none",
+              "completion": "synchronous-noescape",
+              "nonLocalEffects": []
+            },
+            "evidenceBasis": "pinned-defold-declaration-and-source-semantics"
+          },
           "evidenceClaims": {
-            "generated": "universal-fallback-retained",
-            "compiled": "not-applicable",
-            "linked": "not-applicable",
-            "runtime": "not-applicable"
+            "generated": "all-five-target-projections-and-exact-call-twin",
+            "compiled": "pinned-header-adapter-and-exact-twin",
+            "linked": "generated-exact-provider-host-bridge-only",
+            "runtime": "generated-exact-provider-sanitized-and-warmed",
+            "engine": "not-claimed-provider-absent"
           }
         },
         {
@@ -160483,21 +161334,47 @@
         {
           "lane": "dmsdk-borrowed-handle",
           "reportRow": 145,
-          "disposition": "blocked",
-          "semanticState": "blocked-by-structural-or-semantic-policy",
+          "disposition": "generated-provider-boundary",
+          "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:b8f947270bbde3a10ff99a81",
+            "bindingId": 145,
             "symbol": "dmRender::DeleteNamedConstantBuffer",
             "shape": "scalar:void(value:handle:dmRender::HNamedConstantBuffer:opaque)"
           },
           "blockers": [
-            "borrowed-handle-effect:destructive"
+            "call-thread-affinity-unresolved",
+            "handle-ownership-nullability-lifetime-unresolved",
+            "native-symbol-linkage-unverified",
+            "target-feature-symbol-matrix-unverified"
           ],
+          "resolvedPolicies": {
+            "transport": "provider-validated-u64-handle",
+            "ownership": "generated-per-argument-lifecycle-transitions",
+            "lifetime": "synchronous-transition-committed-after-success",
+            "thread": "provider-current-thread",
+            "handleParameterPositions": [
+              0
+            ],
+            "lifecycle": {
+              "resourceArguments": [
+                {
+                  "position": 0,
+                  "effect": "finalize"
+                }
+              ],
+              "result": "none",
+              "completion": "synchronous-noescape",
+              "nonLocalEffects": []
+            },
+            "evidenceBasis": "pinned-defold-declaration-and-source-semantics"
+          },
           "evidenceClaims": {
-            "generated": "universal-fallback-retained",
-            "compiled": "not-applicable",
-            "linked": "not-applicable",
-            "runtime": "not-applicable"
+            "generated": "all-five-target-projections-and-exact-call-twin",
+            "compiled": "pinned-header-adapter-and-exact-twin",
+            "linked": "generated-exact-provider-host-bridge-only",
+            "runtime": "generated-exact-provider-sanitized-and-warmed",
+            "engine": "not-claimed-provider-absent"
           }
         },
         {
@@ -160717,7 +161594,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:c8d261ef0d9e7394b2bf476b",
-            "bindingId": 113,
+            "bindingId": 142,
             "symbol": "dmRender::GetConstantName",
             "shape": "scalar:u64(value:handle:dmRender::HConstant:opaque)"
           },
@@ -161303,7 +162180,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:a7047a36b2e8870984654ec5",
-            "bindingId": 120,
+            "bindingId": 151,
             "symbol": "dmRender::GetMaterialSamplerNameHash",
             "shape": "scalar:u64(value:handle:dmRender::HMaterial:opaque,value:scalar:u32)"
           },
@@ -161458,7 +162335,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:97ba5cc5ca3535c362d4cdb4",
-            "bindingId": 121,
+            "bindingId": 152,
             "symbol": "dmRender::GetMaterialSamplerUnit",
             "shape": "scalar:u32(value:handle:dmRender::HMaterial:opaque,value:scalar:u64)"
           },
@@ -161613,7 +162490,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:8c597212e510d352c6c1ac1f",
-            "bindingId": 112,
+            "bindingId": 140,
             "symbol": "dmRender::GetMaterialTagListKey",
             "shape": "scalar:u32(value:handle:dmRender::HMaterial:opaque)"
           },
@@ -162232,7 +163109,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:660b79a8d65887cca6f378f5",
-            "bindingId": 118,
+            "bindingId": 148,
             "symbol": "dmRender::GetNamedConstantCount",
             "shape": "scalar:u32(value:handle:dmRender::HNamedConstantBuffer:opaque)"
           },
@@ -162969,7 +163846,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:b87e85c9ec9511c10914f43f",
-            "bindingId": 117,
+            "bindingId": 147,
             "symbol": "dmRender::RemoveNamedConstant",
             "shape": "scalar:void(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64)"
           },
@@ -163906,7 +164783,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:5a3d66773d1a40bcb62954ed",
-            "bindingId": 115,
+            "bindingId": 144,
             "symbol": "dmRender::SetConstantLocation",
             "shape": "scalar:void(value:handle:dmRender::HConstant:opaque,value:handle:dmGraphics::HUniformLocation:i64)"
           },
@@ -164064,7 +164941,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:e590772975477e95de705193",
-            "bindingId": 114,
+            "bindingId": 143,
             "symbol": "dmRender::SetConstantName",
             "shape": "scalar:void(value:handle:dmRender::HConstant:opaque,value:scalar:u64)"
           },
@@ -167412,21 +168289,52 @@
         {
           "lane": "dmsdk-borrowed-handle",
           "reportRow": 164,
-          "disposition": "blocked",
-          "semanticState": "blocked-by-structural-or-semantic-policy",
+          "disposition": "generated-provider-boundary",
+          "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:f619ba9ab42c3e550e138f6f",
+            "bindingId": 164,
             "symbol": "dmResource::FreeResourceType",
             "shape": "scalar:void(value:handle:dmResource::HFactory:opaque,value:handle:HResourceType:opaque)"
           },
           "blockers": [
-            "borrowed-handle-effect:destructive"
+            "call-thread-affinity-unresolved",
+            "handle-ownership-nullability-lifetime-unresolved",
+            "native-symbol-linkage-unverified",
+            "target-feature-symbol-matrix-unverified"
           ],
+          "resolvedPolicies": {
+            "transport": "provider-validated-u64-handle",
+            "ownership": "generated-per-argument-lifecycle-transitions",
+            "lifetime": "synchronous-transition-committed-after-success",
+            "thread": "provider-current-thread",
+            "handleParameterPositions": [
+              0,
+              1
+            ],
+            "lifecycle": {
+              "resourceArguments": [
+                {
+                  "position": 0,
+                  "effect": "borrow"
+                },
+                {
+                  "position": 1,
+                  "effect": "finalize"
+                }
+              ],
+              "result": "none",
+              "completion": "synchronous-noescape",
+              "nonLocalEffects": []
+            },
+            "evidenceBasis": "pinned-defold-declaration-and-source-semantics"
+          },
           "evidenceClaims": {
-            "generated": "universal-fallback-retained",
-            "compiled": "not-applicable",
-            "linked": "not-applicable",
-            "runtime": "not-applicable"
+            "generated": "all-five-target-projections-and-exact-call-twin",
+            "compiled": "pinned-header-adapter-and-exact-twin",
+            "linked": "generated-exact-provider-host-bridge-only",
+            "runtime": "generated-exact-provider-sanitized-and-warmed",
+            "engine": "not-claimed-provider-absent"
           }
         },
         {
@@ -169550,7 +170458,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:79cf22fb04ebf4270e449950",
-            "bindingId": 131,
+            "bindingId": 165,
             "symbol": "dmResource::GetNameHash",
             "shape": "scalar:u64(value:handle:HResourceType:opaque)"
           },
@@ -169693,7 +170601,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:406cdf152c4350462aa62b6f",
-            "bindingId": 132,
+            "bindingId": 166,
             "symbol": "dmResource::GetNameHash",
             "shape": "scalar:u64(value:handle:dmResource::HDescriptor:opaque)"
           },
@@ -170847,7 +171755,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:30204764c6582de473c9b13c",
-            "bindingId": 134,
+            "bindingId": 168,
             "symbol": "dmResource::GetResourceSize",
             "shape": "scalar:u32(value:handle:dmResource::HDescriptor:opaque)"
           },
@@ -172252,21 +173160,52 @@
         {
           "lane": "dmsdk-borrowed-handle",
           "reportRow": 163,
-          "disposition": "blocked",
-          "semanticState": "blocked-by-structural-or-semantic-policy",
+          "disposition": "generated-provider-boundary",
+          "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:78912f251113b55358703ca8",
+            "bindingId": 163,
             "symbol": "dmResource::IncRef",
             "shape": "scalar:void(value:handle:dmResource::HFactory:opaque,value:handle:HResourceDescriptor:opaque)"
           },
           "blockers": [
-            "borrowed-handle-effect:retained"
+            "call-thread-affinity-unresolved",
+            "handle-ownership-nullability-lifetime-unresolved",
+            "native-symbol-linkage-unverified",
+            "target-feature-symbol-matrix-unverified"
           ],
+          "resolvedPolicies": {
+            "transport": "provider-validated-u64-handle",
+            "ownership": "generated-per-argument-lifecycle-transitions",
+            "lifetime": "synchronous-transition-committed-after-success",
+            "thread": "provider-current-thread",
+            "handleParameterPositions": [
+              0,
+              1
+            ],
+            "lifecycle": {
+              "resourceArguments": [
+                {
+                  "position": 0,
+                  "effect": "borrow"
+                },
+                {
+                  "position": 1,
+                  "effect": "retain"
+                }
+              ],
+              "result": "none",
+              "completion": "synchronous-noescape",
+              "nonLocalEffects": []
+            },
+            "evidenceBasis": "pinned-defold-declaration-and-source-semantics"
+          },
           "evidenceClaims": {
-            "generated": "universal-fallback-retained",
-            "compiled": "not-applicable",
-            "linked": "not-applicable",
-            "runtime": "not-applicable"
+            "generated": "all-five-target-projections-and-exact-call-twin",
+            "compiled": "pinned-header-adapter-and-exact-twin",
+            "linked": "generated-exact-provider-host-bridge-only",
+            "runtime": "generated-exact-provider-sanitized-and-warmed",
+            "engine": "not-claimed-provider-absent"
           }
         },
         {
@@ -174417,7 +175356,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:06bf42f071e799a026edd084",
-            "bindingId": 133,
+            "bindingId": 167,
             "symbol": "dmResource::SetResourceSize",
             "shape": "scalar:void(value:handle:dmResource::HDescriptor:opaque,value:scalar:u32)"
           },
@@ -175616,21 +176555,47 @@
         {
           "lane": "dmsdk-borrowed-handle",
           "reportRow": 169,
-          "disposition": "blocked",
-          "semanticState": "blocked-by-structural-or-semantic-policy",
+          "disposition": "generated-provider-boundary",
+          "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:1db94bade45f0f3c0bf7cde9",
+            "bindingId": 169,
             "symbol": "dmRig::DeleteContext",
             "shape": "scalar:void(value:handle:dmRig::HRigContext:opaque)"
           },
           "blockers": [
-            "borrowed-handle-effect:destructive"
+            "call-thread-affinity-unresolved",
+            "handle-ownership-nullability-lifetime-unresolved",
+            "native-symbol-linkage-unverified",
+            "target-feature-symbol-matrix-unverified"
           ],
+          "resolvedPolicies": {
+            "transport": "provider-validated-u64-handle",
+            "ownership": "generated-per-argument-lifecycle-transitions",
+            "lifetime": "synchronous-transition-committed-after-success",
+            "thread": "provider-current-thread",
+            "handleParameterPositions": [
+              0
+            ],
+            "lifecycle": {
+              "resourceArguments": [
+                {
+                  "position": 0,
+                  "effect": "finalize"
+                }
+              ],
+              "result": "none",
+              "completion": "synchronous-noescape",
+              "nonLocalEffects": []
+            },
+            "evidenceBasis": "pinned-defold-declaration-and-source-semantics"
+          },
           "evidenceClaims": {
-            "generated": "universal-fallback-retained",
-            "compiled": "not-applicable",
-            "linked": "not-applicable",
-            "runtime": "not-applicable"
+            "generated": "all-five-target-projections-and-exact-call-twin",
+            "compiled": "pinned-header-adapter-and-exact-twin",
+            "linked": "generated-exact-provider-host-bridge-only",
+            "runtime": "generated-exact-provider-sanitized-and-warmed",
+            "engine": "not-claimed-provider-absent"
           }
         },
         {
@@ -176222,7 +177187,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:d8fa07993ec03df6bd299499",
-            "bindingId": 135,
+            "bindingId": 170,
             "symbol": "dmRig::GetAnimation",
             "shape": "scalar:u64(value:handle:dmRig::HRigInstance:opaque)"
           },
@@ -176365,7 +177330,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:25de2a43b9fed55d9a1f7639",
-            "bindingId": 144,
+            "bindingId": 179,
             "symbol": "dmRig::GetBoneCount",
             "shape": "scalar:u32(value:handle:dmRig::HRigInstance:opaque)"
           },
@@ -176504,7 +177469,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:7ed6c384afe591ded5a5e601",
-            "bindingId": 138,
+            "bindingId": 173,
             "symbol": "dmRig::GetCursor",
             "shape": "scalar:f32(value:handle:dmRig::HRigInstance:opaque,value:scalar:bool)"
           },
@@ -176655,7 +177620,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:c59e771a3f05aa9ab6b33328",
-            "bindingId": 142,
+            "bindingId": 177,
             "symbol": "dmRig::GetEnabled",
             "shape": "scalar:bool(value:handle:dmRig::HRigInstance:opaque)"
           },
@@ -176920,7 +177885,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:4cc600a14e893b2ec97ebbe8",
-            "bindingId": 145,
+            "bindingId": 180,
             "symbol": "dmRig::GetMaxBoneCount",
             "shape": "scalar:u32(value:handle:dmRig::HRigInstance:opaque)"
           },
@@ -177059,7 +178024,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:2a7b343577ce6bbf8c049f2b",
-            "bindingId": 137,
+            "bindingId": 172,
             "symbol": "dmRig::GetModel",
             "shape": "scalar:u64(value:handle:dmRig::HRigInstance:opaque)"
           },
@@ -177342,7 +178307,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:900febb2fb1affb47e6f0995",
-            "bindingId": 139,
+            "bindingId": 174,
             "symbol": "dmRig::GetPlaybackRate",
             "shape": "scalar:f32(value:handle:dmRig::HRigInstance:opaque)"
           },
@@ -177601,7 +178566,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:f434fee2684c845d1dc49e3b",
-            "bindingId": 136,
+            "bindingId": 171,
             "symbol": "dmRig::GetVertexCount",
             "shape": "scalar:u32(value:handle:dmRig::HRigInstance:opaque)"
           },
@@ -177740,7 +178705,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:8438c6d4bec852b20f3b75eb",
-            "bindingId": 146,
+            "bindingId": 181,
             "symbol": "dmRig::HasPoseMatrixCacheAnimatedPose",
             "shape": "scalar:bool(value:handle:dmRig::HRigInstance:opaque)"
           },
@@ -178221,7 +179186,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:b29919e6d5501fcb4dc88d15",
-            "bindingId": 143,
+            "bindingId": 178,
             "symbol": "dmRig::IsValid",
             "shape": "scalar:bool(value:handle:dmRig::HRigInstance:opaque)"
           },
@@ -178756,7 +179721,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:ff394b237828faf7b3b4a515",
-            "bindingId": 140,
+            "bindingId": 175,
             "symbol": "dmRig::ResetIKTarget",
             "shape": "scalar:bool(value:handle:dmRig::HRigInstance:opaque,value:scalar:u64)"
           },
@@ -179067,7 +180032,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:2a4fa01b14a2f9ccdd3f6b3f",
-            "bindingId": 141,
+            "bindingId": 176,
             "symbol": "dmRig::SetEnabled",
             "shape": "scalar:void(value:handle:dmRig::HRigInstance:opaque,value:scalar:bool)"
           },
@@ -191463,7 +192428,7 @@
           "semanticState": "generated-provider-boundary-engine-semantics-remain-gated",
           "generationIdentity": {
             "projectionId": "dmsdk-projection:9667f829a6eb91c97d8aba05",
-            "bindingId": 14,
+            "bindingId": 21,
             "symbol": "dmSocket::GetFD",
             "shape": "scalar:i32(value:handle:dmSocket::Socket:i32)"
           },
@@ -512923,5 +513888,5 @@
       }
     }
   ],
-  "planSha256": "debd28633bb4890e7f7b261e480b5c23828e6ef8da0f5b6dac356b74366464ae"
+  "planSha256": "d843a7ab0335b0faa22dcc454deae98b1a92c907ea88e87d8ab8cbbbdee0e9e7"
 }

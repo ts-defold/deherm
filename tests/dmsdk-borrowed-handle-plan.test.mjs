@@ -60,22 +60,25 @@ function decisionByLeaf(plan, leaf) {
   return plan.decisions.find(({ declarationId }) => declarationId.startsWith(`dmsdk:${leaf}@`));
 }
 
-test("global borrowed-handle planning selects only synchronous borrowed consumers", async () => {
+test("global handle planning selects borrowed and lifecycle routes without losing universal coverage", async () => {
   const inputs = await loadInputs();
   const committed = JSON.parse(await readFile(planUrl, "utf8"));
   const index = indexDmSdkBorrowedHandlePlan(committed, inputs);
   assert.equal(index.size, committed.coverage.structurallyRelevant);
   assert.equal(committed.coverage.structurallyRelevant, 182);
-  assert.equal(committed.coverage.selected, 147);
-  assert.equal(committed.coverage.universalFallback, 35);
-  assert.equal(committed.coverage.sourceDerived, 73);
-  assert.equal(committed.coverage.compatibilityPreserved, 74);
-  assert.equal(committed.providerAbiVersion, 2);
-  assert.equal(committed.abi.reason, "withdrawal renumbers private pre-release version-one IDs atomically");
+  assert.equal(committed.coverage.selected, 182);
+  assert.equal(committed.coverage.universalFallback, 0);
+  assert.equal(committed.coverage.borrowedSelected, 148);
+  assert.equal(committed.coverage.lifecycleSelected, 34);
+  assert.equal(committed.coverage.sourceDerived, 74);
+  assert.equal(committed.coverage.defoldContractTrusted, 74);
+  assert.equal(committed.coverage.revisionDerivedLifecycle, 34);
+  assert.equal(committed.providerAbiVersion, 3);
+  assert.match(committed.abi.reason, /lifecycle effect vectors/u);
   assert.equal(decisionByLeaf(committed, "dmGraphics::GetWindowWidth").fallback, false);
   assert.equal(
     decisionByLeaf(committed, "dmGraphics::GetWindowWidth").effect.admission.kind,
-    "compatibility-preserved",
+    "defold-contract-trusted",
   );
   assert.equal(decisionByLeaf(committed, "dmImage::GetWidth").effect.admission.kind, "source-derived");
   for (const leaf of [
@@ -93,18 +96,19 @@ test("global borrowed-handle planning selects only synchronous borrowed consumer
     "WindowClose",
     "WindowDelete",
   ])
-    assert.equal(decisionByLeaf(committed, leaf).fallback, true, leaf);
+    assert.equal(decisionByLeaf(committed, leaf).fallback, false, leaf);
   assert.deepEqual(
     committed.decisions.filter(({ fallback }) => !fallback).map(({ order }) => order),
     Array.from({ length: committed.coverage.selected }, (_, index) => index),
   );
 });
 
-test("effect semantics dominate the borrowed default", async () => {
+test("supported lifecycle semantics select the lifecycle family while escaping effects still fail closed", async () => {
   const base = await loadInputs();
   const baseline = buildDmSdkBorrowedHandlePlan(base);
   const selected = baseline.decisions.find(
-    ({ fallback, effect }) => !fallback && effect.admission.kind === "source-derived",
+    ({ fallback, effect }) =>
+      !fallback && effect.admission.kind === "source-derived" && effect.taxonomy.resourceArguments.length === 1,
   );
   const cases = [
     {
@@ -118,24 +122,28 @@ test("effect semantics dominate the borrowed default", async () => {
       name: "AcquireLease",
       description: "Acquire a lease.",
       effect: "borrowed-or-transferred-requires-token",
+      expectedFamily: "borrowed-handle",
     },
     {
       label: "retained handle",
       name: "ObserveHandle",
       description: "Retains the shared reference.",
       effect: "borrowed-or-transferred-requires-token",
+      expectedFamily: "handle-lifecycle",
     },
     {
       label: "transferred handle",
       name: "SubmitHandle",
       description: "Takes ownership of the handle.",
       effect: "borrowed-or-transferred-requires-token",
+      fallback: true,
     },
     {
       label: "async handle",
       name: "ScheduleHandle",
       description: "The handle is stored for later asynchronous use.",
       effect: "borrowed-or-transferred-requires-token",
+      fallback: true,
     },
   ];
   for (const fixture of cases) {
@@ -149,14 +157,82 @@ test("effect semantics dominate the borrowed default", async () => {
     const decision = buildDmSdkBorrowedHandlePlan(inputs).decisions.find(
       ({ declarationId }) => declarationId === selected.declarationId,
     );
-    assert.equal(decision.fallback, true, fixture.label);
-    assert.ok(decision.blockers.length > 0, fixture.label);
-    assert.equal(decision.effect.admission.kind, "revision-contradiction", fixture.label);
+    assert.equal(decision.fallback, fixture.fallback ?? false, fixture.label);
+    if (fixture.fallback) {
+      assert.ok(decision.blockers.length > 0, fixture.label);
+      assert.equal(decision.effect.admission.kind, "revision-contradiction", fixture.label);
+    } else {
+      assert.equal(decision.family, fixture.expectedFamily ?? "handle-lifecycle", fixture.label);
+      assert.equal(decision.blockers.length, 0, fixture.label);
+    }
     assert.ok(decision.effect.signals.length > 0, fixture.label);
   }
 });
 
-test("withdrawing source proof preserves the trusted compatibility route without mislabeling it", async () => {
+test("lifecycle inference targets exact resource positions instead of every handle in the signature", async () => {
+  const plan = buildDmSdkBorrowedHandlePlan(await loadInputs());
+  const effects = (leaf) => decisionByLeaf(plan, leaf).effect.taxonomy;
+  const expected = new Map([
+    ["dmBuffer::Destroy", [[[0, "finalize"]], []]],
+    ["dmConditionVariable::Delete", [[[0, "finalize"]], []]],
+    ["dmConnectionPool::Return", [[[0, "borrow"], [1, "release"]], []]],
+    ["dmConnectionPool::Close", [[[0, "borrow"], [1, "release"]], ["connection-closed", "pool-slot-invalidated"]]],
+    ["dmImage::DeleteImage", [[[0, "finalize"]], []]],
+    ["JobSystemDestroy", [[[0, "finalize"]], []]],
+    ["dmMutex::Delete", [[[0, "finalize"]], []]],
+    ["FontDestroy", [[[0, "finalize"]], []]],
+    ["FontCollectionDestroy", [[[0, "finalize"]], []]],
+    ["TextLayoutAcquire", [[[0, "retain"]], []]],
+    ["TextLayoutRelease", [[[0, "release"]], []]],
+    ["dmGameObject::Delete", [[[0, "borrow"], [1, "finalize"]], []]],
+    ["dmGameObject::DeleteBones", [[[0, "borrow"]], ["descendant-finalize"]]],
+    ["dmGameObject::PropertyContainerDestroy", [[[0, "finalize"]], []]],
+    ["dmGameSystem::DestroyRenderConstants", [[[0, "finalize"]], []]],
+    ["dmGraphics::DeleteVertexStreamDeclaration", [[[0, "finalize"]], []]],
+    ["dmGraphics::DeleteVertexDeclaration", [[[0, "finalize"]], []]],
+    ["dmGraphics::DeleteVertexBuffer", [[[0, "finalize"]], []]],
+    ["dmGraphics::DeleteIndexBuffer", [[[0, "finalize"]], []]],
+    ["dmGraphics::DeleteTexture", [[[0, "borrow"], [1, "finalize"]], []]],
+    ["dmGraphics::DeleteRenderTarget", [[[0, "borrow"], [1, "finalize"]], []]],
+    ["dmGraphics::DeleteContext", [[[0, "finalize"]], ["owned-descendants-finalized"]]],
+    ["dmGraphics::CloseWindow", [[[0, "borrow"]], ["associated-window-closed"]]],
+    ["dmGraphics::DeleteProgram", [[[0, "borrow"], [1, "finalize"]], ["owned-descendants-finalized"]]],
+    ["dmGui::DeleteNode", [[[0, "borrow"], [1, "finalize"]], []]],
+    ["WindowDelete", [[[0, "finalize"]], []]],
+    ["WindowClose", [[[0, "borrow"]], ["associated-window-closed"]]],
+    ["dmRender::DeleteConstant", [[[0, "finalize"]], []]],
+    ["dmRender::DeleteNamedConstantBuffer", [[[0, "finalize"]], []]],
+    ["dmRender::DeleteMaterial", [[[0, "borrow"], [1, "finalize"]], []]],
+    ["ResourceDescriptorIncRef", [[[0, "borrow"], [1, "retain"]], []]],
+    ["dmResource::IncRef", [[[0, "borrow"], [1, "retain"]], []]],
+    ["dmResource::FreeResourceType", [[[0, "borrow"], [1, "finalize"]], []]],
+    ["dmRig::DeleteContext", [[[0, "finalize"]], []]],
+  ]);
+  const actualLeaves = plan.decisions
+    .filter(({ family }) => family === "handle-lifecycle")
+    .map(({ declarationId }) => declarationId.slice("dmsdk:".length).split("@")[0]);
+  assert.deepEqual(actualLeaves.sort(), [...expected.keys()].sort());
+  for (const [leaf, [resourceArguments, nonLocalEffects]] of expected) {
+    assert.deepEqual(
+      effects(leaf),
+      {
+        resourceArguments: resourceArguments.map(([position, effect]) => ({ position, effect })),
+        result: "none",
+        completion: "synchronous-noescape",
+        nonLocalEffects,
+      },
+      leaf,
+    );
+  }
+  assert.deepEqual(effects("dmGameObject::AcquireInstanceIndex"), {
+    resourceArguments: [{ position: 0, effect: "borrow" }],
+    result: "none",
+    completion: "synchronous-noescape",
+    nonLocalEffects: [],
+  });
+});
+
+test("withdrawing source proof preserves the Defold-contract route without inventing source proof", async () => {
   const inputs = await loadInputs();
   const baseline = buildDmSdkBorrowedHandlePlan(inputs);
   const selected = baseline.decisions.find(
@@ -177,7 +253,7 @@ test("withdrawing source proof preserves the trusted compatibility route without
     ({ declarationId }) => declarationId === selected.declarationId,
   );
   assert.equal(decision.fallback, false);
-  assert.equal(decision.effect.admission.kind, "compatibility-preserved");
+  assert.equal(decision.effect.admission.kind, "defold-contract-trusted");
   assert.deepEqual(decision.effect.sourceProof.evidenceGaps, ["cpp-effect:fixture-source-proof-withdrawn"]);
 });
 
@@ -203,7 +279,10 @@ test("borrowed-handle plan validation rejects forged ownership and source identi
   assert.throws(() => indexDmSdkBorrowedHandlePlan(forged), /owner differs/u);
   const reordered = structuredClone(plan);
   [reordered.decisions[0], reordered.decisions[1]] = [reordered.decisions[1], reordered.decisions[0]];
-  assert.throws(() => indexDmSdkBorrowedHandlePlan(reordered), /not canonically ordered/u);
+  assert.throws(
+    () => indexDmSdkBorrowedHandlePlan(reordered),
+    /not canonically ordered|selected order is not dense/u,
+  );
   const stale = structuredClone(plan);
   stale.sourceHashes.ir = "0".repeat(64);
   assert.throws(() => indexDmSdkBorrowedHandlePlan(stale, inputs), /strict source re-derivation/u);
@@ -212,4 +291,8 @@ test("borrowed-handle plan validation rejects forged ownership and source identi
 test("the package eligibility recipe contains semantics, not Defold identities", () => {
   const recipe = JSON.stringify(DMSDK_BORROWED_HANDLE_ELIGIBILITY);
   assert.doesNotMatch(recipe, /@upstream|dmsdk:|dm[A-Z][A-Za-z]+::/u);
+  assert.equal(
+    DMSDK_BORROWED_HANDLE_ELIGIBILITY.trustDefault.contradictionPolicy,
+    "positive-defold-revision-contradiction-dominates",
+  );
 });

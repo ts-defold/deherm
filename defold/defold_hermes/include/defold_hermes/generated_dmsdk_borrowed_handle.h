@@ -2,17 +2,19 @@
 #ifndef DEFOLD_HERMES_GENERATED_DMSDK_BORROWED_HANDLE_H
 #define DEFOLD_HERMES_GENERATED_DMSDK_BORROWED_HANDLE_H
 #include <stdint.h>
-#define DEHERM_DMSDK_BORROWED_PROVIDER_ABI UINT32_C(2)
+#define DEHERM_DMSDK_BORROWED_PROVIDER_ABI UINT32_C(3)
 #define DEHERM_DMSDK_BORROWED_MAX_ARGUMENTS 8
 #define DEHERM_DMSDK_BORROWED_NO_HANDLE_KIND UINT16_MAX
 typedef enum DehermDmSdkBorrowedKind { DEHERM_DMSDK_BORROWED_VOID=0, DEHERM_DMSDK_BORROWED_HANDLE=1, DEHERM_DMSDK_BORROWED_BOOL=2, DEHERM_DMSDK_BORROWED_I32=3, DEHERM_DMSDK_BORROWED_U32=4, DEHERM_DMSDK_BORROWED_U64=5, DEHERM_DMSDK_BORROWED_F32=6, DEHERM_DMSDK_BORROWED_U8=7, DEHERM_DMSDK_BORROWED_U16=8 } DehermDmSdkBorrowedKind;
+typedef enum DehermDmSdkHandleEffect { DEHERM_DMSDK_HANDLE_NONE=0, DEHERM_DMSDK_HANDLE_BORROW=1, DEHERM_DMSDK_HANDLE_RETAIN=2, DEHERM_DMSDK_HANDLE_RELEASE=3, DEHERM_DMSDK_HANDLE_FINALIZE=4 } DehermDmSdkHandleEffect;
 typedef enum DehermDmSdkBorrowedStatus { DEHERM_DMSDK_BORROWED_OK=0, DEHERM_DMSDK_BORROWED_UNKNOWN_ID=1, DEHERM_DMSDK_BORROWED_WRONG_ARITY=2, DEHERM_DMSDK_BORROWED_NULL_STORAGE=3, DEHERM_DMSDK_BORROWED_PROVIDER_MISSING=4, DEHERM_DMSDK_BORROWED_WRONG_THREAD=5, DEHERM_DMSDK_BORROWED_INVALID_HANDLE=6, DEHERM_DMSDK_BORROWED_INVALID_PROVIDER=7, DEHERM_DMSDK_BORROWED_PROVIDER_ERROR=8, DEHERM_DMSDK_BORROWED_INVALID_VALUE=9 } DehermDmSdkBorrowedStatus;
-typedef struct DehermDmSdkBorrowedDescriptor { uint16_t id; uint8_t argument_count; uint8_t result_kind; uint8_t argument_kinds[DEHERM_DMSDK_BORROWED_MAX_ARGUMENTS]; uint16_t handle_kinds[DEHERM_DMSDK_BORROWED_MAX_ARGUMENTS]; const char* declaration_id; } DehermDmSdkBorrowedDescriptor;
+typedef struct DehermDmSdkBorrowedDescriptor { uint16_t id; uint8_t argument_count; uint8_t result_kind; uint8_t argument_kinds[DEHERM_DMSDK_BORROWED_MAX_ARGUMENTS]; uint16_t handle_kinds[DEHERM_DMSDK_BORROWED_MAX_ARGUMENTS]; uint8_t argument_effects[DEHERM_DMSDK_BORROWED_MAX_ARGUMENTS]; uint8_t result_effect; const char* declaration_id; } DehermDmSdkBorrowedDescriptor;
 typedef struct DehermDmSdkBorrowedHandleKind { uint16_t id; const char* name; const char* native_representation; } DehermDmSdkBorrowedHandleKind;
 typedef uint8_t (*DehermDmSdkBorrowedCurrentThreadFn)(void* context);
 typedef uint8_t (*DehermDmSdkBorrowedValidateHandleFn)(void* context, uint16_t handle_kind, uint64_t value);
 typedef DehermDmSdkBorrowedStatus (*DehermDmSdkBorrowedInvokeFn)(void* context, uint16_t id, const uint64_t* arguments, uint32_t argument_count, uint64_t* out_result);
-typedef struct DehermDmSdkBorrowedProvider { uint32_t abi_version; void* context; DehermDmSdkBorrowedCurrentThreadFn is_current_thread; DehermDmSdkBorrowedValidateHandleFn validate_handle; DehermDmSdkBorrowedInvokeFn invoke; } DehermDmSdkBorrowedProvider;
+typedef void (*DehermDmSdkBorrowedTransitionHandleFn)(void* context, uint16_t id, uint8_t position, uint16_t handle_kind, uint64_t value, uint8_t effect);
+typedef struct DehermDmSdkBorrowedProvider { uint32_t abi_version; void* context; DehermDmSdkBorrowedCurrentThreadFn is_current_thread; DehermDmSdkBorrowedValidateHandleFn validate_handle; DehermDmSdkBorrowedInvokeFn invoke; DehermDmSdkBorrowedTransitionHandleFn transition_handle; } DehermDmSdkBorrowedProvider;
 #ifdef __cplusplus
 extern "C" {
 #endif

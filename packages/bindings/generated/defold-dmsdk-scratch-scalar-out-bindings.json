@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "sources": {
     "ir": "packages/bindings/generated/defold-sdk-ir.json",
@@ -14,8 +14,8 @@
     "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
     "projection": "71b49d4aac3b9aafffe8680a95ed08bc8fc46a2c7ffeceb5b6c303d9ce4685ba",
     "policy": "9d2a8a95e9f918bcc517cb2a702df912a067e6a941ef3f4291f96ddd568b3099",
-    "effectFacts": "9063563ceb0c4b39be9a283bdbb713c6d8302503a98416a1381a8d02593810f3",
-    "plan": "6e4680d3a75b065b91b52be6c6295e22230cb539477251a20f65664449bb5fa7"
+    "effectFacts": "071b3051cd60780a67958cd92266a1460cf1e46479abe1f062da2f43f8b606aa",
+    "plan": "5a96296e4518ebfd87f9a86c5aeffec6aade226d26e59adeb7bc6eab67494d66"
   },
   "selector": "compiler-owned authenticated scratch plan; source-derived admissions plus structurally preserved prior provider routes; no symbol allowlist",
   "patternRegistry": [
@@ -121,7 +121,7 @@
     "generated": 11,
     "blocked": 19,
     "sourceDerived": 6,
-    "compatibilityPreserved": 5,
+    "defoldContractTrusted": 5,
     "cAbiGenerated": 11,
     "dynamicHermesJsiGenerated": 11,
     "staticHermesGenerated": 11,
@@ -914,7 +914,7 @@
       "bindingId": 4,
       "shape": "enum:dmGameObject::Result(value:handle:dmGameObject::HInstance:opaque,value:scalar:u16,inout:pointer:scalar:u64)",
       "patternDecision": "pointer.scratch-scalar-out-provider-boundary",
-      "admission": "compatibility-preserved",
+      "admission": "defold-contract-trusted",
       "evidenceGaps": [
         "completion-facts-unavailable",
         "memory-facts-unavailable",
@@ -1027,7 +1027,7 @@
       "bindingId": 7,
       "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,out:pointer:scalar:u64)",
       "patternDecision": "pointer.scratch-scalar-out-provider-boundary",
-      "admission": "compatibility-preserved",
+      "admission": "defold-contract-trusted",
       "evidenceGaps": [
         "completion-facts-unavailable",
         "ownership-facts-unavailable",
@@ -1067,7 +1067,7 @@
       "bindingId": 8,
       "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,out:pointer:scalar:f32)",
       "patternDecision": "pointer.scratch-scalar-out-provider-boundary",
-      "admission": "compatibility-preserved",
+      "admission": "defold-contract-trusted",
       "evidenceGaps": [
         "completion-facts-unavailable",
         "ownership-facts-unavailable",
@@ -1107,7 +1107,7 @@
       "bindingId": 9,
       "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,out:pointer:scalar:bool)",
       "patternDecision": "pointer.scratch-scalar-out-provider-boundary",
-      "admission": "compatibility-preserved",
+      "admission": "defold-contract-trusted",
       "evidenceGaps": [
         "completion-facts-unavailable",
         "ownership-facts-unavailable",
@@ -1215,7 +1215,7 @@
       "bindingId": 10,
       "shape": "scalar:bool(value:handle:dmHID::HContext:opaque,value:handle:dmHID::HGamepad:opaque,out:pointer:scalar:u32)",
       "patternDecision": "pointer.scratch-scalar-out-provider-boundary",
-      "admission": "compatibility-preserved",
+      "admission": "defold-contract-trusted",
       "evidenceGaps": [
         "memory-facts-unavailable",
         "write-facts-unavailable"

@@ -299,6 +299,7 @@ int ProtectedBaseline(lua_State* state) {
 
 uint8_t StubCurrentThread(void*) { return 1; }
 uint8_t StubValidateHandle(void*, uint16_t, uint64_t) { return 1; }
+void StubTransitionHandle(void*, uint16_t, uint8_t, uint16_t, uint64_t, uint8_t) {}
 DehermDmSdkBorrowedStatus StubInvoke(void*, uint16_t, const uint64_t*, uint32_t, uint64_t* out) {
   *out = UINT64_C(7);
   return DEHERM_DMSDK_BORROWED_OK;
@@ -579,7 +580,8 @@ int main() {
   // and validation, not the Defold call behind it.
   {
     const DehermDmSdkBorrowedProvider provider{
-        DEHERM_DMSDK_BORROWED_PROVIDER_ABI, nullptr, StubCurrentThread, StubValidateHandle, StubInvoke};
+        DEHERM_DMSDK_BORROWED_PROVIDER_ABI, nullptr, StubCurrentThread, StubValidateHandle, StubInvoke,
+        StubTransitionHandle};
     expect(deherm_dmsdk_borrowed_set_provider(&provider) == DEHERM_DMSDK_BORROWED_OK,
         "borrowed-handle provider was rejected");
     for (uint16_t id = 0; id < 2 && id < deherm_dmsdk_borrowed_count(); ++id) {
@@ -663,7 +665,8 @@ int main() {
   }
   {
     const DehermDmSdkBorrowedProvider provider{
-        DEHERM_DMSDK_BORROWED_PROVIDER_ABI, nullptr, StubCurrentThread, StubValidateHandle, StubInvoke};
+        DEHERM_DMSDK_BORROWED_PROVIDER_ABI, nullptr, StubCurrentThread, StubValidateHandle, StubInvoke,
+        StubTransitionHandle};
     (void)deherm_dmsdk_borrowed_set_provider(&provider);
     uint64_t arguments[DEHERM_DMSDK_BORROWED_MAX_ARGUMENTS] = {1, 1};
     uint64_t result = 0;

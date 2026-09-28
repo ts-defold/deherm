@@ -39,7 +39,7 @@ test("scratch scalar-out emitter consumes the authenticated compiler plan withou
     generated: 11,
     blocked: 19,
     sourceDerived: 6,
-    compatibilityPreserved: 5,
+    defoldContractTrusted: 5,
     cAbiGenerated: 11,
     dynamicHermesJsiGenerated: 11,
     staticHermesGenerated: 11,

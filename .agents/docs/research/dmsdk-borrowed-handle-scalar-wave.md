@@ -15,32 +15,42 @@ pinned revision has 182 structurally compatible declarations:
 
 | Disposition | Count | Rule |
 | --- | ---: | --- |
-| provider-gated handle/scalar ABI | 147 | The structural contract matches and the revision contains no ownership, lifecycle, lease, retention, transfer, or deferred-use contradiction to Defold's public by-value-resource borrow convention. |
-| universal fallback | 35 | Twenty-three historical finalizers, `AcquireInstanceIndex`, and eleven routes previously misclassified as borrowed have explicit lifecycle, refcount, lease, or state-transition contradictions. |
+| borrowed handle/scalar ABI | 148 | Every handle argument is borrowed for the synchronous call and the result is void or a bounded scalar. |
+| handle lifecycle ABI | 34 | The same transport carries an exact per-argument retain, release, or finalize transition plus any public non-local state effect. |
+| universal fallback | 0 | No route in this revision's 182-declaration structural envelope requires transfer or asynchronous escape. The universal recipe remains available beneath every specialization. |
 
 The generated report is
 `packages/bindings/generated/defold-dmsdk-borrowed-handle-bindings.json`. It retains all
-182 stable declaration and projection identities. Every rejected row records
-its effect evidence and keeps the universal route. The selection policy in
+182 stable declaration and projection identities. Every row records its effect
+evidence and keeps the universal route. The selection policy in
 `packages/bindings/overrides/dmsdk-borrowed-handle-bindings.json` contains only shape
 rules; it has no declaration list, expected count, or per-symbol exception.
 
 This remains a soundness repair, not a claim that absence of a contradiction is
-implementation proof. The authenticated plan now joins the compiler's C++
-ownership/effect artifact directly. Of the 147 selected routes, 73 have
+implementation proof. The authenticated plan joins the compiler's C++
+ownership/effect artifact directly. Of the 148 pure-borrow routes, 74 have
 diagnostic-free source proof for non-owning, synchronous, non-escaping handle
 use; 74 retain the exact `defold-public-by-value-resource-borrow`
-compatibility convention and carry their source-proof gaps. The 35 explicit
-lifecycle/refcount/state-transition contradictions still dominate either
-admission and remain on the universal route. Withdrawing a source fact changes
-`source-derived` to `compatibility-preserved` without changing emitted ABI or
+Defold-contract convention and carry their source-proof gaps. The remaining 34
+routes use revision-derived lifecycle vectors instead of being discarded:
+each handle position is independently `borrow`, `retain`, `release`, or
+`finalize`, while scalar positions remain `none`. `AcquireInstanceIndex` is a
+pure-borrow route because its result is a scalar index, not an acquired handle.
+Withdrawing a source fact changes
+`source-derived` to `defold-contract-trusted` without changing emitted ABI or
 mislabeling the evidence; adding a contradiction still withdraws the fast
 path.
 
+The source audit deliberately stops at the Defold boundary. Unresolved calls
+through a selected graphics backend, platform wrapper, system library, or OS
+primitive are recorded as proof gaps; they are not treated as evidence that a
+Defold public contract is unsafe. This avoids turning specialization into
+whole-program verification while preserving positive contradiction detection.
+
 # Provider boundary
 
-The 147 generated declarations use one C ABI dispatcher with caller-owned
-64-bit argument and result slots. There are 45 deterministic semantic handle
+The 182 generated declarations use one C ABI dispatcher with caller-owned
+64-bit argument and result slots. There are 48 deterministic semantic handle
 kinds and at most eight arguments per selected call. A borrowed handle never
 crosses as a JavaScript number: Dynamic Hermes and TypeScript use `BigInt`,
 while Static Hermes and the browser descriptor use an exact 64-bit memory lane.
@@ -51,13 +61,16 @@ Before every dispatch, the native bridge requires a provider to prove:
 2. every handle is nonzero;
 3. every handle matches the expected semantic kind and is live in the
    provider's current lifetime epoch; and
-4. the provider accepts the stable generated binding ID.
+4. the provider accepts the stable generated binding ID; and
+5. after a successful call and canonical result validation, the provider
+   applies each generated non-borrow lifecycle transition.
 
 Registration copies one fixed provider record and is constrained to startup or
 shutdown, before concurrent dispatch. Concurrent provider replacement is not a
-supported operation. The family is borrowed-only: it creates, retains,
-releases, or invalidates no engine resource, and it returns only void or scalar
-lanes.
+supported operation. Lifecycle bookkeeping is a required, infallible provider
+callback after success; it never runs for a rejected argument, provider error,
+or invalid result. The ABI itself allocates no resource and returns only void or
+bounded scalar lanes.
 
 The generated adapters cover:
 
@@ -66,8 +79,8 @@ The generated adapters cover:
 - Static Hermes `extern_c` direct-memory declaration;
 - browser/Wasm direct-memory descriptors and raw dispatcher;
 - nominal TypeScript `BorrowedHandle<Kind>` APIs; and
-- a 147-signature pinned-header audit across the selected dmSDK headers; and
-- 147 generator-owned exact-call provider twins with position-distinct native
+- a 182-signature pinned-header audit across the selected dmSDK headers; and
+- 182 generator-owned exact-call provider twins with position-distinct native
   arguments and result checks.
 
 # Evidence
@@ -82,13 +95,14 @@ node --test \
   tests/dmsdk-generator-pipeline.test.mjs
 ```
 
-The tests independently rederive the 182/147/35 plan census and its 73/74
-source-derived/compatibility-preserved selected partition, regenerate every
+The tests independently rederive the 182/148/34/0 plan census and its
+74 source-derived / 74 Defold-contract-trusted / 34 revision-derived-lifecycle
+partition, regenerate every
 artifact into a clean temporary directory, reject source/census drift, compile
 all selected signatures against the complete pinned SDK include projection,
 compile the C and JSI adapters, type-check the Dynamic/Static TypeScript
 surfaces, parse the browser adapter, and link/run the provider bridge under
-ASan and UBSan. The host harness dispatches every one of the 147 generated
+ASan and UBSan. The host harness dispatches every one of the 182 generated
 routes through its exact typed provider twin, rejects noncanonical argument and
 result cells, rejects finite JavaScript values that overflow `f32`, clears the
 caller result before every fallible check, and normalizes successful `void`
@@ -100,14 +114,15 @@ byte-for-byte from pinned inputs.
 
 # Evidence boundary
 
-The runtime harness uses a deterministic fake provider. It proves all 147
+The runtime harness uses a deterministic fake provider. It proves all 182
 selected descriptors' layout, error ordering, provider callbacks, thread rejection, handle rejection,
 linkage of the generic bridge, sanitizer cleanliness, and warmed glue
-allocation behavior. It does not supply real Defold handles, link the 147 engine
+allocation behavior. It also proves the lifecycle callback runs only after a
+successful provider call. It does not supply real Defold handles, link the 182 engine
 symbols, establish real subsystem thread policies, or prove packaged-engine
 behavior. Consequently the generated report records zero packaged-engine
 runtime verifications. The withdrawal is an atomic private pre-release provider
-ABI v2 migration; all generated consumers use the same plan-owned dense IDs.
+ABI v3 migration; all generated consumers use the same plan-owned dense IDs.
 
 The native C ABI and Dynamic Hermes module are compiled into the production
 runtime, and the Static Hermes entry point is exported from its package. They
@@ -116,14 +131,15 @@ TypeScript helper is generated but is not re-exported from the high-level SDK
 barrel, because doing that before provider installation and target
 feature/symbol selection would make the optional fast path appear universally
 available. All 182 structural candidates retain the working universal recipe
-beneath the optional provider specialization, including the 35 fallback rows.
-The 147 selected routes retain the universal base recipe as well; this provider
+Both the 148 pure-borrow and 34 lifecycle routes retain the universal base
+recipe; this provider
 boundary is additive and cannot suppress it.
 
-No dmSDK declaration disappeared: every withdrawn specialization is realized
-through the generated universal machinery. Unlocking a fallback row requires
-revision-derived effect evidence satisfying the same compiler-owned taxonomy;
-a one-off wrapper or declaration allowlist is not an accepted substitute.
+No dmSDK declaration disappeared. A future transferred or asynchronous route
+will remain callable through generated universal machinery and will carry a
+machine-readable fallback blocker. New lifecycle shapes must satisfy the same
+compiler-owned taxonomy; a one-off wrapper or declaration allowlist is not an
+accepted substitute.
 
 ## Source-fact frontend (audit boundary)
 

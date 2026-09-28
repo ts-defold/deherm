@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "kind": "deherm.dmsdk-scratch-scalar-out-plan",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "sources": {
@@ -14,7 +14,7 @@
     "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
     "projection": "71b49d4aac3b9aafffe8680a95ed08bc8fc46a2c7ffeceb5b6c303d9ce4685ba",
     "policy": "9d2a8a95e9f918bcc517cb2a702df912a067e6a941ef3f4291f96ddd568b3099",
-    "effectFacts": "9063563ceb0c4b39be9a283bdbb713c6d8302503a98416a1381a8d02593810f3"
+    "effectFacts": "071b3051cd60780a67958cd92266a1460cf1e46479abe1f062da2f43f8b606aa"
   },
   "eligibility": {
     "schemaVersion": 2,
@@ -106,7 +106,7 @@
     "structurallyRelevant": 30,
     "selected": 11,
     "sourceDerived": 6,
-    "compatibilityPreserved": 5,
+    "defoldContractTrusted": 5,
     "universalFallback": 19,
     "blockerCounts": {
       "ownership": 23,
@@ -877,7 +877,7 @@
       "family": "scratch-scalar-out",
       "emitter": "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
       "fallback": false,
-      "admission": "compatibility-preserved",
+      "admission": "defold-contract-trusted",
       "facts": {
         "ownership": "unknown",
         "memory": "unknown",
@@ -959,7 +959,7 @@
       "family": "scratch-scalar-out",
       "emitter": "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
       "fallback": false,
-      "admission": "compatibility-preserved",
+      "admission": "defold-contract-trusted",
       "facts": {
         "ownership": "unknown",
         "memory": "exact-one-scalar-no-alias-no-span",
@@ -991,7 +991,7 @@
       "family": "scratch-scalar-out",
       "emitter": "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
       "fallback": false,
-      "admission": "compatibility-preserved",
+      "admission": "defold-contract-trusted",
       "facts": {
         "ownership": "unknown",
         "memory": "exact-one-scalar-no-alias-no-span",
@@ -1023,7 +1023,7 @@
       "family": "scratch-scalar-out",
       "emitter": "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
       "fallback": false,
-      "admission": "compatibility-preserved",
+      "admission": "defold-contract-trusted",
       "facts": {
         "ownership": "unknown",
         "memory": "exact-one-scalar-no-alias-no-span",
@@ -1133,7 +1133,7 @@
       "family": "scratch-scalar-out",
       "emitter": "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
       "fallback": false,
-      "admission": "compatibility-preserved",
+      "admission": "defold-contract-trusted",
       "facts": {
         "ownership": "borrowed-handle-or-scalar-no-transfer",
         "memory": "unknown",

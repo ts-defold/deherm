@@ -5,13 +5,23 @@ import {
   DMSDK_CPP_SOURCE_SEMANTIC_ADMISSION,
   validateDmSdkCppOwnershipEffectReport,
 } from "./dmsdk-cpp-ownership-effect-frontend.mjs";
-import { borrowedHandlePattern } from "./dmsdk-pattern-catalog.mjs";
+import { borrowedHandlePattern, handleLifecyclePattern } from "./dmsdk-pattern-catalog.mjs";
 import { defineDmSdkPattern, DMSDK_UNIVERSAL_FALLBACK_PATTERN, selectDmSdkPattern } from "./dmsdk-pattern-selector.mjs";
 
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 const compareCodeUnits = (left, right) => (left < right ? -1 : left > right ? 1 : 0);
 const object = (value) => value !== null && typeof value === "object" && !Array.isArray(value);
 const SOURCE_KEYS = Object.freeze(["ir", "shapes", "projection", "policy", "effectFacts"]);
+const BORROWED_SEMANTIC_TOKENS = Object.freeze([
+  "borrowed-handle-consumer",
+  "provider-validated-handle",
+  "synchronous-noescape",
+]);
+const LIFECYCLE_SEMANTIC_TOKENS = Object.freeze([
+  "handle-lifecycle-transition",
+  "provider-validated-handle",
+  "synchronous-noescape",
+]);
 
 export const DMSDK_BORROWED_HANDLE_PLAN_KIND = "deherm.dmsdk-borrowed-handle-plan";
 
@@ -23,13 +33,9 @@ export const DMSDK_BORROWED_HANDLE_ELIGIBILITY = Object.freeze({
   trustDefault: Object.freeze({
     id: "defold-public-by-value-resource-borrow",
     assertion: "by-value resource parameters are synchronous/noescape borrowed unless revision evidence contradicts",
-    contradictionPolicy: "unsafe-or-unknown-dominates",
+    contradictionPolicy: "positive-defold-revision-contradiction-dominates",
   }),
-  requiredSemanticTokens: Object.freeze([
-    "borrowed-handle-consumer",
-    "provider-validated-handle",
-    "synchronous-noescape",
-  ]),
+  requiredSemanticTokens: BORROWED_SEMANTIC_TOKENS,
   effectPrecedence: Object.freeze([
     "transferred",
     "retained",
@@ -37,12 +43,14 @@ export const DMSDK_BORROWED_HANDLE_ELIGIBILITY = Object.freeze({
     "destructive",
     "acquired-or-leased",
     "returned-to-owner",
+    "state-transition",
   ]),
   declarationNameTerms: Object.freeze({
-    destructive: Object.freeze(["close", "dealloc", "deallocate", "delete", "destroy", "dispose", "free", "shutdown"]),
+    destructive: Object.freeze(["dealloc", "deallocate", "delete", "destroy", "dispose", "free"]),
     retained: Object.freeze(["addref", "incref", "retain"]),
     "acquired-or-leased": Object.freeze(["acquire", "lease"]),
     "returned-to-owner": Object.freeze(["release", "return"]),
+    "state-transition": Object.freeze(["close", "shutdown"]),
   }),
   documentationPhrases: Object.freeze({
     transferred: Object.freeze(["takes ownership", "take ownership", "transfers ownership", "transfer ownership"]),
@@ -62,6 +70,7 @@ export const DMSDK_BORROWED_HANDLE_ELIGIBILITY = Object.freeze({
       "release a previously",
       "releases a previously",
     ]),
+    "state-transition": Object.freeze(["close the", "closes the", "shut down", "shuts down"]),
   }),
 });
 
@@ -125,6 +134,10 @@ function semanticPattern(selection) {
   });
 }
 
+function lifecycleSemanticPattern(selection) {
+  return defineDmSdkPattern(handleLifecyclePattern(selection));
+}
+
 function structurallyRelevant(shape, pattern) {
   const decision = selectDmSdkPattern(patternFacts(shape, DMSDK_BORROWED_HANDLE_ELIGIBILITY.requiredSemanticTokens), [
     pattern,
@@ -145,6 +158,11 @@ function documentation(declaration) {
     .toLowerCase();
 }
 
+function containsPhrase(text, phrase) {
+  const escaped = phrase.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
+  return new RegExp(`(?:^|[^A-Za-z0-9])${escaped}(?=$|[^A-Za-z0-9])`, "u").test(text);
+}
+
 function effectSignals(declaration, projection) {
   const signals = [];
   const add = (category, source, value) => signals.push({ category, source, value });
@@ -153,7 +171,10 @@ function effectSignals(declaration, projection) {
     ...(projection.effects?.ownership?.parameters ?? []),
   ]) {
     if (typeof ownership !== "string") continue;
-    if (/consum|destroy|finaliz/iu.test(ownership)) add("destructive", "projection-ownership", ownership);
+    // A `*-candidate-requires-token` projection is an unresolved request for
+    // lifecycle facts, never positive evidence of a transition.
+    if (/^(?:consumed|ownership-consumed|destroyed|finalized|ownership-finalized)$/iu.test(ownership))
+      add("destructive", "projection-ownership", ownership);
     // `borrowed-or-transferred-requires-token` is the projection's unresolved
     // default, not positive transfer evidence. Only an asserted effect wins.
     if (/^(?:transferred|ownership-transferred|takes-ownership)$/iu.test(ownership))
@@ -178,7 +199,7 @@ function effectSignals(declaration, projection) {
   const prose = documentation(declaration);
   for (const [category, phrases] of Object.entries(DMSDK_BORROWED_HANDLE_ELIGIBILITY.documentationPhrases)) {
     for (const phrase of phrases) {
-      if (prose.includes(phrase)) add(category, "public-documentation", phrase);
+      if (containsPhrase(prose, phrase)) add(category, "public-documentation", phrase);
     }
   }
   return signals
@@ -198,38 +219,128 @@ function effectSignals(declaration, projection) {
     );
 }
 
-function effectTaxonomy(classification, handlePositions) {
-  const unsafeArgument = {
-    transferred: "transfer",
-    retained: "retain",
-    asynchronous: "escape",
-    destructive: "finalize",
-    "acquired-or-leased": "retain",
-    "returned-to-owner": "release",
-  }[classification];
+const LIFECYCLE_WORDS = new Set([
+  "acquire",
+  "add",
+  "close",
+  "dealloc",
+  "deallocate",
+  "delete",
+  "destroy",
+  "dispose",
+  "free",
+  "inc",
+  "incref",
+  "lease",
+  "ref",
+  "release",
+  "retain",
+  "return",
+  "shutdown",
+]);
+
+function lifecycleTargetWords(declaration) {
+  return splitIdentifier(String(declaration.name).split("::").at(-1)).filter((word) => !LIFECYCLE_WORDS.has(word));
+}
+
+function parameterWords(declaration, position) {
+  const parameter = declaration.parameters?.[position] ?? {};
+  return new Set(splitIdentifier(`${parameter.name ?? ""} ${parameter.type ?? ""} ${parameter.description ?? ""}`));
+}
+
+function matchingHandlePositions(declaration, handlePositions, targetWords) {
+  if (targetWords.length === 0) return [];
+  return handlePositions.filter((position) => {
+    const words = parameterWords(declaration, position);
+    return targetWords.some((word) => words.has(word));
+  });
+}
+
+function replaceResourceEffect(resourceArguments, positions, effect) {
+  const selected = new Set(positions);
+  return resourceArguments.map((argument) =>
+    selected.has(argument.position) ? { ...argument, effect } : argument,
+  );
+}
+
+function effectTaxonomy(classification, declaration, shape, handlePositions) {
+  let resourceArguments = handlePositions.map((position) => ({ position, effect: "borrow" }));
+  const targetWords = lifecycleTargetWords(declaration);
+  const matches = matchingHandlePositions(declaration, handlePositions, targetWords);
+  const prose = documentation(declaration);
+  const nonLocalEffects = [];
+
+  if (classification === "destructive") {
+    // A named resource target wins. A bare Delete/Destroy/Free conventionally
+    // consumes the final handle, while DeleteBones(parent) is intentionally a
+    // non-local descendant transition because "bones" matches no parameter.
+    const descendantTransition =
+      targetWords.length > 0 &&
+      matches.length === 0 &&
+      /recursive|child|descendant|hierarchy|bone/iu.test(`${declaration.name} ${prose}`);
+    const positions = matches.length > 0
+      ? [matches.at(-1)]
+      : !descendantTransition && (targetWords.length === 0 || handlePositions.length === 1)
+        ? [handlePositions.at(-1)]
+        : [];
+    resourceArguments = replaceResourceEffect(resourceArguments, positions.filter(Number.isInteger), "finalize");
+    if (descendantTransition) nonLocalEffects.push("descendant-finalize");
+    if (/associated resources|all resources|owned/iu.test(prose))
+      nonLocalEffects.push("owned-descendants-finalized");
+  } else if (classification === "retained") {
+    resourceArguments = replaceResourceEffect(resourceArguments, [matches.at(-1) ?? handlePositions.at(-1)], "retain");
+  } else if (classification === "returned-to-owner") {
+    resourceArguments = replaceResourceEffect(resourceArguments, [matches.at(-1) ?? handlePositions.at(-1)], "release");
+  } else if (classification === "acquired-or-leased") {
+    // A void Acquire is the conventional AddRef spelling. A scalar result is
+    // not promoted into an owned handle merely because the function says
+    // Acquire (AcquireInstanceIndex returns a plain uint32_t pool index).
+    if (shape.result.role === "scalar:void")
+      resourceArguments = replaceResourceEffect(resourceArguments, [matches.at(-1) ?? handlePositions.at(-1)], "retain");
+  } else if (classification === "state-transition") {
+    const connection = handlePositions.find((position) => parameterWords(declaration, position).has("connection"));
+    if (connection !== undefined) {
+      resourceArguments = replaceResourceEffect(resourceArguments, [connection], "release");
+      nonLocalEffects.push("connection-closed", "pool-slot-invalidated");
+    } else if (/window/iu.test(`${declaration.name} ${prose}`)) {
+      nonLocalEffects.push("associated-window-closed");
+    } else {
+      nonLocalEffects.push("associated-state-closed");
+    }
+  }
+
   return {
-    resourceArguments: handlePositions.map((position) => ({
-      position,
-      effect: unsafeArgument ?? "mutate-nonownership",
-    })),
-    result: classification === "acquired-or-leased" ? "lease-token" : "plain",
+    resourceArguments,
+    result: "none",
     completion: classification === "asynchronous" ? "retained/deferred" : "synchronous-noescape",
+    nonLocalEffects: sortedUnique(nonLocalEffects),
   };
 }
 
-export function inferDmSdkBorrowedHandleEffect(declaration, projection, handlePositions = []) {
+export function inferDmSdkBorrowedHandleEffect(declaration, projection, shape, handlePositions = []) {
   const signals = effectSignals(declaration, projection);
   const classification = signals[0]?.category ?? "trusted-borrowed-default";
   return {
     classification,
     admission: {
-      kind: signals.length ? "revision-contradiction" : "compatibility-preserved",
+      kind: signals.length ? "revision-contradiction" : "defold-contract-trusted",
       trustDefault: DMSDK_BORROWED_HANDLE_ELIGIBILITY.trustDefault.id,
     },
-    taxonomy: effectTaxonomy(classification, handlePositions),
+    taxonomy: effectTaxonomy(classification, declaration, shape, handlePositions),
     sources: sortedUnique(signals.map(({ source }) => source)),
     signals,
   };
+}
+
+function effectMode(effect) {
+  if (effect.signals.some(({ category }) => ["transferred", "asynchronous"].includes(category))) return "fallback";
+  if (
+    effect.taxonomy.resourceArguments.some(({ effect: argumentEffect }) => argumentEffect !== "borrow") ||
+    effect.taxonomy.result !== "none" ||
+    effect.taxonomy.nonLocalEffects.length > 0
+  )
+    return "lifecycle";
+  return "borrowed";
 }
 
 function sourceEffectProof(effectFacts, declarationId, handlePositions) {
@@ -281,7 +392,7 @@ function validatePolicy(policy) {
     "borrowed-handle policy",
   );
   assert(
-    policy.schemaVersion === 1 && policy.family === "borrowed-handle-consumers",
+    policy.schemaVersion === 2 && policy.family === "borrowed-handle-consumers",
     "borrowed-handle policy identity is invalid",
   );
   exactKeys(
@@ -359,8 +470,9 @@ export function buildDmSdkBorrowedHandlePlan({ ir, shapes, projection, policy, e
   const declarations = new Map(ir.declarations.map((row) => [row.id, row]));
   const projections = new Map(projection.rows.map((row) => [row.id, row]));
   const structural = borrowedHandlePattern(policy.selection);
-  const specialized = semanticPattern(policy.selection);
-  const registry = [specialized, DMSDK_UNIVERSAL_FALLBACK_PATTERN];
+  const borrowed = semanticPattern(policy.selection);
+  const lifecycle = lifecycleSemanticPattern(policy.selection);
+  const registry = [lifecycle, borrowed, DMSDK_UNIVERSAL_FALLBACK_PATTERN];
   const candidates = shapes.rows
     .filter((shape) => structurallyRelevant(shape, structural))
     .map((shape) => {
@@ -377,14 +489,17 @@ export function buildDmSdkBorrowedHandlePlan({ ir, shapes, projection, policy, e
     const handleParameterPositions = shape.parameters
       .map(({ role }, position) => (role.startsWith(policy.selection.handleRolePrefix) ? position : null))
       .filter((position) => position !== null);
-    const inferredEffect = inferDmSdkBorrowedHandleEffect(declaration, projected, handleParameterPositions);
+    const inferredEffect = inferDmSdkBorrowedHandleEffect(declaration, projected, shape, handleParameterPositions);
     const sourceProof = sourceEffectProof(effectFacts, shape.id, handleParameterPositions);
-    const safe = inferredEffect.classification === "trusted-borrowed-default";
-    const admissionKind = !safe
-      ? "revision-contradiction"
-      : sourceProof.state === "proven"
-        ? "source-derived"
-        : "compatibility-preserved";
+    const mode = effectMode(inferredEffect);
+    const admissionKind =
+      mode === "fallback"
+        ? "revision-contradiction"
+        : mode === "lifecycle"
+          ? "revision-derived-lifecycle"
+          : sourceProof.state === "proven"
+            ? "source-derived"
+            : "defold-contract-trusted";
     const effect = {
       ...inferredEffect,
       admission: {
@@ -393,13 +508,16 @@ export function buildDmSdkBorrowedHandlePlan({ ir, shapes, projection, policy, e
       },
       sourceProof,
     };
-    const semanticTokens = safe ? [...DMSDK_BORROWED_HANDLE_ELIGIBILITY.requiredSemanticTokens] : [];
+    const semanticTokens =
+      mode === "borrowed" ? [...BORROWED_SEMANTIC_TOKENS] : mode === "lifecycle" ? [...LIFECYCLE_SEMANTIC_TOKENS] : [];
     const decision = selectDmSdkPattern(patternFacts(shape, semanticTokens), registry);
-    const blockers = safe
-      ? []
-      : sortedUnique(effect.signals.map(({ category }) => `borrowed-handle-effect:${category}`));
-    const semantics = safe
-      ? {
+    const blockers =
+      mode === "fallback"
+        ? sortedUnique(effect.signals.map(({ category }) => `borrowed-handle-effect:${category}`))
+        : [];
+    const semantics =
+      mode === "borrowed"
+        ? {
           transport: "provider-validated-u64-handle",
           ownership: "borrowed-only-no-transfer-no-release",
           lifetime: "synchronous-call-only",
@@ -410,11 +528,21 @@ export function buildDmSdkBorrowedHandlePlan({ ir, shapes, projection, policy, e
               ? "cpp-ownership-effect-facts"
               : DMSDK_BORROWED_HANDLE_ELIGIBILITY.trustDefault.id,
         }
-      : null;
+        : mode === "lifecycle"
+          ? {
+              transport: "provider-validated-u64-handle",
+              ownership: "generated-per-argument-lifecycle-transitions",
+              lifetime: "synchronous-transition-committed-after-success",
+              thread: "provider-current-thread",
+              handleParameterPositions,
+              lifecycle: effect.taxonomy,
+              evidenceBasis: "pinned-defold-declaration-and-source-semantics",
+            }
+          : null;
     return {
       declarationId: shape.id,
       sourceOrdinal: ordinal,
-      order: safe ? selectedOrder++ : null,
+      order: mode === "fallback" ? null : selectedOrder++,
       patternId: decision.patternId,
       family: decision.family,
       emitter: decision.emitter,
@@ -429,15 +557,15 @@ export function buildDmSdkBorrowedHandlePlan({ ir, shapes, projection, policy, e
   });
 
   return {
-    schemaVersion: 2,
+    schemaVersion: 4,
     kind: DMSDK_BORROWED_HANDLE_PLAN_KIND,
     defoldRevision: ir.defoldRevision,
-    providerAbiVersion: 2,
+    providerAbiVersion: 3,
     abi: {
-      version: 2,
+      version: 3,
       compatibility: "intentional-breaking-replan",
       bindingIdentity: "dense-selected-order-within-authenticated-plan",
-      reason: "withdrawal renumbers private pre-release version-one IDs atomically",
+      reason: "lifecycle effect vectors and post-success transitions extend the private provider ABI",
     },
     sources: {
       ir: "packages/bindings/generated/defold-sdk-ir.json",
@@ -453,10 +581,15 @@ export function buildDmSdkBorrowedHandlePlan({ ir, shapes, projection, policy, e
       structurallyRelevant: decisions.length,
       selected: decisions.filter(({ fallback }) => !fallback).length,
       universalFallback: decisions.filter(({ fallback }) => fallback).length,
+      borrowedSelected: decisions.filter(({ fallback, family }) => !fallback && family === "borrowed-handle").length,
+      lifecycleSelected: decisions.filter(({ fallback, family }) => !fallback && family === "handle-lifecycle").length,
       sourceDerived: decisions.filter(({ fallback, effect }) => !fallback && effect.admission.kind === "source-derived")
         .length,
-      compatibilityPreserved: decisions.filter(
-        ({ fallback, effect }) => !fallback && effect.admission.kind === "compatibility-preserved",
+      defoldContractTrusted: decisions.filter(
+        ({ fallback, effect }) => !fallback && effect.admission.kind === "defold-contract-trusted",
+      ).length,
+      revisionDerivedLifecycle: decisions.filter(
+        ({ fallback, effect }) => !fallback && effect.admission.kind === "revision-derived-lifecycle",
       ).length,
       effectBlockers: Object.fromEntries(
         DMSDK_BORROWED_HANDLE_ELIGIBILITY.effectPrecedence.map((category) => [
@@ -488,12 +621,12 @@ function validatePlan(plan) {
     "borrowed-handle plan",
   );
   assert(
-    plan.schemaVersion === 2 && plan.kind === DMSDK_BORROWED_HANDLE_PLAN_KIND,
+    plan.schemaVersion === 4 && plan.kind === DMSDK_BORROWED_HANDLE_PLAN_KIND,
     "invalid borrowed-handle plan identity",
   );
-  assert(plan.providerAbiVersion === 2, "borrowed-handle provider ABI version differs");
+  assert(plan.providerAbiVersion === 3, "borrowed-handle provider ABI version differs");
   exactKeys(plan.abi, ["version", "compatibility", "bindingIdentity", "reason"], "borrowed-handle ABI policy");
-  assert(plan.abi.version === 2, "borrowed-handle plan must explicitly use ABI version two");
+  assert(plan.abi.version === 3, "borrowed-handle plan must explicitly use ABI version three");
   assert(plan.abi.compatibility === "intentional-breaking-replan", "borrowed-handle ABI compatibility differs");
   assert(
     isDeepStrictEqual(plan.eligibility, DMSDK_BORROWED_HANDLE_ELIGIBILITY),
@@ -591,7 +724,7 @@ function validatePlan(plan) {
     exactKeys(decision.effect.sourceProof, ["state", "evidenceGaps"], `${decision.declarationId}: source proof`);
     exactKeys(
       decision.effect.taxonomy,
-      ["resourceArguments", "result", "completion"],
+      ["resourceArguments", "result", "completion", "nonLocalEffects"],
       `${decision.declarationId}: effect taxonomy`,
     );
     assert(
@@ -608,11 +741,36 @@ function validatePlan(plan) {
       `${decision.declarationId}: borrowed-handle source proof is invalid`,
     );
     assert(
-      Array.isArray(decision.effect.taxonomy.resourceArguments),
+      Array.isArray(decision.effect.taxonomy.resourceArguments) && Array.isArray(decision.effect.taxonomy.nonLocalEffects),
       `${decision.declarationId}: resource effects are invalid`,
     );
-    for (const resourceArgument of decision.effect.taxonomy.resourceArguments)
+    const resourcePositions = new Set();
+    for (const resourceArgument of decision.effect.taxonomy.resourceArguments) {
       exactKeys(resourceArgument, ["position", "effect"], `${decision.declarationId}: resource argument effect`);
+      assert(
+        Number.isSafeInteger(resourceArgument.position) &&
+          resourceArgument.position >= 0 &&
+          !resourcePositions.has(resourceArgument.position),
+        `${decision.declarationId}: resource argument positions are invalid`,
+      );
+      assert(
+        ["borrow", "retain", "release", "finalize"].includes(resourceArgument.effect),
+        `${decision.declarationId}: resource argument effect is invalid`,
+      );
+      resourcePositions.add(resourceArgument.position);
+    }
+    assert(decision.effect.taxonomy.result === "none", `${decision.declarationId}: resource result effect is invalid`);
+    assert(
+      ["synchronous-noescape", "retained/deferred"].includes(decision.effect.taxonomy.completion),
+      `${decision.declarationId}: resource completion is invalid`,
+    );
+    assert(
+      isDeepStrictEqual(
+        decision.effect.taxonomy.nonLocalEffects,
+        sortedUnique(decision.effect.taxonomy.nonLocalEffects),
+      ),
+      `${decision.declarationId}: non-local effects are not unique and sorted`,
+    );
     for (const signal of decision.effect.signals)
       exactKeys(signal, ["category", "source", "value"], `${decision.declarationId}: borrowed-handle effect signal`);
     assert(
@@ -642,34 +800,44 @@ function validatePlan(plan) {
       );
     } else {
       assert(
-        decision.patternId === DMSDK_BORROWED_HANDLE_ELIGIBILITY.patternId,
-        `${decision.declarationId}: selected borrowed-handle pattern differs`,
-      );
-      assert(
         decision.order === selectedOrder++,
         `${decision.declarationId}: borrowed-handle selected order is not dense`,
       );
-      assert(
-        decision.effect.classification === "trusted-borrowed-default",
-        `${decision.declarationId}: unsafe effect was selected`,
-      );
-      assert(
-        ["source-derived", "compatibility-preserved"].includes(decision.effect.admission.kind),
-        `${decision.declarationId}: source/compatibility admission differs`,
-      );
-      assert(
-        (decision.effect.admission.kind === "source-derived") === (decision.effect.sourceProof.state === "proven"),
-        `${decision.declarationId}: source proof differs from admission`,
-      );
-      assert(
-        decision.effect.signals.length === 0,
-        `${decision.declarationId}: selected route has contradiction evidence`,
-      );
-      exactKeys(
-        decision.semantics,
-        ["transport", "ownership", "lifetime", "thread", "handleParameterPositions", "evidenceBasis"],
-        `${decision.declarationId}: borrowed-handle semantics`,
-      );
+      if (decision.family === "borrowed-handle") {
+        assert(
+          decision.patternId === DMSDK_BORROWED_HANDLE_ELIGIBILITY.patternId,
+          `${decision.declarationId}: selected borrowed-handle pattern differs`,
+        );
+        assert(
+          ["source-derived", "defold-contract-trusted"].includes(decision.effect.admission.kind),
+          `${decision.declarationId}: source/Defold-contract admission differs`,
+        );
+        assert(
+          (decision.effect.admission.kind === "source-derived") === (decision.effect.sourceProof.state === "proven"),
+          `${decision.declarationId}: source proof differs from admission`,
+        );
+        exactKeys(
+          decision.semantics,
+          ["transport", "ownership", "lifetime", "thread", "handleParameterPositions", "evidenceBasis"],
+          `${decision.declarationId}: borrowed-handle semantics`,
+        );
+      } else {
+        assert(decision.family === "handle-lifecycle", `${decision.declarationId}: selected family is unsupported`);
+        assert(
+          decision.effect.admission.kind === "revision-derived-lifecycle",
+          `${decision.declarationId}: lifecycle admission differs`,
+        );
+        assert(effectMode(decision.effect) === "lifecycle", `${decision.declarationId}: lifecycle effect differs`);
+        exactKeys(
+          decision.semantics,
+          ["transport", "ownership", "lifetime", "thread", "handleParameterPositions", "lifecycle", "evidenceBasis"],
+          `${decision.declarationId}: handle-lifecycle semantics`,
+        );
+        assert(
+          isDeepStrictEqual(decision.semantics.lifecycle, decision.effect.taxonomy),
+          `${decision.declarationId}: lifecycle semantics differ from taxonomy`,
+        );
+      }
     }
     index.set(decision.declarationId, decision);
   }
@@ -679,8 +847,11 @@ function validatePlan(plan) {
       "structurallyRelevant",
       "selected",
       "universalFallback",
+      "borrowedSelected",
+      "lifecycleSelected",
       "sourceDerived",
-      "compatibilityPreserved",
+      "defoldContractTrusted",
+      "revisionDerivedLifecycle",
       "effectBlockers",
     ],
     "borrowed-handle coverage",
@@ -697,15 +868,26 @@ function validatePlan(plan) {
     "borrowed-handle fallback coverage differs",
   );
   assert(
+    plan.coverage.borrowedSelected + plan.coverage.lifecycleSelected === plan.coverage.selected,
+    "borrowed/lifecycle selected coverage differs",
+  );
+  assert(
     plan.coverage.sourceDerived ===
       plan.decisions.filter(({ fallback, effect }) => !fallback && effect.admission.kind === "source-derived").length,
     "borrowed-handle source-derived coverage differs",
   );
   assert(
-    plan.coverage.compatibilityPreserved ===
-      plan.decisions.filter(({ fallback, effect }) => !fallback && effect.admission.kind === "compatibility-preserved")
+    plan.coverage.defoldContractTrusted ===
+      plan.decisions.filter(({ fallback, effect }) => !fallback && effect.admission.kind === "defold-contract-trusted")
         .length,
-    "borrowed-handle compatibility coverage differs",
+    "borrowed-handle Defold-contract coverage differs",
+  );
+  assert(
+    plan.coverage.revisionDerivedLifecycle ===
+      plan.decisions.filter(
+        ({ fallback, effect }) => !fallback && effect.admission.kind === "revision-derived-lifecycle",
+      ).length,
+    "borrowed-handle lifecycle coverage differs",
   );
   for (const category of DMSDK_BORROWED_HANDLE_ELIGIBILITY.effectPrecedence) {
     const count = plan.decisions.filter(({ effect }) =>

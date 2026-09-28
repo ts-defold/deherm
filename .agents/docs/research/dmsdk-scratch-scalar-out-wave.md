@@ -18,7 +18,7 @@ selection logic and neither layer contains a function-name allowlist.
 | Disposition | Count | Structural rule |
 | --- | ---: | --- |
 | source-derived provider route | 6 | The structural shape plus diagnostic-free ownership, exact-one memory, success-path write, and synchronous/no-escape facts. |
-| compatibility-preserved provider route | 5 | A route from the prior revision-derived `scratch-out-parameters` tranche that still matches the same structural pattern; missing source-effect facts remain visible as evidence gaps. |
+| Defold-contract-trusted provider route | 5 | A route from the prior revision-derived `scratch-out-parameters` tranche that still matches the same structural pattern; missing source-effect facts remain visible as evidence gaps. |
 | universal fallback | 19 | Structurally compatible, but neither source-proven nor covered by the compatibility admission. |
 
 The generated report is
@@ -38,9 +38,9 @@ rejected row. The promoted symbols are:
 10. `dmGameObject::GetPropertyAsBool`
 11. `dmHID::GetGamepadUserId`
 
-The 19 fallback rows retain all missing-fact tokens. Compatibility-preserved
+The 19 fallback rows retain all missing-fact tokens. Defold-contract-trusted
 rows also retain their evidence gaps even though they remain selected, so a
-consumer can distinguish preservation of an already tested route from new
+consumer can distinguish Defold-authoritative preservation of an already tested route from new
 source-derived proof.
 
 # ABI and lifetime contract
@@ -135,8 +135,8 @@ mechanically prove all four requirements in the plan:
 `dmBuffer::GetContentVersion`, `TextLayoutGetBounds`,
 `dmGameObject::GetPropertyOptionsIndex`, and
 `dmGameObject::GetPropertyOptionsKey`. Five additional routes preserve the
-prior generated provider boundary through a narrow structural compatibility
-admission. The single authenticated plan therefore owns 30 structural
+prior generated provider boundary through a narrow Defold-contract admission.
+The single authenticated plan therefore owns 30 structural
 candidates, 11 selected routes, and 19 universal fallbacks. The production
 emitter realizes exactly that plan and has no private selector. This preserves
 all seven prior optimizations and adds four source-derived routes without

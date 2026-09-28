@@ -208,11 +208,11 @@ export function buildDmSdkScratchScalarOutPlan({ ir, shapes, projection, policy,
     const facts = factsFor(shape, projected, effectFacts);
     const evidenceGaps = blockersFor(facts);
     const sourceDerived = evidenceGaps.length === 0;
-    const compatibilityPreserved = !sourceDerived && shape.tranche === policy.family;
+    const defoldContractTrusted = !sourceDerived && shape.tranche === policy.family;
     const admission = sourceDerived
       ? "source-derived"
-      : compatibilityPreserved
-        ? "compatibility-preserved"
+      : defoldContractTrusted
+        ? "defold-contract-trusted"
         : "universal-fallback";
     const selected = admission !== "universal-fallback";
     const blockers = selected ? [] : evidenceGaps;
@@ -234,7 +234,7 @@ export function buildDmSdkScratchScalarOutPlan({ ir, shapes, projection, policy,
     };
   });
   return {
-    schemaVersion: 2,
+    schemaVersion: 3,
     kind: DMSDK_SCRATCH_SCALAR_OUT_PLAN_KIND,
     defoldRevision: ir.defoldRevision,
     sources: {
@@ -251,7 +251,7 @@ export function buildDmSdkScratchScalarOutPlan({ ir, shapes, projection, policy,
       structurallyRelevant: decisions.length,
       selected: decisions.filter(({ fallback }) => !fallback).length,
       sourceDerived: decisions.filter(({ admission }) => admission === "source-derived").length,
-      compatibilityPreserved: decisions.filter(({ admission }) => admission === "compatibility-preserved").length,
+      defoldContractTrusted: decisions.filter(({ admission }) => admission === "defold-contract-trusted").length,
       universalFallback: decisions.filter(({ fallback }) => fallback).length,
       blockerCounts: Object.fromEntries(
         ["ownership", "memory", "write", "completion"].map((key) => [
@@ -280,7 +280,7 @@ export function indexDmSdkScratchScalarOutPlan(plan, inputs = undefined) {
     ],
     "scratch plan",
   );
-  assert(plan.schemaVersion === 2 && plan.kind === DMSDK_SCRATCH_SCALAR_OUT_PLAN_KIND, "invalid scratch plan identity");
+  assert(plan.schemaVersion === 3 && plan.kind === DMSDK_SCRATCH_SCALAR_OUT_PLAN_KIND, "invalid scratch plan identity");
   assert(
     isDeepStrictEqual(plan.eligibility, DMSDK_SCRATCH_SCALAR_OUT_ELIGIBILITY),
     "scratch eligibility recipe differs",
@@ -325,7 +325,7 @@ export function indexDmSdkScratchScalarOutPlan(plan, inputs = undefined) {
       `${decision.declarationId}: scratch facts`,
     );
     assert(
-      ["source-derived", "compatibility-preserved", "universal-fallback"].includes(decision.admission),
+      ["source-derived", "defold-contract-trusted", "universal-fallback"].includes(decision.admission),
       `${decision.declarationId}: scratch admission is invalid`,
     );
     assert(
@@ -371,7 +371,7 @@ export function indexDmSdkScratchScalarOutPlan(plan, inputs = undefined) {
       "structurallyRelevant",
       "selected",
       "sourceDerived",
-      "compatibilityPreserved",
+      "defoldContractTrusted",
       "universalFallback",
       "blockerCounts",
     ],
@@ -384,9 +384,9 @@ export function indexDmSdkScratchScalarOutPlan(plan, inputs = undefined) {
     "scratch source-derived coverage differs",
   );
   assert(
-    plan.coverage.compatibilityPreserved ===
-      plan.decisions.filter(({ admission }) => admission === "compatibility-preserved").length,
-    "scratch compatibility coverage differs",
+    plan.coverage.defoldContractTrusted ===
+      plan.decisions.filter(({ admission }) => admission === "defold-contract-trusted").length,
+    "scratch Defold-contract coverage differs",
   );
   assert(
     plan.coverage.universalFallback === plan.decisions.length - selectedOrder,

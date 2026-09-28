@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "family": "borrowed-handle-consumers",
   "selection": {
     "declarationKinds": ["function"],
@@ -10,12 +10,13 @@
     "rejectedFamilies": ["platform-gated"]
   },
   "providerContract": {
-    "ownership": "borrowed-only-no-transfer-no-release",
+    "ownership": "descriptor-authenticated-per-argument-borrow-retain-release-or-finalize",
     "nullability": "zero-handle-rejected-before-provider",
     "lifetime": "provider-validates-kind-and-live-epoch-on-every-dispatch",
     "thread": "provider-is-current-thread-must-pass-before-handle-validation-or-invoke",
     "registration": "single-provider-copy-before-concurrent-dispatch-no-concurrent-replacement",
-    "result": "void-or-bounded-scalar-only-no-borrowed-pointer-or-handle-result"
+    "result": "void-or-bounded-scalar-only-no-borrowed-pointer-or-handle-result",
+    "transition": "infallible-provider-bookkeeping-after-successful-invoke-and-canonical-result-validation"
   },
   "targetPolicy": {
     "dynamicHermes": "handles-and-u64-use-BigInt; other scalar lanes are checked values",

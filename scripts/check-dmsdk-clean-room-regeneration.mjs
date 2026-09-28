@@ -694,13 +694,13 @@ async function validateReports(root) {
     scratchScalarOutPlan.coverage.structurallyRelevant === 30 &&
       scratchScalarOutPlan.coverage.selected === 11 &&
       scratchScalarOutPlan.coverage.sourceDerived === 6 &&
-      scratchScalarOutPlan.coverage.compatibilityPreserved === 5 &&
+      scratchScalarOutPlan.coverage.defoldContractTrusted === 5 &&
       scratchScalarOutPlan.coverage.universalFallback === 19 &&
       scratchScalarOut.coverage.candidates === scratchScalarOutPlan.coverage.structurallyRelevant &&
       scratchScalarOut.coverage.generated === scratchScalarOutPlan.coverage.selected &&
       scratchScalarOut.coverage.blocked === scratchScalarOutPlan.coverage.universalFallback &&
       scratchScalarOut.coverage.sourceDerived === scratchScalarOutPlan.coverage.sourceDerived &&
-      scratchScalarOut.coverage.compatibilityPreserved === scratchScalarOutPlan.coverage.compatibilityPreserved &&
+      scratchScalarOut.coverage.defoldContractTrusted === scratchScalarOutPlan.coverage.defoldContractTrusted &&
       scratchScalarOut.coverage.cAbiGenerated === scratchScalarOutPlan.coverage.selected &&
       scratchScalarOut.coverage.dynamicHermesJsiGenerated === scratchScalarOutPlan.coverage.selected &&
       scratchScalarOut.coverage.staticHermesGenerated === scratchScalarOutPlan.coverage.selected &&

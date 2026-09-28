@@ -268,9 +268,10 @@ its complete global ABI candidate envelope, documentation-derived string
 contracts, explicit universal fallbacks, and collision-free TypeScript route
 identity while preserving the canonical pre-migration dispatch order. The
 borrowed-handle plan owns the complete 182-route structural envelope, records
-Defold trust-default admission separately from lifecycle contradiction
-evidence, and routes 35 unsafe or ownership-bearing operations to the
-universal implementation. The eleven emitters consume their plan rows and
+Defold trust-default admission separately from lifecycle evidence, and selects
+148 pure-borrow plus 34 per-argument lifecycle routes. Transfer and
+asynchronous escape still fail closed to the universal implementation; the
+current revision has none in this envelope. The eleven emitters consume their plan rows and
 cannot import the selector or define a private registry.
 Plan tests canonicalize unordered inputs or preserve an explicitly canonical
 projection order, withdraw semantic facts to the universal fallback, reject
@@ -281,12 +282,12 @@ TypeScript and native generation, compilation, linkage, and exact-call harness
 execution.
 
 Borrowed-handle and scratch-scalar-out planning now both authenticate and join
-the shared body-derived C++ ownership/effect artifact. Borrowed handles retain
-147 selected routes as 73 source-derived plus 74 explicitly compatible trusted
-Defold conventions; 35 contradictions use the universal route. Scratch scalar
-outputs derive candidates from the complete structural envelope, select six
-source-derived plus five compatibility-preserved routes, and keep nineteen
-universal fallbacks. Neither emitter owns a private selector. Source semantics
+the shared body-derived C++ ownership/effect artifact. Borrowed handles emit all
+182 structural routes: 74 source-derived pure borrows, 74 explicitly
+`defold-contract-trusted` pure borrows, and 34 revision-derived lifecycle
+routes. Scratch scalar outputs derive candidates from the complete structural
+envelope, select six source-derived plus five Defold-contract-trusted routes,
+and keep nineteen universal fallbacks. Neither emitter owns a private selector. Source semantics
 and target symbol/link availability are separate schema fields, so this
 progress does not claim packaged-engine or all-target runtime proof.
 

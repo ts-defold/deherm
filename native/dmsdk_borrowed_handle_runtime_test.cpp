@@ -19,6 +19,10 @@ struct ProviderContext {
     DehermDmSdkBorrowedStatus forced_status = DEHERM_DMSDK_BORROWED_OK;
     uint64_t rejected_handle = UINT64_C(0xdead);
     uint64_t invocations = 0;
+    uint64_t transitions = 0;
+    uint16_t last_transition_id = UINT16_MAX;
+    uint8_t last_transition_position = UINT8_MAX;
+    uint8_t last_transition_effect = DEHERM_DMSDK_HANDLE_NONE;
 };
 
 uint8_t is_current_thread(void* opaque)
@@ -65,6 +69,21 @@ DehermDmSdkBorrowedStatus invoke(
     *out_result = value;
     return DEHERM_DMSDK_BORROWED_OK;
 }
+
+void transition_handle(
+    void* opaque,
+    uint16_t id,
+    uint8_t position,
+    uint16_t,
+    uint64_t,
+    uint8_t effect)
+{
+    auto& context = *static_cast<ProviderContext*>(opaque);
+    ++context.transitions;
+    context.last_transition_id = id;
+    context.last_transition_position = position;
+    context.last_transition_effect = effect;
+}
 }
 
 void* operator new(std::size_t size)
@@ -79,7 +98,7 @@ void operator delete(void* value, std::size_t) noexcept { std::free(value); }
 
 int main()
 {
-    static_assert(DEHERM_DMSDK_BORROWED_PROVIDER_ABI == UINT32_C(2), "provider ABI migration was not atomic");
+    static_assert(DEHERM_DMSDK_BORROWED_PROVIDER_ABI == UINT32_C(3), "provider ABI migration was not atomic");
     assert(deherm_dmsdk_borrowed_count() > UINT32_C(0));
     assert(deherm_dmsdk_borrowed_handle_kind_count() > UINT32_C(0));
     const auto* descriptors = deherm_dmsdk_borrowed_descriptors();
@@ -90,6 +109,14 @@ int main()
         assert(descriptors[index].argument_count > 0);
         assert(descriptors[index].argument_count <= DEHERM_DMSDK_BORROWED_MAX_ARGUMENTS);
         assert(descriptors[index].declaration_id != nullptr);
+        for (uint32_t argument = 0; argument < descriptors[index].argument_count; ++argument) {
+            if (descriptors[index].argument_kinds[argument] == DEHERM_DMSDK_BORROWED_HANDLE) {
+                assert(descriptors[index].argument_effects[argument] >= DEHERM_DMSDK_HANDLE_BORROW);
+                assert(descriptors[index].argument_effects[argument] <= DEHERM_DMSDK_HANDLE_FINALIZE);
+            } else {
+                assert(descriptors[index].argument_effects[argument] == DEHERM_DMSDK_HANDLE_NONE);
+            }
+        }
     }
     for (uint32_t index = 0; index < deherm_dmsdk_borrowed_handle_kind_count(); ++index) {
         assert(handle_kinds[index].id == index);
@@ -99,7 +126,21 @@ int main()
 
     uint64_t arguments[DEHERM_DMSDK_BORROWED_MAX_ARGUMENTS] = {UINT64_C(0x1234), UINT64_C(7)};
     uint64_t result = UINT64_MAX;
-    const auto& route = descriptors[0];
+    const DehermDmSdkBorrowedDescriptor* borrowed_route = nullptr;
+    for (uint32_t index = 0; index < deherm_dmsdk_borrowed_count() && borrowed_route == nullptr; ++index) {
+        bool only_borrows = true;
+        for (uint32_t argument = 0; argument < descriptors[index].argument_count; ++argument) {
+            if (descriptors[index].argument_kinds[argument] == DEHERM_DMSDK_BORROWED_HANDLE &&
+                descriptors[index].argument_effects[argument] != DEHERM_DMSDK_HANDLE_BORROW) {
+                only_borrows = false;
+                break;
+            }
+        }
+        if (only_borrows)
+            borrowed_route = &descriptors[index];
+    }
+    assert(borrowed_route != nullptr);
+    const auto& route = *borrowed_route;
     assert(deherm_dmsdk_borrowed_dispatch(route.id, arguments, route.argument_count, &result) == DEHERM_DMSDK_BORROWED_PROVIDER_MISSING);
     assert(result == UINT64_C(0));
     result = UINT64_MAX;
@@ -122,6 +163,7 @@ int main()
         is_current_thread,
         validate_handle,
         invoke,
+        transition_handle,
     };
     assert(deherm_dmsdk_borrowed_set_provider(&provider) == DEHERM_DMSDK_BORROWED_OK);
     context.current_thread = false;
@@ -129,6 +171,41 @@ int main()
     assert(deherm_dmsdk_borrowed_dispatch(route.id, arguments, route.argument_count, &result) == DEHERM_DMSDK_BORROWED_WRONG_THREAD);
     assert(result == UINT64_C(0));
     context.current_thread = true;
+    const DehermDmSdkBorrowedDescriptor* lifecycle_route = nullptr;
+    uint32_t lifecycle_transition_count = 0;
+    for (uint32_t index = 0; index < deherm_dmsdk_borrowed_count() && lifecycle_route == nullptr; ++index) {
+        for (uint32_t argument = 0; argument < descriptors[index].argument_count; ++argument) {
+            if (descriptors[index].argument_effects[argument] > DEHERM_DMSDK_HANDLE_BORROW) {
+                lifecycle_route = &descriptors[index];
+                break;
+            }
+        }
+    }
+    assert(lifecycle_route != nullptr);
+    for (uint32_t argument = 0; argument < lifecycle_route->argument_count; ++argument) {
+        arguments[argument] = lifecycle_route->argument_kinds[argument] == DEHERM_DMSDK_BORROWED_HANDLE
+            ? UINT64_C(0x8123) + argument
+            : UINT64_C(1);
+        if (lifecycle_route->argument_effects[argument] > DEHERM_DMSDK_HANDLE_BORROW)
+            ++lifecycle_transition_count;
+    }
+    const uint64_t transitions_before = context.transitions;
+    assert(deherm_dmsdk_borrowed_dispatch(
+               lifecycle_route->id, arguments, lifecycle_route->argument_count, &result) ==
+           DEHERM_DMSDK_BORROWED_OK);
+    assert(context.transitions == transitions_before + lifecycle_transition_count);
+    assert(context.last_transition_id == lifecycle_route->id);
+    assert(context.last_transition_effect > DEHERM_DMSDK_HANDLE_BORROW);
+    context.force_result = true;
+    context.forced_result = UINT64_C(0);
+    context.forced_status = DEHERM_DMSDK_BORROWED_PROVIDER_ERROR;
+    const uint64_t transitions_before_failure = context.transitions;
+    assert(deherm_dmsdk_borrowed_dispatch(
+               lifecycle_route->id, arguments, lifecycle_route->argument_count, &result) ==
+           DEHERM_DMSDK_BORROWED_PROVIDER_ERROR);
+    assert(context.transitions == transitions_before_failure);
+    context.force_result = false;
+    context.forced_status = DEHERM_DMSDK_BORROWED_OK;
     for (uint32_t index = 0; index < deherm_dmsdk_borrowed_count(); ++index) {
         const auto& candidate = descriptors[index];
         for (uint32_t argument = 0; argument < candidate.argument_count; ++argument) {

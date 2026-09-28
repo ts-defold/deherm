@@ -5,7 +5,7 @@
   "unit": "sh_export_deherm_typed_native",
   "transport": "typed-native",
   "requiresRuntime": "hermes",
-  "assembledForTarget": "arm64-macos",
+  "assembledForTarget": "arm64-osx",
   "assembledForExtenderTarget": "arm64-osx",
   "uploadGate": {
     "mechanism": ".defignore",

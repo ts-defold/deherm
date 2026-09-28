@@ -317,6 +317,30 @@ export function borrowedHandlePattern(selection) {
   });
 }
 
+export function handleLifecyclePattern(selection) {
+  return pattern({
+    id: "handle.lifecycle-provider-boundary",
+    family: "handle-lifecycle",
+    emitter: "scripts/generate-dmsdk-borrowed-handle-bindings.mjs",
+    priority: 710,
+    cost: 22,
+    when: {
+      declarationKinds: selection.declarationKinds,
+      result: { roles: selection.resultRoles },
+      parameters: {
+        every: [{ rolePrefixes: [selection.handleRolePrefix] }, { roles: selection.parameterRoles }],
+        some: [{ rolePrefixes: [selection.handleRolePrefix] }],
+      },
+      requireSemanticTokens: [
+        "handle-lifecycle-transition",
+        "provider-validated-handle",
+        "synchronous-noescape",
+      ],
+      rejectFamilies: selection.rejectedFamilies,
+    },
+  });
+}
+
 export function scratchScalarOutPattern(selection) {
   return pattern({
     id: "pointer.scratch-scalar-out-provider-boundary",
@@ -351,6 +375,7 @@ export function createDmSdkPatternCatalog({ borrowedHandleSelection, scratchScal
     enumValuePattern(),
     ...arenaCStringPatterns(),
     ...cstringValuePatterns(),
+    handleLifecyclePattern(borrowedHandleSelection),
     borrowedHandlePattern(borrowedHandleSelection),
     scratchScalarOutPattern(scratchScalarOutSelection),
     DMSDK_UNIVERSAL_FALLBACK_PATTERN,

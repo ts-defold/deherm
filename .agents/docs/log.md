@@ -4401,3 +4401,62 @@ calls still covered all 147 selected routes with zero warmed C++ allocations,
 and policy-only materialization passed at root `9545b27ddb55` (52 namespaces,
 189 subtrees, 25.26 MB). These are generation, compilation, fake-provider
 runtime, sanitizer, allocation-observation, and materialization claims only.
+
+## 2026-09-27 - Defold-contract trust is explicit in generated plans
+
+The borrowed-handle and scratch scalar-out plans now call their non-source-
+proven positive admission `defold-contract-trusted` instead of the ambiguous
+`compatibility-preserved`. Coverage uses the matching
+`defoldContractTrusted` field, and both plan schemas advance to version 3; the
+scratch emitted report advances to version 3 as well. The package recipe now
+states that only a positive Defold-revision contradiction dominates the public
+contract default. Missing transitive proof through backend dispatch tables,
+system libraries, or the OS remains an evidence gap and cannot by itself
+withdraw a structurally valid Defold specialization.
+
+This is an evidence-model and schema change, not a route or transport change.
+The borrowed census remains 182 structural / 147 selected / 35 universal,
+partitioned into 73 source-derived and 74 Defold-contract-trusted selections.
+The scratch census remains 30 structural / 11 selected / 19 universal,
+partitioned into six source-derived and five Defold-contract-trusted
+selections. Positive lifecycle, refcount, acquire, release, return, and
+destructive evidence still forces universal fallback. The broader lifecycle
+family is a separate optimization frontier because multi-handle calls require
+the transition position to be derived rather than invalidating every argument.
+
+## 2026-09-27 - Handle lifecycle effects close the borrowed-envelope gap
+
+The compiler now treats synchronous handle lifecycle operations as a
+composable sibling of the pure-borrow pattern instead of sending them to the
+universal fallback. The package recipe remains declaration-free. Revision IR,
+public Defold contract text, ABI roles, and authenticated source observations
+derive exact per-argument `borrow`, `retain`, `release`, and `finalize` vectors;
+transfer and asynchronous escape still fail closed. The current 182-route
+structural envelope emits 148 pure-borrow routes and 34 lifecycle routes with
+zero specialization fallbacks. `AcquireInstanceIndex` is correctly one of the
+148 because its result is a scalar pool index, not a resource acquisition.
+
+Provider ABI v3 carries lifecycle effects in each descriptor and requires an
+infallible transition callback. The runtime invokes that callback only after
+the provider call succeeds and its result is canonical. The generated browser
+descriptor, Dynamic Hermes JSI lane, Static Hermes direct-memory lane,
+TypeScript API, pinned-header audit, and exact-call twins all consume the same
+plan. A non-circular test matrix independently fixes the expected position and
+effect of all 34 lifecycle routes, including collection-versus-instance,
+pool-versus-connection, retain/release pairs, recursive descendant deletion,
+and close-without-context-destruction.
+
+Focused verification passed 204 dmSDK generator tests. That evidence includes
+native compilation/linkage, exact fake-provider execution under ASan/UBSan,
+transition failure ordering, and 100,000 warmed dispatches with zero observed
+C++ allocations. Clean-room regeneration reproduced all 122 owned artifacts
+byte-for-byte and retained a universal recipe beneath every one of the 1,361
+dmSDK declarations. These are generator, compile/link, fake-provider runtime,
+sanitizer, and allocation-observation claims. A packaged Defold engine provider
+is still absent, so packaged-engine runtime verification remains zero.
+
+The repository-wide `pnpm check` subsequently completed green on this exact
+tree, including policy materialization, package-boundary inventory, the full
+dmSDK generator and semantic-causality suites, clean-room replay, Static Hermes
+reachability, War Battles/WebTransport integration tests, language-server
+tests, and OKF validation.

@@ -623,7 +623,7 @@ function implementationLaneIndex(units, inputs, defoldRevision) {
     throw new Error("dmSDK C-string implementation lane schema or Defold revision drifted");
   }
 
-  if (dmsdkBorrowedHandle.schemaVersion !== 1 ||
+  if (dmsdkBorrowedHandle.schemaVersion !== 2 ||
       dmsdkBorrowedHandle.defoldRevision !== defoldRevision ||
       dmsdkBorrowedHandle.declarations.length !== dmsdkBorrowedHandle.coverage.candidates ||
       dmsdkBorrowedHandle.coverage.generated + dmsdkBorrowedHandle.coverage.blocked !==

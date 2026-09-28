@@ -123,6 +123,15 @@ linkage. Defold owns the implementation semantics behind the selected call.
 Conformance probes refine contradictions and portability claims; they are not a
 license to withhold an otherwise authoritative Defold API.
 
+That boundary stops at the exported Defold contract. Déherm does not require a
+transitive proof through Defold's backend function tables, libc, pthreads,
+graphics drivers, or the operating system before using a structurally complete
+Defold API. A diagnostic-free source observation may add positive optimization
+evidence, but an unresolved transitive callee is not itself a contradiction to
+the public contract. Only positive revision evidence of transfer, retention,
+destruction, deferred completion, incompatible layout, or another violated
+pattern invariant withdraws that specialization.
+
 The integrated anti-regression contract is relational rather than a frozen
 route count. Source IDs and emitted IDs must be equal sets; every ID has exactly
 one preferred selection and one universal base recipe; every structurally
@@ -196,8 +205,8 @@ plan over the complete global ABI envelope. That migration found eleven
 lifecycle/refcount/state-transition routes inside the former "borrowed"
 tranche and withdrew their specializations without removing their universal
 APIs. The same plan now authenticates and joins the shared C++
-ownership/effect artifact: 73 selected routes are source-derived and 74 retain
-the explicit Defold public by-value-resource compatibility convention with
+ownership/effect artifact: 73 selected routes are source-derived and 74 are
+explicitly `defold-contract-trusted` under Defold's public by-value-resource convention with
 machine-readable proof gaps. A source-proof withdrawal changes only that
 admission label; lifecycle/refcount contradictions still dominate and select
 the universal route. The emitter never performs either selection.
@@ -223,7 +232,7 @@ being rejected merely because it supplies less optimization evidence, while a
 missing structurally eligible declaration still fails closed.
 
 The systemic plan-properties gate makes these relations executable for the
-compiler-owned borrowed-handle plan. It checks the real current universal
+compiler-owned borrowed-handle and lifecycle plan. It checks the real current universal
 corpus by declaration identity (1361 dispatchable raw calls; the remaining IR
 rows are type metadata or intentionally hidden), authenticates the package
 recipe and current policy, and asserts that selected/fallback totals and dense
@@ -233,10 +242,12 @@ fixture as a revision envelope. Those cases prove that the planner does not
 key its result to a revision string; the separate four-revision derivation
 matrix supplies historical source evidence. Small
 metamorphic cases then rename a contradiction-free route, add a structurally
-valid route, and introduce an unresolved lifetime fact. Existing decisions stay
-stable, totals change mechanically, and the unresolved route is retained by
-the universal fallback. Source-proof withdrawal also preserves the explicit
-compatibility route without relabeling it as source-derived.
+valid route, introduce a lifecycle transition, and introduce transfer or
+asynchronous escape. Existing decisions stay stable, totals change
+mechanically, lifecycle operations receive exact per-argument effect vectors,
+and transfer/escape retains the universal fallback. Source-proof withdrawal
+also preserves the explicit Defold-contract route without relabeling it as
+source-derived.
 
 # Claim protocol
 

@@ -7,592 +7,732 @@ function module():DmSdkBorrowedHandleModule { const value=globalThis.__defoldMod
 /** Unsafe admission only: the native provider still validates kind, provenance, lifetime, and thread on every call. */
 export function unsafeBorrowedHandle<Kind extends string>(kind:Kind,value:bigint):BorrowedHandle<Kind>{void kind;if(value<=0n||value>0xffff_ffff_ffff_ffffn)throw new RangeError("borrowed handle must be a nonzero u64");return value as BorrowedHandle<Kind>;}
 export const DmSdkBorrowedHandleId={
-  dmBufferIsBufferValid: 0,
-  dmConditionVariableWait: 1,
-  dmConditionVariableSignal: 2,
-  dmConditionVariableBroadcast: 3,
-  dmConnectionPoolGetReuseCount: 4,
-  dmImageGetWidth: 5,
-  dmImageGetHeight: 6,
-  jobSystemUpdate: 7,
-  jobSystemGetWorkerCount: 8,
-  dmMessageIsSocketValid: 9,
-  dmMessageGetSocketNameHash: 10,
-  dmMutexLock: 11,
-  dmMutexTryLock: 12,
-  dmMutexUnlock: 13,
-  dmSocketGetFd: 14,
-  fontGetPathHash: 15,
-  fontGetScaleFromSize: 16,
-  fontGetAscent: 17,
-  fontGetDescent: 18,
-  fontGetLineGap: 19,
-  fontGetResourceSize: 20,
-  fontGetGlyphIndex: 21,
-  fontCollectionGetFontCount: 22,
-  textLayoutUpdate: 23,
-  textLayoutGetGlyphCount: 24,
-  textLayoutGetLineCount: 25,
-  textLayoutGetParagraphCount: 26,
-  textLayoutGetDecorationCount: 27,
-  textLayoutGetObjectCount: 28,
-  textLayoutSetObjectStyle: 29,
-  dmGameObjectComponentTypeGetTypeIndex: 30,
-  dmGameObjectComponentTypeSetReadsTransforms: 31,
-  dmGameObjectComponentTypeSetPrio: 32,
-  dmGameObjectComponentTypeSetHasUserData: 33,
-  dmGameObjectAssignInstanceIndex: 34,
-  dmGameObjectGetIdentifier: 35,
-  dmGameObjectGetGeneration: 36,
-  dmGameObjectSetScale: 37,
-  dmGameObjectSetScaleXy: 38,
-  dmGameObjectGetUniformScale: 39,
-  dmGameObjectGetWorldUniformScale: 40,
-  dmGameObjectSetBone: 41,
-  dmGameObjectIsBone: 42,
-  dmGameObjectGetComponentTypeIndex: 43,
-  dmGameObjectAddDynamicResourceHash: 44,
-  dmGameObjectGetPropertyOptionsCount: 45,
-  dmGameObjectPropertyContainerPushFloat: 46,
-  dmGameObjectPropertyContainerPushBool: 47,
-  dmGameObjectPropertyContainerPushHash: 48,
-  dmGameSystemCompFactoryIsLoading: 49,
-  dmGameSystemCompFactoryIsDynamicPrototype: 50,
-  dmGameSystemGetRenderConstantCount: 51,
-  dmGameSystemClearRenderConstant: 52,
-  dmGameSystemAreRenderConstantsUpdated: 53,
-  dmGraphicsGetVertexStreamOffset: 54,
-  dmGraphicsGetMaxElementsVertices: 55,
-  dmGraphicsGetMaxElementsIndices: 56,
-  dmGraphicsGetNumSupportedExtensions: 57,
-  dmGraphicsGetTextureResourceSize: 58,
-  dmGraphicsGetTextureWidth: 59,
-  dmGraphicsGetTextureHeight: 60,
-  dmGraphicsGetTextureDepth: 61,
-  dmGraphicsGetOriginalTextureWidth: 62,
-  dmGraphicsGetOriginalTextureHeight: 63,
-  dmGraphicsGetTextureMipmapCount: 64,
-  dmGraphicsGetNumTextureHandles: 65,
-  dmGraphicsGetTextureUsageHintFlags: 66,
-  dmGraphicsGetTextureStatusFlags: 67,
-  dmGraphicsEnableTexture: 68,
-  dmGraphicsDisableTexture: 69,
-  dmGraphicsGetMaxTextureSize: 70,
-  dmGraphicsGetWindowWidth: 71,
-  dmGraphicsGetWindowHeight: 72,
-  dmGraphicsGetWidth: 73,
-  dmGraphicsGetHeight: 74,
-  dmGraphicsSetStencilMask: 75,
-  dmGraphicsSetColorMask: 76,
-  dmGraphicsSetDepthMask: 77,
-  dmGraphicsSetRenderTarget: 78,
-  dmGraphicsGetRenderTargetSampleCount: 79,
-  dmGraphicsSetRenderTargetSize: 80,
-  dmGraphicsGetDisplayScaleFactor: 81,
-  dmGraphicsBeginFrame: 82,
-  dmGraphicsFlip: 83,
-  dmGraphicsSetViewport: 84,
-  dmGraphicsSetScissor: 85,
-  dmGraphicsEnableProgram: 86,
-  dmGraphicsDisableProgram: 87,
-  dmGraphicsEnableVertexDeclaration: 88,
-  dmGraphicsDisableVertexDeclaration: 89,
-  dmGraphicsEnableVertexBuffer: 90,
-  dmGraphicsDisableVertexBuffer: 91,
-  dmGraphicsSetSampler: 92,
-  dmGraphicsClear: 93,
-  dmGuiSetNodeId: 94,
-  dmGuiGetNodeId: 95,
-  dmGuiGetNodeIsBone: 96,
-  dmGuiSetNodeIsBone: 97,
-  dmGuiGetNodeCustomType: 98,
-  dmGuiGetNodeTextureId: 99,
-  dmHidSetGamepadButton: 100,
-  dmHidSetGamepadAxis: 101,
-  dmHidSetMousePosition: 102,
-  dmHidSetMouseWheel: 103,
-  dmHidAddKeyboardChar: 104,
-  windowShow: 105,
-  windowIconify: 106,
-  windowGetWidth: 107,
-  windowGetHeight: 108,
-  windowGetDisplayScaleFactor: 109,
-  windowSetSize: 110,
-  windowPollEvents: 111,
-  dmRenderGetMaterialTagListKey: 112,
-  dmRenderGetConstantName: 113,
-  dmRenderSetConstantName: 114,
-  dmRenderSetConstantLocation: 115,
-  dmRenderClearNamedConstantBuffer: 116,
-  dmRenderRemoveNamedConstant: 117,
-  dmRenderGetNamedConstantCount: 118,
-  dmRenderClearMaterialTags: 119,
-  dmRenderGetMaterialSamplerNameHash: 120,
-  dmRenderGetMaterialSamplerUnit: 121,
-  dmRenderApplyMaterialSampler: 122,
-  resourceDescriptorGetNameHash: 123,
-  resourceDescriptorSetResourceSize: 124,
-  resourceDescriptorGetResourceSize: 125,
-  resourceTypeGetNameHash: 126,
-  resourceTypeSetStreaming: 127,
-  resourceTypeIsStreaming: 128,
-  resourceTypeGetPreloadSize: 129,
-  resourceTypeReset: 130,
-  dmResourceGetNameHashFromHResourceType: 131,
-  dmResourceGetNameHashFromHDescriptor: 132,
-  dmResourceSetResourceSize: 133,
-  dmResourceGetResourceSize: 134,
-  dmRigGetAnimation: 135,
-  dmRigGetVertexCount: 136,
-  dmRigGetModel: 137,
-  dmRigGetCursor: 138,
-  dmRigGetPlaybackRate: 139,
-  dmRigResetIktarget: 140,
-  dmRigSetEnabled: 141,
-  dmRigGetEnabled: 142,
-  dmRigIsValid: 143,
-  dmRigGetBoneCount: 144,
-  dmRigGetMaxBoneCount: 145,
-  dmRigHasPoseMatrixCacheAnimatedPose: 146
+  dmBufferDestroy: 0,
+  dmBufferIsBufferValid: 1,
+  dmConditionVariableDelete: 2,
+  dmConditionVariableWait: 3,
+  dmConditionVariableSignal: 4,
+  dmConditionVariableBroadcast: 5,
+  dmConnectionPoolReturn: 6,
+  dmConnectionPoolClose: 7,
+  dmConnectionPoolGetReuseCount: 8,
+  dmImageDeleteImage: 9,
+  dmImageGetWidth: 10,
+  dmImageGetHeight: 11,
+  jobSystemDestroy: 12,
+  jobSystemUpdate: 13,
+  jobSystemGetWorkerCount: 14,
+  dmMessageIsSocketValid: 15,
+  dmMessageGetSocketNameHash: 16,
+  dmMutexDelete: 17,
+  dmMutexLock: 18,
+  dmMutexTryLock: 19,
+  dmMutexUnlock: 20,
+  dmSocketGetFd: 21,
+  fontDestroy: 22,
+  fontGetPathHash: 23,
+  fontGetScaleFromSize: 24,
+  fontGetAscent: 25,
+  fontGetDescent: 26,
+  fontGetLineGap: 27,
+  fontGetResourceSize: 28,
+  fontGetGlyphIndex: 29,
+  fontCollectionDestroy: 30,
+  fontCollectionGetFontCount: 31,
+  textLayoutAcquire: 32,
+  textLayoutRelease: 33,
+  textLayoutUpdate: 34,
+  textLayoutGetGlyphCount: 35,
+  textLayoutGetLineCount: 36,
+  textLayoutGetParagraphCount: 37,
+  textLayoutGetDecorationCount: 38,
+  textLayoutGetObjectCount: 39,
+  textLayoutSetObjectStyle: 40,
+  dmGameObjectComponentTypeGetTypeIndex: 41,
+  dmGameObjectComponentTypeSetReadsTransforms: 42,
+  dmGameObjectComponentTypeSetPrio: 43,
+  dmGameObjectComponentTypeSetHasUserData: 44,
+  dmGameObjectDelete: 45,
+  dmGameObjectAcquireInstanceIndex: 46,
+  dmGameObjectAssignInstanceIndex: 47,
+  dmGameObjectGetIdentifier: 48,
+  dmGameObjectGetGeneration: 49,
+  dmGameObjectSetScale: 50,
+  dmGameObjectSetScaleXy: 51,
+  dmGameObjectGetUniformScale: 52,
+  dmGameObjectGetWorldUniformScale: 53,
+  dmGameObjectSetBone: 54,
+  dmGameObjectIsBone: 55,
+  dmGameObjectDeleteBones: 56,
+  dmGameObjectGetComponentTypeIndex: 57,
+  dmGameObjectAddDynamicResourceHash: 58,
+  dmGameObjectGetPropertyOptionsCount: 59,
+  dmGameObjectPropertyContainerPushFloat: 60,
+  dmGameObjectPropertyContainerPushBool: 61,
+  dmGameObjectPropertyContainerPushHash: 62,
+  dmGameObjectPropertyContainerDestroy: 63,
+  dmGameSystemCompFactoryIsLoading: 64,
+  dmGameSystemCompFactoryIsDynamicPrototype: 65,
+  dmGameSystemDestroyRenderConstants: 66,
+  dmGameSystemGetRenderConstantCount: 67,
+  dmGameSystemClearRenderConstant: 68,
+  dmGameSystemAreRenderConstantsUpdated: 69,
+  dmGraphicsDeleteVertexStreamDeclaration: 70,
+  dmGraphicsDeleteVertexDeclaration: 71,
+  dmGraphicsGetVertexStreamOffset: 72,
+  dmGraphicsDeleteVertexBuffer: 73,
+  dmGraphicsGetMaxElementsVertices: 74,
+  dmGraphicsDeleteIndexBuffer: 75,
+  dmGraphicsGetMaxElementsIndices: 76,
+  dmGraphicsGetNumSupportedExtensions: 77,
+  dmGraphicsDeleteTexture: 78,
+  dmGraphicsGetTextureResourceSize: 79,
+  dmGraphicsGetTextureWidth: 80,
+  dmGraphicsGetTextureHeight: 81,
+  dmGraphicsGetTextureDepth: 82,
+  dmGraphicsGetOriginalTextureWidth: 83,
+  dmGraphicsGetOriginalTextureHeight: 84,
+  dmGraphicsGetTextureMipmapCount: 85,
+  dmGraphicsGetNumTextureHandles: 86,
+  dmGraphicsGetTextureUsageHintFlags: 87,
+  dmGraphicsGetTextureStatusFlags: 88,
+  dmGraphicsEnableTexture: 89,
+  dmGraphicsDisableTexture: 90,
+  dmGraphicsGetMaxTextureSize: 91,
+  dmGraphicsGetWindowWidth: 92,
+  dmGraphicsGetWindowHeight: 93,
+  dmGraphicsGetWidth: 94,
+  dmGraphicsGetHeight: 95,
+  dmGraphicsSetStencilMask: 96,
+  dmGraphicsSetColorMask: 97,
+  dmGraphicsSetDepthMask: 98,
+  dmGraphicsDeleteRenderTarget: 99,
+  dmGraphicsSetRenderTarget: 100,
+  dmGraphicsGetRenderTargetSampleCount: 101,
+  dmGraphicsSetRenderTargetSize: 102,
+  dmGraphicsGetDisplayScaleFactor: 103,
+  dmGraphicsDeleteContext: 104,
+  dmGraphicsBeginFrame: 105,
+  dmGraphicsFlip: 106,
+  dmGraphicsCloseWindow: 107,
+  dmGraphicsSetViewport: 108,
+  dmGraphicsSetScissor: 109,
+  dmGraphicsEnableProgram: 110,
+  dmGraphicsDisableProgram: 111,
+  dmGraphicsEnableVertexDeclaration: 112,
+  dmGraphicsDisableVertexDeclaration: 113,
+  dmGraphicsEnableVertexBuffer: 114,
+  dmGraphicsDisableVertexBuffer: 115,
+  dmGraphicsSetSampler: 116,
+  dmGraphicsDeleteProgram: 117,
+  dmGraphicsClear: 118,
+  dmGuiDeleteNode: 119,
+  dmGuiSetNodeId: 120,
+  dmGuiGetNodeId: 121,
+  dmGuiGetNodeIsBone: 122,
+  dmGuiSetNodeIsBone: 123,
+  dmGuiGetNodeCustomType: 124,
+  dmGuiGetNodeTextureId: 125,
+  dmHidSetGamepadButton: 126,
+  dmHidSetGamepadAxis: 127,
+  dmHidSetMousePosition: 128,
+  dmHidSetMouseWheel: 129,
+  dmHidAddKeyboardChar: 130,
+  windowDelete: 131,
+  windowClose: 132,
+  windowShow: 133,
+  windowIconify: 134,
+  windowGetWidth: 135,
+  windowGetHeight: 136,
+  windowGetDisplayScaleFactor: 137,
+  windowSetSize: 138,
+  windowPollEvents: 139,
+  dmRenderGetMaterialTagListKey: 140,
+  dmRenderDeleteConstant: 141,
+  dmRenderGetConstantName: 142,
+  dmRenderSetConstantName: 143,
+  dmRenderSetConstantLocation: 144,
+  dmRenderDeleteNamedConstantBuffer: 145,
+  dmRenderClearNamedConstantBuffer: 146,
+  dmRenderRemoveNamedConstant: 147,
+  dmRenderGetNamedConstantCount: 148,
+  dmRenderDeleteMaterial: 149,
+  dmRenderClearMaterialTags: 150,
+  dmRenderGetMaterialSamplerNameHash: 151,
+  dmRenderGetMaterialSamplerUnit: 152,
+  dmRenderApplyMaterialSampler: 153,
+  resourceDescriptorGetNameHash: 154,
+  resourceDescriptorSetResourceSize: 155,
+  resourceDescriptorGetResourceSize: 156,
+  resourceDescriptorIncRef: 157,
+  resourceTypeGetNameHash: 158,
+  resourceTypeSetStreaming: 159,
+  resourceTypeIsStreaming: 160,
+  resourceTypeGetPreloadSize: 161,
+  resourceTypeReset: 162,
+  dmResourceIncRef: 163,
+  dmResourceFreeResourceType: 164,
+  dmResourceGetNameHashFromHResourceType: 165,
+  dmResourceGetNameHashFromHDescriptor: 166,
+  dmResourceSetResourceSize: 167,
+  dmResourceGetResourceSize: 168,
+  dmRigDeleteContext: 169,
+  dmRigGetAnimation: 170,
+  dmRigGetVertexCount: 171,
+  dmRigGetModel: 172,
+  dmRigGetCursor: 173,
+  dmRigGetPlaybackRate: 174,
+  dmRigResetIktarget: 175,
+  dmRigSetEnabled: 176,
+  dmRigGetEnabled: 177,
+  dmRigIsValid: 178,
+  dmRigGetBoneCount: 179,
+  dmRigGetMaxBoneCount: 180,
+  dmRigHasPoseMatrixCacheAnimatedPose: 181
 } as const;
 
-/** Provider-validated borrowed call for dmBuffer::IsBufferValid; does not transfer ownership. */
+/** Provider-validated call for dmBuffer::Destroy. Lifecycle: buffer:finalize. */
+export function dmBufferDestroy(buffer: BorrowedHandle<"dmBuffer::HBuffer">): void { module().call(DmSdkBorrowedHandleId.dmBufferDestroy, buffer); }
+
+/** Provider-validated call for dmBuffer::IsBufferValid. Lifecycle: all handles borrowed. */
 export function dmBufferIsBufferValid(buffer: BorrowedHandle<"dmBuffer::HBuffer">): boolean { return module().call(DmSdkBorrowedHandleId.dmBufferIsBufferValid, buffer) as boolean; }
 
-/** Provider-validated borrowed call for dmConditionVariable::Wait; does not transfer ownership. */
+/** Provider-validated call for dmConditionVariable::Delete. Lifecycle: condition:finalize. */
+export function dmConditionVariableDelete(condition: BorrowedHandle<"dmConditionVariable::HConditionVariable">): void { module().call(DmSdkBorrowedHandleId.dmConditionVariableDelete, condition); }
+
+/** Provider-validated call for dmConditionVariable::Wait. Lifecycle: all handles borrowed. */
 export function dmConditionVariableWait(condition: BorrowedHandle<"dmConditionVariable::HConditionVariable">, mutex: BorrowedHandle<"dmMutex::HMutex">): void { module().call(DmSdkBorrowedHandleId.dmConditionVariableWait, condition, mutex); }
 
-/** Provider-validated borrowed call for dmConditionVariable::Signal; does not transfer ownership. */
+/** Provider-validated call for dmConditionVariable::Signal. Lifecycle: all handles borrowed. */
 export function dmConditionVariableSignal(condition: BorrowedHandle<"dmConditionVariable::HConditionVariable">): void { module().call(DmSdkBorrowedHandleId.dmConditionVariableSignal, condition); }
 
-/** Provider-validated borrowed call for dmConditionVariable::Broadcast; does not transfer ownership. */
+/** Provider-validated call for dmConditionVariable::Broadcast. Lifecycle: all handles borrowed. */
 export function dmConditionVariableBroadcast(condition: BorrowedHandle<"dmConditionVariable::HConditionVariable">): void { module().call(DmSdkBorrowedHandleId.dmConditionVariableBroadcast, condition); }
 
-/** Provider-validated borrowed call for dmConnectionPool::GetReuseCount; does not transfer ownership. */
+/** Provider-validated call for dmConnectionPool::Return. Lifecycle: connection:release. */
+export function dmConnectionPoolReturn(pool: BorrowedHandle<"dmConnectionPool::HPool">, connection: BorrowedHandle<"dmConnectionPool::HConnection">): void { module().call(DmSdkBorrowedHandleId.dmConnectionPoolReturn, pool, connection); }
+
+/** Provider-validated call for dmConnectionPool::Close. Lifecycle: connection:release, connection-closed, pool-slot-invalidated. */
+export function dmConnectionPoolClose(pool: BorrowedHandle<"dmConnectionPool::HPool">, connection: BorrowedHandle<"dmConnectionPool::HConnection">): void { module().call(DmSdkBorrowedHandleId.dmConnectionPoolClose, pool, connection); }
+
+/** Provider-validated call for dmConnectionPool::GetReuseCount. Lifecycle: all handles borrowed. */
 export function dmConnectionPoolGetReuseCount(pool: BorrowedHandle<"dmConnectionPool::HPool">, connection: BorrowedHandle<"dmConnectionPool::HConnection">): number { return module().call(DmSdkBorrowedHandleId.dmConnectionPoolGetReuseCount, pool, connection) as number; }
 
-/** Provider-validated borrowed call for dmImage::GetWidth; does not transfer ownership. */
+/** Provider-validated call for dmImage::DeleteImage. Lifecycle: image:finalize. */
+export function dmImageDeleteImage(image: BorrowedHandle<"dmImage::HImage">): void { module().call(DmSdkBorrowedHandleId.dmImageDeleteImage, image); }
+
+/** Provider-validated call for dmImage::GetWidth. Lifecycle: all handles borrowed. */
 export function dmImageGetWidth(image: BorrowedHandle<"dmImage::HImage">): number { return module().call(DmSdkBorrowedHandleId.dmImageGetWidth, image) as number; }
 
-/** Provider-validated borrowed call for dmImage::GetHeight; does not transfer ownership. */
+/** Provider-validated call for dmImage::GetHeight. Lifecycle: all handles borrowed. */
 export function dmImageGetHeight(image: BorrowedHandle<"dmImage::HImage">): number { return module().call(DmSdkBorrowedHandleId.dmImageGetHeight, image) as number; }
 
-/** Provider-validated borrowed call for JobSystemUpdate; does not transfer ownership. */
+/** Provider-validated call for JobSystemDestroy. Lifecycle: context:finalize. */
+export function jobSystemDestroy(context: BorrowedHandle<"HJobContext">): void { module().call(DmSdkBorrowedHandleId.jobSystemDestroy, context); }
+
+/** Provider-validated call for JobSystemUpdate. Lifecycle: all handles borrowed. */
 export function jobSystemUpdate(context: BorrowedHandle<"HJobContext">, time_limit: bigint): void { module().call(DmSdkBorrowedHandleId.jobSystemUpdate, context, time_limit); }
 
-/** Provider-validated borrowed call for JobSystemGetWorkerCount; does not transfer ownership. */
+/** Provider-validated call for JobSystemGetWorkerCount. Lifecycle: all handles borrowed. */
 export function jobSystemGetWorkerCount(context: BorrowedHandle<"HJobContext">): number { return module().call(DmSdkBorrowedHandleId.jobSystemGetWorkerCount, context) as number; }
 
-/** Provider-validated borrowed call for dmMessage::IsSocketValid; does not transfer ownership. */
+/** Provider-validated call for dmMessage::IsSocketValid. Lifecycle: all handles borrowed. */
 export function dmMessageIsSocketValid(socket: BorrowedHandle<"dmMessage::HSocket">): boolean { return module().call(DmSdkBorrowedHandleId.dmMessageIsSocketValid, socket) as boolean; }
 
-/** Provider-validated borrowed call for dmMessage::GetSocketNameHash; does not transfer ownership. */
+/** Provider-validated call for dmMessage::GetSocketNameHash. Lifecycle: all handles borrowed. */
 export function dmMessageGetSocketNameHash(socket: BorrowedHandle<"dmMessage::HSocket">): bigint { return module().call(DmSdkBorrowedHandleId.dmMessageGetSocketNameHash, socket) as bigint; }
 
-/** Provider-validated borrowed call for dmMutex::Lock; does not transfer ownership. */
+/** Provider-validated call for dmMutex::Delete. Lifecycle: mutex:finalize. */
+export function dmMutexDelete(mutex: BorrowedHandle<"dmMutex::HMutex">): void { module().call(DmSdkBorrowedHandleId.dmMutexDelete, mutex); }
+
+/** Provider-validated call for dmMutex::Lock. Lifecycle: all handles borrowed. */
 export function dmMutexLock(mutex: BorrowedHandle<"dmMutex::HMutex">): void { module().call(DmSdkBorrowedHandleId.dmMutexLock, mutex); }
 
-/** Provider-validated borrowed call for dmMutex::TryLock; does not transfer ownership. */
+/** Provider-validated call for dmMutex::TryLock. Lifecycle: all handles borrowed. */
 export function dmMutexTryLock(mutex: BorrowedHandle<"dmMutex::HMutex">): boolean { return module().call(DmSdkBorrowedHandleId.dmMutexTryLock, mutex) as boolean; }
 
-/** Provider-validated borrowed call for dmMutex::Unlock; does not transfer ownership. */
+/** Provider-validated call for dmMutex::Unlock. Lifecycle: all handles borrowed. */
 export function dmMutexUnlock(mutex: BorrowedHandle<"dmMutex::HMutex">): void { module().call(DmSdkBorrowedHandleId.dmMutexUnlock, mutex); }
 
-/** Provider-validated borrowed call for dmSocket::GetFD; does not transfer ownership. */
+/** Provider-validated call for dmSocket::GetFD. Lifecycle: all handles borrowed. */
 export function dmSocketGetFd(socket: BorrowedHandle<"dmSocket::Socket">): number { return module().call(DmSdkBorrowedHandleId.dmSocketGetFd, socket) as number; }
 
-/** Provider-validated borrowed call for FontGetPathHash; does not transfer ownership. */
+/** Provider-validated call for FontDestroy. Lifecycle: font:finalize. */
+export function fontDestroy(font: BorrowedHandle<"HFont">): void { module().call(DmSdkBorrowedHandleId.fontDestroy, font); }
+
+/** Provider-validated call for FontGetPathHash. Lifecycle: all handles borrowed. */
 export function fontGetPathHash(font: BorrowedHandle<"HFont">): number { return module().call(DmSdkBorrowedHandleId.fontGetPathHash, font) as number; }
 
-/** Provider-validated borrowed call for FontGetScaleFromSize; does not transfer ownership. */
+/** Provider-validated call for FontGetScaleFromSize. Lifecycle: all handles borrowed. */
 export function fontGetScaleFromSize(font: BorrowedHandle<"HFont">, size: number): number { return module().call(DmSdkBorrowedHandleId.fontGetScaleFromSize, font, size) as number; }
 
-/** Provider-validated borrowed call for FontGetAscent; does not transfer ownership. */
+/** Provider-validated call for FontGetAscent. Lifecycle: all handles borrowed. */
 export function fontGetAscent(font: BorrowedHandle<"HFont">, scale: number): number { return module().call(DmSdkBorrowedHandleId.fontGetAscent, font, scale) as number; }
 
-/** Provider-validated borrowed call for FontGetDescent; does not transfer ownership. */
+/** Provider-validated call for FontGetDescent. Lifecycle: all handles borrowed. */
 export function fontGetDescent(font: BorrowedHandle<"HFont">, scale: number): number { return module().call(DmSdkBorrowedHandleId.fontGetDescent, font, scale) as number; }
 
-/** Provider-validated borrowed call for FontGetLineGap; does not transfer ownership. */
+/** Provider-validated call for FontGetLineGap. Lifecycle: all handles borrowed. */
 export function fontGetLineGap(font: BorrowedHandle<"HFont">, scale: number): number { return module().call(DmSdkBorrowedHandleId.fontGetLineGap, font, scale) as number; }
 
-/** Provider-validated borrowed call for FontGetResourceSize; does not transfer ownership. */
+/** Provider-validated call for FontGetResourceSize. Lifecycle: all handles borrowed. */
 export function fontGetResourceSize(font: BorrowedHandle<"HFont">): number { return module().call(DmSdkBorrowedHandleId.fontGetResourceSize, font) as number; }
 
-/** Provider-validated borrowed call for FontGetGlyphIndex; does not transfer ownership. */
+/** Provider-validated call for FontGetGlyphIndex. Lifecycle: all handles borrowed. */
 export function fontGetGlyphIndex(font: BorrowedHandle<"HFont">, codepoint: number): number { return module().call(DmSdkBorrowedHandleId.fontGetGlyphIndex, font, codepoint) as number; }
 
-/** Provider-validated borrowed call for FontCollectionGetFontCount; does not transfer ownership. */
+/** Provider-validated call for FontCollectionDestroy. Lifecycle: coll:finalize. */
+export function fontCollectionDestroy(coll: BorrowedHandle<"HFontCollection">): void { module().call(DmSdkBorrowedHandleId.fontCollectionDestroy, coll); }
+
+/** Provider-validated call for FontCollectionGetFontCount. Lifecycle: all handles borrowed. */
 export function fontCollectionGetFontCount(coll: BorrowedHandle<"HFontCollection">): number { return module().call(DmSdkBorrowedHandleId.fontCollectionGetFontCount, coll) as number; }
 
-/** Provider-validated borrowed call for TextLayoutUpdate; does not transfer ownership. */
+/** Provider-validated call for TextLayoutAcquire. Lifecycle: layout:retain. */
+export function textLayoutAcquire(layout: BorrowedHandle<"HTextLayout">): void { module().call(DmSdkBorrowedHandleId.textLayoutAcquire, layout); }
+
+/** Provider-validated call for TextLayoutRelease. Lifecycle: layout:release. */
+export function textLayoutRelease(layout: BorrowedHandle<"HTextLayout">): void { module().call(DmSdkBorrowedHandleId.textLayoutRelease, layout); }
+
+/** Provider-validated call for TextLayoutUpdate. Lifecycle: all handles borrowed. */
 export function textLayoutUpdate(layout: BorrowedHandle<"HTextLayout">, delta_time: number): void { module().call(DmSdkBorrowedHandleId.textLayoutUpdate, layout, delta_time); }
 
-/** Provider-validated borrowed call for TextLayoutGetGlyphCount; does not transfer ownership. */
+/** Provider-validated call for TextLayoutGetGlyphCount. Lifecycle: all handles borrowed. */
 export function textLayoutGetGlyphCount(layout: BorrowedHandle<"HTextLayout">): number { return module().call(DmSdkBorrowedHandleId.textLayoutGetGlyphCount, layout) as number; }
 
-/** Provider-validated borrowed call for TextLayoutGetLineCount; does not transfer ownership. */
+/** Provider-validated call for TextLayoutGetLineCount. Lifecycle: all handles borrowed. */
 export function textLayoutGetLineCount(layout: BorrowedHandle<"HTextLayout">): number { return module().call(DmSdkBorrowedHandleId.textLayoutGetLineCount, layout) as number; }
 
-/** Provider-validated borrowed call for TextLayoutGetParagraphCount; does not transfer ownership. */
+/** Provider-validated call for TextLayoutGetParagraphCount. Lifecycle: all handles borrowed. */
 export function textLayoutGetParagraphCount(layout: BorrowedHandle<"HTextLayout">): number { return module().call(DmSdkBorrowedHandleId.textLayoutGetParagraphCount, layout) as number; }
 
-/** Provider-validated borrowed call for TextLayoutGetDecorationCount; does not transfer ownership. */
+/** Provider-validated call for TextLayoutGetDecorationCount. Lifecycle: all handles borrowed. */
 export function textLayoutGetDecorationCount(layout: BorrowedHandle<"HTextLayout">): number { return module().call(DmSdkBorrowedHandleId.textLayoutGetDecorationCount, layout) as number; }
 
-/** Provider-validated borrowed call for TextLayoutGetObjectCount; does not transfer ownership. */
+/** Provider-validated call for TextLayoutGetObjectCount. Lifecycle: all handles borrowed. */
 export function textLayoutGetObjectCount(layout: BorrowedHandle<"HTextLayout">): number { return module().call(DmSdkBorrowedHandleId.textLayoutGetObjectCount, layout) as number; }
 
-/** Provider-validated borrowed call for TextLayoutSetObjectStyle; does not transfer ownership. */
+/** Provider-validated call for TextLayoutSetObjectStyle. Lifecycle: all handles borrowed. */
 export function textLayoutSetObjectStyle(layout: BorrowedHandle<"HTextLayout">, object_id: bigint, style: bigint): number { return module().call(DmSdkBorrowedHandleId.textLayoutSetObjectStyle, layout, object_id, style) as number; }
 
-/** Provider-validated borrowed call for dmGameObject::ComponentTypeGetTypeIndex; does not transfer ownership. */
+/** Provider-validated call for dmGameObject::ComponentTypeGetTypeIndex. Lifecycle: all handles borrowed. */
 export function dmGameObjectComponentTypeGetTypeIndex(type: BorrowedHandle<"dmGameObject::HComponentType">): number { return module().call(DmSdkBorrowedHandleId.dmGameObjectComponentTypeGetTypeIndex, type) as number; }
 
-/** Provider-validated borrowed call for dmGameObject::ComponentTypeSetReadsTransforms; does not transfer ownership. */
+/** Provider-validated call for dmGameObject::ComponentTypeSetReadsTransforms. Lifecycle: all handles borrowed. */
 export function dmGameObjectComponentTypeSetReadsTransforms(type: BorrowedHandle<"dmGameObject::HComponentType">, reads_transforms: boolean): void { module().call(DmSdkBorrowedHandleId.dmGameObjectComponentTypeSetReadsTransforms, type, reads_transforms); }
 
-/** Provider-validated borrowed call for dmGameObject::ComponentTypeSetPrio; does not transfer ownership. */
+/** Provider-validated call for dmGameObject::ComponentTypeSetPrio. Lifecycle: all handles borrowed. */
 export function dmGameObjectComponentTypeSetPrio(type: BorrowedHandle<"dmGameObject::HComponentType">, prio: number): void { module().call(DmSdkBorrowedHandleId.dmGameObjectComponentTypeSetPrio, type, prio); }
 
-/** Provider-validated borrowed call for dmGameObject::ComponentTypeSetHasUserData; does not transfer ownership. */
+/** Provider-validated call for dmGameObject::ComponentTypeSetHasUserData. Lifecycle: all handles borrowed. */
 export function dmGameObjectComponentTypeSetHasUserData(type: BorrowedHandle<"dmGameObject::HComponentType">, has_user_data: boolean): void { module().call(DmSdkBorrowedHandleId.dmGameObjectComponentTypeSetHasUserData, type, has_user_data); }
 
-/** Provider-validated borrowed call for dmGameObject::AssignInstanceIndex; does not transfer ownership. */
+/** Provider-validated call for dmGameObject::Delete. Lifecycle: instance:finalize. */
+export function dmGameObjectDelete(collection: BorrowedHandle<"dmGameObject::HCollection">, instance: BorrowedHandle<"dmGameObject::HInstance">, recursive: boolean): void { module().call(DmSdkBorrowedHandleId.dmGameObjectDelete, collection, instance, recursive); }
+
+/** Provider-validated call for dmGameObject::AcquireInstanceIndex. Lifecycle: all handles borrowed. */
+export function dmGameObjectAcquireInstanceIndex(collection: BorrowedHandle<"dmGameObject::HCollection">): number { return module().call(DmSdkBorrowedHandleId.dmGameObjectAcquireInstanceIndex, collection) as number; }
+
+/** Provider-validated call for dmGameObject::AssignInstanceIndex. Lifecycle: all handles borrowed. */
 export function dmGameObjectAssignInstanceIndex(index: number, instance: BorrowedHandle<"dmGameObject::HInstance">): void { module().call(DmSdkBorrowedHandleId.dmGameObjectAssignInstanceIndex, index, instance); }
 
-/** Provider-validated borrowed call for dmGameObject::GetIdentifier; does not transfer ownership. */
+/** Provider-validated call for dmGameObject::GetIdentifier. Lifecycle: all handles borrowed. */
 export function dmGameObjectGetIdentifier(instance: BorrowedHandle<"dmGameObject::HInstance">): bigint { return module().call(DmSdkBorrowedHandleId.dmGameObjectGetIdentifier, instance) as bigint; }
 
-/** Provider-validated borrowed call for dmGameObject::GetGeneration; does not transfer ownership. */
+/** Provider-validated call for dmGameObject::GetGeneration. Lifecycle: all handles borrowed. */
 export function dmGameObjectGetGeneration(instance: BorrowedHandle<"dmGameObject::HInstance">): number { return module().call(DmSdkBorrowedHandleId.dmGameObjectGetGeneration, instance) as number; }
 
-/** Provider-validated borrowed call for dmGameObject::SetScale; does not transfer ownership. */
+/** Provider-validated call for dmGameObject::SetScale. Lifecycle: all handles borrowed. */
 export function dmGameObjectSetScale(instance: BorrowedHandle<"dmGameObject::HInstance">, scale: number): void { module().call(DmSdkBorrowedHandleId.dmGameObjectSetScale, instance, scale); }
 
-/** Provider-validated borrowed call for dmGameObject::SetScaleXY; does not transfer ownership. */
+/** Provider-validated call for dmGameObject::SetScaleXY. Lifecycle: all handles borrowed. */
 export function dmGameObjectSetScaleXy(instance: BorrowedHandle<"dmGameObject::HInstance">, scale_x: number, scale_y: number): void { module().call(DmSdkBorrowedHandleId.dmGameObjectSetScaleXy, instance, scale_x, scale_y); }
 
-/** Provider-validated borrowed call for dmGameObject::GetUniformScale; does not transfer ownership. */
+/** Provider-validated call for dmGameObject::GetUniformScale. Lifecycle: all handles borrowed. */
 export function dmGameObjectGetUniformScale(instance: BorrowedHandle<"dmGameObject::HInstance">): number { return module().call(DmSdkBorrowedHandleId.dmGameObjectGetUniformScale, instance) as number; }
 
-/** Provider-validated borrowed call for dmGameObject::GetWorldUniformScale; does not transfer ownership. */
+/** Provider-validated call for dmGameObject::GetWorldUniformScale. Lifecycle: all handles borrowed. */
 export function dmGameObjectGetWorldUniformScale(instance: BorrowedHandle<"dmGameObject::HInstance">): number { return module().call(DmSdkBorrowedHandleId.dmGameObjectGetWorldUniformScale, instance) as number; }
 
-/** Provider-validated borrowed call for dmGameObject::SetBone; does not transfer ownership. */
+/** Provider-validated call for dmGameObject::SetBone. Lifecycle: all handles borrowed. */
 export function dmGameObjectSetBone(instance: BorrowedHandle<"dmGameObject::HInstance">, bone: boolean): void { module().call(DmSdkBorrowedHandleId.dmGameObjectSetBone, instance, bone); }
 
-/** Provider-validated borrowed call for dmGameObject::IsBone; does not transfer ownership. */
+/** Provider-validated call for dmGameObject::IsBone. Lifecycle: all handles borrowed. */
 export function dmGameObjectIsBone(instance: BorrowedHandle<"dmGameObject::HInstance">): boolean { return module().call(DmSdkBorrowedHandleId.dmGameObjectIsBone, instance) as boolean; }
 
-/** Provider-validated borrowed call for dmGameObject::GetComponentTypeIndex; does not transfer ownership. */
+/** Provider-validated call for dmGameObject::DeleteBones. Lifecycle: descendant-finalize. */
+export function dmGameObjectDeleteBones(parent: BorrowedHandle<"dmGameObject::HInstance">): void { module().call(DmSdkBorrowedHandleId.dmGameObjectDeleteBones, parent); }
+
+/** Provider-validated call for dmGameObject::GetComponentTypeIndex. Lifecycle: all handles borrowed. */
 export function dmGameObjectGetComponentTypeIndex(collection: BorrowedHandle<"dmGameObject::HCollection">, type_hash: bigint): number { return module().call(DmSdkBorrowedHandleId.dmGameObjectGetComponentTypeIndex, collection, type_hash) as number; }
 
-/** Provider-validated borrowed call for dmGameObject::AddDynamicResourceHash; does not transfer ownership. */
+/** Provider-validated call for dmGameObject::AddDynamicResourceHash. Lifecycle: all handles borrowed. */
 export function dmGameObjectAddDynamicResourceHash(collection: BorrowedHandle<"dmGameObject::HCollection">, path_hash: bigint): void { module().call(DmSdkBorrowedHandleId.dmGameObjectAddDynamicResourceHash, collection, path_hash); }
 
-/** Provider-validated borrowed call for dmGameObject::GetPropertyOptionsCount; does not transfer ownership. */
+/** Provider-validated call for dmGameObject::GetPropertyOptionsCount. Lifecycle: all handles borrowed. */
 export function dmGameObjectGetPropertyOptionsCount(options: BorrowedHandle<"dmGameObject::HPropertyOptions">): number { return module().call(DmSdkBorrowedHandleId.dmGameObjectGetPropertyOptionsCount, options) as number; }
 
-/** Provider-validated borrowed call for dmGameObject::PropertyContainerPushFloat; does not transfer ownership. */
+/** Provider-validated call for dmGameObject::PropertyContainerPushFloat. Lifecycle: all handles borrowed. */
 export function dmGameObjectPropertyContainerPushFloat(builder: BorrowedHandle<"dmGameObject::HPropertyContainerBuilder">, id: bigint, value: number): void { module().call(DmSdkBorrowedHandleId.dmGameObjectPropertyContainerPushFloat, builder, id, value); }
 
-/** Provider-validated borrowed call for dmGameObject::PropertyContainerPushBool; does not transfer ownership. */
+/** Provider-validated call for dmGameObject::PropertyContainerPushBool. Lifecycle: all handles borrowed. */
 export function dmGameObjectPropertyContainerPushBool(builder: BorrowedHandle<"dmGameObject::HPropertyContainerBuilder">, id: bigint, value: boolean): void { module().call(DmSdkBorrowedHandleId.dmGameObjectPropertyContainerPushBool, builder, id, value); }
 
-/** Provider-validated borrowed call for dmGameObject::PropertyContainerPushHash; does not transfer ownership. */
+/** Provider-validated call for dmGameObject::PropertyContainerPushHash. Lifecycle: all handles borrowed. */
 export function dmGameObjectPropertyContainerPushHash(builder: BorrowedHandle<"dmGameObject::HPropertyContainerBuilder">, id: bigint, value: bigint): void { module().call(DmSdkBorrowedHandleId.dmGameObjectPropertyContainerPushHash, builder, id, value); }
 
-/** Provider-validated borrowed call for dmGameSystem::CompFactoryIsLoading; does not transfer ownership. */
+/** Provider-validated call for dmGameObject::PropertyContainerDestroy. Lifecycle: container:finalize. */
+export function dmGameObjectPropertyContainerDestroy(container: BorrowedHandle<"dmGameObject::HPropertyContainer">): void { module().call(DmSdkBorrowedHandleId.dmGameObjectPropertyContainerDestroy, container); }
+
+/** Provider-validated call for dmGameSystem::CompFactoryIsLoading. Lifecycle: all handles borrowed. */
 export function dmGameSystemCompFactoryIsLoading(world: BorrowedHandle<"dmGameSystem::HFactoryWorld">, component: BorrowedHandle<"dmGameSystem::HFactoryComponent">): boolean { return module().call(DmSdkBorrowedHandleId.dmGameSystemCompFactoryIsLoading, world, component) as boolean; }
 
-/** Provider-validated borrowed call for dmGameSystem::CompFactoryIsDynamicPrototype; does not transfer ownership. */
+/** Provider-validated call for dmGameSystem::CompFactoryIsDynamicPrototype. Lifecycle: all handles borrowed. */
 export function dmGameSystemCompFactoryIsDynamicPrototype(world: BorrowedHandle<"dmGameSystem::HFactoryWorld">, component: BorrowedHandle<"dmGameSystem::HFactoryComponent">): boolean { return module().call(DmSdkBorrowedHandleId.dmGameSystemCompFactoryIsDynamicPrototype, world, component) as boolean; }
 
-/** Provider-validated borrowed call for dmGameSystem::GetRenderConstantCount; does not transfer ownership. */
+/** Provider-validated call for dmGameSystem::DestroyRenderConstants. Lifecycle: constants:finalize. */
+export function dmGameSystemDestroyRenderConstants(constants: BorrowedHandle<"dmGameSystem::HComponentRenderConstants">): void { module().call(DmSdkBorrowedHandleId.dmGameSystemDestroyRenderConstants, constants); }
+
+/** Provider-validated call for dmGameSystem::GetRenderConstantCount. Lifecycle: all handles borrowed. */
 export function dmGameSystemGetRenderConstantCount(constants: BorrowedHandle<"dmGameSystem::HComponentRenderConstants">): number { return module().call(DmSdkBorrowedHandleId.dmGameSystemGetRenderConstantCount, constants) as number; }
 
-/** Provider-validated borrowed call for dmGameSystem::ClearRenderConstant; does not transfer ownership. */
+/** Provider-validated call for dmGameSystem::ClearRenderConstant. Lifecycle: all handles borrowed. */
 export function dmGameSystemClearRenderConstant(constants: BorrowedHandle<"dmGameSystem::HComponentRenderConstants">, name_hash: bigint): number { return module().call(DmSdkBorrowedHandleId.dmGameSystemClearRenderConstant, constants, name_hash) as number; }
 
-/** Provider-validated borrowed call for dmGameSystem::AreRenderConstantsUpdated; does not transfer ownership. */
+/** Provider-validated call for dmGameSystem::AreRenderConstantsUpdated. Lifecycle: all handles borrowed. */
 export function dmGameSystemAreRenderConstantsUpdated(constants: BorrowedHandle<"dmGameSystem::HComponentRenderConstants">): number { return module().call(DmSdkBorrowedHandleId.dmGameSystemAreRenderConstantsUpdated, constants) as number; }
 
-/** Provider-validated borrowed call for dmGraphics::GetVertexStreamOffset; does not transfer ownership. */
+/** Provider-validated call for dmGraphics::DeleteVertexStreamDeclaration. Lifecycle: stream_declaration:finalize. */
+export function dmGraphicsDeleteVertexStreamDeclaration(stream_declaration: BorrowedHandle<"dmGraphics::HVertexStreamDeclaration">): void { module().call(DmSdkBorrowedHandleId.dmGraphicsDeleteVertexStreamDeclaration, stream_declaration); }
+
+/** Provider-validated call for dmGraphics::DeleteVertexDeclaration. Lifecycle: vertex_declaration:finalize. */
+export function dmGraphicsDeleteVertexDeclaration(vertex_declaration: BorrowedHandle<"dmGraphics::HVertexDeclaration">): void { module().call(DmSdkBorrowedHandleId.dmGraphicsDeleteVertexDeclaration, vertex_declaration); }
+
+/** Provider-validated call for dmGraphics::GetVertexStreamOffset. Lifecycle: all handles borrowed. */
 export function dmGraphicsGetVertexStreamOffset(vertex_declaration: BorrowedHandle<"dmGraphics::HVertexDeclaration">, name_hash: bigint): number { return module().call(DmSdkBorrowedHandleId.dmGraphicsGetVertexStreamOffset, vertex_declaration, name_hash) as number; }
 
-/** Provider-validated borrowed call for dmGraphics::GetMaxElementsVertices; does not transfer ownership. */
+/** Provider-validated call for dmGraphics::DeleteVertexBuffer. Lifecycle: buffer:finalize. */
+export function dmGraphicsDeleteVertexBuffer(buffer: BorrowedHandle<"dmGraphics::HVertexBuffer">): void { module().call(DmSdkBorrowedHandleId.dmGraphicsDeleteVertexBuffer, buffer); }
+
+/** Provider-validated call for dmGraphics::GetMaxElementsVertices. Lifecycle: all handles borrowed. */
 export function dmGraphicsGetMaxElementsVertices(context: BorrowedHandle<"dmGraphics::HContext">): number { return module().call(DmSdkBorrowedHandleId.dmGraphicsGetMaxElementsVertices, context) as number; }
 
-/** Provider-validated borrowed call for dmGraphics::GetMaxElementsIndices; does not transfer ownership. */
+/** Provider-validated call for dmGraphics::DeleteIndexBuffer. Lifecycle: buffer:finalize. */
+export function dmGraphicsDeleteIndexBuffer(buffer: BorrowedHandle<"dmGraphics::HIndexBuffer">): void { module().call(DmSdkBorrowedHandleId.dmGraphicsDeleteIndexBuffer, buffer); }
+
+/** Provider-validated call for dmGraphics::GetMaxElementsIndices. Lifecycle: all handles borrowed. */
 export function dmGraphicsGetMaxElementsIndices(context: BorrowedHandle<"dmGraphics::HContext">): number { return module().call(DmSdkBorrowedHandleId.dmGraphicsGetMaxElementsIndices, context) as number; }
 
-/** Provider-validated borrowed call for dmGraphics::GetNumSupportedExtensions; does not transfer ownership. */
+/** Provider-validated call for dmGraphics::GetNumSupportedExtensions. Lifecycle: all handles borrowed. */
 export function dmGraphicsGetNumSupportedExtensions(context: BorrowedHandle<"dmGraphics::HContext">): number { return module().call(DmSdkBorrowedHandleId.dmGraphicsGetNumSupportedExtensions, context) as number; }
 
-/** Provider-validated borrowed call for dmGraphics::GetTextureResourceSize; does not transfer ownership. */
+/** Provider-validated call for dmGraphics::DeleteTexture. Lifecycle: texture:finalize. */
+export function dmGraphicsDeleteTexture(context: BorrowedHandle<"dmGraphics::HContext">, texture: BorrowedHandle<"dmGraphics::HTexture">): void { module().call(DmSdkBorrowedHandleId.dmGraphicsDeleteTexture, context, texture); }
+
+/** Provider-validated call for dmGraphics::GetTextureResourceSize. Lifecycle: all handles borrowed. */
 export function dmGraphicsGetTextureResourceSize(context: BorrowedHandle<"dmGraphics::HContext">, texture: BorrowedHandle<"dmGraphics::HTexture">): number { return module().call(DmSdkBorrowedHandleId.dmGraphicsGetTextureResourceSize, context, texture) as number; }
 
-/** Provider-validated borrowed call for dmGraphics::GetTextureWidth; does not transfer ownership. */
+/** Provider-validated call for dmGraphics::GetTextureWidth. Lifecycle: all handles borrowed. */
 export function dmGraphicsGetTextureWidth(context: BorrowedHandle<"dmGraphics::HContext">, texture: BorrowedHandle<"dmGraphics::HTexture">): number { return module().call(DmSdkBorrowedHandleId.dmGraphicsGetTextureWidth, context, texture) as number; }
 
-/** Provider-validated borrowed call for dmGraphics::GetTextureHeight; does not transfer ownership. */
+/** Provider-validated call for dmGraphics::GetTextureHeight. Lifecycle: all handles borrowed. */
 export function dmGraphicsGetTextureHeight(context: BorrowedHandle<"dmGraphics::HContext">, texture: BorrowedHandle<"dmGraphics::HTexture">): number { return module().call(DmSdkBorrowedHandleId.dmGraphicsGetTextureHeight, context, texture) as number; }
 
-/** Provider-validated borrowed call for dmGraphics::GetTextureDepth; does not transfer ownership. */
+/** Provider-validated call for dmGraphics::GetTextureDepth. Lifecycle: all handles borrowed. */
 export function dmGraphicsGetTextureDepth(context: BorrowedHandle<"dmGraphics::HContext">, texture: BorrowedHandle<"dmGraphics::HTexture">): number { return module().call(DmSdkBorrowedHandleId.dmGraphicsGetTextureDepth, context, texture) as number; }
 
-/** Provider-validated borrowed call for dmGraphics::GetOriginalTextureWidth; does not transfer ownership. */
+/** Provider-validated call for dmGraphics::GetOriginalTextureWidth. Lifecycle: all handles borrowed. */
 export function dmGraphicsGetOriginalTextureWidth(context: BorrowedHandle<"dmGraphics::HContext">, texture: BorrowedHandle<"dmGraphics::HTexture">): number { return module().call(DmSdkBorrowedHandleId.dmGraphicsGetOriginalTextureWidth, context, texture) as number; }
 
-/** Provider-validated borrowed call for dmGraphics::GetOriginalTextureHeight; does not transfer ownership. */
+/** Provider-validated call for dmGraphics::GetOriginalTextureHeight. Lifecycle: all handles borrowed. */
 export function dmGraphicsGetOriginalTextureHeight(context: BorrowedHandle<"dmGraphics::HContext">, texture: BorrowedHandle<"dmGraphics::HTexture">): number { return module().call(DmSdkBorrowedHandleId.dmGraphicsGetOriginalTextureHeight, context, texture) as number; }
 
-/** Provider-validated borrowed call for dmGraphics::GetTextureMipmapCount; does not transfer ownership. */
+/** Provider-validated call for dmGraphics::GetTextureMipmapCount. Lifecycle: all handles borrowed. */
 export function dmGraphicsGetTextureMipmapCount(context: BorrowedHandle<"dmGraphics::HContext">, texture: BorrowedHandle<"dmGraphics::HTexture">): number { return module().call(DmSdkBorrowedHandleId.dmGraphicsGetTextureMipmapCount, context, texture) as number; }
 
-/** Provider-validated borrowed call for dmGraphics::GetNumTextureHandles; does not transfer ownership. */
+/** Provider-validated call for dmGraphics::GetNumTextureHandles. Lifecycle: all handles borrowed. */
 export function dmGraphicsGetNumTextureHandles(context: BorrowedHandle<"dmGraphics::HContext">, texture: BorrowedHandle<"dmGraphics::HTexture">): number { return module().call(DmSdkBorrowedHandleId.dmGraphicsGetNumTextureHandles, context, texture) as number; }
 
-/** Provider-validated borrowed call for dmGraphics::GetTextureUsageHintFlags; does not transfer ownership. */
+/** Provider-validated call for dmGraphics::GetTextureUsageHintFlags. Lifecycle: all handles borrowed. */
 export function dmGraphicsGetTextureUsageHintFlags(context: BorrowedHandle<"dmGraphics::HContext">, texture: BorrowedHandle<"dmGraphics::HTexture">): number { return module().call(DmSdkBorrowedHandleId.dmGraphicsGetTextureUsageHintFlags, context, texture) as number; }
 
-/** Provider-validated borrowed call for dmGraphics::GetTextureStatusFlags; does not transfer ownership. */
+/** Provider-validated call for dmGraphics::GetTextureStatusFlags. Lifecycle: all handles borrowed. */
 export function dmGraphicsGetTextureStatusFlags(context: BorrowedHandle<"dmGraphics::HContext">, texture: BorrowedHandle<"dmGraphics::HTexture">): number { return module().call(DmSdkBorrowedHandleId.dmGraphicsGetTextureStatusFlags, context, texture) as number; }
 
-/** Provider-validated borrowed call for dmGraphics::EnableTexture; does not transfer ownership. */
+/** Provider-validated call for dmGraphics::EnableTexture. Lifecycle: all handles borrowed. */
 export function dmGraphicsEnableTexture(context: BorrowedHandle<"dmGraphics::HContext">, unit: number, id_index: number, texture: BorrowedHandle<"dmGraphics::HTexture">): void { module().call(DmSdkBorrowedHandleId.dmGraphicsEnableTexture, context, unit, id_index, texture); }
 
-/** Provider-validated borrowed call for dmGraphics::DisableTexture; does not transfer ownership. */
+/** Provider-validated call for dmGraphics::DisableTexture. Lifecycle: all handles borrowed. */
 export function dmGraphicsDisableTexture(context: BorrowedHandle<"dmGraphics::HContext">, unit: number, texture: BorrowedHandle<"dmGraphics::HTexture">): void { module().call(DmSdkBorrowedHandleId.dmGraphicsDisableTexture, context, unit, texture); }
 
-/** Provider-validated borrowed call for dmGraphics::GetMaxTextureSize; does not transfer ownership. */
+/** Provider-validated call for dmGraphics::GetMaxTextureSize. Lifecycle: all handles borrowed. */
 export function dmGraphicsGetMaxTextureSize(context: BorrowedHandle<"dmGraphics::HContext">): number { return module().call(DmSdkBorrowedHandleId.dmGraphicsGetMaxTextureSize, context) as number; }
 
-/** Provider-validated borrowed call for dmGraphics::GetWindowWidth; does not transfer ownership. */
+/** Provider-validated call for dmGraphics::GetWindowWidth. Lifecycle: all handles borrowed. */
 export function dmGraphicsGetWindowWidth(context: BorrowedHandle<"dmGraphics::HContext">): number { return module().call(DmSdkBorrowedHandleId.dmGraphicsGetWindowWidth, context) as number; }
 
-/** Provider-validated borrowed call for dmGraphics::GetWindowHeight; does not transfer ownership. */
+/** Provider-validated call for dmGraphics::GetWindowHeight. Lifecycle: all handles borrowed. */
 export function dmGraphicsGetWindowHeight(context: BorrowedHandle<"dmGraphics::HContext">): number { return module().call(DmSdkBorrowedHandleId.dmGraphicsGetWindowHeight, context) as number; }
 
-/** Provider-validated borrowed call for dmGraphics::GetWidth; does not transfer ownership. */
+/** Provider-validated call for dmGraphics::GetWidth. Lifecycle: all handles borrowed. */
 export function dmGraphicsGetWidth(context: BorrowedHandle<"dmGraphics::HContext">): number { return module().call(DmSdkBorrowedHandleId.dmGraphicsGetWidth, context) as number; }
 
-/** Provider-validated borrowed call for dmGraphics::GetHeight; does not transfer ownership. */
+/** Provider-validated call for dmGraphics::GetHeight. Lifecycle: all handles borrowed. */
 export function dmGraphicsGetHeight(context: BorrowedHandle<"dmGraphics::HContext">): number { return module().call(DmSdkBorrowedHandleId.dmGraphicsGetHeight, context) as number; }
 
-/** Provider-validated borrowed call for dmGraphics::SetStencilMask; does not transfer ownership. */
+/** Provider-validated call for dmGraphics::SetStencilMask. Lifecycle: all handles borrowed. */
 export function dmGraphicsSetStencilMask(context: BorrowedHandle<"dmGraphics::HContext">, mask: number): void { module().call(DmSdkBorrowedHandleId.dmGraphicsSetStencilMask, context, mask); }
 
-/** Provider-validated borrowed call for dmGraphics::SetColorMask; does not transfer ownership. */
+/** Provider-validated call for dmGraphics::SetColorMask. Lifecycle: all handles borrowed. */
 export function dmGraphicsSetColorMask(context: BorrowedHandle<"dmGraphics::HContext">, red: boolean, green: boolean, blue: boolean, alpha: boolean): void { module().call(DmSdkBorrowedHandleId.dmGraphicsSetColorMask, context, red, green, blue, alpha); }
 
-/** Provider-validated borrowed call for dmGraphics::SetDepthMask; does not transfer ownership. */
+/** Provider-validated call for dmGraphics::SetDepthMask. Lifecycle: all handles borrowed. */
 export function dmGraphicsSetDepthMask(context: BorrowedHandle<"dmGraphics::HContext">, enable_mask: boolean): void { module().call(DmSdkBorrowedHandleId.dmGraphicsSetDepthMask, context, enable_mask); }
 
-/** Provider-validated borrowed call for dmGraphics::SetRenderTarget; does not transfer ownership. */
+/** Provider-validated call for dmGraphics::DeleteRenderTarget. Lifecycle: render_target:finalize. */
+export function dmGraphicsDeleteRenderTarget(context: BorrowedHandle<"dmGraphics::HContext">, render_target: BorrowedHandle<"dmGraphics::HRenderTarget">): void { module().call(DmSdkBorrowedHandleId.dmGraphicsDeleteRenderTarget, context, render_target); }
+
+/** Provider-validated call for dmGraphics::SetRenderTarget. Lifecycle: all handles borrowed. */
 export function dmGraphicsSetRenderTarget(context: BorrowedHandle<"dmGraphics::HContext">, render_target: BorrowedHandle<"dmGraphics::HRenderTarget">, transient_buffer_types: number): void { module().call(DmSdkBorrowedHandleId.dmGraphicsSetRenderTarget, context, render_target, transient_buffer_types); }
 
-/** Provider-validated borrowed call for dmGraphics::GetRenderTargetSampleCount; does not transfer ownership. */
+/** Provider-validated call for dmGraphics::GetRenderTargetSampleCount. Lifecycle: all handles borrowed. */
 export function dmGraphicsGetRenderTargetSampleCount(context: BorrowedHandle<"dmGraphics::HContext">, render_target: BorrowedHandle<"dmGraphics::HRenderTarget">): number { return module().call(DmSdkBorrowedHandleId.dmGraphicsGetRenderTargetSampleCount, context, render_target) as number; }
 
-/** Provider-validated borrowed call for dmGraphics::SetRenderTargetSize; does not transfer ownership. */
+/** Provider-validated call for dmGraphics::SetRenderTargetSize. Lifecycle: all handles borrowed. */
 export function dmGraphicsSetRenderTargetSize(context: BorrowedHandle<"dmGraphics::HContext">, render_target: BorrowedHandle<"dmGraphics::HRenderTarget">, width: number, height: number): void { module().call(DmSdkBorrowedHandleId.dmGraphicsSetRenderTargetSize, context, render_target, width, height); }
 
-/** Provider-validated borrowed call for dmGraphics::GetDisplayScaleFactor; does not transfer ownership. */
+/** Provider-validated call for dmGraphics::GetDisplayScaleFactor. Lifecycle: all handles borrowed. */
 export function dmGraphicsGetDisplayScaleFactor(context: BorrowedHandle<"dmGraphics::HContext">): number { return module().call(DmSdkBorrowedHandleId.dmGraphicsGetDisplayScaleFactor, context) as number; }
 
-/** Provider-validated borrowed call for dmGraphics::BeginFrame; does not transfer ownership. */
+/** Provider-validated call for dmGraphics::DeleteContext. Lifecycle: context:finalize, owned-descendants-finalized. */
+export function dmGraphicsDeleteContext(context: BorrowedHandle<"dmGraphics::HContext">): void { module().call(DmSdkBorrowedHandleId.dmGraphicsDeleteContext, context); }
+
+/** Provider-validated call for dmGraphics::BeginFrame. Lifecycle: all handles borrowed. */
 export function dmGraphicsBeginFrame(context: BorrowedHandle<"dmGraphics::HContext">): void { module().call(DmSdkBorrowedHandleId.dmGraphicsBeginFrame, context); }
 
-/** Provider-validated borrowed call for dmGraphics::Flip; does not transfer ownership. */
+/** Provider-validated call for dmGraphics::Flip. Lifecycle: all handles borrowed. */
 export function dmGraphicsFlip(context: BorrowedHandle<"dmGraphics::HContext">): void { module().call(DmSdkBorrowedHandleId.dmGraphicsFlip, context); }
 
-/** Provider-validated borrowed call for dmGraphics::SetViewport; does not transfer ownership. */
+/** Provider-validated call for dmGraphics::CloseWindow. Lifecycle: associated-window-closed. */
+export function dmGraphicsCloseWindow(context: BorrowedHandle<"dmGraphics::HContext">): void { module().call(DmSdkBorrowedHandleId.dmGraphicsCloseWindow, context); }
+
+/** Provider-validated call for dmGraphics::SetViewport. Lifecycle: all handles borrowed. */
 export function dmGraphicsSetViewport(context: BorrowedHandle<"dmGraphics::HContext">, x: number, y: number, width: number, height: number): void { module().call(DmSdkBorrowedHandleId.dmGraphicsSetViewport, context, x, y, width, height); }
 
-/** Provider-validated borrowed call for dmGraphics::SetScissor; does not transfer ownership. */
+/** Provider-validated call for dmGraphics::SetScissor. Lifecycle: all handles borrowed. */
 export function dmGraphicsSetScissor(context: BorrowedHandle<"dmGraphics::HContext">, x: number, y: number, width: number, height: number): void { module().call(DmSdkBorrowedHandleId.dmGraphicsSetScissor, context, x, y, width, height); }
 
-/** Provider-validated borrowed call for dmGraphics::EnableProgram; does not transfer ownership. */
+/** Provider-validated call for dmGraphics::EnableProgram. Lifecycle: all handles borrowed. */
 export function dmGraphicsEnableProgram(context: BorrowedHandle<"dmGraphics::HContext">, program: BorrowedHandle<"dmGraphics::HProgram">): void { module().call(DmSdkBorrowedHandleId.dmGraphicsEnableProgram, context, program); }
 
-/** Provider-validated borrowed call for dmGraphics::DisableProgram; does not transfer ownership. */
+/** Provider-validated call for dmGraphics::DisableProgram. Lifecycle: all handles borrowed. */
 export function dmGraphicsDisableProgram(context: BorrowedHandle<"dmGraphics::HContext">): void { module().call(DmSdkBorrowedHandleId.dmGraphicsDisableProgram, context); }
 
-/** Provider-validated borrowed call for dmGraphics::EnableVertexDeclaration; does not transfer ownership. */
+/** Provider-validated call for dmGraphics::EnableVertexDeclaration. Lifecycle: all handles borrowed. */
 export function dmGraphicsEnableVertexDeclaration(context: BorrowedHandle<"dmGraphics::HContext">, vertex_declaration: BorrowedHandle<"dmGraphics::HVertexDeclaration">, binding_index: number, base_offset: number, program: BorrowedHandle<"dmGraphics::HProgram">): void { module().call(DmSdkBorrowedHandleId.dmGraphicsEnableVertexDeclaration, context, vertex_declaration, binding_index, base_offset, program); }
 
-/** Provider-validated borrowed call for dmGraphics::DisableVertexDeclaration; does not transfer ownership. */
+/** Provider-validated call for dmGraphics::DisableVertexDeclaration. Lifecycle: all handles borrowed. */
 export function dmGraphicsDisableVertexDeclaration(context: BorrowedHandle<"dmGraphics::HContext">, vertex_declaration: BorrowedHandle<"dmGraphics::HVertexDeclaration">): void { module().call(DmSdkBorrowedHandleId.dmGraphicsDisableVertexDeclaration, context, vertex_declaration); }
 
-/** Provider-validated borrowed call for dmGraphics::EnableVertexBuffer; does not transfer ownership. */
+/** Provider-validated call for dmGraphics::EnableVertexBuffer. Lifecycle: all handles borrowed. */
 export function dmGraphicsEnableVertexBuffer(context: BorrowedHandle<"dmGraphics::HContext">, vertex_buffer: BorrowedHandle<"dmGraphics::HVertexBuffer">, binding_index: number): void { module().call(DmSdkBorrowedHandleId.dmGraphicsEnableVertexBuffer, context, vertex_buffer, binding_index); }
 
-/** Provider-validated borrowed call for dmGraphics::DisableVertexBuffer; does not transfer ownership. */
+/** Provider-validated call for dmGraphics::DisableVertexBuffer. Lifecycle: all handles borrowed. */
 export function dmGraphicsDisableVertexBuffer(context: BorrowedHandle<"dmGraphics::HContext">, vertex_buffer: BorrowedHandle<"dmGraphics::HVertexBuffer">): void { module().call(DmSdkBorrowedHandleId.dmGraphicsDisableVertexBuffer, context, vertex_buffer); }
 
-/** Provider-validated borrowed call for dmGraphics::SetSampler; does not transfer ownership. */
+/** Provider-validated call for dmGraphics::SetSampler. Lifecycle: all handles borrowed. */
 export function dmGraphicsSetSampler(context: BorrowedHandle<"dmGraphics::HContext">, location: BorrowedHandle<"dmGraphics::HUniformLocation">, unit: number): void { module().call(DmSdkBorrowedHandleId.dmGraphicsSetSampler, context, location, unit); }
 
-/** Provider-validated borrowed call for dmGraphics::Clear; does not transfer ownership. */
+/** Provider-validated call for dmGraphics::DeleteProgram. Lifecycle: program:finalize, owned-descendants-finalized. */
+export function dmGraphicsDeleteProgram(context: BorrowedHandle<"dmGraphics::HContext">, program: BorrowedHandle<"dmGraphics::HProgram">): void { module().call(DmSdkBorrowedHandleId.dmGraphicsDeleteProgram, context, program); }
+
+/** Provider-validated call for dmGraphics::Clear. Lifecycle: all handles borrowed. */
 export function dmGraphicsClear(context: BorrowedHandle<"dmGraphics::HContext">, flags: number, red: number, green: number, blue: number, alpha: number, depth: number, stencil: number): void { module().call(DmSdkBorrowedHandleId.dmGraphicsClear, context, flags, red, green, blue, alpha, depth, stencil); }
 
-/** Provider-validated borrowed call for dmGui::SetNodeId; does not transfer ownership. */
+/** Provider-validated call for dmGui::DeleteNode. Lifecycle: node:finalize. */
+export function dmGuiDeleteNode(scene: BorrowedHandle<"dmGui::HScene">, node: BorrowedHandle<"dmGui::HNode">): void { module().call(DmSdkBorrowedHandleId.dmGuiDeleteNode, scene, node); }
+
+/** Provider-validated call for dmGui::SetNodeId. Lifecycle: all handles borrowed. */
 export function dmGuiSetNodeId(scene: BorrowedHandle<"dmGui::HScene">, node: BorrowedHandle<"dmGui::HNode">, id: bigint): void { module().call(DmSdkBorrowedHandleId.dmGuiSetNodeId, scene, node, id); }
 
-/** Provider-validated borrowed call for dmGui::GetNodeId; does not transfer ownership. */
+/** Provider-validated call for dmGui::GetNodeId. Lifecycle: all handles borrowed. */
 export function dmGuiGetNodeId(scene: BorrowedHandle<"dmGui::HScene">, node: BorrowedHandle<"dmGui::HNode">): bigint { return module().call(DmSdkBorrowedHandleId.dmGuiGetNodeId, scene, node) as bigint; }
 
-/** Provider-validated borrowed call for dmGui::GetNodeIsBone; does not transfer ownership. */
+/** Provider-validated call for dmGui::GetNodeIsBone. Lifecycle: all handles borrowed. */
 export function dmGuiGetNodeIsBone(scene: BorrowedHandle<"dmGui::HScene">, node: BorrowedHandle<"dmGui::HNode">): boolean { return module().call(DmSdkBorrowedHandleId.dmGuiGetNodeIsBone, scene, node) as boolean; }
 
-/** Provider-validated borrowed call for dmGui::SetNodeIsBone; does not transfer ownership. */
+/** Provider-validated call for dmGui::SetNodeIsBone. Lifecycle: all handles borrowed. */
 export function dmGuiSetNodeIsBone(scene: BorrowedHandle<"dmGui::HScene">, node: BorrowedHandle<"dmGui::HNode">, is_bone: boolean): void { module().call(DmSdkBorrowedHandleId.dmGuiSetNodeIsBone, scene, node, is_bone); }
 
-/** Provider-validated borrowed call for dmGui::GetNodeCustomType; does not transfer ownership. */
+/** Provider-validated call for dmGui::GetNodeCustomType. Lifecycle: all handles borrowed. */
 export function dmGuiGetNodeCustomType(scene: BorrowedHandle<"dmGui::HScene">, node: BorrowedHandle<"dmGui::HNode">): number { return module().call(DmSdkBorrowedHandleId.dmGuiGetNodeCustomType, scene, node) as number; }
 
-/** Provider-validated borrowed call for dmGui::GetNodeTextureId; does not transfer ownership. */
+/** Provider-validated call for dmGui::GetNodeTextureId. Lifecycle: all handles borrowed. */
 export function dmGuiGetNodeTextureId(scene: BorrowedHandle<"dmGui::HScene">, node: BorrowedHandle<"dmGui::HNode">): bigint { return module().call(DmSdkBorrowedHandleId.dmGuiGetNodeTextureId, scene, node) as bigint; }
 
-/** Provider-validated borrowed call for dmHID::SetGamepadButton; does not transfer ownership. */
+/** Provider-validated call for dmHID::SetGamepadButton. Lifecycle: all handles borrowed. */
 export function dmHidSetGamepadButton(gamepad: BorrowedHandle<"dmHID::HGamepad">, button: number, value: boolean): void { module().call(DmSdkBorrowedHandleId.dmHidSetGamepadButton, gamepad, button, value); }
 
-/** Provider-validated borrowed call for dmHID::SetGamepadAxis; does not transfer ownership. */
+/** Provider-validated call for dmHID::SetGamepadAxis. Lifecycle: all handles borrowed. */
 export function dmHidSetGamepadAxis(gamepad: BorrowedHandle<"dmHID::HGamepad">, axis: number, value: number): void { module().call(DmSdkBorrowedHandleId.dmHidSetGamepadAxis, gamepad, axis, value); }
 
-/** Provider-validated borrowed call for dmHID::SetMousePosition; does not transfer ownership. */
+/** Provider-validated call for dmHID::SetMousePosition. Lifecycle: all handles borrowed. */
 export function dmHidSetMousePosition(mouse: BorrowedHandle<"dmHID::HMouse">, x: number, y: number): void { module().call(DmSdkBorrowedHandleId.dmHidSetMousePosition, mouse, x, y); }
 
-/** Provider-validated borrowed call for dmHID::SetMouseWheel; does not transfer ownership. */
+/** Provider-validated call for dmHID::SetMouseWheel. Lifecycle: all handles borrowed. */
 export function dmHidSetMouseWheel(mouse: BorrowedHandle<"dmHID::HMouse">, value: number): void { module().call(DmSdkBorrowedHandleId.dmHidSetMouseWheel, mouse, value); }
 
-/** Provider-validated borrowed call for dmHID::AddKeyboardChar; does not transfer ownership. */
+/** Provider-validated call for dmHID::AddKeyboardChar. Lifecycle: all handles borrowed. */
 export function dmHidAddKeyboardChar(context: BorrowedHandle<"dmHID::HContext">, chr: number): void { module().call(DmSdkBorrowedHandleId.dmHidAddKeyboardChar, context, chr); }
 
-/** Provider-validated borrowed call for WindowShow; does not transfer ownership. */
+/** Provider-validated call for WindowDelete. Lifecycle: window:finalize. */
+export function windowDelete(window: BorrowedHandle<"HWindow">): void { module().call(DmSdkBorrowedHandleId.windowDelete, window); }
+
+/** Provider-validated call for WindowClose. Lifecycle: associated-window-closed. */
+export function windowClose(window: BorrowedHandle<"HWindow">): void { module().call(DmSdkBorrowedHandleId.windowClose, window); }
+
+/** Provider-validated call for WindowShow. Lifecycle: all handles borrowed. */
 export function windowShow(window: BorrowedHandle<"HWindow">): void { module().call(DmSdkBorrowedHandleId.windowShow, window); }
 
-/** Provider-validated borrowed call for WindowIconify; does not transfer ownership. */
+/** Provider-validated call for WindowIconify. Lifecycle: all handles borrowed. */
 export function windowIconify(window: BorrowedHandle<"HWindow">): void { module().call(DmSdkBorrowedHandleId.windowIconify, window); }
 
-/** Provider-validated borrowed call for WindowGetWidth; does not transfer ownership. */
+/** Provider-validated call for WindowGetWidth. Lifecycle: all handles borrowed. */
 export function windowGetWidth(window: BorrowedHandle<"HWindow">): number { return module().call(DmSdkBorrowedHandleId.windowGetWidth, window) as number; }
 
-/** Provider-validated borrowed call for WindowGetHeight; does not transfer ownership. */
+/** Provider-validated call for WindowGetHeight. Lifecycle: all handles borrowed. */
 export function windowGetHeight(window: BorrowedHandle<"HWindow">): number { return module().call(DmSdkBorrowedHandleId.windowGetHeight, window) as number; }
 
-/** Provider-validated borrowed call for WindowGetDisplayScaleFactor; does not transfer ownership. */
+/** Provider-validated call for WindowGetDisplayScaleFactor. Lifecycle: all handles borrowed. */
 export function windowGetDisplayScaleFactor(window: BorrowedHandle<"HWindow">): number { return module().call(DmSdkBorrowedHandleId.windowGetDisplayScaleFactor, window) as number; }
 
-/** Provider-validated borrowed call for WindowSetSize; does not transfer ownership. */
+/** Provider-validated call for WindowSetSize. Lifecycle: all handles borrowed. */
 export function windowSetSize(window: BorrowedHandle<"HWindow">, width: number, height: number): void { module().call(DmSdkBorrowedHandleId.windowSetSize, window, width, height); }
 
-/** Provider-validated borrowed call for WindowPollEvents; does not transfer ownership. */
+/** Provider-validated call for WindowPollEvents. Lifecycle: all handles borrowed. */
 export function windowPollEvents(window: BorrowedHandle<"HWindow">): void { module().call(DmSdkBorrowedHandleId.windowPollEvents, window); }
 
-/** Provider-validated borrowed call for dmRender::GetMaterialTagListKey; does not transfer ownership. */
+/** Provider-validated call for dmRender::GetMaterialTagListKey. Lifecycle: all handles borrowed. */
 export function dmRenderGetMaterialTagListKey(material: BorrowedHandle<"dmRender::HMaterial">): number { return module().call(DmSdkBorrowedHandleId.dmRenderGetMaterialTagListKey, material) as number; }
 
-/** Provider-validated borrowed call for dmRender::GetConstantName; does not transfer ownership. */
+/** Provider-validated call for dmRender::DeleteConstant. Lifecycle: constant:finalize. */
+export function dmRenderDeleteConstant(constant: BorrowedHandle<"dmRender::HConstant">): void { module().call(DmSdkBorrowedHandleId.dmRenderDeleteConstant, constant); }
+
+/** Provider-validated call for dmRender::GetConstantName. Lifecycle: all handles borrowed. */
 export function dmRenderGetConstantName(constant: BorrowedHandle<"dmRender::HConstant">): bigint { return module().call(DmSdkBorrowedHandleId.dmRenderGetConstantName, constant) as bigint; }
 
-/** Provider-validated borrowed call for dmRender::SetConstantName; does not transfer ownership. */
+/** Provider-validated call for dmRender::SetConstantName. Lifecycle: all handles borrowed. */
 export function dmRenderSetConstantName(constant: BorrowedHandle<"dmRender::HConstant">, name: bigint): void { module().call(DmSdkBorrowedHandleId.dmRenderSetConstantName, constant, name); }
 
-/** Provider-validated borrowed call for dmRender::SetConstantLocation; does not transfer ownership. */
+/** Provider-validated call for dmRender::SetConstantLocation. Lifecycle: all handles borrowed. */
 export function dmRenderSetConstantLocation(constant: BorrowedHandle<"dmRender::HConstant">, location: BorrowedHandle<"dmGraphics::HUniformLocation">): void { module().call(DmSdkBorrowedHandleId.dmRenderSetConstantLocation, constant, location); }
 
-/** Provider-validated borrowed call for dmRender::ClearNamedConstantBuffer; does not transfer ownership. */
+/** Provider-validated call for dmRender::DeleteNamedConstantBuffer. Lifecycle: buffer:finalize. */
+export function dmRenderDeleteNamedConstantBuffer(buffer: BorrowedHandle<"dmRender::HNamedConstantBuffer">): void { module().call(DmSdkBorrowedHandleId.dmRenderDeleteNamedConstantBuffer, buffer); }
+
+/** Provider-validated call for dmRender::ClearNamedConstantBuffer. Lifecycle: all handles borrowed. */
 export function dmRenderClearNamedConstantBuffer(buffer: BorrowedHandle<"dmRender::HNamedConstantBuffer">): void { module().call(DmSdkBorrowedHandleId.dmRenderClearNamedConstantBuffer, buffer); }
 
-/** Provider-validated borrowed call for dmRender::RemoveNamedConstant; does not transfer ownership. */
+/** Provider-validated call for dmRender::RemoveNamedConstant. Lifecycle: all handles borrowed. */
 export function dmRenderRemoveNamedConstant(buffer: BorrowedHandle<"dmRender::HNamedConstantBuffer">, name_hash: bigint): void { module().call(DmSdkBorrowedHandleId.dmRenderRemoveNamedConstant, buffer, name_hash); }
 
-/** Provider-validated borrowed call for dmRender::GetNamedConstantCount; does not transfer ownership. */
+/** Provider-validated call for dmRender::GetNamedConstantCount. Lifecycle: all handles borrowed. */
 export function dmRenderGetNamedConstantCount(buffer: BorrowedHandle<"dmRender::HNamedConstantBuffer">): number { return module().call(DmSdkBorrowedHandleId.dmRenderGetNamedConstantCount, buffer) as number; }
 
-/** Provider-validated borrowed call for dmRender::ClearMaterialTags; does not transfer ownership. */
+/** Provider-validated call for dmRender::DeleteMaterial. Lifecycle: material:finalize. */
+export function dmRenderDeleteMaterial(render_context: BorrowedHandle<"dmRender::HRenderContext">, material: BorrowedHandle<"dmRender::HMaterial">): void { module().call(DmSdkBorrowedHandleId.dmRenderDeleteMaterial, render_context, material); }
+
+/** Provider-validated call for dmRender::ClearMaterialTags. Lifecycle: all handles borrowed. */
 export function dmRenderClearMaterialTags(material: BorrowedHandle<"dmRender::HMaterial">): void { module().call(DmSdkBorrowedHandleId.dmRenderClearMaterialTags, material); }
 
-/** Provider-validated borrowed call for dmRender::GetMaterialSamplerNameHash; does not transfer ownership. */
+/** Provider-validated call for dmRender::GetMaterialSamplerNameHash. Lifecycle: all handles borrowed. */
 export function dmRenderGetMaterialSamplerNameHash(material: BorrowedHandle<"dmRender::HMaterial">, unit: number): bigint { return module().call(DmSdkBorrowedHandleId.dmRenderGetMaterialSamplerNameHash, material, unit) as bigint; }
 
-/** Provider-validated borrowed call for dmRender::GetMaterialSamplerUnit; does not transfer ownership. */
+/** Provider-validated call for dmRender::GetMaterialSamplerUnit. Lifecycle: all handles borrowed. */
 export function dmRenderGetMaterialSamplerUnit(material: BorrowedHandle<"dmRender::HMaterial">, name_hash: bigint): number { return module().call(DmSdkBorrowedHandleId.dmRenderGetMaterialSamplerUnit, material, name_hash) as number; }
 
-/** Provider-validated borrowed call for dmRender::ApplyMaterialSampler; does not transfer ownership. */
+/** Provider-validated call for dmRender::ApplyMaterialSampler. Lifecycle: all handles borrowed. */
 export function dmRenderApplyMaterialSampler(render_context: BorrowedHandle<"dmRender::HRenderContext">, material: BorrowedHandle<"dmRender::HMaterial">, sampler: BorrowedHandle<"dmRender::HSampler">, value_index: number, texture: BorrowedHandle<"dmGraphics::HTexture">): void { module().call(DmSdkBorrowedHandleId.dmRenderApplyMaterialSampler, render_context, material, sampler, value_index, texture); }
 
-/** Provider-validated borrowed call for ResourceDescriptorGetNameHash; does not transfer ownership. */
+/** Provider-validated call for ResourceDescriptorGetNameHash. Lifecycle: all handles borrowed. */
 export function resourceDescriptorGetNameHash(rd: BorrowedHandle<"HResourceDescriptor">): bigint { return module().call(DmSdkBorrowedHandleId.resourceDescriptorGetNameHash, rd) as bigint; }
 
-/** Provider-validated borrowed call for ResourceDescriptorSetResourceSize; does not transfer ownership. */
+/** Provider-validated call for ResourceDescriptorSetResourceSize. Lifecycle: all handles borrowed. */
 export function resourceDescriptorSetResourceSize(rd: BorrowedHandle<"HResourceDescriptor">, size: number): void { module().call(DmSdkBorrowedHandleId.resourceDescriptorSetResourceSize, rd, size); }
 
-/** Provider-validated borrowed call for ResourceDescriptorGetResourceSize; does not transfer ownership. */
+/** Provider-validated call for ResourceDescriptorGetResourceSize. Lifecycle: all handles borrowed. */
 export function resourceDescriptorGetResourceSize(rd: BorrowedHandle<"HResourceDescriptor">): number { return module().call(DmSdkBorrowedHandleId.resourceDescriptorGetResourceSize, rd) as number; }
 
-/** Provider-validated borrowed call for ResourceTypeGetNameHash; does not transfer ownership. */
+/** Provider-validated call for ResourceDescriptorIncRef. Lifecycle: rd:retain. */
+export function resourceDescriptorIncRef(factory: BorrowedHandle<"HResourceFactory">, rd: BorrowedHandle<"HResourceDescriptor">): void { module().call(DmSdkBorrowedHandleId.resourceDescriptorIncRef, factory, rd); }
+
+/** Provider-validated call for ResourceTypeGetNameHash. Lifecycle: all handles borrowed. */
 export function resourceTypeGetNameHash(type: BorrowedHandle<"HResourceType">): bigint { return module().call(DmSdkBorrowedHandleId.resourceTypeGetNameHash, type) as bigint; }
 
-/** Provider-validated borrowed call for ResourceTypeSetStreaming; does not transfer ownership. */
+/** Provider-validated call for ResourceTypeSetStreaming. Lifecycle: all handles borrowed. */
 export function resourceTypeSetStreaming(type: BorrowedHandle<"HResourceType">, preload_size: number): void { module().call(DmSdkBorrowedHandleId.resourceTypeSetStreaming, type, preload_size); }
 
-/** Provider-validated borrowed call for ResourceTypeIsStreaming; does not transfer ownership. */
+/** Provider-validated call for ResourceTypeIsStreaming. Lifecycle: all handles borrowed. */
 export function resourceTypeIsStreaming(type: BorrowedHandle<"HResourceType">): boolean { return module().call(DmSdkBorrowedHandleId.resourceTypeIsStreaming, type) as boolean; }
 
-/** Provider-validated borrowed call for ResourceTypeGetPreloadSize; does not transfer ownership. */
+/** Provider-validated call for ResourceTypeGetPreloadSize. Lifecycle: all handles borrowed. */
 export function resourceTypeGetPreloadSize(type: BorrowedHandle<"HResourceType">): number { return module().call(DmSdkBorrowedHandleId.resourceTypeGetPreloadSize, type) as number; }
 
-/** Provider-validated borrowed call for ResourceTypeReset; does not transfer ownership. */
+/** Provider-validated call for ResourceTypeReset. Lifecycle: all handles borrowed. */
 export function resourceTypeReset(type: BorrowedHandle<"HResourceType">): void { module().call(DmSdkBorrowedHandleId.resourceTypeReset, type); }
 
-/** Provider-validated borrowed call for dmResource::GetNameHash; does not transfer ownership. */
+/** Provider-validated call for dmResource::IncRef. Lifecycle: rd:retain. */
+export function dmResourceIncRef(factory: BorrowedHandle<"dmResource::HFactory">, rd: BorrowedHandle<"HResourceDescriptor">): void { module().call(DmSdkBorrowedHandleId.dmResourceIncRef, factory, rd); }
+
+/** Provider-validated call for dmResource::FreeResourceType. Lifecycle: type:finalize. */
+export function dmResourceFreeResourceType(factory: BorrowedHandle<"dmResource::HFactory">, type: BorrowedHandle<"HResourceType">): void { module().call(DmSdkBorrowedHandleId.dmResourceFreeResourceType, factory, type); }
+
+/** Provider-validated call for dmResource::GetNameHash. Lifecycle: all handles borrowed. */
 export function dmResourceGetNameHashFromHResourceType(type: BorrowedHandle<"HResourceType">): bigint { return module().call(DmSdkBorrowedHandleId.dmResourceGetNameHashFromHResourceType, type) as bigint; }
 
-/** Provider-validated borrowed call for dmResource::GetNameHash; does not transfer ownership. */
+/** Provider-validated call for dmResource::GetNameHash. Lifecycle: all handles borrowed. */
 export function dmResourceGetNameHashFromHDescriptor(rd: BorrowedHandle<"dmResource::HDescriptor">): bigint { return module().call(DmSdkBorrowedHandleId.dmResourceGetNameHashFromHDescriptor, rd) as bigint; }
 
-/** Provider-validated borrowed call for dmResource::SetResourceSize; does not transfer ownership. */
+/** Provider-validated call for dmResource::SetResourceSize. Lifecycle: all handles borrowed. */
 export function dmResourceSetResourceSize(rd: BorrowedHandle<"dmResource::HDescriptor">, size: number): void { module().call(DmSdkBorrowedHandleId.dmResourceSetResourceSize, rd, size); }
 
-/** Provider-validated borrowed call for dmResource::GetResourceSize; does not transfer ownership. */
+/** Provider-validated call for dmResource::GetResourceSize. Lifecycle: all handles borrowed. */
 export function dmResourceGetResourceSize(rd: BorrowedHandle<"dmResource::HDescriptor">): number { return module().call(DmSdkBorrowedHandleId.dmResourceGetResourceSize, rd) as number; }
 
-/** Provider-validated borrowed call for dmRig::GetAnimation; does not transfer ownership. */
+/** Provider-validated call for dmRig::DeleteContext. Lifecycle: context:finalize. */
+export function dmRigDeleteContext(context: BorrowedHandle<"dmRig::HRigContext">): void { module().call(DmSdkBorrowedHandleId.dmRigDeleteContext, context); }
+
+/** Provider-validated call for dmRig::GetAnimation. Lifecycle: all handles borrowed. */
 export function dmRigGetAnimation(instance: BorrowedHandle<"dmRig::HRigInstance">): bigint { return module().call(DmSdkBorrowedHandleId.dmRigGetAnimation, instance) as bigint; }
 
-/** Provider-validated borrowed call for dmRig::GetVertexCount; does not transfer ownership. */
+/** Provider-validated call for dmRig::GetVertexCount. Lifecycle: all handles borrowed. */
 export function dmRigGetVertexCount(instance: BorrowedHandle<"dmRig::HRigInstance">): number { return module().call(DmSdkBorrowedHandleId.dmRigGetVertexCount, instance) as number; }
 
-/** Provider-validated borrowed call for dmRig::GetModel; does not transfer ownership. */
+/** Provider-validated call for dmRig::GetModel. Lifecycle: all handles borrowed. */
 export function dmRigGetModel(instance: BorrowedHandle<"dmRig::HRigInstance">): bigint { return module().call(DmSdkBorrowedHandleId.dmRigGetModel, instance) as bigint; }
 
-/** Provider-validated borrowed call for dmRig::GetCursor; does not transfer ownership. */
+/** Provider-validated call for dmRig::GetCursor. Lifecycle: all handles borrowed. */
 export function dmRigGetCursor(instance: BorrowedHandle<"dmRig::HRigInstance">, normalized: boolean): number { return module().call(DmSdkBorrowedHandleId.dmRigGetCursor, instance, normalized) as number; }
 
-/** Provider-validated borrowed call for dmRig::GetPlaybackRate; does not transfer ownership. */
+/** Provider-validated call for dmRig::GetPlaybackRate. Lifecycle: all handles borrowed. */
 export function dmRigGetPlaybackRate(instance: BorrowedHandle<"dmRig::HRigInstance">): number { return module().call(DmSdkBorrowedHandleId.dmRigGetPlaybackRate, instance) as number; }
 
-/** Provider-validated borrowed call for dmRig::ResetIKTarget; does not transfer ownership. */
+/** Provider-validated call for dmRig::ResetIKTarget. Lifecycle: all handles borrowed. */
 export function dmRigResetIktarget(instance: BorrowedHandle<"dmRig::HRigInstance">, constraint_id: bigint): boolean { return module().call(DmSdkBorrowedHandleId.dmRigResetIktarget, instance, constraint_id) as boolean; }
 
-/** Provider-validated borrowed call for dmRig::SetEnabled; does not transfer ownership. */
+/** Provider-validated call for dmRig::SetEnabled. Lifecycle: all handles borrowed. */
 export function dmRigSetEnabled(instance: BorrowedHandle<"dmRig::HRigInstance">, enabled: boolean): void { module().call(DmSdkBorrowedHandleId.dmRigSetEnabled, instance, enabled); }
 
-/** Provider-validated borrowed call for dmRig::GetEnabled; does not transfer ownership. */
+/** Provider-validated call for dmRig::GetEnabled. Lifecycle: all handles borrowed. */
 export function dmRigGetEnabled(instance: BorrowedHandle<"dmRig::HRigInstance">): boolean { return module().call(DmSdkBorrowedHandleId.dmRigGetEnabled, instance) as boolean; }
 
-/** Provider-validated borrowed call for dmRig::IsValid; does not transfer ownership. */
+/** Provider-validated call for dmRig::IsValid. Lifecycle: all handles borrowed. */
 export function dmRigIsValid(instance: BorrowedHandle<"dmRig::HRigInstance">): boolean { return module().call(DmSdkBorrowedHandleId.dmRigIsValid, instance) as boolean; }
 
-/** Provider-validated borrowed call for dmRig::GetBoneCount; does not transfer ownership. */
+/** Provider-validated call for dmRig::GetBoneCount. Lifecycle: all handles borrowed. */
 export function dmRigGetBoneCount(instance: BorrowedHandle<"dmRig::HRigInstance">): number { return module().call(DmSdkBorrowedHandleId.dmRigGetBoneCount, instance) as number; }
 
-/** Provider-validated borrowed call for dmRig::GetMaxBoneCount; does not transfer ownership. */
+/** Provider-validated call for dmRig::GetMaxBoneCount. Lifecycle: all handles borrowed. */
 export function dmRigGetMaxBoneCount(instance: BorrowedHandle<"dmRig::HRigInstance">): number { return module().call(DmSdkBorrowedHandleId.dmRigGetMaxBoneCount, instance) as number; }
 
-/** Provider-validated borrowed call for dmRig::HasPoseMatrixCacheAnimatedPose; does not transfer ownership. */
+/** Provider-validated call for dmRig::HasPoseMatrixCacheAnimatedPose. Lifecycle: all handles borrowed. */
 export function dmRigHasPoseMatrixCacheAnimatedPose(instance: BorrowedHandle<"dmRig::HRigInstance">): boolean { return module().call(DmSdkBorrowedHandleId.dmRigHasPoseMatrixCacheAnimatedPose, instance) as boolean; }

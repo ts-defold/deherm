@@ -44,7 +44,7 @@ test("scratch plan covers every structural match and preserves universal fallbac
   assert.equal(plan.coverage.structurallyRelevant, 30);
   assert.equal(plan.coverage.selected, 11);
   assert.equal(plan.coverage.sourceDerived, 6);
-  assert.equal(plan.coverage.compatibilityPreserved, 5);
+  assert.equal(plan.coverage.defoldContractTrusted, 5);
   assert.equal(plan.coverage.universalFallback, 19);
   assert.equal(plan.decisions.length, 30);
   assert.ok(plan.decisions.every((decision) => decision.universalFallback.preserved));
@@ -61,7 +61,7 @@ test("scratch plan covers every structural match and preserves universal fallbac
   );
   assert.ok(
     plan.decisions
-      .filter((decision) => decision.admission === "compatibility-preserved")
+      .filter((decision) => decision.admission === "defold-contract-trusted")
       .every(
         (decision) =>
           decision.blockers.length === 0 &&
@@ -110,7 +110,7 @@ test("withdrawing source proof demotes a newly inferred route to universal fallb
       admission === "source-derived" &&
       value.shapes.rows.find(({ id }) => id === declarationId)?.tranche !== value.policy.family,
   );
-  assert.ok(sourceDecision, "expected a source-derived route outside the compatibility tranche");
+  assert.ok(sourceDecision, "expected a source-derived route outside the Defold-contract tranche");
   const changed = structuredClone(value);
   const fact = changed.effectFacts.functions.find(
     ({ declarationId }) => declarationId === sourceDecision.declarationId,
