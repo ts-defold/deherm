@@ -15,7 +15,7 @@
   },
   "policy": {
     "required-now": "Public 0.1 facade required for the proven Chrome-to-Deno War Battles path.",
-    "compatibility-required": "Pre-CR browser and Deno shape retained until createWritable is deployed across the exercised runtimes.",
+    "compatibility-required": "The pre-CR datagrams.writable browser and Deno shape remains accepted as an additive compatibility fallback.",
     "forward-compatible": "Reserved WebTransport shape; addition must be capability-tested and must not be silently emulated with different semantics."
   },
   "generation": {
@@ -57,9 +57,9 @@
     },
     {
       "id": "datagrams",
-      "requiredNow": ["datagrams.readable", "datagrams.maxDatagramSize"],
+      "requiredNow": ["datagrams.readable", "datagrams.createWritable(options?)", "datagrams.maxDatagramSize"],
       "compatibilityRequired": ["datagrams.writable"],
-      "forwardCompatible": ["datagrams.createWritable(options?)", "datagrams.incomingMaxAge", "datagrams.outgoingMaxAge", "datagrams.incomingMaxBufferedDatagrams", "datagrams.outgoingMaxBufferedDatagrams", "WebTransportDatagramsWritable.sendGroup", "WebTransportDatagramsWritable.sendOrder"]
+      "forwardCompatible": ["datagrams.incomingMaxAge", "datagrams.outgoingMaxAge", "datagrams.incomingMaxBufferedDatagrams", "datagrams.outgoingMaxBufferedDatagrams", "WebTransportDatagramsWritable.sendGroup", "WebTransportDatagramsWritable.sendOrder"]
     },
     {
       "id": "unidirectional-streams",
@@ -109,6 +109,7 @@
       "closed",
       "close",
       "datagrams.readable",
+      "datagrams.createWritable",
       "datagrams.writable",
       "datagrams.maxDatagramSize",
       "createUnidirectionalStream",

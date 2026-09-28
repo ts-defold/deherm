@@ -1,0 +1,10 @@
+{
+  "name": "@deherm/example-defold-webtransport-minimal",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "cert": "deno task cert",
+    "server": "deno task server",
+    "check": "deno task check"
+  }
+}

@@ -28,6 +28,15 @@ Native does not assume DOM Web Streams: the generated facade owns bounded
 structural streams and registers its frame drain internally. Native 0.1
 requires exactly one SHA-256 certificate pin; browser delegation can use normal
 browser root trust.
+
+The HTML5 backend prefers the current Candidate Recommendation datagram
+factory, `transport.datagrams.createWritable()`, and retains
+`transport.datagrams.writable` for older Deno/browser implementations. Safari
+26.4 introduced WebTransport, but browser feature presence is not an end-to-end
+interop guarantee: applications should exercise the datagram and stream shapes
+they require. On browsers with no usable WebTransport implementation, session
+creation fails explicitly; the extension never disguises WebSocket or WebRTC
+as QUIC. The application owns routing and fallback policy.
 `defold_webtransport/webtransport/public-api-compatibility.json` records the
 versioned required waist and the Candidate Recommendation members reserved for
 additive implementation; it is not a second native method catalog.
@@ -50,6 +59,11 @@ authors may instead consume the stable `native_v1.h` handle/poll ABI; that
 single explicitly low-level header is not the recommended application API.
 Release packaging fails closed unless the HTML5 backend and every native
 library declared by `ext.manifest` have been staged.
+
+The repository includes `examples/defold-webtransport-minimal`: an ordinary
+Lua Defold client and a tiny Deno QUIC/WebTransport echo server. It exercises
+datagrams and a bidirectional stream without installing déherm or importing
+War Battles protocol code.
 
 ## Native artifacts
 

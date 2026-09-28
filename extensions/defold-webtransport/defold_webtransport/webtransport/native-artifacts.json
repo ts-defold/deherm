@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "repository": "ts-defold/deherm",
-  "tag": "defold-webtransport-native-a631a34671a6",
-  "fingerprint": "a631a34671a62f54acb11d82a0061e631f65c2907573a2dceb86372882d23567",
-  "abiSha256": "544a26fded780ef78910acb8ad39fb1bd76fe9c7af0c12151c49be3fcfb65543",
+  "tag": "defold-webtransport-native-605d781f314e",
+  "fingerprint": "605d781f314e54a510205607c0a4ccb0284e0a71ca62877b7e79c2d17629c9e9",
+  "abiSha256": "f43dda649b3e44ff177666b62ac69a81ba420dc0764a0ed63b9de25e3546b8bc",
   "assets": [
     {
       "target": "arm64-android",

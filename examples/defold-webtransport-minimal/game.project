@@ -1,0 +1,11 @@
+[project]
+title = Defold WebTransport Minimal Echo
+version = 0.1.0
+dependencies#0 = https://github.com/ts-defold/deherm/releases/download/defold-webtransport-v0.1.0/defold-webtransport-0.1.0.zip
+
+[bootstrap]
+main_collection = /main/main.collectionc
+
+[display]
+width = 640
+height = 360

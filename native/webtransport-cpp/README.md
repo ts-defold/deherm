@@ -10,7 +10,7 @@ under `defold_webtransport/lib/<platform>/`.
 
 | dependency | revision | license |
 | --- | --- | --- |
-| picoquic / h3zero / picowt | `8616f9d402cf886ade825e299e781a24fb4293db` | BSD-2-Clause |
+| picoquic / h3zero / picowt | `8616f9d402cf886ade825e299e781a24fb4293db` | MIT |
 | picotls | `bfa67875982afc4c24f21e146cef4747fa189c2f` | MIT |
 | Mbed TLS 3.6.7 | `068ff080b369adfac81509f9b57b2afabaf82dc5` | Apache-2.0 OR GPL-2.0-or-later |
 | mbedtls-framework | `dde0c4a0e448a0552f18817dcea633bb851fd288` | Apache-2.0 |

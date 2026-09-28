@@ -10,7 +10,7 @@ import { unzipSync } from "fflate";
 import {
   describeDefoldWebtransportPackage,
   packageDefoldWebtransport,
-  repositoryRoot
+  repositoryRoot,
 } from "../scripts/package-defold-webtransport.mjs";
 import { nativeArtifactAbiSha256 } from "../packages/cli/src/webtransport-artifacts.mjs";
 
@@ -26,39 +26,55 @@ async function fixture(root, { version = "1.2.3" } = {}) {
   await mkdir(path.join(extension, "script"), { recursive: true });
   await mkdir(path.join(extension, "src"), { recursive: true });
   await mkdir(path.join(extension, "lib/web"), { recursive: true });
+  await mkdir(path.join(extension, "licenses"), { recursive: true });
   await mkdir(path.join(extension, "webtransport"), { recursive: true });
   await writeFile(path.join(root, "VERSION"), `${version}\n`);
   await writeFile(path.join(root, "game.project"), `[project]\ntitle = Defold WebTransport\nversion = ${version}\n`);
   await writeFile(path.join(extension, "ext.manifest"), "name: DefoldWebTransport\nplatforms: {}\n");
   await writeFile(
     path.join(extension, "include/defold_webtransport/defold_webtransport.h"),
-    "#pragma once\nunsigned int defold_webtransport_abi_version(void);\n"
+    "#pragma once\nunsigned int defold_webtransport_abi_version(void);\n",
   );
   await writeFile(
     path.join(extension, "script/defold_webtransport.script_api"),
-    "- name: defold_webtransport\n  type: table\n"
+    "- name: defold_webtransport\n  type: table\n",
   );
   await writeFile(path.join(extension, "src/extension.cpp"), "// fixture\n");
   await writeFile(path.join(extension, "lib/web/library_defold_webtransport.js"), "// browser backend fixture\n");
+  await writeFile(path.join(extension, "CHANGELOG.md"), "# Changelog\n");
+  for (const license of [
+    "LICENSE.txt",
+    "THIRD_PARTY_NOTICES.md",
+    "Apache-2.0-Mbed-TLS.txt",
+    "BSD-2-Clause-micro-ecc.txt",
+    "CC0-1.0-cifra.txt",
+    "MIT-picoquic.txt",
+    "MIT-picotls.txt",
+  ])
+    await writeFile(path.join(extension, "licenses", license), `${license}\n`);
   await writeFile(
     path.join(extension, "webtransport/defold-hermes.bindings.json"),
-    `${JSON.stringify({ schemaVersion: 1, publicHeader: "include/defold_webtransport/defold_webtransport.h" })}\n`
+    `${JSON.stringify({ schemaVersion: 1, publicHeader: "include/defold_webtransport/defold_webtransport.h" })}\n`,
   );
   await writeFile(
     path.join(extension, "webtransport/public-api-compatibility.json"),
-    `${JSON.stringify({ schemaVersion: 1, contractVersion: version })}\n`
+    `${JSON.stringify({ schemaVersion: 1, contractVersion: version })}\n`,
   );
   const fingerprint = "a".repeat(64);
   await writeFile(
     path.join(extension, "webtransport/native-artifacts.json"),
-    `${JSON.stringify({
-      schemaVersion: 1,
-      repository: "ts-defold/deherm",
-      tag: `defold-webtransport-native-${fingerprint.slice(0, 12)}`,
-      fingerprint,
-      abiSha256: await nativeArtifactAbiSha256(extension),
-      assets: []
-    }, null, 2)}\n`
+    `${JSON.stringify(
+      {
+        schemaVersion: 1,
+        repository: "ts-defold/deherm",
+        tag: `defold-webtransport-native-${fingerprint.slice(0, 12)}`,
+        fingerprint,
+        abiSha256: await nativeArtifactAbiSha256(extension),
+        assets: [],
+      },
+      null,
+      2,
+    )}\n`,
   );
   await writeFile(path.join(root, "README.md"), "source-only release instructions\n");
 }
@@ -77,15 +93,23 @@ test("standalone package has Defold dependency layout and its own version", asyn
   assert.match(result.sha256, /^[a-f0-9]{64}$/u);
   const members = Object.keys(unzipSync(await readFile(result.archivePath))).sort();
   assert.deepEqual(members, [
+    "defold_webtransport/CHANGELOG.md",
     "defold_webtransport/ext.manifest",
     "defold_webtransport/include/defold_webtransport/defold_webtransport.h",
     "defold_webtransport/lib/web/library_defold_webtransport.js",
+    "defold_webtransport/licenses/Apache-2.0-Mbed-TLS.txt",
+    "defold_webtransport/licenses/BSD-2-Clause-micro-ecc.txt",
+    "defold_webtransport/licenses/CC0-1.0-cifra.txt",
+    "defold_webtransport/licenses/LICENSE.txt",
+    "defold_webtransport/licenses/MIT-picoquic.txt",
+    "defold_webtransport/licenses/MIT-picotls.txt",
+    "defold_webtransport/licenses/THIRD_PARTY_NOTICES.md",
     "defold_webtransport/script/defold_webtransport.script_api",
     "defold_webtransport/src/extension.cpp",
     "defold_webtransport/webtransport/defold-hermes.bindings.json",
     "defold_webtransport/webtransport/native-artifacts.json",
     "defold_webtransport/webtransport/public-api-compatibility.json",
-    "game.project"
+    "game.project",
   ]);
   assert.ok(members.every((member) => member === "game.project" || member.startsWith("defold_webtransport/")));
 });
@@ -114,7 +138,7 @@ test("dogfood staging tree contains the exact bytes represented by the archive",
   const result = await packageDefoldWebtransport({
     sourceRoot: source,
     outputRoot: path.join(directory, "out"),
-    stageRoot: stage
+    stageRoot: stage,
   });
   const archive = unzipSync(await readFile(result.archivePath));
   for (const member of result.members) {
@@ -127,7 +151,7 @@ test("version override verifies VERSION rather than renaming unrelated bytes", a
   await fixture(directory);
   await assert.rejects(
     describeDefoldWebtransportPackage({ sourceRoot: directory, requestedVersion: "1.2.4" }),
-    /does not match VERSION 1\.2\.3/u
+    /does not match VERSION 1\.2\.3/u,
   );
 });
 
@@ -137,7 +161,7 @@ test("game.project and release authority cannot carry different versions", async
   await writeFile(path.join(directory, "game.project"), "[project]\ntitle = Defold WebTransport\nversion = 9.9.9\n");
   await assert.rejects(
     describeDefoldWebtransportPackage({ sourceRoot: directory }),
-    /game\.project version 9\.9\.9 does not match VERSION 1\.2\.3/u
+    /game\.project version 9\.9\.9 does not match VERSION 1\.2\.3/u,
   );
 });
 
@@ -146,6 +170,16 @@ test("package fails closed when public API metadata is absent", async (t) => {
   await fixture(directory);
   await rm(path.join(directory, "defold_webtransport/script/defold_webtransport.script_api"));
   await assert.rejects(describeDefoldWebtransportPackage({ sourceRoot: directory }), /script_api documentation/u);
+});
+
+test("package fails closed when license or attribution files are absent", async (t) => {
+  const directory = await scratch(t);
+  await fixture(directory);
+  await rm(path.join(directory, "defold_webtransport/licenses/THIRD_PARTY_NOTICES.md"));
+  await assert.rejects(
+    describeDefoldWebtransportPackage({ sourceRoot: directory }),
+    /required license or attribution file/u,
+  );
 });
 
 test("package refuses a source-only extension without the functional HTML5 backend", async (t) => {
@@ -158,13 +192,16 @@ test("package refuses a source-only extension without the functional HTML5 backe
 test("every bundled native library declared by ext.manifest must be staged for its target", async (t) => {
   const directory = await scratch(t);
   await fixture(directory);
-  await writeFile(path.join(directory, "defold_webtransport/ext.manifest"), `
+  await writeFile(
+    path.join(directory, "defold_webtransport/ext.manifest"),
+    `
 name: DefoldWebTransport
 platforms:
   arm64-osx:
     context:
       libs: [defold_webtransport_core, picoquic-core]
-`);
+`,
+  );
   await mkdir(path.join(directory, "defold_webtransport/lib/arm64-osx"), { recursive: true });
   await writeFile(path.join(directory, "defold_webtransport/lib/arm64-osx/libdefold_webtransport_core.a"), "fixture\n");
   await assert.rejects(describeDefoldWebtransportPackage({ sourceRoot: directory }), /libpicoquic-core\.a/u);
@@ -182,11 +219,11 @@ test("package refuses a stale public API compatibility contract", async (t) => {
   await fixture(directory);
   await writeFile(
     path.join(directory, "defold_webtransport/webtransport/public-api-compatibility.json"),
-    `${JSON.stringify({ schemaVersion: 1, contractVersion: "1.2.2" })}\n`
+    `${JSON.stringify({ schemaVersion: 1, contractVersion: "1.2.2" })}\n`,
   );
   await assert.rejects(
     describeDefoldWebtransportPackage({ sourceRoot: directory }),
-    /public API contract version 1\.2\.2 does not match VERSION 1\.2\.3/u
+    /public API contract version 1\.2\.2 does not match VERSION 1\.2\.3/u,
   );
 });
 
@@ -202,7 +239,7 @@ test("package refuses symlinks so archive inputs cannot escape the extension roo
 test("release workflow keys the immutable asset to the extension version", async () => {
   const workflow = await readFile(
     path.join(repositoryRoot, ".github/workflows/defold-webtransport-release.yml"),
-    "utf8"
+    "utf8",
   );
   assert.match(workflow, /defold-webtransport-v\$\{version\}/u);
   assert.match(workflow, /defold-webtransport-\$\{version\}\.zip/u);

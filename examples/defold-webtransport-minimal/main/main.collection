@@ -1,0 +1,5 @@
+name: "webtransport_echo"
+instances {
+  id: "client"
+  prototype: "/main/client.go"
+}

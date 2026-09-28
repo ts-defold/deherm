@@ -84,7 +84,7 @@ class FakeWebTransport {
     this.datagrams = {
       maxDatagramSize: 1200,
       readable: { getReader: () => new EmptyReader() },
-      writable: { getWriter: () => this.datagramWriter }
+      createWritable: () => ({ getWriter: () => this.datagramWriter })
     };
     this.incomingBidirectionalReader = new PushReader();
     this.incomingUnidirectionalReader = new PushReader();
@@ -137,6 +137,21 @@ const context = vm.createContext({
   }
 });
 vm.runInContext(source, context, { filename: "library_defold_webtransport.js" });
+
+{
+  const current = new PendingWriter();
+  assert.equal(context.DefoldWebTransport.datagramWriter({
+    createWritable: () => ({ getWriter: () => current })
+  }), current);
+  const legacy = new PendingWriter();
+  assert.equal(context.DefoldWebTransport.datagramWriter({
+    writable: { getWriter: () => legacy }
+  }), legacy);
+  assert.throws(
+    () => context.DefoldWebTransport.datagramWriter({}),
+    /datagram writer is unavailable/u
+  );
+}
 
 function putString(value) {
   const bytes = encoder.encode(value);

@@ -1,0 +1,10 @@
+{
+  "tasks": {
+    "cert": "deno run --allow-run=openssl --allow-read=. --allow-write=. generate-certificate.ts",
+    "server": "deno run --unstable-net --allow-net --allow-read=cert.pem,key.pem --allow-env=HOST,PORT server.ts",
+    "check": "deno check --unstable-net server.ts generate-certificate.ts"
+  },
+  "compilerOptions": {
+    "strict": true
+  }
+}

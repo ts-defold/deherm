@@ -256,6 +256,16 @@ var LibraryDefoldWebTransport = {
         reader.releaseLock();
       }
     },
+    datagramWriter: function (datagrams) {
+      if (!datagrams) throw new Error("browser WebTransport datagrams are unavailable");
+      var writable = typeof datagrams.createWritable === "function"
+        ? datagrams.createWritable()
+        : datagrams.writable;
+      if (!writable || typeof writable.getWriter !== "function") {
+        throw new Error("browser WebTransport datagram writer is unavailable");
+      }
+      return writable.getWriter();
+    },
     closeSession: function (session) {
       if (!session || session.destroyed) return;
       session.destroyed = true;
@@ -328,7 +338,7 @@ var LibraryDefoldWebTransport = {
       if (session.destroyed || session.closeRequested) return;
       session.ready = true;
       session.state = 2;
-      session.datagramWriter = session.transport.datagrams.writable.getWriter();
+      session.datagramWriter = DefoldWebTransport.datagramWriter(session.transport.datagrams);
       DefoldWebTransport.enqueue(session, {type: 1});
       DefoldWebTransport.readDatagrams(session);
       DefoldWebTransport.readIncoming(session, session.transport.incomingBidirectionalStreams, true);
@@ -527,7 +537,7 @@ var LibraryDefoldWebTransport = {
     session.transport.ready.then(function () {
       if (session.destroyed || session.closeRequested) return;
       session.ready = true; session.state = 2;
-      session.datagramWriter = session.transport.datagrams.writable.getWriter();
+      session.datagramWriter = DefoldWebTransport.datagramWriter(session.transport.datagrams);
       DefoldWebTransport.enqueue(session, {type: 1});
       DefoldWebTransport.readDatagrams(session);
       DefoldWebTransport.readIncoming(session, session.transport.incomingBidirectionalStreams, true);

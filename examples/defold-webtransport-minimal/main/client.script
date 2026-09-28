@@ -1,0 +1,44 @@
+go.property("url", "https://127.0.0.1:4443/echo")
+go.property("certificate_sha256", "PASTE_CERTIFICATE_SHA256_HEX_HERE")
+
+local function decode_hex(value)
+    assert(#value == 64, "certificate_sha256 must contain exactly 64 hexadecimal characters")
+    return (value:gsub("..", function(pair)
+        local byte = tonumber(pair, 16)
+        assert(byte, "certificate_sha256 contains a non-hexadecimal character")
+        return string.char(byte)
+    end))
+end
+
+local function on_webtransport_event(self, event)
+    if event.type == "ready" then
+        print("WebTransport ready; sending a datagram and opening an echo stream")
+        assert(defold_webtransport.send_datagram(self.session, "hello datagram"))
+        assert(defold_webtransport.create_bidirectional_stream(self.session))
+    elseif event.type == "stream" and not event.incoming then
+        assert(defold_webtransport.write(event.stream, "hello stream", true))
+    elseif event.type == "datagram" then
+        print("datagram echo: " .. event.data)
+    elseif event.type == "data" then
+        print("stream echo: " .. event.data .. (event.fin and " [fin]" or ""))
+    elseif event.type == "close" then
+        print("WebTransport closed: " .. tostring(event.code) .. " " .. tostring(event.reason))
+    end
+end
+
+function init(self)
+    self.session = defold_webtransport.connect(self.url, {
+        server_certificate_hashes = {{
+            algorithm = "sha-256",
+            value = decode_hex(self.certificate_sha256),
+        }},
+        anticipated_incoming_unidirectional_streams = 4,
+        anticipated_incoming_bidirectional_streams = 4,
+    }, on_webtransport_event)
+end
+
+function final(self)
+    if self.session then
+        defold_webtransport.close(self.session, 0, "example stopped")
+    end
+end

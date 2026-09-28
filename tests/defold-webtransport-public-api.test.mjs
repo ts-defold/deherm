@@ -7,7 +7,7 @@ import { repositoryRoot } from "../scripts/package-defold-webtransport.mjs";
 
 const matrixPath = path.join(
   repositoryRoot,
-  "extensions/defold-webtransport/defold_webtransport/webtransport/public-api-compatibility.json"
+  "extensions/defold-webtransport/defold_webtransport/webtransport/public-api-compatibility.json",
 );
 
 async function loadMatrix() {
@@ -40,17 +40,16 @@ test("public compatibility matrix has one explicit disposition per surface", asy
     assert.equal(
       [...seen.keys()].some((surface) => surface === internalName || surface.startsWith(`${internalName}(`)),
       false,
-      `${internalName} is an internal bridge concept, not public WebTransport shape`
+      `${internalName} is an internal bridge concept, not public WebTransport shape`,
     );
   }
 });
 
 test("0.1 core remains the exact War Battles browser and Deno interoperability waist", async () => {
   const matrix = await loadMatrix();
-  const required = new Set(matrix.families.flatMap((family) => [
-    ...(family.requiredNow ?? []),
-    ...(family.compatibilityRequired ?? [])
-  ]));
+  const required = new Set(
+    matrix.families.flatMap((family) => [...(family.requiredNow ?? []), ...(family.compatibilityRequired ?? [])]),
+  );
   const expected = [
     "constructor(url, options?)",
     "ready",
@@ -59,6 +58,7 @@ test("0.1 core remains the exact War Battles browser and Deno interoperability w
     "WebTransportCloseInfo.closeCode",
     "WebTransportCloseInfo.reason",
     "datagrams.readable",
+    "datagrams.createWritable(options?)",
     "datagrams.writable",
     "datagrams.maxDatagramSize",
     "createUnidirectionalStream(options?)",
@@ -73,7 +73,7 @@ test("0.1 core remains the exact War Battles browser and Deno interoperability w
     "WebTransportHash.algorithm",
     "WebTransportHash.value",
     "WebTransportOptions.anticipatedConcurrentIncomingUnidirectionalStreams",
-    "WebTransportOptions.anticipatedConcurrentIncomingBidirectionalStreams"
+    "WebTransportOptions.anticipatedConcurrentIncomingBidirectionalStreams",
   ];
   assert.deepEqual([...required].sort(), expected.sort());
   assert.deepEqual(matrix.warBattlesExercise.symbols, [
@@ -81,6 +81,7 @@ test("0.1 core remains the exact War Battles browser and Deno interoperability w
     "closed",
     "close",
     "datagrams.readable",
+    "datagrams.createWritable",
     "datagrams.writable",
     "datagrams.maxDatagramSize",
     "createUnidirectionalStream",
@@ -89,7 +90,7 @@ test("0.1 core remains the exact War Battles browser and Deno interoperability w
     "incomingBidirectionalStreams",
     "serverCertificateHashes",
     "anticipatedConcurrentIncomingUnidirectionalStreams",
-    "anticipatedConcurrentIncomingBidirectionalStreams"
+    "anticipatedConcurrentIncomingBidirectionalStreams",
   ]);
 });
 
@@ -113,6 +114,6 @@ test("War Battles adapter and packaged runtime evidence still back every claimed
 test("CR datagram factory and legacy writable compatibility cannot silently replace each other", async () => {
   const matrix = await loadMatrix();
   const datagrams = matrix.families.find((family) => family.id === "datagrams");
+  assert.ok(datagrams.requiredNow.includes("datagrams.createWritable(options?)"));
   assert.deepEqual(datagrams.compatibilityRequired, ["datagrams.writable"]);
-  assert.ok(datagrams.forwardCompatible.includes("datagrams.createWritable(options?)"));
 });

@@ -72,6 +72,7 @@ function validateMembers(members) {
     member !== "game.project" && !member.startsWith(`${extensionDirectory}/`));
   if (unexpected.length > 0) fail(`archive has unexpected root members: ${unexpected.join(", ")}`);
   if (!members.includes(`${extensionDirectory}/ext.manifest`)) fail("extension has no ext.manifest");
+  if (!members.includes(`${extensionDirectory}/CHANGELOG.md`)) fail("extension has no CHANGELOG.md");
   if (!members.includes(`${extensionDirectory}/script/defold_webtransport.script_api`)) {
     fail("extension has no script/defold_webtransport.script_api documentation");
   }
@@ -87,6 +88,18 @@ function validateMembers(members) {
   if (!members.some((member) =>
     member.startsWith(`${extensionDirectory}/include/defold_webtransport/`) && member.endsWith(".h"))) {
     fail("extension has no public C ABI header under include/defold_webtransport");
+  }
+  for (const license of [
+    "LICENSE.txt",
+    "THIRD_PARTY_NOTICES.md",
+    "Apache-2.0-Mbed-TLS.txt",
+    "BSD-2-Clause-micro-ecc.txt",
+    "CC0-1.0-cifra.txt",
+    "MIT-picoquic.txt",
+    "MIT-picotls.txt"
+  ]) {
+    const member = `${extensionDirectory}/licenses/${license}`;
+    if (!members.includes(member)) fail(`extension has no required license or attribution file: ${member}`);
   }
 }
 

@@ -67,3 +67,24 @@ local source. `deherm generate` copies it into a content-keyed, manifest-owned
 `defold_webtransport/` tree before inventory, so Bob and SDK generation consume
 the same descriptor. Published projects can instead use an ordinary resolved
 Defold dependency; no application target branch is introduced.
+
+# Release gate and community example
+
+The 0.1 archive carries the extension's MIT license, pinned third-party
+attribution, and the exact MIT, Apache-2.0, BSD-2-Clause, and CC0 texts needed
+by its statically linked native dependencies. Packaging fails closed if any
+required license file or `CHANGELOG.md` is absent. Release notes come from that
+changelog; a tag never overwrites an existing non-identical asset.
+
+The release workflow assembles all content-addressed native targets, runs the
+generic JSI and Static Hermes facades, executes the native fixed-storage core
+under ASan and UBSan, then uses Bob to compile the staged ordinary Lua example
+for x86_64 Linux and HTML5 before attaching the ZIP. The minimal example owns
+only a Lua client and Deno WebTransport echo server; it does not depend on
+déherm or any War Battles transport or protocol module.
+
+The browser backend treats `datagrams.createWritable()` as the current
+WebTransport contract and retains `datagrams.writable` as an explicit legacy
+compatibility input. A missing browser WebTransport implementation is an
+application routing condition, not permission for the extension to substitute
+a different transport silently.
