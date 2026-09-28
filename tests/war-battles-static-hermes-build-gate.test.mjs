@@ -268,6 +268,10 @@ exit 0
     assert.match(report.stages.find(({ name }) => name === "link").command.join(" "), /fake-java/);
     assert.ok(report.stages.find(({ name }) => name === "link").output.sha256);
     assert.equal(report.stages.find(({ name }) => name === "link").stagedProject.nativeArtifact.target, "arm64-osx");
+    assert.equal(report.stages.find(({ name }) => name === "link").stagedProject.nativeArtifact.variant, "release");
+    assert.equal(report.stages.find(({ name }) => name === "link").stagedProject.bundleProjection.representation, "static-application");
+    assert.equal(report.stages.find(({ name }) => name === "link").stagedProject.bundleProjection.resource, null);
+    assert.match(report.stages.find(({ name }) => name === "link").command.join(" "), /--variant release/u);
     assert.ok(report.stages.find(({ name }) => name === "link").stagedProject.emittedApplicationCSha256);
     assert.ok(report.stages.find(({ name }) => name === "link").stagedProject.applicationExtensionSourceSha256);
     assert.equal(report.blockers.some(({ code }) => code === "application-not-requested"), false);

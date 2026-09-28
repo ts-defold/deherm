@@ -348,8 +348,14 @@ package/tool invocation evidence, not target-engine runtime evidence.
 
 Two artifacts cross from déherm into Bob, with different lifecycles:
 
-1. **The application bundle** at `/deherm/app.dehermc`, which Bob archives as a
-   `custom_resources` entry. Per build, derived from the user's TypeScript.
+1. **The application bundle** derived from `/deherm/app.dehermc`. That path is
+   the fingerprinted development artifact, not a promise that every release
+   archives its JavaScript bytes. Immediately before Bob walks the project,
+   `deherm prepare-bob` projects exactly one runtime representation through the
+   package-owned `.defignore` block: optimized Hermes bytecode for a native
+   Dynamic Hermes release, no dynamic resource for a Static Hermes release,
+   and JavaScript for the browser host. Source maps are never release runtime
+   resources. Per build, derived from the user's TypeScript.
 2. **The extension** `defold_hermes/`, which Bob uploads to Extender. Per
    release for its fixed parts, **per build for its generated C**.
 

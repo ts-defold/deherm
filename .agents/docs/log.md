@@ -1,5 +1,35 @@
 # Defold Hermes knowledge log
 
+## 2026-09-28 - Bob archives one runtime representation
+
+The release boundary now treats `/deherm/app.dehermc` as the fingerprinted
+development authority rather than blindly archiving every artifact beside it.
+`deherm prepare-bob` derives an explicit runtime projection from the
+authenticated target matrix and Bob variant. Native Dynamic Hermes release
+compiles the verified source with the shipped `hermesc -O`, writes a
+release-only `.dehermc` containing HBC bytes, and uses a Bob settings overlay
+to select it. Static Hermes excludes every dynamic application resource;
+HTML5 retains JavaScript because the browser is its runtime. Every projection
+excludes source maps, and `.defignore` hides all non-selected siblings without
+mutating the authored bundle or `game.project`.
+
+The final projection composes the typed-native target decision in the same
+managed-block write. A real first browser run exposed that two independent
+reconciliations of a replaceable block let the latter reveal the former's
+browser-incompatible Static Hermes extension; the combined projection keeps
+that extension excluded.
+
+Focused projection/boundary tests pass. A real arm64-macOS release through the
+pinned local Bob/Extender path compiled 409,767 bytes of JavaScript to 339,960
+bytes of optimized HBC, linked the 16,364,928-byte executable, and reduced
+`game.arcd` from 818,103 to 424,419 bytes. The packaged release process stayed
+alive until deliberate interruption. Its release logging emitted no activation
+marker, so no activation transcript is claimed.
+
+The corrected `wasm-web` run also passed: its resource archive fell from
+796,291 to 296,223 bytes and its complete payload is 4,462,778 bytes raw or
+1,315,857 bytes with Brotli quality 11.
+
 ## 2026-09-27 - Implementation AST facts close the bounded-span semantic wave
 
 - Replaced the last Defold-derived bounded-span constants and identifier rules

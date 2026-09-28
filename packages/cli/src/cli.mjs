@@ -26,6 +26,7 @@ Commands:
   extensions   List native extensions and their script API coverage
   generate     Write project inventory, TypeScript SDK, tsconfig, and VS Code setup
   assemble-typed-native  Compile the reachable Static Hermes lane into a Defold extension
+  prepare-bob  Project the runtime bundle Bob may archive for one target/variant
   materialize-dmsdk  Emit reachable dmSDK provider + exact-call twin from checker usage
   generate-extension-api  Parse a C header and emit native-extension IR, TypeScript, and C ABI glue
   typecheck    Type-check shared, game-object, GUI, and render TypeScript projects
@@ -86,6 +87,8 @@ Options:
   --shard <i/n>      Stable zero-based shard selection (default: 0/1)
   --strict           Fail a report unless every required selected stage passed
   --release          Type-check with release reachability and write release usage manifests
+  --variant <name>   Bob build variant for prepare-bob: debug or release
+  --application-mode <name>  dynamic or static application for prepare-bob
   --profile          Enable typed-native transport telemetry in the assembled extension
   --reconcile        Only reconcile typed-native upload eligibility for --target
   --shermes <path>   Static Hermes compiler override for assemble-typed-native
@@ -121,6 +124,8 @@ export function parseArguments(argv) {
     else if (value === "--strict") options.strict = true;
     else if (value === "--release") options.release = true;
     else if (value === "--profile") options.profile = true;
+    else if (value === "--variant") options.variant = args.shift();
+    else if (value === "--application-mode") options.applicationMode = args.shift();
     else if (value === "--replace-debugger") options.replaceDebugger = true;
     else if (value === "--stdio") options.stdio = true;
     else if (value === "--reconcile") options.reconcile = true;
@@ -446,6 +451,20 @@ export async function run(argv = process.argv.slice(2)) {
     else if (options.reconcile) console.log(`typed-native: ${result.message}`);
     else console.log(`Assembled typed-native extension in ${path.relative(process.cwd(), result.extensionRoot) || "."}`);
     return result.refusal ? 3 : 0;
+  }
+  if (options.command === "prepare-bob") {
+    const projectRoot = await findProjectRoot(process.cwd(), options.project);
+    const { hostDefoldPlatform } = await import("./toolchains.mjs");
+    const { prepareBobBundleProjection } = await import("./bob-bundle-projection.mjs");
+    const result = await prepareBobBundleProjection({
+      projectRoot,
+      platform: options.target ?? hostDefoldPlatform(),
+      variant: options.variant ?? "debug",
+      applicationMode: options.applicationMode ?? "dynamic"
+    });
+    if (options.json) console.log(JSON.stringify({ schemaVersion: 1, ...result }, null, 2));
+    else console.log(`Bob bundle: ${result.representation}${result.resource ? ` at ${result.resource}` : " (no dynamic resource)"}`);
+    return 0;
   }
   if (options.command === "materialize-dmsdk") {
     const result = await materializeDmSdkUsageFile({

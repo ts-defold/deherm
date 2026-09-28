@@ -278,6 +278,38 @@ The `generated-sources` artifact kind records the same relation for files
 assembled into the extension before Bob uploads it - `shermes -emit-c` output
 and per-extension FFI glue.
 
+## Release representation before Bob
+
+`deherm prepare-bob --project <project> --target <platform> --variant <variant>`
+turns the verified development artifact into the only representation the
+selected runtime may execute. `scripts/bob.sh` runs it after `verify-bundle`
+and before Bob reads resources.
+
+| Projection | Archived application representation |
+| --- | --- |
+| Native Dynamic Hermes release | `hermesc -O` bytecode at `/deherm/app.release.dehermc` |
+| Native Static Hermes | none; the application unit is linked into the executable |
+| HTML5 browser host | JavaScript |
+| Native debug | JavaScript |
+
+The package-owned `.defignore` block excludes every non-selected sibling. In
+particular, `.map` files never cross the release boundary and a native Dynamic
+release never archives JavaScript source beside its bytecode. A Bob settings
+overlay points `[defold_hermes] app` at the release-only bytecode resource; the
+authored `game.project` and fingerprinted development bundle remain unchanged.
+
+Observed on 2026-09-28 with the pinned arm64-macOS Bob/Extender path: optimized
+War Battles HBC was 339,960 bytes, Bob linked the 16,364,928-byte executable,
+and the application archive fell from 818,103 to 424,419 bytes. The packaged
+process remained alive until deliberately interrupted. Release logging does
+not expose the development activation marker, so this is linkage, archive, and
+process-liveness evidence rather than an activation-transcript claim.
+
+The matching `wasm-web` release passed after the same final projection retained
+JavaScript and kept the typed-native extension excluded. Its archive fell from
+796,291 to 296,223 bytes; the complete browser payload is 4,462,778 bytes raw
+and 1,315,857 bytes with Brotli quality 11.
+
 ## Assembling the emitted C
 
 `scripts/assemble-typed-native-extension.mjs` is the consumer of that kind. It

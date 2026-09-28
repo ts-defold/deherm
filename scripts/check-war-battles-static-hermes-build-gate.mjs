@@ -16,6 +16,7 @@ import { fileURLToPath } from "node:url";
 
 import { buildWarBattlesStaticHermesProjection } from "./generate-war-battles-static-hermes-projection.mjs";
 import { sourceBindingDigest } from "../packages/compiler/src/bundle-freshness.mjs";
+import { prepareBobBundleProjection } from "../packages/cli/src/bob-bundle-projection.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const defaultProject = path.join(repositoryRoot, "examples/war-battles-online/defold");
@@ -96,6 +97,7 @@ function parseArgs(argv) {
     link: false,
     run: false,
     keep: false,
+    variant: "release",
     java: null,
     buildServer: process.env.DEFOLD_HERMES_BUILD_SERVER ?? "http://localhost:9010"
   };
@@ -121,6 +123,7 @@ function parseArgs(argv) {
     else if (arg === "--link") options.link = true;
     else if (arg === "--run") options.run = true;
     else if (arg === "--keep") options.keep = true;
+    else if (arg === "--variant") options.variant = argv[++index];
     else if (arg === "--java") options.java = value();
     else if (arg === "--build-server") options.buildServer = argv[++index];
     else if (arg === "--help") options.help = true;
@@ -130,6 +133,9 @@ function parseArgs(argv) {
     options.applicationBundle = path.join(options.project, "deherm/app.dehermc");
   }
   if (!argv.includes("--project-lock")) options.projectLock = path.join(options.project, "deherm.lock");
+  if (options.variant !== "debug" && options.variant !== "release") {
+    throw new Error(`--variant must be debug or release, got ${JSON.stringify(options.variant)}`);
+  }
   options.output ??= path.join(repositoryRoot, "build/gates/war-battles-static-hermes");
   return options;
 }
@@ -148,7 +154,8 @@ function usageText() {
     "  --java <file>                     explicit JDK java executable",
     "  --build-server <url>              Bob/Extender endpoint (default localhost:9010)",
     "  --output <dir>                    gate evidence directory",
-    "  --keep                            retain temporary derived source and C output"
+    "  --keep                            retain temporary derived source and C output",
+    "  --variant <debug|release>         Bob/Extender build variant (default: release)"
   ].join("\n");
 }
 
@@ -392,7 +399,7 @@ function localServer(url) {
   return /^http:\/\/(?:localhost|127\.0\.0\.1|\[::1\])(?::\d+)?$/u.test(url);
 }
 
-async function stageTypedNativeProject({ project, emittedC, emittedApplicationC, bobJar, buildServer, target = "arm64-macos" }) {
+async function stageTypedNativeProject({ project, emittedC, emittedApplicationC, bobJar, buildServer, target = "arm64-macos", variant = "release" }) {
   const stagedRoot = await mkdtemp(path.join(os.tmpdir(), "deherm-static-hermes-link-"));
   await cp(project, stagedRoot, {
     recursive: true,
@@ -470,7 +477,7 @@ async function stageTypedNativeProject({ project, emittedC, emittedApplicationC,
   let nativeArtifact;
   try {
     nativeArtifact = await ensureProjectNativeArtifact(stagedRoot, resolvedTarget.extenderTarget, {
-      variant: "debug",
+      variant,
       offline: true,
       cacheRoot
     });
@@ -494,6 +501,12 @@ async function stageTypedNativeProject({ project, emittedC, emittedApplicationC,
   const engineOutput = path.join(stagedRoot, "build", resolvedTarget.extenderTarget);
   const bobOutputRelative = "build/gate-bob";
   const bundleOutputRelative = "build/gate-bundle";
+  const bundleProjection = await prepareBobBundleProjection({
+    projectRoot: stagedRoot,
+    platform: target,
+    variant,
+    applicationMode: "static"
+  });
   const command = [
     "-jar", bobJar,
     "--root", stagedRoot,
@@ -501,7 +514,7 @@ async function stageTypedNativeProject({ project, emittedC, emittedApplicationC,
     "--bundle-output", bundleOutputRelative,
     "--platform", target,
     "--architectures", target,
-    "--variant", "debug",
+    "--variant", variant,
     "--build-server", buildServer,
     "--archive",
     "resolve", "build"
@@ -521,6 +534,11 @@ async function stageTypedNativeProject({ project, emittedC, emittedApplicationC,
       fingerprint: nativeArtifact.fingerprint,
       cache: displayPath(cacheTarget),
       installed
+    },
+    bundleProjection: {
+      representation: bundleProjection.representation,
+      resource: bundleProjection.resource,
+      ignored: bundleProjection.ignore
     },
     bobOutput,
     bundleOutput,
@@ -638,6 +656,7 @@ export async function buildGate(rawOptions = {}) {
     link: false,
     run: false,
     keep: false,
+    variant: "release",
     java: null,
     buildServer: process.env.DEFOLD_HERMES_BUILD_SERVER ?? "http://localhost:9010",
     ...rawOptions
@@ -647,12 +666,16 @@ export async function buildGate(rawOptions = {}) {
     options.applicationBundle = path.join(options.project, "deherm/app.dehermc");
   }
   if (!Object.hasOwn(rawOptions, "projectLock")) options.projectLock = path.join(options.project, "deherm.lock");
+  if (options.variant !== "debug" && options.variant !== "release") {
+    throw new Error(`variant must be debug or release, got ${JSON.stringify(options.variant)}`);
+  }
   options.output ??= path.join(repositoryRoot, "build/gates/war-battles-static-hermes");
   const report = {
     schemaVersion: 1,
     kind: "deherm.war-battles.static-hermes-build-gate",
     generator: "scripts/check-war-battles-static-hermes-build-gate.mjs",
     target: "arm64-macos",
+    variant: options.variant,
     status: "blocked",
     inputs: {},
     reachability: null,
@@ -921,8 +944,8 @@ export async function buildGate(rawOptions = {}) {
           report.blockers.push(blocker("extender-unavailable", `Local Extender is not healthy at ${options.buildServer}`, { healthExitStatus: health.status, healthStderr: health.stderr ?? "" }));
           report.stages.push(stage("link", "blocked", { ...linkDetails, extenderHealth: { status: health.status, stdout: health.stdout, stderr: health.stderr } }));
         } else {
-          const staged = await stageTypedNativeProject({ project: options.project, emittedC: emittedCPath, emittedApplicationC: emittedApplicationCPath, bobJar: defaultPaths.bob, buildServer: options.buildServer });
-          linkDetails.stagedProject = { root: displayPath(staged.stagedRoot), extensionSourceSha256: staged.extensionSourceSha256, emittedCSha256: staged.emittedCSha256, applicationExtensionSourceSha256: staged.applicationExtensionSourceSha256, emittedApplicationCSha256: staged.emittedApplicationCSha256, emittedApplicationCBytes: staged.emittedApplicationCBytes, nativeArtifact: staged.nativeArtifact };
+          const staged = await stageTypedNativeProject({ project: options.project, emittedC: emittedCPath, emittedApplicationC: emittedApplicationCPath, bobJar: defaultPaths.bob, buildServer: options.buildServer, variant: options.variant });
+          linkDetails.stagedProject = { root: displayPath(staged.stagedRoot), extensionSourceSha256: staged.extensionSourceSha256, emittedCSha256: staged.emittedCSha256, applicationExtensionSourceSha256: staged.applicationExtensionSourceSha256, emittedApplicationCSha256: staged.emittedApplicationCSha256, emittedApplicationCBytes: staged.emittedApplicationCBytes, nativeArtifact: staged.nativeArtifact, bundleProjection: staged.bundleProjection };
           linkDetails.command = [java, ...staged.command];
           const result = runBob(java, staged.command, staged.stagedRoot);
           linkDetails.result = result;
@@ -947,8 +970,8 @@ export async function buildGate(rawOptions = {}) {
           if (!options.keep) await rm(staged.stagedRoot, { recursive: true, force: true });
         }
       } else {
-        const staged = await stageTypedNativeProject({ project: options.project, emittedC: emittedCPath, emittedApplicationC: emittedApplicationCPath, bobJar: defaultPaths.bob, buildServer: options.buildServer });
-        linkDetails.stagedProject = { root: displayPath(staged.stagedRoot), extensionSourceSha256: staged.extensionSourceSha256, emittedCSha256: staged.emittedCSha256, applicationExtensionSourceSha256: staged.applicationExtensionSourceSha256, emittedApplicationCSha256: staged.emittedApplicationCSha256, emittedApplicationCBytes: staged.emittedApplicationCBytes, nativeArtifact: staged.nativeArtifact };
+        const staged = await stageTypedNativeProject({ project: options.project, emittedC: emittedCPath, emittedApplicationC: emittedApplicationCPath, bobJar: defaultPaths.bob, buildServer: options.buildServer, variant: options.variant });
+        linkDetails.stagedProject = { root: displayPath(staged.stagedRoot), extensionSourceSha256: staged.extensionSourceSha256, emittedCSha256: staged.emittedCSha256, applicationExtensionSourceSha256: staged.applicationExtensionSourceSha256, emittedApplicationCSha256: staged.emittedApplicationCSha256, emittedApplicationCBytes: staged.emittedApplicationCBytes, nativeArtifact: staged.nativeArtifact, bundleProjection: staged.bundleProjection };
         linkDetails.command = [java, ...staged.command];
         const result = runBob(java, staged.command, staged.stagedRoot);
         linkDetails.result = result;

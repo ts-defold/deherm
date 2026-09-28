@@ -108,6 +108,15 @@ if [[ "${DEFOLD_HERMES_SKIP_BUNDLE_CHECK:-0}" != "1" ]]; then
   node "$repo_root/bin/deherm.mjs" verify-bundle --project "$project_root" --allow-unbound
 fi
 
+# Bob must see exactly one executable application representation. Native
+# release builds compile the verified JavaScript to optimized Hermes bytecode;
+# browser releases retain JavaScript; Static Hermes builds retain neither.
+# `.defignore` hides every sibling representation before Bob walks resources.
+application_mode="${DEFOLD_HERMES_APPLICATION_MODE:-dynamic}"
+node "$repo_root/bin/deherm.mjs" prepare-bob \
+  --project "$project_root" --target "$bundle_target" --variant "$variant" \
+  --application-mode "$application_mode"
+
 arguments=(
   --root "$project_root"
   --output build/bob
@@ -118,6 +127,11 @@ arguments=(
   --build-server "$build_server"
   --verbose
 )
+
+release_settings="$project_root/.deherm/bob-release.settings"
+if [[ -f "$release_settings" ]]; then
+  arguments+=(--settings "$release_settings")
+fi
 
 case "$action" in
   build)

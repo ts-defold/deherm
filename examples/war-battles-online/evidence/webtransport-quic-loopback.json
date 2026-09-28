@@ -38,9 +38,9 @@
   "minimumSnapshotsApplied": 3,
   "minimumInputsSent": 3,
   "observedSnapshotsApplied": 3,
-  "observedInputsSent": 15,
+  "observedInputsSent": 12,
   "lastServerTick": 126,
-  "lastLocalTick": 140,
+  "lastLocalTick": 136,
   "input": {
     "moveX": 1,
     "moveY": 0,
@@ -51,7 +51,7 @@
   "inputsDropped": 0,
   "presentation": {
     "localCorrectionMagnitude": 0,
-    "maximumLocalCorrectionMagnitude": 4781,
+    "maximumLocalCorrectionMagnitude": 4778,
     "remoteInterpolationRebases": 0,
     "maximumRemoteInterpolationRebaseDistance": 0,
     "maximumRemoteInterpolationDiscontinuity": 0,
@@ -65,7 +65,7 @@
     "inputsAcceptedAtLeast": 3,
     "markers": [
       "war-battles-server:listening:https://localhost:<port>",
-      "war-battles-server:health:http://localhost:60015",
+      "war-battles-server:health:http://localhost:61064",
       "war-battles-server:roster:32:bots:2",
       "war-battles-server:incoming:id=1",
       "war-battles-server:quic-accepted:id=1",
@@ -121,8 +121,8 @@
     {
       "path": "package.json",
       "kind": "file",
-      "bytes": 54842,
-      "sha256": "96d1b64338cdc1ea4f6669fd0168f6879794cd0fd6d82086c4e8dfbe71051f00"
+      "bytes": 55034,
+      "sha256": "0e984e49bcd043ea386a4e19826660ccdabf14dd493965c15653a8a926ca6b1e"
     },
     {
       "path": "pnpm-lock.yaml",
@@ -137,6 +137,6 @@
       "sha256": "6fd5533ae7b9ebb266685f8319dc4bcad914fbba15a26859921d8518ba6536b8"
     }
   ],
-  "sourceKey": "578b52049bf8d751bc8e1eca35743a0b5cb117b3108ab812d5d4cf72825f3392",
+  "sourceKey": "653f42133a73d5df1fbb2316bbe621161de6b36de9de52c2b6b242d7d32c18bf",
   "evidenceBoundary": "Real loopback Chrome-to-Deno HTTP/3/WebTransport transport, authoritative welcome/snapshot/input and scalar client-presentation telemetry; server input acceptance is observed from MatchServer stats; the telemetry describes this bounded loopback trace and is not a visual-quality, WAN, ingress, native Defold, allocation, or reliable-lane-persistence claim."
 }
