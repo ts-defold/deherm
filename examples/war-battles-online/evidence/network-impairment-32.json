@@ -333,19 +333,19 @@
       "path": "examples/war-battles-online/package.json",
       "kind": "file",
       "bytes": 8208,
-      "sha256": "75a1655aa12376932db5c63e88432b67167f5159c33a8e114293f692aa122a9c"
+      "sha256": "002c5496e73a01678526ae390b54e3a0d3c81b34766e8be15a16221d4f5fd5f3"
     },
     {
       "path": "package.json",
       "kind": "file",
-      "bytes": 55034,
-      "sha256": "0e984e49bcd043ea386a4e19826660ccdabf14dd493965c15653a8a926ca6b1e"
+      "bytes": 55192,
+      "sha256": "88ed1179e8a16d4103e8fb7fdef1560f8355b3ced8bfbba1cfbdfe374f450cc1"
     },
     {
       "path": "pnpm-lock.yaml",
       "kind": "file",
-      "bytes": 94071,
-      "sha256": "fbacd2a0d4c0edb257c033ab73b71c0f2d60fb5f42a8c779a37b674c10844dd9"
+      "bytes": 94115,
+      "sha256": "38cac917340b6ae482f268bd2f4b4491662602793e2b2ad61ba23addc4911e86"
     },
     {
       "path": "examples/war-battles-online/integration/network-impairment-matrix.ts",
@@ -360,5 +360,5 @@
       "sha256": "f1d6b752f1eb4b956bd2784eb59cea113e6643a2e70ba9c613fea1344b590734"
     }
   ],
-  "sourceKey": "9f9f938ecdc4279e75d94874890ceaf56922f26c4ba08d6a9cd31fe89448f93a"
+  "sourceKey": "78fb523f36e5d9bad4c25880ad791f8bd689e9fae4e962a666def0109ac80a84"
 }

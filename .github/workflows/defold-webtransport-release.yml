@@ -55,7 +55,18 @@ jobs:
         with:
           node-version: '22'
           cache: pnpm
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '25'
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
       - run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Verify 0.1 release metadata and standalone example
+        run: |
+          pnpm check:release-readiness
+          deno task --config examples/defold-webtransport-minimal/deno.json check
       - name: Resolve the independently versioned release
         id: release
         env:
@@ -92,6 +103,8 @@ jobs:
           pnpm test:native-webtransport-jsi
           pnpm test:static-native-module-exact
           pnpm test:static-webtransport-facade-exact
+      - name: Verify the native hot path under ASan and UBSan
+        run: pnpm test:defold-webtransport-native-core-sanitize
       - name: Download every immutable native target archive
         env:
           GH_TOKEN: ${{ github.token }}
@@ -110,6 +123,24 @@ jobs:
             --version "${{ steps.release.outputs.version }}" \
             --output build/releases \
             --stage build/defold-webtransport-dogfood
+      - name: Build the standalone Lua example with Bob for native and HTML5
+        env:
+          DEFOLD_BUILD_SERVER: https://build.defold.com
+        run: |
+          ./scripts/bootstrap-bob.sh
+          node scripts/stage-defold-webtransport-minimal-example.mjs \
+            --extension build/defold-webtransport-release-source \
+            --output build/defold-webtransport-minimal
+          java -jar build/tooling/bob.jar \
+            --root build/defold-webtransport-minimal \
+            --output build/defold-webtransport-minimal/bob-x86_64-linux \
+            --platform x86_64-linux --architectures x86_64-linux \
+            --variant release --build-server "$DEFOLD_BUILD_SERVER" --archive resolve build
+          java -jar build/tooling/bob.jar \
+            --root build/defold-webtransport-minimal \
+            --output build/defold-webtransport-minimal/bob-wasm-web \
+            --platform wasm-web --architectures wasm-web \
+            --variant release --build-server "$DEFOLD_BUILD_SERVER" --archive resolve build
       - uses: actions/upload-artifact@v6
         with:
           name: ${{ steps.release.outputs.asset }}
@@ -141,5 +172,5 @@ jobs:
             gh release create "$TAG" "$local_asset" --repo "$GITHUB_REPOSITORY" \
               --target "$GITHUB_SHA" \
               --title "Defold WebTransport v$VERSION" \
-              --notes "Standalone Defold WebTransport extension v$VERSION. Add the release ZIP as an ordinary Defold project dependency; déherm is optional."
+              --notes-file extensions/defold-webtransport/defold_webtransport/CHANGELOG.md
           fi

@@ -11,10 +11,16 @@ test("VS Code manifest is a thin workspace extension with an attach configuratio
   assert.equal(manifest.publisher, "ts-defold");
   assert.equal(manifest.main, "./dist/extension.cjs");
   assert.deepEqual(manifest.extensionKind, ["workspace"]);
-  assert.equal(manifest.capabilities.untrustedWorkspaces.supported, false,
-    "the workspace extension executes the project-local CLI and must stay disabled until trust is granted");
+  assert.deepEqual(manifest.extensionPack, ["ms-vscode.vscode-js-profile-flame"]);
+  assert.equal(
+    manifest.capabilities.untrustedWorkspaces.supported,
+    false,
+    "the workspace extension executes the project-local CLI and must stay disabled until trust is granted",
+  );
   assert.ok(manifest.activationEvents.includes("workspaceContains:**/game.project"));
   assert.ok(manifest.activationEvents.includes("onDebug:deherm"));
+  assert.ok(manifest.activationEvents.includes("onCommand:deherm.captureCpuProfile"));
+  assert.ok(manifest.activationEvents.includes("onCommand:deherm.captureHeapSnapshot"));
   const debuggerContribution = manifest.contributes.debuggers.find(({ type }: { type: string }) => type === "deherm");
   assert.ok(debuggerContribution);
   assert.equal(debuggerContribution.initialConfigurations[0].request, "attach");
@@ -26,6 +32,13 @@ test("VSIX client depends on the protocol client but never embeds the deherm com
   assert.equal(manifest.dependencies["vscode-languageclient"], "9.0.1");
   assert.equal(manifest.contributes.configuration.properties["deherm.cliPath"].scope, "resource");
   assert.equal(manifest.contributes.configuration.properties["deherm.nodePath"].scope, "resource");
+  assert.equal(manifest.contributes.configuration.properties["deherm.profile.cpuDurationMs"].default, 10000);
+  assert.ok(
+    manifest.contributes.commands.some(({ command }: { command: string }) => command === "deherm.captureCpuProfile"),
+  );
+  assert.ok(
+    manifest.contributes.commands.some(({ command }: { command: string }) => command === "deherm.captureHeapSnapshot"),
+  );
 });
 
 test("VSIX packaging excludes source, tests, dependencies, and nested VSIX output", async () => {

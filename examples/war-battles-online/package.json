@@ -1,6 +1,6 @@
 {
   "name": "@deherm/example-war-battles-online",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "type": "module",
   "source": "./core/index.ts",

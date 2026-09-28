@@ -4,23 +4,11 @@
 
 # déherm
 
-> [!CAUTION]
-> **Early alpha. Not ready for use.**
->
-> This repository is public so its CI can publish build artifacts and its
-> generated API policies can be served from GitHub Pages. That is the only
-> reason it is public. It is not an announcement, a release, or an invitation
-> to depend on it.
->
-> Nothing here is stable: package names, the generated API surface, the policy
-> URL scheme, the native artifact layout and the extension ABI all change
-> without notice or migration notes. Published artifacts may be deleted or
-> rebuilt with different bytes under the same tag.
-
-> [!WARNING]
-> Issues and pull requests are welcome as discussion, but there is no support,
-> no release cadence, and no compatibility commitment yet. If you build
-> something on this, expect to rebuild it.
+> [!IMPORTANT]
+> **0.1 preview release.** The generated API and independently versioned
+> WebTransport extension are being prepared for their first public release.
+> Content-addressed native artifacts and versioned release ZIPs are immutable;
+> pre-1.0 source compatibility may still change through documented releases.
 
 An experimental TypeScript runtime for Defold, backed by Hermes on native
 targets and the browser's JavaScript engine on HTML5.
@@ -32,7 +20,7 @@ project does not cold-build Go tooling. The product target is TypeScript-owned
 game logic with full generated Defold compatibility. TS-to-Lua remains a
 migration and fallback target, not a requirement for the new runtime.
 
-This repository is an architecture spike. Start with the
+This repository is an actively hardened preview. Start with the
 [knowledge base](.agents/docs/index.md), especially the
 [implementation plan](.agents/docs/plan.md) and
 [runtime strategy](.agents/docs/decisions/runtime-strategy.md).

@@ -14,3 +14,21 @@ servers always match the project toolchain. The package requires Node.js 22.13
 or newer; the extension resolves `node` from `PATH`, with a resource-scoped
 `deherm.nodePath` override for GUI environments that do not inherit a shell
 toolchain path.
+
+## Debugging and profiling
+
+Start `deherm dev`, then use the generated **déherm: Attach to running game**
+configuration. The adapter maps breakpoints, stacks, scopes, evaluation, and
+hot-reload generations back to authored TypeScript source maps for native and
+HTML5 sessions.
+
+Run **déherm: Capture Hermes CPU Profile** or **déherm: Capture Hermes Heap
+Snapshot** from the command palette while a development game is running. The
+commands invoke the matching workspace-local CLI, write canonical Chrome
+DevTools `.cpuprofile` and `.heapsnapshot` files under `.deherm/profiles/`, and
+open the result in VS Code. CPU profiles use VS Code's built-in table viewer;
+the extension pack installs Microsoft's flame-chart visualizer for flame and
+left-heavy views. Heap snapshots open in Microsoft's bundled table visualizer.
+The files remain portable to Chrome DevTools and other tools that read the
+standard formats. Release runtimes intentionally omit the debugger and profiler
+transport.

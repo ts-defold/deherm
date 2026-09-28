@@ -2,7 +2,7 @@
   "name": "deherm",
   "displayName": "déherm",
   "description": "Defold project intelligence and Hermes debugging for TypeScript",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "private": true,
   "license": "MIT",
   "type": "module",
@@ -28,6 +28,9 @@
   "extensionKind": [
     "workspace"
   ],
+  "extensionPack": [
+    "ms-vscode.vscode-js-profile-flame"
+  ],
   "capabilities": {
     "untrustedWorkspaces": {
       "supported": false
@@ -37,13 +40,25 @@
   "activationEvents": [
     "workspaceContains:**/game.project",
     "onDebug:deherm",
-    "onCommand:deherm.restartLanguageServer"
+    "onCommand:deherm.restartLanguageServer",
+    "onCommand:deherm.captureCpuProfile",
+    "onCommand:deherm.captureHeapSnapshot"
   ],
   "contributes": {
     "commands": [
       {
         "command": "deherm.restartLanguageServer",
         "title": "Restart Language Server",
+        "category": "déherm"
+      },
+      {
+        "command": "deherm.captureCpuProfile",
+        "title": "Capture Hermes CPU Profile",
+        "category": "déherm"
+      },
+      {
+        "command": "deherm.captureHeapSnapshot",
+        "title": "Capture Hermes Heap Snapshot",
         "category": "déherm"
       }
     ],
@@ -61,6 +76,14 @@
           "default": "",
           "scope": "resource",
           "description": "Optional Node.js 22.13+ executable. By default the extension resolves node from PATH."
+        },
+        "deherm.profile.cpuDurationMs": {
+          "type": "number",
+          "default": 10000,
+          "minimum": 1,
+          "maximum": 86400000,
+          "scope": "resource",
+          "description": "CPU profile capture duration in milliseconds."
         }
       }
     },

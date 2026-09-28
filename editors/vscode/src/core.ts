@@ -28,21 +28,21 @@ function pathsFor(platform: NodeJS.Platform): PathApi {
 }
 
 function samePath(left: string, right: string, platform: NodeJS.Platform): boolean {
-  return platform === "win32"
-    ? left.localeCompare(right, undefined, { sensitivity: "accent" }) === 0
-    : left === right;
+  return platform === "win32" ? left.localeCompare(right, undefined, { sensitivity: "accent" }) === 0 : left === right;
 }
 
 function contains(parent: string, child: string, paths: PathApi): boolean {
   const relative = paths.relative(parent, child);
-  return relative === "" || (!relative.startsWith(`..${paths.sep}`) && relative !== ".." && !paths.isAbsolute(relative));
+  return (
+    relative === "" || (!relative.startsWith(`..${paths.sep}`) && relative !== ".." && !paths.isAbsolute(relative))
+  );
 }
 
 /** Return the deepest Defold project that owns a document path. */
 export function owningDehermProject(
   projects: readonly DehermProject[],
   documentPath: string,
-  platform: NodeJS.Platform = process.platform
+  platform: NodeJS.Platform = process.platform,
 ): DehermProject | undefined {
   const paths = pathsFor(platform);
   const document = paths.resolve(documentPath);
@@ -61,7 +61,7 @@ export function owningDehermProject(
 export function resolveLiveValueDocument(
   projects: readonly DehermProject[],
   navigation: unknown,
-  platform: NodeJS.Platform = process.platform
+  platform: NodeJS.Platform = process.platform,
 ): string | undefined {
   if (navigation === null || typeof navigation !== "object") return undefined;
   const candidate = navigation as { projectRoot?: unknown; documentPath?: unknown };
@@ -72,8 +72,12 @@ export function resolveLiveValueDocument(
   const projectRoot = paths.resolve(candidate.projectRoot);
   const documentPath = paths.resolve(candidate.documentPath);
   const project = projects.find((entry) => samePath(paths.resolve(entry.projectRoot), projectRoot, platform));
-  if (!project || owningDehermProject(projects, documentPath, platform) !== project ||
-      !/\.(?:script|gui|render)\.ts$/u.test(documentPath)) return undefined;
+  if (
+    !project ||
+    owningDehermProject(projects, documentPath, platform) !== project ||
+    !/\.(?:script|gui|render)\.ts$/u.test(documentPath)
+  )
+    return undefined;
   return documentPath;
 }
 
@@ -87,7 +91,7 @@ export function resolveLiveValueDocument(
 export function dehermCliCandidates({
   projectRoot,
   workspaceRoot = projectRoot,
-  platform = process.platform
+  platform = process.platform,
 }: {
   projectRoot: string;
   workspaceRoot?: string;
@@ -122,7 +126,7 @@ export async function resolveDehermCli({
   workspaceRoot = projectRoot,
   configuredPath,
   platform = process.platform,
-  isFile = regularFile
+  isFile = regularFile,
 }: {
   projectRoot: string;
   workspaceRoot?: string;
@@ -145,8 +149,8 @@ export async function resolveDehermCli({
   }
   throw new Error(
     `No workspace-local @ts-defold/deherm CLI was found for ${paths.resolve(projectRoot)}. ` +
-    `Install it with 'pnpm add -D @ts-defold/deherm' and run 'pnpm deherm generate'. ` +
-    `Searched: ${candidates.join(", ")}`
+      `Install it with 'pnpm add -D @ts-defold/deherm' and run 'pnpm deherm generate'. ` +
+      `Searched: ${candidates.join(", ")}`,
   );
 }
 
@@ -164,7 +168,7 @@ export function selectDehermProject({
   projects,
   requestedProject,
   workspaceRoot,
-  platform = process.platform
+  platform = process.platform,
 }: {
   projects: readonly DehermProject[];
   requestedProject?: string;
@@ -173,11 +177,13 @@ export function selectDehermProject({
 }): DehermProject {
   if (projects.length === 0) throw new Error("No game.project was found in the selected workspace");
   const scoped = workspaceRoot
-    ? projects.filter((project) => samePath(
-        pathsFor(platform).resolve(project.workspaceRoot),
-        pathsFor(platform).resolve(workspaceRoot),
-        platform
-      ))
+    ? projects.filter((project) =>
+        samePath(
+          pathsFor(platform).resolve(project.workspaceRoot),
+          pathsFor(platform).resolve(workspaceRoot),
+          platform,
+        ),
+      )
     : [...projects];
   if (workspaceRoot && scoped.length === 0) {
     throw new Error(`No game.project was found in workspace folder ${pathsFor(platform).resolve(workspaceRoot)}`);
@@ -187,15 +193,19 @@ export function selectDehermProject({
   if (requestedProject?.trim()) {
     const base = workspaceRoot ?? candidates[0].workspaceRoot;
     const requested = normalizedProjectPath(requestedProject, base, platform);
-    const exact = candidates.find((project) => samePath(
-      pathsFor(platform).resolve(project.projectRoot), requested, platform
-    ));
+    const exact = candidates.find((project) =>
+      samePath(pathsFor(platform).resolve(project.projectRoot), requested, platform),
+    );
     if (exact) return exact;
 
     // `${workspaceFolder}` is intentionally a convenient initial config. It
     // selects the one Defold project inside that folder, but never picks one of
     // several nested projects by accident.
-    if (workspaceRoot && samePath(requested, pathsFor(platform).resolve(workspaceRoot), platform) && candidates.length === 1) {
+    if (
+      workspaceRoot &&
+      samePath(requested, pathsFor(platform).resolve(workspaceRoot), platform) &&
+      candidates.length === 1
+    ) {
       return candidates[0];
     }
     throw new Error(`The debug project '${requestedProject}' does not resolve to a discovered game.project`);
@@ -203,7 +213,7 @@ export function selectDehermProject({
 
   if (candidates.length === 1) return candidates[0];
   throw new Error(
-    `The workspace contains ${candidates.length} Defold projects; set 'project' to the intended game.project directory`
+    `The workspace contains ${candidates.length} Defold projects; set 'project' to the intended game.project directory`,
   );
 }
 
@@ -220,7 +230,7 @@ export function languageServerLaunch({
   cliPath,
   projectRoot,
   nodeExecutable = process.platform === "win32" ? "node.exe" : "node",
-  environment = process.env
+  environment = process.env,
 }: {
   cliPath: string;
   projectRoot: string;
@@ -232,7 +242,7 @@ export function languageServerLaunch({
     command: nodeExecutable,
     args: [path.resolve(cliPath), "language-server", "--stdio", "--project", root],
     cwd: root,
-    env: processEnvironment(environment)
+    env: processEnvironment(environment),
   };
 }
 
@@ -242,7 +252,7 @@ export function debugAdapterLaunch({
   inspectorSession,
   replaceDebugger = false,
   nodeExecutable = process.platform === "win32" ? "node.exe" : "node",
-  environment = process.env
+  environment = process.env,
 }: {
   cliPath: string;
   projectRoot: string;
@@ -254,15 +264,50 @@ export function debugAdapterLaunch({
   const root = path.resolve(projectRoot);
   const args = [path.resolve(cliPath), "debug", "--project", root];
   if (inspectorSession?.trim()) {
-    args.push("--inspector-session", path.isAbsolute(inspectorSession)
-      ? path.resolve(inspectorSession)
-      : path.resolve(root, inspectorSession));
+    args.push(
+      "--inspector-session",
+      path.isAbsolute(inspectorSession) ? path.resolve(inspectorSession) : path.resolve(root, inspectorSession),
+    );
   }
   if (replaceDebugger) args.push("--replace-debugger");
   return {
     command: nodeExecutable,
     args,
     cwd: root,
-    env: processEnvironment(environment)
+    env: processEnvironment(environment),
+  };
+}
+
+export function profileLaunch({
+  cliPath,
+  projectRoot,
+  kind,
+  durationMs,
+  inspectorSession,
+  nodeExecutable = process.platform === "win32" ? "node.exe" : "node",
+  environment = process.env,
+}: {
+  cliPath: string;
+  projectRoot: string;
+  kind: "cpu" | "heap";
+  durationMs?: number;
+  inspectorSession?: string;
+  nodeExecutable?: string;
+  environment?: NodeJS.ProcessEnv;
+}): ProcessLaunch {
+  const root = path.resolve(projectRoot);
+  const args = [path.resolve(cliPath), "profile", kind, "--project", root, "--json"];
+  if (kind === "cpu" && durationMs !== undefined) args.push("--duration", String(durationMs));
+  if (inspectorSession?.trim()) {
+    args.push(
+      "--inspector-session",
+      path.isAbsolute(inspectorSession) ? path.resolve(inspectorSession) : path.resolve(root, inspectorSession),
+    );
+  }
+  return {
+    command: nodeExecutable,
+    args,
+    cwd: root,
+    env: processEnvironment(environment),
   };
 }

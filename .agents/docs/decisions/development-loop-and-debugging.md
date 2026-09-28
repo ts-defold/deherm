@@ -295,6 +295,23 @@ macOS evidence; it does not promote unexecuted host/target combinations.
 Release performance measurement uses a separate instrumented profile; the lean
 shipping runtime does not carry the debugger server.
 
+The VS Code client contributes command-palette CPU and heap capture commands.
+They resolve the workspace-local déherm CLI, capture through the same
+authenticated inspector descriptor as the editor-neutral commands, and open
+the resulting `.cpuprofile` or `.heapsnapshot`. Those are Chrome DevTools
+formats rather than project-specific envelopes: VS Code's bundled JavaScript
+profile table consumes CPU profiles and heap snapshots directly, while the
+extension pack installs Microsoft's optional flame-chart visualizer for CPU
+flame and left-heavy views. Chrome DevTools and other compatible analyzers
+remain valid consumers. Capturing does not replace an attached debugger
+implicitly.
+
+The release-readiness workflow runs the Node-only TUI/dev-loop suite and the
+thin VS Code extension tests on Linux, macOS, and Windows. That matrix is the
+portable terminal/process/path contract. Native engine debugger execution
+remains attributed separately to the target-specific integrated evidence
+above rather than being inferred from portable model tests.
+
 # Acceptance gates
 
 1. Break in authored TypeScript during `init`, `update`, and a native callback.

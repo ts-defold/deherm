@@ -1,4 +1,5 @@
 import path from "node:path";
+import { execFile } from "node:child_process";
 
 import * as vscode from "vscode";
 import {
@@ -13,6 +14,7 @@ import {
   debugAdapterLaunch,
   languageServerLaunch,
   owningDehermProject,
+  profileLaunch,
   resolveLiveValueDocument,
   resolveDehermCli,
   selectDehermProject,
@@ -60,6 +62,92 @@ class ProjectRegistry {
       workspaceRoot: folder?.uri.fsPath,
     });
   }
+
+  async choose(): Promise<DehermProject | undefined> {
+    const projects = await this.refresh();
+    if (projects.length === 0) {
+      void vscode.window.showErrorMessage("déherm: no game.project was found in this workspace");
+      return undefined;
+    }
+    if (projects.length === 1) return projects[0];
+    const selected = await vscode.window.showQuickPick(
+      projects.map((project) => ({
+        label: path.basename(project.projectRoot),
+        description: path.relative(project.workspaceRoot, project.projectRoot) || ".",
+        project,
+      })),
+      { placeHolder: "Select the Defold project to profile" },
+    );
+    return selected?.project;
+  }
+}
+
+interface ProfileResult {
+  readonly kind: "cpu" | "heap";
+  readonly output: string;
+}
+
+function executeJson(launch: ReturnType<typeof profileLaunch>): Promise<ProfileResult> {
+  return new Promise((resolve, reject) => {
+    execFile(
+      launch.command,
+      [...launch.args],
+      {
+        cwd: launch.cwd,
+        env: launch.env,
+        encoding: "utf8",
+        maxBuffer: 1024 * 1024,
+      },
+      (error, stdout, stderr) => {
+        if (error) {
+          reject(new Error(stderr.trim() || error.message));
+          return;
+        }
+        try {
+          const parsed = JSON.parse(stdout) as Partial<ProfileResult>;
+          if ((parsed.kind !== "cpu" && parsed.kind !== "heap") || typeof parsed.output !== "string") {
+            throw new Error("profile command returned an invalid result");
+          }
+          resolve(parsed as ProfileResult);
+        } catch (parseError) {
+          reject(
+            new Error(
+              `Could not parse déherm profile result: ${parseError instanceof Error ? parseError.message : String(parseError)}`,
+            ),
+          );
+        }
+      },
+    );
+  });
+}
+
+async function captureProfile(
+  kind: "cpu" | "heap",
+  projects: ProjectRegistry,
+  output: vscode.OutputChannel,
+): Promise<void> {
+  const project = await projects.choose();
+  if (!project) return;
+  const configuration = vscode.workspace.getConfiguration("deherm", vscode.Uri.file(project.projectRoot));
+  const configuredPath = configuration.get<string>("cliPath") || undefined;
+  const cliPath = await resolveDehermCli({
+    projectRoot: project.projectRoot,
+    workspaceRoot: project.workspaceRoot,
+    configuredPath,
+  });
+  const nodeExecutable = configuration.get<string>("nodePath") || undefined;
+  const durationMs = kind === "cpu" ? configuration.get<number>("profile.cpuDurationMs", 10_000) : undefined;
+  const launch = profileLaunch({ cliPath, projectRoot: project.projectRoot, kind, durationMs, nodeExecutable });
+  const result = await vscode.window.withProgress(
+    {
+      location: vscode.ProgressLocation.Notification,
+      title: kind === "cpu" ? "Capturing Hermes CPU profile" : "Capturing Hermes heap snapshot",
+      cancellable: false,
+    },
+    () => executeJson(launch),
+  );
+  output.appendLine(`Captured Hermes ${result.kind} profile: ${result.output}`);
+  await vscode.commands.executeCommand("vscode.open", vscode.Uri.file(result.output));
 }
 
 class DehermClients {
@@ -423,6 +511,24 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
       await activeClients?.startAll(true);
       await activeLiveValues?.startAll();
       if (!activeClients?.hasFailures()) void vscode.window.showInformationMessage("déherm language server restarted");
+    }),
+    vscode.commands.registerCommand("deherm.captureCpuProfile", async () => {
+      try {
+        await captureProfile("cpu", projects, output);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        output.appendLine(`CPU profile failed: ${message}`);
+        void vscode.window.showErrorMessage(`déherm CPU profile: ${message}`);
+      }
+    }),
+    vscode.commands.registerCommand("deherm.captureHeapSnapshot", async () => {
+      try {
+        await captureProfile("heap", projects, output);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        output.appendLine(`Heap snapshot failed: ${message}`);
+        void vscode.window.showErrorMessage(`déherm heap snapshot: ${message}`);
+      }
     }),
     vscode.workspace.onDidChangeWorkspaceFolders(() => {
       void activeClients?.startAll();

@@ -1,0 +1,43 @@
+name: release-readiness
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-readiness-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  portable-tooling:
+    name: TUI, VS Code, and release contract (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-15, windows-2025]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: pnpm
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      # The TUI owns a native PTY dependency. Let pnpm install its verified
+      # platform prebuild so this matrix exercises the package users receive.
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm check:release-readiness
+      - run: pnpm test:dev
+      - run: pnpm test:vscode
+      - run: deno task --config examples/defold-webtransport-minimal/deno.json check
+      - run: node --test tests/defold-webtransport-package.test.mjs tests/defold-webtransport-minimal-example.test.mjs tests/defold-webtransport-public-api.test.mjs
+      - run: node native/webtransport-cpp/test/browser_backend_test.mjs

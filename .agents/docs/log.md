@@ -4490,3 +4490,32 @@ tree, including policy materialization, package-boundary inventory, the full
 dmSDK generator and semantic-causality suites, clean-room replay, Static Hermes
 reachability, War Battles/WebTransport integration tests, language-server
 tests, and OKF validation.
+
+## 2026-09-28 - 0.1 release hardening begins
+
+Every workspace manifest, the VS Code extension, and the independently
+versioned Defold WebTransport product now identify the 0.1.0 release line.
+Changelogs are explicit release inputs. No Git tag or public package was
+created by this change; those remain consequences of a green release gate.
+
+The reusable HTML5 extension backend now prefers the current
+`datagrams.createWritable()` WebTransport API and retains the older
+`datagrams.writable` shape as a tested compatibility branch. The focused fake
+browser backend and public-contract tests pass both shapes. This is structural
+browser-backend evidence; the prior real Chrome/Deno evidence predates the
+current-API branch and is not silently relabeled as Safari runtime evidence.
+
+The deterministic extension ZIP now requires its own license, third-party
+attribution, dependency license texts, and changelog. A standalone Lua Defold
+client plus Deno echo server was added outside the déherm stack; its Deno
+sources type-check and its staging test proves the Bob input contains the
+extension and no package dependency or déherm reference. The release workflow
+now schedules ASan/UBSan, native and HTML5 Bob builds of that staged example,
+and immutable changelog-backed release notes.
+
+The VS Code client now exposes CPU and heap capture commands backed by the
+existing workspace-local CLI and standard `.cpuprofile`/`.heapsnapshot`
+outputs. Type checking and 19 extension unit tests pass locally. A new
+Linux/macOS/Windows release-readiness matrix owns the TUI/dev-loop, VS Code,
+minimal Deno, package-contract, and HTML5-backend portable tests; those jobs
+are declared but are not claimed green until GitHub executes them.

@@ -3,7 +3,7 @@
   "kind": "deherm.policy.manifest",
   "comment": "A reviewable statement of what this checkout's policy store holds. It is NOT a policy object: it names the revision, which no content-addressed object may, and it records the reconciliation between upstream.lock's restated pins and Defold's own declaration.",
   "generator": "sha256:c13ed6aff42ed7174f7ea891e15a69220bab78abc48b0cb41a05b6248a23fcee",
-  "producerPackageVersion": "0.0.0",
+  "producerPackageVersion": "0.1.0",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "policyRoot": "1fd2d07eda5ac2941f220dddd7e1417bbc8dbbf6531459d678408eab2e95648f",
   "layoutVersion": "v1",
