@@ -20,7 +20,10 @@ test("availability profiles regenerate byte-identically from manifests and Lua r
   const outputRoot = await mkdtemp(join(tmpdir(), "deherm-route-profiles-"));
   try {
     run(["scripts/generate-script-route-availability-profiles.mjs", "--out-root", outputRoot]);
-    const generated = await readFile(join(outputRoot, "packages/bindings/generated/defold-script-route-availability-profiles.json"), "utf8");
+    const generated = await readFile(
+      join(outputRoot, "packages/bindings/generated/defold-script-route-availability-profiles.json"),
+      "utf8",
+    );
     assert.equal(generated, await readFile(reportPath, "utf8"));
     run(["scripts/generate-script-route-availability-profiles.mjs", "--check"]);
   } finally {
@@ -36,7 +39,7 @@ test("the six pinned profiles are inferred from Defold manifests and cover full 
     "legacy-no-bullet": [171, 171, ["core", "box2d-v2"], 3],
     "v3-no-bullet": [247, 245, ["core", "box2d-v3"], 5],
     "bullet-only": [198, 198, ["core", "bullet3d"], 9],
-    "no-physics": [26, 26, ["core"], 1]
+    "no-physics": [26, 26, ["core"], 1],
   };
   for (const [id, [documentedCount, availableCount, features, bits]] of Object.entries(expected)) {
     const profile = report.profiles[id];
@@ -45,22 +48,39 @@ test("the six pinned profiles are inferred from Defold manifests and cover full 
     assert.deepEqual(profile.features, features);
     assert.equal(profile.runtimeHandshake.capabilityBits, bits);
     assert.equal(new Set(stableIds(profile)).size, availableCount);
-    assert.deepEqual(stableIds(profile), [...stableIds(profile)].sort((left, right) => left - right));
+    assert.deepEqual(
+      stableIds(profile),
+      [...stableIds(profile)].sort((left, right) => left - right),
+    );
   }
-  assert.deepEqual(Object.fromEntries(Object.entries(report.features).map(([id, feature]) =>
-    [id, [feature.documentedRouteCount, feature.availableRouteCount]])), {
-    core: [26, 26],
-    "box2d-v2": [145, 145],
-    "box2d-v3": [221, 219],
-    bullet3d: [172, 172]
-  });
-  assert.deepEqual(Object.fromEntries(Object.entries(report.handleFeatures).map(([id, feature]) =>
-    [id, [feature.documentedRouteCount, feature.availableRouteCount]])), {
-    core: [9, 9],
-    "box2d-v2": [124, 124],
-    "box2d-v3": [189, 187],
-    bullet3d: [139, 139]
-  });
+  assert.deepEqual(
+    Object.fromEntries(
+      Object.entries(report.features).map(([id, feature]) => [
+        id,
+        [feature.documentedRouteCount, feature.availableRouteCount],
+      ]),
+    ),
+    {
+      core: [26, 26],
+      "box2d-v2": [145, 145],
+      "box2d-v3": [221, 219],
+      bullet3d: [172, 172],
+    },
+  );
+  assert.deepEqual(
+    Object.fromEntries(
+      Object.entries(report.handleFeatures).map(([id, feature]) => [
+        id,
+        [feature.documentedRouteCount, feature.availableRouteCount],
+      ]),
+    ),
+    {
+      core: [9, 9],
+      "box2d-v2": [124, 124],
+      "box2d-v3": [189, 187],
+      bullet3d: [139, 139],
+    },
+  );
   const noPhysics = new Set(stableIds(report.profiles["no-physics"]));
   for (const profile of Object.values(report.profiles)) {
     assert([...noPhysics].every((stableId) => stableIds(profile).includes(stableId)));
@@ -68,12 +88,14 @@ test("the six pinned profiles are inferred from Defold manifests and cover full 
   const v2 = new Set(report.features["box2d-v2"].documentedRoutes.map(({ stableId }) => stableId));
   const v3 = new Set(report.features["box2d-v3"].documentedRoutes.map(({ stableId }) => stableId));
   assert.equal(new Set([...v2, ...v3]).size, 257);
-  assert.deepEqual(report.features["box2d-v3"].unavailableRoutes.map(({ id }) => id), [
-    "script:b2d.body.get_user_data",
-    "script:b2d.body.set_user_data"
-  ]);
-  assert.deepEqual(Object.fromEntries(report.manifestAudit.map(({ id, features }) => [id, features])),
-    Object.fromEntries(Object.entries(report.profiles).map(([id, profile]) => [id, profile.features])));
+  assert.deepEqual(
+    report.features["box2d-v3"].unavailableRoutes.map(({ id }) => id),
+    ["script:b2d.body.get_user_data", "script:b2d.body.set_user_data"],
+  );
+  assert.deepEqual(
+    Object.fromEntries(report.manifestAudit.map(({ id, features }) => [id, features])),
+    Object.fromEntries(Object.entries(report.profiles).map(([id, profile]) => [id, profile.features])),
+  );
   assert(report.manifestAudit.find(({ id }) => id === "no-physics").linkedLibraries.includes("physics_null"));
   assert(report.manifestAudit.find(({ id }) => id === "v3-no-bullet").excludedLibraries.includes("BulletDynamics"));
   assert.deepEqual(report.manifestAudit.find(({ id }) => id === "bullet-only").features, ["core", "bullet3d"]);
@@ -87,7 +109,13 @@ test("the six pinned profiles are inferred from Defold manifests and cover full 
 test("runtime capability handshake contracts are complete generated material", async () => {
   const report = JSON.parse(await readFile(reportPath, "utf8"));
   assert.deepEqual(report.handshakeContract.requiredFields, [
-    "schema", "profileId", "defoldRevision", "capabilityBits", "routeCount", "routeSetSha256", "catalogSha256"
+    "schema",
+    "profileId",
+    "defoldRevision",
+    "capabilityBits",
+    "routeCount",
+    "routeSetSha256",
+    "catalogSha256",
   ]);
   for (const [profileId, profile] of Object.entries(report.profiles)) {
     assert.deepEqual(Object.keys(profile.runtimeHandshake).sort(), [...report.handshakeContract.requiredFields].sort());
@@ -96,8 +124,11 @@ test("runtime capability handshake contracts are complete generated material", a
     assert.equal(profile.runtimeHandshake.defoldRevision, report.defoldRevision);
     assert.equal(profile.runtimeHandshake.routeCount, profile.availableRouteCount);
     if (profileId === "no-physics") {
-      assert.equal(profile.runtimeHandshake.routeSetSha256, report.features.core.availableRouteSetSha256,
-        "no-physics handshake must be exactly the core route set");
+      assert.equal(
+        profile.runtimeHandshake.routeSetSha256,
+        report.features.core.availableRouteSetSha256,
+        "no-physics handshake must be exactly the core route set",
+      );
     } else {
       assert.notEqual(profile.runtimeHandshake.routeSetSha256, report.features.core.availableRouteSetSha256);
     }
@@ -108,18 +139,35 @@ test("runtime capability handshake contracts are complete generated material", a
 test("source hash drift is reported while census drift still aborts generation", async () => {
   const outputRoot = await mkdtemp(join(tmpdir(), "deherm-route-profile-drift-"));
   try {
-    const policy = await readFile(new URL("packages/bindings/overrides/script-route-availability-profiles.json", root), "utf8");
+    const policy = await readFile(
+      new URL("packages/bindings/overrides/script-route-availability-profiles.json", root),
+      "utf8",
+    );
     const hashDriftPolicy = join(outputRoot, "hash-drift.json");
     await writeFile(hashDriftPolicy, policy.replace(/c898c4b8[a-f0-9]+/, "0".repeat(64)));
-    assert.doesNotThrow(() => run([
-      "scripts/generate-script-route-availability-profiles.mjs", "--policy", hashDriftPolicy, "--out-root", outputRoot
-    ]));
+    assert.doesNotThrow(() =>
+      run([
+        "scripts/generate-script-route-availability-profiles.mjs",
+        "--policy",
+        hashDriftPolicy,
+        "--out-root",
+        outputRoot,
+      ]),
+    );
 
     const countDriftPolicy = join(outputRoot, "count-drift.json");
     await writeFile(countDriftPolicy, policy.replace('"box2d-v3": 187', '"box2d-v3": 188'));
-    assert.throws(() => run([
-      "scripts/generate-script-route-availability-profiles.mjs", "--policy", countDriftPolicy, "--out-root", outputRoot
-    ]), /box2d-v3 expectedAvailableFeatureCounts expected 188, found 187|box2d-v3: expected 188 registered handle routes, found 187/);
+    assert.throws(
+      () =>
+        run([
+          "scripts/generate-script-route-availability-profiles.mjs",
+          "--policy",
+          countDriftPolicy,
+          "--out-root",
+          outputRoot,
+        ]),
+      /box2d-v3 expectedAvailableFeatureCounts expected 188, found 187|box2d-v3: expected 188 registered handle routes, found 187/,
+    );
   } finally {
     await rm(outputRoot, { recursive: true, force: true });
   }

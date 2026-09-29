@@ -7,7 +7,7 @@ const platformEngines = Object.freeze({
   "darwin:x64": ["x86_64-osx/dmengine"],
   "linux:arm64": ["arm64-linux/dmengine"],
   "linux:x64": ["x86_64-linux/dmengine"],
-  "win32:x64": ["x86_64-win32/dmengine.exe"]
+  "win32:x64": ["x86_64-win32/dmengine.exe"],
 });
 
 async function exists(file, accessFile = access) {
@@ -26,13 +26,17 @@ export async function resolveBuiltEngine(projectRoot, options = {}) {
   const architecture = options.arch ?? process.arch;
   const candidates = platformEngines[`${platform}:${architecture}`] ?? [];
   if (!(await exists(path.join(runtimeRoot, "game.projectc"), options.access))) {
-    throw new Error(`No compiled Defold project found at ${path.join(runtimeRoot, "game.projectc")}; build the project with Bob first`);
+    throw new Error(
+      `No compiled Defold project found at ${path.join(runtimeRoot, "game.projectc")}; build the project with Bob first`,
+    );
   }
   for (const relative of candidates) {
     const executable = path.join(buildRoot, relative);
     if (await exists(executable, options.access)) return { executable, runtimeRoot };
   }
-  throw new Error(`No built Defold engine found for ${platform}/${architecture} under ${buildRoot}; build the custom engine with Bob first`);
+  throw new Error(
+    `No built Defold engine found for ${platform}/${architecture} under ${buildRoot}; build the custom engine with Bob first`,
+  );
 }
 
 function diagnosticLevel(line) {
@@ -42,28 +46,35 @@ function diagnosticLevel(line) {
   return "info";
 }
 
-const controlEventPattern = /\bDEHERM_EVENT bundle-(activated|rejected) fingerprint=([0-9a-fA-F]{64}|unavailable) resource_generation=(\d+) runtime_id=(\d+) initial=(true|false)\b/;
-const telemetryEventPattern = /\bDEHERM_EVENT telemetry runtime_id=(\d+) frame_dt_us=(\d+) heap_available=(true|false) heap_bytes=(\d+) heap_size_bytes=(\d+) heap_peak_bytes=(\d+) callback_roots=(\d+) component_instances=(\d+) lua_handles=(\d+) lua_handle_capacity=(\d+) arena_high_water_bytes=(\d+)\b/;
+const controlEventPattern =
+  /\bDEHERM_EVENT bundle-(activated|rejected) fingerprint=([0-9a-fA-F]{64}|unavailable) resource_generation=(\d+) runtime_id=(\d+) initial=(true|false)\b/;
+const telemetryEventPattern =
+  /\bDEHERM_EVENT telemetry runtime_id=(\d+) frame_dt_us=(\d+) heap_available=(true|false) heap_bytes=(\d+) heap_size_bytes=(\d+) heap_peak_bytes=(\d+) callback_roots=(\d+) component_instances=(\d+) lua_handles=(\d+) lua_handle_capacity=(\d+) arena_high_water_bytes=(\d+)\b/;
 
 export function parseEngineControlEvent(line, id = "local-engine") {
   const match = controlEventPattern.exec(line);
   if (match) {
     const resourceGeneration = Number(match[3]);
     const runtimeId = Number(match[4]);
-    if (!Number.isSafeInteger(resourceGeneration) || resourceGeneration <= 0 ||
-        !Number.isSafeInteger(runtimeId) || runtimeId < 0) return undefined;
+    if (
+      !Number.isSafeInteger(resourceGeneration) ||
+      resourceGeneration <= 0 ||
+      !Number.isSafeInteger(runtimeId) ||
+      runtimeId < 0
+    )
+      return undefined;
     return {
       type: match[1] === "activated" ? "runtime-activation-observed" : "runtime-activation-rejected",
       id,
       fingerprint: match[2].toLowerCase(),
       resourceGeneration,
       runtimeId,
-      initial: match[5] === "true"
+      initial: match[5] === "true",
     };
   }
   const telemetry = telemetryEventPattern.exec(line);
   if (!telemetry) return undefined;
-  const numbers = telemetry.slice(1).map((value, index) => index === 2 ? value : Number(value));
+  const numbers = telemetry.slice(1).map((value, index) => (index === 2 ? value : Number(value)));
   if (numbers.some((value, index) => index !== 2 && (!Number.isSafeInteger(value) || value < 0))) return undefined;
   return {
     type: "telemetry",
@@ -79,8 +90,8 @@ export function parseEngineControlEvent(line, id = "local-engine") {
       componentInstances: numbers[7],
       luaRegistryUsed: numbers[8],
       luaRegistryCapacity: numbers[9],
-      arenaHighWaterBytes: numbers[10]
-    }
+      arenaHighWaterBytes: numbers[10],
+    },
   };
 }
 
@@ -91,11 +102,12 @@ function pipeLines(stream, source, emit, targetId) {
     pending += chunk;
     const lines = pending.split(/\r?\n/);
     pending = lines.pop() ?? "";
-    for (const line of lines) if (line) {
-      emit({ type: "log", source, level: diagnosticLevel(line), message: line });
-      const control = parseEngineControlEvent(line, targetId);
-      if (control) emit(control);
-    }
+    for (const line of lines)
+      if (line) {
+        emit({ type: "log", source, level: diagnosticLevel(line), message: line });
+        const control = parseEngineControlEvent(line, targetId);
+        if (control) emit(control);
+      }
   });
   stream?.on("end", () => {
     if (pending) {
@@ -121,17 +133,15 @@ export function createEngineController(options) {
     // the archive it was built with, so a hot-reload request re-reads the same
     // bytes and the development bundle never crosses the boundary. Point it at
     // the development resource server when one is running.
-    const resourceUri = typeof options.resourceUri === "function"
-      ? options.resourceUri()
-      : options.resourceUri;
+    const resourceUri = typeof options.resourceUri === "function" ? options.resourceUri() : options.resourceUri;
     const launchArguments = resourceUri ? [`--config=resource.uri=${resourceUri}`] : [];
     if (options.inspectorPort) {
       launchArguments.push(`--config=defold_hermes.inspector_port=${options.inspectorPort}`);
     }
     const next = spawn(resolved.executable, launchArguments, {
       cwd: resolved.runtimeRoot,
-      env: { ...process.env, ...(options.env ?? {}) },
-      stdio: ["ignore", "pipe", "pipe"]
+      env: { ...process.env, ...options.env },
+      stdio: ["ignore", "pipe", "pipe"],
     });
     child = next;
     pipeLines(next.stdout, "engine", emit, options.targetId ?? "local-engine");
@@ -159,14 +169,16 @@ export function createEngineController(options) {
         resolve(true);
       });
       running.kill("SIGTERM");
-    }).finally(() => { closing = undefined; });
+    }).finally(() => {
+      closing = undefined;
+    });
     return closing;
   };
 
   return {
     launch,
     stop,
-    toggle: () => child ? stop() : launch(),
-    running: () => Boolean(child)
+    toggle: () => (child ? stop() : launch()),
+    running: () => Boolean(child),
   };
 }

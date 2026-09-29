@@ -52,7 +52,7 @@ export function reviewedClaims(input, document) {
         id: node.id ?? node.key ?? null,
         file: evidencePath(target),
         sha256: node.sha256,
-        anchors: Array.isArray(node.anchors) ? node.anchors : []
+        anchors: Array.isArray(node.anchors) ? node.anchors : [],
       });
     }
     for (const [key, child] of Object.entries(node)) visit(child, `${trail}.${key}`);
@@ -112,6 +112,6 @@ export async function auditReviewedEvidence(treeRoot) {
     // The count that actually matters to a reader: how many reviewed entries
     // stopped applying. `drifted` is dominated by files Defold merely edited.
     withdrawn,
-    driftedByInput: Object.fromEntries(Object.entries(byInput).sort(([left], [right]) => left < right ? -1 : 1))
+    driftedByInput: Object.fromEntries(Object.entries(byInput).sort(([left], [right]) => (left < right ? -1 : 1))),
   };
 }

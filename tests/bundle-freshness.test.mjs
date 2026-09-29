@@ -9,7 +9,7 @@ import { createContext, runInContext } from "node:vm";
 import {
   applyBundleFingerprint,
   bundleFingerprintBanner,
-  createBundleFingerprintPlaceholder
+  createBundleFingerprintPlaceholder,
 } from "../packages/compiler/src/bundle-fingerprint.mjs";
 import {
   BUILD_ARTIFACT_SCHEMA,
@@ -17,31 +17,28 @@ import {
   checkBuildArtifacts,
   formatBuildArtifactReport,
   inspectBundleFingerprint,
-  sourceBindingDigest
+  sourceBindingDigest,
 } from "../packages/compiler/src/bundle-freshness.mjs";
 import { createIncrementalCompiler } from "../packages/cli/src/dev/compiler.mjs";
 import {
   readProjectLock,
   recordBuildArtifact,
   recordBundleBuild,
-  verifyProjectBuildArtifacts
+  verifyProjectBuildArtifacts,
 } from "../packages/cli/src/build-artifacts.mjs";
 
 async function bundleProject() {
   const root = await mkdtemp(path.join(tmpdir(), "deherm-freshness-"));
   await mkdir(path.join(root, "src"), { recursive: true });
-  await writeFile(path.join(root, "game.project"), [
-    "[project]",
-    "custom_resources = /deherm",
-    "[defold_hermes]",
-    "app = /deherm/app.dehermc",
-    ""
-  ].join("\n"));
+  await writeFile(
+    path.join(root, "game.project"),
+    ["[project]", "custom_resources = /deherm", "[defold_hermes]", "app = /deherm/app.dehermc", ""].join("\n"),
+  );
   await writeFile(path.join(root, "deherm.lock"), `${JSON.stringify({ schemaVersion: 1 }, null, 2)}\n`);
   await writeFile(path.join(root, "src", "constants.ts"), "export const MUZZLE = 384;\n");
   await writeFile(
     path.join(root, "src", "main.ts"),
-    'import { MUZZLE } from "./constants.js";\nglobalThis.muzzle = MUZZLE;\n'
+    'import { MUZZLE } from "./constants.js";\nglobalThis.muzzle = MUZZLE;\n',
   );
   return root;
 }
@@ -54,7 +51,7 @@ async function buildAndRecord(root) {
     resourcePath: "/deherm/app.dehermc",
     useTtsc: false,
     sourcemap: false,
-    captureDiagnostics: false
+    captureDiagnostics: false,
   });
   try {
     const build = await compiler.rebuild([]);
@@ -86,7 +83,7 @@ test("a strict bundle publishes its fingerprint through browser-style indirect e
   const placeholder = createBundleFingerprintPlaceholder();
   const { fingerprint, source } = applyBundleFingerprint(
     `${bundleFingerprintBanner(placeholder)}\nglobalThis.loaded = true;\n`,
-    placeholder
+    placeholder,
   );
   const context = createContext({ candidate: source });
   runInContext("(0, eval)(candidate)", context);
@@ -218,9 +215,10 @@ test("the verify-bundle CLI keeps diagnostics visible but exits before Bob for n
   t.after(() => rm(root, { recursive: true, force: true }));
   await buildAndRecord(root);
 
-  const inspection = spawnSync(process.execPath, [
-    path.resolve("bin/deherm.mjs"), "verify-bundle", "--project", root
-  ], { cwd: path.resolve("."), encoding: "utf8" });
+  const inspection = spawnSync(process.execPath, [path.resolve("bin/deherm.mjs"), "verify-bundle", "--project", root], {
+    cwd: path.resolve("."),
+    encoding: "utf8",
+  });
   assert.equal(inspection.status, 1, `${inspection.stdout}\n${inspection.stderr}`);
   assert.match(inspection.stdout, /bundle .*was built with TypeScript transforms disabled/u);
   assert.match(inspection.stdout, /--no-ttsc is diagnostic-only/u);
@@ -240,7 +238,7 @@ test("generated extension sources bind to their inputs the way a bundle does", a
     kind: "generated-sources",
     artifacts: [generated],
     sources: [path.join(root, "src", "main.ts"), path.join(root, "src", "constants.ts")],
-    build: { emitter: "shermes -typed -emit-c", reachableRoutes: 1 }
+    build: { emitter: "shermes -typed -emit-c", reachableRoutes: 1 },
   });
   assert.equal(recorded.record.kind, "generated-sources");
   assert.equal(recorded.record.sources.fileCount, 2);
@@ -253,10 +251,13 @@ test("generated extension sources bind to their inputs the way a bundle does", a
   assert.equal(stale.entries[0].status, "stale-sources");
   assert.equal(stale.ok, false);
 
-  assert.throws(() => buildArtifactRecord({ kind: "mystery", artifacts: { "a.c": "0".repeat(64) } }), /Unknown build artifact kind/);
+  assert.throws(
+    () => buildArtifactRecord({ kind: "mystery", artifacts: { "a.c": "0".repeat(64) } }),
+    /Unknown build artifact kind/,
+  );
   assert.throws(
     () => buildArtifactRecord({ kind: "bundle", artifacts: { "a.js": "0".repeat(64) } }),
-    /requires its published fingerprint/
+    /requires its published fingerprint/,
   );
 });
 
@@ -268,7 +269,7 @@ test("a toolchain the artifact was not built with is reported without failing", 
   const result = await checkBuildArtifacts({
     projectRoot: root,
     lock,
-    toolchain: { esbuild: "0.0.0-not-the-recorded-one" }
+    toolchain: { esbuild: "0.0.0-not-the-recorded-one" },
   });
   assert.equal(result.entries[0].status, "toolchain-drift");
   assert.equal(result.ok, true);

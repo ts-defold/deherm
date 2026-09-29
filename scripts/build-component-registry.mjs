@@ -4,7 +4,7 @@ import { build } from "esbuild";
 import {
   applyBundleFingerprint,
   bundleFingerprintBanner,
-  createBundleFingerprintPlaceholder
+  createBundleFingerprintPlaceholder,
 } from "../packages/compiler/src/bundle-fingerprint.mjs";
 import { lstat, mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -88,14 +88,18 @@ async function verifySentinel(sentinelPath, outputRoot, key, deep) {
 export async function buildComponentRegistry(argv = []) {
   const options = Array.isArray(argv) ? parseArguments(argv) : argv;
   options.projectRoot = path.resolve(options.projectRoot);
-  options.outputRoot = path.resolve(options.outputRoot ?? path.join(options.projectRoot, ".deherm", "build", "components"));
+  options.outputRoot = path.resolve(
+    options.outputRoot ?? path.join(options.projectRoot, ".deherm", "build", "components"),
+  );
   const generated = await generateComponentProxies({
     projectRoot: options.projectRoot,
     outputRoot: options.projectRoot,
     check: options.check === true,
-    componentPolicy: options.componentPolicy ?? await loadComponentProxyPolicy(path.join(
-      options.projectRoot, ".deherm", "ir", "defold-component-proxy-contract.json"
-    ))
+    componentPolicy:
+      options.componentPolicy ??
+      (await loadComponentProxyPolicy(
+        path.join(options.projectRoot, ".deherm", "ir", "defold-component-proxy-contract.json"),
+      )),
   });
   const registryPath = path.join(options.projectRoot, ".deherm", "generated", "components", "registry.ts");
   const manifestPath = path.join(options.projectRoot, ".deherm", "generated", "components", "manifest.json");
@@ -103,23 +107,27 @@ export async function buildComponentRegistry(argv = []) {
     readFile(registryPath),
     readFile(manifestPath),
     readFile(path.join(repositoryRoot, "packages/compiler/src/component-proxy-generator.mjs")),
-    readFile(fileURLToPath(import.meta.url))
+    readFile(fileURLToPath(import.meta.url)),
   ]);
   const manifest = JSON.parse(manifestSource);
-  const key = sha256(JSON.stringify({
-    schemaVersion: 1,
-    generator: sha256(generatorSource),
-    builder: sha256(buildSource),
-    registry: sha256(registrySource),
-    manifest: sha256(manifestSource),
-    target: "es2020",
-    format: "iife",
-    platform: "neutral"
-  }));
+  const key = sha256(
+    JSON.stringify({
+      schemaVersion: 1,
+      generator: sha256(generatorSource),
+      builder: sha256(buildSource),
+      registry: sha256(registrySource),
+      manifest: sha256(manifestSource),
+      target: "es2020",
+      format: "iife",
+      platform: "neutral",
+    }),
+  );
   const sentinelPath = path.join(options.outputRoot, "component-bundle.sentinel.json");
-  const current = !options.force && await verifySentinel(sentinelPath, options.outputRoot, key, options.check === true);
+  const current =
+    !options.force && (await verifySentinel(sentinelPath, options.outputRoot, key, options.check === true));
   if (current) return { cacheHit: true, key, manifest, sentinel: current, generated };
-  if (options.check) throw new Error("Component registry bundle is missing or stale; run without --check to regenerate it");
+  if (options.check)
+    throw new Error("Component registry bundle is missing or stale; run without --check to regenerate it");
 
   // This bundle is evaluated by defold_hermes::Runtime::load, so it must carry
   // the same self-describing content fingerprint as every other deherm bundle.
@@ -139,43 +147,54 @@ export async function buildComponentRegistry(argv = []) {
     sourcemap: "external",
     metafile: true,
     alias: {
-      "@ts-defold/deherm/component": path.join(repositoryRoot, "packages/sdk/src/component.ts")
-    }
+      "@ts-defold/deherm/component": path.join(repositoryRoot, "packages/sdk/src/component.ts"),
+    },
   });
   const js = buildResult.outputFiles.find(({ path: file }) => file.endsWith(".js"));
   const map = buildResult.outputFiles.find(({ path: file }) => file.endsWith(".js.map"));
   if (!js || !map) throw new Error("Component registry bundler did not emit JavaScript and source map outputs");
-  const { fingerprint, source: fingerprintedJs } =
-      applyBundleFingerprint(js.text, fingerprintPlaceholder);
-  const usage = `${JSON.stringify({
-    schemaVersion: 1,
-    generator: "scripts/build-component-registry.mjs",
-    cacheKey: key,
-    registry: "__defoldComponentsV1",
-    componentOnlyBootstrap: true,
-    bundleFingerprint: fingerprint,
-    components: manifest.components.map(({ componentId, source, contextKind, schemaFingerprint }) => ({
-      componentId, source, contextKind, schemaFingerprint
-    }))
-  }, null, 2)}\n`;
+  const { fingerprint, source: fingerprintedJs } = applyBundleFingerprint(js.text, fingerprintPlaceholder);
+  const usage = `${JSON.stringify(
+    {
+      schemaVersion: 1,
+      generator: "scripts/build-component-registry.mjs",
+      cacheKey: key,
+      registry: "__defoldComponentsV1",
+      componentOnlyBootstrap: true,
+      bundleFingerprint: fingerprint,
+      components: manifest.components.map(({ componentId, source, contextKind, schemaFingerprint }) => ({
+        componentId,
+        source,
+        contextKind,
+        schemaFingerprint,
+      })),
+    },
+    null,
+    2,
+  )}\n`;
   const contents = new Map([
     ["components.js", Buffer.from(fingerprintedJs)],
     ["components.js.map", map.contents],
-    ["components.usage.json", Buffer.from(usage)]
+    ["components.usage.json", Buffer.from(usage)],
   ]);
-  const outputs = Object.fromEntries([...contents].map(([name, content]) => [name, {
-    size: content.byteLength,
-    sha256: sha256(content)
-  }]));
+  const outputs = Object.fromEntries(
+    [...contents].map(([name, content]) => [
+      name,
+      {
+        size: content.byteLength,
+        sha256: sha256(content),
+      },
+    ]),
+  );
   const sentinel = {
     schemaVersion: 1,
     generator: "scripts/build-component-registry.mjs",
     cacheKey: key,
     inputs: {
       componentManifestSha256: sha256(manifestSource),
-      registrySha256: sha256(registrySource)
+      registrySha256: sha256(registrySource),
     },
-    outputs
+    outputs,
   };
   for (const [name, content] of contents) await atomicWrite(path.join(options.outputRoot, name), content);
   await atomicWrite(sentinelPath, `${JSON.stringify(sentinel, null, 2)}\n`);
@@ -184,5 +203,7 @@ export async function buildComponentRegistry(argv = []) {
 
 if (process.argv[1] && pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url) {
   const result = await buildComponentRegistry(process.argv.slice(2));
-  console.log(`Component registry bundle: ${result.cacheHit ? "current" : "generated"} (${result.manifest.components.length} components)`);
+  console.log(
+    `Component registry bundle: ${result.cacheHit ? "current" : "generated"} (${result.manifest.components.length} components)`,
+  );
 }

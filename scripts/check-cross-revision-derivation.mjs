@@ -48,7 +48,8 @@ import { REVISION_AUDIT_ENV } from "./lib/revision-audit.mjs";
 const run = promisify(execFile);
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const baselinePath = path.join(root, "packages", "bindings", "probes", "cross-revision-baseline.json");
-const baselineComment = "How much of the complete binding-generation chain refuses to derive a Defold revision other than the pinned one. Measured by scripts/check-cross-revision-derivation.mjs. This number only goes DOWN: a change that makes more steps refuse fails the check with the new refusals named. The ordinary pinned-revision check cannot expose assumptions written against that same revision.";
+const baselineComment =
+  "How much of the complete binding-generation chain refuses to derive a Defold revision other than the pinned one. Measured by scripts/check-cross-revision-derivation.mjs. This number only goes DOWN: a change that makes more steps refuse fails the check with the new refusals named. The ordinary pinned-revision check cannot expose assumptions written against that same revision.";
 
 /**
  * Every revision-derived binding generator, tagged by surface.
@@ -60,7 +61,7 @@ const baselineComment = "How much of the complete binding-generation chain refus
  */
 export const crossRevisionGenerationSteps = Object.freeze([
   ...scriptGenerationSteps.map((step) => Object.freeze({ ...step, surface: "script" })),
-  ...dmSdkGenerationSteps.map((step) => Object.freeze({ ...step, surface: "dmsdk" }))
+  ...dmSdkGenerationSteps.map((step) => Object.freeze({ ...step, surface: "dmsdk" })),
 ]);
 
 /**
@@ -73,25 +74,28 @@ const CAUSES = [
   {
     id: "absent-source",
     test: /ENOENT|no such file/,
-    fix: "Load cited Defold sources with loadReviewedSources, which withdraws the " +
+    fix:
+      "Load cited Defold sources with loadReviewedSources, which withdraws the " +
       "ones a revision does not have instead of dying on the first. Defold 1.13.1 " +
-      "has no bullet3d backend at all; that is not a broken review."
+      "has no bullet3d backend at all; that is not a broken review.",
   },
   {
     id: "revision-stamp",
     test: /revisions? differs?|different Defold revision|revisions differ/i,
-    fix: "The generator refuses when two of its inputs carry different defoldRevision " +
+    fix:
+      "The generator refuses when two of its inputs carry different defoldRevision " +
       "stamps. During a derivation that is transient - it means an earlier step in " +
       "the chain has not regenerated yet - so it must report which inputs disagree " +
-      "rather than refuse."
+      "rather than refuse.",
   },
   {
     id: "pinned-census",
     test: /expected|census|no longer resolves|drifted|is stale/i,
-    fix: "A count or hash recorded at the reviewed revision, asserted at another one. " +
+    fix:
+      "A count or hash recorded at the reviewed revision, asserted at another one. " +
       "Route it through expectReviewedCount: fatal in an ordinary generation, " +
-      "reported inside a declared derivation."
-  }
+      "reported inside a declared derivation.",
+  },
 ];
 
 function classify(message) {
@@ -112,15 +116,17 @@ async function main() {
   // optional here: a control revision is by definition not the one the reviews
   // name, and the point is to measure the GENERATORS, not to rediscover that.
   await rm(workspace, { recursive: true, force: true });
-  await run(process.execPath, [
-    "scripts/derive-revision.mjs", "--revision", revision, "--workspace", workspace, "--carry-reviews"
-  ], { cwd: root, maxBuffer: 64 * 1024 * 1024 }).catch((error) => error);
+  await run(
+    process.execPath,
+    ["scripts/derive-revision.mjs", "--revision", revision, "--workspace", workspace, "--carry-reviews"],
+    { cwd: root, maxBuffer: 64 * 1024 * 1024 },
+  ).catch((error) => error);
 
   const env = {
     ...process.env,
     [DERIVED_REVISION_ENV]: revision,
     [CARRIED_REVIEW_LEDGER_ENV]: path.join(workspace, "carried-reviews.jsonl"),
-    [REVISION_AUDIT_ENV]: path.join(workspace, "revision-audit.ndjson")
+    [REVISION_AUDIT_ENV]: path.join(workspace, "revision-audit.ndjson"),
   };
 
   const refusals = [];
@@ -136,9 +142,17 @@ async function main() {
       await run(command, [step.script], { cwd: workspace, env, maxBuffer: 32 * 1024 * 1024 });
     } catch (error) {
       const text = `${error.stderr ?? ""}${error.stdout ?? ""}`;
-      const message = (text.split("\n").find((line) => /^\s*(Error|AssertionError)/.test(line))
-        ?? text.split("\n")[0] ?? "").trim();
-      refusals.push({ surface: step.surface, step: step.script, cause: classify(message), message: message.slice(0, 300) });
+      const message = (
+        text.split("\n").find((line) => /^\s*(Error|AssertionError)/.test(line)) ??
+        text.split("\n")[0] ??
+        ""
+      ).trim();
+      refusals.push({
+        surface: step.surface,
+        step: step.script,
+        cause: classify(message),
+        message: message.slice(0, 300),
+      });
     }
   }
 
@@ -147,15 +161,18 @@ async function main() {
 
   const report = [];
   report.push(`Cross-revision derivation: Defold ${revision}`);
-  report.push(`${crossRevisionGenerationSteps.length} binding-generation steps, ${refusals.length} refused ` +
-    `(baseline ${baseline.refusingSteps}).`);
+  report.push(
+    `${crossRevisionGenerationSteps.length} binding-generation steps, ${refusals.length} refused ` +
+      `(baseline ${baseline.refusingSteps}).`,
+  );
   report.push("");
   for (const cause of [...CAUSES.map(({ id }) => id), "unclassified"]) {
     const rows = byCause.get(cause) ?? [];
     if (!rows.length) continue;
-    const fix = CAUSES.find(({ id }) => id === cause)?.fix
-      ?? "Not one of the known causes. Read the message and decide whether it is a real " +
-         "engine difference or another pinned assumption.";
+    const fix =
+      CAUSES.find(({ id }) => id === cause)?.fix ??
+      "Not one of the known causes. Read the message and decide whether it is a real " +
+        "engine difference or another pinned assumption.";
     report.push(`## ${cause} (${rows.length})`);
     report.push("");
     report.push(fix);
@@ -168,13 +185,23 @@ async function main() {
   await writeFile(path.join(workspace, "cross-revision-report.md"), `${text}\n`);
 
   if (update) {
-    await writeFile(baselinePath, `${JSON.stringify({
-      ...baseline, comment: baselineComment,
-      refusingSteps: refusals.length, totalSteps: crossRevisionGenerationSteps.length,
-      refusalsByCause: Object.fromEntries([...byCause].map(([cause, rows]) => [cause, rows.length])),
-      steps: refusals.map(({ surface, step, cause }) => ({ surface, step, cause }))
-        .sort((a, b) => a.surface.localeCompare(b.surface) || a.step.localeCompare(b.step))
-    }, null, 2)}\n`);
+    await writeFile(
+      baselinePath,
+      `${JSON.stringify(
+        {
+          ...baseline,
+          comment: baselineComment,
+          refusingSteps: refusals.length,
+          totalSteps: crossRevisionGenerationSteps.length,
+          refusalsByCause: Object.fromEntries([...byCause].map(([cause, rows]) => [cause, rows.length])),
+          steps: refusals
+            .map(({ surface, step, cause }) => ({ surface, step, cause }))
+            .sort((a, b) => a.surface.localeCompare(b.surface) || a.step.localeCompare(b.step)),
+        },
+        null,
+        2,
+      )}\n`,
+    );
     console.log(`\nBaseline updated to ${refusals.length}.`);
     return;
   }
@@ -184,14 +211,16 @@ async function main() {
     const added = refusals.filter(({ step }) => !known.has(step));
     throw new Error(
       `${refusals.length} steps refuse to derive ${revision}, up from a baseline of ` +
-      `${baseline.refusingSteps}.\nNewly refusing:\n` +
-      added.map(({ step, message }) => `  ${step}\n      ${message}`).join("\n") +
-      "\nA generator must not start depending on the pinned revision's shape."
+        `${baseline.refusingSteps}.\nNewly refusing:\n` +
+        added.map(({ step, message }) => `  ${step}\n      ${message}`).join("\n") +
+        "\nA generator must not start depending on the pinned revision's shape.",
     );
   }
   if (refusals.length < baseline.refusingSteps) {
-    console.log(`\n${baseline.refusingSteps - refusals.length} fewer than the baseline. ` +
-      "Lower it: node scripts/check-cross-revision-derivation.mjs --update-baseline");
+    console.log(
+      `\n${baseline.refusingSteps - refusals.length} fewer than the baseline. ` +
+        "Lower it: node scripts/check-cross-revision-derivation.mjs --update-baseline",
+    );
   }
 }
 

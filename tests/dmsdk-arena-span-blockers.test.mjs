@@ -21,23 +21,24 @@ function withJson(text, mutate) {
 function withIrMutation(inputs, mutate) {
   const irText = withJson(inputs.irText, mutate);
   const hash = createHash("sha256").update(irText).digest("hex");
-  const shapesText = withJson(inputs.shapesText, (shapes) => { shapes.sourceHashes.ir = hash; });
+  const shapesText = withJson(inputs.shapesText, (shapes) => {
+    shapes.sourceHashes.ir = hash;
+  });
   const shapesHash = createHash("sha256").update(shapesText).digest("hex");
-  const priorWaveTexts = new Map([...inputs.priorWaveTexts].map(([path, text]) => [
-    path,
-    withJson(text, (report) => {
-      report.sourceHashes.ir = hash;
-      report.sourceHashes.shapes = shapesHash;
-    }),
-  ]));
+  const priorWaveTexts = new Map(
+    [...inputs.priorWaveTexts].map(([path, text]) => [
+      path,
+      withJson(text, (report) => {
+        report.sourceHashes.ir = hash;
+        report.sourceHashes.shapes = shapesHash;
+      }),
+    ]),
+  );
   return { ...inputs, irText, shapesText, priorWaveTexts };
 }
 
 test("arena-cstring policy contains a transport recipe, not Defold revision facts", async () => {
-  const text = await readFile(
-    new URL("packages/bindings/overrides/dmsdk-arena-span-blockers.json", root),
-    "utf8",
-  );
+  const text = await readFile(new URL("packages/bindings/overrides/dmsdk-arena-span-blockers.json", root), "utf8");
   const value = JSON.parse(text);
   assert.deepEqual(Object.keys(value).sort(), ["family", "recipe", "schemaVersion"]);
   assert.deepEqual(Object.keys(value.recipe).sort(), [
@@ -49,18 +50,20 @@ test("arena-cstring policy contains a transport recipe, not Defold revision fact
     "sourceGrouping",
     "transport",
   ]);
-  assert.doesNotMatch(text, /(?:defoldRevision|dmURI|upstream\/defold|dmsdk:|policyVersion|priorWaveReports|sourceEvidence|shape)/u);
+  assert.doesNotMatch(
+    text,
+    /(?:defoldRevision|dmURI|upstream\/defold|dmsdk:|policyVersion|priorWaveReports|sourceEvidence|shape)/u,
+  );
 });
 
 test("arena-span census deterministically promotes bounded cstring arenas and preserves blockers", async () => {
   execFileSync(process.execPath, ["scripts/generate-dmsdk-arena-span-blockers.mjs", "--check"], {
     cwd: root,
-    stdio: "pipe"
+    stdio: "pipe",
   });
-  const report = JSON.parse(await readFile(
-    new URL("packages/bindings/generated/defold-dmsdk-arena-span-blockers.json", root),
-    "utf8"
-  ));
+  const report = JSON.parse(
+    await readFile(new URL("packages/bindings/generated/defold-dmsdk-arena-span-blockers.json", root), "utf8"),
+  );
   assert.deepEqual(report.coverage, {
     arenaSpanCensus: 79,
     coveredByPriorWaves: 14,
@@ -69,13 +72,13 @@ test("arena-span census deterministically promotes bounded cstring arenas and pr
     executableAdaptersEmitted: 5,
     exactCallTwinsEmitted: 5,
     overlap: 0,
-    unaccounted: 0
+    unaccounted: 0,
   });
   assert.deepEqual(report.partitionSummary, {
     "handle-provenance-or-engine-context": 33,
     "opaque-byte-pointee-unit-or-lifetime": 4,
     "record-layout-or-borrowed-record-lifetime": 17,
-    "template-element-layout-or-specialization": 6
+    "template-element-layout-or-specialization": 6,
   });
   const priorIds = new Set(report.coveredByPriorWaves.map(({ id }) => id));
   const blockedIds = new Set(report.declarations.map(({ id }) => id));
@@ -83,13 +86,26 @@ test("arena-span census deterministically promotes bounded cstring arenas and pr
   const generatedIds = new Set(report.generatedDeclarations.map(({ id }) => id));
   assert.equal(generatedIds.size, 5);
   assert.equal(blockedIds.size, 60);
-  assert.equal([...priorIds].some((id) => blockedIds.has(id)), false);
-  assert.equal([...priorIds].some((id) => generatedIds.has(id)), false);
-  assert.equal([...generatedIds].some((id) => blockedIds.has(id)), false);
-  assert.equal(Object.values(report.partitionSummary).reduce((sum, count) => sum + count, 0), 60);
-  assert.deepEqual(report.generatedDeclarations.map(({ recipe }) => recipe.kind), [
-    "canonical-path", "error-string", "trimmed-string", "uri-encode", "canonical-path"
-  ]);
+  assert.equal(
+    [...priorIds].some((id) => blockedIds.has(id)),
+    false,
+  );
+  assert.equal(
+    [...priorIds].some((id) => generatedIds.has(id)),
+    false,
+  );
+  assert.equal(
+    [...generatedIds].some((id) => blockedIds.has(id)),
+    false,
+  );
+  assert.equal(
+    Object.values(report.partitionSummary).reduce((sum, count) => sum + count, 0),
+    60,
+  );
+  assert.deepEqual(
+    report.generatedDeclarations.map(({ recipe }) => recipe.kind),
+    ["canonical-path", "error-string", "trimmed-string", "uri-encode", "canonical-path"],
+  );
   for (const declaration of report.generatedDeclarations) {
     assert.equal(declaration.disposition, "generated");
     assert.equal(declaration.preferredLowering, true);
@@ -100,8 +116,11 @@ test("arena-span census deterministically promotes bounded cstring arenas and pr
     assert.equal(declaration.patternDecision.fallback, false);
     assert.equal(declaration.patternDecision.patternId, `arena-cstring.${declaration.recipe.kind}`);
     assert.equal(declaration.symbolEvidence.path, "packages/bindings/generated/defold-dmsdk-symbol-evidence.json");
-    assert.ok(declaration.symbolEvidence.linkage === "header-only" ||
-      (declaration.symbolEvidence.linkage === "external" && declaration.symbolEvidence.availability === "all-targets-all-variants"));
+    assert.ok(
+      declaration.symbolEvidence.linkage === "header-only" ||
+        (declaration.symbolEvidence.linkage === "external" &&
+          declaration.symbolEvidence.availability === "all-targets-all-variants"),
+    );
   }
   assert.match(report.sourceHashes.symbolEvidence, /^[0-9a-f]{64}$/u);
   for (const declaration of report.declarations) {
@@ -115,23 +134,91 @@ test("arena-span census deterministically promotes bounded cstring arenas and pr
 test("arena cstring production and exact twins compile, and exact vectors execute", async () => {
   const directory = await mkdtemp(path.join(tmpdir(), "deherm-arena-cstring-"));
   const repository = repositoryRoot;
-  const sdk = path.join(repository, "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk");
+  const sdk = path.join(
+    repository,
+    "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk",
+  );
   const compiler = process.env.CXX || "clang++";
   const cCompiler = process.env.CC || "clang";
-  const includes = [`-I${path.join(repository, "defold/defold_hermes/include")}`, "-isystem", path.join(sdk, "sdk/include"), "-isystem", path.join(sdk, "include")];
+  const includes = [
+    `-I${path.join(repository, "defold/defold_hermes/include")}`,
+    "-isystem",
+    path.join(sdk, "sdk/include"),
+    "-isystem",
+    path.join(sdk, "include"),
+  ];
   try {
     const cHeader = path.join(directory, "header.c");
-    await writeFile(cHeader, "#include <defold_hermes/generated_dmsdk_arena_cstring.h>\nint main(void){return DEHERM_DMSDK_ARENA_CSTRING_MAX_INPUT==UINT32_C(4095)?0:1;}\n");
-    execFileSync(cCompiler, ["-std=c11", "-Wall", "-Wextra", "-Werror", "-pedantic", `-I${path.join(repository, "defold/defold_hermes/include")}`, "-c", cHeader, "-o", path.join(directory, "header.o")], { cwd: repository, stdio: "pipe" });
-    execFileSync(compiler, ["-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic", ...includes, "-c", "defold/defold_hermes/src/generated_dmsdk_arena_cstring.cpp", "-o", path.join(directory, "production.o")], { cwd: repository, stdio: "pipe" });
+    await writeFile(
+      cHeader,
+      "#include <defold_hermes/generated_dmsdk_arena_cstring.h>\nint main(void){return DEHERM_DMSDK_ARENA_CSTRING_MAX_INPUT==UINT32_C(4095)?0:1;}\n",
+    );
+    execFileSync(
+      cCompiler,
+      [
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pedantic",
+        `-I${path.join(repository, "defold/defold_hermes/include")}`,
+        "-c",
+        cHeader,
+        "-o",
+        path.join(directory, "header.o"),
+      ],
+      { cwd: repository, stdio: "pipe" },
+    );
+    execFileSync(
+      compiler,
+      [
+        "-std=c++17",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pedantic",
+        ...includes,
+        "-c",
+        "defold/defold_hermes/src/generated_dmsdk_arena_cstring.cpp",
+        "-o",
+        path.join(directory, "production.o"),
+      ],
+      { cwd: repository, stdio: "pipe" },
+    );
     const main = path.join(directory, "main.cpp");
-    await writeFile(main, "extern \"C\" int deherm_dmsdk_arena_cstring_exact_verify(void);\nint main(){return deherm_dmsdk_arena_cstring_exact_verify();}\n");
+    await writeFile(
+      main,
+      'extern "C" int deherm_dmsdk_arena_cstring_exact_verify(void);\nint main(){return deherm_dmsdk_arena_cstring_exact_verify();}\n',
+    );
     const executable = path.join(directory, process.platform === "win32" ? "exact.exe" : "exact");
-    const sanitizerFlags = process.platform === "win32" ? [] : ["-fsanitize=address,undefined", "-fno-omit-frame-pointer"];
-    execFileSync(compiler, ["-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic", ...sanitizerFlags, ...includes, "tests/fixtures/generated_dmsdk_arena_cstring_exact.cpp", main, "-o", executable], { cwd: repository, stdio: "pipe" });
-    execFileSync(executable, [], { cwd: repository, stdio: "pipe", env: { ...process.env, ASAN_OPTIONS: "detect_leaks=0", UBSAN_OPTIONS: "halt_on_error=1" } });
+    const sanitizerFlags =
+      process.platform === "win32" ? [] : ["-fsanitize=address,undefined", "-fno-omit-frame-pointer"];
+    execFileSync(
+      compiler,
+      [
+        "-std=c++17",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pedantic",
+        ...sanitizerFlags,
+        ...includes,
+        "tests/fixtures/generated_dmsdk_arena_cstring_exact.cpp",
+        main,
+        "-o",
+        executable,
+      ],
+      { cwd: repository, stdio: "pipe" },
+    );
+    execFileSync(executable, [], {
+      cwd: repository,
+      stdio: "pipe",
+      env: { ...process.env, ASAN_OPTIONS: "detect_leaks=0", UBSAN_OPTIONS: "halt_on_error=1" },
+    });
     const allocationMain = path.join(directory, "allocation.cpp");
-    await writeFile(allocationMain, `
+    await writeFile(
+      allocationMain,
+      `
 #include <defold_hermes/generated_dmsdk_arena_cstring.h>
 #include <cstddef>
 #include <cstdint>
@@ -145,10 +232,31 @@ extern "C" DehermDmSdkArenaCStringStatus deherm_dmsdk_arena_cstring_exact_dispat
 int main(){const char input[]="arena_0";char output[64]{};DehermDmSdkArenaCStringResult result{};
 if(deherm_dmsdk_arena_cstring_exact_dispatch(0,reinterpret_cast<const uint8_t*>(input),7,0,output,64,&result)!=DEHERM_DMSDK_ARENA_CSTRING_OK)return 1;
 tracking=true;for(uint32_t i=0;i<UINT32_C(100000);++i){std::memset(output,0,sizeof(output));result={};if(deherm_dmsdk_arena_cstring_exact_dispatch(0,reinterpret_cast<const uint8_t*>(input),7,0,output,64,&result)!=DEHERM_DMSDK_ARENA_CSTRING_OK||std::strcmp(output,"result_0")!=0)return 2;}tracking=false;return allocations==0?0:3;}
-`);
+`,
+    );
     const allocationExecutable = path.join(directory, process.platform === "win32" ? "allocation.exe" : "allocation");
-    execFileSync(compiler, ["-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic", ...sanitizerFlags, ...includes, "tests/fixtures/generated_dmsdk_arena_cstring_exact.cpp", allocationMain, "-o", allocationExecutable], { cwd: repository, stdio: "pipe" });
-    execFileSync(allocationExecutable, [], { cwd: repository, stdio: "pipe", env: { ...process.env, ASAN_OPTIONS: "detect_leaks=0", UBSAN_OPTIONS: "halt_on_error=1" } });
+    execFileSync(
+      compiler,
+      [
+        "-std=c++17",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pedantic",
+        ...sanitizerFlags,
+        ...includes,
+        "tests/fixtures/generated_dmsdk_arena_cstring_exact.cpp",
+        allocationMain,
+        "-o",
+        allocationExecutable,
+      ],
+      { cwd: repository, stdio: "pipe" },
+    );
+    execFileSync(allocationExecutable, [], {
+      cwd: repository,
+      stdio: "pipe",
+      env: { ...process.env, ASAN_OPTIONS: "detect_leaks=0", UBSAN_OPTIONS: "halt_on_error=1" },
+    });
   } finally {
     await rm(directory, { recursive: true, force: true });
   }
@@ -157,10 +265,19 @@ tracking=true;for(uint32_t i=0;i<UINT32_C(100000);++i){std::memset(output,0,size
 test("arena cstring generation is clean-room deterministic and allocation bounded", async () => {
   const directory = await mkdtemp(path.join(tmpdir(), "deherm-arena-cstring-generation-"));
   try {
-    execFileSync(process.execPath, ["scripts/generate-dmsdk-arena-span-blockers.mjs", "--output-root", directory], { cwd: root, stdio: "pipe" });
-    const report = JSON.parse(await readFile(new URL("packages/bindings/generated/defold-dmsdk-arena-span-blockers.json", root), "utf8"));
+    execFileSync(process.execPath, ["scripts/generate-dmsdk-arena-span-blockers.mjs", "--output-root", directory], {
+      cwd: root,
+      stdio: "pipe",
+    });
+    const report = JSON.parse(
+      await readFile(new URL("packages/bindings/generated/defold-dmsdk-arena-span-blockers.json", root), "utf8"),
+    );
     for (const artifact of [...report.artifacts, "packages/bindings/generated/defold-dmsdk-arena-span-blockers.json"]) {
-      assert.equal(await readFile(path.join(directory, artifact), "utf8"), await readFile(new URL(artifact, root), "utf8"), artifact);
+      assert.equal(
+        await readFile(path.join(directory, artifact), "utf8"),
+        await readFile(new URL(artifact, root), "utf8"),
+        artifact,
+      );
     }
     for (const artifact of report.artifacts.filter((name) => name.endsWith(".cpp"))) {
       const source = await readFile(new URL(artifact, root), "utf8");
@@ -175,36 +292,71 @@ test("arena cstring generation is clean-room deterministic and allocation bounde
 
 test("arena-span blocker generator rejects recipe, provenance, and duplicate drift", async () => {
   const inputs = await loadInputs();
-  assert.throws(() => generate({
-    ...inputs,
-    recipeText: withJson(inputs.recipeText, (recipe) => { recipe.schemaVersion = 2; })
-  }), /schemaVersion must be 1/);
-  assert.throws(() => generate({
-    ...inputs,
-    recipeText: withJson(inputs.recipeText, (recipe) => { recipe.defoldRevision = "0".repeat(40); })
-  }), /unsupported schema keys: .*defoldRevision/);
-  assert.throws(() => generate({
-    ...inputs,
-    shapesText: withJson(inputs.shapesText, (shapes) => { shapes.sourceHashes.ir = "0".repeat(64); })
-  }), /IR hash does not match ABI-shape census provenance/);
-  assert.throws(() => generate({
-    ...inputs,
-    shapesText: withJson(inputs.shapesText, (shapes) => { shapes.rows.push(structuredClone(shapes.rows[0])); })
-  }), /contains duplicate/);
-  assert.throws(() => generate({
-    ...inputs,
-    symbolEvidenceText: withJson(inputs.symbolEvidenceText, (evidence) => { evidence.defoldRevision = "0".repeat(40); })
-  }), /symbol evidence is invalid or revision-mismatched/);
+  assert.throws(
+    () =>
+      generate({
+        ...inputs,
+        recipeText: withJson(inputs.recipeText, (recipe) => {
+          recipe.schemaVersion = 2;
+        }),
+      }),
+    /schemaVersion must be 1/,
+  );
+  assert.throws(
+    () =>
+      generate({
+        ...inputs,
+        recipeText: withJson(inputs.recipeText, (recipe) => {
+          recipe.defoldRevision = "0".repeat(40);
+        }),
+      }),
+    /unsupported schema keys: .*defoldRevision/,
+  );
+  assert.throws(
+    () =>
+      generate({
+        ...inputs,
+        shapesText: withJson(inputs.shapesText, (shapes) => {
+          shapes.sourceHashes.ir = "0".repeat(64);
+        }),
+      }),
+    /IR hash does not match ABI-shape census provenance/,
+  );
+  assert.throws(
+    () =>
+      generate({
+        ...inputs,
+        shapesText: withJson(inputs.shapesText, (shapes) => {
+          shapes.rows.push(structuredClone(shapes.rows[0]));
+        }),
+      }),
+    /contains duplicate/,
+  );
+  assert.throws(
+    () =>
+      generate({
+        ...inputs,
+        symbolEvidenceText: withJson(inputs.symbolEvidenceText, (evidence) => {
+          evidence.defoldRevision = "0".repeat(40);
+        }),
+      }),
+    /symbol evidence is invalid or revision-mismatched/,
+  );
   const generatedId = generate(inputs).report.generatedDeclarations[0].id;
   const unavailable = generate({
     ...inputs,
     symbolEvidenceText: withJson(inputs.symbolEvidenceText, (evidence) => {
       evidence.declarations[generatedId].availability = "target-subset";
-    })
+    }),
   }).report;
-  assert.equal(unavailable.generatedDeclarations.some(({ id }) => id === generatedId), false);
-  assert.equal(unavailable.declarations.find(({ id }) => id === generatedId)?.blocker,
-    "cstring-arena-specialization-unverified");
+  assert.equal(
+    unavailable.generatedDeclarations.some(({ id }) => id === generatedId),
+    false,
+  );
+  assert.equal(
+    unavailable.declarations.find(({ id }) => id === generatedId)?.blocker,
+    "cstring-arena-specialization-unverified",
+  );
   assert.equal(unavailable.declarations.find(({ id }) => id === generatedId)?.universalFallback, "retained");
 });
 
@@ -212,19 +364,31 @@ test("arena-span historical counts do not gate a new revision", async () => {
   const inputs = await loadInputs();
   const priorWaveTexts = new Map(inputs.priorWaveTexts);
   const [path, text] = priorWaveTexts.entries().next().value;
-  priorWaveTexts.set(path, withJson(text, (report) => { report.declarations.pop(); }));
+  priorWaveTexts.set(
+    path,
+    withJson(text, (report) => {
+      report.declarations.pop();
+    }),
+  );
   const changed = generate({ ...inputs, priorWaveTexts }).report;
   assert.equal(changed.coverage.coveredByPriorWaves, 13);
   assert.equal(changed.coverage.unaccounted, 0);
 
   const corruptPriorWaveTexts = new Map(inputs.priorWaveTexts);
-  corruptPriorWaveTexts.set(path, withJson(text, (report) => { report.sourceHashes.shapes = "0".repeat(64); }));
+  corruptPriorWaveTexts.set(
+    path,
+    withJson(text, (report) => {
+      report.sourceHashes.shapes = "0".repeat(64);
+    }),
+  );
   assert.throws(() => generate({ ...inputs, priorWaveTexts: corruptPriorWaveTexts }), /ABI-shape provenance drifted/);
 });
 
 test("arena-span recipes follow revision IR semantics and decline only the specialization when evidence disappears", async () => {
   const inputs = await loadInputs();
-  const generatedId = generate(inputs).report.generatedDeclarations.find(({ recipe }) => recipe.kind === "error-string").id;
+  const generatedId = generate(inputs).report.generatedDeclarations.find(
+    ({ recipe }) => recipe.kind === "error-string",
+  ).id;
   const changed = withIrMutation(inputs, (ir) => {
     const declaration = ir.declarations.find(({ id }) => id === generatedId);
     declaration.description = "The upstream documentation no longer proves the bounded output contract.";
@@ -253,6 +417,9 @@ test("a revision with no applicable arena specialization still emits a valid uni
   assert.equal(generated.report.coverage.generatedCStringArena, 0);
   assert.equal(generated.report.coverage.unaccounted, 0);
   assert.ok(generated.report.declarations.every(({ stages }) => stages.generated === "not-applicable"));
-  assert.match(generated.artifacts.get("defold/defold_hermes/src/generated_dmsdk_arena_cstring.cpp"), /return UINT32_C\(0\)/u);
+  assert.match(
+    generated.artifacts.get("defold/defold_hermes/src/generated_dmsdk_arena_cstring.cpp"),
+    /return UINT32_C\(0\)/u,
+  );
   assert.match(generated.artifacts.get("tests/fixtures/generated_dmsdk_arena_cstring_exact.cpp"), /UNKNOWN_ID/u);
 });

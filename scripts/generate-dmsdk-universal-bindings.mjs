@@ -69,17 +69,34 @@ const artifacts = Object.freeze([
 ]);
 
 const valueKind = Object.freeze({
-  void: "void", scalar: "scalar", enum: "enum", cstring: "cstring", array: "memory",
-  pointer: "pointer", reference: "pointer", record: "record", "template-record": "record",
-  handle: "handle", callback: "callback", named: "named", template: "template",
-  "type-parameter": "type-parameter", variadic: "variadic", opaque: "opaque", unknown: "unknown",
+  void: "void",
+  scalar: "scalar",
+  enum: "enum",
+  cstring: "cstring",
+  array: "memory",
+  pointer: "pointer",
+  reference: "pointer",
+  record: "record",
+  "template-record": "record",
+  handle: "handle",
+  callback: "callback",
+  named: "named",
+  template: "template",
+  "type-parameter": "type-parameter",
+  variadic: "variadic",
+  opaque: "opaque",
+  unknown: "unknown",
 });
 
-function sha256(value) { return createHash("sha256").update(value).digest("hex"); }
+function sha256(value) {
+  return createHash("sha256").update(value).digest("hex");
+}
 
 export function selectEndianRoundTripRecipes(recipes) {
   const selected = ["dmEndian::ToNetwork", "dmEndian::ToHost"].map((symbol) => {
-    const matches = recipes.filter((recipe) => recipe.symbol === symbol && recipe.abi.parameters[0]?.nativeType === "uint32_t");
+    const matches = recipes.filter(
+      (recipe) => recipe.symbol === symbol && recipe.abi.parameters[0]?.nativeType === "uint32_t",
+    );
     if (matches.length > 1) throw new Error(`Expected at most one uint32_t ${symbol} recipe, got ${matches.length}`);
     return matches[0] ?? null;
   });
@@ -122,8 +139,8 @@ function nodeKinds(node) {
 function carriesRecordByValue(node, behindIndirection = false) {
   if (!node || typeof node !== "object") return false;
   if (["record", "template-record"].includes(node.kind)) return !behindIndirection;
-  const nextBehindIndirection = behindIndirection ||
-    ["pointer", "reference", "handle", "callback", "opaque"].includes(node.kind);
+  const nextBehindIndirection =
+    behindIndirection || ["pointer", "reference", "handle", "callback", "opaque"].includes(node.kind);
   for (const key of ["to", "target", "representation", "element", "result"]) {
     if (carriesRecordByValue(node[key], nextBehindIndirection)) return true;
   }
@@ -148,13 +165,17 @@ function ownerOf(row) {
   return pieces.slice(0, -1).join("::");
 }
 
-function leafOf(symbol) { return symbol.split("::").at(-1); }
+function leafOf(symbol) {
+  return symbol.split("::").at(-1);
+}
 
 function stripCppComments(source) {
   return source.replace(/\/\*[\s\S]*?\*\//gu, " ").replace(/\/\/.*$/gmu, " ");
 }
 
-function regexpEscape(value) { return value.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&"); }
+function regexpEscape(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
+}
 
 function hasCallableMemberSpelling(code, member) {
   // A word boundary cannot precede a C++ destructor spelling: both whitespace
@@ -196,8 +217,13 @@ async function requireDirectory(target, label) {
 }
 
 function validatePublicSdkInclude(include) {
-  if (typeof include !== "string" || include.length === 0 || path.isAbsolute(include) ||
-      include.includes("\\") || include.split("/").includes("..")) {
+  if (
+    typeof include !== "string" ||
+    include.length === 0 ||
+    path.isAbsolute(include) ||
+    include.includes("\\") ||
+    include.split("/").includes("..")
+  ) {
     throw new Error(`Invalid public Defold SDK include path: ${JSON.stringify(include)}`);
   }
   return include;
@@ -207,7 +233,9 @@ export async function attachPublicSdkFacts(root, revision, recipes) {
   const lockFile = path.join(root, "upstream.lock");
   const lock = await readLockKeys(lockFile, ["DEFOLD_REV", "DEFOLD_SDK_URL", "DEFOLD_SDK_SHA256"]);
   if (lock.DEFOLD_REV !== revision) {
-    throw new Error(`upstream.lock pins Defold ${lock.DEFOLD_REV}, but the dmSDK universal inputs describe ${revision}`);
+    throw new Error(
+      `upstream.lock pins Defold ${lock.DEFOLD_REV}, but the dmSDK universal inputs describe ${revision}`,
+    );
   }
   if (!/^[0-9a-f]{64}$/u.test(lock.DEFOLD_SDK_SHA256)) {
     throw new Error(`upstream.lock DEFOLD_SDK_SHA256 is not a lowercase SHA-256 digest: ${lock.DEFOLD_SDK_SHA256}`);
@@ -223,7 +251,7 @@ export async function attachPublicSdkFacts(root, revision, recipes) {
   }
   if (observedDigest !== lock.DEFOLD_SDK_SHA256) {
     throw new Error(
-      `The pinned Defold SDK extraction digest is ${observedDigest || "empty"}, expected ${lock.DEFOLD_SDK_SHA256}`
+      `The pinned Defold SDK extraction digest is ${observedDigest || "empty"}, expected ${lock.DEFOLD_SDK_SHA256}`,
     );
   }
 
@@ -255,7 +283,9 @@ export async function attachPublicSdkFacts(root, revision, recipes) {
         requiredHeaders.push({ header: include, state: "absent" });
         continue;
       }
-      throw new Error(`The pinned Defold SDK extraction has no readable required header ${include}: ${headerPath}`, { cause });
+      throw new Error(`The pinned Defold SDK extraction has no readable required header ${include}: ${headerPath}`, {
+        cause,
+      });
     }
     if (!member) {
       throw new Error(`The pinned Defold SDK cache contains unmanifested archive member ${memberPath}: ${headerPath}`);
@@ -264,7 +294,7 @@ export async function attachPublicSdkFacts(root, revision, recipes) {
     if (bytes.byteLength !== member.size || observedSha256 !== member.sha256) {
       throw new Error(
         `The pinned Defold SDK cache modified archive member ${memberPath}: expected ${member.size} bytes/${member.sha256}, ` +
-        `got ${bytes.byteLength} bytes/${observedSha256}`
+          `got ${bytes.byteLength} bytes/${observedSha256}`,
       );
     }
     texts.set(include, bytes.toString("utf8"));
@@ -292,13 +322,13 @@ export async function attachPublicSdkFacts(root, revision, recipes) {
 }
 
 function invocationKind(kind) {
-  return ({
+  return {
     function: "direct-function",
     method: "member-function",
     constructor: "placement-constructor",
     destructor: "explicit-destructor",
     "function-template": "function-template-specialization",
-  })[kind];
+  }[kind];
 }
 
 function templateParameters(row) {
@@ -315,21 +345,25 @@ function templateParameters(row) {
 
 function enumFact(shape, row, declarations) {
   if (shape.kind !== "enum") return null;
-  let matches = declarations.filter((declaration) =>
-    declaration.kind === "enum" && declaration.name === shape.name);
+  let matches = declarations.filter((declaration) => declaration.kind === "enum" && declaration.name === shape.name);
   if (matches.length !== 1) {
     const leaf = shape.name.split("::").at(-1);
-    matches = declarations.filter((declaration) =>
-      declaration.kind === "enum" && declaration.header === row.provenance.header &&
-      declaration.name.split("::").at(-1) === leaf);
+    matches = declarations.filter(
+      (declaration) =>
+        declaration.kind === "enum" &&
+        declaration.header === row.provenance.header &&
+        declaration.name.split("::").at(-1) === leaf,
+    );
   }
   if (matches.length !== 1) {
     throw new Error(`${row.id} enum ${shape.name} resolves to ${matches.length} SDK declarations`);
   }
   const declaration = matches[0];
   const members = (declaration.members ?? []).map(({ name, value }) => ({ name, value }));
-  if (!members.length || members.some(({ name, value }) =>
-    typeof name !== "string" || !name || !Number.isSafeInteger(value))) {
+  if (
+    !members.length ||
+    members.some(({ name, value }) => typeof name !== "string" || !name || !Number.isSafeInteger(value))
+  ) {
     throw new Error(`${row.id} enum ${shape.name} has no complete safe-integer domain`);
   }
   return {
@@ -348,7 +382,8 @@ function requirementFor(node) {
   if (kinds.includes("template") || kinds.includes("type-parameter")) requirements.push("template-arguments");
   if (kinds.includes("variadic")) requirements.push("typed-nonvariadic-facade");
   if (kinds.includes("callback")) requirements.push("callback-trampoline");
-  if (kinds.some((kind) => ["pointer", "reference", "cstring", "handle", "opaque"].includes(kind))) requirements.push("pointer-lifetime");
+  if (kinds.some((kind) => ["pointer", "reference", "cstring", "handle", "opaque"].includes(kind)))
+    requirements.push("pointer-lifetime");
   return requirements;
 }
 
@@ -371,7 +406,11 @@ function buildRecipe(row, declaration, numericId, specialized, context) {
   });
   const resultRequirements = requirementFor(row.signature.result);
   const resultEnumeration = enumFact(row.signature.result, row, context.declarations);
-  const requirements = new Set([...row.semanticTokensNeeded, ...resultRequirements, ...parameters.flatMap((item) => item.requirements)]);
+  const requirements = new Set([
+    ...row.semanticTokensNeeded,
+    ...resultRequirements,
+    ...parameters.flatMap((item) => item.requirements),
+  ]);
   if (hasReceiver) requirements.add("receiver-native-type");
   const templates = templateParameters(row);
   if (kind === "function-template" && templates.length === 0) requirements.add("explicit-template-arguments");
@@ -391,21 +430,30 @@ function buildRecipe(row, declaration, numericId, specialized, context) {
       nativeSymbol: row.symbol,
       sourceDefined: row.provenance.sourceDefined === true,
       member: ["method", "constructor", "destructor"].includes(kind) ? leafOf(row.symbol) : null,
-      receiver: hasReceiver ? {
-        required: true,
-        mode: kind === "constructor" ? "construction-storage" : "object",
-        owner: receiver,
-        nativeType: receiver && !context.templatedReceiverOwners.has(receiver) ? receiver : null,
-        source: receiver && !context.templatedReceiverOwners.has(receiver)
-          ? "source-derived-nontemplate-owner"
-          : "usage-substitution-required",
-      } : null,
+      receiver: hasReceiver
+        ? {
+            required: true,
+            mode: kind === "constructor" ? "construction-storage" : "object",
+            owner: receiver,
+            nativeType: receiver && !context.templatedReceiverOwners.has(receiver) ? receiver : null,
+            source:
+              receiver && !context.templatedReceiverOwners.has(receiver)
+                ? "source-derived-nontemplate-owner"
+                : "usage-substitution-required",
+          }
+        : null,
       templateArguments: { names: templates, source: "usage-required-when-unresolved" },
-      monomorphization: kind === "function-template" ? {
-        required: true,
-        signatureSource: parameters.length || row.signature.result.kind !== "void" ? "projection-or-usage-override" : "usage-required",
-        usageInputs: ["templateArguments", "parameters", "resultCppType", "resultShape", "nativeSymbol"],
-      } : null,
+      monomorphization:
+        kind === "function-template"
+          ? {
+              required: true,
+              signatureSource:
+                parameters.length || row.signature.result.kind !== "void"
+                  ? "projection-or-usage-override"
+                  : "usage-required",
+              usageInputs: ["templateArguments", "parameters", "resultCppType", "resultShape", "nativeSymbol"],
+            }
+          : null,
     },
     abi: {
       argumentOffset: hasReceiver ? 1 : 0,
@@ -426,15 +474,15 @@ function buildRecipe(row, declaration, numericId, specialized, context) {
     },
     preferredLowering: specializedFamily
       ? {
-        ...(row.loweringState === "generated-adapter"
-          ? row.lowering
-          : {
-            state: "generated-adapter",
-            family: specializedFamily,
-            wrapper: specializedEntry.wrapper ?? null,
-          }),
-        adapter: specializedEntry.adapter,
-      }
+          ...(row.loweringState === "generated-adapter"
+            ? row.lowering
+            : {
+                state: "generated-adapter",
+                family: specializedFamily,
+                wrapper: specializedEntry.wrapper ?? null,
+              }),
+          adapter: specializedEntry.adapter,
+        }
       : { state: "universal-fallback", family: "universal-recipe" },
     fallback: {
       state: "materializable",
@@ -457,19 +505,23 @@ function generatedAttempt(declaration) {
   if (declaration.emitted === true) return true;
   return Boolean(
     declaration.wrapper &&
-      ["complete", "generated"].includes(declaration.stages?.generated?.status ?? declaration.stages?.generated),
+    ["complete", "generated"].includes(declaration.stages?.generated?.status ?? declaration.stages?.generated),
   );
 }
 
 function attemptBlockers(declaration) {
   if (generatedAttempt(declaration)) return [];
-  return [...new Set([
-    ...(declaration.blockers ?? []),
-    ...(declaration.engineProviderBlockers ?? []),
-    ...(declaration.fallbackAudit?.missingWiring ?? []),
-    ...(declaration.blocker ? [declaration.blocker] : []),
-    ...(declaration.policy ? [declaration.policy] : []),
-  ].filter((value) => typeof value === "string" && value.length > 0))].sort();
+  return [
+    ...new Set(
+      [
+        ...(declaration.blockers ?? []),
+        ...(declaration.engineProviderBlockers ?? []),
+        ...(declaration.fallbackAudit?.missingWiring ?? []),
+        ...(declaration.blocker ? [declaration.blocker] : []),
+        ...(declaration.policy ? [declaration.policy] : []),
+      ].filter((value) => typeof value === "string" && value.length > 0),
+    ),
+  ].sort();
 }
 
 function collectSpecializationAttempts(specializedReports, patterns) {
@@ -503,15 +555,20 @@ function collectSpecializationAttempts(specializedReports, patterns) {
   return attempts;
 }
 
-function renderHeader(maxArguments, catalogHash) {
-  return `// ${banner}\n#ifndef DEFOLD_HERMES_GENERATED_DMSDK_UNIVERSAL_H\n#define DEFOLD_HERMES_GENERATED_DMSDK_UNIVERSAL_H\n\n#include <stdint.h>\n\n#define DEHERM_DMSDK_UNIVERSAL_MAX_ARGUMENTS ${maxArguments}\n\ntypedef enum DehermDmSdkUniversalStatus {\n  DEHERM_DMSDK_UNIVERSAL_OK = 0,\n  DEHERM_DMSDK_UNIVERSAL_UNKNOWN_ID = 1,\n  DEHERM_DMSDK_UNIVERSAL_WRONG_ARITY = 2,\n  DEHERM_DMSDK_UNIVERSAL_NO_PROVIDER = 3,\n  DEHERM_DMSDK_UNIVERSAL_INVALID_STORAGE = 4,\n  DEHERM_DMSDK_UNIVERSAL_PROVIDER_ERROR = 5,\n  DEHERM_DMSDK_UNIVERSAL_TYPE_MISMATCH = 6\n} DehermDmSdkUniversalStatus;\n\ntypedef enum DehermDmSdkUniversalValueTag {\n  DEHERM_DMSDK_UNIVERSAL_VOID = 0,\n  DEHERM_DMSDK_UNIVERSAL_BOOL = 1,\n  DEHERM_DMSDK_UNIVERSAL_I64 = 2,\n  DEHERM_DMSDK_UNIVERSAL_U64 = 3,\n  DEHERM_DMSDK_UNIVERSAL_F64 = 4,\n  DEHERM_DMSDK_UNIVERSAL_ADDRESS = 5,\n  DEHERM_DMSDK_UNIVERSAL_MEMORY = 6,\n  DEHERM_DMSDK_UNIVERSAL_CALLBACK = 7,\n  DEHERM_DMSDK_UNIVERSAL_NATIVE_VALUE = 8\n} DehermDmSdkUniversalValueTag;\n\ntypedef struct DehermDmSdkUniversalValue {\n  uint64_t payload;\n  uint64_t auxiliary;\n  uint32_t tag;\n  uint32_t type_id;\n} DehermDmSdkUniversalValue;\n\ntypedef struct DehermDmSdkUniversalDescriptor {\n  uint32_t id;\n  uint16_t argument_count;\n  uint8_t declaration_kind;\n  uint8_t flags;\n} DehermDmSdkUniversalDescriptor;\n\ntypedef DehermDmSdkUniversalStatus (*DehermDmSdkUniversalProvider)(\n    void* context, const DehermDmSdkUniversalDescriptor* descriptor,\n    const DehermDmSdkUniversalValue* arguments, uint32_t argument_count,\n    DehermDmSdkUniversalValue* result);\n\n#ifdef __cplusplus\nextern \"C\" {\n#endif\nuint32_t deherm_dmsdk_universal_count(void);\nconst char* deherm_dmsdk_universal_catalog_sha256(void);\nconst DehermDmSdkUniversalDescriptor* deherm_dmsdk_universal_descriptors(void);\nconst DehermDmSdkUniversalDescriptor* deherm_dmsdk_universal_find(uint32_t id);\nvoid deherm_dmsdk_universal_install_provider(DehermDmSdkUniversalProvider provider, void* context);\nDehermDmSdkUniversalStatus deherm_dmsdk_universal_dispatch(\n    uint32_t id, const DehermDmSdkUniversalValue* arguments, uint32_t argument_count,\n    DehermDmSdkUniversalValue* result);\n#ifdef __cplusplus\n}\n#endif\n\n#endif\n`;
+function renderHeader(maxArguments) {
+  return `// ${banner}\n#ifndef DEFOLD_HERMES_GENERATED_DMSDK_UNIVERSAL_H\n#define DEFOLD_HERMES_GENERATED_DMSDK_UNIVERSAL_H\n\n#include <stdint.h>\n\n#define DEHERM_DMSDK_UNIVERSAL_MAX_ARGUMENTS ${maxArguments}\n\ntypedef enum DehermDmSdkUniversalStatus {\n  DEHERM_DMSDK_UNIVERSAL_OK = 0,\n  DEHERM_DMSDK_UNIVERSAL_UNKNOWN_ID = 1,\n  DEHERM_DMSDK_UNIVERSAL_WRONG_ARITY = 2,\n  DEHERM_DMSDK_UNIVERSAL_NO_PROVIDER = 3,\n  DEHERM_DMSDK_UNIVERSAL_INVALID_STORAGE = 4,\n  DEHERM_DMSDK_UNIVERSAL_PROVIDER_ERROR = 5,\n  DEHERM_DMSDK_UNIVERSAL_TYPE_MISMATCH = 6\n} DehermDmSdkUniversalStatus;\n\ntypedef enum DehermDmSdkUniversalValueTag {\n  DEHERM_DMSDK_UNIVERSAL_VOID = 0,\n  DEHERM_DMSDK_UNIVERSAL_BOOL = 1,\n  DEHERM_DMSDK_UNIVERSAL_I64 = 2,\n  DEHERM_DMSDK_UNIVERSAL_U64 = 3,\n  DEHERM_DMSDK_UNIVERSAL_F64 = 4,\n  DEHERM_DMSDK_UNIVERSAL_ADDRESS = 5,\n  DEHERM_DMSDK_UNIVERSAL_MEMORY = 6,\n  DEHERM_DMSDK_UNIVERSAL_CALLBACK = 7,\n  DEHERM_DMSDK_UNIVERSAL_NATIVE_VALUE = 8\n} DehermDmSdkUniversalValueTag;\n\ntypedef struct DehermDmSdkUniversalValue {\n  uint64_t payload;\n  uint64_t auxiliary;\n  uint32_t tag;\n  uint32_t type_id;\n} DehermDmSdkUniversalValue;\n\ntypedef struct DehermDmSdkUniversalDescriptor {\n  uint32_t id;\n  uint16_t argument_count;\n  uint8_t declaration_kind;\n  uint8_t flags;\n} DehermDmSdkUniversalDescriptor;\n\ntypedef DehermDmSdkUniversalStatus (*DehermDmSdkUniversalProvider)(\n    void* context, const DehermDmSdkUniversalDescriptor* descriptor,\n    const DehermDmSdkUniversalValue* arguments, uint32_t argument_count,\n    DehermDmSdkUniversalValue* result);\n\n#ifdef __cplusplus\nextern "C" {\n#endif\nuint32_t deherm_dmsdk_universal_count(void);\nconst char* deherm_dmsdk_universal_catalog_sha256(void);\nconst DehermDmSdkUniversalDescriptor* deherm_dmsdk_universal_descriptors(void);\nconst DehermDmSdkUniversalDescriptor* deherm_dmsdk_universal_find(uint32_t id);\nvoid deherm_dmsdk_universal_install_provider(DehermDmSdkUniversalProvider provider, void* context);\nDehermDmSdkUniversalStatus deherm_dmsdk_universal_dispatch(\n    uint32_t id, const DehermDmSdkUniversalValue* arguments, uint32_t argument_count,\n    DehermDmSdkUniversalValue* result);\n#ifdef __cplusplus\n}\n#endif\n\n#endif\n`;
 }
 
 const kindCode = Object.freeze({ function: 1, method: 2, constructor: 3, destructor: 4, "function-template": 5 });
 
 function renderCpp(recipes, catalogHash) {
-  const rows = recipes.map((recipe) => `  {UINT32_C(${recipe.numericId}), UINT16_C(${recipe.abi.argumentCount}), UINT8_C(${kindCode[recipe.declarationKind]}), UINT8_C(${recipe.preferredLowering.state === "generated-adapter" ? 1 : 0})}`).join(",\n");
-  return `// ${banner}\n#include <defold_hermes/generated_dmsdk_universal.h>\n\n#include <stddef.h>\n\nnamespace {\nconst DehermDmSdkUniversalDescriptor kDescriptors[] = {\n${rows}\n};\nDehermDmSdkUniversalProvider g_provider = nullptr;\nvoid* g_context = nullptr;\n}\n\nextern \"C\" {\nuint32_t deherm_dmsdk_universal_count(void) { return UINT32_C(${recipes.length}); }\nconst char* deherm_dmsdk_universal_catalog_sha256(void) { return ${JSON.stringify(catalogHash)}; }\nconst DehermDmSdkUniversalDescriptor* deherm_dmsdk_universal_descriptors(void) { return kDescriptors; }\nconst DehermDmSdkUniversalDescriptor* deherm_dmsdk_universal_find(uint32_t id) {\n  return id < deherm_dmsdk_universal_count() && kDescriptors[id].id == id ? &kDescriptors[id] : nullptr;\n}\nvoid deherm_dmsdk_universal_install_provider(DehermDmSdkUniversalProvider provider, void* context) {\n  g_provider = provider; g_context = context;\n}\nDehermDmSdkUniversalStatus deherm_dmsdk_universal_dispatch(\n    uint32_t id, const DehermDmSdkUniversalValue* arguments, uint32_t argument_count,\n    DehermDmSdkUniversalValue* result) {\n  const DehermDmSdkUniversalDescriptor* descriptor = deherm_dmsdk_universal_find(id);\n  if (!descriptor) return DEHERM_DMSDK_UNIVERSAL_UNKNOWN_ID;\n  if (descriptor->declaration_kind != UINT8_C(5) && argument_count != descriptor->argument_count) return DEHERM_DMSDK_UNIVERSAL_WRONG_ARITY;\n  if (argument_count && !arguments) return DEHERM_DMSDK_UNIVERSAL_INVALID_STORAGE;\n  if (!result) return DEHERM_DMSDK_UNIVERSAL_INVALID_STORAGE;\n  if (!g_provider) return DEHERM_DMSDK_UNIVERSAL_NO_PROVIDER;\n  return g_provider(g_context, descriptor, arguments, argument_count, result);\n}\n}\n`;
+  const rows = recipes
+    .map(
+      (recipe) =>
+        `  {UINT32_C(${recipe.numericId}), UINT16_C(${recipe.abi.argumentCount}), UINT8_C(${kindCode[recipe.declarationKind]}), UINT8_C(${recipe.preferredLowering.state === "generated-adapter" ? 1 : 0})}`,
+    )
+    .join(",\n");
+  return `// ${banner}\n#include <defold_hermes/generated_dmsdk_universal.h>\n\n#include <stddef.h>\n\nnamespace {\nconst DehermDmSdkUniversalDescriptor kDescriptors[] = {\n${rows}\n};\nDehermDmSdkUniversalProvider g_provider = nullptr;\nvoid* g_context = nullptr;\n}\n\nextern "C" {\nuint32_t deherm_dmsdk_universal_count(void) { return UINT32_C(${recipes.length}); }\nconst char* deherm_dmsdk_universal_catalog_sha256(void) { return ${JSON.stringify(catalogHash)}; }\nconst DehermDmSdkUniversalDescriptor* deherm_dmsdk_universal_descriptors(void) { return kDescriptors; }\nconst DehermDmSdkUniversalDescriptor* deherm_dmsdk_universal_find(uint32_t id) {\n  return id < deherm_dmsdk_universal_count() && kDescriptors[id].id == id ? &kDescriptors[id] : nullptr;\n}\nvoid deherm_dmsdk_universal_install_provider(DehermDmSdkUniversalProvider provider, void* context) {\n  g_provider = provider; g_context = context;\n}\nDehermDmSdkUniversalStatus deherm_dmsdk_universal_dispatch(\n    uint32_t id, const DehermDmSdkUniversalValue* arguments, uint32_t argument_count,\n    DehermDmSdkUniversalValue* result) {\n  const DehermDmSdkUniversalDescriptor* descriptor = deherm_dmsdk_universal_find(id);\n  if (!descriptor) return DEHERM_DMSDK_UNIVERSAL_UNKNOWN_ID;\n  if (descriptor->declaration_kind != UINT8_C(5) && argument_count != descriptor->argument_count) return DEHERM_DMSDK_UNIVERSAL_WRONG_ARITY;\n  if (argument_count && !arguments) return DEHERM_DMSDK_UNIVERSAL_INVALID_STORAGE;\n  if (!result) return DEHERM_DMSDK_UNIVERSAL_INVALID_STORAGE;\n  if (!g_provider) return DEHERM_DMSDK_UNIVERSAL_NO_PROVIDER;\n  return g_provider(g_context, descriptor, arguments, argument_count, result);\n}\n}\n`;
 }
 
 function renderJsiHeader(recipeCount) {
@@ -543,7 +600,15 @@ void installDmSdkUniversalModule(jsi::Runtime& runtime,jsi::Object& modules){if(
 }
 
 function renderWeb(recipes, maxArguments, catalogHash) {
-  const metadata = recipes.map(({ numericId, declarationId, symbol, declarationKind, abi, projectionId }) => ({ id: numericId, declarationId, symbol, declarationKind, argumentCount: abi.argumentCount, resultKind: abi.resultKind, recipeId: projectionId }));
+  const metadata = recipes.map(({ numericId, declarationId, symbol, declarationKind, abi, projectionId }) => ({
+    id: numericId,
+    declarationId,
+    symbol,
+    declarationKind,
+    argumentCount: abi.argumentCount,
+    resultKind: abi.resultKind,
+    recipeId: projectionId,
+  }));
   return `// ${banner}\nvar LibraryDefoldHermesDmSdkUniversal={\n  $DEFOLD_HERMES_DMSDK_UNIVERSAL__deps:["deherm_dmsdk_universal_dispatch","deherm_dmsdk_universal_catalog_sha256"],\n  $DEFOLD_HERMES_DMSDK_UNIVERSAL:{\n    catalogSha256:${JSON.stringify(catalogHash)},\n    abi:Object.freeze({valueBytes:24,maxArguments:${maxArguments},dispatch:'direct-memory',embind:false}),\n    recipes:Object.freeze(${JSON.stringify(metadata)}),\n    callRaw:function(id,argumentsPointer,argumentCount,resultPointer){return _deherm_dmsdk_universal_dispatch(id,argumentsPointer,argumentCount,resultPointer);}\n  }\n};\nautoAddDeps(LibraryDefoldHermesDmSdkUniversal,'$DEFOLD_HERMES_DMSDK_UNIVERSAL');\naddToLibrary(LibraryDefoldHermesDmSdkUniversal);\n`;
 }
 
@@ -560,7 +625,7 @@ async function writeArtifact(root, relative, contents, check) {
   const target = path.join(root, relative);
   const normalized = contents.endsWith("\n") ? contents : `${contents}\n`;
   if (check) {
-    if (await readFile(target, "utf8") !== normalized) throw new Error(`${relative} is stale`);
+    if ((await readFile(target, "utf8")) !== normalized) throw new Error(`${relative} is stale`);
   } else {
     await mkdir(path.dirname(target), { recursive: true });
     await writeFile(target, normalized);
@@ -580,14 +645,18 @@ export async function buildUniversalDmSdkBindings({
     readFile(path.resolve(root, projectionPath), "utf8"),
     readFile(path.resolve(root, sdkIrPath), "utf8"),
     readFile(path.resolve(root, abiShapesPath), "utf8"),
-    Promise.all(Object.entries(specializedReportPaths).map(async ([family, relative]) => {
-      const content = await readFile(path.resolve(root, relative), "utf8");
-      return [family, content, JSON.parse(content)];
-    })),
-    Promise.all(Object.entries(patternPolicyPaths).map(async ([family, relative]) => {
-      const content = await readFile(path.resolve(root, relative), "utf8");
-      return [family, content, JSON.parse(content)];
-    })),
+    Promise.all(
+      Object.entries(specializedReportPaths).map(async ([family, relative]) => {
+        const content = await readFile(path.resolve(root, relative), "utf8");
+        return [family, content, JSON.parse(content)];
+      }),
+    ),
+    Promise.all(
+      Object.entries(patternPolicyPaths).map(async ([family, relative]) => {
+        const content = await readFile(path.resolve(root, relative), "utf8");
+        return [family, content, JSON.parse(content)];
+      }),
+    ),
   ]);
   const projection = JSON.parse(projectionContent);
   const ir = JSON.parse(irContent);
@@ -600,36 +669,41 @@ export async function buildUniversalDmSdkBindings({
     scratchScalarOutSelection: patternPolicy.scratchScalarOut.selection,
   });
   const projectionIds = new Set(projection.rows.map((row) => row.id));
-  const specialized = new Map(projection.rows
-    .filter((row) => row.loweringState === "generated-adapter")
-    .map((row) => [row.id, {
-      family: row.lowering.family,
-      adapter: {
-        applicability: "callable",
-        kind: "named-wrapper",
-        id: null,
-        dispatcher: null,
-        blockers: [],
-      },
-    }]));
+  const specialized = new Map(
+    projection.rows
+      .filter((row) => row.loweringState === "generated-adapter")
+      .map((row) => [
+        row.id,
+        {
+          family: row.lowering.family,
+          adapter: {
+            applicability: "callable",
+            kind: "named-wrapper",
+            id: null,
+            dispatcher: null,
+            blockers: [],
+          },
+        },
+      ]),
+  );
   for (const [family, , report] of specializedReports) {
     for (const declaration of reportDeclarations(report)) {
       if (!projectionIds.has(declaration.id) || !generatedAttempt(declaration)) continue;
       if (specialized.has(declaration.id)) continue;
       const providerRequired = declaration.disposition === "generated-provider-boundary";
       const callable = !providerRequired;
-      const dispatcher = callable && family === "hashState"
-        ? "deherm_dmsdk_hash_state_dispatch"
-        : callable && family === "cstringValue"
-          ? "deherm_dmsdk_cstring_value_dispatch"
-          : callable && family === "arenaCString"
-            ? "deherm_dmsdk_arena_cstring_dispatch"
-            : callable && family === "namedScalar"
-              ? "deherm_dmsdk_named_scalar_dispatch"
-            : null;
-      const wrapper = typeof declaration.wrapper === "string" && declaration.wrapper.length > 0
-        ? declaration.wrapper
-        : null;
+      const dispatcher =
+        callable && family === "hashState"
+          ? "deherm_dmsdk_hash_state_dispatch"
+          : callable && family === "cstringValue"
+            ? "deherm_dmsdk_cstring_value_dispatch"
+            : callable && family === "arenaCString"
+              ? "deherm_dmsdk_arena_cstring_dispatch"
+              : callable && family === "namedScalar"
+                ? "deherm_dmsdk_named_scalar_dispatch"
+                : null;
+      const wrapper =
+        typeof declaration.wrapper === "string" && declaration.wrapper.length > 0 ? declaration.wrapper : null;
       if (callable && dispatcher === null && wrapper === null) {
         throw new Error(`${declaration.id}: generated ${family} specialization has no callable symbol`);
       }
@@ -647,10 +721,12 @@ export async function buildUniversalDmSdkBindings({
     }
   }
   const declarations = new Map(ir.declarations.map((declaration) => [declaration.id, declaration]));
-  const templatedReceiverOwners = new Set(projection.rows.flatMap((row) => {
-    const owner = ownerOf(row);
-    return owner && templateParameters(row).length ? [owner] : [];
-  }));
+  const templatedReceiverOwners = new Set(
+    projection.rows.flatMap((row) => {
+      const owner = ownerOf(row);
+      return owner && templateParameters(row).length ? [owner] : [];
+    }),
+  );
   const context = {
     declarations: [...ir.declarations, ...(ir.typeSupportDeclarations ?? [])],
     templatedReceiverOwners,
@@ -663,8 +739,10 @@ export async function buildUniversalDmSdkBindings({
   const publicSdk = await attachPublicSdkFacts(root, projection.defoldRevision, recipes);
   recipes = publicSdk.recipes;
   const expectedRuntimeDeclarations = ir.runtimeUnimplementedCount ?? projection.rows.length;
-  if (recipes.length !== expectedRuntimeDeclarations) throw new Error(`Expected ${expectedRuntimeDeclarations} recipes, got ${recipes.length}`);
-  if (new Set(recipes.map(({ declarationId }) => declarationId)).size !== recipes.length) throw new Error("Duplicate universal declaration recipe");
+  if (recipes.length !== expectedRuntimeDeclarations)
+    throw new Error(`Expected ${expectedRuntimeDeclarations} recipes, got ${recipes.length}`);
+  if (new Set(recipes.map(({ declarationId }) => declarationId)).size !== recipes.length)
+    throw new Error("Duplicate universal declaration recipe");
   // A provider-only generated lane is an additional exact boundary, not a
   // reason to hide a universal call that already materializes from the same
   // source-derived recipe. Resolve the candidate catalog once, then make the
@@ -678,8 +756,10 @@ export async function buildUniversalDmSdkBindings({
   };
   const candidateIndex = buildDmSdkCallSymbolIndex(ir, candidateCatalog);
   recipes = recipes.map((recipe) => {
-    if (recipe.preferredLowering?.adapter?.applicability !== "provider-required" ||
-        candidateIndex.declarations[recipe.declarationId]?.materialization?.state !== "universal-ready") {
+    if (
+      recipe.preferredLowering?.adapter?.applicability !== "provider-required" ||
+      candidateIndex.declarations[recipe.declarationId]?.materialization?.state !== "universal-ready"
+    ) {
       return recipe;
     }
     return {
@@ -691,14 +771,20 @@ export async function buildUniversalDmSdkBindings({
   const maxArguments = Math.max(...recipes.map(({ abi }) => abi.argumentCount));
   assertDmSdkUniversalStaticFrameCapacity({ abi: { maxArguments } });
   const staticFrame = emitDmSdkUniversalStaticFrame();
-  const specializedSourceHashes = Object.fromEntries(specializedReports.map(([family, content]) => [family, sha256(content)]));
-  const patternPolicySourceHashes = Object.fromEntries(patternPolicies.map(([family, content]) => [family, sha256(content)]));
+  const specializedSourceHashes = Object.fromEntries(
+    specializedReports.map(([family, content]) => [family, sha256(content)]),
+  );
+  const patternPolicySourceHashes = Object.fromEntries(
+    patternPolicies.map(([family, content]) => [family, sha256(content)]),
+  );
   const publicSdkSource = JSON.stringify(publicSdk.provenance);
   const sourceHash = sha256(
-    projectionContent + irContent + abiShapesContent +
-    specializedReports.map(([family, content]) => `${family}\0${content}`).join("") +
-    patternPolicies.map(([family, content]) => `${family}\0${content}`).join("") +
-    `public-sdk\0${publicSdkSource}`
+    projectionContent +
+      irContent +
+      abiShapesContent +
+      specializedReports.map(([family, content]) => `${family}\0${content}`).join("") +
+      patternPolicies.map(([family, content]) => `${family}\0${content}`).join("") +
+      `public-sdk\0${publicSdkSource}`,
   );
   const catalogHash = sha256(JSON.stringify(recipes));
   const report = {
@@ -723,10 +809,18 @@ export async function buildUniversalDmSdkBindings({
       browserDirectMemoryMetadata: recipes.length,
       typescriptStableIds: recipes.length,
       silentlyOmitted: 0,
-      preferredSpecialized: recipes.filter(({ preferredLowering }) => preferredLowering.state === "generated-adapter").length,
-      usageMaterializedFallback: recipes.filter(({ preferredLowering }) => preferredLowering.state === "universal-fallback").length,
+      preferredSpecialized: recipes.filter(({ preferredLowering }) => preferredLowering.state === "generated-adapter")
+        .length,
+      usageMaterializedFallback: recipes.filter(
+        ({ preferredLowering }) => preferredLowering.state === "universal-fallback",
+      ).length,
     },
-    abi: { schema: "DehermDmSdkUniversalFrame/v1", valueBytes: 24, maxArguments, allocationPolicy: "caller-owned-fixed-frame" },
+    abi: {
+      schema: "DehermDmSdkUniversalFrame/v1",
+      valueBytes: 24,
+      maxArguments,
+      allocationPolicy: "caller-owned-fixed-frame",
+    },
     artifacts,
     recipes,
   };
@@ -757,7 +851,7 @@ export async function buildUniversalDmSdkBindings({
   report.coverage.universalReadyExactVectors = readyCorpus.report.verification.vectorCount;
   const outputs = new Map([
     [artifacts[0], `${JSON.stringify(report, null, 2)}\n`],
-    [artifacts[1], renderHeader(maxArguments, catalogHash)],
+    [artifacts[1], renderHeader(maxArguments)],
     [artifacts[2], renderJsiHeader(recipes.length)],
     [artifacts[3], renderCpp(recipes, catalogHash)],
     [artifacts[4], renderJsiSource(catalogHash)],
@@ -775,16 +869,38 @@ export async function buildUniversalDmSdkBindings({
   ]);
   const endianRecipes = selectEndianRoundTripRecipes(recipes);
   if (endianRecipes) {
-    const fixture = materializeDmSdkUsages(endianRecipes.map((recipe, index) => ({
-      declarationId: recipe.declarationId,
-      wrapper: index === 0 ? "deherm_test_to_network" : "deherm_test_to_host",
-      acknowledgements: { generatedAdapterBypass: { reason: "generated native JSI integration fixture", evidence: "round-trip through Hermes, C ABI dispatcher, and generated thunk" } },
-    })), { recipes, catalogSha256: catalogHash, providerName: "deherm_dmsdk_test_provider", installName: "deherm_dmsdk_test_provider_install" });
+    const fixture = materializeDmSdkUsages(
+      endianRecipes.map((recipe, index) => ({
+        declarationId: recipe.declarationId,
+        wrapper: index === 0 ? "deherm_test_to_network" : "deherm_test_to_host",
+        acknowledgements: {
+          generatedAdapterBypass: {
+            reason: "generated native JSI integration fixture",
+            evidence: "round-trip through Hermes, C ABI dispatcher, and generated thunk",
+          },
+        },
+      })),
+      {
+        recipes,
+        catalogSha256: catalogHash,
+        providerName: "deherm_dmsdk_test_provider",
+        installName: "deherm_dmsdk_test_provider_install",
+      },
+    );
     outputs.set(artifacts[10], fixture.source);
-    outputs.set(artifacts[11], `// ${banner}\n#pragma once\n#define DEHERM_TEST_TO_NETWORK_ID ${endianRecipes[0].numericId}\n#define DEHERM_TEST_TO_HOST_ID ${endianRecipes[1].numericId}\n#define DEHERM_TEST_DMSDK_CATALOG_SHA256 ${JSON.stringify(catalogHash)}\n`);
+    outputs.set(
+      artifacts[11],
+      `// ${banner}\n#pragma once\n#define DEHERM_TEST_TO_NETWORK_ID ${endianRecipes[0].numericId}\n#define DEHERM_TEST_TO_HOST_ID ${endianRecipes[1].numericId}\n#define DEHERM_TEST_DMSDK_CATALOG_SHA256 ${JSON.stringify(catalogHash)}\n`,
+    );
   } else {
-    outputs.set(artifacts[10], `// ${banner}\n// The selected Defold revision has no uint32_t endian round-trip API.\nextern "C" void deherm_dmsdk_test_provider_install(void) {}\n`);
-    outputs.set(artifacts[11], `// ${banner}\n#pragma once\n#define DEHERM_TEST_DMSDK_ENDIAN_UNAVAILABLE 1\n#define DEHERM_TEST_TO_NETWORK_ID 0\n#define DEHERM_TEST_TO_HOST_ID 0\n#define DEHERM_TEST_DMSDK_CATALOG_SHA256 ${JSON.stringify(catalogHash)}\n`);
+    outputs.set(
+      artifacts[10],
+      `// ${banner}\n// The selected Defold revision has no uint32_t endian round-trip API.\nextern "C" void deherm_dmsdk_test_provider_install(void) {}\n`,
+    );
+    outputs.set(
+      artifacts[11],
+      `// ${banner}\n#pragma once\n#define DEHERM_TEST_DMSDK_ENDIAN_UNAVAILABLE 1\n#define DEHERM_TEST_TO_NETWORK_ID 0\n#define DEHERM_TEST_TO_HOST_ID 0\n#define DEHERM_TEST_DMSDK_CATALOG_SHA256 ${JSON.stringify(catalogHash)}\n`,
+    );
   }
   for (const [relative, contents] of outputs) await writeArtifact(outRoot, relative, contents, false);
   return report;
@@ -793,23 +909,42 @@ export async function buildUniversalDmSdkBindings({
 export async function run(argv = process.argv.slice(2)) {
   const options = parseArguments(argv);
   if (!options.check) {
-    const report = await buildUniversalDmSdkBindings({ outRoot: options.outRoot, projectionPath: options.projection, sdkIrPath: options.sdkIr });
-    process.stdout.write(`Generated ${report.coverage.recipes}/${report.coverage.declarations} dmSDK universal recipes with zero omissions.\n`);
+    const report = await buildUniversalDmSdkBindings({
+      outRoot: options.outRoot,
+      projectionPath: options.projection,
+      sdkIrPath: options.sdkIr,
+    });
+    process.stdout.write(
+      `Generated ${report.coverage.recipes}/${report.coverage.declarations} dmSDK universal recipes with zero omissions.\n`,
+    );
     return report;
   }
   const temporary = await mkdtemp(path.join(tmpdir(), "deherm-dmsdk-universal-check-"));
   let report;
   try {
-    report = await buildUniversalDmSdkBindings({ outRoot: temporary, projectionPath: options.projection, sdkIrPath: options.sdkIr });
+    report = await buildUniversalDmSdkBindings({
+      outRoot: temporary,
+      projectionPath: options.projection,
+      sdkIrPath: options.sdkIr,
+    });
     for (const relative of artifacts) {
-      const [expected, actual] = await Promise.all([readFile(path.join(temporary, relative)), readFile(path.join(options.outRoot, relative))]);
+      const [expected, actual] = await Promise.all([
+        readFile(path.join(temporary, relative)),
+        readFile(path.join(options.outRoot, relative)),
+      ]);
       if (!expected.equals(actual)) throw new Error(`${relative} is stale`);
     }
   } finally {
     await rm(temporary, { recursive: true, force: true });
   }
-  process.stdout.write(`Verified ${report.coverage.recipes}/${report.coverage.declarations} dmSDK universal recipes with zero omissions.\n`);
+  process.stdout.write(
+    `Verified ${report.coverage.recipes}/${report.coverage.declarations} dmSDK universal recipes with zero omissions.\n`,
+  );
   return report;
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) run().catch((error) => { console.error(error.stack ?? error); process.exitCode = 1; });
+if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href)
+  run().catch((error) => {
+    console.error(error.stack ?? error);
+    process.exitCode = 1;
+  });

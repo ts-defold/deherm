@@ -29,7 +29,7 @@ const executors = Object.freeze({
   "arm64-osx": { lane: "apple", runner: "macos-15", slot: 0 },
   "x86_64-osx": { lane: "apple", runner: "macos-15", slot: 1 },
   "arm64-ios": { lane: "apple", runner: "macos-15", slot: 2 },
-  "arm64_sim-ios": { lane: "apple", runner: "macos-15", slot: 3 }
+  "arm64_sim-ios": { lane: "apple", runner: "macos-15", slot: 3 },
 });
 
 function compare(left, right) {
@@ -53,7 +53,7 @@ async function filesBelow(directory, prefix = "") {
     const absolute = path.join(directory, ...relative.split("/"));
     const status = await lstat(absolute);
     if (status.isSymbolicLink()) fail(`symbolic links are not artifact inputs: ${absolute}`);
-    if (status.isDirectory()) result.push(...await filesBelow(directory, relative));
+    if (status.isDirectory()) result.push(...(await filesBelow(directory, relative)));
     else if (status.isFile()) result.push(relative);
   }
   return result;
@@ -88,7 +88,7 @@ export async function readNativeArtifactRows({ root = repositoryRoot } = {}) {
       libraries,
       files: libraries.map((name) => libraryFilename(target, name)),
       asset: `defold-webtransport-native-${target}.zip`,
-      ...executor
+      ...executor,
     });
   }
   return rows.sort((left, right) => compare(left.target, right.target));
@@ -98,7 +98,7 @@ const fingerprintFiles = Object.freeze([
   manifestRelative,
   "scripts/lib/defold-webtransport-artifacts.mjs",
   "scripts/manage-defold-webtransport-artifacts.mjs",
-  ".github/workflows/defold-webtransport-native-artifacts.yml"
+  ".github/workflows/defold-webtransport-native-artifacts.yml",
 ]);
 
 const nativeToolchainFile = "packages/toolchains/defold-bundle-targets.json";
@@ -107,7 +107,7 @@ const nativeToolchainKeys = Object.freeze([
   "androidNdkApiVersion",
   "android64NdkApiVersion",
   "iphoneosVersionMin",
-  "macosxVersionMin"
+  "macosxVersionMin",
 ]);
 
 const fingerprintTrees = Object.freeze([
@@ -115,7 +115,7 @@ const fingerprintTrees = Object.freeze([
   "native/webtransport-cpp/include",
   "native/webtransport-cpp/patches",
   "native/webtransport-cpp/src",
-  "extensions/defold-webtransport/defold_webtransport/include"
+  "extensions/defold-webtransport/defold_webtransport/include",
 ]);
 
 export async function fingerprintNativeArtifacts({ root = repositoryRoot } = {}) {
@@ -135,11 +135,13 @@ export async function fingerprintNativeArtifacts({ root = repositoryRoot } = {})
     hash.update(bytes);
   }
   const toolchains = JSON.parse(await readFile(path.join(root, nativeToolchainFile), "utf8"));
-  const projection = Object.fromEntries(nativeToolchainKeys.map((key) => {
-    const value = toolchains?.sdk?.[key];
-    if (typeof value !== "string" || value.length === 0) fail(`${nativeToolchainFile} sdk.${key} is required`);
-    return [key, value];
-  }));
+  const projection = Object.fromEntries(
+    nativeToolchainKeys.map((key) => {
+      const value = toolchains?.sdk?.[key];
+      if (typeof value !== "string" || value.length === 0) fail(`${nativeToolchainFile} sdk.${key} is required`);
+      return [key, value];
+    }),
+  );
   hash.update(`${nativeToolchainFile}#native-sdk\0`);
   hash.update(JSON.stringify(projection));
   return hash.digest("hex");
@@ -158,8 +160,8 @@ export async function nativeArtifactRelease(options = {}) {
       `Input fingerprint (SHA-256): \`${fingerprint}\``,
       "",
       "The tag is content-addressed from the pinned picoquic/picotls/Mbed TLS build graph, " +
-        "the Defold SDK target inputs, the extension ABI, and the deterministic archive recipe."
-    ].join("\n")
+        "the Defold SDK target inputs, the extension ABI, and the deterministic archive recipe.",
+    ].join("\n"),
   };
 }
 
@@ -173,18 +175,28 @@ export async function nativeArtifactIndex({ root = repositoryRoot } = {}) {
     tag: release.tag,
     fingerprint: release.fingerprint,
     abiSha256: await nativeArtifactAbiSha256(extensionRoot),
-    assets: rows.map(({ target, asset }) => ({ target, asset }))
+    assets: rows.map(({ target, asset }) => ({ target, asset })),
   };
 }
 
 export async function writeNativeArtifactIndex({ root = repositoryRoot, check = false } = {}) {
   const index = await nativeArtifactIndex({ root });
-  const destination = path.join(root, "extensions", "defold-webtransport", extensionDirectory, "webtransport", "native-artifacts.json");
+  const destination = path.join(
+    root,
+    "extensions",
+    "defold-webtransport",
+    extensionDirectory,
+    "webtransport",
+    "native-artifacts.json",
+  );
   const rendered = `${JSON.stringify(index, null, 2)}\n`;
   if (check) {
     let current;
-    try { current = await readFile(destination, "utf8"); }
-    catch (error) { if (error?.code !== "ENOENT") throw error; }
+    try {
+      current = await readFile(destination, "utf8");
+    } catch (error) {
+      if (error?.code !== "ENOENT") throw error;
+    }
     if (current !== rendered) fail(`generated native artifact index is stale: ${destination}`);
   } else {
     await writeFile(destination, rendered);
@@ -203,7 +215,7 @@ export async function planNativeArtifactBuilds(present = [], options = {}) {
     missing,
     lanes,
     expectedAssets: rows.map((row) => row.asset),
-    complete: missing.length === 0
+    complete: missing.length === 0,
   };
 }
 
@@ -237,12 +249,16 @@ export async function packageNativeArtifact({ target, inputRoot, outputRoot, roo
   if (!row) fail(`unknown native target ${target}`);
   const release = await nativeArtifactRelease({ root });
   const libraries = await locateLibraries(path.resolve(inputRoot), row);
-  const fileRecords = row.files.map((name) => ({ name, sha256: sha256(libraries.get(name)), bytes: libraries.get(name).byteLength }));
+  const fileRecords = row.files.map((name) => ({
+    name,
+    sha256: sha256(libraries.get(name)),
+    bytes: libraries.get(name).byteLength,
+  }));
   const metadata = {
     schemaVersion: nativeArtifactSchemaVersion,
     target,
     fingerprint: release.fingerprint,
-    files: fileRecords
+    files: fileRecords,
   };
   const entries = new Map([["artifact.json", Buffer.from(`${JSON.stringify(metadata, null, 2)}\n`)]]);
   for (const [name, bytes] of libraries) entries.set(`lib/${target}/${name}`, bytes);
@@ -264,14 +280,18 @@ export async function verifyNativeArtifact({ target, archivePath, root = reposit
     fail(`${target} archive members differ; expected ${expectedMembers.join(", ")}, observed ${observed.join(", ")}`);
   }
   let metadata;
-  try { metadata = JSON.parse(Buffer.from(archive["artifact.json"]).toString("utf8")); }
-  catch (error) { fail(`${target} artifact.json is invalid: ${error.message}`); }
+  try {
+    metadata = JSON.parse(Buffer.from(archive["artifact.json"]).toString("utf8"));
+  } catch (error) {
+    fail(`${target} artifact.json is invalid: ${error.message}`);
+  }
   const release = await nativeArtifactRelease({ root });
   if (metadata.schemaVersion !== nativeArtifactSchemaVersion || metadata.target !== target) {
     fail(`${target} artifact metadata identity is invalid`);
   }
   if (metadata.fingerprint !== release.fingerprint) fail(`${target} artifact fingerprint is stale`);
-  if (!Array.isArray(metadata.files) || metadata.files.length !== row.files.length) fail(`${target} artifact file inventory is invalid`);
+  if (!Array.isArray(metadata.files) || metadata.files.length !== row.files.length)
+    fail(`${target} artifact file inventory is invalid`);
   for (const name of row.files) {
     const record = metadata.files.find((candidate) => candidate?.name === name);
     const bytes = archive[`lib/${target}/${name}`];
@@ -282,7 +302,12 @@ export async function verifyNativeArtifact({ target, archivePath, root = reposit
   return { row, metadata, archive, sha256: sha256(await readFile(archivePath)) };
 }
 
-export async function assembleNativeArtifacts({ sourceRoot = extensionSourceRoot, archiveRoot, outputRoot, root = repositoryRoot }) {
+export async function assembleNativeArtifacts({
+  sourceRoot = extensionSourceRoot,
+  archiveRoot,
+  outputRoot,
+  root = repositoryRoot,
+}) {
   const rows = await readNativeArtifactRows({ root });
   await rm(outputRoot, { recursive: true, force: true });
   await mkdir(outputRoot, { recursive: true });
@@ -306,9 +331,12 @@ export async function assembleNativeArtifacts({ sourceRoot = extensionSourceRoot
     tag: release.tag,
     fingerprint: release.fingerprint,
     abiSha256: await nativeArtifactAbiSha256(path.join(outputRoot, extensionDirectory)),
-    artifacts
+    artifacts,
   };
-  await writeFile(path.join(outputRoot, ".defold-webtransport-native-artifacts.json"), `${JSON.stringify(manifest, null, 2)}\n`);
+  await writeFile(
+    path.join(outputRoot, ".defold-webtransport-native-artifacts.json"),
+    `${JSON.stringify(manifest, null, 2)}\n`,
+  );
   return { outputRoot: path.resolve(outputRoot), ...manifest };
 }
 
@@ -326,9 +354,12 @@ export async function stageNativeArtifactOverlay({ target, archivePath, outputRo
     tag: release.tag,
     fingerprint: release.fingerprint,
     abiSha256: await nativeArtifactAbiSha256(path.join(root, "extensions", "defold-webtransport", extensionDirectory)),
-    artifacts: [{ target, asset: verified.row.asset, sha256: verified.sha256, files: verified.metadata.files }]
+    artifacts: [{ target, asset: verified.row.asset, sha256: verified.sha256, files: verified.metadata.files }],
   };
-  await writeFile(path.join(outputRoot, ".defold-webtransport-native-artifacts.json"), `${JSON.stringify(manifest, null, 2)}\n`);
+  await writeFile(
+    path.join(outputRoot, ".defold-webtransport-native-artifacts.json"),
+    `${JSON.stringify(manifest, null, 2)}\n`,
+  );
   return { outputRoot: path.resolve(outputRoot), ...manifest };
 }
 
@@ -336,8 +367,11 @@ export async function auditNativeArtifactDirectory({ archiveRoot, partial = fals
   const rows = await readNativeArtifactRows({ root });
   const release = await nativeArtifactRelease({ root });
   let names = [];
-  try { names = (await readdir(archiveRoot)).filter((name) => name.endsWith(".zip")).sort(compare); }
-  catch (error) { if (error?.code !== "ENOENT") throw error; }
+  try {
+    names = (await readdir(archiveRoot)).filter((name) => name.endsWith(".zip")).sort(compare);
+  } catch (error) {
+    if (error?.code !== "ENOENT") throw error;
+  }
   const expected = new Set(rows.map(({ asset }) => asset));
   const unexpected = names.filter((name) => !expected.has(name));
   if (unexpected.length) fail(`release directory contains unexpected assets: ${unexpected.join(", ")}`);
@@ -352,7 +386,9 @@ export async function auditNativeArtifactDirectory({ archiveRoot, partial = fals
       const result = await verifyNativeArtifact({ target: row.target, archivePath, root });
       verified.push({ target: row.target, asset: row.asset, sha256: result.sha256 });
     } catch (error) {
-      fail(`${release.tag}/${row.asset} is corrupt or foreign: ${error.message}. This content-addressed asset is immutable; quarantine/delete the bad release asset or rotate a real fingerprint input before republishing.`);
+      fail(
+        `${release.tag}/${row.asset} is corrupt or foreign: ${error.message}. This content-addressed asset is immutable; quarantine/delete the bad release asset or rotate a real fingerprint input before republishing.`,
+      );
     }
   }
   return { tag: release.tag, fingerprint: release.fingerprint, complete: names.length === rows.length, verified };

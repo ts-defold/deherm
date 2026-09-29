@@ -28,12 +28,20 @@ export const sdkVersionsPath = path.join(root, "upstream", "defold", "build_tool
 export const generatedPath = path.join(root, "packages", "toolchains", "defold-bundle-targets.json");
 export const platformSourcePath = path.join(
   root,
-  "upstream", "defold", "com.dynamo.cr", "com.dynamo.cr.bob", "src", "com", "dynamo", "bob", "Platform.java"
+  "upstream",
+  "defold",
+  "com.dynamo.cr",
+  "com.dynamo.cr.bob",
+  "src",
+  "com",
+  "dynamo",
+  "bob",
+  "Platform.java",
 );
 export const platformPairsPath = path.join(root, "packages", "toolchains", "defold-platform-pairs.json");
 export const generatedBundleTargetArtifacts = Object.freeze([
   "packages/toolchains/defold-bundle-targets.json",
-  "packages/toolchains/defold-platform-pairs.json"
+  "packages/toolchains/defold-platform-pairs.json",
 ]);
 
 // The SDK levels each cross build has to match are pinned by the engine, not by
@@ -47,7 +55,7 @@ const sdkFields = Object.freeze({
   android64NdkApiVersion: /^ANDROID_64_NDK_API_VERSION\s*=\s*'([^']+)'/m,
   androidTargetApiLevel: /^ANDROID_TARGET_API_LEVEL\s*=\s*(\d+)/m,
   iphoneosVersionMin: /^VERSION_IPHONEOS_MIN\s*=\s*"([^"]+)"/m,
-  macosxVersionMin: /^VERSION_MACOSX_MIN\s*=\s*"([^"]+)"/m
+  macosxVersionMin: /^VERSION_MACOSX_MIN\s*=\s*"([^"]+)"/m,
 });
 
 async function deriveSdkVersions() {
@@ -71,7 +79,10 @@ export async function derivePlatformPairs(bundleTargets) {
   const source = await readFile(platformSourcePath, "utf8");
   const entries = [];
   for (const line of source.split(/\r?\n/u)) {
-    const match = /^\s*public static final Platform \w+\s*=\s*new Platform\([^,]+,\s*"([^"]+)",\s*(?:true|false),\s*"([^"]+)",.*,\s*"([^"]+)"\);\s*$/u.exec(line);
+    const match =
+      /^\s*public static final Platform \w+\s*=\s*new Platform\([^,]+,\s*"([^"]+)",\s*(?:true|false),\s*"([^"]+)",.*,\s*"([^"]+)"\);\s*$/u.exec(
+        line,
+      );
     if (!match) continue;
     const [, architecture, osName, extenderTarget] = match;
     entries.push({ extenderTarget, bobPlatform: `${architecture}-${osName}` });
@@ -89,7 +100,7 @@ export async function derivePlatformPairs(bundleTargets) {
     defoldRevision: bundleTargets.defoldRevision,
     platforms: activeTargets
       .map(({ target }) => byExtenderTarget.get(target))
-      .sort((left, right) => left.extenderTarget.localeCompare(right.extenderTarget))
+      .sort((left, right) => left.extenderTarget.localeCompare(right.extenderTarget)),
   };
 }
 
@@ -114,7 +125,7 @@ export async function deriveBundleTargets() {
       group: name.slice(separator + 1),
       // An empty body means upstream kept the key for manifest compatibility and
       // removed its toolchain; `x86-osx` is the current example.
-      kind: body === null || body === undefined ? "retired" : "bundle"
+      kind: body === null || body === undefined ? "retired" : "bundle",
     });
   }
   const lock = await readFile(path.join(root, "upstream.lock"), "utf8");
@@ -127,7 +138,7 @@ export async function deriveBundleTargets() {
     defoldRevision: lock.match(/^DEFOLD_REV=(.+)$/m)?.[1] ?? null,
     sdk: await deriveSdkVersions(),
     groups: groups.sort(),
-    targets: targets.sort((left, right) => left.target.localeCompare(right.target))
+    targets: targets.sort((left, right) => left.target.localeCompare(right.target)),
   };
 }
 
@@ -151,17 +162,16 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   if (process.argv.includes("--check")) {
     const [current, currentPairs] = await Promise.all([
       readFile(generatedPath, "utf8").catch(() => ""),
-      readFile(platformPairsPath, "utf8").catch(() => "")
+      readFile(platformPairsPath, "utf8").catch(() => ""),
     ]);
     if (current !== serialized || currentPairs !== pairsSerialized) {
       throw new Error("Defold target metadata is stale; run node scripts/generate-defold-bundle-targets.mjs");
     }
-    console.log(`ok Defold bundle targets: ${bundleTargetNames(derived).length} bundle, ${derived.targets.length - bundleTargetNames(derived).length} retired, ${platformPairs.platforms.length} Bob pairs`);
+    console.log(
+      `ok Defold bundle targets: ${bundleTargetNames(derived).length} bundle, ${derived.targets.length - bundleTargetNames(derived).length} retired, ${platformPairs.platforms.length} Bob pairs`,
+    );
   } else {
-    await Promise.all([
-      writeFile(generatedPath, serialized),
-      writeFile(platformPairsPath, pairsSerialized)
-    ]);
+    await Promise.all([writeFile(generatedPath, serialized), writeFile(platformPairsPath, pairsSerialized)]);
     console.log(`wrote Defold target metadata: ${derived.targets.map(({ target }) => target).join(", ")}`);
   }
 }

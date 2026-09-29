@@ -23,29 +23,22 @@ import {
   isPropertyAssignment,
   isPropertyDeclaration,
   isSatisfiesExpression,
-  isStringLiteral
+  isStringLiteral,
 } from "typescript/unstable/ast/is";
 
 import {
   componentAuthoringConventions,
   componentProxyInvariantConstants,
-  createComponentProxyConstants
+  createComponentProxyConstants,
 } from "./component-proxy-contract.mjs";
 
 const {
   componentIdNamespace: COMPONENT_ID_NAMESPACE,
   generatedMarker: GENERATED_MARKER,
   generator: GENERATOR,
-  proxyRuntimeCapability: PROXY_RUNTIME_CAPABILITY
+  proxyRuntimeCapability: PROXY_RUNTIME_CAPABILITY,
 } = componentProxyInvariantConstants;
-const ignoredDirectories = new Set([
-  ".deherm",
-  ".git",
-  "build",
-  "dist",
-  "node_modules",
-  "upstream"
-]);
+const ignoredDirectories = new Set([".deherm", ".git", "build", "dist", "node_modules", "upstream"]);
 
 function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
@@ -61,8 +54,11 @@ function canonicalRelativePath(projectRoot, file, componentSourceKinds = compone
     throw new Error(`${file}: component source must be inside project root ${projectRoot}`);
   }
   if (!componentSourceKinds.some(({ suffix }) => relative.endsWith(suffix))) {
-    throw new Error(`${relative}: component source must end in .script.ts, .gui.ts, .render.ts, or legacy .gui_script.ts`);
+    throw new Error(
+      `${relative}: component source must end in .script.ts, .gui.ts, .render.ts, or legacy .gui_script.ts`,
+    );
   }
+  // oxlint-disable-next-line no-control-regex -- resource paths must reject terminal and filesystem control bytes.
   if (/[\u0000-\u001f\u007f]/.test(relative)) {
     throw new Error(`${JSON.stringify(relative)}: component source path may not contain control characters`);
   }
@@ -70,7 +66,8 @@ function canonicalRelativePath(projectRoot, file, componentSourceKinds = compone
 }
 
 function componentSourceKind(relativeSource, componentSourceKinds) {
-  const kind = [...componentSourceKinds].sort((left, right) => right.suffix.length - left.suffix.length)
+  const kind = [...componentSourceKinds]
+    .sort((left, right) => right.suffix.length - left.suffix.length)
     .find(({ suffix }) => relativeSource.endsWith(suffix));
   if (!kind) throw new Error(`${relativeSource}: unsupported component source suffix`);
   return kind;
@@ -101,14 +98,18 @@ function nodeName(node, sourceFile, context) {
   if (isIdentifier(node) || isStringLiteral(node) || isNoSubstitutionTemplateLiteral(node)) {
     return node.text;
   }
-  throw new Error(`${context}: computed, numeric, and private property names are not supported (${node.getText(sourceFile)})`);
+  throw new Error(
+    `${context}: computed, numeric, and private property names are not supported (${node.getText(sourceFile)})`,
+  );
 }
 
 function objectMembers(object, sourceFile, context) {
   const members = new Map();
   for (const member of object.properties) {
     if (!isPropertyAssignment(member) && !isMethodDeclaration(member)) {
-      throw new Error(`${context}: only explicit property assignments and methods are supported (${member.getText(sourceFile)})`);
+      throw new Error(
+        `${context}: only explicit property assignments and methods are supported (${member.getText(sourceFile)})`,
+      );
     }
     const name = nodeName(member.name, sourceFile, context);
     if (members.has(name)) throw new Error(`${context}: duplicate member ${JSON.stringify(name)}`);
@@ -173,7 +174,11 @@ function propertyCall(member, sourceFile, propertyName) {
     throw new Error(`property ${JSON.stringify(propertyName)}: default must be a direct property.<kind>(...) call`);
   }
   const callee = unwrapExpression(initializer.expression);
-  if (!isPropertyAccessExpression(callee) || !isIdentifier(callee.expression) || callee.expression.text !== "property") {
+  if (
+    !isPropertyAccessExpression(callee) ||
+    !isIdentifier(callee.expression) ||
+    callee.expression.text !== "property"
+  ) {
     throw new Error(`property ${JSON.stringify(propertyName)}: default must be a direct property.<kind>(...) call`);
   }
   return { kind: callee.name.text, arguments: [...initializer.arguments] };
@@ -192,7 +197,9 @@ function zeroOrOneArgument(args, context) {
 function parseProperty(member, sourceFile, name, slot, constants) {
   const { propertyCodecs, resourceKinds } = constants;
   if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(name) || name.startsWith("__deherm_")) {
-    throw new Error(`property ${JSON.stringify(name)}: name must be a Lua-safe identifier and may not use the __deherm_ prefix`);
+    throw new Error(
+      `property ${JSON.stringify(name)}: name must be a Lua-safe identifier and may not use the __deherm_ prefix`,
+    );
   }
   const call = propertyCall(member, sourceFile, name);
   const context = `property ${JSON.stringify(name)} (${call.kind})`;
@@ -200,7 +207,14 @@ function parseProperty(member, sourceFile, name, slot, constants) {
   if (call.kind === "number") {
     exactArity(call.arguments, 1, context);
     const value = numberLiteral(call.arguments[0], sourceFile, context);
-    return { name, slot, kind: call.kind, codecId: propertyCodecs.number.codecId, default: value, luaDefault: luaNumber(value) };
+    return {
+      name,
+      slot,
+      kind: call.kind,
+      codecId: propertyCodecs.number.codecId,
+      default: value,
+      luaDefault: luaNumber(value),
+    };
   }
   if (call.kind === "boolean") {
     exactArity(call.arguments, 1, context);
@@ -209,7 +223,14 @@ function parseProperty(member, sourceFile, name, slot, constants) {
       throw new Error(`${context}: expected true or false, received ${argument.getText(sourceFile)}`);
     }
     const value = argument.kind === SyntaxKind.TrueKeyword;
-    return { name, slot, kind: call.kind, codecId: propertyCodecs.boolean.codecId, default: value, luaDefault: String(value) };
+    return {
+      name,
+      slot,
+      kind: call.kind,
+      codecId: propertyCodecs.boolean.codecId,
+      default: value,
+      luaDefault: String(value),
+    };
   }
   if (call.kind === "string" || call.kind === "hash") {
     exactArity(call.arguments, 1, context);
@@ -222,10 +243,13 @@ function parseProperty(member, sourceFile, name, slot, constants) {
     return { name, slot, kind: call.kind, codecId: propertyCodecs.url.codecId, default: null, luaDefault: "msg.url()" };
   }
 
-  const vectorArity = call.kind === "vector3" ? 3 : call.kind === "vector4" || call.kind === "quaternion" ? 4 : undefined;
+  const vectorArity =
+    call.kind === "vector3" ? 3 : call.kind === "vector4" || call.kind === "quaternion" ? 4 : undefined;
   if (vectorArity !== undefined) {
     exactArity(call.arguments, vectorArity, context);
-    const value = call.arguments.map((argument, index) => numberLiteral(argument, sourceFile, `${context} argument ${index + 1}`));
+    const value = call.arguments.map((argument, index) =>
+      numberLiteral(argument, sourceFile, `${context} argument ${index + 1}`),
+    );
     const constructor = call.kind === "quaternion" ? "quat" : call.kind;
     return {
       name,
@@ -233,7 +257,7 @@ function parseProperty(member, sourceFile, name, slot, constants) {
       kind: call.kind,
       codecId: propertyCodecs[call.kind].codecId,
       default: value,
-      luaDefault: `vmath.${constructor}(${value.map(luaNumber).join(", ")})`
+      luaDefault: `vmath.${constructor}(${value.map(luaNumber).join(", ")})`,
     };
   }
 
@@ -257,11 +281,13 @@ function parseProperty(member, sourceFile, name, slot, constants) {
       resourceKind,
       codecId: propertyCodecs.resource.codecId,
       default: value,
-      luaDefault: `resource.${resourceKind}(${value === null ? "" : luaString(value)})`
+      luaDefault: `resource.${resourceKind}(${value === null ? "" : luaString(value)})`,
     };
   }
 
-  throw new Error(`${context}: unsupported property kind; supported kinds are number, boolean, string, hash, url, vector3, vector4, quaternion, resource(<policy kind>), ${Object.keys(resourceKinds).join(", ")}`);
+  throw new Error(
+    `${context}: unsupported property kind; supported kinds are number, boolean, string, hash, url, vector3, vector4, quaternion, resource(<policy kind>), ${Object.keys(resourceKinds).join(", ")}`,
+  );
 }
 
 function validateLifecycle(member, sourceFile, name) {
@@ -290,24 +316,33 @@ function parseClassDefinition(sourceFile, relativeSource, sourceKind, argument, 
   if (!isIdentifier(argument)) {
     throw new Error(`${relativeSource}: component argument must name a class declared in the same file`);
   }
-  const declarations = sourceFile.statements.filter((statement) =>
-    isClassDeclaration(statement) && statement.name?.text === argument.text
+  const declarations = sourceFile.statements.filter(
+    (statement) => isClassDeclaration(statement) && statement.name?.text === argument.text,
   );
   if (declarations.length !== 1) {
-    throw new Error(`${relativeSource}: component class ${JSON.stringify(argument.text)} must have exactly one declaration in the same file`);
+    throw new Error(
+      `${relativeSource}: component class ${JSON.stringify(argument.text)} must have exactly one declaration in the same file`,
+    );
   }
   const declaration = declarations[0];
-  const extendsClauses = (declaration.heritageClauses ?? [])
-    .filter((clause) => clause.token === SyntaxKind.ExtendsKeyword);
+  const extendsClauses = (declaration.heritageClauses ?? []).filter(
+    (clause) => clause.token === SyntaxKind.ExtendsKeyword,
+  );
   const baseTypes = extendsClauses.flatMap((clause) => [...clause.types]);
   if (baseTypes.length !== 1 || !isIdentifier(unwrapExpression(baseTypes[0].expression))) {
     throw new Error(`${relativeSource}: component class ${argument.text} must directly extend its context base class`);
   }
   const actualBase = unwrapExpression(baseTypes[0].expression).text;
-  const expectedBase = sourceKind.contextKind === "game-object" ? "ScriptComponent" :
-    sourceKind.contextKind === "gui-scene" ? "GuiComponent" : "RenderComponent";
+  const expectedBase =
+    sourceKind.contextKind === "game-object"
+      ? "ScriptComponent"
+      : sourceKind.contextKind === "gui-scene"
+        ? "GuiComponent"
+        : "RenderComponent";
   if (actualBase !== expectedBase) {
-    throw new Error(`${relativeSource}: ${sourceKind.proxyKind} class components must extend ${expectedBase}, received ${actualBase}`);
+    throw new Error(
+      `${relativeSource}: ${sourceKind.proxyKind} class components must extend ${expectedBase}, received ${actualBase}`,
+    );
   }
 
   const members = new Map();
@@ -324,7 +359,9 @@ function parseClassDefinition(sourceFile, relativeSource, sourceKind, argument, 
     const isStatic = hasModifier(member, SyntaxKind.StaticKeyword);
     if (name === "properties") {
       if (!isStatic || !isPropertyDeclaration(member) || !member.initializer) {
-        throw new Error(`${relativeSource}: class properties must be a static field initialized with an object literal`);
+        throw new Error(
+          `${relativeSource}: class properties must be a static field initialized with an object literal`,
+        );
       }
       if (propertiesMember) throw new Error(`${relativeSource}: duplicate class properties declaration`);
       propertiesMember = member;
@@ -343,7 +380,7 @@ function parseClassDefinition(sourceFile, relativeSource, sourceKind, argument, 
     authoringStyle: "class",
     className: argument.text,
     members,
-    propertiesMember
+    propertiesMember,
   };
 }
 
@@ -363,12 +400,18 @@ function parseSourceFile(sourceFile, relativeSource, sourceText, constants) {
   const rootMemberNames = new Set(["properties", ...Object.keys(lifecycleSlots)]);
   const sourceKind = componentSourceKind(relativeSource, componentSourceKinds);
   const exports = sourceFile.statements.filter(isExportAssignment).filter((statement) => !statement.isExportEquals);
-  if (exports.length !== 1) throw new Error(`${relativeSource}: expected exactly one export default defineComponent(...) or component(...)`);
+  if (exports.length !== 1)
+    throw new Error(`${relativeSource}: expected exactly one export default defineComponent(...) or component(...)`);
 
   const exported = unwrapExpression(exports[0].expression);
-  if (!isCallExpression(exported) || !isIdentifier(exported.expression) ||
-      (exported.expression.text !== "defineComponent" && exported.expression.text !== "component")) {
-    throw new Error(`${relativeSource}: default export must be a direct defineComponent({...}) or component(ClassName) call`);
+  if (
+    !isCallExpression(exported) ||
+    !isIdentifier(exported.expression) ||
+    (exported.expression.text !== "defineComponent" && exported.expression.text !== "component")
+  ) {
+    throw new Error(
+      `${relativeSource}: default export must be a direct defineComponent({...}) or component(ClassName) call`,
+    );
   }
   const factoryName = exported.expression.text;
   exactArity([...exported.arguments], 1, `${relativeSource}: ${factoryName}`);
@@ -382,7 +425,7 @@ function parseSourceFile(sourceFile, relativeSource, sourceText, constants) {
     authoring = {
       authoringStyle: "object",
       members: objectMembers(definition, sourceFile, `${relativeSource}: component definition`),
-      propertiesMember: undefined
+      propertiesMember: undefined,
     };
     authoring.propertiesMember = authoring.members.get("properties");
   } else {
@@ -391,16 +434,21 @@ function parseSourceFile(sourceFile, relativeSource, sourceText, constants) {
 
   const { members, propertiesMember } = authoring;
   for (const name of members.keys()) {
-    if (!rootMemberNames.has(name)) throw new Error(`${relativeSource}: unsupported component member ${JSON.stringify(name)}`);
+    if (!rootMemberNames.has(name))
+      throw new Error(`${relativeSource}: unsupported component member ${JSON.stringify(name)}`);
     if (Object.hasOwn(lifecycleSlots, name) && !sourceKind.lifecycle.supported.includes(name)) {
-      throw new Error(`${relativeSource}: ${sourceKind.proxyKind} components do not support lifecycle ${JSON.stringify(name)}; supported lifecycles are ${sourceKind.lifecycle.supported.join(", ")}`);
+      throw new Error(
+        `${relativeSource}: ${sourceKind.proxyKind} components do not support lifecycle ${JSON.stringify(name)}; supported lifecycles are ${sourceKind.lifecycle.supported.join(", ")}`,
+      );
     }
   }
 
   let properties = [];
   if (propertiesMember) {
     if (!sourceKind.supportsProperties) {
-      throw new Error(`${relativeSource}: ${sourceKind.proxyKind} components do not support go.property editor properties`);
+      throw new Error(
+        `${relativeSource}: ${sourceKind.proxyKind} components do not support go.property editor properties`,
+      );
     }
     if (!isPropertyAssignment(propertiesMember) && !isPropertyDeclaration(propertiesMember)) {
       throw new Error(`${relativeSource}: properties must be an object literal`);
@@ -408,13 +456,16 @@ function parseSourceFile(sourceFile, relativeSource, sourceText, constants) {
     const value = unwrapExpression(propertiesMember.initializer);
     if (!isObjectLiteralExpression(value)) throw new Error(`${relativeSource}: properties must be an object literal`);
     const propertyMembers = objectMembers(value, sourceFile, `${relativeSource}: properties`);
-    properties = [...propertyMembers.entries()].map(([name, member], slot) => parseProperty(member, sourceFile, name, slot, constants));
+    properties = [...propertyMembers.entries()].map(([name, member], slot) =>
+      parseProperty(member, sourceFile, name, slot, constants),
+    );
   }
 
   const propertyNames = new Set();
   for (const property of properties) {
     const folded = property.name.toLowerCase();
-    if (propertyNames.has(folded)) throw new Error(`${relativeSource}: property names must be unique ignoring case (${property.name})`);
+    if (propertyNames.has(folded))
+      throw new Error(`${relativeSource}: property names must be unique ignoring case (${property.name})`);
     propertyNames.add(folded);
   }
 
@@ -446,8 +497,8 @@ function parseSourceFile(sourceFile, relativeSource, sourceText, constants) {
       kind,
       ...(resourceKind ? { resourceKind } : {}),
       codecId,
-      default: defaultValue
-    }))
+      default: defaultValue,
+    })),
   };
   return {
     ...schema,
@@ -465,7 +516,7 @@ function parseSourceFile(sourceFile, relativeSource, sourceText, constants) {
     sourceSha256: sha256(sourceText),
     schemaFingerprint: sha256(JSON.stringify(schema)),
     nativeSymbol: `deherm_component_${id.slice(id.lastIndexOf("/") + 1, id.lastIndexOf("/") + 33)}`,
-    properties
+    properties,
   };
 }
 
@@ -480,7 +531,7 @@ function renderLua(component) {
     `-- context-kind: ${component.contextKind}`,
     `-- teardown-policy: ${component.teardownPolicy}`,
     `-- proxy-runtime: ${PROXY_RUNTIME_CAPABILITY.state}`,
-    ""
+    "",
   ];
   for (const property of component.properties) {
     lines.push(`go.property(${luaString(property.name)}, ${property.luaDefault})`);
@@ -490,17 +541,17 @@ function renderLua(component) {
     `local COMPONENT_ID = ${luaString(component.componentId)}`,
     `local SCHEMA_FINGERPRINT = ${luaString(component.schemaFingerprint)}`,
     `local COMPONENT_CONTEXT = ${luaString(component.contextKind)}`,
-    "local PROPERTY_SPECIALIZATIONS = {"
+    "local PROPERTY_SPECIALIZATIONS = {",
   );
   for (const property of component.properties) {
     lines.push(`    { ${luaString(property.name)}, ${property.codecId} },`);
   }
-  lines.push(
-    "}",
-    ""
-  );
+  lines.push("}", "");
 
-  lines.push("function init(self)", `    assert(${luaModule}.attachComponent(self, COMPONENT_ID, SCHEMA_FINGERPRINT, COMPONENT_CONTEXT, PROPERTY_SPECIALIZATIONS))`);
+  lines.push(
+    "function init(self)",
+    `    assert(${luaModule}.attachComponent(self, COMPONENT_ID, SCHEMA_FINGERPRINT, COMPONENT_CONTEXT, PROPERTY_SPECIALIZATIONS))`,
+  );
   if (component.lifecycles.init) lines.push(`    ${luaModule}.dispatchLifecycle(self, COMPONENT_ID, "init")`);
   lines.push("end", "");
 
@@ -509,7 +560,7 @@ function renderLua(component) {
       "function update(self, dt)",
       `    ${luaModule}.dispatchLifecycle(self, COMPONENT_ID, "update", dt)`,
       "end",
-      ""
+      "",
     );
   }
 
@@ -518,7 +569,7 @@ function renderLua(component) {
       "function late_update(self, dt)",
       `    ${luaModule}.dispatchLifecycle(self, COMPONENT_ID, "lateUpdate", dt)`,
       "end",
-      ""
+      "",
     );
   }
 
@@ -527,7 +578,7 @@ function renderLua(component) {
       "function fixed_update(self, dt)",
       `    ${luaModule}.dispatchLifecycle(self, COMPONENT_ID, "fixedUpdate", dt)`,
       "end",
-      ""
+      "",
     );
   }
 
@@ -537,7 +588,7 @@ function renderLua(component) {
       lines.push(
         `    local ok, result = pcall(${luaModule}.dispatchLifecycle, self, COMPONENT_ID, "final")`,
         `    ${luaModule}.detachComponent(self, COMPONENT_ID)`,
-        "    if not ok then error(result, 0) end"
+        "    if not ok then error(result, 0) end",
       );
     } else {
       lines.push(`    ${luaModule}.detachComponent(self, COMPONENT_ID)`);
@@ -550,7 +601,7 @@ function renderLua(component) {
       "function on_message(self, message_id, message, sender)",
       `    ${luaModule}.dispatchMessage(self, COMPONENT_ID, message_id, message, sender)`,
       "end",
-      ""
+      "",
     );
   }
   if (component.lifecycles.onInput) {
@@ -558,16 +609,11 @@ function renderLua(component) {
       "function on_input(self, action_id, action)",
       `    return ${luaModule}.dispatchInput(self, COMPONENT_ID, action_id, action)`,
       "end",
-      ""
+      "",
     );
   }
   if (component.lifecycles.onReload) {
-    lines.push(
-      "function on_reload(self)",
-      `    ${luaModule}.dispatchReload(self, COMPONENT_ID)`,
-      "end",
-      ""
-    );
+    lines.push("function on_reload(self)", `    ${luaModule}.dispatchReload(self, COMPONENT_ID)`, "end", "");
   }
   return `${lines.join("\n").trimEnd()}\n`;
 }
@@ -594,7 +640,7 @@ function publicComponent(component) {
     lifecycleMask: component.lifecycleMask,
     lifecycles: component.lifecycles,
     properties: component.properties.map(({ luaDefault: _luaDefault, ...property }) => property),
-    native: { symbol: component.nativeSymbol }
+    native: { symbol: component.nativeSymbol },
   };
 }
 
@@ -603,24 +649,23 @@ function renderJson(value) {
 }
 
 function registryImportPath(component) {
-  const fromRegistry = path.posix.relative(
-    ".deherm/generated/components",
-    component.source
-  ).replace(/\.ts$/, ".js");
+  const fromRegistry = path.posix.relative(".deherm/generated/components", component.source).replace(/\.ts$/, ".js");
   return fromRegistry.startsWith(".") ? fromRegistry : `./${fromRegistry}`;
 }
 
 function renderRegistry(components) {
-  const imports = components.map((component, index) =>
-    `import component${index} from ${JSON.stringify(registryImportPath(component))};`
+  const imports = components.map(
+    (component, index) => `import component${index} from ${JSON.stringify(registryImportPath(component))};`,
   );
-  const entries = components.map((component, index) => [
-    `  ${JSON.stringify(component.componentId)}: Object.freeze({`,
-    `    schemaFingerprint: ${JSON.stringify(component.schemaFingerprint)},`,
-    `    contextKind: ${JSON.stringify(component.contextKind)},`,
-    `    definition: component${index}`,
-    "  })"
-  ].join("\n"));
+  const entries = components.map((component, index) =>
+    [
+      `  ${JSON.stringify(component.componentId)}: Object.freeze({`,
+      `    schemaFingerprint: ${JSON.stringify(component.schemaFingerprint)},`,
+      `    contextKind: ${JSON.stringify(component.contextKind)},`,
+      `    definition: component${index}`,
+      "  })",
+    ].join("\n"),
+  );
   return `${[
     "// Generated by @ts-defold/deherm component-proxy-generator/v1. Do not edit.",
     ...imports,
@@ -634,34 +679,32 @@ function renderRegistry(components) {
     "}).__defoldComponentsV1 = registry;",
     "",
     "export { registry as __defoldComponentsV1 };",
-    ""
+    "",
   ].join("\n")}`;
 }
 
 function outputsFor(components, outputRoot, constants) {
-  const {
-    lifecycleSlots,
-    propertyCodecs,
-    sourceKinds: componentSourceKinds
-  } = constants;
+  const { lifecycleSlots, propertyCodecs, sourceKinds: componentSourceKinds } = constants;
   const manifest = {
     schemaVersion: 1,
     generator: GENERATOR,
     componentIdNamespace: COMPONENT_ID_NAMESPACE,
     proxyRuntimeCapability: PROXY_RUNTIME_CAPABILITY,
-    sourceConventions: componentSourceKinds.map(({ suffix, canonicalSuffix, proxySuffix, proxyKind, contextKind, supportsProperties, legacy, lifecycle }) => ({
-      authoredSuffix: suffix,
-      canonicalAuthoredSuffix: canonicalSuffix,
-      proxySuffix,
-      proxyKind,
-      contextKind,
-      supportsProperties,
-      legacy,
-      supportedLifecycles: lifecycle.supported,
-      teardownPolicy: lifecycle.teardownPolicy,
-      ...(lifecycle.evidence ? { lifecycleEvidence: lifecycle.evidence } : {})
-    })),
-    components: components.map(publicComponent)
+    sourceConventions: componentSourceKinds.map(
+      ({ suffix, canonicalSuffix, proxySuffix, proxyKind, contextKind, supportsProperties, legacy, lifecycle }) => ({
+        authoredSuffix: suffix,
+        canonicalAuthoredSuffix: canonicalSuffix,
+        proxySuffix,
+        proxyKind,
+        contextKind,
+        supportsProperties,
+        legacy,
+        supportedLifecycles: lifecycle.supported,
+        teardownPolicy: lifecycle.teardownPolicy,
+        ...(lifecycle.evidence ? { lifecycleEvidence: lifecycle.evidence } : {}),
+      }),
+    ),
+    components: components.map(publicComponent),
   };
   const specializations = {
     schemaVersion: 1,
@@ -686,30 +729,30 @@ function outputsFor(components, outputRoot, constants) {
         name,
         slot,
         codecId,
-        ...(resourceKind ? { resourceKind } : {})
-      }))
-    }))
+        ...(resourceKind ? { resourceKind } : {}),
+      })),
+    })),
   };
 
   const outputs = components.map((component) => ({
     path: path.join(outputRoot, component.proxy),
     content: renderLua(component),
     generatedLua: true,
-    owner: { source: component.source, componentId: component.componentId }
+    owner: { source: component.source, componentId: component.componentId },
   }));
   outputs.push(
     {
       path: path.join(outputRoot, ".deherm", "generated", "components", "manifest.json"),
-      content: renderJson(manifest)
+      content: renderJson(manifest),
     },
     {
       path: path.join(outputRoot, ".deherm", "generated", "components", "specializations.json"),
-      content: renderJson(specializations)
+      content: renderJson(specializations),
     },
     {
       path: path.join(outputRoot, ".deherm", "generated", "components", "registry.ts"),
-      content: renderRegistry(components)
-    }
+      content: renderRegistry(components),
+    },
   );
   return { manifest, specializations, outputs };
 }
@@ -724,11 +767,13 @@ function proxyOwnership(content) {
 function assertProxyOwnership(file, content, expected, action) {
   const actual = proxyOwnership(content);
   if (!actual) {
-    throw new Error(`${file}: refusing to ${action} a .script, .gui_script, or .render_script file without complete Deherm ownership headers`);
+    throw new Error(
+      `${file}: refusing to ${action} a .script, .gui_script, or .render_script file without complete Deherm ownership headers`,
+    );
   }
   if (actual.source !== expected.source || actual.componentId !== expected.componentId) {
     throw new Error(
-      `${file}: refusing to ${action} proxy owned by ${actual.source} (${actual.componentId}); expected ${expected.source} (${expected.componentId})`
+      `${file}: refusing to ${action} proxy owned by ${actual.source} (${actual.componentId}); expected ${expected.source} (${expected.componentId})`,
     );
   }
 }
@@ -817,14 +862,17 @@ export async function compileComponentSources({ projectRoot, sourceFiles, compon
   const records = files.map((file) => ({ file, relative: canonicalRelativePath(root, file, componentSourceKinds) }));
   records.sort((left, right) => compareCodeUnits(left.relative, right.relative));
 
-  await Promise.all(records.map(async (record) => {
-    record.sourceText = await readFile(record.file, "utf8");
-  }));
+  await Promise.all(
+    records.map(async (record) => {
+      record.sourceText = await readFile(record.file, "utf8");
+    }),
+  );
 
   const foldedPaths = new Set();
   for (const record of records) {
     const folded = record.relative.toLowerCase();
-    if (foldedPaths.has(folded)) throw new Error(`component source paths must be unique ignoring case (${record.relative})`);
+    if (foldedPaths.has(folded))
+      throw new Error(`component source paths must be unique ignoring case (${record.relative})`);
     foldedPaths.add(folded);
   }
 
@@ -841,16 +889,22 @@ export async function compileComponentSources({ projectRoot, sourceFiles, compon
         if (!sourceFile) throw new Error(`${record.relative}: TypeScript did not parse the source`);
         const diagnostics = project.program.getSyntacticDiagnostics(record.file);
         if (diagnostics.length) {
-          throw new Error(`${record.relative}: TypeScript syntax error: ${diagnostics.map(({ messageText }) => diagnosticText(messageText)).join("; ")}`);
+          throw new Error(
+            `${record.relative}: TypeScript syntax error: ${diagnostics.map(({ messageText }) => diagnosticText(messageText)).join("; ")}`,
+          );
         }
         const sourceTextAfterParse = await readFile(record.file, "utf8");
         if (sourceTextAfterParse !== record.sourceText) {
-          throw new Error(`${record.relative}: source changed while component generation was running; retry generation`);
+          throw new Error(
+            `${record.relative}: source changed while component generation was running; retry generation`,
+          );
         }
         const component = parseSourceFile(sourceFile, record.relative, record.sourceText, constants);
         const collision = ids.get(component.componentId);
         if (collision && collision !== record.relative) {
-          throw new Error(`component ID collision: ${collision} and ${record.relative} both map to ${component.componentId}`);
+          throw new Error(
+            `component ID collision: ${collision} and ${record.relative} both map to ${component.componentId}`,
+          );
         }
         ids.set(component.componentId, record.relative);
         components.push(component);
@@ -861,7 +915,9 @@ export async function compileComponentSources({ projectRoot, sourceFiles, compon
         const collision = proxies.get(folded);
         if (collision) {
           const canonicalSource = component.proxy.replace(/\.gui_script$/, ".gui.ts");
-          throw new Error(`component proxy collision: ${collision.source} and ${component.source} both generate ${component.proxy}; prefer canonical ${canonicalSource}`);
+          throw new Error(
+            `component proxy collision: ${collision.source} and ${component.source} both generate ${component.proxy}; prefer canonical ${canonicalSource}`,
+          );
         }
         proxies.set(folded, component);
       }
@@ -874,7 +930,13 @@ export async function compileComponentSources({ projectRoot, sourceFiles, compon
   }
 }
 
-export async function generateComponentProxies({ projectRoot, sourceFiles, outputRoot = projectRoot, check = false, componentPolicy }) {
+export async function generateComponentProxies({
+  projectRoot,
+  sourceFiles,
+  outputRoot = projectRoot,
+  check = false,
+  componentPolicy,
+}) {
   const constants = createComponentProxyConstants(componentPolicy);
   const componentSourceKinds = constants.sourceKinds;
   const root = path.resolve(projectRoot);
@@ -894,9 +956,11 @@ export async function generateComponentProxies({ projectRoot, sourceFiles, outpu
   const generated = outputsFor(components, output, constants);
   const prior = await previousManifest(output);
 
-  const currentOwners = new Map(generated.outputs
-    .filter(({ generatedLua }) => generatedLua)
-    .map(({ path: file, owner }) => [path.relative(output, file).split(path.sep).join("/"), owner]));
+  const currentOwners = new Map(
+    generated.outputs
+      .filter(({ generatedLua }) => generatedLua)
+      .map(({ path: file, owner }) => [path.relative(output, file).split(path.sep).join("/"), owner]),
+  );
   const orphans = [];
   if (prior) {
     const priorProxies = new Set();
@@ -910,7 +974,9 @@ export async function generateComponentProxies({ projectRoot, sourceFiles, outpu
       const current = currentOwners.get(proxy);
       if (current) {
         if (current.source !== expected.source || current.componentId !== expected.componentId) {
-          throw new Error(`${orphanPath}: proxy ownership changed from ${expected.source} (${expected.componentId}) to ${current.source} (${current.componentId})`);
+          throw new Error(
+            `${orphanPath}: proxy ownership changed from ${expected.source} (${expected.componentId}) to ${current.source} (${current.componentId})`,
+          );
         }
         continue;
       }
@@ -945,8 +1011,4 @@ export async function generateComponentProxies({ projectRoot, sourceFiles, outpu
   return { ...generated, stale, defoldResourceStale };
 }
 
-export {
-  componentAuthoringConventions,
-  componentProxyInvariantConstants,
-  createComponentProxyConstants
-};
+export { componentAuthoringConventions, componentProxyInvariantConstants, createComponentProxyConstants };

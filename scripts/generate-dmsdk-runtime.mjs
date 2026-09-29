@@ -22,7 +22,7 @@ export async function runDmSdkGeneration({ check = false, root = repositoryRoot 
   for (const step of dmSdkGenerationSteps) {
     const result = await execFileAsync(process.execPath, [step.script, ...(check ? ["--check"] : [])], {
       cwd: root,
-      maxBuffer: 16 * 1024 * 1024
+      maxBuffer: 16 * 1024 * 1024,
     });
     results.push({ ...step, stdout: result.stdout, stderr: result.stderr });
   }
@@ -36,7 +36,9 @@ async function main() {
     if (result.stdout) process.stdout.write(result.stdout);
     if (result.stderr) process.stderr.write(result.stderr);
   }
-  console.log(`${options.check ? "Verified" : "Generated"} the complete dmSDK runtime pipeline (${results.length} deterministic steps).`);
+  console.log(
+    `${options.check ? "Verified" : "Generated"} the complete dmSDK runtime pipeline (${results.length} deterministic steps).`,
+  );
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

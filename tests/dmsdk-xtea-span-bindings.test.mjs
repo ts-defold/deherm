@@ -90,13 +90,7 @@ test("xtea span derives bounds and results from implementation dataflow without 
       ),
     );
     assert.ok(
-      extractXteaSpanSemantics(
-        { ...declaration, name: "dmCrypt::Transform" },
-        candidate,
-        enums,
-        policy.recipe,
-        facts,
-      ),
+      extractXteaSpanSemantics({ ...declaration, name: "dmCrypt::Transform" }, candidate, enums, policy.recipe, facts),
     );
     assert.equal(extractXteaSpanSemantics(declaration, candidate, enums, policy.recipe, { definitions: [] }), null);
   }

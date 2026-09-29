@@ -12,12 +12,16 @@ function stripComments(source) {
   let index = 0;
   while (index < source.length) {
     const character = source[index];
-    if (character === "\"" || character === "'") {
+    if (character === '"' || character === "'") {
       const quote = character;
       out += character;
       index += 1;
       while (index < source.length) {
-        if (source[index] === "\\") { out += source[index] + (source[index + 1] ?? ""); index += 2; continue; }
+        if (source[index] === "\\") {
+          out += source[index] + (source[index + 1] ?? "");
+          index += 2;
+          continue;
+        }
         out += source[index];
         index += 1;
         if (source[index - 1] === quote) break;
@@ -43,27 +47,37 @@ function stripComments(source) {
 
 function tokenize(source) {
   const tokens = [];
-  const pattern = /"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|[A-Za-z_][A-Za-z0-9_.]*|-?\d+(?:\.\d+)?|[{}()\[\];=,<>]/g;
+  const pattern = /"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|[A-Za-z_][A-Za-z0-9_.]*|-?\d+(?:\.\d+)?|[{}()[\];=,<>]/g;
   let match;
   while ((match = pattern.exec(source)) !== null) tokens.push(match[0]);
   return tokens;
 }
 
 function unquote(token) {
-  if (token.length >= 2 && (token[0] === "\"" || token[0] === "'")) {
-    return token.slice(1, -1).replaceAll("\\\"", "\"").replaceAll("\\'", "'").replaceAll("\\\\", "\\");
+  if (token.length >= 2 && (token[0] === '"' || token[0] === "'")) {
+    return token.slice(1, -1).replaceAll('\\"', '"').replaceAll("\\'", "'").replaceAll("\\\\", "\\");
   }
   return token;
 }
 
 class Reader {
-  constructor(tokens) { this.tokens = tokens; this.index = 0; }
-  get done() { return this.index >= this.tokens.length; }
-  peek(offset = 0) { return this.tokens[this.index + offset]; }
-  next() { return this.tokens[this.index++]; }
+  constructor(tokens) {
+    this.tokens = tokens;
+    this.index = 0;
+  }
+  get done() {
+    return this.index >= this.tokens.length;
+  }
+  peek(offset = 0) {
+    return this.tokens[this.index + offset];
+  }
+  next() {
+    return this.tokens[this.index++];
+  }
   expect(token) {
     const value = this.next();
-    if (value !== token) throw new Error(`expected ${JSON.stringify(token)}, received ${JSON.stringify(value ?? "<end>")}`);
+    if (value !== token)
+      throw new Error(`expected ${JSON.stringify(token)}, received ${JSON.stringify(value ?? "<end>")}`);
     return value;
   }
   skipBalanced(open, close) {
@@ -103,8 +117,10 @@ function readFieldOptions(reader) {
     let value = true;
     if (reader.peek() === "=") {
       reader.expect("=");
-      if (reader.peek() === "{") { reader.skipBalanced("{", "}"); value = null; }
-      else value = unquote(reader.next());
+      if (reader.peek() === "{") {
+        reader.skipBalanced("{", "}");
+        value = null;
+      } else value = unquote(reader.next());
     }
     options[name] = value === "true" ? true : value === "false" ? false : value;
     if (reader.peek() === ",") reader.expect(",");
@@ -117,7 +133,10 @@ function readMessageBody(reader, message) {
   reader.expect("{");
   while (!reader.done && reader.peek() !== "}") {
     const token = reader.peek();
-    if (token === ";") { reader.next(); continue; }
+    if (token === ";") {
+      reader.next();
+      continue;
+    }
     if (token === "message") {
       reader.next();
       const name = reader.next();
@@ -145,8 +164,14 @@ function readMessageBody(reader, message) {
     }
     if (token === "option" || token === "extensions" || token === "reserved" || token === "extend") {
       reader.next();
-      if (token === "extend") { reader.next(); reader.skipBalanced("{", "}"); continue; }
-      if (reader.peek() === "(") { reader.skipBalanced("(", ")"); }
+      if (token === "extend") {
+        reader.next();
+        reader.skipBalanced("{", "}");
+        continue;
+      }
+      if (reader.peek() === "(") {
+        reader.skipBalanced("(", ")");
+      }
       reader.skipStatement();
       continue;
     }
@@ -175,13 +200,28 @@ export function parseProtoSource(source, file = "<proto>") {
   try {
     while (!reader.done) {
       const token = reader.peek();
-      if (token === ";") { reader.next(); continue; }
-      if (token === "syntax" || token === "import") { reader.next(); reader.skipStatement(); continue; }
-      if (token === "package") { reader.next(); result.package = reader.next(); reader.skipStatement(); continue; }
+      if (token === ";") {
+        reader.next();
+        continue;
+      }
+      if (token === "syntax" || token === "import") {
+        reader.next();
+        reader.skipStatement();
+        continue;
+      }
+      if (token === "package") {
+        reader.next();
+        result.package = reader.next();
+        reader.skipStatement();
+        continue;
+      }
       if (token === "option") {
         reader.next();
         let name = reader.next();
-        if (name === "(") { name = reader.next(); reader.expect(")"); }
+        if (name === "(") {
+          name = reader.next();
+          reader.expect(")");
+        }
         if (reader.peek() === "=") {
           reader.expect("=");
           result.options[name] = unquote(reader.next());
@@ -195,9 +235,25 @@ export function parseProtoSource(source, file = "<proto>") {
         result.messages.push(readMessageBody(reader, { name, fields: [], messages: [], enums: [] }));
         continue;
       }
-      if (token === "enum") { reader.next(); const name = reader.next(); reader.skipBalanced("{", "}"); result.enums.push({ name }); continue; }
-      if (token === "extend") { reader.next(); reader.next(); reader.skipBalanced("{", "}"); continue; }
-      if (token === "service") { reader.next(); reader.next(); reader.skipBalanced("{", "}"); continue; }
+      if (token === "enum") {
+        reader.next();
+        const name = reader.next();
+        reader.skipBalanced("{", "}");
+        result.enums.push({ name });
+        continue;
+      }
+      if (token === "extend") {
+        reader.next();
+        reader.next();
+        reader.skipBalanced("{", "}");
+        continue;
+      }
+      if (token === "service") {
+        reader.next();
+        reader.next();
+        reader.skipBalanced("{", "}");
+        continue;
+      }
       reader.next();
     }
   } catch (error) {

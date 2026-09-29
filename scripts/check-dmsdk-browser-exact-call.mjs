@@ -16,11 +16,7 @@ import {
   dmSdkUniversalCatalogSha256,
   dmSdkUniversalRecipes,
 } from "../packages/compiler/src/generated/dmsdk-universal-recipes.mjs";
-import {
-  defaultChromeBinary,
-  openBundlePage,
-  waitFor,
-} from "../packages/cli/src/dev/browser-host.mjs";
+import { defaultChromeBinary, openBundlePage, waitFor } from "../packages/cli/src/dev/browser-host.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const sdkIrPath = path.join(root, "packages/bindings/generated/defold-sdk-ir.json");
@@ -51,15 +47,13 @@ function executableVersion(executable, argumentsList) {
 export function resolveBrowserExactPrerequisites(environment = process.env) {
   const emsdkVersion = lockValue("EMSDK_VERSION");
   const emsdkRevision = lockValue("EMSDK_REV");
-  const emsdkRoot = path.resolve(environment.DEHERM_EMSDK_ROOT
-    ?? path.join(root, "upstream/extender/platformsdk", `emsdk-${emsdkVersion}`));
+  const emsdkRoot = path.resolve(
+    environment.DEHERM_EMSDK_ROOT ?? path.join(root, "upstream/extender/platformsdk", `emsdk-${emsdkVersion}`),
+  );
   const emxx = path.join(emsdkRoot, "upstream/emscripten/em++");
   const emConfig = path.join(emsdkRoot, ".emscripten");
-  const emCache = environment.EM_CACHE
-    ?? path.join(root, "upstream/extender/platformsdk", `emcache_${emsdkVersion}`);
-  const chrome = environment.DEHERM_CHROME
-    ?? environment.DEFOLD_HERMES_CHROME
-    ?? defaultChromeBinary;
+  const emCache = environment.EM_CACHE ?? path.join(root, "upstream/extender/platformsdk", `emcache_${emsdkVersion}`);
+  const chrome = environment.DEHERM_CHROME ?? environment.DEFOLD_HERMES_CHROME ?? defaultChromeBinary;
   const blockers = [];
   const actualEmsdkRevision = executableVersion("git", ["-C", emsdkRoot, "rev-parse", "HEAD"]);
   if (actualEmsdkRevision !== emsdkRevision) {
@@ -118,10 +112,7 @@ export function materializeBrowserExactVectors() {
     recipes: dmSdkUniversalRecipes,
   };
   const sdkIr = JSON.parse(readFileSync(sdkIrPath, "utf8"));
-  const corpus = materializeDmSdkUniversalReadyCorpus(
-    buildDmSdkCallSymbolIndex(sdkIr, catalog),
-    catalog,
-  );
+  const corpus = materializeDmSdkUniversalReadyCorpus(buildDmSdkCallSymbolIndex(sdkIr, catalog), catalog);
   const materialized = corpus.generated;
   return {
     materialized,
@@ -145,9 +136,16 @@ export function classifyBrowserExactVectors(verification) {
       if (!supportedBrowserWireTags.has(argument.tag)) {
         reasons.push({ code: "browser-arena-unsupported-argument-tag", slot: argument.slot, tag: argument.tag });
       }
-      if (argument.tag === "address" && argument.fixture &&
-          !["cstring", "aligned-address-token", "aligned-receiver-storage", "value-object"].includes(argument.fixture)) {
-        reasons.push({ code: "browser-arena-unsupported-address-fixture", slot: argument.slot, fixture: argument.fixture });
+      if (
+        argument.tag === "address" &&
+        argument.fixture &&
+        !["cstring", "aligned-address-token", "aligned-receiver-storage", "value-object"].includes(argument.fixture)
+      ) {
+        reasons.push({
+          code: "browser-arena-unsupported-address-fixture",
+          slot: argument.slot,
+          fixture: argument.fixture,
+        });
       }
     }
     const resultTag = vector.result.fakeReturn.tag;
@@ -186,37 +184,48 @@ export function classifyBrowserExactVectors(verification) {
 
 export function browserSupportSource(materialized) {
   const { verification } = materialized;
-  const fixtureCases = verification.vectors.flatMap((vector, index) => {
-    const slots = vector.wireArguments
-      .filter(({ fixture }) => fixture && fixture !== "cstring")
-      .map(({ slot }) => `case UINT32_C(${slot}):return static_cast<uint32_t>(deherm_exact_vector_${index}_arguments[${slot}].payload);`)
-      .join("");
-    return slots ? `case UINT32_C(${vector.numericId}):switch(slot){${slots}default:return 0;}` : [];
-  }).join("");
-  const resultCases = verification.vectors.flatMap((vector, index) => {
-    const fixture = vector.result.fakeReturn.fixture;
-    if (!fixture) return [];
-    const suffix = fixture === "cstring" ? "return_cstring" :
-      fixture === "value-object" ? "return_reference" : "return_address";
-    const expression = fixture === "cstring"
-      ? `deherm_exact_vector_${index}_${suffix}`
-      : `&deherm_exact_vector_${index}_${suffix}`;
-    return `case UINT32_C(${vector.numericId}):return static_cast<uint32_t>(reinterpret_cast<uintptr_t>(${expression}));`;
-  }).join("");
-  const cstringCases = verification.vectors.flatMap((vector, index) => {
-    const slots = vector.wireArguments.filter(({ fixture }) => fixture === "cstring").map(({ slot }) => slot);
-    if (!slots.length) return [];
-    const checks = slots.map((slot) =>
-      `if(arguments[${slot}].tag!=DEHERM_DMSDK_UNIVERSAL_ADDRESS||arguments[${slot}].payload==0||` +
-      `arguments[${slot}].auxiliary!=deherm_exact_vector_${index}_arguments[${slot}].auxiliary||` +
-      `std::strcmp(reinterpret_cast<const char*>(static_cast<uintptr_t>(arguments[${slot}].payload)),` +
-      `reinterpret_cast<const char*>(static_cast<uintptr_t>(deherm_exact_vector_${index}_arguments[${slot}].payload)))!=0)return UINT32_C(3);`
-    ).join("");
-    const adopt = slots.map((slot) =>
-      `deherm_exact_vector_${index}_arguments[${slot}].payload=arguments[${slot}].payload;`
-    ).join("");
-    return `case UINT32_C(${vector.numericId}):if(argument_count!=UINT32_C(${vector.argumentCount}))return UINT32_C(2);${checks}${adopt}return 0;`;
-  }).join("");
+  const fixtureCases = verification.vectors
+    .flatMap((vector, index) => {
+      const slots = vector.wireArguments
+        .filter(({ fixture }) => fixture && fixture !== "cstring")
+        .map(
+          ({ slot }) =>
+            `case UINT32_C(${slot}):return static_cast<uint32_t>(deherm_exact_vector_${index}_arguments[${slot}].payload);`,
+        )
+        .join("");
+      return slots ? `case UINT32_C(${vector.numericId}):switch(slot){${slots}default:return 0;}` : [];
+    })
+    .join("");
+  const resultCases = verification.vectors
+    .flatMap((vector, index) => {
+      const fixture = vector.result.fakeReturn.fixture;
+      if (!fixture) return [];
+      const suffix =
+        fixture === "cstring" ? "return_cstring" : fixture === "value-object" ? "return_reference" : "return_address";
+      const expression =
+        fixture === "cstring" ? `deherm_exact_vector_${index}_${suffix}` : `&deherm_exact_vector_${index}_${suffix}`;
+      return `case UINT32_C(${vector.numericId}):return static_cast<uint32_t>(reinterpret_cast<uintptr_t>(${expression}));`;
+    })
+    .join("");
+  const cstringCases = verification.vectors
+    .flatMap((vector, index) => {
+      const slots = vector.wireArguments.filter(({ fixture }) => fixture === "cstring").map(({ slot }) => slot);
+      if (!slots.length) return [];
+      const checks = slots
+        .map(
+          (slot) =>
+            `if(arguments[${slot}].tag!=DEHERM_DMSDK_UNIVERSAL_ADDRESS||arguments[${slot}].payload==0||` +
+            `arguments[${slot}].auxiliary!=deherm_exact_vector_${index}_arguments[${slot}].auxiliary||` +
+            `std::strcmp(reinterpret_cast<const char*>(static_cast<uintptr_t>(arguments[${slot}].payload)),` +
+            `reinterpret_cast<const char*>(static_cast<uintptr_t>(deherm_exact_vector_${index}_arguments[${slot}].payload)))!=0)return UINT32_C(3);`,
+        )
+        .join("");
+      const adopt = slots
+        .map((slot) => `deherm_exact_vector_${index}_arguments[${slot}].payload=arguments[${slot}].payload;`)
+        .join("");
+      return `case UINT32_C(${vector.numericId}):if(argument_count!=UINT32_C(${vector.argumentCount}))return UINT32_C(2);${checks}${adopt}return 0;`;
+    })
+    .join("");
   return `
 #include <cstring>
 extern "C" int deherm_dmsdk_browser_exact_prepare(void){
@@ -234,16 +243,20 @@ extern "C" uint32_t deherm_dmsdk_browser_exact_preflight(uint32_t id,const Deher
 }
 
 export function browserRunnerSource({ materialized, applicability, moduleFile }) {
-  const applicableIds = new Set(applicability.vectors.filter(({ applicable }) => applicable).map(({ numericId }) => numericId));
-  const vectors = materialized.verification.vectors.filter(({ numericId }) => applicableIds.has(numericId)).map((vector, index) => ({
-    index,
-    declarationId: vector.declarationId,
-    numericId: vector.numericId,
-    argumentCount: vector.argumentCount,
-    wireArguments: vector.wireArguments,
-    result: vector.result.fakeReturn,
-    vectorSha256: vector.vectorSha256,
-  }));
+  const applicableIds = new Set(
+    applicability.vectors.filter(({ applicable }) => applicable).map(({ numericId }) => numericId),
+  );
+  const vectors = materialized.verification.vectors
+    .filter(({ numericId }) => applicableIds.has(numericId))
+    .map((vector, index) => ({
+      index,
+      declarationId: vector.declarationId,
+      numericId: vector.numericId,
+      argumentCount: vector.argumentCount,
+      wireArguments: vector.wireArguments,
+      result: vector.result.fakeReturn,
+      vectorSha256: vector.vectorSha256,
+    }));
   return `
 import createExactModule from ${JSON.stringify(`./${moduleFile}`)};
 import { createBrowserDmSdkUniversalBridge } from ${JSON.stringify(browserArenaPath)};
@@ -348,59 +361,74 @@ export async function buildBrowserExactModule({ output, prerequisites }) {
     writeFile(verificationPath, `${materialized.verificationSource}${browserSupportSource(materialized)}`),
     writeFile(harnessPath, "int main(){return 0;}\n"),
     writeFile(runnerSourcePath, browserRunnerSource({ materialized, applicability, moduleFile })),
-    writeFile(path.join(output, "dmsdk-exact.verify.json"), `${JSON.stringify({
-      ...materialized.verification,
-      browserArenaApplicability: applicability,
-    }, null, 2)}\n`),
+    writeFile(
+      path.join(output, "dmsdk-exact.verify.json"),
+      `${JSON.stringify(
+        {
+          ...materialized.verification,
+          browserArenaApplicability: applicability,
+        },
+        null,
+        2,
+      )}\n`,
+    ),
   ]);
   await mkdir(prerequisites.emCache, { recursive: true });
   const defoldRevision = lockValue("DEFOLD_REV");
   const sdkRoot = path.join(root, "upstream/extender/server/app/sdk", defoldRevision, "defoldsdk");
-  execFileSync(prerequisites.emxx, [
-    "-std=c++17",
-    "-O2",
-    "-sASSERTIONS=1",
-    "-sENVIRONMENT=web",
-    "-sEXIT_RUNTIME=0",
-    "-sFILESYSTEM=0",
-    "-sALLOW_MEMORY_GROWTH=1",
-    "-sMODULARIZE=1",
-    "-sEXPORT_ES6=1",
-    "-sEXPORT_NAME=createDehermDmSdkExactModule",
-    `-sEXPORTED_RUNTIME_METHODS=${JSON.stringify(["wasmMemory"])}`,
-    `-sEXPORTED_FUNCTIONS=${JSON.stringify([
-      "_malloc",
-      "_free",
-      "_deherm_dmsdk_universal_dispatch",
-      `_${materialized.verification.observations.calls}`,
-      `_${materialized.verification.observations.failures}`,
-      "_deherm_dmsdk_browser_exact_prepare",
-      "_deherm_dmsdk_browser_exact_fixture",
-      "_deherm_dmsdk_browser_exact_result_fixture",
-      "_deherm_dmsdk_browser_exact_preflight",
-    ])}`,
-    `-I${universalIncludePath}`,
-    "-isystem", dlibIncludePath,
-    "-isystem", path.join(sdkRoot, "sdk/include"),
-    "-isystem", path.join(sdkRoot, "include"),
-    "-isystem", path.join(sdkRoot, "ext/include"),
-    "-DDLIB_LOG_DOMAIN=\"deherm\"",
-    universalRuntimePath,
-    verificationPath,
-    harnessPath,
-    "-o",
-    modulePath,
-  ], {
-    cwd: root,
-    env: {
-      ...process.env,
-      EM_CONFIG: prerequisites.emConfig,
-      EM_CACHE: prerequisites.emCache,
+  execFileSync(
+    prerequisites.emxx,
+    [
+      "-std=c++17",
+      "-O2",
+      "-sASSERTIONS=1",
+      "-sENVIRONMENT=web",
+      "-sEXIT_RUNTIME=0",
+      "-sFILESYSTEM=0",
+      "-sALLOW_MEMORY_GROWTH=1",
+      "-sMODULARIZE=1",
+      "-sEXPORT_ES6=1",
+      "-sEXPORT_NAME=createDehermDmSdkExactModule",
+      `-sEXPORTED_RUNTIME_METHODS=${JSON.stringify(["wasmMemory"])}`,
+      `-sEXPORTED_FUNCTIONS=${JSON.stringify([
+        "_malloc",
+        "_free",
+        "_deherm_dmsdk_universal_dispatch",
+        `_${materialized.verification.observations.calls}`,
+        `_${materialized.verification.observations.failures}`,
+        "_deherm_dmsdk_browser_exact_prepare",
+        "_deherm_dmsdk_browser_exact_fixture",
+        "_deherm_dmsdk_browser_exact_result_fixture",
+        "_deherm_dmsdk_browser_exact_preflight",
+      ])}`,
+      `-I${universalIncludePath}`,
+      "-isystem",
+      dlibIncludePath,
+      "-isystem",
+      path.join(sdkRoot, "sdk/include"),
+      "-isystem",
+      path.join(sdkRoot, "include"),
+      "-isystem",
+      path.join(sdkRoot, "ext/include"),
+      '-DDLIB_LOG_DOMAIN="deherm"',
+      universalRuntimePath,
+      verificationPath,
+      harnessPath,
+      "-o",
+      modulePath,
+    ],
+    {
+      cwd: root,
+      env: {
+        ...process.env,
+        EM_CONFIG: prerequisites.emConfig,
+        EM_CACHE: prerequisites.emCache,
+      },
+      encoding: "utf8",
+      maxBuffer: 16 * 1024 * 1024,
+      stdio: "pipe",
     },
-    encoding: "utf8",
-    maxBuffer: 16 * 1024 * 1024,
-    stdio: "pipe",
-  });
+  );
   await buildJavaScript({
     entryPoints: [runnerSourcePath],
     bundle: true,
@@ -411,7 +439,10 @@ export async function buildBrowserExactModule({ output, prerequisites }) {
     external: [`./${moduleFile}`],
     logLevel: "silent",
   });
-  await writeFile(htmlPath, `<!doctype html>\n<meta charset="utf-8">\n<link rel="icon" href="data:,">\n<title>déherm dmSDK browser arena exact call</title>\n<pre id="output"></pre>\n<script type="module" src="./${runnerFile}"></script>\n`);
+  await writeFile(
+    htmlPath,
+    `<!doctype html>\n<meta charset="utf-8">\n<link rel="icon" href="data:,">\n<title>déherm dmSDK browser arena exact call</title>\n<pre id="output"></pre>\n<script type="module" src="./${runnerFile}"></script>\n`,
+  );
   const wasmPath = path.join(output, "dmsdk-exact-module.wasm");
   for (const artifact of [htmlPath, modulePath, runnerPath, wasmPath]) {
     if (!existsSync(artifact)) throw new Error(`Emscripten did not emit ${artifact}`);
@@ -434,13 +465,15 @@ export async function buildBrowserExactModule({ output, prerequisites }) {
 export async function runBrowserExactCall(options = {}) {
   const prerequisites = resolveBrowserExactPrerequisites(options.environment);
   if (prerequisites.blockers.length) {
-    const error = new Error(`browser dmSDK exact-call prerequisites failed:\n${JSON.stringify(prerequisites.blockers, null, 2)}`);
+    const error = new Error(
+      `browser dmSDK exact-call prerequisites failed:\n${JSON.stringify(prerequisites.blockers, null, 2)}`,
+    );
     error.code = "DEHERM_BROWSER_EXACT_PREREQUISITE";
     error.blockers = prerequisites.blockers;
     throw error;
   }
   const ownedOutput = !options.output;
-  const output = path.resolve(options.output ?? await mkdtemp(path.join(tmpdir(), "deherm-dmsdk-browser-exact.")));
+  const output = path.resolve(options.output ?? (await mkdtemp(path.join(tmpdir(), "deherm-dmsdk-browser-exact."))));
   try {
     const built = await buildBrowserExactModule({ output, prerequisites });
     const page = await openBundlePage({
@@ -454,22 +487,27 @@ export async function runBrowserExactCall(options = {}) {
       keepProfile: true,
     });
     try {
-      const successLine = await waitFor(() => {
-        const marker = page.client.transcript.find((line) => line.includes(built.marker));
-        if (marker) return marker;
-        const explicitFailure = page.client.transcript.find((line) => line.includes("DEHERM_BROWSER_DMSDK_ARENA_EXACT_FAIL"));
-        if (explicitFailure) {
-          const error = new Error(explicitFailure);
-          error.fatal = true;
-          throw error;
-        }
-        if (page.client.failures.length) {
-          const error = new Error(JSON.stringify(page.client.failures));
-          error.fatal = true;
-          throw error;
-        }
-        return false;
-      }, { timeoutMs: options.runtimeTimeoutMs ?? 30_000, what: "the real browser arena exact-call marker" });
+      const successLine = await waitFor(
+        () => {
+          const marker = page.client.transcript.find((line) => line.includes(built.marker));
+          if (marker) return marker;
+          const explicitFailure = page.client.transcript.find((line) =>
+            line.includes("DEHERM_BROWSER_DMSDK_ARENA_EXACT_FAIL"),
+          );
+          if (explicitFailure) {
+            const error = new Error(explicitFailure);
+            error.fatal = true;
+            throw error;
+          }
+          if (page.client.failures.length) {
+            const error = new Error(JSON.stringify(page.client.failures));
+            error.fatal = true;
+            throw error;
+          }
+          return false;
+        },
+        { timeoutMs: options.runtimeTimeoutMs ?? 30_000, what: "the real browser arena exact-call marker" },
+      );
       if (page.client.failures.length) {
         throw new Error(`browser dmSDK exact-call page failures: ${JSON.stringify(page.client.failures)}`);
       }
@@ -496,8 +534,13 @@ export async function runBrowserExactCall(options = {}) {
         unsupportedReasonCounts: built.applicability.reasonCounts,
         unsupported: built.applicability.vectors.filter(({ applicable }) => !applicable),
         runtime,
-        vectors: built.applicability.vectors.map(({ declarationId, numericId, vectorSha256, applicable, reasons }) =>
-          ({ declarationId, numericId, vectorSha256, applicable, reasons })),
+        vectors: built.applicability.vectors.map(({ declarationId, numericId, vectorSha256, applicable, reasons }) => ({
+          declarationId,
+          numericId,
+          vectorSha256,
+          applicable,
+          reasons,
+        })),
         toolchain: {
           emscripten: prerequisites.emsdkVersion,
           emsdkRevision: prerequisites.actualEmsdkRevision,
@@ -505,8 +548,9 @@ export async function runBrowserExactCall(options = {}) {
           emxxLauncherSha256: sha256(await readFile(prerequisites.emxx)),
           browser: prerequisites.chromeVersion.split("\n")[0],
         },
-        artifacts: Object.fromEntries(Object.entries(built.artifacts).map(([name, artifact]) =>
-          [name, { sha256: artifact.sha256 }])),
+        artifacts: Object.fromEntries(
+          Object.entries(built.artifacts).map(([name, artifact]) => [name, { sha256: artifact.sha256 }]),
+        ),
         transcript: page.client.transcript,
       };
     } finally {
@@ -527,18 +571,38 @@ export function assertBrowserExactRuntime(runtime, applicability) {
   exactInteger("runtime.vectorCount", runtime?.vectorCount, expected);
   exactInteger("runtime.observationCount", runtime?.observationCount, expected);
   if (!Number.isSafeInteger(runtime?.allocationCount) || runtime.allocationCount < 0) {
-    violations.push({ name: "runtime.allocationCount", expected: "non-negative safe integer", actual: runtime?.allocationCount });
+    violations.push({
+      name: "runtime.allocationCount",
+      expected: "non-negative safe integer",
+      actual: runtime?.allocationCount,
+    });
   }
   if (!Number.isSafeInteger(runtime?.releaseCount) || runtime.releaseCount !== runtime?.allocationCount) {
-    violations.push({ name: "runtime.releaseCount", expected: runtime?.allocationCount, actual: runtime?.releaseCount });
+    violations.push({
+      name: "runtime.releaseCount",
+      expected: runtime?.allocationCount,
+      actual: runtime?.releaseCount,
+    });
   }
-  if (!Number.isSafeInteger(runtime?.peakActiveBytes) || runtime.peakActiveBytes < 0 || runtime.peakActiveBytes > 65_536) {
-    violations.push({ name: "runtime.peakActiveBytes", expected: "integer in [0, 65536]", actual: runtime?.peakActiveBytes });
+  if (
+    !Number.isSafeInteger(runtime?.peakActiveBytes) ||
+    runtime.peakActiveBytes < 0 ||
+    runtime.peakActiveBytes > 65_536
+  ) {
+    violations.push({
+      name: "runtime.peakActiveBytes",
+      expected: "integer in [0, 65536]",
+      actual: runtime?.peakActiveBytes,
+    });
   }
-  if (runtime?.reverseRelease !== true) violations.push({ name: "runtime.reverseRelease", expected: true, actual: runtime?.reverseRelease });
-  if (runtime?.liveEmscriptenHeap !== true) violations.push({ name: "runtime.liveEmscriptenHeap", expected: true, actual: runtime?.liveEmscriptenHeap });
+  if (runtime?.reverseRelease !== true)
+    violations.push({ name: "runtime.reverseRelease", expected: true, actual: runtime?.reverseRelease });
+  if (runtime?.liveEmscriptenHeap !== true)
+    violations.push({ name: "runtime.liveEmscriptenHeap", expected: true, actual: runtime?.liveEmscriptenHeap });
   if (violations.length) {
-    const error = new Error(`browser dmSDK exact-call runtime evidence disagrees with its applicability partition:\n${JSON.stringify(violations, null, 2)}`);
+    const error = new Error(
+      `browser dmSDK exact-call runtime evidence disagrees with its applicability partition:\n${JSON.stringify(violations, null, 2)}`,
+    );
     error.code = "DEHERM_BROWSER_EXACT_RUNTIME_MISMATCH";
     error.violations = violations;
     throw error;

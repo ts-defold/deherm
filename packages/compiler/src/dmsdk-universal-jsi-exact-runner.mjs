@@ -39,7 +39,9 @@ function expectedResultSetup(vector, index) {
   if (!tag) throw new Error(`${vector.declarationId} has unsupported JSI result tag ${expected.tag}`);
   const lines = [`DehermDmSdkUniversalValue ${name}{};`, `${name}.tag=${tag};`];
   if (expected.tag === "f64") {
-    lines.push(`{const double value=${Number(expected.value).toFixed(2)};memcpy(&${name}.payload,&value,sizeof(value));}`);
+    lines.push(
+      `{const double value=${Number(expected.value).toFixed(2)};memcpy(&${name}.payload,&value,sizeof(value));}`,
+    );
   } else if (expected.tag === "i64") {
     lines.push(`${name}.payload=static_cast<uint64_t>(INT64_C(${expected.value}));`);
   } else if (["u64", "bool"].includes(expected.tag)) {
@@ -49,9 +51,11 @@ function expectedResultSetup(vector, index) {
     if (expected.fixture === "cstring") expression = `deherm_exact_vector_${index}_return_cstring`;
     if (expected.fixture === "value-object") expression = `&deherm_exact_vector_${index}_return_reference`;
     if (expected.fixture === "aligned-address-token") expression = `&deherm_exact_vector_${index}_return_address`;
-    lines.push(expression
-      ? `${name}.payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(${expression}));`
-      : `${name}.payload=UINT64_C(${expected.value});`);
+    lines.push(
+      expression
+        ? `${name}.payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(${expression}));`
+        : `${name}.payload=UINT64_C(${expected.value});`,
+    );
   }
   return { name, source: lines.join("\n ") };
 }
@@ -68,10 +72,13 @@ function renderVector(vector, index, names) {
   const argumentsName = `deherm_exact_jsi_arguments_${index}`;
   const resultName = `deherm_exact_jsi_result_${index}`;
   const id = `UINT32_C(${vector.numericId})`;
-  const assignments = vector.wireArguments.map(({ slot }) =>
-    `${argumentsName}.setValueAtIndex(runtime,UINT32_C(${slot}),` +
-    `deherm_exact_jsi_input(runtime,deherm_exact_vector_${index}_arguments[${slot}]));`
-  ).join("\n ");
+  const assignments = vector.wireArguments
+    .map(
+      ({ slot }) =>
+        `${argumentsName}.setValueAtIndex(runtime,UINT32_C(${slot}),` +
+        `deherm_exact_jsi_input(runtime,deherm_exact_vector_${index}_arguments[${slot}]));`,
+    )
+    .join("\n ");
   return `jsi::Array ${argumentsName}(runtime,UINT32_C(${vector.argumentCount}));
  ${assignments}
  jsi::Value deherm_exact_jsi_call_${index}[2]={jsi::Value(static_cast<double>(${id})),jsi::Value(runtime,${argumentsName})};
@@ -96,20 +103,21 @@ export function renderDmSdkUniversalJsiExactRunner(generated, options = {}) {
     runner: identifier(options.functionName ?? "deherm_dmsdk_run_jsi_exact_verification", "JSI runner"),
   };
   const unsupported = [];
-  const rendered = verification.vectors.map((vector, index) => {
-    const source = renderVector(vector, index, names);
-    if (!source) {
-      unsupported.push({
-        declarationId: vector.declarationId,
-        numericId: vector.numericId,
-        reason: "production JSI encoder has no callback wire-value representation",
-      });
-    }
-    return source;
-  }).filter(Boolean);
-  const verificationInclude = options.verificationInclude === undefined
-    ? ""
-    : `#include ${quotedLocalInclude(options.verificationInclude)}\n`;
+  const rendered = verification.vectors
+    .map((vector, index) => {
+      const source = renderVector(vector, index, names);
+      if (!source) {
+        unsupported.push({
+          declarationId: vector.declarationId,
+          numericId: vector.numericId,
+          reason: "production JSI encoder has no callback wire-value representation",
+        });
+      }
+      return source;
+    })
+    .filter(Boolean);
+  const verificationInclude =
+    options.verificationInclude === undefined ? "" : `#include ${quotedLocalInclude(options.verificationInclude)}\n`;
   const source = `// Generated dynamic Hermes/JSI dmSDK exact-call runner. Do not edit.
 ${verificationInclude}#include <defold_hermes/generated_dmsdk_universal.h>
 #include <defold_hermes/generated_dmsdk_universal_jsi.hpp>
@@ -173,7 +181,8 @@ extern "C" int ${names.runner}(void){
     schemaVersion: 1,
     source: "deherm-dmsdk-dynamic-hermes-jsi-exact-call-verification",
     transport: "dynamic-hermes-jsi",
-    evidenceBoundary: "Executes the production DmSdkUniversal JSI host function in a real Hermes runtime and checks stable-id selection, JavaScript-to-wire argument order and tags, exact native fake observations, and wire-to-JavaScript result signatures. It does not execute Defold implementation semantics or prove handle/callback ownership lifecycles.",
+    evidenceBoundary:
+      "Executes the production DmSdkUniversal JSI host function in a real Hermes runtime and checks stable-id selection, JavaScript-to-wire argument order and tags, exact native fake observations, and wire-to-JavaScript result signatures. It does not execute Defold implementation semantics or prove handle/callback ownership lifecycles.",
     catalogSha256: verification.catalogSha256,
     verificationManifestSha256: verification.manifestSha256,
     vectorCount: verification.vectors.length,

@@ -17,13 +17,22 @@ const outputPath = path.join(root, "packages", "bindings", "generated", "defold-
 const scriptIrPath = path.join(root, "packages", "bindings", "generated", "defold-script-api-ir.json");
 const buildersPath = path.join(
   root,
-  "upstream", "defold", "com.dynamo.cr", "com.dynamo.cr.bob", "src", "com", "dynamo", "bob", "pipeline", "ScriptBuilders.java"
+  "upstream",
+  "defold",
+  "com.dynamo.cr",
+  "com.dynamo.cr.bob",
+  "src",
+  "com",
+  "dynamo",
+  "bob",
+  "pipeline",
+  "ScriptBuilders.java",
 );
 
 const contextKinds = Object.freeze({
   script: Object.freeze({ contextKind: "game-object", supportsProperties: true }),
   gui_script: Object.freeze({ contextKind: "gui-scene", supportsProperties: false }),
-  render_script: Object.freeze({ contextKind: "render-instance+graphics", supportsProperties: false })
+  render_script: Object.freeze({ contextKind: "render-instance+graphics", supportsProperties: false }),
 });
 
 // These are compiler codec capabilities, not Defold spellings. The emitted
@@ -37,7 +46,7 @@ const propertyCodecBySemanticName = Object.freeze({
   url: "url",
   vector3: "vector3",
   vector4: "vector4",
-  quaternion: "quaternion"
+  quaternion: "quaternion",
 });
 
 function camel(value) {
@@ -54,9 +63,11 @@ function builderExtensions(source) {
 
 export async function buildComponentProxyPolicy(options = {}) {
   const sourceRoot = options.sourceRoot ?? root;
-  const scriptIr = options.scriptIr ?? JSON.parse(await readFile(path.join(sourceRoot, path.relative(root, scriptIrPath)), "utf8"));
-  const buildersSource = options.buildersSource ?? await readFile(path.join(sourceRoot, path.relative(root, buildersPath)), "utf8");
-  const lifecycle = options.lifecycle ?? await readLifecycleCallbacks(path.join(sourceRoot, "upstream", "defold"));
+  const scriptIr =
+    options.scriptIr ?? JSON.parse(await readFile(path.join(sourceRoot, path.relative(root, scriptIrPath)), "utf8"));
+  const buildersSource =
+    options.buildersSource ?? (await readFile(path.join(sourceRoot, path.relative(root, buildersPath)), "utf8"));
+  const lifecycle = options.lifecycle ?? (await readLifecycleCallbacks(path.join(sourceRoot, "upstream", "defold")));
   const extensions = builderExtensions(buildersSource);
 
   const contexts = [];
@@ -72,8 +83,8 @@ export async function buildComponentProxyPolicy(options = {}) {
       callbacks: table.callbacks,
       evidence: {
         lifecycle: `${table.source}:${table.symbol}`,
-        resource: "com.dynamo.cr/com.dynamo.cr.bob/src/com/dynamo/bob/pipeline/ScriptBuilders.java:@BuilderParams"
-      }
+        resource: "com.dynamo.cr/com.dynamo.cr.bob/src/com/dynamo/bob/pipeline/ScriptBuilders.java:@BuilderParams",
+      },
     });
   }
 
@@ -81,7 +92,10 @@ export async function buildComponentProxyPolicy(options = {}) {
   assert.equal(property.length, 1, `expected exactly one go.property declaration, found ${property.length}`);
   const valueParameter = property[0].parameters.find(({ rawName }) => rawName === "value");
   assert(valueParameter?.rawType, "go.property has no declared value type");
-  const valueTypes = valueParameter.rawType.split("|").map((value) => value.trim()).filter(Boolean);
+  const valueTypes = valueParameter.rawType
+    .split("|")
+    .map((value) => value.trim())
+    .filter(Boolean);
 
   const resourceConstructors = scriptIr.functions
     .filter((fn) => fn.modulePath.length === 1 && fn.modulePath[0] === "resource")
@@ -90,23 +104,30 @@ export async function buildComponentProxyPolicy(options = {}) {
     // their source documentation contract: they are the resource functions
     // legal only inside go.property. Do not pin the generator to either era's
     // return-token spelling.
-    .filter((fn) => /only be called within\s+(?:\[(?:ref:)?go\.property\]|`go\.property`|go\.property)/iu.test(fn.description ?? ""))
+    .filter((fn) =>
+      /only be called within\s+(?:\[(?:ref:)?go\.property\]|`go\.property`|go\.property)/iu.test(fn.description ?? ""),
+    )
     .map((fn) => ({
       authoringName: fn.jsName ?? camel(fn.member),
       engineName: fn.member,
       route: fn.rawName,
-      source: `${fn.source}:${fn.line}`
+      source: `${fn.source}:${fn.line}`,
     }))
-    .sort((left, right) => left.engineName < right.engineName ? -1 : left.engineName > right.engineName ? 1 : 0);
+    .sort((left, right) => (left.engineName < right.engineName ? -1 : left.engineName > right.engineName ? 1 : 0));
   assert(resourceConstructors.length > 0, "no resource constructors restricted to go.property were derived");
-  const resourceReturnTypes = new Set(scriptIr.functions
-    .filter((fn) => resourceConstructors.some(({ route }) => route === fn.rawName))
-    .flatMap((fn) => fn.returns ?? []));
-  const valueTypeCodecs = Object.fromEntries(valueTypes.map((name) => {
-    const codec = propertyCodecBySemanticName[name] ??
-      (resourceReturnTypes.has(name) || /resource/iu.test(name) ? "resource" : "unsupported");
-    return [name, codec];
-  }));
+  const resourceReturnTypes = new Set(
+    scriptIr.functions
+      .filter((fn) => resourceConstructors.some(({ route }) => route === fn.rawName))
+      .flatMap((fn) => fn.returns ?? []),
+  );
+  const valueTypeCodecs = Object.fromEntries(
+    valueTypes.map((name) => {
+      const codec =
+        propertyCodecBySemanticName[name] ??
+        (resourceReturnTypes.has(name) || /resource/iu.test(name) ? "resource" : "unsupported");
+      return [name, codec];
+    }),
+  );
 
   return {
     schemaVersion: 1,
@@ -119,8 +140,8 @@ export async function buildComponentProxyPolicy(options = {}) {
       valueTypes,
       valueTypeCodecs,
       source: `${property[0].source}:${property[0].line}`,
-      resourceConstructors
-    }
+      resourceConstructors,
+    },
   };
 }
 
@@ -130,7 +151,11 @@ export async function runComponentProxyPolicyGenerator(options = {}) {
   const source = `${JSON.stringify(await buildComponentProxyPolicy(options), null, 2)}\n`;
   if (check) {
     const current = await readFile(target, "utf8").catch(() => null);
-    assert.equal(current, source, `${path.relative(root, target)} is stale; run node scripts/generate-component-proxy-contract.mjs`);
+    assert.equal(
+      current,
+      source,
+      `${path.relative(root, target)} is stale; run node scripts/generate-component-proxy-contract.mjs`,
+    );
   } else {
     await writeFile(target, source);
   }

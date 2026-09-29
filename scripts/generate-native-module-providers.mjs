@@ -22,8 +22,10 @@ const RESULT_KINDS = Object.freeze({ status: 1, u32: 2 });
 
 function validate(input) {
   assert.equal(input.schemaVersion, 1, "extension binding schemaVersion");
-  assert.ok(Array.isArray(input.nativeModules) && input.nativeModules.length > 0,
-    "nativeModules must be a non-empty array");
+  assert.ok(
+    Array.isArray(input.nativeModules) && input.nativeModules.length > 0,
+    "nativeModules must be a non-empty array",
+  );
   const names = new Set();
   for (const module of input.nativeModules) {
     assertNativeModuleDescriptor(module);
@@ -32,12 +34,14 @@ function validate(input) {
     names.add(module.name);
     assert.ok(Number.isInteger(module.abiVersion) && module.abiVersion > 0);
     assert.ok(Array.isArray(module.methods) && module.methods.length > 0 && module.methods.length <= 32);
-    const ids = new Set(), methodNames = new Set();
+    const ids = new Set(),
+      methodNames = new Set();
     for (const method of module.methods) {
       assert.ok(Number.isInteger(method.id) && method.id > 0 && !ids.has(method.id));
       assert.match(method.name, /^[A-Za-z_][A-Za-z0-9_]*$/u);
       assert.ok(!methodNames.has(method.name));
-      ids.add(method.id); methodNames.add(method.name);
+      ids.add(method.id);
+      methodNames.add(method.name);
       assert.ok(Array.isArray(method.args) && method.args.length <= 8);
       for (const argument of method.args) {
         assert.match(argument.name, /^[A-Za-z_][A-Za-z0-9_]*$/u);
@@ -301,11 +305,16 @@ void installGeneratedNativeModuleProviders(jsi::Runtime& runtime, jsi::Object& m
 
 export function repositoryNativeModuleArtifactPath(module, kind) {
   if (module.name !== "NativeWebTransport") throw new Error(`No repository fixture path for ${module.name}`);
-  if (kind === "header") return "extensions/defold-webtransport/defold_webtransport/include/defold_webtransport/deherm_provider.h";
-  if (kind === "typescript") return "extensions/defold-webtransport/defold_webtransport/webtransport/typescript/NativeWebTransport.ts";
-  if (kind === "staticHeader") return "extensions/defold-webtransport/defold_webtransport/webtransport/static/deherm_static_native_web_transport.h";
-  if (kind === "staticSource") return "extensions/defold-webtransport/defold_webtransport/webtransport/static/deherm_static_native_web_transport.cpp";
-  if (kind === "staticTypescript") return "extensions/defold-webtransport/defold_webtransport/webtransport/static/NativeWebTransport.ts";
+  if (kind === "header")
+    return "extensions/defold-webtransport/defold_webtransport/include/defold_webtransport/deherm_provider.h";
+  if (kind === "typescript")
+    return "extensions/defold-webtransport/defold_webtransport/webtransport/typescript/NativeWebTransport.ts";
+  if (kind === "staticHeader")
+    return "extensions/defold-webtransport/defold_webtransport/webtransport/static/deherm_static_native_web_transport.h";
+  if (kind === "staticSource")
+    return "extensions/defold-webtransport/defold_webtransport/webtransport/static/deherm_static_native_web_transport.cpp";
+  if (kind === "staticTypescript")
+    return "extensions/defold-webtransport/defold_webtransport/webtransport/static/NativeWebTransport.ts";
   if (kind === "adapterSource") return "tests/fixtures/generated_native_webtransport_provider_adapter.cpp";
   throw new Error(`Unknown repository native module artifact kind ${kind}`);
 }
@@ -318,30 +327,41 @@ export function generateNativeModuleProviderArtifacts(input, options = {}) {
     ["defold/defold_hermes/src/generated_native_module_registry.cpp", registrySource()],
     ["defold/defold_hermes/src/generated_native_module_jsi.cpp", jsiSource()],
   ]);
-  const artifactPath = options.artifactPath ?? ((module, kind) => {
-    const leaf = {
-      header: "provider.h",
-      typescript: `${module.name}.ts`,
-      staticHeader: `deherm_static_${module.name}.h`,
-      staticSource: `deherm_static_${module.name}.cpp`,
-      staticTypescript: `${module.name}.static.ts`,
-      adapterSource: "provider_adapter.cpp"
-    }[kind];
-    if (!leaf) throw new Error(`Unknown native module artifact kind ${kind}`);
-    return `generated/native-modules/${module.name}/${leaf}`;
-  });
+  const artifactPath =
+    options.artifactPath ??
+    ((module, kind) => {
+      const leaf = {
+        header: "provider.h",
+        typescript: `${module.name}.ts`,
+        staticHeader: `deherm_static_${module.name}.h`,
+        staticSource: `deherm_static_${module.name}.cpp`,
+        staticTypescript: `${module.name}.static.ts`,
+        adapterSource: "provider_adapter.cpp",
+      }[kind];
+      if (!leaf) throw new Error(`Unknown native module artifact kind ${kind}`);
+      return `generated/native-modules/${module.name}/${leaf}`;
+    });
   for (const module of modules) {
     artifacts.set(artifactPath(module, "header"), renderNativeModuleProviderHeader(module, BANNER));
-    artifacts.set(artifactPath(module, "typescript"), renderNativeModuleTypescript(module, "@deherm/project/module-runtime", BANNER));
+    artifacts.set(
+      artifactPath(module, "typescript"),
+      renderNativeModuleTypescript(module, "@deherm/project/module-runtime", BANNER),
+    );
     const staticHeader = `deherm_static_${module.name.replace(/([a-z0-9])([A-Z])/gu, "$1_$2").toLowerCase()}.h`;
     artifacts.set(artifactPath(module, "staticHeader"), renderNativeModuleStaticHeader(module, BANNER));
     artifacts.set(artifactPath(module, "staticSource"), renderNativeModuleStaticSource(module, staticHeader, BANNER));
-    artifacts.set(artifactPath(module, "staticTypescript"), renderNativeModuleStaticTypescript(module, staticHeader, BANNER));
+    artifacts.set(
+      artifactPath(module, "staticTypescript"),
+      renderNativeModuleStaticTypescript(module, staticHeader, BANNER),
+    );
     if (module.cProvider) {
-      const providerHeader = options.providerHeaderInclude?.(module)
-        ?? (module.name === "NativeWebTransport" ? "defold_webtransport/deherm_provider.h" : "provider.h");
-      artifacts.set(artifactPath(module, "adapterSource"),
-        renderNativeModuleProviderAdapterSource(module, providerHeader, BANNER));
+      const providerHeader =
+        options.providerHeaderInclude?.(module) ??
+        (module.name === "NativeWebTransport" ? "defold_webtransport/deherm_provider.h" : "provider.h");
+      artifacts.set(
+        artifactPath(module, "adapterSource"),
+        renderNativeModuleProviderAdapterSource(module, providerHeader, BANNER),
+      );
     }
   }
   return artifacts;
@@ -350,10 +370,15 @@ export function generateNativeModuleProviderArtifacts(input, options = {}) {
 async function main() {
   const input = parseNativeModuleDescriptorJson(await readFile(resolve(ROOT, WEBTRANSPORT_SCHEMA), "utf8"));
   const check = process.argv.includes("--check");
-  for (const [relative, contents] of generateNativeModuleProviderArtifacts(input, { artifactPath: repositoryNativeModuleArtifactPath })) {
+  for (const [relative, contents] of generateNativeModuleProviderArtifacts(input, {
+    artifactPath: repositoryNativeModuleArtifactPath,
+  })) {
     const output = resolve(ROOT, relative);
     if (check) assert.equal(await readFile(output, "utf8"), contents, `${relative} is stale`);
-    else { await mkdir(dirname(output), { recursive: true }); await writeFile(output, contents); }
+    else {
+      await mkdir(dirname(output), { recursive: true });
+      await writeFile(output, contents);
+    }
   }
   console.log(`Native module provider generation ${check ? "check passed" : "completed"}`);
 }

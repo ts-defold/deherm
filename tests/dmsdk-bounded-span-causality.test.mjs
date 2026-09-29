@@ -23,7 +23,13 @@ async function fixture() {
   const declarations = new Map(ir.declarations.map((declaration) => [declaration.name, declaration]));
   const candidates = new Map(shapes.rows.map((candidate) => [candidate.id, candidate]));
   const facts = new Map(sourceFacts.declarations.map((entry) => [entry.name, entry]));
-  return { ir, declarations, candidates, facts, recipes: { base64: base64.recipe, astc: astc.recipe, xtea: xtea.recipe } };
+  return {
+    ir,
+    declarations,
+    candidates,
+    facts,
+    recipes: { base64: base64.recipe, astc: astc.recipe, xtea: xtea.recipe },
+  };
 }
 
 function inputs(state, name) {
@@ -88,25 +94,34 @@ test("ASTC selection relates the input guard and three outputs to the called par
     fixedArrays: [],
     variables: [],
     operations: [],
-    returns: [{
-      kind: "boolean",
-      value: false,
-      conditions: [{
-        branch: true,
-        expression: {
-          kind: "binary",
-          operator: "<",
-          left: { kind: "parameter", index: 1 },
-          right: { kind: "integer", value: 999 },
-        },
-      }],
-    }],
+    returns: [
+      {
+        kind: "boolean",
+        value: false,
+        conditions: [
+          {
+            branch: true,
+            expression: {
+              kind: "binary",
+              operator: "<",
+              left: { kind: "parameter", index: 1 },
+              right: { kind: "integer", value: 999 },
+            },
+          },
+        ],
+      },
+    ],
   });
   for (const index of [2, 3, 4]) {
     facts.definitions[0].operations.push({
       operator: "=",
       left: { kind: "unary", operator: "*", operand: { kind: "parameter", index } },
-      right: { kind: "binary", operator: "<<", left: { kind: "integer", value: 1 }, right: { kind: "integer", value: 31 } },
+      right: {
+        kind: "binary",
+        operator: "<<",
+        left: { kind: "integer", value: 1 },
+        right: { kind: "integer", value: 31 },
+      },
       conditions: [],
     });
   }
@@ -128,10 +143,21 @@ test("XTEA selection accepts only the called helper's key-copy capacity and in-p
   const helper = facts.definitions[0].reachableDefinitions.find(({ fixedArrays = [] }) =>
     fixedArrays.some(({ byteExtent }) => byteExtent === baseline.maximumKeyBytes),
   );
-  helper.fixedArrays.push({ name: "scratch", type: "uint8_t[999]", elementType: "uint8_t", extent: 999, byteExtent: 999 });
+  helper.fixedArrays.push({
+    name: "scratch",
+    type: "uint8_t[999]",
+    elementType: "uint8_t",
+    extent: 999,
+    byteExtent: 999,
+  });
   helper.operations.push(
     { operator: "<=", left: { kind: "parameter", index: 3 }, right: { kind: "integer", value: 999 }, conditions: [] },
-    { operator: "^=", left: { kind: "subscript", base: { kind: "parameter", index: 0 }, index: { kind: "integer", value: 0 } }, right: { kind: "integer", value: 1 }, conditions: [] },
+    {
+      operator: "^=",
+      left: { kind: "subscript", base: { kind: "parameter", index: 0 }, index: { kind: "integer", value: 0 } },
+      right: { kind: "integer", value: 1 },
+      conditions: [],
+    },
   );
   const noisy = extractXteaSpanSemantics(declaration, candidate, enums, state.recipes.xtea, facts);
   assert.equal(noisy?.maximumKeyBytes, baseline.maximumKeyBytes);

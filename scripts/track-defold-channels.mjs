@@ -50,7 +50,7 @@ export async function readChannel(channel, { template, fetchImpl = fetch }) {
  * is how often the answer is "nothing".
  */
 export async function planChannels({ site, index, indexPath, fetchImpl = fetch } = {}) {
-  const config = site ?? await readSiteConfig();
+  const config = site ?? (await readSiteConfig());
   const shipped = index ?? JSON.parse(await readFile(indexPath ?? shippedIndexPath, "utf8"));
   const indexed = new Map(shipped.entries.map((entry) => [entry.defoldRevision, entry]));
   const observations = [];
@@ -87,7 +87,7 @@ async function digest(url, fetchImpl) {
  */
 export async function pinRevision(revision, { fetchImpl = fetch, lock } = {}) {
   if (!REVISION.test(revision)) throw new Error(`Not a Defold revision: ${revision}`);
-  const current = lock ?? await readFile(lockPath, "utf8");
+  const current = lock ?? (await readFile(lockPath, "utf8"));
   const refDocUrl = `${ARCHIVE}/${revision}/engine/share/ref-doc.zip`;
   const sdkUrl = `${ARCHIVE}/${revision}/engine/defoldsdk.zip`;
   const bobUrl = `${ARCHIVE}/${revision}/bob/bob.jar`;
@@ -101,7 +101,7 @@ export async function pinRevision(revision, { fetchImpl = fetch, lock } = {}) {
     DEFOLD_SDK_URL: sdkUrl,
     DEFOLD_SDK_SHA256: sdk.sha256,
     DEFOLD_BOB_URL: bobUrl,
-    DEFOLD_BOB_SHA256: bob.sha256
+    DEFOLD_BOB_SHA256: bob.sha256,
   };
   let updated = current;
   for (const [key, value] of Object.entries(replacements)) {
@@ -126,14 +126,18 @@ async function main(argv = process.argv.slice(2)) {
     if (json) {
       // `derive` is what a matrix fans out over. An empty list is the steady
       // state and means this run publishes nothing at all.
-      console.log(JSON.stringify({ derive: plan.derive.map(({ channel, sha1, version }) => ({ channel, sha1, version })) }));
+      console.log(
+        JSON.stringify({ derive: plan.derive.map(({ channel, sha1, version }) => ({ channel, sha1, version })) }),
+      );
       return;
     }
     for (const row of plan.observations) console.log(`${row.channel.padEnd(7)} ${row.sha1} ${row.version ?? ""}`);
     for (const row of plan.covered) console.log(`  covered: ${row.channel} -> policy ${row.policyRoot.slice(0, 12)}`);
-    console.log(plan.derive.length
-      ? `derive: ${plan.derive.map((row) => `${row.channel}@${row.sha1.slice(0, 12)}`).join(", ")}`
-      : "derive: nothing - every tracked channel resolves to an indexed revision");
+    console.log(
+      plan.derive.length
+        ? `derive: ${plan.derive.map((row) => `${row.channel}@${row.sha1.slice(0, 12)}`).join(", ")}`
+        : "derive: nothing - every tracked channel resolves to an indexed revision",
+    );
     return;
   }
   if (command === "pin") {

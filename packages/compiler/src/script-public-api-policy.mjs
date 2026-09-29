@@ -1,9 +1,7 @@
 // Public TypeScript names for raw Defold Lua modules. The source module path
 // remains unchanged so stable binding IDs and Lua bridge lookup paths do not
 // drift when the TypeScript spelling is improved.
-const rootAliases = new Map([
-  ["builtins", "defold"]
-]);
+const rootAliases = new Map([["builtins", "defold"]]);
 const rawRootByPublicName = new Map([...rootAliases].map(([raw, publicName]) => [publicName, raw]));
 
 export function publicScriptRootName(rawRootName) {
@@ -29,7 +27,7 @@ export function assertUniquePublicScriptRoots(rawRootNames) {
     if (prior && prior !== rawRootName) {
       throw new Error(
         `Public Defold script root ${JSON.stringify(publicRootName)} collides between ` +
-        `${JSON.stringify(prior)} and ${JSON.stringify(rawRootName)}`
+          `${JSON.stringify(prior)} and ${JSON.stringify(rawRootName)}`,
       );
     }
     sourceByPublicName.set(publicRootName, rawRootName);

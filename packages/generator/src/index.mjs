@@ -6,10 +6,10 @@ export {
   generateIndex as generateScriptIndex,
   generateModules as generateScriptModules,
   generateRuntime as generateScriptRuntime,
-  generateTypes as generateScriptTypes
+  generateTypes as generateScriptTypes,
 } from "./sdk/script-sdk.mjs";
 export {
   createTypeRenderer as createDmSdkTypeRenderer,
   generateRuntime as generateDmSdkRuntime,
-  generateTypes as generateDmSdkTypes
+  generateTypes as generateDmSdkTypes,
 } from "./sdk/dmsdk-sdk.mjs";

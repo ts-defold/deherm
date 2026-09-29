@@ -10,8 +10,28 @@
 const NAME_MEMBERS = new Set(["string", "hash", "nil"]);
 const ADDRESS_MEMBERS = new Set(["string", "hash", "url", "nil"]);
 const STOP_WORDS = new Set([
-  "a", "an", "and", "as", "be", "by", "for", "from", "hashed", "in", "is", "must",
-  "of", "on", "optional", "or", "that", "the", "this", "to", "which", "with"
+  "a",
+  "an",
+  "and",
+  "as",
+  "be",
+  "by",
+  "for",
+  "from",
+  "hashed",
+  "in",
+  "is",
+  "must",
+  "of",
+  "on",
+  "optional",
+  "or",
+  "that",
+  "the",
+  "this",
+  "to",
+  "which",
+  "with",
 ]);
 
 function compare(left, right) {
@@ -19,7 +39,10 @@ function compare(left, right) {
 }
 
 function unionMembers(rawType) {
-  return String(rawType ?? "").split("|").map((part) => part.trim()).filter(Boolean);
+  return String(rawType ?? "")
+    .split("|")
+    .map((part) => part.trim())
+    .filter(Boolean);
 }
 
 /** Classify a parameter's value shape without consulting its name or route. */
@@ -34,7 +57,9 @@ export function parameterValueShape(rawType) {
 }
 
 function normalize(value) {
-  return String(value).toLowerCase().replaceAll(/[^a-z0-9]+/g, "");
+  return String(value)
+    .toLowerCase()
+    .replaceAll(/[^a-z0-9]+/g, "");
 }
 
 /**
@@ -84,8 +109,9 @@ function carriesKind(nouns, kind) {
   const normalized = normalize(kind);
   if (nouns.identifier.has(normalized)) return true;
   if (!nouns.described.has(normalized)) return false;
-  return ["id", "name"].some((identity) =>
-    nouns.pairs.has(`${normalized}${identity}`) || nouns.pairs.has(`${identity}${normalized}`));
+  return ["id", "name"].some(
+    (identity) => nouns.pairs.has(`${normalized}${identity}`) || nouns.pairs.has(`${identity}${normalized}`),
+  );
 }
 
 function namespaceIndex(schema) {
@@ -129,8 +155,8 @@ export function classifyRouteResourceNamespaces(fn, index) {
         ...base,
         resourceNamespace: {
           scope: "component-address",
-          namespaces: ["go:component", "collection:instance"]
-        }
+          namespaces: ["go:component", "collection:instance"],
+        },
       });
       continue;
     }
@@ -149,7 +175,7 @@ export function classifyRouteResourceNamespaces(fn, index) {
           ? { unresolved: "declaring-route-introduces-the-name", declares: moduleMatches }
           : addressParameter >= 0
             ? { scope: "addressed-component-resource", namespaces: moduleMatches, addressParameter }
-            : { scope: "attached-resource", namespaces: moduleMatches }
+            : { scope: "attached-resource", namespaces: moduleMatches },
       });
       continue;
     }
@@ -173,7 +199,7 @@ export function classifyRouteResourceNamespaces(fn, index) {
       ...base,
       resourceNamespace: declaringMember
         ? { unresolved: "declaring-route-introduces-the-name", declares: kindMatches }
-        : { scope: "addressed-component-resource", namespaces: kindMatches, addressParameter }
+        : { scope: "addressed-component-resource", namespaces: kindMatches, addressParameter },
     });
   }
   return rows;
@@ -196,8 +222,8 @@ export function buildResourceNamespaceClassification({ ir, schema, interfaceName
       declaringInterface: interfaceNameFor(fn),
       parameters: classified.map((row) => ({
         ...row,
-        jsParameter: parameterIdentifier(row.parameter, row.position)
-      }))
+        jsParameter: parameterIdentifier(row.parameter, row.position),
+      })),
     });
   }
   // A namespace whose names can also be introduced at runtime is not a closed
@@ -243,6 +269,6 @@ export function buildResourceNamespaceClassification({ ir, schema, interfaceName
     runtimeExtensibleNamespaces: [...runtimeExtensible].sort(compare),
     unresolvedReasons: Object.fromEntries(Object.entries(unresolvedReasons).sort(([a], [b]) => compare(a, b))),
     namespaceCounts: Object.fromEntries(Object.entries(namespaceCounts).sort(([a], [b]) => compare(a, b))),
-    routes
+    routes,
   };
 }

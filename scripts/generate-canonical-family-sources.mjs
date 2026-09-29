@@ -9,7 +9,11 @@ function compareCodeUnits(left, right) {
 }
 
 function identifier(value) {
-  const slug = value.replace(/[^A-Za-z0-9]+/g, "_").replace(/^_+|_+$/g, "").toLowerCase() || "family";
+  const slug =
+    value
+      .replace(/[^A-Za-z0-9]+/g, "_")
+      .replace(/^_+|_+$/g, "")
+      .toLowerCase() || "family";
   return `${slug}_${sha256(value).slice(0, 8)}`;
 }
 
@@ -18,17 +22,23 @@ function validateAuthority(plan, emission) {
     throw new Error("Canonical family emission requires lowering-plan schema v2");
   }
   const { planSha256, ...body } = plan;
-  if (sha256(JSON.stringify(body)) !== planSha256) throw new Error("Canonical lowering plan has an invalid internal digest");
+  if (sha256(JSON.stringify(body)) !== planSha256)
+    throw new Error("Canonical lowering plan has an invalid internal digest");
   if (emission?.schemaVersion !== 1 || emission.sourcePlanSha256 !== planSha256) {
     throw new Error("Binding emission plan does not name the canonical lowering plan");
   }
   if (!Array.isArray(emission.units) || !Array.isArray(emission.diagnostics)) {
     throw new Error("Binding emission plan has no unit/diagnostic inventory");
   }
-  if (emission.target !== "dynamicHermesJsi" && emission.target !== "staticHermesCAbi" && emission.target !== "browserWasmHost") {
+  if (
+    emission.target !== "dynamicHermesJsi" &&
+    emission.target !== "staticHermesCAbi" &&
+    emission.target !== "browserWasmHost"
+  ) {
     throw new Error(`Canonical family source emitter does not support target '${emission.target}'`);
   }
-  if (!plan.targetOrder.includes(emission.target)) throw new Error("Binding emission target is absent from the canonical plan");
+  if (!plan.targetOrder.includes(emission.target))
+    throw new Error("Binding emission target is absent from the canonical plan");
   const { emissionPlanSha256, ...emissionBody } = emission;
   if (emissionPlanSha256 !== sha256(JSON.stringify(emissionBody))) {
     throw new Error("Binding emission plan has an invalid internal digest");
@@ -44,9 +54,11 @@ function selectedUnits(plan, emission) {
     if (seen.has(selected.id)) throw new Error(`Binding emission plan repeats '${selected.id}'`);
     seen.add(selected.id);
     const unit = plan.units[selected.sourceUnit];
-    if (!unit || unit.identity.id !== selected.id) throw new Error(`${selected.id}: canonical source-unit reference drifted`);
+    if (!unit || unit.identity.id !== selected.id)
+      throw new Error(`${selected.id}: canonical source-unit reference drifted`);
     const backend = unit.backends[emission.target];
-    if (backend.selection !== "emit") throw new Error(`${selected.id}: selected source has canonical '${backend.selection}' disposition`);
+    if (backend.selection !== "emit")
+      throw new Error(`${selected.id}: selected source has canonical '${backend.selection}' disposition`);
     if (unit.identity.surface !== selected.surface || unit.sourceState.loweringFamily !== selected.loweringFamily) {
       throw new Error(`${selected.id}: selected family identity drifted`);
     }
@@ -57,29 +69,39 @@ function selectedUnits(plan, emission) {
     // emission plan authoritative, but delegate non-script surfaces to their
     // generated transports and account for them in the manifest/report.
     if (unit.identity.surface !== "script") {
-      if (unit.abi.state !== "existing-generated-entry" ||
-          (typeof unit.abi.symbol !== "string" && typeof unit.abi.plannedSymbol !== "string")) {
+      if (
+        unit.abi.state !== "existing-generated-entry" ||
+        (typeof unit.abi.symbol !== "string" && typeof unit.abi.plannedSymbol !== "string")
+      ) {
         throw new Error(`${selected.id}: selected non-script surface has no generated ABI entry`);
       }
       delegatedSurfaceCounts[unit.identity.surface] = (delegatedSurfaceCounts[unit.identity.surface] ?? 0) + 1;
       continue;
     }
-    if (unit.abi.invoker?.kind !== "cached-lua-route" ||
-        unit.abi.invoker.stableId !== unit.identity.stableId) {
+    if (unit.abi.invoker?.kind !== "cached-lua-route" || unit.abi.invoker.stableId !== unit.identity.stableId) {
       throw new Error(`${selected.id}: no uniform generated script dispatch ABI is proven`);
     }
-    if (!Number.isInteger(unit.identity.stableId) || unit.identity.stableId < 0 || unit.identity.stableId > 0xffffffff) {
+    if (
+      !Number.isInteger(unit.identity.stableId) ||
+      unit.identity.stableId < 0 ||
+      unit.identity.stableId > 0xffffffff
+    ) {
       throw new Error(`${selected.id}: canonical stable ID is not a u32`);
     }
-    if (stableIds.has(unit.identity.stableId)) throw new Error(`${selected.id}: canonical stable ID collides in selected output`);
+    if (stableIds.has(unit.identity.stableId))
+      throw new Error(`${selected.id}: canonical stable ID collides in selected output`);
     stableIds.add(unit.identity.stableId);
     units.push(unit);
   }
-  units.sort((left, right) => left.identity.stableId - right.identity.stableId || compareCodeUnits(left.identity.id, right.identity.id));
+  units.sort(
+    (left, right) =>
+      left.identity.stableId - right.identity.stableId || compareCodeUnits(left.identity.id, right.identity.id),
+  );
   return {
     units,
-    delegatedSurfaceCounts: Object.fromEntries(Object.entries(delegatedSurfaceCounts)
-      .sort(([left], [right]) => compareCodeUnits(left, right)))
+    delegatedSurfaceCounts: Object.fromEntries(
+      Object.entries(delegatedSurfaceCounts).sort(([left], [right]) => compareCodeUnits(left, right)),
+    ),
   };
 }
 
@@ -87,7 +109,12 @@ function groupUnits(units) {
   const groups = new Map();
   for (const unit of units) {
     const key = `${unit.identity.surface}:${unit.sourceState.loweringFamily}`;
-    const group = groups.get(key) ?? { key, surface: unit.identity.surface, family: unit.sourceState.loweringFamily, units: [] };
+    const group = groups.get(key) ?? {
+      key,
+      surface: unit.identity.surface,
+      family: unit.sourceState.loweringFamily,
+      units: [],
+    };
     group.units.push(unit);
     groups.set(key, group);
   }
@@ -155,23 +182,32 @@ function registrySource(groups, units) {
   });
   const accessors = groups.map((group) => `  &dehermCanonicalReleaseFamily_${identifier(group.key)},`);
   const descriptors = units.map((unit) => {
-    const familyIndex = groups.findIndex(({ key }) => key === `${unit.identity.surface}:${unit.sourceState.loweringFamily}`);
+    const familyIndex = groups.findIndex(
+      ({ key }) => key === `${unit.identity.surface}:${unit.sourceState.loweringFamily}`,
+    );
     return `  {0x${unit.identity.stableId.toString(16).padStart(8, "0")}u, ${familyIndex}u, 0u},`;
   });
-  const familyStorage = groups.length ? `constexpr FamilyAccessor kFamilies[] = {
+  const familyStorage = groups.length
+    ? `constexpr FamilyAccessor kFamilies[] = {
 ${accessors.join("\n")}
-};` : "";
-  const routeStorage = units.length ? `constexpr DehermCanonicalReleaseRoute kRoutes[] = {
+};`
+    : "";
+  const routeStorage = units.length
+    ? `constexpr DehermCanonicalReleaseRoute kRoutes[] = {
 ${descriptors.join("\n")}
-};` : "";
+};`
+    : "";
   const routesResult = units.length ? "kRoutes" : "nullptr";
-  const enabledBody = groups.length ? `  for (FamilyAccessor accessor : kFamilies) {
+  const enabledBody = groups.length
+    ? `  for (FamilyAccessor accessor : kFamilies) {
     uint32_t count = 0;
     const uint32_t* values = accessor(&count);
     if (contains(values, count, stable_id)) return 1;
   }
-  return 0;` : "  (void) stable_id;\n  return 0;";
-  const containsFunction = groups.length ? `bool contains(const uint32_t* values, uint32_t end, uint32_t target) {
+  return 0;`
+    : "  (void) stable_id;\n  return 0;";
+  const containsFunction = groups.length
+    ? `bool contains(const uint32_t* values, uint32_t end, uint32_t target) {
   uint32_t first = 0;
   while (first < end) {
     const uint32_t middle = first + (end - first) / 2;
@@ -180,15 +216,20 @@ ${descriptors.join("\n")}
     else return true;
   }
   return false;
-}` : "";
-  const dispatchDeclaration = units.length ? `extern "C" int defoldHermesScriptCall(
+}`
+    : "";
+  const dispatchDeclaration = units.length
+    ? `extern "C" int defoldHermesScriptCall(
     uint32_t, uint32_t, const uint8_t*, const uint8_t*, const double*, const uint64_t*,
     const uint32_t*, const uint32_t*, const char*, uint32_t, uint8_t*, uint8_t*,
-    double*, uint64_t*, char*, uint32_t, uint32_t*);` : "";
-  const dispatchBody = units.length ? `  if (!dehermCanonicalReleaseRouteEnabled(stable_id)) return DEHERM_CANONICAL_RELEASE_NOT_REACHABLE;
+    double*, uint64_t*, char*, uint32_t, uint32_t*);`
+    : "";
+  const dispatchBody = units.length
+    ? `  if (!dehermCanonicalReleaseRouteEnabled(stable_id)) return DEHERM_CANONICAL_RELEASE_NOT_REACHABLE;
   return defoldHermesScriptCall(stable_id, argument_count, tags, handle_kinds, numbers, payloads,
       string_offsets, string_lengths, string_data, string_data_length, out_tag, out_handle_kind,
-      out_number, out_payload, out_string, out_string_capacity, out_string_length);` : `  (void) stable_id; (void) argument_count; (void) tags; (void) handle_kinds;
+      out_number, out_payload, out_string, out_string_capacity, out_string_length);`
+    : `  (void) stable_id; (void) argument_count; (void) tags; (void) handle_kinds;
   (void) numbers; (void) payloads; (void) string_offsets; (void) string_lengths;
   (void) string_data; (void) string_data_length; (void) out_tag; (void) out_handle_kind;
   (void) out_number; (void) out_payload; (void) out_string; (void) out_string_capacity;
@@ -238,7 +279,8 @@ ${paths}
 
 function staticHermesSource(units) {
   const ids = units.map((unit) => `0x${unit.identity.stableId.toString(16).padStart(8, "0")}`).join(", ");
-  if (units.length === 0) return `// Generated canonical Static Hermes release gate. No routes are authorized.
+  if (units.length === 0)
+    return `// Generated canonical Static Hermes release gate. No routes are authorized.
 "use strict";
 const __dehermCanonicalStableIds = Object.freeze([]);
 function __dehermCanonicalRouteEnabled(_stableId) { return false; }
@@ -255,9 +297,10 @@ const __dehermCanonicalStableIds = Object.freeze([${ids}]);
 
 function browserSource(units) {
   const ids = units.map((unit) => unit.identity.stableId).join(", ");
-  const enabled = units.length === 0
-    ? "function(_stableId) { return false; }"
-    : "function(stableId) { return _dehermCanonicalReleaseRouteEnabled(stableId) !== 0; }";
+  const enabled =
+    units.length === 0
+      ? "function(_stableId) { return false; }"
+      : "function(stableId) { return _dehermCanonicalReleaseRouteEnabled(stableId) !== 0; }";
   return `// Generated canonical browser/Wasm release gate. Do not edit.
 var LibraryDehermCanonicalRelease = {
   $DEHERM_CANONICAL_RELEASE: {
@@ -288,11 +331,12 @@ function requirementsReport(plan, emission, units, delegatedSurfaceCounts) {
       blockerCounts[blocker] = (blockerCounts[blocker] ?? 0) + 1;
     }
   }
-  const status = units.length > 0
-    ? "authority-satisfied-for-selected-script-units"
-    : (selectionCounts.emit ?? 0) === 0
-      ? "blocked-by-canonical-plan"
-      : "empty-by-usage";
+  const status =
+    units.length > 0
+      ? "authority-satisfied-for-selected-script-units"
+      : (selectionCounts.emit ?? 0) === 0
+        ? "blocked-by-canonical-plan"
+        : "empty-by-usage";
   const body = {
     schemaVersion: 1,
     target: emission.target,
@@ -304,17 +348,25 @@ function requirementsReport(plan, emission, units, delegatedSurfaceCounts) {
     selectedScriptEmitUnits: units.length,
     delegatedSurfaceCounts,
     status,
-    selectionCounts: Object.fromEntries(Object.entries(selectionCounts).sort(([left], [right]) => compareCodeUnits(left, right))),
-    blockerCounts: Object.fromEntries(Object.entries(blockerCounts).sort(([left], [right]) => compareCodeUnits(left, right))),
-    usageDiagnosticSelectionCounts: Object.fromEntries(Object.entries(diagnosticSelectionCounts).sort(([left], [right]) => compareCodeUnits(left, right))),
-    usageDiagnosticBlockerCounts: Object.fromEntries(Object.entries(diagnosticBlockerCounts).sort(([left], [right]) => compareCodeUnits(left, right))),
+    selectionCounts: Object.fromEntries(
+      Object.entries(selectionCounts).sort(([left], [right]) => compareCodeUnits(left, right)),
+    ),
+    blockerCounts: Object.fromEntries(
+      Object.entries(blockerCounts).sort(([left], [right]) => compareCodeUnits(left, right)),
+    ),
+    usageDiagnosticSelectionCounts: Object.fromEntries(
+      Object.entries(diagnosticSelectionCounts).sort(([left], [right]) => compareCodeUnits(left, right)),
+    ),
+    usageDiagnosticBlockerCounts: Object.fromEntries(
+      Object.entries(diagnosticBlockerCounts).sort(([left], [right]) => compareCodeUnits(left, right)),
+    ),
     requiredAuthorityForAdditionalUnits: {
       backendSelection: "emit",
       blockerSet: "empty",
       abi: "uniform-existing-generated-entry",
       implementationEvidence: "target-specific-generated-executable",
-      note: "The emitter will not reinterpret blocked-capability, blocked-semantic, omit-profile, or separate-module as emitted."
-    }
+      note: "The emitter will not reinterpret blocked-capability, blocked-semantic, omit-profile, or separate-module as emitted.",
+    },
   };
   return { ...body, requirementsSha256: sha256(JSON.stringify(body)) };
 }
@@ -357,13 +409,15 @@ export function generateCanonicalFamilyArtifacts(plan, emission) {
       routeCount: group.units.length,
       stableIds: group.units.map((unit) => unit.identity.stableId),
       routeIds: group.units.map((unit) => unit.identity.id),
-      source: `src/family-${identifier(group.key)}.cpp`
+      source: `src/family-${identifier(group.key)}.cpp`,
     })),
-    outputs: [...artifacts].map(([path, contents]) => ({
-      path: path.slice(prefix.length + 1),
-      bytes: Buffer.byteLength(contents),
-      sha256: sha256(contents)
-    })).sort((left, right) => compareCodeUnits(left.path, right.path)),
+    outputs: [...artifacts]
+      .map(([path, contents]) => ({
+        path: path.slice(prefix.length + 1),
+        bytes: Buffer.byteLength(contents),
+        sha256: sha256(contents),
+      }))
+      .sort((left, right) => compareCodeUnits(left.path, right.path)),
     evidenceBoundary: {
       sourceEmission: units.length ? "generated-and-link-consumable" : "empty-fail-closed",
       dispatch: units.length ? "reachability-gated-flat-c-abi-entry-emitted" : "rejects-all-routes",
@@ -372,8 +426,8 @@ export function generateCanonicalFamilyArtifacts(plan, emission) {
         : "No route reaches the flat C ABI.",
       compilation: "not-claimed-by-generator",
       productionLinkage: "requires-generated-sources-cmake-consumer",
-      runtime: "not-claimed"
-    }
+      runtime: "not-claimed",
+    },
   };
   const manifest = { ...manifestBody, manifestSha256: sha256(JSON.stringify(manifestBody)) };
   artifacts.set(`${prefix}/manifest.json`, `${JSON.stringify(manifest, null, 2)}\n`);

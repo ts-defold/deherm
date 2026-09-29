@@ -36,9 +36,18 @@ test("all 1,361 runtime-pending declarations have one reproducible ABI shape and
     unshaped: 0,
   });
   assert.equal(new Set(report.rows.map(({ id }) => id)).size, 1361);
-  assert.equal(Object.values(report.primaryFamilySummary).reduce((sum, count) => sum + count, 0), 1361);
-  assert.equal(Object.values(report.trancheSummary).reduce((sum, count) => sum + count, 0), 1361);
-  assert.equal(Object.values(report.shapeSummary).reduce((sum, count) => sum + count, 0), 1361);
+  assert.equal(
+    Object.values(report.primaryFamilySummary).reduce((sum, count) => sum + count, 0),
+    1361,
+  );
+  assert.equal(
+    Object.values(report.trancheSummary).reduce((sum, count) => sum + count, 0),
+    1361,
+  );
+  assert.equal(
+    Object.values(report.shapeSummary).reduce((sum, count) => sum + count, 0),
+    1361,
+  );
   assert.equal(report.trancheSummary["implemented-scalar-frontier"], 31);
   assert.equal(report.trancheSummary["next-enum-value-direct"], 10);
   assert.deepEqual(report.policy.nextFamilies, ["next-enum-value-direct", "next-named-scalar-direct"]);
@@ -60,8 +69,13 @@ test("the next enum-value family is derived from resolved SDK types rather than 
   assert.ok(buffer.blockers.includes("enum-width-domain-validation-policy"));
   assert.ok(rows.some(({ symbol }) => symbol === "dmGraphics::InstallAdapter"));
   assert.ok(rows.some(({ symbol }) => symbol === "dmLogSetLevel"));
-  assert.ok(rows.every(({ parameters, result }) => [result, ...parameters].every(({ role }) =>
-    role === "void" || role.startsWith("scalar:") || role.startsWith("enum:"))));
+  assert.ok(
+    rows.every(({ parameters, result }) =>
+      [result, ...parameters].every(
+        ({ role }) => role === "void" || role.startsWith("scalar:") || role.startsWith("enum:"),
+      ),
+    ),
+  );
 });
 
 test("every source fingerprint is pinned and complete", async () => {

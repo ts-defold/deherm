@@ -1,5 +1,19 @@
 import { BACKEND_RAW_WRITE_MARKER, computeSelection, selectAll as selectAllRows, ui as uiFactory } from "@rezi-ui/core";
-import { Box, Button, Callout, Column, Input, Layers, Page, Panel, RadioGroup, Row, Select, StatusBar, Text } from "@rezi-ui/jsx";
+import {
+  Box,
+  Button,
+  Callout,
+  Column,
+  Input,
+  Layers,
+  Page,
+  Panel,
+  RadioGroup,
+  Row,
+  Select,
+  StatusBar,
+  Text,
+} from "@rezi-ui/jsx";
 import { createNodeApp } from "@rezi-ui/node";
 
 import { copyToClipboard, decodePaste } from "./clipboard.mjs";
@@ -11,7 +25,7 @@ import {
   footerText,
   helpBindings,
   paletteItems,
-  scopeForFocusedId
+  scopeForFocusedId,
 } from "./keymap.mjs";
 import { openExternal } from "./open-external.mjs";
 import {
@@ -21,7 +35,7 @@ import {
   pointToCaret,
   selectAllRange,
   selectedLogText,
-  urlAtCaret
+  urlAtCaret,
 } from "./logViewport.mjs";
 import { renderCompactLogo, renderLogo } from "./logo.mjs";
 import { closeOverlay, closeTopOverlay, createUiState, normalizeState, openOverlay, topOverlay } from "./state.mjs";
@@ -40,7 +54,7 @@ import {
   detailClipboardText,
   filteredLogEntries,
   generationRows,
-  targetRows
+  targetRows,
 } from "./views.tsx";
 
 // Rendering is a pure projection of state, so a dashboard rendered without a
@@ -88,14 +102,14 @@ export function renderDevDashboard(rawState) {
       gap={0}
       header={
         <Box border="none" px={1} py={0}>
-          {mode === "compact"
-            ? renderCompactLogo()
-            : (
-              <Row justify="between" align="start" width="full">
-                {renderLogo(state.tick, state.reducedMotion, mode === "wide")}
-                <SessionPlate snapshot={snapshot} />
-              </Row>
-            )}
+          {mode === "compact" ? (
+            renderCompactLogo()
+          ) : (
+            <Row justify="between" align="start" width="full">
+              {renderLogo(state.tick, state.reducedMotion, mode === "wide")}
+              <SessionPlate snapshot={snapshot} />
+            </Row>
+          )}
         </Box>
       }
       body={
@@ -109,13 +123,7 @@ export function renderDevDashboard(rawState) {
             onChange={(key) => actions.selectView?.(key)}
           />
           {viewContent(ui.view, viewProps)}
-          <LogsPanel
-            snapshot={snapshot}
-            ui={ui}
-            actions={actions}
-            focusedScope={focusedScope}
-            height={plan.logs}
-          />
+          <LogsPanel snapshot={snapshot} ui={ui} actions={actions} focusedScope={focusedScope} height={plan.logs} />
         </Column>
       }
       footer={
@@ -128,8 +136,17 @@ export function renderDevDashboard(rawState) {
     />
   );
 
-  const overlay = <Overlay ui={ui} snapshot={snapshot} actions={actions} bindings={state.bindings} items={state.paletteItems ?? []} />;
-  return overlay ? <Layers>{page}{overlay}</Layers> : page;
+  const overlay = (
+    <Overlay ui={ui} snapshot={snapshot} actions={actions} bindings={state.bindings} items={state.paletteItems ?? []} />
+  );
+  return overlay ? (
+    <Layers>
+      {page}
+      {overlay}
+    </Layers>
+  ) : (
+    page
+  );
 }
 
 function tableClipboardText(rows, selection, columns) {
@@ -152,7 +169,8 @@ export async function runDevTui(options) {
   let interval;
   let syncQueued = false;
 
-  const viewport = () => options.viewport?.() ?? { cols: process.stdout.columns ?? 120, rows: process.stdout.rows ?? 30 };
+  const viewport = () =>
+    options.viewport?.() ?? { cols: process.stdout.columns ?? 120, rows: process.stdout.rows ?? 30 };
   const snapshotOf = () => options.snapshot();
 
   const app = (options.createApp ?? createNodeApp)({
@@ -168,14 +186,15 @@ export async function runDevTui(options) {
       bindings: [],
       paletteItems: [],
       entries: [],
-      setLogScroll: () => {}
+      setLogScroll: () => {},
     },
-    config: { fpsCap: options.fpsCap ?? 20, executionMode: "worker" }
+    config: { fpsCap: options.fpsCap ?? 20, executionMode: "worker" },
   });
 
-  const writeRaw = typeof app.backend?.[BACKEND_RAW_WRITE_MARKER] === "function"
-    ? app.backend[BACKEND_RAW_WRITE_MARKER].bind(app.backend)
-    : undefined;
+  const writeRaw =
+    typeof app.backend?.[BACKEND_RAW_WRITE_MARKER] === "function"
+      ? app.backend[BACKEND_RAW_WRITE_MARKER].bind(app.backend)
+      : undefined;
 
   const currentLines = () => logLines(filteredLogEntries(snapshotOf(), ui));
 
@@ -193,7 +212,7 @@ export async function runDevTui(options) {
         bindings: helpBindings(entries, app.getBindings?.()),
         paletteItems: palette,
         entries,
-        setLogScroll: actions.setLogScroll
+        setLogScroll: actions.setLogScroll,
       }));
     } catch (error) {
       if (!stopping) options.onError?.(error);
@@ -237,7 +256,8 @@ export async function runDevTui(options) {
     if (topOverlay(ui) === "detail") return detailClipboardText(ui, snapshot);
     const scope = scopeForFocusedId(ui.focusedId);
     if (scope === "targets") return tableClipboardText(targetRows(snapshot), ui.targetSelection, TARGET_COLUMNS);
-    if (scope === "generations") return tableClipboardText(generationRows(snapshot), ui.generationSelection, GENERATION_COLUMNS);
+    if (scope === "generations")
+      return tableClipboardText(generationRows(snapshot), ui.generationSelection, GENERATION_COLUMNS);
     const lines = currentLines();
     return ui.logSelection ? selectedLogText(lines, ui.logSelection) : lines.map((line) => line.text).join("\n");
   };
@@ -345,9 +365,19 @@ export async function runDevTui(options) {
       const snapshot = snapshotOf();
       const scope = scopeForFocusedId(ui.focusedId);
       if (scope === "targets") {
-        ui.targetSelection = [...selectAllRows(targetRows(snapshot).map((row) => row.key), ui.targetSelection).selection];
+        ui.targetSelection = [
+          ...selectAllRows(
+            targetRows(snapshot).map((row) => row.key),
+            ui.targetSelection,
+          ).selection,
+        ];
       } else if (scope === "generations") {
-        ui.generationSelection = [...selectAllRows(generationRows(snapshot).map((row) => row.key), ui.generationSelection).selection];
+        ui.generationSelection = [
+          ...selectAllRows(
+            generationRows(snapshot).map((row) => row.key),
+            ui.generationSelection,
+          ).selection,
+        ];
       } else {
         ui.logSelection = selectAllRange(currentLines());
       }
@@ -363,17 +393,21 @@ export async function runDevTui(options) {
     copySelection() {
       const text = clipboardPayload();
       const result = copyToClipboard(text, { writeRaw });
-      notify(result.copied
-        ? `copied ${result.bytes} bytes via ${result.transports.join(" + ")}`
-        : `copy failed: ${result.reason}`);
+      notify(
+        result.copied
+          ? `copied ${result.bytes} bytes via ${result.transports.join(" + ")}`
+          : `copy failed: ${result.reason}`,
+      );
     },
     toggleTargetSelection(rowKey, modifiers) {
       const snapshot = snapshotOf();
       const keys = targetRows(snapshot).map((row) => row.key);
-      ui.targetSelection = [...computeSelection(ui.targetSelection, rowKey, "multi", modifiers, keys, ui.lastTargetKey ?? null).selection];
+      ui.targetSelection = [
+        ...computeSelection(ui.targetSelection, rowKey, "multi", modifiers, keys, ui.lastTargetKey ?? null).selection,
+      ];
       ui.lastTargetKey = rowKey;
       sync();
-    }
+    },
   };
 
   const entries = devKeymapEntries(actions);
@@ -439,12 +473,14 @@ export async function runDevTui(options) {
       if (!pressed?.moved) {
         const url = urlAtCaret(lines, pressed?.caret ?? caret);
         if (url) {
-          void openExternal(url).catch((error) => emit({
-            type: "log",
-            level: "warn",
-            source: "tui",
-            message: `could not open ${url}: ${error instanceof Error ? error.message : String(error)}`
-          }));
+          void openExternal(url).catch((error) =>
+            emit({
+              type: "log",
+              level: "warn",
+              source: "tui",
+              message: `could not open ${url}: ${error instanceof Error ? error.message : String(error)}`,
+            }),
+          );
         }
         return;
       }
@@ -461,27 +497,30 @@ export async function runDevTui(options) {
     started = true;
     if (!stopping) {
       commit();
-      interval = setInterval(() => {
-        if (stopping) return;
-        try {
-          app.update((previous) => ({
-            ...previous,
-            snapshot: snapshotOf(),
-            tick: reducedMotion ? previous.tick : previous.tick + 1,
-            viewport: viewport(),
-            logScroll: ui.logScroll,
-            logAutoScroll: ui.logAutoScroll,
-            ui: { ...ui },
-            actions,
-            bindings: helpBindings(entries, app.getBindings?.()),
-            paletteItems: palette,
-            entries,
-            setLogScroll: actions.setLogScroll
-          }));
-        } catch (error) {
-          if (!stopping) options.onError?.(error);
-        }
-      }, options.refreshMs ?? (reducedMotion ? 250 : 80));
+      interval = setInterval(
+        () => {
+          if (stopping) return;
+          try {
+            app.update((previous) => ({
+              ...previous,
+              snapshot: snapshotOf(),
+              tick: reducedMotion ? previous.tick : previous.tick + 1,
+              viewport: viewport(),
+              logScroll: ui.logScroll,
+              logAutoScroll: ui.logAutoScroll,
+              ui: { ...ui },
+              actions,
+              bindings: helpBindings(entries, app.getBindings?.()),
+              paletteItems: palette,
+              entries,
+              setLogScroll: actions.setLogScroll,
+            }));
+          } catch (error) {
+            if (!stopping) options.onError?.(error);
+          }
+        },
+        options.refreshMs ?? (reducedMotion ? 250 : 80),
+      );
     }
     await runPromise;
   } finally {
@@ -495,7 +534,7 @@ export async function runDevTui(options) {
 function projectOptions(projects, cwd) {
   return projects.map((project) => ({
     value: project,
-    label: (project.startsWith(cwd) ? project.slice(cwd.length + 1) : project) || "."
+    label: (project.startsWith(cwd) ? project.slice(cwd.length + 1) : project) || ".",
   }));
 }
 
@@ -506,7 +545,11 @@ export function renderLauncher(state, actions) {
     <Page
       p={0}
       gap={0}
-      header={<Box border="none" px={1} py={0}>{renderLogo(state.tick, state.reducedMotion, true)}</Box>}
+      header={
+        <Box border="none" px={1} py={0}>
+          {renderLogo(state.tick, state.reducedMotion, true)}
+        </Box>
+      }
       body={
         <Column px={2} py={1} gap={1} height="full" overflow="hidden">
           <Panel title="PROJECT CONTROL" variant="heavy" p={1} gap={1}>
@@ -524,8 +567,19 @@ export function renderLauncher(state, actions) {
               onChange={actions.selectProject}
             />
             <Row gap={1}>
-              <Button id="start" label="Start dev" disabled={!selected} intent="primary" onPress={() => actions.finish({ type: "dev", project: selected })} />
-              <Button id="doctor" label="Doctor" disabled={!selected} onPress={() => actions.finish({ type: "doctor", project: selected })} />
+              <Button
+                id="start"
+                label="Start dev"
+                disabled={!selected}
+                intent="primary"
+                onPress={() => actions.finish({ type: "dev", project: selected })}
+              />
+              <Button
+                id="doctor"
+                label="Doctor"
+                disabled={!selected}
+                onPress={() => actions.finish({ type: "doctor", project: selected })}
+              />
               <Button id="quit" label="Quit" onPress={() => actions.finish({ type: "quit" })} />
             </Row>
           </Panel>
@@ -577,9 +631,9 @@ export async function runLauncherTui(options = {}) {
       selectedProject: options.selectedProject ?? initialProjects[0] ?? "",
       createPath: options.createPath ?? "deherm-game",
       reducedMotion,
-      tick: 0
+      tick: 0,
     },
-    config: { fpsCap: options.fpsCap ?? 20, executionMode: "worker" }
+    config: { fpsCap: options.fpsCap ?? 20, executionMode: "worker" },
   });
   const finish = (next) => {
     if (stopping) return;
@@ -601,7 +655,7 @@ export async function runLauncherTui(options = {}) {
     },
     setCreatePath(value) {
       app.update((state) => ({ ...state, createPath: value }));
-    }
+    },
   };
   app.view((state) => renderLauncher(state, actions));
   app.keys({ q: { description: "Quit", handler: () => finish({ type: "quit" }) } });

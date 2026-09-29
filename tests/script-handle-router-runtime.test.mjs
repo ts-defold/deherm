@@ -7,15 +7,19 @@ const root = new URL("../", import.meta.url);
 test("all generated native handle routes cross the pinned Lua 5.1 router", { timeout: 120_000 }, () => {
   execFileSync("cmake", ["-S", ".", "-B", "build/native", "-G", "Ninja", "-DCMAKE_BUILD_TYPE=Release"], {
     cwd: root,
-    stdio: "pipe"
+    stdio: "pipe",
   });
-  execFileSync("cmake", ["--build", "build/native", "--target", "defold-hermes-script-handle-router-test", "--parallel"], {
-    cwd: root,
-    stdio: "pipe"
-  });
+  execFileSync(
+    "cmake",
+    ["--build", "build/native", "--target", "defold-hermes-script-handle-router-test", "--parallel"],
+    {
+      cwd: root,
+      stdio: "pipe",
+    },
+  );
   const output = execFileSync("build/native/defold-hermes-script-handle-router-test", [], {
     cwd: root,
-    encoding: "utf8"
+    encoding: "utf8",
   });
   assert.match(output, /script-handle-router:routes:405:ok/);
   assert.match(output, /script-handle-router:profiles:6:ok/);

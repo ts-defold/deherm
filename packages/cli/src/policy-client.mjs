@@ -10,13 +10,10 @@ import { hashBytes, POLICY_REALIZER_CAPABILITIES } from "../../compiler/src/api-
 import {
   assertPolicySurfaceRealizationIdentity,
   materializePolicySurface,
-  policySurfaceRealizationIdentity
+  policySurfaceRealizationIdentity,
 } from "../../compiler/src/policy-surface-materializer.mjs";
 import { DEFOLD_REVISION_PATTERN } from "./defold-revision.mjs";
-import {
-  defoldSurfaceCacheHome,
-  verifyMaterializedSurfaceRoot
-} from "./defold-surface.mjs";
+import { defoldSurfaceCacheHome, verifyMaterializedSurfaceRoot } from "./defold-surface.mjs";
 
 const defaultSiteConfig = new URL("../../bindings/policy-site.json", import.meta.url);
 const DIGEST_PATTERN = /^[0-9a-f]{64}$/u;
@@ -27,9 +24,14 @@ const ABANDONED_STAGE_MIN_AGE_MS = 6 * 60 * 60 * 1_000;
 export { policySurfaceRealizationIdentity };
 
 export function policyLocatorFromSiteConfig(config) {
-  if (config?.schemaVersion !== 1 || typeof config.baseUrl !== "string" ||
-      typeof config.pathPrefix !== "string" || !/^v\d+$/u.test(config.layoutVersion ?? "") ||
-      !Array.isArray(config.channels) || typeof config.channelInfoUrl !== "string") {
+  if (
+    config?.schemaVersion !== 1 ||
+    typeof config.baseUrl !== "string" ||
+    typeof config.pathPrefix !== "string" ||
+    !/^v\d+$/u.test(config.layoutVersion ?? "") ||
+    !Array.isArray(config.channels) ||
+    typeof config.channelInfoUrl !== "string"
+  ) {
     throw new Error("The packaged policy publication locator is invalid");
   }
   const layout = config.layoutVersion;
@@ -44,11 +46,11 @@ export function policyLocatorFromSiteConfig(config) {
       artifacts: `${layout}/artifacts/{defoldRevision}.json`,
       policy: `${layout}/policy/{policyRoot}.json`,
       object: `${layout}/object/{subtreeHash}.json`,
-      releaseAsset: "https://github.com/ts-defold/deherm/releases/download/{tag}/{asset}"
+      releaseAsset: "https://github.com/ts-defold/deherm/releases/download/{tag}/{asset}",
     },
     channels: [...config.channels],
     channelInfoUrl: config.channelInfoUrl,
-    entries: []
+    entries: [],
   };
 }
 
@@ -57,7 +59,7 @@ export async function readPolicyLocator(file = defaultSiteConfig) {
 }
 
 export async function resolveDefoldChannelRevision(channel = "stable", options = {}) {
-  const locator = options.locator ?? await readPolicyLocator(options.siteConfig);
+  const locator = options.locator ?? (await readPolicyLocator(options.siteConfig));
   if (!locator.channels.includes(channel)) {
     throw new Error(`Unknown Defold channel ${JSON.stringify(channel)}; expected ${locator.channels.join(", ")}`);
   }
@@ -84,7 +86,8 @@ function policyBase(index) {
   return `${index.base.url.replace(/\/$/, "")}${index.base.pathPrefix ? `/${index.base.pathPrefix.replace(/^\/+|\/+$/g, "")}` : ""}`;
 }
 
-const SEMVER = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/u;
+const SEMVER =
+  /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/u;
 
 function parseSemver(value, label) {
   const match = SEMVER.exec(String(value ?? ""));
@@ -115,10 +118,14 @@ function compareSemver(left, right) {
 }
 
 function validateRealizer(realizer, label) {
-  if (!realizer || typeof realizer.minimumPackageVersion !== "string" ||
-      !Array.isArray(realizer.requiredCapabilities) || realizer.requiredCapabilities.length === 0 ||
-      realizer.requiredCapabilities.some((capability) => typeof capability !== "string" || capability.length === 0) ||
-      new Set(realizer.requiredCapabilities).size !== realizer.requiredCapabilities.length) {
+  if (
+    !realizer ||
+    typeof realizer.minimumPackageVersion !== "string" ||
+    !Array.isArray(realizer.requiredCapabilities) ||
+    realizer.requiredCapabilities.length === 0 ||
+    realizer.requiredCapabilities.some((capability) => typeof capability !== "string" || capability.length === 0) ||
+    new Set(realizer.requiredCapabilities).size !== realizer.requiredCapabilities.length
+  ) {
     throw new Error(`${label}: invalid policy realizer compatibility contract`);
   }
   parseSemver(realizer.minimumPackageVersion, `${label} minimumPackageVersion`);
@@ -126,10 +133,13 @@ function validateRealizer(realizer, label) {
 }
 
 function sameRealizer(left, right) {
-  return left?.minimumPackageVersion === right?.minimumPackageVersion &&
-    Array.isArray(left?.requiredCapabilities) && Array.isArray(right?.requiredCapabilities) &&
+  return (
+    left?.minimumPackageVersion === right?.minimumPackageVersion &&
+    Array.isArray(left?.requiredCapabilities) &&
+    Array.isArray(right?.requiredCapabilities) &&
     left.requiredCapabilities.length === right.requiredCapabilities.length &&
-    left.requiredCapabilities.every((capability, index) => capability === right.requiredCapabilities[index]);
+    left.requiredCapabilities.every((capability, index) => capability === right.requiredCapabilities[index])
+  );
 }
 
 async function installedPackageVersion() {
@@ -142,13 +152,13 @@ function upgradePrompt() {
 }
 
 async function assertCompatibleRealizer(revision, realizer, options) {
-  const packageVersion = options.packageVersion ?? await installedPackageVersion();
+  const packageVersion = options.packageVersion ?? (await installedPackageVersion());
   const installed = parseSemver(packageVersion, "Installed @ts-defold/deherm version");
   const minimum = parseSemver(realizer.minimumPackageVersion, "Policy minimumPackageVersion");
   if (compareSemver(installed, minimum) < 0) {
     throw new Error(
       `Policy for Defold ${revision} requires @ts-defold/deherm >= ${realizer.minimumPackageVersion}, ` +
-      `but ${packageVersion} is installed. ${upgradePrompt()}`
+        `but ${packageVersion} is installed. ${upgradePrompt()}`,
     );
   }
   const capabilities = new Set(options.capabilities ?? POLICY_REALIZER_CAPABILITIES);
@@ -156,7 +166,7 @@ async function assertCompatibleRealizer(revision, realizer, options) {
   if (missing.length > 0) {
     throw new Error(
       `Policy for Defold ${revision} requires unsupported realization capabilities: ${missing.join(", ")}. ` +
-      upgradePrompt()
+        upgradePrompt(),
     );
   }
   return packageVersion;
@@ -164,7 +174,7 @@ async function assertCompatibleRealizer(revision, realizer, options) {
 
 async function atomicWrite(file, bytes) {
   await mkdir(path.dirname(file), { recursive: true });
-  const current = await readFile(file).catch((error) => error?.code === "ENOENT" ? null : Promise.reject(error));
+  const current = await readFile(file).catch((error) => (error?.code === "ENOENT" ? null : Promise.reject(error)));
   if (current && current.equals(bytes)) return false;
   if (current) throw new Error(`Immutable policy cache entry changed at ${file}`);
   const temporary = `${file}.tmp-${process.pid}-${randomBytes(6).toString("hex")}`;
@@ -182,7 +192,7 @@ async function atomicWrite(file, bytes) {
 
 async function atomicReplace(file, bytes) {
   await mkdir(path.dirname(file), { recursive: true });
-  const current = await readFile(file).catch((error) => error?.code === "ENOENT" ? null : Promise.reject(error));
+  const current = await readFile(file).catch((error) => (error?.code === "ENOENT" ? null : Promise.reject(error)));
   if (current?.equals(bytes)) return false;
   const temporary = `${file}.tmp-${process.pid}-${randomBytes(6).toString("hex")}`;
   await writeFile(temporary, bytes, { flag: "wx" });
@@ -221,7 +231,7 @@ async function reapAbandonedRealizationStages(parent) {
     const match = /^\.s-[0-9a-f]{16}-(\d+)-[0-9a-f]{12}$/u.exec(entry.name);
     if (!match || processIsAlive(Number(match[1]))) continue;
     const stage = path.join(parent, entry.name);
-    const information = await lstat(stage).catch((error) => error?.code === "ENOENT" ? null : Promise.reject(error));
+    const information = await lstat(stage).catch((error) => (error?.code === "ENOENT" ? null : Promise.reject(error)));
     if (!information || Date.now() - information.mtimeMs < ABANDONED_STAGE_MIN_AGE_MS) continue;
     await rm(stage, { recursive: true, force: true });
   }
@@ -232,15 +242,18 @@ export async function publishPolicySurface(resolvedPolicy, options) {
   const verifySurface = options.verifySurface ?? verifyMaterializedSurfaceRoot;
   assertPolicySurfaceRealizationIdentity(realization, {
     realizationId: realization.realizationId,
-    policyRoot: resolvedPolicy.entry.policyRoot
+    policyRoot: resolvedPolicy.entry.policyRoot,
   });
   const parent = path.join(surfaceBase, "r");
   const leaf = realization.realizationId.slice(0, 32);
   const realizationRoot = path.join(parent, leaf);
   await reapAbandonedRealizationStages(parent);
 
-  const existing = await lstat(realizationRoot).catch((error) => error?.code === "ENOENT" ? null : Promise.reject(error));
-  if (existing?.isSymbolicLink()) throw new Error(`Immutable materialized surface must not be a symlink: ${realizationRoot}`);
+  const existing = await lstat(realizationRoot).catch((error) =>
+    error?.code === "ENOENT" ? null : Promise.reject(error),
+  );
+  if (existing?.isSymbolicLink())
+    throw new Error(`Immutable materialized surface must not be a symlink: ${realizationRoot}`);
   if (existing) {
     const verified = await verifySurface(realizationRoot, revision, realization);
     if (verified.ok) {
@@ -249,13 +262,10 @@ export async function publishPolicySurface(resolvedPolicy, options) {
         outputRoot: realizationRoot,
         descriptor: verified.descriptor,
         written: [],
-        reused: true
+        reused: true,
       };
     }
-    const quarantine = path.join(
-      parent,
-      `.bad-${leaf}-${process.pid}-${randomBytes(6).toString("hex")}`
-    );
+    const quarantine = path.join(parent, `.bad-${leaf}-${process.pid}-${randomBytes(6).toString("hex")}`);
     try {
       await rename(realizationRoot, quarantine);
     } catch (error) {
@@ -265,7 +275,7 @@ export async function publishPolicySurface(resolvedPolicy, options) {
 
   const stagingRoot = path.join(
     parent,
-    `.s-${realization.realizationId.slice(0, 16)}-${process.pid}-${randomBytes(6).toString("hex")}`
+    `.s-${realization.realizationId.slice(0, 16)}-${process.pid}-${randomBytes(6).toString("hex")}`,
   );
   try {
     let surface = await materialize(resolvedPolicy, {
@@ -273,15 +283,16 @@ export async function publishPolicySurface(resolvedPolicy, options) {
       outputRoot: stagingRoot,
       outputBoundary: path.resolve(options.surfaceBoundary),
       artifacts,
-      realization
+      realization,
     });
     await mkdir(parent, { recursive: true });
     try {
       await rename(stagingRoot, realizationRoot);
       surface = { ...surface, outputRoot: realizationRoot };
     } catch (error) {
-      const winnerStatus = await lstat(realizationRoot)
-        .catch((readError) => readError?.code === "ENOENT" ? null : Promise.reject(readError));
+      const winnerStatus = await lstat(realizationRoot).catch((readError) =>
+        readError?.code === "ENOENT" ? null : Promise.reject(readError),
+      );
       if (!winnerStatus || winnerStatus.isSymbolicLink()) throw error;
       const winner = await verifySurface(realizationRoot, revision, realization);
       if (!winner.ok) throw new Error(`Concurrent materialized-surface winner failed verification: ${winner.error}`);
@@ -290,7 +301,7 @@ export async function publishPolicySurface(resolvedPolicy, options) {
         outputRoot: realizationRoot,
         descriptor: winner.descriptor,
         written: [],
-        reused: true
+        reused: true,
       };
     }
     return surface;
@@ -375,7 +386,7 @@ export async function resolvePublishedPolicy(revision, options = {}) {
   const transfer = { cacheHits: 0, cacheMisses: 0, cacheWrites: 0, transferBytes: 0 };
 
   const cachedFetch = async ({ relative, file, label, validate }) => {
-    const cached = await readFile(file).catch((error) => error?.code === "ENOENT" ? null : Promise.reject(error));
+    const cached = await readFile(file).catch((error) => (error?.code === "ENOENT" ? null : Promise.reject(error)));
     if (cached) {
       try {
         const value = validate(cached, relative);
@@ -403,7 +414,7 @@ export async function resolvePublishedPolicy(revision, options = {}) {
   // for explicit offline use.
   const refreshableFetch = async ({ relative, file, label, validate }) => {
     if (offline) {
-      const cached = await readFile(file).catch((error) => error?.code === "ENOENT" ? null : Promise.reject(error));
+      const cached = await readFile(file).catch((error) => (error?.code === "ENOENT" ? null : Promise.reject(error)));
       if (!cached) {
         transfer.cacheMisses += 1;
         throw new Error(`No cached ${label} for Defold ${revision} at ${file}; DEHERM_OFFLINE=1`);
@@ -432,19 +443,26 @@ export async function resolvePublishedPolicy(revision, options = {}) {
     label: "policy index entry",
     validate(bytes, label) {
       const entry = parseJson(bytes, label);
-      if (entry.kind !== "deherm.policy.index-entry" || entry.defoldRevision !== revision ||
-          !DIGEST_PATTERN.test(entry.policyRoot ?? "")) {
+      if (
+        entry.kind !== "deherm.policy.index-entry" ||
+        entry.defoldRevision !== revision ||
+        !DIGEST_PATTERN.test(entry.policyRoot ?? "")
+      ) {
         throw new Error(`${label}: invalid policy index entry for ${revision}`);
       }
       validateRealizer(entry.realizer, label);
       return entry;
-    }
+    },
   });
   const entry = entryResult.value;
   const packageVersion = await assertCompatibleRealizer(revision, entry.realizer, options);
   const shipped = index.entries?.find((candidate) => candidate.defoldRevision === revision);
-  if (shipped && (shipped.policyRoot !== entry.policyRoot || shipped.generator !== entry.generator ||
-      !sameRealizer(shipped.realizer, entry.realizer))) {
+  if (
+    shipped &&
+    (shipped.policyRoot !== entry.policyRoot ||
+      shipped.generator !== entry.generator ||
+      !sameRealizer(shipped.realizer, entry.realizer))
+  ) {
     throw new Error(`${revision}: published entry contradicts this package's shipped index`);
   }
 
@@ -454,7 +472,8 @@ export async function resolvePublishedPolicy(revision, options = {}) {
     file: path.join(cacheRoot, "policy", `${entry.policyRoot}.json`),
     label: "policy root",
     validate(bytes, label) {
-      if (hashBytes(bytes) !== entry.policyRoot) throw new Error(`${label}: policy bytes do not hash to ${entry.policyRoot}`);
+      if (hashBytes(bytes) !== entry.policyRoot)
+        throw new Error(`${label}: policy bytes do not hash to ${entry.policyRoot}`);
       const policy = parseJson(bytes, label);
       if (policy.kind !== "deherm.policy.root" || policy.generator !== entry.generator || !policy.subtrees) {
         throw new Error(`${label}: invalid policy root`);
@@ -464,7 +483,7 @@ export async function resolvePublishedPolicy(revision, options = {}) {
         throw new Error(`${label}: policy realizer contract does not match its index entry`);
       }
       return policy;
-    }
+    },
   });
   const policy = rootResult.value;
 
@@ -487,7 +506,7 @@ export async function resolvePublishedPolicy(revision, options = {}) {
           throw new Error(`${label}: object names namespace ${object.namespace}, expected ${namespace}`);
         }
         return object;
-      }
+      },
     });
     const record = { digest, bytes: result.bytes, value: result.value };
     objects.set(namespace, record);
@@ -507,12 +526,15 @@ export async function resolvePublishedPolicy(revision, options = {}) {
       label: "artifact mapping",
       validate(bytes, label) {
         const value = parseJson(bytes, label);
-        if (value.kind !== "deherm.policy.artifacts" || value.defoldRevision !== revision ||
-            value.artifacts?.["native-artifacts"]?.indexedBy !== "bundleTarget") {
+        if (
+          value.kind !== "deherm.policy.artifacts" ||
+          value.defoldRevision !== revision ||
+          value.artifacts?.["native-artifacts"]?.indexedBy !== "bundleTarget"
+        ) {
           throw new Error(`${label}: invalid artifact mapping for ${revision}`);
         }
         return value;
-      }
+      },
     });
     artifacts = { ...result.value, releaseAsset: index.base.releaseAsset ?? null };
   }
@@ -523,11 +545,13 @@ export async function resolvePublishedPolicy(revision, options = {}) {
     defoldRevision: revision,
     policyRoot: entry.policyRoot,
     generator: entry.generator,
-    objects: Object.fromEntries([...objects].map(([namespace, { digest }]) => [namespace, digest]))
+    objects: Object.fromEntries([...objects].map(([namespace, { digest }]) => [namespace, digest])),
   };
   const receiptFile = path.join(cacheRoot, "receipt", revision, `${entry.policyRoot}.json`);
-  const priorReceipt = await readFile(receiptFile, "utf8")
-    .then((source) => JSON.parse(source), (error) => error?.code === "ENOENT" ? null : Promise.reject(error));
+  const priorReceipt = await readFile(receiptFile, "utf8").then(
+    (source) => JSON.parse(source),
+    (error) => (error?.code === "ENOENT" ? null : Promise.reject(error)),
+  );
   if (priorReceipt && (priorReceipt.defoldRevision !== revision || priorReceipt.policyRoot !== entry.policyRoot)) {
     throw new Error(`Corrupt authenticated policy receipt ${receiptFile}: revision or policy root mismatch`);
   }
@@ -535,30 +559,35 @@ export async function resolvePublishedPolicy(revision, options = {}) {
   // Schema-1 receipts from eager clients remain valid evidence for the same
   // exact revision/root. Do not rewrite immutable evidence merely to add the
   // smaller realization-closure inventory introduced by schema 2.
-  if (!priorReceipt && await atomicWrite(receiptFile, receiptBytes)) transfer.cacheWrites += 1;
+  if (!priorReceipt && (await atomicWrite(receiptFile, receiptBytes))) transfer.cacheWrites += 1;
 
   const surfaceBase = path.resolve(options.surfaceRoot ?? path.join(cacheHome, "surfaces", revision));
-  const materialize = options.materializeImpl === false ? null : options.materializeImpl ?? materializePolicySurface;
+  const materialize = options.materializeImpl === false ? null : (options.materializeImpl ?? materializePolicySurface);
   const realization = policySurfaceRealizationIdentity({ entry, packageVersion, artifacts });
   let surface = null;
   if (materialize) {
-    surface = await publishPolicySurface({ revision, entry, policy, objects }, {
-      revision,
-      realization,
-      surfaceBase,
-      surfaceBoundary: path.resolve(options.surfaceBoundary ?? cacheHome),
-      materialize,
-      artifacts,
-      verifySurface: options.verifySurfaceImpl ?? verifyMaterializedSurfaceRoot
-    });
+    surface = await publishPolicySurface(
+      { revision, entry, policy, objects },
+      {
+        revision,
+        realization,
+        surfaceBase,
+        surfaceBoundary: path.resolve(options.surfaceBoundary ?? cacheHome),
+        materialize,
+        artifacts,
+        verifySurface: options.verifySurfaceImpl ?? verifyMaterializedSurfaceRoot,
+      },
+    );
     const pointer = {
       schemaVersion: 1,
       kind: "deherm.materialized-defold-surface-pointer",
       defoldRevision: revision,
       realizationId: realization.realizationId,
-      policyRoot: realization.policyRoot
+      policyRoot: realization.policyRoot,
     };
-    if (await atomicReplace(path.join(surfaceBase, "current.json"), Buffer.from(`${JSON.stringify(pointer, null, 2)}\n`))) {
+    if (
+      await atomicReplace(path.join(surfaceBase, "current.json"), Buffer.from(`${JSON.stringify(pointer, null, 2)}\n`))
+    ) {
       transfer.cacheWrites += 1;
     }
   }
@@ -575,6 +604,6 @@ export async function resolvePublishedPolicy(revision, options = {}) {
     surface,
     transfer,
     written: transfer.cacheWrites,
-    source: `${base}/${entryRelative}`
+    source: `${base}/${entryRelative}`,
   };
 }

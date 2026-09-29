@@ -13,7 +13,7 @@ import {
   buildHeadlessConformancePlan,
   buildRouteAvailability,
   classifyRoute,
-  loadHeadlessConformanceInputs
+  loadHeadlessConformanceInputs,
 } from "../scripts/lib/headless-conformance-plan.mjs";
 import { harnessFiles } from "../scripts/generate-headless-conformance.mjs";
 
@@ -23,9 +23,9 @@ const plan = buildHeadlessConformancePlan(documents);
 
 test("every script contract is accounted for exactly once", () => {
   const loweringPlan = documents.loweringPlan.value;
-  const contractIndexes = new Set(loweringPlan.units
-    .filter((unit) => unit.identity.surface === "script")
-    .map((unit) => unit.contractDetails));
+  const contractIndexes = new Set(
+    loweringPlan.units.filter((unit) => unit.identity.surface === "script").map((unit) => unit.contractDetails),
+  );
   assert.equal(plan.contractCount, contractIndexes.size);
   assert.equal(plan.contracts.length, plan.contractCount);
   assert.equal(new Set(plan.contracts.map(({ id }) => id)).size, plan.contractCount);
@@ -51,14 +51,17 @@ test("a contract without a fixture fails closed with machine-readable blockers",
       continue;
     }
     assert.ok(contract.exercises.length > 0, contract.id);
-    const requiredRouteIds = new Set(contract.exercises
-      .filter((exercise) => exercise.arity === "required")
-      .map((exercise) => exercise.routeId));
-    const optionalExerciseCount = contract.exercises
-      .filter((exercise) => exercise.arity !== "required" && requiredRouteIds.has(exercise.routeId))
-      .length;
+    const requiredRouteIds = new Set(
+      contract.exercises.filter((exercise) => exercise.arity === "required").map((exercise) => exercise.routeId),
+    );
+    const optionalExerciseCount = contract.exercises.filter(
+      (exercise) => exercise.arity !== "required" && requiredRouteIds.has(exercise.routeId),
+    ).length;
     assert.ok(optionalExerciseCount <= MAX_OPTIONAL_EXERCISES_PER_CONTRACT, contract.id);
-    assert.ok(FIXTURE_PROFILES.some((profile) => profile.id === contract.profile), contract.id);
+    assert.ok(
+      FIXTURE_PROFILES.some((profile) => profile.id === contract.profile),
+      contract.id,
+    );
     // A destructive route is admitted only as a last resort, and then alone.
     if (contract.exercises.some((exercise) => exercise.destructive)) {
       assert.equal(contract.exercises.length, 1, contract.id);
@@ -68,18 +71,16 @@ test("a contract without a fixture fails closed with machine-readable blockers",
     assert.equal(
       contract.eligibleRouteCount + contract.blockers.reduce((total, item) => total + item.routeCount, 0),
       contract.routeCount,
-      contract.id
+      contract.id,
     );
   }
-  assert.equal(
-    plan.reachableContractCount + plan.unreachableContractCount,
-    plan.contractCount
-  );
+  assert.equal(plan.reachableContractCount + plan.unreachableContractCount, plan.contractCount);
 });
 
 test("string inhabitants are valid absolute Defold resource paths", () => {
   const resourceContract = plan.contracts.find((contract) =>
-    contract.exercises?.some(({ routeId }) => routeId === "script:resource.load"));
+    contract.exercises?.some(({ routeId }) => routeId === "script:resource.load"),
+  );
   assert.ok(resourceContract);
   const exercise = resourceContract.exercises.find(({ routeId }) => routeId === "script:resource.load");
   assert.deepEqual(exercise.arguments, [{ kind: "literal", value: "/deherm_conformance" }]);
@@ -93,12 +94,12 @@ test("properties are selected by the contract record, never by route identity", 
     assert.equal(
       contract.properties.includes("scratch-reuse"),
       record.scratch?.token === "caller-owned-bounded-reentrant-scratch",
-      contract.id
+      contract.id,
     );
     assert.equal(
       contract.properties.includes("error-model"),
       record.errorModel?.token === "status-return-and-target-exception",
-      contract.id
+      contract.id,
     );
   }
 });
@@ -120,8 +121,10 @@ test("a fixture only ever calls a route from a context the harness supplies", ()
     const assertArgument = (argument) => {
       assert.ok(["literal", "address", "handle", "value", "record"].includes(argument.kind), exercise.routeId);
       if (argument.kind === "literal") {
-        assert.ok(argument.value === null || ["number", "boolean", "string"].includes(typeof argument.value),
-          exercise.routeId);
+        assert.ok(
+          argument.value === null || ["number", "boolean", "string"].includes(typeof argument.value),
+          exercise.routeId,
+        );
       } else if (argument.kind === "value") {
         assert.ok(argument.accessor.length >= 2, exercise.routeId);
       } else if (argument.kind === "record") {
@@ -134,7 +137,10 @@ test("a fixture only ever calls a route from a context the harness supplies", ()
     for (const argument of exercise.arguments) assertArgument(argument);
   }
   assert.deepEqual(plan.suppliedContexts, [...SUPPLIED_CONTEXTS]);
-  assert.deepEqual(plan.unsuppliedContexts.map((entry) => entry.context), UNSUPPLIED_CONTEXTS.map((entry) => entry.context));
+  assert.deepEqual(
+    plan.unsuppliedContexts.map((entry) => entry.context),
+    UNSUPPLIED_CONTEXTS.map((entry) => entry.context),
+  );
 });
 
 test("every handle argument names a provider the contract's profile can root", () => {
@@ -152,10 +158,12 @@ test("every handle argument names a provider the contract's profile can root", (
     }
     // The recorded provenance is transitively closed.
     for (const provider of contract.handleProviders) {
-      const chain = profileById.get(contract.profile).handleProviders
-        .find((item) => item.handleKind === provider.handleKind);
+      const chain = profileById
+        .get(contract.profile)
+        .handleProviders.find((item) => item.handleKind === provider.handleKind);
       for (const argument of chain.arguments) {
-        if (argument.kind === "handle") assert.ok(recorded.has(argument.handleKind), `${contract.id}: ${argument.handleKind}`);
+        if (argument.kind === "handle")
+          assert.ok(recorded.has(argument.handleKind), `${contract.id}: ${argument.handleKind}`);
       }
     }
   }
@@ -188,7 +196,7 @@ test("a handle kind is rooted only by a profile whose physics backend owns it", 
 test("route classification rejects an unsupplied context and an unsynthesizable parameter", () => {
   const unit = {
     identity: { surface: "script", id: "script:test.route", stableId: 1 },
-    backends: { luaStack: { selection: "emit" } }
+    backends: { luaStack: { selection: "emit" } },
   };
   const universalBinding = {
     minimumArgumentCount: 1,
@@ -196,14 +204,14 @@ test("route classification rejects an unsupplied context and an unsynthesizable 
     minimumResultCount: 0,
     maximumResultCount: 1,
     variadic: false,
-    loweringFamily: "scalar"
+    loweringFamily: "scalar",
   };
   const renderOnly = classifyRoute({
     unit,
     irFunction: { modulePath: ["test"], jsName: "route", member: "route", parameters: [{ rawType: "number" }] },
     universalBinding,
     scalarBinding: null,
-    conformanceCase: { execution: { policy: "safe" }, requiredContexts: ["render-script"] }
+    conformanceCase: { execution: { policy: "safe" }, requiredContexts: ["render-script"] },
   });
   assert.equal(renderOnly.eligible, false);
   assert.equal(renderOnly.reason, "context-fixture-missing:render-script");
@@ -213,7 +221,7 @@ test("route classification rejects an unsupplied context and an unsynthesizable 
     irFunction: { modulePath: ["test"], jsName: "route", member: "route", parameters: [{ rawType: "b2Body" }] },
     universalBinding,
     scalarBinding: null,
-    conformanceCase: { execution: { policy: "safe" }, requiredContexts: ["engine"] }
+    conformanceCase: { execution: { policy: "safe" }, requiredContexts: ["engine"] },
   });
   assert.equal(opaqueParameter.eligible, false);
   assert.equal(opaqueParameter.reason, "unsynthesizable-parameter-type:b2Body");
@@ -223,7 +231,7 @@ test("route classification rejects an unsupplied context and an unsynthesizable 
     irFunction: { modulePath: ["test"], jsName: "route", member: "route", parameters: [] },
     universalBinding: { ...universalBinding, minimumArgumentCount: 0 },
     scalarBinding: null,
-    conformanceCase: { execution: { policy: "destructive" }, requiredContexts: ["engine"] }
+    conformanceCase: { execution: { policy: "destructive" }, requiredContexts: ["engine"] },
   });
   assert.equal(destructive.eligible, false);
   assert.equal(destructive.reason, "execution-policy-destructive");
@@ -235,22 +243,28 @@ test("dedicated and compile-time bindings are not reported as missing adapters",
   const baseUnit = {
     identity: { surface: "script", id: "script:test.route", stableId: 1 },
     abi: { state: "planned" },
-    backends: { luaStack: { selection: "separate-module" } }
+    backends: { luaStack: { selection: "separate-module" } },
   };
-  assert.equal(classifyRoute({
-    unit: baseUnit,
-    irFunction,
-    universalBinding: null,
-    scalarBinding: null,
-    conformanceCase
-  }).reason, "separate-module-adapter");
-  assert.equal(classifyRoute({
-    unit: { ...baseUnit, abi: { state: "compile-time-intrinsic" } },
-    irFunction,
-    universalBinding: null,
-    scalarBinding: null,
-    conformanceCase
-  }).reason, "compile-time-intrinsic");
+  assert.equal(
+    classifyRoute({
+      unit: baseUnit,
+      irFunction,
+      universalBinding: null,
+      scalarBinding: null,
+      conformanceCase,
+    }).reason,
+    "separate-module-adapter",
+  );
+  assert.equal(
+    classifyRoute({
+      unit: { ...baseUnit, abi: { state: "compile-time-intrinsic" } },
+      irFunction,
+      universalBinding: null,
+      scalarBinding: null,
+      conformanceCase,
+    }).reason,
+    "compile-time-intrinsic",
+  );
 });
 
 test("the generated harness emits one collection, game object and script per reachable contract", () => {
@@ -279,23 +293,22 @@ test("the generated harness emits one collection, game object and script per rea
 test("the committed plan matches the generator", async () => {
   const committed = await readFile(
     new URL("packages/bindings/generated/defold-headless-conformance-plan.json", root),
-    "utf8"
+    "utf8",
   );
   const digest = (text) => createHash("sha256").update(text).digest("hex");
   assert.equal(
     digest(committed),
     digest(`${JSON.stringify(plan, null, 2)}\n`),
-    "packages/bindings/generated/defold-headless-conformance-plan.json is stale; run pnpm generate:headless-conformance"
+    "packages/bindings/generated/defold-headless-conformance-plan.json is stale; run pnpm generate:headless-conformance",
   );
 });
 
 test("a recorded runtime report never claims more than the plan permits", async () => {
   let report;
   try {
-    report = JSON.parse(await readFile(
-      new URL("packages/bindings/generated/defold-headless-conformance-report.json", root),
-      "utf8"
-    ));
+    report = JSON.parse(
+      await readFile(new URL("packages/bindings/generated/defold-headless-conformance-report.json", root), "utf8"),
+    );
   } catch (error) {
     if (error.code === "ENOENT") return;
     throw error;
@@ -308,7 +321,7 @@ test("a recorded runtime report never claims more than the plan permits", async 
     assert.ok(planned, result.id);
     assert.ok(
       ["observed", "mismatched", "engine-fault", "blocked", "unreachable"].includes(result.outcome),
-      `${result.id}: ${result.outcome}`
+      `${result.id}: ${result.outcome}`,
     );
     if (planned.disposition === "unreachable") {
       assert.equal(result.outcome, "unreachable", `${result.id} claims runtime evidence without a fixture`);
@@ -324,7 +337,11 @@ test("a recorded runtime report never claims more than the plan permits", async 
     if (result.outcome === "engine-fault" && "diagnostics" in result.engine) {
       assert.ok(Array.isArray(result.engine.diagnostics), result.id);
       assert.ok(result.engine.diagnostics.length <= 32, result.id);
-      assert.equal(result.engine.diagnostics.some((line) => line.includes(root.pathname)), false, result.id);
+      assert.equal(
+        result.engine.diagnostics.some((line) => line.includes(root.pathname)),
+        false,
+        result.id,
+      );
     }
   }
 });

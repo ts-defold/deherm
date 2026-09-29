@@ -89,10 +89,12 @@ const FAMILY_PRIORITY = Object.freeze([
   "scalar-direct",
 ]);
 
-const PRIMITIVE_TYPE = /^(?:void|bool|char|signed char|unsigned char|short|unsigned short|int|unsigned int|long|unsigned long|long long|unsigned long long|float|double|int\d+_t|uint\d+_t|size_t|ssize_t|intptr_t|uintptr_t|ptrdiff_t)$/;
+const PRIMITIVE_TYPE =
+  /^(?:void|bool|char|signed char|unsigned char|short|unsigned short|int|unsigned int|long|unsigned long|long long|unsigned long long|float|double|int\d+_t|uint\d+_t|size_t|ssize_t|intptr_t|uintptr_t|ptrdiff_t)$/;
 const OUTPUT_NAME = /(?:^out(?:_|$)|(?:^|_)(?:out|output|result|result_out|destination|dst)(?:_|$))/i;
 const HANDLE_NAME = /(?:^|::)H[A-Z][A-Za-z0-9_]*$|Handle(?:$|[A-Z_])/;
-const PLATFORM_NAME = /(?:RegisteriOS|UnregisteriOS|GetNative(?:Android|OSX|iOS|X11)|::(?:OpenGL|Vulkan|WebGPU)|ToMetal)/;
+const PLATFORM_NAME =
+  /(?:RegisteriOS|UnregisteriOS|GetNative(?:Android|OSX|iOS|X11)|::(?:OpenGL|Vulkan|WebGPU)|ToMetal)/;
 
 function cleanType(type) {
   return String(type ?? "")
@@ -110,7 +112,11 @@ function baseType(type) {
 }
 
 function leafName(name) {
-  return String(name ?? "").split("::").at(-1) ?? "";
+  return (
+    String(name ?? "")
+      .split("::")
+      .at(-1) ?? ""
+  );
 }
 
 function createTypeIndex(declarations) {
@@ -150,7 +156,7 @@ function isCallbackType(type, index, seen = new Set()) {
 }
 
 function isRecordType(type, index) {
-  if (/[\*]/.test(type ?? "")) return false;
+  if (/[*]/.test(type ?? "")) return false;
   const resolved = resolveType(type, index);
   return resolved?.kind === "record" || resolved?.kind === "class-template";
 }
@@ -166,12 +172,18 @@ function isEnumOrHandleType(type, index, seen = new Set()) {
   seen.add(resolved.name);
   if (isCallbackType(resolved.type, index)) return false;
   const aliasBase = baseType(resolved.type);
-  return HANDLE_NAME.test(resolved.name) || PRIMITIVE_TYPE.test(aliasBase) || isEnumOrHandleType(resolved.type, index, seen);
+  return (
+    HANDLE_NAME.test(resolved.name) || PRIMITIVE_TYPE.test(aliasBase) || isEnumOrHandleType(resolved.type, index, seen)
+  );
 }
 
 function lengthRoot(name) {
-  const normalized = String(name ?? "").replace(/^num_?/, "").replace(/^n_/, "");
-  const match = normalized.match(/^(.*?)(?:_?(?:byte_?count|buffer_?size|data_?size|length|len|size|count|capacity|bytes|width|height|stride))$/i);
+  const normalized = String(name ?? "")
+    .replace(/^num_?/, "")
+    .replace(/^n_/, "");
+  const match = normalized.match(
+    /^(.*?)(?:_?(?:byte_?count|buffer_?size|data_?size|length|len|size|count|capacity|bytes|width|height|stride))$/i,
+  );
   return match ? match[1].replace(/_+$/, "").toLowerCase() : undefined;
 }
 
@@ -179,9 +191,7 @@ function pointerRoot(name) {
   const normalized = String(name ?? "")
     .replace(/^(?:out|in|src|dst)_/, "")
     .toLowerCase();
-  return normalized
-    .replace(/_(?:ptr|pointer|data|buffer|array|bytes|values|items|decls?)$/i, "")
-    .replace(/_+$/, "");
+  return normalized.replace(/_(?:ptr|pointer|data|buffer|array|bytes|values|items|decls?)$/i, "").replace(/_+$/, "");
 }
 
 function hasLengthCompanion(parameters) {
@@ -196,10 +206,13 @@ function hasLengthCompanion(parameters) {
       if (pointers.some((pointer) => description.includes(String(pointer.name ?? "").toLowerCase()))) return true;
       continue;
     }
-    if (pointers.some((pointer) => {
-      const candidate = pointerRoot(pointer.name);
-      return candidate === root || candidate.startsWith(root) || root.startsWith(candidate);
-    })) return true;
+    if (
+      pointers.some((pointer) => {
+        const candidate = pointerRoot(pointer.name);
+        return candidate === root || candidate.startsWith(root) || root.startsWith(candidate);
+      })
+    )
+      return true;
   }
   return false;
 }
@@ -208,8 +221,10 @@ function isOutParameter(parameter) {
   const type = String(parameter.type ?? "");
   if (/\*\s*\*/.test(type)) return true;
   if (/&/.test(type) && !/^\s*const\b/.test(type)) return true;
-  return /\*/.test(type) && !/^\s*const\b/.test(type) && (
-    OUTPUT_NAME.test(parameter.name ?? "") || /\b(?:out|output|destination)\b/i.test(parameter.description ?? "")
+  return (
+    /\*/.test(type) &&
+    !/^\s*const\b/.test(type) &&
+    (OUTPUT_NAME.test(parameter.name ?? "") || /\b(?:out|output|destination)\b/i.test(parameter.description ?? ""))
   );
 }
 
@@ -227,10 +242,11 @@ export function classifyDeclaration(declaration, typeIndex) {
   const types = [declaration.returns ?? "void", ...parameters.map((parameter) => parameter.type ?? "")];
   const families = new Set();
 
-  if (declaration.status === "direct-candidate" || (
-    declaration.kind === "function" &&
-    types.every((type) => !/[&*]/.test(type) && PRIMITIVE_TYPE.test(baseType(type)))
-  )) {
+  if (
+    declaration.status === "direct-candidate" ||
+    (declaration.kind === "function" &&
+      types.every((type) => !/[&*]/.test(type) && PRIMITIVE_TYPE.test(baseType(type))))
+  ) {
     families.add("scalar-direct");
   }
   if (types.some((type) => isEnumOrHandleType(type, typeIndex))) families.add("enum-handle");
@@ -257,10 +273,12 @@ export function classifyDeclaration(declaration, typeIndex) {
   if (families.size === 0) families.add("enum-handle");
   const orderedFamilies = FAMILY_PRIORITY.filter((family) => families.has(family));
   const primaryFamily = orderedFamilies[0];
-  const blockers = [...new Set([
-    "native symbol adapter is not generated or linked",
-    ...orderedFamilies.map((family) => FAMILY_CATALOG[family].blocker),
-  ])];
+  const blockers = [
+    ...new Set([
+      "native symbol adapter is not generated or linked",
+      ...orderedFamilies.map((family) => FAMILY_CATALOG[family].blocker),
+    ]),
+  ];
 
   return {
     id: declaration.id,
@@ -278,9 +296,9 @@ export function classifyDeclaration(declaration, typeIndex) {
 function summarizeFamilies(bindings, property) {
   const summary = {};
   for (const family of Object.keys(FAMILY_CATALOG).sort()) {
-    const members = bindings.filter((binding) => property === "primaryFamily"
-      ? binding.primaryFamily === family
-      : binding.families.includes(family));
+    const members = bindings.filter((binding) =>
+      property === "primaryFamily" ? binding.primaryFamily === family : binding.families.includes(family),
+    );
     summary[family] = {
       count: members.length,
       representativeSymbols: [...new Set(members.map((binding) => binding.symbol))].slice(0, 5),

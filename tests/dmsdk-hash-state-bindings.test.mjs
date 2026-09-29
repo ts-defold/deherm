@@ -99,7 +99,10 @@ test("hash-state lifecycle inference uses the closed ABI family rather than name
     ...ir,
     declarations: ir.declarations.map((declaration) =>
       declaration.kind === "record" && declaration.name === "HashState32"
-        ? { ...declaration, members: [{ ...declaration.members[0], type: "uint16_t" }, ...declaration.members.slice(1)] }
+        ? {
+            ...declaration,
+            members: [{ ...declaration.members[0], type: "uint16_t" }, ...declaration.members.slice(1)],
+          }
         : declaration,
     ),
   };

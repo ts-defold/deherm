@@ -3,10 +3,7 @@
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
-import {
-  assertProjectNativeArtifact,
-  ensureProjectNativeArtifact
-} from "../packages/cli/src/toolchains.mjs";
+import { assertProjectNativeArtifact, ensureProjectNativeArtifact } from "../packages/cli/src/toolchains.mjs";
 
 export async function main(argv = process.argv.slice(2)) {
   const [project, target, variant, ...extra] = argv;

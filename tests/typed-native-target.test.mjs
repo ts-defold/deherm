@@ -16,7 +16,7 @@ import { resolveDefoldSurface } from "../packages/cli/src/defold-surface.mjs";
 import {
   BOB_MANAGED_IGNORE_BEGIN,
   BOB_MANAGED_IGNORE_END,
-  BOB_TOOLING_IGNORE_ENTRIES
+  BOB_TOOLING_IGNORE_ENTRIES,
 } from "../packages/cli/src/bob-project-boundary.mjs";
 
 function managedEntries(source) {
@@ -33,14 +33,13 @@ import {
   TYPED_NATIVE_REFUSAL_CODE,
   defoldTargetRuntime,
   reconcileTypedNativeUpload,
-  typedNativeDisposition
+  typedNativeDisposition,
 } from "../packages/cli/src/typed-native.mjs";
 
 const repositoryRoot = path.resolve(import.meta.dirname, "..");
-const revision = JSON.parse(await readFile(
-  path.join(repositoryRoot, "packages/bindings/generated/defold-api-policy.json"),
-  "utf8"
-)).defoldRevision;
+const revision = JSON.parse(
+  await readFile(path.join(repositoryRoot, "packages/bindings/generated/defold-api-policy.json"), "utf8"),
+).defoldRevision;
 const toolchain = (await resolveDefoldSurface(revision, { packageRoot: repositoryRoot })).toolchain;
 
 async function project({ materialised = true } = {}) {
@@ -56,7 +55,14 @@ test("every web bundle target runs the browser runtime and every other one runs 
   }
   // Bob names macOS differently from Extender; the mapping is the package's
   // own and must not change the answer.
-  for (const platform of ["arm64-macos", "x86_64-macos", "arm64-ios", "arm64-android", "x86_64-linux", "x86_64-win32"]) {
+  for (const platform of [
+    "arm64-macos",
+    "x86_64-macos",
+    "arm64-ios",
+    "arm64-android",
+    "x86_64-linux",
+    "x86_64-win32",
+  ]) {
     assert.equal((await defoldTargetRuntime(platform, { toolchain })).runtimeId, "hermes", platform);
   }
 });
@@ -85,7 +91,7 @@ test("a web build hides an already materialised unit and a Hermes build reveals 
     assert.equal(excluded.changed, true);
     assert.deepEqual(managedEntries(await readFile(defignore, "utf8")), [
       ...BOB_TOOLING_IGNORE_ENTRIES,
-      TYPED_NATIVE_IGNORE_ENTRY
+      TYPED_NATIVE_IGNORE_ENTRY,
     ]);
 
     // Idempotent: a second web build changes nothing and says so.
@@ -109,10 +115,7 @@ test("npm tooling is hidden even when no typed-native unit is materialised", asy
     assert.equal(result.materialised, false);
     assert.equal(result.ignored, false);
     assert.equal(result.changed, true);
-    assert.deepEqual(
-      managedEntries(await readFile(path.join(root, ".defignore"), "utf8")),
-      BOB_TOOLING_IGNORE_ENTRIES
-    );
+    assert.deepEqual(managedEntries(await readFile(path.join(root, ".defignore"), "utf8")), BOB_TOOLING_IGNORE_ENTRIES);
   } finally {
     await rm(root, { recursive: true, force: true });
   }
@@ -126,12 +129,18 @@ test("a project's own .defignore entries survive both directions", async () => {
 
     await reconcileTypedNativeUpload({ projectRoot: root, platform: "wasm-web" });
     const hidden = await readFile(defignore, "utf8");
-    assert.deepEqual(hidden.slice(0, hidden.indexOf(BOB_MANAGED_IGNORE_BEGIN)).trim().split("\n"), ["/reference", "/notes"]);
+    assert.deepEqual(hidden.slice(0, hidden.indexOf(BOB_MANAGED_IGNORE_BEGIN)).trim().split("\n"), [
+      "/reference",
+      "/notes",
+    ]);
     assert.deepEqual(managedEntries(hidden), [...BOB_TOOLING_IGNORE_ENTRIES, TYPED_NATIVE_IGNORE_ENTRY]);
 
     await reconcileTypedNativeUpload({ projectRoot: root, platform: "arm64-macos" });
     const revealed = await readFile(defignore, "utf8");
-    assert.deepEqual(revealed.slice(0, revealed.indexOf(BOB_MANAGED_IGNORE_BEGIN)).trim().split("\n"), ["/reference", "/notes"]);
+    assert.deepEqual(revealed.slice(0, revealed.indexOf(BOB_MANAGED_IGNORE_BEGIN)).trim().split("\n"), [
+      "/reference",
+      "/notes",
+    ]);
     assert.deepEqual(managedEntries(revealed), BOB_TOOLING_IGNORE_ENTRIES);
   } finally {
     await rm(root, { recursive: true, force: true });
@@ -144,8 +153,10 @@ test("the materialised unit fails closed at compile time if it ever reaches an E
   // undefined _sh_* symbols at link time.
   const { renderRuntimeGuard } = await import("../scripts/assemble-typed-native-extension.mjs");
   const unit = path.join(
-    path.dirname(new URL(import.meta.url).pathname), "..",
-    "examples/war-battles-online/defold/defold_hermes_typed_native/src/deherm_typed_native_unit.cpp");
+    path.dirname(new URL(import.meta.url).pathname),
+    "..",
+    "examples/war-battles-online/defold/defold_hermes_typed_native/src/deherm_typed_native_unit.cpp",
+  );
   assert.match(renderRuntimeGuard(), /typed-native-requires-hermes-runtime/);
   let source;
   try {

@@ -39,8 +39,8 @@
   "minimumInputsSent": 3,
   "observedSnapshotsApplied": 3,
   "observedInputsSent": 12,
-  "lastServerTick": 60,
-  "lastLocalTick": 70,
+  "lastServerTick": 258,
+  "lastLocalTick": 269,
   "input": {
     "moveX": 1,
     "moveY": 0,
@@ -50,12 +50,12 @@
   },
   "inputsDropped": 0,
   "presentation": {
-    "localCorrectionMagnitude": 27,
-    "maximumLocalCorrectionMagnitude": 2380,
+    "localCorrectionMagnitude": 0,
+    "maximumLocalCorrectionMagnitude": 28176,
     "remoteInterpolationRebases": 0,
     "maximumRemoteInterpolationRebaseDistance": 0,
     "maximumRemoteInterpolationDiscontinuity": 0,
-    "remoteLifecycleHardSnaps": 0
+    "remoteLifecycleHardSnaps": 2
   },
   "prediction": {
     "inputLeadTicks": 5,
@@ -65,7 +65,7 @@
     "inputsAcceptedAtLeast": 3,
     "markers": [
       "war-battles-server:listening:https://localhost:<port>",
-      "war-battles-server:health:http://localhost:60176",
+      "war-battles-server:health:http://localhost:56498",
       "war-battles-server:roster:32:bots:2",
       "war-battles-server:incoming:id=1",
       "war-battles-server:quic-accepted:id=1",
@@ -121,8 +121,8 @@
     {
       "path": "package.json",
       "kind": "file",
-      "bytes": 55503,
-      "sha256": "4959a1316ae68fd9bf0cc7232ab58e61be9771a164e0c0693827be4ce6f382a2"
+      "bytes": 54777,
+      "sha256": "66cc92195d06340f874dbc1d272c21938fa488f98fb24c7f84d85861efa9fa88"
     },
     {
       "path": "pnpm-lock.yaml",
@@ -133,10 +133,10 @@
     {
       "path": "packages/cli/src/dev/browser-host.mjs",
       "kind": "file",
-      "bytes": 13810,
-      "sha256": "6fd5533ae7b9ebb266685f8319dc4bcad914fbba15a26859921d8518ba6536b8"
+      "bytes": 13899,
+      "sha256": "31fdeff053927fb67441d9dc9435af6a0cb60d279e3113dd8f6399962290143c"
     }
   ],
-  "sourceKey": "669cf14bd54338cf3bd38f8f23ac5bd5edfe45b072671d5c43728b10e4cfb850",
+  "sourceKey": "5725d4c8f1234c037edeeee40066f5355fc9a200fdfb611efb073c2c28db77f0",
   "evidenceBoundary": "Real loopback Chrome-to-Deno HTTP/3/WebTransport transport, authoritative welcome/snapshot/input and scalar client-presentation telemetry; server input acceptance is observed from MatchServer stats; the telemetry describes this bounded loopback trace and is not a visual-quality, WAN, ingress, native Defold, allocation, or reliable-lane-persistence claim."
 }

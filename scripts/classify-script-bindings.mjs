@@ -10,7 +10,7 @@ const FAMILY_ORDER = [
   "lua-table",
   "borrowed-handle",
   "defold-value",
-  "scalar"
+  "scalar",
 ];
 
 const FAMILY_DESCRIPTIONS = {
@@ -21,7 +21,7 @@ const FAMILY_DESCRIPTIONS = {
   "lua-table": "Lua arrays/tables recursively encoded or decoded from generated record metadata.",
   "borrowed-handle": "Opaque Lua userdata or numeric handles represented by checked, generation-aware host handles.",
   "defold-value": "Defold value userdata such as hashes, URLs, vectors, quaternions, and matrices.",
-  scalar: "Booleans, numbers, strings, nil, and numeric Defold enums."
+  scalar: "Booleans, numbers, strings, nil, and numeric Defold enums.",
 };
 
 const SCALARS = new Set(["boolean", "integer", "number", "string", "nil"]);
@@ -32,7 +32,7 @@ const EXTERNAL_HANDLES = new Set([
   "socket_client",
   "socket_server",
   "socket_connected",
-  "socket_unconnected"
+  "socket_unconnected",
 ]);
 
 function splitTopLevel(source, delimiter = "|") {
@@ -112,14 +112,18 @@ function classifyType(rawType, registry, seen = new Set()) {
   }
 
   const union = splitTopLevel(source);
-  if (union.length > 1) return mergeCodecs(union.map((part) => classifyType(part, registry, seen)), source);
+  if (union.length > 1)
+    return mergeCodecs(
+      union.map((part) => classifyType(part, registry, seen)),
+      source,
+    );
 
   if (source.endsWith("[]")) {
     const element = classifyType(source.slice(0, -2), registry, seen);
     return {
       codecs: ["table", ...element.codecs].filter((value, index, all) => all.indexOf(value) === index).sort(),
       unresolved: element.unresolved,
-      flags: element.flags
+      flags: element.flags,
     };
   }
   if (source === "table" || source.startsWith("table<") || source.startsWith("{") || source === "{}") {
@@ -140,7 +144,7 @@ function classifyType(rawType, registry, seen = new Set()) {
     if (definition.rawType === "userdata") {
       return { codecs: [VALUES.has(source) ? "value" : "handle"], unresolved: [], flags: [] };
     }
-    if (/^defold_enum\./.test(definition.rawType)) return { codecs: ["scalar"], unresolved: [], flags: [] };
+    if (definition.rawType.startsWith("defold_enum.")) return { codecs: ["scalar"], unresolved: [], flags: [] };
     if (definition.description?.toLowerCase().includes("opaque") && /^(integer|number)$/.test(definition.rawType)) {
       return { codecs: ["handle"], unresolved: [], flags: [] };
     }
@@ -151,9 +155,11 @@ function classifyType(rawType, registry, seen = new Set()) {
 
 function selectFamily(functionEntry, parameterCodecs, returnCodecs) {
   const codecs = new Set([...parameterCodecs, ...returnCodecs]);
-  if (codecs.has("dynamic") || functionEntry.parameters.some((parameter) => parameter.rawName === "...")) return "dynamic-values";
+  if (codecs.has("dynamic") || functionEntry.parameters.some((parameter) => parameter.rawName === "..."))
+    return "dynamic-values";
   if (codecs.has("callback")) return "callback-lifecycle";
-  if (functionEntry.overloads.length > 0 || functionEntry.generics.length > 0 || codecs.has("polymorphic")) return "overload-dispatch";
+  if (functionEntry.overloads.length > 0 || functionEntry.generics.length > 0 || codecs.has("polymorphic"))
+    return "overload-dispatch";
   if (functionEntry.returns.length > 1) return "multi-result";
   if (codecs.has("table")) return "lua-table";
   if (codecs.has("handle") || codecs.has("unknown")) return "borrowed-handle";
@@ -166,12 +172,12 @@ function classifyFunction(functionEntry, registry) {
     name: parameter.rawName,
     rawType: parameter.rawType,
     optional: parameter.optional,
-    ...classifyType(parameter.rawType, registry)
+    ...classifyType(parameter.rawType, registry),
   }));
   const returns = functionEntry.returns.map((rawType, index) => ({
     index,
     rawType,
-    ...classifyType(rawType, registry)
+    ...classifyType(rawType, registry),
   }));
   const parameterCodecs = parameters.flatMap((parameter) => parameter.codecs);
   const returnCodecs = returns.flatMap((result) => result.codecs);
@@ -191,7 +197,7 @@ function classifyFunction(functionEntry, registry) {
     returnCodecs: returns.map(({ index, rawType, codecs }) => ({ index, rawType, codecs })),
     traits: [...flags].sort(),
     unresolvedTypes,
-    runtimeStatus: "classified-not-implemented"
+    runtimeStatus: "classified-not-implemented",
   };
 }
 
@@ -207,11 +213,13 @@ export function classifyScriptBindings(ir, sourceText = `${JSON.stringify(ir)}\n
       name,
       count: members.length,
       description: FAMILY_DESCRIPTIONS[name],
-      representativeIds: members.slice(0, 3).map((binding) => binding.id)
+      representativeIds: members.slice(0, 3).map((binding) => binding.id),
     };
   });
   const unresolvedTypes = [...new Set(bindings.flatMap((binding) => binding.unresolvedTypes))].sort();
-  const ambiguousBindings = bindings.filter((binding) => binding.traits.length > 0 || binding.unresolvedTypes.length > 0);
+  const ambiguousBindings = bindings.filter(
+    (binding) => binding.traits.length > 0 || binding.unresolvedTypes.length > 0,
+  );
   return {
     schemaVersion: 1,
     defoldRevision: ir.defoldRevision,
@@ -230,9 +238,9 @@ export function classifyScriptBindings(ir, sourceText = `${JSON.stringify(ir)}\n
       source,
       line,
       traits,
-      unresolvedTypes
+      unresolvedTypes,
     })),
-    bindings
+    bindings,
   };
 }
 
@@ -253,8 +261,12 @@ async function main(argv = process.argv.slice(2)) {
     await writeFile(outputUrl, serialized);
   }
   const counts = report.families.map(({ name, count }) => `${name}=${count}`).join(", ");
-  console.log(`${check ? "Verified" : "Classified"} ${report.classifiedFunctionCount} pending script bindings: ${counts}`);
-  console.log(`Unresolved type tokens: ${report.unresolvedTypeCount}; policy-sensitive bindings: ${report.ambiguousBindingCount}`);
+  console.log(
+    `${check ? "Verified" : "Classified"} ${report.classifiedFunctionCount} pending script bindings: ${counts}`,
+  );
+  console.log(
+    `Unresolved type tokens: ${report.unresolvedTypeCount}; policy-sensitive bindings: ${report.ambiguousBindingCount}`,
+  );
 }
 
 if (process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url) await main();

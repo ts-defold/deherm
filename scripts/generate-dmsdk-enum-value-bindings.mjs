@@ -3,10 +3,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import {
-  indexDmSdkValuePlan,
-  inferEnumValueSemantics,
-} from "../packages/compiler/src/dmsdk-value-plan.mjs";
+import { indexDmSdkValuePlan, inferEnumValueSemantics } from "../packages/compiler/src/dmsdk-value-plan.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const paths = {
@@ -250,8 +247,8 @@ export async function build() {
       enumValue: sha256(contents.overrides),
     },
   });
-  const patterns = valuePlan.patternRegistry.filter(({ id }) =>
-    id === "value.enum-domain-direct" || id === "universal.default",
+  const patterns = valuePlan.patternRegistry.filter(
+    ({ id }) => id === "value.enum-domain-direct" || id === "universal.default",
   );
   const candidates = shapes.rows
     .map((candidate) => {

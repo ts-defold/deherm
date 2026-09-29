@@ -1,9 +1,12 @@
 import { stableBindingId } from "./binding-identity.mjs";
 
 export const universalTargetSupport = Object.freeze({
-  nativeDynamicHermes: "generated-recursive-jsi-lua-adapter-with-23-registry-eligible-callback-inputs-and-2-rooted-higher-order-lua-closure-results-native-harness-proven-packaged-engine-unverified",
-  nativeStaticHermes: "generated-sound-typed-fixed-capacity-frame-marshal-runtime-proven-for-optional-input-callbacks-that-decline-to-jsi-non-handle-non-defold-value-shapes-packaged-engine-unverified",
-  html5BrowserHost: "generated-direct-wasm-memory-provider-plus-23-registry-eligible-callback-trampolines-node-and-native-harness-proven-2-higher-order-lua-closures-blocked-packaged-browser-engine-unverified"
+  nativeDynamicHermes:
+    "generated-recursive-jsi-lua-adapter-with-23-registry-eligible-callback-inputs-and-2-rooted-higher-order-lua-closure-results-native-harness-proven-packaged-engine-unverified",
+  nativeStaticHermes:
+    "generated-sound-typed-fixed-capacity-frame-marshal-runtime-proven-for-optional-input-callbacks-that-decline-to-jsi-non-handle-non-defold-value-shapes-packaged-engine-unverified",
+  html5BrowserHost:
+    "generated-direct-wasm-memory-provider-plus-23-registry-eligible-callback-trampolines-node-and-native-harness-proven-2-higher-order-lua-closures-blocked-packaged-browser-engine-unverified",
 });
 
 function assert(condition, message) {
@@ -17,12 +20,29 @@ function compare(left, right) {
 export function validateUniversalPolicy(policy) {
   assert(policy?.schemaVersion === 1, "unsupported universal-value policy schema");
   assert(Array.isArray(policy.selection?.loweringFamilies), "universal loweringFamilies must be an array");
-  assert(Array.isArray(policy.selection?.excludedLoweringFamilies), "universal excludedLoweringFamilies must be an array");
+  assert(
+    Array.isArray(policy.selection?.excludedLoweringFamilies),
+    "universal excludedLoweringFamilies must be an array",
+  );
   assert(Array.isArray(policy.selection?.excludedContexts), "universal excludedContexts must be an array");
-  assert(Number.isInteger(policy.bounds?.maximumArguments) && policy.bounds.maximumArguments > 0 && policy.bounds.maximumArguments <= 255, "maximumArguments must be a positive u8");
-  assert(Number.isInteger(policy.bounds?.maximumDepth) && policy.bounds.maximumDepth > 0, "maximumDepth must be positive");
-  assert(Number.isInteger(policy.bounds?.maximumEntries) && policy.bounds.maximumEntries > 0, "maximumEntries must be positive");
-  assert(Number.isInteger(policy.bounds?.maximumStringBytes) && policy.bounds.maximumStringBytes > 0, "maximumStringBytes must be positive");
+  assert(
+    Number.isInteger(policy.bounds?.maximumArguments) &&
+      policy.bounds.maximumArguments > 0 &&
+      policy.bounds.maximumArguments <= 255,
+    "maximumArguments must be a positive u8",
+  );
+  assert(
+    Number.isInteger(policy.bounds?.maximumDepth) && policy.bounds.maximumDepth > 0,
+    "maximumDepth must be positive",
+  );
+  assert(
+    Number.isInteger(policy.bounds?.maximumEntries) && policy.bounds.maximumEntries > 0,
+    "maximumEntries must be positive",
+  );
+  assert(
+    Number.isInteger(policy.bounds?.maximumStringBytes) && policy.bounds.maximumStringBytes > 0,
+    "maximumStringBytes must be positive",
+  );
 }
 
 // Routes are normalized projections of the source IR. This selector is the
@@ -44,7 +64,10 @@ function overloadArity(token) {
   for (let index = open; index < token.length; ++index) {
     const char = token[index];
     if (char === "(") ++depth;
-    else if (char === ")" && --depth === 0) { close = index; break; }
+    else if (char === ")" && --depth === 0) {
+      close = index;
+      break;
+    }
   }
   if (close < 0) return null;
   const body = token.slice(open + 1, close).trim();
@@ -56,7 +79,10 @@ function overloadArity(token) {
     const char = body[index];
     if (char === "<" || char === "(" || char === "[") ++nesting;
     else if (char === ">" || char === ")" || char === "]") --nesting;
-    else if (char === "," && nesting === 0) { parts.push(body.slice(start, index)); start = index + 1; }
+    else if (char === "," && nesting === 0) {
+      parts.push(body.slice(start, index));
+      start = index + 1;
+    }
   }
   parts.push(body.slice(start));
   const parameters = parts.map((part) => part.trim()).filter((part) => part.length !== 0);
@@ -67,7 +93,7 @@ function overloadArity(token) {
   };
   return {
     total: parameters.length,
-    required: parameters.filter((parameter) => !name(parameter).endsWith("?")).length
+    required: parameters.filter((parameter) => !name(parameter).endsWith("?")).length,
   };
 }
 
@@ -98,7 +124,8 @@ export function selectUniversalRoutes(routes, policy) {
     });
     const minimumArgumentCount = Math.min(
       fixedParameters.filter(({ optional }) => !optional).length,
-      ...overloads.map(({ required }) => required));
+      ...overloads.map(({ required }) => required),
+    );
     const maximumArgumentCount = variadic
       ? policy.bounds.maximumArguments
       : Math.max(route.parameters.length, ...overloads.map(({ total }) => total));
@@ -132,13 +159,16 @@ export function selectUniversalRoutes(routes, policy) {
       // inside union variants. Transports that copy fixed-layout records need
       // the type identity, not just the `defold-value` shape kind.
       defoldValueTypes: [...(route.defoldValueTypes ?? [])].sort(compare),
-      recursive: route.recursive ?? { token: "shape-metadata-unavailable" }
+      recursive: route.recursive ?? { token: "shape-metadata-unavailable" },
     });
   }
   selected.sort((left, right) => left.stableId - right.stableId || compare(left.id, right.id));
   excluded.sort((left, right) => compare(left.id, right.id));
   assert(new Set(selected.map(({ id }) => id)).size === selected.length, "universal-value identities are duplicated");
-  assert(new Set(selected.map(({ stableId }) => stableId)).size === selected.length, "universal-value stable ID collision");
+  assert(
+    new Set(selected.map(({ stableId }) => stableId)).size === selected.length,
+    "universal-value stable ID collision",
+  );
   assert(selected.length > 0, "universal-value selection is empty");
   return { selected, excluded };
 }

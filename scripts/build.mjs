@@ -10,13 +10,17 @@ import {
   bundleReachableStableIds,
   checkerReachableRoutes,
   crossCheckReachability,
-  defoldApiUsageDocument
+  defoldApiUsageDocument,
 } from "./defold-api-reachability.mjs";
 
 await ensureBindingLoweringPlan({ deepCheck: true });
-const canonicalLoweringPlan = JSON.parse(await readFile("packages/bindings/generated/defold-binding-lowering-plan.json", "utf8"));
+const canonicalLoweringPlan = JSON.parse(
+  await readFile("packages/bindings/generated/defold-binding-lowering-plan.json", "utf8"),
+);
 if (canonicalLoweringPlan.schemaVersion !== 2) {
-  throw new Error(`JavaScript build requires canonical lowering-plan schema v2, got ${canonicalLoweringPlan.schemaVersion ?? "missing"}`);
+  throw new Error(
+    `JavaScript build requires canonical lowering-plan schema v2, got ${canonicalLoweringPlan.schemaVersion ?? "missing"}`,
+  );
 }
 
 // The checker needs one derived input to answer reachability in canonical
@@ -39,36 +43,40 @@ const result = await build({
     "defold-app": "examples/runtime-smoke/src/main.ts",
     "binding-benchmark": "benchmarks/binding.ts",
     "web-host": "packages/web-adapter/src/host.ts",
-    "web-runner": "packages/web-adapter/src/runner.ts"
+    "web-runner": "packages/web-adapter/src/runner.ts",
   },
   outdir: "dist",
   bundle: true,
   format: "iife",
   platform: "neutral",
   target: "es2020",
-  plugins: [ttsc({
-    // One program, one manifest. Left to per-file discovery the bundled
-    // entrypoints would resolve to several tsconfigs, and each program would
-    // publish a manifest covering only the files it happened to own.
-    project: path.resolve("tsconfig.json"),
-    plugins: [{
-      transform: path.resolve("packages/compiler/ttsc.mjs"),
-      enabled: true,
-      // This repository's own build is a development projection: it computes
-      // reachability to report it and never prunes what it links.
-      profile: "development",
-      routeSymbols: path.resolve(routeIndexPath),
-      apiUsage: path.resolve(apiUsagePath)
-    }]
-  })],
+  plugins: [
+    ttsc({
+      // One program, one manifest. Left to per-file discovery the bundled
+      // entrypoints would resolve to several tsconfigs, and each program would
+      // publish a manifest covering only the files it happened to own.
+      project: path.resolve("tsconfig.json"),
+      plugins: [
+        {
+          transform: path.resolve("packages/compiler/ttsc.mjs"),
+          enabled: true,
+          // This repository's own build is a development projection: it computes
+          // reachability to report it and never prunes what it links.
+          profile: "development",
+          routeSymbols: path.resolve(routeIndexPath),
+          apiUsage: path.resolve(apiUsagePath),
+        },
+      ],
+    }),
+  ],
   define: {
-    __DEFOLD_HERMES_BUILD_FINGERPRINT__: JSON.stringify(pendingFingerprint)
+    __DEFOLD_HERMES_BUILD_FINGERPRINT__: JSON.stringify(pendingFingerprint),
   },
   sourcemap: true,
   sourcesContent: true,
   legalComments: "none",
   logLevel: "info",
-  metafile: true
+  metafile: true,
 });
 
 const defoldAppPath = "dist/defold-app.js";
@@ -77,13 +85,8 @@ const placeholderOccurrences = defoldAppWithPlaceholder.split(pendingFingerprint
 if (placeholderOccurrences !== 1) {
   throw new Error(`Expected one Defold runtime fingerprint placeholder, found ${placeholderOccurrences}`);
 }
-const defoldAppFingerprint = createHash("sha256")
-  .update(defoldAppWithPlaceholder)
-  .digest("hex");
-await writeFile(
-  defoldAppPath,
-  defoldAppWithPlaceholder.replace(pendingFingerprint, defoldAppFingerprint)
-);
+const defoldAppFingerprint = createHash("sha256").update(defoldAppWithPlaceholder).digest("hex");
+await writeFile(defoldAppPath, defoldAppWithPlaceholder.replace(pendingFingerprint, defoldAppFingerprint));
 
 const usageManifest = JSON.parse(await readFile(apiUsagePath, "utf8"));
 if (usageManifest.schemaVersion !== 1 || usageManifest.routeIndexSha256 !== routeIndex.indexSha256) {
@@ -97,9 +100,11 @@ const dynamicRegistry = "packages/sdk/src/registry.ts";
 const reachabilityDisagreements = [];
 for (const [output, metadata] of Object.entries(result.metafile.outputs)) {
   if (!metadata.entryPoint || path.extname(output) !== ".js") continue;
-  const retainedInputs = new Set(Object.entries(metadata.inputs)
-    .filter(([, contribution]) => contribution.bytesInOutput > 0)
-    .map(([input]) => input));
+  const retainedInputs = new Set(
+    Object.entries(metadata.inputs)
+      .filter(([, contribution]) => contribution.bytesInOutput > 0)
+      .map(([input]) => input),
+  );
   const dynamicAccess = retainedInputs.has(dynamicRegistry);
   const symbols = dynamicAccess
     ? symbolMap.symbols
@@ -112,7 +117,7 @@ for (const [output, metadata] of Object.entries(result.metafile.outputs)) {
     entryPoint: metadata.entryPoint,
     output,
     dynamicAccess,
-    symbols
+    symbols,
   };
   const usagePath = output.replace(/\.js$/, ".usage.json");
   await writeFile(usagePath, `${JSON.stringify(manifest, null, 2)}\n`);
@@ -129,7 +134,7 @@ for (const [output, metadata] of Object.entries(result.metafile.outputs)) {
     manifest: usageManifest,
     routeIndex,
     checkerRouteIds,
-    bundleStableIds
+    bundleStableIds,
   });
   if (crossCheck.status !== "agree") reachabilityDisagreements.push(crossCheck);
   const defoldApiUsage = defoldApiUsageDocument({
@@ -138,13 +143,13 @@ for (const [output, metadata] of Object.entries(result.metafile.outputs)) {
     manifest: usageManifest,
     routeIndex,
     checkerRouteIds,
-    crossCheck
+    crossCheck,
   });
   const defoldApiUsagePath = output.replace(/\.js$/, ".defold-api-usage.json");
   await writeFile(defoldApiUsagePath, `${JSON.stringify(defoldApiUsage, null, 2)}\n`);
   process.stdout.write(
     `reachability ${output}: ${checkerRouteIds.length}/${routeIndex.routeCount} Defold routes` +
-    `${usageManifest.dynamicAccess ? " (dynamic access declared; release retains the complete surface)" : ""}\n`
+      `${usageManifest.dynamicAccess ? " (dynamic access declared; release retains the complete surface)" : ""}\n`,
   );
 }
 
@@ -154,8 +159,9 @@ if (reachabilityDisagreements.length > 0) {
     .join("\n");
   throw new Error(
     "The ttsc symbol set and the bundler module graph disagree about what this build reaches.\n" +
-    "Two independent derivations differing means one is wrong; a release projection built from\n" +
-    "either would be unsound.\n" + detail
+      "Two independent derivations differing means one is wrong; a release projection built from\n" +
+      "either would be unsound.\n" +
+      detail,
   );
 }
 

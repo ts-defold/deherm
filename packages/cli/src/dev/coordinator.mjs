@@ -22,7 +22,10 @@ export class HotReloadCoordinator {
     if (this.#closed) return Promise.reject(new Error("hot reload coordinator is closed"));
     for (const source of changedSources) this.#pending.add(source);
     if (changedSources.length === 0 || (!this.#loop && this.#pending.size === 0)) this.#forcePending = true;
-    if (!this.#loop) this.#loop = this.#drain().finally(() => { this.#loop = undefined; });
+    if (!this.#loop)
+      this.#loop = this.#drain().finally(() => {
+        this.#loop = undefined;
+      });
     return this.#loop;
   }
 
@@ -41,10 +44,14 @@ export class HotReloadCoordinator {
           generation,
           fingerprint: build.fingerprint,
           resources: build.resourcePaths,
-          metrics: build.metrics
+          metrics: build.metrics,
         });
       } catch (error) {
-        this.#emit({ type: "build-failed", generation, diagnostic: error instanceof Error ? error.message : String(error) });
+        this.#emit({
+          type: "build-failed",
+          generation,
+          diagnostic: error instanceof Error ? error.message : String(error),
+        });
         continue;
       }
 
@@ -56,15 +63,22 @@ export class HotReloadCoordinator {
     const targets = [...this.#targets];
     if (generation <= 0 || resources.length === 0 || targets.length === 0) return;
     for (const [id] of targets) this.#emit({ type: "reload-started", id, generation });
-    await Promise.all(targets.map(async ([id, target]) => {
-      try {
-        await this.#postReload(target.url, resources);
-        this.#emit({ type: "target-connected", id, name: target.name, url: target.url });
-        this.#emit({ type: "reload-signalled", id, generation });
-      } catch (error) {
-        this.#emit({ type: "reload-failed", id, generation, diagnostic: error instanceof Error ? error.message : String(error) });
-      }
-    }));
+    await Promise.all(
+      targets.map(async ([id, target]) => {
+        try {
+          await this.#postReload(target.url, resources);
+          this.#emit({ type: "target-connected", id, name: target.name, url: target.url });
+          this.#emit({ type: "reload-signalled", id, generation });
+        } catch (error) {
+          this.#emit({
+            type: "reload-failed",
+            id,
+            generation,
+            diagnostic: error instanceof Error ? error.message : String(error),
+          });
+        }
+      }),
+    );
   }
 
   async close() {

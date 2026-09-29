@@ -92,7 +92,10 @@ test("a present archive member deleted from the SDK cache is not misclassified a
     await writeFile(header, "void Visible();\n");
     await authenticateExtraction(sdkRoot);
     await rm(header);
-    await assert.rejects(attachPublicSdkFacts(root, revision, [recipe]), /cache deleted archive member sdk\/include\/dmsdk\/test\.h/u);
+    await assert.rejects(
+      attachPublicSdkFacts(root, revision, [recipe]),
+      /cache deleted archive member sdk\/include\/dmsdk\/test\.h/u,
+    );
   } finally {
     await rm(root, { recursive: true, force: true });
   }
@@ -105,7 +108,10 @@ test("a present archive member modified in the SDK cache is rejected", async () 
     await writeFile(header, "void Visible();\n");
     await authenticateExtraction(sdkRoot);
     await writeFile(header, "void Changed();\n");
-    await assert.rejects(attachPublicSdkFacts(root, revision, [recipe]), /cache modified archive member sdk\/include\/dmsdk\/test\.h/u);
+    await assert.rejects(
+      attachPublicSdkFacts(root, revision, [recipe]),
+      /cache modified archive member sdk\/include\/dmsdk\/test\.h/u,
+    );
   } finally {
     await rm(root, { recursive: true, force: true });
   }

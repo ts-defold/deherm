@@ -9,5 +9,5 @@ await build({
   platform: "neutral",
   target: "es2020",
   outfile: "build/script-api-e2e.js",
-  sourcemap: false
+  sourcemap: false,
 });

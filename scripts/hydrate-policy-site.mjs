@@ -6,19 +6,22 @@
 // no-op nightly would rebuild a one-entry site and erase every older revision.
 
 import { mkdir, readFile, writeFile } from "node:fs/promises";
-import path from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { pathToFileURL } from "node:url";
 
 import { readSiteConfig, readStore, shippedIndexPath, storeRoot } from "./generate-api-policy.mjs";
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const REVISION = /^[0-9a-f]{40}$/u;
 const HASH = /^[0-9a-f]{64}$/u;
 
 function assertEntry(entry, source) {
-  if (!entry || entry.kind !== "deherm.policy.index-entry" || entry.schemaVersion !== 1 ||
-      !REVISION.test(entry.defoldRevision ?? "") || !HASH.test(entry.policyRoot ?? "") ||
-      !/^sha256:[0-9a-f]{64}$/u.test(entry.generator ?? "")) {
+  if (
+    !entry ||
+    entry.kind !== "deherm.policy.index-entry" ||
+    entry.schemaVersion !== 1 ||
+    !REVISION.test(entry.defoldRevision ?? "") ||
+    !HASH.test(entry.policyRoot ?? "") ||
+    !/^sha256:[0-9a-f]{64}$/u.test(entry.generator ?? "")
+  ) {
     throw new Error(`${source}: malformed policy index entry`);
   }
 }
@@ -56,7 +59,7 @@ async function importPublishedClosure({ entry, layoutSource, layoutDestination }
 }
 
 export async function hydratePolicySite(options) {
-  const site = options.site ?? await readSiteConfig();
+  const site = options.site ?? (await readSiteConfig());
   const publishedRoot = path.resolve(options.from);
   const layoutSource = path.join(publishedRoot, ...site.pathPrefix.split("/").filter(Boolean), site.layoutVersion);
   const manifestFile = path.join(layoutSource, "index", "manifest.json");
@@ -70,11 +73,15 @@ export async function hydratePolicySite(options) {
 
   const publishedEntries = new Map();
   for (const summary of published.entries) {
-    if (!REVISION.test(summary?.defoldRevision ?? "") || !HASH.test(summary?.policyRoot ?? "") ||
-        !/^sha256:[0-9a-f]{64}$/u.test(summary?.generator ?? "")) {
+    if (
+      !REVISION.test(summary?.defoldRevision ?? "") ||
+      !HASH.test(summary?.policyRoot ?? "") ||
+      !/^sha256:[0-9a-f]{64}$/u.test(summary?.generator ?? "")
+    ) {
       throw new Error(`${manifestFile}: malformed entry summary`);
     }
-    if (publishedEntries.has(summary.defoldRevision)) throw new Error(`${manifestFile}: duplicate ${summary.defoldRevision}`);
+    if (publishedEntries.has(summary.defoldRevision))
+      throw new Error(`${manifestFile}: duplicate ${summary.defoldRevision}`);
     const entryFile = path.join(layoutSource, "index", `${summary.defoldRevision}.json`);
     const entry = JSON.parse(await readFile(entryFile, "utf8"));
     assertEntry(entry, entryFile);
@@ -101,12 +108,16 @@ export async function hydratePolicySite(options) {
     const agrees = packaged && packaged.policyRoot === entry.policyRoot && packaged.generator === entry.generator;
     if (packaged && !agrees) {
       const packagedEntryFile = path.join(layoutDestination, "index", `${entry.defoldRevision}.json`);
-      const packagedEntry = JSON.parse(await readFile(packagedEntryFile, "utf8").catch((error) => {
-        if (error.code === "ENOENT") {
-          throw new Error(`${entry.defoldRevision}: packaged index claims the revision but its store entry is missing`);
-        }
-        throw error;
-      }));
+      const packagedEntry = JSON.parse(
+        await readFile(packagedEntryFile, "utf8").catch((error) => {
+          if (error.code === "ENOENT") {
+            throw new Error(
+              `${entry.defoldRevision}: packaged index claims the revision but its store entry is missing`,
+            );
+          }
+          throw error;
+        }),
+      );
       assertEntry(packagedEntry, packagedEntryFile);
       if (packagedEntry.policyRoot !== packaged.policyRoot || packagedEntry.generator !== packaged.generator) {
         throw new Error(`${packagedEntryFile}: entry does not match the packaged index`);
@@ -120,16 +131,18 @@ export async function hydratePolicySite(options) {
   for (const entry of local.entries ?? []) merged.set(entry.defoldRevision, entry);
   const document = {
     ...local,
-    entries: [...merged.values()].sort((a, b) => a.defoldRevision.localeCompare(b.defoldRevision))
+    entries: [...merged.values()].sort((a, b) => a.defoldRevision.localeCompare(b.defoldRevision)),
   };
   await writeFile(localIndexPath, `${JSON.stringify(document, null, 2)}\n`);
 
   const store = await readStore(options.store ?? storeRoot, site.layoutVersion);
   if (store.problems.length || store.orphans.length) {
-    throw new Error([
-      ...store.problems,
-      ...(store.orphans.length ? [`${store.orphans.length} orphaned policy objects after hydration`] : [])
-    ].join("\n"));
+    throw new Error(
+      [
+        ...store.problems,
+        ...(store.orphans.length ? [`${store.orphans.length} orphaned policy objects after hydration`] : []),
+      ].join("\n"),
+    );
   }
   return { copied, revisions: document.entries.length };
 }

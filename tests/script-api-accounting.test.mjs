@@ -19,28 +19,33 @@ async function inputs() {
     "packages/bindings/overrides/script-go-current-instance-bindings.json",
     "packages/bindings/overrides/script-msg-structured-bindings.json",
     "packages/bindings/overrides/script-factory-structured-bindings.json",
-    "packages/bindings/overrides/script-gui-structured-bindings.json"
+    "packages/bindings/overrides/script-gui-structured-bindings.json",
   ];
-  const valueDefinitions = await Promise.all(definitionPaths.map(async (path) => {
-    const definitionText = await text(path);
-    const definition = JSON.parse(definitionText);
-    const additionalSources = await Promise.all((definition.additionalSourceEvidence ?? []).map(async ({ source }) => ({
-      source,
-      sourceText: await text(`upstream/defold/${source}`)
-    })));
-    return {
-      path,
-      definitionText,
-      sourceText: await text(`upstream/defold/${definition.source}`),
-      additionalSources
-    };
-  }));
+  const valueDefinitions = await Promise.all(
+    definitionPaths.map(async (path) => {
+      const definitionText = await text(path);
+      const definition = JSON.parse(definitionText);
+      const additionalSources = await Promise.all(
+        (definition.additionalSourceEvidence ?? []).map(async ({ source }) => ({
+          source,
+          sourceText: await text(`upstream/defold/${source}`),
+        })),
+      );
+      return {
+        path,
+        definitionText,
+        sourceText: await text(`upstream/defold/${definition.source}`),
+        additionalSources,
+      };
+    }),
+  );
   const urlOverrideText = await text("packages/bindings/overrides/script-url-address-classification.json");
   const urlOverride = JSON.parse(urlOverrideText);
-  const urlSourceTexts = new Map(await Promise.all(urlOverride.sourceEvidence.map(async ({ source }) => [
-    source,
-    await text(`upstream/defold/${source}`)
-  ])));
+  const urlSourceTexts = new Map(
+    await Promise.all(
+      urlOverride.sourceEvidence.map(async ({ source }) => [source, await text(`upstream/defold/${source}`)]),
+    ),
+  );
   return {
     inventoryText: await text("packages/bindings/generated/defold-script-api-inventory.json"),
     irText: await text("packages/bindings/generated/defold-script-api-ir.json"),
@@ -56,7 +61,7 @@ async function inputs() {
     componentPolicyText: await text("packages/bindings/generated/defold-component-proxy-contract.json"),
     urlOverrideText,
     urlSourceTexts,
-    valueDefinitions
+    valueDefinitions,
   };
 }
 
@@ -76,13 +81,16 @@ test("accounts for all 926 APIs in one and only one category", () => {
     "executable-stable-id": 915,
     "component-property-compiler": 8,
     "separate-module": 3,
-    pending: 0
+    pending: 0,
   });
   assert.deepEqual(generated.pendingByLoweringFamily, {});
   assert.equal(new Set(generated.rows.map(({ id }) => id)).size, 926);
   assert.equal(generated.rows.filter(({ category }) => category === "pending").length, 0);
-  assert.ok(generated.rows.filter(({ category }) => category === "pending")
-    .every(({ reason }) => reason.code && reason.loweringFamily));
+  assert.ok(
+    generated.rows
+      .filter(({ category }) => category === "pending")
+      .every(({ reason }) => reason.code && reason.loweringFamily),
+  );
   assert.deepEqual(checked, generated);
 });
 
@@ -92,7 +100,10 @@ test("keeps stable-ID and separate-module evidence explicit and bounded", () => 
   assert.equal(executable.filter(({ evidence }) => evidence.generator === "native-value-dispatch").length, 78);
   assert.equal(executable.filter(({ evidence }) => evidence.generator === "fixed-tuple-lua-dispatch").length, 24);
   assert.equal(executable.filter(({ evidence }) => evidence.generator === "url-lua-dispatch").length, 70);
-  assert.equal(executable.filter(({ evidence }) => evidence.generator === "captured-lua-value-tail-dispatch").length, 16);
+  assert.equal(
+    executable.filter(({ evidence }) => evidence.generator === "captured-lua-value-tail-dispatch").length,
+    16,
+  );
   assert.equal(executable.filter(({ evidence }) => evidence.generator === "captured-lua-overload-dispatch").length, 8);
   assert.equal(executable.filter(({ evidence }) => evidence.generator === "universal-value-fallback").length, 629);
   assert.equal(executable.filter(({ evidence }) => evidence.generatedFamily === "gui-node-setters").length, 39);
@@ -109,7 +120,7 @@ test("keeps stable-ID and separate-module evidence explicit and bounded", () => 
   assert.equal(deleteRoute.evidence.callShapes.length > deleteRoute.evidence.implementedCallShapes.length, true);
   assert.deepEqual(
     generated.rows.filter(({ category }) => category === "separate-module").map(({ id }) => id),
-    ["script:timer.cancel", "script:timer.delay", "script:timer.trigger"]
+    ["script:timer.cancel", "script:timer.delay", "script:timer.trigger"],
   );
   assert.deepEqual(
     generated.rows.filter(({ category }) => category === "component-property-compiler").map(({ id }) => id),
@@ -121,8 +132,8 @@ test("keeps stable-ID and separate-module evidence explicit and bounded", () => 
       "script:resource.material",
       "script:resource.render_target",
       "script:resource.texture",
-      "script:resource.tile_source"
-    ]
+      "script:resource.tile_source",
+    ],
   );
   assert.match(generated.coverageClaim, /neither category claims per-target or per-function engine conformance/);
 });
@@ -148,8 +159,10 @@ test("rejects duplicate, omitted, overlapping, and stale route evidence", () => 
     value.bindings.pop();
     value.bindingCount -= 1;
   });
-  assert.throws(() => generateScriptApiAccounting(omitted),
-    /value-tail bindings are stale|generated route count differs from reviewed family metadata|does not match reviewed value definitions/);
+  assert.throws(
+    () => generateScriptApiAccounting(omitted),
+    /value-tail bindings are stale|generated route count differs from reviewed family metadata|does not match reviewed value definitions/,
+  );
 
   const overlapping = structuredClone(sourceInputs);
   const valueRow = JSON.parse(overlapping.valueText).bindings[0];
@@ -184,8 +197,10 @@ test("rejects duplicate, omitted, overlapping, and stale route evidence", () => 
     report.rows[0].argumentCodecs = [["Nil"]];
     report.rows[0].resultCodec = "Quaternion";
   });
-  assert.throws(() => generateScriptApiAccounting(malformedUrl),
-    /value-tail bindings are stale|URL binding report semantics are stale against pinned inputs/);
+  assert.throws(
+    () => generateScriptApiAccounting(malformedUrl),
+    /value-tail bindings are stale|URL binding report semantics are stale against pinned inputs/,
+  );
 });
 
 test("rejects stale reviewed Defold source evidence", () => {
@@ -197,6 +212,6 @@ test("rejects stale reviewed Defold source evidence", () => {
 test("check command proves the checked-in report is current", () => {
   execFileSync(process.execPath, ["scripts/generate-script-api-accounting.mjs", "--check"], {
     cwd: root,
-    stdio: "pipe"
+    stdio: "pipe",
   });
 });

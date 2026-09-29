@@ -9,13 +9,12 @@ import {
   compileComponentSources as compileComponentSourcesWithPolicy,
   createComponentProxyConstants,
   discoverComponentSources,
-  generateComponentProxies as generateComponentProxiesWithPolicy
+  generateComponentProxies as generateComponentProxiesWithPolicy,
 } from "../scripts/lib/component-proxy-generator.mjs";
 
-const componentPolicy = JSON.parse(await readFile(
-  path.resolve("packages/bindings/generated/defold-component-proxy-contract.json"),
-  "utf8"
-));
+const componentPolicy = JSON.parse(
+  await readFile(path.resolve("packages/bindings/generated/defold-component-proxy-contract.json"), "utf8"),
+);
 const componentProxyConstants = createComponentProxyConstants(componentPolicy);
 const compileComponentSources = (options) => compileComponentSourcesWithPolicy({ ...options, componentPolicy });
 const generateComponentProxies = (options) => generateComponentProxiesWithPolicy({ ...options, componentPolicy });
@@ -61,29 +60,34 @@ test("typed .script.ts source generates exact Lua, manifest, and native speciali
   const result = await generateComponentProxies({
     projectRoot: fixtureRoot,
     sourceFiles: [fixtureSource],
-    outputRoot
+    outputRoot,
   });
 
   const cases = [
     ["player.script", "expected/player.script"],
     [".deherm/generated/components/manifest.json", "expected/manifest.json"],
-    [".deherm/generated/components/specializations.json", "expected/specializations.json"]
+    [".deherm/generated/components/specializations.json", "expected/specializations.json"],
   ];
   for (const [actual, expected] of cases) {
     assert.equal(
       await readFile(path.join(outputRoot, actual), "utf8"),
       await readFile(path.join(fixtureRoot, expected), "utf8"),
-      actual
+      actual,
     );
   }
 
   const player = result.manifest.components.find(({ source }) => source === "player.script.ts");
-  const playerSpecialization = result.specializations.components.find(({ componentId }) => componentId === player.componentId);
+  const playerSpecialization = result.specializations.components.find(
+    ({ componentId }) => componentId === player.componentId,
+  );
   assert.equal(result.manifest.components.length, 2);
   assert.equal(player.lifecycleMask, 0b11_1111);
   assert.equal(player.reloadPolicy, "preserve-instance-state");
   assert.equal(playerSpecialization.reloadPolicy, "preserve-instance-state");
-  assert.deepEqual(playerSpecialization.propertySlots.map(({ codecId }) => codecId), [1, 2, 3, 4, 5, 6, 7, 8, 9]);
+  assert.deepEqual(
+    playerSpecialization.propertySlots.map(({ codecId }) => codecId),
+    [1, 2, 3, 4, 5, 6, 7, 8, 9],
+  );
   assert.equal(result.manifest.proxyRuntimeCapability.state, "native-dynamic-hermes-harness-executable");
   assert.equal(result.manifest.proxyRuntimeCapability.runtimeConformant, false);
   const proxy = await readFile(path.join(outputRoot, "player.script"), "utf8");
@@ -100,14 +104,20 @@ test("typed .script.ts source generates exact Lua, manifest, and native speciali
 
 test("render source generates the exact supported proxy without an unavailable final detach", async () => {
   const outputRoot = await temporaryProject();
-  const result = await generateComponentProxies({ projectRoot: fixtureRoot, sourceFiles: [fixtureRenderSource], outputRoot });
+  const result = await generateComponentProxies({
+    projectRoot: fixtureRoot,
+    sourceFiles: [fixtureRenderSource],
+    outputRoot,
+  });
   const proxy = await readFile(path.join(outputRoot, "render.render_script"), "utf8");
   assert.equal(proxy, await readFile(path.join(fixtureRoot, "expected/render.render_script"), "utf8"));
   assert.doesNotMatch(proxy, /function final|function on_input|detachComponent/);
   assert.match(proxy, /teardown-policy: provider-required-unimplemented-no-final-callback/);
   assert.match(proxy, /proxy-runtime: native-dynamic-hermes-harness-executable/);
   const render = result.manifest.components.find(({ source }) => source === "render.render.ts");
-  const renderSpecialization = result.specializations.components.find(({ componentId }) => componentId === render.componentId);
+  const renderSpecialization = result.specializations.components.find(
+    ({ componentId }) => componentId === render.componentId,
+  );
   assert.deepEqual(render.supportedLifecycles, ["init", "update", "onMessage", "onReload"]);
   assert.equal(render.teardownPolicy, "provider-required-unimplemented-no-final-callback");
   assert.equal(renderSpecialization.teardownPolicy, "provider-required-unimplemented-no-final-callback");
@@ -119,17 +129,20 @@ test("class authoring lowers through the same proxy ABI with static properties a
   const result = await generateComponentProxies({
     projectRoot: classFixtureRoot,
     sourceFiles: [classFixtureSource],
-    outputRoot
+    outputRoot,
   });
   const component = result.manifest.components[0];
   const specialization = result.specializations.components[0];
   assert.equal(component.authoringStyle, "class");
   assert.equal(component.className, "ClassPlayer");
   assert.equal(component.lifecycleMask, 0b11_0011);
-  assert.deepEqual(component.properties.map(({ name, kind }) => ({ name, kind })), [
-    { name: "speed", kind: "number" },
-    { name: "team", kind: "hash" }
-  ]);
+  assert.deepEqual(
+    component.properties.map(({ name, kind }) => ({ name, kind })),
+    [
+      { name: "speed", kind: "number" },
+      { name: "team", kind: "hash" },
+    ],
+  );
   assert.equal(specialization.authoringStyle, "class");
   assert.equal(specialization.className, "ClassPlayer");
   const proxy = await readFile(path.join(outputRoot, "class-player.script"), "utf8");
@@ -138,13 +151,25 @@ test("class authoring lowers through the same proxy ABI with static properties a
   assert.match(proxy, /dispatchInput\(self, COMPONENT_ID, action_id, action\)/);
   assert.match(proxy, /dispatchReload\(self, COMPONENT_ID\)/);
 
-  const checked = spawnSync(process.execPath, [
-    path.resolve("node_modules/typescript/bin/tsc"),
-    "--ignoreConfig", "--noEmit", "--strict", "--skipLibCheck",
-    "--target", "ES2020", "--module", "ESNext", "--moduleResolution", "Bundler",
-    classFixtureSource,
-    path.resolve("packages/sdk/src/component.ts")
-  ], { cwd: process.cwd(), encoding: "utf8" });
+  const checked = spawnSync(
+    process.execPath,
+    [
+      path.resolve("node_modules/typescript/bin/tsc"),
+      "--ignoreConfig",
+      "--noEmit",
+      "--strict",
+      "--skipLibCheck",
+      "--target",
+      "ES2020",
+      "--module",
+      "ESNext",
+      "--moduleResolution",
+      "Bundler",
+      classFixtureSource,
+      path.resolve("packages/sdk/src/component.ts"),
+    ],
+    { cwd: process.cwd(), encoding: "utf8" },
+  );
   assert.equal(checked.status, 0, `${checked.stdout}\n${checked.stderr}`);
 });
 
@@ -157,7 +182,7 @@ test("class authoring rejects context mismatch, allocating lifecycle fields, and
         class Player extends GuiComponent {}
         export default component(Player);
       `,
-      error: /class components must extend ScriptComponent/
+      error: /class components must extend ScriptComponent/,
     },
     {
       name: "lifecycle instance field",
@@ -166,7 +191,7 @@ test("class authoring rejects context mismatch, allocating lifecycle fields, and
         class Player extends ScriptComponent { update = (_dt: number): void => {}; }
         export default component(Player);
       `,
-      error: /lifecycle "update" must be a prototype method/
+      error: /lifecycle "update" must be a prototype method/,
     },
     {
       name: "constructor arguments",
@@ -175,23 +200,28 @@ test("class authoring rejects context mismatch, allocating lifecycle fields, and
         class Player extends ScriptComponent { constructor(_value: number) { super(); } }
         export default component(Player);
       `,
-      error: /constructor must accept zero arguments/
-    }
+      error: /constructor must accept zero arguments/,
+    },
   ];
-  for (const fixture of cases) await t.test(fixture.name, async () => {
-    const projectRoot = await temporaryProject();
-    const source = await componentSource(projectRoot, "player.script.ts", fixture.body);
-    await assert.rejects(compileComponentSources({ projectRoot, sourceFiles: [source] }), fixture.error);
-  });
+  for (const fixture of cases)
+    await t.test(fixture.name, async () => {
+      const projectRoot = await temporaryProject();
+      const source = await componentSource(projectRoot, "player.script.ts", fixture.body);
+      await assert.rejects(compileComponentSources({ projectRoot, sourceFiles: [source] }), fixture.error);
+    });
 });
 
 test("class authoring always emits the attach-time initializer needed to construct per-instance state", async () => {
   const projectRoot = await temporaryProject();
-  const source = await componentSource(projectRoot, "constructor-only.script.ts", `
+  const source = await componentSource(
+    projectRoot,
+    "constructor-only.script.ts",
+    `
     import { component, ScriptComponent } from "@ts-defold/deherm/component";
     class ConstructorOnly extends ScriptComponent { value = 1; }
     export default component(ConstructorOnly);
-  `);
+  `,
+  );
   const [compiled] = await compileComponentSources({ projectRoot, sourceFiles: [source] });
   assert.equal(compiled.authoringStyle, "class");
   assert.equal(compiled.lifecycles.init, true);
@@ -200,35 +230,41 @@ test("class authoring always emits the attach-time initializer needed to constru
   await generateComponentProxies({ projectRoot, outputRoot });
   assert.match(
     await readFile(path.join(outputRoot, "constructor-only.script"), "utf8"),
-    /dispatchLifecycle\(self, COMPONENT_ID, "init"\)/
+    /dispatchLifecycle\(self, COMPONENT_ID, "init"\)/,
   );
 });
 
 test("GUI and render lifecycle contracts match pinned Defold function tables", async () => {
   const extract = (source, name) => {
-    const body = source.match(new RegExp(`(?:const|static const) char\\* ${name}\\[[^\\]]*\\]\\s*=\\s*\\{([\\s\\S]*?)\\};`))?.[1];
+    const body = source.match(
+      new RegExp(`(?:const|static const) char\\* ${name}\\[[^\\]]*\\]\\s*=\\s*\\{([\\s\\S]*?)\\};`),
+    )?.[1];
     assert.ok(body, name);
     return [...body.matchAll(/"([a-z_]+)"/g)].map(([, value]) => value);
   };
-  const [guiSource,renderSource]=await Promise.all([
-    readFile(path.resolve("upstream/defold/engine/gui/src/gui.cpp"),"utf8"),
-    readFile(path.resolve("upstream/defold/engine/render/src/render/render_script.cpp"),"utf8")
+  const [guiSource, renderSource] = await Promise.all([
+    readFile(path.resolve("upstream/defold/engine/gui/src/gui.cpp"), "utf8"),
+    readFile(path.resolve("upstream/defold/engine/render/src/render/render_script.cpp"), "utf8"),
   ]);
-  const gui=componentProxyConstants.sourceKinds.find(({suffix})=>suffix===".gui.ts");
-  const render=componentProxyConstants.sourceKinds.find(({suffix})=>suffix===".render.ts");
-  assert.deepEqual(extract(guiSource,"SCRIPT_FUNCTION_NAMES"),gui.lifecycle.engineCallbacks);
-  assert.deepEqual(extract(renderSource,"RENDER_SCRIPT_FUNCTION_NAMES"),render.lifecycle.engineCallbacks);
+  const gui = componentProxyConstants.sourceKinds.find(({ suffix }) => suffix === ".gui.ts");
+  const render = componentProxyConstants.sourceKinds.find(({ suffix }) => suffix === ".render.ts");
+  assert.deepEqual(extract(guiSource, "SCRIPT_FUNCTION_NAMES"), gui.lifecycle.engineCallbacks);
+  assert.deepEqual(extract(renderSource, "RENDER_SCRIPT_FUNCTION_NAMES"), render.lifecycle.engineCallbacks);
 });
 
 test("source-derived script callbacks lower late and fixed update without moving existing ABI slots", async () => {
   const projectRoot = await temporaryProject();
-  const source = await componentSource(projectRoot, "timing.script.ts", `
+  const source = await componentSource(
+    projectRoot,
+    "timing.script.ts",
+    `
 import { defineComponent } from "@ts-defold/deherm/component";
 export default defineComponent({
   lateUpdate(_self: unknown, _dt: number): void {},
   fixedUpdate(_self: unknown, _dt: number): void {},
 });
-`);
+`,
+  );
   const result = await generateComponentProxies({ projectRoot, sourceFiles: [source] });
   const proxy = await readFile(path.join(projectRoot, "timing.script"), "utf8");
   assert.match(proxy, /function late_update\(self, dt\)[\s\S]*?"lateUpdate", dt\)/);
@@ -251,8 +287,9 @@ test("a future Defold callback is reported as unsupported instead of disappearin
 test("policy-defined resource property tokens select the same stable codec without package aliases", () => {
   for (const resourceToken of ["resource", "resource_data", "future_asset_reference"]) {
     const revisionPolicy = structuredClone(componentPolicy);
-    revisionPolicy.property.valueTypes = revisionPolicy.property.valueTypes
-      .filter((name) => name !== "resource" && name !== "resource_data");
+    revisionPolicy.property.valueTypes = revisionPolicy.property.valueTypes.filter(
+      (name) => name !== "resource" && name !== "resource_data",
+    );
     delete revisionPolicy.property.valueTypeCodecs.resource;
     delete revisionPolicy.property.valueTypeCodecs.resource_data;
     revisionPolicy.property.valueTypes.push(resourceToken);
@@ -267,8 +304,7 @@ test("policy-defined resource property tokens select the same stable codec witho
 test("legacy component policy infers unknown property tokens as resource without a spelling allowlist", () => {
   const legacyPolicy = structuredClone(componentPolicy);
   delete legacyPolicy.property.valueTypeCodecs;
-  legacyPolicy.property.valueTypes = legacyPolicy.property.valueTypes
-    .filter((name) => name !== "resource_data");
+  legacyPolicy.property.valueTypes = legacyPolicy.property.valueTypes.filter((name) => name !== "resource_data");
   legacyPolicy.property.valueTypes.push("historical_resource_reference");
   const constants = createComponentProxyConstants(legacyPolicy);
   assert.equal(constants.propertyTypeCodecs.historical_resource_reference, "resource");
@@ -295,33 +331,45 @@ test("a policy-added resource constructor is usable through the stable generic r
     authoringName: "mesh",
     engineName: "mesh",
     route: "resource.mesh",
-    source: "synthetic-future-revision:1"
+    source: "synthetic-future-revision:1",
   });
   const projectRoot = await temporaryProject();
-  const source = await componentSource(projectRoot, "mesh.script.ts", `
+  const source = await componentSource(
+    projectRoot,
+    "mesh.script.ts",
+    `
 import { defineComponent, property } from "@ts-defold/deherm/component";
 export default defineComponent({
   properties: { model: property.resource("mesh", "/assets/tank.mesh") },
 });
-`);
+`,
+  );
   const [component] = await compileComponentSourcesWithPolicy({
     projectRoot,
     sourceFiles: [source],
-    componentPolicy: futurePolicy
+    componentPolicy: futurePolicy,
   });
   assert.equal(component.properties[0].resourceKind, "mesh");
   assert.equal(component.properties[0].luaDefault, 'resource.mesh("/assets/tank.mesh")');
 });
 
 test("render components reject lifecycle hooks Defold never calls", async (t) => {
-  for(const lifecycle of ["final","onInput"])await t.test(lifecycle,async()=>{
-    const projectRoot=await temporaryProject();
-    const source=await componentSource(projectRoot,"invalid.render.ts",`
+  for (const lifecycle of ["final", "onInput"])
+    await t.test(lifecycle, async () => {
+      const projectRoot = await temporaryProject();
+      const source = await componentSource(
+        projectRoot,
+        "invalid.render.ts",
+        `
       import { defineComponent } from "@ts-defold/deherm/component";
       export default defineComponent({ ${lifecycle}(): void {} });
-    `);
-    await assert.rejects(compileComponentSources({projectRoot,sourceFiles:[source]}),new RegExp(`render_script components do not support lifecycle "${lifecycle}"`));
-  });
+    `,
+      );
+      await assert.rejects(
+        compileComponentSources({ projectRoot, sourceFiles: [source] }),
+        new RegExp(`render_script components do not support lifecycle "${lifecycle}"`),
+      );
+    });
 });
 
 test("authored suffixes route deterministically to Defold component proxies and plain TypeScript stays plain", async () => {
@@ -330,42 +378,98 @@ test("authored suffixes route deterministically to Defold component proxies and 
     await componentSource(projectRoot, "game/player.script.ts", minimalComponent()),
     await componentSource(projectRoot, "game/hud.gui.ts", minimalContextComponent()),
     await componentSource(projectRoot, "game/legacy.gui_script.ts", minimalContextComponent()),
-    await componentSource(projectRoot, "game/main.render.ts", minimalContextComponent())
+    await componentSource(projectRoot, "game/main.render.ts", minimalContextComponent()),
   ];
   await componentSource(projectRoot, "game/math.ts", "export const add = (a: number, b: number) => a + b;\n");
 
   const discovered = await discoverComponentSources(projectRoot);
-  assert.deepEqual(discovered.map((file) => path.relative(projectRoot, file)), [
-    "game/hud.gui.ts", "game/legacy.gui_script.ts", "game/main.render.ts", "game/player.script.ts"
-  ]);
+  assert.deepEqual(
+    discovered.map((file) => path.relative(projectRoot, file)),
+    ["game/hud.gui.ts", "game/legacy.gui_script.ts", "game/main.render.ts", "game/player.script.ts"],
+  );
   const firstOutput = await temporaryProject();
   const secondOutput = await temporaryProject();
-  const first = await generateComponentProxies({ projectRoot, sourceFiles: files.toReversed(), outputRoot: firstOutput });
+  const first = await generateComponentProxies({
+    projectRoot,
+    sourceFiles: files.toReversed(),
+    outputRoot: firstOutput,
+  });
   const second = await generateComponentProxies({ projectRoot, sourceFiles: files, outputRoot: secondOutput });
   assert.equal(
     await readFile(path.join(firstOutput, ".deherm/generated/components/manifest.json"), "utf8"),
-    await readFile(path.join(secondOutput, ".deherm/generated/components/manifest.json"), "utf8")
+    await readFile(path.join(secondOutput, ".deherm/generated/components/manifest.json"), "utf8"),
   );
   assert.equal(
     await readFile(path.join(firstOutput, ".deherm/generated/components/registry.ts"), "utf8"),
-    await readFile(path.join(secondOutput, ".deherm/generated/components/registry.ts"), "utf8")
+    await readFile(path.join(secondOutput, ".deherm/generated/components/registry.ts"), "utf8"),
   );
-  assert.deepEqual(first.manifest.sourceConventions, componentProxyConstants.sourceKinds.map(({ suffix, canonicalSuffix, proxySuffix, proxyKind, contextKind, supportsProperties, legacy, lifecycle }) => ({
-    authoredSuffix: suffix, canonicalAuthoredSuffix: canonicalSuffix, proxySuffix, proxyKind, contextKind, supportsProperties, legacy,
-    supportedLifecycles: lifecycle.supported, teardownPolicy: lifecycle.teardownPolicy, ...(lifecycle.evidence ? { lifecycleEvidence: lifecycle.evidence } : {})
-  })));
-  assert.deepEqual(first.manifest.components.map(({ source, proxy, proxyKind, contextKind, legacyAuthoredSuffix }) => ({ source, proxy, proxyKind, contextKind, legacyAuthoredSuffix })), [
-    { source: "game/hud.gui.ts", proxy: "game/hud.gui_script", proxyKind: "gui_script", contextKind: "gui-scene", legacyAuthoredSuffix: false },
-    { source: "game/legacy.gui_script.ts", proxy: "game/legacy.gui_script", proxyKind: "gui_script", contextKind: "gui-scene", legacyAuthoredSuffix: true },
-    { source: "game/main.render.ts", proxy: "game/main.render_script", proxyKind: "render_script", contextKind: "render-instance+graphics", legacyAuthoredSuffix: false },
-    { source: "game/player.script.ts", proxy: "game/player.script", proxyKind: "script", contextKind: "game-object", legacyAuthoredSuffix: false }
-  ]);
-  for(const proxy of ["game/player.script", "game/hud.gui_script", "game/legacy.gui_script", "game/main.render_script"]) {
+  assert.deepEqual(
+    first.manifest.sourceConventions,
+    componentProxyConstants.sourceKinds.map(
+      ({ suffix, canonicalSuffix, proxySuffix, proxyKind, contextKind, supportsProperties, legacy, lifecycle }) => ({
+        authoredSuffix: suffix,
+        canonicalAuthoredSuffix: canonicalSuffix,
+        proxySuffix,
+        proxyKind,
+        contextKind,
+        supportsProperties,
+        legacy,
+        supportedLifecycles: lifecycle.supported,
+        teardownPolicy: lifecycle.teardownPolicy,
+        ...(lifecycle.evidence ? { lifecycleEvidence: lifecycle.evidence } : {}),
+      }),
+    ),
+  );
+  assert.deepEqual(
+    first.manifest.components.map(({ source, proxy, proxyKind, contextKind, legacyAuthoredSuffix }) => ({
+      source,
+      proxy,
+      proxyKind,
+      contextKind,
+      legacyAuthoredSuffix,
+    })),
+    [
+      {
+        source: "game/hud.gui.ts",
+        proxy: "game/hud.gui_script",
+        proxyKind: "gui_script",
+        contextKind: "gui-scene",
+        legacyAuthoredSuffix: false,
+      },
+      {
+        source: "game/legacy.gui_script.ts",
+        proxy: "game/legacy.gui_script",
+        proxyKind: "gui_script",
+        contextKind: "gui-scene",
+        legacyAuthoredSuffix: true,
+      },
+      {
+        source: "game/main.render.ts",
+        proxy: "game/main.render_script",
+        proxyKind: "render_script",
+        contextKind: "render-instance+graphics",
+        legacyAuthoredSuffix: false,
+      },
+      {
+        source: "game/player.script.ts",
+        proxy: "game/player.script",
+        proxyKind: "script",
+        contextKind: "game-object",
+        legacyAuthoredSuffix: false,
+      },
+    ],
+  );
+  for (const proxy of [
+    "game/player.script",
+    "game/hud.gui_script",
+    "game/legacy.gui_script",
+    "game/main.render_script",
+  ]) {
     assert.match(await readFile(path.join(firstOutput, proxy), "utf8"), /^-- @generated by/);
   }
   await assert.rejects(
     compileComponentSources({ projectRoot, sourceFiles: [path.join(projectRoot, "game/math.ts")] }),
-    /must end in \.script\.ts, \.gui\.ts, \.render\.ts, or legacy \.gui_script\.ts/
+    /must end in \.script\.ts, \.gui\.ts, \.render\.ts, or legacy \.gui_script\.ts/,
   );
   assert.equal(second.manifest.components.length, 4);
 });
@@ -376,7 +480,7 @@ test("canonical .gui.ts and legacy .gui_script.ts may not target the same proxy"
   const legacy = await componentSource(projectRoot, "hud.gui_script.ts", minimalContextComponent());
   await assert.rejects(
     compileComponentSources({ projectRoot, sourceFiles: [legacy, canonical] }),
-    /both generate hud\.gui_script; prefer canonical hud\.gui\.ts/
+    /both generate hud\.gui_script; prefer canonical hud\.gui\.ts/,
   );
 });
 
@@ -386,52 +490,62 @@ test("explicit inputs still compile the full inventory and cannot hide proxy col
   await componentSource(projectRoot, "second.script.ts", minimalComponent());
   const outputRoot = await temporaryProject();
   const generated = await generateComponentProxies({ projectRoot, sourceFiles: [first], outputRoot });
-  assert.deepEqual(generated.manifest.components.map(({ source }) => source), ["first.script.ts", "second.script.ts"]);
+  assert.deepEqual(
+    generated.manifest.components.map(({ source }) => source),
+    ["first.script.ts", "second.script.ts"],
+  );
 
   await componentSource(projectRoot, "hud.gui.ts", minimalContextComponent());
   const legacy = await componentSource(projectRoot, "hud.gui_script.ts", minimalContextComponent());
   await assert.rejects(
     generateComponentProxies({ projectRoot, sourceFiles: [legacy], outputRoot }),
-    /both generate hud\.gui_script; prefer canonical hud\.gui\.ts/
+    /both generate hud\.gui_script; prefer canonical hud\.gui\.ts/,
   );
 });
 
 test("the authored component fixture passes the TypeScript 7 type checker", () => {
   const tsc = path.resolve("node_modules/typescript/bin/tsc");
-  const result = spawnSync(process.execPath, [
-    tsc,
-    "--ignoreConfig",
-    "--noEmit",
-    "--strict",
-    "--skipLibCheck",
-    "--target", "ES2020",
-    "--module", "ESNext",
-    "--moduleResolution", "Bundler",
-    path.join(fixtureRoot, "component-api.d.ts"),
-    fixtureSource
-  ], { cwd: process.cwd(), encoding: "utf8" });
+  const result = spawnSync(
+    process.execPath,
+    [
+      tsc,
+      "--ignoreConfig",
+      "--noEmit",
+      "--strict",
+      "--skipLibCheck",
+      "--target",
+      "ES2020",
+      "--module",
+      "ESNext",
+      "--moduleResolution",
+      "Bundler",
+      path.join(fixtureRoot, "component-api.d.ts"),
+      fixtureSource,
+    ],
+    { cwd: process.cwd(), encoding: "utf8" },
+  );
   assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
 });
 
 test("War Battles sources type-check against the shipped component API and proxies stay fresh", async () => {
   const tsc = path.resolve("node_modules/typescript/bin/tsc");
-  const checked = spawnSync(process.execPath, [
-    tsc,
-    "--project", path.join(warBattlesRoot, "tsconfig.json"),
-    "--pretty", "false"
-  ], { cwd: process.cwd(), encoding: "utf8" });
+  const checked = spawnSync(
+    process.execPath,
+    [tsc, "--project", path.join(warBattlesRoot, "tsconfig.json"), "--pretty", "false"],
+    { cwd: process.cwd(), encoding: "utf8" },
+  );
   assert.equal(checked.status, 0, `${checked.stdout}\n${checked.stderr}`);
   const outputRoot = await temporaryProject("deherm-war-battles-proxies-");
   const generated = await generateComponentProxies({
     projectRoot: warBattlesRoot,
-    outputRoot
+    outputRoot,
   });
   assert.equal(generated.manifest.components.length, 3);
   for (const component of generated.manifest.components) {
     assert.equal(
       await readFile(path.join(outputRoot, component.proxy), "utf8"),
       await readFile(path.join(warBattlesRoot, component.proxy), "utf8"),
-      component.proxy
+      component.proxy,
     );
   }
 });
@@ -446,7 +560,7 @@ test("check mode is a strict freshness gate and normal generation repairs marked
   await writeFile(proxy, `${await readFile(proxy, "utf8")}-- stale\n`, "utf8");
   await assert.rejects(
     generateComponentProxies({ ...options, check: true }),
-    /component proxy outputs are missing or stale:[\s\S]*player\.script/
+    /component proxy outputs are missing or stale:[\s\S]*player\.script/,
   );
 
   await generateComponentProxies(options);
@@ -462,7 +576,11 @@ test("component body edits update provenance without invalidating the Defold pro
   const proxy = path.join(projectRoot, "player.script");
   const originalProxy = await readFile(proxy, "utf8");
 
-  await writeFile(source, minimalComponent("property.number(1)", "const implementationOnly = 2; void implementationOnly;"), "utf8");
+  await writeFile(
+    source,
+    minimalComponent("property.number(1)", "const implementationOnly = 2; void implementationOnly;"),
+    "utf8",
+  );
   const implementationEdit = await generateComponentProxies({ projectRoot });
   assert.deepEqual(implementationEdit.defoldResourceStale, []);
   assert.ok(implementationEdit.stale.some((file) => file.endsWith("manifest.json")));
@@ -483,7 +601,7 @@ test("full-inventory reconciliation reports and removes only owned orphan proxie
 
   await assert.rejects(
     generateComponentProxies({ projectRoot, check: true }),
-    /component proxy outputs are missing or stale:[\s\S]*retired\.script/
+    /component proxy outputs are missing or stale:[\s\S]*retired\.script/,
   );
   await generateComponentProxies({ projectRoot });
   await assert.rejects(readFile(proxy, "utf8"), /ENOENT/);
@@ -500,7 +618,7 @@ test("orphan reconciliation never deletes a proxy whose ownership headers were r
 
   await assert.rejects(
     generateComponentProxies({ projectRoot }),
-    /refusing to delete a \.script, \.gui_script, or \.render_script file without complete Deherm ownership headers/
+    /refusing to delete a \.script, \.gui_script, or \.render_script file without complete Deherm ownership headers/,
   );
   assert.equal(await readFile(proxy, "utf8"), "-- user-owned replacement\n");
 });
@@ -525,32 +643,37 @@ test("generator refuses to overwrite user-owned script, GUI, and render proxies"
   for (const fixture of [
     { source: "player.script.ts", proxy: "player.script", body: minimalComponent() },
     { source: "hud.gui.ts", proxy: "hud.gui_script", body: minimalContextComponent() },
-    { source: "main.render.ts", proxy: "main.render_script", body: minimalContextComponent() }
-  ]) await t.test(fixture.proxy, async () => {
-    const projectRoot = await temporaryProject();
-    const source = await componentSource(projectRoot, fixture.source, fixture.body);
-    await writeFile(path.join(projectRoot, fixture.proxy), "-- user-owned gameplay\n", "utf8");
-    await assert.rejects(
-      generateComponentProxies({ projectRoot, sourceFiles: [source] }),
-      /refusing to overwrite a \.script, \.gui_script, or \.render_script file without complete Deherm ownership headers/
-    );
-    assert.equal(await readFile(path.join(projectRoot, fixture.proxy), "utf8"), "-- user-owned gameplay\n");
-  });
+    { source: "main.render.ts", proxy: "main.render_script", body: minimalContextComponent() },
+  ])
+    await t.test(fixture.proxy, async () => {
+      const projectRoot = await temporaryProject();
+      const source = await componentSource(projectRoot, fixture.source, fixture.body);
+      await writeFile(path.join(projectRoot, fixture.proxy), "-- user-owned gameplay\n", "utf8");
+      await assert.rejects(
+        generateComponentProxies({ projectRoot, sourceFiles: [source] }),
+        /refusing to overwrite a \.script, \.gui_script, or \.render_script file without complete Deherm ownership headers/,
+      );
+      assert.equal(await readFile(path.join(projectRoot, fixture.proxy), "utf8"), "-- user-owned gameplay\n");
+    });
 });
 
 test("generator refuses to transfer a marked proxy between component owners", async () => {
   const projectRoot = await temporaryProject();
   await componentSource(projectRoot, "player.script.ts", minimalComponent());
   const proxy = path.join(projectRoot, "player.script");
-  await writeFile(proxy, [
-    componentProxyConstants.generatedMarker,
-    "-- source: another.script.ts",
-    `-- component-id: ${componentProxyConstants.componentIdNamespace}/${"0".repeat(64)}`,
-    ""
-  ].join("\n"), "utf8");
+  await writeFile(
+    proxy,
+    [
+      componentProxyConstants.generatedMarker,
+      "-- source: another.script.ts",
+      `-- component-id: ${componentProxyConstants.componentIdNamespace}/${"0".repeat(64)}`,
+      "",
+    ].join("\n"),
+    "utf8",
+  );
   await assert.rejects(
     generateComponentProxies({ projectRoot }),
-    /refusing to overwrite proxy owned by another\.script\.ts/
+    /refusing to overwrite proxy owned by another\.script\.ts/,
   );
   assert.match(await readFile(proxy, "utf8"), /source: another\.script\.ts/);
 });
@@ -560,17 +683,17 @@ test("property schema parsing fails closed for expressions, unknown codecs, URL 
     {
       name: "nonliteral number",
       source: minimalComponent("property.number(DEFAULT_SPEED)", "const DEFAULT_SPEED = 12;"),
-      error: /expected a numeric literal/
+      error: /expected a numeric literal/,
     },
     {
       name: "unknown property kind",
       source: minimalComponent('property.color("red")'),
-      error: /unsupported property kind/
+      error: /unsupported property kind/,
     },
     {
       name: "nonempty URL default",
       source: minimalComponent('property.url("#enemy")'),
-      error: /expected 0 arguments, received 1/
+      error: /expected 0 arguments, received 1/,
     },
     {
       name: "spread property schema",
@@ -579,7 +702,7 @@ test("property schema parsing fails closed for expressions, unknown codecs, URL 
         const base = { speed: property.number(1) };
         export default defineComponent({ properties: { ...base } });
       `,
-      error: /only explicit property assignments and methods are supported/
+      error: /only explicit property assignments and methods are supported/,
     },
     {
       name: "unsafe Lua field",
@@ -587,7 +710,7 @@ test("property schema parsing fails closed for expressions, unknown codecs, URL 
         import { defineComponent, property } from "@ts-defold/deherm/component";
         export default defineComponent({ properties: { "bad-name": property.number(1) } });
       `,
-      error: /name must be a Lua-safe identifier/
+      error: /name must be a Lua-safe identifier/,
     },
     {
       name: "unknown component member",
@@ -595,7 +718,7 @@ test("property schema parsing fails closed for expressions, unknown codecs, URL 
         import { defineComponent } from "@ts-defold/deherm/component";
         export default defineComponent({ initialise() {} });
       `,
-      error: /unsupported component member "initialise"/
+      error: /unsupported component member "initialise"/,
     },
     {
       name: "async lifecycle",
@@ -603,8 +726,8 @@ test("property schema parsing fails closed for expressions, unknown codecs, URL 
         import { defineComponent } from "@ts-defold/deherm/component";
         export default defineComponent({ async update() {} });
       `,
-      error: /lifecycle must be synchronous/
-    }
+      error: /lifecycle must be synchronous/,
+    },
   ];
 
   for (const fixture of cases) {
@@ -622,7 +745,10 @@ test("component IDs are stable by normalized project path and distinct for diffe
   const b = await componentSource(projectRoot, "enemies/player.script.ts", minimalComponent("property.number(1)"));
   const initial = await compileComponentSources({ projectRoot, sourceFiles: [b, a] });
 
-  assert.deepEqual(initial.map(({ source }) => source), ["actors/player.script.ts", "enemies/player.script.ts"]);
+  assert.deepEqual(
+    initial.map(({ source }) => source),
+    ["actors/player.script.ts", "enemies/player.script.ts"],
+  );
   assert.notEqual(initial[0].componentId, initial[1].componentId);
   assert.match(initial[0].componentId, /^deherm\.component\/v1\/[a-f0-9]{64}$/);
 
@@ -642,19 +768,22 @@ test("discovery is deterministic and skips generated, dependency, build, and sym
   await componentSource(projectRoot, "node_modules/ignored.script.ts", minimalComponent());
 
   const discovered = await discoverComponentSources(projectRoot);
-  assert.deepEqual(discovered.map((file) => path.relative(projectRoot, file)), ["nested/a.script.ts", "z.script.ts"]);
+  assert.deepEqual(
+    discovered.map((file) => path.relative(projectRoot, file)),
+    ["nested/a.script.ts", "z.script.ts"],
+  );
 });
 
 test("inventory ordering uses locale-independent code-unit order", async () => {
   const projectRoot = await temporaryProject();
   const names = ["a_thing.script.ts", "a-thing.script.ts", "A.script.ts", "ä.script.ts", "z.script.ts"];
   for (const name of names) await componentSource(projectRoot, name, minimalComponent());
-  const generated = await generateComponentProxies({ projectRoot, sourceFiles: names.toReversed().map((name) => path.join(projectRoot, name)) });
-  assert.deepEqual(generated.manifest.components.map(({ source }) => source), [
-    "A.script.ts",
-    "a-thing.script.ts",
-    "a_thing.script.ts",
-    "z.script.ts",
-    "ä.script.ts"
-  ]);
+  const generated = await generateComponentProxies({
+    projectRoot,
+    sourceFiles: names.toReversed().map((name) => path.join(projectRoot, name)),
+  });
+  assert.deepEqual(
+    generated.manifest.components.map(({ source }) => source),
+    ["A.script.ts", "a-thing.script.ts", "a_thing.script.ts", "z.script.ts", "ä.script.ts"],
+  );
 });

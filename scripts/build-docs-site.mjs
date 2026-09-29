@@ -8,11 +8,8 @@ import { fileURLToPath } from "node:url";
 export const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 export const defaultOutputDirectory = path.join(repositoryRoot, "build", "docs-site");
 
-const html = (value) => String(value)
-  .replaceAll("&", "&amp;")
-  .replaceAll("<", "&lt;")
-  .replaceAll(">", "&gt;")
-  .replaceAll('"', "&quot;");
+const html = (value) =>
+  String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
 const digest = (value) => createHash("sha256").update(value).digest("hex");
 const json = (value) => JSON.stringify(value, null, 2);
 const compactBytes = (value) => {
@@ -42,8 +39,15 @@ function renderPage({ site, metrics, quickStartSource }) {
   const existingCommands = renderCommands(site.quickStart.existingProject.commands);
   const release = metrics.release;
   const transport = metrics.transport;
-  const overheadPercent = ((release.nativeArm64Macos.engineOverheadBytes / release.nativeArm64Macos.stockDefoldEngineBytes) * 100).toFixed(0);
-  const webOverheadPercent = ((release.browserWasmWeb.engineShellOverheadBytes / (release.browserWasmWeb.stockDefoldEngineWasmBytes + release.browserWasmWeb.stockDefoldEngineJavaScriptBytes)) * 100).toFixed(0);
+  const overheadPercent = (
+    (release.nativeArm64Macos.engineOverheadBytes / release.nativeArm64Macos.stockDefoldEngineBytes) *
+    100
+  ).toFixed(0);
+  const webOverheadPercent = (
+    (release.browserWasmWeb.engineShellOverheadBytes /
+      (release.browserWasmWeb.stockDefoldEngineWasmBytes + release.browserWasmWeb.stockDefoldEngineJavaScriptBytes)) *
+    100
+  ).toFixed(0);
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -128,14 +132,17 @@ export async function buildDocsSite({ output = defaultOutputDirectory } = {}) {
     readJson("packages/bindings/generated/defold-dmsdk-accounting.json"),
     readJson("docs/site/evidence/release-sizes.json"),
     readJson("docs/site/evidence/transport-overhead.json"),
-    readJson("examples/war-battles-online/evidence/vscode-live-values.json")
+    readJson("examples/war-battles-online/evidence/vscode-live-values.json"),
   ]);
   const quickStartSource = await readText("docs/site/quick-start.script.ts");
   const metrics = {
     schemaVersion: 2,
     packageVersion: packageJson.value.version,
     defoldRevision: scriptAccounting.value.defoldRevision,
-    surface: { scriptFunctions: scriptAccounting.value.functionCount, dmsdkDeclarations: dmsdkAccounting.value.declarationCount },
+    surface: {
+      scriptFunctions: scriptAccounting.value.functionCount,
+      dmsdkDeclarations: dmsdkAccounting.value.declarationCount,
+    },
     release: release.value,
     transport: transport.value,
     editor: { vscodeEvidenceKey: vscode.value.evidenceKey, screenshot: vscode.value.screenshot },
@@ -145,15 +152,22 @@ export async function buildDocsSite({ output = defaultOutputDirectory } = {}) {
       source("packages/bindings/generated/defold-dmsdk-accounting.json", dmsdkAccounting),
       source("docs/site/evidence/release-sizes.json", release),
       source("docs/site/evidence/transport-overhead.json", transport),
-      source("examples/war-battles-online/evidence/vscode-live-values.json", vscode)
+      source("examples/war-battles-online/evidence/vscode-live-values.json", vscode),
     ],
-    evidenceBoundary: "Only release bundle records and unprofiled Release transport benchmarks are presented as size or overhead evidence. Development artifacts, repository totals, and CI cache sizes are excluded."
+    evidenceBoundary:
+      "Only release bundle records and unprofiled Release transport benchmarks are presented as size or overhead evidence. Development artifacts, repository totals, and CI cache sizes are excluded.",
   };
   await mkdir(path.join(output, "assets"), { recursive: true });
   await Promise.all([
-    copyFile(path.join(repositoryRoot, "docs/assets/brand/deherm-dev-tui-preview-150x48.png"), path.join(output, "assets/deherm-tui.png")),
-    copyFile(path.join(repositoryRoot, "examples/war-battles-online/evidence/vscode-live-values.png"), path.join(output, "assets/vscode-live-values.png")),
-    copyFile(path.join(repositoryRoot, "docs/assets/brand/deherm-og.png"), path.join(output, "assets/deherm-og.png"))
+    copyFile(
+      path.join(repositoryRoot, "docs/assets/brand/deherm-dev-tui-preview-150x48.png"),
+      path.join(output, "assets/deherm-tui.png"),
+    ),
+    copyFile(
+      path.join(repositoryRoot, "examples/war-battles-online/evidence/vscode-live-values.png"),
+      path.join(output, "assets/vscode-live-values.png"),
+    ),
+    copyFile(path.join(repositoryRoot, "docs/assets/brand/deherm-og.png"), path.join(output, "assets/deherm-og.png")),
   ]);
   await writeFile(path.join(output, "index.html"), renderPage({ site, metrics, quickStartSource }));
   await writeFile(path.join(output, "metrics.json"), `${json(metrics)}\n`);

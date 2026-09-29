@@ -29,9 +29,9 @@ async function writeValuePlan(directory, irPath, shapesPath) {
     enumValue: join(repositoryRoot, "packages/bindings/overrides/dmsdk-enum-value-bindings.json"),
     namedScalar: join(repositoryRoot, "packages/bindings/overrides/dmsdk-named-scalar-policies.json"),
   };
-  const texts = Object.fromEntries(await Promise.all(
-    Object.entries(paths).map(async ([key, path]) => [key, await readFile(path, "utf8")]),
-  ));
+  const texts = Object.fromEntries(
+    await Promise.all(Object.entries(paths).map(async ([key, path]) => [key, await readFile(path, "utf8")])),
+  );
   const plan = buildDmSdkValuePlan({
     ir: JSON.parse(texts.ir),
     shapes: JSON.parse(texts.shapes),

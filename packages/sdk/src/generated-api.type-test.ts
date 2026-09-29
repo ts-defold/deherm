@@ -7,7 +7,7 @@ import {
   type DmReadonlyPointer,
   type DmSdkTypes,
   type Vector3,
-  vmath
+  vmath,
 } from "./index";
 
 const position: Vector3 = vmath.vector3(10, 20, 0);

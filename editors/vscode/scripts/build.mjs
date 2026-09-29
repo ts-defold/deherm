@@ -18,5 +18,5 @@ await build({
   minify: true,
   sourcemap: false,
   external: ["vscode"],
-  logLevel: "info"
+  logLevel: "info",
 });

@@ -4,10 +4,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import {
-  buildDmSdkHashStatePlan,
-  indexDmSdkHashStatePlan,
-} from "../packages/compiler/src/dmsdk-hash-state-plan.mjs";
+import { buildDmSdkHashStatePlan, indexDmSdkHashStatePlan } from "../packages/compiler/src/dmsdk-hash-state-plan.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const sources = Object.freeze({
@@ -19,9 +16,11 @@ const sources = Object.freeze({
 const output = "packages/bindings/generated/defold-dmsdk-hash-state-plan.json";
 
 export async function generateDmSdkHashStatePlan({ root: outputRoot = root, check = false } = {}) {
-  const texts = Object.fromEntries(await Promise.all(
-    Object.entries(sources).map(async ([key, source]) => [key, await readFile(resolve(outputRoot, source), "utf8")]),
-  ));
+  const texts = Object.fromEntries(
+    await Promise.all(
+      Object.entries(sources).map(async ([key, source]) => [key, await readFile(resolve(outputRoot, source), "utf8")]),
+    ),
+  );
   const plan = buildDmSdkHashStatePlan({
     ir: JSON.parse(texts.ir),
     shapes: JSON.parse(texts.shapes),
@@ -33,7 +32,7 @@ export async function generateDmSdkHashStatePlan({ root: outputRoot = root, chec
   const content = `${JSON.stringify(plan, null, 2)}\n`;
   const destination = resolve(outputRoot, output);
   if (check) {
-    if (await readFile(destination, "utf8") !== content) throw new Error(`${output} is stale`);
+    if ((await readFile(destination, "utf8")) !== content) throw new Error(`${output} is stale`);
   } else {
     await mkdir(dirname(destination), { recursive: true });
     await writeFile(destination, content);

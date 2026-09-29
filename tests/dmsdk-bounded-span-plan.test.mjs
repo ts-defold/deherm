@@ -38,7 +38,10 @@ test("one authenticated bounded-span plan owns every family emitter decision", a
   }
   assert.deepEqual(
     [...emitted].sort(),
-    plan.decisions.filter(({ fallback }) => !fallback).map(({ declarationId }) => declarationId).sort(),
+    plan.decisions
+      .filter(({ fallback }) => !fallback)
+      .map(({ declarationId }) => declarationId)
+      .sort(),
   );
 });
 

@@ -33,12 +33,32 @@ export const DEFOLD_REVISION_PATTERN = /^[0-9a-f]{40}$/;
 // disagrees is just out of date.
 export const defoldRevisionSources = Object.freeze([
   Object.freeze({ id: "explicit-option", authority: "live", cost: "cheap", label: "--defold-sdk" }),
-  Object.freeze({ id: "editor-hook", authority: "live", cost: "cheap", label: "DEHERM_DEFOLD_ENGINE_SHA1 (Defold editor hook)" }),
+  Object.freeze({
+    id: "editor-hook",
+    authority: "live",
+    cost: "cheap",
+    label: "DEHERM_DEFOLD_ENGINE_SHA1 (Defold editor hook)",
+  }),
   Object.freeze({ id: "bob-version", authority: "live", cost: "expensive", label: "the configured Bob jar" }),
-  Object.freeze({ id: "game-project", authority: "declared", cost: "cheap", label: "game.project [defold_hermes] defold_sdk" }),
-  Object.freeze({ id: "dependency-url", authority: "declared", cost: "cheap", label: "a game.project dependency naming a Defold archive" }),
-  Object.freeze({ id: "extender-build", authority: "historical", cost: "expensive", label: ".internal/cache/<platform>/build.zip build log" }),
-  Object.freeze({ id: "deherm-lock", authority: "historical", cost: "cheap", label: "deherm.lock" })
+  Object.freeze({
+    id: "game-project",
+    authority: "declared",
+    cost: "cheap",
+    label: "game.project [defold_hermes] defold_sdk",
+  }),
+  Object.freeze({
+    id: "dependency-url",
+    authority: "declared",
+    cost: "cheap",
+    label: "a game.project dependency naming a Defold archive",
+  }),
+  Object.freeze({
+    id: "extender-build",
+    authority: "historical",
+    cost: "expensive",
+    label: ".internal/cache/<platform>/build.zip build log",
+  }),
+  Object.freeze({ id: "deherm-lock", authority: "historical", cost: "cheap", label: "deherm.lock" }),
 ]);
 
 const sourceRank = new Map(defoldRevisionSources.map((source, index) => [source.id, index]));
@@ -147,8 +167,12 @@ function runCapture(command, args, timeoutMs) {
     timer.unref?.();
     child.stdout.setEncoding("utf8");
     child.stderr.setEncoding("utf8");
-    child.stdout.on("data", (chunk) => { stdout += chunk; });
-    child.stderr.on("data", (chunk) => { stderr += chunk; });
+    child.stdout.on("data", (chunk) => {
+      stdout += chunk;
+    });
+    child.stderr.on("data", (chunk) => {
+      stderr += chunk;
+    });
     child.on("error", (error) => {
       if (settled) return;
       settled = true;
@@ -168,7 +192,7 @@ async function resolveJava(options) {
   const candidates = [
     options.java,
     options.env?.DEHERM_JAVA,
-    options.env?.JAVA_HOME ? path.join(options.env.JAVA_HOME, "bin", "java") : undefined
+    options.env?.JAVA_HOME ? path.join(options.env.JAVA_HOME, "bin", "java") : undefined,
   ].filter(Boolean);
   for (const candidate of candidates) if (await exists(candidate, constants.X_OK)) return candidate;
   return "java";
@@ -182,14 +206,18 @@ async function observeBob(projectRoot, options, diagnostics) {
   const java = await resolveJava(options);
   const observations = [];
   for (const jar of jars) {
-    const result = await (options.runBobVersion ?? runCapture)(java, ["-jar", jar, "--version"], options.bobTimeoutMs ?? 30_000);
+    const result = await (options.runBobVersion ?? runCapture)(
+      java,
+      ["-jar", jar, "--version"],
+      options.bobTimeoutMs ?? 30_000,
+    );
     const text = `${result.stdout ?? ""}\n${result.stderr ?? ""}`;
     const match = /sha1\s*[:=]?\s*([0-9a-f]{40})/i.exec(text);
     if (!match) {
       diagnostics.push({
         severity: "warning",
         source: "bob-version",
-        message: `${path.basename(jar)} did not report an engine sha1${result.ok ? "" : ` (${result.message})`}; it was not used to resolve the Defold revision`
+        message: `${path.basename(jar)} did not report an engine sha1${result.ok ? "" : ` (${result.message})`}; it was not used to resolve the Defold revision`,
       });
       continue;
     }
@@ -197,7 +225,7 @@ async function observeBob(projectRoot, options, diagnostics) {
       source: "bob-version",
       authority: "live",
       revision: match[1].toLowerCase(),
-      evidence: { jar, java }
+      evidence: { jar, java },
     });
   }
   return observations;
@@ -230,14 +258,14 @@ async function observeExtenderBuild(projectRoot, diagnostics) {
     let log;
     try {
       const entries = unzipSync(new Uint8Array(await readFile(archive)), {
-        filter: (file) => file.name === "log.txt"
+        filter: (file) => file.name === "log.txt",
       });
       log = entries["log.txt"];
     } catch (error) {
       diagnostics.push({
         severity: "warning",
         source: "extender-build",
-        message: `.internal/cache/${platform}/build.zip could not be read for an engine revision: ${error.message}`
+        message: `.internal/cache/${platform}/build.zip could not be read for an engine revision: ${error.message}`,
       });
       continue;
     }
@@ -249,7 +277,7 @@ async function observeExtenderBuild(projectRoot, diagnostics) {
       diagnostics.push({
         severity: "warning",
         source: "extender-build",
-        message: `.internal/cache/${platform}/build.zip names more than one engine SDK (${[...revisions].sort().join(", ")}); it was not used to resolve the Defold revision`
+        message: `.internal/cache/${platform}/build.zip names more than one engine SDK (${[...revisions].sort().join(", ")}); it was not used to resolve the Defold revision`,
       });
       continue;
     }
@@ -262,8 +290,8 @@ async function observeExtenderBuild(projectRoot, diagnostics) {
           archive: `.internal/cache/${platform}/build.zip`,
           platform,
           size: information.size,
-          modifiedMs: Math.trunc(information.mtimeMs)
-        }
+          modifiedMs: Math.trunc(information.mtimeMs),
+        },
       });
     }
   }
@@ -279,12 +307,14 @@ function observeLock(lock) {
   if (!isRevision(previous.revision) || previous.revision !== lock.defoldRevision) return [];
   if (typeof previous.source !== "string" || previous.source === "deherm-lock") return [];
   if (!sourceById.has(previous.source)) return [];
-  return [{
-    source: "deherm-lock",
-    authority: "historical",
-    revision: previous.revision,
-    evidence: { recordedSource: previous.source, recordedEvidence: previous.evidence ?? null }
-  }];
+  return [
+    {
+      source: "deherm-lock",
+      authority: "historical",
+      revision: previous.revision,
+      evidence: { recordedSource: previous.source, recordedEvidence: previous.evidence ?? null },
+    },
+  ];
 }
 
 // A lock whose own recorded evidence is an unchanged file on disk can stand in
@@ -300,23 +330,31 @@ async function lockEvidenceStillCurrent(projectRoot, lock) {
   if (path.isAbsolute(normalized) || normalized.split(path.sep).includes("..")) return false;
   try {
     const information = await stat(path.join(projectRoot, normalized));
-    return information.isFile() &&
+    return (
+      information.isFile() &&
       information.size === evidence.size &&
-      Math.trunc(information.mtimeMs) === evidence.modifiedMs;
+      Math.trunc(information.mtimeMs) === evidence.modifiedMs
+    );
   } catch {
     return false;
   }
 }
 
 function selectObservation(observations) {
-  return [...observations].sort((left, right) =>
-    sourceRank.get(left.source) - sourceRank.get(right.source) ||
-    left.revision.localeCompare(right.revision))[0] ?? null;
+  return (
+    [...observations].sort(
+      (left, right) =>
+        sourceRank.get(left.source) - sourceRank.get(right.source) || left.revision.localeCompare(right.revision),
+    )[0] ?? null
+  );
 }
 
 function describeObservation(observation) {
   const label = sourceById.get(observation.source)?.label ?? observation.source;
-  const detail = observation.evidence?.jar ?? observation.evidence?.archive ?? observation.evidence?.url ??
+  const detail =
+    observation.evidence?.jar ??
+    observation.evidence?.archive ??
+    observation.evidence?.url ??
     observation.evidence?.recordedSource;
   return `${observation.revision} from ${label}${detail ? ` (${detail})` : ""}`;
 }
@@ -339,7 +377,7 @@ export async function resolveDefoldRevision(options = {}) {
       source: "explicit-option",
       authority: "live",
       revision: normalizeDefoldRevision(options.explicit, "--defold-sdk"),
-      evidence: { option: "--defold-sdk" }
+      evidence: { option: "--defold-sdk" },
     });
   }
   checked.push("--defold-sdk");
@@ -350,7 +388,7 @@ export async function resolveDefoldRevision(options = {}) {
       source: "editor-hook",
       authority: "live",
       revision: normalizeDefoldRevision(hook, "DEHERM_DEFOLD_ENGINE_SHA1"),
-      evidence: { variable: "DEHERM_DEFOLD_ENGINE_SHA1" }
+      evidence: { variable: "DEHERM_DEFOLD_ENGINE_SHA1" },
     });
   }
   checked.push("DEHERM_DEFOLD_ENGINE_SHA1 (Defold editor hook)");
@@ -370,7 +408,7 @@ export async function resolveDefoldRevision(options = {}) {
       source: "game-project",
       authority: "declared",
       revision: normalizeDefoldRevision(declared, "game.project [defold_hermes] defold_sdk"),
-      evidence: { key: "[defold_hermes] defold_sdk" }
+      evidence: { key: "[defold_hermes] defold_sdk" },
     });
   }
   checked.push("game.project [defold_hermes] defold_sdk");
@@ -399,11 +437,11 @@ export async function resolveDefoldRevision(options = {}) {
   const lockCovers = await lockEvidenceStillCurrent(projectRoot, lock);
   const bobRequested = Boolean(options.bob || env.DEHERM_BOB);
   if (bobRequested || (!cheapAuthority && !lockCovers)) {
-    observations.push(...await observeBob(projectRoot, options, diagnostics));
+    observations.push(...(await observeBob(projectRoot, options, diagnostics)));
     checked.push("the configured Bob jar (--bob, DEHERM_BOB, <project>/bob.jar, .deherm/cache/toolchains/*/bob.jar)");
   }
   if (!cheapAuthority && !lockCovers && !observations.some(({ authority }) => authority === "live")) {
-    observations.push(...await observeExtenderBuild(projectRoot, diagnostics));
+    observations.push(...(await observeExtenderBuild(projectRoot, diagnostics)));
     checked.push(".internal/cache/<platform>/build.zip Extender build log");
   }
 
@@ -424,15 +462,17 @@ export async function resolveDefoldRevision(options = {}) {
           "Checked, in order:",
           ...checked.map((entry) => `  - ${entry}`),
           "Resolve it by passing --defold-sdk <sha>, by declaring [defold_hermes] defold_sdk in game.project,",
-          "or by building the project's native extensions once so Extender's build log records the SDK."
-        ].join("\n")
-      }
+          "or by building the project's native extensions once so Extender's build log records the SDK.",
+        ].join("\n"),
+      },
     };
   }
 
-  const contradicting = observations.filter((observation) =>
-    observation.revision !== selected.revision &&
-    (observation.authority === "live" || observation.authority === "declared"));
+  const contradicting = observations.filter(
+    (observation) =>
+      observation.revision !== selected.revision &&
+      (observation.authority === "live" || observation.authority === "declared"),
+  );
   // `--defold-sdk` is a first-class input, not a tie-breaker: a user building
   // in CI against several Defold versions, or targeting a revision their
   // working tree does not name, has stated the answer. It always wins, and what
@@ -451,9 +491,9 @@ export async function resolveDefoldRevision(options = {}) {
         message: [
           "This project names more than one Defold engine revision, and déherm will not pick between them:",
           ...[selected, ...contradicting].map((observation) => `  - ${describeObservation(observation)}`),
-          "Make them agree, or pass --defold-sdk <sha> to state the revision explicitly."
-        ].join("\n")
-      }
+          "Make them agree, or pass --defold-sdk <sha> to state the revision explicitly.",
+        ].join("\n"),
+      },
     };
   }
 
@@ -462,7 +502,7 @@ export async function resolveDefoldRevision(options = {}) {
     diagnostics.push({
       severity: "warning",
       source: observation.source,
-      message: `${describeObservation(observation)} ${observation.authority === "historical" ? "is out of date" : "was overridden"}; generating for ${selected.revision} from ${sourceById.get(selected.source)?.label ?? selected.source}`
+      message: `${describeObservation(observation)} ${observation.authority === "historical" ? "is out of date" : "was overridden"}; generating for ${selected.revision} from ${sourceById.get(selected.source)?.label ?? selected.source}`,
     });
   }
 
@@ -473,7 +513,7 @@ export async function resolveDefoldRevision(options = {}) {
     selected,
     observations,
     diagnostics,
-    blocker: null
+    blocker: null,
   };
 }
 
@@ -495,8 +535,8 @@ export function defoldResolutionRecord(resolution) {
     revision: resolution.revision,
     source,
     authority: sourceById.get(source)?.authority ?? "unknown",
-    evidence: carried ? carried.recordedEvidence ?? null : resolution.selected?.evidence ?? null,
-    ...(carried ? { via: "deherm-lock" } : {})
+    evidence: carried ? (carried.recordedEvidence ?? null) : (resolution.selected?.evidence ?? null),
+    ...(carried ? { via: "deherm-lock" } : {}),
   };
 }
 

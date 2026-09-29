@@ -25,13 +25,19 @@ function parameter(value, index) {
 }
 
 function pascalIdentifier(value) {
-  const result = String(value).split(/[^A-Za-z0-9]+/).filter(Boolean)
-    .map((part) => `${part[0].toUpperCase()}${part.slice(1)}`).join("");
+  const result = String(value)
+    .split(/[^A-Za-z0-9]+/)
+    .filter(Boolean)
+    .map((part) => `${part[0].toUpperCase()}${part.slice(1)}`)
+    .join("");
   return /^[A-Za-z_$]/.test(result) ? result : `Dm${result}`;
 }
 
 function normalizeType(raw) {
-  return String(raw || "void").replace(/\b(?:const|volatile|restrict)\b/g, "").replace(/\s+/g, " ").trim();
+  return String(raw || "void")
+    .replace(/\b(?:const|volatile|restrict)\b/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 export function createTypeRenderer(ir) {
@@ -51,18 +57,40 @@ export function createTypeRenderer(ir) {
   const unresolved = new Map();
   const opaque = new Map();
   const scalar = new Map([
-    ["void", "void"], ["bool", "boolean"], ["float", "number"], ["double", "number"],
-    ["char", "number"], ["signed char", "number"], ["unsigned char", "number"],
-    ["int8_t", "number"], ["uint8_t", "number"], ["int16_t", "number"], ["uint16_t", "number"],
-    ["int32_t", "number"], ["uint32_t", "number"], ["int", "number"], ["unsigned int", "number"],
-    ["short", "number"], ["unsigned short", "number"], ["size_t", "number"], ["ptrdiff_t", "number"],
-    ["int64_t", "bigint"], ["uint64_t", "bigint"], ["intptr_t", "bigint"], ["uintptr_t", "bigint"],
-    ["long", "bigint"], ["unsigned long", "bigint"],
-    ["long long", "bigint"], ["unsigned long long", "bigint"]
+    ["void", "void"],
+    ["bool", "boolean"],
+    ["float", "number"],
+    ["double", "number"],
+    ["char", "number"],
+    ["signed char", "number"],
+    ["unsigned char", "number"],
+    ["int8_t", "number"],
+    ["uint8_t", "number"],
+    ["int16_t", "number"],
+    ["uint16_t", "number"],
+    ["int32_t", "number"],
+    ["uint32_t", "number"],
+    ["int", "number"],
+    ["unsigned int", "number"],
+    ["short", "number"],
+    ["unsigned short", "number"],
+    ["size_t", "number"],
+    ["ptrdiff_t", "number"],
+    ["int64_t", "bigint"],
+    ["uint64_t", "bigint"],
+    ["intptr_t", "bigint"],
+    ["uintptr_t", "bigint"],
+    ["long", "bigint"],
+    ["unsigned long", "bigint"],
+    ["long long", "bigint"],
+    ["unsigned long long", "bigint"],
   ]);
 
   function cleanName(value) {
-    return value.replace(/^(?:struct|class|enum)\s+/, "").replace(/^::/, "").trim();
+    return value
+      .replace(/^(?:struct|class|enum)\s+/, "")
+      .replace(/^::/, "")
+      .trim();
   }
 
   function resolveName(value, contextName) {
@@ -109,7 +137,8 @@ export function createTypeRenderer(ir) {
     if (/\(\s*[*&^]\s*\)/.test(value) || /\(\s*[*&^]\w+\s*\)/.test(value)) return "DmNativeCallback";
     const array = value.match(/^(.*)\[([^\]]*)\]$/);
     if (array) return `DmSpan<${renderType(array[1], contextName)}>`;
-    if (value.endsWith("&&") || value.endsWith("&")) return `DmReference<${renderType(value.replace(/&&?$/, ""), contextName)}>`;
+    if (value.endsWith("&&") || value.endsWith("&"))
+      return `DmReference<${renderType(value.replace(/&&?$/, ""), contextName)}>`;
     if (value.endsWith("*")) {
       const pointee = cleanName(value.replace(/\*+$/, "").trim()) || "void";
       const canonical = resolveName(pointee, contextName) ?? pointee;
@@ -133,7 +162,11 @@ export function createTypeRenderer(ir) {
 
 function documentation(value, indent = "") {
   if (!value) return [];
-  const clean = value.replace(/<[^>]+>/g, " ").replace(/\s+\n/g, "\n").replaceAll("*/", "* /").trim();
+  const clean = value
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+\n/g, "\n")
+    .replaceAll("*/", "* /")
+    .trim();
   if (!clean) return [];
   return [`${indent}/**`, ...clean.split(/\r?\n/).map((line) => `${indent} * ${line.trim()}`), `${indent} */`];
 }
@@ -143,12 +176,16 @@ function declarationDocumentation(declaration, { includeDescription = true } = {
   return [
     includeDescription ? declaration.description : "",
     notes.length ? `@remarks ${notes.join("\n\n")}` : "",
-    declaration.deprecated ? `@deprecated ${declaration.deprecated}` : ""
-  ].filter(Boolean).join("\n\n");
+    declaration.deprecated ? `@deprecated ${declaration.deprecated}` : "",
+  ]
+    .filter(Boolean)
+    .join("\n\n");
 }
 
 function signature(declaration, renderType) {
-  const parameters = (declaration.parameters ?? []).map((item, index) => `${parameter(item.name, index)}: ${renderType(item.type, declaration.name)}`).join(", ");
+  const parameters = (declaration.parameters ?? [])
+    .map((item, index) => `${parameter(item.name, index)}: ${renderType(item.type, declaration.name)}`)
+    .join(", ");
   return `(${parameters}): ${renderType(declaration.returns ?? "void", declaration.name)}`;
 }
 
@@ -157,7 +194,9 @@ function overloadIdentity(declaration, renderType) {
 }
 
 function functionType(declaration, renderType) {
-  const parameters = (declaration.parameters ?? []).map((item, index) => `${parameter(item.name, index)}: ${renderType(item.type, declaration.name)}`).join(", ");
+  const parameters = (declaration.parameters ?? [])
+    .map((item, index) => `${parameter(item.name, index)}: ${renderType(item.type, declaration.name)}`)
+    .join(", ");
   return `(${parameters}) => ${renderType(declaration.returns ?? "void", declaration.name)}`;
 }
 
@@ -171,7 +210,9 @@ function functionType(declaration, renderType) {
  */
 export function dmSdkRuntimeOverloads(ir, renderer) {
   const groups = new Map();
-  for (const declaration of ir.declarations.filter((item) => callableKinds.has(item.kind) && item.disposition === "generated-raw-call")) {
+  for (const declaration of ir.declarations.filter(
+    (item) => callableKinds.has(item.kind) && item.disposition === "generated-raw-call",
+  )) {
     const declarations = groups.get(declaration.name) ?? [];
     declarations.push(declaration);
     groups.set(declaration.name, declarations);
@@ -195,7 +236,7 @@ export function dmSdkRuntimeOverloads(ir, renderer) {
         name,
         signature: signature(matching[0], renderer.renderType),
         marker: `__deherm_dmsdk_${sha256(declarationIds.join("\n")).slice(0, 20)}`,
-        declarationIds
+        declarationIds,
       });
     }
   }
@@ -243,7 +284,9 @@ function enumType(declaration) {
 export function generateTypes(ir, renderer) {
   const { renderType } = renderer;
   const groups = new Map();
-  for (const declaration of ir.declarations.filter((item) => callableKinds.has(item.kind) && item.disposition === "generated-raw-call")) {
+  for (const declaration of ir.declarations.filter(
+    (item) => callableKinds.has(item.kind) && item.disposition === "generated-raw-call",
+  )) {
     const list = groups.get(declaration.name) ?? [];
     list.push(declaration);
     groups.set(declaration.name, list);
@@ -258,11 +301,11 @@ export function generateTypes(ir, renderer) {
     "export type DmNativeType<Name extends string> = { readonly [nativeTypeBrand]: Name };",
     "export type DmReadonlyPointer<Pointee extends string = string> = number & { readonly [nativePointerBrand]: Pointee };",
     "export type DmPointer<Pointee extends string = string> = DmReadonlyPointer<Pointee> & { readonly [nativeMutablePointerBrand]: true };",
-    "export type DmReference<Value = unknown> = DmPointer<\"reference\"> & { readonly value?: Value; readonly [nativeReferenceBrand]: true };",
-    "export type DmNativeCallback = DmPointer<\"callback\"> & { readonly [nativeCallbackBrand]: true };",
+    'export type DmReference<Value = unknown> = DmPointer<"reference"> & { readonly value?: Value; readonly [nativeReferenceBrand]: true };',
+    'export type DmNativeCallback = DmPointer<"callback"> & { readonly [nativeCallbackBrand]: true };',
     "export interface DmSpan<Value> { readonly data: DmPointer; readonly length: number; readonly __value?: Value; }",
     "",
-    "export interface DmSdkCalls {"
+    "export interface DmSdkCalls {",
   ];
   for (const [name, declarations] of [...groups].sort(([left], [right]) => compareCodeUnits(left, right))) {
     lines.push(...documentation(declarations.find(({ description }) => description)?.description, "  "));
@@ -281,42 +324,55 @@ export function generateTypes(ir, renderer) {
   }
   lines.push("}", "", "export type DmSdkSymbol = keyof DmSdkCalls;", "");
   lines.push("export interface DmSdkDeclarationCalls {");
-  for (const declaration of ir.declarations.filter((item) => callableKinds.has(item.kind) && item.disposition === "generated-raw-call")) {
+  for (const declaration of ir.declarations.filter(
+    (item) => callableKinds.has(item.kind) && item.disposition === "generated-raw-call",
+  )) {
     lines.push(`  readonly ${JSON.stringify(declaration.id)}: ${functionType(declaration, renderType)};`);
   }
   lines.push("}", "");
   const typeGroups = new Map();
-  for (const declaration of [...ir.declarations, ...(ir.typeSupportDeclarations ?? [])]
-    .filter((item) => ["record", "enum", "type-alias"].includes(item.kind))) {
+  for (const declaration of [...ir.declarations, ...(ir.typeSupportDeclarations ?? [])].filter((item) =>
+    ["record", "enum", "type-alias"].includes(item.kind),
+  )) {
     const current = typeGroups.get(declaration.name);
-    if (!current || (declaration.members?.length ?? 0) > (current.members?.length ?? 0)) typeGroups.set(declaration.name, declaration);
+    if (!current || (declaration.members?.length ?? 0) > (current.members?.length ?? 0))
+      typeGroups.set(declaration.name, declaration);
   }
-  for (const declaration of [...typeGroups.values()].filter(({ kind }) => kind === "enum").sort((left, right) => compareCodeUnits(left.name, right.name))) {
+  for (const declaration of [...typeGroups.values()]
+    .filter(({ kind }) => kind === "enum")
+    .sort((left, right) => compareCodeUnits(left.name, right.name))) {
     const members = resolvedEnumMembers(declaration);
     if (!members.length) continue;
     const name = enumExportName(declaration);
-    lines.push(...documentation(declarationDocumentation({
-      ...declaration,
-      description: declaration.description || `Native enum ${declaration.name}.`
-    }), ""));
+    lines.push(
+      ...documentation(
+        declarationDocumentation({
+          ...declaration,
+          description: declaration.description || `Native enum ${declaration.name}.`,
+        }),
+        "",
+      ),
+    );
     lines.push(`export const ${name} = {`);
     for (const member of members) lines.push(`  ${property(member.name)}: ${member.value},`);
     lines.push(`} as const;`, `export type ${name} = (typeof ${name})[keyof typeof ${name}];`, "");
   }
   lines.push("export interface DmSdkTypes {");
   for (const [name, declaration] of [...typeGroups].sort(([left], [right]) => compareCodeUnits(left, right))) {
-    const type = declaration.kind === "record"
-      ? publicRecordType(declaration, renderType)
-      : declaration.kind === "enum"
-        ? enumType(declaration)
-        : renderType(declaration.type, declaration.name);
+    const type =
+      declaration.kind === "record"
+        ? publicRecordType(declaration, renderType)
+        : declaration.kind === "enum"
+          ? enumType(declaration)
+          : renderType(declaration.type, declaration.name);
     lines.push(...documentation(declarationDocumentation(declaration), "  "));
     lines.push(`  readonly ${property(name)}: ${type};`);
   }
   lines.push("}", "");
   lines.push("export interface DmSdkVariables {");
   const variables = new Map();
-  for (const declaration of ir.declarations.filter((item) => item.kind === "variable")) variables.set(declaration.name, declaration);
+  for (const declaration of ir.declarations.filter((item) => item.kind === "variable"))
+    variables.set(declaration.name, declaration);
   for (const [name, declaration] of [...variables].sort(([left], [right]) => compareCodeUnits(left, right))) {
     lines.push(...documentation(declarationDocumentation(declaration), "  "));
     lines.push(`  readonly ${property(name)}: ${renderType(declaration.type, declaration.name)};`);
@@ -324,7 +380,9 @@ export function generateTypes(ir, renderer) {
   lines.push("}", "");
   lines.push("export interface DmSdkDeclarationMap {");
   for (const declaration of ir.declarations) {
-    lines.push(`  readonly ${JSON.stringify(declaration.id)}: { readonly name: ${JSON.stringify(declaration.name)}; readonly kind: ${JSON.stringify(declaration.kind)}; readonly header: ${JSON.stringify(declaration.header)}; readonly disposition: ${JSON.stringify(declaration.disposition)} };`);
+    lines.push(
+      `  readonly ${JSON.stringify(declaration.id)}: { readonly name: ${JSON.stringify(declaration.name)}; readonly kind: ${JSON.stringify(declaration.kind)}; readonly header: ${JSON.stringify(declaration.header)}; readonly disposition: ${JSON.stringify(declaration.disposition)} };`,
+    );
   }
   lines.push("}", "");
   return lines.join("\n");
@@ -345,13 +403,17 @@ export function generateRuntime(ir, renderer) {
     "export function installDmSdkBridge(bridge: DmSdkBridge): void {",
     "  activeBridge = bridge;",
     "}",
-    ""
+    "",
   ];
   for (const overload of dmSdkRuntimeOverloads(ir, renderer)) {
     const declaration = ir.declarations.find(({ id }) => id === overload.declarationIds[0]);
-    const parameters = (declaration.parameters ?? []).map((item, index) => `${parameter(item.name, index)}: ${renderer.renderType(item.type, declaration.name)}`).join(", ");
+    const parameters = (declaration.parameters ?? [])
+      .map((item, index) => `${parameter(item.name, index)}: ${renderer.renderType(item.type, declaration.name)}`)
+      .join(", ");
     const result = renderer.renderType(declaration.returns ?? "void", declaration.name);
-    lines.push(`export function callDmSdk(${overload.marker}: ${JSON.stringify(overload.name)}${parameters ? `, ${parameters}` : ""}): ${result};`);
+    lines.push(
+      `export function callDmSdk(${overload.marker}: ${JSON.stringify(overload.name)}${parameters ? `, ${parameters}` : ""}): ${result};`,
+    );
   }
   lines.push(
     "export function callDmSdk(symbol: string, ...args: readonly unknown[]): unknown {",
@@ -361,7 +423,7 @@ export function generateRuntime(ir, renderer) {
     "",
     "function dmSdkSymbolFromDeclarationId(declarationId: string): string {",
     '  const prefix = "dmsdk:";',
-    "  const separator = declarationId.indexOf(\"@\", prefix.length);",
+    '  const separator = declarationId.indexOf("@", prefix.length);',
     '  if (declarationId.slice(0, prefix.length) !== prefix || separator < 0) throw new Error("invalid dmSDK declaration ID");',
     "  return declarationId.slice(prefix.length, separator);",
     "}",
@@ -377,7 +439,7 @@ export function generateRuntime(ir, renderer) {
     "    args,",
     "  ) as ReturnType<DmSdkDeclarationCalls[Id]>;",
     "}",
-    ""
+    "",
   );
   return lines.join("\n");
 }

@@ -7,15 +7,11 @@ import { join } from "node:path";
 const outputDir = await mkdtemp(join(tmpdir(), "defold-hermes-static-"));
 try {
   function runShermes(output, extraArguments = []) {
-    const result = spawnSync("build/native/bin/shermes", [
-      "-typed",
-      "-strict",
-      "-emit-c",
-      ...extraArguments,
-      "packages/static-hermes/src/generated/ffi.js",
-      "-o",
-      output
-    ], { cwd: process.cwd(), encoding: "utf8" });
+    const result = spawnSync(
+      "build/native/bin/shermes",
+      ["-typed", "-strict", "-emit-c", ...extraArguments, "packages/static-hermes/src/generated/ffi.js", "-o", output],
+      { cwd: process.cwd(), encoding: "utf8" },
+    );
     assert.equal(result.status, 0, result.stderr || result.stdout);
   }
 

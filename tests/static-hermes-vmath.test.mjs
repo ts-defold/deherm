@@ -13,13 +13,13 @@ const outputFiles = [
   "packages/bindings/generated/defold-static-hermes-vmath.json",
   "defold/defold_hermes/include/defold_hermes/generated_static_hermes_vmath.h",
   "defold/defold_hermes/src/generated_static_hermes_vmath.cpp",
-  "packages/static-hermes/src/generated/script-vmath.ts"
+  "packages/static-hermes/src/generated/script-vmath.ts",
 ];
 
 function run(arguments_) {
   return spawnSync(process.execPath, [generator, ...arguments_], {
     cwd: root,
-    encoding: "utf8"
+    encoding: "utf8",
   });
 }
 
@@ -29,7 +29,7 @@ test("Static Hermes vmath bridge is current and covers only sound scalar results
   const report = JSON.parse(await readFile(path.join(root, outputFiles[0]), "utf8"));
   const [descriptorRaw, overrideRaw] = await Promise.all([
     readFile(descriptorPath, "utf8"),
-    readFile(path.join(root, "packages/bindings/overrides/static-hermes-vmath.json"), "utf8")
+    readFile(path.join(root, "packages/bindings/overrides/static-hermes-vmath.json"), "utf8"),
   ]);
   assert.equal(report.descriptorSha256, createHash("sha256").update(descriptorRaw).digest("hex"));
   assert.equal(report.overrideSha256, createHash("sha256").update(overrideRaw).digest("hex"));
@@ -39,11 +39,11 @@ test("Static Hermes vmath bridge is current and covers only sound scalar results
     includedBindings: 3,
     includedCallShapes: 7,
     structuredResultExclusions: 27,
-    outOfScopeBindings: 48
+    outOfScopeBindings: 48,
   });
   assert.deepEqual(
     report.included.map(({ id }) => id),
-    ["script:vmath.length", "script:vmath.project", "script:vmath.length_sqr"]
+    ["script:vmath.length", "script:vmath.project", "script:vmath.length_sqr"],
   );
   assert.equal(new Set(report.included.map(({ stableId }) => stableId)).size, 3);
   assert.equal(report.exclusions.length, 75);
@@ -57,7 +57,7 @@ test("Static Hermes vmath generation is deterministic", async () => {
     for (const relative of outputFiles) {
       const [expected, actual] = await Promise.all([
         readFile(path.join(root, relative), "utf8"),
-        readFile(path.join(temporary, relative), "utf8")
+        readFile(path.join(temporary, relative), "utf8"),
       ]);
       assert.equal(actual, expected, `${relative} was not generated deterministically`);
     }
@@ -73,10 +73,7 @@ test("Static Hermes vmath generation rejects executable descriptor drift structu
     descriptor.bindings.find(({ id }) => id === "script:vmath.length").stableId ^= 1;
     const changedDescriptor = path.join(temporary, "descriptor.json");
     await writeFile(changedDescriptor, `${JSON.stringify(descriptor, null, 2)}\n`);
-    const result = run([
-      "--descriptor", changedDescriptor,
-      "--output-root", path.join(temporary, "output")
-    ]);
+    const result = run(["--descriptor", changedDescriptor, "--output-root", path.join(temporary, "output")]);
     assert.notEqual(result.status, 0);
     assert.match(`${result.stderr}${result.stdout}`, /invalid source-generated stable ID/);
   } finally {
@@ -87,7 +84,7 @@ test("Static Hermes vmath generation rejects executable descriptor drift structu
 test("generated bridge keeps float32 lanes and stack-only ScriptCallFrame glue", async () => {
   const [typescript, source] = await Promise.all([
     readFile(path.join(root, outputFiles[3]), "utf8"),
-    readFile(path.join(root, outputFiles[2]), "utf8")
+    readFile(path.join(root, outputFiles[2]), "utf8"),
   ]);
   assert.match(typescript, /arg0X: c_f32/);
   assert.match(typescript, /\): c_f64/);

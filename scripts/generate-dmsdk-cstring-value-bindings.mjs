@@ -22,11 +22,18 @@ const relative = Object.freeze({
   jsi: "defold/defold_hermes/src/generated_dmsdk_cstring_value_jsi.cpp",
   browser: "defold/defold_hermes/lib/web/generated_dmsdk_cstring_value.js",
   typescript: "packages/sdk/src/generated/dmsdk/cstring-value.ts",
-  staticHermes: "packages/static-hermes/src/generated/dmsdk-cstring-value.ts"
+  staticHermes: "packages/static-hermes/src/generated/dmsdk-cstring-value.ts",
 });
 
 function options(argv) {
-  const value = { check: false, outputRoot: root, projection: relative.projection, sdkIr: relative.sdkIr, plan: relative.plan, policy: relative.policy };
+  const value = {
+    check: false,
+    outputRoot: root,
+    projection: relative.projection,
+    sdkIr: relative.sdkIr,
+    plan: relative.plan,
+    policy: relative.policy,
+  };
   for (let index = 0; index < argv.length; ++index) {
     if (argv[index] === "--check") value.check = true;
     else if (argv[index] === "--output-root") value.outputRoot = path.resolve(argv[++index]);
@@ -41,8 +48,12 @@ function options(argv) {
 
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 const quote = (value) => JSON.stringify(value);
-const pascal = (value) => value.split(/[^A-Za-z0-9]+/).filter(Boolean)
-  .map((part) => `${part[0].toUpperCase()}${part.slice(1)}`).join("");
+const pascal = (value) =>
+  value
+    .split(/[^A-Za-z0-9]+/)
+    .filter(Boolean)
+    .map((part) => `${part[0].toUpperCase()}${part.slice(1)}`)
+    .join("");
 const camel = (value) => {
   const result = pascal(value);
   return result ? result[0].toLowerCase() + result.slice(1) : "binding";
@@ -64,9 +75,21 @@ function kind(type) {
   if (type.kind === "cstring") return "DEHERM_DMSDK_CSTRING_STRING";
   if (type.kind === "enum") return "DEHERM_DMSDK_CSTRING_ENUM";
   const names = {
-    bool: "BOOL", i8: "I8", u8: "U8", i16: "I16", u16: "U16", i32: "I32", u32: "U32",
-    i64: "I64", u64: "U64", isize: "ISIZE", usize: "USIZE", "word-signed": "ISIZE",
-    "word-unsigned": "USIZE", f32: "F32", f64: "F64"
+    bool: "BOOL",
+    i8: "I8",
+    u8: "U8",
+    i16: "I16",
+    u16: "U16",
+    i32: "I32",
+    u32: "U32",
+    i64: "I64",
+    u64: "U64",
+    isize: "ISIZE",
+    usize: "USIZE",
+    "word-signed": "ISIZE",
+    "word-unsigned": "USIZE",
+    f32: "F32",
+    f64: "F64",
   };
   assert.ok(names[type.name], `Unsupported C-string scalar ${type.name}`);
   return `DEHERM_DMSDK_CSTRING_${names[type.name]}`;
@@ -77,7 +100,9 @@ function cppArgument(parameter, stringIndex, scalarIndex, prologue) {
   const index = scalarIndex.value++;
   const local = `scalar_${index}`;
   if (parameter.type.kind === "enum") {
-    prologue.push(`    ${parameter.type.name} ${local}{}; if(!decode_${cppIdentifier(parameter.type.name)}(scalar_args[${index}],&${local})) return DEHERM_DMSDK_CSTRING_SCALAR_RANGE;`);
+    prologue.push(
+      `    ${parameter.type.name} ${local}{}; if(!decode_${cppIdentifier(parameter.type.name)}(scalar_args[${index}],&${local})) return DEHERM_DMSDK_CSTRING_SCALAR_RANGE;`,
+    );
     return local;
   }
   if (parameter.type.name === "u32") {
@@ -93,24 +118,37 @@ function cppIdentifier(value) {
 }
 
 function enumDomains(entries, sdkIr) {
-  const required = [...new Set(entries.flatMap(({ row }) => row.signature.parameters.map(({ type }) => type))
-    .filter(({ kind: value }) => value === "enum").map(({ name }) => name))].sort();
-  const declarations = new Map(sdkIr.declarations.filter(({ kind }) => kind === "enum").map((declaration) => [declaration.name, declaration]));
+  const required = [
+    ...new Set(
+      entries
+        .flatMap(({ row }) => row.signature.parameters.map(({ type }) => type))
+        .filter(({ kind: value }) => value === "enum")
+        .map(({ name }) => name),
+    ),
+  ].sort();
+  const declarations = new Map(
+    sdkIr.declarations.filter(({ kind }) => kind === "enum").map((declaration) => [declaration.name, declaration]),
+  );
   return required.map((name) => {
     const declaration = declarations.get(name);
     assert.ok(declaration, `Missing SDK IR enum declaration for ${name}`);
     const members = declaration.members.filter(({ name: member }) => !/(?:^|_)(?:MAX|COUNT|NUM)(?:_|$)/.test(member));
     assert.ok(members.length > 0, `${name}: no callable enum members after sentinel filtering`);
     const scope = name.includes("::") ? name.slice(0, name.lastIndexOf("::")) : "";
-    return { name, members: members.map(({ name: member, value }) => ({
-      name: `${scope ? `${scope}::` : ""}${member}`,
-      value
-    })) };
+    return {
+      name,
+      members: members.map(({ name: member, value }) => ({
+        name: `${scope ? `${scope}::` : ""}${member}`,
+        value,
+      })),
+    };
   });
 }
 
 function renderEnumDecoder(domain) {
-  const checks = domain.members.map((member) => `  if(value==static_cast<Underlying>(${member.name})){*output=${member.name};return true;}`).join("\n");
+  const checks = domain.members
+    .map((member) => `  if(value==static_cast<Underlying>(${member.name})){*output=${member.name};return true;}`)
+    .join("\n");
   return `bool decode_${cppIdentifier(domain.name)}(uint64_t raw,${domain.name}* output){
   using Underlying=typename std::underlying_type<${domain.name}>::type;
   Underlying value{};
@@ -131,7 +169,9 @@ function invokeCase(entry) {
   const strings = { value: 0 };
   const scalars = { value: 0 };
   const prologue = [];
-  const args = entry.row.signature.parameters.map((parameter) => cppArgument(parameter, strings, scalars, prologue)).join(", ");
+  const args = entry.row.signature.parameters
+    .map((parameter) => cppArgument(parameter, strings, scalars, prologue))
+    .join(", ");
   const call = `${entry.row.symbol}(${args})`;
   const result = entry.row.signature.result;
   if (result.kind === "cstring") {
@@ -153,11 +193,11 @@ function invokeCase(entry) {
 function storageShape(entries) {
   const counts = entries.map(({ row }) => ({
     strings: row.signature.parameters.filter(({ type }) => type.kind === "cstring").length,
-    scalars: row.signature.parameters.filter(({ type }) => type.kind !== "cstring").length
+    scalars: row.signature.parameters.filter(({ type }) => type.kind !== "cstring").length,
   }));
   return {
     strings: Math.max(1, ...counts.map(({ strings }) => strings)),
-    scalars: Math.max(1, ...counts.map(({ scalars }) => scalars))
+    scalars: Math.max(1, ...counts.map(({ scalars }) => scalars)),
   };
 }
 
@@ -249,16 +289,22 @@ DehermDmSdkCStringStatus deherm_dmsdk_cstring_write_output(const char* value,uin
 }
 
 function renderNative(entries, storage, domains) {
-  const includes = [...new Set(entries.map(({ row }) => includeFor(row.provenance.header)))].sort()
-    .map((value) => `#include <${value}>`).join("\n");
-  const descriptors = entries.map((entry) => {
-    const strings = entry.row.signature.parameters.filter(({ type }) => type.kind === "cstring").length;
-    const scalars = entry.row.signature.parameters.length - strings;
-    const nullable = entry.contract?.result?.nullability === "nullable" ? 1 : 0;
-    return `  {UINT32_C(${entry.stableId}),${strings},${scalars},${kind(entry.row.signature.result)},${nullable},${quote(entry.row.projectionId)},${quote(entry.row.id)}},`;
-  }).join("\n");
+  const includes = [...new Set(entries.map(({ row }) => includeFor(row.provenance.header)))]
+    .sort()
+    .map((value) => `#include <${value}>`)
+    .join("\n");
+  const descriptors = entries
+    .map((entry) => {
+      const strings = entry.row.signature.parameters.filter(({ type }) => type.kind === "cstring").length;
+      const scalars = entry.row.signature.parameters.length - strings;
+      const nullable = entry.contract?.result?.nullability === "nullable" ? 1 : 0;
+      return `  {UINT32_C(${entry.stableId}),${strings},${scalars},${kind(entry.row.signature.result)},${nullable},${quote(entry.row.projectionId)},${quote(entry.row.id)}},`;
+    })
+    .join("\n");
   const enumTypes = domains.map(({ name }) => name);
-  const assertions = enumTypes.map((name) => `static_assert(sizeof(${name})<=sizeof(int32_t),"${name} exceeds the exact JS-safe enum lane");`).join("\n");
+  const assertions = enumTypes
+    .map((name) => `static_assert(sizeof(${name})<=sizeof(int32_t),"${name} exceeds the exact JS-safe enum lane");`)
+    .join("\n");
   const enumDecoders = domains.map(renderEnumDecoder).join("\n");
   const cases = entries.map((entry, id) => `  case ${id}: {\n${invokeCase(entry)}\n  }`).join("\n");
   return `// Generated by scripts/generate-dmsdk-cstring-value-bindings.mjs. Do not edit.
@@ -300,22 +346,28 @@ function renderJsiHeader() {
 }
 
 function renderJsi(entries, storage) {
-  const cases = entries.map((entry, id) => {
-    const params = entry.row.signature.parameters;
-    let stringIndex = 0;
-    let scalarIndex = 0;
-    const encode = params.map((parameter, index) => {
-      if (parameter.type.kind === "cstring") {
-        const current = stringIndex++;
-        return `        if(!args[${index + 1}].isString())throw jsi::JSError(runtime,"dmSDK C-string argument must be string"); encoded[${current}]=args[${index + 1}].getString(runtime).utf8(runtime); if(encoded[${current}].size()>=std::numeric_limits<uint32_t>::max())throw jsi::JSError(runtime,"dmSDK C-string argument is too large"); views[${current}]={reinterpret_cast<const uint8_t*>(encoded[${current}].data()),static_cast<uint32_t>(encoded[${current}].size())};`;
-      }
-      const current = scalarIndex++;
-      if (parameter.type.kind === "scalar" && parameter.type.name === "u64") return `        if(!args[${index + 1}].isBigInt())throw jsi::JSError(runtime,"dmSDK u64 argument must be bigint"); {const auto bigint=args[${index + 1}].asBigInt(runtime);if(!bigint.isUint64(runtime))throw jsi::JSError(runtime,"dmSDK u64 argument is out of range");scalars[${current}]=bigint.asUint64(runtime);}`;
-      if (parameter.type.kind === "scalar" && parameter.type.name === "u32") return `        if(!args[${index + 1}].isNumber()||!std::isfinite(args[${index + 1}].asNumber())||std::trunc(args[${index + 1}].asNumber())!=args[${index + 1}].asNumber()||args[${index + 1}].asNumber()<0||args[${index + 1}].asNumber()>UINT32_MAX)throw jsi::JSError(runtime,"dmSDK u32 argument is out of range");scalars[${current}]=static_cast<uint32_t>(args[${index + 1}].asNumber());`;
-      return `        if(!args[${index + 1}].isNumber()||!std::isfinite(args[${index + 1}].asNumber())||std::trunc(args[${index + 1}].asNumber())!=args[${index + 1}].asNumber()||args[${index + 1}].asNumber()<-9007199254740991.0||args[${index + 1}].asNumber()>9007199254740991.0)throw jsi::JSError(runtime,"dmSDK enum argument must be a safe integer");scalars[${current}]=static_cast<uint64_t>(static_cast<int64_t>(args[${index + 1}].asNumber()));`;
-    }).join("\n");
-    return `      case ${id}: { if(count!=${params.length + 1})throw jsi::JSError(runtime,"Wrong dmSDK C-string argument count");\n${encode}\n        break; }`;
-  }).join("\n");
+  const cases = entries
+    .map((entry, id) => {
+      const params = entry.row.signature.parameters;
+      let stringIndex = 0;
+      let scalarIndex = 0;
+      const encode = params
+        .map((parameter, index) => {
+          if (parameter.type.kind === "cstring") {
+            const current = stringIndex++;
+            return `        if(!args[${index + 1}].isString())throw jsi::JSError(runtime,"dmSDK C-string argument must be string"); encoded[${current}]=args[${index + 1}].getString(runtime).utf8(runtime); if(encoded[${current}].size()>=std::numeric_limits<uint32_t>::max())throw jsi::JSError(runtime,"dmSDK C-string argument is too large"); views[${current}]={reinterpret_cast<const uint8_t*>(encoded[${current}].data()),static_cast<uint32_t>(encoded[${current}].size())};`;
+          }
+          const current = scalarIndex++;
+          if (parameter.type.kind === "scalar" && parameter.type.name === "u64")
+            return `        if(!args[${index + 1}].isBigInt())throw jsi::JSError(runtime,"dmSDK u64 argument must be bigint"); {const auto bigint=args[${index + 1}].asBigInt(runtime);if(!bigint.isUint64(runtime))throw jsi::JSError(runtime,"dmSDK u64 argument is out of range");scalars[${current}]=bigint.asUint64(runtime);}`;
+          if (parameter.type.kind === "scalar" && parameter.type.name === "u32")
+            return `        if(!args[${index + 1}].isNumber()||!std::isfinite(args[${index + 1}].asNumber())||std::trunc(args[${index + 1}].asNumber())!=args[${index + 1}].asNumber()||args[${index + 1}].asNumber()<0||args[${index + 1}].asNumber()>UINT32_MAX)throw jsi::JSError(runtime,"dmSDK u32 argument is out of range");scalars[${current}]=static_cast<uint32_t>(args[${index + 1}].asNumber());`;
+          return `        if(!args[${index + 1}].isNumber()||!std::isfinite(args[${index + 1}].asNumber())||std::trunc(args[${index + 1}].asNumber())!=args[${index + 1}].asNumber()||args[${index + 1}].asNumber()<-9007199254740991.0||args[${index + 1}].asNumber()>9007199254740991.0)throw jsi::JSError(runtime,"dmSDK enum argument must be a safe integer");scalars[${current}]=static_cast<uint64_t>(static_cast<int64_t>(args[${index + 1}].asNumber()));`;
+        })
+        .join("\n");
+      return `      case ${id}: { if(count!=${params.length + 1})throw jsi::JSError(runtime,"Wrong dmSDK C-string argument count");\n${encode}\n        break; }`;
+    })
+    .join("\n");
   return `// Generated by scripts/generate-dmsdk-cstring-value-bindings.mjs. Do not edit.
 #if defined(DEHERM_ENABLE_PRIVATE_DMSDK_CSTRING_VALUE) && !defined(DM_PLATFORM_HTML5)
 #include <defold_hermes/generated_dmsdk_cstring_value_jsi.hpp>
@@ -344,19 +396,25 @@ ${cases}
 function tsType(type) {
   if (type.kind === "cstring") return "string";
   if (type.kind === "void") return "void";
-  if (type.kind === "scalar" && ["u64", "i64", "usize", "isize", "word-signed", "word-unsigned"].includes(type.name)) return "bigint";
+  if (type.kind === "scalar" && ["u64", "i64", "usize", "isize", "word-signed", "word-unsigned"].includes(type.name))
+    return "bigint";
   if (type.kind === "scalar" && type.name === "bool") return "boolean";
   return "number";
 }
 
 function renderTypescript(entries) {
   const ids = entries.map((entry, index) => `  ${entry.typescriptName}: ${index},`).join("\n");
-  const functions = entries.map((entry) => {
-    const params = entry.row.signature.parameters.map((parameter, index) => `${camel(parameter.name || `arg ${index}`)}: ${tsType(parameter.type)}`);
-    const names = entry.row.signature.parameters.map((parameter, index) => camel(parameter.name || `arg ${index}`));
-    const result = tsType(entry.row.signature.result) + (entry.contract?.result?.nullability === "nullable" ? " | undefined" : "");
-    return `/** ${entry.row.provenance.nativeSignature}. Source: ${entry.row.provenance.header}:${entry.row.provenance.line}. */\nexport function ${entry.typescriptName}(${params.join(", ")}): ${result} { return module().call(DmSdkCStringValueId.${entry.typescriptName}${names.length ? `, ${names.join(", ")}` : ""}) as ${result}; }`;
-  }).join("\n\n");
+  const functions = entries
+    .map((entry) => {
+      const params = entry.row.signature.parameters.map(
+        (parameter, index) => `${camel(parameter.name || `arg ${index}`)}: ${tsType(parameter.type)}`,
+      );
+      const names = entry.row.signature.parameters.map((parameter, index) => camel(parameter.name || `arg ${index}`));
+      const result =
+        tsType(entry.row.signature.result) + (entry.contract?.result?.nullability === "nullable" ? " | undefined" : "");
+      return `/** ${entry.row.provenance.nativeSignature}. Source: ${entry.row.provenance.header}:${entry.row.provenance.line}. */\nexport function ${entry.typescriptName}(${params.join(", ")}): ${result} { return module().call(DmSdkCStringValueId.${entry.typescriptName}${names.length ? `, ${names.join(", ")}` : ""}) as ${result}; }`;
+    })
+    .join("\n\n");
   return `// Generated by scripts/generate-dmsdk-cstring-value-bindings.mjs. Do not edit.
 interface DmSdkCStringValueModule { call(id:number,...args:readonly unknown[]):unknown; }
 declare global { var __defoldModulesV1:Record<string,object>|undefined; }
@@ -380,14 +438,18 @@ const __ffi_dmsdkCStringValueDispatch=$SHBuiltin.extern_c(
 }
 
 function renderBrowser(entries) {
-  const rows = entries.map((entry, index) => {
-    const strings = entry.row.signature.parameters.filter(({ type }) => type.kind === "cstring").length;
-    const scalarKinds = entry.row.signature.parameters.filter(({ type }) => type.kind !== "cstring")
-      .map(({ type }) => type.kind === "scalar" ? type.name : `enum:${type.name}`);
-    const result = entry.row.signature.result;
-    const resultKind = result.kind === "scalar" ? result.name : result.kind === "enum" ? `enum:${result.name}` : result.kind;
-    return `      {id:${index},stableId:${entry.stableId},strings:${strings},scalarKinds:Object.freeze(${quote(scalarKinds)}),resultKind:${quote(resultKind)},resultLaneBytes:${result.kind === "void" ? 0 : result.kind === "cstring" ? 1 : 8},nullableResult:${entry.contract?.result?.nullability === "nullable"}}`;
-  }).join(",\n");
+  const rows = entries
+    .map((entry, index) => {
+      const strings = entry.row.signature.parameters.filter(({ type }) => type.kind === "cstring").length;
+      const scalarKinds = entry.row.signature.parameters
+        .filter(({ type }) => type.kind !== "cstring")
+        .map(({ type }) => (type.kind === "scalar" ? type.name : `enum:${type.name}`));
+      const result = entry.row.signature.result;
+      const resultKind =
+        result.kind === "scalar" ? result.name : result.kind === "enum" ? `enum:${result.name}` : result.kind;
+      return `      {id:${index},stableId:${entry.stableId},strings:${strings},scalarKinds:Object.freeze(${quote(scalarKinds)}),resultKind:${quote(resultKind)},resultLaneBytes:${result.kind === "void" ? 0 : result.kind === "cstring" ? 1 : 8},nullableResult:${entry.contract?.result?.nullability === "nullable"}}`;
+    })
+    .join(",\n");
   return `// Generated by scripts/generate-dmsdk-cstring-value-bindings.mjs. Do not edit.
 var LibraryDefoldHermesDmSdkCStringValue={
   $DEFOLD_HERMES_DMSDK_CSTRING_VALUE:{install:function(){return Object.freeze({privateStaging:true,registered:false,abi:"direct-wasm-memory-v1",dispatch:"deherm_dmsdk_cstring_value_dispatch",viewLayout:Object.freeze({data:0,length:4,size:8}),scratchLayout:Object.freeze({data:0,capacity:4,used:8,size:12}),outputLayout:Object.freeze({scalarBytes:8,requiredBytes:4,presentBytes:1,capacityIncludesTrailingNul:true}),stringInputContract:Object.freeze({encoding:"utf8",emptyView:"null-data-with-zero-length-means-empty",embeddedNul:"rejected",terminator:"synthesized-in-scratch"}),routes:Object.freeze([
@@ -401,17 +463,25 @@ autoAddDeps(LibraryDefoldHermesDmSdkCStringValue,'$DEFOLD_HERMES_DMSDK_CSTRING_V
 async function writeOrCheck(outputRoot, name, content, check) {
   const target = path.join(outputRoot, name);
   if (check) assert.equal(await readFile(target, "utf8"), content, `${name} is stale`);
-  else { await mkdir(path.dirname(target), { recursive: true }); await writeFile(target, content); }
+  else {
+    await mkdir(path.dirname(target), { recursive: true });
+    await writeFile(target, content);
+  }
 }
 
 async function main() {
   const opt = options(process.argv.slice(2));
-  const inputPath = (value) => path.isAbsolute(value) ? value : path.join(root, value);
+  const inputPath = (value) => (path.isAbsolute(value) ? value : path.join(root, value));
   const [projectionRaw, irRaw, planRaw, policyRaw] = await Promise.all([
-    readFile(inputPath(opt.projection), "utf8"), readFile(inputPath(opt.sdkIr), "utf8"),
-    readFile(inputPath(opt.plan), "utf8"), readFile(inputPath(opt.policy), "utf8")
+    readFile(inputPath(opt.projection), "utf8"),
+    readFile(inputPath(opt.sdkIr), "utf8"),
+    readFile(inputPath(opt.plan), "utf8"),
+    readFile(inputPath(opt.policy), "utf8"),
   ]);
-  const projection = JSON.parse(projectionRaw); const sdkIr = JSON.parse(irRaw); const plan = JSON.parse(planRaw); const policy = JSON.parse(policyRaw);
+  const projection = JSON.parse(projectionRaw);
+  const sdkIr = JSON.parse(irRaw);
+  const plan = JSON.parse(planRaw);
+  const policy = JSON.parse(policyRaw);
   assert.equal(projection.schemaVersion, 1, "C-string projection schema drifted");
   assert.equal(sdkIr.schemaVersion, 1, "C-string SDK IR schema drifted");
   assert.equal(projection.defoldRevision, sdkIr.defoldRevision, "C-string projection and SDK IR revisions differ");
@@ -457,36 +527,101 @@ async function main() {
   const storage = storageShape(entries);
   const domains = enumDomains(entries, sdkIr);
   const artifacts = new Map([
-    [relative.header, renderHeader(entries, recipe)], [relative.runtime, renderRuntime()], [relative.native, renderNative(entries, storage, domains)],
-    [relative.jsiHeader, renderJsiHeader()], [relative.jsi, renderJsi(entries, storage)], [relative.browser, renderBrowser(entries)],
-    [relative.typescript, renderTypescript(entries)], [relative.staticHermes, renderStaticHermes()]
+    [relative.header, renderHeader(entries, recipe)],
+    [relative.runtime, renderRuntime()],
+    [relative.native, renderNative(entries, storage, domains)],
+    [relative.jsiHeader, renderJsiHeader()],
+    [relative.jsi, renderJsi(entries, storage)],
+    [relative.browser, renderBrowser(entries)],
+    [relative.typescript, renderTypescript(entries)],
+    [relative.staticHermes, renderStaticHermes()],
   ]);
   const report = {
-    schemaVersion: 1, defoldRevision: projection.defoldRevision,
-    sources: { projection: relative.projection, sdkIr: relative.sdkIr, plan: relative.plan, policy: relative.policy, hashes: { projection: sha256(projectionRaw), sdkIr: sha256(irRaw), plan: sha256(planRaw), policy: sha256(policyRaw) } },
-    selector: plan.eligibility,
-    coverage: { candidates: decisions.size, generated: entries.length, blocked: blocked.length, nativeAbiGenerated: entries.length, headerObjectCompiled: 0, pinnedEngineLinked: 0, stubAbiLinkedAndRuntimeTested: 0, nativeDynamicHermesAdapterGenerated: entries.length, nativeStaticHermesDirectMemoryAbiGenerated: entries.length, browserDirectMemoryDescriptorGenerated: entries.length, allTargetConformant: 0 },
-    stringPolicy: {
-      input: "The staged JavaScript adapter deliberately narrows const char* inputs to non-null JavaScript strings, uses the host JSI UTF-8 conversion, rejects embedded NUL, and synthesizes the terminator. Lone-surrogate handling therefore follows the selected JSI engine and remains outside cross-target conformance until a shared UTF-16-to-UTF-8 policy is generated. The C ABI itself continues to accept exact caller-provided non-NUL byte views; this policy does not claim every native byte domain is intrinsically UTF-8.",
-      result: "Revision-derived result contracts explicitly choose nullable or non-null and decode copied null-terminated native bytes as UTF-8. Public IR documentation supplies the semantic evidence; it does not prove arbitrary engine-returned bytes are valid Unicode.",
-      unresolved: "A candidate whose revision documentation and ABI shape do not select one structural recipe is blocked as cstring-semantic-contract-unresolved."
+    schemaVersion: 1,
+    defoldRevision: projection.defoldRevision,
+    sources: {
+      projection: relative.projection,
+      sdkIr: relative.sdkIr,
+      plan: relative.plan,
+      policy: relative.policy,
+      hashes: {
+        projection: sha256(projectionRaw),
+        sdkIr: sha256(irRaw),
+        plan: sha256(planRaw),
+        policy: sha256(policyRaw),
+      },
     },
-    abi: { input: "exact byte view; null data is valid only with zero length and means an empty string; embedded NUL rejected; terminator synthesized in bounded caller/TLS scratch", enumInput: "exact declared-value membership generated from pinned SDK IR; sentinel COUNT/MAX/NUM enumerators are rejected", enumDomains: Object.fromEntries(domains.map(({ name, members }) => [name, members])), output: "immediate overlap-safe copy to caller-owned dst/capacity/out_required/present; capacity includes the required trailing NUL, so capacity == required is too small for a present result", browserDescriptor: "route-specific scalar/enum input kinds, exact result lane width, result nullability, memory layouts, and string policy are generated; the descriptor remains private and unregistered", status: "fixed-width uint32_t / Static Hermes c_uint", storage, tlsScratchCapacity: recipe.scratchCapacity, reentrant: "mark/reset frames on thread-local or caller-owned scratch", allocation: "generated C ABI contains no explicit allocation primitive; an independent test observes zero warmed C++ operator-new calls. Caller-owned scratch is the strict caller-controlled capacity path; TLS scratch is a bounded convenience path. Engine implementations and JS string conversion are outside this claim" },
-    truthBoundary: "Private staging only: the TypeScript wrapper is not exported from the SDK barrel, the JSI installer is not registered, the Static Hermes artifact is not compiled into an application, the browser descriptor is not installed by a public module, and the guarded native sources are not linked into a production runtime target. This generated report claims generation only and intentionally records compile/link/runtime evidence as zero. tests/dmsdk-cstring-value-bindings.test.mjs independently object-compiles the generated native, runtime, and JSI units against pinned headers and links/runs every native adapter against ABI-compatible stubs. Pinned Defold engine linkage, extension retention, target execution, and engine-allocation observations remain unproven; generated does not mean engine-proven.",
+    selector: plan.eligibility,
+    coverage: {
+      candidates: decisions.size,
+      generated: entries.length,
+      blocked: blocked.length,
+      nativeAbiGenerated: entries.length,
+      headerObjectCompiled: 0,
+      pinnedEngineLinked: 0,
+      stubAbiLinkedAndRuntimeTested: 0,
+      nativeDynamicHermesAdapterGenerated: entries.length,
+      nativeStaticHermesDirectMemoryAbiGenerated: entries.length,
+      browserDirectMemoryDescriptorGenerated: entries.length,
+      allTargetConformant: 0,
+    },
+    stringPolicy: {
+      input:
+        "The staged JavaScript adapter deliberately narrows const char* inputs to non-null JavaScript strings, uses the host JSI UTF-8 conversion, rejects embedded NUL, and synthesizes the terminator. Lone-surrogate handling therefore follows the selected JSI engine and remains outside cross-target conformance until a shared UTF-16-to-UTF-8 policy is generated. The C ABI itself continues to accept exact caller-provided non-NUL byte views; this policy does not claim every native byte domain is intrinsically UTF-8.",
+      result:
+        "Revision-derived result contracts explicitly choose nullable or non-null and decode copied null-terminated native bytes as UTF-8. Public IR documentation supplies the semantic evidence; it does not prove arbitrary engine-returned bytes are valid Unicode.",
+      unresolved:
+        "A candidate whose revision documentation and ABI shape do not select one structural recipe is blocked as cstring-semantic-contract-unresolved.",
+    },
+    abi: {
+      input:
+        "exact byte view; null data is valid only with zero length and means an empty string; embedded NUL rejected; terminator synthesized in bounded caller/TLS scratch",
+      enumInput:
+        "exact declared-value membership generated from pinned SDK IR; sentinel COUNT/MAX/NUM enumerators are rejected",
+      enumDomains: Object.fromEntries(domains.map(({ name, members }) => [name, members])),
+      output:
+        "immediate overlap-safe copy to caller-owned dst/capacity/out_required/present; capacity includes the required trailing NUL, so capacity == required is too small for a present result",
+      browserDescriptor:
+        "route-specific scalar/enum input kinds, exact result lane width, result nullability, memory layouts, and string policy are generated; the descriptor remains private and unregistered",
+      status: "fixed-width uint32_t / Static Hermes c_uint",
+      storage,
+      tlsScratchCapacity: recipe.scratchCapacity,
+      reentrant: "mark/reset frames on thread-local or caller-owned scratch",
+      allocation:
+        "generated C ABI contains no explicit allocation primitive; an independent test observes zero warmed C++ operator-new calls. Caller-owned scratch is the strict caller-controlled capacity path; TLS scratch is a bounded convenience path. Engine implementations and JS string conversion are outside this claim",
+    },
+    truthBoundary:
+      "Private staging only: the TypeScript wrapper is not exported from the SDK barrel, the JSI installer is not registered, the Static Hermes artifact is not compiled into an application, the browser descriptor is not installed by a public module, and the guarded native sources are not linked into a production runtime target. This generated report claims generation only and intentionally records compile/link/runtime evidence as zero. tests/dmsdk-cstring-value-bindings.test.mjs independently object-compiles the generated native, runtime, and JSI units against pinned headers and links/runs every native adapter against ABI-compatible stubs. Pinned Defold engine linkage, extension retention, target execution, and engine-allocation observations remain unproven; generated does not mean engine-proven.",
     declarations: classified.map(({ row, rule, contract, semantics, patternDecision, stableId: value }) => ({
-      id: row.id, projectionId: row.projectionId, stableId: value, denseId: rule ? null : entries.findIndex(({ row: candidateRow }) => candidateRow.id === row.id), symbol: row.symbol,
-      provenance: row.provenance, disposition: rule ? "blocked" : "generated", blocker: rule?.id ?? null,
+      id: row.id,
+      projectionId: row.projectionId,
+      stableId: value,
+      denseId: rule ? null : entries.findIndex(({ row: candidateRow }) => candidateRow.id === row.id),
+      symbol: row.symbol,
+      provenance: row.provenance,
+      disposition: rule ? "blocked" : "generated",
+      blocker: rule?.id ?? null,
       universalFallback: rule ? "retained" : "retained-usage-materialized-recipe",
       stringContract: contract ? { ...contract, semanticEvidence: semantics.evidence } : null,
       blockerEvidence: rule ? semantics.evidence : null,
       patternDecision,
-      targetDisposition: rule ? { nativeDynamicHermes: "blocked", nativeStaticHermes: "blocked", html5BrowserHost: "blocked" } : { typescriptSdk: "staged-private-not-barrel-exported", nativeDynamicHermes: "staged-private-jsi-unregistered-unlinked", nativeStaticHermes: "staged-private-c-abi-uncompiled-unlinked", html5BrowserHost: "staged-private-descriptor-unregistered-unlinked" }
+      targetDisposition: rule
+        ? { nativeDynamicHermes: "blocked", nativeStaticHermes: "blocked", html5BrowserHost: "blocked" }
+        : {
+            typescriptSdk: "staged-private-not-barrel-exported",
+            nativeDynamicHermes: "staged-private-jsi-unregistered-unlinked",
+            nativeStaticHermes: "staged-private-c-abi-uncompiled-unlinked",
+            html5BrowserHost: "staged-private-descriptor-unregistered-unlinked",
+          },
     })),
-    artifacts: [...artifacts.keys()], artifactHashes: Object.fromEntries([...artifacts].map(([name, content]) => [name, sha256(content)]))
+    artifacts: [...artifacts.keys()],
+    artifactHashes: Object.fromEntries([...artifacts].map(([name, content]) => [name, sha256(content)])),
   };
   artifacts.set(relative.report, `${JSON.stringify(report, null, 2)}\n`);
   for (const [name, content] of artifacts) await writeOrCheck(opt.outputRoot, name, content, opt.check);
-  process.stdout.write(`${opt.check ? "Verified" : "Generated"} ${entries.length}/${decisions.size} dmSDK C-string/value adapters; ${blocked.length} fail closed.\n`);
+  process.stdout.write(
+    `${opt.check ? "Verified" : "Generated"} ${entries.length}/${decisions.size} dmSDK C-string/value adapters; ${blocked.length} fail closed.\n`,
+  );
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) await main();

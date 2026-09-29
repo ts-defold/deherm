@@ -8,7 +8,9 @@ import { classifyScriptBindings } from "../scripts/classify-script-bindings.mjs"
 const root = new URL("../", import.meta.url);
 const irSource = await readFile(new URL("packages/bindings/generated/defold-script-api-ir.json", root), "utf8");
 const ir = JSON.parse(irSource);
-const checkedIn = JSON.parse(await readFile(new URL("packages/bindings/generated/defold-script-binding-patterns.json", root), "utf8"));
+const checkedIn = JSON.parse(
+  await readFile(new URL("packages/bindings/generated/defold-script-binding-patterns.json", root), "utf8"),
+);
 const generated = classifyScriptBindings(ir, irSource);
 
 test("classifies every pending script function exactly once", () => {
@@ -20,20 +22,20 @@ test("classifies every pending script function exactly once", () => {
   assert.equal(pendingIds.length, 923);
   assert.deepEqual(classifiedIds, pendingIds);
   assert.equal(new Set(classifiedIds).size, classifiedIds.length);
-  assert.equal(generated.families.reduce((sum, family) => sum + family.count, 0), pendingIds.length);
-  assert.deepEqual(
-    Object.fromEntries(generated.families.map(({ name, count }) => [name, count])),
-    {
-      "dynamic-values": 14,
-      "callback-lifecycle": 25,
-      "overload-dispatch": 23,
-      "multi-result": 37,
-      "lua-table": 151,
-      "borrowed-handle": 456,
-      "defold-value": 127,
-      scalar: 90
-    }
+  assert.equal(
+    generated.families.reduce((sum, family) => sum + family.count, 0),
+    pendingIds.length,
   );
+  assert.deepEqual(Object.fromEntries(generated.families.map(({ name, count }) => [name, count])), {
+    "dynamic-values": 14,
+    "callback-lifecycle": 25,
+    "overload-dispatch": 23,
+    "multi-result": 37,
+    "lua-table": 151,
+    "borrowed-handle": 456,
+    "defold-value": 127,
+    scalar: 90,
+  });
 });
 
 test("keeps the generated classification deterministic", () => {
@@ -44,7 +46,7 @@ test("keeps the generated classification deterministic", () => {
 test("check mode accepts the current checked-in artifact", () => {
   execFileSync(process.execPath, ["scripts/classify-script-bindings.mjs", "--check"], {
     cwd: new URL("../", import.meta.url),
-    stdio: "pipe"
+    stdio: "pipe",
   });
 });
 

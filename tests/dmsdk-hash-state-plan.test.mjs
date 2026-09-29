@@ -3,10 +3,7 @@ import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-import {
-  buildDmSdkHashStatePlan,
-  indexDmSdkHashStatePlan,
-} from "../packages/compiler/src/dmsdk-hash-state-plan.mjs";
+import { buildDmSdkHashStatePlan, indexDmSdkHashStatePlan } from "../packages/compiler/src/dmsdk-hash-state-plan.mjs";
 
 const root = new URL("../", import.meta.url);
 const sources = Object.freeze({
@@ -18,9 +15,11 @@ const sources = Object.freeze({
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 
 async function inputs() {
-  const texts = Object.fromEntries(await Promise.all(
-    Object.entries(sources).map(async ([key, source]) => [key, await readFile(new URL(source, root), "utf8")]),
-  ));
+  const texts = Object.fromEntries(
+    await Promise.all(
+      Object.entries(sources).map(async ([key, source]) => [key, await readFile(new URL(source, root), "utf8")]),
+    ),
+  );
   return {
     texts,
     ir: JSON.parse(texts.ir),
@@ -45,7 +44,10 @@ test("one authenticated hash-state plan owns the complete lifecycle selection", 
   assert.equal(report.sourceHashes.plan, sha256(planText));
   assert.deepEqual(
     report.declarations.map(({ id }) => id).sort(),
-    plan.decisions.filter(({ fallback }) => !fallback).map(({ declarationId }) => declarationId).sort(),
+    plan.decisions
+      .filter(({ fallback }) => !fallback)
+      .map(({ declarationId }) => declarationId)
+      .sort(),
   );
   assert.equal(plan.coverage.selected, 10);
   assert.equal(plan.coverage.universalFallback, 0);
@@ -93,9 +95,7 @@ test("one linkage withdrawal falls back the whole state lifecycle", async () => 
 test("a duplicated lifecycle operation rejects the whole ambiguous group", async () => {
   const input = await inputs();
   const baseline = buildDmSdkHashStatePlan(input);
-  const original = baseline.decisions.find(
-    ({ semantics }) => semantics.operation === "Init" && semantics.width === 32,
-  );
+  const original = baseline.decisions.find(({ semantics }) => semantics.operation === "Init" && semantics.width === 32);
   const declaration = structuredClone(input.ir.declarations.find(({ id }) => id === original.declarationId));
   const row = structuredClone(input.shapes.rows.find(({ id }) => id === original.declarationId));
   const symbol = structuredClone(input.symbols.declarations[original.declarationId]);
@@ -137,9 +137,7 @@ test("a second complete state type with the same width falls both groups back", 
     twinRow.id = twinId;
     twinRow.parameters = twinRow.parameters.map((parameter) => ({
       ...parameter,
-      role: parameter.role === `pointer:record:${originalState}`
-        ? `pointer:record:${twinState}`
-        : parameter.role,
+      role: parameter.role === `pointer:record:${originalState}` ? `pointer:record:${twinState}` : parameter.role,
     }));
     input.ir.declarations.push(twinDeclaration);
     input.shapes.rows.push(twinRow);

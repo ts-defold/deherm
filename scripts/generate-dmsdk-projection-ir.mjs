@@ -6,10 +6,19 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 const scriptDirectory = dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = resolve(scriptDirectory, "..");
 const defaultIrPath = resolve(repositoryRoot, "packages/bindings/generated/defold-sdk-ir.json");
-const defaultClassificationPath = resolve(repositoryRoot, "packages/bindings/generated/defold-dmsdk-binding-patterns.json");
+const defaultClassificationPath = resolve(
+  repositoryRoot,
+  "packages/bindings/generated/defold-dmsdk-binding-patterns.json",
+);
 const defaultOutputPath = resolve(repositoryRoot, "packages/bindings/generated/defold-dmsdk-projection-ir.json");
-const defaultSymbolEvidencePath = resolve(repositoryRoot, "packages/bindings/generated/defold-dmsdk-symbol-evidence.json");
-const defaultTargetConditionalsPath = resolve(repositoryRoot, "packages/bindings/generated/defold-dmsdk-target-conditionals.json");
+const defaultSymbolEvidencePath = resolve(
+  repositoryRoot,
+  "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
+);
+const defaultTargetConditionalsPath = resolve(
+  repositoryRoot,
+  "packages/bindings/generated/defold-dmsdk-target-conditionals.json",
+);
 
 /**
  * The dmSDK headers that are the Lua transport itself rather than an API to
@@ -34,18 +43,38 @@ const loweringEvidencePaths = Object.freeze({
   astcProbe: "packages/bindings/generated/defold-dmsdk-astc-probe-bindings.json",
   xteaSpan: "packages/bindings/generated/defold-dmsdk-xtea-span-bindings.json",
   hashSpan: "packages/bindings/generated/defold-dmsdk-hash-span-bindings.json",
-  arenaSpan: "packages/bindings/generated/defold-dmsdk-arena-span-blockers.json"
+  arenaSpan: "packages/bindings/generated/defold-dmsdk-arena-span-blockers.json",
 });
 
 const PRIMITIVES = new Map([
-  ["bool", "bool"], ["char", "i8"], ["signed char", "i8"], ["unsigned char", "u8"],
-  ["short", "i16"], ["unsigned short", "u16"], ["int", "i32"], ["unsigned int", "u32"],
-  ["long", "word-signed"], ["unsigned long", "word-unsigned"], ["long long", "i64"],
-  ["unsigned long long", "u64"], ["int8_t", "i8"], ["uint8_t", "u8"],
-  ["int16_t", "i16"], ["uint16_t", "u16"], ["int32_t", "i32"], ["uint32_t", "u32"],
-  ["int64_t", "i64"], ["uint64_t", "u64"], ["float", "f32"], ["double", "f64"],
-  ["size_t", "usize"], ["ssize_t", "isize"], ["intptr_t", "isize"],
-  ["uintptr_t", "usize"], ["ptrdiff_t", "isize"], ["lua_Number", "f64"],
+  ["bool", "bool"],
+  ["char", "i8"],
+  ["signed char", "i8"],
+  ["unsigned char", "u8"],
+  ["short", "i16"],
+  ["unsigned short", "u16"],
+  ["int", "i32"],
+  ["unsigned int", "u32"],
+  ["long", "word-signed"],
+  ["unsigned long", "word-unsigned"],
+  ["long long", "i64"],
+  ["unsigned long long", "u64"],
+  ["int8_t", "i8"],
+  ["uint8_t", "u8"],
+  ["int16_t", "i16"],
+  ["uint16_t", "u16"],
+  ["int32_t", "i32"],
+  ["uint32_t", "u32"],
+  ["int64_t", "i64"],
+  ["uint64_t", "u64"],
+  ["float", "f32"],
+  ["double", "f64"],
+  ["size_t", "usize"],
+  ["ssize_t", "isize"],
+  ["intptr_t", "isize"],
+  ["uintptr_t", "usize"],
+  ["ptrdiff_t", "isize"],
+  ["lua_Number", "f64"],
   ["lua_Integer", "word-signed"],
 ]);
 
@@ -58,15 +87,24 @@ function sha256(value) {
 }
 
 function cleanType(type) {
-  return String(type ?? "").replace(/\s+/g, " ").trim();
+  return String(type ?? "")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function stripCv(type) {
-  return cleanType(type).replace(/\b(?:const|volatile|struct|class|enum)\b/g, " ").replace(/\s+/g, " ").trim();
+  return cleanType(type)
+    .replace(/\b(?:const|volatile|struct|class|enum)\b/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function leafName(name) {
-  return String(name ?? "").split("::").at(-1) ?? "";
+  return (
+    String(name ?? "")
+      .split("::")
+      .at(-1) ?? ""
+  );
 }
 
 function namespaceOf(name) {
@@ -130,11 +168,16 @@ function buildTypeIndex(declarations, opaqueTypes, targetConditionals = null) {
     candidates.push(declaration);
     leaves.set(leaf, candidates);
   }
-  const platformSupplied = new Map((targetConditionals?.declarations ?? [])
-    .filter((entry) => entry.kind === "type-alias" &&
-      entry.absentDisposition === "platform-supplied" &&
-      entry.respelledAs?.disposition === "platform-supplied")
-    .map((entry) => [entry.name, entry]));
+  const platformSupplied = new Map(
+    (targetConditionals?.declarations ?? [])
+      .filter(
+        (entry) =>
+          entry.kind === "type-alias" &&
+          entry.absentDisposition === "platform-supplied" &&
+          entry.respelledAs?.disposition === "platform-supplied",
+      )
+      .map((entry) => [entry.name, entry]),
+  );
   return {
     exact,
     leaves,
@@ -144,7 +187,11 @@ function buildTypeIndex(declarations, opaqueTypes, targetConditionals = null) {
 }
 
 function resolveDeclaration(type, owner, index) {
-  const name = stripCv(type).replace(/[&*]+/g, " ").replace(/\[[^\]]*\]/g, " ").replace(/\s+/g, " ").trim();
+  const name = stripCv(type)
+    .replace(/[&*]+/g, " ")
+    .replace(/\[[^\]]*\]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
   if (!name) return undefined;
   if (index.exact.has(name)) return index.exact.get(name);
   const scope = namespaceOf(owner).split("::").filter(Boolean);
@@ -152,8 +199,11 @@ function resolveDeclaration(type, owner, index) {
     const qualified = `${scope.slice(0, length).join("::")}::${name}`;
     if (index.exact.has(qualified)) return index.exact.get(qualified);
   }
-  const candidates = [...new Map((index.leaves.get(leafName(name)) ?? [])
-    .map((candidate) => [`${candidate.kind}:${candidate.name}`, candidate])).values()];
+  const candidates = [
+    ...new Map(
+      (index.leaves.get(leafName(name)) ?? []).map((candidate) => [`${candidate.kind}:${candidate.name}`, candidate]),
+    ).values(),
+  ];
   const complete = candidates.filter(({ completeDefinition }) => completeDefinition);
   if (complete.length === 1) return complete[0];
   return candidates.length === 1 ? candidates[0] : undefined;
@@ -162,9 +212,10 @@ function resolveDeclaration(type, owner, index) {
 function parseCallback(type, owner, index, state) {
   const match = cleanType(type).match(/^(.*?)\(\s*\*[^)]*\)\s*\((.*)\)(?:\s*(?:const|noexcept))*$/);
   if (!match) return undefined;
-  const parameters = match[2].trim() === "" || match[2].trim() === "void"
-    ? []
-    : splitTopLevel(match[2]).map((parameter) => lowerType(parameter, owner, index, state));
+  const parameters =
+    match[2].trim() === "" || match[2].trim() === "void"
+      ? []
+      : splitTopLevel(match[2]).map((parameter) => lowerType(parameter, owner, index, state));
   return {
     kind: "callback",
     result: lowerType(match[1], owner, index, state),
@@ -287,8 +338,12 @@ function lowerType(type, owner, index, state = { aliases: new Set() }) {
     const representation = Object.keys(targetTypes).length
       ? { ...loweredTarget, targetTypes, targetDependent }
       : loweredTarget;
-    if (/^H[A-Z]/.test(leafName(resolved.name)) || /Handle(?:$|[A-Z_])/.test(leafName(resolved.name)) ||
-        ["pointer", "handle"].includes(loweredTarget.kind) || targetIncludesPointer) {
+    if (
+      /^H[A-Z]/.test(leafName(resolved.name)) ||
+      /Handle(?:$|[A-Z_])/.test(leafName(resolved.name)) ||
+      ["pointer", "handle"].includes(loweredTarget.kind) ||
+      targetIncludesPointer
+    ) {
       return {
         kind: "handle",
         name: resolved.name,
@@ -304,7 +359,12 @@ function lowerType(type, owner, index, state = { aliases: new Set() }) {
   }
   if (base === "id") return { kind: "opaque", name: "id", reason: "objective-c-object" };
   if (/^H[A-Z]/.test(leafName(base)) || /Handle(?:$|[A-Z_])/.test(leafName(base))) {
-    return { kind: "handle", name: base, representation: { kind: "unknown", spelling: base, reason: "unresolved-handle-representation" }, nullable: "unspecified" };
+    return {
+      kind: "handle",
+      name: base,
+      representation: { kind: "unknown", spelling: base, reason: "unresolved-handle-representation" },
+      nullable: "unspecified",
+    };
   }
   return { kind: "unknown", spelling: base, reason: "unresolved-native-type" };
 }
@@ -356,8 +416,10 @@ function directionOf(type, name) {
 
 function contextEffect(declaration) {
   if (declaration.kind === "method") return { kind: "receiver", receiver: "implicit", binding: "required" };
-  if (declaration.kind === "constructor") return { kind: "receiver-construction", receiver: "implicit", binding: "required" };
-  if (declaration.kind === "destructor") return { kind: "receiver-destruction", receiver: "implicit", binding: "required" };
+  if (declaration.kind === "constructor")
+    return { kind: "receiver-construction", receiver: "implicit", binding: "required" };
+  if (declaration.kind === "destructor")
+    return { kind: "receiver-destruction", receiver: "implicit", binding: "required" };
   if (declaration.kind === "function-template") return { kind: "template-instantiation", specialization: "required" };
   return { kind: "global", binding: "none" };
 }
@@ -383,7 +445,9 @@ function collectIndices(signature, kinds) {
   const result = [];
   for (const parameter of signature.parameters) {
     let present = false;
-    walkSurface(parameter.type, (node) => { if (kinds.has(node.kind)) present = true; });
+    walkSurface(parameter.type, (node) => {
+      if (kinds.has(node.kind)) present = true;
+    });
     if (present) result.push(parameter.position);
   }
   return result;
@@ -396,11 +460,17 @@ function semanticTokens(declaration, binding, signature, effects) {
   if (nodes.some(({ kind }) => kind === "unknown")) tokens.add("native-type-resolution");
   if (allNodes.some(({ kind }) => kind === "opaque")) tokens.add("opaque-type-abi-contract");
   if (nodes.some(({ kind }) => kind === "handle")) tokens.add("handle-ownership-nullability-lifetime");
-  if (nodes.some(({ kind }) => ["pointer", "reference", "cstring"].includes(kind))) tokens.add("pointer-bounds-nullability-lifetime");
-  if (nodes.some(({ kind }) => ["record", "template-record"].includes(kind))) tokens.add("record-layout-alignment-copy");
+  if (nodes.some(({ kind }) => ["pointer", "reference", "cstring"].includes(kind)))
+    tokens.add("pointer-bounds-nullability-lifetime");
+  if (nodes.some(({ kind }) => ["record", "template-record"].includes(kind)))
+    tokens.add("record-layout-alignment-copy");
   if (nodes.some(({ kind }) => kind === "enum")) tokens.add("enum-width-domain-validation");
   if (nodes.some(({ kind }) => kind === "callback")) tokens.add("callback-thread-reentrancy-lifetime");
-  if (nodes.some(({ kind }) => ["template", "template-record", "type-parameter"].includes(kind)) || declaration.kind === "function-template") tokens.add("template-specialization-set");
+  if (
+    nodes.some(({ kind }) => ["template", "template-record", "type-parameter"].includes(kind)) ||
+    declaration.kind === "function-template"
+  )
+    tokens.add("template-specialization-set");
   if (signature.variadic || nodes.some(({ kind }) => kind === "variadic")) {
     tokens.add("typed-nonvariadic-facade");
   }
@@ -412,7 +482,8 @@ function semanticTokens(declaration, binding, signature, effects) {
   // emitting it only for the ones that looked doubtful is what let 1361 units
   // share one unexamined answer.
   tokens.add("target-feature-symbol-matrix");
-  if (signature.parameters.some(({ direction }) => direction === "out" || direction === "inout")) tokens.add("out-storage-initialization-failure");
+  if (signature.parameters.some(({ direction }) => direction === "out" || direction === "inout"))
+    tokens.add("out-storage-initialization-failure");
   if (effects.context.kind !== "global") tokens.add("receiver-provenance-lifetime");
   if (binding.families.includes("callback")) tokens.add("callback-registration-unregistration");
   return [...tokens].sort();
@@ -429,15 +500,17 @@ function loweringEvidenceIndex(reports) {
       // Some callable C ABI families deliberately remain sibling execution
       // lanes while the universal catalog stays the preferred lowering.
       if (row.preferredLowering === false) continue;
-      const emitted = row.emitted === true || (row.wrapper && row.disposition !== "blocked" && row.stages?.generated !== "not-applicable");
+      const emitted =
+        row.emitted === true ||
+        (row.wrapper && row.disposition !== "blocked" && row.stages?.generated !== "not-applicable");
       const blocked = row.disposition === "blocked" || row.emitted === false;
       if (!emitted && !blocked) continue;
       add(row.id, {
         state: emitted ? "generated-adapter" : "policy-blocked",
         family,
-        wrapper: emitted ? row.wrapper ?? null : null,
-        policy: emitted ? null : row.policy?.id ?? row.blocker ?? row.blockers ?? "reviewed-policy-blocked",
-        stages: row.stages ?? null
+        wrapper: emitted ? (row.wrapper ?? null) : null,
+        policy: emitted ? null : (row.policy?.id ?? row.blocker ?? row.blockers ?? "reviewed-policy-blocked"),
+        stages: row.stages ?? null,
       });
     }
   }
@@ -446,7 +519,8 @@ function loweringEvidenceIndex(reports) {
 
 function countNodes(rows) {
   const counts = new Map();
-  for (const row of rows) for (const node of nodesOf(row.signature)) counts.set(node.kind, (counts.get(node.kind) ?? 0) + 1);
+  for (const row of rows)
+    for (const node of nodesOf(row.signature)) counts.set(node.kind, (counts.get(node.kind) ?? 0) + 1);
   return Object.fromEntries([...counts].sort(([left], [right]) => left.localeCompare(right)));
 }
 
@@ -467,13 +541,17 @@ function buildRow(declaration, binding, typeIndex, defoldRevision, loweringEvide
   const signature = {
     result: lowerType(declaration.returns ?? "void", declaration.name, typeIndex),
     parameters,
-    variadic: parameters.some(({ type }) => type.kind === "variadic") ||
+    variadic:
+      parameters.some(({ type }) => type.kind === "variadic") ||
       /(?:^|[, (])\.\.\.(?:\)|$)/.test(declaration.type ?? ""),
   };
   const callbackParameters = collectIndices(signature, new Set(["callback"]));
   let resultHasCallback = false;
-  walkSurface(signature.result, (node) => { if (node.kind === "callback") resultHasCallback = true; });
-  const nestedOrOpaqueCallback = binding.families.includes("callback") && callbackParameters.length === 0 && !resultHasCallback;
+  walkSurface(signature.result, (node) => {
+    if (node.kind === "callback") resultHasCallback = true;
+  });
+  const nestedOrOpaqueCallback =
+    binding.families.includes("callback") && callbackParameters.length === 0 && !resultHasCallback;
   const hasCallback = callbackParameters.length > 0 || resultHasCallback || nestedOrOpaqueCallback;
   const recordParameters = collectIndices(signature, new Set(["record", "template-record"]));
   const templateParameters = collectIndices(signature, new Set(["template", "template-record", "type-parameter"]));
@@ -485,7 +563,7 @@ function buildRow(declaration, binding, typeIndex, defoldRevision, loweringEvide
     },
     ownership: undefined,
     lifetime: {
-      result: "value-or-static" ,
+      result: "value-or-static",
       policy: "resource-lifetimes-require-semantic-token",
     },
     context: contextEffect(declaration),
@@ -502,12 +580,17 @@ function buildRow(declaration, binding, typeIndex, defoldRevision, loweringEvide
       reentrancy: hasCallback ? "unspecified-requires-token" : "not-applicable",
     },
     records: {
-      present: recordParameters.length > 0 || surfaceNodesOf(signature).some(({ kind }) => ["record", "template-record"].includes(kind)),
+      present:
+        recordParameters.length > 0 ||
+        surfaceNodesOf(signature).some(({ kind }) => ["record", "template-record"].includes(kind)),
       parameters: recordParameters,
       layout: "source-declaration-only-not-abi-verified",
     },
     templates: {
-      present: declaration.kind === "function-template" || templateParameters.length > 0 || surfaceNodesOf(signature).some(({ kind }) => ["template", "template-record", "type-parameter"].includes(kind)),
+      present:
+        declaration.kind === "function-template" ||
+        templateParameters.length > 0 ||
+        surfaceNodesOf(signature).some(({ kind }) => ["template", "template-record", "type-parameter"].includes(kind)),
       parameters: templateParameters,
       specialization: "unspecified-requires-token",
     },
@@ -532,7 +615,11 @@ function buildRow(declaration, binding, typeIndex, defoldRevision, loweringEvide
     },
   };
   effects.ownership = ownershipEffect(declaration, signature);
-  if (surfaceNodesOf(signature).some(({ kind }) => ["handle", "pointer", "reference", "cstring", "callback"].includes(kind))) {
+  if (
+    surfaceNodesOf(signature).some(({ kind }) =>
+      ["handle", "pointer", "reference", "cstring", "callback"].includes(kind),
+    )
+  ) {
     effects.lifetime.result = "unspecified-requires-token";
   }
   const tokens = semanticTokens(declaration, binding, signature, effects);
@@ -553,7 +640,7 @@ function buildRow(declaration, binding, typeIndex, defoldRevision, loweringEvide
     family: null,
     wrapper: null,
     policy: null,
-    stages: null
+    stages: null,
   };
   return {
     id: declaration.id,
@@ -593,7 +680,9 @@ export async function build(
     throw new Error("dmSDK target conditionals revision differs from dmSDK IR");
   }
   const symbolEvidenceById = new Map(Object.entries(symbolEvidence?.declarations ?? {}));
-  const loweringReports = Object.fromEntries(Object.entries(loweringEvidenceContents).map(([name, content]) => [name, JSON.parse(content)]));
+  const loweringReports = Object.fromEntries(
+    Object.entries(loweringEvidenceContents).map(([name, content]) => [name, JSON.parse(content)]),
+  );
   for (const [name, report] of Object.entries(loweringReports)) {
     if (report.defoldRevision && report.defoldRevision !== ir.defoldRevision) {
       throw new Error(`${name} lowering evidence revision differs from dmSDK IR`);
@@ -610,23 +699,34 @@ export async function build(
   );
   const seen = new Set();
   for (const id of loweringById.keys()) {
-    if (!declarationsById.has(id)) throw new Error(`Lowering evidence names a declaration absent from source IR: ${id}`);
+    if (!declarationsById.has(id))
+      throw new Error(`Lowering evidence names a declaration absent from source IR: ${id}`);
   }
-  const rows = classification.bindings.map((binding) => {
-    if (seen.has(binding.id)) throw new Error(`Duplicate classified declaration ${binding.id}`);
-    seen.add(binding.id);
-    const declaration = declarationsById.get(binding.id);
-    if (!declaration) throw new Error(`Classified declaration does not exist in source IR: ${binding.id}`);
-    return buildRow(declaration, binding, typeIndex, ir.defoldRevision, loweringById.get(binding.id),
-      symbolEvidenceById.get(binding.id));
-  }).sort((left, right) => left.id.localeCompare(right.id));
+  const rows = classification.bindings
+    .map((binding) => {
+      if (seen.has(binding.id)) throw new Error(`Duplicate classified declaration ${binding.id}`);
+      seen.add(binding.id);
+      const declaration = declarationsById.get(binding.id);
+      if (!declaration) throw new Error(`Classified declaration does not exist in source IR: ${binding.id}`);
+      return buildRow(
+        declaration,
+        binding,
+        typeIndex,
+        ir.defoldRevision,
+        loweringById.get(binding.id),
+        symbolEvidenceById.get(binding.id),
+      );
+    })
+    .sort((left, right) => left.id.localeCompare(right.id));
 
   const missingSemanticToken = [];
   for (const row of rows) {
     const unknowns = nodesOf(row.signature).filter(({ kind }) => kind === "unknown");
-    if (unknowns.length > 0 && !row.semanticTokensNeeded.includes("native-type-resolution")) missingSemanticToken.push(row.id);
+    if (unknowns.length > 0 && !row.semanticTokensNeeded.includes("native-type-resolution"))
+      missingSemanticToken.push(row.id);
   }
-  if (missingSemanticToken.length) throw new Error(`Unknown types silently escaped semantic-token accounting: ${missingSemanticToken.join(", ")}`);
+  if (missingSemanticToken.length)
+    throw new Error(`Unknown types silently escaped semantic-token accounting: ${missingSemanticToken.join(", ")}`);
 
   const projectionIds = new Set(rows.map(({ projectionId }) => projectionId));
   if (projectionIds.size !== rows.length) throw new Error("Projection ID collision");
@@ -653,9 +753,39 @@ export async function build(
     schemaVersion: 1,
     defoldRevision: ir.defoldRevision,
     algebra: {
-      valueConstructors: ["void", "scalar", "enum", "cstring", "array", "pointer", "reference", "record", "template-record", "handle", "callback", "named", "template", "type-parameter", "variadic", "opaque", "unknown"],
-      effectDimensions: ["direction", "ownership", "lifetime", "context", "thread", "callbacks", "records", "templates", "spans", "availability"],
-      unknownPolicy: "Unknown native shapes and unresolved semantics are emitted explicitly and must have a matching semantic token. There is no permissive fallback.",
+      valueConstructors: [
+        "void",
+        "scalar",
+        "enum",
+        "cstring",
+        "array",
+        "pointer",
+        "reference",
+        "record",
+        "template-record",
+        "handle",
+        "callback",
+        "named",
+        "template",
+        "type-parameter",
+        "variadic",
+        "opaque",
+        "unknown",
+      ],
+      effectDimensions: [
+        "direction",
+        "ownership",
+        "lifetime",
+        "context",
+        "thread",
+        "callbacks",
+        "records",
+        "templates",
+        "spans",
+        "availability",
+      ],
+      unknownPolicy:
+        "Unknown native shapes and unresolved semantics are emitted explicitly and must have a matching semantic token. There is no permissive fallback.",
     },
     sources: {
       ir: "packages/bindings/generated/defold-sdk-ir.json",
@@ -667,7 +797,9 @@ export async function build(
         classification: sha256(classificationContent),
         symbolEvidence: symbolEvidenceContent ? sha256(symbolEvidenceContent) : null,
         targetConditionals: targetConditionalsContent ? sha256(targetConditionalsContent) : null,
-        loweringEvidence: Object.fromEntries(Object.entries(loweringEvidenceContents).map(([name, content]) => [name, sha256(content)])),
+        loweringEvidence: Object.fromEntries(
+          Object.entries(loweringEvidenceContents).map(([name, content]) => [name, sha256(content)]),
+        ),
         headers: headerHashes,
       },
     },
@@ -700,10 +832,14 @@ export async function run(argv = process.argv.slice(2)) {
   const options = parseOptions(argv);
   const irContent = await readFile(options.ir, "utf8");
   const classificationContent = await readFile(options.classification, "utf8");
-  const loweringEvidenceContents = Object.fromEntries(await Promise.all(Object.entries(loweringEvidencePaths).map(async ([name, relative]) => [
-    name,
-    await readFile(resolve(repositoryRoot, relative), "utf8")
-  ])));
+  const loweringEvidenceContents = Object.fromEntries(
+    await Promise.all(
+      Object.entries(loweringEvidencePaths).map(async ([name, relative]) => [
+        name,
+        await readFile(resolve(repositoryRoot, relative), "utf8"),
+      ]),
+    ),
+  );
   const symbolEvidenceContent = await readFile(options.symbolEvidence, "utf8");
   const targetConditionalsContent = await readFile(options.targetConditionals, "utf8");
   const report = await build(
@@ -715,12 +851,15 @@ export async function run(argv = process.argv.slice(2)) {
   );
   const serialized = `${JSON.stringify(report, null, 2)}\n`;
   if (options.check) {
-    if (await readFile(options.output, "utf8") !== serialized) throw new Error(`${options.output} is stale; regenerate dmSDK projection IR`);
+    if ((await readFile(options.output, "utf8")) !== serialized)
+      throw new Error(`${options.output} is stale; regenerate dmSDK projection IR`);
   } else {
     await mkdir(dirname(options.output), { recursive: true });
     await writeFile(options.output, serialized);
   }
-  process.stdout.write(`${options.check ? "Verified" : "Generated"} ${report.coverage.projectedDeclarations}/${report.coverage.classifiedDeclarations} dmSDK projection rows across ${Object.keys(report.constructorSummary).length} value constructors.\n`);
+  process.stdout.write(
+    `${options.check ? "Verified" : "Generated"} ${report.coverage.projectedDeclarations}/${report.coverage.classifiedDeclarations} dmSDK projection rows across ${Object.keys(report.constructorSummary).length} value constructors.\n`,
+  );
   return report;
 }
 

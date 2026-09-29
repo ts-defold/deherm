@@ -7,7 +7,7 @@ import { renderWebRuntimeVariant } from "../packages/cli/src/toolchains.mjs";
 
 const extensionBootstrapSource = await readFile(
   new URL("../defold/defold_hermes/lib/web/library_defold_hermes.js", import.meta.url),
-  "utf8"
+  "utf8",
 );
 
 test("release web runtime stripping preserves the surrounding source layout", () => {
@@ -19,15 +19,12 @@ test("release web runtime stripping preserves the surrounding source layout", ()
     "  /* DEHERM_DEBUG_SNAPSHOT_END */",
     "  next: true",
     "};",
-    ""
+    "",
   ].join("\n");
-  assert.equal(renderWebRuntimeVariant(source, "release"), [
-    "var value = {",
-    "  live: true,",
-    "  next: true",
-    "};",
-    ""
-  ].join("\n"));
+  assert.equal(
+    renderWebRuntimeVariant(source, "release"),
+    ["var value = {", "  live: true,", "  next: true", "};", ""].join("\n"),
+  );
 });
 
 test("browser bootstrap installs the generated universal script provider", () => {
@@ -37,25 +34,26 @@ test("browser bootstrap installs the generated universal script provider", () =>
 });
 
 async function loadLibrary(options = {}) {
-  const source = renderWebRuntimeVariant(await readFile(
-    new URL("../packages/cli/templates/web-runtime/library_defold_hermes.js", import.meta.url),
-    "utf8"
-  ), "debug");
-  const componentSource = renderWebRuntimeVariant(await readFile(
-    new URL("../packages/cli/templates/web-runtime/component_bridge.js", import.meta.url),
-    "utf8"
-  ), "debug");
+  const source = renderWebRuntimeVariant(
+    await readFile(new URL("../packages/cli/templates/web-runtime/library_defold_hermes.js", import.meta.url), "utf8"),
+    "debug",
+  );
+  const componentSource = renderWebRuntimeVariant(
+    await readFile(new URL("../packages/cli/templates/web-runtime/component_bridge.js", import.meta.url), "utf8"),
+    "debug",
+  );
   const logs = [];
-  const record = (level) => (...parts) => logs.push({ level, text: parts.join(" ") });
+  const record =
+    (level) =>
+    (...parts) =>
+      logs.push({ level, text: parts.join(" ") });
   const context = vm.createContext({
-    console: options.captureConsole
-      ? { log: record("log"), warn: record("warn"), error: record("error") }
-      : console,
+    console: options.captureConsole ? { log: record("log"), warn: record("warn"), error: record("error") } : console,
     performance: { now: () => 0, memory: options.memory },
     UTF8ToString: () => options.bundleSource ?? "void 0",
     stringToUTF8: () => {},
     autoAddDeps() {},
-    addToLibrary() {}
+    addToLibrary() {},
   });
   vm.runInContext(source, context, { filename: "library_defold_hermes.js" });
   vm.runInContext(componentSource, context, { filename: "component_bridge.js" });
@@ -86,7 +84,11 @@ test("web callback reset invalidates handles across runtime reloads", async () =
 test("web reset disposes the generated universal scratch pool", async () => {
   const { context } = await loadLibrary();
   let disposals = 0;
-  context.DEFOLD_HERMES_SCRIPT_UNIVERSAL = { dispose() { ++disposals; } };
+  context.DEFOLD_HERMES_SCRIPT_UNIVERSAL = {
+    dispose() {
+      ++disposals;
+    },
+  };
   context.DEFOLD_HERMES_BRIDGE.reset();
   assert.equal(disposals, 1);
 });
@@ -98,7 +100,11 @@ test("web finalization cleans roots and callbacks when the app hook throws", asy
   const callback = callbacks.acquire(() => {});
   const error = new Error("final failed");
 
-  bridge.app = { final() { throw error; } };
+  bridge.app = {
+    final() {
+      throw error;
+    },
+  };
   context.__defoldAppV1 = bridge.app;
   context.__defoldHostV1 = {};
   context.__defoldModulesV1 = {};
@@ -124,12 +130,14 @@ test("generated web bindings execute the timer lifecycle through real callback h
   const { context, library } = await loadLibrary();
   const source = await readFile(
     new URL("../defold/defold_hermes/lib/web/generated_modules.js", import.meta.url),
-    "utf8"
+    "utf8",
   );
-  const verification = JSON.parse(await readFile(
-    new URL("../packages/bindings/generated/defold-script-special-call-verification.json", import.meta.url),
-    "utf8"
-  ));
+  const verification = JSON.parse(
+    await readFile(
+      new URL("../packages/bindings/generated/defold-script-special-call-verification.json", import.meta.url),
+      "utf8",
+    ),
+  );
   const vectors = new Map(verification.separateModules.map((vector) => [vector.function, vector]));
   const scenario = verification.scenarios.find(({ module }) => module === "Timer");
   const calls = [];
@@ -140,7 +148,7 @@ test("generated web bindings execute the timer lifecycle through real callback h
     const handle = nextHandle++;
     timers.set(handle, {
       repeating: args[1] !== 0,
-      callback: { runtime: args[2], slot: args[3], generation: args[4], type: args[5] }
+      callback: { runtime: args[2], slot: args[3], generation: args[4], type: args[5] },
     });
     return handle;
   };
@@ -152,7 +160,7 @@ test("generated web bindings execute the timer lifecycle through real callback h
       timer.callback.runtime,
       timer.callback.slot,
       timer.callback.generation,
-      timer.callback.type
+      timer.callback.type,
     );
     timers.delete(handle);
     return 1;
@@ -167,14 +175,14 @@ test("generated web bindings execute the timer lifecycle through real callback h
       timer.callback.generation,
       timer.callback.type,
       handle,
-      scenario.elapsed
+      scenario.elapsed,
     );
     if (!timer.repeating) {
       library.defoldHermesWebReleaseCallback(
         timer.callback.runtime,
         timer.callback.slot,
         timer.callback.generation,
-        timer.callback.type
+        timer.callback.type,
       );
       timers.delete(handle);
     }
@@ -197,7 +205,7 @@ test("generated web bindings execute the timer lifecycle through real callback h
     runtime: calls[0].args[2],
     slot: calls[0].args[3],
     generation: calls[0].args[4],
-    type: calls[0].args[5]
+    type: calls[0].args[5],
   };
   assert.equal(context.DEFOLD_HERMES_WEB_CALLBACKS.resolve(callbackHandle), callback);
   assert.equal(modules.Timer.trigger(oneShot), true);
@@ -213,15 +221,18 @@ test("generated web bindings execute the timer lifecycle through real callback h
   assert.equal(context.DEFOLD_HERMES_WEB_CALLBACKS.resolve(repeatingCallback), null);
   assert.equal(modules.Timer.trigger(repeating), false);
   assert.equal(typeof modules.Timer.cancel(7), "boolean");
-  assert.deepEqual(calls.map(({ function: name, args }) => [name, args[0]]), [
-    ["delay", scenario.delay],
-    ["trigger", scenario.firstHandle],
-    ["delay", scenario.delay],
-    ["trigger", scenario.secondHandle],
-    ["cancel", scenario.secondHandle],
-    ["trigger", scenario.secondHandle],
-    ["cancel", 7]
-  ]);
+  assert.deepEqual(
+    calls.map(({ function: name, args }) => [name, args[0]]),
+    [
+      ["delay", scenario.delay],
+      ["trigger", scenario.firstHandle],
+      ["delay", scenario.delay],
+      ["trigger", scenario.secondHandle],
+      ["cancel", scenario.secondHandle],
+      ["trigger", scenario.secondHandle],
+      ["cancel", 7],
+    ],
+  );
 
   let failedHandle;
   context._defold_hermes_lua_timer_delay = (...args) => {
@@ -234,13 +245,12 @@ test("generated web bindings execute the timer lifecycle through real callback h
 });
 
 test("generated browser dmSDK scalar adapter exposes only the 16 semantically valid bindings", async () => {
-  const report = JSON.parse(await readFile(
-    new URL("../packages/bindings/generated/defold-dmsdk-scalar-thunks.json", import.meta.url),
-    "utf8"
-  ));
+  const report = JSON.parse(
+    await readFile(new URL("../packages/bindings/generated/defold-dmsdk-scalar-thunks.json", import.meta.url), "utf8"),
+  );
   const source = await readFile(
     new URL("../defold/defold_hermes/lib/web/generated_dmsdk_scalar.js", import.meta.url),
-    "utf8"
+    "utf8",
   );
   const context = vm.createContext({ autoAddDeps() {}, addToLibrary() {} });
   let nativeCalls = 0;
@@ -263,10 +273,7 @@ test("generated browser dmSDK scalar adapter exposes only the 16 semantically va
 });
 
 test("browser script bridge declares helpers, supports bounded stack reentrancy, and restores its Emscripten stack", async () => {
-  const source = await readFile(
-    new URL("../defold/defold_hermes/lib/web/script_bridge.js", import.meta.url),
-    "utf8"
-  );
+  const source = await readFile(new URL("../defold/defold_hermes/lib/web/script_bridge.js", import.meta.url), "utf8");
   const memory = new ArrayBuffer(256 * 1024);
   const HEAPU8 = new Uint8Array(memory);
   const HEAPU32 = new Uint32Array(memory);
@@ -290,8 +297,12 @@ test("browser script bridge declares helpers, supports bounded stack reentrancy,
       stack = (stack + size + 7) & ~7;
       return result;
     },
-    stackRestore(value) { stack = value; },
-    lengthBytesUTF8(value) { return encoder.encode(value).length; },
+    stackRestore(value) {
+      stack = value;
+    },
+    lengthBytesUTF8(value) {
+      return encoder.encode(value).length;
+    },
     stringToUTF8(value, pointer, capacity) {
       const bytes = encoder.encode(value).subarray(0, capacity - 1);
       HEAPU8.set(bytes, pointer);
@@ -302,7 +313,22 @@ test("browser script bridge declares helpers, supports bounded stack reentrancy,
       return decoder.decode(HEAPU8.subarray(pointer, end));
     },
     _defoldHermesScriptLastError: () => 0,
-    _defoldHermesScriptCall(stableId, count, tags, handleKinds, numbers, payloads, offsets, lengths, strings, stringDataLength, outTag, outHandleKind, outNumber, outPayload) {
+    _defoldHermesScriptCall(
+      stableId,
+      count,
+      tags,
+      handleKinds,
+      numbers,
+      payloads,
+      offsets,
+      lengths,
+      strings,
+      stringDataLength,
+      outTag,
+      outHandleKind,
+      outNumber,
+      outPayload,
+    ) {
       nativeCalls += 1;
       if (attemptReentry) {
         attemptReentry = false;
@@ -329,11 +355,14 @@ test("browser script bridge declares helpers, supports bounded stack reentrancy,
       assert.equal(HEAPF64[(numbers >> 3) + 1], 1);
       const stringOffset = HEAPU32[(offsets >> 2) + 2];
       const stringLength = HEAPU32[(lengths >> 2) + 2];
-      assert.equal(decoder.decode(HEAPU8.subarray(strings + stringOffset, strings + stringOffset + stringLength)), expectedInputString);
+      assert.equal(
+        decoder.decode(HEAPU8.subarray(strings + stringOffset, strings + stringOffset + stringLength)),
+        expectedInputString,
+      );
       HEAPU8[outTag] = 3;
       HEAPF64[outNumber >> 3] = 77;
       return 1;
-    }
+    },
   });
   vm.runInContext(source, context, { filename: "script_bridge.js" });
   assert.deepEqual(
@@ -346,8 +375,8 @@ test("browser script bridge declares helpers, supports bounded stack reentrancy,
       "$stackRestore",
       "$UTF8ToString",
       "$stringToUTF8",
-      "$lengthBytesUTF8"
-    ]
+      "$lengthBytesUTF8",
+    ],
   );
   context.DEFOLD_HERMES_SCRIPT_BRIDGE = context.LibraryDefoldHermesScriptBridge.$DEFOLD_HERMES_SCRIPT_BRIDGE;
   bridge = context.DEFOLD_HERMES_SCRIPT_BRIDGE.install();
@@ -400,16 +429,22 @@ async function loadedBridge(options = {}) {
 test("browser activation commits a candidate and acknowledges its exact fingerprint", async () => {
   const marks = [];
   const { context, logs } = await loadedBridge({
-    bundleSource: bundle({ fingerprint: fingerprintA, init: "globalThis.mark('a:init')", final: "globalThis.mark('a:final')" })
+    bundleSource: bundle({
+      fingerprint: fingerprintA,
+      init: "globalThis.mark('a:init')",
+      final: "globalThis.mark('a:final')",
+    }),
   });
   context.mark = (value) => marks.push(value);
   const bridge = context.DEFOLD_HERMES_BRIDGE;
   bridge.init();
 
-  const result = bridge.activate(bundle({
-    fingerprint: fingerprintB,
-    init: "globalThis.mark('b:init')"
-  }));
+  const result = bridge.activate(
+    bundle({
+      fingerprint: fingerprintB,
+      init: "globalThis.mark('b:init')",
+    }),
+  );
 
   assert.equal(result.status, "activated");
   assert.equal(result.fingerprint, fingerprintB);
@@ -418,24 +453,31 @@ test("browser activation commits a candidate and acknowledges its exact fingerpr
   // The candidate initializes before the outgoing generation finalizes, which
   // is what makes a rejected candidate survivable. Native orders it the same way.
   assert.deepEqual(marks, ["a:init", "b:init", "a:final"]);
-  assert.ok(logs.some(({ text }) => text.includes(
-    `DEHERM_EVENT bundle-activated fingerprint=${fingerprintB} resource_generation=2 runtime_id=0 initial=false`)));
+  assert.ok(
+    logs.some(({ text }) =>
+      text.includes(
+        `DEHERM_EVENT bundle-activated fingerprint=${fingerprintB} resource_generation=2 runtime_id=0 initial=false`,
+      ),
+    ),
+  );
 });
 
 test("a browser candidate that throws leaves the running generation active", async () => {
   const marks = [];
   const { context, logs } = await loadedBridge({
-    bundleSource: bundle({ fingerprint: fingerprintA, update: "globalThis.mark('a:update')" })
+    bundleSource: bundle({ fingerprint: fingerprintA, update: "globalThis.mark('a:update')" }),
   });
   context.mark = (value) => marks.push(value);
   const bridge = context.DEFOLD_HERMES_BRIDGE;
   bridge.init();
   const running = bridge.app;
 
-  const result = bridge.activate(bundle({
-    fingerprint: fingerprintB,
-    init: "throw new Error('candidate init failed')"
-  }));
+  const result = bridge.activate(
+    bundle({
+      fingerprint: fingerprintB,
+      init: "throw new Error('candidate init failed')",
+    }),
+  );
 
   assert.equal(result.status, "rejected");
   assert.match(result.diagnostic, /candidate init failed/);
@@ -447,8 +489,11 @@ test("a browser candidate that throws leaves the running generation active", asy
   assert.deepEqual(marks, ["a:update"]);
   // A rejection names the candidate's own fingerprint, so the control plane
   // can tell which pending build was refused rather than only that one was.
-  assert.ok(logs.some(({ text }) => text.includes(
-    `DEHERM_EVENT bundle-rejected fingerprint=${fingerprintB} resource_generation=2`)));
+  assert.ok(
+    logs.some(({ text }) =>
+      text.includes(`DEHERM_EVENT bundle-rejected fingerprint=${fingerprintB} resource_generation=2`),
+    ),
+  );
 });
 
 test("a browser candidate without a fingerprint cannot be acknowledged", async () => {
@@ -492,13 +537,14 @@ test("a component schema change is refused rather than rebound", async () => {
     "player": { schemaFingerprint: ${JSON.stringify(schema)}, contextKind: "game-object", definition: {} }
   }`;
   const { context } = await loadedBridge({
-    bundleSource: bundle({ fingerprint: fingerprintA, components: registryOf("schema-1") })
+    bundleSource: bundle({ fingerprint: fingerprintA, components: registryOf("schema-1") }),
   });
   const components = context.DEFOLD_HERMES_COMPONENTS;
   const handle = components.attach("player", "schema-1", "game-object");
 
   const result = context.DEFOLD_HERMES_BRIDGE.activate(
-    bundle({ fingerprint: fingerprintB, components: registryOf("schema-2") }));
+    bundle({ fingerprint: fingerprintB, components: registryOf("schema-2") }),
+  );
 
   assert.equal(result.status, "rejected");
   assert.match(result.diagnostic, /schema fingerprint changed/);
@@ -509,7 +555,7 @@ test("a component schema change is refused rather than rebound", async () => {
 test("browser telemetry reports measured counters and names every gap", async () => {
   const { context } = await loadedBridge({
     bundleSource: bundle({ fingerprint: fingerprintA }),
-    memory: { usedJSHeapSize: 4096, totalJSHeapSize: 8192, jsHeapSizeLimit: 65536 }
+    memory: { usedJSHeapSize: 4096, totalJSHeapSize: 8192, jsHeapSizeLimit: 65536 },
   });
   context.DEFOLD_HERMES_WEB_CALLBACKS.acquire(() => {});
   context.DEFOLD_HERMES_BRIDGE.update(0.02);
@@ -532,7 +578,7 @@ test("browser component snapshots encode only bounded declared own data properti
     "player": { schemaFingerprint: "schema-1", contextKind: "game-object", definition: {} }
   }`;
   const { context } = await loadedBridge({
-    bundleSource: bundle({ fingerprint: fingerprintA, components: registry })
+    bundleSource: bundle({ fingerprint: fingerprintA, components: registry }),
   });
   const components = context.DEFOLD_HERMES_COMPONENTS;
   const handle = components.attach("player", "schema-1", "game-object");
@@ -543,13 +589,16 @@ test("browser component snapshots encode only bounded declared own data properti
     ["label", "é".repeat(128)],
     ["surrogate", "\ud800"],
     ["hash", 0x1234n],
-    ["url", {
-      __dehermUrlV1: true,
-      socket: 1n,
-      reserved: 2n,
-      path: 3n,
-      fragment: 0xffffffffffffffffn
-    }],
+    [
+      "url",
+      {
+        __dehermUrlV1: true,
+        socket: 1n,
+        reserved: 2n,
+        path: 3n,
+        fragment: 0xffffffffffffffffn,
+      },
+    ],
     ["position", { __dehermValueKind: "vector3", x: 1, y: 2, z: 3 }],
     ["velocity", { __dehermValueKind: "vector3", x: 4, y: 5, z: 6 }],
     ["tint", { __dehermValueKind: "vector4", x: 1, y: 2, z: 3, w: 4 }],
@@ -561,7 +610,7 @@ test("browser component snapshots encode only bounded declared own data properti
     ["invalidHash", -1n],
     ["invalidUrl", { __dehermUrlV1: true, socket: 1n }],
     ["invalidVector", { __dehermValueKind: "vector3", x: 1, y: Infinity, z: 3 }],
-    ["functionValue", () => {}]
+    ["functionValue", () => {}],
   ];
   for (const [name, value] of values) {
     components.setProperty(handle.slot, handle.generation, name, value);
@@ -569,7 +618,12 @@ test("browser component snapshots encode only bounded declared own data properti
   let getterReads = 0;
   components.setProperty(handle.slot, handle.generation, "accessor", 1);
   const self = components.resolve(handle.slot, handle.generation).self;
-  Object.defineProperty(self, "accessor", { get() { getterReads += 1; return 9; } });
+  Object.defineProperty(self, "accessor", {
+    get() {
+      getterReads += 1;
+      return 9;
+    },
+  });
   components.setProperty(handle.slot, handle.generation, "missing", 1);
   delete self.missing;
   Object.setPrototypeOf(self, { missing: 99 });
@@ -578,12 +632,13 @@ test("browser component snapshots encode only bounded declared own data properti
     getOwnPropertyDescriptor(target, name) {
       proxyDescriptorReads += 1;
       return Reflect.getOwnPropertyDescriptor(target, name);
-    }
+    },
   });
 
   // The sampler captured the intrinsic before application code could replace
   // it. If it reached this poisoned method, the snapshot would throw.
-  vm.runInContext(`
+  vm.runInContext(
+    `
     globalThis.__snapshotPrototypeRuns = 0;
     Object.getOwnPropertyDescriptor = function() { throw new Error('poisoned'); };
     Object.defineProperty(Object.prototype, 'socket', {
@@ -604,7 +659,9 @@ test("browser component snapshots encode only bounded declared own data properti
       globalThis.__snapshotBigIntRuns += 1;
       throw new Error('poisoned BigInt');
     };
-  `, context);
+  `,
+    context,
+  );
   const snapshot = context.__defoldHermesDevV1.componentSnapshot();
 
   assert.equal(snapshot.schemaVersion, 1);
@@ -623,7 +680,7 @@ test("browser component snapshots encode only bounded declared own data properti
   assert.equal(
     components.snapshotInstanceByteLength(instance),
     new TextEncoder().encode(JSON.stringify(instance)).length,
-    "manual instance accounting must exactly match serialized UTF-8 bytes"
+    "manual instance accounting must exactly match serialized UTF-8 bytes",
   );
   const properties = Object.fromEntries(instance.properties.map(({ name, value }) => [name, value]));
   assert.deepEqual(JSON.parse(JSON.stringify(properties.nil)), { kind: "nil" });
@@ -637,11 +694,11 @@ test("browser component snapshots encode only bounded declared own data properti
     socket: "0000000000000001",
     reserved: "0000000000000002",
     path: "0000000000000003",
-    fragment: "ffffffffffffffff"
+    fragment: "ffffffffffffffff",
   });
   assert.deepEqual(JSON.parse(JSON.stringify(properties.position)), {
     kind: "unavailable",
-    reason: "untrusted-structured-value"
+    reason: "untrusted-structured-value",
   });
   assert.deepEqual(JSON.parse(JSON.stringify(properties.velocity)), { kind: "vector3", value: [4, 5, 6] });
   assert.deepEqual(JSON.parse(JSON.stringify(properties.tint)), { kind: "vector4", value: [1, 2, 3, 4] });
@@ -656,7 +713,7 @@ test("browser component snapshots encode only bounded declared own data properti
     invalidVector: "invalid-vector",
     functionValue: "unsupported-type",
     accessor: "accessor-property",
-    missing: "missing-own-property"
+    missing: "missing-own-property",
   };
   for (const name of Object.keys(unavailableReasons)) {
     assert.equal(properties[name].kind, "unavailable", `${name} must fail closed`);
@@ -664,24 +721,39 @@ test("browser component snapshots encode only bounded declared own data properti
   }
   assert.equal(getterReads, 0, "sampling must not invoke accessors");
   assert.equal(proxyDescriptorReads, 0, "sampling must reject replacement Proxies before reflection");
-  assert.equal(context.__snapshotPrototypeRuns, 0,
-    "snapshot construction must not invoke authored Object, Array, or Function prototype hooks");
-  assert.equal(context.__snapshotBigIntRuns, 0,
-    "snapshot encoding must use captured bigint bounds rather than the authored global BigInt");
+  assert.equal(
+    context.__snapshotPrototypeRuns,
+    0,
+    "snapshot construction must not invoke authored Object, Array, or Function prototype hooks",
+  );
+  assert.equal(
+    context.__snapshotBigIntRuns,
+    0,
+    "snapshot encoding must use captured bigint bounds rather than the authored global BigInt",
+  );
 
   const entry = components.resolve(handle.slot, handle.generation);
   const rootsToRelease = ["velocity", "tint", "rotation"];
-  entry.self.velocity.retainedGraph = { payload: new Array(64).fill("retained") };
-  entry.self.tint.retainedGraph = { payload: new Array(64).fill("retained") };
-  entry.self.rotation.retainedGraph = { payload: new Array(64).fill("retained") };
+  entry.self.velocity.retainedGraph = { payload: Array.from({ length: 64 }, () => "retained") };
+  entry.self.tint.retainedGraph = { payload: Array.from({ length: 64 }, () => "retained") };
+  entry.self.rotation.retainedGraph = { payload: Array.from({ length: 64 }, () => "retained") };
   entry.self.velocity = 7;
   delete entry.self.tint;
-  Object.defineProperty(entry.self, "rotation", { configurable: true, get() { getterReads += 1; return null; } });
+  Object.defineProperty(entry.self, "rotation", {
+    configurable: true,
+    get() {
+      getterReads += 1;
+      return null;
+    },
+  });
   context.__defoldHermesDevV1.componentSnapshot();
   for (const name of rootsToRelease) {
     const index = entry.declaredProperties.indexOf(name);
-    assert.equal(entry.trustedPropertyObjects[index], null,
-      `${name} must release its trusted structured root when authored state stops referencing it`);
+    assert.equal(
+      entry.trustedPropertyObjects[index],
+      null,
+      `${name} must release its trusted structured root when authored state stops referencing it`,
+    );
   }
   assert.equal(getterReads, 0, "root release must not invoke a replacement accessor");
 });
@@ -691,7 +763,7 @@ test("browser component snapshots retain at most 32 declarations and clear them 
     "player": { schemaFingerprint: "schema-1", contextKind: "game-object", definition: {} }
   }`;
   const { context } = await loadedBridge({
-    bundleSource: bundle({ fingerprint: fingerprintA, components: registry })
+    bundleSource: bundle({ fingerprint: fingerprintA, components: registry }),
   });
   const components = context.DEFOLD_HERMES_COMPONENTS;
   components.capacity = 1;
@@ -714,7 +786,10 @@ test("browser component snapshots retain at most 32 declarations and clear them 
   const reused = context.__defoldHermesDevV1.componentSnapshot();
   assert.equal(reused.instances[0].instanceId.slot, first.slot);
   assert.notEqual(reused.instances[0].instanceId.generation, first.generation);
-  assert.deepEqual([...reused.instances[0].properties].map(({ name }) => name), ["fresh"]);
+  assert.deepEqual(
+    [...reused.instances[0].properties].map(({ name }) => name),
+    ["fresh"],
+  );
 });
 
 test("browser component snapshot frames omit whole instances at 512 KiB", async () => {
@@ -722,7 +797,7 @@ test("browser component snapshot frames omit whole instances at 512 KiB", async 
     "player": { schemaFingerprint: "schema-1", contextKind: "game-object", definition: {} }
   }`;
   const { context } = await loadedBridge({
-    bundleSource: bundle({ fingerprint: fingerprintA, components: registry })
+    bundleSource: bundle({ fingerprint: fingerprintA, components: registry }),
   });
   const components = context.DEFOLD_HERMES_COMPONENTS;
   for (let index = 0; index < components.capacity; ++index) {
@@ -731,13 +806,16 @@ test("browser component snapshot frames omit whole instances at 512 KiB", async 
       components.setProperty(handle.slot, handle.generation, `label${property}`, "é".repeat(128));
     }
   }
-  vm.runInContext(`
+  vm.runInContext(
+    `
     globalThis.__snapshotToJSONReads = 0;
     Object.defineProperty(Object.prototype, "toJSON", { configurable: true, get() {
       globalThis.__snapshotToJSONReads += 1;
       return function() { return {}; };
     }});
-  `, context);
+  `,
+    context,
+  );
   const snapshot = context.__defoldHermesDevV1.componentSnapshot();
   assert.equal(context.__snapshotToJSONReads, 0, "snapshot sizing must not consult application prototypes");
   vm.runInContext("delete Object.prototype.toJSON", context);
@@ -757,7 +835,7 @@ test("navigation reset removes the development entry point and clears component 
     "player": { schemaFingerprint: "schema-1", contextKind: "game-object", definition: {} }
   }`;
   const { context } = await loadedBridge({
-    bundleSource: bundle({ fingerprint: fingerprintA, components: registry })
+    bundleSource: bundle({ fingerprint: fingerprintA, components: registry }),
   });
   assert.equal(typeof context.__defoldHermesDevV1.activate, "function");
   assert.equal(typeof context.__defoldHermesDevV1.telemetry, "function");

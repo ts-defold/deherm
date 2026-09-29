@@ -34,7 +34,6 @@
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
-import os from "node:os";
 import path from "node:path";
 
 import { defoldSurfaceCacheHome } from "./defold-surface.mjs";
@@ -59,7 +58,12 @@ async function verifiedBinary(file, pinned, description) {
   }
   const sha256 = createHash("sha256").update(bytes).digest("hex");
   if (sha256 !== pinned) {
-    return { ok: false, file, sha256, detail: `${description} does not match its pinned digest (${pinned.slice(0, 12)} expected, ${sha256.slice(0, 12)} found)` };
+    return {
+      ok: false,
+      file,
+      sha256,
+      detail: `${description} does not match its pinned digest (${pinned.slice(0, 12)} expected, ${sha256.slice(0, 12)} found)`,
+    };
   }
   return { ok: true, file, sha256, bytes: bytes.byteLength };
 }
@@ -77,16 +81,20 @@ async function inspectHostTool(key, tool, record, roots) {
     builder: record.builder ?? null,
     blocker: record.blocker ?? null,
     file: record.file ?? null,
-    expectedSha256: record.sha256 ?? null
+    expectedSha256: record.sha256 ?? null,
   };
   if (record.status === "blocked") {
-    return { ...base, ok: false, detail: `${record.blocker?.code ?? "blocked"}: ${record.blocker?.reason ?? "no reason recorded"}` };
+    return {
+      ...base,
+      ok: false,
+      detail: `${record.blocker?.code ?? "blocked"}: ${record.blocker?.reason ?? "no reason recorded"}`,
+    };
   }
   if (record.status !== "vendored") {
     return {
       ...base,
       ok: false,
-      detail: `no published ${tool} build for ${key} yet (${record.status}; builder ${record.builder ?? "none"})`
+      detail: `no published ${tool} build for ${key} yet (${record.status}; builder ${record.builder ?? "none"})`,
     };
   }
   if (!/^[a-f0-9]{64}$/.test(record.sha256 ?? "")) {
@@ -101,7 +109,15 @@ async function inspectHostTool(key, tool, record, roots) {
     const relative = candidate.flat ? path.basename(record.file) : record.file;
     const result = await verifiedBinary(path.join(candidate.root, relative), record.sha256, `${key} ${tool}`);
     if (result.ok) {
-      return { ...base, ok: true, source: candidate.source, sha256: result.sha256, bytes: result.bytes, path: result.file, detail: `${result.sha256.slice(0, 12)} (${candidate.source})` };
+      return {
+        ...base,
+        ok: true,
+        source: candidate.source,
+        sha256: result.sha256,
+        bytes: result.bytes,
+        path: result.file,
+        detail: `${result.sha256.slice(0, 12)} (${candidate.source})`,
+      };
     }
     attempts.push(`${candidate.source}: ${result.detail}`);
   }
@@ -121,8 +137,9 @@ function cachedFamilyRoots(key) {
     const base = process.env.DEHERM_TOOL_CACHE
       ? path.resolve(process.env.DEHERM_TOOL_CACHE)
       : path.join(defoldSurfaceCacheHome(), "toolchains");
-    const tags = JSON.parse(readFileSync(
-      path.join(packageRoot, "packages", "toolchains", "release-tags.json"), "utf8"));
+    const tags = JSON.parse(
+      readFileSync(path.join(packageRoot, "packages", "toolchains", "release-tags.json"), "utf8"),
+    );
     for (const family of ["hermes-host", "dehermc"]) {
       const tag = tags.families?.[family]?.tag;
       if (!tag) continue;
@@ -137,7 +154,7 @@ function cachedFamilyRoots(key) {
 }
 
 export async function inspectHostCompilers(key, manifest) {
-  const resolved = manifest ?? await readHostCompilerManifest();
+  const resolved = manifest ?? (await readHostCompilerManifest());
   const record = resolved.hosts?.[key];
   if (!record) {
     return {
@@ -145,7 +162,7 @@ export async function inspectHostCompilers(key, manifest) {
       ok: false,
       status: "unknown-host",
       tools: {},
-      detail: `déherm declares no hermesc/shermes/dehermc build for ${key}; supported hosts are ${Object.keys(resolved.hosts ?? {}).join(", ")}`
+      detail: `déherm declares no hermesc/shermes/dehermc build for ${key}; supported hosts are ${Object.keys(resolved.hosts ?? {}).join(", ")}`,
     };
   }
   const roots = [];
@@ -179,19 +196,19 @@ export async function inspectHostCompilers(key, manifest) {
     missing,
     // Retained for callers that only want the digests of what resolved.
     binaries: Object.fromEntries(names.filter((tool) => tools[tool].ok).map((tool) => [tool, tools[tool]])),
-    detail
+    detail,
   };
 }
 
 export async function hostCompilerReport(manifest) {
-  const resolved = manifest ?? await readHostCompilerManifest();
+  const resolved = manifest ?? (await readHostCompilerManifest());
   const current = hostCompilerKey();
   const hosts = [];
   for (const key of Object.keys(resolved.hosts ?? {})) {
-    hosts.push({ ...await inspectHostCompilers(key, resolved), current: key === current });
+    hosts.push({ ...(await inspectHostCompilers(key, resolved)), current: key === current });
   }
   if (!resolved.hosts?.[current]) {
-    hosts.push({ ...await inspectHostCompilers(current, resolved), current: true });
+    hosts.push({ ...(await inspectHostCompilers(current, resolved)), current: true });
   }
   hosts.sort((left, right) => left.host.localeCompare(right.host));
   return {
@@ -199,7 +216,7 @@ export async function hostCompilerReport(manifest) {
     currentHost: current,
     ttscVersion: resolved.ttscVersion ?? null,
     tools: Object.keys(resolved.tools ?? {}),
-    hosts
+    hosts,
   };
 }
 
@@ -229,10 +246,12 @@ function familyForTool(tool) {
 }
 
 function expectedFamilyDigests(result, family) {
-  return Object.fromEntries(Object.values(result.tools ?? {})
-    .filter((candidate) => familyForTool(candidate.tool) === family)
-    .filter((candidate) => candidate.file && /^[a-f0-9]{64}$/.test(candidate.expectedSha256 ?? ""))
-    .map((candidate) => [path.basename(candidate.file), candidate.expectedSha256]));
+  return Object.fromEntries(
+    Object.values(result.tools ?? {})
+      .filter((candidate) => familyForTool(candidate.tool) === family)
+      .filter((candidate) => candidate.file && /^[a-f0-9]{64}$/.test(candidate.expectedSha256 ?? ""))
+      .map((candidate) => [path.basename(candidate.file), candidate.expectedSha256]),
+  );
 }
 
 export async function requireHostTool(tool, options = {}) {
@@ -252,7 +271,7 @@ export async function requireHostTool(tool, options = {}) {
       try {
         await ensureHostFamily(family, key, {
           expectedDigests: expectedFamilyDigests(result, family),
-          onProgress: options.onProgress
+          onProgress: options.onProgress,
         });
       } catch (error) {
         // A network/release failure is context for the same unavailable-tool
@@ -265,7 +284,9 @@ export async function requireHostTool(tool, options = {}) {
   }
   const resolvedTool = result.tools?.[tool];
   if (!resolvedTool) {
-    throw new Error(`déherm declares no ${tool} for ${key}; declared tools are ${Object.keys(result.tools ?? {}).join(", ") || "none"}`);
+    throw new Error(
+      `déherm declares no ${tool} for ${key}; declared tools are ${Object.keys(result.tools ?? {}).join(", ") || "none"}`,
+    );
   }
   if (!resolvedTool.ok) {
     const fetchDetail = fetchFailure ? `; automatic release fetch failed: ${fetchFailure.message}` : "";

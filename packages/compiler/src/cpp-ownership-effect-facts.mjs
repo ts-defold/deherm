@@ -288,7 +288,11 @@ export function extractCppOwnershipEffectFacts(ast, requestedDeclarationIds, opt
     const parameterNodes = (definition.inner ?? []).filter(({ kind }) => kind === "ParmVarDecl");
     const parameters = new Map(parameterNodes.map((parameter, index) => [parameter.id, { index, node: parameter }]));
     const parameterFacts = parameterNodes.map((parameter, index) =>
-      emptyParameter(index, parameter.type?.qualType ?? "", parameter.type?.desugaredQualType ?? parameter.type?.qualType ?? ""),
+      emptyParameter(
+        index,
+        parameter.type?.qualType ?? "",
+        parameter.type?.desugaredQualType ?? parameter.type?.qualType ?? "",
+      ),
     );
     const ownership = [];
     const escapes = [];

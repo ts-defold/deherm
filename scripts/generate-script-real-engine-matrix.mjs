@@ -18,12 +18,22 @@ const inputUrls = {
   overloadRoutes: new URL("packages/bindings/generated/defold-script-overload-dispatch.json", root),
   scalarProbes: new URL("packages/bindings/generated/defold-script-real-engine-probes.json", root),
   valueProbes: new URL("packages/bindings/generated/defold-script-value-real-engine-probes.json", root),
-  tupleProbes: new URL("packages/bindings/generated/defold-script-fixed-tuple-probes.json", root)
+  tupleProbes: new URL("packages/bindings/generated/defold-script-fixed-tuple-probes.json", root),
 };
 const reportUrl = new URL("packages/bindings/generated/defold-script-real-engine-matrix.json", root);
 const stages = ["compile", "link", "runtime"];
 const setupContextKinds = new Set(["global", "script-instance", "gui-script", "render-script", "extension"]);
-const propertyTypes = new Set(["number", "integer", "boolean", "string", "hash", "url", "vector3", "vector4", "quaternion"]);
+const propertyTypes = new Set([
+  "number",
+  "integer",
+  "boolean",
+  "string",
+  "hash",
+  "url",
+  "vector3",
+  "vector4",
+  "quaternion",
+]);
 
 function compareText(left, right) {
   return left < right ? -1 : left > right ? 1 : 0;
@@ -44,19 +54,28 @@ function assertNonEmpty(value, label) {
 function validatePropertyValue(property, label) {
   if (!propertyTypes.has(property.type)) throw new Error(`${label}.type is unsupported: ${property.type}`);
   const value = property.value;
-  if (property.type === "number" && (typeof value !== "number" || !Number.isFinite(value))) throw new Error(`${label}.value must be finite`);
-  if (property.type === "integer" && !Number.isSafeInteger(value)) throw new Error(`${label}.value must be a safe integer`);
+  if (property.type === "number" && (typeof value !== "number" || !Number.isFinite(value)))
+    throw new Error(`${label}.value must be finite`);
+  if (property.type === "integer" && !Number.isSafeInteger(value))
+    throw new Error(`${label}.value must be a safe integer`);
   if (property.type === "boolean" && typeof value !== "boolean") throw new Error(`${label}.value must be boolean`);
-  if (["string", "hash", "url"].includes(property.type) && typeof value !== "string") throw new Error(`${label}.value must be a string`);
+  if (["string", "hash", "url"].includes(property.type) && typeof value !== "string")
+    throw new Error(`${label}.value must be a string`);
   const widths = { vector3: 3, vector4: 4, quaternion: 4 };
   const width = widths[property.type];
-  if (width && (!Array.isArray(value) || value.length !== width || value.some((component) => typeof component !== "number" || !Number.isFinite(component)))) {
+  if (
+    width &&
+    (!Array.isArray(value) ||
+      value.length !== width ||
+      value.some((component) => typeof component !== "number" || !Number.isFinite(component)))
+  ) {
     throw new Error(`${label}.value must contain ${width} finite components`);
   }
 }
 
 function validateSetups(manifest) {
-  if (!Array.isArray(manifest.setups) || manifest.setups.length === 0) throw new Error("At least one setup is required");
+  if (!Array.isArray(manifest.setups) || manifest.setups.length === 0)
+    throw new Error("At least one setup is required");
   const setups = new Map();
   for (const setup of manifest.setups) {
     assertRecord(setup, "setup");
@@ -77,7 +96,8 @@ function validateSetups(manifest) {
       }
     }
     if (setup.properties !== undefined) {
-      if (setup.context.kind !== "script-instance") throw new Error(`${setup.id}: properties require script-instance context`);
+      if (setup.context.kind !== "script-instance")
+        throw new Error(`${setup.id}: properties require script-instance context`);
       if (!Array.isArray(setup.properties)) throw new Error(`${setup.id}.properties must be an array`);
       const names = new Set();
       setup.properties.forEach((property, index) => {
@@ -101,7 +121,7 @@ function routeRows(scalarRoutes, valueRoutes, tupleRoutes, urlRoutes, valueTailR
       rawName: binding.rawName,
       routeKind: "scalar",
       source: binding.source,
-      line: binding.line
+      line: binding.line,
     })),
     ...valueRoutes.bindings.map((binding) => ({
       id: binding.id,
@@ -109,7 +129,7 @@ function routeRows(scalarRoutes, valueRoutes, tupleRoutes, urlRoutes, valueTailR
       rawName: binding.rawName,
       routeKind: binding.id === "script:hash" ? "handle" : "value",
       source: binding.source,
-      line: binding.line
+      line: binding.line,
     })),
     ...tupleRoutes.bindings.map((binding) => ({
       id: binding.id,
@@ -118,7 +138,7 @@ function routeRows(scalarRoutes, valueRoutes, tupleRoutes, urlRoutes, valueTailR
       routeKind: "fixed-tuple",
       source: binding.sourceEvidence.path,
       line: 0,
-      publicTypeScriptFixture: binding.targetSupport.publicTypeScriptFixture
+      publicTypeScriptFixture: binding.targetSupport.publicTypeScriptFixture,
     })),
     ...urlRoutes.rows.map((binding) => ({
       id: binding.id,
@@ -126,30 +146,35 @@ function routeRows(scalarRoutes, valueRoutes, tupleRoutes, urlRoutes, valueTailR
       rawName: binding.rawName,
       routeKind: "url-address",
       source: binding.source,
-      line: binding.line
+      line: binding.line,
     })),
-    ...valueTailRoutes.bindings.filter(({ disposition }) => disposition === "candidate").map((binding) => ({
-      id: binding.id,
-      stableId: binding.stableId,
-      rawName: binding.id.slice("script:".length),
-      routeKind: "captured-lua-value-tail",
-      source: binding.sourcePath,
-      line: 0
-    })),
-    ...overloadRoutes.bindings.filter(({ generatedFamilyExecutableCandidate }) => generatedFamilyExecutableCandidate).map((binding) => ({
-      id: binding.id,
-      stableId: binding.stableId,
-      rawName: binding.id.slice("script:".length),
-      routeKind: "captured-lua-overload",
-      source: binding.sourceEvidence.path,
-      line: 0
-    }))
+    ...valueTailRoutes.bindings
+      .filter(({ disposition }) => disposition === "candidate")
+      .map((binding) => ({
+        id: binding.id,
+        stableId: binding.stableId,
+        rawName: binding.id.slice("script:".length),
+        routeKind: "captured-lua-value-tail",
+        source: binding.sourcePath,
+        line: 0,
+      })),
+    ...overloadRoutes.bindings
+      .filter(({ generatedFamilyExecutableCandidate }) => generatedFamilyExecutableCandidate)
+      .map((binding) => ({
+        id: binding.id,
+        stableId: binding.stableId,
+        rawName: binding.id.slice("script:".length),
+        routeKind: "captured-lua-overload",
+        source: binding.sourceEvidence.path,
+        line: 0,
+      })),
   ].sort((left, right) => compareText(left.id, right.id));
   const ids = new Set();
   const stableIds = new Set();
   for (const route of rows) {
     if (ids.has(route.id)) throw new Error(`Executable route appears more than once: ${route.id}`);
-    if (stableIds.has(route.stableId)) throw new Error(`Executable stable ID appears more than once: ${route.stableId}`);
+    if (stableIds.has(route.stableId))
+      throw new Error(`Executable stable ID appears more than once: ${route.stableId}`);
     ids.add(route.id);
     stableIds.add(route.stableId);
   }
@@ -158,14 +183,19 @@ function routeRows(scalarRoutes, valueRoutes, tupleRoutes, urlRoutes, valueTailR
 
 function importedScenarios(manifest, setups, scalarProbes, valueProbes, routeById) {
   if (!Array.isArray(manifest.probeImports)) throw new Error("probeImports must be an array");
-  const reports = new Map([["scalar", scalarProbes], ["value", valueProbes]]);
+  const reports = new Map([
+    ["scalar", scalarProbes],
+    ["value", valueProbes],
+  ]);
   const seenSources = new Set();
   const scenarios = [];
   for (const probeImport of manifest.probeImports) {
     assertRecord(probeImport, "probe import");
-    if (!reports.has(probeImport.source) || seenSources.has(probeImport.source)) throw new Error(`Invalid or duplicate probe import: ${probeImport.source}`);
+    if (!reports.has(probeImport.source) || seenSources.has(probeImport.source))
+      throw new Error(`Invalid or duplicate probe import: ${probeImport.source}`);
     seenSources.add(probeImport.source);
-    if (!setups.has(probeImport.defaultSetupId)) throw new Error(`${probeImport.source}: unknown default setup ${probeImport.defaultSetupId}`);
+    if (!setups.has(probeImport.defaultSetupId))
+      throw new Error(`${probeImport.source}: unknown default setup ${probeImport.defaultSetupId}`);
     assertRecord(probeImport.setupByProbeKey, `${probeImport.source}.setupByProbeKey`);
     const report = reports.get(probeImport.source);
     const knownProbeKeys = new Set(report.probes.map(({ key }) => key));
@@ -177,16 +207,21 @@ function importedScenarios(manifest, setups, scalarProbes, valueProbes, routeByI
         if (!declaredDerivation()) throw new Error(`${probeImport.source}: setup assigned to unknown probe ${key}`);
         recordAudit({
           input: "packages/bindings/probes/defold-script-real-engine-matrix.json",
-          id: key, status: VOID, reason: "withdrawn-probe", source: probeImport.source
+          id: key,
+          status: VOID,
+          reason: "withdrawn-probe",
+          source: probeImport.source,
         });
         continue;
       }
       if (!setups.has(setupId)) throw new Error(`${probeImport.source}:${key}: unknown setup ${setupId}`);
     }
     for (const probe of report.probes) {
-      if (!routeById.has(probe.id)) throw new Error(`${probeImport.source}:${probe.key}: probe route is not executable: ${probe.id}`);
+      if (!routeById.has(probe.id))
+        throw new Error(`${probeImport.source}:${probe.key}: probe route is not executable: ${probe.id}`);
       const state = probe.state ?? "instrumented";
-      if (!["instrumented", "planned"].includes(state)) throw new Error(`${probeImport.source}:${probe.key}: invalid probe state`);
+      if (!["instrumented", "planned"].includes(state))
+        throw new Error(`${probeImport.source}:${probe.key}: invalid probe state`);
       if (state === "planned") assertNonEmpty(probe.reason, `${probeImport.source}:${probe.key}.reason`);
       const markerKind = probe.expectedMarker ? "exact-line" : "line-prefix";
       const expectedMarker = probe.expectedMarker ?? probe.expectedMarkerPrefix;
@@ -202,11 +237,12 @@ function importedScenarios(manifest, setups, scalarProbes, valueProbes, routeByI
         markerKind,
         expectedMarker,
         expectation: probe.expectation,
-        ...(state === "planned" ? { reason: probe.reason } : {})
+        ...(state === "planned" ? { reason: probe.reason } : {}),
       });
     }
   }
-  if (seenSources.size !== reports.size) throw new Error("Both scalar and value probe reports must be imported exactly once");
+  if (seenSources.size !== reports.size)
+    throw new Error("Both scalar and value probe reports must be imported exactly once");
   return scenarios;
 }
 
@@ -220,13 +256,20 @@ function applyOverrides(manifest, setups, routeById, scenarios) {
     assertNonEmpty(override.setupId, `${override.key}.setupId`);
     assertNonEmpty(override.reason, `${override.key}.reason`);
     if (keys.has(override.key)) throw new Error(`Duplicate scenario key: ${override.key}`);
-    if (!routeById.has(override.routeId)) throw new Error(`${override.key}: route is not executable: ${override.routeId}`);
+    if (!routeById.has(override.routeId))
+      throw new Error(`${override.key}: route is not executable: ${override.routeId}`);
     if (!setups.has(override.setupId)) throw new Error(`${override.key}: unknown setup ${override.setupId}`);
     if ("evidence" in override || "status" in override || "verified" in override) {
       throw new Error(`${override.key}: scenario overrides cannot claim evidence`);
     }
     keys.add(override.key);
-    scenarios.push({ key: override.key, routeId: override.routeId, state: "planned", setupId: override.setupId, reason: override.reason });
+    scenarios.push({
+      key: override.key,
+      routeId: override.routeId,
+      state: "planned",
+      setupId: override.setupId,
+      reason: override.reason,
+    });
   }
 }
 
@@ -241,11 +284,14 @@ async function validateObservations(manifest, scenarios, routeById, loadEvidence
     if (seen.has(observation.id)) throw new Error(`Duplicate observation: ${observation.id}`);
     seen.add(observation.id);
     if (!stages.includes(observation.stage)) throw new Error(`${observation.id}: invalid evidence stage`);
-    if (observation.target !== manifest.target) throw new Error(`${observation.id}: observation target does not match matrix target`);
-    if (observation.result !== "passed") throw new Error(`${observation.id}: only explicitly passed observations are evidence`);
+    if (observation.target !== manifest.target)
+      throw new Error(`${observation.id}: observation target does not match matrix target`);
+    if (observation.result !== "passed")
+      throw new Error(`${observation.id}: only explicitly passed observations are evidence`);
     assertNonEmpty(observation.command, `${observation.id}.command`);
     assertNonEmpty(observation.observedAt, `${observation.id}.observedAt`);
-    if (!Array.isArray(observation.routeIds) || observation.routeIds.length === 0) throw new Error(`${observation.id}.routeIds must not be empty`);
+    if (!Array.isArray(observation.routeIds) || observation.routeIds.length === 0)
+      throw new Error(`${observation.id}.routeIds must not be empty`);
     const routeIds = [...new Set(observation.routeIds)].sort(compareText);
     const scenarioKeys = [...new Set(observation.scenarioKeys ?? [])].sort(compareText);
     // An observation is a RECORDED RUN - a real engine, on a real bundle, at one
@@ -256,28 +302,36 @@ async function validateObservations(manifest, scenarios, routeById, loadEvidence
     // this stays fatal there.
     const unknown = [
       ...routeIds.filter((routeId) => !routeById.has(routeId)).map((routeId) => `route ${routeId}`),
-      ...scenarioKeys.filter((key) => !scenarioByKey.has(key)).map((key) => `scenario ${key}`)
+      ...scenarioKeys.filter((key) => !scenarioByKey.has(key)).map((key) => `scenario ${key}`),
     ];
     if (unknown.length) {
       if (!declaredDerivation()) throw new Error(`${observation.id}: unknown ${unknown[0]}`);
       recordAudit({
         input: "packages/bindings/probes/defold-script-real-engine-matrix.json",
-        id: observation.id, status: VOID, reason: "withdrawn-observation", anchorsLost: unknown
+        id: observation.id,
+        status: VOID,
+        reason: "withdrawn-observation",
+        anchorsLost: unknown,
       });
       continue;
     }
     assertRecord(observation.artifact, `${observation.id}.artifact`);
     assertNonEmpty(observation.artifact.path, `${observation.id}.artifact.path`);
     const artifactPath = observation.artifact.path;
-    if (artifactPath.startsWith("/") || /^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(artifactPath) ||
-        artifactPath.split(/[\\/]/).includes("..")) {
+    if (
+      artifactPath.startsWith("/") ||
+      /^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(artifactPath) ||
+      artifactPath.split(/[\\/]/).includes("..")
+    ) {
       throw new Error(`${observation.id}: evidence artifact path must stay within the repository`);
     }
-    if (!/^[0-9a-f]{64}$/.test(observation.artifact.sha256)) throw new Error(`${observation.id}: artifact SHA-256 is invalid`);
+    if (!/^[0-9a-f]{64}$/.test(observation.artifact.sha256))
+      throw new Error(`${observation.id}: artifact SHA-256 is invalid`);
     const evidence = await loadEvidence(observation.artifact.path);
     const bytes = Buffer.isBuffer(evidence) ? evidence : Buffer.from(evidence);
     const actualSha256 = createHash("sha256").update(bytes).digest("hex");
-    if (actualSha256 !== observation.artifact.sha256) throw new Error(`${observation.id}: evidence artifact SHA-256 mismatch`);
+    if (actualSha256 !== observation.artifact.sha256)
+      throw new Error(`${observation.id}: evidence artifact SHA-256 mismatch`);
     const evidenceText = bytes.toString("utf8");
     const lines = evidenceLines(evidenceText);
     const requiredMarkers = [...new Set(observation.requiredMarkers ?? [])].sort(compareText);
@@ -286,20 +340,28 @@ async function validateObservations(manifest, scenarios, routeById, loadEvidence
     }
     for (const marker of requiredMarkers) {
       assertNonEmpty(marker, `${observation.id}.requiredMarkers`);
-      if (!evidenceText.includes(marker)) throw new Error(`${observation.id}: evidence artifact is missing marker ${marker}`);
+      if (!evidenceText.includes(marker))
+        throw new Error(`${observation.id}: evidence artifact is missing marker ${marker}`);
     }
     if (observation.stage === "runtime") {
-      if (scenarioKeys.length === 0) throw new Error(`${observation.id}: runtime evidence must name instrumented scenarios`);
+      if (scenarioKeys.length === 0)
+        throw new Error(`${observation.id}: runtime evidence must name instrumented scenarios`);
       const runtimeRoutes = new Set();
       const requiredProbeSetMarkers = new Set();
       for (const key of scenarioKeys) {
         const scenario = scenarioByKey.get(key);
-        if (scenario.state !== "instrumented") throw new Error(`${observation.id}: planned scenario cannot be promoted to runtime evidence`);
-        if (!routeIds.includes(scenario.routeId)) throw new Error(`${observation.id}: runtime scenario route is not covered by routeIds`);
-        const markerObserved = scenario.markerKind === "exact-line"
-          ? lines.includes(scenario.expectedMarker)
-          : lines.some((line) => line.startsWith(scenario.expectedMarker));
-        if (!markerObserved) throw new Error(`${observation.id}: evidence artifact is missing ${scenario.markerKind} scenario marker ${scenario.expectedMarker}`);
+        if (scenario.state !== "instrumented")
+          throw new Error(`${observation.id}: planned scenario cannot be promoted to runtime evidence`);
+        if (!routeIds.includes(scenario.routeId))
+          throw new Error(`${observation.id}: runtime scenario route is not covered by routeIds`);
+        const markerObserved =
+          scenario.markerKind === "exact-line"
+            ? lines.includes(scenario.expectedMarker)
+            : lines.some((line) => line.startsWith(scenario.expectedMarker));
+        if (!markerObserved)
+          throw new Error(
+            `${observation.id}: evidence artifact is missing ${scenario.markerKind} scenario marker ${scenario.expectedMarker}`,
+          );
         requiredProbeSetMarkers.add(scenario.probeSetInputMarker);
         runtimeRoutes.add(scenario.routeId);
       }
@@ -318,11 +380,17 @@ async function validateObservations(manifest, scenarios, routeById, loadEvidence
         }
         recordAudit({
           input: "packages/bindings/probes/defold-script-real-engine-matrix.json",
-          id: observation.id, status: VOID, reason: "withdrawn-probe-set", anchorsLost: [marker]
+          id: observation.id,
+          status: VOID,
+          reason: "withdrawn-probe-set",
+          anchorsLost: [marker],
         });
       }
       const routesWithoutScenarios = routeIds.filter((routeId) => !runtimeRoutes.has(routeId));
-      if (routesWithoutScenarios.length) throw new Error(`${observation.id}: runtime route lacks an observed scenario: ${routesWithoutScenarios.join(", ")}`);
+      if (routesWithoutScenarios.length)
+        throw new Error(
+          `${observation.id}: runtime route lacks an observed scenario: ${routesWithoutScenarios.join(", ")}`,
+        );
     }
     observations.push({
       id: observation.id,
@@ -334,7 +402,7 @@ async function validateObservations(manifest, scenarios, routeById, loadEvidence
       routeIds,
       scenarioKeys,
       artifact: observation.artifact,
-      requiredMarkers
+      requiredMarkers,
     });
   }
   return observations;
@@ -356,23 +424,41 @@ export async function generateScriptRealEngineMatrix(texts, options = {}) {
   assertRecord(manifest.policy, "policy");
   assertNonEmpty(manifest.policy.defaultPlannedReason, "policy.defaultPlannedReason");
   assertNonEmpty(manifest.policy.defaultSetupId, "policy.defaultSetupId");
-  if (JSON.stringify(manifest.policy.requiredEvidenceStages) !== JSON.stringify(stages)) throw new Error("requiredEvidenceStages must be compile, link, runtime");
-  if (manifest.policy.runtimeRequiresExactScenarioMarker !== true) throw new Error("runtimeRequiresExactScenarioMarker must be true");
+  if (JSON.stringify(manifest.policy.requiredEvidenceStages) !== JSON.stringify(stages))
+    throw new Error("requiredEvidenceStages must be compile, link, runtime");
+  if (manifest.policy.runtimeRequiresExactScenarioMarker !== true)
+    throw new Error("runtimeRequiresExactScenarioMarker must be true");
   expectSameRevision({
     label: "script real-engine matrix",
     inputs: [
       { path: "packages/bindings/generated/defold-script-scalar-dispatch.json", revision: scalarRoutes.defoldRevision },
       { path: "packages/bindings/generated/defold-script-value-bindings.json", revision: valueRoutes.defoldRevision },
       { path: "packages/bindings/generated/defold-script-fixed-tuples.json", revision: tupleRoutes.defoldRevision },
-      { path: "packages/bindings/generated/defold-script-url-address-classification.json", revision: urlRoutes.defoldRevision },
-      { path: "packages/bindings/generated/defold-script-value-tail-bindings.json", revision: valueTailRoutes.defoldRevision },
-      { path: "packages/bindings/generated/defold-script-overload-dispatch.json", revision: overloadRoutes.defoldRevision },
-      { path: "packages/bindings/generated/defold-script-real-engine-probes.json", revision: scalarProbes.defoldRevision },
-      { path: "packages/bindings/generated/defold-script-value-real-engine-probes.json", revision: valueProbes.defoldRevision }
-    ]
+      {
+        path: "packages/bindings/generated/defold-script-url-address-classification.json",
+        revision: urlRoutes.defoldRevision,
+      },
+      {
+        path: "packages/bindings/generated/defold-script-value-tail-bindings.json",
+        revision: valueTailRoutes.defoldRevision,
+      },
+      {
+        path: "packages/bindings/generated/defold-script-overload-dispatch.json",
+        revision: overloadRoutes.defoldRevision,
+      },
+      {
+        path: "packages/bindings/generated/defold-script-real-engine-probes.json",
+        revision: scalarProbes.defoldRevision,
+      },
+      {
+        path: "packages/bindings/generated/defold-script-value-real-engine-probes.json",
+        revision: valueProbes.defoldRevision,
+      },
+    ],
   });
   const setups = validateSetups(manifest);
-  if (!setups.has(manifest.policy.defaultSetupId)) throw new Error(`Unknown default setup ${manifest.policy.defaultSetupId}`);
+  if (!setups.has(manifest.policy.defaultSetupId))
+    throw new Error(`Unknown default setup ${manifest.policy.defaultSetupId}`);
   const routes = routeRows(scalarRoutes, valueRoutes, tupleRoutes, urlRoutes, valueTailRoutes, overloadRoutes);
   const routeById = new Map(routes.map((route) => [route.id, route]));
   const scenarios = importedScenarios(manifest, setups, scalarProbes, valueProbes, routeById);
@@ -382,15 +468,17 @@ export async function generateScriptRealEngineMatrix(texts, options = {}) {
     const setupId = probe.requirements.includes("active-context:GuiScriptInstance")
       ? "generated-gui-script-instance"
       : probe.requirements.includes("active-context:ScriptInstance")
-        ? "bootstrap-script-instance" : "global-runtime";
+        ? "bootstrap-script-instance"
+        : "global-runtime";
     scenarios.push({
       key: `tuple:${probe.id}`,
       routeId: probe.routeId,
       state: "planned",
       setupId,
-      reason: probe.publicTypeScriptFixture === "blocked-missing-handle-producer"
-        ? "Generated tuple lowering awaits its public TypeScript borrowed-handle producer."
-        : "Generated tuple lowering has no observed packaged-engine marker yet."
+      reason:
+        probe.publicTypeScriptFixture === "blocked-missing-handle-producer"
+          ? "Generated tuple lowering awaits its public TypeScript borrowed-handle producer."
+          : "Generated tuple lowering has no observed packaged-engine marker yet.",
     });
   }
   const routesWithScenarios = new Set(scenarios.map(({ routeId }) => routeId));
@@ -401,7 +489,7 @@ export async function generateScriptRealEngineMatrix(texts, options = {}) {
         routeId: route.id,
         state: "planned",
         setupId: manifest.policy.defaultSetupId,
-        reason: manifest.policy.defaultPlannedReason
+        reason: manifest.policy.defaultPlannedReason,
       });
     }
   }
@@ -424,28 +512,51 @@ export async function generateScriptRealEngineMatrix(texts, options = {}) {
       ...route,
       scenarios: routeScenarios.map((scenario) => scenario.key),
       scenarioState: routeScenarios.some(({ state }) => state === "instrumented") ? "instrumented" : "planned",
-      evidence: Object.fromEntries(stages.map((stage) => {
-        const observationIds = observationsByRouteStage.get(`${route.id}\0${stage}`) ?? [];
-        return [stage, { status: observationIds.length ? "verified" : "unverified", observationIds }];
-      }))
+      evidence: Object.fromEntries(
+        stages.map((stage) => {
+          const observationIds = observationsByRouteStage.get(`${route.id}\0${stage}`) ?? [];
+          return [stage, { status: observationIds.length ? "verified" : "unverified", observationIds }];
+        }),
+      ),
     };
   });
-  const stageSummary = Object.fromEntries(stages.map((stage) => [stage, {
-    verifiedRouteCount: routeReports.filter((route) => route.evidence[stage].status === "verified").length,
-    unverifiedRouteCount: routeReports.filter((route) => route.evidence[stage].status === "unverified").length
-  }]));
+  const stageSummary = Object.fromEntries(
+    stages.map((stage) => [
+      stage,
+      {
+        verifiedRouteCount: routeReports.filter((route) => route.evidence[stage].status === "verified").length,
+        unverifiedRouteCount: routeReports.filter((route) => route.evidence[stage].status === "unverified").length,
+      },
+    ]),
+  );
   const inputSha256 = createHash("sha256")
-    .update(texts.manifest).update("\0").update(texts.scalarRoutes).update("\0").update(texts.valueRoutes)
-    .update("\0").update(texts.tupleRoutes).update("\0").update(texts.urlRoutes)
-    .update("\0").update(texts.valueTailRoutes).update("\0").update(texts.overloadRoutes)
-    .update("\0").update(texts.scalarProbes)
-    .update("\0").update(texts.valueProbes).update("\0").update(texts.tupleProbes).digest("hex");
+    .update(texts.manifest)
+    .update("\0")
+    .update(texts.scalarRoutes)
+    .update("\0")
+    .update(texts.valueRoutes)
+    .update("\0")
+    .update(texts.tupleRoutes)
+    .update("\0")
+    .update(texts.urlRoutes)
+    .update("\0")
+    .update(texts.valueTailRoutes)
+    .update("\0")
+    .update(texts.overloadRoutes)
+    .update("\0")
+    .update(texts.scalarProbes)
+    .update("\0")
+    .update(texts.valueProbes)
+    .update("\0")
+    .update(texts.tupleProbes)
+    .digest("hex");
   return {
     schemaVersion: 1,
     defoldRevision: scalarRoutes.defoldRevision,
     target: manifest.target,
     inputSha256,
-    evidencePolicy: "Scenario state records planning/instrumentation only. A route stage is verified exclusively by an explicit, passed, target-matched observation whose repository-confined evidence artifact matches its declared SHA-256. Runtime requires the current probe-set fingerprint and an exact line or explicitly declared line prefix for every scenario.",
+    evidencePolicy:
+      "Scenario state records planning/instrumentation only. A route stage is verified exclusively by an explicit, passed, target-matched observation whose repository-confined evidence artifact matches its declared SHA-256. Runtime requires the current probe-set fingerprint and an exact line or explicitly declared line prefix for every scenario.",
     coverageClaim: `All ${routes.length} generated executable script routes have at least one deterministic scenario. No compile, link, or runtime behavior is claimed without a verified observation.`,
     routeCount: routes.length,
     scenarioCount: scenarios.length,
@@ -459,7 +570,7 @@ export async function generateScriptRealEngineMatrix(texts, options = {}) {
     setups: [...setups.values()],
     scenarios,
     observations,
-    routes: routeReports
+    routes: routeReports,
   };
 }
 
@@ -467,15 +578,19 @@ async function main(argv = process.argv.slice(2)) {
   const unknown = argv.filter((argument) => argument !== "--check");
   if (unknown.length) throw new Error(`Unknown argument: ${unknown[0]}`);
   const check = argv.includes("--check");
-  const entries = await Promise.all(Object.entries(inputUrls).map(async ([key, url]) => [key, await readFile(url, "utf8")]));
+  const entries = await Promise.all(
+    Object.entries(inputUrls).map(async ([key, url]) => [key, await readFile(url, "utf8")]),
+  );
   const report = `${JSON.stringify(await generateScriptRealEngineMatrix(Object.fromEntries(entries)), null, 2)}\n`;
   if (check) {
-    if (await readFile(reportUrl, "utf8") !== report) throw new Error(`${reportUrl.pathname} is stale`);
+    if ((await readFile(reportUrl, "utf8")) !== report) throw new Error(`${reportUrl.pathname} is stale`);
   } else {
     await writeFile(reportUrl, report);
   }
   const parsed = JSON.parse(report);
-  console.log(`${check ? "Verified" : "Generated"} ${parsed.routeCount} route scenarios; ${parsed.instrumentedRouteCount} instrumented, ${parsed.plannedOnlyRouteCount} planned-only, ${parsed.stageSummary.runtime.verifiedRouteCount} runtime-verified.`);
+  console.log(
+    `${check ? "Verified" : "Generated"} ${parsed.routeCount} route scenarios; ${parsed.instrumentedRouteCount} instrumented, ${parsed.plannedOnlyRouteCount} planned-only, ${parsed.stageSummary.runtime.verifiedRouteCount} runtime-verified.`,
+  );
 }
 
 if (process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url) await main();

@@ -10,7 +10,7 @@ import {
   assertDmSdkSourceCensus,
   discoverDmSdkImplementationEvidence,
   dmSdkCleanRoomEvidencePaths,
-  runDmSdkCleanRoomRegeneration
+  runDmSdkCleanRoomRegeneration,
 } from "../scripts/check-dmsdk-clean-room-regeneration.mjs";
 import { dmSdkGeneratorSources, generatedDmSdkArtifacts } from "../scripts/lib/dmsdk-generator-pipeline.mjs";
 
@@ -42,32 +42,33 @@ test("dmSDK implementation evidence is derived from IR rather than generated fac
     "upstream/defold/engine/dlib/src/second.mm",
   ]);
   await writeFile(path.join(engine, "match.cpp"), "int Different(int value) { return value; }\n");
-  assert.deepEqual(await discoverDmSdkImplementationEvidence(root, ir), [
-    "upstream/defold/engine/dlib/src/second.mm",
-  ]);
+  assert.deepEqual(await discoverDmSdkImplementationEvidence(root, ir), ["upstream/defold/engine/dlib/src/second.mm"]);
 });
 
 test("the clean room owns the SDK extraction manifest and its verifier", async () => {
-  const lock = Object.fromEntries((await readFile(path.join(repositoryRoot, "upstream.lock"), "utf8"))
-    .split(/\r?\n/u)
-    .flatMap((line) => {
+  const lock = Object.fromEntries(
+    (await readFile(path.join(repositoryRoot, "upstream.lock"), "utf8")).split(/\r?\n/u).flatMap((line) => {
       const match = line.match(/^([A-Z0-9_]+)=(.*)$/u);
       return match ? [[match[1], match[2]]] : [];
-    }));
+    }),
+  );
   const evidence = await dmSdkCleanRoomEvidencePaths(repositoryRoot, lock.DEFOLD_REV);
-  assert.ok(evidence.includes(
-    `upstream/extender/server/app/sdk/${lock.DEFOLD_REV}/defoldsdk/.deherm-sdk-extraction-manifest.json`
-  ));
+  assert.ok(
+    evidence.includes(
+      `upstream/extender/server/app/sdk/${lock.DEFOLD_REV}/defoldsdk/.deherm-sdk-extraction-manifest.json`,
+    ),
+  );
   assert.ok(dmSdkGeneratorSources.includes("scripts/lib/defold-sdk-extraction-manifest.mjs"));
 });
 
 test("dmSDK artifact ownership rejects hand-authored generated output", () => {
   assert.throws(
-    () => assertGeneratedDmSdkArtifactInventory([
-      ...generatedDmSdkArtifacts,
-      "packages/bindings/generated/defold-dmsdk-hand-authored-binding.json"
-    ]),
-    /Unexpected \(possibly hand-authored\): packages\/bindings\/generated\/defold-dmsdk-hand-authored-binding\.json/
+    () =>
+      assertGeneratedDmSdkArtifactInventory([
+        ...generatedDmSdkArtifacts,
+        "packages/bindings/generated/defold-dmsdk-hand-authored-binding.json",
+      ]),
+    /Unexpected \(possibly hand-authored\): packages\/bindings\/generated\/defold-dmsdk-hand-authored-binding\.json/,
   );
 });
 
@@ -75,8 +76,30 @@ test("dmSDK clean-room census follows synthetic source add/remove drift", () => 
   const source = {
     patterns: { bindings: [{ id: "dmsdk:a" }], coverage: { runtimePendingCount: 1, classifiedCount: 1 } },
     shapes: { rows: [{ id: "dmsdk:a" }], coverage: { runtimePending: 1, shaped: 1 } },
-    projection: { rows: [{ id: "dmsdk:a" }], coverage: { classifiedDeclarations: 1, projectedDeclarations: 1, mechanicallyProjected: 1, unprojectedDeclarations: 0, projectionGaps: 0, silentUnknowns: 0 } },
-    universal: { recipes: [{ declarationId: "dmsdk:a" }], coverage: { declarations: 1, recipes: 1, cAbiDispatchable: 1, dynamicHermesMetadata: 1, staticHermesDeclarations: 1, browserDirectMemoryMetadata: 1, typescriptStableIds: 1, silentlyOmitted: 0 } }
+    projection: {
+      rows: [{ id: "dmsdk:a" }],
+      coverage: {
+        classifiedDeclarations: 1,
+        projectedDeclarations: 1,
+        mechanicallyProjected: 1,
+        unprojectedDeclarations: 0,
+        projectionGaps: 0,
+        silentUnknowns: 0,
+      },
+    },
+    universal: {
+      recipes: [{ declarationId: "dmsdk:a" }],
+      coverage: {
+        declarations: 1,
+        recipes: 1,
+        cAbiDispatchable: 1,
+        dynamicHermesMetadata: 1,
+        staticHermesDeclarations: 1,
+        browserDirectMemoryMetadata: 1,
+        typescriptStableIds: 1,
+        silentlyOmitted: 0,
+      },
+    },
   };
   assert.equal(assertDmSdkSourceCensus(source), 1);
 
@@ -85,17 +108,40 @@ test("dmSDK clean-room census follows synthetic source add/remove drift", () => 
   added.universal.recipes.push({ declarationId: "dmsdk:b" });
   for (const key of ["runtimePendingCount", "classifiedCount"]) added.patterns.coverage[key] += 1;
   for (const key of ["runtimePending", "shaped"]) added.shapes.coverage[key] += 1;
-  for (const key of ["classifiedDeclarations", "projectedDeclarations", "mechanicallyProjected"]) added.projection.coverage[key] += 1;
-  for (const key of ["declarations", "recipes", "cAbiDispatchable", "dynamicHermesMetadata", "staticHermesDeclarations", "browserDirectMemoryMetadata", "typescriptStableIds"]) added.universal.coverage[key] += 1;
+  for (const key of ["classifiedDeclarations", "projectedDeclarations", "mechanicallyProjected"])
+    added.projection.coverage[key] += 1;
+  for (const key of [
+    "declarations",
+    "recipes",
+    "cAbiDispatchable",
+    "dynamicHermesMetadata",
+    "staticHermesDeclarations",
+    "browserDirectMemoryMetadata",
+    "typescriptStableIds",
+  ])
+    added.universal.coverage[key] += 1;
   assert.equal(assertDmSdkSourceCensus(added), 2);
 
   const removed = structuredClone(added);
-  for (const report of [removed.patterns, removed.shapes, removed.projection]) report.bindings ? report.bindings.pop() : report.rows.pop();
+  for (const report of [removed.patterns, removed.shapes, removed.projection]) {
+    if (report.bindings) report.bindings.pop();
+    else report.rows.pop();
+  }
   removed.universal.recipes.pop();
   for (const key of ["runtimePendingCount", "classifiedCount"]) removed.patterns.coverage[key] -= 1;
   for (const key of ["runtimePending", "shaped"]) removed.shapes.coverage[key] -= 1;
-  for (const key of ["classifiedDeclarations", "projectedDeclarations", "mechanicallyProjected"]) removed.projection.coverage[key] -= 1;
-  for (const key of ["declarations", "recipes", "cAbiDispatchable", "dynamicHermesMetadata", "staticHermesDeclarations", "browserDirectMemoryMetadata", "typescriptStableIds"]) removed.universal.coverage[key] -= 1;
+  for (const key of ["classifiedDeclarations", "projectedDeclarations", "mechanicallyProjected"])
+    removed.projection.coverage[key] -= 1;
+  for (const key of [
+    "declarations",
+    "recipes",
+    "cAbiDispatchable",
+    "dynamicHermesMetadata",
+    "staticHermesDeclarations",
+    "browserDirectMemoryMetadata",
+    "typescriptStableIds",
+  ])
+    removed.universal.coverage[key] -= 1;
   assert.equal(assertDmSdkSourceCensus(removed), 1);
 });
 
@@ -122,7 +168,7 @@ test("all generated dmSDK runtime artifacts regenerate byte-for-byte from pinned
   assert.equal(report.universalReadyExactVectorCount, 537);
   assert.equal(
     94 + report.universalReadyExactVectorCount + report.remainingWithoutGeneratedAdapters,
-    report.runtimePendingCount
+    report.runtimePendingCount,
   );
   assert.equal(report.uniqueShapeCount, 888);
   assert.equal(report.trancheCount, 15);

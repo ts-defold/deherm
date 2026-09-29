@@ -34,7 +34,7 @@ export function defaultDefoldBundleOutput(projectRoot, options = {}) {
   const cacheHome = defoldSurfaceCacheHome(
     options.env ?? process.env,
     options.hostPlatform ?? process.platform,
-    options.userHome
+    options.userHome,
   );
   return path.join(cacheHome, "dev-bundles", projectKey);
 }
@@ -47,7 +47,7 @@ export function defaultDefoldBundleBuildOutput(projectRoot, bundlePlatform = "wa
 
 export async function ensureBob(projectRoot, lock, options = {}) {
   const metadata = lock.toolchain?.bob;
-  if (!/^https:\/\//.test(metadata.url) || !/^[a-f0-9]{64}$/.test(metadata.sha256)) {
+  if (!metadata.url.startsWith("https://") || !/^[a-f0-9]{64}$/.test(metadata.sha256)) {
     throw new Error("deherm.lock contains invalid Bob toolchain metadata");
   }
   const directory = path.join(projectRoot, ".deherm", "cache", "toolchains", lock.defoldRevision);
@@ -60,12 +60,19 @@ export async function ensureBob(projectRoot, lock, options = {}) {
   await mkdir(directory, { recursive: true });
   const temporary = `${target}.download-${process.pid}`;
   await rm(temporary, { force: true });
-  options.emit?.({ type: "log", source: "bob", message: `downloading verified Bob for Defold ${lock.defoldRevision.slice(0, 7)}` });
-  const response = await (options.fetch ?? globalThis.fetch)(metadata.url, { signal: AbortSignal.timeout(options.downloadTimeoutMs ?? 120_000) });
+  options.emit?.({
+    type: "log",
+    source: "bob",
+    message: `downloading verified Bob for Defold ${lock.defoldRevision.slice(0, 7)}`,
+  });
+  const response = await (options.fetch ?? globalThis.fetch)(metadata.url, {
+    signal: AbortSignal.timeout(options.downloadTimeoutMs ?? 120_000),
+  });
   if (!response.ok) throw new Error(`Unable to download Bob: ${response.status} ${response.statusText}`);
   const bytes = Buffer.from(await response.arrayBuffer());
   const actual = sha256(bytes);
-  if (actual !== metadata.sha256) throw new Error(`Downloaded Bob checksum mismatch: expected ${metadata.sha256}, got ${actual}`);
+  if (actual !== metadata.sha256)
+    throw new Error(`Downloaded Bob checksum mismatch: expected ${metadata.sha256}, got ${actual}`);
   await writeFile(temporary, bytes, { flag: "wx" });
   await rename(temporary, target);
   return target;
@@ -77,7 +84,7 @@ async function resolveJava(options = {}) {
     process.env.DEHERM_JAVA,
     process.env.JAVA_HOME ? path.join(process.env.JAVA_HOME, "bin", "java") : undefined,
     "/opt/homebrew/opt/openjdk@25/bin/java",
-    "/usr/local/opt/openjdk@25/bin/java"
+    "/usr/local/opt/openjdk@25/bin/java",
   ].filter(Boolean);
   for (const candidate of candidates) if (await exists(candidate, constants.X_OK)) return candidate;
   return "java";
@@ -92,7 +99,12 @@ function pipeLines(stream, source, emit) {
     pending = lines.pop() ?? "";
     for (const line of lines) {
       if (!line.trim() || /\bFINE\b/.test(line)) continue;
-      emit({ type: "log", source, level: /\b(error|fatal)\b/i.test(line) ? "error" : /\bwarn/i.test(line) ? "warn" : "info", message: line });
+      emit({
+        type: "log",
+        source,
+        level: /\b(error|fatal)\b/i.test(line) ? "error" : /\bwarn/i.test(line) ? "warn" : "info",
+        message: line,
+      });
     }
   });
   stream?.on("end", () => {
@@ -106,7 +118,7 @@ function run(command, args, options) {
     const child = (options.spawn ?? spawnProcess)(command, args, {
       cwd: options.cwd,
       env: options.env ?? process.env,
-      stdio: ["ignore", "pipe", "pipe"]
+      stdio: ["ignore", "pipe", "pipe"],
     });
     pipeLines(child.stdout, options.source ?? "bob", options.emit ?? (() => {}));
     pipeLines(child.stderr, options.source ?? "bob", options.emit ?? (() => {}));
@@ -118,7 +130,14 @@ function run(command, args, options) {
   });
 }
 
-const ignoredOutputNames = new Set(["_BobBuildState_", "digest_cache", "game.arcd", "game.arci", "game.dmanifest", "game.graph.json"]);
+const ignoredOutputNames = new Set([
+  "_BobBuildState_",
+  "digest_cache",
+  "game.arcd",
+  "game.arci",
+  "game.dmanifest",
+  "game.graph.json",
+]);
 
 export async function snapshotCompiledResources(outputRoot, prior = new Map()) {
   const resources = new Map();
@@ -136,9 +155,7 @@ export async function snapshotCompiledResources(outputRoot, prior = new Map()) {
         // the authority; this identity only avoids rereading untouched output.
         const statIdentity = `${information.size}:${information.mtimeNs}:${information.ctimeNs}`;
         const previous = prior.get(relative);
-        const digest = previous?.statIdentity === statIdentity
-          ? previous.digest
-          : sha256(await readFile(absolute));
+        const digest = previous?.statIdentity === statIdentity ? previous.digest : sha256(await readFile(absolute));
         resources.set(relative, { statIdentity, digest });
       }
     }
@@ -149,22 +166,28 @@ export async function snapshotCompiledResources(outputRoot, prior = new Map()) {
 
 export function changedCompiledResources(before, after) {
   const changed = [];
-  for (const [relative, identity] of after) if (before.get(relative)?.digest !== identity.digest) changed.push(`/${relative}`);
+  for (const [relative, identity] of after)
+    if (before.get(relative)?.digest !== identity.digest) changed.push(`/${relative}`);
   return changed.sort();
 }
 
 export function extractBobFailureDiagnostics(text, limit = 12) {
   if (typeof text !== "string") throw new TypeError("Bob diagnostics input must be text");
-  if (!Number.isSafeInteger(limit) || limit < 0) throw new RangeError("Bob diagnostics limit must be a non-negative integer");
+  if (!Number.isSafeInteger(limit) || limit < 0)
+    throw new RangeError("Bob diagnostics limit must be a non-negative integer");
   const diagnostics = [];
   const seen = new Set();
   for (const raw of text.split(/\r?\n/)) {
     const line = raw.trim();
-    if (!line || !(
-      /^(?:ERROR|FATAL):/.test(line) ||
-      /:\d+:\d+: (?:fatal )?error:/.test(line) ||
-      /(?:ExtenderException|Unable to find property|Cannot (?:get|set|create) property)/.test(line)
-    )) continue;
+    if (
+      !line ||
+      !(
+        /^(?:ERROR|FATAL):/.test(line) ||
+        /:\d+:\d+: (?:fatal )?error:/.test(line) ||
+        /(?:ExtenderException|Unable to find property|Cannot (?:get|set|create) property)/.test(line)
+      )
+    )
+      continue;
     if (seen.has(line)) continue;
     seen.add(line);
     diagnostics.push(line);
@@ -191,7 +214,7 @@ async function emitBobFailureDiagnostics(projectRoot, outputRoot, emit) {
     type: "log",
     source: "bob",
     level: "error",
-    message: `full native build log: ${path.relative(projectRoot, logFile).split(path.sep).join("/")}`
+    message: `full native build log: ${path.relative(projectRoot, logFile).split(path.sep).join("/")}`,
   });
   return logFile;
 }
@@ -202,7 +225,7 @@ function engineRelativePath(platform) {
     "x86_64-macos": ["x86_64-osx", "dmengine"],
     "arm64-linux": ["arm64-linux", "dmengine"],
     "x86_64-linux": ["x86_64-linux", "dmengine"],
-    "x86_64-win32": ["x86_64-win32", "dmengine.exe"]
+    "x86_64-win32": ["x86_64-win32", "dmengine.exe"],
   }[platform];
   if (!mapped) throw new Error(`No Defold engine output mapping exists for ${platform}`);
   return mapped;
@@ -242,21 +265,27 @@ export async function createDefoldBuilder(options) {
       if (upload.changed) emit({ type: "log", source: "bob", message: `typed-native: ${upload.message}` });
       const before = previous;
       const args = [
-        "-jar", bob,
-        "--root", projectRoot,
-        "--output", path.relative(projectRoot, outputRoot),
-        "--platform", platform,
-        "--architectures", platform,
-        "--variant", "debug",
+        "-jar",
+        bob,
+        "--root",
+        projectRoot,
+        "--output",
+        path.relative(projectRoot, outputRoot),
+        "--platform",
+        platform,
+        "--architectures",
+        platform,
+        "--variant",
+        "debug",
         "--archive",
-        "--verbose"
+        "--verbose",
       ];
       if (buildServer) args.push("--build-server", buildServer);
       args.push("resolve", "build");
       try {
         await run(java, args, { ...options, cwd: projectRoot, emit, source: "bob" });
         const engine = path.join(projectRoot, "build", ...engineRelativePath(platform));
-        if (process.platform !== "win32" && await exists(engine)) await chmod(engine, 0o755);
+        if (process.platform !== "win32" && (await exists(engine))) await chmod(engine, 0o755);
         previous = await snapshotCompiledResources(outputRoot, previous);
         const resources = changedCompiledResources(before, previous);
         emit({ type: "defold-build-succeeded", reason, resources });
@@ -269,7 +298,7 @@ export async function createDefoldBuilder(options) {
         const logFile = await emitBobFailureDiagnostics(
           projectRoot,
           nativeBobFailureOutputRoot(projectRoot, platform),
-          emit
+          emit,
         );
         const detail = error instanceof Error ? error.message : String(error);
         const diagnostic = logFile
@@ -296,10 +325,12 @@ export async function createDefoldBuilder(options) {
   const bundle = (options_ = {}) => {
     const bundlePlatform = options_.platform ?? "wasm-web";
     const variant = options_.variant ?? "debug";
-    const bundleOutput = path.resolve(options_.bundleOutput
-      ?? defaultDefoldBundleOutput(projectRoot, { env: options.env }));
-    const bundleBuildOutput = path.resolve(options_.buildOutput
-      ?? defaultDefoldBundleBuildOutput(projectRoot, bundlePlatform));
+    const bundleOutput = path.resolve(
+      options_.bundleOutput ?? defaultDefoldBundleOutput(projectRoot, { env: options.env }),
+    );
+    const bundleBuildOutput = path.resolve(
+      options_.buildOutput ?? defaultDefoldBundleBuildOutput(projectRoot, bundlePlatform),
+    );
     const reason = options_.reason ?? `bundle ${bundlePlatform}`;
     const operation = loop.then(async () => {
       emit({ type: "defold-build-started", reason });
@@ -310,15 +341,22 @@ export async function createDefoldBuilder(options) {
       const upload = await reconcileTypedNativeUpload({ projectRoot, platform: bundlePlatform });
       if (upload.changed) emit({ type: "log", source: "bob", message: `typed-native: ${upload.message}` });
       const args = [
-        "-jar", bob,
-        "--root", projectRoot,
-        "--output", path.relative(projectRoot, bundleBuildOutput),
-        "--bundle-output", bundleOutput,
-        "--platform", bundlePlatform,
-        "--architectures", bundlePlatform,
-        "--variant", variant,
+        "-jar",
+        bob,
+        "--root",
+        projectRoot,
+        "--output",
+        path.relative(projectRoot, bundleBuildOutput),
+        "--bundle-output",
+        bundleOutput,
+        "--platform",
+        bundlePlatform,
+        "--architectures",
+        bundlePlatform,
+        "--variant",
+        variant,
         "--archive",
-        "--verbose"
+        "--verbose",
       ];
       if (buildServer) args.push("--build-server", buildServer);
       args.push("resolve", "build", "bundle");
@@ -328,7 +366,11 @@ export async function createDefoldBuilder(options) {
         return { bundleOutput, buildOutput: bundleBuildOutput, platform: bundlePlatform };
       } catch (error) {
         await emitBobFailureDiagnostics(projectRoot, bundleBuildOutput, emit);
-        emit({ type: "defold-build-failed", reason, diagnostic: error instanceof Error ? error.message : String(error) });
+        emit({
+          type: "defold-build-failed",
+          reason,
+          diagnostic: error instanceof Error ? error.message : String(error),
+        });
         throw error;
       }
     });

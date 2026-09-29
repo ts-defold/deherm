@@ -12,11 +12,7 @@ const hermesRoot = path.join(repositoryRoot, "upstream", "hermes");
 const extensionInclude = path.join(repositoryRoot, "defold", "defold_hermes", "include");
 
 async function resolvePublicHeaderClosure(seeds) {
-  const roots = [
-    path.join(hermesRoot, "API"),
-    path.join(hermesRoot, "public"),
-    path.join(hermesRoot, "include")
-  ];
+  const roots = [path.join(hermesRoot, "API"), path.join(hermesRoot, "public"), path.join(hermesRoot, "include")];
   const pending = [...seeds];
   const resolved = new Map();
   while (pending.length) {
@@ -75,7 +71,7 @@ for (const [sourceRelative, destinationRelative] of copies) {
   } catch (error) {
     if (error?.code === "ENOENT") {
       throw new Error(
-        `Hermes public headers are unavailable at ${sourceRelative}; run pnpm bootstrap:upstreams before packing.`
+        `Hermes public headers are unavailable at ${sourceRelative}; run pnpm bootstrap:upstreams before packing.`,
       );
     }
     throw error;
@@ -93,11 +89,9 @@ for (const [sourceRelative, destinationRelative] of copies) {
   }
 }
 
-const staticHeaders = await resolveHermesHeaderClosure(
-  path.join(hermesRoot, "include"),
-  null,
-  { omitTargetConfig: true }
-);
+const staticHeaders = await resolveHermesHeaderClosure(path.join(hermesRoot, "include"), null, {
+  omitTargetConfig: true,
+});
 for (const [relative, { source }] of staticHeaders) {
   const destination = path.join(extensionInclude, relative);
   await mkdir(path.dirname(destination), { recursive: true });
@@ -109,10 +103,7 @@ for (const [relative, { source }] of staticHeaders) {
 // agent/API. Walk those entry headers rather than maintaining a hand-written
 // dependency list, so a pinned Hermes revision that changes the public closure
 // either stages the new header or fails before packaging.
-const debuggerHeaders = await resolvePublicHeaderClosure([
-  "hermes/cdp/CDPAgent.h",
-  "hermes/cdp/CDPDebugAPI.h"
-]);
+const debuggerHeaders = await resolvePublicHeaderClosure(["hermes/cdp/CDPAgent.h", "hermes/cdp/CDPDebugAPI.h"]);
 for (const [relative, source] of debuggerHeaders) {
   const destination = path.join(extensionInclude, relative);
   await mkdir(path.dirname(destination), { recursive: true });

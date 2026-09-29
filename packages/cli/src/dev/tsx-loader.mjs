@@ -25,10 +25,10 @@ export function registerTsxLoader() {
         jsx: "automatic",
         jsxImportSource: "@rezi-ui/jsx",
         sourcefile: file,
-        sourcemap: "inline"
+        sourcemap: "inline",
       });
       return { format: "module", shortCircuit: true, source: code };
-    }
+    },
   });
 }
 

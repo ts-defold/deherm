@@ -7,7 +7,7 @@ import {
   TraceMap,
   generatedPositionFor,
   originalPositionFor,
-  sourceContentFor
+  sourceContentFor,
 } from "@jridgewell/trace-mapping";
 
 function sourceUrl(file) {
@@ -37,7 +37,7 @@ export class DebugSourceMap {
       index,
       url,
       path: sourcePath(url),
-      name: path.basename(sourcePath(url))
+      name: path.basename(sourcePath(url)),
     }));
     this.identity = identity;
     return true;
@@ -49,7 +49,7 @@ export class DebugSourceMap {
       source: sourceUrl(source),
       line,
       column,
-      bias: LEAST_UPPER_BOUND
+      bias: LEAST_UPPER_BOUND,
     });
     if (position.line == null || position.column == null) return null;
     return { line: position.line, column: position.column };
@@ -63,7 +63,7 @@ export class DebugSourceMap {
       source: sourcePath(position.source),
       line: position.line,
       column: position.column,
-      name: position.name ?? null
+      name: position.name ?? null,
     };
   }
 

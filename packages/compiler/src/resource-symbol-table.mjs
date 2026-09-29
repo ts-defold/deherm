@@ -28,7 +28,7 @@ const expressionEndingTokens = new Set([
   SyntaxKind.SuperKeyword,
   SyntaxKind.CloseBracketToken,
   SyntaxKind.PlusPlusToken,
-  SyntaxKind.MinusMinusToken
+  SyntaxKind.MinusMinusToken,
 ]);
 const controlConditionTokens = new Set([
   SyntaxKind.IfKeyword,
@@ -36,7 +36,7 @@ const controlConditionTokens = new Set([
   SyntaxKind.WhileKeyword,
   SyntaxKind.SwitchKeyword,
   SyntaxKind.WithKeyword,
-  SyntaxKind.CatchKeyword
+  SyntaxKind.CatchKeyword,
 ]);
 
 function compare(left, right) {
@@ -75,7 +75,8 @@ export function componentProxyPath(relativeSource, sourceKinds) {
 
 function everyStringField(fields, path = [], out = []) {
   for (const field of fields) {
-    if (field.kind === "string") out.push({ path: [...path, field.name].join("."), value: field.value, line: field.line });
+    if (field.kind === "string")
+      out.push({ path: [...path, field.name].join("."), value: field.value, line: field.line });
     else if (field.kind === "message") everyStringField(field.message, [...path, field.name], out);
   }
   return out;
@@ -109,7 +110,7 @@ export function readResource({ path: relative, source, schema }) {
     extension,
     fields: parsed,
     strings: everyStringField(parsed),
-    namespaces
+    namespaces,
   };
 }
 
@@ -194,9 +195,15 @@ function slashDisposition(tokens) {
   if (!previous) return "regex";
   if (previous.kind === SyntaxKind.CloseBraceToken) return "ambiguous";
   if (previous.kind === SyntaxKind.CloseParenToken) {
-    const open = matchingTokenBackward(tokens, tokens.length - 1, SyntaxKind.OpenParenToken, SyntaxKind.CloseParenToken);
+    const open = matchingTokenBackward(
+      tokens,
+      tokens.length - 1,
+      SyntaxKind.OpenParenToken,
+      SyntaxKind.CloseParenToken,
+    );
     if (open < 0) return "ambiguous";
-    const controlCondition = controlConditionTokens.has(tokens[open - 1]?.kind) ||
+    const controlCondition =
+      controlConditionTokens.has(tokens[open - 1]?.kind) ||
       (tokens[open - 1]?.kind === SyntaxKind.AwaitKeyword && tokens[open - 2]?.kind === SyntaxKind.ForKeyword);
     return controlCondition ? "regex" : "division";
   }
@@ -231,7 +238,7 @@ function scanTypeScript(source) {
     tokens.push({
       kind,
       value: scanner.getTokenValue(),
-      start: scanner.getTokenStart()
+      start: scanner.getTokenStart(),
     });
   }
   return { tokens, skipped: null };
@@ -258,7 +265,7 @@ function matchingTokenBackward(tokens, start, open, close) {
 function lexicalScopes(tokens) {
   const scopes = [{ parent: -1, start: -1, end: tokens.length, shadows: new Set(), functionScope: true }];
   const stack = [0];
-  const at = new Array(tokens.length).fill(0);
+  const at = Array.from({ length: tokens.length }, () => 0);
   for (let index = 0; index < tokens.length; index += 1) {
     at[index] = stack.at(-1);
     if (tokens[index].kind === SyntaxKind.OpenBraceToken) {
@@ -275,14 +282,19 @@ function lexicalScopes(tokens) {
     SyntaxKind.WhileKeyword,
     SyntaxKind.SwitchKeyword,
     SyntaxKind.WithKeyword,
-    SyntaxKind.CatchKeyword
+    SyntaxKind.CatchKeyword,
   ]);
   for (let scope = 1; scope < scopes.length; scope += 1) {
     const entry = scopes[scope];
     let close = entry.start - 1;
-    while (close >= 0 && tokens[close].kind !== SyntaxKind.CloseParenToken &&
-           tokens[close].kind !== SyntaxKind.SemicolonToken && tokens[close].kind !== SyntaxKind.OpenBraceToken &&
-           tokens[close].kind !== SyntaxKind.CloseBraceToken) close -= 1;
+    while (
+      close >= 0 &&
+      tokens[close].kind !== SyntaxKind.CloseParenToken &&
+      tokens[close].kind !== SyntaxKind.SemicolonToken &&
+      tokens[close].kind !== SyntaxKind.OpenBraceToken &&
+      tokens[close].kind !== SyntaxKind.CloseBraceToken
+    )
+      close -= 1;
     if (tokens[close]?.kind === SyntaxKind.CloseParenToken) {
       const open = matchingTokenBackward(tokens, close, SyntaxKind.OpenParenToken, SyntaxKind.CloseParenToken);
       if (open >= 0 && !controlParameters.has(tokens[open - 1]?.kind)) {
@@ -291,8 +303,10 @@ function lexicalScopes(tokens) {
           if (tokens[index].kind === SyntaxKind.Identifier) entry.shadows.add(tokens[index].value);
         }
       }
-    } else if (tokens[entry.start - 1]?.kind === SyntaxKind.EqualsGreaterThanToken &&
-               tokens[entry.start - 2]?.kind === SyntaxKind.Identifier) {
+    } else if (
+      tokens[entry.start - 1]?.kind === SyntaxKind.EqualsGreaterThanToken &&
+      tokens[entry.start - 2]?.kind === SyntaxKind.Identifier
+    ) {
       entry.functionScope = true;
       entry.shadows.add(tokens[entry.start - 2].value);
     }
@@ -302,7 +316,7 @@ function lexicalScopes(tokens) {
     SyntaxKind.LetKeyword,
     SyntaxKind.VarKeyword,
     SyntaxKind.FunctionKeyword,
-    SyntaxKind.ClassKeyword
+    SyntaxKind.ClassKeyword,
   ]);
   for (let index = 0; index + 1 < tokens.length; index += 1) {
     if (!declarationKinds.has(tokens[index].kind)) continue;
@@ -314,8 +328,10 @@ function lexicalScopes(tokens) {
     }
     if (tokens[index + 1].kind === SyntaxKind.Identifier) {
       scopes[declarationScope].shadows.add(tokens[index + 1].value);
-    } else if (tokens[index + 1].kind === SyntaxKind.OpenBraceToken ||
-               tokens[index + 1].kind === SyntaxKind.OpenBracketToken) {
+    } else if (
+      tokens[index + 1].kind === SyntaxKind.OpenBraceToken ||
+      tokens[index + 1].kind === SyntaxKind.OpenBracketToken
+    ) {
       const open = tokens[index + 1].kind;
       const close = open === SyntaxKind.OpenBraceToken ? SyntaxKind.CloseBraceToken : SyntaxKind.CloseBracketToken;
       const end = matchingToken(tokens, index + 1, open, close);
@@ -331,15 +347,22 @@ function lexicalScopes(tokens) {
   }
   const expressionShadows = [];
   for (let arrow = 0; arrow < tokens.length; arrow += 1) {
-    if (tokens[arrow].kind !== SyntaxKind.EqualsGreaterThanToken ||
-        tokens[arrow + 1]?.kind === SyntaxKind.OpenBraceToken) continue;
+    if (
+      tokens[arrow].kind !== SyntaxKind.EqualsGreaterThanToken ||
+      tokens[arrow + 1]?.kind === SyntaxKind.OpenBraceToken
+    )
+      continue;
     const names = new Set();
     let parameterClose = arrow - 1;
-    while (parameterClose >= 0 && tokens[parameterClose].kind !== SyntaxKind.CloseParenToken &&
-           tokens[parameterClose].kind !== SyntaxKind.EqualsToken &&
-           tokens[parameterClose].kind !== SyntaxKind.SemicolonToken &&
-           tokens[parameterClose].kind !== SyntaxKind.OpenBraceToken &&
-           tokens[parameterClose].kind !== SyntaxKind.CloseBraceToken) parameterClose -= 1;
+    while (
+      parameterClose >= 0 &&
+      tokens[parameterClose].kind !== SyntaxKind.CloseParenToken &&
+      tokens[parameterClose].kind !== SyntaxKind.EqualsToken &&
+      tokens[parameterClose].kind !== SyntaxKind.SemicolonToken &&
+      tokens[parameterClose].kind !== SyntaxKind.OpenBraceToken &&
+      tokens[parameterClose].kind !== SyntaxKind.CloseBraceToken
+    )
+      parameterClose -= 1;
     if (tokens[parameterClose]?.kind === SyntaxKind.CloseParenToken) {
       const open = matchingTokenBackward(tokens, parameterClose, SyntaxKind.OpenParenToken, SyntaxKind.CloseParenToken);
       if (open >= 0) {
@@ -361,16 +384,29 @@ function lexicalScopes(tokens) {
       else if (kind === SyntaxKind.OpenBracketToken) brackets += 1;
       else if (kind === SyntaxKind.OpenBraceToken) braces += 1;
       else if (kind === SyntaxKind.CloseParenToken) {
-        if (parens === 0 && brackets === 0 && braces === 0) { end = cursor; break; }
+        if (parens === 0 && brackets === 0 && braces === 0) {
+          end = cursor;
+          break;
+        }
         parens -= 1;
       } else if (kind === SyntaxKind.CloseBracketToken) {
-        if (parens === 0 && brackets === 0 && braces === 0) { end = cursor; break; }
+        if (parens === 0 && brackets === 0 && braces === 0) {
+          end = cursor;
+          break;
+        }
         brackets -= 1;
       } else if (kind === SyntaxKind.CloseBraceToken) {
-        if (parens === 0 && brackets === 0 && braces === 0) { end = cursor; break; }
+        if (parens === 0 && brackets === 0 && braces === 0) {
+          end = cursor;
+          break;
+        }
         braces -= 1;
-      } else if ((kind === SyntaxKind.CommaToken || kind === SyntaxKind.SemicolonToken) &&
-                 parens === 0 && brackets === 0 && braces === 0) {
+      } else if (
+        (kind === SyntaxKind.CommaToken || kind === SyntaxKind.SemicolonToken) &&
+        parens === 0 &&
+        brackets === 0 &&
+        braces === 0
+      ) {
         end = cursor;
         break;
       }
@@ -393,11 +429,16 @@ function isShadowed(tokenIndex, name, lexical, stopScope = 0) {
 function importedBindings(tokens) {
   const bindings = { msg: new Set(), hashLiteral: new Set() };
   for (let index = 0; index < tokens.length; index += 1) {
-    if (tokens[index].kind !== SyntaxKind.ImportKeyword || tokens[index + 1]?.kind !== SyntaxKind.OpenBraceToken) continue;
+    if (tokens[index].kind !== SyntaxKind.ImportKeyword || tokens[index + 1]?.kind !== SyntaxKind.OpenBraceToken)
+      continue;
     const close = matchingToken(tokens, index + 1, SyntaxKind.OpenBraceToken, SyntaxKind.CloseBraceToken);
-    if (close < 0 || tokens[close + 1]?.kind !== SyntaxKind.FromKeyword ||
-        tokens[close + 2]?.kind !== SyntaxKind.StringLiteral ||
-        !messageApiModules.has(tokens[close + 2].value)) continue;
+    if (
+      close < 0 ||
+      tokens[close + 1]?.kind !== SyntaxKind.FromKeyword ||
+      tokens[close + 2]?.kind !== SyntaxKind.StringLiteral ||
+      !messageApiModules.has(tokens[close + 2].value)
+    )
+      continue;
     for (let cursor = index + 2; cursor < close;) {
       const imported = tokens[cursor];
       if (imported.kind === SyntaxKind.TypeKeyword) {
@@ -408,9 +449,10 @@ function importedBindings(tokens) {
         cursor += 1;
         continue;
       }
-      const alias = tokens[cursor + 1]?.kind === SyntaxKind.AsKeyword && tokens[cursor + 2]?.kind === SyntaxKind.Identifier
-        ? tokens[cursor + 2]
-        : imported;
+      const alias =
+        tokens[cursor + 1]?.kind === SyntaxKind.AsKeyword && tokens[cursor + 2]?.kind === SyntaxKind.Identifier
+          ? tokens[cursor + 2]
+          : imported;
       if (bindings[imported.value]) bindings[imported.value].add(alias.value);
       cursor += alias === imported ? 1 : 3;
     }
@@ -474,13 +516,23 @@ function lifecycleCallable(tokens, member, limit) {
   if (!parameters) return null;
   cursor = parameters.close + 1;
   if (arrow) {
-    while (cursor < limit && tokens[cursor].kind !== SyntaxKind.EqualsGreaterThanToken &&
-           tokens[cursor].kind !== SyntaxKind.SemicolonToken && tokens[cursor].kind !== SyntaxKind.CommaToken) cursor += 1;
+    while (
+      cursor < limit &&
+      tokens[cursor].kind !== SyntaxKind.EqualsGreaterThanToken &&
+      tokens[cursor].kind !== SyntaxKind.SemicolonToken &&
+      tokens[cursor].kind !== SyntaxKind.CommaToken
+    )
+      cursor += 1;
     if (tokens[cursor]?.kind !== SyntaxKind.EqualsGreaterThanToken) return null;
     cursor += 1;
   }
-  while (cursor < limit && tokens[cursor].kind !== SyntaxKind.OpenBraceToken &&
-         tokens[cursor].kind !== SyntaxKind.SemicolonToken && tokens[cursor].kind !== SyntaxKind.CommaToken) cursor += 1;
+  while (
+    cursor < limit &&
+    tokens[cursor].kind !== SyntaxKind.OpenBraceToken &&
+    tokens[cursor].kind !== SyntaxKind.SemicolonToken &&
+    tokens[cursor].kind !== SyntaxKind.CommaToken
+  )
+    cursor += 1;
   if (tokens[cursor]?.kind !== SyntaxKind.OpenBraceToken) return null;
   let bodyOpen = cursor;
   let bodyClose = matchingToken(tokens, bodyOpen, SyntaxKind.OpenBraceToken, SyntaxKind.CloseBraceToken);
@@ -501,7 +553,7 @@ function directLifecycleCallables(tokens, containerOpen, containerClose, message
     SyntaxKind.AsyncKeyword,
     SyntaxKind.GetKeyword,
     SyntaxKind.SetKeyword,
-    SyntaxKind.AsteriskToken
+    SyntaxKind.AsteriskToken,
   ]);
   let nestedBraces = 0;
   for (let index = containerOpen + 1; index < containerClose; index += 1) {
@@ -513,8 +565,12 @@ function directLifecycleCallables(tokens, containerOpen, containerClose, message
       nestedBraces -= 1;
       continue;
     }
-    if (nestedBraces !== 0 || tokens[index].value !== "onMessage" ||
-        unsupportedPrecedingModifiers.has(tokens[index - 1]?.kind)) continue;
+    if (
+      nestedBraces !== 0 ||
+      tokens[index].value !== "onMessage" ||
+      unsupportedPrecedingModifiers.has(tokens[index - 1]?.kind)
+    )
+      continue;
     const callable = lifecycleCallable(tokens, index, containerClose);
     if (callable) callables.push({ ...callable, messageParameter });
   }
@@ -524,38 +580,56 @@ function directLifecycleCallables(tokens, containerOpen, containerClose, message
 function recognizedOnMessageCallables(tokens, lexical) {
   const callables = [];
   for (let index = 0; index + 3 < tokens.length; index += 1) {
-    if (lexical.at[index] !== 0 || tokens[index].kind !== SyntaxKind.ExportKeyword ||
-        tokens[index + 1]?.kind !== SyntaxKind.DefaultKeyword || tokens[index + 2]?.kind !== SyntaxKind.Identifier) continue;
+    if (
+      lexical.at[index] !== 0 ||
+      tokens[index].kind !== SyntaxKind.ExportKeyword ||
+      tokens[index + 1]?.kind !== SyntaxKind.DefaultKeyword ||
+      tokens[index + 2]?.kind !== SyntaxKind.Identifier
+    )
+      continue;
     const factory = tokens[index + 2].value;
     if (factory !== "defineComponent" && factory !== "component") continue;
     let open = index + 3;
-    while (open < tokens.length && tokens[open].kind !== SyntaxKind.OpenParenToken &&
-           tokens[open].kind !== SyntaxKind.SemicolonToken) open += 1;
+    while (
+      open < tokens.length &&
+      tokens[open].kind !== SyntaxKind.OpenParenToken &&
+      tokens[open].kind !== SyntaxKind.SemicolonToken
+    )
+      open += 1;
     if (tokens[open]?.kind !== SyntaxKind.OpenParenToken) continue;
     const invocation = callArguments(tokens, open);
     if (!invocation || invocation.arguments.length !== 1) continue;
     if (factory === "defineComponent") {
       const argument = invocation.arguments[0];
       const objectOpen = open + 1;
-      if (argument[0]?.kind !== SyntaxKind.OpenBraceToken || tokens[objectOpen]?.kind !== SyntaxKind.OpenBraceToken) continue;
+      if (argument[0]?.kind !== SyntaxKind.OpenBraceToken || tokens[objectOpen]?.kind !== SyntaxKind.OpenBraceToken)
+        continue;
       const objectClose = matchingToken(tokens, objectOpen, SyntaxKind.OpenBraceToken, SyntaxKind.CloseBraceToken);
       if (objectClose >= 0 && objectClose < invocation.close) {
         callables.push(...directLifecycleCallables(tokens, objectOpen, objectClose, 1));
       }
       continue;
     }
-    const className = invocation.arguments[0]?.length === 1 && invocation.arguments[0][0].kind === SyntaxKind.Identifier
-      ? invocation.arguments[0][0].value
-      : null;
+    const className =
+      invocation.arguments[0]?.length === 1 && invocation.arguments[0][0].kind === SyntaxKind.Identifier
+        ? invocation.arguments[0][0].value
+        : null;
     if (!className) continue;
     for (let declaration = 0; declaration < tokens.length; declaration += 1) {
-      if (lexical.at[declaration] !== 0 || tokens[declaration].kind !== SyntaxKind.ClassKeyword ||
-          tokens[declaration + 1]?.value !== className) continue;
+      if (
+        lexical.at[declaration] !== 0 ||
+        tokens[declaration].kind !== SyntaxKind.ClassKeyword ||
+        tokens[declaration + 1]?.value !== className
+      )
+        continue;
       let classOpen = declaration + 2;
       let validBase = false;
       while (classOpen < tokens.length && tokens[classOpen].kind !== SyntaxKind.OpenBraceToken) {
-        if (tokens[classOpen].kind === SyntaxKind.ExtendsKeyword &&
-            ["ScriptComponent", "GuiComponent", "RenderComponent"].includes(tokens[classOpen + 1]?.value)) validBase = true;
+        if (
+          tokens[classOpen].kind === SyntaxKind.ExtendsKeyword &&
+          ["ScriptComponent", "GuiComponent", "RenderComponent"].includes(tokens[classOpen + 1]?.value)
+        )
+          validBase = true;
         classOpen += 1;
       }
       if (!validBase || tokens[classOpen]?.kind !== SyntaxKind.OpenBraceToken) continue;
@@ -571,8 +645,13 @@ function evidence(kind, sourcePath, lineStarts, token, extra = {}) {
 }
 
 function compareEvidence(left, right) {
-  return compare(left.source, right.source) || left.line - right.line || left.column - right.column ||
-    compare(left.kind, right.kind) || compare(left.constant ?? "", right.constant ?? "");
+  return (
+    compare(left.source, right.source) ||
+    left.line - right.line ||
+    left.column - right.column ||
+    compare(left.kind, right.kind) ||
+    compare(left.constant ?? "", right.constant ?? "")
+  );
 }
 
 /**
@@ -594,9 +673,14 @@ export function projectMessageEvidence(sourceText, sourcePath) {
   const sender = [];
 
   for (let index = 0; index + 5 < tokens.length; index += 1) {
-    if (!bindings.msg.has(tokens[index].value) || isShadowed(index, tokens[index].value, lexical) ||
-        tokens[index + 1].kind !== SyntaxKind.DotToken ||
-        tokens[index + 2].value !== "post" || tokens[index + 3].kind !== SyntaxKind.OpenParenToken) continue;
+    if (
+      !bindings.msg.has(tokens[index].value) ||
+      isShadowed(index, tokens[index].value, lexical) ||
+      tokens[index + 1].kind !== SyntaxKind.DotToken ||
+      tokens[index + 2].value !== "post" ||
+      tokens[index + 3].kind !== SyntaxKind.OpenParenToken
+    )
+      continue;
     const call = callArguments(tokens, index + 3);
     const argument = call?.arguments[1];
     if (!call || argument?.length !== 1) continue;
@@ -607,12 +691,21 @@ export function projectMessageEvidence(sourceText, sourcePath) {
 
   const constants = new Map();
   for (let index = 0; index + 4 < tokens.length; index += 1) {
-    if (lexical.at[index] !== 0 || tokens[index].kind !== SyntaxKind.ConstKeyword ||
-        tokens[index + 1].kind !== SyntaxKind.Identifier) continue;
+    if (
+      lexical.at[index] !== 0 ||
+      tokens[index].kind !== SyntaxKind.ConstKeyword ||
+      tokens[index + 1].kind !== SyntaxKind.Identifier
+    )
+      continue;
     const identifier = tokens[index + 1];
     let equals = index + 2;
-    while (equals < tokens.length && tokens[equals].kind !== SyntaxKind.EqualsToken &&
-           tokens[equals].kind !== SyntaxKind.CommaToken && tokens[equals].kind !== SyntaxKind.SemicolonToken) equals += 1;
+    while (
+      equals < tokens.length &&
+      tokens[equals].kind !== SyntaxKind.EqualsToken &&
+      tokens[equals].kind !== SyntaxKind.CommaToken &&
+      tokens[equals].kind !== SyntaxKind.SemicolonToken
+    )
+      equals += 1;
     if (tokens[equals]?.kind !== SyntaxKind.EqualsToken) continue;
     const callee = tokens[equals + 1];
     if (!bindings.hashLiteral.has(callee?.value) || tokens[equals + 2]?.kind !== SyntaxKind.OpenParenToken) continue;
@@ -623,7 +716,9 @@ export function projectMessageEvidence(sourceText, sourcePath) {
     if (!name || !argument[0].value.startsWith("#")) continue;
     constants.set(identifier.value, {
       name,
-      evidence: evidence("on-message-hash-comparison", sourcePath, lineStarts, argument[0], { constant: identifier.value })
+      evidence: evidence("on-message-hash-comparison", sourcePath, lineStarts, argument[0], {
+        constant: identifier.value,
+      }),
     });
   }
 
@@ -636,7 +731,8 @@ export function projectMessageEvidence(sourceText, sourcePath) {
     const bodyScope = lexical.at[bodyOpen + 1] ?? 0;
     for (let cursor = bodyOpen + 1; cursor + 2 < bodyClose; cursor += 1) {
       const operator = tokens[cursor + 1].kind;
-      if (operator !== SyntaxKind.EqualsEqualsEqualsToken && operator !== SyntaxKind.ExclamationEqualsEqualsToken) continue;
+      if (operator !== SyntaxKind.EqualsEqualsEqualsToken && operator !== SyntaxKind.ExclamationEqualsEqualsToken)
+        continue;
       let constant = null;
       let messageIndex = -1;
       let constantIndex = -1;
@@ -650,8 +746,11 @@ export function projectMessageEvidence(sourceText, sourcePath) {
         constant = constants.get(tokens[constantIndex].value);
       }
       if (!constant) continue;
-      if (isShadowed(messageIndex, messageId, lexical, bodyScope) ||
-          isShadowed(constantIndex, tokens[constantIndex].value, lexical)) continue;
+      if (
+        isShadowed(messageIndex, messageId, lexical, bodyScope) ||
+        isShadowed(constantIndex, tokens[constantIndex].value, lexical)
+      )
+        continue;
       const key = `${constant.name}\0${constant.evidence.source}\0${constant.evidence.line}\0${constant.evidence.column}`;
       if (seenReceiver.has(key)) continue;
       seenReceiver.add(key);
@@ -696,16 +795,16 @@ export function buildProjectMessages(sourceTexts) {
     dynamicExpressions: "ignored-without-diagnostic",
     limits: messageScanLimits,
     routes: {
-      "MsgApi.post": { parameter: 1, role: "message-id", names: "projectMessages.names" }
+      "MsgApi.post": { parameter: 1, role: "message-id", names: "projectMessages.names" },
     },
     receiver: {
       role: "message-id",
       names: "projectMessages.names",
       evidence: "receiverEvidence",
-      prefix: "#"
+      prefix: "#",
     },
     names: merged,
-    skippedSources
+    skippedSources,
   };
 }
 
@@ -720,12 +819,22 @@ export function unreferencedDeclarations(declarations, literals) {
       }
     }
   }
-  return report.sort((left, right) =>
-    compare(left.resource, right.resource) || compare(left.namespace, right.namespace) ||
-    compare(left.name, right.name));
+  return report.sort(
+    (left, right) =>
+      compare(left.resource, right.resource) ||
+      compare(left.namespace, right.namespace) ||
+      compare(left.name, right.name),
+  );
 }
 
-export function buildResourceSymbolTable({ schema, classification, resources, componentSources, sourceTexts = new Map(), componentPolicy }) {
+export function buildResourceSymbolTable({
+  schema,
+  classification,
+  resources,
+  componentSources,
+  sourceTexts = new Map(),
+  componentPolicy,
+}) {
   const { sourceKinds } = createComponentProxyConstants(componentPolicy);
   const byPath = new Map(resources.map((resource) => [resource.path, resource]));
   const namespaceKinds = {};
@@ -749,7 +858,7 @@ export function buildResourceSymbolTable({ schema, classification, resources, co
           line: identity.line,
           type: type ? type.value : extensionOf(component?.value ?? "").replace(/^\./, ""),
           component: component ? component.value : null,
-          resources: boundResources(schema, message.message, byPath)
+          resources: boundResources(schema, message.message, byPath),
         };
       }
     }
@@ -766,7 +875,7 @@ export function buildResourceSymbolTable({ schema, classification, resources, co
         if (!identity) continue;
         instances[identity.value] = {
           line: identity.line,
-          prototype: stringField(message.message, "prototype")?.value ?? null
+          prototype: stringField(message.message, "prototype")?.value ?? null,
         };
       }
     }
@@ -787,7 +896,11 @@ export function buildResourceSymbolTable({ schema, classification, resources, co
     if (references.length !== 1) {
       components[relativeSource] = { proxy, unresolved: references.length ? "ambiguous-attachment" : "no-attachment" };
       if (references.length > 1) {
-        attachmentConflicts.push({ source: relativeSource, proxy, resources: references.map(({ resource }) => resource.path) });
+        attachmentConflicts.push({
+          source: relativeSource,
+          proxy,
+          resources: references.map(({ resource }) => resource.path),
+        });
       }
       continue;
     }
@@ -795,8 +908,9 @@ export function buildResourceSymbolTable({ schema, classification, resources, co
     const entry = { proxy, attachedResource: resource.path, attachedExtension: resource.extension };
     if (resource.extension === ".go") {
       entry.gameObject = resource.path;
-      const owner = Object.entries(gameObjects[resource.path]?.components ?? {})
-        .find(([, component]) => component.component === proxy);
+      const owner = Object.entries(gameObjects[resource.path]?.components ?? {}).find(
+        ([, component]) => component.component === proxy,
+      );
       if (owner) [entry.componentId] = owner;
       else entry.componentField = field.path;
     } else {
@@ -804,18 +918,22 @@ export function buildResourceSymbolTable({ schema, classification, resources, co
       // instantiates its component, so the owning object is the one whose
       // component points at the attached resource.
       const hosts = Object.entries(gameObjects).filter(([, gameObject]) =>
-        Object.values(gameObject.components).some((component) => component.component === resource.path));
+        Object.values(gameObject.components).some((component) => component.component === resource.path),
+      );
       if (hosts.length === 1) {
         const [[hostPath, gameObject]] = hosts;
         entry.gameObject = hostPath;
-        const owner = Object.entries(gameObject.components)
-          .find(([, component]) => component.component === resource.path);
+        const owner = Object.entries(gameObject.components).find(
+          ([, component]) => component.component === resource.path,
+        );
         if (owner) [entry.componentId] = owner;
       } else entry.gameObjectUnresolved = hosts.length ? "ambiguous-game-object" : "no-game-object";
     }
     if (entry.gameObject) {
       const owners = Object.entries(collections)
-        .filter(([, collection]) => Object.values(collection.instances).some(({ prototype }) => prototype === entry.gameObject))
+        .filter(([, collection]) =>
+          Object.values(collection.instances).some(({ prototype }) => prototype === entry.gameObject),
+        )
         .map(([path]) => path);
       if (owners.length === 1) [entry.collection] = owners;
       else entry.collectionUnresolved = owners.length ? "ambiguous-collection" : "no-collection";
@@ -858,8 +976,9 @@ export function buildResourceSymbolTable({ schema, classification, resources, co
     attachmentConflicts,
     unreferenced: {
       evidence: "literal-occurrence-in-project-typescript-sources",
-      caveat: "A name a program assembles or computes at runtime is reported here; this is a review aid, never a diagnostic.",
-      declarations: sourceTexts.size ? unreferencedDeclarations(declarations, literals) : []
-    }
+      caveat:
+        "A name a program assembles or computes at runtime is reported here; this is a review aid, never a diagnostic.",
+      declarations: sourceTexts.size ? unreferencedDeclarations(declarations, literals) : [],
+    },
   };
 }

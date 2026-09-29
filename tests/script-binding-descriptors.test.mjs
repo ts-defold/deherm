@@ -7,9 +7,17 @@ import { generateScriptBindingDescriptors } from "../scripts/generate-script-bin
 
 const root = new URL("../", import.meta.url);
 const ir = JSON.parse(await readFile(new URL("packages/bindings/generated/defold-script-api-ir.json", root), "utf8"));
-const patterns = JSON.parse(await readFile(new URL("packages/bindings/generated/defold-script-binding-patterns.json", root), "utf8"));
-const checkedJsonText = await readFile(new URL("packages/bindings/generated/defold-script-binding-descriptors.json", root), "utf8");
-const checkedHeader = await readFile(new URL("defold/defold_hermes/include/defold_hermes/generated_script_binding_descriptors.hpp", root), "utf8");
+const patterns = JSON.parse(
+  await readFile(new URL("packages/bindings/generated/defold-script-binding-patterns.json", root), "utf8"),
+);
+const checkedJsonText = await readFile(
+  new URL("packages/bindings/generated/defold-script-binding-descriptors.json", root),
+  "utf8",
+);
+const checkedHeader = await readFile(
+  new URL("defold/defold_hermes/include/defold_hermes/generated_script_binding_descriptors.hpp", root),
+  "utf8",
+);
 const checked = JSON.parse(checkedJsonText);
 const generated = generateScriptBindingDescriptors(ir, patterns);
 
@@ -17,7 +25,7 @@ function pendingIds(sourceIr) {
   return sourceIr.functions
     .filter((entry) => entry.runtimeStatus === "requires-universal-lua-bridge")
     .map((entry) => entry.id)
-    .sort((left, right) => left < right ? -1 : left > right ? 1 : 0);
+    .sort((left, right) => (left < right ? -1 : left > right ? 1 : 0));
 }
 
 test("assigns every pending function one dense deterministic numeric ID", () => {
@@ -35,8 +43,17 @@ test("assigns every pending function one dense deterministic numeric ID", () => 
 
 test("keeps all hot SoA ranges compact, contiguous, and in bounds", () => {
   const perBindingArrays = [
-    "stableId", "family", "parameterBegin", "parameterCount", "returnBegin", "returnCount",
-    "minimumArity", "maximumArity", "traitMask", "parameterCodecUnion", "returnCodecUnion"
+    "stableId",
+    "family",
+    "parameterBegin",
+    "parameterCount",
+    "returnBegin",
+    "returnCount",
+    "minimumArity",
+    "maximumArity",
+    "traitMask",
+    "parameterCodecUnion",
+    "returnCodecUnion",
   ];
   for (const name of perBindingArrays) assert.equal(checked.hot[name].length, checked.bindingCount, name);
   assert.equal(checked.hot.parameterCodecMask.length, checked.parameterSlotCount);
@@ -63,8 +80,9 @@ test("keeps all hot SoA ranges compact, contiguous, and in bounds", () => {
 });
 
 test("uses one persistent stable-ID scheme across full and scalar descriptors", async () => {
-  const scalar = JSON.parse(await readFile(new URL(
-    "packages/bindings/generated/defold-script-scalar-dispatch.json", root), "utf8"));
+  const scalar = JSON.parse(
+    await readFile(new URL("packages/bindings/generated/defold-script-scalar-dispatch.json", root), "utf8"),
+  );
   const denseByKey = new Map(checked.cold.stableKeys.map((key, index) => [key, index]));
   for (const binding of scalar.bindings) {
     const denseIndex = denseByKey.get(binding.id);
@@ -75,7 +93,13 @@ test("uses one persistent stable-ID scheme across full and scalar descriptors", 
 
 test("separates cold names and provenance from the hot descriptor tables", () => {
   const perBindingArrays = [
-    "stableKeys", "rawNames", "jsNames", "members", "sourceFileIndex", "sourceLines", "modulePathIndex"
+    "stableKeys",
+    "rawNames",
+    "jsNames",
+    "members",
+    "sourceFileIndex",
+    "sourceLines",
+    "modulePathIndex",
   ];
   for (const name of perBindingArrays) assert.equal(checked.cold[name].length, checked.bindingCount, name);
   assert.ok(checked.cold.sourceFileIndex.every((index) => index < checked.cold.sourceFiles.length));
@@ -101,7 +125,7 @@ test("encodes pattern families, codecs, and arity without losing rows", () => {
   }
   assert.deepEqual(
     Object.fromEntries(familyCounts),
-    Object.fromEntries(patterns.families.map(({ name, count }) => [name, count]))
+    Object.fromEntries(patterns.families.map(({ name, count }) => [name, count])),
   );
 });
 
@@ -141,13 +165,15 @@ test("rejects stale or structurally dishonest pattern inputs", () => {
 test("check mode accepts both generated artifacts", () => {
   execFileSync(process.execPath, ["scripts/generate-script-binding-descriptors.mjs", "--check"], {
     cwd: root,
-    stdio: "pipe"
+    stdio: "pipe",
   });
 });
 
 test("generated descriptor header compiles as strict C++17 constexpr data", () => {
   const candidates = [process.env.CXX, "clang++", "c++"].filter(Boolean);
-  const compiler = candidates.find((candidate) => spawnSync(candidate, ["--version"], { stdio: "ignore" }).status === 0);
+  const compiler = candidates.find(
+    (candidate) => spawnSync(candidate, ["--version"], { stdio: "ignore" }).status === 0,
+  );
   assert.ok(compiler, "a C++17 compiler is required to validate the generated descriptor header");
   const dynamicId = checked.cold.stableKeys.indexOf("script:bit.band");
   const dynamicCodecId = checked.cold.stableKeys.indexOf("script:json.decode");
@@ -166,8 +192,20 @@ static_assert(isValidDenseIndex(922));
 static_assert(!isValidDenseIndex(923));
 int main() { return 0; }
 `;
-  execFileSync(compiler, [
-    "-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic", "-fsyntax-only",
-    "-Idefold/defold_hermes/include", "-x", "c++", "-"
-  ], { cwd: root, input: source, stdio: ["pipe", "pipe", "pipe"] });
+  execFileSync(
+    compiler,
+    [
+      "-std=c++17",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pedantic",
+      "-fsyntax-only",
+      "-Idefold/defold_hermes/include",
+      "-x",
+      "c++",
+      "-",
+    ],
+    { cwd: root, input: source, stdio: ["pipe", "pipe", "pipe"] },
+  );
 });

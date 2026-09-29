@@ -11,17 +11,14 @@
 
 import { spawn, spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { access, mkdir, readFile, writeFile } from "node:fs/promises";
+import { access, mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { build as esbuild } from "esbuild";
 import ttsc from "@ttsc/unplugin/esbuild";
 
-import {
-  buildHeadlessConformancePlan,
-  loadHeadlessConformanceInputs
-} from "./lib/headless-conformance-plan.mjs";
+import { buildHeadlessConformancePlan, loadHeadlessConformanceInputs } from "./lib/headless-conformance-plan.mjs";
 import { writeHeadlessConformanceHarness } from "./generate-headless-conformance.mjs";
 
 const root = new URL("../", import.meta.url);
@@ -62,7 +59,7 @@ function run(command, args, options = {}) {
 
 async function bundleHarness(entryPoint) {
   await esbuild({
-    entryPoints: { "app": entryPoint },
+    entryPoints: { app: entryPoint },
     outdir: path.join(projectDirectory, "deherm"),
     outExtension: { ".js": ".dehermc" },
     bundle: true,
@@ -77,23 +74,20 @@ async function bundleHarness(entryPoint) {
     absWorkingDir: repoRoot,
     sourcemap: false,
     legalComments: "none",
-    logLevel: "warning"
+    logLevel: "warning",
   });
 }
 
 function compileContent() {
-  run(javaExecutable(), [
-    "-jar", bobJar,
-    "--root", projectDirectory,
-    "--output", "build/bob",
-    "--archive",
-    "build"
-  ], { stdio: ["ignore", "pipe", "pipe"] });
+  run(javaExecutable(), ["-jar", bobJar, "--root", projectDirectory, "--output", "build/bob", "--archive", "build"], {
+    stdio: ["ignore", "pipe", "pipe"],
+  });
 }
 
 async function writeManifest(fixtures) {
-  const lines = fixtures.map((fixture) =>
-    `${fixture.id}\t${fixture.collection}\t${TICK_BUDGET}\t${(fixture.engineConfig ?? []).join(" ")}`);
+  const lines = fixtures.map(
+    (fixture) => `${fixture.id}\t${fixture.collection}\t${TICK_BUDGET}\t${(fixture.engineConfig ?? []).join(" ")}`,
+  );
   await mkdir(path.dirname(manifestPath), { recursive: true });
   await writeFile(manifestPath, `${lines.join("\n")}\n`);
 }
@@ -165,10 +159,13 @@ async function runDriver(projectFile, remaining) {
   return new Promise((resolve, reject) => {
     const child = spawn(driverPath, ["--project-file", projectFile, "--manifest", manifestPath], {
       cwd: repoRoot,
-      stdio: ["ignore", "pipe", "pipe"]
+      stdio: ["ignore", "pipe", "pipe"],
     });
     const completeLines = [];
-    const pending = new Map([["stdout", ""], ["stderr", ""]]);
+    const pending = new Map([
+      ["stdout", ""],
+      ["stderr", ""],
+    ]);
     const append = (stream, chunk) => {
       const lines = `${pending.get(stream)}${chunk.toString("utf8")}`.split("\n");
       pending.set(stream, lines.pop());
@@ -208,7 +205,7 @@ export async function checkHeadlessConformance({ skipBuild = false } = {}) {
   const plan = buildHeadlessConformancePlan(documents);
   await writeFile(
     new URL("packages/bindings/generated/defold-headless-conformance-plan.json", root),
-    `${JSON.stringify(plan, null, 2)}\n`
+    `${JSON.stringify(plan, null, 2)}\n`,
   );
   const written = await writeHeadlessConformanceHarness(plan);
 
@@ -258,7 +255,7 @@ export async function checkHeadlessConformance({ skipBuild = false } = {}) {
       // A signal without the engine's own preceding diagnostic is not enough
       // to debug CI. Keep only the normalized tail for this process; the full
       // normalized transcript is written as a separate evidence artifact.
-      diagnostics: diagnosticLines(result.transcript)
+      diagnostics: diagnosticLines(result.transcript),
     });
     remaining = unfinished.filter((fixture) => fixture.id !== faulted);
   }
@@ -268,7 +265,7 @@ export async function checkHeadlessConformance({ skipBuild = false } = {}) {
   if (unexpectedProfiles.length > 0) {
     throw new Error(
       `The linked engine reported Defold runtime profile ${unexpectedProfiles.join(", ")}, ` +
-      `but the plan was built for ${plan.runtimeProfile}`
+        `but the plan was built for ${plan.runtimeProfile}`,
     );
   }
 
@@ -301,7 +298,7 @@ export async function checkHeadlessConformance({ skipBuild = false } = {}) {
         contractIndex: contract.contractIndex,
         routeCount: contract.routeCount,
         outcome: "unreachable",
-        blockers: contract.blockers
+        blockers: contract.blockers,
       };
     }
     const engine = outcomes.get(contract.id) ?? { disposition: "not-executed", exitCode: -1, ticks: 0 };
@@ -338,7 +335,7 @@ export async function checkHeadlessConformance({ skipBuild = false } = {}) {
       properties,
       ...(outcome === "blocked" || outcome === "engine-fault"
         ? { blockers: blockersFor(contract, engine, properties, conclusive) }
-        : {})
+        : {}),
     };
   });
 
@@ -374,7 +371,7 @@ export async function checkHeadlessConformance({ skipBuild = false } = {}) {
       mismatched: counts.mismatched ?? 0,
       engineFault: counts["engine-fault"] ?? 0,
       blocked: counts.blocked ?? 0,
-      unreachable: counts.unreachable ?? 0
+      unreachable: counts.unreachable ?? 0,
     },
     propertySummary: observations.reduce((totals, item) => {
       const key = `${item.property}:${item.disposition}`;
@@ -387,8 +384,8 @@ export async function checkHeadlessConformance({ skipBuild = false } = {}) {
     // initialiser loop whose `luaL_Reg` names are never read, so the parser
     // never reaches tcp.c's own array - but the engine either has the function
     // or it does not, and here it says which.
-    routeResolution: Object.fromEntries([...resolutions].sort(([a], [b]) => a < b ? -1 : 1)),
-    contracts: results
+    routeResolution: Object.fromEntries([...resolutions].sort(([a], [b]) => (a < b ? -1 : 1))),
+    contracts: results,
   };
 
   await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`);
@@ -405,16 +402,16 @@ async function main(argv = process.argv.slice(2)) {
   console.log(`headless-conformance:report:${reportPath}`);
   console.log(
     `headless-conformance:observed=${report.summary.observed} ` +
-    `mismatched=${report.summary.mismatched} ` +
-    `engine-fault=${report.summary.engineFault} ` +
-    `blocked=${report.summary.blocked} ` +
-    `unreachable=${report.summary.unreachable} of ${report.contractCount} contracts`
+      `mismatched=${report.summary.mismatched} ` +
+      `engine-fault=${report.summary.engineFault} ` +
+      `blocked=${report.summary.blocked} ` +
+      `unreachable=${report.summary.unreachable} of ${report.contractCount} contracts`,
   );
   for (const contract of report.contracts) {
     if (contract.outcome !== "engine-fault") continue;
     console.log(
       `headless-conformance:engine-fault:${contract.id}:${contract.engine.signal ?? "unknown"}:` +
-      `${(contract.engine.crashFrames ?? [])[0] ?? "unattributed"}`
+        `${(contract.engine.crashFrames ?? [])[0] ?? "unattributed"}`,
     );
     for (const line of contract.engine.diagnostics ?? []) {
       console.log(`headless-conformance:diagnostic:${contract.id}:${line}`);

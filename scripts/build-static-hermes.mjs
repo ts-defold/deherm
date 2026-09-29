@@ -13,27 +13,33 @@ const outputDirectory = args.get("--output-dir");
 // The typed-native lane handed to the C emitter. Development compiles the
 // complete lane on purpose; a release projection points this at its pruned
 // re-render so the emitted C carries no symbol for an unreachable route.
-const typedNativeSource = args.get("--typed-native-source")
-  ?? "packages/static-hermes/src/generated/script-vmath.ts";
+const typedNativeSource = args.get("--typed-native-source") ?? "packages/static-hermes/src/generated/script-vmath.ts";
 assert.ok(shermes, "--shermes is required");
 assert.ok(outputDirectory, "--output-dir is required");
 
 await mkdir(outputDirectory, { recursive: true });
 const generatedFfi = await readFile("packages/static-hermes/src/generated/ffi.js", "utf8");
 const generatedVmath = await readFile(typedNativeSource, "utf8");
-const generatedUniversal = (await readFile("packages/static-hermes/src/generated/script-universal-value.ts", "utf8"))
-  .replace(/^export \{.*\};$/m, "");
-const universalReport = JSON.parse(await readFile("packages/bindings/generated/defold-script-universal-value-bindings.json", "utf8"));
-const universalProbe = universalReport.bindings.find((binding) =>
-  binding.minimumArgumentCount <= 1 &&
-  binding.maximumArgumentCount >= 1 &&
-  binding.resultCount === 1 &&
-  !binding.shapeKinds.includes("callback") &&
-  binding.frameContract.inputEntryCapacity >= 9 &&
-  binding.frameContract.matrix4Arena &&
-  binding.frameContract.urlArena);
-assert.ok(universalProbe,
-  "Static Hermes universal probe needs a one-argument/one-result route with table, Matrix4, and URL input capacity");
+const generatedUniversal = (
+  await readFile("packages/static-hermes/src/generated/script-universal-value.ts", "utf8")
+).replace(/^export \{.*\};$/m, "");
+const universalReport = JSON.parse(
+  await readFile("packages/bindings/generated/defold-script-universal-value-bindings.json", "utf8"),
+);
+const universalProbe = universalReport.bindings.find(
+  (binding) =>
+    binding.minimumArgumentCount <= 1 &&
+    binding.maximumArgumentCount >= 1 &&
+    binding.resultCount === 1 &&
+    !binding.shapeKinds.includes("callback") &&
+    binding.frameContract.inputEntryCapacity >= 9 &&
+    binding.frameContract.matrix4Arena &&
+    binding.frameContract.urlArena,
+);
+assert.ok(
+  universalProbe,
+  "Static Hermes universal probe needs a one-argument/one-result route with table, Matrix4, and URL input capacity",
+);
 const typedSource = `${generatedFfi}\n\nconst __ffi_deherm_static_probe_report = $SHBuiltin.extern_c(\n  {include: "defold_hermes/static_probe.h"},\n  function defold_hermes_static_probe_report(value: c_f64): void { throw 0; }\n);\n\n__ffi_deherm_static_probe_report(__ffi_ExampleMath_add(20, 22));\n`;
 const typedInput = path.join(outputDirectory, "static-ffi.js");
 const typedOutput = path.join(outputDirectory, "static-ffi.c");
@@ -43,7 +49,10 @@ const vmathOutput = path.join(outputDirectory, "static-vmath.c");
 const universalInput = path.join(outputDirectory, "static-universal.ts");
 const universalOutput = path.join(outputDirectory, "static-universal.c");
 await writeFile(typedInput, typedSource);
-await writeFile(vmathInput, `${generatedVmath}\n\nconst __ffi_deherm_static_vmath_report = $SHBuiltin.extern_c(\n  {include: "defold_hermes/static_probe.h"},\n  function defold_hermes_static_vmath_report(stage: c_u32, value: c_f64): void { throw 0; }\n);\n\n__ffi_deherm_static_vmath_report(1, vmathLengthVector3(3, 4, 12));\n__ffi_deherm_static_vmath_report(2, vmathLengthVector4(1, 2, 2, 4));\n__ffi_deherm_static_vmath_report(3, vmathLengthQuaternion(0, 0, 0, 1));\n__ffi_deherm_static_vmath_report(4, vmathProjectVector3Vector3(2, 4, 6, 1, 2, 3));\n__ffi_deherm_static_vmath_report(5, vmathLengthSqrVector3(3, 4, 12));\n__ffi_deherm_static_vmath_report(6, vmathLengthSqrVector4(1, 2, 3, 4));\n__ffi_deherm_static_vmath_report(7, vmathLengthSqrQuaternion(1, 2, 2, 0));\nlet projectZeroTargetRejected: number = 0;\ntry {\n  vmathProjectVector3Vector3(1, 2, 3, 0, 0, 0);\n} catch (error) {\n  projectZeroTargetRejected = 1;\n}\n__ffi_deherm_static_vmath_report(8, projectZeroTargetRejected);\n`);
+await writeFile(
+  vmathInput,
+  `${generatedVmath}\n\nconst __ffi_deherm_static_vmath_report = $SHBuiltin.extern_c(\n  {include: "defold_hermes/static_probe.h"},\n  function defold_hermes_static_vmath_report(stage: c_u32, value: c_f64): void { throw 0; }\n);\n\n__ffi_deherm_static_vmath_report(1, vmathLengthVector3(3, 4, 12));\n__ffi_deherm_static_vmath_report(2, vmathLengthVector4(1, 2, 2, 4));\n__ffi_deherm_static_vmath_report(3, vmathLengthQuaternion(0, 0, 0, 1));\n__ffi_deherm_static_vmath_report(4, vmathProjectVector3Vector3(2, 4, 6, 1, 2, 3));\n__ffi_deherm_static_vmath_report(5, vmathLengthSqrVector3(3, 4, 12));\n__ffi_deherm_static_vmath_report(6, vmathLengthSqrVector4(1, 2, 3, 4));\n__ffi_deherm_static_vmath_report(7, vmathLengthSqrQuaternion(1, 2, 2, 0));\nlet projectZeroTargetRejected: number = 0;\ntry {\n  vmathProjectVector3Vector3(1, 2, 3, 0, 0, 0);\n} catch (error) {\n  projectZeroTargetRejected = 1;\n}\n__ffi_deherm_static_vmath_report(8, projectZeroTargetRejected);\n`,
+);
 const universalProbeSource = [
   generatedUniversal,
   "",
@@ -67,55 +76,59 @@ const universalProbeSource = [
   `let vectorResults:Array<DehermStaticValue>=dispatchScriptUniversalValue(${universalProbe.stableId},[new DehermStaticDefoldValue(1,1.5,2.25,3.125,0)]);`,
   `__ffi_deherm_static_universal_value_report(4,vectorResults[0].probeChecksum());`,
   `__ffi_deherm_static_universal_value_report(5,matrixResults[0].probeSize()+urlResults[0].probeSize());`,
-  ""
+  "",
 ].join("\n");
 await writeFile(universalInput, universalProbeSource);
 
 function compile(arguments_) {
   const result = spawnSync(shermes, arguments_, {
     cwd: process.cwd(),
-    encoding: "utf8"
+    encoding: "utf8",
   });
   assert.equal(result.status, 0, result.stderr || result.stdout);
 }
 
-compile([
-  "-typed", "-strict", "-O", "-emit-c",
-  "-exported-unit=deherm_static_ffi",
-  typedInput,
-  "-o", typedOutput
-]);
+compile(["-typed", "-strict", "-O", "-emit-c", "-exported-unit=deherm_static_ffi", typedInput, "-o", typedOutput]);
 compile([
   // Sound TypeScript is the input language here. The ts2flow compatibility
   // pass leaves return annotations on extern_c and class methods behind; feed
   // the same sound-typed grammar used by the generated exact-call units.
-  "-fno-std-globals", "-typed", "-strict", "-O", "-emit-c",
+  "-fno-std-globals",
+  "-typed",
+  "-strict",
+  "-O",
+  "-emit-c",
   "-exported-unit=deherm_static_app",
   "packages/static-hermes/src/typed-app.ts",
-  "-o", appOutput
+  "-o",
+  appOutput,
 ]);
 compile([
-  "-typed", "-strict", "-O", "-emit-c",
+  "-typed",
+  "-strict",
+  "-O",
+  "-emit-c",
   "-exported-unit=deherm_static_universal",
   universalInput,
-  "-o", universalOutput
+  "-o",
+  universalOutput,
 ]);
 compile([
   // Static Hermes' sound-typed grammar is the FFI authority for this generated
   // TS-compatible subset. The pinned ts2flow path currently leaves return type
   // annotations on extern_c function expressions unlowered.
-  "-fno-std-globals", "-typed", "-strict", "-O", "-emit-c",
+  "-fno-std-globals",
+  "-typed",
+  "-strict",
+  "-O",
+  "-emit-c",
   "-exported-unit=deherm_static_vmath",
   vmathInput,
-  "-o", vmathOutput
+  "-o",
+  vmathOutput,
 ]);
 
 const compatibilityOutput = path.join(outputDirectory, "static-compat-app.c");
-compile([
-  "-O", "-emit-c",
-  "-exported-unit=deherm_static_compat_app",
-  "dist/sample.js",
-  "-o", compatibilityOutput
-]);
+compile(["-O", "-emit-c", "-exported-unit=deherm_static_compat_app", "dist/sample.js", "-o", compatibilityOutput]);
 
 console.log(`Static Hermes emitted sound-typed ABI/lifecycle/vmath/universal units and ${compatibilityOutput}`);

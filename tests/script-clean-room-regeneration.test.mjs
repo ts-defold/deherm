@@ -4,16 +4,17 @@ import test from "node:test";
 import {
   assertGeneratedArtifactInventory,
   generatedScriptArtifacts,
-  runScriptCleanRoomRegeneration
+  runScriptCleanRoomRegeneration,
 } from "../scripts/check-script-clean-room-regeneration.mjs";
 
 test("generated artifact inventory rejects per-route hand-authored output", () => {
   assert.throws(
-    () => assertGeneratedArtifactInventory([
-      ...generatedScriptArtifacts,
-      "packages/bindings/generated/defold-script-hand-authored-route.json"
-    ]),
-    /Unexpected \(possibly hand-authored\): packages\/bindings\/generated\/defold-script-hand-authored-route\.json/
+    () =>
+      assertGeneratedArtifactInventory([
+        ...generatedScriptArtifacts,
+        "packages/bindings/generated/defold-script-hand-authored-route.json",
+      ]),
+    /Unexpected \(possibly hand-authored\): packages\/bindings\/generated\/defold-script-hand-authored-route\.json/,
   );
 });
 
@@ -27,18 +28,24 @@ test("all source-derived script routes regenerate byte-for-byte from pinned inpu
   assert.match(report.pinnedGroundTruth.refDocSha256, /^[0-9a-f]{64}$/);
   assert.equal(
     report.executableRouteCount,
-    report.scalarRouteCount + report.valueRouteCount + report.fixedTupleRouteCount + report.urlRouteCount +
-      report.valueTailRouteCount + report.overloadRouteCount
+    report.scalarRouteCount +
+      report.valueRouteCount +
+      report.fixedTupleRouteCount +
+      report.urlRouteCount +
+      report.valueTailRouteCount +
+      report.overloadRouteCount,
   );
   assert.ok(report.executableRouteCount > 0);
   assert.ok(report.universalRouteCount > 0);
   assert.ok(report.universalConstantRouteCount > 0);
   assert.ok(report.constantPolicyCount > 0);
-  assert.equal(report.typedNativeFunctionRouteCount,
-    report.typedNativeRouteCount - report.typedNativeConstantRouteCount);
+  assert.equal(
+    report.typedNativeFunctionRouteCount,
+    report.typedNativeRouteCount - report.typedNativeConstantRouteCount,
+  );
   assert.equal(report.typedNativeConstantRouteCount, report.universalConstantRouteCount);
   assert.equal(
     report.typedNativeRouteCount,
-    report.typedNativeFunctionRouteCount + report.typedNativeConstantRouteCount
+    report.typedNativeFunctionRouteCount + report.typedNativeConstantRouteCount,
   );
 });

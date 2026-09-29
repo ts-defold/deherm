@@ -12,12 +12,12 @@ const targetVariantHeader = "defold_hermes/include/defold_hermes/generated_runti
 const webRuntimeVariantFiles = [
   {
     source: "packages/cli/templates/web-runtime/component_bridge.js",
-    destination: "defold_hermes/lib/web/component_bridge.js"
+    destination: "defold_hermes/lib/web/component_bridge.js",
   },
   {
     source: "packages/cli/templates/web-runtime/library_defold_hermes.js",
-    destination: "defold_hermes/lib/web/library_defold_hermes.js"
-  }
+    destination: "defold_hermes/lib/web/library_defold_hermes.js",
+  },
 ];
 const webDebugBegin = "/* DEHERM_DEBUG_SNAPSHOT_BEGIN */";
 const webDebugEnd = "/* DEHERM_DEBUG_SNAPSHOT_END */";
@@ -40,10 +40,12 @@ async function replaceProjectFile(destination, writeTemporary) {
 }
 
 async function replaceProjectCopy(source, destination) {
-  await replaceProjectFile(destination, (temporary) => cp(source, temporary, {
-    errorOnExist: true,
-    force: false
-  }));
+  await replaceProjectFile(destination, (temporary) =>
+    cp(source, temporary, {
+      errorOnExist: true,
+      force: false,
+    }),
+  );
 }
 
 async function replaceProjectText(destination, source) {
@@ -64,7 +66,7 @@ export function hostDefoldPlatform(platform = process.platform, architecture = p
     "darwin:x64": "x86_64-macos",
     "linux:arm64": "arm64-linux",
     "linux:x64": "x86_64-linux",
-    "win32:x64": "x86_64-win32"
+    "win32:x64": "x86_64-win32",
   }[`${platform}:${architecture}`];
   if (!mapped) throw new Error(`No Defold development platform mapping exists for ${platform}/${architecture}`);
   return mapped;
@@ -80,7 +82,7 @@ function targetRecord(lock, requested) {
     throw new Error("deherm.lock has no authenticated Defold target matrix; run 'deherm generate'");
   }
   const pair = matrix.platformPairs.find(
-    (entry) => entry.bobPlatform === requested || entry.extenderTarget === requested
+    (entry) => entry.bobPlatform === requested || entry.extenderTarget === requested,
   );
   const extenderTarget = pair?.extenderTarget ?? requested;
   if (!/^[A-Za-z0-9_]+-[A-Za-z0-9_]+$/u.test(extenderTarget)) {
@@ -101,15 +103,15 @@ export async function resolveDefoldPlatform(projectRoot, requested, options = {}
     throw new TypeError("A Bob or Extender platform is required");
   }
   const root = path.resolve(projectRoot);
-  const lock = options.lock ?? await projectLock(root);
+  const lock = options.lock ?? (await projectLock(root));
   const target = targetRecord(lock, requested);
   if (target.kind !== "bundle") throw new Error(`${target.extenderTarget} is retired by this Defold revision`);
   const pair = lock.toolchain.targetMatrix.platformPairs.find(
-    (entry) => entry.extenderTarget === target.extenderTarget
+    (entry) => entry.extenderTarget === target.extenderTarget,
   );
   if (!pair) {
     throw new Error(
-      `${target.extenderTarget} has no Bob platform declared by ${lock.toolchain.targetMatrix.authority.pairs}`
+      `${target.extenderTarget} has no Bob platform declared by ${lock.toolchain.targetMatrix.authority.pairs}`,
     );
   }
   return { ...target, bobPlatform: pair.bobPlatform };
@@ -117,9 +119,12 @@ export async function resolveDefoldPlatform(projectRoot, requested, options = {}
 
 function nativeArtifactFamily(lock) {
   const family = lock.artifacts?.artifacts?.["native-artifacts"];
-  if (!family || family.indexedBy !== "bundleTarget" ||
-      !/^[A-Za-z0-9][A-Za-z0-9._-]*$/u.test(family.tag ?? "") ||
-      !/^[a-f0-9]{64}$/u.test(family.fingerprint ?? "")) {
+  if (
+    !family ||
+    family.indexedBy !== "bundleTarget" ||
+    !/^[A-Za-z0-9][A-Za-z0-9._-]*$/u.test(family.tag ?? "") ||
+    !/^[a-f0-9]{64}$/u.test(family.fingerprint ?? "")
+  ) {
     throw new Error("deherm.lock has no published target-artifact mapping; run 'deherm policy' and 'deherm generate'");
   }
   return family;
@@ -127,16 +132,21 @@ function nativeArtifactFamily(lock) {
 
 function releaseArtifactMembers(family, target) {
   const members = family.contents?.[target] ?? [];
-  return members.filter((member) => member === "libhermes.a" || member === "hermes.lib" ||
-    member === "libhermes.debug.a" || member === "hermes.debug.lib" ||
-    member === "libhermesvm-config.h");
+  return members.filter(
+    (member) =>
+      member === "libhermes.a" ||
+      member === "hermes.lib" ||
+      member === "libhermes.debug.a" ||
+      member === "hermes.debug.lib" ||
+      member === "libhermesvm-config.h",
+  );
 }
 
 function variantLibraryMember(members, variant) {
   const debug = variant === "debug";
-  const member = members.find((candidate) =>
-    (candidate.endsWith(".a") || candidate.endsWith(".lib")) &&
-    candidate.includes("debug") === debug);
+  const member = members.find(
+    (candidate) => (candidate.endsWith(".a") || candidate.endsWith(".lib")) && candidate.includes("debug") === debug,
+  );
   if (!member) throw new Error(`Published Hermes archive has no ${variant} library member`);
   return member;
 }
@@ -146,25 +156,30 @@ function canonicalLibraryMember(members) {
 }
 
 function renderRuntimeVariantHeader(variant, target, fingerprint) {
-  return `// Generated by @ts-defold/deherm target-artifact installation. Do not edit.\n` +
+  return (
+    `// Generated by @ts-defold/deherm target-artifact installation. Do not edit.\n` +
     `// target=${target} fingerprint=${fingerprint} variant=${variant}\n` +
     `#pragma once\n` +
-    `#define DEHERM_HERMES_DEBUGGER ${variant === "debug" ? 1 : 0}\n`;
+    `#define DEHERM_HERMES_DEBUGGER ${variant === "debug" ? 1 : 0}\n`
+  );
 }
 
 export function renderWebRuntimeVariant(source, variant) {
-  if (variant !== "debug" && variant !== "release") throw new Error(`Unknown web runtime variant ${JSON.stringify(variant)}`);
+  if (variant !== "debug" && variant !== "release")
+    throw new Error(`Unknown web runtime variant ${JSON.stringify(variant)}`);
   const starts = source.split(webDebugBegin).length - 1;
   const ends = source.split(webDebugEnd).length - 1;
-  if (starts === 0 || starts !== ends) throw new Error("Web runtime snapshot variant markers are missing or unbalanced");
-  const rendered = variant === "debug"
-    ? source
-      .replace(/^[\t ]*\/\* DEHERM_DEBUG_SNAPSHOT_BEGIN \*\/[\t ]*\r?\n/gmu, "")
-      .replace(/^[\t ]*\/\* DEHERM_DEBUG_SNAPSHOT_END \*\/[\t ]*\r?\n/gmu, "")
-    : source.replace(
-      /^[\t ]*\/\* DEHERM_DEBUG_SNAPSHOT_BEGIN \*\/[\t ]*\r?\n[\s\S]*?^[\t ]*\/\* DEHERM_DEBUG_SNAPSHOT_END \*\/[\t ]*\r?\n/gmu,
-      ""
-    );
+  if (starts === 0 || starts !== ends)
+    throw new Error("Web runtime snapshot variant markers are missing or unbalanced");
+  const rendered =
+    variant === "debug"
+      ? source
+          .replace(/^[\t ]*\/\* DEHERM_DEBUG_SNAPSHOT_BEGIN \*\/[\t ]*\r?\n/gmu, "")
+          .replace(/^[\t ]*\/\* DEHERM_DEBUG_SNAPSHOT_END \*\/[\t ]*\r?\n/gmu, "")
+      : source.replace(
+          /^[\t ]*\/\* DEHERM_DEBUG_SNAPSHOT_BEGIN \*\/[\t ]*\r?\n[\s\S]*?^[\t ]*\/\* DEHERM_DEBUG_SNAPSHOT_END \*\/[\t ]*\r?\n/gmu,
+          "",
+        );
   if (rendered.includes(webDebugBegin) || rendered.includes(webDebugEnd)) {
     throw new Error("Web runtime snapshot variant markers survived rendering");
   }
@@ -172,10 +187,14 @@ export function renderWebRuntimeVariant(source, variant) {
 }
 
 async function webRuntimeVariantSources(variant) {
-  return Object.fromEntries(await Promise.all(webRuntimeVariantFiles.map(async ({ source, destination }) => [
-    destination,
-    renderWebRuntimeVariant(await readFile(path.join(packageRoot, source), "utf8"), variant)
-  ])));
+  return Object.fromEntries(
+    await Promise.all(
+      webRuntimeVariantFiles.map(async ({ source, destination }) => [
+        destination,
+        renderWebRuntimeVariant(await readFile(path.join(packageRoot, source), "utf8"), variant),
+      ]),
+    ),
+  );
 }
 
 async function installProjectWebRuntimeVariant(root, variant) {
@@ -205,16 +224,28 @@ function targetArtifactPath(projectRoot, target, member) {
 
 async function allFilesExist(root, members) {
   for (const member of members) {
-    if (!await stat(path.join(root, member)).then((value) => value.isFile(), () => false)) return false;
+    if (
+      !(await stat(path.join(root, member)).then(
+        (value) => value.isFile(),
+        () => false,
+      ))
+    )
+      return false;
   }
   return members.length > 0;
 }
 
 async function memberDigests(root, members) {
-  return Object.fromEntries(await Promise.all(members.map(async (member) => [
-    member,
-    createHash("sha256").update(await readFile(path.join(root, member))).digest("hex")
-  ])));
+  return Object.fromEntries(
+    await Promise.all(
+      members.map(async (member) => [
+        member,
+        createHash("sha256")
+          .update(await readFile(path.join(root, member)))
+          .digest("hex"),
+      ]),
+    ),
+  );
 }
 
 async function cachedTargetArtifact(destination, family, target, asset, members) {
@@ -224,16 +255,24 @@ async function cachedTargetArtifact(destination, family, target, asset, members)
   } catch {
     return null;
   }
-  if (receipt?.schemaVersion !== 1 || receipt.kind !== "deherm.target-artifact-cache" ||
-      receipt.target !== target || receipt.tag !== family.tag ||
-      receipt.fingerprint !== family.fingerprint || receipt.asset !== asset ||
-      !/^[a-f0-9]{64}$/u.test(receipt.assetSha256 ?? "") ||
-      JSON.stringify(receipt.members) !== JSON.stringify(members)) return null;
+  if (
+    receipt?.schemaVersion !== 1 ||
+    receipt.kind !== "deherm.target-artifact-cache" ||
+    receipt.target !== target ||
+    receipt.tag !== family.tag ||
+    receipt.fingerprint !== family.fingerprint ||
+    receipt.asset !== asset ||
+    !/^[a-f0-9]{64}$/u.test(receipt.assetSha256 ?? "") ||
+    JSON.stringify(receipt.members) !== JSON.stringify(members)
+  )
+    return null;
   for (const member of members) {
     const expected = receipt.hashes?.[member];
     if (!/^[a-f0-9]{64}$/u.test(expected ?? "")) return null;
-    const actual = await readFile(path.join(destination, member))
-      .then((bytes) => createHash("sha256").update(bytes).digest("hex"), () => null);
+    const actual = await readFile(path.join(destination, member)).then(
+      (bytes) => createHash("sha256").update(bytes).digest("hex"),
+      () => null,
+    );
     if (actual !== expected) return null;
   }
   return receipt;
@@ -249,7 +288,7 @@ function releaseRepository(lock) {
 /** Fetch exactly one target archive into the project cache, then install it. */
 export async function ensureProjectNativeArtifact(projectRoot, defoldPlatform, options = {}) {
   const root = path.resolve(projectRoot);
-  const lock = options.lock ?? await projectLock(root);
+  const lock = options.lock ?? (await projectLock(root));
   const target = targetRecord(lock, defoldPlatform);
   if (target.kind !== "bundle") throw new Error(`${target.extenderTarget} is retired by this Defold revision`);
   if (target.group === "web") {
@@ -268,7 +307,7 @@ export async function ensureProjectNativeArtifact(projectRoot, defoldPlatform, o
     // This is the keyed/idempotent fast path used before every development
     // build. The explicit assertion command still hashes bytes; repeated
     // builds trust the authenticated receipt plus exact file sizes.
-    verifyDigests: false
+    verifyDigests: false,
   }).catch(() => null);
   if (current) return { ...current, cache: null, installed: [], reused: true };
   const asset = family.assets?.[target.extenderTarget];
@@ -280,12 +319,11 @@ export async function ensureProjectNativeArtifact(projectRoot, defoldPlatform, o
     ? path.resolve(options.cacheRoot)
     : path.join(defoldSurfaceCacheHome(options.env), "artifacts");
   const destination = path.join(cacheRoot, family.tag, target.extenderTarget);
-  let cacheReceipt = await cachedTargetArtifact(
-    destination, family, target.extenderTarget, asset, members);
+  let cacheReceipt = await cachedTargetArtifact(destination, family, target.extenderTarget, asset, members);
   if (!cacheReceipt) {
     if (options.offline || process.env.DEHERM_OFFLINE === "1") {
       throw new Error(
-        `${target.extenderTarget} Hermes archive has no valid cache receipt at ${destination} and DEHERM_OFFLINE=1`
+        `${target.extenderTarget} Hermes archive has no valid cache receipt at ${destination} and DEHERM_OFFLINE=1`,
       );
     }
     const staging = `${destination}.incoming-${process.pid}-${randomBytes(5).toString("hex")}`;
@@ -297,12 +335,14 @@ export async function ensureProjectNativeArtifact(projectRoot, defoldPlatform, o
         tag: family.tag,
         assets: [asset],
         destination: staging,
-        onProgress: options.onProgress
+        onProgress: options.onProgress,
       });
-      const assetSha256 = createHash("sha256").update(await readFile(downloaded[0])).digest("hex");
+      const assetSha256 = createHash("sha256")
+        .update(await readFile(downloaded[0]))
+        .digest("hex");
       await extractReleaseArchive({ archive: downloaded[0], destination: staging });
       await rm(downloaded[0], { force: true });
-      if (!await allFilesExist(staging, members)) throw new Error(`${asset} does not contain ${members.join(", ")}`);
+      if (!(await allFilesExist(staging, members))) throw new Error(`${asset} does not contain ${members.join(", ")}`);
       const hashes = await memberDigests(staging, members);
       cacheReceipt = {
         schemaVersion: 1,
@@ -313,7 +353,7 @@ export async function ensureProjectNativeArtifact(projectRoot, defoldPlatform, o
         asset,
         assetSha256,
         members,
-        hashes
+        hashes,
       };
       await writeFile(path.join(staging, targetCacheReceiptName), `${JSON.stringify(cacheReceipt, null, 2)}\n`);
       await mkdir(path.dirname(destination), { recursive: true });
@@ -330,7 +370,10 @@ export async function ensureProjectNativeArtifact(projectRoot, defoldPlatform, o
   if (!configMember) throw new Error(`${asset} does not contain libhermesvm-config.h`);
   const installed = [];
   const installedBytes = {};
-  for (const [source, targetMember] of [[selectedMember, canonicalMember], [configMember, configMember]]) {
+  for (const [source, targetMember] of [
+    [selectedMember, canonicalMember],
+    [configMember, configMember],
+  ]) {
     const output = targetArtifactPath(root, target.extenderTarget, targetMember);
     await replaceProjectCopy(path.join(destination, source), output);
     installed.push(output);
@@ -340,37 +383,53 @@ export async function ensureProjectNativeArtifact(projectRoot, defoldPlatform, o
   // library. Extender discovers every static archive recursively, so leaving
   // it there makes link selection depend on archive order. The cache retains
   // both variants; the project extension contains exactly one.
-  for (const member of members.filter((member) => member !== canonicalMember &&
-      member !== configMember && (member.endsWith(".a") || member.endsWith(".lib")))) {
+  for (const member of members.filter(
+    (member) =>
+      member !== canonicalMember && member !== configMember && (member.endsWith(".a") || member.endsWith(".lib")),
+  )) {
     await rm(targetArtifactPath(root, target.extenderTarget, member), { force: true });
   }
   const header = path.join(root, targetVariantHeader);
   await replaceProjectText(header, renderRuntimeVariantHeader(variant, target.extenderTarget, family.fingerprint));
   installed.push(header);
-  await replaceProjectText(path.join(root, "defold_hermes", "lib", target.extenderTarget, targetInstallReceiptName), `${JSON.stringify({
-    schemaVersion: 2,
-    kind: "deherm.installed-target-artifact",
+  await replaceProjectText(
+    path.join(root, "defold_hermes", "lib", target.extenderTarget, targetInstallReceiptName),
+    `${JSON.stringify(
+      {
+        schemaVersion: 2,
+        kind: "deherm.installed-target-artifact",
+        target: target.extenderTarget,
+        variant,
+        selectedMember,
+        canonicalMember,
+        tag: family.tag,
+        fingerprint: family.fingerprint,
+        asset,
+        assetSha256: cacheReceipt.assetSha256,
+        cacheMembers: members,
+        installed: {
+          [canonicalMember]: hashes[selectedMember],
+          [configMember]: hashes[configMember],
+        },
+        installedBytes,
+      },
+      null,
+      2,
+    )}\n`,
+  );
+  return {
     target: target.extenderTarget,
     variant,
-    selectedMember,
-    canonicalMember,
     tag: family.tag,
     fingerprint: family.fingerprint,
-    asset,
-    assetSha256: cacheReceipt.assetSha256,
-    cacheMembers: members,
-    installed: {
-      [canonicalMember]: hashes[selectedMember],
-      [configMember]: hashes[configMember]
-    },
-    installedBytes
-  }, null, 2)}\n`);
-  return { target: target.extenderTarget, variant, tag: family.tag, fingerprint: family.fingerprint, cache: destination, installed };
+    cache: destination,
+    installed,
+  };
 }
 
 export async function assertProjectNativeArtifact(projectRoot, defoldPlatform, options = {}) {
   const root = path.resolve(projectRoot);
-  const lock = options.lock ?? await projectLock(root);
+  const lock = options.lock ?? (await projectLock(root));
   const target = targetRecord(lock, defoldPlatform);
   if (target.group === "web") {
     const variant = requestedArtifactVariant(options);
@@ -380,7 +439,8 @@ export async function assertProjectNativeArtifact(projectRoot, defoldPlatform, o
       const file = path.join(root, relative);
       const actual = await readFile(file, "utf8").catch(() => null);
       if (actual === null) throw new Error(`The installed déherm extension is missing ${path.relative(root, file)}`);
-      if (actual !== source) throw new Error(`The installed ${target.extenderTarget} ${variant} browser source checksum mismatch`);
+      if (actual !== source)
+        throw new Error(`The installed ${target.extenderTarget} ${variant} browser source checksum mismatch`);
       files.push(file);
     }
     return {
@@ -388,7 +448,7 @@ export async function assertProjectNativeArtifact(projectRoot, defoldPlatform, o
       variant,
       file: files.at(-1),
       files,
-      source: "package-browser-adapter"
+      source: "package-browser-adapter",
     };
   }
   const family = nativeArtifactFamily(lock);
@@ -401,38 +461,59 @@ export async function assertProjectNativeArtifact(projectRoot, defoldPlatform, o
   const file = targetLibraryPath(root, target.extenderTarget, canonicalMember);
   let receipt = null;
   try {
-    receipt = JSON.parse(await readFile(path.join(root, "defold_hermes", "lib", target.extenderTarget, targetInstallReceiptName), "utf8"));
+    receipt = JSON.parse(
+      await readFile(path.join(root, "defold_hermes", "lib", target.extenderTarget, targetInstallReceiptName), "utf8"),
+    );
   } catch {}
   const installedPaths = [canonicalMember, configMember];
   const verifyDigests = options.verifyDigests !== false;
-  const installedState = Object.fromEntries(await Promise.all(installedPaths.map(async (member) => {
-    const installed = targetArtifactPath(root, target.extenderTarget, member);
-    const value = await stat(installed).catch(() => null);
-    if (!value?.isFile()) return [member, null];
-    return [member, {
-      bytes: value.size,
-      digest: verifyDigests
-        ? createHash("sha256").update(await readFile(installed)).digest("hex")
-        : null
-    }];
-  })));
+  const installedState = Object.fromEntries(
+    await Promise.all(
+      installedPaths.map(async (member) => {
+        const installed = targetArtifactPath(root, target.extenderTarget, member);
+        const value = await stat(installed).catch(() => null);
+        if (!value?.isFile()) return [member, null];
+        return [
+          member,
+          {
+            bytes: value.size,
+            digest: verifyDigests
+              ? createHash("sha256")
+                  .update(await readFile(installed))
+                  .digest("hex")
+              : null,
+          },
+        ];
+      }),
+    ),
+  );
   const variantHeader = await readFile(path.join(root, targetVariantHeader), "utf8").catch(() => "");
-  const installedMembersMatch = installedPaths.every((member) =>
-    installedState[member]?.bytes === receipt?.installedBytes?.[member] &&
-    (!verifyDigests || installedState[member]?.digest === receipt?.installed?.[member]));
-  if (installedMembersMatch &&
-      receipt?.schemaVersion === 2 && receipt?.kind === "deherm.installed-target-artifact" &&
-      receipt.variant === variant && receipt.selectedMember === selectedMember &&
-      receipt.canonicalMember === canonicalMember && receipt.target === target.extenderTarget &&
-      receipt.tag === family.tag && receipt.fingerprint === family.fingerprint &&
-      receipt.asset === family.assets?.[target.extenderTarget] &&
-      /^[a-f0-9]{64}$/u.test(receipt.assetSha256 ?? "") &&
-      members.every((member) => receipt.cacheMembers?.includes(member)) &&
-      new RegExp(`^#define DEHERM_HERMES_DEBUGGER ${variant === "debug" ? 1 : 0}$`, "m").test(variantHeader)) {
+  const installedMembersMatch = installedPaths.every(
+    (member) =>
+      installedState[member]?.bytes === receipt?.installedBytes?.[member] &&
+      (!verifyDigests || installedState[member]?.digest === receipt?.installed?.[member]),
+  );
+  if (
+    installedMembersMatch &&
+    receipt?.schemaVersion === 2 &&
+    receipt?.kind === "deherm.installed-target-artifact" &&
+    receipt.variant === variant &&
+    receipt.selectedMember === selectedMember &&
+    receipt.canonicalMember === canonicalMember &&
+    receipt.target === target.extenderTarget &&
+    receipt.tag === family.tag &&
+    receipt.fingerprint === family.fingerprint &&
+    receipt.asset === family.assets?.[target.extenderTarget] &&
+    /^[a-f0-9]{64}$/u.test(receipt.assetSha256 ?? "") &&
+    members.every((member) => receipt.cacheMembers?.includes(member)) &&
+    new RegExp(`^#define DEHERM_HERMES_DEBUGGER ${variant === "debug" ? 1 : 0}$`, "m").test(variantHeader)
+  ) {
     return { target: target.extenderTarget, variant, file, tag: family.tag, fingerprint: family.fingerprint };
   }
   if (options.fetch === false) {
-    throw new Error(`The installed déherm extension is missing or does not match its receipt: ${path.relative(root, file)}`);
+    throw new Error(
+      `The installed déherm extension is missing or does not match its receipt: ${path.relative(root, file)}`,
+    );
   }
   await ensureProjectNativeArtifact(root, defoldPlatform, { ...options, lock, variant });
   return { target: target.extenderTarget, variant, file, tag: family.tag, fingerprint: family.fingerprint };
@@ -440,15 +521,23 @@ export async function assertProjectNativeArtifact(projectRoot, defoldPlatform, o
 
 export async function nativeArtifactReport(projectRoot) {
   if (!projectRoot) {
-    const tags = JSON.parse(await readFile(path.join(packageRoot, "packages", "toolchains", "release-tags.json"), "utf8"));
+    const tags = JSON.parse(
+      await readFile(path.join(packageRoot, "packages", "toolchains", "release-tags.json"), "utf8"),
+    );
     const family = tags.families?.["native-artifacts"];
     return {
       schemaVersion: 2,
       source: "published native-artifacts release (target authority requires a generated project)",
-      targets: Object.keys(family?.assets ?? {}).sort().map((target) => ({
-        target, kind: "published", status: "published", bundleable: true, ok: true,
-        detail: `${family.tag}/${family.assets[target]}`
-      }))
+      targets: Object.keys(family?.assets ?? {})
+        .sort()
+        .map((target) => ({
+          target,
+          kind: "published",
+          status: "published",
+          bundleable: true,
+          ok: true,
+          detail: `${family.tag}/${family.assets[target]}`,
+        })),
     };
   }
   const lock = await projectLock(projectRoot);
@@ -468,7 +557,7 @@ export async function nativeArtifactReport(projectRoot) {
       bundleable: web || Boolean(asset),
       ok: web || Boolean(asset),
       detail: web ? "browser-host source adapter" : asset ? `${family.tag}/${asset}` : "no published archive",
-      project: inspected
+      project: inspected,
     });
   }
   return { schemaVersion: 2, source: lock.toolchain.targetMatrix.authority.targets, targets: rows };

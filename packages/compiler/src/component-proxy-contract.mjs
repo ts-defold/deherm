@@ -18,9 +18,9 @@ const PROXY_RUNTIME_CAPABILITY = Object.freeze({
     "dispatchMessage",
     "dispatchInput",
     "dispatchReload",
-    "detachComponent"
+    "detachComponent",
   ]),
-  evidence: "generated-proxy-contract-native-lua-and-dynamic-hermes-harnesses-packaged-engine-unverified"
+  evidence: "generated-proxy-contract-native-lua-and-dynamic-hermes-harnesses-packaged-engine-unverified",
 });
 
 // These are package-owned lowering constructs, not a statement that any one
@@ -37,7 +37,7 @@ export const componentLifecycleRecipes = Object.freeze({
   // New callbacks append to the stable déherm component ABI. Existing slots
   // never move merely because Defold inserts a callback in its source table.
   lateUpdate: Object.freeze({ engineName: "late_update", slot: 6 }),
-  fixedUpdate: Object.freeze({ engineName: "fixed_update", slot: 7 })
+  fixedUpdate: Object.freeze({ engineName: "fixed_update", slot: 7 }),
 });
 
 // The .ts suffixes are déherm authoring conventions. Their Defold proxy suffix,
@@ -45,8 +45,13 @@ export const componentLifecycleRecipes = Object.freeze({
 export const componentAuthoringConventions = Object.freeze([
   Object.freeze({ suffix: ".script.ts", canonicalSuffix: ".script.ts", contextKind: "game-object", legacy: false }),
   Object.freeze({ suffix: ".gui.ts", canonicalSuffix: ".gui.ts", contextKind: "gui-scene", legacy: false }),
-  Object.freeze({ suffix: ".render.ts", canonicalSuffix: ".render.ts", contextKind: "render-instance+graphics", legacy: false }),
-  Object.freeze({ suffix: ".gui_script.ts", canonicalSuffix: ".gui.ts", contextKind: "gui-scene", legacy: true })
+  Object.freeze({
+    suffix: ".render.ts",
+    canonicalSuffix: ".render.ts",
+    contextKind: "render-instance+graphics",
+    legacy: false,
+  }),
+  Object.freeze({ suffix: ".gui_script.ts", canonicalSuffix: ".gui.ts", contextKind: "gui-scene", legacy: true }),
 ]);
 
 const propertyCodecs = Object.freeze({
@@ -58,7 +63,7 @@ const propertyCodecs = Object.freeze({
   vector3: Object.freeze({ codecId: 6 }),
   vector4: Object.freeze({ codecId: 7 }),
   quaternion: Object.freeze({ codecId: 8 }),
-  resource: Object.freeze({ codecId: 9 })
+  resource: Object.freeze({ codecId: 9 }),
 });
 
 function invariant(condition, message) {
@@ -67,7 +72,10 @@ function invariant(condition, message) {
 
 function uniqueStrings(values, label) {
   invariant(Array.isArray(values), `${label} must be an array`);
-  invariant(values.every((value) => typeof value === "string" && value.length > 0), `${label} must contain non-empty strings`);
+  invariant(
+    values.every((value) => typeof value === "string" && value.length > 0),
+    `${label} must contain non-empty strings`,
+  );
   invariant(new Set(values).size === values.length, `${label} contains duplicates`);
   return [...values];
 }
@@ -84,7 +92,10 @@ export function createComponentProxyConstants(policy) {
   for (const context of policy.contexts) {
     invariant(typeof context?.contextKind === "string" && context.contextKind.length > 0, "contextKind is missing");
     invariant(!contexts.has(context.contextKind), `duplicate context ${context.contextKind}`);
-    invariant(typeof context.proxyKind === "string" && context.proxyKind.length > 0, `${context.contextKind}.proxyKind is missing`);
+    invariant(
+      typeof context.proxyKind === "string" && context.proxyKind.length > 0,
+      `${context.contextKind}.proxyKind is missing`,
+    );
     invariant(/^\.[a-z0-9_]+$/u.test(context.proxySuffix ?? ""), `${context.contextKind}.proxySuffix is invalid`);
     invariant(typeof context.supportsProperties === "boolean", `${context.contextKind}.supportsProperties is missing`);
     const engineCallbacks = uniqueStrings(context.callbacks, `${context.contextKind}.callbacks`);
@@ -97,19 +108,24 @@ export function createComponentProxyConstants(policy) {
       else unsupported.push(engineName);
     }
     supported.sort((left, right) => componentLifecycleRecipes[left].slot - componentLifecycleRecipes[right].slot);
-    contexts.set(context.contextKind, Object.freeze({
-      proxyKind: context.proxyKind,
-      proxySuffix: context.proxySuffix,
-      contextKind: context.contextKind,
-      supportsProperties: context.supportsProperties,
-      lifecycle: Object.freeze({
-        supported: Object.freeze(supported),
-        unsupported: Object.freeze(unsupported),
-        engineCallbacks: Object.freeze(engineCallbacks),
-        teardownPolicy: engineSet.has("final") ? "final-callback-detach" : "provider-required-unimplemented-no-final-callback",
-        evidence: context.evidence
-      })
-    }));
+    contexts.set(
+      context.contextKind,
+      Object.freeze({
+        proxyKind: context.proxyKind,
+        proxySuffix: context.proxySuffix,
+        contextKind: context.contextKind,
+        supportsProperties: context.supportsProperties,
+        lifecycle: Object.freeze({
+          supported: Object.freeze(supported),
+          unsupported: Object.freeze(unsupported),
+          engineCallbacks: Object.freeze(engineCallbacks),
+          teardownPolicy: engineSet.has("final")
+            ? "final-callback-detach"
+            : "provider-required-unimplemented-no-final-callback",
+          evidence: context.evidence,
+        }),
+      }),
+    );
   }
 
   const sourceKinds = componentAuthoringConventions.map((authoring) => {
@@ -117,44 +133,63 @@ export function createComponentProxyConstants(policy) {
     invariant(context, `no policy context for ${authoring.contextKind}`);
     return Object.freeze({ ...authoring, ...context });
   });
-  const unusedContexts = [...contexts.keys()].filter((name) => !componentAuthoringConventions.some(({ contextKind }) => contextKind === name));
-  invariant(unusedContexts.length === 0, `contexts require an unsupported authoring recipe: ${unusedContexts.join(", ")}`);
+  const unusedContexts = [...contexts.keys()].filter(
+    (name) => !componentAuthoringConventions.some(({ contextKind }) => contextKind === name),
+  );
+  invariant(
+    unusedContexts.length === 0,
+    `contexts require an unsupported authoring recipe: ${unusedContexts.join(", ")}`,
+  );
 
   const declaredPropertyTypes = uniqueStrings(policy.property.valueTypes, "property.valueTypes");
   const explicitPropertyTypeCodecs = policy.property.valueTypeCodecs;
-  invariant(explicitPropertyTypeCodecs === undefined ||
-    (explicitPropertyTypeCodecs && typeof explicitPropertyTypeCodecs === "object"),
-  "property.valueTypeCodecs must be an object");
-  const propertyTypeCodecs = Object.fromEntries(declaredPropertyTypes.map((name) => {
-    // v1 documents predate the explicit source-token -> stable-codec table.
-    // Their only non-core codec was a resource token, whose historical
-    // spellings contain "resource". Keep that bounded compatibility decoder;
-    // never treat an arbitrary new v1 token as a resource ABI.
-    const legacyCodec = Object.hasOwn(propertyCodecs, name)
-      ? name
-      : /resource/iu.test(name) ? "resource" : null;
-    const codec = explicitPropertyTypeCodecs?.[name] ??
-      (explicitPropertyTypeCodecs === undefined ? legacyCodec : null);
-    return [name, Object.hasOwn(propertyCodecs, codec) ? codec : null];
-  }));
-  const stalePropertyTypeCodecs = Object.keys(explicitPropertyTypeCodecs ?? {})
-    .filter((name) => !declaredPropertyTypes.includes(name));
-  invariant(stalePropertyTypeCodecs.length === 0,
-    `property.valueTypeCodecs names absent value types: ${stalePropertyTypeCodecs.join(", ")}`);
+  invariant(
+    explicitPropertyTypeCodecs === undefined ||
+      (explicitPropertyTypeCodecs && typeof explicitPropertyTypeCodecs === "object"),
+    "property.valueTypeCodecs must be an object",
+  );
+  const propertyTypeCodecs = Object.fromEntries(
+    declaredPropertyTypes.map((name) => {
+      // v1 documents predate the explicit source-token -> stable-codec table.
+      // Their only non-core codec was a resource token, whose historical
+      // spellings contain "resource". Keep that bounded compatibility decoder;
+      // never treat an arbitrary new v1 token as a resource ABI.
+      const legacyCodec = Object.hasOwn(propertyCodecs, name) ? name : /resource/iu.test(name) ? "resource" : null;
+      const codec =
+        explicitPropertyTypeCodecs?.[name] ?? (explicitPropertyTypeCodecs === undefined ? legacyCodec : null);
+      return [name, Object.hasOwn(propertyCodecs, codec) ? codec : null];
+    }),
+  );
+  const stalePropertyTypeCodecs = Object.keys(explicitPropertyTypeCodecs ?? {}).filter(
+    (name) => !declaredPropertyTypes.includes(name),
+  );
+  invariant(
+    stalePropertyTypeCodecs.length === 0,
+    `property.valueTypeCodecs names absent value types: ${stalePropertyTypeCodecs.join(", ")}`,
+  );
   const unsupportedPropertyTypes = declaredPropertyTypes.filter((name) => propertyTypeCodecs[name] === null);
   const resources = policy.property.resourceConstructors;
   invariant(Array.isArray(resources), "property.resourceConstructors must be an array");
   const resourceKinds = {};
   for (const resource of resources) {
-    invariant(typeof resource?.authoringName === "string" && /^[A-Za-z_][A-Za-z0-9_]*$/u.test(resource.authoringName), "resource authoringName is invalid");
-    invariant(typeof resource.engineName === "string" && /^[a-z_][a-z0-9_]*$/u.test(resource.engineName), `${resource.authoringName}.engineName is invalid`);
-    invariant(resourceKinds[resource.authoringName] === undefined, `duplicate resource constructor ${resource.authoringName}`);
+    invariant(
+      typeof resource?.authoringName === "string" && /^[A-Za-z_][A-Za-z0-9_]*$/u.test(resource.authoringName),
+      "resource authoringName is invalid",
+    );
+    invariant(
+      typeof resource.engineName === "string" && /^[a-z_][a-z0-9_]*$/u.test(resource.engineName),
+      `${resource.authoringName}.engineName is invalid`,
+    );
+    invariant(
+      resourceKinds[resource.authoringName] === undefined,
+      `duplicate resource constructor ${resource.authoringName}`,
+    );
     resourceKinds[resource.authoringName] = resource.engineName;
   }
 
-  const lifecycleSlots = Object.freeze(Object.fromEntries(
-    Object.entries(componentLifecycleRecipes).map(([name, recipe]) => [name, recipe.slot])
-  ));
+  const lifecycleSlots = Object.freeze(
+    Object.fromEntries(Object.entries(componentLifecycleRecipes).map(([name, recipe]) => [name, recipe.slot])),
+  );
   return Object.freeze({
     componentIdNamespace: COMPONENT_ID_NAMESPACE,
     generatedMarker: GENERATED_MARKER,
@@ -167,7 +202,7 @@ export function createComponentProxyConstants(policy) {
     sourceKinds: Object.freeze(sourceKinds),
     resourceKinds: Object.freeze(resourceKinds),
     unsupportedPropertyTypes: Object.freeze(unsupportedPropertyTypes),
-    policy
+    policy,
   });
 }
 
@@ -178,5 +213,5 @@ export const componentProxyInvariantConstants = Object.freeze({
   lifecycleRecipes: componentLifecycleRecipes,
   propertyCodecs,
   proxyRuntimeCapability: PROXY_RUNTIME_CAPABILITY,
-  sourceKinds: componentAuthoringConventions
+  sourceKinds: componentAuthoringConventions,
 });

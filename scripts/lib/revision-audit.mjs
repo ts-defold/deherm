@@ -108,7 +108,7 @@ export function classifyReviewedSource(source, evidence) {
       reason: observed === evidence.sha256 ? "anchor" : "content",
       observed,
       anchorsHeld: anchors.length - lost.length,
-      anchorsLost: lost
+      anchorsLost: lost,
     };
   }
   if (observed === evidence.sha256) {
@@ -155,15 +155,21 @@ export function renderAuditSummary(rows, { revision, reviewed } = {}) {
   lines.push("## Reviewed-policy audit");
   lines.push("");
   if (revision) {
-    lines.push(`Generated against Defold \`${revision}\`` +
-      (reviewed && reviewed !== revision ? `, reviewed at \`${reviewed}\`.` : "."));
+    lines.push(
+      `Generated against Defold \`${revision}\`` +
+        (reviewed && reviewed !== revision ? `, reviewed at \`${reviewed}\`.` : "."),
+    );
     lines.push("");
   }
   lines.push(`| | claims | meaning |`);
   lines.push(`| --- | ---: | --- |`);
   lines.push(`| holds | ${byStatus[HOLDS].length} | file unchanged since review |`);
-  lines.push(`| moved | ${byStatus[MOVED].length} | file changed, every reviewed anchor still present - policy applies, pin restated |`);
-  lines.push(`| void | ${byStatus[VOID].length} | reviewed anchor gone - policy withdrawn for this revision, re-review queued |`);
+  lines.push(
+    `| moved | ${byStatus[MOVED].length} | file changed, every reviewed anchor still present - policy applies, pin restated |`,
+  );
+  lines.push(
+    `| void | ${byStatus[VOID].length} | reviewed anchor gone - policy withdrawn for this revision, re-review queued |`,
+  );
   lines.push("");
 
   if (byStatus[VOID].length) {
@@ -183,7 +189,9 @@ export function renderAuditSummary(rows, { revision, reviewed } = {}) {
     lines.push("");
     for (const row of byStatus[MOVED]) {
       lines.push(`- \`${row.id ?? row.input}\` — ${row.source ?? "?"}`);
-      lines.push(`  - reviewed \`${String(row.reviewedSha ?? "").slice(0, 12)}\` → observed \`${String(row.observed ?? "").slice(0, 12)}\``);
+      lines.push(
+        `  - reviewed \`${String(row.reviewedSha ?? "").slice(0, 12)}\` → observed \`${String(row.observed ?? "").slice(0, 12)}\``,
+      );
     }
     lines.push("");
     lines.push("</details>");

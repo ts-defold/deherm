@@ -7,7 +7,7 @@ import test from "node:test";
 
 import {
   generateScriptUrlAddressClassification,
-  loadScriptUrlAddressInputs
+  loadScriptUrlAddressInputs,
 } from "../scripts/generate-script-url-address-classification.mjs";
 
 const root = new URL("../", import.meta.url);
@@ -28,11 +28,11 @@ test("classifies the exact 70-route URL/address frontier without overlapping Mat
     physics: 11,
     sound: 3,
     sprite: 3,
-    tilemap: 4
+    tilemap: 4,
   });
   assert.deepEqual(generated.rawUrlParameterTypeCounts, {
     "string|hash|url": 54,
-    "url|number|nil": 19
+    "url|number|nil": 19,
   });
   assert.deepEqual(generated.disjointCensus, {
     classifiedDefoldValue: 127,
@@ -42,13 +42,17 @@ test("classifies the exact 70-route URL/address frontier without overlapping Mat
     urlAddressRoutes: 70,
     nonMatrixNonUrl: 34,
     binaryStringRemainder: 2,
-    otherNonMatrixNonUrl: 32
+    otherNonMatrixNonUrl: 32,
   });
-  assert.ok(generated.rows.every(({ routing, targetSupport }) =>
-    routing.status === "generated-native-dynamic" &&
-    targetSupport.nativeDynamicHermes.status === "generated-executable" &&
-    targetSupport.nativeStaticHermes.status === "fail-closed-unverified" &&
-    targetSupport.html5BrowserHost.status === "fail-closed-unverified"));
+  assert.ok(
+    generated.rows.every(
+      ({ routing, targetSupport }) =>
+        routing.status === "generated-native-dynamic" &&
+        targetSupport.nativeDynamicHermes.status === "generated-executable" &&
+        targetSupport.nativeStaticHermes.status === "fail-closed-unverified" &&
+        targetSupport.html5BrowserHost.status === "fail-closed-unverified",
+    ),
+  );
   assert.match(generated.coverageClaim, /generated stable-ID descriptors/);
 });
 
@@ -67,7 +71,10 @@ test("fails closed on route, shape, partition, and pinned-source drift", () => {
   const patternsForRoute = JSON.parse(routeDrift.patternsText);
   patternsForRoute.bindings.find(({ id }) => id === "script:physics.set_group").loweringFamily = "lua-table";
   routeDrift.patternsText = `${JSON.stringify(patternsForRoute, null, 2)}\n`;
-  assert.throws(() => generateScriptUrlAddressClassification(routeDrift), /census (?:drifted|expected .* found)|route count drifted/);
+  assert.throws(
+    () => generateScriptUrlAddressClassification(routeDrift),
+    /census (?:drifted|expected .* found)|route count drifted/,
+  );
 
   const shapeDrift = structuredClone(sourceInputs);
   const ir = JSON.parse(shapeDrift.irText);
@@ -84,7 +91,7 @@ test("fails closed on route, shape, partition, and pinned-source drift", () => {
 test("generated runtime uses explicit URL branding and preserves the nonzero reserved lane", async () => {
   const [jsi, address] = await Promise.all([
     readFile(new URL("../defold/defold_hermes/src/script_jsi_bridge.cpp", import.meta.url), "utf8"),
-    readFile(new URL("../packages/sdk/src/address.ts", import.meta.url), "utf8")
+    readFile(new URL("../packages/sdk/src/address.ts", import.meta.url), "utf8"),
   ]);
   assert.match(jsi, /kDefoldUrlProperty = "__dehermUrlV1"/);
   assert.match(jsi, /"reserved".*url\.reserved/s);
@@ -97,14 +104,20 @@ test("regenerates the classification byte-identically in a temporary output", as
   const directory = await mkdtemp(join(tmpdir(), "deherm-url-classifier-"));
   try {
     const temporary = join(directory, "classification.json");
-    execFileSync(process.execPath, [
-      "scripts/generate-script-url-address-classification.mjs", "--output", temporary
-    ], { cwd: root, stdio: "pipe" });
-    assert.equal(await readFile(temporary, "utf8"), await readFile(
-      new URL("packages/bindings/generated/defold-script-url-address-classification.json", root), "utf8"));
+    execFileSync(process.execPath, ["scripts/generate-script-url-address-classification.mjs", "--output", temporary], {
+      cwd: root,
+      stdio: "pipe",
+    });
+    assert.equal(
+      await readFile(temporary, "utf8"),
+      await readFile(
+        new URL("packages/bindings/generated/defold-script-url-address-classification.json", root),
+        "utf8",
+      ),
+    );
     execFileSync(process.execPath, ["scripts/generate-script-url-address-classification.mjs", "--check"], {
       cwd: root,
-      stdio: "pipe"
+      stdio: "pipe",
     });
   } finally {
     await rm(directory, { recursive: true, force: true });
@@ -115,13 +128,24 @@ test("native URL arena proves pinned layout, exact bits, reentrancy, exhaustion,
   const directory = await mkdtemp(join(tmpdir(), "deherm-url-arena-"));
   try {
     const executable = join(directory, "script-url-arena-test");
-    execFileSync(process.env.CXX || "clang++", [
-      "-std=c++17", "-Wall", "-Wextra", "-Werror", "-Wno-zero-length-array", "-pedantic",
-      "-Idefold/defold_hermes/include", "-Iupstream/defold/engine/dlib/src",
-      "native/script_url_arena_test.cpp", "-o", executable
-    ], { cwd: root, stdio: "pipe" });
-    assert.equal(execFileSync(executable, [], { encoding: "utf8" }).trim(),
-      "script-url-arena:ok allocations:0");
+    execFileSync(
+      process.env.CXX || "clang++",
+      [
+        "-std=c++17",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-zero-length-array",
+        "-pedantic",
+        "-Idefold/defold_hermes/include",
+        "-Iupstream/defold/engine/dlib/src",
+        "native/script_url_arena_test.cpp",
+        "-o",
+        executable,
+      ],
+      { cwd: root, stdio: "pipe" },
+    );
+    assert.equal(execFileSync(executable, [], { encoding: "utf8" }).trim(), "script-url-arena:ok allocations:0");
   } finally {
     await rm(directory, { recursive: true, force: true });
   }

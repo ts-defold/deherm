@@ -8,10 +8,7 @@ function wireTag(value) {
   return typeof value === "string" && value.length ? value : "missing";
 }
 
-export function partitionDmSdkUniversalStaticExactVectors(
-  vectors,
-  capability = dmSdkUniversalStaticFrameCapability(),
-) {
+export function partitionDmSdkUniversalStaticExactVectors(vectors, capability = dmSdkUniversalStaticFrameCapability()) {
   if (!Array.isArray(vectors)) throw new Error("Static dmSDK exact vectors must be an array");
   if (!Number.isSafeInteger(capability?.argumentCapacity) || capability.argumentCapacity < 0) {
     throw new Error("Static dmSDK exact capability needs a non-negative integer argumentCapacity");

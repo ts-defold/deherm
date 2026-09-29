@@ -34,7 +34,7 @@ const readJson = async (file) => JSON.parse(await readFile(file, "utf8"));
  * members back into the census rather than letting them sit mislabelled.
  */
 const categories = Object.freeze({
-  "bound": "Projected as a callable route.",
+  bound: "Projected as a callable route.",
   "transport-infrastructure":
     "Consumed by the runtime's own C++ and never projected. The Lua C API is the case: " +
     "lua_bridge.hpp includes <dmsdk/lua/lua.h> and calls lua_settop, lua_gettop and luaL_ref " +
@@ -51,12 +51,12 @@ const categories = Object.freeze({
   "platform-internal":
     "A backend's internal handle accessor - WebGPU, Vulkan, the iOS UIApplicationDelegate " +
     "registration. Reaching these from TypeScript would hand out raw driver state.",
-  "absent":
+  absent:
     "Declared in a header but present in no engine archive for any target, and not explained " +
     "by any category above. A real finding that stays blocked.",
-  "pending":
+  pending:
     "Bindable in principle and not yet lowered. This is the only category that represents " +
-    "work outstanding rather than a decision taken."
+    "work outstanding rather than a decision taken.",
 });
 
 function categorise(declaration, evidence) {
@@ -68,14 +68,15 @@ function categorise(declaration, evidence) {
   if (declaration.inline || declaration.storageClass === "static") return "header-only";
   if (record?.linkage === "external") return "pending";
   if (/graphics_webgpu\.h$|graphics_vulkan\.h$/.test(declaration.header ?? "")) return "platform-internal";
-  if (/\/profile\.h$/.test(declaration.header ?? "")) return "variant-gated";
+  if ((declaration.header ?? "").endsWith("/profile.h")) return "variant-gated";
   return "absent";
 }
 
 export async function buildAccounting(options = {}) {
   const ir = await readJson(options.irPath ?? path.join(generated, "defold-sdk-ir.json"));
-  const evidence = await readJson(options.evidencePath ?? path.join(generated, "defold-dmsdk-symbol-evidence.json"))
-    .catch(() => null);
+  const evidence = await readJson(
+    options.evidencePath ?? path.join(generated, "defold-dmsdk-symbol-evidence.json"),
+  ).catch(() => null);
 
   const rows = [];
   const counts = Object.fromEntries(Object.keys(categories).map((key) => [key, 0]));
@@ -89,8 +90,11 @@ export async function buildAccounting(options = {}) {
   // The three claims that make this a gate rather than a summary.
   assert.equal(rows.length, (ir.declarations ?? []).length, "dmSDK accounting omitted declarations");
   assert.equal(new Set(rows.map(({ id }) => id)).size, rows.length, "dmSDK accounting duplicates declarations");
-  assert.equal(Object.values(counts).reduce((sum, n) => sum + n, 0), rows.length,
-    "dmSDK accounting categories do not sum to the declaration count");
+  assert.equal(
+    Object.values(counts).reduce((sum, n) => sum + n, 0),
+    rows.length,
+    "dmSDK accounting categories do not sum to the declaration count",
+  );
 
   return {
     schemaVersion: 1,
@@ -103,7 +107,7 @@ export async function buildAccounting(options = {}) {
     categories,
     declarationCount: rows.length,
     counts,
-    declarations: rows.sort((left, right) => (left.id < right.id ? -1 : 1))
+    declarations: rows.sort((left, right) => (left.id < right.id ? -1 : 1)),
   };
 }
 
@@ -112,11 +116,13 @@ async function main(argv = process.argv.slice(2)) {
   const serialized = `${JSON.stringify(report, null, 2)}\n`;
   if (argv.includes("--check")) {
     const existing = await readFile(accountingPath, "utf8").catch(() => "");
-    if (existing !== serialized) throw new Error("defold-dmsdk-accounting.json is stale; run node scripts/generate-dmsdk-accounting.mjs");
-  }
-  else await writeFile(accountingPath, serialized);
-  const shown = Object.entries(report.counts).filter(([, n]) => n > 0)
-    .map(([key, n]) => `${n} ${key}`).join(", ");
+    if (existing !== serialized)
+      throw new Error("defold-dmsdk-accounting.json is stale; run node scripts/generate-dmsdk-accounting.mjs");
+  } else await writeFile(accountingPath, serialized);
+  const shown = Object.entries(report.counts)
+    .filter(([, n]) => n > 0)
+    .map(([key, n]) => `${n} ${key}`)
+    .join(", ");
   console.log(`Verified exact dmSDK accounting: ${shown}; ${report.declarationCount} total.`);
 }
 

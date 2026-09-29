@@ -7,7 +7,7 @@ import test from "node:test";
 import { generateComponentProxies } from "../packages/compiler/src/component-proxy-generator.mjs";
 import {
   generateScriptSpecialCallVerification,
-  renderScriptSpecialCallVerificationHeader
+  renderScriptSpecialCallVerificationHeader,
 } from "../packages/compiler/src/script-special-call-verification.mjs";
 import { generateArtifacts } from "../scripts/generate-bindings.mjs";
 import { generateLuaArtifacts } from "../scripts/generate-lua-bridge.mjs";
@@ -19,7 +19,7 @@ async function json(relative) {
 const [accounting, moduleSchema, luaSchema] = await Promise.all([
   json("packages/bindings/generated/defold-script-api-accounting.json"),
   json("packages/bindings/modules.json"),
-  json("packages/bindings/lua-compat.json")
+  json("packages/bindings/lua-compat.json"),
 ]);
 const componentPolicy = await json("packages/bindings/generated/defold-component-proxy-contract.json");
 const report = generateScriptSpecialCallVerification({ accounting, moduleSchema, luaSchema, componentPolicy });
@@ -47,15 +47,18 @@ test("every compiler-intrinsic vector emits its exact Lua declaration", async ()
     const properties = report.compilerIntrinsics
       .map(({ propertyName, authoringExpression }) => `    ${propertyName}: ${authoringExpression},`)
       .join("\n");
-    await writeFile(path.join(projectRoot, "vectors.script.ts"), [
-      'import { defineComponent, property } from "@ts-defold/deherm/component";',
-      "export default defineComponent({",
-      "  properties: {",
-      properties,
-      "  },",
-      "});",
-      ""
-    ].join("\n"));
+    await writeFile(
+      path.join(projectRoot, "vectors.script.ts"),
+      [
+        'import { defineComponent, property } from "@ts-defold/deherm/component";',
+        "export default defineComponent({",
+        "  properties: {",
+        properties,
+        "  },",
+        "});",
+        "",
+      ].join("\n"),
+    );
     await mkdir(path.join(projectRoot, "node_modules", "@ts-defold"), { recursive: true });
     await generateComponentProxies({ projectRoot, componentPolicy });
     const proxy = await readFile(path.join(projectRoot, "vectors.script"), "utf8");
@@ -69,17 +72,24 @@ test("every compiler-intrinsic vector emits its exact Lua declaration", async ()
 
 test("the same timer rows select the Lua, JSI, Static Hermes, and browser call programs", () => {
   const bindings = generateArtifacts(moduleSchema);
-  const lua = generateLuaArtifacts(luaSchema)
-    .get("defold/defold_hermes/src/generated_lua_bridge.cpp");
+  const lua = generateLuaArtifacts(luaSchema).get("defold/defold_hermes/src/generated_lua_bridge.cpp");
   const jsi = bindings.get("defold/defold_hermes/src/generated_jsi.cpp");
   const staticHermes = bindings.get("packages/static-hermes/src/generated/ffi.js");
   const browser = bindings.get("defold/defold_hermes/lib/web/generated_modules.js");
   for (const vector of report.separateModules) {
-    const luaBlock = lua.slice(lua.indexOf(`bool timer${vector.function[0].toUpperCase()}${vector.function.slice(1)}(`));
+    const luaBlock = lua.slice(
+      lua.indexOf(`bool timer${vector.function[0].toUpperCase()}${vector.function.slice(1)}(`),
+    );
     assert.match(luaBlock, new RegExp(`call\\.invoke\\(${vector.parameters.length}, 1\\)`), vector.id);
-    assert.match(jsi, new RegExp(`${vector.cSymbol}\\(${vector.cAbiArguments.map((name) =>
-      name.startsWith("callback_") ? `callback_handle\\.${name.slice("callback_".length)}` : ".+?"
-    ).join(", ")}\\)`), vector.id);
+    assert.match(
+      jsi,
+      new RegExp(
+        `${vector.cSymbol}\\(${vector.cAbiArguments
+          .map((name) => (name.startsWith("callback_") ? `callback_handle\\.${name.slice("callback_".length)}` : ".+?"))
+          .join(", ")}\\)`,
+      ),
+      vector.id,
+    );
     assert.match(staticHermes, new RegExp(`function ${vector.cSymbol}\\(`), vector.id);
     assert.match(browser, new RegExp(`_${vector.cSymbol}\\(`), vector.id);
   }
@@ -93,6 +103,6 @@ test("module and Lua schemas cannot drift independently", () => {
   drifted.modules[0].functions[0].parameters.reverse();
   assert.throws(
     () => generateScriptSpecialCallVerification({ accounting, moduleSchema, luaSchema: drifted, componentPolicy }),
-    /module and Lua parameter schemas differ/
+    /module and Lua parameter schemas differ/,
   );
 });

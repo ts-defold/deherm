@@ -7,15 +7,10 @@ import {
   createTypeRenderer,
   dmSdkRuntimeOverloads,
   generateRuntime,
-  generateTypes
+  generateTypes,
 } from "../../../compiler/src/sdk/dmsdk-sdk.mjs";
 
-export {
-  createTypeRenderer,
-  dmSdkRuntimeOverloads,
-  generateRuntime,
-  generateTypes
-};
+export { createTypeRenderer, dmSdkRuntimeOverloads, generateRuntime, generateTypes };
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../..");
 const inventoryPath = path.join(root, "packages", "bindings", "generated", "defold-sdk-inventory.json");
@@ -48,29 +43,16 @@ function strategies(declaration) {
   return result;
 }
 
-function documentation(value, indent = "") {
-  if (!value) return [];
-  const clean = value.replace(/<[^>]+>/g, " ").replace(/\s+\n/g, "\n").replaceAll("*/", "* /").trim();
-  if (!clean) return [];
-  return [`${indent}/**`, ...clean.split(/\r?\n/).map((line) => `${indent} * ${line.trim()}`), `${indent} */`];
-}
-
 function deprecationNotice(...values) {
   for (const value of values.flat(Infinity)) {
     if (typeof value !== "string") continue;
-    const line = value.split(/\r?\n/u).map((item) => item.trim()).find((item) => /\bdeprecated\b/iu.test(item));
+    const line = value
+      .split(/\r?\n/u)
+      .map((item) => item.trim())
+      .find((item) => /\bdeprecated\b/iu.test(item));
     if (line) return line;
   }
   return undefined;
-}
-
-function declarationDocumentation(declaration, { includeDescription = true } = {}) {
-  const notes = (declaration.notes ?? []).filter((note) => note !== declaration.deprecated);
-  return [
-    includeDescription ? declaration.description : "",
-    notes.length ? `@remarks ${notes.join("\n\n")}` : "",
-    declaration.deprecated ? `@deprecated ${declaration.deprecated}` : ""
-  ].filter(Boolean).join("\n\n");
 }
 
 function docsByHeader(archive) {
@@ -79,7 +61,11 @@ function docsByHeader(archive) {
   for (const [name, bytes] of Object.entries(archive)) {
     if (!name.startsWith("doc/dmsdk-") || !name.endsWith("_doc.json")) continue;
     let parsed;
-    try { parsed = JSON.parse(decoder.decode(bytes)); } catch { continue; }
+    try {
+      parsed = JSON.parse(decoder.decode(bytes));
+    } catch {
+      continue;
+    }
     const elements = new Map();
     for (const element of parsed.elements ?? []) {
       if (!element?.name) continue;
@@ -113,24 +99,32 @@ function attachDocumentation(inventory, docs) {
       description: element.description || element.brief || "",
       ...((element.notes ?? []).length ? { notes: [...element.notes] } : {}),
       ...(deprecated ? { deprecated } : {}),
-      parameters: (declaration.parameters ?? []).map((item) => ({ ...item, description: parameterDocs.get(item.name) ?? "" })),
-      returnDescription: (element.returnvalues ?? []).map((item) => item.doc).filter(Boolean).join("; ")
+      parameters: (declaration.parameters ?? []).map((item) => ({
+        ...item,
+        description: parameterDocs.get(item.name) ?? "",
+      })),
+      returnDescription: (element.returnvalues ?? [])
+        .map((item) => item.doc)
+        .filter(Boolean)
+        .join("; "),
     };
   });
 }
 
 function enrich(inventory) {
   const declarations = inventory.declarations.map((declaration, index) => {
-    const normalized = declaration.kind === "enum"
-      ? { ...declaration, members: resolvedEnumMembers(declaration) }
-      : declaration;
+    const normalized =
+      declaration.kind === "enum" ? { ...declaration, members: resolvedEnumMembers(declaration) } : declaration;
     return {
       ...normalized,
       id: `dmsdk:${normalized.name}@${normalized.header}:${normalized.line ?? 0}:${index}`,
-      disposition: normalized.access === "private" || normalized.access === "protected"
-        ? "intentionally-hidden-non-public"
-        : callableKinds.has(normalized.kind) ? "generated-raw-call" : "generated-type-metadata",
-      abiStrategies: strategies(normalized)
+      disposition:
+        normalized.access === "private" || normalized.access === "protected"
+          ? "intentionally-hidden-non-public"
+          : callableKinds.has(normalized.kind)
+            ? "generated-raw-call"
+            : "generated-type-metadata",
+      abiStrategies: strategies(normalized),
     };
   });
   const typeSupportDeclarations = (inventory.typeSupportDeclarations ?? []).map((declaration, index) => ({
@@ -150,7 +144,9 @@ function enrich(inventory) {
     declarationCount: declarations.length,
     typeSurfaceUnresolvedCount: undefined,
     runtimeImplementedCount: 0,
-    runtimeUnimplementedCount: declarations.filter((item) => callableKinds.has(item.kind) && item.disposition === "generated-raw-call").length,
+    runtimeUnimplementedCount: declarations.filter(
+      (item) => callableKinds.has(item.kind) && item.disposition === "generated-raw-call",
+    ).length,
     declarations,
     typeSupportDeclarations,
   };
@@ -170,7 +166,11 @@ async function output(file, contents) {
   const normalized = contents.endsWith("\n") ? contents : `${contents}\n`;
   if (check) {
     let current;
-    try { current = await readFile(file, "utf8"); } catch { current = undefined; }
+    try {
+      current = await readFile(file, "utf8");
+    } catch {
+      current = undefined;
+    }
     assert.equal(current, normalized, `${path.relative(root, file)} is stale; run npm run generate:dmsdk-sdk`);
     return;
   }
@@ -198,7 +198,7 @@ export async function runDmSdkGenerator() {
   // changes do not invalidate ABI classifications or executable evidence.
   const runtimeIr = {
     ...ir,
-    declarations: ir.declarations.map(({ deprecated: _deprecated, notes: _notes, ...declaration }) => declaration)
+    declarations: ir.declarations.map(({ deprecated: _deprecated, notes: _notes, ...declaration }) => declaration),
   };
   const sdkDocumentation = {
     schemaVersion: 1,
@@ -209,9 +209,9 @@ export async function runDmSdkGenerator() {
       .map(({ id, deprecated, notes }) => ({
         id,
         ...(notes?.length ? { notes } : {}),
-        ...(deprecated ? { deprecated } : {})
+        ...(deprecated ? { deprecated } : {}),
       }))
-      .sort((left, right) => compareCodeUnits(left.id, right.id))
+      .sort((left, right) => compareCodeUnits(left.id, right.id)),
   };
   await output(irPath, JSON.stringify(runtimeIr, null, 2));
   await output(documentationPath, JSON.stringify(sdkDocumentation, null, 2));
@@ -223,8 +223,8 @@ export async function runDmSdkGenerator() {
   );
   console.log(
     `${check ? "checked" : "generated"} ${ir.declarationCount} dmSDK declarations, ` +
-    `${Object.keys(inventory.countsByKind).length} kinds, ${ir.typeSurfaceUnresolvedCount} type-surface unresolved, ` +
-    `${ir.runtimeUnimplementedCount} runtime bindings pending`,
+      `${Object.keys(inventory.countsByKind).length} kinds, ${ir.typeSurfaceUnresolvedCount} type-surface unresolved, ` +
+      `${ir.runtimeUnimplementedCount} runtime bindings pending`,
   );
 }
 

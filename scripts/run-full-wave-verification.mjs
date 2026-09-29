@@ -32,8 +32,7 @@ function invariant(condition, message) {
 }
 
 function safeId(value, label) {
-  invariant(typeof value === "string" && /^[a-z0-9][a-z0-9-]*$/.test(value),
-    `${label} must match [a-z0-9][a-z0-9-]*`);
+  invariant(typeof value === "string" && /^[a-z0-9][a-z0-9-]*$/.test(value), `${label} must match [a-z0-9][a-z0-9-]*`);
   return value;
 }
 
@@ -48,14 +47,20 @@ function repositoryRelative(value, label) {
 function validateCommand(command, label) {
   invariant(command && typeof command === "object" && !Array.isArray(command), `${label} must be an object`);
   safeId(command.id, `${label}.id`);
-  invariant(typeof command.executable === "string" && command.executable.length > 0,
-    `${label}.executable must be a non-empty string`);
-  invariant(Array.isArray(command.arguments) && command.arguments.every((entry) => typeof entry === "string"),
-    `${label}.arguments must be a string array`);
+  invariant(
+    typeof command.executable === "string" && command.executable.length > 0,
+    `${label}.executable must be a non-empty string`,
+  );
+  invariant(
+    Array.isArray(command.arguments) && command.arguments.every((entry) => typeof entry === "string"),
+    `${label}.arguments must be a string array`,
+  );
   if (command.cwd !== undefined) repositoryRelative(command.cwd, `${label}.cwd`);
   if (command.timeoutMs !== undefined) {
-    invariant(Number.isInteger(command.timeoutMs) && command.timeoutMs >= 1 && command.timeoutMs <= 3_600_000,
-      `${label}.timeoutMs must be an integer from 1 to 3600000`);
+    invariant(
+      Number.isInteger(command.timeoutMs) && command.timeoutMs >= 1 && command.timeoutMs <= 3_600_000,
+      `${label}.timeoutMs must be an integer from 1 to 3600000`,
+    );
   }
 }
 
@@ -63,8 +68,10 @@ export function validateVerificationPlan(plan) {
   invariant(plan && typeof plan === "object" && !Array.isArray(plan), "verification plan must be an object");
   invariant(plan.schemaVersion === 1, "verification plan schemaVersion must be 1");
   safeId(plan.matrixId, "matrixId");
-  invariant(typeof plan.description === "string" && plan.description.length > 0,
-    "verification plan description must be non-empty");
+  invariant(
+    typeof plan.description === "string" && plan.description.length > 0,
+    "verification plan description must be non-empty",
+  );
   invariant(Array.isArray(plan.rows) && plan.rows.length > 0, "verification plan rows must be non-empty");
   const rowIds = new Set();
   for (const [rowIndex, row] of plan.rows.entries()) {
@@ -75,7 +82,10 @@ export function validateVerificationPlan(plan) {
     rowIds.add(row.id);
     invariant(typeof row.title === "string" && row.title.length > 0, `${rowLabel}.title must be non-empty`);
     invariant(typeof row.scope === "string" && row.scope.length > 0, `${rowLabel}.scope must be non-empty`);
-    invariant(row.cells && typeof row.cells === "object" && !Array.isArray(row.cells), `${rowLabel}.cells must be an object`);
+    invariant(
+      row.cells && typeof row.cells === "object" && !Array.isArray(row.cells),
+      `${rowLabel}.cells must be an object`,
+    );
     assertExactKeys(row.cells, evidenceStages, `${rowLabel}.cells`);
     for (const stage of evidenceStages) {
       const cell = row.cells[stage];
@@ -93,10 +103,15 @@ export function validateVerificationPlan(plan) {
           }
         }
       } else if (cell.kind === "command") {
-        invariant(cell.status === undefined && cell.reason === undefined,
-          `${label} command evidence must not predeclare a status or reason`);
+        invariant(
+          cell.status === undefined && cell.reason === undefined,
+          `${label} command evidence must not predeclare a status or reason`,
+        );
         invariant(Array.isArray(cell.modes) && cell.modes.length > 0, `${label}.modes must be non-empty`);
-        invariant(cell.modes.every((mode) => allowedModes.has(mode)), `${label}.modes contains an unknown mode`);
+        invariant(
+          cell.modes.every((mode) => allowedModes.has(mode)),
+          `${label}.modes contains an unknown mode`,
+        );
         invariant(new Set(cell.modes).size === cell.modes.length, `${label}.modes contains duplicates`);
         invariant(Array.isArray(cell.commands) && cell.commands.length > 0, `${label}.commands must be non-empty`);
         const commandIds = new Set();
@@ -116,8 +131,10 @@ export function validateVerificationPlan(plan) {
 function assertExactKeys(value, expected, label) {
   const actual = Object.keys(value).sort();
   const wanted = [...expected].sort();
-  invariant(actual.length === wanted.length && actual.every((entry, index) => entry === wanted[index]),
-    `${label} must contain exactly: ${wanted.join(", ")}`);
+  invariant(
+    actual.length === wanted.length && actual.every((entry, index) => entry === wanted[index]),
+    `${label} must contain exactly: ${wanted.join(", ")}`,
+  );
 }
 
 export async function loadVerificationPlan(planPath, repositoryRoot = repositoryRootDefault) {
@@ -136,7 +153,9 @@ function isoNow(now) {
 }
 
 function defaultRunId(now) {
-  return `${isoNow(now).replace(/[^0-9A-Za-z]+/g, "-").replace(/^-|-$/g, "")}-${process.pid}`.toLowerCase();
+  return `${isoNow(now)
+    .replace(/[^0-9A-Za-z]+/g, "-")
+    .replace(/^-|-$/g, "")}-${process.pid}`.toLowerCase();
 }
 
 function initialCell(cell) {
@@ -173,15 +192,18 @@ function summarize(report) {
   }
   const failed = cellStatuses.failed ?? 0;
   const pending = cellStatuses.pending ?? 0;
-  const gaps = ["blocked", "unavailable", "unobserved", "not-run"]
-    .reduce((count, status) => count + (cellStatuses[status] ?? 0), 0);
-  const outcome = failed > 0
-    ? "failed"
-    : pending > 0
-      ? "incomplete"
-      : gaps > 0
-        ? `${report.mode}-commands-passed-with-evidence-gaps`
-        : "passed";
+  const gaps = ["blocked", "unavailable", "unobserved", "not-run"].reduce(
+    (count, status) => count + (cellStatuses[status] ?? 0),
+    0,
+  );
+  const outcome =
+    failed > 0
+      ? "failed"
+      : pending > 0
+        ? "incomplete"
+        : gaps > 0
+          ? `${report.mode}-commands-passed-with-evidence-gaps`
+          : "passed";
   return { outcome, failed, pending, evidenceGaps: gaps, cellStatuses, commandStatuses };
 }
 
@@ -255,15 +277,18 @@ async function runCommand(command, context) {
     logPath,
     ...(errorMessage ? { error: errorMessage } : {}),
   };
-  await atomicWrite(logPath, [
-    `${JSON.stringify(record, null, 2)}\n`,
-    "--- stdout ---\n",
-    stdout,
-    stdout.endsWith("\n") || stdout.length === 0 ? "" : "\n",
-    "--- stderr ---\n",
-    stderr,
-    stderr.endsWith("\n") || stderr.length === 0 ? "" : "\n",
-  ].join(""));
+  await atomicWrite(
+    logPath,
+    [
+      `${JSON.stringify(record, null, 2)}\n`,
+      "--- stdout ---\n",
+      stdout,
+      stdout.endsWith("\n") || stdout.length === 0 ? "" : "\n",
+      "--- stderr ---\n",
+      stderr,
+      stderr.endsWith("\n") || stderr.length === 0 ? "" : "\n",
+    ].join(""),
+  );
   return record;
 }
 
@@ -273,7 +298,11 @@ export async function runFullWaveVerification(options = {}) {
   invariant(allowedModes.has(mode), `Unknown verification mode: ${mode}`);
   const now = options.now ?? (() => new Date());
   const loaded = options.plan
-    ? { plan: validateVerificationPlan(options.plan), source: `${JSON.stringify(options.plan, null, 2)}\n`, absolute: options.planPath ?? "<memory>" }
+    ? {
+        plan: validateVerificationPlan(options.plan),
+        source: `${JSON.stringify(options.plan, null, 2)}\n`,
+        absolute: options.planPath ?? "<memory>",
+      }
     : await loadVerificationPlan(options.planPath ?? defaultPlanPath, repositoryRoot);
   const outputRoot = path.resolve(repositoryRoot, options.outputRoot ?? defaultOutputRoot);
   const runId = safeId(options.runId ?? defaultRunId(now), "runId");
@@ -327,7 +356,12 @@ export async function runFullWaveVerification(options = {}) {
         resultCell.status = "not-run";
         resultCell.reason = `cell is not selected in ${mode} mode`;
       } else {
-        const logRoot = path.join(runDirectory, "logs", `${String(rowIndex + 1).padStart(2, "0")}-${planRow.id}`, stage);
+        const logRoot = path.join(
+          runDirectory,
+          "logs",
+          `${String(rowIndex + 1).padStart(2, "0")}-${planRow.id}`,
+          stage,
+        );
         let failed = false;
         for (let commandIndex = 0; commandIndex < planCell.commands.length; commandIndex += 1) {
           const command = planCell.commands[commandIndex];

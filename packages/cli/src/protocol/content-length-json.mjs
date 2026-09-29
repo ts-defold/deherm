@@ -27,14 +27,13 @@ export function createContentLengthJsonTransport(input, output, options = {}) {
       if (expected === null) {
         const delimiter = buffer.indexOf("\r\n\r\n");
         if (delimiter < 0) {
-          if (buffer.length > maximumHeaderBytes) fail(new Error(`${protocol} header exceeds ${maximumHeaderBytes} bytes`));
+          if (buffer.length > maximumHeaderBytes)
+            fail(new Error(`${protocol} header exceeds ${maximumHeaderBytes} bytes`));
           return;
         }
         const headers = buffer.subarray(0, delimiter).toString("ascii").split("\r\n");
         buffer = buffer.subarray(delimiter + 4);
-        const contentLength = headers
-          .map((line) => line.match(/^content-length:\s*(\d+)$/iu))
-          .find(Boolean)?.[1];
+        const contentLength = headers.map((line) => line.match(/^content-length:\s*(\d+)$/iu)).find(Boolean)?.[1];
         expected = Number(contentLength);
         if (!Number.isSafeInteger(expected) || expected < 1 || expected > maximumMessageBytes) {
           fail(new Error(`${protocol} message has no valid bounded Content-Length`));
@@ -48,7 +47,9 @@ export function createContentLengthJsonTransport(input, output, options = {}) {
       try {
         events.emit("message", JSON.parse(body.toString("utf8")));
       } catch (error) {
-        fail(new Error(`${protocol} message is not valid JSON: ${error instanceof Error ? error.message : String(error)}`));
+        fail(
+          new Error(`${protocol} message is not valid JSON: ${error instanceof Error ? error.message : String(error)}`),
+        );
       }
     }
   };
@@ -81,6 +82,6 @@ export function createContentLengthJsonTransport(input, output, options = {}) {
     close() {
       closed = true;
       input.pause?.();
-    }
+    },
   };
 }

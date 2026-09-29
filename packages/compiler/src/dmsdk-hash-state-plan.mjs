@@ -1,13 +1,10 @@
 import { createHash } from "node:crypto";
 
 import { incrementalHashStatePattern } from "./dmsdk-pattern-catalog.mjs";
-import {
-  DMSDK_UNIVERSAL_FALLBACK_PATTERN,
-  selectDmSdkPattern,
-} from "./dmsdk-pattern-selector.mjs";
+import { DMSDK_UNIVERSAL_FALLBACK_PATTERN, selectDmSdkPattern } from "./dmsdk-pattern-selector.mjs";
 
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
-const compareCodeUnits = (left, right) => left < right ? -1 : left > right ? 1 : 0;
+const compareCodeUnits = (left, right) => (left < right ? -1 : left > right ? 1 : 0);
 const operations = Object.freeze(["Init", "Clone", "UpdateBuffer", "Final", "Release"]);
 
 export const DMSDK_HASH_STATE_PLAN_KIND = "deherm.dmsdk-hash-state-plan";
@@ -19,7 +16,10 @@ function assert(condition, message) {
 function exactKeys(value, expected, label) {
   const actual = Object.keys(value ?? {}).sort(compareCodeUnits);
   const wanted = [...expected].sort(compareCodeUnits);
-  assert(JSON.stringify(actual) === JSON.stringify(wanted), `${label} has unsupported schema keys: ${actual.join(", ")}`);
+  assert(
+    JSON.stringify(actual) === JSON.stringify(wanted),
+    `${label} has unsupported schema keys: ${actual.join(", ")}`,
+  );
 }
 
 function patternFacts(row, semanticTokens = []) {
@@ -47,7 +47,8 @@ function recordWidths(ir, supportedWidths) {
       declaration.completeDefinition !== true ||
       !Array.isArray(declaration.members) ||
       declaration.members.length !== 5
-    ) continue;
+    )
+      continue;
     const types = declaration.members.map(({ type }) => type);
     const width = supportedWidths.find(
       (candidate) =>
@@ -106,7 +107,8 @@ export function inferHashStateSemantics(declaration, row, policy, stateWidths) {
     row.parameters.length === 2 &&
     row.parameters[1].role === "scalar:bool" &&
     row.parameters[1].direction === "value"
-  ) operation = "Init";
+  )
+    operation = "Init";
   else if (
     row.result.role === "scalar:void" &&
     row.parameters.length === 3 &&
@@ -114,7 +116,8 @@ export function inferHashStateSemantics(declaration, row, policy, stateWidths) {
     row.parameters[1].direction === "in" &&
     row.parameters[2].role === "scalar:bool" &&
     row.parameters[2].direction === "value"
-  ) operation = "Clone";
+  )
+    operation = "Clone";
   else if (
     row.result.role === "scalar:void" &&
     row.parameters.length === 3 &&
@@ -122,7 +125,8 @@ export function inferHashStateSemantics(declaration, row, policy, stateWidths) {
     row.parameters[1].direction === "in" &&
     row.parameters[2].role === "scalar:u32" &&
     row.parameters[2].direction === "value"
-  ) operation = "UpdateBuffer";
+  )
+    operation = "UpdateBuffer";
   else if (row.result.role === `scalar:u${width}` && row.parameters.length === 1) operation = "Final";
   else if (row.result.role === "scalar:void" && row.parameters.length === 1) operation = "Release";
   if (!operation || !policy.recipe.operations.includes(operation)) return null;
@@ -155,12 +159,14 @@ export function discoverHashStateSemantics(ir, shapes, policy) {
 
 function linkageHolds(symbols, row) {
   const evidence = symbols.declarations[row.id];
-  return evidence?.name === row.symbol &&
+  return (
+    evidence?.name === row.symbol &&
     evidence.kind === "function" &&
     evidence.header === row.header &&
     evidence.linkage === "external" &&
     evidence.availability === "all-targets-all-variants" &&
-    symbols.variants.every((variant) => (evidence.linkedIn?.[variant] ?? []).length === symbols.targets.length);
+    symbols.variants.every((variant) => (evidence.linkedIn?.[variant] ?? []).length === symbols.targets.length)
+  );
 }
 
 function validateInputs({ ir, shapes, symbols, policy, texts }) {
@@ -209,8 +215,12 @@ export function buildDmSdkHashStatePlan({ ir, shapes, symbols, policy, texts }) 
     if (!operations.every((operation) => byOperation.get(operation)?.length === 1))
       blocker = "hash-state-lifecycle-incomplete";
     else if ((statesByWidth.get(width) ?? []).length !== 1) blocker = "duplicate-hash-state-width";
-    else if (members.some(({ row, semantics }) =>
-      selectDmSdkPattern(patternFacts(row, semantics.semanticTokens), registry).patternId !== pattern.id))
+    else if (
+      members.some(
+        ({ row, semantics }) =>
+          selectDmSdkPattern(patternFacts(row, semantics.semanticTokens), registry).patternId !== pattern.id,
+      )
+    )
       blocker = "hash-state-signature-unverified";
     else if (members.some(({ row }) => !linkageHolds(symbols, row))) blocker = "hash-state-linkage-unverified";
     groupBlockers.set(state, blocker);
@@ -267,21 +277,47 @@ export function indexDmSdkHashStatePlan(plan, { revision, sourceHashes } = {}) {
   assert(registry.has(DMSDK_UNIVERSAL_FALLBACK_PATTERN.id), "hash-state plan has no universal fallback");
   let previousId = "";
   for (const decision of plan.decisions) {
-    assert(previousId === "" || compareCodeUnits(previousId, decision.declarationId) < 0, "hash-state plan decisions are not uniquely sorted");
+    assert(
+      previousId === "" || compareCodeUnits(previousId, decision.declarationId) < 0,
+      "hash-state plan decisions are not uniquely sorted",
+    );
     previousId = decision.declarationId;
     const selected = registry.get(decision.patternId);
     assert(selected, `${decision.declarationId}: hash-state decision names an unknown pattern`);
-    assert(decision.family === selected.family && decision.emitter === selected.emitter, `${decision.declarationId}: hash-state decision owner differs`);
+    assert(
+      decision.family === selected.family && decision.emitter === selected.emitter,
+      `${decision.declarationId}: hash-state decision owner differs`,
+    );
     assert(decision.fallback === selected.fallback, `${decision.declarationId}: hash-state decision fallback differs`);
-    assert(decision.priority === selected.priority && decision.cost === selected.cost, `${decision.declarationId}: hash-state decision rank differs`);
-    assert(decision.candidatePatternId === "state.incremental-hash-lifecycle", `${decision.declarationId}: hash-state candidate differs`);
-    assert(decision.semantics && typeof decision.semantics === "object", `${decision.declarationId}: hash-state semantics are missing`);
+    assert(
+      decision.priority === selected.priority && decision.cost === selected.cost,
+      `${decision.declarationId}: hash-state decision rank differs`,
+    );
+    assert(
+      decision.candidatePatternId === "state.incremental-hash-lifecycle",
+      `${decision.declarationId}: hash-state candidate differs`,
+    );
+    assert(
+      decision.semantics && typeof decision.semantics === "object",
+      `${decision.declarationId}: hash-state semantics are missing`,
+    );
     assert(Array.isArray(decision.trace), `${decision.declarationId}: hash-state decision trace is missing`);
-    if (decision.fallback) assert(typeof decision.blocker === "string", `${decision.declarationId}: hash-state fallback has no blocker`);
-    else assert(decision.blocker === null && decision.lifecycleComplete === true, `${decision.declarationId}: selected hash-state route is not complete`);
+    if (decision.fallback)
+      assert(typeof decision.blocker === "string", `${decision.declarationId}: hash-state fallback has no blocker`);
+    else
+      assert(
+        decision.blocker === null && decision.lifecycleComplete === true,
+        `${decision.declarationId}: selected hash-state route is not complete`,
+      );
   }
   assert(plan.coverage?.discovered === plan.decisions.length, "hash-state plan coverage total differs");
-  assert(plan.coverage.selected === plan.decisions.filter(({ fallback }) => !fallback).length, "hash-state plan selected count differs");
-  assert(plan.coverage.universalFallback === plan.decisions.filter(({ fallback }) => fallback).length, "hash-state plan fallback count differs");
+  assert(
+    plan.coverage.selected === plan.decisions.filter(({ fallback }) => !fallback).length,
+    "hash-state plan selected count differs",
+  );
+  assert(
+    plan.coverage.universalFallback === plan.decisions.filter(({ fallback }) => fallback).length,
+    "hash-state plan fallback count differs",
+  );
   return new Map(plan.decisions.map((decision) => [decision.declarationId, decision]));
 }

@@ -16,13 +16,13 @@ import { promisify } from "node:util";
 
 import {
   materializePolicySurface,
-  policySurfaceRealizationIdentity
+  policySurfaceRealizationIdentity,
 } from "../packages/compiler/src/policy-surface-materializer.mjs";
 import { verifyMaterializedSurfaceRoot } from "../packages/cli/src/defold-surface.mjs";
 import {
   readRevisionWorkspaceMetadata,
   revisionProducerInputIdentity,
-  revisionWorkspaceMetadataMismatch
+  revisionWorkspaceMetadataMismatch,
 } from "./lib/revision-workspace-metadata.mjs";
 
 const run = promisify(execFile);
@@ -47,7 +47,7 @@ async function regularFiles(root, relative = "") {
     const child = relative ? `${relative}/${entry.name}` : entry.name;
     const information = await lstat(path.join(root, child));
     if (information.isSymbolicLink()) throw new Error(`${root}: generated tree contains symbolic link ${child}`);
-    if (information.isDirectory()) files.push(...await regularFiles(root, child));
+    if (information.isDirectory()) files.push(...(await regularFiles(root, child)));
     else if (information.isFile()) files.push(child);
     else throw new Error(`${root}: generated tree contains unsupported entry ${child}`);
   }
@@ -65,21 +65,36 @@ async function treeDigest(root) {
 }
 
 export function validateRevisionMatrix(manifest) {
-  if (manifest?.schemaVersion !== 1 || manifest.kind !== "deherm.defold-revision-matrix" ||
-      !Array.isArray(manifest.lanes) || manifest.lanes.length === 0) {
+  if (
+    manifest?.schemaVersion !== 1 ||
+    manifest.kind !== "deherm.defold-revision-matrix" ||
+    !Array.isArray(manifest.lanes) ||
+    manifest.lanes.length === 0
+  ) {
     throw new Error("Invalid Defold revision matrix manifest");
   }
   const ids = new Set();
   const revisions = new Set();
   for (const lane of manifest.lanes) {
-    if (!lane || typeof lane.id !== "string" || !lane.id || ids.has(lane.id) ||
-        typeof lane.label !== "string" || !REVISION.test(lane.revision ?? "") ||
-        revisions.has(lane.revision) || typeof lane.workspace !== "string" || !lane.workspace ||
-        !["blocking", "nightly"].includes(lane.cadence)) {
+    if (
+      !lane ||
+      typeof lane.id !== "string" ||
+      !lane.id ||
+      ids.has(lane.id) ||
+      typeof lane.label !== "string" ||
+      !REVISION.test(lane.revision ?? "") ||
+      revisions.has(lane.revision) ||
+      typeof lane.workspace !== "string" ||
+      !lane.workspace ||
+      !["blocking", "nightly"].includes(lane.cadence)
+    ) {
       throw new Error(`Invalid or duplicate Defold revision matrix lane ${JSON.stringify(lane?.id)}`);
     }
     const resolved = path.resolve(repositoryRoot, lane.workspace);
-    if (resolved !== repositoryRoot && !resolved.startsWith(`${path.join(repositoryRoot, "build", "revision-matrix")}${path.sep}`)) {
+    if (
+      resolved !== repositoryRoot &&
+      !resolved.startsWith(`${path.join(repositoryRoot, "build", "revision-matrix")}${path.sep}`)
+    ) {
       throw new Error(`${lane.id}: workspace must be the repository or live below build/revision-matrix`);
     }
     ids.add(lane.id);
@@ -92,8 +107,12 @@ export async function loadResolvedPolicy(workspace) {
   const generated = path.join(workspace, "packages", "bindings", "generated");
   const manifestPath = path.join(generated, "defold-api-policy.json");
   const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
-  if (manifest?.kind !== "deherm.policy.manifest" || !REVISION.test(manifest.defoldRevision ?? "") ||
-      !DIGEST.test(manifest.policyRoot ?? "") || typeof manifest.layoutVersion !== "string") {
+  if (
+    manifest?.kind !== "deherm.policy.manifest" ||
+    !REVISION.test(manifest.defoldRevision ?? "") ||
+    !DIGEST.test(manifest.policyRoot ?? "") ||
+    typeof manifest.layoutVersion !== "string"
+  ) {
     throw new Error(`${manifestPath}: invalid policy manifest`);
   }
   const store = path.join(generated, "policy", manifest.layoutVersion);
@@ -104,7 +123,9 @@ export async function loadResolvedPolicy(workspace) {
     throw new Error(`${manifestPath}: invalid policy root object`);
   }
   const objects = new Map();
-  for (const [namespace, digest] of Object.entries(policy.subtrees).sort(([left], [right]) => compareCodeUnits(left, right))) {
+  for (const [namespace, digest] of Object.entries(policy.subtrees).sort(([left], [right]) =>
+    compareCodeUnits(left, right),
+  )) {
     if (!DIGEST.test(digest)) throw new Error(`${manifestPath}: invalid ${namespace} object digest`);
     const bytes = await readFile(path.join(store, "object", `${digest}.json`));
     if (sha256(bytes) !== digest) throw new Error(`${manifestPath}: ${namespace} object digest mismatch`);
@@ -116,16 +137,17 @@ export async function loadResolvedPolicy(workspace) {
       revision: manifest.defoldRevision,
       entry: { policyRoot: manifest.policyRoot, generator: policy.generator, realizer: policy.realizer },
       policy,
-      objects
-    }
+      objects,
+    },
   };
 }
 
 function countRecord(record = {}) {
-  return Object.fromEntries(Object.entries(record).sort(([left], [right]) => compareCodeUnits(left, right)).map(([key, value]) => [
-    key,
-    typeof value === "number" ? value : Number(value?.count ?? 0)
-  ]));
+  return Object.fromEntries(
+    Object.entries(record)
+      .sort(([left], [right]) => compareCodeUnits(left, right))
+      .map(([key, value]) => [key, typeof value === "number" ? value : Number(value?.count ?? 0)]),
+  );
 }
 
 async function semanticCensus(materializedRoot) {
@@ -133,17 +155,20 @@ async function semanticCensus(materializedRoot) {
   const [accounting, scriptPatterns, dmsdkPatterns] = await Promise.all([
     readFile(path.join(ir, "defold-script-api-accounting.json"), "utf8").then(JSON.parse),
     readFile(path.join(ir, "defold-script-binding-patterns.json"), "utf8").then(JSON.parse),
-    readFile(path.join(ir, "defold-dmsdk-binding-patterns.json"), "utf8").then(JSON.parse)
+    readFile(path.join(ir, "defold-dmsdk-binding-patterns.json"), "utf8").then(JSON.parse),
   ]);
   return {
     scriptFunctions: accounting.functionCount,
     scriptCategories: countRecord(accounting.categoryCounts),
-    scriptFamilies: Object.fromEntries(scriptPatterns.families
-      .map(({ name, count }) => [name, count]).sort(([left], [right]) => compareCodeUnits(left, right))),
+    scriptFamilies: Object.fromEntries(
+      scriptPatterns.families
+        .map(({ name, count }) => [name, count])
+        .sort(([left], [right]) => compareCodeUnits(left, right)),
+    ),
     scriptUnresolvedTypes: scriptPatterns.unresolvedTypeCount,
     dmsdkDeclarations: dmsdkPatterns.coverage.runtimePendingCount,
     dmsdkClassified: dmsdkPatterns.coverage.classifiedCount,
-    dmsdkPrimaryFamilies: countRecord(dmsdkPatterns.primaryFamilySummary)
+    dmsdkPrimaryFamilies: countRecord(dmsdkPatterns.primaryFamilySummary),
   };
 }
 
@@ -170,9 +195,13 @@ async function executeCommand(workspace, name, command, args) {
     const { stdout, stderr } = await run(command, args, {
       cwd: workspace,
       env: { ...process.env, FORCE_COLOR: "0" },
-      maxBuffer: 64 * 1024 * 1024
+      maxBuffer: 64 * 1024 * 1024,
     });
-    return { script: name, milliseconds: Date.now() - started, outputTail: `${stdout}${stderr}`.trim().split(/\r?\n/u).slice(-8) };
+    return {
+      script: name,
+      milliseconds: Date.now() - started,
+      outputTail: `${stdout}${stderr}`.trim().split(/\r?\n/u).slice(-8),
+    };
   } catch (error) {
     const evidence = `${error.stdout ?? ""}${error.stderr ?? ""}`.trim();
     throw new Error(`${name} failed in ${workspace}${evidence ? `\n${evidence}` : ""}`, { cause: error });
@@ -187,32 +216,58 @@ async function compileExactCallTwins(workspace, revision, output) {
   const sdk = path.join(workspace, "upstream", "extender", "server", "app", "sdk", revision, "defoldsdk");
   const includeArgs = [
     `-I${include}`,
-    "-isystem", path.join(sdk, "sdk", "include"),
-    "-isystem", path.join(sdk, "include"),
-    "-isystem", path.join(sdk, "ext", "include"),
-    "-DDLIB_LOG_DOMAIN=\"deherm\""
+    "-isystem",
+    path.join(sdk, "sdk", "include"),
+    "-isystem",
+    path.join(sdk, "include"),
+    "-isystem",
+    path.join(sdk, "ext", "include"),
+    '-DDLIB_LOG_DOMAIN="deherm"',
   ];
-  const report = JSON.parse(await readFile(path.join(
-    workspace, "packages", "bindings", "generated", "defold-dmsdk-universal-bindings.json"
-  ), "utf8"));
+  const report = JSON.parse(
+    await readFile(
+      path.join(workspace, "packages", "bindings", "generated", "defold-dmsdk-universal-bindings.json"),
+      "utf8",
+    ),
+  );
   const count = report.coverage?.declarations;
   if (!Number.isSafeInteger(count) || count < 0) throw new Error(`${revision}: invalid universal declaration count`);
 
   const cHarness = path.join(output, "universal-c11.c");
   const cObject = path.join(output, "universal-c11.o");
   const cExecutable = path.join(output, "universal-c11");
-  await writeFile(cHarness, `#include <defold_hermes/generated_dmsdk_universal.h>\nint main(void){DehermDmSdkUniversalValue result={0};return deherm_dmsdk_universal_count()==${count}u&&deherm_dmsdk_universal_dispatch(${count}u,0,0,&result)==DEHERM_DMSDK_UNIVERSAL_UNKNOWN_ID?0:1;}\n`);
+  await writeFile(
+    cHarness,
+    `#include <defold_hermes/generated_dmsdk_universal.h>\nint main(void){DehermDmSdkUniversalValue result={0};return deherm_dmsdk_universal_count()==${count}u&&deherm_dmsdk_universal_dispatch(${count}u,0,0,&result)==DEHERM_DMSDK_UNIVERSAL_UNKNOWN_ID?0:1;}\n`,
+  );
   await executeCommand(workspace, "compile universal C11 caller", cc, [
-    "-std=c11", "-Wall", "-Wextra", "-Werror", "-pedantic", `-I${include}`, "-c", cHarness, "-o", cObject
+    "-std=c11",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-pedantic",
+    `-I${include}`,
+    "-c",
+    cHarness,
+    "-o",
+    cObject,
   ]);
   await executeCommand(workspace, "link universal C ABI", cxx, [
-    "-std=c++17", `-I${include}`, "defold/defold_hermes/src/generated_dmsdk_universal.cpp", cObject, "-o", cExecutable
+    "-std=c++17",
+    `-I${include}`,
+    "defold/defold_hermes/src/generated_dmsdk_universal.cpp",
+    cObject,
+    "-o",
+    cExecutable,
   ]);
   await executeCommand(workspace, "execute universal C ABI", cExecutable, []);
 
-  const readyPlan = JSON.parse(await readFile(path.join(
-    workspace, "packages", "bindings", "generated", "defold-dmsdk-universal-ready-exact-plan.json"
-  ), "utf8"));
+  const readyPlan = JSON.parse(
+    await readFile(
+      path.join(workspace, "packages", "bindings", "generated", "defold-dmsdk-universal-ready-exact-plan.json"),
+      "utf8",
+    ),
+  );
   const driver = readyPlan.verification?.driver?.function;
   if (!/^[A-Za-z_][A-Za-z0-9_]*$/u.test(driver ?? "")) throw new Error(`${revision}: invalid exact-call driver`);
   const readyHarness = path.join(output, "universal-ready.cpp");
@@ -220,48 +275,92 @@ async function compileExactCallTwins(workspace, revision, output) {
   const readyExecutable = path.join(output, "universal-ready");
   await writeFile(readyHarness, `extern "C" int ${driver}(void);\nint main(){return ${driver}();}\n`);
   await executeCommand(workspace, "compile universal-ready production calls", cxx, [
-    "-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic", ...includeArgs,
-    "-c", "tests/fixtures/generated_dmsdk_universal_ready_provider.cpp", "-o", readyProvider
+    "-std=c++17",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-pedantic",
+    ...includeArgs,
+    "-c",
+    "tests/fixtures/generated_dmsdk_universal_ready_provider.cpp",
+    "-o",
+    readyProvider,
   ]);
   await executeCommand(workspace, "link universal-ready exact-call twin", cxx, [
-    "-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic", ...includeArgs,
+    "-std=c++17",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-pedantic",
+    ...includeArgs,
     "defold/defold_hermes/src/generated_dmsdk_universal.cpp",
-    "tests/fixtures/generated_dmsdk_universal_ready_verification.cpp", readyHarness, "-o", readyExecutable
+    "tests/fixtures/generated_dmsdk_universal_ready_verification.cpp",
+    readyHarness,
+    "-o",
+    readyExecutable,
   ]);
   await executeCommand(workspace, "execute universal-ready exact-call twin", readyExecutable, []);
   await executeCommand(workspace, "compile specialized dmSDK exact-call twin", cxx, [
-    "-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic", ...includeArgs,
-    "-c", "tests/fixtures/generated_dmsdk_adapter_exact_verification.cpp",
-    "-o", path.join(output, "dmsdk-adapter-exact.o")
+    "-std=c++17",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-pedantic",
+    ...includeArgs,
+    "-c",
+    "tests/fixtures/generated_dmsdk_adapter_exact_verification.cpp",
+    "-o",
+    path.join(output, "dmsdk-adapter-exact.o"),
   ]);
   await executeCommand(workspace, "compile Lua exact-call twin", cxx, [
-    "-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic", ...includeArgs,
+    "-std=c++17",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-pedantic",
+    ...includeArgs,
     `-I${path.join(workspace, "tests", "fixtures")}`,
     `-I${path.join(workspace, "upstream", "defold", "engine", "lua", "src")}`,
-    "-c", "tests/fixtures/generated_script_recording_lua_adapter.cpp",
-    "-o", path.join(output, "script-lua-exact.o")
+    "-c",
+    "tests/fixtures/generated_script_recording_lua_adapter.cpp",
+    "-o",
+    path.join(output, "script-lua-exact.o"),
   ]);
   return {
     script: "compile:generated-exact-call-twins",
     universalReadyVectors: readyPlan.universalReadyCount,
-    specializedDmSdkVectors: JSON.parse(await readFile(path.join(
-      workspace, "packages", "bindings", "generated", "defold-dmsdk-generated-adapter-exact-plan.json"
-    ), "utf8")).generatedAdapterCount
+    specializedDmSdkVectors: JSON.parse(
+      await readFile(
+        path.join(workspace, "packages", "bindings", "generated", "defold-dmsdk-generated-adapter-exact-plan.json"),
+        "utf8",
+      ),
+    ).generatedAdapterCount,
   };
 }
 
 async function executeChecks(workspace, revision, output) {
-  const binary = (name) => path.join(repositoryRoot, "node_modules", ".bin", `${name}${process.platform === "win32" ? ".cmd" : ""}`);
+  const binary = (name) =>
+    path.join(repositoryRoot, "node_modules", ".bin", `${name}${process.platform === "win32" ? ".cmd" : ""}`);
   const typesStarted = Date.now();
   const tsc = await executeCommand(workspace, "compile generated TypeScript SDK", binary("tsc"), [
-    "--ignoreConfig", "--noEmit", "--strict", "--skipLibCheck", "--target", "ES2022",
-    "--module", "preserve", "--moduleResolution", "bundler", "--lib", "ES2022,DOM",
-    "packages/sdk/src/index.ts"
+    "--ignoreConfig",
+    "--noEmit",
+    "--strict",
+    "--skipLibCheck",
+    "--target",
+    "ES2022",
+    "--module",
+    "preserve",
+    "--moduleResolution",
+    "bundler",
+    "--lib",
+    "ES2022,DOM",
+    "packages/sdk/src/index.ts",
   ]);
   const types = {
     script: "compile:generated-typescript-sdk",
     milliseconds: Date.now() - typesStarted,
-    outputTail: tsc.outputTail
+    outputTail: tsc.outputTail,
   };
   const exactStarted = Date.now();
   const exact = await compileExactCallTwins(workspace, revision, output);
@@ -276,7 +375,10 @@ async function inspectRevisionWorkspace(lane, workspace, producerInput, packageV
     manifest = JSON.parse(await readFile(manifestPath, "utf8"));
   } catch (error) {
     if (error?.code !== "ENOENT" && !(error instanceof SyntaxError)) throw error;
-    return { current: false, reason: error instanceof SyntaxError ? "policy manifest is invalid" : "policy manifest is missing" };
+    return {
+      current: false,
+      reason: error instanceof SyntaxError ? "policy manifest is invalid" : "policy manifest is missing",
+    };
   }
   if (manifest?.defoldRevision !== lane.revision) {
     return { current: false, reason: `policy manifest names revision ${manifest?.defoldRevision ?? "missing"}` };
@@ -284,16 +386,20 @@ async function inspectRevisionWorkspace(lane, workspace, producerInput, packageV
   if (!DIGEST.test(manifest?.policyRoot ?? "")) return { current: false, reason: "policy manifest root is invalid" };
   const metadata = await readRevisionWorkspaceMetadata(workspace);
   const reason = revisionWorkspaceMetadataMismatch(metadata, {
-    revision: lane.revision, producerInput, packageVersion, policyRoot: manifest.policyRoot
+    revision: lane.revision,
+    producerInput,
+    packageVersion,
+    policyRoot: manifest.policyRoot,
   });
   return { current: reason === null, reason, manifest, metadata };
 }
 
 async function runLaneDerivation(lane, workspace) {
-  await run(process.execPath, [
-    "scripts/derive-revision.mjs", "--revision", lane.revision,
-    "--workspace", workspace, "--carry-reviews"
-  ], { cwd: repositoryRoot, env: process.env, maxBuffer: 128 * 1024 * 1024 });
+  await run(
+    process.execPath,
+    ["scripts/derive-revision.mjs", "--revision", lane.revision, "--workspace", workspace, "--carry-reviews"],
+    { cwd: repositoryRoot, env: process.env, maxBuffer: 128 * 1024 * 1024 },
+  );
 }
 
 export async function ensureRevisionWorkspace(lane, workspace, options) {
@@ -302,7 +408,7 @@ export async function ensureRevisionWorkspace(lane, workspace, options) {
     producerInput,
     packageVersion,
     workspaceBoundary = path.join(repositoryRoot, "build", "revision-matrix"),
-    derive = runLaneDerivation
+    derive = runLaneDerivation,
   } = options;
   const state = await inspectRevisionWorkspace(lane, workspace, producerInput, packageVersion);
   if (state.current) return { derived: false, reason: null };
@@ -326,15 +432,14 @@ export async function ensureRevisionWorkspace(lane, workspace, options) {
 
 export async function verifyLane(lane, options) {
   const workspace = path.resolve(repositoryRoot, lane.workspace);
-  const packageVersion = options.packageVersion ?? JSON.parse(
-    await readFile(path.join(repositoryRoot, "package.json"), "utf8")
-  ).version;
+  const packageVersion =
+    options.packageVersion ?? JSON.parse(await readFile(path.join(repositoryRoot, "package.json"), "utf8")).version;
   if (workspace !== repositoryRoot) {
-    const producerInput = options.producerInput ?? await revisionProducerInputIdentity(repositoryRoot);
+    const producerInput = options.producerInput ?? (await revisionProducerInputIdentity(repositoryRoot));
     await ensureRevisionWorkspace(lane, workspace, {
       deriveMissing: options.deriveMissing,
       producerInput,
-      packageVersion
+      packageVersion,
     });
   }
   const started = Date.now();
@@ -348,27 +453,38 @@ export async function verifyLane(lane, options) {
     const firstRoot = path.join(temporary, "forward");
     const reverseRoot = path.join(temporary, "reverse");
     const first = await materializePolicySurface(resolved, {
-      revision: lane.revision, outputRoot: firstRoot, outputBoundary: temporary, realization
+      revision: lane.revision,
+      outputRoot: firstRoot,
+      outputBoundary: temporary,
+      realization,
     });
     const repeated = await materializePolicySurface(resolved, {
-      revision: lane.revision, outputRoot: firstRoot, outputBoundary: temporary, realization
+      revision: lane.revision,
+      outputRoot: firstRoot,
+      outputBoundary: temporary,
+      realization,
     });
     if (repeated.written.length !== 0) throw new Error(`${lane.id}: identical second materialization rewrote files`);
     const reversed = { ...resolved, objects: new Map([...resolved.objects].reverse()) };
     const second = await materializePolicySurface(reversed, {
-      revision: lane.revision, outputRoot: reverseRoot, outputBoundary: temporary, realization
+      revision: lane.revision,
+      outputRoot: reverseRoot,
+      outputBoundary: temporary,
+      realization,
     });
     const [forwardDigest, reverseDigest, verified] = await Promise.all([
       treeDigest(firstRoot),
       treeDigest(reverseRoot),
-      verifyMaterializedSurfaceRoot(firstRoot, lane.revision, realization)
+      verifyMaterializedSurfaceRoot(firstRoot, lane.revision, realization),
     ]);
     if (forwardDigest !== reverseDigest || JSON.stringify(first.descriptor) !== JSON.stringify(second.descriptor)) {
       throw new Error(`${lane.id}: materialization depends on authenticated object enumeration order`);
     }
     if (!verified.ok) throw new Error(`${lane.id}: materialized surface failed verification: ${verified.error}`);
     await assertMatchesDerivedWorkspace(workspace, firstRoot, first.descriptor);
-    const checks = options.compile ? await executeChecks(workspace, lane.revision, path.join(temporary, "compile")) : [];
+    const checks = options.compile
+      ? await executeChecks(workspace, lane.revision, path.join(temporary, "compile"))
+      : [];
     return {
       id: lane.id,
       label: lane.label,
@@ -382,7 +498,7 @@ export async function verifyLane(lane, options) {
       outputTreeSha256: first.descriptor.outputTreeSha256,
       census: await semanticCensus(firstRoot),
       checks,
-      milliseconds: Date.now() - started
+      milliseconds: Date.now() - started,
     };
   } finally {
     await rm(temporary, { recursive: true, force: true });
@@ -397,22 +513,28 @@ function markdownReport(report) {
     "API census and lowering-family differences are reported facts; equality across revisions is not required.",
     "",
     "| Lane | Revision | Script API | dmSDK | Policy root | Surface tree | Result |",
-    "| --- | --- | ---: | ---: | --- | --- | --- |"
+    "| --- | --- | ---: | ---: | --- | --- | --- |",
   ];
-  for (const result of report.results) lines.push(
-    `| ${result.label} | \`${result.revision.slice(0, 12)}\` | ${result.census.scriptFunctions} | ${result.census.dmsdkDeclarations} | \`${result.policyRoot.slice(0, 12)}\` | \`${result.surfaceTreeSha256.slice(0, 12)}\` | verified |`
-  );
+  for (const result of report.results)
+    lines.push(
+      `| ${result.label} | \`${result.revision.slice(0, 12)}\` | ${result.census.scriptFunctions} | ${result.census.dmsdkDeclarations} | \`${result.policyRoot.slice(0, 12)}\` | \`${result.surfaceTreeSha256.slice(0, 12)}\` | verified |`,
+    );
   lines.push("", "## Semantic lowering distributions", "");
   for (const result of report.results) {
-    lines.push(`### ${result.label}`, "", `- Script: ${JSON.stringify(result.census.scriptFamilies)}`,
-      `- dmSDK: ${JSON.stringify(result.census.dmsdkPrimaryFamilies)}`, "");
+    lines.push(
+      `### ${result.label}`,
+      "",
+      `- Script: ${JSON.stringify(result.census.scriptFamilies)}`,
+      `- dmSDK: ${JSON.stringify(result.census.dmsdkPrimaryFamilies)}`,
+      "",
+    );
   }
   return `${lines.join("\n")}\n`;
 }
 
 async function main() {
   const argv = process.argv.slice(2);
-  const valueAfter = (name) => argv.includes(name) ? argv[argv.indexOf(name) + 1] : null;
+  const valueAfter = (name) => (argv.includes(name) ? argv[argv.indexOf(name) + 1] : null);
   const manifestPath = path.resolve(valueAfter("--manifest") ?? defaultManifest);
   const manifest = validateRevisionMatrix(JSON.parse(await readFile(manifestPath, "utf8")));
   const selected = valueAfter("--lanes")?.split(",").filter(Boolean) ?? manifest.lanes.map(({ id }) => id);
@@ -427,13 +549,15 @@ async function main() {
   const results = [];
   for (const lane of manifest.lanes.filter(({ id }) => selected.includes(id))) {
     process.stdout.write(`revision-matrix:${lane.id}: verifying ${lane.revision}\n`);
-    results.push(await verifyLane(lane, {
-      temporaryRoot,
-      deriveMissing: argv.includes("--derive-missing"),
-      compile: !argv.includes("--skip-compile"),
-      producerInput,
-      packageVersion
-    }));
+    results.push(
+      await verifyLane(lane, {
+        temporaryRoot,
+        deriveMissing: argv.includes("--derive-missing"),
+        compile: !argv.includes("--skip-compile"),
+        producerInput,
+        packageVersion,
+      }),
+    );
     process.stdout.write(`revision-matrix:${lane.id}: verified\n`);
   }
   const report = {
@@ -441,12 +565,12 @@ async function main() {
     kind: "deherm.defold-revision-matrix-report",
     packageVersion,
     generatedAt: new Date().toISOString(),
-    results
+    results,
   };
   const reportRoot = path.join(repositoryRoot, "build", "revision-matrix");
   await Promise.all([
     writeFile(path.join(reportRoot, "report.json"), `${JSON.stringify(report, null, 2)}\n`),
-    writeFile(path.join(reportRoot, "report.md"), markdownReport(report))
+    writeFile(path.join(reportRoot, "report.md"), markdownReport(report)),
   ]);
   console.log(markdownReport(report));
 }

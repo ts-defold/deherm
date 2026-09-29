@@ -32,12 +32,7 @@ export function missingPublishedEntries(expected, observed) {
 
 const delay = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
-export async function waitForPublishedPolicy({
-  expected,
-  fetchImpl = fetch,
-  timeoutMs = 300_000,
-  intervalMs = 5_000
-}) {
+export async function waitForPublishedPolicy({ expected, fetchImpl = fetch, timeoutMs = 300_000, intervalMs = 5_000 }) {
   const url = manifestUrl(expected);
   const deadline = Date.now() + timeoutMs;
   let last = "not requested";
@@ -50,7 +45,8 @@ export async function waitForPublishedPolicy({
         const observed = await response.json();
         const missing = missingPublishedEntries(expected, observed);
         if (missing.length === 0) return { url, observed };
-        last = `${missing.length} expected revision(s) still absent or stale: ` +
+        last =
+          `${missing.length} expected revision(s) still absent or stale: ` +
           missing.map((entry) => entry.defoldRevision).join(", ");
       }
     } catch (error) {
@@ -78,7 +74,7 @@ async function main(argv = process.argv.slice(2)) {
   const result = await resolvePolicy({ index: asserted });
   console.log(
     `ok published policy: ${expected.entries.length} derived revision(s), ` +
-    `${result.results.length} resolved and content-verified through ${url}`
+      `${result.results.length} resolved and content-verified through ${url}`,
   );
 }
 

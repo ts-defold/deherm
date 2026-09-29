@@ -14,14 +14,24 @@ const urls = {
   ir: new URL("packages/bindings/generated/defold-script-api-ir.json", root),
   patterns: new URL("packages/bindings/generated/defold-script-binding-patterns.json", root),
   accounting: new URL("packages/bindings/generated/defold-script-api-accounting.json", root),
-  overrides: new URL("packages/bindings/overrides/script-table-tuple-schema-overrides.json", root)
+  overrides: new URL("packages/bindings/overrides/script-table-tuple-schema-overrides.json", root),
 };
 const reportUrl = new URL("packages/bindings/generated/defold-script-table-tuple-schemas.json", root);
 const documentationUrl = new URL(".agents/docs/research/script-table-tuple-schema-classification.md", root);
 
 const primitiveTypes = new Set([
-  "boolean", "integer", "number", "string", "hash", "url", "vector", "vector3",
-  "vector4", "quaternion", "matrix4", "nil"
+  "boolean",
+  "integer",
+  "number",
+  "string",
+  "hash",
+  "url",
+  "vector",
+  "vector3",
+  "vector4",
+  "quaternion",
+  "matrix4",
+  "nil",
 ]);
 const familyOrder = ["lua-table", "multi-result"];
 const bucketOrder = [
@@ -36,69 +46,99 @@ const bucketOrder = [
   "semantic-flat-record",
   "owned-handle-tuple",
   "binary-string-tuple",
-  "dynamic-recursive"
+  "dynamic-recursive",
 ];
 const bucketDefinitions = {
   "flat-record": {
-    family: "lua-table", origin: "mechanical-ir", implementationOrder: 1,
+    family: "lua-table",
+    origin: "mechanical-ir",
+    implementationOrder: 1,
     description: "Fixed-field records whose fields are scalar, enum, hash, URL, or copied Defold values.",
-    requirements: ["fixed-field-descriptor", "unknown-key-policy", "copy-results-before-lua-pop"]
+    requirements: ["fixed-field-descriptor", "unknown-key-policy", "copy-results-before-lua-pop"],
   },
   "fixed-scalar-tuple": {
-    family: "multi-result", origin: "mechanical-ir", implementationOrder: 2,
+    family: "multi-result",
+    origin: "mechanical-ir",
+    implementationOrder: 2,
     description: "Fixed-arity tuples containing only scalar, enum, and nullable scalar slots.",
-    requirements: ["exact-result-count", "preserve-interior-nil", "positional-codecs"]
+    requirements: ["exact-result-count", "preserve-interior-nil", "positional-codecs"],
   },
   "fixed-value-tuple": {
-    family: "multi-result", origin: "mechanical-ir", implementationOrder: 2,
+    family: "multi-result",
+    origin: "mechanical-ir",
+    implementationOrder: 2,
     description: "Fixed-arity tuples containing copied Defold values such as vectors and quaternions.",
-    requirements: ["exact-result-count", "preserve-interior-nil", "copy-defold-values"]
+    requirements: ["exact-result-count", "preserve-interior-nil", "copy-defold-values"],
   },
   "typed-sequence": {
-    family: "lua-table", origin: "mechanical-shape-explicit-policy", implementationOrder: 3,
+    family: "lua-table",
+    origin: "mechanical-shape-explicit-policy",
+    implementationOrder: 3,
     description: "Arrays or records containing arrays with mechanically known element codecs but no IR size bound.",
-    requirements: ["explicit-maximum-length", "dense-array-policy", "element-codec", "copy-results-before-lua-pop"]
+    requirements: ["explicit-maximum-length", "dense-array-policy", "element-codec", "copy-results-before-lua-pop"],
   },
   "typed-map": {
-    family: "lua-table", origin: "mechanical-shape-explicit-policy", implementationOrder: 4,
+    family: "lua-table",
+    origin: "mechanical-shape-explicit-policy",
+    implementationOrder: 4,
     description: "Maps with mechanically known key/value codecs but no IR entry bound or coercion policy.",
-    requirements: ["explicit-maximum-entries", "own-keys-only", "key-coercion-collision-policy", "value-codec"]
+    requirements: ["explicit-maximum-entries", "own-keys-only", "key-coercion-collision-policy", "value-codec"],
   },
   "table-tuple-schema": {
-    family: "multi-result", origin: "mechanical-shape-explicit-policy", implementationOrder: 5,
+    family: "multi-result",
+    origin: "mechanical-shape-explicit-policy",
+    implementationOrder: 5,
     description: "Fixed tuples with at least one table input or result that requires a bounded table schema.",
-    requirements: ["exact-result-count", "explicit-table-schema", "bounded-collections", "ownership-policy"]
+    requirements: ["exact-result-count", "explicit-table-schema", "bounded-collections", "ownership-policy"],
   },
   "tagged-table-union": {
-    family: "lua-table", origin: "mechanical-shape-explicit-policy", implementationOrder: 5,
+    family: "lua-table",
+    origin: "mechanical-shape-explicit-policy",
+    implementationOrder: 5,
     description: "A table participates in a non-null union and requires an explicit branch discriminator.",
-    requirements: ["explicit-branch-selection", "branch-specific-codecs", "reject-ambiguous-values"]
+    requirements: ["explicit-branch-selection", "branch-specific-codecs", "reject-ambiguous-values"],
   },
   "opaque-record": {
-    family: "lua-table", origin: "mechanical-shape-explicit-policy", implementationOrder: 5,
+    family: "lua-table",
+    origin: "mechanical-shape-explicit-policy",
+    implementationOrder: 5,
     description: "A record contains an opaque or unresolved nested value such as a render constant buffer.",
-    requirements: ["explicit-nested-schema", "context-policy", "lifetime-policy"]
+    requirements: ["explicit-nested-schema", "context-policy", "lifetime-policy"],
   },
   "semantic-flat-record": {
-    family: "lua-table", origin: "reviewed-override", implementationOrder: 5,
-    description: "A structurally flat record whose discriminator, binary data, or ownership semantics are not in the IR shape.",
-    requirements: ["reviewed-semantic-schema", "source-anchored-probe", "ownership-or-discriminator-policy"]
+    family: "lua-table",
+    origin: "reviewed-override",
+    implementationOrder: 5,
+    description:
+      "A structurally flat record whose discriminator, binary data, or ownership semantics are not in the IR shape.",
+    requirements: ["reviewed-semantic-schema", "source-anchored-probe", "ownership-or-discriminator-policy"],
   },
   "owned-handle-tuple": {
-    family: "multi-result", origin: "reviewed-override", implementationOrder: 5,
+    family: "multi-result",
+    origin: "reviewed-override",
+    implementationOrder: 5,
     description: "A fixed tuple returning owned Lua userdata whose close and registry lifetime must be explicit.",
-    requirements: ["exact-result-count", "generational-registry-handle", "explicit-close-policy", "queued-finalizer-release"]
+    requirements: [
+      "exact-result-count",
+      "generational-registry-handle",
+      "explicit-close-policy",
+      "queued-finalizer-release",
+    ],
   },
   "binary-string-tuple": {
-    family: "multi-result", origin: "reviewed-override", implementationOrder: 5,
+    family: "multi-result",
+    origin: "reviewed-override",
+    implementationOrder: 5,
     description: "A fixed tuple containing a Lua byte string that cannot use a generic UTF-16 JavaScript string codec.",
-    requirements: ["exact-result-count", "binary-byte-codec", "copy-before-lua-pop"]
+    requirements: ["exact-result-count", "binary-byte-codec", "copy-before-lua-pop"],
   },
   "dynamic-recursive": {
-    family: "lua-table", origin: "mechanical-shape-explicit-policy", implementationOrder: 6,
+    family: "lua-table",
+    origin: "mechanical-shape-explicit-policy",
+    implementationOrder: 6,
     description: "Recursive or any-valued tables requiring cycle, depth, size, and supported-value policies.",
-    requirements: ["explicit-maximum-depth", "explicit-maximum-entries", "cycle-rejection", "supported-value-union"]
-  }
+    requirements: ["explicit-maximum-depth", "explicit-maximum-entries", "cycle-rejection", "supported-value-union"],
+  },
 };
 
 function assert(condition, message) {
@@ -124,7 +164,7 @@ function splitTopLevel(source, delimiter = "|") {
       if (character === quote && source[index - 1] !== "\\") quote = "";
       continue;
     }
-    if (character === "\"" || character === "'") quote = character;
+    if (character === '"' || character === "'") quote = character;
     else if ("<{[(".includes(character)) ++depth;
     else if (">}])".includes(character)) --depth;
     else if (character === delimiter && depth === 0) {
@@ -194,7 +234,7 @@ function analyzeType(rawType, types, depth = 0, seen = new Set()) {
 function signature(fn) {
   return {
     parameters: fn.parameters.map(({ rawType }) => rawType),
-    returns: [...fn.returns]
+    returns: [...fn.returns],
   };
 }
 
@@ -204,8 +244,9 @@ function sameJson(left, right) {
 
 function classifyLuaTable(pattern, types) {
   const features = new Set();
-  const tableCodecs = [...pattern.parameterCodecs, ...pattern.returnCodecs]
-    .filter(({ codecs }) => codecs.includes("table"));
+  const tableCodecs = [...pattern.parameterCodecs, ...pattern.returnCodecs].filter(({ codecs }) =>
+    codecs.includes("table"),
+  );
   assert(tableCodecs.length > 0, `${pattern.id}: lua-table route has no table codec`);
   for (const codec of tableCodecs) addFeatures(features, analyzeType(codec.rawType, types));
   if (features.has("dynamic")) return "dynamic-recursive";
@@ -238,7 +279,10 @@ function validateOverrides(document, functions, inScope) {
     assert(declaredDerivation(), message);
     recordAudit({
       input: "packages/bindings/overrides/script-table-tuple-schema-overrides.json",
-      id, status: VOID, reason, detail: message
+      id,
+      status: VOID,
+      reason,
+      detail: message,
     });
     return true;
   };
@@ -253,10 +297,14 @@ function validateOverrides(document, functions, inScope) {
       withdraw(override.id, "absent-route", `Override route is absent from the pinned IR: ${override.id}`);
       continue;
     }
-    assert(bucketDefinitions[override.bucket]?.origin === "reviewed-override",
-      `${override.id}: ${override.bucket} is not an override bucket`);
-    assert(bucketDefinitions[override.bucket].family === inScope.get(override.id),
-      `${override.id}: override bucket belongs to the wrong lowering family`);
+    assert(
+      bucketDefinitions[override.bucket]?.origin === "reviewed-override",
+      `${override.id}: ${override.bucket} is not an override bucket`,
+    );
+    assert(
+      bucketDefinitions[override.bucket].family === inScope.get(override.id),
+      `${override.id}: override bucket belongs to the wrong lowering family`,
+    );
     if (!sameJson(signature(fn), { parameters: override.parameters, returns: override.returns })) {
       withdraw(override.id, "stale-signature", `${override.id}: reviewed signature drifted`);
       continue;
@@ -264,14 +312,16 @@ function validateOverrides(document, functions, inScope) {
     const documentation = [
       fn.description,
       ...fn.parameters.map(({ description }) => description),
-      ...fn.returnDescriptions
+      ...fn.returnDescriptions,
     ].join("\n");
     if (!(typeof override.descriptionAnchor === "string" && documentation.includes(override.descriptionAnchor))) {
       withdraw(override.id, "stale-description-anchor", `${override.id}: reviewed description anchor drifted`);
       continue;
     }
-    assert(typeof override.reasonCode === "string" && override.reasonCode.length > 0,
-      `${override.id}: reasonCode is required`);
+    assert(
+      typeof override.reasonCode === "string" && override.reasonCode.length > 0,
+      `${override.id}: reasonCode is required`,
+    );
     result.set(override.id, override);
   }
   return result;
@@ -287,14 +337,13 @@ export function generateScriptTableTupleSchemas(texts) {
     inputs: [
       { path: "packages/bindings/generated/defold-script-api-ir.json", revision: ir.defoldRevision },
       { path: "packages/bindings/generated/defold-script-binding-patterns.json", revision: patterns.defoldRevision },
-      { path: "packages/bindings/generated/defold-script-api-accounting.json", revision: accounting.defoldRevision }
-    ]
+      { path: "packages/bindings/generated/defold-script-api-accounting.json", revision: accounting.defoldRevision },
+    ],
   });
   const functions = new Map(ir.functions.map((fn) => [fn.id, fn]));
   const patternById = new Map(patterns.bindings.map((row) => [row.id, row]));
   const types = new Map(ir.types.map((type) => [type.name, type]));
-  assert(new Set(accounting.rows.map(({ id }) => id)).size === accounting.rows.length,
-    "Duplicate accounting route");
+  assert(new Set(accounting.rows.map(({ id }) => id)).size === accounting.rows.length, "Duplicate accounting route");
   const inScope = new Map();
   for (const accounted of accounting.rows) {
     const pattern = patternById.get(accounted.id);
@@ -315,14 +364,15 @@ export function generateScriptTableTupleSchemas(texts) {
     assert(fn && pattern, `${id}: route is missing from IR or binding-pattern inputs`);
     assert(pattern.loweringFamily === family, `${id}: accounting and pattern lowering families differ`);
     const override = overrides.get(id);
-    const bucket = override?.bucket ?? (family === "lua-table"
-      ? classifyLuaTable(pattern, types)
-      : classifyMultiResult(pattern));
+    const bucket =
+      override?.bucket ?? (family === "lua-table" ? classifyLuaTable(pattern, types) : classifyMultiResult(pattern));
     const definition = bucketDefinitions[bucket];
     assert(definition?.family === family, `${id}: invalid bucket ${bucket} for ${family}`);
     const stableId = stableBindingId(id);
-    assert(!stableIds.has(stableId),
-      `Stable ID collision ${hexBindingId(stableId)}: ${stableIds.get(stableId)} and ${id}`);
+    assert(
+      !stableIds.has(stableId),
+      `Stable ID collision ${hexBindingId(stableId)}: ${stableIds.get(stableId)} and ${id}`,
+    );
     stableIds.set(stableId, id);
     rows.push({
       id,
@@ -337,7 +387,7 @@ export function generateScriptTableTupleSchemas(texts) {
       parameters: pattern.parameterCodecs,
       returns: pattern.returnCodecs,
       traits: pattern.traits,
-      requirements: definition.requirements
+      requirements: definition.requirements,
     });
   }
   assert(rows.length === inScope.size, "Not every in-scope route was classified exactly once");
@@ -347,59 +397,82 @@ export function generateScriptTableTupleSchemas(texts) {
   expectReviewedCount({
     input: "packages/bindings/overrides/script-table-tuple-schema-overrides.json",
     label: "reviewed override consumption",
-    expected: overrideDocument.overrides.length, observed: overrides.size
+    expected: overrideDocument.overrides.length,
+    observed: overrides.size,
   });
-  const familyCounts = Object.fromEntries(familyOrder.map((family) => [family, rows.filter((row) => row.family === family).length]));
-  const bucketCounts = Object.fromEntries(bucketOrder.map((bucket) => [bucket, rows.filter((row) => row.bucket === bucket).length]));
+  const familyCounts = Object.fromEntries(
+    familyOrder.map((family) => [family, rows.filter((row) => row.family === family).length]),
+  );
+  const bucketCounts = Object.fromEntries(
+    bucketOrder.map((bucket) => [bucket, rows.filter((row) => row.bucket === bucket).length]),
+  );
   for (const family of [...familyOrder, "total"]) {
     expectReviewedCount({
       input: "packages/bindings/overrides/script-table-tuple-schema-overrides.json",
       label: `table/tuple route census:${family}`,
       expected: overrideDocument.expectedRouteCounts[family],
-      observed: family === "total" ? rows.length : familyCounts[family]
+      observed: family === "total" ? rows.length : familyCounts[family],
     });
   }
-  assert(Object.keys(overrideDocument.expectedBucketCounts).length === bucketOrder.length,
-    "Expected bucket ledger does not contain every bucket exactly once");
+  assert(
+    Object.keys(overrideDocument.expectedBucketCounts).length === bucketOrder.length,
+    "Expected bucket ledger does not contain every bucket exactly once",
+  );
   for (const bucket of bucketOrder) {
     expectReviewedCount({
       input: "packages/bindings/overrides/script-table-tuple-schema-overrides.json",
       label: `table/tuple bucket census:${bucket}`,
-      expected: overrideDocument.expectedBucketCounts[bucket], observed: bucketCounts[bucket]
+      expected: overrideDocument.expectedBucketCounts[bucket],
+      observed: bucketCounts[bucket],
     });
   }
-  const tupleArities = Object.fromEntries([2, 3, 4].map((arity) => [arity,
-    rows.filter((row) => row.family === "multi-result" && row.returns.length === arity).length]));
+  const tupleArities = Object.fromEntries(
+    [2, 3, 4].map((arity) => [
+      arity,
+      rows.filter((row) => row.family === "multi-result" && row.returns.length === arity).length,
+    ]),
+  );
   for (const [arity, expected] of Object.entries({ 2: 29, 3: 5, 4: 3 })) {
     expectReviewedCount({
       input: "packages/bindings/overrides/script-table-tuple-schema-overrides.json",
-      label: `fixed tuple arity census:${arity}`, expected, observed: tupleArities[arity]
+      label: `fixed tuple arity census:${arity}`,
+      expected,
+      observed: tupleArities[arity],
     });
   }
   const report = {
     schemaVersion: 1,
     defoldRevision: ir.defoldRevision,
-    scope: "All lua-table and multi-result routes in the exact script API pattern ledger, including generated fixed tuples",
-    evidencePolicy: "Planning/schema classification only. This artifact does not claim compilation, linkage, packaged-engine execution, or runtime behavior.",
+    scope:
+      "All lua-table and multi-result routes in the exact script API pattern ledger, including generated fixed tuples",
+    evidencePolicy:
+      "Planning/schema classification only. This artifact does not claim compilation, linkage, packaged-engine execution, or runtime behavior.",
     inputSha256: sha256([texts.ir, texts.patterns, texts.accounting, texts.overrides].join("\0")),
     routeCount: rows.length,
     familyCounts,
     bucketCounts,
     mechanicalIrRouteCount: rows.filter(({ classificationOrigin }) => classificationOrigin === "mechanical-ir").length,
-    explicitPolicyRouteCount: rows.filter(({ classificationOrigin }) => classificationOrigin !== "mechanical-ir").length,
+    explicitPolicyRouteCount: rows.filter(({ classificationOrigin }) => classificationOrigin !== "mechanical-ir")
+      .length,
     reviewedOverrideCount: overrides.size,
     tupleArities,
     buckets: bucketOrder.map((name) => ({ name, count: bucketCounts[name], ...bucketDefinitions[name] })),
-    rows
+    rows,
   };
   return report;
 }
 
 function markdown(report) {
-  const rows = report.buckets.map((bucket) =>
-    `| \`${bucket.name}\` | ${bucket.family} | ${bucket.count} | ${bucket.origin} | ${bucket.implementationOrder} | ${bucket.description} |`).join("\n");
-  const overrides = report.rows.filter(({ classificationOrigin }) => classificationOrigin === "reviewed-override")
-    .map((row) => `| \`${row.id}\` | \`${row.bucket}\` | \`${row.reasonCode}\` |`).join("\n");
+  const rows = report.buckets
+    .map(
+      (bucket) =>
+        `| \`${bucket.name}\` | ${bucket.family} | ${bucket.count} | ${bucket.origin} | ${bucket.implementationOrder} | ${bucket.description} |`,
+    )
+    .join("\n");
+  const overrides = report.rows
+    .filter(({ classificationOrigin }) => classificationOrigin === "reviewed-override")
+    .map((row) => `| \`${row.id}\` | \`${row.bucket}\` | \`${row.reasonCode}\` |`)
+    .join("\n");
   return `---
 type: Research
 title: Generated script table and tuple schema classification
@@ -443,21 +516,23 @@ async function main(argv = process.argv.slice(2)) {
   const unknown = argv.filter((argument) => argument !== "--check");
   if (unknown.length) throw new Error(`Unknown argument: ${unknown[0]}`);
   const check = argv.includes("--check");
-  const texts = Object.fromEntries(await Promise.all(Object.entries(urls).map(async ([name, url]) =>
-    [name, await readFile(url, "utf8")]
-  )));
+  const texts = Object.fromEntries(
+    await Promise.all(Object.entries(urls).map(async ([name, url]) => [name, await readFile(url, "utf8")])),
+  );
   const report = generateScriptTableTupleSchemas(texts);
   const outputs = [
     [reportUrl, `${JSON.stringify(report, null, 2)}\n`],
-    [documentationUrl, markdown(report)]
+    [documentationUrl, markdown(report)],
   ];
   for (const [url, expected] of outputs) {
     if (check) {
-      if (await readFile(url, "utf8") !== expected) throw new Error(`${url.pathname} is stale`);
+      if ((await readFile(url, "utf8")) !== expected) throw new Error(`${url.pathname} is stale`);
     } else await writeFile(url, expected);
   }
-  console.log(`${check ? "Verified" : "Generated"} ${report.routeCount} table/tuple schema classifications ` +
-    `(${report.familyCounts["lua-table"]} lua-table, ${report.familyCounts["multi-result"]} multi-result).`);
+  console.log(
+    `${check ? "Verified" : "Generated"} ${report.routeCount} table/tuple schema classifications ` +
+      `(${report.familyCounts["lua-table"]} lua-table, ${report.familyCounts["multi-result"]} multi-result).`,
+  );
 }
 
 if (process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url) await main();

@@ -26,10 +26,11 @@ export async function runScriptGeneration({ check = false, root = repositoryRoot
     // that join exactly once before its first consumer so a clean generation is
     // a single pass rather than "generate, discover staleness, generate again".
     if (!loweringPlanChecked && step.script === "scripts/generate-typed-native-bridge.mjs") {
-      const planResult = await execFileAsync(process.execPath, [
-        "scripts/ensure-binding-lowering-plan.mjs",
-        ...(check ? ["--check"] : []),
-      ], { cwd: root, maxBuffer: 16 * 1024 * 1024 });
+      const planResult = await execFileAsync(
+        process.execPath,
+        ["scripts/ensure-binding-lowering-plan.mjs", ...(check ? ["--check"] : [])],
+        { cwd: root, maxBuffer: 16 * 1024 * 1024 },
+      );
       results.push({ runtime: "node", script: "scripts/ensure-binding-lowering-plan.mjs", ...planResult });
       loweringPlanChecked = true;
     }
@@ -37,7 +38,7 @@ export async function runScriptGeneration({ check = false, root = repositoryRoot
     const args = [step.script, ...(check ? ["--check"] : [])];
     const result = await execFileAsync(command, args, {
       cwd: root,
-      maxBuffer: 16 * 1024 * 1024
+      maxBuffer: 16 * 1024 * 1024,
     });
     results.push({ ...step, stdout: result.stdout, stderr: result.stderr });
   }
@@ -51,7 +52,9 @@ async function main() {
     if (result.stdout) process.stdout.write(result.stdout);
     if (result.stderr) process.stderr.write(result.stderr);
   }
-  console.log(`${options.check ? "Verified" : "Generated"} the complete Defold script runtime pipeline (${results.length} deterministic steps).`);
+  console.log(
+    `${options.check ? "Verified" : "Generated"} the complete Defold script runtime pipeline (${results.length} deterministic steps).`,
+  );
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

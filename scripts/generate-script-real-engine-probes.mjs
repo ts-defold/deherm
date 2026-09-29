@@ -51,7 +51,11 @@ function validateExpectation(probe, binding) {
     if (result.codec !== "Integer" && result.codec !== "Number") {
       throw new Error(`${probe.key}: integer-range requires a numeric result`);
     }
-    if (!Number.isSafeInteger(expectation.minimum) || !Number.isSafeInteger(expectation.maximum) || expectation.minimum > expectation.maximum) {
+    if (
+      !Number.isSafeInteger(expectation.minimum) ||
+      !Number.isSafeInteger(expectation.maximum) ||
+      expectation.minimum > expectation.maximum
+    ) {
       throw new Error(`${probe.key}: invalid integer range`);
     }
     return;
@@ -77,7 +81,8 @@ function expectationExpression(probe, resultName) {
     return `typeof ${resultName} === "number" && Number.isInteger(${resultName}) && ${resultName} >= ${expectation.minimum} && ${resultName} <= ${expectation.maximum}`;
   }
   if (expectation.kind === "non-empty-string") return `typeof ${resultName} === "string" && ${resultName}.length > 0`;
-  if (expectation.kind === "string-suffix") return `typeof ${resultName} === "string" && ${resultName}.endsWith(${literal(expectation.suffix)})`;
+  if (expectation.kind === "string-suffix")
+    return `typeof ${resultName} === "string" && ${resultName}.endsWith(${literal(expectation.suffix)})`;
   throw new Error(`${probe.key}: unsupported expectation ${expectation.kind}`);
 }
 
@@ -96,7 +101,8 @@ export function buildOutputs(sourceText, descriptorsText, irText) {
   const descriptors = JSON.parse(descriptorsText);
   const ir = JSON.parse(irText);
   if (source.schemaVersion !== 1) throw new Error(`Unsupported probe schema ${source.schemaVersion}`);
-  if (!Array.isArray(source.probes) || source.probes.length === 0) throw new Error("At least one real-engine probe is required");
+  if (!Array.isArray(source.probes) || source.probes.length === 0)
+    throw new Error("At least one real-engine probe is required");
   const descriptorById = new Map(descriptors.bindings.map((binding) => [binding.id, binding]));
   const functionById = new Map(ir.functions.map((fn) => [fn.id, fn]));
   const keys = new Set();
@@ -117,15 +123,21 @@ export function buildOutputs(sourceText, descriptorsText, irText) {
   // is withdrawn for this revision and reported as queued review work, and at
   // the reviewed revision every one of these stays fatal.
   const probes = source.probes.flatMap((probe, index) => {
-    if (typeof probe.key !== "string" || !probe.key || keys.has(probe.key)) throw new Error(`Probe key must be unique: ${probe.key}`);
+    if (typeof probe.key !== "string" || !probe.key || keys.has(probe.key))
+      throw new Error(`Probe key must be unique: ${probe.key}`);
     keys.add(probe.key);
     const binding = descriptorById.get(probe.id);
     const fn = functionById.get(probe.id);
     try {
       if (!binding || !fn) throw new Error(`${probe.key}: ${probe.id} is not a generated scalar binding`);
       if (!Array.isArray(probe.arguments)) throw new Error(`${probe.key}: arguments must be an array`);
-      if (probe.arguments.length < binding.requiredArgumentCount || probe.arguments.length > binding.maximumArgumentCount) {
-        throw new Error(`${probe.key}: ${probe.arguments.length} arguments violate generated range ${binding.requiredArgumentCount}..${binding.maximumArgumentCount}`);
+      if (
+        probe.arguments.length < binding.requiredArgumentCount ||
+        probe.arguments.length > binding.maximumArgumentCount
+      ) {
+        throw new Error(
+          `${probe.key}: ${probe.arguments.length} arguments violate generated range ${binding.requiredArgumentCount}..${binding.maximumArgumentCount}`,
+        );
       }
       for (let argumentIndex = 0; argumentIndex < probe.arguments.length; ++argumentIndex) {
         const codec = binding.parameters[argumentIndex].codec;
@@ -138,40 +150,50 @@ export function buildOutputs(sourceText, descriptorsText, irText) {
       if (!declaredDerivation()) throw error;
       recordAudit({
         input: "packages/bindings/probes/defold-script-real-engine-probes.json",
-        id: probe.key, status: VOID, reason: "descriptor-mismatch", route: probe.id, detail: error.message
+        id: probe.key,
+        status: VOID,
+        reason: "descriptor-mismatch",
+        route: probe.id,
+        detail: error.message,
       });
       return [];
     }
     const markerPrefix = `INFO:DEFOLD_HERMES: script-api:${probe.key}:`;
     const exactValue = exactMarkerValue(probe.expectation);
-    return [{
-      index,
-      key: probe.key,
-      id: probe.id,
-      stableId: binding.stableId,
-      rawName: binding.rawName,
-      modulePath: fn.modulePath,
-      jsName: fn.jsName,
-      arguments: probe.arguments,
-      argumentCodecs: binding.parameters.slice(0, probe.arguments.length).map(({ codec }) => codec),
-      requiredArgumentCount: binding.requiredArgumentCount,
-      maximumArgumentCount: binding.maximumArgumentCount,
-      result: binding.result,
-      expectation: probe.expectation,
-      expectedMarkerPrefix: markerPrefix,
-      ...(exactValue === undefined ? {} : { expectedMarker: `${markerPrefix}${exactValue}` })
-    }];
+    return [
+      {
+        index,
+        key: probe.key,
+        id: probe.id,
+        stableId: binding.stableId,
+        rawName: binding.rawName,
+        modulePath: fn.modulePath,
+        jsName: fn.jsName,
+        arguments: probe.arguments,
+        argumentCodecs: binding.parameters.slice(0, probe.arguments.length).map(({ codec }) => codec),
+        requiredArgumentCount: binding.requiredArgumentCount,
+        maximumArgumentCount: binding.maximumArgumentCount,
+        result: binding.result,
+        expectation: probe.expectation,
+        expectedMarkerPrefix: markerPrefix,
+        ...(exactValue === undefined ? {} : { expectedMarker: `${markerPrefix}${exactValue}` }),
+      },
+    ];
   });
 
   // Runtime evidence identifies the executable probe plan, not provenance and
   // reporting metadata in its upstream descriptors. Evidence-only changes to a
   // projection must not invalidate a byte-for-byte identical set of calls.
   const semanticProbes = probes.map(({ index: _index, ...probe }) => probe);
-  const inputSha256 = createHash("sha256").update(JSON.stringify({
-    schemaVersion: 1,
-    target: source.target,
-    probes: semanticProbes,
-  })).digest("hex");
+  const inputSha256 = createHash("sha256")
+    .update(
+      JSON.stringify({
+        schemaVersion: 1,
+        target: source.target,
+        probes: semanticProbes,
+      }),
+    )
+    .digest("hex");
 
   const roots = [...new Set(probes.map((probe) => probe.modulePath[0]))].sort();
   const lines = [
@@ -181,14 +203,16 @@ export function buildOutputs(sourceText, descriptorsText, irText) {
     "export type ScriptRealEngineProbeLog = (message: string) => void;",
     "",
     "export function runScriptRealEngineProbes(log: ScriptRealEngineProbeLog): void {",
-    `  log(${literal(`script-api-probes:${inputSha256}`)});`
+    `  log(${literal(`script-api-probes:${inputSha256}`)});`,
   ];
   for (const probe of probes) {
     const resultName = portableIdentifier(probe.key, probe.index);
     const callable = [...probe.modulePath, probe.jsName].join(".");
     lines.push(`  const ${resultName} = ${callable}(${probe.arguments.map(literal).join(", ")});`);
     lines.push(`  if (!(${expectationExpression(probe, resultName)})) {`);
-    lines.push(`    throw new Error(${literal(`${probe.id} probe ${probe.key} failed; received `)} + String(${resultName}));`);
+    lines.push(
+      `    throw new Error(${literal(`${probe.id} probe ${probe.key} failed; received `)} + String(${resultName}));`,
+    );
     lines.push("  }");
     lines.push(`  log(${literal(`script-api:${probe.key}:`)} + String(${resultName}));`);
   }
@@ -205,13 +229,15 @@ export function buildOutputs(sourceText, descriptorsText, irText) {
     uniqueBindingCount: new Set(probes.map(({ id }) => id)).size,
     argumentCodecs: [...new Set(probes.flatMap(({ argumentCodecs }) => argumentCodecs))].sort(),
     resultCodecs: [...new Set(probes.map(({ result }) => result.codec))].sort(),
-    nullableResultProbeCount: probes.filter(({ expectation }) => expectation.kind === "equal" && expectation.value === null).length,
+    nullableResultProbeCount: probes.filter(
+      ({ expectation }) => expectation.kind === "equal" && expectation.value === null,
+    ).length,
     optionalOmissionProbeCount: probes.filter((probe) => probe.arguments.length < probe.maximumArgumentCount).length,
-    probes: semanticProbes
+    probes: semanticProbes,
   };
   return {
     report: `${JSON.stringify(report, null, 2)}\n`,
-    typescript: `${lines.join("\n")}\n`
+    typescript: `${lines.join("\n")}\n`,
   };
 }
 
@@ -222,10 +248,13 @@ async function main(argv = process.argv.slice(2)) {
   const [sourceText, descriptorsText, irText] = await Promise.all([
     readFile(sourceUrl, "utf8"),
     readFile(descriptorsUrl, "utf8"),
-    readFile(irUrl, "utf8")
+    readFile(irUrl, "utf8"),
   ]);
   const outputs = buildOutputs(sourceText, descriptorsText, irText);
-  const targets = [[reportUrl, outputs.report], [typescriptUrl, outputs.typescript]];
+  const targets = [
+    [reportUrl, outputs.report],
+    [typescriptUrl, outputs.typescript],
+  ];
   if (check) {
     for (const [url, expected] of targets) {
       const actual = await readFile(url, "utf8");
@@ -235,7 +264,9 @@ async function main(argv = process.argv.slice(2)) {
     await mkdir(new URL("./", typescriptUrl), { recursive: true });
     await Promise.all(targets.map(([url, contents]) => writeFile(url, contents)));
   }
-  console.log(`${check ? "Verified" : "Generated"} ${JSON.parse(outputs.report).probeCount} descriptor-driven real-engine probes.`);
+  console.log(
+    `${check ? "Verified" : "Generated"} ${JSON.parse(outputs.report).probeCount} descriptor-driven real-engine probes.`,
+  );
 }
 
 if (process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url) await main();

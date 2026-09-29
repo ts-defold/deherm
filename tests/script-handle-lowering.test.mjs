@@ -9,7 +9,7 @@ import {
   inputPaths,
   loadInputs,
   outputPaths,
-  renderArtifacts
+  renderArtifacts,
 } from "../scripts/generate-script-handle-lowering.mjs";
 
 const root = new URL("../", import.meta.url);
@@ -50,34 +50,40 @@ test("selects all 407 borrowed-handle routes from shape and effect predicates", 
       "legacy-no-bullet": 182,
       "no-physics": 70,
       "v3-bullet": 380,
-      "v3-no-bullet": 249
-    }
+      "v3-no-bullet": 249,
+    },
   });
   assert.equal(new Set(generated.routes.map(({ id }) => id)).size, 407);
   assert.deepEqual(generated.operationClassCounts, {
     "checked-child-engine-object-invalidate": 2,
     "checked-handle-input-terminal": 367,
     "checked-handle-return-capture": 33,
-    "checked-self-engine-object-invalidate": 5
+    "checked-self-engine-object-invalidate": 5,
   });
   assert.deepEqual(generated.contextCounts, {
     "explicit-physics-handle": 332,
     "game-object-instance": 5,
     "gui-scene": 55,
     "render-script-instance-and-graphics-context": 7,
-    "runtime-global": 8
+    "runtime-global": 8,
   });
   assert.equal(inputs.policy.includes("script:"), false, "policy must not contain a route allowlist");
 });
 
 test("keeps Lua registration profiles distinct from adapter-executable profiles", () => {
-  assert.equal(generated.routes.some(({ id }) => id.startsWith("script:constant.")), false,
-    "borrowed-handle lowering must remain a function-only surface");
+  assert.equal(
+    generated.routes.some(({ id }) => id.startsWith("script:constant.")),
+    false,
+    "borrowed-handle lowering must remain a function-only surface",
+  );
   for (const id of ["script:b2d.body.get_world", "script:b2d.get_world"]) {
     const route = generated.routes.find((candidate) => candidate.id === id);
     assert.ok(route, `${id} route is generated`);
     assert.deepEqual(route.profiles.registration, [
-      "default-legacy-bullet", "legacy-no-bullet", "v3-bullet", "v3-no-bullet"
+      "default-legacy-bullet",
+      "legacy-no-bullet",
+      "v3-bullet",
+      "v3-no-bullet",
     ]);
     assert.deepEqual(route.profiles.runtime, ["v3-bullet", "v3-no-bullet"]);
   }
@@ -85,7 +91,7 @@ test("keeps Lua registration profiles distinct from adapter-executable profiles"
   assert.deepEqual(
     [defaultProfile.sourceRouteCount, defaultProfile.adapterExecutableRouteCount],
     [343, 313],
-    "profile detection must use the registration surface while dispatch uses the adapter surface"
+    "profile detection must use the registration surface while dispatch uses the adapter surface",
   );
 });
 
@@ -93,11 +99,12 @@ test("preserves optional argument arity and nil codecs from projected signatures
   const projection = JSON.parse(inputs.projection);
   for (const route of generated.routes) {
     const parameters = projection.rows.find(({ id }) => id === route.id).signature.parameters;
-    const minimum = parameters.reduce((count, parameter, index) => parameter.optional ? count : index + 1, 0);
+    const minimum = parameters.reduce((count, parameter, index) => (parameter.optional ? count : index + 1), 0);
     assert.equal(route.requiredArgumentCount, minimum, route.id);
     assert.equal(route.argumentCount, parameters.length, route.id);
     for (const [index, parameter] of parameters.entries()) {
-      if (parameter.optional) assert.notEqual(generated.argumentCodecs[route.argumentOffset + index].mask & 1, 0, route.id);
+      if (parameter.optional)
+        assert.notEqual(generated.argumentCodecs[route.argumentOffset + index].mask & 1, 0, route.id);
     }
   }
   const enabled = generated.routes.find(({ id }) => id === "script:gui.is_enabled");
@@ -109,7 +116,10 @@ test("preserves optional argument arity and nil codecs from projected signatures
 test("legacy GUI handles bridge only to the matching semantic node codec", () => {
   const { header, source } = renderArtifacts(generated);
   assert.match(header, /LegacyHandleApi legacyHandles = \{\}/);
-  assert.match(source, /value\.handleKind == ScriptHandleKind::kGuiNode && codec\.semanticKind == SemanticHandleKind::kGuiNode && legacyHandles_\.pushGuiNode/);
+  assert.match(
+    source,
+    /value\.handleKind == ScriptHandleKind::kGuiNode && codec\.semanticKind == SemanticHandleKind::kGuiNode && legacyHandles_\.pushGuiNode/,
+  );
 });
 
 test("descriptor selection is independent of compile/link/runtime evidence state", () => {
@@ -119,11 +129,14 @@ test("descriptor selection is independent of compile/link/runtime evidence state
       for (const row of value.rows) {
         if (row.loweringFamily === "borrowed-handle") row.evidence.accountingCategory = "executable-stable-id";
       }
-    })
+    }),
   };
   const regenerated = generateScriptHandleLowering(promoted);
   assert.equal(regenerated.coverage.selectedRoutes, 407);
-  assert.deepEqual(regenerated.routes.map(({ id }) => id), generated.routes.map(({ id }) => id));
+  assert.deepEqual(
+    regenerated.routes.map(({ id }) => id),
+    generated.routes.map(({ id }) => id),
+  );
 });
 
 test("brands semantic handle kinds and separates adapter coverage from engine evidence", () => {
@@ -151,20 +164,23 @@ test("brands semantic handle kinds and separates adapter coverage from engine ev
     executableAdapterUnimplemented: 0,
     guiAttachmentUnavailable: 55,
     renderAttachmentUnavailable: 7,
-    profileSymbolUnavailable: 2
+    profileSymbolUnavailable: 2,
   });
 });
 
 test("derives exact fail-closed runtime profile masks and handshakes", () => {
   assert.equal(generated.runtimeProfiles.length, 6);
-  assert.deepEqual(generated.runtimeProfiles.map(({ id, adapterExecutableRouteCount }) => [id, adapterExecutableRouteCount]), [
-    ["bullet-only", 201],
-    ["default-legacy-bullet", 313],
-    ["legacy-no-bullet", 182],
-    ["no-physics", 70],
-    ["v3-bullet", 380],
-    ["v3-no-bullet", 249]
-  ]);
+  assert.deepEqual(
+    generated.runtimeProfiles.map(({ id, adapterExecutableRouteCount }) => [id, adapterExecutableRouteCount]),
+    [
+      ["bullet-only", 201],
+      ["default-legacy-bullet", 313],
+      ["legacy-no-bullet", 182],
+      ["no-physics", 70],
+      ["v3-bullet", 380],
+      ["v3-no-bullet", 249],
+    ],
+  );
   for (const profile of generated.runtimeProfiles) {
     assert.equal(profile.mask, 1 << profile.index);
     assert.match(profile.routeSetSha256, /^[0-9a-f]{64}$/);
@@ -173,21 +189,31 @@ test("derives exact fail-closed runtime profile masks and handshakes", () => {
     assert.equal(profile.schema, "deherm.script-route-capabilities/v1");
     assert.match(profile.adapterSurfaceSha256, /^[0-9a-f]{64}$/);
     assert.match(profile.registrationSurfaceSha256, /^[0-9a-f]{64}$/);
-    assert.equal(generated.routes.filter((route) =>
-      route.generation.router === "emitted" && (route.profiles.runtimeMask & profile.mask) !== 0).length,
-    profile.adapterExecutableRouteCount);
+    assert.equal(
+      generated.routes.filter(
+        (route) => route.generation.router === "emitted" && (route.profiles.runtimeMask & profile.mask) !== 0,
+      ).length,
+      profile.adapterExecutableRouteCount,
+    );
   }
   assert.equal(new Set(generated.runtimeProfiles.map(({ adapterSurfaceSha256 }) => adapterSurfaceSha256)).size, 6);
-  assert.equal(new Set(generated.runtimeProfiles.map(({ registrationSurfaceSha256 }) => registrationSurfaceSha256)).size, 6);
+  assert.equal(
+    new Set(generated.runtimeProfiles.map(({ registrationSurfaceSha256 }) => registrationSurfaceSha256)).size,
+    6,
+  );
   const executableSymbols = generated.routes
     .filter(({ generation }) => generation.router === "emitted")
     .map(({ modulePath, member }) => `${modulePath.join(".")}.${member}`);
   assert.equal(new Set(executableSymbols).size, executableSymbols.length);
   for (const route of generated.routes) {
-    const expectedRegistrationMask = generated.runtimeProfiles.reduce((mask, profile) =>
-      mask | (route.profiles.registration.includes(profile.id) ? profile.mask : 0), 0);
-    const expectedMask = generated.runtimeProfiles.reduce((mask, profile) =>
-      mask | (route.profiles.runtime.includes(profile.id) ? profile.mask : 0), 0);
+    const expectedRegistrationMask = generated.runtimeProfiles.reduce(
+      (mask, profile) => mask | (route.profiles.registration.includes(profile.id) ? profile.mask : 0),
+      0,
+    );
+    const expectedMask = generated.runtimeProfiles.reduce(
+      (mask, profile) => mask | (route.profiles.runtime.includes(profile.id) ? profile.mask : 0),
+      0,
+    );
     assert.equal(route.profiles.registrationMask, expectedRegistrationMask);
     assert.equal(route.profiles.runtimeMask, expectedMask);
   }
@@ -196,10 +222,16 @@ test("derives exact fail-closed runtime profile masks and handshakes", () => {
     const profile = generated.runtimeProfiles.find((candidate) => candidate.id === "default-legacy-bullet");
     assert.ok(route, `${id} route is generated`);
     assert.ok(profile, "default-legacy-bullet profile is generated");
-    assert.notEqual(route.profiles.registrationMask & profile.mask, 0,
-      `${id} is present in the source registration surface`);
-    assert.equal(route.profiles.runtimeMask & profile.mask, 0,
-      `${id} remains unavailable to the adapter because its lightuserdata world handle is not capturable`);
+    assert.notEqual(
+      route.profiles.registrationMask & profile.mask,
+      0,
+      `${id} is present in the source registration surface`,
+    );
+    assert.equal(
+      route.profiles.runtimeMask & profile.mask,
+      0,
+      `${id} remains unavailable to the adapter because its lightuserdata world handle is not capturable`,
+    );
   }
 });
 
@@ -207,24 +239,26 @@ test("collapses observationally equivalent revision profiles conservatively", ()
   const profiles = [
     { id: "alpha", index: 0, mask: 1, adapterSurfaceSha256: "adapter-a", registrationSurfaceSha256: "same" },
     { id: "beta", index: 1, mask: 2, adapterSurfaceSha256: "adapter-b", registrationSurfaceSha256: "same" },
-    { id: "stable", index: 2, mask: 4, adapterSurfaceSha256: "adapter-c", registrationSurfaceSha256: "other" }
+    { id: "stable", index: 2, mask: 4, adapterSurfaceSha256: "adapter-c", registrationSurfaceSha256: "other" },
   ];
   const kinds = [
     { id: "shared", capturableProfileMask: 7, capturableProfiles: ["alpha", "beta", "stable"] },
-    { id: "alpha-only", capturableProfileMask: 5, capturableProfiles: ["alpha", "stable"] }
+    { id: "alpha-only", capturableProfileMask: 5, capturableProfiles: ["alpha", "stable"] },
   ];
 
   const groups = assignRuntimeProfileEquivalence(profiles, kinds);
 
-  assert.deepEqual(groups, [{
-    registrationSurfaceSha256: "same",
-    canonicalProfileId: "alpha",
-    equivalentProfileIds: ["alpha", "beta"],
-    equivalentProfileMask: 3,
-    conservativelyUnavailableHandleKinds: ["alpha-only"],
-    proof: "identical-exact-function-presence-vector",
-    alert: "named-runtime-profiles-observationally-equivalent"
-  }]);
+  assert.deepEqual(groups, [
+    {
+      registrationSurfaceSha256: "same",
+      canonicalProfileId: "alpha",
+      equivalentProfileIds: ["alpha", "beta"],
+      equivalentProfileMask: 3,
+      conservativelyUnavailableHandleKinds: ["alpha-only"],
+      proof: "identical-exact-function-presence-vector",
+      alert: "named-runtime-profiles-observationally-equivalent",
+    },
+  ]);
   assert.equal(profiles[0].detectionCanonicalProfileId, "alpha");
   assert.equal(profiles[1].detectionCanonicalProfileId, "alpha");
   assert.equal(profiles[0].detectionCanonicalProfileIndex, 0);
@@ -235,24 +269,33 @@ test("collapses observationally equivalent revision profiles conservatively", ()
 });
 
 test("assigns honest per-target dispositions", () => {
-  assert.deepEqual(counts(generated.routes, ({ targets }) => targets.nativeDynamicHermes), {
-    "captured-lua-router-harness-proven-jsi-unverified": 343,
-    "profile-symbol-unavailable": 2,
-    "gui-script-attachment-unavailable": 55,
-    "render-script-attachment-unavailable": 7
-  });
-  assert.deepEqual(counts(generated.routes, ({ targets }) => targets.nativeStaticHermes), {
-    "static-ffi-unimplemented": 343,
-    "profile-symbol-unavailable": 2,
-    "gui-script-attachment-unavailable": 55,
-    "render-script-attachment-unavailable": 7
-  });
-  assert.deepEqual(counts(generated.routes, ({ targets }) => targets.html5BrowserHost), {
-    "browser-host-unimplemented": 343,
-    "profile-symbol-unavailable": 2,
-    "gui-script-attachment-unavailable": 55,
-    "render-script-attachment-unavailable": 7
-  });
+  assert.deepEqual(
+    counts(generated.routes, ({ targets }) => targets.nativeDynamicHermes),
+    {
+      "captured-lua-router-harness-proven-jsi-unverified": 343,
+      "profile-symbol-unavailable": 2,
+      "gui-script-attachment-unavailable": 55,
+      "render-script-attachment-unavailable": 7,
+    },
+  );
+  assert.deepEqual(
+    counts(generated.routes, ({ targets }) => targets.nativeStaticHermes),
+    {
+      "static-ffi-unimplemented": 343,
+      "profile-symbol-unavailable": 2,
+      "gui-script-attachment-unavailable": 55,
+      "render-script-attachment-unavailable": 7,
+    },
+  );
+  assert.deepEqual(
+    counts(generated.routes, ({ targets }) => targets.html5BrowserHost),
+    {
+      "browser-host-unimplemented": 343,
+      "profile-symbol-unavailable": 2,
+      "gui-script-attachment-unavailable": 55,
+      "render-script-attachment-unavailable": 7,
+    },
+  );
 });
 
 test("publishes source-suffix attachment providers without route wrappers", () => {
@@ -260,12 +303,16 @@ test("publishes source-suffix attachment providers without route wrappers", () =
     "*.ts": { proxyExtension: null, context: "runtime-global", state: "context-free" },
     "*.script.ts": { proxyExtension: ".script", context: "game-object-instance", state: "generated-proxy-provider" },
     "*.gui.ts": { proxyExtension: ".gui_script", context: "gui-scene", state: "provider-required-unimplemented" },
-    "*.render.ts": { proxyExtension: ".render_script", context: "render-script-instance-and-graphics-context", state: "provider-required-unimplemented" }
+    "*.render.ts": {
+      proxyExtension: ".render_script",
+      context: "render-script-instance-and-graphics-context",
+      state: "provider-required-unimplemented",
+    },
   });
   assert.deepEqual(generated.nativeAdapterHarnessContexts, {
     gameObject: "captured-and-selected",
     gui: "captured-and-selected-test-fixture-only",
-    render: "captured-and-selected-test-fixture-only"
+    render: "captured-and-selected-test-fixture-only",
   });
 });
 
@@ -280,13 +327,21 @@ test("publishes exact-vector profile detection without mutable project authority
     packagedDefoldEngine: "unverified",
     nativeDynamicHermesJsi: "unverified",
     nativeStaticHermes: "unverified",
-    html5BrowserHost: "unverified"
+    html5BrowserHost: "unverified",
   });
   const extension = await readFile(new URL("../defold/defold_hermes/src/extension.cpp", import.meta.url), "utf8");
   const project = await readFile(new URL("../defold/game.project", import.meta.url), "utf8");
   assert.match(extension, /detectRuntimeProfile\(/);
   assert.ok(extension.indexOf("EnsureScriptBridgeReady(state)") < extension.indexOf("gLuaBridge->captureInstance(1)"));
-  for (const key of ["profile_schema", "profile_id", "profile_defold_revision", "profile_capability_bits", "profile_route_count", "profile_route_set_sha256", "profile_catalog_sha256"]) {
+  for (const key of [
+    "profile_schema",
+    "profile_id",
+    "profile_defold_revision",
+    "profile_capability_bits",
+    "profile_route_count",
+    "profile_route_set_sha256",
+    "profile_catalog_sha256",
+  ]) {
     assert.equal(extension.includes(`defold_hermes.${key}`), false);
     assert.equal(project.includes(`${key} =`), false);
   }
@@ -296,7 +351,7 @@ test("generation is order-independent, provenance-pinned, and byte deterministic
   const reordered = {
     ...inputs,
     projection: replaceJson(inputs.projection, (value) => value.rows.reverse()),
-    classification: replaceJson(inputs.classification, (value) => value.rows.reverse())
+    classification: replaceJson(inputs.classification, (value) => value.rows.reverse()),
   };
   const reorderedGenerated = generateScriptHandleLowering(reordered);
   assert.deepEqual(reorderedGenerated.routes, generated.routes);
@@ -312,7 +367,7 @@ test("generation is order-independent, provenance-pinned, and byte deterministic
   }
   execFileSync(process.execPath, ["scripts/generate-script-handle-lowering.mjs", "--check"], {
     cwd: root,
-    stdio: "pipe"
+    stdio: "pipe",
   });
 });
 
@@ -326,13 +381,16 @@ test("protected Lua dispatch permits LuaJIT errors to reach lua_cpcall", () => {
 });
 
 test("regeneration is locale-independent and uses code-unit ordering", async () => {
-  const generatorSource = await readFile(new URL("../scripts/generate-script-handle-lowering.mjs", import.meta.url), "utf8");
+  const generatorSource = await readFile(
+    new URL("../scripts/generate-script-handle-lowering.mjs", import.meta.url),
+    "utf8",
+  );
   assert.doesNotMatch(generatorSource, /localeCompare/);
   for (const locale of ["C", "en_US.UTF-8", "tr_TR.UTF-8"]) {
     execFileSync(process.execPath, ["scripts/generate-script-handle-lowering.mjs", "--check"], {
       cwd: root,
       env: { ...process.env, LC_ALL: locale, LANG: locale },
-      stdio: "pipe"
+      stdio: "pipe",
     });
   }
 });
@@ -343,7 +401,7 @@ test("rejects shape, semantic-kind, availability, and pinned-revision drift", ()
     projection: replaceJson(inputs.projection, (value) => {
       const row = value.rows.find(({ id }) => id === generated.routes[0].id);
       row.signature.parameters[0].value = { kind: "sequence", element: row.signature.parameters[0].value };
-    })
+    }),
   };
   assert.throws(() => generateScriptHandleLowering(shapeDrift), /algebraic handle route census expected/);
 
@@ -351,22 +409,25 @@ test("rejects shape, semantic-kind, availability, and pinned-revision drift", ()
     ...inputs,
     classification: replaceJson(inputs.classification, (value) => {
       value.rows.find(({ id }) => id === generated.routes[0].id).inputHandleKinds = [];
-    })
+    }),
   };
   assert.throws(() => generateScriptHandleLowering(kindDrift), /semantic handle kinds drifted/);
 
   const invalidationDrift = {
     ...inputs,
     classification: replaceJson(inputs.classification, (value) => {
-      value.rows.find(({ operationClass }) => operationClass === "checked-self-engine-object-invalidate")
-        .invalidatedIdentity = null;
-    })
+      value.rows.find(
+        ({ operationClass }) => operationClass === "checked-self-engine-object-invalidate",
+      ).invalidatedIdentity = null;
+    }),
   };
   assert.throws(() => generateScriptHandleLowering(invalidationDrift), /invalidation semantics drifted/);
 
   const availabilityDrift = {
     ...inputs,
-    availability: replaceJson(inputs.availability, (value) => { value.catalogSha256 = "0".repeat(64); })
+    availability: replaceJson(inputs.availability, (value) => {
+      value.catalogSha256 = "0".repeat(64);
+    }),
   };
   assert.throws(() => generateScriptHandleLowering(availabilityDrift), /stale availability catalog/);
 
@@ -374,24 +435,36 @@ test("rejects shape, semantic-kind, availability, and pinned-revision drift", ()
     ...inputs,
     availability: replaceJson(inputs.availability, (value) => {
       value.profiles["default-legacy-bullet"].runtimeHandshake.routeSetSha256 = "0".repeat(64);
-    })
+    }),
   };
   assert.throws(() => generateScriptHandleLowering(handshakeDrift), /capability handshake/);
 
   const revisionDrift = {
     ...inputs,
-    classification: replaceJson(inputs.classification, (value) => { value.defoldRevision = "0".repeat(40); })
+    classification: replaceJson(inputs.classification, (value) => {
+      value.defoldRevision = "0".repeat(40);
+    }),
   };
   assert.throws(() => generateScriptHandleLowering(revisionDrift), /pinned Defold revision/);
 });
 
 test("generated C++ descriptors and generic router compile warning-clean", () => {
-  execFileSync(process.env.CXX || "clang++", [
-    "-std=c++17", "-Wall", "-Wextra", "-Werror", "-Wno-zero-length-array", "-pedantic", "-fsyntax-only",
-    "-Idefold/defold_hermes/include",
-    `-Iupstream/extender/server/app/sdk/${generated.defoldRevision}/defoldsdk/sdk/include`,
-    "-Iupstream/defold/engine/dlib/src",
-    "-Iupstream/defold/engine/lua/src",
-    outputPaths.source
-  ], { cwd: root, stdio: "pipe" });
+  execFileSync(
+    process.env.CXX || "clang++",
+    [
+      "-std=c++17",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-Wno-zero-length-array",
+      "-pedantic",
+      "-fsyntax-only",
+      "-Idefold/defold_hermes/include",
+      `-Iupstream/extender/server/app/sdk/${generated.defoldRevision}/defoldsdk/sdk/include`,
+      "-Iupstream/defold/engine/dlib/src",
+      "-Iupstream/defold/engine/lua/src",
+      outputPaths.source,
+    ],
+    { cwd: root, stdio: "pipe" },
+  );
 });

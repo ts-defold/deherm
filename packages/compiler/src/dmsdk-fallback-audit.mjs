@@ -55,7 +55,8 @@ function optimizationRecommendation(candidates, attempts, shape) {
     return {
       action: "retain-universal-preferred",
       requiredForAvailability: false,
-      reason: "a generated auxiliary/provider specialization exists, while the complete universal route is intentionally preferred",
+      reason:
+        "a generated auxiliary/provider specialization exists, while the complete universal route is intentionally preferred",
       availablePatterns: available.map(({ family, patternId, emitter }) => ({ family, patternId, emitter })),
     };
   }
@@ -107,7 +108,9 @@ function baseRecommendation(indexEntry, recipe) {
   return {
     action: "supply-usage-facts",
     state: materialization.state,
-    requirements: [...new Set(materialization.requirements ?? recipe.fallback.requirements ?? [])].sort(compareCodeUnits),
+    requirements: [...new Set(materialization.requirements ?? recipe.fallback.requirements ?? [])].sort(
+      compareCodeUnits,
+    ),
     diagnostic: materialization.diagnostic ?? null,
   };
 }
@@ -133,7 +136,10 @@ export function createDmSdkFallbackAudit({
   sourceHashes,
 }) {
   assert(typeof defoldRevision === "string" && defoldRevision.length > 0, "dmSDK fallback audit requires a revision");
-  assert(Array.isArray(recipes) && Array.isArray(shapes) && Array.isArray(patterns), "dmSDK fallback audit inputs are invalid");
+  assert(
+    Array.isArray(recipes) && Array.isArray(shapes) && Array.isArray(patterns),
+    "dmSDK fallback audit inputs are invalid",
+  );
   const shapeById = new Map(shapes.map((shape) => [shape.id, shape]));
   const projectionById = new Map(projectionRows.map((row) => [row.id, row]));
   assert(shapeById.size === shapes.length, "dmSDK fallback audit ABI shapes contain duplicate declaration ids");
@@ -155,9 +161,12 @@ export function createDmSdkFallbackAudit({
     };
     const decision = selectDmSdkPattern(facts, patterns);
     const candidates = candidateRows(decision, registry);
-    const attempts = (specializationAttempts.get(recipe.declarationId) ?? []).map(normalizeAttempt).sort(
-      (left, right) => compareCodeUnits(left.family, right.family) || compareCodeUnits(left.patternId ?? "", right.patternId ?? ""),
-    );
+    const attempts = (specializationAttempts.get(recipe.declarationId) ?? [])
+      .map(normalizeAttempt)
+      .sort(
+        (left, right) =>
+          compareCodeUnits(left.family, right.family) || compareCodeUnits(left.patternId ?? "", right.patternId ?? ""),
+      );
     const recommendation = optimizationRecommendation(candidates, attempts, shape.shape);
     const groupBody = {
       kind: shape.kind,
@@ -205,7 +214,9 @@ export function createDmSdkFallbackAudit({
       },
     };
   });
-  declarations.sort((left, right) => left.numericId - right.numericId || compareCodeUnits(left.declarationId, right.declarationId));
+  declarations.sort(
+    (left, right) => left.numericId - right.numericId || compareCodeUnits(left.declarationId, right.declarationId),
+  );
   const shapeGroups = [...groups.values()]
     .map((group) => ({
       ...group,
@@ -214,7 +225,10 @@ export function createDmSdkFallbackAudit({
     }))
     .sort((left, right) => compareCodeUnits(left.groupId, right.groupId));
   assert(declarations.length === fallbackRecipes.length, "dmSDK fallback audit omitted a universal fallback");
-  assert(declarations.every(({ groupId }) => groups.has(groupId)), "dmSDK fallback audit declaration has no shape group");
+  assert(
+    declarations.every(({ groupId }) => groups.has(groupId)),
+    "dmSDK fallback audit declaration has no shape group",
+  );
   const catalog = patterns.map(({ schemaVersion, id, family, emitter, priority, cost, fallback, when }) => ({
     schemaVersion,
     id,
@@ -243,11 +257,8 @@ export function createDmSdkFallbackAudit({
       existingAuxiliarySpecialization: declarations.filter(
         ({ optimization }) => optimization.action === "retain-universal-preferred",
       ).length,
-      semanticRecipeCandidates: declarations.filter(
-        ({ optimization }) =>
-          ["derive-source-semantic-facts-if-expressed", "resolve-specialization-blockers"].includes(
-            optimization.action,
-          ),
+      semanticRecipeCandidates: declarations.filter(({ optimization }) =>
+        ["derive-source-semantic-facts-if-expressed", "resolve-specialization-blockers"].includes(optimization.action),
       ).length,
       composableUniversalOnly: declarations.filter(
         ({ optimization }) => optimization.action === "extend-composable-specialization-if-profitable",

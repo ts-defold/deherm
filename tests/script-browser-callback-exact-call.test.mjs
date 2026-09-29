@@ -13,26 +13,48 @@ test("browser exact vectors close every emitted direct-memory and callback route
   const browserSummary = materialized.report.summary.browserExact;
   const callbackRouteCount = browserSummary.callbackRouteCount;
   assert.equal(materialized.vectors.length, browserSummary.routeCount);
-  assert.equal(materialized.vectors.filter(({ lane }) => lane === "browser-wasm-direct-memory").length,
-    browserSummary.routeCount - callbackRouteCount);
-  assert.equal(materialized.vectors.filter(({ lane }) => lane === "browser-wasm-callback-registry").length, callbackRouteCount);
-  assert.equal(materialized.vectors.reduce((count, vector) => count + vector.callbackSlots.length, 0), browserSummary.callbackCount);
-  assert.ok(materialized.vectors.every((vector) =>
-    Number.isInteger(vector.stableId) && vector.stableId > 0 &&
-    vector.contract &&
-    (vector.lane === "browser-wasm-direct-memory" || vector.lane === "browser-wasm-callback-registry")));
-  assert.ok(materialized.vectors.filter(({ lane }) => lane === "browser-wasm-callback-registry").every((vector) =>
-    vector.callbackSlots.length > 0 &&
-    vector.callbackInvocation.argumentValues.length === 2 &&
-    vector.callbackInvocation.resultValues.length === 2 &&
-    typeof vector.lifecycle.lifetime === "string" &&
-    typeof vector.lifecycle.owner === "string"));
+  assert.equal(
+    materialized.vectors.filter(({ lane }) => lane === "browser-wasm-direct-memory").length,
+    browserSummary.routeCount - callbackRouteCount,
+  );
+  assert.equal(
+    materialized.vectors.filter(({ lane }) => lane === "browser-wasm-callback-registry").length,
+    callbackRouteCount,
+  );
+  assert.equal(
+    materialized.vectors.reduce((count, vector) => count + vector.callbackSlots.length, 0),
+    browserSummary.callbackCount,
+  );
+  assert.ok(
+    materialized.vectors.every(
+      (vector) =>
+        Number.isInteger(vector.stableId) &&
+        vector.stableId > 0 &&
+        vector.contract &&
+        (vector.lane === "browser-wasm-direct-memory" || vector.lane === "browser-wasm-callback-registry"),
+    ),
+  );
+  assert.ok(
+    materialized.vectors
+      .filter(({ lane }) => lane === "browser-wasm-callback-registry")
+      .every(
+        (vector) =>
+          vector.callbackSlots.length > 0 &&
+          vector.callbackInvocation.argumentValues.length === 2 &&
+          vector.callbackInvocation.resultValues.length === 2 &&
+          typeof vector.lifecycle.lifetime === "string" &&
+          typeof vector.lifecycle.owner === "string",
+      ),
+  );
   assert.equal(new Set(materialized.vectors.map(({ stableId }) => stableId)).size, browserSummary.routeCount);
-  const constantRoutes = materialized.report.routes.filter(({ loweringFamily, applicability }) =>
-    loweringFamily === "script-constant" &&
-    materialized.report.applicabilityCatalog.lanes[applicability[materialized.report.applicabilityCatalog.targets.indexOf("browser-wasm")]].status === "exercise");
-  const constantVectors = materialized.vectors.filter(({ id }) =>
-    constantRoutes.some((route) => route.id === id));
+  const constantRoutes = materialized.report.routes.filter(
+    ({ loweringFamily, applicability }) =>
+      loweringFamily === "script-constant" &&
+      materialized.report.applicabilityCatalog.lanes[
+        applicability[materialized.report.applicabilityCatalog.targets.indexOf("browser-wasm")]
+      ].status === "exercise",
+  );
+  const constantVectors = materialized.vectors.filter(({ id }) => constantRoutes.some((route) => route.id === id));
   assert.equal(constantVectors.length, constantRoutes.length);
   const constant = constantVectors.find(({ id }) => id === "script:constant.physics.SHAPE_TYPE_MESH");
   assert.ok(constant, "generated browser exact vectors omit a constant route");
@@ -77,7 +99,10 @@ test("browser runtime acceptance waits for clean exit and checks failure before 
   const runner = await readFile("scripts/check-script-browser-callback-exact-call.mjs", "utf8");
   assert.match(runner, /Module\.onExit/);
   assert.match(runner, /DEHERM_SCRIPT_BROWSER_EXACT_EXIT status=0/);
-  const waitBody = runner.slice(runner.indexOf("await waitFor"), runner.indexOf("what: \"the real script callback Wasm marker\""));
+  const waitBody = runner.slice(
+    runner.indexOf("await waitFor"),
+    runner.indexOf('what: "the real script callback Wasm marker"'),
+  );
   assert.ok(waitBody.indexOf("DEHERM_SCRIPT_BROWSER_EXACT_FAIL") < waitBody.indexOf("const successes"));
   assert.match(runner, /lateFailure/);
 });

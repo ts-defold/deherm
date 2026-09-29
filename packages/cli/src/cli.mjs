@@ -7,14 +7,23 @@ import { generateComponentProxies } from "../../compiler/src/component-proxy-gen
 import {
   writeProjectDmSdkCallSymbolIndex,
   writeProjectResourceSymbols,
-  writeProjectRouteSymbolIndex
+  writeProjectRouteSymbolIndex,
 } from "./resource-symbols.mjs";
 import { discoverProjectRoots, findProjectRoot, inspectDefoldProject, parseGameProject } from "./project.mjs";
-import { installNativeExtension, installProjectWebTransportExtension, typecheckGeneratedProject, verifyGeneratedProject, writeGeneratedProject } from "./generate.mjs";
+import {
+  installNativeExtension,
+  installProjectWebTransportExtension,
+  typecheckGeneratedProject,
+  verifyGeneratedProject,
+  writeGeneratedProject,
+} from "./generate.mjs";
 import { createDefoldProject } from "./scaffold.mjs";
 import { materializeDmSdkUsageFile } from "./dmsdk.mjs";
 import { resolveWebTransportArtifactRoot, selectWebTransportArtifactTarget } from "./webtransport-artifacts.mjs";
-import { ingestNativeExtensionHeader, renderNativeExtensionBindings } from "../../compiler/src/native-extension-generator.mjs";
+import {
+  ingestNativeExtensionHeader,
+  renderNativeExtensionBindings,
+} from "../../compiler/src/native-extension-generator.mjs";
 
 const help = `deherm <command> [options]
 
@@ -110,7 +119,7 @@ export function parseArguments(argv) {
     contexts: [],
     targets: [],
     transcripts: [],
-    sessionLogs: []
+    sessionLogs: [],
   };
   const args = [...argv];
   if (args[0] && !args[0].startsWith("-")) options.command = args.shift();
@@ -131,7 +140,8 @@ export function parseArguments(argv) {
     else if (value === "--reconcile") options.reconcile = true;
     else if (value === "--shermes") options.shermes = args.shift();
     else if (value === "--force") options.force = true;
-    else if ((value === "--project-cache" || value === "--pin") && options.command === "policy") options.projectCache = true;
+    else if ((value === "--project-cache" || value === "--pin") && options.command === "policy")
+      options.projectCache = true;
     else if (value === "--recompute") options.recompute = true;
     else if (value === "--allow-unbound") options.allowUnbound = true;
     else if (value === "--once") options.once = true;
@@ -164,7 +174,14 @@ export function parseArguments(argv) {
     else if (value === "--surface") options.surface = args.shift();
     else if (value === "--target" && options.command === "dev") options.targets.push(args.shift());
     else if (value === "--target") options.target = args.shift();
-    else if (value === "--context") options.contexts.push(...args.shift().split(",").map((item) => item.trim()).filter(Boolean));
+    else if (value === "--context")
+      options.contexts.push(
+        ...args
+          .shift()
+          .split(",")
+          .map((item) => item.trim())
+          .filter(Boolean),
+      );
     else if (value === "--shard") options.shard = args.shift();
     else if (value === "--entry") options.entry = args.shift();
     else if (value === "--watch") options.watchRoot = args.shift();
@@ -180,13 +197,24 @@ export function parseArguments(argv) {
     else if (value === "--browser-window") options.browserHeadless = false;
     else throw new Error(`Unknown option: ${value}`);
   }
-  if (options.command === "dev" && !options.json && options.headless === undefined && (!process.stdin.isTTY || !process.stdout.isTTY)) {
+  if (
+    options.command === "dev" &&
+    !options.json &&
+    options.headless === undefined &&
+    (!process.stdin.isTTY || !process.stdout.isTTY)
+  ) {
     options.headless = true;
   }
-  if (options.servicePort !== undefined && (!Number.isSafeInteger(options.servicePort) || options.servicePort < 1 || options.servicePort > 65_535)) {
+  if (
+    options.servicePort !== undefined &&
+    (!Number.isSafeInteger(options.servicePort) || options.servicePort < 1 || options.servicePort > 65_535)
+  ) {
     throw new Error("--service-port must be an integer from 1 through 65535");
   }
-  if (options.durationMs !== undefined && (!Number.isSafeInteger(options.durationMs) || options.durationMs < 1 || options.durationMs > 86_400_000)) {
+  if (
+    options.durationMs !== undefined &&
+    (!Number.isSafeInteger(options.durationMs) || options.durationMs < 1 || options.durationMs > 86_400_000)
+  ) {
     throw new Error("--duration must be an integer from 1 through 86400000 milliseconds");
   }
   return options;
@@ -196,7 +224,9 @@ async function selectProjectFromTerminal(projects) {
   const prompt = createInterface({ input: process.stdin, output: process.stderr });
   try {
     process.stderr.write("Multiple Defold projects were found:\n");
-    projects.forEach((project, index) => process.stderr.write(`  ${index + 1}. ${path.relative(process.cwd(), project) || "."}\n`));
+    projects.forEach((project, index) =>
+      process.stderr.write(`  ${index + 1}. ${path.relative(process.cwd(), project) || "."}\n`),
+    );
     const answer = await prompt.question("Choose a project number: ");
     const index = Number(answer) - 1;
     if (!Number.isInteger(index) || !projects[index]) throw new Error(`Invalid project selection: ${answer}`);
@@ -213,21 +243,21 @@ async function scaffoldProject(options) {
     directory: options.directory,
     name: options.name,
     packageVersion,
-    defoldRevision: options.defoldSdk
+    defoldRevision: options.defoldSdk,
   });
   const inventory = await inspectDefoldProject({ project: scaffold.projectRoot });
   const generated = await writeGeneratedProject(inventory, options.outDir, {
     force: true,
-    requirePublishedArtifacts: true
+    requirePublishedArtifacts: true,
   });
   const nativeExtension = await installNativeExtension(scaffold.projectRoot, {
     force: true,
-    surfaceRepositoryRoot: generated.surfaceRepositoryRoot
+    surfaceRepositoryRoot: generated.surfaceRepositoryRoot,
   });
   const components = await generateComponentProxies({
     projectRoot: scaffold.projectRoot,
     outputRoot: scaffold.projectRoot,
-    componentPolicy: generated.componentPolicy
+    componentPolicy: generated.componentPolicy,
   });
   await writeProjectResourceSymbols(scaffold.projectRoot, generated.root);
   await writeProjectRouteSymbolIndex(generated.root);
@@ -236,7 +266,7 @@ async function scaffoldProject(options) {
     ...scaffold,
     generatedRoot: generated.root,
     nativeExtensionRoot: nativeExtension.root,
-    componentCount: components.manifest.components.length
+    componentCount: components.manifest.components.length,
   };
 }
 
@@ -249,13 +279,13 @@ export async function installConfiguredProjectWebTransport(projectRoot, options 
   const artifacts = resolveWebTransportArtifactRoot({
     environmentValue: environment.DEHERM_WEBTRANSPORT_ARTIFACT_ROOT,
     projectValue: configuration?.artifacts,
-    projectRoot: resolvedProject
+    projectRoot: resolvedProject,
   });
   const configuredTarget = environment.DEHERM_WEBTRANSPORT_ARTIFACT_TARGET ?? configuration?.artifact_target;
   const artifactTarget = selectWebTransportArtifactTarget({
     configuredTarget,
     hasSource: Boolean(source || configuration),
-    hasArtifactRoot: Boolean(artifacts)
+    hasArtifactRoot: Boolean(artifacts),
   });
   if (!configuration && !source && !artifacts && !artifactTarget) {
     return { root: path.join(resolvedProject, "defold_webtransport"), installed: false, source: "unconfigured" };
@@ -269,7 +299,7 @@ export async function installConfiguredProjectWebTransport(projectRoot, options 
     version: configuration?.version,
     force: options.force,
     environment,
-    fetchImpl: options.fetchImpl
+    fetchImpl: options.fetchImpl,
   });
 }
 
@@ -286,7 +316,7 @@ function devGenerationInputs(inventory) {
   }
   return {
     extensionRoots: [...extensionRoots].sort(),
-    typescriptFacades: [...typescriptFacades].sort()
+    typescriptFacades: [...typescriptFacades].sort(),
   };
 }
 
@@ -296,22 +326,24 @@ async function reconcileDevProject(options, { force = false } = {}) {
   const inventory = await inspectDefoldProject({ project: options.project, requireDehermRuntime: true });
   const errors = inventory.diagnostics.filter(({ severity }) => severity === "error");
   if (errors.length) {
-    throw new Error(`Defold project configuration is not ready for déherm dev:\n${errors.map(({ path, message }) => `- ${path}: ${message}`).join("\n")}`);
+    throw new Error(
+      `Defold project configuration is not ready for déherm dev:\n${errors.map(({ path, message }) => `- ${path}: ${message}`).join("\n")}`,
+    );
   }
   const generated = await writeGeneratedProject(inventory, options.outDir, {
     defoldSdk: options.defoldSdk,
     bob: options.bob,
     force,
-    requirePublishedArtifacts: true
+    requirePublishedArtifacts: true,
   });
   await installNativeExtension(inventory.projectRoot, {
     force,
-    surfaceRepositoryRoot: generated.surfaceRepositoryRoot
+    surfaceRepositoryRoot: generated.surfaceRepositoryRoot,
   });
   return {
     inventory,
     generated,
-    generationInputs: devGenerationInputs(inventory)
+    generationInputs: devGenerationInputs(inventory),
   };
 }
 
@@ -319,13 +351,17 @@ function printExtensions(inventory) {
   if (!inventory.extensions.length) console.log("No native extensions found.");
   for (const extension of inventory.extensions) {
     const moduleCount = extension.scriptApis.reduce((count, api) => count + api.declarations.length, 0);
-    console.log(`${extension.name}  ${extension.kind}  ${extension.bindingStatus}  ${moduleCount} script module(s)  ${extension.publicHeaders.length} public header(s)  ${extension.manifestPath}`);
+    console.log(
+      `${extension.name}  ${extension.kind}  ${extension.bindingStatus}  ${moduleCount} script module(s)  ${extension.publicHeaders.length} public header(s)  ${extension.manifestPath}`,
+    );
   }
   // Discovery is rooted at ext.manifest, so a resolved dependency without one
   // contributes nothing. Saying so is the difference between "no bindings" and
   // "nothing was there".
   for (const archive of inventory.dependencyArchivesWithoutManifest ?? []) {
-    console.log(`--  dependency  no-ext-manifest  ${archive.files} file(s), ${archive.luaModules} Lua module(s)  ${archive.archive}`);
+    console.log(
+      `--  dependency  no-ext-manifest  ${archive.files} file(s), ${archive.luaModules} Lua module(s)  ${archive.archive}`,
+    );
   }
 }
 
@@ -338,7 +374,10 @@ async function runDoctor(options) {
   const { hostCompilerReport } = await import("./host-compilers.mjs");
   const { nativeArtifactReport } = await import("./toolchains.mjs");
   const requested = options.target
-    ? options.target.split(",").map((value) => value.trim()).filter(Boolean)
+    ? options.target
+        .split(",")
+        .map((value) => value.trim())
+        .filter(Boolean)
     : null;
 
   let inventory = null;
@@ -346,8 +385,9 @@ async function runDoctor(options) {
   try {
     inventory = await inspectDefoldProject({
       project: options.project,
-      selectProject: !options.json && process.stdin.isTTY && process.stdout.isTTY ? selectProjectFromTerminal : undefined,
-      requireDehermRuntime: true
+      selectProject:
+        !options.json && process.stdin.isTTY && process.stdout.isTTY ? selectProjectFromTerminal : undefined,
+      requireDehermRuntime: true,
     });
   } catch (error) {
     // A user asking what their toolchain can build should get that answer even
@@ -384,14 +424,22 @@ async function runDoctor(options) {
   const projectErrors = inventory?.diagnostics.filter(({ severity }) => severity === "error") ?? [];
 
   if (options.json) {
-    console.log(JSON.stringify({
-      schemaVersion: 1,
-      ok: failures.length === 0 && !projectErrors.length && !projectError,
-      project: inventory ? { root: inventory.projectRoot, summary: inventory.summary, diagnostics: inventory.diagnostics } : { error: projectError },
-      hostCompilers: hosts,
-      bundleTargets: { ...artifacts, requested, unknownTargets },
-      failures
-    }, null, 2));
+    console.log(
+      JSON.stringify(
+        {
+          schemaVersion: 1,
+          ok: failures.length === 0 && !projectErrors.length && !projectError,
+          project: inventory
+            ? { root: inventory.projectRoot, summary: inventory.summary, diagnostics: inventory.diagnostics }
+            : { error: projectError },
+          hostCompilers: hosts,
+          bundleTargets: { ...artifacts, requested, unknownTargets },
+          failures,
+        },
+        null,
+        2,
+      ),
+    );
     return failures.length || projectErrors.length || projectError ? 1 : 0;
   }
 
@@ -399,23 +447,30 @@ async function runDoctor(options) {
   // other hosts are information, not the question the user asked, so they stay
   // one line each - but that line still names the tools that are missing.
   if (!currentHost || !Object.keys(currentHost.tools ?? {}).length) {
-    console.log(`!! host tools ${hosts.currentHost} (this host): ${currentHost?.status ?? "unknown-host"} ${currentHost?.detail ?? ""}`.trimEnd());
+    console.log(
+      `!! host tools ${hosts.currentHost} (this host): ${currentHost?.status ?? "unknown-host"} ${currentHost?.detail ?? ""}`.trimEnd(),
+    );
   } else {
     for (const tool of Object.values(currentHost.tools)) {
-      console.log(`${tool.ok ? "ok" : "!!"} ${tool.tool} ${hosts.currentHost} (this host): ${tool.status} ${tool.detail}`);
+      console.log(
+        `${tool.ok ? "ok" : "!!"} ${tool.tool} ${hosts.currentHost} (this host): ${tool.status} ${tool.detail}`,
+      );
     }
   }
   for (const host of hosts.hosts) {
     if (host.current) continue;
     const missing = host.missing ?? [];
-    console.log(`${host.ok ? "ok" : "--"} host tools ${host.host}: ${host.status}${missing.length ? ` missing ${missing.join(", ")}` : ` ${host.detail}`}`);
+    console.log(
+      `${host.ok ? "ok" : "--"} host tools ${host.host}: ${host.status}${missing.length ? ` missing ${missing.join(", ")}` : ` ${host.detail}`}`,
+    );
   }
   for (const row of selected) {
     // Without an explicit --target, a target the user is not shipping is
     // information, not a failure; with one, it is the question they asked.
     const severity = row.ok ? "ok" : requested ? "!!" : "--";
     console.log(`${severity} target ${row.target}: ${row.status} ${row.detail}`);
-    if (row.project && !row.project.ok) console.log(`${requested ? "!!" : "--"}   project extension: ${row.project.detail}`);
+    if (row.project && !row.project.ok)
+      console.log(`${requested ? "!!" : "--"}   project extension: ${row.project.detail}`);
   }
   for (const target of unknownTargets) {
     console.log(`!! target ${target}: not a Defold bundle target declared by ${artifacts.source}`);
@@ -429,12 +484,18 @@ async function runDoctor(options) {
   console.log(`${projectErrors.length ? "!!" : "ok"} project: ${inventory.projectRoot}`);
   console.log(`ok extensions: ${summary.localExtensions} local, ${summary.dependencyExtensions} dependency`);
   console.log(`ok script APIs: ${summary.scriptApiFiles} file(s), ${summary.scriptModules} module declaration(s)`);
-  console.log(`ok native APIs: ${summary.publicHeaders} public header(s), ${summary.extensionsRequiringNativeSchema} schema(s) required`);
+  console.log(
+    `ok native APIs: ${summary.publicHeaders} public header(s), ${summary.extensionsRequiringNativeSchema} schema(s) required`,
+  );
   if (summary.extensionsWithoutApiMetadata) {
-    console.log(`-- metadata: ${summary.extensionsWithoutApiMetadata} extension(s) expose no discoverable API metadata`);
+    console.log(
+      `-- metadata: ${summary.extensionsWithoutApiMetadata} extension(s) expose no discoverable API metadata`,
+    );
   }
   if (summary.dependencyArchivesWithoutManifest) {
-    console.log(`-- dependencies: ${summary.dependencyArchivesWithoutManifest} resolved archive(s) declare no ext.manifest and contribute no bindings`);
+    console.log(
+      `-- dependencies: ${summary.dependencyArchivesWithoutManifest} resolved archive(s) declare no ext.manifest and contribute no bindings`,
+    );
   }
   for (const diagnostic of inventory.diagnostics) {
     console.log(`${diagnostic.severity === "error" ? "!!" : "--"} ${diagnostic.path}: ${diagnostic.message}`);
@@ -450,7 +511,9 @@ export async function run(argv = process.argv.slice(2)) {
   }
   if (options.command === "ui") {
     if (!process.stdin.isTTY || !process.stdout.isTTY) {
-      throw new Error("The base déherm TUI requires an interactive terminal. Use 'deherm --help' or an explicit command in non-interactive environments.");
+      throw new Error(
+        "The base déherm TUI requires an interactive terminal. Use 'deherm --help' or an explicit command in non-interactive environments.",
+      );
     }
     const { runLauncherTui } = await import("./dev/tui.mjs");
     const action = await runLauncherTui({ cwd: process.cwd(), projects: await discoverProjectRoots(process.cwd()) });
@@ -483,15 +546,14 @@ export async function run(argv = process.argv.slice(2)) {
       project: projectRoot,
       target: options.target ?? hostDefoldPlatform(),
       profile: options.profile === true,
-      shermes: options.shermes ?? null
+      shermes: options.shermes ?? null,
     };
-    const result = options.reconcile
-      ? await module.reconcile(request)
-      : await module.assemble(request);
+    const result = options.reconcile ? await module.reconcile(request) : await module.assemble(request);
     if (options.json) console.log(JSON.stringify({ schemaVersion: 1, ...result }, null, 2));
     else if (result.refusal) console.log(`${result.refusal.code}: ${result.refusal.reason}`);
     else if (options.reconcile) console.log(`typed-native: ${result.message}`);
-    else console.log(`Assembled typed-native extension in ${path.relative(process.cwd(), result.extensionRoot) || "."}`);
+    else
+      console.log(`Assembled typed-native extension in ${path.relative(process.cwd(), result.extensionRoot) || "."}`);
     return result.refusal ? 3 : 0;
   }
   if (options.command === "prepare-bob") {
@@ -502,10 +564,13 @@ export async function run(argv = process.argv.slice(2)) {
       projectRoot,
       platform: options.target ?? hostDefoldPlatform(),
       variant: options.variant ?? "debug",
-      applicationMode: options.applicationMode ?? "dynamic"
+      applicationMode: options.applicationMode ?? "dynamic",
     });
     if (options.json) console.log(JSON.stringify({ schemaVersion: 1, ...result }, null, 2));
-    else console.log(`Bob bundle: ${result.representation}${result.resource ? ` at ${result.resource}` : " (no dynamic resource)"}`);
+    else
+      console.log(
+        `Bob bundle: ${result.representation}${result.resource ? ` at ${result.resource}` : " (no dynamic resource)"}`,
+      );
     return 0;
   }
   if (options.command === "materialize-dmsdk") {
@@ -517,11 +582,15 @@ export async function run(argv = process.argv.slice(2)) {
       check: options.check,
     });
     if (options.json) console.log(JSON.stringify({ schemaVersion: 1, ...result }, null, 2));
-    else console.log(`${result.checked ? "Verified" : "Materialized"} ${result.materializedCount} dmSDK declaration(s) in ${path.relative(process.cwd(), result.output) || "."}; install with ${result.provider.install}()`);
+    else
+      console.log(
+        `${result.checked ? "Verified" : "Materialized"} ${result.materializedCount} dmSDK declaration(s) in ${path.relative(process.cwd(), result.output) || "."}; install with ${result.provider.install}()`,
+      );
     return 0;
   }
   if (options.command === "generate-extension-api") {
-    if (!options.header || !options.module || !options.output) throw new Error("generate-extension-api requires --header, --module, and --output <directory>");
+    if (!options.header || !options.module || !options.output)
+      throw new Error("generate-extension-api requires --header, --module, and --output <directory>");
     const ir = ingestNativeExtensionHeader({ header: options.header, moduleName: options.module });
     const generated = renderNativeExtensionBindings(ir);
     const output = path.resolve(options.output);
@@ -532,7 +601,10 @@ export async function run(argv = process.argv.slice(2)) {
       writeFile(path.join(output, `${ir.module}_glue.cpp`), generated.source),
       writeFile(path.join(output, `${ir.module}_glue.verify.cpp`), generated.verificationSource),
       writeFile(path.join(output, `${ir.module}_glue.verify.driver.cpp`), generated.verificationDriver),
-      writeFile(path.join(output, `${ir.module}_glue.verify.json`), `${JSON.stringify(generated.verification, null, 2)}\n`),
+      writeFile(
+        path.join(output, `${ir.module}_glue.verify.json`),
+        `${JSON.stringify(generated.verification, null, 2)}\n`,
+      ),
     ]);
     const result = {
       output,
@@ -543,7 +615,10 @@ export async function run(argv = process.argv.slice(2)) {
       verificationManifestSha256: generated.verification.manifestSha256,
     };
     if (options.json) console.log(JSON.stringify({ schemaVersion: 1, ...result }, null, 2));
-    else console.log(`Generated ${result.generatedRouteCount}/${result.routeCount} native extension route(s) in ${path.relative(process.cwd(), output) || "."}; ${result.blockedRouteCount} need layout policy`);
+    else
+      console.log(
+        `Generated ${result.generatedRouteCount}/${result.routeCount} native extension route(s) in ${path.relative(process.cwd(), output) || "."}; ${result.blockedRouteCount} need layout policy`,
+      );
     return result.blockedRouteCount ? 2 : 0;
   }
   if (options.command === "conformance") {
@@ -557,20 +632,23 @@ export async function run(argv = process.argv.slice(2)) {
       let sdkTemplateRoot;
       if (!generatedRoot) {
         const packageRoot = path.resolve(import.meta.dirname, "../../..");
-        const sourceCheckout = await readFile(path.join(packageRoot, "pnpm-workspace.yaml"))
-          .then(() => true, () => false);
+        const sourceCheckout = await readFile(path.join(packageRoot, "pnpm-workspace.yaml")).then(
+          () => true,
+          () => false,
+        );
         if (!options.defoldSdk && !sourceCheckout) {
           throw new Error("conformance generate outside a Defold project requires --defold-sdk <sha>");
         }
         if (options.defoldSdk) {
-          const [{ assertResolvedDefoldRevision, resolveDefoldRevision }, { resolveDefoldSurface }] = await Promise.all([
-            import("./defold-revision.mjs"),
-            import("./defold-surface.mjs")
-          ]);
-          const revision = assertResolvedDefoldRevision(await resolveDefoldRevision({
-            explicit: options.defoldSdk,
-            projectRoot: process.cwd()
-          }));
+          const [{ assertResolvedDefoldRevision, resolveDefoldRevision }, { resolveDefoldSurface }] = await Promise.all(
+            [import("./defold-revision.mjs"), import("./defold-surface.mjs")],
+          );
+          const revision = assertResolvedDefoldRevision(
+            await resolveDefoldRevision({
+              explicit: options.defoldSdk,
+              projectRoot: process.cwd(),
+            }),
+          );
           let surface;
           try {
             surface = await resolveDefoldSurface(revision, { packageRoot });
@@ -580,7 +658,7 @@ export async function run(argv = process.argv.slice(2)) {
             const resolved = await resolvePublishedPolicy(revision, { index: await readPolicyLocator() });
             surface = {
               irRoot: path.join(resolved.surface.outputRoot, "ir"),
-              sdkRoot: path.join(resolved.surface.outputRoot, "sdk")
+              sdkRoot: path.join(resolved.surface.outputRoot, "sdk"),
             };
           }
           inputRoot = surface.irRoot;
@@ -597,7 +675,7 @@ export async function run(argv = process.argv.slice(2)) {
         inputRoot,
         inputLayout,
         sdkRoot,
-        sdkTemplateRoot
+        sdkTemplateRoot,
       });
       const summary = {
         root: output.root,
@@ -607,13 +685,19 @@ export async function run(argv = process.argv.slice(2)) {
         shard: output.plan.shard,
         selectedCaseCount: output.plan.selectedCaseCount,
         summary: output.plan.summary,
-        files: output.files
+        files: output.files,
       };
       if (options.json) console.log(JSON.stringify(summary, null, 2));
       else {
-        console.log(`Generated ${summary.selectedCaseCount} conformance case(s) in ${path.relative(process.cwd(), output.root) || "."}`);
-        console.log(`Plan ${summary.planId}; target ${summary.target}; shard ${summary.shard.index}/${summary.shard.count}`);
-        console.log(`Compile ${summary.summary.compile["compile-only"] ?? 0}; linked ${summary.summary.link.linked ?? 0}; executable ${summary.summary.runtime.executable ?? 0}; runtime-skipped ${summary.summary.runtime["skipped-with-reason"] ?? 0}`);
+        console.log(
+          `Generated ${summary.selectedCaseCount} conformance case(s) in ${path.relative(process.cwd(), output.root) || "."}`,
+        );
+        console.log(
+          `Plan ${summary.planId}; target ${summary.target}; shard ${summary.shard.index}/${summary.shard.count}`,
+        );
+        console.log(
+          `Compile ${summary.summary.compile["compile-only"] ?? 0}; linked ${summary.summary.link.linked ?? 0}; executable ${summary.summary.runtime.executable ?? 0}; runtime-skipped ${summary.summary.runtime["skipped-with-reason"] ?? 0}`,
+        );
       }
       return 0;
     }
@@ -624,10 +708,13 @@ export async function run(argv = process.argv.slice(2)) {
         output: result.output,
         passed: result.passed,
         status: result.status,
-        caseCount: result.observation.results.length
+        caseCount: result.observation.results.length,
       };
       if (options.json) console.log(JSON.stringify(summary, null, 2));
-      else console.log(`${result.passed ? "ok" : "!!"} compiled ${summary.caseCount} conformance case(s); observation ${path.relative(process.cwd(), result.output)}`);
+      else
+        console.log(
+          `${result.passed ? "ok" : "!!"} compiled ${summary.caseCount} conformance case(s); observation ${path.relative(process.cwd(), result.output)}`,
+        );
       if (!result.passed && result.stderr) console.error(result.stderr.trim());
       if (!result.passed && result.stdout) console.error(result.stdout.trim());
       return result.passed ? 0 : 1;
@@ -642,13 +729,21 @@ export async function run(argv = process.argv.slice(2)) {
       }
       if (options.json || !options.output) console.log(JSON.stringify(report, null, 2));
       else {
-        console.log(`Conformance report ${report.planId}: ${report.observationCount} observed stage(s), ${report.caseCount} case(s)`);
-        console.log(`Compile passed ${report.summary.compile.passed ?? 0}; link passed ${report.summary.link.passed ?? 0}; runtime passed ${report.summary.runtime.passed ?? 0}; semantic passed ${report.summary.semantic.passed ?? 0}`);
-        console.log(`${report.strictPass ? "ok" : "!!"} strict gate: ${report.strictFailures.length} missing or failed required stage(s)`);
+        console.log(
+          `Conformance report ${report.planId}: ${report.observationCount} observed stage(s), ${report.caseCount} case(s)`,
+        );
+        console.log(
+          `Compile passed ${report.summary.compile.passed ?? 0}; link passed ${report.summary.link.passed ?? 0}; runtime passed ${report.summary.runtime.passed ?? 0}; semantic passed ${report.summary.semantic.passed ?? 0}`,
+        );
+        console.log(
+          `${report.strictPass ? "ok" : "!!"} strict gate: ${report.strictFailures.length} missing or failed required stage(s)`,
+        );
       }
       return options.strict && !report.strictPass ? 1 : 0;
     }
-    throw new Error(`Unknown conformance action: ${options.action ?? "<missing>"}; expected generate, compile, or report`);
+    throw new Error(
+      `Unknown conformance action: ${options.action ?? "<missing>"}; expected generate, compile, or report`,
+    );
   }
   if (options.command === "dev") {
     // Keep doctor/generate/conformance usable without loading the heavier dev
@@ -658,7 +753,7 @@ export async function run(argv = process.argv.slice(2)) {
     const entryFromInvocation = entryLocatesProject ? path.resolve(process.cwd(), options.entry) : null;
     if (!options.project && !options.entry) {
       options.project = await findProjectRoot(process.cwd(), undefined, {
-        select: !options.json && process.stdin.isTTY && process.stdout.isTTY ? selectProjectFromTerminal : undefined
+        select: !options.json && process.stdin.isTTY && process.stdout.isTTY ? selectProjectFromTerminal : undefined,
       });
     }
     options.project = await findProjectRoot(process.cwd(), options.project ?? options.entry);
@@ -667,7 +762,7 @@ export async function run(argv = process.argv.slice(2)) {
     // compile and supplies the watcher with the same operation so an API input
     // can never reach TypeScript or Bob against stale generated bindings.
     const { inventory, generated, generationInputs } = await reconcileDevProject(options, {
-      force: options.force === true
+      force: options.force === true,
     });
     options.generatedRoot = generated.root;
     options.generationInputs = generationInputs;
@@ -676,13 +771,13 @@ export async function run(argv = process.argv.slice(2)) {
       return {
         cached: reconciled.generated.cached === true,
         componentPolicy: reconciled.generated.componentPolicy,
-        generationInputs: reconciled.generationInputs
+        generationInputs: reconciled.generationInputs,
       };
     };
     await generateComponentProxies({
       projectRoot: inventory.projectRoot,
       outputRoot: inventory.projectRoot,
-      componentPolicy: generated.componentPolicy
+      componentPolicy: generated.componentPolicy,
     });
     const snapshot = await runDevSession(options);
     if (options.once && options.json) console.log(JSON.stringify({ schemaVersion: 1, snapshot }, null, 2));
@@ -695,14 +790,17 @@ export async function run(argv = process.argv.slice(2)) {
       projectRoot,
       sessionFile: options.inspectorSession,
       output: options.output,
-      replaceDebugger: options.replaceDebugger === true
+      replaceDebugger: options.replaceDebugger === true,
     };
     let result;
     if (options.action === "cpu") result = await captureCpuProfile({ ...request, durationMs: options.durationMs });
     else if (options.action === "heap") result = await captureHeapSnapshot(request);
     else throw new Error(`Unknown profile action: ${options.action ?? "<missing>"}; expected cpu or heap`);
     if (options.json) console.log(JSON.stringify({ schemaVersion: 1, ...result }, null, 2));
-    else console.log(`Captured ${result.kind} profile in ${path.relative(process.cwd(), result.output) || path.basename(result.output)}`);
+    else
+      console.log(
+        `Captured ${result.kind} profile in ${path.relative(process.cwd(), result.output) || path.basename(result.output)}`,
+      );
     return 0;
   }
   if (options.command === "debug") {
@@ -711,7 +809,7 @@ export async function run(argv = process.argv.slice(2)) {
     await runDapSession({
       projectRoot,
       sessionFile: options.inspectorSession,
-      replaceDebugger: options.replaceDebugger === true
+      replaceDebugger: options.replaceDebugger === true,
     });
     return 0;
   }
@@ -724,20 +822,29 @@ export async function run(argv = process.argv.slice(2)) {
     // The pool reports how déherm itself behaved during real runs. It is a
     // reporting surface, never a gate, so it always exits 0; promoting a pool
     // entry into conformance or completion evidence is a category error.
-    const {
-      bugPoolDocument, defaultBugPoolFile, formatBugPool, harvestBugPool, readBugPool
-    } = await import("./dev/bug-pool.mjs");
-    const projectRoot = await findProjectRoot(process.cwd(), options.project).catch(() => path.resolve(options.project ?? process.cwd()));
+    const { bugPoolDocument, defaultBugPoolFile, formatBugPool, harvestBugPool, readBugPool } =
+      await import("./dev/bug-pool.mjs");
+    const projectRoot = await findProjectRoot(process.cwd(), options.project).catch(() =>
+      path.resolve(options.project ?? process.cwd()),
+    );
     const poolFile = path.resolve(options.pool ?? defaultBugPoolFile(projectRoot));
-    const result = options.harvest === false
-      ? { poolFile, sources: [], document: bugPoolDocument(await readBugPool(poolFile)) }
-      : await harvestBugPool({
-        projectRoot,
-        poolFile,
-        sessionLogs: options.sessionLogs.length ? options.sessionLogs : undefined,
-        transcripts: options.transcripts
-      });
-    if (options.json) console.log(JSON.stringify({ schemaVersion: 1, poolFile: result.poolFile, sources: result.sources, ...result.document }, null, 2));
+    const result =
+      options.harvest === false
+        ? { poolFile, sources: [], document: bugPoolDocument(await readBugPool(poolFile)) }
+        : await harvestBugPool({
+            projectRoot,
+            poolFile,
+            sessionLogs: options.sessionLogs.length ? options.sessionLogs : undefined,
+            transcripts: options.transcripts,
+          });
+    if (options.json)
+      console.log(
+        JSON.stringify(
+          { schemaVersion: 1, poolFile: result.poolFile, sources: result.sources, ...result.document },
+          null,
+          2,
+        ),
+      );
     else console.log(formatBugPool(result.document, { cwd: process.cwd(), poolFile: result.poolFile }));
     return 0;
   }
@@ -751,7 +858,7 @@ export async function run(argv = process.argv.slice(2)) {
     const resolution = await resolveDefoldRevision({
       projectRoot: projectRoot ?? process.cwd(),
       explicit: options.defoldSdk,
-      bob: options.bob
+      bob: options.bob,
     });
     const revision = assertResolvedDefoldRevision(resolution);
     if (options.projectCache && !projectRoot) {
@@ -763,7 +870,7 @@ export async function run(argv = process.argv.slice(2)) {
     const result = await resolvePublishedPolicy(revision, {
       index: await readPolicyLocator(),
       surfaceRoot,
-      surfaceBoundary: options.projectCache ? projectRoot : undefined
+      surfaceBoundary: options.projectCache ? projectRoot : undefined,
     });
     const summary = {
       schemaVersion: 1,
@@ -779,15 +886,18 @@ export async function run(argv = process.argv.slice(2)) {
       surfaceWritten: result.surface?.written.length ?? 0,
       pinnedProjectCache: Boolean(options.projectCache),
       source: result.source,
-      revisionSource: resolution.source
+      revisionSource: resolution.source,
     };
     if (options.json) console.log(JSON.stringify(summary, null, 2));
     else {
       console.log(`Verified Defold ${summary.defoldRevision} -> policy ${summary.policyRoot.slice(0, 12)}`);
       console.log(`${summary.namespaces} namespaces, ${summary.objects} realization objects authenticated`);
-      console.log(`Policy cache: ${summary.transfer.cacheHits} hit(s), ${summary.transfer.cacheMisses} miss(es), ${summary.transfer.cacheWrites} write(s), ${summary.transfer.transferBytes} byte(s) transferred`);
+      console.log(
+        `Policy cache: ${summary.transfer.cacheHits} hit(s), ${summary.transfer.cacheMisses} miss(es), ${summary.transfer.cacheWrites} write(s), ${summary.transfer.transferBytes} byte(s) transferred`,
+      );
       console.log(`Evidence: ${summary.cacheRoot}`);
-      if (result.surface) console.log(`Surface: ${result.surface.outputRoot} (${result.surface.written.length} file(s) updated)`);
+      if (result.surface)
+        console.log(`Surface: ${result.surface.outputRoot} (${result.surface.written.length} file(s) updated)`);
     }
     return 0;
   }
@@ -796,7 +906,10 @@ export async function run(argv = process.argv.slice(2)) {
     // anything, so it stays usable on a build server that only ever runs Bob,
     // and it costs a hash of the files the recorded build read.
     const {
-      formatBuildArtifactReport, recomputeBundleFingerprint, summarizeBuildArtifacts, verifyProjectBuildArtifacts
+      formatBuildArtifactReport,
+      recomputeBundleFingerprint,
+      summarizeBuildArtifacts,
+      verifyProjectBuildArtifacts,
     } = await import("./build-artifacts.mjs");
     const projectRoot = await findProjectRoot(process.cwd(), options.project);
     const result = await verifyProjectBuildArtifacts(projectRoot, {
@@ -813,7 +926,10 @@ export async function run(argv = process.argv.slice(2)) {
           // including one the bundler discards. A rebuild of the current
           // sources that produces the artifact already on disk answers the
           // question the gate actually asks, so it clears the failure.
-          if (fingerprint === entry.fingerprint.onDisk && ["stale-sources", "artifact-replaced"].includes(entry.status)) {
+          if (
+            fingerprint === entry.fingerprint.onDisk &&
+            ["stale-sources", "artifact-replaced"].includes(entry.status)
+          ) {
             entry.status = "equivalent-rebuild";
             entry.severity = "warn";
           }
@@ -825,14 +941,16 @@ export async function run(argv = process.argv.slice(2)) {
     if (options.recompute) summarizeBuildArtifacts(result);
     if (options.json) console.log(JSON.stringify({ schemaVersion: 1, ...result }, null, 2));
     else {
-      console.log(`${result.ok ? "ok" : "!!"} build artifacts in ${path.relative(process.cwd(), projectRoot) || "."}: ${result.status}`);
+      console.log(
+        `${result.ok ? "ok" : "!!"} build artifacts in ${path.relative(process.cwd(), projectRoot) || "."}: ${result.status}`,
+      );
       for (const line of formatBuildArtifactReport(result)) console.log(line);
     }
     return result.ok ? 0 : 1;
   }
   if (options.command === "generate") {
     options.project = await findProjectRoot(process.cwd(), options.project, {
-      select: !options.json && process.stdin.isTTY && process.stdout.isTTY ? selectProjectFromTerminal : undefined
+      select: !options.json && process.stdin.isTTY && process.stdout.isTTY ? selectProjectFromTerminal : undefined,
     });
     // A generated project consumes a managed copy of the package extension;
     // it must never alias and mutate the package or contributor checkout.
@@ -842,7 +960,7 @@ export async function run(argv = process.argv.slice(2)) {
   const inventory = await inspectDefoldProject({
     project: options.project,
     selectProject: !options.json && process.stdin.isTTY && process.stdout.isTTY ? selectProjectFromTerminal : undefined,
-    requireDehermRuntime: options.command === "generate"
+    requireDehermRuntime: options.command === "generate",
   });
   if (options.command === "extensions") {
     if (options.json) console.log(JSON.stringify(inventory, null, 2));
@@ -850,25 +968,28 @@ export async function run(argv = process.argv.slice(2)) {
     return inventory.diagnostics.some(({ severity }) => severity === "error") ? 1 : 0;
   }
   if (options.command === "generate") {
-    if (options.defoldSdk && !/^[a-f0-9]{40}$/i.test(options.defoldSdk)) throw new Error("--defold-sdk must be a 40-character SHA");
+    if (options.defoldSdk && !/^[a-f0-9]{40}$/i.test(options.defoldSdk))
+      throw new Error("--defold-sdk must be a 40-character SHA");
     const errors = inventory.diagnostics.filter(({ severity }) => severity === "error");
     if (errors.length) {
-      throw new Error(`Defold project configuration is not ready for déherm:\n${errors.map(({ path, message }) => `- ${path}: ${message}`).join("\n")}`);
+      throw new Error(
+        `Defold project configuration is not ready for déherm:\n${errors.map(({ path, message }) => `- ${path}: ${message}`).join("\n")}`,
+      );
     }
     const output = await writeGeneratedProject(inventory, options.outDir, {
       defoldSdk: options.defoldSdk,
       bob: options.bob,
       force: options.force,
-      requirePublishedArtifacts: true
+      requirePublishedArtifacts: true,
     });
     const nativeExtension = await installNativeExtension(inventory.projectRoot, {
       force: options.force,
-      surfaceRepositoryRoot: output.surfaceRepositoryRoot
+      surfaceRepositoryRoot: output.surfaceRepositoryRoot,
     });
     const components = await generateComponentProxies({
       projectRoot: inventory.projectRoot,
       outputRoot: inventory.projectRoot,
-      componentPolicy: output.componentPolicy
+      componentPolicy: output.componentPolicy,
     });
     const componentCount = components.manifest.components.length;
     const resourceSymbols = await writeProjectResourceSymbols(inventory.projectRoot, output.root);
@@ -877,37 +998,68 @@ export async function run(argv = process.argv.slice(2)) {
     // what a release build would retain.
     const routeSymbols = await writeProjectRouteSymbolIndex(output.root);
     const dmSdkSymbols = await writeProjectDmSdkCallSymbolIndex(output.root);
-    if (options.json) console.log(JSON.stringify({ ...output, nativeExtension, componentCount, resourceSymbols: { resources: resourceSymbols.table.resourceCount }, routeSymbols: { routes: routeSymbols.index.routeCount }, dmSdkSymbols: { recipes: dmSdkSymbols.index.recipeCount, overloads: dmSdkSymbols.index.overloadCount }, summary: inventory.summary }, null, 2));
+    if (options.json)
+      console.log(
+        JSON.stringify(
+          {
+            ...output,
+            nativeExtension,
+            componentCount,
+            resourceSymbols: { resources: resourceSymbols.table.resourceCount },
+            routeSymbols: { routes: routeSymbols.index.routeCount },
+            dmSdkSymbols: { recipes: dmSdkSymbols.index.recipeCount, overloads: dmSdkSymbols.index.overloadCount },
+            summary: inventory.summary,
+          },
+          null,
+          2,
+        ),
+      );
     else {
-      console.log(`${output.cached ? "Current" : "Generated"} extension inventory, types, and ${output.moduleCount} SDK module(s) in ${path.relative(process.cwd(), output.root) || "."}`);
-      console.log(`${output.cached ? "Current" : "Generated"} ${output.nativeExtensions?.generatedRouteCount ?? 0} native extension C route(s); ${output.nativeExtensions?.blockedRouteCount ?? 0} blocked route(s) remain explicit`);
-      console.log(`${nativeExtension.installed ? "Installed" : "Current"} native extension in ${path.relative(process.cwd(), nativeExtension.root) || "."}`);
+      console.log(
+        `${output.cached ? "Current" : "Generated"} extension inventory, types, and ${output.moduleCount} SDK module(s) in ${path.relative(process.cwd(), output.root) || "."}`,
+      );
+      console.log(
+        `${output.cached ? "Current" : "Generated"} ${output.nativeExtensions?.generatedRouteCount ?? 0} native extension C route(s); ${output.nativeExtensions?.blockedRouteCount ?? 0} blocked route(s) remain explicit`,
+      );
+      console.log(
+        `${nativeExtension.installed ? "Installed" : "Current"} native extension in ${path.relative(process.cwd(), nativeExtension.root) || "."}`,
+      );
       console.log(`Generated ${componentCount} TypeScript component proxy resource(s)`);
       if (output.projection?.blocked) {
-        console.log(`-- extension projection: ${output.projection.blocked} of ${output.projection.members} .script_api member(s) failed closed; see ${path.join(path.relative(process.cwd(), output.root) || ".", "bindings.ir.json")}`);
+        console.log(
+          `-- extension projection: ${output.projection.blocked} of ${output.projection.members} .script_api member(s) failed closed; see ${path.join(path.relative(process.cwd(), output.root) || ".", "bindings.ir.json")}`,
+        );
         for (const [code, count] of Object.entries(output.projection.blockerCodes)) console.log(`   ${code}: ${count}`);
       }
       console.log(`Indexed ${resourceSymbols.table.resourceCount} Defold resource(s) for compile-time name resolution`);
       console.log(`Indexed ${routeSymbols.index.routeCount} Defold route(s) for compile-time reachability`);
-      console.log(`Indexed ${dmSdkSymbols.index.recipeCount} dmSDK recipe(s) across ${dmSdkSymbols.index.overloadCount} checker overload(s)`);
+      console.log(
+        `Indexed ${dmSdkSymbols.index.recipeCount} dmSDK recipe(s) across ${dmSdkSymbols.index.overloadCount} checker overload(s)`,
+      );
       for (const diagnostic of output.revisionDiagnostics ?? []) {
         console.log(`-- Defold revision: ${diagnostic.message}`);
       }
-      console.log(`Defold API: ${output.defoldRevision} (resolved from ${output.defoldResolution?.source ?? "unknown"}; surface layer ${output.defoldSurfaceLayer ?? "unknown"})`);
-      if (output.created.tsconfig) console.log("Created tsconfig.json referencing all generated TypeScript context projects");
-      else if (output.migrated.tsconfig) console.log("Migrated the legacy generated tsconfig.json to TypeScript project references");
+      console.log(
+        `Defold API: ${output.defoldRevision} (resolved from ${output.defoldResolution?.source ?? "unknown"}; surface layer ${output.defoldSurfaceLayer ?? "unknown"})`,
+      );
+      if (output.created.tsconfig)
+        console.log("Created tsconfig.json referencing all generated TypeScript context projects");
+      else if (output.migrated.tsconfig)
+        console.log("Migrated the legacy generated tsconfig.json to TypeScript project references");
       else console.log("Kept existing tsconfig.json; run 'deherm typecheck' to check every generated context project");
     }
     return inventory.diagnostics.some(({ severity }) => severity === "error") ? 1 : 0;
   }
   if (options.command === "verify-generated") {
     const result = await verifyGeneratedProject(inventory.projectRoot, options.outDir);
-    const componentPolicy = JSON.parse(await readFile(path.join(result.root, "ir", "defold-component-proxy-contract.json"), "utf8"));
+    const componentPolicy = JSON.parse(
+      await readFile(path.join(result.root, "ir", "defold-component-proxy-contract.json"), "utf8"),
+    );
     const components = await generateComponentProxies({
       projectRoot: inventory.projectRoot,
       outputRoot: inventory.projectRoot,
       check: true,
-      componentPolicy
+      componentPolicy,
     });
     const componentCount = components.manifest.components.length;
     if (options.json) console.log(JSON.stringify({ ...result, componentCount }, null, 2));
@@ -915,7 +1067,9 @@ export async function run(argv = process.argv.slice(2)) {
       console.log(`ok generated project: ${result.checkedFiles} verified IR and generated-output sentinel(s)`);
       console.log(`ok component proxies: ${componentCount} generated resource(s)`);
       console.log(`ok lowering plan: ${result.planSha256}`);
-      console.log(`ok Defold API: ${result.defoldRevision} (resolved from ${result.defoldResolution?.source ?? "unknown"})`);
+      console.log(
+        `ok Defold API: ${result.defoldRevision} (resolved from ${result.defoldResolution?.source ?? "unknown"})`,
+      );
       const { formatBuildArtifactReport } = await import("./build-artifacts.mjs");
       for (const line of formatBuildArtifactReport(result.buildArtifacts)) console.log(line);
       if (!result.buildArtifacts.ok) {
@@ -929,9 +1083,11 @@ export async function run(argv = process.argv.slice(2)) {
     if (options.json) {
       console.log(JSON.stringify(result, null, 2));
     } else if (result.passed) {
-      console.log(options.release
-        ? "ok release TypeScript reachability and usage manifests"
-        : "ok TypeScript contexts: shared, game-object, GUI, render");
+      console.log(
+        options.release
+          ? "ok release TypeScript reachability and usage manifests"
+          : "ok TypeScript contexts: shared, game-object, GUI, render",
+      );
     } else {
       if (result.stdout.trim()) console.error(result.stdout.trimEnd());
       if (result.stderr.trim()) console.error(result.stderr.trimEnd());

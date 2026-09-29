@@ -8,11 +8,11 @@ import test from "node:test";
 import {
   generateBindingLoweringPlan,
   inputPaths,
-  loadBindingLoweringInputs
+  loadBindingLoweringInputs,
 } from "../scripts/generate-binding-lowering-plan.mjs";
 import {
   renderTypescript as renderTypedNativeBridge,
-  selectClaimedRoutes as selectTypedNativeRoutes
+  selectClaimedRoutes as selectTypedNativeRoutes,
 } from "../scripts/generate-typed-native-bridge.mjs";
 
 const repositoryRoot = resolve(new URL("..", import.meta.url).pathname);
@@ -35,18 +35,22 @@ test("the canonical plan contains every API unit and all five backend dispositio
     scriptConstantUnits: 141,
     dmsdkUnits: 1361,
     backendRecords: 12140,
-    identitySelectedPolicyRules: 0
+    identitySelectedPolicyRules: 0,
   });
   assert.deepEqual(generated.targetOrder, [
     "typescriptSdk",
     "dynamicHermesJsi",
     "staticHermesCAbi",
     "luaStack",
-    "browserWasmHost"
+    "browserWasmHost",
   ]);
   assert.equal(new Set(generated.units.map(({ identity }) => `${identity.surface}:${identity.id}`)).size, 2428);
-  assert.ok(generated.units.every(({ backends }) => Object.keys(backends).join(",") === generated.targetOrder.join(",")));
-  const constantPolicy = JSON.parse(await readFile(resolve(repositoryRoot, "packages/bindings/generated/defold-script-constant-lowering.json"), "utf8"));
+  assert.ok(
+    generated.units.every(({ backends }) => Object.keys(backends).join(",") === generated.targetOrder.join(",")),
+  );
+  const constantPolicy = JSON.parse(
+    await readFile(resolve(repositoryRoot, "packages/bindings/generated/defold-script-constant-lowering.json"), "utf8"),
+  );
   const constantUnits = generated.units.filter(({ sourceRef }) => sourceRef?.input === "scriptConstantLowering");
   assert.equal(constantUnits.length, constantPolicy.entries.length - constantPolicy.counts.inlined);
   for (const unit of constantUnits) {
@@ -54,10 +58,14 @@ test("the canonical plan contains every API unit and all five backend dispositio
     assert.equal(unit.identity.id, `script:constant.${entry.name}`);
     assert.equal(unit.identity.stableId, entry.stableId);
   }
-  const physicsConstant = generated.units.find(({ identity }) => identity.id === "script:constant.physics.SHAPE_TYPE_MESH");
+  const physicsConstant = generated.units.find(
+    ({ identity }) => identity.id === "script:constant.physics.SHAPE_TYPE_MESH",
+  );
   assert.equal(physicsConstant.availability.profileAvailability.kind, "runtime-profile-gated");
   assert.ok(physicsConstant.availability.profiles.includes("no-physics"));
-  const cameraConstant = generated.units.find(({ identity }) => identity.id === "script:constant.camera.ORTHO_MODE_FIXED");
+  const cameraConstant = generated.units.find(
+    ({ identity }) => identity.id === "script:constant.camera.ORTHO_MODE_FIXED",
+  );
   assert.equal(cameraConstant, undefined, "compile-time-intrinsic constants do not need universal lowering units");
   assert.equal(generated.selectionSummary.typescriptSdk.emit, 2428);
   assert.equal(generated.evidenceBoundary.compilation, "not-claimed");
@@ -72,25 +80,25 @@ test("generated implementation lanes join by exact identity and universal fallba
   const implementations = generated.units.flatMap((unit) => {
     assert.ok(
       unit.implementationSet >= 0 && unit.implementationSet < generated.tables.implementationSets.length,
-      unit.identity.id
+      unit.identity.id,
     );
     return generated.tables.implementationSets[unit.implementationSet].map((implementation) => ({
       unit,
-      implementation
+      implementation,
     }));
   });
   assert.equal(
     implementations.filter(({ implementation }) => implementation.lane === "script-handle-lowering").length,
-    handleReport.routes.length
+    handleReport.routes.length,
   );
   assert.equal(
     implementations.filter(({ implementation }) => implementation.lane === "dmsdk-cstring-value").length,
-    cstringReport.declarations.length
+    cstringReport.declarations.length,
   );
   const urlReport = JSON.parse(inputs.scriptUrlAddress);
   assert.equal(
     implementations.filter(({ implementation }) => implementation.lane === "script-url-dispatch").length,
-    urlReport.rows.length
+    urlReport.rows.length,
   );
 
   const handle = generated.units.find(({ identity }) => identity.id === "script:b2d.body.apply_force");
@@ -114,11 +122,16 @@ test("generated implementation lanes join by exact identity and universal fallba
     assert.ok(input, `implementation lane source is not a declared plan input: ${source}`);
     assert.match(generated.inputHashes[input], /^[a-f0-9]{64}$/);
   }
-  assert.ok(generated.units.every((unit) => {
-    const set = generated.tables.implementationSets[unit.implementationSet];
-    return set.length >= 1 && set.length <= 2 &&
-      set.filter(({ lane }) => !["script-universal-value", "dmsdk-universal"].includes(lane)).length <= 1;
-  }));
+  assert.ok(
+    generated.units.every((unit) => {
+      const set = generated.tables.implementationSets[unit.implementationSet];
+      return (
+        set.length >= 1 &&
+        set.length <= 2 &&
+        set.filter(({ lane }) => !["script-universal-value", "dmsdk-universal"].includes(lane)).length <= 1
+      );
+    }),
+  );
 
   const dynamic = generated.units.find(({ identity }) => identity.id === "script:bit.band");
   const dynamicImplementation = generated.tables.implementationSets[dynamic.implementationSet][0];
@@ -157,7 +170,8 @@ test("generated implementation lanes join by exact identity and universal fallba
         target === "staticHermesCAbi"
           ? ["higher-order-lua-closure-result-transport-unavailable", "shape-kind:callback"]
           : ["higher-order-lua-closure-result-transport-unavailable"],
-        `${id}/${target}`);
+        `${id}/${target}`,
+      );
     }
   }
 
@@ -172,8 +186,9 @@ test("generated implementation lanes join by exact identity and universal fallba
 test("typed-native bridge exactly realizes the canonical script selection, including bounded variadics", () => {
   const universal = JSON.parse(inputs.scriptUniversalValue);
   const selection = selectTypedNativeRoutes(generated, universal);
-  const planned = generated.units.filter((unit) =>
-    unit.identity.surface === "script" && unit.backends.staticHermesCAbi.selection === "emit");
+  const planned = generated.units.filter(
+    (unit) => unit.identity.surface === "script" && unit.backends.staticHermesCAbi.selection === "emit",
+  );
   assert.equal(planned.filter(({ sourceState }) => sourceState.loweringFamily !== "script-constant").length, 376);
   assert.equal(planned.filter(({ sourceState }) => sourceState.loweringFamily === "script-constant").length, 141);
   assert.equal(planned.length, 517);
@@ -181,8 +196,11 @@ test("typed-native bridge exactly realizes the canonical script selection, inclu
   assert.deepEqual(selection.declined, []);
   assert.equal(selection.maximumArgumentCount, universal.bounds.maximumArguments);
   assert.deepEqual(
-    selection.claimed.filter(({ arity }) => arity === "bounded-variadic").map(({ id }) => id).sort(),
-    ["script:bit.band", "script:bit.bor", "script:bit.bxor", "script:pprint", "script:socket.skip"]
+    selection.claimed
+      .filter(({ arity }) => arity === "bounded-variadic")
+      .map(({ id }) => id)
+      .sort(),
+    ["script:bit.band", "script:bit.bor", "script:bit.bxor", "script:pprint", "script:socket.skip"],
   );
   const source = renderTypedNativeBridge(selection);
   for (const route of selection.claimed.filter(({ arity }) => arity === "bounded-variadic")) {
@@ -192,20 +210,27 @@ test("typed-native bridge exactly realizes the canonical script selection, inclu
 
   const drifted = structuredClone(universal);
   drifted.bindings.find(({ id }) => id === "script:bit.band").maximumArgumentCount -= 1;
-  assert.throws(() => selectTypedNativeRoutes(generated, drifted),
-    /script:bit\.band: variadic bound differs from the universal frame capacity/);
+  assert.throws(
+    () => selectTypedNativeRoutes(generated, drifted),
+    /script:bit\.band: variadic bound differs from the universal frame capacity/,
+  );
 
   const missingSameRevision = structuredClone(universal);
   missingSameRevision.bindings = missingSameRevision.bindings.filter(({ id }) => id !== "script:bit.band");
-  assert.throws(() => selectTypedNativeRoutes(generated, missingSameRevision),
-    /script:bit\.band: canonical typed-native selection has no universal-value frame/);
+  assert.throws(
+    () => selectTypedNativeRoutes(generated, missingSameRevision),
+    /script:bit\.band: canonical typed-native selection has no universal-value frame/,
+  );
 
   const otherRevision = structuredClone(missingSameRevision);
   otherRevision.defoldRevision = "0123456789abcdef0123456789abcdef01234567";
   const fallback = selectTypedNativeRoutes(generated, otherRevision);
   assert.equal(fallback.planRevisionMatched, false);
-  assert.ok(fallback.declined.some(({ id, reason }) =>
-    id === "script:bit.band" && reason === "canonical-route-absent-from-derived-revision"));
+  assert.ok(
+    fallback.declined.some(
+      ({ id, reason }) => id === "script:bit.band" && reason === "canonical-route-absent-from-derived-revision",
+    ),
+  );
   assert.equal(fallback.claimed.length + fallback.declined.length, planned.length);
 });
 
@@ -281,13 +306,19 @@ test("implementation lane joins fail closed on identity and census drift", () =>
   forgedEvidence.dmsdkFixedDigests = replaceJson(forgedEvidence.dmsdkFixedDigests, (value) => {
     value.declarations[0].stages.runtime = "packaged-engine-verified";
   });
-  assert.throws(() => generateBindingLoweringPlan(forgedEvidence), /unsupported evidence status 'packaged-engine-verified'/);
+  assert.throws(
+    () => generateBindingLoweringPlan(forgedEvidence),
+    /unsupported evidence status 'packaged-engine-verified'/,
+  );
 
   const forgedTarget = structuredClone(inputs);
   forgedTarget.scriptDynamicValues = replaceJson(forgedTarget.scriptDynamicValues, (value) => {
     value.bindings[0].targetSupport.nativeDynamicHermes = "packaged-engine-verified";
   });
-  assert.throws(() => generateBindingLoweringPlan(forgedTarget), /unsupported target status 'packaged-engine-verified'/);
+  assert.throws(
+    () => generateBindingLoweringPlan(forgedTarget),
+    /unsupported target status 'packaged-engine-verified'/,
+  );
 });
 
 test("runtime emit selections never escape unresolved semantics or target capability checks", () => {
@@ -295,11 +326,24 @@ test("runtime emit selections never escape unresolved semantics or target capabi
     assert.ok(unit.contractDetails >= 0 && unit.contractDetails < generated.tables.contracts.length, unit.identity.id);
     for (const target of generated.targetOrder.filter((name) => generated.targetCapabilities[name].runtime)) {
       const backend = unit.backends[target];
-      assert.ok(backend.marshallingProgram >= 0 && backend.marshallingProgram < generated.tables.marshallingPrograms.length, `${unit.identity.id}/${target}`);
-      assert.ok(backend.blockerSet >= 0 && backend.blockerSet < generated.tables.blockerSets.length, `${unit.identity.id}/${target}`);
-      assert.ok(backend.unresolvedTokenSet >= 0 && backend.unresolvedTokenSet < generated.tables.unresolvedTokenSets.length, `${unit.identity.id}/${target}`);
+      assert.ok(
+        backend.marshallingProgram >= 0 && backend.marshallingProgram < generated.tables.marshallingPrograms.length,
+        `${unit.identity.id}/${target}`,
+      );
+      assert.ok(
+        backend.blockerSet >= 0 && backend.blockerSet < generated.tables.blockerSets.length,
+        `${unit.identity.id}/${target}`,
+      );
+      assert.ok(
+        backend.unresolvedTokenSet >= 0 && backend.unresolvedTokenSet < generated.tables.unresolvedTokenSets.length,
+        `${unit.identity.id}/${target}`,
+      );
       if (backend.selection === "emit") {
-        assert.deepEqual(generated.tables.unresolvedTokenSets[backend.unresolvedTokenSet], [], `${unit.identity.id}/${target}`);
+        assert.deepEqual(
+          generated.tables.unresolvedTokenSets[backend.unresolvedTokenSet],
+          [],
+          `${unit.identity.id}/${target}`,
+        );
         assert.deepEqual(generated.tables.blockerSets[backend.blockerSet], [], `${unit.identity.id}/${target}`);
         assert.ok(unit.abi.symbol || unit.abi.plannedSymbol, `${unit.identity.id}/${target}`);
       }
@@ -313,11 +357,33 @@ test("marshalling is an interned data-oriented opcode algebra rather than route 
   assert.ok(generated.tables.blockerSets.length < 200);
   assert.ok(generated.tables.unresolvedTokenSets.length < generated.coverage.units / 4);
   const allowed = new Set([
-    "validate-scalar", "pass-dynamic", "validate-named", "validate-enum", "decode-defold-value",
-    "resolve-handle", "decode-record-ref", "decode-record", "decode-sequence", "decode-map", "select-union",
-    "check-optional", "register-callback", "decode-variadic", "reject-unknown", "no-value", "copy-utf8",
-    "borrow-fixed-array", "borrow-pointer", "borrow-reference", "decode-template-record", "instantiate-template",
-    "resolve-type-parameter", "resolve-opaque", "call-cached-lua", "call-native-symbol", "restore-scratch"
+    "validate-scalar",
+    "pass-dynamic",
+    "validate-named",
+    "validate-enum",
+    "decode-defold-value",
+    "resolve-handle",
+    "decode-record-ref",
+    "decode-record",
+    "decode-sequence",
+    "decode-map",
+    "select-union",
+    "check-optional",
+    "register-callback",
+    "decode-variadic",
+    "reject-unknown",
+    "no-value",
+    "copy-utf8",
+    "borrow-fixed-array",
+    "borrow-pointer",
+    "borrow-reference",
+    "decode-template-record",
+    "instantiate-template",
+    "resolve-type-parameter",
+    "resolve-opaque",
+    "call-cached-lua",
+    "call-native-symbol",
+    "restore-scratch",
   ]);
   for (const program of generated.tables.marshallingPrograms) {
     for (const instruction of program) {
@@ -328,13 +394,10 @@ test("marshalling is an interned data-oriented opcode algebra rather than route 
 
   const route = generated.units.find(({ identity }) => identity.id === "script:b2d.body.apply_force");
   const program = generated.tables.marshallingPrograms[route.backends.dynamicHermesJsi.marshallingProgram];
-  assert.deepEqual(program.map(({ op }) => op), [
-    "resolve-handle",
-    "decode-defold-value",
-    "decode-defold-value",
-    "call-cached-lua",
-    "restore-scratch"
-  ]);
+  assert.deepEqual(
+    program.map(({ op }) => op),
+    ["resolve-handle", "decode-defold-value", "decode-defold-value", "call-cached-lua", "restore-scratch"],
+  );
   assert.equal(route.backends.dynamicHermesJsi.selection, "emit");
 });
 
@@ -353,34 +416,40 @@ test("interned contracts preserve every dmSDK composite effect record", () => {
 
 test("semantic policies are algebraic, reject identity selectors, overlap, and absent tokens", () => {
   const identity = structuredClone(inputs);
-  identity.semanticPolicies = replaceJson(identity.semanticPolicies, (value) => value.rules.push({
-    id: "forbidden-route-rule",
-    selector: { id: "script:b2d.body.apply_force" },
-    resolves: { "lowering:borrowed-handle": "generated-handle-codec" }
-  }));
+  identity.semanticPolicies = replaceJson(identity.semanticPolicies, (value) =>
+    value.rules.push({
+      id: "forbidden-route-rule",
+      selector: { id: "script:b2d.body.apply_force" },
+      resolves: { "lowering:borrowed-handle": "generated-handle-codec" },
+    }),
+  );
   assert.throws(() => generateBindingLoweringPlan(identity), /identity selector 'id'/);
 
   const zero = structuredClone(inputs);
-  zero.semanticPolicies = replaceJson(zero.semanticPolicies, (value) => value.rules.push({
-    id: "zero-match",
-    selector: { surface: "script", semanticTokensAll: ["not-a-real-token"] },
-    resolves: { "not-a-real-token": "impossible" }
-  }));
+  zero.semanticPolicies = replaceJson(zero.semanticPolicies, (value) =>
+    value.rules.push({
+      id: "zero-match",
+      selector: { surface: "script", semanticTokensAll: ["not-a-real-token"] },
+      resolves: { "not-a-real-token": "impossible" },
+    }),
+  );
   assert.throws(() => generateBindingLoweringPlan(zero), /matches zero units/);
 
   const overlap = structuredClone(inputs);
-  overlap.semanticPolicies = replaceJson(overlap.semanticPolicies, (value) => value.rules.push(
-    {
-      id: "first-context",
-      selector: { surface: "script", semanticTokensAll: ["context-policy"] },
-      resolves: { "context-policy": "global-script-context" }
-    },
-    {
-      id: "second-context",
-      selector: { surface: "script", semanticTokensAll: ["context-policy"] },
-      resolves: { "context-policy": "different-context" }
-    }
-  ));
+  overlap.semanticPolicies = replaceJson(overlap.semanticPolicies, (value) =>
+    value.rules.push(
+      {
+        id: "first-context",
+        selector: { surface: "script", semanticTokensAll: ["context-policy"] },
+        resolves: { "context-policy": "global-script-context" },
+      },
+      {
+        id: "second-context",
+        selector: { surface: "script", semanticTokensAll: ["context-policy"] },
+        resolves: { "context-policy": "different-context" },
+      },
+    ),
+  );
   assert.throws(() => generateBindingLoweringPlan(overlap), /semantic policies overlap/);
 });
 
@@ -388,9 +457,15 @@ test("the plan regenerates byte-identically and rejects projection census drift"
   const directory = await mkdtemp(join(tmpdir(), "deherm-lowering-plan-"));
   try {
     const output = join(directory, "plan.json");
-    execFileSync(process.execPath, ["scripts/generate-binding-lowering-plan.mjs", "--output", output], { cwd: repositoryRoot, stdio: "pipe" });
+    execFileSync(process.execPath, ["scripts/generate-binding-lowering-plan.mjs", "--output", output], {
+      cwd: repositoryRoot,
+      stdio: "pipe",
+    });
     assert.equal(await readFile(output, "utf8"), await readFile(reportPath, "utf8"));
-    execFileSync(process.execPath, ["scripts/generate-binding-lowering-plan.mjs", "--output", output, "--check"], { cwd: repositoryRoot, stdio: "pipe" });
+    execFileSync(process.execPath, ["scripts/generate-binding-lowering-plan.mjs", "--output", output, "--check"], {
+      cwd: repositoryRoot,
+      stdio: "pipe",
+    });
   } finally {
     await rm(directory, { recursive: true, force: true });
   }
@@ -409,12 +484,12 @@ test("canonical ordering is byte-identical across host locales", async () => {
     execFileSync(process.execPath, ["scripts/generate-binding-lowering-plan.mjs", "--output", cOutput], {
       cwd: repositoryRoot,
       env: { ...process.env, LC_ALL: "C", LANG: "C" },
-      stdio: "pipe"
+      stdio: "pipe",
     });
     execFileSync(process.execPath, ["scripts/generate-binding-lowering-plan.mjs", "--output", czechOutput], {
       cwd: repositoryRoot,
       env: { ...process.env, LC_ALL: "cs_CZ.UTF-8", LANG: "cs_CZ.UTF-8" },
-      stdio: "pipe"
+      stdio: "pipe",
     });
     assert.equal(await readFile(cOutput, "utf8"), await readFile(czechOutput, "utf8"));
   } finally {

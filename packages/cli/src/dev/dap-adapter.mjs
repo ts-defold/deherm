@@ -25,9 +25,7 @@ function scopeHint(type) {
 const browserBundleUrlRegex = "^defold-hermes://app(?:\\.\\d+)?\\.js$";
 
 function breakpointUrl(session) {
-  return session?.runtime === "browser"
-    ? { urlRegex: browserBundleUrlRegex }
-    : { url: session.bundleUrl };
+  return session?.runtime === "browser" ? { urlRegex: browserBundleUrlRegex } : { url: session.bundleUrl };
 }
 
 function isBundleScript(session, url) {
@@ -64,24 +62,24 @@ export async function createDapAdapter(options = {}) {
   const scripts = new Map();
   let newestBundleScriptId;
 
-  const message = (value) => emit({ seq: sequence += 1, ...value });
+  const message = (value) => emit({ seq: (sequence += 1), ...value });
   const event = (name, body = {}) => message({ type: "event", event: name, body });
   const response = (request, body = {}) => ({
-    seq: sequence += 1,
+    seq: (sequence += 1),
     type: "response",
     request_seq: request.seq,
     command: request.command,
     success: true,
-    body
+    body,
   });
   const failure = (request, error) => ({
-    seq: sequence += 1,
+    seq: (sequence += 1),
     type: "response",
     request_seq: request.seq,
     command: request.command,
     success: false,
     message: error instanceof Error ? error.message : String(error),
-    body: { error: { id: 1, format: error instanceof Error ? error.message : String(error) } }
+    body: { error: { id: 1, format: error instanceof Error ? error.message : String(error) } },
   });
   const refreshMap = async () => {
     if (!session?.sourceMapFile) return false;
@@ -93,7 +91,7 @@ export async function createDapAdapter(options = {}) {
       throw error;
     }
   };
-  const dapSource = (file) => file ? { name: path.basename(file), path: file } : undefined;
+  const dapSource = (file) => (file ? { name: path.basename(file), path: file } : undefined);
   const rawScriptSource = (source) => {
     if (source?.url?.startsWith("file:")) return dapSource(fileURLToPath(source.url));
     if (source?.url) return { name: source.url.split("/").at(-1) || source.url, path: source.url };
@@ -104,18 +102,18 @@ export async function createDapAdapter(options = {}) {
     return source?.scriptId === newestBundleScriptId && isBundleScript(session, source.url);
   };
   const mapGeneratedLocation = (source, lineNumber, columnNumber = 0) => {
-    const original = sourceMap?.trace && sourceUsesCurrentMap(source)
-      ? sourceMap.original(lineNumber + 1, columnNumber)
-      : null;
-    if (original) return {
-      source: dapSource(original.source),
-      line: original.line,
-      column: original.column + 1
-    };
+    const original =
+      sourceMap?.trace && sourceUsesCurrentMap(source) ? sourceMap.original(lineNumber + 1, columnNumber) : null;
+    if (original)
+      return {
+        source: dapSource(original.source),
+        line: original.line,
+        column: original.column + 1,
+      };
     return {
       source: rawScriptSource(source),
       line: lineNumber + 1,
-      column: columnNumber + 1
+      column: columnNumber + 1,
     };
   };
   const preferredBreakpointLocation = (locations = []) => {
@@ -124,8 +122,11 @@ export async function createDapAdapter(options = {}) {
     if (current) return current;
     return locations
       .filter(({ scriptId }) => isBundleScript(session, scripts.get(scriptId)?.url))
-      .sort((left, right) => browserBundleGeneration(scripts.get(right.scriptId)?.url)
-        - browserBundleGeneration(scripts.get(left.scriptId)?.url))[0];
+      .sort(
+        (left, right) =>
+          browserBundleGeneration(scripts.get(right.scriptId)?.url) -
+          browserBundleGeneration(scripts.get(left.scriptId)?.url),
+      )[0];
   };
   const referenceFor = (object) => {
     if (!object?.objectId) return 0;
@@ -161,16 +162,22 @@ export async function createDapAdapter(options = {}) {
           source: dapSource(record.source),
           line: spec.line,
           column: spec.column ?? 1,
-          message: session?.bundleUrl ? "No executable source-map location for this line" : "The dev session published no debug bundle URL"
+          message: session?.bundleUrl
+            ? "No executable source-map location for this line"
+            : "The dev session published no debug bundle URL",
         });
         continue;
       }
-      const answer = await client.send("Debugger.setBreakpointByUrl", {
-        lineNumber: generated.line - 1,
-        columnNumber: generated.column,
-        ...breakpointUrl(session),
-        ...(spec.condition ? { condition: spec.condition } : {})
-      }, { timeoutMs: 10_000 });
+      const answer = await client.send(
+        "Debugger.setBreakpointByUrl",
+        {
+          lineNumber: generated.line - 1,
+          columnNumber: generated.column,
+          ...breakpointUrl(session),
+          ...(spec.condition ? { condition: spec.condition } : {}),
+        },
+        { timeoutMs: 10_000 },
+      );
       record.cdpIds.push(answer.breakpointId);
       cdpBreakpoints.set(answer.breakpointId, { record, spec });
       const actual = preferredBreakpointLocation(answer.locations);
@@ -182,7 +189,7 @@ export async function createDapAdapter(options = {}) {
         id: spec.id,
         verified: Boolean(actual),
         ...mapped,
-        ...(!actual ? { message: "Breakpoint is pending the next matching script load" } : {})
+        ...(!actual ? { message: "Breakpoint is pending the next matching script load" } : {}),
       });
     }
     return results;
@@ -192,12 +199,13 @@ export async function createDapAdapter(options = {}) {
     breakpointQueue = current.catch(() => {});
     return current;
   };
-  const reapplyBreakpoints = () => enqueueBreakpoints(async () => {
-    for (const record of breakpointSources.values()) {
-      const results = await applyBreakpointSource(record);
-      for (const breakpoint of results) event("breakpoint", { reason: "changed", breakpoint });
-    }
-  });
+  const reapplyBreakpoints = () =>
+    enqueueBreakpoints(async () => {
+      for (const record of breakpointSources.values()) {
+        const results = await applyBreakpointSource(record);
+        for (const breakpoint of results) event("breakpoint", { reason: "changed", breakpoint });
+      }
+    });
   const onPaused = async (params) => {
     await refreshMap();
     clearPause();
@@ -213,15 +221,17 @@ export async function createDapAdapter(options = {}) {
       reason: params.reason === "exception" ? "exception" : params.reason === "step" ? "step" : "breakpoint",
       threadId: 1,
       allThreadsStopped: true,
-      ...(params.description ? { description: params.description } : {})
+      ...(params.description ? { description: params.description } : {}),
     });
   };
   const enqueuePause = (params) => {
     const current = pauseQueue.then(() => onPaused(params));
-    pauseQueue = current.catch((error) => event("output", {
-      category: "stderr",
-      output: `${error.message}\n`
-    }));
+    pauseQueue = current.catch((error) =>
+      event("output", {
+        category: "stderr",
+        output: `${error.message}\n`,
+      }),
+    );
     return current;
   };
 
@@ -238,13 +248,12 @@ export async function createDapAdapter(options = {}) {
     const discovered = await discover({
       projectRoot,
       sessionFile: args.inspectorSession ? path.resolve(projectRoot, args.inspectorSession) : sessionFile,
-      replaceDebugger: args.replaceDebugger === true || options.replaceDebugger === true
+      replaceDebugger: args.replaceDebugger === true || options.replaceDebugger === true,
     });
     session = discovered.session;
     await refreshMap();
     const websocket = new URL(discovered.target.webSocketDebuggerUrl);
-    if (session.runtime !== "browser" &&
-        (args.replaceDebugger === true || options.replaceDebugger === true)) {
+    if (session.runtime !== "browser" && (args.replaceDebugger === true || options.replaceDebugger === true)) {
       websocket.searchParams.set("replace", "1");
     }
     client = await connect(websocket.href, { retain: false });
@@ -257,10 +266,12 @@ export async function createDapAdapter(options = {}) {
         }
       }
       if (isBundleScript(session, params.url) && breakpointSources.size) {
-        void reapplyBreakpoints().catch((error) => event("output", {
-          category: "stderr",
-          output: `déherm could not reapply breakpoints after reload: ${error.message}\n`
-        }));
+        void reapplyBreakpoints().catch((error) =>
+          event("output", {
+            category: "stderr",
+            output: `déherm could not reapply breakpoints after reload: ${error.message}\n`,
+          }),
+        );
       }
     });
     client.onEvent("Debugger.breakpointResolved", ({ breakpointId, location }) => {
@@ -271,7 +282,7 @@ export async function createDapAdapter(options = {}) {
       const mapped = mapGeneratedLocation(source, location.lineNumber, location.columnNumber);
       event("breakpoint", {
         reason: "changed",
-        breakpoint: { id: owner.spec.id, verified: true, ...mapped }
+        breakpoint: { id: owner.spec.id, verified: true, ...mapped },
       });
     });
     client.onEvent("Debugger.paused", enqueuePause);
@@ -300,8 +311,8 @@ export async function createDapAdapter(options = {}) {
               supportsLogPoints: false,
               exceptionBreakpointFilters: [
                 { filter: "uncaught", label: "Uncaught exceptions", default: true },
-                { filter: "all", label: "All exceptions", default: false }
-              ]
+                { filter: "all", label: "All exceptions", default: false },
+              ],
             });
           case "attach":
           case "launch":
@@ -342,12 +353,12 @@ export async function createDapAdapter(options = {}) {
               const mapped = mapGeneratedLocation(
                 scripts.get(callFrame.location.scriptId),
                 callFrame.location.lineNumber,
-                callFrame.location.columnNumber
+                callFrame.location.columnNumber,
               );
               return {
                 id: callFrame.__dapFrameId,
                 name: callFrame.functionName || "(anonymous)",
-                ...mapped
+                ...mapped,
               };
             });
             return response(request, { stackFrames, totalFrames: paused.length });
@@ -359,52 +370,67 @@ export async function createDapAdapter(options = {}) {
               name: scope.name || scope.type || "scope",
               presentationHint: scopeHint(scope.type),
               variablesReference: referenceFor(scope.object),
-              expensive: scope.type === "global"
+              expensive: scope.type === "global",
             }));
-            if (callFrame.this) scopes.push({
-              name: "this",
-              presentationHint: "locals",
-              variablesReference: referenceFor(callFrame.this),
-              expensive: false
-            });
+            if (callFrame.this)
+              scopes.push({
+                name: "this",
+                presentationHint: "locals",
+                variablesReference: referenceFor(callFrame.this),
+                expensive: false,
+              });
             return response(request, { scopes });
           }
           case "variables": {
             const objectId = objectByReference.get(request.arguments?.variablesReference);
             if (!objectId) throw new Error("Unknown or stale variables reference");
-            const result = await client.send("Runtime.getProperties", {
-              objectId,
-              ownProperties: false,
-              accessorPropertiesOnly: false,
-              generatePreview: true
-            }, { timeoutMs: 10_000 });
-            const variables = (result.result ?? []).filter((property) => property.value).map((property) => ({
-              name: property.name,
-              value: remoteValue(property.value),
-              type: property.value.type,
-              variablesReference: referenceFor(property.value),
-              evaluateName: property.name
-            }));
+            const result = await client.send(
+              "Runtime.getProperties",
+              {
+                objectId,
+                ownProperties: false,
+                accessorPropertiesOnly: false,
+                generatePreview: true,
+              },
+              { timeoutMs: 10_000 },
+            );
+            const variables = (result.result ?? [])
+              .filter((property) => property.value)
+              .map((property) => ({
+                name: property.name,
+                value: remoteValue(property.value),
+                type: property.value.type,
+                variablesReference: referenceFor(property.value),
+                evaluateName: property.name,
+              }));
             return response(request, { variables });
           }
           case "evaluate": {
             const callFrame = frameById.get(request.arguments?.frameId);
             const result = callFrame
-              ? await client.send("Debugger.evaluateOnCallFrame", {
-                  callFrameId: callFrame.callFrameId,
-                  expression: request.arguments.expression,
-                  generatePreview: true,
-                  returnByValue: false
-                }, { timeoutMs: 10_000 })
-              : await client.send("Runtime.evaluate", {
-                  expression: request.arguments.expression,
-                  generatePreview: true,
-                  returnByValue: false
-                }, { timeoutMs: 10_000 });
+              ? await client.send(
+                  "Debugger.evaluateOnCallFrame",
+                  {
+                    callFrameId: callFrame.callFrameId,
+                    expression: request.arguments.expression,
+                    generatePreview: true,
+                    returnByValue: false,
+                  },
+                  { timeoutMs: 10_000 },
+                )
+              : await client.send(
+                  "Runtime.evaluate",
+                  {
+                    expression: request.arguments.expression,
+                    generatePreview: true,
+                    returnByValue: false,
+                  },
+                  { timeoutMs: 10_000 },
+                );
             return response(request, {
               result: remoteValue(result.result),
               type: result.result?.type,
-              variablesReference: referenceFor(result.result)
+              variablesReference: referenceFor(result.result),
             });
           }
           case "continue":
@@ -435,8 +461,9 @@ export async function createDapAdapter(options = {}) {
           case "exceptionInfo":
             return response(request, {
               exceptionId: pauseDetails?.data?.className ?? "hermes",
-              description: pauseDetails?.description ?? pauseDetails?.data?.description ?? "Hermes JavaScript exception",
-              breakMode: "always"
+              description:
+                pauseDetails?.description ?? pauseDetails?.data?.description ?? "Hermes JavaScript exception",
+              breakMode: "always",
             });
           case "disconnect":
           case "terminate":
@@ -458,7 +485,7 @@ export async function createDapAdapter(options = {}) {
     async close() {
       await client?.close();
       client = undefined;
-    }
+    },
   };
 }
 

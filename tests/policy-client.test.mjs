@@ -8,7 +8,7 @@ import { hashBytes, POLICY_REALIZER_CAPABILITIES } from "../packages/compiler/sr
 import {
   policySurfaceRealizationIdentity,
   publishPolicySurface,
-  resolvePublishedPolicy
+  resolvePublishedPolicy,
 } from "../packages/cli/src/policy-client.mjs";
 
 const revision = "1".repeat(40);
@@ -24,7 +24,7 @@ function fixture({ tamper = false, entryRealizer, rootRealizer, defoldRevision =
     kind: "deherm.policy.compiler-document",
     namespace: documentNamespace,
     name: "fixture.json",
-    value: { fixture: fixtureValue }
+    value: { fixture: fixtureValue },
   });
   const documentHash = hashBytes(documentBytes);
   const compilerBytes = json({
@@ -35,21 +35,26 @@ function fixture({ tamper = false, entryRealizer, rootRealizer, defoldRevision =
     documents: {
       schemaVersion: 1,
       kind: "deherm.policy.compiler-document-manifest",
-      entries: { "fixture.json": { object: documentNamespace, recipe: "fixture.copy.v1" } }
+      entries: { "fixture.json": { object: documentNamespace, recipe: "fixture.copy.v1" } },
     },
     sdk: { schemaVersion: 1, kind: "deherm.policy.sdk-manifest", entries: {} },
     outputs: { schemaVersion: 1, kind: "deherm.policy.output-manifest", entries: {} },
-    realizationRecipes: { documents: { "fixture.json": "fixture.copy.v1" }, sdk: {}, outputs: {} }
+    realizationRecipes: { documents: { "fixture.json": "fixture.copy.v1" }, sdk: {}, outputs: {} },
   });
   const compilerHash = hashBytes(compilerBytes);
   const toolchainBytes = json({ schemaVersion: 1, kind: "deherm.policy.toolchain", bob: {} });
   const toolchainHash = hashBytes(toolchainBytes);
-  const unusedBytes = json({ schemaVersion: 1, kind: "deherm.policy.namespace", namespace: "go", script: { functions: [] } });
+  const unusedBytes = json({
+    schemaVersion: 1,
+    kind: "deherm.policy.namespace",
+    namespace: "go",
+    script: { functions: [] },
+  });
   const unusedHash = hashBytes(unusedBytes);
   const generator = `sha256:${"2".repeat(64)}`;
   const realizer = entryRealizer ?? {
     minimumPackageVersion: "0.0.0",
-    requiredCapabilities: [...POLICY_REALIZER_CAPABILITIES]
+    requiredCapabilities: [...POLICY_REALIZER_CAPABILITIES],
   };
   const rootBytes = json({
     schemaVersion: 1,
@@ -62,18 +67,28 @@ function fixture({ tamper = false, entryRealizer, rootRealizer, defoldRevision =
       "@compiler": compilerHash,
       "@compiler:document:fixture.json": documentHash,
       "@toolchain": toolchainHash,
-      go: unusedHash
-    }
+      go: unusedHash,
+    },
   });
   const policyRoot = hashBytes(rootBytes);
-  const entryBytes = json({ schemaVersion: 1, kind: "deherm.policy.index-entry", defoldRevision, policyRoot, generator, realizer });
+  const entryBytes = json({
+    schemaVersion: 1,
+    kind: "deherm.policy.index-entry",
+    defoldRevision,
+    policyRoot,
+    generator,
+    realizer,
+  });
   const routes = new Map([
     [`https://policy.invalid/deherm/v1/index/${defoldRevision}.json`, entryBytes],
     [`https://policy.invalid/deherm/v1/policy/${policyRoot}.json`, rootBytes],
     [`https://policy.invalid/deherm/v1/object/${compilerHash}.json`, compilerBytes],
     [`https://policy.invalid/deherm/v1/object/${toolchainHash}.json`, toolchainBytes],
-    [`https://policy.invalid/deherm/v1/object/${documentHash}.json`, tamper ? json({ namespace: documentNamespace, altered: true }) : documentBytes],
-    [`https://policy.invalid/deherm/v1/object/${unusedHash}.json`, unusedBytes]
+    [
+      `https://policy.invalid/deherm/v1/object/${documentHash}.json`,
+      tamper ? json({ namespace: documentNamespace, altered: true }) : documentBytes,
+    ],
+    [`https://policy.invalid/deherm/v1/object/${unusedHash}.json`, unusedBytes],
   ]);
   const index = {
     base: {
@@ -82,9 +97,9 @@ function fixture({ tamper = false, entryRealizer, rootRealizer, defoldRevision =
       layoutVersion: "v1",
       index: "v1/index/{defoldRevision}.json",
       policy: "v1/policy/{policyRoot}.json",
-      object: "v1/object/{subtreeHash}.json"
+      object: "v1/object/{subtreeHash}.json",
     },
-    entries: []
+    entries: [],
   };
   const requests = [];
   const fetchImpl = async (url) => {
@@ -108,26 +123,40 @@ test("surface realization identity binds policy, compiler, and relevant options"
     generator: `sha256:${"2".repeat(64)}`,
     realizer: {
       minimumPackageVersion: "0.0.0",
-      requiredCapabilities: [...POLICY_REALIZER_CAPABILITIES]
-    }
+      requiredCapabilities: [...POLICY_REALIZER_CAPABILITIES],
+    },
   };
   const first = policySurfaceRealizationIdentity({ entry: base, packageVersion: "1.2.3" });
   const reordered = policySurfaceRealizationIdentity({
-    entry: { ...base, realizer: { ...base.realizer, requiredCapabilities: [...base.realizer.requiredCapabilities].reverse() } },
-    packageVersion: "1.2.3"
+    entry: {
+      ...base,
+      realizer: { ...base.realizer, requiredCapabilities: [...base.realizer.requiredCapabilities].reverse() },
+    },
+    packageVersion: "1.2.3",
   });
   assert.equal(first.realizationId, reordered.realizationId, "capability discovery order must not change identity");
-  assert.notEqual(first.realizationId, policySurfaceRealizationIdentity({
-    entry: { ...base, policyRoot: "f".repeat(64) }, packageVersion: "1.2.3"
-  }).realizationId);
-  assert.notEqual(first.realizationId, policySurfaceRealizationIdentity({
-    entry: base, packageVersion: "1.2.4"
-  }).realizationId);
-  assert.notEqual(first.realizationId, policySurfaceRealizationIdentity({
-    entry: base,
-    packageVersion: "1.2.3",
-    artifacts: { kind: "deherm.policy.artifacts", release: "next" }
-  }).realizationId);
+  assert.notEqual(
+    first.realizationId,
+    policySurfaceRealizationIdentity({
+      entry: { ...base, policyRoot: "f".repeat(64) },
+      packageVersion: "1.2.3",
+    }).realizationId,
+  );
+  assert.notEqual(
+    first.realizationId,
+    policySurfaceRealizationIdentity({
+      entry: base,
+      packageVersion: "1.2.4",
+    }).realizationId,
+  );
+  assert.notEqual(
+    first.realizationId,
+    policySurfaceRealizationIdentity({
+      entry: base,
+      packageVersion: "1.2.3",
+      artifacts: { kind: "deherm.policy.artifacts", release: "next" },
+    }).realizationId,
+  );
 });
 
 test("immutable publication refuses a symlink winner and cleans a failed stage", async () => {
@@ -136,7 +165,7 @@ test("immutable publication refuses a symlink winner and cleans a failed stage",
   const entry = {
     policyRoot: "e".repeat(64),
     generator: `sha256:${"2".repeat(64)}`,
-    realizer: { minimumPackageVersion: "0.0.0", requiredCapabilities: [...POLICY_REALIZER_CAPABILITIES] }
+    realizer: { minimumPackageVersion: "0.0.0", requiredCapabilities: [...POLICY_REALIZER_CAPABILITIES] },
   };
   const realization = policySurfaceRealizationIdentity({ entry, packageVersion: "1.2.3" });
   const parent = path.join(surfaceBase, "r");
@@ -145,35 +174,45 @@ test("immutable publication refuses a symlink winner and cleans a failed stage",
   await mkdir(parent, { recursive: true });
   await symlink(target, path.join(parent, realization.realizationId.slice(0, 32)), "dir");
   await assert.rejects(
-    publishPolicySurface({ entry }, {
-      revision,
-      realization,
-      surfaceBase,
-      surfaceBoundary: root,
-      materialize: async () => { throw new Error("must not materialize through a symlink"); },
-      artifacts: null
-    }),
-    /must not be a symlink/u
+    publishPolicySurface(
+      { entry },
+      {
+        revision,
+        realization,
+        surfaceBase,
+        surfaceBoundary: root,
+        materialize: async () => {
+          throw new Error("must not materialize through a symlink");
+        },
+        artifacts: null,
+      },
+    ),
+    /must not be a symlink/u,
   );
 
   const cleanBase = path.join(root, "clean", "surfaces", revision);
   await assert.rejects(
-    publishPolicySurface({ entry }, {
-      revision,
-      realization,
-      surfaceBase: cleanBase,
-      surfaceBoundary: root,
-      materialize: async (_policy, options) => {
-        await mkdir(options.outputRoot, { recursive: true });
-        await writeFile(path.join(options.outputRoot, "partial"), "partial\n");
-        throw new Error("synthetic materializer failure");
+    publishPolicySurface(
+      { entry },
+      {
+        revision,
+        realization,
+        surfaceBase: cleanBase,
+        surfaceBoundary: root,
+        materialize: async (_policy, options) => {
+          await mkdir(options.outputRoot, { recursive: true });
+          await writeFile(path.join(options.outputRoot, "partial"), "partial\n");
+          throw new Error("synthetic materializer failure");
+        },
+        artifacts: null,
       },
-      artifacts: null
-    }),
-    /synthetic materializer failure/u
+    ),
+    /synthetic materializer failure/u,
   );
-  assert.ok(!(await readdir(path.join(cleanBase, "r"))).some((name) => name.startsWith(".s-")),
-    "a failed materializer must not leave a staging directory");
+  assert.ok(
+    !(await readdir(path.join(cleanBase, "r"))).some((name) => name.startsWith(".s-")),
+    "a failed materializer must not leave a staging directory",
+  );
 });
 
 test("cold policy resolution transfers only the authenticated realization closure", async () => {
@@ -187,15 +226,14 @@ test("cold policy resolution transfers only the authenticated realization closur
   assert.equal(first.transfer.cacheWrites, 6);
   assert.ok(first.transfer.transferBytes > 0);
   assert.equal(source.requests.length, 5);
-  assert.ok(!source.requests.some((url) => url.endsWith(`${source.unusedHash}.json`)), "unused API namespace was transferred");
+  assert.ok(
+    !source.requests.some((url) => url.endsWith(`${source.unusedHash}.json`)),
+    "unused API namespace was transferred",
+  );
   const receipt = JSON.parse(await readFile(first.receipt, "utf8"));
   assert.equal(receipt.defoldRevision, revision);
   assert.equal(receipt.policyRoot, source.policyRoot);
-  assert.deepEqual(Object.keys(receipt.objects).sort(), [
-    "@compiler",
-    "@compiler:document:fixture.json",
-    "@toolchain"
-  ]);
+  assert.deepEqual(Object.keys(receipt.objects).sort(), ["@compiler", "@compiler:document:fixture.json", "@toolchain"]);
 });
 
 test("a warm authenticated cache resolves offline without invoking fetch", async () => {
@@ -206,7 +244,9 @@ test("a warm authenticated cache resolves offline without invoking fetch", async
     ...source,
     cacheHome,
     offline: true,
-    fetchImpl: async () => { throw new Error("offline resolution attempted network I/O"); }
+    fetchImpl: async () => {
+      throw new Error("offline resolution attempted network I/O");
+    },
   });
   assert.deepEqual(warm.transfer, { cacheHits: 5, cacheMisses: 0, cacheWrites: 0, transferBytes: 0 });
 });
@@ -245,7 +285,7 @@ test("an absent exact revision is rejected without revision fallback", async () 
   const absentRevision = "3".repeat(40);
   await assert.rejects(
     resolvePublishedPolicy(absentRevision, { ...source, cacheHome }),
-    new RegExp(`/index/${absentRevision}\\.json: HTTP 404`, "u")
+    new RegExp(`/index/${absentRevision}\\.json: HTTP 404`, "u"),
   );
   assert.deepEqual(source.requests, [`https://policy.invalid/deherm/v1/index/${absentRevision}.json`]);
 });
@@ -268,7 +308,9 @@ test("published policy resolution retries transient Pages propagation failures",
       return fetchImpl(url);
     },
     fetchRetryDelaysMs: [1, 2],
-    sleepImpl: async (milliseconds) => { sleeps.push(milliseconds); }
+    sleepImpl: async (milliseconds) => {
+      sleeps.push(milliseconds);
+    },
   });
   assert.equal(resolved.entry.policyRoot, source.policyRoot);
   assert.deepEqual(sleeps, [1, 2]);
@@ -279,7 +321,7 @@ test("published policy resolution rejects an object substituted at its digest pa
   const cacheHome = await mkdtemp(path.join(tmpdir(), "deherm-policy-client-tamper-"));
   await assert.rejects(
     resolvePublishedPolicy(revision, { ...fixture({ tamper: true }), cacheHome }),
-    /object bytes do not hash/
+    /object bytes do not hash/,
   );
 });
 
@@ -293,9 +335,11 @@ test("a corrupt cached content-addressed object is rejected without network fall
       ...source,
       cacheHome,
       offline: true,
-      fetchImpl: async () => { throw new Error("corrupt cache fell back to network"); }
+      fetchImpl: async () => {
+        throw new Error("corrupt cache fell back to network");
+      },
     }),
-    /Corrupt authenticated policy cache entry[\s\S]*object bytes do not hash/u
+    /Corrupt authenticated policy cache entry[\s\S]*object bytes do not hash/u,
   );
 });
 
@@ -311,25 +355,33 @@ test("shared authenticated evidence realizes two project caches offline and stay
       kind: "fixture-surface",
       defoldRevision: options.revision,
       policyRoot: options.realization.policyRoot,
-      realization: options.realization
+      realization: options.realization,
     })}\n`;
-    const current = await readFile(file, "utf8").catch((error) => error?.code === "ENOENT" ? null : Promise.reject(error));
+    const current = await readFile(file, "utf8").catch((error) =>
+      error?.code === "ENOENT" ? null : Promise.reject(error),
+    );
     if (current === bytes) return { outputRoot: options.outputRoot, written: [] };
     await mkdir(options.outputRoot, { recursive: true });
     await writeFile(file, bytes);
     return { outputRoot: options.outputRoot, written: ["surface.json"] };
   };
   const cold = await resolvePublishedPolicy(revision, {
-    ...source, cacheHome, surfaceRoot: projectOne, materializeImpl, verifySurfaceImpl: verifyFixtureSurface
+    ...source,
+    cacheHome,
+    surfaceRoot: projectOne,
+    materializeImpl,
+    verifySurfaceImpl: verifyFixtureSurface,
   });
   assert.deepEqual(cold.surface.written, ["surface.json"]);
   const offlineSource = {
     ...source,
     cacheHome,
     offline: true,
-    fetchImpl: async () => { throw new Error("cross-project reuse attempted network I/O"); },
+    fetchImpl: async () => {
+      throw new Error("cross-project reuse attempted network I/O");
+    },
     materializeImpl,
-    verifySurfaceImpl: verifyFixtureSurface
+    verifySurfaceImpl: verifyFixtureSurface,
   };
   const reused = await resolvePublishedPolicy(revision, { ...offlineSource, surfaceRoot: projectTwo });
   assert.deepEqual(reused.transfer, { cacheHits: 5, cacheMisses: 0, cacheWrites: 1, transferBytes: 0 });
@@ -342,7 +394,7 @@ test("shared authenticated evidence realizes two project caches offline and stay
   assert.deepEqual(
     (await readdir(path.join(projectTwo, "r"))).filter((name) => !name.startsWith(".s-")),
     [reused.realization.realizationId.slice(0, 32)],
-    "one policy/compiler/options identity must publish one immutable realization directory"
+    "one policy/compiler/options identity must publish one immutable realization directory",
   );
 });
 
@@ -357,19 +409,25 @@ test("a replaced policy publishes a new immutable realization and atomically mov
       kind: "deherm.materialized-defold-surface",
       defoldRevision: options.revision,
       policyRoot: options.realization.policyRoot,
-      realization: options.realization
+      realization: options.realization,
     };
     await writeFile(path.join(options.outputRoot, "surface.json"), `${JSON.stringify(descriptor)}\n`);
     return { outputRoot: options.outputRoot, descriptor, written: ["surface.json"] };
   };
 
   const first = await resolvePublishedPolicy(revision, {
-    ...fixture({ fixtureValue: "first" }), cacheHome, surfaceRoot, materializeImpl,
-    verifySurfaceImpl: verifyFixtureSurface
+    ...fixture({ fixtureValue: "first" }),
+    cacheHome,
+    surfaceRoot,
+    materializeImpl,
+    verifySurfaceImpl: verifyFixtureSurface,
   });
   const second = await resolvePublishedPolicy(revision, {
-    ...fixture({ fixtureValue: "second" }), cacheHome, surfaceRoot, materializeImpl,
-    verifySurfaceImpl: verifyFixtureSurface
+    ...fixture({ fixtureValue: "second" }),
+    cacheHome,
+    surfaceRoot,
+    materializeImpl,
+    verifySurfaceImpl: verifyFixtureSurface,
   });
   assert.notEqual(second.realization.realizationId, first.realization.realizationId);
   assert.notEqual(second.surface.outputRoot, first.surface.outputRoot);
@@ -378,7 +436,7 @@ test("a replaced policy publishes a new immutable realization and atomically mov
   assert.deepEqual(
     (await readdir(path.join(surfaceRoot, "r"))).sort(),
     [first.realization.realizationId.slice(0, 32), second.realization.realizationId.slice(0, 32)].sort(),
-    "publishing a replacement must preserve the prior immutable realization"
+    "publishing a replacement must preserve the prior immutable realization",
   );
 });
 
@@ -387,12 +445,12 @@ test("an incompatible package version is rejected before the policy root is fetc
   const source = fixture({
     entryRealizer: {
       minimumPackageVersion: "2.0.0",
-      requiredCapabilities: [...POLICY_REALIZER_CAPABILITIES]
-    }
+      requiredCapabilities: [...POLICY_REALIZER_CAPABILITIES],
+    },
   });
   await assert.rejects(
     resolvePublishedPolicy(revision, { ...source, cacheHome, packageVersion: "1.9.9" }),
-    /requires @ts-defold\/deherm >= 2\.0\.0[\s\S]*pnpm up[\s\S]*npm install/u
+    /requires @ts-defold\/deherm >= 2\.0\.0[\s\S]*pnpm up[\s\S]*npm install/u,
   );
   assert.equal(source.requests.length, 1);
   assert.match(source.requests[0], /\/index\//u);
@@ -403,17 +461,17 @@ test("a missing realizer capability is rejected before the policy root is fetche
   const source = fixture({
     entryRealizer: {
       minimumPackageVersion: "0.0.0",
-      requiredCapabilities: [...POLICY_REALIZER_CAPABILITIES, "sdk.future-shape.v1"]
-    }
+      requiredCapabilities: [...POLICY_REALIZER_CAPABILITIES, "sdk.future-shape.v1"],
+    },
   });
   await assert.rejects(
     resolvePublishedPolicy(revision, {
       ...source,
       cacheHome,
       packageVersion: "9.0.0",
-      capabilities: POLICY_REALIZER_CAPABILITIES
+      capabilities: POLICY_REALIZER_CAPABILITIES,
     }),
-    /unsupported realization capabilities: sdk\.future-shape\.v1[\s\S]*pnpm up[\s\S]*npm install/u
+    /unsupported realization capabilities: sdk\.future-shape\.v1[\s\S]*pnpm up[\s\S]*npm install/u,
   );
   assert.equal(source.requests.length, 1);
 });
@@ -423,12 +481,12 @@ test("the authenticated root must repeat the index realizer contract exactly", a
   const source = fixture({
     rootRealizer: {
       minimumPackageVersion: "0.0.1",
-      requiredCapabilities: [...POLICY_REALIZER_CAPABILITIES]
-    }
+      requiredCapabilities: [...POLICY_REALIZER_CAPABILITIES],
+    },
   });
   await assert.rejects(
     resolvePublishedPolicy(revision, { ...source, cacheHome, packageVersion: "9.0.0" }),
-    /policy realizer contract does not match its index entry/u
+    /policy realizer contract does not match its index entry/u,
   );
   assert.equal(source.requests.length, 2);
   assert.match(source.requests[1], /\/policy\//u);

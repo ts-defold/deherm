@@ -36,7 +36,31 @@ class Unresolved extends Error {
 // ── The `#if` expression grammar ────────────────────────────────────────────
 
 const PUNCTUATION = [
-  "&&", "||", "==", "!=", "<=", ">=", "<<", ">>", "(", ")", "!", "<", ">", "+", "-", "*", "/", "%", "~", "&", "|", "^", "?", ":", ","
+  "&&",
+  "||",
+  "==",
+  "!=",
+  "<=",
+  ">=",
+  "<<",
+  ">>",
+  "(",
+  ")",
+  "!",
+  "<",
+  ">",
+  "+",
+  "-",
+  "*",
+  "/",
+  "%",
+  "~",
+  "&",
+  "|",
+  "^",
+  "?",
+  ":",
+  ",",
 ];
 
 export function tokenizeExpression(text) {
@@ -44,7 +68,10 @@ export function tokenizeExpression(text) {
   let index = 0;
   while (index < text.length) {
     const character = text[index];
-    if (/\s/.test(character)) { index += 1; continue; }
+    if (/\s/.test(character)) {
+      index += 1;
+      continue;
+    }
     if (/[A-Za-z_]/.test(character)) {
       const match = /^[A-Za-z_]\w*/.exec(text.slice(index));
       tokens.push({ kind: "name", value: match[0] });
@@ -94,7 +121,10 @@ export function evaluateCondition(expression, environment) {
   const peek = () => tokens[position];
   const take = () => tokens[position++];
   const accept = (value) => {
-    if (peek()?.kind === "punctuation" && peek().value === value) { position += 1; return true; }
+    if (peek()?.kind === "punctuation" && peek().value === value) {
+      position += 1;
+      return true;
+    }
     return false;
   };
   const expect = (value) => {
@@ -121,7 +151,11 @@ export function evaluateCondition(expression, environment) {
     if (token === undefined) throw new Unresolved("conditional expression ended early");
     if (token.kind === "number") return token.value;
     if (token.kind === "punctuation") {
-      if (token.value === "(") { const value = ternary(); expect(")"); return value; }
+      if (token.value === "(") {
+        const value = ternary();
+        expect(")");
+        return value;
+      }
       if (token.value === "!") return primary() ? 0 : 1;
       if (token.value === "-") return -primary();
       if (token.value === "+") return primary();
@@ -164,25 +198,64 @@ export function evaluateCondition(expression, environment) {
       take();
       const right = next();
       switch (token.value) {
-        case "*": left = left * right; break;
-        case "/": if (right === 0) throw new Unresolved("division by zero"); left = Math.trunc(left / right); break;
-        case "%": if (right === 0) throw new Unresolved("modulo by zero"); left = left % right; break;
-        case "+": left = left + right; break;
-        case "-": left = left - right; break;
-        case "<<": left = left << right; break;
-        case ">>": left = left >> right; break;
-        case "<": left = left < right ? 1 : 0; break;
-        case ">": left = left > right ? 1 : 0; break;
-        case "<=": left = left <= right ? 1 : 0; break;
-        case ">=": left = left >= right ? 1 : 0; break;
-        case "==": left = left === right ? 1 : 0; break;
-        case "!=": left = left !== right ? 1 : 0; break;
-        case "&": left = left & right; break;
-        case "^": left = left ^ right; break;
-        case "|": left = left | right; break;
-        case "&&": left = left && right ? 1 : 0; break;
-        case "||": left = left || right ? 1 : 0; break;
-        default: throw new Unresolved(`unsupported operator "${token.value}"`);
+        case "*":
+          left = left * right;
+          break;
+        case "/":
+          if (right === 0) throw new Unresolved("division by zero");
+          left = Math.trunc(left / right);
+          break;
+        case "%":
+          if (right === 0) throw new Unresolved("modulo by zero");
+          left = left % right;
+          break;
+        case "+":
+          left = left + right;
+          break;
+        case "-":
+          left = left - right;
+          break;
+        case "<<":
+          left = left << right;
+          break;
+        case ">>":
+          left = left >> right;
+          break;
+        case "<":
+          left = left < right ? 1 : 0;
+          break;
+        case ">":
+          left = left > right ? 1 : 0;
+          break;
+        case "<=":
+          left = left <= right ? 1 : 0;
+          break;
+        case ">=":
+          left = left >= right ? 1 : 0;
+          break;
+        case "==":
+          left = left === right ? 1 : 0;
+          break;
+        case "!=":
+          left = left !== right ? 1 : 0;
+          break;
+        case "&":
+          left = left & right;
+          break;
+        case "^":
+          left = left ^ right;
+          break;
+        case "|":
+          left = left | right;
+          break;
+        case "&&":
+          left = left && right ? 1 : 0;
+          break;
+        case "||":
+          left = left || right ? 1 : 0;
+          break;
+        default:
+          throw new Unresolved(`unsupported operator "${token.value}"`);
       }
     }
   };
@@ -249,13 +322,22 @@ export function readConditionalBranches(source) {
   };
   const arm = (kind, expression, line) => {
     const frame = stack.at(-1);
-    if (!frame) { problems.push({ line, problem: `#${kind} without #if` }); return; }
+    if (!frame) {
+      problems.push({ line, problem: `#${kind} without #if` });
+      return;
+    }
     branches[frame.branch].endLine = line - 1;
     const parent = branches[frame.branch].parent;
     const branch = branches.length;
     branches.push({
-      index: branch, kind, expression, line, endLine: lines.length, parent,
-      group: frame.group, siblings: [...frame.arms]
+      index: branch,
+      kind,
+      expression,
+      line,
+      endLine: lines.length,
+      parent,
+      group: frame.group,
+      siblings: [...frame.arms],
     });
     frame.arms.push(branch);
     frame.branch = branch;
@@ -266,18 +348,38 @@ export function readConditionalBranches(source) {
     const match = DIRECTIVE.exec(text);
     if (!match) return;
     const [, kind, rest] = match;
-    const expression = rest.replace(/\/\*.*?\*\//g, " ").replace(/\/\/.*$/, "").trim();
+    const expression = rest
+      .replace(/\/\*.*?\*\//g, " ")
+      .replace(/\/\/.*$/, "")
+      .trim();
     switch (kind) {
-      case "if": open("if", expression, line); break;
-      case "ifdef": open("if", `defined(${expression.split(/\s+/)[0] ?? ""})`, line); break;
-      case "ifndef": open("if", `!defined(${expression.split(/\s+/)[0] ?? ""})`, line); break;
-      case "elif": arm("elif", expression, line); break;
-      case "elifdef": arm("elif", `defined(${expression.split(/\s+/)[0] ?? ""})`, line); break;
-      case "elifndef": arm("elif", `!defined(${expression.split(/\s+/)[0] ?? ""})`, line); break;
-      case "else": arm("else", null, line); break;
+      case "if":
+        open("if", expression, line);
+        break;
+      case "ifdef":
+        open("if", `defined(${expression.split(/\s+/)[0] ?? ""})`, line);
+        break;
+      case "ifndef":
+        open("if", `!defined(${expression.split(/\s+/)[0] ?? ""})`, line);
+        break;
+      case "elif":
+        arm("elif", expression, line);
+        break;
+      case "elifdef":
+        arm("elif", `defined(${expression.split(/\s+/)[0] ?? ""})`, line);
+        break;
+      case "elifndef":
+        arm("elif", `!defined(${expression.split(/\s+/)[0] ?? ""})`, line);
+        break;
+      case "else":
+        arm("else", null, line);
+        break;
       case "endif": {
         const frame = stack.pop();
-        if (!frame) { problems.push({ line, problem: "#endif without #if" }); break; }
+        if (!frame) {
+          problems.push({ line, problem: "#endif without #if" });
+          break;
+        }
         branches[frame.branch].endLine = line - 1;
         break;
       }
@@ -290,7 +392,8 @@ export function readConditionalBranches(source) {
         defines.delete(expression.split(/\s+/)[0] ?? "");
         break;
       }
-      default: break;
+      default:
+        break;
     }
   });
   for (const frame of stack) problems.push({ line: branches[frame.branch].line, problem: "#if without #endif" });
@@ -309,7 +412,7 @@ export function resolveBranches(structure, environment) {
     return {
       branch: branch.index,
       selected: result.unresolved === undefined ? result.value : null,
-      unresolved: result.unresolved ?? null
+      unresolved: result.unresolved ?? null,
     };
   });
   // An `#else` is taken when every preceding arm is decidedly false, is not
@@ -330,10 +433,13 @@ export function resolveBranches(structure, environment) {
     if (branch.kind !== "elif") continue;
     const state = states[branch.index];
     const priors = branch.siblings.map((index) => states[index]);
-    if (priors.some((prior) => prior.selected === true)) { state.selected = false; state.unresolved = null; }
-    else if (state.selected !== false && priors.some((prior) => prior.unresolved !== null)) {
-      state.unresolved = state.unresolved
-        ?? `an earlier arm of this group is unresolved: ${priors.find((prior) => prior.unresolved)?.unresolved}`;
+    if (priors.some((prior) => prior.selected === true)) {
+      state.selected = false;
+      state.unresolved = null;
+    } else if (state.selected !== false && priors.some((prior) => prior.unresolved !== null)) {
+      state.unresolved =
+        state.unresolved ??
+        `an earlier arm of this group is unresolved: ${priors.find((prior) => prior.unresolved)?.unresolved}`;
       state.selected = null;
     }
   }
@@ -358,6 +464,6 @@ export function resolveBranches(structure, environment) {
         if (state.unresolved) return state.unresolved;
       }
       return null;
-    }
+    },
   };
 }

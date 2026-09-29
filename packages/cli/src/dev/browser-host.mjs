@@ -20,9 +20,10 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 
 /** Where Chrome usually is, per host. Overridable by every caller. */
-export const defaultChromeBinary = process.env.DEHERM_CHROME
-  ?? process.env.DEFOLD_HERMES_CHROME
-  ?? (process.platform === "darwin"
+export const defaultChromeBinary =
+  process.env.DEHERM_CHROME ??
+  process.env.DEFOLD_HERMES_CHROME ??
+  (process.platform === "darwin"
     ? "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
     : process.platform === "win32"
       ? "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
@@ -41,7 +42,7 @@ const mimeTypes = new Map([
   [".ogg", "audio/ogg"],
   [".wav", "audio/wav"],
   [".ttf", "font/ttf"],
-  [".ico", "image/x-icon"]
+  [".ico", "image/x-icon"],
 ]);
 
 /**
@@ -101,7 +102,7 @@ export async function startBundleServer(options) {
       "content-type": mimeTypes.get(path.extname(file)) ?? "application/octet-stream",
       // A development host must never serve a stale engine or archive after a
       // rebundle, and these bytes never leave loopback.
-      "cache-control": "no-store"
+      "cache-control": "no-store",
     });
     createReadStream(file).pipe(response);
   });
@@ -115,7 +116,7 @@ export async function startBundleServer(options) {
     port,
     baseUrl: `http://127.0.0.1:${port}`,
     pageUrl: `http://127.0.0.1:${port}/${encodeURIComponent(index)}`,
-    close: () => new Promise((resolve) => server.close(() => resolve(true)))
+    close: () => new Promise((resolve) => server.close(() => resolve(true))),
   };
 }
 
@@ -159,9 +160,7 @@ export async function connectCdp(webSocketDebuggerUrl, options = {}) {
     }
     for (const notify of listeners.get(message.method) ?? []) notify(message.params);
     if (message.method === "Runtime.consoleAPICalled") {
-      const rendered = message.params.args
-        .map((argument) => argument.value ?? argument.description ?? "")
-        .join(" ");
+      const rendered = message.params.args.map((argument) => argument.value ?? argument.description ?? "").join(" ");
       // The browser host prefixes every application log line; engine output
       // arrives as Emscripten's own console lines.
       const line = rendered.replace(/^\[defold-hermes\] /, "").replace(/\n$/, "");
@@ -184,7 +183,7 @@ export async function connectCdp(webSocketDebuggerUrl, options = {}) {
       const failure = {
         kind: "log",
         detail: message.params.entry.text,
-        url: message.params.entry.url ?? null
+        url: message.params.entry.url ?? null,
       };
       if (retain) failures.push(failure);
       options.onFailure?.(failure);
@@ -204,18 +203,19 @@ export async function connectCdp(webSocketDebuggerUrl, options = {}) {
     socket.send(JSON.stringify({ id, method, params }));
     return result;
   };
-  const waitForEvent = (method, timeoutMs = 30_000) => new Promise((ok, no) => {
-    const timer = setTimeout(() => {
+  const waitForEvent = (method, timeoutMs = 30_000) =>
+    new Promise((ok, no) => {
+      const timer = setTimeout(() => {
+        const queue = waiters.get(method) ?? [];
+        const remaining = queue.filter((waiter) => waiter.timer !== timer);
+        if (remaining.length) waiters.set(method, remaining);
+        else waiters.delete(method);
+        no(new Error(`Timed out waiting for CDP event ${method}`));
+      }, timeoutMs);
       const queue = waiters.get(method) ?? [];
-      const remaining = queue.filter((waiter) => waiter.timer !== timer);
-      if (remaining.length) waiters.set(method, remaining);
-      else waiters.delete(method);
-      no(new Error(`Timed out waiting for CDP event ${method}`));
-    }, timeoutMs);
-    const queue = waiters.get(method) ?? [];
-    queue.push({ resolve: ok, reject: no, timer });
-    waiters.set(method, queue);
-  });
+      queue.push({ resolve: ok, reject: no, timer });
+      waiters.set(method, queue);
+    });
   const onEvent = (method, listener) => {
     const group = listeners.get(method) ?? new Set();
     group.add(listener);
@@ -225,11 +225,12 @@ export async function connectCdp(webSocketDebuggerUrl, options = {}) {
       if (!group.size) listeners.delete(method);
     };
   };
-  const close = () => new Promise((resolve) => {
-    if (socket.readyState === WebSocket.CLOSED) return resolve();
-    socket.addEventListener("close", resolve, { once: true });
-    socket.close(1000, "CDP client closed");
-  });
+  const close = () =>
+    new Promise((resolve) => {
+      if (socket.readyState === WebSocket.CLOSED) return resolve();
+      socket.addEventListener("close", resolve, { once: true });
+      socket.close(1000, "CDP client closed");
+    });
   socket.addEventListener("close", () => {
     for (const [, continuation] of pending) {
       if (continuation.timer) clearTimeout(continuation.timer);
@@ -255,7 +256,7 @@ export async function connectCdp(webSocketDebuggerUrl, options = {}) {
  * state and leaves none; the caller removes it in `close`.
  */
 export async function launchChrome(options) {
-  const profile = options.profile ?? await mkdtemp(path.join(tmpdir(), "deherm-browser-target."));
+  const profile = options.profile ?? (await mkdtemp(path.join(tmpdir(), "deherm-browser-target.")));
   const spawn = options.spawn ?? spawnProcess;
   const argv = [
     ...(options.headless === false ? [] : ["--headless=new"]),
@@ -266,7 +267,7 @@ export async function launchChrome(options) {
     "--no-first-run",
     "--no-default-browser-check",
     ...(options.extraArguments ?? []),
-    options.url
+    options.url,
   ];
   const child = spawn(options.binary ?? defaultChromeBinary, argv, { stdio: ["ignore", "ignore", "pipe"] });
   return { child, profile, argv };
@@ -296,7 +297,11 @@ export async function openBundlePage(options) {
   let browser;
   let client;
   const close = async () => {
-    try { client?.socket.close(); } catch { /* already closed */ }
+    try {
+      client?.socket.close();
+    } catch {
+      /* already closed */
+    }
     await terminate(browser?.child);
     await server.close();
     if (browser?.profile && options.keepProfile !== true) {
@@ -304,7 +309,7 @@ export async function openBundlePage(options) {
     }
   };
   try {
-    const debuggingPort = options.debuggingPort ?? await freeLoopbackPort();
+    const debuggingPort = options.debuggingPort ?? (await freeLoopbackPort());
     const initialUrl = options.deferNavigation === true ? "about:blank" : server.pageUrl;
     browser = await launchChrome({
       binary: options.chromeBinary,
@@ -312,20 +317,25 @@ export async function openBundlePage(options) {
       debuggingPort,
       headless: options.headless,
       spawn: options.spawn,
-      extraArguments: options.chromeArguments
+      extraArguments: options.chromeArguments,
     });
     browser.child.once("exit", () => options.onBrowserExit?.());
-    await waitFor(async () => (await fetch(server.pageUrl)).ok,
-      { timeoutMs: options.serverTimeoutMs ?? 15_000, what: "the local bundle server" });
-    const target = await waitFor(async () => {
-      const targets = await (await fetch(`http://127.0.0.1:${debuggingPort}/json/list`)).json();
-      return targets.find((candidate) => candidate.type === "page" && candidate.url === initialUrl);
-    }, { timeoutMs: options.browserTimeoutMs ?? 30_000, what: "the headless Chrome page target" });
+    await waitFor(async () => (await fetch(server.pageUrl)).ok, {
+      timeoutMs: options.serverTimeoutMs ?? 15_000,
+      what: "the local bundle server",
+    });
+    const target = await waitFor(
+      async () => {
+        const targets = await (await fetch(`http://127.0.0.1:${debuggingPort}/json/list`)).json();
+        return targets.find((candidate) => candidate.type === "page" && candidate.url === initialUrl);
+      },
+      { timeoutMs: options.browserTimeoutMs ?? 30_000, what: "the headless Chrome page target" },
+    );
     client = await connectCdp(target.webSocketDebuggerUrl, {
       retain: options.retain,
       onConsole: options.onConsole,
       onFailure: options.onFailure,
-      onClose: options.onClose
+      onClose: options.onClose,
     });
     await client.send("Page.enable");
     await client.send("Runtime.enable");

@@ -15,7 +15,7 @@ const urls = {
   output: new URL("packages/bindings/generated/defold-script-url-address-classification.json", root),
   header: new URL("defold/defold_hermes/include/defold_hermes/generated_script_url_bindings.hpp", root),
   source: new URL("defold/defold_hermes/src/generated_script_url_bindings.cpp", root),
-  target: new URL("packages/sdk/src/generated/script/url-target-support.ts", root)
+  target: new URL("packages/sdk/src/generated/script/url-target-support.ts", root),
 };
 
 function assert(condition, message) {
@@ -23,8 +23,11 @@ function assert(condition, message) {
 }
 
 function parse(text, label) {
-  try { return JSON.parse(text); }
-  catch (error) { throw new Error(`${label} is not valid JSON: ${error.message}`); }
+  try {
+    return JSON.parse(text);
+  } catch (error) {
+    throw new Error(`${label} is not valid JSON: ${error.message}`);
+  }
 }
 
 function sha256(value) {
@@ -65,19 +68,29 @@ function formsFor(rawType) {
 }
 
 function split(rawType) {
-  return rawType.split("|").map((part) => part.trim()).filter(Boolean);
+  return rawType
+    .split("|")
+    .map((part) => part.trim())
+    .filter(Boolean);
 }
 
 const TYPE_CODECS = new Map([
-  ["nil", "Nil"], ["boolean", "Boolean"], ["integer", "Integer"],
-  ["number", "Number"], ["string", "String"], ["hash", "Hash"],
-  ["url", "Url"], ["vector3", "Vector3"], ["vector4", "Vector4"],
-  ["quaternion", "Quaternion"]
+  ["nil", "Nil"],
+  ["boolean", "Boolean"],
+  ["integer", "Integer"],
+  ["number", "Number"],
+  ["string", "String"],
+  ["hash", "Hash"],
+  ["url", "Url"],
+  ["vector3", "Vector3"],
+  ["vector4", "Vector4"],
+  ["quaternion", "Quaternion"],
 ]);
 
 function codecsFor(rawType, optional, id) {
-  const codecs = split(rawType).map((type) => TYPE_CODECS.get(type) ??
-    (/^[A-Za-z_][A-Za-z0-9_.]*$/.test(type) ? "Integer" : null));
+  const codecs = split(rawType).map(
+    (type) => TYPE_CODECS.get(type) ?? (/^[A-Za-z_][A-Za-z0-9_.]*$/.test(type) ? "Integer" : null),
+  );
   assert(codecs.every(Boolean), `${id}: unsupported generated URL argument type '${rawType}'`);
   if (optional && !codecs.includes("Nil")) codecs.push("Nil");
   return [...new Set(codecs)];
@@ -136,7 +149,9 @@ function compareCounts(actual, expected, label) {
   for (const key of [...new Set([...Object.keys(expected), ...Object.keys(actual)])].sort(compare)) {
     expectReviewedCount({
       input: "packages/bindings/overrides/script-url-address-classification.json",
-      label: `${label}:${key}`, expected: expected[key] ?? 0, observed: actual[key] ?? 0
+      label: `${label}:${key}`,
+      expected: expected[key] ?? 0,
+      observed: actual[key] ?? 0,
     });
   }
 }
@@ -155,7 +170,7 @@ export function generateScriptUrlAddressClassification(inputs) {
     input: "packages/bindings/overrides/script-url-address-classification.json",
     reviewed: override.defoldRevision,
     derived: ir.defoldRevision,
-    detail: "the reviewed URL/address value shapes"
+    detail: "the reviewed URL/address value shapes",
   });
   const withdrawnSources = inputs.withdrawnSources ?? new Set();
   validateSources(override, inputs.sourceTexts, withdrawnSources);
@@ -163,63 +178,104 @@ export function generateScriptUrlAddressClassification(inputs) {
   const irById = uniqueMap(ir.functions, "script API IR");
   uniqueMap(patterns.bindings, "script binding patterns");
   const classified = patterns.bindings.filter((row) => row.loweringFamily === "defold-value");
-  expectReviewedCount({ input: "packages/bindings/overrides/script-url-address-classification.json", label: "classified defold-value census",
-    expected: override.expectedCounts.classifiedDefoldValue, observed: classified.length });
+  expectReviewedCount({
+    input: "packages/bindings/overrides/script-url-address-classification.json",
+    label: "classified defold-value census",
+    expected: override.expectedCounts.classifiedDefoldValue,
+    observed: classified.length,
+  });
   const matrixIds = new Set();
   const urlIds = new Set();
   const urlCandidateIds = new Set();
   const remainderIds = new Set();
   const excludedUrlIds = new Set(override.excludedPreexistingUrlIds);
-  expectReviewedCount({ input: "packages/bindings/overrides/script-url-address-classification.json", label: "excluded pre-existing URL route census",
-    expected: override.expectedCounts.excludedPreexistingUrl, observed: excludedUrlIds.size });
+  expectReviewedCount({
+    input: "packages/bindings/overrides/script-url-address-classification.json",
+    label: "excluded pre-existing URL route census",
+    expected: override.expectedCounts.excludedPreexistingUrl,
+    observed: excludedUrlIds.size,
+  });
   for (const pattern of classified) {
     const fn = irById.get(pattern.id);
     assert(fn, `${pattern.id}: pattern row is absent from pinned IR`);
-    assert(JSON.stringify(pattern.parameterCodecs.map(({ rawType }) => rawType)) ===
-      JSON.stringify(fn.parameters.map(({ rawType }) => rawType)) &&
-      JSON.stringify(pattern.returnCodecs.map(({ rawType }) => rawType)) === JSON.stringify(fn.returns),
-    `${pattern.id}: binding-pattern shapes differ from pinned IR`);
+    assert(
+      JSON.stringify(pattern.parameterCodecs.map(({ rawType }) => rawType)) ===
+        JSON.stringify(fn.parameters.map(({ rawType }) => rawType)) &&
+        JSON.stringify(pattern.returnCodecs.map(({ rawType }) => rawType)) === JSON.stringify(fn.returns),
+      `${pattern.id}: binding-pattern shapes differ from pinned IR`,
+    );
     const types = allTypes(fn);
     if (types.some((type) => type.includes("matrix4"))) matrixIds.add(pattern.id);
     else if (types.some((type) => type.includes("url"))) {
       urlCandidateIds.add(pattern.id);
       if (!excludedUrlIds.has(pattern.id)) urlIds.add(pattern.id);
-    }
-    else remainderIds.add(pattern.id);
+    } else remainderIds.add(pattern.id);
   }
-  expectReviewedCount({ input: "packages/bindings/overrides/script-url-address-classification.json", label: "matrix4 disjoint census",
-    expected: override.expectedCounts.matrix4Disjoint, observed: matrixIds.size });
-  expectReviewedCount({ input: "packages/bindings/overrides/script-url-address-classification.json", label: "URL/address route count",
-    expected: override.expectedCounts.total, observed: urlIds.size });
-  expectReviewedCount({ input: "packages/bindings/overrides/script-url-address-classification.json", label: "URL/address candidate count",
-    expected: override.expectedCounts.urlCandidates, observed: urlCandidateIds.size });
-  for (const id of excludedUrlIds) assert(urlCandidateIds.has(id), `${id}: pinned URL exclusion left the candidate set`);
-  expectReviewedCount({ input: "packages/bindings/overrides/script-url-address-classification.json", label: "non-matrix/non-URL defold-value census",
-    expected: override.expectedCounts.nonMatrixNonUrl, observed: remainderIds.size });
+  expectReviewedCount({
+    input: "packages/bindings/overrides/script-url-address-classification.json",
+    label: "matrix4 disjoint census",
+    expected: override.expectedCounts.matrix4Disjoint,
+    observed: matrixIds.size,
+  });
+  expectReviewedCount({
+    input: "packages/bindings/overrides/script-url-address-classification.json",
+    label: "URL/address route count",
+    expected: override.expectedCounts.total,
+    observed: urlIds.size,
+  });
+  expectReviewedCount({
+    input: "packages/bindings/overrides/script-url-address-classification.json",
+    label: "URL/address candidate count",
+    expected: override.expectedCounts.urlCandidates,
+    observed: urlCandidateIds.size,
+  });
+  for (const id of excludedUrlIds)
+    assert(urlCandidateIds.has(id), `${id}: pinned URL exclusion left the candidate set`);
+  expectReviewedCount({
+    input: "packages/bindings/overrides/script-url-address-classification.json",
+    label: "non-matrix/non-URL defold-value census",
+    expected: override.expectedCounts.nonMatrixNonUrl,
+    observed: remainderIds.size,
+  });
   const binaryIds = new Set(override.binaryStringRemainderIds);
   // The reviewed list against its own recorded size is internal consistency and
   // stays exact; whether each reviewed route is still in this revision's
   // remainder is a census.
-  assert(binaryIds.size === override.expectedCounts.binaryStringRemainder,
-    "binary-string reviewed remainder count drifted");
-  expectReviewedCount({ input: "packages/bindings/overrides/script-url-address-classification.json", label: "binary-string remainder membership",
-    expected: binaryIds.size, observed: [...binaryIds].filter((id) => remainderIds.has(id)).length });
+  assert(
+    binaryIds.size === override.expectedCounts.binaryStringRemainder,
+    "binary-string reviewed remainder count drifted",
+  );
+  expectReviewedCount({
+    input: "packages/bindings/overrides/script-url-address-classification.json",
+    label: "binary-string remainder membership",
+    expected: binaryIds.size,
+    observed: [...binaryIds].filter((id) => remainderIds.has(id)).length,
+  });
   const rows = [...urlIds].sort(compare).map((id) => {
     const fn = irById.get(id);
-    const urlParameters = fn.parameters.flatMap((parameter, index) => parameter.rawType.includes("url") ? [{
-      index,
-      name: parameter.rawName,
-      rawType: parameter.rawType,
-      forms: formsFor(parameter.rawType)
-    }] : []);
+    const urlParameters = fn.parameters.flatMap((parameter, index) =>
+      parameter.rawType.includes("url")
+        ? [
+            {
+              index,
+              name: parameter.rawName,
+              rawType: parameter.rawType,
+              forms: formsFor(parameter.rawType),
+            },
+          ]
+        : [],
+    );
     assert(urlParameters.length > 0, `${id}: selected URL route has no URL parameter`);
-    assert(fn.returns.every((type) => !type.includes("url")),
-      `${id}: URL result requires copy-before-pop routing not enabled by this planned classifier`);
+    assert(
+      fn.returns.every((type) => !type.includes("url")),
+      `${id}: URL result requires copy-before-pop routing not enabled by this planned classifier`,
+    );
     const lastRequiredIndex = fn.parameters.reduce(
-      (result, parameter, index) => parameter.optional ? result : index, -1);
+      (result, parameter, index) => (parameter.optional ? result : index),
+      -1,
+    );
     const requiredArgumentCount = lastRequiredIndex + 1;
-    const argumentCodecs = fn.parameters.map(({ rawType, optional }) =>
-      codecsFor(rawType, optional, id));
+    const argumentCodecs = fn.parameters.map(({ rawType, optional }) => codecsFor(rawType, optional, id));
     const resultCodec = resultCodecFor(fn.returns, id);
     return {
       id,
@@ -240,18 +296,24 @@ export function generateScriptUrlAddressClassification(inputs) {
         fullUrl: "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
         stringShorthand: "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
         hashShorthand: "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
-        result: "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+        result: "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack",
       },
-      targetSupport: override.targetSupport
+      targetSupport: override.targetSupport,
     };
   });
-  assert(new Set(rows.map(({ stableId }) => stableId)).size === rows.length,
-    "URL/address route stable-ID collision detected");
+  assert(
+    new Set(rows.map(({ stableId }) => stableId)).size === rows.length,
+    "URL/address route stable-ID collision detected",
+  );
   const moduleCounts = countBy(rows, ({ modulePath }) => modulePath.join("."));
   compareCounts(moduleCounts, override.expectedCounts.modules, "URL/address module census");
   const urlParameters = rows.flatMap(({ urlParameters }) => urlParameters);
-  expectReviewedCount({ input: "packages/bindings/overrides/script-url-address-classification.json", label: "URL parameter count",
-    expected: override.expectedCounts.urlParameters, observed: urlParameters.length });
+  expectReviewedCount({
+    input: "packages/bindings/overrides/script-url-address-classification.json",
+    label: "URL parameter count",
+    expected: override.expectedCounts.urlParameters,
+    observed: urlParameters.length,
+  });
   const rawUrlParameterTypeCounts = countBy(urlParameters, ({ rawType }) => rawType);
   compareCounts(rawUrlParameterTypeCounts, override.expectedCounts.rawUrlParameterTypes, "URL parameter type census");
 
@@ -261,16 +323,21 @@ export function generateScriptUrlAddressClassification(inputs) {
     classificationOverrideSha256: sha256(inputs.overrideText),
     defoldSources: [...override.sourceEvidence]
       .filter(({ source }) => !withdrawnSources.has(source))
-      .sort((a, b) => compare(a.source, b.source)).map(({ id, source, sha256 }) => ({
-        id, path: `upstream/defold/${source}`, sha256
-      }))
+      .sort((a, b) => compare(a.source, b.source))
+      .map(({ id, source, sha256 }) => ({
+        id,
+        path: `upstream/defold/${source}`,
+        sha256,
+      })),
   };
-  inputEvidence.aggregateInputSha256 = sha256([
-    inputEvidence.scriptIrSha256,
-    inputEvidence.bindingPatternsSha256,
-    inputEvidence.classificationOverrideSha256,
-    ...inputEvidence.defoldSources.map(({ path, sha256 }) => `${path}\0${sha256}`)
-  ].join("\0"));
+  inputEvidence.aggregateInputSha256 = sha256(
+    [
+      inputEvidence.scriptIrSha256,
+      inputEvidence.bindingPatternsSha256,
+      inputEvidence.classificationOverrideSha256,
+      ...inputEvidence.defoldSources.map(({ path, sha256 }) => `${path}\0${sha256}`),
+    ].join("\0"),
+  );
 
   return {
     schemaVersion: 1,
@@ -290,34 +357,39 @@ export function generateScriptUrlAddressClassification(inputs) {
       urlAddressRoutes: rows.length,
       nonMatrixNonUrl: remainderIds.size,
       binaryStringRemainder: binaryIds.size,
-      otherNonMatrixNonUrl: remainderIds.size - binaryIds.size
+      otherNonMatrixNonUrl: remainderIds.size - binaryIds.size,
     },
     representationPolicy: {
       fullUrl: "four exact uint64 lanes (socket, reserved, path, fragment) in a generation-checked ScriptUrlArena slot",
       stringShorthand: "distinct string value resolved by Defold against captured Lua caller context",
       hashShorthand: "distinct hash value resolved by Defold as default-socket path with zero fragment",
-      collapsedLegacyUrl: "fail-closed: ScriptHandleKind::kUrl with no sidecar slot is never interpreted as a full URL"
+      collapsedLegacyUrl: "fail-closed: ScriptHandleKind::kUrl with no sidecar slot is never interpreted as a full URL",
     },
     targetSupport: override.targetSupport,
     inputEvidence,
-    rows
+    rows,
   };
 }
 
 export async function loadScriptUrlAddressInputs() {
   const [irText, patternsText, overrideText] = await Promise.all([
-    readFile(urls.ir, "utf8"), readFile(urls.patterns, "utf8"), readFile(urls.override, "utf8")
+    readFile(urls.ir, "utf8"),
+    readFile(urls.patterns, "utf8"),
+    readFile(urls.override, "utf8"),
   ]);
   const override = parse(overrideText, "URL classification override");
   const loaded = await loadReviewedSources({
     input: "packages/bindings/overrides/script-url-address-classification.json",
     defoldRoot: fileURLToPath(new URL("upstream/defold", root)),
     evidence: override.sourceEvidence.map(({ source, sha256, anchors }) => ({ path: source, sha256, anchors })),
-    derived: parse(irText, "script API IR").defoldRevision
+    derived: parse(irText, "script API IR").defoldRevision,
   });
   return {
-    irText, patternsText, overrideText,
-    sourceTexts: loaded.texts, withdrawnSources: loaded.withdrawn
+    irText,
+    patternsText,
+    overrideText,
+    sourceTexts: loaded.texts,
+    withdrawnSources: loaded.withdrawn,
   };
 }
 
@@ -337,22 +409,30 @@ async function main(argv = process.argv.slice(2)) {
   const runtime = renderRuntime(report);
   if (check) {
     const current = await Promise.all([
-      readFile(urls.output, "utf8"), readFile(urls.header, "utf8"),
-      readFile(urls.source, "utf8"), readFile(urls.target, "utf8")
+      readFile(urls.output, "utf8"),
+      readFile(urls.header, "utf8"),
+      readFile(urls.source, "utf8"),
+      readFile(urls.target, "utf8"),
     ]);
     const expected = [generated, runtime.header, runtime.source, runtime.target];
     const labels = [urls.output.pathname, urls.header.pathname, urls.source.pathname, urls.target.pathname];
     for (let index = 0; index < current.length; ++index) {
-      if (current[index] !== expected[index]) throw new Error(`${labels[index]} is stale; regenerate URL/address bindings`);
+      if (current[index] !== expected[index])
+        throw new Error(`${labels[index]} is stale; regenerate URL/address bindings`);
     }
   } else {
     if (outputPath) await writeFile(outputPath, generated);
-    else await Promise.all([
-      writeFile(urls.output, generated), writeFile(urls.header, runtime.header),
-      writeFile(urls.source, runtime.source), writeFile(urls.target, runtime.target)
-    ]);
+    else
+      await Promise.all([
+        writeFile(urls.output, generated),
+        writeFile(urls.header, runtime.header),
+        writeFile(urls.source, runtime.source),
+        writeFile(urls.target, runtime.target),
+      ]);
   }
-  console.log(`${check ? "Verified" : "Generated"} 70 native-dynamic URL/address routes with exact composite sidecars; Static/Wasm and HTML5 full URLs fail closed.`);
+  console.log(
+    `${check ? "Verified" : "Generated"} 70 native-dynamic URL/address routes with exact composite sidecars; Static/Wasm and HTML5 full URLs fail closed.`,
+  );
 }
 
 if (process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url) await main();

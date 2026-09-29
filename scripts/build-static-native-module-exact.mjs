@@ -15,8 +15,8 @@ assert.ok(outputDirectory, "--output-dir is required");
 const lowLevelPath = "extensions/defold-webtransport/defold_webtransport/webtransport/static/NativeWebTransport.ts";
 const lowLevel = (await readFile(lowLevelPath, "utf8")).replace(/^export /gmu, "");
 const certificate = `[${Array.from({ length: 32 }, (_, index) => index).join(",")}]`;
-const firstPoll = `[${new Array(64).fill(238).join(",")}]`;
-const secondPoll = `[${new Array(64).fill(0).join(",")}]`;
+const firstPoll = `[${Array.from({ length: 64 }, () => 238).join(",")}]`;
+const secondPoll = `[${Array.from({ length: 64 }, () => 0).join(",")}]`;
 const source = `${lowLevel}
 const __report=$SHBuiltin.extern_c({include:"static_native_module_exact_fixture.h"},function deherm_static_native_module_exact_report(planned:c_uint,executed:c_uint,mismatches:c_uint):void{});
 let executed:number=0,mismatches:number=0;
@@ -55,13 +55,20 @@ await mkdir(outputDirectory, { recursive: true });
 const inputPath = path.join(outputDirectory, "static-native-module-exact.ts");
 const outputPath = path.join(outputDirectory, "static-native-module-exact.c");
 const headerPath = path.join(outputDirectory, "static_native_module_exact_fixture.h");
-await Promise.all([
-  writeFile(inputPath, source),
-  writeFile(headerPath, header),
-]);
-const result = spawnSync(shermes, [
-  "-typed", "-strict", "-O", "-emit-c",
-  "-exported-unit=deherm_static_native_module_exact", inputPath, "-o", outputPath,
-], { cwd: process.cwd(), encoding: "utf8" });
+await Promise.all([writeFile(inputPath, source), writeFile(headerPath, header)]);
+const result = spawnSync(
+  shermes,
+  [
+    "-typed",
+    "-strict",
+    "-O",
+    "-emit-c",
+    "-exported-unit=deherm_static_native_module_exact",
+    inputPath,
+    "-o",
+    outputPath,
+  ],
+  { cwd: process.cwd(), encoding: "utf8" },
+);
 assert.equal(result.status, 0, result.stderr || result.stdout);
 console.log(`Static Hermes native-module exact-call unit emitted ${outputPath}`);

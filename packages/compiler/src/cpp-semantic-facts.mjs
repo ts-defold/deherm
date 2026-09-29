@@ -49,7 +49,11 @@ function declarationReference(node, parameters) {
     return { kind: "declaration", declarationKind: referenced.kind ?? "unknown", name: referenced.name ?? "" };
   }
   if (current.kind === "UnaryOperator" && current.inner?.length === 1) {
-    return { kind: "unary", operator: current.opcode ?? "", operand: declarationReference(current.inner[0], parameters) };
+    return {
+      kind: "unary",
+      operator: current.opcode ?? "",
+      operand: declarationReference(current.inner[0], parameters),
+    };
   }
   if (current.kind === "MemberExpr") {
     return {
@@ -146,13 +150,14 @@ function callFacts(body, parameters) {
     if (node.kind === "CallExpr" || node.kind === "CXXMemberCallExpr" || node.kind === "RecoveryExpr") {
       const [callee, ...arguments_] = node.inner ?? [];
       const identity = calleeIdentity(callee);
-      if (identity?.name) calls.push({
-        callee: identity.name,
-        ...(identity.rawDeclarationId ? { _calleeDeclarationId: identity.rawDeclarationId } : {}),
-        ...(identity.type ? { calleeType: identity.type } : {}),
-        arguments: arguments_.map((argument) => declarationReference(argument, parameters)),
-        conditions,
-      });
+      if (identity?.name)
+        calls.push({
+          callee: identity.name,
+          ...(identity.rawDeclarationId ? { _calleeDeclarationId: identity.rawDeclarationId } : {}),
+          ...(identity.type ? { calleeType: identity.type } : {}),
+          arguments: arguments_.map((argument) => declarationReference(argument, parameters)),
+          conditions,
+        });
     }
     if (controlChildren(node, parameters, conditions, visit)) return;
     for (const child of node.inner ?? []) visit(child, conditions);
@@ -170,8 +175,17 @@ function localFixedArrays(body) {
       if (match) {
         const elementType = type.slice(0, type.lastIndexOf("[")).trim();
         const widths = new Map([
-          ["char", 1], ["signed char", 1], ["unsigned char", 1], ["int8_t", 1], ["uint8_t", 1],
-          ["int16_t", 2], ["uint16_t", 2], ["int32_t", 4], ["uint32_t", 4], ["int64_t", 8], ["uint64_t", 8],
+          ["char", 1],
+          ["signed char", 1],
+          ["unsigned char", 1],
+          ["int8_t", 1],
+          ["uint8_t", 1],
+          ["int16_t", 2],
+          ["uint16_t", 2],
+          ["int32_t", 4],
+          ["uint32_t", 4],
+          ["int64_t", 8],
+          ["uint64_t", 8],
         ]);
         const extent = Number(match[1]);
         arrays.push({
@@ -274,9 +288,11 @@ export function extractCppImplementationFacts(ast, requestedNames, source) {
   visit(ast);
   const stableIdentity = (definition) =>
     `${definition.name}|${definition.type}|${definition.source}|${definition.line ?? 0}`;
-  const definitionsByRawId = new Map(allDefinitions.flatMap((definition) =>
-    definition._declarationId ? [[definition._declarationId, definition]] : [],
-  ));
+  const definitionsByRawId = new Map(
+    allDefinitions.flatMap((definition) =>
+      definition._declarationId ? [[definition._declarationId, definition]] : [],
+    ),
+  );
   for (const definition of allDefinitions) definition.identity = stableIdentity(definition);
   function normalizeExpressionIdentities(value) {
     if (!value || typeof value !== "object") return;
@@ -319,20 +335,26 @@ export function extractCppImplementationFacts(ast, requestedNames, source) {
       const call = queue.shift();
       const matches = definitionsByLeaf.get(call.callee) ?? [];
       const sameNamespace = matches.filter(({ name }) => name.split("::").slice(0, -1).join("::") === namespace);
-      const selected = definitionsByIdentity.get(call.calleeIdentity) ??
+      const selected =
+        definitionsByIdentity.get(call.calleeIdentity) ??
         (sameNamespace.length === 1 ? sameNamespace[0] : matches.length === 1 ? matches[0] : null);
       if (!selected || visited.has(selected.identity)) continue;
       visited.add(selected.identity);
       reachable.push(selected);
       queue.push(...selected.calls);
     }
-    return reachable.sort((left, right) => compareCodeUnits(left.name, right.name) || (left.line ?? 0) - (right.line ?? 0));
+    return reachable.sort(
+      (left, right) => compareCodeUnits(left.name, right.name) || (left.line ?? 0) - (right.line ?? 0),
+    );
   }
   const definitions = allDefinitions
     .filter(({ name }) => requested.has(name))
     .map((definition) => ({ ...definition, reachableDefinitions: reachableFrom(definition) }));
-  definitions.sort((left, right) =>
-    compareCodeUnits(left.name, right.name) || compareCodeUnits(left.source, right.source) || (left.line ?? 0) - (right.line ?? 0),
+  definitions.sort(
+    (left, right) =>
+      compareCodeUnits(left.name, right.name) ||
+      compareCodeUnits(left.source, right.source) ||
+      (left.line ?? 0) - (right.line ?? 0),
   );
   return freeze(definitions);
 }
@@ -341,9 +363,9 @@ function forwardedSuffix(call, parameterCount) {
   const arguments_ = call.arguments ?? [];
   for (let start = 0; start <= arguments_.length - parameterCount; start += 1) {
     if (
-      arguments_.slice(start, start + parameterCount).every(
-        (argument, index) => argument.kind === "parameter" && argument.index === index,
-      )
+      arguments_
+        .slice(start, start + parameterCount)
+        .every((argument, index) => argument.kind === "parameter" && argument.index === index)
     ) {
       return { start, before: arguments_.slice(0, start), after: arguments_.slice(start + parameterCount) };
     }
@@ -353,20 +375,21 @@ function forwardedSuffix(call, parameterCount) {
 
 function callTarget(definition, call) {
   const reachable = definition.reachableDefinitions ?? [];
-  return reachable.find(({ identity }) =>
-    identity && identity === call.calleeIdentity,
-  ) ?? (() => {
-    const matches = reachable.filter(({ name }) => name.split("::").at(-1) === call.callee);
-    return matches.length === 1 ? matches[0] : null;
-  })();
+  return (
+    reachable.find(({ identity }) => identity && identity === call.calleeIdentity) ??
+    (() => {
+      const matches = reachable.filter(({ name }) => name.split("::").at(-1) === call.callee);
+      return matches.length === 1 ? matches[0] : null;
+    })()
+  );
 }
 
 function helperConsumesForwardedOutputAndExtent(helper, outputIndex, extentIndex) {
   if (!helper) return false;
   return (helper.calls ?? []).some(({ arguments: arguments_ = [] }) => {
-    const referenced = new Set(arguments_.flatMap((argument) =>
-      argument.kind === "parameter" ? [argument.index] : [],
-    ));
+    const referenced = new Set(
+      arguments_.flatMap((argument) => (argument.kind === "parameter" ? [argument.index] : [])),
+    );
     return referenced.has(outputIndex) && referenced.has(extentIndex);
   });
 }
@@ -411,7 +434,9 @@ export function inferForwardedFixedOutputExtent(definitions, parameterCount) {
 }
 
 export function sourceFactDigest(value) {
-  return createHash("sha256").update(typeof value === "string" ? value : JSON.stringify(value)).digest("hex");
+  return createHash("sha256")
+    .update(typeof value === "string" ? value : JSON.stringify(value))
+    .digest("hex");
 }
 
 /**

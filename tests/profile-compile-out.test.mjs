@@ -10,7 +10,7 @@ import {
   instrumentedGeneratedSources,
   repositoryRoot,
   telemetryStringMarkers,
-  telemetrySymbolMarkers
+  telemetrySymbolMarkers,
 } from "../scripts/check-profile-compile-out.mjs";
 
 // The source-level claim needs no toolchain: every generated transport scope
@@ -37,14 +37,8 @@ test(
     configureAndBuild("build/profile-off", { profile: false });
     configureAndBuild("build/profile-on", { profile: true });
     const findings = await checkProfileCompileOut({ offBinary, onBinary, sources: false });
-    assert.equal(
-      findings.absentFromOffBuild.length,
-      telemetrySymbolMarkers.length + telemetryStringMarkers.length
-    );
-    assert.equal(
-      findings.presentInOnBuild.length,
-      telemetrySymbolMarkers.length + telemetryStringMarkers.length
-    );
+    assert.equal(findings.absentFromOffBuild.length, telemetrySymbolMarkers.length + telemetryStringMarkers.length);
+    assert.equal(findings.presentInOnBuild.length, telemetrySymbolMarkers.length + telemetryStringMarkers.length);
     assert.ok(findings.offBytes < findings.onBytes);
-  }
+  },
 );

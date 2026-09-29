@@ -18,11 +18,11 @@ const invocation = {
   components: contexts.map((context) => {
     const component = byContext.get(context);
     return { context, componentId: component.componentId, schemaFingerprint: component.schemaFingerprint };
-  })
+  }),
 };
 await writeFile(
   path.resolve("build/component-runtime-e2e/invocation.json"),
-  `${JSON.stringify(invocation, null, 2)}\n`
+  `${JSON.stringify(invocation, null, 2)}\n`,
 );
 // Ensure the bundle was materialized before the native target is launched.
 await readFile(invocation.bundle);

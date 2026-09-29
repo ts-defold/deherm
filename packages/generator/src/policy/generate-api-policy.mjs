@@ -42,28 +42,30 @@ import {
   objectPath,
   POLICY_REALIZER_CAPABILITIES,
   policyPath,
-  serializeObject
+  serializeObject,
 } from "./api-policy.mjs";
 import {
   buildDefoldTargetMatrix,
   buildToolchainPins,
-  nativeArtifactCompatibility
+  nativeArtifactCompatibility,
 } from "../../../compiler/src/defold-toolchain-pins.mjs";
 import {
   LOCALLY_RENDERED_OUTPUT_INPUTS,
-  LOCALLY_RENDERED_OUTPUT_RECIPES
+  LOCALLY_RENDERED_OUTPUT_RECIPES,
 } from "../../../compiler/src/revision-output-emitter.mjs";
-import {
-  REVISION_OUTPUT_ROOTS,
-  STABLE_GENERATED_OUTPUTS
-} from "../../../compiler/src/revision-output-layout.mjs";
+import { REVISION_OUTPUT_ROOTS, STABLE_GENERATED_OUTPUTS } from "../../../compiler/src/revision-output-layout.mjs";
 import {
   BINDING_LOWERING_RECIPE_CAPABILITY,
   BINDING_LOWERING_RECIPE_NAME,
-  createBindingLoweringRecipeFacts
+  createBindingLoweringRecipeFacts,
 } from "../../../compiler/src/binding-lowering-plan-recipe.mjs";
 import { releaseAssetUrlTemplate } from "../../../cli/src/release-assets.mjs";
-import { artifactFamilies, artifactFamilyNames, familyRelease, publishedAssets } from "../../../../scripts/lib/artifact-releases.mjs";
+import {
+  artifactFamilies,
+  artifactFamilyNames,
+  familyRelease,
+  publishedAssets,
+} from "../../../../scripts/lib/artifact-releases.mjs";
 import { apiPolicyGenerator } from "../../../../scripts/lib/script-generator-pipeline.mjs";
 
 export const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../..");
@@ -97,7 +99,7 @@ export const compilerSurfaceDocuments = Object.freeze({
   "defold-dmsdk-scalar-thunks.json": "defold-dmsdk-scalar-thunks.json",
   "defold-dmsdk-universal-bindings.json": "defold-dmsdk-universal-bindings.json",
   "defold-resource-declaration-schema.json": "defold-resource-declaration-schema.json",
-  "defold-script-resource-namespaces.json": "defold-script-resource-namespaces.json"
+  "defold-script-resource-namespaces.json": "defold-script-resource-namespaces.json",
 });
 
 const locallyRenderedSdkSources = new Set([
@@ -113,14 +115,11 @@ const locallyRenderedSdkSources = new Set([
   "script/browser-target-support.ts",
   "dmsdk/scalar.ts",
   "dmsdk/universal.ts",
-  "dmsdk/browser-arena.ts"
+  "dmsdk/browser-arena.ts",
 ]);
 
-for (const relative of [
-  "dmsdk/named-scalar.ts",
-  "script/url-target-support.ts",
-  "script/value-target-support.ts"
-]) locallyRenderedSdkSources.add(relative);
+for (const relative of ["dmsdk/named-scalar.ts", "script/url-target-support.ts", "script/value-target-support.ts"])
+  locallyRenderedSdkSources.add(relative);
 
 const locallyRenderedSdkRecipes = Object.freeze({
   "script/types.ts": "sdk.script.types.render.v1",
@@ -138,14 +137,14 @@ const locallyRenderedSdkRecipes = Object.freeze({
   "dmsdk/browser-arena.ts": "sdk.dmsdk.browser-arena.render.v1",
   "dmsdk/named-scalar.ts": "sdk.dmsdk.named-scalar.render.v1",
   "script/url-target-support.ts": "sdk.script.url-target-support.render.v1",
-  "script/value-target-support.ts": "sdk.script.value-target-support.render.v1"
+  "script/value-target-support.ts": "sdk.script.value-target-support.render.v1",
 });
 
 const locallyRenderedSdkInputs = Object.freeze({
   "script/types.ts": Object.freeze([
     "defold-script-api-ir.json",
     "defold-script-sdk-documentation.json",
-    "defold-script-handle-lowering.json"
+    "defold-script-handle-lowering.json",
   ]),
   "script/modules.ts": Object.freeze(["defold-script-api-ir.json", "defold-script-constant-lowering.json"]),
   "script/runtime.ts": Object.freeze([]),
@@ -161,14 +160,14 @@ const locallyRenderedSdkInputs = Object.freeze({
   "dmsdk/browser-arena.ts": Object.freeze(["defold-dmsdk-universal-bindings.json"]),
   "dmsdk/named-scalar.ts": Object.freeze([]),
   "script/url-target-support.ts": Object.freeze([]),
-  "script/value-target-support.ts": Object.freeze([])
+  "script/value-target-support.ts": Object.freeze([]),
 });
 
 const compilerDocumentRecipes = Object.freeze({
   "defold-value-layouts.json": "policy.compiler-document.defold-value-layouts.v2",
   "defold-component-proxy-contract.json": "policy.compiler-document.component-proxy-contract.v2",
   "defold-dmsdk-universal-bindings.json": "policy.compiler-document.dmsdk-universal.v1",
-  [BINDING_LOWERING_RECIPE_NAME]: BINDING_LOWERING_RECIPE_CAPABILITY
+  [BINDING_LOWERING_RECIPE_NAME]: BINDING_LOWERING_RECIPE_CAPABILITY,
 });
 
 export const compilerSurfaceSdkSources = Object.freeze([
@@ -199,7 +198,7 @@ export const compilerSurfaceSdkSources = Object.freeze([
   "dmsdk/scalar.ts",
   "dmsdk/scratch-scalar-out.ts",
   "dmsdk/types.ts",
-  "dmsdk/universal.ts"
+  "dmsdk/universal.ts",
 ]);
 
 async function readJson(file) {
@@ -217,13 +216,17 @@ export async function discoverCompilerSurfaceOutputs(sourceRoot = root) {
   const files = [];
   async function visit(absoluteRoot, relativeRoot, rule) {
     const entries = await readdir(absoluteRoot, { withFileTypes: true });
-    entries.sort((left, right) => left.name < right.name ? -1 : left.name > right.name ? 1 : 0);
+    entries.sort((left, right) => (left.name < right.name ? -1 : left.name > right.name ? 1 : 0));
     for (const entry of entries) {
       const relative = `${relativeRoot}/${entry.name}`;
       const absolute = path.join(absoluteRoot, entry.name);
       if (entry.isDirectory()) await visit(absolute, relative, rule);
-      else if (entry.isFile() && (rule.all || entry.name.startsWith(rule.prefix)) &&
-          !STABLE_GENERATED_OUTPUTS.has(relative)) files.push(relative);
+      else if (
+        entry.isFile() &&
+        (rule.all || entry.name.startsWith(rule.prefix)) &&
+        !STABLE_GENERATED_OUTPUTS.has(relative)
+      )
+        files.push(relative);
       else if (!entry.isFile()) throw new Error(`Unsupported compiler-output entry ${relative}`);
     }
   }
@@ -236,8 +239,9 @@ export async function discoverCompilerSurfaceOutputs(sourceRoot = root) {
 export async function readSiteConfig(file = sitePath) {
   const config = await readJson(file);
   const url = new URL(config.baseUrl);
-  const segments = [...url.pathname.split("/"), ...String(config.pathPrefix ?? "").split("/")]
-    .filter((segment) => segment.length > 0);
+  const segments = [...url.pathname.split("/"), ...String(config.pathPrefix ?? "").split("/")].filter(
+    (segment) => segment.length > 0,
+  );
   // The decision's hard constraint: everything sits beneath one segment this
   // project owns. A base with an empty path and no prefix would publish
   // `/v1/index/...` at the domain root, where it collides with whatever the
@@ -245,7 +249,7 @@ export async function readSiteConfig(file = sitePath) {
   if (segments.length === 0) {
     throw new Error(
       `${path.relative(root, file)}: baseUrl "${config.baseUrl}" has no owned path segment and pathPrefix is empty. ` +
-      "Nothing may be published at a root-level segment."
+        "Nothing may be published at a root-level segment.",
     );
   }
   if (!/^v\d+$/.test(config.layoutVersion)) {
@@ -288,24 +292,31 @@ function lockValue(lock, key) {
  */
 export function reconcileLocalPins({ lock, pins }) {
   const comparisons = [
-    { local: "EMSCRIPTEN_VERSION", localValue: lockValue(lock, "EMSCRIPTEN_VERSION"), engine: "EMSCRIPTEN_VERSION_STR" },
-    { local: "EMSDK_VERSION", localValue: lockValue(lock, "EMSDK_VERSION"), engine: "EMSCRIPTEN_VERSION_STR" }
+    {
+      local: "EMSCRIPTEN_VERSION",
+      localValue: lockValue(lock, "EMSCRIPTEN_VERSION"),
+      engine: "EMSCRIPTEN_VERSION_STR",
+    },
+    { local: "EMSDK_VERSION", localValue: lockValue(lock, "EMSDK_VERSION"), engine: "EMSCRIPTEN_VERSION_STR" },
   ].filter((row) => row.localValue !== null);
   const rows = comparisons.map((row) => ({
     localSymbol: row.local,
     localValue: row.localValue,
     engineSymbol: row.engine,
     engineValue: pins[row.engine],
-    agrees: row.localValue === pins[row.engine]
+    agrees: row.localValue === pins[row.engine],
   }));
   const divergent = rows.filter((row) => !row.agrees);
   if (divergent.length) {
     throw new Error(
       "upstream.lock restates a Defold toolchain pin and now disagrees with it:\n" +
-      divergent.map((row) =>
-        `  upstream.lock ${row.localSymbol}=${row.localValue} but sdk.py ${row.engineSymbol}="${row.engineValue}"`
-      ).join("\n") +
-      "\nThe policy is the authority. Update upstream.lock to the engine's number, or stop restating it."
+        divergent
+          .map(
+            (row) =>
+              `  upstream.lock ${row.localSymbol}=${row.localValue} but sdk.py ${row.engineSymbol}="${row.engineValue}"`,
+          )
+          .join("\n") +
+        "\nThe policy is the authority. Update upstream.lock to the engine's number, or stop restating it.",
     );
   }
   return rows;
@@ -340,9 +351,9 @@ export async function buildArtifactReferences(options = {}) {
       ANDROID_64_NDK_API_VERSION: bundleTargets.sdk.android64NdkApiVersion,
       ANDROID_TARGET_API_LEVEL: bundleTargets.sdk.androidTargetApiLevel,
       VERSION_IPHONEOS_MIN: bundleTargets.sdk.iphoneosVersionMin,
-      VERSION_MACOSX_MIN: bundleTargets.sdk.macosxVersionMin
+      VERSION_MACOSX_MIN: bundleTargets.sdk.macosxVersionMin,
     },
-    targetMatrix: { targets: bundleTargets.targets }
+    targetMatrix: { targets: bundleTargets.targets },
   });
   const families = {};
   for (const name of artifactFamilyNames) {
@@ -369,7 +380,7 @@ export async function buildArtifactReferences(options = {}) {
       indexedBy: family.tools ? "host" : "bundleTarget",
       summary: family.summary,
       assets,
-      contents
+      contents,
     };
     if (name === "native-artifacts") families[name].compatibility = compatibility;
   }
@@ -385,7 +396,7 @@ export async function derivePolicy(options = {}) {
     readJson(path.join(artifacts, "defold-lua-registration-surface.json")),
     readJson(path.join(artifacts, "defold-script-route-availability-profiles.json")),
     readJson(path.join(artifacts, "defold-resource-declaration-schema.json")),
-    readJson(path.join(sourceRoot, "package.json"))
+    readJson(path.join(sourceRoot, "package.json")),
   ]);
 
   if (typeof packageDocument.version !== "string" || packageDocument.version.length === 0) {
@@ -398,13 +409,13 @@ export async function derivePolicy(options = {}) {
     ["defold-script-api-ir.json", scriptIr.defoldRevision],
     ["defold-sdk-ir.json", dmsdkIr.defoldRevision],
     ["defold-lua-registration-surface.json", registrationSurface.defoldRevision],
-    ["defold-script-route-availability-profiles.json", routeProfiles.defoldRevision]
+    ["defold-script-route-availability-profiles.json", routeProfiles.defoldRevision],
   ]);
   const distinct = new Set(revisions.values());
   if (distinct.size !== 1 || [...distinct][0] === undefined) {
     throw new Error(
       "Generated inputs disagree about the Defold revision:\n" +
-      [...revisions].map(([file, revision]) => `  ${file}: ${revision ?? "(none)"}`).join("\n")
+        [...revisions].map(([file, revision]) => `  ${file}: ${revision ?? "(none)"}`).join("\n"),
     );
   }
   const defoldRevision = [...distinct][0];
@@ -417,7 +428,7 @@ export async function derivePolicy(options = {}) {
 
   const sdkSource = await readFile(path.join(sourceRoot, "upstream", "defold", "build_tools", "sdk.py"), "utf8");
   const buildInput = parseYaml(
-    await readFile(path.join(sourceRoot, "upstream", "defold", "share", "extender", "build_input.yml"), "utf8")
+    await readFile(path.join(sourceRoot, "upstream", "defold", "share", "extender", "build_input.yml"), "utf8"),
   );
   if (!buildInput?.platforms) throw new Error("share/extender/build_input.yml declares no platforms map");
   const bobUrlTemplate = "https://d.defold.com/archive/{defoldRevision}/bob/bob.jar";
@@ -427,26 +438,37 @@ export async function derivePolicy(options = {}) {
   if (bobUrl !== expectedBobUrl || !/^[0-9a-f]{64}$/u.test(bobSha256)) {
     throw new Error(
       `upstream.lock has no authenticated Bob artifact for ${defoldRevision}: ` +
-      `expected ${expectedBobUrl} and a SHA-256 digest`
+        `expected ${expectedBobUrl} and a SHA-256 digest`,
     );
   }
-  const platformSource = await readFile(path.join(
-    sourceRoot,
-    "upstream", "defold", "com.dynamo.cr", "com.dynamo.cr.bob", "src", "com", "dynamo", "bob", "Platform.java"
-  ), "utf8");
+  const platformSource = await readFile(
+    path.join(
+      sourceRoot,
+      "upstream",
+      "defold",
+      "com.dynamo.cr",
+      "com.dynamo.cr.bob",
+      "src",
+      "com",
+      "dynamo",
+      "bob",
+      "Platform.java",
+    ),
+    "utf8",
+  );
   const toolchain = {
     ...buildToolchainPins({
       sdkSource,
-      buildInputPlatforms: Object.keys(buildInput.platforms)
+      buildInputPlatforms: Object.keys(buildInput.platforms),
     }),
     targetMatrix: buildDefoldTargetMatrix({
       buildInputPlatforms: buildInput.platforms,
-      platformSource
+      platformSource,
     }),
     bob: {
       urlTemplate: bobUrlTemplate,
-      sha256: bobSha256
-    }
+      sha256: bobSha256,
+    },
   };
   const reconciliation = reconcileLocalPins({ lock, pins: toolchain.pins });
 
@@ -454,71 +476,99 @@ export async function derivePolicy(options = {}) {
   const [namedScalarReport, valueBindingsReport, urlBindingsReport] = await Promise.all([
     readJson(path.join(artifacts, "defold-dmsdk-named-scalar-bindings.json")),
     readJson(path.join(artifacts, "defold-script-value-bindings.json")),
-    readJson(path.join(artifacts, "defold-script-url-address-classification.json"))
+    readJson(path.join(artifacts, "defold-script-url-address-classification.json")),
   ]);
   const sdkRecipeInputs = Object.freeze({
     "dmsdk/named-scalar.ts": {
-      emittedCount: namedScalarReport.coverage?.typescriptCallable
+      emittedCount: namedScalarReport.coverage?.typescriptCallable,
     },
     "script/url-target-support.ts": {
       routeCount: urlBindingsReport.routeCount,
-      targetSupport: urlBindingsReport.targetSupport
+      targetSupport: urlBindingsReport.targetSupport,
     },
     "script/value-target-support.ts": {
       browserUnsupported: valueBindingsReport.bindings
         .filter(({ targetSupport }) => targetSupport?.html5BrowserHost?.status === "not-executable")
-        .map(({ id, stableId }) => ({ id, stableId }))
-    }
+        .map(({ id, stableId }) => ({ id, stableId })),
+    },
   });
   const compilerSurface = {
-    documents: Object.fromEntries(await Promise.all(Object.entries(compilerSurfaceDocuments).map(async ([name, relative]) => {
-      if (name === BINDING_LOWERING_RECIPE_NAME) {
-        const [plan, sentinel] = await Promise.all([
-          readJson(path.join(artifacts, "defold-binding-lowering-plan.json")),
-          readJson(path.join(artifacts, "defold-binding-lowering-plan.sentinel.json"))
-        ]);
-        return [name, createBindingLoweringRecipeFacts(plan, sentinel)];
-      }
-      return [name, await readJson(path.join(artifacts, relative))];
-    }))),
-    sdk: Object.fromEntries(await Promise.all(compilerSurfaceSdkSources.map(async (relative) => {
-      const source = await readFile(path.join(sourceRoot, "packages", "sdk", "src", "generated", relative), "utf8");
-      const canonicalSource = canonicalizePolicyText(source).split(defoldRevision).join(DEFOLD_REVISION_TOKEN);
-      return [relative, {
-        mode: locallyRenderedSdkSources.has(relative) ? "render-and-verify" : "authenticated-compatibility-source",
-        sha256: createHash("sha256").update(canonicalSource).digest("hex"),
-        inputs: locallyRenderedSdkInputs[relative] ?? [],
-        recipeInput: sdkRecipeInputs[relative],
-        source: locallyRenderedSdkSources.has(relative) ? undefined : canonicalSource
-      }];
-    }))),
-    outputs: Object.fromEntries(await Promise.all(compilerOutputPaths.map(async (relative) => {
-      const source = await readFile(path.join(sourceRoot, relative), "utf8");
-      const canonicalSource = canonicalizePolicyText(source).split(defoldRevision).join(DEFOLD_REVISION_TOKEN);
-      return [relative, {
-        mode: LOCALLY_RENDERED_OUTPUT_RECIPES[relative]
-          ? "render-and-verify"
-          : "authenticated-compatibility-source",
-        sha256: createHash("sha256").update(canonicalSource).digest("hex"),
-        inputs: LOCALLY_RENDERED_OUTPUT_INPUTS[relative] ?? [],
-        source: LOCALLY_RENDERED_OUTPUT_RECIPES[relative] ? undefined : canonicalSource
-      }];
-    }))),
+    documents: Object.fromEntries(
+      await Promise.all(
+        Object.entries(compilerSurfaceDocuments).map(async ([name, relative]) => {
+          if (name === BINDING_LOWERING_RECIPE_NAME) {
+            const [plan, sentinel] = await Promise.all([
+              readJson(path.join(artifacts, "defold-binding-lowering-plan.json")),
+              readJson(path.join(artifacts, "defold-binding-lowering-plan.sentinel.json")),
+            ]);
+            return [name, createBindingLoweringRecipeFacts(plan, sentinel)];
+          }
+          return [name, await readJson(path.join(artifacts, relative))];
+        }),
+      ),
+    ),
+    sdk: Object.fromEntries(
+      await Promise.all(
+        compilerSurfaceSdkSources.map(async (relative) => {
+          const source = await readFile(path.join(sourceRoot, "packages", "sdk", "src", "generated", relative), "utf8");
+          const canonicalSource = canonicalizePolicyText(source).split(defoldRevision).join(DEFOLD_REVISION_TOKEN);
+          return [
+            relative,
+            {
+              mode: locallyRenderedSdkSources.has(relative)
+                ? "render-and-verify"
+                : "authenticated-compatibility-source",
+              sha256: createHash("sha256").update(canonicalSource).digest("hex"),
+              inputs: locallyRenderedSdkInputs[relative] ?? [],
+              recipeInput: sdkRecipeInputs[relative],
+              source: locallyRenderedSdkSources.has(relative) ? undefined : canonicalSource,
+            },
+          ];
+        }),
+      ),
+    ),
+    outputs: Object.fromEntries(
+      await Promise.all(
+        compilerOutputPaths.map(async (relative) => {
+          const source = await readFile(path.join(sourceRoot, relative), "utf8");
+          const canonicalSource = canonicalizePolicyText(source).split(defoldRevision).join(DEFOLD_REVISION_TOKEN);
+          return [
+            relative,
+            {
+              mode: LOCALLY_RENDERED_OUTPUT_RECIPES[relative]
+                ? "render-and-verify"
+                : "authenticated-compatibility-source",
+              sha256: createHash("sha256").update(canonicalSource).digest("hex"),
+              inputs: LOCALLY_RENDERED_OUTPUT_INPUTS[relative] ?? [],
+              source: LOCALLY_RENDERED_OUTPUT_RECIPES[relative] ? undefined : canonicalSource,
+            },
+          ];
+        }),
+      ),
+    ),
     realizationRecipes: {
-      documents: Object.fromEntries(Object.keys(compilerSurfaceDocuments)
-        .map((name) => [name, compilerDocumentRecipes[name] ?? "policy.compiler-document.copy-json.v1"])),
-      sdk: Object.fromEntries(compilerSurfaceSdkSources.map((relative) => [
-        relative,
-        locallyRenderedSdkRecipes[relative] ?? "sdk.compatibility-source.copy.v1"
-      ])),
-      outputs: Object.fromEntries(compilerOutputPaths.map((relative) => [
-        relative,
-        LOCALLY_RENDERED_OUTPUT_RECIPES[relative] ?? "output.compatibility-source.copy.v1"
-      ]))
-    }
+      documents: Object.fromEntries(
+        Object.keys(compilerSurfaceDocuments).map((name) => [
+          name,
+          compilerDocumentRecipes[name] ?? "policy.compiler-document.copy-json.v1",
+        ]),
+      ),
+      sdk: Object.fromEntries(
+        compilerSurfaceSdkSources.map((relative) => [
+          relative,
+          locallyRenderedSdkRecipes[relative] ?? "sdk.compatibility-source.copy.v1",
+        ]),
+      ),
+      outputs: Object.fromEntries(
+        compilerOutputPaths.map((relative) => [
+          relative,
+          LOCALLY_RENDERED_OUTPUT_RECIPES[relative] ?? "output.compatibility-source.copy.v1",
+        ]),
+      ),
+    },
   };
 
-  const generator = options.generator ?? await generatorRevision();
+  const generator = options.generator ?? (await generatorRevision());
   const policy = buildPolicy({
     scriptIr,
     dmsdkIr,
@@ -528,7 +578,7 @@ export async function derivePolicy(options = {}) {
     toolchain,
     compilerSurface,
     generator,
-    repositoryRoot: sourceRoot
+    repositoryRoot: sourceRoot,
   });
   assertNoRevisionLeak({ rootBytes: policy.rootBytes, objects: policy.objects, revision: defoldRevision });
   // No artifact references here. They are a function of the build recipe rather
@@ -537,7 +587,7 @@ export async function derivePolicy(options = {}) {
   // artifactsPath.
   const producerPackageVersion = packageDocument.version;
   const unsupportedCapabilities = policy.root.realizer.requiredCapabilities.filter(
-    (capability) => !POLICY_REALIZER_CAPABILITIES.includes(capability)
+    (capability) => !POLICY_REALIZER_CAPABILITIES.includes(capability),
   );
   if (unsupportedCapabilities.length > 0) {
     throw new Error(`Current package cannot realize capabilities it derived: ${unsupportedCapabilities.join(", ")}`);
@@ -549,7 +599,7 @@ export async function derivePolicy(options = {}) {
     realizer: policy.root.realizer,
     producerPackageVersion,
     toolchain,
-    reconciliation
+    reconciliation,
   };
 }
 
@@ -565,7 +615,7 @@ async function listStoreFiles(directory) {
       if (error.code === "ENOENT") return;
       throw error;
     }
-    for (const entry of entries.sort((left, right) => left.name < right.name ? -1 : 1)) {
+    for (const entry of entries.sort((left, right) => (left.name < right.name ? -1 : 1))) {
       const next = prefix ? `${prefix}/${entry.name}` : entry.name;
       if (entry.isDirectory()) await visit(path.join(current, entry.name), next);
       else files.push(next);
@@ -620,7 +670,13 @@ export async function readStore(directory = storeRoot, layoutVersion = "v1") {
     }
   }
   const orphans = files.filter((file) => !file.startsWith(`${layoutVersion}/index/`) && !referenced.has(file));
-  return { files, entries: entries.sort((a, b) => a.defoldRevision < b.defoldRevision ? -1 : 1), referenced, orphans, problems };
+  return {
+    files,
+    entries: entries.sort((a, b) => (a.defoldRevision < b.defoldRevision ? -1 : 1)),
+    referenced,
+    orphans,
+    problems,
+  };
 }
 
 export function buildShippedIndex({ site, entries }) {
@@ -654,7 +710,7 @@ export function buildShippedIndex({ site, entries }) {
       // a forge's release storage, not by the policy site, so they do not sit
       // beneath this base. The template is the same expression
       // packages/cli/src/release-assets.mjs builds its URLs from.
-      releaseAsset: releaseAssetUrlTemplate()
+      releaseAsset: releaseAssetUrlTemplate(),
     },
     channels: site.channels,
     channelInfoUrl: site.channelInfoUrl,
@@ -662,14 +718,14 @@ export function buildShippedIndex({ site, entries }) {
       defoldRevision,
       policyRoot,
       generator,
-      realizer
-    }))
+      realizer,
+    })),
   };
 }
 
 function buildManifest({ policy, site, entries, reconciliation }) {
   const objectSizes = Object.fromEntries(
-    Object.entries(policy.root.subtrees).map(([key, hash]) => [key, policy.objects.get(hash).length])
+    Object.entries(policy.root.subtrees).map(([key, hash]) => [key, policy.objects.get(hash).length]),
   );
   return {
     schemaVersion: 1,
@@ -686,15 +742,15 @@ function buildManifest({ policy, site, entries, reconciliation }) {
     counts: {
       ...policy.root.counts,
       objectBytes: [...policy.objects.values()].reduce((total, bytes) => total + bytes.length, 0),
-      indexEntries: entries.length
+      indexEntries: entries.length,
     },
     toolchainPins: policy.toolchain.pins,
     localPinReconciliation: reconciliation,
     subtrees: Object.fromEntries(
       Object.entries(policy.root.subtrees)
-        .sort(([left], [right]) => left < right ? -1 : 1)
-        .map(([key, hash]) => [key, { hash, bytes: objectSizes[key] }])
-    )
+        .sort(([left], [right]) => (left < right ? -1 : 1))
+        .map(([key, hash]) => [key, { hash, bytes: objectSizes[key] }]),
+    ),
   };
 }
 
@@ -707,7 +763,7 @@ export async function writeStore({ policy, site, check }) {
     defoldRevision: policy.defoldRevision,
     policyRoot: policy.rootHash,
     generator: policy.generator,
-    realizer: policy.realizer
+    realizer: policy.realizer,
   });
   planned.set(indexPath(layout, policy.defoldRevision), `${serializeObject(entry)}\n`);
 
@@ -754,26 +810,30 @@ export async function runApiPolicyGenerator(argv = process.argv.slice(2)) {
   const manifest = `${JSON.stringify(
     buildManifest({ policy, site, entries: store.entries, reconciliation: policy.reconciliation }),
     null,
-    2
+    2,
   )}\n`;
 
   const failures = [...store.problems];
   if (store.orphans.length && !prune) {
-    failures.push(`${store.orphans.length} unreferenced objects in the store: ${store.orphans.slice(0, 3).join(", ")}…`);
+    failures.push(
+      `${store.orphans.length} unreferenced objects in the store: ${store.orphans.slice(0, 3).join(", ")}…`,
+    );
   }
   if (check) {
     if (result.written.length) {
       failures.push(
-        `${result.written.length} policy objects are missing from the store: ${result.written.slice(0, 8).join(", ")}`
+        `${result.written.length} policy objects are missing from the store: ${result.written.slice(0, 8).join(", ")}`,
       );
     }
     if (result.republished.length) {
       failures.push(
-        `${result.republished.length} stored objects disagree with the derivation: ${result.republished.slice(0, 8).join(", ")}`
+        `${result.republished.length} stored objects disagree with the derivation: ${result.republished.slice(0, 8).join(", ")}`,
       );
     }
-    if (await readFile(shippedIndexPath, "utf8").catch(() => "") !== shippedIndex) failures.push("defold-policy-index.json is stale");
-    if (await readFile(manifestPath, "utf8").catch(() => "") !== manifest) failures.push("defold-api-policy.json is stale");
+    if ((await readFile(shippedIndexPath, "utf8").catch(() => "")) !== shippedIndex)
+      failures.push("defold-policy-index.json is stale");
+    if ((await readFile(manifestPath, "utf8").catch(() => "")) !== manifest)
+      failures.push("defold-api-policy.json is stale");
     if (failures.length) throw new Error(`Policy store check failed:\n  ${failures.join("\n  ")}`);
   } else {
     if (failures.length) throw new Error(`Policy store is inconsistent:\n  ${failures.join("\n  ")}`);
@@ -784,9 +844,9 @@ export async function runApiPolicyGenerator(argv = process.argv.slice(2)) {
   const bytes = [...policy.objects.values()].reduce((total, value) => total + value.length, 0);
   console.log(
     `${check ? "Verified" : "Generated"} policy ${policy.rootHash.slice(0, 12)} for ${policy.defoldRevision.slice(0, 12)}: ` +
-    `${policy.root.counts.namespaces} namespaces, ${policy.root.counts.subtrees} subtrees, ` +
-    `${(bytes / 1e6).toFixed(2)} MB, ${store.entries.length} index entries` +
-    (check ? "" : ` (${result.written.length} new objects, ${result.republished.length} rewritten)`)
+      `${policy.root.counts.namespaces} namespaces, ${policy.root.counts.subtrees} subtrees, ` +
+      `${(bytes / 1e6).toFixed(2)} MB, ${store.entries.length} index entries` +
+      (check ? "" : ` (${result.written.length} new objects, ${result.republished.length} rewritten)`),
   );
 }
 

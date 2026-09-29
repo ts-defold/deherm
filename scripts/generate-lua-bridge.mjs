@@ -9,7 +9,7 @@ const TYPES = {
   u32: { cpp: "uint32_t", push: "pushU32", read: "readU32" },
   f64: { cpp: "double", push: "pushF64", read: "readF64" },
   void: { cpp: "void" },
-  callback: { cpp: "Handle", push: "pushTimerCallback" }
+  callback: { cpp: "Handle", push: "pushTimerCallback" },
 };
 const IDENTIFIER = /^[A-Za-z_][A-Za-z0-9_]*$/;
 
@@ -40,26 +40,32 @@ export function validateLuaSchema(input) {
   for (const [moduleIndex, module] of schema.modules.entries()) {
     const path = `modules[${moduleIndex}]`;
     if (!IDENTIFIER.test(module.name)) fail(`${path}.name`, "expected an identifier");
-    if (typeof module.luaModule !== "string" || !module.luaModule) fail(`${path}.luaModule`, "expected a Lua module name");
+    if (typeof module.luaModule !== "string" || !module.luaModule)
+      fail(`${path}.luaModule`, "expected a Lua module name");
     if (!Array.isArray(module.functions)) fail(`${path}.functions`, "expected an array");
     for (const [functionIndex, fn] of module.functions.entries()) {
       const functionPath = `${path}.functions[${functionIndex}]`;
       if (!IDENTIFIER.test(fn.name)) fail(`${functionPath}.name`, "expected an identifier");
-      if (typeof fn.luaFunction !== "string" || !fn.luaFunction) fail(`${functionPath}.luaFunction`, "expected a Lua function name");
+      if (typeof fn.luaFunction !== "string" || !fn.luaFunction)
+        fail(`${functionPath}.luaFunction`, "expected a Lua function name");
       if (!Array.isArray(fn.parameters)) fail(`${functionPath}.parameters`, "expected an array");
       if (!TYPES[fn.returns]) fail(`${functionPath}.returns`, `unsupported type ${fn.returns}`);
       const id = `${module.name}.${fn.name}`;
       if (ids.has(id)) fail(functionPath, `duplicate function ${id}`);
       ids.add(id);
       for (const [parameterIndex, parameter] of fn.parameters.entries()) {
-        if (!IDENTIFIER.test(parameter.name)) fail(`${functionPath}.parameters[${parameterIndex}].name`, "expected an identifier");
+        if (!IDENTIFIER.test(parameter.name))
+          fail(`${functionPath}.parameters[${parameterIndex}].name`, "expected an identifier");
         if (!TYPES[parameter.type] || parameter.type === "void") {
           fail(`${functionPath}.parameters[${parameterIndex}].type`, `unsupported type ${parameter.type}`);
         }
         if (parameter.type === "callback") {
           const repeating = fn.parameters.find(({ name }) => name === parameter.repeatingParameter);
           if (!repeating || repeating.type !== "bool") {
-            fail(`${functionPath}.parameters[${parameterIndex}].repeatingParameter`, "expected the name of a boolean parameter");
+            fail(
+              `${functionPath}.parameters[${parameterIndex}].repeatingParameter`,
+              "expected the name of a boolean parameter",
+            );
           }
         }
       }
@@ -87,14 +93,20 @@ function generateHeader(schema) {
     "",
     "namespace defold_hermes::lua_bridge::generated {",
     "",
-    "enum class Binding : uint32_t {"
+    "enum class Binding : uint32_t {",
   ];
   const entries = functions(schema);
   entries.forEach(({ module, fn }, index) => lines.push(`  ${enumName(module, fn)} = ${index},`));
   lines.push(`  Count = ${entries.length}`, "};", "");
-  lines.push("bool initialize(LuaBridge& bridge, lua_State* state, RegistryApi registryApi, InstanceApi instanceApi = {});", "");
+  lines.push(
+    "bool initialize(LuaBridge& bridge, lua_State* state, RegistryApi registryApi, InstanceApi instanceApi = {});",
+    "",
+  );
   for (const { module, fn } of entries) {
-    const parameters = ["LuaBridge& bridge", ...fn.parameters.map((parameter) => `${TYPES[parameter.type].cpp} ${parameter.name}`)];
+    const parameters = [
+      "LuaBridge& bridge",
+      ...fn.parameters.map((parameter) => `${TYPES[parameter.type].cpp} ${parameter.name}`),
+    ];
     if (fn.returns !== "void") parameters.push(`${TYPES[fn.returns].cpp}* out`);
     lines.push(`bool ${thunkName(module, fn)}(${parameters.join(", ")});`);
   }
@@ -110,25 +122,31 @@ function generateSource(schema) {
     "",
     "namespace defold_hermes::lua_bridge::generated {",
     "namespace {",
-    "constexpr BindingDescriptor kBindings[] = {"
+    "constexpr BindingDescriptor kBindings[] = {",
   ];
   for (const { module, fn } of entries) {
     lines.push(`  {"${module.luaModule}", "${fn.luaFunction}"},`);
   }
   lines.push("};", "}  // namespace", "");
-  lines.push("bool initialize(LuaBridge& bridge, lua_State* state, RegistryApi registryApi, InstanceApi instanceApi) {");
-  lines.push(`  return bridge.initialize(state, kBindings, ${entries.length}, ${schema.stackReserve}, registryApi, instanceApi);`);
+  lines.push(
+    "bool initialize(LuaBridge& bridge, lua_State* state, RegistryApi registryApi, InstanceApi instanceApi) {",
+  );
+  lines.push(
+    `  return bridge.initialize(state, kBindings, ${entries.length}, ${schema.stackReserve}, registryApi, instanceApi);`,
+  );
   lines.push("}", "");
   for (const { module, fn } of entries) {
-    const parameters = ["LuaBridge& bridge", ...fn.parameters.map((parameter) => `${TYPES[parameter.type].cpp} ${parameter.name}`)];
+    const parameters = [
+      "LuaBridge& bridge",
+      ...fn.parameters.map((parameter) => `${TYPES[parameter.type].cpp} ${parameter.name}`),
+    ];
     if (fn.returns !== "void") parameters.push(`${TYPES[fn.returns].cpp}* out`);
     lines.push(`bool ${thunkName(module, fn)}(${parameters.join(", ")}) {`);
     lines.push(`  LuaCall call = bridge.beginCall(static_cast<uint32_t>(Binding::${enumName(module, fn)}));`);
     lines.push("  if (!call) return false;");
     for (const parameter of fn.parameters) {
-      const argumentsList = parameter.type === "callback"
-        ? `${parameter.name}, ${parameter.repeatingParameter}`
-        : parameter.name;
+      const argumentsList =
+        parameter.type === "callback" ? `${parameter.name}, ${parameter.repeatingParameter}` : parameter.name;
       lines.push(`  call.${TYPES[parameter.type].push}(${argumentsList});`);
     }
     lines.push(`  if (!call.invoke(${fn.parameters.length}, ${fn.returns === "void" ? 0 : 1})) return false;`);
@@ -157,7 +175,7 @@ export function generateLuaArtifacts(input) {
   const schema = validateLuaSchema(input);
   return new Map([
     ["defold/defold_hermes/include/defold_hermes/generated_lua_bridge.hpp", generateHeader(schema)],
-    ["defold/defold_hermes/src/generated_lua_bridge.cpp", generateSource(schema)]
+    ["defold/defold_hermes/src/generated_lua_bridge.cpp", generateSource(schema)],
   ]);
 }
 

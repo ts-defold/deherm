@@ -13,7 +13,7 @@ export const inputPaths = Object.freeze({
   policy: "packages/bindings/overrides/script-handle-lowering-policy.json",
   projection: "packages/bindings/generated/defold-script-projection-ir.json",
   classification: "packages/bindings/generated/defold-script-borrowed-handle-classification.json",
-  availability: "packages/bindings/generated/defold-script-route-availability-profiles.json"
+  availability: "packages/bindings/generated/defold-script-route-availability-profiles.json",
 });
 
 export const outputPaths = Object.freeze({
@@ -21,7 +21,7 @@ export const outputPaths = Object.freeze({
   kindHeader: "defold/defold_hermes/include/defold_hermes/generated_script_handle_kinds.hpp",
   header: "defold/defold_hermes/include/defold_hermes/generated_script_handle_lowering.hpp",
   source: "defold/defold_hermes/src/generated_script_handle_lowering.cpp",
-  typescript: "packages/sdk/src/generated/script/handle-lowering.ts"
+  typescript: "packages/sdk/src/generated/script/handle-lowering.ts",
 });
 
 const codecBits = Object.freeze({
@@ -35,7 +35,7 @@ const codecBits = Object.freeze({
   vector3: 128,
   vector4: 256,
   quaternion: 512,
-  handle: 1024
+  handle: 1024,
 });
 
 function compareCodeUnits(left, right) {
@@ -62,7 +62,7 @@ export function assignRuntimeProfileEquivalence(runtimeProfiles, handleKinds) {
   const groups = [...bySurface.entries()]
     .map(([registrationSurfaceSha256, profiles]) => ({
       registrationSurfaceSha256,
-      profiles: profiles.sort((left, right) => compareCodeUnits(left.id, right.id))
+      profiles: profiles.sort((left, right) => compareCodeUnits(left.id, right.id)),
     }))
     .sort((left, right) => compareCodeUnits(left.profiles[0].id, right.profiles[0].id));
   const collapsed = [];
@@ -92,7 +92,7 @@ export function assignRuntimeProfileEquivalence(runtimeProfiles, handleKinds) {
       equivalentProfileMask,
       conservativelyUnavailableHandleKinds: conservativelyUnavailableHandleKinds.sort(compareCodeUnits),
       proof: "identical-exact-function-presence-vector",
-      alert: "named-runtime-profiles-observationally-equivalent"
+      alert: "named-runtime-profiles-observationally-equivalent",
     });
   }
   return collapsed;
@@ -134,8 +134,10 @@ function compareCounts(actual, expected, label) {
   if (JSON.stringify(actual) === JSON.stringify(sorted)) return;
   for (const key of [...new Set([...Object.keys(sorted), ...Object.keys(actual)])].sort(compareCodeUnits)) {
     expectReviewedCount({
-      input: "packages/bindings/overrides/script-handle-lowering-policy.json", label: `${label}:${key}`,
-      expected: sorted[key] ?? 0, observed: actual[key] ?? 0
+      input: "packages/bindings/overrides/script-handle-lowering-policy.json",
+      label: `${label}:${key}`,
+      expected: sorted[key] ?? 0,
+      observed: actual[key] ?? 0,
     });
   }
 }
@@ -157,11 +159,16 @@ function walkShape(shape, visit) {
 
 function exactShapeMask(shape, semanticKind) {
   if (shape.kind === "optional") return codecBits.nil | exactShapeMask(shape.value, semanticKind);
-  if (shape.kind === "union") return shape.variants.reduce((mask, variant) => {
-    const identityVariant = variant.kind === "handle" || (variant.kind === "defold-value" &&
-      ["node", "buffer_data", "buffer_stream", "constant_buffer", "render_target", "texture"].includes(variant.name));
-    return mask | exactShapeMask(variant, identityVariant ? semanticKind : null);
-  }, 0);
+  if (shape.kind === "union")
+    return shape.variants.reduce((mask, variant) => {
+      const identityVariant =
+        variant.kind === "handle" ||
+        (variant.kind === "defold-value" &&
+          ["node", "buffer_data", "buffer_stream", "constant_buffer", "render_target", "texture"].includes(
+            variant.name,
+          ));
+      return mask | exactShapeMask(variant, identityVariant ? semanticKind : null);
+    }, 0);
   if (semanticKind) return codecBits.handle;
   if (shape.kind === "enum") return codecBits.integer;
   if (shape.kind === "handle") return codecBits.handle;
@@ -169,7 +176,15 @@ function exactShapeMask(shape, semanticKind) {
     if (codecBits[shape.name] !== undefined) return codecBits[shape.name];
   }
   if (shape.kind === "defold-value") {
-    const aliases = { "gui.PROP": "hash", node: "handle", buffer_data: "handle", buffer_stream: "handle", constant_buffer: "handle", render_target: "handle", texture: "handle" };
+    const aliases = {
+      "gui.PROP": "hash",
+      node: "handle",
+      buffer_data: "handle",
+      buffer_stream: "handle",
+      constant_buffer: "handle",
+      render_target: "handle",
+      texture: "handle",
+    };
     const name = aliases[shape.name] ?? shape.name;
     if (codecBits[name] !== undefined) return codecBits[name];
   }
@@ -186,12 +201,17 @@ function algebraicallySelected(row, classification, policy) {
   const selection = policy.selection;
   if (row.loweringFamily !== selection.loweringFamily) return false;
   if (!classification || selection.excludedOperationClasses.includes(classification.operationClass)) return false;
-  if (row.signature.parameters.length > selection.maximumArguments || row.signature.returns.length > selection.maximumResults) return false;
+  if (
+    row.signature.parameters.length > selection.maximumArguments ||
+    row.signature.returns.length > selection.maximumResults
+  )
+    return false;
   if (selection.requiresFixedArity && row.effects.variadic.token !== "fixed-arity") return false;
   if (selection.requiresAcyclicValues && row.effects.recursive.token !== "acyclic-value-shape") return false;
   const allowed = new Set(selection.allowedValueConstructors);
-  return [...row.signature.parameters, ...row.signature.returns]
-    .every(({ value }) => [...shapeKinds(value)].every((kind) => allowed.has(kind)));
+  return [...row.signature.parameters, ...row.signature.returns].every(({ value }) =>
+    [...shapeKinds(value)].every((kind) => allowed.has(kind)),
+  );
 }
 
 function rawTypeTokens(rawType) {
@@ -204,7 +224,8 @@ function semanticKindsForValue(value, rawType, rawTypeToKind) {
     const kind = rawTypeToKind.get(token);
     if (kind) kinds.add(kind);
   }
-  if (kinds.size > 1) throw new Error(`value ${rawType} maps to multiple semantic handle kinds: ${[...kinds].join(", ")}`);
+  if (kinds.size > 1)
+    throw new Error(`value ${rawType} maps to multiple semantic handle kinds: ${[...kinds].join(", ")}`);
   const [semanticKind = null] = kinds;
   const mask = exactShapeMask(value, semanticKind);
   return { mask, semanticKind };
@@ -226,8 +247,11 @@ function nativeAdapterHarnessDisposition(row, policy) {
 }
 
 function pascal(value) {
-  const result = String(value).split(/[^A-Za-z0-9]+/).filter(Boolean)
-    .map((part) => `${part[0].toUpperCase()}${part.slice(1)}`).join("");
+  const result = String(value)
+    .split(/[^A-Za-z0-9]+/)
+    .filter(Boolean)
+    .map((part) => `${part[0].toUpperCase()}${part.slice(1)}`)
+    .join("");
   return /^\d/.test(result) ? `N${result}` : result;
 }
 
@@ -239,9 +263,11 @@ function cppString(value) {
 // per route, so every route interns the exact codec signature it crosses with.
 // The token is derived from the same generated codecs the transport uses, so it
 // cannot drift from the call it describes.
-const codecBitNames = Object.freeze(Object.entries(codecBits)
-  .sort(([, left], [, right]) => left - right)
-  .map(([name, bit]) => [bit, name]));
+const codecBitNames = Object.freeze(
+  Object.entries(codecBits)
+    .sort(([, left], [, right]) => left - right)
+    .map(([name, bit]) => [bit, name]),
+);
 
 function codecShapeToken(codec) {
   if (codec.semanticKind) return `handle:${codec.semanticKind}`;
@@ -486,7 +512,7 @@ const operationCpp = Object.freeze({
   "checked-handle-input-terminal": "OperationClass::kTerminal",
   "checked-handle-return-capture": "OperationClass::kProducer",
   "checked-self-engine-object-invalidate": "OperationClass::kSelfInvalidator",
-  "checked-child-engine-object-invalidate": "OperationClass::kChildInvalidator"
+  "checked-child-engine-object-invalidate": "OperationClass::kChildInvalidator",
 });
 
 const contextCpp = Object.freeze({
@@ -494,7 +520,7 @@ const contextCpp = Object.freeze({
   "runtime-global": "Context::kRuntimeGlobal",
   "game-object-instance": "Context::kGameObjectInstance",
   "gui-scene": "Context::kGuiScene",
-  "render-script-instance-and-graphics-context": "Context::kRenderScriptAndGraphics"
+  "render-script-instance-and-graphics-context": "Context::kRenderScriptAndGraphics",
 });
 
 const dispositionCpp = Object.freeze({
@@ -503,23 +529,47 @@ const dispositionCpp = Object.freeze({
   "browser-host-unimplemented": "Disposition::kBrowserHostUnimplemented",
   "gui-script-attachment-unavailable": "Disposition::kGuiScriptAttachmentUnavailable",
   "render-script-attachment-unavailable": "Disposition::kRenderScriptAttachmentUnavailable",
-  "profile-symbol-unavailable": "Disposition::kProfileSymbolUnavailable"
+  "profile-symbol-unavailable": "Disposition::kProfileSymbolUnavailable",
 });
 
 function renderSource(report) {
-  const kinds = report.handleKinds.map((kind) =>
-    `  {SemanticHandleKind::k${kind.enumName}, ${cppString(kind.id)}, ${cppString(kind.representation)}, ${cppString(kind.ownership)}, ${kind.capturableProfileMask}},`).join("\n");
-  const arguments_ = report.argumentCodecs.map((codec) =>
-    `  {${codec.mask}, SemanticHandleKind::k${codec.semanticKind ? report.kindById[codec.semanticKind].enumName : "None"}},`).join("\n");
-  const results = report.resultCodecs.map((codec) =>
-    `  {${codec.mask}, SemanticHandleKind::k${codec.semanticKind ? report.kindById[codec.semanticKind].enumName : "None"}},`).join("\n");
-  const routes = report.routes.map((route) => `  {${route.index}, ${route.stableId}u, ${cppString(route.id)}, ${cppString(route.modulePath.join("."))}, ${cppString(route.member)}, ${operationCpp[route.operationClass]}, ${contextCpp[route.context]}, Invalidation::k${pascal(route.invalidation)}, ${cppString(route.ownership.projectionToken)}, ${cppString(route.lifetime.projectionToken)}, ${cppString(route.profiles.token)}, ${route.profiles.runtimeAvailable}, ${route.profiles.registrationMask}, ${route.profiles.runtimeMask}, ${route.generation.router === "emitted"}, ${dispositionCpp[route.targets.nativeDynamicHermes]}, ${dispositionCpp[route.targets.nativeStaticHermes]}, ${dispositionCpp[route.targets.html5BrowserHost]}, ${route.argumentOffset}, ${route.resultOffset}, ${route.requiredArgumentCount}, ${route.argumentCount}, ${route.resultCount}},`).join("\n");
-  const runtimeProfiles = report.runtimeProfiles.map((profile) =>
-    `  {${profile.index}, ${profile.mask}, ${profile.detectionCanonicalProfileIndex}, ${profile.equivalentProfileMask}, ${profile.capabilityBits}u, ${profile.sourceRouteCount}u, ${profile.adapterExecutableRouteCount}, ${cppString(profile.id)}, ${cppString(profile.schema)}, ${cppString(profile.defoldRevision)}, ${cppString(profile.routeSetSha256)}, ${cppString(profile.catalogSha256)}},`).join("\n");
-  const stableOrder = [...report.routes].sort((left, right) => left.stableId - right.stableId).map(({ index }) => index);
+  const kinds = report.handleKinds
+    .map(
+      (kind) =>
+        `  {SemanticHandleKind::k${kind.enumName}, ${cppString(kind.id)}, ${cppString(kind.representation)}, ${cppString(kind.ownership)}, ${kind.capturableProfileMask}},`,
+    )
+    .join("\n");
+  const arguments_ = report.argumentCodecs
+    .map(
+      (codec) =>
+        `  {${codec.mask}, SemanticHandleKind::k${codec.semanticKind ? report.kindById[codec.semanticKind].enumName : "None"}},`,
+    )
+    .join("\n");
+  const results = report.resultCodecs
+    .map(
+      (codec) =>
+        `  {${codec.mask}, SemanticHandleKind::k${codec.semanticKind ? report.kindById[codec.semanticKind].enumName : "None"}},`,
+    )
+    .join("\n");
+  const routes = report.routes
+    .map(
+      (route) =>
+        `  {${route.index}, ${route.stableId}u, ${cppString(route.id)}, ${cppString(route.modulePath.join("."))}, ${cppString(route.member)}, ${operationCpp[route.operationClass]}, ${contextCpp[route.context]}, Invalidation::k${pascal(route.invalidation)}, ${cppString(route.ownership.projectionToken)}, ${cppString(route.lifetime.projectionToken)}, ${cppString(route.profiles.token)}, ${route.profiles.runtimeAvailable}, ${route.profiles.registrationMask}, ${route.profiles.runtimeMask}, ${route.generation.router === "emitted"}, ${dispositionCpp[route.targets.nativeDynamicHermes]}, ${dispositionCpp[route.targets.nativeStaticHermes]}, ${dispositionCpp[route.targets.html5BrowserHost]}, ${route.argumentOffset}, ${route.resultOffset}, ${route.requiredArgumentCount}, ${route.argumentCount}, ${route.resultCount}},`,
+    )
+    .join("\n");
+  const runtimeProfiles = report.runtimeProfiles
+    .map(
+      (profile) =>
+        `  {${profile.index}, ${profile.mask}, ${profile.detectionCanonicalProfileIndex}, ${profile.equivalentProfileMask}, ${profile.capabilityBits}u, ${profile.sourceRouteCount}u, ${profile.adapterExecutableRouteCount}, ${cppString(profile.id)}, ${cppString(profile.schema)}, ${cppString(profile.defoldRevision)}, ${cppString(profile.routeSetSha256)}, ${cppString(profile.catalogSha256)}},`,
+    )
+    .join("\n");
+  const stableOrder = [...report.routes]
+    .sort((left, right) => left.stableId - right.stableId)
+    .map(({ index }) => index);
   const profileShapes = report.routes.map((route) => `  ${route.contractShapeIndex},`).join("\n");
-  const profileNames = report.routes.map((route) =>
-    `  ${cppString(`deherm.lua-stack.${route.modulePath.join(".")}.${route.member}`)},`).join("\n");
+  const profileNames = report.routes
+    .map((route) => `  ${cppString(`deherm.lua-stack.${route.modulePath.join(".")}.${route.member}`)},`)
+    .join("\n");
   const profileShapeNames = report.contractShapes.map((token) => `  ${cppString(token)},`).join("\n");
   return `#include <defold_hermes/generated_script_handle_lowering.hpp>
 #include <defold_hermes/script_url_arena.hpp>
@@ -1076,9 +1126,18 @@ bool CapturedLuaRouter::dispatch(ScriptCallFrame* frame, char* error, size_t cap
 
 function renderTypescript(report) {
   const kinds = report.handleKinds.map(({ id }) => JSON.stringify(id)).join(" | ");
-  const kindRows = report.handleKinds.map(({ id, numericId, representation, ownership }) =>
-    `  ${JSON.stringify(id)}: { numericId: ${numericId}, representation: ${JSON.stringify(representation)}, ownership: ${JSON.stringify(ownership)} },`).join("\n");
-  const routes = report.routes.map((route) => `  ${JSON.stringify(route.id)}: { stableId: ${route.stableId}, operationClass: ${JSON.stringify(route.operationClass)}, operationEffect: ${JSON.stringify(route.operationEffect)}, context: ${JSON.stringify(route.context)}, invalidation: ${JSON.stringify(route.invalidation)}, inputKinds: ${JSON.stringify(route.inputKinds)}, returnKinds: ${JSON.stringify(route.returnKinds)}, ownership: ${JSON.stringify(route.ownership)}, lifetime: ${JSON.stringify(route.lifetime)}, profiles: ${JSON.stringify(route.profiles)}, targets: ${JSON.stringify(route.targets)} },`).join("\n");
+  const kindRows = report.handleKinds
+    .map(
+      ({ id, numericId, representation, ownership }) =>
+        `  ${JSON.stringify(id)}: { numericId: ${numericId}, representation: ${JSON.stringify(representation)}, ownership: ${JSON.stringify(ownership)} },`,
+    )
+    .join("\n");
+  const routes = report.routes
+    .map(
+      (route) =>
+        `  ${JSON.stringify(route.id)}: { stableId: ${route.stableId}, operationClass: ${JSON.stringify(route.operationClass)}, operationEffect: ${JSON.stringify(route.operationEffect)}, context: ${JSON.stringify(route.context)}, invalidation: ${JSON.stringify(route.invalidation)}, inputKinds: ${JSON.stringify(route.inputKinds)}, returnKinds: ${JSON.stringify(route.returnKinds)}, ownership: ${JSON.stringify(route.ownership)}, lifetime: ${JSON.stringify(route.lifetime)}, profiles: ${JSON.stringify(route.profiles)}, targets: ${JSON.stringify(route.targets)} },`,
+    )
+    .join("\n");
   return `/** Generated semantic brands for identity-bearing Defold script values. */
 export type SemanticHandleKind = ${kinds};
 
@@ -1112,7 +1171,10 @@ export const attachmentProviders = ${JSON.stringify(report.attachmentProviders, 
 export function generateScriptHandleLowering(textInputs) {
   const parsed = Object.fromEntries(Object.entries(textInputs).map(([name, text]) => [name, parseJson(text, name)]));
   const { policy, projection, classification, availability } = parsed;
-  if (projection.defoldRevision !== classification.defoldRevision || projection.defoldRevision !== availability.defoldRevision) {
+  if (
+    projection.defoldRevision !== classification.defoldRevision ||
+    projection.defoldRevision !== availability.defoldRevision
+  ) {
     throw new Error("handle lowering inputs do not share one pinned Defold revision");
   }
   for (const row of projection.rows) {
@@ -1125,27 +1187,37 @@ export function generateScriptHandleLowering(textInputs) {
     .filter((row) => algebraicallySelected(row, classificationById.get(row.id), policy))
     .sort((left, right) => compareCodeUnits(left.id, right.id));
   expectReviewedCount({
-    input: "packages/bindings/overrides/script-handle-lowering-policy.json", label: "algebraic handle route census",
-    expected: policy.selection.expectedRouteCount, observed: selected.length
+    input: "packages/bindings/overrides/script-handle-lowering-policy.json",
+    label: "algebraic handle route census",
+    expected: policy.selection.expectedRouteCount,
+    observed: selected.length,
   });
 
-  const handleKinds = semanticHandleKinds(classification)
-    .map((kind) => ({ ...kind, enumName: pascal(kind.id) }));
+  const handleKinds = semanticHandleKinds(classification).map((kind) => ({ ...kind, enumName: pascal(kind.id) }));
   const kindById = Object.fromEntries(handleKinds.map((kind) => [kind.id, kind]));
   const rawTypeToKind = new Map();
-  for (const kind of handleKinds) for (const rawType of kind.rawTypes) {
-    if (rawTypeToKind.has(rawType)) throw new Error(`semantic handle raw type ${rawType} is ambiguous`);
-    rawTypeToKind.set(rawType, kind.id);
-  }
+  for (const kind of handleKinds)
+    for (const rawType of kind.rawTypes) {
+      if (rawTypeToKind.has(rawType)) throw new Error(`semantic handle raw type ${rawType} is ambiguous`);
+      rawTypeToKind.set(rawType, kind.id);
+    }
 
   const runtimeProfiles = Object.entries(availability.profiles ?? {})
     .sort(([left], [right]) => compareCodeUnits(left, right))
     .map(([id, profile], index) => {
       const handshake = profile.runtimeHandshake;
-      const sourceRouteSetSha256 = sha256(JSON.stringify((profile.availableRoutes ?? []).map(({ stableId }) => stableId)));
-      if (!handshake || handshake.profileId !== id || handshake.schema !== availability.handshakeContract?.schema ||
-          handshake.defoldRevision !== projection.defoldRevision || handshake.catalogSha256 !== availability.catalogSha256 ||
-          handshake.routeCount !== profile.availableRouteCount || handshake.routeSetSha256 !== sourceRouteSetSha256) {
+      const sourceRouteSetSha256 = sha256(
+        JSON.stringify((profile.availableRoutes ?? []).map(({ stableId }) => stableId)),
+      );
+      if (
+        !handshake ||
+        handshake.profileId !== id ||
+        handshake.schema !== availability.handshakeContract?.schema ||
+        handshake.defoldRevision !== projection.defoldRevision ||
+        handshake.catalogSha256 !== availability.catalogSha256 ||
+        handshake.routeCount !== profile.availableRouteCount ||
+        handshake.routeSetSha256 !== sourceRouteSetSha256
+      ) {
         throw new Error(`runtime profile ${id} has a stale or incomplete capability handshake`);
       }
       if (index >= 8) throw new Error("handle router supports at most eight runtime profiles");
@@ -1159,15 +1231,18 @@ export function generateScriptHandleLowering(textInputs) {
         sourceRouteCount: handshake.routeCount,
         routeSetSha256: handshake.routeSetSha256,
         catalogSha256: handshake.catalogSha256,
-        adapterExecutableRouteCount: 0
+        adapterExecutableRouteCount: 0,
       };
     });
-  if (runtimeProfiles.length !== 6) throw new Error(`expected six pinned runtime profiles, got ${runtimeProfiles.length}`);
+  if (runtimeProfiles.length !== 6)
+    throw new Error(`expected six pinned runtime profiles, got ${runtimeProfiles.length}`);
   const runtimeProfileById = new Map(runtimeProfiles.map((profile) => [profile.id, profile]));
-  const availableRouteIdsByProfile = new Map(Object.entries(availability.profiles).map(([id, profile]) => [
-    id,
-    new Set((profile.availableRoutes ?? []).map(({ id: routeId }) => routeId))
-  ]));
+  const availableRouteIdsByProfile = new Map(
+    Object.entries(availability.profiles).map(([id, profile]) => [
+      id,
+      new Set((profile.availableRoutes ?? []).map(({ id: routeId }) => routeId)),
+    ]),
+  );
 
   // Which runtime profiles root a handle kind as a generation-checked
   // identity. A kind whose representation is the same in every backend is
@@ -1186,8 +1261,9 @@ export function generateScriptHandleLowering(textInputs) {
     const uncapturable = new Set(kind.uncapturableFeatures ?? []);
     const profiles = runtimeProfiles.filter(({ id }) => {
       const features = availability.profiles[id]?.features ?? [];
-      return features.some((feature) => capturable.has(feature)) &&
-        !features.some((feature) => uncapturable.has(feature));
+      return (
+        features.some((feature) => capturable.has(feature)) && !features.some((feature) => uncapturable.has(feature))
+      );
     });
     kind.capturableProfiles = profiles.map(({ id }) => id);
     kind.capturableProfileMask = profiles.reduce((mask, { mask: bit }) => mask | bit, 0);
@@ -1203,11 +1279,17 @@ export function generateScriptHandleLowering(textInputs) {
       return { ...codec, mask: codec.mask | (optional ? codecBits.nil : 0) };
     });
     const requiredArgumentCount = row.signature.parameters.reduce(
-      (count, parameter, index) => parameter.optional ? count : index + 1, 0);
-    const results = row.signature.returns.map(({ value, sourceType }) => semanticKindsForValue(value, sourceType, rawTypeToKind));
+      (count, parameter, index) => (parameter.optional ? count : index + 1),
+      0,
+    );
+    const results = row.signature.returns.map(({ value, sourceType }) =>
+      semanticKindsForValue(value, sourceType, rawTypeToKind),
+    );
     argumentCodecs.push(...arguments_);
     resultCodecs.push(...results);
-    const discoveredInputKinds = [...new Set(arguments_.map(({ semanticKind }) => semanticKind).filter(Boolean))].sort();
+    const discoveredInputKinds = [
+      ...new Set(arguments_.map(({ semanticKind }) => semanticKind).filter(Boolean)),
+    ].sort();
     const discoveredReturnKinds = [...new Set(results.map(({ semanticKind }) => semanticKind).filter(Boolean))].sort();
     if (JSON.stringify(discoveredInputKinds) !== JSON.stringify([...classified.inputHandleKinds].sort())) {
       throw new Error(`${row.id} input semantic handle kinds drifted`);
@@ -1219,7 +1301,7 @@ export function generateScriptHandleLowering(textInputs) {
       "checked-handle-input-terminal": null,
       "checked-handle-return-capture": null,
       "checked-self-engine-object-invalidate": "self-underlying",
-      "checked-child-engine-object-invalidate": "child-index"
+      "checked-child-engine-object-invalidate": "child-index",
     }[classified.operationClass];
     if (expectedInvalidation === undefined || (classified.invalidatedIdentity ?? null) !== expectedInvalidation) {
       throw new Error(`${row.id} operation-class invalidation semantics drifted`);
@@ -1230,14 +1312,16 @@ export function generateScriptHandleLowering(textInputs) {
     const targets = {
       nativeDynamicHermes: targetDisposition(row, "nativeDynamicHermes", policy),
       nativeStaticHermes: targetDisposition(row, "nativeStaticHermes", policy),
-      html5BrowserHost: targetDisposition(row, "html5BrowserHost", policy)
+      html5BrowserHost: targetDisposition(row, "html5BrowserHost", policy),
     };
     const harnessDisposition = nativeAdapterHarnessDisposition(row, policy);
     const blocked = harnessDisposition !== "router-candidate";
-    const registrationProfileIds = [...(row.availability.runtimeProfiles ??
-      (row.availability.runtimeAvailable !== false && row.availability.token === "core"
-        ? runtimeProfiles.map(({ id }) => id)
-        : []))].sort();
+    const registrationProfileIds = [
+      ...(row.availability.runtimeProfiles ??
+        (row.availability.runtimeAvailable !== false && row.availability.token === "core"
+          ? runtimeProfiles.map(({ id }) => id)
+          : [])),
+    ].sort();
     let registrationMask = 0;
     for (const profileId of registrationProfileIds) {
       const profile = runtimeProfileById.get(profileId);
@@ -1259,10 +1343,11 @@ export function generateScriptHandleLowering(textInputs) {
     }
     for (const profile of runtimeProfiles) {
       const catalogAvailable = availableRouteIdsByProfile.get(profile.id)?.has(row.id) === true;
-      const capturable = semanticKinds.every((kind) =>
-        (kindById[kind].capturableProfileMask & profile.mask) !== 0);
-      if (row.availability.token !== "core" &&
-          (catalogAvailable && capturable) !== runtimeProfileIds.includes(profile.id)) {
+      const capturable = semanticKinds.every((kind) => (kindById[kind].capturableProfileMask & profile.mask) !== 0);
+      if (
+        row.availability.token !== "core" &&
+        (catalogAvailable && capturable) !== runtimeProfileIds.includes(profile.id)
+      ) {
         throw new Error(`${row.id} source-derived runtime profile membership drifted for ${profile.id}`);
       }
     }
@@ -1283,11 +1368,11 @@ export function generateScriptHandleLowering(textInputs) {
       ownership: {
         projectionToken: row.effects.ownership.token,
         hostWrapper: "generation-checked-lua-registry-root",
-        underlying: "semantic-handle-kind-policy"
+        underlying: "semantic-handle-kind-policy",
       },
       lifetime: {
         projectionToken: row.effects.lifetime.token,
-        loweringToken: "semantic-handle-kind-policy"
+        loweringToken: "semantic-handle-kind-policy",
       },
       callback: row.effects.callback,
       variadic: row.effects.variadic,
@@ -1302,7 +1387,7 @@ export function generateScriptHandleLowering(textInputs) {
         registrationMask,
         runtime: runtimeProfileIds,
         runtimeAvailable: row.availability.runtimeAvailable !== false,
-        runtimeMask
+        runtimeMask,
       },
       argumentOffset,
       requiredArgumentCount,
@@ -1312,7 +1397,7 @@ export function generateScriptHandleLowering(textInputs) {
       targets,
       generation: {
         descriptor: "emitted",
-        router: blocked ? "blocked" : "emitted"
+        router: blocked ? "blocked" : "emitted",
       },
       evidence: {
         nativeAdapterHarness: blocked ? "blocked-disposition-covered" : "covered-by-all-route-descriptor-loop",
@@ -1320,16 +1405,15 @@ export function generateScriptHandleLowering(textInputs) {
         nativeDynamicHermesJsi: "unverified",
         nativeStaticHermes: "unverified",
         html5BrowserHost: "unverified",
-        allocationPerRoute: "unverified"
-      }
+        allocationPerRoute: "unverified",
+      },
     };
   });
 
-  const contractShapes = [...new Set(routes.map(({ contractShape }) => contractShape))]
-    .sort(compareCodeUnits);
+  const contractShapes = [...new Set(routes.map(({ contractShape }) => contractShape))].sort(compareCodeUnits);
   const contractShapeIndexByToken = new Map(contractShapes.map((token, index) => [token, index]));
   for (const route of routes) route.contractShapeIndex = contractShapeIndexByToken.get(route.contractShape);
-  if (contractShapes.length > 0xFFFF) throw new Error("telemetry contract shape ids exceed the packed field");
+  if (contractShapes.length > 0xffff) throw new Error("telemetry contract shape ids exceed the packed field");
 
   const operationClassCounts = countBy(routes, ({ operationClass }) => operationClass);
   const contextCounts = countBy(routes, ({ context }) => context);
@@ -1341,19 +1425,26 @@ export function generateScriptHandleLowering(textInputs) {
   for (const [label, expected, observed] of [
     ["handle lowering blocked", policy.expected.blockedCount, blocked],
     ["handle lowering router candidates", policy.expected.routerCandidateCount, routerCandidates],
-    ["handle lowering runtime-unavailable", policy.expected.runtimeUnavailableCount, runtimeUnavailable]
-  ]) expectReviewedCount({ input: "packages/bindings/overrides/script-handle-lowering-policy.json", label, expected, observed });
+    ["handle lowering runtime-unavailable", policy.expected.runtimeUnavailableCount, runtimeUnavailable],
+  ])
+    expectReviewedCount({
+      input: "packages/bindings/overrides/script-handle-lowering-policy.json",
+      label,
+      expected,
+      observed,
+    });
   for (const profile of runtimeProfiles) {
-    profile.adapterExecutableRouteCount = routes.filter((route) =>
-      route.generation.router === "emitted" && (route.profiles.runtimeMask & profile.mask) !== 0).length;
+    profile.adapterExecutableRouteCount = routes.filter(
+      (route) => route.generation.router === "emitted" && (route.profiles.runtimeMask & profile.mask) !== 0,
+    ).length;
     const surface = routes
       .filter((route) => route.generation.router === "emitted")
-      .map((route) => (route.profiles.runtimeMask & profile.mask) !== 0 ? "1" : "0")
+      .map((route) => ((route.profiles.runtimeMask & profile.mask) !== 0 ? "1" : "0"))
       .join("");
     profile.adapterSurfaceSha256 = sha256(surface);
     const registrationSurface = routes
       .filter((route) => route.generation.router === "emitted")
-      .map((route) => (route.profiles.registrationMask & profile.mask) !== 0 ? "1" : "0")
+      .map((route) => ((route.profiles.registrationMask & profile.mask) !== 0 ? "1" : "0"))
       .join("");
     profile.registrationSurfaceSha256 = sha256(registrationSurface);
   }
@@ -1368,12 +1459,13 @@ export function generateScriptHandleLowering(textInputs) {
   const report = {
     schemaVersion: 2,
     defoldRevision: projection.defoldRevision,
-    scope: "Algebra-selected borrowed-handle captured-Lua router. Generated dispositions describe code paths; per-route evidence remains separate and no Defold-engine semantic behavior is inferred from adapter tests.",
+    scope:
+      "Algebra-selected borrowed-handle captured-Lua router. Generated dispositions describe code paths; per-route evidence remains separate and no Defold-engine semantic behavior is inferred from adapter tests.",
     selection: policy.selection,
     inputEvidence: {
       paths: inputPaths,
       hashes: Object.fromEntries(Object.entries(textInputs).map(([name, text]) => [name, sha256(text)])),
-      availabilityCatalogSha256: availability.catalogSha256
+      availabilityCatalogSha256: availability.catalogSha256,
     },
     coverage: {
       selectedRoutes: routes.length,
@@ -1387,7 +1479,9 @@ export function generateScriptHandleLowering(textInputs) {
       nativeStaticHermesExecutableRoutes: 0,
       html5BrowserExecutableRoutes: 0,
       runtimeUnavailable,
-      adapterExecutableRoutesByProfile: Object.fromEntries(runtimeProfiles.map((profile) => [profile.id, profile.adapterExecutableRouteCount]))
+      adapterExecutableRoutesByProfile: Object.fromEntries(
+        runtimeProfiles.map((profile) => [profile.id, profile.adapterExecutableRouteCount]),
+      ),
     },
     operationClassCounts,
     contextCounts,
@@ -1395,12 +1489,16 @@ export function generateScriptHandleLowering(textInputs) {
       "*.ts": { proxyExtension: null, context: "runtime-global", state: "context-free" },
       "*.script.ts": { proxyExtension: ".script", context: "game-object-instance", state: "generated-proxy-provider" },
       "*.gui.ts": { proxyExtension: ".gui_script", context: "gui-scene", state: "provider-required-unimplemented" },
-      "*.render.ts": { proxyExtension: ".render_script", context: "render-script-instance-and-graphics-context", state: "provider-required-unimplemented" }
+      "*.render.ts": {
+        proxyExtension: ".render_script",
+        context: "render-script-instance-and-graphics-context",
+        state: "provider-required-unimplemented",
+      },
     },
     nativeAdapterHarnessContexts: {
       gameObject: "captured-and-selected",
       gui: "captured-and-selected-test-fixture-only",
-      render: "captured-and-selected-test-fixture-only"
+      render: "captured-and-selected-test-fixture-only",
     },
     runtimeProfileDetection: {
       authority: "generated-lua-registration-surface",
@@ -1412,7 +1510,7 @@ export function generateScriptHandleLowering(textInputs) {
       packagedDefoldEngine: "unverified",
       nativeDynamicHermesJsi: "unverified",
       nativeStaticHermes: "unverified",
-      html5BrowserHost: "unverified"
+      html5BrowserHost: "unverified",
     },
     operationEffects: policy.operationClasses,
     handleKindCount: handleKinds.length,
@@ -1426,28 +1524,32 @@ export function generateScriptHandleLowering(textInputs) {
     resultCodecs,
     runtimeProfiles,
     runtimeProfileEquivalence,
-    routes
+    routes,
   };
   report.semanticPolicyHoles = {
-    projectionLifetimePolicyUnresolved: routes.filter(({ lifetime }) => lifetime.projectionToken.endsWith("-unresolved")).length,
+    projectionLifetimePolicyUnresolved: routes.filter(({ lifetime }) =>
+      lifetime.projectionToken.endsWith("-unresolved"),
+    ).length,
     executableAdapterUnimplemented: 0,
     guiAttachmentUnavailable: routes.filter(({ context }) => context === "gui-scene").length,
-    renderAttachmentUnavailable: routes.filter(({ context }) =>
-      context === "render-script-instance-and-graphics-context").length,
-    profileSymbolUnavailable: runtimeUnavailable
+    renderAttachmentUnavailable: routes.filter(
+      ({ context }) => context === "render-script-instance-and-graphics-context",
+    ).length,
+    profileSymbolUnavailable: runtimeUnavailable,
   };
   report.generated = {
     report: `${JSON.stringify({ routeCount: routes.length, hash: sha256(JSON.stringify(routes)) })}`,
-    artifacts: Object.values(outputPaths)
+    artifacts: Object.values(outputPaths),
   };
   return report;
 }
 
 export async function loadInputs(root = repositoryRoot) {
-  return Object.fromEntries(await Promise.all(Object.entries(inputPaths).map(async ([name, path]) => [
-    name,
-    await readFile(resolve(root, path), "utf8")
-  ])));
+  return Object.fromEntries(
+    await Promise.all(
+      Object.entries(inputPaths).map(async ([name, path]) => [name, await readFile(resolve(root, path), "utf8")]),
+    ),
+  );
 }
 
 export function renderArtifacts(report) {
@@ -1458,7 +1560,7 @@ export function renderArtifacts(report) {
     kindHeader: renderKindHeader(report),
     header: renderHeader(report),
     source: renderSource(report),
-    typescript: renderTypescript(report)
+    typescript: renderTypescript(report),
   };
 }
 
@@ -1471,15 +1573,19 @@ export async function run(argv = process.argv.slice(2), root = repositoryRoot) {
   for (const [name, content] of Object.entries(artifacts)) {
     const path = resolve(root, outputPaths[name]);
     if (check) {
-      if (await readFile(path, "utf8") !== content) throw new Error(`${outputPaths[name]} is stale`);
+      if ((await readFile(path, "utf8")) !== content) throw new Error(`${outputPaths[name]} is stale`);
     } else {
       await mkdir(dirname(path), { recursive: true });
       await writeFile(path, content);
     }
   }
-  process.stdout.write(`${check ? "Verified" : "Generated"} ${report.coverage.descriptorRowsEmitted} handle descriptors: ${report.coverage.adapterExecutableRoutes} adapter-executable/harness-covered, ${report.coverage.blocked} blocked; JSI/engine/Static/browser runtime evidence remains unverified.\n`);
+  process.stdout.write(
+    `${check ? "Verified" : "Generated"} ${report.coverage.descriptorRowsEmitted} handle descriptors: ${report.coverage.adapterExecutableRoutes} adapter-executable/harness-covered, ${report.coverage.blocked} blocked; JSI/engine/Static/browser runtime evidence remains unverified.\n`,
+  );
   if (report.runtimeProfileEquivalence.length > 0) {
-    process.stderr.write(`warning: ${report.runtimeProfileEquivalence.length} runtime profile equivalence class(es) share an identical exact-function-presence vector; deterministic conservative representatives emitted: ${report.runtimeProfileEquivalence.map(({ equivalentProfileIds }) => equivalentProfileIds.join("=")).join(", ")}\n`);
+    process.stderr.write(
+      `warning: ${report.runtimeProfileEquivalence.length} runtime profile equivalence class(es) share an identical exact-function-presence vector; deterministic conservative representatives emitted: ${report.runtimeProfileEquivalence.map(({ equivalentProfileIds }) => equivalentProfileIds.join("=")).join(", ")}\n`,
+    );
   }
   return report;
 }

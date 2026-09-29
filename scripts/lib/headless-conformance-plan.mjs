@@ -41,7 +41,7 @@ const SCALAR_INHABITANTS = Object.freeze({
   // old relative inhabitant made resource probes emit dozens of
   // "Resource path is not absolute" diagnostics: evidence about a malformed
   // harness argument, not about the generated binding.
-  string: "/deherm_conformance"
+  string: "/deherm_conformance",
 });
 
 /** Raw parameter types that name a component address rather than a plain string. */
@@ -132,35 +132,37 @@ export const FIXTURE_PROFILES = Object.freeze([
     physicsBackendPath: null,
     components: Object.freeze([]),
     componentAddresses: Object.freeze([]),
-    engineConfig: Object.freeze([])
+    engineConfig: Object.freeze([]),
   }),
   Object.freeze({
     id: "physics-2d",
-    summary: "One game object carrying the déherm script and a dynamic box collision object, with the Box2D backend selected.",
+    summary:
+      "One game object carrying the déherm script and a dynamic box collision object, with the Box2D backend selected.",
     suppliedContexts: Object.freeze(["engine", "game-object"]),
     handleContexts: Object.freeze(["runtime-global", "game-object-instance", "explicit-physics-handle"]),
     physicsBackendPath: "/gamesys/scripts/box2d/",
     components: Object.freeze(["collisionobject"]),
     componentAddresses: Object.freeze(["#physics", "/probe_b#physics"]),
-    engineConfig: Object.freeze(["physics.type=2D"])
+    engineConfig: Object.freeze(["physics.type=2D"]),
   }),
   Object.freeze({
     id: "physics-3d",
-    summary: "One game object carrying the déherm script and a dynamic box collision object, with the Bullet backend selected.",
+    summary:
+      "One game object carrying the déherm script and a dynamic box collision object, with the Bullet backend selected.",
     suppliedContexts: Object.freeze(["engine", "game-object"]),
     handleContexts: Object.freeze(["runtime-global", "game-object-instance", "explicit-physics-handle"]),
     physicsBackendPath: "/gamesys/scripts/bullet3d/",
     components: Object.freeze(["collisionobject"]),
     componentAddresses: Object.freeze(["#physics", "/probe_b#physics"]),
-    engineConfig: Object.freeze(["physics.type=3D"])
-  })
+    engineConfig: Object.freeze(["physics.type=3D"]),
+  }),
 ]);
 
 export const DEFAULT_FIXTURE_PROFILE = FIXTURE_PROFILES[0];
 
 /** Contexts this harness can supply, across every profile. */
 export const SUPPLIED_CONTEXTS = Object.freeze(
-  [...new Set(FIXTURE_PROFILES.flatMap((profile) => profile.suppliedContexts))].sort()
+  [...new Set(FIXTURE_PROFILES.flatMap((profile) => profile.suppliedContexts))].sort(),
 );
 
 /**
@@ -174,35 +176,37 @@ export const UNSUPPLIED_CONTEXTS = Object.freeze([
   Object.freeze({
     context: "gui-scene",
     obstacle: "bootstrap-attachment-requires-game-object-instance",
-    evidence: "defold/defold_hermes/src/extension.cpp AttachLuaInstance calls dmScript::CheckGOInstance, " +
+    evidence:
+      "defold/defold_hermes/src/extension.cpp AttachLuaInstance calls dmScript::CheckGOInstance, " +
       "so a .gui_script instance cannot attach the déherm runtime",
-    unblockedBy: "component-proxy gui-script attachment (.gui.ts transport)"
+    unblockedBy: "component-proxy gui-script attachment (.gui.ts transport)",
   }),
   Object.freeze({
     context: "render-script",
     obstacle: "bootstrap-attachment-requires-game-object-instance",
-    evidence: "defold/defold_hermes/src/extension.cpp AttachLuaInstance calls dmScript::CheckGOInstance, " +
+    evidence:
+      "defold/defold_hermes/src/extension.cpp AttachLuaInstance calls dmScript::CheckGOInstance, " +
       "so a .render_script instance cannot attach the déherm runtime",
-    unblockedBy: "a render-script attachment lane"
+    unblockedBy: "a render-script attachment lane",
   }),
   Object.freeze({
     context: "window",
     obstacle: "headless-variant-selects-the-null-window-backend",
     evidence: "engine/platform/src/platform_window_null.cpp is what the headless appmanifest links",
-    unblockedBy: "a windowed packaged-engine lane, which is not this instrument"
+    unblockedBy: "a windowed packaged-engine lane, which is not this instrument",
   }),
   Object.freeze({
     context: "network",
     obstacle: "hermetic-run-has-no-live-socket",
     evidence: "the driver runs offline and must stay deterministic",
-    unblockedBy: "a loopback server fixture owned by the driver"
+    unblockedBy: "a loopback server fixture owned by the driver",
   }),
   Object.freeze({
     context: "browser",
     obstacle: "target-is-arm64-macos-not-js-web",
     evidence: "html5 script routes require target js-web",
-    unblockedBy: "the browser/wasm conformance lane"
-  })
+    unblockedBy: "the browser/wasm conformance lane",
+  }),
 ]);
 
 const INPUT_PATHS = Object.freeze({
@@ -214,7 +218,7 @@ const INPUT_PATHS = Object.freeze({
   routeAvailability: "packages/bindings/generated/defold-script-route-availability-profiles.json",
   handleLowering: "packages/bindings/generated/defold-script-handle-lowering.json",
   valueLayouts: "packages/bindings/generated/defold-value-layouts.json",
-  projection: "packages/bindings/generated/defold-script-projection-ir.json"
+  projection: "packages/bindings/generated/defold-script-projection-ir.json",
 });
 
 /**
@@ -233,7 +237,10 @@ function sha256(text) {
 }
 
 function typeMembers(rawType) {
-  return String(rawType).split("|").map((member) => member.trim()).filter((member) => member.length > 0);
+  return String(rawType)
+    .split("|")
+    .map((member) => member.trim())
+    .filter((member) => member.length > 0);
 }
 
 /**
@@ -262,7 +269,7 @@ const EMPTY_AVAILABILITY = Object.freeze({
   runtimeProfile: null,
   features: [],
   catalog: new Set(),
-  available: new Set()
+  available: new Set(),
 });
 
 /**
@@ -270,7 +277,9 @@ const EMPTY_AVAILABILITY = Object.freeze({
  * borrowed-handle classification rather than from any name list here.
  */
 export function buildHandleAlgebra(classification) {
-  const sourcePathById = new Map((classification?.inputEvidence?.defoldSources ?? []).map((item) => [item.id, item.path]));
+  const sourcePathById = new Map(
+    (classification?.inputEvidence?.defoldSources ?? []).map((item) => [item.id, item.path]),
+  );
   const backendByKind = new Map();
   const kindByRawType = new Map();
   for (const kind of classification?.handleKinds ?? []) {
@@ -324,8 +333,7 @@ function synthesizeArgument(parameter, context, depth = 0) {
   // A parameter that names a component address takes one of the profile's
   // published addresses instead of an arbitrary string, so the engine resolves
   // it for real rather than refusing it.
-  if (profile.componentAddresses.length > 0 &&
-      members.some((member) => ADDRESS_MEMBERS.includes(member))) {
+  if (profile.componentAddresses.length > 0 && members.some((member) => ADDRESS_MEMBERS.includes(member))) {
     const ordinal = ordinals.addresses;
     ordinals.addresses += 1;
     return { ok: true, spec: { kind: "address", ordinal } };
@@ -367,8 +375,7 @@ function synthesizeArgument(parameter, context, depth = 0) {
     const fields = [];
     for (const field of record.fields ?? []) {
       if (field.optional) continue;
-      const synthesized = synthesizeArgument(
-        { rawName: field.rawName, rawType: field.rawType }, context, depth + 1);
+      const synthesized = synthesizeArgument({ rawName: field.rawName, rawType: field.rawType }, context, depth + 1);
       if (!synthesized.ok) {
         return { ok: false, reason: `${synthesized.reason}@${rawType}.${field.rawName}` };
       }
@@ -384,7 +391,7 @@ function synthesizeArgument(parameter, context, depth = 0) {
         ok: false,
         reason: kindAdmissible(profile, algebra, kindId)
           ? `no-handle-producer-chain:${member}`
-          : `handle-kind-outside-fixture-profile:${member}`
+          : `handle-kind-outside-fixture-profile:${member}`,
       };
     }
   }
@@ -403,7 +410,7 @@ function synthesizeArgument(parameter, context, depth = 0) {
 export function buildValueConstructors(irFunctions, valueLayouts, isCallable = () => true) {
   const valueTypes = new Set([
     ...Object.keys(valueLayouts?.transparent ?? {}),
-    ...Object.keys(valueLayouts?.opaque ?? {})
+    ...Object.keys(valueLayouts?.opaque ?? {}),
   ]);
   const byType = new Map();
   const sorted = [...irFunctions].sort((left, right) => (left.id < right.id ? -1 : left.id > right.id ? 1 : 0));
@@ -437,7 +444,7 @@ function contractSlug(index) {
 const EMPTY_ALGEBRA = Object.freeze({
   backendByKind: new Map(),
   kindByRawType: new Map(),
-  rowsById: new Map()
+  rowsById: new Map(),
 });
 
 /**
@@ -459,7 +466,7 @@ export function classifyRoute({
   valueConstructors = new Map(),
   records = new Map(),
   projectionRow = null,
-  admitDestructive = false
+  admitDestructive = false,
 }) {
   if (!irFunction) return { eligible: false, reason: "absent-from-script-projection" };
   if (!universalBinding) {
@@ -512,8 +519,12 @@ export function classifyRoute({
   }
   const classificationRow = algebra.rowsById.get(unit.identity.id) ?? null;
   const context = {
-    profile, providers, algebra, valueConstructors, records,
-    ordinals: { handles: new Map(), addresses: 0 }
+    profile,
+    providers,
+    algebra,
+    valueConstructors,
+    records,
+    ordinals: { handles: new Map(), addresses: 0 },
   };
   // Lua argument passing is positional, so an optional parameter that sits
   // before a required one is a hole that still has to be filled. The
@@ -559,8 +570,10 @@ export function classifyRoute({
     if (!synthesizedByIndex[index].ok) break;
     optional.push(synthesizedByIndex[index].spec);
   }
-  if (required.length < universalBinding.minimumArgumentCount ||
-      required.length > universalBinding.maximumArgumentCount) {
+  if (
+    required.length < universalBinding.minimumArgumentCount ||
+    required.length > universalBinding.maximumArgumentCount
+  ) {
     return { eligible: false, reason: "argument-arity-disagrees-with-projection" };
   }
   const base = {
@@ -575,9 +588,8 @@ export function classifyRoute({
     resultCodec: scalarBinding ? scalarBinding.result.codec : null,
     resultNullable: scalarBinding ? Boolean(scalarBinding.result.nullable) : null,
     destructive,
-    returnHandleKind: classificationRow?.returnHandleKinds?.length === 1
-      ? classificationRow.returnHandleKinds[0]
-      : null
+    returnHandleKind:
+      classificationRow?.returnHandleKinds?.length === 1 ? classificationRow.returnHandleKinds[0] : null,
   };
   return {
     eligible: true,
@@ -585,9 +597,10 @@ export function classifyRoute({
     // An optional tail the harness can inhabit is a second, additive
     // observation of the same route at a wider arity. It never replaces the
     // required-only observation.
-    optionalExercise: (optional.length > 0 || widened.some((spec, index) => spec !== required[index])) && !destructive
-      ? { ...base, arity: "required-and-optional", arguments: [...widened, ...optional] }
-      : null
+    optionalExercise:
+      (optional.length > 0 || widened.some((spec, index) => spec !== required[index])) && !destructive
+        ? { ...base, arity: "required-and-optional", arguments: [...widened, ...optional] }
+        : null,
   };
 }
 
@@ -605,10 +618,12 @@ export function handleProducers(irFunctions, algebra) {
   for (const irFunction of irFunctions) {
     const returns = irFunction.returns ?? [];
     if (returns.length !== 1) continue;
-    const kinds = new Set(typeMembers(returns[0])
-      .filter((member) => member !== ABSENT_MEMBER)
-      .map((member) => algebra.kindByRawType.get(member))
-      .filter((kindId) => kindId !== undefined));
+    const kinds = new Set(
+      typeMembers(returns[0])
+        .filter((member) => member !== ABSENT_MEMBER)
+        .map((member) => algebra.kindByRawType.get(member))
+        .filter((kindId) => kindId !== undefined),
+    );
     if (kinds.size !== 1) continue;
     producers.push({ id: irFunction.id, handleKind: [...kinds][0] });
   }
@@ -641,7 +656,7 @@ export function buildHandleProviders({ profile, algebra, availability, lookup, v
         availability,
         valueConstructors,
         records,
-        projectionRow: lookup.projectionById.get(producer.id) ?? null
+        projectionRow: lookup.projectionById.get(producer.id) ?? null,
       });
       if (!decision.eligible) continue;
       providers.set(kindId, {
@@ -649,7 +664,7 @@ export function buildHandleProviders({ profile, algebra, availability, lookup, v
         routeId: producer.id,
         accessor: decision.exercise.accessor,
         arguments: decision.exercise.arguments,
-        depth: depth + 1
+        depth: depth + 1,
       });
       added = true;
     }
@@ -677,7 +692,12 @@ export function buildHandleProviders({ profile, algebra, availability, lookup, v
  * engine really did produce. That disagreement is recorded here rather than
  * left to be rediscovered from a runtime transcript.
  */
-export function handleTransportAgreement(providers, loweredRouteIds, consumersByKind, semanticCaptureByRoute = new Map()) {
+export function handleTransportAgreement(
+  providers,
+  loweredRouteIds,
+  consumersByKind,
+  semanticCaptureByRoute = new Map(),
+) {
   return [...providers.values()]
     .sort((left, right) => (left.handleKind < right.handleKind ? -1 : 1))
     .map((provider) => {
@@ -687,7 +707,9 @@ export function handleTransportAgreement(providers, loweredRouteIds, consumersBy
       const universalCapture = semanticCaptureByRoute.get(provider.routeId) === provider.handleKind;
       const producerTransport = producerLowered
         ? "handle-lowering"
-        : universalCapture ? "universal-value-semantic-capture" : "universal-value-anonymous";
+        : universalCapture
+          ? "universal-value-semantic-capture"
+          : "universal-value-anonymous";
       return {
         handleKind: provider.handleKind,
         producerRouteId: provider.routeId,
@@ -696,9 +718,10 @@ export function handleTransportAgreement(providers, loweredRouteIds, consumersBy
         producerCapturesSemanticHandle: producerLowered || universalCapture,
         consumerCount: consumers.length,
         handleLoweredConsumerCount: loweredConsumers.length,
-        agreement: producerLowered || universalCapture || loweredConsumers.length === 0
-          ? "agreed"
-          : "producer-outside-semantic-handle-capture"
+        agreement:
+          producerLowered || universalCapture || loweredConsumers.length === 0
+            ? "agreed"
+            : "producer-outside-semantic-handle-capture",
       };
     });
 }
@@ -711,22 +734,26 @@ function propertiesForContract(contractRecord) {
 }
 
 export async function loadHeadlessConformanceInputs(root) {
-  const entries = await Promise.all(Object.entries(INPUT_PATHS).map(async ([name, relative]) => {
-    const text = await readFile(new URL(relative, root), "utf8");
-    return [name, { text, value: JSON.parse(text), path: relative, sha256: sha256(text) }];
-  }));
+  const entries = await Promise.all(
+    Object.entries(INPUT_PATHS).map(async ([name, relative]) => {
+      const text = await readFile(new URL(relative, root), "utf8");
+      return [name, { text, value: JSON.parse(text), path: relative, sha256: sha256(text) }];
+    }),
+  );
   const documents = Object.fromEntries(entries);
   documents.conformance = await loadConformanceInputs();
   return documents;
 }
 
-export function buildHeadlessConformancePlan(documents, {
-  target = "arm64-macos",
-  runtimeProfile = HEADLESS_RUNTIME_PROFILE
-} = {}) {
+export function buildHeadlessConformancePlan(
+  documents,
+  { target = "arm64-macos", runtimeProfile = HEADLESS_RUNTIME_PROFILE } = {},
+) {
   const loweringPlan = documents.loweringPlan.value;
   if (loweringPlan.schemaVersion !== 2) {
-    throw new Error(`Headless conformance requires canonical lowering-plan schema v2, got ${loweringPlan.schemaVersion}`);
+    throw new Error(
+      `Headless conformance requires canonical lowering-plan schema v2, got ${loweringPlan.schemaVersion}`,
+    );
   }
   const conformancePlan = buildConformancePlan(documents.conformance, { target, contexts: ["*"], shard: "0/1" });
   const classification = documents.borrowedHandles?.value ?? null;
@@ -739,16 +766,18 @@ export function buildHeadlessConformancePlan(documents, {
     universalById: new Map(documents.universalValueBindings.value.bindings.map((item) => [item.id, item])),
     scalarById: new Map(documents.scalarDispatch.value.bindings.map((item) => [item.id, item])),
     unitById: new Map(loweringPlan.units.map((unit) => [unit.identity.id, unit])),
-    projectionById: new Map((documents.projection?.value?.rows ?? []).map((row) => [row.id, row]))
+    projectionById: new Map((documents.projection?.value?.rows ?? []).map((row) => [row.id, row])),
   };
 
   const loweredRouteIds = new Set((documents.handleLowering?.value?.routes ?? []).map((route) => route.id));
   // The universal transport captures a declared rooted-handle result into the
   // same semantic registry the handle-lowering table uses, so a route here
   // produces a representation handle-lowered consumers accept.
-  const semanticCaptureByRoute = new Map(documents.universalValueBindings.value.bindings
-    .filter((binding) => binding.resultSemanticKind)
-    .map((binding) => [binding.id, binding.resultSemanticKind]));
+  const semanticCaptureByRoute = new Map(
+    documents.universalValueBindings.value.bindings
+      .filter((binding) => binding.resultSemanticKind)
+      .map((binding) => [binding.id, binding.resultSemanticKind]),
+  );
   const consumersByKind = new Map();
   for (const irFunction of lookup.irById.values()) {
     for (const parameter of irFunction.parameters ?? []) {
@@ -772,19 +801,23 @@ export function buildHeadlessConformancePlan(documents, {
     documents.valueLayouts?.value ?? null,
     (irFunction) => {
       const conformanceCase = lookup.conformanceById.get(irFunction.id);
-      return lookup.universalById.has(irFunction.id) &&
+      return (
+        lookup.universalById.has(irFunction.id) &&
         conformanceCase?.execution?.policy === "safe" &&
-        (conformanceCase.requiredContexts ?? []).every((context) => context === AMBIENT_CONTEXT);
-    }
+        (conformanceCase.requiredContexts ?? []).every((context) => context === AMBIENT_CONTEXT)
+      );
+    },
   );
-  const records = new Map((documents.scriptIr.value.types ?? [])
-    .filter((type) => type.kind === "class")
-    .map((type) => [type.name, type]));
+  const records = new Map(
+    (documents.scriptIr.value.types ?? []).filter((type) => type.kind === "class").map((type) => [type.name, type]),
+  );
 
-  const profileProviders = new Map(FIXTURE_PROFILES.map((profile) => [
-    profile.id,
-    buildHandleProviders({ profile, algebra, availability, lookup, valueConstructors, records })
-  ]));
+  const profileProviders = new Map(
+    FIXTURE_PROFILES.map((profile) => [
+      profile.id,
+      buildHandleProviders({ profile, algebra, availability, lookup, valueConstructors, records }),
+    ]),
+  );
 
   const byContract = new Map();
   for (const unit of loweringPlan.units) {
@@ -796,8 +829,12 @@ export function buildHeadlessConformancePlan(documents, {
 
   const contracts = [];
   for (const index of [...byContract.keys()].sort((left, right) => left - right)) {
-    const units = byContract.get(index).slice().sort((left, right) =>
-      left.identity.id < right.identity.id ? -1 : left.identity.id > right.identity.id ? 1 : 0);
+    const units = byContract
+      .get(index)
+      .slice()
+      .sort((left, right) =>
+        left.identity.id < right.identity.id ? -1 : left.identity.id > right.identity.id ? 1 : 0,
+      );
     const contractRecord = loweringPlan.tables.contracts[index];
 
     // Every profile is tried; the contract takes the one that makes the most
@@ -825,7 +862,7 @@ export function buildHeadlessConformancePlan(documents, {
             valueConstructors,
             records,
             projectionRow: lookup.projectionById.get(unit.identity.id) ?? null,
-            admitDestructive
+            admitDestructive,
           });
           if (decision.eligible) {
             eligible.push(decision.exercise);
@@ -865,11 +902,24 @@ export function buildHeadlessConformancePlan(documents, {
       const mismatched = [...blockerCounts.entries()]
         .filter(([reason]) => reason.startsWith("handle-kind-outside-fixture-profile"))
         .reduce((total, [, count]) => total + count, 0);
-      const grounded = eligible.filter((exercise) =>
-        (exercise.returnHandleKind !== null && kindAdmissible(profile, algebra, exercise.returnHandleKind)) ||
-        exercise.arguments.some((argument) => argument.kind === "handle")).length;
-      const candidate = { profile, eligible, optional, blockerCounts, blockerExamples, blockerRoutes, providers, mismatched, grounded };
-      const better = chosen === null ||
+      const grounded = eligible.filter(
+        (exercise) =>
+          (exercise.returnHandleKind !== null && kindAdmissible(profile, algebra, exercise.returnHandleKind)) ||
+          exercise.arguments.some((argument) => argument.kind === "handle"),
+      ).length;
+      const candidate = {
+        profile,
+        eligible,
+        optional,
+        blockerCounts,
+        blockerExamples,
+        blockerRoutes,
+        providers,
+        mismatched,
+        grounded,
+      };
+      const better =
+        chosen === null ||
         eligible.length > chosen.eligible.length ||
         (eligible.length === chosen.eligible.length && grounded > chosen.grounded) ||
         (eligible.length === chosen.eligible.length && grounded === chosen.grounded && mismatched < chosen.mismatched);
@@ -882,7 +932,7 @@ export function buildHeadlessConformancePlan(documents, {
         reason,
         routeCount,
         exampleRouteId: chosen.blockerExamples.get(reason),
-        routeIds: [...(chosen.blockerRoutes.get(reason) ?? [])].sort()
+        routeIds: [...(chosen.blockerRoutes.get(reason) ?? [])].sort(),
       }));
 
     const properties = propertiesForContract(contractRecord);
@@ -900,11 +950,11 @@ export function buildHeadlessConformancePlan(documents, {
         callbackPresent: Boolean(contractRecord.callback?.present),
         invalidation: contractRecord.invalidation?.token ?? null,
         errorModel: contractRecord.errorModel?.token ?? null,
-        scratch: contractRecord.scratch?.token ?? null
+        scratch: contractRecord.scratch?.token ?? null,
       },
       properties,
       disposition: chosen.eligible.length > 0 ? "fixture" : "unreachable",
-      blockers
+      blockers,
     };
     if (chosen.eligible.length > 0) {
       // A destructive contract still exercises exactly one route: the engine
@@ -918,9 +968,7 @@ export function buildHeadlessConformancePlan(documents, {
       // themselves are not.
       const budget = destructive ? 0 : MAX_OPTIONAL_EXERCISES_PER_CONTRACT;
       const exercisedRoutes = new Set(exercises.map((exercise) => exercise.routeId));
-      const extras = chosen.optional
-        .filter((exercise) => exercisedRoutes.has(exercise.routeId))
-        .slice(0, budget);
+      const extras = chosen.optional.filter((exercise) => exercisedRoutes.has(exercise.routeId)).slice(0, budget);
       record.profile = chosen.profile.id;
       if (destructive) record.executionPolicy = "destructive-last-resort";
       record.collection = `/conformance/${slug}.collectionc`;
@@ -976,21 +1024,27 @@ export function buildHeadlessConformancePlan(documents, {
       componentAddresses: [...profile.componentAddresses],
       engineConfig: [...profile.engineConfig],
       contractCount: reachable.filter((item) => item.profile === profile.id).length,
-      handleProviders: [...profileProviders.get(profile.id).values()]
-        .sort((left, right) => (left.handleKind < right.handleKind ? -1 : 1)),
+      handleProviders: [...profileProviders.get(profile.id).values()].sort((left, right) =>
+        left.handleKind < right.handleKind ? -1 : 1,
+      ),
       handleTransportAgreement: handleTransportAgreement(
-        profileProviders.get(profile.id), loweredRouteIds, consumersByKind, semanticCaptureByRoute)
+        profileProviders.get(profile.id),
+        loweredRouteIds,
+        consumersByKind,
+        semanticCaptureByRoute,
+      ),
     })),
     usedProfiles,
-    inputs: Object.fromEntries(Object.entries(INPUT_PATHS).map(([name, relative]) => [
-      relative,
-      documents[name].sha256
-    ])),
+    inputs: Object.fromEntries(
+      Object.entries(INPUT_PATHS).map(([name, relative]) => [relative, documents[name].sha256]),
+    ),
     contractCount: contracts.length,
     reachableContractCount: reachable.length,
     unreachableContractCount: contracts.length - reachable.length,
     exercisedRouteCount: reachable.reduce(
-      (total, item) => total + new Set(item.exercises.map((exercise) => exercise.routeId)).size, 0),
+      (total, item) => total + new Set(item.exercises.map((exercise) => exercise.routeId)).size,
+      0,
+    ),
     exerciseCount: reachable.reduce((total, item) => total + item.exercises.length, 0),
     eligibleRouteCount: contracts.reduce((total, item) => total + item.eligibleRouteCount, 0),
     // Every documented route's Lua name, so the generated harness can ask the
@@ -999,7 +1053,7 @@ export function buildHeadlessConformancePlan(documents, {
     // it exists.
     documentedRouteNames: documents.scriptIr.value.functions.map(({ rawName }) => rawName).sort(),
     blockerSummary: summarizeBlockers(contracts),
-    contracts
+    contracts,
   };
 }
 

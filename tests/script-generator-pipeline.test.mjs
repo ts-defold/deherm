@@ -5,7 +5,7 @@ import {
   generatedScriptArtifacts,
   scriptGenerationSteps,
   scriptGeneratorSources,
-  scriptPinnedInputs
+  scriptPinnedInputs,
 } from "../scripts/lib/script-generator-pipeline.mjs";
 
 function assertUnique(values, label) {

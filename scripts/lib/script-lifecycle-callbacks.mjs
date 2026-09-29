@@ -41,18 +41,18 @@ export const LIFECYCLE_TABLES = Object.freeze([
   Object.freeze({
     proxyKind: "script",
     source: "engine/gameobject/src/gameobject/gameobject_script.cpp",
-    symbol: "SCRIPT_FUNCTION_NAMES"
+    symbol: "SCRIPT_FUNCTION_NAMES",
   }),
   Object.freeze({
     proxyKind: "gui_script",
     source: "engine/gui/src/gui.cpp",
-    symbol: "SCRIPT_FUNCTION_NAMES"
+    symbol: "SCRIPT_FUNCTION_NAMES",
   }),
   Object.freeze({
     proxyKind: "render_script",
     source: "engine/render/src/render/render_script.cpp",
-    symbol: "RENDER_SCRIPT_FUNCTION_NAMES"
-  })
+    symbol: "RENDER_SCRIPT_FUNCTION_NAMES",
+  }),
 ]);
 
 /**
@@ -66,15 +66,36 @@ export const LIFECYCLE_TABLES = Object.freeze([
  * TypeScript author has JavaScript's own equivalents, and Hermes provides them.
  */
 export const LUA_BASE_LIBRARY = Object.freeze([
-  "assert", "collectgarbage", "dofile", "error", "getfenv", "getmetatable",
-  "ipairs", "load", "loadfile", "loadstring", "module", "next", "pairs",
-  "pcall", "print", "rawequal", "rawget", "rawset", "require", "select",
-  "setfenv", "setmetatable", "tonumber", "tostring", "type", "unpack", "xpcall"
+  "assert",
+  "collectgarbage",
+  "dofile",
+  "error",
+  "getfenv",
+  "getmetatable",
+  "ipairs",
+  "load",
+  "loadfile",
+  "loadstring",
+  "module",
+  "next",
+  "pairs",
+  "pcall",
+  "print",
+  "rawequal",
+  "rawget",
+  "rawset",
+  "require",
+  "select",
+  "setfenv",
+  "setmetatable",
+  "tonumber",
+  "tostring",
+  "type",
+  "unpack",
+  "xpcall",
 ]);
 
-const TABLE = (symbol) => new RegExp(
-  `${symbol}\\s*\\[[^\\]]*\\]\\s*=\\s*\\{([^}]*)\\}`, "s"
-);
+const TABLE = (symbol) => new RegExp(`${symbol}\\s*\\[[^\\]]*\\]\\s*=\\s*\\{([^}]*)\\}`, "s");
 
 /**
  * Read every script type's callback names from the engine checkout.
@@ -92,15 +113,15 @@ export async function readLifecycleCallbacks(defoldRoot) {
     if (text === null) {
       throw new Error(
         `${table.source} is not in this Defold checkout, so the ${table.proxyKind} ` +
-        "lifecycle callbacks cannot be read. They decide which documented globals " +
-        "are callbacks rather than callable API, so guessing them is not an option."
+          "lifecycle callbacks cannot be read. They decide which documented globals " +
+          "are callbacks rather than callable API, so guessing them is not an option.",
       );
     }
     const match = text.match(TABLE(table.symbol));
     if (!match) {
       throw new Error(
         `${table.source} no longer declares ${table.symbol} as an initialised array. ` +
-        "That table is the only authority on this script type's callback names."
+          "That table is the only authority on this script type's callback names.",
       );
     }
     const callbacks = [...match[1].matchAll(/"([a-z_][a-z0-9_]*)"/g)].map(([, name]) => name);

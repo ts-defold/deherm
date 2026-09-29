@@ -19,7 +19,7 @@ function locationForProjectPath(projectRoot, projectPath, line = 1, column = 1) 
   if (relative.startsWith(`..${path.sep}`) || relative === ".." || path.isAbsolute(relative)) return null;
   const position = {
     line: Math.max(0, Number.isInteger(line) ? line - 1 : 0),
-    character: Math.max(0, Number.isInteger(column) ? column - 1 : 0)
+    character: Math.max(0, Number.isInteger(column) ? column - 1 : 0),
   };
   return { uri: pathToFileURL(absolute).href, range: { start: position, end: position } };
 }
@@ -62,8 +62,8 @@ function literalAt(text, position) {
     prefix: line.slice(quote + 1, cursor),
     range: {
       start: { line: position.line, character: quote + 1 },
-      end: { line: position.line, character: end }
-    }
+      end: { line: position.line, character: end },
+    },
   };
 }
 
@@ -100,7 +100,7 @@ function declarationSymbols(table, projectRoot, namespaces = null, resources = n
           detail: namespace,
           documentation: `${namespace} declared by ${resource}`,
           kind: 12,
-          location: declarationLocation(projectRoot, resource, declaration.line)
+          location: declarationLocation(projectRoot, resource, declaration.line),
         });
       }
     }
@@ -122,7 +122,7 @@ function addressSymbols(table, projectRoot, relativeDocument, namespaces = null)
         detail: `component · ${component.type || "unknown"}`,
         documentation: `${name} on ${gameObjectPath}`,
         kind: 18,
-        location: declarationLocation(projectRoot, gameObjectPath, component.line)
+        location: declarationLocation(projectRoot, gameObjectPath, component.line),
       });
     }
   }
@@ -137,18 +137,20 @@ function addressSymbols(table, projectRoot, relativeDocument, namespaces = null)
         detail: "collection instance",
         documentation: `${name} in ${collectionPath}${instance.prototype ? ` · ${instance.prototype}` : ""}`,
         kind: 18,
-        location: declarationLocation(projectRoot, collectionPath, instance.line)
+        location: declarationLocation(projectRoot, collectionPath, instance.line),
       });
     }
     if (!accepted.has("go:component")) continue;
-    for (const [componentName, component] of Object.entries(table.gameObjects?.[instance.prototype]?.components ?? {})) {
+    for (const [componentName, component] of Object.entries(
+      table.gameObjects?.[instance.prototype]?.components ?? {},
+    )) {
       addSymbol(symbols, {
         insertText: `/${name}#${componentName}`,
         label: `/${name}#${componentName}`,
         detail: `component address · ${component.type || "unknown"}`,
         documentation: `${componentName} on ${instance.prototype}, instance ${name}`,
         kind: 18,
-        location: declarationLocation(projectRoot, instance.prototype, component.line)
+        location: declarationLocation(projectRoot, instance.prototype, component.line),
       });
     }
   }
@@ -164,7 +166,7 @@ function broadSymbols(table, projectRoot, relativeDocument) {
       detail: "Defold resource",
       documentation: `Project resource ${resource}`,
       kind: 17,
-      location: declarationLocation(projectRoot, resource)
+      location: declarationLocation(projectRoot, resource),
     });
   }
   for (const symbol of declarationSymbols(table, projectRoot)) addSymbol(symbols, symbol);
@@ -182,8 +184,22 @@ function scanTokens(text) {
   const identifierStart = /[A-Za-z_$]/u;
   const identifierPart = /[A-Za-z0-9_$]/u;
   const expressionPrefixKeywords = new Set([
-    "await", "break", "case", "continue", "delete", "do", "else", "in",
-    "instanceof", "new", "of", "return", "throw", "typeof", "void", "yield"
+    "await",
+    "break",
+    "case",
+    "continue",
+    "delete",
+    "do",
+    "else",
+    "in",
+    "instanceof",
+    "new",
+    "of",
+    "return",
+    "throw",
+    "typeof",
+    "void",
+    "yield",
   ]);
   const controlParentheses = new Set(["catch", "for", "if", "switch", "while", "with"]);
   const parentheses = [];
@@ -260,7 +276,7 @@ function scanTokens(text) {
         kind: interpolated ? "interpolated-template" : "string",
         value: text.slice(start + 1, closed ? index - 1 : index),
         start,
-        end: index
+        end: index,
       });
       continue;
     }
@@ -282,7 +298,29 @@ function scanTokens(text) {
       continue;
     }
     const pair = text.slice(index, index + 2);
-    if (["=>", "?.", "&&", "||", "??", "++", "--", "==", "!=", "<=", ">=", "+=", "-=", "*=", "/=", "%=", "&=", "|=", "^="].includes(pair)) {
+    if (
+      [
+        "=>",
+        "?.",
+        "&&",
+        "||",
+        "??",
+        "++",
+        "--",
+        "==",
+        "!=",
+        "<=",
+        ">=",
+        "+=",
+        "-=",
+        "*=",
+        "/=",
+        "%=",
+        "&=",
+        "|=",
+        "^=",
+      ].includes(pair)
+    ) {
       tokens.push({ kind: "punctuation", value: text.slice(index, index + 2), start, end: index + 2 });
       index += 2;
       continue;
@@ -290,11 +328,9 @@ function scanTokens(text) {
     const token = { kind: "punctuation", value: character, start, end: ++index };
     if (character === "(") {
       const previous = tokens.at(-1)?.value;
-      const control = controlParentheses.has(previous) ||
-        (previous === "await" && tokens.at(-2)?.value === "for");
+      const control = controlParentheses.has(previous) || (previous === "await" && tokens.at(-2)?.value === "for");
       parentheses.push({ control });
-    }
-    else if (character === ")") token.controlClose = parentheses.pop()?.control ?? false;
+    } else if (character === ")") token.controlClose = parentheses.pop()?.control ?? false;
     tokens.push(token);
   }
   return tokens;
@@ -325,7 +361,12 @@ function lexicalScopes(tokens, pairs) {
   const byOpen = new Map();
   for (const [index, token] of tokens.entries()) {
     if (token.value === "{") {
-      const scope = { open: index, close: pairs.openToClose.get(index) ?? tokens.length, parent: stack.at(-1), bindings: new Map() };
+      const scope = {
+        open: index,
+        close: pairs.openToClose.get(index) ?? tokens.length,
+        parent: stack.at(-1),
+        bindings: new Map(),
+      };
       scopes.push(scope);
       byOpen.set(index, scope);
       stack.push(scope);
@@ -346,8 +387,8 @@ function lexicalScopes(tokens, pairs) {
   const resolve = (name, index) => {
     for (let scope = scopeAt(index); scope; scope = scope.parent) {
       const candidates = (scope.bindings.get(name) ?? []).filter(({ start }) => start <= index);
-      if (candidates.length) return candidates.toSorted((left, right) =>
-        right.start - left.start || right.order - left.order)[0].value;
+      if (candidates.length)
+        return candidates.toSorted((left, right) => right.start - left.start || right.order - left.order)[0].value;
     }
     return null;
   };
@@ -385,7 +426,8 @@ function topLevelSegments(tokens, start, end) {
 }
 
 function bindingNames(tokens, start, end) {
-  while (start < end && ["...", "public", "private", "protected", "readonly"].includes(tokens[start]?.value)) start += 1;
+  while (start < end && ["...", "public", "private", "protected", "readonly"].includes(tokens[start]?.value))
+    start += 1;
   if (start >= end) return [];
   if (tokens[start]?.kind === "identifier") return [tokens[start].value];
   const open = tokens[start]?.value;
@@ -421,8 +463,7 @@ function bindingNames(tokens, start, end) {
 }
 
 function parameterNames(tokens, open, close) {
-  return topLevelSegments(tokens, open + 1, close)
-    .flatMap(([start, end]) => bindingNames(tokens, start, end));
+  return topLevelSegments(tokens, open + 1, close).flatMap(([start, end]) => bindingNames(tokens, start, end));
 }
 
 function methodHeadBefore(tokens, open) {
@@ -436,16 +477,13 @@ function methodHeadBefore(tokens, open) {
     else if (tokens[position].value === "<") depth -= 1;
     position -= 1;
   }
-  return depth === 0 ? tokens[position] ?? null : null;
+  return depth === 0 ? (tokens[position] ?? null) : null;
 }
 
 function routeCatalog(table, tokens) {
   const byCall = new Map();
   const knownNamespaces = new Set();
-  const routeKeys = new Set([
-    ...Object.keys(table.routes ?? {}),
-    ...Object.keys(table.projectMessages?.routes ?? {})
-  ]);
+  const routeKeys = new Set([...Object.keys(table.routes ?? {}), ...Object.keys(table.projectMessages?.routes ?? {})]);
   for (const routeKey of routeKeys) {
     const dot = routeKey.lastIndexOf(".");
     if (dot < 1) continue;
@@ -463,9 +501,12 @@ function routeCatalog(table, tokens) {
     if (tokens[index]?.value !== "import") continue;
     let from = index + 1;
     while (from < tokens.length && tokens[from].value !== "from" && tokens[from].value !== ";") from += 1;
-    const moduleIndex = tokens[from]?.value === "from" && tokens[from + 1]?.kind === "string"
-      ? from + 1
-      : tokens[index + 1]?.kind === "string" ? index + 1 : -1;
+    const moduleIndex =
+      tokens[from]?.value === "from" && tokens[from + 1]?.kind === "string"
+        ? from + 1
+        : tokens[index + 1]?.kind === "string"
+          ? index + 1
+          : -1;
     const statementEnd = moduleIndex >= 0 ? moduleIndex + 1 : Math.min(tokens.length, from + 1);
     const moduleName = moduleIndex >= 0 ? tokens[moduleIndex].value : null;
     const canonicalModule = generatedSdkModules.has(moduleName);
@@ -478,21 +519,26 @@ function routeCatalog(table, tokens) {
       scopes.bind(scopes.root, tokens[cursor].value, BLOCKED_BINDING);
       cursor += tokens[cursor + 1]?.value === "," ? 2 : 1;
     }
-    if (tokens[cursor]?.value === "*" && tokens[cursor + 1]?.value === "as" && tokens[cursor + 2]?.kind === "identifier") {
+    if (
+      tokens[cursor]?.value === "*" &&
+      tokens[cursor + 1]?.value === "as" &&
+      tokens[cursor + 2]?.kind === "identifier"
+    ) {
       scopes.bind(scopes.root, tokens[cursor + 2].value, canonicalModule ? { kind: "sdk-namespace" } : BLOCKED_BINDING);
     }
     if (tokens[cursor]?.value === "{") {
       const close = pairs.openToClose.get(cursor);
       if (close !== undefined && close < statementEnd) {
-        for (const [start, end] of topLevelSegments(tokens, cursor + 1, close)) {
+        for (const [start] of topLevelSegments(tokens, cursor + 1, close)) {
           let position = start;
           const typeOnlySpecifier = tokens[position]?.value === "type";
           if (typeOnlySpecifier) position += 1;
           const imported = tokens[position];
           if (imported?.kind !== "identifier") continue;
-          const local = tokens[position + 1]?.value === "as" && tokens[position + 2]?.kind === "identifier"
-            ? tokens[position + 2].value
-            : imported.value;
+          const local =
+            tokens[position + 1]?.value === "as" && tokens[position + 2]?.kind === "identifier"
+              ? tokens[position + 2].value
+              : imported.value;
           let binding = BLOCKED_BINDING;
           if (canonicalModule && !typeOnlyImport && !typeOnlySpecifier && knownNamespaces.has(imported.value)) {
             binding = { kind: "sdk-module", namespace: imported.value, imported: true };
@@ -556,8 +602,10 @@ function routeCatalog(table, tokens) {
     bodyScope.functionScope = true;
     if (tokens[index - 1]?.value === ")") {
       const open = pairs.closeToOpen.get(index - 1);
-      if (open !== undefined) for (const name of parameterNames(tokens, open, index - 1)) scopes.bind(bodyScope, name, BLOCKED_BINDING);
-    } else if (tokens[index - 1]?.kind === "identifier") scopes.bind(bodyScope, tokens[index - 1].value, BLOCKED_BINDING);
+      if (open !== undefined)
+        for (const name of parameterNames(tokens, open, index - 1)) scopes.bind(bodyScope, name, BLOCKED_BINDING);
+    } else if (tokens[index - 1]?.kind === "identifier")
+      scopes.bind(bodyScope, tokens[index - 1].value, BLOCKED_BINDING);
   }
 
   // Object/class methods and catch clauses introduce the same parameter
@@ -615,14 +663,19 @@ function routeCatalog(table, tokens) {
         initializerEnd = cursor;
       }
       let directAlias = BLOCKED_BINDING;
-      if (names.length === 1 && tokens[patternStart]?.kind === "identifier" &&
-        initializerEnd === initializerStart + 1 && tokens[initializerStart]?.kind === "identifier") {
-        directAlias = scopes.resolve(tokens[initializerStart].value, index) ??
+      if (
+        names.length === 1 &&
+        tokens[patternStart]?.kind === "identifier" &&
+        initializerEnd === initializerStart + 1 &&
+        tokens[initializerStart]?.kind === "identifier"
+      ) {
+        directAlias =
+          scopes.resolve(tokens[initializerStart].value, index) ??
           (knownNamespaces.has(tokens[initializerStart].value)
             ? { kind: "sdk-module", namespace: tokens[initializerStart].value }
             : knownWrappers.has(tokens[initializerStart].value)
               ? { kind: "sdk-wrapper", wrapper: tokens[initializerStart].value }
-            : BLOCKED_BINDING);
+              : BLOCKED_BINDING);
         if (!["sdk-module", "sdk-wrapper"].includes(directAlias.kind)) directAlias = BLOCKED_BINDING;
       }
       for (const name of names) {
@@ -634,7 +687,8 @@ function routeCatalog(table, tokens) {
     }
   }
 
-  const resolve = (name, index) => scopes.resolve(name, index) ??
+  const resolve = (name, index) =>
+    scopes.resolve(name, index) ??
     (knownNamespaces.has(name)
       ? { kind: "sdk-module", namespace: name }
       : knownWrappers.has(name)
@@ -685,8 +739,14 @@ function staticStringFromRange(tokens, range, resolve) {
   const selected = tokens.slice(range[0], range[1]);
   if (selected.length === 1 && selected[0].kind === "string") return selected[0].value;
   const wrapper = selected[0]?.kind === "identifier" ? resolve(selected[0].value, range[0]) : BLOCKED_BINDING;
-  if (selected.length === 4 && wrapper.kind === "sdk-wrapper" && selected[1].value === "(" &&
-    selected[2].kind === "string" && selected[3].value === ")") return selected[2].value;
+  if (
+    selected.length === 4 &&
+    wrapper.kind === "sdk-wrapper" &&
+    selected[1].value === "(" &&
+    selected[2].kind === "string" &&
+    selected[3].value === ")"
+  )
+    return selected[2].value;
   return null;
 }
 
@@ -695,8 +755,15 @@ function directLiteralFromRange(tokens, range, literalIndex, resolve) {
   const selected = tokens.slice(range[0], range[1]);
   if (selected.length === 1 && range[0] === literalIndex && selected[0].kind === "string") return selected[0].value;
   const wrapper = selected[0]?.kind === "identifier" ? resolve(selected[0].value, range[0]) : BLOCKED_BINDING;
-  if (selected.length === 4 && range[0] + 2 === literalIndex && wrapper.kind === "sdk-wrapper" && selected[1].value === "(" &&
-    selected[2].kind === "string" && selected[3].value === ")") return selected[2].value;
+  if (
+    selected.length === 4 &&
+    range[0] + 2 === literalIndex &&
+    wrapper.kind === "sdk-wrapper" &&
+    selected[1].value === "(" &&
+    selected[2].kind === "string" &&
+    selected[3].value === ")"
+  )
+    return selected[2].value;
   return null;
 }
 
@@ -708,14 +775,18 @@ function receiverEvidenceAt(table, relativeDocument, text, literal, position) {
   const lineStart = text.lastIndexOf("\n", literal.start - 1) + 1;
   const column = literal.start - lineStart + 1;
   return (table.projectMessages?.names ?? []).some((entry) =>
-    (entry.receiverEvidence ?? []).some((site) =>
-      site.source === relativeDocument && site.line === line && site.column === column));
+    (entry.receiverEvidence ?? []).some(
+      (site) => site.source === relativeDocument && site.line === line && site.column === column,
+    ),
+  );
 }
 
 function semanticContextAt(table, text, position, relativeDocument = null) {
   const offset = positionOffset(text, position);
   const tokens = scanTokens(text);
-  const literalIndex = tokens.findIndex((token) => token.kind === "string" && offset > token.start && offset <= token.end);
+  const literalIndex = tokens.findIndex(
+    (token) => token.kind === "string" && offset > token.start && offset <= token.end,
+  );
   if (literalIndex < 0) return { kind: "ignored" };
   const { byCall, knownNamespaces, resolve } = routeCatalog(table, tokens);
   const opens = [];
@@ -754,9 +825,10 @@ function semanticContextAt(table, text, position, relativeDocument = null) {
       routeKey,
       argumentIndex,
       parameter,
-      addressValue: parameter?.scope === "addressed-component-resource"
-        ? staticStringFromRange(tokens, ranges[parameter.addressParameter], resolve)
-        : null
+      addressValue:
+        parameter?.scope === "addressed-component-resource"
+          ? staticStringFromRange(tokens, ranges[parameter.addressParameter], resolve)
+          : null,
     };
   }
   // Receiver message ids are a separate generated projection. They are not
@@ -764,16 +836,18 @@ function semanticContextAt(table, text, position, relativeDocument = null) {
   // argument, so join only the canonical hashLiteral wrapper and the exact
   // evidence coordinate produced by the bounded project-message scanner.
   const receiver = table.projectMessages?.receiver;
-  const receiverBinding = receiver?.names === "projectMessages.names"
-    ? resolve("hashLiteral", literalIndex)
-    : null;
+  const receiverBinding = receiver?.names === "projectMessages.names" ? resolve("hashLiteral", literalIndex) : null;
   const literal = tokens[literalIndex];
-  if (receiverBinding?.kind === "sdk-wrapper" && receiverBinding.wrapper === "hashLiteral" &&
-      receiverBinding.imported === true &&
-      tokens[literalIndex - 1]?.value === "(" && tokens[literalIndex - 2]?.kind === "identifier" &&
-      tokens[literalIndex - 2]?.value === "hashLiteral" &&
-      tokens[literalIndex + 1]?.value === ")" &&
-      receiverEvidenceAt(table, relativeDocument, text, literal, position)) {
+  if (
+    receiverBinding?.kind === "sdk-wrapper" &&
+    receiverBinding.wrapper === "hashLiteral" &&
+    receiverBinding.imported === true &&
+    tokens[literalIndex - 1]?.value === "(" &&
+    tokens[literalIndex - 2]?.kind === "identifier" &&
+    tokens[literalIndex - 2]?.value === "hashLiteral" &&
+    tokens[literalIndex + 1]?.value === ")" &&
+    receiverEvidenceAt(table, relativeDocument, text, literal, position)
+  ) {
     return { kind: "project-message", routeKey: "projectMessages.receiver", argumentIndex: 0, descriptor: receiver };
   }
   return null;
@@ -830,7 +904,7 @@ function resourceSymbolsForContext(table, projectRoot, relativeDocument, context
 function projectMessageSymbols(table, projectRoot, descriptor) {
   const symbols = new Map();
   for (const entry of table.projectMessages?.names ?? []) {
-    const candidateEvidence = descriptor?.evidence ? entry[descriptor.evidence] ?? [] : null;
+    const candidateEvidence = descriptor?.evidence ? (entry[descriptor.evidence] ?? []) : null;
     if (candidateEvidence && candidateEvidence.length === 0) continue;
     const evidence = [...(entry.receiverEvidence ?? []), ...(entry.senderEvidence ?? [])];
     const receiverCount = entry.receiverEvidence?.length ?? 0;
@@ -838,7 +912,14 @@ function projectMessageSymbols(table, projectRoot, descriptor) {
     const name = `${descriptor?.prefix ?? ""}${entry.name}`;
     const documentation = `Project message identifier from static TypeScript evidence (${receiverCount} receiver${receiverCount === 1 ? "" : "s"}, ${senderCount} sender${senderCount === 1 ? "" : "s"}).`;
     if (!evidence.length) {
-      addSymbol(symbols, { insertText: name, label: name, detail: descriptor.role, documentation, kind: 18, location: null });
+      addSymbol(symbols, {
+        insertText: name,
+        label: name,
+        detail: descriptor.role,
+        documentation,
+        kind: 18,
+        location: null,
+      });
       continue;
     }
     for (const site of evidence) {
@@ -848,7 +929,7 @@ function projectMessageSymbols(table, projectRoot, descriptor) {
         detail: descriptor.role,
         documentation,
         kind: 18,
-        location: locationForProjectPath(projectRoot, site.source, site.line, site.column)
+        location: locationForProjectPath(projectRoot, site.source, site.line, site.column),
       });
     }
   }
@@ -857,23 +938,29 @@ function projectMessageSymbols(table, projectRoot, descriptor) {
 
 function symbolsAt(table, projectRoot, relativeDocument, text, position) {
   const context = semanticContextAt(table, text, position, relativeDocument);
-  const symbols = context?.kind === "resource"
-    ? resourceSymbolsForContext(table, projectRoot, relativeDocument, context)
-    : context?.kind === "project-message"
-      ? projectMessageSymbols(table, projectRoot, context.descriptor)
-      : context?.kind === "none" || context?.kind === "ignored"
-        ? []
-        : broadSymbols(table, projectRoot, relativeDocument);
-  return [...symbols].sort((left, right) =>
-    compare(left.label, right.label) || compare(left.detail, right.detail) ||
-    compare(String(left.location?.uri ?? ""), String(right.location?.uri ?? "")) ||
-    (left.location?.range?.start?.line ?? -1) - (right.location?.range?.start?.line ?? -1));
+  const symbols =
+    context?.kind === "resource"
+      ? resourceSymbolsForContext(table, projectRoot, relativeDocument, context)
+      : context?.kind === "project-message"
+        ? projectMessageSymbols(table, projectRoot, context.descriptor)
+        : context?.kind === "none" || context?.kind === "ignored"
+          ? []
+          : broadSymbols(table, projectRoot, relativeDocument);
+  return [...symbols].sort(
+    (left, right) =>
+      compare(left.label, right.label) ||
+      compare(left.detail, right.detail) ||
+      compare(String(left.location?.uri ?? ""), String(right.location?.uri ?? "")) ||
+      (left.location?.range?.start?.line ?? -1) - (right.location?.range?.start?.line ?? -1),
+  );
 }
 
 /** A content-keyed view over the generated Defold project symbol table. */
 export function createResourceSemanticIndex(projectRoot, options = {}) {
   const root = path.resolve(projectRoot);
-  const symbolFile = path.resolve(options.symbolFile ?? path.join(root, ".deherm", "generated", "resource-symbols.json"));
+  const symbolFile = path.resolve(
+    options.symbolFile ?? path.join(root, ".deherm", "generated", "resource-symbols.json"),
+  );
   let cached = null;
   let cachedIdentity = "";
 
@@ -893,9 +980,15 @@ export function createResourceSemanticIndex(projectRoot, options = {}) {
     try {
       parsed = JSON.parse(await readFile(symbolFile, "utf8"));
     } catch (error) {
-      throw new Error(`generated Defold resource symbols are malformed at ${symbolFile}; run 'deherm generate': ${error instanceof Error ? error.message : String(error)}`);
+      throw new Error(
+        `generated Defold resource symbols are malformed at ${symbolFile}; run 'deherm generate': ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
-    if (parsed.schemaVersion !== 1 || typeof parsed.declarations !== "object" || typeof parsed.components !== "object") {
+    if (
+      parsed.schemaVersion !== 1 ||
+      typeof parsed.declarations !== "object" ||
+      typeof parsed.components !== "object"
+    ) {
       throw new Error(`unsupported resource symbol table at ${symbolFile}; run 'deherm generate'`);
     }
     cached = parsed;
@@ -927,38 +1020,41 @@ export function createResourceSemanticIndex(projectRoot, options = {}) {
       const relative = relativeDocument(uri);
       if (!literal || !relative) return [];
       const symbols = symbolsAt(await load(), root, relative, text, position);
-      const matching = symbols.filter(({ insertText }) =>
-        !literal.prefix || insertText.startsWith(literal.prefix) || insertText.includes(literal.prefix));
+      const matching = symbols.filter(
+        ({ insertText }) =>
+          !literal.prefix || insertText.startsWith(literal.prefix) || insertText.includes(literal.prefix),
+      );
       const unique = new Map();
       for (const symbol of matching) {
         const key = `${symbol.insertText}\0${symbol.detail}\0${symbol.documentation}`;
         if (!unique.has(key)) unique.set(key, symbol);
       }
-      return [...unique.values()]
-        .map((symbol) => ({
-          label: symbol.label,
-          kind: symbol.kind,
-          detail: symbol.detail,
-          documentation: { kind: "markdown", value: symbol.documentation },
-          textEdit: { range: literal.range, newText: symbol.insertText },
-          data: { deherm: true, insertText: symbol.insertText }
-        }));
+      return [...unique.values()].map((symbol) => ({
+        label: symbol.label,
+        kind: symbol.kind,
+        detail: symbol.detail,
+        documentation: { kind: "markdown", value: symbol.documentation },
+        textEdit: { range: literal.range, newText: symbol.insertText },
+        data: { deherm: true, insertText: symbol.insertText },
+      }));
     },
     async hover(uri, text, position) {
       const literal = literalAt(text, position);
       const relative = relativeDocument(uri);
       if (!literal || !relative) return null;
-      const matches = symbolsAt(await load(), root, relative, text, position)
-        .filter(({ insertText }) => insertText === literal.value);
+      const matches = symbolsAt(await load(), root, relative, text, position).filter(
+        ({ insertText }) => insertText === literal.value,
+      );
       if (!matches.length) return null;
-      const descriptions = [...new Set(matches.map(({ label, detail, documentation }) =>
-        `**${label}** — ${detail}\n\n${documentation}`))];
+      const descriptions = [
+        ...new Set(matches.map(({ label, detail, documentation }) => `**${label}** — ${detail}\n\n${documentation}`)),
+      ];
       return {
         contents: {
           kind: "markdown",
-          value: descriptions.join("\n\n---\n\n")
+          value: descriptions.join("\n\n---\n\n"),
         },
-        range: literal.range
+        range: literal.range,
       };
     },
     async definition(uri, text, position) {
@@ -969,7 +1065,7 @@ export function createResourceSemanticIndex(projectRoot, options = {}) {
         .filter(({ insertText, location }) => insertText === literal.value && location)
         .map(({ location }) => location);
       return locations.length ? locations : null;
-    }
+    },
   };
 }
 

@@ -33,7 +33,11 @@ function argumentCodec(argument, label) {
   if (argument?.codec === "Hash" && typeof argument.hashLiteral === "string") return "Hash";
   if (argument?.codec === "Url" && typeof argument.msgUrl === "string") return "Url";
   if (argument?.codec === "Node" && typeof argument.guiGetNode === "string") return "Node";
-  if (!argument || typeof argument !== "object" || !["Vector3", "Vector4", "Quaternion", "Matrix4"].includes(argument.codec)) {
+  if (
+    !argument ||
+    typeof argument !== "object" ||
+    !["Vector3", "Vector4", "Quaternion", "Matrix4"].includes(argument.codec)
+  ) {
     throw new Error(`${label} must be a number or supported generated Defold value`);
   }
   const count = argument.codec === "Vector3" ? 3 : argument.codec === "Matrix4" ? 16 : 4;
@@ -54,7 +58,8 @@ function argumentExpression(argument) {
   if (argument.codec === "Url") return `msg.url(${JSON.stringify(argument.msgUrl)})`;
   if (argument.codec === "Node") return `gui.getNode(${JSON.stringify(argument.guiGetNode)})`;
   if (argument.codec === "Matrix4") return `[${argument.components.map(JSON.stringify).join(", ")}] as const`;
-  const call = argument.codec === "Vector3" ? "vmath.vector3" : argument.codec === "Vector4" ? "vmath.vector4" : "vmath.quat";
+  const call =
+    argument.codec === "Vector3" ? "vmath.vector3" : argument.codec === "Vector4" ? "vmath.vector4" : "vmath.quat";
   return `${call}(${argument.components.map(JSON.stringify).join(", ")})`;
 }
 
@@ -89,16 +94,24 @@ function expectationExpression(expectation, resultName, resultCodec, key) {
     return `typeof ${resultName} === "number" && Math.abs(${resultName} - ${JSON.stringify(value)}) <= ${JSON.stringify(tolerance)}`;
   }
   if (expectation.kind === "components") {
-    const count = resultCodec === "Vector3" ? 3 :
-      ["Vector4", "Quaternion"].includes(resultCodec) ? 4 : resultCodec === "Matrix4" ? 16 : 0;
+    const count =
+      resultCodec === "Vector3"
+        ? 3
+        : ["Vector4", "Quaternion"].includes(resultCodec)
+          ? 4
+          : resultCodec === "Matrix4"
+            ? 16
+            : 0;
     if (!count || !Array.isArray(expectation.values) || expectation.values.length !== count) {
       throw new Error(`${key}: component expectation does not match ${resultCodec}`);
     }
-    return expectation.values.map((value, index) => {
-      finite(value, `${key}.expectation.values[${index}]`);
-      const access = resultCodec === "Matrix4" ? `[${index}]` : `.${componentNames[index]}`;
-      return `Math.abs(${resultName}${access} - ${JSON.stringify(value)}) <= ${JSON.stringify(tolerance)}`;
-    }).join(" && ");
+    return expectation.values
+      .map((value, index) => {
+        finite(value, `${key}.expectation.values[${index}]`);
+        const access = resultCodec === "Matrix4" ? `[${index}]` : `.${componentNames[index]}`;
+        return `Math.abs(${resultName}${access} - ${JSON.stringify(value)}) <= ${JSON.stringify(tolerance)}`;
+      })
+      .join(" && ");
   }
   throw new Error(`${key}: unsupported expectation kind ${expectation.kind}`);
 }
@@ -109,10 +122,12 @@ export function generateScriptValueRealEngineProbes(sourceText, bindingsText) {
   if (source.schemaVersion !== 1 || !Array.isArray(source.probes) || !Array.isArray(source.plannedFamilyRecipes)) {
     throw new Error("Unsupported value probe schema");
   }
-  if (!source.instrumentedProbeSet ||
-      typeof source.instrumentedProbeSet.marker !== "string" ||
-      !/^INFO:DEFOLD_HERMES: script-value-probes:[0-9a-f]{64}$/.test(source.instrumentedProbeSet.marker) ||
-      !/^[0-9a-f]{64}$/.test(source.instrumentedProbeSet.semanticSha256 ?? "")) {
+  if (
+    !source.instrumentedProbeSet ||
+    typeof source.instrumentedProbeSet.marker !== "string" ||
+    !/^INFO:DEFOLD_HERMES: script-value-probes:[0-9a-f]{64}$/.test(source.instrumentedProbeSet.marker) ||
+    !/^[0-9a-f]{64}$/.test(source.instrumentedProbeSet.semanticSha256 ?? "")
+  ) {
     throw new Error("Value probes require a pinned instrumentedProbeSet marker and semantic SHA-256");
   }
   const inputSha256 = createHash("sha256").update(sourceText).update("\0").update(bindingsText).digest("hex");
@@ -126,17 +141,21 @@ export function generateScriptValueRealEngineProbes(sourceText, bindingsText) {
     "export type ScriptValueRealEngineProbeLog = (message: string) => void;",
     "",
     "export function runScriptValueRealEngineProbes(log: ScriptValueRealEngineProbeLog): void {",
-    `  log(${JSON.stringify(source.instrumentedProbeSet.marker.replace("INFO:DEFOLD_HERMES: ", ""))});`
+    `  log(${JSON.stringify(source.instrumentedProbeSet.marker.replace("INFO:DEFOLD_HERMES: ", ""))});`,
   ];
   const generatedProbeInputs = generated.bindings
     .filter(({ generatedProbe }) => generatedProbe != null)
     .map((binding) => {
-      if (!binding.generatedFamily || !binding.generatedProbe ||
-          typeof binding.generatedProbe !== "object" || Array.isArray(binding.generatedProbe) ||
-          "id" in binding.generatedProbe ||
-          (binding.generatedProbe.state != null && binding.generatedProbe.state !== "planned") ||
-          (binding.generatedProbe.state === "planned" &&
-            (typeof binding.generatedProbe.reason !== "string" || !binding.generatedProbe.reason))) {
+      if (
+        !binding.generatedFamily ||
+        !binding.generatedProbe ||
+        typeof binding.generatedProbe !== "object" ||
+        Array.isArray(binding.generatedProbe) ||
+        "id" in binding.generatedProbe ||
+        (binding.generatedProbe.state != null && binding.generatedProbe.state !== "planned") ||
+        (binding.generatedProbe.state === "planned" &&
+          (typeof binding.generatedProbe.reason !== "string" || !binding.generatedProbe.reason))
+      ) {
         throw new Error(`${binding.id}: generated family probe metadata is invalid`);
       }
       return { ...binding.generatedProbe, id: binding.id, generatedFamily: binding.generatedFamily };
@@ -150,25 +169,33 @@ export function generateScriptValueRealEngineProbes(sourceText, bindingsText) {
     if (!declaredDerivation()) throw new Error(`${probe.key}: ${probe.id} is not a generated value binding`);
     recordAudit({
       input: "packages/bindings/probes/defold-script-value-real-engine-probes.json",
-      id: probe.key, status: VOID, reason: "withdrawn-route", route: probe.id
+      id: probe.key,
+      status: VOID,
+      reason: "withdrawn-route",
+      route: probe.id,
     });
     return false;
   });
   const probes = probeInputs.map((probe, index) => {
-    if (typeof probe.key !== "string" || !probe.key || seenKeys.has(probe.key)) throw new Error(`Probe key must be unique: ${probe.key}`);
+    if (typeof probe.key !== "string" || !probe.key || seenKeys.has(probe.key))
+      throw new Error(`Probe key must be unique: ${probe.key}`);
     seenKeys.add(probe.key);
     const binding = byId.get(probe.id);
     if (!binding) throw new Error(`${probe.key}: ${probe.id} is not a generated value binding`);
     if (!Array.isArray(probe.arguments)) throw new Error(`${probe.key}: arguments must be an array`);
-    const codecs = probe.arguments.map((argument, argumentIndex) => argumentCodec(argument, `${probe.key}.arguments[${argumentIndex}]`));
+    const codecs = probe.arguments.map((argument, argumentIndex) =>
+      argumentCodec(argument, `${probe.key}.arguments[${argumentIndex}]`),
+    );
     if (!Array.isArray(binding.implementedCallShapes)) {
       throw new Error(`${probe.key}: generated binding has no implementedCallShapes`);
     }
     if (!binding.implementedCallShapes.some((shape) => JSON.stringify(shape) === JSON.stringify(codecs))) {
       throw new Error(`${probe.key}: argument codecs ${JSON.stringify(codecs)} do not match an implemented call shape`);
     }
-    if (probe.expectation?.kind === "deferredLua" &&
-        probe.expectation.marker !== `DEBUG:SCRIPT: script-value:${probe.key}:ok`) {
+    if (
+      probe.expectation?.kind === "deferredLua" &&
+      probe.expectation.marker !== `DEBUG:SCRIPT: script-value:${probe.key}:ok`
+    ) {
       throw new Error(`${probe.key}: deferredLua marker must be derived from the probe key`);
     }
     const state = probe.state ?? "instrumented";
@@ -178,14 +205,14 @@ export function generateScriptValueRealEngineProbes(sourceText, bindingsText) {
     }
     const resultCodec = binding.resultCodec === "SameDefoldValue" ? codecs[0] : binding.resultCodec;
     const resultName = `result_${index}`;
-    const callable = binding.id === "script:hash"
-      ? `${publicScriptRootName("builtins")}.${binding.jsName}`
-      : `${publicScriptRootName(binding.rawName.split(".")[0])}.${binding.jsName}`;
+    const callable =
+      binding.id === "script:hash"
+        ? `${publicScriptRootName("builtins")}.${binding.jsName}`
+        : `${publicScriptRootName(binding.rawName.split(".")[0])}.${binding.jsName}`;
     // A `raises` probe asserts the negative half of a route's contract: the
     // call must fail closed at the boundary rather than produce a default.
     const raises = probe.expectation?.kind === "raises";
-    const predicate = raises ? null
-      : expectationExpression(probe.expectation, resultName, resultCodec, probe.key);
+    const predicate = raises ? null : expectationExpression(probe.expectation, resultName, resultCodec, probe.key);
     if (state === "instrumented" && raises) {
       if (typeof probe.expectation.reason !== "string" || !probe.expectation.reason) {
         throw new Error(`${probe.key}: raises expectation requires a reason`);
@@ -217,25 +244,35 @@ export function generateScriptValueRealEngineProbes(sourceText, bindingsText) {
       resultCodec,
       expectation: probe.expectation,
       ...(probe.generatedFamily ? { generatedFamily: probe.generatedFamily } : {}),
-      expectedMarker: probe.expectation.kind === "deferredLua"
-        ? probe.expectation.marker
-        : `INFO:DEFOLD_HERMES: script-value:${probe.key}:ok`
+      expectedMarker:
+        probe.expectation.kind === "deferredLua"
+          ? probe.expectation.marker
+          : `INFO:DEFOLD_HERMES: script-value:${probe.key}:ok`,
     };
   });
   const plannedFamilyRecipes = new Map();
   for (const recipe of source.plannedFamilyRecipes) {
-    if (!recipe || typeof recipe !== "object" ||
-        typeof recipe.generatedFamily !== "string" || !recipe.generatedFamily ||
-        typeof recipe.context !== "string" || !recipe.context ||
-        typeof recipe.scenarioKeyPrefix !== "string" || !recipe.scenarioKeyPrefix ||
-        typeof recipe.reason !== "string" || !recipe.reason) {
+    if (
+      !recipe ||
+      typeof recipe !== "object" ||
+      typeof recipe.generatedFamily !== "string" ||
+      !recipe.generatedFamily ||
+      typeof recipe.context !== "string" ||
+      !recipe.context ||
+      typeof recipe.scenarioKeyPrefix !== "string" ||
+      !recipe.scenarioKeyPrefix ||
+      typeof recipe.reason !== "string" ||
+      !recipe.reason
+    ) {
       throw new Error("Planned family recipe requires generatedFamily, context, scenarioKeyPrefix, and reason");
     }
     if (plannedFamilyRecipes.has(recipe.generatedFamily)) {
       throw new Error(`Duplicate planned family recipe: ${recipe.generatedFamily}`);
     }
     if (!recipe.scenarioKeyPrefix.startsWith("planned:") || !recipe.scenarioKeyPrefix.endsWith(":")) {
-      throw new Error(`${recipe.generatedFamily}: planned scenarioKeyPrefix must be a planned: namespace ending in ':'`);
+      throw new Error(
+        `${recipe.generatedFamily}: planned scenarioKeyPrefix must be a planned: namespace ending in ':'`,
+      );
     }
     plannedFamilyRecipes.set(recipe.generatedFamily, recipe);
   }
@@ -265,7 +302,7 @@ export function generateScriptValueRealEngineProbes(sourceText, bindingsText) {
       context: recipe.context,
       target: source.target,
       implementedCallShapes: binding.implementedCallShapes,
-      resultCodec: binding.resultCodec
+      resultCodec: binding.resultCodec,
     });
   }
   for (const family of plannedFamilyRecipes.keys()) {
@@ -278,17 +315,20 @@ export function generateScriptValueRealEngineProbes(sourceText, bindingsText) {
     const missing = generated.bindings.filter(({ id }) => !seenBindings.has(id)).map(({ id }) => id);
     throw new Error(`Every generated value binding requires a real-engine probe; missing: ${missing.join(", ")}`);
   }
-  const instrumentedSemanticRows = probes.filter(({ state }) => state === "instrumented").map((probe) => ({
-    key: probe.key,
-    id: probe.id,
-    stableId: probe.stableId,
-    callShape: probe.callShape,
-    resultCodec: probe.resultCodec,
-    expectation: probe.expectation,
-    expectedMarker: probe.expectedMarker
-  }));
+  const instrumentedSemanticRows = probes
+    .filter(({ state }) => state === "instrumented")
+    .map((probe) => ({
+      key: probe.key,
+      id: probe.id,
+      stableId: probe.stableId,
+      callShape: probe.callShape,
+      resultCodec: probe.resultCodec,
+      expectation: probe.expectation,
+      expectedMarker: probe.expectedMarker,
+    }));
   const instrumentedSemanticSha256 = createHash("sha256")
-    .update(JSON.stringify(instrumentedSemanticRows)).digest("hex");
+    .update(JSON.stringify(instrumentedSemanticRows))
+    .digest("hex");
   // A hash of the instrumented probe set, recorded at the reviewed revision. It
   // is fatal in an ordinary generation - the probes are the contract the real
   // engine run asserts - and an observation inside a declared derivation, where
@@ -296,7 +336,8 @@ export function generateScriptValueRealEngineProbes(sourceText, bindingsText) {
   expectReviewedCount({
     input: "packages/bindings/probes/defold-script-value-real-engine-probes.json",
     label: "instrumented probe-set semantics sha256",
-    expected: source.instrumentedProbeSet.semanticSha256, observed: instrumentedSemanticSha256
+    expected: source.instrumentedProbeSet.semanticSha256,
+    observed: instrumentedSemanticSha256,
   });
   const report = {
     schemaVersion: 1,
@@ -315,7 +356,7 @@ export function generateScriptValueRealEngineProbes(sourceText, bindingsText) {
     routeDispositionCount: probes.length + plannedProbes.length,
     uniqueBindingCount: seenBindings.size,
     probes,
-    plannedProbes
+    plannedProbes,
   };
   return { report: `${JSON.stringify(report, null, 2)}\n`, typescript: `${lines.join("\n")}\n` };
 }
@@ -326,9 +367,13 @@ async function main(argv = process.argv.slice(2)) {
   const check = argv.includes("--check");
   const [sourceText, bindingsText] = await Promise.all([readFile(sourceUrl, "utf8"), readFile(bindingsUrl, "utf8")]);
   const outputs = generateScriptValueRealEngineProbes(sourceText, bindingsText);
-  const targets = [[reportUrl, outputs.report], [typescriptUrl, outputs.typescript]];
+  const targets = [
+    [reportUrl, outputs.report],
+    [typescriptUrl, outputs.typescript],
+  ];
   if (check) {
-    for (const [url, expected] of targets) if (await readFile(url, "utf8") !== expected) throw new Error(`${url.pathname} is stale`);
+    for (const [url, expected] of targets)
+      if ((await readFile(url, "utf8")) !== expected) throw new Error(`${url.pathname} is stale`);
   } else {
     await mkdir(new URL("./", typescriptUrl), { recursive: true });
     await Promise.all(targets.map(([url, contents]) => writeFile(url, contents)));

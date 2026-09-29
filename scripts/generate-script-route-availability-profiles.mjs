@@ -6,7 +6,13 @@ import { dirname, isAbsolute, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { stableBindingId } from "./lib/binding-identity.mjs";
-import { assertReviewedRevision, expectReviewedCount, expectSameRevision, declaredDerivation, observeReviewedSource } from "./lib/reviewed-revision.mjs";
+import {
+  assertReviewedRevision,
+  expectReviewedCount,
+  expectSameRevision,
+  declaredDerivation,
+  observeReviewedSource,
+} from "./lib/reviewed-revision.mjs";
 import { VOID, recordAudit } from "./lib/revision-audit.mjs";
 
 const repositoryRoot = fileURLToPath(new URL("../", import.meta.url));
@@ -33,7 +39,13 @@ function compareText(left, right) {
 }
 
 function parseArgs(argv) {
-  const options = { check: false, outRoot: repositoryRoot, policy: defaultPolicy, borrowed: defaultBorrowed, scriptIr: defaultScriptIr };
+  const options = {
+    check: false,
+    outRoot: repositoryRoot,
+    policy: defaultPolicy,
+    borrowed: defaultBorrowed,
+    scriptIr: defaultScriptIr,
+  };
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
     if (argument === "--check") options.check = true;
@@ -61,7 +73,9 @@ async function loadJson(path, label) {
 
 function registrationNames(text, array, sourcePath) {
   const escaped = array.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const match = text.match(new RegExp(`static\\s+const\\s+luaL_(?:reg|Reg)\\s+${escaped}\\s*\\[\\s*\\]\\s*=\\s*\\{([\\s\\S]*?)\\n\\s*\\};`));
+  const match = text.match(
+    new RegExp(`static\\s+const\\s+luaL_(?:reg|Reg)\\s+${escaped}\\s*\\[\\s*\\]\\s*=\\s*\\{([\\s\\S]*?)\\n\\s*\\};`),
+  );
   assert(match, `${sourcePath}: registration array '${array}' was not found`);
   const body = match[1].replace(/\/\/.*$/gm, "").replace(/\/\*[\s\S]*?\*\//g, "");
   const names = [...body.matchAll(/\{\s*"([^"]+)"\s*,\s*[^}]+\}/g)].map((entry) => entry[1]);
@@ -92,9 +106,13 @@ function featuresFromManifest(text, engineProfileSelection) {
   const legacyScriptLibrary = axes.box2d?.legacyScriptLibrary;
   const v3ScriptLibrary = axes.box2d?.v3ScriptLibrary;
   const bulletDisableLibraries = axes.bullet3d?.disableWhenExcluded ?? [];
-  assert(nullPhysicsLibraries.length > 0 && typeof legacyScriptLibrary === "string" &&
-    typeof v3ScriptLibrary === "string" && bulletDisableLibraries.length > 0,
-  "engineProfileSelection axes do not describe manifest feature derivation");
+  assert(
+    nullPhysicsLibraries.length > 0 &&
+      typeof legacyScriptLibrary === "string" &&
+      typeof v3ScriptLibrary === "string" &&
+      bulletDisableLibraries.length > 0,
+    "engineProfileSelection axes do not describe manifest feature derivation",
+  );
   const noPhysics = nullPhysicsLibraries.some((library) => linked.has(library));
   const noBox2d = noPhysics || (excluded.has(v3ScriptLibrary) && excluded.has(legacyScriptLibrary));
   const v3 = !noBox2d && linked.has(v3ScriptLibrary) && excluded.has(legacyScriptLibrary);
@@ -102,7 +120,7 @@ function featuresFromManifest(text, engineProfileSelection) {
   return {
     features: ["core", ...(!noBox2d ? [v3 ? "box2d-v3" : "box2d-v2"] : []), ...(bullet ? ["bullet3d"] : [])],
     excludedLibraries,
-    linkedLibraries
+    linkedLibraries,
   };
 }
 
@@ -123,14 +141,17 @@ async function validateEvidence(evidence, kind) {
     }
     const verdict = observeReviewedSource({
       input: "packages/bindings/overrides/script-route-availability-profiles.json",
-      id: `${kind}: ${item.path}`, source: text,
-      evidence: { source: item.path, sha256: item.sha256, anchors: item.anchors ?? [] }
+      id: `${kind}: ${item.path}`,
+      source: text,
+      evidence: { source: item.path, sha256: item.sha256, anchors: item.anchors ?? [] },
     });
     if (verdict.status !== VOID) continue;
-    assert(declaredDerivation(),
+    assert(
+      declaredDerivation(),
       verdict.reason === "absent" || !verdict.anchorsLost.length
         ? `${kind} hash drifted for ${item.path}`
-        : `${kind} anchor '${verdict.anchorsLost[0]}' drifted in ${item.path}`);
+        : `${kind} anchor '${verdict.anchorsLost[0]}' drifted in ${item.path}`,
+    );
     withdrawn.add(item.path);
     textByPath.delete(item.path);
   }
@@ -144,7 +165,7 @@ function routeRow(row) {
     stableId: row.stableId,
     rawName: row.rawName,
     operationClass: row.operationClass,
-    requiredContext: row.requiredContext
+    requiredContext: row.requiredContext,
   };
 }
 
@@ -154,7 +175,7 @@ function scriptRouteRow(row) {
     stableId: stableBindingId(row.id),
     rawName: row.rawName,
     source: row.source,
-    line: row.line
+    line: row.line,
   };
 }
 
@@ -171,8 +192,10 @@ async function generate(options) {
   const scriptIr = scriptIrInput.value;
 
   assert(policy.schemaVersion === 1, "unsupported policy schema");
-  assert(new Set(policy.buildEvidence.map(({ path }) => path)).size === policy.buildEvidence.length,
-    "build evidence paths are not unique");
+  assert(
+    new Set(policy.buildEvidence.map(({ path }) => path)).size === policy.buildEvidence.length,
+    "build evidence paths are not unique",
+  );
   // The revision this report speaks for comes from a DERIVED input - the
   // imported script API IR - and never from the reviewed policy, so a reviewed
   // file can no longer decide which revision the generated surface claims.
@@ -181,8 +204,11 @@ async function generate(options) {
     label: "script route availability",
     inputs: [
       { path: "packages/bindings/generated/defold-script-api-ir.json", revision: defoldRevision },
-      { path: "packages/bindings/generated/defold-script-borrowed-handle-classification.json", revision: borrowed.defoldRevision }
-    ]
+      {
+        path: "packages/bindings/generated/defold-script-borrowed-handle-classification.json",
+        revision: borrowed.defoldRevision,
+      },
+    ],
   });
   assert(Array.isArray(borrowed.rows), "borrowed-handle classification has no rows");
   // Reviewed evidence, compared against the revision being generated. The
@@ -192,16 +218,22 @@ async function generate(options) {
     input: options.policy,
     reviewed: policy.defoldRevision,
     derived: defoldRevision,
-    detail: "the reviewed route availability profiles"
+    detail: "the reviewed route availability profiles",
   });
   const engineProfileSelection = policy.engineProfileSelection;
-  assert(engineProfileSelection?.schemaVersion === 1 &&
-    typeof engineProfileSelection.defaultProfileId === "string" &&
-    engineProfileSelection.axes && typeof engineProfileSelection.axes === "object" &&
-    engineProfileSelection.profiles && typeof engineProfileSelection.profiles === "object",
-  "engineProfileSelection is missing or invalid");
-  assert(engineProfileSelection.profiles[engineProfileSelection.defaultProfileId],
-    "engineProfileSelection.defaultProfileId is not declared in profiles");
+  assert(
+    engineProfileSelection?.schemaVersion === 1 &&
+      typeof engineProfileSelection.defaultProfileId === "string" &&
+      engineProfileSelection.axes &&
+      typeof engineProfileSelection.axes === "object" &&
+      engineProfileSelection.profiles &&
+      typeof engineProfileSelection.profiles === "object",
+    "engineProfileSelection is missing or invalid",
+  );
+  assert(
+    engineProfileSelection.profiles[engineProfileSelection.defaultProfileId],
+    "engineProfileSelection.defaultProfileId is not declared in profiles",
+  );
   assert(Array.isArray(scriptIr.functions), "script API IR has no functions");
   const documentedNames = new Set(scriptIr.functions.map(({ rawName }) => rawName));
   const scriptRowsByRawName = new Map(scriptIr.functions.map((row) => [row.rawName, scriptRouteRow(row)]));
@@ -223,8 +255,10 @@ async function generate(options) {
   const manifestAudit = [];
   for (const manifest of manifestEntries) {
     const parsed = featuresFromManifest(manifestTexts.get(manifest.path), engineProfileSelection);
-    assert(JSON.stringify(parsed.features) === JSON.stringify(manifest.features),
-      `${manifest.id}: parsed manifest features ${parsed.features.join(",")} differ from policy ${manifest.features.join(",")}`);
+    assert(
+      JSON.stringify(parsed.features) === JSON.stringify(manifest.features),
+      `${manifest.id}: parsed manifest features ${parsed.features.join(",")} differ from policy ${manifest.features.join(",")}`,
+    );
     manifestAudit.push({ id: manifest.id, ...parsed });
   }
   const registrationTexts = await validateEvidence(policy.registrations, "Lua registration source");
@@ -238,16 +272,20 @@ async function generate(options) {
     // this revision does not bear out. Fatal where it was read; withdrawn and
     // reported in a declared derivation of another revision.
     const source = registrationTexts.get(exception.source);
-    const failure = row?.id !== exception.id
-      ? [`${exception.id}: documented/unregistered stable ID drifted`, "absent-route"]
-      : !source?.includes(exception.anchor)
-        ? [`${exception.id}: commented registration evidence drifted`, "stale-anchor"]
-        : null;
+    const failure =
+      row?.id !== exception.id
+        ? [`${exception.id}: documented/unregistered stable ID drifted`, "absent-route"]
+        : !source?.includes(exception.anchor)
+          ? [`${exception.id}: commented registration evidence drifted`, "stale-anchor"]
+          : null;
     if (failure) {
       assert(declaredDerivation(), failure[0]);
       recordAudit({
         input: "packages/bindings/overrides/script-route-availability-profiles.json",
-        id: exception.id, status: VOID, reason: failure[1], detail: failure[0]
+        id: exception.id,
+        status: VOID,
+        reason: failure[1],
+        detail: failure[0],
       });
       continue;
     }
@@ -257,7 +295,10 @@ async function generate(options) {
     const scriptRoute = scriptRowsByRawName.get(row.rawName);
     assert(scriptRoute?.id === exception.id, `${exception.id}: documented/unregistered script IR identity drifted`);
     const scriptExceptions = unavailableScriptRoutesByFeature.get(exception.feature) ?? [];
-    unavailableScriptRoutesByFeature.set(exception.feature, [...scriptExceptions, { ...scriptRoute, reason: exception.reason }]);
+    unavailableScriptRoutesByFeature.set(exception.feature, [
+      ...scriptExceptions,
+      { ...scriptRoute, reason: exception.reason },
+    ]);
   }
 
   const registrations = new Map();
@@ -283,7 +324,10 @@ async function generate(options) {
     const registeredNames = [...registrations.entries()]
       .filter(([key]) => key.startsWith(`${feature}:`))
       .flatMap(([, names]) => names);
-    assert(new Set(registeredNames).size === registeredNames.length, `${feature}: duplicate fully-qualified Lua registrations`);
+    assert(
+      new Set(registeredNames).size === registeredNames.length,
+      `${feature}: duplicate fully-qualified Lua registrations`,
+    );
     const matchingRows = registeredNames
       .map((rawName) => rowsByRawName.get(rawName))
       .filter(Boolean)
@@ -291,25 +335,37 @@ async function generate(options) {
       .sort((left, right) => left.stableId - right.stableId);
     const registeredDocumentedNames = registeredNames.filter((rawName) => documentedNames.has(rawName));
     const registrationOnlyNames = registeredNames.filter((rawName) => !documentedNames.has(rawName)).sort(compareText);
-    expectReviewedCount({ input: "packages/bindings/overrides/script-route-availability-profiles.json", label: `${feature} expectedRegisteredDocumentedCounts`,
-      expected: policy.expectedRegisteredDocumentedCounts[feature], observed: registeredDocumentedNames.length });
-    expectReviewedCount({ input: "packages/bindings/overrides/script-route-availability-profiles.json", label: `${feature} expectedRegistrationOnlyCounts`,
-      expected: policy.expectedRegistrationOnlyCounts[feature], observed: registrationOnlyNames.length });
-    const relevantPrefix = feature.startsWith("box2d-") ? "b2d." : feature === "bullet3d" ? "bullet3d." : null;
-    const unmatched = relevantPrefix === null ? [] : borrowed.rows
-      .filter((row) => row.rawName.startsWith(relevantPrefix) && !registeredNames.includes(row.rawName))
-      .map((row) => row.rawName)
-      .sort(compareText);
-    expectReviewedCount({ input: "packages/bindings/overrides/script-route-availability-profiles.json", label: `${feature} expectedAvailableFeatureCounts`,
-      expected: policy.expectedAvailableFeatureCounts[feature], observed: matchingRows.length });
+    expectReviewedCount({
+      input: "packages/bindings/overrides/script-route-availability-profiles.json",
+      label: `${feature} expectedRegisteredDocumentedCounts`,
+      expected: policy.expectedRegisteredDocumentedCounts[feature],
+      observed: registeredDocumentedNames.length,
+    });
+    expectReviewedCount({
+      input: "packages/bindings/overrides/script-route-availability-profiles.json",
+      label: `${feature} expectedRegistrationOnlyCounts`,
+      expected: policy.expectedRegistrationOnlyCounts[feature],
+      observed: registrationOnlyNames.length,
+    });
+    expectReviewedCount({
+      input: "packages/bindings/overrides/script-route-availability-profiles.json",
+      label: `${feature} expectedAvailableFeatureCounts`,
+      expected: policy.expectedAvailableFeatureCounts[feature],
+      observed: matchingRows.length,
+    });
     const reviewedUnavailable = unavailableByFeature.get(feature) ?? [];
     for (const row of reviewedUnavailable) {
       assert(!registeredNames.includes(row.rawName), `${row.id}: reviewed unavailable route is now registered`);
     }
-    const documentedRows = [...matchingRows.map(routeRow), ...reviewedUnavailable]
-      .sort((left, right) => left.stableId - right.stableId);
-    expectReviewedCount({ input: "packages/bindings/overrides/script-route-availability-profiles.json", label: `${feature} expectedFeatureCounts`,
-      expected: policy.expectedFeatureCounts[feature], observed: documentedRows.length });
+    const documentedRows = [...matchingRows.map(routeRow), ...reviewedUnavailable].sort(
+      (left, right) => left.stableId - right.stableId,
+    );
+    expectReviewedCount({
+      input: "packages/bindings/overrides/script-route-availability-profiles.json",
+      label: `${feature} expectedFeatureCounts`,
+      expected: policy.expectedFeatureCounts[feature],
+      observed: documentedRows.length,
+    });
     availableFeatureRows[feature] = matchingRows.map(routeRow);
     documentedFeatureRows[feature] = documentedRows;
     const availableScriptRows = registeredDocumentedNames
@@ -317,12 +373,20 @@ async function generate(options) {
       .sort((left, right) => left.stableId - right.stableId);
     const documentedScriptRows = [
       ...availableScriptRows,
-      ...(unavailableScriptRoutesByFeature.get(feature) ?? [])
+      ...(unavailableScriptRoutesByFeature.get(feature) ?? []),
     ].sort((left, right) => left.stableId - right.stableId);
-    expectReviewedCount({ input: "packages/bindings/overrides/script-route-availability-profiles.json", label: `${feature} expectedAvailableRouteFeatureCounts`,
-      expected: policy.expectedAvailableRouteFeatureCounts[feature], observed: availableScriptRows.length });
-    expectReviewedCount({ input: "packages/bindings/overrides/script-route-availability-profiles.json", label: `${feature} expectedRouteFeatureCounts`,
-      expected: policy.expectedRouteFeatureCounts[feature], observed: documentedScriptRows.length });
+    expectReviewedCount({
+      input: "packages/bindings/overrides/script-route-availability-profiles.json",
+      label: `${feature} expectedAvailableRouteFeatureCounts`,
+      expected: policy.expectedAvailableRouteFeatureCounts[feature],
+      observed: availableScriptRows.length,
+    });
+    expectReviewedCount({
+      input: "packages/bindings/overrides/script-route-availability-profiles.json",
+      label: `${feature} expectedRouteFeatureCounts`,
+      expected: policy.expectedRouteFeatureCounts[feature],
+      observed: documentedScriptRows.length,
+    });
     availableRouteFeatureRows[feature] = availableScriptRows;
     documentedRouteFeatureRows[feature] = documentedScriptRows;
     registrationAudit.push({
@@ -334,43 +398,66 @@ async function generate(options) {
       documentedButUnregisteredCount: reviewedUnavailable.length,
       registeredDocumentedRouteCount: registeredDocumentedNames.length,
       registrationOnlyRouteCount: registrationOnlyNames.length,
-      registrationOnlyNames
+      registrationOnlyNames,
     });
   }
 
   const expectedB2d = borrowed.rows.filter((row) => row.rawName.startsWith("b2d."));
-  const b2dUnion = new Set([...documentedFeatureRows["box2d-v2"], ...documentedFeatureRows["box2d-v3"]].map(({ stableId }) => stableId));
-  assert(b2dUnion.size === expectedB2d.length && expectedB2d.every(({ stableId }) => b2dUnion.has(stableId)),
-    "Box2D v2/v3 registration union does not cover the borrowed-handle Box2D census");
+  const b2dUnion = new Set(
+    [...documentedFeatureRows["box2d-v2"], ...documentedFeatureRows["box2d-v3"]].map(({ stableId }) => stableId),
+  );
+  assert(
+    b2dUnion.size === expectedB2d.length && expectedB2d.every(({ stableId }) => b2dUnion.has(stableId)),
+    "Box2D v2/v3 registration union does not cover the borrowed-handle Box2D census",
+  );
   const expectedBullet = borrowed.rows.filter((row) => row.rawName.startsWith("bullet3d."));
-  assert(documentedFeatureRows.bullet3d.length === expectedBullet.length, "Bullet registrations do not cover the borrowed-handle Bullet census");
-  const coreExpected = borrowed.rows.filter((row) =>
-    row.operationClass !== "declaration-token" && /^(buffer|resource|sys)\./.test(row.rawName));
-  assert(documentedFeatureRows.core.length === coreExpected.length, "core registrations do not cover the runtime global handle census");
+  assert(
+    documentedFeatureRows.bullet3d.length === expectedBullet.length,
+    "Bullet registrations do not cover the borrowed-handle Bullet census",
+  );
+  const coreExpected = borrowed.rows.filter(
+    (row) => row.operationClass !== "declaration-token" && /^(buffer|resource|sys)\./.test(row.rawName),
+  );
+  assert(
+    documentedFeatureRows.core.length === coreExpected.length,
+    "core registrations do not cover the runtime global handle census",
+  );
 
   const profiles = {};
   const routeProfiles = {};
   for (const manifest of manifestEntries) {
     assert(manifest.features[0] === "core", `${manifest.id}: core must be the first feature`);
-    assert(!(manifest.features.includes("box2d-v2") && manifest.features.includes("box2d-v3")),
-      `${manifest.id}: mutually exclusive Box2D versions were selected together`);
+    assert(
+      !(manifest.features.includes("box2d-v2") && manifest.features.includes("box2d-v3")),
+      `${manifest.id}: mutually exclusive Box2D versions were selected together`,
+    );
     const selectedDocumented = manifest.features.flatMap((feature) => {
       assert(documentedFeatureRows[feature], `${manifest.id}: unknown feature '${feature}'`);
       return documentedFeatureRows[feature];
     });
     const selectedAvailable = manifest.features.flatMap((feature) => availableFeatureRows[feature]);
-    const documentedRoutes = [...new Map(selectedDocumented.map((row) => [row.stableId, row])).values()]
-      .sort((left, right) => left.stableId - right.stableId);
-    const availableRoutes = [...new Map(selectedAvailable.map((row) => [row.stableId, row])).values()]
-      .sort((left, right) => left.stableId - right.stableId);
+    const documentedRoutes = [...new Map(selectedDocumented.map((row) => [row.stableId, row])).values()].sort(
+      (left, right) => left.stableId - right.stableId,
+    );
+    const availableRoutes = [...new Map(selectedAvailable.map((row) => [row.stableId, row])).values()].sort(
+      (left, right) => left.stableId - right.stableId,
+    );
     const unavailableIds = new Set(availableRoutes.map(({ stableId }) => stableId));
     const unavailableRoutes = documentedRoutes.filter(({ stableId }) => !unavailableIds.has(stableId));
     const expectedCount = policy.expectedProfileCounts[manifest.id];
     const expectedRuntimeCount = policy.expectedRuntimeProfileCounts[manifest.id];
-    expectReviewedCount({ input: "packages/bindings/overrides/script-route-availability-profiles.json", label: `${manifest.id} ${"expectedCount"}`,
-      expected: expectedCount, observed: documentedRoutes.length });
-    expectReviewedCount({ input: "packages/bindings/overrides/script-route-availability-profiles.json", label: `${manifest.id} ${"expectedRuntimeCount"}`,
-      expected: expectedRuntimeCount, observed: availableRoutes.length });
+    expectReviewedCount({
+      input: "packages/bindings/overrides/script-route-availability-profiles.json",
+      label: `${manifest.id} ${"expectedCount"}`,
+      expected: expectedCount,
+      observed: documentedRoutes.length,
+    });
+    expectReviewedCount({
+      input: "packages/bindings/overrides/script-route-availability-profiles.json",
+      label: `${manifest.id} ${"expectedRuntimeCount"}`,
+      expected: expectedRuntimeCount,
+      observed: availableRoutes.length,
+    });
     const routeHash = routeSetSha256(availableRoutes);
     profiles[manifest.id] = {
       manifest: manifest.path,
@@ -387,20 +474,30 @@ async function generate(options) {
         defoldRevision,
         capabilityBits: manifest.features.reduce((bits, feature) => bits | featureBits[feature], 0),
         routeCount: availableRoutes.length,
-        routeSetSha256: routeHash
-      }
+        routeSetSha256: routeHash,
+      },
     };
 
     const selectedDocumentedRoutes = manifest.features.flatMap((feature) => documentedRouteFeatureRows[feature]);
     const selectedAvailableRoutes = manifest.features.flatMap((feature) => availableRouteFeatureRows[feature]);
-    const routeDocumented = [...new Map(selectedDocumentedRoutes.map((row) => [row.stableId, row])).values()]
-      .sort((left, right) => left.stableId - right.stableId);
-    const routeAvailable = [...new Map(selectedAvailableRoutes.map((row) => [row.stableId, row])).values()]
-      .sort((left, right) => left.stableId - right.stableId);
-    expectReviewedCount({ input: "packages/bindings/overrides/script-route-availability-profiles.json", label: `${manifest.id} ${"policy.expectedRouteProfileCounts[manifest.id]"}`,
-      expected: policy.expectedRouteProfileCounts[manifest.id], observed: routeDocumented.length });
-    expectReviewedCount({ input: "packages/bindings/overrides/script-route-availability-profiles.json", label: `${manifest.id} ${"policy.expectedRuntimeRouteProfileCounts[manifest.id]"}`,
-      expected: policy.expectedRuntimeRouteProfileCounts[manifest.id], observed: routeAvailable.length });
+    const routeDocumented = [...new Map(selectedDocumentedRoutes.map((row) => [row.stableId, row])).values()].sort(
+      (left, right) => left.stableId - right.stableId,
+    );
+    const routeAvailable = [...new Map(selectedAvailableRoutes.map((row) => [row.stableId, row])).values()].sort(
+      (left, right) => left.stableId - right.stableId,
+    );
+    expectReviewedCount({
+      input: "packages/bindings/overrides/script-route-availability-profiles.json",
+      label: `${manifest.id} ${"policy.expectedRouteProfileCounts[manifest.id]"}`,
+      expected: policy.expectedRouteProfileCounts[manifest.id],
+      observed: routeDocumented.length,
+    });
+    expectReviewedCount({
+      input: "packages/bindings/overrides/script-route-availability-profiles.json",
+      label: `${manifest.id} ${"policy.expectedRuntimeRouteProfileCounts[manifest.id]"}`,
+      expected: policy.expectedRuntimeRouteProfileCounts[manifest.id],
+      observed: routeAvailable.length,
+    });
     const routeAvailableIds = new Set(routeAvailable.map(({ stableId }) => stableId));
     routeProfiles[manifest.id] = {
       manifest: manifest.path,
@@ -410,20 +507,28 @@ async function generate(options) {
       availableRouteCount: routeAvailable.length,
       documentedRoutes: routeDocumented,
       availableRoutes: routeAvailable,
-      unavailableRoutes: routeDocumented.filter(({ stableId }) => !routeAvailableIds.has(stableId))
+      unavailableRoutes: routeDocumented.filter(({ stableId }) => !routeAvailableIds.has(stableId)),
     };
   }
 
-  assert(Object.keys(profiles).sort(compareText).join("\n") === Object.keys(policy.expectedProfileCounts).sort(compareText).join("\n"),
-    "profile expectations and manifest evidence differ");
+  assert(
+    Object.keys(profiles).sort(compareText).join("\n") ===
+      Object.keys(policy.expectedProfileCounts).sort(compareText).join("\n"),
+    "profile expectations and manifest evidence differ",
+  );
 
   const catalogMaterial = {
     defoldRevision,
-    profiles: Object.fromEntries(Object.entries(routeProfiles).map(([id, profile]) => [id, {
-      features: profile.features,
-      capabilityBits: profiles[id].runtimeHandshake.capabilityBits,
-      routeSetSha256: routeSetSha256(profile.availableRoutes)
-    }]))
+    profiles: Object.fromEntries(
+      Object.entries(routeProfiles).map(([id, profile]) => [
+        id,
+        {
+          features: profile.features,
+          capabilityBits: profiles[id].runtimeHandshake.capabilityBits,
+          routeSetSha256: routeSetSha256(profile.availableRoutes),
+        },
+      ]),
+    ),
   };
   const catalogSha256 = sha256(JSON.stringify(catalogMaterial));
   for (const [id, profile] of Object.entries(routeProfiles)) {
@@ -434,15 +539,19 @@ async function generate(options) {
       capabilityBits: profiles[id].runtimeHandshake.capabilityBits,
       routeCount: profile.availableRouteCount,
       routeSetSha256: routeSetSha256(profile.availableRoutes),
-      catalogSha256
+      catalogSha256,
     };
   }
 
-  const sourceHashes = Object.fromEntries([...new Map([
-    ...policy.buildEvidence.map(({ path, sha256: hash }) => [path, hash]),
-    ...manifestEntries.map(({ path, sha256: hash }) => [path, hash]),
-    ...policy.registrations.map(({ path, sha256: hash }) => [path, hash])
-  ])].sort(([left], [right]) => compareText(left, right)));
+  const sourceHashes = Object.fromEntries(
+    [
+      ...new Map([
+        ...policy.buildEvidence.map(({ path, sha256: hash }) => [path, hash]),
+        ...manifestEntries.map(({ path, sha256: hash }) => [path, hash]),
+        ...policy.registrations.map(({ path, sha256: hash }) => [path, hash]),
+      ]),
+    ].sort(([left], [right]) => compareText(left, right)),
+  );
 
   const report = {
     schemaVersion: 1,
@@ -456,55 +565,83 @@ async function generate(options) {
       borrowedClassificationSha256: sha256(borrowedInput.text),
       scriptIr: options.scriptIr,
       scriptIrSha256: sha256(scriptIrInput.text),
-      sourceHashes
+      sourceHashes,
     },
     handshakeContract: {
       schema: "deherm.script-route-capabilities/v1",
-      requiredFields: ["schema", "profileId", "defoldRevision", "capabilityBits", "routeCount", "routeSetSha256", "catalogSha256"],
-      acceptance: "All fields must exactly match the selected generated profile before route installation. Unknown bits, IDs, revisions, route sets, and catalog hashes fail closed."
+      requiredFields: [
+        "schema",
+        "profileId",
+        "defoldRevision",
+        "capabilityBits",
+        "routeCount",
+        "routeSetSha256",
+        "catalogSha256",
+      ],
+      acceptance:
+        "All fields must exactly match the selected generated profile before route installation. Unknown bits, IDs, revisions, route sets, and catalog hashes fail closed.",
     },
     registrationAudit,
     manifestAudit,
-    handleFeatures: Object.fromEntries(Object.entries(documentedFeatureRows).map(([id, documentedRoutes]) => [id, {
-      capabilityBit: featureBits[id],
-      documentedRouteCount: documentedRoutes.length,
-      availableRouteCount: availableFeatureRows[id].length,
-      documentedRouteSetSha256: routeSetSha256(documentedRoutes),
-      availableRouteSetSha256: routeSetSha256(availableFeatureRows[id]),
-      documentedRoutes,
-      availableRoutes: availableFeatureRows[id],
-      unavailableRoutes: documentedRoutes.filter(({ stableId }) =>
-        !availableFeatureRows[id].some((available) => available.stableId === stableId))
-    }])),
-    handleProfiles: Object.fromEntries(Object.entries(profiles).map(([id, profile]) => [id, {
-      manifest: profile.manifest,
-      manifestSha256: profile.manifestSha256,
-      features: profile.features,
-      documentedRouteCount: profile.documentedRouteCount,
-      availableRouteCount: profile.availableRouteCount,
-      documentedRoutes: profile.documentedRoutes,
-      availableRoutes: profile.availableRoutes,
-      unavailableRoutes: profile.unavailableRoutes
-    }])),
-    features: Object.fromEntries(Object.entries(documentedRouteFeatureRows).map(([id, documentedRoutes]) => [id, {
-      capabilityBit: featureBits[id],
-      documentedRouteCount: documentedRoutes.length,
-      availableRouteCount: availableRouteFeatureRows[id].length,
-      documentedRouteSetSha256: routeSetSha256(documentedRoutes),
-      availableRouteSetSha256: routeSetSha256(availableRouteFeatureRows[id]),
-      documentedRoutes,
-      availableRoutes: availableRouteFeatureRows[id],
-      unavailableRoutes: documentedRoutes.filter(({ stableId }) =>
-        !availableRouteFeatureRows[id].some((available) => available.stableId === stableId))
-    }])),
-    profiles: routeProfiles
+    handleFeatures: Object.fromEntries(
+      Object.entries(documentedFeatureRows).map(([id, documentedRoutes]) => [
+        id,
+        {
+          capabilityBit: featureBits[id],
+          documentedRouteCount: documentedRoutes.length,
+          availableRouteCount: availableFeatureRows[id].length,
+          documentedRouteSetSha256: routeSetSha256(documentedRoutes),
+          availableRouteSetSha256: routeSetSha256(availableFeatureRows[id]),
+          documentedRoutes,
+          availableRoutes: availableFeatureRows[id],
+          unavailableRoutes: documentedRoutes.filter(
+            ({ stableId }) => !availableFeatureRows[id].some((available) => available.stableId === stableId),
+          ),
+        },
+      ]),
+    ),
+    handleProfiles: Object.fromEntries(
+      Object.entries(profiles).map(([id, profile]) => [
+        id,
+        {
+          manifest: profile.manifest,
+          manifestSha256: profile.manifestSha256,
+          features: profile.features,
+          documentedRouteCount: profile.documentedRouteCount,
+          availableRouteCount: profile.availableRouteCount,
+          documentedRoutes: profile.documentedRoutes,
+          availableRoutes: profile.availableRoutes,
+          unavailableRoutes: profile.unavailableRoutes,
+        },
+      ]),
+    ),
+    features: Object.fromEntries(
+      Object.entries(documentedRouteFeatureRows).map(([id, documentedRoutes]) => [
+        id,
+        {
+          capabilityBit: featureBits[id],
+          documentedRouteCount: documentedRoutes.length,
+          availableRouteCount: availableRouteFeatureRows[id].length,
+          documentedRouteSetSha256: routeSetSha256(documentedRoutes),
+          availableRouteSetSha256: routeSetSha256(availableRouteFeatureRows[id]),
+          documentedRoutes,
+          availableRoutes: availableRouteFeatureRows[id],
+          unavailableRoutes: documentedRoutes.filter(
+            ({ stableId }) => !availableRouteFeatureRows[id].some((available) => available.stableId === stableId),
+          ),
+        },
+      ]),
+    ),
+    profiles: routeProfiles,
   };
 
   // Keep evidence reads live so every build pin is accounted for. Historical
   // derivations may withdraw a pin whose anchor did not exist yet; that is a
   // policy difference, not duplicate evidence or a reason to refuse the API.
-  assert(buildTexts.size + buildTexts.withdrawn.size === policy.buildEvidence.length,
-    "build evidence accounting drifted");
+  assert(
+    buildTexts.size + buildTexts.withdrawn.size === policy.buildEvidence.length,
+    "build evidence accounting drifted",
+  );
   return `${JSON.stringify(report, null, 2)}\n`;
 }
 

@@ -50,7 +50,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { serializeObject } from "../../packages/compiler/src/api-policy.mjs";
-import { parseLock, readLockKeys } from "./upstream-lock.mjs";
+import { readLockKeys } from "./upstream-lock.mjs";
 
 export { parseLock, readLockKeys } from "./upstream-lock.mjs";
 
@@ -90,7 +90,7 @@ export const artifactFamilies = Object.freeze({
     tools: ["hermesc", "shermes"],
     lockKeys: ["HERMES_URL", "HERMES_REV"],
     files: ["toolchains/hermes/build-host-compilers.sh", archivePackager],
-    json: []
+    json: [],
   },
   dehermc: {
     tagPrefix: "tools",
@@ -101,11 +101,7 @@ export const artifactFamilies = Object.freeze({
     // Nothing from upstream.lock. dehermc links the typescript-go compiler that
     // arrives with the pinned ttsc npm package; neither engine is involved.
     lockKeys: [],
-    files: [
-      "toolchains/go/build-dehermc.sh",
-      "packages/compiler/go.mod",
-      archivePackager
-    ],
+    files: ["toolchains/go/build-dehermc.sh", "packages/compiler/go.mod", archivePackager],
     // Every Go source below this root is linked into dehermc. Enumerating the
     // tree, rather than today's filenames, makes a newly added transform an
     // input automatically instead of silently publishing changed bytes under
@@ -117,8 +113,8 @@ export const artifactFamilies = Object.freeze({
     json: [
       { file: "packages/toolchains/host-compilers.json", fields: ["ttscVersion"] },
       // build-dehermc.sh stamps this value into the binary with -ldflags -X.
-      { file: "package.json", fields: ["version"] }
-    ]
+      { file: "package.json", fields: ["version"] },
+    ],
   },
   "native-artifacts": {
     tagPrefix: "libs",
@@ -146,21 +142,21 @@ export const artifactFamilies = Object.freeze({
       // The local macOS packaging path, which produces the artifact
       // `manage-native-artifacts.mjs record` pins.
       "scripts/package-defold-extension.sh",
-      archivePackager
+      archivePackager,
     ],
     // `sdk` is what every cross build compiles against and `targets` is the
     // matrix it compiles for. The rest of that file - `defoldRevision`,
     // `sourceSha256`, `source` - describes where the numbers came from, not
     // what the compiler does with them.
-    json: [{ file: "packages/toolchains/defold-bundle-targets.json", fields: ["sdk", "targets"] }]
-  }
+    json: [{ file: "packages/toolchains/defold-bundle-targets.json", fields: ["sdk", "targets"] }],
+  },
 });
 
 export const artifactFamilyNames = Object.freeze(Object.keys(artifactFamilies));
 
 /** The families whose artifacts are indexed by the user's host, not by a bundle target. */
 export const hostArtifactFamilyNames = Object.freeze(
-  artifactFamilyNames.filter((name) => Array.isArray(artifactFamilies[name].tools))
+  artifactFamilyNames.filter((name) => Array.isArray(artifactFamilies[name].tools)),
 );
 
 export function requireFamily(name) {
@@ -309,8 +305,8 @@ export async function familyRelease(name, options = {}) {
         "byte-identical archive. Extract with `tar -xzf`.",
       "",
       "Vendor with `node scripts/manage-native-artifacts.mjs pull` or " +
-        "`node scripts/manage-host-compilers.mjs pull`, which resolve assets by URL and need no gh."
-    ].join("\n")
+        "`node scripts/manage-host-compilers.mjs pull`, which resolve assets by URL and need no gh.",
+    ].join("\n"),
   };
 }
 
@@ -402,7 +398,7 @@ export async function publishedAssets(name, options = {}) {
         host,
         tools,
         files: tools.map((tool) => path.posix.basename(record.tools[tool].file)),
-        asset: familyArchiveName(name, host)
+        asset: familyArchiveName(name, host),
       });
     }
   } else {
@@ -411,12 +407,8 @@ export async function publishedAssets(name, options = {}) {
       if (!installableTarget(artifact)) continue;
       rows.push({
         target,
-        files: [
-          targetLibraryName(target, artifact),
-          targetDebugLibraryName(target, artifact),
-          "libhermesvm-config.h"
-        ],
-        asset: familyArchiveName(name, target)
+        files: [targetLibraryName(target, artifact), targetDebugLibraryName(target, artifact), "libhermesvm-config.h"],
+        asset: familyArchiveName(name, target),
       });
     }
   }

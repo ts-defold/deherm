@@ -37,7 +37,7 @@ export async function captureCpuProfile(options = {}) {
   const { session, target } = await discoverInspectorTarget({
     sessionFile,
     projectRoot,
-    replaceDebugger: options.replaceDebugger === true
+    replaceDebugger: options.replaceDebugger === true,
   });
   const websocketUrl = new URL(target.webSocketDebuggerUrl);
   if (options.replaceDebugger === true) websocketUrl.searchParams.set("replace", "1");
@@ -56,7 +56,7 @@ export async function captureCpuProfile(options = {}) {
       durationMs,
       sessionId: session.sessionId,
       nodeCount: result.profile.nodes.length,
-      sampleCount: result.profile.samples?.length ?? 0
+      sampleCount: result.profile.samples?.length ?? 0,
     };
   } finally {
     await client.close();
@@ -69,7 +69,7 @@ export async function captureHeapSnapshot(options = {}) {
   const { session, target } = await discoverInspectorTarget({
     sessionFile,
     projectRoot,
-    replaceDebugger: options.replaceDebugger === true
+    replaceDebugger: options.replaceDebugger === true,
   });
   const destination = path.resolve(options.output ?? defaultOutput(projectRoot, "heap"));
   const temporary = `${destination}.${process.pid}.${randomUUID()}.tmp`;
@@ -89,12 +89,20 @@ export async function captureHeapSnapshot(options = {}) {
       if (typeof chunk !== "string" || writeFailure) return;
       chunkCount += 1;
       bytes += Buffer.byteLength(chunk);
-      writes = writes.then(() => handle.write(chunk)).catch((error) => { writeFailure = error; });
+      writes = writes
+        .then(() => handle.write(chunk))
+        .catch((error) => {
+          writeFailure = error;
+        });
     });
-    await client.send("HeapProfiler.takeHeapSnapshot", {
-      reportProgress: true,
-      captureNumericValue: true
-    }, { timeoutMs: options.timeoutMs ?? 120_000 });
+    await client.send(
+      "HeapProfiler.takeHeapSnapshot",
+      {
+        reportProgress: true,
+        captureNumericValue: true,
+      },
+      { timeoutMs: options.timeoutMs ?? 120_000 },
+    );
     await writes;
     if (writeFailure) throw writeFailure;
     if (!chunkCount || !bytes) throw new Error("Hermes returned an empty heap snapshot");

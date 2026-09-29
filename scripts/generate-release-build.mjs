@@ -32,7 +32,7 @@ function parseArguments(argv) {
     project: null,
     platform: null,
     check: false,
-    force: false
+    force: false,
   };
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
@@ -62,7 +62,7 @@ export function resolveReleaseSelection(engineProfiles, options = {}, policyDefa
   }
   return {
     profile: options.profile ?? platformProfile ?? engineProfiles?.defaultProfileId ?? policyDefaultProfileId,
-    target: options.target ?? (options.platform?.endsWith("-web") ? "browserWasmHost" : "dynamicHermesJsi")
+    target: options.target ?? (options.platform?.endsWith("-web") ? "browserWasmHost" : "dynamicHermesJsi"),
   };
 }
 
@@ -84,23 +84,23 @@ export function selectedTargetArtifacts(target) {
   const common = [
     "packages/bindings/generated/symbol-map.json",
     "packages/sdk/src/generated/modules.ts",
-    "packages/abi/src/generated/layouts.ts"
+    "packages/abi/src/generated/layouts.ts",
   ];
   const targetFiles = {
     dynamicHermesJsi: [
       "defold/defold_hermes/include/defold_hermes/generated_modules.h",
       "defold/defold_hermes/include/defold_hermes/generated_jsi.hpp",
-      "defold/defold_hermes/src/generated_jsi.cpp"
+      "defold/defold_hermes/src/generated_jsi.cpp",
     ],
     staticHermesCAbi: [
       "defold/defold_hermes/include/defold_hermes/generated_modules.h",
-      "packages/static-hermes/src/generated/ffi.js"
+      "packages/static-hermes/src/generated/ffi.js",
     ],
     browserWasmHost: [
       "defold/defold_hermes/include/defold_hermes/generated_modules.h",
-      "defold/defold_hermes/lib/web/generated_modules.js"
+      "defold/defold_hermes/lib/web/generated_modules.js",
     ],
-    luaStack: ["defold/defold_hermes/include/defold_hermes/generated_modules.h"]
+    luaStack: ["defold/defold_hermes/include/defold_hermes/generated_modules.h"],
   };
   return [...common, ...(targetFiles[target] ?? [])].sort(compareCodeUnits);
 }
@@ -122,16 +122,29 @@ function defoldApiReachability(defoldUsage, emissionPlan, canonical) {
     emittedRouteCount: canonical.manifest.routeCount,
     canonicalPlanUnits: emittableSurface,
     reachableRouteIds: canonical.manifest.groups.flatMap(({ routeIds }) => routeIds).sort(compareCodeUnits),
-    evidence: defoldUsage.dynamicAccess === true
-      ? "Dynamic access was declared, so the complete profile-available surface is retained by design."
-      : "Every emitted route was resolved to a call site by the ttsc checker and confirmed present in the bundler's module graph."
+    evidence:
+      defoldUsage.dynamicAccess === true
+        ? "Dynamic access was declared, so the complete profile-available surface is retained by design."
+        : "Every emitted route was resolved to a call site by the ttsc checker and confirmed present in the bundler's module graph.",
   };
 }
 
-function releaseProjection({ cacheKey, target, profile, moduleUsage, defoldUsage, componentUsage, emissionPlan, artifacts, canonical, typedNative }) {
-  const symbolIds = moduleUsage.dynamicAccess === true
-    ? artifacts.symbols.map(({ id }) => id)
-    : moduleUsage.symbols.map((symbol) => typeof symbol === "string" ? symbol : symbol.id).sort(compareCodeUnits);
+function releaseProjection({
+  cacheKey,
+  target,
+  profile,
+  moduleUsage,
+  defoldUsage,
+  componentUsage,
+  emissionPlan,
+  artifacts,
+  canonical,
+  typedNative,
+}) {
+  const symbolIds =
+    moduleUsage.dynamicAccess === true
+      ? artifacts.symbols.map(({ id }) => id)
+      : moduleUsage.symbols.map((symbol) => (typeof symbol === "string" ? symbol : symbol.id)).sort(compareCodeUnits);
   const selectedArtifacts = selectedTargetArtifacts(target);
   return {
     schemaVersion: 1,
@@ -142,9 +155,10 @@ function releaseProjection({ cacheKey, target, profile, moduleUsage, defoldUsage
       status: "source-content-pruned",
       reachableSymbols: symbolIds,
       selectedArtifacts,
-      evidence: "The listed generated source files were emitted from the reachability-filtered module schema in this release directory.",
+      evidence:
+        "The listed generated source files were emitted from the reachability-filtered module schema in this release directory.",
       compilation: "not-run-by-this-step",
-      linkage: "consumer-build-required"
+      linkage: "consumer-build-required",
     },
     canonicalDefoldApi: {
       status: canonical.manifest.routeCount > 0 ? "family-source-emitted" : canonical.requirements.status,
@@ -155,48 +169,59 @@ function releaseProjection({ cacheKey, target, profile, moduleUsage, defoldUsage
       requirements: `canonical/${target}/requirements.json`,
       generatedGroups: canonical.manifest.groupCount,
       generatedRoutes: canonical.manifest.routeCount,
-      evidence: canonical.manifest.routeCount > 0
-        ? "Canonical script families were projected into generated C++ route tables and a release reachability gate."
-        : canonical.requirements.status === "blocked-by-canonical-plan"
-          ? "The canonical plan authorizes no emitted routes for this target; the generated registry rejects every route and requirements.json records the exact blocker authority."
-          : "Usage selected no canonical routes; the generated registry rejects every route.",
-      reachability: defoldApiReachability(defoldUsage, emissionPlan, canonical)
+      evidence:
+        canonical.manifest.routeCount > 0
+          ? "Canonical script families were projected into generated C++ route tables and a release reachability gate."
+          : canonical.requirements.status === "blocked-by-canonical-plan"
+            ? "The canonical plan authorizes no emitted routes for this target; the generated registry rejects every route and requirements.json records the exact blocker authority."
+            : "Usage selected no canonical routes; the generated registry rejects every route.",
+      reachability: defoldApiReachability(defoldUsage, emissionPlan, canonical),
     },
     typedNativeLane: {
-      status: typedNative.manifest.retainedSymbols.length > 0 ? "reachable-subset-emitted" : "no-reachable-typed-native-route",
+      status:
+        typedNative.manifest.retainedSymbols.length > 0
+          ? "reachable-subset-emitted"
+          : "no-reachable-typed-native-route",
       manifest: `canonical/${target}/typed-native/manifest.json`,
       source: `canonical/${target}/typed-native/script-vmath.ts`,
       surfaceRoutes: typedNative.manifest.surfaceRouteCount,
       retainedRoutes: typedNative.manifest.retainedRouteIds.length,
       retainedSymbols: typedNative.manifest.retainedSymbols,
       prunedSymbols: typedNative.manifest.prunedSymbols,
-      evidence: "The typed-native lane handed to `shermes -emit-c` was re-rendered from its own generated report over the reachable route set; pruned symbols have no declaration to emit.",
-      cEmission: "requires-shermes-emit-c-consumer"
+      evidence:
+        "The typed-native lane handed to `shermes -emit-c` was re-rendered from its own generated report over the reachable route set; pruned symbols have no declaration to emit.",
+      cEmission: "requires-shermes-emit-c-consumer",
     },
-    components: componentUsage ? {
-      status: target === "dynamicHermesJsi"
-        ? "compiler-registry-bundle-reachable"
-        : "bundle-generated-runtime-provider-unimplemented",
-      registry: componentUsage.registry,
-      componentOnlyBootstrap: componentUsage.componentOnlyBootstrap === true,
-      reachableComponentIds: componentUsage.components.map(({ componentId }) => componentId).sort(compareCodeUnits),
-      usage: "component-reachability.json",
-      evidence: target === "dynamicHermesJsi"
-        ? "Every discovered Defold component proxy has one mechanically imported registry entry; no per-component native wrapper is emitted."
-        : "The component registry bundle is target-neutral JavaScript, but this target has no verified component provider/bootstrap."
-    } : {
-      status: "no-component-usage-input",
-      reachableComponentIds: []
-    },
+    components: componentUsage
+      ? {
+          status:
+            target === "dynamicHermesJsi"
+              ? "compiler-registry-bundle-reachable"
+              : "bundle-generated-runtime-provider-unimplemented",
+          registry: componentUsage.registry,
+          componentOnlyBootstrap: componentUsage.componentOnlyBootstrap === true,
+          reachableComponentIds: componentUsage.components.map(({ componentId }) => componentId).sort(compareCodeUnits),
+          usage: "component-reachability.json",
+          evidence:
+            target === "dynamicHermesJsi"
+              ? "Every discovered Defold component proxy has one mechanically imported registry entry; no per-component native wrapper is emitted."
+              : "The component registry bundle is target-neutral JavaScript, but this target has no verified component provider/bootstrap.",
+        }
+      : {
+          status: "no-component-usage-input",
+          reachableComponentIds: [],
+        },
     evidenceBoundary: {
       generatedModuleSourcePruning: "proven-by-filtered-generation",
       generatedModuleCompilation: "not-claimed",
       generatedModuleLinkage: "not-claimed",
-      canonicalSourcePruning: canonical.manifest.routeCount > 0 ? "registration-dispatch-glue-proven" : "fail-closed-empty-registry",
-      canonicalLinkPruning: canonical.manifest.routeCount > 0 ? "generated-glue-cmake-consumer-available" : "no-authorized-routes-to-link",
+      canonicalSourcePruning:
+        canonical.manifest.routeCount > 0 ? "registration-dispatch-glue-proven" : "fail-closed-empty-registry",
+      canonicalLinkPruning:
+        canonical.manifest.routeCount > 0 ? "generated-glue-cmake-consumer-available" : "no-authorized-routes-to-link",
       canonicalImplementationObjectPruning: "not-claimed-existing-family-objects-remain-coarse-grained",
-      runtime: "not-claimed"
-    }
+      runtime: "not-claimed",
+    },
   };
 }
 
@@ -228,7 +253,10 @@ function checkedOutputPath(outputRoot, relativePath) {
 async function verifySentinelOutputs(options, sentinel) {
   const sizes = sentinel.outputSizes ?? {};
   const hashes = sentinel.outputSha256 ?? {};
-  if (JSON.stringify(Object.keys(sizes).sort(compareCodeUnits)) !== JSON.stringify(Object.keys(hashes).sort(compareCodeUnits))) {
+  if (
+    JSON.stringify(Object.keys(sizes).sort(compareCodeUnits)) !==
+    JSON.stringify(Object.keys(hashes).sort(compareCodeUnits))
+  ) {
     throw new Error("Release sentinel has no exact output hash inventory; regenerate it");
   }
   for (const relativePath of Object.keys(sizes).sort(compareCodeUnits)) {
@@ -244,7 +272,8 @@ async function replaceDirectory(staging, output) {
   let hadOutput = false;
   try {
     const information = await lstat(output);
-    if (!information.isDirectory() || information.isSymbolicLink()) throw new Error("Release output root must be a regular directory");
+    if (!information.isDirectory() || information.isSymbolicLink())
+      throw new Error("Release output root must be a regular directory");
     await rename(output, backup);
     hadOutput = true;
   } catch (error) {
@@ -269,12 +298,15 @@ export async function generateReleaseBuild(argv = []) {
     projectManifestSource = await readFile(resolve(options.project, ".deherm/manifest.json"));
     engineProfiles = JSON.parse(projectManifestSource).engineProfiles;
   }
-  const policyProfilesPath = resolve(repositoryRoot, "packages/bindings/generated/defold-script-route-availability-profiles.json");
+  const policyProfilesPath = resolve(
+    repositoryRoot,
+    "packages/bindings/generated/defold-script-route-availability-profiles.json",
+  );
   const policyProfileCatalog = await readJson(policyProfilesPath);
   const selection = resolveReleaseSelection(
     engineProfiles,
     options,
-    policyProfileCatalog.engineProfileSelection?.defaultProfileId
+    policyProfileCatalog.engineProfileSelection?.defaultProfileId,
   );
   if (!selection.profile) throw new Error("Defold policy has no default engine profile");
   options.target = selection.target;
@@ -288,9 +320,23 @@ export async function generateReleaseBuild(argv = []) {
     bindingsGenerator: resolve(repositoryRoot, "scripts/generate-bindings.mjs"),
     emissionGenerator: resolve(repositoryRoot, "scripts/generate-binding-emission-plan.mjs"),
     canonicalFamilyGenerator: resolve(repositoryRoot, "scripts/generate-canonical-family-sources.mjs"),
-    typedNativeLane: resolve(repositoryRoot, "packages/bindings/generated/defold-static-hermes-vmath.json")
+    typedNativeLane: resolve(repositoryRoot, "packages/bindings/generated/defold-static-hermes-vmath.json"),
   };
-  const [generatorSource, schemaSource, planSource, planSentinelSource, projectionSource, profilesSource, moduleUsageSource, defoldUsageSource, componentUsageSource, bindingsGeneratorSource, emissionGeneratorSource, canonicalFamilyGeneratorSource, typedNativeLaneSource] = await Promise.all([
+  const [
+    generatorSource,
+    schemaSource,
+    planSource,
+    planSentinelSource,
+    projectionSource,
+    profilesSource,
+    moduleUsageSource,
+    defoldUsageSource,
+    componentUsageSource,
+    bindingsGeneratorSource,
+    emissionGeneratorSource,
+    canonicalFamilyGeneratorSource,
+    typedNativeLaneSource,
+  ] = await Promise.all([
     readFile(scriptPath),
     readFile(paths.schema),
     readFile(paths.plan),
@@ -303,11 +349,15 @@ export async function generateReleaseBuild(argv = []) {
     readFile(paths.bindingsGenerator),
     readFile(paths.emissionGenerator),
     readFile(paths.canonicalFamilyGenerator),
-    readFile(paths.typedNativeLane)
+    readFile(paths.typedNativeLane),
   ]);
   const plan = JSON.parse(planSource);
   const planSentinel = JSON.parse(planSentinelSource);
-  if (plan.schemaVersion !== 2 || planSentinel.outputSha256 !== sha256(planSource) || planSentinel.planSha256 !== plan.planSha256) {
+  if (
+    plan.schemaVersion !== 2 ||
+    planSentinel.outputSha256 !== sha256(planSource) ||
+    planSentinel.planSha256 !== plan.planSha256
+  ) {
     throw new Error("Release build requires an authenticated canonical lowering-plan schema v2");
   }
   const keyInputs = {
@@ -326,23 +376,37 @@ export async function generateReleaseBuild(argv = []) {
     projectManifest: projectManifestSource ? sha256(projectManifestSource) : null,
     platform: options.platform,
     target: options.target,
-    profile: options.profile
+    profile: options.profile,
   };
   const cacheKey = sha256(JSON.stringify(keyInputs));
   const current = options.force ? null : await currentSentinel(options, cacheKey);
   if (current) {
     if (options.check) await verifySentinelOutputs(options, current);
-    return { action: "current", outputRoot: options.outputRoot, cacheKey, projection: await readJson(resolve(options.outputRoot, "defold-build-projection.json")) };
+    return {
+      action: "current",
+      outputRoot: options.outputRoot,
+      cacheKey,
+      projection: await readJson(resolve(options.outputRoot, "defold-build-projection.json")),
+    };
   }
   if (options.check) throw new Error(`Release build projection is stale or missing for key ${cacheKey}`);
 
   const schema = JSON.parse(schemaSource);
   const moduleUsage = JSON.parse(moduleUsageSource);
   const componentUsage = componentUsageSource ? JSON.parse(componentUsageSource) : null;
-  if (componentUsage && (componentUsage.schemaVersion !== 1 || componentUsage.registry !== "__defoldComponentsV1" ||
-      !Array.isArray(componentUsage.components) || componentUsage.components.some(({ componentId, source, contextKind, schemaFingerprint }) =>
-        typeof componentId !== "string" || typeof source !== "string" || typeof contextKind !== "string" ||
-        typeof schemaFingerprint !== "string"))) {
+  if (
+    componentUsage &&
+    (componentUsage.schemaVersion !== 1 ||
+      componentUsage.registry !== "__defoldComponentsV1" ||
+      !Array.isArray(componentUsage.components) ||
+      componentUsage.components.some(
+        ({ componentId, source, contextKind, schemaFingerprint }) =>
+          typeof componentId !== "string" ||
+          typeof source !== "string" ||
+          typeof contextKind !== "string" ||
+          typeof schemaFingerprint !== "string",
+      ))
+  ) {
     throw new Error("Release component usage is missing the authenticated compiler-registry shape");
   }
   const selectedSchema = filterSchemaForUsage(schema, moduleUsage);
@@ -358,8 +422,8 @@ export async function generateReleaseBuild(argv = []) {
       profile: options.profile,
       planFileSha256: sha256(planSource),
       scriptProjectionSha256: sha256(projectionSource),
-      profileCatalogSha256: sha256(profilesSource)
-    }
+      profileCatalogSha256: sha256(profilesSource),
+    },
   );
   const canonical = generateCanonicalFamilyArtifacts(plan, emissionPlan);
   // One reachable set drives every layer, including the tier-2 lane whose
@@ -368,7 +432,7 @@ export async function generateReleaseBuild(argv = []) {
     vmathReport: JSON.parse(typedNativeLaneSource),
     reachableRouteIds: canonical.manifest.groups.flatMap(({ routeIds }) => routeIds),
     dynamicAccess: defoldUsage.dynamicAccess === true,
-    target: options.target
+    target: options.target,
   });
   const symbolMap = JSON.parse(generatedArtifacts.get("packages/bindings/generated/symbol-map.json"));
   const projection = releaseProjection({
@@ -381,7 +445,7 @@ export async function generateReleaseBuild(argv = []) {
     emissionPlan,
     artifacts: symbolMap,
     canonical,
-    typedNative
+    typedNative,
   });
   const staging = `${options.outputRoot}.staging-${process.pid}`;
   await rm(staging, { recursive: true, force: true });
@@ -410,22 +474,36 @@ export async function generateReleaseBuild(argv = []) {
     await writeFile(resolve(staging, "component-reachability.json"), serializedComponentUsage);
   }
   const sentinelContents = {
-    "packages/bindings/generated/symbol-map.json": generatedArtifacts.get("packages/bindings/generated/symbol-map.json"),
+    "packages/bindings/generated/symbol-map.json": generatedArtifacts.get(
+      "packages/bindings/generated/symbol-map.json",
+    ),
     "defold-binding-emission-plan.json": serializedEmission,
     "defold-build-projection.json": serializedProjection,
     ...(serializedComponentUsage ? { "component-reachability.json": serializedComponentUsage } : {}),
     ...Object.fromEntries(canonical.artifacts),
     ...Object.fromEntries(typedNative.artifacts),
-    ...Object.fromEntries(selectedTargetArtifacts(options.target).filter((item) => item !== "packages/bindings/generated/symbol-map.json").map((item) => [item, generatedArtifacts.get(item)]))
+    ...Object.fromEntries(
+      selectedTargetArtifacts(options.target)
+        .filter((item) => item !== "packages/bindings/generated/symbol-map.json")
+        .map((item) => [item, generatedArtifacts.get(item)]),
+    ),
   };
-  const sentinelOutputs = Object.fromEntries(Object.entries(sentinelContents).map(([item, contents]) => [item, Buffer.byteLength(contents)]));
-  const sentinelHashes = Object.fromEntries(Object.entries(sentinelContents).map(([item, contents]) => [item, sha256(contents)]));
+  const sentinelOutputs = Object.fromEntries(
+    Object.entries(sentinelContents).map(([item, contents]) => [item, Buffer.byteLength(contents)]),
+  );
+  const sentinelHashes = Object.fromEntries(
+    Object.entries(sentinelContents).map(([item, contents]) => [item, sha256(contents)]),
+  );
   const sentinel = {
     schemaVersion: 1,
     cacheKey,
     keyInputs,
-    outputSizes: Object.fromEntries(Object.entries(sentinelOutputs).sort(([left], [right]) => compareCodeUnits(left, right))),
-    outputSha256: Object.fromEntries(Object.entries(sentinelHashes).sort(([left], [right]) => compareCodeUnits(left, right)))
+    outputSizes: Object.fromEntries(
+      Object.entries(sentinelOutputs).sort(([left], [right]) => compareCodeUnits(left, right)),
+    ),
+    outputSha256: Object.fromEntries(
+      Object.entries(sentinelHashes).sort(([left], [right]) => compareCodeUnits(left, right)),
+    ),
   };
   await writeFile(resolve(staging, "release-build.sentinel.json"), `${JSON.stringify(sentinel, null, 2)}\n`);
   await mkdir(dirname(options.outputRoot), { recursive: true });
@@ -435,7 +513,9 @@ export async function generateReleaseBuild(argv = []) {
 
 export async function run(argv = process.argv.slice(2)) {
   const result = await generateReleaseBuild(argv);
-  process.stdout.write(`${result.action === "current" ? "Current" : "Generated"} release build projection ${result.cacheKey} at ${result.outputRoot}.\n`);
+  process.stdout.write(
+    `${result.action === "current" ? "Current" : "Generated"} release build projection ${result.cacheKey} at ${result.outputRoot}.\n`,
+  );
   return result;
 }
 

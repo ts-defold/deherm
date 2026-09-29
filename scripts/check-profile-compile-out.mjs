@@ -34,20 +34,20 @@ export const telemetrySymbolMarkers = Object.freeze([
   "defold_hermes::script_handle_lowering::profileContractShape(",
   "defold_hermes::script_handle_lowering::profileRouteName(",
   "_deherm_dmsdk_borrowed_profile_name",
-  "_deherm_script_universal_profile_name"
+  "_deherm_script_universal_profile_name",
 ]);
 
 export const telemetryStringMarkers = Object.freeze([
   "deherm.lua-stack.",
   "deherm.c-abi-native.",
-  "deherm.typed-native."
+  "deherm.typed-native.",
 ]);
 
 /// Generated sources whose instrumentation must sit behind the compile switch.
 export const instrumentedGeneratedSources = Object.freeze([
   "defold/defold_hermes/src/generated_script_handle_lowering.cpp",
   "defold/defold_hermes/src/generated_dmsdk_borrowed_handle_runtime.cpp",
-  "defold/defold_hermes/src/generated_script_universal_value_capi.cpp"
+  "defold/defold_hermes/src/generated_script_universal_value_capi.cpp",
 ]);
 
 /// The build-time switch that travels with a packaged extension. Bob and
@@ -55,16 +55,12 @@ export const instrumentedGeneratedSources = Object.freeze([
 /// it as this header; a profiling run therefore leaves an instrumented header
 /// behind in the working tree, and nothing about the header's *shape* says
 /// which of the two it is.
-export const shippedBuildConfigPath =
-  "defold/defold_hermes/include/defold_hermes/generated_build_config.h";
+export const shippedBuildConfigPath = "defold/defold_hermes/include/defold_hermes/generated_build_config.h";
 
 /// Assembled extension manifests that must agree the shipped build is not the
 /// instrumented one. The header is the authority; these are the second opinion
 /// that names which project was assembled with telemetry on.
-export const assembledManifestGlobRoots = Object.freeze([
-  "defold",
-  "examples/war-battles-online/defold"
-]);
+export const assembledManifestGlobRoots = Object.freeze(["defold", "examples/war-battles-online/defold"]);
 
 /**
  * The shipped default is telemetry OFF, and it is checked against the
@@ -79,10 +75,11 @@ export async function checkShippedProfileDefault() {
     const instrumented = committed === renderBuildConfig(true);
     throw new Error(
       `${shippedBuildConfigPath} is not the shipped skeleton` +
-      (instrumented ? " - it is the instrumented header a --profile assembly leaves behind" : "") +
-      ". Restore it with:\n" +
-      "  node scripts/assemble-typed-native-extension.mjs --project <project> \n" +
-      "(without --profile), or delete the file and re-run that command.");
+        (instrumented ? " - it is the instrumented header a --profile assembly leaves behind" : "") +
+        ". Restore it with:\n" +
+        "  node scripts/assemble-typed-native-extension.mjs --project <project> \n" +
+        "(without --profile), or delete the file and re-run that command.",
+    );
   }
   const manifests = [];
   for (const root of assembledManifestGlobRoots) {
@@ -98,7 +95,8 @@ export async function checkShippedProfileDefault() {
     if (manifest.profile !== false) {
       throw new Error(
         `${manifestPath} records profile=${JSON.stringify(manifest.profile)}; ` +
-        "re-assemble that project without --profile before committing");
+          "re-assemble that project without --profile before committing",
+      );
     }
     manifests.push(manifestPath);
   }
@@ -110,19 +108,26 @@ function run(command, argv, options = {}) {
     cwd: repositoryRoot,
     encoding: "utf8",
     maxBuffer: 256 * 1024 * 1024,
-    ...options
+    ...options,
   });
 }
 
 export function configureAndBuild(buildDirectory, { profile }) {
-  run("cmake", [
-    "-S", ".",
-    "-B", buildDirectory,
-    "-G", "Ninja",
-    "-DCMAKE_BUILD_TYPE=Release",
-    "-DDEHERM_CANONICAL_RELEASE_DIR=",
-    `-DDEHERM_PROFILE=${profile ? "ON" : "OFF"}`
-  ], { stdio: "pipe" });
+  run(
+    "cmake",
+    [
+      "-S",
+      ".",
+      "-B",
+      buildDirectory,
+      "-G",
+      "Ninja",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DDEHERM_CANONICAL_RELEASE_DIR=",
+      `-DDEHERM_PROFILE=${profile ? "ON" : "OFF"}`,
+    ],
+    { stdio: "pipe" },
+  );
   run("cmake", ["--build", buildDirectory, "--target", benchmarkTarget, "--parallel"], { stdio: "pipe" });
   return resolve(repositoryRoot, buildDirectory, benchmarkTarget);
 }
@@ -131,7 +136,7 @@ export function inspect(binaryPath) {
   return {
     // -C demangles, so the C++ markers above are the readable names.
     symbols: run("nm", ["-C", "-a", binaryPath]),
-    strings: run("strings", ["-a", binaryPath])
+    strings: run("strings", ["-a", binaryPath]),
   };
 }
 
@@ -140,11 +145,7 @@ function contains(haystack, needle) {
 }
 
 /// Returns a machine-readable report. Throws on the first violated claim.
-export async function checkProfileCompileOut({
-  offBinary,
-  onBinary,
-  sources = true
-} = {}) {
+export async function checkProfileCompileOut({ offBinary, onBinary, sources = true } = {}) {
   const findings = { absentFromOffBuild: [], presentInOnBuild: [], guardedGeneratedSources: [] };
 
   if (sources) {
@@ -172,13 +173,17 @@ export async function checkProfileCompileOut({
     const on = inspect(onBinary);
     for (const marker of telemetrySymbolMarkers) {
       if (!contains(on.symbols, marker)) {
-        throw new Error(`DEHERM_PROFILE=ON build is missing telemetry symbol ${marker}; the compile-out proof would be vacuous`);
+        throw new Error(
+          `DEHERM_PROFILE=ON build is missing telemetry symbol ${marker}; the compile-out proof would be vacuous`,
+        );
       }
       findings.presentInOnBuild.push(marker);
     }
     for (const marker of telemetryStringMarkers) {
       if (!contains(on.strings, marker)) {
-        throw new Error(`DEHERM_PROFILE=ON build is missing telemetry string ${marker}; the compile-out proof would be vacuous`);
+        throw new Error(
+          `DEHERM_PROFILE=ON build is missing telemetry string ${marker}; the compile-out proof would be vacuous`,
+        );
       }
       findings.presentInOnBuild.push(marker);
     }
@@ -218,7 +223,8 @@ export async function run_(argv = process.argv.slice(2)) {
     const shipped = await checkShippedProfileDefault();
     process.stdout.write(
       `shipped DEHERM_PROFILE default verified: ${shipped.header} is the skeleton; ` +
-      `${shipped.manifests.length} assembled manifest(s) agree.\n`);
+        `${shipped.manifests.length} assembled manifest(s) agree.\n`,
+    );
     return shipped;
   }
   const offDirectory = argv.includes("--reuse") ? "build/native" : "build/profile-off";
@@ -228,7 +234,8 @@ export async function run_(argv = process.argv.slice(2)) {
   const findings = await checkProfileCompileOut({ offBinary, onBinary });
   process.stdout.write(
     `DEHERM_PROFILE compile-out verified: ${findings.absentFromOffBuild.length} markers absent with the switch off, ` +
-    `${findings.presentInOnBuild.length} present with it on; ${findings.offBytes} vs ${findings.onBytes} bytes.\n`);
+      `${findings.presentInOnBuild.length} present with it on; ${findings.offBytes} vs ${findings.onBytes} bytes.\n`,
+  );
   return findings;
 }
 

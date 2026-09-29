@@ -38,15 +38,14 @@ export async function readReleaseReachability(projectRoot) {
     developmentLinkedSurface: "complete",
     profile: manifest.profile ?? "development",
     surfaceRouteCount: manifest.surfaceRouteCount ?? 0,
-    reachableRouteCount: manifest.dynamicAccess === true
-      ? (manifest.surfaceRouteCount ?? 0)
-      : manifest.routeCount ?? 0,
+    reachableRouteCount:
+      manifest.dynamicAccess === true ? (manifest.surfaceRouteCount ?? 0) : (manifest.routeCount ?? 0),
     resolvedRouteCount: manifest.routeCount ?? 0,
     namespaces,
     dynamicAccess: manifest.dynamicAccess === true,
     declaredDynamicAccess: manifest.declaredDynamicAccess === true,
     dynamicSites: manifest.dynamicSites ?? [],
-    routes: (manifest.routes ?? []).map(({ id, member, namespace }) => ({ id, member, namespace }))
+    routes: (manifest.routes ?? []).map(({ id, member, namespace }) => ({ id, member, namespace })),
   };
 }
 
@@ -54,12 +53,16 @@ export async function readReleaseReachability(projectRoot) {
 export function describeReleaseReachability(reachability) {
   if (!reachability) return "release reachability: not yet computed";
   if (reachability.dynamicAccess && !reachability.declaredDynamicAccess) {
-    return `release reachability: undeclared dynamic access at ${reachability.dynamicSites.length} site(s); ` +
-      "a release build would refuse until it is declared";
+    return (
+      `release reachability: undeclared dynamic access at ${reachability.dynamicSites.length} site(s); ` +
+      "a release build would refuse until it is declared"
+    );
   }
   if (reachability.dynamicAccess) {
     return `release reachability: dynamic access declared; all ${reachability.surfaceRouteCount} routes retained`;
   }
-  return `release would retain ${reachability.reachableRouteCount}/${reachability.surfaceRouteCount} Defold routes ` +
-    `across ${reachability.namespaces.length} namespace(s); development links all of them`;
+  return (
+    `release would retain ${reachability.reachableRouteCount}/${reachability.surfaceRouteCount} Defold routes ` +
+    `across ${reachability.namespaces.length} namespace(s); development links all of them`
+  );
 }

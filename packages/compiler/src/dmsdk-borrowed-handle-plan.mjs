@@ -258,9 +258,7 @@ function matchingHandlePositions(declaration, handlePositions, targetWords) {
 
 function replaceResourceEffect(resourceArguments, positions, effect) {
   const selected = new Set(positions);
-  return resourceArguments.map((argument) =>
-    selected.has(argument.position) ? { ...argument, effect } : argument,
-  );
+  return resourceArguments.map((argument) => (selected.has(argument.position) ? { ...argument, effect } : argument));
 }
 
 function effectTaxonomy(classification, declaration, shape, handlePositions) {
@@ -278,15 +276,15 @@ function effectTaxonomy(classification, declaration, shape, handlePositions) {
       targetWords.length > 0 &&
       matches.length === 0 &&
       /recursive|child|descendant|hierarchy|bone/iu.test(`${declaration.name} ${prose}`);
-    const positions = matches.length > 0
-      ? [matches.at(-1)]
-      : !descendantTransition && (targetWords.length === 0 || handlePositions.length === 1)
-        ? [handlePositions.at(-1)]
-        : [];
+    const positions =
+      matches.length > 0
+        ? [matches.at(-1)]
+        : !descendantTransition && (targetWords.length === 0 || handlePositions.length === 1)
+          ? [handlePositions.at(-1)]
+          : [];
     resourceArguments = replaceResourceEffect(resourceArguments, positions.filter(Number.isInteger), "finalize");
     if (descendantTransition) nonLocalEffects.push("descendant-finalize");
-    if (/associated resources|all resources|owned/iu.test(prose))
-      nonLocalEffects.push("owned-descendants-finalized");
+    if (/associated resources|all resources|owned/iu.test(prose)) nonLocalEffects.push("owned-descendants-finalized");
   } else if (classification === "retained") {
     resourceArguments = replaceResourceEffect(resourceArguments, [matches.at(-1) ?? handlePositions.at(-1)], "retain");
   } else if (classification === "returned-to-owner") {
@@ -296,7 +294,11 @@ function effectTaxonomy(classification, declaration, shape, handlePositions) {
     // not promoted into an owned handle merely because the function says
     // Acquire (AcquireInstanceIndex returns a plain uint32_t pool index).
     if (shape.result.role === "scalar:void")
-      resourceArguments = replaceResourceEffect(resourceArguments, [matches.at(-1) ?? handlePositions.at(-1)], "retain");
+      resourceArguments = replaceResourceEffect(
+        resourceArguments,
+        [matches.at(-1) ?? handlePositions.at(-1)],
+        "retain",
+      );
   } else if (classification === "state-transition") {
     const connection = handlePositions.find((position) => parameterWords(declaration, position).has("connection"));
     if (connection !== undefined) {
@@ -518,16 +520,16 @@ export function buildDmSdkBorrowedHandlePlan({ ir, shapes, projection, policy, e
     const semantics =
       mode === "borrowed"
         ? {
-          transport: "provider-validated-u64-handle",
-          ownership: "borrowed-only-no-transfer-no-release",
-          lifetime: "synchronous-call-only",
-          thread: "provider-current-thread",
-          handleParameterPositions,
-          evidenceBasis:
-            admissionKind === "source-derived"
-              ? "cpp-ownership-effect-facts"
-              : DMSDK_BORROWED_HANDLE_ELIGIBILITY.trustDefault.id,
-        }
+            transport: "provider-validated-u64-handle",
+            ownership: "borrowed-only-no-transfer-no-release",
+            lifetime: "synchronous-call-only",
+            thread: "provider-current-thread",
+            handleParameterPositions,
+            evidenceBasis:
+              admissionKind === "source-derived"
+                ? "cpp-ownership-effect-facts"
+                : DMSDK_BORROWED_HANDLE_ELIGIBILITY.trustDefault.id,
+          }
         : mode === "lifecycle"
           ? {
               transport: "provider-validated-u64-handle",
@@ -741,7 +743,8 @@ function validatePlan(plan) {
       `${decision.declarationId}: borrowed-handle source proof is invalid`,
     );
     assert(
-      Array.isArray(decision.effect.taxonomy.resourceArguments) && Array.isArray(decision.effect.taxonomy.nonLocalEffects),
+      Array.isArray(decision.effect.taxonomy.resourceArguments) &&
+        Array.isArray(decision.effect.taxonomy.nonLocalEffects),
       `${decision.declarationId}: resource effects are invalid`,
     );
     const resourcePositions = new Set();

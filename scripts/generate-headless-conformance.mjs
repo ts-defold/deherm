@@ -28,7 +28,7 @@ import {
   FIXTURE_PROFILES,
   SCRATCH_REUSE_REPETITIONS,
   buildHeadlessConformancePlan,
-  loadHeadlessConformanceInputs
+  loadHeadlessConformanceInputs,
 } from "./lib/headless-conformance-plan.mjs";
 
 const root = new URL("../", import.meta.url);
@@ -92,7 +92,7 @@ function gameProject(plan) {
     "[deherm_conformance]",
     "case = none",
     `plan = ${plan.contractCount}`,
-    ""
+    "",
   ].join("\n");
 }
 
@@ -104,7 +104,7 @@ function instance(id, prototype) {
     "  position { x: 0.0 y: 0.0 z: 0.0 }",
     "  rotation { x: 0.0 y: 0.0 z: 0.0 w: 1.0 }",
     "  scale3 { x: 1.0 y: 1.0 z: 1.0 }",
-    "}"
+    "}",
   ].join("\n");
 }
 
@@ -138,13 +138,13 @@ function secondProbeGameObject() {
 // 3D backend, so a single compiled resource serves every physics profile.
 function collisionObject() {
   return [
-    "collision_shape: \"\"",
+    'collision_shape: ""',
     "type: COLLISION_OBJECT_TYPE_DYNAMIC",
     "mass: 1.0",
     "friction: 0.1",
     "restitution: 0.5",
-    "group: \"default\"",
-    "mask: \"default\"",
+    'group: "default"',
+    'mask: "default"',
     "embedded_collision_shape {",
     "  shapes {",
     "    shape_type: TYPE_BOX",
@@ -152,13 +152,13 @@ function collisionObject() {
     "    rotation { x: 0.0 y: 0.0 z: 0.0 w: 1.0 }",
     "    index: 0",
     "    count: 3",
-    "    id: \"box\"",
+    '    id: "box"',
     "  }",
     "  data: 8.0",
     "  data: 8.0",
     "  data: 8.0",
     "}",
-    ""
+    "",
   ].join("\n");
 }
 
@@ -187,7 +187,7 @@ function contractScript(slug) {
     "function final(self)",
     "    pcall(_deherm_.detach, self)",
     "end",
-    ""
+    "",
   ].join("\n");
 }
 
@@ -195,17 +195,13 @@ function contractScript(slug) {
 // proxies make every per-contract collection a build target without
 // instantiating any of them, so the driver can boot each one directly.
 function indexCollection() {
-  return [
-    'name: "conformance"',
-    "scale_along_z: 0",
-    instance("index", "/conformance/index.go"),
-    ""
-  ].join("\n");
+  return ['name: "conformance"', "scale_along_z: 0", instance("index", "/conformance/index.go"), ""].join("\n");
 }
 
 function indexGameObject(fixtures) {
-  return fixtures.map((fixture) =>
-    component(fixture.id, `/conformance/${fixture.id}.collectionproxy`)).join("\n") + "\n";
+  return (
+    fixtures.map((fixture) => component(fixture.id, `/conformance/${fixture.id}.collectionproxy`)).join("\n") + "\n"
+  );
 }
 
 function collectionProxy(slug) {
@@ -435,8 +431,7 @@ function renderArgument(spec, context) {
   if (spec.kind === "address") return `address(${ordinalExpression(spec.ordinal)})`;
   if (spec.kind === "value") return `${spec.accessor.join(".")}()`;
   if (spec.kind === "record") {
-    const fields = spec.fields.map((field) =>
-      `${literal(field.name)}: ${renderArgument(field.value, context)}`);
+    const fields = spec.fields.map((field) => `${literal(field.name)}: ${renderArgument(field.value, context)}`);
     return fields.length === 0 ? "{}" : `{ ${fields.join(", ")} }`;
   }
   return `resolve(${literal(spec.handleKind)}, ${ordinalExpression(spec.ordinal)})`;
@@ -462,9 +457,11 @@ function specImportRoots(spec, output = new Set()) {
  * thunk the harness evaluates at call time rather than at module load.
  */
 function renderExerciseArguments(args, context) {
-  const rendered = args.map((spec) => spec.kind === "literal" || spec.kind === "handle"
-    ? literal(spec)
-    : `{ kind: "constructed", make: (): unknown => (${renderArgument(spec, context)}) }`);
+  const rendered = args.map((spec) =>
+    spec.kind === "literal" || spec.kind === "handle"
+      ? literal(spec)
+      : `{ kind: "constructed", make: (): unknown => (${renderArgument(spec, context)}) }`,
+  );
   return `[${rendered.join(", ")}]`;
 }
 
@@ -472,10 +469,14 @@ function renderExerciseArguments(args, context) {
 // producer chain for one borrowed handle kind, so a consumer route never needs
 // a hand-authored scenario to obtain a live engine object.
 function providersModule(profile, providers) {
-  const roots = [...new Set(providers.flatMap((provider) => [
-    provider.accessor[0],
-    ...provider.arguments.flatMap((spec) => [...specImportRoots(spec)])
-  ]))].sort();
+  const roots = [
+    ...new Set(
+      providers.flatMap((provider) => [
+        provider.accessor[0],
+        ...provider.arguments.flatMap((spec) => [...specImportRoots(spec)]),
+      ]),
+    ),
+  ].sort();
   const addresses = profile.componentAddresses;
   const lines = [
     GENERATED_BANNER,
@@ -486,7 +487,7 @@ function providersModule(profile, providers) {
     `const ADDRESSES: readonly string[] = ${literal([...addresses])};`,
     "",
     "function address(ordinal: number): string {",
-    "  return ADDRESSES.length === 0 ? \"\" : (ADDRESSES[ordinal % ADDRESSES.length] as string);",
+    '  return ADDRESSES.length === 0 ? "" : (ADDRESSES[ordinal % ADDRESSES.length] as string);',
     "}",
     "",
     // Exported, because a nested handle - one inside a constructed record
@@ -506,7 +507,7 @@ function providersModule(profile, providers) {
     "  }",
     "}",
     "",
-    "export const providers: Readonly<Record<string, Provider>> = {"
+    "export const providers: Readonly<Record<string, Provider>> = {",
   ].filter((line) => line !== "");
 
   for (const provider of providers) {
@@ -530,10 +531,14 @@ function providersModule(profile, providers) {
 
 function contractModule(contract) {
   const addresses = profileById.get(contract.profile).componentAddresses;
-  const roots = [...new Set(contract.exercises.flatMap((exercise) => [
-    exercise.accessor[0],
-    ...exercise.arguments.flatMap((spec) => [...specImportRoots(spec)])
-  ]))].sort();
+  const roots = [
+    ...new Set(
+      contract.exercises.flatMap((exercise) => [
+        exercise.accessor[0],
+        ...exercise.arguments.flatMap((spec) => [...specImportRoots(spec)]),
+      ]),
+    ),
+  ].sort();
   const lines = [
     GENERATED_BANNER,
     `// Contract ${contract.id}: ${contract.routeCount} routes intern to this contract,`,
@@ -544,15 +549,15 @@ function contractModule(contract) {
     "PROVIDER_IMPORT_PLACEHOLDER",
     "",
     "export function runContract(report: Report): boolean {",
-    "  let ok = true;"
+    "  let ok = true;",
   ];
   for (const exercise of contract.exercises) {
     const accessor = exercise.accessor.join(".");
     // An exercise is the root of its own call, so an address ordinal resolves
     // to one of the profile's published addresses at generation time.
-    const args = exercise.arguments.map((spec) => spec.kind === "address"
-      ? { kind: "literal", value: addresses[spec.ordinal % addresses.length] ?? "" }
-      : spec);
+    const args = exercise.arguments.map((spec) =>
+      spec.kind === "address" ? { kind: "literal", value: addresses[spec.ordinal % addresses.length] ?? "" } : spec,
+    );
     lines.push("  ok = runExercise(report, {");
     lines.push(`    contract: ${literal(contract.id)},`);
     lines.push(`    route: ${literal(exercise.routeId)},`);
@@ -585,7 +590,8 @@ function contractModule(contract) {
   const providerImports = /\bresolve\(/.test(body) ? "providers, resolve" : "providers";
   return body.replace(
     "PROVIDER_IMPORT_PLACEHOLDER",
-    `import { ${providerImports} } from "../${providerModuleName(contract.profile)}";`);
+    `import { ${providerImports} } from "../${providerModuleName(contract.profile)}";`,
+  );
 }
 
 function registryModule(fixtures) {
@@ -712,7 +718,7 @@ export async function writeHeadlessConformanceHarness(plan) {
     projectDirectory: projectBase,
     entryPoint: path.join(typescriptBase, "main.ts"),
     fileCount: typescript.size + content.size,
-    fixtureCount: fixtures.length
+    fixtureCount: fixtures.length,
   };
 }
 
@@ -735,7 +741,7 @@ async function main(argv = process.argv.slice(2)) {
     }
     console.log(
       `Verified headless conformance plan: ${plan.reachableContractCount} reachable and ` +
-      `${plan.unreachableContractCount} unreachable of ${plan.contractCount} script contracts.`
+        `${plan.unreachableContractCount} unreachable of ${plan.contractCount} script contracts.`,
     );
     return;
   }
@@ -744,9 +750,9 @@ async function main(argv = process.argv.slice(2)) {
   const written = await writeHeadlessConformanceHarness(plan);
   console.log(
     `Generated headless conformance harness: ${plan.reachableContractCount} reachable and ` +
-    `${plan.unreachableContractCount} unreachable of ${plan.contractCount} script contracts, ` +
-    `${plan.exercisedRouteCount} exercised routes in ${plan.exerciseCount} exercises, ` +
-    `${written.fileCount} project files.`
+      `${plan.unreachableContractCount} unreachable of ${plan.contractCount} script contracts, ` +
+      `${plan.exercisedRouteCount} exercised routes in ${plan.exerciseCount} exercises, ` +
+      `${written.fileCount} project files.`,
   );
 }
 

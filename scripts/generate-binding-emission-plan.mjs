@@ -24,7 +24,7 @@ function parseArguments(argv) {
     output: resolve(repositoryRoot, "build/profiles/release/defold-binding-emission-plan.json"),
     target: "dynamicHermesJsi",
     profile: null,
-    check: false
+    check: false,
   };
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
@@ -47,7 +47,7 @@ function usageIds(usage, known) {
   if (usage.schemaVersion !== 1 || !Array.isArray(usage.symbols)) {
     throw new Error("Usage must be a version 1 manifest with a symbols array");
   }
-  const ids = usage.symbols.map((value) => typeof value === "string" ? value : value?.id);
+  const ids = usage.symbols.map((value) => (typeof value === "string" ? value : value?.id));
   if (ids.some((id) => typeof id !== "string")) throw new Error("Every usage symbol needs a string id");
   if (new Set(ids).size !== ids.length) throw new Error("Usage manifest contains duplicate symbols");
   for (const id of ids) if (!known.has(id)) throw new Error(`Usage names unknown binding '${id}'`);
@@ -56,7 +56,9 @@ function usageIds(usage, known) {
 
 function validatePlanIdentity(plan) {
   if (plan?.schemaVersion !== 2) {
-    throw new Error(`Binding emission requires canonical lowering-plan schema v2, got ${plan?.schemaVersion ?? "missing"}`);
+    throw new Error(
+      `Binding emission requires canonical lowering-plan schema v2, got ${plan?.schemaVersion ?? "missing"}`,
+    );
   }
   if (!plan || typeof plan !== "object" || typeof plan.planSha256 !== "string") {
     throw new Error("Lowering plan has no internal identity");
@@ -66,26 +68,33 @@ function validatePlanIdentity(plan) {
 }
 
 function validateProfileAuthority(scriptProjection, profileCatalog) {
-  const projectionCatalogs = new Set(scriptProjection.rows
-    .map((row) => row.availability?.catalogSha256)
-    .filter(Boolean));
+  const projectionCatalogs = new Set(
+    scriptProjection.rows.map((row) => row.availability?.catalogSha256).filter(Boolean),
+  );
   if (projectionCatalogs.size !== 1 || !projectionCatalogs.has(profileCatalog.catalogSha256)) {
     throw new Error("Script projection and profile catalog authorities differ");
   }
   const catalogMaterial = {
     defoldRevision: profileCatalog.defoldRevision,
-    profiles: Object.fromEntries(Object.entries(profileCatalog.profiles ?? {}).map(([profileId, profile]) => [profileId, {
-      features: profile.features,
-      capabilityBits: profile.runtimeHandshake?.capabilityBits,
-      routeSetSha256: profile.runtimeHandshake?.routeSetSha256
-    }]))
+    profiles: Object.fromEntries(
+      Object.entries(profileCatalog.profiles ?? {}).map(([profileId, profile]) => [
+        profileId,
+        {
+          features: profile.features,
+          capabilityBits: profile.runtimeHandshake?.capabilityBits,
+          routeSetSha256: profile.runtimeHandshake?.routeSetSha256,
+        },
+      ]),
+    ),
   };
   if (sha256(JSON.stringify(catalogMaterial)) !== profileCatalog.catalogSha256) {
     throw new Error("Defold profile catalog internal digest is invalid");
   }
   for (const [profileId, profile] of Object.entries(profileCatalog.profiles ?? {})) {
-    if (profile.runtimeHandshake?.catalogSha256 !== profileCatalog.catalogSha256 ||
-        profile.runtimeHandshake?.profileId !== profileId) {
+    if (
+      profile.runtimeHandshake?.catalogSha256 !== profileCatalog.catalogSha256 ||
+      profile.runtimeHandshake?.profileId !== profileId
+    ) {
       throw new Error(`Defold profile '${profileId}' has an invalid runtime authority`);
     }
   }
@@ -126,7 +135,7 @@ function internSelected(sourceValues, indices) {
   return {
     values: selected.map((sourceIndex) => sourceValues[sourceIndex]),
     sourceIndices: selected,
-    remap
+    remap,
   };
 }
 
@@ -137,7 +146,10 @@ export function generateBindingEmissionPlan(plan, scriptProjection, profileCatal
   if (plan.inputCanonicalHashes?.scriptProjection !== sha256(JSON.stringify(scriptProjection))) {
     throw new Error("Script projection does not match the lowering plan authority");
   }
-  if (plan.defoldRevision !== scriptProjection.defoldRevision || plan.defoldRevision !== profileCatalog.defoldRevision) {
+  if (
+    plan.defoldRevision !== scriptProjection.defoldRevision ||
+    plan.defoldRevision !== profileCatalog.defoldRevision
+  ) {
     throw new Error("Lowering plan, script projection, and profile catalog revisions differ");
   }
   validateProfileAuthority(scriptProjection, profileCatalog);
@@ -156,7 +168,7 @@ export function generateBindingEmissionPlan(plan, scriptProjection, profileCatal
     const detail = (usage.derivation.crossCheck.disagreements ?? []).join("; ");
     throw new Error(
       `Defold API usage failed its module-graph cross-check (${usage.derivation.crossCheck.status})` +
-      `${detail ? `: ${detail}` : ""}`
+        `${detail ? `: ${detail}` : ""}`,
     );
   }
   // Dynamic access is a declaration, not an inference. Retaining the complete
@@ -168,9 +180,9 @@ export function generateBindingEmissionPlan(plan, scriptProjection, profileCatal
       .join("\n");
     throw new Error(
       "Defold API usage reaches the surface dynamically without declaring it, so a release build " +
-      "would silently retain every route.\n" +
-      "Set \"dynamicApiAccess\": true on the deherm ttsc plugin entry to opt into the complete surface.\n" +
-      (sites || "  (the deriving compiler recorded no site)")
+        "would silently retain every route.\n" +
+        'Set "dynamicApiAccess": true on the deherm ttsc plugin entry to opt into the complete surface.\n' +
+        (sites || "  (the deriving compiler recorded no site)"),
     );
   }
   const explicitIds = usageIds(usage, byId);
@@ -178,7 +190,7 @@ export function generateBindingEmissionPlan(plan, scriptProjection, profileCatal
   const normalizedUsage = {
     schemaVersion: 1,
     dynamicAccess: usage.dynamicAccess === true,
-    symbols: usage.dynamicAccess === true ? [] : explicitIds
+    symbols: usage.dynamicAccess === true ? [] : explicitIds,
   };
   const sourceScriptRows = new Map(scriptProjection.rows.map((row, index) => [index, row]));
   const selected = [];
@@ -200,10 +212,12 @@ export function generateBindingEmissionPlan(plan, scriptProjection, profileCatal
         id,
         selection: backend.selection,
         blockers: plan.tables.blockerSets[backend.blockerSet],
-        ...(tolerated ? { toleratedForExplicitUsage: tolerated } : {})
+        ...(tolerated ? { toleratedForExplicitUsage: tolerated } : {}),
       });
       if (usage.dynamicAccess !== true && !tolerated) {
-        throw new Error(`${id} cannot emit for ${target}: ${backend.selection} (${plan.tables.blockerSets[backend.blockerSet].join(", ")})`);
+        throw new Error(
+          `${id} cannot emit for ${target}: ${backend.selection} (${plan.tables.blockerSets[backend.blockerSet].join(", ")})`,
+        );
       }
       continue;
     }
@@ -227,7 +241,7 @@ export function generateBindingEmissionPlan(plan, scriptProjection, profileCatal
     marshallingProgram: programs.remap.get(backend.marshallingProgram),
     blockerSet: blockers.remap.get(backend.blockerSet),
     resolvedTokenSet: resolved.remap.get(backend.resolvedTokenSet),
-    unresolvedTokenSet: unresolved.remap.get(backend.unresolvedTokenSet)
+    unresolvedTokenSet: unresolved.remap.get(backend.unresolvedTokenSet),
   }));
   const familyCounts = {};
   for (const unit of units) familyCounts[unit.loweringFamily] = (familyCounts[unit.loweringFamily] ?? 0) + 1;
@@ -239,7 +253,7 @@ export function generateBindingEmissionPlan(plan, scriptProjection, profileCatal
       planFileSha256: options.planFileSha256 ?? sha256(JSON.stringify(plan)),
       scriptProjectionSha256: options.scriptProjectionSha256 ?? sha256(JSON.stringify(scriptProjection)),
       profileCatalogSha256: options.profileCatalogSha256 ?? sha256(JSON.stringify(profileCatalog)),
-      profileCatalogIdentity: profileCatalog.catalogSha256
+      profileCatalogIdentity: profileCatalog.catalogSha256,
     },
     target,
     profileId,
@@ -254,7 +268,7 @@ export function generateBindingEmissionPlan(plan, scriptProjection, profileCatal
       routeIndexSha256: usage.derivation?.routeIndexSha256 ?? null,
       crossCheck: usage.derivation?.crossCheck?.status ?? "not-performed",
       declaredDynamicAccess: usage.derivation?.declaredDynamicAccess === true,
-      dynamicSiteCount: usage.derivation?.dynamicSites?.length ?? 0
+      dynamicSiteCount: usage.derivation?.dynamicSites?.length ?? 0,
     },
     evidenceBoundary: {
       selection: "Bindings are selected for a later emitter; this file does not contain emitted source.",
@@ -263,7 +277,7 @@ export function generateBindingEmissionPlan(plan, scriptProjection, profileCatal
       linkage: "not-claimed",
       runtime: "not-claimed",
       allocation: "not-claimed",
-      conformance: "not-claimed"
+      conformance: "not-claimed",
     },
     treeShaking: {
       totalPlanUnits: plan.coverage.units,
@@ -271,17 +285,20 @@ export function generateBindingEmissionPlan(plan, scriptProjection, profileCatal
       notSelectedUnits: plan.coverage.units - units.length,
       retainedMarshallingPrograms: programs.values.length,
       totalMarshallingPrograms: plan.tables.marshallingPrograms.length,
-      policy: "Only explicitly reachable, profile-available units with an emit disposition are retained. Shared tables are compacted to referenced entries."
+      policy:
+        "Only explicitly reachable, profile-available units with an emit disposition are retained. Shared tables are compacted to referenced entries.",
     },
-    familyCounts: Object.fromEntries(Object.entries(familyCounts).sort(([left], [right]) => compareCodeUnits(left, right))),
+    familyCounts: Object.fromEntries(
+      Object.entries(familyCounts).sort(([left], [right]) => compareCodeUnits(left, right)),
+    ),
     diagnostics,
     tables: {
       marshallingPrograms: programs.values,
       blockerSets: blockers.values,
       resolvedTokenSets: resolved.values,
-      unresolvedTokenSets: unresolved.values
+      unresolvedTokenSets: unresolved.values,
     },
-    units
+    units,
   };
   return { ...body, emissionPlanSha256: sha256(JSON.stringify(body)) };
 }
@@ -294,14 +311,19 @@ export async function run(argv = process.argv.slice(2)) {
     readFile(resolve(repositoryRoot, "packages/compiler/src/generate-binding-lowering-plan.mjs"), "utf8"),
     readFile(options.scriptProjection, "utf8"),
     readFile(options.profiles, "utf8"),
-    readFile(options.usage, "utf8")
+    readFile(options.usage, "utf8"),
   ]);
   const plan = JSON.parse(planText);
   const sentinel = JSON.parse(sentinelText);
-  if (sentinel.schemaVersion !== 1 || sentinel.generator !== "packages/compiler/src/generate-binding-lowering-plan.mjs" ||
-      sentinel.generatorSha256 !== sha256(loweringGeneratorText) || sentinel.outputSha256 !== sha256(planText) ||
-      sentinel.outputBytes !== Buffer.byteLength(planText) || sentinel.planSha256 !== plan.planSha256 ||
-      JSON.stringify(sentinel.inputHashes) !== JSON.stringify(plan.inputHashes)) {
+  if (
+    sentinel.schemaVersion !== 1 ||
+    sentinel.generator !== "packages/compiler/src/generate-binding-lowering-plan.mjs" ||
+    sentinel.generatorSha256 !== sha256(loweringGeneratorText) ||
+    sentinel.outputSha256 !== sha256(planText) ||
+    sentinel.outputBytes !== Buffer.byteLength(planText) ||
+    sentinel.planSha256 !== plan.planSha256 ||
+    JSON.stringify(sentinel.inputHashes) !== JSON.stringify(plan.inputHashes)
+  ) {
     throw new Error("Canonical lowering-plan sentinel is stale or does not authenticate the selected plan");
   }
   if (plan.inputHashes?.scriptProjection !== sha256(scriptText)) {
@@ -316,17 +338,20 @@ export async function run(argv = process.argv.slice(2)) {
       ...options,
       planFileSha256: sha256(planText),
       scriptProjectionSha256: sha256(scriptText),
-      profileCatalogSha256: sha256(profilesText)
-    }
+      profileCatalogSha256: sha256(profilesText),
+    },
   );
   const serialized = `${JSON.stringify(report, null, 2)}\n`;
   if (options.check) {
-    if (await readFile(options.output, "utf8") !== serialized) throw new Error(`${options.output} is stale; regenerate binding emission plan`);
+    if ((await readFile(options.output, "utf8")) !== serialized)
+      throw new Error(`${options.output} is stale; regenerate binding emission plan`);
   } else {
     await mkdir(dirname(options.output), { recursive: true });
     await writeFile(options.output, serialized);
   }
-  process.stdout.write(`${options.check ? "Verified" : "Generated"} ${report.treeShaking.selectedForEmissionUnits}/${report.treeShaking.totalPlanUnits} units selected for ${report.target}/${report.profileId}.\n`);
+  process.stdout.write(
+    `${options.check ? "Verified" : "Generated"} ${report.treeShaking.selectedForEmissionUnits}/${report.treeShaking.totalPlanUnits} units selected for ${report.target}/${report.profileId}.\n`,
+  );
   return report;
 }
 

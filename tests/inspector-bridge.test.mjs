@@ -12,7 +12,7 @@ import {
   createInspectorSession,
   readInspectorSession,
   removeOwnedInspectorSession,
-  writeInspectorSession
+  writeInspectorSession,
 } from "../packages/cli/src/dev/inspector-session.mjs";
 
 function event(target, name) {
@@ -75,23 +75,28 @@ test("reserved native component snapshots update dev state and never reach CDP",
     sampledAt: 100,
     complete: true,
     omitted: { instances: 0, properties: 0 },
-    instances: [{
-      instanceId: { slot: 2, generation: 4 },
-      componentId: "player",
-      schemaFingerprint: "abc",
-      contextKind: "script",
-      properties: [{ name: "health", value: 100 }]
-    }]
+    instances: [
+      {
+        instanceId: { slot: 2, generation: 4 },
+        componentId: "player",
+        schemaFingerprint: "abc",
+        contextKind: "script",
+        properties: [{ name: "health", value: 100 }],
+      },
+    ],
   };
   const response = new Promise((resolve) => frontend.once("message", (data) => resolve(data.toString("utf8"))));
   engine.write(`${JSON.stringify({ channel: "deherm-dev-v1", payload })}\n`);
   engine.write('{"id":9,"result":{}}\n');
   assert.equal(await response, '{"id":9,"result":{}}');
-  assert.deepEqual(events.find(({ type }) => type === "component-snapshot"), {
-    ...payload,
-    id: "local-engine",
-    connectionEpoch: 1
-  });
+  assert.deepEqual(
+    events.find(({ type }) => type === "component-snapshot"),
+    {
+      ...payload,
+      id: "local-engine",
+      connectionEpoch: 1,
+    },
+  );
 
   frontend.close();
   engine.destroy();
@@ -102,11 +107,13 @@ test("a frontend command before the engine connects receives a correlated CDP er
   const bridge = await createInspectorBridge();
   const frontend = new WebSocket(bridge.websocketUrl);
   await event(frontend, "open");
-  const response = new Promise((resolve) => frontend.once("message", (data) => resolve(JSON.parse(data.toString("utf8")))));
+  const response = new Promise((resolve) =>
+    frontend.once("message", (data) => resolve(JSON.parse(data.toString("utf8")))),
+  );
   frontend.send('{"id":27,"method":"Runtime.enable"}');
   assert.deepEqual(await response, {
     id: 27,
-    error: { code: -32000, message: "Defold Hermes runtime is not connected" }
+    error: { code: -32000, message: "Defold Hermes runtime is not connected" },
   });
   frontend.close();
   await bridge.close();
@@ -199,12 +206,12 @@ test("dev state endpoint requires its descriptor token and supports ETag revalid
     modelVersion: 4,
     targetId: "local-engine",
     telemetry: { componentInstances: 1 },
-    componentSnapshot: { schemaVersion: 1, type: "component-snapshot", instances: [] }
+    componentSnapshot: { schemaVersion: 1, type: "component-snapshot", instances: [] },
   };
   const bridge = await createInspectorBridge({
     projectRoot: root,
     sessionFile,
-    getDevState: () => state
+    getDevState: () => state,
   });
   const session = await readInspectorSession(sessionFile);
   try {
@@ -214,7 +221,7 @@ test("dev state endpoint requires its descriptor token and supports ETag revalid
     assert.equal(unauthorized.headers.get("cache-control"), "no-store");
 
     const authorized = await fetch(session.stateUrl, {
-      headers: { authorization: `Bearer ${session.authToken}` }
+      headers: { authorization: `Bearer ${session.authToken}` },
     });
     assert.equal(authorized.status, 200);
     assert.equal(authorized.headers.get("cache-control"), "no-store");
@@ -228,8 +235,8 @@ test("dev state endpoint requires its descriptor token and supports ETag revalid
     const unchanged = await fetch(session.stateUrl, {
       headers: {
         authorization: `Bearer ${session.authToken}`,
-        "if-none-match": etag
-      }
+        "if-none-match": etag,
+      },
     });
     assert.equal(unchanged.status, 304);
     assert.equal(unchanged.headers.get("cache-control"), "no-store");
@@ -247,7 +254,7 @@ test("owned-session cleanup preserves a different or malformed descriptor", asyn
     enginePort: 9000,
     devtoolsPort: 9001,
     devtoolsUrl: "http://127.0.0.1:9001",
-    websocketUrl: "ws://127.0.0.1:9001/devtools/page/deherm"
+    websocketUrl: "ws://127.0.0.1:9001/devtools/page/deherm",
   });
   await writeInspectorSession(sessionFile, replacement);
   assert.equal(await removeOwnedInspectorSession(sessionFile, "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), false);
@@ -257,27 +264,35 @@ test("owned-session cleanup preserves a different or malformed descriptor", asyn
   await writeFile(sessionFile, malformed, { mode: 0o600 });
   await assert.rejects(
     () => removeOwnedInspectorSession(sessionFile, replacement.sessionId),
-    /Could not read inspector session/
+    /Could not read inspector session/,
   );
   assert.equal(await readFile(sessionFile, "utf8"), malformed);
 });
 
 test("session descriptors reject non-loopback debugger endpoints", () => {
-  assert.throws(() => createInspectorSession({
-    projectRoot: process.cwd(),
-    enginePort: 9000,
-    devtoolsPort: 9001,
-    devtoolsUrl: "http://example.com:9001",
-    websocketUrl: "ws://example.com:9001/devtools/page/deherm"
-  }), /loopback-only/);
-  assert.throws(() => createInspectorSession({
-    sessionId: "------------------------------------",
-    projectRoot: process.cwd(),
-    enginePort: 9000,
-    devtoolsPort: 9001,
-    devtoolsUrl: "http://127.0.0.1:9001",
-    websocketUrl: "ws://127.0.0.1:9001/devtools/page/deherm"
-  }), /valid sessionId/);
+  assert.throws(
+    () =>
+      createInspectorSession({
+        projectRoot: process.cwd(),
+        enginePort: 9000,
+        devtoolsPort: 9001,
+        devtoolsUrl: "http://example.com:9001",
+        websocketUrl: "ws://example.com:9001/devtools/page/deherm",
+      }),
+    /loopback-only/,
+  );
+  assert.throws(
+    () =>
+      createInspectorSession({
+        sessionId: "------------------------------------",
+        projectRoot: process.cwd(),
+        enginePort: 9000,
+        devtoolsPort: 9001,
+        devtoolsUrl: "http://127.0.0.1:9001",
+        websocketUrl: "ws://127.0.0.1:9001/devtools/page/deherm",
+      }),
+    /valid sessionId/,
+  );
 });
 
 test("session descriptors carry project-owned maps and runtime-specific bundle URLs", () => {
@@ -289,17 +304,25 @@ test("session descriptors carry project-owned maps and runtime-specific bundle U
     devtoolsUrl: "http://127.0.0.1:9001",
     websocketUrl: "ws://127.0.0.1:9001/devtools/page/deherm",
     bundleUrl: "deherm:///deherm/app.dehermc",
-    sourceMapFile: path.join(projectRoot, ".deherm", "dev", "app.dehermc.map")
+    sourceMapFile: path.join(projectRoot, ".deherm", "dev", "app.dehermc.map"),
   });
   assert.equal(valid.bundleUrl, "deherm:///deherm/app.dehermc");
-  assert.throws(() => createInspectorSession({
-    ...valid,
-    sourceMapFile: path.resolve(projectRoot, "..", "outside.map")
-  }), /must be inside projectRoot/);
-  assert.throws(() => createInspectorSession({
-    ...valid,
-    bundleUrl: "https://example.com/app.js"
-  }), /must use deherm:/);
+  assert.throws(
+    () =>
+      createInspectorSession({
+        ...valid,
+        sourceMapFile: path.resolve(projectRoot, "..", "outside.map"),
+      }),
+    /must be inside projectRoot/,
+  );
+  assert.throws(
+    () =>
+      createInspectorSession({
+        ...valid,
+        bundleUrl: "https://example.com/app.js",
+      }),
+    /must use deherm:/,
+  );
 
   const browser = createInspectorSession({
     runtime: "browser",
@@ -308,7 +331,7 @@ test("session descriptors carry project-owned maps and runtime-specific bundle U
     devtoolsUrl: "http://127.0.0.1:9222",
     websocketUrl: "ws://127.0.0.1:9222/devtools/page/browser",
     bundleUrl: "defold-hermes://app.js",
-    sourceMapFile: path.join(projectRoot, ".deherm", "dev", "app.dehermc.map")
+    sourceMapFile: path.join(projectRoot, ".deherm", "dev", "app.dehermc.map"),
   });
   assert.equal(browser.enginePort, undefined);
   assert.equal(browser.runtime, "browser");
@@ -322,12 +345,14 @@ test("a failed session publication releases both reserved bridge ports", async (
   const sessionFile = path.join(root, "inspector.json");
   await mkdir(sessionFile);
   const [enginePort, devtoolsPort] = await reservePorts(2);
-  await assert.rejects(() => createInspectorBridge({
-    projectRoot: root,
-    sessionFile,
-    enginePort,
-    devtoolsPort
-  }));
+  await assert.rejects(() =>
+    createInspectorBridge({
+      projectRoot: root,
+      sessionFile,
+      enginePort,
+      devtoolsPort,
+    }),
+  );
   const replacement = await createInspectorBridge({ enginePort, devtoolsPort });
   await replacement.close();
 });

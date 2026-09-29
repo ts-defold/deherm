@@ -21,7 +21,7 @@
 //      because a check that never fails proves nothing.
 
 import { createServer } from "node:http";
-import { mkdtemp, readFile, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -46,12 +46,14 @@ function serve(directory) {
     }
     try {
       const bytes = await readFile(path.join(directory, relative));
-      response.writeHead(200, {
-        "content-type": relative.endsWith(".json") ? "application/json" : "text/html",
-        // Objects are immutable: a change produces a different path rather than
-        // a new version of one.
-        "cache-control": /\/(object|policy)\//.test(relative) ? "public, max-age=31536000, immutable" : "no-cache"
-      }).end(bytes);
+      response
+        .writeHead(200, {
+          "content-type": relative.endsWith(".json") ? "application/json" : "text/html",
+          // Objects are immutable: a change produces a different path rather than
+          // a new version of one.
+          "cache-control": /\/(object|policy)\//.test(relative) ? "public, max-age=31536000, immutable" : "no-cache",
+        })
+        .end(bytes);
     } catch {
       response.writeHead(404).end();
     }
@@ -61,20 +63,23 @@ function serve(directory) {
     // error instead of leaving the promise unsettled (which Node reports only
     // as exit code 13 and hides the cause).
     server.once("error", reject);
-    server.listen(0, "127.0.0.1", () => resolve({
-      server,
-      tampered,
-      origin: `http://127.0.0.1:${server.address().port}`,
-      close: () => new Promise((done, reject) => {
-        // Node's fetch implementation keeps loopback HTTP/1.1 connections
-        // alive. `server.close()` waits for those sockets and left this check
-        // suspended until Node exited with code 13 for an unsettled top-level
-        // await. Stop accepting requests, then explicitly retire the idle
-        // consumer connections the check itself created.
-        server.close((error) => error ? reject(error) : done());
-        server.closeIdleConnections();
-      })
-    }));
+    server.listen(0, "127.0.0.1", () =>
+      resolve({
+        server,
+        tampered,
+        origin: `http://127.0.0.1:${server.address().port}`,
+        close: () =>
+          new Promise((done, reject) => {
+            // Node's fetch implementation keeps loopback HTTP/1.1 connections
+            // alive. `server.close()` waits for those sockets and left this check
+            // suspended until Node exited with code 13 for an unsettled top-level
+            // await. Stop accepting requests, then explicitly retire the idle
+            // consumer connections the check itself created.
+            server.close((error) => (error ? reject(error) : done()));
+            server.closeIdleConnections();
+          }),
+      }),
+    );
   });
 }
 
@@ -102,7 +107,7 @@ export async function fetchPolicyText({
   fetchImpl = fetch,
   maxAttempts = 5,
   retryDelayMs = 1_000,
-  sleep = delay
+  sleep = delay,
 }) {
   let lastError;
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
@@ -130,12 +135,13 @@ export async function fetchPolicyText({
  */
 export async function resolvePolicy({ index, fetchImpl = fetch, retry = {} }) {
   const base = `${index.base.url.replace(/\/$/, "")}${index.base.pathPrefix ? `/${index.base.pathPrefix}` : ""}`;
-  const get = (relative) => fetchPolicyText({
-    url: `${base}/${relative}`,
-    label: relative,
-    fetchImpl,
-    ...retry
-  });
+  const get = (relative) =>
+    fetchPolicyText({
+      url: `${base}/${relative}`,
+      label: relative,
+      fetchImpl,
+      ...retry,
+    });
   const trace = [];
   const results = [];
   for (const asserted of index.entries) {
@@ -219,12 +225,17 @@ export function rebuildHandshake({ profiles, revision, profileId }) {
   const { catalogRecipe } = profiles;
   const material = {
     defoldRevision: revision,
-    profiles: Object.fromEntries(catalogRecipe.profileOrder.map((id) => [id, Object.fromEntries(
-      catalogRecipe.profileFields.map((field) => [
-        field,
-        field === "features" ? profiles.profiles[id].features : profiles.profiles[id].runtimeHandshake[field]
-      ])
-    )]))
+    profiles: Object.fromEntries(
+      catalogRecipe.profileOrder.map((id) => [
+        id,
+        Object.fromEntries(
+          catalogRecipe.profileFields.map((field) => [
+            field,
+            field === "features" ? profiles.profiles[id].features : profiles.profiles[id].runtimeHandshake[field],
+          ]),
+        ),
+      ]),
+    ),
   };
   const catalogSha256 = createHash("sha256").update(JSON.stringify(material)).digest("hex");
   return { ...profiles.profiles[profileId].runtimeHandshake, defoldRevision: revision, catalogSha256 };
@@ -276,28 +287,35 @@ async function main() {
       for (const pin of ["ANDROID_NDK_API_VERSION", "VERSION_IPHONEOS_MIN", "EMSCRIPTEN_VERSION_STR"]) {
         if (!subtrees["@toolchain"].pins[pin]) throw new Error(`policy toolchain subtree is missing ${pin}`);
       }
-      lines.push(`  NDK ${subtrees["@toolchain"].pins.ANDROID_NDK_VERSION} api ${subtrees["@toolchain"].pins.ANDROID_NDK_API_VERSION}, ` +
-        `emscripten ${subtrees["@toolchain"].pins.EMSCRIPTEN_VERSION_STR}, iOS min ${subtrees["@toolchain"].pins.VERSION_IPHONEOS_MIN}`);
+      lines.push(
+        `  NDK ${subtrees["@toolchain"].pins.ANDROID_NDK_VERSION} api ${subtrees["@toolchain"].pins.ANDROID_NDK_API_VERSION}, ` +
+          `emscripten ${subtrees["@toolchain"].pins.EMSCRIPTEN_VERSION_STR}, iOS min ${subtrees["@toolchain"].pins.VERSION_IPHONEOS_MIN}`,
+      );
 
       // A namespace subtree must actually answer for its namespace.
       const gui = subtrees.gui;
       if (!gui?.script?.functions?.length) throw new Error("the gui subtree carries no script functions");
       if (!gui.registration) throw new Error("the gui subtree carries no source-derived registration");
-      lines.push(`  gui: ${gui.script.functions.length} declared routes, ` +
-        `${Object.values(gui.registration).reduce((total, target) => total + target.routes.length, 0)} registered route records`);
+      lines.push(
+        `  gui: ${gui.script.functions.length} declared routes, ` +
+          `${Object.values(gui.registration).reduce((total, target) => total + target.routes.length, 0)} registered route records`,
+      );
 
-      const defaultProfileId = subtrees["@compiler:document:defold-script-route-availability-profiles.json"]
-        ?.value?.engineProfileSelection?.defaultProfileId;
+      const defaultProfileId =
+        subtrees["@compiler:document:defold-script-route-availability-profiles.json"]?.value?.engineProfileSelection
+          ?.defaultProfileId;
       if (typeof defaultProfileId !== "string" || !defaultProfileId) {
         throw new Error("policy profile subtree has no default engine profile");
       }
       const handshake = validateRebuiltHandshake({
         profiles: subtrees["@profiles"],
         revision,
-        profileId: defaultProfileId
+        profileId: defaultProfileId,
       });
-      lines.push(`  rebuilt runtime handshake for ${defaultProfileId} matches its policy profile ` +
-        `(catalogSha256 ${handshake.catalogSha256.slice(0, 12)})`);
+      lines.push(
+        `  rebuilt runtime handshake for ${defaultProfileId} matches its policy profile ` +
+          `(catalogSha256 ${handshake.catalogSha256.slice(0, 12)})`,
+      );
     }
 
     // The artifact half, resolved from served data alone. It is a SIBLING of
@@ -312,7 +330,7 @@ async function main() {
     for (const { revision, artifacts } of results) {
       for (const [family, key, member] of [
         ["native-artifacts", "arm64-osx", "libhermes.a"],
-        ["hermes-host", "linux-x64", "hermesc"]
+        ["hermes-host", "linux-x64", "hermesc"],
       ]) {
         const resolved = resolveArtifactUrl({ index, artifacts, family, key, member });
         // The vendoring path builds the same URL from the same tag and asset
@@ -354,8 +372,10 @@ async function main() {
     lines.push(`tampered object rejected: ${caught}`);
 
     console.log(lines.map((line) => `  ${line}`).join("\n"));
-    console.log(`ok policy site resolves end to end from ${host.origin}/deherm-relocated, ` +
-      "including an artifact download URL built from the index's own template");
+    console.log(
+      `ok policy site resolves end to end from ${host.origin}/deherm-relocated, ` +
+        "including an artifact download URL built from the index's own template",
+    );
   } finally {
     await host.close();
   }

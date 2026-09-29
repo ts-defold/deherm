@@ -15,23 +15,34 @@ import test from "node:test";
 
 import { strToU8, zipSync } from "fflate";
 
-import { buildProjectBindingIr as compileProjectBindingIr, generateExtensionTypes as renderExtensionTypes, writeGeneratedProject } from "../packages/cli/src/generate.mjs";
+import {
+  buildProjectBindingIr as compileProjectBindingIr,
+  generateExtensionTypes as renderExtensionTypes,
+  writeGeneratedProject,
+} from "../packages/cli/src/generate.mjs";
 import { inspectDefoldProject } from "../packages/cli/src/project.mjs";
-import { fixtureRoot, materializeIngestionProject, readExtensionLock } from "./fixtures/defold-extension-ingestion/materialize.mjs";
+import {
+  fixtureRoot,
+  materializeIngestionProject,
+  readExtensionLock,
+} from "./fixtures/defold-extension-ingestion/materialize.mjs";
 
 const defoldValueLayouts = JSON.parse(
-  await readFile(path.resolve("packages/bindings/generated/defold-value-layouts.json"), "utf8"));
+  await readFile(path.resolve("packages/bindings/generated/defold-value-layouts.json"), "utf8"),
+);
 const buildProjectBindingIr = (inventory) => compileProjectBindingIr(inventory, defoldValueLayouts);
 const generateExtensionTypes = (inventory) => renderExtensionTypes(inventory, defoldValueLayouts);
 
 /** Builds a binding IR from declarations without touching the filesystem. */
 function projectDeclarations(...declarations) {
   return buildProjectBindingIr({
-    extensions: [{
-      name: "Fixture",
-      bindingStatus: "script-api",
-      scriptApis: [{ path: "fixture.script_api", declarations }]
-    }]
+    extensions: [
+      {
+        name: "Fixture",
+        bindingStatus: "script-api",
+        scriptApis: [{ path: "fixture.script_api", declarations }],
+      },
+    ],
   });
 }
 
@@ -95,8 +106,8 @@ test("published xMath and defold-astar extensions ingest end to end and the decl
     inventory.extensions.map(({ name, kind, bindingStatus }) => ({ name, kind, bindingStatus })),
     [
       { name: "astar", kind: "dependency", bindingStatus: "script-api" },
-      { name: "xMath", kind: "dependency", bindingStatus: "script-api" }
-    ]
+      { name: "xMath", kind: "dependency", bindingStatus: "script-api" },
+    ],
   );
   assert.deepEqual(inventory.diagnostics, []);
 
@@ -114,7 +125,10 @@ test("published xMath and defold-astar extensions ingest end to end and the decl
   // defold-astar: scalar and enum surface, trailing `[optional]` markers, and
   // multi-value Lua returns.
   assert.match(types, /newMapId\(\): number;/);
-  assert.match(types, /solve\(startX: number, startY: number, endX: number, endY: number, mapId\?: number\): \[number, number, number, Readonly<Record<string, unknown>>\];/);
+  assert.match(
+    types,
+    /solve\(startX: number, startY: number, endX: number, endY: number, mapId\?: number\): \[number, number, number, Readonly<Record<string, unknown>>\];/,
+  );
   assert.match(types, /resetCache\(mapId\?: number\): void;/);
   assert.match(types, /readonly DIRECTION_EIGHT: number;/);
   assert.match(types, /readonly START_END_SAME: number;/);
@@ -125,13 +139,16 @@ test("published xMath and defold-astar extensions ingest end to end and the decl
   assert.equal(ir.coverage.blocked, ir.blockers.length);
   assert.equal(ir.coverage.projected + ir.coverage.blocked, ir.coverage.members);
   // The only shape in either published extension that cannot be projected.
-  assert.deepEqual(ir.blockers.map(({ module, member, code }) => ({ module, member, code })), [
-    { module: "astar", member: "use_zero", code: "call-signature-without-function-type" }
-  ]);
+  assert.deepEqual(
+    ir.blockers.map(({ module, member, code }) => ({ module, member, code })),
+    [{ module: "astar", member: "use_zero", code: "call-signature-without-function-type" }],
+  );
 
   const authored = path.join(root, "main");
   await mkdir(authored, { recursive: true });
-  await writeFile(path.join(authored, "ingestion.script.ts"), `import { astar, vmath, xmath } from "@deherm/project";
+  await writeFile(
+    path.join(authored, "ingestion.script.ts"),
+    `import { astar, vmath, xmath } from "@deherm/project";
 
 export function ingest(): number {
   const position = vmath.vector3(0, 0, 0);
@@ -145,7 +162,8 @@ export function ingest(): number {
   astar.useZero(true);
   return result + size + cost + astar.DIRECTION_EIGHT;
 }
-`);
+`,
+  );
 
   const output = await writeGeneratedProject(inventory);
   assert.equal(output.moduleCount, 2);
@@ -159,30 +177,50 @@ export function ingest(): number {
   assert.match(astarModule, /throw new Error\("deherm: astar\.use_zero is not projectable/);
 
   const tsc = path.resolve("node_modules/typescript/bin/tsc");
-  const checked = spawnSync(process.execPath, [tsc, "--build", path.join(root, "tsconfig.deherm.json"), "--pretty", "false", "--force"], {
-    cwd: process.cwd(),
-    encoding: "utf8"
-  });
+  const checked = spawnSync(
+    process.execPath,
+    [tsc, "--build", path.join(root, "tsconfig.deherm.json"), "--pretty", "false", "--force"],
+    {
+      cwd: process.cwd(),
+      encoding: "utf8",
+    },
+  );
   assert.equal(checked.status, 0, `${checked.stdout}\n${checked.stderr}`);
 });
 
 test("defect 1: a YAML sequence type is an alternation, not a silent any", async () => {
-  const module = projectModule([{
-    name: "add",
-    type: "function",
-    parameters: [{ name: "target", type: ["vector3", "vector4"] }, { name: "scale", type: ["number", "vector3"] }]
-  }]);
+  const module = projectModule([
+    {
+      name: "add",
+      type: "function",
+      parameters: [
+        { name: "target", type: ["vector3", "vector4"] },
+        { name: "scale", type: ["number", "vector3"] },
+      ],
+    },
+  ]);
   const member = memberNamed(module, "add");
   assert.equal(member.disposition, "projected");
-  assert.deepEqual(member.parameters[0].type.types.map(({ name }) => name), ["vector3", "vector4"]);
+  assert.deepEqual(
+    member.parameters[0].type.types.map(({ name }) => name),
+    ["vector3", "vector4"],
+  );
   assert.equal(member.parameters[0].type.raw, "vector3|vector4");
-  assert.deepEqual(member.parameters[1].type.types.map(({ kind }) => kind), ["number", "defold-value"]);
+  assert.deepEqual(
+    member.parameters[1].type.types.map(({ kind }) => kind),
+    ["number", "defold-value"],
+  );
   // The string spelling of the same union must normalize identically.
-  const stringForm = projectModule([{
-    name: "add",
-    type: "function",
-    parameters: [{ name: "target", type: "vector3|vector4" }, { name: "scale", type: "number|vector3" }]
-  }]);
+  const stringForm = projectModule([
+    {
+      name: "add",
+      type: "function",
+      parameters: [
+        { name: "target", type: "vector3|vector4" },
+        { name: "scale", type: "number|vector3" },
+      ],
+    },
+  ]);
   assert.deepEqual(memberNamed(stringForm, "add").parameters, member.parameters);
   // An empty sequence has no alternation to project and must fail closed.
   const empty = projectModule([{ name: "empty", type: "function", parameters: [{ name: "value", type: [] }] }]);
@@ -191,16 +229,30 @@ test("defect 1: a YAML sequence type is an alternation, not a silent any", async
 });
 
 test("defect 2: named Defold value types resolve to the generated transparent layouts", async () => {
-  const layouts = JSON.parse(await readFile(path.resolve("packages/bindings/generated/defold-value-layouts.json"), "utf8"));
-  const expected = { vector3: "Vector3", vector4: "Vector4", quaternion: "Quaternion", matrix4: "Matrix4", hash: "DefoldHash", url: "DefoldUrl" };
-  assert.deepEqual(Object.keys(layouts.transparent).sort(), Object.keys(expected).sort(),
-    "every transparent value type must have a declared TypeScript projection");
+  const layouts = JSON.parse(
+    await readFile(path.resolve("packages/bindings/generated/defold-value-layouts.json"), "utf8"),
+  );
+  const expected = {
+    vector3: "Vector3",
+    vector4: "Vector4",
+    quaternion: "Quaternion",
+    matrix4: "Matrix4",
+    hash: "DefoldHash",
+    url: "DefoldUrl",
+  };
+  assert.deepEqual(
+    Object.keys(layouts.transparent).sort(),
+    Object.keys(expected).sort(),
+    "every transparent value type must have a declared TypeScript projection",
+  );
 
-  const module = projectModule(Object.keys(expected).map((name) => ({
-    name: `take_${name}`,
-    type: "function",
-    parameters: [{ name: "value", type: name }]
-  })));
+  const module = projectModule(
+    Object.keys(expected).map((name) => ({
+      name: `take_${name}`,
+      type: "function",
+      parameters: [{ name: "value", type: name }],
+    })),
+  );
   for (const [name, ts] of Object.entries(expected)) {
     const member = memberNamed(module, `take_${name}`);
     assert.equal(member.disposition, "projected", name);
@@ -209,14 +261,24 @@ test("defect 2: named Defold value types resolve to the generated transparent la
   }
 
   const types = generateExtensionTypes({
-    extensions: [{
-      name: "Fixture",
-      bindingStatus: "script-api",
-      scriptApis: [{
-        path: "fixture.script_api",
-        declarations: [{ name: "fixture", type: "table", members: [{ name: "spin", type: "function", parameters: [{ name: "q", type: "quaternion" }] }] }]
-      }]
-    }]
+    extensions: [
+      {
+        name: "Fixture",
+        bindingStatus: "script-api",
+        scriptApis: [
+          {
+            path: "fixture.script_api",
+            declarations: [
+              {
+                name: "fixture",
+                type: "table",
+                members: [{ name: "spin", type: "function", parameters: [{ name: "q", type: "quaternion" }] }],
+              },
+            ],
+          },
+        ],
+      },
+    ],
   });
   assert.match(types, /from "\.\/sdk\/generated\/script\/types\.js"/);
   assert.match(types, /spin\(q: Quaternion\): void;/);
@@ -232,50 +294,71 @@ test("defect 3: nested table fields spelled members: are projected like paramete
   const shape = (key) => ({
     name: "connect",
     type: "function",
-    parameters: [{
-      name: "params",
-      type: "table",
-      [key]: [
-        { name: "timeout", type: "number" },
-        { name: "protocol", type: "string", optional: true },
-        { name: "origin", type: "vector3" }
-      ]
-    }]
+    parameters: [
+      {
+        name: "params",
+        type: "table",
+        [key]: [
+          { name: "timeout", type: "number" },
+          { name: "protocol", type: "string", optional: true },
+          { name: "origin", type: "vector3" },
+        ],
+      },
+    ],
   });
   const viaMembers = memberNamed(projectModule([shape("members")]), "connect");
   const viaParameters = memberNamed(projectModule([shape("parameters")]), "connect");
   assert.equal(viaMembers.disposition, "projected");
   assert.deepEqual(viaMembers.parameters[0].type, viaParameters.parameters[0].type);
-  assert.deepEqual(viaMembers.parameters[0].type.fields.map(({ name, optional }) => ({ name, optional })), [
-    { name: "timeout", optional: false },
-    { name: "protocol", optional: true },
-    { name: "origin", optional: false }
-  ]);
+  assert.deepEqual(
+    viaMembers.parameters[0].type.fields.map(({ name, optional }) => ({ name, optional })),
+    [
+      { name: "timeout", optional: false },
+      { name: "protocol", optional: true },
+      { name: "origin", optional: false },
+    ],
+  );
   assert.equal(viaMembers.parameters[0].type.fields[2].type.ts, "Vector3");
 
   // Defold's own editor resolves `parameters` before `members`; so does this.
-  const both = memberNamed(projectModule([{
-    name: "connect",
-    type: "function",
-    parameters: [{
-      name: "params",
-      type: "table",
-      parameters: [{ name: "fromParameters", type: "number" }],
-      members: [{ name: "fromMembers", type: "number" }]
-    }]
-  }]), "connect");
-  assert.deepEqual(both.parameters[0].type.fields.map(({ name }) => name), ["fromParameters"]);
+  const both = memberNamed(
+    projectModule([
+      {
+        name: "connect",
+        type: "function",
+        parameters: [
+          {
+            name: "params",
+            type: "table",
+            parameters: [{ name: "fromParameters", type: "number" }],
+            members: [{ name: "fromMembers", type: "number" }],
+          },
+        ],
+      },
+    ]),
+    "connect",
+  );
+  assert.deepEqual(
+    both.parameters[0].type.fields.map(({ name }) => name),
+    ["fromParameters"],
+  );
 
   // A nested field that cannot be projected blocks the member that carries it.
-  const nested = memberNamed(projectModule([{
-    name: "connect",
-    type: "function",
-    parameters: [{ name: "params", type: "table", members: [{ name: "handle", type: "SomeExtensionHandle" }] }]
-  }]), "connect");
+  const nested = memberNamed(
+    projectModule([
+      {
+        name: "connect",
+        type: "function",
+        parameters: [{ name: "params", type: "table", members: [{ name: "handle", type: "SomeExtensionHandle" }] }],
+      },
+    ]),
+    "connect",
+  );
   assert.equal(nested.disposition, "blocked");
-  assert.deepEqual(nested.blockers.map(({ site, code }) => ({ site, code })), [
-    { site: "parameter[0]:params.handle", code: "unresolved-named-type:SomeExtensionHandle" }
-  ]);
+  assert.deepEqual(
+    nested.blockers.map(({ site, code }) => ({ site, code })),
+    [{ site: "parameter[0]:params.handle", code: "unresolved-named-type:SomeExtensionHandle" }],
+  );
 });
 
 test("defect 4: an unprojectable .script_api shape fails closed with a machine-readable blocker", async () => {
@@ -287,8 +370,8 @@ test("defect 4: an unprojectable .script_api shape fails closed with a machine-r
       { name: "no_type", type: "function", parameters: [{ name: "value" }] },
       { name: "bad_return", type: "function", return: { type: "ExtensionResult" } },
       { name: "call_shaped_value", parameters: [{ name: "toggle", type: "boolean" }] },
-      { name: "fine", type: "function", parameters: [{ name: "count", type: "number" }] }
-    ]
+      { name: "fine", type: "function", parameters: [{ name: "count", type: "number" }] },
+    ],
   });
 
   assert.equal(ir.coverage.members, 5);
@@ -298,29 +381,52 @@ test("defect 4: an unprojectable .script_api shape fails closed with a machine-r
     "call-signature-without-function-type": 1,
     "missing-type": 1,
     "unresolved-named-type:ExtensionHandle": 1,
-    "unresolved-named-type:ExtensionResult": 1
+    "unresolved-named-type:ExtensionResult": 1,
   });
-  assert.deepEqual(ir.blockers.map(({ id, site, code }) => ({ id, site, code })), [
-    { id: "script:fixture.bad_return#return", site: "return", code: "unresolved-named-type:ExtensionResult" },
-    { id: "script:fixture.call_shaped_value#value", site: "value", code: "call-signature-without-function-type" },
-    { id: "script:fixture.handle_it#parameter[0]:handle", site: "parameter[0]:handle", code: "unresolved-named-type:ExtensionHandle" },
-    { id: "script:fixture.no_type#parameter[0]:value", site: "parameter[0]:value", code: "missing-type" }
-  ]);
+  assert.deepEqual(
+    ir.blockers.map(({ id, site, code }) => ({ id, site, code })),
+    [
+      { id: "script:fixture.bad_return#return", site: "return", code: "unresolved-named-type:ExtensionResult" },
+      { id: "script:fixture.call_shaped_value#value", site: "value", code: "call-signature-without-function-type" },
+      {
+        id: "script:fixture.handle_it#parameter[0]:handle",
+        site: "parameter[0]:handle",
+        code: "unresolved-named-type:ExtensionHandle",
+      },
+      { id: "script:fixture.no_type#parameter[0]:value", site: "parameter[0]:value", code: "missing-type" },
+    ],
+  );
   assert.equal(ir.blockers[0].declared, "ExtensionResult");
 
   const types = generateExtensionTypes({
-    extensions: [{ name: "Fixture", bindingStatus: "script-api", scriptApis: [{ path: "fixture.script_api", declarations: [{
-      name: "fixture",
-      type: "table",
-      members: [
-        { name: "handle_it", type: "function", parameters: [{ name: "handle", type: "ExtensionHandle" }] },
-        { name: "fine", type: "function", parameters: [{ name: "count", type: "number" }] }
-      ]
-    }] }] }]
+    extensions: [
+      {
+        name: "Fixture",
+        bindingStatus: "script-api",
+        scriptApis: [
+          {
+            path: "fixture.script_api",
+            declarations: [
+              {
+                name: "fixture",
+                type: "table",
+                members: [
+                  { name: "handle_it", type: "function", parameters: [{ name: "handle", type: "ExtensionHandle" }] },
+                  { name: "fine", type: "function", parameters: [{ name: "count", type: "number" }] },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ],
   });
   // The blocked member is uninhabited and carries its reason; nothing about it
   // is spelled `any` or `unknown`.
-  assert.match(types, /\/\*\* blocked: parameter\[0\]:handle=unresolved-named-type:ExtensionHandle \*\/\n  readonly handleIt: never;/);
+  assert.match(
+    types,
+    /\/\*\* blocked: parameter\[0\]:handle=unresolved-named-type:ExtensionHandle \*\/\n  readonly handleIt: never;/,
+  );
   assert.match(types, /fine\(count: number\): void;/);
   assert.doesNotMatch(types, /handleIt\(/);
   assert.doesNotMatch(types, /: unknown/);
@@ -334,7 +440,7 @@ test("published extension name spellings project without silent mangling", async
     { name: "seek", type: "function", parameters: [{ name: "[target]", type: "number" }] },
     { name: "probe", type: "function", parameters: [{ name: "value[range]", type: "number" }] },
     { name: "DIRECTION_EIGHT", type: "number" },
-    { name: "count", type: "function", returns: [{ name: "total", type: "number" }] }
+    { name: "count", type: "function", returns: [{ name: "total", type: "number" }] },
   ]);
 
   const reset = memberNamed(module, "reset");
@@ -344,7 +450,7 @@ test("published extension name spellings project without silent mangling", async
     jsName: "mapId",
     optional: true,
     type: { kind: "number", raw: "number" },
-    nameSpelling: "trailing-optional-marker"
+    nameSpelling: "trailing-optional-marker",
   });
 
   const seek = memberNamed(module, "seek");
@@ -371,7 +477,7 @@ test("discovery reports resolved dependency archives that declare no ext.manifes
   assert.equal(inventory.dependencyArchivesWithoutManifest.length, 1);
   assert.deepEqual(
     inventory.dependencyArchivesWithoutManifest.map(({ files, luaModules }) => ({ files, luaModules })),
-    [{ files: 3, luaModules: 2 }]
+    [{ files: 3, luaModules: 2 }],
   );
   const [reported] = inventory.diagnostics;
   assert.equal(reported.severity, "warning");
@@ -383,15 +489,18 @@ test("an archive that declares no ext.manifest is reported rather than silently 
   const project = await mkdtemp(path.join(tmpdir(), "deherm-lua-only-"));
   await mkdir(path.join(project, ".internal", "lib"), { recursive: true });
   await writeFile(path.join(project, "game.project"), "[project]\ntitle = Lua only\n");
-  await writeFile(path.join(project, ".internal", "lib", "druid.zip"), zipSync({
-    "druid/druid.lua": strToU8("return {}\n"),
-    "druid/base/button.lua": strToU8("return {}\n"),
-    "druid/README.md": strToU8("# Druid\n")
-  }));
+  await writeFile(
+    path.join(project, ".internal", "lib", "druid.zip"),
+    zipSync({
+      "druid/druid.lua": strToU8("return {}\n"),
+      "druid/base/button.lua": strToU8("return {}\n"),
+      "druid/README.md": strToU8("# Druid\n"),
+    }),
+  );
   const inventory = await inspectDefoldProject({ project });
   assert.deepEqual(inventory.extensions, []);
   assert.deepEqual(inventory.dependencyArchivesWithoutManifest, [
-    { archive: ".internal/lib/druid.zip", files: 3, luaModules: 2 }
+    { archive: ".internal/lib/druid.zip", files: 3, luaModules: 2 },
   ]);
   assert.equal(inventory.diagnostics.length, 1);
   assert.match(inventory.diagnostics[0].message, /no ingestible binding surface/);

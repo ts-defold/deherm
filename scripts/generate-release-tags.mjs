@@ -34,7 +34,7 @@ export async function buildReleaseTags() {
       "be told. Expand releaseAsset with a tag and an asset name to get a download URL.",
     repository: defaultReleaseRepository,
     releaseAsset: releaseAssetUrlTemplate(),
-    families: await buildArtifactReferences()
+    families: await buildArtifactReferences(),
   };
 }
 

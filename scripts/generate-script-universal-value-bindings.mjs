@@ -5,14 +5,8 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import {
-  selectUniversalRoutes,
-  universalTargetSupport
-} from "./lib/script-universal-selection.mjs";
-import {
-  ROOTED_USERDATA_REPRESENTATION,
-  semanticHandleKinds
-} from "./lib/semantic-handle-kinds.mjs";
+import { selectUniversalRoutes, universalTargetSupport } from "./lib/script-universal-selection.mjs";
+import { ROOTED_USERDATA_REPRESENTATION, semanticHandleKinds } from "./lib/semantic-handle-kinds.mjs";
 import { declaredDerivation } from "./lib/reviewed-revision.mjs";
 import { VOID, recordAudit } from "./lib/revision-audit.mjs";
 
@@ -34,7 +28,7 @@ const relativePaths = Object.freeze({
   typescript: "packages/sdk/src/generated/script/universal-value-bindings.ts",
   browserTargetSupport: "packages/sdk/src/generated/script/browser-target-support.ts",
   staticHermes: "packages/static-hermes/src/generated/script-universal-value.ts",
-  browser: "defold/defold_hermes/lib/web/generated_script_universal_value.js"
+  browser: "defold/defold_hermes/lib/web/generated_script_universal_value.js",
 });
 
 function chunk(items, size) {
@@ -56,15 +50,16 @@ function assert(condition, message) {
 function layoutOf(layouts, name, transport) {
   const layout = layouts.transparent[name];
   assert(layout, `Defold value layout report declares no transparent ${name}`);
-  assert(layout.transport === transport,
-    `Defold value ${name} changed transport to ${layout.transport}`);
+  assert(layout.transport === transport, `Defold value ${name} changed transport to ${layout.transport}`);
   return layout;
 }
 
 function matrix4Elements(layouts) {
   const layout = layoutOf(layouts, "matrix4", "float-arena");
-  assert(layout.element === "f32" && layout.ordering === "column-major",
-    "Defold Matrix4 is no longer a column-major float32 record");
+  assert(
+    layout.element === "f32" && layout.ordering === "column-major",
+    "Defold Matrix4 is no longer a column-major float32 record",
+  );
   return Array.from({ length: layout.storageElements }, (_, index) => `e${index}`);
 }
 
@@ -300,8 +295,17 @@ function collectShapeKinds(value, output = new Set()) {
  * frame instead of silently narrowing it.
  */
 const inlinedShapeKinds = new Set([
-  "scalar", "enum", "defold-value", "handle", "union", "optional", "void",
-  "sequence", "map", "record", "variadic"
+  "scalar",
+  "enum",
+  "defold-value",
+  "handle",
+  "union",
+  "optional",
+  "void",
+  "sequence",
+  "map",
+  "record",
+  "variadic",
 ]);
 
 /** Inlined constructors that materialize as a bounded table in the call frame. */
@@ -342,27 +346,28 @@ function frameContract(signature, bounds, row) {
   const input = collectFramePhase(signature?.parameters ?? []);
   const output = collectFramePhase(signature?.returns ?? []);
   const opaque = (phase) => [...phase.kinds].some((kind) => !inlinedShapeKinds.has(kind));
-  const carriesTable = (phase) =>
-    opaque(phase) || [...phase.kinds].some((kind) => tableShapeKinds.has(kind));
+  const carriesTable = (phase) => opaque(phase) || [...phase.kinds].some((kind) => tableShapeKinds.has(kind));
   const anyOpaque = opaque(input) || opaque(output);
-  const reaches = (name) =>
-    anyOpaque || input.defoldValueTypes.has(name) || output.defoldValueTypes.has(name);
+  const reaches = (name) => anyOpaque || input.defoldValueTypes.has(name) || output.defoldValueTypes.has(name);
   return {
     argumentCapacity: row.maximumArgumentCount,
     resultCapacity: row.maximumResultCount,
     inputEntryCapacity: carriesTable(input) ? bounds.maximumEntries : 0,
     outputEntryCapacity: carriesTable(output) ? bounds.maximumEntries : 0,
     matrix4Arena: reaches("matrix4"),
-    urlArena: reaches("url")
+    urlArena: reaches("url"),
   };
 }
 
 /** Stable key and census for the distinct frame shapes the routes need. */
 function frameProfileKey(contract) {
   return [
-    contract.argumentCapacity, contract.resultCapacity,
-    contract.inputEntryCapacity, contract.outputEntryCapacity,
-    contract.matrix4Arena ? 1 : 0, contract.urlArena ? 1 : 0
+    contract.argumentCapacity,
+    contract.resultCapacity,
+    contract.inputEntryCapacity,
+    contract.outputEntryCapacity,
+    contract.matrix4Arena ? 1 : 0,
+    contract.urlArena ? 1 : 0,
   ].join("/");
 }
 
@@ -441,14 +446,16 @@ function parseArguments(argv) {
 }
 
 async function readInputs(root = repositoryRoot) {
-  const [projectionText, callbacksText, classificationText, policyText, layoutsText, constantsText] = await Promise.all([
-    readFile(path.join(root, relativePaths.projection), "utf8"),
-    readFile(path.join(root, relativePaths.callbacks), "utf8"),
-    readFile(path.join(root, relativePaths.classification), "utf8"),
-    readFile(path.join(root, relativePaths.policy), "utf8"),
-    readFile(path.join(root, relativePaths.layouts), "utf8"),
-    readFile(path.join(root, relativePaths.constants), "utf8")
-  ]);
+  const [projectionText, callbacksText, classificationText, policyText, layoutsText, constantsText] = await Promise.all(
+    [
+      readFile(path.join(root, relativePaths.projection), "utf8"),
+      readFile(path.join(root, relativePaths.callbacks), "utf8"),
+      readFile(path.join(root, relativePaths.classification), "utf8"),
+      readFile(path.join(root, relativePaths.policy), "utf8"),
+      readFile(path.join(root, relativePaths.layouts), "utf8"),
+      readFile(path.join(root, relativePaths.constants), "utf8"),
+    ],
+  );
   return { projectionText, callbacksText, classificationText, policyText, layoutsText, constantsText };
 }
 
@@ -524,9 +531,12 @@ DispatchStatus dispatch(ScriptCallFrame*, char*, size_t, const LuaApi*) noexcept
 }
 
 function renderSource(rows) {
-  const operations = rows.map((row) =>
-    `  {0x${row.stableId.toString(16).padStart(8, "0")}u, ${quote(row.id)}, ${quote(row.modulePath.join("."))}, ${quote(row.member)}, ${row.minimumArgumentCount}, ${row.maximumArgumentCount}, ${row.minimumResultCount}, ${row.maximumResultCount}, ${row.maximumResultCount}, ${row.resultSemanticKindId}, ${row.frameContract.inputEntryCapacity}, ${row.frameContract.outputEntryCapacity}, ${row.frameContract.matrix4Arena ? 1 : 0}, ${row.frameContract.urlArena ? 1 : 0}, ${row.constant ? 1 : 0}},`
-  ).join("\n");
+  const operations = rows
+    .map(
+      (row) =>
+        `  {0x${row.stableId.toString(16).padStart(8, "0")}u, ${quote(row.id)}, ${quote(row.modulePath.join("."))}, ${quote(row.member)}, ${row.minimumArgumentCount}, ${row.maximumArgumentCount}, ${row.minimumResultCount}, ${row.maximumResultCount}, ${row.maximumResultCount}, ${row.resultSemanticKindId}, ${row.frameContract.inputEntryCapacity}, ${row.frameContract.outputEntryCapacity}, ${row.frameContract.matrix4Arena ? 1 : 0}, ${row.frameContract.urlArena ? 1 : 0}, ${row.constant ? 1 : 0}},`,
+    )
+    .join("\n");
   return `// Generated by scripts/generate-script-universal-value-bindings.mjs. Do not edit.
 #include <defold_hermes/generated_script_universal_value_bindings.hpp>
 
@@ -664,7 +674,9 @@ typedef struct DehermScriptUniversalEntry {
 } DehermScriptUniversalEntry;
 
 typedef struct DehermScriptUniversalUrl {
-${urlLanes(layouts).map((name) => `  uint64_t ${name};`).join("\n")}
+${urlLanes(layouts)
+  .map((name) => `  uint64_t ${name};`)
+  .join("\n")}
 } DehermScriptUniversalUrl;
 
 DehermScriptUniversalStatus deherm_script_universal_dispatch(
@@ -915,10 +927,24 @@ function renderCSource(rows) {
   const frameMachinery = frameMachineryTemplate
     .replaceAll("@PROFILE_COUNT@", String(profiles.length))
     .replaceAll("@ROUTE_COUNT@", String(rows.length))
-    .replace("@PROFILE_ROWS@", profiles.map((profile) =>
-      `  &runContractFrame<${profile.argumentCapacity}u, ${profile.resultCapacity}u, ${profile.inputEntryCapacity}u, ${profile.outputEntryCapacity}u, ${profile.matrix4Arena}, ${profile.urlArena}>,`).join("\n"))
-    .replace("@ROUTE_ROWS@", chunk(rows.map((row) => String(indexOf(row))), 24)
-      .map((line) => `  ${line.join(", ")},`).join("\n"));
+    .replace(
+      "@PROFILE_ROWS@",
+      profiles
+        .map(
+          (profile) =>
+            `  &runContractFrame<${profile.argumentCapacity}u, ${profile.resultCapacity}u, ${profile.inputEntryCapacity}u, ${profile.outputEntryCapacity}u, ${profile.matrix4Arena}, ${profile.urlArena}>,`,
+        )
+        .join("\n"),
+    )
+    .replace(
+      "@ROUTE_ROWS@",
+      chunk(
+        rows.map((row) => String(indexOf(row))),
+        24,
+      )
+        .map((line) => `  ${line.join(", ")},`)
+        .join("\n"),
+    );
 
   // Telemetry identity for the typed-native (extern_c) transport. Interned from
   // the same generated arity contract the dispatcher enforces, so cost is
@@ -926,13 +952,16 @@ function renderCSource(rows) {
   // site. Routes that do not yet qualify for a typed-native terminal still cross
   // this C ABI, so instrumenting it here covers the path today and the Defold
   // value types landing on it later.
-  const shapeTokens = rows.map((row) =>
-    `args:${row.minimumArgumentCount}-${row.maximumArgumentCount}->results:${row.minimumResultCount}-${row.maximumResultCount}`);
+  const shapeTokens = rows.map(
+    (row) =>
+      `args:${row.minimumArgumentCount}-${row.maximumArgumentCount}->results:${row.minimumResultCount}-${row.maximumResultCount}`,
+  );
   const shapes = [...new Set(shapeTokens)].sort();
   const shapeIndex = new Map(shapes.map((token, index) => [token, index]));
   const profileShapeRows = shapeTokens.map((token) => `  UINT16_C(${shapeIndex.get(token)}),`).join("\n");
-  const profileNameRows = rows.map((row) =>
-    `  ${quote(`deherm.typed-native.${row.id.slice("script:".length)}`)},`).join("\n");
+  const profileNameRows = rows
+    .map((row) => `  ${quote(`deherm.typed-native.${row.id.slice("script:".length)}`)},`)
+    .join("\n");
   const profileShapeNameRows = shapes.map((token) => `  ${quote(token)},`).join("\n");
   const profileTables = [
     "#if DEHERM_PROFILE_ENABLED",
@@ -950,23 +979,23 @@ function renderCSource(rows) {
     `static_assert(sizeof(kProfileContractShapes) / sizeof(kProfileContractShapes[0]) == ${rows.length}, "universal telemetry shape census drifted");`,
     `static_assert(sizeof(kProfileNames) / sizeof(kProfileNames[0]) == ${rows.length}, "universal telemetry name census drifted");`,
     `static_assert(sizeof(kProfileContractShapeNames) / sizeof(kProfileContractShapeNames[0]) == ${shapes.length}, "universal telemetry contract census drifted");`,
-    "#endif"
+    "#endif",
   ].join("\n");
   const profileResolvers = [
     "#if DEHERM_PROFILE_ENABLED",
     "// Telemetry identity resolvers. A consumer draining the ring maps the numeric",
     "// operation index and contract shape id back to their cold names through these.",
-    "extern \"C\" uint16_t deherm_script_universal_profile_contract_shape(uint32_t operationIndex) {",
+    'extern "C" uint16_t deherm_script_universal_profile_contract_shape(uint32_t operationIndex) {',
     `  return operationIndex < ${rows.length}u ? kProfileContractShapes[operationIndex] : UINT16_C(0);`,
     "}",
-    "extern \"C\" const char* deherm_script_universal_profile_name(uint32_t operationIndex) {",
+    'extern "C" const char* deherm_script_universal_profile_name(uint32_t operationIndex) {',
     `  return operationIndex < ${rows.length}u ? kProfileNames[operationIndex] : "deherm.typed-native.unknown";`,
     "}",
     `extern "C" uint32_t deherm_script_universal_profile_contract_shape_count(void) { return ${shapes.length}u; }`,
-    "extern \"C\" const char* deherm_script_universal_profile_contract_shape_name(uint16_t shapeId) {",
+    'extern "C" const char* deherm_script_universal_profile_contract_shape_name(uint16_t shapeId) {',
     `  return shapeId < ${shapes.length}u ? kProfileContractShapeNames[shapeId] : "unknown";`,
     "}",
-    "#endif"
+    "#endif",
   ].join("\n");
   return `// Generated by scripts/generate-script-universal-value-bindings.mjs. Do not edit.
 #include <defold_hermes/generated_script_universal_value_capi.h>
@@ -1630,7 +1659,7 @@ function renderTypescript(rows, policy) {
     maximumArgumentCount: row.maximumArgumentCount,
     minimumResultCount: row.minimumResultCount,
     maximumResultCount: row.maximumResultCount,
-    resultCount: row.maximumResultCount
+    resultCount: row.maximumResultCount,
   }));
   return `// Generated by scripts/generate-script-universal-value-bindings.mjs. Do not edit.
 export const scriptUniversalValuePolicy = ${JSON.stringify({ bounds: policy.bounds, tablePolicy: policy.tablePolicy }, null, 2)} as const;
@@ -1646,23 +1675,42 @@ export function renderStaticHermes(layouts, options = {}) {
   const urlHandleKind = 2;
   const include = "defold_hermes/generated_script_universal_static_frame.h";
   const urlParameters = lanes.flatMap((name) => [`${name}Low`, `${name}High`]);
-  const exact = options.verification === true
-    ? {
-        base: " exactTag():number{return -1;} exactNumber(slot:number):number{return 0;} exactString():string{return \"\";} exactLength():number{return 0;} exactKeyString(slot:number):string{return \"\";} exactKey(slot:number):DehermStaticValue{throw \"deherm exact key unavailable\";} exactValue(slot:number):DehermStaticValue{throw \"deherm exact value unavailable\";}",
-        undefined: " exactTag():number{return 0;}",
-        null: " exactTag():number{return 1;}",
-        boolean: " exactTag():number{return 2;} exactNumber(slot:number):number{return this.value?1:0;}",
-        number: " exactTag():number{return 3;} exactNumber(slot:number):number{return this.value;}",
-        string: " exactTag():number{return 4;} exactString():string{return this.value;}",
-        handle: " exactTag():number{return 5;} exactNumber(slot:number):number{return slot===0?this.kind:slot===1?this.semanticKind:slot===2?this.runtime:slot===3?this.payloadLow:this.payloadHigh;}",
-        defold: " exactTag():number{return 6;} exactNumber(slot:number):number{return slot===0?this.kind:slot===1?this.x:slot===2?this.y:slot===3?this.z:this.w;}",
-        matrix4: " exactTag():number{return 7;} exactNumber(slot:number):number{return this.elements[slot];}",
-        url: ` exactTag():number{return 8;} exactNumber(slot:number):number{return ${urlParameters.map((name, index) => `slot===${index}?this.${name}:`).join("")}0;}`,
-        array: " exactTag():number{return 9;} exactLength():number{return this.values.length;} exactValue(slot:number):DehermStaticValue{return this.values[slot];}",
-        record: " exactTag():number{return 10;} exactLength():number{return this.values.length;} exactKeyString(slot:number):string{return this.keys[slot];} exactValue(slot:number):DehermStaticValue{return this.values[slot];}",
-        map: " exactTag():number{return 11;} exactLength():number{return this.values.length;} exactKey(slot:number):DehermStaticValue{return this.keys[slot];} exactValue(slot:number):DehermStaticValue{return this.values[slot];}"
-      }
-    : { base: "", undefined: "", null: "", boolean: "", number: "", string: "", handle: "", defold: "", matrix4: "", url: "", array: "", record: "", map: "" };
+  const exact =
+    options.verification === true
+      ? {
+          base: ' exactTag():number{return -1;} exactNumber(slot:number):number{return 0;} exactString():string{return "";} exactLength():number{return 0;} exactKeyString(slot:number):string{return "";} exactKey(slot:number):DehermStaticValue{throw "deherm exact key unavailable";} exactValue(slot:number):DehermStaticValue{throw "deherm exact value unavailable";}',
+          undefined: " exactTag():number{return 0;}",
+          null: " exactTag():number{return 1;}",
+          boolean: " exactTag():number{return 2;} exactNumber(slot:number):number{return this.value?1:0;}",
+          number: " exactTag():number{return 3;} exactNumber(slot:number):number{return this.value;}",
+          string: " exactTag():number{return 4;} exactString():string{return this.value;}",
+          handle:
+            " exactTag():number{return 5;} exactNumber(slot:number):number{return slot===0?this.kind:slot===1?this.semanticKind:slot===2?this.runtime:slot===3?this.payloadLow:this.payloadHigh;}",
+          defold:
+            " exactTag():number{return 6;} exactNumber(slot:number):number{return slot===0?this.kind:slot===1?this.x:slot===2?this.y:slot===3?this.z:this.w;}",
+          matrix4: " exactTag():number{return 7;} exactNumber(slot:number):number{return this.elements[slot];}",
+          url: ` exactTag():number{return 8;} exactNumber(slot:number):number{return ${urlParameters.map((name, index) => `slot===${index}?this.${name}:`).join("")}0;}`,
+          array:
+            " exactTag():number{return 9;} exactLength():number{return this.values.length;} exactValue(slot:number):DehermStaticValue{return this.values[slot];}",
+          record:
+            " exactTag():number{return 10;} exactLength():number{return this.values.length;} exactKeyString(slot:number):string{return this.keys[slot];} exactValue(slot:number):DehermStaticValue{return this.values[slot];}",
+          map: " exactTag():number{return 11;} exactLength():number{return this.values.length;} exactKey(slot:number):DehermStaticValue{return this.keys[slot];} exactValue(slot:number):DehermStaticValue{return this.values[slot];}",
+        }
+      : {
+          base: "",
+          undefined: "",
+          null: "",
+          boolean: "",
+          number: "",
+          string: "",
+          handle: "",
+          defold: "",
+          matrix4: "",
+          url: "",
+          array: "",
+          record: "",
+          map: "",
+        };
   return `// Generated by scripts/generate-script-universal-value-bindings.mjs. Do not edit.
 // Sound typed values materialize through a reentrant, caller-owned native frame.
 "use strict";
@@ -1737,9 +1785,12 @@ export {DehermStaticValue,DehermStaticUndefined,DehermStaticNull,DehermStaticBoo
  */
 function renderBrowserTargetSupport(blocked) {
   const cases = blocked
-    .map(({ id, stableId, browserCallback }) =>
-      `    case ${(stableId >>> 0)}: throw new Error(${JSON.stringify(
-        `${id} is not executable in the HTML5 browser host: ${browserCallback.machineBlock}`)});`)
+    .map(
+      ({ id, stableId, browserCallback }) =>
+        `    case ${stableId >>> 0}: throw new Error(${JSON.stringify(
+          `${id} is not executable in the HTML5 browser host: ${browserCallback.machineBlock}`,
+        )});`,
+    )
     .join("\n");
   return `// Generated by scripts/generate-script-universal-value-bindings.mjs. Do not edit.
 export function assertBrowserRouteTargetSupport(stableId: number, target: string | undefined): void {
@@ -1777,9 +1828,11 @@ function renderBrowser(rows, policy) {
   reserveScratch("counts", 6 * 4, 4);
   reserveScratch("error", 512, 1);
   scratchBytes = Math.ceil(scratchBytes / 16) * 16;
-  const tupleResultArities = Object.fromEntries(rows
-    .filter(({ maximumResultCount }) => maximumResultCount > 1)
-    .map(({ stableId, maximumResultCount }) => [stableId, maximumResultCount]));
+  const tupleResultArities = Object.fromEntries(
+    rows
+      .filter(({ maximumResultCount }) => maximumResultCount > 1)
+      .map(({ stableId, maximumResultCount }) => [stableId, maximumResultCount]),
+  );
   return `// Generated by scripts/generate-script-universal-value-bindings.mjs. Do not edit.
 var LibraryDefoldHermesScriptUniversalValue = {
   $DEFOLD_HERMES_SCRIPT_UNIVERSAL__deps: [
@@ -2354,43 +2407,53 @@ export function generateUniversalValueBindings(inputs) {
   const policy = JSON.parse(inputs.policyText);
   const layouts = JSON.parse(inputs.layoutsText);
   const constantReport = JSON.parse(inputs.constantsText);
-  assert(classification.defoldRevision === projection.defoldRevision,
-    "borrowed-handle classification does not match the script projection");
+  assert(
+    classification.defoldRevision === projection.defoldRevision,
+    "borrowed-handle classification does not match the script projection",
+  );
   const semanticKinds = semanticHandleKinds(classification);
   const semanticKindIds = new Map(semanticKinds.map(({ id, numericId }) => [id, numericId]));
-  const rootedKinds = new Set(semanticKinds
-    .filter(({ representation }) => representation === ROOTED_USERDATA_REPRESENTATION)
-    .map(({ id }) => id));
+  const rootedKinds = new Set(
+    semanticKinds.filter(({ representation }) => representation === ROOTED_USERDATA_REPRESENTATION).map(({ id }) => id),
+  );
   assert(projection.schemaVersion === 1, "unsupported script projection schema");
-  assert(layouts.schemaVersion === 1 && layouts.defoldRevision === projection.defoldRevision,
-    "Defold value layout report does not match the script projection");
-  assert(callbacks.schemaVersion === 1 && callbacks.defoldRevision === projection.defoldRevision,
-    "callback lifecycle input does not match the script projection");
+  assert(
+    layouts.schemaVersion === 1 && layouts.defoldRevision === projection.defoldRevision,
+    "Defold value layout report does not match the script projection",
+  );
+  assert(
+    callbacks.schemaVersion === 1 && callbacks.defoldRevision === projection.defoldRevision,
+    "callback lifecycle input does not match the script projection",
+  );
   const callbackById = new Map(callbacks.routes.map((route) => [route.id, route]));
-  const { selected: selectedBase, excluded } = selectUniversalRoutes(projection.rows.map((row) => {
-    const variadicToken = row.effects.variadic.token;
-    assert(variadicToken === "runtime-arity" || variadicToken === "fixed-arity", `${row.id}: unknown variadic token`);
-    return {
-      id: row.id,
-      stableId: row.stableId,
-      modulePath: row.modulePath,
-      member: row.member,
-      runtimeModulePath: row.runtimeModulePath,
-      runtimeMember: row.runtimeMember,
-      loweringFamily: row.loweringFamily,
-      contextToken: row.context.token,
-      parameters: row.signature.parameters,
-      overloadTokens: row.signature.overloadTokens,
-      returns: row.signature.returns,
-      variadic: variadicToken === "runtime-arity",
-      shapeKinds: collectShapeKinds(row.signature),
-      defoldValueTypes: collectDefoldValueTypes(row.signature),
-      recursive: row.effects.recursive
-    };
-  }), policy);
+  const { selected: selectedBase, excluded } = selectUniversalRoutes(
+    projection.rows.map((row) => {
+      const variadicToken = row.effects.variadic.token;
+      assert(variadicToken === "runtime-arity" || variadicToken === "fixed-arity", `${row.id}: unknown variadic token`);
+      return {
+        id: row.id,
+        stableId: row.stableId,
+        modulePath: row.modulePath,
+        member: row.member,
+        runtimeModulePath: row.runtimeModulePath,
+        runtimeMember: row.runtimeMember,
+        loweringFamily: row.loweringFamily,
+        contextToken: row.context.token,
+        parameters: row.signature.parameters,
+        overloadTokens: row.signature.overloadTokens,
+        returns: row.signature.returns,
+        variadic: variadicToken === "runtime-arity",
+        shapeKinds: collectShapeKinds(row.signature),
+        defoldValueTypes: collectDefoldValueTypes(row.signature),
+        recursive: row.effects.recursive,
+      };
+    }),
+    policy,
+  );
   const signatureById = new Map(projection.rows.map((row) => [row.id, row.signature]));
-  const resultSemanticKindById = new Map(projection.rows.map((row) =>
-    [row.id, declaredRootedResultKind(row, rootedKinds)]));
+  const resultSemanticKindById = new Map(
+    projection.rows.map((row) => [row.id, declaredRootedResultKind(row, rootedKinds)]),
+  );
   const selectedRoutes = selectedBase.map((row) => {
     const signature = signatureById.get(row.id);
     assert(signature, `${row.id}: universal selection lost its projected signature`);
@@ -2400,10 +2463,12 @@ export function generateUniversalValueBindings(inputs) {
       ...row,
       resultSemanticKind,
       resultSemanticKindId: resultSemanticKind === null ? 0 : semanticKindIds.get(resultSemanticKind),
-      frameContract: frameContract(signature, policy.bounds, row)
+      frameContract: frameContract(signature, policy.bounds, row),
     };
-    assert(sized.resultSemanticKindId !== undefined,
-      `${row.id}: declared result handle kind '${resultSemanticKind}' has no dense semantic identity`);
+    assert(
+      sized.resultSemanticKindId !== undefined,
+      `${row.id}: declared result handle kind '${resultSemanticKind}' has no dense semantic identity`,
+    );
     if (!callback && row.shapeKinds.includes("callback")) {
       assert(declaredDerivation(), `${row.id}: universal callback route has no reviewed lifecycle entry`);
       recordAudit({
@@ -2411,7 +2476,7 @@ export function generateUniversalValueBindings(inputs) {
         id: row.id,
         status: VOID,
         reason: "unreviewed-callback-lifecycle",
-        detail: "The API and universal descriptor are emitted, but the browser callback transport stays fail-closed."
+        detail: "The API and universal descriptor are emitted, but the browser callback transport stays fail-closed.",
       });
       return {
         ...sized,
@@ -2421,20 +2486,22 @@ export function generateUniversalValueBindings(inputs) {
           lifetime: null,
           owner: null,
           threadAffinity: null,
-          machineBlock: "unreviewed-callback-lifecycle-for-revision"
-        }
+          machineBlock: "unreviewed-callback-lifecycle-for-revision",
+        },
       };
     }
-    return callback ? {
-      ...sized,
-      browserCallback: {
-        registryEligible: callback.registryEligible,
-        lifetime: callback.lifetime,
-        owner: callback.owner,
-        threadAffinity: callback.threadAffinity,
-        machineBlock: callback.machineBlock ?? null
-      }
-    } : sized;
+    return callback
+      ? {
+          ...sized,
+          browserCallback: {
+            registryEligible: callback.registryEligible,
+            lifetime: callback.lifetime,
+            owner: callback.owner,
+            threadAffinity: callback.threadAffinity,
+            machineBlock: callback.machineBlock ?? null,
+          },
+        }
+      : sized;
   });
   const selectedConstants = constantReport.entries
     .filter((entry) => entry.state === "runtime-backed" || entry.state === "profile-unavailable")
@@ -2460,32 +2527,46 @@ export function generateUniversalValueBindings(inputs) {
           inputEntryCapacity: 0,
           outputEntryCapacity: 0,
           matrix4Arena: false,
-          urlArena: false
+          urlArena: false,
         },
         shapeKinds: [],
         defoldValueTypes: [],
         recursive: { token: "constant" },
-        constant: true
+        constant: true,
       };
     });
-  const selected = [...selectedRoutes, ...selectedConstants]
-    .sort((left, right) => left.stableId - right.stableId || compare(left.id, right.id));
-  assert(new Set(selected.map(({ stableId }) => stableId)).size === selected.length,
-    "script function and constant stable IDs collide");
-  assert(selected.filter(({ shapeKinds, id }) => shapeKinds.includes("callback") && callbackById.has(id)).length === callbacks.routeCount,
-    "universal callback census differs from the lifecycle ledger");
+  const selected = [...selectedRoutes, ...selectedConstants].sort(
+    (left, right) => left.stableId - right.stableId || compare(left.id, right.id),
+  );
+  assert(
+    new Set(selected.map(({ stableId }) => stableId)).size === selected.length,
+    "script function and constant stable IDs collide",
+  );
+  assert(
+    selected.filter(({ shapeKinds, id }) => shapeKinds.includes("callback") && callbackById.has(id)).length ===
+      callbacks.routeCount,
+    "universal callback census differs from the lifecycle ledger",
+  );
   const browserCallbackRoutes = selected.filter(({ browserCallback }) => browserCallback?.registryEligible);
-  const blockedBrowserCallbackRoutes = selected.filter(({ browserCallback }) => browserCallback && !browserCallback.registryEligible);
+  const blockedBrowserCallbackRoutes = selected.filter(
+    ({ browserCallback }) => browserCallback && !browserCallback.registryEligible,
+  );
   const reviewedBlockedBrowserCallbackRoutes = blockedBrowserCallbackRoutes.filter(
-    ({ browserCallback }) => browserCallback.reviewedLifecycle !== false);
-  assert(browserCallbackRoutes.length === callbacks.registryEligibleRouteCount &&
-    reviewedBlockedBrowserCallbackRoutes.length === callbacks.higherOrderClosureRouteCount,
-  "universal browser callback partition differs from the lifecycle ledger");
+    ({ browserCallback }) => browserCallback.reviewedLifecycle !== false,
+  );
+  assert(
+    browserCallbackRoutes.length === callbacks.registryEligibleRouteCount &&
+      reviewedBlockedBrowserCallbackRoutes.length === callbacks.higherOrderClosureRouteCount,
+    "universal browser callback partition differs from the lifecycle ledger",
+  );
   const frameProfileCensus = frameProfiles(selected).profiles.map((profile) => ({
     ...profile,
-    bytes: profile.argumentCapacity * 48 + profile.resultCapacity * 48 +
+    bytes:
+      profile.argumentCapacity * 48 +
+      profile.resultCapacity * 48 +
       (profile.inputEntryCapacity + profile.outputEntryCapacity) * 96 +
-      (profile.matrix4Arena ? 1296 : 0) + (profile.urlArena ? 1296 : 0)
+      (profile.matrix4Arena ? 1296 : 0) +
+      (profile.urlArena ? 1296 : 0),
   }));
   const header = renderHeader(selected, policy);
   const source = renderSource(selected);
@@ -2501,10 +2582,12 @@ export function generateUniversalValueBindings(inputs) {
   // report models transparently. Engine-owned values and Lua closures stay out
   // until the retained-handle and closure transports land.
   const transparentValueTypes = new Set(Object.keys(layouts.transparent));
-  const staticHermesEligible = selected.filter(({ id, shapeKinds, defoldValueTypes }) =>
-    (!shapeKinds.includes("callback") || staticOptionalCallbackTransport(signatureById.get(id))) &&
-    !shapeKinds.includes("handle") &&
-    defoldValueTypes.every((name) => transparentValueTypes.has(name)));
+  const staticHermesEligible = selected.filter(
+    ({ id, shapeKinds, defoldValueTypes }) =>
+      (!shapeKinds.includes("callback") || staticOptionalCallbackTransport(signatureById.get(id))) &&
+      !shapeKinds.includes("handle") &&
+      defoldValueTypes.every((name) => transparentValueTypes.has(name)),
+  );
   const artifacts = [
     relativePaths.header,
     relativePaths.source,
@@ -2515,7 +2598,7 @@ export function generateUniversalValueBindings(inputs) {
     relativePaths.typescript,
     relativePaths.browserTargetSupport,
     relativePaths.staticHermes,
-    relativePaths.browser
+    relativePaths.browser,
   ];
   const artifactHashes = Object.fromEntries([
     [relativePaths.header, sha256(header)],
@@ -2527,13 +2610,15 @@ export function generateUniversalValueBindings(inputs) {
     [relativePaths.typescript, sha256(typescript)],
     [relativePaths.browserTargetSupport, sha256(browserTargetSupport)],
     [relativePaths.staticHermes, sha256(staticHermes)],
-    [relativePaths.browser, sha256(browser)]
+    [relativePaths.browser, sha256(browser)],
   ]);
   const report = {
     schemaVersion: 1,
     defoldRevision: projection.defoldRevision,
-    scope: "Every callable script route selected mechanically by one bounded universal value-graph fallback; browser callbacks are promoted only when the generated lifecycle ledger marks them registry-eligible, and optimized lanes remain preferred at runtime.",
-    evidenceBoundary: "The shared recursive Lua backend, fixed-layout C ABI, sound-typed Static Hermes frame marshaller, direct-memory browser provider, and browser callback trampoline are generated and independently harness-tested. Static Hermes runtime execution proves the shape subset that carries no retained Lua handle, whose Defold value types all have a pinned transparent layout, and whose callback inputs are optional and declined to the JSI lane when present; packaged Defold and packaged browser execution remain unverified.",
+    scope:
+      "Every callable script route selected mechanically by one bounded universal value-graph fallback; browser callbacks are promoted only when the generated lifecycle ledger marks them registry-eligible, and optimized lanes remain preferred at runtime.",
+    evidenceBoundary:
+      "The shared recursive Lua backend, fixed-layout C ABI, sound-typed Static Hermes frame marshaller, direct-memory browser provider, and browser callback trampoline are generated and independently harness-tested. Static Hermes runtime execution proves the shape subset that carries no retained Lua handle, whose Defold value types all have a pinned transparent layout, and whose callback inputs are optional and declined to the JSI lane when present; packaged Defold and packaged browser execution remain unverified.",
     selection: policy.selection,
     bounds: policy.bounds,
     tablePolicy: policy.tablePolicy,
@@ -2546,7 +2631,7 @@ export function generateUniversalValueBindings(inputs) {
     frameProfiles: {
       rule: "input-and-output-value-shapes-walked-per-phase-unreadable-constructors-keep-the-full-frame",
       distinct: frameProfileCensus.length,
-      profiles: frameProfileCensus
+      profiles: frameProfileCensus,
     },
     targetSupport: universalTargetSupport,
     targetEvidence: {
@@ -2555,15 +2640,17 @@ export function generateUniversalValueBindings(inputs) {
         harnessRuntime: "proven",
         registryEligibleCallbackRoutes: browserCallbackRoutes.length,
         rootedHigherOrderClosureRoutes: blockedBrowserCallbackRoutes.map(({ id }) => id),
-        luaClosureResultRooting: "real-hermes-lua-harness-proven-with-varargs-multi-result-error-finalizer-and-teardown",
-        packagedDefold: "unverified"
+        luaClosureResultRooting:
+          "real-hermes-lua-harness-proven-with-varargs-multi-result-error-finalizer-and-teardown",
+        packagedDefold: "unverified",
       },
       nativeStaticHermes: {
         cAbiCompileLinkRuntime: "proven",
         staticCompiler: "proven",
         staticHermesRuntime: "proven-representative-recursive-value-graph-with-transparent-defold-value-records",
         emittedRouteCount: staticHermesEligible.length,
-        emittedShapeRule: "optional-input-callbacks-decline-to-jsi-no-lua-handle-and-every-defold-value-type-transparent",
+        emittedShapeRule:
+          "optional-input-callbacks-decline-to-jsi-no-lua-handle-and-every-defold-value-type-transparent",
         transparentValueTypes: [...transparentValueTypes].sort(compare),
         opaqueValueTypes: Object.keys(layouts.opaque).sort(compare),
         defoldValueLayoutSource: relativePaths.layouts,
@@ -2574,9 +2661,9 @@ export function generateUniversalValueBindings(inputs) {
           stringBytesMacro: "DEHERM_SCRIPT_STATIC_FRAME_STRING_BYTES",
           defaultInputStringBytesPerFrame: 16384,
           defaultOutputStringBytesPerFrame: 16384,
-          exactNativeFootprint: "reported-by-runtime-harness-not-portably-derived"
+          exactNativeFootprint: "reported-by-runtime-harness-not-portably-derived",
         },
-        packagedDefold: "unverified"
+        packagedDefold: "unverified",
       },
       html5BrowserHost: {
         providerSyntax: "proven",
@@ -2584,8 +2671,8 @@ export function generateUniversalValueBindings(inputs) {
         callbackRegistryNativeHarness: "proven",
         registryEligibleCallbackRoutes: browserCallbackRoutes.length,
         blockedHigherOrderClosureRoutes: blockedBrowserCallbackRoutes.map(({ id }) => id),
-        packagedBrowserEngine: "unverified"
-      }
+        packagedBrowserEngine: "unverified",
+      },
     },
     inputHashes: {
       projection: sha256(inputs.projectionText),
@@ -2593,20 +2680,32 @@ export function generateUniversalValueBindings(inputs) {
       classification: sha256(inputs.classificationText),
       policy: sha256(inputs.policyText),
       layouts: sha256(inputs.layoutsText),
-      constants: sha256(inputs.constantsText)
+      constants: sha256(inputs.constantsText),
     },
     artifacts,
     artifactHashes,
     bindings: selected,
-    excluded
+    excluded,
   };
-  return { report, header, source, cHeader, cSource, staticFrameHeader, staticFrameSource, typescript, browserTargetSupport, staticHermes, browser };
+  return {
+    report,
+    header,
+    source,
+    cHeader,
+    cSource,
+    staticFrameHeader,
+    staticFrameSource,
+    typescript,
+    browserTargetSupport,
+    staticHermes,
+    browser,
+  };
 }
 
 async function writeOrCheck(root, relative, content, check) {
   const destination = path.join(root, relative);
   if (check) {
-    assert(await readFile(destination, "utf8") === content, `${relative} is stale`);
+    assert((await readFile(destination, "utf8")) === content, `${relative} is stale`);
     return;
   }
   await mkdir(path.dirname(destination), { recursive: true });
@@ -2634,5 +2733,8 @@ export async function runUniversalValueGenerator(options = {}) {
 if (process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url) {
   runUniversalValueGenerator(parseArguments(process.argv.slice(2)))
     .then((report) => console.log(`Generated ${report.candidateCount} universal-value script descriptors.`))
-    .catch((error) => { console.error(error.stack ?? error.message); process.exitCode = 1; });
+    .catch((error) => {
+      console.error(error.stack ?? error.message);
+      process.exitCode = 1;
+    });
 }

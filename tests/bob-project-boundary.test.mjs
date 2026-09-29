@@ -9,7 +9,7 @@ import {
   BOB_MANAGED_IGNORE_BEGIN,
   BOB_MANAGED_IGNORE_END,
   discoverBobAuthoringIgnoreEntries,
-  reconcileBobProjectBoundary
+  reconcileBobProjectBoundary,
 } from "../packages/cli/src/bob-project-boundary.mjs";
 
 function managedEntries(source) {
@@ -23,14 +23,17 @@ function managedEntries(source) {
 test("the Bob boundary excludes only invariant tooling trees and preserves authored rules", async (t) => {
   const root = await mkdtemp(path.join(tmpdir(), "deherm-bob-boundary-"));
   t.after(() => rm(root, { recursive: true, force: true }));
-  await writeFile(path.join(root, ".defignore"), [
-    "this line is intentionally ignored by Defold",
-    "/reference",
-    "/node_modules/",
-    "/node_modules",
-    "/old-generated-unit",
-    ""
-  ].join("\n"));
+  await writeFile(
+    path.join(root, ".defignore"),
+    [
+      "this line is intentionally ignored by Defold",
+      "/reference",
+      "/node_modules/",
+      "/node_modules",
+      "/old-generated-unit",
+      "",
+    ].join("\n"),
+  );
   await mkdir(path.join(root, "src"));
   await writeFile(path.join(root, "src", "main.script.ts"), "export default {};\n");
   await writeFile(path.join(root, "src", "main.script"), "-- generated proxy\n");
@@ -38,25 +41,25 @@ test("the Bob boundary excludes only invariant tooling trees and preserves autho
   const first = await reconcileBobProjectBoundary({
     projectRoot: root,
     includeEntries: ["/target-generated-unit"],
-    excludeEntries: ["/old-generated-unit"]
+    excludeEntries: ["/old-generated-unit"],
   });
   assert.equal(first.changed, true);
   const source = await readFile(path.join(root, ".defignore"), "utf8");
   assert.deepEqual(source.slice(0, source.indexOf(BOB_MANAGED_IGNORE_BEGIN)).trim().split("\n"), [
     "this line is intentionally ignored by Defold",
-    "/reference"
+    "/reference",
   ]);
   assert.deepEqual(managedEntries(source), [
     ...BOB_TOOLING_IGNORE_ENTRIES,
     "/src/main.script.ts",
-    "/target-generated-unit"
+    "/target-generated-unit",
   ]);
   assert.ok(!managedEntries(source).includes("/src/main.script"), "generated Defold proxy remains visible to Bob");
 
   const second = await reconcileBobProjectBoundary({
     projectRoot: root,
     includeEntries: ["/target-generated-unit"],
-    excludeEntries: ["/old-generated-unit"]
+    excludeEntries: ["/old-generated-unit"],
   });
   assert.equal(second.changed, false);
 });
@@ -80,22 +83,25 @@ test("the Bob boundary discovers exact TypeScript inputs without excluding their
     "/src/shared/hud.tsx",
     "/src/shared/legacy.cts",
     "/src/shared/math.ts",
-    "/src/shared/worker.mts"
+    "/src/shared/worker.mts",
   ]);
 });
 
 test("the Bob boundary replaces its managed block and removes stale generated exclusions", async (t) => {
   const root = await mkdtemp(path.join(tmpdir(), "deherm-bob-stale-"));
   t.after(() => rm(root, { recursive: true, force: true }));
-  await writeFile(path.join(root, ".defignore"), [
-    "/authored-rule",
-    "",
-    BOB_MANAGED_IGNORE_BEGIN,
-    "/stale.ts",
-    "/stale-generated-extension",
-    BOB_MANAGED_IGNORE_END,
-    ""
-  ].join("\n"));
+  await writeFile(
+    path.join(root, ".defignore"),
+    [
+      "/authored-rule",
+      "",
+      BOB_MANAGED_IGNORE_BEGIN,
+      "/stale.ts",
+      "/stale-generated-extension",
+      BOB_MANAGED_IGNORE_END,
+      "",
+    ].join("\n"),
+  );
 
   await reconcileBobProjectBoundary({ projectRoot: root, discoverAuthoringSources: false });
   const source = await readFile(path.join(root, ".defignore"), "utf8");
@@ -124,14 +130,14 @@ test("the Bob boundary refuses the project root and contradictory managed entrie
   t.after(() => rm(root, { recursive: true, force: true }));
   await assert.rejects(
     reconcileBobProjectBoundary({ projectRoot: root, includeEntries: ["/"] }),
-    /cannot ignore the project root/u
+    /cannot ignore the project root/u,
   );
   await assert.rejects(
     reconcileBobProjectBoundary({
       projectRoot: root,
       includeEntries: ["/generated"],
-      excludeEntries: ["/generated/"]
+      excludeEntries: ["/generated/"],
     }),
-    /both required and removed/u
+    /both required and removed/u,
   );
 });

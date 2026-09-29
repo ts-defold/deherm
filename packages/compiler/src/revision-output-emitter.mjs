@@ -113,19 +113,19 @@ namespace defold_hermes {
 void installDmSdkScalarModule(facebook::jsi::Runtime& runtime, facebook::jsi::Object& modules);
 }
 #endif
-`
+`,
 });
 
 export const LOCALLY_RENDERED_OUTPUT_RECIPES = Object.freeze({
   ...Object.fromEntries(Object.keys(stableTemplates).map((relative) => [relative, STABLE_OUTPUT_RECIPE])),
-  "defold/defold_hermes/include/defold_hermes/generated_dmsdk_universal_jsi.hpp": DMSDK_UNIVERSAL_JSI_HEADER_RECIPE
+  "defold/defold_hermes/include/defold_hermes/generated_dmsdk_universal_jsi.hpp": DMSDK_UNIVERSAL_JSI_HEADER_RECIPE,
 });
 
 export const LOCALLY_RENDERED_OUTPUT_INPUTS = Object.freeze({
   ...Object.fromEntries(Object.keys(stableTemplates).map((relative) => [relative, Object.freeze([])])),
   "defold/defold_hermes/include/defold_hermes/generated_dmsdk_universal_jsi.hpp": Object.freeze([
-    "defold-dmsdk-universal-bindings.json"
-  ])
+    "defold-dmsdk-universal-bindings.json",
+  ]),
 });
 
 function generateDmSdkUniversalJsiHeader(report) {

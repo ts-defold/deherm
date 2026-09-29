@@ -59,7 +59,7 @@ import {
   TYPED_NATIVE_EXTENSION,
   TYPED_NATIVE_RUNTIME,
   reconcileTypedNativeUpload,
-  typedNativeDisposition
+  typedNativeDisposition,
 } from "../packages/cli/src/typed-native.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -77,7 +77,7 @@ const kRegistrationSource = "deherm_typed_native_extension.cpp";
 // `shermes` unit is not a module.
 const kLaneSources = [
   ".deherm/static-hermes/generated/script-universal-value.ts",
-  ".deherm/static-hermes/generated/script-typed-native-bridge.ts"
+  ".deherm/static-hermes/generated/script-typed-native-bridge.ts",
 ];
 
 /** Packaged Hermes archives whose assert state the emitted unit must match. */
@@ -118,22 +118,32 @@ function parseArguments(argv) {
     profile: false,
     shermes: null,
     hermesInclude: path.join(repositoryRoot, "defold/defold_hermes/include"),
-    hermesConfigInclude: null
+    hermesConfigInclude: null,
   };
   for (let index = 2; index < argv.length; ++index) {
     const argument = argv[index];
-    if (argument === "--profile") { options.profile = true; continue; }
+    if (argument === "--profile") {
+      options.profile = true;
+      continue;
+    }
     // Decide and apply the upload disposition without running `shermes`. This
     // is what a build wrapper calls before Bob walks the project.
-    if (argument === "--reconcile") { options.reconcile = true; continue; }
+    if (argument === "--reconcile") {
+      options.reconcile = true;
+      continue;
+    }
     if (argument === "--target") {
       const value = argv[++index];
       assert.ok(value, "--target requires a value");
       options.target = value;
       continue;
     }
-    if (argument === "--project" || argument === "--shermes" ||
-        argument === "--hermes-include" || argument === "--hermes-config-include") {
+    if (
+      argument === "--project" ||
+      argument === "--shermes" ||
+      argument === "--hermes-include" ||
+      argument === "--hermes-config-include"
+    ) {
       const value = argv[++index];
       assert.ok(value, `${argument} requires a value`);
       const key = argument.slice(2).replace(/-([a-z])/g, (_, character) => character.toUpperCase());
@@ -235,10 +245,14 @@ export function renderPrelude(declarations) {
   for (const { returnType, name, parameters } of declarations) {
     if (!parameters.some(({ pointer }) => pointer)) continue;
     const signature = parameters
-      .map(({ pointer, type, name: parameterName }) => (pointer ? `void* ${parameterName}` : `${type} ${parameterName}`))
+      .map(({ pointer, type, name: parameterName }) =>
+        pointer ? `void* ${parameterName}` : `${type} ${parameterName}`,
+      )
       .join(", ");
     const call = parameters
-      .map(({ pointer, type, name: parameterName }) => (pointer ? `static_cast<${type}>(${parameterName})` : parameterName))
+      .map(({ pointer, type, name: parameterName }) =>
+        pointer ? `static_cast<${type}>(${parameterName})` : parameterName,
+      )
       .join(", ");
     const body = returnType === "void" ? `${name}(${call});` : `return ${name}(${call});`;
     overloads.push(`static inline ${returnType} ${name}(${signature}) { ${body} }`);
@@ -275,7 +289,10 @@ export function parseDeclarations(source, names) {
     if (!match) continue;
     const returnType = match[1].trim();
     const rawParameters = match[2].trim();
-    if (rawParameters === "void" || rawParameters === "") { found.set(name, { returnType, name, parameters: [] }); continue; }
+    if (rawParameters === "void" || rawParameters === "") {
+      found.set(name, { returnType, name, parameters: [] });
+      continue;
+    }
     if (rawParameters.includes("...")) continue;
     const parameters = rawParameters.split(",").map((parameter, index) => {
       const text = parameter.trim();
@@ -284,7 +301,7 @@ export function parseDeclarations(source, names) {
       return {
         type: declarator,
         name: identifier ? identifier[1] : `argument${index}`,
-        pointer: declarator.endsWith("*")
+        pointer: declarator.endsWith("*"),
       };
     });
     found.set(name, { returnType, name, parameters });
@@ -311,7 +328,9 @@ export function adaptEmittedCToCxx(emitted, preludeHeader) {
 
   // 1. A tentative array definition has no C++ spelling. The real definition
   //    is moved over the forward declaration instead of being duplicated.
-  const tentative = [...source.matchAll(/^static (?:const )?[A-Za-z_][\w:]* [A-Za-z_]\w*\[\];$/gm)].map((match) => match[0]);
+  const tentative = [...source.matchAll(/^static (?:const )?[A-Za-z_][\w:]* [A-Za-z_]\w*\[\];$/gm)].map(
+    (match) => match[0],
+  );
   assert.ok(tentative.length > 0, "Emitted unit has no tentative array definition; the emitter shape changed");
   for (const declaration of tentative) {
     const head = `${declaration.slice(0, -1)} = {`;
@@ -371,8 +390,7 @@ export async function resolveArchiveAssertState(libraryRoot) {
       models.add(match[1]);
     }
   }
-  assert.ok(models.size <= 1,
-    `Vendored Hermes archives disagree about asserts: ${[...models].sort().join(", ")}`);
+  assert.ok(models.size <= 1, `Vendored Hermes archives disagree about asserts: ${[...models].sort().join(", ")}`);
   // With nothing vendered to read, the project's own CI configuration is the
   // only claim available, and it builds Release.
   return { assertsOff: models.size === 0 || models.has("rel"), observed: [...models][0] ?? null };
@@ -380,8 +398,10 @@ export async function resolveArchiveAssertState(libraryRoot) {
 
 function renderArchiveMatchPrologue({ assertsOff, observed }) {
   if (!assertsOff) {
-    return `// The packaged libhermes.a exports an asserts-on model symbol` +
-      ` (_sh_model..._${observed ?? "dbg"}), which Extender's debug variant already matches.\n`;
+    return (
+      `// The packaged libhermes.a exports an asserts-on model symbol` +
+      ` (_sh_model..._${observed ?? "dbg"}), which Extender's debug variant already matches.\n`
+    );
   }
   return `// The packaged libhermes.a is an asserts-off build: its symbol table exports
 // _sh_model..._${observed ?? "rel"}. Hermes turns that into a link-time check that a client
@@ -509,7 +529,9 @@ export async function reconcile(options) {
 export async function assemble(options) {
   const projectRoot = path.resolve(options.project);
   const extensionRoot = path.join(projectRoot, kExtensionName);
-  const hermesInclude = path.resolve(options.hermesInclude ?? path.join(repositoryRoot, "defold/defold_hermes/include"));
+  const hermesInclude = path.resolve(
+    options.hermesInclude ?? path.join(repositoryRoot, "defold/defold_hermes/include"),
+  );
 
   // A typed-native unit is a transport of the `hermes` runtime. Deciding this
   // before anything is emitted is what keeps a browser-runtime target from
@@ -529,7 +551,7 @@ export async function assemble(options) {
       reason: disposition.reason,
       // The refusal is not the whole answer: an earlier native build may have
       // left a unit on disk, and that unit must not reach this target's upload.
-      reconciled: await reconcileTypedNativeUpload({ projectRoot, platform: options.target })
+      reconciled: await reconcileTypedNativeUpload({ projectRoot, platform: options.target }),
     };
     return { extensionRoot, refusal, manifest: null, written: [], recorded: null };
   }
@@ -539,8 +561,7 @@ export async function assemble(options) {
   // content-addressed target artifact before resolving the header closure;
   // never borrow a config from the host that packed the npm package.
   await ensureProjectNativeArtifact(projectRoot, options.target);
-  const hermesConfigInclude = options.hermesConfigInclude ??
-    path.join(projectRoot, "defold_hermes", "include");
+  const hermesConfigInclude = options.hermesConfigInclude ?? path.join(projectRoot, "defold_hermes", "include");
 
   const laneSources = [];
   for (const relative of kLaneSources) {
@@ -549,9 +570,7 @@ export async function assemble(options) {
     laneSources.push({ relative, absolute, source });
   }
   // `export { ... }` makes the lane a module; a `shermes` unit is not one.
-  const unitSource = laneSources
-    .map(({ source }) => source.replace(/^export \{.*\};$/m, ""))
-    .join("\n");
+  const unitSource = laneSources.map(({ source }) => source.replace(/^export \{.*\};$/m, "")).join("\n");
 
   // `shermes` writes the input path it was given into the emitted source
   // locations, so a temporary directory would make identical TypeScript emit
@@ -564,27 +583,37 @@ export async function assemble(options) {
   const output = path.join(stagingDirectory, `${kUnitName}.c`);
   await writeFile(path.join(projectRoot, relativeInput), unitSource);
   const shermesPath = await resolveShermes(options.shermes);
-  const result = spawnSync(shermesPath, [
-    "-typed", "-strict", "-O", "-emit-c",
-    `-exported-unit=${kUnitName}`,
-    relativeInput, "-o", output
-  ], { cwd: projectRoot, encoding: "utf8" });
+  const result = spawnSync(
+    shermesPath,
+    ["-typed", "-strict", "-O", "-emit-c", `-exported-unit=${kUnitName}`, relativeInput, "-o", output],
+    { cwd: projectRoot, encoding: "utf8" },
+  );
   assert.equal(result.status, 0, result.stderr || result.stdout || "shermes did not run");
   const emittedC = await readFile(output, "utf8");
-  assert.ok(emittedC.includes(`// ${relativeInput}:`),
-    "Emitted C does not name the staged lane; source locations changed shape");
-  assert.doesNotMatch(emittedC, /^\/\/ \//m,
-    "Emitted C carries an absolute source path, so the emission is not reproducible across hosts");
+  assert.ok(
+    emittedC.includes(`// ${relativeInput}:`),
+    "Emitted C does not name the staged lane; source locations changed shape",
+  );
+  assert.doesNotMatch(
+    emittedC,
+    /^\/\/ \//m,
+    "Emitted C carries an absolute source path, so the emission is not reproducible across hosts",
+  );
 
   // The emission is only useful if it really lowered the `extern_c`
   // declarations to direct C calls. Assert that from the artifact rather than
   // assuming it: a JSI fallback inside the unit would leave no such symbol.
-  assert.match(emittedC, /#define CREATE_THIS_UNIT sh_export_deherm_typed_native/,
-    "shermes did not emit a library-shaped unit");
+  assert.match(
+    emittedC,
+    /#define CREATE_THIS_UNIT sh_export_deherm_typed_native/,
+    "shermes did not emit a library-shaped unit",
+  );
   assert.doesNotMatch(emittedC, /\bint\s+main\s*\(/, "shermes emitted an executable unit");
   const externCallSites = (emittedC.match(/\bdeherm_script_static_[a-z_0-9]*\(/g) ?? []).length;
-  assert.ok(externCallSites > 0,
-    "Emitted C contains no direct call to the universal static frame; extern_c did not lower");
+  assert.ok(
+    externCallSites > 0,
+    "Emitted C contains no direct call to the universal static frame; extern_c did not lower",
+  );
 
   // The prelude is derived from the same declarations the lane pointed
   // `extern_c` at, so a changed signature changes the overload rather than
@@ -594,7 +623,7 @@ export async function assemble(options) {
   const declarations = new Map();
   for (const headerPath of [
     path.join(projectRoot, "defold_hermes/include/defold_hermes/generated_script_universal_static_frame.h"),
-    path.join(hermesInclude, "hermes/VM/static_h.h")
+    path.join(hermesInclude, "hermes/VM/static_h.h"),
   ]) {
     const header = await readFile(headerPath, "utf8");
     for (const [name, declaration] of parseDeclarations(header, calleeNames)) {
@@ -602,8 +631,7 @@ export async function assemble(options) {
     }
   }
   const unresolved = calleeNames.filter((name) => !declarations.has(name));
-  assert.deepEqual(unresolved, [],
-    `extern_c callees have no parsed C declaration: ${unresolved.join(", ")}`);
+  assert.deepEqual(unresolved, [], `extern_c callees have no parsed C declaration: ${unresolved.join(", ")}`);
   const prelude = renderPrelude([...declarations.values()]);
   const assertState = await resolveArchiveAssertState(path.join(projectRoot, kVendoredLibraryRoot));
   const adapted = `${renderRuntimeGuard()}${renderArchiveMatchPrologue(assertState)}${adaptEmittedCToCxx(emittedC, kPreludeHeader)}`;
@@ -632,8 +660,7 @@ export async function assemble(options) {
   // The profile switch is a property of the assembled build, so it is
   // materialised with it and lives in the extension whose dispatchers it
   // instruments.
-  const buildConfig = path.join(projectRoot,
-    "defold_hermes/include/defold_hermes/generated_build_config.h");
+  const buildConfig = path.join(projectRoot, "defold_hermes/include/defold_hermes/generated_build_config.h");
   await writeFile(buildConfig, renderBuildConfig(options.profile));
 
   const manifest = {
@@ -652,13 +679,15 @@ export async function assemble(options) {
       mechanism: ".defignore",
       entry: `/${kExtensionName}`,
       appliedBy: "packages/cli/src/typed-native.mjs",
-      note: "Bob filters extension discovery through .defignore, and an ext.manifest cannot exclude a platform."
+      note: "Bob filters extension discovery through .defignore, and an ext.manifest cannot exclude a platform.",
     },
     profile: options.profile,
     laneSources: Object.fromEntries(laneSources.map(({ relative, source }) => [relative, sha256(source)])),
-    vendoredHeaders: Object.fromEntries([...headers]
-      .sort(([left], [right]) => (left < right ? -1 : 1))
-      .map(([relative, { source }]) => [relative, sha256(source)])),
+    vendoredHeaders: Object.fromEntries(
+      [...headers]
+        .sort(([left], [right]) => (left < right ? -1 : 1))
+        .map(([relative, { source }]) => [relative, sha256(source)]),
+    ),
     hermesArchiveModel: assertState.observed,
     compiledWithAssertsOff: assertState.assertsOff,
     externCalleeCount: calleeNames.length,
@@ -670,8 +699,8 @@ export async function assemble(options) {
       cEmission: "observed",
       compilation: "requires-extender",
       linkage: "requires-extender",
-      runtime: "not-claimed"
-    }
+      runtime: "not-claimed",
+    },
   };
   await write("manifest.json", `${JSON.stringify(manifest, null, 2)}\n`);
 
@@ -687,8 +716,8 @@ export async function assemble(options) {
         transport: "typed-native",
         unit: `sh_export_${kUnitName}`,
         profile: options.profile,
-        toolchain: await installedToolchain()
-      }
+        toolchain: await installedToolchain(),
+      },
     });
   } catch (error) {
     // A project without a lock is still assembled; the binding is the part
@@ -722,8 +751,9 @@ export async function run(argv = process.argv) {
   const files = await readdir(path.join(result.extensionRoot, "src"));
   console.log(
     `assembled ${kExtensionName} into ${path.relative(repositoryRoot, result.extensionRoot)}: ` +
-    `${files.length} C source(s), ${Object.keys(result.manifest.vendoredHeaders).length} vendored header(s), ` +
-    `${result.manifest.emittedCBytes} bytes of emitted C, profile=${options.profile ? "on" : "off"}`);
+      `${files.length} C source(s), ${Object.keys(result.manifest.vendoredHeaders).length} vendored header(s), ` +
+      `${result.manifest.emittedCBytes} bytes of emitted C, profile=${options.profile ? "on" : "off"}`,
+  );
   if (result.recorded?.reason) console.log(`deherm.lock binding skipped: ${result.recorded.reason}`);
   return result;
 }

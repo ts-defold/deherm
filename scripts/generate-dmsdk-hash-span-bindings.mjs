@@ -64,8 +64,8 @@ function validateProvenance(ir, shapes, contents) {
 }
 
 function createEntries(rows, declarations, plan, planById) {
-  const patterns = plan.patternRegistry.filter(({ id }) =>
-    id === "span.fixed-width-hash" || id === "universal.default",
+  const patterns = plan.patternRegistry.filter(
+    ({ id }) => id === "span.fixed-width-hash" || id === "universal.default",
   );
   const entries = [];
   const blocked = [];
@@ -163,9 +163,7 @@ function createReport(contents, ir, shapes, policy, entries, blocked, structural
     policyVersion: policy.policyVersion,
     defoldRevision: ir.defoldRevision,
     sources: { ir: defaults.ir, shapes: defaults.shapes, policy: defaults.policy },
-    sourceHashes: {
-      ...Object.fromEntries(Object.entries(contents).map(([key, value]) => [key, sha256(value)])),
-    },
+    sourceHashes: Object.fromEntries(Object.entries(contents).map(([key, value]) => [key, sha256(value)])),
     policy: {
       recipe: policy.recipe,
       patternRegistry: patterns.map(({ id, family, emitter, priority, cost, fallback, when }) => ({
@@ -250,12 +248,7 @@ export async function build(options) {
       hashSpan: sha256(contents.policy),
     },
   });
-  const { entries, blocked, structurallyEligible, patterns } = createEntries(
-    shapes.rows,
-    declarations,
-    plan,
-    planById,
-  );
+  const { entries, blocked, structurallyEligible, patterns } = createEntries(shapes.rows, declarations, plan, planById);
   const artifacts = new Map([
     ["defold/defold_hermes/include/defold_hermes/generated_dmsdk_hash_span.h", renderHeader(entries)],
     ["defold/defold_hermes/include/defold_hermes/generated_dmsdk_hash_span_runtime.h", renderRuntimeHeader()],

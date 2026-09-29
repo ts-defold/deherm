@@ -7,7 +7,7 @@ export const VIEWS = [
   { key: "overview", label: "Overview", hotkey: "o" },
   { key: "targets", label: "Targets", hotkey: "t" },
   { key: "generations", label: "Generations", hotkey: "g" },
-  { key: "instances", label: "Instances", hotkey: "i" }
+  { key: "instances", label: "Instances", hotkey: "i" },
 ];
 
 // Focus scope for every panel that owns keys. Rezi routes Tab/Shift-Tab across
@@ -22,7 +22,7 @@ export const PANEL_IDS = {
   generations: "deherm-generations",
   instances: "deherm-instances",
   logs: "deherm-logs",
-  logsSelection: "deherm-logs-selection"
+  logsSelection: "deherm-logs-selection",
 };
 
 const SCOPE_BY_ID = new Map(Object.entries(PANEL_IDS).map(([scope, id]) => [id, scope]));
@@ -41,7 +41,7 @@ export const PANEL_TITLES = {
   runtime: "RUNTIME HEALTH",
   generations: "GENERATIONS",
   instances: "RUNTIME INSTANCES",
-  logs: "LIVE LOGS"
+  logs: "LIVE LOGS",
 };
 
 // A table row rather than a flat map: order is meaningful for the footer and
@@ -51,43 +51,270 @@ export const PANEL_TITLES = {
 //   group     help section
 //   footer    "always" | "wide" | "never"
 export function devKeymapEntries(actions = {}) {
-  const call = (name, ...args) => () => actions[name]?.(...args);
+  const call =
+    (name, ...args) =>
+    () =>
+      actions[name]?.(...args);
   const entries = [
-    { sequence: "p", scope: "global", group: "Session", description: "Launch or stop the built Defold game", hint: "play/stop", footer: "always", run: call("play") },
-    { sequence: "w", scope: "global", group: "Session", description: "Launch or stop the HTML5 build in a headless browser", hint: "web", footer: "always", run: call("web") },
-    { sequence: "r", scope: "global", group: "Session", description: "Signal a hot reload to every target", hint: "reload", footer: "always", run: call("reload") },
-    { sequence: "b", scope: "global", group: "Session", description: "Full rebuild and relaunch", hint: "rebuild", footer: "wide", run: call("rebuild") },
-    { sequence: "q", scope: "global", group: "Session", description: "Quit the dev session and stop the engine", hint: "quit", footer: "never", run: call("quit") },
+    {
+      sequence: "p",
+      scope: "global",
+      group: "Session",
+      description: "Launch or stop the built Defold game",
+      hint: "play/stop",
+      footer: "always",
+      run: call("play"),
+    },
+    {
+      sequence: "w",
+      scope: "global",
+      group: "Session",
+      description: "Launch or stop the HTML5 build in a headless browser",
+      hint: "web",
+      footer: "always",
+      run: call("web"),
+    },
+    {
+      sequence: "r",
+      scope: "global",
+      group: "Session",
+      description: "Signal a hot reload to every target",
+      hint: "reload",
+      footer: "always",
+      run: call("reload"),
+    },
+    {
+      sequence: "b",
+      scope: "global",
+      group: "Session",
+      description: "Full rebuild and relaunch",
+      hint: "rebuild",
+      footer: "wide",
+      run: call("rebuild"),
+    },
+    {
+      sequence: "q",
+      scope: "global",
+      group: "Session",
+      description: "Quit the dev session and stop the engine",
+      hint: "quit",
+      footer: "never",
+      run: call("quit"),
+    },
 
-    { sequence: "o", scope: "global", group: "Views", description: "Overview", hint: "overview", footer: "never", run: call("selectView", "overview") },
-    { sequence: "t", scope: "global", group: "Views", description: "Targets: generation, fingerprint, phase, telemetry", hint: "targets", footer: "always", run: call("selectView", "targets") },
-    { sequence: "g", scope: "global", group: "Views", description: "Generations: build timeline and activation outcome", hint: "generations", footer: "always", run: call("selectView", "generations") },
-    { sequence: "i", scope: "global", group: "Views", description: "Runtime instances", hint: "instances", footer: "wide", run: call("selectView", "instances") },
+    {
+      sequence: "o",
+      scope: "global",
+      group: "Views",
+      description: "Overview",
+      hint: "overview",
+      footer: "never",
+      run: call("selectView", "overview"),
+    },
+    {
+      sequence: "t",
+      scope: "global",
+      group: "Views",
+      description: "Targets: generation, fingerprint, phase, telemetry",
+      hint: "targets",
+      footer: "always",
+      run: call("selectView", "targets"),
+    },
+    {
+      sequence: "g",
+      scope: "global",
+      group: "Views",
+      description: "Generations: build timeline and activation outcome",
+      hint: "generations",
+      footer: "always",
+      run: call("selectView", "generations"),
+    },
+    {
+      sequence: "i",
+      scope: "global",
+      group: "Views",
+      description: "Runtime instances",
+      hint: "instances",
+      footer: "wide",
+      run: call("selectView", "instances"),
+    },
 
-    { sequence: null, scope: "global", group: "Focus", description: "Focus the next panel", routedBy: "focus runtime", hint: "focus", footer: "wide", sequenceLabel: "tab" },
-    { sequence: null, scope: "global", group: "Focus", description: "Focus the previous panel", routedBy: "focus runtime", footer: "never", sequenceLabel: "shift+tab" },
-    { sequence: "escape", scope: "global", group: "Focus", description: "Close the topmost overlay", hint: "close", footer: "never", run: call("closeLayer") },
+    {
+      sequence: null,
+      scope: "global",
+      group: "Focus",
+      description: "Focus the next panel",
+      routedBy: "focus runtime",
+      hint: "focus",
+      footer: "wide",
+      sequenceLabel: "tab",
+    },
+    {
+      sequence: null,
+      scope: "global",
+      group: "Focus",
+      description: "Focus the previous panel",
+      routedBy: "focus runtime",
+      footer: "never",
+      sequenceLabel: "shift+tab",
+    },
+    {
+      sequence: "escape",
+      scope: "global",
+      group: "Focus",
+      description: "Close the topmost overlay",
+      hint: "close",
+      footer: "never",
+      run: call("closeLayer"),
+    },
 
-    { sequence: ":", scope: "global", group: "Commands", description: "Command palette over every action", hint: "commands", footer: "always", run: call("openPalette") },
-    { sequence: "?", scope: "global", group: "Commands", description: "Keybinding help", hint: "help", footer: "always", run: call("openHelp") },
+    {
+      sequence: ":",
+      scope: "global",
+      group: "Commands",
+      description: "Command palette over every action",
+      hint: "commands",
+      footer: "always",
+      run: call("openPalette"),
+    },
+    {
+      sequence: "?",
+      scope: "global",
+      group: "Commands",
+      description: "Keybinding help",
+      hint: "help",
+      footer: "always",
+      run: call("openHelp"),
+    },
 
-    { sequence: "y", scope: "global", group: "Selection", description: "Copy the focused panel's selection to the clipboard", hint: "copy", footer: "wide", run: call("copySelection") },
-    { sequence: "ctrl+a", scope: "global", group: "Selection", description: "Select everything in the focused panel", footer: "never", run: call("selectAll") },
-    { sequence: "ctrl+c", scope: "global", group: "Selection", description: "Clear the current selection", footer: "never", run: call("clearSelection") },
+    {
+      sequence: "y",
+      scope: "global",
+      group: "Selection",
+      description: "Copy the focused panel's selection to the clipboard",
+      hint: "copy",
+      footer: "wide",
+      run: call("copySelection"),
+    },
+    {
+      sequence: "ctrl+a",
+      scope: "global",
+      group: "Selection",
+      description: "Select everything in the focused panel",
+      footer: "never",
+      run: call("selectAll"),
+    },
+    {
+      sequence: "ctrl+c",
+      scope: "global",
+      group: "Selection",
+      description: "Clear the current selection",
+      footer: "never",
+      run: call("clearSelection"),
+    },
 
-    { sequence: "/", scope: "global", group: "Logs", description: "Filter the log stream", hint: "filter", footer: "wide", run: call("openFilter") },
-    { sequence: "f", scope: "global", group: "Logs", description: "Follow the newest log entries", hint: "follow", footer: "always", run: call("followLogs") },
-    { sequence: "up", scope: "logs", group: "Logs", description: "Scroll logs up one line", hint: "scroll", footer: "always", run: call("scrollLogs", -1) },
-    { sequence: "down", scope: "logs", group: "Logs", description: "Scroll logs down one line", footer: "never", run: call("scrollLogs", 1) },
-    { sequence: "ctrl+u", scope: "logs", group: "Logs", description: "Scroll logs up one page", footer: "never", run: call("scrollLogs", -10) },
-    { sequence: "ctrl+d", scope: "logs", group: "Logs", description: "Scroll logs down one page", footer: "never", run: call("scrollLogs", 10) },
-    { sequence: "pageup", scope: "logs", group: "Logs", description: "Scroll logs up one page", footer: "never", run: call("scrollLogs", -10) },
-    { sequence: "pagedown", scope: "logs", group: "Logs", description: "Scroll logs down one page", footer: "never", run: call("scrollLogs", 10) },
-    { sequence: "home", scope: "logs", group: "Logs", description: "Jump to the oldest retained log entry", footer: "never", run: call("scrollLogsHome") },
-    { sequence: "end", scope: "logs", group: "Logs", description: "Follow the newest log entries", footer: "never", run: call("followLogs") },
+    {
+      sequence: "/",
+      scope: "global",
+      group: "Logs",
+      description: "Filter the log stream",
+      hint: "filter",
+      footer: "wide",
+      run: call("openFilter"),
+    },
+    {
+      sequence: "f",
+      scope: "global",
+      group: "Logs",
+      description: "Follow the newest log entries",
+      hint: "follow",
+      footer: "always",
+      run: call("followLogs"),
+    },
+    {
+      sequence: "up",
+      scope: "logs",
+      group: "Logs",
+      description: "Scroll logs up one line",
+      hint: "scroll",
+      footer: "always",
+      run: call("scrollLogs", -1),
+    },
+    {
+      sequence: "down",
+      scope: "logs",
+      group: "Logs",
+      description: "Scroll logs down one line",
+      footer: "never",
+      run: call("scrollLogs", 1),
+    },
+    {
+      sequence: "ctrl+u",
+      scope: "logs",
+      group: "Logs",
+      description: "Scroll logs up one page",
+      footer: "never",
+      run: call("scrollLogs", -10),
+    },
+    {
+      sequence: "ctrl+d",
+      scope: "logs",
+      group: "Logs",
+      description: "Scroll logs down one page",
+      footer: "never",
+      run: call("scrollLogs", 10),
+    },
+    {
+      sequence: "pageup",
+      scope: "logs",
+      group: "Logs",
+      description: "Scroll logs up one page",
+      footer: "never",
+      run: call("scrollLogs", -10),
+    },
+    {
+      sequence: "pagedown",
+      scope: "logs",
+      group: "Logs",
+      description: "Scroll logs down one page",
+      footer: "never",
+      run: call("scrollLogs", 10),
+    },
+    {
+      sequence: "home",
+      scope: "logs",
+      group: "Logs",
+      description: "Jump to the oldest retained log entry",
+      footer: "never",
+      run: call("scrollLogsHome"),
+    },
+    {
+      sequence: "end",
+      scope: "logs",
+      group: "Logs",
+      description: "Follow the newest log entries",
+      footer: "never",
+      run: call("followLogs"),
+    },
 
-    { sequence: null, scope: "targets", group: "Targets", description: "Open the focused target", routedBy: "table runtime", sequenceLabel: "enter", footer: "never" },
-    { sequence: null, scope: "generations", group: "Generations", description: "Open the focused generation", routedBy: "table runtime", sequenceLabel: "enter", footer: "never" }
+    {
+      sequence: null,
+      scope: "targets",
+      group: "Targets",
+      description: "Open the focused target",
+      routedBy: "table runtime",
+      sequenceLabel: "enter",
+      footer: "never",
+    },
+    {
+      sequence: null,
+      scope: "generations",
+      group: "Generations",
+      description: "Open the focused generation",
+      routedBy: "table runtime",
+      sequenceLabel: "enter",
+      footer: "never",
+    },
   ];
   return entries.map((entry) => Object.freeze({ ...entry, label: entry.sequenceLabel ?? entry.sequence }));
 }
@@ -100,9 +327,10 @@ export function bindingMapFrom(entries, scopeOf) {
   for (const entry of entries) {
     if (!entry.sequence || typeof entry.run !== "function") continue;
     if (map[entry.sequence]) continue;
-    map[entry.sequence] = entry.scope === "global"
-      ? { description: entry.description, handler: entry.run }
-      : { description: entry.description, handler: entry.run, when: () => scopeOf() === entry.scope };
+    map[entry.sequence] =
+      entry.scope === "global"
+        ? { description: entry.description, handler: entry.run }
+        : { description: entry.description, handler: entry.run, when: () => scopeOf() === entry.scope };
   }
   return map;
 }
@@ -147,6 +375,6 @@ export function paletteItems(entries) {
       description: entry.scope === "global" ? entry.group : `${entry.group} · needs ${entry.scope} focus`,
       shortcut: entry.label,
       sourceId: "actions",
-      data: entry
+      data: entry,
     }));
 }

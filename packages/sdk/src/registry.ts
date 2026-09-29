@@ -20,5 +20,5 @@ export const DefoldModules: DefoldModuleRegistry = {
 
   getEnforcing<T extends object>(name: string): T {
     return requireDefoldModule<T>(name);
-  }
+  },
 };

@@ -15,16 +15,17 @@ async function text(path) {
 async function inputs() {
   const overrideText = await text("packages/bindings/overrides/script-borrowed-handle-classification.json");
   const override = JSON.parse(overrideText);
-  const sourceTexts = new Map(await Promise.all(override.sourceEvidence.map(async ({ source }) => [
-    source,
-    await text(`upstream/defold/${source}`)
-  ])));
+  const sourceTexts = new Map(
+    await Promise.all(
+      override.sourceEvidence.map(async ({ source }) => [source, await text(`upstream/defold/${source}`)]),
+    ),
+  );
   return {
     irText: await text("packages/bindings/generated/defold-script-api-ir.json"),
     accountingText: await text("packages/bindings/generated/defold-script-api-accounting.json"),
     patternsText: await text("packages/bindings/generated/defold-script-binding-patterns.json"),
     overrideText,
-    sourceTexts
+    sourceTexts,
   };
 }
 
@@ -45,7 +46,7 @@ test("partitions all 437 borrowed-handle routes exactly once", () => {
     "checked-child-engine-object-invalidate": 2,
     "checked-handle-return-capture": 55,
     "checked-self-engine-object-invalidate": 5,
-    "declaration-token": 8
+    "declaration-token": 8,
   });
   assert.deepEqual(generated.moduleCounts, {
     b2d: 218,
@@ -55,7 +56,7 @@ test("partitions all 437 borrowed-handle routes exactly once", () => {
     gui: 55,
     render: 8,
     resource: 10,
-    sys: 1
+    sys: 1,
   });
   assert.equal(new Set(generated.rows.map(({ id }) => id)).size, 437);
   assert.deepEqual(checked, generated);
@@ -64,7 +65,7 @@ test("partitions all 437 borrowed-handle routes exactly once", () => {
 test("admits a handle producer on its declared result, whatever shape its arguments take", () => {
   assert.deepEqual(generated.censusBasisCounts, {
     "declared-handle-result": 22,
-    "handle-lowering-family": 415
+    "handle-lowering-family": 415,
   });
   // A constructor taking a definition record is filed under the table lowering
   // family, because a table-shaped parameter outranks a handle when the family
@@ -86,8 +87,14 @@ test("admits a handle producer on its declared result, whatever shape its argume
 
   // A union of scalars that merely admits a handle member is not a handle
   // result, and a sequence of handles is a table.
-  assert.equal(generated.rows.find(({ id }) => id === "script:b2d.body.get_joints"), undefined);
-  assert.equal(generated.rows.find(({ id }) => id === "script:go.get"), undefined);
+  assert.equal(
+    generated.rows.find(({ id }) => id === "script:b2d.body.get_joints"),
+    undefined,
+  );
+  assert.equal(
+    generated.rows.find(({ id }) => id === "script:go.get"),
+    undefined,
+  );
 });
 
 test("scopes a handle kind's representation to the backend that implements it", () => {
@@ -104,35 +111,47 @@ test("scopes a handle kind's representation to the backend that implements it", 
   const body = generated.handleKinds.find(({ id }) => id === "box2d-body");
   assert.equal(body.representationIsFeatureScoped, false);
   assert.equal(body.capturableFeatures, null);
-  assert.deepEqual(body.representations, [{
-    feature: null,
-    representation: "lua-rooted-userdata",
-    capturable: true,
-    sourceEvidence: ["box2d-body"]
-  }]);
+  assert.deepEqual(body.representations, [
+    {
+      feature: null,
+      representation: "lua-rooted-userdata",
+      capturable: true,
+      sourceEvidence: ["box2d-body"],
+    },
+  ]);
 });
 
 test("assigns stable IDs, concrete representations, context, and validity metadata", () => {
   assert.ok(generated.rows.every((row) => row.stableId === stableBindingId(row.id)));
   assert.equal(new Set(generated.rows.map(({ stableId }) => stableId)).size, 437);
-  assert.ok(generated.rows.every(({ inputHandleKinds, returnHandleKinds }) =>
-    inputHandleKinds.length + returnHandleKinds.length > 0));
+  assert.ok(
+    generated.rows.every(
+      ({ inputHandleKinds, returnHandleKinds }) => inputHandleKinds.length + returnHandleKinds.length > 0,
+    ),
+  );
 
   const kinds = new Map(generated.handleKinds.map((kind) => [kind.id, kind]));
   assert.equal(kinds.get("gui-node").representation, "lua-rooted-userdata");
   assert.equal(kinds.get("graphics-render-target").representation, "numeric-graphics-asset-handle");
   assert.equal(kinds.get("resource-declaration").representation, "declaration-only-token");
   assert.match(kinds.get("buffer-data").ownership, /owner-c-owner-lua-or-owner-resource/);
-  assert.ok(generated.handleKinds.every(({ validity, invalidationBoundary, sourceEvidence }) =>
-    validity.length > 0 && invalidationBoundary.length > 0 && sourceEvidence.length > 0));
+  assert.ok(
+    generated.handleKinds.every(
+      ({ validity, invalidationBoundary, sourceEvidence }) =>
+        validity.length > 0 && invalidationBoundary.length > 0 && sourceEvidence.length > 0,
+    ),
+  );
 
-  assert.equal(generated.rows.find(({ id }) => id === "script:b2d.get_body").requiredContext,
-    "game-object-instance");
+  assert.equal(generated.rows.find(({ id }) => id === "script:b2d.get_body").requiredContext, "game-object-instance");
   assert.equal(generated.rows.find(({ id }) => id === "script:gui.clone").requiredContext, "gui-scene");
-  assert.equal(generated.rows.find(({ id }) => id === "script:render.constant_buffer").requiredContext,
-    "render-script-instance-and-graphics-context");
-  assert.equal(generated.rows.find(({ id }) => id === "script:resource.atlas").requiredContext,
-    "component-property-compiler");
+  assert.equal(
+    generated.rows.find(({ id }) => id === "script:render.constant_buffer").requiredContext,
+    "render-script-instance-and-graphics-context",
+  );
+  assert.equal(
+    generated.rows.find(({ id }) => id === "script:resource.atlas").requiredContext,
+    "component-property-compiler",
+  );
   const childDestroy = generated.rows.find(({ id }) => id === "script:b2d.body.destroy_shape");
   assert.equal(childDestroy.invalidatedIdentity, "child-index");
   assert.equal(childDestroy.hostHandleEffect, "preserve");
@@ -143,35 +162,46 @@ test("assigns stable IDs, concrete representations, context, and validity metada
 
 test("keeps declaration tokens out of runtime handle capture", () => {
   const declarations = generated.rows.filter(({ operationClass }) => operationClass === "declaration-token");
-  assert.deepEqual(declarations.map(({ id }) => id), [
-    "script:go.property",
-    "script:resource.atlas",
-    "script:resource.buffer",
-    "script:resource.font",
-    "script:resource.material",
-    "script:resource.render_target",
-    "script:resource.texture",
-    "script:resource.tile_source"
-  ]);
-  assert.ok(declarations.every(({ inputHandleKinds, returnHandleKinds }) =>
-    [...inputHandleKinds, ...returnHandleKinds].includes("resource-declaration")));
+  assert.deepEqual(
+    declarations.map(({ id }) => id),
+    [
+      "script:go.property",
+      "script:resource.atlas",
+      "script:resource.buffer",
+      "script:resource.font",
+      "script:resource.material",
+      "script:resource.render_target",
+      "script:resource.texture",
+      "script:resource.tile_source",
+    ],
+  );
+  assert.ok(
+    declarations.every(({ inputHandleKinds, returnHandleKinds }) =>
+      [...inputHandleKinds, ...returnHandleKinds].includes("resource-declaration"),
+    ),
+  );
   assert.match(generated.coverageClaim, /not runtime evidence/);
   assert.match(generated.allocationClaim, /does not claim.*allocation-free.*engine operations may allocate/i);
-  assert.deepEqual(generated.implementationOrder.map(({ operationClass }) => operationClass), [
-    "checked-handle-input-terminal",
-    "checked-handle-return-capture",
-    "checked-child-engine-object-invalidate",
-    "checked-self-engine-object-invalidate",
-    "declaration-token"
-  ]);
+  assert.deepEqual(
+    generated.implementationOrder.map(({ operationClass }) => operationClass),
+    [
+      "checked-handle-input-terminal",
+      "checked-handle-return-capture",
+      "checked-child-engine-object-invalidate",
+      "checked-self-engine-object-invalidate",
+      "declaration-token",
+    ],
+  );
 });
 
 test("fails closed on census, exception, stable-ID, kind, and source drift", () => {
   const censusDrift = structuredClone(sourceInputs);
   censusDrift.accountingText = replaceJson(censusDrift.accountingText, (value) => {
-    const borrowed = new Set(JSON.parse(censusDrift.patternsText).bindings
-      .filter(({ loweringFamily }) => loweringFamily === "borrowed-handle")
-      .map(({ id }) => id));
+    const borrowed = new Set(
+      JSON.parse(censusDrift.patternsText)
+        .bindings.filter(({ loweringFamily }) => loweringFamily === "borrowed-handle")
+        .map(({ id }) => id),
+    );
     value.rows = value.rows.filter(({ id }) => !borrowed.has(id) || id !== [...borrowed][0]);
   });
   assert.throws(() => generateBorrowedHandleClassification(censusDrift), /borrowed-handle route census expected/);
@@ -185,7 +215,7 @@ test("fails closed on census, exception, stable-ID, kind, and source drift", () 
   const overlap = structuredClone(sourceInputs);
   overlap.overrideText = replaceJson(overlap.overrideText, (value) => {
     value.exceptionalRoutes["checked-self-engine-object-invalidate"].push(
-      value.exceptionalRoutes["checked-handle-return-capture"][0]
+      value.exceptionalRoutes["checked-handle-return-capture"][0],
     );
   });
   assert.throws(() => generateBorrowedHandleClassification(overlap), /multiple operation classes/);
@@ -207,15 +237,13 @@ test("fails closed on census, exception, stable-ID, kind, and source drift", () 
   // Outside a declared derivation that withdrawal is still fatal, because at
   // the reviewed revision every citation resolves.
   const withdrawnSource = structuredClone(sourceInputs);
-  withdrawnSource.withdrawnSources = new Set([
-    JSON.parse(withdrawnSource.overrideText).sourceEvidence[0].source
-  ]);
+  withdrawnSource.withdrawnSources = new Set([JSON.parse(withdrawnSource.overrideText).sourceEvidence[0].source]);
   assert.throws(() => generateBorrowedHandleClassification(withdrawnSource), /unknown source evidence/);
 });
 
 test("check command proves the checked-in classification is current", () => {
   execFileSync(process.execPath, ["scripts/generate-borrowed-handle-classification.mjs", "--check"], {
     cwd: root,
-    stdio: "pipe"
+    stdio: "pipe",
   });
 });

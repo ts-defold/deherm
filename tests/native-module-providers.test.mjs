@@ -15,18 +15,21 @@ const schema = JSON.parse(await readFile(path.join(root, WEBTRANSPORT_SCHEMA), "
 
 test("extension schema owns the generic provider and WebTransport artifacts", async () => {
   const artifacts = generateNativeModuleProviderArtifacts(schema, { artifactPath: repositoryNativeModuleArtifactPath });
-  assert.deepEqual([...artifacts.keys()], [
-    "defold/defold_hermes/include/defold_hermes/native_module_provider.h",
-    "defold/defold_hermes/include/defold_hermes/generated_native_module_jsi.hpp",
-    "defold/defold_hermes/src/generated_native_module_registry.cpp",
-    "defold/defold_hermes/src/generated_native_module_jsi.cpp",
-    "extensions/defold-webtransport/defold_webtransport/include/defold_webtransport/deherm_provider.h",
-    "extensions/defold-webtransport/defold_webtransport/webtransport/typescript/NativeWebTransport.ts",
-    "extensions/defold-webtransport/defold_webtransport/webtransport/static/deherm_static_native_web_transport.h",
-    "extensions/defold-webtransport/defold_webtransport/webtransport/static/deherm_static_native_web_transport.cpp",
-    "extensions/defold-webtransport/defold_webtransport/webtransport/static/NativeWebTransport.ts",
-    "tests/fixtures/generated_native_webtransport_provider_adapter.cpp",
-  ]);
+  assert.deepEqual(
+    [...artifacts.keys()],
+    [
+      "defold/defold_hermes/include/defold_hermes/native_module_provider.h",
+      "defold/defold_hermes/include/defold_hermes/generated_native_module_jsi.hpp",
+      "defold/defold_hermes/src/generated_native_module_registry.cpp",
+      "defold/defold_hermes/src/generated_native_module_jsi.cpp",
+      "extensions/defold-webtransport/defold_webtransport/include/defold_webtransport/deherm_provider.h",
+      "extensions/defold-webtransport/defold_webtransport/webtransport/typescript/NativeWebTransport.ts",
+      "extensions/defold-webtransport/defold_webtransport/webtransport/static/deherm_static_native_web_transport.h",
+      "extensions/defold-webtransport/defold_webtransport/webtransport/static/deherm_static_native_web_transport.cpp",
+      "extensions/defold-webtransport/defold_webtransport/webtransport/static/NativeWebTransport.ts",
+      "tests/fixtures/generated_native_webtransport_provider_adapter.cpp",
+    ],
+  );
   for (const [relative, expected] of artifacts) {
     assert.equal(await readFile(path.join(root, relative), "utf8"), expected, `${relative} is stale`);
   }
@@ -35,12 +38,22 @@ test("extension schema owns the generic provider and WebTransport artifacts", as
 test("every extension descriptor method reaches generated C metadata, JSI dispatch, and TypeScript", () => {
   const artifacts = generateNativeModuleProviderArtifacts(schema, { artifactPath: repositoryNativeModuleArtifactPath });
   const generic = artifacts.get("defold/defold_hermes/include/defold_hermes/native_module_provider.h");
-  const provider = artifacts.get("extensions/defold-webtransport/defold_webtransport/include/defold_webtransport/deherm_provider.h");
+  const provider = artifacts.get(
+    "extensions/defold-webtransport/defold_webtransport/include/defold_webtransport/deherm_provider.h",
+  );
   const jsi = artifacts.get("defold/defold_hermes/src/generated_native_module_jsi.cpp");
-  const typescript = artifacts.get("extensions/defold-webtransport/defold_webtransport/webtransport/typescript/NativeWebTransport.ts");
-  const staticHeader = artifacts.get("extensions/defold-webtransport/defold_webtransport/webtransport/static/deherm_static_native_web_transport.h");
-  const staticSource = artifacts.get("extensions/defold-webtransport/defold_webtransport/webtransport/static/deherm_static_native_web_transport.cpp");
-  const staticTypescript = artifacts.get("extensions/defold-webtransport/defold_webtransport/webtransport/static/NativeWebTransport.ts");
+  const typescript = artifacts.get(
+    "extensions/defold-webtransport/defold_webtransport/webtransport/typescript/NativeWebTransport.ts",
+  );
+  const staticHeader = artifacts.get(
+    "extensions/defold-webtransport/defold_webtransport/webtransport/static/deherm_static_native_web_transport.h",
+  );
+  const staticSource = artifacts.get(
+    "extensions/defold-webtransport/defold_webtransport/webtransport/static/deherm_static_native_web_transport.cpp",
+  );
+  const staticTypescript = artifacts.get(
+    "extensions/defold-webtransport/defold_webtransport/webtransport/static/NativeWebTransport.ts",
+  );
   const adapter = artifacts.get("tests/fixtures/generated_native_webtransport_provider_adapter.cpp");
   assert.match(generic, /PROVIDER_ABI_VERSION UINT32_C\(1\)/);
   assert.match(generic, /bounded core storage/);
@@ -52,14 +65,26 @@ test("every extension descriptor method reaches generated C metadata, JSI dispat
   assert.match(jsi, /native module collides with an installed module/);
   assert.match(jsi, /module_abi_version/);
   assert.match(typescript, /requireDefoldModule<NativeWebTransportSpec>\("NativeWebTransport", 1\)/);
-  assert.doesNotMatch(generic + provider + jsi + typescript + staticHeader + staticSource + staticTypescript,
-    /lua_State|lua_pcall|LuaBridge/);
+  assert.doesNotMatch(
+    generic + provider + jsi + typescript + staticHeader + staticSource + staticTypescript,
+    /lua_State|lua_pcall|LuaBridge/,
+  );
   for (const method of schema.nativeModules[0].methods) {
     assert.match(provider, new RegExp(`\\{${method.id}, "${method.name}"`));
     assert.match(typescript, new RegExp(`\\b${method.name}\\(`));
-    assert.match(staticHeader, new RegExp(`deherm_static_native_web_transport_${method.name.replace(/([a-z0-9])([A-Z])/gu, "$1_$2").toLowerCase()}\\(`));
+    assert.match(
+      staticHeader,
+      new RegExp(
+        `deherm_static_native_web_transport_${method.name.replace(/([a-z0-9])([A-Z])/gu, "$1_$2").toLowerCase()}\\(`,
+      ),
+    );
     assert.match(staticTypescript, new RegExp(`\\b${method.name}:\\(`));
-    assert.match(adapter, new RegExp(`defold_webtransport_native_v1_${method.name.replace(/([a-z0-9])([A-Z])/gu, "$1_$2").toLowerCase()}\\(`));
+    assert.match(
+      adapter,
+      new RegExp(
+        `defold_webtransport_native_v1_${method.name.replace(/([a-z0-9])([A-Z])/gu, "$1_$2").toLowerCase()}\\(`,
+      ),
+    );
   }
   assert.match(staticHeader, /FRAME_BYTES UINT32_C\(1048608\)/);
   assert.match(staticSource, /constexpr uint32_t kFrameDepth = 1/);
@@ -111,10 +136,14 @@ test("generic provider recipe rejects duplicate IDs and unsupported argument sha
 });
 
 test("binding descriptor JSON rejects duplicate object keys before JSON.parse can last-win", () => {
-  assert.throws(() => parseNativeModuleDescriptorJson('{"schemaVersion":1,"schemaVersion":2}'),
-    /duplicate JSON object key: schemaVersion/u);
-  assert.throws(() => parseNativeModuleDescriptorJson('{"nativeModules":[{"name":"A","name":"B"}]}'),
-    /duplicate JSON object key: name/u);
+  assert.throws(
+    () => parseNativeModuleDescriptorJson('{"schemaVersion":1,"schemaVersion":2}'),
+    /duplicate JSON object key: schemaVersion/u,
+  );
+  assert.throws(
+    () => parseNativeModuleDescriptorJson('{"nativeModules":[{"name":"A","name":"B"}]}'),
+    /duplicate JSON object key: name/u,
+  );
 });
 
 test("native module pump registry is bounded and reuses released slots", async () => {
@@ -145,16 +174,26 @@ test("native module pump registry is bounded and reuses released slots", async (
   assert.equal(resolveCalls, 1);
   delete globalThis.__defoldModulesV1;
   assert.equal(globalThis.__dehermNativeModulePumpStateV1, undefined, "pump state stays lazy until registration");
-  const calls = new Array(32).fill(0);
-  const unregister = calls.map((_, index) => (index === 31 ? hmrRuntime : runtime).registerNativeModulePump(() => { calls[index] += 1; }));
+  const calls = Array.from({ length: 32 }, () => 0);
+  const unregister = calls.map((_, index) =>
+    (index === 31 ? hmrRuntime : runtime).registerNativeModulePump(() => {
+      calls[index] += 1;
+    }),
+  );
   const sharedTick = globalThis.__dehermNativeModulesTickV1;
   assert.throws(() => runtime.registerNativeModulePump(() => {}), /capacity exceeded \(32\)/);
   globalThis.__dehermNativeModulesTickV1(0.25);
   assert.ok(calls.every((count) => count === 1));
-  assert.equal(globalThis.__dehermNativeModulesTickV1, sharedTick, "HMR module copies must not clobber the shared tick");
+  assert.equal(
+    globalThis.__dehermNativeModulesTickV1,
+    sharedTick,
+    "HMR module copies must not clobber the shared tick",
+  );
   unregister[7]();
   let replacementCalls = 0;
-  const removeReplacement = runtime.registerNativeModulePump(() => { replacementCalls += 1; });
+  const removeReplacement = runtime.registerNativeModulePump(() => {
+    replacementCalls += 1;
+  });
   globalThis.__dehermNativeModulesTickV1(0.25);
   assert.equal(calls[7], 1);
   assert.equal(replacementCalls, 1);
@@ -167,16 +206,22 @@ test("native module pump registry is bounded and reuses released slots", async (
 test("a second arbitrary extension module uses the same emitter without WebTransport assumptions", () => {
   const synthetic = {
     schemaVersion: 1,
-    nativeModules: [{
-      name: "NativeClipboard",
-      abiVersion: 3,
-      cProvider: { header: "clipboard/native_v3.h", symbolPrefix: "clipboard_native_v3_", argumentExpansion: "pointer-length-v1" },
-      methods: [
-        { id: 7, name: "write", args: [{ name: "arguments", type: "utf8" }], returns: "status" },
-        { id: 9, name: "available", args: [], returns: "u32" },
-        { id: 11, name: "read", args: [{ name: "status", type: "mutableBytes" }], returns: "status" },
-      ],
-    }],
+    nativeModules: [
+      {
+        name: "NativeClipboard",
+        abiVersion: 3,
+        cProvider: {
+          header: "clipboard/native_v3.h",
+          symbolPrefix: "clipboard_native_v3_",
+          argumentExpansion: "pointer-length-v1",
+        },
+        methods: [
+          { id: 7, name: "write", args: [{ name: "arguments", type: "utf8" }], returns: "status" },
+          { id: 9, name: "available", args: [], returns: "u32" },
+          { id: 11, name: "read", args: [{ name: "status", type: "mutableBytes" }], returns: "status" },
+        ],
+      },
+    ],
   };
   const artifacts = generateNativeModuleProviderArtifacts(synthetic);
   const header = artifacts.get("generated/native-modules/NativeClipboard/provider.h");

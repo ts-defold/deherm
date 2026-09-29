@@ -8,15 +8,9 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import {
-  resolveBrowserExactPrerequisites,
-} from "./check-dmsdk-browser-exact-call.mjs";
+import { resolveBrowserExactPrerequisites } from "./check-dmsdk-browser-exact-call.mjs";
 export { resolveBrowserExactPrerequisites } from "./check-dmsdk-browser-exact-call.mjs";
-import {
-  defaultChromeBinary,
-  openBundlePage,
-  waitFor,
-} from "../packages/cli/src/dev/browser-host.mjs";
+import { defaultChromeBinary, openBundlePage, waitFor } from "../packages/cli/src/dev/browser-host.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const reportPath = path.join(root, "packages/bindings/generated/defold-script-recording-engine.json");
@@ -44,9 +38,15 @@ export function extractProductionCallbackRegistry(source) {
       else if (character === quote) quote = "";
       continue;
     }
-    if (character === "'" || character === '"' || character === "`") { quote = character; continue; }
+    if (character === "'" || character === '"' || character === "`") {
+      quote = character;
+      continue;
+    }
     if (character === "{") ++depth;
-    else if (character === "}" && --depth === 0) { objectEnd = index + 1; break; }
+    else if (character === "}" && --depth === 0) {
+      objectEnd = index + 1;
+      break;
+    }
   }
   if (objectEnd < 0) throw new Error(`production browser callback registry object is unterminated`);
   const propertySource = source.slice(start, objectEnd);
@@ -56,7 +56,9 @@ export function extractProductionCallbackRegistry(source) {
   if (releaseStart < 0 || releaseFunction < 0 || releaseObjectStart < 0) {
     throw new Error("production browser bootstrap has no callback release trampoline");
   }
-  depth = 0; quote = ""; escaped = false;
+  depth = 0;
+  quote = "";
+  escaped = false;
   let releaseEnd = -1;
   for (let index = releaseObjectStart; index < source.length; ++index) {
     const character = source[index];
@@ -66,16 +68,24 @@ export function extractProductionCallbackRegistry(source) {
       else if (character === quote) quote = "";
       continue;
     }
-    if (character === "'" || character === '"' || character === "`") { quote = character; continue; }
+    if (character === "'" || character === '"' || character === "`") {
+      quote = character;
+      continue;
+    }
     if (character === "{") ++depth;
-    else if (character === "}" && --depth === 0) { releaseEnd = index + 1; break; }
+    else if (character === "}" && --depth === 0) {
+      releaseEnd = index + 1;
+      break;
+    }
   }
   if (releaseEnd < 0) throw new Error("production browser callback release trampoline is unterminated");
   const releaseSource = source.slice(releaseStart, releaseEnd);
-  return `// Extracted byte-for-byte from library_defold_hermes.js for the isolated exact-call link.\n` +
+  return (
+    `// Extracted byte-for-byte from library_defold_hermes.js for the isolated exact-call link.\n` +
     `var LibraryDehermExactCallbackRegistry = {\n  ${propertySource},\n  ${releaseSource}\n};\n` +
     `autoAddDeps(LibraryDehermExactCallbackRegistry, '$DEFOLD_HERMES_WEB_CALLBACKS');\n` +
-    `addToLibrary(LibraryDehermExactCallbackRegistry);\n`;
+    `addToLibrary(LibraryDehermExactCallbackRegistry);\n`
+  );
 }
 
 export async function materializeScriptBrowserCallbackExactVectors() {
@@ -92,15 +102,17 @@ export async function materializeScriptBrowserCallbackExactVectors() {
     if (lane.lane === "browser-wasm-callback-registry" && override?.lane !== lane.lane) {
       throw new Error(`${route.id} has callback applicability without a callback exact vector`);
     }
-    return [{
-      id: route.id,
-      stableId: route.stableId,
-      lane: lane.lane,
-      callbackSlots: override?.callbackSlots ?? [],
-      callbackInvocation: override?.callbackInvocation ?? null,
-      lifecycle: override?.lifecycle ?? null,
-      contract: contracts.get(route.exactVector.contract),
-    }];
+    return [
+      {
+        id: route.id,
+        stableId: route.stableId,
+        lane: lane.lane,
+        callbackSlots: override?.callbackSlots ?? [],
+        callbackInvocation: override?.callbackInvocation ?? null,
+        lifecycle: override?.lifecycle ?? null,
+        contract: contracts.get(route.exactVector.contract),
+      },
+    ];
   });
   if (vectors.length !== report.summary.browserExact.routeCount) {
     throw new Error(`browser exact vector census drifted: ${vectors.length}`);
@@ -122,41 +134,56 @@ export async function buildScriptBrowserCallbackExactModule({ output, prerequisi
   const runtimeLifecyclePath = path.join(output, "runtime_lifecycle.js");
   const callbackRegistry = extractProductionCallbackRegistry(await readFile(browserBootstrapPath, "utf8"));
   await writeFile(callbackRegistryPath, callbackRegistry);
-  await writeFile(runtimeLifecyclePath,
+  await writeFile(
+    runtimeLifecyclePath,
     "var Module = typeof Module === 'object' ? Module : {};\n" +
-    "Module.onExit = function(status) { console.log('DEHERM_SCRIPT_BROWSER_EXACT_EXIT status=' + status); };\n");
-  execFileSync(prerequisites.emxx, [
-    "-std=c++17",
-    "-O2",
-    "-DDM_PLATFORM_HTML5",
-    "-sASSERTIONS=1",
-    "-sENVIRONMENT=web",
-    "-sEXIT_RUNTIME=1",
-    "-sFILESYSTEM=0",
-    `-I${path.join(root, "defold/defold_hermes/include")}`,
-    `-I${path.join(root, "tests/fixtures")}`,
-    path.join(root, "defold/defold_hermes/src/generated_script_universal_value_bindings.cpp"),
-    path.join(root, "defold/defold_hermes/src/generated_script_universal_value_capi.cpp"),
-    path.join(root, "defold/defold_hermes/src/script_bridge_capi.cpp"),
-    path.join(root, "tests/fixtures/generated_script_recording_tables.cpp"),
-    path.join(root, "tests/fixtures/generated_script_recording_provider.cpp"),
-    path.join(root, "tests/fixtures/generated_script_recording_browser_callback_driver.cpp"),
-    "--js-library", callbackRegistryPath,
-    "--pre-js", runtimeLifecyclePath,
-    "--js-library", path.join(root, "defold/defold_hermes/lib/web/generated_script_universal_value.js"),
-    "--js-library", path.join(root, "tests/fixtures/generated_script_recording_browser_callback_driver.js"),
-    "-o", htmlPath,
-  ], {
-    cwd: root,
-    env: { ...process.env, EM_CONFIG: prerequisites.emConfig, EM_CACHE: prerequisites.emCache },
-    encoding: "utf8",
-    maxBuffer: 16 * 1024 * 1024,
-    stdio: "pipe",
-  });
+      "Module.onExit = function(status) { console.log('DEHERM_SCRIPT_BROWSER_EXACT_EXIT status=' + status); };\n",
+  );
+  execFileSync(
+    prerequisites.emxx,
+    [
+      "-std=c++17",
+      "-O2",
+      "-DDM_PLATFORM_HTML5",
+      "-sASSERTIONS=1",
+      "-sENVIRONMENT=web",
+      "-sEXIT_RUNTIME=1",
+      "-sFILESYSTEM=0",
+      `-I${path.join(root, "defold/defold_hermes/include")}`,
+      `-I${path.join(root, "tests/fixtures")}`,
+      path.join(root, "defold/defold_hermes/src/generated_script_universal_value_bindings.cpp"),
+      path.join(root, "defold/defold_hermes/src/generated_script_universal_value_capi.cpp"),
+      path.join(root, "defold/defold_hermes/src/script_bridge_capi.cpp"),
+      path.join(root, "tests/fixtures/generated_script_recording_tables.cpp"),
+      path.join(root, "tests/fixtures/generated_script_recording_provider.cpp"),
+      path.join(root, "tests/fixtures/generated_script_recording_browser_callback_driver.cpp"),
+      "--js-library",
+      callbackRegistryPath,
+      "--pre-js",
+      runtimeLifecyclePath,
+      "--js-library",
+      path.join(root, "defold/defold_hermes/lib/web/generated_script_universal_value.js"),
+      "--js-library",
+      path.join(root, "tests/fixtures/generated_script_recording_browser_callback_driver.js"),
+      "-o",
+      htmlPath,
+    ],
+    {
+      cwd: root,
+      env: { ...process.env, EM_CONFIG: prerequisites.emConfig, EM_CACHE: prerequisites.emCache },
+      encoding: "utf8",
+      maxBuffer: 16 * 1024 * 1024,
+      stdio: "pipe",
+    },
+  );
   const emittedHtml = await readFile(htmlPath, "utf8");
   await writeFile(htmlPath, emittedHtml.replace("</head>", '<link rel="icon" href="data:,">\n</head>'));
   const artifacts = {};
-  for (const [name, file] of [["html", "index.html"], ["javascript", "index.js"], ["wasm", "index.wasm"]]) {
+  for (const [name, file] of [
+    ["html", "index.html"],
+    ["javascript", "index.js"],
+    ["wasm", "index.wasm"],
+  ]) {
     const artifact = path.join(output, file);
     if (!existsSync(artifact)) throw new Error(`Emscripten did not emit ${artifact}`);
     artifacts[name] = { path: artifact, sha256: sha256(await readFile(artifact)) };
@@ -167,17 +194,22 @@ export async function buildScriptBrowserCallbackExactModule({ output, prerequisi
 export async function runScriptBrowserCallbackExactCall(options = {}) {
   const environment = {
     ...options.environment,
-    DEHERM_CHROME: options.environment?.DEHERM_CHROME ?? options.environment?.DEFOLD_HERMES_CHROME ?? defaultChromeBinary,
+    DEHERM_CHROME:
+      options.environment?.DEHERM_CHROME ?? options.environment?.DEFOLD_HERMES_CHROME ?? defaultChromeBinary,
   };
   const prerequisites = resolveBrowserExactPrerequisites(environment);
   if (prerequisites.blockers.length) {
-    const error = new Error(`browser script callback exact-call prerequisites failed:\n${JSON.stringify(prerequisites.blockers, null, 2)}`);
+    const error = new Error(
+      `browser script callback exact-call prerequisites failed:\n${JSON.stringify(prerequisites.blockers, null, 2)}`,
+    );
     error.code = "DEHERM_SCRIPT_BROWSER_CALLBACK_EXACT_PREREQUISITE";
     error.blockers = prerequisites.blockers;
     throw error;
   }
   const ownedOutput = !options.output;
-  const output = path.resolve(options.output ?? await mkdtemp(path.join(tmpdir(), "deherm-script-browser-callback-exact.")));
+  const output = path.resolve(
+    options.output ?? (await mkdtemp(path.join(tmpdir(), "deherm-script-browser-callback-exact."))),
+  );
   try {
     const built = await buildScriptBrowserCallbackExactModule({ output, prerequisites });
     const marker = `DEHERM_SCRIPT_BROWSER_EXACT_OK routes=${built.vectors.length}`;
@@ -189,26 +221,30 @@ export async function runScriptBrowserCallbackExactCall(options = {}) {
       keepProfile: true,
     });
     try {
-      await waitFor(() => {
-        const failure = page.client.transcript.find((line) => line.includes("DEHERM_SCRIPT_BROWSER_EXACT_FAIL"));
-        if (failure || page.client.failures.length) {
-          const error = new Error(failure ?? JSON.stringify(page.client.failures));
-          error.fatal = true;
-          throw error;
-        }
-        const successes = page.client.transcript.filter((line) => line.startsWith(marker));
-        if (successes.length > 1) {
-          const error = new Error(`browser exact-call emitted ${successes.length} success records`);
-          error.fatal = true;
-          throw error;
-        }
-        const exited = page.client.transcript.includes("DEHERM_SCRIPT_BROWSER_EXACT_EXIT status=0");
-        if (successes.length === 1 && exited) return successes[0];
-        return false;
-      }, { timeoutMs: options.runtimeTimeoutMs ?? 30_000, what: "the real script callback Wasm marker" });
+      await waitFor(
+        () => {
+          const failure = page.client.transcript.find((line) => line.includes("DEHERM_SCRIPT_BROWSER_EXACT_FAIL"));
+          if (failure || page.client.failures.length) {
+            const error = new Error(failure ?? JSON.stringify(page.client.failures));
+            error.fatal = true;
+            throw error;
+          }
+          const successes = page.client.transcript.filter((line) => line.startsWith(marker));
+          if (successes.length > 1) {
+            const error = new Error(`browser exact-call emitted ${successes.length} success records`);
+            error.fatal = true;
+            throw error;
+          }
+          const exited = page.client.transcript.includes("DEHERM_SCRIPT_BROWSER_EXACT_EXIT status=0");
+          if (successes.length === 1 && exited) return successes[0];
+          return false;
+        },
+        { timeoutMs: options.runtimeTimeoutMs ?? 30_000, what: "the real script callback Wasm marker" },
+      );
       await new Promise((resolve) => setTimeout(resolve, 50));
       const lateFailure = page.client.transcript.find((line) => line.includes("DEHERM_SCRIPT_BROWSER_EXACT_FAIL"));
-      if (lateFailure || page.client.failures.length) throw new Error(lateFailure ?? JSON.stringify(page.client.failures));
+      if (lateFailure || page.client.failures.length)
+        throw new Error(lateFailure ?? JSON.stringify(page.client.failures));
       return {
         schema: "deherm-script-browser-exact-result/v1",
         lane: "browser-wasm",
@@ -226,8 +262,9 @@ export async function runScriptBrowserCallbackExactCall(options = {}) {
           emsdkRevision: prerequisites.actualEmsdkRevision,
           browser: prerequisites.chromeVersion.split("\n")[0],
         },
-        artifacts: Object.fromEntries(Object.entries(built.artifacts).map(([name, artifact]) =>
-          [name, { sha256: artifact.sha256 }])),
+        artifacts: Object.fromEntries(
+          Object.entries(built.artifacts).map(([name, artifact]) => [name, { sha256: artifact.sha256 }]),
+        ),
         transcript: page.client.transcript,
       };
     } finally {
@@ -251,5 +288,8 @@ async function main() {
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  main().catch((error) => { console.error(error.stack ?? error.message); process.exitCode = 1; });
+  main().catch((error) => {
+    console.error(error.stack ?? error.message);
+    process.exitCode = 1;
+  });
 }

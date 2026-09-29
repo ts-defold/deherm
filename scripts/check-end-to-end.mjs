@@ -58,7 +58,7 @@ export const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "
 export const paths = Object.freeze({
   bundleTargets: "packages/toolchains/defold-bundle-targets.json",
   nativeArtifacts: "packages/toolchains/native-artifacts.json",
-  releaseTags: "packages/toolchains/release-tags.json"
+  releaseTags: "packages/toolchains/release-tags.json",
 });
 
 /**
@@ -71,14 +71,10 @@ export const paths = Object.freeze({
  * THEIR build server.
  */
 export function buildServerForDefoldRef(ref) {
-  return String(ref).trim().toLowerCase() === "stable"
-    ? "https://build.defold.com"
-    : "https://build-stage.defold.com";
+  return String(ref).trim().toLowerCase() === "stable" ? "https://build.defold.com" : "https://build-stage.defold.com";
 }
 
-const pinnedDefoldRef = /^DEFOLD_REF=(.+)$/mu.exec(
-  readFileSync(path.join(root, "upstream.lock"), "utf8")
-)?.[1];
+const pinnedDefoldRef = /^DEFOLD_REF=(.+)$/mu.exec(readFileSync(path.join(root, "upstream.lock"), "utf8"))?.[1];
 if (!pinnedDefoldRef) throw new Error("upstream.lock has no DEFOLD_REF");
 
 // Defold publishes pending SDK/Extender changes to the staging service. A dev,
@@ -109,7 +105,9 @@ export const stageNames = Object.freeze(["policy", "host-tools", "target-archive
 
 export function scaffoldArguments({ project, defoldRevision, name = "deherm end to end" }) {
   if (!/^[a-f0-9]{40}$/u.test(defoldRevision ?? "")) {
-    throw new Error(`End-to-end scaffold requires the exact policy Defold revision, got ${JSON.stringify(defoldRevision)}`);
+    throw new Error(
+      `End-to-end scaffold requires the exact policy Defold revision, got ${JSON.stringify(defoldRevision)}`,
+    );
   }
   return ["create", project, "--name", name, "--defold-sdk", defoldRevision];
 }
@@ -140,7 +138,7 @@ export function buildLedger({ bundleTargets, artifacts, releaseTags }) {
     if (!entry) {
       problems.push(
         `${target}: ${paths.bundleTargets} declares this bundle target and ${paths.nativeArtifacts} does not. ` +
-        "Nothing is built, published or exercised for it, and this gate will not invent a reason for that."
+          "Nothing is built, published or exercised for it, and this gate will not invent a reason for that.",
       );
       continue;
     }
@@ -149,7 +147,7 @@ export function buildLedger({ bundleTargets, artifacts, releaseTags }) {
       group: bundleTargets.targets.find((item) => item.target === target)?.group ?? null,
       status: entry.status,
       builder: entry.builder ?? null,
-      published: published.has(target)
+      published: published.has(target),
     };
     if (entry.status === "retired-upstream") {
       rows.push({ ...base, disposition: "declined", reason: glossary[entry.status] ?? entry.status });
@@ -170,15 +168,18 @@ export function buildLedger({ bundleTargets, artifacts, releaseTags }) {
       // A web target links Emscripten sources rather than a Hermes archive, so
       // the archive stage has nothing to install for it. Saying so here keeps
       // the stage itself from having to know about platform groups.
-      archiveStage: entry.status === "vendored-source"
-        ? { disposition: "declined", reason: glossary["vendored-source"] ?? "links a source artifact" }
-        : { disposition: "exercise" }
+      archiveStage:
+        entry.status === "vendored-source"
+          ? { disposition: "declined", reason: glossary["vendored-source"] ?? "links a source artifact" }
+          : { disposition: "exercise" },
     });
   }
 
   for (const target of Object.keys(manifest).sort()) {
     if (!declared.includes(target)) {
-      problems.push(`${target}: ${paths.nativeArtifacts} carries this target and ${paths.bundleTargets} does not declare it`);
+      problems.push(
+        `${target}: ${paths.nativeArtifacts} carries this target and ${paths.bundleTargets} does not declare it`,
+      );
     }
   }
 
@@ -189,7 +190,7 @@ export async function readLedger() {
   const [bundleTargets, artifacts, releaseTags] = await Promise.all([
     readJson(paths.bundleTargets),
     readJson(paths.nativeArtifacts),
-    readJson(paths.releaseTags)
+    readJson(paths.releaseTags),
   ]);
   return { ...buildLedger({ bundleTargets, artifacts, releaseTags }), defoldRevision: artifacts.defoldRevision };
 }
@@ -209,14 +210,14 @@ const stages = {
     // document in deherm.lock to authenticate the target archive it uploads.
     const { readPolicyLocator, resolvePublishedPolicy } = await import("../packages/cli/src/policy-client.mjs");
     const resolved = await resolvePublishedPolicy(context.defoldRevision, {
-      index: await readPolicyLocator()
+      index: await readPolicyLocator(),
     });
     const native = resolved.artifacts?.artifacts?.["native-artifacts"];
     if (native?.indexedBy !== "bundleTarget" || !native.tag || !native.assets) {
       throw new Error(`${context.defoldRevision}: published policy carries no usable native-artifacts mapping`);
     }
     return {
-      detail: `resolved ${resolved.entry.policyRoot.slice(0, 12)} and materialized ${native.tag} for ${Object.keys(native.assets).length} target(s)`
+      detail: `resolved ${resolved.entry.policyRoot.slice(0, 12)} and materialized ${native.tag} for ${Object.keys(native.assets).length} target(s)`,
     };
   },
 
@@ -226,13 +227,17 @@ const stages = {
     const detail = [];
     for (const family of ["hermes-host", "dehermc"]) {
       const result = await ensureHostFamily(family, host);
-      detail.push(`${family}@${result.tag} ${result.cached ? "cached" : "fetched"} (${result.members.length} member(s))`);
+      detail.push(
+        `${family}@${result.tag} ${result.cached ? "cached" : "fetched"} (${result.members.length} member(s))`,
+      );
     }
     return { detail: `${host}: ${detail.join("; ")}` };
   },
 
   async "target-archives"(context) {
-    const wanted = context.rows.filter((row) => row.disposition === "exercise" && row.archiveStage.disposition === "exercise");
+    const wanted = context.rows.filter(
+      (row) => row.disposition === "exercise" && row.archiveStage.disposition === "exercise",
+    );
     // `--partial` installs what the release actually carries and reports the
     // rest, which is what lets one incomplete release be a named per-target
     // failure below instead of one opaque error for the whole matrix.
@@ -283,8 +288,8 @@ const stages = {
             DEFOLD_HERMES_PLATFORM: row.target,
             DEFOLD_HERMES_PROJECT: context.project,
             DEFOLD_HERMES_BUILD_SERVER: context.buildServer,
-            DEFOLD_HERMES_ALLOW_REMOTE_BUILD: "1"
-          }
+            DEFOLD_HERMES_ALLOW_REMOTE_BUILD: "1",
+          },
         });
         context.targetResult(row.target, "bob", { detail: `built against ${context.buildServer}` });
       } catch (error) {
@@ -300,20 +305,22 @@ const stages = {
     }
     if (failures.length) throw new Error(failures.join("\n\n"));
     return { detail: `${context.rows.filter((item) => item.disposition === "exercise").length} target(s) built` };
-  }
+  },
 };
 
 // ── Reporting ───────────────────────────────────────────────────────────────
 
 function renderLedger(rows) {
   const width = Math.max(...rows.map((row) => row.target.length));
-  return rows.map((row) => {
-    const name = row.target.padEnd(width);
-    if (row.disposition === "declined") return `  -- ${name}  not exercised: ${row.reason}`;
-    const notes = [row.published ? "published" : "unpublished", row.status];
-    if (row.archiveStage.disposition === "declined") notes.push(`no archive: ${row.archiveStage.reason}`);
-    return `  ** ${name}  exercise (${notes.join(", ")})`;
-  }).join("\n");
+  return rows
+    .map((row) => {
+      const name = row.target.padEnd(width);
+      if (row.disposition === "declined") return `  -- ${name}  not exercised: ${row.reason}`;
+      const notes = [row.published ? "published" : "unpublished", row.status];
+      if (row.archiveStage.disposition === "declined") notes.push(`no archive: ${row.archiveStage.reason}`);
+      return `  ** ${name}  exercise (${notes.join(", ")})`;
+    })
+    .join("\n");
 }
 
 export async function main(argv) {
@@ -328,14 +335,17 @@ export async function main(argv) {
     const value = argv[index];
     if (value === "--json") json = true;
     else if (value === "--plan") plan = true;
-    else if (value === "--project") { project = argv[++index]; projectWasGiven = true; }
-    else if (value === "--build-server") buildServer = argv[++index];
+    else if (value === "--project") {
+      project = argv[++index];
+      projectWasGiven = true;
+    } else if (value === "--build-server") buildServer = argv[++index];
     else if (value === "--stage") requested.push(argv[++index]);
     else if (value === "--target") only.push(argv[++index]);
     else throw new Error(`Unknown argument ${value}`);
   }
   for (const name of requested) {
-    if (!stageNames.includes(name)) throw new Error(`Unknown stage ${name}; declared stages are ${stageNames.join(", ")}`);
+    if (!stageNames.includes(name))
+      throw new Error(`Unknown stage ${name}; declared stages are ${stageNames.join(", ")}`);
   }
   const selected = requested.length ? requested : stageNames;
 
@@ -345,7 +355,9 @@ export async function main(argv) {
   // that covers one target says so instead of looking complete.
   for (const target of only) {
     if (!everyRow.some((row) => row.target === target)) {
-      throw new Error(`No declared bundle target ${target}; declared targets are ${everyRow.map((row) => row.target).join(", ")}`);
+      throw new Error(
+        `No declared bundle target ${target}; declared targets are ${everyRow.map((row) => row.target).join(", ")}`,
+      );
     }
   }
   const rows = only.length ? everyRow.filter((row) => only.includes(row.target)) : everyRow;
@@ -359,7 +371,7 @@ export async function main(argv) {
     targetResult(target, stage, result) {
       if (!targetResults.has(target)) targetResults.set(target, {});
       targetResults.get(target)[stage] = result;
-    }
+    },
   };
 
   const report = {
@@ -371,7 +383,7 @@ export async function main(argv) {
     onlyTargets: only.length ? only : null,
     stages: [],
     targets: everyRow,
-    problems
+    problems,
   };
 
   if (!json) {
@@ -385,10 +397,20 @@ export async function main(argv) {
       const started = Date.now();
       try {
         const result = await stages[name](context);
-        report.stages.push({ stage: name, status: "passed", seconds: Math.round((Date.now() - started) / 100) / 10, ...result });
+        report.stages.push({
+          stage: name,
+          status: "passed",
+          seconds: Math.round((Date.now() - started) / 100) / 10,
+          ...result,
+        });
         if (!json) console.log(`ok   ${name}: ${result.detail}`);
       } catch (error) {
-        report.stages.push({ stage: name, status: "failed", seconds: Math.round((Date.now() - started) / 100) / 10, detail: error.message });
+        report.stages.push({
+          stage: name,
+          status: "failed",
+          seconds: Math.round((Date.now() - started) / 100) / 10,
+          detail: error.message,
+        });
         if (!json) console.error(`FAIL ${name}:\n${error.message}`);
       }
     }
@@ -407,9 +429,9 @@ export async function main(argv) {
     const declared = everyRow.length;
     console.log(
       `${report.status}: ${exercised} of ${declared} declared bundle target(s) exercised` +
-      `${only.length ? ` (narrowed to ${only.join(", ")})` : ""}, ` +
-      `${everyRow.length - everyRow.filter((row) => row.disposition === "exercise").length} declined with a named reason, ` +
-      `${failed.length} stage(s) failed`
+        `${only.length ? ` (narrowed to ${only.join(", ")})` : ""}, ` +
+        `${everyRow.length - everyRow.filter((row) => row.disposition === "exercise").length} declined with a named reason, ` +
+        `${failed.length} stage(s) failed`,
     );
   }
   return report.status === "failed" ? 1 : 0;

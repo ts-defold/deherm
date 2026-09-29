@@ -6,10 +6,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 
-import {
-  clangAst,
-  clangInvocation,
-} from "../scripts/generate-dmsdk-source-semantic-facts.mjs";
+import { clangAst, clangInvocation } from "../scripts/generate-dmsdk-source-semantic-facts.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const artifact = "packages/bindings/generated/defold-dmsdk-source-semantic-facts.json";
@@ -34,7 +31,9 @@ test("bounded-span source facts regenerate deterministically from pinned C/C++ i
     const report = JSON.parse(actual);
     assert.deepEqual(report.coverage, { requested: 10, observed: 10, missing: 0 });
     assert.equal(report.extraction, "clang-json-ast/compact-dataflow-v1");
-    assert.ok(report.sources.every(({ path, sha256 }) => path.startsWith("upstream/defold/") && /^[0-9a-f]{64}$/u.test(sha256)));
+    assert.ok(
+      report.sources.every(({ path, sha256 }) => path.startsWith("upstream/defold/") && /^[0-9a-f]{64}$/u.test(sha256)),
+    );
     run(["--out-root", output, "--check"]);
   } finally {
     await rm(output, { recursive: true, force: true });
@@ -44,7 +43,12 @@ test("bounded-span source facts regenerate deterministically from pinned C/C++ i
 test("translation-unit language follows the source language instead of forcing C++", () => {
   assert.deepEqual(clangInvocation("source.c", []).slice(0, 4), ["-x", "c", "-std=c11", "-fsyntax-only"]);
   assert.deepEqual(clangInvocation("source.cpp", []).slice(0, 4), ["-x", "c++", "-std=c++17", "-fsyntax-only"]);
-  assert.deepEqual(clangInvocation("source.mm", []).slice(0, 4), ["-x", "objective-c++", "-std=c++17", "-fsyntax-only"]);
+  assert.deepEqual(clangInvocation("source.mm", []).slice(0, 4), [
+    "-x",
+    "objective-c++",
+    "-std=c++17",
+    "-fsyntax-only",
+  ]);
 });
 
 test("errored recovery ASTs are categorically unavailable as positive semantic evidence", async () => {

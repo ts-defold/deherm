@@ -1,9 +1,8 @@
 import assert from "node:assert/strict";
 
-const pageUrl = process.env.DEFOLD_HERMES_HTML5_URL
-  ?? "http://127.0.0.1:4174/build/bundle/Defold%20Hermes%20Spike/index.html";
-const discoveryUrl = process.env.DEFOLD_HERMES_CDP_URL
-  ?? "http://127.0.0.1:9223/json/list";
+const pageUrl =
+  process.env.DEFOLD_HERMES_HTML5_URL ?? "http://127.0.0.1:4174/build/bundle/Defold%20Hermes%20Spike/index.html";
+const discoveryUrl = process.env.DEFOLD_HERMES_CDP_URL ?? "http://127.0.0.1:9223/json/list";
 
 const targets = await (await fetch(discoveryUrl)).json();
 const target = targets.find((candidate) => candidate.type === "page" && candidate.url === pageUrl);
@@ -45,7 +44,7 @@ socket.addEventListener("message", ({ data }) => {
     const event = {
       kind: "console",
       level: message.params.type,
-      values: message.params.args.map((argument) => argument.value ?? argument.description)
+      values: message.params.args.map((argument) => argument.value ?? argument.description),
     };
     const rendered = event.values.join(" ");
     sawInit ||= rendered.includes("init:browser");
@@ -64,7 +63,7 @@ socket.addEventListener("message", ({ data }) => {
       kind: "log",
       level: message.params.entry.level,
       text: message.params.entry.text,
-      url: message.params.entry.url ?? null
+      url: message.params.entry.url ?? null,
     });
   }
 });
@@ -93,7 +92,7 @@ async function evaluate(expression) {
   const result = await send("Runtime.evaluate", {
     expression,
     awaitPromise: true,
-    returnByValue: true
+    returnByValue: true,
   });
   if (result.exceptionDetails) throw new Error(result.exceptionDetails.text);
   return result.result.value;
@@ -130,17 +129,28 @@ while (Date.now() < deadline) {
       return value ? { width: value.width, height: value.height } : null;
     })()
   })`);
-  if (state.engineStarted && state.appRegistered && state.scriptBridgeInstalled && sawInit && sawGeneratedCall && sawScriptProbe && sawHashProbe && sawUpdate) break;
+  if (
+    state.engineStarted &&
+    state.appRegistered &&
+    state.scriptBridgeInstalled &&
+    sawInit &&
+    sawGeneratedCall &&
+    sawScriptProbe &&
+    sawHashProbe &&
+    sawUpdate
+  )
+    break;
   await new Promise((resolve) => setTimeout(resolve, 100));
 }
 
 socket.close();
 
-const relevantEvents = events.filter((event) =>
-  event.kind === "exception"
-  || event.level === "error"
-  || (JSON.stringify(event).includes("defold-hermes")
-    && !JSON.stringify(event).includes("update:")));
+const relevantEvents = events.filter(
+  (event) =>
+    event.kind === "exception" ||
+    event.level === "error" ||
+    (JSON.stringify(event).includes("defold-hermes") && !JSON.stringify(event).includes("update:")),
+);
 const diagnosticEvents = events.slice(-100);
 
 const evidence = JSON.stringify({ state, events: diagnosticEvents });
@@ -154,9 +164,9 @@ assert.equal(sawGeneratedCall, true, "Generated ExampleMath binding did not retu
 assert.equal(sawScriptProbe, true, "Generated Defold script binding did not execute through the browser bridge");
 assert.equal(sawHashProbe, true, "Generated hash binding did not cross the browser/Wasm C ABI");
 assert.equal(sawUpdate, true, "Defold did not invoke the TypeScript update lifecycle");
-const fatalEvents = relevantEvents.filter((event) =>
-  event.kind === "exception"
-  || (event.level === "error" && !event.url?.endsWith("/favicon.ico")));
+const fatalEvents = relevantEvents.filter(
+  (event) => event.kind === "exception" || (event.level === "error" && !event.url?.endsWith("/favicon.ico")),
+);
 assert.equal(fatalEvents.length, 0, `Browser errors: ${JSON.stringify(fatalEvents)}`);
 
 console.log(JSON.stringify({ state, events: relevantEvents }, null, 2));

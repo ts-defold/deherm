@@ -39,7 +39,10 @@ for (const commit of commits) {
   const author = identity(headers, "author");
   const committer = identity(headers, "committer");
 
-  for (const [role, value] of [["author", author], ["committer", committer]]) {
+  for (const [role, value] of [
+    ["author", author],
+    ["committer", committer],
+  ]) {
     if (!value || value.name !== allowed.name || value.email !== allowed.email) {
       failures.push(`${commit}: ${role} must be ${allowed.name} <${allowed.email}>`);
     }
@@ -67,5 +70,5 @@ if (failures.length) {
 
 console.log(
   `Verified ${commits.length} commit(s) reachable from ${ref}: ` +
-  `${allowed.name} <${allowed.email}>, signed, with no secondary authorship/contribution trailers.`,
+    `${allowed.name} <${allowed.email}>, signed, with no secondary authorship/contribution trailers.`,
 );

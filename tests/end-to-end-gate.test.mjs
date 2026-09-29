@@ -7,7 +7,7 @@ import {
   buildServerForDefoldRef,
   readLedger,
   scaffoldArguments,
-  stageNames
+  stageNames,
 } from "../scripts/check-end-to-end.mjs";
 
 // The property that makes the gate worth having: it cannot silently omit a
@@ -20,11 +20,16 @@ test("every declared bundle target is either exercised or declined by name", asy
   for (const row of rows) {
     assert.ok(["exercise", "declined"].includes(row.disposition), `${row.target}: ${row.disposition}`);
     if (row.disposition === "declined") {
-      assert.ok(row.reason && row.reason.length > 20,
-        `${row.target} is not exercised and says only "${row.reason}"; a decline must name a reason`);
+      assert.ok(
+        row.reason && row.reason.length > 20,
+        `${row.target} is not exercised and says only "${row.reason}"; a decline must name a reason`,
+      );
     }
   }
-  assert.ok(rows.some((row) => row.disposition === "exercise"), "the gate exercises nothing at all");
+  assert.ok(
+    rows.some((row) => row.disposition === "exercise"),
+    "the gate exercises nothing at all",
+  );
 });
 
 test("the scaffold is pinned to the policy revision instead of racing Defold latest", async () => {
@@ -35,11 +40,11 @@ test("the scaffold is pinned to the policy revision instead of racing Defold lat
     "--name",
     "deherm end to end",
     "--defold-sdk",
-    defoldRevision
+    defoldRevision,
   ]);
   assert.throws(
     () => scaffoldArguments({ project: "build/example", defoldRevision: "stable" }),
-    /requires the exact policy Defold revision/u
+    /requires the exact policy Defold revision/u,
   );
 });
 
@@ -47,7 +52,7 @@ test("a bundle target Defold adds is a failure, not a missing row", () => {
   const { rows, problems } = buildLedger({
     bundleTargets: { targets: [{ target: "riscv64-linux", group: "linux", architecture: "riscv64" }] },
     artifacts: { targets: {}, statuses: {} },
-    releaseTags: { families: {} }
+    releaseTags: { families: {} },
   });
   assert.deepEqual(rows, []);
   assert.equal(problems.length, 1);
@@ -58,7 +63,7 @@ test("an artifact the bundle-target list does not declare is a failure", () => {
   const { problems } = buildLedger({
     bundleTargets: { targets: [] },
     artifacts: { targets: { "ppc-aix": { status: "vendored" } }, statuses: {} },
-    releaseTags: { families: {} }
+    releaseTags: { families: {} },
   });
   assert.equal(problems.length, 1);
   assert.match(problems[0], /ppc-aix/);
@@ -71,7 +76,7 @@ test("a blocked target must carry a machine-readable blocker to be declined", ()
   const vague = buildLedger({
     bundleTargets,
     artifacts: { targets: { "wasm_pthread-web": { status: "blocked" } }, statuses: {} },
-    releaseTags
+    releaseTags,
   });
   assert.deepEqual(vague.rows, []);
   assert.match(vague.problems[0], /machine-readable blocker/);
@@ -80,11 +85,14 @@ test("a blocked target must carry a machine-readable blocker to be declined", ()
     bundleTargets,
     artifacts: {
       targets: {
-        "wasm_pthread-web": { status: "blocked", blocker: { code: "no-runner", reason: "nothing in CI runs a pthread browser host" } }
+        "wasm_pthread-web": {
+          status: "blocked",
+          blocker: { code: "no-runner", reason: "nothing in CI runs a pthread browser host" },
+        },
       },
-      statuses: {}
+      statuses: {},
     },
-    releaseTags
+    releaseTags,
   });
   assert.deepEqual(named.problems, []);
   assert.equal(named.rows[0].disposition, "declined");
@@ -95,8 +103,10 @@ test("the declared stages are the ones the gate can run", async () => {
   const module = await import("../scripts/check-end-to-end.mjs");
   assert.ok(stageNames.includes("bob"), "the gate must build the game, or it is not end to end");
   assert.ok(stageNames.includes("policy"), "the gate must resolve a published policy");
-  assert.ok(module.defaultBuildServer.startsWith("https://"),
-    "the gate must default to a real build server, not this repository's localhost Extender");
+  assert.ok(
+    module.defaultBuildServer.startsWith("https://"),
+    "the gate must default to a real build server, not this repository's localhost Extender",
+  );
 });
 
 test("the implicit hosted Extender follows the pinned Defold channel", async () => {
@@ -124,7 +134,7 @@ test("the Bob matrix consumes the package's pinned Hermes public headers", async
   assert.match(headers, /actions\/setup-node@v7[\s\S]*cache: 'pnpm'/u);
   assert.match(
     headers,
-    /pnpm\/action-setup@v6[\s\S]*actions\/setup-node@v7[\s\S]*pnpm install --frozen-lockfile --ignore-scripts[\s\S]*bootstrap-upstreams\.sh hermes[\s\S]*stage-hermes-public-headers\.mjs/u
+    /pnpm\/action-setup@v6[\s\S]*actions\/setup-node@v7[\s\S]*pnpm install --frozen-lockfile --ignore-scripts[\s\S]*bootstrap-upstreams\.sh hermes[\s\S]*stage-hermes-public-headers\.mjs/u,
   );
   assert.match(headers, /name: pinned-hermes-public-headers/u);
   assert.match(workflow, /needs: \[local, extension-headers\]/u);
@@ -135,21 +145,33 @@ test("pushes run the available cheap consumer half while artifact-dispatched run
   const workflow = await readFile(new URL("../.github/workflows/end-to-end.yml", import.meta.url), "utf8");
   const nativeWorkflow = await readFile(new URL("../.github/workflows/native-artifacts.yml", import.meta.url), "utf8");
   const local = workflow.slice(workflow.indexOf("  local:"), workflow.indexOf("  extension-headers:"));
-  assert.match(local, /if \[ "\$\{\{ github\.event_name \}\}" != push \]; then[\s\S]*stages\+=\(--stage target-archives\)/u);
+  assert.match(
+    local,
+    /if \[ "\$\{\{ github\.event_name \}\}" != push \]; then[\s\S]*stages\+=\(--stage target-archives\)/u,
+  );
   assert.match(local, /--stage policy[\s\S]*--stage scaffold[\s\S]*--stage generate/u);
-  assert.match(local, /\[ "\$\{\{ steps\.published-host-tools\.outputs\.available \}\}" = true \][\s\S]*stages\+=\(--stage host-tools\)/u);
+  assert.match(
+    local,
+    /\[ "\$\{\{ steps\.published-host-tools\.outputs\.available \}\}" = true \][\s\S]*stages\+=\(--stage host-tools\)/u,
+  );
   assert.match(local, /for \(const family of \["hermes-host", "dehermc"\]\)/u);
   assert.match(local, /tags\[family\]\.assets\["linux-x64"\]/u);
   assert.match(local, /ordered artifact dispatch will exercise it/u);
   assert.match(local, /DEHERM_PACKAGE_SMOKE_DOWNLOAD_DEHERMC=1/u);
   assert.match(local, /Packed clean consumer downloads the published compiler/u);
-  assert.match(workflow, /group: end-to-end-\$\{\{ github\.ref \}\}-\$\{\{ github\.event_name == 'push' && 'push' \|\| 'full' \}\}/u);
+  assert.match(
+    workflow,
+    /group: end-to-end-\$\{\{ github\.ref \}\}-\$\{\{ github\.event_name == 'push' && 'push' \|\| 'full' \}\}/u,
+  );
   assert.match(workflow, /extension-headers:[\s\S]*if: github\.event_name != 'push'/u);
   assert.match(workflow, /bob:[\s\S]*if: github\.event_name != 'push'/u);
   const bob = workflow.slice(workflow.indexOf("  bob:"));
   assert.match(bob, /--stage policy --stage target-archives --stage scaffold --stage generate --stage bob/u);
   const dispatch = nativeWorkflow.slice(nativeWorkflow.indexOf("Verify every fingerprinted row is published"));
-  assert.match(dispatch, /Run full end-to-end after every fingerprinted row is published[\s\S]*gh workflow run end-to-end\.yml/u);
+  assert.match(
+    dispatch,
+    /Run full end-to-end after every fingerprinted row is published[\s\S]*gh workflow run end-to-end\.yml/u,
+  );
   assert.doesNotMatch(dispatch, /if: needs\.plan\.outputs\.build_any == 'true'/u);
 });
 

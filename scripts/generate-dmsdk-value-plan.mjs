@@ -17,9 +17,11 @@ const sources = Object.freeze({
 const output = "packages/bindings/generated/defold-dmsdk-value-plan.json";
 
 export async function generateDmSdkValuePlan({ root: outputRoot = root, check = false } = {}) {
-  const texts = Object.fromEntries(await Promise.all(
-    Object.entries(sources).map(async ([key, source]) => [key, await readFile(resolve(outputRoot, source), "utf8")]),
-  ));
+  const texts = Object.fromEntries(
+    await Promise.all(
+      Object.entries(sources).map(async ([key, source]) => [key, await readFile(resolve(outputRoot, source), "utf8")]),
+    ),
+  );
   const plan = buildDmSdkValuePlan({
     ir: JSON.parse(texts.ir),
     shapes: JSON.parse(texts.shapes),
@@ -34,7 +36,7 @@ export async function generateDmSdkValuePlan({ root: outputRoot = root, check = 
   const content = `${JSON.stringify(plan, null, 2)}\n`;
   const destination = resolve(outputRoot, output);
   if (check) {
-    if (await readFile(destination, "utf8") !== content) throw new Error(`${output} is stale`);
+    if ((await readFile(destination, "utf8")) !== content) throw new Error(`${output} is stale`);
   } else {
     await mkdir(dirname(destination), { recursive: true });
     await writeFile(destination, content);

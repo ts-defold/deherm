@@ -2,10 +2,7 @@ import { createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 
-import {
-  hexBindingId as hex32,
-  stableBindingId as fnv1a32
-} from "./lib/binding-identity.mjs";
+import { hexBindingId as hex32, stableBindingId as fnv1a32 } from "./lib/binding-identity.mjs";
 import { loadScriptSemanticOverrides } from "./lib/script-semantic-overrides.mjs";
 import { expectReviewedCount } from "./lib/reviewed-revision.mjs";
 
@@ -18,8 +15,11 @@ const headerUrl = new URL("defold/defold_hermes/include/defold_hermes/generated_
 const sourceUrl = new URL("defold/defold_hermes/src/generated_scalar_lua_descriptors.cpp", root);
 
 function pascal(value) {
-  return value.split(/[^A-Za-z0-9]+/).filter(Boolean)
-    .map((part) => `${part[0].toUpperCase()}${part.slice(1)}`).join("");
+  return value
+    .split(/[^A-Za-z0-9]+/)
+    .filter(Boolean)
+    .map((part) => `${part[0].toUpperCase()}${part.slice(1)}`)
+    .join("");
 }
 
 function typeRegistry(ir) {
@@ -27,7 +27,9 @@ function typeRegistry(ir) {
 }
 
 function splitUnion(rawType) {
-  return String(rawType).split("|").map((part) => part.trim());
+  return String(rawType)
+    .split("|")
+    .map((part) => part.trim());
 }
 
 function resolveCodec(rawType, registry, seen = new Set()) {
@@ -42,7 +44,7 @@ function resolveCodec(rawType, registry, seen = new Set()) {
   if (type === "string") return { codec: "String", nullable };
   const definition = registry.get(type);
   if (!definition) throw new Error(`Unknown scalar type ${type}`);
-  if (definition.kind === "enum" || /^defold_enum\./.test(definition.rawType ?? "")) {
+  if (definition.kind === "enum" || (definition.rawType ?? "").startsWith("defold_enum.")) {
     return { codec: "Integer", nullable };
   }
   if (definition.kind === "alias" && !seen.has(type)) {
@@ -107,7 +109,7 @@ function makeOutputs(patternsText, irText, registrationGateText, validatedOverri
           name: parameter.rawName,
           rawType: parameter.rawType,
           codec: lowered.codec,
-          optional: override?.parameterOptional?.[parameter.rawName] ?? parameter.optional
+          optional: override?.parameterOptional?.[parameter.rawName] ?? parameter.optional,
         };
       });
       const firstOptional = parameters.findIndex((parameter) => parameter.optional);
@@ -115,9 +117,10 @@ function makeOutputs(patternsText, irText, registrationGateText, validatedOverri
         throw new Error(`Non-suffix optional parameters need an explicit call-shape policy: ${pattern.id}`);
       }
       if (fn.returns.length > 1) throw new Error(`Scalar binding has multiple results: ${pattern.id}`);
-      const result = fn.returns.length === 0
-        ? { codec: "None", nullable: false, rawType: null }
-        : { ...resolveCodec(fn.returns[0], registry), rawType: fn.returns[0] };
+      const result =
+        fn.returns.length === 0
+          ? { codec: "None", nullable: false, rawType: null }
+          : { ...resolveCodec(fn.returns[0], registry), rawType: fn.returns[0] };
       return {
         id: pattern.id,
         stableId,
@@ -132,7 +135,7 @@ function makeOutputs(patternsText, irText, registrationGateText, validatedOverri
         maximumArgumentCount: parameters.length,
         result,
         semanticOverride: override?.evidence ?? null,
-        executableStatus: "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
+        executableStatus: "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed",
       };
     })
     .sort((left, right) => left.stableId - right.stableId);
@@ -141,8 +144,10 @@ function makeOutputs(patternsText, irText, registrationGateText, validatedOverri
   // ordinary generation a different number is a regression; in a declared
   // derivation it is what that revision has - 1.13.1 has 117 - and is reported.
   expectReviewedCount({
-    input: "scripts/generate-scalar-lua-dispatch.mjs", label: "scalar bindings",
-    expected: 90, observed: bindings.length
+    input: "scripts/generate-scalar-lua-dispatch.mjs",
+    label: "scalar bindings",
+    expected: 90,
+    observed: bindings.length,
   });
   for (const id of validatedOverrides.keys()) {
     if (!usedOverrides.has(id)) throw new Error(`Semantic override does not match an emitted scalar binding: ${id}`);
@@ -156,20 +161,28 @@ function makeOutputs(patternsText, irText, registrationGateText, validatedOverri
   const maxArguments = Math.max(...bindings.map((binding) => binding.maximumArgumentCount));
   const overrideEvidence = [...validatedOverrides.entries()];
   const inputHash = createHash("sha256")
-    .update(patternsText).update("\0").update(irText).update("\0").update(registrationGateText).update("\0")
-    .update(JSON.stringify(overrideEvidence)).digest("hex");
+    .update(patternsText)
+    .update("\0")
+    .update(irText)
+    .update("\0")
+    .update(registrationGateText)
+    .update("\0")
+    .update(JSON.stringify(overrideEvidence))
+    .digest("hex");
   const report = {
     schemaVersion: 1,
     defoldRevision: ir.defoldRevision,
     inputSha256: inputHash,
     stableIdAlgorithm: "FNV-1a 32-bit over canonical script:<module>.<member> id; collisions fail generation",
-    coverageClaim: "Stable-ID runtime dispatch is installed for all 90 scalar-classified functions; representative mock execution is proven, but per-function real-engine conformance is not claimed.",
-    allocationClaim: "Generated tables and native dispatch use fixed storage. Lua may allocate while interning new strings, formatting errors, or inside called engine functions.",
+    coverageClaim:
+      "Stable-ID runtime dispatch is installed for all 90 scalar-classified functions; representative mock execution is proven, but per-function real-engine conformance is not claimed.",
+    allocationClaim:
+      "Generated tables and native dispatch use fixed storage. Lua may allocate while interning new strings, formatting errors, or inside called engine functions.",
     bindingCount: bindings.length,
     argumentCodecCount: argumentsFlat.length,
     maxArgumentCount: maxArguments,
     semanticOverrideCount: bindings.filter((binding) => binding.semanticOverride).length,
-    bindings
+    bindings,
   };
 
   const header = `// Generated by scripts/generate-scalar-lua-dispatch.mjs. Do not edit.\n#pragma once\n\n#include <cstddef>\n#include <cstdint>\n\nnamespace defold_hermes::lua_bridge::scalar::generated {\n\ninline constexpr size_t kBindingCount = ${bindings.length};\ninline constexpr size_t kArgumentCodecCount = ${argumentsFlat.length};\ninline constexpr size_t kMaxArgumentCount = ${maxArguments};\n\nenum class BindingId : uint32_t {\n${bindings.map((binding) => `  ${binding.enumName} = ${hex32(binding.stableId)},`).join("\n")}\n};\n\n}  // namespace defold_hermes::lua_bridge::scalar::generated\n`;
@@ -180,7 +193,7 @@ function makeOutputs(patternsText, irText, registrationGateText, validatedOverri
     argumentOffset += binding.parameters.length;
     offsets.push(argumentOffset);
   }
-  const source = `// Generated by scripts/generate-scalar-lua-dispatch.mjs. Do not edit.\n#include <defold_hermes/scalar_lua_dispatch.hpp>\n\nnamespace defold_hermes::lua_bridge::scalar::generated {\nnamespace {\nconstexpr uint32_t kStableIds[] = {\n${bindings.map((binding) => `  ${hex32(binding.stableId)},  // ${binding.id}`).join("\n")}\n};\nconstexpr const char* kCanonicalIds[] = {\n${bindings.map((binding) => `  ${cppString(binding.id)},`).join("\n")}\n};\nconstexpr const char* kModulePaths[] = {\n${bindings.map((binding) => `  ${cppString(binding.modulePath)},`).join("\n")}\n};\nconstexpr const char* kMembers[] = {\n${bindings.map((binding) => `  ${cppString(binding.member)},`).join("\n")}\n};\nconstexpr uint16_t kArgumentOffsets[] = {\n  ${offsets.join(", ")}\n};\nconstexpr ScalarCodec kArgumentCodecs[] = {\n${argumentsFlat.map((argument) => `  ScalarCodec::k${argument.codec},`).join("\n")}\n};\nconstexpr uint8_t kArgumentOptional[] = {\n  ${argumentsFlat.map((argument) => argument.optional ? 1 : 0).join(", ")}\n};\nconstexpr uint8_t kRequiredArgumentCounts[] = {\n  ${bindings.map((binding) => binding.requiredArgumentCount).join(", ")}\n};\nconstexpr uint8_t kMaximumArgumentCounts[] = {\n  ${bindings.map((binding) => binding.maximumArgumentCount).join(", ")}\n};\nconstexpr ScalarCodec kResultCodecs[] = {\n${bindings.map((binding) => `  ScalarCodec::k${binding.result.codec},`).join("\n")}\n};\nconstexpr uint8_t kResultNullable[] = {\n  ${bindings.map((binding) => binding.result.nullable ? 1 : 0).join(", ")}\n};\nconstexpr ScalarBindingTables kTables{\n  kBindingCount, kArgumentCodecCount, kStableIds, kCanonicalIds, kModulePaths, kMembers,\n  kArgumentOffsets, kArgumentCodecs, kArgumentOptional, kRequiredArgumentCounts,\n  kMaximumArgumentCounts, kResultCodecs, kResultNullable\n};\n}  // namespace\n\nconst ScalarBindingTables& tables() noexcept { return kTables; }\n\n}  // namespace defold_hermes::lua_bridge::scalar::generated\n`;
+  const source = `// Generated by scripts/generate-scalar-lua-dispatch.mjs. Do not edit.\n#include <defold_hermes/scalar_lua_dispatch.hpp>\n\nnamespace defold_hermes::lua_bridge::scalar::generated {\nnamespace {\nconstexpr uint32_t kStableIds[] = {\n${bindings.map((binding) => `  ${hex32(binding.stableId)},  // ${binding.id}`).join("\n")}\n};\nconstexpr const char* kCanonicalIds[] = {\n${bindings.map((binding) => `  ${cppString(binding.id)},`).join("\n")}\n};\nconstexpr const char* kModulePaths[] = {\n${bindings.map((binding) => `  ${cppString(binding.modulePath)},`).join("\n")}\n};\nconstexpr const char* kMembers[] = {\n${bindings.map((binding) => `  ${cppString(binding.member)},`).join("\n")}\n};\nconstexpr uint16_t kArgumentOffsets[] = {\n  ${offsets.join(", ")}\n};\nconstexpr ScalarCodec kArgumentCodecs[] = {\n${argumentsFlat.map((argument) => `  ScalarCodec::k${argument.codec},`).join("\n")}\n};\nconstexpr uint8_t kArgumentOptional[] = {\n  ${argumentsFlat.map((argument) => (argument.optional ? 1 : 0)).join(", ")}\n};\nconstexpr uint8_t kRequiredArgumentCounts[] = {\n  ${bindings.map((binding) => binding.requiredArgumentCount).join(", ")}\n};\nconstexpr uint8_t kMaximumArgumentCounts[] = {\n  ${bindings.map((binding) => binding.maximumArgumentCount).join(", ")}\n};\nconstexpr ScalarCodec kResultCodecs[] = {\n${bindings.map((binding) => `  ScalarCodec::k${binding.result.codec},`).join("\n")}\n};\nconstexpr uint8_t kResultNullable[] = {\n  ${bindings.map((binding) => (binding.result.nullable ? 1 : 0)).join(", ")}\n};\nconstexpr ScalarBindingTables kTables{\n  kBindingCount, kArgumentCodecCount, kStableIds, kCanonicalIds, kModulePaths, kMembers,\n  kArgumentOffsets, kArgumentCodecs, kArgumentOptional, kRequiredArgumentCounts,\n  kMaximumArgumentCounts, kResultCodecs, kResultNullable\n};\n}  // namespace\n\nconst ScalarBindingTables& tables() noexcept { return kTables; }\n\n}  // namespace defold_hermes::lua_bridge::scalar::generated\n`;
   return { report: `${JSON.stringify(report, null, 2)}\n`, header, source };
 }
 
@@ -191,14 +204,14 @@ async function main(argv = process.argv.slice(2)) {
   const [patternsText, irText, registrationGateText] = await Promise.all([
     readFile(patternsUrl, "utf8"),
     readFile(irUrl, "utf8"),
-    readFile(registrationGateUrl, "utf8")
+    readFile(registrationGateUrl, "utf8"),
   ]);
   const validatedOverrides = await loadScriptSemanticOverrides(root);
   const outputs = makeOutputs(patternsText, irText, registrationGateText, validatedOverrides);
   const targets = [
     [reportUrl, outputs.report],
     [headerUrl, outputs.header],
-    [sourceUrl, outputs.source]
+    [sourceUrl, outputs.source],
   ];
   if (check) {
     for (const [url, expected] of targets) {

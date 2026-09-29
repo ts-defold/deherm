@@ -39,12 +39,14 @@ export function targetActivation(snapshot) {
   const targets = snapshot.targets ?? [];
   if (generation <= 0 || targets.length === 0) return { generation, applied: 0, total: targets.length, progress: 0 };
   const applied = targets.filter((target) => (target.appliedGeneration ?? 0) >= generation).length;
-  const awaiting = targets.some((target) => target.pendingGeneration === generation || target.signalledGeneration === generation);
+  const awaiting = targets.some(
+    (target) => target.pendingGeneration === generation || target.signalledGeneration === generation,
+  );
   return {
     generation,
     applied,
     total: targets.length,
-    progress: applied === targets.length ? 1 : applied > 0 || awaiting ? 0.5 : 0
+    progress: applied === targets.length ? 1 : applied > 0 || awaiting ? 0.5 : 0,
   };
 }
 
@@ -85,13 +87,13 @@ export function logEntries(snapshot) {
       timestamp: entry.at,
       level: logLevels.includes(entry.level) ? entry.level : "info",
       source: entry.source ?? "deherm",
-      message: entry.message
+      message: entry.message,
     };
   });
 }
 
 export function shortFingerprint(value) {
-  return typeof value === "string" && value.length > 12 ? value.slice(0, 12) : value ?? "—";
+  return typeof value === "string" && value.length > 12 ? value.slice(0, 12) : (value ?? "—");
 }
 
 export function layoutMode(viewport) {

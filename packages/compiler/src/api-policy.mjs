@@ -80,9 +80,7 @@ export const POLICY_REALIZER_CAPABILITY_REGISTRY = Object.freeze({
 export const POLICY_REALIZER_CAPABILITIES = Object.freeze(Object.keys(POLICY_REALIZER_CAPABILITY_REGISTRY).sort());
 
 const POLICY_REALIZER_CAPABILITY_IMPLICATIONS = Object.freeze({
-  "policy.compiler-document.dmsdk-universal.v1": Object.freeze([
-    DMSDK_UNIVERSAL_STATIC_FRAME_CAPABILITY,
-  ]),
+  "policy.compiler-document.dmsdk-universal.v1": Object.freeze([DMSDK_UNIVERSAL_STATIC_FRAME_CAPABILITY]),
 });
 
 function versionTuple(version) {
@@ -106,7 +104,8 @@ export function buildPolicyRealizer({ compilerSurface, capabilityRegistry = POLI
   if (compilerSurface) {
     required.add("policy.compiler-surface.references.v1");
     const recipes = compilerSurface.realizationRecipes;
-    if (!recipes || typeof recipes !== "object") throw new Error("Compiler surface has no explicit realization recipes");
+    if (!recipes || typeof recipes !== "object")
+      throw new Error("Compiler surface has no explicit realization recipes");
     for (const section of ["documents", "sdk", "outputs"]) {
       const values = compilerSurface[section] ?? {};
       const selected = recipes[section] ?? {};
@@ -164,7 +163,11 @@ const NON_MODULE_REGISTRATION_SCOPES = Object.freeze(new Set(["<globals>", ""]))
 export function canonicalize(value) {
   if (Array.isArray(value)) return value.map(canonicalize);
   if (value && typeof value === "object") {
-    return Object.fromEntries(Object.keys(value).sort().map((key) => [key, canonicalize(value[key])]));
+    return Object.fromEntries(
+      Object.keys(value)
+        .sort()
+        .map((key) => [key, canonicalize(value[key])]),
+    );
   }
   return value;
 }
@@ -242,7 +245,9 @@ export function normalizePaths(value, repositoryRoot) {
   if (typeof value === "string") return value.split(prefix).join("");
   if (Array.isArray(value)) return value.map((entry) => normalizePaths(entry, repositoryRoot));
   if (value && typeof value === "object") {
-    return Object.fromEntries(Object.entries(value).map(([key, entry]) => [key, normalizePaths(entry, repositoryRoot)]));
+    return Object.fromEntries(
+      Object.entries(value).map(([key, entry]) => [key, normalizePaths(entry, repositoryRoot)]),
+    );
   }
   return value;
 }
@@ -256,7 +261,9 @@ export function abstractDefoldRevision(value, revision) {
   if (typeof value === "string") return value.split(revision).join(DEFOLD_REVISION_TOKEN);
   if (Array.isArray(value)) return value.map((entry) => abstractDefoldRevision(entry, revision));
   if (value && typeof value === "object") {
-    return Object.fromEntries(Object.entries(value).map(([key, entry]) => [key, abstractDefoldRevision(entry, revision)]));
+    return Object.fromEntries(
+      Object.entries(value).map(([key, entry]) => [key, abstractDefoldRevision(entry, revision)]),
+    );
   }
   return value;
 }
@@ -266,7 +273,9 @@ export function restoreDefoldRevision(value, revision) {
   if (typeof value === "string") return value.split(DEFOLD_REVISION_TOKEN).join(revision);
   if (Array.isArray(value)) return value.map((entry) => restoreDefoldRevision(entry, revision));
   if (value && typeof value === "object") {
-    return Object.fromEntries(Object.entries(value).map(([key, entry]) => [key, restoreDefoldRevision(entry, revision)]));
+    return Object.fromEntries(
+      Object.entries(value).map(([key, entry]) => [key, restoreDefoldRevision(entry, revision)]),
+    );
   }
   return value;
 }
@@ -309,7 +318,7 @@ export function buildPolicy(inputs) {
     toolchain,
     compilerSurface,
     generator,
-    repositoryRoot = ""
+    repositoryRoot = "",
   } = inputs;
 
   const realizer = buildPolicyRealizer({ compilerSurface });
@@ -340,7 +349,11 @@ export function buildPolicy(inputs) {
       // Fail closed: a declaration whose public header is not under `dmsdk/`
       // cannot be attributed to a namespace, and guessing one would put it in a
       // subtree two revisions could not meaningfully share.
-      dmsdkBlockers.push({ code: "dmsdk-declaration-without-namespace", id: declaration.id, header: declaration.header });
+      dmsdkBlockers.push({
+        code: "dmsdk-declaration-without-namespace",
+        id: declaration.id,
+        header: declaration.header,
+      });
       continue;
     }
     const dmsdk = section(bucket(namespaces, namespace), "dmsdk", () => ({ declarations: [] }));
@@ -360,7 +373,7 @@ export function buildPolicy(inputs) {
     // namespace. Keep the exact blocker in the shared subtree so consumers can
     // surface the gap while the remaining declarations remain usable. Omit an
     // empty field to preserve byte identity for complete policies.
-    ...(dmsdkBlockers.length ? { blockers: dmsdkBlockers } : {})
+    ...(dmsdkBlockers.length ? { blockers: dmsdkBlockers } : {}),
   };
   shared.script = section(shared, "script", () => ({ functions: [], types: [] }));
   shared.script.unresolvedTypes = scriptIr.unresolvedTypes ?? [];
@@ -373,7 +386,7 @@ export function buildPolicy(inputs) {
   // function of which extensions this checkout happened to have.
   const engineTargets = sortBy(
     Object.values(registrationSurface.targets).filter((target) => target.kind === "engine-tree"),
-    (target) => target.id
+    (target) => target.id,
   );
   for (const target of engineTargets) {
     const perNamespace = new Map();
@@ -385,7 +398,7 @@ export function buildPolicy(inputs) {
           registeredButUndeclared: [],
           registeredConstants: [],
           commentedOutRegistrations: [],
-          modules: {}
+          modules: {},
         });
       }
       return perNamespace.get(namespace)[field];
@@ -398,7 +411,8 @@ export function buildPolicy(inputs) {
     for (const row of target.declaredButUnregistered) take(moduleOf(row), "declaredButUnregistered").push(row);
     for (const row of target.registeredButUndeclared) take(moduleOf(row), "registeredButUndeclared").push(row);
     for (const row of target.registeredConstants) take(moduleOf(row), "registeredConstants").push(row);
-    for (const row of target.commentedOutRegistrations ?? []) take(moduleOf(row), "commentedOutRegistrations").push(row);
+    for (const row of target.commentedOutRegistrations ?? [])
+      take(moduleOf(row), "commentedOutRegistrations").push(row);
     for (const [module, stats] of Object.entries(target.namespaces ?? {})) {
       const namespace = moduleOf({ module });
       if (!perNamespace.has(namespace)) take(namespace, "routes");
@@ -412,7 +426,7 @@ export function buildPolicy(inputs) {
         registeredButUndeclared: sortBy(payload.registeredButUndeclared, (row) => row.name),
         registeredConstants: sortBy(payload.registeredConstants, (row) => `${row.module}.${row.member}`),
         commentedOutRegistrations: sortBy(payload.commentedOutRegistrations, (row) => row.name ?? ""),
-        modules: payload.modules
+        modules: payload.modules,
       };
     }
     // Blockers are sites in C that the parser refused, so they are attributed to
@@ -429,7 +443,7 @@ export function buildPolicy(inputs) {
       blockers: target.blockers ?? [],
       diagnostics: target.diagnostics ?? [],
       policyNotes: target.policyNotes ?? [],
-      registrationEntryPoints: target.registrationEntryPoints ?? []
+      registrationEntryPoints: target.registrationEntryPoints ?? [],
     };
   }
   shared.registration = shared.registration ?? {};
@@ -455,7 +469,7 @@ export function buildPolicy(inputs) {
       manifestSha256: profile.manifestSha256,
       features: profile.features,
       runtimeHandshake: handshake,
-      boundAtResolution: ["defoldRevision", "catalogSha256"]
+      boundAtResolution: ["defoldRevision", "catalogSha256"],
     };
     const classify = (rows, state) => {
       for (const row of rows) {
@@ -473,7 +487,7 @@ export function buildPolicy(inputs) {
     featureDefinitions[name] = {
       capabilityBit: feature.capabilityBit,
       documentedRouteSetSha256: feature.documentedRouteSetSha256,
-      availableRouteSetSha256: feature.availableRouteSetSha256
+      availableRouteSetSha256: feature.availableRouteSetSha256,
     };
     for (const row of feature.documentedRoutes ?? []) {
       const namespace = scriptNamespaceOfModulePath(row.rawName);
@@ -493,14 +507,14 @@ export function buildPolicy(inputs) {
       encoding: "JSON.stringify of an object with keys in the stated order",
       material: ["defoldRevision", "profiles"],
       profileOrder: Object.keys(routeProfiles.profiles),
-      profileFields: ["features", "capabilityBits", "routeSetSha256"]
+      profileFields: ["features", "capabilityBits", "routeSetSha256"],
     },
     registrationAudit: routeProfiles.registrationAudit,
     manifestAudit: routeProfiles.manifestAudit,
     handleFeatures: routeProfiles.handleFeatures,
     handleProfiles: routeProfiles.handleProfiles,
     features: featureDefinitions,
-    profiles: profileDefinitions
+    profiles: profileDefinitions,
   };
 
   // ── Resource declaration schema ───────────────────────────────────────────
@@ -511,7 +525,7 @@ export function buildPolicy(inputs) {
   shared.resources = {
     derivation: resourceSchema.derivation,
     resources: resourceSchema.resources,
-    blockers: resourceSchema.blockers
+    blockers: resourceSchema.blockers,
   };
 
   // ── Seal ──────────────────────────────────────────────────────────────────
@@ -546,50 +560,58 @@ export function buildPolicy(inputs) {
       schemaVersion: POLICY_SCHEMA_VERSION,
       kind: namespace.startsWith(RESERVED_SUBTREE_PREFIX) ? "deherm.policy.shared" : "deherm.policy.namespace",
       namespace,
-      ...payload
+      ...payload,
     });
   }
   subtrees[PROFILES_SUBTREE] = seal(profiles);
   subtrees[TOOLCHAIN_SUBTREE] = seal({
     schemaVersion: POLICY_SCHEMA_VERSION,
     kind: "deherm.policy.toolchain",
-    ...toolchain
+    ...toolchain,
   });
   if (compilerSurface) {
     const normalizedDocuments = abstractDefoldRevision(
-      normalizePaths(compilerSurface.documents, repositoryRoot), scriptIr.defoldRevision);
+      normalizePaths(compilerSurface.documents, repositoryRoot),
+      scriptIr.defoldRevision,
+    );
     const normalizedSdk = abstractDefoldRevision(
-      normalizePaths(compilerSurface.sdk, repositoryRoot), scriptIr.defoldRevision);
+      normalizePaths(compilerSurface.sdk, repositoryRoot),
+      scriptIr.defoldRevision,
+    );
     const normalizedOutputs = abstractDefoldRevision(
-      normalizePaths(compilerSurface.outputs ?? {}, repositoryRoot), scriptIr.defoldRevision);
+      normalizePaths(compilerSurface.outputs ?? {}, repositoryRoot),
+      scriptIr.defoldRevision,
+    );
     const documentManifest = {};
-    for (const [name, value] of Object.entries(normalizedDocuments).sort(([left], [right]) => left < right ? -1 : 1)) {
+    for (const [name, value] of Object.entries(normalizedDocuments).sort(([left], [right]) =>
+      left < right ? -1 : 1,
+    )) {
       const namespace = `${COMPILER_DOCUMENT_SUBTREE_PREFIX}${name}`;
       subtrees[namespace] = seal({
         schemaVersion: POLICY_SCHEMA_VERSION,
         kind: "deherm.policy.compiler-document",
         namespace,
         name,
-        value
+        value,
       });
       documentManifest[name] = {
         object: namespace,
-        recipe: compilerSurface.realizationRecipes.documents[name]
+        recipe: compilerSurface.realizationRecipes.documents[name],
       };
     }
     const sdkManifest = {};
-    for (const [name, record] of Object.entries(normalizedSdk).sort(([left], [right]) => left < right ? -1 : 1)) {
+    for (const [name, record] of Object.entries(normalizedSdk).sort(([left], [right]) => (left < right ? -1 : 1))) {
       if (typeof record.source === "string" && hashBytes(record.source) !== record.sha256) {
         throw new Error(
           `${name}: SDK manifest digest is not over revision-abstracted source bytes; ` +
-          "canonicalize Defold revision tokens before hashing"
+            "canonicalize Defold revision tokens before hashing",
         );
       }
       const manifestRecord = {
         mode: record.mode,
         sha256: record.sha256,
         recipe: compilerSurface.realizationRecipes.sdk[name],
-        inputs: [...(record.inputs ?? [])]
+        inputs: [...(record.inputs ?? [])],
       };
       if (record.recipeInput !== undefined) manifestRecord.recipeInput = record.recipeInput;
       if (typeof record.source === "string") {
@@ -599,14 +621,14 @@ export function buildPolicy(inputs) {
           kind: "deherm.policy.compiler-sdk-source",
           namespace,
           name,
-          source: record.source
+          source: record.source,
         });
         manifestRecord.sourceObject = namespace;
       }
       sdkManifest[name] = manifestRecord;
     }
     const outputManifest = {};
-    for (const [name, record] of Object.entries(normalizedOutputs).sort(([left], [right]) => left < right ? -1 : 1)) {
+    for (const [name, record] of Object.entries(normalizedOutputs).sort(([left], [right]) => (left < right ? -1 : 1))) {
       if (!/^[0-9a-f]{64}$/u.test(record.sha256 ?? "")) {
         throw new Error(`${name}: compiler output has no canonical SHA-256`);
       }
@@ -614,7 +636,7 @@ export function buildPolicy(inputs) {
         mode: record.mode,
         sha256: record.sha256,
         recipe: compilerSurface.realizationRecipes.outputs[name],
-        inputs: [...(record.inputs ?? [])]
+        inputs: [...(record.inputs ?? [])],
       };
       if (record.mode === "authenticated-compatibility-source") {
         if (typeof record.source !== "string" || hashBytes(record.source) !== record.sha256) {
@@ -626,7 +648,7 @@ export function buildPolicy(inputs) {
           kind: "deherm.policy.compiler-output-source",
           namespace,
           name,
-          source: record.source
+          source: record.source,
         });
         manifestRecord.sourceObject = namespace;
       } else if (record.mode !== "render-and-verify" || record.source !== undefined) {
@@ -643,19 +665,19 @@ export function buildPolicy(inputs) {
       documents: {
         schemaVersion: 1,
         kind: "deherm.policy.compiler-document-manifest",
-        entries: documentManifest
+        entries: documentManifest,
       },
       sdk: {
         schemaVersion: 1,
         kind: "deherm.policy.sdk-manifest",
-        entries: sdkManifest
+        entries: sdkManifest,
       },
       outputs: {
         schemaVersion: 1,
         kind: "deherm.policy.output-manifest",
-        entries: outputManifest
+        entries: outputManifest,
       },
-      realizationRecipes: compilerSurface.realizationRecipes
+      realizationRecipes: compilerSurface.realizationRecipes,
     });
   }
 
@@ -671,13 +693,17 @@ export function buildPolicy(inputs) {
     generator,
     realizer: {
       minimumPackageVersion: realizer.minimumPackageVersion,
-      requiredCapabilities: [...realizer.requiredCapabilities]
+      requiredCapabilities: [...realizer.requiredCapabilities],
     },
-    subtrees: Object.fromEntries(Object.keys(subtrees).sort().map((key) => [key, subtrees[key]])),
+    subtrees: Object.fromEntries(
+      Object.keys(subtrees)
+        .sort()
+        .map((key) => [key, subtrees[key]]),
+    ),
     counts: {
       subtrees: Object.keys(subtrees).length,
-      namespaces: namespaceKeys.length
-    }
+      namespaces: namespaceKeys.length,
+    },
   };
   const sealedRoot = sealObject(root);
   return { root, rootBytes: sealedRoot.bytes, rootHash: sealedRoot.hash, objects, subtrees };
@@ -700,8 +726,8 @@ export function assertNoRevisionLeak({ rootBytes, objects, revision }) {
   if (offenders.length) {
     throw new Error(
       `Policy content carries the Defold revision (${offenders.join(", ")}). ` +
-      "A policy is a function of the declared surface, not of the version string; " +
-      "the sha-to-root mapping belongs in the index alone."
+        "A policy is a function of the declared surface, not of the version string; " +
+        "the sha-to-root mapping belongs in the index alone.",
     );
   }
 }
@@ -720,8 +746,12 @@ export function assertNoRevisionLeak({ rootBytes, objects, revision }) {
  * time; see artifactsPath.
  */
 export function buildIndexEntry({ defoldRevision, policyRoot, generator, realizer }) {
-  if (!realizer || typeof realizer.minimumPackageVersion !== "string" ||
-      !Array.isArray(realizer.requiredCapabilities) || realizer.requiredCapabilities.length === 0) {
+  if (
+    !realizer ||
+    typeof realizer.minimumPackageVersion !== "string" ||
+    !Array.isArray(realizer.requiredCapabilities) ||
+    realizer.requiredCapabilities.length === 0
+  ) {
     throw new Error("Policy index realization requires minimumPackageVersion and requiredCapabilities");
   }
   return {
@@ -732,8 +762,8 @@ export function buildIndexEntry({ defoldRevision, policyRoot, generator, realize
     generator,
     realizer: {
       minimumPackageVersion: realizer.minimumPackageVersion,
-      requiredCapabilities: [...realizer.requiredCapabilities]
-    }
+      requiredCapabilities: [...realizer.requiredCapabilities],
+    },
   };
 }
 

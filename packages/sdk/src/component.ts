@@ -21,8 +21,7 @@ export interface DefoldResource<Kind extends string> {
 
 export type PropertyMap = Readonly<Record<string, PropertyDescriptor<unknown, string>>>;
 
-export type PropertyValue<Descriptor> =
-  Descriptor extends PropertyDescriptor<infer Value, string> ? Value : never;
+export type PropertyValue<Descriptor> = Descriptor extends PropertyDescriptor<infer Value, string> ? Value : never;
 
 export type ComponentSelf<Properties extends PropertyMap> = {
   -readonly [Name in keyof Properties]: PropertyValue<Properties[Name]>;
@@ -51,17 +50,15 @@ export class ScriptComponent<Properties extends PropertyMap = PropertyMap> {
   get props(): ComponentSelf<Properties> {
     return this as unknown as ComponentSelf<Properties>;
   }
-}
 
-export interface ScriptComponent<Properties extends PropertyMap = PropertyMap> {
-  init?(): void;
-  update?(dt: number): void;
-  lateUpdate?(dt: number): void;
-  fixedUpdate?(dt: number): void;
-  final?(): void;
-  onMessage?(messageId: DefoldHash, message: unknown, sender: DefoldUrl): void;
-  onInput?(actionId: DefoldHash, action: unknown): boolean;
-  onReload?(): void;
+  declare init?: () => void;
+  declare update?: (dt: number) => void;
+  declare lateUpdate?: (dt: number) => void;
+  declare fixedUpdate?: (dt: number) => void;
+  declare final?: () => void;
+  declare onMessage?: (messageId: DefoldHash, message: unknown, sender: DefoldUrl) => void;
+  declare onInput?: (actionId: DefoldHash, action: unknown) => boolean;
+  declare onReload?: () => void;
 }
 
 /** Class authoring contract for a `*.gui.ts` component. */
@@ -72,23 +69,23 @@ export class RenderComponent<Properties extends PropertyMap = PropertyMap> {
   get props(): ComponentSelf<Properties> {
     return this as unknown as ComponentSelf<Properties>;
   }
-}
 
-export interface RenderComponent<Properties extends PropertyMap = PropertyMap> {
-  init?(): void;
-  update?(dt: number): void;
-  onMessage?(messageId: DefoldHash, message: unknown, sender: DefoldUrl): void;
-  onReload?(): void;
+  declare init?: () => void;
+  declare update?: (dt: number) => void;
+  declare onMessage?: (messageId: DefoldHash, message: unknown, sender: DefoldUrl) => void;
+  declare onReload?: () => void;
 }
 
 export type ComponentClassInstance<Properties extends PropertyMap = PropertyMap> =
-  ScriptComponent<Properties> | GuiComponent<Properties> | RenderComponent<Properties>;
+  | ScriptComponent<Properties>
+  | GuiComponent<Properties>
+  | RenderComponent<Properties>;
 
 export interface ComponentClass<
   Properties extends PropertyMap = PropertyMap,
-  Instance extends ComponentClassInstance = ComponentClassInstance
+  Instance extends ComponentClassInstance = ComponentClassInstance,
 > {
-  new(): Instance;
+  new (): Instance;
   readonly properties?: Properties;
 }
 
@@ -130,7 +127,10 @@ export const property = Object.freeze({
    * policy exposes a resource constructor newer than the convenience methods
    * below; the component compiler validates `kind` against that policy.
    */
-  resource<const Kind extends string>(_kind: Kind, _path?: string): PropertyDescriptor<DefoldResource<Kind>, "resource"> {
+  resource<const Kind extends string>(
+    _kind: Kind,
+    _path?: string,
+  ): PropertyDescriptor<DefoldResource<Kind>, "resource"> {
     return descriptor();
   },
   atlas(_path?: string): PropertyDescriptor<DefoldResource<"atlas">, "atlas"> {
@@ -153,12 +153,10 @@ export const property = Object.freeze({
   },
   tileSource(_path?: string): PropertyDescriptor<DefoldResource<"tileSource">, "tileSource"> {
     return descriptor();
-  }
+  },
 });
 
-export function defineComponent<const Definition extends ComponentDefinition>(
-  definition: Definition
-): Definition {
+export function defineComponent<const Definition extends ComponentDefinition>(definition: Definition): Definition {
   return definition;
 }
 
@@ -182,9 +180,9 @@ interface InternalComponentSelf {
 }
 
 function ensureClassInstance(
-  Type: new() => InternalClassInstance,
+  Type: new () => InternalClassInstance,
   self: InternalComponentSelf,
-  propertyNames: readonly string[]
+  propertyNames: readonly string[],
 ): InternalClassInstance {
   const retained = self[classInstanceSlot];
   if (retained) return retained;
@@ -207,11 +205,10 @@ function ensureClassInstance(
  * runtime adapter only creates one state instance per attached Defold instance
  * and forwards lifecycle calls with that state as `this`.
  */
-export function component<
-  const Properties extends PropertyMap,
-  Instance extends ComponentClassInstance
->(Type: ComponentClass<Properties, Instance>): ComponentDefinition {
-  const InternalType = Type as unknown as new() => InternalClassInstance;
+export function component<const Properties extends PropertyMap, Instance extends ComponentClassInstance>(
+  Type: ComponentClass<Properties, Instance>,
+): ComponentDefinition {
+  const InternalType = Type as unknown as new () => InternalClassInstance;
   const prototype = InternalType.prototype;
   const properties = Type.properties;
   const propertyNames = properties ? Object.keys(properties) : [];
@@ -260,7 +257,7 @@ export function component<
         ensureClassInstance(InternalType, self as InternalComponentSelf, propertyNames),
         messageId,
         message,
-        sender
+        sender,
       );
     };
   }
@@ -271,7 +268,7 @@ export function component<
       return onInput.call(
         ensureClassInstance(InternalType, self as InternalComponentSelf, propertyNames),
         actionId,
-        action
+        action,
       );
     };
   }

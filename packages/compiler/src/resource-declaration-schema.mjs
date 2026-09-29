@@ -6,8 +6,21 @@
 import { indexProtoMessages, parseProtoSource } from "./protobuf-schema.mjs";
 
 const SCALAR_TYPES = new Set([
-  "double", "float", "int32", "int64", "uint32", "uint64", "sint32", "sint64",
-  "fixed32", "fixed64", "sfixed32", "sfixed64", "bool", "string", "bytes"
+  "double",
+  "float",
+  "int32",
+  "int64",
+  "uint32",
+  "uint64",
+  "sint32",
+  "sint64",
+  "fixed32",
+  "fixed64",
+  "sfixed32",
+  "sfixed64",
+  "bool",
+  "string",
+  "bytes",
 ]);
 
 const GENERIC_IDENTITY_FIELDS = new Set(["id", "name"]);
@@ -50,10 +63,8 @@ export function parseBuilderAnnotations(source, file) {
     results.push({
       file,
       srcClass,
-      qualifiedSrcClass: imported
-        ? [imported, ...srcClass.split(".").slice(1)].join(".")
-        : srcClass,
-      extensions
+      qualifiedSrcClass: imported ? [imported, ...srcClass.split(".").slice(1)].join(".") : srcClass,
+      extensions,
     });
   }
   return results;
@@ -85,7 +96,7 @@ function elementMessage(field, owner, messages, parsed) {
     `${owner}.${field.type}`,
     parsed.package && field.type.startsWith(`${parsed.package}.`) ? field.type : null,
     `${parsed.package}.${field.type}`,
-    field.type
+    field.type,
   ].filter(Boolean);
   for (const candidate of candidates) {
     const message = messages.get(candidate);
@@ -103,11 +114,13 @@ function elementMessage(field, owner, messages, parsed) {
 }
 
 function identityField(message) {
-  const strings = message.fields.filter((field) =>
-    field.type === "string" &&
-    field.label !== "repeated" &&
-    field.options?.["resource"] !== true &&
-    field.options?.["runtime_only"] !== true);
+  const strings = message.fields.filter(
+    (field) =>
+      field.type === "string" &&
+      field.label !== "repeated" &&
+      field.options?.["resource"] !== true &&
+      field.options?.["runtime_only"] !== true,
+  );
   const named = strings.find((field) => GENERIC_IDENTITY_FIELDS.has(field.name));
   if (named) return named.name;
   if (strings.length === 1) return strings[0].name;
@@ -140,7 +153,7 @@ export function collectDeclarationSites(root, messages, parsed) {
           field: field.name,
           elementMessage: element.qualified.split(".").pop(),
           identityField: identity,
-          nested
+          nested,
         });
       }
       visit(element.qualified, element.message, nextPath, nested || Boolean(identity), depth + 1);
@@ -182,8 +195,9 @@ export function groupNamespaces(extension, sites) {
   }
   const namespaces = [];
   for (const group of groups.values()) {
-    const ordered = [...group].sort((left, right) =>
-      left.field.length - right.field.length || compare(left.field, right.field));
+    const ordered = [...group].sort(
+      (left, right) => left.field.length - right.field.length || compare(left.field, right.field),
+    );
     const primary = ordered[0];
     const kind = GENERIC_IDENTITY_FIELDS.has(primary.identityField)
       ? commonFieldKind(ordered.map(({ field }) => singular(field)))
@@ -192,8 +206,11 @@ export function groupNamespaces(extension, sites) {
       id: `${extension.replace(/^\./, "")}:${kind}`,
       kind,
       identityField: primary.identityField,
-      sites: ordered.map(({ fieldPath, elementMessage, identityField: field }) =>
-        ({ fieldPath, elementMessage, identityField: field }))
+      sites: ordered.map(({ fieldPath, elementMessage, identityField: field }) => ({
+        fieldPath,
+        elementMessage,
+        identityField: field,
+      })),
     });
   }
   return namespaces.sort((left, right) => compare(left.id, right.id));
@@ -218,14 +235,14 @@ export function buildResourceDeclarationSchema({ builders, protoFiles }) {
         reason: "unresolved-src-class",
         srcClass: builder.qualifiedSrcClass,
         builder: builder.file,
-        extensions: builder.extensions
+        extensions: builder.extensions,
       });
       continue;
     }
     const sites = collectDeclarationSites(
       { qualified: resolved.qualified, message: resolved.message },
       resolved.messages,
-      resolved.parsed
+      resolved.parsed,
     );
     for (const extension of builder.extensions) {
       const namespaces = groupNamespaces(extension, sites);
@@ -234,7 +251,7 @@ export function buildResourceDeclarationSchema({ builders, protoFiles }) {
         extension,
         rootMessage: resolved.qualified,
         proto: resolved.parsed.file,
-        namespaces
+        namespaces,
       });
     }
   }

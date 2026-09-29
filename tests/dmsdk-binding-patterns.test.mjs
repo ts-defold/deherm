@@ -36,8 +36,7 @@ test("classifies every emitted raw dmSDK call exactly once", async () => {
     new Set(pending.map((declaration) => declaration.id)),
   );
 
-  const primaryTotal = Object.values(generated.primaryFamilySummary)
-    .reduce((sum, family) => sum + family.count, 0);
+  const primaryTotal = Object.values(generated.primaryFamilySummary).reduce((sum, family) => sum + family.count, 0);
   assert.equal(primaryTotal, pending.length);
   for (const binding of generated.bindings) {
     assert.ok(FAMILY_CATALOG[binding.primaryFamily], `${binding.id} has an unknown primary family`);
@@ -67,14 +66,20 @@ test("classifies representative ABI and codegen families", async () => {
 
   assert.ok(findBinding(generated, "EndianSwap16").families.includes("scalar-direct"));
   assert.ok(findBinding(generated, "dmBuffer::Destroy").families.includes("enum-handle"));
-  assert.ok(findBinding(generated, "dmDDF::LoadMessage", (binding) => binding.signature.includes("void **"))
-    .families.includes("pointer-span"));
+  assert.ok(
+    findBinding(generated, "dmDDF::LoadMessage", (binding) => binding.signature.includes("void **")).families.includes(
+      "pointer-span",
+    ),
+  );
   assert.ok(findBinding(generated, "dmBuffer::Create").families.includes("out-param"));
   assert.ok(findBinding(generated, "dmTransform::Apply").families.includes("record-reference"));
   assert.ok(findBinding(generated, "ConfigFileRegisterExtension").families.includes("callback"));
   assert.ok(findBinding(generated, "dmSnPrintf").families.includes("variadic"));
-  assert.ok(findBinding(generated, "dmDDF::LoadMessage", (binding) => binding.kind === "function-template")
-    .families.includes("template-opaque"));
+  assert.ok(
+    findBinding(generated, "dmDDF::LoadMessage", (binding) => binding.kind === "function-template").families.includes(
+      "template-opaque",
+    ),
+  );
   assert.ok(findBinding(generated, "dmConnectionPool::Params::Params").families.includes("constructor"));
   assert.ok(findBinding(generated, "dmMutex::ScopedLock::~ScopedLock").families.includes("destructor"));
   assert.ok(findBinding(generated, "dmArray::dmArray::Capacity").families.includes("method"));
@@ -125,19 +130,17 @@ test("regeneration is deterministic and the checked-in classification is current
   const temporaryDirectory = await mkdtemp(join(tmpdir(), "deherm-dmsdk-patterns-"));
   const output = join(temporaryDirectory, "patterns.json");
   try {
-    execFileSync(process.execPath, [
-      "scripts/classify-dmsdk-bindings.mjs",
-      "--input", irPath,
-      "--output", output,
-    ], { cwd: repositoryRoot, stdio: "pipe" });
+    execFileSync(process.execPath, ["scripts/classify-dmsdk-bindings.mjs", "--input", irPath, "--output", output], {
+      cwd: repositoryRoot,
+      stdio: "pipe",
+    });
     assert.equal(await readFile(output, "utf8"), await readFile(generatedPath, "utf8"));
 
-    execFileSync(process.execPath, [
-      "scripts/classify-dmsdk-bindings.mjs",
-      "--input", irPath,
-      "--output", generatedPath,
-      "--check",
-    ], { cwd: repositoryRoot, stdio: "pipe" });
+    execFileSync(
+      process.execPath,
+      ["scripts/classify-dmsdk-bindings.mjs", "--input", irPath, "--output", generatedPath, "--check"],
+      { cwd: repositoryRoot, stdio: "pipe" },
+    );
   } finally {
     await rm(temporaryDirectory, { recursive: true, force: true });
   }

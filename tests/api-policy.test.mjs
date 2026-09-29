@@ -23,41 +23,33 @@ import {
   scriptNamespaceOfModulePath,
   scriptNamespaceOfTypeName,
   sealObject,
-  serializeObject
+  serializeObject,
 } from "../packages/compiler/src/api-policy.mjs";
 import {
   DMSDK_UNIVERSAL_STATIC_FRAME_CAPABILITY,
   DMSDK_UNIVERSAL_STATIC_FRAME_CAPACITY,
-  DMSDK_UNIVERSAL_STATIC_FRAME_SCHEMA
+  DMSDK_UNIVERSAL_STATIC_FRAME_SCHEMA,
 } from "../packages/compiler/src/dmsdk-universal-static-frame.mjs";
 import { buildToolchainPins, parseSdkPins } from "../packages/compiler/src/defold-toolchain-pins.mjs";
 import { isRevisionOutput, REVISION_OUTPUT_ROOTS } from "../packages/compiler/src/revision-output-layout.mjs";
 import { manifestUrl, missingPublishedEntries } from "../scripts/check-published-policy.mjs";
 import { fetchPolicyText, validateRebuiltHandshake } from "../scripts/check-policy-site-resolution.mjs";
-import {
-  buildShippedIndex,
-  canonicalizePolicyText,
-  generatorRevision
-} from "../scripts/generate-api-policy.mjs";
+import { buildShippedIndex, canonicalizePolicyText, generatorRevision } from "../scripts/generate-api-policy.mjs";
 import { apiPolicyGenerator } from "../scripts/lib/script-generator-pipeline.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const generated = path.join(repositoryRoot, "packages", "bindings", "generated");
 const node24ArtifactActions = {
   upload: "actions/upload-artifact@v6",
-  download: "actions/download-artifact@v7"
+  download: "actions/download-artifact@v7",
 };
 const node24CacheAction = "actions/cache@v5";
 
 const readJson = async (file) => JSON.parse(await readFile(file, "utf8"));
 
 test("project-selected runtime variants never leak into revision policy", () => {
-  assert.equal(isRevisionOutput(
-    "defold/defold_hermes/include/defold_hermes/generated_runtime_variant.h"
-  ), false);
-  assert.equal(isRevisionOutput(
-    "defold/defold_hermes/include/defold_hermes/generated_scalar_lua_ids.hpp"
-  ), true);
+  assert.equal(isRevisionOutput("defold/defold_hermes/include/defold_hermes/generated_runtime_variant.h"), false);
+  assert.equal(isRevisionOutput("defold/defold_hermes/include/defold_hermes/generated_scalar_lua_ids.hpp"), true);
 });
 
 test("policy host parity materializes every authoritative generator input", async () => {
@@ -65,28 +57,27 @@ test("policy host parity materializes every authoritative generator input", asyn
   const bootstrap = await readFile(path.join(repositoryRoot, "scripts/bootstrap-upstreams.sh"), "utf8");
   const bobBootstrap = await readFile(path.join(repositoryRoot, "scripts/bootstrap-bob.sh"), "utf8");
   const checksumHelper = await readFile(path.join(repositoryRoot, "scripts/lib/sha256.sh"), "utf8");
-  const importers = await Promise.all([
-    "scripts/import-defold-sdk.py",
-    "scripts/import-defold-script-api.py"
-  ].map(async (relative) => [relative, await readFile(path.join(repositoryRoot, relative), "utf8")]));
-  const parity = workflow.slice(
-    workflow.indexOf("  host-parity:"),
-    workflow.indexOf("  engine-conformance:")
+  const importers = await Promise.all(
+    ["scripts/import-defold-sdk.py", "scripts/import-defold-script-api.py"].map(async (relative) => [
+      relative,
+      await readFile(path.join(repositoryRoot, relative), "utf8"),
+    ]),
   );
-  const engine = workflow.slice(
-    workflow.indexOf("  engine-conformance:"),
-    workflow.indexOf("  publish-site:")
-  );
+  const parity = workflow.slice(workflow.indexOf("  host-parity:"), workflow.indexOf("  engine-conformance:"));
+  const engine = workflow.slice(workflow.indexOf("  engine-conformance:"), workflow.indexOf("  publish-site:"));
   const publish = workflow.slice(workflow.indexOf("  publish-site:"));
   const packedSurface = workflow.slice(
     workflow.indexOf("      - name: Pack the exact generated surface"),
-    workflow.indexOf(`      - uses: ${node24ArtifactActions.upload}`, workflow.indexOf("      - name: Pack the exact generated surface"))
+    workflow.indexOf(
+      `      - uses: ${node24ArtifactActions.upload}`,
+      workflow.indexOf("      - name: Pack the exact generated surface"),
+    ),
   );
 
   for (const { root: revisionRoot } of REVISION_OUTPUT_ROOTS) {
     assert.ok(
       packedSurface.includes(revisionRoot),
-      `policy-surface archive omits revision-derived root ${revisionRoot}`
+      `policy-surface archive omits revision-derived root ${revisionRoot}`,
     );
   }
   assert.match(parity, /rm -rf[^\n]*packages\/abi\/src\/generated/u);
@@ -109,7 +100,10 @@ test("policy host parity materializes every authoritative generator input", asyn
   assert.match(publish, /Select only a completely published artifact mapping/u);
   assert.match(publish, /build\/published-policy-site\/v1\/artifacts/u);
   assert.match(publish, /--artifact-references/u);
-  assert.match(publish, /Current fingerprinted releases are still publishing; the site retains its last complete artifact mapping/u);
+  assert.match(
+    publish,
+    /Current fingerprinted releases are still publishing; the site retains its last complete artifact mapping/u,
+  );
   assert.match(workflow, /manage-native-artifacts\.mjs pull --target x86_64-linux/u);
   assert.match(engine, /Wait for the content-addressed Linux archive/u);
   assert.match(engine, /manage-native-artifacts\.mjs tag/u);
@@ -121,12 +115,12 @@ test("policy host parity materializes every authoritative generator input", asyn
   assert.ok(
     engine.indexOf("Wait for the content-addressed Linux archive") <
       engine.indexOf("manage-native-artifacts.mjs pull --target x86_64-linux"),
-    "the policy engine lane must wait for its exact content-addressed archive before pulling"
+    "the policy engine lane must wait for its exact content-addressed archive before pulling",
   );
   assert.ok(
     engine.indexOf("manage-native-artifacts.mjs pull --target x86_64-linux") <
       engine.indexOf("pnpm check:exact-call-materializers"),
-    "the JSI exact-call gate must run after the packaged Hermes archive is installed"
+    "the JSI exact-call gate must run after the packaged Hermes archive is installed",
   );
   assert.match(engine, /defold-hermes-static-dmsdk-exact-test/u);
   assert.match(engine, /defold-hermes-static-script-exact-test/u);
@@ -134,40 +128,52 @@ test("policy host parity materializes every authoritative generator input", asyn
   assert.match(engine, /pnpm test:dmsdk-browser-exact-call/u);
   assert.match(engine, /pnpm test:script-browser-exact-call/u);
   assert.match(engine, /continue-on-error: true/u);
-  assert.match(engine, /Enforce engine-lane infrastructure health[\s\S]*steps\.engine\.outcome != 'success'[\s\S]*exit 1/u);
+  assert.match(
+    engine,
+    /Enforce engine-lane infrastructure health[\s\S]*steps\.engine\.outcome != 'success'[\s\S]*exit 1/u,
+  );
   assert.match(workflow, /consumer-smoke:[\s\S]*needs: \[derive, publish-site\]/u);
   assert.match(workflow, /check-published-policy\.mjs/u);
 });
 
 test("all workflow artifact actions use their Node 24-compatible official majors", async () => {
-  const workflows = await Promise.all([
-    "commit-provenance.yml",
-    "end-to-end.yml",
-    "native-artifacts.yml",
-    "policy.yml"
-  ].map(async (name) => [name, await readFile(path.join(repositoryRoot, ".github/workflows", name), "utf8")]));
+  const workflows = await Promise.all(
+    ["commit-provenance.yml", "end-to-end.yml", "native-artifacts.yml", "policy.yml"].map(async (name) => [
+      name,
+      await readFile(path.join(repositoryRoot, ".github/workflows", name), "utf8"),
+    ]),
+  );
   const allWorkflowText = workflows.map(([, text]) => text).join("\n");
   const uploadRefs = [...allWorkflowText.matchAll(/actions\/upload-artifact@v\d+/gu)].map(([ref]) => ref);
   const downloadRefs = [...allWorkflowText.matchAll(/actions\/download-artifact@v\d+/gu)].map(([ref]) => ref);
 
   assert.ok(uploadRefs.length > 0, "workflows must retain artifact uploads");
   assert.ok(downloadRefs.length > 0, "workflows must retain artifact downloads");
-  assert.ok(uploadRefs.every((ref) => ref === node24ArtifactActions.upload), `unexpected upload refs: ${uploadRefs.join(", ")}`);
-  assert.ok(downloadRefs.every((ref) => ref === node24ArtifactActions.download), `unexpected download refs: ${downloadRefs.join(", ")}`);
+  assert.ok(
+    uploadRefs.every((ref) => ref === node24ArtifactActions.upload),
+    `unexpected upload refs: ${uploadRefs.join(", ")}`,
+  );
+  assert.ok(
+    downloadRefs.every((ref) => ref === node24ArtifactActions.download),
+    `unexpected download refs: ${downloadRefs.join(", ")}`,
+  );
 });
 
 test("all workflow cache actions use the official Node 24-compatible major", async () => {
-  const workflows = await Promise.all([
-    "commit-provenance.yml",
-    "end-to-end.yml",
-    "native-artifacts.yml",
-    "policy.yml"
-  ].map(async (name) => [name, await readFile(path.join(repositoryRoot, ".github/workflows", name), "utf8")]));
+  const workflows = await Promise.all(
+    ["commit-provenance.yml", "end-to-end.yml", "native-artifacts.yml", "policy.yml"].map(async (name) => [
+      name,
+      await readFile(path.join(repositoryRoot, ".github/workflows", name), "utf8"),
+    ]),
+  );
   const allWorkflowText = workflows.map(([, text]) => text).join("\n");
   const cacheRefs = [...allWorkflowText.matchAll(/actions\/cache@v\d+/gu)].map(([ref]) => ref);
 
   assert.ok(cacheRefs.length > 0, "workflows must retain cache actions");
-  assert.ok(cacheRefs.every((ref) => ref === node24CacheAction), `unexpected cache refs: ${cacheRefs.join(", ")}`);
+  assert.ok(
+    cacheRefs.every((ref) => ref === node24CacheAction),
+    `unexpected cache refs: ${cacheRefs.join(", ")}`,
+  );
 });
 
 test("published immutable policy objects retry transient transport failures only", async () => {
@@ -184,46 +190,55 @@ test("published immutable policy objects retry transient transport failures only
       if (attempts === 1) return { ok: false, status: 503 };
       if (attempts === 2) throw new Error("socket reset");
       return { ok: true, status: 200, text: async () => "policy-body" };
-    }
+    },
   });
   assert.equal(text, "policy-body");
   assert.equal(attempts, 3);
   assert.deepEqual(sleeps, [10, 20]);
 
   let missingAttempts = 0;
-  await assert.rejects(fetchPolicyText({
-    url: "https://example.test/policies/v1/object/missing.json",
-    label: "v1/object/missing.json",
-    maxAttempts: 5,
-    sleep: async () => assert.fail("a permanent 404 must not sleep or retry"),
-    fetchImpl: async () => {
-      missingAttempts += 1;
-      return { ok: false, status: 404 };
-    }
-  }), /v1\/object\/missing\.json: HTTP 404/u);
+  await assert.rejects(
+    fetchPolicyText({
+      url: "https://example.test/policies/v1/object/missing.json",
+      label: "v1/object/missing.json",
+      maxAttempts: 5,
+      sleep: async () => assert.fail("a permanent 404 must not sleep or retry"),
+      fetchImpl: async () => {
+        missingAttempts += 1;
+        return { ok: false, status: 404 };
+      },
+    }),
+    /v1\/object\/missing\.json: HTTP 404/u,
+  );
   assert.equal(missingAttempts, 1);
 });
 
 test("published smoke waits for the exact derived entries at the configured site", () => {
   const expected = {
     base: { url: "https://example.test/deherm/", pathPrefix: "policies", layoutVersion: "v1" },
-    entries: [{ defoldRevision: "a", policyRoot: "root-a", generator: "gen-a" }]
+    entries: [{ defoldRevision: "a", policyRoot: "root-a", generator: "gen-a" }],
   };
   assert.equal(manifestUrl(expected), "https://example.test/deherm/policies/v1/index/manifest.json");
   assert.deepEqual(missingPublishedEntries(expected, { entries: [] }), expected.entries);
-  assert.deepEqual(missingPublishedEntries(expected, {
-    entries: [{ defoldRevision: "a", policyRoot: "root-a", generator: "gen-a" }]
-  }), []);
-  assert.deepEqual(missingPublishedEntries(expected, {
-    entries: [{ defoldRevision: "a", policyRoot: "wrong", generator: "gen-a" }]
-  }), expected.entries);
+  assert.deepEqual(
+    missingPublishedEntries(expected, {
+      entries: [{ defoldRevision: "a", policyRoot: "root-a", generator: "gen-a" }],
+    }),
+    [],
+  );
+  assert.deepEqual(
+    missingPublishedEntries(expected, {
+      entries: [{ defoldRevision: "a", policyRoot: "wrong", generator: "gen-a" }],
+    }),
+    expected.entries,
+  );
 });
 
 test("policy handshakes bind each resolved revision to its own profile facts", () => {
   const profilesFor = (routeCount) => ({
     catalogRecipe: {
       profileOrder: ["default-legacy-bullet"],
-      profileFields: ["features", "capabilityBits", "routeSetSha256"]
+      profileFields: ["features", "capabilityBits", "routeSetSha256"],
     },
     profiles: {
       "default-legacy-bullet": {
@@ -234,20 +249,20 @@ test("policy handshakes bind each resolved revision to its own profile facts", (
           profileId: "default-legacy-bullet",
           capabilityBits: 1,
           routeCount,
-          routeSetSha256: String(routeCount).padStart(64, "0")
-        }
-      }
-    }
+          routeSetSha256: String(routeCount).padStart(64, "0"),
+        },
+      },
+    },
   });
   const stable = validateRebuiltHandshake({
     profiles: profilesFor(26),
     revision: "a".repeat(40),
-    profileId: "default-legacy-bullet"
+    profileId: "default-legacy-bullet",
   });
   const alpha = validateRebuiltHandshake({
     profiles: profilesFor(27),
     revision: "b".repeat(40),
-    profileId: "default-legacy-bullet"
+    profileId: "default-legacy-bullet",
   });
   assert.equal(stable.defoldRevision, "a".repeat(40));
   assert.equal(stable.routeCount, 26);
@@ -266,26 +281,41 @@ function fixture(overrides = {}) {
       defoldRevision: "a".repeat(40),
       functions: [
         { id: "script:gui.get_node", modulePath: ["gui"], rawName: "gui.get_node", parameters: [] },
-        { id: "script:go.set_position", modulePath: ["go"], rawName: "go.set_position", parameters: [] }
+        { id: "script:go.set_position", modulePath: ["go"], rawName: "go.set_position", parameters: [] },
       ],
       types: [
         { name: "defold_api.gui", fields: [] },
         { name: "defold_enum.go.PLAYBACK", fields: [] },
-        { name: "hash", fields: [] }
+        { name: "hash", fields: [] },
       ],
       unresolvedTypes: [],
-      ...overrides.scriptIr
+      ...overrides.scriptIr,
     },
     dmsdkIr: {
       defoldRevision: "a".repeat(40),
-      parseEnvironment: { triple: "wasm32-unknown-unknown", platformNeutralOf: ["__APPLE__"], sysroot: "s", sysrootSha256: "b".repeat(64) },
+      parseEnvironment: {
+        triple: "wasm32-unknown-unknown",
+        platformNeutralOf: ["__APPLE__"],
+        sysroot: "s",
+        sysrootSha256: "b".repeat(64),
+      },
       declarations: [
-        { id: "dmsdk:dmGui::X", name: "dmGui::X", header: "upstream/defold/engine/gui/src/dmsdk/gui/gui.h", kind: "record" },
-        { id: "dmsdk:dmGameObject::Y", name: "dmGameObject::Y", header: "upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h", kind: "record" }
+        {
+          id: "dmsdk:dmGui::X",
+          name: "dmGui::X",
+          header: "upstream/defold/engine/gui/src/dmsdk/gui/gui.h",
+          kind: "record",
+        },
+        {
+          id: "dmsdk:dmGameObject::Y",
+          name: "dmGameObject::Y",
+          header: "upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h",
+          kind: "record",
+        },
       ],
       opaqueTypes: [],
       unresolvedTypes: [],
-      ...overrides.dmsdkIr
+      ...overrides.dmsdkIr,
     },
     registrationSurface: {
       contract: { groundTruth: "c" },
@@ -301,7 +331,7 @@ function fixture(overrides = {}) {
           registrationEntryPoints: [],
           routes: [
             { name: "gui.get_node", module: "gui", cFunction: "GuiGetNode" },
-            { name: "go.set_position", module: "go", cFunction: "GoSetPosition" }
+            { name: "go.set_position", module: "go", cFunction: "GoSetPosition" },
           ],
           declaredButUnregistered: [],
           registeredButUndeclared: [],
@@ -309,11 +339,11 @@ function fixture(overrides = {}) {
           commentedOutRegistrations: [],
           blockers: [{ code: "ambiguous-registration-callee", path: "engine/x.cpp", line: 1 }],
           diagnostics: [],
-          policyNotes: []
+          policyNotes: [],
         },
-        "extension-thing": { id: "extension-thing", kind: "extension-root", status: "unverifiable", routes: [] }
+        "extension-thing": { id: "extension-thing", kind: "extension-root", status: "unverifiable", routes: [] },
       },
-      ...overrides.registrationSurface
+      ...overrides.registrationSurface,
     },
     routeProfiles: {
       defoldRevision: "a".repeat(40),
@@ -322,7 +352,12 @@ function fixture(overrides = {}) {
       manifestAudit: [],
       handleFeatures: {},
       handleProfiles: {},
-      features: { core: { capabilityBit: 1, documentedRoutes: [{ id: "script:gui.get_node", stableId: 1, rawName: "gui.get_node" }] } },
+      features: {
+        core: {
+          capabilityBit: 1,
+          documentedRoutes: [{ id: "script:gui.get_node", stableId: 1, rawName: "gui.get_node" }],
+        },
+      },
       profiles: {
         only: {
           manifest: "m",
@@ -337,17 +372,22 @@ function fixture(overrides = {}) {
             capabilityBits: 1,
             routeCount: 1,
             routeSetSha256: "r",
-            catalogSha256: "c"
-          }
-        }
+            catalogSha256: "c",
+          },
+        },
       },
-      ...overrides.routeProfiles
+      ...overrides.routeProfiles,
     },
     resourceSchema: { derivation: [], resources: [], blockers: [], ...overrides.resourceSchema },
-    toolchain: { source: "sdk.py", pins: { EMSCRIPTEN_VERSION_STR: "4.0.6" }, platformKeys: [], ...overrides.toolchain },
+    toolchain: {
+      source: "sdk.py",
+      pins: { EMSCRIPTEN_VERSION_STR: "4.0.6" },
+      platformKeys: [],
+      ...overrides.toolchain,
+    },
     compilerSurface: overrides.compilerSurface,
     generator: overrides.generator ?? "sha256:fixture",
-    repositoryRoot: "/checkout"
+    repositoryRoot: "/checkout",
   };
 }
 
@@ -361,19 +401,20 @@ test("canonical serialization depends on content, not key order", () => {
 test("generator identity is independent of checkout newline encoding", async (t) => {
   const lf = await mkdtemp(path.join(tmpdir(), "deherm-generator-lf-"));
   const crlf = await mkdtemp(path.join(tmpdir(), "deherm-generator-crlf-"));
-  t.after(async () => Promise.all([
-    rm(lf, { recursive: true, force: true }),
-    rm(crlf, { recursive: true, force: true })
-  ]));
+  t.after(async () =>
+    Promise.all([rm(lf, { recursive: true, force: true }), rm(crlf, { recursive: true, force: true })]),
+  );
   const sources = ["one.mjs", "two.json"];
-  const texts = ["export const one = 1;\n", "{\n  \"two\": 2\n}\n"];
-  await Promise.all(sources.flatMap((source, index) => [
-    writeFile(path.join(lf, source), texts[index]),
-    writeFile(path.join(crlf, source), texts[index].replace(/\n/g, "\r\n"))
-  ]));
+  const texts = ["export const one = 1;\n", '{\n  "two": 2\n}\n'];
+  await Promise.all(
+    sources.flatMap((source, index) => [
+      writeFile(path.join(lf, source), texts[index]),
+      writeFile(path.join(crlf, source), texts[index].replace(/\n/g, "\r\n")),
+    ]),
+  );
   assert.equal(
     await generatorRevision({ sourceRoot: lf, sources }),
-    await generatorRevision({ sourceRoot: crlf, sources })
+    await generatorRevision({ sourceRoot: crlf, sources }),
   );
 });
 
@@ -425,16 +466,16 @@ test("policy roots carry only the realization capabilities their payload uses", 
     sdk: {
       "script/types.ts": { mode: "render-and-verify" },
       "dmsdk/types.ts": { mode: "render-and-verify" },
-      "script/value-target-support.ts": { mode: "authenticated-compatibility-source" }
+      "script/value-target-support.ts": { mode: "authenticated-compatibility-source" },
     },
     realizationRecipes: {
       documents: {},
       sdk: {
         "script/types.ts": "sdk.script.types.render.v1",
         "dmsdk/types.ts": "sdk.dmsdk.types.render.v1",
-        "script/value-target-support.ts": "sdk.compatibility-source.copy.v1"
-      }
-    }
+        "script/value-target-support.ts": "sdk.compatibility-source.copy.v1",
+      },
+    },
   };
   const policy = buildPolicy(fixture({ compilerSurface }));
   assert.deepEqual(policy.root.realizer, {
@@ -444,36 +485,38 @@ test("policy roots carry only the realization capabilities their payload uses", 
       "policy.content-addressed-graph.v1",
       "sdk.compatibility-source.copy.v1",
       "sdk.dmsdk.types.render.v1",
-      "sdk.script.types.render.v1"
-    ]
+      "sdk.script.types.render.v1",
+    ],
   });
   assert.deepEqual(buildPolicyRealizer({ compilerSurface: undefined }), {
     minimumPackageVersion: "0.0.0",
-    requiredCapabilities: ["policy.content-addressed-graph.v1"]
+    requiredCapabilities: ["policy.content-addressed-graph.v1"],
   });
-  const introduced = Object.fromEntries(POLICY_REALIZER_CAPABILITIES.map((capability) => [
-    capability,
-    { introducedInVersion: capability === "sdk.script.types.render.v1" ? "2.4.0" : "1.3.0" }
-  ]));
+  const introduced = Object.fromEntries(
+    POLICY_REALIZER_CAPABILITIES.map((capability) => [
+      capability,
+      { introducedInVersion: capability === "sdk.script.types.render.v1" ? "2.4.0" : "1.3.0" },
+    ]),
+  );
   assert.equal(
     buildPolicyRealizer({ compilerSurface, capabilityRegistry: introduced }).minimumPackageVersion,
     "2.4.0",
-    "the floor is the newest capability actually required, not the producer package version"
+    "the floor is the newest capability actually required, not the producer package version",
   );
 });
 
 test("dmSDK universal policies require the package-owned bounded Static Hermes frame", () => {
   const compilerSurface = {
     documents: {
-      "defold-dmsdk-universal-bindings.json": {}
+      "defold-dmsdk-universal-bindings.json": {},
     },
     sdk: {},
     realizationRecipes: {
       documents: {
-        "defold-dmsdk-universal-bindings.json": "policy.compiler-document.dmsdk-universal.v1"
+        "defold-dmsdk-universal-bindings.json": "policy.compiler-document.dmsdk-universal.v1",
       },
-      sdk: {}
-    }
+      sdk: {},
+    },
   };
   assert.deepEqual(buildPolicyRealizer({ compilerSurface }), {
     minimumPackageVersion: "0.0.0",
@@ -481,13 +524,13 @@ test("dmSDK universal policies require the package-owned bounded Static Hermes f
       DMSDK_UNIVERSAL_STATIC_FRAME_CAPABILITY,
       "policy.compiler-document.dmsdk-universal.v1",
       "policy.compiler-surface.references.v1",
-      "policy.content-addressed-graph.v1"
-    ]
+      "policy.content-addressed-graph.v1",
+    ],
   });
   assert.deepEqual(POLICY_REALIZER_CAPABILITY_REGISTRY[DMSDK_UNIVERSAL_STATIC_FRAME_CAPABILITY], {
     introducedInVersion: "0.0.0",
     schema: DMSDK_UNIVERSAL_STATIC_FRAME_SCHEMA,
-    argumentCapacity: DMSDK_UNIVERSAL_STATIC_FRAME_CAPACITY
+    argumentCapacity: DMSDK_UNIVERSAL_STATIC_FRAME_CAPACITY,
   });
 });
 
@@ -497,7 +540,7 @@ test("index entries and the shipped index preserve the root realization contract
     defoldRevision: "a".repeat(40),
     policyRoot: policy.rootHash,
     generator: policy.root.generator,
-    realizer: policy.root.realizer
+    realizer: policy.root.realizer,
   });
   assert.deepEqual(entry.realizer, policy.root.realizer);
   const shipped = buildShippedIndex({
@@ -506,9 +549,9 @@ test("index entries and the shipped index preserve the root realization contract
       pathPrefix: "policies",
       layoutVersion: "v1",
       channels: ["stable"],
-      channelInfoUrl: "https://example.test/{channel}/info.json"
+      channelInfoUrl: "https://example.test/{channel}/info.json",
     },
-    entries: [entry]
+    entries: [entry],
   });
   assert.deepEqual(shipped.entries[0].realizer, policy.root.realizer);
 });
@@ -519,7 +562,8 @@ test("two inputs differing in one namespace share every other subtree", () => {
   moved.scriptIr = {
     ...moved.scriptIr,
     functions: moved.scriptIr.functions.map((fn) =>
-      fn.modulePath[0] === "gui" ? { ...fn, parameters: [{ rawName: "node", optional: true }] } : fn)
+      fn.modulePath[0] === "gui" ? { ...fn, parameters: [{ rawName: "node", optional: true }] } : fn,
+    ),
   };
   const changed = buildPolicy(moved);
 
@@ -555,7 +599,7 @@ test("no policy object may carry the Defold revision", () => {
   const bad = buildPolicy(leaky);
   assert.throws(
     () => assertNoRevisionLeak({ rootBytes: bad.rootBytes, objects: bad.objects, revision }),
-    /carries the Defold revision/
+    /carries the Defold revision/,
   );
 });
 
@@ -568,18 +612,15 @@ test("SDK manifest snapshots must hash revision-abstracted bytes", () => {
         mode: "authenticated-compatibility-source",
         source: `export const revision = ${JSON.stringify(revision)};\n`,
         sha256: hashBytes(`export const revision = ${JSON.stringify(revision)};\n`),
-        inputs: []
-      }
+        inputs: [],
+      },
     },
     realizationRecipes: {
       documents: {},
-      sdk: { "script/example.ts": "sdk.compatibility-source.copy.v1" }
-    }
+      sdk: { "script/example.ts": "sdk.compatibility-source.copy.v1" },
+    },
   };
-  assert.throws(
-    () => buildPolicy(fixture({ compilerSurface })),
-    /digest is not over revision-abstracted source bytes/
-  );
+  assert.throws(() => buildPolicy(fixture({ compilerSurface })), /digest is not over revision-abstracted source bytes/);
 });
 
 test("the runtime handshake's revision-keyed fields are stripped and reconstructible", () => {
@@ -612,17 +653,27 @@ test("an unnamespaceable dmSDK declaration is sealed as a blocker without suppre
   const bad = fixture();
   bad.dmsdkIr.declarations = [
     { id: "dmsdk:X", name: "X", header: "engine/x/src/private/x.h" },
-    { id: "dmsdk:dmGui::Y", name: "dmGui::Y", header: "upstream/defold/engine/gui/src/dmsdk/gui/gui.h", kind: "record" }
+    {
+      id: "dmsdk:dmGui::Y",
+      name: "dmGui::Y",
+      header: "upstream/defold/engine/gui/src/dmsdk/gui/gui.h",
+      kind: "record",
+    },
   ];
   const policy = buildPolicy(bad);
   const shared = JSON.parse(policy.objects.get(policy.subtrees["@shared"]));
-  assert.deepEqual(shared.dmsdk.blockers, [{
-    code: "dmsdk-declaration-without-namespace",
-    id: "dmsdk:X",
-    header: "engine/x/src/private/x.h"
-  }]);
+  assert.deepEqual(shared.dmsdk.blockers, [
+    {
+      code: "dmsdk-declaration-without-namespace",
+      id: "dmsdk:X",
+      header: "engine/x/src/private/x.h",
+    },
+  ]);
   const gui = JSON.parse(policy.objects.get(policy.subtrees.gui));
-  assert.deepEqual(gui.dmsdk.declarations.map(({ id }) => id), ["dmsdk:dmGui::Y"]);
+  assert.deepEqual(
+    gui.dmsdk.declarations.map(({ id }) => id),
+    ["dmsdk:dmGui::Y"],
+  );
 });
 
 test("path templates carry the schema version and never a root-level segment", () => {
@@ -648,7 +699,7 @@ test("sdk.py pins are read verbatim, including its derived compositions", () => 
     'EMSCRIPTEN_VERSION_STR  =  "4.0.6"',
     'PACKAGES_EMSCRIPTEN_SDK = f"emsdk-{EMSCRIPTEN_VERSION_STR}"',
     'PACKAGES_MACOS_SDK="MacOSX%s.sdk" % VERSION_MACOSX',
-    "    LOCAL_ONLY='no'"
+    "    LOCAL_ONLY='no'",
   ].join("\n");
   const { bound, refusals } = parseSdkPins(source);
   assert.equal(bound.VERSION_XCODE, "26.5");
@@ -663,21 +714,21 @@ test("sdk.py pin parsing is independent of checkout newline encoding", () => {
   const source = [
     'VERSION_XCODE="26.5" # comment',
     'ANDROID_NDK_API_VERSION="19" # Android 4.4',
-    'PACKAGES_XCODE_TOOLCHAIN="XcodeDefault%s.xctoolchain" % VERSION_XCODE'
+    'PACKAGES_XCODE_TOOLCHAIN="XcodeDefault%s.xctoolchain" % VERSION_XCODE',
   ].join("\r\n");
   const { bound, refusals } = parseSdkPins(source);
   assert.deepEqual(refusals, []);
   assert.deepEqual(bound, {
     VERSION_XCODE: "26.5",
     ANDROID_NDK_API_VERSION: "19",
-    PACKAGES_XCODE_TOOLCHAIN: "XcodeDefault26.5.xctoolchain"
+    PACKAGES_XCODE_TOOLCHAIN: "XcodeDefault26.5.xctoolchain",
   });
 });
 
 test("only ABI-critical artifact pins are required while revision-specific toolchain names are discovered", () => {
   assert.throws(
     () => buildToolchainPins({ sdkSource: 'VERSION_XCODE="26.5"', buildInputPlatforms: [] }),
-    /no longer declares/
+    /no longer declares/,
   );
   const source = [
     'VERSION_IPHONEOS_MIN="11.0"',
@@ -685,9 +736,9 @@ test("only ABI-critical artifact pins are required while revision-specific toolc
     'ANDROID_NDK_VERSION="25b"',
     'ANDROID_NDK_API_VERSION="19"',
     'ANDROID_64_NDK_API_VERSION="21"',
-    'ANDROID_TARGET_API_LEVEL=35',
+    "ANDROID_TARGET_API_LEVEL=35",
     'VERSION_WINDOWS_SDK_10="10.0.20348.0"',
-    'PACKAGES_WIN32_SDK_10=f"WindowsKits-{VERSION_WINDOWS_SDK_10}"'
+    'PACKAGES_WIN32_SDK_10=f"WindowsKits-{VERSION_WINDOWS_SDK_10}"',
   ].join("\n");
   const historical = buildToolchainPins({ sdkSource: source, buildInputPlatforms: [] });
   assert.equal(historical.pins.VERSION_WINDOWS_SDK, undefined);
@@ -699,9 +750,17 @@ test("the real sdk.py yields every pin the decision names", async () => {
   const sdkSource = await readFile(path.join(repositoryRoot, "upstream/defold/build_tools/sdk.py"), "utf8");
   const toolchain = buildToolchainPins({ sdkSource, buildInputPlatforms: ["x86_64-linux", "common"] });
   for (const symbol of [
-    "VERSION_IPHONEOS_MIN", "VERSION_MACOSX_MIN", "ANDROID_NDK_VERSION", "ANDROID_NDK_API_VERSION",
-    "ANDROID_TARGET_API_LEVEL", "ANDROID_BUILD_TOOLS_VERSION", "VERSION_LINUX_CLANG", "VERSION_WINDOWS_SDK",
-    "VERSION_WINDOWS_MSVC", "VISUAL_STUDIO_VERSION", "EMSCRIPTEN_VERSION_STR"
+    "VERSION_IPHONEOS_MIN",
+    "VERSION_MACOSX_MIN",
+    "ANDROID_NDK_VERSION",
+    "ANDROID_NDK_API_VERSION",
+    "ANDROID_TARGET_API_LEVEL",
+    "ANDROID_BUILD_TOOLS_VERSION",
+    "VERSION_LINUX_CLANG",
+    "VERSION_WINDOWS_SDK",
+    "VERSION_WINDOWS_MSVC",
+    "VISUAL_STUDIO_VERSION",
+    "EMSCRIPTEN_VERSION_STR",
   ]) {
     assert.match(toolchain.pins[symbol], /\S/, `${symbol} must be read from Defold's own declaration`);
   }
@@ -774,21 +833,25 @@ test("a base with no owned path segment is refused", async () => {
   // domain routes now or later, so it is refused rather than published.
   await assert.rejects(
     readSiteConfig(await write({ baseUrl: "https://example.org", pathPrefix: "", layoutVersion: "v1" })),
-    /no owned path segment/
+    /no owned path segment/,
   );
   await assert.rejects(
     readSiteConfig(await write({ baseUrl: "https://example.org/", pathPrefix: "/", layoutVersion: "v1" })),
-    /no owned path segment/
+    /no owned path segment/,
   );
   // An org-site repository removes the repository-name prefix; `pathPrefix` is
   // what restores an owned segment without a code change.
-  const viaPrefix = await readSiteConfig(await write({ baseUrl: "https://example.org", pathPrefix: "deherm", layoutVersion: "v1" }));
+  const viaPrefix = await readSiteConfig(
+    await write({ baseUrl: "https://example.org", pathPrefix: "deherm", layoutVersion: "v1" }),
+  );
   assert.deepEqual(viaPrefix.ownedSegments, ["deherm"]);
-  const viaRepositoryName = await readSiteConfig(await write({ baseUrl: "https://example.org/deherm", pathPrefix: "", layoutVersion: "v1" }));
+  const viaRepositoryName = await readSiteConfig(
+    await write({ baseUrl: "https://example.org/deherm", pathPrefix: "", layoutVersion: "v1" }),
+  );
   assert.deepEqual(viaRepositoryName.ownedSegments, ["deherm"]);
   await assert.rejects(
     readSiteConfig(await write({ baseUrl: "https://example.org/deherm", pathPrefix: "", layoutVersion: "1" })),
-    /layoutVersion/
+    /layoutVersion/,
   );
 });
 
@@ -802,29 +865,32 @@ test("a channel whose sha is already indexed derives nothing", async () => {
     "https://example.test/stable/info.json": { version: "1.0.0", sha1: known },
     "https://example.test/beta/info.json": { version: "1.1.0", sha1: fresh },
     // Two channels resolving to one sha must contribute one derivation, not two.
-    "https://example.test/alpha/info.json": { version: "1.1.0", sha1: fresh }
+    "https://example.test/alpha/info.json": { version: "1.1.0", sha1: fresh },
   };
   const fetchImpl = async (url) => ({ ok: url in responses, status: 404, json: async () => responses[url] });
   const plan = await planChannels({
     site: { channels: ["stable", "beta", "alpha"], channelInfoUrl: "https://example.test/{channel}/info.json" },
     index: { entries: [{ defoldRevision: known, policyRoot: "r", generator: "g" }] },
-    fetchImpl
+    fetchImpl,
   });
-  assert.deepEqual(plan.covered.map((row) => row.channel), ["stable"]);
-  assert.deepEqual(plan.derive.map((row) => row.sha1), [fresh]);
+  assert.deepEqual(
+    plan.covered.map((row) => row.channel),
+    ["stable"],
+  );
+  assert.deepEqual(
+    plan.derive.map((row) => row.sha1),
+    [fresh],
+  );
 });
 
 test("an unreachable channel is an error, never an empty plan", async () => {
   const { planChannels } = await import("../scripts/track-defold-channels.mjs");
   const site = { channels: ["stable"], channelInfoUrl: "https://example.test/{channel}/info.json" };
   const index = { entries: [] };
-  await assert.rejects(
-    planChannels({ site, index, fetchImpl: async () => ({ ok: false, status: 503 }) }),
-    /HTTP 503/
-  );
+  await assert.rejects(planChannels({ site, index, fetchImpl: async () => ({ ok: false, status: 503 }) }), /HTTP 503/);
   await assert.rejects(
     planChannels({ site, index, fetchImpl: async () => ({ ok: true, json: async () => ({ sha1: "not-a-sha" }) }) }),
-    /not a Defold revision/
+    /not a Defold revision/,
   );
 });
 
@@ -837,7 +903,7 @@ test("channel planning can use the accumulated published manifest instead of the
   const plan = await planChannels({
     site: { channels: ["stable"], channelInfoUrl: "https://example.test/{channel}/info.json" },
     indexPath,
-    fetchImpl: async () => ({ ok: true, json: async () => ({ sha1: revision, version: "1.0.0" }) })
+    fetchImpl: async () => ({ ok: true, json: async () => ({ sha1: revision, version: "1.0.0" }) }),
   });
   assert.deepEqual(plan.derive, []);
   assert.equal(plan.covered[0].policyRoot, "root");
@@ -849,10 +915,14 @@ test("pinning a revision records the digest the archive actually served", async 
   const bodies = { "ref-doc.zip": "REFDOC", "defoldsdk.zip": "SDK", "bob.jar": "BOB" };
   const fetchImpl = async (url) => ({
     ok: true,
-    arrayBuffer: async () => Buffer.from(
-      url.endsWith("bob.jar") ? bodies["bob.jar"] :
-        url.endsWith("defoldsdk.zip") ? bodies["defoldsdk.zip"] : bodies["ref-doc.zip"]
-    )
+    arrayBuffer: async () =>
+      Buffer.from(
+        url.endsWith("bob.jar")
+          ? bodies["bob.jar"]
+          : url.endsWith("defoldsdk.zip")
+            ? bodies["defoldsdk.zip"]
+            : bodies["ref-doc.zip"],
+      ),
   });
   const lock = [
     "DEFOLD_REV=" + "e".repeat(40),
@@ -862,7 +932,7 @@ test("pinning a revision records the digest the archive actually served", async 
     "DEFOLD_SDK_SHA256=old",
     "DEFOLD_BOB_URL=old",
     "DEFOLD_BOB_SHA256=old",
-    "HERMES_REV=keepme"
+    "HERMES_REV=keepme",
   ].join("\n");
   const { updated, replacements } = await pinRevision(revision, { fetchImpl, lock });
   assert.equal(replacements.DEFOLD_REV, revision);

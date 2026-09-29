@@ -22,19 +22,15 @@ async function sourceMapFixture(t) {
   const source = path.join(root, "game.script.ts");
   const generated = path.join(root, ".deherm", "dev", "app.js");
   const map = `${generated}.map`;
-  const input = [
-    "export function tick(): number {",
-    "  const answer: number = 42;",
-    "  return answer;",
-    "}",
-    ""
-  ].join("\n");
+  const input = ["export function tick(): number {", "  const answer: number = 42;", "  return answer;", "}", ""].join(
+    "\n",
+  );
   const result = await transform(input, {
     loader: "ts",
     sourcefile: source,
     sourcemap: "external",
     sourcesContent: true,
-    format: "iife"
+    format: "iife",
   });
   await mkdir(path.dirname(map), { recursive: true });
   await writeFile(source, input);
@@ -86,7 +82,7 @@ test("real dehermc transforms compose authored locations into the dev bundle", a
   const compiler = await createIncrementalCompiler({
     entryPoint: source,
     outputFile: generated,
-    tsconfig: path.join(projectRoot, "tsconfig.deherm.bundle.json")
+    tsconfig: path.join(projectRoot, "tsconfig.deherm.bundle.json"),
   });
   t.after(async () => {
     await compiler.dispose();
@@ -107,7 +103,7 @@ test("real dehermc transforms compose authored locations into the dev bundle", a
     source,
     line: authoredLine,
     column: 4,
-    name: null
+    name: null,
   });
 });
 
@@ -120,20 +116,25 @@ test("DAP adapter maps breakpoints, stack, scopes, variables, evaluate, and relo
   const listeners = new Map();
   let breakpointSequence = 0;
   const client = {
-    onEvent(name, listener) { listeners.set(name, listener); return () => listeners.delete(name); },
+    onEvent(name, listener) {
+      listeners.set(name, listener);
+      return () => listeners.delete(name);
+    },
     async send(method, params) {
       calls.push({ method, params });
-      if (method === "Debugger.setBreakpointByUrl") return {
-        breakpointId: `bp-${breakpointSequence += 1}`,
-        locations: [{ scriptId: "script-1", lineNumber: params.lineNumber, columnNumber: params.columnNumber }]
-      };
-      if (method === "Runtime.getProperties") return {
-        result: [{ name: "answer", value: { type: "number", value: 42 } }]
-      };
+      if (method === "Debugger.setBreakpointByUrl")
+        return {
+          breakpointId: `bp-${(breakpointSequence += 1)}`,
+          locations: [{ scriptId: "script-1", lineNumber: params.lineNumber, columnNumber: params.columnNumber }],
+        };
+      if (method === "Runtime.getProperties")
+        return {
+          result: [{ name: "answer", value: { type: "number", value: 42 } }],
+        };
       if (method === "Debugger.evaluateOnCallFrame") return { result: { type: "number", value: 42 } };
       return {};
     },
-    async close() {}
+    async close() {},
   };
   const events = [];
   const session = {
@@ -141,7 +142,7 @@ test("DAP adapter maps breakpoints, stack, scopes, variables, evaluate, and relo
     projectRoot: fixture.root,
     bundleUrl: "deherm:///deherm/app.dehermc",
     sourceMapFile: fixture.map,
-    websocketUrl: "ws://127.0.0.1:9001/devtools/page/deherm"
+    websocketUrl: "ws://127.0.0.1:9001/devtools/page/deherm",
   };
   const adapter = await createDapAdapter({
     projectRoot: fixture.root,
@@ -149,9 +150,9 @@ test("DAP adapter maps breakpoints, stack, scopes, variables, evaluate, and relo
     emit: (message) => events.push(message),
     discoverInspectorTarget: async () => ({
       session,
-      target: { webSocketDebuggerUrl: session.websocketUrl }
+      target: { webSocketDebuggerUrl: session.websocketUrl },
     }),
-    connectCdp: async () => client
+    connectCdp: async () => client,
   });
 
   const initialized = await adapter.handle(request(1, "initialize"));
@@ -159,16 +160,18 @@ test("DAP adapter maps breakpoints, stack, scopes, variables, evaluate, and relo
   assert.equal(initialized.body.supportsConditionalBreakpoints, true);
   assert.deepEqual(
     initialized.body.exceptionBreakpointFilters.map(({ filter }) => filter),
-    ["uncaught", "all"]
+    ["uncaught", "all"],
   );
   adapter.afterResponse(request(1, "initialize"));
   assert.equal(events.at(-1).event, "initialized");
   assert.equal((await adapter.handle(request(2, "attach"))).success, true);
 
-  const set = await adapter.handle(request(3, "setBreakpoints", {
-    source: { path: fixture.source },
-    breakpoints: [{ line: 2, column: 3, condition: "answer === 42" }]
-  }));
+  const set = await adapter.handle(
+    request(3, "setBreakpoints", {
+      source: { path: fixture.source },
+      breakpoints: [{ line: 2, column: 3, condition: "answer === 42" }],
+    }),
+  );
   assert.equal(set.success, true);
   assert.equal(set.body.breakpoints[0].verified, true);
   assert.equal(calls.find(({ method }) => method === "Debugger.setBreakpointByUrl").params.url, session.bundleUrl);
@@ -178,25 +181,29 @@ test("DAP adapter maps breakpoints, stack, scopes, variables, evaluate, and relo
     await new Promise((resolve) => setImmediate(resolve));
   }
   assert.equal(breakpointSequence, 2, "HMR script parsing reapplies the authored breakpoint");
-  const replaced = await adapter.handle(request(31, "setBreakpoints", {
-    source: { path: fixture.source },
-    breakpoints: [{ line: 3, column: 3 }]
-  }));
+  const replaced = await adapter.handle(
+    request(31, "setBreakpoints", {
+      source: { path: fixture.source },
+      breakpoints: [{ line: 3, column: 3 }],
+    }),
+  );
   assert.equal(replaced.success, true);
   assert.ok(
     calls.some(({ method, params }) => method === "Debugger.removeBreakpoint" && params.breakpointId === "bp-2"),
-    "a DAP replacement removes the preceding CDP breakpoint instead of leaking it"
+    "a DAP replacement removes the preceding CDP breakpoint instead of leaking it",
   );
 
   await listeners.get("Debugger.paused")({
     reason: "breakpoint",
-    callFrames: [{
-      callFrameId: "frame-1",
-      functionName: "tick",
-      location: { scriptId: "script-1", lineNumber: generated.line - 1, columnNumber: generated.column },
-      scopeChain: [{ type: "local", object: { objectId: "scope-1", type: "object" } }],
-      this: { objectId: "this-1", type: "object", description: "GameObject" }
-    }]
+    callFrames: [
+      {
+        callFrameId: "frame-1",
+        functionName: "tick",
+        location: { scriptId: "script-1", lineNumber: generated.line - 1, columnNumber: generated.column },
+        scopeChain: [{ type: "local", object: { objectId: "scope-1", type: "object" } }],
+        this: { objectId: "this-1", type: "object", description: "GameObject" },
+      },
+    ],
   });
   let stopped;
   for (let index = 0; index < 20 && !stopped; index += 1) {
@@ -210,9 +217,11 @@ test("DAP adapter maps breakpoints, stack, scopes, variables, evaluate, and relo
   assert.equal(stack.body.stackFrames[0].line, 2);
   const frameId = stack.body.stackFrames[0].id;
   const scopes = await adapter.handle(request(5, "scopes", { frameId }));
-  const variables = await adapter.handle(request(6, "variables", {
-    variablesReference: scopes.body.scopes[0].variablesReference
-  }));
+  const variables = await adapter.handle(
+    request(6, "variables", {
+      variablesReference: scopes.body.scopes[0].variablesReference,
+    }),
+  );
   assert.equal(variables.body.variables[0].value, "42");
   const evaluated = await adapter.handle(request(7, "evaluate", { frameId, expression: "answer" }));
   assert.equal(evaluated.body.result, "42");
@@ -230,35 +239,39 @@ test("browser DAP breakpoints cover the initial bundle and numbered HMR generati
   let breakpointSequence = 0;
   let currentBrowserScript = "browser-initial";
   const client = {
-    onEvent(name, listener) { listeners.set(name, listener); return () => listeners.delete(name); },
+    onEvent(name, listener) {
+      listeners.set(name, listener);
+      return () => listeners.delete(name);
+    },
     async send(method, params) {
       calls.push({ method, params });
       if (method === "Debugger.enable") {
         listeners.get("Debugger.scriptParsed")({
           scriptId: "browser-initial",
-          url: "defold-hermes://app.js"
+          url: "defold-hermes://app.js",
         });
         return {};
       }
-      if (method === "Debugger.setBreakpointByUrl") return {
-        breakpointId: `browser-${breakpointSequence += 1}`,
-        locations: [
-          { scriptId: "browser-initial", lineNumber: params.lineNumber, columnNumber: params.columnNumber },
-          ...(currentBrowserScript === "browser-initial" ? [] : [
-            { scriptId: currentBrowserScript, lineNumber: params.lineNumber, columnNumber: params.columnNumber }
-          ])
-        ]
-      };
+      if (method === "Debugger.setBreakpointByUrl")
+        return {
+          breakpointId: `browser-${(breakpointSequence += 1)}`,
+          locations: [
+            { scriptId: "browser-initial", lineNumber: params.lineNumber, columnNumber: params.columnNumber },
+            ...(currentBrowserScript === "browser-initial"
+              ? []
+              : [{ scriptId: currentBrowserScript, lineNumber: params.lineNumber, columnNumber: params.columnNumber }]),
+          ],
+        };
       return {};
     },
-    async close() {}
+    async close() {},
   };
   const session = {
     runtime: "browser",
     projectRoot: fixture.root,
     bundleUrl: "defold-hermes://app.js",
     sourceMapFile: fixture.map,
-    websocketUrl: "ws://127.0.0.1:9222/devtools/page/browser"
+    websocketUrl: "ws://127.0.0.1:9222/devtools/page/browser",
   };
   const events = [];
   const adapter = await createDapAdapter({
@@ -268,13 +281,15 @@ test("browser DAP breakpoints cover the initial bundle and numbered HMR generati
     connectCdp: async (url) => {
       assert.equal(url, session.websocketUrl, "browser CDP URLs do not receive the native replacement query");
       return client;
-    }
+    },
   });
   assert.equal((await adapter.handle(request(40, "attach"))).success, true);
-  const set = await adapter.handle(request(41, "setBreakpoints", {
-    source: { path: fixture.source },
-    breakpoints: [{ line: 2, column: 3 }]
-  }));
+  const set = await adapter.handle(
+    request(41, "setBreakpoints", {
+      source: { path: fixture.source },
+      breakpoints: [{ line: 2, column: 3 }],
+    }),
+  );
   assert.equal(set.body.breakpoints[0].verified, true);
   const command = calls.find(({ method }) => method === "Debugger.setBreakpointByUrl");
   assert.equal(command.params.url, undefined);
@@ -292,38 +307,53 @@ test("browser DAP breakpoints cover the initial bundle and numbered HMR generati
   await new Promise((resolve) => setImmediate(resolve));
   assert.equal(breakpointSequence, 2, "unrelated page scripts do not reapply game breakpoints");
 
-  const replaced = await adapter.handle(request(42, "setBreakpoints", {
-    source: { path: fixture.source },
-    breakpoints: [{ line: 2, column: 3 }]
-  }));
-  assert.equal(replaced.body.breakpoints[0].source.path, fixture.source,
-    "the newest HMR script wins even when Chrome returns an older location first");
+  const replaced = await adapter.handle(
+    request(42, "setBreakpoints", {
+      source: { path: fixture.source },
+      breakpoints: [{ line: 2, column: 3 }],
+    }),
+  );
+  assert.equal(
+    replaced.body.breakpoints[0].source.path,
+    fixture.source,
+    "the newest HMR script wins even when Chrome returns an older location first",
+  );
 
   await listeners.get("Debugger.paused")({
     reason: "breakpoint",
-    callFrames: [{
-      callFrameId: "old-frame",
-      functionName: "oldCallback",
-      location: { scriptId: "browser-initial", lineNumber: location.line - 1, columnNumber: location.column },
-      scopeChain: []
-    }]
+    callFrames: [
+      {
+        callFrameId: "old-frame",
+        functionName: "oldCallback",
+        location: { scriptId: "browser-initial", lineNumber: location.line - 1, columnNumber: location.column },
+        scopeChain: [],
+      },
+    ],
   });
   const oldStack = await adapter.handle(request(43, "stackTrace", { threadId: 1 }));
-  assert.equal(oldStack.body.stackFrames[0].source.path, "defold-hermes://app.js",
-    "an old live closure is not mapped through the newest generation's source map");
+  assert.equal(
+    oldStack.body.stackFrames[0].source.path,
+    "defold-hermes://app.js",
+    "an old live closure is not mapped through the newest generation's source map",
+  );
 
   await listeners.get("Debugger.paused")({
     reason: "exception",
-    callFrames: [{
-      callFrameId: "foreign-frame",
-      functionName: "loader",
-      location: { scriptId: "other", lineNumber: location.line - 1, columnNumber: location.column },
-      scopeChain: []
-    }]
+    callFrames: [
+      {
+        callFrameId: "foreign-frame",
+        functionName: "loader",
+        location: { scriptId: "other", lineNumber: location.line - 1, columnNumber: location.column },
+        scopeChain: [],
+      },
+    ],
   });
   const foreignStack = await adapter.handle(request(44, "stackTrace", { threadId: 1 }));
-  assert.equal(foreignStack.body.stackFrames[0].source.path, "https://example.test/app.js",
-    "a page script is never projected through the game bundle's TypeScript map");
+  assert.equal(
+    foreignStack.body.stackFrames[0].source.path,
+    "https://example.test/app.js",
+    "a page script is never projected through the game bundle's TypeScript map",
+  );
   assert.ok(events.some(({ event }) => event === "stopped"));
   await adapter.close();
 });

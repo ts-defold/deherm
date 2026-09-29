@@ -59,7 +59,8 @@ test("browser runner imports the production arena and uses live Emscripten memor
   assert.match(runner, /allocationCount!==releaseCount/);
   assert.doesNotMatch(runner, /\bccall\b|\bcwrap\b|\bEmbind\b|\bembind\b/);
   const buildSource = await import("node:fs/promises").then(({ readFile }) =>
-    readFile(new URL("../scripts/check-dmsdk-browser-exact-call.mjs", import.meta.url), "utf8"));
+    readFile(new URL("../scripts/check-dmsdk-browser-exact-call.mjs", import.meta.url), "utf8"),
+  );
   assert.match(buildSource, /-sALLOW_MEMORY_GROWTH=1/);
 });
 
@@ -77,12 +78,14 @@ test("browser exact-call runtime evidence must agree with the generated applicab
   assert.equal(assertBrowserExactRuntime(valid, applicability), valid);
   assert.throws(
     () => assertBrowserExactRuntime({ ...valid, observationCount: valid.observationCount - 1 }, applicability),
-    (error) => error.code === "DEHERM_BROWSER_EXACT_RUNTIME_MISMATCH" &&
+    (error) =>
+      error.code === "DEHERM_BROWSER_EXACT_RUNTIME_MISMATCH" &&
       error.violations.some(({ name }) => name === "runtime.observationCount"),
   );
   assert.throws(
     () => assertBrowserExactRuntime({ ...valid, releaseCount: valid.releaseCount - 1 }, applicability),
-    (error) => error.code === "DEHERM_BROWSER_EXACT_RUNTIME_MISMATCH" &&
+    (error) =>
+      error.code === "DEHERM_BROWSER_EXACT_RUNTIME_MISMATCH" &&
       error.violations.some(({ name }) => name === "runtime.releaseCount"),
   );
 });
@@ -99,5 +102,6 @@ test("browser exact-call prerequisites fail closed when real tools are absent", 
     "pinned-emscripten-unavailable",
     "pinned-emscripten-config-unavailable",
     "real-browser-unavailable",
-  ]) assert.ok(blockers.has(expected), `missing prerequisite blocker ${expected}`);
+  ])
+    assert.ok(blockers.has(expected), `missing prerequisite blocker ${expected}`);
 });

@@ -8,18 +8,15 @@ import { executionTarget, parseTranscript } from "../scripts/check-headless-conf
 import { runtimeEvidenceMatchesPlan } from "../scripts/generate-route-verification.mjs";
 
 const root = new URL("../", import.meta.url);
-const report = JSON.parse(await readFile(
-  new URL("packages/bindings/generated/defold-script-value-real-engine-probes.json", root),
-  "utf8"
-));
-const bindings = JSON.parse(await readFile(
-  new URL("packages/bindings/generated/defold-script-value-bindings.json", root),
-  "utf8"
-));
-const routeVerification = JSON.parse(await readFile(
-  new URL("packages/bindings/generated/defold-route-verification.json", root),
-  "utf8"
-));
+const report = JSON.parse(
+  await readFile(new URL("packages/bindings/generated/defold-script-value-real-engine-probes.json", root), "utf8"),
+);
+const bindings = JSON.parse(
+  await readFile(new URL("packages/bindings/generated/defold-script-value-bindings.json", root), "utf8"),
+);
+const routeVerification = JSON.parse(
+  await readFile(new URL("packages/bindings/generated/defold-route-verification.json", root), "utf8"),
+);
 const policyWorkflow = await readFile(new URL(".github/workflows/policy.yml", root), "utf8");
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 
@@ -32,46 +29,45 @@ test("headless reports distinguish the execution host from the planned API targe
 test("native runtime accepts complete emitted and planned-only value dispositions", () => {
   const instrumented = validateNativeValueProbeReport(report, bindings);
   assert.equal(instrumented.length, report.instrumentedProbeCount);
-  assert.ok(instrumented.every(({ state, expectedMarker }) =>
-    state === "instrumented" && typeof expectedMarker === "string"));
+  assert.ok(
+    instrumented.every(({ state, expectedMarker }) => state === "instrumented" && typeof expectedMarker === "string"),
+  );
   assert.equal(report.routeDispositionCount, report.probeCount + report.plannedFamilyProbeCount);
   // Dispositions cover every binding; a binding with several implemented call
   // shapes legitimately carries several probes.
-  assert.equal(new Set([...report.probes, ...report.plannedProbes].map(({ id }) => id)).size,
-    bindings.bindingCount);
+  assert.equal(new Set([...report.probes, ...report.plannedProbes].map(({ id }) => id)).size, bindings.bindingCount);
 });
 
 test("native runtime rejects missing, duplicate, and promoted dispositions", () => {
   assert.throws(
-    () => validateNativeValueProbeReport({ ...report, routeDispositionCount: report.routeDispositionCount - 1 }, bindings),
-    /account for every generated binding/
+    () =>
+      validateNativeValueProbeReport({ ...report, routeDispositionCount: report.routeDispositionCount - 1 }, bindings),
+    /account for every generated binding/,
   );
   const duplicate = structuredClone(report);
   duplicate.plannedProbes[0].id = duplicate.probes[0].id;
-  assert.throws(
-    () => validateNativeValueProbeReport(duplicate, bindings),
-    /cover each binding at least once/
-  );
+  assert.throws(() => validateNativeValueProbeReport(duplicate, bindings), /cover each binding at least once/);
   const promoted = structuredClone(report);
   promoted.plannedProbes[0].state = "instrumented";
-  assert.throws(
-    () => validateNativeValueProbeReport(promoted, bindings),
-    /Unknown non-emitted probe state/
-  );
+  assert.throws(() => validateNativeValueProbeReport(promoted, bindings), /Unknown non-emitted probe state/);
 });
 
 test("headless evidence parser ignores incomplete interleaved log markers", () => {
-  const parsed = parseTranscript([
-    "INFO:DEFOLD_HERMES: deherm-headless-conformance\tcontract_0001ERROR:GAMEOBJECT: interleaved stderr",
-    "INFO:DEFOLD_HERMES: deherm-headless-conformance\tcontract_0001\tscript:go.set_parent#required\tresult-arity\tobserved\tundefined"
-  ].join("\n"));
-  assert.deepEqual(parsed.observations, [{
-    contract: "contract_0001",
-    route: "script:go.set_parent#required",
-    property: "result-arity",
-    disposition: "observed",
-    detail: "undefined"
-  }]);
+  const parsed = parseTranscript(
+    [
+      "INFO:DEFOLD_HERMES: deherm-headless-conformance\tcontract_0001ERROR:GAMEOBJECT: interleaved stderr",
+      "INFO:DEFOLD_HERMES: deherm-headless-conformance\tcontract_0001\tscript:go.set_parent#required\tresult-arity\tobserved\tundefined",
+    ].join("\n"),
+  );
+  assert.deepEqual(parsed.observations, [
+    {
+      contract: "contract_0001",
+      route: "script:go.set_parent#required",
+      property: "result-arity",
+      disposition: "observed",
+      detail: "undefined",
+    },
+  ]);
 });
 
 test("route verification marks only source/runtime contradictions", () => {
@@ -79,38 +75,52 @@ test("route verification marks only source/runtime contradictions", () => {
   assert.equal(new Set(routeVerification.routes.map(({ id }) => id)).size, routeVerification.routeCount);
 
   const marked = routeVerification.routes.filter(({ status }) => status === "suspect");
-  assert.deepEqual(routeVerification.wantsIssue.map(({ id }) => id), marked.map(({ id }) => id));
+  assert.deepEqual(
+    routeVerification.wantsIssue.map(({ id }) => id),
+    marked.map(({ id }) => id),
+  );
   assert.equal(new Set(marked.map(({ issue }) => issue.key)).size, marked.length);
   assert.equal(new Set(marked.map(({ issue }) => issue.title)).size, marked.length);
   for (const row of marked) {
     assert.match(row.annotation, /^@suspect /);
     assert.match(row.issue.url, /^https:\/\/github\.com\/ts-defold\/deherm\/issues\?/);
     assert.match(row.issue.body, new RegExp(row.id.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
-    assert.equal(row.issue.title.includes(routeVerification.defoldRevision.slice(0, 12)), false,
-      "issue identity must stay stable when the Defold revision advances");
+    assert.equal(
+      row.issue.title.includes(routeVerification.defoldRevision.slice(0, 12)),
+      false,
+      "issue identity must stay stable when the Defold revision advances",
+    );
   }
-  assert.ok(routeVerification.routes
-    .filter(({ status }) => status === "verified")
-    .every((row) => row.annotation === undefined && row.issue === undefined));
+  assert.ok(
+    routeVerification.routes
+      .filter(({ status }) => status === "verified")
+      .every((row) => row.annotation === undefined && row.issue === undefined),
+  );
 
   // Every harness gap describes the harness, not the public route. It remains
   // visible in the coverage queue without becoming an API warning.
-  const contextual = /^(?:context-fixture-missing|route-unavailable-in-runtime-profile|execution-policy-|handle-kind-outside-fixture-profile|harness-effect-guard|compile-time-intrinsic|separate-module-adapter|no-generated-universal-adapter)/;
-  const generatorGap = /^(?:unsynthesizable-parameter-type|multi-result-shape-unmodelled|variadic-argument-shape-unmodelled|lua-stack-blocked-capability)/;
-  assert.ok(routeVerification.routes
-    .filter(({ notExecutedHere }) => contextual.test(notExecutedHere ?? ""))
-    .every(({ status }) => status === "verified"));
-  assert.ok(routeVerification.routes
-    .filter(({ notExecutedHere }) => generatorGap.test(notExecutedHere ?? ""))
-    .every(({ status }) => status === "verified"));
+  const contextual =
+    /^(?:context-fixture-missing|route-unavailable-in-runtime-profile|execution-policy-|handle-kind-outside-fixture-profile|harness-effect-guard|compile-time-intrinsic|separate-module-adapter|no-generated-universal-adapter)/;
+  const generatorGap =
+    /^(?:unsynthesizable-parameter-type|multi-result-shape-unmodelled|variadic-argument-shape-unmodelled|lua-stack-blocked-capability)/;
+  assert.ok(
+    routeVerification.routes
+      .filter(({ notExecutedHere }) => contextual.test(notExecutedHere ?? ""))
+      .every(({ status }) => status === "verified"),
+  );
+  assert.ok(
+    routeVerification.routes
+      .filter(({ notExecutedHere }) => generatorGap.test(notExecutedHere ?? ""))
+      .every(({ status }) => status === "verified"),
+  );
 });
 
 test("source-backed route contradictions stay suspect and go.set_parent is not a false positive", () => {
   const suspects = routeVerification.routes.filter(({ status }) => status === "suspect");
-  assert.deepEqual(suspects.map(({ id }) => id), [
-    "script:b2d.body.get_user_data",
-    "script:b2d.body.set_user_data"
-  ]);
+  assert.deepEqual(
+    suspects.map(({ id }) => id),
+    ["script:b2d.body.get_user_data", "script:b2d.body.set_user_data"],
+  );
   const corrected = routeVerification.routes.find(({ id }) => id === "script:sys.set_render_enable");
   assert.equal(corrected.status, "verified");
   assert.equal(corrected.runtimeLuaName, "sys.set_render_enabled");
@@ -126,19 +136,25 @@ test("route verification never carries runtime observations across a changed pla
     defoldRevision: "a".repeat(40),
     target: "arm64-macos",
     runtimeProfile: "default",
-    planInputs: { "input.json": "old" }
+    planInputs: { "input.json": "old" },
   };
   const plan = {
     target: "arm64-macos",
     runtimeProfile: "default",
-    inputs: { "input.json": "old" }
+    inputs: { "input.json": "old" },
   };
   report.planSha256 = sha256(JSON.stringify(plan));
   assert.equal(runtimeEvidenceMatchesPlan(report, plan, report.defoldRevision), true);
-  assert.equal(runtimeEvidenceMatchesPlan(report, { ...plan, inputs: { "input.json": "new" } }, report.defoldRevision), false);
+  assert.equal(
+    runtimeEvidenceMatchesPlan(report, { ...plan, inputs: { "input.json": "new" } }, report.defoldRevision),
+    false,
+  );
   assert.equal(runtimeEvidenceMatchesPlan(report, { ...plan, target: "x86_64-linux" }, report.defoldRevision), false);
   assert.equal(runtimeEvidenceMatchesPlan(report, plan, "b".repeat(40)), false);
-  assert.equal(runtimeEvidenceMatchesPlan({ ...report, planSha256: "0".repeat(64) }, plan, report.defoldRevision), false);
+  assert.equal(
+    runtimeEvidenceMatchesPlan({ ...report, planSha256: "0".repeat(64) }, plan, report.defoldRevision),
+    false,
+  );
 });
 
 test("the policy workflow materializes the issue links emitted for marked routes", () => {

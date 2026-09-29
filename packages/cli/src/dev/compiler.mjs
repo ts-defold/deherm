@@ -10,19 +10,15 @@ import {
   BUNDLE_FINGERPRINT_GLOBAL as fingerprintGlobal,
   applyBundleFingerprint,
   bundleFingerprintBanner,
-  createBundleFingerprintPlaceholder
+  createBundleFingerprintPlaceholder,
 } from "../../../compiler/src/bundle-fingerprint.mjs";
-import {
-  emitProjectWithSourceMaps,
-  loadDehermPluginConfig,
-  transformProject
-} from "../transform-compiler.mjs";
+import { emitProjectWithSourceMaps, loadDehermPluginConfig, transformProject } from "../transform-compiler.mjs";
 
 let temporarySequence = 0;
 
 async function writeAtomically(file, contents) {
   await mkdir(path.dirname(file), { recursive: true });
-  const temporary = `${file}.deherm-tmp-${process.pid}-${temporarySequence += 1}`;
+  const temporary = `${file}.deherm-tmp-${process.pid}-${(temporarySequence += 1)}`;
   try {
     await writeFile(temporary, contents);
     await rename(temporary, file);
@@ -40,11 +36,13 @@ async function filesBelow(root) {
   const files = [];
   const visit = async (directory) => {
     const entries = await readdir(directory, { withFileTypes: true });
-    await Promise.all(entries.map(async (entry) => {
-      const absolute = path.join(directory, entry.name);
-      if (entry.isDirectory()) await visit(absolute);
-      else if (entry.isFile()) files.push(absolute);
-    }));
+    await Promise.all(
+      entries.map(async (entry) => {
+        const absolute = path.join(directory, entry.name);
+        if (entry.isDirectory()) await visit(absolute);
+        else if (entry.isFile()) files.push(absolute);
+      }),
+    );
   };
   await visit(root);
   return files.sort();
@@ -71,8 +69,7 @@ async function loadMappedJavaScript(outputRoot) {
     sourceMap.sourceRoot = "";
     sourceMap.sources = [path.basename(sourceFile)];
     const javaScriptFile = mapFile.slice(0, -4);
-    const javaScript = (await readFile(javaScriptFile, "utf8"))
-      .replace(/\n?\/\/# sourceMappingURL=[^\n]*\s*$/, "");
+    const javaScript = (await readFile(javaScriptFile, "utf8")).replace(/\n?\/\/# sourceMappingURL=[^\n]*\s*$/, "");
     const inlineMap = Buffer.from(JSON.stringify(sourceMap)).toString("base64");
     modules.set(sourceFile, `${javaScript}\n//# sourceMappingURL=data:application/json;base64,${inlineMap}\n`);
   }
@@ -103,13 +100,17 @@ async function emitBytecode(outputFile, { optimize, sourceMapFile }) {
   // in generated bundle text, which is the same as having no source map at all.
   // `-g2` keeps location info for every instruction; `-Og` keeps the
   // optimisations that do not destroy that mapping.
-  const result = spawnSync(tool.path, [
-    ...(optimize ? ["-O"] : ["-Og", "-g2"]),
-    ...(sourceMapFile ? [`-source-map=${sourceMapFile}`] : []),
-    "-emit-binary",
-    `-out=${bytecodeFile}`,
-    outputFile
-  ], { encoding: "utf8" });
+  const result = spawnSync(
+    tool.path,
+    [
+      ...(optimize ? ["-O"] : ["-Og", "-g2"]),
+      ...(sourceMapFile ? [`-source-map=${sourceMapFile}`] : []),
+      "-emit-binary",
+      `-out=${bytecodeFile}`,
+      outputFile,
+    ],
+    { encoding: "utf8" },
+  );
   if (result.status !== 0) {
     throw new Error(`hermesc failed for ${outputFile}: ${result.stderr || result.stdout || "no output"}`);
   }
@@ -117,7 +118,7 @@ async function emitBytecode(outputFile, { optimize, sourceMapFile }) {
     file: bytecodeFile,
     bytes: (await stat(bytecodeFile)).size,
     optimized: Boolean(optimize),
-    sourceMapped: Boolean(sourceMapFile)
+    sourceMapped: Boolean(sourceMapFile),
   };
 }
 
@@ -134,9 +135,7 @@ export async function createIncrementalCompiler(options) {
   if (useTtsc && !tsconfig) {
     throw new Error("The déherm transform compiler requires a generated tsconfig");
   }
-  const transformOutputRoot = useTtsc
-    ? await mkdtemp(path.join(tmpdir(), "deherm-mapped-transform-"))
-    : null;
+  const transformOutputRoot = useTtsc ? await mkdtemp(path.join(tmpdir(), "deherm-mapped-transform-")) : null;
   let transformedSources = new Map();
   let transformInputFiles = [];
   const transformedSourcePlugin = {
@@ -148,10 +147,10 @@ export async function createIncrementalCompiler(options) {
         return {
           contents: source,
           loader: "js",
-          watchFiles: transformInputFiles
+          watchFiles: transformInputFiles,
         };
       });
-    }
+    },
   };
   const refreshTransforms = async () => {
     if (!useTtsc) return;
@@ -160,7 +159,7 @@ export async function createIncrementalCompiler(options) {
     const envelope = await transformProject({
       tsconfig,
       cwd: projectRoot,
-      config
+      config,
     });
     await rm(transformOutputRoot, { recursive: true, force: true });
     await mkdir(transformOutputRoot, { recursive: true });
@@ -168,18 +167,20 @@ export async function createIncrementalCompiler(options) {
       tsconfig,
       cwd: projectRoot,
       config,
-      outDir: transformOutputRoot
+      outDir: transformOutputRoot,
     });
     transformedSources = await loadMappedJavaScript(transformOutputRoot);
     const observedHostInputs = Object.entries(envelope.hostInputHashes ?? {})
       .filter(([, digest]) => typeof digest === "string")
       .map(([file]) => path.resolve(projectRoot, file));
     const configInputs = (envelope.graph?.configs ?? []).map((file) => path.resolve(projectRoot, file));
-    transformInputFiles = [...new Set([
-      ...Object.keys(envelope.typescript ?? {}).map((file) => path.resolve(projectRoot, file)),
-      ...observedHostInputs,
-      ...configInputs
-    ])].sort();
+    transformInputFiles = [
+      ...new Set([
+        ...Object.keys(envelope.typescript ?? {}).map((file) => path.resolve(projectRoot, file)),
+        ...observedHostInputs,
+        ...configInputs,
+      ]),
+    ].sort();
   };
   // Identical TypeScript compiled through a different entry point, tsconfig, or
   // output setting is a different program with a different fingerprint, so the
@@ -195,7 +196,7 @@ export async function createIncrementalCompiler(options) {
     platform: "neutral",
     ttsc: useTtsc,
     transformCompiler: useTtsc ? "dehermc" : null,
-    define: options.define ?? null
+    define: options.define ?? null,
   };
   const fingerprintPlaceholder = createBundleFingerprintPlaceholder();
   if (Object.hasOwn(options.define ?? {}, fingerprintGlobal)) {
@@ -204,13 +205,11 @@ export async function createIncrementalCompiler(options) {
   const input = preludeEntries.length
     ? {
         stdin: {
-          contents: [...preludeEntries, entryPoint]
-            .map((file) => `import ${JSON.stringify(file)};`)
-            .join("\n"),
+          contents: [...preludeEntries, entryPoint].map((file) => `import ${JSON.stringify(file)};`).join("\n"),
           resolveDir: path.dirname(entryPoint),
           sourcefile: ".deherm-composed-entry.ts",
-          loader: "ts"
-        }
+          loader: "ts",
+        },
       }
     : { entryPoints: [entryPoint] };
   const buildContext = await context({
@@ -229,7 +228,7 @@ export async function createIncrementalCompiler(options) {
     legalComments: "none",
     logLevel: "silent",
     metafile: true,
-    write: false
+    write: false,
   });
 
   let previousBytes = 0;
@@ -264,8 +263,7 @@ export async function createIncrementalCompiler(options) {
       }
       const bundledOutput = result.outputFiles.find(({ path: file }) => path.resolve(file) === outputFile);
       if (!bundledOutput) throw new Error(`esbuild did not produce expected output: ${outputFile}`);
-      const { fingerprint, source: finalSource } =
-          applyBundleFingerprint(bundledOutput.text, fingerprintPlaceholder);
+      const { fingerprint, source: finalSource } = applyBundleFingerprint(bundledOutput.text, fingerprintPlaceholder);
       for (const artifact of result.outputFiles.filter(({ path: file }) => path.resolve(file) !== outputFile)) {
         await writeAtomically(artifact.path, artifact.contents);
       }
@@ -276,7 +274,7 @@ export async function createIncrementalCompiler(options) {
         ? await emitBytecode(outputFile, {
             optimize: options.bytecodeOptimize !== false,
             // The bundle's own map is written above, before this runs.
-            sourceMapFile: sourcemap ? `${outputFile}.map` : null
+            sourceMapFile: sourcemap ? `${outputFile}.map` : null,
           })
         : null;
       const sourceMap = result.outputFiles.find(({ path: file }) => path.resolve(file) === `${outputFile}.map`);
@@ -297,10 +295,9 @@ export async function createIncrementalCompiler(options) {
       // program through a ttsc transform. The freshness binding in deherm.lock
       // is only as honest as this list, so it is the bundler's whole input
       // closure and not the retained-module census below.
-      const sources = [...new Set([
-        ...Object.keys(result.metafile.inputs).map((file) => path.resolve(file)),
-        ...transformInputFiles
-      ])].sort();
+      const sources = [
+        ...new Set([...Object.keys(result.metafile.inputs).map((file) => path.resolve(file)), ...transformInputFiles]),
+      ].sort();
       const output = Object.entries(result.metafile.outputs).find(([file]) => path.resolve(file) === outputFile)?.[1];
       const bytes = Buffer.byteLength(finalSource);
       const modules = Object.entries(output?.inputs ?? {})
@@ -312,16 +309,25 @@ export async function createIncrementalCompiler(options) {
         bytes,
         byteDelta: bytes - previousBytes,
         moduleCount: modules.length,
-        modules
+        modules,
       };
       previousBytes = bytes;
-      const build = { fingerprint, outputFile, bytecode, mirrors, resourcePaths: [resourcePath], sources, configuration, metrics };
+      const build = {
+        fingerprint,
+        outputFile,
+        bytecode,
+        mirrors,
+        resourcePaths: [resourcePath],
+        sources,
+        configuration,
+        metrics,
+      };
       await options.afterRebuild?.(build);
       return build;
     },
     async dispose() {
       await buildContext.dispose();
       if (transformOutputRoot) await rm(transformOutputRoot, { recursive: true, force: true });
-    }
+    },
   };
 }

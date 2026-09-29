@@ -43,10 +43,15 @@ test("CPU profile capture writes the exact standard CDP profile", async (t) => {
   const engine = recordingEngine(bridge.enginePort, (message) => {
     calls.push(message.method);
     if (message.method === "Profiler.start") return [{ id: message.id, result: {} }];
-    if (message.method === "Profiler.stop") return [{
-      id: message.id,
-      result: { profile: { nodes: [{ id: 1, callFrame: { functionName: "tick" } }], samples: [1], timeDeltas: [10] } }
-    }];
+    if (message.method === "Profiler.stop")
+      return [
+        {
+          id: message.id,
+          result: {
+            profile: { nodes: [{ id: 1, callFrame: { functionName: "tick" } }], samples: [1], timeDeltas: [10] },
+          },
+        },
+      ];
     return [];
   });
   await event(engine, "connect");
@@ -64,13 +69,17 @@ test("heap capture streams every CDP chunk in order without retaining the snapsh
   const sessionFile = path.join(root, ".deherm", "dev", "inspector.json");
   const output = path.join(root, "capture.heapsnapshot");
   const bridge = await createInspectorBridge({ projectRoot: root, sessionFile });
-  const engine = recordingEngine(bridge.enginePort, (message) => [{
-    method: "HeapProfiler.addHeapSnapshotChunk",
-    params: { chunk: "{\"snapshot\":" }
-  }, {
-    method: "HeapProfiler.addHeapSnapshotChunk",
-    params: { chunk: "{\"title\":\"déherm\"}}" }
-  }, { id: message.id, result: {} }]);
+  const engine = recordingEngine(bridge.enginePort, (message) => [
+    {
+      method: "HeapProfiler.addHeapSnapshotChunk",
+      params: { chunk: '{"snapshot":' },
+    },
+    {
+      method: "HeapProfiler.addHeapSnapshotChunk",
+      params: { chunk: '{"title":"déherm"}}' },
+    },
+    { id: message.id, result: {} },
+  ]);
   await event(engine, "connect");
   const result = await captureHeapSnapshot({ projectRoot: root, sessionFile, output });
   assert.equal(result.chunkCount, 2);
@@ -86,10 +95,7 @@ test("profile capture does not silently evict an attached debugger", async (t) =
   const bridge = await createInspectorBridge({ projectRoot: root, sessionFile });
   const debuggerClient = new WebSocket(bridge.websocketUrl);
   await event(debuggerClient, "open");
-  await assert.rejects(
-    () => captureCpuProfile({ projectRoot: root, sessionFile, durationMs: 1 }),
-    /already attached/
-  );
+  await assert.rejects(() => captureCpuProfile({ projectRoot: root, sessionFile, durationMs: 1 }), /already attached/);
   assert.equal(debuggerClient.readyState, WebSocket.OPEN);
   debuggerClient.close();
   await bridge.close();
@@ -102,7 +108,7 @@ test("profile capture rejects a descriptor owned by a different project", async 
   const bridge = await createInspectorBridge({ projectRoot: root, sessionFile });
   await assert.rejects(
     () => captureCpuProfile({ projectRoot: path.join(root, "other"), sessionFile, durationMs: 1 }),
-    /belongs to a different project/
+    /belongs to a different project/,
   );
   await bridge.close();
 });

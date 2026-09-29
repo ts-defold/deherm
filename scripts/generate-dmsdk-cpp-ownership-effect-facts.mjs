@@ -269,7 +269,6 @@ function structuralCandidates(ir, shapes, policy, scratchPolicy) {
   }
   return [...envelopes.entries()]
     .map(([id, envelopeNames]) => {
-      const shape = shapes.rows.find((row) => row.id === id);
       const declaration = declarations.get(id);
       if (!declaration) throw new Error(`${id}: structural candidate is absent from SDK IR`);
       return { ...declaration, envelopes: envelopeNames.sort(compareCodeUnits) };

@@ -4,10 +4,7 @@ import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import {
-  buildWarBattlesRuntimeGate,
-  renderWarBattlesRuntimeGate
-} from "./lib/war-battles-runtime-gate.mjs";
+import { buildWarBattlesRuntimeGate, renderWarBattlesRuntimeGate } from "./lib/war-battles-runtime-gate.mjs";
 
 const repositoryRoot = path.resolve(fileURLToPath(new URL("../", import.meta.url)));
 const reportPath = path.join(repositoryRoot, ".agents/docs/data/war-battles-runtime-gate.json");
@@ -48,7 +45,9 @@ export async function main(argv = process.argv.slice(2)) {
   } else {
     await atomicWrite(reportPath, rendered);
   }
-  console.log(`War Battles API gate: ${report.status} (${report.counts.missingExecutableCount} missing executable binding(s))`);
+  console.log(
+    `War Battles API gate: ${report.status} (${report.counts.missingExecutableCount} missing executable binding(s))`,
+  );
   if (options.requireReady && report.status !== "ready") {
     throw new Error(`War Battles is blocked by: ${report.missingExecutableIds.join(", ")}`);
   }

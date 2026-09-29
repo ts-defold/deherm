@@ -42,7 +42,7 @@ export const inputPaths = Object.freeze({
   dynamicHermesJsi: "packages/bindings/targets/dynamic-hermes-jsi.json",
   staticHermesCAbi: "packages/bindings/targets/static-hermes-cabi.json",
   luaStack: "packages/bindings/targets/lua-stack.json",
-  browserWasmHost: "packages/bindings/targets/browser-wasm-host.json"
+  browserWasmHost: "packages/bindings/targets/browser-wasm-host.json",
 });
 
 const targetOrder = Object.freeze([
@@ -50,7 +50,7 @@ const targetOrder = Object.freeze([
   "dynamicHermesJsi",
   "staticHermesCAbi",
   "luaStack",
-  "browserWasmHost"
+  "browserWasmHost",
 ]);
 
 function compareCodeUnits(left, right) {
@@ -81,7 +81,7 @@ const opcodeByKind = Object.freeze({
   "template-record": "decode-template-record",
   template: "instantiate-template",
   "type-parameter": "resolve-type-parameter",
-  opaque: "resolve-opaque"
+  opaque: "resolve-opaque",
 });
 
 function sha256(value) {
@@ -91,7 +91,7 @@ function sha256(value) {
 function parseArguments(argv) {
   const options = {
     output: resolve(repositoryRoot, "packages/bindings/generated/defold-binding-lowering-plan.json"),
-    check: false
+    check: false,
   };
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
@@ -106,10 +106,14 @@ export async function loadBindingLoweringInputs(root) {
   if (!root) {
     throw new Error("loadBindingLoweringInputs requires an explicit authenticated or materialized surface root");
   }
-  return Object.fromEntries(await Promise.all(Object.entries(inputPaths).map(async ([name, relative]) => [
-    name,
-    await readFile(resolve(root, relative), "utf8")
-  ])));
+  return Object.fromEntries(
+    await Promise.all(
+      Object.entries(inputPaths).map(async ([name, relative]) => [
+        name,
+        await readFile(resolve(root, relative), "utf8"),
+      ]),
+    ),
+  );
 }
 
 function walkShape(shape, visit, path = "value") {
@@ -118,11 +122,20 @@ function walkShape(shape, visit, path = "value") {
   if (shape.value) walkShape(shape.value, visit, `${path}.value`);
   if (shape.element) walkShape(shape.element, visit, `${path}.element`);
   if (shape.key) walkShape(shape.key, visit, `${path}.key`);
-  if (Array.isArray(shape.values)) shape.values.forEach((value, index) => walkShape(value, visit, `${path}.values[${index}]`));
-  if (Array.isArray(shape.types)) shape.types.forEach((value, index) => walkShape(value, visit, `${path}.types[${index}]`));
-  if (Array.isArray(shape.fields)) shape.fields.forEach((field, index) => walkShape(field.value ?? field.type, visit, `${path}.fields[${index}]`));
-  if (Array.isArray(shape.parameters)) shape.parameters.forEach((parameter, index) => walkShape(parameter.value ?? parameter.type, visit, `${path}.parameters[${index}]`));
-  if (Array.isArray(shape.returns)) shape.returns.forEach((value, index) => walkShape(value.value ?? value.type ?? value, visit, `${path}.returns[${index}]`));
+  if (Array.isArray(shape.values))
+    shape.values.forEach((value, index) => walkShape(value, visit, `${path}.values[${index}]`));
+  if (Array.isArray(shape.types))
+    shape.types.forEach((value, index) => walkShape(value, visit, `${path}.types[${index}]`));
+  if (Array.isArray(shape.fields))
+    shape.fields.forEach((field, index) => walkShape(field.value ?? field.type, visit, `${path}.fields[${index}]`));
+  if (Array.isArray(shape.parameters))
+    shape.parameters.forEach((parameter, index) =>
+      walkShape(parameter.value ?? parameter.type, visit, `${path}.parameters[${index}]`),
+    );
+  if (Array.isArray(shape.returns))
+    shape.returns.forEach((value, index) =>
+      walkShape(value.value ?? value.type ?? value, visit, `${path}.returns[${index}]`),
+    );
   if (shape.pointee) walkShape(shape.pointee, visit, `${path}.pointee`);
   if (shape.target) walkShape(shape.target, visit, `${path}.target`);
   if (shape.result) walkShape(shape.result, visit, `${path}.result`);
@@ -139,25 +152,35 @@ function marshallingProgram(signature, invoker) {
   const parameters = signature.parameters ?? [];
   for (let index = 0; index < parameters.length; index += 1) {
     const shape = parameters[index].value ?? parameters[index].type;
-    walkShape(shape, ({ kind, name }, shapePath) => operations.push({
-      op: opcodeByKind[kind] ?? "reject-unrecognized-constructor",
-      phase: "input",
-      path: shapePath,
-      kind,
-      ...(name ? { type: name } : {})
-    }), `parameters[${index}]`);
+    walkShape(
+      shape,
+      ({ kind, name }, shapePath) =>
+        operations.push({
+          op: opcodeByKind[kind] ?? "reject-unrecognized-constructor",
+          phase: "input",
+          path: shapePath,
+          kind,
+          ...(name ? { type: name } : {}),
+        }),
+      `parameters[${index}]`,
+    );
   }
   operations.push({ op: invoker === "cached-lua-route" ? "call-cached-lua" : "call-native-symbol", phase: "invoke" });
   const returns = signature.returns ?? (signature.result ? [signature.result] : []);
   for (let index = 0; index < returns.length; index += 1) {
     const shape = returns[index].value ?? returns[index].type ?? returns[index];
-    walkShape(shape, ({ kind, name }, shapePath) => operations.push({
-      op: `encode-${opcodeByKind[kind] ?? "unrecognized-constructor"}`,
-      phase: "output",
-      path: shapePath,
-      kind,
-      ...(name ? { type: name } : {})
-    }), `returns[${index}]`);
+    walkShape(
+      shape,
+      ({ kind, name }, shapePath) =>
+        operations.push({
+          op: `encode-${opcodeByKind[kind] ?? "unrecognized-constructor"}`,
+          phase: "output",
+          path: shapePath,
+          kind,
+          ...(name ? { type: name } : {}),
+        }),
+      `returns[${index}]`,
+    );
   }
   operations.push({ op: "restore-scratch", phase: "cleanup" });
   return operations;
@@ -178,29 +201,31 @@ function scriptUnit(row, rowIndex) {
       callback: row.effects.callback,
       invalidation: row.effects.invalidation,
       errorModel: { token: "status-return-and-target-exception" },
-      scratch: { token: "caller-owned-bounded-reentrant-scratch" }
+      scratch: { token: "caller-owned-bounded-reentrant-scratch" },
     },
     abi: {
-      state: row.evidence.accountingCategory === "executable-stable-id"
-        ? "existing-generated-entry"
-        : row.evidence.accountingCategory === "component-property-compiler"
-          ? "compile-time-intrinsic"
-          : "planned",
+      state:
+        row.evidence.accountingCategory === "executable-stable-id"
+          ? "existing-generated-entry"
+          : row.evidence.accountingCategory === "component-property-compiler"
+            ? "compile-time-intrinsic"
+            : "planned",
       symbol: `deherm_script_route_${row.stableId.toString(16).padStart(8, "0")}`,
       version: 1,
       callingConvention: "extern-c",
       statusReturn: "i32",
-      invoker: row.evidence.accountingCategory === "component-property-compiler"
-        ? { kind: "component-property-compiler" }
-        : { kind: "cached-lua-route", stableId: row.stableId }
+      invoker:
+        row.evidence.accountingCategory === "component-property-compiler"
+          ? { kind: "component-property-compiler" }
+          : { kind: "cached-lua-route", stableId: row.stableId },
     },
     shapeKinds: shapeKinds(row.signature),
     unresolvedTokens,
     sourceState: {
       loweringFamily: row.loweringFamily,
       accountingCategory: row.evidence.accountingCategory,
-      currentTargets: row.targets
-    }
+      currentTargets: row.targets,
+    },
   };
 }
 
@@ -213,14 +238,14 @@ function scriptConstantUnit(binding, entry, rowIndex) {
     sourceRef: { input: "scriptConstantLowering", row: rowIndex },
     publicSignature: {
       parameters: [],
-      returns: [{ value: { kind: "dynamic" } }]
+      returns: [{ value: { kind: "dynamic" } }],
     },
     availability: {
       kind: entry.state,
       linkage: "generated-lua-registration",
       runtimeAvailable: (entry.profileAvailability?.runtimeProfiles?.length ?? 0) > 0,
       profiles: entry.profileAvailability?.runtimeProfiles ?? [],
-      profileAvailability: entry.profileAvailability
+      profileAvailability: entry.profileAvailability,
     },
     resolvedContract: {
       context: { token: "unspecified" },
@@ -230,7 +255,7 @@ function scriptConstantUnit(binding, entry, rowIndex) {
       callback: { token: "none" },
       invalidation: { token: "none" },
       errorModel: { token: "status-return-and-target-exception" },
-      scratch: { token: "caller-owned-bounded-reentrant-scratch" }
+      scratch: { token: "caller-owned-bounded-reentrant-scratch" },
     },
     abi: {
       state: "existing-generated-entry",
@@ -238,7 +263,7 @@ function scriptConstantUnit(binding, entry, rowIndex) {
       version: 1,
       callingConvention: "extern-c",
       statusReturn: "i32",
-      invoker: { kind: "cached-lua-route", stableId: binding.stableId }
+      invoker: { kind: "cached-lua-route", stableId: binding.stableId },
     },
     shapeKinds: ["dynamic"],
     unresolvedTokens: [],
@@ -248,9 +273,9 @@ function scriptConstantUnit(binding, entry, rowIndex) {
       currentTargets: {
         nativeDynamicHermes: { disposition: "backend-emitted" },
         nativeStaticHermes: { disposition: "backend-emitted" },
-        html5BrowserHost: { disposition: "backend-emitted" }
-      }
-    }
+        html5BrowserHost: { disposition: "backend-emitted" },
+      },
+    },
   };
 }
 
@@ -271,7 +296,7 @@ function dmsdkUnit(row, rowIndex) {
       callback: row.effects.callbacks,
       invalidation: { token: "native-resource-effect-unresolved" },
       errorModel: { token: "status-return-and-target-exception" },
-      scratch: { token: "caller-owned-bounded-reentrant-scratch" }
+      scratch: { token: "caller-owned-bounded-reentrant-scratch" },
     },
     abi: {
       state: row.loweringState === "generated-adapter" ? "existing-generated-entry" : "planned",
@@ -280,7 +305,7 @@ function dmsdkUnit(row, rowIndex) {
       version: 1,
       callingConvention: "extern-c",
       statusReturn: "i32",
-      invoker: { kind: "native-symbol", symbol: row.symbol }
+      invoker: { kind: "native-symbol", symbol: row.symbol },
     },
     shapeKinds: shapeKinds(row.signature),
     unresolvedTokens: [...unresolvedTokens].sort(compareCodeUnits),
@@ -292,32 +317,203 @@ function dmsdkUnit(row, rowIndex) {
       // calls directly - transport, not surface - and the script side has used
       // the same word for the same reason since its accounting was written.
       accountingCategory: row.accountingCategory ?? "projected",
-      loweringEvidence: row.lowering
-    }
+      loweringEvidence: row.lowering,
+    },
   };
 }
 
 const genericImplementationLaneDefinitions = Object.freeze([
-  Object.freeze({ input: "scriptScalarDispatch", lane: "script-scalar-dispatch", surface: "script", schemaVersion: 1, collection: "bindings", countPath: ["bindingCount"], requireStableId: true, scope: "Generated scalar Lua descriptors and stable dispatch identities." }),
-  Object.freeze({ input: "scriptValueBindings", lane: "script-value-bindings", surface: "script", schemaVersion: 1, collection: "bindings", countPath: ["bindingCount"], requireStableId: true, scope: "Generated structured Defold-value operation descriptors and native adapters." }),
-  Object.freeze({ input: "scriptFixedTuples", lane: "script-fixed-tuples", surface: "script", schemaVersion: 1, collection: "bindings", countPath: ["bindingCount"], requireStableId: true, scope: "Generated fixed-tuple codecs and target dispositions." }),
-  Object.freeze({ input: "scriptDynamicValues", lane: "script-dynamic-values", surface: "script", schemaVersion: 1, collection: "bindings", countPath: ["routeCount"], requireStableId: true, scope: "Generated dynamic-value candidate descriptors and focused native evidence." }),
-  Object.freeze({ input: "scriptValueTail", lane: "script-value-tail", surface: "script", schemaVersion: 1, collection: "bindings", countPath: ["routeCount"], requireStableId: true, scope: "Generated remaining Defold-value family descriptors and blockers." }),
-  Object.freeze({ input: "scriptOverloadDispatch", lane: "script-overload-dispatch", surface: "script", schemaVersion: 1, collection: "bindings", countPath: ["routeCount"], requireStableId: true, scope: "Generated overload classifiers and target dispositions." }),
-  Object.freeze({ input: "scriptTableRecords", lane: "script-table-records", surface: "script", schemaVersion: 1, collection: "bindings", countPath: ["candidateCount"], requireStableId: true, scope: "Generated fixed-record codecs and required-context claims." }),
-  Object.freeze({ input: "scriptCallbackLifecycle", lane: "script-callback-lifecycle", surface: "script", schemaVersion: 1, collection: "routes", countPath: ["routeCount"], requireStableId: true, scope: "Generated callback lifecycle contracts and registry eligibility." }),
-  Object.freeze({ input: "scriptCopiedValueBlockers", lane: "script-copied-value-blockers", surface: "script", schemaVersion: 1, collection: "routes", countPath: ["routeCount"], requireStableId: true, scope: "Source-pinned copied-value blockers." }),
-  Object.freeze({ input: "scriptOpaqueRecordBlockers", lane: "script-opaque-record-blockers", surface: "script", schemaVersion: 1, collection: "routes", countPath: ["routeCount"], requireStableId: true, scope: "Source-pinned opaque-record blockers." }),
-  Object.freeze({ input: "scriptUrlAddress", lane: "script-url-dispatch", surface: "script", schemaVersion: 1, collection: "rows", countPath: ["routeCount"], requireStableId: true, scope: "Generated URL/address codecs and captured-instance dispatch identities." }),
-  Object.freeze({ input: "dmsdkScalarThunks", lane: "dmsdk-scalar-thunks", surface: "dmsdk", schemaVersion: 2, collection: "declarations", countPath: ["coverage", "reviewed"], scope: "Generated scalar C ABI, target adapters, and staged verification claims." }),
-  Object.freeze({ input: "dmsdkEnumValues", lane: "dmsdk-enum-values", surface: "dmsdk", schemaVersion: 1, collection: "declarations", countPath: ["coverage", "discovered"], scope: "Generated enum-domain value bindings and staged verification claims." }),
-  Object.freeze({ input: "dmsdkNamedScalars", lane: "dmsdk-named-scalars", surface: "dmsdk", schemaVersion: 1, collection: "declarations", countPath: ["coverage", "reviewed"], scope: "Generated or policy-blocked named-scalar bindings." }),
-  Object.freeze({ input: "dmsdkFixedDigests", lane: "dmsdk-fixed-digests", surface: "dmsdk", schemaVersion: 1, collection: "declarations", countPath: ["coverage", "structurallyEligible"], scope: "Generated or universally retained fixed-output digest span bindings." }),
-  Object.freeze({ input: "dmsdkBase64Spans", lane: "dmsdk-base64-spans", surface: "dmsdk", schemaVersion: 1, collection: "declarations", countPath: ["coverage", "structurallyEligible"], scope: "Generated or universally retained bounded Base64 span bindings." }),
-  Object.freeze({ input: "dmsdkAstcProbes", lane: "dmsdk-astc-probes", surface: "dmsdk", schemaVersion: 1, collection: "declarations", countPath: ["coverage", "structurallyEligible"], scope: "Generated or universally retained bounded ASTC inspection bindings." }),
-  Object.freeze({ input: "dmsdkXteaSpans", lane: "dmsdk-xtea-spans", surface: "dmsdk", schemaVersion: 1, collection: "declarations", countPath: ["coverage", "structurallyEligible"], scope: "Generated or universally retained bounded XTEA span bindings." }),
-  Object.freeze({ input: "dmsdkHashSpans", lane: "dmsdk-hash-spans", surface: "dmsdk", schemaVersion: 1, collection: "declarations", countPath: ["coverage", "structurallyEligible"], scope: "Generated or universally retained bounded hash span bindings." }),
-  Object.freeze({ input: "dmsdkArenaSpanBlockers", lane: "dmsdk-arena-span-blockers", surface: "dmsdk", schemaVersion: 1, collection: "declarations", countPath: ["coverage", "blocked"], scope: "Generated explicit blockers for unresolved arena/span declarations." })
+  Object.freeze({
+    input: "scriptScalarDispatch",
+    lane: "script-scalar-dispatch",
+    surface: "script",
+    schemaVersion: 1,
+    collection: "bindings",
+    countPath: ["bindingCount"],
+    requireStableId: true,
+    scope: "Generated scalar Lua descriptors and stable dispatch identities.",
+  }),
+  Object.freeze({
+    input: "scriptValueBindings",
+    lane: "script-value-bindings",
+    surface: "script",
+    schemaVersion: 1,
+    collection: "bindings",
+    countPath: ["bindingCount"],
+    requireStableId: true,
+    scope: "Generated structured Defold-value operation descriptors and native adapters.",
+  }),
+  Object.freeze({
+    input: "scriptFixedTuples",
+    lane: "script-fixed-tuples",
+    surface: "script",
+    schemaVersion: 1,
+    collection: "bindings",
+    countPath: ["bindingCount"],
+    requireStableId: true,
+    scope: "Generated fixed-tuple codecs and target dispositions.",
+  }),
+  Object.freeze({
+    input: "scriptDynamicValues",
+    lane: "script-dynamic-values",
+    surface: "script",
+    schemaVersion: 1,
+    collection: "bindings",
+    countPath: ["routeCount"],
+    requireStableId: true,
+    scope: "Generated dynamic-value candidate descriptors and focused native evidence.",
+  }),
+  Object.freeze({
+    input: "scriptValueTail",
+    lane: "script-value-tail",
+    surface: "script",
+    schemaVersion: 1,
+    collection: "bindings",
+    countPath: ["routeCount"],
+    requireStableId: true,
+    scope: "Generated remaining Defold-value family descriptors and blockers.",
+  }),
+  Object.freeze({
+    input: "scriptOverloadDispatch",
+    lane: "script-overload-dispatch",
+    surface: "script",
+    schemaVersion: 1,
+    collection: "bindings",
+    countPath: ["routeCount"],
+    requireStableId: true,
+    scope: "Generated overload classifiers and target dispositions.",
+  }),
+  Object.freeze({
+    input: "scriptTableRecords",
+    lane: "script-table-records",
+    surface: "script",
+    schemaVersion: 1,
+    collection: "bindings",
+    countPath: ["candidateCount"],
+    requireStableId: true,
+    scope: "Generated fixed-record codecs and required-context claims.",
+  }),
+  Object.freeze({
+    input: "scriptCallbackLifecycle",
+    lane: "script-callback-lifecycle",
+    surface: "script",
+    schemaVersion: 1,
+    collection: "routes",
+    countPath: ["routeCount"],
+    requireStableId: true,
+    scope: "Generated callback lifecycle contracts and registry eligibility.",
+  }),
+  Object.freeze({
+    input: "scriptCopiedValueBlockers",
+    lane: "script-copied-value-blockers",
+    surface: "script",
+    schemaVersion: 1,
+    collection: "routes",
+    countPath: ["routeCount"],
+    requireStableId: true,
+    scope: "Source-pinned copied-value blockers.",
+  }),
+  Object.freeze({
+    input: "scriptOpaqueRecordBlockers",
+    lane: "script-opaque-record-blockers",
+    surface: "script",
+    schemaVersion: 1,
+    collection: "routes",
+    countPath: ["routeCount"],
+    requireStableId: true,
+    scope: "Source-pinned opaque-record blockers.",
+  }),
+  Object.freeze({
+    input: "scriptUrlAddress",
+    lane: "script-url-dispatch",
+    surface: "script",
+    schemaVersion: 1,
+    collection: "rows",
+    countPath: ["routeCount"],
+    requireStableId: true,
+    scope: "Generated URL/address codecs and captured-instance dispatch identities.",
+  }),
+  Object.freeze({
+    input: "dmsdkScalarThunks",
+    lane: "dmsdk-scalar-thunks",
+    surface: "dmsdk",
+    schemaVersion: 2,
+    collection: "declarations",
+    countPath: ["coverage", "reviewed"],
+    scope: "Generated scalar C ABI, target adapters, and staged verification claims.",
+  }),
+  Object.freeze({
+    input: "dmsdkEnumValues",
+    lane: "dmsdk-enum-values",
+    surface: "dmsdk",
+    schemaVersion: 1,
+    collection: "declarations",
+    countPath: ["coverage", "discovered"],
+    scope: "Generated enum-domain value bindings and staged verification claims.",
+  }),
+  Object.freeze({
+    input: "dmsdkNamedScalars",
+    lane: "dmsdk-named-scalars",
+    surface: "dmsdk",
+    schemaVersion: 1,
+    collection: "declarations",
+    countPath: ["coverage", "reviewed"],
+    scope: "Generated or policy-blocked named-scalar bindings.",
+  }),
+  Object.freeze({
+    input: "dmsdkFixedDigests",
+    lane: "dmsdk-fixed-digests",
+    surface: "dmsdk",
+    schemaVersion: 1,
+    collection: "declarations",
+    countPath: ["coverage", "structurallyEligible"],
+    scope: "Generated or universally retained fixed-output digest span bindings.",
+  }),
+  Object.freeze({
+    input: "dmsdkBase64Spans",
+    lane: "dmsdk-base64-spans",
+    surface: "dmsdk",
+    schemaVersion: 1,
+    collection: "declarations",
+    countPath: ["coverage", "structurallyEligible"],
+    scope: "Generated or universally retained bounded Base64 span bindings.",
+  }),
+  Object.freeze({
+    input: "dmsdkAstcProbes",
+    lane: "dmsdk-astc-probes",
+    surface: "dmsdk",
+    schemaVersion: 1,
+    collection: "declarations",
+    countPath: ["coverage", "structurallyEligible"],
+    scope: "Generated or universally retained bounded ASTC inspection bindings.",
+  }),
+  Object.freeze({
+    input: "dmsdkXteaSpans",
+    lane: "dmsdk-xtea-spans",
+    surface: "dmsdk",
+    schemaVersion: 1,
+    collection: "declarations",
+    countPath: ["coverage", "structurallyEligible"],
+    scope: "Generated or universally retained bounded XTEA span bindings.",
+  }),
+  Object.freeze({
+    input: "dmsdkHashSpans",
+    lane: "dmsdk-hash-spans",
+    surface: "dmsdk",
+    schemaVersion: 1,
+    collection: "declarations",
+    countPath: ["coverage", "structurallyEligible"],
+    scope: "Generated or universally retained bounded hash span bindings.",
+  }),
+  Object.freeze({
+    input: "dmsdkArenaSpanBlockers",
+    lane: "dmsdk-arena-span-blockers",
+    surface: "dmsdk",
+    schemaVersion: 1,
+    collection: "declarations",
+    countPath: ["coverage", "blocked"],
+    scope: "Generated explicit blockers for unresolved arena/span declarations.",
+  }),
 ]);
 
 const allowedEvidenceStatuses = new Set([
@@ -351,7 +547,7 @@ const allowedEvidenceStatuses = new Set([
   "100000-warmed-dispatch-zero-cpp-allocations",
   "100000-warmed-canonical-dispatch-zero-cpp-operator-new",
   "100000-warmed-dispatch-zero-cpp-operator-new",
-  "100000-warmed-dispatch-zero-cpp-operator-new-with-reverse-hashing-default-disabled"
+  "100000-warmed-dispatch-zero-cpp-operator-new-with-reverse-hashing-default-disabled",
 ]);
 
 const allowedTargetClaimStatuses = new Set([
@@ -375,7 +571,7 @@ const allowedTargetClaimStatuses = new Set([
   "not-integrated-fail-closed",
   "blocked-render-target-table-and-resource-lifetime-codecs",
   "blocked-box2d-handle-and-structured-fixture-codecs",
-  "fail-closed-unverified"
+  "fail-closed-unverified",
 ]);
 
 function valueAtPath(value, path) {
@@ -388,26 +584,36 @@ function normalizedEvidenceClaims(value, context) {
     if (!allowedEvidenceStatuses.has(value)) throw new Error(`${context}: unsupported evidence status '${value}'`);
     return value;
   }
-  if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error(`${context}: malformed evidence claims`);
-  return Object.fromEntries(Object.entries(value).sort(([left], [right]) => compareCodeUnits(left, right)).map(([stage, claim]) => {
-    const status = typeof claim === "string" ? claim : claim?.status;
-    if (typeof status !== "string" || !allowedEvidenceStatuses.has(status)) {
-      throw new Error(`${context}/${stage}: unsupported evidence status '${String(status)}'`);
-    }
-    return [stage, status];
-  }));
+  if (!value || typeof value !== "object" || Array.isArray(value))
+    throw new Error(`${context}: malformed evidence claims`);
+  return Object.fromEntries(
+    Object.entries(value)
+      .sort(([left], [right]) => compareCodeUnits(left, right))
+      .map(([stage, claim]) => {
+        const status = typeof claim === "string" ? claim : claim?.status;
+        if (typeof status !== "string" || !allowedEvidenceStatuses.has(status)) {
+          throw new Error(`${context}/${stage}: unsupported evidence status '${String(status)}'`);
+        }
+        return [stage, status];
+      }),
+  );
 }
 
 function normalizedTargetClaims(value, context) {
   if (value === undefined) return undefined;
-  if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error(`${context}: malformed target claims`);
-  return Object.fromEntries(Object.entries(value).sort(([left], [right]) => compareCodeUnits(left, right)).map(([target, claim]) => {
-    const status = typeof claim === "string" ? claim : claim?.status;
-    if (typeof status !== "string" || !allowedTargetClaimStatuses.has(status)) {
-      throw new Error(`${context}/${target}: unsupported target status '${String(status)}'`);
-    }
-    return [target, status];
-  }));
+  if (!value || typeof value !== "object" || Array.isArray(value))
+    throw new Error(`${context}: malformed target claims`);
+  return Object.fromEntries(
+    Object.entries(value)
+      .sort(([left], [right]) => compareCodeUnits(left, right))
+      .map(([target, claim]) => {
+        const status = typeof claim === "string" ? claim : claim?.status;
+        if (typeof status !== "string" || !allowedTargetClaimStatuses.has(status)) {
+          throw new Error(`${context}/${target}: unsupported target status '${String(status)}'`);
+        }
+        return [target, status];
+      }),
+  );
 }
 
 function selectDefined(source, names) {
@@ -426,17 +632,32 @@ function normalizedStableId(value, context) {
 
 function genericImplementationRecord(definition, entry, reportRow) {
   const reportState = selectDefined(entry, [
-    "disposition", "emitted", "executableStatus", "generatedFamilyExecutableCandidate",
-    "registryEligible", "blocker", "blockers", "tranche", "family", "backend"
+    "disposition",
+    "emitted",
+    "executableStatus",
+    "generatedFamilyExecutableCandidate",
+    "registryEligible",
+    "blocker",
+    "blockers",
+    "tranche",
+    "family",
+    "backend",
   ]);
   const generationIdentity = selectDefined(entry, [
-    "stableId", "bindingId", "wrapper", "enumName", "operation", "strategy",
-    "resultCodec", "requiredContext", "context"
+    "stableId",
+    "bindingId",
+    "wrapper",
+    "enumName",
+    "operation",
+    "strategy",
+    "resultCodec",
+    "requiredContext",
+    "context",
   ]);
   const targetClaims = normalizedTargetClaims(entry.targetSupport ?? entry.targets, `${definition.lane}/${entry.id}`);
   const evidenceClaims = normalizedEvidenceClaims(
     entry.stages ?? entry.evidence?.stages ?? entry.focusedNativeEvidence,
-    `${definition.lane}/${entry.id}`
+    `${definition.lane}/${entry.id}`,
   );
   return {
     lane: definition.lane,
@@ -444,12 +665,19 @@ function genericImplementationRecord(definition, entry, reportRow) {
     reportState,
     generationIdentity,
     ...(targetClaims !== undefined ? { targetClaims } : {}),
-    ...(evidenceClaims !== undefined ? { evidenceClaims } : {})
+    ...(evidenceClaims !== undefined ? { evidenceClaims } : {}),
   };
 }
 
 function implementationLaneIndex(units, inputs, defoldRevision) {
-  const { scriptHandleLowering, scriptUniversalValue, scriptConstantLowering, dmsdkUniversal, dmsdkCStringValue, dmsdkBorrowedHandle } = inputs;
+  const {
+    scriptHandleLowering,
+    scriptUniversalValue,
+    scriptConstantLowering,
+    dmsdkUniversal,
+    dmsdkCStringValue,
+    dmsdkBorrowedHandle,
+  } = inputs;
   const unitsById = new Map(units.map((unit) => [unit.identity.id, unit]));
   const lanes = new Map(units.map((unit) => [unit.identity.id, []]));
   const laneIds = new Set();
@@ -463,7 +691,9 @@ function implementationLaneIndex(units, inputs, defoldRevision) {
     const existing = lanes.get(unitId);
     const existingSpecialized = existing.find(({ lane }) => !fallbackLanes.has(lane));
     if (existingSpecialized && !fallbackLanes.has(implementation.lane)) {
-      throw new Error(`${unitId}: implementation lane overlap between ${existingSpecialized.lane} and ${implementation.lane}`);
+      throw new Error(
+        `${unitId}: implementation lane overlap between ${existingSpecialized.lane} and ${implementation.lane}`,
+      );
     }
     laneIds.add(key);
     const fallback = existing.find(({ lane }) => fallbackLanes.has(lane));
@@ -474,14 +704,18 @@ function implementationLaneIndex(units, inputs, defoldRevision) {
     return unit;
   }
 
-  if (scriptUniversalValue.schemaVersion !== 1 ||
-      scriptUniversalValue.defoldRevision !== defoldRevision ||
-      scriptUniversalValue.bindings.length !== scriptUniversalValue.candidateCount) {
+  if (
+    scriptUniversalValue.schemaVersion !== 1 ||
+    scriptUniversalValue.defoldRevision !== defoldRevision ||
+    scriptUniversalValue.bindings.length !== scriptUniversalValue.candidateCount
+  ) {
     throw new Error("Script universal-value implementation lane schema, revision, or census drifted");
   }
-  if (scriptConstantLowering.schemaVersion !== 1 ||
-      scriptConstantLowering.defoldRevision !== defoldRevision ||
-      scriptConstantLowering.entries.length !== scriptConstantLowering.counts.total) {
+  if (
+    scriptConstantLowering.schemaVersion !== 1 ||
+    scriptConstantLowering.defoldRevision !== defoldRevision ||
+    scriptConstantLowering.entries.length !== scriptConstantLowering.counts.total
+  ) {
     throw new Error("Script constant-lowering implementation lane schema, revision, or census drifted");
   }
   for (let reportRow = 0; reportRow < scriptUniversalValue.bindings.length; ++reportRow) {
@@ -496,7 +730,7 @@ function implementationLaneIndex(units, inputs, defoldRevision) {
         minimumArgumentCount: binding.minimumArgumentCount,
         maximumArgumentCount: binding.maximumArgumentCount,
         minimumResultCount: binding.minimumResultCount,
-        maximumResultCount: binding.maximumResultCount
+        maximumResultCount: binding.maximumResultCount,
       },
       shapeKinds: binding.shapeKinds,
       defoldValueTypes: binding.defoldValueTypes,
@@ -505,19 +739,21 @@ function implementationLaneIndex(units, inputs, defoldRevision) {
       browserCallback: binding.browserCallback ?? null,
       targetClaims: scriptUniversalValue.targetSupport,
       evidenceBoundary: scriptUniversalValue.evidenceBoundary,
-      supersededLanes: []
+      supersededLanes: [],
     });
     if (unit.identity.surface !== "script" || unit.identity.stableId !== binding.stableId) {
       throw new Error(`script-universal-value: identity drift for ${binding.id}`);
     }
   }
 
-  if (dmsdkUniversal.schemaVersion !== 1 ||
-      dmsdkUniversal.defoldRevision !== defoldRevision ||
-      dmsdkUniversal.coverage.declarations !== dmsdkUniversal.recipes.length ||
-      dmsdkUniversal.coverage.recipes !== dmsdkUniversal.recipes.length ||
-      dmsdkUniversal.coverage.silentlyOmitted !== 0 ||
-      dmsdkUniversal.recipes.length !== units.filter(({ identity }) => identity.surface === "dmsdk").length) {
+  if (
+    dmsdkUniversal.schemaVersion !== 1 ||
+    dmsdkUniversal.defoldRevision !== defoldRevision ||
+    dmsdkUniversal.coverage.declarations !== dmsdkUniversal.recipes.length ||
+    dmsdkUniversal.coverage.recipes !== dmsdkUniversal.recipes.length ||
+    dmsdkUniversal.coverage.silentlyOmitted !== 0 ||
+    dmsdkUniversal.recipes.length !== units.filter(({ identity }) => identity.surface === "dmsdk").length
+  ) {
     throw new Error("dmSDK universal implementation lane schema, revision, or census drifted");
   }
   for (let reportRow = 0; reportRow < dmsdkUniversal.recipes.length; ++reportRow) {
@@ -533,17 +769,16 @@ function implementationLaneIndex(units, inputs, defoldRevision) {
         symbol: recipe.symbol,
         declarationKind: recipe.declarationKind,
         argumentCount: recipe.abi.argumentCount,
-        resultKind: recipe.abi.resultKind
+        resultKind: recipe.abi.resultKind,
       },
       invocation: recipe.invocation,
       abi: recipe.abi,
       targets: recipe.targets,
       preferredLowering: recipe.preferredLowering,
       fallback: recipe.fallback,
-      supersededLanes: []
+      supersededLanes: [],
     });
-    if (unit.identity.surface !== "dmsdk" ||
-        unit.identity.projectionId !== recipe.projectionId) {
+    if (unit.identity.surface !== "dmsdk" || unit.identity.projectionId !== recipe.projectionId) {
       throw new Error(`dmsdk-universal: identity drift for ${recipe.declarationId}`);
     }
   }
@@ -569,9 +804,11 @@ function implementationLaneIndex(units, inputs, defoldRevision) {
         throw new Error(`${definition.lane}: row ${reportRow} has no API identity`);
       }
       const existing = lanes.get(entry.id);
-      if (existing.length > 0 && existing[0].lane === "script-universal-value" &&
-          (definition.lane === "script-copied-value-blockers" ||
-           definition.lane === "script-opaque-record-blockers")) {
+      if (
+        existing.length > 0 &&
+        existing[0].lane === "script-universal-value" &&
+        (definition.lane === "script-copied-value-blockers" || definition.lane === "script-opaque-record-blockers")
+      ) {
         existing[0].supersededLanes.push(definition.lane);
         continue;
       }
@@ -597,9 +834,10 @@ function implementationLaneIndex(units, inputs, defoldRevision) {
     const unit = add(route.id, {
       lane: "script-handle-lowering",
       disposition: route.generation.router === "emitted" ? "generated-private-runtime" : "blocked",
-      semanticState: route.generation.router === "emitted"
-        ? "generated-contract-retains-declared-policy-holes"
-        : "blocked-by-declared-target-or-context-policy",
+      semanticState:
+        route.generation.router === "emitted"
+          ? "generated-contract-retains-declared-policy-holes"
+          : "blocked-by-declared-target-or-context-policy",
       contract: {
         context: route.context,
         ownership: route.ownership,
@@ -608,11 +846,11 @@ function implementationLaneIndex(units, inputs, defoldRevision) {
         callback: route.callback,
         variadic: route.variadic,
         recursive: route.recursive,
-        profiles: route.profiles
+        profiles: route.profiles,
       },
       targets: route.targets,
       generation: route.generation,
-      evidence: route.evidence
+      evidence: route.evidence,
     });
     if (unit.identity.surface !== "script" || unit.identity.stableId !== route.stableId) {
       throw new Error(`script-handle-lowering: identity drift for ${route.id}`);
@@ -623,11 +861,13 @@ function implementationLaneIndex(units, inputs, defoldRevision) {
     throw new Error("dmSDK C-string implementation lane schema or Defold revision drifted");
   }
 
-  if (dmsdkBorrowedHandle.schemaVersion !== 2 ||
-      dmsdkBorrowedHandle.defoldRevision !== defoldRevision ||
-      dmsdkBorrowedHandle.declarations.length !== dmsdkBorrowedHandle.coverage.candidates ||
-      dmsdkBorrowedHandle.coverage.generated + dmsdkBorrowedHandle.coverage.blocked !==
-        dmsdkBorrowedHandle.coverage.candidates) {
+  if (
+    dmsdkBorrowedHandle.schemaVersion !== 2 ||
+    dmsdkBorrowedHandle.defoldRevision !== defoldRevision ||
+    dmsdkBorrowedHandle.declarations.length !== dmsdkBorrowedHandle.coverage.candidates ||
+    dmsdkBorrowedHandle.coverage.generated + dmsdkBorrowedHandle.coverage.blocked !==
+      dmsdkBorrowedHandle.coverage.candidates
+  ) {
     throw new Error("dmSDK borrowed-handle implementation lane schema, revision, or census drifted");
   }
   for (let reportRow = 0; reportRow < dmsdkBorrowedHandle.declarations.length; ++reportRow) {
@@ -645,15 +885,10 @@ function implementationLaneIndex(units, inputs, defoldRevision) {
         : "blocked-by-structural-or-semantic-policy",
       generationIdentity: selectDefined(declaration, ["projectionId", "bindingId", "symbol", "shape"]),
       blockers: declaration.blockers ?? declaration.engineProviderBlockers,
-      ...(declaration.resolvedPolicies !== undefined
-        ? { resolvedPolicies: declaration.resolvedPolicies }
-        : {}),
-      ...(declaration.stages !== undefined
-        ? { evidenceClaims: declaration.stages }
-        : {})
+      ...(declaration.resolvedPolicies !== undefined ? { resolvedPolicies: declaration.resolvedPolicies } : {}),
+      ...(declaration.stages !== undefined ? { evidenceClaims: declaration.stages } : {}),
     });
-    if (unit.identity.surface !== "dmsdk" ||
-        unit.identity.projectionId !== declaration.projectionId) {
+    if (unit.identity.surface !== "dmsdk" || unit.identity.projectionId !== declaration.projectionId) {
       throw new Error(`dmsdk-borrowed-handle: identity drift for ${declaration.id}`);
     }
   }
@@ -664,23 +899,24 @@ function implementationLaneIndex(units, inputs, defoldRevision) {
     const unit = add(declaration.id, {
       lane: "dmsdk-cstring-value",
       disposition: declaration.disposition === "generated" ? "generated-private-staging" : "blocked",
-      semanticState: declaration.disposition === "generated"
-        ? "explicit-string-contract-private-unlinked"
-        : "blocked-by-declared-string-policy",
+      semanticState:
+        declaration.disposition === "generated"
+          ? "explicit-string-contract-private-unlinked"
+          : "blocked-by-declared-string-policy",
       contract: declaration.stringContract,
       targets: declaration.targetDisposition,
       generation: {
         stableId: declaration.stableId,
-        denseId: declaration.denseId
+        denseId: declaration.denseId,
       },
       evidence: {
         generation: declaration.disposition === "generated" ? "source-emitted" : "not-emitted",
         compilation: "report-level-only",
         linkage: "unclaimed-by-canonical-plan",
         runtime: "unclaimed-by-canonical-plan",
-        conformance: "unclaimed-by-canonical-plan"
+        conformance: "unclaimed-by-canonical-plan",
       },
-      ...(declaration.blocker ? { blocker: declaration.blocker } : {})
+      ...(declaration.blocker ? { blocker: declaration.blocker } : {}),
     });
     if (unit.identity.surface !== "dmsdk" || unit.identity.projectionId !== declaration.projectionId) {
       throw new Error(`dmsdk-cstring-value: identity drift for ${declaration.id}`);
@@ -689,21 +925,26 @@ function implementationLaneIndex(units, inputs, defoldRevision) {
 
   for (const unit of units) {
     if (lanes.get(unit.identity.id).length > 0) continue;
-    add(unit.identity.id, unit.identity.surface === "script" ? {
-      lane: "script-projection-only",
-      disposition: "projection-only",
-      semanticState: "awaits-generated-adapter-or-explicit-blocker-policy",
-      loweringFamily: unit.sourceState.loweringFamily,
-      accountingCategory: unit.sourceState.accountingCategory,
-      unresolvedTokens: unit.unresolvedTokens
-    } : {
-      lane: "dmsdk-projection-only",
-      disposition: "projection-only",
-      semanticState: "awaits-generated-adapter-or-explicit-blocker-policy",
-      loweringFamily: unit.sourceState.loweringFamily,
-      loweringState: unit.sourceState.loweringState,
-      unresolvedTokens: unit.unresolvedTokens
-    });
+    add(
+      unit.identity.id,
+      unit.identity.surface === "script"
+        ? {
+            lane: "script-projection-only",
+            disposition: "projection-only",
+            semanticState: "awaits-generated-adapter-or-explicit-blocker-policy",
+            loweringFamily: unit.sourceState.loweringFamily,
+            accountingCategory: unit.sourceState.accountingCategory,
+            unresolvedTokens: unit.unresolvedTokens,
+          }
+        : {
+            lane: "dmsdk-projection-only",
+            disposition: "projection-only",
+            semanticState: "awaits-generated-adapter-or-explicit-blocker-policy",
+            loweringFamily: unit.sourceState.loweringFamily,
+            loweringState: unit.sourceState.loweringState,
+            unresolvedTokens: unit.unresolvedTokens,
+          },
+    );
   }
 
   for (const implementations of lanes.values()) {
@@ -718,8 +959,16 @@ function implementationLaneIndex(units, inputs, defoldRevision) {
 }
 
 function selectorMatches(unit, selector) {
-  const supported = new Set(["surface", "valueKindsAll", "valueKindsAny", "contexts", "semanticTokensAll",
-    "semanticTokensAny", "linkage", "availabilityKinds"]);
+  const supported = new Set([
+    "surface",
+    "valueKindsAll",
+    "valueKindsAny",
+    "contexts",
+    "semanticTokensAll",
+    "semanticTokensAny",
+    "linkage",
+    "availabilityKinds",
+  ]);
   for (const key of Object.keys(selector)) {
     if (!supported.has(key)) throw new Error(`Semantic policy uses unsupported or identity selector '${key}'`);
   }
@@ -750,54 +999,76 @@ function selectorMatches(unit, selector) {
  */
 export function deriveConformanceVocabulary(policies, targetConditionals) {
   const vocabulary = policies?.conformanceVocabulary;
-  if (!vocabulary || vocabulary.schemaVersion !== 1 || !vocabulary.fallback ||
-      !Array.isArray(vocabulary.contextRows) || !Array.isArray(vocabulary.targetRows)) {
+  if (
+    !vocabulary ||
+    vocabulary.schemaVersion !== 1 ||
+    !vocabulary.fallback ||
+    !Array.isArray(vocabulary.contextRows) ||
+    !Array.isArray(vocabulary.targetRows)
+  ) {
     throw new Error("Semantic policy has no valid conformance vocabulary");
   }
-  if (typeof vocabulary.fallback.context !== "string" || vocabulary.fallback.context.length === 0 ||
-      typeof vocabulary.fallback.targetReason !== "string" || vocabulary.fallback.targetReason.length === 0) {
+  if (
+    typeof vocabulary.fallback.context !== "string" ||
+    vocabulary.fallback.context.length === 0 ||
+    typeof vocabulary.fallback.targetReason !== "string" ||
+    vocabulary.fallback.targetReason.length === 0
+  ) {
     throw new Error("Conformance vocabulary fallback is incomplete");
   }
-  const normalizeRows = (rows, kind) => rows.map((row, index) => {
-    if (!row || typeof row !== "object" || Array.isArray(row) || typeof row.id !== "string" ||
-        !["script", "dmsdk"].includes(row.surface) || !row.match || typeof row.match !== "object" ||
-        !Array.isArray(row.contexts ?? row.targetIds ?? row.targetGroups)) {
-      throw new Error(`Conformance ${kind} row ${index} is malformed`);
-    }
-    const match = row.match;
-    const moduleRoots = match.moduleRoots ?? [];
-    const namePrefixes = match.namePrefixes ?? [];
-    if (!Array.isArray(moduleRoots) || !Array.isArray(namePrefixes) ||
-        (moduleRoots.length === 0 && namePrefixes.length === 0) ||
-        moduleRoots.some((value) => typeof value !== "string" || value.length === 0) ||
-        namePrefixes.some((value) => typeof value !== "string" || value.length === 0)) {
-      throw new Error(`Conformance ${kind} row ${row.id} has an invalid matcher`);
-    }
-    const contexts = row.contexts ? [...new Set(row.contexts)].sort(compareCodeUnits) : undefined;
-    const targetIds = row.targetIds ? [...new Set(row.targetIds)].sort(compareCodeUnits) : undefined;
-    const targetGroups = row.targetGroups ? [...new Set(row.targetGroups)].sort(compareCodeUnits) : undefined;
-    if (kind === "context" && (!contexts?.length || targetIds || targetGroups)) {
-      throw new Error(`Conformance context row ${row.id} has invalid result fields`);
-    }
-    if (kind === "target" && (!targetIds?.length && !targetGroups?.length || contexts)) {
-      throw new Error(`Conformance target row ${row.id} has invalid result fields`);
-    }
-    if (typeof row.evidence !== "string" || row.evidence.length === 0) {
-      throw new Error(`Conformance ${kind} row ${row.id} has no evidence label`);
-    }
-    return {
-      id: row.id,
-      surface: row.surface,
-      match: {
-        ...(moduleRoots.length ? { moduleRoots: [...new Set(moduleRoots)].sort(compareCodeUnits) } : {}),
-        ...(namePrefixes.length ? { namePrefixes: [...new Set(namePrefixes)].sort(compareCodeUnits) } : {})
-      },
-      ...(contexts ? { contexts } : {}),
-      ...(targetIds ? { targetIds } : {}),
-      ...(targetGroups ? { targetGroups } : {}),
-      evidence: row.evidence
-    };
-  }).sort((left, right) => compareCodeUnits(left.id, right.id));
+  const normalizeRows = (rows, kind) =>
+    rows
+      .map((row, index) => {
+        if (
+          !row ||
+          typeof row !== "object" ||
+          Array.isArray(row) ||
+          typeof row.id !== "string" ||
+          !["script", "dmsdk"].includes(row.surface) ||
+          !row.match ||
+          typeof row.match !== "object" ||
+          !Array.isArray(row.contexts ?? row.targetIds ?? row.targetGroups)
+        ) {
+          throw new Error(`Conformance ${kind} row ${index} is malformed`);
+        }
+        const match = row.match;
+        const moduleRoots = match.moduleRoots ?? [];
+        const namePrefixes = match.namePrefixes ?? [];
+        if (
+          !Array.isArray(moduleRoots) ||
+          !Array.isArray(namePrefixes) ||
+          (moduleRoots.length === 0 && namePrefixes.length === 0) ||
+          moduleRoots.some((value) => typeof value !== "string" || value.length === 0) ||
+          namePrefixes.some((value) => typeof value !== "string" || value.length === 0)
+        ) {
+          throw new Error(`Conformance ${kind} row ${row.id} has an invalid matcher`);
+        }
+        const contexts = row.contexts ? [...new Set(row.contexts)].sort(compareCodeUnits) : undefined;
+        const targetIds = row.targetIds ? [...new Set(row.targetIds)].sort(compareCodeUnits) : undefined;
+        const targetGroups = row.targetGroups ? [...new Set(row.targetGroups)].sort(compareCodeUnits) : undefined;
+        if (kind === "context" && (!contexts?.length || targetIds || targetGroups)) {
+          throw new Error(`Conformance context row ${row.id} has invalid result fields`);
+        }
+        if (kind === "target" && ((!targetIds?.length && !targetGroups?.length) || contexts)) {
+          throw new Error(`Conformance target row ${row.id} has invalid result fields`);
+        }
+        if (typeof row.evidence !== "string" || row.evidence.length === 0) {
+          throw new Error(`Conformance ${kind} row ${row.id} has no evidence label`);
+        }
+        return {
+          id: row.id,
+          surface: row.surface,
+          match: {
+            ...(moduleRoots.length ? { moduleRoots: [...new Set(moduleRoots)].sort(compareCodeUnits) } : {}),
+            ...(namePrefixes.length ? { namePrefixes: [...new Set(namePrefixes)].sort(compareCodeUnits) } : {}),
+          },
+          ...(contexts ? { contexts } : {}),
+          ...(targetIds ? { targetIds } : {}),
+          ...(targetGroups ? { targetGroups } : {}),
+          evidence: row.evidence,
+        };
+      })
+      .sort((left, right) => compareCodeUnits(left.id, right.id));
   const contextRows = normalizeRows(vocabulary.contextRows, "context");
   const targetRows = normalizeRows(vocabulary.targetRows, "target");
   if (new Set([...contextRows, ...targetRows].map(({ id }) => id)).size !== contextRows.length + targetRows.length) {
@@ -806,13 +1077,20 @@ export function deriveConformanceVocabulary(policies, targetConditionals) {
   if (targetConditionals?.schemaVersion !== 1 || !Array.isArray(targetConditionals.targets)) {
     throw new Error("dmSDK target conditionals have no generated target census");
   }
-  const targets = targetConditionals.targets.map((row, index) => {
-    if (!row || typeof row.target !== "string" || row.target.length === 0 ||
-        typeof row.group !== "string" || row.group.length === 0) {
-      throw new Error(`dmSDK target conditional row ${index} is malformed`);
-    }
-    return { target: row.target, group: row.group };
-  }).sort((left, right) => compareCodeUnits(left.target, right.target));
+  const targets = targetConditionals.targets
+    .map((row, index) => {
+      if (
+        !row ||
+        typeof row.target !== "string" ||
+        row.target.length === 0 ||
+        typeof row.group !== "string" ||
+        row.group.length === 0
+      ) {
+        throw new Error(`dmSDK target conditional row ${index} is malformed`);
+      }
+      return { target: row.target, group: row.group };
+    })
+    .sort((left, right) => compareCodeUnits(left.target, right.target));
   if (new Set(targets.map(({ target }) => target)).size !== targets.length) {
     throw new Error("dmSDK target conditional target IDs must be unique");
   }
@@ -820,16 +1098,17 @@ export function deriveConformanceVocabulary(policies, targetConditionals) {
     schemaVersion: 1,
     fallback: {
       context: vocabulary.fallback.context,
-      targetReason: vocabulary.fallback.targetReason
+      targetReason: vocabulary.fallback.targetReason,
     },
     contextRows,
     targetRows,
-    targets
+    targets,
   };
 }
 
 function applySemanticPolicies(units, policies) {
-  if (policies.schemaVersion !== 1 || !Array.isArray(policies.rules)) throw new Error("Invalid semantic policy catalog");
+  if (policies.schemaVersion !== 1 || !Array.isArray(policies.rules))
+    throw new Error("Invalid semantic policy catalog");
   const resolutions = new Map();
   const ruleMatches = {};
   for (const rule of policies.rules) {
@@ -842,8 +1121,10 @@ function applySemanticPolicies(units, policies) {
       matches += 1;
       const unitResolutions = resolutions.get(unit.identity.id) ?? new Map();
       for (const [token, decision] of Object.entries(rule.resolves)) {
-        if (!unit.unresolvedTokens.includes(token)) throw new Error(`${rule.id} resolves absent token '${token}' on ${unit.identity.id}`);
-        if (unitResolutions.has(token)) throw new Error(`${unit.identity.id}: semantic policies overlap for '${token}'`);
+        if (!unit.unresolvedTokens.includes(token))
+          throw new Error(`${rule.id} resolves absent token '${token}' on ${unit.identity.id}`);
+        if (unitResolutions.has(token))
+          throw new Error(`${unit.identity.id}: semantic policies overlap for '${token}'`);
         unitResolutions.set(token, { rule: rule.id, decision });
       }
       resolutions.set(unit.identity.id, unitResolutions);
@@ -861,9 +1142,11 @@ function applySemanticPolicies(units, policies) {
  */
 function transparentValueTypes(target, layouts) {
   const supported = new Set(target.transparentValueTransports ?? []);
-  return new Set(Object.entries(layouts.transparent)
-    .filter(([, layout]) => supported.has(layout.transport))
-    .map(([name]) => name));
+  return new Set(
+    Object.entries(layouts.transparent)
+      .filter(([, layout]) => supported.has(layout.transport))
+      .map(([name]) => name),
+  );
 }
 
 // Static Hermes can safely claim an optional callback-shaped route when the
@@ -911,59 +1194,66 @@ function backendRecord(unit, target, resolutions, implementationLanes, valueType
   const resolved = new Map(resolutions.get(unit.identity.id) ?? []);
   const implementations = implementationLanes.get(unit.identity.id) ?? [];
   const universalImplementation = implementations.find(({ lane }) => lane === "script-universal-value");
-  const higherOrderClosure = unit.shapeKinds.includes("callback") &&
-    universalImplementation?.browserCallback?.registryEligible === false;
-  const unsupportedHigherOrderClosure = higherOrderClosure &&
-    target.target !== "dynamicHermesJsi";
-  const universalCallbackTransport = !unit.shapeKinds.includes("callback") ||
-    universalImplementation?.browserCallback?.registryEligible === true;
-  const optionalCallbackTransport = target.target === "staticHermesCAbi" &&
-    staticOptionalCallbackTransport(unit.publicSignature);
+  const higherOrderClosure =
+    unit.shapeKinds.includes("callback") && universalImplementation?.browserCallback?.registryEligible === false;
+  const unsupportedHigherOrderClosure = higherOrderClosure && target.target !== "dynamicHermesJsi";
+  const universalCallbackTransport =
+    !unit.shapeKinds.includes("callback") || universalImplementation?.browserCallback?.registryEligible === true;
+  const optionalCallbackTransport =
+    target.target === "staticHermesCAbi" && staticOptionalCallbackTransport(unit.publicSignature);
   const opaqueShapeKinds = new Set(target.opaqueShapeKinds ?? []);
   // The generated GUI structured family owns a bounded generation-checked
   // node adapter.  It is selected by context plus value shape and the
   // generator-owned operation template, never by a route-name allowlist.
-  const guiNodeOperation = universalImplementation?.browserCallback?.owner === "gui-node-flipbook" ||
-    implementations.some(({ lane, generationIdentity }) =>
-      lane === "script-value-bindings" &&
-      ["gui-node-lookup", "gui-node-setter", "gui-node-text-set"].includes(
-        generationIdentity?.operation?.template));
+  const guiNodeOperation =
+    universalImplementation?.browserCallback?.owner === "gui-node-flipbook" ||
+    implementations.some(
+      ({ lane, generationIdentity }) =>
+        lane === "script-value-bindings" &&
+        ["gui-node-lookup", "gui-node-setter", "gui-node-text-set"].includes(generationIdentity?.operation?.template),
+    );
   const guiContext = unit.resolvedContract.context?.token ?? unit.resolvedContract.context;
-  const guiNodeStaticAdapter = target.target === "staticHermesCAbi" &&
+  const guiNodeStaticAdapter =
+    target.target === "staticHermesCAbi" &&
     unit.identity.surface === "script" &&
     (guiContext === "active-gui-scene" ||
       (guiContext === "captured-gui-script-instance" &&
         universalImplementation?.browserCallback?.owner === "gui-node-flipbook")) &&
     (universalImplementation?.defoldValueTypes ?? []).includes("node") &&
     guiNodeOperation;
-  const staticTransportBlockers = target.target === "staticHermesCAbi" && universalImplementation
-    ? [...new Set([
-        ...universalImplementation.shapeKinds.filter((kind) => opaqueShapeKinds.has(kind))
-          .filter((kind) => (kind !== "callback" || !optionalCallbackTransport) &&
-            !(guiNodeStaticAdapter && kind === "handle"))
-          .map((kind) => `shape-kind:${kind}`),
-        ...(universalImplementation.defoldValueTypes ?? [])
-          .filter((name) => !valueTypes.has(name) &&
-            !(guiNodeStaticAdapter && name === "node"))
-          .map((name) => `value-type:${name}`)
-      ])].sort(compareCodeUnits)
-    : [];
-  const universalStaticTransport = target.target === "staticHermesCAbi" &&
+  const staticTransportBlockers =
+    target.target === "staticHermesCAbi" && universalImplementation
+      ? [
+          ...new Set([
+            ...universalImplementation.shapeKinds
+              .filter((kind) => opaqueShapeKinds.has(kind))
+              .filter(
+                (kind) =>
+                  (kind !== "callback" || !optionalCallbackTransport) && !(guiNodeStaticAdapter && kind === "handle"),
+              )
+              .map((kind) => `shape-kind:${kind}`),
+            ...(universalImplementation.defoldValueTypes ?? [])
+              .filter((name) => !valueTypes.has(name) && !(guiNodeStaticAdapter && name === "node"))
+              .map((name) => `value-type:${name}`),
+          ]),
+        ].sort(compareCodeUnits)
+      : [];
+  const universalStaticTransport =
+    target.target === "staticHermesCAbi" &&
     Boolean(universalImplementation) &&
     (optionalCallbackTransport || !unit.shapeKinds.includes("callback")) &&
     staticTransportBlockers.length === 0;
-  const universalScriptTarget = Boolean(universalImplementation) && (
-    (target.target === "dynamicHermesJsi" &&
-      (universalCallbackTransport || higherOrderClosure)) ||
-    (target.target === "luaStack" && universalCallbackTransport) ||
-    (target.target === "browserWasmHost" && universalCallbackTransport) ||
-    universalStaticTransport
-  );
+  const universalScriptTarget =
+    Boolean(universalImplementation) &&
+    ((target.target === "dynamicHermesJsi" && (universalCallbackTransport || higherOrderClosure)) ||
+      (target.target === "luaStack" && universalCallbackTransport) ||
+      (target.target === "browserWasmHost" && universalCallbackTransport) ||
+      universalStaticTransport);
   if (universalScriptTarget) {
     for (const token of unit.unresolvedTokens) {
       resolved.set(token, {
         rule: "generated:script-universal-value",
-        decision: "bounded-recursive-captured-lua-adapter"
+        decision: "bounded-recursive-captured-lua-adapter",
       });
     }
   }
@@ -975,8 +1265,11 @@ function backendRecord(unit, target, resolutions, implementationLanes, valueType
   } else if (!target.surfaces.includes(unit.identity.surface)) {
     selection = "blocked-capability";
     blockers.push(`surface:${unit.identity.surface}`);
-  } else if (unit.identity.surface === "script" && unit.availability.runtimeAvailable === false &&
-    !(unit.sourceState.loweringFamily === "script-constant" && universalScriptTarget)) {
+  } else if (
+    unit.identity.surface === "script" &&
+    unit.availability.runtimeAvailable === false &&
+    !(unit.sourceState.loweringFamily === "script-constant" && universalScriptTarget)
+  ) {
     selection = "omit-profile";
     blockers.push("unavailable-in-all-pinned-runtime-profiles");
   } else if (unit.sourceState.accountingCategory === "component-property-compiler") {
@@ -997,11 +1290,12 @@ function backendRecord(unit, target, resolutions, implementationLanes, valueType
   } else if (universalScriptTarget) {
     selection = "emit";
   } else if (unit.identity.surface === "script") {
-    const current = target.target === "dynamicHermesJsi" || target.target === "luaStack"
-      ? unit.sourceState.currentTargets.nativeDynamicHermes.disposition
-      : target.target === "staticHermesCAbi"
-        ? unit.sourceState.currentTargets.nativeStaticHermes.disposition
-        : unit.sourceState.currentTargets.html5BrowserHost.disposition;
+    const current =
+      target.target === "dynamicHermesJsi" || target.target === "luaStack"
+        ? unit.sourceState.currentTargets.nativeDynamicHermes.disposition
+        : target.target === "staticHermesCAbi"
+          ? unit.sourceState.currentTargets.nativeStaticHermes.disposition
+          : unit.sourceState.currentTargets.html5BrowserHost.disposition;
     if (current === "backend-emitted") selection = "emit";
     else {
       selection = "blocked-capability";
@@ -1017,15 +1311,14 @@ function backendRecord(unit, target, resolutions, implementationLanes, valueType
   if (target.runtime && selection === "emit" && unresolved.length > 0) {
     throw new Error(`${unit.identity.id}/${target.target}: runtime emission escaped unresolved semantics`);
   }
-  const program = target.runtime && selection === "emit"
-    ? marshallingProgram(unit.publicSignature, unit.abi.invoker.kind)
-    : [];
+  const program =
+    target.runtime && selection === "emit" ? marshallingProgram(unit.publicSignature, unit.abi.invoker.kind) : [];
   return {
     selection,
     marshallingProgram: program,
     blockers: [...new Set(blockers)].sort(compareCodeUnits),
     resolvedTokens: Object.fromEntries([...resolved].sort(([left], [right]) => compareCodeUnits(left, right))),
-    unresolvedTokens: unresolved
+    unresolvedTokens: unresolved,
   };
 }
 
@@ -1044,7 +1337,7 @@ function compactContract(contract) {
     callback: tokenOf(contract.callback, contract.callback?.present ? "present" : "none"),
     invalidation: tokenOf(contract.invalidation, "unspecified"),
     errorModel: tokenOf(contract.errorModel, "unspecified"),
-    scratch: tokenOf(contract.scratch, "unspecified")
+    scratch: tokenOf(contract.scratch, "unspecified"),
   };
 }
 
@@ -1061,7 +1354,7 @@ function createInterner() {
       values.push(value);
       return index;
     },
-    values
+    values,
   };
 }
 
@@ -1087,29 +1380,35 @@ function compactUnits(units, implementationLanes) {
     abi: unit.abi,
     shapeKinds: unit.shapeKinds,
     unresolvedTokenSet: unresolvedTokenSets.intern(unit.unresolvedTokens),
-    sourceState: unit.identity.surface === "script"
-      ? {
-          loweringFamily: unit.sourceState.loweringFamily,
-          accountingCategory: unit.sourceState.accountingCategory
-        }
-      : {
-          loweringFamily: unit.sourceState.loweringFamily,
-          loweringState: unit.sourceState.loweringState,
-          accountingCategory: unit.sourceState.accountingCategory,
-          linkage: unit.availability?.linkage ?? "unmeasured",
-          availability: unit.availability?.kind ?? "unmeasured"
-        },
+    sourceState:
+      unit.identity.surface === "script"
+        ? {
+            loweringFamily: unit.sourceState.loweringFamily,
+            accountingCategory: unit.sourceState.accountingCategory,
+          }
+        : {
+            loweringFamily: unit.sourceState.loweringFamily,
+            loweringState: unit.sourceState.loweringState,
+            accountingCategory: unit.sourceState.accountingCategory,
+            linkage: unit.availability?.linkage ?? "unmeasured",
+            availability: unit.availability?.kind ?? "unmeasured",
+          },
     implementationSet: implementationSets.intern(implementationLanes.get(unit.identity.id) ?? []),
-    backends: Object.fromEntries(targetOrder.map((target) => {
-      const backend = unit.backends[target];
-      return [target, {
-        selection: backend.selection,
-        marshallingProgram: programs.intern(backend.marshallingProgram),
-        blockerSet: blockerSets.intern(backend.blockers),
-        resolvedTokenSet: resolvedTokenSets.intern(backend.resolvedTokens),
-        unresolvedTokenSet: unresolvedTokenSets.intern(backend.unresolvedTokens)
-      }];
-    }))
+    backends: Object.fromEntries(
+      targetOrder.map((target) => {
+        const backend = unit.backends[target];
+        return [
+          target,
+          {
+            selection: backend.selection,
+            marshallingProgram: programs.intern(backend.marshallingProgram),
+            blockerSet: blockerSets.intern(backend.blockers),
+            resolvedTokenSet: resolvedTokenSets.intern(backend.resolvedTokens),
+            unresolvedTokenSet: unresolvedTokenSets.intern(backend.unresolvedTokens),
+          },
+        ];
+      }),
+    ),
   }));
   return {
     units: compact,
@@ -1119,8 +1418,8 @@ function compactUnits(units, implementationLanes) {
       blockerSets: blockerSets.values,
       resolvedTokenSets: resolvedTokenSets.values,
       unresolvedTokenSets: unresolvedTokenSets.values,
-      implementationSets: implementationSets.values
-    }
+      implementationSets: implementationSets.values,
+    },
   };
 }
 
@@ -1142,8 +1441,11 @@ function countSelections(units, target) {
  * because that share is a soundness and performance tier rather than coverage.
  */
 function runtimeCoverage(units, targets) {
-  const runtimeIds = [...new Set(targets.filter((target) => target.runtime === true && target.runtimeId)
-    .map((target) => target.runtimeId))].sort(compareCodeUnits);
+  const runtimeIds = [
+    ...new Set(
+      targets.filter((target) => target.runtime === true && target.runtimeId).map((target) => target.runtimeId),
+    ),
+  ].sort(compareCodeUnits);
   const summary = {};
   for (const runtimeId of runtimeIds) {
     const members = targets.filter((target) => target.runtimeId === runtimeId && target.runtime === true);
@@ -1159,10 +1461,8 @@ function runtimeCoverage(units, targets) {
       transports: members.map((target) => target.transport).sort(compareCodeUnits),
       unitsWithAnyTransport: reachable.size,
       byTransport,
-      typedNativeShare: typedNative
-        ? { emit: byTransport["typed-native"].emit, ofReachable: reachable.size }
-        : null,
-      evidence: "Transport selection only. This is not compile, link, runtime, or conformance evidence."
+      typedNativeShare: typedNative ? { emit: byTransport["typed-native"].emit, ofReachable: reachable.size } : null,
+      evidence: "Transport selection only. This is not compile, link, runtime, or conformance evidence.",
     };
   }
   return summary;
@@ -1171,28 +1471,43 @@ function runtimeCoverage(units, targets) {
 export function generateBindingLoweringPlan(inputs) {
   const parsed = Object.fromEntries(Object.entries(inputs).map(([name, content]) => [name, JSON.parse(content)]));
   const { scriptProjection, scriptUniversalValue, scriptConstantLowering, dmsdkProjection, semanticPolicies } = parsed;
-  if (scriptProjection.defoldRevision !== dmsdkProjection.defoldRevision) throw new Error("Projection Defold revisions differ");
-  if (scriptProjection.schemaVersion !== 1 || scriptProjection.routeCount !== scriptProjection.rows.length) throw new Error("Script projection census drifted");
-  if (dmsdkProjection.schemaVersion !== 1 ||
-      dmsdkProjection.coverage.classifiedDeclarations !== dmsdkProjection.rows.length ||
-      dmsdkProjection.coverage.projectedDeclarations !== dmsdkProjection.rows.length ||
-      dmsdkProjection.coverage.uniqueSourceIds !== dmsdkProjection.rows.length ||
-      dmsdkProjection.coverage.uniqueProjectionIds !== dmsdkProjection.rows.length ||
-      dmsdkProjection.coverage.projectionGaps !== 0 ||
-      dmsdkProjection.coverage.unprojectedDeclarations !== 0 ||
-      dmsdkProjection.coverage.silentUnknowns !== 0) throw new Error("dmSDK projection census drifted");
-  const constantEntriesByName = new Map(scriptConstantLowering.entries.map((entry, rowIndex) => [entry.name, { entry, rowIndex }]));
-  const constantBindings = scriptUniversalValue.bindings.filter(({ loweringFamily }) => loweringFamily === "script-constant");
-  if (constantEntriesByName.size !== scriptConstantLowering.entries.length ||
-      scriptConstantLowering.entries.length !== scriptConstantLowering.counts.total ||
-      constantBindings.length !== scriptConstantLowering.counts.runtimeBacked + scriptConstantLowering.counts.profileUnavailable) {
+  if (scriptProjection.defoldRevision !== dmsdkProjection.defoldRevision)
+    throw new Error("Projection Defold revisions differ");
+  if (scriptProjection.schemaVersion !== 1 || scriptProjection.routeCount !== scriptProjection.rows.length)
+    throw new Error("Script projection census drifted");
+  if (
+    dmsdkProjection.schemaVersion !== 1 ||
+    dmsdkProjection.coverage.classifiedDeclarations !== dmsdkProjection.rows.length ||
+    dmsdkProjection.coverage.projectedDeclarations !== dmsdkProjection.rows.length ||
+    dmsdkProjection.coverage.uniqueSourceIds !== dmsdkProjection.rows.length ||
+    dmsdkProjection.coverage.uniqueProjectionIds !== dmsdkProjection.rows.length ||
+    dmsdkProjection.coverage.projectionGaps !== 0 ||
+    dmsdkProjection.coverage.unprojectedDeclarations !== 0 ||
+    dmsdkProjection.coverage.silentUnknowns !== 0
+  )
+    throw new Error("dmSDK projection census drifted");
+  const constantEntriesByName = new Map(
+    scriptConstantLowering.entries.map((entry, rowIndex) => [entry.name, { entry, rowIndex }]),
+  );
+  const constantBindings = scriptUniversalValue.bindings.filter(
+    ({ loweringFamily }) => loweringFamily === "script-constant",
+  );
+  if (
+    constantEntriesByName.size !== scriptConstantLowering.entries.length ||
+    scriptConstantLowering.entries.length !== scriptConstantLowering.counts.total ||
+    constantBindings.length !==
+      scriptConstantLowering.counts.runtimeBacked + scriptConstantLowering.counts.profileUnavailable
+  ) {
     throw new Error("Script constant lowering and universal binding censuses differ");
   }
   const targets = targetOrder.map((name) => parsed[name]);
-  if (new Set(targets.map(({ target }) => target)).size !== targetOrder.length) throw new Error("Target capability names are duplicated");
+  if (new Set(targets.map(({ target }) => target)).size !== targetOrder.length)
+    throw new Error("Target capability names are duplicated");
   for (let index = 0; index < targets.length; index += 1) {
-    if (targets[index].target !== targetOrder[index]) throw new Error(`Target capability order/name mismatch for ${targetOrder[index]}`);
-    if (!Array.isArray(targets[index].surfaces) || !Array.isArray(targets[index].unsupportedValueKinds)) throw new Error(`${targetOrder[index]} target capability is malformed`);
+    if (targets[index].target !== targetOrder[index])
+      throw new Error(`Target capability order/name mismatch for ${targetOrder[index]}`);
+    if (!Array.isArray(targets[index].surfaces) || !Array.isArray(targets[index].unsupportedValueKinds))
+      throw new Error(`${targetOrder[index]} target capability is malformed`);
     if (typeof targets[index].transport !== "string") throw new Error(`${targetOrder[index]} declares no transport`);
     if (targets[index].runtime === true && typeof targets[index].runtimeId !== "string") {
       throw new Error(`${targetOrder[index]} is a runtime backend but declares no runtimeId`);
@@ -1205,44 +1520,56 @@ export function generateBindingLoweringPlan(inputs) {
       if (!source) throw new Error(`script constant ${binding.id} has no lowering-policy entry`);
       return scriptConstantUnit(binding, source.entry, source.rowIndex);
     }),
-    ...dmsdkProjection.rows.map(dmsdkUnit)
-  ].sort((left, right) => compareCodeUnits(left.identity.surface, right.identity.surface) || compareCodeUnits(left.identity.id, right.identity.id));
+    ...dmsdkProjection.rows.map(dmsdkUnit),
+  ].sort(
+    (left, right) =>
+      compareCodeUnits(left.identity.surface, right.identity.surface) ||
+      compareCodeUnits(left.identity.id, right.identity.id),
+  );
   if (new Set(units.map(({ identity }) => `${identity.surface}:${identity.id}`)).size !== units.length) {
     throw new Error("Unified lowering plan contains duplicate units");
   }
   const { resolutions, ruleMatches } = applySemanticPolicies(units, semanticPolicies);
   const conformanceVocabulary = deriveConformanceVocabulary(semanticPolicies, parsed.dmsdkTargetConditionals);
   const conformanceVocabularyDigest = sha256(JSON.stringify(conformanceVocabulary));
-  const implementationLanes = implementationLaneIndex(
-    units, parsed, scriptProjection.defoldRevision);
+  const implementationLanes = implementationLaneIndex(units, parsed, scriptProjection.defoldRevision);
   const { defoldValueLayouts } = parsed;
-  if (defoldValueLayouts.schemaVersion !== 1 ||
-      defoldValueLayouts.defoldRevision !== scriptProjection.defoldRevision) {
+  if (defoldValueLayouts.schemaVersion !== 1 || defoldValueLayouts.defoldRevision !== scriptProjection.defoldRevision) {
     throw new Error("Defold value layout report schema or Defold revision drifted");
   }
-  const valueTypesByTarget = new Map(targets.map((target) =>
-    [target.target, transparentValueTypes(target, defoldValueLayouts)]));
+  const valueTypesByTarget = new Map(
+    targets.map((target) => [target.target, transparentValueTypes(target, defoldValueLayouts)]),
+  );
   for (const unit of units) {
-    unit.backends = Object.fromEntries(targets.map((target) => [target.target, backendRecord(
-      unit, target, resolutions, implementationLanes, valueTypesByTarget.get(target.target))]));
-    if (Object.keys(unit.backends).join(",") !== targetOrder.join(",")) throw new Error(`${unit.identity.id}: incomplete backend matrix`);
+    unit.backends = Object.fromEntries(
+      targets.map((target) => [
+        target.target,
+        backendRecord(unit, target, resolutions, implementationLanes, valueTypesByTarget.get(target.target)),
+      ]),
+    );
+    if (Object.keys(unit.backends).join(",") !== targetOrder.join(","))
+      throw new Error(`${unit.identity.id}: incomplete backend matrix`);
   }
   const compact = compactUnits(units, implementationLanes);
   const body = {
     schemaVersion: 2,
     defoldRevision: scriptProjection.defoldRevision,
-    scope: "Canonical generation plan for every Defold script route and dmSDK runtime declaration. It describes emission decisions and marshalling only; it is not compile, link, runtime, allocation, or conformance evidence.",
+    scope:
+      "Canonical generation plan for every Defold script route and dmSDK runtime declaration. It describes emission decisions and marshalling only; it is not compile, link, runtime, allocation, or conformance evidence.",
     evidenceBoundary: {
       generation: "A backend selection of emit means the plan permits an emitter to produce source.",
-      implementationLanes: "A generated universal fallback may resolve the semantic tokens its bounded codec owns for explicitly supported targets. Specialized overlays are preferred implementations but cannot erase unrelated semantic tokens or target gates.",
+      implementationLanes:
+        "A generated universal fallback may resolve the semantic tokens its bounded codec owns for explicitly supported targets. Specialized overlays are preferred implementations but cannot erase unrelated semantic tokens or target gates.",
       compilation: "not-claimed",
       linkage: "not-claimed",
       runtime: "not-claimed",
       allocation: "not-claimed",
-      conformance: "not-claimed"
+      conformance: "not-claimed",
     },
     inputHashes: Object.fromEntries(Object.entries(inputs).map(([name, content]) => [name, sha256(content)])),
-    inputCanonicalHashes: Object.fromEntries(Object.entries(inputs).map(([name, content]) => [name, sha256(JSON.stringify(JSON.parse(content)))])),
+    inputCanonicalHashes: Object.fromEntries(
+      Object.entries(inputs).map(([name, content]) => [name, sha256(JSON.stringify(JSON.parse(content)))]),
+    ),
     targetOrder,
     targetCapabilities: Object.fromEntries(targets.map((target) => [target.target, target])),
     conformanceVocabulary: {
@@ -1250,8 +1577,8 @@ export function generateBindingLoweringPlan(inputs) {
       digest: conformanceVocabularyDigest,
       sources: [
         { input: "semanticPolicies", sha256: sha256(inputs.semanticPolicies) },
-        { input: "dmsdkTargetConditionals", sha256: sha256(inputs.dmsdkTargetConditionals) }
-      ]
+        { input: "dmsdkTargetConditionals", sha256: sha256(inputs.dmsdkTargetConditionals) },
+      ],
     },
     runtimes: runtimeCoverage(units, targets),
     semanticPolicyMatches: ruleMatches,
@@ -1262,45 +1589,53 @@ export function generateBindingLoweringPlan(inputs) {
       scriptConstantUnits: constantBindings.length,
       dmsdkUnits: units.filter(({ identity }) => identity.surface === "dmsdk").length,
       backendRecords: units.length * targetOrder.length,
-      identitySelectedPolicyRules: 0
+      identitySelectedPolicyRules: 0,
     },
     implementationLanes: {
-      ...Object.fromEntries(genericImplementationLaneDefinitions.map((definition) => [definition.lane, {
-        source: inputPaths[definition.input],
-        scope: definition.scope
-      }])),
+      ...Object.fromEntries(
+        genericImplementationLaneDefinitions.map((definition) => [
+          definition.lane,
+          {
+            source: inputPaths[definition.input],
+            scope: definition.scope,
+          },
+        ]),
+      ),
       "script-handle-lowering": {
         source: inputPaths.scriptHandleLowering,
-        scope: "Generated captured-Lua handle descriptors/router and target-specific evidence dispositions."
+        scope: "Generated captured-Lua handle descriptors/router and target-specific evidence dispositions.",
       },
       "script-universal-value": {
         source: inputPaths.scriptUniversalValue,
-        scope: "Generated bounded recursive Lua/JS value-graph descriptors and native Dynamic Hermes adapter."
+        scope: "Generated bounded recursive Lua/JS value-graph descriptors and native Dynamic Hermes adapter.",
       },
       "dmsdk-universal": {
         source: inputPaths.dmsdkUniversal,
-        scope: "Generated all-declaration dmSDK recipes, caller-owned C ABI frames, target metadata, and usage-driven native materialization requirements."
+        scope:
+          "Generated all-declaration dmSDK recipes, caller-owned C ABI frames, target metadata, and usage-driven native materialization requirements.",
       },
       "dmsdk-cstring-value": {
         source: inputPaths.dmsdkCStringValue,
-        scope: "Generated private C-string ABI staging and target-specific registration/linkage dispositions."
+        scope: "Generated private C-string ABI staging and target-specific registration/linkage dispositions.",
       },
       "dmsdk-borrowed-handle": {
         source: inputPaths.dmsdkBorrowedHandle,
-        scope: "Generated borrowed-handle consumer provider boundary and explicit structural/semantic blockers."
+        scope: "Generated borrowed-handle consumer provider boundary and explicit structural/semantic blockers.",
       },
       "script-projection-only": {
         source: inputPaths.scriptProjection,
-        scope: "Canonical ownership for script routes that have projection IR but no specialized generated adapter lane yet."
+        scope:
+          "Canonical ownership for script routes that have projection IR but no specialized generated adapter lane yet.",
       },
       "dmsdk-projection-only": {
         source: inputPaths.dmsdkProjection,
-        scope: "Canonical ownership for dmSDK declarations that have projection IR but no specialized generated adapter lane yet."
-      }
+        scope:
+          "Canonical ownership for dmSDK declarations that have projection IR but no specialized generated adapter lane yet.",
+      },
     },
     selectionSummary: Object.fromEntries(targetOrder.map((target) => [target, countSelections(units, target)])),
     tables: compact.tables,
-    units: compact.units
+    units: compact.units,
   };
   return { ...body, planSha256: sha256(JSON.stringify(body)) };
 }
@@ -1310,12 +1645,15 @@ export async function run(argv = process.argv.slice(2)) {
   const report = generateBindingLoweringPlan(await loadBindingLoweringInputs(repositoryRoot));
   const serialized = `${JSON.stringify(report, null, 2)}\n`;
   if (options.check) {
-    if (await readFile(options.output, "utf8") !== serialized) throw new Error(`${options.output} is stale; regenerate binding lowering plan`);
+    if ((await readFile(options.output, "utf8")) !== serialized)
+      throw new Error(`${options.output} is stale; regenerate binding lowering plan`);
   } else {
     await mkdir(dirname(options.output), { recursive: true });
     await writeFile(options.output, serialized);
   }
-  process.stdout.write(`${options.check ? "Verified" : "Generated"} ${report.coverage.units} units × ${report.targetOrder.length} backends (${report.coverage.backendRecords} explicit dispositions).\n`);
+  process.stdout.write(
+    `${options.check ? "Verified" : "Generated"} ${report.coverage.units} units × ${report.targetOrder.length} backends (${report.coverage.backendRecords} explicit dispositions).\n`,
+  );
   return report;
 }
 

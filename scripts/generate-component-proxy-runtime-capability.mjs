@@ -20,11 +20,11 @@ const inputs = {
   adapterSource: "defold/defold_hermes/src/script_scalar_lua_adapter.cpp",
   componentSdk: "packages/sdk/src/component.ts",
   nativeLuaHarness: "tests/native/component_proxy_lua_gate/component_proxy_lua_gate_test.cpp",
-  dynamicHermesHarness: "native/component_runtime_hermes_e2e.cpp"
+  dynamicHermesHarness: "native/component_runtime_hermes_e2e.cpp",
 };
 const outputs = {
   report: "packages/bindings/generated/defold-component-proxy-runtime-capability.json",
-  header: "defold/defold_hermes/include/defold_hermes/generated_component_proxy_capability.hpp"
+  header: "defold/defold_hermes/include/defold_hermes/generated_component_proxy_capability.hpp",
 };
 
 function sha256(text) {
@@ -59,48 +59,96 @@ ${rows}
 }
 
 async function build() {
-  const text = Object.fromEntries(await Promise.all(Object.entries(inputs).map(async ([key, path]) => [key, await readFile(resolve(root, path), "utf8")])));
+  const text = Object.fromEntries(
+    await Promise.all(
+      Object.entries(inputs).map(async ([key, path]) => [key, await readFile(resolve(root, path), "utf8")]),
+    ),
+  );
   const capability = componentProxyInvariantConstants.proxyRuntimeCapability;
   const requiredMethods = capability?.requiredMethods;
   const luaModule = capability?.luaModule;
-  assert.match(luaModule, /^_[a-z][a-z0-9_]*_$/, "component runtime Lua module must use a private reserved-style identifier");
-  assert(Array.isArray(requiredMethods) && requiredMethods.length > 0, "component proxy generator has no required runtime methods");
+  assert.match(
+    luaModule,
+    /^_[a-z][a-z0-9_]*_$/,
+    "component runtime Lua module must use a private reserved-style identifier",
+  );
+  assert(
+    Array.isArray(requiredMethods) && requiredMethods.length > 0,
+    "component proxy generator has no required runtime methods",
+  );
   assert.equal(new Set(requiredMethods).size, requiredMethods.length, "component runtime methods are not unique");
   assert.equal(capability.state, "native-dynamic-hermes-harness-executable");
   assert.equal(capability.runtimeConformant, false);
 
   assert.match(text.runtimeSource, /__defoldComponentsV1/, "component registry evidence drifted");
   assert.match(text.runtimeSource, /ComponentHandle attachComponent/, "component Runtime attachment evidence drifted");
-  assert.match(text.adapterSource, /bool ScriptAdapter::pushComponentContext[\s\S]*?component (?:script )?context stack is exhausted/, "bounded component ScriptAdapter context evidence drifted");
+  assert.match(
+    text.adapterSource,
+    /bool ScriptAdapter::pushComponentContext[\s\S]*?component (?:script )?context stack is exhausted/,
+    "bounded component ScriptAdapter context evidence drifted",
+  );
   assert.match(text.proxyGenerator, /__defoldComponentsV1 = registry/, "compiler registry emission evidence drifted");
   assert.match(text.componentBundler, /componentOnlyBootstrap: true/, "component-only bundle evidence drifted");
   assert.match(text.componentSdk, /return definition;/, "defineComponent identity-transform evidence drifted");
-  assert.match(text.extensionSource, /gComponentLuaRuntime->registerLuaApi/, "native component Lua provider is not installed");
-  assert.match(text.extensionSource, /gComponentWebBackend = std::make_unique/, "HTML5 component provider is not installed");
+  assert.match(
+    text.extensionSource,
+    /gComponentLuaRuntime->registerLuaApi/,
+    "native component Lua provider is not installed",
+  );
+  assert.match(
+    text.extensionSource,
+    /gComponentWebBackend = std::make_unique/,
+    "HTML5 component provider is not installed",
+  );
   assert.match(text.hermesBackend, /runtime->attachComponent/, "Hermes component backend evidence drifted");
   assert.match(text.webBackend, /defoldHermesWebComponentDispatch/, "browser component backend evidence drifted");
-  assert.match(text.browserProvider, /decodeWireRoots/, "browser component provider does not decode the universal wire format");
+  assert.match(
+    text.browserProvider,
+    /decodeWireRoots/,
+    "browser component provider does not decode the universal wire format",
+  );
   assert.match(text.nativeLuaHarness, /lua-allocations-warmed:0/, "native Lua allocation evidence drifted");
-  assert.match(text.nativeLuaHarness, /attachment-churn-lua-allocations:0/, "native attachment-churn allocation evidence drifted");
+  assert.match(
+    text.nativeLuaHarness,
+    /attachment-churn-lua-allocations:0/,
+    "native attachment-churn allocation evidence drifted",
+  );
   assert.match(text.dynamicHermesHarness, /packaged-defold-engine:unverified/, "dynamic Hermes evidence label drifted");
-  assert.match(text.dynamicHermesHarness, /compiler-registry-component-only-bootstrap:ok/, "compiler component-only bootstrap evidence drifted");
+  assert.match(
+    text.dynamicHermesHarness,
+    /compiler-registry-component-only-bootstrap:ok/,
+    "compiler component-only bootstrap evidence drifted",
+  );
   assert.match(text.dynamicHermesHarness, /runtime-generation-rebind:ok/, "runtime-generation rebind evidence drifted");
-  assert.match(text.dynamicHermesHarness, /bounded-recursive-event-codec:ok/, "bounded recursive component codec evidence drifted");
+  assert.match(
+    text.dynamicHermesHarness,
+    /bounded-recursive-event-codec:ok/,
+    "bounded recursive component codec evidence drifted",
+  );
   for (const method of requiredMethods) {
     assert.match(text.luaProvider, new RegExp(`"${method}"`), `${method} is absent from the Lua provider`);
   }
 
-  const diagnostic = "deherm component proxies are unavailable on this target: native Lua, dynamic-Hermes, and browser-host providers are installed, but Static Hermes has no component C ABI and packaged-Defold execution remains unverified";
+  const diagnostic =
+    "deherm component proxies are unavailable on this target: native Lua, dynamic-Hermes, and browser-host providers are installed, but Static Hermes has no component C ABI and packaged-Defold execution remains unverified";
   const blockers = [];
-  const methodDisposition = Object.fromEntries(requiredMethods.map((method) => [method, {
-    nativeDynamicHermes: "provider-compiled-native-lua-and-dynamic-hermes-harness-proven-packaged-engine-unverified",
-    nativeStaticHermes: "fail-closed-no-component-c-abi",
-    html5BrowserHost: "provider-compiled-browser-universal-direct-memory-transport-packaged-browser-gate-is-example-owned"
-  }]));
+  const methodDisposition = Object.fromEntries(
+    requiredMethods.map((method) => [
+      method,
+      {
+        nativeDynamicHermes:
+          "provider-compiled-native-lua-and-dynamic-hermes-harness-proven-packaged-engine-unverified",
+        nativeStaticHermes: "fail-closed-no-component-c-abi",
+        html5BrowserHost:
+          "provider-compiled-browser-universal-direct-memory-transport-packaged-browser-gate-is-example-owned",
+      },
+    ]),
+  );
   const report = {
     schemaVersion: 2,
     generator: "scripts/generate-component-proxy-runtime-capability.mjs",
-    scope: "Generated component-proxy provider capability and stage-qualified harness evidence; packaged Defold execution is not claimed.",
+    scope:
+      "Generated component-proxy provider capability and stage-qualified harness evidence; packaged Defold execution is not claimed.",
     capabilityState: "native-provider-capability-present",
     harnessEvidenceState: "native-lua-and-dynamic-hermes-harness-proven",
     runtimeConformant: false,
@@ -112,7 +160,7 @@ async function build() {
     contexts: {
       "game-object": "native-lua-and-dynamic-hermes-harness-proven-packaged-engine-unverified",
       "gui-scene": "native-lua-and-dynamic-hermes-harness-proven-packaged-engine-unverified",
-      "render-instance+graphics": "native-lua-and-dynamic-hermes-harness-proven-packaged-engine-unverified"
+      "render-instance+graphics": "native-lua-and-dynamic-hermes-harness-proven-packaged-engine-unverified",
     },
     blockers,
     implementedCapabilities: {
@@ -120,24 +168,31 @@ async function build() {
       componentOnlyBootstrap: "native-runtime-and-lazy-extension-attach-path-implemented",
       scriptAdapterContextSelection: "fixed-depth-16-reentrant-stack-no-hot-path-registry-allocation",
       eventCodec: "caller-stack-owned-256-fields-256-elements-depth-8-recursive-object-array-codec",
-      browserProvider: "fixed-capacity-1024-slot-generational-browser-registry-over-the-generated-universal-direct-memory-wire-format"
+      browserProvider:
+        "fixed-capacity-1024-slot-generational-browser-registry-over-the-generated-universal-direct-memory-wire-format",
     },
     methodDisposition,
     diagnostic,
     evidence: {
-      generation: "component generator emits context/property metadata plus a complete import registry; bundling emits exact component usage and a keyed sentinel",
+      generation:
+        "component generator emits context/property metadata plus a complete import registry; bundling emits exact component usage and a keyed sentinel",
       nativeCompile: "component provider and Hermes backend compile in a dedicated native target",
-      nativeLuaHarness: "all six Lua ABI methods, all three contexts, failure recovery, warmed dispatch, and warmed attach/detach churn with zero Lua allocator calls are tested against pinned Lua 5.1",
-      dynamicHermesHarness: "Lua-to-Hermes property/lifecycle/message/input/reload/final/detach, wide nested event payloads, and runtime-generation rebind execution are tested for all three contexts",
+      nativeLuaHarness:
+        "all six Lua ABI methods, all three contexts, failure recovery, warmed dispatch, and warmed attach/detach churn with zero Lua allocator calls are tested against pinned Lua 5.1",
+      dynamicHermesHarness:
+        "Lua-to-Hermes property/lifecycle/message/input/reload/final/detach, wide nested event payloads, and runtime-generation rebind execution are tested for all three contexts",
       packagedDefoldEngine: "unverified",
       staticHermesRuntime: "unverified",
-      browserRuntime: "generated browser provider attaches, dispatches, and detaches component instances over the universal direct-memory wire format; packaged browser execution is asserted by an example-owned HTML5 runtime gate that is deliberately not an input to this generator"
+      browserRuntime:
+        "generated browser provider attaches, dispatches, and detaches component instances over the universal direct-memory wire format; packaged browser execution is asserted by an example-owned HTML5 runtime gate that is deliberately not an input to this generator",
     },
-    provenance: Object.fromEntries(Object.entries(inputs).map(([key, path]) => [key, { path, sha256: sha256(text[key]) }]))
+    provenance: Object.fromEntries(
+      Object.entries(inputs).map(([key, path]) => [key, { path, sha256: sha256(text[key]) }]),
+    ),
   };
   return {
     [outputs.report]: `${JSON.stringify(report, null, 2)}\n`,
-    [outputs.header]: renderHeader(luaModule, requiredMethods, diagnostic)
+    [outputs.header]: renderHeader(luaModule, requiredMethods, diagnostic),
   };
 }
 
@@ -149,14 +204,21 @@ async function main() {
     const absolute = resolve(root, path);
     if (check) {
       let existing = "";
-      try { existing = await readFile(absolute, "utf8"); } catch {}
+      try {
+        existing = await readFile(absolute, "utf8");
+      } catch {}
       if (existing !== content) stale.push(path);
     } else {
       await writeFile(absolute, content);
     }
   }
-  if (stale.length) throw new Error(`component proxy runtime capability outputs are stale:\n${stale.map((path) => `- ${path}`).join("\n")}`);
-  console.log(`Component proxy runtime capability: ${check ? "checked" : "generated"} (${Object.keys(generated).length} artifacts)`);
+  if (stale.length)
+    throw new Error(
+      `component proxy runtime capability outputs are stale:\n${stale.map((path) => `- ${path}`).join("\n")}`,
+    );
+  console.log(
+    `Component proxy runtime capability: ${check ? "checked" : "generated"} (${Object.keys(generated).length} artifacts)`,
+  );
 }
 
 await main();

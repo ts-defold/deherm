@@ -10,7 +10,7 @@ const relativePaths = Object.freeze({
   projection: "packages/bindings/generated/defold-script-projection-ir.json",
   policy: "packages/bindings/overrides/defold-value-layouts.json",
   report: "packages/bindings/generated/defold-value-layouts.json",
-  header: "defold/defold_hermes/include/defold_hermes/generated_defold_value_layout.h"
+  header: "defold/defold_hermes/include/defold_hermes/generated_defold_value_layout.h",
 });
 
 function assert(condition, message) {
@@ -65,14 +65,15 @@ function note(block, pattern, description) {
 
 function vmathLayout(text, file, declaration, transport) {
   const block = docBlock(text, file, declaration);
-  const alignment = Number.parseInt(
-    note(block, /^\s*\*\s*@note\s+(\d+) byte aligned\s*$/m, "alignment")[1], 10);
+  const alignment = Number.parseInt(note(block, /^\s*\*\s*@note\s+(\d+) byte aligned\s*$/m, "alignment")[1], 10);
   const tuple = block.body.match(/^\/\*#\s*(\d+)-tuple/m);
   const matrix = block.body.match(/^\/\*#\s*(\d+)x(\d+) matrix/m);
   assert(tuple || matrix, `${file}: ${declaration} declares neither a tuple nor a matrix arity`);
   if (tuple) {
     const storage = Number.parseInt(
-      note(block, /^\s*\*\s*@note\s+Always size of (\d+) float32\s*$/m, "storage")[1], 10);
+      note(block, /^\s*\*\s*@note\s+Always size of (\d+) float32\s*$/m, "storage")[1],
+      10,
+    );
     const lanes = Number.parseInt(tuple[1], 10);
     assert(lanes <= storage, `${file}: ${declaration} declares more lanes than storage`);
     return {
@@ -83,13 +84,12 @@ function vmathLayout(text, file, declaration, transport) {
       byteSize: storage * 4,
       alignment,
       ordering: "lane-order",
-      evidence: { file, line: block.line, declaration }
+      evidence: { file, line: block.line, declaration },
     };
   }
   const rows = Number.parseInt(matrix[1], 10);
   const columns = Number.parseInt(matrix[2], 10);
-  const composition = note(block,
-    /^\s*\*\s*@note\s+Implemented as (\d+) x (Vector\d)\s*$/m, "composition");
+  const composition = note(block, /^\s*\*\s*@note\s+Implemented as (\d+) x (Vector\d)\s*$/m, "composition");
   const columnCount = Number.parseInt(composition[1], 10);
   assert(columnCount === columns, `${file}: ${declaration} column count disagrees with its arity`);
   const column = vmathLayout(text, file, composition[2], "float-lanes");
@@ -104,7 +104,7 @@ function vmathLayout(text, file, declaration, transport) {
     alignment,
     ordering: "column-major",
     composedOf: { count: columnCount, declaration: composition[2] },
-    evidence: { file, line: block.line, declaration }
+    evidence: { file, line: block.line, declaration },
   };
 }
 
@@ -137,7 +137,7 @@ function scalarLayout(sources, file, declaration, transport) {
     alignment: resolved.byteSize,
     ordering: "scalar",
     typedefChain: resolved.chain,
-    evidence: { file, declaration }
+    evidence: { file, declaration },
   };
 }
 
@@ -154,8 +154,10 @@ function structLayout(sources, file, declaration, transport) {
   }
   assert(fields.length > 0, `${file}: struct ${declaration} exposes no fixed-width fields`);
   const element = fields[0].element;
-  assert(fields.every((field) => field.element === element),
-    `${file}: struct ${declaration} mixes element widths and needs an explicit lowering`);
+  assert(
+    fields.every((field) => field.element === element),
+    `${file}: struct ${declaration} mixes element widths and needs an explicit lowering`,
+  );
   const byteSize = fields.reduce((total, field) => total + field.byteSize, 0);
   return {
     transport,
@@ -166,21 +168,22 @@ function structLayout(sources, file, declaration, transport) {
     alignment: fields[0].byteSize,
     ordering: "declaration-order",
     fields: fields.map(({ name, declared }) => ({ name, declared })),
-    evidence: { file, declaration, line: lineOf(text, match.index) }
+    evidence: { file, declaration, line: lineOf(text, match.index) },
   };
 }
 
 const transportBuilders = Object.freeze({
-  "float-lanes": (sources, entry) => vmathLayout(sources[entry.source], entry.source, entry.declaration, entry.transport),
-  "float-arena": (sources, entry) => vmathLayout(sources[entry.source], entry.source, entry.declaration, entry.transport),
+  "float-lanes": (sources, entry) =>
+    vmathLayout(sources[entry.source], entry.source, entry.declaration, entry.transport),
+  "float-arena": (sources, entry) =>
+    vmathLayout(sources[entry.source], entry.source, entry.declaration, entry.transport),
   "u64-scalar": (sources, entry) => scalarLayout(sources, entry.source, entry.declaration, entry.transport),
-  "u64-lane-quad": (sources, entry) => structLayout(sources, entry.source, entry.declaration, entry.transport)
+  "u64-lane-quad": (sources, entry) => structLayout(sources, entry.source, entry.declaration, entry.transport),
 });
 
-const recordingShapes = Object.freeze(new Set([
-  "number", "hash", "url", "handle", "userdata",
-  "vector3", "vector4", "quaternion", "matrix4"
-]));
+const recordingShapes = Object.freeze(
+  new Set(["number", "hash", "url", "handle", "userdata", "vector3", "vector4", "quaternion", "matrix4"]),
+);
 
 function recordingShape(policy, name, classification) {
   const shape = policy.recordingShapes?.[name];
@@ -188,8 +191,7 @@ function recordingShape(policy, name, classification) {
     assert(recordingShapes.has(shape), `${name}: unsupported recording shape ${shape}`);
     return shape;
   }
-  assert(classification === "generated",
-    `${name}: reviewed Defold value policy has no recording shape`);
+  assert(classification === "generated", `${name}: reviewed Defold value policy has no recording shape`);
   // An unseen Defold value is still carried by the universal Lua-value lane.
   // Recording it as opaque userdata is conservative and keeps the route in the
   // generated census; a later reviewed policy may select a narrower shape.
@@ -210,8 +212,10 @@ export function generateDefoldValueLayouts({ projection, policy, sources, source
     const builder = transportBuilders[entry.transport];
     assert(builder, `${name}: unsupported transparent transport ${entry.transport}`);
     const layout = builder(sources, entry);
-    assert(typeof entry.typescriptType === "string" && /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(entry.typescriptType),
-      `${name}: transparent policy must declare a TypeScript type identifier`);
+    assert(
+      typeof entry.typescriptType === "string" && /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(entry.typescriptType),
+      `${name}: transparent policy must declare a TypeScript type identifier`,
+    );
     layout.typescriptType = entry.typescriptType;
     layout.recordingShape = recordingShape(policy, name, "reviewed");
     layout.evidence = { ...layout.evidence, file: sourcePaths[layout.evidence.file] ?? layout.evidence.file };
@@ -228,7 +232,7 @@ export function generateDefoldValueLayouts({ projection, policy, sources, source
       classification: "reviewed",
       proof: "reviewed-semantic-classification",
       fallbackTransport: "script-universal-value",
-      recordingShape: recordingShape(policy, name, "reviewed")
+      recordingShape: recordingShape(policy, name, "reviewed"),
     };
   }
   for (const name of unclassified) {
@@ -239,41 +243,47 @@ export function generateDefoldValueLayouts({ projection, policy, sources, source
       proof: "source-derived-name; specialized-layout-unproven",
       fallbackTransport: "script-universal-value",
       recordingShape: recordingShape(policy, name, "generated"),
-      alert: "specialized-layout-unproven"
+      alert: "specialized-layout-unproven",
     };
   }
 
   return {
     schemaVersion: 1,
     defoldRevision: projection.defoldRevision,
-    scope: "Fixed-layout Defold script value types derived from the pinned dmSDK headers, reviewed opaque classifications, and generated conservative opaque fallbacks for revision-specific names. Conservative entries remain usable through the universal value transport but are excluded from transparent typed-native lowering until specialized layout evidence exists. Layout only; this is not compile, link, runtime, or conformance evidence.",
+    scope:
+      "Fixed-layout Defold script value types derived from the pinned dmSDK headers, reviewed opaque classifications, and generated conservative opaque fallbacks for revision-specific names. Conservative entries remain usable through the universal value transport but are excluded from transparent typed-native lowering until specialized layout evidence exists. Layout only; this is not compile, link, runtime, or conformance evidence.",
     policySha256: sha256(JSON.stringify(policy)),
-    sourceSha256: Object.fromEntries(Object.entries(sourcePaths).sort(([left], [right]) => compare(left, right))
-      .map(([alias, file]) => [alias, { path: file, sha256: sha256(sources[alias]) }])),
+    sourceSha256: Object.fromEntries(
+      Object.entries(sourcePaths)
+        .sort(([left], [right]) => compare(left, right))
+        .map(([alias, file]) => [alias, { path: file, sha256: sha256(sources[alias]) }]),
+    ),
     coverage: {
       projectedValueTypes: names.length,
       transparent: Object.keys(transparent).length,
       opaque: Object.keys(opaque).length,
       reviewedOpaque: Object.values(opaque).filter(({ classification }) => classification === "reviewed").length,
       conservativeOpaque: unclassified.length,
-      dormantPolicyEntries: unreachable.length
+      dormantPolicyEntries: unreachable.length,
     },
     alerts: unclassified.map((name) => ({
       code: "specialized-layout-unproven",
       valueType: name,
       severity: "warning",
       fallbackTransport: "script-universal-value",
-      effect: "available through the universal transport; excluded from transparent typed-native lowering"
+      effect: "available through the universal transport; excluded from transparent typed-native lowering",
     })),
     dormantPolicyEntries: unreachable,
     transports: {
       "float-lanes": "Copied as exact float32 lanes through the typed frame. No arena and no ownership.",
-      "float-arena": "Copied through the caller-owned bounded float arena because the record exceeds the four inline lanes.",
-      "u64-scalar": "Copied as an exact 64-bit value split into two uint32 halves; the typed frontend never narrows it to a double.",
-      "u64-lane-quad": "Copied as four exact 64-bit lanes through the caller-owned bounded URL arena."
+      "float-arena":
+        "Copied through the caller-owned bounded float arena because the record exceeds the four inline lanes.",
+      "u64-scalar":
+        "Copied as an exact 64-bit value split into two uint32 halves; the typed frontend never narrows it to a double.",
+      "u64-lane-quad": "Copied as four exact 64-bit lanes through the caller-owned bounded URL arena.",
     },
     transparent,
-    opaque
+    opaque,
   };
 }
 
@@ -307,7 +317,8 @@ static_assert(sizeof(uint64_t) * DEHERM_DEFOLD_URL_STORAGE_ELEMENTS == DEHERM_DE
 async function writeOrCheck(target, content, check) {
   if (check) {
     const current = await readFile(target, "utf8");
-    if (current !== content) throw new Error(`${path.relative(repositoryRoot, target)} is stale; regenerate Defold value layouts`);
+    if (current !== content)
+      throw new Error(`${path.relative(repositoryRoot, target)} is stale; regenerate Defold value layouts`);
     return;
   }
   await mkdir(path.dirname(target), { recursive: true });
@@ -323,25 +334,37 @@ export async function run(argv = process.argv.slice(2)) {
   }
   const [projectionText, policyText] = await Promise.all([
     readFile(path.join(repositoryRoot, relativePaths.projection), "utf8"),
-    readFile(path.join(repositoryRoot, relativePaths.policy), "utf8")
+    readFile(path.join(repositoryRoot, relativePaths.policy), "utf8"),
   ]);
   const policy = JSON.parse(policyText);
   const sourcePaths = policy.sources;
-  const sources = Object.fromEntries(await Promise.all(Object.entries(sourcePaths).map(async ([alias, file]) => [
-    alias,
-    await readFile(path.join(repositoryRoot, file), "utf8")
-  ])));
+  const sources = Object.fromEntries(
+    await Promise.all(
+      Object.entries(sourcePaths).map(async ([alias, file]) => [
+        alias,
+        await readFile(path.join(repositoryRoot, file), "utf8"),
+      ]),
+    ),
+  );
   const report = generateDefoldValueLayouts({
     projection: JSON.parse(projectionText),
     policy,
     sources,
-    sourcePaths
+    sourcePaths,
   });
-  await writeOrCheck(path.join(options.outputRoot, relativePaths.report), `${JSON.stringify(report, null, 2)}\n`, options.check);
+  await writeOrCheck(
+    path.join(options.outputRoot, relativePaths.report),
+    `${JSON.stringify(report, null, 2)}\n`,
+    options.check,
+  );
   await writeOrCheck(path.join(options.outputRoot, relativePaths.header), renderHeader(report), options.check);
-  process.stdout.write(`${options.check ? "Verified" : "Generated"} ${report.coverage.transparent} transparent and ${report.coverage.opaque} opaque Defold value layouts from ${Object.keys(sourcePaths).length} pinned headers.\n`);
+  process.stdout.write(
+    `${options.check ? "Verified" : "Generated"} ${report.coverage.transparent} transparent and ${report.coverage.opaque} opaque Defold value layouts from ${Object.keys(sourcePaths).length} pinned headers.\n`,
+  );
   if (report.coverage.conservativeOpaque > 0) {
-    process.stderr.write(`warning: ${report.coverage.conservativeOpaque} revision-specific Defold value type(s) use the generated universal fallback; transparent typed-native layout remains unproven: ${report.alerts.map(({ valueType }) => valueType).join(", ")}\n`);
+    process.stderr.write(
+      `warning: ${report.coverage.conservativeOpaque} revision-specific Defold value type(s) use the generated universal fallback; transparent typed-native layout remains unproven: ${report.alerts.map(({ valueType }) => valueType).join(", ")}\n`,
+    );
   }
   return report;
 }

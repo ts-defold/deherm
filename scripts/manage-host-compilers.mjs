@@ -14,7 +14,6 @@
 // part of it is.
 
 import { createHash } from "node:crypto";
-import { spawn } from "node:child_process";
 import { chmod, cp, mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 
@@ -35,7 +34,7 @@ import {
   familyRelease,
   fingerprintFamily,
   hostArtifactFamilyNames,
-  publishedAssets
+  publishedAssets,
 } from "./lib/artifact-releases.mjs";
 import { verifyPinnedHostToolFile } from "./lib/host-compiler-artifact-verification.mjs";
 
@@ -47,7 +46,9 @@ function requireHostFamily(name) {
     throw new Error(`Name the artifact family: one of ${hostArtifactFamilyNames.join(", ")}`);
   }
   if (!hostArtifactFamilyNames.includes(name)) {
-    throw new Error(`${name} is not a host artifact family; declared families are ${hostArtifactFamilyNames.join(", ")}`);
+    throw new Error(
+      `${name} is not a host artifact family; declared families are ${hostArtifactFamilyNames.join(", ")}`,
+    );
   }
   return name;
 }
@@ -96,7 +97,8 @@ function hostRecord(manifest, key) {
 async function recordTool(manifest, key, tool) {
   const record = hostRecord(manifest, key);
   const toolRecord = record.tools?.[tool];
-  if (!toolRecord) throw new Error(`${key} declares no ${tool}; declared tools are ${Object.keys(record.tools ?? {}).join(", ")}`);
+  if (!toolRecord)
+    throw new Error(`${key} declares no ${tool}; declared tools are ${Object.keys(record.tools ?? {}).join(", ")}`);
   const file = path.join(root, record.directory, toolRecord.file);
   const bytes = await readFile(file);
   if (bytes.byteLength < MINIMUM_PLAUSIBLE_BYTES) {
@@ -135,9 +137,11 @@ async function install(downloadRoot) {
     for (const [tool, toolRecord] of Object.entries(record.tools ?? {})) {
       if (toolRecord.status === "blocked") continue;
       const name = path.basename(toolRecord.file);
-      const candidates = available.filter((file) =>
-        path.basename(file) === name && file.split(path.sep).includes(`host-compilers-${key}`));
-      if (candidates.length > 1) throw new Error(`Expected one ${name} in host-compilers-${key}, found ${candidates.length}`);
+      const candidates = available.filter(
+        (file) => path.basename(file) === name && file.split(path.sep).includes(`host-compilers-${key}`),
+      );
+      if (candidates.length > 1)
+        throw new Error(`Expected one ${name} in host-compilers-${key}, found ${candidates.length}`);
       // A download that carries nothing for a tool leaves that tool alone, so
       // one runner failing never silently unpins another tool's digest.
       if (candidates.length === 0) continue;
@@ -172,7 +176,7 @@ async function report() {
         builder: toolRecord.builder ?? null,
         file: toolRecord.file,
         blocker: toolRecord.blocker ?? null,
-        detail: ""
+        detail: "",
       };
       if (!knownStatuses.has(toolRecord.status)) {
         entry.detail = `unknown status ${toolRecord.status}`;
@@ -214,12 +218,18 @@ async function report() {
       host: key,
       platform: record.host.platform,
       architecture: record.host.architecture,
-      status: missing.length === 0 ? "vendored" : tools.every((entry) => entry.status === "blocked") ? "blocked" : "required-missing",
+      status:
+        missing.length === 0
+          ? "vendored"
+          : tools.every((entry) => entry.status === "blocked")
+            ? "blocked"
+            : "required-missing",
       invalid: tools.some((entry) => entry.invalid),
       tools,
-      detail: missing.length === 0
-        ? tools.map((entry) => `${entry.tool} ${entry.sha256.slice(0, 12)}`).join(", ")
-        : missing.map((entry) => `${entry.tool}: ${entry.detail}`).join("; ")
+      detail:
+        missing.length === 0
+          ? tools.map((entry) => `${entry.tool} ${entry.sha256.slice(0, 12)}`).join(", ")
+          : missing.map((entry) => `${entry.tool}: ${entry.detail}`).join("; "),
     });
   }
   rows.sort((left, right) => left.host.localeCompare(right.host));
@@ -229,7 +239,7 @@ async function report() {
     ttscVersion: manifest.ttscVersion ?? null,
     tools: Object.keys(manifest.tools ?? {}),
     families: Object.fromEntries(hostArtifactFamilyNames.map((name) => [name, artifactFamilies[name].tools])),
-    hosts: rows
+    hosts: rows,
   };
 }
 
@@ -241,30 +251,30 @@ async function verify(complete, json) {
     for (const entry of row.tools) {
       if (entry.invalid) problems.push(`${row.host} ${entry.tool}: ${entry.detail}`);
       else if (complete && missingStatuses.has(entry.status)) {
-        problems.push(`${row.host} ${entry.tool}: ${entry.status}${entry.blocker ? ` (${entry.blocker.code}: ${entry.blocker.reason})` : ` (${entry.detail})`}`);
+        problems.push(
+          `${row.host} ${entry.tool}: ${entry.status}${entry.blocker ? ` (${entry.blocker.code}: ${entry.blocker.reason})` : ` (${entry.detail})`}`,
+        );
       }
     }
   }
   if (problems.length) {
-    throw new Error(`Host tool matrix (${complete ? "complete" : "declared"}) failed:\n${problems.map((problem) => `- ${problem}`).join("\n")}`);
+    throw new Error(
+      `Host tool matrix (${complete ? "complete" : "declared"}) failed:\n${problems.map((problem) => `- ${problem}`).join("\n")}`,
+    );
   }
   if (!json) {
     for (const row of result.hosts) {
       for (const entry of row.tools) {
-        console.log(`${entry.status === "vendored" ? "ok" : "--"} ${row.host} ${entry.tool}: ${entry.status} ${entry.detail}`);
+        console.log(
+          `${entry.status === "vendored" ? "ok" : "--"} ${row.host} ${entry.tool}: ${entry.status} ${entry.detail}`,
+        );
       }
     }
     const count = result.hosts.reduce((total, row) => total + row.tools.length, 0);
-    console.log(`ok host tool matrix (${complete ? "complete" : "declared"}): ${result.hosts.length} host(s), ${count} tool(s)`);
+    console.log(
+      `ok host tool matrix (${complete ? "complete" : "declared"}): ${result.hosts.length} host(s), ${count} tool(s)`,
+    );
   }
-}
-
-function run(command, args) {
-  return new Promise((resolve, reject) => {
-    const child = spawn(command, args, { cwd: root, stdio: "inherit" });
-    child.once("error", reject);
-    child.once("exit", (code, signal) => code === 0 ? resolve() : reject(new Error(`${command} exited ${code ?? signal}`)));
-  });
 }
 
 const [command, ...args] = process.argv.slice(2);
@@ -289,8 +299,7 @@ if (command === "fingerprint") console.log(await fingerprintFamily(requireHostFa
 else if (command === "tag") console.log((await familyRelease(requireHostFamily(args[0]), { root })).tag);
 else if (command === "release-metadata") {
   console.log(JSON.stringify(await familyRelease(requireHostFamily(args[0]), { root }), null, 2));
-}
-else if (command === "install") {
+} else if (command === "install") {
   if (!args[0]) throw new Error("install requires a downloaded artifact directory");
   const installed = await install(args[0]);
   console.log(`installed ${installed.length} host tool(s): ${installed.join(", ") || "none"}`);
@@ -301,7 +310,11 @@ else if (command === "install") {
     ? { [args[1]]: await recordTool(manifest, args[0], args[1]) }
     : await recordHost(manifest, args[0]);
   await writeManifest(manifest);
-  console.log(`recorded ${args[0]} ${Object.entries(recorded).map(([tool, value]) => `${tool}=${value.sha256}`).join(" ")}`);
+  console.log(
+    `recorded ${args[0]} ${Object.entries(recorded)
+      .map(([tool, value]) => `${tool}=${value.sha256}`)
+      .join(" ")}`,
+  );
 } else if (command === "report") console.log(JSON.stringify(await report(), null, 2));
 else if (command === "expected-assets") console.log((await expectedAssets(args[0])).join("\n"));
 else if (command === "verify-file") {
@@ -311,11 +324,10 @@ else if (command === "verify-file") {
     manifest: await readManifest(),
     host: key,
     tool,
-    file
+    file,
   });
   console.log(`verified ${result.host} ${result.tool}: ${result.sha256} (${result.bytes} bytes) at ${result.file}`);
-}
-else if (command === "verify") await verify(args.includes("--complete"), args.includes("--json"));
+} else if (command === "verify") await verify(args.includes("--complete"), args.includes("--json"));
 else if (command === "pull") {
   // Release assets, not workflow artifacts: a workflow artifact expires, is
   // run-scoped and needs auth, and none of that survives to a user six months
@@ -346,7 +358,7 @@ else if (command === "pull") {
       assets: rows.map((row) => row.asset),
       destination,
       optional: args.includes("--partial"),
-      onProgress: ({ asset, status }) => console.log(`${status === "missing" ? "absent" : "fetched"} ${asset}`)
+      onProgress: ({ asset, status }) => console.log(`${status === "missing" ? "absent" : "fetched"} ${asset}`),
     });
     if (missing.length) console.log(`${missing.length} ${family} asset(s) not published for these inputs`);
     // Each asset is one reproducible .tar.gz holding that host's tools for this
@@ -363,10 +375,10 @@ else if (command === "pull") {
       if (absent.has(row.asset)) continue;
       await extractReleaseArchive({
         archive: path.join(destination, row.asset),
-        destination: path.join(destination, `host-compilers-${row.host}`, "bin")
+        destination: path.join(destination, `host-compilers-${row.host}`, "bin"),
       });
     }
-    installed.push(...await install(destination));
+    installed.push(...(await install(destination)));
   }
   console.log(`installed ${installed.length} host tool(s): ${installed.join(", ") || "none"}`);
   // A partial pull of one family still leaves the other's tools missing, so the
@@ -388,7 +400,12 @@ else if (command === "pull") {
     const candidates = [path.resolve(buildDir, "bin", name), path.resolve(buildDir, name)];
     let source = null;
     for (const candidate of candidates) {
-      if (await stat(candidate).then(() => true, () => false)) {
+      if (
+        await stat(candidate).then(
+          () => true,
+          () => false,
+        )
+      ) {
         source = candidate;
         break;
       }
@@ -410,11 +427,11 @@ else if (command === "pull") {
 } else {
   throw new Error(
     "Usage: manage-host-compilers.mjs {" +
-    `fingerprint <${hostArtifactFamilyNames.join("|")}>|` +
-    `tag <${hostArtifactFamilyNames.join("|")}>|` +
-    `release-metadata <${hostArtifactFamilyNames.join("|")}>|` +
-    `expected-assets <${hostArtifactFamilyNames.join("|")}>|` +
-    "report|verify [--complete] [--json]|verify-file <host> <tool> <file>|install <dir>|record <host> [tool]|" +
-    "stage <host> <build dir> [tool]|pull [--family <name>] [--tag <tag>] [--partial]}"
+      `fingerprint <${hostArtifactFamilyNames.join("|")}>|` +
+      `tag <${hostArtifactFamilyNames.join("|")}>|` +
+      `release-metadata <${hostArtifactFamilyNames.join("|")}>|` +
+      `expected-assets <${hostArtifactFamilyNames.join("|")}>|` +
+      "report|verify [--complete] [--json]|verify-file <host> <tool> <file>|install <dir>|record <host> [tool]|" +
+      "stage <host> <build dir> [tool]|pull [--family <name>] [--tag <tag>] [--partial]}",
   );
 }

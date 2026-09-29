@@ -29,7 +29,7 @@ export const inputPaths = Object.freeze({
   // registration verifier that carries positive evidence in C source and holds
   // in every mutually exclusive engine build variant, so they are acted on here
   // rather than only reported.
-  registrationGate: "packages/bindings/generated/defold-lua-registration-gate.json"
+  registrationGate: "packages/bindings/generated/defold-lua-registration-gate.json",
 });
 
 function sha256(text) {
@@ -95,17 +95,31 @@ const scalarKinds = Object.freeze({
   number: "number",
   integer: "integer",
   string: "string",
-  nil: "nil"
+  nil: "nil",
 });
 
 const defoldValueNames = new Set([
-  "hash", "url", "vector", "vector3", "vector4", "quaternion", "matrix4", "node",
-  "buffer", "buffer_data", "buffer_stream", "constant_buffer", "render_predicate",
-  "render_target", "resource_data", "texture", "timer_handle"
+  "hash",
+  "url",
+  "vector",
+  "vector3",
+  "vector4",
+  "quaternion",
+  "matrix4",
+  "node",
+  "buffer",
+  "buffer_data",
+  "buffer_stream",
+  "constant_buffer",
+  "render_predicate",
+  "render_target",
+  "resource_data",
+  "texture",
+  "timer_handle",
 ]);
 
 function normalizeUnion(variants) {
-  const flattened = variants.flatMap((variant) => variant.kind === "union" ? variant.variants : [variant]);
+  const flattened = variants.flatMap((variant) => (variant.kind === "union" ? variant.variants : [variant]));
   const unique = [...new Map(flattened.map((variant) => [JSON.stringify(variant), variant])).values()];
   const nilIndex = unique.findIndex((variant) => variant.kind === "scalar" && variant.name === "nil");
   if (nilIndex !== -1 && unique.length === 2) {
@@ -127,36 +141,47 @@ function parseRecord(text, codecHints) {
       return {
         name: rawName.replace(/\?$/, ""),
         optional: rawName.endsWith("?"),
-        value: parseValueShape(field.slice(separator + 1).trim(), codecHints)
+        value: parseValueShape(field.slice(separator + 1).trim(), codecHints),
       };
-    })
+    }),
   };
 }
 
 function parseCallback(text) {
   const close = text.lastIndexOf(")");
   const parameterText = text.slice(4, close);
-  const resultText = text.slice(close + 1).replace(/^\s*:\s*/, "").trim();
-  const parameters = parameterText.length === 0 ? [] : splitTopLevel(parameterText, ",").map((parameter, index) => {
-    const separator = parameter.indexOf(":");
-    if (separator === -1) {
-      return parameter === "..." || parameter.startsWith("...")
-        ? { name: `rest${index}`, optional: false, variadic: true, value: { kind: "dynamic" } }
-        : { name: `arg${index}`, optional: false, variadic: false, value: { kind: "unknown", source: parameter } };
-    }
-    const rawName = parameter.slice(0, separator).trim();
-    const rawType = parameter.slice(separator + 1).trim();
-    return {
-      name: rawName.replace(/^\.\.\./, "").replace(/\?$/, ""),
-      optional: rawName.endsWith("?"),
-      variadic: rawName.startsWith("..."),
-      value: parseValueShape(rawType, [])
-    };
-  });
+  const resultText = text
+    .slice(close + 1)
+    .replace(/^\s*:\s*/, "")
+    .trim();
+  const parameters =
+    parameterText.length === 0
+      ? []
+      : splitTopLevel(parameterText, ",").map((parameter, index) => {
+          const separator = parameter.indexOf(":");
+          if (separator === -1) {
+            return parameter === "..." || parameter.startsWith("...")
+              ? { name: `rest${index}`, optional: false, variadic: true, value: { kind: "dynamic" } }
+              : {
+                  name: `arg${index}`,
+                  optional: false,
+                  variadic: false,
+                  value: { kind: "unknown", source: parameter },
+                };
+          }
+          const rawName = parameter.slice(0, separator).trim();
+          const rawType = parameter.slice(separator + 1).trim();
+          return {
+            name: rawName.replace(/^\.\.\./, "").replace(/\?$/, ""),
+            optional: rawName.endsWith("?"),
+            variadic: rawName.startsWith("..."),
+            value: parseValueShape(rawType, []),
+          };
+        });
   return {
     kind: "callback",
     parameters,
-    returns: resultText.length === 0 ? [] : [parseValueShape(resultText, [])]
+    returns: resultText.length === 0 ? [] : [parseValueShape(resultText, [])],
   };
 }
 
@@ -180,7 +205,7 @@ export function parseValueShape(rawType, codecHints = []) {
     return {
       kind: "map",
       key: parseValueShape(arguments_[0], []),
-      value: parseValueShape(arguments_[1], [])
+      value: parseValueShape(arguments_[1], []),
     };
   }
   if (scalarKinds[text]) return { kind: "scalar", name: scalarKinds[text] };
@@ -210,13 +235,14 @@ function walkShape(shape, visitor, depth = 0) {
 
 function shapeFacts(shapes) {
   const facts = { callback: false, handle: false, variadic: false, recursive: false, unknown: [] };
-  for (const shape of shapes) walkShape(shape, (entry, depth) => {
-    if (entry.kind === "callback") facts.callback = true;
-    if (entry.kind === "handle") facts.handle = true;
-    if (entry.kind === "variadic") facts.variadic = true;
-    if (["map", "record", "sequence"].includes(entry.kind) && depth > 0) facts.recursive = true;
-    if (entry.kind === "unknown") facts.unknown.push(entry.source);
-  });
+  for (const shape of shapes)
+    walkShape(shape, (entry, depth) => {
+      if (entry.kind === "callback") facts.callback = true;
+      if (entry.kind === "handle") facts.handle = true;
+      if (entry.kind === "variadic") facts.variadic = true;
+      if (["map", "record", "sequence"].includes(entry.kind) && depth > 0) facts.recursive = true;
+      if (entry.kind === "unknown") facts.unknown.push(entry.source);
+    });
   facts.unknown = [...new Set(facts.unknown)].sort();
   return facts;
 }
@@ -226,11 +252,13 @@ function normalizeContextToken(value) {
     .replace(/([a-z0-9])([A-Z])/g, "$1-$2")
     .replace(/[_\s]+/g, "-")
     .toLowerCase();
-  return ({
-    guiscriptinstance: "gui-script-instance",
-    renderscriptinstance: "render-script-instance",
-    scriptinstance: "script-instance"
-  })[token] ?? token;
+  return (
+    {
+      guiscriptinstance: "gui-script-instance",
+      renderscriptinstance: "render-script-instance",
+      scriptinstance: "script-instance",
+    }[token] ?? token
+  );
 }
 
 function moduleAvailability(modulePath) {
@@ -255,7 +283,7 @@ function buildAvailabilityIndex(report, defoldRevision) {
       documentedFeatures: new Set(),
       runtimeFeatures: new Set(),
       documentedProfiles: new Set(),
-      runtimeProfiles: new Set()
+      runtimeProfiles: new Set(),
     };
     if (current.id !== route.id) throw new Error(`availability stable-ID collision at ${route.stableId}`);
     result.set(route.stableId, current);
@@ -290,14 +318,23 @@ function buildRegistrationGate(gate, defoldRevision) {
   const authorityByRoute = new Map();
   for (const authority of gate.routeAuthority ?? []) {
     if (!authority.route) throw new Error("Lua registration gate contains authority without a route");
-    if (authorityByRoute.has(authority.route)) throw new Error(`Lua registration gate duplicates authority for '${authority.route}'`);
-    if (!["registered", "target-variant", "positive-unavailability-observed", "documentation-only"].includes(authority.state)) {
-      throw new Error(`Lua registration gate has unknown authority state '${authority.state}' for '${authority.route}'`);
+    if (authorityByRoute.has(authority.route))
+      throw new Error(`Lua registration gate duplicates authority for '${authority.route}'`);
+    if (
+      !["registered", "target-variant", "positive-unavailability-observed", "documentation-only"].includes(
+        authority.state,
+      )
+    ) {
+      throw new Error(
+        `Lua registration gate has unknown authority state '${authority.state}' for '${authority.route}'`,
+      );
     }
     if (!Array.isArray(authority.targetStates) || authority.targetStates.length !== gate.engineTargets?.length) {
       throw new Error(`Lua registration gate has incomplete target states for '${authority.route}'`);
     }
-    if (authority.targetStates.some((state) => !["registered", "positively-unavailable", "unresolved"].includes(state))) {
+    if (
+      authority.targetStates.some((state) => !["registered", "positively-unavailable", "unresolved"].includes(state))
+    ) {
       throw new Error(`Lua registration gate has an unknown target state for '${authority.route}'`);
     }
     authorityByRoute.set(authority.route, authority);
@@ -329,7 +366,7 @@ function applyRegistrationGate(gate, fn, parameters) {
         findings: [],
       },
       runtimeRawName: fn.rawName,
-      holes: []
+      holes: [],
     };
   }
   const holes = [];
@@ -341,23 +378,46 @@ function applyRegistrationGate(gate, fn, parameters) {
         throw new Error(`${fn.rawName}: registered-name correction has no qualified callableAs`);
       }
       runtimeRawName = finding.callableAs;
-      applied.push({ kind: finding.kind, action: finding.action, parameter: null, callableAs: finding.callableAs, reason: finding.reason });
+      applied.push({
+        kind: finding.kind,
+        action: finding.action,
+        parameter: null,
+        callableAs: finding.callableAs,
+        reason: finding.reason,
+      });
       continue;
     }
     if (finding.action === "mark-source-unavailable") {
       holes.push(`registration:${finding.kind}`);
-      applied.push({ kind: finding.kind, action: finding.action, parameter: null, callableAs: null, reason: finding.reason });
+      applied.push({
+        kind: finding.kind,
+        action: finding.action,
+        parameter: null,
+        callableAs: null,
+        reason: finding.reason,
+      });
       continue;
     }
     if (finding.action === "require-parameter") {
       const slot = parameters[finding.parameter.index - 1];
-      if (!slot) throw new Error(`${fn.rawName}: gate corrects parameter ${finding.parameter.index}, which the script IR does not declare`);
+      if (!slot)
+        throw new Error(
+          `${fn.rawName}: gate corrects parameter ${finding.parameter.index}, which the script IR does not declare`,
+        );
       if (slot.name !== finding.parameter.name) {
-        throw new Error(`${fn.rawName}: gate corrects parameter '${finding.parameter.name}' but the script IR declares '${slot.name}'`);
+        throw new Error(
+          `${fn.rawName}: gate corrects parameter '${finding.parameter.name}' but the script IR declares '${slot.name}'`,
+        );
       }
       slot.optional = false;
       slot.optionalityCorrectedBy = "lua-registration-gate";
-      applied.push({ kind: finding.kind, action: finding.action, parameter: finding.parameter, callableAs: null, reason: finding.reason });
+      applied.push({
+        kind: finding.kind,
+        action: finding.action,
+        parameter: finding.parameter,
+        callableAs: null,
+        reason: finding.reason,
+      });
       continue;
     }
     throw new Error(`${fn.rawName}: unknown Lua registration gate action '${finding.action}'`);
@@ -367,10 +427,10 @@ function applyRegistrationGate(gate, fn, parameters) {
       token: holes.length ? "registration-source-unavailable" : "registration-corrected",
       authority: { state: authority.state, targetStates: authority.targetStates },
       sourceReportSha256: gate.sourceReportSha256,
-      findings: applied
+      findings: applied,
     },
     runtimeRawName,
-    holes
+    holes,
   };
 }
 
@@ -385,12 +445,12 @@ function routeAvailability(fn, stableId, catalog) {
     runtimeFeatures: [...exact.runtimeFeatures].sort(),
     documentedProfiles: [...exact.documentedProfiles].sort(),
     runtimeProfiles: [...exact.runtimeProfiles].sort(),
-    runtimeAvailable: exact.runtimeProfiles.size > 0
+    runtimeAvailable: exact.runtimeProfiles.size > 0,
   };
 }
 
 function rawTargetSupport(...rows) {
-  return rows.flatMap((row) => row?.targetSupport ? [{ source: row.id, support: row.targetSupport }] : []);
+  return rows.flatMap((row) => (row?.targetSupport ? [{ source: row.id, support: row.targetSupport }] : []));
 }
 
 function normalizedDisposition(category, target) {
@@ -416,13 +476,13 @@ function evidenceFor(accounting, matrix) {
   const noStageEvidence = {
     compile: { status: "unverified", observationIds: [] },
     link: { status: "unverified", observationIds: [] },
-    runtime: { status: "unverified", observationIds: [] }
+    runtime: { status: "unverified", observationIds: [] },
   };
   return {
     accountingCategory: accounting.category,
     generator: accounting.evidence?.generator ?? null,
     generatedFamily: accounting.evidence?.generatedFamily ?? null,
-    stages: matrix?.evidence ?? noStageEvidence
+    stages: matrix?.evidence ?? noStageEvidence,
   };
 }
 
@@ -439,8 +499,14 @@ export function generateScriptProjectionIr(textInputs) {
   const parsed = Object.fromEntries(Object.entries(textInputs).map(([name, text]) => [name, parseJson(text, name)]));
   const { ir, patterns, accounting } = parsed;
   const functionCount = ir.functions?.length ?? 0;
-  if (ir.counts?.functions !== functionCount) throw new Error(`script IR function count metadata is stale: ${ir.counts?.functions ?? "missing"} versus ${functionCount}`);
-  if (patterns.classifiedFunctionCount !== patterns.bindings?.length || accounting.functionCount !== ir.functions.length) {
+  if (ir.counts?.functions !== functionCount)
+    throw new Error(
+      `script IR function count metadata is stale: ${ir.counts?.functions ?? "missing"} versus ${functionCount}`,
+    );
+  if (
+    patterns.classifiedFunctionCount !== patterns.bindings?.length ||
+    accounting.functionCount !== ir.functions.length
+  ) {
     throw new Error("script pattern/accounting census is stale against the script IR");
   }
   const availabilityCatalog = buildAvailabilityIndex(parsed.availabilityProfiles, ir.defoldRevision);
@@ -462,7 +528,7 @@ export function generateScriptProjectionIr(textInputs) {
     tableRecordBlockers: indexRows(parsed.tableRecords.blockedRoutes, "tableRecordBlockers"),
     copiedRecords: indexRows(reportRows(parsed.copiedRecords), "copiedRecords"),
     opaqueRecords: indexRows(reportRows(parsed.opaqueRecords), "opaqueRecords"),
-    engineMatrix: indexRows(reportRows(parsed.engineMatrix), "engineMatrix")
+    engineMatrix: indexRows(reportRows(parsed.engineMatrix), "engineMatrix"),
   };
 
   const ids = ir.functions.map(({ id }) => id);
@@ -480,139 +546,182 @@ export function generateScriptProjectionIr(textInputs) {
     }
   }
 
-  const rows = ir.functions.map((fn) => {
-    const pattern = indexes.patterns.get(fn.id) ?? {
-      loweringFamily: "separate-module",
-      parameterCodecs: fn.parameters.map(() => ({ codecs: [] })),
-      returnCodecs: fn.returns.map(() => ({ codecs: [] })),
-      traits: []
-    };
-    const account = indexes.accounting.get(fn.id);
-    const related = Object.fromEntries(Object.entries(indexes).map(([name, index]) => [name, index.get(fn.id)]));
-    const stableId = stableBindingId(fn.id);
-    const parameters = fn.parameters.map((parameter, index) => ({
-      name: parameter.rawName,
-      optional: parameter.optional,
-      value: parseValueShape(parameter.rawType, pattern.parameterCodecs[index]?.codecs ?? []),
-      sourceType: parameter.rawType
-    }));
-    // The C source outranks the declaration: a slot the body refuses to default
-    // is corrected here, and a differently registered name becomes the runtime
-    // lookup without suppressing the documented public route.
-    const gated = applyRegistrationGate(registrationGate, fn, parameters);
-    const runtimeSegments = gated.runtimeRawName.split(".");
-    const runtimeMember = runtimeSegments.pop();
-    const returns = fn.returns.map((rawType, index) => ({
-      index,
-      value: parseValueShape(rawType, pattern.returnCodecs[index]?.codecs ?? []),
-      sourceType: rawType
-    }));
-    const facts = shapeFacts([...parameters.map(({ value }) => value), ...returns.map(({ value }) => value)]);
-    const context = account.category === "component-property-compiler"
-      ? { token: "component-property-compiler", source: "component-proxy-generator" }
-      : selectContext({
-          handle: related.handles,
-          callback: related.callbacks,
-          tail: related.tails,
-          tuple: related.tuples,
-          tableRecord: related.tableRecords,
-          value: related.values
-        });
-    const invalidation = related.handles?.invalidatedIdentity
-      ? { token: "invalidate-underlying-identity", identity: related.handles.invalidatedIdentity, hostHandle: related.handles.hostHandleEffect }
-      : { token: "none" };
-    const callback = related.callbacks ? {
-      token: "retained-lua-closure",
-      lifetime: related.callbacks.lifetime,
-      owner: related.callbacks.owner,
-      threadAffinity: related.callbacks.threadAffinity,
-      registryEligible: related.callbacks.registryEligible
-    } : facts.callback ? { token: "callback-policy-unresolved" } : { token: "none" };
-    const semanticHoles = [];
-    if (context.token === "context-policy-unresolved") semanticHoles.push("context-policy");
-    if (callback.token === "callback-policy-unresolved") semanticHoles.push("callback-lifetime-policy");
-    if (facts.handle && !related.handles) semanticHoles.push("handle-ownership-lifetime-policy");
-    if (facts.unknown.length > 0) semanticHoles.push("value-shape-parser");
-    semanticHoles.push(...gated.holes);
-    if (account.category === "pending") semanticHoles.push(`lowering:${account.reason.loweringFamily}`);
-    const explicitBlockers = [
-      related.dynamics?.blocker,
-      related.tails?.blocker,
-      related.overloads?.blocker,
-      related.tableRecordBlockers?.blocker,
-      related.copiedRecords?.blocker,
-      related.opaqueRecords?.blocker
-    ].filter(Boolean);
-    semanticHoles.push(...explicitBlockers.map((blocker) => `policy:${blocker}`));
+  const rows = ir.functions
+    .map((fn) => {
+      const pattern = indexes.patterns.get(fn.id) ?? {
+        loweringFamily: "separate-module",
+        parameterCodecs: fn.parameters.map(() => ({ codecs: [] })),
+        returnCodecs: fn.returns.map(() => ({ codecs: [] })),
+        traits: [],
+      };
+      const account = indexes.accounting.get(fn.id);
+      const related = Object.fromEntries(Object.entries(indexes).map(([name, index]) => [name, index.get(fn.id)]));
+      const stableId = stableBindingId(fn.id);
+      const parameters = fn.parameters.map((parameter, index) => ({
+        name: parameter.rawName,
+        optional: parameter.optional,
+        value: parseValueShape(parameter.rawType, pattern.parameterCodecs[index]?.codecs ?? []),
+        sourceType: parameter.rawType,
+      }));
+      // The C source outranks the declaration: a slot the body refuses to default
+      // is corrected here, and a differently registered name becomes the runtime
+      // lookup without suppressing the documented public route.
+      const gated = applyRegistrationGate(registrationGate, fn, parameters);
+      const runtimeSegments = gated.runtimeRawName.split(".");
+      const runtimeMember = runtimeSegments.pop();
+      const returns = fn.returns.map((rawType, index) => ({
+        index,
+        value: parseValueShape(rawType, pattern.returnCodecs[index]?.codecs ?? []),
+        sourceType: rawType,
+      }));
+      const facts = shapeFacts([...parameters.map(({ value }) => value), ...returns.map(({ value }) => value)]);
+      const context =
+        account.category === "component-property-compiler"
+          ? { token: "component-property-compiler", source: "component-proxy-generator" }
+          : selectContext({
+              handle: related.handles,
+              callback: related.callbacks,
+              tail: related.tails,
+              tuple: related.tuples,
+              tableRecord: related.tableRecords,
+              value: related.values,
+            });
+      const invalidation = related.handles?.invalidatedIdentity
+        ? {
+            token: "invalidate-underlying-identity",
+            identity: related.handles.invalidatedIdentity,
+            hostHandle: related.handles.hostHandleEffect,
+          }
+        : { token: "none" };
+      const callback = related.callbacks
+        ? {
+            token: "retained-lua-closure",
+            lifetime: related.callbacks.lifetime,
+            owner: related.callbacks.owner,
+            threadAffinity: related.callbacks.threadAffinity,
+            registryEligible: related.callbacks.registryEligible,
+          }
+        : facts.callback
+          ? { token: "callback-policy-unresolved" }
+          : { token: "none" };
+      const semanticHoles = [];
+      if (context.token === "context-policy-unresolved") semanticHoles.push("context-policy");
+      if (callback.token === "callback-policy-unresolved") semanticHoles.push("callback-lifetime-policy");
+      if (facts.handle && !related.handles) semanticHoles.push("handle-ownership-lifetime-policy");
+      if (facts.unknown.length > 0) semanticHoles.push("value-shape-parser");
+      semanticHoles.push(...gated.holes);
+      if (account.category === "pending") semanticHoles.push(`lowering:${account.reason.loweringFamily}`);
+      const explicitBlockers = [
+        related.dynamics?.blocker,
+        related.tails?.blocker,
+        related.overloads?.blocker,
+        related.tableRecordBlockers?.blocker,
+        related.copiedRecords?.blocker,
+        related.opaqueRecords?.blocker,
+      ].filter(Boolean);
+      semanticHoles.push(...explicitBlockers.map((blocker) => `policy:${blocker}`));
 
-    return {
-      id: fn.id,
-      stableId,
-      rawName: fn.rawName,
-      modulePath: fn.modulePath,
-      member: fn.member,
-      runtimeRawName: gated.runtimeRawName,
-      runtimeModulePath: runtimeSegments,
-      runtimeMember,
-      source: { path: fn.source, line: fn.line },
-      loweringFamily: pattern.loweringFamily,
-      signature: {
-        parameters,
-        returns,
-        overloadTokens: [...fn.overloads],
-        genericTokens: [...fn.generics]
-      },
-      context,
-      availability: routeAvailability(fn, stableId, availabilityCatalog),
-      registration: gated.registration,
-      effects: {
-        ownership: related.handles ? {
-          token: "generation-checked-host-handle",
-          inputKinds: related.handles.inputHandleKinds,
-          returnKinds: related.handles.returnHandleKinds,
-          hostHandleEffect: related.handles.hostHandleEffect
-        } : facts.handle ? {
-          token: "handle-ownership-policy-unresolved"
-        } : { token: "copied-or-call-local-value" },
-        lifetime: related.callbacks
-          ? { token: related.callbacks.lifetime, owner: related.callbacks.owner }
-          : facts.handle ? { token: "handle-lifetime-policy-unresolved" } : { token: "call-local" },
-        invalidation,
-        callback,
-        variadic: (facts.variadic || pattern.traits.includes("variable-arguments") || pattern.traits.includes("variable-results"))
-          ? { token: "runtime-arity", traits: pattern.traits.filter((trait) => trait.startsWith("variable-")) }
-          : { token: "fixed-arity" },
-        recursive: facts.recursive || pattern.loweringFamily === "lua-table"
-          ? { token: "recursive-value-graph", cyclePolicy: "policy-unresolved" }
-          : { token: "acyclic-value-shape" }
-      },
-      targets: {
-        nativeDynamicHermes: { disposition: normalizedDisposition(account.category, "native-dynamic-hermes") },
-        nativeStaticHermes: { disposition: normalizedDisposition(account.category, "native-static-hermes") },
-        html5BrowserHost: { disposition: normalizedDisposition(account.category, "html5-browser-host") },
-        sourcePolicies: rawTargetSupport(related.values, related.urls, related.tuples, related.dynamics, related.overloads)
-      },
-      generation: {
-        state: "projected",
-        deterministic: true,
-        semanticHoles
-      },
-      evidence: evidenceFor(account, related.engineMatrix)
-    };
-  }).sort((left, right) => left.id.localeCompare(right.id));
+      return {
+        id: fn.id,
+        stableId,
+        rawName: fn.rawName,
+        modulePath: fn.modulePath,
+        member: fn.member,
+        runtimeRawName: gated.runtimeRawName,
+        runtimeModulePath: runtimeSegments,
+        runtimeMember,
+        source: { path: fn.source, line: fn.line },
+        loweringFamily: pattern.loweringFamily,
+        signature: {
+          parameters,
+          returns,
+          overloadTokens: [...fn.overloads],
+          genericTokens: [...fn.generics],
+        },
+        context,
+        availability: routeAvailability(fn, stableId, availabilityCatalog),
+        registration: gated.registration,
+        effects: {
+          ownership: related.handles
+            ? {
+                token: "generation-checked-host-handle",
+                inputKinds: related.handles.inputHandleKinds,
+                returnKinds: related.handles.returnHandleKinds,
+                hostHandleEffect: related.handles.hostHandleEffect,
+              }
+            : facts.handle
+              ? {
+                  token: "handle-ownership-policy-unresolved",
+                }
+              : { token: "copied-or-call-local-value" },
+          lifetime: related.callbacks
+            ? { token: related.callbacks.lifetime, owner: related.callbacks.owner }
+            : facts.handle
+              ? { token: "handle-lifetime-policy-unresolved" }
+              : { token: "call-local" },
+          invalidation,
+          callback,
+          variadic:
+            facts.variadic ||
+            pattern.traits.includes("variable-arguments") ||
+            pattern.traits.includes("variable-results")
+              ? { token: "runtime-arity", traits: pattern.traits.filter((trait) => trait.startsWith("variable-")) }
+              : { token: "fixed-arity" },
+          recursive:
+            facts.recursive || pattern.loweringFamily === "lua-table"
+              ? { token: "recursive-value-graph", cyclePolicy: "policy-unresolved" }
+              : { token: "acyclic-value-shape" },
+        },
+        targets: {
+          nativeDynamicHermes: { disposition: normalizedDisposition(account.category, "native-dynamic-hermes") },
+          nativeStaticHermes: { disposition: normalizedDisposition(account.category, "native-static-hermes") },
+          html5BrowserHost: { disposition: normalizedDisposition(account.category, "html5-browser-host") },
+          sourcePolicies: rawTargetSupport(
+            related.values,
+            related.urls,
+            related.tuples,
+            related.dynamics,
+            related.overloads,
+          ),
+        },
+        generation: {
+          state: "projected",
+          deterministic: true,
+          semanticHoles,
+        },
+        evidence: evidenceFor(account, related.engineMatrix),
+      };
+    })
+    .sort((left, right) => left.id.localeCompare(right.id));
 
   const projectedIds = rows.map(({ id }) => id);
-  if (new Set(projectedIds).size !== ir.functions.length) throw new Error("projection does not cover every script route exactly once");
+  if (new Set(projectedIds).size !== ir.functions.length)
+    throw new Error("projection does not cover every script route exactly once");
   const projectedStableIds = rows.map(({ stableId }) => stableId);
-  if (new Set(projectedStableIds).size !== rows.length) throw new Error("script projection contains a stable-ID collision");
+  if (new Set(projectedStableIds).size !== rows.length)
+    throw new Error("script projection contains a stable-ID collision");
   const holeRows = rows.filter(({ generation }) => generation.semanticHoles.length > 0);
   return {
     schemaVersion: 1,
     defoldRevision: ir.defoldRevision,
-    scope: "Normalized value-shape/effect algebra for every imported Defold script function. Projection state is intentionally independent of compile/link/runtime evidence.",
+    scope:
+      "Normalized value-shape/effect algebra for every imported Defold script function. Projection state is intentionally independent of compile/link/runtime evidence.",
     constructors: [
-      "scalar", "dynamic", "named", "enum", "defold-value", "handle", "record-ref", "record",
-      "sequence", "map", "union", "optional", "callback", "variadic", "unknown"
+      "scalar",
+      "dynamic",
+      "named",
+      "enum",
+      "defold-value",
+      "handle",
+      "record-ref",
+      "record",
+      "sequence",
+      "map",
+      "union",
+      "optional",
+      "callback",
+      "variadic",
+      "unknown",
     ],
     inputHashes: Object.fromEntries(Object.entries(textInputs).map(([name, text]) => [name, sha256(text)])),
     routeCount: rows.length,
@@ -622,17 +731,21 @@ export function generateScriptProjectionIr(textInputs) {
     contextCounts: countBy(rows, ({ context }) => context.token),
     availabilityCounts: countBy(rows, ({ availability }) => availability.token),
     registrationCounts: countBy(rows, ({ registration }) => registration.token),
-    semanticHoleCounts: countBy(holeRows.flatMap((row) => row.generation.semanticHoles.map((hole) => ({ hole }))), ({ hole }) => hole),
+    semanticHoleCounts: countBy(
+      holeRows.flatMap((row) => row.generation.semanticHoles.map((hole) => ({ hole }))),
+      ({ hole }) => hole,
+    ),
     semanticHoles: holeRows.map(({ id, generation }) => ({ id, tokens: generation.semanticHoles })),
-    rows
+    rows,
   };
 }
 
 export async function loadScriptProjectionInputs() {
-  return Object.fromEntries(await Promise.all(Object.entries(inputPaths).map(async ([name, path]) => [
-    name,
-    await readFile(new URL(path, root), "utf8")
-  ])));
+  return Object.fromEntries(
+    await Promise.all(
+      Object.entries(inputPaths).map(async ([name, path]) => [name, await readFile(new URL(path, root), "utf8")]),
+    ),
+  );
 }
 
 async function main() {

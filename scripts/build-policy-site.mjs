@@ -29,7 +29,13 @@ import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { ARTIFACTS_DOCUMENT_KIND, artifactsPath, hashBytes } from "../packages/compiler/src/api-policy.mjs";
-import { buildArtifactReferences, readSiteConfig, readStore, shippedIndexPath, storeRoot } from "./generate-api-policy.mjs";
+import {
+  buildArtifactReferences,
+  readSiteConfig,
+  readStore,
+  shippedIndexPath,
+  storeRoot,
+} from "./generate-api-policy.mjs";
 import { artifactFamilyNames } from "./lib/artifact-releases.mjs";
 
 export const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -44,9 +50,9 @@ async function walk(directory, prefix = "") {
     if (error.code === "ENOENT") return out;
     throw error;
   }
-  for (const entry of entries.sort((left, right) => left.name < right.name ? -1 : 1)) {
+  for (const entry of entries.sort((left, right) => (left.name < right.name ? -1 : 1))) {
     const next = prefix ? `${prefix}/${entry.name}` : entry.name;
-    if (entry.isDirectory()) out.push(...await walk(path.join(directory, entry.name), next));
+    if (entry.isDirectory()) out.push(...(await walk(path.join(directory, entry.name), next)));
     else out.push(next);
   }
   return out;
@@ -90,8 +96,7 @@ function pngSize(bytes) {
   return { width: bytes.readUInt32BE(16), height: bytes.readUInt32BE(20) };
 }
 
-const escapeHtml = (value) => String(value)
-  .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+const escapeHtml = (value) => String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
 // Deliberately minimal. This page exists so a human who lands on a hash URL can
 // tell what the store is and where the project lives; the policies themselves
@@ -216,7 +221,7 @@ ${escapeHtml(site.layoutVersion)}/object/&lt;subtree-hash&gt;.json  &rarr; one n
 }
 
 export async function buildPolicySite(options = {}) {
-  const site = options.site ?? await readSiteConfig();
+  const site = options.site ?? (await readSiteConfig());
   const output = options.output ?? defaultOutputDirectory;
   const store = await readStore(options.storeRoot ?? storeRoot, site.layoutVersion);
   if (store.problems.length) {
@@ -224,7 +229,9 @@ export async function buildPolicySite(options = {}) {
   }
   if (!store.entries.length) throw new Error("The policy store holds no index entries");
   if (store.orphans.length) {
-    throw new Error(`Refusing to publish ${store.orphans.length} unreferenced objects: ${store.orphans.slice(0, 3).join(", ")}`);
+    throw new Error(
+      `Refusing to publish ${store.orphans.length} unreferenced objects: ${store.orphans.slice(0, 3).join(", ")}`,
+    );
   }
 
   const shippedIndex = JSON.parse(await readFile(options.shippedIndexPath ?? shippedIndexPath, "utf8"));
@@ -236,8 +243,8 @@ export async function buildPolicySite(options = {}) {
     base: {
       ...shippedIndex.base,
       url: options.baseUrl ?? shippedIndex.base.url,
-      pathPrefix: options.pathPrefix ?? shippedIndex.base.pathPrefix
-    }
+      pathPrefix: options.pathPrefix ?? shippedIndex.base.pathPrefix,
+    },
   };
 
   const prefix = (options.pathPrefix ?? site.pathPrefix ?? "").split("/").filter(Boolean);
@@ -248,8 +255,10 @@ export async function buildPolicySite(options = {}) {
   // `manifest.json` cannot collide with a revision entry: a Defold sha is 40 hex
   // characters and this is not one. It is how a consumer discovers every indexed
   // revision and the base, without a listing endpoint.
-  files.set([...prefix, site.layoutVersion, "index", "manifest.json"].join("/"),
-    Buffer.from(`${JSON.stringify(served, null, 2)}\n`));
+  files.set(
+    [...prefix, site.layoutVersion, "index", "manifest.json"].join("/"),
+    Buffer.from(`${JSON.stringify(served, null, 2)}\n`),
+  );
 
   // The artifact mapping is emitted here rather than committed to the store,
   // because it is a function of the BUILD RECIPE and not of the engine: a tag
@@ -260,17 +269,19 @@ export async function buildPolicySite(options = {}) {
   // Every indexed revision gets one, naming the tags this publish is current
   // for. It is the one served document that is legitimately rewritten.
   const artifactReferences = validateArtifactReferences(
-    options.artifactReferences ?? await buildArtifactReferences()
+    options.artifactReferences ?? (await buildArtifactReferences()),
   );
   for (const entry of store.entries) {
     const document = {
       schemaVersion: 1,
       kind: ARTIFACTS_DOCUMENT_KIND,
       defoldRevision: entry.defoldRevision,
-      artifacts: artifactReferences
+      artifacts: artifactReferences,
     };
-    files.set([...prefix, artifactsPath(site.layoutVersion, entry.defoldRevision)].join("/"),
-      Buffer.from(`${JSON.stringify(document, null, 2)}\n`));
+    files.set(
+      [...prefix, artifactsPath(site.layoutVersion, entry.defoldRevision)].join("/"),
+      Buffer.from(`${JSON.stringify(document, null, 2)}\n`),
+    );
   }
   const plan = JSON.parse(await readFile(options.planPath ?? planPath, "utf8"));
   // The wordmark and the unfurl card are the only non-generated bytes the site
@@ -278,13 +289,18 @@ export async function buildPolicySite(options = {}) {
   // because they belong to the page and not to the versioned object scheme.
   const wordmarkBytes = await readFile(wordmarkPath);
   const ogImageBytes = await readFile(ogImagePath);
-  files.set([...prefix, "index.html"].join("/"), Buffer.from(landingPage({
-    site,
-    plan,
-    defoldRevision: plan.defoldRevision,
-    wordmark: pngSize(wordmarkBytes),
-    ogImage: pngSize(ogImageBytes)
-  })));
+  files.set(
+    [...prefix, "index.html"].join("/"),
+    Buffer.from(
+      landingPage({
+        site,
+        plan,
+        defoldRevision: plan.defoldRevision,
+        wordmark: pngSize(wordmarkBytes),
+        ogImage: pngSize(ogImageBytes),
+      }),
+    ),
+  );
   files.set([...prefix, "deherm-wordmark.png"].join("/"), wordmarkBytes);
   files.set([...prefix, "deherm-og.png"].join("/"), ogImageBytes);
   // Pages runs Jekyll unless told not to, and Jekyll drops paths it considers
@@ -294,7 +310,7 @@ export async function buildPolicySite(options = {}) {
 
   const written = [];
   const unchanged = [];
-  for (const [relative, bytes] of [...files].sort(([left], [right]) => left < right ? -1 : 1)) {
+  for (const [relative, bytes] of [...files].sort(([left], [right]) => (left < right ? -1 : 1))) {
     const absolute = path.join(output, relative);
     const current = await readFile(absolute).catch(() => null);
     if (current && current.equals(bytes)) {
@@ -317,9 +333,11 @@ export async function verifyEmittedTree({ output, site, pathPrefix }) {
   for (const entry of manifest.entries) {
     const indexBytes = await readFile(at(site.layoutVersion, "index", `${entry.defoldRevision}.json`), "utf8");
     const index = JSON.parse(indexBytes);
-    if (index.policyRoot !== entry.policyRoot) throw new Error(`${entry.defoldRevision}: manifest and index entry disagree`);
+    if (index.policyRoot !== entry.policyRoot)
+      throw new Error(`${entry.defoldRevision}: manifest and index entry disagree`);
     const rootBytes = await readFile(at(site.layoutVersion, "policy", `${index.policyRoot}.json`), "utf8");
-    if (hashBytes(rootBytes) !== index.policyRoot) throw new Error(`policy ${index.policyRoot} does not hash to its path`);
+    if (hashBytes(rootBytes) !== index.policyRoot)
+      throw new Error(`policy ${index.policyRoot} does not hash to its path`);
     for (const [namespace, hash] of Object.entries(JSON.parse(rootBytes).subtrees)) {
       const bytes = await readFile(at(site.layoutVersion, "object", `${hash}.json`), "utf8");
       if (hashBytes(bytes) !== hash) throw new Error(`object ${hash} (${namespace}) does not hash to its path`);
@@ -340,22 +358,21 @@ async function main(argv = process.argv.slice(2)) {
       const file = path.resolve(argv[++index]);
       options.artifactReferences = validateArtifactReferences(
         JSON.parse(await readFile(file, "utf8")),
-        `artifact references from ${file}`
+        `artifact references from ${file}`,
       );
-    }
-    else throw new Error(`Unknown argument: ${argument}`);
+    } else throw new Error(`Unknown argument: ${argument}`);
   }
   const result = await buildPolicySite(options);
   const verified = await verifyEmittedTree({
     output: result.output,
     site: result.site,
-    pathPrefix: options.pathPrefix ?? result.site.pathPrefix
+    pathPrefix: options.pathPrefix ?? result.site.pathPrefix,
   });
   console.log(
     `Emitted ${result.files.length} files to ${path.relative(root, result.output)} ` +
-    `(${result.written.length} written, ${result.unchanged.length} already current); ` +
-    `verified ${verified.revisions} revision(s) and ${verified.objects} objects against their own paths; ` +
-    `base ${result.served.base.url}${result.served.base.pathPrefix ? `/${result.served.base.pathPrefix}` : ""}`
+      `(${result.written.length} written, ${result.unchanged.length} already current); ` +
+      `verified ${verified.revisions} revision(s) and ${verified.objects} objects against their own paths; ` +
+      `base ${result.served.base.url}${result.served.base.pathPrefix ? `/${result.served.base.pathPrefix}` : ""}`,
   );
 }
 

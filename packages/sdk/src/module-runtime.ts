@@ -11,7 +11,9 @@ export function requireDefoldModule<T extends object>(name: string, moduleAbiVer
   if (moduleAbiVersion !== undefined) {
     const actual = (module as Record<string, unknown>).__dehermNativeModuleAbiVersionV1;
     if (actual !== moduleAbiVersion) {
-      throw new Error(`Defold native module ABI mismatch: ${name} requires ${moduleAbiVersion}, received ${String(actual)}`);
+      throw new Error(
+        `Defold native module ABI mismatch: ${name} requires ${moduleAbiVersion}, received ${String(actual)}`,
+      );
     }
   }
   return module;
@@ -32,9 +34,16 @@ const nativePumpGlobal = globalThis as typeof globalThis & {
 function nativeModulePumpState(): NativeModulePumpStateV1 {
   const existing = nativePumpGlobal.__dehermNativeModulePumpStateV1;
   if (existing) {
-    if (existing.version !== 1 || existing.pumps.length !== MAX_NATIVE_MODULE_PUMPS ||
-        typeof existing.tick !== "function") throw new Error("Invalid native module pump state v1");
-    if (nativePumpGlobal.__dehermNativeModulesTickV1 && nativePumpGlobal.__dehermNativeModulesTickV1 !== existing.tick) {
+    if (
+      existing.version !== 1 ||
+      existing.pumps.length !== MAX_NATIVE_MODULE_PUMPS ||
+      typeof existing.tick !== "function"
+    )
+      throw new Error("Invalid native module pump state v1");
+    if (
+      nativePumpGlobal.__dehermNativeModulesTickV1 &&
+      nativePumpGlobal.__dehermNativeModulesTickV1 !== existing.tick
+    ) {
       throw new Error("Native module pump tick v1 is already owned by an incompatible runtime");
     }
     nativePumpGlobal.__dehermNativeModulesTickV1 ??= existing.tick;
@@ -43,7 +52,7 @@ function nativeModulePumpState(): NativeModulePumpStateV1 {
   if (nativePumpGlobal.__dehermNativeModulesTickV1) {
     throw new Error("Native module pump tick v1 exists without its shared state");
   }
-  const pumps = new Array<NativeModulePump | undefined>(MAX_NATIVE_MODULE_PUMPS);
+  const pumps = Array.from<NativeModulePump | undefined>({ length: MAX_NATIVE_MODULE_PUMPS });
   const state: NativeModulePumpStateV1 = {
     version: 1,
     pumps,

@@ -1,9 +1,8 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { mkdir, readFile, rm, unlink, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, unlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
-import { mkdtemp } from "node:fs/promises";
 import test from "node:test";
 
 import { ensureBindingLoweringPlan } from "../scripts/ensure-binding-lowering-plan.mjs";
@@ -20,7 +19,7 @@ async function cacheFixture() {
   return {
     root,
     output: join(root, "packages/bindings/generated/defold-binding-lowering-plan.json"),
-    sentinel: join(root, "packages/bindings/generated/defold-binding-lowering-plan.sentinel.json")
+    sentinel: join(root, "packages/bindings/generated/defold-binding-lowering-plan.sentinel.json"),
   };
 }
 
@@ -30,7 +29,10 @@ test("content-addressed ensure is idempotent and writes nothing while the sentin
     const first = await ensureBindingLoweringPlan(fixture);
     assert.equal(first.action, "regenerated");
     assert.equal(first.reason, "missing-or-invalid-sentinel");
-    const [output, sentinel] = await Promise.all([readFile(fixture.output, "utf8"), readFile(fixture.sentinel, "utf8")]);
+    const [output, sentinel] = await Promise.all([
+      readFile(fixture.output, "utf8"),
+      readFile(fixture.sentinel, "utf8"),
+    ]);
 
     const second = await ensureBindingLoweringPlan(fixture);
     assert.equal(second.action, "current");
@@ -55,13 +57,14 @@ test("changed inputs, corrupted output, or a deleted sentinel invalidate the exa
     await writeFile(fixture.output, validOutput);
     await assert.rejects(
       ensureBindingLoweringPlan({ ...fixture, check: true, deepCheck: true }),
-      /output-digest-mismatch/
+      /output-digest-mismatch/,
     );
     assert.equal((await ensureBindingLoweringPlan({ ...fixture, force: true })).reason, "forced");
 
     const forged = JSON.parse(await readFile(fixture.output, "utf8"));
     forged.evidenceBoundary.compilation = "yes-claimed";
-    const { planSha256: ignored, ...forgedBody } = forged;
+    const forgedBody = { ...forged };
+    delete forgedBody.planSha256;
     forged.planSha256 = createHash("sha256").update(JSON.stringify(forgedBody)).digest("hex");
     const forgedText = `${JSON.stringify(forged, null, 2)}\n`;
     const forgedSentinel = JSON.parse(await readFile(fixture.sentinel, "utf8"));
@@ -73,12 +76,12 @@ test("changed inputs, corrupted output, or a deleted sentinel invalidate the exa
     const beforeDeepCheck = await Promise.all([readFile(fixture.output, "utf8"), readFile(fixture.sentinel, "utf8")]);
     await assert.rejects(
       ensureBindingLoweringPlan({ ...fixture, deepCheck: true }),
-      /output-does-not-match-declared-inputs/
+      /output-does-not-match-declared-inputs/,
     );
     assert.deepEqual(
       await Promise.all([readFile(fixture.output, "utf8"), readFile(fixture.sentinel, "utf8")]),
       beforeDeepCheck,
-      "deep verification must never repair or rewrite evidence"
+      "deep verification must never repair or rewrite evidence",
     );
     await ensureBindingLoweringPlan({ ...fixture, force: true });
 

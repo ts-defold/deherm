@@ -30,8 +30,7 @@ function parseArgs(argv) {
   for (let i = 0; i < argv.length; ++i) {
     if (argv[i] === "--check") options.check = true;
     else if (argv[i] === "--out-root") options.outRoot = path.resolve(argv[++i]);
-    else if (["--shapes", "--plan", "--policy"].includes(argv[i]))
-      options[argv[i].slice(2)] = path.resolve(argv[++i]);
+    else if (["--shapes", "--plan", "--policy"].includes(argv[i])) options[argv[i].slice(2)] = path.resolve(argv[++i]);
     else throw new Error(`Unknown argument ${argv[i]}`);
   }
   for (const key of Object.keys(defaults)) options[key] = path.resolve(root, options[key]);
@@ -149,7 +148,8 @@ function renderExactForEntries(entries) {
         return `void ${entry.symbol}(${state}* d,const ${state}* s,bool r){++calls[${id}];uint${width}_t value=0;std::memcpy(&value,static_cast<const void*>(s),sizeof(value));value+=r?${width === 32 ? 7 : 9}:1;std::memset(static_cast<void*>(d),0,sizeof(*d));std::memcpy(static_cast<void*>(d),&value,sizeof(value));}`;
       if (op === "UpdateBuffer")
         return `void ${entry.symbol}(${state}* s,const void* p,uint32_t n){++calls[${id}];uint${width}_t value=0;std::memcpy(&value,static_cast<const void*>(s),sizeof(value));const auto* b=(const uint8_t*)p;for(uint32_t i=0;i<n;++i)value+=b[i];std::memcpy(static_cast<void*>(s),&value,sizeof(value));}`;
-      if (op === "Final") return `uint${width}_t ${entry.symbol}(${state}* s){++calls[${id}];uint${width}_t value=0;std::memcpy(&value,static_cast<const void*>(s),sizeof(value));return value;}`;
+      if (op === "Final")
+        return `uint${width}_t ${entry.symbol}(${state}* s){++calls[${id}];uint${width}_t value=0;std::memcpy(&value,static_cast<const void*>(s),sizeof(value));return value;}`;
       return `void ${entry.symbol}(${state}*){++calls[${id}];}`;
     })
     .join("\n");

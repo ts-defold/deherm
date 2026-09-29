@@ -221,27 +221,51 @@ function arenaPattern(id, kind, result, positions, semanticTokens) {
 
 export function arenaCStringPatterns() {
   return Object.freeze([
-    arenaPattern("arena-cstring.error-string", "error-string", { roles: ["scalar:void"] }, [
-      { roles: ["cstring-mutable"], directions: ["out"] },
-      { roles: ["scalar:usize"], directions: ["value"] },
-      { roles: ["scalar:i32"], directions: ["value"] },
-    ], ["bounded-cstring-output", "error-string", "null-terminated-output", "synchronous-noescape"]),
-    arenaPattern("arena-cstring.trimmed-string", "trimmed-string", { roles: ["scalar:usize"] }, [
-      { roles: ["cstring-mutable"], directions: ["out"] },
-      { roles: ["scalar:usize"], directions: ["value"] },
-      { roles: ["cstring-in"], directions: ["in"] },
-    ], ["bounded-cstring-output", "counted-cstring-input", "null-terminated-output", "trimmed-string"]),
-    arenaPattern("arena-cstring.canonical-path", "canonical-path", { roles: ["scalar:u32"] }, [
-      { roles: ["cstring-in"], directions: ["in"] },
-      { roles: ["cstring-mutable"], directions: ["inout"] },
-      { roles: ["scalar:u32"], directions: ["value"] },
-    ], ["bounded-cstring-output", "canonical-path", "counted-cstring-input", "output-length-result"]),
-    arenaPattern("arena-cstring.uri-encode", "uri-encode", { rolePrefixes: ["enum:"] }, [
-      { roles: ["cstring-in"], directions: ["in"] },
-      { roles: ["cstring-mutable"], directions: ["out"] },
-      { roles: ["scalar:u32"], directions: ["value"] },
-      { roles: ["pointer:scalar:u32"], directions: ["inout"] },
-    ], ["bounded-cstring-output", "counted-cstring-input", "output-byte-count", "uri-encode"]),
+    arenaPattern(
+      "arena-cstring.error-string",
+      "error-string",
+      { roles: ["scalar:void"] },
+      [
+        { roles: ["cstring-mutable"], directions: ["out"] },
+        { roles: ["scalar:usize"], directions: ["value"] },
+        { roles: ["scalar:i32"], directions: ["value"] },
+      ],
+      ["bounded-cstring-output", "error-string", "null-terminated-output", "synchronous-noescape"],
+    ),
+    arenaPattern(
+      "arena-cstring.trimmed-string",
+      "trimmed-string",
+      { roles: ["scalar:usize"] },
+      [
+        { roles: ["cstring-mutable"], directions: ["out"] },
+        { roles: ["scalar:usize"], directions: ["value"] },
+        { roles: ["cstring-in"], directions: ["in"] },
+      ],
+      ["bounded-cstring-output", "counted-cstring-input", "null-terminated-output", "trimmed-string"],
+    ),
+    arenaPattern(
+      "arena-cstring.canonical-path",
+      "canonical-path",
+      { roles: ["scalar:u32"] },
+      [
+        { roles: ["cstring-in"], directions: ["in"] },
+        { roles: ["cstring-mutable"], directions: ["inout"] },
+        { roles: ["scalar:u32"], directions: ["value"] },
+      ],
+      ["bounded-cstring-output", "canonical-path", "counted-cstring-input", "output-length-result"],
+    ),
+    arenaPattern(
+      "arena-cstring.uri-encode",
+      "uri-encode",
+      { rolePrefixes: ["enum:"] },
+      [
+        { roles: ["cstring-in"], directions: ["in"] },
+        { roles: ["cstring-mutable"], directions: ["out"] },
+        { roles: ["scalar:u32"], directions: ["value"] },
+        { roles: ["pointer:scalar:u32"], directions: ["inout"] },
+      ],
+      ["bounded-cstring-output", "counted-cstring-input", "output-byte-count", "uri-encode"],
+    ),
   ]);
 }
 
@@ -331,11 +355,7 @@ export function handleLifecyclePattern(selection) {
         every: [{ rolePrefixes: [selection.handleRolePrefix] }, { roles: selection.parameterRoles }],
         some: [{ rolePrefixes: [selection.handleRolePrefix] }],
       },
-      requireSemanticTokens: [
-        "handle-lifecycle-transition",
-        "provider-validated-handle",
-        "synchronous-noescape",
-      ],
+      requireSemanticTokens: ["handle-lifecycle-transition", "provider-validated-handle", "synchronous-noescape"],
       rejectFamilies: selection.rejectedFamilies,
     },
   });

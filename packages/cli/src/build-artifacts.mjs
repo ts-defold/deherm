@@ -12,7 +12,7 @@ import {
   formatBuildArtifactReport,
   portableRelativePath,
   sha256,
-  summarizeBuildArtifacts
+  summarizeBuildArtifacts,
 } from "../../compiler/src/bundle-freshness.mjs";
 import { parseGameProject } from "./project.mjs";
 
@@ -136,8 +136,8 @@ export async function recordBuildArtifact({ projectRoot, kind, resource, artifac
     build: {
       ...build,
       ...(unportable ? { unportableInputCount: unportable } : {}),
-      ...(syntheticInputCount ? { syntheticInputCount } : {})
-    }
+      ...(syntheticInputCount ? { syntheticInputCount } : {}),
+    },
   });
   const lock = await readProjectLock(root);
   if (!lock) throw new Error(`No deherm.lock in ${root}; run 'deherm generate' before recording build artifacts`);
@@ -148,8 +148,10 @@ export async function recordBuildArtifact({ projectRoot, kind, resource, artifac
     ...lock,
     buildArtifacts: {
       schema: BUILD_ARTIFACT_SCHEMA,
-      artifacts: Object.fromEntries(Object.entries(merged).sort(([left], [right]) => (left < right ? -1 : left > right ? 1 : 0)))
-    }
+      artifacts: Object.fromEntries(
+        Object.entries(merged).sort(([left], [right]) => (left < right ? -1 : left > right ? 1 : 0)),
+      ),
+    },
   };
   // A development rebuild that changed nothing must not churn the lock.
   if (JSON.stringify(lock.buildArtifacts) === JSON.stringify(next.buildArtifacts)) return { record, written: false };
@@ -168,8 +170,9 @@ export async function recordBundleBuild({ projectRoot, build, toolchain }) {
   const configuration = build.configuration ?? {};
   const resource = configuration.resourcePath ?? null;
   const target = resource?.slice(1);
-  const artifact = [build.outputFile, ...(build.mirrors ?? [])]
-    .find((file) => target && portableRelativePath(root, file) === target);
+  const artifact = [build.outputFile, ...(build.mirrors ?? [])].find(
+    (file) => target && portableRelativePath(root, file) === target,
+  );
   if (!artifact) return { record: null, written: false, reason: "no-project-artifact" };
   const relativeOrNull = (file) => (file ? portableRelativePath(root, file) : null);
   return await recordBuildArtifact({
@@ -189,8 +192,8 @@ export async function recordBundleBuild({ projectRoot, build, toolchain }) {
       sourcemap: configuration.sourcemap ?? null,
       ttsc: configuration.ttsc ?? null,
       define: configuration.define ?? null,
-      toolchain: toolchain ?? await installedToolchain()
-    }
+      toolchain: toolchain ?? (await installedToolchain()),
+    },
   });
 }
 
@@ -203,13 +206,13 @@ export async function recordBundleBuild({ projectRoot, build, toolchain }) {
 export async function verifyProjectBuildArtifacts(projectRoot, options = {}) {
   const root = path.resolve(projectRoot);
   const lock = await readProjectLock(root);
-  const expectedBundle = options.expected ?? await expectedBundleArtifact(root);
+  const expectedBundle = options.expected ?? (await expectedBundleArtifact(root));
   const expected = expectedBundle ? [expectedBundle] : [];
   const result = await checkBuildArtifacts({
     projectRoot: root,
     lock: lock ?? {},
     expected,
-    toolchain: await installedToolchain()
+    toolchain: await installedToolchain(),
   });
   if (!lock) {
     result.entries.unshift({
@@ -222,7 +225,7 @@ export async function verifyProjectBuildArtifacts(projectRoot, options = {}) {
       sources: null,
       outputs: [],
       toolchainDrift: [],
-      build: null
+      build: null,
     });
   }
   // Before Bob, an artifact nobody can relate to a source tree is as
@@ -255,7 +258,9 @@ export async function recomputeBundleFingerprint(projectRoot, entry) {
   const root = path.resolve(projectRoot);
   const build = entry?.build;
   if (!build?.entryPoint) {
-    throw new Error(`deherm.lock records no bundler entry point for ${entry?.name ?? "the bundle"}; rebuild it once to record one`);
+    throw new Error(
+      `deherm.lock records no bundler entry point for ${entry?.name ?? "the bundle"}; rebuild it once to record one`,
+    );
   }
   const { createIncrementalCompiler } = await import("./dev/compiler.mjs");
   const scratch = await mkdtemp(path.join(tmpdir(), "deherm-fingerprint-"));
@@ -273,7 +278,7 @@ export async function recomputeBundleFingerprint(projectRoot, entry) {
       // program text.
       sourcemap: build.sourcemap ?? undefined,
       define: build.define ?? undefined,
-      captureDiagnostics: false
+      captureDiagnostics: false,
     });
     try {
       const rebuilt = await compiler.rebuild([]);

@@ -28,7 +28,12 @@ function applyContentChanges(source, changes) {
 }
 
 /** Run the editor-neutral Defold semantic language server over stdio-like streams. */
-export async function runLanguageServer({ projectRoot, input = process.stdin, output = process.stdout, semanticIndex } = {}) {
+export async function runLanguageServer({
+  projectRoot,
+  input = process.stdin,
+  output = process.stdout,
+  semanticIndex,
+} = {}) {
   const transport = createContentLengthJsonTransport(input, output, { protocol: "LSP" });
   const index = semanticIndex ?? createResourceSemanticIndex(projectRoot);
   const documents = new Map();
@@ -67,9 +72,9 @@ export async function runLanguageServer({ projectRoot, input = process.stdin, ou
                 completionProvider: { triggerCharacters: ['"', "'", "`", "#", "/", ":"] },
                 hoverProvider: true,
                 definitionProvider: true,
-                workspace: { workspaceFolders: { supported: true, changeNotifications: false } }
+                workspace: { workspaceFolders: { supported: true, changeNotifications: false } },
               },
-              serverInfo: { name: "deherm" }
+              serverInfo: { name: "deherm" },
             });
             return;
           case "initialized":
@@ -79,15 +84,16 @@ export async function runLanguageServer({ projectRoot, input = process.stdin, ou
           case "textDocument/didOpen":
             documents.set(message.params.textDocument.uri, {
               text: message.params.textDocument.text,
-              version: message.params.textDocument.version
+              version: message.params.textDocument.version,
             });
             return;
           case "textDocument/didChange": {
             const current = document(message.params);
-            if (current) documents.set(message.params.textDocument.uri, {
-              text: applyContentChanges(current.text, message.params.contentChanges),
-              version: message.params.textDocument.version
-            });
+            if (current)
+              documents.set(message.params.textDocument.uri, {
+                text: applyContentChanges(current.text, message.params.contentChanges),
+                version: message.params.textDocument.version,
+              });
             return;
           }
           case "textDocument/didClose":
@@ -98,17 +104,32 @@ export async function runLanguageServer({ projectRoot, input = process.stdin, ou
             return;
           case "textDocument/completion": {
             const current = document(message.params);
-            respond(message, current ? await index.complete(message.params.textDocument.uri, current.text, message.params.position) : []);
+            respond(
+              message,
+              current
+                ? await index.complete(message.params.textDocument.uri, current.text, message.params.position)
+                : [],
+            );
             return;
           }
           case "textDocument/hover": {
             const current = document(message.params);
-            respond(message, current ? await index.hover(message.params.textDocument.uri, current.text, message.params.position) : null);
+            respond(
+              message,
+              current
+                ? await index.hover(message.params.textDocument.uri, current.text, message.params.position)
+                : null,
+            );
             return;
           }
           case "textDocument/definition": {
             const current = document(message.params);
-            respond(message, current ? await index.definition(message.params.textDocument.uri, current.text, message.params.position) : null);
+            respond(
+              message,
+              current
+                ? await index.definition(message.params.textDocument.uri, current.text, message.params.position)
+                : null,
+            );
             return;
           }
           case "shutdown":
@@ -122,7 +143,8 @@ export async function runLanguageServer({ projectRoot, input = process.stdin, ou
             if (isRequest) failRequest(message, methodNotFound, `Method not found: ${message.method}`);
         }
       } catch (error) {
-        if (Object.hasOwn(message, "id")) failRequest(message, internalError, error instanceof Error ? error.message : String(error));
+        if (Object.hasOwn(message, "id"))
+          failRequest(message, internalError, error instanceof Error ? error.message : String(error));
       }
     });
   });

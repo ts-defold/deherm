@@ -1,4 +1,3 @@
-import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -11,7 +10,9 @@ test("the Static Hermes registry separates one application from bounded auxiliar
   const output = await mkdtemp(path.join(tmpdir(), "deherm-static-unit-registry-"));
   const source = path.join(output, "main.cpp");
   const executable = path.join(output, "registry");
-  await writeFile(source, String.raw`
+  await writeFile(
+    source,
+    String.raw`
 #include <defold_hermes/static_unit_registry.h>
 
 #include <cstdint>
@@ -51,15 +52,25 @@ int main() {
   if (count != DEHERM_MAX_STATIC_UNITS - 1 || units[count - 1] != extra12) return 14;
   return 0;
 }
-`);
+`,
+  );
   try {
-    execFileSync(process.env.CXX ?? "clang++", [
-      "-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic",
-      `-I${path.join(repositoryRoot, "defold/defold_hermes/include")}`,
-      path.join(repositoryRoot, "defold/defold_hermes/src/static_unit_registry.cpp"),
-      source,
-      "-o", executable
-    ], { cwd: repositoryRoot, stdio: "pipe" });
+    execFileSync(
+      process.env.CXX ?? "clang++",
+      [
+        "-std=c++17",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pedantic",
+        `-I${path.join(repositoryRoot, "defold/defold_hermes/include")}`,
+        path.join(repositoryRoot, "defold/defold_hermes/src/static_unit_registry.cpp"),
+        source,
+        "-o",
+        executable,
+      ],
+      { cwd: repositoryRoot, stdio: "pipe" },
+    );
     execFileSync(executable, [], { stdio: "pipe" });
   } finally {
     await rm(output, { recursive: true, force: true });

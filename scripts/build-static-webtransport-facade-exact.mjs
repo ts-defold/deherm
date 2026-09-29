@@ -68,5 +68,13 @@ function compile(arguments_) {
   const result = spawnSync(shermes, arguments_, { cwd: process.cwd(), encoding: "utf8" });
   assert.equal(result.status, 0, result.stderr || result.stdout || `shermes terminated by ${result.signal}`);
 }
-compile(["-strict", "-O", "-emit-c", "-exported-unit=deherm_static_webtransport_facade_exact", facadeInput, "-o", facadeOutput]);
+compile([
+  "-strict",
+  "-O",
+  "-emit-c",
+  "-exported-unit=deherm_static_webtransport_facade_exact",
+  facadeInput,
+  "-o",
+  facadeOutput,
+]);
 console.log(`Static Hermes emitted executable high-level facade ${facadeOutput}`);

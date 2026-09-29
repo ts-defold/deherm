@@ -68,29 +68,26 @@ test("class adapter creates one instance, copies properties, and retains state a
           enumerableBackingKeys: Object.keys(backing),
           objectIdentity: objectSelf.value,
         };
-      `
+      `,
     },
     alias: {
-      "@ts-defold/deherm/component": componentSdk
+      "@ts-defold/deherm/component": componentSdk,
     },
     bundle: true,
     format: "iife",
     platform: "neutral",
     target: "es2020",
-    write: false
+    write: false,
   });
   const context = { globalThis: null };
   context.globalThis = context;
   vm.runInNewContext(result.outputFiles[0].text, context);
-  assert.deepEqual(
-    JSON.parse(JSON.stringify(context.__classAdapterResult)),
-    {
-      constructors: 3,
-      consumed: true,
-      retainedCounter: 139,
-      secondCounter: 5,
-      enumerableBackingKeys: ["speed"],
-      objectIdentity: 9
-    }
-  );
+  assert.deepEqual(JSON.parse(JSON.stringify(context.__classAdapterResult)), {
+    constructors: 3,
+    consumed: true,
+    retainedCounter: 139,
+    secondCounter: 5,
+    enumerableBackingKeys: ["speed"],
+    objectIdentity: 9,
+  });
 });

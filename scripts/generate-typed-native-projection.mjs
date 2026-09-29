@@ -36,13 +36,10 @@ export function generateTypedNativeProjection({ vmathReport, reachableRouteIds, 
     throw new Error("Typed-native projection requires a version 1 Static Hermes vmath report");
   }
   const reachable = new Set(reachableRouteIds);
-  const retained = dynamicAccess
-    ? vmathReport.included
-    : vmathReport.included.filter(({ id }) => reachable.has(id));
+  const retained = dynamicAccess ? vmathReport.included : vmathReport.included.filter(({ id }) => reachable.has(id));
   const pruned = vmathReport.included.filter((binding) => !retained.includes(binding));
-  const symbolsOf = (bindings) => bindings
-    .flatMap(({ shapes }) => shapes.map(({ cFunction }) => cFunction))
-    .sort(compareCodeUnits);
+  const symbolsOf = (bindings) =>
+    bindings.flatMap(({ shapes }) => shapes.map(({ cFunction }) => cFunction)).sort(compareCodeUnits);
   const source = renderTypescript(retained);
   const body = {
     schemaVersion: 1,
@@ -66,8 +63,8 @@ export function generateTypedNativeProjection({ vmathReport, reachableRouteIds, 
       cEmission: "requires-shermes-emit-c-consumer",
       compilation: "not-claimed",
       linkage: "not-claimed",
-      runtime: "not-claimed"
-    }
+      runtime: "not-claimed",
+    },
   };
   const manifest = { ...body, manifestSha256: sha256(JSON.stringify(body)) };
   const artifacts = new Map();

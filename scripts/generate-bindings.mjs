@@ -13,7 +13,7 @@ const scalarTypes = {
   f32: { ts: "number", c: "float", sh: "c_f32", size: 4, align: 4, heap: "f32" },
   f64: { ts: "number", c: "double", sh: "c_f64", size: 8, align: 8, heap: "f64" },
   callback: { ts: "(handle: number, elapsed: number) => void", c: null, sh: null, size: 0, align: 1, heap: null },
-  void: { ts: "void", c: "void", sh: "void", size: 0, align: 1, heap: null }
+  void: { ts: "void", c: "void", sh: "void", size: 0, align: 1, heap: null },
 };
 
 function fail(path, message) {
@@ -119,8 +119,10 @@ export function validateSchema(schema) {
       const fnPath = `${path}.functions[${functionIndex}]`;
       expectIdentifier(fn.name, `${fnPath}.name`);
       if (fn.symbol !== undefined) expectIdentifier(fn.symbol, `${fnPath}.symbol`);
-      if (fn.callbackFailureValue !== undefined &&
-          (!Number.isSafeInteger(fn.callbackFailureValue) || fn.callbackFailureValue < 0)) {
+      if (
+        fn.callbackFailureValue !== undefined &&
+        (!Number.isSafeInteger(fn.callbackFailureValue) || fn.callbackFailureValue < 0)
+      ) {
         fail(`${fnPath}.callbackFailureValue`, "expected a non-negative safe integer");
       }
       expectArray(fn.parameters, `${fnPath}.parameters`);
@@ -153,12 +155,8 @@ export function filterSchemaForUsage(input, manifest) {
   }
   if (manifest.dynamicAccess === true) return schema;
 
-  const known = new Set(schema.modules.flatMap((module) =>
-    module.functions.map((fn) => symbolId(module, fn))
-  ));
-  const selected = new Set(manifest.symbols.map((symbol) =>
-    typeof symbol === "string" ? symbol : symbol?.id
-  ));
+  const known = new Set(schema.modules.flatMap((module) => module.functions.map((fn) => symbolId(module, fn))));
+  const selected = new Set(manifest.symbols.map((symbol) => (typeof symbol === "string" ? symbol : symbol?.id)));
   for (const id of selected) {
     if (typeof id !== "string" || !known.has(id)) fail("usage.symbols", `unknown symbol ${JSON.stringify(id)}`);
   }
@@ -166,12 +164,14 @@ export function filterSchemaForUsage(input, manifest) {
   const modules = schema.modules
     .map((module) => ({
       ...module,
-      functions: module.functions.filter((fn) => selected.has(symbolId(module, fn)))
+      functions: module.functions.filter((fn) => selected.has(symbolId(module, fn))),
     }))
     .filter((module) => module.functions.length > 0);
-  const referencedTypes = new Set(modules.flatMap((module) =>
-    module.functions.flatMap((fn) => [fn.returns, ...fn.parameters.map((parameter) => parameter.type)])
-  ));
+  const referencedTypes = new Set(
+    modules.flatMap((module) =>
+      module.functions.flatMap((fn) => [fn.returns, ...fn.parameters.map((parameter) => parameter.type)]),
+    ),
+  );
   return { ...schema, types: schema.types.filter((type) => referencedTypes.has(type.name)), modules };
 }
 
@@ -195,7 +195,7 @@ function generateTypeScript(schema, layouts) {
   const lines = [
     `// ${GENERATED_BANNER}`,
     `export const DEFOLD_HERMES_ABI_VERSION = ${schema.abiVersion} as const;`,
-    ""
+    "",
   ];
   for (const type of layouts) {
     if (type.description) lines.push(`/** ${type.description} */`);
@@ -230,22 +230,28 @@ function generateFunctionWrapper(module, fn) {
 }
 
 function generateModuleEntry(module) {
-  return `${module.functions.map((fn) =>
-    `export { ${fn.name} } from "../functions/${module.name}/${fn.name}";`
-  ).join("\n")}\n`;
+  return `${module.functions
+    .map((fn) => `export { ${fn.name} } from "../functions/${module.name}/${fn.name}";`)
+    .join("\n")}\n`;
 }
 
 function generateSymbolMap(schema) {
-  return `${JSON.stringify({
-    schemaVersion: 1,
-    symbols: schema.modules.flatMap((module) => module.functions.map((fn) => ({
-      id: symbolId(module, fn),
-      module: module.name,
-      function: fn.name,
-      cSymbol: cSymbol(module, fn),
-      source: generatedFunctionPath(module, fn)
-    })))
-  }, null, 2)}\n`;
+  return `${JSON.stringify(
+    {
+      schemaVersion: 1,
+      symbols: schema.modules.flatMap((module) =>
+        module.functions.map((fn) => ({
+          id: symbolId(module, fn),
+          module: module.name,
+          function: fn.name,
+          cSymbol: cSymbol(module, fn),
+          source: generatedFunctionPath(module, fn),
+        })),
+      ),
+    },
+    null,
+    2,
+  )}\n`;
 }
 
 function generateCHeader(schema, layouts) {
@@ -262,7 +268,7 @@ function generateCHeader(schema, layouts) {
     "#ifdef __cplusplus",
     'extern "C" {',
     "#endif",
-    ""
+    "",
   ];
   for (const type of layouts) {
     lines.push(`typedef struct ${cTypeName(type.name)} {`);
@@ -271,16 +277,19 @@ function generateCHeader(schema, layouts) {
   }
   for (const module of schema.modules) {
     for (const fn of module.functions) {
-      const parameters = fn.parameters
-        .flatMap((parameter) => parameter.type === "callback"
-          ? [
-              `uint32_t ${parameter.name}_runtime`,
-              `uint32_t ${parameter.name}_slot`,
-              `uint32_t ${parameter.name}_generation`,
-              `uint32_t ${parameter.name}_type`
-            ]
-          : [`${scalarTypes[parameter.type].c} ${parameter.name}`])
-        .join(", ") || "void";
+      const parameters =
+        fn.parameters
+          .flatMap((parameter) =>
+            parameter.type === "callback"
+              ? [
+                  `uint32_t ${parameter.name}_runtime`,
+                  `uint32_t ${parameter.name}_slot`,
+                  `uint32_t ${parameter.name}_generation`,
+                  `uint32_t ${parameter.name}_type`,
+                ]
+              : [`${scalarTypes[parameter.type].c} ${parameter.name}`],
+          )
+          .join(", ") || "void";
       lines.push(`${scalarTypes[fn.returns].c} ${cSymbol(module, fn)}(${parameters});`);
     }
   }
@@ -290,12 +299,16 @@ function generateCHeader(schema, layouts) {
     lines.push("#if defined(__cplusplus)");
     lines.push(`static_assert(sizeof(${name}) == ${type.size}, "${name} ABI size mismatch");`);
     for (const field of type.fields) {
-      lines.push(`static_assert(offsetof(${name}, ${field.name}) == ${field.offset}, "${name}.${field.name} ABI offset mismatch");`);
+      lines.push(
+        `static_assert(offsetof(${name}, ${field.name}) == ${field.offset}, "${name}.${field.name} ABI offset mismatch");`,
+      );
     }
     lines.push("#else");
     lines.push(`_Static_assert(sizeof(${name}) == ${type.size}, "${name} ABI size mismatch");`);
     for (const field of type.fields) {
-      lines.push(`_Static_assert(offsetof(${name}, ${field.name}) == ${field.offset}, "${name}.${field.name} ABI offset mismatch");`);
+      lines.push(
+        `_Static_assert(offsetof(${name}, ${field.name}) == ${field.offset}, "${name}.${field.name} ABI offset mismatch");`,
+      );
     }
     lines.push("#endif", "");
   }
@@ -327,7 +340,7 @@ function generateAbiLayouts(schema, layouts) {
     "}",
     "",
     `export const DEFOLD_ABI_LAYOUT_VERSION = ${schema.abiVersion} as const;`,
-    ""
+    "",
   ];
   for (const type of layouts) {
     lines.push(`export const ${type.name}Layout = {`);
@@ -338,10 +351,13 @@ function generateAbiLayouts(schema, layouts) {
       lines.push(`    ${field.name}: { offset: ${field.offset}, type: "${field.type}" },`);
     }
     lines.push("  },");
-    lines.push(`  read(memory: DefoldAbiMemory, pointer: number, out: ${type.name} = {} as ${type.name}): ${type.name} {`);
+    lines.push(
+      `  read(memory: DefoldAbiMemory, pointer: number, out: ${type.name} = {} as ${type.name}): ${type.name} {`,
+    );
     for (const field of type.fields) {
       const scalar = scalarTypes[field.type];
-      const index = scalar.size === 1 ? `pointer + ${field.offset}` : `(pointer + ${field.offset}) >>> ${Math.log2(scalar.size)}`;
+      const index =
+        scalar.size === 1 ? `pointer + ${field.offset}` : `(pointer + ${field.offset}) >>> ${Math.log2(scalar.size)}`;
       const expression = `memory.${scalar.heap}[${index}]`;
       lines.push(`    out.${field.name} = ${field.type === "bool" ? `${expression} !== 0` : expression};`);
     }
@@ -349,7 +365,8 @@ function generateAbiLayouts(schema, layouts) {
     lines.push(`  write(memory: DefoldAbiMemory, pointer: number, value: ${type.name}): void {`);
     for (const field of type.fields) {
       const scalar = scalarTypes[field.type];
-      const index = scalar.size === 1 ? `pointer + ${field.offset}` : `(pointer + ${field.offset}) >>> ${Math.log2(scalar.size)}`;
+      const index =
+        scalar.size === 1 ? `pointer + ${field.offset}` : `(pointer + ${field.offset}) >>> ${Math.log2(scalar.size)}`;
       const value = field.type === "bool" ? `value.${field.name} ? 1 : 0` : `value.${field.name}`;
       lines.push(`    memory.${scalar.heap}[${index}] = ${value};`);
     }
@@ -361,36 +378,43 @@ function generateAbiLayouts(schema, layouts) {
 function jsiValidation(parameter, index) {
   const at = `args[${index}]`;
   switch (parameter.type) {
-    case "bool": return `${at}.isBool()`;
-    case "i32": return `${at}.isNumber() && isI32(${at}.asNumber())`;
-    case "u32": return `${at}.isNumber() && isU32(${at}.asNumber())`;
+    case "bool":
+      return `${at}.isBool()`;
+    case "i32":
+      return `${at}.isNumber() && isI32(${at}.asNumber())`;
+    case "u32":
+      return `${at}.isNumber() && isU32(${at}.asNumber())`;
     case "f32":
-    case "f64": return `${at}.isNumber()`;
-    case "callback": return `${at}.isObject() && ${at}.asObject(runtime).isFunction(runtime)`;
-    default: throw new Error(`unhandled JSI type ${parameter.type}`);
+    case "f64":
+      return `${at}.isNumber()`;
+    case "callback":
+      return `${at}.isObject() && ${at}.asObject(runtime).isFunction(runtime)`;
+    default:
+      throw new Error(`unhandled JSI type ${parameter.type}`);
   }
 }
 
 function jsiArguments(parameter, index) {
   if (parameter.type !== "callback") return [jsiArgument(parameter, index)];
   const local = `${parameter.name}_handle`;
-  return [
-    `${local}.runtime`,
-    `${local}.slot`,
-    `${local}.generation`,
-    `${local}.type`
-  ];
+  return [`${local}.runtime`, `${local}.slot`, `${local}.generation`, `${local}.type`];
 }
 
 function jsiArgument(parameter, index) {
   const at = `args[${index}]`;
   switch (parameter.type) {
-    case "bool": return `${at}.getBool() ? 1 : 0`;
-    case "i32": return `static_cast<int32_t>(${at}.asNumber())`;
-    case "u32": return `static_cast<uint32_t>(${at}.asNumber())`;
-    case "f32": return `static_cast<float>(${at}.asNumber())`;
-    case "f64": return `${at}.asNumber()`;
-    default: throw new Error(`unhandled JSI type ${parameter.type}`);
+    case "bool":
+      return `${at}.getBool() ? 1 : 0`;
+    case "i32":
+      return `static_cast<int32_t>(${at}.asNumber())`;
+    case "u32":
+      return `static_cast<uint32_t>(${at}.asNumber())`;
+    case "f32":
+      return `static_cast<float>(${at}.asNumber())`;
+    case "f64":
+      return `${at}.asNumber()`;
+    default:
+      throw new Error(`unhandled JSI type ${parameter.type}`);
   }
 }
 
@@ -435,7 +459,7 @@ function generateJsiSource(schema) {
     "}  // namespace",
     "",
     "void installGeneratedModules(jsi::Runtime& runtime, jsi::Object& modules, CallbackRegistry& callbacks) {",
-    "  (void)callbacks;"
+    "  (void)callbacks;",
   ];
   for (const module of schema.modules) {
     lines.push(`  jsi::Object ${snake(module.name)}(runtime);`);
@@ -452,11 +476,15 @@ function generateJsiSource(schema) {
       lines.push("         const jsi::Value* args,");
       lines.push("         size_t count) {");
       lines.push(`        if (count != ${fn.parameters.length}) {`);
-      lines.push(`          throw jsi::JSError(runtime, "${displayName} expects exactly ${fn.parameters.length} argument(s)");`);
+      lines.push(
+        `          throw jsi::JSError(runtime, "${displayName} expects exactly ${fn.parameters.length} argument(s)");`,
+      );
       lines.push("        }");
       for (const [index, parameter] of fn.parameters.entries()) {
         lines.push(`        if (!(${jsiValidation(parameter, index)})) {`);
-        lines.push(`          throw jsi::JSError(runtime, "${displayName}: argument ${index + 1} (${parameter.name}) must be ${parameter.type}");`);
+        lines.push(
+          `          throw jsi::JSError(runtime, "${displayName}: argument ${index + 1} (${parameter.name}) must be ${parameter.type}");`,
+        );
         lines.push("        }");
       }
       const callbacks = fn.parameters
@@ -501,7 +529,7 @@ function generateJsiSource(schema) {
     "}  // namespace defold_hermes",
     "",
     "#endif  // !DM_PLATFORM_HTML5",
-    ""
+    "",
   );
   return lines.join("\n");
 }
@@ -513,18 +541,22 @@ function generateStaticHermes(schema) {
     "",
     "// Raw, allocation-free C ABI imports for Static Hermes typed code.",
     "// Higher-level string, span, and struct codecs are generated separately.",
-    ""
+    "",
   ];
   for (const module of schema.modules) {
     for (const fn of module.functions) {
-      const parameters = fn.parameters.flatMap((parameter) => parameter.type === "callback"
-        ? [
-            `${parameter.name}_runtime: c_u32`,
-            `${parameter.name}_slot: c_u32`,
-            `${parameter.name}_generation: c_u32`,
-            `${parameter.name}_type: c_u32`
-          ]
-        : [`${parameter.name}: ${scalarTypes[parameter.type].sh}`]).join(", ");
+      const parameters = fn.parameters
+        .flatMap((parameter) =>
+          parameter.type === "callback"
+            ? [
+                `${parameter.name}_runtime: c_u32`,
+                `${parameter.name}_slot: c_u32`,
+                `${parameter.name}_generation: c_u32`,
+                `${parameter.name}_type: c_u32`,
+              ]
+            : [`${parameter.name}: ${scalarTypes[parameter.type].sh}`],
+        )
+        .join(", ");
       const symbol = cSymbol(module, fn);
       lines.push(`const __ffi_${module.name}_${fn.name} = $SHBuiltin.extern_c(`);
       lines.push('  {include: "defold_hermes/generated_modules.h"},');
@@ -536,9 +568,7 @@ function generateStaticHermes(schema) {
 }
 
 function generateEmscriptenModules(schema) {
-  const symbols = schema.modules.flatMap((module) =>
-    module.functions.map((fn) => `'${cSymbol(module, fn)}'`)
-  );
+  const symbols = schema.modules.flatMap((module) => module.functions.map((fn) => `'${cSymbol(module, fn)}'`));
   const lines = [
     `// ${GENERATED_BANNER}`,
     "var LibraryDefoldHermesGeneratedModules = {",
@@ -546,34 +576,40 @@ function generateEmscriptenModules(schema) {
       ...symbols,
       "'$DEFOLD_HERMES_DMSDK_SCALAR'",
       "'$DEFOLD_HERMES_DMSDK_UNIVERSAL'",
-      ...(schema.modules.some((module) => module.functions.some((fn) => fn.parameters.some(({ type }) => type === "callback")))
+      ...(schema.modules.some((module) =>
+        module.functions.some((fn) => fn.parameters.some(({ type }) => type === "callback")),
+      )
         ? ["'$DEFOLD_HERMES_WEB_CALLBACKS'"]
-        : [])
+        : []),
     ].join(", ")}],`,
     "  $DEFOLD_HERMES_GENERATED_MODULES: {",
     "    install: function() {",
-    "      return {"
+    "      return {",
   ];
-  for (const [moduleIndex, module] of schema.modules.entries()) {
+  for (const module of schema.modules) {
     lines.push(`        ${module.name}: {`);
     for (const [functionIndex, fn] of module.functions.entries()) {
       const parameters = fn.parameters.map((parameter) => parameter.name).join(", ");
-      const args = fn.parameters.flatMap((parameter) => {
-        if (parameter.type === "callback") {
-          return [
-            `${parameter.name}Handle.runtime`,
-            `${parameter.name}Handle.slot`,
-            `${parameter.name}Handle.generation`,
-            `${parameter.name}Handle.type`
-          ];
-        }
-        return [parameter.type === "bool" ? `(${parameter.name} ? 1 : 0)` : parameter.name];
-      }).join(", ");
+      const args = fn.parameters
+        .flatMap((parameter) => {
+          if (parameter.type === "callback") {
+            return [
+              `${parameter.name}Handle.runtime`,
+              `${parameter.name}Handle.slot`,
+              `${parameter.name}Handle.generation`,
+              `${parameter.name}Handle.type`,
+            ];
+          }
+          return [parameter.type === "bool" ? `(${parameter.name} ? 1 : 0)` : parameter.name];
+        })
+        .join(", ");
       lines.push(`          ${fn.name}: function(${parameters}) {`);
       const callbacks = fn.parameters.filter(({ type }) => type === "callback");
       for (const [callbackIndex, parameter] of callbacks.entries()) {
         if (callbackIndex === 0) {
-          lines.push(`            var ${parameter.name}Handle = DEFOLD_HERMES_WEB_CALLBACKS.acquire(${parameter.name});`);
+          lines.push(
+            `            var ${parameter.name}Handle = DEFOLD_HERMES_WEB_CALLBACKS.acquire(${parameter.name});`,
+          );
           continue;
         }
         lines.push(`            var ${parameter.name}Handle;`);
@@ -615,7 +651,7 @@ function generateEmscriptenModules(schema) {
     "",
     "autoAddDeps(LibraryDefoldHermesGeneratedModules, '$DEFOLD_HERMES_GENERATED_MODULES');",
     "addToLibrary(LibraryDefoldHermesGeneratedModules);",
-    ""
+    "",
   );
   return lines.join("\n");
 }
@@ -631,7 +667,7 @@ export function generateArtifacts(input) {
     ["defold/defold_hermes/src/generated_jsi.cpp", generateJsiSource(schema)],
     ["defold/defold_hermes/lib/web/generated_modules.js", generateEmscriptenModules(schema)],
     ["packages/static-hermes/src/generated/ffi.js", generateStaticHermes(schema)],
-    ["packages/bindings/generated/symbol-map.json", generateSymbolMap(schema)]
+    ["packages/bindings/generated/symbol-map.json", generateSymbolMap(schema)],
   ]);
   for (const module of schema.modules) {
     artifacts.set(`packages/sdk/src/generated/modules/${module.name}.ts`, generateModuleEntry(module));

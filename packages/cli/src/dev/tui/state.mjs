@@ -23,7 +23,7 @@ export function createUiState(overrides = {}) {
     generationSelection: [],
     overviewSizes: [50, 50],
     notice: undefined,
-    ...overrides
+    ...overrides,
   };
 }
 
@@ -53,10 +53,12 @@ export function closeTopOverlay(ui) {
  * it must never assume the full interactive shell is wired up.
  */
 export function normalizeState(state) {
-  const ui = state.ui ?? createUiState({
-    logScroll: state.logScroll ?? 0,
-    logAutoScroll: state.logAutoScroll ?? true
-  });
+  const ui =
+    state.ui ??
+    createUiState({
+      logScroll: state.logScroll ?? 0,
+      logAutoScroll: state.logAutoScroll ?? true,
+    });
   return {
     tick: state.tick ?? 0,
     reducedMotion: state.reducedMotion ?? false,
@@ -67,6 +69,6 @@ export function normalizeState(state) {
     paletteItems: state.paletteItems ?? [],
     actions: state.actions ?? {},
     setLogScroll: state.setLogScroll,
-    ui
+    ui,
   };
 }

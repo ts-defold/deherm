@@ -8,18 +8,26 @@ test("the bundled TypeScript app obeys the v1 host contract", async () => {
   const transcript = [];
   const context = {
     __defoldModulesV1: {
-      ExampleMath: { add(a, b) { return a + b; } }
+      ExampleMath: {
+        add(a, b) {
+          return a + b;
+        },
+      },
     },
     __defoldHostV1: {
       version: 1,
       runtime: "test",
-      log(level, message) { transcript.push(`log:${level}:${message}`); },
-      now() { return 42; },
+      log(level, message) {
+        transcript.push(`log:${level}:${message}`);
+      },
+      now() {
+        return 42;
+      },
       request(channel, payload) {
         transcript.push(`request:${channel}:${payload}`);
         return `test:${channel}:${payload}`;
-      }
-    }
+      },
+    },
   };
 
   vm.runInNewContext(bundle, context, { filename: "sample.js" });
@@ -40,6 +48,6 @@ test("the bundled TypeScript app obeys the v1 host contract", async () => {
     "log:debug:update:2:0.016667",
     "log:debug:update:3:0.016667",
     "log:info:message:hello-from-contract-test",
-    "log:info:final:ok"
+    "log:info:final:ok",
   ]);
 });

@@ -28,7 +28,7 @@ import {
   publishedAssets,
   repositoryRoot,
   tagDigestLength,
-  targetDebugLibraryName
+  targetDebugLibraryName,
 } from "../scripts/lib/artifact-releases.mjs";
 
 const execFileAsync = promisify(execFile);
@@ -88,7 +88,7 @@ test("packaging the same inputs twice produces a byte-identical archive", async 
   assert.equal(
     digest(second),
     digest(first),
-    "repackaging identical build outputs must produce identical bytes, or the pinned tag can never hold"
+    "repackaging identical build outputs must produce identical bytes, or the pinned tag can never hold",
   );
 });
 
@@ -123,8 +123,10 @@ test("an archive round-trips through the download side, flat and still executabl
   // the row's own directory and nowhere deeper.
   assert.equal(await readFile(path.join(unpacked, "libhermes.a"), "utf8"), "release archive contents");
   assert.equal(await readFile(path.join(unpacked, "libhermes.debug.a"), "utf8"), "debugger-enabled archive contents");
-  assert.equal(await readFile(path.join(unpacked, "libhermesvm-config.h"), "utf8"),
-    "#define HERMESVM_SIZEOF_VOID_P 8\n");
+  assert.equal(
+    await readFile(path.join(unpacked, "libhermesvm-config.h"), "utf8"),
+    "#define HERMESVM_SIZEOF_VOID_P 8\n",
+  );
   // The reason the host compilers travel in an archive at all: a bare release
   // asset loses this, and a compiler that cannot be executed is not installed,
   // merely present.
@@ -140,7 +142,7 @@ test("the packager refuses an input that does not exist rather than shipping a s
     (error) => {
       assert.match(error.stderr ?? "", /libhermes\.debug\.a does not exist/);
       return true;
-    }
+    },
   );
 });
 
@@ -153,7 +155,7 @@ test("the download side refuses nested archive members before extraction", async
   await execFileAsync("tar", ["-czf", archive, "-C", directory, "nested/libhermes.a"]);
   await assert.rejects(
     extractReleaseArchive({ archive, destination: path.join(directory, "unpacked") }),
-    /not a non-empty flat release archive/u
+    /not a non-empty flat release archive/u,
   );
 });
 
@@ -184,7 +186,7 @@ test("every family publishes one archive per matrix row, named for that row", as
 test("a target archive carries both libraries and their matching generated config", async () => {
   const rows = await publishedAssets("native-artifacts");
   const manifest = JSON.parse(
-    await readFile(path.join(repositoryRoot, "packages/toolchains/native-artifacts.json"), "utf8")
+    await readFile(path.join(repositoryRoot, "packages/toolchains/native-artifacts.json"), "utf8"),
   );
   for (const row of rows) {
     const artifact = manifest.targets[row.target];
@@ -210,7 +212,7 @@ test("the tag is a readable prefix of the full fingerprint, which is kept", asyn
     assert.match(release.fingerprint, /^[a-f0-9]{64}$/, "provenance is still asserted over the whole digest");
     assert.ok(
       release.tag.endsWith(release.fingerprint.slice(0, tagDigestLength)),
-      `${release.tag} is not derived from ${release.fingerprint}`
+      `${release.tag} is not derived from ${release.fingerprint}`,
     );
     // The point of the truncation: 81-character tags could not be compared by
     // eye or quoted in a bug report.
@@ -226,7 +228,7 @@ test("package-archive.sh is an input to every family, because it decides the pub
   for (const name of artifactFamilyNames) {
     assert.ok(
       artifactFamilies[name].files.includes("toolchains/hermes/package-archive.sh"),
-      `${name} publishes archives this script writes but does not hash it`
+      `${name} publishes archives this script writes but does not hash it`,
     );
   }
 });
@@ -248,35 +250,32 @@ test("native MSVC packaging protects options and removes Hermes' duplicate zip m
   await writeFile(cygpath, "#!/usr/bin/env bash\nprintf 'C:\\\\native\\\\hermes.lib\\n'\n");
   await writeFile(
     archiver,
-    "#!/usr/bin/env bash\nif [[ \"$1\" == /LIST ]]; then exit 0; fi\nprintf '%s\\n' \"$MSYS2_ARG_CONV_EXCL\" \"$@\" > \"$CAPTURE\"\n"
+    '#!/usr/bin/env bash\nif [[ "$1" == /LIST ]]; then exit 0; fi\nprintf \'%s\\n\' "$MSYS2_ARG_CONV_EXCL" "$@" > "$CAPTURE"\n',
   );
   await writeFile(
     readobj,
-    "#!/usr/bin/env bash\nprintf '%s\\n' 'Directive(s): /DEFAULTLIB:libcmt.lib /FAILIFMISMATCH:\"RuntimeLibrary=MT_StaticRelease\"'\n"
+    "#!/usr/bin/env bash\nprintf '%s\\n' 'Directive(s): /DEFAULTLIB:libcmt.lib /FAILIFMISMATCH:\"RuntimeLibrary=MT_StaticRelease\"'\n",
   );
   await Promise.all([chmod(cygpath, 0o755), chmod(archiver, 0o755), chmod(readobj, 0o755)]);
 
-  await execFileAsync("bash", [
-    path.join(repositoryRoot, "toolchains/hermes/package-msvc.sh"),
-    build,
-    path.join(directory, "hermes.lib")
-  ], {
-    env: {
-      ...process.env,
-      CAPTURE: capture,
-      LIB_TOOL: archiver,
-      PATH: `${tools}:${process.env.PATH}`
-    }
-  });
+  await execFileAsync(
+    "bash",
+    [path.join(repositoryRoot, "toolchains/hermes/package-msvc.sh"), build, path.join(directory, "hermes.lib")],
+    {
+      env: {
+        ...process.env,
+        CAPTURE: capture,
+        LIB_TOOL: archiver,
+        PATH: `${tools}:${process.env.PATH}`,
+      },
+    },
+  );
 
   const args = (await readFile(capture, "utf8")).trimEnd().split("\n");
   assert.equal(args[0], "/OUT:;/REMOVE:");
   assert.equal(args[1], "/OUT:C:\\native\\hermes.lib");
   assert.equal(args[2], "/REMOVE:zip.c.obj");
-  assert.deepEqual(args.slice(3), [
-    path.join(build, "lib", "hermesvm_a.lib"),
-    path.join(build, "jsi", "jsi.lib")
-  ]);
+  assert.deepEqual(args.slice(3), [path.join(build, "lib", "hermesvm_a.lib"), path.join(build, "jsi", "jsi.lib")]);
 });
 
 test("the Extender llvm-lib path deletes zip.c.obj with llvm-ar", async (t) => {
@@ -297,16 +296,13 @@ test("the Extender llvm-lib path deletes zip.c.obj with llvm-ar", async (t) => {
   const editor = path.join(tools, "llvm-ar");
   const readobj = path.join(tools, "llvm-readobj");
   await writeFile(cygpath, "#!/usr/bin/env bash\nprintf 'C:\\\\native\\\\hermes.lib\\n'\n");
-  await writeFile(
-    archiver,
-    "#!/usr/bin/env bash\nprintf '%s\\n' \"$MSYS2_ARG_CONV_EXCL\" \"$@\" > \"$LIB_CAPTURE\"\n"
-  );
+  await writeFile(archiver, '#!/usr/bin/env bash\nprintf \'%s\\n\' "$MSYS2_ARG_CONV_EXCL" "$@" > "$LIB_CAPTURE"\n');
   await writeFile(
     editor,
     [
       "#!/usr/bin/env bash",
-      "if [[ \"$1\" == t ]]; then",
-      "  if [[ ! -f \"$REMOVED\" ]]; then",
+      'if [[ "$1" == t ]]; then',
+      '  if [[ ! -f "$REMOVED" ]]; then',
       "    printf 'zip.c.obj\\n'",
       // More than a pipe buffer after the early match: with `set -o pipefail`,
       // the old `llvm-ar t | grep -q` check killed the producer with SIGPIPE and
@@ -315,22 +311,18 @@ test("the Extender llvm-lib path deletes zip.c.obj with llvm-ar", async (t) => {
       "  fi",
       "  exit 0",
       "fi",
-      "printf '%s\\n' \"$@\" > \"$AR_CAPTURE\"",
-      "touch \"$REMOVED\""
-    ].join("\n") + "\n"
+      'printf \'%s\\n\' "$@" > "$AR_CAPTURE"',
+      'touch "$REMOVED"',
+    ].join("\n") + "\n",
   );
   await writeFile(
     readobj,
-    "#!/usr/bin/env bash\nprintf '%s\\n' 'Directive(s): /DEFAULTLIB:libcmt.lib /FAILIFMISMATCH:\"RuntimeLibrary=MT_StaticRelease\"'\n"
+    "#!/usr/bin/env bash\nprintf '%s\\n' 'Directive(s): /DEFAULTLIB:libcmt.lib /FAILIFMISMATCH:\"RuntimeLibrary=MT_StaticRelease\"'\n",
   );
   await Promise.all([chmod(cygpath, 0o755), chmod(archiver, 0o755), chmod(editor, 0o755), chmod(readobj, 0o755)]);
 
   const output = path.join(directory, "hermes.lib");
-  await execFileAsync("bash", [
-    path.join(repositoryRoot, "toolchains/hermes/package-msvc.sh"),
-    build,
-    output
-  ], {
+  await execFileAsync("bash", [path.join(repositoryRoot, "toolchains/hermes/package-msvc.sh"), build, output], {
     env: {
       ...process.env,
       AR_CAPTURE: arCapture,
@@ -338,17 +330,14 @@ test("the Extender llvm-lib path deletes zip.c.obj with llvm-ar", async (t) => {
       LIB_CAPTURE: libCapture,
       LIB_TOOL: archiver,
       PATH: `${tools}:${process.env.PATH}`,
-      REMOVED: removed
-    }
+      REMOVED: removed,
+    },
   });
 
   const libArgs = (await readFile(libCapture, "utf8")).trimEnd().split("\n");
   assert.equal(libArgs[0], "/OUT:");
   assert.equal(libArgs[1], "/OUT:C:\\native\\hermes.lib");
-  assert.deepEqual(libArgs.slice(2), [
-    path.join(build, "lib", "hermesvm_a.lib"),
-    path.join(build, "jsi", "jsi.lib")
-  ]);
+  assert.deepEqual(libArgs.slice(2), [path.join(build, "lib", "hermesvm_a.lib"), path.join(build, "jsi", "jsi.lib")]);
   assert.deepEqual((await readFile(arCapture, "utf8")).trimEnd().split("\n"), ["d", output, "zip.c.obj"]);
 });
 
@@ -366,39 +355,36 @@ test("MSVC packaging rejects a dynamic CRT archive before publication", async (t
   const editor = path.join(tools, "llvm-ar");
   const readobj = path.join(tools, "llvm-readobj");
   await writeFile(archiver, "#!/usr/bin/env bash\nexit 0\n");
-  await writeFile(editor, "#!/usr/bin/env bash\nif [[ \"$1\" == t ]]; then exit 0; fi\n");
+  await writeFile(editor, '#!/usr/bin/env bash\nif [[ "$1" == t ]]; then exit 0; fi\n');
   await writeFile(
     readobj,
-    "#!/usr/bin/env bash\nprintf '%s\\n' 'Directive(s): /DEFAULTLIB:msvcrt.lib /FAILIFMISMATCH:\"RuntimeLibrary=MD_DynamicRelease\"'\n"
+    "#!/usr/bin/env bash\nprintf '%s\\n' 'Directive(s): /DEFAULTLIB:msvcrt.lib /FAILIFMISMATCH:\"RuntimeLibrary=MD_DynamicRelease\"'\n",
   );
   await Promise.all([chmod(archiver, 0o755), chmod(editor, 0o755), chmod(readobj, 0o755)]);
 
   await assert.rejects(
-    execFileAsync("bash", [
-      path.join(repositoryRoot, "toolchains/hermes/package-msvc.sh"),
-      build,
-      path.join(directory, "hermes.lib")
-    ], {
-      env: {
-        ...process.env,
-        AR_TOOL: editor,
-        COFF_DIRECTIVES_TOOL: readobj,
-        LIB_TOOL: archiver,
-        PATH: `${tools}:${process.env.PATH}`
-      }
-    }),
+    execFileAsync(
+      "bash",
+      [path.join(repositoryRoot, "toolchains/hermes/package-msvc.sh"), build, path.join(directory, "hermes.lib")],
+      {
+        env: {
+          ...process.env,
+          AR_TOOL: editor,
+          COFF_DIRECTIVES_TOOL: readobj,
+          LIB_TOOL: archiver,
+          PATH: `${tools}:${process.env.PATH}`,
+        },
+      },
+    ),
     (error) => {
       assert.match(error.stderr ?? "", /MD_DynamicRelease/);
       return true;
-    }
+    },
   );
 });
 
 test("the Windows cross toolchain uses Defold's MSVC and SDK headers", async () => {
-  const source = await readFile(
-    path.join(repositoryRoot, "toolchains/hermes/windows-msvc.cmake"),
-    "utf8"
-  );
+  const source = await readFile(path.join(repositoryRoot, "toolchains/hermes/windows-msvc.cmake"), "utf8");
 
   // A target triple alone is insufficient: clang otherwise reaches the host's
   // Linux C++ headers, and Hermes' first `<atomic>` probe fails. These are the
@@ -410,13 +396,13 @@ test("the Windows cross toolchain uses Defold's MSVC and SDK headers", async () 
     "$ENV{WINDOWS_SDK_DIR}/Include/$ENV{WINDOWS_SDK_VERSION}/ucrt",
     "$ENV{WINDOWS_SDK_DIR}/Include/$ENV{WINDOWS_SDK_VERSION}/winrt",
     "$ENV{WINDOWS_SDK_DIR}/Include/$ENV{WINDOWS_SDK_VERSION}/um",
-    "$ENV{WINDOWS_SDK_DIR}/Include/$ENV{WINDOWS_SDK_VERSION}/shared"
+    "$ENV{WINDOWS_SDK_DIR}/Include/$ENV{WINDOWS_SDK_VERSION}/shared",
   ]) {
     assert.match(source, new RegExp(suffix.replace(/[{}$]/g, "\\$&")));
   }
   assert.ok(
     source.indexOf("$ENV{CLANG_RESOURCE_DIR}/include") < source.indexOf("$ENV{WINDOWS_MSVC_DIR}/include"),
-    "Clang's intrinsic headers must precede MSVC's, exactly as they do in Defold's win32 systemIncludes"
+    "Clang's intrinsic headers must precede MSVC's, exactly as they do in Defold's win32 systemIncludes",
   );
   assert.match(source, /-nostdinc\+\+/);
   assert.match(source, /"-D_WINDOWS -DDM_PLATFORM_WINDOWS/);
@@ -425,29 +411,21 @@ test("the Windows cross toolchain uses Defold's MSVC and SDK headers", async () 
   assert.match(source, /set\(CMAKE_ASM_FLAGS_INIT "-target x86_64-pc-win32-msvc -m64"\)/);
   assert.match(source, /set\(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded"/);
 
-  const nativeBuild = await readFile(
-    path.join(repositoryRoot, "toolchains/hermes/build-windows.sh"),
-    "utf8"
-  );
+  const nativeBuild = await readFile(path.join(repositoryRoot, "toolchains/hermes/build-windows.sh"), "utf8");
   assert.match(nativeBuild, /-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded/);
 });
 
 test("the Windows extension links Hermes' system ICU import libraries", async () => {
-  const manifest = parseYaml(
-    await readFile(path.join(repositoryRoot, "defold/defold_hermes/ext.manifest"), "utf8")
-  );
+  const manifest = parseYaml(await readFile(path.join(repositoryRoot, "defold/defold_hermes/ext.manifest"), "utf8"));
   assert.deepEqual(
     manifest.platforms?.["x86_64-win32"]?.context?.libs,
     ["icuuc", "icuin"],
-    "Hermes' Windows 10 ICU backend leaves these symbols for the final Defold link"
+    "Hermes' Windows 10 ICU backend leaves these symbols for the final Defold link",
   );
 });
 
 test("the Linux target archive keeps the glibc 2.35 compatibility floor", async () => {
-  const dockerfile = await readFile(
-    path.join(repositoryRoot, "toolchains/hermes/Dockerfile.linux"),
-    "utf8"
-  );
+  const dockerfile = await readFile(path.join(repositoryRoot, "toolchains/hermes/Dockerfile.linux"), "utf8");
   assert.match(dockerfile, /^FROM ubuntu:22\.04$/mu);
   assert.doesNotMatch(dockerfile, /^FROM ubuntu:24\.04$/mu);
   assert.equal((dockerfile.match(/nm -u \/out\/libhermes(?:\.debug)?\.a/g) ?? []).length, 2);
@@ -460,7 +438,10 @@ test("the POSIX packager merges explicit static runtime dependencies", async (t)
   for (const candidate of candidates) {
     try {
       const { stdout, stderr } = await execFileAsync(candidate, ["--version"]);
-      if (/GNU|LLVM/u.test(`${stdout}${stderr}`)) { arTool = candidate; break; }
+      if (/GNU|LLVM/u.test(`${stdout}${stderr}`)) {
+        arTool = candidate;
+        break;
+      }
     } catch {
       // BSD ar has no MRI mode; try the next deterministic archiver.
     }
@@ -477,20 +458,15 @@ test("the POSIX packager merges explicit static runtime dependencies", async (t)
   const vm = path.join(objects, "vm.o");
   const jsi = path.join(objects, "jsi.o");
   const icu = path.join(objects, "icu.o");
-  await Promise.all([
-    writeFile(vm, "vm"),
-    writeFile(jsi, "jsi"),
-    writeFile(icu, "icu")
-  ]);
+  await Promise.all([writeFile(vm, "vm"), writeFile(jsi, "jsi"), writeFile(icu, "icu")]);
   await execFileAsync(arTool, ["rcs", path.join(build, "lib", "libhermesvm_a.a"), vm]);
   await execFileAsync(arTool, ["rcs", path.join(build, "jsi", "libjsi.a"), jsi]);
   await execFileAsync(arTool, ["rcs", dependency, icu]);
-  await execFileAsync("bash", [
-    path.join(repositoryRoot, "toolchains/hermes/package-posix.sh"),
-    build,
-    output,
-    dependency
-  ], { env: { ...process.env, AR: arTool } });
+  await execFileAsync(
+    "bash",
+    [path.join(repositoryRoot, "toolchains/hermes/package-posix.sh"), build, output, dependency],
+    { env: { ...process.env, AR: arTool } },
+  );
   const { stdout } = await execFileAsync(arTool, ["t", output]);
   assert.deepEqual(new Set(stdout.trim().split(/\r?\n/u)), new Set(["vm.o", "jsi.o", "icu.o"]));
 });

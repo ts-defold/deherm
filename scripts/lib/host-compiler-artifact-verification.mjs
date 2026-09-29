@@ -29,14 +29,10 @@ export async function verifyPinnedHostToolFile({ manifest, host, tool, file }) {
   const bytes = await readFile(absolute);
   const sha256 = createHash("sha256").update(bytes).digest("hex");
   if (bytes.byteLength !== record.bytes) {
-    throw new Error(
-      `${host} ${tool} is ${bytes.byteLength} bytes at ${absolute}; manifest expects ${record.bytes}`
-    );
+    throw new Error(`${host} ${tool} is ${bytes.byteLength} bytes at ${absolute}; manifest expects ${record.bytes}`);
   }
   if (sha256 !== record.sha256) {
-    throw new Error(
-      `${host} ${tool} hashes ${sha256} at ${absolute}; manifest expects ${record.sha256}`
-    );
+    throw new Error(`${host} ${tool} hashes ${sha256} at ${absolute}; manifest expects ${record.sha256}`);
   }
   return { host, tool, file: absolute, bytes: bytes.byteLength, sha256 };
 }

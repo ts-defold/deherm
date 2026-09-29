@@ -91,10 +91,9 @@ test("base64-span semantics come from implementation dataflow plus ABI, not name
   const [ir, shapes, sourceFacts] = await Promise.all([
     readFile(join(repositoryRoot, "packages/bindings/generated/defold-sdk-ir.json"), "utf8").then(JSON.parse),
     readFile(join(repositoryRoot, "packages/bindings/generated/defold-dmsdk-abi-shapes.json"), "utf8").then(JSON.parse),
-    readFile(
-      join(repositoryRoot, "packages/bindings/generated/defold-dmsdk-source-semantic-facts.json"),
-      "utf8",
-    ).then(JSON.parse),
+    readFile(join(repositoryRoot, "packages/bindings/generated/defold-dmsdk-source-semantic-facts.json"), "utf8").then(
+      JSON.parse,
+    ),
   ]);
   const policyText = await readFile(
     join(repositoryRoot, "packages/bindings/overrides/dmsdk-base64-span-bindings.json"),
@@ -133,12 +132,7 @@ test("base64-span semantics come from implementation dataflow plus ABI, not name
       ),
     );
     assert.ok(
-      extractBase64SpanSemantics(
-        { ...declaration, name: "dmCrypt::Transform" },
-        candidate,
-        policy.recipe,
-        facts,
-      ),
+      extractBase64SpanSemantics({ ...declaration, name: "dmCrypt::Transform" }, candidate, policy.recipe, facts),
     );
     assert.equal(extractBase64SpanSemantics(declaration, candidate, policy.recipe, { definitions: [] }), null);
   }

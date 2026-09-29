@@ -33,8 +33,12 @@ export function createBindingLoweringRecipeFacts(plan, sentinel) {
   if (sha256(JSON.stringify(body)) !== planSha256) {
     throw new Error("Lowering-recipe extraction requires a plan with a valid internal digest");
   }
-  if (!sentinel || sentinel.schemaVersion !== 1 || !sentinel.inputPaths ||
-      JSON.stringify(sentinel.inputHashes) !== JSON.stringify(plan.inputHashes)) {
+  if (
+    !sentinel ||
+    sentinel.schemaVersion !== 1 ||
+    !sentinel.inputPaths ||
+    JSON.stringify(sentinel.inputHashes) !== JSON.stringify(plan.inputHashes)
+  ) {
     throw new Error("Lowering-recipe extraction requires matching cache identity facts");
   }
 
@@ -82,20 +86,29 @@ export function createBindingLoweringRecipeFacts(plan, sentinel) {
     inputPaths: structuredClone(sentinel.inputPaths),
     strings,
     shapes,
-    root: encode(body)
+    root: encode(body),
   };
 }
 
 /** Reconstruct the canonical lowering plan using package code only. */
 export function emitBindingLoweringPlan(facts) {
-  if (!facts || facts.schemaVersion !== RECIPE_SCHEMA_VERSION ||
-      facts.kind !== BINDING_LOWERING_RECIPE_KIND || !Array.isArray(facts.strings) ||
-      !Array.isArray(facts.shapes) || !Array.isArray(facts.root) || !facts.inputPaths) {
+  if (
+    !facts ||
+    facts.schemaVersion !== RECIPE_SCHEMA_VERSION ||
+    facts.kind !== BINDING_LOWERING_RECIPE_KIND ||
+    !Array.isArray(facts.strings) ||
+    !Array.isArray(facts.shapes) ||
+    !Array.isArray(facts.root) ||
+    !facts.inputPaths
+  ) {
     throw new Error("Unsupported binding-lowering recipe facts");
   }
-  if (facts.strings.some((value) => typeof value !== "string") ||
-      facts.shapes.some((shape) => !Array.isArray(shape) ||
-        shape.some((key) => typeof key !== "string" || key.length === 0))) {
+  if (
+    facts.strings.some((value) => typeof value !== "string") ||
+    facts.shapes.some(
+      (shape) => !Array.isArray(shape) || shape.some((key) => typeof key !== "string" || key.length === 0),
+    )
+  ) {
     throw new Error("Binding-lowering recipe dictionaries are malformed");
   }
 
@@ -152,6 +165,6 @@ export function emitBindingLoweringPlanSentinel(facts, emitted, emitterSource) {
     output: "packages/bindings/generated/defold-binding-lowering-plan.json",
     outputBytes: Buffer.byteLength(emitted.source),
     outputSha256: sha256(emitted.source),
-    planSha256: emitted.plan.planSha256
+    planSha256: emitted.plan.planSha256,
   };
 }

@@ -13,7 +13,7 @@ import {
   referencesOkfIndex,
   refreshOkfIndex,
   searchOkfIndex,
-  sectionOkfIndex
+  sectionOkfIndex,
 } from "../.agents/lib/okf-graph.mjs";
 
 const repositoryRoot = path.resolve(import.meta.dirname, "..");
@@ -26,14 +26,16 @@ async function fixture() {
     mkdir(docs, { recursive: true }),
     mkdir(path.join(root, "src"), { recursive: true }),
     mkdir(path.join(root, "generated"), { recursive: true }),
-    mkdir(path.join(root, "tests"), { recursive: true })
+    mkdir(path.join(root, "tests"), { recursive: true }),
   ]);
   await Promise.all([
     writeFile(path.join(root, "src", "engine.ts"), "export const engine = 1;\n"),
     writeFile(path.join(root, "src", "owned.ts"), "export const owned = true;\n"),
     writeFile(path.join(root, "generated", "data.json"), `${JSON.stringify({ large: "body must not be indexed" })}\n`),
     writeFile(path.join(root, "tests", "check.test.mjs"), "// verification\n"),
-    writeFile(path.join(docs, "b.md"), `---
+    writeFile(
+      path.join(docs, "b.md"),
+      `---
 type: Note
 title: Beta reference
 description: Linked fixture.
@@ -44,8 +46,11 @@ description: Linked fixture.
 ## Shared heading
 
 Beta body.
-`),
-    writeFile(path.join(docs, "a.md"), `---
+`,
+    ),
+    writeFile(
+      path.join(docs, "a.md"),
+      `---
 type: Note
 title: Alpha graph
 description: Graph fixture.
@@ -75,7 +80,8 @@ one
 two
 three
 four
-`)
+`,
+    ),
   ]);
   return { root, docs, databasePath };
 }
@@ -91,10 +97,12 @@ async function waitForOutput(stream, expected) {
 }
 
 async function holdDatabaseLock(databasePath, begin) {
-  const child = spawn(process.execPath, [
-    "--input-type=module",
-    "--eval",
-    `
+  const child = spawn(
+    process.execPath,
+    [
+      "--input-type=module",
+      "--eval",
+      `
       import { DatabaseSync } from "node:sqlite";
       const database = new DatabaseSync(process.argv[1]);
       database.exec(process.argv[2]);
@@ -104,38 +112,54 @@ async function holdDatabaseLock(databasePath, begin) {
         database.close();
       }, 300);
     `,
-    databasePath,
-    begin
-  ], { stdio: ["ignore", "pipe", "pipe"] });
+      databasePath,
+      begin,
+    ],
+    { stdio: ["ignore", "pipe", "pipe"] },
+  );
   const exit = once(child, "exit");
   let stderr = "";
   child.stderr.setEncoding("utf8");
-  child.stderr.on("data", (chunk) => { stderr += chunk; });
+  child.stderr.on("data", (chunk) => {
+    stderr += chunk;
+  });
   await waitForOutput(child.stdout, "database-locked\n");
   return { child, exit, stderr: () => stderr };
 }
 
 test("OKF CLI supports subcommand help and bounded query aliases", async () => {
-  const cacheRoot = await import("node:fs/promises").then(({ mkdtemp }) => mkdtemp(path.join(tmpdir(), "deherm-okf-cli-")));
+  const cacheRoot = await import("node:fs/promises").then(({ mkdtemp }) =>
+    mkdtemp(path.join(tmpdir(), "deherm-okf-cli-")),
+  );
   try {
     const cli = path.join(repositoryRoot, ".agents", "okf-index.mjs");
     const environment = { ...process.env, DEHERM_OKF_CACHE: path.join(cacheRoot, "okf.sqlite") };
     const help = execFileSync(process.execPath, [cli, "search", "--help"], {
-      cwd: repositoryRoot, env: environment, encoding: "utf8"
+      cwd: repositoryRoot,
+      env: environment,
+      encoding: "utf8",
     });
     assert.match(help, /search --query <terms> \[--limit N\]/);
     const result = execFileSync(process.execPath, [cli, "search", "--query", "dmSDK exact call", "--limit", "1"], {
-      cwd: repositoryRoot, env: environment, encoding: "utf8"
+      cwd: repositoryRoot,
+      env: environment,
+      encoding: "utf8",
     });
     assert.equal(result.trim().split("\n").filter(Boolean).length, 1);
     const literalHelp = execFileSync(process.execPath, [cli, "search", "help", "--limit", "1"], {
-      cwd: repositoryRoot, env: environment, encoding: "utf8"
+      cwd: repositoryRoot,
+      env: environment,
+      encoding: "utf8",
     });
     assert.doesNotMatch(literalHelp, /Usage: node \.agents\/okf-index\.mjs/);
     assert.equal(literalHelp.trim().split("\n").filter(Boolean).length, 1);
-    const metadata = JSON.parse(execFileSync(process.execPath, [
-      cli, "metadata", "research/okf-semantic-retrieval-index.md"
-    ], { cwd: repositoryRoot, env: environment, encoding: "utf8" }));
+    const metadata = JSON.parse(
+      execFileSync(process.execPath, [cli, "metadata", "research/okf-semantic-retrieval-index.md"], {
+        cwd: repositoryRoot,
+        env: environment,
+        encoding: "utf8",
+      }),
+    );
     assert.equal(metadata.type, "Design and Verification Report");
     assert.equal(Object.hasOwn(metadata, "content"), false);
   } finally {
@@ -147,14 +171,21 @@ test("OKF graph refresh is content-addressed and updates source digests incremen
   const value = await fixture();
   try {
     const first = await refreshOkfIndex(value);
-    assert.deepEqual({ indexed: first.indexed, reused: first.reused, removed: first.removed },
-      { indexed: 2, reused: 0, removed: 0 });
+    assert.deepEqual(
+      { indexed: first.indexed, reused: first.reused, removed: first.removed },
+      { indexed: 2, reused: 0, removed: 0 },
+    );
 
     const second = await refreshOkfIndex(value);
-    assert.deepEqual({ indexed: second.indexed, reused: second.reused, sourceUpdated: second.sourceUpdated },
-      { indexed: 0, reused: 2, sourceUpdated: 0 });
+    assert.deepEqual(
+      { indexed: second.indexed, reused: second.reused, sourceUpdated: second.sourceUpdated },
+      { indexed: 0, reused: 2, sourceUpdated: 0 },
+    );
 
-    await writeFile(path.join(value.docs, "a.md"), `${await readFile(path.join(value.docs, "a.md"), "utf8")}\nchanged\n`);
+    await writeFile(
+      path.join(value.docs, "a.md"),
+      `${await readFile(path.join(value.docs, "a.md"), "utf8")}\nchanged\n`,
+    );
     const changedDocument = await refreshOkfIndex(value);
     assert.deepEqual({ indexed: changedDocument.indexed, reused: changedDocument.reused }, { indexed: 1, reused: 1 });
 
@@ -173,7 +204,7 @@ test("OKF graph exposes structured document frontmatter without reading document
     await refreshOkfIndex(value);
     const metadata = await metadataOkfIndex({
       databasePath: value.databasePath,
-      document: "research/a.md"
+      document: "research/a.md",
     });
     assert.equal(metadata.path, "research/a.md");
     assert.equal(metadata.type, "Note");
@@ -183,12 +214,12 @@ test("OKF graph exposes structured document frontmatter without reading document
     assert.deepEqual(metadata.metadata, {
       type: "Note",
       title: "Alpha graph",
-      description: "Graph fixture."
+      description: "Graph fixture.",
     });
     assert.equal(Object.hasOwn(metadata, "content"), false);
     await assert.rejects(
       metadataOkfIndex({ databasePath: value.databasePath, document: "research/missing.md" }),
-      /unknown OKF document/
+      /unknown OKF document/,
     );
   } finally {
     await rm(value.root, { recursive: true, force: true });
@@ -199,7 +230,9 @@ test("bounded metadata projection fails closed when distinct keys truncate to th
   const value = await fixture();
   try {
     const shared = "k".repeat(256);
-    await writeFile(path.join(value.docs, "collision.md"), `---
+    await writeFile(
+      path.join(value.docs, "collision.md"),
+      `---
 type: Note
 title: Collision
 description: Bounded-key collision fixture.
@@ -208,11 +241,12 @@ ${shared}b: second
 ---
 
 # Collision
-`);
+`,
+    );
     await refreshOkfIndex(value);
     await assert.rejects(
       metadataOkfIndex({ databasePath: value.databasePath, document: "research/collision.md" }),
-      /metadata keys collide after bounded projection/
+      /metadata keys collide after bounded projection/,
     );
   } finally {
     await rm(value.root, { recursive: true, force: true });
@@ -228,7 +262,7 @@ test("OKF refresh and read operations wait for concurrent locks instead of faili
     const stats = await refreshOkfIndex(value);
     assert.deepEqual(
       { indexed: stats.indexed, reused: stats.reused, documents: stats.documents },
-      { indexed: 0, reused: 2, documents: 2 }
+      { indexed: 0, reused: 2, documents: 2 },
     );
     let [code] = await lock.exit;
     assert.equal(code, 0, lock.stderr());
@@ -238,7 +272,7 @@ test("OKF refresh and read operations wait for concurrent locks instead of faili
     const section = await sectionOkfIndex({
       databasePath: value.databasePath,
       document: "research/a.md",
-      terms: ["ownership"]
+      terms: ["ownership"],
     });
     assert.equal(section.title, "Ownership");
     [code] = await lock.exit;
@@ -260,7 +294,7 @@ test("OKF graph connects links, declared sources, and semantic ownership edges w
     const edges = await queryOkfSql({
       databasePath: value.databasePath,
       sql: "SELECT kind, target FROM edges WHERE source_doc = 'research/a.md' ORDER BY kind, target",
-      max: 50
+      max: 50,
     });
     assert.ok(edges.some((edge) => edge.kind === "links" && edge.target === "doc:research/b.md"));
     assert.ok(edges.some((edge) => edge.kind === "links" && edge.target === "heading:research/b.md#shared-heading"));
@@ -273,7 +307,7 @@ test("OKF graph connects links, declared sources, and semantic ownership edges w
     const [generated] = await queryOkfSql({
       databasePath: value.databasePath,
       sql: "SELECT path, digest, content FROM nodes WHERE id = 'source:generated/data.json'",
-      max: 1
+      max: 1,
     });
     assert.equal(generated.path, "generated/data.json");
     assert.match(generated.digest, /^[a-f0-9]{64}$/);
@@ -291,7 +325,7 @@ test("OKF graph exposes bounded document links and heading-aware backlinks", asy
       databasePath: value.databasePath,
       document: "research/a.md",
       direction: "outgoing",
-      max: 50
+      max: 50,
     });
     assert.ok(links.some((edge) => edge.kind === "links" && edge.target === "doc:research/b.md"));
     assert.ok(links.some((edge) => edge.kind === "source" && edge.target === "source:src/engine.ts"));
@@ -301,7 +335,7 @@ test("OKF graph exposes bounded document links and heading-aware backlinks", asy
       databasePath: value.databasePath,
       document: "research/b.md",
       direction: "incoming",
-      max: 50
+      max: 50,
     });
     assert.ok(backlinks.some((edge) => edge.target === "doc:research/b.md"));
     assert.ok(backlinks.some((edge) => edge.target === "heading:research/b.md#shared-heading"));
@@ -309,7 +343,7 @@ test("OKF graph exposes bounded document links and heading-aware backlinks", asy
     assert.ok(backlinks.every((edge) => edge.sourcePath === "research/a.md"));
     await assert.rejects(
       referencesOkfIndex({ databasePath: value.databasePath, document: "research/a.md", direction: "sideways" }),
-      /outgoing or incoming/
+      /outgoing or incoming/,
     );
   } finally {
     await rm(value.root, { recursive: true, force: true });
@@ -325,7 +359,7 @@ test("heading identities are line-independent anchors with deterministic duplica
     const before = await queryOkfSql({
       databasePath: value.databasePath,
       sql: "SELECT id, line FROM nodes WHERE kind = 'heading' AND path = 'research/a.md' ORDER BY line",
-      max: 20
+      max: 20,
     });
     assert.ok(before.some((heading) => heading.id === "heading:research/a.md#ownership"));
     assert.ok(before.some((heading) => heading.id === "heading:research/a.md#ownership-2"));
@@ -337,9 +371,12 @@ test("heading identities are line-independent anchors with deterministic duplica
     const after = await queryOkfSql({
       databasePath: value.databasePath,
       sql: "SELECT id, line FROM nodes WHERE kind = 'heading' AND path = 'research/a.md' ORDER BY line",
-      max: 20
+      max: 20,
     });
-    assert.deepEqual(after.map((heading) => heading.id), before.map((heading) => heading.id));
+    assert.deepEqual(
+      after.map((heading) => heading.id),
+      before.map((heading) => heading.id),
+    );
     assert.equal(after.find((heading) => heading.id === "heading:research/a.md#ownership").line, ownershipLine + 2);
   } finally {
     await rm(value.root, { recursive: true, force: true });
@@ -350,18 +387,20 @@ test("heading identities do not alias duplicate ordinals with literal suffixed h
   const value = await fixture();
   try {
     const documentPath = path.join(value.docs, "a.md");
-    await writeFile(documentPath, `${await readFile(documentPath, "utf8")}\n## Ownership\n\nDuplicate body.\n\n## Ownership-2\n\nLiteral suffix body.\n`);
+    await writeFile(
+      documentPath,
+      `${await readFile(documentPath, "utf8")}\n## Ownership\n\nDuplicate body.\n\n## Ownership-2\n\nLiteral suffix body.\n`,
+    );
     await refreshOkfIndex(value);
     const headings = await queryOkfSql({
       databasePath: value.databasePath,
       sql: "SELECT id, content FROM nodes WHERE kind = 'heading' AND path = 'research/a.md' AND id LIKE 'heading:research/a.md#ownership%' ORDER BY line",
-      max: 20
+      max: 20,
     });
-    assert.deepEqual(headings.map(({ id }) => id), [
-      "heading:research/a.md#ownership",
-      "heading:research/a.md#ownership-2",
-      "heading:research/a.md#ownership-2-2"
-    ]);
+    assert.deepEqual(
+      headings.map(({ id }) => id),
+      ["heading:research/a.md#ownership", "heading:research/a.md#ownership-2", "heading:research/a.md#ownership-2-2"],
+    );
     assert.match(headings[1].content, /Duplicate body/);
     assert.match(headings[2].content, /Literal suffix body/);
   } finally {
@@ -374,16 +413,22 @@ test("OKF search, outline, and section results have enforced output bounds", asy
   try {
     await refreshOkfIndex(value);
     assert.equal((await searchOkfIndex({ databasePath: value.databasePath, terms: ["alpha"], max: 2 })).length, 2);
-    assert.equal((await outlineOkfIndex({ databasePath: value.databasePath, document: "research/a.md", max: 1 })).length, 1);
+    assert.equal(
+      (await outlineOkfIndex({ databasePath: value.databasePath, document: "research/a.md", max: 1 })).length,
+      1,
+    );
     const section = await sectionOkfIndex({
       databasePath: value.databasePath,
       document: "research/a.md",
       terms: ["long", "section"],
-      maxLines: 3
+      maxLines: 3,
     });
     assert.equal(section.content.split("\n").length, 3);
     assert.equal(section.truncated, true);
-    await assert.rejects(searchOkfIndex({ databasePath: value.databasePath, terms: ["alpha"], max: 51 }), /1 through 50/);
+    await assert.rejects(
+      searchOkfIndex({ databasePath: value.databasePath, terms: ["alpha"], max: 51 }),
+      /1 through 50/,
+    );
   } finally {
     await rm(value.root, { recursive: true, force: true });
   }
@@ -393,17 +438,29 @@ test("SQL escape hatch is bounded and physically read-only", async () => {
   const value = await fixture();
   try {
     await refreshOkfIndex(value);
-    const rows = await queryOkfSql({ databasePath: value.databasePath, sql: "SELECT id FROM nodes ORDER BY id", max: 2 });
+    const rows = await queryOkfSql({
+      databasePath: value.databasePath,
+      sql: "SELECT id FROM nodes ORDER BY id",
+      max: 2,
+    });
     assert.equal(rows.length, 2);
     await assert.rejects(
       queryOkfSql({ databasePath: value.databasePath, sql: "DELETE FROM nodes", max: 2 }),
-      /accepts exactly one/
+      /accepts exactly one/,
     );
     await assert.rejects(
-      queryOkfSql({ databasePath: value.databasePath, sql: "WITH chosen AS (SELECT id FROM nodes LIMIT 1) DELETE FROM nodes WHERE id IN chosen", max: 2 }),
-      /readonly|read-only/i
+      queryOkfSql({
+        databasePath: value.databasePath,
+        sql: "WITH chosen AS (SELECT id FROM nodes LIMIT 1) DELETE FROM nodes WHERE id IN chosen",
+        max: 2,
+      }),
+      /readonly|read-only/i,
     );
-    const [count] = await queryOkfSql({ databasePath: value.databasePath, sql: "SELECT count(*) AS count FROM nodes", max: 1 });
+    const [count] = await queryOkfSql({
+      databasePath: value.databasePath,
+      sql: "SELECT count(*) AS count FROM nodes",
+      max: 1,
+    });
     assert.ok(Number(count.count) > 0);
   } finally {
     await rm(value.root, { recursive: true, force: true });
@@ -413,7 +470,9 @@ test("SQL escape hatch is bounded and physically read-only", async () => {
 test("section and SQL byte budgets reject context-volume bypasses", async () => {
   const value = await fixture();
   try {
-    await writeFile(path.join(value.docs, "large.md"), `---
+    await writeFile(
+      path.join(value.docs, "large.md"),
+      `---
 type: Note
 title: Large line
 description: Byte-bound fixture.
@@ -423,13 +482,14 @@ owner: ${"y".repeat(250_000)}
 # Large
 
 ${"x".repeat(250_000)}
-`);
+`,
+    );
     await refreshOkfIndex(value);
     const section = await sectionOkfIndex({
       databasePath: value.databasePath,
       document: "research/large.md",
       terms: ["large"],
-      maxLines: 200
+      maxLines: 200,
     });
     assert.equal(section.truncated, true);
     assert.ok(Buffer.byteLength(section.content, "utf8") <= 64 * 1_024);
@@ -437,7 +497,7 @@ ${"x".repeat(250_000)}
 
     const metadata = await metadataOkfIndex({
       databasePath: value.databasePath,
-      document: "research/large.md"
+      document: "research/large.md",
     });
     assert.ok(Buffer.byteLength(metadata.metadata.owner, "utf8") <= 4_096);
     assert.ok(Buffer.byteLength(JSON.stringify(metadata), "utf8") <= 64 * 1_024);
@@ -445,22 +505,22 @@ ${"x".repeat(250_000)}
     const rows = await queryOkfSql({
       databasePath: value.databasePath,
       sql: "SELECT zeroblob(100000) AS payload",
-      max: 1
+      max: 1,
     });
     assert.deepEqual(rows[0].payload, {
       type: "blob",
       bytes: 100_000,
       hexPrefix: "00".repeat(64),
-      truncated: true
+      truncated: true,
     });
     assert.ok(Buffer.byteLength(JSON.stringify(rows), "utf8") < 1_000);
     await assert.rejects(
       queryOkfSql({
         databasePath: value.databasePath,
         sql: "WITH RECURSIVE x(n) AS (VALUES(1) UNION ALL SELECT n+1 FROM x) SELECT n FROM x",
-        max: 1
+        max: 1,
       }),
-      /not authorized|authorization denied/u
+      /not authorized|authorization denied/u,
     );
   } finally {
     await rm(value.root, { recursive: true, force: true });
@@ -470,7 +530,9 @@ ${"x".repeat(250_000)}
 test("bounded text output truncates only at UTF-8 code point boundaries", async () => {
   const value = await fixture();
   try {
-    await writeFile(path.join(value.docs, "multibyte.md"), `---
+    await writeFile(
+      path.join(value.docs, "multibyte.md"),
+      `---
 type: Note
 title: Multibyte boundaries
 description: UTF-8 boundary fixture.
@@ -482,7 +544,8 @@ owner: ${"é".repeat(5_000)}
 ${"😀".repeat(5_000)}
 
 ## ${"界".repeat(2_000)}
-`);
+`,
+    );
     await refreshOkfIndex(value);
 
     const assertBounded = (text, maximumBytes) => {
@@ -493,7 +556,7 @@ ${"😀".repeat(5_000)}
 
     const metadata = await metadataOkfIndex({
       databasePath: value.databasePath,
-      document: "research/multibyte.md"
+      document: "research/multibyte.md",
     });
     assertBounded(metadata.metadata.owner, 4_096);
 
@@ -501,21 +564,21 @@ ${"😀".repeat(5_000)}
       databasePath: value.databasePath,
       document: "research/multibyte.md",
       terms: ["multibyte"],
-      maxLines: 200
+      maxLines: 200,
     });
     assertBounded(section.content.split("\n")[2], 4_096);
 
     const outline = await outlineOkfIndex({
       databasePath: value.databasePath,
       document: "research/multibyte.md",
-      max: 200
+      max: 200,
     });
     assertBounded(outline[1].title, 1_024);
 
     const [row] = await queryOkfSql({
       databasePath: value.databasePath,
       sql: "SELECT content FROM nodes WHERE kind = 'heading' AND path = 'research/multibyte.md' AND label = 'Multibyte'",
-      max: 1
+      max: 1,
     });
     assertBounded(row.content, 4_096);
   } finally {
@@ -564,13 +627,13 @@ sources:
     const [document] = await queryOkfSql({
       databasePath: value.databasePath,
       sql: "SELECT label FROM nodes WHERE id = 'doc:research/windows.md'",
-      max: 1
+      max: 1,
     });
     assert.equal(document.label, "Windows metadata");
     const edges = await queryOkfSql({
       databasePath: value.databasePath,
       sql: "SELECT kind, target FROM edges WHERE source_doc = 'research/windows.md'",
-      max: 10
+      max: 10,
     });
     assert.ok(edges.some((edge) => edge.kind === "source" && edge.target === "source:src/engine.ts"));
   } finally {

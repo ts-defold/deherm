@@ -8,8 +8,8 @@ function projection(...names) {
     defoldRevision: "0123456789012345678901234567890123456789",
     rows: names.map((name, index) => ({
       id: `script:test.${index}`,
-      signature: { kind: "defold-value", name }
-    }))
+      signature: { kind: "defold-value", name },
+    })),
   };
 }
 
@@ -19,15 +19,15 @@ function policy() {
     transparent: {},
     opaque: {
       node: "retained-engine-handle",
-      "future-only": "retained-engine-handle"
+      "future-only": "retained-engine-handle",
     },
     recordingShapes: {
       node: "handle",
-      "future-only": "handle"
+      "future-only": "handle",
     },
     opaqueReasons: {
-      "retained-engine-handle": "Engine-owned handle."
-    }
+      "retained-engine-handle": "Engine-owned handle.",
+    },
   };
 }
 
@@ -36,7 +36,7 @@ test("revision-specific value names use a visible conservative universal fallbac
     projection: projection("node", "go.EASING_INBACK", "buffer"),
     policy: policy(),
     sources: {},
-    sourcePaths: {}
+    sourcePaths: {},
   });
 
   assert.equal(report.opaque.node.classification, "reviewed");
@@ -48,7 +48,7 @@ test("revision-specific value names use a visible conservative universal fallbac
       proof: "source-derived-name; specialized-layout-unproven",
       fallbackTransport: "script-universal-value",
       recordingShape: "userdata",
-      alert: "specialized-layout-unproven"
+      alert: "specialized-layout-unproven",
     });
   }
   assert.equal(report.coverage.conservativeOpaque, 2);
@@ -61,7 +61,7 @@ test("a policy entry for an API absent from this revision is dormant, not fatal"
     projection: projection("node"),
     policy: policy(),
     sources: {},
-    sourcePaths: {}
+    sourcePaths: {},
   });
 
   assert.deepEqual(Object.keys(report.opaque), ["node"]);

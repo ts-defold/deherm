@@ -13,7 +13,7 @@ import {
   readNativeArtifactRows,
   stageNativeArtifactOverlay,
   writeNativeArtifactIndex,
-  verifyNativeArtifact
+  verifyNativeArtifact,
 } from "./lib/defold-webtransport-artifacts.mjs";
 
 function parse(args) {
@@ -21,7 +21,8 @@ function parse(args) {
   const values = {};
   for (let index = 0; index < args.length; index += 1) {
     const key = args[index];
-    if (!key.startsWith("--") || !args[index + 1] || args[index + 1].startsWith("--")) throw new Error(`${key} requires a value`);
+    if (!key.startsWith("--") || !args[index + 1] || args[index + 1].startsWith("--"))
+      throw new Error(`${key} requires a value`);
     values[key.slice(2)] = args[++index];
   }
   return { command, values };
@@ -50,33 +51,67 @@ export async function run(args = process.argv.slice(2)) {
   if (command === "check-index") return writeNativeArtifactIndex({ check: true });
   if (command === "rows") return readNativeArtifactRows();
   if (command === "plan") {
-    const present = values.present ? (await readFile(path.resolve(values.present), "utf8")).split(/\r?\n/u).filter(Boolean) : [];
+    const present = values.present
+      ? (await readFile(path.resolve(values.present), "utf8")).split(/\r?\n/u).filter(Boolean)
+      : [];
     const plan = await planNativeArtifactBuilds(present);
     if (values["describe-row"]) {
       const [lane, slotText] = values["describe-row"].split("=");
       const row = plan.lanes[lane]?.find((candidate) => candidate.slot === Number(slotText));
       if (!row) throw new Error(`No ${values["describe-row"]} build row`);
       if (values["github-env"]) {
-        await appendFile(path.resolve(values["github-env"]), Object.entries(row).filter(([, value]) => !Array.isArray(value)).map(([key, value]) => `${key.toUpperCase()}=${value}`).join("\n") + "\n");
+        await appendFile(
+          path.resolve(values["github-env"]),
+          Object.entries(row)
+            .filter(([, value]) => !Array.isArray(value))
+            .map(([key, value]) => `${key.toUpperCase()}=${value}`)
+            .join("\n") + "\n",
+        );
         return row;
       }
       return row;
     }
     if (values["github-output"]) {
-      await appendFile(path.resolve(values["github-output"]), Object.entries(githubRecords(plan)).map(([key, value]) => `${key}=${value}`).join("\n") + "\n");
+      await appendFile(
+        path.resolve(values["github-output"]),
+        Object.entries(githubRecords(plan))
+          .map(([key, value]) => `${key}=${value}`)
+          .join("\n") + "\n",
+      );
     }
     return plan;
   }
-  if (command === "package") return packageNativeArtifact({ target: values.target, inputRoot: required(values, "input"), outputRoot: required(values, "output") });
+  if (command === "package")
+    return packageNativeArtifact({
+      target: values.target,
+      inputRoot: required(values, "input"),
+      outputRoot: required(values, "output"),
+    });
   if (command === "verify") {
-    const { archive: _archive, ...result } = await verifyNativeArtifact({ target: values.target, archivePath: required(values, "archive") });
+    const { archive: _archive, ...result } = await verifyNativeArtifact({
+      target: values.target,
+      archivePath: required(values, "archive"),
+    });
     return result;
   }
-  if (command === "assemble") return assembleNativeArtifacts({ sourceRoot: values.source ? path.resolve(values.source) : undefined, archiveRoot: required(values, "archives"), outputRoot: required(values, "output") });
-  if (command === "stage") return stageNativeArtifactOverlay({ target: values.target, archivePath: required(values, "archive"), outputRoot: required(values, "output") });
+  if (command === "assemble")
+    return assembleNativeArtifacts({
+      sourceRoot: values.source ? path.resolve(values.source) : undefined,
+      archiveRoot: required(values, "archives"),
+      outputRoot: required(values, "output"),
+    });
+  if (command === "stage")
+    return stageNativeArtifactOverlay({
+      target: values.target,
+      archivePath: required(values, "archive"),
+      outputRoot: required(values, "output"),
+    });
   if (command === "audit") return auditNativeArtifactDirectory({ archiveRoot: required(values, "archives") });
-  if (command === "audit-present") return auditNativeArtifactDirectory({ archiveRoot: required(values, "archives"), partial: true });
-  throw new Error("Usage: manage-defold-webtransport-artifacts.mjs <release-metadata|write-index|check-index|rows|plan|package|verify|stage|assemble|audit|audit-present> [options]");
+  if (command === "audit-present")
+    return auditNativeArtifactDirectory({ archiveRoot: required(values, "archives"), partial: true });
+  throw new Error(
+    "Usage: manage-defold-webtransport-artifacts.mjs <release-metadata|write-index|check-index|rows|plan|package|verify|stage|assemble|audit|audit-present> [options]",
+  );
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {

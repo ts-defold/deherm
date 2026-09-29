@@ -32,16 +32,19 @@ test("a digest-mismatched host-tool cache is replaced and the repaired cache is 
     await execFileAsync("tar", ["-czf", archive, "-C", source, member]);
 
     const releaseTagsPath = path.join(root, "release-tags.json");
-    await writeFile(releaseTagsPath, JSON.stringify({
-      repository: "ts-defold/deherm",
-      families: {
-        dehermc: {
-          tag,
-          assets: { [host]: asset },
-          contents: { [host]: [member] }
-        }
-      }
-    }));
+    await writeFile(
+      releaseTagsPath,
+      JSON.stringify({
+        repository: "ts-defold/deherm",
+        families: {
+          dehermc: {
+            tag,
+            assets: { [host]: asset },
+            contents: { [host]: [member] },
+          },
+        },
+      }),
+    );
 
     const destination = path.join(root, ".deherm", "cache", "toolchains", tag, host);
     await mkdir(destination, { recursive: true });
@@ -57,7 +60,7 @@ test("a digest-mismatched host-tool cache is replaced and the repaired cache is 
     const options = {
       expectedDigests: { [member]: expected },
       cacheRoot: path.join(root, ".deherm", "cache", "toolchains"),
-      releaseTagsPath
+      releaseTagsPath,
     };
     const repaired = await ensureHostFamily("dehermc", host, options);
     assert.equal(repaired.cached, false);
@@ -87,27 +90,33 @@ test("a downloaded member with the wrong digest never replaces the existing cach
     const archive = path.join(root, asset);
     await execFileAsync("tar", ["-czf", archive, "-C", source, member]);
     const releaseTagsPath = path.join(root, "release-tags.json");
-    await writeFile(releaseTagsPath, JSON.stringify({
-      repository: "ts-defold/deherm",
-      families: {
-        dehermc: {
-          tag,
-          assets: { [host]: asset },
-          contents: { [host]: [member] }
-        }
-      }
-    }));
+    await writeFile(
+      releaseTagsPath,
+      JSON.stringify({
+        repository: "ts-defold/deherm",
+        families: {
+          dehermc: {
+            tag,
+            assets: { [host]: asset },
+            contents: { [host]: [member] },
+          },
+        },
+      }),
+    );
     const destination = path.join(root, ".deherm", "cache", "toolchains", tag, host);
     await mkdir(destination, { recursive: true });
     await writeFile(path.join(destination, member), "original corrupt cache\n");
     const archiveBytes = await readFile(archive);
     globalThis.fetch = async () => new Response(archiveBytes, { status: 200 });
 
-    await assert.rejects(ensureHostFamily("dehermc", host, {
-      expectedDigests: { [member]: sha256(Buffer.from("expected release bytes\n")) },
-      cacheRoot: path.join(root, ".deherm", "cache", "toolchains"),
-      releaseTagsPath
-    }), /manifest expects/);
+    await assert.rejects(
+      ensureHostFamily("dehermc", host, {
+        expectedDigests: { [member]: sha256(Buffer.from("expected release bytes\n")) },
+        cacheRoot: path.join(root, ".deherm", "cache", "toolchains"),
+        releaseTagsPath,
+      }),
+      /manifest expects/,
+    );
     assert.equal(await readFile(path.join(destination, member), "utf8"), "original corrupt cache\n");
   } finally {
     globalThis.fetch = originalFetch;

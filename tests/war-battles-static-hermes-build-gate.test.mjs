@@ -33,10 +33,18 @@ test("host-family resolver derives release member digests without flat tool fall
 
 test("root and example scripts name the typed-native bridge gate explicitly", async () => {
   const rootPackage = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
-  const examplePackage = JSON.parse(await readFile(path.join(root, "examples/war-battles-online/package.json"), "utf8"));
-  assert.equal(rootPackage.scripts["check:war-battles-static-hermes-typed-native-bridge"], "pnpm test:war-battles-static-hermes-typed-native-bridge");
+  const examplePackage = JSON.parse(
+    await readFile(path.join(root, "examples/war-battles-online/package.json"), "utf8"),
+  );
+  assert.equal(
+    rootPackage.scripts["check:war-battles-static-hermes-typed-native-bridge"],
+    "pnpm test:war-battles-static-hermes-typed-native-bridge",
+  );
   assert.match(rootPackage.scripts["gate:war-battles-static-hermes-typed-native-bridge"], /--link/);
-  assert.match(examplePackage.scripts["check:typed-native-bridge"], /check:war-battles-static-hermes-typed-native-bridge/);
+  assert.match(
+    examplePackage.scripts["check:typed-native-bridge"],
+    /check:war-battles-static-hermes-typed-native-bridge/,
+  );
   assert.match(examplePackage.scripts.check, /check:typed-native-bridge/);
 });
 
@@ -47,7 +55,7 @@ test("War Battles Static Hermes gate derives a closed release route set", async 
       output,
       shermes: path.join(root, "build/native/bin/shermes"),
       allowUnpinnedToolchain: true,
-      typedNativeSource: path.join(root, "packages/static-hermes/src/generated/script-typed-native-bridge.ts")
+      typedNativeSource: path.join(root, "packages/static-hermes/src/generated/script-typed-native-bridge.ts"),
     });
     assert.equal(report.schemaVersion, 1);
     assert.equal(report.kind, "deherm.war-battles.static-hermes-build-gate");
@@ -58,18 +66,24 @@ test("War Battles Static Hermes gate derives a closed release route set", async 
     assert.equal(report.stages.find(({ name }) => name === "compile").status, "observed-unpinned");
     assert.ok(report.stages.find(({ name }) => name === "compile").emittedCBytes > 0);
     assert.equal(report.stages.find(({ name }) => name === "compile").exportedUnit, "deherm_typed_native");
-    assert.equal(report.stages.find(({ name }) => name === "compile").staticApplication.exportedUnit, "deherm_static_application");
+    assert.equal(
+      report.stages.find(({ name }) => name === "compile").staticApplication.exportedUnit,
+      "deherm_static_application",
+    );
     assert.ok(report.stages.find(({ name }) => name === "compile").staticApplication.emittedCBytes > 0);
-    assert.equal(report.stages.find(({ name }) => name === "compile").staticApplication.hasDefoldRuntimeEntrypoint, true);
+    assert.equal(
+      report.stages.find(({ name }) => name === "compile").staticApplication.hasDefoldRuntimeEntrypoint,
+      true,
+    );
     assert.match(
       await readFile(path.join(output, "derived-unit.c"), "utf8"),
       /#define CREATE_THIS_UNIT sh_export_deherm_typed_native\b/,
-      "compiled unit must export the symbol consumed by the staged extension"
+      "compiled unit must export the symbol consumed by the staged extension",
     );
     assert.match(
       await readFile(path.join(output, "static-application.c"), "utf8"),
       /#define CREATE_THIS_UNIT sh_export_deherm_static_application\b/,
-      "compiled application unit must export the symbol consumed by the staged application extension"
+      "compiled application unit must export the symbol consumed by the staged application extension",
     );
     assert.ok(report.blockers.some(({ code }) => code === "shermes-unpinned-diagnostic"));
     assert.ok(report.blockers.some(({ code }) => code === "link-not-requested"));
@@ -95,18 +109,33 @@ test("default toolchain policy fails closed before unpinned emission", async () 
 
 test("Static application evidence requires the activation marker", () => {
   assert.equal(staticApplicationActivationObserved({ stdout: "engine booted", stderr: "" }), false);
-  assert.equal(staticApplicationActivationObserved({
-    stdout: "INFO:DEFOLD_HERMES: DEHERM_EVENT static-application-activated auxiliary_count=1 fingerprint=abc123",
-    stderr: ""
-  }), true);
-  assert.equal(staticApplicationActivationObserved({
-    stdout: "INFO:DEFOLD_HERMES: DEHERM_EVENT static-application-activated auxiliary_count=1 fingerprint=abc123",
-    stderr: ""
-  }, "abc123"), true);
-  assert.equal(staticApplicationActivationObserved({
-    stdout: "INFO:DEFOLD_HERMES: DEHERM_EVENT static-application-activated auxiliary_count=1 fingerprint=stale",
-    stderr: ""
-  }, "abc123"), false);
+  assert.equal(
+    staticApplicationActivationObserved({
+      stdout: "INFO:DEFOLD_HERMES: DEHERM_EVENT static-application-activated auxiliary_count=1 fingerprint=abc123",
+      stderr: "",
+    }),
+    true,
+  );
+  assert.equal(
+    staticApplicationActivationObserved(
+      {
+        stdout: "INFO:DEFOLD_HERMES: DEHERM_EVENT static-application-activated auxiliary_count=1 fingerprint=abc123",
+        stderr: "",
+      },
+      "abc123",
+    ),
+    true,
+  );
+  assert.equal(
+    staticApplicationActivationObserved(
+      {
+        stdout: "INFO:DEFOLD_HERMES: DEHERM_EVENT static-application-activated auxiliary_count=1 fingerprint=stale",
+        stderr: "",
+      },
+      "abc123",
+    ),
+    false,
+  );
 });
 
 test("Static product gate rejects an application bundle outside the project lock", async () => {
@@ -139,7 +168,10 @@ test("Static product gate rejects a lock and bundle that are stale against curre
       output: path.join(output, "gate"),
     });
     assert.equal(report.status, "blocked");
-    assert.match(report.blockers[0]?.message ?? "", /application source is stale: src\/generated-war-battles\/world\.ts/u);
+    assert.match(
+      report.blockers[0]?.message ?? "",
+      /application source is stale: src\/generated-war-battles\/world\.ts/u,
+    );
     assert.deepEqual(report.stages, [{ name: "provenance", status: "blocked" }]);
   } finally {
     await rm(output, { recursive: true, force: true });
@@ -173,8 +205,12 @@ test("Static product gate rejects an authored source tree newer than its locked 
   const output = await mkdtemp(path.join(tmpdir(), "deherm-static-gate-source-drift-"));
   const project = path.join(output, "project");
   try {
-    const projection = JSON.parse(await readFile(path.join(
-      root, "examples/war-battles-online/evidence/static-hermes-reachable-arm64-macos.json"), "utf8"));
+    const projection = JSON.parse(
+      await readFile(
+        path.join(root, "examples/war-battles-online/evidence/static-hermes-reachable-arm64-macos.json"),
+        "utf8",
+      ),
+    );
     const sourceRoot = path.join(root, "examples/war-battles-online/defold");
     const projectLock = JSON.parse(await readFile(path.join(sourceRoot, "deherm.lock"), "utf8"));
     await copyLockedApplicationSources(sourceRoot, project, projectLock);
@@ -192,7 +228,10 @@ test("Static product gate rejects an authored source tree newer than its locked 
       projectLock: path.join(sourceRoot, "deherm.lock"),
     });
     assert.equal(report.status, "blocked");
-    assert.match(report.blockers[0]?.message ?? "", /project lock application source is stale: main\/arena\.script\.ts/u);
+    assert.match(
+      report.blockers[0]?.message ?? "",
+      /project lock application source is stale: main\/arena\.script\.ts/u,
+    );
     assert.deepEqual(report.stages, [{ name: "provenance", status: "blocked" }]);
   } finally {
     await rm(output, { recursive: true, force: true });
@@ -237,10 +276,15 @@ test("Static product gate rejects a self-consistent replacement projection", asy
 
 test("link stage stages a temporary extension and consumes Bob output", async () => {
   const output = await mkdtemp(path.join(tmpdir(), "deherm-static-gate-fake-link-"));
-  const authoredUnit = path.join(root, "examples/war-battles-online/defold/defold_hermes_typed_native/src/deherm_typed_native_unit.cpp");
+  const authoredUnit = path.join(
+    root,
+    "examples/war-battles-online/defold/defold_hermes_typed_native/src/deherm_typed_native_unit.cpp",
+  );
   const authoredBytes = await readFile(authoredUnit);
   const fakeJava = path.join(output, "fake-java");
-  await writeFile(fakeJava, `#!/bin/sh
+  await writeFile(
+    fakeJava,
+    `#!/bin/sh
 if [ "$1" = "-version" ]; then exit 0; fi
 output=""
 previous=""
@@ -251,7 +295,8 @@ done
 mkdir -p "$output/arm64-osx"
 printf 'fake linked dmengine' > "$output/arm64-osx/dmengine"
 exit 0
-`);
+`,
+  );
   await chmod(fakeJava, 0o755);
   try {
     const report = await buildGate({
@@ -261,7 +306,7 @@ exit 0
       typedNativeSource: path.join(root, "packages/static-hermes/src/generated/script-typed-native-bridge.ts"),
       link: true,
       java: fakeJava,
-      buildServer: "https://fake.invalid"
+      buildServer: "https://fake.invalid",
     });
     assert.equal(report.stages.find(({ name }) => name === "link").status, "observed-unpinned");
     assert.match(report.evidenceBoundary.linkage, /unpinned diagnostic compiler/u);
@@ -269,12 +314,18 @@ exit 0
     assert.ok(report.stages.find(({ name }) => name === "link").output.sha256);
     assert.equal(report.stages.find(({ name }) => name === "link").stagedProject.nativeArtifact.target, "arm64-osx");
     assert.equal(report.stages.find(({ name }) => name === "link").stagedProject.nativeArtifact.variant, "release");
-    assert.equal(report.stages.find(({ name }) => name === "link").stagedProject.bundleProjection.representation, "static-application");
+    assert.equal(
+      report.stages.find(({ name }) => name === "link").stagedProject.bundleProjection.representation,
+      "static-application",
+    );
     assert.equal(report.stages.find(({ name }) => name === "link").stagedProject.bundleProjection.resource, null);
     assert.match(report.stages.find(({ name }) => name === "link").command.join(" "), /--variant release/u);
     assert.ok(report.stages.find(({ name }) => name === "link").stagedProject.emittedApplicationCSha256);
     assert.ok(report.stages.find(({ name }) => name === "link").stagedProject.applicationExtensionSourceSha256);
-    assert.equal(report.blockers.some(({ code }) => code === "application-not-requested"), false);
+    assert.equal(
+      report.blockers.some(({ code }) => code === "application-not-requested"),
+      false,
+    );
     assert.equal(report.stages.find(({ name }) => name === "application").status, "not-requested");
     assert.deepEqual(await readFile(authoredUnit), authoredBytes, "link staging mutated the authored project");
   } finally {

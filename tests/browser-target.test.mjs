@@ -18,7 +18,7 @@ import {
   browserComponentSnapshotEvent,
   browserTelemetryEvent,
   createBrowserTarget,
-  resolveWebBundle
+  resolveWebBundle,
 } from "../packages/cli/src/dev/browser-target.mjs";
 import { connectCdp, startBundleServer } from "../packages/cli/src/dev/browser-host.mjs";
 import { readInspectorSession } from "../packages/cli/src/dev/inspector-session.mjs";
@@ -39,7 +39,7 @@ async function waitForSignal(signal, description, timeoutMs = 1_000) {
       signal,
       new Promise((_, reject) => {
         timer = setTimeout(() => reject(new Error(`Timed out waiting for ${description}`)), timeoutMs);
-      })
+      }),
     ]);
   } finally {
     clearTimeout(timer);
@@ -64,7 +64,7 @@ test("the configured cache root resolves Bob's nested titled directory", async (
     const resolved = await resolveWebBundle({
       projectRoot: path.join(root, "unrelated-project"),
       bundleDirectory: explicitRoot,
-      allowNestedBundleDirectory: true
+      allowNestedBundleDirectory: true,
     });
     assert.equal(resolved.directory, bundle);
     assert.equal(resolved.index, "index.html");
@@ -77,10 +77,14 @@ test("the configured cache root resolves Bob's nested titled directory", async (
 test("an explicit bundle directory cannot guess a nested child", async () => {
   const { root } = await bundleProject();
   try {
-    await assert.rejects(() => resolveWebBundle({
-      projectRoot: root,
-      bundleDirectory: path.join(root, "build", "bundle")
-    }), /No index\.html in HTML5 bundle directory/u);
+    await assert.rejects(
+      () =>
+        resolveWebBundle({
+          projectRoot: root,
+          bundleDirectory: path.join(root, "build", "bundle"),
+        }),
+      /No index\.html in HTML5 bundle directory/u,
+    );
   } finally {
     await rm(root, { recursive: true, force: true });
   }
@@ -110,14 +114,14 @@ test("browser activation rejects a target replacement after host readiness", asy
           }
           activationCalls += 1;
           return { result: { value: { status: "activated" } } };
-        }
+        },
       },
       target: { webSocketDebuggerUrl: "ws://127.0.0.1:9333/devtools/page/browser-fixture" },
       debuggingPort: 9333,
       pageUrl: "http://127.0.0.1:9444/index.html",
       profile: path.join(root, "profile"),
-      close: async () => {}
-    })
+      close: async () => {},
+    }),
   };
   target = createBrowserTarget(targetOptions);
   try {
@@ -134,8 +138,10 @@ test("browser activation rejects a target replacement after host readiness", asy
 test("a missing bundle is an actionable message, never a guess", async () => {
   const root = await mkdtemp(path.join(tmpdir(), "deherm-browser-empty."));
   try {
-    await assert.rejects(() => resolveWebBundle({ projectRoot: root, cwd: root }),
-      /No packaged HTML5 bundle found .* wasm-web/s);
+    await assert.rejects(
+      () => resolveWebBundle({ projectRoot: root, cwd: root }),
+      /No packaged HTML5 bundle found .* wasm-web/s,
+    );
   } finally {
     await rm(root, { recursive: true, force: true });
   }
@@ -160,8 +166,8 @@ test("the browser target publishes and owns a browser debugger session", async (
       debuggingPort: 9333,
       pageUrl: "http://127.0.0.1:9444/index.html",
       profile: path.join(root, "profile"),
-      close: async () => {}
-    })
+      close: async () => {},
+    }),
   });
   try {
     assert.equal(await target.launch(), true);
@@ -221,19 +227,21 @@ test("browser exception diagnostics retain source location and exception descrip
             exception: { description: "Error: retained hashLiteral call" },
             url: "http://fixture/app.js",
             lineNumber: 7,
-            columnNumber: 11
-          }
-        }
-      })
+            columnNumber: 11,
+          },
+        },
+      }),
     });
-    assert.deepEqual(failures, [{
-      kind: "exception",
-      detail: "Error: retained hashLiteral call",
-      text: "Uncaught Error",
-      url: "http://fixture/app.js",
-      line: 8,
-      column: 12
-    }]);
+    assert.deepEqual(failures, [
+      {
+        kind: "exception",
+        detail: "Error: retained hashLiteral call",
+        text: "Uncaught Error",
+        url: "http://fixture/app.js",
+        line: 8,
+        column: 12,
+      },
+    ]);
     assert.deepEqual(client.failures, failures);
     await client.close();
   } finally {
@@ -257,8 +265,10 @@ test("browser launch releases the page when inspector-session validation fails",
       debuggingPort: 9333,
       pageUrl: "http://127.0.0.1:9444/index.html",
       profile: path.join(root, "profile"),
-      close: async () => { closes += 1; }
-    })
+      close: async () => {
+        closes += 1;
+      },
+    }),
   });
   try {
     await assert.rejects(() => target.launch(), /sourceMapFile must be inside projectRoot/u);
@@ -289,9 +299,11 @@ test("browser launch does not publish a session for a page that exited while ope
         debuggingPort: 9333,
         pageUrl: "http://127.0.0.1:9444/index.html",
         profile: path.join(root, "profile"),
-        close: async () => { closes += 1; }
+        close: async () => {
+          closes += 1;
+        },
       };
-    }
+    },
   });
   try {
     await assert.rejects(() => target.launch(), /browser exited while publishing/u);
@@ -328,14 +340,14 @@ test("first browser activation waits for Defold to install its host", async () =
             return { result: { value: readinessCalls >= 3 } };
           }
           return { result: { value: { status: "activated" } } };
-        }
+        },
       },
       target: { webSocketDebuggerUrl: "ws://127.0.0.1:9333/devtools/page/browser-fixture" },
       debuggingPort: 9333,
       pageUrl: "http://127.0.0.1:9444/index.html",
       profile: path.join(root, "profile"),
-      close: async () => {}
-    })
+      close: async () => {},
+    }),
   });
   try {
     await target.launch();
@@ -369,8 +381,8 @@ test("browser activation fails closed when the Defold host never appears", async
       debuggingPort: 9333,
       pageUrl: "http://127.0.0.1:9444/index.html",
       profile: path.join(root, "profile"),
-      close: async () => {}
-    })
+      close: async () => {},
+    }),
   });
   try {
     await target.launch();
@@ -400,21 +412,25 @@ test("a failed activation closes the reload event pair", async () => {
         async send(_method, request) {
           if (request.expression.startsWith("Boolean(")) return { result: { value: true } };
           throw new Error("CDP page closed");
-        }
+        },
       },
       target: { webSocketDebuggerUrl: "ws://127.0.0.1:9333/devtools/page/browser-fixture" },
       debuggingPort: 9333,
       pageUrl: "http://127.0.0.1:9444/index.html",
       profile: path.join(root, "profile"),
-      close: async () => {}
-    })
+      close: async () => {},
+    }),
   });
   try {
     await target.launch();
     await assert.rejects(() => target.activate(9), /CDP page closed/u);
     assert.ok(events.some(({ type, generation }) => type === "reload-started" && generation === 9));
-    assert.ok(events.some(({ type, generation, diagnostic }) =>
-      type === "reload-failed" && generation === 9 && diagnostic === "CDP page closed"));
+    assert.ok(
+      events.some(
+        ({ type, generation, diagnostic }) =>
+          type === "reload-failed" && generation === 9 && diagnostic === "CDP page closed",
+      ),
+    );
     assert.equal(target.pushCount(), 0);
   } finally {
     await target.stop();
@@ -436,14 +452,14 @@ test("browser telemetry reports what the page measured and names what it could n
       callbackCapacity: 4096,
       jsHeapBytes: 4096,
       jsHeapSizeBytes: 8192,
-      jsHeapLimitBytes: 65536
+      jsHeapLimitBytes: 65536,
     },
     unavailable: {
       hermesHeapBytes: "The browser runtime embeds no Hermes.",
       luaHandles: "The Lua value registry lives inside the Wasm engine.",
       arenaHighWaterBytes: "No high-water mark is recorded.",
-      jsHeapBytesWhenAbsent: null
-    }
+      jsHeapBytesWhenAbsent: null,
+    },
   });
   assert.equal(event.type, "telemetry");
   assert.equal(event.values.frameDtMs, 16.5);
@@ -452,8 +468,11 @@ test("browser telemetry reports what the page measured and names what it could n
   assert.equal(event.values.hermesHeapAvailable, false);
   assert.equal(event.values.jsHeapBytes, 4096);
   assert.equal(event.values.hermesHeapBytes, undefined);
-  assert.deepEqual(event.capabilities.map(({ name }) => name).sort(),
-    ["arenaHighWaterBytes", "hermesHeapBytes", "luaHandles"]);
+  assert.deepEqual(event.capabilities.map(({ name }) => name).sort(), [
+    "arenaHighWaterBytes",
+    "hermesHeapBytes",
+    "luaHandles",
+  ]);
   for (const capability of event.capabilities) assert.equal(capability.available, false);
 });
 
@@ -466,12 +485,12 @@ test("browser component snapshots receive the target connection epoch without mu
     sampledAt: 42,
     complete: true,
     omitted: { instances: 0, properties: 0 },
-    instances: [{ properties: [{ name: "health", value: 90 }] }]
+    instances: [{ properties: [{ name: "health", value: 90 }] }],
   };
   assert.deepEqual(browserComponentSnapshotEvent("browser-host", 3, reported), {
     ...reported,
     id: "browser-host",
-    connectionEpoch: 3
+    connectionEpoch: 3,
   });
   assert.equal(reported.id, undefined);
   assert.equal(reported.connectionEpoch, undefined);
@@ -492,26 +511,30 @@ test("browser polling obtains telemetry and component state in one CDP tick", as
       client: {
         async send(_method, parameters) {
           expressions.push(parameters.expression);
-          return { result: { value: {
-            telemetry: { generation: 1, componentRevision: 7, frames: 2, available: {} },
-            componentSnapshot: {
-              schemaVersion: 1,
-              type: "component-snapshot",
-              runtimeId: 7,
-              sequence: 1,
-              complete: true,
-              omitted: { instances: 0, properties: 0 },
-              instances: []
-            }
-          } } };
-        }
+          return {
+            result: {
+              value: {
+                telemetry: { generation: 1, componentRevision: 7, frames: 2, available: {} },
+                componentSnapshot: {
+                  schemaVersion: 1,
+                  type: "component-snapshot",
+                  runtimeId: 7,
+                  sequence: 1,
+                  complete: true,
+                  omitted: { instances: 0, properties: 0 },
+                  instances: [],
+                },
+              },
+            },
+          };
+        },
       },
       target: { webSocketDebuggerUrl: "ws://127.0.0.1:9333/devtools/page/browser-fixture" },
       debuggingPort: 9333,
       pageUrl: "http://127.0.0.1:9444/index.html",
       profile: path.join(root, "profile"),
-      close: async () => {}
-    })
+      close: async () => {},
+    }),
   });
   try {
     await target.launch();
@@ -536,8 +559,12 @@ test("a deferred poll from a closed page cannot populate its replacement epoch",
   let pageNumber = 0;
   let releaseOldPoll;
   let oldPollStarted;
-  const oldPoll = new Promise((resolve) => { releaseOldPoll = resolve; });
-  const started = new Promise((resolve) => { oldPollStarted = resolve; });
+  const oldPoll = new Promise((resolve) => {
+    releaseOldPoll = resolve;
+  });
+  const started = new Promise((resolve) => {
+    oldPollStarted = resolve;
+  });
   const target = createBrowserTarget({
     projectRoot: root,
     bundleDirectory: bundle,
@@ -555,34 +582,41 @@ test("a deferred poll from a closed page cannot populate its replacement epoch",
               return oldPoll;
             }
             return { result: { value: null } };
-          }
+          },
         },
         target: { webSocketDebuggerUrl: `ws://127.0.0.1:9333/devtools/page/browser-${current}` },
         debuggingPort: 9332 + current,
         pageUrl: `http://127.0.0.1:${9443 + current}/index.html`,
         profile: path.join(root, `profile-${current}`),
-        close: async () => {}
+        close: async () => {},
       };
-    }
+    },
   });
   try {
     await target.launch();
     await waitForSignal(started, "the first browser telemetry poll");
     await target.stop();
     await target.launch();
-    releaseOldPoll({ result: { value: {
-      telemetry: { generation: 1, componentRevision: 1, frames: 1, available: {} },
-      componentSnapshot: {
-        schemaVersion: 1,
-        type: "component-snapshot",
-        runtimeId: 99,
-        sequence: 1,
-        instances: []
-      }
-    } } });
+    releaseOldPoll({
+      result: {
+        value: {
+          telemetry: { generation: 1, componentRevision: 1, frames: 1, available: {} },
+          componentSnapshot: {
+            schemaVersion: 1,
+            type: "component-snapshot",
+            runtimeId: 99,
+            sequence: 1,
+            instances: [],
+          },
+        },
+      },
+    });
     await new Promise((resolve) => setTimeout(resolve, 25));
-    assert.equal(events.some(({ type, runtimeId }) => type === "component-snapshot" && runtimeId === 99), false,
-      "page A telemetry must not be relabelled with page B's epoch");
+    assert.equal(
+      events.some(({ type, runtimeId }) => type === "component-snapshot" && runtimeId === 99),
+      false,
+      "page A telemetry must not be relabelled with page B's epoch",
+    );
     assert.ok(events.some(({ type, connectionEpoch }) => type === "target-connected" && connectionEpoch === 2));
   } finally {
     await target.stop();
@@ -611,9 +645,9 @@ test("a late exit callback from a replaced page cannot stop its successor", asyn
         debuggingPort: 9332 + current,
         pageUrl: `http://127.0.0.1:${9443 + current}/index.html`,
         profile: path.join(root, `profile-${current}`),
-        close: async () => {}
+        close: async () => {},
       };
-    }
+    },
   });
   try {
     await target.launch();
@@ -622,8 +656,10 @@ test("a late exit callback from a replaced page cannot stop its successor", asyn
     exitCallbacks[0]();
     assert.equal(target.running(), true);
     assert.equal(target.pageUrl(), "http://127.0.0.1:9445/index.html");
-    assert.equal(events.some(({ type, connectionEpoch }) =>
-      type === "target-disconnected" && connectionEpoch === 2), false);
+    assert.equal(
+      events.some(({ type, connectionEpoch }) => type === "target-disconnected" && connectionEpoch === 2),
+      false,
+    );
   } finally {
     await target.stop();
     await rm(root, { recursive: true, force: true });
@@ -637,8 +673,12 @@ test("browser telemetry polling is single-flight within one connection epoch", a
   let maximumActive = 0;
   let releaseFirst;
   let firstStarted;
-  const first = new Promise((resolve) => { releaseFirst = resolve; });
-  const started = new Promise((resolve) => { firstStarted = resolve; });
+  const first = new Promise((resolve) => {
+    releaseFirst = resolve;
+  });
+  const started = new Promise((resolve) => {
+    firstStarted = resolve;
+  });
   const target = createBrowserTarget({
     projectRoot: root,
     bundleDirectory: bundle,
@@ -657,14 +697,14 @@ test("browser telemetry polling is single-flight within one connection epoch", a
           }
           active -= 1;
           return { result: { value: null } };
-        }
+        },
       },
       target: { webSocketDebuggerUrl: "ws://127.0.0.1:9333/devtools/page/browser-fixture" },
       debuggingPort: 9333,
       pageUrl: "http://127.0.0.1:9444/index.html",
       profile: path.join(root, "profile"),
-      close: async () => {}
-    })
+      close: async () => {},
+    }),
   });
   try {
     await target.launch();
@@ -688,7 +728,7 @@ test("a counter the page could not measure is absent from the values, not zero",
     componentRevision: 1,
     frames: 0,
     available: { frameDtMs: null, componentInstances: 0, callbackRoots: 0 },
-    unavailable: { frameDtMs: "No application lifecycle is attached." }
+    unavailable: { frameDtMs: "No application lifecycle is attached." },
   });
   assert.equal("frameDtMs" in event.values, false);
   assert.ok(event.capabilities.some(({ name }) => name === "frameDtMs"));
@@ -701,12 +741,12 @@ test("declared capability gaps reach a console snapshot with their reasons", () 
     id: "browser-host",
     name: "chrome:1234",
     url: "http://127.0.0.1:1234/index.html",
-    runtime: "browser"
+    runtime: "browser",
   });
   applyDevEvent(model, {
     type: "target-capabilities",
     id: "browser-host",
-    capabilities: browserCapabilityGaps.map((gap) => ({ ...gap }))
+    capabilities: browserCapabilityGaps.map((gap) => ({ ...gap })),
   });
   const [target] = snapshotDevModel(model).targets;
   assert.equal(target.runtime, "browser");
@@ -715,8 +755,10 @@ test("declared capability gaps reach a console snapshot with their reasons", () 
     assert.equal(gap.available, false);
     assert.ok(gap.reason.length > 20, `${gap.name} must carry a reason`);
   }
-  assert.ok(target.capabilities.some(({ name }) => name === "visual-verification"),
-    "the console must never be able to imply a visual claim");
+  assert.ok(
+    target.capabilities.some(({ name }) => name === "visual-verification"),
+    "the console must never be able to imply a visual claim",
+  );
 });
 
 test("the bundle server binds loopback only and refuses to serve outside its root", async () => {

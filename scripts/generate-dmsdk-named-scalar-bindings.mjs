@@ -550,8 +550,8 @@ export async function build({
       namedScalar: digest(policyContent),
     },
   });
-  const patterns = valuePlan.patternRegistry.filter(({ id }) =>
-    id === "value.named-scalar-direct" || id === "universal.default",
+  const patterns = valuePlan.patternRegistry.filter(
+    ({ id }) => id === "value.named-scalar-direct" || id === "universal.default",
   );
   const candidates = shapes.rows
     .map((shape) => {

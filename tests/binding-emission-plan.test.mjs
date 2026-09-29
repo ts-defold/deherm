@@ -7,25 +7,30 @@ import test from "node:test";
 import { generateBindingEmissionPlan, run } from "../scripts/generate-binding-emission-plan.mjs";
 
 const root = resolve(new URL("..", import.meta.url).pathname);
-const plan = JSON.parse(await readFile(join(root, "packages/bindings/generated/defold-binding-lowering-plan.json"), "utf8"));
-const scriptProjection = JSON.parse(await readFile(join(root, "packages/bindings/generated/defold-script-projection-ir.json"), "utf8"));
-const profiles = JSON.parse(await readFile(join(root, "packages/bindings/generated/defold-script-route-availability-profiles.json"), "utf8"));
+const plan = JSON.parse(
+  await readFile(join(root, "packages/bindings/generated/defold-binding-lowering-plan.json"), "utf8"),
+);
+const scriptProjection = JSON.parse(
+  await readFile(join(root, "packages/bindings/generated/defold-script-projection-ir.json"), "utf8"),
+);
+const profiles = JSON.parse(
+  await readFile(join(root, "packages/bindings/generated/defold-script-route-availability-profiles.json"), "utf8"),
+);
 
 function usage(symbols, dynamicAccess = false) {
   return { schemaVersion: 1, dynamicAccess, symbols };
 }
 
 test("final-build selection retains only reachable compatible units and shared programs", () => {
-  const selectedIds = [
-    "script:camera.get_projection",
-    "script:factory.create",
-    "script:go.delete"
-  ];
+  const selectedIds = ["script:camera.get_projection", "script:factory.create", "script:go.delete"];
   const result = generateBindingEmissionPlan(plan, scriptProjection, profiles, usage(selectedIds), {
     target: "dynamicHermesJsi",
-    profile: "default-legacy-bullet"
+    profile: "default-legacy-bullet",
   });
-  assert.deepEqual(result.units.map(({ id }) => id), [...selectedIds].sort());
+  assert.deepEqual(
+    result.units.map(({ id }) => id),
+    [...selectedIds].sort(),
+  );
   assert.equal(result.treeShaking.totalPlanUnits, 2428);
   assert.equal(result.treeShaking.selectedForEmissionUnits, 3);
   assert.equal(result.treeShaking.notSelectedUnits, 2425);
@@ -36,12 +41,20 @@ test("final-build selection retains only reachable compatible units and shared p
   assert.equal(result.evidenceBoundary.runtime, "not-claimed");
   assert.match(result.emissionPlanSha256, /^[a-f0-9]{64}$/);
   const referencedPrograms = new Set(result.units.map(({ marshallingProgram }) => marshallingProgram));
-  assert.deepEqual([...referencedPrograms].sort((left, right) => left - right), result.tables.marshallingPrograms.map((_, index) => index));
+  assert.deepEqual(
+    [...referencedPrograms].sort((left, right) => left - right),
+    result.tables.marshallingPrograms.map((_, index) => index),
+  );
 });
 
 test("new game-code reachability changes do not regenerate the canonical API plan", () => {
   const one = generateBindingEmissionPlan(plan, scriptProjection, profiles, usage(["script:go.delete"]));
-  const two = generateBindingEmissionPlan(plan, scriptProjection, profiles, usage(["script:go.delete", "script:factory.create"]));
+  const two = generateBindingEmissionPlan(
+    plan,
+    scriptProjection,
+    profiles,
+    usage(["script:go.delete", "script:factory.create"]),
+  );
   assert.equal(one.sourcePlanSha256, plan.planSha256);
   assert.equal(two.sourcePlanSha256, plan.planSha256);
   assert.notEqual(one.emissionPlanSha256, two.emissionPlanSha256);
@@ -54,51 +67,67 @@ test("semantically identical reachability manifests produce one canonical artifa
     schemaVersion: 1,
     dynamicAccess: false,
     symbols: ["script:factory.create", "script:go.delete"],
-    ignoredMetadata: "left"
+    ignoredMetadata: "left",
   });
   const right = generateBindingEmissionPlan(plan, scriptProjection, profiles, {
     symbols: ["script:go.delete", "script:factory.create"],
     dynamicAccess: false,
     schemaVersion: 1,
-    ignoredMetadata: "right"
+    ignoredMetadata: "right",
   });
   assert.deepEqual(left, right);
 });
 
 test("explicit use fails closed for blocked, unavailable, duplicate, and unknown bindings", () => {
-  assert.throws(() => generateBindingEmissionPlan(
-    plan,
-    scriptProjection,
-    profiles,
-    usage(["dmsdk:ArraySizeHelper@upstream/defold/engine/dlib/src/dmsdk/dlib/array.h:57:12"])
-  ), /cannot emit.*blocked-semantic/);
-  assert.throws(() => generateBindingEmissionPlan(
-    plan,
-    scriptProjection,
-    profiles,
-    usage(["script:b2d.body.get_user_data"]),
-    { profile: "v3-bullet" }
-  ), /unavailable in Defold profile/);
-  assert.throws(() => generateBindingEmissionPlan(plan, scriptProjection, profiles, usage(["script:go.delete", "script:go.delete"])), /duplicate symbols/);
-  assert.throws(() => generateBindingEmissionPlan(plan, scriptProjection, profiles, usage(["script:not.real"])), /unknown binding/);
+  assert.throws(
+    () =>
+      generateBindingEmissionPlan(
+        plan,
+        scriptProjection,
+        profiles,
+        usage(["dmsdk:ArraySizeHelper@upstream/defold/engine/dlib/src/dmsdk/dlib/array.h:57:12"]),
+      ),
+    /cannot emit.*blocked-semantic/,
+  );
+  assert.throws(
+    () =>
+      generateBindingEmissionPlan(plan, scriptProjection, profiles, usage(["script:b2d.body.get_user_data"]), {
+        profile: "v3-bullet",
+      }),
+    /unavailable in Defold profile/,
+  );
+  assert.throws(
+    () =>
+      generateBindingEmissionPlan(plan, scriptProjection, profiles, usage(["script:go.delete", "script:go.delete"])),
+    /duplicate symbols/,
+  );
+  assert.throws(
+    () => generateBindingEmissionPlan(plan, scriptProjection, profiles, usage(["script:not.real"])),
+    /unknown binding/,
+  );
 });
 
 test("dynamic access chooses the full currently compatible pre-generated target surface", () => {
   const result = generateBindingEmissionPlan(plan, scriptProjection, profiles, usage([], true), {
     target: "dynamicHermesJsi",
-    profile: "default-legacy-bullet"
+    profile: "default-legacy-bullet",
   });
   const sourceRows = new Map(scriptProjection.rows.map((row, index) => [index, row]));
   const profileAvailable = (unit) => {
     if (unit.identity.surface !== "script" || unit.sourceRef.input !== "scriptProjection") return true;
     const availability = sourceRows.get(unit.sourceRef.row).availability;
-    return availability.token === "core" || availability.token === "html5-host" ||
-      availability.runtimeProfiles?.includes("default-legacy-bullet") === true;
+    return (
+      availability.token === "core" ||
+      availability.token === "html5-host" ||
+      availability.runtimeProfiles?.includes("default-legacy-bullet") === true
+    );
   };
-  const expected = plan.units.filter((unit) =>
-    unit.backends.dynamicHermesJsi.selection === "emit" && profileAvailable(unit)).length;
-  const expectedDiagnostics = plan.units.filter((unit) =>
-    unit.backends.dynamicHermesJsi.selection !== "emit" && profileAvailable(unit)).length;
+  const expected = plan.units.filter(
+    (unit) => unit.backends.dynamicHermesJsi.selection === "emit" && profileAvailable(unit),
+  ).length;
+  const expectedDiagnostics = plan.units.filter(
+    (unit) => unit.backends.dynamicHermesJsi.selection !== "emit" && profileAvailable(unit),
+  ).length;
   assert.equal(result.treeShaking.selectedForEmissionUnits, expected);
   assert.equal(result.usage.requestedCount, 2428);
   assert.equal(result.diagnostics.length, expectedDiagnostics);
@@ -109,21 +138,21 @@ test("stale or forged lowering and profile authorities fail before selection", (
   forgedPlan.units[0].backends.dynamicHermesJsi.selection = "emit";
   assert.throws(
     () => generateBindingEmissionPlan(forgedPlan, scriptProjection, profiles, usage([])),
-    /internal digest is invalid/
+    /internal digest is invalid/,
   );
 
   const forgedProjection = structuredClone(scriptProjection);
   forgedProjection.rows[0].availability.runtimeProfiles = [];
   assert.throws(
     () => generateBindingEmissionPlan(plan, forgedProjection, profiles, usage([])),
-    /does not match the lowering plan authority/
+    /does not match the lowering plan authority/,
   );
 
   const forgedProfiles = structuredClone(profiles);
   forgedProfiles.catalogSha256 = "0".repeat(64);
   assert.throws(
     () => generateBindingEmissionPlan(plan, scriptProjection, forgedProfiles, usage([])),
-    /authorities differ/
+    /authorities differ/,
   );
 });
 

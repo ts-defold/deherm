@@ -11,7 +11,8 @@ const defaultIgnored = new Set([".deherm", ".git", ".internal", "build", "dist",
 // `<name>.tmp.<pid>.<digest>`, `<name>.deherm-tmp-<pid>[-<sequence>]`,
 // `<name>.deherm-replace-<pid>-<digest>`, and the usual editor scratch and
 // backup names.
-const temporaryArtifact = /(?:\.(?:deherm-)?tmp(?:[-.](?:\d+|[0-9a-f]{6,}))*|\.deherm-replace-\d+-[0-9a-f]{6,}|\.sw[a-p]|~|\.orig|\.rej|\.bak)$/i;
+const temporaryArtifact =
+  /(?:\.(?:deherm-)?tmp(?:[-.](?:\d+|[0-9a-f]{6,}))*|\.deherm-replace-\d+-[0-9a-f]{6,}|\.sw[a-p]|~|\.orig|\.rej|\.bak)$/i;
 const editorScratch = /^(?:\.#|#|\.~lock\.)/;
 
 export function isTemporaryArtifact(relative) {
@@ -34,10 +35,12 @@ function ignoredPath(relative, ignoredPaths) {
 export function createWatchPathFilter(rootValue, options = {}) {
   const root = path.resolve(rootValue);
   const ignoredNames = new Set([...defaultIgnored, ...(options.ignoredNames ?? [])]);
-  const ignoredPaths = (options.ignoredPaths ?? []).map((file) => {
-    const relative = path.isAbsolute(file) ? path.relative(root, file) : file;
-    return normalizeRelative(relative);
-  }).filter((relative) => relative && relative !== ".." && !relative.startsWith("../"));
+  const ignoredPaths = (options.ignoredPaths ?? [])
+    .map((file) => {
+      const relative = path.isAbsolute(file) ? path.relative(root, file) : file;
+      return normalizeRelative(relative);
+    })
+    .filter((relative) => relative && relative !== ".." && !relative.startsWith("../"));
   return (file) => {
     const relative = path.relative(root, file);
     if (!relative || relative.startsWith("..") || ignored(relative, ignoredNames)) return undefined;
@@ -112,6 +115,6 @@ export async function watchProject(options) {
       clearTimeout(timer);
       for (const handle of watchers.values()) handle.close();
       watchers.clear();
-    }
+    },
   };
 }

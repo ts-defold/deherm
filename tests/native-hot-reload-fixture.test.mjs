@@ -4,7 +4,7 @@ import test from "node:test";
 import {
   createRejectedCandidate,
   createValidCandidate,
-  rejectedCandidateMarker
+  rejectedCandidateMarker,
 } from "../scripts/lib/native-hot-reload-fixture.mjs";
 
 const source = `

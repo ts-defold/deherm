@@ -21,8 +21,7 @@ test("dmSDK inventory accounts for every parsed declaration", async () => {
   );
   assert.ok(inventory.declarations.every((declaration) => declaration.status));
   assert.equal(inventory.typeSupportDeclarations.length, 91);
-  assert.doesNotMatch(JSON.stringify(inventory.typeSupportDeclarations),
-    new RegExp(inventory.defoldRevision));
+  assert.doesNotMatch(JSON.stringify(inventory.typeSupportDeclarations), new RegExp(inventory.defoldRevision));
   const vulkanImage = inventory.typeSupportDeclarations.find(({ name }) => name === "VkImage");
   assert.match(vulkanImage.header, /^upstream\/defold-sdk\//);
   assert.equal(vulkanImage.targetTypes["arm64-osx"], "struct VkImage_T *");
@@ -61,12 +60,18 @@ test("generated dmSDK resolves every Clang declaration", async () => {
   assert.equal(ir.declarations.length, inventory.declarationCount);
   assert.equal(ir.typeSupportDeclarations.length, inventory.typeSupportDeclarations.length);
   assert.equal(ir.typeSurfaceUnresolvedCount, 0);
-  const publicCalls = ir.declarations.filter(({ kind, disposition }) => ["function", "method", "constructor", "destructor", "function-template"].includes(kind) && disposition === "generated-raw-call");
+  const publicCalls = ir.declarations.filter(
+    ({ kind, disposition }) =>
+      ["function", "method", "constructor", "destructor", "function-template"].includes(kind) &&
+      disposition === "generated-raw-call",
+  );
   assert.equal(ir.runtimeImplementedCount + ir.runtimeUnimplementedCount, publicCalls.length);
   assert.ok(ir.declarations.every(({ disposition, abiStrategies }) => disposition && abiStrategies.length));
   const enums = ir.declarations.filter(({ kind }) => kind === "enum");
   assert.ok(enums.length > 0);
-  assert.ok(enums.every(({ members }) => members.length > 0 && members.every(({ value }) => Number.isSafeInteger(value))));
+  assert.ok(
+    enums.every(({ members }) => members.length > 0 && members.every(({ value }) => Number.isSafeInteger(value))),
+  );
   const types = await readFile(new URL("../packages/sdk/src/generated/dmsdk/types.ts", import.meta.url), "utf8");
   assert.match(types, /export const DmBufferResult = \{/);
   assert.match(types, /RESULT_METADATA_MISSING: 11/);

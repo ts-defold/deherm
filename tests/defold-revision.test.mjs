@@ -11,21 +11,21 @@ import {
   assertResolvedDefoldRevision,
   defoldResolutionRecord,
   normalizeDefoldRevision,
-  resolveDefoldRevision
+  resolveDefoldRevision,
 } from "../packages/cli/src/defold-revision.mjs";
 import {
   buildGenerationMerkle,
   defoldSurfaceCacheHome,
   defoldSurfaceLegacyCacheHome,
   defoldSurfaceSearchPath,
-  resolveDefoldSurface
+  resolveDefoldSurface,
 } from "../packages/cli/src/defold-surface.mjs";
 import { inspectDefoldProject } from "../packages/cli/src/project.mjs";
 import { writeGeneratedProject } from "../packages/cli/src/generate.mjs";
 
 const packageRoot = path.resolve(import.meta.dirname, "..");
 const bundled = JSON.parse(
-  await readFile(path.join(packageRoot, "packages", "bindings", "generated", "defold-script-api-ir.json"), "utf8")
+  await readFile(path.join(packageRoot, "packages", "bindings", "generated", "defold-script-api-ir.json"), "utf8"),
 ).defoldRevision;
 const otherRevision = "0123456789abcdef0123456789abcdef01234567";
 
@@ -53,7 +53,11 @@ test("a project that names no Defold revision is refused rather than assumed", a
 
 test("an explicit --defold-sdk always wins and is recorded as the source", async () => {
   const root = await project(`[project]\ntitle = Fixture\n[defold_hermes]\ndefold_sdk = ${bundled}\n`);
-  const resolution = await resolveDefoldRevision({ projectRoot: root, explicit: otherRevision.toUpperCase(), env: emptyEnv });
+  const resolution = await resolveDefoldRevision({
+    projectRoot: root,
+    explicit: otherRevision.toUpperCase(),
+    env: emptyEnv,
+  });
   assert.equal(resolution.blocker, null);
   assert.equal(resolution.revision, otherRevision);
   assert.equal(resolution.source, "explicit-option");
@@ -62,7 +66,7 @@ test("an explicit --defold-sdk always wins and is recorded as the source", async
     revision: otherRevision,
     source: "explicit-option",
     authority: "live",
-    evidence: { option: "--defold-sdk" }
+    evidence: { option: "--defold-sdk" },
   });
   // What it overrode is reported rather than hidden.
   assert.equal(resolution.diagnostics.length, 1);
@@ -79,7 +83,7 @@ test("game.project declares the revision and the editor hook overrides it", asyn
   // precedence win: one of them is describing a different engine.
   const conflicted = await resolveDefoldRevision({
     projectRoot: root,
-    env: { DEHERM_DEFOLD_ENGINE_SHA1: otherRevision }
+    env: { DEHERM_DEFOLD_ENGINE_SHA1: otherRevision },
   });
   assert.equal(conflicted.revision, null);
   assert.equal(conflicted.blocker.code, "defold-revision-conflict");
@@ -93,13 +97,15 @@ test("a malformed declared revision is rejected at the point it is read", async 
 });
 
 test("a dependency URL pinning a Defold engine archive is read as a declaration", async () => {
-  const root = await project([
-    "[project]",
-    "title = Fixture",
-    `dependencies#0 = https://github.com/defold/defold/archive/${otherRevision}.zip`,
-    "dependencies#1 = https://github.com/selimanac/defold-astar/archive/1471c5445b0c0376bd23c377e8ef8d84e52b43bf.zip",
-    ""
-  ].join("\n"));
+  const root = await project(
+    [
+      "[project]",
+      "title = Fixture",
+      `dependencies#0 = https://github.com/defold/defold/archive/${otherRevision}.zip`,
+      "dependencies#1 = https://github.com/selimanac/defold-astar/archive/1471c5445b0c0376bd23c377e8ef8d84e52b43bf.zip",
+      "",
+    ].join("\n"),
+  );
   const resolution = await resolveDefoldRevision({ projectRoot: root, env: emptyEnv });
   assert.equal(resolution.revision, otherRevision);
   assert.equal(resolution.source, "dependency-url");
@@ -111,9 +117,12 @@ test("a dependency URL pinning a Defold engine archive is read as a declaration"
 test("an Extender build log witnesses the engine the project actually compiled against", async () => {
   const root = await project();
   await mkdir(path.join(root, ".internal", "cache", "arm64-osx"), { recursive: true });
-  await writeFile(path.join(root, ".internal", "cache", "arm64-osx", "build.zip"), zipSync({
-    "log.txt": strToU8(`clang++ -I/var/extender/sdk/${otherRevision}/defoldsdk//sdk/include upload/x.cpp\n`)
-  }));
+  await writeFile(
+    path.join(root, ".internal", "cache", "arm64-osx", "build.zip"),
+    zipSync({
+      "log.txt": strToU8(`clang++ -I/var/extender/sdk/${otherRevision}/defoldsdk//sdk/include upload/x.cpp\n`),
+    }),
+  );
   const resolution = await resolveDefoldRevision({ projectRoot: root, env: emptyEnv });
   assert.equal(resolution.revision, otherRevision);
   assert.equal(resolution.source, "extender-build");
@@ -130,7 +139,7 @@ test("Bob is asked for its own engine sha1 when the project names none", async (
     runBobVersion: async (command, args) => {
       calls.push({ command, args });
       return { ok: true, message: "", stdout: `bob.jar version: 1.11.0  sha1: ${otherRevision}\n`, stderr: "" };
-    }
+    },
   });
   assert.equal(calls.length, 1);
   assert.deepEqual(calls[0].args.slice(0, 1), ["-jar"]);
@@ -141,21 +150,41 @@ test("Bob is asked for its own engine sha1 when the project names none", async (
 
 test("a lock is evidence only when it records how it decided", async () => {
   const root = await project();
-  await writeFile(path.join(root, "deherm.lock"), `${JSON.stringify({
-    schemaVersion: 1,
-    defoldRevision: bundled
-  }, null, 2)}\n`);
+  await writeFile(
+    path.join(root, "deherm.lock"),
+    `${JSON.stringify(
+      {
+        schemaVersion: 1,
+        defoldRevision: bundled,
+      },
+      null,
+      2,
+    )}\n`,
+  );
   // A lock written before revisions were resolved carries whatever the package
   // shipped. Trusting it would re-introduce the silent assumption.
   const ignored = await resolveDefoldRevision({ projectRoot: root, env: emptyEnv });
   assert.equal(ignored.revision, null);
   assert.equal(ignored.blocker.code, "defold-revision-unresolved");
 
-  await writeFile(path.join(root, "deherm.lock"), `${JSON.stringify({
-    schemaVersion: 1,
-    defoldRevision: bundled,
-    defoldResolution: { schemaVersion: 1, revision: bundled, source: "bob-version", authority: "live", evidence: {} }
-  }, null, 2)}\n`);
+  await writeFile(
+    path.join(root, "deherm.lock"),
+    `${JSON.stringify(
+      {
+        schemaVersion: 1,
+        defoldRevision: bundled,
+        defoldResolution: {
+          schemaVersion: 1,
+          revision: bundled,
+          source: "bob-version",
+          authority: "live",
+          evidence: {},
+        },
+      },
+      null,
+      2,
+    )}\n`,
+  );
   const accepted = await resolveDefoldRevision({ projectRoot: root, env: emptyEnv });
   assert.equal(accepted.revision, bundled);
   assert.equal(accepted.source, "deherm-lock");
@@ -167,14 +196,14 @@ test("a lock is evidence only when it records how it decided", async () => {
     source: "bob-version",
     authority: "live",
     evidence: {},
-    via: "deherm-lock"
+    via: "deherm-lock",
   });
 
   // A live source outranks the lock and the stale record is reported, not
   // silently dropped.
   const upgraded = await resolveDefoldRevision({
     projectRoot: root,
-    env: { DEHERM_DEFOLD_ENGINE_SHA1: otherRevision }
+    env: { DEHERM_DEFOLD_ENGINE_SHA1: otherRevision },
   });
   assert.equal(upgraded.revision, otherRevision);
   assert.equal(upgraded.source, "editor-hook");
@@ -187,14 +216,17 @@ test("no layer-0 surface exists for an unknown revision and generation refuses t
   const surface = await resolveDefoldSurface(otherRevision, {
     packageRoot,
     projectRoot: root,
-    env: { DEHERM_CACHE_HOME: path.join(root, "cache") }
+    env: { DEHERM_CACHE_HOME: path.join(root, "cache") },
   });
   assert.equal(surface.layer, null);
   assert.equal(surface.blocker.code, "defold-surface-not-cached");
   assert.match(surface.blocker.message, new RegExp(otherRevision));
   assert.match(surface.blocker.message, /deherm policy/);
   assert.match(surface.blocker.message, /No Defold source checkout/);
-  assert.deepEqual(surface.searched.map(({ layer }) => layer), ["user-cache", "project-cache", "repository-checkout"]);
+  assert.deepEqual(
+    surface.searched.map(({ layer }) => layer),
+    ["user-cache", "project-cache", "repository-checkout"],
+  );
   assert.equal(surface.searched[2].reason, `holds Defold ${bundled}`);
 
   const bundledSurface = await resolveDefoldSurface(bundled, { packageRoot, projectRoot: root });
@@ -206,9 +238,12 @@ test("the surface search path prefers caches and uses a repository checkout only
   const layers = defoldSurfaceSearchPath(bundled, {
     packageRoot: "/pkg",
     projectRoot: "/proj",
-    env: { DEHERM_CACHE_HOME: "/cache" }
+    env: { DEHERM_CACHE_HOME: "/cache" },
   });
-  assert.deepEqual(layers.map(({ layer }) => layer), ["user-cache", "project-cache", "repository-checkout"]);
+  assert.deepEqual(
+    layers.map(({ layer }) => layer),
+    ["user-cache", "project-cache", "repository-checkout"],
+  );
   assert.equal(layers[0].root, path.join("/cache", "surfaces", bundled));
   assert.equal(layers[1].root, path.join("/proj", ".deherm", "cache", "surfaces", bundled));
   assert.equal(layers[2].root, "/pkg");
@@ -218,7 +253,10 @@ test("the shared surface cache follows host conventions with explicit overrides 
   assert.equal(defoldSurfaceCacheHome({ DEHERM_CACHE_HOME: "/explicit" }, "darwin", "/Users/test"), "/explicit");
   assert.equal(defoldSurfaceCacheHome({ XDG_CACHE_HOME: "/xdg" }, "darwin", "/Users/test"), "/xdg/deherm");
   assert.equal(defoldSurfaceCacheHome({}, "darwin", "/Users/test"), "/Users/test/Library/Caches/deherm");
-  assert.equal(defoldSurfaceCacheHome({ LOCALAPPDATA: "C:\\Users\\test\\AppData\\Local" }, "win32", "C:\\Users\\test"), path.join(path.resolve("C:\\Users\\test\\AppData\\Local"), "deherm", "cache"));
+  assert.equal(
+    defoldSurfaceCacheHome({ LOCALAPPDATA: "C:\\Users\\test\\AppData\\Local" }, "win32", "C:\\Users\\test"),
+    path.join(path.resolve("C:\\Users\\test\\AppData\\Local"), "deherm", "cache"),
+  );
   assert.equal(defoldSurfaceCacheHome({}, "win32", "/Users/test"), "/Users/test/AppData/Local/deherm/cache");
   assert.equal(defoldSurfaceCacheHome({}, "linux", "/home/test"), "/home/test/.cache/deherm");
 
@@ -235,37 +273,68 @@ test("native cache roots read an existing legacy cache without moving or rewriti
     platform: "darwin",
     userHome: "/Users/test",
     env: {},
-    projectRoot: "/project"
+    projectRoot: "/project",
   });
-  assert.deepEqual(mac.map(({ layer }) => layer), ["user-cache", "legacy-user-cache", "project-cache"]);
+  assert.deepEqual(
+    mac.map(({ layer }) => layer),
+    ["user-cache", "legacy-user-cache", "project-cache"],
+  );
   assert.equal(mac[0].root, `/Users/test/Library/Caches/deherm/surfaces/${revision}`);
   assert.equal(mac[1].root, `/Users/test/.cache/deherm/surfaces/${revision}`);
 
   const windows = defoldSurfaceSearchPath(revision, {
     platform: "win32",
     userHome: "/Users/test",
-    env: { LOCALAPPDATA: "/Users/test/AppData/Local" }
+    env: { LOCALAPPDATA: "/Users/test/AppData/Local" },
   });
-  assert.deepEqual(windows.map(({ layer }) => layer), ["user-cache", "legacy-user-cache"]);
+  assert.deepEqual(
+    windows.map(({ layer }) => layer),
+    ["user-cache", "legacy-user-cache"],
+  );
   assert.equal(windows[0].root, `/Users/test/AppData/Local/deherm/cache/surfaces/${revision}`);
   assert.equal(windows[1].root, `/Users/test/.cache/deherm/surfaces/${revision}`);
 
   const explicit = defoldSurfaceSearchPath(revision, {
     platform: "darwin",
     userHome: "/Users/test",
-    env: { DEHERM_CACHE_HOME: "/explicit" }
+    env: { DEHERM_CACHE_HOME: "/explicit" },
   });
-  assert.deepEqual(explicit.map(({ layer }) => layer), ["user-cache"]);
+  assert.deepEqual(
+    explicit.map(({ layer }) => layer),
+    ["user-cache"],
+  );
 });
 
 test("the generation Merkle root keys the Defold revision and the native input set independently", () => {
   const extensions = [
-    { name: "Camera", manifestPath: "camera/ext.manifest", root: "camera", scriptApis: [{ path: "camera/camera.script_api", declarations: [{ name: "camera" }] }], publicHeaders: ["camera/include/camera.h"], sourceFiles: [] },
-    { name: "XMath", manifestPath: "math.zip:math/ext.manifest", archive: ".internal/lib/math.zip", scriptApis: [], publicHeaders: [], sourceFiles: ["math.zip:math/src/xmath.cpp"] }
+    {
+      name: "Camera",
+      manifestPath: "camera/ext.manifest",
+      root: "camera",
+      scriptApis: [{ path: "camera/camera.script_api", declarations: [{ name: "camera" }] }],
+      publicHeaders: ["camera/include/camera.h"],
+      sourceFiles: [],
+    },
+    {
+      name: "XMath",
+      manifestPath: "math.zip:math/ext.manifest",
+      archive: ".internal/lib/math.zip",
+      scriptApis: [],
+      publicHeaders: [],
+      sourceFiles: ["math.zip:math/src/xmath.cpp"],
+    },
   ];
-  const base = buildGenerationMerkle({ defoldRevision: bundled, surface: { layer: "packaged", inputs: { a: "1" } }, extensions });
+  const base = buildGenerationMerkle({
+    defoldRevision: bundled,
+    surface: { layer: "packaged", inputs: { a: "1" } },
+    extensions,
+  });
 
-  const engineMoved = buildGenerationMerkle({ defoldRevision: otherRevision, surface: { layer: "user-cache", inputs: { a: "2" } }, extensions });
+  const engineMoved = buildGenerationMerkle({
+    defoldRevision: otherRevision,
+    surface: { layer: "user-cache", inputs: { a: "2" } },
+    extensions,
+  });
   assert.notEqual(engineMoved.engineRoot, base.engineRoot);
   assert.equal(engineMoved.nativeRoot, base.nativeRoot, "an engine upgrade must not invalidate extension policies");
   assert.notEqual(engineMoved.root, base.root);
@@ -273,7 +342,17 @@ test("the generation Merkle root keys the Defold revision and the native input s
   const nativeMoved = buildGenerationMerkle({
     defoldRevision: bundled,
     surface: { layer: "packaged", inputs: { a: "1" } },
-    extensions: [...extensions, { name: "New", manifestPath: "new/ext.manifest", root: "new", scriptApis: [], publicHeaders: [], sourceFiles: [] }]
+    extensions: [
+      ...extensions,
+      {
+        name: "New",
+        manifestPath: "new/ext.manifest",
+        root: "new",
+        scriptApis: [],
+        publicHeaders: [],
+        sourceFiles: [],
+      },
+    ],
   });
   assert.equal(nativeMoved.engineRoot, base.engineRoot, "adding an extension must not invalidate the engine surface");
   assert.notEqual(nativeMoved.nativeRoot, base.nativeRoot);
@@ -281,10 +360,14 @@ test("the generation Merkle root keys the Defold revision and the native input s
   // a root mismatch resolves down to the leaf that moved.
   assert.deepEqual(
     nativeMoved.nodes.native.children.filter(({ name }) => name !== "New").map(({ digest }) => digest),
-    base.nodes.native.children.map(({ digest }) => digest)
+    base.nodes.native.children.map(({ digest }) => digest),
   );
   // Ordering is by content and structure, never by discovery order.
-  const reordered = buildGenerationMerkle({ defoldRevision: bundled, surface: { layer: "packaged", inputs: { a: "1" } }, extensions: [...extensions].reverse() });
+  const reordered = buildGenerationMerkle({
+    defoldRevision: bundled,
+    surface: { layer: "packaged", inputs: { a: "1" } },
+    extensions: [...extensions].reverse(),
+  });
   assert.equal(reordered.root, base.root);
 });
 
@@ -292,19 +375,21 @@ test("generation refuses a project whose revision cannot be resolved, and record
   const unresolved = await project("[project]\ntitle = Unresolved\n");
   await assert.rejects(
     writeGeneratedProject(await inspectDefoldProject({ project: unresolved }), ".deherm", { env: emptyEnv }),
-    (error) => error.code === "defold-revision-unresolved"
+    (error) => error.code === "defold-revision-unresolved",
   );
 
   const mismatched = await project(`[project]\ntitle = Mismatched\n[defold_hermes]\ndefold_sdk = ${otherRevision}\n`);
   await assert.rejects(
     writeGeneratedProject(await inspectDefoldProject({ project: mismatched }), ".deherm", {
-      env: { ...emptyEnv, DEHERM_OFFLINE: "1" }
+      env: { ...emptyEnv, DEHERM_OFFLINE: "1" },
     }),
-    (error) => error.code === "defold-surface-not-cached" && new RegExp(otherRevision).test(error.message)
+    (error) => error.code === "defold-surface-not-cached" && new RegExp(otherRevision).test(error.message),
   );
 
   const resolved = await project(`[project]\ntitle = Resolved\n[defold_hermes]\ndefold_sdk = ${bundled}\n`);
-  const output = await writeGeneratedProject(await inspectDefoldProject({ project: resolved }), ".deherm", { env: emptyEnv });
+  const output = await writeGeneratedProject(await inspectDefoldProject({ project: resolved }), ".deherm", {
+    env: emptyEnv,
+  });
   assert.equal(output.defoldRevision, bundled);
   assert.equal(output.defoldResolution.source, "game-project");
   assert.equal(output.defoldSurfaceLayer, "repository-checkout");

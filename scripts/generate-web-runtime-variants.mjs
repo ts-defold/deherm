@@ -6,17 +6,11 @@ import { renderWebRuntimeVariant } from "../packages/cli/src/toolchains.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
 const check = process.argv.includes("--check");
-const files = [
-  "component_bridge.js",
-  "library_defold_hermes.js"
-];
+const files = ["component_bridge.js", "library_defold_hermes.js"];
 
 let changed = false;
 for (const name of files) {
-  const template = await readFile(
-    path.join(root, "packages", "cli", "templates", "web-runtime", name),
-    "utf8"
-  );
+  const template = await readFile(path.join(root, "packages", "cli", "templates", "web-runtime", name), "utf8");
   // The checked-in/package extension is release-safe for callers that invoke
   // Defold directly. Development tooling explicitly materializes debug before
   // a browser dev bundle.

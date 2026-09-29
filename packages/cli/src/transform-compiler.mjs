@@ -47,10 +47,12 @@ const pluginLoaderKeys = new Set(["enabled", "name", "stage", "transform"]);
 
 function isDehermTransform(plugin) {
   if (!plugin || plugin.enabled === false || typeof plugin.transform !== "string") return false;
-  return plugin.transform === "@ts-defold/deherm/ttsc" ||
+  return (
+    plugin.transform === "@ts-defold/deherm/ttsc" ||
     plugin.transform.endsWith("/packages/compiler/ttsc.mjs") ||
     plugin.transform.endsWith("/compiler/ttsc.mjs") ||
-    plugin.transform.endsWith("packages/compiler/ttsc.mjs");
+    plugin.transform.endsWith("packages/compiler/ttsc.mjs")
+  );
 }
 
 async function readConfigChain(configPath, seen = new Set()) {
@@ -63,11 +65,13 @@ async function readConfigChain(configPath, seen = new Set()) {
   const inherited = [];
   if (typeof document.extends === "string") {
     if (!document.extends.startsWith(".")) {
-      throw new Error(`Generated TypeScript config ${absolute} extends unsupported package config '${document.extends}'`);
+      throw new Error(
+        `Generated TypeScript config ${absolute} extends unsupported package config '${document.extends}'`,
+      );
     }
     const candidate = path.resolve(path.dirname(absolute), document.extends);
     const parent = path.extname(candidate) ? candidate : `${candidate}.json`;
-    inherited.push(...await readConfigChain(parent, seen));
+    inherited.push(...(await readConfigChain(parent, seen)));
   }
   inherited.push(...(document.compilerOptions?.plugins ?? []));
   return inherited;
@@ -77,11 +81,11 @@ async function readConfigChain(configPath, seen = new Set()) {
 export async function loadDehermPluginConfig(tsconfig) {
   const plugins = (await readConfigChain(tsconfig)).filter(isDehermTransform);
   if (plugins.length !== 1) {
-    throw new Error(`Expected exactly one enabled @ts-defold/deherm/ttsc transform in ${path.resolve(tsconfig)}, found ${plugins.length}`);
+    throw new Error(
+      `Expected exactly one enabled @ts-defold/deherm/ttsc transform in ${path.resolve(tsconfig)}, found ${plugins.length}`,
+    );
   }
-  return Object.fromEntries(
-    Object.entries(plugins[0]).filter(([key]) => !pluginLoaderKeys.has(key))
-  );
+  return Object.fromEntries(Object.entries(plugins[0]).filter(([key]) => !pluginLoaderKeys.has(key)));
 }
 
 async function invoke(command, { tsconfig, cwd, config, outDir, emit = false, tsgoArgs }) {
@@ -99,10 +103,24 @@ async function invoke(command, { tsconfig, cwd, config, outDir, emit = false, ts
     // name blockers this way. Hand back what it said rather than a wrapped
     // Error whose message is "Command failed".
     if (typeof error?.code === "number") {
-      return { ok: false, status: error.code, signal: error.signal ?? null, stdout: error.stdout ?? "", stderr: error.stderr ?? "", tool };
+      return {
+        ok: false,
+        status: error.code,
+        signal: error.signal ?? null,
+        stdout: error.stdout ?? "",
+        stderr: error.stderr ?? "",
+        tool,
+      };
     }
     if (error?.signal) {
-      return { ok: false, status: null, signal: error.signal, stdout: error.stdout ?? "", stderr: error.stderr ?? "", tool };
+      return {
+        ok: false,
+        status: null,
+        signal: error.signal,
+        stdout: error.stdout ?? "",
+        stderr: error.stderr ?? "",
+        tool,
+      };
     }
     throw error;
   }
@@ -143,7 +161,7 @@ export async function emitProjectWithSourceMaps(options) {
   const result = await invoke("build", {
     ...options,
     emit: true,
-    tsgoArgs: ["--sourceMap", "true", "--inlineSources", "true"]
+    tsgoArgs: ["--sourceMap", "true", "--inlineSources", "true"],
   });
   if (!result.ok) {
     throw new Error(`dehermc mapped emit failed (exit ${result.status}):\n${result.stderr || result.stdout}`);
@@ -152,7 +170,7 @@ export async function emitProjectWithSourceMaps(options) {
     compiler: result.tool.path,
     compilerSha256: result.tool.sha256,
     outDir: path.resolve(options.cwd ?? process.cwd(), options.outDir),
-    diagnostics: `${result.stdout}${result.stderr}`.trimEnd()
+    diagnostics: `${result.stdout}${result.stderr}`.trimEnd(),
   };
 }
 
@@ -173,7 +191,7 @@ export async function checkProject(options) {
     stderr: result.stderr,
     diagnostics: `${result.stdout}${result.stderr}`.trimEnd(),
     compiler: result.tool.path,
-    compilerSha256: result.tool.sha256
+    compilerSha256: result.tool.sha256,
   };
 }
 

@@ -57,8 +57,10 @@ export function validateInspectorSession(value) {
   if (runtime !== "hermes" && runtime !== "browser") {
     throw new Error("Inspector session runtime must be hermes or browser");
   }
-  if (runtime === "hermes" &&
-      (!Number.isSafeInteger(value.enginePort) || value.enginePort < 1 || value.enginePort > 65_535)) {
+  if (
+    runtime === "hermes" &&
+    (!Number.isSafeInteger(value.enginePort) || value.enginePort < 1 || value.enginePort > 65_535)
+  ) {
     throw new Error("Hermes inspector session enginePort is invalid");
   }
   if (runtime === "browser" && value.enginePort !== undefined) {
@@ -80,7 +82,12 @@ export function validateInspectorSession(value) {
       throw new Error("Inspector session authToken is invalid");
     }
     const state = assertLoopbackUrl(value.stateUrl, "stateUrl", ["http:"]);
-    if (Number(state.port) !== value.devtoolsPort || state.pathname !== "/deherm/dev/v1/snapshot" || state.search || state.hash) {
+    if (
+      Number(state.port) !== value.devtoolsPort ||
+      state.pathname !== "/deherm/dev/v1/snapshot" ||
+      state.search ||
+      state.hash
+    ) {
       throw new Error("Inspector session stateUrl does not match the authenticated dev state endpoint");
     }
   }
@@ -118,7 +125,7 @@ export function createInspectorSession(values) {
     websocketUrl: values.websocketUrl,
     ...(values.authToken === undefined ? {} : { authToken: values.authToken, stateUrl: values.stateUrl }),
     ...(values.bundleUrl === undefined ? {} : { bundleUrl: values.bundleUrl }),
-    ...(values.sourceMapFile === undefined ? {} : { sourceMapFile: path.resolve(values.sourceMapFile) })
+    ...(values.sourceMapFile === undefined ? {} : { sourceMapFile: path.resolve(values.sourceMapFile) }),
   });
 }
 
@@ -132,7 +139,9 @@ export async function discoverInspectorTarget(options) {
   try {
     response = await fetch(`${session.devtoolsUrl}/json/list`, { signal: AbortSignal.timeout(5_000) });
   } catch (error) {
-    throw new Error(`Inspector session ${session.sessionId} is not reachable: ${error instanceof Error ? error.message : String(error)}`);
+    throw new Error(
+      `Inspector session ${session.sessionId} is not reachable: ${error instanceof Error ? error.message : String(error)}`,
+    );
   }
   if (!response.ok) throw new Error(`Inspector discovery failed with HTTP ${response.status}`);
   const targets = await response.json();
@@ -172,7 +181,9 @@ export async function readInspectorSession(file) {
     parsed = JSON.parse(await readFile(source, "utf8"));
   } catch (error) {
     if (error?.code === "ENOENT") throw new Error(`No live inspector session at ${source}`);
-    throw new Error(`Could not read inspector session ${source}: ${error instanceof Error ? error.message : String(error)}`);
+    throw new Error(
+      `Could not read inspector session ${source}: ${error instanceof Error ? error.message : String(error)}`,
+    );
   }
   return validateInspectorSession(parsed);
 }

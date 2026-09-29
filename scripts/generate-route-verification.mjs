@@ -88,7 +88,7 @@ function issueMetadata(row, defoldRevision) {
   // the identity would open a fresh copy of every unresolved route each time a
   // channel advanced.
   const title = `route verification: ${row.luaName} is ${row.status}`;
-  const query = new URLSearchParams({ q: `is:issue in:title \"${title}\"` });
+  const query = new URLSearchParams({ q: `is:issue in:title "${title}"` });
   const evidence = row.mismatch ?? row.registration;
   return {
     key: `${row.id}:${row.status}`,
@@ -103,17 +103,19 @@ function issueMetadata(row, defoldRevision) {
       `Registration: \`${row.registration}\``,
       "",
       "This issue is generated from `packages/bindings/generated/defold-route-verification.json`. " +
-        "Repeated policy runs update this issue instead of opening a duplicate."
-    ].join("\n")
+        "Repeated policy runs update this issue instead of opening a duplicate.",
+    ].join("\n"),
   };
 }
 
 export function runtimeEvidenceMatchesPlan(report, plan, defoldRevision) {
-  return report.defoldRevision === defoldRevision
-    && report.target === plan.target
-    && report.runtimeProfile === plan.runtimeProfile
-    && report.planSha256 === sha256(JSON.stringify(plan))
-    && JSON.stringify(report.planInputs ?? null) === JSON.stringify(plan.inputs ?? null);
+  return (
+    report.defoldRevision === defoldRevision &&
+    report.target === plan.target &&
+    report.runtimeProfile === plan.runtimeProfile &&
+    report.planSha256 === sha256(JSON.stringify(plan)) &&
+    JSON.stringify(report.planInputs ?? null) === JSON.stringify(plan.inputs ?? null)
+  );
 }
 
 async function main() {
@@ -123,10 +125,13 @@ async function main() {
     read("defold-headless-conformance-report.json"),
     read("defold-headless-conformance-plan.json"),
     read("defold-lua-registration-surface.json"),
-    read("defold-component-proxy-contract.json")
+    read("defold-component-proxy-contract.json"),
   ]);
-  assert.equal(componentPolicy.defoldRevision, ir.defoldRevision,
-    "component proxy policy and script API IR revisions differ");
+  assert.equal(
+    componentPolicy.defoldRevision,
+    ir.defoldRevision,
+    "component proxy policy and script API IR revisions differ",
+  );
   const componentProxyConstants = createComponentProxyConstants(componentPolicy);
   const runtimeEvidenceCurrent = runtimeEvidenceMatchesPlan(report, plan, ir.defoldRevision);
   // Never promote a runtime observation across the plan/input boundary that
@@ -134,7 +139,7 @@ async function main() {
   // contract while leaving the old report on disk; treating that report as
   // current is how the former go.set_parent false positive survived its own
   // zero-argument runtime observation.
-  const runtimeContracts = runtimeEvidenceCurrent ? report.contracts ?? [] : [];
+  const runtimeContracts = runtimeEvidenceCurrent ? (report.contracts ?? []) : [];
 
   // Runtime evidence: what the engine actually did, per route.
   const observedByRoute = new Map();
@@ -190,7 +195,7 @@ async function main() {
       if (route.arity?.verdict !== "disagree" || arityDisagreement.has(route.name)) continue;
       arityDisagreement.set(route.name, {
         documented: [route.arity.declaredMinimum, route.arity.declaredMaximum],
-        derived: [route.arity.derived?.min, route.arity.derived?.max]
+        derived: [route.arity.derived?.min, route.arity.derived?.max],
       });
     }
   }
@@ -233,7 +238,10 @@ async function main() {
     for (const row of target.registeredButUndeclared ?? []) {
       const documented = row.documentedName?.name;
       if (documented && documented !== row.name && !registeredUnder.has(documented)) {
-        registeredUnder.set(documented, { registeredName: row.name, at: `${row.registration?.path}:${row.registration?.line}` });
+        registeredUnder.set(documented, {
+          registeredName: row.name,
+          at: `${row.registration?.path}:${row.registration?.line}`,
+        });
       }
     }
     for (const row of target.declaredButUnregistered ?? []) {
@@ -260,69 +268,81 @@ async function main() {
   // register, and vice versa. If Defold adds an eighth kind, or starts
   // registering one of these at runtime, the assertion below says so instead of
   // the route silently changing category.
-  const loweredKinds = new Set(Object.values(componentProxyConstants.resourceKinds)
-    .map((kind) => `resource.${kind}`));
-  const compileTimeIntrinsics = new Set(
-    [...loweredKinds].filter((name) => !registeredSomewhere.has(name)));
+  const loweredKinds = new Set(Object.values(componentProxyConstants.resourceKinds).map((kind) => `resource.${kind}`));
+  const compileTimeIntrinsics = new Set([...loweredKinds].filter((name) => !registeredSomewhere.has(name)));
   const loweredButRegistered = [...loweredKinds].filter((name) => registeredSomewhere.has(name));
-  assert.deepEqual(loweredButRegistered, [],
+  assert.deepEqual(
+    loweredButRegistered,
+    [],
     `the component proxy lowers ${loweredButRegistered.join(", ")} at compile time, but the engine ` +
-    "registers them at runtime - one of the two is now wrong");
+      "registers them at runtime - one of the two is now wrong",
+  );
 
-  const rows = ir.functions.map((fn) => {
-    const luaName = fn.rawName;
-    const disposition = runtime.get(fn.id) ?? null;
-    const registered = registeredSomewhere.has(luaName) ? "registered"
-      : registeredUnder.has(luaName) ? "documented-name-mismatch"
-      : compileTimeIntrinsics.has(luaName) ? "compile-time-intrinsic"
-      : commentedOut.has(luaName) ? "commented-out-upstream"
-      : parserBlocked.has(luaName) ? "registration-form-not-traced"
-      : declaredUnregistered.has(luaName) ? "declared-but-unregistered"
-      : "no-registration-evidence";
-    // Only our own evidence contradicting the documentation makes a route
-    // suspect. Neither "we did not run it" nor "our parser could not follow
-    // the registration form" is a statement about the route.
-    // A compile-time intrinsic is not suspect: it has no runtime registration
-    // because it is not a runtime call. Everything else here is our evidence
-    // disagreeing with Defold's documentation, which is worth an issue.
-    const contradicted = registered === "declared-but-unregistered"
-      || registered === "commented-out-upstream"
-      || disposition === "mismatched";
-    const notExecutedHere = runtimeBlocker.get(fn.id) ?? untestedReason.get(fn.id) ?? "not-in-conformance-plan";
-    const status = contradicted ? "suspect" : "verified";
-    const row = {
-      id: fn.id,
-      luaName,
-      status,
-      ...(disposition ? { disposition } : {}),
-      // A note about OUR harness, for our own queue - never published as a
-      // caveat on the route.
-      ...(!disposition || disposition !== "observed" ? { notExecutedHere } : {}),
-      runtimeObserved: disposition === "observed",
-      ...(mismatchDetail.has(fn.id) ? { mismatch: mismatchDetail.get(fn.id) } : {}),
-      ...(arityDisagreement.has(luaName) ? { arityDisagreement: arityDisagreement.get(luaName) } : {}),
-      registration: registered,
-      ...(registeredUnder.has(luaName) ? { runtimeLuaName: registeredUnder.get(luaName).registeredName } : {}),
-      ...(declaredUnregistered.has(luaName) ? { declaredAt: declaredUnregistered.get(luaName).source } : {}),
-      ...(commentedOut.has(luaName)
-        ? { commentedOutAt: `${commentedOut.get(luaName).path ?? commentedOut.get(luaName).registration?.path}`,
-            commentedOutFunction: commentedOut.get(luaName).cFunction }
-        : {}),
-      ...(parserBlocked.has(luaName) ? { parserBlocker: parserBlocked.get(luaName).code } : {}),
-      ...(registeredUnder.has(luaName) ? { registeredAs: registeredUnder.get(luaName) } : {}),
-      source: fn.source
-    };
-    if (status === "suspect") {
-      row.annotation = `@suspect ${row.mismatch ?? row.registration}`;
-      row.issue = issueMetadata(row, ir.defoldRevision);
-    }
-    return row;
-  }).sort((left, right) => left.id < right.id ? -1 : 1);
+  const rows = ir.functions
+    .map((fn) => {
+      const luaName = fn.rawName;
+      const disposition = runtime.get(fn.id) ?? null;
+      const registered = registeredSomewhere.has(luaName)
+        ? "registered"
+        : registeredUnder.has(luaName)
+          ? "documented-name-mismatch"
+          : compileTimeIntrinsics.has(luaName)
+            ? "compile-time-intrinsic"
+            : commentedOut.has(luaName)
+              ? "commented-out-upstream"
+              : parserBlocked.has(luaName)
+                ? "registration-form-not-traced"
+                : declaredUnregistered.has(luaName)
+                  ? "declared-but-unregistered"
+                  : "no-registration-evidence";
+      // Only our own evidence contradicting the documentation makes a route
+      // suspect. Neither "we did not run it" nor "our parser could not follow
+      // the registration form" is a statement about the route.
+      // A compile-time intrinsic is not suspect: it has no runtime registration
+      // because it is not a runtime call. Everything else here is our evidence
+      // disagreeing with Defold's documentation, which is worth an issue.
+      const contradicted =
+        registered === "declared-but-unregistered" ||
+        registered === "commented-out-upstream" ||
+        disposition === "mismatched";
+      const notExecutedHere = runtimeBlocker.get(fn.id) ?? untestedReason.get(fn.id) ?? "not-in-conformance-plan";
+      const status = contradicted ? "suspect" : "verified";
+      const row = {
+        id: fn.id,
+        luaName,
+        status,
+        ...(disposition ? { disposition } : {}),
+        // A note about OUR harness, for our own queue - never published as a
+        // caveat on the route.
+        ...(!disposition || disposition !== "observed" ? { notExecutedHere } : {}),
+        runtimeObserved: disposition === "observed",
+        ...(mismatchDetail.has(fn.id) ? { mismatch: mismatchDetail.get(fn.id) } : {}),
+        ...(arityDisagreement.has(luaName) ? { arityDisagreement: arityDisagreement.get(luaName) } : {}),
+        registration: registered,
+        ...(registeredUnder.has(luaName) ? { runtimeLuaName: registeredUnder.get(luaName).registeredName } : {}),
+        ...(declaredUnregistered.has(luaName) ? { declaredAt: declaredUnregistered.get(luaName).source } : {}),
+        ...(commentedOut.has(luaName)
+          ? {
+              commentedOutAt: `${commentedOut.get(luaName).path ?? commentedOut.get(luaName).registration?.path}`,
+              commentedOutFunction: commentedOut.get(luaName).cFunction,
+            }
+          : {}),
+        ...(parserBlocked.has(luaName) ? { parserBlocker: parserBlocked.get(luaName).code } : {}),
+        ...(registeredUnder.has(luaName) ? { registeredAs: registeredUnder.get(luaName) } : {}),
+        source: fn.source,
+      };
+      if (status === "suspect") {
+        row.annotation = `@suspect ${row.mismatch ?? row.registration}`;
+        row.issue = issueMetadata(row, ir.defoldRevision);
+      }
+      return row;
+    })
+    .sort((left, right) => (left.id < right.id ? -1 : 1));
 
   const tally = (select) => {
     const counts = {};
     for (const row of rows) counts[select(row)] = (counts[select(row)] ?? 0) + 1;
-    return Object.fromEntries(Object.entries(counts).sort(([a], [b]) => a < b ? -1 : 1));
+    return Object.fromEntries(Object.entries(counts).sort(([a], [b]) => (a < b ? -1 : 1)));
   };
 
   // Actual contradictions and generator/test-shape gaps want issues. Ordinary
@@ -336,11 +356,16 @@ async function main() {
     evidence: {
       runtime: report.evidenceBoundary ?? null,
       runtimeCurrent: runtimeEvidenceCurrent,
-      ...(!runtimeEvidenceCurrent ? { runtimeNotApplied: "report revision/plan digest/inputs/target/profile do not match the current generated plan" } : {}),
+      ...(!runtimeEvidenceCurrent
+        ? {
+            runtimeNotApplied:
+              "report revision/plan digest/inputs/target/profile do not match the current generated plan",
+          }
+        : {}),
       planTarget: report.target ?? null,
       runtimeTarget: report.executionTarget ?? report.target ?? null,
       runtimeProfile: report.runtimeProfile ?? null,
-      registrationTargets: Object.values(registration.targets ?? {}).map((target) => target.id)
+      registrationTargets: Object.values(registration.targets ?? {}).map((target) => target.id),
     },
     routeCount: rows.length,
     statusCounts: tally((row) => row.status),
@@ -356,11 +381,32 @@ async function main() {
       return Object.fromEntries(Object.entries(counts).sort(([, a], [, b]) => b - a));
     })(),
     arityDisagreementCount: rows.filter(({ arityDisagreement: value }) => value).length,
-    wantsIssue: wantsIssue.map(({ id, luaName, status, disposition, mismatch, notExecutedHere, registration, declaredAt, annotation, issue }) =>
-      ({ id, luaName, status, ...(disposition ? { disposition } : {}), ...(mismatch ? { mismatch } : {}),
-         ...(notExecutedHere ? { notExecutedHere } : {}), registration, ...(declaredAt ? { declaredAt } : {}),
-         annotation, issue })),
-    routes: rows
+    wantsIssue: wantsIssue.map(
+      ({
+        id,
+        luaName,
+        status,
+        disposition,
+        mismatch,
+        notExecutedHere,
+        registration,
+        declaredAt,
+        annotation,
+        issue,
+      }) => ({
+        id,
+        luaName,
+        status,
+        ...(disposition ? { disposition } : {}),
+        ...(mismatch ? { mismatch } : {}),
+        ...(notExecutedHere ? { notExecutedHere } : {}),
+        registration,
+        ...(declaredAt ? { declaredAt } : {}),
+        annotation,
+        issue,
+      }),
+    ),
+    routes: rows,
   };
 
   const serialized = `${JSON.stringify(artifact, null, 2)}\n`;
@@ -373,19 +419,37 @@ async function main() {
     await writeFile(outputPath, serialized);
   }
 
-  console.log(`${check ? "Verified" : "Generated"} route verification for ${rows.length} documented routes at ${ir.defoldRevision}:`);
-  console.log(`  ${Object.entries(artifact.statusCounts).map(([k, v]) => `${v} ${k}`).join(", ")}`);
-  console.log(`  registration: ${Object.entries(artifact.registrationCounts).map(([k, v]) => `${v} ${k}`).join(", ")}`);
+  console.log(
+    `${check ? "Verified" : "Generated"} route verification for ${rows.length} documented routes at ${ir.defoldRevision}:`,
+  );
+  console.log(
+    `  ${Object.entries(artifact.statusCounts)
+      .map(([k, v]) => `${v} ${k}`)
+      .join(", ")}`,
+  );
+  console.log(
+    `  registration: ${Object.entries(artifact.registrationCounts)
+      .map(([k, v]) => `${v} ${k}`)
+      .join(", ")}`,
+  );
   if (Object.keys(artifact.harnessCoverageGaps).length) {
     const total = Object.values(artifact.harnessCoverageGaps).reduce((sum, value) => sum + value, 0);
     console.log(`  our harness has not executed ${total} of them here (our queue, not a caveat on the API):`);
-    console.log(`    ${Object.entries(artifact.harnessCoverageGaps).map(([k, v]) => `${v} ${k}`).join(", ")}`);
+    console.log(
+      `    ${Object.entries(artifact.harnessCoverageGaps)
+        .map(([k, v]) => `${v} ${k}`)
+        .join(", ")}`,
+    );
   }
-  console.log(`  ${artifact.arityDisagreementCount} route(s) where the documented arity and the parsed C implementation disagree (reported, not a verdict)`);
+  console.log(
+    `  ${artifact.arityDisagreementCount} route(s) where the documented arity and the parsed C implementation disagree (reported, not a verdict)`,
+  );
   if (wantsIssue.length) {
     console.log(`  ${wantsIssue.length} source/runtime contradiction route(s) want an issue:`);
     for (const row of wantsIssue.slice(0, 25)) {
-      console.log(`    ${row.luaName} - ${row.status}${row.disposition ? ` (${row.disposition})` : ""}, ${row.registration}${row.declaredAt ? ` at ${row.declaredAt}` : ""}`);
+      console.log(
+        `    ${row.luaName} - ${row.status}${row.disposition ? ` (${row.disposition})` : ""}, ${row.registration}${row.declaredAt ? ` at ${row.declaredAt}` : ""}`,
+      );
     }
     if (wantsIssue.length > 25) console.log(`    ... and ${wantsIssue.length - 25} more`);
   }

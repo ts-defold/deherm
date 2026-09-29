@@ -11,7 +11,7 @@ import {
   DERIVED_REVISION_ENV,
   assertReviewedRevision,
   declaredDerivation,
-  observeReviewedSource
+  observeReviewedSource,
 } from "../scripts/lib/reviewed-revision.mjs";
 import {
   HOLDS,
@@ -20,17 +20,17 @@ import {
   VOID,
   classifyReviewedSource,
   readAudit,
-  renderAuditSummary
+  renderAuditSummary,
 } from "../scripts/lib/revision-audit.mjs";
 import { auditReviewedEvidence, evidencePath, reviewedClaims } from "../scripts/lib/reviewed-evidence.mjs";
 import { crossRevisionGenerationSteps } from "../scripts/check-cross-revision-derivation.mjs";
 import { validateRevisionMatrix } from "../scripts/check-defold-revision-matrix.mjs";
-import {
-  documentedSurface,
-  resolveDocumentedDuplication
-} from "../scripts/lib/documented-route-duplication.mjs";
+import { documentedSurface, resolveDocumentedDuplication } from "../scripts/lib/documented-route-duplication.mjs";
 import { targetEnvironment } from "../scripts/generate-dmsdk-target-conditionals.mjs";
-import { classifyPublicSdkRecipe, selectEndianRoundTripRecipes } from "../scripts/generate-dmsdk-universal-bindings.mjs";
+import {
+  classifyPublicSdkRecipe,
+  selectEndianRoundTripRecipes,
+} from "../scripts/generate-dmsdk-universal-bindings.mjs";
 import { buildApiTrees } from "../packages/compiler/src/sdk/script-sdk.mjs";
 import { dmSdkGenerationSteps } from "../scripts/lib/dmsdk-generator-pipeline.mjs";
 import { scriptGenerationSteps } from "../scripts/lib/script-generator-pipeline.mjs";
@@ -42,7 +42,7 @@ import {
   materializeWorkspace,
   ownedArtifactPaths,
   revisionSupportSteps,
-  surfaceFingerprint
+  surfaceFingerprint,
 } from "../scripts/derive-revision.mjs";
 
 const repositoryRoot = path.resolve(import.meta.dirname, "..");
@@ -50,15 +50,27 @@ const pinned = "7f0f554f41f9dce1e0ddff99bf08200657d1ee05";
 const other = "0123456789abcdef0123456789abcdef01234567";
 
 test("the historical matrix is immutable, unique, and data-driven", async () => {
-  const manifest = validateRevisionMatrix(JSON.parse(await readFile(path.join(
-    repositoryRoot, "packages", "bindings", "probes", "defold-revision-matrix.json"
-  ), "utf8")));
-  assert.deepEqual(manifest.lanes.map(({ id }) => id), ["current", "1.13.1", "1.12.0", "1.11.0"]);
+  const manifest = validateRevisionMatrix(
+    JSON.parse(
+      await readFile(
+        path.join(repositoryRoot, "packages", "bindings", "probes", "defold-revision-matrix.json"),
+        "utf8",
+      ),
+    ),
+  );
+  assert.deepEqual(
+    manifest.lanes.map(({ id }) => id),
+    ["current", "1.13.1", "1.12.0", "1.11.0"],
+  );
   assert.equal(manifest.lanes.filter(({ cadence }) => cadence === "blocking").length, 2);
-  assert.throws(() => validateRevisionMatrix({
-    ...manifest,
-    lanes: [...manifest.lanes, { ...manifest.lanes[0], id: "duplicate-revision" }]
-  }), /Invalid or duplicate/u);
+  assert.throws(
+    () =>
+      validateRevisionMatrix({
+        ...manifest,
+        lanes: [...manifest.lanes, { ...manifest.lanes[0], id: "duplicate-revision" }],
+      }),
+    /Invalid or duplicate/u,
+  );
 });
 
 test("historical editor documentation cannot shadow a game-runtime route", () => {
@@ -66,19 +78,20 @@ test("historical editor documentation cannot shadow a game-runtime route", () =>
   assert.equal(documentedSurface("doc/editor.apidoc_doc.lua"), "editor");
   assert.equal(documentedSurface("doc/scripts-script_http.cpp_doc.lua"), "game-runtime");
   const runtime = { source: "doc/scripts-script_http.cpp_doc.lua", line: 56 };
-  assert.deepEqual(resolveDocumentedDuplication("http.request", [
-    { source: "doc/editor_doc.lua", line: 640 }, runtime
-  ]), { route: runtime, reason: "editor-surface", variants: [], overloads: [] });
+  assert.deepEqual(
+    resolveDocumentedDuplication("http.request", [{ source: "doc/editor_doc.lua", line: 640 }, runtime]),
+    { route: runtime, reason: "editor-surface", variants: [], overloads: [] },
+  );
 });
 
 test("the historical Emscripten JS target is modeled without inventing Wasm", async () => {
-  const macros = JSON.parse(await readFile(path.join(
-    repositoryRoot, "packages", "bindings", "overrides", "dmsdk-target-macros.json"
-  ), "utf8"));
+  const macros = JSON.parse(
+    await readFile(path.join(repositoryRoot, "packages", "bindings", "overrides", "dmsdk-target-macros.json"), "utf8"),
+  );
   const environment = targetEnvironment({
     macros,
     platforms: { common: {}, web: {}, "js-web": {} },
-    target: { target: "js-web", architecture: "js", group: "web" }
+    target: { target: "js-web", architecture: "js", group: "web" },
   });
   assert.equal(environment.defined.get("__EMSCRIPTEN__"), "1");
   assert.equal(environment.defined.get("__SIZEOF_POINTER__"), "4");
@@ -90,15 +103,18 @@ test("an absent revision-local endian demo never blocks the universal catalog", 
   const shape = { abi: { parameters: [{ nativeType: "uint32_t" }] } };
   const pair = [
     { ...shape, symbol: "dmEndian::ToNetwork", declarationId: "network" },
-    { ...shape, symbol: "dmEndian::ToHost", declarationId: "host" }
+    { ...shape, symbol: "dmEndian::ToHost", declarationId: "host" },
   ];
-  assert.deepEqual(selectEndianRoundTripRecipes(pair).map(({ declarationId }) => declarationId), ["network", "host"]);
+  assert.deepEqual(
+    selectEndianRoundTripRecipes(pair).map(({ declarationId }) => declarationId),
+    ["network", "host"],
+  );
 });
 
 test("historical empty defold_api marker classes do not become invalid TypeScript namespaces", () => {
   const trees = buildApiTrees({
     functions: [],
-    classes: [{ name: "defold_api.", fields: [], description: "" }]
+    classes: [{ name: "defold_api.", fields: [], description: "" }],
   });
   assert.equal(trees.has(""), false);
   assert.equal(trees.size, 0);
@@ -107,30 +123,44 @@ test("historical empty defold_api marker classes do not become invalid TypeScrip
 test("public SDK facts distinguish comments, declarations, and incomplete constructor receivers", () => {
   const direct = { invocation: { kind: "direct-function", nativeSymbol: "TextLayoutFree", member: null } };
   assert.deepEqual(classifyPublicSdkRecipe(direct, "/* call TextLayoutFree() */"), {
-    callable: false, reason: "public-sdk-declaration-absent"
+    callable: false,
+    reason: "public-sdk-declaration-absent",
   });
   assert.deepEqual(classifyPublicSdkRecipe(direct, "void TextLayoutFree(HTextLayout value);"), {
-    callable: true, reason: "public-sdk-declaration-visible"
+    callable: true,
+    reason: "public-sdk-declaration-visible",
   });
   assert.deepEqual(classifyPublicSdkRecipe(direct, "void OtherTextLayoutFree();"), {
-    callable: false, reason: "public-sdk-declaration-absent"
+    callable: false,
+    reason: "public-sdk-declaration-absent",
   });
-  const constructor = { invocation: {
-    kind: "placement-constructor", nativeSymbol: "dmGameObject::PropertyOptions::PropertyOptions",
-    member: "PropertyOptions", receiver: { nativeType: "dmGameObject::PropertyOptions" }
-  } };
+  const constructor = {
+    invocation: {
+      kind: "placement-constructor",
+      nativeSymbol: "dmGameObject::PropertyOptions::PropertyOptions",
+      member: "PropertyOptions",
+      receiver: { nativeType: "dmGameObject::PropertyOptions" },
+    },
+  };
   assert.deepEqual(classifyPublicSdkRecipe(constructor, "typedef struct PropertyOptions* HPropertyOptions;"), {
-    callable: false, reason: "public-sdk-declaration-absent"
+    callable: false,
+    reason: "public-sdk-declaration-absent",
   });
   assert.deepEqual(classifyPublicSdkRecipe(constructor, "struct PropertyOptions { PropertyOptions(); };"), {
-    callable: true, reason: "public-sdk-declaration-visible"
+    callable: true,
+    reason: "public-sdk-declaration-visible",
   });
-  const destructor = { invocation: {
-    kind: "explicit-destructor", nativeSymbol: "dmMutex::ScopedLock::~ScopedLock",
-    member: "~ScopedLock", receiver: { nativeType: "dmMutex::ScopedLock" }
-  } };
+  const destructor = {
+    invocation: {
+      kind: "explicit-destructor",
+      nativeSymbol: "dmMutex::ScopedLock::~ScopedLock",
+      member: "~ScopedLock",
+      receiver: { nativeType: "dmMutex::ScopedLock" },
+    },
+  };
   assert.deepEqual(classifyPublicSdkRecipe(destructor, "struct ScopedLock { ~ScopedLock(); };"), {
-    callable: true, reason: "public-sdk-declaration-visible"
+    callable: true,
+    reason: "public-sdk-declaration-visible",
   });
 });
 
@@ -144,7 +174,7 @@ test("a review that names the revision being generated is accepted unchanged", (
 test("a review that names another revision is refused, naming both revisions", () => {
   assert.throws(
     () => assertReviewedRevision({ input: "reviewed.json", reviewed: pinned, derived: other, env: {} }),
-    (error) => error.message.includes(pinned) && error.message.includes(other)
+    (error) => error.message.includes(pinned) && error.message.includes(other),
   );
 });
 
@@ -161,11 +191,20 @@ test("a declared derivation may carry a review, and the carry is recorded", asyn
   await writeFile(ledger, "");
   const env = { [DERIVED_REVISION_ENV]: other, [CARRIED_REVIEW_LEDGER_ENV]: ledger };
   const result = assertReviewedRevision({
-    input: "reviewed.json", reviewed: pinned, derived: other, detail: "the reviewed census", env
+    input: "reviewed.json",
+    reviewed: pinned,
+    derived: other,
+    detail: "the reviewed census",
+    env,
   });
   assert.equal(result.carried, true);
-  const recorded = (await readFile(ledger, "utf8")).trim().split("\n").map((line) => JSON.parse(line));
-  assert.deepEqual(recorded, [{ input: "reviewed.json", reviewed: pinned, derived: other, detail: "the reviewed census" }]);
+  const recorded = (await readFile(ledger, "utf8"))
+    .trim()
+    .split("\n")
+    .map((line) => JSON.parse(line));
+  assert.deepEqual(recorded, [
+    { input: "reviewed.json", reviewed: pinned, derived: other, detail: "the reviewed census" },
+  ]);
 });
 
 test("a carry with nowhere to be recorded still happens - reporting is not a gate", () => {
@@ -185,7 +224,9 @@ test("a malformed derivation declaration is an error, never a quiet 'not derivin
 });
 
 test("a non-revision on either side is refused before anything is compared", () => {
-  assert.throws(() => assertReviewedRevision({ input: "reviewed.json", reviewed: pinned, derived: "unknown", env: {} }));
+  assert.throws(() =>
+    assertReviewedRevision({ input: "reviewed.json", reviewed: pinned, derived: "unknown", env: {} }),
+  );
   assert.throws(() => assertReviewedRevision({ input: "reviewed.json", reviewed: null, derived: pinned, env: {} }));
 });
 
@@ -198,7 +239,7 @@ test("a non-revision on either side is refused before anything is compared", () 
 const anchored = {
   source: "engine/a.cpp",
   sha256: createHash("sha256").update("int f() { return GUARD; }").digest("hex"),
-  anchors: ["GUARD"]
+  anchors: ["GUARD"],
 };
 
 test("an unchanged source holds", () => {
@@ -233,8 +274,13 @@ test("observing a source records an audit line and never throws", async () => {
   const audit = path.join(directory, "audit.ndjson");
   const env = { [REVISION_AUDIT_ENV]: audit };
   const verdict = observeReviewedSource({
-    input: "overrides/x.json", id: "a", source: "int f() { return 0; }",
-    evidence: anchored, reviewed: pinned, derived: other, env
+    input: "overrides/x.json",
+    id: "a",
+    source: "int f() { return 0; }",
+    evidence: anchored,
+    reviewed: pinned,
+    derived: other,
+    env,
   });
   assert.equal(verdict.status, VOID);
   const rows = readAudit(audit);
@@ -248,8 +294,13 @@ test("an audit with nowhere to be written loses the report, not the run", () => 
   // Same rule as the carry ledger above, and for the same reason.
   const env = { [REVISION_AUDIT_ENV]: "/dev/null/not-a-directory/audit.ndjson" };
   const verdict = observeReviewedSource({
-    input: "overrides/x.json", id: "a", source: "int f() { return GUARD; }",
-    evidence: anchored, reviewed: pinned, derived: pinned, env
+    input: "overrides/x.json",
+    id: "a",
+    source: "int f() { return GUARD; }",
+    evidence: anchored,
+    reviewed: pinned,
+    derived: pinned,
+    env,
   });
   assert.equal(verdict.status, HOLDS);
 });
@@ -260,7 +311,7 @@ test("repeated observations of one claim count once in a summary", () => {
   const rows = [
     { input: "overrides/x.json", id: "a", status: MOVED, source: "engine/a.cpp" },
     { input: "overrides/x.json", id: "a", status: MOVED, source: "engine/a.cpp" },
-    { input: "overrides/x.json", id: "b", status: VOID, source: "engine/b.cpp", anchorsLost: ["GONE"] }
+    { input: "overrides/x.json", id: "b", status: VOID, source: "engine/b.cpp", anchorsLost: ["GONE"] },
   ];
   const summary = renderAuditSummary(rows, { revision: other });
   assert.match(summary, /\| moved \| 2 \|/);
@@ -274,12 +325,15 @@ test("a reviewed claim is any sha256 beside a path or a source, wherever it sits
   const claims = reviewedClaims("overrides/x.json", {
     sourceEvidence: [{ id: "a", source: "engine/a.cpp", sha256: "a".repeat(64), anchors: ["needle"] }],
     manifests: { profile: { path: "editor/b.appmanifest", sha256: "b".repeat(64) } },
-    unrelated: { sha256: "c".repeat(64) }
+    unrelated: { sha256: "c".repeat(64) },
   });
-  assert.deepEqual(claims.map(({ file, id }) => [id, file]), [
-    ["a", "upstream/defold/engine/a.cpp"],
-    [null, "upstream/defold/editor/b.appmanifest"]
-  ]);
+  assert.deepEqual(
+    claims.map(({ file, id }) => [id, file]),
+    [
+      ["a", "upstream/defold/engine/a.cpp"],
+      [null, "upstream/defold/editor/b.appmanifest"],
+    ],
+  );
 });
 
 test("an evidence path may not escape the checkout", () => {
@@ -299,12 +353,15 @@ test("a moved source is reported with the anchors that survived it", async () =>
   await mkdir(path.join(workspace, "packages/bindings/overrides"), { recursive: true });
   await mkdir(path.join(workspace, "upstream/defold/engine"), { recursive: true });
   await writeFile(path.join(workspace, "upstream/defold/engine/a.cpp"), "kept anchor, moved surroundings\n");
-  await writeFile(path.join(workspace, "packages/bindings/overrides/reviewed.json"), JSON.stringify({
-    sourceEvidence: [
-      { id: "held", source: "engine/a.cpp", sha256: "0".repeat(64), anchors: ["kept anchor", "gone"] },
-      { id: "missing", source: "engine/absent.cpp", sha256: "1".repeat(64), anchors: [] }
-    ]
-  }));
+  await writeFile(
+    path.join(workspace, "packages/bindings/overrides/reviewed.json"),
+    JSON.stringify({
+      sourceEvidence: [
+        { id: "held", source: "engine/a.cpp", sha256: "0".repeat(64), anchors: ["kept anchor", "gone"] },
+        { id: "missing", source: "engine/absent.cpp", sha256: "1".repeat(64), anchors: [] },
+      ],
+    }),
+  );
   const audit = await auditReviewedEvidence(workspace);
   assert.equal(audit.drifted.length, 2);
   const [content, absent] = audit.drifted;
@@ -324,30 +381,41 @@ test("the derivation chain is declared once, and every step is a repository scri
   }
   const last = derivationSteps.at(-1);
   assert.deepEqual([last.script, last.args], ["scripts/generate-api-policy.mjs", ["--check"]]);
-  assert.ok(derivationSteps.some(({ script }) => script === "scripts/generate-dmsdk-runtime.mjs"),
-    "revision derivation must regenerate the complete dmSDK binding family");
+  assert.ok(
+    derivationSteps.some(({ script }) => script === "scripts/generate-dmsdk-runtime.mjs"),
+    "revision derivation must regenerate the complete dmSDK binding family",
+  );
   const sdk = derivationSteps.findIndex(({ script }) => script === "scripts/generate-dmsdk-sdk.mjs");
   const targets = derivationSteps.findIndex(({ script }) => script === "scripts/generate-defold-bundle-targets.mjs");
   const symbols = derivationSteps.findIndex(({ script }) => script === "scripts/generate-dmsdk-symbol-evidence.mjs");
   const dmsdkRuntime = derivationSteps.findIndex(({ script }) => script === "scripts/generate-dmsdk-runtime.mjs");
-  assert.ok(targets >= 0 && sdk >= 0 && symbols > targets && symbols > sdk && dmsdkRuntime > symbols,
-    "revision-derived dmSDK consumers must run after symbol evidence is measured from that revision's SDK archive");
+  assert.ok(
+    targets >= 0 && sdk >= 0 && symbols > targets && symbols > sdk && dmsdkRuntime > symbols,
+    "revision-derived dmSDK consumers must run after symbol evidence is measured from that revision's SDK archive",
+  );
   const plan = derivationSteps.findIndex(({ script }) => script === "scripts/ensure-binding-lowering-plan.mjs");
   const typed = derivationSteps.findIndex(({ script }) => script === "scripts/generate-typed-native-bridge.mjs");
-  const recording = derivationSteps.findIndex(({ script }) => script === "scripts/generate-script-recording-engine.mjs");
-  assert.ok(plan >= 0 && typed > plan && recording > plan,
-    "revision-derived consumers must run after the canonical lowering plan is rebuilt");
+  const recording = derivationSteps.findIndex(
+    ({ script }) => script === "scripts/generate-script-recording-engine.mjs",
+  );
+  assert.ok(
+    plan >= 0 && typed > plan && recording > plan,
+    "revision-derived consumers must run after the canonical lowering plan is rebuilt",
+  );
 });
 
 test("the historical cross-revision ratchet covers both complete binding pipelines", () => {
   const expected = [
     ...scriptGenerationSteps.map(({ script }) => `script:${script}`),
-    ...dmSdkGenerationSteps.map(({ script }) => `dmsdk:${script}`)
+    ...dmSdkGenerationSteps.map(({ script }) => `dmsdk:${script}`),
   ];
   const observed = crossRevisionGenerationSteps.map(({ surface, script }) => `${surface}:${script}`);
   assert.deepEqual(observed, expected);
-  assert.equal(new Set(observed).size, observed.length,
-    "a generator may not be counted twice by the cross-revision ratchet");
+  assert.equal(
+    new Set(observed).size,
+    observed.length,
+    "a generator may not be counted twice by the cross-revision ratchet",
+  );
 });
 
 test("the final script SDK pass follows revision-local profiles before downstream consumers", () => {
@@ -356,8 +424,10 @@ test("the final script SDK pass follows revision-local profiles before downstrea
   const sdk = index("scripts/generate-script-sdk.mjs");
   const projection = index("scripts/generate-script-projection-ir.mjs");
   const typedNative = index("scripts/generate-typed-native-bridge.mjs");
-  assert.ok(profiles >= 0 && sdk > profiles && projection > sdk && typedNative > projection,
-    "revision-local profile data must replace the semantic bootstrap before projection and typed-native emission");
+  assert.ok(
+    profiles >= 0 && sdk > profiles && projection > sdk && typedNative > projection,
+    "revision-local profile data must replace the semantic bootstrap before projection and typed-native emission",
+  );
 });
 
 test("the engine slice carries the vectormath package the dmSDK importer needs", () => {
@@ -371,7 +441,7 @@ test("the engine slice carries the vectormath package the dmSDK importer needs",
 
 test("every derived revision hydrates its own digest-pinned Defold SDK before parsing", () => {
   assert.deepEqual(revisionSupportSteps, [
-    { runtime: "bash", script: "scripts/bootstrap-upstreams.sh", args: ["defold-sdk"] }
+    { runtime: "bash", script: "scripts/bootstrap-upstreams.sh", args: ["defold-sdk"] },
   ]);
 });
 
@@ -379,7 +449,10 @@ test("Defold SDK bootstrap derives and requires an archive extraction manifest",
   const source = await readFile(path.join(repositoryRoot, "scripts/bootstrap-upstreams.sh"), "utf8");
   assert.match(source, /sdk_manifest="\$sdk_root\/\.deherm-sdk-extraction-manifest\.json"/u);
   assert.match(source, /\[\[ -f "\$sdk_manifest" \]\][\s\S]*defold-sdk-extraction-manifest\.mjs" check/u);
-  assert.match(source, /unzip -q "\$sdk_archive" -d "\$sdk_parent"\s+[\s\S]*defold-sdk-extraction-manifest\.mjs" create/u);
+  assert.match(
+    source,
+    /unzip -q "\$sdk_archive" -d "\$sdk_parent"\s+[\s\S]*defold-sdk-extraction-manifest\.mjs" create/u,
+  );
 });
 
 test("package-owned dmSDK scalar emission resolves SDK evidence from the derived revision", async () => {
@@ -430,11 +503,15 @@ test("the surface fingerprint changes when a derivable file changes, and is othe
   const [sample] = [...mutated.files.keys()];
   mutated.files.set(sample, "0".repeat(64));
   mutated.files.set("packages/bindings/generated/invented.json", "1".repeat(64));
-  assert.deepEqual(fingerprintDifference(first, mutated), [
-    { file: "packages/bindings/generated/invented.json", disposition: "added" },
-    { file: sample, disposition: "changed" }
-  ].sort((left, right) => left.file < right.file ? -1 : 1));
-  assert.deepEqual(fingerprintDifference(mutated, first).filter(({ disposition }) => disposition === "removed"), [
-    { file: "packages/bindings/generated/invented.json", disposition: "removed" }
-  ]);
+  assert.deepEqual(
+    fingerprintDifference(first, mutated),
+    [
+      { file: "packages/bindings/generated/invented.json", disposition: "added" },
+      { file: sample, disposition: "changed" },
+    ].sort((left, right) => (left.file < right.file ? -1 : 1)),
+  );
+  assert.deepEqual(
+    fingerprintDifference(mutated, first).filter(({ disposition }) => disposition === "removed"),
+    [{ file: "packages/bindings/generated/invented.json", disposition: "removed" }],
+  );
 });

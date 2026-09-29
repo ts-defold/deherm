@@ -1,17 +1,10 @@
 import { createHash } from "node:crypto";
 
-import {
-  directPrimitiveScalarPattern,
-  enumValuePattern,
-  namedScalarPattern,
-} from "./dmsdk-pattern-catalog.mjs";
-import {
-  DMSDK_UNIVERSAL_FALLBACK_PATTERN,
-  selectDmSdkPattern,
-} from "./dmsdk-pattern-selector.mjs";
+import { directPrimitiveScalarPattern, enumValuePattern, namedScalarPattern } from "./dmsdk-pattern-catalog.mjs";
+import { DMSDK_UNIVERSAL_FALLBACK_PATTERN, selectDmSdkPattern } from "./dmsdk-pattern-selector.mjs";
 
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
-const compareCodeUnits = (left, right) => left < right ? -1 : left > right ? 1 : 0;
+const compareCodeUnits = (left, right) => (left < right ? -1 : left > right ? 1 : 0);
 const leaf = (value) => String(value).split("::").at(-1);
 
 const DIRECT_PRIMITIVE_TYPES = new Set(["void", "bool", "uint16_t", "uint32_t", "uint64_t", "float"]);
@@ -69,7 +62,9 @@ export function inferScalarThunkSemantics(declaration, row) {
   const leafName = leaf(declaration.name);
   const description = `${declaration.description ?? ""} ${declaration.returnDescription ?? ""}`.trim();
   const lifecycleOperation =
-    declaration.parameters.length === 0 && declaration.returns === "void" && /(?:initialize|finalize)$/iu.test(leafName);
+    declaration.parameters.length === 0 &&
+    declaration.returns === "void" &&
+    /(?:initialize|finalize)$/iu.test(leafName);
   const mayBlock = /(?:^|\b)(?:sleep|block(?:s|ing)?)(?:\b|$)/iu.test(`${leafName} ${description}`);
   return {
     semanticTokens: ["direct-native-primitive", "fixed-width-cell-codec", "synchronous-noescape"],
@@ -163,10 +158,19 @@ function validateInputs({ ir, shapes, policies, texts }) {
   assert(shapes?.schemaVersion === 1 && Array.isArray(shapes.rows), "value plan has invalid ABI shapes");
   assert(ir.defoldRevision === shapes.defoldRevision, "value plan IR and ABI-shape revisions differ");
   assert(shapes.sourceHashes?.ir === sha256(texts.ir), "value plan ABI shapes do not authenticate the IR");
-  assert(new Set(ir.declarations.map(({ id }) => id)).size === ir.declarations.length, "value plan IR has duplicate ids");
+  assert(
+    new Set(ir.declarations.map(({ id }) => id)).size === ir.declarations.length,
+    "value plan IR has duplicate ids",
+  );
   assert(new Set(shapes.rows.map(({ id }) => id)).size === shapes.rows.length, "value plan shapes have duplicate ids");
-  assert(policies.scalar?.schemaVersion === 1 && policies.scalar.family === "scalar-thunk", "value plan scalar policy is invalid");
-  assert(policies.enumValue?.schemaVersion === 2 && policies.enumValue.family === "enum-value", "value plan enum policy is invalid");
+  assert(
+    policies.scalar?.schemaVersion === 1 && policies.scalar.family === "scalar-thunk",
+    "value plan scalar policy is invalid",
+  );
+  assert(
+    policies.enumValue?.schemaVersion === 2 && policies.enumValue.family === "enum-value",
+    "value plan enum policy is invalid",
+  );
   assert(
     policies.namedScalar?.schemaVersion === 3 && policies.namedScalar.family === "named-scalar",
     "value plan named-scalar policy is invalid",
@@ -191,8 +195,9 @@ export function buildDmSdkValuePlan({ ir, shapes, policies, texts }) {
       patternId: family.pattern.id,
       semantics: family.analyze({ declaration, candidate, aliasIndex }),
     }));
-    const semanticTokens = [...new Set(analyses.flatMap(({ semantics }) => semantics?.semanticTokens ?? []))]
-      .sort(compareCodeUnits);
+    const semanticTokens = [...new Set(analyses.flatMap(({ semantics }) => semantics?.semanticTokens ?? []))].sort(
+      compareCodeUnits,
+    );
     const decision = selectDmSdkPattern(patternFacts(candidate, semanticTokens), registry);
     const selected = analyses.find(({ patternId }) => patternId === decision.patternId) ?? null;
     decisions.push({
@@ -205,7 +210,9 @@ export function buildDmSdkValuePlan({ ir, shapes, policies, texts }) {
       cost: decision.cost,
       semanticTokens,
       semantics: selected?.semantics ?? null,
-      missingFacts: selected ? [] : analyses.filter(({ semantics }) => !semantics).map(({ family }) => `${family}-semantic-facts`),
+      missingFacts: selected
+        ? []
+        : analyses.filter(({ semantics }) => !semantics).map(({ family }) => `${family}-semantic-facts`),
       structuralCandidates: analyses.map(({ patternId }) => patternId).sort(compareCodeUnits),
       trace: decision.trace,
     });
@@ -243,26 +250,49 @@ export function indexDmSdkValuePlan(plan, { revision, sourceHashes } = {}) {
   assert(registry.has(DMSDK_UNIVERSAL_FALLBACK_PATTERN.id), "value plan has no universal fallback");
   let previousId = "";
   for (const decision of plan.decisions) {
-    assert(previousId === "" || compareCodeUnits(previousId, decision.declarationId) < 0, "value plan decisions are not uniquely sorted");
+    assert(
+      previousId === "" || compareCodeUnits(previousId, decision.declarationId) < 0,
+      "value plan decisions are not uniquely sorted",
+    );
     previousId = decision.declarationId;
     const pattern = registry.get(decision.patternId);
     assert(pattern, `${decision.declarationId}: value decision names an unknown pattern`);
-    assert(decision.family === pattern.family && decision.emitter === pattern.emitter, `${decision.declarationId}: value decision owner differs`);
-    assert(decision.fallback === pattern.fallback, `${decision.declarationId}: value decision fallback differs`);
-    assert(decision.priority === pattern.priority && decision.cost === pattern.cost, `${decision.declarationId}: value decision rank differs`);
     assert(
-      JSON.stringify(decision.structuralCandidates) === JSON.stringify([...new Set(decision.structuralCandidates)].sort(compareCodeUnits)),
+      decision.family === pattern.family && decision.emitter === pattern.emitter,
+      `${decision.declarationId}: value decision owner differs`,
+    );
+    assert(decision.fallback === pattern.fallback, `${decision.declarationId}: value decision fallback differs`);
+    assert(
+      decision.priority === pattern.priority && decision.cost === pattern.cost,
+      `${decision.declarationId}: value decision rank differs`,
+    );
+    assert(
+      JSON.stringify(decision.structuralCandidates) ===
+        JSON.stringify([...new Set(decision.structuralCandidates)].sort(compareCodeUnits)),
       `${decision.declarationId}: value structural candidates are not unique and sorted`,
     );
     assert(Array.isArray(decision.trace), `${decision.declarationId}: value decision trace is missing`);
-    if (decision.fallback) assert(decision.semantics === null, `${decision.declarationId}: value fallback carries semantics`);
+    if (decision.fallback)
+      assert(decision.semantics === null, `${decision.declarationId}: value fallback carries semantics`);
     else {
-      assert(decision.structuralCandidates.includes(decision.patternId), `${decision.declarationId}: selected value pattern is not structural`);
-      assert(decision.semantics && typeof decision.semantics === "object", `${decision.declarationId}: selected value semantics are missing`);
+      assert(
+        decision.structuralCandidates.includes(decision.patternId),
+        `${decision.declarationId}: selected value pattern is not structural`,
+      );
+      assert(
+        decision.semantics && typeof decision.semantics === "object",
+        `${decision.declarationId}: selected value semantics are missing`,
+      );
     }
   }
   assert(plan.coverage?.structurallyRelevant === plan.decisions.length, "value plan coverage total differs");
-  assert(plan.coverage.selected === plan.decisions.filter(({ fallback }) => !fallback).length, "value plan selected count differs");
-  assert(plan.coverage.universalFallback === plan.decisions.filter(({ fallback }) => fallback).length, "value plan fallback count differs");
+  assert(
+    plan.coverage.selected === plan.decisions.filter(({ fallback }) => !fallback).length,
+    "value plan selected count differs",
+  );
+  assert(
+    plan.coverage.universalFallback === plan.decisions.filter(({ fallback }) => fallback).length,
+    "value plan fallback count differs",
+  );
   return new Map(plan.decisions.map((decision) => [decision.declarationId, decision]));
 }

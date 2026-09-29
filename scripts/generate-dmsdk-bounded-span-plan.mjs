@@ -23,9 +23,11 @@ const sources = Object.freeze({
 const output = "packages/bindings/generated/defold-dmsdk-bounded-span-plan.json";
 
 export async function generateDmSdkBoundedSpanPlan({ root = repositoryRoot, check = false } = {}) {
-  const texts = Object.fromEntries(await Promise.all(
-    Object.entries(sources).map(async ([key, source]) => [key, await readFile(resolve(root, source), "utf8")]),
-  ));
+  const texts = Object.fromEntries(
+    await Promise.all(
+      Object.entries(sources).map(async ([key, source]) => [key, await readFile(resolve(root, source), "utf8")]),
+    ),
+  );
   const plan = buildDmSdkBoundedSpanPlan({
     ir: JSON.parse(texts.ir),
     shapes: JSON.parse(texts.shapes),
@@ -43,7 +45,7 @@ export async function generateDmSdkBoundedSpanPlan({ root = repositoryRoot, chec
   const content = `${JSON.stringify(plan, null, 2)}\n`;
   const destination = resolve(root, output);
   if (check) {
-    if (await readFile(destination, "utf8") !== content) throw new Error(`${output} is stale`);
+    if ((await readFile(destination, "utf8")) !== content) throw new Error(`${output} is stale`);
   } else {
     await mkdir(dirname(destination), { recursive: true });
     await writeFile(destination, content);

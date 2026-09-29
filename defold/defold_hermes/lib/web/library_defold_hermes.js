@@ -7,10 +7,10 @@ var LibraryDefoldHermes = {
     generations: [],
     free: [],
 
-    acquire: function(callback) {
-      if (typeof callback !== 'function') throw new TypeError('Expected a timer callback');
+    acquire: function (callback) {
+      if (typeof callback !== "function") throw new TypeError("Expected a timer callback");
       if (!this.free.length && this.functions.length >= this.capacity) {
-        throw new RangeError('Browser callback pool is exhausted');
+        throw new RangeError("Browser callback pool is exhausted");
       }
       var slot = this.free.length ? this.free.pop() : this.functions.length;
       if (this.generations[slot] === undefined) this.generations[slot] = 1;
@@ -19,15 +19,15 @@ var LibraryDefoldHermes = {
         runtime: this.runtime >>> 0,
         slot: slot >>> 0,
         generation: this.generations[slot] >>> 0,
-        type: this.type >>> 0
+        type: this.type >>> 0,
       };
     },
 
-    resolve: function(handle) {
+    resolve: function (handle) {
       return this.resolveParts(handle.runtime, handle.slot, handle.generation, handle.type);
     },
 
-    resolveParts: function(runtime, slot, generation, type) {
+    resolveParts: function (runtime, slot, generation, type) {
       runtime = runtime >>> 0;
       slot = slot >>> 0;
       generation = generation >>> 0;
@@ -38,11 +38,11 @@ var LibraryDefoldHermes = {
       return this.functions[slot] || null;
     },
 
-    release: function(handle) {
+    release: function (handle) {
       return this.releaseParts(handle.runtime, handle.slot, handle.generation, handle.type);
     },
 
-    releaseParts: function(runtime, slot, generation, type) {
+    releaseParts: function (runtime, slot, generation, type) {
       runtime = runtime >>> 0;
       slot = slot >>> 0;
       generation = generation >>> 0;
@@ -54,21 +54,21 @@ var LibraryDefoldHermes = {
       return true;
     },
 
-    reset: function() {
+    reset: function () {
       this.functions.length = 0;
       this.generations.length = 0;
       this.free.length = 0;
       this.runtime = (this.runtime + 1) >>> 0 || 1;
-    }
+    },
   },
 
   $DEFOLD_HERMES_BRIDGE__deps: [
-    '$DEFOLD_HERMES_GENERATED_MODULES',
-    '$DEFOLD_HERMES_WEB_CALLBACKS',
-    '$DEFOLD_HERMES_SCRIPT_UNIVERSAL',
-    '$DEFOLD_HERMES_COMPONENTS',
-    '$UTF8ToString',
-    '$stringToUTF8'
+    "$DEFOLD_HERMES_GENERATED_MODULES",
+    "$DEFOLD_HERMES_WEB_CALLBACKS",
+    "$DEFOLD_HERMES_SCRIPT_UNIVERSAL",
+    "$DEFOLD_HERMES_COMPONENTS",
+    "$UTF8ToString",
+    "$stringToUTF8",
   ],
   $DEFOLD_HERMES_BRIDGE: {
     app: null,
@@ -81,8 +81,8 @@ var LibraryDefoldHermes = {
     frames: 0,
     lastFrameDtMs: null,
 
-    reset: function() {
-      if (DEFOLD_HERMES_SCRIPT_UNIVERSAL && typeof DEFOLD_HERMES_SCRIPT_UNIVERSAL.dispose === 'function') {
+    reset: function () {
+      if (DEFOLD_HERMES_SCRIPT_UNIVERSAL && typeof DEFOLD_HERMES_SCRIPT_UNIVERSAL.dispose === "function") {
         DEFOLD_HERMES_SCRIPT_UNIVERSAL.dispose();
       }
       this.app = null;
@@ -99,34 +99,35 @@ var LibraryDefoldHermes = {
       DEFOLD_HERMES_WEB_CALLBACKS.reset();
     },
 
-    load: function(sourcePointer, sourceSize) {
+    load: function (sourcePointer, sourceSize) {
       var source = UTF8ToString(sourcePointer, sourceSize);
       globalThis.__defoldHostV1 = {
         version: 1,
-        runtime: 'browser',
-        log: function(level, message) {
+        runtime: "browser",
+        log: function (level, message) {
           var logger = console[level] || console.log;
-          logger.call(console, '[defold-hermes]', message);
+          logger.call(console, "[defold-hermes]", message);
         },
-        now: function() {
+        now: function () {
           return performance.now();
         },
-        request: function(channel, payload) {
-          return 'browser:' + channel + ':' + payload;
-        }
+        request: function (channel, payload) {
+          return "browser:" + channel + ":" + payload;
+        },
       };
       globalThis.__defoldModulesV1 = DEFOLD_HERMES_GENERATED_MODULES.install();
       globalThis.__defoldScriptBridgeV1 = DEFOLD_HERMES_SCRIPT_UNIVERSAL.install();
 
       try {
-        (0, eval)(source + '\n//# sourceURL=defold-hermes://app.js');
+        // oxlint-disable-next-line no-eval -- application bundles are intentionally evaluated in the Defold browser host.
+        (0, eval)(source + "\n//# sourceURL=defold-hermes://app.js");
         DEFOLD_HERMES_BRIDGE.app = globalThis.__defoldAppV1 || null;
         // A bundle registers an application lifecycle, a component registry, or
         // both. `runtime.cpp` applies exactly this rule for dynamic Hermes.
         var components = globalThis.__defoldComponentsV1;
-        var hasComponents = Boolean(components) && typeof components === 'object';
+        var hasComponents = Boolean(components) && typeof components === "object";
         if (!DEFOLD_HERMES_BRIDGE.app && !hasComponents) {
-          throw new Error('Bundle registered neither __defoldAppV1 nor __defoldComponentsV1');
+          throw new Error("Bundle registered neither __defoldAppV1 nor __defoldComponentsV1");
         }
         if (hasComponents) DEFOLD_HERMES_COMPONENTS.activate();
         DEFOLD_HERMES_BRIDGE.generation = 1;
@@ -135,9 +136,13 @@ var LibraryDefoldHermes = {
         // reload to. This is that entry point, and it is the only way in.
         globalThis.__defoldHermesDevV1 = {
           version: 1,
-          runtime: 'browser',
-          activate: function(candidate) { return DEFOLD_HERMES_BRIDGE.activate(candidate); },
-          telemetry: function() { return DEFOLD_HERMES_BRIDGE.telemetry(); }
+          runtime: "browser",
+          activate: function (candidate) {
+            return DEFOLD_HERMES_BRIDGE.activate(candidate);
+          },
+          telemetry: function () {
+            return DEFOLD_HERMES_BRIDGE.telemetry();
+          },
         };
       } catch (error) {
         DEFOLD_HERMES_BRIDGE.reset();
@@ -163,18 +168,18 @@ var LibraryDefoldHermes = {
      * registry and the fingerprint - and cannot undo arbitrary global writes a
      * failed candidate performed on its way to failing.
      */
-    activate: function(candidate) {
-      if (typeof candidate !== 'string' || !candidate) {
-        return {status: 'rejected', diagnostic: 'Candidate bundle source must be a non-empty string'};
+    activate: function (candidate) {
+      if (typeof candidate !== "string" || !candidate) {
+        return { status: "rejected", diagnostic: "Candidate bundle source must be a non-empty string" };
       }
       if (!globalThis.__defoldHostV1) {
-        return {status: 'rejected', diagnostic: 'Browser host is not loaded'};
+        return { status: "rejected", diagnostic: "Browser host is not loaded" };
       }
       var previous = {
         app: DEFOLD_HERMES_BRIDGE.app,
         registered: globalThis.__defoldAppV1,
         components: globalThis.__defoldComponentsV1,
-        fingerprint: globalThis.__DEFOLD_HERMES_BUILD_FINGERPRINT__
+        fingerprint: globalThis.__DEFOLD_HERMES_BUILD_FINGERPRINT__,
       };
       var pending = DEFOLD_HERMES_BRIDGE.generation + 1;
       var fingerprint = null;
@@ -183,26 +188,31 @@ var LibraryDefoldHermes = {
         // back after evaluation is the candidate's own. Inheriting the previous
         // one would let the host acknowledge a bundle it never ran.
         globalThis.__DEFOLD_HERMES_BUILD_FINGERPRINT__ = undefined;
-        (0, eval)(candidate + '\n//# sourceURL=defold-hermes://app.' + pending + '.js');
+        // oxlint-disable-next-line no-eval -- HMR candidates are executable bundles supplied by the local development host.
+        (0, eval)(candidate + "\n//# sourceURL=defold-hermes://app." + pending + ".js");
         var app = globalThis.__defoldAppV1 || null;
         var components = globalThis.__defoldComponentsV1;
-        var hasComponents = Boolean(components) && typeof components === 'object';
+        var hasComponents = Boolean(components) && typeof components === "object";
         if (!app && !hasComponents) {
-          throw new Error('Bundle registered neither __defoldAppV1 nor __defoldComponentsV1');
+          throw new Error("Bundle registered neither __defoldAppV1 nor __defoldComponentsV1");
         }
         var candidateFingerprint = globalThis.__DEFOLD_HERMES_BUILD_FINGERPRINT__;
-        if (typeof candidateFingerprint !== 'string' || !/^[0-9a-f]{64}$/.test(candidateFingerprint)) {
-          throw new Error('Candidate bundle carries no build fingerprint');
+        if (typeof candidateFingerprint !== "string" || !/^[0-9a-f]{64}$/.test(candidateFingerprint)) {
+          throw new Error("Candidate bundle carries no build fingerprint");
         }
         fingerprint = candidateFingerprint;
         DEFOLD_HERMES_BRIDGE.app = app;
         if (app && app.init) app.init();
-        var rebind = hasComponents
-          ? DEFOLD_HERMES_COMPONENTS.rebindAll()
-          : {rebound: 0, live: 0, failed: []};
+        var rebind = hasComponents ? DEFOLD_HERMES_COMPONENTS.rebindAll() : { rebound: 0, live: 0, failed: [] };
         if (rebind.failed.length) {
-          throw new Error('Component rebind failed: ' + rebind.failed
-            .map(function(entry) { return entry.componentId + ': ' + entry.message; }).join('; '));
+          throw new Error(
+            "Component rebind failed: " +
+              rebind.failed
+                .map(function (entry) {
+                  return entry.componentId + ": " + entry.message;
+                })
+                .join("; "),
+          );
         }
         // Accepted. The outgoing finalizer runs after the accepted candidate's
         // init, exactly as the native transaction orders it.
@@ -210,20 +220,26 @@ var LibraryDefoldHermes = {
           try {
             previous.app.final();
           } catch (failure) {
-            console.warn('[defold-hermes] previous generation finalizer failed', failure);
+            console.warn("[defold-hermes] previous generation finalizer failed", failure);
           }
         }
         DEFOLD_HERMES_BRIDGE.generation = pending;
-        console.log('[defold-hermes] DEHERM_EVENT bundle-activated fingerprint=' + fingerprint +
-          ' resource_generation=' + pending +
-          ' runtime_id=' + (DEFOLD_HERMES_COMPONENTS.revision >>> 0) + ' initial=false');
+        console.log(
+          "[defold-hermes] DEHERM_EVENT bundle-activated fingerprint=" +
+            fingerprint +
+            " resource_generation=" +
+            pending +
+            " runtime_id=" +
+            (DEFOLD_HERMES_COMPONENTS.revision >>> 0) +
+            " initial=false",
+        );
         return {
-          status: 'activated',
+          status: "activated",
           fingerprint: fingerprint,
           generation: pending,
           componentRevision: DEFOLD_HERMES_COMPONENTS.revision >>> 0,
           reboundComponents: rebind.rebound,
-          liveComponents: rebind.live
+          liveComponents: rebind.live,
         };
       } catch (error) {
         DEFOLD_HERMES_BRIDGE.app = previous.app;
@@ -231,11 +247,17 @@ var LibraryDefoldHermes = {
         globalThis.__defoldComponentsV1 = previous.components;
         globalThis.__DEFOLD_HERMES_BUILD_FINGERPRINT__ = previous.fingerprint;
         var diagnostic = error && error.message ? error.message : String(error);
-        console.error('[defold-hermes] DEHERM_EVENT bundle-rejected fingerprint=' +
-          (fingerprint || 'unavailable') + ' resource_generation=' + pending +
-          ' runtime_id=' + (DEFOLD_HERMES_COMPONENTS.revision >>> 0) + ' initial=false');
-        console.error('[defold-hermes] browser bundle generation ' + pending + ' was rejected: ' + diagnostic);
-        return {status: 'rejected', generation: pending, diagnostic: diagnostic};
+        console.error(
+          "[defold-hermes] DEHERM_EVENT bundle-rejected fingerprint=" +
+            (fingerprint || "unavailable") +
+            " resource_generation=" +
+            pending +
+            " runtime_id=" +
+            (DEFOLD_HERMES_COMPONENTS.revision >>> 0) +
+            " initial=false",
+        );
+        console.error("[defold-hermes] browser bundle generation " + pending + " was rejected: " + diagnostic);
+        return { status: "rejected", generation: pending, diagnostic: diagnostic };
       }
     },
 
@@ -249,13 +271,13 @@ var LibraryDefoldHermes = {
      * JavaScript heap, so it is reported under its own name rather than as a
      * Hermes heap.
      */
-    telemetry: function() {
+    telemetry: function () {
       var callbacks = DEFOLD_HERMES_WEB_CALLBACKS;
       var liveCallbacks = 0;
       for (var index = 0; index < callbacks.functions.length; ++index) {
         if (callbacks.functions[index]) ++liveCallbacks;
       }
-      var memory = (typeof performance !== 'undefined' && performance.memory) || null;
+      var memory = (typeof performance !== "undefined" && performance.memory) || null;
       var componentsLoaded = Boolean(DEFOLD_HERMES_COMPONENTS.slots);
       // The frame delta reaches this host only through the application
       // lifecycle's update, which the engine calls from the bootstrap script
@@ -264,7 +286,7 @@ var LibraryDefoldHermes = {
       // answer available.
       var frameDeltaMeasured = DEFOLD_HERMES_BRIDGE.frames > 0;
       return {
-        runtime: 'browser',
+        runtime: "browser",
         generation: DEFOLD_HERMES_BRIDGE.generation,
         componentRevision: DEFOLD_HERMES_COMPONENTS.revision >>> 0,
         frames: DEFOLD_HERMES_BRIDGE.frames,
@@ -276,37 +298,41 @@ var LibraryDefoldHermes = {
           callbackCapacity: callbacks.capacity,
           jsHeapBytes: memory ? memory.usedJSHeapSize : null,
           jsHeapSizeBytes: memory ? memory.totalJSHeapSize : null,
-          jsHeapLimitBytes: memory ? memory.jsHeapSizeLimit : null
+          jsHeapLimitBytes: memory ? memory.jsHeapSizeLimit : null,
         },
         unavailable: {
           frameDtMs: frameDeltaMeasured
             ? null
-            : 'No application lifecycle is attached, so the engine never calls the browser host update. A component-only bundle measures no frame delta here; Defold\'s own frame timing is inside the Wasm engine.',
-          hermesHeapBytes: 'The browser runtime embeds no Hermes. performance.memory measures the page JavaScript heap and is reported as jsHeapBytes instead.',
-          hermesHeapPeakBytes: 'The browser runtime embeds no Hermes.',
-          luaHandles: 'The Lua value registry lives inside the Wasm engine and exports no counter to the browser host.',
-          arenaHighWaterBytes: 'The generated browser value bridge resets its per-call arena state and records no high-water mark; adding one is a generator change.',
-          jsHeapBytesWhenAbsent: memory ? null : 'performance.memory is a Chromium-only extension and this browser does not expose it.'
-        }
+            : "No application lifecycle is attached, so the engine never calls the browser host update. A component-only bundle measures no frame delta here; Defold's own frame timing is inside the Wasm engine.",
+          hermesHeapBytes:
+            "The browser runtime embeds no Hermes. performance.memory measures the page JavaScript heap and is reported as jsHeapBytes instead.",
+          hermesHeapPeakBytes: "The browser runtime embeds no Hermes.",
+          luaHandles: "The Lua value registry lives inside the Wasm engine and exports no counter to the browser host.",
+          arenaHighWaterBytes:
+            "The generated browser value bridge resets its per-call arena state and records no high-water mark; adding one is a generator change.",
+          jsHeapBytesWhenAbsent: memory
+            ? null
+            : "performance.memory is a Chromium-only extension and this browser does not expose it.",
+        },
       };
     },
 
 
-    fingerprint: function(buffer, capacity) {
+    fingerprint: function (buffer, capacity) {
       var value = globalThis.__DEFOLD_HERMES_BUILD_FINGERPRINT__;
-      if (typeof value !== 'string' || value.length !== 64 || !/^[0-9a-f]{64}$/.test(value)) return 0;
+      if (typeof value !== "string" || value.length !== 64 || !/^[0-9a-f]{64}$/.test(value)) return 0;
       if (!capacity) return 0;
       stringToUTF8(value, buffer, capacity);
       return value.length;
     },
 
-    init: function() {
+    init: function () {
       if (DEFOLD_HERMES_BRIDGE.app && DEFOLD_HERMES_BRIDGE.app.init) {
         DEFOLD_HERMES_BRIDGE.app.init();
       }
     },
 
-    update: function(dt) {
+    update: function (dt) {
       // The engine already passes the frame delta here, so recording it is a
       // measurement rather than an instrument.
       DEFOLD_HERMES_BRIDGE.frames = (DEFOLD_HERMES_BRIDGE.frames + 1) >>> 0;
@@ -316,7 +342,7 @@ var LibraryDefoldHermes = {
       }
     },
 
-    finalize: function() {
+    finalize: function () {
       try {
         if (DEFOLD_HERMES_BRIDGE.app && DEFOLD_HERMES_BRIDGE.app.final) {
           DEFOLD_HERMES_BRIDGE.app.final();
@@ -324,55 +350,52 @@ var LibraryDefoldHermes = {
       } finally {
         DEFOLD_HERMES_BRIDGE.reset();
       }
-    }
+    },
   },
 
-  defoldHermesWebLoad__deps: [
-    '$DEFOLD_HERMES_BRIDGE',
-    'defold_hermes_example_math_add'
-  ],
-  defoldHermesWebLoad: function(sourcePointer, sourceSize) {
+  defoldHermesWebLoad__deps: ["$DEFOLD_HERMES_BRIDGE", "defold_hermes_example_math_add"],
+  defoldHermesWebLoad: function (sourcePointer, sourceSize) {
     DEFOLD_HERMES_BRIDGE.load(sourcePointer, sourceSize);
   },
 
-  defoldHermesWebBundleFingerprint__deps: ['$DEFOLD_HERMES_BRIDGE', '$stringToUTF8'],
-  defoldHermesWebBundleFingerprint: function(buffer, capacity) {
+  defoldHermesWebBundleFingerprint__deps: ["$DEFOLD_HERMES_BRIDGE", "$stringToUTF8"],
+  defoldHermesWebBundleFingerprint: function (buffer, capacity) {
     return DEFOLD_HERMES_BRIDGE.fingerprint(buffer, capacity);
   },
 
-  defoldHermesWebUpdate__deps: ['$DEFOLD_HERMES_BRIDGE'],
-  defoldHermesWebUpdate: function(dt) {
+  defoldHermesWebUpdate__deps: ["$DEFOLD_HERMES_BRIDGE"],
+  defoldHermesWebUpdate: function (dt) {
     DEFOLD_HERMES_BRIDGE.update(dt);
   },
 
-  defoldHermesWebInit__deps: ['$DEFOLD_HERMES_BRIDGE'],
-  defoldHermesWebInit: function() {
+  defoldHermesWebInit__deps: ["$DEFOLD_HERMES_BRIDGE"],
+  defoldHermesWebInit: function () {
     DEFOLD_HERMES_BRIDGE.init();
   },
 
-  defoldHermesWebFinalize__deps: ['$DEFOLD_HERMES_BRIDGE'],
-  defoldHermesWebFinalize: function() {
+  defoldHermesWebFinalize__deps: ["$DEFOLD_HERMES_BRIDGE"],
+  defoldHermesWebFinalize: function () {
     DEFOLD_HERMES_BRIDGE.finalize();
   },
 
-  defoldHermesWebInvokeCallback__deps: ['$DEFOLD_HERMES_WEB_CALLBACKS'],
-  defoldHermesWebInvokeCallback: function(runtime, slot, generation, type, timer, elapsed) {
+  defoldHermesWebInvokeCallback__deps: ["$DEFOLD_HERMES_WEB_CALLBACKS"],
+  defoldHermesWebInvokeCallback: function (runtime, slot, generation, type, timer, elapsed) {
     var callback = DEFOLD_HERMES_WEB_CALLBACKS.resolveParts(runtime, slot, generation, type);
     if (!callback) return 0;
     try {
       callback(timer, elapsed);
       return 1;
     } catch (error) {
-      console.error('[defold-hermes] timer callback failed', error);
+      console.error("[defold-hermes] timer callback failed", error);
       return 0;
     }
   },
 
-  defoldHermesWebReleaseCallback__deps: ['$DEFOLD_HERMES_WEB_CALLBACKS'],
-  defoldHermesWebReleaseCallback: function(runtime, slot, generation, type) {
+  defoldHermesWebReleaseCallback__deps: ["$DEFOLD_HERMES_WEB_CALLBACKS"],
+  defoldHermesWebReleaseCallback: function (runtime, slot, generation, type) {
     DEFOLD_HERMES_WEB_CALLBACKS.releaseParts(runtime, slot, generation, type);
-  }
+  },
 };
 
-autoAddDeps(LibraryDefoldHermes, '$DEFOLD_HERMES_BRIDGE');
+autoAddDeps(LibraryDefoldHermes, "$DEFOLD_HERMES_BRIDGE");
 addToLibrary(LibraryDefoldHermes);

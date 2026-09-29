@@ -1,10 +1,4 @@
-import {
-  type B2Body,
-  type B2Joint,
-  type DefoldHandle,
-  type Node,
-  type Texture,
-} from "./index";
+import { type B2Body, type B2Joint, type DefoldHandle, type Node, type Texture } from "./index";
 
 declare const body: B2Body;
 declare const joint: B2Joint;

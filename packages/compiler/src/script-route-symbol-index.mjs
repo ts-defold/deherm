@@ -27,7 +27,10 @@ function compareCodeUnits(left, right) {
 // Mirrors scripts/generate-script-sdk.mjs `pascal`; the declaring interface for
 // a public root is exactly `${pascal(root)}Api`.
 function pascal(value) {
-  const words = value.replace(/^defold_(?:api|enum)\./, "").split(/[^A-Za-z0-9]+/).filter(Boolean);
+  const words = value
+    .replace(/^defold_(?:api|enum)\./, "")
+    .split(/[^A-Za-z0-9]+/)
+    .filter(Boolean);
   const joined = words.map((word) => word[0].toUpperCase() + word.slice(1)).join("") || "Anonymous";
   return /^[A-Za-z_$]/.test(joined) ? joined : `_${joined}`;
 }
@@ -47,7 +50,9 @@ export function scriptRouteMemberPath(modulePath, jsName) {
 
 function validatePlanIdentity(plan) {
   if (plan?.schemaVersion !== 2 || typeof plan.planSha256 !== "string") {
-    throw new Error(`Route symbol index requires canonical lowering-plan schema v2, got ${plan?.schemaVersion ?? "missing"}`);
+    throw new Error(
+      `Route symbol index requires canonical lowering-plan schema v2, got ${plan?.schemaVersion ?? "missing"}`,
+    );
   }
   const { planSha256, ...body } = plan;
   if (sha256(JSON.stringify(body)) !== planSha256) {
@@ -73,8 +78,9 @@ export function buildScriptRouteSymbolIndex(scriptApiIr, loweringPlan) {
   // Constants have generated stable-ID transport units in the lowering plan,
   // but their TypeScript surface is literal/intrinsic and therefore has no
   // callable member path for the checker to resolve.
-  const scriptUnits = loweringPlan.units.filter(({ identity, sourceRef }) =>
-    identity.surface === "script" && sourceRef?.input === "scriptProjection");
+  const scriptUnits = loweringPlan.units.filter(
+    ({ identity, sourceRef }) => identity.surface === "script" && sourceRef?.input === "scriptProjection",
+  );
   const members = {};
   const byStableId = {};
   const namespaces = {};
@@ -88,14 +94,16 @@ export function buildScriptRouteSymbolIndex(scriptApiIr, loweringPlan) {
     const [namespace] = publicScriptModulePath(fn.modulePath);
     const [declaringInterface] = member.split(".");
     namespaces[namespace] = declaringInterface;
-    const selections = Object.fromEntries(Object.entries(unit.backends)
-      .map(([target, backend]) => [target, backend.selection])
-      .sort(([left], [right]) => compareCodeUnits(left, right)));
+    const selections = Object.fromEntries(
+      Object.entries(unit.backends)
+        .map(([target, backend]) => [target, backend.selection])
+        .sort(([left], [right]) => compareCodeUnits(left, right)),
+    );
     members[member] = {
       id: unit.identity.id,
       stableId: unit.identity.stableId,
       namespace,
-      selections
+      selections,
     };
     if (byStableId[unit.identity.stableId]) {
       throw new Error(`Stable ID ${unit.identity.stableId} is claimed by two routes`);
@@ -116,7 +124,7 @@ export function buildScriptRouteSymbolIndex(scriptApiIr, loweringPlan) {
     routeCount: scriptUnits.length,
     namespaces: Object.fromEntries(Object.entries(namespaces).sort(([left], [right]) => compareCodeUnits(left, right))),
     members: Object.fromEntries(Object.entries(members).sort(([left], [right]) => compareCodeUnits(left, right))),
-    byStableId: Object.fromEntries(Object.entries(byStableId).sort(([left], [right]) => Number(left) - Number(right)))
+    byStableId: Object.fromEntries(Object.entries(byStableId).sort(([left], [right]) => Number(left) - Number(right))),
   };
   return { ...body, indexSha256: sha256(JSON.stringify(body)) };
 }

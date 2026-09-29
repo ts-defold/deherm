@@ -15,30 +15,51 @@ function run(command, args, options = {}) {
 
 test("universal-value generation is mechanical, complete for its selected families, and deterministic", async () => {
   const report = JSON.parse(await readFile(reportPath, "utf8"));
-  const projection = JSON.parse(await readFile(path.join(root, "packages/bindings/generated/defold-script-projection-ir.json"), "utf8"));
-  const constants = JSON.parse(await readFile(path.join(root, "packages/bindings/generated/defold-script-constant-lowering.json"), "utf8"));
-  const expected = projection.rows.filter((row) =>
-    report.selection.loweringFamilies.includes(row.loweringFamily) &&
-    !report.selection.excludedLoweringFamilies.includes(row.loweringFamily) &&
-    !report.selection.excludedContexts.includes(row.context.token));
-  const expectedIds = [...expected.map(({ id }) => id), ...constants.entries.filter(({ state }) => state === "runtime-backed" || state === "profile-unavailable").map(({ name }) => `script:constant.${name}`)];
+  const projection = JSON.parse(
+    await readFile(path.join(root, "packages/bindings/generated/defold-script-projection-ir.json"), "utf8"),
+  );
+  const constants = JSON.parse(
+    await readFile(path.join(root, "packages/bindings/generated/defold-script-constant-lowering.json"), "utf8"),
+  );
+  const expected = projection.rows.filter(
+    (row) =>
+      report.selection.loweringFamilies.includes(row.loweringFamily) &&
+      !report.selection.excludedLoweringFamilies.includes(row.loweringFamily) &&
+      !report.selection.excludedContexts.includes(row.context.token),
+  );
+  const expectedIds = [
+    ...expected.map(({ id }) => id),
+    ...constants.entries
+      .filter(({ state }) => state === "runtime-backed" || state === "profile-unavailable")
+      .map(({ name }) => `script:constant.${name}`),
+  ];
   assert.equal(report.candidateCount, expectedIds.length);
   assert.deepEqual(new Set(report.bindings.map(({ id }) => id)), new Set(expectedIds));
   assert.ok(report.bindings.every(({ shapeKinds }) => Array.isArray(shapeKinds)));
-  assert.ok(report.bindings.every(({ minimumResultCount, maximumResultCount, resultCount }) =>
-    Number.isInteger(minimumResultCount) && minimumResultCount >= 0 &&
-    maximumResultCount === resultCount && minimumResultCount <= maximumResultCount));
-  const loadResource = report.bindings.find(({ id }) => id === "script:sys.load_resource");
-  assert.deepEqual(
-    [loadResource.minimumResultCount, loadResource.maximumResultCount],
-    [0, 2],
+  assert.ok(
+    report.bindings.every(
+      ({ minimumResultCount, maximumResultCount, resultCount }) =>
+        Number.isInteger(minimumResultCount) &&
+        minimumResultCount >= 0 &&
+        maximumResultCount === resultCount &&
+        minimumResultCount <= maximumResultCount,
+    ),
   );
+  const loadResource = report.bindings.find(({ id }) => id === "script:sys.load_resource");
+  assert.deepEqual([loadResource.minimumResultCount, loadResource.maximumResultCount], [0, 2]);
   assert.match(report.evidenceBoundary, /remain unverified/);
   const temporary = await mkdtemp(path.join(tmpdir(), "deherm-universal-value-"));
   try {
     run(process.execPath, ["scripts/generate-script-universal-value-bindings.mjs", "--output-root", temporary]);
-    for (const relative of [...report.artifacts, "packages/bindings/generated/defold-script-universal-value-bindings.json"]) {
-      assert.equal(await readFile(path.join(temporary, relative), "utf8"), await readFile(path.join(root, relative), "utf8"), relative);
+    for (const relative of [
+      ...report.artifacts,
+      "packages/bindings/generated/defold-script-universal-value-bindings.json",
+    ]) {
+      assert.equal(
+        await readFile(path.join(temporary, relative), "utf8"),
+        await readFile(path.join(root, relative), "utf8"),
+        relative,
+      );
     }
   } finally {
     await rm(temporary, { recursive: true, force: true });
@@ -50,11 +71,16 @@ test("universal-value descriptor runtime compiles, links, and rejects invalid fr
   try {
     const executable = path.join(temporary, "test");
     run(process.env.CXX ?? "clang++", [
-      "-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic",
+      "-std=c++17",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pedantic",
       `-I${path.join(root, "defold/defold_hermes/include")}`,
       "defold/defold_hermes/src/generated_script_universal_value_bindings.cpp",
       "native/script_universal_value_binding_test.cpp",
-      "-o", executable
+      "-o",
+      executable,
     ]);
     run(executable, []);
   } finally {
@@ -64,17 +90,47 @@ test("universal-value descriptor runtime compiles, links, and rejects invalid fr
 
 test("per-call frame scratch is sized from the same contract the dispatcher enforces", async () => {
   const report = JSON.parse(await readFile(reportPath, "utf8"));
-  const descriptors = await readFile(path.join(root, "defold/defold_hermes/src/generated_script_universal_value_bindings.cpp"), "utf8");
-  const dispatcher = await readFile(path.join(root, "defold/defold_hermes/src/generated_script_universal_value_capi.cpp"), "utf8");
-  assert.doesNotMatch(dispatcher, /deherm\.typed-native\.\./,
-    "global routes must retain a stable non-empty profiling identity");
+  const descriptors = await readFile(
+    path.join(root, "defold/defold_hermes/src/generated_script_universal_value_bindings.cpp"),
+    "utf8",
+  );
+  const dispatcher = await readFile(
+    path.join(root, "defold/defold_hermes/src/generated_script_universal_value_capi.cpp"),
+    "utf8",
+  );
+  assert.doesNotMatch(
+    dispatcher,
+    /deherm\.typed-native\.\./,
+    "global routes must retain a stable non-empty profiling identity",
+  );
 
   // The operation descriptor publishes the contract; the dispatcher allocates a
   // stack frame from it. Both are generated, so the only thing worth asserting
   // is that they are still the same numbers - a frame narrower than the
   // descriptor would reject calls the descriptor accepts.
-  const declared = [...descriptors.matchAll(/^ {2}\{0x([0-9a-f]{8})u, "([^"]+)", "([^"]*)", "([^"]*)", (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+)\},$/gm)]
-    .map(([, stableId, id, modulePath, member, , maximumArgumentCount, , maximumResultCount, , resultSemanticKind, inputTableEntryCapacity, outputTableEntryCapacity, matrix4Arena, urlArena, constant]) => ({
+  const declared = [
+    ...descriptors.matchAll(
+      /^ {2}\{0x([0-9a-f]{8})u, "([^"]+)", "([^"]*)", "([^"]*)", (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+)\},$/gm,
+    ),
+  ].map(
+    ([
+      ,
+      stableId,
+      id,
+      modulePath,
+      member,
+      ,
+      maximumArgumentCount,
+      ,
+      maximumResultCount,
+      ,
+      resultSemanticKind,
+      inputTableEntryCapacity,
+      outputTableEntryCapacity,
+      matrix4Arena,
+      urlArena,
+      constant,
+    ]) => ({
       id,
       stableId: Number.parseInt(stableId, 16),
       modulePath,
@@ -86,10 +142,14 @@ test("per-call frame scratch is sized from the same contract the dispatcher enfo
       outputTableEntryCapacity: Number(outputTableEntryCapacity),
       matrix4Arena: matrix4Arena === "1",
       urlArena: urlArena === "1",
-      constant: constant === "1"
-    }));
+      constant: constant === "1",
+    }),
+  );
   assert.equal(declared.length, report.candidateCount);
-  assert.deepEqual(declared.map(({ id }) => id), report.bindings.map(({ id }) => id));
+  assert.deepEqual(
+    declared.map(({ id }) => id),
+    report.bindings.map(({ id }) => id),
+  );
   for (let index = 0; index < declared.length; ++index) {
     const operation = declared[index];
     const binding = report.bindings[index];
@@ -112,18 +172,23 @@ test("per-call frame scratch is sized from the same contract the dispatcher enfo
   assert.equal(constructor.resultSemanticKind, "box2d-joint");
   assert.equal(constructor.loweringFamily, "lua-table");
 
-  const profiles = [...dispatcher.matchAll(/&runContractFrame<(\d+)u, (\d+)u, (\d+)u, (\d+)u, (true|false), (true|false)>,/g)]
-    .map(([, argumentCapacity, resultCapacity, inputEntryCapacity, outputEntryCapacity, matrix4Arena, urlArena]) => ({
-      argumentCapacity: Number(argumentCapacity),
-      resultCapacity: Number(resultCapacity),
-      inputEntryCapacity: Number(inputEntryCapacity),
-      outputEntryCapacity: Number(outputEntryCapacity),
-      matrix4Arena: matrix4Arena === "true",
-      urlArena: urlArena === "true"
-    }));
+  const profiles = [
+    ...dispatcher.matchAll(/&runContractFrame<(\d+)u, (\d+)u, (\d+)u, (\d+)u, (true|false), (true|false)>,/g),
+  ].map(([, argumentCapacity, resultCapacity, inputEntryCapacity, outputEntryCapacity, matrix4Arena, urlArena]) => ({
+    argumentCapacity: Number(argumentCapacity),
+    resultCapacity: Number(resultCapacity),
+    inputEntryCapacity: Number(inputEntryCapacity),
+    outputEntryCapacity: Number(outputEntryCapacity),
+    matrix4Arena: matrix4Arena === "true",
+    urlArena: urlArena === "true",
+  }));
   assert.equal(profiles.length, report.frameProfiles.distinct);
-  const assignment = /constexpr uint8_t kRouteContractFrames\[\] = \{([^}]*)\};/.exec(dispatcher)[1]
-    .split(",").map((value) => value.trim()).filter((value) => value.length !== 0).map(Number);
+  const assignment = /constexpr uint8_t kRouteContractFrames\[\] = \{([^}]*)\};/
+    .exec(dispatcher)[1]
+    .split(",")
+    .map((value) => value.trim())
+    .filter((value) => value.length !== 0)
+    .map(Number);
   assert.equal(assignment.length, report.candidateCount);
 
   for (let index = 0; index < declared.length; ++index) {
@@ -131,14 +196,18 @@ test("per-call frame scratch is sized from the same contract the dispatcher enfo
     const frame = profiles[assignment[index]];
     const contract = report.bindings[index].frameContract;
     assert.ok(frame, `${operation.id}: frame profile index is out of range`);
-    assert.deepEqual(frame, {
-      argumentCapacity: contract.argumentCapacity,
-      resultCapacity: contract.resultCapacity,
-      inputEntryCapacity: contract.inputEntryCapacity,
-      outputEntryCapacity: contract.outputEntryCapacity,
-      matrix4Arena: contract.matrix4Arena,
-      urlArena: contract.urlArena
-    }, operation.id);
+    assert.deepEqual(
+      frame,
+      {
+        argumentCapacity: contract.argumentCapacity,
+        resultCapacity: contract.resultCapacity,
+        inputEntryCapacity: contract.inputEntryCapacity,
+        outputEntryCapacity: contract.outputEntryCapacity,
+        matrix4Arena: contract.matrix4Arena,
+        urlArena: contract.urlArena,
+      },
+      operation.id,
+    );
     assert.equal(frame.argumentCapacity, operation.maximumArgumentCount, operation.id);
     assert.equal(frame.resultCapacity, operation.maximumResultCount, operation.id);
     assert.equal(frame.inputEntryCapacity, operation.inputTableEntryCapacity, operation.id);
@@ -152,46 +221,85 @@ test("per-call frame scratch is sized from the same contract the dispatcher enfo
   // or the sizing has stopped following the contract.
   const reaching = (binding, name) =>
     binding.defoldValueTypes.includes(name) ||
-    binding.shapeKinds.some((kind) => !["scalar", "enum", "defold-value", "handle", "union", "optional", "void", "sequence", "map", "record", "variadic"].includes(kind));
+    binding.shapeKinds.some(
+      (kind) =>
+        ![
+          "scalar",
+          "enum",
+          "defold-value",
+          "handle",
+          "union",
+          "optional",
+          "void",
+          "sequence",
+          "map",
+          "record",
+          "variadic",
+        ].includes(kind),
+    );
   for (const binding of report.bindings) {
     if (reaching(binding, "url")) assert.ok(binding.frameContract.urlArena, `${binding.id}: URL arena dropped`);
-    if (reaching(binding, "matrix4")) assert.ok(binding.frameContract.matrix4Arena, `${binding.id}: Matrix4 arena dropped`);
+    if (reaching(binding, "matrix4"))
+      assert.ok(binding.frameContract.matrix4Arena, `${binding.id}: Matrix4 arena dropped`);
   }
-  const tableFree = report.bindings.filter(({ frameContract }) =>
-    frameContract.inputEntryCapacity === 0 && frameContract.outputEntryCapacity === 0);
-  assert.ok(tableFree.length > report.bindings.length / 2,
-    "most routes should no longer carry table scratch they cannot address");
+  const tableFree = report.bindings.filter(
+    ({ frameContract }) => frameContract.inputEntryCapacity === 0 && frameContract.outputEntryCapacity === 0,
+  );
+  assert.ok(
+    tableFree.length > report.bindings.length / 2,
+    "most routes should no longer carry table scratch they cannot address",
+  );
 });
 
 test("portable C ABI compiles as C, runs recursive/reentrant native behavior, and stays allocation-free when warm", async () => {
   const staticFrameSource = await readFile(
     path.join(root, "defold/defold_hermes/src/generated_script_universal_static_frame.cpp"),
-    "utf8"
+    "utf8",
   );
   assert.match(staticFrameSource, /thread_local std::unique_ptr<StaticFramePool> frames/u);
-  assert.doesNotMatch(staticFrameSource, /thread_local std::array<DehermScriptUniversalStaticFrame/u,
-    "the bounded frame pool must not inflate every Defold pthread's static TLS allocation");
+  assert.doesNotMatch(
+    staticFrameSource,
+    /thread_local std::array<DehermScriptUniversalStaticFrame/u,
+    "the bounded frame pool must not inflate every Defold pthread's static TLS allocation",
+  );
   const temporary = await mkdtemp(path.join(tmpdir(), "deherm-universal-value-capi-"));
   try {
     const cProbe = path.join(temporary, "probe.c");
-    await writeFile(cProbe, [
-      "#include <defold_hermes/generated_script_universal_value_capi.h>",
-      "int main(void) { DehermScriptUniversalValue value = {0}; return (int)value.tag; }"
-    ].join("\n"));
+    await writeFile(
+      cProbe,
+      [
+        "#include <defold_hermes/generated_script_universal_value_capi.h>",
+        "int main(void) { DehermScriptUniversalValue value = {0}; return (int)value.tag; }",
+      ].join("\n"),
+    );
     run(process.env.CC ?? "clang", [
-      "-std=c11", "-Wall", "-Wextra", "-Werror", "-pedantic",
-      `-I${path.join(root, "defold/defold_hermes/include")}`, cProbe, "-o", path.join(temporary, "c-probe")
+      "-std=c11",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pedantic",
+      `-I${path.join(root, "defold/defold_hermes/include")}`,
+      cProbe,
+      "-o",
+      path.join(temporary, "c-probe"),
     ]);
     run(path.join(temporary, "c-probe"), []);
     const executable = path.join(temporary, "runtime");
     run(process.env.CXX ?? "clang++", [
-      "-std=c++17", "-Wall", "-Wextra", "-Werror", "-Wno-zero-length-array", "-pedantic",
+      "-std=c++17",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-Wno-zero-length-array",
+      "-pedantic",
       `-I${path.join(root, "defold/defold_hermes/include")}`,
       "defold/defold_hermes/src/generated_script_universal_value_bindings.cpp",
       "defold/defold_hermes/src/generated_script_universal_value_capi.cpp",
       "defold/defold_hermes/src/generated_script_universal_static_frame.cpp",
       "defold/defold_hermes/src/script_bridge_capi.cpp",
-      "native/script_universal_value_capi_test.cpp", "-o", executable
+      "native/script_universal_value_capi_test.cpp",
+      "-o",
+      executable,
     ]);
     assert.match(run(executable, []), /recursive-reentrant-cycle-exhaustion-idempotence:ok allocations:0/);
   } finally {
@@ -204,13 +312,20 @@ test("browser callback C ABI uses caller handle arenas, fixed slots, bounded ree
   try {
     const executable = path.join(temporary, "runtime");
     run(process.env.CXX ?? "clang++", [
-      "-std=c++17", "-Wall", "-Wextra", "-Werror", "-Wno-zero-length-array", "-pedantic",
+      "-std=c++17",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-Wno-zero-length-array",
+      "-pedantic",
       "-DDM_PLATFORM_HTML5",
       `-I${path.join(root, "defold/defold_hermes/include")}`,
       "defold/defold_hermes/src/generated_script_universal_value_bindings.cpp",
       "defold/defold_hermes/src/generated_script_universal_value_capi.cpp",
       "defold/defold_hermes/src/script_bridge_capi.cpp",
-      "native/script_browser_callback_capi_test.cpp", "-o", executable
+      "native/script_browser_callback_capi_test.cpp",
+      "-o",
+      executable,
     ]);
     assert.match(run(executable, []), /direct-memory-reentrant-error-lifetime-exhaustion:ok allocations:0/);
   } finally {
@@ -220,22 +335,39 @@ test("browser callback C ABI uses caller handle arenas, fixed slots, bounded ree
 
 test("Static Hermes provider type-checks and compiles through the pinned Static Hermes frontend", async () => {
   run("npx", [
-    "tsc", "--ignoreConfig", "--noEmit", "--strict", "--skipLibCheck", "--target", "ES2022",
-    "--module", "NodeNext", "--moduleResolution", "NodeNext",
+    "tsc",
+    "--ignoreConfig",
+    "--noEmit",
+    "--strict",
+    "--skipLibCheck",
+    "--target",
+    "ES2022",
+    "--module",
+    "NodeNext",
+    "--moduleResolution",
+    "NodeNext",
     "packages/static-hermes/src/globals.d.ts",
     "packages/static-hermes/src/generated/script-universal-value.ts",
-    "tests/fixtures/static-hermes-universal-types.ts"
+    "tests/fixtures/static-hermes-universal-types.ts",
   ]);
   const shermes = path.join(root, "build/native/bin/shermes");
   const output = path.join(tmpdir(), `deherm-script-universal-static-${process.pid}.c`);
-  const staticSource = await readFile(path.join(root, "packages/static-hermes/src/generated/script-universal-value.ts"), "utf8");
+  const staticSource = await readFile(
+    path.join(root, "packages/static-hermes/src/generated/script-universal-value.ts"),
+    "utf8",
+  );
   const staticInput = path.join(tmpdir(), `deherm-script-universal-static-${process.pid}.ts`);
   await writeFile(staticInput, staticSource.replace(/^export \{.*\};$/m, ""));
   try {
     run(shermes, [
-      "-typed", "-strict", "-O", "-emit-c",
+      "-typed",
+      "-strict",
+      "-O",
+      "-emit-c",
       "-exported-unit=deherm_script_universal",
-      staticInput, "-o", output
+      staticInput,
+      "-o",
+      output,
     ]);
   } finally {
     await rm(staticInput, { force: true });
@@ -243,11 +375,20 @@ test("Static Hermes provider type-checks and compiles through the pinned Static 
 });
 
 test("browser provider round-trips recursive direct-memory values and rejects cycles", async () => {
-  const source = await readFile(path.join(root, "defold/defold_hermes/lib/web/generated_script_universal_value.js"), "utf8");
+  const source = await readFile(
+    path.join(root, "defold/defold_hermes/lib/web/generated_script_universal_value.js"),
+    "utf8",
+  );
   assert.doesNotMatch(source, /embind|Embind|ccall|cwrap/);
-  const callScratchSource = source.slice(source.indexOf("    call: function(stableId, args)"), source.indexOf("    install: function()"));
-  assert.doesNotMatch(callScratchSource, /stackAlloc|stackSave|stackRestore/,
-    "universal calls must not place their bounded scratch arena on the 64 KiB Wasm stack");
+  const callScratchSource = source.slice(
+    source.indexOf("    call: function(stableId, args)"),
+    source.indexOf("    install: function()"),
+  );
+  assert.doesNotMatch(
+    callScratchSource,
+    /stackAlloc|stackSave|stackRestore/,
+    "universal calls must not place their bounded scratch arena on the 64 KiB Wasm stack",
+  );
   assert.match(callScratchSource, /acquireScratch\(this\.depth - 1\)/);
   const memory = new ArrayBuffer(16 * 1024 * 1024);
   const HEAPU8 = new Uint8Array(memory);
@@ -269,11 +410,24 @@ test("browser provider round-trips recursive direct-memory values and rejects cy
   const dispatchPointers = [];
   const align = (value) => (value + 15) & ~15;
   const context = {
-    HEAPU8, HEAPU32, HEAPF32, HEAPF64, BigInt, Map, Object, Array,
+    HEAPU8,
+    HEAPU32,
+    HEAPF32,
+    HEAPF64,
+    BigInt,
+    Map,
+    Object,
+    Array,
     FinalizationRegistry: undefined,
     stackSave: () => stack,
-    stackAlloc: (size) => { const pointer = align(stack); stack = align(pointer + size); return pointer; },
-    stackRestore: (checkpoint) => { stack = checkpoint; },
+    stackAlloc: (size) => {
+      const pointer = align(stack);
+      stack = align(pointer + size);
+      return pointer;
+    },
+    stackRestore: (checkpoint) => {
+      stack = checkpoint;
+    },
     _malloc: (size) => {
       const pointer = align(heap);
       heap = align(pointer + size);
@@ -292,25 +446,60 @@ test("browser provider round-trips recursive direct-memory values and rejects cy
       if (capacity) HEAPU8[pointer + Math.min(bytes.length, capacity - 1)] = 0;
     },
     UTF8ToString: (pointer, length) => {
-      if (length === undefined) { length = 0; while (HEAPU8[pointer + length]) ++length; }
+      if (length === undefined) {
+        length = 0;
+        while (HEAPU8[pointer + length]) ++length;
+      }
       return decoder.decode(HEAPU8.subarray(pointer, pointer + length));
     },
     autoAddDeps: () => {},
-    addToLibrary: (value) => { library = value; },
+    addToLibrary: (value) => {
+      library = value;
+    },
     _deherm_script_universal_release: (pointer) => {
       if (HEAPU8[pointer] === 5 && HEAPU8[pointer + 1] >= 3) ++releases;
       HEAPU8.fill(0, pointer, pointer + 48);
     },
     _deherm_script_universal_dispatch: (...parameters) => {
-      const [stableId, values, valueCount, entries, entryCount, strings, stringCount,
-        floats, floatCount, urls, urlCount, roots, argumentCount,
-        outValues, , outValueCount, outEntries, , outEntryCount,
-        outStrings, , outStringCount, outFloats, , outFloatCount,
-        outUrls, , outUrlCount, resultRoots, , resultCount] = parameters;
+      const [
+        stableId,
+        values,
+        valueCount,
+        entries,
+        entryCount,
+        strings,
+        stringCount,
+        floats,
+        floatCount,
+        urls,
+        urlCount,
+        roots,
+        argumentCount,
+        outValues,
+        ,
+        outValueCount,
+        outEntries,
+        ,
+        outEntryCount,
+        outStrings,
+        ,
+        outStringCount,
+        outFloats,
+        ,
+        outFloatCount,
+        outUrls,
+        ,
+        outUrlCount,
+        resultRoots,
+        ,
+        resultCount,
+      ] = parameters;
       dispatchPointers.push({ stableId, values });
       if (stableId === 99 && !nested) {
         assert.throws(() => host.dispose(), /active call/);
-        nested = true; host.call(100, []); nested = false;
+        nested = true;
+        host.call(100, []);
+        nested = false;
       }
       if (stableId === 200) {
         assert.equal(argumentCount, 1);
@@ -320,7 +509,7 @@ test("browser provider round-trips recursive direct-memory values and rejects cy
           runtime: HEAPU32[(callbackPointer + 28) >> 2],
           slot: HEAPU32[(callbackPointer + 16) >> 2],
           generation: HEAPU32[(callbackPointer + 20) >> 2],
-          type: HEAPU8[callbackPointer + 3]
+          type: HEAPU8[callbackPointer + 3],
         };
         HEAPU32[outValueCount >> 2] = HEAPU32[outEntryCount >> 2] = HEAPU32[outStringCount >> 2] = 0;
         HEAPU32[outFloatCount >> 2] = HEAPU32[outUrlCount >> 2] = HEAPU32[resultCount >> 2] = 0;
@@ -339,10 +528,14 @@ test("browser provider round-trips recursive direct-memory values and rejects cy
       HEAPU32[resultCount >> 2] = argumentCount ? 1 : 0;
       if (argumentCount) HEAPU32[resultRoots >> 2] = HEAPU32[roots >> 2];
       return 0;
-    }
+    },
   };
   const callbackRegistry = {
-    runtime: 1, type: 1, functions: [], generations: [], free: [],
+    runtime: 1,
+    type: 1,
+    functions: [],
+    generations: [],
+    free: [],
     acquire(callback) {
       const slot = this.free.length ? this.free.pop() : this.functions.length;
       if (this.generations[slot] === undefined) this.generations[slot] = 1;
@@ -350,18 +543,24 @@ test("browser provider round-trips recursive direct-memory values and rejects cy
       return { runtime: this.runtime, slot, generation: this.generations[slot], type: this.type };
     },
     resolveParts(runtime, slot, generation, type) {
-      runtime >>>= 0; slot >>>= 0; generation >>>= 0; type >>>= 0;
+      runtime >>>= 0;
+      slot >>>= 0;
+      generation >>>= 0;
+      type >>>= 0;
       return runtime === this.runtime && type === this.type && this.generations[slot] === generation
-        ? this.functions[slot] || null : null;
+        ? this.functions[slot] || null
+        : null;
     },
-    release(handle) { return this.releaseParts(handle.runtime, handle.slot, handle.generation, handle.type); },
+    release(handle) {
+      return this.releaseParts(handle.runtime, handle.slot, handle.generation, handle.type);
+    },
     releaseParts(runtime, slot, generation, type) {
       if (!this.resolveParts(runtime, slot, generation, type)) return false;
       this.functions[slot] = null;
       this.generations[slot] = (this.generations[slot] + 1) >>> 0 || 1;
       this.free.push(slot);
       return true;
-    }
+    },
   };
   context.DEFOLD_HERMES_WEB_CALLBACKS = callbackRegistry;
   vm.runInNewContext(source, context, { filename: "generated_script_universal_value.js" });
@@ -374,17 +573,36 @@ test("browser provider round-trips recursive direct-memory values and rejects cy
   const boundaryStrings = context.stackAlloc(5);
   const boundaryRoots = context.stackAlloc(4);
   HEAPU8[boundaryStrings + 4] = 0xa5;
-  assert.throws(() => context.DEFOLD_HERMES_SCRIPT_UNIVERSAL.encodeWireRoots(
-    ["1234"], boundaryValues, 1, 0, 0, boundaryStrings, 4,
-    0, 0, 0, 0, boundaryRoots, 1), /reserved for UTF-8 termination/);
-  assert.equal(HEAPU8[boundaryStrings + 4], 0xa5,
-    "exact-capacity UTF-8 rejection must preserve the byte after declared scratch");
+  assert.throws(
+    () =>
+      context.DEFOLD_HERMES_SCRIPT_UNIVERSAL.encodeWireRoots(
+        ["1234"],
+        boundaryValues,
+        1,
+        0,
+        0,
+        boundaryStrings,
+        4,
+        0,
+        0,
+        0,
+        0,
+        boundaryRoots,
+        1,
+      ),
+    /reserved for UTF-8 termination/,
+  );
+  assert.equal(
+    HEAPU8[boundaryStrings + 4],
+    0xa5,
+    "exact-capacity UTF-8 rejection must preserve the byte after declared scratch",
+  );
   context.stackRestore(boundaryCheckpoint);
   const input = Object.assign(Object.create(null), {
     name: "volcano",
     values: [1, true, 9n],
     nested: new Map([["x", { __dehermValueKind: "vector3", x: 1, y: 2, z: 3 }]]),
-    url: { __dehermUrlV1: true, socket: 1n, reserved: 2n, path: 3n, fragment: 4n }
+    url: { __dehermUrlV1: true, socket: 1n, reserved: 2n, path: 3n, fragment: 4n },
   });
   const output = host.call(99, [input]);
   assert.equal(output.name, "volcano");
@@ -398,11 +616,15 @@ test("browser provider round-trips recursive direct-memory values and rejects cy
   const nestedScratch = dispatchPointers.find(({ stableId }) => stableId === 100).values;
   assert.notEqual(outerScratch, nestedScratch, "reentrant calls must use separate scratch slots");
   const variableTuple = host.call(0x8993930a, ["resource-data"]);
-  assert.deepEqual(Array.from(variableTuple), ["resource-data", undefined],
-    "browser SDK bridge must pad an omitted trailing optional Lua result");
+  assert.deepEqual(
+    Array.from(variableTuple),
+    ["resource-data", undefined],
+    "browser SDK bridge must pad an omitted trailing optional Lua result",
+  );
   assert.equal(dispatchPointers.at(-1).values, outerScratch, "a warmed outer-depth arena must be reused");
   assert.equal(allocations.length, 2, "warmed calls must not allocate additional Wasm heap scratch");
-  const cycle = {}; cycle.self = cycle;
+  const cycle = {};
+  cycle.self = cycle;
   assert.throws(() => host.call(101, [cycle]), /cycle/);
   const retained = host.call(102, [{ __dehermHandleV1: true, kind: 5, semanticKind: 7, runtime: 3, payload: 12n }]);
   retained.dispose();
@@ -411,18 +633,30 @@ test("browser provider round-trips recursive direct-memory values and rejects cy
 
   let callbackCalls = 0;
   callbackRegistry.runtime = 0x80000001;
-  assert.equal(host.call(200, [(number, label, borrowed) => {
-    callbackCalls += 1;
-    assert.equal(number, 9.25);
-    assert.equal(label, "hot");
-    assert.equal(borrowed.borrowed, true);
-    assert.equal(borrowed.kind, 3);
-    borrowed.dispose();
-    assert.equal(releases, 1, "borrowed callback handles must not release their Lua-owned token from JS");
-    return 42.5;
-  }]), undefined);
-  assert.equal(typeof callbackRegistry.resolveParts(
-    callbackToken.runtime, callbackToken.slot, callbackToken.generation, callbackToken.type), "function");
+  assert.equal(
+    host.call(200, [
+      (number, label, borrowed) => {
+        callbackCalls += 1;
+        assert.equal(number, 9.25);
+        assert.equal(label, "hot");
+        assert.equal(borrowed.borrowed, true);
+        assert.equal(borrowed.kind, 3);
+        borrowed.dispose();
+        assert.equal(releases, 1, "borrowed callback handles must not release their Lua-owned token from JS");
+        return 42.5;
+      },
+    ]),
+    undefined,
+  );
+  assert.equal(
+    typeof callbackRegistry.resolveParts(
+      callbackToken.runtime,
+      callbackToken.slot,
+      callbackToken.generation,
+      callbackToken.type,
+    ),
+    "function",
+  );
   const callbackCheckpoint = stack;
   const inputValues = context.stackAlloc(3 * 48);
   const inputStrings = context.stackAlloc(4);
@@ -447,34 +681,107 @@ test("browser provider round-trips recursive direct-memory values and rejects cy
   HEAPU32[(inputRoots >> 2) + 1] = 1;
   HEAPU32[(inputRoots >> 2) + 2] = 2;
   const invoked = library.defoldHermesWebInvokeUniversalCallback(
-    callbackToken.runtime | 0, callbackToken.slot | 0,
-    callbackToken.generation | 0, callbackToken.type | 0,
-    inputValues, 3, 0, 0, inputStrings, 3, 0, 0, 0, 0, inputRoots, 3,
-    outputValues, 4, outputCounts, 0, 0, outputCounts + 4,
-    0, 0, outputCounts + 8, 0, 0, outputCounts + 12,
-    0, 0, outputCounts + 16, outputRoots, 4, outputCounts + 20,
-    callbackError, 128);
+    callbackToken.runtime | 0,
+    callbackToken.slot | 0,
+    callbackToken.generation | 0,
+    callbackToken.type | 0,
+    inputValues,
+    3,
+    0,
+    0,
+    inputStrings,
+    3,
+    0,
+    0,
+    0,
+    0,
+    inputRoots,
+    3,
+    outputValues,
+    4,
+    outputCounts,
+    0,
+    0,
+    outputCounts + 4,
+    0,
+    0,
+    outputCounts + 8,
+    0,
+    0,
+    outputCounts + 12,
+    0,
+    0,
+    outputCounts + 16,
+    outputRoots,
+    4,
+    outputCounts + 20,
+    callbackError,
+    128,
+  );
   assert.equal(invoked, 1, context.UTF8ToString(callbackError));
   assert.equal(callbackCalls, 1);
   assert.equal(HEAPU32[outputCounts >> 2], 1);
   assert.equal(HEAPU8[outputValues], 3);
   assert.equal(HEAPF64[(outputValues + 8) >> 3], 42.5);
-  callbackRegistry.releaseParts(callbackToken.runtime, callbackToken.slot, callbackToken.generation, callbackToken.type);
-  assert.equal(library.defoldHermesWebInvokeUniversalCallback(
-    callbackToken.runtime, callbackToken.slot, callbackToken.generation, callbackToken.type,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    outputValues, 4, outputCounts, 0, 0, outputCounts + 4,
-    0, 0, outputCounts + 8, 0, 0, outputCounts + 12,
-    0, 0, outputCounts + 16, outputRoots, 4, outputCounts + 20,
-    callbackError, 128), 0);
+  callbackRegistry.releaseParts(
+    callbackToken.runtime,
+    callbackToken.slot,
+    callbackToken.generation,
+    callbackToken.type,
+  );
+  assert.equal(
+    library.defoldHermesWebInvokeUniversalCallback(
+      callbackToken.runtime,
+      callbackToken.slot,
+      callbackToken.generation,
+      callbackToken.type,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      outputValues,
+      4,
+      outputCounts,
+      0,
+      0,
+      outputCounts + 4,
+      0,
+      0,
+      outputCounts + 8,
+      0,
+      0,
+      outputCounts + 12,
+      0,
+      0,
+      outputCounts + 16,
+      outputRoots,
+      4,
+      outputCounts + 20,
+      callbackError,
+      128,
+    ),
+    0,
+  );
   assert.match(context.UTF8ToString(callbackError), /stale/);
   context.stackRestore(callbackCheckpoint);
 
   const leakedBefore = callbackRegistry.functions.filter(Boolean).length;
-  const callbackCycle = {}; callbackCycle.self = callbackCycle;
+  const callbackCycle = {};
+  callbackCycle.self = callbackCycle;
   assert.throws(() => host.call(201, [() => {}, callbackCycle]), /cycle/);
-  assert.equal(callbackRegistry.functions.filter(Boolean).length, leakedBefore,
-    "failed pre-dispatch encoding must release callback registry slots");
+  assert.equal(
+    callbackRegistry.functions.filter(Boolean).length,
+    leakedBefore,
+    "failed pre-dispatch encoding must release callback registry slots",
+  );
   assert.equal(allocations.length, 2, "fail-closed encoding must retain the reusable arena pool");
   host.dispose();
   assert.equal(frees.length, 2);

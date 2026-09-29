@@ -6,10 +6,18 @@ export const DMSDK_UNIVERSAL_STATIC_FRAME_SCHEMA = "DehermDmSdkUniversalStaticFr
 export const DMSDK_UNIVERSAL_STATIC_FRAME_CAPACITY = 32;
 export const DMSDK_UNIVERSAL_STATIC_FRAME_CAPABILITY = "dmsdk.static-hermes-bounded-frame.v1";
 export const DMSDK_UNIVERSAL_STATIC_FRAME_ARGUMENT_WIRE_TAGS = Object.freeze([
-  "bool", "i64", "u64", "f64", "address", "memory", "callback", "native-value",
+  "bool",
+  "i64",
+  "u64",
+  "f64",
+  "address",
+  "memory",
+  "callback",
+  "native-value",
 ]);
 export const DMSDK_UNIVERSAL_STATIC_FRAME_RESULT_WIRE_TAGS = Object.freeze([
-  "void", ...DMSDK_UNIVERSAL_STATIC_FRAME_ARGUMENT_WIRE_TAGS,
+  "void",
+  ...DMSDK_UNIVERSAL_STATIC_FRAME_ARGUMENT_WIRE_TAGS,
 ]);
 
 export function dmSdkUniversalStaticFrameCapability() {
@@ -42,7 +50,7 @@ export function dmSdkUniversalCatalogMaximumArguments(catalog) {
   }
   if (declared !== undefined && derived !== undefined && declared !== derived) {
     throw new Error(
-      `dmSDK universal policy catalog abi.maxArguments ${declared} does not match recipe maximum ${derived}`
+      `dmSDK universal policy catalog abi.maxArguments ${declared} does not match recipe maximum ${derived}`,
     );
   }
   return declared ?? derived;
@@ -53,8 +61,8 @@ export function assertDmSdkUniversalStaticFrameCapacity(catalog) {
   if (maximum > DMSDK_UNIVERSAL_STATIC_FRAME_CAPACITY) {
     throw new Error(
       `dmSDK universal policy catalog requires ${maximum} arguments, but ` +
-      `${DMSDK_UNIVERSAL_STATIC_FRAME_SCHEMA} supports ${DMSDK_UNIVERSAL_STATIC_FRAME_CAPACITY}; ` +
-      "upgrade @ts-defold/deherm to a package with a compatible frame capability"
+        `${DMSDK_UNIVERSAL_STATIC_FRAME_SCHEMA} supports ${DMSDK_UNIVERSAL_STATIC_FRAME_CAPACITY}; ` +
+        "upgrade @ts-defold/deherm to a package with a compatible frame capability",
     );
   }
   return maximum;

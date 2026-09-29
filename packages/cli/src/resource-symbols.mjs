@@ -2,11 +2,7 @@ import { readFile, readdir, mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import {
-  buildResourceSymbolTable,
-  readResource,
-  resourcePath
-} from "../../compiler/src/resource-symbol-table.mjs";
+import { buildResourceSymbolTable, readResource, resourcePath } from "../../compiler/src/resource-symbol-table.mjs";
 import { createComponentProxyConstants } from "../../compiler/src/component-proxy-contract.mjs";
 import { buildScriptRouteSymbolIndex } from "../../compiler/src/script-route-symbol-index.mjs";
 import { buildDmSdkCallSymbolIndex } from "../../compiler/src/dmsdk-call-symbol-index.mjs";
@@ -28,14 +24,18 @@ const generatedBindings = path.join(packageRoot, "packages", "bindings", "genera
 export async function loadResourceClassification({
   schemaPath = path.join(generatedBindings, "defold-resource-declaration-schema.json"),
   classificationPath = path.join(generatedBindings, "defold-script-resource-namespaces.json"),
-  componentPolicyPath = path.join(generatedBindings, "defold-component-proxy-contract.json")
+  componentPolicyPath = path.join(generatedBindings, "defold-component-proxy-contract.json"),
 } = {}) {
   const [schema, classification, componentPolicy] = await Promise.all([
     readFile(schemaPath, "utf8"),
     readFile(classificationPath, "utf8"),
-    readFile(componentPolicyPath, "utf8")
+    readFile(componentPolicyPath, "utf8"),
   ]);
-  return { schema: JSON.parse(schema), classification: JSON.parse(classification), componentPolicy: JSON.parse(componentPolicy) };
+  return {
+    schema: JSON.parse(schema),
+    classification: JSON.parse(classification),
+    componentPolicy: JSON.parse(componentPolicy),
+  };
 }
 
 async function walkProject(projectRoot, sourceKinds) {
@@ -49,7 +49,7 @@ async function walkProject(projectRoot, sourceKinds) {
     } catch {
       return;
     }
-    entries.sort((left, right) => left.name < right.name ? -1 : left.name > right.name ? 1 : 0);
+    entries.sort((left, right) => (left.name < right.name ? -1 : left.name > right.name ? 1 : 0));
     for (const entry of entries) {
       if (entry.isSymbolicLink()) continue;
       const absolute = path.join(directory, entry.name);
@@ -83,7 +83,7 @@ async function walkProject(projectRoot, sourceKinds) {
  * checks that would have come from the missing declarations.
  */
 export async function buildProjectResourceSymbols(projectRoot, options = {}) {
-  const { schema, classification, componentPolicy } = options.pinned ?? await loadResourceClassification();
+  const { schema, classification, componentPolicy } = options.pinned ?? (await loadResourceClassification());
   const { sourceKinds } = createComponentProxyConstants(componentPolicy);
   const extensions = schemaExtensions(schema);
   const { resources, componentSources, typeScriptSources } = await walkProject(projectRoot, sourceKinds);
@@ -110,32 +110,45 @@ export async function buildProjectResourceSymbols(projectRoot, options = {}) {
     try {
       sourceTexts.set(relative, await readFile(path.join(projectRoot, relative), "utf8"));
     } catch (error) {
-      diagnostics.push({ severity: "warning", path: relative, message: `unreadable TypeScript source: ${error.message}` });
+      diagnostics.push({
+        severity: "warning",
+        path: relative,
+        message: `unreadable TypeScript source: ${error.message}`,
+      });
     }
   }
-  const table = buildResourceSymbolTable({ schema, classification, resources: parsed, componentSources, sourceTexts, componentPolicy });
+  const table = buildResourceSymbolTable({
+    schema,
+    classification,
+    resources: parsed,
+    componentSources,
+    sourceTexts,
+    componentPolicy,
+  });
   return {
     ...table,
     projectFile: "game.project",
     projectRootFrom: options.projectRootFrom ?? ".",
     resourceCount: parsed.length,
     componentCount: componentSources.length,
-    diagnostics
+    diagnostics,
   };
 }
 
 /** Write `<outputRoot>/generated/resource-symbols.json` for the ttsc transform. */
 export async function writeProjectResourceSymbols(projectRoot, outputRoot, options = {}) {
   const directory = path.join(outputRoot, "generated");
-  const pinned = options.pinned ?? await loadResourceClassification({
-    schemaPath: path.join(outputRoot, "ir", "defold-resource-declaration-schema.json"),
-    classificationPath: path.join(outputRoot, "ir", "defold-script-resource-namespaces.json"),
-    componentPolicyPath: path.join(outputRoot, "ir", "defold-component-proxy-contract.json")
-  });
+  const pinned =
+    options.pinned ??
+    (await loadResourceClassification({
+      schemaPath: path.join(outputRoot, "ir", "defold-resource-declaration-schema.json"),
+      classificationPath: path.join(outputRoot, "ir", "defold-script-resource-namespaces.json"),
+      componentPolicyPath: path.join(outputRoot, "ir", "defold-component-proxy-contract.json"),
+    }));
   const table = await buildProjectResourceSymbols(projectRoot, {
     ...options,
     pinned,
-    projectRootFrom: portable(path.relative(directory, path.resolve(projectRoot))) || "."
+    projectRootFrom: portable(path.relative(directory, path.resolve(projectRoot))) || ".",
   });
   await mkdir(directory, { recursive: true });
   const file = path.join(directory, "resource-symbols.json");
@@ -157,7 +170,7 @@ export async function writeProjectRouteSymbolIndex(outputRoot, options = {}) {
   const directory = path.join(outputRoot, "generated");
   const [scriptIr, loweringPlan] = await Promise.all([
     readFile(options.scriptIrPath ?? path.join(outputRoot, "ir", "script-api.json"), "utf8"),
-    readFile(options.loweringPlanPath ?? path.join(outputRoot, "ir", "binding-lowering-plan.json"), "utf8")
+    readFile(options.loweringPlanPath ?? path.join(outputRoot, "ir", "binding-lowering-plan.json"), "utf8"),
   ]);
   const index = buildScriptRouteSymbolIndex(JSON.parse(scriptIr), JSON.parse(loweringPlan));
   await mkdir(directory, { recursive: true });
@@ -171,7 +184,7 @@ export async function writeProjectDmSdkCallSymbolIndex(outputRoot, options = {})
   const directory = path.join(outputRoot, "generated");
   const [irSource, catalogSource] = await Promise.all([
     readFile(options.irPath ?? path.join(outputRoot, "ir", "dmsdk.json"), "utf8"),
-    readFile(options.catalogPath ?? path.join(outputRoot, "ir", "dmsdk-universal-bindings.json"), "utf8")
+    readFile(options.catalogPath ?? path.join(outputRoot, "ir", "dmsdk-universal-bindings.json"), "utf8"),
   ]);
   const index = buildDmSdkCallSymbolIndex(JSON.parse(irSource), JSON.parse(catalogSource));
   await mkdir(directory, { recursive: true });

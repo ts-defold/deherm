@@ -3,9 +3,16 @@ import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 
-function sha256(value) { return createHash("sha256").update(value).digest("hex"); }
-function safeName(value, label) { if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(value)) throw new Error(`${label} must be an identifier`); return value; }
-function typeScriptName(value) { return value.replaceAll("::", "$"); }
+function sha256(value) {
+  return createHash("sha256").update(value).digest("hex");
+}
+function safeName(value, label) {
+  if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(value)) throw new Error(`${label} must be an identifier`);
+  return value;
+}
+function typeScriptName(value) {
+  return value.replaceAll("::", "$");
+}
 function mainHeaderDeclaration(node, absolute, ancestors = []) {
   if (node.isImplicit || node.implicit) return false;
   const location = node.loc ?? {};
@@ -23,9 +30,7 @@ function walk(node, visit, ancestors = []) {
   for (const child of node.inner ?? []) walk(child, visit, [...ancestors, node]);
 }
 function resultSpelling(node) {
-  return node.type.qualType
-    .replace(/\s*\([^()]*\)(?:\s+(?:const|volatile|noexcept))*$/u, "")
-    .trim();
+  return node.type.qualType.replace(/\s*\([^()]*\)(?:\s+(?:const|volatile|noexcept))*$/u, "").trim();
 }
 
 function cppScopePath(ancestors) {
@@ -43,10 +48,21 @@ function sourceOffset(node) {
 }
 
 const scalar = new Map([
-  ["void", ["void", "void"]], ["_Bool", ["bool", "boolean"]], ["bool", ["bool", "boolean"]],
-  ["uint8_t", ["u8", "number"]], ["uint16_t", ["u16", "number"]], ["uint32_t", ["u32", "number"]], ["uint64_t", ["u64", "bigint"]],
-  ["int8_t", ["i8", "number"]], ["int16_t", ["i16", "number"]], ["int32_t", ["i32", "number"]], ["int64_t", ["i64", "bigint"]],
-  ["float", ["f32", "number"]], ["double", ["f64", "number"]], ["const char *", ["cstring", "string"]], ["char const *", ["cstring", "string"]],
+  ["void", ["void", "void"]],
+  ["_Bool", ["bool", "boolean"]],
+  ["bool", ["bool", "boolean"]],
+  ["uint8_t", ["u8", "number"]],
+  ["uint16_t", ["u16", "number"]],
+  ["uint32_t", ["u32", "number"]],
+  ["uint64_t", ["u64", "bigint"]],
+  ["int8_t", ["i8", "number"]],
+  ["int16_t", ["i16", "number"]],
+  ["int32_t", ["i32", "number"]],
+  ["int64_t", ["i64", "bigint"]],
+  ["float", ["f32", "number"]],
+  ["double", ["f64", "number"]],
+  ["const char *", ["cstring", "string"]],
+  ["char const *", ["cstring", "string"]],
 ]);
 
 function declaredType(types, name, scope) {
@@ -61,19 +77,50 @@ function declaredType(types, name, scope) {
 
 function normalizeType(spelling, enums, records, scope = []) {
   const text = spelling.replace(/\s+/g, " ").trim();
-  if (scalar.has(text)) { const [kind, ts] = scalar.get(text); return { kind, nativeType: text, ts }; }
+  if (scalar.has(text)) {
+    const [kind, ts] = scalar.get(text);
+    return { kind, nativeType: text, ts };
+  }
   const enumName = text.replace(/^enum /, "");
   const enumDeclaration = declaredType(enums, enumName, scope);
-  if (enumDeclaration) { const declared = enumDeclaration.name; return { kind: "enum", name: declared, nativeType: declared.includes("::") ? declared : text, ts: typeScriptName(declared) }; }
+  if (enumDeclaration) {
+    const declared = enumDeclaration.name;
+    return {
+      kind: "enum",
+      name: declared,
+      nativeType: declared.includes("::") ? declared : text,
+      ts: typeScriptName(declared),
+    };
+  }
   const recordName = text.replace(/^struct /, "");
   const recordDeclaration = declaredType(records, recordName, scope);
-  if (recordDeclaration) { const declared = recordDeclaration.name; return { kind: "record", name: declared, nativeType: declared.includes("::") ? declared : text, ts: typeScriptName(declared) }; }
-  if (/\*$/.test(text)) return { kind: "pointer", nativeType: text, ts: "NativeAddress" };
+  if (recordDeclaration) {
+    const declared = recordDeclaration.name;
+    return {
+      kind: "record",
+      name: declared,
+      nativeType: declared.includes("::") ? declared : text,
+      ts: typeScriptName(declared),
+    };
+  }
+  if (text.endsWith("*")) return { kind: "pointer", nativeType: text, ts: "NativeAddress" };
   return { kind: "unsupported", nativeType: text, ts: "never" };
 }
 
-function enumValues(nodes) { let next = 0; return nodes.filter((item) => item.kind === "EnumConstantDecl").map((item) => { const explicit = item.inner?.find((child) => child.kind === "ConstantExpr")?.value; const value = explicit === undefined ? next : Number(explicit); next = value + 1; return { name: item.name, value }; }); }
-function typeSupported(type) { return !["record", "unsupported", "pointer"].includes(type.kind); }
+function enumValues(nodes) {
+  let next = 0;
+  return nodes
+    .filter((item) => item.kind === "EnumConstantDecl")
+    .map((item) => {
+      const explicit = item.inner?.find((child) => child.kind === "ConstantExpr")?.value;
+      const value = explicit === undefined ? next : Number(explicit);
+      next = value + 1;
+      return { name: item.name, value };
+    });
+}
+function typeSupported(type) {
+  return !["record", "unsupported", "pointer"].includes(type.kind);
+}
 
 function routeIdentity(module, symbol, parameters, result, variadic) {
   const signature = {
@@ -99,26 +146,53 @@ export function ingestNativeExtensionHeader({
   language = "c",
   symbols = null,
   clang = process.env.CLANG ?? "clang",
-  include = []
+  include = [],
 }) {
-  const absolute = path.resolve(header), module = safeName(moduleName, "moduleName");
+  const absolute = path.resolve(header),
+    module = safeName(moduleName, "moduleName");
   if (language !== "c" && language !== "c++") throw new Error("language must be c or c++");
-  const effectiveSymbolPrefix = symbolPrefix === undefined ? (language === "c++" ? null : `${moduleName}_`) : symbolPrefix;
-  if (effectiveSymbolPrefix !== null && (typeof effectiveSymbolPrefix !== "string" || !/^[A-Za-z_][A-Za-z0-9_]*$/u.test(effectiveSymbolPrefix))) {
+  const effectiveSymbolPrefix =
+    symbolPrefix === undefined ? (language === "c++" ? null : `${moduleName}_`) : symbolPrefix;
+  if (
+    effectiveSymbolPrefix !== null &&
+    (typeof effectiveSymbolPrefix !== "string" || !/^[A-Za-z_][A-Za-z0-9_]*$/u.test(effectiveSymbolPrefix))
+  ) {
     throw new Error("symbolPrefix must be null or a C identifier prefix");
   }
-  if (symbols !== null && (!Array.isArray(symbols) || symbols.some((symbol) => typeof symbol !== "string" || !/^[A-Za-z_][A-Za-z0-9_]*(?:::[A-Za-z_][A-Za-z0-9_]*)*$/u.test(symbol)))) {
+  if (
+    symbols !== null &&
+    (!Array.isArray(symbols) ||
+      symbols.some(
+        (symbol) =>
+          typeof symbol !== "string" || !/^[A-Za-z_][A-Za-z0-9_]*(?:::[A-Za-z_][A-Za-z0-9_]*)*$/u.test(symbol),
+      ))
+  ) {
     throw new Error("symbols must be null or an array of C/C++ identifiers");
   }
   const selectedSymbols = symbols === null ? null : new Set(symbols);
-  if (selectedSymbols && selectedSymbols.size !== symbols.length) throw new Error("symbols must not contain duplicates");
-  const ast = JSON.parse(execFileSync(clang, [
-    "-x", language, language === "c++" ? "-std=c++17" : "-std=c11",
-    "-Wno-pragma-once-outside-header",
-    ...include.flatMap((entry) => ["-I", path.resolve(entry)]),
-    "-Xclang", "-ast-dump=json", "-fsyntax-only", absolute
-  ], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024, stdio: ["ignore", "pipe", "pipe"] }));
-  const enums = new Map(), records = new Map(), functions = [], methods = [];
+  if (selectedSymbols && selectedSymbols.size !== symbols.length)
+    throw new Error("symbols must not contain duplicates");
+  const ast = JSON.parse(
+    execFileSync(
+      clang,
+      [
+        "-x",
+        language,
+        language === "c++" ? "-std=c++17" : "-std=c11",
+        "-Wno-pragma-once-outside-header",
+        ...include.flatMap((entry) => ["-I", path.resolve(entry)]),
+        "-Xclang",
+        "-ast-dump=json",
+        "-fsyntax-only",
+        absolute,
+      ],
+      { encoding: "utf8", maxBuffer: 64 * 1024 * 1024, stdio: ["ignore", "pipe", "pipe"] },
+    ),
+  );
+  const enums = new Map(),
+    records = new Map(),
+    functions = [],
+    methods = [];
   walk(ast, (node, ancestors) => {
     // Type facts may live in transitive public headers even though only the
     // selected header owns callable surface declarations. Referenced-type
@@ -129,18 +203,30 @@ export function ingestNativeExtensionHeader({
     }
     if ((node.kind === "RecordDecl" || node.kind === "CXXRecordDecl") && node.name) {
       const name = language === "c++" ? qualifiedName(node.name, ancestors) : node.name;
-      const record = { name, fields: (node.inner ?? []).filter((item) => item.kind === "FieldDecl").map((item) => ({ name: item.name, nativeType: item.type.qualType })) };
+      const record = {
+        name,
+        fields: (node.inner ?? [])
+          .filter((item) => item.kind === "FieldDecl")
+          .map((item) => ({ name: item.name, nativeType: item.type.qualType })),
+      };
       if (!records.has(name) || record.fields.length) records.set(name, record);
     }
     const template = ancestors.some(({ kind }) => kind === "FunctionTemplateDecl" || kind === "ClassTemplateDecl");
     if (node.kind === "FunctionDecl" && node.name && mainHeaderDeclaration(node, absolute, ancestors)) {
       const nativeSymbol = language === "c++" ? qualifiedName(node.name, ancestors) : node.name;
-      if ((effectiveSymbolPrefix === null || node.name.startsWith(effectiveSymbolPrefix)) &&
-          (!selectedSymbols || selectedSymbols.has(nativeSymbol))) {
+      if (
+        (effectiveSymbolPrefix === null || node.name.startsWith(effectiveSymbolPrefix)) &&
+        (!selectedSymbols || selectedSymbols.has(nativeSymbol))
+      ) {
         functions.push({ node, nativeSymbol, template, scope: language === "c++" ? cppScopePath(ancestors) : [] });
       }
     }
-    if (language === "c++" && node.kind === "CXXMethodDecl" && node.name && mainHeaderDeclaration(node, absolute, ancestors)) {
+    if (
+      language === "c++" &&
+      node.kind === "CXXMethodDecl" &&
+      node.name &&
+      mainHeaderDeclaration(node, absolute, ancestors)
+    ) {
       const record = [...ancestors].reverse().find(({ kind, name }) => kind === "CXXRecordDecl" && name);
       const nativeSymbol = qualifiedName(node.name, ancestors);
       if (!selectedSymbols || selectedSymbols.has(nativeSymbol)) {
@@ -150,39 +236,50 @@ export function ingestNativeExtensionHeader({
   });
   const callableNodes = [
     ...functions.map((entry) => ({ ...entry, invocation: "free-function" })),
-    ...methods.map((entry) => ({ ...entry, invocation: "method" }))
+    ...methods.map((entry) => ({ ...entry, invocation: "method" })),
   ];
-  const candidates = callableNodes.sort((a, b) => sourceOffset(a.node) - sourceOffset(b.node) || a.nativeSymbol.localeCompare(b.nativeSymbol)).map(({ node, nativeSymbol, template, invocation, record, scope }) => {
-    const parameters = (node.inner ?? []).filter((item) => item.kind === "ParmVarDecl").map((item, position) => ({ position, name: item.name || `arg${position}`, type: normalizeType(item.type.qualType, enums, records, scope) }));
-    const result = normalizeType(resultSpelling(node), enums, records, scope);
-    const variadic = Boolean(node.variadic) || /,?\s*\.\.\.\s*\)/u.test(node.type.qualType);
-    const blockers = [
-      ...(invocation === "method" ? [`receiver:requires-handle-policy:${record ?? "unknown"}`] : []),
-      ...(template ? ["template:requires-specialization"] : []),
-      ...parameters.filter(({ type }) => !typeSupported(type)).map(({ position, type }) => `parameter-${position}:${type.kind}:${type.nativeType}`),
-      ...(!typeSupported(result) ? [`result:${result.kind}:${result.nativeType}`] : []),
-      ...(variadic ? ["variadic:requires-typed-nonvariadic-facade"] : []),
-    ];
-    const identity = routeIdentity(module, nativeSymbol, parameters, result, variadic);
-    return {
-      id: identity.numericId,
-      ...identity,
-      symbol: nativeSymbol,
-      memberName: invocation === "method" || effectiveSymbolPrefix === null
-        ? node.name
-        : node.name.slice(effectiveSymbolPrefix.length),
-      line: node.loc.line ?? 0,
-      language,
-      linkage: language === "c++" && node.mangledName && node.mangledName !== node.name ? "c++" : "extern-c",
-      invocation,
-      ...(record ? { receiverType: record } : {}),
-      variadic,
-      parameters,
-      result,
-      disposition: blockers.length ? "cataloged-needs-layout" : "generated-c-abi",
-      blockers
-    };
-  });
+  const candidates = callableNodes
+    .sort((a, b) => sourceOffset(a.node) - sourceOffset(b.node) || a.nativeSymbol.localeCompare(b.nativeSymbol))
+    .map(({ node, nativeSymbol, template, invocation, record, scope }) => {
+      const parameters = (node.inner ?? [])
+        .filter((item) => item.kind === "ParmVarDecl")
+        .map((item, position) => ({
+          position,
+          name: item.name || `arg${position}`,
+          type: normalizeType(item.type.qualType, enums, records, scope),
+        }));
+      const result = normalizeType(resultSpelling(node), enums, records, scope);
+      const variadic = Boolean(node.variadic) || /,?\s*\.\.\.\s*\)/u.test(node.type.qualType);
+      const blockers = [
+        ...(invocation === "method" ? [`receiver:requires-handle-policy:${record ?? "unknown"}`] : []),
+        ...(template ? ["template:requires-specialization"] : []),
+        ...parameters
+          .filter(({ type }) => !typeSupported(type))
+          .map(({ position, type }) => `parameter-${position}:${type.kind}:${type.nativeType}`),
+        ...(!typeSupported(result) ? [`result:${result.kind}:${result.nativeType}`] : []),
+        ...(variadic ? ["variadic:requires-typed-nonvariadic-facade"] : []),
+      ];
+      const identity = routeIdentity(module, nativeSymbol, parameters, result, variadic);
+      return {
+        id: identity.numericId,
+        ...identity,
+        symbol: nativeSymbol,
+        memberName:
+          invocation === "method" || effectiveSymbolPrefix === null
+            ? node.name
+            : node.name.slice(effectiveSymbolPrefix.length),
+        line: node.loc.line ?? 0,
+        language,
+        linkage: language === "c++" && node.mangledName && node.mangledName !== node.name ? "c++" : "extern-c",
+        invocation,
+        ...(record ? { receiverType: record } : {}),
+        variadic,
+        parameters,
+        result,
+        disposition: blockers.length ? "cataloged-needs-layout" : "generated-c-abi",
+        blockers,
+      };
+    });
   const stableRoutes = new Map();
   for (const route of candidates) {
     if (!stableRoutes.has(route.stableId)) stableRoutes.set(route.stableId, route);
@@ -191,11 +288,24 @@ export function ingestNativeExtensionHeader({
   const numericOwners = new Map();
   for (const route of routes) {
     const owner = numericOwners.get(route.numericId);
-    if (owner) throw new Error(`native extension numeric ID collision between ${owner.symbol} (${owner.stableId}) and ${route.symbol} (${route.stableId})`);
+    if (owner)
+      throw new Error(
+        `native extension numeric ID collision between ${owner.symbol} (${owner.stableId}) and ${route.symbol} (${route.stableId})`,
+      );
     numericOwners.set(route.numericId, route);
   }
-  const referencedRecords = new Set(routes.flatMap((route) => [route.result, ...route.parameters.map(({ type }) => type)]).filter(({ kind }) => kind === "record").map(({ name }) => name));
-  const referencedEnums = new Set(routes.flatMap((route) => [route.result, ...route.parameters.map(({ type }) => type)]).filter(({ kind }) => kind === "enum").map(({ name }) => name));
+  const referencedRecords = new Set(
+    routes
+      .flatMap((route) => [route.result, ...route.parameters.map(({ type }) => type)])
+      .filter(({ kind }) => kind === "record")
+      .map(({ name }) => name),
+  );
+  const referencedEnums = new Set(
+    routes
+      .flatMap((route) => [route.result, ...route.parameters.map(({ type }) => type)])
+      .filter(({ kind }) => kind === "enum")
+      .map(({ name }) => name),
+  );
   const missingSymbols = selectedSymbols
     ? [...selectedSymbols].filter((symbol) => !routes.some((route) => route.symbol === symbol)).sort()
     : [];
@@ -207,22 +317,66 @@ export function ingestNativeExtensionHeader({
     ...(symbols === null ? {} : { selectedSymbols: [...selectedSymbols].sort(), missingSymbols }),
     header: path.basename(absolute),
     headerSha256: sha256(readFileSync(absolute)),
-    enums: [...new Map([...enums.values()].filter(({ name }) => referencedEnums.has(name)).map((item) => [item.name, item])).values()].sort((a, b) => a.name.localeCompare(b.name)),
-    records: [...new Map([...records.values()].filter(({ name }) => referencedRecords.has(name)).map((item) => [item.name, item])).values()].sort((a, b) => a.name.localeCompare(b.name)),
+    enums: [
+      ...new Map(
+        [...enums.values()].filter(({ name }) => referencedEnums.has(name)).map((item) => [item.name, item]),
+      ).values(),
+    ].sort((a, b) => a.name.localeCompare(b.name)),
+    records: [
+      ...new Map(
+        [...records.values()].filter(({ name }) => referencedRecords.has(name)).map((item) => [item.name, item]),
+      ).values(),
+    ].sort((a, b) => a.name.localeCompare(b.name)),
     routes,
-    blockers: missingSymbols.map((symbol) => ({ code: "schema-symbol-not-found", symbol }))
+    blockers: missingSymbols.map((symbol) => ({ code: "schema-symbol-not-found", symbol })),
   };
 }
 
-function tag(type) { if (type.kind === "bool") return "DEHERM_DMSDK_UNIVERSAL_BOOL"; if (["f32", "f64"].includes(type.kind)) return "DEHERM_DMSDK_UNIVERSAL_F64"; if (["i8", "i16", "i32", "i64", "enum"].includes(type.kind)) return "DEHERM_DMSDK_UNIVERSAL_I64"; if (["u8", "u16", "u32", "u64"].includes(type.kind)) return "DEHERM_DMSDK_UNIVERSAL_U64"; if (type.kind === "cstring") return "DEHERM_DMSDK_UNIVERSAL_ADDRESS"; return type.kind === "void" ? "DEHERM_DMSDK_UNIVERSAL_VOID" : null; }
-function condition(type, index, ir) { const tagged = `arguments[${index}].tag==${tag(type)}`; if (type.kind === "bool") return `${tagged}&&arguments[${index}].payload<=1`; if (["u8", "u16", "u32"].includes(type.kind)) return `${tagged}&&arguments[${index}].payload<=UINT${type.kind.slice(1)}_MAX`; if (["i8", "i16", "i32"].includes(type.kind)) return `${tagged}&&deherm_ext_unpack_i64(arguments[${index}].payload)>=INT${type.kind.slice(1)}_MIN&&deherm_ext_unpack_i64(arguments[${index}].payload)<=INT${type.kind.slice(1)}_MAX`; if (type.kind === "enum") { const domain = ir.enums.find(({ name }) => name === type.name)?.values ?? []; return `${tagged}&&(${domain.map(({ value }) => `deherm_ext_unpack_i64(arguments[${index}].payload)==INT64_C(${value})`).join("||") || "false"})`; } if (type.kind === "cstring") return `${tagged}&&arguments[${index}].payload!=0`; return tagged; }
-function decode(type, index) { if (type.kind === "bool") return `arguments[${index}].payload != 0`; if (type.kind === "f32") return `static_cast<float>(deherm_ext_unpack_f64(arguments[${index}].payload))`; if (type.kind === "f64") return `deherm_ext_unpack_f64(arguments[${index}].payload)`; if (["i8", "i16", "i32", "i64", "enum"].includes(type.kind)) return `static_cast<${type.nativeType}>(deherm_ext_unpack_i64(arguments[${index}].payload))`; if (["u8", "u16", "u32", "u64"].includes(type.kind)) return `static_cast<${type.nativeType}>(arguments[${index}].payload)`; if (type.kind === "cstring") return `reinterpret_cast<const char*>(static_cast<uintptr_t>(arguments[${index}].payload))`; }
-function encodeResult(type, call) { if (type.kind === "void") return `${call}; result->tag=DEHERM_DMSDK_UNIVERSAL_VOID;`;
-  if (type.kind === "bool") return `auto value=${call};result->tag=DEHERM_DMSDK_UNIVERSAL_BOOL;result->payload=value?1:0;`;
-  if (["f32", "f64"].includes(type.kind)) return `double value=static_cast<double>(${call});result->tag=DEHERM_DMSDK_UNIVERSAL_F64;memcpy(&result->payload,&value,sizeof(value));`;
-  if (["i8", "i16", "i32", "i64", "enum"].includes(type.kind)) return `auto value=${call};result->tag=DEHERM_DMSDK_UNIVERSAL_I64;result->payload=static_cast<uint64_t>(static_cast<int64_t>(value));`;
-  if (["u8", "u16", "u32", "u64"].includes(type.kind)) return `auto value=${call};result->tag=DEHERM_DMSDK_UNIVERSAL_U64;result->payload=static_cast<uint64_t>(value);`;
-  if (type.kind === "cstring") return `const char* value=${call};result->tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;result->payload=reinterpret_cast<uintptr_t>(value);result->auxiliary=value?strlen(value):0;`;
+function tag(type) {
+  if (type.kind === "bool") return "DEHERM_DMSDK_UNIVERSAL_BOOL";
+  if (["f32", "f64"].includes(type.kind)) return "DEHERM_DMSDK_UNIVERSAL_F64";
+  if (["i8", "i16", "i32", "i64", "enum"].includes(type.kind)) return "DEHERM_DMSDK_UNIVERSAL_I64";
+  if (["u8", "u16", "u32", "u64"].includes(type.kind)) return "DEHERM_DMSDK_UNIVERSAL_U64";
+  if (type.kind === "cstring") return "DEHERM_DMSDK_UNIVERSAL_ADDRESS";
+  return type.kind === "void" ? "DEHERM_DMSDK_UNIVERSAL_VOID" : null;
+}
+function condition(type, index, ir) {
+  const tagged = `arguments[${index}].tag==${tag(type)}`;
+  if (type.kind === "bool") return `${tagged}&&arguments[${index}].payload<=1`;
+  if (["u8", "u16", "u32"].includes(type.kind))
+    return `${tagged}&&arguments[${index}].payload<=UINT${type.kind.slice(1)}_MAX`;
+  if (["i8", "i16", "i32"].includes(type.kind))
+    return `${tagged}&&deherm_ext_unpack_i64(arguments[${index}].payload)>=INT${type.kind.slice(1)}_MIN&&deherm_ext_unpack_i64(arguments[${index}].payload)<=INT${type.kind.slice(1)}_MAX`;
+  if (type.kind === "enum") {
+    const domain = ir.enums.find(({ name }) => name === type.name)?.values ?? [];
+    return `${tagged}&&(${domain.map(({ value }) => `deherm_ext_unpack_i64(arguments[${index}].payload)==INT64_C(${value})`).join("||") || "false"})`;
+  }
+  if (type.kind === "cstring") return `${tagged}&&arguments[${index}].payload!=0`;
+  return tagged;
+}
+function decode(type, index) {
+  if (type.kind === "bool") return `arguments[${index}].payload != 0`;
+  if (type.kind === "f32") return `static_cast<float>(deherm_ext_unpack_f64(arguments[${index}].payload))`;
+  if (type.kind === "f64") return `deherm_ext_unpack_f64(arguments[${index}].payload)`;
+  if (["i8", "i16", "i32", "i64", "enum"].includes(type.kind))
+    return `static_cast<${type.nativeType}>(deherm_ext_unpack_i64(arguments[${index}].payload))`;
+  if (["u8", "u16", "u32", "u64"].includes(type.kind))
+    return `static_cast<${type.nativeType}>(arguments[${index}].payload)`;
+  if (type.kind === "cstring")
+    return `reinterpret_cast<const char*>(static_cast<uintptr_t>(arguments[${index}].payload))`;
+}
+function encodeResult(type, call) {
+  if (type.kind === "void") return `${call}; result->tag=DEHERM_DMSDK_UNIVERSAL_VOID;`;
+  if (type.kind === "bool")
+    return `auto value=${call};result->tag=DEHERM_DMSDK_UNIVERSAL_BOOL;result->payload=value?1:0;`;
+  if (["f32", "f64"].includes(type.kind))
+    return `double value=static_cast<double>(${call});result->tag=DEHERM_DMSDK_UNIVERSAL_F64;memcpy(&result->payload,&value,sizeof(value));`;
+  if (["i8", "i16", "i32", "i64", "enum"].includes(type.kind))
+    return `auto value=${call};result->tag=DEHERM_DMSDK_UNIVERSAL_I64;result->payload=static_cast<uint64_t>(static_cast<int64_t>(value));`;
+  if (["u8", "u16", "u32", "u64"].includes(type.kind))
+    return `auto value=${call};result->tag=DEHERM_DMSDK_UNIVERSAL_U64;result->payload=static_cast<uint64_t>(value);`;
+  if (type.kind === "cstring")
+    return `const char* value=${call};result->tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;result->payload=reinterpret_cast<uintptr_t>(value);result->auxiliary=value?strlen(value):0;`;
 }
 
 function routeNames(namespace, route) {
@@ -251,21 +405,35 @@ function fakeDeclaration(route) {
 function sampleFor(type, position, ir, role) {
   if (type.kind === "void") return { kind: "void", tag: tag(type), value: null };
   if (type.kind === "bool") return { kind: type.kind, tag: tag(type), value: true };
-  if (["u8", "u16", "u32", "u64"].includes(type.kind)) return { kind: type.kind, tag: tag(type), value: role === "result" ? 91 : 17 + position };
-  if (["i8", "i16", "i32", "i64"].includes(type.kind)) return { kind: type.kind, tag: tag(type), value: role === "result" ? -31 : -7 - position };
-  if (["f32", "f64"].includes(type.kind)) return { kind: type.kind, tag: tag(type), value: role === "result" ? 9.5 : 1.25 + position };
-  if (type.kind === "cstring") return { kind: type.kind, tag: tag(type), value: role === "result" ? "deherm-exact-result" : `deherm-exact-argument-${position}` };
+  if (["u8", "u16", "u32", "u64"].includes(type.kind))
+    return { kind: type.kind, tag: tag(type), value: role === "result" ? 91 : 17 + position };
+  if (["i8", "i16", "i32", "i64"].includes(type.kind))
+    return { kind: type.kind, tag: tag(type), value: role === "result" ? -31 : -7 - position };
+  if (["f32", "f64"].includes(type.kind))
+    return { kind: type.kind, tag: tag(type), value: role === "result" ? 9.5 : 1.25 + position };
+  if (type.kind === "cstring")
+    return {
+      kind: type.kind,
+      tag: tag(type),
+      value: role === "result" ? "deherm-exact-result" : `deherm-exact-argument-${position}`,
+    };
   if (type.kind === "enum") {
     const domain = ir.enums.find(({ name }) => name === type.name)?.values ?? [];
     if (!domain.length) throw new Error(`${type.name}: generated enum route has no declared values`);
-    return { kind: type.kind, tag: tag(type), value: domain[role === "result" ? domain.length - 1 : position % domain.length].value, enumName: type.name };
+    return {
+      kind: type.kind,
+      tag: tag(type),
+      value: domain[role === "result" ? domain.length - 1 : position % domain.length].value,
+      enumName: type.name,
+    };
   }
   throw new Error(`cannot generate exact-call sample for ${type.nativeType}`);
 }
 
 function nativeLiteral(type, sample) {
   if (type.kind === "bool") return sample.value ? "true" : "false";
-  if (["u8", "u16", "u32", "u64", "i8", "i16", "i32", "i64"].includes(type.kind)) return `static_cast<${type.nativeType}>(${sample.value})`;
+  if (["u8", "u16", "u32", "u64", "i8", "i16", "i32", "i64"].includes(type.kind))
+    return `static_cast<${type.nativeType}>(${sample.value})`;
   if (type.kind === "f32") return `${sample.value}f`;
   if (type.kind === "f64") return `${sample.value}`;
   if (type.kind === "cstring") return JSON.stringify(sample.value);
@@ -282,20 +450,28 @@ function nativeComparison(type, expression, sample) {
 function renderCellSetup(sample, index) {
   const slot = `arguments[${index}]`;
   if (sample.kind === "bool") return `${slot}.tag=${sample.tag};${slot}.payload=${sample.value ? 1 : 0};`;
-  if (["u8", "u16", "u32", "u64"].includes(sample.kind)) return `${slot}.tag=${sample.tag};${slot}.payload=UINT64_C(${sample.value});`;
-  if (["i8", "i16", "i32", "i64", "enum"].includes(sample.kind)) return `${slot}.tag=${sample.tag};${slot}.payload=static_cast<uint64_t>(${sample.value});`;
-  if (["f32", "f64"].includes(sample.kind)) return `{double value=${sample.value};${slot}.tag=${sample.tag};memcpy(&${slot}.payload,&value,sizeof(value));}`;
-  if (sample.kind === "cstring") return `{const char* value=${JSON.stringify(sample.value)};${slot}.tag=${sample.tag};${slot}.payload=reinterpret_cast<uintptr_t>(value);${slot}.auxiliary=strlen(value);}`;
+  if (["u8", "u16", "u32", "u64"].includes(sample.kind))
+    return `${slot}.tag=${sample.tag};${slot}.payload=UINT64_C(${sample.value});`;
+  if (["i8", "i16", "i32", "i64", "enum"].includes(sample.kind))
+    return `${slot}.tag=${sample.tag};${slot}.payload=static_cast<uint64_t>(${sample.value});`;
+  if (["f32", "f64"].includes(sample.kind))
+    return `{double value=${sample.value};${slot}.tag=${sample.tag};memcpy(&${slot}.payload,&value,sizeof(value));}`;
+  if (sample.kind === "cstring")
+    return `{const char* value=${JSON.stringify(sample.value)};${slot}.tag=${sample.tag};${slot}.payload=reinterpret_cast<uintptr_t>(value);${slot}.auxiliary=strlen(value);}`;
   throw new Error(`cannot render exact-call cell for ${sample.kind}`);
 }
 
 function renderResultCheck(type, sample) {
   if (type.kind === "void") return `result.tag==${sample.tag}`;
   if (type.kind === "bool") return `result.tag==${sample.tag}&&result.payload==${sample.value ? 1 : 0}`;
-  if (["u8", "u16", "u32", "u64"].includes(type.kind)) return `result.tag==${sample.tag}&&result.payload==UINT64_C(${sample.value})`;
-  if (["i8", "i16", "i32", "i64", "enum"].includes(type.kind)) return `result.tag==${sample.tag}&&deherm_exact_result_i64(result)==${sample.value}`;
-  if (["f32", "f64"].includes(type.kind)) return `result.tag==${sample.tag}&&deherm_exact_result_f64(result)==${sample.value}`;
-  if (type.kind === "cstring") return `result.tag==${sample.tag}&&result.payload!=0&&strcmp(reinterpret_cast<const char*>(static_cast<uintptr_t>(result.payload)),${JSON.stringify(sample.value)})==0&&result.auxiliary==UINT64_C(${Buffer.byteLength(sample.value)})`;
+  if (["u8", "u16", "u32", "u64"].includes(type.kind))
+    return `result.tag==${sample.tag}&&result.payload==UINT64_C(${sample.value})`;
+  if (["i8", "i16", "i32", "i64", "enum"].includes(type.kind))
+    return `result.tag==${sample.tag}&&deherm_exact_result_i64(result)==${sample.value}`;
+  if (["f32", "f64"].includes(type.kind))
+    return `result.tag==${sample.tag}&&deherm_exact_result_f64(result)==${sample.value}`;
+  if (type.kind === "cstring")
+    return `result.tag==${sample.tag}&&result.payload!=0&&strcmp(reinterpret_cast<const char*>(static_cast<uintptr_t>(result.payload)),${JSON.stringify(sample.value)})==0&&result.auxiliary==UINT64_C(${Buffer.byteLength(sample.value)})`;
   throw new Error(`cannot render exact-call result check for ${type.nativeType}`);
 }
 
@@ -309,10 +485,15 @@ function extensionDeclaredOwnershipContract(route) {
   const result = {
     transport: route.result.kind === "void" ? "none" : route.result.kind === "cstring" ? "address" : "value",
     direction: "return",
-    effect: route.result.kind === "void" ? "no-result" : route.result.kind === "cstring" ? "returned-identity-unowned" : "copied-result",
+    effect:
+      route.result.kind === "void"
+        ? "no-result"
+        : route.result.kind === "cstring"
+          ? "returned-identity-unowned"
+          : "copied-result",
   };
-  const declaredOwnershipEffectMask = (parameters.some(({ transport }) => transport === "address") ? 16 : 0) |
-    (result.transport === "address" ? 128 : 0);
+  const declaredOwnershipEffectMask =
+    (parameters.some(({ transport }) => transport === "address") ? 16 : 0) | (result.transport === "address" ? 128 : 0);
   return { receiver: null, parameters, result, unresolvedRequirements: [], declaredOwnershipEffectMask };
 }
 
@@ -325,10 +506,14 @@ function renderVerificationDriver(ir, routes, exactDispatch) {
     const conditions = route.parameters.map(({ type }, index) => nativeComparison(type, `arg${index}`, inputs[index]));
     const returnStatement = route.result.kind === "void" ? "return;" : `return ${nativeLiteral(route.result, output)};`;
     const declaredOwnership = extensionDeclaredOwnershipContract(route);
-    definitions.push(`extern "C" ${route.result.nativeType} ${route.names.fakeCallee}(${route.parameters.map(({ type }, index) => `${type.nativeType} arg${index}`).join(",")}){++deherm_exact_calls[${routeIndex}];if(${conditions.length ? `!(${conditions.join("&&")})` : "false"}){++deherm_exact_failures[${routeIndex}];deherm_exact_failure=${routeIndex + 1};}${returnStatement}}`);
+    definitions.push(
+      `extern "C" ${route.result.nativeType} ${route.names.fakeCallee}(${route.parameters.map(({ type }, index) => `${type.nativeType} arg${index}`).join(",")}){++deherm_exact_calls[${routeIndex}];if(${conditions.length ? `!(${conditions.join("&&")})` : "false"}){++deherm_exact_failures[${routeIndex}];deherm_exact_failure=${routeIndex + 1};}${returnStatement}}`,
+    );
     const setups = inputs.map(renderCellSetup).join("");
     const id = `UINT32_C(${route.numericId})`;
-    cases.push(`{DehermDmSdkUniversalValue arguments[${Math.max(1, route.parameters.length)}]={};DehermDmSdkUniversalValue result={};${setups}if(${exactDispatch}(${id},arguments,${route.parameters.length},&result)!=DEHERM_DMSDK_UNIVERSAL_OK)return deherm_exact_fail("dispatch",UINT32_C(${routeIndex}),${id});if(deherm_exact_calls[${routeIndex}]!=UINT32_C(1))return deherm_exact_fail("call-count",UINT32_C(${routeIndex}),${id});if(deherm_exact_failures[${routeIndex}]!=UINT32_C(0)||deherm_exact_failure)return deherm_exact_fail("arguments",UINT32_C(${routeIndex}),${id});if(!(${renderResultCheck(route.result, output)}))return deherm_exact_fail("result",UINT32_C(${routeIndex}),${id});}`);
+    cases.push(
+      `{DehermDmSdkUniversalValue arguments[${Math.max(1, route.parameters.length)}]={};DehermDmSdkUniversalValue result={};${setups}if(${exactDispatch}(${id},arguments,${route.parameters.length},&result)!=DEHERM_DMSDK_UNIVERSAL_OK)return deherm_exact_fail("dispatch",UINT32_C(${routeIndex}),${id});if(deherm_exact_calls[${routeIndex}]!=UINT32_C(1))return deherm_exact_fail("call-count",UINT32_C(${routeIndex}),${id});if(deherm_exact_failures[${routeIndex}]!=UINT32_C(0)||deherm_exact_failure)return deherm_exact_fail("arguments",UINT32_C(${routeIndex}),${id});if(!(${renderResultCheck(route.result, output)}))return deherm_exact_fail("result",UINT32_C(${routeIndex}),${id});}`,
+    );
     route.samples = { parameters: inputs, result: output };
     route.declaredOwnership = declaredOwnership;
   }
@@ -337,18 +522,40 @@ function renderVerificationDriver(ir, routes, exactDispatch) {
   return { source, fakeDefinitionsSha256: sha256(fakeDefinitions) };
 }
 
-export function renderNativeExtensionBindings(ir, { headerInclude = path.basename(ir.header), namespace = ir.module } = {}) {
+export function renderNativeExtensionBindings(
+  ir,
+  { headerInclude = path.basename(ir.header), namespace = ir.module } = {},
+) {
   const generatedNamespace = safeName(namespace, "namespace");
-  const generated = ir.routes.filter((route) => route.disposition === "generated-c-abi").map((route) => ({ ...route, names: routeNames(generatedNamespace, route) }));
-  const enumLines = ir.enums.flatMap((item) => { const name = typeScriptName(item.name); return [`export const ${name}={${item.values.map((value) => `${value.name}:${value.value}`).join(",")}} as const;`, `export type ${name}=typeof ${name}[keyof typeof ${name}];`]; });
-  const recordLines = ir.records.map((item) => `export interface ${typeScriptName(item.name)}{${item.fields.map((field) => `readonly ${field.name}:number`).join(";")}}`);
-  const functions = ir.routes.map((route) => route.disposition === "generated-c-abi" ? `  ${route.memberName ?? route.symbol.slice(ir.module.length + 1)}(${route.parameters.map((parameter) => `${parameter.name}:${parameter.type.ts}`).join(",")}):${route.result.ts};` : `  /** blocked: ${route.blockers.join(", ")} */ readonly ${route.memberName ?? route.symbol.slice(ir.module.length + 1)}:never;`);
-  const typescript = `// Generated by @deherm/compiler native-extension-generator. Do not edit.\nexport type NativeAddress=bigint;\n${enumLines.join("\n")}\n${recordLines.join("\n")}\nexport interface ${ir.module[0].toUpperCase()+ir.module.slice(1)}NativeExtension {\n${functions.join("\n")}\n}\n`;
+  const generated = ir.routes
+    .filter((route) => route.disposition === "generated-c-abi")
+    .map((route) => ({ ...route, names: routeNames(generatedNamespace, route) }));
+  const enumLines = ir.enums.flatMap((item) => {
+    const name = typeScriptName(item.name);
+    return [
+      `export const ${name}={${item.values.map((value) => `${value.name}:${value.value}`).join(",")}} as const;`,
+      `export type ${name}=typeof ${name}[keyof typeof ${name}];`,
+    ];
+  });
+  const recordLines = ir.records.map(
+    (item) =>
+      `export interface ${typeScriptName(item.name)}{${item.fields.map((field) => `readonly ${field.name}:number`).join(";")}}`,
+  );
+  const functions = ir.routes.map((route) =>
+    route.disposition === "generated-c-abi"
+      ? `  ${route.memberName ?? route.symbol.slice(ir.module.length + 1)}(${route.parameters.map((parameter) => `${parameter.name}:${parameter.type.ts}`).join(",")}):${route.result.ts};`
+      : `  /** blocked: ${route.blockers.join(", ")} */ readonly ${route.memberName ?? route.symbol.slice(ir.module.length + 1)}:never;`,
+  );
+  const typescript = `// Generated by @deherm/compiler native-extension-generator. Do not edit.\nexport type NativeAddress=bigint;\n${enumLines.join("\n")}\n${recordLines.join("\n")}\nexport interface ${ir.module[0].toUpperCase() + ir.module.slice(1)}NativeExtension {\n${functions.join("\n")}\n}\n`;
   const preamble = `#include <defold_hermes/generated_dmsdk_universal.h>\n#include <${headerInclude}>\n#include <stdint.h>\n#include <string.h>\n[[maybe_unused]] static int64_t deherm_ext_unpack_i64(uint64_t bits){int64_t value;memcpy(&value,&bits,sizeof(value));return value;}\n[[maybe_unused]] static double deherm_ext_unpack_f64(uint64_t bits){double value;memcpy(&value,&bits,sizeof(value));return value;}\n`;
   const productionDispatch = `deherm_ext_${generatedNamespace}_dispatch`;
   const exactDispatch = `deherm_ext_${generatedNamespace}_exact_dispatch`;
-  const productionWrappers = generated.map((route) => renderWrapper(route, ir, route.names.productionWrapper, route.symbol));
-  const exactWrappers = generated.map((route) => renderWrapper(route, ir, route.names.exactWrapper, route.names.fakeCallee));
+  const productionWrappers = generated.map((route) =>
+    renderWrapper(route, ir, route.names.productionWrapper, route.symbol),
+  );
+  const exactWrappers = generated.map((route) =>
+    renderWrapper(route, ir, route.names.exactWrapper, route.names.fakeCallee),
+  );
   const source = `// Generated by @deherm/compiler native-extension-generator. Do not edit.\n${preamble}${productionWrappers.join("\n")}\n${renderDispatcher(productionDispatch, generated, "productionWrapper")}\n`;
   const verificationSource = `// Generated by @deherm/compiler native-extension exact-call materializer. Do not edit.\n${preamble}${generated.map(fakeDeclaration).join("\n")}\n${exactWrappers.join("\n")}\n${renderDispatcher(exactDispatch, generated, "exactWrapper")}\n`;
   const renderedDriver = renderVerificationDriver({ ...ir, header: headerInclude }, generated, exactDispatch);
@@ -382,7 +589,12 @@ export function renderNativeExtensionBindings(ir, { headerInclude = path.basenam
         parameterCppTypes: route.parameters.map(({ type }) => type.nativeType),
         signatureSha256: route.signatureSha256,
       },
-      parameters: route.parameters.map(({ position, name, type }, parameterIndex) => ({ position, name, type, sample: route.samples.parameters[parameterIndex] })),
+      parameters: route.parameters.map(({ position, name, type }, parameterIndex) => ({
+        position,
+        name,
+        type,
+        sample: route.samples.parameters[parameterIndex],
+      })),
       result: { type: route.result, sample: route.samples.result },
       declaredOwnership: {
         receiver: route.declaredOwnership.receiver,
@@ -400,5 +612,14 @@ export function renderNativeExtensionBindings(ir, { headerInclude = path.basenam
     })),
   };
   verification.manifestSha256 = sha256(JSON.stringify(verification));
-  return { ir, typescript, source, verificationSource, verificationDriver, verification, generatedRouteCount: generated.length, blockedRouteCount: ir.routes.length - generated.length };
+  return {
+    ir,
+    typescript,
+    source,
+    verificationSource,
+    verificationDriver,
+    verification,
+    generatedRouteCount: generated.length,
+    blockedRouteCount: ir.routes.length - generated.length,
+  };
 }

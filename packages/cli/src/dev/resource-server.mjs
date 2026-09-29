@@ -7,7 +7,7 @@ const mimeTypes = new Map([
   [".json", "application/json; charset=utf-8"],
   [".js", "text/javascript; charset=utf-8"],
   [".map", "application/json; charset=utf-8"],
-  [".wasm", "application/wasm"]
+  [".wasm", "application/wasm"],
 ]);
 
 function resolveRequest(root, requestUrl) {
@@ -22,7 +22,8 @@ function resolveRequest(root, requestUrl) {
   if (!decoded || decoded.includes("\0")) return null;
   const candidate = path.resolve(root, decoded);
   const relative = path.relative(root, candidate);
-  if (relative === "" || relative === ".." || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative)) return null;
+  if (relative === "" || relative === ".." || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative))
+    return null;
   return candidate;
 }
 
@@ -76,7 +77,7 @@ export async function startResourceServer(options) {
       response.writeHead(200, {
         "content-length": contents.byteLength,
         "content-type": mimeTypes.get(path.extname(resolved)) ?? "application/octet-stream",
-        etag
+        etag,
       });
       if (request.method === "HEAD") response.end();
       else response.end(contents);
@@ -97,6 +98,6 @@ export async function startResourceServer(options) {
     root,
     port: address.port,
     baseUrl: `http://${address.address.includes(":") ? `[${address.address}]` : address.address}:${address.port}/build`,
-    close: () => new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve()))
+    close: () => new Promise((resolve, reject) => server.close((error) => (error ? reject(error) : resolve()))),
   };
 }

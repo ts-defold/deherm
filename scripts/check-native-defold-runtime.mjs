@@ -39,7 +39,7 @@ if (probeReport.target !== "arm64-macos" || !Array.isArray(probeReport.probes) |
 let instrumentedValueProbes;
 try {
   instrumentedValueProbes = validateNativeValueProbeReport(valueProbeReport, valueBindingReport);
-} catch (error) {
+} catch {
   throw new Error(`Invalid native value probe report: ${valueProbeReportPath}`);
 }
 
@@ -52,12 +52,14 @@ const expected = [
   exact(`INFO:DEFOLD_HERMES: bundle:${fingerprint}`),
   exact("INFO:DEFOLD_HERMES: module:42"),
   exact(probeReport.expectedInputMarker),
-  ...probeReport.probes.map((probe) => probe.expectedMarker ? exact(probe.expectedMarker) : prefix(probe.expectedMarkerPrefix)),
+  ...probeReport.probes.map((probe) =>
+    probe.expectedMarker ? exact(probe.expectedMarker) : prefix(probe.expectedMarkerPrefix),
+  ),
   exact(valueProbeReport.expectedInputMarker),
   ...instrumentedValueProbes.map((probe) => exact(probe.expectedMarker)),
   exact("INFO:DEFOLD_HERMES: Extension update entered (application initialized: true)"),
   exact("INFO:DEFOLD_HERMES: lifecycle:update:1"),
-  exact("INFO:DEFOLD_HERMES: final:ok")
+  exact("INFO:DEFOLD_HERMES: final:ok"),
 ];
 
 if (!Number.isSafeInteger(timeoutMs) || timeoutMs <= 0) {
@@ -70,7 +72,7 @@ if (!executableStat.isFile()) throw new Error(`Native bundle executable is missi
 const child = spawn(executable, ["--config=deherm.test_exit=1"], {
   cwd: resources,
   env: process.env,
-  stdio: ["ignore", "pipe", "pipe"]
+  stdio: ["ignore", "pipe", "pipe"],
 });
 
 let transcript = "";
@@ -135,15 +137,21 @@ const result = await new Promise((resolveResult, rejectResult) => {
     const lines = observedLines();
     const runtimeError = firstRuntimeError(lines);
     if (runtimeError || code !== 0 || signal || !expected.every((expectation) => hasMarker(lines, expectation))) {
-      rejectResult(new Error(
-        `Native Defold runtime did not complete clean evidence (code=${code}, signal=${signal}, error=${runtimeError ?? "none"}):\n${transcript}`
-      ));
+      rejectResult(
+        new Error(
+          `Native Defold runtime did not complete clean evidence (code=${code}, signal=${signal}, error=${runtimeError ?? "none"}):\n${transcript}`,
+        ),
+      );
       return;
     }
-    resolveResult(expected.map((expectation) =>
-      lines.find((line) => expectation.kind === "exact-line"
-        ? line === expectation.marker
-        : line.startsWith(expectation.marker)) ?? expectation.marker));
+    resolveResult(
+      expected.map(
+        (expectation) =>
+          lines.find((line) =>
+            expectation.kind === "exact-line" ? line === expectation.marker : line.startsWith(expectation.marker),
+          ) ?? expectation.marker,
+      ),
+    );
   });
 });
 
@@ -154,7 +162,7 @@ if (arguments_.has("--record-evidence")) {
   const evidenceManifest = JSON.parse(await readFile(evidenceManifestPath, "utf8"));
   const relativeEvidencePath = ".agents/docs/data/native-defold-runtime.log";
   const observations = evidenceManifest.observations.filter(
-    (observation) => observation.artifact?.path === relativeEvidencePath
+    (observation) => observation.artifact?.path === relativeEvidencePath,
   );
   if (observations.length !== 1) {
     throw new Error(`Expected exactly one observation for ${relativeEvidencePath}, found ${observations.length}`);

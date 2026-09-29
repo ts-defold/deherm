@@ -15,13 +15,10 @@ import {
   fixedWidthHashPattern,
   xteaSpanPattern,
 } from "./dmsdk-pattern-catalog.mjs";
-import {
-  DMSDK_UNIVERSAL_FALLBACK_PATTERN,
-  selectDmSdkPattern,
-} from "./dmsdk-pattern-selector.mjs";
+import { DMSDK_UNIVERSAL_FALLBACK_PATTERN, selectDmSdkPattern } from "./dmsdk-pattern-selector.mjs";
 
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
-const compareCodeUnits = (left, right) => left < right ? -1 : left > right ? 1 : 0;
+const compareCodeUnits = (left, right) => (left < right ? -1 : left > right ? 1 : 0);
 
 export const DMSDK_BOUNDED_SPAN_PLAN_KIND = "deherm.dmsdk-bounded-span-plan";
 
@@ -119,8 +116,14 @@ function validateInputs({ ir, shapes, sourceFacts, policies, texts }) {
     sha256(texts.shapes) === sourceFacts.sourceHashes.shapes,
     "bounded-span plan source facts do not authenticate the ABI shapes",
   );
-  assert(new Set(ir.declarations.map(({ id }) => id)).size === ir.declarations.length, "bounded-span plan IR has duplicate ids");
-  assert(new Set(shapes.rows.map(({ id }) => id)).size === shapes.rows.length, "bounded-span plan shapes have duplicate ids");
+  assert(
+    new Set(ir.declarations.map(({ id }) => id)).size === ir.declarations.length,
+    "bounded-span plan IR has duplicate ids",
+  );
+  assert(
+    new Set(shapes.rows.map(({ id }) => id)).size === shapes.rows.length,
+    "bounded-span plan shapes have duplicate ids",
+  );
   for (const family of DMSDK_BOUNDED_SPAN_FAMILIES) {
     const policy = policies[family.key];
     assert(policy?.schemaVersion === 1, `${family.family}: unsupported policy schema`);
@@ -169,8 +172,9 @@ export function buildDmSdkBoundedSpanPlan({ ir, shapes, sourceFacts, policies, t
         missingFacts: analysis.missingFacts,
       };
     });
-    const semanticTokens = [...new Set(analyses.flatMap(({ semantics }) => semantics?.semanticTokens ?? []))]
-      .sort(compareCodeUnits);
+    const semanticTokens = [...new Set(analyses.flatMap(({ semantics }) => semantics?.semanticTokens ?? []))].sort(
+      compareCodeUnits,
+    );
     const decision = selectDmSdkPattern(patternFacts(candidate, semanticTokens), registry);
     const selected = analyses.find(({ patternId }) => patternId === decision.patternId) ?? null;
     decisions.push({
@@ -223,38 +227,74 @@ export function indexDmSdkBoundedSpanPlan(plan, { revision, sourceHashes } = {})
   assert(registry.has(DMSDK_UNIVERSAL_FALLBACK_PATTERN.id), "bounded-span plan registry has no universal fallback");
   let previousId = "";
   for (const decision of plan.decisions) {
-    assert(typeof decision.declarationId === "string" && decision.declarationId.length > 0, "bounded-span decision has no id");
-    assert(previousId === "" || compareCodeUnits(previousId, decision.declarationId) < 0, "bounded-span decisions are not uniquely sorted");
+    assert(
+      typeof decision.declarationId === "string" && decision.declarationId.length > 0,
+      "bounded-span decision has no id",
+    );
+    assert(
+      previousId === "" || compareCodeUnits(previousId, decision.declarationId) < 0,
+      "bounded-span decisions are not uniquely sorted",
+    );
     previousId = decision.declarationId;
     const pattern = registry.get(decision.patternId);
     assert(pattern, `${decision.declarationId}: bounded-span decision names an unknown pattern`);
-    assert(decision.family === pattern.family, `${decision.declarationId}: bounded-span family differs from its pattern`);
-    assert(decision.emitter === pattern.emitter, `${decision.declarationId}: bounded-span emitter differs from its pattern`);
-    assert(decision.fallback === pattern.fallback, `${decision.declarationId}: bounded-span fallback differs from its pattern`);
-    assert(decision.priority === pattern.priority && decision.cost === pattern.cost, `${decision.declarationId}: bounded-span rank differs from its pattern`);
-    assert(Array.isArray(decision.structuralCandidates) && decision.structuralCandidates.length > 0, `${decision.declarationId}: bounded-span structural candidates are missing`);
+    assert(
+      decision.family === pattern.family,
+      `${decision.declarationId}: bounded-span family differs from its pattern`,
+    );
+    assert(
+      decision.emitter === pattern.emitter,
+      `${decision.declarationId}: bounded-span emitter differs from its pattern`,
+    );
+    assert(
+      decision.fallback === pattern.fallback,
+      `${decision.declarationId}: bounded-span fallback differs from its pattern`,
+    );
+    assert(
+      decision.priority === pattern.priority && decision.cost === pattern.cost,
+      `${decision.declarationId}: bounded-span rank differs from its pattern`,
+    );
+    assert(
+      Array.isArray(decision.structuralCandidates) && decision.structuralCandidates.length > 0,
+      `${decision.declarationId}: bounded-span structural candidates are missing`,
+    );
     assert(
       decision.structuralCandidates.every((patternId) => registry.has(patternId) && !registry.get(patternId).fallback),
       `${decision.declarationId}: bounded-span structural candidate is unknown or fallback`,
     );
     assert(
-      JSON.stringify(decision.structuralCandidates) === JSON.stringify([...new Set(decision.structuralCandidates)].sort(compareCodeUnits)),
+      JSON.stringify(decision.structuralCandidates) ===
+        JSON.stringify([...new Set(decision.structuralCandidates)].sort(compareCodeUnits)),
       `${decision.declarationId}: bounded-span structural candidates are not unique and sorted`,
     );
     assert(
-      JSON.stringify(decision.semanticTokens) === JSON.stringify([...new Set(decision.semanticTokens)].sort(compareCodeUnits)),
+      JSON.stringify(decision.semanticTokens) ===
+        JSON.stringify([...new Set(decision.semanticTokens)].sort(compareCodeUnits)),
       `${decision.declarationId}: bounded-span semantic tokens are not unique and sorted`,
     );
     assert(Array.isArray(decision.trace), `${decision.declarationId}: bounded-span selection trace is missing`);
-    if (decision.fallback) assert(decision.semantics === null, `${decision.declarationId}: fallback cannot carry selected semantics`);
+    if (decision.fallback)
+      assert(decision.semantics === null, `${decision.declarationId}: fallback cannot carry selected semantics`);
     else {
-      assert(decision.structuralCandidates.includes(decision.patternId), `${decision.declarationId}: selected pattern is not structural`);
-      assert(decision.semantics && typeof decision.semantics === "object", `${decision.declarationId}: selected semantics are missing`);
+      assert(
+        decision.structuralCandidates.includes(decision.patternId),
+        `${decision.declarationId}: selected pattern is not structural`,
+      );
+      assert(
+        decision.semantics && typeof decision.semantics === "object",
+        `${decision.declarationId}: selected semantics are missing`,
+      );
     }
   }
   assert(plan.coverage?.structurallyRelevant === plan.decisions.length, "bounded-span plan coverage total differs");
-  assert(plan.coverage.selected === plan.decisions.filter(({ fallback }) => !fallback).length, "bounded-span selected count differs");
-  assert(plan.coverage.universalFallback === plan.decisions.filter(({ fallback }) => fallback).length, "bounded-span fallback count differs");
+  assert(
+    plan.coverage.selected === plan.decisions.filter(({ fallback }) => !fallback).length,
+    "bounded-span selected count differs",
+  );
+  assert(
+    plan.coverage.universalFallback === plan.decisions.filter(({ fallback }) => fallback).length,
+    "bounded-span fallback count differs",
+  );
   const index = new Map(plan.decisions.map((decision) => [decision.declarationId, decision]));
   return index;
 }

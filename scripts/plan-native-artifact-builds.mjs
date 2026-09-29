@@ -28,7 +28,7 @@ const targetExecutors = Object.freeze({
   "arm64-osx": { lane: "apple", slot: 0 },
   "x86_64-osx": { lane: "apple", slot: 1 },
   "arm64-ios": { lane: "apple", slot: 2 },
-  "arm64_sim-ios": { lane: "apple", slot: 3 }
+  "arm64_sim-ios": { lane: "apple", slot: 3 },
 });
 
 const hostExecutors = Object.freeze({
@@ -36,7 +36,7 @@ const hostExecutors = Object.freeze({
   "darwin-x64": { slot: 1, runner: "macos-15-intel" },
   "linux-x64": { slot: 2, runner: "ubuntu-22.04" },
   "linux-arm64": { slot: 3, runner: "ubuntu-22.04-arm" },
-  "win32-x64": { slot: 4, runner: "windows-2022" }
+  "win32-x64": { slot: 4, runner: "windows-2022" },
 });
 
 function matrix(rows) {
@@ -57,10 +57,7 @@ function rowWithKey(row, executor, key) {
 export async function planNativeArtifactBuilds(presentByFamily = {}, options = {}) {
   const root = options.root ?? repositoryRoot;
   const present = Object.fromEntries(
-    ["native-artifacts", "hermes-host", "dehermc"].map((family) => [
-      family,
-      new Set(presentByFamily[family] ?? [])
-    ])
+    ["native-artifacts", "hermes-host", "dehermc"].map((family) => [family, new Set(presentByFamily[family] ?? [])]),
   );
 
   const targetRows = await publishedAssets("native-artifacts", { root });
@@ -101,16 +98,16 @@ export async function planNativeArtifactBuilds(presentByFamily = {}, options = {
   const assets = {
     "native-artifacts": {
       expected: targetRows.map((row) => row.asset),
-      missing: targetRows.filter((row) => !present["native-artifacts"].has(row.asset)).map((row) => row.asset)
+      missing: targetRows.filter((row) => !present["native-artifacts"].has(row.asset)).map((row) => row.asset),
     },
     "hermes-host": {
       expected: hermesHostRows.map((row) => row.asset),
-      missing: hermesHostRows.filter((row) => !present["hermes-host"].has(row.asset)).map((row) => row.asset)
+      missing: hermesHostRows.filter((row) => !present["hermes-host"].has(row.asset)).map((row) => row.asset),
     },
     dehermc: {
       expected: dehermcRows.map((row) => row.asset),
-      missing: dehermcRows.filter((row) => !present.dehermc.has(row.asset)).map((row) => row.asset)
-    }
+      missing: dehermcRows.filter((row) => !present.dehermc.has(row.asset)).map((row) => row.asset),
+    },
   };
 
   return {
@@ -120,7 +117,7 @@ export async function planNativeArtifactBuilds(presentByFamily = {}, options = {
       android: matrix(lanes.android),
       apple: matrix(lanes.apple),
       hermes_host: matrix(hermesHosts),
-      dehermc: matrix(dehermcHosts)
+      dehermc: matrix(dehermcHosts),
     },
     any: {
       linux: lanes.linux.length > 0,
@@ -128,15 +125,18 @@ export async function planNativeArtifactBuilds(presentByFamily = {}, options = {
       android: lanes.android.length > 0,
       apple: lanes.apple.length > 0,
       hermes_host: hermesHosts.length > 0,
-      dehermc: dehermcHosts.length > 0
+      dehermc: dehermcHosts.length > 0,
     },
-    assets
+    assets,
   };
 }
 
 async function readNames(file) {
   if (!file) return [];
-  return (await readFile(file, "utf8")).split(/\r?\n/u).map((line) => line.trim()).filter(Boolean);
+  return (await readFile(file, "utf8"))
+    .split(/\r?\n/u)
+    .map((line) => line.trim())
+    .filter(Boolean);
 }
 
 export function githubOutputRecords(plan) {

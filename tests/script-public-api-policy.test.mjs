@@ -6,7 +6,7 @@ import {
   assertUniquePublicScriptRoots,
   publicScriptModulePath,
   publicScriptRootName,
-  rawScriptRootName
+  rawScriptRootName,
 } from "../packages/compiler/src/script-public-api-policy.mjs";
 
 const root = new URL("../", import.meta.url);
@@ -18,7 +18,7 @@ test("Defold globals project to one collision-checked public root", () => {
   assert.deepEqual(publicScriptModulePath(["vmath"]), ["vmath"]);
   assert.throws(
     () => assertUniquePublicScriptRoots(["builtins", "defold"]),
-    /collides between "builtins" and "defold"/
+    /collides between "builtins" and "defold"/,
   );
 });
 
@@ -27,7 +27,7 @@ test("generated SDK exposes defold while preserving the raw Lua route identity",
     readFile(new URL("packages/sdk/src/generated/script/index.ts", root), "utf8"),
     readFile(new URL("packages/sdk/src/generated/script/modules.ts", root), "utf8"),
     readFile(new URL("packages/sdk/src/generated/script/types.ts", root), "utf8"),
-    readFile(new URL("packages/bindings/generated/defold-script-api-ir.json", root), "utf8")
+    readFile(new URL("packages/bindings/generated/defold-script-api-ir.json", root), "utf8"),
   ]);
   assert.match(index, /\bdefold\b/);
   assert.doesNotMatch(index, /\bbuiltins\b/);

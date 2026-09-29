@@ -5,31 +5,139 @@ import { basaltRamp, heartRamp, prism } from "./theme.mjs";
 // Fourteen raster rows become seven terminal rows through upper/lower half-blocks.
 // The floating acute is part of the bitmap instead of depending on font shaping.
 const glyphs = {
-  d: [".....##", ".....##", ".....##", ".######", "#######", "##...##", "##...##", "##...##", "##...##", "##...##", "##...##", "##...##", "#######", ".######"],
-  é: ["...##..", "..##...", ".......", ".#####.", "#######", "##...##", "#######", "#######", "##.....", "##.....", "##.....", "##.....", "#######", ".#####."],
-  h: ["##.....", "##.....", "##.....", "######.", "#######", "##...##", "##...##", "##...##", "##...##", "##...##", "##...##", "##...##", "##...##", "##...##"],
-  e: [".......", ".......", ".......", ".#####.", "#######", "##...##", "#######", "#######", "##.....", "##.....", "##.....", "##.....", "#######", ".#####."],
-  r: ["......", "......", "......", "##.###", "######", "###...", "##....", "##....", "##....", "##....", "##....", "##....", "##....", "##...."],
-  m: [".........", ".........", ".........", "##.##.##.", "########.", "##.##.##.", "##.##.##.", "##.##.##.", "##.##.##.", "##.##.##.", "##.##.##.", "##.##.##.", "##.##.##.", "##.##.##."],
-  heart: ["........", "........", "........", ".##..##.", "########", "########", "########", "########", ".######.", ".######.", "..####..", "...##...", "...##...", "........"]
+  d: [
+    ".....##",
+    ".....##",
+    ".....##",
+    ".######",
+    "#######",
+    "##...##",
+    "##...##",
+    "##...##",
+    "##...##",
+    "##...##",
+    "##...##",
+    "##...##",
+    "#######",
+    ".######",
+  ],
+  é: [
+    "...##..",
+    "..##...",
+    ".......",
+    ".#####.",
+    "#######",
+    "##...##",
+    "#######",
+    "#######",
+    "##.....",
+    "##.....",
+    "##.....",
+    "##.....",
+    "#######",
+    ".#####.",
+  ],
+  h: [
+    "##.....",
+    "##.....",
+    "##.....",
+    "######.",
+    "#######",
+    "##...##",
+    "##...##",
+    "##...##",
+    "##...##",
+    "##...##",
+    "##...##",
+    "##...##",
+    "##...##",
+    "##...##",
+  ],
+  e: [
+    ".......",
+    ".......",
+    ".......",
+    ".#####.",
+    "#######",
+    "##...##",
+    "#######",
+    "#######",
+    "##.....",
+    "##.....",
+    "##.....",
+    "##.....",
+    "#######",
+    ".#####.",
+  ],
+  r: [
+    "......",
+    "......",
+    "......",
+    "##.###",
+    "######",
+    "###...",
+    "##....",
+    "##....",
+    "##....",
+    "##....",
+    "##....",
+    "##....",
+    "##....",
+    "##....",
+  ],
+  m: [
+    ".........",
+    ".........",
+    ".........",
+    "##.##.##.",
+    "########.",
+    "##.##.##.",
+    "##.##.##.",
+    "##.##.##.",
+    "##.##.##.",
+    "##.##.##.",
+    "##.##.##.",
+    "##.##.##.",
+    "##.##.##.",
+    "##.##.##.",
+  ],
+  heart: [
+    "........",
+    "........",
+    "........",
+    ".##..##.",
+    "########",
+    "########",
+    "########",
+    "########",
+    ".######.",
+    ".######.",
+    "..####..",
+    "...##...",
+    "...##...",
+    "........",
+  ],
 };
 
 function logoPixels() {
   const names = ["d", "é", "h", "e", "r", "m", "heart"];
-  return Array.from({ length: 14 }, (_, y) => names.flatMap((name, index) => {
-    const pixels = [...glyphs[name][y]].map((pixel) => ({ on: pixel === "#", heart: name === "heart" }));
-    const gap = index === names.length - 1 ? [] : [{ on: false, heart: false }];
-    return [...pixels, ...gap];
-  }));
+  return Array.from({ length: 14 }, (_, y) =>
+    names.flatMap((name, index) => {
+      const pixels = [...glyphs[name][y]].map((pixel) => ({ on: pixel === "#", heart: name === "heart" }));
+      const gap = index === names.length - 1 ? [] : [{ on: false, heart: false }];
+      return [...pixels, ...gap];
+    }),
+  );
 }
 
 const logoBitmap = logoPixels();
 
 function bitmapColor(pixel, x, y, frame) {
   if (!pixel.on) return undefined;
-  if (pixel.heart) return heartRamp[Math.min(heartRamp.length - 1, Math.floor((y - 3) / 3) + ((x + frame) % 19 === 0 ? 1 : 0))];
+  if (pixel.heart)
+    return heartRamp[Math.min(heartRamp.length - 1, Math.floor((y - 3) / 3) + ((x + frame) % 19 === 0 ? 1 : 0))];
   if (y >= 9) return prism[Math.min(prism.length - 1, y - 9)];
-  const glintDistance = Math.abs((x + frame) % 31 - 15);
+  const glintDistance = Math.abs(((x + frame) % 31) - 15);
   return basaltRamp[glintDistance <= 1 ? 4 : glintDistance <= 3 ? 3 : glintDistance <= 5 ? 2 : 1];
 }
 
@@ -59,9 +167,10 @@ function renderBitmapRow(topPixels, bottomPixels, frame, topRow) {
       {
         x,
         row: topRow,
-        basaltPair: topRow + 1 < 9 && topPixels[x].on && bottomPixels[x].on && !topPixels[x].heart && !bottomPixels[x].heart,
-        heartPair: topPixels[x].heart && bottomPixels[x].heart
-      }
+        basaltPair:
+          topRow + 1 < 9 && topPixels[x].on && bottomPixels[x].on && !topPixels[x].heart && !bottomPixels[x].heart,
+        heartPair: topPixels[x].heart && bottomPixels[x].heart,
+      },
     );
     const styleKey = `${cell.style.fg ?? ""}/${cell.style.bg ?? ""}`;
     if (previous?.styleKey === styleKey) previous.text += cell.text;
@@ -88,6 +197,6 @@ export function renderCompactLogo() {
     { text: "▰ ", style: { fg: prism[4] } },
     { text: "déherm", style: { fg: basaltRamp[4], bold: true } },
     { text: " ♥", style: { fg: heartRamp[2], bold: true } },
-    { text: "  TypeScript at engine speed", style: { fg: prism[2] } }
+    { text: "  TypeScript at engine speed", style: { fg: prism[2] } },
   ]);
 }

@@ -5,8 +5,24 @@
 // Lua stack. A construct the parser cannot decide becomes a recorded blocker.
 
 const KEYWORDS = new Set([
-  "if", "else", "for", "while", "switch", "case", "do", "return", "catch", "try",
-  "sizeof", "typeof", "static_assert", "new", "delete", "and", "or", "not"
+  "if",
+  "else",
+  "for",
+  "while",
+  "switch",
+  "case",
+  "do",
+  "return",
+  "catch",
+  "try",
+  "sizeof",
+  "typeof",
+  "static_assert",
+  "new",
+  "delete",
+  "and",
+  "or",
+  "not",
 ]);
 
 const LUA_TYPE_TOKENS = Object.freeze({
@@ -18,7 +34,7 @@ const LUA_TYPE_TOKENS = Object.freeze({
   LUA_TUSERDATA: "userdata",
   LUA_TLIGHTUSERDATA: "userdata",
   LUA_TNIL: "nil",
-  LUA_TTHREAD: "thread"
+  LUA_TTHREAD: "thread",
 });
 
 // Structural accessor families. The family decides what the call proves about
@@ -69,7 +85,7 @@ const CORE_ACCESSORS = Object.freeze({
   lua_rawget: { family: "probe", type: "table" },
   lua_rawgeti: { family: "probe", type: "table" },
   lua_getfield: { family: "probe", type: "table" },
-  lua_gettable: { family: "probe", type: "table" }
+  lua_gettable: { family: "probe", type: "table" },
 });
 
 const PUSH_TYPES = Object.freeze({
@@ -86,7 +102,7 @@ const PUSH_TYPES = Object.freeze({
   lua_pushvalue: null,
   lua_newtable: "table",
   lua_createtable: "table",
-  lua_newuserdata: "userdata"
+  lua_newuserdata: "userdata",
 });
 
 export function compareText(left, right) {
@@ -124,8 +140,14 @@ function lex(text) {
     if (character === '"' || character === "'") {
       let at = index + 1;
       while (at < text.length) {
-        if (text[at] === "\\") { at += 2; continue; }
-        if (text[at] === character) { at += 1; break; }
+        if (text[at] === "\\") {
+          at += 2;
+          continue;
+        }
+        if (text[at] === character) {
+          at += 1;
+          break;
+        }
         if (text[at] === "\n") break;
         at += 1;
       }
@@ -148,7 +170,8 @@ function lineAt(offsets, position) {
   let high = offsets.length - 1;
   while (low < high) {
     const middle = (low + high + 1) >> 1;
-    if (offsets[middle] <= position) low = middle; else high = middle - 1;
+    if (offsets[middle] <= position) low = middle;
+    else high = middle - 1;
   }
   return low + 1;
 }
@@ -188,7 +211,11 @@ function splitArguments(text) {
   for (const character of text) {
     if (character === "(" || character === "[" || character === "{") depth += 1;
     else if (character === ")" || character === "]" || character === "}") depth -= 1;
-    if (character === "," && depth === 0) { parts.push(current.trim()); current = ""; continue; }
+    if (character === "," && depth === 0) {
+      parts.push(current.trim());
+      current = "";
+      continue;
+    }
     current += character;
   }
   if (current.trim() || parts.length) parts.push(current.trim());
@@ -214,8 +241,11 @@ function collectMacros(text) {
       const record = {
         name,
         at: match.index,
-        parameters: parameterText.split(",").map((item) => item.trim()).filter(Boolean),
-        body: value
+        parameters: parameterText
+          .split(",")
+          .map((item) => item.trim())
+          .filter(Boolean),
+        body: value,
       };
       functionLike.set(name, record);
       functionLikeHistory.set(name, [...(functionLikeHistory.get(name) ?? []), record]);
@@ -261,11 +291,13 @@ function isNullExpression(value) {
 function stripDirectives(code) {
   const lines = code.split("\n");
   let continuing = false;
-  return lines.map((line) => {
-    const directive = continuing || /^[ \t]*#/.test(line);
-    continuing = directive && /\\\s*$/.test(line);
-    return directive ? " ".repeat(line.length) : line;
-  }).join("\n");
+  return lines
+    .map((line) => {
+      const directive = continuing || /^[ \t]*#/.test(line);
+      continuing = directive && /\\\s*$/.test(line);
+      return directive ? " ".repeat(line.length) : line;
+    })
+    .join("\n");
 }
 
 // `String.prototype.replace` reads `$` sequences in the replacement text. A
@@ -355,8 +387,7 @@ function guardAt(regions, position) {
 
 // An entry name is a string literal, a run of adjacent string literals that C
 // concatenates, or a macro that resolves to one.
-const ENTRY_EXPRESSION =
-  /\{\s*("(?:[^"\\]|\\.)*"(?:\s*"(?:[^"\\]|\\.)*")*|[A-Za-z_]\w*)\s*,\s*([^,{}]*?)\s*\}/g;
+const ENTRY_EXPRESSION = /\{\s*("(?:[^"\\]|\\.)*"(?:\s*"(?:[^"\\]|\\.)*")*|[A-Za-z_]\w*)\s*,\s*([^,{}]*?)\s*\}/g;
 
 function parseRegistrationArrays(file) {
   const arrays = new Map();
@@ -369,7 +400,7 @@ function parseRegistrationArrays(file) {
         code: "unterminated-registration-array",
         path: file.path,
         line: lineAt(file.lines, match.index),
-        detail: `registration array '${match[1]}' has no closing brace`
+        detail: `registration array '${match[1]}' has no closing brace`,
       });
       continue;
     }
@@ -388,7 +419,7 @@ function parseRegistrationArrays(file) {
           code: "unresolved-registration-name",
           path: file.path,
           line: lineAt(file.lines, position),
-          detail: `registration array '${match[1]}' entry name '${nameToken}' is not a resolvable string literal`
+          detail: `registration array '${match[1]}' entry name '${nameToken}' is not a resolvable string literal`,
         });
         continue;
       }
@@ -397,7 +428,7 @@ function parseRegistrationArrays(file) {
         cFunction: target,
         path: file.path,
         line: lineAt(file.lines, position),
-        guard: guardAt(file.guards, position)
+        guard: guardAt(file.guards, position),
       });
     }
     // An entry can also be produced by a function-like macro: gui builds its
@@ -424,7 +455,7 @@ function parseRegistrationArrays(file) {
             path: file.path,
             line: lineAt(file.lines, arrayBodyStart + open),
             guard: guardAt(file.guards, arrayBodyStart + open),
-            expandedFrom: macroName
+            expandedFrom: macroName,
           });
         }
         invocation.lastIndex = close;
@@ -443,7 +474,7 @@ function parseRegistrationArrays(file) {
           cFunction: entry[2],
           path: file.path,
           line: lineAt(file.lines, comment.start + entry.index),
-          evidence: comment.text.trim().slice(0, 200)
+          evidence: comment.text.trim().slice(0, 200),
         });
       }
     }
@@ -452,10 +483,11 @@ function parseRegistrationArrays(file) {
       path: file.path,
       line: lineAt(file.lines, match.index),
       entries,
-      commented
+      commented,
     };
     const existing = arrays.get(match[1]);
-    if (existing) existing.push(record); else arrays.set(match[1], [record]);
+    if (existing) existing.push(record);
+    else arrays.set(match[1], [record]);
   }
   return arrays;
 }
@@ -486,8 +518,7 @@ function resolveCallee(project, name, fromPath) {
 // array identifier and the `.func` member matter.
 const INDIRECT_DISPATCH = /\b([A-Za-z_]\w*)\s*\[[^\]]*\]\s*\.\s*func\s*\(/g;
 
-const FUNCTION_DEFINITION =
-  /(^|[\s*&>])([A-Za-z_]\w*)\s*\(([^;{}()]*(?:\([^()]*\)[^;{}()]*)*)\)\s*(?:const\s*)?\{/g;
+const FUNCTION_DEFINITION = /(^|[\s*&>])([A-Za-z_]\w*)\s*\(([^;{}()]*(?:\([^()]*\)[^;{}()]*)*)\)\s*(?:const\s*)?\{/g;
 
 // Read every function definition out of one span of code. `origin` describes
 // where that span came from, so a definition produced by expanding a file-scope
@@ -518,10 +549,11 @@ function collectFunctionDefinitions(code, origin, into) {
       // Where this definition starts in the FILE: its own header, or the macro
       // invocation that generated it. It is what a preceding documentation
       // comment is attached to.
-      headerStart: origin.headerStart ?? match.index + match[1].length
+      headerStart: origin.headerStart ?? match.index + match[1].length,
     };
     const existing = into.get(name);
-    if (existing) existing.push(record); else into.set(name, [record]);
+    if (existing) existing.push(record);
+    else into.set(name, [record]);
   }
   return into;
 }
@@ -558,13 +590,17 @@ function collectMacroGeneratedDefinitions(file, written) {
       // setter to `LUASET` - so the expansion is run back through the ordinary
       // nested expansion before its definitions are read.
       const expansion = expandFunctionMacros(substituteMacroArguments(inEffect, rawArguments), file.macros);
-      collectFunctionDefinitions(expansion, {
-        path: file.path,
-        file,
-        line: lineAt(file.lines, match.index),
-        headerStart: match.index + (match[1] ? 1 : 0),
-        macroExpanded: true
-      }, generated);
+      collectFunctionDefinitions(
+        expansion,
+        {
+          path: file.path,
+          file,
+          line: lineAt(file.lines, match.index),
+          headerStart: match.index + (match[1] ? 1 : 0),
+          macroExpanded: true,
+        },
+        generated,
+      );
     }
   }
   return generated;
@@ -592,7 +628,7 @@ export function parseSourceFile(path, text) {
     // `// comment` on a #define does not become part of its value.
     macros: collectMacros(code),
     guards: guardRegions(text),
-    blockers: []
+    blockers: [],
   };
   file.arrays = parseRegistrationArrays(file);
   file.functions = parseFunctionDefinitions(file);
@@ -605,11 +641,15 @@ export function parseSourceFile(path, text) {
 // without editing this file.
 
 function luaTypeFromCType(cType) {
-  const cleaned = cType.replace(/\bconst\b/g, "").replace(/[*&]/g, "").trim();
+  const cleaned = cType
+    .replace(/\bconst\b/g, "")
+    .replace(/[*&]/g, "")
+    .trim();
   const tail = cleaned.split("::").pop().trim();
   if (!tail) return null;
   if (/^(bool)$/.test(tail)) return "boolean";
-  if (/^(float|double|int|long|unsigned|size_t|u?int(8|16|32|64)_t|lua_Number|lua_Integer)$/.test(tail)) return "number";
+  if (/^(float|double|int|long|unsigned|size_t|u?int(8|16|32|64)_t|lua_Number|lua_Integer)$/.test(tail))
+    return "number";
   if (/^char$/.test(tail)) return "string";
   if (/^dmhash_t$/.test(tail)) return "hash";
   if (/^URL$/.test(tail)) return "url";
@@ -653,7 +693,10 @@ export function collectSdkStackHelpers(headers) {
       const family = verb === "Check" || verb === "Resolve" ? "required" : verb === "Opt" ? "optional" : "probe";
       // `CheckHashOrString` accepts either spelling; the alternation is written
       // into the helper's own name, so it is read from there.
-      const fromName = suffix.split(/Or(?=[A-Z])/).map((part) => luaTypeFromCType(part)).filter(Boolean);
+      const fromName = suffix
+        .split(/Or(?=[A-Z])/)
+        .map((part) => luaTypeFromCType(part))
+        .filter(Boolean);
       const fromReturn = luaTypeFromCType(returnType);
       const types = fromName.length ? fromName : fromReturn ? [fromReturn] : [];
       // The analysed call text keeps the lua_State argument in slot 0.
@@ -663,14 +706,16 @@ export function collectSdkStackHelpers(headers) {
       index.store({
         name,
         arity,
-        slots: [{
-          argument,
-          parameter: null,
-          family,
-          types: [...new Set([...(existing?.types ?? []), ...types])].sort(compareText)
-        }],
+        slots: [
+          {
+            argument,
+            parameter: null,
+            family,
+            types: [...new Set([...(existing?.types ?? []), ...types])].sort(compareText),
+          },
+        ],
         origin: "declaration",
-        source: header.path
+        source: header.path,
       });
     }
   }
@@ -801,14 +846,15 @@ export class HelperIndex {
 
   noteSignature(name, argumentCount) {
     let seen = this.signatures.get(name);
-    if (!seen) { seen = new Set(); this.signatures.set(name, seen); }
+    if (!seen) {
+      seen = new Set();
+      this.signatures.set(name, seen);
+    }
     seen.add(argumentCount);
   }
 
   store(record, { path = null } = {}) {
-    const scope = path === null
-      ? this.global
-      : this.byFile.get(path) ?? this.byFile.set(path, new Map()).get(path);
+    const scope = path === null ? this.global : (this.byFile.get(path) ?? this.byFile.set(path, new Map()).get(path));
     const pool = scope.get(record.name) ?? scope.set(record.name, new Map()).get(record.name);
     pool.set(record.arity, record);
     this.noteSignature(record.name, record.arity);
@@ -819,10 +865,7 @@ export class HelperIndex {
   }
 
   values() {
-    const pools = [
-      ...this.global.values(),
-      ...[...this.byFile.values()].flatMap((item) => [...item.values()])
-    ];
+    const pools = [...this.global.values(), ...[...this.byFile.values()].flatMap((item) => [...item.values()])];
     return pools.flatMap((pool) => [...pool.values()]);
   }
 }
@@ -865,7 +908,9 @@ function raisesOnSlot(code, parameterName) {
 // slot below that comparison, it has already handled the slot being absent.
 function guardsPresence(code, parameterName) {
   const countNames = new Set(["top"]);
-  for (const match of code.matchAll(/\b(?:const\s+)?(?:int|uint32_t|int32_t|size_t)\s+([A-Za-z_]\w*)\s*=\s*lua_gettop\s*\(/g)) {
+  for (const match of code.matchAll(
+    /\b(?:const\s+)?(?:int|uint32_t|int32_t|size_t)\s+([A-Za-z_]\w*)\s*=\s*lua_gettop\s*\(/g,
+  )) {
     countNames.add(match[1]);
   }
   for (const name of countNames) {
@@ -930,17 +975,23 @@ export function collectBodyDerivedHelpers(project, declared, userTypes) {
       // heuristic (`Resolve*` => required). Count only overloads that can
       // actually describe a stack slot when deciding that equal spellings need
       // file scope.
-      const sameArity = definitions.filter((item) =>
-        splitArguments(item.signature).length === arity &&
-        /^\s*(?:const\s+)?(?:struct\s+)?lua_State\s*\*/.test(item.signature) &&
-        integerParameters(item.signature).length > 0).length;
+      const sameArity = definitions.filter(
+        (item) =>
+          splitArguments(item.signature).length === arity &&
+          /^\s*(?:const\s+)?(?:struct\s+)?lua_State\s*\*/.test(item.signature) &&
+          integerParameters(item.signature).length > 0,
+      ).length;
       candidates.push({
         name,
         definition,
         arity,
-        fileScoped: sameArity > 1 || definition.macroExpanded ||
-          /(^|[\s*&])static\s[^;{}]*$/.test(definition.file.code.slice(Math.max(0, definition.bodyStart - 300), definition.bodyStart)),
-        parameters
+        fileScoped:
+          sameArity > 1 ||
+          definition.macroExpanded ||
+          /(^|[\s*&])static\s[^;{}]*$/.test(
+            definition.file.code.slice(Math.max(0, definition.bodyStart - 300), definition.bodyStart),
+          ),
+        parameters,
       });
     }
   }
@@ -984,7 +1035,9 @@ export function collectBodyDerivedHelpers(project, declared, userTypes) {
           const core = CORE_ACCESSORS[call.name];
           const known = core ? null : index.resolve(definition.path, call.name, args.length);
           if (!core && !known) continue;
-          for (const inner of core ? [{ argument: 1, family: core.family, types: core.type ? [core.type] : [] }] : known.slots) {
+          for (const inner of core
+            ? [{ argument: 1, family: core.family, types: core.type ? [core.type] : [] }]
+            : known.slots) {
             if ((args[inner.argument] ?? "").trim() !== parameter.name) continue;
             for (const type of inner.types) types.add(type);
             if (inner.family) seen.add(inner.family);
@@ -996,10 +1049,15 @@ export function collectBodyDerivedHelpers(project, declared, userTypes) {
         // `luaL_checkinteger`, so the `luaL_check*` sits on the else-path and
         // the helper accepts a missing argument. Letting the check win there
         // would emit a required parameter for a slot the engine defaults.
-        const family = seen.has("presence") ? "presence"
-          : seen.has("required") ? "required"
-            : seen.has("optional") ? "optional"
-              : seen.has("probe") ? "probe" : null;
+        const family = seen.has("presence")
+          ? "presence"
+          : seen.has("required")
+            ? "required"
+            : seen.has("optional")
+              ? "optional"
+              : seen.has("probe")
+                ? "probe"
+                : null;
         if (!types.size && family === null) continue;
         chosen.push({ parameter, types, family });
       }
@@ -1015,10 +1073,10 @@ export function collectBodyDerivedHelpers(project, declared, userTypes) {
           family: mergeFamily(item.family, priorSlot(item.parameter.position)?.family ?? null),
           // Declaration-derived and body-derived types describe the same slot,
           // so they are unioned and then specialised.
-          types: specialize([...(priorSlot(item.parameter.position)?.types ?? []), ...item.types])
+          types: specialize([...(priorSlot(item.parameter.position)?.types ?? []), ...item.types]),
         })),
         origin: "body",
-        source: `${definition.path}:${definition.line}`
+        source: `${definition.path}:${definition.line}`,
       };
       const identity = (item) => JSON.stringify([item?.slots ?? null, item?.origin ?? null]);
       if (identity(previous) !== identity(record)) {
@@ -1054,7 +1112,7 @@ function callsIn(code) {
       name: match[2],
       start: match.index,
       argumentsText: code.slice(open + 1, close),
-      end: close
+      end: close,
     });
     CALL_EXPRESSION.lastIndex = open + 1;
   }
@@ -1104,7 +1162,7 @@ export function interpretRegistrations(project) {
         code: "ambiguous-registration-array",
         path: file.path,
         line: lineAt(file.lines, position),
-        detail: `registration array '${identifier}' is defined ${local.length} times in the same file`
+        detail: `registration array '${identifier}' is defined ${local.length} times in the same file`,
       });
       return null;
     }
@@ -1116,7 +1174,7 @@ export function interpretRegistrations(project) {
       line: lineAt(file.lines, position),
       detail: global.length
         ? `registration array '${identifier}' is defined in ${global.length} translation units: ${global.map((item) => item.path).join(", ")}`
-        : `registration array '${identifier}' has no visible definition`
+        : `registration array '${identifier}' has no visible definition`,
     });
     return null;
   }
@@ -1125,7 +1183,10 @@ export function interpretRegistrations(project) {
     for (const entry of record.entries) {
       table.functions.push({ ...entry, guard: entry.guard ?? guardedBy ?? null, array: record.array });
     }
-    table.commented = [...(table.commented ?? []), ...record.commented.map((entry) => ({ ...entry, array: record.array }))];
+    table.commented = [
+      ...(table.commented ?? []),
+      ...record.commented.map((entry) => ({ ...entry, array: record.array })),
+    ];
   }
 
   function run(definition, stack, visited, depth) {
@@ -1134,7 +1195,7 @@ export function interpretRegistrations(project) {
         code: "registration-recursion-limit",
         path: definition.path,
         line: definition.line,
-        detail: `registration interpretation exceeded depth 12 at ${definition.name}`
+        detail: `registration interpretation exceeded depth 12 at ${definition.name}`,
       });
       return;
     }
@@ -1160,7 +1221,7 @@ export function interpretRegistrations(project) {
               code: "unresolved-registration-argument",
               path: definition.path,
               line: definition.line,
-              detail: `${qualified} third argument '${args[2]}' is not a registration array identifier`
+              detail: `${qualified} third argument '${args[2]}' is not a registration array identifier`,
             });
           }
           continue;
@@ -1196,7 +1257,7 @@ export function interpretRegistrations(project) {
               code: "anonymous-registration-without-table",
               path: record.path,
               line: record.line,
-              detail: `${qualified} registers '${record.array}' into the value on top of the stack, and no table was on the stack at all`
+              detail: `${qualified} registers '${record.array}' into the value on top of the stack, and no table was on the stack at all`,
             });
             continue;
           }
@@ -1205,7 +1266,7 @@ export function interpretRegistrations(project) {
               code: "anonymous-registration-below-top",
               path: record.path,
               line: record.line,
-              detail: `${qualified} registers '${record.array}' into the nearest table ${stack.length - 1 - index} slot(s) below the modelled top; untracked pushes left non-table values above it`
+              detail: `${qualified} registers '${record.array}' into the nearest table ${stack.length - 1 - index} slot(s) below the modelled top; untracked pushes left non-table values above it`,
             });
           }
           attach(target, record, null);
@@ -1215,7 +1276,7 @@ export function interpretRegistrations(project) {
           code: "unresolved-module-name",
           path: definition.path,
           line: definition.line,
-          detail: `${qualified} module name '${nameArgument}' is neither a string literal nor a null pointer`
+          detail: `${qualified} module name '${nameArgument}' is neither a string literal nor a null pointer`,
         });
         continue;
       }
@@ -1226,7 +1287,7 @@ export function interpretRegistrations(project) {
             code: "unresolved-module-name",
             path: definition.path,
             line: definition.line,
-            detail: `lua_register name '${args[1]}' is not a resolvable string literal`
+            detail: `lua_register name '${args[1]}' is not a resolvable string literal`,
           });
           continue;
         }
@@ -1239,7 +1300,7 @@ export function interpretRegistrations(project) {
           path: definition.path,
           line: definition.line,
           guard: null,
-          array: null
+          array: null,
         });
         roots.push(table);
         continue;
@@ -1270,9 +1331,17 @@ export function interpretRegistrations(project) {
         stack.push(pushedValue(PUSH_TYPES[call.name], (args[1] ?? "").trim()));
         continue;
       }
-      if (call.name === "lua_setfield" || call.name === "lua_setglobal" || call.name === "lua_rawset" ||
-          call.name === "lua_settable") {
-        if (call.name === "lua_settable" || call.name === "lua_rawset") { stack.pop(); stack.pop(); continue; }
+      if (
+        call.name === "lua_setfield" ||
+        call.name === "lua_setglobal" ||
+        call.name === "lua_rawset" ||
+        call.name === "lua_settable"
+      ) {
+        if (call.name === "lua_settable" || call.name === "lua_rawset") {
+          stack.pop();
+          stack.pop();
+          continue;
+        }
         const isGlobal = call.name === "lua_setglobal" || /LUA_GLOBALSINDEX/.test(args[1] ?? "");
         const fieldName = resolveStringValue(isGlobal ? args[1] : args[2], file.macros);
         const value = stack.pop();
@@ -1293,7 +1362,7 @@ export function interpretRegistrations(project) {
               path: definition.path,
               line: definition.line,
               guard: null,
-              array: null
+              array: null,
             });
             roots.push(table);
           } else {
@@ -1302,7 +1371,7 @@ export function interpretRegistrations(project) {
               valueKind: value.valueKind,
               expression: value.detail,
               path: definition.path,
-              line: definition.line
+              line: definition.line,
             });
             roots.push(table);
           }
@@ -1321,7 +1390,7 @@ export function interpretRegistrations(project) {
             path: definition.path,
             line: definition.line,
             guard: null,
-            array: null
+            array: null,
           });
         } else {
           parent.constants.push({
@@ -1329,7 +1398,7 @@ export function interpretRegistrations(project) {
             valueKind: value.valueKind,
             expression: value.detail,
             path: definition.path,
-            line: definition.line
+            line: definition.line,
           });
         }
         continue;
@@ -1352,15 +1421,18 @@ export function interpretRegistrations(project) {
           code: "ambiguous-registration-callee",
           path: definition.path,
           line: definition.line,
-          detail: `call to '${call.name}' resolves to ${callee.length} definitions: ${callee.map((item) => `${item.path}:${item.line}`).join(", ")}`
+          detail: `call to '${call.name}' resolves to ${callee.length} definitions: ${callee.map((item) => `${item.path}:${item.line}`).join(", ")}`,
         });
         continue;
       }
       const key = `${callee[0].path}#${callee[0].line}`;
       if (visited.has(key)) continue;
       INDIRECT_DISPATCH.lastIndex = 0;
-      if (!/luaL_register|luaL_openlib|lua_register|lua_setfield|lua_setglobal|lua_newtable/.test(callee[0].code)
-          && !INDIRECT_DISPATCH.test(callee[0].code)) continue;
+      if (
+        !/luaL_register|luaL_openlib|lua_register|lua_setfield|lua_setglobal|lua_newtable/.test(callee[0].code) &&
+        !INDIRECT_DISPATCH.test(callee[0].code)
+      )
+        continue;
       INDIRECT_DISPATCH.lastIndex = 0;
       visited.add(key);
       // Every Defold registration helper is stack balanced (DM_LUA_STACK_CHECK
@@ -1422,7 +1494,6 @@ export function interpretRegistrations(project) {
         }
       }
     }
-
   }
 
   const candidates = [];
@@ -1439,9 +1510,12 @@ export function interpretRegistrations(project) {
         // literal-registration-only rule nothing here was ever an entry point
         // and every socket.* route went missing.
         const isLuaOpen = /^luaopen_\w+$/.test(definition.name ?? "");
-        if (!isLuaOpen &&
-            !/luaL_register|luaL_openlib|lua_register|lua_setglobal/.test(definition.code) &&
-            !INDIRECT_DISPATCH.test(definition.code)) continue;
+        if (
+          !isLuaOpen &&
+          !/luaL_register|luaL_openlib|lua_register|lua_setglobal/.test(definition.code) &&
+          !INDIRECT_DISPATCH.test(definition.code)
+        )
+          continue;
         INDIRECT_DISPATCH.lastIndex = 0;
         const expanded = expandFunctionMacros(definition.code, file.macros);
         registrationCapable.push({ definition, expanded });
@@ -1495,14 +1569,18 @@ export function interpretRegistrations(project) {
     seen.add(key);
     uniqueBlockers.push(blocker);
   }
-  uniqueBlockers.sort((left, right) =>
-    compareText(left.code, right.code) || compareText(left.path, right.path) || left.line - right.line ||
-    compareText(left.detail, right.detail));
+  uniqueBlockers.sort(
+    (left, right) =>
+      compareText(left.code, right.code) ||
+      compareText(left.path, right.path) ||
+      left.line - right.line ||
+      compareText(left.detail, right.detail),
+  );
   return {
     modules,
     blockers: uniqueBlockers,
     balancedCallees: [...balanceNotes].sort(compareText),
-    entryPoints: entryPoints.map((item) => ({ path: item.path, line: item.line, name: item.name }))
+    entryPoints: entryPoints.map((item) => ({ path: item.path, line: item.line, name: item.name })),
   };
 }
 
@@ -1531,13 +1609,24 @@ function propagateIntegerLocals(code, resolveHelper) {
       // slot it was given, so the local names slot 3. A helper addressing more
       // than one slot cannot say which index it returned, so it is not followed.
       const helper = callee === "AbsIndex" || callee === "lua_absindex" ? null : resolveHelper?.(callee, args.length);
-      const slot = helper ? (helper.slots.length === 1 ? helper.slots[0].argument : -1)
-        : callee === "AbsIndex" || callee === "lua_absindex" ? 1 : -1;
+      const slot = helper
+        ? helper.slots.length === 1
+          ? helper.slots[0].argument
+          : -1
+        : callee === "AbsIndex" || callee === "lua_absindex"
+          ? 1
+          : -1;
       const literal = slot > 0 ? integerLiteral(args[slot]) : null;
       value = literal === null ? null : String(literal);
     }
-    if (value === null) { assignments.set(name, null); continue; }
-    if (assignments.has(name)) { assignments.set(name, null); continue; }
+    if (value === null) {
+      assignments.set(name, null);
+      continue;
+    }
+    if (assignments.has(name)) {
+      assignments.set(name, null);
+      continue;
+    }
     assignments.set(name, value);
   }
   for (const [name, value] of assignments) {
@@ -1582,9 +1671,9 @@ function pseudoIndex(value) {
 
 export function analyzeFunctionBody(definition, helperIndex, project) {
   const file = definition.file;
-  const code = propagateIntegerLocals(
-    expandFunctionMacros(definition.code, file.macros),
-    (name, argumentCount) => helperIndex.resolve(definition.path, name, argumentCount));
+  const code = propagateIntegerLocals(expandFunctionMacros(definition.code, file.macros), (name, argumentCount) =>
+    helperIndex.resolve(definition.path, name, argumentCount),
+  );
   const slots = new Map();
   const undecided = [];
   const pushes = [];
@@ -1616,7 +1705,7 @@ export function analyzeFunctionBody(definition, helperIndex, project) {
         optional: false,
         presenceGuarded: false,
         types: new Set(),
-        accessors: new Set()
+        accessors: new Set(),
       };
       slots.set(position, record);
     }
@@ -1628,9 +1717,15 @@ export function analyzeFunctionBody(definition, helperIndex, project) {
     const args = splitArguments(call.argumentsText);
     const core = CORE_ACCESSORS[call.name];
     const helper = core ? undefined : helperIndex.resolve(definition.path, call.name, args.length);
-    if (call.name === "lua_gettop") { usesGettop = true; continue; }
-    if (PUSH_TYPES[call.name] !== undefined) { pushes.push({ name: call.name, type: PUSH_TYPES[call.name] }); continue; }
-    if (call.namespace === "dmScript" && /^Push/.test(call.name)) {
+    if (call.name === "lua_gettop") {
+      usesGettop = true;
+      continue;
+    }
+    if (PUSH_TYPES[call.name] !== undefined) {
+      pushes.push({ name: call.name, type: PUSH_TYPES[call.name] });
+      continue;
+    }
+    if (call.namespace === "dmScript" && call.name.startsWith("Push")) {
       pushes.push({ name: `dmScript::${call.name}`, type: luaTypeFromCType(call.name.replace(/^Push/, "")) });
       continue;
     }
@@ -1641,7 +1736,10 @@ export function analyzeFunctionBody(definition, helperIndex, project) {
         undecided.push({ code: "dynamic-stack-index", detail: `${call.name}(${args.join(", ")})` });
         continue;
       }
-      if (position <= 0) { undecided.push({ code: "relative-stack-index", detail: `${call.name}(${args.join(", ")})` }); continue; }
+      if (position <= 0) {
+        undecided.push({ code: "relative-stack-index", detail: `${call.name}(${args.join(", ")})` });
+        continue;
+      }
       const record = slot(position);
       record.required = true;
       if (depths[call.start] === 0) record.requiredUnconditionally = true;
@@ -1667,14 +1765,12 @@ export function analyzeFunctionBody(definition, helperIndex, project) {
       if (helperIndex.hasRecords(definition.path, call.name)) {
         undecided.push({
           code: "unresolved-helper-overload",
-          detail: `${spelled}(${args.join(", ")}) matches no ${call.name} overload taking ${args.length} arguments`
+          detail: `${spelled}(${args.join(", ")}) matches no ${call.name} overload taking ${args.length} arguments`,
         });
       }
       continue;
     }
-    const addressed = core
-      ? [{ argument: 1, family: core.family, types: core.type ? [core.type] : [] }]
-      : helper.slots;
+    const addressed = core ? [{ argument: 1, family: core.family, types: core.type ? [core.type] : [] }] : helper.slots;
     for (const { argument, family, types } of addressed) {
       const raw = args[argument];
       if (pseudoIndex(raw)) continue;
@@ -1714,14 +1810,19 @@ export function analyzeFunctionBody(definition, helperIndex, project) {
     for (const item of inner.undecided) undecided.push(item);
     if (inner.arity.variadic) usesGettop = true;
     topBound = Math.max(topBound, inner.arity.max);
-    if (inner.results.decided) { delegateResults.min = inner.results.min; delegateResults.max = inner.results.max; }
+    if (inner.results.decided) {
+      delegateResults.min = inner.results.min;
+      delegateResults.max = inner.results.max;
+    }
   }
 
   // Whatever local holds `lua_gettop` is the argument count; comparing it with
   // a literal both widens the maximum arity and means the checks below it sit
   // inside a branch, so the minimum cannot be read off them.
   const countNames = new Set(["top"]);
-  for (const match of code.matchAll(/\b(?:const\s+)?(?:int|uint32_t|int32_t|size_t)\s+([A-Za-z_]\w*)\s*=\s*lua_gettop\s*\(/g)) {
+  for (const match of code.matchAll(
+    /\b(?:const\s+)?(?:int|uint32_t|int32_t|size_t)\s+([A-Za-z_]\w*)\s*=\s*lua_gettop\s*\(/g,
+  )) {
     countNames.add(match[1]);
   }
   let branchDependent = false;
@@ -1751,7 +1852,10 @@ export function analyzeFunctionBody(definition, helperIndex, project) {
     if (!expression) continue;
     if (delegates.some((item) => new RegExp(`\\b${item.name}\\s*\\(`).test(expression))) continue;
     const literal = integerLiteral(expression);
-    if (literal !== null) { returnCounts.add(literal); continue; }
+    if (literal !== null) {
+      returnCounts.add(literal);
+      continue;
+    }
     if (/luaL_error|DM_LUA_ERROR|luaL_argerror|lua_error/.test(expression)) continue;
     dynamicReturn = true;
   }
@@ -1773,21 +1877,28 @@ export function analyzeFunctionBody(definition, helperIndex, project) {
         types: [],
         accessors: [],
         evidence: "no-stack-access",
-        requirementUnconditional: false
+        requirementUnconditional: false,
       });
       continue;
     }
     parameters.push({
       index: position,
-      optional: record.required && !record.optional && !record.presenceGuarded
-        ? false
-        : record.optional || record.presenceGuarded || position > minimum,
+      optional:
+        record.required && !record.optional && !record.presenceGuarded
+          ? false
+          : record.optional || record.presenceGuarded || position > minimum,
       types: [...record.types].sort(compareText),
       accessors: [...record.accessors].sort(compareText),
-      evidence: record.required ? "checked" : record.optional ? "defaulted" : record.presenceGuarded ? "presence-guarded" : "probed",
+      evidence: record.required
+        ? "checked"
+        : record.optional
+          ? "defaulted"
+          : record.presenceGuarded
+            ? "presence-guarded"
+            : "probed",
       // A requirement read off a call inside a branch is conditional on that
       // branch, so it does not prove the slot is always refused when missing.
-      requirementUnconditional: record.required && record.requiredUnconditionally
+      requirementUnconditional: record.required && record.requiredUnconditionally,
     });
   }
 
@@ -1812,17 +1923,18 @@ export function analyzeFunctionBody(definition, helperIndex, project) {
       variadic: usesGettop && maximum > minimum,
       // The body selects between argument counts, so a `luaL_check*` below the
       // branch does not prove that slot is always required.
-      branchDependent
+      branchDependent,
     },
     parameters,
     results: {
       ...results,
       pushedTypes: pushTypes,
-      resultTypes: results.decided && results.min === results.max && results.min === 1 && pushTypes.length === 1
-        ? pushTypes
-        : null
+      resultTypes:
+        results.decided && results.min === results.max && results.min === 1 && pushTypes.length === 1
+          ? pushTypes
+          : null,
     },
-    undecided
+    undecided,
   };
 }
 

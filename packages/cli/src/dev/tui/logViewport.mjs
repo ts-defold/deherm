@@ -8,7 +8,7 @@ const LEVEL_COLOR = {
   info: prism[4],
   warn: prism[1],
   error: prism[0],
-  fatal: prism[0]
+  fatal: prism[0],
 };
 
 function clock(value) {
@@ -27,7 +27,9 @@ export function logLines(entries) {
   return entries.map((entry) => ({
     id: entry.id,
     level: entry.level ?? "info",
-    text: `${clock(entry.timestamp)} ${String(entry.level ?? "info").toUpperCase().padEnd(5)} ${String(entry.source ?? "deherm").padEnd(14)} ${entry.message ?? ""}`
+    text: `${clock(entry.timestamp)} ${String(entry.level ?? "info")
+      .toUpperCase()
+      .padEnd(5)} ${String(entry.source ?? "deherm").padEnd(14)} ${entry.message ?? ""}`,
   }));
 }
 
@@ -55,7 +57,10 @@ export function lineSelectionRange(selection, lineIndex, lineLength) {
 
 export function selectedLogText(lines, selection) {
   if (!selection) return "";
-  return getSelectedText(lines.map((line) => line.text), selection);
+  return getSelectedText(
+    lines.map((line) => line.text),
+    selection,
+  );
 }
 
 export function selectAllRange(lines) {
@@ -94,7 +99,7 @@ export function renderLogRow(line, selection, index) {
   return ui.richText([
     ...(range[0] > 0 ? [{ text: line.text.slice(0, range[0]), style: base }] : []),
     { text: line.text.slice(range[0], range[1]), style: selectionStyle },
-    ...(range[1] < line.text.length ? [{ text: line.text.slice(range[1]), style: base }] : [])
+    ...(range[1] < line.text.length ? [{ text: line.text.slice(range[1]), style: base }] : []),
   ]);
 }
 
@@ -126,7 +131,8 @@ export function urlAtCaret(lines, caret) {
   let end = caret.column;
   while (start > 0 && !/\s/.test(text[start - 1])) start -= 1;
   while (end < text.length && !/\s/.test(text[end])) end += 1;
-  const token = text.slice(start, end)
+  const token = text
+    .slice(start, end)
     .replace(/^[([{<'"]+/, "")
     .replace(/[)\]}>,.;:'"]+$/, "");
   return /^https?:\/\/[^\s]+$/.test(token) ? token : null;

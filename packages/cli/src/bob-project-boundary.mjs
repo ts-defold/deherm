@@ -22,7 +22,7 @@ export const BOB_TOOLING_IGNORE_DIRECTORIES = Object.freeze([
   "/.github",
   "/.vscode",
   "/.idea",
-  "/.agents"
+  "/.agents",
 ]);
 
 export const BOB_TOOLING_IGNORE_ENTRIES = Object.freeze([
@@ -51,7 +51,7 @@ export const BOB_TOOLING_IGNORE_ENTRIES = Object.freeze([
   "/AGENTS.md",
   "/CHANGELOG.md",
   "/LICENSE",
-  "/README.md"
+  "/README.md",
 ]);
 
 // Every file kind the TypeScript compiler/bundler can consume as authoring
@@ -60,9 +60,7 @@ export const BOB_TOOLING_IGNORE_ENTRIES = Object.freeze([
 // accepts path prefixes, not globs, at the pinned Defold revision.
 const BOB_AUTHORING_SOURCE_EXTENSIONS = Object.freeze([".ts", ".tsx", ".mts", ".cts"]);
 
-const bobWalkPrunedDirectories = new Set(
-  BOB_TOOLING_IGNORE_DIRECTORIES.map((entry) => entry.slice(1))
-);
+const bobWalkPrunedDirectories = new Set(BOB_TOOLING_IGNORE_DIRECTORIES.map((entry) => entry.slice(1)));
 
 function normalizeManagedEntry(entry) {
   if (typeof entry !== "string" || !entry.startsWith("/") || /[\r\n]/u.test(entry)) {
@@ -132,7 +130,7 @@ export async function discoverBobAuthoringIgnoreEntries(projectRoot) {
   const entries = [];
   async function visit(directory, relativeDirectory = "") {
     const children = await readdir(directory, { withFileTypes: true });
-    children.sort((left, right) => left.name < right.name ? -1 : left.name > right.name ? 1 : 0);
+    children.sort((left, right) => (left.name < right.name ? -1 : left.name > right.name ? 1 : 0));
     for (const child of children) {
       const relative = relativeDirectory ? path.join(relativeDirectory, child.name) : child.name;
       if (child.isDirectory()) {
@@ -147,7 +145,8 @@ export async function discoverBobAuthoringIgnoreEntries(projectRoot) {
         continue;
       }
       // Never follow a symlink out of the project while deriving Bob inputs.
-      if (!child.isFile() || !BOB_AUTHORING_SOURCE_EXTENSIONS.some((extension) => child.name.endsWith(extension))) continue;
+      if (!child.isFile() || !BOB_AUTHORING_SOURCE_EXTENSIONS.some((extension) => child.name.endsWith(extension)))
+        continue;
       entries.push(`/${portable(relative)}`);
     }
   }
@@ -191,19 +190,20 @@ function withoutManagedBlock(lines) {
 export async function reconcileBobProjectBoundary(options) {
   const projectRoot = path.resolve(options.projectRoot);
   const defignore = path.join(projectRoot, ".defignore");
-  const authored = options.discoverAuthoringSources === false
-    ? []
-    : await discoverBobAuthoringIgnoreEntries(projectRoot);
+  const authored =
+    options.discoverAuthoringSources === false ? [] : await discoverBobAuthoringIgnoreEntries(projectRoot);
   const customResources = await projectCustomResourceEntries(projectRoot);
-  const optionalDefaults = BOB_TOOLING_IGNORE_ENTRIES
-    .slice(BOB_TOOLING_IGNORE_DIRECTORIES.length)
-    .filter((entry) => !isCustomResource(entry, customResources));
+  const optionalDefaults = BOB_TOOLING_IGNORE_ENTRIES.slice(BOB_TOOLING_IGNORE_DIRECTORIES.length).filter(
+    (entry) => !isCustomResource(entry, customResources),
+  );
   const required = [
     ...BOB_TOOLING_IGNORE_DIRECTORIES,
     ...optionalDefaults,
     ...authored.filter((entry) => !isCustomResource(entry, customResources)),
-    ...(options.includeEntries ?? [])
-  ].map(normalizeManagedEntry).filter((entry, index, all) => all.indexOf(entry) === index);
+    ...(options.includeEntries ?? []),
+  ]
+    .map(normalizeManagedEntry)
+    .filter((entry, index, all) => all.indexOf(entry) === index);
   const removed = new Set((options.excludeEntries ?? []).map(normalizeManagedEntry));
   const conflict = required.find((entry) => removed.has(entry));
   if (conflict) throw new Error(`Bob ignore entry cannot be both required and removed: ${conflict}`);
@@ -216,8 +216,11 @@ export async function reconcileBobProjectBoundary(options) {
   }
 
   const requiredSet = new Set(required);
-  const legacyManagedSet = new Set([...BOB_TOOLING_IGNORE_ENTRIES, ...(options.includeEntries ?? []), ...(options.excludeEntries ?? [])]
-    .map(normalizeManagedEntry));
+  const legacyManagedSet = new Set(
+    [...BOB_TOOLING_IGNORE_ENTRIES, ...(options.includeEntries ?? []), ...(options.excludeEntries ?? [])].map(
+      normalizeManagedEntry,
+    ),
+  );
   const unmanaged = withoutManagedBlock(parseLines(existing));
   const next = [];
   for (const line of unmanaged) {
@@ -241,6 +244,6 @@ export async function reconcileBobProjectBoundary(options) {
     changed,
     entries: required,
     authoredEntries: authored,
-    customResources
+    customResources,
   };
 }

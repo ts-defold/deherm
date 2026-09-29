@@ -49,7 +49,10 @@ async function record() {
   findLine(lines, "transport-profile:ok");
   const typedNativeRows = lines
     .filter((line) => line.startsWith("transport-profile:typed-native:"))
-    .map((line) => ({ bestNanoseconds: parseNumber(line, "best_ns"), worstNanoseconds: parseNumber(line, "worst_ns") }));
+    .map((line) => ({
+      bestNanoseconds: parseNumber(line, "best_ns"),
+      worstNanoseconds: parseNumber(line, "worst_ns"),
+    }));
   const ownedBridge = lines
     .filter((line) => line.startsWith("transport-profile:delta:"))
     .map((line) => parseNumber(line, "bridge_over_protected_ns"));
@@ -74,14 +77,15 @@ async function record() {
       typedNativeMedianNanoseconds: median(typedNativeRows.map((row) => row.bestNanoseconds)),
       typedNativeMinimumNanoseconds: Math.min(...typedNativeRows.map((row) => row.bestNanoseconds)),
       typedNativeMaximumNanoseconds: Math.max(...typedNativeRows.map((row) => row.bestNanoseconds)),
-      typedNativeShapes: typedNativeRows.length
+      typedNativeShapes: typedNativeRows.length,
     },
     source: {
       executable: "build/native/defold-hermes-transport-profile-benchmark",
       stdoutSha256: digest(stdout),
-      harness: "native/transport_profile_benchmark.cpp"
+      harness: "native/transport_profile_benchmark.cpp",
     },
-    evidenceBoundary: "Release host harness over stub providers. This measures generated crossing/framing cost, not the Defold call behind it; the Lua harness uses pinned PUC Lua 5.1 rather than Defold's shipping LuaJIT."
+    evidenceBoundary:
+      "Release host harness over stub providers. This measures generated crossing/framing cost, not the Defold call behind it; the Lua harness uses pinned PUC Lua 5.1 rather than Defold's shipping LuaJIT.",
   };
   await mkdir(path.dirname(output), { recursive: true });
   await writeFile(output, `${JSON.stringify(document, null, 2)}\n`);
@@ -90,12 +94,19 @@ async function record() {
 
 async function check() {
   const document = JSON.parse(await readFile(output, "utf8"));
-  if (document.schemaVersion !== 1 || document.kind !== "deherm.release-transport-overhead") throw new Error("invalid transport benchmark evidence");
-  if (document.build?.cmakeBuildType !== "Release" || document.build?.profiling !== false) throw new Error("transport evidence is not an unprofiled release build");
-  for (const value of [document.results?.directCAbi?.bestNanoseconds, document.results?.luaBridgeOwnedMedianNanoseconds, document.results?.typedNativeMedianNanoseconds]) {
+  if (document.schemaVersion !== 1 || document.kind !== "deherm.release-transport-overhead")
+    throw new Error("invalid transport benchmark evidence");
+  if (document.build?.cmakeBuildType !== "Release" || document.build?.profiling !== false)
+    throw new Error("transport evidence is not an unprofiled release build");
+  for (const value of [
+    document.results?.directCAbi?.bestNanoseconds,
+    document.results?.luaBridgeOwnedMedianNanoseconds,
+    document.results?.typedNativeMedianNanoseconds,
+  ]) {
     if (!(value > 0)) throw new Error("transport evidence has a missing or invalid measured value");
   }
-  if (!/^[0-9a-f]{64}$/u.test(document.source?.stdoutSha256 ?? "")) throw new Error("transport evidence has no output digest");
+  if (!/^[0-9a-f]{64}$/u.test(document.source?.stdoutSha256 ?? ""))
+    throw new Error("transport evidence has no output digest");
   console.log("transport benchmark evidence is structurally current");
 }
 

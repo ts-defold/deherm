@@ -1,14 +1,7 @@
 #!/usr/bin/env node
 
 import { createHash } from "node:crypto";
-import {
-  lstat,
-  mkdir,
-  readFile,
-  readdir,
-  rm,
-  writeFile
-} from "node:fs/promises";
+import { lstat, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -23,7 +16,8 @@ export const extensionDirectory = "defold_webtransport";
 
 const fixedZipTime = new Date(1980, 0, 1, 0, 0, 0);
 const regularFileMode = 0o100644 << 16;
-const versionPattern = /^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/u;
+const versionPattern =
+  /^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/u;
 
 function compare(left, right) {
   return left < right ? -1 : left > right ? 1 : 0;
@@ -59,7 +53,7 @@ async function collectFiles(root, relative = "") {
     const child = path.join(root, ...childRelative.split("/"));
     const status = await lstat(child);
     if (status.isSymbolicLink()) fail(`symbolic links are not release inputs: ${childRelative}`);
-    if (status.isDirectory()) files.push(...await collectFiles(root, childRelative));
+    if (status.isDirectory()) files.push(...(await collectFiles(root, childRelative)));
     else if (status.isFile()) files.push(childRelative);
     else fail(`unsupported release input: ${childRelative}`);
   }
@@ -68,8 +62,9 @@ async function collectFiles(root, relative = "") {
 
 function validateMembers(members) {
   if (!members.includes("game.project")) fail("archive has no root game.project");
-  const unexpected = members.filter((member) =>
-    member !== "game.project" && !member.startsWith(`${extensionDirectory}/`));
+  const unexpected = members.filter(
+    (member) => member !== "game.project" && !member.startsWith(`${extensionDirectory}/`),
+  );
   if (unexpected.length > 0) fail(`archive has unexpected root members: ${unexpected.join(", ")}`);
   if (!members.includes(`${extensionDirectory}/ext.manifest`)) fail("extension has no ext.manifest");
   if (!members.includes(`${extensionDirectory}/CHANGELOG.md`)) fail("extension has no CHANGELOG.md");
@@ -85,8 +80,11 @@ function validateMembers(members) {
   if (!members.includes(`${extensionDirectory}/webtransport/native-artifacts.json`)) {
     fail("extension has no webtransport/native-artifacts.json release index");
   }
-  if (!members.some((member) =>
-    member.startsWith(`${extensionDirectory}/include/defold_webtransport/`) && member.endsWith(".h"))) {
+  if (
+    !members.some(
+      (member) => member.startsWith(`${extensionDirectory}/include/defold_webtransport/`) && member.endsWith(".h"),
+    )
+  ) {
     fail("extension has no public C ABI header under include/defold_webtransport");
   }
   for (const license of [
@@ -96,7 +94,7 @@ function validateMembers(members) {
     "BSD-2-Clause-micro-ecc.txt",
     "CC0-1.0-cifra.txt",
     "MIT-picoquic.txt",
-    "MIT-picotls.txt"
+    "MIT-picotls.txt",
   ]) {
     const member = `${extensionDirectory}/licenses/${license}`;
     if (!members.includes(member)) fail(`extension has no required license or attribution file: ${member}`);
@@ -105,8 +103,11 @@ function validateMembers(members) {
 
 function validateRuntimeArtifacts(members, manifestSource) {
   let manifest;
-  try { manifest = parseYaml(manifestSource); }
-  catch (error) { fail(`invalid ext.manifest: ${error.message}`); }
+  try {
+    manifest = parseYaml(manifestSource);
+  } catch (error) {
+    fail(`invalid ext.manifest: ${error.message}`);
+  }
   const platforms = manifest?.platforms;
   if (platforms !== undefined && (!platforms || Array.isArray(platforms) || typeof platforms !== "object")) {
     fail("ext.manifest platforms must be a mapping");
@@ -114,7 +115,7 @@ function validateRuntimeArtifacts(members, manifestSource) {
   const memberSet = new Set(members);
   const webBackend = `${extensionDirectory}/lib/web/library_defold_webtransport.js`;
   if (!memberSet.has(webBackend)) fail(`extension has no functional HTML5 backend: ${webBackend}`);
-  const systemLibraries = new Map([["x86_64-win32", new Set(["ws2_32", "bcrypt"])] ]);
+  const systemLibraries = new Map([["x86_64-win32", new Set(["ws2_32", "bcrypt"])]]);
   for (const [platform, definition] of Object.entries(platforms ?? {})) {
     if (platform === "wasm-web" || platform === "wasm_pthread-web") continue;
     const libraries = definition?.context?.libs ?? [];
@@ -131,10 +132,7 @@ function validateRuntimeArtifacts(members, manifestSource) {
   }
 }
 
-export async function describeDefoldWebtransportPackage({
-  sourceRoot = defaultSourceRoot,
-  requestedVersion
-} = {}) {
+export async function describeDefoldWebtransportPackage({ sourceRoot = defaultSourceRoot, requestedVersion } = {}) {
   const versionFile = path.join(sourceRoot, "VERSION");
   await assertRegularFile(versionFile, "VERSION");
   const version = normalizeVersion(await readFile(versionFile, "utf8"), "VERSION");
@@ -163,7 +161,7 @@ export async function describeDefoldWebtransportPackage({
 
   const members = [
     "game.project",
-    ...(await collectFiles(extensionRoot)).map((file) => path.posix.join(extensionDirectory, file))
+    ...(await collectFiles(extensionRoot)).map((file) => path.posix.join(extensionDirectory, file)),
   ].sort(compare);
   validateMembers(members);
   validateRuntimeArtifacts(members, await readFile(path.join(extensionRoot, "ext.manifest"), "utf8"));
@@ -177,22 +175,25 @@ export async function describeDefoldWebtransportPackage({
   }
   if (publicContract?.schemaVersion !== 1) fail("public API compatibility schemaVersion must be 1");
   if (publicContract?.contractVersion !== version) {
-    fail(`public API contract version ${publicContract?.contractVersion ?? "<missing>"} does not match VERSION ${version}`);
+    fail(
+      `public API contract version ${publicContract?.contractVersion ?? "<missing>"} does not match VERSION ${version}`,
+    );
   }
   return {
     version,
     assetName: `defold-webtransport-${version}.zip`,
     sourceRoot: path.resolve(sourceRoot),
-    members
+    members,
   };
 }
 
 async function readMembers(description) {
   const entries = new Map();
   for (const member of description.members) {
-    const source = member === "game.project"
-      ? path.join(description.sourceRoot, member)
-      : path.join(description.sourceRoot, ...member.split("/"));
+    const source =
+      member === "game.project"
+        ? path.join(description.sourceRoot, member)
+        : path.join(description.sourceRoot, ...member.split("/"));
     await assertRegularFile(source, `archive member ${member}`);
     entries.set(member, new Uint8Array(await readFile(source)));
   }
@@ -233,7 +234,7 @@ export async function packageDefoldWebtransport({
   sourceRoot = defaultSourceRoot,
   outputRoot = defaultOutputRoot,
   stageRoot,
-  requestedVersion
+  requestedVersion,
 } = {}) {
   const description = await describeDefoldWebtransportPackage({ sourceRoot, requestedVersion });
   const entries = await readMembers(description);
@@ -249,7 +250,7 @@ export async function packageDefoldWebtransport({
     ...description,
     archivePath,
     stageRoot: stageRoot ? path.resolve(stageRoot) : undefined,
-    sha256: createHash("sha256").update(archive).digest("hex")
+    sha256: createHash("sha256").update(archive).digest("hex"),
   };
 }
 

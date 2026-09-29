@@ -3,10 +3,7 @@ import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-import {
-  buildDmSdkValuePlan,
-  indexDmSdkValuePlan,
-} from "../packages/compiler/src/dmsdk-value-plan.mjs";
+import { buildDmSdkValuePlan, indexDmSdkValuePlan } from "../packages/compiler/src/dmsdk-value-plan.mjs";
 
 const root = new URL("../", import.meta.url);
 const sourcePaths = Object.freeze({
@@ -24,9 +21,11 @@ const reports = Object.freeze([
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 
 async function inputs() {
-  const texts = Object.fromEntries(await Promise.all(
-    Object.entries(sourcePaths).map(async ([key, path]) => [key, await readFile(new URL(path, root), "utf8")]),
-  ));
+  const texts = Object.fromEntries(
+    await Promise.all(
+      Object.entries(sourcePaths).map(async ([key, path]) => [key, await readFile(new URL(path, root), "utf8")]),
+    ),
+  );
   return {
     texts,
     ir: JSON.parse(texts.ir),
@@ -40,13 +39,12 @@ async function inputs() {
 }
 
 test("one authenticated value plan owns scalar, enum, and named-scalar selection", async () => {
-  const planText = await readFile(
-    new URL("packages/bindings/generated/defold-dmsdk-value-plan.json", root),
-    "utf8",
-  );
+  const planText = await readFile(new URL("packages/bindings/generated/defold-dmsdk-value-plan.json", root), "utf8");
   const plan = JSON.parse(planText);
   const planHash = sha256(planText);
-  const selected = new Set(plan.decisions.filter(({ fallback }) => !fallback).map(({ declarationId }) => declarationId));
+  const selected = new Set(
+    plan.decisions.filter(({ fallback }) => !fallback).map(({ declarationId }) => declarationId),
+  );
   const emitted = new Set();
   indexDmSdkValuePlan(plan, { revision: plan.defoldRevision });
   for (const [patternId, path] of reports) {
@@ -96,10 +94,9 @@ test("value emitters cannot select patterns or construct private registries", as
 });
 
 test("value-plan verification rejects a forged decision owner", async () => {
-  const plan = JSON.parse(await readFile(
-    new URL("packages/bindings/generated/defold-dmsdk-value-plan.json", root),
-    "utf8",
-  ));
+  const plan = JSON.parse(
+    await readFile(new URL("packages/bindings/generated/defold-dmsdk-value-plan.json", root), "utf8"),
+  );
   const forged = structuredClone(plan);
   forged.decisions[0].emitter = "scripts/forged-emitter.mjs";
   assert.throws(() => indexDmSdkValuePlan(forged), /owner differs/u);

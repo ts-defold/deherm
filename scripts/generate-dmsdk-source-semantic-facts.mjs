@@ -81,10 +81,7 @@ async function includeRoots(engineRoot) {
   // dlib implementations. Do not infer them by walking the checkout: doing so
   // makes the AST depend on unrelated files that happen to be present and
   // prevents a declared-input clean room from reproducing the same facts.
-  const roots = new Set([
-    engineRoot,
-    path.join(engineRoot, "dlib", "src"),
-  ]);
+  const roots = new Set([engineRoot, path.join(engineRoot, "dlib", "src")]);
   const lock = await readFile(path.join(root, "upstream.lock"), "utf8");
   const revision = lock.match(/^DEFOLD_REV=(.+)$/mu)?.[1]?.trim();
   if (revision) {
@@ -105,8 +102,14 @@ export function clangInvocation(file, roots) {
   const language = extension === ".mm" ? "objective-c++" : extension === ".c" ? "c" : "c++";
   const standard = language === "c" ? "c11" : "c++17";
   return [
-    "-x", language, `-std=${standard}`, "-fsyntax-only", "-Wno-everything", "-ferror-limit=0",
-    "-Xclang", "-ast-dump=json",
+    "-x",
+    language,
+    `-std=${standard}`,
+    "-fsyntax-only",
+    "-Wno-everything",
+    "-ferror-limit=0",
+    "-Xclang",
+    "-ast-dump=json",
     ...roots.map((directory) => `-I${directory}`),
     file,
   ];
@@ -119,29 +122,44 @@ export function clangInvocation(file, roots) {
 export function clangAst(file, roots, repositoryRoot) {
   const args = clangInvocation(file, roots);
   return new Promise((resolve, reject) => {
-    execFile("clang++", args, { cwd: repositoryRoot, encoding: "utf8", maxBuffer: 512 * 1024 * 1024 }, (error, stdout, stderr) => {
-      const diagnostics = normalizeDiagnostics(stderr, repositoryRoot);
-      if (error) {
-        resolve({ ast: null, diagnostics, complete: false });
-        return;
-      }
-      if (!stdout.trim()) {
-        reject(new Error(`clang produced no AST for ${path.relative(repositoryRoot, file)}: ${stderr.trim().split("\n").at(-1) ?? "no diagnostics"}`));
-        return;
-      }
-      try {
-        resolve({ ast: JSON.parse(stdout), diagnostics, complete: true });
-      } catch (parseError) {
-        reject(new Error(`clang produced invalid AST JSON for ${path.relative(repositoryRoot, file)}: ${parseError.message}`));
-      }
-    });
+    execFile(
+      "clang++",
+      args,
+      { cwd: repositoryRoot, encoding: "utf8", maxBuffer: 512 * 1024 * 1024 },
+      (error, stdout, stderr) => {
+        const diagnostics = normalizeDiagnostics(stderr, repositoryRoot);
+        if (error) {
+          resolve({ ast: null, diagnostics, complete: false });
+          return;
+        }
+        if (!stdout.trim()) {
+          reject(
+            new Error(
+              `clang produced no AST for ${path.relative(repositoryRoot, file)}: ${stderr.trim().split("\n").at(-1) ?? "no diagnostics"}`,
+            ),
+          );
+          return;
+        }
+        try {
+          resolve({ ast: JSON.parse(stdout), diagnostics, complete: true });
+        } catch (parseError) {
+          reject(
+            new Error(
+              `clang produced invalid AST JSON for ${path.relative(repositoryRoot, file)}: ${parseError.message}`,
+            ),
+          );
+        }
+      },
+    );
   });
 }
 
 async function writeOutput(file, contents, check) {
   if (check) {
     let current = null;
-    try { current = await readFile(file, "utf8"); } catch {}
+    try {
+      current = await readFile(file, "utf8");
+    } catch {}
     if (current !== contents) throw new Error(`${path.relative(root, file)} is stale`);
     return;
   }
@@ -182,9 +200,7 @@ export async function buildDmSdkSourceSemanticFacts(options = {}) {
       });
       continue;
     }
-    const definitions = result.complete
-      ? extractCppImplementationFacts(result.ast, requestedNames, relative)
-      : [];
+    const definitions = result.complete ? extractCppImplementationFacts(result.ast, requestedNames, relative) : [];
     if (definitions.length) {
       parsed.push({
         path: relative,
@@ -203,22 +219,26 @@ export async function buildDmSdkSourceSemanticFacts(options = {}) {
       definitionsByName.set(definition.name, entries);
     }
   }
-  const entries = candidates.map(({ declaration, row }) => {
-    const definitions = definitionsByName.get(declaration.name) ?? [];
-    return {
-      declarationId: declaration.id,
-      name: declaration.name,
-      shape: row.shape,
-      state: definitions.length ? "observed" : "implementation-not-found",
-      definitions,
-    };
-  }).sort((left, right) => compareCodeUnits(left.declarationId, right.declarationId));
+  const entries = candidates
+    .map(({ declaration, row }) => {
+      const definitions = definitionsByName.get(declaration.name) ?? [];
+      return {
+        declarationId: declaration.id,
+        name: declaration.name,
+        shape: row.shape,
+        state: definitions.length ? "observed" : "implementation-not-found",
+        definitions,
+      };
+    })
+    .sort((left, right) => compareCodeUnits(left.declarationId, right.declarationId));
   const report = {
     schemaVersion: 1,
     defoldRevision: ir.defoldRevision,
     extraction: "clang-json-ast/compact-dataflow-v1",
     scope: "structurally eligible bounded-span declarations",
-    sources: parsed.map(({ definitions: _definitions, ...source }) => source).sort((left, right) => compareCodeUnits(left.path, right.path)),
+    sources: parsed
+      .map(({ definitions: _definitions, ...source }) => source)
+      .sort((left, right) => compareCodeUnits(left.path, right.path)),
     rejectedSources: rejectedSources.sort((left, right) => compareCodeUnits(left.path, right.path)),
     sourceHashes: { ir: sha256(irContent), shapes: sha256(shapesContent) },
     coverage: {
@@ -237,5 +257,7 @@ export async function buildDmSdkSourceSemanticFacts(options = {}) {
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const options = parseArguments(process.argv.slice(2));
   const report = await buildDmSdkSourceSemanticFacts(options);
-  process.stdout.write(`${options.check ? "Verified" : "Generated"} ${report.coverage.observed}/${report.coverage.requested} bounded-span source semantic facts.\n`);
+  process.stdout.write(
+    `${options.check ? "Verified" : "Generated"} ${report.coverage.observed}/${report.coverage.requested} bounded-span source semantic facts.\n`,
+  );
 }

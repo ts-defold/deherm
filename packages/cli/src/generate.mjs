@@ -9,14 +9,11 @@ import { isDeepStrictEqual } from "node:util";
 import { unzipSync } from "fflate";
 import { API as TypeScriptApi } from "typescript/unstable/sync";
 
-import {
-  assertUniquePublicScriptRoots,
-  publicScriptModulePath
-} from "../../compiler/src/script-public-api-policy.mjs";
+import { assertUniquePublicScriptRoots, publicScriptModulePath } from "../../compiler/src/script-public-api-policy.mjs";
 import {
   REVISION_OUTPUT_ROOTS,
   isRevisionOutput,
-  isTargetNativeOutput
+  isTargetNativeOutput,
 } from "../../compiler/src/revision-output-layout.mjs";
 import { BINDING_LOWERING_RECIPE_EMITTER } from "../../compiler/src/binding-lowering-plan-recipe.mjs";
 import {
@@ -25,30 +22,23 @@ import {
   renderNativeModuleStaticHeader,
   renderNativeModuleStaticSource,
   renderNativeModuleStaticTypescript,
-  renderNativeModuleTypescript
+  renderNativeModuleTypescript,
 } from "../../compiler/src/native-module-provider-generator.mjs";
 import { verifyProjectBuildArtifacts } from "./build-artifacts.mjs";
-import {
-  assertResolvedDefoldRevision,
-  defoldResolutionRecord,
-  resolveDefoldRevision
-} from "./defold-revision.mjs";
+import { assertResolvedDefoldRevision, defoldResolutionRecord, resolveDefoldRevision } from "./defold-revision.mjs";
 import { parseGameProject, resolveEngineProfiles } from "./project.mjs";
 import {
   assertResolvedDefoldSurface,
   buildGenerationMerkle,
   defoldSurfaceCacheHome,
-  resolveDefoldSurface
+  resolveDefoldSurface,
 } from "./defold-surface.mjs";
 import { safeParameterIdentifier } from "./names.mjs";
 import { hostDefoldPlatform } from "./toolchains.mjs";
 import { checkProject, loadDehermPluginConfig } from "./transform-compiler.mjs";
 import { materializeProjectNativeExtensionApis, resolveNativeExtensionClang } from "./native-extension-api.mjs";
 import { reconcileBobProjectBoundary } from "./bob-project-boundary.mjs";
-import {
-  fetchWebTransportArtifactOverlay,
-  validateWebTransportArtifactOverlay
-} from "./webtransport-artifacts.mjs";
+import { fetchWebTransportArtifactOverlay, validateWebTransportArtifactOverlay } from "./webtransport-artifacts.mjs";
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
 const require = createRequire(import.meta.url);
@@ -58,14 +48,11 @@ const generatedContextExportNames = new Set(["projectExtensions"]);
 // `.deherm/static-hermes/generated/`.  Keep the list next to the copy lane and
 // cache identity: adding a copied unit without adding it to the identity would
 // recreate the stale-project-source bug this registry prevents.
-const projectStaticHermesOutputs = Object.freeze([
-  "script-universal-value.ts",
-  "script-typed-native-bridge.ts"
-]);
+const projectStaticHermesOutputs = Object.freeze(["script-universal-value.ts", "script-typed-native-bridge.ts"]);
 
 const projectStaticHermesReports = Object.freeze([
   "packages/bindings/generated/defold-script-universal-value-bindings.json",
-  "packages/bindings/generated/defold-typed-native-bridge.json"
+  "packages/bindings/generated/defold-typed-native-bridge.json",
 ]);
 
 // `.script_api` names Defold's engine value types by their Lua spelling. The
@@ -78,19 +65,23 @@ export function createDefoldValueTypeCatalog(layouts) {
   if (!layouts || layouts.schemaVersion !== 1 || !layouts.transparent || !layouts.opaque) {
     throw new Error("Resolved Defold surface has no supported value-layout catalog");
   }
-  const transparent = new Map(Object.keys(layouts.transparent).sort(compareCodeUnits).map((name) => {
-    const typeName = layouts.transparent[name]?.typescriptType;
-    if (typeof typeName !== "string" || !/^[A-Za-z_$][A-Za-z0-9_$]*$/.test(typeName)) {
-      throw new Error(`Transparent Defold value type '${name}' has no policy-defined TypeScript projection`);
-    }
-    return [name.toLowerCase(), typeName];
-  }));
+  const transparent = new Map(
+    Object.keys(layouts.transparent)
+      .sort(compareCodeUnits)
+      .map((name) => {
+        const typeName = layouts.transparent[name]?.typescriptType;
+        if (typeof typeName !== "string" || !/^[A-Za-z_$][A-Za-z0-9_$]*$/.test(typeName)) {
+          throw new Error(`Transparent Defold value type '${name}' has no policy-defined TypeScript projection`);
+        }
+        return [name.toLowerCase(), typeName];
+      }),
+  );
   return Object.freeze({
     transparent,
     opaque: new Set(Object.keys(layouts.opaque).map((name) => name.toLowerCase())),
     imports: [...new Set(transparent.values())]
       .filter((name) => name !== "DefoldHash" && name !== "DefoldUrl")
-      .sort(compareCodeUnits)
+      .sort(compareCodeUnits),
   });
 }
 
@@ -107,11 +98,17 @@ async function packageStaticHermesSourceRoot(defoldRevision) {
   // still letting package output updates invalidate and refresh project-owned
   // Static Hermes sources.
   try {
-    const reports = await Promise.all(projectStaticHermesReports.map(async (relative) =>
-      JSON.parse(await readFile(path.join(packageRoot, relative), "utf8"))));
+    const reports = await Promise.all(
+      projectStaticHermesReports.map(async (relative) =>
+        JSON.parse(await readFile(path.join(packageRoot, relative), "utf8")),
+      ),
+    );
     if (reports.some((report) => report?.defoldRevision !== defoldRevision)) return null;
-    await Promise.all(projectStaticHermesOutputs.map((name) =>
-      access(path.join(packageRoot, "packages", "static-hermes", "src", "generated", name))));
+    await Promise.all(
+      projectStaticHermesOutputs.map((name) =>
+        access(path.join(packageRoot, "packages", "static-hermes", "src", "generated", name)),
+      ),
+    );
     return path.join(packageRoot, "packages", "static-hermes", "src", "generated");
   } catch (error) {
     if (error?.code === "ENOENT" || error instanceof SyntaxError) return null;
@@ -121,20 +118,24 @@ async function packageStaticHermesSourceRoot(defoldRevision) {
 
 async function projectStaticHermesInputs({ core, defoldRevision }) {
   const packageSourceRoot = await packageStaticHermesSourceRoot(defoldRevision);
-  const sourceRoot = packageSourceRoot ?? path.join(core.repositorySourceRoot, "packages", "static-hermes", "src", "generated");
-  const outputSources = Object.fromEntries(await Promise.all(projectStaticHermesOutputs.map(async (name) => [
-    name,
-    sha256(await readFile(path.join(sourceRoot, name)))
-  ])));
+  const sourceRoot =
+    packageSourceRoot ?? path.join(core.repositorySourceRoot, "packages", "static-hermes", "src", "generated");
+  const outputSources = Object.fromEntries(
+    await Promise.all(
+      projectStaticHermesOutputs.map(async (name) => [name, sha256(await readFile(path.join(sourceRoot, name)))]),
+    ),
+  );
   return { sourceRoot, outputSources };
 }
 
 function assertPublishedNativeArtifacts(artifactPolicy, revision) {
   const family = artifactPolicy?.artifacts?.["native-artifacts"];
   if (!family) throw new Error(`Published Defold policy ${revision} has no native-artifacts mapping`);
-  if (family.indexedBy !== "bundleTarget" ||
-      !/^[A-Za-z0-9][A-Za-z0-9._-]*$/u.test(family.tag ?? "") ||
-      !/^[0-9a-f]{64}$/u.test(family.fingerprint ?? "")) {
+  if (
+    family.indexedBy !== "bundleTarget" ||
+    !/^[A-Za-z0-9][A-Za-z0-9._-]*$/u.test(family.tag ?? "") ||
+    !/^[0-9a-f]{64}$/u.test(family.fingerprint ?? "")
+  ) {
     throw new Error(`Published Defold policy ${revision} has an invalid native-artifacts mapping`);
   }
   return family;
@@ -145,9 +146,10 @@ export function generatedProjectCacheMatches({ manifest, lock, generationKey, ge
     schemaVersion: generationMerkle.schemaVersion,
     engineRoot: generationMerkle.engineRoot,
     nativeRoot: generationMerkle.nativeRoot,
-    root: generationMerkle.root
+    root: generationMerkle.root,
   };
-  return manifest?.generation?.cacheKey === generationKey &&
+  return (
+    manifest?.generation?.cacheKey === generationKey &&
     lock?.generation?.cacheKey === generationKey &&
     isDeepStrictEqual(manifest.generationMerkle, expectedMerkle) &&
     isDeepStrictEqual(lock.generationMerkle, expectedMerkle) &&
@@ -158,7 +160,8 @@ export function generatedProjectCacheMatches({ manifest, lock, generationKey, ge
     manifest.defoldSurface?.layer === core.surfaceLayer &&
     lock.defoldSurface?.layer === core.surfaceLayer &&
     isDeepStrictEqual(manifest.inputs, core.inputs) &&
-    isDeepStrictEqual(lock.inputs, core.inputs);
+    isDeepStrictEqual(lock.inputs, core.inputs)
+  );
 }
 
 export function shouldResolvePublishedPolicy(surface, options = {}) {
@@ -225,32 +228,45 @@ async function revisionOutputDigest(repositoryRoot) {
   return hash.digest("hex");
 }
 
-async function projectGenerationIdentity({ inventory, outputDirectory, core, engineProfiles, nativeExtensionClang, staticHermesInputs }) {
+async function projectGenerationIdentity({
+  inventory,
+  outputDirectory,
+  core,
+  engineProfiles,
+  nativeExtensionClang,
+  staticHermesInputs,
+}) {
   const projectGeneratorSha256 = sha256(await readFile(fileURLToPath(import.meta.url)));
-  const nativeExtensionGeneratorSha256 = sha256(Buffer.concat(await Promise.all([
-    readFile(path.join(packageRoot, "packages", "cli", "src", "native-extension-api.mjs")),
-    readFile(path.join(packageRoot, "packages", "compiler", "src", "native-extension-generator.mjs")),
-    readFile(path.join(packageRoot, "packages", "compiler", "src", "native-module-provider-generator.mjs"))
-  ])));
-  const cacheKey = sha256(JSON.stringify({
-    schemaVersion: 1,
-    projectGeneratorSha256,
-    nativeExtensionGeneratorSha256,
-    outputDirectory: outputDirectory.split(path.sep).join("/"),
-    packageVersion: core.packageVersion,
-    coreInputs: core.inputs,
-    staticHermesInputs: { outputs: staticHermesInputs.outputSources },
-    engineProfiles,
-    nativeExtensionClang,
-    inventory
-  }));
+  const nativeExtensionGeneratorSha256 = sha256(
+    Buffer.concat(
+      await Promise.all([
+        readFile(path.join(packageRoot, "packages", "cli", "src", "native-extension-api.mjs")),
+        readFile(path.join(packageRoot, "packages", "compiler", "src", "native-extension-generator.mjs")),
+        readFile(path.join(packageRoot, "packages", "compiler", "src", "native-module-provider-generator.mjs")),
+      ]),
+    ),
+  );
+  const cacheKey = sha256(
+    JSON.stringify({
+      schemaVersion: 1,
+      projectGeneratorSha256,
+      nativeExtensionGeneratorSha256,
+      outputDirectory: outputDirectory.split(path.sep).join("/"),
+      packageVersion: core.packageVersion,
+      coreInputs: core.inputs,
+      staticHermesInputs: { outputs: staticHermesInputs.outputSources },
+      engineProfiles,
+      nativeExtensionClang,
+      inventory,
+    }),
+  );
   return {
     schemaVersion: 1,
     projectGeneratorSha256,
     nativeExtensionGeneratorSha256,
     nativeExtensionClang,
     staticHermesInputs: { outputs: staticHermesInputs.outputSources },
-    cacheKey
+    cacheKey,
   };
 }
 
@@ -263,7 +279,9 @@ function property(name) {
 }
 
 function identifier(name) {
-  const words = String(name).split(/[^A-Za-z0-9$]+|_+/).filter(Boolean);
+  const words = String(name)
+    .split(/[^A-Za-z0-9$]+|_+/)
+    .filter(Boolean);
   const joined = words.map((word) => word[0].toUpperCase() + word.slice(1)).join("") || "Anonymous";
   return /^[A-Za-z_$]/.test(joined) ? joined : `_${joined}`;
 }
@@ -278,24 +296,34 @@ function memberIdentifier(name) {
   // is lossy (`DIRECTION_FOUR` and `DIRECTIONFOUR` would collide) and disagrees
   // with the generated core SDK, which exports `go.EASING_LINEAR` verbatim.
   if (/^[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*$/.test(String(name))) return String(name);
-  const words = String(name).split(/[^A-Za-z0-9$]+|_+/).filter(Boolean);
+  const words = String(name)
+    .split(/[^A-Za-z0-9$]+|_+/)
+    .filter(Boolean);
   if (!words.length) return "anonymous";
   const first = words[0][0].toLowerCase() + words[0].slice(1);
-  const joined = first + words.slice(1)
-    .map((word) => word[0].toUpperCase() + word.slice(1))
-    .join("");
+  const joined =
+    first +
+    words
+      .slice(1)
+      .map((word) => word[0].toUpperCase() + word.slice(1))
+      .join("");
   return /^[A-Za-z_$]/.test(joined) ? joined : `_${joined}`;
 }
 
 function fileName(name) {
-  const value = String(name).replace(/[^A-Za-z0-9._-]+/g, "-").replace(/^[-.]+|[-.]+$/g, "");
+  const value = String(name)
+    .replace(/[^A-Za-z0-9._-]+/g, "-")
+    .replace(/^[-.]+|[-.]+$/g, "");
   return (value || "anonymous").toLowerCase();
 }
 
 function unionType(types, raw) {
   let members = types;
-  if (members.some((type) => type.kind === "defold-value" && type.name === "url") && members.some(({ kind }) => kind === "string")) {
-    members = members.map((type) => type.kind === "string" ? { kind: "address-literal", raw: type.raw } : type);
+  if (
+    members.some((type) => type.kind === "defold-value" && type.name === "url") &&
+    members.some(({ kind }) => kind === "string")
+  ) {
+    members = members.map((type) => (type.kind === "string" ? { kind: "address-literal", raw: type.raw } : type));
   }
   const unique = [...new Map(members.map((type) => [JSON.stringify(type), type])).values()];
   return unique.length === 1 ? unique[0] : { kind: "union", types: unique, raw };
@@ -328,10 +356,20 @@ function declaredName(rawName, fallback) {
   if (marked) {
     const marker = marked[2].trim().toLowerCase();
     if (marker === "optional") return { name: marked[1].trim(), optional: true, spelling: "trailing-optional-marker" };
-    return { name: value, optional: false, spelling: "unrecognized-marker", blocker: `unrecognized-name-marker:${marked[2].trim()}` };
+    return {
+      name: value,
+      optional: false,
+      spelling: "unrecognized-marker",
+      blocker: `unrecognized-name-marker:${marked[2].trim()}`,
+    };
   }
   if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(value)) {
-    return { name: value, optional: false, spelling: "not-an-identifier", blocker: `name-is-not-a-lua-identifier:${value}` };
+    return {
+      name: value,
+      optional: false,
+      spelling: "not-an-identifier",
+      blocker: `name-is-not-a-lua-identifier:${value}`,
+    };
   }
   return { name: value, optional: false, spelling: "plain" };
 }
@@ -340,9 +378,14 @@ function normalizeType(value, valueTypes) {
   if (Array.isArray(value?.type)) {
     // YAML sequence unions: `type: [vector3, vector4]`. The Defold editor joins
     // the same sequence with `|`, so it is an alternation, not a tuple.
-    const raw = value.type.map((entry) => typeof entry === "string" ? entry.trim() : String(entry)).join("|");
+    const raw = value.type.map((entry) => (typeof entry === "string" ? entry.trim() : String(entry))).join("|");
     if (!value.type.length) return { kind: "unprojectable", code: "empty-type-union", raw };
-    return unionType(value.type.map((entry) => normalizeType(typeof entry === "string" ? entry : { ...value, type: entry }, valueTypes)), raw);
+    return unionType(
+      value.type.map((entry) =>
+        normalizeType(typeof entry === "string" ? entry : { ...value, type: entry }, valueTypes),
+      ),
+      raw,
+    );
   }
   if (typeof value === "string") return normalizeNamedType(value, value, valueTypes);
   if (typeof value?.type !== "string") {
@@ -350,7 +393,10 @@ function normalizeType(value, valueTypes) {
   }
   const raw = value.type;
   if (raw.includes("|")) {
-    return unionType(raw.split("|").map((part) => normalizeType({ ...value, type: part.trim() }, valueTypes)), raw);
+    return unionType(
+      raw.split("|").map((part) => normalizeType({ ...value, type: part.trim() }, valueTypes)),
+      raw,
+    );
   }
   const nested = raw.trim().toLowerCase() === "table" ? nestedDeclarations(value) : null;
   if (nested) {
@@ -362,13 +408,17 @@ function normalizeType(value, valueTypes) {
           name: declared.name,
           optional: declared.optional || field?.optional === true,
           type: declared.blocker
-            ? { kind: "unprojectable", code: declared.blocker, raw: typeof field?.name === "string" ? field.name : null }
-            : normalizeType(field, valueTypes)
+            ? {
+                kind: "unprojectable",
+                code: declared.blocker,
+                raw: typeof field?.name === "string" ? field.name : null,
+              }
+            : normalizeType(field, valueTypes),
         };
         if (declared.spelling !== "plain") entry.nameSpelling = declared.spelling;
         return entry;
       }),
-      raw
+      raw,
     };
   }
   return normalizeNamedType(raw, raw, valueTypes);
@@ -378,20 +428,28 @@ function normalizeNamedType(raw, original, valueTypes) {
   const name = raw.trim().toLowerCase();
   switch (name) {
     case "bool":
-    case "boolean": return { kind: "boolean", raw: original };
+    case "boolean":
+      return { kind: "boolean", raw: original };
     case "number":
     case "float":
     case "int":
     case "integer":
-    case "constant": return { kind: "number", raw: original };
-    case "string": return { kind: "string", raw: original };
-    case "nil": return { kind: "null", raw: original };
-    case "table": return { kind: "record", fields: [], raw: original };
-    case "function": return { kind: "function", raw: original };
+    case "constant":
+      return { kind: "number", raw: original };
+    case "string":
+      return { kind: "string", raw: original };
+    case "nil":
+      return { kind: "null", raw: original };
+    case "table":
+      return { kind: "record", fields: [], raw: original };
+    case "function":
+      return { kind: "function", raw: original };
     case "object":
     case "userdata":
-    case "any": return { kind: "unknown", raw: original };
-    default: break;
+    case "any":
+      return { kind: "unknown", raw: original };
+    default:
+      break;
   }
   const transparent = valueTypes.transparent.get(name);
   if (transparent) return { kind: "defold-value", name, ts: transparent, raw: original };
@@ -403,48 +461,72 @@ function normalizeNamedType(raw, original, valueTypes) {
 
 function renderType(type) {
   switch (type.kind) {
-    case "void": return "void";
-    case "boolean": return "boolean";
-    case "number": return "number";
-    case "string": return "string";
-    case "address-literal": return "DefoldAddressLiteral | DefoldRelativeAddress";
-    case "null": return "null";
-    case "defold-value": return type.ts;
-    case "record": return type.fields.length
-      ? `Readonly<{ ${type.fields.map((field) => `${property(field.name)}${field.optional ? "?" : ""}: ${renderType(field.type)}`).join("; ")} }>`
-      : "Readonly<Record<string, unknown>>";
-    case "function": return "(...args: unknown[]) => unknown";
-    case "union": return type.types.map(renderType).join(" | ");
-    case "tuple": return `[${type.types.map(renderType).join(", ")}]`;
+    case "void":
+      return "void";
+    case "boolean":
+      return "boolean";
+    case "number":
+      return "number";
+    case "string":
+      return "string";
+    case "address-literal":
+      return "DefoldAddressLiteral | DefoldRelativeAddress";
+    case "null":
+      return "null";
+    case "defold-value":
+      return type.ts;
+    case "record":
+      return type.fields.length
+        ? `Readonly<{ ${type.fields.map((field) => `${property(field.name)}${field.optional ? "?" : ""}: ${renderType(field.type)}`).join("; ")} }>`
+        : "Readonly<Record<string, unknown>>";
+    case "function":
+      return "(...args: unknown[]) => unknown";
+    case "union":
+      return type.types.map(renderType).join(" | ");
+    case "tuple":
+      return `[${type.types.map(renderType).join(", ")}]`;
     // Fail closed: an unprojectable shape is uninhabited, never `any`.
-    case "unprojectable": return "never";
-    case "unknown": return "unknown";
-    default: throw new Error(`Unknown binding IR type: ${type.kind}`);
+    case "unprojectable":
+      return "never";
+    case "unknown":
+      return "unknown";
+    default:
+      throw new Error(`Unknown binding IR type: ${type.kind}`);
   }
 }
 
 /** Walks a normalized type and reports every shape the lane cannot project. */
 function typeBlockers(type, site) {
   switch (type.kind) {
-    case "unprojectable": return [{ site, code: type.code, raw: type.raw }];
-    case "union": return type.types.flatMap((member, index) => typeBlockers(member, `${site}.union[${index}]`));
-    case "tuple": return type.types.flatMap((member, index) => typeBlockers(member, `${site}[${index}]`));
-    case "record": return type.fields.flatMap((field) => typeBlockers(field.type, `${site}.${field.name}`));
-    default: return [];
+    case "unprojectable":
+      return [{ site, code: type.code, raw: type.raw }];
+    case "union":
+      return type.types.flatMap((member, index) => typeBlockers(member, `${site}.union[${index}]`));
+    case "tuple":
+      return type.types.flatMap((member, index) => typeBlockers(member, `${site}[${index}]`));
+    case "record":
+      return type.fields.flatMap((field) => typeBlockers(field.type, `${site}.${field.name}`));
+    default:
+      return [];
   }
 }
 
 function parameters(member) {
-  return member.parameters.map((parameter, index) => {
-    const canUseQuestion = parameter.optional && member.parameters.slice(index + 1).every((later) => later.optional);
-    const type = `${renderType(parameter.type)}${parameter.optional && !canUseQuestion ? " | undefined" : ""}`;
-    return `${parameter.jsName}${canUseQuestion ? "?" : ""}: ${type}`;
-  }).join(", ");
+  return member.parameters
+    .map((parameter, index) => {
+      const canUseQuestion = parameter.optional && member.parameters.slice(index + 1).every((later) => later.optional);
+      const type = `${renderType(parameter.type)}${parameter.optional && !canUseQuestion ? " | undefined" : ""}`;
+      return `${parameter.jsName}${canUseQuestion ? "?" : ""}: ${type}`;
+    })
+    .join(", ");
 }
 
 function description(value, indent = "") {
   if (typeof value !== "string" || !value.trim()) return [];
-  const clean = value.replaceAll("*/", "* /").split(/\r?\n/).map((line) => line.trim());
+  const clean = value
+    .replaceAll("*/", "* /")
+    .split(/\r?\n/)
+    .map((line) => line.trim());
   return [`${indent}/**`, ...clean.map((line) => `${indent} * ${line}`), `${indent} */`];
 }
 
@@ -461,7 +543,7 @@ function collectModules(inventory) {
         module.sources.push({
           extension: extension.name,
           path: api.path,
-          extensionBindingStatus: extension.bindingStatus
+          extensionBindingStatus: extension.bindingStatus,
         });
         modules.set(key, module);
       }
@@ -482,8 +564,8 @@ function normalizeMember(moduleName, member, valueTypes) {
       dynamicHermes: "lua-compatibility",
       staticHermes: "lua-compatibility",
       html5: "lua-compatibility",
-      directNative: "schema-required"
-    }
+      directNative: "schema-required",
+    },
   };
   if (typeof member.desc === "string") common.description = member.desc;
   if (member.type !== "function") {
@@ -491,11 +573,24 @@ function normalizeMember(moduleName, member, valueTypes) {
     // ambiguous at the source. Projecting it as a value would erase the call
     // signature without saying so, so it fails closed instead.
     if (Array.isArray(member.parameters) || Array.isArray(member.returns) || member.return) {
-      return withBlockers({
-        ...common,
-        kind: "value",
-        type: { kind: "unprojectable", code: "call-signature-without-function-type", raw: typeof member.type === "string" ? member.type : null }
-      }, [{ site: "value", code: "call-signature-without-function-type", raw: typeof member.type === "string" ? member.type : null }]);
+      return withBlockers(
+        {
+          ...common,
+          kind: "value",
+          type: {
+            kind: "unprojectable",
+            code: "call-signature-without-function-type",
+            raw: typeof member.type === "string" ? member.type : null,
+          },
+        },
+        [
+          {
+            site: "value",
+            code: "call-signature-without-function-type",
+            raw: typeof member.type === "string" ? member.type : null,
+          },
+        ],
+      );
     }
     const type = normalizeType(member, valueTypes);
     return withBlockers({ ...common, kind: "value", type }, typeBlockers(type, "value"));
@@ -505,14 +600,18 @@ function normalizeMember(moduleName, member, valueTypes) {
     const declared = declaredName(parameter?.name, `arg${index + 1}`);
     const site = `parameter[${index}]:${declared.name}`;
     const type = declared.blocker
-      ? { kind: "unprojectable", code: declared.blocker, raw: typeof parameter?.name === "string" ? parameter.name : null }
+      ? {
+          kind: "unprojectable",
+          code: declared.blocker,
+          raw: typeof parameter?.name === "string" ? parameter.name : null,
+        }
       : normalizeType(parameter, valueTypes);
     blockers.push(...typeBlockers(type, site));
     const entry = {
       rawName: declared.name,
       jsName: safeParameterIdentifier(memberIdentifier(declared.name), index),
       optional: declared.optional || parameter?.optional === true,
-      type
+      type,
     };
     if (declared.spelling !== "plain") entry.nameSpelling = declared.spelling;
     return entry;
@@ -528,17 +627,20 @@ function normalizeMember(moduleName, member, valueTypes) {
   const returns = !result
     ? { kind: "void" }
     : Array.isArray(result)
-      // A one-entry `returns:` sequence is a single Lua return value, not a
-      // one-element tuple.
-      ? (result.length === 1 ? normalizeType(result[0], valueTypes) : { kind: "tuple", types: result.map((entry) => normalizeType(entry, valueTypes)) })
+      ? // A one-entry `returns:` sequence is a single Lua return value, not a
+        // one-element tuple.
+        result.length === 1
+        ? normalizeType(result[0], valueTypes)
+        : { kind: "tuple", types: result.map((entry) => normalizeType(entry, valueTypes)) }
       : normalizeType(result, valueTypes);
   blockers.push(...typeBlockers(returns, "return"));
   return withBlockers({ ...common, kind: "function", parameters, returns }, blockers);
 }
 
 function withBlockers(normalized, blockers) {
-  const unique = [...new Map(blockers.map((blocker) => [`${blocker.site}\0${blocker.code}`, blocker])).values()]
-    .sort((left, right) => compareCodeUnits(left.site, right.site) || compareCodeUnits(left.code, right.code));
+  const unique = [...new Map(blockers.map((blocker) => [`${blocker.site}\0${blocker.code}`, blocker])).values()].sort(
+    (left, right) => compareCodeUnits(left.site, right.site) || compareCodeUnits(left.code, right.code),
+  );
   if (!unique.length) return { ...normalized, disposition: "projected" };
   return {
     ...normalized,
@@ -547,8 +649,8 @@ function withBlockers(normalized, blockers) {
       id: `${normalized.id}#${blocker.site}`,
       site: blocker.site,
       code: blocker.code,
-      ...(blocker.raw === null || blocker.raw === undefined ? {} : { declared: blocker.raw })
-    }))
+      ...(blocker.raw === null || blocker.raw === undefined ? {} : { declared: blocker.raw }),
+    })),
   };
 }
 
@@ -564,7 +666,9 @@ export function buildProjectBindingIr(inventory, layouts) {
       const normalized = normalizeMember(module.name, member, valueTypes);
       const collision = jsNames.get(normalized.jsName);
       if (collision) {
-        throw new Error(`${module.name}: ${collision} and ${member.name} both map to TypeScript name ${normalized.jsName}`);
+        throw new Error(
+          `${module.name}: ${collision} and ${member.name} both map to TypeScript name ${normalized.jsName}`,
+        );
       }
       jsNames.set(normalized.jsName, member.name);
       members.push(normalized);
@@ -576,7 +680,7 @@ export function buildProjectBindingIr(inventory, layouts) {
       typeName: `${identifier(module.name)}Extension`,
       fileName: fileName(module.name),
       sources: module.sources,
-      members
+      members,
     };
     if (module.descriptions[0]) normalizedModule.description = module.descriptions[0];
     return normalizedModule;
@@ -603,19 +707,25 @@ export function buildProjectBindingIr(inventory, layouts) {
       ...module,
       jsName: `${module.jsName}_${suffix}`,
       typeName: `${module.typeName}_${suffix}`,
-      fileName: `${module.fileName}-${suffix}`
+      fileName: `${module.fileName}-${suffix}`,
     };
   });
-  const blocked = modules.flatMap((module) => module.members
-    .filter(({ disposition }) => disposition === "blocked")
-    .flatMap((member) => member.blockers.map((blocker) => ({
-      module: module.runtimeName,
-      member: member.rawName,
-      ...blocker
-    }))));
+  const blocked = modules.flatMap((module) =>
+    module.members
+      .filter(({ disposition }) => disposition === "blocked")
+      .flatMap((member) =>
+        member.blockers.map((blocker) => ({
+          module: module.runtimeName,
+          member: member.rawName,
+          ...blocker,
+        })),
+      ),
+  );
   const memberCount = modules.reduce((count, module) => count + module.members.length, 0);
-  const blockedMembers = modules.reduce((count, module) =>
-    count + module.members.filter(({ disposition }) => disposition === "blocked").length, 0);
+  const blockedMembers = modules.reduce(
+    (count, module) => count + module.members.filter(({ disposition }) => disposition === "blocked").length,
+    0,
+  );
   const codes = {};
   for (const blocker of blocked) codes[blocker.code] = (codes[blocker.code] ?? 0) + 1;
   return {
@@ -627,17 +737,15 @@ export function buildProjectBindingIr(inventory, layouts) {
       members: memberCount,
       projected: memberCount - blockedMembers,
       blocked: blockedMembers,
-      blockerCodes: Object.fromEntries(Object.entries(codes).sort(([left], [right]) => compareCodeUnits(left, right)))
+      blockerCodes: Object.fromEntries(Object.entries(codes).sort(([left], [right]) => compareCodeUnits(left, right))),
     },
     blockers: blocked.sort((left, right) => compareCodeUnits(left.id, right.id)),
-    modules
+    modules,
   };
 }
 
 function blockedMemberComment(member, indent = "") {
-  return [
-    `${indent}/** blocked: ${member.blockers.map(({ site, code }) => `${site}=${code}`).join(", ")} */`
-  ];
+  return [`${indent}/** blocked: ${member.blockers.map(({ site, code }) => `${site}=${code}`).join(", ")} */`];
 }
 
 function blockedMemberMessage(module, member) {
@@ -647,13 +755,20 @@ function blockedMemberMessage(module, member) {
 function generatedModuleSource(module, valueTypes) {
   const interfaceName = module.typeName;
   const exportName = module.jsName;
-  const typeImports = [interfaceName, "DefoldAddressLiteral", "DefoldRelativeAddress", "DefoldHash", "DefoldUrl", ...valueTypes.imports];
+  const typeImports = [
+    interfaceName,
+    "DefoldAddressLiteral",
+    "DefoldRelativeAddress",
+    "DefoldHash",
+    "DefoldUrl",
+    ...valueTypes.imports,
+  ];
   const lines = [
     "// Generated by deherm. Do not edit.",
     `import type { ${typeImports.join(", ")} } from "../../extensions.js";`,
     'import { callExtension, getExtensionValue } from "../runtime.js";',
     "",
-    `export const ${exportName}: ${interfaceName} = {`
+    `export const ${exportName}: ${interfaceName} = {`,
   ];
   for (const member of module.members) {
     lines.push(...description(member.description, "  "));
@@ -665,11 +780,15 @@ function generatedModuleSource(module, valueTypes) {
     } else if (member.kind === "function") {
       const args = member.parameters.map((parameter) => parameter.jsName);
       lines.push(`  ${property(member.jsName)}(${parameters(member)}): ${renderType(member.returns)} {`);
-      lines.push(`    return callExtension(${JSON.stringify(module.runtimeName)}, ${JSON.stringify(member.rawName)}, [${args.join(", ")}]) as ${renderType(member.returns)};`);
+      lines.push(
+        `    return callExtension(${JSON.stringify(module.runtimeName)}, ${JSON.stringify(member.rawName)}, [${args.join(", ")}]) as ${renderType(member.returns)};`,
+      );
       lines.push("  },");
     } else {
       lines.push(`  get ${property(member.jsName)}(): ${renderType(member.type)} {`);
-      lines.push(`    return getExtensionValue(${JSON.stringify(module.runtimeName)}, ${JSON.stringify(member.rawName)}) as ${renderType(member.type)};`);
+      lines.push(
+        `    return getExtensionValue(${JSON.stringify(module.runtimeName)}, ${JSON.stringify(member.rawName)}) as ${renderType(member.type)};`,
+      );
       lines.push("  },");
     }
   }
@@ -760,23 +879,46 @@ export function getExtensionValue(moduleName: string, memberName: string): unkno
 
 const ignoredAuthoredGlobs = ["node_modules/**", ".internal/**", "build/**", "dist/**"];
 function generatedCompilerOnlyGlobs(generated) {
-  return [...new Set([
-    // Authenticated revision surfaces are materialized below the project
-    // output root for offline reuse. Their compatibility sources are inputs
-    // to native assembly, not authored TypeScript modules for ttsc.
-    `${generated}/cache/**/*.ts`,
-    `${generated}/static-hermes/**/*.ts`,
-    `${generated}/generated/native-extensions/**/*.ts`,
-    // Typed-native assembly deliberately stages at this stable project path so
-    // shermes source locations are reproducible, independent of --out-dir.
-    ".deherm/build/generated/typed-native/**/*.ts"
-  ])];
+  return [
+    ...new Set([
+      // Authenticated revision surfaces are materialized below the project
+      // output root for offline reuse. Their compatibility sources are inputs
+      // to native assembly, not authored TypeScript modules for ttsc.
+      `${generated}/cache/**/*.ts`,
+      `${generated}/static-hermes/**/*.ts`,
+      `${generated}/generated/native-extensions/**/*.ts`,
+      // Typed-native assembly deliberately stages at this stable project path so
+      // shermes source locations are reproducible, independent of --out-dir.
+      ".deherm/build/generated/typed-native/**/*.ts",
+    ]),
+  ];
 }
 const authoredContexts = [
-  { id: "shared", suffix: null, includes: ["**/*.ts"], excludes: ["**/*.script.ts", "**/*.gui.ts", "**/*.gui_script.ts", "**/*.render.ts", ...ignoredAuthoredGlobs] },
-  { id: "game-object", suffix: ".script.ts", includes: ["**/*.ts"], excludes: ["**/*.gui.ts", "**/*.gui_script.ts", "**/*.render.ts", ...ignoredAuthoredGlobs] },
-  { id: "gui", suffix: ".gui.ts", legacySuffixes: [".gui_script.ts"], includes: ["**/*.ts"], excludes: ["**/*.script.ts", "**/*.render.ts", ...ignoredAuthoredGlobs] },
-  { id: "render", suffix: ".render.ts", includes: ["**/*.ts"], excludes: ["**/*.script.ts", "**/*.gui.ts", "**/*.gui_script.ts", ...ignoredAuthoredGlobs] }
+  {
+    id: "shared",
+    suffix: null,
+    includes: ["**/*.ts"],
+    excludes: ["**/*.script.ts", "**/*.gui.ts", "**/*.gui_script.ts", "**/*.render.ts", ...ignoredAuthoredGlobs],
+  },
+  {
+    id: "game-object",
+    suffix: ".script.ts",
+    includes: ["**/*.ts"],
+    excludes: ["**/*.gui.ts", "**/*.gui_script.ts", "**/*.render.ts", ...ignoredAuthoredGlobs],
+  },
+  {
+    id: "gui",
+    suffix: ".gui.ts",
+    legacySuffixes: [".gui_script.ts"],
+    includes: ["**/*.ts"],
+    excludes: ["**/*.script.ts", "**/*.render.ts", ...ignoredAuthoredGlobs],
+  },
+  {
+    id: "render",
+    suffix: ".render.ts",
+    includes: ["**/*.ts"],
+    excludes: ["**/*.script.ts", "**/*.gui.ts", "**/*.gui_script.ts", ...ignoredAuthoredGlobs],
+  },
 ];
 
 function generatedOutputPaths() {
@@ -785,15 +927,15 @@ function generatedOutputPaths() {
       "script-contexts.json",
       "generated/native-extensions/index.json",
       ...authoredContexts.map(({ id }) => `sdk/contexts/${id}.ts`),
-      ...projectStaticHermesOutputs.map((name) => `static-hermes/generated/${name}`)
+      ...projectStaticHermesOutputs.map((name) => `static-hermes/generated/${name}`),
     ],
     project: [
       "tsconfig.deherm.base.json",
       ...authoredContexts.map(({ id }) => `tsconfig.deherm.${id}.json`),
       "tsconfig.deherm.bundle.json",
       "tsconfig.deherm.release.json",
-      "tsconfig.deherm.json"
-    ]
+      "tsconfig.deherm.json",
+    ],
   };
 }
 
@@ -807,14 +949,10 @@ const routeContextClasses = new Map([
   ["captured-gui-script-instance", "gui"],
   ["render-script-instance", "render"],
   ["render-script-instance-and-graphics-context", "render"],
-  ["captured-render-script-instance", "render"]
+  ["captured-render-script-instance", "render"],
 ]);
 
-const sharedContextTokens = new Set([
-  "explicit-physics-handle",
-  "global",
-  "runtime-global"
-]);
+const sharedContextTokens = new Set(["explicit-physics-handle", "global", "runtime-global"]);
 
 // These context tokens prove that the whole Lua namespace is attached to one
 // Defold script kind. Other classified routes remain member-level restrictions.
@@ -825,7 +963,7 @@ const namespaceAttachmentTokens = new Set([
   "captured-gui-script-instance",
   "render-script-instance",
   "render-script-instance-and-graphics-context",
-  "captured-render-script-instance"
+  "captured-render-script-instance",
 ]);
 
 function typeNameForScriptModule(name) {
@@ -851,7 +989,9 @@ function renderMask(tree) {
 
 export function buildScriptContextCapabilities(scriptIr, loweringPlan) {
   if (loweringPlan?.schemaVersion !== 2) {
-    throw new Error(`Context projection requires canonical lowering-plan schema v2, got ${loweringPlan?.schemaVersion ?? "missing"}`);
+    throw new Error(
+      `Context projection requires canonical lowering-plan schema v2, got ${loweringPlan?.schemaVersion ?? "missing"}`,
+    );
   }
   const { planSha256, ...planBody } = loweringPlan;
   if (typeof planSha256 !== "string" || sha256(JSON.stringify(planBody)) !== planSha256) {
@@ -861,8 +1001,9 @@ export function buildScriptContextCapabilities(scriptIr, loweringPlan) {
   if (functions.size !== scriptIr.functions.length) throw new Error("Script API IR contains duplicate route ids");
   // Constant units are executable transport records, but their TypeScript
   // surface is emitted as literals and has no callable context projection.
-  const scriptUnits = loweringPlan.units.filter(({ identity, sourceRef }) =>
-    identity.surface === "script" && sourceRef?.input === "scriptProjection");
+  const scriptUnits = loweringPlan.units.filter(
+    ({ identity, sourceRef }) => identity.surface === "script" && sourceRef?.input === "scriptProjection",
+  );
   const unitIds = new Set();
   for (const unit of scriptUnits) {
     if (unitIds.has(unit.identity.id)) throw new Error(`Lowering plan contains duplicate route id ${unit.identity.id}`);
@@ -871,29 +1012,30 @@ export function buildScriptContextCapabilities(scriptIr, loweringPlan) {
   const missing = scriptIr.functions.map(({ id }) => id).filter((id) => !unitIds.has(id));
   const extra = [...unitIds].filter((id) => !functions.has(id));
   if (missing.length || extra.length) {
-    throw new Error(`Lowering plan route ids must exactly match script API IR (missing: ${missing.join(", ") || "none"}; extra: ${extra.join(", ") || "none"})`);
+    throw new Error(
+      `Lowering plan route ids must exactly match script API IR (missing: ${missing.join(", ") || "none"}; extra: ${extra.join(", ") || "none"})`,
+    );
   }
   const unknownContextTokens = new Set();
-  const routes = scriptUnits
-    .map((unit) => {
-      const fn = functions.get(unit.identity.id);
-      if (!fn) throw new Error(`Lowering plan route ${unit.identity.id} is missing from the script API IR`);
-      const token = unit.contract?.context;
-      const mappedContext = routeContextClasses.get(token);
-      if (!mappedContext && token !== "context-policy-unresolved" && !sharedContextTokens.has(token)) {
-        unknownContextTokens.add(token ?? "<missing>");
-      }
-      return {
-        id: unit.identity.id,
-        // Context projection is a TypeScript-surface concern, so it must use the
-        // same public root names the generated SDK publishes. The raw Lua module
-        // path stays authoritative for stable IDs and bridge lookup.
-        modulePath: publicScriptModulePath(fn.modulePath),
-        member: fn.jsName,
-        token,
-        directContext: mappedContext ?? (sharedContextTokens.has(token) ? "shared" : "unresolved")
-      };
-    });
+  const routes = scriptUnits.map((unit) => {
+    const fn = functions.get(unit.identity.id);
+    if (!fn) throw new Error(`Lowering plan route ${unit.identity.id} is missing from the script API IR`);
+    const token = unit.contract?.context;
+    const mappedContext = routeContextClasses.get(token);
+    if (!mappedContext && token !== "context-policy-unresolved" && !sharedContextTokens.has(token)) {
+      unknownContextTokens.add(token ?? "<missing>");
+    }
+    return {
+      id: unit.identity.id,
+      // Context projection is a TypeScript-surface concern, so it must use the
+      // same public root names the generated SDK publishes. The raw Lua module
+      // path stays authoritative for stable IDs and bridge lookup.
+      modulePath: publicScriptModulePath(fn.modulePath),
+      member: fn.jsName,
+      token,
+      directContext: mappedContext ?? (sharedContextTokens.has(token) ? "shared" : "unresolved"),
+    };
+  });
   if (routes.length !== scriptIr.functions.length) {
     throw new Error(`Lowering plan covers ${routes.length} script routes, expected ${scriptIr.functions.length}`);
   }
@@ -909,14 +1051,16 @@ export function buildScriptContextCapabilities(scriptIr, loweringPlan) {
   const namespaceContexts = new Map();
   for (const [namespace, signals] of namespaceSignals) {
     if (signals.size !== 1) {
-      throw new Error(`Script namespace ${namespace} has conflicting attachment contexts: ${[...signals].sort().join(", ")}`);
+      throw new Error(
+        `Script namespace ${namespace} has conflicting attachment contexts: ${[...signals].sort().join(", ")}`,
+      );
     }
     namespaceContexts.set(namespace, [...signals][0]);
   }
 
   const classified = routes.map((route) => ({
     ...route,
-    context: namespaceContexts.get(route.modulePath[0]) ?? route.directContext
+    context: namespaceContexts.get(route.modulePath[0]) ?? route.directContext,
   }));
   assertUniquePublicScriptRoots(scriptIr.functions.map(({ modulePath }) => modulePath[0]));
   const namespaces = [...new Set(classified.map(({ modulePath }) => modulePath[0]))].sort();
@@ -944,7 +1088,7 @@ export function buildScriptContextCapabilities(scriptIr, loweringPlan) {
       capabilities: [...allowed],
       namespaces: visibleNamespaces,
       deniedRouteCount: classified.filter((route) => !allowed.has(route.context)).length,
-      masks
+      masks,
     };
   }
   const routeContextCounts = {};
@@ -960,10 +1104,12 @@ export function buildScriptContextCapabilities(scriptIr, loweringPlan) {
     unresolvedPolicy: {
       routeCount: routeContextCounts.unresolved ?? 0,
       visibility: "provisionally-visible-in-all-authored-contexts",
-      enforcement: "pending-context-contract-resolution"
+      enforcement: "pending-context-contract-resolution",
     },
-    namespaceContexts: Object.fromEntries([...namespaceContexts].sort(([left], [right]) => compareCodeUnits(left, right))),
-    contexts
+    namespaceContexts: Object.fromEntries(
+      [...namespaceContexts].sort(([left], [right]) => compareCodeUnits(left, right)),
+    ),
+    contexts,
   };
 }
 
@@ -989,8 +1135,18 @@ function projectTypescriptFacades(inventory, nativeModules) {
   for (const extension of inventory.extensions) {
     const declared = extension.bindingSchema?.document?.typescriptFacades ?? [];
     const details = extension.typescriptFacades ?? [];
-    if (declared.length !== details.length || declared.some((facade) =>
-      !details.some((detail) => detail.name === facade.name && detail.source === facade.source && detail.nativeModule === facade.nativeModule))) {
+    if (
+      declared.length !== details.length ||
+      declared.some(
+        (facade) =>
+          !details.some(
+            (detail) =>
+              detail.name === facade.name &&
+              detail.source === facade.source &&
+              detail.nativeModule === facade.nativeModule,
+          ),
+      )
+    ) {
       throw new Error(`Declared TypeScript facade inventory is incomplete for ${extension.manifestPath}`);
     }
     for (const detail of details) {
@@ -1034,16 +1190,18 @@ async function readProjectTypescriptFacade(inventory, facade, target = "dynamic"
     bytes = await readFile(path.join(inventory.projectRoot, ...selectedPath.split("/")));
   } else {
     const separator = selectedPath.indexOf(":");
-    if (separator < 1 || !facade.archive) throw new Error(`Invalid dependency TypeScript facade location: ${selectedPath}`);
+    if (separator < 1 || !facade.archive)
+      throw new Error(`Invalid dependency TypeScript facade location: ${selectedPath}`);
     const entry = selectedPath.slice(separator + 1);
     const archiveBytes = await readFile(path.join(inventory.projectRoot, ...facade.archive.split("/")));
     const extracted = unzipSync(new Uint8Array(archiveBytes), {
-      filter: (file) => file.name.replace(/^(?:\.\/)+/u, "") === entry
+      filter: (file) => file.name.replace(/^(?:\.\/)+/u, "") === entry,
     });
     bytes = extracted[entry] ?? extracted[`./${entry}`];
     if (!bytes) throw new Error(`Dependency TypeScript facade is missing: ${selectedPath}`);
   }
-  if (sha256(bytes) !== selectedSha256) throw new Error(`TypeScript facade changed after project inspection: ${selectedPath}`);
+  if (sha256(bytes) !== selectedSha256)
+    throw new Error(`TypeScript facade changed after project inspection: ${selectedPath}`);
   return Buffer.from(bytes).toString("utf8");
 }
 
@@ -1053,7 +1211,7 @@ async function materializeProjectTypescriptFacades(inventory, facades, destinati
     let source = await readProjectTypescriptFacade(inventory, facade, target);
     source = source.replace(
       /from\s+(["'])@deherm\/project\/module-runtime\1/gu,
-      target === "static" ? 'from "../module-runtime.js"' : 'from "../../module-runtime.js"'
+      target === "static" ? 'from "../module-runtime.js"' : 'from "../../module-runtime.js"',
     );
     if (/@deherm\/project\//u.test(source)) {
       throw new Error(`TypeScript facade ${facade.name} contains an unsupported private project SDK import`);
@@ -1085,10 +1243,16 @@ async function materializeProjectNativeModuleBridge(inventory, nativeModules) {
       throw new Error(`Refusing to replace unmanaged reserved native-module bridge at ${root}`);
     }
     let sentinel;
-    try { sentinel = JSON.parse(await readFile(path.join(root, ".deherm-managed.json"), "utf8")); }
-    catch { throw new Error(`Refusing to replace unmanaged reserved native-module bridge at ${root}`); }
-    if (sentinel?.schemaVersion !== 1 || sentinel.owner !== "@ts-defold/deherm" ||
-        sentinel.kind !== "project-native-module-bridge") {
+    try {
+      sentinel = JSON.parse(await readFile(path.join(root, ".deherm-managed.json"), "utf8"));
+    } catch {
+      throw new Error(`Refusing to replace unmanaged reserved native-module bridge at ${root}`);
+    }
+    if (
+      sentinel?.schemaVersion !== 1 ||
+      sentinel.owner !== "@ts-defold/deherm" ||
+      sentinel.kind !== "project-native-module-bridge"
+    ) {
       throw new Error(`Refusing to replace unmanaged reserved native-module bridge at ${root}`);
     }
   } catch (error) {
@@ -1106,26 +1270,40 @@ async function materializeProjectNativeModuleBridge(inventory, nativeModules) {
     const stem = module.name.replace(/([a-z0-9])([A-Z])/gu, "$1_$2").toLowerCase();
     const providerHeader = `${stem}_provider.h`;
     await writeFile(path.join(includeRoot, providerHeader), renderNativeModuleProviderHeader(module));
-    const adapter = renderNativeModuleProviderAdapterSource(
-      module, `deherm_project_native_modules/${providerHeader}`);
-    await writeFile(path.join(sourceRoot, `${stem}_provider.cpp`),
-      `#if !defined(DM_PLATFORM_HTML5)\n${adapter}#endif\n`);
+    const adapter = renderNativeModuleProviderAdapterSource(module, `deherm_project_native_modules/${providerHeader}`);
+    await writeFile(
+      path.join(sourceRoot, `${stem}_provider.cpp`),
+      `#if !defined(DM_PLATFORM_HTML5)\n${adapter}#endif\n`,
+    );
     registrations.push(`  if (deherm_register_${stem}_provider_v1() != 0) return dmExtension::RESULT_INIT_ERROR;`);
     unregistrations.push(`  deherm_unregister_${stem}_provider_v1();`);
   }
-  const declarations = modules.map((module) => {
-    const stem = module.name.replace(/([a-z0-9])([A-Z])/gu, "$1_$2").toLowerCase();
-    return `extern "C" int32_t deherm_register_${stem}_provider_v1(void);\nextern "C" int32_t deherm_unregister_${stem}_provider_v1(void);`;
-  }).join("\n");
-  await writeFile(path.join(root, "ext.manifest"),
-    '# Generated by deherm. Do not edit.\nname: "deherm_project_native_modules"\n');
-  await writeFile(path.join(root, ".deherm-managed.json"), `${JSON.stringify({
-    schemaVersion: 1,
-    owner: "@ts-defold/deherm",
-    kind: "project-native-module-bridge",
-    modules: modules.map(({ name, abiVersion }) => ({ name, abiVersion }))
-  }, null, 2)}\n`);
-  await writeFile(path.join(sourceRoot, "extension.cpp"), `// Generated by deherm. Do not edit.
+  const declarations = modules
+    .map((module) => {
+      const stem = module.name.replace(/([a-z0-9])([A-Z])/gu, "$1_$2").toLowerCase();
+      return `extern "C" int32_t deherm_register_${stem}_provider_v1(void);\nextern "C" int32_t deherm_unregister_${stem}_provider_v1(void);`;
+    })
+    .join("\n");
+  await writeFile(
+    path.join(root, "ext.manifest"),
+    '# Generated by deherm. Do not edit.\nname: "deherm_project_native_modules"\n',
+  );
+  await writeFile(
+    path.join(root, ".deherm-managed.json"),
+    `${JSON.stringify(
+      {
+        schemaVersion: 1,
+        owner: "@ts-defold/deherm",
+        kind: "project-native-module-bridge",
+        modules: modules.map(({ name, abiVersion }) => ({ name, abiVersion })),
+      },
+      null,
+      2,
+    )}\n`,
+  );
+  await writeFile(
+    path.join(sourceRoot, "extension.cpp"),
+    `// Generated by deherm. Do not edit.
 #define LIB_NAME "deherm_project_native_modules"
 #include <dmsdk/extension/extension.hpp>
 #if !defined(DM_PLATFORM_HTML5)
@@ -1148,7 +1326,8 @@ dmExtension::Result Initialize(dmExtension::Params*) { return dmExtension::RESUL
 dmExtension::Result Finalize(dmExtension::Params*) { return dmExtension::RESULT_OK; }
 }
 DM_DECLARE_EXTENSION(deherm_project_native_modules, LIB_NAME, AppInitialize, AppFinalize, Initialize, 0, 0, Finalize)
-`);
+`,
+  );
   return root;
 }
 
@@ -1159,7 +1338,10 @@ function contextSdkSource(context, modules, nativeModules = [], nativeFacades = 
     'import type * as ScriptTypes from "../generated/script/types.js";',
     'import { defold as projectDefold } from "../defold.js";',
     'import type { DefoldRuntime } from "../host.js";',
-    ...modules.map((module) => `import { ${module.jsName} as dehermExtension_${module.jsName} } from "../modules/${module.fileName}.js";`),
+    ...modules.map(
+      (module) =>
+        `import { ${module.jsName} as dehermExtension_${module.jsName} } from "../modules/${module.fileName}.js";`,
+    ),
     "",
     "type DehermWithoutContextMembers<Api, Denied> = {",
     "  readonly [Key in keyof Api as Key extends keyof Denied ? Denied[Key] extends true ? never : Key : Key]:",
@@ -1175,7 +1357,7 @@ function contextSdkSource(context, modules, nativeModules = [], nativeFacades = 
     'export { installDefoldScriptBridge, type DefoldScriptBridge } from "../generated/script/runtime.js";',
     'export * from "../generated/dmsdk/index.js";',
     'export * from "../generated/dmsdk/scalar.js";',
-    'export * from "../runtime.js";'
+    'export * from "../runtime.js";',
   ];
   for (const module of modules) {
     if (context.namespaces.includes(module.jsName)) continue;
@@ -1209,18 +1391,20 @@ function projectBaseConfig(outputDirectory, profile = "development") {
       lib: ["ES2020", "DOM"],
       skipLibCheck: true,
       verbatimModuleSyntax: true,
-      plugins: [{
-        transform: "@ts-defold/deherm/ttsc",
-        enabled: true,
-        inventory: `./${generated}/extensions.json`,
-        resourceSymbols: `./${generated}/generated/resource-symbols.json`,
-        routeSymbols: `./${generated}/generated/script-route-symbol-index.json`,
-        apiUsage: `./${generated}/generated/defold-api-usage.json`,
-        dmsdkSymbols: `./${generated}/generated/dmsdk-call-symbol-index.json`,
-        dmsdkUsage: `./${generated}/generated/dmsdk-usage.json`,
-        profile
-      }]
-    }
+      plugins: [
+        {
+          transform: "@ts-defold/deherm/ttsc",
+          enabled: true,
+          inventory: `./${generated}/extensions.json`,
+          resourceSymbols: `./${generated}/generated/resource-symbols.json`,
+          routeSymbols: `./${generated}/generated/script-route-symbol-index.json`,
+          apiUsage: `./${generated}/generated/defold-api-usage.json`,
+          dmsdkSymbols: `./${generated}/generated/dmsdk-call-symbol-index.json`,
+          dmsdkUsage: `./${generated}/generated/dmsdk-usage.json`,
+          profile,
+        },
+      ],
+    },
   };
 }
 
@@ -1230,7 +1414,7 @@ function contextProjectConfig(outputDirectory, context, compilerInputs = []) {
     ...context.excludes,
     `${generated}/generated/components/registry.ts`,
     ...generatedCompilerOnlyGlobs(generated),
-    ...compilerInputs
+    ...compilerInputs,
   ];
   return {
     extends: "./tsconfig.deherm.base.json",
@@ -1239,11 +1423,11 @@ function contextProjectConfig(outputDirectory, context, compilerInputs = []) {
       noEmit: true,
       tsBuildInfoFile: `./${generated}/cache/typescript/${context.id}.tsbuildinfo`,
       paths: {
-        "@deherm/project": [`./${generated}/sdk/contexts/${context.id}.ts`]
-      }
+        "@deherm/project": [`./${generated}/sdk/contexts/${context.id}.ts`],
+      },
     },
     include: [...context.includes, `${generated}/**/*.ts`],
-    exclude: excludes
+    exclude: excludes,
   };
 }
 
@@ -1254,11 +1438,11 @@ function bundleProjectConfig(outputDirectory, compilerInputs = []) {
     compilerOptions: {
       noEmit: true,
       paths: {
-        "@deherm/project": [`./${generated}/sdk/index.ts`]
-      }
+        "@deherm/project": [`./${generated}/sdk/index.ts`],
+      },
     },
     include: ["**/*.ts", `${generated}/**/*.ts`],
-    exclude: [...ignoredAuthoredGlobs, ...generatedCompilerOnlyGlobs(generated), ...compilerInputs]
+    exclude: [...ignoredAuthoredGlobs, ...generatedCompilerOnlyGlobs(generated), ...compilerInputs],
   };
 }
 
@@ -1270,18 +1454,18 @@ function releaseProjectConfig(outputDirectory, compilerInputs = []) {
     compilerOptions: {
       ...base.compilerOptions,
       paths: {
-        "@deherm/project": [`./${generated}/sdk/index.ts`]
-      }
+        "@deherm/project": [`./${generated}/sdk/index.ts`],
+      },
     },
     include: ["**/*.ts", `${generated}/**/*.ts`],
-    exclude: [...ignoredAuthoredGlobs, ...generatedCompilerOnlyGlobs(generated), ...compilerInputs]
+    exclude: [...ignoredAuthoredGlobs, ...generatedCompilerOnlyGlobs(generated), ...compilerInputs],
   };
 }
 
 function rootProjectConfig() {
   return {
     files: [],
-    references: authoredContexts.map(({ id }) => ({ path: `./tsconfig.deherm.${id}.json` }))
+    references: authoredContexts.map(({ id }) => ({ path: `./tsconfig.deherm.${id}.json` })),
   };
 }
 
@@ -1308,9 +1492,7 @@ async function mergeVscodeRecommendations(file, recommendations) {
     existed = false;
     document = {};
   }
-  const existing = Array.isArray(document.recommendations)
-    ? [...document.recommendations]
-    : [];
+  const existing = Array.isArray(document.recommendations) ? [...document.recommendations] : [];
   const merged = [...existing];
   for (const recommendation of recommendations) if (!merged.includes(recommendation)) merged.push(recommendation);
   if (JSON.stringify(merged) === JSON.stringify(existing) && Array.isArray(document.recommendations)) {
@@ -1338,8 +1520,13 @@ async function migrateLegacyGeneratedTsconfig(file, contents) {
   } catch {
     return { created: false, migrated: false };
   }
-  if (parsed && typeof parsed === "object" && !Array.isArray(parsed) &&
-      Object.keys(parsed).length === 1 && parsed.extends === "./tsconfig.deherm.json") {
+  if (
+    parsed &&
+    typeof parsed === "object" &&
+    !Array.isArray(parsed) &&
+    Object.keys(parsed).length === 1 &&
+    parsed.extends === "./tsconfig.deherm.json"
+  ) {
     await writeFile(file, contents);
     return { created: false, migrated: true };
   }
@@ -1349,14 +1536,25 @@ async function migrateLegacyGeneratedTsconfig(file, contents) {
 async function readConfinedFile(baseRoot, relative, label) {
   const target = path.resolve(baseRoot, relative);
   const lexicalRelative = path.relative(baseRoot, target);
-  if (!lexicalRelative || lexicalRelative === ".." || lexicalRelative.startsWith(`..${path.sep}`) || path.isAbsolute(lexicalRelative)) {
+  if (
+    !lexicalRelative ||
+    lexicalRelative === ".." ||
+    lexicalRelative.startsWith(`..${path.sep}`) ||
+    path.isAbsolute(lexicalRelative)
+  ) {
     throw new Error(`${label} is outside its verified root`);
   }
   const information = await lstat(target);
-  if (!information.isFile() || information.isSymbolicLink()) throw new Error(`${label} must be a regular file, not a symlink`);
+  if (!information.isFile() || information.isSymbolicLink())
+    throw new Error(`${label} must be a regular file, not a symlink`);
   const resolvedTarget = await realpath(target);
   const resolvedRelative = path.relative(baseRoot, resolvedTarget);
-  if (!resolvedRelative || resolvedRelative === ".." || resolvedRelative.startsWith(`..${path.sep}`) || path.isAbsolute(resolvedRelative)) {
+  if (
+    !resolvedRelative ||
+    resolvedRelative === ".." ||
+    resolvedRelative.startsWith(`..${path.sep}`) ||
+    path.isAbsolute(resolvedRelative)
+  ) {
     throw new Error(`${label} resolves outside its verified root`);
   }
   return readFile(resolvedTarget);
@@ -1372,7 +1570,7 @@ async function coreSdkForRevision(requestedRevision, options = {}) {
   const surfaceOptions = {
     packageRoot,
     projectRoot: options.projectRoot,
-    env: options.env
+    env: options.env,
   };
   let unresolved = await resolveDefoldSurface(requestedRevision, surfaceOptions);
   if (shouldResolvePublishedPolicy(unresolved, options)) {
@@ -1380,7 +1578,7 @@ async function coreSdkForRevision(requestedRevision, options = {}) {
     try {
       await resolvePublishedPolicy(requestedRevision, {
         index: await readPolicyLocator(),
-        env: options.env
+        env: options.env,
       });
     } catch (error) {
       // A cache miss may still be recoverable from an authenticated published
@@ -1393,8 +1591,8 @@ async function coreSdkForRevision(requestedRevision, options = {}) {
           ...unresolved,
           blocker: {
             ...unresolved.blocker,
-            message: `${unresolved.blocker.message}\nAuthenticated policy cache lookup also failed: ${error.message}`
-          }
+            message: `${unresolved.blocker.message}\nAuthenticated policy cache lookup also failed: ${error.message}`,
+          },
         });
       }
       throw error;
@@ -1406,10 +1604,24 @@ async function coreSdkForRevision(requestedRevision, options = {}) {
   const sdkSourceRoot = surface.sdkRoot;
   const repositorySourceRoot = surface.repositoryRoot;
   const {
-    valueLayoutsPath, componentContractPath, scriptIrPath, dmsdkIrPath, scriptDispatchPath, scriptPatternsPath, dmsdkPatternsPath,
-    scriptProbesPath, scriptAccountingPath, scriptUniversalPath,
-    scriptProfilesPath, loweringPlanPath, loweringPlanSentinelPath, dmsdkThunksPath, dmsdkUniversalPath,
-    resourceSchemaPath, resourceNamespacesPath, toolchainPath
+    valueLayoutsPath,
+    componentContractPath,
+    scriptIrPath,
+    dmsdkIrPath,
+    scriptDispatchPath,
+    scriptPatternsPath,
+    dmsdkPatternsPath,
+    scriptProbesPath,
+    scriptAccountingPath,
+    scriptUniversalPath,
+    scriptProfilesPath,
+    loweringPlanPath,
+    loweringPlanSentinelPath,
+    dmsdkThunksPath,
+    dmsdkUniversalPath,
+    resourceSchemaPath,
+    resourceNamespacesPath,
+    toolchainPath,
   } = surface.paths;
   // The lowering-plan generator is package code, not engine surface: it is the
   // program that produced the plan, and its digest authenticates the plan
@@ -1420,7 +1632,29 @@ async function coreSdkForRevision(requestedRevision, options = {}) {
   const toolchainSourcePromise = surface.toolchain
     ? Promise.resolve(Buffer.from(`${JSON.stringify(surface.toolchain, null, 2)}\n`))
     : readFile(toolchainPath);
-  const [valueLayoutsSource, componentContractSource, scriptSource, dmsdkSource, scriptDispatchSource, scriptPatternsSource, dmsdkPatternsSource, scriptProbesSource, scriptAccountingSource, scriptUniversalSource, scriptProfilesSource, loweringPlanSource, loweringPlanSentinelSource, loweringPlanGeneratorSource, loweringPlanRecipeEmitterSource, dmsdkThunksSource, dmsdkUniversalSource, resourceSchemaSource, resourceNamespacesSource, toolchainSource, packageSource] = await Promise.all([
+  const [
+    valueLayoutsSource,
+    componentContractSource,
+    scriptSource,
+    dmsdkSource,
+    scriptDispatchSource,
+    scriptPatternsSource,
+    dmsdkPatternsSource,
+    scriptProbesSource,
+    scriptAccountingSource,
+    scriptUniversalSource,
+    scriptProfilesSource,
+    loweringPlanSource,
+    loweringPlanSentinelSource,
+    loweringPlanGeneratorSource,
+    loweringPlanRecipeEmitterSource,
+    dmsdkThunksSource,
+    dmsdkUniversalSource,
+    resourceSchemaSource,
+    resourceNamespacesSource,
+    toolchainSource,
+    packageSource,
+  ] = await Promise.all([
     readFile(valueLayoutsPath),
     readFile(componentContractPath),
     readFile(scriptIrPath),
@@ -1441,7 +1675,7 @@ async function coreSdkForRevision(requestedRevision, options = {}) {
     readFile(resourceSchemaPath),
     readFile(resourceNamespacesPath),
     toolchainSourcePromise,
-    readFile(path.join(packageRoot, "package.json"), "utf8")
+    readFile(path.join(packageRoot, "package.json"), "utf8"),
   ]);
   const valueLayouts = JSON.parse(valueLayoutsSource);
   const componentContract = JSON.parse(componentContractSource);
@@ -1459,16 +1693,37 @@ async function coreSdkForRevision(requestedRevision, options = {}) {
   const dmsdkThunks = JSON.parse(dmsdkThunksSource);
   const dmsdkUniversal = JSON.parse(dmsdkUniversalSource);
   const toolchainPolicy = JSON.parse(toolchainSource);
-  const revisions = new Set([valueLayouts, componentContract, scriptIr, dmsdkIr, scriptDispatch, scriptPatterns, dmsdkPatterns, scriptProbes, scriptAccounting, scriptUniversal, scriptProfiles, loweringPlan, dmsdkThunks, dmsdkUniversal].map(({ defoldRevision }) => defoldRevision));
+  const revisions = new Set(
+    [
+      valueLayouts,
+      componentContract,
+      scriptIr,
+      dmsdkIr,
+      scriptDispatch,
+      scriptPatterns,
+      dmsdkPatterns,
+      scriptProbes,
+      scriptAccounting,
+      scriptUniversal,
+      scriptProfiles,
+      loweringPlan,
+      dmsdkThunks,
+      dmsdkUniversal,
+    ].map(({ defoldRevision }) => defoldRevision),
+  );
   if (revisions.size !== 1) {
     throw new Error(`Packaged API inputs disagree: ${[...revisions].join(", ")}`);
   }
   if (scriptIr.defoldRevision !== requestedRevision) {
-    throw new Error(`The ${surface.layer} Defold API surface at ${surface.irRoot} declares ${scriptIr.defoldRevision}, not the resolved revision ${requestedRevision}`);
+    throw new Error(
+      `The ${surface.layer} Defold API surface at ${surface.irRoot} declares ${scriptIr.defoldRevision}, not the resolved revision ${requestedRevision}`,
+    );
   }
   const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
   if (loweringPlan.schemaVersion !== 2) {
-    throw new Error(`Packaged canonical lowering plan must use schema v2, got ${loweringPlan.schemaVersion ?? "missing"}`);
+    throw new Error(
+      `Packaged canonical lowering plan must use schema v2, got ${loweringPlan.schemaVersion ?? "missing"}`,
+    );
   }
   const { planSha256, ...planBody } = loweringPlan;
   if (sha256(JSON.stringify(planBody)) !== planSha256) {
@@ -1476,21 +1731,27 @@ async function coreSdkForRevision(requestedRevision, options = {}) {
   }
   const loweringPlanGeneratorSources = new Map([
     [sourcePlanGenerator, loweringPlanGeneratorSource],
-    [BINDING_LOWERING_RECIPE_EMITTER, loweringPlanRecipeEmitterSource]
+    [BINDING_LOWERING_RECIPE_EMITTER, loweringPlanRecipeEmitterSource],
   ]);
   const loweringPlanAuthenticatingSource = loweringPlanGeneratorSources.get(loweringPlanSentinel.generator);
-  if (loweringPlanSentinel.schemaVersion !== 1 || !loweringPlanAuthenticatingSource ||
-      loweringPlanSentinel.generatorSha256 !== sha256(loweringPlanAuthenticatingSource) ||
-      loweringPlanSentinel.outputSha256 !== sha256(loweringPlanSource) ||
-      loweringPlanSentinel.outputBytes !== loweringPlanSource.byteLength ||
-      loweringPlanSentinel.planSha256 !== planSha256 ||
-      JSON.stringify(loweringPlanSentinel.inputHashes) !== JSON.stringify(loweringPlan.inputHashes)) {
+  if (
+    loweringPlanSentinel.schemaVersion !== 1 ||
+    !loweringPlanAuthenticatingSource ||
+    loweringPlanSentinel.generatorSha256 !== sha256(loweringPlanAuthenticatingSource) ||
+    loweringPlanSentinel.outputSha256 !== sha256(loweringPlanSource) ||
+    loweringPlanSentinel.outputBytes !== loweringPlanSource.byteLength ||
+    loweringPlanSentinel.planSha256 !== planSha256 ||
+    JSON.stringify(loweringPlanSentinel.inputHashes) !== JSON.stringify(loweringPlan.inputHashes)
+  ) {
     throw new Error("Packaged canonical lowering-plan sentinel is stale or invalid");
   }
   const bob = toolchainPolicy.bob;
-  if (toolchainPolicy.kind !== "deherm.policy.toolchain" ||
-      typeof bob?.urlTemplate !== "string" || !bob.urlTemplate.includes("{defoldRevision}") ||
-      !/^[0-9a-f]{64}$/u.test(bob.sha256 ?? "")) {
+  if (
+    toolchainPolicy.kind !== "deherm.policy.toolchain" ||
+    typeof bob?.urlTemplate !== "string" ||
+    !bob.urlTemplate.includes("{defoldRevision}") ||
+    !/^[0-9a-f]{64}$/u.test(bob.sha256 ?? "")
+  ) {
     throw new Error("Authenticated Defold toolchain policy has no verified Bob artifact");
   }
   const toolchain = {
@@ -1498,13 +1759,13 @@ async function coreSdkForRevision(requestedRevision, options = {}) {
     targetMatrix: toolchainPolicy.targetMatrix,
     bob: {
       url: bob.urlTemplate.replace("{defoldRevision}", requestedRevision),
-      sha256: bob.sha256
-    }
+      sha256: bob.sha256,
+    },
   };
-  const sdkSourceSha256 = surface.descriptor?.sdkTreeSha256 ??
-    await directoryDigest(path.join(sdkSourceRoot, "generated"));
-  const repositorySourceSha256 = surface.descriptor?.outputTreeSha256 ??
-    await revisionOutputDigest(repositorySourceRoot);
+  const sdkSourceSha256 =
+    surface.descriptor?.sdkTreeSha256 ?? (await directoryDigest(path.join(sdkSourceRoot, "generated")));
+  const repositorySourceSha256 =
+    surface.descriptor?.outputTreeSha256 ?? (await revisionOutputDigest(repositorySourceRoot));
   return {
     revision: scriptIr.defoldRevision,
     surfaceLayer: surface.layer,
@@ -1553,20 +1814,41 @@ async function coreSdkForRevision(requestedRevision, options = {}) {
       resourceNamespacesSha256: sha256(resourceNamespacesSource),
       toolchainSha256: sha256(toolchainSource),
       sdkSourceSha256,
-      repositorySourceSha256
+      repositorySourceSha256,
     },
-    paths: { valueLayoutsPath, componentContractPath, scriptIrPath, dmsdkIrPath, scriptDispatchPath, scriptPatternsPath, dmsdkPatternsPath, scriptProbesPath, scriptAccountingPath, scriptUniversalPath, scriptProfilesPath, loweringPlanPath, loweringPlanSentinelPath, dmsdkThunksPath, dmsdkUniversalPath, resourceSchemaPath, resourceNamespacesPath, toolchainPath }
+    paths: {
+      valueLayoutsPath,
+      componentContractPath,
+      scriptIrPath,
+      dmsdkIrPath,
+      scriptDispatchPath,
+      scriptPatternsPath,
+      dmsdkPatternsPath,
+      scriptProbesPath,
+      scriptAccountingPath,
+      scriptUniversalPath,
+      scriptProfilesPath,
+      loweringPlanPath,
+      loweringPlanSentinelPath,
+      dmsdkThunksPath,
+      dmsdkUniversalPath,
+      resourceSchemaPath,
+      resourceNamespacesPath,
+      toolchainPath,
+    },
   };
 }
 
 function loweringTargetMatrix(plan, surface, loweringFamily) {
   const matrix = {};
-  const units = plan.units.filter((unit) => unit.identity.surface === surface && (
-    loweringFamily === undefined ||
-    (loweringFamily === "script-functions"
-      ? unit.sourceState?.loweringFamily !== "script-constant"
-      : unit.sourceState?.loweringFamily === loweringFamily)
-  ));
+  const units = plan.units.filter(
+    (unit) =>
+      unit.identity.surface === surface &&
+      (loweringFamily === undefined ||
+        (loweringFamily === "script-functions"
+          ? unit.sourceState?.loweringFamily !== "script-constant"
+          : unit.sourceState?.loweringFamily === loweringFamily)),
+  );
   for (const target of plan.targetOrder) {
     const selections = {};
     for (const unit of units) {
@@ -1593,21 +1875,24 @@ function validateEngineProfiles(engineProfiles, catalog) {
     throw new Error("Project engine-profile resolution requires an authenticated Defold policy");
   }
   const selection = catalog?.engineProfileSelection;
-  if (!selection || typeof selection.defaultProfileId !== "string" || !selection.profiles?.[selection.defaultProfileId]) {
+  if (
+    !selection ||
+    typeof selection.defaultProfileId !== "string" ||
+    !selection.profiles?.[selection.defaultProfileId]
+  ) {
     throw new Error("Defold policy has no authenticated engine-profile selection contract");
   }
   const known = new Set(Object.keys(catalog.profiles ?? {}));
-  const selected = new Set([
-    engineProfiles.defaultProfileId,
-    ...Object.values(engineProfiles.platforms ?? {})
-  ].filter(Boolean));
+  const selected = new Set(
+    [engineProfiles.defaultProfileId, ...Object.values(engineProfiles.platforms ?? {})].filter(Boolean),
+  );
   for (const profileId of selected) {
     if (!known.has(profileId)) throw new Error(`Defold project resolved unknown engine profile '${profileId}'`);
   }
   return {
     ...engineProfiles,
     catalogSha256: catalog.catalogSha256,
-    handshakeSchema: catalog.handshakeContract?.schema ?? null
+    handshakeSchema: catalog.handshakeContract?.schema ?? null,
   };
 }
 
@@ -1618,11 +1903,13 @@ export function generateExtensionTypes(inventory, layouts) {
     "// Generated by deherm. Do not edit.",
     'import type { DefoldAddressLiteral, DefoldRelativeAddress, DefoldHash, DefoldUrl } from "./sdk/address.js";',
     'export type { DefoldAddressLiteral, DefoldRelativeAddress, DefoldHash, DefoldUrl } from "./sdk/address.js";',
-    ...(valueTypes.imports.length ? [
-      `import type { ${valueTypes.imports.join(", ")} } from "./sdk/generated/script/types.js";`,
-      `export type { ${valueTypes.imports.join(", ")} } from "./sdk/generated/script/types.js";`
-    ] : []),
-    ""
+    ...(valueTypes.imports.length
+      ? [
+          `import type { ${valueTypes.imports.join(", ")} } from "./sdk/generated/script/types.js";`,
+          `export type { ${valueTypes.imports.join(", ")} } from "./sdk/generated/script/types.js";`,
+        ]
+      : []),
+    "",
   ];
   for (const module of modules) {
     lines.push(...description(module.description));
@@ -1670,7 +1957,9 @@ export async function installNativeExtension(projectRoot, options = {}) {
     const destinationInformation = await lstat(destination);
     if (destinationInformation.isSymbolicLink()) {
       if (!workspaceLink) {
-        throw new Error(`Refusing to replace native-extension symlink that does not target this package: ${destination}`);
+        throw new Error(
+          `Refusing to replace native-extension symlink that does not target this package: ${destination}`,
+        );
       }
     } else if (!destinationInformation.isDirectory()) {
       throw new Error(`Refusing to replace non-directory native extension at ${destination}`);
@@ -1688,7 +1977,7 @@ export async function installNativeExtension(projectRoot, options = {}) {
   };
   const extensionTreeSha256 = await directoryDigest(source, {
     ignore: new Set([".deherm-managed.json"]),
-    exclude: excludeManagedOutput
+    exclude: excludeManagedOutput,
   });
   const surfaceTreeSha256 = surfaceSource ? await directoryDigest(surfaceSource) : null;
   const identity = {
@@ -1697,7 +1986,7 @@ export async function installNativeExtension(projectRoot, options = {}) {
     version: packageManifest.version,
     extensionManifestSha256: sha256(extensionManifest),
     extensionTreeSha256,
-    surfaceTreeSha256
+    surfaceTreeSha256,
   };
   const sentinelName = ".deherm-managed.json";
   let current = null;
@@ -1729,7 +2018,7 @@ export async function installNativeExtension(projectRoot, options = {}) {
       filter: (candidate) => {
         const relative = path.relative(source, candidate);
         return !relative || !excludeManagedOutput(relative);
-      }
+      },
     });
     if (surfaceSource) {
       await cp(surfaceSource, stage, {
@@ -1738,7 +2027,7 @@ export async function installNativeExtension(projectRoot, options = {}) {
         filter: (candidate) => {
           const relative = path.relative(surfaceSource, candidate);
           return !relative || !excludeTargetArtifact(relative);
-        }
+        },
       });
     }
     await writeFile(path.join(stage, sentinelName), `${JSON.stringify(identity, null, 2)}\n`, { flag: "wx" });
@@ -1768,9 +2057,11 @@ export async function installNativeExtension(projectRoot, options = {}) {
 export async function installProjectWebTransportExtension(projectRoot, options = {}) {
   const resolvedProject = path.resolve(projectRoot);
   const destination = path.join(resolvedProject, "defold_webtransport");
-  const selectedSource = options.source ?? (options.packageSource || options.artifacts || options.artifactTarget
-    ? path.join(packageRoot, "extensions", "defold-webtransport", "defold_webtransport")
-    : null);
+  const selectedSource =
+    options.source ??
+    (options.packageSource || options.artifacts || options.artifactTarget
+      ? path.join(packageRoot, "extensions", "defold-webtransport", "defold_webtransport")
+      : null);
   if (!selectedSource) {
     try {
       await access(path.join(destination, "ext.manifest"));
@@ -1788,11 +2079,10 @@ export async function installProjectWebTransportExtension(projectRoot, options =
     const fetched = await fetchWebTransportArtifactOverlay({
       extensionSource: source,
       target: options.artifactTarget,
-      cacheRoot: options.artifactCacheRoot ?? path.join(
-        defoldSurfaceCacheHome(options.environment ?? process.env),
-        "webtransport-artifacts"
-      ),
-      fetchImpl: options.fetchImpl
+      cacheRoot:
+        options.artifactCacheRoot ??
+        path.join(defoldSurfaceCacheHome(options.environment ?? process.env), "webtransport-artifacts"),
+      fetchImpl: options.fetchImpl,
     });
     artifactRoot = fetched.root;
     artifactSource = fetched.source;
@@ -1806,11 +2096,12 @@ export async function installProjectWebTransportExtension(projectRoot, options =
     owner: "defold-webtransport",
     version: options.version ?? null,
     sourceTreeSha256: await directoryDigest(source, { ignore: new Set([sentinelName]) }),
-    artifacts: artifactOverlay?.identity ?? null
+    artifacts: artifactOverlay?.identity ?? null,
   };
   let current;
-  try { current = JSON.parse(await readFile(path.join(destination, sentinelName), "utf8")); }
-  catch (error) {
+  try {
+    current = JSON.parse(await readFile(path.join(destination, sentinelName), "utf8"));
+  } catch (error) {
     if (error?.code !== "ENOENT" && !(error instanceof SyntaxError)) throw error;
     try {
       await lstat(destination);
@@ -1839,18 +2130,30 @@ export async function installProjectWebTransportExtension(projectRoot, options =
       }
     }
     await writeFile(path.join(stage, sentinelName), `${JSON.stringify(identity, null, 2)}\n`, { flag: "wx" });
-    try { await rename(destination, backup); movedCurrent = true; }
-    catch (error) { if (error?.code !== "ENOENT") throw error; }
+    try {
+      await rename(destination, backup);
+      movedCurrent = true;
+    } catch (error) {
+      if (error?.code !== "ENOENT") throw error;
+    }
     await rename(stage, destination);
     if (movedCurrent) await rm(backup, { recursive: true, force: true });
   } catch (error) {
     await rm(stage, { recursive: true, force: true });
     if (movedCurrent) {
-      try { await rename(backup, destination); } catch { /* preserve original error */ }
+      try {
+        await rename(backup, destination);
+      } catch {
+        /* preserve original error */
+      }
     }
     throw error;
   }
-  return { root: destination, installed: true, source: artifactOverlay ? `managed-local+native-artifacts:${artifactSource}` : "managed-local" };
+  return {
+    root: destination,
+    installed: true,
+    source: artifactOverlay ? `managed-local+native-artifacts:${artifactSource}` : "managed-local",
+  };
 }
 
 export async function writeGeneratedProject(inventory, outputDirectory = ".deherm", options = {}) {
@@ -1859,16 +2162,26 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
   }
   const root = path.resolve(inventory.projectRoot, outputDirectory);
   const relativeRoot = path.relative(path.resolve(inventory.projectRoot), root);
-  if (!relativeRoot || relativeRoot === ".." || relativeRoot.startsWith(`..${path.sep}`) || path.isAbsolute(relativeRoot)) {
+  if (
+    !relativeRoot ||
+    relativeRoot === ".." ||
+    relativeRoot.startsWith(`..${path.sep}`) ||
+    path.isAbsolute(relativeRoot)
+  ) {
     throw new Error("Generated output must be a subdirectory of the Defold project");
   }
   await mkdir(root, { recursive: true });
   const [resolvedProjectRoot, resolvedOutputRoot] = await Promise.all([
     realpath(inventory.projectRoot),
-    realpath(root)
+    realpath(root),
   ]);
   const resolvedRelativeRoot = path.relative(resolvedProjectRoot, resolvedOutputRoot);
-  if (!resolvedRelativeRoot || resolvedRelativeRoot === ".." || resolvedRelativeRoot.startsWith(`..${path.sep}`) || path.isAbsolute(resolvedRelativeRoot)) {
+  if (
+    !resolvedRelativeRoot ||
+    resolvedRelativeRoot === ".." ||
+    resolvedRelativeRoot.startsWith(`..${path.sep}`) ||
+    path.isAbsolute(resolvedRelativeRoot)
+  ) {
     throw new Error("Generated output resolves outside the Defold project");
   }
   // Generation is a valid public entry point independent of the CLI command.
@@ -1879,23 +2192,25 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
   // Which Defold revision does this project build against? Answered from the
   // project's own evidence before anything version-specific is read, and a
   // blocker rather than an assumption when it cannot be answered.
-  const revisionResolution = options.defoldRevisionResolution ?? await resolveDefoldRevision({
-    projectRoot: inventory.projectRoot,
-    explicit: options.defoldSdk,
-    bob: options.bob,
-    env: options.env
-  });
+  const revisionResolution =
+    options.defoldRevisionResolution ??
+    (await resolveDefoldRevision({
+      projectRoot: inventory.projectRoot,
+      explicit: options.defoldSdk,
+      bob: options.bob,
+      env: options.env,
+    }));
   const defoldRevision = assertResolvedDefoldRevision(revisionResolution);
   const core = await coreSdkForRevision(defoldRevision, {
     projectRoot: inventory.projectRoot,
     env: options.env,
-    requirePublishedArtifacts: options.requirePublishedArtifacts
+    requirePublishedArtifacts: options.requirePublishedArtifacts,
   });
   const toolchain = core.toolchain;
   inventory.engineProfiles = await resolveEngineProfiles(
     inventory.projectRoot,
     parseGameProject(await readFile(path.join(inventory.projectRoot, "game.project"), "utf8")),
-    core.scriptProfiles.engineProfileSelection
+    core.scriptProfiles.engineProfileSelection,
   );
   const engineProfiles = validateEngineProfiles(inventory.engineProfiles, core.scriptProfiles);
   const nativeExtensionClang = resolveNativeExtensionClang({ inventory, clang: options.clang });
@@ -1908,7 +2223,7 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
     core,
     engineProfiles,
     nativeExtensionClang,
-    staticHermesInputs
+    staticHermesInputs,
   });
   const generationKey = generation.cacheKey;
   // The Defold revision and the native input set are independent cache keys.
@@ -1919,31 +2234,43 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
     surface: { layer: core.surfaceLayer, inputs: core.inputs },
     extensions: inventory.extensions,
     engineProfiles,
-    generator: { package: "@ts-defold/deherm", version: core.packageVersion, projectGeneratorSha256: generation.projectGeneratorSha256 }
+    generator: {
+      package: "@ts-defold/deherm",
+      version: core.packageVersion,
+      projectGeneratorSha256: generation.projectGeneratorSha256,
+    },
   });
   if (options.force !== true) {
     try {
       const [manifestSource, lockSource, nativeIndexSource] = await Promise.all([
         readConfinedFile(resolvedOutputRoot, "manifest.json", "Generated manifest"),
         readConfinedFile(resolvedProjectRoot, "deherm.lock", "deherm.lock"),
-        readConfinedFile(resolvedOutputRoot, "generated/native-extensions/index.json", "Generated native-extension index")
+        readConfinedFile(
+          resolvedOutputRoot,
+          "generated/native-extensions/index.json",
+          "Generated native-extension index",
+        ),
       ]);
       const previousManifest = JSON.parse(manifestSource.toString("utf8"));
       const previousLock = JSON.parse(lockSource.toString("utf8"));
-      if (generatedProjectCacheMatches({
-        manifest: previousManifest,
-        lock: previousLock,
-        generationKey,
-        generationMerkle: merkle,
-        core
-      }) &&
-          previousManifest.generatedOutputs?.output?.["generated/native-extensions/index.json"] === sha256(nativeIndexSource)) {
+      if (
+        generatedProjectCacheMatches({
+          manifest: previousManifest,
+          lock: previousLock,
+          generationKey,
+          generationMerkle: merkle,
+          core,
+        }) &&
+        previousManifest.generatedOutputs?.output?.["generated/native-extensions/index.json"] ===
+          sha256(nativeIndexSource)
+      ) {
         const nativeIndex = JSON.parse(nativeIndexSource.toString("utf8"));
-        if (nativeIndex.keyedOutput !== path.posix.join(core.revision, generationKey)) throw new Error("Cached native-extension index has a stale generation key");
+        if (nativeIndex.keyedOutput !== path.posix.join(core.revision, generationKey))
+          throw new Error("Cached native-extension index has a stale generation key");
         await readConfinedFile(
           resolvedOutputRoot,
           path.posix.join("generated/native-extensions", nativeIndex.keyedOutput, "report.json"),
-          "Cached native-extension report"
+          "Cached native-extension report",
         );
         return {
           root,
@@ -1961,7 +2288,7 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
           generationKey,
           nativeExtensions: previousManifest.nativeExtensions,
           created: { tsconfig: false, vscodeExtensions: false, vscodeSettings: false },
-          migrated: { tsconfig: false }
+          migrated: { tsconfig: false },
         };
       }
     } catch (error) {
@@ -1973,9 +2300,12 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
     outputRoot: root,
     defoldRevision: core.revision,
     generationKey,
-    clang: nativeExtensionClang.command
+    clang: nativeExtensionClang.command,
   });
-  const nativeExtensionsIndexSource = await readFile(path.join(root, "generated", "native-extensions", "index.json"), "utf8");
+  const nativeExtensionsIndexSource = await readFile(
+    path.join(root, "generated", "native-extensions", "index.json"),
+    "utf8",
+  );
   await writeFile(path.join(root, "extensions.json"), `${JSON.stringify(portableInventory, null, 2)}\n`);
   await writeFile(path.join(root, "bindings.ir.json"), `${JSON.stringify(bindingIr, null, 2)}\n`);
   const irRoot = path.join(root, "ir");
@@ -2012,16 +2342,12 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
   await cp(path.join(core.sdkTemplateRoot, "host.ts"), path.join(sdkRoot, "host.ts"));
   await cp(path.join(core.sdkTemplateRoot, "hmr-state.ts"), path.join(sdkRoot, "hmr-state.ts"));
   await cp(path.join(core.sdkTemplateRoot, "module-runtime.ts"), path.join(sdkRoot, "module-runtime.ts"));
-  await cp(
-    path.join(core.sdkSourceRoot, "generated", "script"),
-    path.join(sdkRoot, "generated", "script"),
-    { recursive: true }
-  );
-  await cp(
-    path.join(core.sdkSourceRoot, "generated", "dmsdk"),
-    path.join(sdkRoot, "generated", "dmsdk"),
-    { recursive: true }
-  );
+  await cp(path.join(core.sdkSourceRoot, "generated", "script"), path.join(sdkRoot, "generated", "script"), {
+    recursive: true,
+  });
+  await cp(path.join(core.sdkSourceRoot, "generated", "dmsdk"), path.join(sdkRoot, "generated", "dmsdk"), {
+    recursive: true,
+  });
   const nativeModules = projectNativeModules(inventory);
   const nativeFacades = projectTypescriptFacades(inventory, nativeModules);
   await materializeProjectNativeModuleBridge(inventory, nativeModules);
@@ -2039,10 +2365,7 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
   await rm(staticHermesRoot, { recursive: true, force: true });
   await mkdir(staticHermesRoot, { recursive: true });
   for (const name of projectStaticHermesOutputs) {
-    await cp(
-      path.join(staticHermesInputs.sourceRoot, name),
-      path.join(staticHermesRoot, name)
-    );
+    await cp(path.join(staticHermesInputs.sourceRoot, name), path.join(staticHermesRoot, name));
   }
   const staticNativeRoot = path.join(staticHermesRoot, "native");
   const staticNativeCppRoot = path.join(staticHermesRoot, "native-cpp");
@@ -2052,11 +2375,15 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
   for (const module of nativeModules) {
     const stem = module.name.replace(/([a-z0-9])([A-Z])/gu, "$1_$2").toLowerCase();
     const headerName = `deherm_static_${stem}.h`;
-    await writeFile(path.join(staticNativeRoot, `${module.name}.ts`),
-      renderNativeModuleStaticTypescript(module, headerName));
+    await writeFile(
+      path.join(staticNativeRoot, `${module.name}.ts`),
+      renderNativeModuleStaticTypescript(module, headerName),
+    );
     await writeFile(path.join(staticNativeCppRoot, headerName), renderNativeModuleStaticHeader(module));
-    await writeFile(path.join(staticNativeCppRoot, `deherm_static_${stem}.cpp`),
-      renderNativeModuleStaticSource(module, headerName));
+    await writeFile(
+      path.join(staticNativeCppRoot, `deherm_static_${stem}.cpp`),
+      renderNativeModuleStaticSource(module, headerName),
+    );
   }
   await materializeProjectTypescriptFacades(inventory, nativeFacades, staticNativeRoot, "static");
   await writeFile(path.join(sdkRoot, "runtime.ts"), runtimeSource());
@@ -2075,7 +2402,7 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
     'export { defold, type DefoldApi } from "./defold.js";',
     'export * from "./generated/dmsdk/index.js";',
     'export * from "./generated/dmsdk/scalar.js";',
-    'export * from "./runtime.js";'
+    'export * from "./runtime.js";',
   ];
   for (const module of modules) {
     const moduleFile = module.fileName;
@@ -2091,180 +2418,221 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
   for (const context of authoredContexts) {
     const source = contextSdkSource(scriptContexts.contexts[context.id], modules, nativeModules, nativeFacades);
     contextSources[`sdk/contexts/${context.id}.ts`] = source;
-    await writeFile(
-      path.join(contextsRoot, `${context.id}.ts`),
-      source
-    );
+    await writeFile(path.join(contextsRoot, `${context.id}.ts`), source);
   }
   const relativeOutput = path.relative(inventory.projectRoot, root) || ".deherm";
   const compilerInputs = projectTypescriptFacadeCompilerInputs(inventory);
   const projectConfigSources = {
     "tsconfig.deherm.base.json": `${JSON.stringify(projectBaseConfig(relativeOutput), null, 2)}\n`,
-    ...Object.fromEntries(authoredContexts.map((context) => [
-      `tsconfig.deherm.${context.id}.json`,
-      `${JSON.stringify(contextProjectConfig(relativeOutput, context, compilerInputs), null, 2)}\n`
-    ])),
+    ...Object.fromEntries(
+      authoredContexts.map((context) => [
+        `tsconfig.deherm.${context.id}.json`,
+        `${JSON.stringify(contextProjectConfig(relativeOutput, context, compilerInputs), null, 2)}\n`,
+      ]),
+    ),
     "tsconfig.deherm.bundle.json": `${JSON.stringify(bundleProjectConfig(relativeOutput, compilerInputs), null, 2)}\n`,
     "tsconfig.deherm.release.json": `${JSON.stringify(releaseProjectConfig(relativeOutput, compilerInputs), null, 2)}\n`,
-    "tsconfig.deherm.json": `${JSON.stringify(rootProjectConfig(), null, 2)}\n`
+    "tsconfig.deherm.json": `${JSON.stringify(rootProjectConfig(), null, 2)}\n`,
   };
   for (const [relative, source] of Object.entries(projectConfigSources)) {
     await writeFile(path.join(inventory.projectRoot, relative), source);
   }
   const generatedOutputs = {
     output: {
-      ...Object.fromEntries(Object.entries({
-        "script-contexts.json": scriptContextsSource,
-        "generated/native-extensions/index.json": nativeExtensionsIndexSource,
-        ...contextSources
-      }).map(([relative, source]) => [relative, sha256(source)])),
-      ...Object.fromEntries(projectStaticHermesOutputs.map((name) => [
-        `static-hermes/generated/${name}`,
-        staticHermesInputs.outputSources[name]
-      ]))
+      ...Object.fromEntries(
+        Object.entries({
+          "script-contexts.json": scriptContextsSource,
+          "generated/native-extensions/index.json": nativeExtensionsIndexSource,
+          ...contextSources,
+        }).map(([relative, source]) => [relative, sha256(source)]),
+      ),
+      ...Object.fromEntries(
+        projectStaticHermesOutputs.map((name) => [
+          `static-hermes/generated/${name}`,
+          staticHermesInputs.outputSources[name],
+        ]),
+      ),
     },
-    project: Object.fromEntries(Object.entries(projectConfigSources).map(([relative, source]) => [relative, sha256(source)]))
+    project: Object.fromEntries(
+      Object.entries(projectConfigSources).map(([relative, source]) => [relative, sha256(source)]),
+    ),
   };
   const generatedSdkSha256 = await directoryDigest(sdkRoot);
-  const generatedDmSdkThunkIds = new Set(core.dmsdkThunks.declarations.filter(({ emitted }) => emitted).map(({ id }) => id));
-  await writeFile(path.join(root, "manifest.json"), `${JSON.stringify({
-    schemaVersion: 1,
-    defoldRevision: core.revision,
-    platform: core.platform,
-    generator: { package: "@ts-defold/deherm", version: core.packageVersion },
-    toolchain,
-    artifacts: core.artifacts,
-    generation,
-    // How the Defold revision above was decided, and from which layer-0 surface
-    // its API was read. Recorded so a regeneration, a teammate, or CI can see
-    // that it was resolved from evidence rather than assumed, and so a later run
-    // can reuse the answer without re-deriving it.
-    defoldResolution: defoldResolutionRecord(revisionResolution),
-    defoldSurface: { layer: core.surfaceLayer },
-    generationMerkle: { schemaVersion: merkle.schemaVersion, engineRoot: merkle.engineRoot, nativeRoot: merkle.nativeRoot, root: merkle.root },
-    inputs: core.inputs,
-    generatedOutputs,
-    generatedSdkSha256,
-    nativeExtensions: {
-      headerCount: nativeExtensions.index.headerCount,
-      generatedRouteCount: nativeExtensions.index.generatedRouteCount,
-      blockedRouteCount: nativeExtensions.index.blockedRouteCount,
-      keyedOutput: nativeExtensions.index.keyedOutput,
-      treeSha256: nativeExtensions.treeSha256
-    },
-    engineProfiles,
-    loweringPlan: {
-      sha256: core.loweringPlan.planSha256,
-      units: core.loweringPlan.coverage.units,
-      backendRecords: core.loweringPlan.coverage.backendRecords
-    },
-    scriptContexts: {
-      source: scriptContexts.source,
-      loweringPlanSha256: scriptContexts.loweringPlanSha256,
-      routeCount: scriptContexts.routeCount,
-      routeContextCounts: scriptContexts.routeContextCounts,
-      unknownContextTokens: scriptContexts.unknownContextTokens,
-      suffixes: Object.fromEntries(authoredContexts.map(({ id, suffix }) => [id, suffix]))
-    },
-    coverage: {
-      script: {
-        functions: core.scriptIr.counts.functions,
-        constants: scriptUniversalCoverage(core.scriptUniversal).constants.length,
-        types: core.scriptIr.counts.classes + core.scriptIr.counts.aliases + core.scriptIr.counts.enums,
-        typeSurfaceUnresolved: core.scriptIr.typeSurfaceUnresolvedCount,
-        universalRecipes: scriptUniversalCoverage(core.scriptUniversal).functions.length,
-        constantUniversalRecipes: scriptUniversalCoverage(core.scriptUniversal).constants.length,
-        universalRecipeTotal: core.scriptUniversal.candidateCount,
-        universalExclusions: core.scriptUniversal.excludedCount,
-        accounting: core.scriptAccounting.categoryCounts,
-        targetMatrix: loweringTargetMatrix(core.loweringPlan, "script", "script-functions"),
-        constantTargetMatrix: loweringTargetMatrix(core.loweringPlan, "script", "script-constant"),
-        runtimeLanes: {
-          generatedScalarDispatch: core.scriptDispatch.bindingCount,
-          universalStableId: scriptUniversalCoverage(core.scriptUniversal).functions.length,
-          constantStableId: scriptUniversalCoverage(core.scriptUniversal).constants.length
-        }
+  const generatedDmSdkThunkIds = new Set(
+    core.dmsdkThunks.declarations.filter(({ emitted }) => emitted).map(({ id }) => id),
+  );
+  await writeFile(
+    path.join(root, "manifest.json"),
+    `${JSON.stringify(
+      {
+        schemaVersion: 1,
+        defoldRevision: core.revision,
+        platform: core.platform,
+        generator: { package: "@ts-defold/deherm", version: core.packageVersion },
+        toolchain,
+        artifacts: core.artifacts,
+        generation,
+        // How the Defold revision above was decided, and from which layer-0 surface
+        // its API was read. Recorded so a regeneration, a teammate, or CI can see
+        // that it was resolved from evidence rather than assumed, and so a later run
+        // can reuse the answer without re-deriving it.
+        defoldResolution: defoldResolutionRecord(revisionResolution),
+        defoldSurface: { layer: core.surfaceLayer },
+        generationMerkle: {
+          schemaVersion: merkle.schemaVersion,
+          engineRoot: merkle.engineRoot,
+          nativeRoot: merkle.nativeRoot,
+          root: merkle.root,
+        },
+        inputs: core.inputs,
+        generatedOutputs,
+        generatedSdkSha256,
+        nativeExtensions: {
+          headerCount: nativeExtensions.index.headerCount,
+          generatedRouteCount: nativeExtensions.index.generatedRouteCount,
+          blockedRouteCount: nativeExtensions.index.blockedRouteCount,
+          keyedOutput: nativeExtensions.index.keyedOutput,
+          treeSha256: nativeExtensions.treeSha256,
+        },
+        engineProfiles,
+        loweringPlan: {
+          sha256: core.loweringPlan.planSha256,
+          units: core.loweringPlan.coverage.units,
+          backendRecords: core.loweringPlan.coverage.backendRecords,
+        },
+        scriptContexts: {
+          source: scriptContexts.source,
+          loweringPlanSha256: scriptContexts.loweringPlanSha256,
+          routeCount: scriptContexts.routeCount,
+          routeContextCounts: scriptContexts.routeContextCounts,
+          unknownContextTokens: scriptContexts.unknownContextTokens,
+          suffixes: Object.fromEntries(authoredContexts.map(({ id, suffix }) => [id, suffix])),
+        },
+        coverage: {
+          script: {
+            functions: core.scriptIr.counts.functions,
+            constants: scriptUniversalCoverage(core.scriptUniversal).constants.length,
+            types: core.scriptIr.counts.classes + core.scriptIr.counts.aliases + core.scriptIr.counts.enums,
+            typeSurfaceUnresolved: core.scriptIr.typeSurfaceUnresolvedCount,
+            universalRecipes: scriptUniversalCoverage(core.scriptUniversal).functions.length,
+            constantUniversalRecipes: scriptUniversalCoverage(core.scriptUniversal).constants.length,
+            universalRecipeTotal: core.scriptUniversal.candidateCount,
+            universalExclusions: core.scriptUniversal.excludedCount,
+            accounting: core.scriptAccounting.categoryCounts,
+            targetMatrix: loweringTargetMatrix(core.loweringPlan, "script", "script-functions"),
+            constantTargetMatrix: loweringTargetMatrix(core.loweringPlan, "script", "script-constant"),
+            runtimeLanes: {
+              generatedScalarDispatch: core.scriptDispatch.bindingCount,
+              universalStableId: scriptUniversalCoverage(core.scriptUniversal).functions.length,
+              constantStableId: scriptUniversalCoverage(core.scriptUniversal).constants.length,
+            },
+          },
+          dmsdk: {
+            headers: core.dmsdkIr.headerCount,
+            parsedHeaders: core.dmsdkIr.parsedHeaderCount,
+            diagnosticHeaders: core.dmsdkIr.diagnosticHeaderCount,
+            declarations: core.dmsdkIr.declarationCount,
+            runtimeDeclarations: core.dmsdkUniversal.coverage.declarations,
+            typeSurfaceUnresolved: core.dmsdkIr.typeSurfaceUnresolvedCount,
+            universalRecipes: core.dmsdkUniversal.coverage.recipes,
+            silentlyOmitted: core.dmsdkUniversal.coverage.silentlyOmitted,
+            targetMatrix: loweringTargetMatrix(core.loweringPlan, "dmsdk"),
+            runtimeLanes: {
+              generatedScalarThunks: generatedDmSdkThunkIds.size,
+              preferredSpecialized: core.dmsdkUniversal.coverage.preferredSpecialized,
+              usageMaterializedFallback: core.dmsdkUniversal.coverage.usageMaterializedFallback,
+              projectMaterialized: 0,
+            },
+          },
+          // Third-party `.script_api` projection is measured, not assumed: every
+          // shape the lane cannot represent is counted here and enumerated in
+          // bindings.ir.json.
+          projectExtensions: bindingIr.coverage,
+        },
       },
-      dmsdk: {
-        headers: core.dmsdkIr.headerCount,
-        parsedHeaders: core.dmsdkIr.parsedHeaderCount,
-        diagnosticHeaders: core.dmsdkIr.diagnosticHeaderCount,
-        declarations: core.dmsdkIr.declarationCount,
-        runtimeDeclarations: core.dmsdkUniversal.coverage.declarations,
-        typeSurfaceUnresolved: core.dmsdkIr.typeSurfaceUnresolvedCount,
-        universalRecipes: core.dmsdkUniversal.coverage.recipes,
-        silentlyOmitted: core.dmsdkUniversal.coverage.silentlyOmitted,
-        targetMatrix: loweringTargetMatrix(core.loweringPlan, "dmsdk"),
-        runtimeLanes: {
-          generatedScalarThunks: generatedDmSdkThunkIds.size,
-          preferredSpecialized: core.dmsdkUniversal.coverage.preferredSpecialized,
-          usageMaterializedFallback: core.dmsdkUniversal.coverage.usageMaterializedFallback,
-          projectMaterialized: 0
-        }
-      },
-      // Third-party `.script_api` projection is measured, not assumed: every
-      // shape the lane cannot represent is counted here and enumerated in
-      // bindings.ir.json.
-      projectExtensions: bindingIr.coverage
-    }
-  }, null, 2)}\n`);
+      null,
+      2,
+    )}\n`,
+  );
   // Regenerating the SDK does not rebuild the application bundle, so the
   // artifact-to-source binding survives this write untouched. It is not
   // rewritten either: the generated SDK is one of the bundle's own inputs, so a
   // regeneration that changes it makes the carried-forward binding report the
   // bundle as stale - which is exactly what it then is.
   const previousBuildArtifacts = await readExistingBuildArtifacts(resolvedProjectRoot);
-  await writeFile(path.join(inventory.projectRoot, "deherm.lock"), `${JSON.stringify({
-    schemaVersion: 1,
-    defoldRevision: core.revision,
-    platform: core.platform,
-    generator: { package: "@ts-defold/deherm", version: core.packageVersion },
-    toolchain,
-    artifacts: core.artifacts,
-    generation,
-    defoldResolution: defoldResolutionRecord(revisionResolution),
-    defoldSurface: { layer: core.surfaceLayer },
-    generationMerkle: { schemaVersion: merkle.schemaVersion, engineRoot: merkle.engineRoot, nativeRoot: merkle.nativeRoot, root: merkle.root },
-    inputs: core.inputs,
-    generatedOutputs,
-    generatedSdkSha256,
-    nativeExtensions: {
-      headerCount: nativeExtensions.index.headerCount,
-      generatedRouteCount: nativeExtensions.index.generatedRouteCount,
-      blockedRouteCount: nativeExtensions.index.blockedRouteCount,
-      keyedOutput: nativeExtensions.index.keyedOutput,
-      treeSha256: nativeExtensions.treeSha256
-    },
-    engineProfiles,
-    ...(previousBuildArtifacts ? { buildArtifacts: previousBuildArtifacts } : {})
-  }, null, 2)}\n`);
+  await writeFile(
+    path.join(inventory.projectRoot, "deherm.lock"),
+    `${JSON.stringify(
+      {
+        schemaVersion: 1,
+        defoldRevision: core.revision,
+        platform: core.platform,
+        generator: { package: "@ts-defold/deherm", version: core.packageVersion },
+        toolchain,
+        artifacts: core.artifacts,
+        generation,
+        defoldResolution: defoldResolutionRecord(revisionResolution),
+        defoldSurface: { layer: core.surfaceLayer },
+        generationMerkle: {
+          schemaVersion: merkle.schemaVersion,
+          engineRoot: merkle.engineRoot,
+          nativeRoot: merkle.nativeRoot,
+          root: merkle.root,
+        },
+        inputs: core.inputs,
+        generatedOutputs,
+        generatedSdkSha256,
+        nativeExtensions: {
+          headerCount: nativeExtensions.index.headerCount,
+          generatedRouteCount: nativeExtensions.index.generatedRouteCount,
+          blockedRouteCount: nativeExtensions.index.blockedRouteCount,
+          keyedOutput: nativeExtensions.index.keyedOutput,
+          treeSha256: nativeExtensions.treeSha256,
+        },
+        engineProfiles,
+        ...(previousBuildArtifacts ? { buildArtifacts: previousBuildArtifacts } : {}),
+      },
+      null,
+      2,
+    )}\n`,
+  );
   const tsconfigState = await migrateLegacyGeneratedTsconfig(
     path.join(inventory.projectRoot, "tsconfig.json"),
-    projectConfigSources["tsconfig.deherm.json"]
+    projectConfigSources["tsconfig.deherm.json"],
   );
   const vscodeExtensions = await mergeVscodeRecommendations(
     path.join(inventory.projectRoot, ".vscode", "extensions.json"),
-    ["oxc.oxc-vscode", "samchon.ttsc", "ts-defold.deherm"]
+    ["oxc.oxc-vscode", "samchon.ttsc", "ts-defold.deherm"],
   );
   const createdVscodeSettings = await writeIfMissing(
     path.join(inventory.projectRoot, ".vscode", "settings.json"),
-    `${JSON.stringify({
-      "[javascript][javascriptreact][typescript][typescriptreact]": {
-        "editor.defaultFormatter": "oxc.oxc-vscode"
-      }
-    }, null, 2)}\n`
+    `${JSON.stringify(
+      {
+        "[javascript][javascriptreact][typescript][typescriptreact]": {
+          "editor.defaultFormatter": "oxc.oxc-vscode",
+        },
+      },
+      null,
+      2,
+    )}\n`,
   );
   const createdVscodeLaunch = await writeIfMissing(
     path.join(inventory.projectRoot, ".vscode", "launch.json"),
-    `${JSON.stringify({
-      version: "0.2.0",
-      configurations: [{
-        type: "deherm",
-        request: "attach",
-        name: "déherm: Attach",
-        project: "\${workspaceFolder}"
-      }]
-    }, null, 2)}\n`
+    `${JSON.stringify(
+      {
+        version: "0.2.0",
+        configurations: [
+          {
+            type: "deherm",
+            request: "attach",
+            name: "déherm: Attach",
+            project: "${workspaceFolder}",
+          },
+        ],
+      },
+      null,
+      2,
+    )}\n`,
   );
   return {
     root,
@@ -2286,17 +2654,19 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
       vscodeExtensions: vscodeExtensions.created,
       vscodeExtensionsUpdated: vscodeExtensions.updated,
       vscodeSettings: createdVscodeSettings,
-      vscodeLaunch: createdVscodeLaunch
+      vscodeLaunch: createdVscodeLaunch,
     },
     migrated: {
-      tsconfig: tsconfigState.migrated
-    }
+      tsconfig: tsconfigState.migrated,
+    },
   };
 }
 
 async function readExistingBuildArtifacts(resolvedProjectRoot) {
   try {
-    const lock = JSON.parse((await readConfinedFile(resolvedProjectRoot, "deherm.lock", "deherm.lock")).toString("utf8"));
+    const lock = JSON.parse(
+      (await readConfinedFile(resolvedProjectRoot, "deherm.lock", "deherm.lock")).toString("utf8"),
+    );
     return lock.buildArtifacts ?? null;
   } catch (error) {
     if (error?.code === "ENOENT" || error instanceof SyntaxError) return null;
@@ -2310,26 +2680,33 @@ export async function verifyGeneratedProject(projectRoot, outputDirectory = ".de
   }
   const root = path.resolve(projectRoot, outputDirectory);
   const relativeRoot = path.relative(path.resolve(projectRoot), root);
-  if (!relativeRoot || relativeRoot === ".." || relativeRoot.startsWith(`..${path.sep}`) || path.isAbsolute(relativeRoot)) {
+  if (
+    !relativeRoot ||
+    relativeRoot === ".." ||
+    relativeRoot.startsWith(`..${path.sep}`) ||
+    path.isAbsolute(relativeRoot)
+  ) {
     throw new Error("Generated output must be a subdirectory of the Defold project");
   }
-  const [resolvedProjectRoot, resolvedOutputRoot] = await Promise.all([
-    realpath(projectRoot),
-    realpath(root)
-  ]);
+  const [resolvedProjectRoot, resolvedOutputRoot] = await Promise.all([realpath(projectRoot), realpath(root)]);
   const resolvedRelativeRoot = path.relative(resolvedProjectRoot, resolvedOutputRoot);
-  if (!resolvedRelativeRoot || resolvedRelativeRoot === ".." || resolvedRelativeRoot.startsWith(`..${path.sep}`) || path.isAbsolute(resolvedRelativeRoot)) {
+  if (
+    !resolvedRelativeRoot ||
+    resolvedRelativeRoot === ".." ||
+    resolvedRelativeRoot.startsWith(`..${path.sep}`) ||
+    path.isAbsolute(resolvedRelativeRoot)
+  ) {
     throw new Error("Generated output resolves outside the Defold project");
   }
   const [manifestBytes, lockBytes] = await Promise.all([
     readConfinedFile(resolvedOutputRoot, "manifest.json", "Generated manifest"),
-    readConfinedFile(resolvedProjectRoot, "deherm.lock", "deherm.lock")
+    readConfinedFile(resolvedProjectRoot, "deherm.lock", "deherm.lock"),
   ]);
   const manifest = JSON.parse(manifestBytes.toString("utf8"));
   const lock = JSON.parse(lockBytes.toString("utf8"));
   const core = await coreSdkForRevision(manifest.defoldRevision, {
     projectRoot,
-    env: options.env
+    env: options.env,
   });
   if (JSON.stringify(manifest.inputs) !== JSON.stringify(core.inputs)) {
     throw new Error("Generated manifest inputs do not match this installed deherm package");
@@ -2346,17 +2723,23 @@ export async function verifyGeneratedProject(projectRoot, outputDirectory = ".de
   const currentEngineProfiles = await resolveEngineProfiles(
     resolvedProjectRoot,
     parseGameProject(await readFile(path.join(resolvedProjectRoot, "game.project"), "utf8")),
-    core.scriptProfiles.engineProfileSelection
+    core.scriptProfiles.engineProfileSelection,
   );
   const expectedEngineProfiles = validateEngineProfiles(currentEngineProfiles, core.scriptProfiles);
   if (JSON.stringify(manifest.engineProfiles) !== JSON.stringify(expectedEngineProfiles)) {
-    throw new Error("Generated manifest engine-profile authority differs from the current project and installed Defold catalog");
+    throw new Error(
+      "Generated manifest engine-profile authority differs from the current project and installed Defold catalog",
+    );
   }
-  const inventorySource = await readConfinedFile(resolvedOutputRoot, "extensions.json", "Generated extension inventory");
+  const inventorySource = await readConfinedFile(
+    resolvedOutputRoot,
+    "extensions.json",
+    "Generated extension inventory",
+  );
   const inventory = JSON.parse(inventorySource.toString("utf8"));
   const nativeExtensionClang = resolveNativeExtensionClang({
     inventory,
-    clang: manifest.generation?.nativeExtensionClang?.command
+    clang: manifest.generation?.nativeExtensionClang?.command,
   });
   const staticHermesInputs = await projectStaticHermesInputs({ core, defoldRevision: core.revision });
   const expectedGeneration = await projectGenerationIdentity({
@@ -2365,7 +2748,7 @@ export async function verifyGeneratedProject(projectRoot, outputDirectory = ".de
     core,
     engineProfiles: manifest.engineProfiles,
     nativeExtensionClang,
-    staticHermesInputs
+    staticHermesInputs,
   });
   if (JSON.stringify(manifest.generation) !== JSON.stringify(expectedGeneration)) {
     throw new Error("Generated manifest project-generation key is stale or invalid");
@@ -2383,7 +2766,7 @@ export async function verifyGeneratedProject(projectRoot, outputDirectory = ".de
     loweringPlanSha256: "ir/binding-lowering-plan.json",
     loweringPlanSentinelSha256: "ir/binding-lowering-plan.sentinel.json",
     dmsdkThunksSha256: "ir/dmsdk-scalar-thunks.json",
-    dmsdkUniversalSha256: "ir/dmsdk-universal-bindings.json"
+    dmsdkUniversalSha256: "ir/dmsdk-universal-bindings.json",
   };
   const verified = {};
   verified["extensions.json"] = sha256(inventorySource);
@@ -2391,7 +2774,8 @@ export async function verifyGeneratedProject(projectRoot, outputDirectory = ".de
   for (const [key, relative] of Object.entries(files)) {
     const source = await readConfinedFile(resolvedOutputRoot, relative, relative);
     const actual = createHash("sha256").update(source).digest("hex");
-    if (manifest.inputs?.[key] !== actual) throw new Error(`${relative} does not match generated manifest input ${key}`);
+    if (manifest.inputs?.[key] !== actual)
+      throw new Error(`${relative} does not match generated manifest input ${key}`);
     verified[relative] = actual;
     verifiedSources[relative] = source;
   }
@@ -2412,20 +2796,28 @@ export async function verifyGeneratedProject(projectRoot, outputDirectory = ".de
       verified[`${rootName}:${relative}`] = actual;
     }
   }
-  const nativeIndex = JSON.parse((await readConfinedFile(
-    resolvedOutputRoot,
-    "generated/native-extensions/index.json",
-    "Generated native-extension index"
-  )).toString("utf8"));
+  const nativeIndex = JSON.parse(
+    (
+      await readConfinedFile(
+        resolvedOutputRoot,
+        "generated/native-extensions/index.json",
+        "Generated native-extension index",
+      )
+    ).toString("utf8"),
+  );
   const expectedNativeOutput = path.posix.join(manifest.defoldRevision, manifest.generation.cacheKey);
-  if (nativeIndex.defoldRevision !== manifest.defoldRevision ||
-      nativeIndex.projectGenerationKey !== manifest.generation.cacheKey ||
-      nativeIndex.keyedOutput !== expectedNativeOutput) {
+  if (
+    nativeIndex.defoldRevision !== manifest.defoldRevision ||
+    nativeIndex.projectGenerationKey !== manifest.generation.cacheKey ||
+    nativeIndex.keyedOutput !== expectedNativeOutput
+  ) {
     throw new Error("Generated native-extension index is not keyed to this project generation and Defold revision");
   }
   const nativeOwnerRoot = path.join(resolvedOutputRoot, "generated", "native-extensions");
   const ownerEntries = await readdir(nativeOwnerRoot, { withFileTypes: true });
-  const ownerShape = ownerEntries.map((entry) => `${entry.isDirectory() ? "d" : entry.isFile() ? "f" : "x"}:${entry.name}`).sort();
+  const ownerShape = ownerEntries
+    .map((entry) => `${entry.isDirectory() ? "d" : entry.isFile() ? "f" : "x"}:${entry.name}`)
+    .sort();
   const expectedOwnerShape = [`d:${manifest.defoldRevision}`, "f:index.json"].sort();
   if (JSON.stringify(ownerShape) !== JSON.stringify(expectedOwnerShape)) {
     throw new Error("Generated native-extension owner root contains stale or unsupported files");
@@ -2435,10 +2827,7 @@ export async function verifyGeneratedProject(projectRoot, outputDirectory = ".de
   if (JSON.stringify(revisionShape) !== JSON.stringify([`d:${manifest.generation.cacheKey}`])) {
     throw new Error("Generated native-extension revision root contains stale project generations");
   }
-  const nativeTreeSha256 = await directoryDigest(path.join(
-    nativeOwnerRoot,
-    ...nativeIndex.keyedOutput.split("/")
-  ));
+  const nativeTreeSha256 = await directoryDigest(path.join(nativeOwnerRoot, ...nativeIndex.keyedOutput.split("/")));
   if (nativeTreeSha256 !== nativeIndex.treeSha256 || nativeTreeSha256 !== manifest.nativeExtensions?.treeSha256) {
     throw new Error("Generated native-extension tree does not match its output sentinel; regenerate the project");
   }
@@ -2451,16 +2840,23 @@ export async function verifyGeneratedProject(projectRoot, outputDirectory = ".de
   if (loweringPlan.schemaVersion !== 2) throw new Error("ir/binding-lowering-plan.json must use schema v2");
   const { planSha256, ...planBody } = loweringPlan;
   const calculatedPlanSha256 = createHash("sha256").update(JSON.stringify(planBody)).digest("hex");
-  if (planSha256 !== calculatedPlanSha256) throw new Error("ir/binding-lowering-plan.json has an invalid internal plan digest");
-  if (manifest.loweringPlan?.sha256 !== planSha256) throw new Error("Generated manifest names a different lowering plan");
-  if (core.loweringPlan.planSha256 !== planSha256) throw new Error("Generated lowering plan differs from this installed deherm package");
-  if (loweringPlanSentinel.outputSha256 !== manifest.inputs.loweringPlanSha256 ||
-      loweringPlanSentinel.planSha256 !== planSha256 ||
-      loweringPlanSentinel.generatorSha256 !== core.loweringPlanSentinel.generatorSha256) {
+  if (planSha256 !== calculatedPlanSha256)
+    throw new Error("ir/binding-lowering-plan.json has an invalid internal plan digest");
+  if (manifest.loweringPlan?.sha256 !== planSha256)
+    throw new Error("Generated manifest names a different lowering plan");
+  if (core.loweringPlan.planSha256 !== planSha256)
+    throw new Error("Generated lowering plan differs from this installed deherm package");
+  if (
+    loweringPlanSentinel.outputSha256 !== manifest.inputs.loweringPlanSha256 ||
+    loweringPlanSentinel.planSha256 !== planSha256 ||
+    loweringPlanSentinel.generatorSha256 !== core.loweringPlanSentinel.generatorSha256
+  ) {
     throw new Error("Generated lowering-plan sentinel does not authenticate the copied plan and generator");
   }
-  if (manifest.loweringPlan?.units !== loweringPlan.coverage?.units ||
-      manifest.loweringPlan?.backendRecords !== loweringPlan.coverage?.backendRecords) {
+  if (
+    manifest.loweringPlan?.units !== loweringPlan.coverage?.units ||
+    manifest.loweringPlan?.backendRecords !== loweringPlan.coverage?.backendRecords
+  ) {
     throw new Error("Generated manifest lowering-plan census differs from the verified plan");
   }
   for (const key of ["schemaVersion", "defoldRevision", "platform"]) {
@@ -2477,25 +2873,33 @@ export async function verifyGeneratedProject(projectRoot, outputDirectory = ".de
     surface: { layer: core.surfaceLayer, inputs: core.inputs },
     extensions: inventory.extensions,
     engineProfiles: manifest.engineProfiles,
-    generator: { package: "@ts-defold/deherm", version: core.packageVersion, projectGeneratorSha256: expectedGeneration.projectGeneratorSha256 }
+    generator: {
+      package: "@ts-defold/deherm",
+      version: core.packageVersion,
+      projectGeneratorSha256: expectedGeneration.projectGeneratorSha256,
+    },
   });
-  if (manifest.generationMerkle?.engineRoot !== expectedMerkle.engineRoot ||
-      manifest.generationMerkle?.nativeRoot !== expectedMerkle.nativeRoot ||
-      manifest.generationMerkle?.root !== expectedMerkle.root) {
+  if (
+    manifest.generationMerkle?.engineRoot !== expectedMerkle.engineRoot ||
+    manifest.generationMerkle?.nativeRoot !== expectedMerkle.nativeRoot ||
+    manifest.generationMerkle?.root !== expectedMerkle.root
+  ) {
     throw new Error("Generated manifest generation Merkle root is stale or invalid");
   }
-  if (JSON.stringify(lock.generator) !== JSON.stringify(manifest.generator) ||
-      JSON.stringify(lock.toolchain) !== JSON.stringify(manifest.toolchain) ||
-      JSON.stringify(lock.artifacts ?? null) !== JSON.stringify(manifest.artifacts ?? null) ||
-      JSON.stringify(lock.generation) !== JSON.stringify(manifest.generation) ||
-      JSON.stringify(lock.defoldResolution) !== JSON.stringify(manifest.defoldResolution) ||
-      JSON.stringify(lock.defoldSurface) !== JSON.stringify(manifest.defoldSurface) ||
-      JSON.stringify(lock.generationMerkle) !== JSON.stringify(manifest.generationMerkle) ||
-      JSON.stringify(lock.inputs) !== JSON.stringify(manifest.inputs) ||
-      JSON.stringify(lock.generatedOutputs) !== JSON.stringify(manifest.generatedOutputs) ||
-      lock.generatedSdkSha256 !== manifest.generatedSdkSha256 ||
-      JSON.stringify(lock.nativeExtensions) !== JSON.stringify(manifest.nativeExtensions) ||
-      JSON.stringify(lock.engineProfiles) !== JSON.stringify(manifest.engineProfiles)) {
+  if (
+    JSON.stringify(lock.generator) !== JSON.stringify(manifest.generator) ||
+    JSON.stringify(lock.toolchain) !== JSON.stringify(manifest.toolchain) ||
+    JSON.stringify(lock.artifacts ?? null) !== JSON.stringify(manifest.artifacts ?? null) ||
+    JSON.stringify(lock.generation) !== JSON.stringify(manifest.generation) ||
+    JSON.stringify(lock.defoldResolution) !== JSON.stringify(manifest.defoldResolution) ||
+    JSON.stringify(lock.defoldSurface) !== JSON.stringify(manifest.defoldSurface) ||
+    JSON.stringify(lock.generationMerkle) !== JSON.stringify(manifest.generationMerkle) ||
+    JSON.stringify(lock.inputs) !== JSON.stringify(manifest.inputs) ||
+    JSON.stringify(lock.generatedOutputs) !== JSON.stringify(manifest.generatedOutputs) ||
+    lock.generatedSdkSha256 !== manifest.generatedSdkSha256 ||
+    JSON.stringify(lock.nativeExtensions) !== JSON.stringify(manifest.nativeExtensions) ||
+    JSON.stringify(lock.engineProfiles) !== JSON.stringify(manifest.engineProfiles)
+  ) {
     throw new Error("deherm.lock does not match the generated manifest contract");
   }
   // Generated state being current says nothing about the application bundle
@@ -2512,7 +2916,7 @@ export async function verifyGeneratedProject(projectRoot, outputDirectory = ".de
     planSha256,
     checkedFiles: Object.keys(verified).length,
     verified,
-    buildArtifacts
+    buildArtifacts,
   };
 }
 
@@ -2524,8 +2928,10 @@ function isWithinPath(parent, candidate) {
 function isInstalledPackageSdkTarget(packageSdkRoot, candidate) {
   if (isWithinPath(packageSdkRoot, candidate)) return true;
   const portableTarget = candidate.split(path.sep).join("/");
-  return portableTarget.includes("/node_modules/@ts-defold/deherm/packages/sdk/") ||
-    portableTarget.includes("/node_modules/@ts-defold/deherm/packages/sdk/src/");
+  return (
+    portableTarget.includes("/node_modules/@ts-defold/deherm/packages/sdk/") ||
+    portableTarget.includes("/node_modules/@ts-defold/deherm/packages/sdk/src/")
+  );
 }
 
 function authoredContextForFile(file) {
@@ -2557,14 +2963,19 @@ async function validateAuthoredImportBoundaries(root) {
   try {
     const snapshot = api.updateSnapshot({ openProjects: configPaths });
     for (const project of snapshot.getProjects()) {
-      const projectContext = authoredContexts.find(({ id }) => project.configFileName === path.join(root, `tsconfig.deherm.${id}.json`));
+      const projectContext = authoredContexts.find(
+        ({ id }) => project.configFileName === path.join(root, `tsconfig.deherm.${id}.json`),
+      );
       if (!projectContext) continue;
       for (const file of project.program.getSourceFileNames()) {
         const programFile = path.resolve(file);
         const absolute = await realpath(programFile);
-        if (!isWithinPath(sourceRoot, absolute) ||
-            [...generatedRoots].some((generatedRoot) => isWithinPath(generatedRoot, absolute)) ||
-            authoredContextForFile(absolute) !== projectContext.id) continue;
+        if (
+          !isWithinPath(sourceRoot, absolute) ||
+          [...generatedRoots].some((generatedRoot) => isWithinPath(generatedRoot, absolute)) ||
+          authoredContextForFile(absolute) !== projectContext.id
+        )
+          continue;
         const sourceFile = project.program.getSourceFile(programFile);
         if (!sourceFile) continue;
         for (const literal of sourceFile.imports) {
@@ -2572,31 +2983,50 @@ async function validateAuthoredImportBoundaries(root) {
           const position = sourceFile.getLineAndCharacterOfPosition(literal.getStart(sourceFile));
           const location = `${path.relative(sourceRoot, absolute).split(path.sep).join("/")}:${position.line + 1}:${position.character + 1}`;
           if (specifier.startsWith("@deherm/project/")) {
-            diagnostics.push(`${location} deherm context boundary: import '${specifier}' is a private deep import; use '@deherm/project'`);
+            diagnostics.push(
+              `${location} deherm context boundary: import '${specifier}' is a private deep import; use '@deherm/project'`,
+            );
             continue;
           }
-          if (specifier === "@ts-defold/deherm" || specifier.startsWith("@ts-defold/deherm/") ||
-              specifier === "@deherm/sdk" || specifier.startsWith("@deherm/sdk/")) {
-            diagnostics.push(`${location} deherm context boundary: import '${specifier}' bypasses the context-filtered '@deherm/project' SDK`);
+          if (
+            specifier === "@ts-defold/deherm" ||
+            specifier.startsWith("@ts-defold/deherm/") ||
+            specifier === "@deherm/sdk" ||
+            specifier.startsWith("@deherm/sdk/")
+          ) {
+            diagnostics.push(
+              `${location} deherm context boundary: import '${specifier}' bypasses the context-filtered '@deherm/project' SDK`,
+            );
             continue;
           }
           const symbol = project.checker.getSymbolAtLocation(literal);
           const declaration = symbol?.declarations?.[0]?.resolve(project);
           let target = declaration?.fileName ? path.resolve(declaration.fileName) : null;
           if (!target) continue;
-          try { target = await realpath(target); } catch {}
-          if (specifier !== "@deherm/project" && [...generatedRoots].some((generatedRoot) => isWithinPath(generatedRoot, target))) {
-            diagnostics.push(`${location} deherm context boundary: import '${specifier}' bypasses '@deherm/project' and reaches generated SDK internals`);
+          try {
+            target = await realpath(target);
+          } catch {}
+          if (
+            specifier !== "@deherm/project" &&
+            [...generatedRoots].some((generatedRoot) => isWithinPath(generatedRoot, target))
+          ) {
+            diagnostics.push(
+              `${location} deherm context boundary: import '${specifier}' bypasses '@deherm/project' and reaches generated SDK internals`,
+            );
             continue;
           }
           if (specifier !== "@deherm/project" && isInstalledPackageSdkTarget(packageSdkRoot, target)) {
-            diagnostics.push(`${location} deherm context boundary: import '${specifier}' reaches the unfiltered package SDK; use '@deherm/project'`);
+            diagnostics.push(
+              `${location} deherm context boundary: import '${specifier}' reaches the unfiltered package SDK; use '@deherm/project'`,
+            );
             continue;
           }
           if (!isWithinPath(sourceRoot, target)) continue;
           const targetContext = authoredContextForFile(target);
           if (targetContext && targetContext !== projectContext.id && targetContext !== "shared") {
-            diagnostics.push(`${location} deherm context boundary: ${projectContext.id} source cannot import ${targetContext} source '${specifier}'; only plain shared .ts imports may cross contexts`);
+            diagnostics.push(
+              `${location} deherm context boundary: ${projectContext.id} source cannot import ${targetContext} source '${specifier}'; only plain shared .ts imports may cross contexts`,
+            );
           }
         }
       }
@@ -2637,24 +3067,29 @@ export async function typecheckGeneratedProject(projectRoot, options = {}) {
       status: 1,
       signal: null,
       stdout: "",
-      stderr: `${boundaryDiagnostics.join("\n")}\n`
+      stderr: `${boundaryDiagnostics.join("\n")}\n`,
     };
   }
-  const runCompiler = (executable, arguments_, environment = process.env) => new Promise((resolve, reject) => {
-    const child = spawn(process.execPath, [executable, ...arguments_], {
-      cwd: root,
-      env: environment,
-      stdio: ["ignore", "pipe", "pipe"]
+  const runCompiler = (executable, arguments_, environment = process.env) =>
+    new Promise((resolve, reject) => {
+      const child = spawn(process.execPath, [executable, ...arguments_], {
+        cwd: root,
+        env: environment,
+        stdio: ["ignore", "pipe", "pipe"],
+      });
+      let stdout = "";
+      let stderr = "";
+      child.stdout.setEncoding("utf8");
+      child.stderr.setEncoding("utf8");
+      child.stdout.on("data", (chunk) => {
+        stdout += chunk;
+      });
+      child.stderr.on("data", (chunk) => {
+        stderr += chunk;
+      });
+      child.once("error", reject);
+      child.once("close", (status, signal) => resolve({ status, signal, stdout, stderr }));
     });
-    let stdout = "";
-    let stderr = "";
-    child.stdout.setEncoding("utf8");
-    child.stderr.setEncoding("utf8");
-    child.stdout.on("data", (chunk) => { stdout += chunk; });
-    child.stderr.on("data", (chunk) => { stderr += chunk; });
-    child.once("error", reject);
-    child.once("close", (status, signal) => resolve({ status, signal, stdout, stderr }));
-  });
   let contextResult = null;
   if (release) {
     contextResult = await runCompiler(contextCompiler, ["--build", contextConfig, "--pretty", "false"]);
@@ -2669,7 +3104,7 @@ export async function typecheckGeneratedProject(projectRoot, options = {}) {
         profile: "release",
         phase: "context-typecheck",
         passed: false,
-        ...contextResult
+        ...contextResult,
       };
     }
   }
@@ -2677,7 +3112,7 @@ export async function typecheckGeneratedProject(projectRoot, options = {}) {
     ? await checkProject({
         tsconfig: config,
         cwd: root,
-        config: await loadDehermPluginConfig(config)
+        config: await loadDehermPluginConfig(config),
       })
     : await runCompiler(compiler, ["--build", config, "--pretty", "false"]);
   return {
@@ -2692,6 +3127,6 @@ export async function typecheckGeneratedProject(projectRoot, options = {}) {
     phase: release ? "release-reachability" : "context-typecheck",
     passed: result.status === 0,
     ...result,
-    context: contextResult
+    context: contextResult,
   };
 }

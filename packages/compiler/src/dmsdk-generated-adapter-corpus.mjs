@@ -10,16 +10,66 @@ export const dmSdkGeneratedAdapterCorpusArtifacts = Object.freeze({
 });
 
 const familyDescriptor = Object.freeze({
-  arenaCString: { count: "deherm_dmsdk_arena_cstring_count", descriptors: "deherm_dmsdk_arena_cstring_descriptors", id: "id", declaration: "declaration_id" },
-  scalar: { count: "deherm_dmsdk_scalar_count", descriptors: "deherm_dmsdk_scalar_descriptors", id: "id", declaration: "declaration_id" },
-  enumValue: { count: "deherm_dmsdk_enum_count", descriptors: "deherm_dmsdk_enum_descriptors", id: "id", declaration: "declaration_id" },
-  fixedDigest: { count: "deherm_dmsdk_fixed_digest_count", descriptors: "deherm_dmsdk_fixed_digest_descriptors", id: "id", declaration: "declaration_id" },
-  hashSpan: { count: "deherm_dmsdk_hash_span_count", descriptors: "deherm_dmsdk_hash_span_descriptors", id: "id", declaration: "declaration_id" },
-  hashState: { count: "deherm_dmsdk_hash_state_count", descriptors: "deherm_dmsdk_hash_state_descriptors", id: "id", declaration: "declaration_id" },
-  namedScalar: { count: "deherm_dmsdk_named_scalar_count", descriptors: "deherm_dmsdk_named_scalar_descriptors", id: "id", declaration: "declaration_id" },
-  base64Span: { count: "deherm_dmsdk_base64_span_count", descriptors: "deherm_dmsdk_base64_span_descriptors", id: "id", declaration: "declaration_id" },
-  astcProbe: { count: "deherm_dmsdk_astc_probe_count", descriptors: "deherm_dmsdk_astc_probe_descriptors", id: "id", declaration: "declaration_id" },
-  cstringValue: { count: "deherm_dmsdk_cstring_value_count", descriptors: "deherm_dmsdk_cstring_value_descriptors", id: null, declaration: "source_id" },
+  arenaCString: {
+    count: "deherm_dmsdk_arena_cstring_count",
+    descriptors: "deherm_dmsdk_arena_cstring_descriptors",
+    id: "id",
+    declaration: "declaration_id",
+  },
+  scalar: {
+    count: "deherm_dmsdk_scalar_count",
+    descriptors: "deherm_dmsdk_scalar_descriptors",
+    id: "id",
+    declaration: "declaration_id",
+  },
+  enumValue: {
+    count: "deherm_dmsdk_enum_count",
+    descriptors: "deherm_dmsdk_enum_descriptors",
+    id: "id",
+    declaration: "declaration_id",
+  },
+  fixedDigest: {
+    count: "deherm_dmsdk_fixed_digest_count",
+    descriptors: "deherm_dmsdk_fixed_digest_descriptors",
+    id: "id",
+    declaration: "declaration_id",
+  },
+  hashSpan: {
+    count: "deherm_dmsdk_hash_span_count",
+    descriptors: "deherm_dmsdk_hash_span_descriptors",
+    id: "id",
+    declaration: "declaration_id",
+  },
+  hashState: {
+    count: "deherm_dmsdk_hash_state_count",
+    descriptors: "deherm_dmsdk_hash_state_descriptors",
+    id: "id",
+    declaration: "declaration_id",
+  },
+  namedScalar: {
+    count: "deherm_dmsdk_named_scalar_count",
+    descriptors: "deherm_dmsdk_named_scalar_descriptors",
+    id: "id",
+    declaration: "declaration_id",
+  },
+  base64Span: {
+    count: "deherm_dmsdk_base64_span_count",
+    descriptors: "deherm_dmsdk_base64_span_descriptors",
+    id: "id",
+    declaration: "declaration_id",
+  },
+  astcProbe: {
+    count: "deherm_dmsdk_astc_probe_count",
+    descriptors: "deherm_dmsdk_astc_probe_descriptors",
+    id: "id",
+    declaration: "declaration_id",
+  },
+  cstringValue: {
+    count: "deherm_dmsdk_cstring_value_count",
+    descriptors: "deherm_dmsdk_cstring_value_descriptors",
+    id: null,
+    declaration: "source_id",
+  },
   xteaSpan: { count: "deherm_dmsdk_xtea_span_count", descriptors: null, id: null, declaration: null },
 });
 
@@ -30,8 +80,10 @@ function compareCodeUnits(left, right) {
 function canonicalJson(value) {
   if (value === null || typeof value !== "object") return JSON.stringify(value);
   if (Array.isArray(value)) return `[${value.map(canonicalJson).join(",")}]`;
-  return `{${Object.keys(value).sort(compareCodeUnits)
-    .map((key) => `${JSON.stringify(key)}:${canonicalJson(value[key])}`).join(",")}}`;
+  return `{${Object.keys(value)
+    .sort(compareCodeUnits)
+    .map((key) => `${JSON.stringify(key)}:${canonicalJson(value[key])}`)
+    .join(",")}}`;
 }
 
 function sha256(value) {
@@ -39,8 +91,7 @@ function sha256(value) {
 }
 
 function authenticatedCatalog(catalog, index) {
-  if (!catalog || !Array.isArray(catalog.recipes) ||
-      !/^[0-9a-f]{64}$/.test(catalog.sourceHashes?.catalog ?? "")) {
+  if (!catalog || !Array.isArray(catalog.recipes) || !/^[0-9a-f]{64}$/.test(catalog.sourceHashes?.catalog ?? "")) {
     throw new Error("dmSDK generated-adapter corpus requires the authenticated recipe catalog");
   }
   const digest = sha256(JSON.stringify(catalog.recipes));
@@ -55,21 +106,33 @@ export function dmSdkGeneratedAdapterUsages(index, catalog) {
   authenticatedCatalog(catalog, verified);
   const usages = Object.entries(verified.declarations)
     .filter(([, declaration]) => declaration.materialization.state === "generated-adapter")
-    .map(([declarationId, declaration]) => Object.freeze({
-      declarationId,
-      materialization: declaration.materialization,
-      numericId: declaration.numericId,
-    }))
-    .sort((left, right) => left.numericId - right.numericId || compareCodeUnits(left.declarationId, right.declarationId));
+    .map(([declarationId, declaration]) =>
+      Object.freeze({
+        declarationId,
+        materialization: declaration.materialization,
+        numericId: declaration.numericId,
+      }),
+    )
+    .sort(
+      (left, right) => left.numericId - right.numericId || compareCodeUnits(left.declarationId, right.declarationId),
+    );
   if (usages.length !== verified.generatedAdapterCount) {
     throw new Error("dmSDK generated-adapter corpus count disagrees with its authenticated symbol index");
   }
-  return Object.freeze(usages.map(({ declarationId, materialization }) => Object.freeze({ declarationId, materialization })));
+  return Object.freeze(
+    usages.map(({ declarationId, materialization }) => Object.freeze({ declarationId, materialization })),
+  );
 }
 
 const familyCode = Object.freeze({
-  scalar: 0, enumValue: 1, fixedDigest: 2, hashSpan: 3,
-  base64Span: 4, xteaSpan: 5, astcProbe: 6, cstringValue: 7,
+  scalar: 0,
+  enumValue: 1,
+  fixedDigest: 2,
+  hashSpan: 3,
+  base64Span: 4,
+  xteaSpan: 5,
+  astcProbe: 6,
+  cstringValue: 7,
   arenaCString: 8,
   hashState: 9,
   namedScalar: 10,
@@ -109,7 +172,7 @@ function wrapperType(shape, family) {
   if (family === "enumValue" && shape.kind === "enum") return "int32_t";
   if (shape.kind === "named" || shape.name === "u64") return "uint64_t";
   if (shape.name === "bool") return "uint8_t";
-  return ({ u16: "uint16_t", u32: "uint32_t", f32: "float", f64: "double", i32: "int32_t" })[shape.name] ?? "int32_t";
+  return { u16: "uint16_t", u32: "uint32_t", f32: "float", f64: "double", i32: "int32_t" }[shape.name] ?? "int32_t";
 }
 
 function renderScalarFake(vector) {
@@ -118,36 +181,41 @@ function renderScalarFake(vector) {
     const type = wrapperType(parameter.shape, vector.family);
     return `${type} a${position}`;
   });
-  const validations = vector.abi.parameters.map((parameter, position) => {
-    const expected = parameter.shape.kind === "enum"
-      ? enumValue(parameter, vector.adapterId + position)
-      : scalarSentinel(parameter.shape, vector.adapterId, position).native;
-    return `if(a${position}!=static_cast<${wrapperType(parameter.shape, vector.family)}>(${expected}))++g_failures[${code}][${vector.adapterId}];`;
-  }).join("");
+  const validations = vector.abi.parameters
+    .map((parameter, position) => {
+      const expected =
+        parameter.shape.kind === "enum"
+          ? enumValue(parameter, vector.adapterId + position)
+          : scalarSentinel(parameter.shape, vector.adapterId, position).native;
+      return `if(a${position}!=static_cast<${wrapperType(parameter.shape, vector.family)}>(${expected}))++g_failures[${code}][${vector.adapterId}];`;
+    })
+    .join("");
   const resultType = wrapperType(vector.abi.resultShape, vector.family);
   let returned = "";
   if (resultType !== "void") {
-    const value = vector.abi.resultShape.kind === "enum"
-      ? enumValue({ enumeration: vector.abi.resultEnumeration, shape: vector.abi.resultShape }, vector.adapterId + 1)
-      : scalarSentinel(vector.abi.resultShape, vector.adapterId, 0, true).native;
+    const value =
+      vector.abi.resultShape.kind === "enum"
+        ? enumValue({ enumeration: vector.abi.resultEnumeration, shape: vector.abi.resultShape }, vector.adapterId + 1)
+        : scalarSentinel(vector.abi.resultShape, vector.adapterId, 0, true).native;
     returned = `return static_cast<${resultType}>(${value});`;
   }
-  return `extern \"C\" ${resultType} ${vector.exactCallee}(${parameters.join(",")}){++g_calls[${code}][${vector.adapterId}];${validations}${returned}}`;
+  return `extern "C" ${resultType} ${vector.exactCallee}(${parameters.join(",")}){++g_calls[${code}][${vector.adapterId}];${validations}${returned}}`;
 }
 
 function renderNamedScalarNativeFake(vector) {
   const code = familyCode.namedScalar;
-  const parameters = vector.abi.parameters.map(
-    (parameter, position) => `${parameter.nativeType} a${position}`,
-  );
-  const validations = vector.abi.parameters.map((parameter, position) => {
-    const expected = scalarSentinel(parameter.shape, vector.adapterId, position).native;
-    return `if(a${position}!=static_cast<${parameter.nativeType}>(${expected}))++g_failures[${code}][${vector.adapterId}];`;
-  }).join("");
+  const parameters = vector.abi.parameters.map((parameter, position) => `${parameter.nativeType} a${position}`);
+  const validations = vector.abi.parameters
+    .map((parameter, position) => {
+      const expected = scalarSentinel(parameter.shape, vector.adapterId, position).native;
+      return `if(a${position}!=static_cast<${parameter.nativeType}>(${expected}))++g_failures[${code}][${vector.adapterId}];`;
+    })
+    .join("");
   const resultType = vector.abi.resultNativeType;
-  const returned = vector.abi.resultShape.kind === "void"
-    ? ""
-    : `return static_cast<${resultType}>(${scalarSentinel(vector.abi.resultShape, vector.adapterId, 0, true).native});`;
+  const returned =
+    vector.abi.resultShape.kind === "void"
+      ? ""
+      : `return static_cast<${resultType}>(${scalarSentinel(vector.abi.resultShape, vector.adapterId, 0, true).native});`;
   const qualified = vector.invocation.nativeSymbol.split("::");
   const name = qualified.pop();
   const definition = `${resultType} ${name}(${parameters.join(",")}){++g_calls[${code}][${vector.adapterId}];${validations}${returned}}`;
@@ -165,19 +233,26 @@ function renderCStringFake(vector) {
   const code = familyCode.cstringValue;
   let stringIndex = 0;
   const parameters = vector.abi.parameters.map((parameter, position) => `${cstringNativeType(parameter)} a${position}`);
-  const validations = vector.abi.parameters.map((parameter, position) => {
-    if (parameter.shape.kind === "cstring") {
-      const expected = `exact_${vector.adapterId}_${stringIndex++}`;
-      return `if(a${position}==nullptr||strcmp(a${position},${JSON.stringify(expected)})!=0)++g_failures[${code}][${vector.adapterId}];`;
-    }
-    const expected = parameter.shape.kind === "enum" ? enumValue(parameter, vector.adapterId + position) : scalarSentinel(parameter.shape, vector.adapterId, position).native;
-    return `if(a${position}!=static_cast<${cstringNativeType(parameter)}>(${expected}))++g_failures[${code}][${vector.adapterId}];`;
-  }).join("");
+  const validations = vector.abi.parameters
+    .map((parameter, position) => {
+      if (parameter.shape.kind === "cstring") {
+        const expected = `exact_${vector.adapterId}_${stringIndex++}`;
+        return `if(a${position}==nullptr||strcmp(a${position},${JSON.stringify(expected)})!=0)++g_failures[${code}][${vector.adapterId}];`;
+      }
+      const expected =
+        parameter.shape.kind === "enum"
+          ? enumValue(parameter, vector.adapterId + position)
+          : scalarSentinel(parameter.shape, vector.adapterId, position).native;
+      return `if(a${position}!=static_cast<${cstringNativeType(parameter)}>(${expected}))++g_failures[${code}][${vector.adapterId}];`;
+    })
+    .join("");
   let resultType = vector.abi.resultShape.kind === "enum" ? vector.abi.resultShape.name : vector.abi.resultNativeType;
   let returned = "";
   if (vector.abi.resultShape.kind === "cstring") returned = `return ${JSON.stringify(`result_${vector.adapterId}`)};`;
-  else if (vector.abi.resultShape.kind === "enum") returned = `return static_cast<${resultType}>(${enumValue({ enumeration: vector.abi.resultEnumeration, shape: vector.abi.resultShape }, vector.adapterId + 1)});`;
-  else if (vector.abi.resultShape.kind !== "void") returned = `return static_cast<${resultType}>(${scalarSentinel(vector.abi.resultShape, vector.adapterId, 0, true).native});`;
+  else if (vector.abi.resultShape.kind === "enum")
+    returned = `return static_cast<${resultType}>(${enumValue({ enumeration: vector.abi.resultEnumeration, shape: vector.abi.resultShape }, vector.adapterId + 1)});`;
+  else if (vector.abi.resultShape.kind !== "void")
+    returned = `return static_cast<${resultType}>(${scalarSentinel(vector.abi.resultShape, vector.adapterId, 0, true).native});`;
   return `${resultType} ${vector.invocation.nativeSymbol}(${parameters.join(",")}){++g_calls[${code}][${vector.adapterId}];${validations}${returned}}`;
 }
 
@@ -207,33 +282,37 @@ function renderFamilyFake(vector) {
   }
   if (vector.family === "fixedDigest") {
     const bytes = vector.familyContract.digestBytes;
-    return `extern \"C\" uint8_t ${name}(const uint8_t* input,uint32_t length,uint8_t* output,uint32_t capacity){++g_calls[${code}][${id}];if(!input||length!=UINT32_C(${5 + id})||capacity<UINT32_C(${bytes}))++g_failures[${code}][${id}];for(uint32_t i=0;i<UINT32_C(${bytes});++i)output[i]=static_cast<uint8_t>(UINT8_C(${0x70 + id})+i);return UINT8_C(1);}`;
+    return `extern "C" uint8_t ${name}(const uint8_t* input,uint32_t length,uint8_t* output,uint32_t capacity){++g_calls[${code}][${id}];if(!input||length!=UINT32_C(${5 + id})||capacity<UINT32_C(${bytes}))++g_failures[${code}][${id}];for(uint32_t i=0;i<UINT32_C(${bytes});++i)output[i]=static_cast<uint8_t>(UINT8_C(${0x70 + id})+i);return UINT8_C(1);}`;
   }
   if (vector.family === "hashSpan") {
     const out = vector.familyContract.resultBits === 32 ? "uint32_t*" : "uint64_t*";
-    const value = vector.familyContract.resultBits === 32 ? `UINT32_C(${0x65000000 + id})` : `UINT64_C(${0x6500000000000000 + id})`;
-    return `extern \"C\" uint8_t ${name}(const uint8_t* input,uint32_t length,${out} output){++g_calls[${code}][${id}];if(!input||length!=UINT32_C(${7 + id})||input[0]!=UINT8_C(${0x30 + id})||!output)++g_failures[${code}][${id}];*output=${value};return UINT8_C(1);}`;
+    const value =
+      vector.familyContract.resultBits === 32 ? `UINT32_C(${0x65000000 + id})` : `UINT64_C(${0x6500000000000000 + id})`;
+    return `extern "C" uint8_t ${name}(const uint8_t* input,uint32_t length,${out} output){++g_calls[${code}][${id}];if(!input||length!=UINT32_C(${7 + id})||input[0]!=UINT8_C(${0x30 + id})||!output)++g_failures[${code}][${id}];*output=${value};return UINT8_C(1);}`;
   }
   if (vector.family === "hashState") {
     const operation = vector.familyContract.operation;
     const width = vector.familyContract.width;
     const state = `HashState${width}`;
     const count = `++g_calls[${code}][${id}];`;
-    if (operation === "Init") return `void ${name}(${state}* s,bool reverse){${count}s->m_Hash=reverse?${width}:${width === 32 ? 3 : 6};s->m_Tail=0;s->m_Count=0;s->m_Size=0;s->m_ReverseHashEntryIndex=0;}`;
-    if (operation === "Clone") return `void ${name}(${state}* d,const ${state}* s,bool reverse){${count}d->m_Hash=s->m_Hash+(reverse?${width === 32 ? 7 : 9}:1);d->m_Tail=s->m_Tail;d->m_Count=s->m_Count;d->m_Size=s->m_Size;d->m_ReverseHashEntryIndex=0;}`;
-    if (operation === "UpdateBuffer") return `void ${name}(${state}* s,const void* input,uint32_t length){${count}const auto* bytes=static_cast<const uint8_t*>(input);for(uint32_t i=0;i<length;++i)s->m_Hash+=bytes[i];}`;
+    if (operation === "Init")
+      return `void ${name}(${state}* s,bool reverse){${count}s->m_Hash=reverse?${width}:${width === 32 ? 3 : 6};s->m_Tail=0;s->m_Count=0;s->m_Size=0;s->m_ReverseHashEntryIndex=0;}`;
+    if (operation === "Clone")
+      return `void ${name}(${state}* d,const ${state}* s,bool reverse){${count}d->m_Hash=s->m_Hash+(reverse?${width === 32 ? 7 : 9}:1);d->m_Tail=s->m_Tail;d->m_Count=s->m_Count;d->m_Size=s->m_Size;d->m_ReverseHashEntryIndex=0;}`;
+    if (operation === "UpdateBuffer")
+      return `void ${name}(${state}* s,const void* input,uint32_t length){${count}const auto* bytes=static_cast<const uint8_t*>(input);for(uint32_t i=0;i<length;++i)s->m_Hash+=bytes[i];}`;
     if (operation === "Final") return `uint${width}_t ${name}(${state}* s){${count}return s->m_Hash;}`;
     if (operation === "Release") return `void ${name}(${state}*){${count}}`;
     throw new Error(`${vector.declarationId} has unsupported hash-state operation ${operation}`);
   }
   if (vector.family === "base64Span") {
-    return `extern \"C\" uint8_t ${name}(const uint8_t* input,uint32_t length,uint8_t* output,uint32_t* inout){++g_calls[${code}][${id}];if(!input||length!=UINT32_C(${id === 0 ? 4 : 5})||input[0]!=UINT8_C(${id === 0 ? 81 : 0x41 + id})||!output||!inout||*inout!=UINT32_C(32))++g_failures[${code}][${id}];if(output&&inout){output[0]=UINT8_C(${0x81 + id});output[1]=UINT8_C(${0x91 + id});*inout=UINT32_C(2);}return UINT8_C(1);}`;
+    return `extern "C" uint8_t ${name}(const uint8_t* input,uint32_t length,uint8_t* output,uint32_t* inout){++g_calls[${code}][${id}];if(!input||length!=UINT32_C(${id === 0 ? 4 : 5})||input[0]!=UINT8_C(${id === 0 ? 81 : 0x41 + id})||!output||!inout||*inout!=UINT32_C(32))++g_failures[${code}][${id}];if(output&&inout){output[0]=UINT8_C(${0x81 + id});output[1]=UINT8_C(${0x91 + id});*inout=UINT32_C(2);}return UINT8_C(1);}`;
   }
   if (vector.family === "xteaSpan") {
-    return `extern \"C\" uint8_t ${name}(uint8_t* data,uint32_t length,const uint8_t* key,uint32_t key_length){++g_calls[${code}][${id}];if(!data||length!=UINT32_C(${9 + id})||data[0]!=UINT8_C(${0x41 + id})||!key||key_length!=UINT32_C(${3 + id})||key[0]!=UINT8_C(${0x61 + id}))++g_failures[${code}][${id}];if(data)data[0]=UINT8_C(${0xa1 + id});return UINT8_C(1);}`;
+    return `extern "C" uint8_t ${name}(uint8_t* data,uint32_t length,const uint8_t* key,uint32_t key_length){++g_calls[${code}][${id}];if(!data||length!=UINT32_C(${9 + id})||data[0]!=UINT8_C(${0x41 + id})||!key||key_length!=UINT32_C(${3 + id})||key[0]!=UINT8_C(${0x61 + id}))++g_failures[${code}][${id}];if(data)data[0]=UINT8_C(${0xa1 + id});return UINT8_C(1);}`;
   }
   if (vector.family === "astcProbe") {
-    return `extern \"C\" uint8_t ${name}(const uint8_t* input,uint32_t length,DehermDmSdkAstcProbeResult* output){++g_calls[${code}][${id}];if(!input||length!=UINT32_C(${16 + id})||input[0]!=UINT8_C(${0x51 + id})||!output)++g_failures[${code}][${id}];if(output){output->width=UINT32_C(${101 + id});output->height=UINT32_C(${201 + id});output->depth=UINT32_C(${301 + id});}return UINT8_C(1);}`;
+    return `extern "C" uint8_t ${name}(const uint8_t* input,uint32_t length,DehermDmSdkAstcProbeResult* output){++g_calls[${code}][${id}];if(!input||length!=UINT32_C(${16 + id})||input[0]!=UINT8_C(${0x51 + id})||!output)++g_failures[${code}][${id}];if(output){output->width=UINT32_C(${101 + id});output->height=UINT32_C(${201 + id});output->depth=UINT32_C(${301 + id});}return UINT8_C(1);}`;
   }
   if (vector.family === "namedScalar") return renderNamedScalarNativeFake(vector);
   return renderScalarFake(vector);
@@ -254,16 +333,23 @@ function renderDispatchCheck(vector, failure) {
   }
   if (["scalar", "enumValue", "namedScalar"].includes(vector.family)) {
     const isScalar = vector.family === "scalar";
-    const args = vector.abi.parameters.map((parameter, position) => parameter.shape.kind === "enum"
-      ? signedRaw(enumValue(parameter, id + position))
-      : scalarSentinel(parameter.shape, id, position).raw);
+    const args = vector.abi.parameters.map((parameter, position) =>
+      parameter.shape.kind === "enum"
+        ? signedRaw(enumValue(parameter, id + position))
+        : scalarSentinel(parameter.shape, id, position).raw,
+    );
     let expected = "UINT64_C(0)";
-    if (vector.abi.resultShape.kind === "enum") expected = signedRaw(enumValue({ enumeration: vector.abi.resultEnumeration, shape: vector.abi.resultShape }, id + 1));
+    if (vector.abi.resultShape.kind === "enum")
+      expected = signedRaw(
+        enumValue({ enumeration: vector.abi.resultEnumeration, shape: vector.abi.resultShape }, id + 1),
+      );
     else if (vector.abi.resultShape.kind !== "void") expected = scalarSentinel(vector.abi.resultShape, id, 0, true).raw;
     const prefix = isScalar ? "scalar" : vector.family === "enumValue" ? "enum" : "named_scalar";
     const status = isScalar
       ? "DEHERM_DMSDK_SCALAR_OK"
-      : vector.family === "enumValue" ? "DEHERM_DMSDK_ENUM_OK" : "DEHERM_DMSDK_NAMED_SCALAR_OK";
+      : vector.family === "enumValue"
+        ? "DEHERM_DMSDK_ENUM_OK"
+        : "DEHERM_DMSDK_NAMED_SCALAR_OK";
     return `{uint64_t arguments[2]={${args.join(",") || "UINT64_C(0)"}};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_${prefix}_dispatch(UINT16_C(${id}),arguments,UINT32_C(${args.length}),&result)!=${status})return ${failure};${common}if(result!=${expected})return ${failure};}`;
   }
   if (vector.family === "fixedDigest") {
@@ -271,7 +357,8 @@ function renderDispatchCheck(vector, failure) {
     return `{uint8_t input[16]={UINT8_C(${0x20 + id})};uint8_t output[64]={};uint32_t written=0;if(deherm_dmsdk_fixed_digest_dispatch(UINT16_C(${id}),input,UINT32_C(${5 + id}),output,UINT32_C(64),&written)!=DEHERM_DMSDK_FIXED_DIGEST_OK)return ${failure};${common}if(written!=UINT32_C(${bytes}))return ${failure};for(uint32_t i=0;i<written;++i)if(output[i]!=static_cast<uint8_t>(UINT8_C(${0x70 + id})+i))return ${failure};}`;
   }
   if (vector.family === "hashSpan") {
-    const expected = vector.familyContract.resultBits === 32 ? `UINT64_C(${0x65000000 + id})` : `UINT64_C(${0x6500000000000000 + id})`;
+    const expected =
+      vector.familyContract.resultBits === 32 ? `UINT64_C(${0x65000000 + id})` : `UINT64_C(${0x6500000000000000 + id})`;
     return `{uint8_t input[16]={UINT8_C(${0x30 + id})};uint64_t output=0;if(deherm_dmsdk_hash_span_dispatch(UINT16_C(${id}),input,UINT32_C(${7 + id}),&output)!=DEHERM_DMSDK_HASH_SPAN_OK)return ${failure};${common}if(output!=${expected})return ${failure};}`;
   }
   if (vector.family === "hashState") {
@@ -283,26 +370,46 @@ function renderDispatchCheck(vector, failure) {
     const bytes = `uint8_t input[4]={1,2,3,4};`;
     const before = `const uint32_t before=g_calls[${code}][${id}];`;
     const stateCommon = `if(g_calls[${code}][${id}]!=before+UINT32_C(1)||g_failures[${code}][${id}]!=UINT32_C(0))return ${failure};`;
-    if (operation === "Init") return `{${before}uint64_t state=0,value=0;if(deherm_dmsdk_hash_state_dispatch(UINT16_C(${id}),0,nullptr,0,1,&state)!=DEHERM_DMSDK_HASH_STATE_OK||state==0)return ${failure};${stateCommon}if(deherm_dmsdk_hash_state_dispatch(${finalId},state,nullptr,0,0,&value)!=DEHERM_DMSDK_HASH_STATE_OK||value!=UINT64_C(${width}))return ${failure};}`;
-    if (operation === "Clone") return `{uint64_t source=0,value=0,result=0;if(deherm_dmsdk_hash_state_dispatch(${initId},0,nullptr,0,0,&source)!=DEHERM_DMSDK_HASH_STATE_OK)return ${failure};${before}if(deherm_dmsdk_hash_state_dispatch(UINT16_C(${id}),source,nullptr,0,1,&value)!=DEHERM_DMSDK_HASH_STATE_OK||value==0||value==source)return ${failure};${stateCommon}if(deherm_dmsdk_hash_state_dispatch(${finalId},value,nullptr,0,0,&result)!=DEHERM_DMSDK_HASH_STATE_OK||result!=UINT64_C(${width === 32 ? 10 : 15}))return ${failure};if(deherm_dmsdk_hash_state_dispatch(${releaseId},source,nullptr,0,0,&result)!=DEHERM_DMSDK_HASH_STATE_OK)return ${failure};}`;
-    if (operation === "UpdateBuffer") return `{uint64_t state=0,value=9,result=0;${bytes}if(deherm_dmsdk_hash_state_dispatch(${initId},0,nullptr,0,0,&state)!=DEHERM_DMSDK_HASH_STATE_OK)return ${failure};${before}if(deherm_dmsdk_hash_state_dispatch(UINT16_C(${id}),state,input,4,0,&value)!=DEHERM_DMSDK_HASH_STATE_OK||value!=0)return ${failure};${stateCommon}if(deherm_dmsdk_hash_state_dispatch(${finalId},state,nullptr,0,0,&result)!=DEHERM_DMSDK_HASH_STATE_OK||result!=UINT64_C(${width === 32 ? 13 : 16}))return ${failure};}`;
-    if (operation === "Final") return `{uint64_t state=0,value=0;if(deherm_dmsdk_hash_state_dispatch(${initId},0,nullptr,0,0,&state)!=DEHERM_DMSDK_HASH_STATE_OK)return ${failure};${before}if(deherm_dmsdk_hash_state_dispatch(UINT16_C(${id}),state,nullptr,0,0,&value)!=DEHERM_DMSDK_HASH_STATE_OK||value!=UINT64_C(${width === 32 ? 3 : 6}))return ${failure};${stateCommon}}`;
+    if (operation === "Init")
+      return `{${before}uint64_t state=0,value=0;if(deherm_dmsdk_hash_state_dispatch(UINT16_C(${id}),0,nullptr,0,1,&state)!=DEHERM_DMSDK_HASH_STATE_OK||state==0)return ${failure};${stateCommon}if(deherm_dmsdk_hash_state_dispatch(${finalId},state,nullptr,0,0,&value)!=DEHERM_DMSDK_HASH_STATE_OK||value!=UINT64_C(${width}))return ${failure};}`;
+    if (operation === "Clone")
+      return `{uint64_t source=0,value=0,result=0;if(deherm_dmsdk_hash_state_dispatch(${initId},0,nullptr,0,0,&source)!=DEHERM_DMSDK_HASH_STATE_OK)return ${failure};${before}if(deherm_dmsdk_hash_state_dispatch(UINT16_C(${id}),source,nullptr,0,1,&value)!=DEHERM_DMSDK_HASH_STATE_OK||value==0||value==source)return ${failure};${stateCommon}if(deherm_dmsdk_hash_state_dispatch(${finalId},value,nullptr,0,0,&result)!=DEHERM_DMSDK_HASH_STATE_OK||result!=UINT64_C(${width === 32 ? 10 : 15}))return ${failure};if(deherm_dmsdk_hash_state_dispatch(${releaseId},source,nullptr,0,0,&result)!=DEHERM_DMSDK_HASH_STATE_OK)return ${failure};}`;
+    if (operation === "UpdateBuffer")
+      return `{uint64_t state=0,value=9,result=0;${bytes}if(deherm_dmsdk_hash_state_dispatch(${initId},0,nullptr,0,0,&state)!=DEHERM_DMSDK_HASH_STATE_OK)return ${failure};${before}if(deherm_dmsdk_hash_state_dispatch(UINT16_C(${id}),state,input,4,0,&value)!=DEHERM_DMSDK_HASH_STATE_OK||value!=0)return ${failure};${stateCommon}if(deherm_dmsdk_hash_state_dispatch(${finalId},state,nullptr,0,0,&result)!=DEHERM_DMSDK_HASH_STATE_OK||result!=UINT64_C(${width === 32 ? 13 : 16}))return ${failure};}`;
+    if (operation === "Final")
+      return `{uint64_t state=0,value=0;if(deherm_dmsdk_hash_state_dispatch(${initId},0,nullptr,0,0,&state)!=DEHERM_DMSDK_HASH_STATE_OK)return ${failure};${before}if(deherm_dmsdk_hash_state_dispatch(UINT16_C(${id}),state,nullptr,0,0,&value)!=DEHERM_DMSDK_HASH_STATE_OK||value!=UINT64_C(${width === 32 ? 3 : 6}))return ${failure};${stateCommon}}`;
     return `{uint64_t state=0,value=9;if(deherm_dmsdk_hash_state_dispatch(${initId},0,nullptr,0,0,&state)!=DEHERM_DMSDK_HASH_STATE_OK)return ${failure};${before}if(deherm_dmsdk_hash_state_dispatch(UINT16_C(${id}),state,nullptr,0,0,&value)!=DEHERM_DMSDK_HASH_STATE_OK||value!=0)return ${failure};${stateCommon}}`;
   }
   if (vector.family === "base64Span") {
     const init = id === 0 ? "'Q','Q','=','='" : `${0x41 + id},0x22,0x33,0x44,0x55`;
     return `{uint8_t input[5]={${init}};uint8_t output[32]={};uint32_t written=0;if(deherm_dmsdk_base64_span_dispatch(UINT16_C(${id}),input,UINT32_C(${id === 0 ? 4 : 5}),output,UINT32_C(32),&written)!=DEHERM_DMSDK_BASE64_SPAN_OK)return ${failure};${common}if(written!=UINT32_C(2)||output[0]!=UINT8_C(${0x81 + id})||output[1]!=UINT8_C(${0x91 + id}))return ${failure};}`;
   }
-  if (vector.family === "xteaSpan") return `{uint8_t data[16]={UINT8_C(${0x41 + id})};uint8_t key[8]={UINT8_C(${0x61 + id})};if(deherm_dmsdk_xtea_span_dispatch(UINT16_C(${id}),data,UINT32_C(${9 + id}),key,UINT32_C(${3 + id}))!=DEHERM_DMSDK_XTEA_SPAN_OK)return ${failure};${common}if(data[0]!=UINT8_C(${0xa1 + id}))return ${failure};}`;
-  if (vector.family === "astcProbe") return `{uint8_t input[17]={UINT8_C(${0x51 + id})};DehermDmSdkAstcProbeResult output{};if(deherm_dmsdk_astc_probe_dispatch(UINT16_C(${id}),input,UINT32_C(${16 + id}),&output)!=DEHERM_DMSDK_ASTC_PROBE_OK)return ${failure};${common}if(output.width!=UINT32_C(${101 + id})||output.height!=UINT32_C(${201 + id})||output.depth!=UINT32_C(${301 + id}))return ${failure};}`;
+  if (vector.family === "xteaSpan")
+    return `{uint8_t data[16]={UINT8_C(${0x41 + id})};uint8_t key[8]={UINT8_C(${0x61 + id})};if(deherm_dmsdk_xtea_span_dispatch(UINT16_C(${id}),data,UINT32_C(${9 + id}),key,UINT32_C(${3 + id}))!=DEHERM_DMSDK_XTEA_SPAN_OK)return ${failure};${common}if(data[0]!=UINT8_C(${0xa1 + id}))return ${failure};}`;
+  if (vector.family === "astcProbe")
+    return `{uint8_t input[17]={UINT8_C(${0x51 + id})};DehermDmSdkAstcProbeResult output{};if(deherm_dmsdk_astc_probe_dispatch(UINT16_C(${id}),input,UINT32_C(${16 + id}),&output)!=DEHERM_DMSDK_ASTC_PROBE_OK)return ${failure};${common}if(output.width!=UINT32_C(${101 + id})||output.height!=UINT32_C(${201 + id})||output.depth!=UINT32_C(${301 + id}))return ${failure};}`;
   const strings = vector.abi.parameters.filter(({ shape }) => shape.kind === "cstring");
   const scalars = vector.abi.parameters.filter(({ shape }) => shape.kind !== "cstring");
-  const stringRows = strings.map((_, index) => `{reinterpret_cast<const uint8_t*>(${JSON.stringify(`exact_${id}_${index}`)}),UINT32_C(${`exact_${id}_${index}`.length})}`).join(",");
-  const scalarRows = scalars.map((parameter, position) => parameter.shape.kind === "enum" ? signedRaw(enumValue(parameter, id + position)) : scalarSentinel(parameter.shape, id, position).raw).join(",");
+  const stringRows = strings
+    .map(
+      (_, index) =>
+        `{reinterpret_cast<const uint8_t*>(${JSON.stringify(`exact_${id}_${index}`)}),UINT32_C(${`exact_${id}_${index}`.length})}`,
+    )
+    .join(",");
+  const scalarRows = scalars
+    .map((parameter, position) =>
+      parameter.shape.kind === "enum"
+        ? signedRaw(enumValue(parameter, id + position))
+        : scalarSentinel(parameter.shape, id, position).raw,
+    )
+    .join(",");
   let resultCheck = "";
-  if (vector.abi.resultShape.kind === "cstring") resultCheck = `if(!present||required!=UINT32_C(${`result_${id}`.length})||strcmp(reinterpret_cast<const char*>(output),${JSON.stringify(`result_${id}`)})!=0)return ${failure};`;
-  else if (vector.abi.resultShape.kind === "enum") resultCheck = `if(result!=${signedRaw(enumValue({ enumeration: vector.abi.resultEnumeration, shape: vector.abi.resultShape }, id + 1))})return ${failure};`;
-  else if (vector.abi.resultShape.kind !== "void") resultCheck = `if(result!=${scalarSentinel(vector.abi.resultShape, id, 0, true).raw})return ${failure};`;
+  if (vector.abi.resultShape.kind === "cstring")
+    resultCheck = `if(!present||required!=UINT32_C(${`result_${id}`.length})||strcmp(reinterpret_cast<const char*>(output),${JSON.stringify(`result_${id}`)})!=0)return ${failure};`;
+  else if (vector.abi.resultShape.kind === "enum")
+    resultCheck = `if(result!=${signedRaw(enumValue({ enumeration: vector.abi.resultEnumeration, shape: vector.abi.resultShape }, id + 1))})return ${failure};`;
+  else if (vector.abi.resultShape.kind !== "void")
+    resultCheck = `if(result!=${scalarSentinel(vector.abi.resultShape, id, 0, true).raw})return ${failure};`;
   return `{uint8_t scratch_bytes[256]={};DehermDmSdkCStringScratch scratch{scratch_bytes,UINT32_C(256),UINT32_C(0)};DehermDmSdkCStringView strings[2]={${stringRows || "{nullptr,UINT32_C(0)}"}};uint64_t scalars[2]={${scalarRows || "UINT64_C(0)"}};uint64_t result=0;uint8_t output[64]={};uint32_t required=0;uint8_t present=0;if(deherm_dmsdk_cstring_value_dispatch(UINT16_C(${id}),&scratch,strings,UINT32_C(${strings.length}),scalars,UINT32_C(${scalars.length}),&result,output,UINT32_C(64),&required,&present)!=DEHERM_DMSDK_CSTRING_OK)return ${failure};${common}${resultCheck}}`;
 }
 
@@ -321,12 +428,17 @@ function renderVerificationSource(generated) {
     scalar: "scalar",
     xteaSpan: "xtea_span",
   };
-  const headers = [...new Set(vectors.flatMap(({ productionHeader, family }) => [
-    productionHeader,
-    `defold_hermes/generated_dmsdk_${runtimeHeaderStem[family]}.h`,
-  ]))].sort(compareCodeUnits);
-  const sdkHeaders = [...new Set(vectors.map(({ nativeHeader }) => nativeHeader).filter(Boolean))]
-    .sort(compareCodeUnits);
+  const headers = [
+    ...new Set(
+      vectors.flatMap(({ productionHeader, family }) => [
+        productionHeader,
+        `defold_hermes/generated_dmsdk_${runtimeHeaderStem[family]}.h`,
+      ]),
+    ),
+  ].sort(compareCodeUnits);
+  const sdkHeaders = [...new Set(vectors.map(({ nativeHeader }) => nativeHeader).filter(Boolean))].sort(
+    compareCodeUnits,
+  );
   const descriptorChecks = [];
   let failure = 1;
   for (const [family, descriptor] of Object.entries(familyDescriptor)) {
@@ -336,15 +448,27 @@ function renderVerificationSource(generated) {
     for (const vector of owned) {
       if (!descriptor.descriptors) continue;
       const access = `${descriptor.descriptors}()[UINT16_C(${vector.adapterId})]`;
-      if (descriptor.id) descriptorChecks.push(`if(${access}.${descriptor.id}!=UINT16_C(${vector.adapterId}))return ${failure++};`);
-      descriptorChecks.push(`if(strcmp(${access}.${descriptor.declaration},${JSON.stringify(vector.declarationId)})!=0)return ${failure++};`);
+      if (descriptor.id)
+        descriptorChecks.push(`if(${access}.${descriptor.id}!=UINT16_C(${vector.adapterId}))return ${failure++};`);
+      descriptorChecks.push(
+        `if(strcmp(${access}.${descriptor.declaration},${JSON.stringify(vector.declarationId)})!=0)return ${failure++};`,
+      );
     }
   }
   const calls = vectors.map((vector) => renderDispatchCheck(vector, failure++)).join("\n");
   const uri = vectors.find((vector) => vector.family === "arenaCString" && vector.familyContract.mode === "uri-encode");
-  const nativeFailure = uri ? `{char output[64];memset(output,'x',sizeof(output));DehermDmSdkArenaCStringResult result{UINT64_C(9),9,9};g_arena_uri_failure=true;const char input[]=${JSON.stringify(`arena_${uri.adapterId}`)};const auto status=deherm_dmsdk_arena_cstring_dispatch(UINT16_C(${uri.adapterId}),reinterpret_cast<const uint8_t*>(input),UINT32_C(${`arena_${uri.adapterId}`.length}),UINT64_C(0),output,UINT32_C(64),&result);g_arena_uri_failure=false;if(status!=DEHERM_DMSDK_ARENA_CSTRING_NATIVE_FAILURE||result.native_result!=0||result.output_length!=0||result.required_length!=0)return ${failure++};for(char value:output)if(value!='\\0')return ${failure++};}` : "";
-  const vectorRows = vectors.map((vector) => ` {UINT32_C(${vector.numericId}),UINT16_C(${vector.adapterId}),${JSON.stringify(vector.family)},${JSON.stringify(vector.vectorSha256)}}`).join(",\n");
-  const fakes = vectors.map((vector) => vector.family === "cstringValue" ? renderCStringFake(vector) : renderFamilyFake(vector)).join("\n");
+  const nativeFailure = uri
+    ? `{char output[64];memset(output,'x',sizeof(output));DehermDmSdkArenaCStringResult result{UINT64_C(9),9,9};g_arena_uri_failure=true;const char input[]=${JSON.stringify(`arena_${uri.adapterId}`)};const auto status=deherm_dmsdk_arena_cstring_dispatch(UINT16_C(${uri.adapterId}),reinterpret_cast<const uint8_t*>(input),UINT32_C(${`arena_${uri.adapterId}`.length}),UINT64_C(0),output,UINT32_C(64),&result);g_arena_uri_failure=false;if(status!=DEHERM_DMSDK_ARENA_CSTRING_NATIVE_FAILURE||result.native_result!=0||result.output_length!=0||result.required_length!=0)return ${failure++};for(char value:output)if(value!='\\0')return ${failure++};}`
+    : "";
+  const vectorRows = vectors
+    .map(
+      (vector) =>
+        ` {UINT32_C(${vector.numericId}),UINT16_C(${vector.adapterId}),${JSON.stringify(vector.family)},${JSON.stringify(vector.vectorSha256)}}`,
+    )
+    .join(",\n");
+  const fakes = vectors
+    .map((vector) => (vector.family === "cstringValue" ? renderCStringFake(vector) : renderFamilyFake(vector)))
+    .join("\n");
   return `// Generated by @deherm/compiler dmSDK generated-adapter exact corpus. Do not edit.
 #ifndef DLIB_LOG_DOMAIN
 #define DLIB_LOG_DOMAIN "deherm"
@@ -359,9 +483,9 @@ struct DehermDmSdkAdapterExactVector{uint32_t recipe_id;uint16_t adapter_id;cons
 static const DehermDmSdkAdapterExactVector kVectors[]={
 ${vectorRows}
 };
-extern \"C\" uint32_t deherm_dmsdk_generated_adapter_exact_vector_count(void){return UINT32_C(${vectors.length});}
-extern \"C\" const DehermDmSdkAdapterExactVector* deherm_dmsdk_generated_adapter_exact_vectors(void){return kVectors;}
-extern \"C\" int deherm_dmsdk_run_generated_adapter_exact_verification(void){
+extern "C" uint32_t deherm_dmsdk_generated_adapter_exact_vector_count(void){return UINT32_C(${vectors.length});}
+extern "C" const DehermDmSdkAdapterExactVector* deherm_dmsdk_generated_adapter_exact_vectors(void){return kVectors;}
+extern "C" int deherm_dmsdk_run_generated_adapter_exact_verification(void){
 ${descriptorChecks.join("\n")}
 ${calls}
 ${nativeFailure}
@@ -425,28 +549,43 @@ function jsiResultExpectation(vector) {
 }
 
 function renderJsiVerificationSource(generated) {
-  const vectors = generated.verification.vectors.filter((vector) =>
-    vector.transports.dynamicHermesJsi.applicability === "callable");
-  const byFamily = new Map(["scalar", "enumValue"].map((family) =>
-    [family, vectors.filter((vector) => vector.family === family).sort((a, b) => a.adapterId - b.adapterId)]));
+  const vectors = generated.verification.vectors.filter(
+    (vector) => vector.transports.dynamicHermesJsi.applicability === "callable",
+  );
+  const byFamily = new Map(
+    ["scalar", "enumValue"].map((family) => [
+      family,
+      vectors.filter((vector) => vector.family === family).sort((a, b) => a.adapterId - b.adapterId),
+    ]),
+  );
   const scalar = byFamily.get("scalar");
   const enumeration = byFamily.get("enumValue");
-  const scalarRows = scalar.map((vector) => {
-    const argumentsKinds = vector.abi.parameters.map((parameter) => scalarKind(parameter.shape, "scalar"));
-    return ` {UINT16_C(${vector.adapterId}),UINT8_C(${argumentsKinds.length}),${scalarKind(vector.abi.resultShape, "scalar")},{${argumentsKinds[0] ?? "DEHERM_DMSDK_SCALAR_VOID"}},UINT8_C(1),${JSON.stringify(vector.declarationId)},${JSON.stringify(vector.invocation.nativeSymbol)}}`;
-  }).join(",\n");
-  const enumRows = enumeration.map((vector) => {
-    const kinds = vector.abi.parameters.map((parameter) => scalarKind(parameter.shape, "enumValue"));
-    return ` {UINT16_C(${vector.adapterId}),UINT8_C(${kinds.length}),${scalarKind(vector.abi.resultShape, "enumValue")},{${[kinds[0] ?? "DEHERM_DMSDK_ENUM_VOID", kinds[1] ?? "DEHERM_DMSDK_ENUM_VOID"].join(",")}},${JSON.stringify(vector.declarationId)}}`;
-  }).join(",\n");
-  const calls = vectors.map((vector, index) => {
-    const args = vector.abi.parameters.map((parameter, position) => jsiArgument(parameter, vector.adapterId, position));
-    const module = vector.transports.dynamicHermesJsi.module;
-    const expectedFamily = { scalar: 1, enumValue: 2 }[vector.family];
-    const expectedResult = jsiResultExpectation(vector);
-    const laneChecks = args.map((argument, position) => `if(g_lanes[${position}]!=${argument.raw})return FAILURE;`).join("");
-    return `{constexpr int FAILURE=${index + 1};reset();auto module=modules.getProperty(runtime,${JSON.stringify(module)}).asObject(runtime);auto call=module.getProperty(runtime,"call").asObject(runtime).asFunction(runtime);jsi::Value args[]={jsi::Value(${vector.adapterId}.0)${args.length ? `,${args.map(({ expression }) => expression).join(",")}` : ""}};auto returned=call.call(runtime,static_cast<const jsi::Value*>(args),static_cast<size_t>(sizeof(args)/sizeof(args[0])));if(g_family!=${expectedFamily}||g_id!=UINT16_C(${vector.adapterId})||g_count!=UINT32_C(${args.length}))return FAILURE;${laneChecks}${expectedResult.assertion}}`;
-  }).join("\n ");
+  const scalarRows = scalar
+    .map((vector) => {
+      const argumentsKinds = vector.abi.parameters.map((parameter) => scalarKind(parameter.shape, "scalar"));
+      return ` {UINT16_C(${vector.adapterId}),UINT8_C(${argumentsKinds.length}),${scalarKind(vector.abi.resultShape, "scalar")},{${argumentsKinds[0] ?? "DEHERM_DMSDK_SCALAR_VOID"}},UINT8_C(1),${JSON.stringify(vector.declarationId)},${JSON.stringify(vector.invocation.nativeSymbol)}}`;
+    })
+    .join(",\n");
+  const enumRows = enumeration
+    .map((vector) => {
+      const kinds = vector.abi.parameters.map((parameter) => scalarKind(parameter.shape, "enumValue"));
+      return ` {UINT16_C(${vector.adapterId}),UINT8_C(${kinds.length}),${scalarKind(vector.abi.resultShape, "enumValue")},{${[kinds[0] ?? "DEHERM_DMSDK_ENUM_VOID", kinds[1] ?? "DEHERM_DMSDK_ENUM_VOID"].join(",")}},${JSON.stringify(vector.declarationId)}}`;
+    })
+    .join(",\n");
+  const calls = vectors
+    .map((vector, index) => {
+      const args = vector.abi.parameters.map((parameter, position) =>
+        jsiArgument(parameter, vector.adapterId, position),
+      );
+      const module = vector.transports.dynamicHermesJsi.module;
+      const expectedFamily = { scalar: 1, enumValue: 2 }[vector.family];
+      const expectedResult = jsiResultExpectation(vector);
+      const laneChecks = args
+        .map((argument, position) => `if(g_lanes[${position}]!=${argument.raw})return FAILURE;`)
+        .join("");
+      return `{constexpr int FAILURE=${index + 1};reset();auto module=modules.getProperty(runtime,${JSON.stringify(module)}).asObject(runtime);auto call=module.getProperty(runtime,"call").asObject(runtime).asFunction(runtime);jsi::Value args[]={jsi::Value(${vector.adapterId}.0)${args.length ? `,${args.map(({ expression }) => expression).join(",")}` : ""}};auto returned=call.call(runtime,static_cast<const jsi::Value*>(args),static_cast<size_t>(sizeof(args)/sizeof(args[0])));if(g_family!=${expectedFamily}||g_id!=UINT16_C(${vector.adapterId})||g_count!=UINT32_C(${args.length}))return FAILURE;${laneChecks}${expectedResult.assertion}}`;
+    })
+    .join("\n ");
   return `// Generated by @deherm/compiler dmSDK generated-adapter JSI exact corpus. Do not edit.
 #include <defold_hermes/generated_dmsdk_scalar_jsi.hpp>
 #include <defold_hermes/generated_dmsdk_scalar_runtime.h>
@@ -484,9 +623,11 @@ export function materializeDmSdkGeneratedAdapterCorpus(index, catalog) {
   });
   const verificationSource = renderVerificationSource(generated);
   const jsiVerificationSource = renderJsiVerificationSource(generated);
-  const familyCounts = Object.fromEntries([...new Set(generated.verification.vectors.map(({ family }) => family))]
-    .sort(compareCodeUnits)
-    .map((family) => [family, generated.verification.vectors.filter((vector) => vector.family === family).length]));
+  const familyCounts = Object.fromEntries(
+    [...new Set(generated.verification.vectors.map(({ family }) => family))]
+      .sort(compareCodeUnits)
+      .map((family) => [family, generated.verification.vectors.filter((vector) => vector.family === family).length]),
+  );
   const body = {
     schemaVersion: 1,
     source: "deherm-dmsdk-generated-adapter-exact-corpus",

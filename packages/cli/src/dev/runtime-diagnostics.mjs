@@ -111,7 +111,8 @@ export function diagnosticSignature({ classification = UNCLASSIFIED, text, frame
 }
 
 const FRAME_PATTERN = /^(?:\s+|\[C\]|at\s|\tat\s)|^\s*[\w./\\@+-]+:-?\d+:|^\s*at\s/;
-const LOCATION_PATTERN = /(?:^|[\s("'<[])((?:[A-Za-z0-9_@+~-]|[./\\](?![/\\]))*[A-Za-z0-9_](?:\.[A-Za-z0-9_]+)*):(\d+)(?::(\d+))?/g;
+const LOCATION_PATTERN =
+  /(?:^|[\s("'<[])((?:[A-Za-z0-9_@+~-]|[./\\](?![/\\]))*[A-Za-z0-9_](?:\.[A-Za-z0-9_]+)*):(\d+)(?::(\d+))?/g;
 
 /** True when the line looks like a stack frame rather than a fresh message. */
 export function isStackFrameLine(line) {

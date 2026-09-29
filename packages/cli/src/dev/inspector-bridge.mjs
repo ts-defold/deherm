@@ -4,11 +4,7 @@ import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 
 import WebSocket, { WebSocketServer } from "ws";
 
-import {
-  createInspectorSession,
-  removeOwnedInspectorSession,
-  writeInspectorSession
-} from "./inspector-session.mjs";
+import { createInspectorSession, removeOwnedInspectorSession, writeInspectorSession } from "./inspector-session.mjs";
 
 const maximumMessageBytes = 4 * 1024 * 1024;
 const componentSnapshotChannel = "deherm-dev-v1";
@@ -134,7 +130,7 @@ export async function createInspectorBridge(options = {}) {
       url: "deherm://runtime",
       attached: frontendSocket?.readyState === WebSocket.OPEN,
       webSocketDebuggerUrl: websocket,
-      devtoolsFrontendUrl: `/devtools/inspector.html?ws=127.0.0.1:${devtoolsPort}/devtools/page/deherm`
+      devtoolsFrontendUrl: `/devtools/inspector.html?ws=127.0.0.1:${devtoolsPort}/devtools/page/deherm`,
     };
   };
   const httpServer = http.createServer((request, response) => {
@@ -149,21 +145,23 @@ export async function createInspectorBridge(options = {}) {
         response.writeHead(401, {
           "cache-control": "no-store",
           "content-type": "text/plain; charset=utf-8",
-          "www-authenticate": "Bearer"
+          "www-authenticate": "Bearer",
         });
         response.end("Unauthorized\n");
         return;
       }
-      const body = JSON.stringify(options.getDevState?.() ?? {
-        schemaVersion: 1,
-        kind: "deherm-dev-state",
-        modelVersion: 0,
-        targets: []
-      });
+      const body = JSON.stringify(
+        options.getDevState?.() ?? {
+          schemaVersion: 1,
+          kind: "deherm-dev-state",
+          modelVersion: 0,
+          targets: [],
+        },
+      );
       const etag = `"${createHash("sha256").update(body).digest("base64url")}"`;
       const headers = {
         "cache-control": "no-store",
-        etag
+        etag,
       };
       if (request.headers["if-none-match"] === etag) {
         response.writeHead(304, headers);
@@ -173,18 +171,19 @@ export async function createInspectorBridge(options = {}) {
       response.writeHead(200, {
         ...headers,
         "content-type": "application/json; charset=utf-8",
-        "content-length": Buffer.byteLength(body)
+        "content-length": Buffer.byteLength(body),
       });
       response.end(body);
       return;
     }
     let body;
     if (pathname === "/json" || pathname === "/json/list") body = JSON.stringify([target()]);
-    else if (pathname === "/json/version") body = JSON.stringify({
-      Browser: "déherm/Hermes",
-      "Protocol-Version": "1.3",
-      webSocketDebuggerUrl: target().webSocketDebuggerUrl
-    });
+    else if (pathname === "/json/version")
+      body = JSON.stringify({
+        Browser: "déherm/Hermes",
+        "Protocol-Version": "1.3",
+        webSocketDebuggerUrl: target().webSocketDebuggerUrl,
+      });
     else {
       response.writeHead(404, { "content-type": "text/plain; charset=utf-8" });
       response.end("Not found\n");
@@ -193,7 +192,7 @@ export async function createInspectorBridge(options = {}) {
     response.writeHead(200, {
       "cache-control": "no-store",
       "content-type": "application/json; charset=utf-8",
-      "content-length": Buffer.byteLength(body)
+      "content-length": Buffer.byteLength(body),
     });
     response.end(body);
   });
@@ -204,7 +203,9 @@ export async function createInspectorBridge(options = {}) {
       socket.destroy();
       return;
     }
-    websocketServer.handleUpgrade(request, socket, head, (client) => websocketServer.emit("connection", client, request));
+    websocketServer.handleUpgrade(request, socket, head, (client) =>
+      websocketServer.emit("connection", client, request),
+    );
   });
   websocketServer.on("connection", (socket, request) => {
     const replace = new URL(request.url ?? "/", "http://127.0.0.1").searchParams.get("replace") === "1";
@@ -238,11 +239,15 @@ export async function createInspectorBridge(options = {}) {
           return;
         }
         let id;
-        try { id = JSON.parse(message)?.id; } catch {}
-        socket.send(JSON.stringify({
-          ...(id === undefined ? {} : { id }),
-          error: { code: -32000, message: "Defold Hermes runtime is not connected" }
-        }));
+        try {
+          id = JSON.parse(message)?.id;
+        } catch {}
+        socket.send(
+          JSON.stringify({
+            ...(id === undefined ? {} : { id }),
+            error: { code: -32000, message: "Defold Hermes runtime is not connected" },
+          }),
+        );
         return;
       }
       if (engineSocket.writableLength + Buffer.byteLength(message) > maximumMessageBytes) {
@@ -291,7 +296,7 @@ export async function createInspectorBridge(options = {}) {
           authToken,
           stateUrl,
           bundleUrl: options.bundleUrl,
-          sourceMapFile: options.sourceMapFile
+          sourceMapFile: options.sourceMapFile,
         })
       : undefined;
     if (session) await writeInspectorSession(options.sessionFile, session);
@@ -325,6 +330,6 @@ export async function createInspectorBridge(options = {}) {
     stateUrl: `${devtoolsUrl}/deherm/dev/v1/snapshot`,
     session,
     sessionFile: options.sessionFile,
-    close
+    close,
   };
 }

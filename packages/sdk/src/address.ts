@@ -2,8 +2,7 @@ declare const defoldUrlBrand: unique symbol;
 declare const defoldRelativeAddressBrand: unique symbol;
 
 /** Authoring spelling accepted by the compile-time hash intrinsic. */
-export type DefoldHashLiteral<Name extends string = string> =
-  Name extends "" ? never : `#${Name}`;
+export type DefoldHashLiteral<Name extends string = string> = Name extends "" ? never : `#${Name}`;
 
 /**
  * A Defold hash in authored TypeScript.
@@ -16,8 +15,7 @@ export type DefoldHash<Name extends string = string> =
   | (bigint & { readonly __dehermHashV1: Name })
   | (DefoldHashLiteral<Name> & { readonly __dehermHashV1?: Name });
 
-type HashLiteralName<Value extends DefoldHashLiteral> =
-  Value extends `#${infer Name}` ? Name : never;
+type HashLiteralName<Value extends DefoldHashLiteral> = Value extends `#${infer Name}` ? Name : never;
 
 /**
  * Compile-time-only Defold hash intrinsic.
@@ -27,7 +25,7 @@ type HashLiteralName<Value extends DefoldHashLiteral> =
  * is not hashed. A dynamic string is deliberately rejected by the type.
  */
 export function hashLiteral<const Value extends DefoldHashLiteral>(
-  _value: Value & (Value extends "#" ? never : unknown)
+  _value: Value & (Value extends "#" ? never : unknown),
 ): DefoldHash<HashLiteralName<Value>> {
   throw new Error("hashLiteral() must be compiled by the deherm ttsc transform");
 }
@@ -48,7 +46,7 @@ export function defoldUrl(
   socket: DefoldHash,
   path: DefoldHash,
   fragment: DefoldHash,
-  reserved: DefoldHash = 0n as DefoldHash
+  reserved: DefoldHash = 0n as DefoldHash,
 ): DefoldUrl {
   return { __dehermUrlV1: true, socket, reserved, path, fragment } as DefoldUrl;
 }
@@ -82,12 +80,13 @@ export type DefoldRelativeAddress<Value extends string = string> = Value & {
 
 export type DefoldAddress = DefoldUrl | DefoldHash | DefoldAddressLiteral | DefoldRelativeAddress;
 
-type WithoutAddressSeparators<Value extends string> =
-  Value extends `${string}:${string}` | `${string}#${string}` ? never : Value;
+type WithoutAddressSeparators<Value extends string> = Value extends `${string}:${string}` | `${string}#${string}`
+  ? never
+  : Value;
 
 /** Mark a bare relative game-object id after statically rejecting URL separators. */
 export function relativeAddress<const Value extends string>(
-  value: Value & WithoutAddressSeparators<Value>
+  value: Value & WithoutAddressSeparators<Value>,
 ): DefoldRelativeAddress<Value> {
   return value as unknown as DefoldRelativeAddress<Value>;
 }

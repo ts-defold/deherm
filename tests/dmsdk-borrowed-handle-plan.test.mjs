@@ -175,8 +175,26 @@ test("lifecycle inference targets exact resource positions instead of every hand
   const expected = new Map([
     ["dmBuffer::Destroy", [[[0, "finalize"]], []]],
     ["dmConditionVariable::Delete", [[[0, "finalize"]], []]],
-    ["dmConnectionPool::Return", [[[0, "borrow"], [1, "release"]], []]],
-    ["dmConnectionPool::Close", [[[0, "borrow"], [1, "release"]], ["connection-closed", "pool-slot-invalidated"]]],
+    [
+      "dmConnectionPool::Return",
+      [
+        [
+          [0, "borrow"],
+          [1, "release"],
+        ],
+        [],
+      ],
+    ],
+    [
+      "dmConnectionPool::Close",
+      [
+        [
+          [0, "borrow"],
+          [1, "release"],
+        ],
+        ["connection-closed", "pool-slot-invalidated"],
+      ],
+    ],
     ["dmImage::DeleteImage", [[[0, "finalize"]], []]],
     ["JobSystemDestroy", [[[0, "finalize"]], []]],
     ["dmMutex::Delete", [[[0, "finalize"]], []]],
@@ -184,7 +202,16 @@ test("lifecycle inference targets exact resource positions instead of every hand
     ["FontCollectionDestroy", [[[0, "finalize"]], []]],
     ["TextLayoutAcquire", [[[0, "retain"]], []]],
     ["TextLayoutRelease", [[[0, "release"]], []]],
-    ["dmGameObject::Delete", [[[0, "borrow"], [1, "finalize"]], []]],
+    [
+      "dmGameObject::Delete",
+      [
+        [
+          [0, "borrow"],
+          [1, "finalize"],
+        ],
+        [],
+      ],
+    ],
     ["dmGameObject::DeleteBones", [[[0, "borrow"]], ["descendant-finalize"]]],
     ["dmGameObject::PropertyContainerDestroy", [[[0, "finalize"]], []]],
     ["dmGameSystem::DestroyRenderConstants", [[[0, "finalize"]], []]],
@@ -192,20 +219,92 @@ test("lifecycle inference targets exact resource positions instead of every hand
     ["dmGraphics::DeleteVertexDeclaration", [[[0, "finalize"]], []]],
     ["dmGraphics::DeleteVertexBuffer", [[[0, "finalize"]], []]],
     ["dmGraphics::DeleteIndexBuffer", [[[0, "finalize"]], []]],
-    ["dmGraphics::DeleteTexture", [[[0, "borrow"], [1, "finalize"]], []]],
-    ["dmGraphics::DeleteRenderTarget", [[[0, "borrow"], [1, "finalize"]], []]],
+    [
+      "dmGraphics::DeleteTexture",
+      [
+        [
+          [0, "borrow"],
+          [1, "finalize"],
+        ],
+        [],
+      ],
+    ],
+    [
+      "dmGraphics::DeleteRenderTarget",
+      [
+        [
+          [0, "borrow"],
+          [1, "finalize"],
+        ],
+        [],
+      ],
+    ],
     ["dmGraphics::DeleteContext", [[[0, "finalize"]], ["owned-descendants-finalized"]]],
     ["dmGraphics::CloseWindow", [[[0, "borrow"]], ["associated-window-closed"]]],
-    ["dmGraphics::DeleteProgram", [[[0, "borrow"], [1, "finalize"]], ["owned-descendants-finalized"]]],
-    ["dmGui::DeleteNode", [[[0, "borrow"], [1, "finalize"]], []]],
+    [
+      "dmGraphics::DeleteProgram",
+      [
+        [
+          [0, "borrow"],
+          [1, "finalize"],
+        ],
+        ["owned-descendants-finalized"],
+      ],
+    ],
+    [
+      "dmGui::DeleteNode",
+      [
+        [
+          [0, "borrow"],
+          [1, "finalize"],
+        ],
+        [],
+      ],
+    ],
     ["WindowDelete", [[[0, "finalize"]], []]],
     ["WindowClose", [[[0, "borrow"]], ["associated-window-closed"]]],
     ["dmRender::DeleteConstant", [[[0, "finalize"]], []]],
     ["dmRender::DeleteNamedConstantBuffer", [[[0, "finalize"]], []]],
-    ["dmRender::DeleteMaterial", [[[0, "borrow"], [1, "finalize"]], []]],
-    ["ResourceDescriptorIncRef", [[[0, "borrow"], [1, "retain"]], []]],
-    ["dmResource::IncRef", [[[0, "borrow"], [1, "retain"]], []]],
-    ["dmResource::FreeResourceType", [[[0, "borrow"], [1, "finalize"]], []]],
+    [
+      "dmRender::DeleteMaterial",
+      [
+        [
+          [0, "borrow"],
+          [1, "finalize"],
+        ],
+        [],
+      ],
+    ],
+    [
+      "ResourceDescriptorIncRef",
+      [
+        [
+          [0, "borrow"],
+          [1, "retain"],
+        ],
+        [],
+      ],
+    ],
+    [
+      "dmResource::IncRef",
+      [
+        [
+          [0, "borrow"],
+          [1, "retain"],
+        ],
+        [],
+      ],
+    ],
+    [
+      "dmResource::FreeResourceType",
+      [
+        [
+          [0, "borrow"],
+          [1, "finalize"],
+        ],
+        [],
+      ],
+    ],
     ["dmRig::DeleteContext", [[[0, "finalize"]], []]],
   ]);
   const actualLeaves = plan.decisions
@@ -279,10 +378,7 @@ test("borrowed-handle plan validation rejects forged ownership and source identi
   assert.throws(() => indexDmSdkBorrowedHandlePlan(forged), /owner differs/u);
   const reordered = structuredClone(plan);
   [reordered.decisions[0], reordered.decisions[1]] = [reordered.decisions[1], reordered.decisions[0]];
-  assert.throws(
-    () => indexDmSdkBorrowedHandlePlan(reordered),
-    /not canonically ordered|selected order is not dense/u,
-  );
+  assert.throws(() => indexDmSdkBorrowedHandlePlan(reordered), /not canonically ordered|selected order is not dense/u);
   const stale = structuredClone(plan);
   stale.sourceHashes.ir = "0".repeat(64);
   assert.throws(() => indexDmSdkBorrowedHandlePlan(stale, inputs), /strict source re-derivation/u);

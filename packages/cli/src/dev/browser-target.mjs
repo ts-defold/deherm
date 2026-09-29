@@ -27,11 +27,7 @@ import path from "node:path";
 
 import { defaultChromeBinary, openBundlePage, waitFor } from "./browser-host.mjs";
 import { parseEngineControlEvent } from "./engine-process.mjs";
-import {
-  createInspectorSession,
-  removeOwnedInspectorSession,
-  writeInspectorSession
-} from "./inspector-session.mjs";
+import { createInspectorSession, removeOwnedInspectorSession, writeInspectorSession } from "./inspector-session.mjs";
 
 export const BROWSER_TARGET_ID = "browser-host";
 
@@ -46,38 +42,44 @@ export const browserCapabilityGaps = Object.freeze([
   Object.freeze({
     name: "hermes-heap",
     available: false,
-    reason: "The browser runtime embeds no Hermes. performance.memory reports the page's JavaScript heap and is shown under its own name."
+    reason:
+      "The browser runtime embeds no Hermes. performance.memory reports the page's JavaScript heap and is shown under its own name.",
   }),
   Object.freeze({
     name: "lua-handles",
     available: false,
-    reason: "The Lua value registry lives inside the Wasm engine and exports no counter to the browser host."
+    reason: "The Lua value registry lives inside the Wasm engine and exports no counter to the browser host.",
   }),
   Object.freeze({
     name: "arena-high-water",
     available: false,
-    reason: "The generated browser value bridge resets per-call arena state and records no high-water mark; adding one is a generator change."
+    reason:
+      "The generated browser value bridge resets per-call arena state and records no high-water mark; adding one is a generator change.",
   }),
   Object.freeze({
     name: "typed-native-transport",
     available: false,
-    reason: "typed-native is a transport of the Hermes runtime; the browser projection lowers every route to direct-memory instead."
+    reason:
+      "typed-native is a transport of the Hermes runtime; the browser projection lowers every route to direct-memory instead.",
   }),
   Object.freeze({
     name: "engine-service-reload",
     available: false,
-    reason: "An HTML5 page exposes no Defold engine service, so a bundle is pushed into the page over CDP rather than posted as a resource reload."
+    reason:
+      "An HTML5 page exposes no Defold engine service, so a bundle is pushed into the page over CDP rather than posted as a resource reload.",
   }),
   Object.freeze({
     name: "wasm-rebuild-in-session",
     available: false,
-    reason: "A wasm-web engine is produced by Bob and Extender, not by this session. A TypeScript edit does not change the engine, so the session reloads the bundle inside the running page; changing the extension or game.project needs a new wasm-web bundle."
+    reason:
+      "A wasm-web engine is produced by Bob and Extender, not by this session. A TypeScript edit does not change the engine, so the session reloads the bundle inside the running page; changing the extension or game.project needs a new wasm-web bundle.",
   }),
   Object.freeze({
     name: "visual-verification",
     available: false,
-    reason: "Nothing here inspects the canvas. The observable surface is the console transcript, page errors, and what the page reports when asked."
-  })
+    reason:
+      "Nothing here inspects the canvas. The observable surface is the console transcript, page errors, and what the page reports when asked.",
+  }),
 ]);
 
 async function newestBundleDirectory(root, index) {
@@ -135,7 +137,7 @@ export async function resolveWebBundle(options) {
     const directory = path.resolve(options.bundleDirectory);
     const direct = await stat(path.join(directory, index)).then(
       (entry) => entry.isFile(),
-      () => false
+      () => false,
     );
     if (direct) return { directory, index, source: "explicit" };
     if (options.allowNestedBundleDirectory) {
@@ -153,7 +155,7 @@ export async function resolveWebBundle(options) {
   // reporting a bundle missing that was sitting on disk the whole time.
   const roots = [
     path.join(path.resolve(options.projectRoot), "build", "bundle"),
-    path.join(path.resolve(options.cwd ?? process.cwd()), "build", "bundle")
+    path.join(path.resolve(options.cwd ?? process.cwd()), "build", "bundle"),
   ];
   const repositoryRoot = findRepositoryRoot(path.resolve(options.projectRoot));
   if (repositoryRoot) {
@@ -166,8 +168,9 @@ export async function resolveWebBundle(options) {
   }
   throw new Error(
     `No packaged HTML5 bundle found under ${roots.join(" or ")}. ` +
-    "Bundle the project for wasm-web first (DEFOLD_HERMES_PLATFORM=wasm-web scripts/bob-local.sh bundle), " +
-    "or pass --web-bundle <directory>.");
+      "Bundle the project for wasm-web first (DEFOLD_HERMES_PLATFORM=wasm-web scripts/bob-local.sh bundle), " +
+      "or pass --web-bundle <directory>.",
+  );
 }
 
 /**
@@ -193,21 +196,28 @@ export function browserTelemetryEvent(id, reported) {
       callbackRoots: available.callbackRoots ?? 0,
       callbackCapacity: available.callbackCapacity ?? 0,
       hermesHeapAvailable: false,
-      ...(typeof available.jsHeapBytes === "number" ? {
-        jsHeapBytes: available.jsHeapBytes,
-        jsHeapSizeBytes: available.jsHeapSizeBytes,
-        jsHeapLimitBytes: available.jsHeapLimitBytes
-      } : {})
+      ...(typeof available.jsHeapBytes === "number"
+        ? {
+            jsHeapBytes: available.jsHeapBytes,
+            jsHeapSizeBytes: available.jsHeapSizeBytes,
+            jsHeapLimitBytes: available.jsHeapLimitBytes,
+          }
+        : {}),
     },
     capabilities: Object.entries(reported.unavailable ?? {})
       .filter(([, reason]) => typeof reason === "string")
-      .map(([name, reason]) => ({ name, available: false, reason }))
+      .map(([name, reason]) => ({ name, available: false, reason })),
   };
 }
 
 export function browserComponentSnapshotEvent(id, connectionEpoch, reported) {
-  if (!reported || reported.schemaVersion !== 1 || reported.type !== "component-snapshot" ||
-      !Array.isArray(reported.instances)) return undefined;
+  if (
+    !reported ||
+    reported.schemaVersion !== 1 ||
+    reported.type !== "component-snapshot" ||
+    !Array.isArray(reported.instances)
+  )
+    return undefined;
   return { ...reported, id, connectionEpoch };
 }
 
@@ -232,18 +242,19 @@ export function createBrowserTarget(options) {
 
   const log = (message, level = "info") => emit({ type: "log", source: "browser", level, message });
 
-  const publishCapabilities = () => emit({
-    type: "target-capabilities",
-    id,
-    capabilities: browserCapabilityGaps.map((gap) => ({ ...gap }))
-  });
+  const publishCapabilities = () =>
+    emit({
+      type: "target-capabilities",
+      id,
+      capabilities: browserCapabilityGaps.map((gap) => ({ ...gap })),
+    });
 
   const onConsole = (line, level) => {
     emit({
       type: "log",
       source: "browser",
       level: level === "error" ? "error" : level === "warning" ? "warn" : "info",
-      message: line
+      message: line,
     });
     // The page logs the same control events the native extension logs, so one
     // parser serves both targets and the console cannot tell a real activation
@@ -267,7 +278,7 @@ export function createBrowserTarget(options) {
               componentSnapshot: typeof dev.componentSnapshot === "function" ? dev.componentSnapshot() : null
             } : null;
           })()`,
-          returnByValue: true
+          returnByValue: true,
         });
         // A CDP response from a page that closed while evaluation was pending
         // must never be relabelled as the replacement page's connection epoch.
@@ -296,7 +307,7 @@ export function createBrowserTarget(options) {
         projectRoot,
         cwd: options.cwd,
         bundleDirectory: options.bundleDirectory,
-        allowNestedBundleDirectory: options.allowNestedBundleDirectory
+        allowNestedBundleDirectory: options.allowNestedBundleDirectory,
       });
       log(`serving ${path.relative(projectRoot, bundle.directory) || bundle.directory}`);
       let openedExited = false;
@@ -320,12 +331,11 @@ export function createBrowserTarget(options) {
           clearInterval(telemetryTimer);
           telemetryTimer = undefined;
           if (opened.inspectorSession) {
-            void removeOwnedInspectorSession(options.sessionFile, opened.inspectorSession.sessionId)
-              .catch(() => {});
+            void removeOwnedInspectorSession(options.sessionFile, opened.inspectorSession.sessionId).catch(() => {});
           }
           emit({ type: "target-disconnected", id, connectionEpoch: openedEpoch });
           emit({ type: "log", source: "browser", message: "browser exited" });
-        }
+        },
       });
       let inspectorSession;
       try {
@@ -337,7 +347,7 @@ export function createBrowserTarget(options) {
               devtoolsUrl: `http://127.0.0.1:${opened.debuggingPort}`,
               websocketUrl: opened.target.webSocketDebuggerUrl,
               bundleUrl: "defold-hermes://app.js",
-              sourceMapFile: options.sourceMapFile
+              sourceMapFile: options.sourceMapFile,
             })
           : undefined;
         if (inspectorSession) await writeInspectorSession(options.sessionFile, inspectorSession);
@@ -352,15 +362,31 @@ export function createBrowserTarget(options) {
       opened.inspectorSession = inspectorSession;
       page = opened;
       openedEpoch = ++connectionEpoch;
-      emit({ type: "target-configured", id, name: `chrome:${opened.server.port}`, url: opened.pageUrl, runtime: "browser" });
-      emit({ type: "target-connected", id, name: `chrome:${opened.server.port}`, url: opened.pageUrl, connectionEpoch: openedEpoch });
+      emit({
+        type: "target-configured",
+        id,
+        name: `chrome:${opened.server.port}`,
+        url: opened.pageUrl,
+        runtime: "browser",
+      });
+      emit({
+        type: "target-connected",
+        id,
+        name: `chrome:${opened.server.port}`,
+        url: opened.pageUrl,
+        connectionEpoch: openedEpoch,
+      });
       publishCapabilities();
       log(`page ${opened.pageUrl} (CDP 127.0.0.1:${opened.debuggingPort}, profile ${opened.profile})`);
       if (inspectorSession) log(`browser inspector session: ${options.sessionFile}`);
-      telemetryTimer = setInterval(() => { void pollTelemetry(); }, options.telemetryIntervalMs ?? 1_000);
+      telemetryTimer = setInterval(() => {
+        void pollTelemetry();
+      }, options.telemetryIntervalMs ?? 1_000);
       telemetryTimer.unref?.();
       return true;
-    })().finally(() => { starting = undefined; });
+    })().finally(() => {
+      starting = undefined;
+    });
     return starting;
   };
 
@@ -373,14 +399,19 @@ export function createBrowserTarget(options) {
     page = undefined;
     clearInterval(telemetryTimer);
     telemetryTimer = undefined;
-    stopping = open.close().then(async () => {
-      if (open.inspectorSession) {
-        await removeOwnedInspectorSession(options.sessionFile, open.inspectorSession.sessionId);
-      }
-      emit({ type: "target-disconnected", id, connectionEpoch: stoppedEpoch });
-      log("browser target stopped; server, profile and browser released");
-      return true;
-    }).finally(() => { stopping = undefined; });
+    stopping = open
+      .close()
+      .then(async () => {
+        if (open.inspectorSession) {
+          await removeOwnedInspectorSession(options.sessionFile, open.inspectorSession.sessionId);
+        }
+        emit({ type: "target-disconnected", id, connectionEpoch: stoppedEpoch });
+        log("browser target stopped; server, profile and browser released");
+        return true;
+      })
+      .finally(() => {
+        stopping = undefined;
+      });
     return stopping;
   };
 
@@ -394,22 +425,26 @@ export function createBrowserTarget(options) {
     if (!page) return { status: "skipped", reason: "no browser target is running" };
     const activePage = page;
     const activeEpoch = connectionEpoch;
-    await waitFor(async () => {
-      if (page !== activePage || connectionEpoch !== activeEpoch) {
-        const error = new Error("browser target changed while waiting for its Defold host");
-        error.fatal = true;
-        throw error;
-      }
-      const readiness = await activePage.client.send("Runtime.evaluate", {
-        expression: "Boolean(globalThis.__defoldHermesDevV1 && typeof globalThis.__defoldHermesDevV1.activate === 'function')",
-        returnByValue: true
-      });
-      return readiness.result?.value === true;
-    }, {
-      timeoutMs: options.hostTimeoutMs ?? 30_000,
-      intervalMs: options.hostPollIntervalMs ?? 50,
-      what: "the Defold browser host"
-    });
+    await waitFor(
+      async () => {
+        if (page !== activePage || connectionEpoch !== activeEpoch) {
+          const error = new Error("browser target changed while waiting for its Defold host");
+          error.fatal = true;
+          throw error;
+        }
+        const readiness = await activePage.client.send("Runtime.evaluate", {
+          expression:
+            "Boolean(globalThis.__defoldHermesDevV1 && typeof globalThis.__defoldHermesDevV1.activate === 'function')",
+          returnByValue: true,
+        });
+        return readiness.result?.value === true;
+      },
+      {
+        timeoutMs: options.hostTimeoutMs ?? 30_000,
+        intervalMs: options.hostPollIntervalMs ?? 50,
+        what: "the Defold browser host",
+      },
+    );
     if (page !== activePage || connectionEpoch !== activeEpoch) {
       const error = new Error("browser target changed before bundle activation");
       error.fatal = true;
@@ -429,22 +464,24 @@ export function createBrowserTarget(options) {
           ? globalThis.__defoldHermesDevV1.activate(${JSON.stringify(source)})
           : { status: "rejected", diagnostic: "browser host is not loaded" }`,
         returnByValue: true,
-        awaitPromise: false
+        awaitPromise: false,
       });
     } catch (error) {
-      if (generation !== undefined) emit({
-        type: "reload-failed",
-        id,
-        generation,
-        diagnostic: error instanceof Error ? error.message : String(error)
-      });
+      if (generation !== undefined)
+        emit({
+          type: "reload-failed",
+          id,
+          generation,
+          diagnostic: error instanceof Error ? error.message : String(error),
+        });
       throw error;
     }
     const value = result.result?.value ?? { status: "rejected", diagnostic: "page returned nothing" };
     ++pushed;
     if (generation !== undefined) {
       if (value.status === "activated") emit({ type: "reload-signalled", id, generation });
-      else emit({ type: "reload-failed", id, generation, diagnostic: value.diagnostic ?? "browser rejected the bundle" });
+      else
+        emit({ type: "reload-failed", id, generation, diagnostic: value.diagnostic ?? "browser rejected the bundle" });
     }
     return value;
   };
@@ -458,6 +495,6 @@ export function createBrowserTarget(options) {
     activate,
     pushCount: () => pushed,
     capabilities: () => browserCapabilityGaps.map((gap) => ({ ...gap })),
-    pageUrl: () => page?.pageUrl
+    pageUrl: () => page?.pageUrl,
   };
 }

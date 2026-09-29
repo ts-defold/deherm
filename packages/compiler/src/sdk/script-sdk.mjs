@@ -28,11 +28,7 @@ function splitTopLevel(value, delimiter) {
 }
 function documentation(value, indent = "") {
   if (!value) return [];
-  return [
-    `${indent}/**`,
-    ...value.split("\n").map((line) => `${indent} *${line ? ` ${line}` : ""}`),
-    `${indent} */`
-  ];
+  return [`${indent}/**`, ...value.split("\n").map((line) => `${indent} *${line ? ` ${line}` : ""}`), `${indent} */`];
 }
 
 function balancedOuter(value, open, close) {
@@ -47,7 +43,10 @@ function balancedOuter(value, open, close) {
 }
 
 function pascal(value) {
-  const words = value.replace(/^defold_(?:api|enum)\./, "").split(/[^A-Za-z0-9]+/).filter(Boolean);
+  const words = value
+    .replace(/^defold_(?:api|enum)\./, "")
+    .split(/[^A-Za-z0-9]+/)
+    .filter(Boolean);
   const joined = words.map((word) => word[0].toUpperCase() + word.slice(1)).join("") || "Anonymous";
   return /^[A-Za-z_$]/.test(joined) ? joined : `_${joined}`;
 }
@@ -95,12 +94,24 @@ export function createTypeRenderer(model) {
     named.delete(primitive);
   }
   const primitives = new Map([
-    ["nil", "null"], ["any", "unknown"], ["boolean", "boolean"], ["bool", "boolean"],
-    ["number", "number"], ["integer", "number"], ["string", "string"], ["void", "void"],
-    ["hash", "DefoldHash"], ["url", "DefoldUrl"], ["table", "Readonly<Record<PropertyKey, unknown>>"],
-    ["function", "(...args: readonly unknown[]) => unknown"], ["userdata", "DefoldOpaque<\"userdata\">"],
+    ["nil", "null"],
+    ["any", "unknown"],
+    ["boolean", "boolean"],
+    ["bool", "boolean"],
+    ["number", "number"],
+    ["integer", "number"],
+    ["string", "string"],
+    ["void", "void"],
+    ["hash", "DefoldHash"],
+    ["url", "DefoldUrl"],
+    ["table", "Readonly<Record<PropertyKey, unknown>>"],
+    ["function", "(...args: readonly unknown[]) => unknown"],
+    ["userdata", 'DefoldOpaque<"userdata">'],
     ["...", "readonly unknown[]"],
-    ["vector3", "Vector3"], ["vector4", "Vector4"], ["quaternion", "Quaternion"], ["matrix4", "Matrix4"]
+    ["vector3", "Vector3"],
+    ["vector4", "Vector4"],
+    ["quaternion", "Quaternion"],
+    ["matrix4", "Matrix4"],
   ]);
 
   function renderObject(value, localNames) {
@@ -174,13 +185,15 @@ export function createTypeRenderer(model) {
     const union = splitTopLevel(value, "|");
     if (union.length > 1) {
       const rendered = [...new Set(union.map((item) => render(item, localNames)))];
-      return rendered.map((item) => item.includes("=>") ? `(${item})` : item).join(" | ");
+      return rendered.map((item) => (item.includes("=>") ? `(${item})` : item)).join(" | ");
     }
     if (value.endsWith("[]")) return `ReadonlyArray<${render(value.slice(0, -2), localNames)}>`;
     if (balancedOuter(value, "(", ")")) {
       const inner = value.slice(1, -1);
       const tuple = splitTopLevel(inner, ",");
-      return tuple.length > 1 ? `readonly [${tuple.map((item) => render(item, localNames)).join(", ")}]` : render(inner, localNames);
+      return tuple.length > 1
+        ? `readonly [${tuple.map((item) => render(item, localNames)).join(", ")}]`
+        : render(inner, localNames);
     }
     if (value.startsWith("table<") && value.endsWith(">")) {
       const args = splitTopLevel(value.slice(6, -1), ",");
@@ -248,15 +261,17 @@ export function buildApiTrees(model) {
 }
 
 function renderParameters(fn, renderType) {
-  return fn.parameters.map((param, index) => {
-    if (param.rawName === "...") return `...args: ${renderType(param.rawType)}[]`;
-    const laterRequired = fn.parameters.slice(index + 1).some((later) => !later.optional && later.rawName !== "...");
-    const optional = param.optional && !laterRequired;
-    const rawUnion = new Set(splitTopLevel(param.rawType, "|"));
-    const rendered = rawUnion.has("string") && rawUnion.has("url") ? "DefoldAddress" : renderType(param.rawType);
-    const type = `${rendered}${param.optional && laterRequired ? " | undefined" : ""}`;
-    return `${parameterName(param.rawName, index)}${optional ? "?" : ""}: ${type}`;
-  }).join(", ");
+  return fn.parameters
+    .map((param, index) => {
+      if (param.rawName === "...") return `...args: ${renderType(param.rawType)}[]`;
+      const laterRequired = fn.parameters.slice(index + 1).some((later) => !later.optional && later.rawName !== "...");
+      const optional = param.optional && !laterRequired;
+      const rawUnion = new Set(splitTopLevel(param.rawType, "|"));
+      const rendered = rawUnion.has("string") && rawUnion.has("url") ? "DefoldAddress" : renderType(param.rawType);
+      const type = `${rendered}${param.optional && laterRequired ? " | undefined" : ""}`;
+      return `${parameterName(param.rawName, index)}${optional ? "?" : ""}: ${type}`;
+    })
+    .join(", ");
 }
 
 function renderReturns(fn, renderType) {
@@ -271,9 +286,8 @@ function renderGenerics(fn, renderType) {
     const separator = value.indexOf(":");
     const rawName = (separator < 0 ? value : value.slice(0, separator)).trim();
     const constraint = separator < 0 ? "unknown" : value.slice(separator + 1).trim();
-    const name = /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(rawName) && !reservedParameterSynonyms.has(rawName)
-      ? rawName
-      : `T${index + 1}`;
+    const name =
+      /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(rawName) && !reservedParameterSynonyms.has(rawName) ? rawName : `T${index + 1}`;
     localNames.set(rawName, name);
     return { name, constraint };
   });
@@ -292,18 +306,23 @@ function renderNodeInterface(node, renderType, indent = "  ") {
   for (const fn of node.functions.sort((a, b) => a.jsName.localeCompare(b.jsName))) {
     const tags = [fn.description];
     if (fn.deprecated) tags.push(`@deprecated ${fn.deprecated}`);
-    for (const [index, param] of fn.parameters.entries()) if (param.description) tags.push(`@param ${parameterName(param.rawName, index)} ${param.description}`);
+    for (const [index, param] of fn.parameters.entries())
+      if (param.description) tags.push(`@param ${parameterName(param.rawName, index)} ${param.description}`);
     if (fn.returnDescriptions.some(Boolean)) tags.push(`@returns ${fn.returnDescriptions.filter(Boolean).join("; ")}`);
     lines.push(...documentation(tags.filter(Boolean).join("\n\n"), indent));
     lines.push(`${indent}readonly ${property(fn.jsName)}: {`);
     for (const overload of fn.overloads) {
       const overloadType = renderType(overload);
       const callable = overloadType.match(/^(\(.*\)) => (.+)$/)?.slice(1);
-      lines.push(`${indent}  ${callable ? `${callable[0]}: ${callable[1]}` : `(...args: readonly unknown[]): ${overloadType}`};`);
+      lines.push(
+        `${indent}  ${callable ? `${callable[0]}: ${callable[1]}` : `(...args: readonly unknown[]): ${overloadType}`};`,
+      );
     }
     const generics = renderGenerics(fn, renderType);
     const localRender = (value) => renderType(value, generics.localNames);
-    lines.push(`${indent}  ${generics.declaration}(${renderParameters(fn, localRender)}): ${renderReturns(fn, localRender)};`);
+    lines.push(
+      `${indent}  ${generics.declaration}(${renderParameters(fn, localRender)}): ${renderReturns(fn, localRender)};`,
+    );
     lines.push(`${indent}};`);
   }
   for (const [name, child] of [...node.children].sort(([left], [right]) => left.localeCompare(right))) {
@@ -334,14 +353,17 @@ function constantLiteral(entry) {
 // unconditional.  An unfamiliar source is deliberately conservative: equal
 // literals from a future optional module must stay on the executable route until
 // its profile scope is identified by the generator.
-function renderNodeValue(rootName, pathSegments, node, interfaceAccess, constantValues, indent = "  ") {
+function renderNodeValue(pathSegments, node, interfaceAccess, constantValues, indent = "  ") {
   const lines = ["{"];
   for (const field of node.fields.sort((a, b) => a.rawName.localeCompare(b.rawName))) {
     const jsName = camel(field.rawName);
     const fullName = `${pathSegments.join(".")}.${field.rawName}`;
     const entry = constantValues.get(fullName);
-    const literal = entry && (entry.state === undefined || entry.state === "inlined") &&
-      entry.profileAvailability?.kind !== "runtime-profile-gated" && constantLiteral(entry);
+    const literal =
+      entry &&
+      (entry.state === undefined || entry.state === "inlined") &&
+      entry.profileAvailability?.kind !== "runtime-profile-gated" &&
+      constantLiteral(entry);
     const value = literal
       ? `return ${literal} as unknown as ${interfaceAccess}[${JSON.stringify(jsName)}];`
       : entry?.state === "runtime-backed" || entry?.state === "profile-unavailable"
@@ -350,11 +372,19 @@ function renderNodeValue(rootName, pathSegments, node, interfaceAccess, constant
     lines.push(`${indent}get ${property(jsName)}() { ${value} },`);
   }
   for (const fn of node.functions.sort((a, b) => a.jsName.localeCompare(b.jsName))) {
-    lines.push(`${indent}${property(fn.jsName)}: ((...args: readonly unknown[]) => callScriptApi(${hexBindingId(fn.stableId).replace(/u$/, "")}, args)) as ${interfaceAccess}[${JSON.stringify(fn.jsName)}],`);
+    lines.push(
+      `${indent}${property(fn.jsName)}: ((...args: readonly unknown[]) => callScriptApi(${hexBindingId(fn.stableId).replace(/u$/, "")}, args)) as ${interfaceAccess}[${JSON.stringify(fn.jsName)}],`,
+    );
   }
   for (const [name, child] of [...node.children].sort(([left], [right]) => left.localeCompare(right))) {
     const jsName = camel(name);
-    const childLines = renderNodeValue(rootName, [...pathSegments, name], child, `${interfaceAccess}[${JSON.stringify(jsName)}]`, constantValues, `${indent}  `);
+    const childLines = renderNodeValue(
+      [...pathSegments, name],
+      child,
+      `${interfaceAccess}[${JSON.stringify(jsName)}]`,
+      constantValues,
+      `${indent}  `,
+    );
     lines.push(`${indent}${property(jsName)}: ${childLines[0]}`);
     lines.push(...childLines.slice(1).map((line) => `${indent}${line}`));
     lines[lines.length - 1] += ",";
@@ -372,47 +402,71 @@ export function generateTypes(model, renderer, trees, semanticHandleTypes) {
     "declare const opaqueBrand: unique symbol;",
     "declare const defoldValueBrand: unique symbol;",
     "export type DefoldOpaque<Name extends string> = { readonly [opaqueBrand]: Name };",
-    "export type Vector3 = Readonly<{ x: number; y: number; z: number; readonly [defoldValueBrand]: \"vector3\" }>;",
-    "export type Vector4 = Readonly<{ x: number; y: number; z: number; w: number; readonly [defoldValueBrand]: \"vector4\" }>;",
-    "export type Quaternion = Readonly<{ x: number; y: number; z: number; w: number; readonly [defoldValueBrand]: \"quaternion\" }>;",
+    'export type Vector3 = Readonly<{ x: number; y: number; z: number; readonly [defoldValueBrand]: "vector3" }>;',
+    'export type Vector4 = Readonly<{ x: number; y: number; z: number; w: number; readonly [defoldValueBrand]: "vector4" }>;',
+    'export type Quaternion = Readonly<{ x: number; y: number; z: number; w: number; readonly [defoldValueBrand]: "quaternion" }>;',
     "export type Matrix4 = readonly [number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number];",
-    ""
+    "",
   ];
   for (const item of [...model.enums].sort((a, b) => a.name.localeCompare(b.name))) {
     const name = renderer.named.get(item.name);
-    if (name) lines.push(...documentation(item.description), `export type ${name} = ${renderer.render(item.rawType)} & DefoldOpaque<${JSON.stringify(item.name)}>;`);
+    if (name)
+      lines.push(
+        ...documentation(item.description),
+        `export type ${name} = ${renderer.render(item.rawType)} & DefoldOpaque<${JSON.stringify(item.name)}>;`,
+      );
   }
   for (const item of [...model.aliases].sort((a, b) => a.name.localeCompare(b.name))) {
     const name = renderer.named.get(item.name);
     const semanticKind = semanticHandleTypes.get(item.name);
-    if (name) lines.push(...documentation(item.description), `export type ${name} = ${semanticKind ? `DefoldHandle<${JSON.stringify(semanticKind)}>` : renderer.render(item.rawType)};`);
+    if (name)
+      lines.push(
+        ...documentation(item.description),
+        `export type ${name} = ${semanticKind ? `DefoldHandle<${JSON.stringify(semanticKind)}>` : renderer.render(item.rawType)};`,
+      );
   }
-  for (const item of model.classes.filter((value) => !value.name.startsWith("defold_api.")).sort((a, b) => a.name.localeCompare(b.name))) {
+  for (const item of model.classes
+    .filter((value) => !value.name.startsWith("defold_api."))
+    .sort((a, b) => a.name.localeCompare(b.name))) {
     const name = renderer.named.get(item.name);
     if (!name) continue;
     lines.push(...documentation(item.description), `export interface ${name} {`);
     if (!item.fields.length) lines.push(`  readonly __type?: ${JSON.stringify(item.name)};`);
     const fields = new Map();
     for (const field of item.fields) fields.set(camel(field.rawName), field);
-    for (const field of fields.values()) lines.push(...documentation(field.description, "  "), `  ${fieldDeclaration(field, renderer.render)}`);
+    for (const field of fields.values())
+      lines.push(...documentation(field.description, "  "), `  ${fieldDeclaration(field, renderer.render)}`);
     lines.push("}");
   }
   lines.push("");
   for (const [rootName, node] of [...trees].sort(([left], [right]) => left.localeCompare(right))) {
     const interfaceName = `${pascal(rootName)}Api`;
     const rendered = renderNodeInterface(node, renderer.render);
-    lines.push(...documentation(node.description), `export interface ${interfaceName} ${rendered[0]}`, ...rendered.slice(1), "");
+    lines.push(
+      ...documentation(node.description),
+      `export interface ${interfaceName} ${rendered[0]}`,
+      ...rendered.slice(1),
+      "",
+    );
   }
   return `${lines.join("\n").trimEnd()}\n`;
 }
 
 export function generateModules(trees, constantValues = new Map()) {
-  const lines = [banner, 'import { callScriptApi, failScriptApiConstant } from "./runtime";', 'import type * as Types from "./types";', ""];
+  const lines = [
+    banner,
+    'import { callScriptApi, failScriptApiConstant } from "./runtime";',
+    'import type * as Types from "./types";',
+    "",
+  ];
   for (const [rootName, node] of [...trees].sort(([left], [right]) => left.localeCompare(right))) {
     const interfaceName = `${pascal(rootName)}Api`;
     const rawRootName = rawScriptRootName(rootName);
-    const rendered = renderNodeValue(rootName, [rawRootName], node, `Types.${interfaceName}`, constantValues);
-    lines.push(`export const ${property(camel(rootName))}: Types.${interfaceName} = ${rendered[0]}`, ...rendered.slice(1));
+    const rendered = renderNodeValue([rawRootName], node, `Types.${interfaceName}`, constantValues);
+    lines.push(
+      `export const ${property(camel(rootName))}: Types.${interfaceName} = ${rendered[0]}`,
+      ...rendered.slice(1),
+    );
     lines[lines.length - 1] += ";";
     lines.push("");
   }

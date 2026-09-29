@@ -6,29 +6,30 @@ function requireCount(value, label) {
 }
 
 export function validateNativeValueProbeReport(report, bindingReport) {
-  if (!report || report.target !== "arm64-macos-dynamic-hermes" ||
-      !bindingReport || !Array.isArray(bindingReport.bindings) ||
-      !Array.isArray(report.probes) || !Array.isArray(report.plannedProbes)) {
+  if (
+    !report ||
+    report.target !== "arm64-macos-dynamic-hermes" ||
+    !bindingReport ||
+    !Array.isArray(bindingReport.bindings) ||
+    !Array.isArray(report.probes) ||
+    !Array.isArray(report.plannedProbes)
+  ) {
     throw new Error("Invalid native value probe report shape");
   }
 
   const bindingCount = requireCount(bindingReport.bindingCount, "bindingCount");
   const probeCount = requireCount(report.probeCount, "probeCount");
-  const plannedFamilyProbeCount = requireCount(
-    report.plannedFamilyProbeCount,
-    "plannedFamilyProbeCount"
-  );
-  const routeDispositionCount = requireCount(
-    report.routeDispositionCount,
-    "routeDispositionCount"
-  );
+  const plannedFamilyProbeCount = requireCount(report.plannedFamilyProbeCount, "plannedFamilyProbeCount");
+  const routeDispositionCount = requireCount(report.routeDispositionCount, "routeDispositionCount");
   const uniqueBindingCount = requireCount(report.uniqueBindingCount, "uniqueBindingCount");
 
-  if (bindingCount !== bindingReport.bindings.length ||
-      uniqueBindingCount !== bindingCount ||
-      probeCount !== report.probes.length ||
-      plannedFamilyProbeCount !== report.plannedProbes.length ||
-      probeCount + plannedFamilyProbeCount !== routeDispositionCount) {
+  if (
+    bindingCount !== bindingReport.bindings.length ||
+    uniqueBindingCount !== bindingCount ||
+    probeCount !== report.probes.length ||
+    plannedFamilyProbeCount !== report.plannedProbes.length ||
+    probeCount + plannedFamilyProbeCount !== routeDispositionCount
+  ) {
     throw new Error("Native value probe counts do not account for every generated binding");
   }
 
@@ -49,8 +50,7 @@ export function validateNativeValueProbeReport(report, bindingReport) {
     if (probe.state !== "instrumented" && probe.state !== "planned") {
       throw new Error(`Unknown emitted probe state for ${probe.id}: ${probe.state}`);
     }
-    if (probe.state === "instrumented" &&
-        (typeof probe.expectedMarker !== "string" || !probe.expectedMarker)) {
+    if (probe.state === "instrumented" && (typeof probe.expectedMarker !== "string" || !probe.expectedMarker)) {
       throw new Error(`Instrumented probe ${probe.id} has no expected marker`);
     }
   }

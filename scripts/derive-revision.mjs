@@ -45,7 +45,19 @@
 
 import { createHash } from "node:crypto";
 import { execFile } from "node:child_process";
-import { copyFile, lstat, mkdir, mkdtemp, readFile, readdir, readlink, rm, stat, symlink, writeFile } from "node:fs/promises";
+import {
+  copyFile,
+  lstat,
+  mkdir,
+  mkdtemp,
+  readFile,
+  readdir,
+  readlink,
+  rm,
+  stat,
+  symlink,
+  writeFile,
+} from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -55,7 +67,7 @@ import {
   generatedScriptArtifacts,
   luaRegistrationSurfaceGenerator,
   resourceNamespaceGenerator,
-  apiPolicyGenerator
+  apiPolicyGenerator,
 } from "./lib/script-generator-pipeline.mjs";
 import { generatedDmSdkArtifacts } from "./lib/dmsdk-generator-pipeline.mjs";
 import { generatedBundleTargetArtifacts } from "./generate-defold-bundle-targets.mjs";
@@ -64,7 +76,7 @@ import { auditReviewedEvidence } from "./lib/reviewed-evidence.mjs";
 import {
   makeRevisionWorkspaceMetadata,
   revisionProducerInputIdentity,
-  writeRevisionWorkspaceMetadata
+  writeRevisionWorkspaceMetadata,
 } from "./lib/revision-workspace-metadata.mjs";
 
 const execFileAsync = promisify(execFile);
@@ -96,7 +108,7 @@ export const derivationSteps = Object.freeze([
   Object.freeze({ runtime: "node", script: "scripts/generate-typed-native-bridge.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-script-recording-engine.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-api-policy.mjs", args: ["--prune"] }),
-  Object.freeze({ runtime: "node", script: "scripts/generate-api-policy.mjs", args: ["--check"] })
+  Object.freeze({ runtime: "node", script: "scripts/generate-api-policy.mjs", args: ["--check"] }),
 ]);
 
 /**
@@ -108,7 +120,7 @@ export const derivationSteps = Object.freeze([
  * the revision being derived, never from the repository's pinned revision.
  */
 export const revisionSupportSteps = Object.freeze([
-  Object.freeze({ runtime: "bash", script: "scripts/bootstrap-upstreams.sh", args: ["defold-sdk"] })
+  Object.freeze({ runtime: "bash", script: "scripts/bootstrap-upstreams.sh", args: ["defold-sdk"] }),
 ]);
 
 /**
@@ -127,7 +139,7 @@ export const enginePaths = Object.freeze([
   "share/extender/variants",
   "com.dynamo.cr/com.dynamo.cr.bob/src",
   "editor/test/resources/test_project/app_manifest",
-  "packages"
+  "packages",
 ]);
 
 /**
@@ -148,14 +160,14 @@ export const derivedSurfaceRoots = Object.freeze([
   "defold/defold_hermes/lib/web",
   "examples/runtime-smoke/src/generated",
   "tests/fixtures",
-  ".agents/docs/research"
+  ".agents/docs/research",
 ]);
 
 /** Documentation the importers own outright, beside the registries' artifact lists. */
 const generatedDocumentation = Object.freeze([
   ".agents/docs/research/sdk-coverage.md",
   ".agents/docs/research/script-api-coverage.md",
-  ".agents/docs/research/script-table-tuple-schema-classification.md"
+  ".agents/docs/research/script-table-tuple-schema-classification.md",
 ]);
 
 /**
@@ -176,14 +188,16 @@ export function ownedArtifactPaths() {
     ...generatedDmSdkArtifacts,
     ...luaRegistrationSurfaceGenerator.artifacts,
     ...resourceNamespaceGenerator.artifacts,
-    ...apiPolicyGenerator.artifacts
+    ...apiPolicyGenerator.artifacts,
   ]);
 }
 
 function isOwned(relativePath, owned) {
-  return owned.has(relativePath) ||
+  return (
+    owned.has(relativePath) ||
     relativePath.startsWith("packages/bindings/generated/") ||
-    relativePath.startsWith("packages/sdk/src/generated/");
+    relativePath.startsWith("packages/sdk/src/generated/")
+  );
 }
 
 // ── Fingerprinting the committed surface ────────────────────────────────────
@@ -198,9 +212,9 @@ async function walk(base, relative = "") {
     throw error;
   }
   const files = [];
-  for (const entry of entries.sort((left, right) => left.name < right.name ? -1 : 1)) {
+  for (const entry of entries.sort((left, right) => (left.name < right.name ? -1 : 1))) {
     const child = relative ? `${relative}/${entry.name}` : entry.name;
-    if (entry.isDirectory()) files.push(...await walk(base, child));
+    if (entry.isDirectory()) files.push(...(await walk(base, child)));
     else if (entry.isFile()) files.push(child);
   }
   return files;
@@ -216,8 +230,9 @@ async function walk(base, relative = "") {
  */
 export async function ignoredSurfacePaths(sourceRoot) {
   const { stdout } = await run(
-    "git", ["ls-files", "-z", "--others", "--ignored", "--exclude-standard", "--", ...derivedSurfaceRoots],
-    { cwd: sourceRoot }
+    "git",
+    ["ls-files", "-z", "--others", "--ignored", "--exclude-standard", "--", ...derivedSurfaceRoots],
+    { cwd: sourceRoot },
   );
   return new Set(stdout.split("\0").filter(Boolean));
 }
@@ -227,7 +242,12 @@ export async function surfaceFingerprint(treeRoot, ignored = new Set()) {
   const files = new Map();
   const record = async (file) => {
     if (ignored.has(file)) return;
-    files.set(file, createHash("sha256").update(await readFile(path.join(treeRoot, file))).digest("hex"));
+    files.set(
+      file,
+      createHash("sha256")
+        .update(await readFile(path.join(treeRoot, file)))
+        .digest("hex"),
+    );
   };
   for (const entry of derivedSurfaceRoots) {
     const absolute = path.join(treeRoot, entry);
@@ -244,7 +264,7 @@ export async function surfaceFingerprint(treeRoot, ignored = new Set()) {
     }
     for (const relative of await walk(absolute)) await record(`${entry}/${relative}`);
   }
-  const sorted = [...files].sort(([left], [right]) => left < right ? -1 : 1);
+  const sorted = [...files].sort(([left], [right]) => (left < right ? -1 : 1));
   const digest = createHash("sha256");
   for (const [file, hash] of sorted) digest.update(file).update("\0").update(hash).update("\0");
   return { files: new Map(sorted), root: `sha256:${digest.digest("hex")}` };
@@ -260,7 +280,7 @@ export function fingerprintDifference(before, after) {
   for (const file of before.files.keys()) {
     if (!after.files.has(file)) changed.push({ file, disposition: "removed" });
   }
-  return changed.sort((left, right) => left.file < right.file ? -1 : 1);
+  return changed.sort((left, right) => (left.file < right.file ? -1 : 1));
 }
 
 // ── The workspace ───────────────────────────────────────────────────────────
@@ -282,9 +302,9 @@ export async function materializeWorkspace({ sourceRoot, workspace }) {
   // Tracked files plus anything new that is not ignored - the set a commit would
   // carry. A derivation must exercise the generator change being written, and a
   // new generator library is untracked until the moment it is committed.
-  const { stdout } = await run(
-    "git", ["ls-files", "-z", "--cached", "--others", "--exclude-standard"], { cwd: sourceRoot }
-  );
+  const { stdout } = await run("git", ["ls-files", "-z", "--cached", "--others", "--exclude-standard"], {
+    cwd: sourceRoot,
+  });
   const files = stdout.split("\0").filter(Boolean);
   const directories = new Set();
   for (const file of files) {
@@ -432,7 +452,7 @@ export async function deriveRevision(options) {
     carryReviews = false,
     auditOnly = false,
     adopt = false,
-    onProgress = () => {}
+    onProgress = () => {},
   } = options;
   if (!isDefoldRevision(revision)) throw new Error(`Not a Defold revision: ${revision}`);
 
@@ -448,10 +468,14 @@ export async function deriveRevision(options) {
   onProgress(`materialising ${path.relative(sourceRoot, workspace) || workspace}`);
   const fileCount = await materializeWorkspace({ sourceRoot, workspace });
   const producerInputAfterCopy = await revisionProducerInputIdentity(sourceRoot);
-  if (fileCount !== producerInput.fileCount ||
-      producerInputAfterCopy.sha256 !== producerInput.sha256 ||
-      producerInputAfterCopy.fileCount !== producerInput.fileCount) {
-    throw new Error("The producer input tree changed while the revision workspace was being materialised; retry from a stable checkout");
+  if (
+    fileCount !== producerInput.fileCount ||
+    producerInputAfterCopy.sha256 !== producerInput.sha256 ||
+    producerInputAfterCopy.fileCount !== producerInput.fileCount
+  ) {
+    throw new Error(
+      "The producer input tree changed while the revision workspace was being materialised; retry from a stable checkout",
+    );
   }
 
   // Repin FIRST: the engine slice's reference archive is verified against the
@@ -520,11 +544,14 @@ export async function deriveRevision(options) {
     }
   }
 
-  const carried = (await readFile(ledger, "utf8")).split("\n").filter(Boolean).map((line) => JSON.parse(line));
+  const carried = (await readFile(ledger, "utf8"))
+    .split("\n")
+    .filter(Boolean)
+    .map((line) => JSON.parse(line));
   let manifest = null;
   if (!blocker && !auditOnly) {
     manifest = JSON.parse(
-      await readFile(path.join(workspace, "packages/bindings/generated/defold-api-policy.json"), "utf8")
+      await readFile(path.join(workspace, "packages/bindings/generated/defold-api-policy.json"), "utf8"),
     );
     if (manifest.defoldRevision !== revision) {
       throw new Error(`The derived policy manifest names ${manifest.defoldRevision}, not ${revision}`);
@@ -538,9 +565,9 @@ export async function deriveRevision(options) {
   if (disturbed.length) {
     throw new Error(
       `The committed surface of ${pinned} moved while ${revision} was being derived:\n` +
-      disturbed.map(({ file, disposition }) => `  ${disposition} ${file}`).join("\n") +
-      "\nA derivation must never write into this checkout. If nothing else was editing the tree, " +
-      "a generator in the chain addressed a repository path instead of the workspace."
+        disturbed.map(({ file, disposition }) => `  ${disposition} ${file}`).join("\n") +
+        "\nA derivation must never write into this checkout. If nothing else was editing the tree, " +
+        "a generator in the chain addressed a repository path instead of the workspace.",
     );
   }
 
@@ -551,8 +578,8 @@ export async function deriveRevision(options) {
   if (unowned.length) {
     throw new Error(
       "The derivation changed files that no ownership registry declares:\n" +
-      unowned.map(({ file, disposition }) => `  ${disposition} ${file}`).join("\n") +
-      "\nRegister them with their generator, or stop writing them."
+        unowned.map(({ file, disposition }) => `  ${disposition} ${file}`).join("\n") +
+        "\nRegister them with their generator, or stop writing them.",
     );
   }
 
@@ -572,13 +599,16 @@ export async function deriveRevision(options) {
   }
 
   if (!blocker && !auditOnly) {
-    await writeRevisionWorkspaceMetadata(workspace, makeRevisionWorkspaceMetadata({
-      revision,
-      producerInput,
-      packageVersion,
-      policyRoot: manifest.policyRoot,
-      generator: manifest.generator
-    }));
+    await writeRevisionWorkspaceMetadata(
+      workspace,
+      makeRevisionWorkspaceMetadata({
+        revision,
+        producerInput,
+        packageVersion,
+        policyRoot: manifest.policyRoot,
+        generator: manifest.generator,
+      }),
+    );
   }
 
   return {
@@ -595,7 +625,7 @@ export async function deriveRevision(options) {
       fileCount: evidence.fileCount,
       driftedCount: evidence.drifted.length,
       driftedByInput: evidence.driftedByInput,
-      drifted: evidence.drifted
+      drifted: evidence.drifted,
     },
     carriedReviews: carried,
     policyRoot: manifest?.policyRoot ?? null,
@@ -605,7 +635,7 @@ export async function deriveRevision(options) {
     committedSurfaceRoot: before.root,
     committedSurfaceUnchanged: true,
     changed,
-    adopted
+    adopted,
   };
 }
 
@@ -613,8 +643,14 @@ export async function deriveRevision(options) {
 
 function parseArguments(argv) {
   const options = {
-    revision: null, workspace: null, upstreamFrom: null,
-    carryReviews: false, auditOnly: false, adopt: false, clean: false, json: false
+    revision: null,
+    workspace: null,
+    upstreamFrom: null,
+    carryReviews: false,
+    auditOnly: false,
+    adopt: false,
+    clean: false,
+    json: false,
   };
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
@@ -635,8 +671,10 @@ function parseArguments(argv) {
     else throw new Error(`Unknown argument: ${argument}`);
   }
   if (!options.revision) {
-    throw new Error("Usage: derive-revision.mjs --revision <sha> [--workspace <dir>] [--upstream-from <dir>] " +
-      "[--carry-reviews] [--audit-only] [--adopt] [--clean] [--json]");
+    throw new Error(
+      "Usage: derive-revision.mjs --revision <sha> [--workspace <dir>] [--upstream-from <dir>] " +
+        "[--carry-reviews] [--audit-only] [--adopt] [--clean] [--json]",
+    );
   }
   return options;
 }
@@ -649,12 +687,16 @@ async function main(argv = process.argv.slice(2)) {
   const report = await deriveRevision({
     ...options,
     workspace,
-    onProgress: (message) => { if (!options.json) console.log(`  ${message}`); }
+    onProgress: (message) => {
+      if (!options.json) console.log(`  ${message}`);
+    },
   });
   if (options.clean) await rm(workspace, { recursive: true, force: true });
 
   if (options.json) {
-    console.log(JSON.stringify({ ...report, steps: report.steps.map(({ stdout: _o, stderr: _e, ...row }) => row) }, null, 2));
+    console.log(
+      JSON.stringify({ ...report, steps: report.steps.map(({ stdout: _o, stderr: _e, ...row }) => row) }, null, 2),
+    );
     if (report.status === "blocked") process.exitCode = 1;
     return;
   }
@@ -665,19 +707,25 @@ async function main(argv = process.argv.slice(2)) {
   console.log("");
 
   const evidence = report.reviewedEvidence;
-  console.log(`Reviewed evidence at ${report.revision}: ` +
-    `${evidence.claimCount - evidence.driftedCount}/${evidence.claimCount} claims hold ` +
-    `across ${evidence.fileCount} pinned Defold sources.`);
+  console.log(
+    `Reviewed evidence at ${report.revision}: ` +
+      `${evidence.claimCount - evidence.driftedCount}/${evidence.claimCount} claims hold ` +
+      `across ${evidence.fileCount} pinned Defold sources.`,
+  );
   if (evidence.driftedCount) {
     for (const [input, count] of Object.entries(evidence.driftedByInput)) {
       const rows = evidence.drifted.filter((row) => row.input === input);
       const moved = rows.filter((row) => row.status === "moved").length;
       const withdrawn = rows.filter((row) => row.status === "void");
-      console.log(`  ${count} in ${input}` +
-        (moved ? `, ${moved} moved with every reviewed anchor intact (entry still applies)` : "") +
-        (withdrawn.length ? `, ${withdrawn.length} WITHDRAWN for this revision` : ""));
+      console.log(
+        `  ${count} in ${input}` +
+          (moved ? `, ${moved} moved with every reviewed anchor intact (entry still applies)` : "") +
+          (withdrawn.length ? `, ${withdrawn.length} WITHDRAWN for this revision` : ""),
+      );
       for (const row of withdrawn) {
-        console.log(`      ${row.id ?? row.file} - ${row.reason === "absent" ? "source absent at this revision" : `lost ${row.anchorsLost.length} reviewed anchor(s)`}`);
+        console.log(
+          `      ${row.id ?? row.file} - ${row.reason === "absent" ? "source absent at this revision" : `lost ${row.anchorsLost.length} reviewed anchor(s)`}`,
+        );
       }
     }
   }
@@ -685,17 +733,24 @@ async function main(argv = process.argv.slice(2)) {
 
   if (report.status === "derived") {
     console.log(`Derived Defold ${report.revision} -> policy ${report.policyRoot.slice(0, 12)}`);
-    console.log(`  ${report.counts.namespaces} namespaces, ${report.counts.subtrees} subtrees, ` +
-      `${report.counts.indexEntries} index entries`);
+    console.log(
+      `  ${report.counts.namespaces} namespaces, ${report.counts.subtrees} subtrees, ` +
+        `${report.counts.indexEntries} index entries`,
+    );
     console.log(`  ${report.changed.length} generated files differ from the pinned surface`);
   } else if (report.status === "audited") {
     console.log(`Audited Defold ${report.revision}; no generator was run.`);
   } else {
     console.log(`Defold ${report.revision} is NOT derivable from this checkout.`);
-    console.log(`  blocked by ${report.blocker.kind}` +
-      (report.blocker.step ? ` at ${report.blocker.step}` : "") + `: ${report.blocker.message}`);
+    console.log(
+      `  blocked by ${report.blocker.kind}` +
+        (report.blocker.step ? ` at ${report.blocker.step}` : "") +
+        `: ${report.blocker.message}`,
+    );
   }
-  console.log(`  committed surface of ${report.pinnedRevision} unchanged (${report.committedSurfaceRoot.slice(0, 19)})`);
+  console.log(
+    `  committed surface of ${report.pinnedRevision} unchanged (${report.committedSurfaceRoot.slice(0, 19)})`,
+  );
   if (report.carriedReviews.length) {
     console.log(`  ${report.carriedReviews.length} reviewed inputs were CARRIED forward and must be re-reviewed:`);
     for (const row of report.carriedReviews) {

@@ -9,35 +9,53 @@ import vm from "node:vm";
 
 import { deriveBundleTargets, derivePlatformPairs } from "../scripts/generate-defold-bundle-targets.mjs";
 import { main as selectProjectNativeArtifact } from "../scripts/check-project-native-artifact.mjs";
-import { hostCompilerKey, inspectHostCompilers, hostCompilerReport, requireHostCompilers, requireHostTool } from "../packages/cli/src/host-compilers.mjs";
+import {
+  hostCompilerKey,
+  inspectHostCompilers,
+  hostCompilerReport,
+  requireHostCompilers,
+  requireHostTool,
+} from "../packages/cli/src/host-compilers.mjs";
 import { resolveDefoldSurface } from "../packages/cli/src/defold-surface.mjs";
 import {
   assertProjectNativeArtifact,
   ensureProjectNativeArtifact,
   nativeArtifactReport,
-  resolveDefoldPlatform
+  resolveDefoldPlatform,
 } from "../packages/cli/src/toolchains.mjs";
 import { buildArtifactReferences } from "../packages/generator/src/policy/generate-api-policy.mjs";
-import { dehermPluginManifest, transformCompilerIdentity, transformProject } from "../packages/cli/src/transform-compiler.mjs";
+import {
+  dehermPluginManifest,
+  transformCompilerIdentity,
+  transformProject,
+} from "../packages/cli/src/transform-compiler.mjs";
 
 const repositoryRoot = path.resolve(import.meta.dirname, "..");
 const knownTargetStatuses = new Set(["vendored", "vendored-source", "required-missing", "blocked", "retired-upstream"]);
 
 const policyManifest = await readJson("packages/bindings/generated/defold-api-policy.json");
-const policyToolchain = (await resolveDefoldSurface(policyManifest.defoldRevision, { packageRoot: repositoryRoot })).toolchain;
+const policyToolchain = (await resolveDefoldSurface(policyManifest.defoldRevision, { packageRoot: repositoryRoot }))
+  .toolchain;
 const artifactDocument = {
   schemaVersion: 1,
   kind: "deherm.policy.artifacts",
   defoldRevision: policyManifest.defoldRevision,
-  artifacts: await buildArtifactReferences()
+  artifacts: await buildArtifactReferences(),
 };
 
 async function writeProjectLock(root) {
-  await writeFile(path.join(root, "deherm.lock"), `${JSON.stringify({
-    defoldRevision: policyManifest.defoldRevision,
-    toolchain: policyToolchain,
-    artifacts: artifactDocument
-  }, null, 2)}\n`);
+  await writeFile(
+    path.join(root, "deherm.lock"),
+    `${JSON.stringify(
+      {
+        defoldRevision: policyManifest.defoldRevision,
+        toolchain: policyToolchain,
+        artifacts: artifactDocument,
+      },
+      null,
+      2,
+    )}\n`,
+  );
 }
 
 async function readJson(relative) {
@@ -54,15 +72,23 @@ test("the bundle target list is derived from the pinned Defold sources, not hand
   // future Defold release from quietly reclassifying one as the other.
   for (const entry of generated.targets) assert.match(entry.target, /-/);
   for (const group of generated.groups) assert.equal(group.includes("-"), false);
-  assert.ok(generated.targets.some((entry) => entry.group === "android"), "Android must be derived, not omitted");
-  assert.ok(generated.targets.some((entry) => entry.group === "ios"), "iOS must be derived, not omitted");
+  assert.ok(
+    generated.targets.some((entry) => entry.group === "android"),
+    "Android must be derived, not omitted",
+  );
+  assert.ok(
+    generated.targets.some((entry) => entry.group === "ios"),
+    "iOS must be derived, not omitted",
+  );
 });
 
 test("Bob and Extender platform identities are derived from Defold Platform.java", async () => {
   const generated = await readJson("packages/toolchains/defold-platform-pairs.json");
   assert.deepEqual(generated, await derivePlatformPairs());
   assert.deepEqual(policyToolchain.targetMatrix.platformPairs, generated.platforms);
-  assert.ok(policyToolchain.targetMatrix.targets.some(({ target, kind }) => target === "x86-osx" && kind === "retired"));
+  assert.ok(
+    policyToolchain.targetMatrix.targets.some(({ target, kind }) => target === "x86-osx" && kind === "retired"),
+  );
 });
 
 test("a generated project resolves Bob and Extender identities from its authenticated target matrix", async () => {
@@ -85,10 +111,7 @@ test("browser-host sources select debug telemetry and compile it out of release"
   const project = await mkdtemp(path.join(tmpdir(), "deherm-web-artifact."));
   try {
     await writeProjectLock(project);
-    const relatives = [
-      "defold_hermes/lib/web/component_bridge.js",
-      "defold_hermes/lib/web/library_defold_hermes.js"
-    ];
+    const relatives = ["defold_hermes/lib/web/component_bridge.js", "defold_hermes/lib/web/library_defold_hermes.js"];
     for (const relative of relatives) {
       await mkdir(path.join(project, path.dirname(relative)), { recursive: true });
       await copyFile(path.join(repositoryRoot, "defold", relative), path.join(project, relative));
@@ -115,7 +138,8 @@ test("browser-host sources select debug telemetry and compile it out of release"
     await writeFile(path.join(project, relatives[1]), "tampered");
     await assert.rejects(
       assertProjectNativeArtifact(project, "wasm-web", { variant: "release" }),
-      /release browser source checksum mismatch/);
+      /release browser source checksum mismatch/,
+    );
   } finally {
     await rm(project, { recursive: true, force: true });
   }
@@ -128,12 +152,12 @@ test("the Bob artifact selector materializes the requested web variant in a fres
     await selectProjectNativeArtifact([project, "wasm-web", "release"]);
     assert.doesNotMatch(
       await readFile(path.join(project, "defold_hermes", "lib", "web", "library_defold_hermes.js"), "utf8"),
-      /componentSnapshot/u
+      /componentSnapshot/u,
     );
     await selectProjectNativeArtifact([project, "wasm-web", "debug"]);
     assert.match(
       await readFile(path.join(project, "defold_hermes", "lib", "web", "library_defold_hermes.js"), "utf8"),
-      /componentSnapshot/u
+      /componentSnapshot/u,
     );
   } finally {
     await rm(project, { recursive: true, force: true });
@@ -142,33 +166,31 @@ test("the Bob artifact selector materializes the requested web variant in a fres
 
 test("the repository Defold project switches web variants without consuming immutable templates", async () => {
   const project = path.join(repositoryRoot, "defold");
-  const lock = JSON.parse(await readFile(
-    path.join(repositoryRoot, "examples", "war-battles-online", "defold", "deherm.lock"),
-    "utf8"
-  ));
-  const templates = [
-    "component_bridge.js",
-    "library_defold_hermes.js"
-  ];
-  const before = await Promise.all(templates.map((name) => readFile(
-    path.join(repositoryRoot, "packages", "cli", "templates", "web-runtime", name),
-    "utf8"
-  )));
+  const lock = JSON.parse(
+    await readFile(path.join(repositoryRoot, "examples", "war-battles-online", "defold", "deherm.lock"), "utf8"),
+  );
+  const templates = ["component_bridge.js", "library_defold_hermes.js"];
+  const before = await Promise.all(
+    templates.map((name) =>
+      readFile(path.join(repositoryRoot, "packages", "cli", "templates", "web-runtime", name), "utf8"),
+    ),
+  );
   try {
     await ensureProjectNativeArtifact(project, "wasm-web", { lock, variant: "debug" });
     for (const name of templates) {
       assert.match(
         await readFile(path.join(project, "defold_hermes", "lib", "web", name), "utf8"),
-        /componentSnapshot/u
+        /componentSnapshot/u,
       );
     }
     await ensureProjectNativeArtifact(project, "wasm-web", { lock, variant: "release" });
     await ensureProjectNativeArtifact(project, "wasm-web", { lock, variant: "debug" });
     await ensureProjectNativeArtifact(project, "wasm-web", { lock, variant: "release" });
-    const after = await Promise.all(templates.map((name) => readFile(
-      path.join(repositoryRoot, "packages", "cli", "templates", "web-runtime", name),
-      "utf8"
-    )));
+    const after = await Promise.all(
+      templates.map((name) =>
+        readFile(path.join(repositoryRoot, "packages", "cli", "templates", "web-runtime", name), "utf8"),
+      ),
+    );
     assert.deepEqual(after, before);
   } finally {
     await ensureProjectNativeArtifact(project, "wasm-web", { lock, variant: "release" });
@@ -181,7 +203,7 @@ test("every Defold bundle target carries an explicit status and never silence", 
   assert.deepEqual(
     Object.keys(manifest.targets).sort(),
     generated.targets.map(({ target }) => target).sort(),
-    "the artifact manifest and the derived platform list must enumerate exactly the same targets"
+    "the artifact manifest and the derived platform list must enumerate exactly the same targets",
   );
   for (const [target, artifact] of Object.entries(manifest.targets)) {
     assert.ok(knownTargetStatuses.has(artifact.status), `${target} has unknown status ${artifact.status}`);
@@ -201,7 +223,13 @@ test("every Defold bundle target carries an explicit status and never silence", 
 
 test("the host tool matrix covers every supported host with a pinned record per tool", async () => {
   const manifest = await readJson("packages/toolchains/host-compilers.json");
-  assert.deepEqual(Object.keys(manifest.hosts).sort(), ["darwin-arm64", "darwin-x64", "linux-arm64", "linux-x64", "win32-x64"]);
+  assert.deepEqual(Object.keys(manifest.hosts).sort(), [
+    "darwin-arm64",
+    "darwin-x64",
+    "linux-arm64",
+    "linux-x64",
+    "win32-x64",
+  ]);
   // Three tools run on the user's machine, not two. dehermc is tracked the
   // same way as the Hermes compilers because it has the same property: it runs
   // on the host, it is indexed by the host, and without it shipped the user's
@@ -210,13 +238,20 @@ test("the host tool matrix covers every supported host with a pinned record per 
   assert.deepEqual(Object.keys(manifest.tools).sort(), ["dehermc", "hermesc", "shermes"]);
   for (const [key, record] of Object.entries(manifest.hosts)) {
     assert.equal(`${record.host.platform}-${record.host.architecture}`, key);
-    assert.deepEqual(Object.keys(record.tools).sort(), ["dehermc", "hermesc", "shermes"], `${key} must ship all three host tools`);
+    assert.deepEqual(
+      Object.keys(record.tools).sort(),
+      ["dehermc", "hermesc", "shermes"],
+      `${key} must ship all three host tools`,
+    );
     for (const [tool, toolRecord] of Object.entries(record.tools)) {
       assert.ok(toolRecord.file, `${key} ${tool} names no file`);
       if (toolRecord.status === "vendored") {
         assert.match(toolRecord.sha256 ?? "", /^[a-f0-9]{64}$/, `${key} ${tool} carries no pinned digest`);
       } else {
-        assert.ok(toolRecord.builder || toolRecord.blocker?.code, `${key} ${tool} is ${toolRecord.status} without a builder or a blocker`);
+        assert.ok(
+          toolRecord.builder || toolRecord.blocker?.code,
+          `${key} ${tool} is ${toolRecord.status} without a builder or a blocker`,
+        );
       }
     }
     assert.equal(record.package, undefined, `${key} must not route binaries through npm`);
@@ -258,7 +293,7 @@ test("a host with no available build fails closed with an actionable diagnostic"
       assert.match(error.message, /déherm cannot compile on this host/);
       assert.ok(
         error.message.includes(hostCompilerKey()) || error.message.includes("DEHERM_TOOL_CACHE"),
-        `diagnostic must name the host or release cache: ${error.message}`
+        `diagnostic must name the host or release cache: ${error.message}`,
       );
       return true;
     });
@@ -276,7 +311,10 @@ test("the transform compiler is driven by digest, or fails closed naming itself"
   assert.equal(manifest[0].stage, "transform");
   assert.deepEqual(manifest[0].config, { resourceSymbols: "./symbols.json" });
 
-  const resolved = await transformCompilerIdentity().then((identity) => identity, () => null);
+  const resolved = await transformCompilerIdentity().then(
+    (identity) => identity,
+    () => null,
+  );
   if (!resolved) {
     // The published binary is not in this checkout, which is the normal state
     // until CI has run. What must hold unconditionally is that the seam refuses
@@ -294,7 +332,7 @@ test("the transform compiler is driven by digest, or fails closed naming itself"
   assert.equal(resolved.host, hostCompilerKey());
 
   const envelope = await transformProject({
-    tsconfig: path.join(repositoryRoot, "tests/fixtures/hash-literal/tsconfig.json")
+    tsconfig: path.join(repositoryRoot, "tests/fixtures/hash-literal/tsconfig.json"),
   });
   const entry = Object.entries(envelope.typescript).find(([file]) => file.endsWith("hash-literal/entry.ts"));
   assert.ok(entry, "the transform envelope must carry the fixture entry point");
@@ -303,14 +341,13 @@ test("the transform compiler is driven by digest, or fails closed naming itself"
   assert.match(entry[1], /export const up: DefoldHash<"up"> = 0x80356add32e752e9n;/);
 });
 
-
 test("the artifact report says what this package can bundle, per target", async () => {
   const project = await mkdtemp(path.join(tmpdir(), "deherm-artifact-report."));
   await writeProjectLock(project);
   await mkdir(path.join(project, "defold_hermes/lib/web"), { recursive: true });
   await copyFile(
     path.join(repositoryRoot, "defold/defold_hermes/lib/web/library_defold_hermes.js"),
-    path.join(project, "defold_hermes/lib/web/library_defold_hermes.js")
+    path.join(project, "defold_hermes/lib/web/library_defold_hermes.js"),
   );
   const report = await nativeArtifactReport(project);
   const generated = await readJson("packages/toolchains/defold-bundle-targets.json");
@@ -320,7 +357,10 @@ test("the artifact report says what this package can bundle, per target", async 
   }
   const macos = report.targets.find((row) => row.target === "arm64-osx");
   assert.equal(macos.status, "published");
-  assert.equal(report.targets.some((row) => row.target === "x86-osx"), false);
+  assert.equal(
+    report.targets.some((row) => row.target === "x86-osx"),
+    false,
+  );
   await rm(project, { recursive: true, force: true });
 });
 
@@ -338,29 +378,35 @@ test("a target release already in the content-addressed cache installs without n
       await writeFile(path.join(cached, member), bytes);
       hashes[member] = createHash("sha256").update(bytes).digest("hex");
     }
-    await writeFile(path.join(cached, ".deherm-target-cache.json"), `${JSON.stringify({
-      schemaVersion: 1,
-      kind: "deherm.target-artifact-cache",
-      target: "arm64-osx",
-      tag: family.tag,
-      fingerprint: family.fingerprint,
-      asset: family.assets["arm64-osx"],
-      assetSha256: "a".repeat(64),
-      members: family.contents["arm64-osx"],
-      hashes
-    }, null, 2)}\n`);
+    await writeFile(
+      path.join(cached, ".deherm-target-cache.json"),
+      `${JSON.stringify(
+        {
+          schemaVersion: 1,
+          kind: "deherm.target-artifact-cache",
+          target: "arm64-osx",
+          tag: family.tag,
+          fingerprint: family.fingerprint,
+          asset: family.assets["arm64-osx"],
+          assetSha256: "a".repeat(64),
+          members: family.contents["arm64-osx"],
+          hashes,
+        },
+        null,
+        2,
+      )}\n`,
+    );
     const installed = await ensureProjectNativeArtifact(project, "arm64-macos", {
       env: { DEHERM_CACHE_HOME: cacheHome },
-      offline: true
+      offline: true,
     });
     assert.equal(installed.target, "arm64-osx");
     assert.equal(installed.variant, "release");
     const verified = await assertProjectNativeArtifact(project, "arm64-macos", { fetch: false });
     assert.match(await readFile(verified.file, "utf8"), /^fixture:/u);
-    await assert.rejects(
-      readFile(path.join(project, "defold_hermes/lib/arm64-osx/libhermes.debug.a"), "utf8"),
-      { code: "ENOENT" }
-    );
+    await assert.rejects(readFile(path.join(project, "defold_hermes/lib/arm64-osx/libhermes.debug.a"), "utf8"), {
+      code: "ENOENT",
+    });
     const variantHeader = path.join(project, "defold_hermes/include/defold_hermes/generated_runtime_variant.h");
     assert.match(await readFile(variantHeader, "utf8"), /DEHERM_HERMES_DEBUGGER 0/u);
     const protectedLibraryLink = path.join(project, "package-template-libhermes.a");
@@ -370,7 +416,7 @@ test("a target release already in the content-addressed cache installs without n
     const debug = await ensureProjectNativeArtifact(project, "arm64-macos", {
       env: { DEHERM_CACHE_HOME: cacheHome },
       offline: true,
-      variant: "debug"
+      variant: "debug",
     });
     assert.equal(debug.variant, "debug");
     assert.equal(await readFile(verified.file, "utf8"), "fixture:libhermes.debug.a");
@@ -379,27 +425,27 @@ test("a target release already in the content-addressed cache installs without n
     assert.match(await readFile(protectedHeaderLink, "utf8"), /DEHERM_HERMES_DEBUGGER 0/u);
     await assert.rejects(
       assertProjectNativeArtifact(project, "arm64-macos", { fetch: false, variant: "release" }),
-      /missing or does not match its receipt/u
+      /missing or does not match its receipt/u,
     );
     assert.equal(
       (await assertProjectNativeArtifact(project, "arm64-macos", { fetch: false, variant: "debug" })).variant,
-      "debug"
+      "debug",
     );
     await ensureProjectNativeArtifact(project, "arm64-macos", {
       env: { DEHERM_CACHE_HOME: cacheHome },
       offline: true,
-      variant: "release"
+      variant: "release",
     });
     const installedConfig = path.join(project, "defold_hermes/include/libhermesvm-config.h");
     assert.equal(await readFile(installedConfig, "utf8"), "fixture:libhermesvm-config.h");
     await writeFile(installedConfig, "wrong target config");
     await assert.rejects(
       assertProjectNativeArtifact(project, "arm64-macos", { fetch: false }),
-      /missing or does not match its receipt/u
+      /missing or does not match its receipt/u,
     );
     await ensureProjectNativeArtifact(project, "arm64-macos", {
       env: { DEHERM_CACHE_HOME: cacheHome },
-      offline: true
+      offline: true,
     });
     await writeFile(path.join(cached, family.contents["arm64-osx"][0]), "corrupt cache");
     // A valid project install does not need to re-read the cache. Invalidate
@@ -408,13 +454,13 @@ test("a target release already in the content-addressed cache installs without n
     await assert.rejects(
       ensureProjectNativeArtifact(project, "arm64-macos", {
         env: { DEHERM_CACHE_HOME: cacheHome },
-        offline: true
+        offline: true,
       }),
-      /no valid cache receipt/u
+      /no valid cache receipt/u,
     );
     await assert.rejects(
       assertProjectNativeArtifact(project, "arm64-macos", { fetch: false }),
-      /missing or does not match its receipt: defold_hermes\/lib\/arm64-osx\/libhermes\.a/u
+      /missing or does not match its receipt: defold_hermes\/lib\/arm64-osx\/libhermes\.a/u,
     );
   } finally {
     await rm(project, { recursive: true, force: true });
@@ -422,12 +468,11 @@ test("a target release already in the content-addressed cache installs without n
 });
 
 test("deherm doctor reports the matrix and rejects a target Defold does not declare", () => {
-  const result = spawnSync(process.execPath, [
-    path.join(repositoryRoot, "bin", "deherm.mjs"),
-    "doctor",
-    "--target", "arm64-osx,not-a-platform",
-    "--json"
-  ], { cwd: repositoryRoot, encoding: "utf8" });
+  const result = spawnSync(
+    process.execPath,
+    [path.join(repositoryRoot, "bin", "deherm.mjs"), "doctor", "--target", "arm64-osx,not-a-platform", "--json"],
+    { cwd: repositoryRoot, encoding: "utf8" },
+  );
   const report = JSON.parse(result.stdout);
   assert.equal(report.ok, false);
   assert.deepEqual(report.bundleTargets.unknownTargets, ["not-a-platform"]);
@@ -437,23 +482,33 @@ test("deherm doctor reports the matrix and rejects a target Defold does not decl
 });
 
 test("the declared matrix verifies and the complete matrix names every gap", () => {
-  const declared = spawnSync(process.execPath, [path.join(repositoryRoot, "scripts", "manage-native-artifacts.mjs"), "verify"], {
-    cwd: repositoryRoot,
-    encoding: "utf8"
-  });
+  const declared = spawnSync(
+    process.execPath,
+    [path.join(repositoryRoot, "scripts", "manage-native-artifacts.mjs"), "verify"],
+    {
+      cwd: repositoryRoot,
+      encoding: "utf8",
+    },
+  );
   assert.equal(declared.status, 0, declared.stderr);
 
-  const complete = spawnSync(process.execPath, [path.join(repositoryRoot, "scripts", "manage-native-artifacts.mjs"), "verify", "--complete"], {
-    cwd: repositoryRoot,
-    encoding: "utf8"
-  });
+  const complete = spawnSync(
+    process.execPath,
+    [path.join(repositoryRoot, "scripts", "manage-native-artifacts.mjs"), "verify", "--complete"],
+    {
+      cwd: repositoryRoot,
+      encoding: "utf8",
+    },
+  );
   if (complete.status !== 0) {
     // The point of --complete is that it names every gap at once; reporting
     // only the first would make filling the matrix a serial guessing game.
-    const manifest = JSON.parse(spawnSync(process.execPath, [path.join(repositoryRoot, "scripts", "manage-native-artifacts.mjs"), "report"], {
-      cwd: repositoryRoot,
-      encoding: "utf8"
-    }).stdout);
+    const manifest = JSON.parse(
+      spawnSync(process.execPath, [path.join(repositoryRoot, "scripts", "manage-native-artifacts.mjs"), "report"], {
+        cwd: repositoryRoot,
+        encoding: "utf8",
+      }).stdout,
+    );
     for (const row of manifest.targets) {
       if (row.status === "required-missing" || row.status === "blocked") {
         assert.ok(complete.stderr.includes(row.target), `--complete did not name ${row.target}`);
@@ -463,11 +518,11 @@ test("the declared matrix verifies and the complete matrix names every gap", () 
 });
 
 test("targeted artifact verification does not require unrelated bundle targets", () => {
-  const result = spawnSync(process.execPath, [
-    path.join(repositoryRoot, "scripts", "manage-native-artifacts.mjs"),
-    "verify",
-    "--target", "wasm-web"
-  ], { cwd: repositoryRoot, encoding: "utf8" });
+  const result = spawnSync(
+    process.execPath,
+    [path.join(repositoryRoot, "scripts", "manage-native-artifacts.mjs"), "verify", "--target", "wasm-web"],
+    { cwd: repositoryRoot, encoding: "utf8" },
+  );
   assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
   assert.match(result.stdout, /ok wasm-web: vendored-source/u);
   assert.doesNotMatch(result.stdout, /arm64-osx/u);
@@ -477,7 +532,7 @@ test("a targeted artifact pull rejects a target that has no published row before
   const result = spawnSync(
     process.execPath,
     [path.join(repositoryRoot, "scripts", "manage-native-artifacts.mjs"), "pull", "--target", "not-a-defold-target"],
-    { cwd: repositoryRoot, encoding: "utf8" }
+    { cwd: repositoryRoot, encoding: "utf8" },
   );
   assert.notEqual(result.status, 0);
   assert.match(`${result.stdout}${result.stderr}`, /No native artifact is published for not-a-defold-target/u);

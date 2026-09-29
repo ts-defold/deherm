@@ -27,7 +27,7 @@ export const REQUIRED_SDK_SYMBOLS = Object.freeze([
   "ANDROID_NDK_VERSION",
   "ANDROID_NDK_API_VERSION",
   "ANDROID_64_NDK_API_VERSION",
-  "ANDROID_TARGET_API_LEVEL"
+  "ANDROID_TARGET_API_LEVEL",
 ]);
 
 // sdk.py's module-level uppercase namespace is itself Defold's toolchain data.
@@ -112,12 +112,16 @@ export function buildToolchainPins({ sdkSource, buildInputPlatforms }) {
     const blocked = refusals.filter((refusal) => missing.includes(refusal.symbol));
     throw new Error(
       `upstream/defold/build_tools/sdk.py no longer declares: ${missing.join(", ")}` +
-      (blocked.length ? `\n  refused: ${blocked.map((row) => `${row.symbol}: ${row.reason}`).join("\n  refused: ")}` : "")
+        (blocked.length
+          ? `\n  refused: ${blocked.map((row) => `${row.symbol}: ${row.reason}`).join("\n  refused: ")}`
+          : ""),
     );
   }
-  const pins = Object.fromEntries(Object.entries(bound)
-    .filter(([symbol]) => TOOLCHAIN_SYMBOL.test(symbol))
-    .sort(([left], [right]) => left.localeCompare(right)));
+  const pins = Object.fromEntries(
+    Object.entries(bound)
+      .filter(([symbol]) => TOOLCHAIN_SYMBOL.test(symbol))
+      .sort(([left], [right]) => left.localeCompare(right)),
+  );
   const unparsed = refusals
     .filter(({ symbol }) => TOOLCHAIN_SYMBOL.test(symbol))
     .sort((left, right) => left.symbol.localeCompare(right.symbol));
@@ -127,7 +131,7 @@ export function buildToolchainPins({ sdkSource, buildInputPlatforms }) {
     authority: "Defold declares these; deherm never restates one as its own constant.",
     pins,
     unparsed,
-    platformKeys: [...buildInputPlatforms].sort()
+    platformKeys: [...buildInputPlatforms].sort(),
   };
 }
 
@@ -145,13 +149,16 @@ export function buildDefoldTargetMatrix({ buildInputPlatforms, platformSource })
       target: name,
       architecture: name.slice(0, separator),
       group: name.slice(separator + 1),
-      kind: body === null || body === undefined ? "retired" : "bundle"
+      kind: body === null || body === undefined ? "retired" : "bundle",
     });
   }
 
   const pairs = [];
   for (const line of platformSource.replace(/\r\n?/gu, "\n").split("\n")) {
-    const match = /^\s*public static final Platform \w+\s*=\s*new Platform\([^,]+,\s*"([^"]+)",\s*(?:true|false),\s*"([^"]+)",.*,\s*"([^"]+)"\);\s*$/u.exec(line);
+    const match =
+      /^\s*public static final Platform \w+\s*=\s*new Platform\([^,]+,\s*"([^"]+)",\s*(?:true|false),\s*"([^"]+)",.*,\s*"([^"]+)"\);\s*$/u.exec(
+        line,
+      );
     if (!match) continue;
     const [, architecture, osName, extenderTarget] = match;
     pairs.push({ extenderTarget, bobPlatform: `${architecture}-${osName}` });
@@ -164,12 +171,12 @@ export function buildDefoldTargetMatrix({ buildInputPlatforms, platformSource })
   return {
     authority: {
       targets: "upstream/defold/share/extender/build_input.yml",
-      pairs: "upstream/defold/com.dynamo.cr/com.dynamo.cr.bob/src/com/dynamo/bob/Platform.java"
+      pairs: "upstream/defold/com.dynamo.cr/com.dynamo.cr.bob/src/com/dynamo/bob/Platform.java",
     },
     targets: targets.sort((left, right) => left.target.localeCompare(right.target)),
     platformPairs: pairs
       .filter(({ extenderTarget }) => active.has(extenderTarget))
-      .sort((left, right) => left.extenderTarget.localeCompare(right.extenderTarget))
+      .sort((left, right) => left.extenderTarget.localeCompare(right.extenderTarget)),
   };
 }
 
@@ -179,13 +186,17 @@ const NATIVE_ARTIFACT_SDK_PINS = Object.freeze({
   android64NdkApiVersion: "ANDROID_64_NDK_API_VERSION",
   androidTargetApiLevel: "ANDROID_TARGET_API_LEVEL",
   iphoneosVersionMin: "VERSION_IPHONEOS_MIN",
-  macosxVersionMin: "VERSION_MACOSX_MIN"
+  macosxVersionMin: "VERSION_MACOSX_MIN",
 });
 
 function canonical(value) {
   if (Array.isArray(value)) return value.map(canonical);
   if (value && typeof value === "object") {
-    return Object.fromEntries(Object.keys(value).sort().map((key) => [key, canonical(value[key])]));
+    return Object.fromEntries(
+      Object.keys(value)
+        .sort()
+        .map((key) => [key, canonical(value[key])]),
+    );
   }
   return value;
 }
@@ -194,14 +205,17 @@ function canonical(value) {
 export function nativeArtifactCompatibility(toolchain) {
   const pins = toolchain?.pins ?? {};
   const targets = toolchain?.targetMatrix?.targets;
-  if (!Array.isArray(targets)) throw new Error("Defold toolchain has no target matrix for native artifact compatibility");
-  const sdk = Object.fromEntries(Object.entries(NATIVE_ARTIFACT_SDK_PINS).map(([name, symbol]) => {
-    if (pins[symbol] === undefined) throw new Error(`Defold toolchain has no ${symbol} native artifact pin`);
-    return [name, pins[symbol]];
-  }));
+  if (!Array.isArray(targets))
+    throw new Error("Defold toolchain has no target matrix for native artifact compatibility");
+  const sdk = Object.fromEntries(
+    Object.entries(NATIVE_ARTIFACT_SDK_PINS).map(([name, symbol]) => {
+      if (pins[symbol] === undefined) throw new Error(`Defold toolchain has no ${symbol} native artifact pin`);
+      return [name, pins[symbol]];
+    }),
+  );
   const inputs = canonical({ sdk, targets });
   return {
     kind: "deherm.native-artifact-compatibility",
-    sha256: createHash("sha256").update(JSON.stringify(inputs)).digest("hex")
+    sha256: createHash("sha256").update(JSON.stringify(inputs)).digest("hex"),
   };
 }

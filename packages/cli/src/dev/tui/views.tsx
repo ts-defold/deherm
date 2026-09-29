@@ -14,7 +14,7 @@ import {
   SplitPane,
   Table,
   Text,
-  VirtualList
+  VirtualList,
 } from "@rezi-ui/jsx";
 
 import { describeReleaseReachability } from "../release-reachability.mjs";
@@ -33,7 +33,7 @@ import {
   prism,
   shortFingerprint,
   statusColor,
-  targetActivation
+  targetActivation,
 } from "./theme.mjs";
 
 const focusedBorderStyle = { fg: prism[4], bold: true };
@@ -81,47 +81,50 @@ function stageRows(snapshot) {
     { key: "build", stage: "ttsc" },
     { key: "bundle", stage: "bundle" },
     { key: "signal", stage: "signal" },
-    { key: "activate", stage: "activate" }
+    { key: "activate", stage: "activate" },
   ].map((row) => {
     const progress = phaseProgress(snapshot, row.key);
     return { ...row, progress, state: progress === 1 ? "done" : progress > 0 ? "running" : "idle" };
   });
 }
 
-export function PipelinePanel({ snapshot, focusedScope, actions, height, compact }) {
+export function PipelinePanel({ snapshot, focusedScope, actions, height }) {
   const activation = targetActivation(snapshot);
-  const activationText = activation.total === 0 ? "applied unverified" : `applied ${activation.applied}/${activation.total}`;
+  const activationText =
+    activation.total === 0 ? "applied unverified" : `applied ${activation.applied}/${activation.total}`;
   const tone = snapshot.phase === "failed" ? "danger" : "accent";
   return (
     <FocusPanel scope="pipeline" focusedScope={focusedScope} height={height}>
       <Column gap={0} px={1} width="full" height="full" overflow="hidden">
         <Pane height={5}>
-        <Table
-          id={PANEL_IDS.pipeline}
-          accessibleLabel="Edit loop stages"
-          columns={[
-            { key: "stage", header: "stage", width: 9 },
-            {
-              key: "progress",
-              header: "progress",
-              flex: 1,
-              minWidth: 6,
-              render: (value) => <Progress value={value} variant="blocks" showPercent={false} dsTone={tone} />
-            },
-            { key: "state", header: "", width: 7, align: "right" }
-          ]}
-          data={stageRows(snapshot)}
-          getRowKey={(row) => row.key}
-          selectionMode="single"
-          showHeader={false}
-          border="none"
-          onRowPress={() => actions.rebuild?.()}
-        />
+          <Table
+            id={PANEL_IDS.pipeline}
+            accessibleLabel="Edit loop stages"
+            columns={[
+              { key: "stage", header: "stage", width: 9 },
+              {
+                key: "progress",
+                header: "progress",
+                flex: 1,
+                minWidth: 6,
+                render: (value) => <Progress value={value} variant="blocks" showPercent={false} dsTone={tone} />,
+              },
+              { key: "state", header: "", width: 7, align: "right" },
+            ]}
+            data={stageRows(snapshot)}
+            getRowKey={(row) => row.key}
+            selectionMode="single"
+            showHeader={false}
+            border="none"
+            onRowPress={() => actions.rebuild?.()}
+          />
         </Pane>
         <Text style={{ fg: statusColor(snapshot.phase), bold: true }} textOverflow="ellipsis">
           {`built ${snapshot.lastSuccessfulGeneration ?? 0} · ${activationText}`}
         </Text>
-        <Text style={{ fg: dim }} textOverflow="ellipsis">{snapshot.phase ?? "idle"}</Text>
+        <Text style={{ fg: dim }} textOverflow="ellipsis">
+          {snapshot.phase ?? "idle"}
+        </Text>
       </Column>
     </FocusPanel>
   );
@@ -133,7 +136,7 @@ function moduleRows(snapshot) {
   return modules.map((module, index) => ({
     key: `module-${index}`,
     file: module.file,
-    bytes: formatBytes(module.bytes)
+    bytes: formatBytes(module.bytes),
   }));
 }
 
@@ -147,25 +150,29 @@ export function BundlePanel({ snapshot, focusedScope, ui, actions, height, flex 
           {`${formatBytes(metrics.bytes)}  ${delta(metrics.byteDelta)}  ${metrics.moduleCount ?? 0} modules`}
         </Text>
         <Text style={{ fg: dim }} textOverflow="ellipsis">{`build ${(metrics.durationMs ?? 0).toFixed(1)} ms`}</Text>
-        <Text style={{ fg: dim }} textOverflow="ellipsis">{describeReleaseReachability(snapshot.reachability)}</Text>
+        <Text style={{ fg: dim }} textOverflow="ellipsis">
+          {describeReleaseReachability(snapshot.reachability)}
+        </Text>
         <Pane height={Math.max(1, (height ?? 12) - 7)}>
-        <Table
-          id={PANEL_IDS.bundle}
-          accessibleLabel="Largest retained modules"
-          columns={[
-            { key: "file", header: "largest retained", flex: 1, minWidth: 8, overflow: "middle" },
-            { key: "bytes", header: "bytes", width: 10, align: "right" }
-          ]}
-          data={moduleRows(snapshot)}
-          getRowKey={(row) => row.key}
-          selection={ui.bundleSelection}
-          selectionMode="multi"
-          onSelectionChange={(keys) => actions.selectBundle?.(keys)}
-          border="none"
-        />
+          <Table
+            id={PANEL_IDS.bundle}
+            accessibleLabel="Largest retained modules"
+            columns={[
+              { key: "file", header: "largest retained", flex: 1, minWidth: 8, overflow: "middle" },
+              { key: "bytes", header: "bytes", width: 10, align: "right" },
+            ]}
+            data={moduleRows(snapshot)}
+            getRowKey={(row) => row.key}
+            selection={ui.bundleSelection}
+            selectionMode="multi"
+            onSelectionChange={(keys) => actions.selectBundle?.(keys)}
+            border="none"
+          />
         </Pane>
         <Divider label="recent files" />
-        <Text textOverflow="middle" style={{ fg: dim }}>{recent.length ? `› ${recent[0]}` : "no pending edits"}</Text>
+        <Text textOverflow="middle" style={{ fg: dim }}>
+          {recent.length ? `› ${recent[0]}` : "no pending edits"}
+        </Text>
       </Column>
     </FocusPanel>
   );
@@ -196,7 +203,7 @@ function targetRow(target) {
     resource: String(telemetry.resourceGeneration ?? "—").padStart(3),
     frame: (Number.isFinite(telemetry.frameDtMs) ? `${telemetry.frameDtMs.toFixed(2)} ms` : "—").padStart(8),
     url: target.url ?? "",
-    target
+    target,
   };
 }
 
@@ -210,7 +217,11 @@ export function targetRows(snapshot) {
 function AcknowledgementLine({ rows }) {
   const acknowledged = rows.find((row) => row.fingerprint !== "—");
   if (!acknowledged) {
-    return <Text style={{ fg: dim }} textOverflow="ellipsis">activation unverified · no runtime acknowledgement</Text>;
+    return (
+      <Text style={{ fg: dim }} textOverflow="ellipsis">
+        activation unverified · no runtime acknowledgement
+      </Text>
+    );
   }
   return (
     <Text style={{ fg: good }} textOverflow="middle">
@@ -224,17 +235,29 @@ export function TargetsPanel({ snapshot, focusedScope, ui, actions, height, comp
   return (
     <FocusPanel scope="targets" focusedScope={focusedScope} height={height}>
       <Column gap={0} px={1} width="full" height="full" overflow="hidden">
-        {rows.length === 0
-          ? <Text style={{ fg: dim }} textOverflow="ellipsis">no target connected · activation unverified</Text>
-          : (
-            <Pane height={Math.max(1, (height ?? 12) - 3)}>
+        {rows.length === 0 ? (
+          <Text style={{ fg: dim }} textOverflow="ellipsis">
+            no target connected · activation unverified
+          </Text>
+        ) : (
+          <Pane height={Math.max(1, (height ?? 12) - 3)}>
             <Table
               id={PANEL_IDS.targets}
               accessibleLabel="Reload targets"
               columns={[
                 { key: "name", header: "target", flex: 2, minWidth: 6 },
-                { key: "status", header: "phase", flex: 2, minWidth: 6, render: (value) => <Text style={{ fg: statusColor(value) }} textOverflow="ellipsis">{String(value)}</Text> },
-                ...(compact ? [] : [{ key: "applied", header: "appl", width: 5 }])
+                {
+                  key: "status",
+                  header: "phase",
+                  flex: 2,
+                  minWidth: 6,
+                  render: (value) => (
+                    <Text style={{ fg: statusColor(value) }} textOverflow="ellipsis">
+                      {String(value)}
+                    </Text>
+                  ),
+                },
+                ...(compact ? [] : [{ key: "applied", header: "appl", width: 5 }]),
               ]}
               data={rows}
               getRowKey={(row) => row.key}
@@ -244,8 +267,8 @@ export function TargetsPanel({ snapshot, focusedScope, ui, actions, height, comp
               onRowPress={(row) => actions.openDetail?.("target", row.id)}
               border="none"
             />
-            </Pane>
-          )}
+          </Pane>
+        )}
         <AcknowledgementLine rows={rows} />
       </Column>
     </FocusPanel>
@@ -261,12 +284,20 @@ function runtimeRows(telemetry) {
       metric: "Hermes heap",
       value: telemetry.hermesHeapAvailable
         ? `${formatBytes(telemetry.hermesHeapBytes)} / ${formatBytes(telemetry.hermesHeapSizeBytes)}  peak ${formatBytes(telemetry.hermesPeakBytes)}`
-        : "unavailable"
+        : "unavailable",
     },
     { key: "roots", metric: "callback roots", value: String(telemetry.callbackRoots ?? "—") },
     { key: "components", metric: "component instances", value: String(telemetry.componentInstances ?? "—") },
-    { key: "arena", metric: "arena high-water", value: telemetry.arenaHighWaterBytes === undefined ? "unavailable" : formatBytes(telemetry.arenaHighWaterBytes) },
-    { key: "lua", metric: "Lua handles", value: `${telemetry.luaRegistryUsed ?? "—"}/${telemetry.luaRegistryCapacity ?? "—"}` }
+    {
+      key: "arena",
+      metric: "arena high-water",
+      value: telemetry.arenaHighWaterBytes === undefined ? "unavailable" : formatBytes(telemetry.arenaHighWaterBytes),
+    },
+    {
+      key: "lua",
+      metric: "Lua handles",
+      value: `${telemetry.luaRegistryUsed ?? "—"}/${telemetry.luaRegistryCapacity ?? "—"}`,
+    },
   ];
 }
 
@@ -285,21 +316,21 @@ export function RuntimePanel({ snapshot, focusedScope, ui, actions, height, flex
           style={{ fg: Number.isFinite(frame) && frame > 16.7 ? bad : prism[4] }}
         />
         <Pane height={Math.max(1, (height ?? 12) - 4)}>
-        <Table
-          id={PANEL_IDS.runtime}
-          accessibleLabel="Runtime health metrics"
-          columns={[
-            { key: "metric", header: "metric", width: 21 },
-            { key: "value", header: "value", flex: 1, minWidth: 8, overflow: "ellipsis" }
-          ]}
-          data={runtimeRows(telemetry)}
-          getRowKey={(row) => row.key}
-          selection={ui.runtimeSelection}
-          selectionMode="multi"
-          onSelectionChange={(keys) => actions.selectRuntime?.(keys)}
-          showHeader={false}
-          border="none"
-        />
+          <Table
+            id={PANEL_IDS.runtime}
+            accessibleLabel="Runtime health metrics"
+            columns={[
+              { key: "metric", header: "metric", width: 21 },
+              { key: "value", header: "value", flex: 1, minWidth: 8, overflow: "ellipsis" },
+            ]}
+            data={runtimeRows(telemetry)}
+            getRowKey={(row) => row.key}
+            selection={ui.runtimeSelection}
+            selectionMode="multi"
+            onSelectionChange={(keys) => actions.selectRuntime?.(keys)}
+            showHeader={false}
+            border="none"
+          />
         </Pane>
       </Column>
     </FocusPanel>
@@ -320,24 +351,33 @@ export function LogsPanel({ snapshot, ui, actions, focusedScope, height }) {
   const title = ui.filter?.query ? `${PANEL_TITLES.logs} · /${ui.filter.query}` : PANEL_TITLES.logs;
   const inner = Math.max(1, (height ?? 8) - 2 - (summary ? 1 : 0));
   return (
-    <FocusPanel scope="logs" focusedScope={focusedScope} title={summary ? `${title} · SELECTION` : title} height={height}>
+    <FocusPanel
+      scope="logs"
+      focusedScope={focusedScope}
+      title={summary ? `${title} · SELECTION` : title}
+      height={height}
+    >
       <Column gap={0} width="full" height="full" overflow="hidden">
         <Pane height={inner}>
-          {selecting
-            ? <SelectableLogs snapshot={snapshot} ui={ui} actions={actions} />
-            : (
-              <LogsConsole
-                id={PANEL_IDS.logs}
-                entries={filteredLogEntries(snapshot, ui)}
-                scrollTop={ui.logScroll}
-                autoScroll={ui.logAutoScroll}
-                showSource
-                showTimestamps
-                onScroll={(value) => actions.setLogScroll?.(value)}
-              />
-            )}
+          {selecting ? (
+            <SelectableLogs snapshot={snapshot} ui={ui} actions={actions} />
+          ) : (
+            <LogsConsole
+              id={PANEL_IDS.logs}
+              entries={filteredLogEntries(snapshot, ui)}
+              scrollTop={ui.logScroll}
+              autoScroll={ui.logAutoScroll}
+              showSource
+              showTimestamps
+              onScroll={(value) => actions.setLogScroll?.(value)}
+            />
+          )}
         </Pane>
-        {summary ? <Text style={{ fg: prism[2] }} textOverflow="ellipsis">{summary}</Text> : undefined}
+        {summary ? (
+          <Text style={{ fg: prism[2] }} textOverflow="ellipsis">
+            {summary}
+          </Text>
+        ) : undefined}
       </Column>
     </FocusPanel>
   );
@@ -379,31 +419,43 @@ export function TargetsView({ snapshot, focusedScope, ui, actions, height }) {
     <FocusPanel scope="targets" focusedScope={focusedScope} title="TARGETS" height={height}>
       <Column gap={0} px={1} width="full" height="full" overflow="hidden">
         <Pane height={Math.max(1, (height ?? 14) - 3)}>
-        <Table
-          id={PANEL_IDS.targets}
-          accessibleLabel="Targets"
-          columns={[
-            { key: "name", header: "target", flex: 2, minWidth: 8 },
-            { key: "runtimeKind", header: "runtime", width: 8 },
-            { key: "applied", header: "gen", width: 5 },
-            { key: "fingerprint", header: "fingerprint", width: 15 },
-            { key: "status", header: "phase", flex: 2, minWidth: 8, render: (value) => <Text style={{ fg: statusColor(value) }} textOverflow="ellipsis">{String(value)}</Text> },
-            { key: "runtime", header: "rt", width: 5 },
-            { key: "resource", header: "res", width: 5 },
-            { key: "frame", header: "frame dt", width: 9 },
-            { key: "gapCount", header: "gaps", width: 5 }
-          ]}
-          data={rows}
-          getRowKey={(row) => row.key}
-          selection={ui.targetSelection}
-          selectionMode="multi"
-          onSelectionChange={(keys) => actions.selectTargets?.(keys)}
-          onRowPress={(row) => actions.openDetail?.("target", row.id)}
-          border="none"
-        />
+          <Table
+            id={PANEL_IDS.targets}
+            accessibleLabel="Targets"
+            columns={[
+              { key: "name", header: "target", flex: 2, minWidth: 8 },
+              { key: "runtimeKind", header: "runtime", width: 8 },
+              { key: "applied", header: "gen", width: 5 },
+              { key: "fingerprint", header: "fingerprint", width: 15 },
+              {
+                key: "status",
+                header: "phase",
+                flex: 2,
+                minWidth: 8,
+                render: (value) => (
+                  <Text style={{ fg: statusColor(value) }} textOverflow="ellipsis">
+                    {String(value)}
+                  </Text>
+                ),
+              },
+              { key: "runtime", header: "rt", width: 5 },
+              { key: "resource", header: "res", width: 5 },
+              { key: "frame", header: "frame dt", width: 9 },
+              { key: "gapCount", header: "gaps", width: 5 },
+            ]}
+            data={rows}
+            getRowKey={(row) => row.key}
+            selection={ui.targetSelection}
+            selectionMode="multi"
+            onSelectionChange={(keys) => actions.selectTargets?.(keys)}
+            onRowPress={(row) => actions.openDetail?.("target", row.id)}
+            border="none"
+          />
         </Pane>
         <CapabilityGapLine rows={rows} />
-        <Text style={{ fg: dim }} textOverflow="ellipsis">enter opens the focused target · y copies the selection</Text>
+        <Text style={{ fg: dim }} textOverflow="ellipsis">
+          enter opens the focused target · y copies the selection
+        </Text>
       </Column>
     </FocusPanel>
   );
@@ -415,7 +467,11 @@ export function TargetsView({ snapshot, focusedScope, ui, actions, height }) {
 function CapabilityGapLine({ rows }) {
   const withGaps = rows.filter((row) => row.gaps.length > 0);
   if (withGaps.length === 0) {
-    return <Text style={{ fg: dim }} textOverflow="ellipsis">no declared capability gaps</Text>;
+    return (
+      <Text style={{ fg: dim }} textOverflow="ellipsis">
+        no declared capability gaps
+      </Text>
+    );
   }
   const first = withGaps[0];
   return (
@@ -442,12 +498,13 @@ export function generationRows(snapshot) {
       duration: (Number.isFinite(record.durationMs) ? `${record.durationMs} ms` : "—").padStart(7),
       outcome: record.status,
       resources: String(record.resources?.length ?? 0),
-      record
+      record,
     };
   });
 }
 
-const outcomeColor = (outcome) => (outcome === "activated" ? good : outcome === "rejected" || outcome === "failed" ? bad : prism[4]);
+const outcomeColor = (outcome) =>
+  outcome === "activated" ? good : outcome === "rejected" || outcome === "failed" ? bad : prism[4];
 
 export function GenerationsView({ snapshot, focusedScope, ui, actions, height }) {
   const rows = generationRows(snapshot);
@@ -465,25 +522,35 @@ export function GenerationsView({ snapshot, focusedScope, ui, actions, height })
     <FocusPanel scope="generations" focusedScope={focusedScope} height={height}>
       <Column gap={0} px={1} width="full" height="full" overflow="hidden">
         <Pane height={Math.max(1, (height ?? 14) - 3)}>
-        <Table
-          id={PANEL_IDS.generations}
-          accessibleLabel="Build generations"
-          columns={[
-            { key: "generation", header: "gen", width: 5 },
-            { key: "fingerprint", header: "fingerprint", width: 15 },
-            { key: "bytes", header: "bytes", width: 11 },
-            { key: "moduleDelta", header: "modules (Δ)", width: 17 },
-            { key: "duration", header: "build", width: 9 },
-            { key: "outcome", header: "activation", flex: 1, minWidth: 9, render: (value) => <Text style={{ fg: outcomeColor(value) }} textOverflow="ellipsis">{String(value)}</Text> }
-          ]}
-          data={rows}
-          getRowKey={(row) => row.key}
-          selection={ui.generationSelection}
-          selectionMode="multi"
-          onSelectionChange={(keys) => actions.selectGenerations?.(keys)}
-          onRowPress={(row) => actions.openDetail?.("generation", row.key)}
-          border="none"
-        />
+          <Table
+            id={PANEL_IDS.generations}
+            accessibleLabel="Build generations"
+            columns={[
+              { key: "generation", header: "gen", width: 5 },
+              { key: "fingerprint", header: "fingerprint", width: 15 },
+              { key: "bytes", header: "bytes", width: 11 },
+              { key: "moduleDelta", header: "modules (Δ)", width: 17 },
+              { key: "duration", header: "build", width: 9 },
+              {
+                key: "outcome",
+                header: "activation",
+                flex: 1,
+                minWidth: 9,
+                render: (value) => (
+                  <Text style={{ fg: outcomeColor(value) }} textOverflow="ellipsis">
+                    {String(value)}
+                  </Text>
+                ),
+              },
+            ]}
+            data={rows}
+            getRowKey={(row) => row.key}
+            selection={ui.generationSelection}
+            selectionMode="multi"
+            onSelectionChange={(keys) => actions.selectGenerations?.(keys)}
+            onRowPress={(row) => actions.openDetail?.("generation", row.key)}
+            border="none"
+          />
         </Pane>
         <Text style={{ fg: dim }} textOverflow="ellipsis">
           built means produced; activated means a runtime acknowledged that exact fingerprint
@@ -494,6 +561,7 @@ export function GenerationsView({ snapshot, focusedScope, ui, actions, height })
 }
 
 function terminalValue(value, maximum = 96) {
+  // oxlint-disable-next-line no-control-regex -- untrusted runtime text must not inject terminal control sequences.
   const singleLine = String(value).replace(/[\u0000-\u001f\u007f-\u009f]/gu, "�");
   return singleLine.length > maximum ? `${singleLine.slice(0, maximum - 1)}…` : singleLine;
 }
@@ -511,15 +579,21 @@ function liveValue(value) {
 }
 
 export function instanceRows(snapshot) {
-  return (snapshot.targets ?? []).flatMap((target) => (target.instances ?? []).map((instance) => ({
-    key: `${target.id}:${target.connectionEpoch ?? 0}:${instance.instanceId?.slot ?? 0}:${instance.instanceId?.generation ?? 0}`,
-    target: terminalValue(target.id, 64),
-    identity: terminalValue(`${instance.instanceId?.slot ?? "?"}:${instance.instanceId?.generation ?? "?"}`, 32),
-    component: terminalValue(instance.source ?? instance.componentId, 192),
-    schema: terminalValue(instance.schemaStatus ?? "unjoined", 48),
-    properties: terminalValue((instance.properties ?? []).map(({ name, value }) =>
-      `${terminalValue(name, 48)}=${liveValue(value)}`).join("  ") || "—", 4096)
-  })));
+  return (snapshot.targets ?? []).flatMap((target) =>
+    (target.instances ?? []).map((instance) => ({
+      key: `${target.id}:${target.connectionEpoch ?? 0}:${instance.instanceId?.slot ?? 0}:${instance.instanceId?.generation ?? 0}`,
+      target: terminalValue(target.id, 64),
+      identity: terminalValue(`${instance.instanceId?.slot ?? "?"}:${instance.instanceId?.generation ?? "?"}`, 32),
+      component: terminalValue(instance.source ?? instance.componentId, 192),
+      schema: terminalValue(instance.schemaStatus ?? "unjoined", 48),
+      properties: terminalValue(
+        (instance.properties ?? [])
+          .map(({ name, value }) => `${terminalValue(name, 48)}=${liveValue(value)}`)
+          .join("  ") || "—",
+        4096,
+      ),
+    })),
+  );
 }
 
 export function InstancesView({ snapshot, focusedScope, height }) {
@@ -529,20 +603,20 @@ export function InstancesView({ snapshot, focusedScope, height }) {
       <FocusPanel scope="instances" focusedScope={focusedScope} height={height}>
         <Column gap={0} px={1} width="full" height="full" overflow="hidden">
           <Pane height={Math.max(1, (height ?? 12) - 4)}>
-          <Table
-            id={PANEL_IDS.instances}
-            accessibleLabel="Live component instances"
-            columns={[
-              { key: "target", header: "target", width: 14 },
-              { key: "identity", header: "slot:gen", width: 10 },
-              { key: "component", header: "component", width: 28 },
-              { key: "schema", header: "schema", width: 10 },
-              { key: "properties", header: "live properties", flex: 1, minWidth: 18 }
-            ]}
-            data={rows}
-            getRowKey={(row) => row.key}
-            border="none"
-          />
+            <Table
+              id={PANEL_IDS.instances}
+              accessibleLabel="Live component instances"
+              columns={[
+                { key: "target", header: "target", width: 14 },
+                { key: "identity", header: "slot:gen", width: 10 },
+                { key: "component", header: "component", width: 28 },
+                { key: "schema", header: "schema", width: 10 },
+                { key: "properties", header: "live properties", flex: 1, minWidth: 18 },
+              ]}
+              data={rows}
+              getRowKey={(row) => row.key}
+              border="none"
+            />
           </Pane>
           <Text style={{ fg: dim }} textOverflow="ellipsis">
             sampled own data properties · slot:generation identities are runtime-local
@@ -555,19 +629,23 @@ export function InstancesView({ snapshot, focusedScope, height }) {
   const counts = [
     { label: "component instances", value: telemetry.componentInstances },
     { label: "callback roots", value: telemetry.callbackRoots },
-    { label: "Lua handles", value: telemetry.luaRegistryUsed }
+    { label: "Lua handles", value: telemetry.luaRegistryUsed },
   ];
   return (
     <FocusPanel scope="instances" focusedScope={focusedScope} height={height}>
       <Column gap={0} px={1} width="full" height="full" overflow="hidden">
-        <Text style={{ fg: prism[2], bold: true }} textOverflow="ellipsis">waiting for a component snapshot</Text>
+        <Text style={{ fg: prism[2], bold: true }} textOverflow="ellipsis">
+          waiting for a component snapshot
+        </Text>
         <Text style={{ fg: dim }} textOverflow="ellipsis">
           Launch a debug-enabled native or browser target to stream bounded live values.
         </Text>
         <Divider label="aggregate telemetry" />
         {counts.map((entry) => (
           <Row key={entry.label} justify="between" width="full">
-            <Text style={{ fg: basaltRamp[4] }} textOverflow="ellipsis">{entry.label}</Text>
+            <Text style={{ fg: basaltRamp[4] }} textOverflow="ellipsis">
+              {entry.label}
+            </Text>
             <Text style={{ fg: entry.value === undefined ? dim : good }}>
               {entry.value === undefined ? "unavailable" : String(entry.value)}
             </Text>
@@ -592,8 +670,15 @@ export function OverviewView({ snapshot, focusedScope, ui, actions, mode, height
         minSizes={[24, 24]}
         onChange={(sizes) => actions.setOverviewSizes?.(sizes)}
       >
-        <PipelinePanel snapshot={snapshot} focusedScope={focusedScope} actions={actions} height={topHeight} compact={compact} />
-        <TargetsPanel snapshot={snapshot} focusedScope={focusedScope} ui={ui} actions={actions} height={topHeight} compact={compact} />
+        <PipelinePanel snapshot={snapshot} focusedScope={focusedScope} actions={actions} height={topHeight} />
+        <TargetsPanel
+          snapshot={snapshot}
+          focusedScope={focusedScope}
+          ui={ui}
+          actions={actions}
+          height={topHeight}
+          compact={compact}
+        />
       </SplitPane>
     </Pane>
   );
@@ -602,8 +687,22 @@ export function OverviewView({ snapshot, focusedScope, ui, actions, mode, height
     <Column gap={0} width="full" height={height} overflow="hidden">
       {top}
       <Row gap={1} width="full" height={bottomHeight}>
-        <BundlePanel snapshot={snapshot} focusedScope={focusedScope} ui={ui} actions={actions} height={bottomHeight} flex={1} />
-        <RuntimePanel snapshot={snapshot} focusedScope={focusedScope} ui={ui} actions={actions} height={bottomHeight} flex={1} />
+        <BundlePanel
+          snapshot={snapshot}
+          focusedScope={focusedScope}
+          ui={ui}
+          actions={actions}
+          height={bottomHeight}
+          flex={1}
+        />
+        <RuntimePanel
+          snapshot={snapshot}
+          focusedScope={focusedScope}
+          ui={ui}
+          actions={actions}
+          height={bottomHeight}
+          flex={1}
+        />
       </Row>
     </Column>
   );
@@ -690,7 +789,12 @@ function detailFields(detail, snapshot) {
         ["runtime id", row.runtime],
         ["resource generation", row.resource],
         ["frame dt", row.frame],
-        ["Hermes heap", telemetry.hermesHeapAvailable ? `${formatBytes(telemetry.hermesHeapBytes)} / ${formatBytes(telemetry.hermesHeapSizeBytes)}` : "unavailable"],
+        [
+          "Hermes heap",
+          telemetry.hermesHeapAvailable
+            ? `${formatBytes(telemetry.hermesHeapBytes)} / ${formatBytes(telemetry.hermesHeapSizeBytes)}`
+            : "unavailable",
+        ],
         ...(Number.isFinite(telemetry.jsHeapBytes)
           ? [["page JS heap", `${formatBytes(telemetry.jsHeapBytes)} / ${formatBytes(telemetry.jsHeapSizeBytes)}`]]
           : []),
@@ -700,8 +804,8 @@ function detailFields(detail, snapshot) {
         // Every declared gap is listed with its reason. This is the whole point
         // of carrying capabilities on the target: an operator reads why a
         // counter is missing instead of guessing from a dash.
-        ...row.gaps.map((gap) => [`gap · ${gap.name}`, gap.reason])
-      ]
+        ...row.gaps.map((gap) => [`gap · ${gap.name}`, gap.reason]),
+      ],
     };
   }
   if (detail?.kind === "generation") {
@@ -718,8 +822,8 @@ function detailFields(detail, snapshot) {
         ["resources", (row.record.resources ?? []).join(", ") || "none"],
         ["runtime id", String(row.record.runtimeId ?? "—")],
         ["resource generation", String(row.record.resourceGeneration ?? "—")],
-        ["diagnostic", row.record.diagnostic ?? "none"]
-      ]
+        ["diagnostic", row.record.diagnostic ?? "none"],
+      ],
     };
   }
   return undefined;
@@ -740,11 +844,15 @@ export function DetailOverlay({ ui, snapshot, actions }) {
           {detail.pairs.map(([label, value]) => (
             <Row key={label} justify="between" width="full" gap={2}>
               <Text style={{ fg: dim }}>{label}</Text>
-              <Text textOverflow="middle" style={{ fg: basaltRamp[4] }}>{String(value)}</Text>
+              <Text textOverflow="middle" style={{ fg: basaltRamp[4] }}>
+                {String(value)}
+              </Text>
             </Row>
           ))}
           <Divider />
-          <Text style={{ fg: dim }} textOverflow="ellipsis">y copies these fields · r signals a reload to every target</Text>
+          <Text style={{ fg: dim }} textOverflow="ellipsis">
+            y copies these fields · r signals a reload to every target
+          </Text>
         </Column>
       }
     />

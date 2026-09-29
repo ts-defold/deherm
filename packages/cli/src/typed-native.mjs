@@ -32,13 +32,9 @@
 import { access, readFile } from "node:fs/promises";
 import path from "node:path";
 
-import {
-  BOB_TOOLING_IGNORE_ENTRIES,
-  reconcileBobProjectBoundary
-} from "./bob-project-boundary.mjs";
+import { BOB_TOOLING_IGNORE_ENTRIES, reconcileBobProjectBoundary } from "./bob-project-boundary.mjs";
 
 export { BOB_TOOLING_IGNORE_ENTRIES };
-
 
 /** The materialised extension's directory name, relative to a project root. */
 export const TYPED_NATIVE_EXTENSION = "defold_hermes_typed_native";
@@ -75,17 +71,18 @@ export async function defoldTargetRuntime(defoldPlatform, options = {}) {
   if (typeof defoldPlatform !== "string" || !defoldPlatform) {
     throw new TypeError("A Defold bundle platform is required");
   }
-  const toolchain = options.toolchain ?? await readProjectToolchain(options.projectRoot);
+  const toolchain = options.toolchain ?? (await readProjectToolchain(options.projectRoot));
   const targetMatrix = toolchain.targetMatrix;
   const pair = targetMatrix.platformPairs.find(
-    (entry) => entry.bobPlatform === defoldPlatform || entry.extenderTarget === defoldPlatform
+    (entry) => entry.bobPlatform === defoldPlatform || entry.extenderTarget === defoldPlatform,
   );
   const target = pair?.extenderTarget ?? defoldPlatform;
   const declared = targetMatrix.targets.find((entry) => entry.target === target);
   if (!declared) {
     throw new Error(
       `${defoldPlatform} is not a Defold bundle target in ${targetMatrix.authority.targets}; ` +
-      "deherm cannot decide which runtime would execute its game code");
+        "deherm cannot decide which runtime would execute its game code",
+    );
   }
   const byGroup = declared.group === "web" ? "browser" : "hermes";
   return {
@@ -94,7 +91,7 @@ export async function defoldTargetRuntime(defoldPlatform, options = {}) {
     group: declared.group,
     runtimeId: byGroup,
     artifact: null,
-    source: targetMatrix.authority.targets
+    source: targetMatrix.authority.targets,
   };
 }
 
@@ -115,7 +112,7 @@ export async function typedNativeDisposition(defoldPlatform, options = {}) {
     reason:
       `A Static Hermes unit is a transport of the 'hermes' runtime, and ${runtime.platform} runs game code ` +
       `on the '${runtime.runtimeId}' runtime, which embeds no Hermes. Its emitted C calls _sh_* entry points ` +
-      "that only libhermes.a defines, so uploading one would fail the link rather than change a transport."
+      "that only libhermes.a defines, so uploading one would fail the link rather than change a transport.",
   };
 }
 
@@ -132,14 +129,16 @@ export async function typedNativeDisposition(defoldPlatform, options = {}) {
 export async function reconcileTypedNativeUpload(options) {
   const projectRoot = path.resolve(options.projectRoot);
   const disposition = await typedNativeDisposition(options.platform, { projectRoot });
-  const materialised = await access(path.join(projectRoot, TYPED_NATIVE_EXTENSION))
-    .then(() => true, () => false);
+  const materialised = await access(path.join(projectRoot, TYPED_NATIVE_EXTENSION)).then(
+    () => true,
+    () => false,
+  );
   const defignore = path.join(projectRoot, ".defignore");
   const wanted = !disposition.eligible && materialised;
   const boundary = await reconcileBobProjectBoundary({
     projectRoot,
     includeEntries: wanted ? [TYPED_NATIVE_IGNORE_ENTRY] : [],
-    excludeEntries: wanted ? [] : [TYPED_NATIVE_IGNORE_ENTRY]
+    excludeEntries: wanted ? [] : [TYPED_NATIVE_IGNORE_ENTRY],
   });
   const result = {
     ...disposition,
@@ -147,7 +146,7 @@ export async function reconcileTypedNativeUpload(options) {
     materialised,
     ignored: wanted,
     changed: boundary.changed,
-    message: ""
+    message: "",
   };
   if (!boundary.changed) {
     result.message = wanted

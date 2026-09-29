@@ -58,10 +58,14 @@ function sourceScopes(code, position) {
 }
 
 function numberLiteral(value) {
-  const normalized = value.trim()
+  const normalized = value
+    .trim()
     .replace(/\b0[bB]([01]+)(?:u|U|l|L|ll|LL|ul|UL|ull|ULL)?\b/g, (_, bits) => String(parseInt(bits, 2)))
     .replace(/\b(0[xX][0-9a-fA-F]+|[0-9]+)(?:u|U|l|L|ll|LL|ul|UL|ull|ULL|f|F)\b/g, "$1")
-    .replace(/\b(?:lua_Number|int(?:8|16|32|64)_t|uint(?:8|16|32|64)_t|size_t|float|double|long|short|unsigned|signed|char)\b/g, "")
+    .replace(
+      /\b(?:lua_Number|int(?:8|16|32|64)_t|uint(?:8|16|32|64)_t|size_t|float|double|long|short|unsigned|signed|char)\b/g,
+      "",
+    )
     .replace(/\s+/g, " ")
     .trim();
   if (!/^[0-9a-fA-FxX.+\-*/%<>&|^~() \t]+$/.test(normalized)) return undefined;
@@ -78,7 +82,11 @@ function stringLiteral(value) {
   if (!/^"(?:[^"\\]|\\.)*"(?:\s*"(?:[^"\\]|\\.)*")*$/.test(trimmed)) return undefined;
   let joined = "";
   for (const match of trimmed.matchAll(/"((?:[^"\\]|\\.)*)"/g)) {
-    try { joined += JSON.parse(`"${match[1]}"`); } catch { return undefined; }
+    try {
+      joined += JSON.parse(`"${match[1]}"`);
+    } catch {
+      return undefined;
+    }
   }
   return joined;
 }
@@ -101,7 +109,9 @@ function collectSymbols(files) {
       macros.set(match[1], body);
       add(match[1], stringLiteral(body) ?? numberLiteral(body));
     }
-    for (const match of code.matchAll(/\benum(?:\s+(?:class|struct))?\s*([A-Za-z_]\w*(?:::\w+)*)?\s*(?::\s*[^\{]+)?\s*\{/g)) {
+    for (const match of code.matchAll(
+      /\benum(?:\s+(?:class|struct))?\s*([A-Za-z_]\w*(?:::\w+)*)?\s*(?::\s*[^{]+)?\s*\{/g,
+    )) {
       const open = match.index + match[0].lastIndexOf("{");
       const close = matchingBrace(code, open);
       if (close < 0) continue;
@@ -125,7 +135,9 @@ function collectSymbols(files) {
     }
     // Integral static/constexpr declarations cover the private engine enums
     // that are exposed by registration but are not SDK header enums.
-    for (const match of code.matchAll(/\b(?:static\s+)?(?:constexpr|const)\s+(?:unsigned\s+|signed\s+)?(?:long\s+long|long|short|int|uint\d*_t|int\d*_t|size_t|[A-Za-z_]\w*)\s+([A-Za-z_]\w*)\s*=\s*([^;]+);/g)) {
+    for (const match of code.matchAll(
+      /\b(?:static\s+)?(?:constexpr|const)\s+(?:unsigned\s+|signed\s+)?(?:long\s+long|long|short|int|uint\d*_t|int\d*_t|size_t|[A-Za-z_]\w*)\s+([A-Za-z_]\w*)\s*=\s*([^;]+);/g,
+    )) {
       const value = stringLiteral(match[2]) ?? numberLiteral(match[2]);
       const scopes = sourceScopes(code, match.index);
       const qualified = [...scopes, match[1]].join("::");
@@ -175,14 +187,22 @@ export function deriveConstantValues(files, registrations) {
     // blocker when two declarations disagree.
     const scopePrefixes = preferredScopes.map((scope) => `${scope}::`);
     const scopedCandidates = [...symbols.entries()]
-      .filter(([key]) => key.endsWith(`::${simple}`) && (
-        key.startsWith(`${normalized}::`) || key === normalized || scopePrefixes.some((scope) => key.startsWith(scope))))
-      .map(([, candidate]) => typeof candidate === "object" ? resolveExpression(candidate.expression, preferredScopes) : candidate)
+      .filter(
+        ([key]) =>
+          key.endsWith(`::${simple}`) &&
+          (key.startsWith(`${normalized}::`) ||
+            key === normalized ||
+            scopePrefixes.some((scope) => key.startsWith(scope))),
+      )
+      .map(([, candidate]) =>
+        typeof candidate === "object" ? resolveExpression(candidate.expression, preferredScopes) : candidate,
+      )
       .filter((candidate) => candidate !== undefined);
-    if (scopedCandidates.length && scopedCandidates.every((candidate) => candidate === scopedCandidates[0])) return scopedCandidates[0];
+    if (scopedCandidates.length && scopedCandidates.every((candidate) => candidate === scopedCandidates[0]))
+      return scopedCandidates[0];
     const candidates = bare.get(simple) ?? [];
     const values = candidates
-      .map((candidate) => typeof candidate === "object" ? resolveExpression(candidate.expression) : candidate)
+      .map((candidate) => (typeof candidate === "object" ? resolveExpression(candidate.expression) : candidate))
       .filter((candidate) => candidate !== undefined);
     const resolved = values.length && values.every((candidate) => candidate === values[0]) ? values[0] : undefined;
     resolving.delete(normalized);
@@ -191,8 +211,12 @@ export function deriveConstantValues(files, registrations) {
   const resolveExpression = (expression, preferredScopes = []) => {
     const directString = stringLiteral(expression);
     if (directString !== undefined) return directString;
-    let value = expression.trim()
-      .replace(/\(\s*(?:lua_Number|int(?:8|16|32|64)_t|uint(?:8|16|32|64)_t|size_t|float|double|long|short|unsigned|signed|char)\s*\)/g, "")
+    let value = expression
+      .trim()
+      .replace(
+        /\(\s*(?:lua_Number|int(?:8|16|32|64)_t|uint(?:8|16|32|64)_t|size_t|float|double|long|short|unsigned|signed|char)\s*\)/g,
+        "",
+      )
       .replace(/\bstatic_cast\s*<[^>]+>\s*\(/g, "(")
       .replace(/\s*::\s*/g, "::");
     const identifier = value.match(/^([A-Za-z_]\w*(?:::\s*[A-Za-z_]\w*)*)$/);
@@ -203,7 +227,10 @@ export function deriveConstantValues(files, registrations) {
     let undecided = false;
     value = value.replace(/\b[A-Za-z_]\w*(?:::\s*[A-Za-z_]\w*)*/g, (token) => {
       const resolved = resolveName(token, preferredScopes);
-      if (typeof resolved !== "number") { undecided = true; return token; }
+      if (typeof resolved !== "number") {
+        undecided = true;
+        return token;
+      }
       return `(${resolved})`;
     });
     if (undecided) return undefined;
@@ -217,13 +244,14 @@ export function deriveConstantValues(files, registrations) {
       ? sourceScopes(stripComments(source.text), source.text.split("\n").slice(0, registration.line).join("\n").length)
       : [];
     const value = resolveExpression(registration.expression, preferredScopes);
-    if (value !== undefined && (registration.valueKind === "number" || registration.valueKind === "string")) result.set(registration.name, {
-      valueKind: registration.valueKind,
-      value,
-      expression: registration.expression,
-      source: registration.path,
-      line: registration.line
-    });
+    if (value !== undefined && (registration.valueKind === "number" || registration.valueKind === "string"))
+      result.set(registration.name, {
+        valueKind: registration.valueKind,
+        value,
+        expression: registration.expression,
+        source: registration.path,
+        line: registration.line,
+      });
   }
   return result;
 }

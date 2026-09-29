@@ -47,8 +47,10 @@ function sha256(value) {
 function canonicalJson(value) {
   if (value === null || typeof value !== "object") return JSON.stringify(value);
   if (Array.isArray(value)) return `[${value.map(canonicalJson).join(",")}]`;
-  return `{${Object.keys(value).sort().map((key) =>
-    `${JSON.stringify(key)}:${canonicalJson(value[key])}`).join(",")}}`;
+  return `{${Object.keys(value)
+    .sort()
+    .map((key) => `${JSON.stringify(key)}:${canonicalJson(value[key])}`)
+    .join(",")}}`;
 }
 
 function parseArguments(argv) {
@@ -62,37 +64,44 @@ function parseArguments(argv) {
 }
 
 function emitted(declaration) {
-  return declaration.disposition === "generated" || declaration.emitted === true ||
-    (typeof declaration.wrapper === "string" && Number.isSafeInteger(declaration.denseId ?? declaration.bindingId));
+  return (
+    declaration.disposition === "generated" ||
+    declaration.emitted === true ||
+    (typeof declaration.wrapper === "string" && Number.isSafeInteger(declaration.denseId ?? declaration.bindingId))
+  );
 }
 
-export async function buildDmSdkGeneratedAdapterExact({ root = repositoryRoot, outRoot = root, familyReportPaths = {} } = {}) {
+export async function buildDmSdkGeneratedAdapterExact({
+  root = repositoryRoot,
+  outRoot = root,
+  familyReportPaths = {},
+} = {}) {
   const effectiveReportPaths = { ...reportPaths, ...familyReportPaths };
   const [catalogSource, irSource, reports] = await Promise.all([
     readFile(path.join(root, "packages/bindings/generated/defold-dmsdk-universal-bindings.json"), "utf8"),
     readFile(path.join(root, "packages/bindings/generated/defold-sdk-ir.json"), "utf8"),
-    Promise.all(Object.entries(effectiveReportPaths).map(async ([family, relative]) => {
-      const source = await readFile(path.resolve(root, relative), "utf8");
-      return [family, relative, source, JSON.parse(source)];
-    })),
+    Promise.all(
+      Object.entries(effectiveReportPaths).map(async ([family, relative]) => {
+        const source = await readFile(path.resolve(root, relative), "utf8");
+        return [family, relative, source, JSON.parse(source)];
+      }),
+    ),
   ]);
   const productionCatalog = JSON.parse(catalogSource);
   const ir = JSON.parse(irSource);
   const routeByDeclaration = new Map();
   const declarationByFamilyId = new Map();
   for (const [family, , , report] of reports) {
-    for (const declaration of [
-      ...(report.declarations ?? []),
-      ...(report.generatedDeclarations ?? []),
-    ]) {
+    for (const declaration of [...(report.declarations ?? []), ...(report.generatedDeclarations ?? [])]) {
       if (!emitted(declaration)) continue;
       const id = declaration.denseId ?? declaration.bindingId;
       if (!Number.isSafeInteger(id)) throw new Error(`${declaration.id} has no family-local adapter id`);
-      if (routeByDeclaration.has(declaration.id)) throw new Error(`${declaration.id} is owned by multiple callable adapter families`);
+      if (routeByDeclaration.has(declaration.id))
+        throw new Error(`${declaration.id} is owned by multiple callable adapter families`);
       const familyId = `${family}:${id}`;
       if (declarationByFamilyId.has(familyId)) {
         throw new Error(
-          `${declaration.id} and ${declarationByFamilyId.get(familyId)} share callable adapter identity ${familyId}`
+          `${declaration.id} and ${declarationByFamilyId.get(familyId)} share callable adapter identity ${familyId}`,
         );
       }
       declarationByFamilyId.set(familyId, declaration.id);
@@ -100,9 +109,7 @@ export async function buildDmSdkGeneratedAdapterExact({ root = repositoryRoot, o
         family,
         id,
         dispatcher: dispatchers[family],
-        callee: family === "arenaCString"
-          ? declaration.symbol
-          : declaration.wrapper ?? declaration.symbol,
+        callee: family === "arenaCString" ? declaration.symbol : (declaration.wrapper ?? declaration.symbol),
         digestBytes: declaration.digestBytes ?? null,
         resultBits: declaration.resultBits ?? null,
         mode: declaration.mode ?? declaration.recipe?.kind ?? null,
@@ -158,7 +165,7 @@ export async function buildDmSdkGeneratedAdapterExact({ root = repositoryRoot, o
   const orphanRoutes = [...routeByDeclaration.keys()].filter((declarationId) => !consumedRoutes.has(declarationId));
   if (orphanRoutes.length) {
     throw new Error(
-      `Callable adapter reports contain declarations absent from the generated-adapter recipe surface: ${orphanRoutes.join(", ")}`
+      `Callable adapter reports contain declarations absent from the generated-adapter recipe surface: ${orphanRoutes.join(", ")}`,
     );
   }
   const exactCatalogSha256 = sha256(JSON.stringify(recipes));
@@ -177,8 +184,9 @@ export async function buildDmSdkGeneratedAdapterExact({ root = repositoryRoot, o
     sourceHashes: {
       productionCatalog: sha256(catalogSource),
       sdkIr: sha256(irSource),
-      familyReports: Object.fromEntries(reports.map(([family, relative, source]) =>
-        [family, { path: relative, sha256: sha256(source) }])),
+      familyReports: Object.fromEntries(
+        reports.map(([family, relative, source]) => [family, { path: relative, sha256: sha256(source) }]),
+      ),
     },
   };
   const report = { ...reportBody, corpusSha256: sha256(canonicalJson(reportBody)) };
@@ -199,7 +207,9 @@ export async function run(argv = process.argv.slice(2)) {
   const options = parseArguments(argv);
   if (!options.check) {
     const result = await buildDmSdkGeneratedAdapterExact({ outRoot: options.outRoot });
-    process.stdout.write(`Generated ${result.report.generatedAdapterCount} dmSDK generated-adapter exact vectors from ${result.report.recipeCount} recipes.\n`);
+    process.stdout.write(
+      `Generated ${result.report.generatedAdapterCount} dmSDK generated-adapter exact vectors from ${result.report.recipeCount} recipes.\n`,
+    );
     return result;
   }
   const temporary = await mkdtemp(path.join(tmpdir(), "deherm-dmsdk-generated-adapter-exact-"));
@@ -212,7 +222,9 @@ export async function run(argv = process.argv.slice(2)) {
       ]);
       if (!expected.equals(actual)) throw new Error(`${relative} is stale`);
     }
-    process.stdout.write(`Verified ${result.report.generatedAdapterCount} dmSDK generated-adapter exact vectors from ${result.report.recipeCount} recipes.\n`);
+    process.stdout.write(
+      `Verified ${result.report.generatedAdapterCount} dmSDK generated-adapter exact vectors from ${result.report.recipeCount} recipes.\n`,
+    );
     return result;
   } finally {
     await rm(temporary, { recursive: true, force: true });
@@ -220,5 +232,8 @@ export async function run(argv = process.argv.slice(2)) {
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
-  run().catch((error) => { console.error(error.stack ?? error); process.exitCode = 1; });
+  run().catch((error) => {
+    console.error(error.stack ?? error);
+    process.exitCode = 1;
+  });
 }

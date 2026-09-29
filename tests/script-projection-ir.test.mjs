@@ -7,13 +7,15 @@ import {
   generateScriptProjectionIr,
   inputPaths,
   loadScriptProjectionInputs,
-  parseValueShape
+  parseValueShape,
 } from "../scripts/generate-script-projection-ir.mjs";
 
 const root = new URL("../", import.meta.url);
 const inputs = await loadScriptProjectionInputs();
 const generated = generateScriptProjectionIr(inputs);
-const checked = JSON.parse(await readFile(new URL("packages/bindings/generated/defold-script-projection-ir.json", root), "utf8"));
+const checked = JSON.parse(
+  await readFile(new URL("packages/bindings/generated/defold-script-projection-ir.json", root), "utf8"),
+);
 
 function replaceJson(text, mutate) {
   const value = JSON.parse(text);
@@ -26,38 +28,44 @@ test("projects the source-derived script API census exactly once independently o
   assert.deepEqual(generated.generationCounts, { projected: generated.routeCount });
   assert.equal(new Set(generated.rows.map(({ id }) => id)).size, generated.routeCount);
   const accountingCounts = {};
-  for (const row of JSON.parse(inputs.accounting).rows) accountingCounts[row.category] = (accountingCounts[row.category] ?? 0) + 1;
+  for (const row of JSON.parse(inputs.accounting).rows)
+    accountingCounts[row.category] = (accountingCounts[row.category] ?? 0) + 1;
   assert.deepEqual(generated.accountingCounts, Object.fromEntries(Object.entries(accountingCounts).sort()));
-  assert.ok(generated.rows.every(({ generation, evidence }) =>
-    generation.state === "projected" && typeof evidence.accountingCategory === "string"));
+  assert.ok(
+    generated.rows.every(
+      ({ generation, evidence }) => generation.state === "projected" && typeof evidence.accountingCategory === "string",
+    ),
+  );
   assert.deepEqual(checked, generated);
 });
 
 test("normalizes the value algebra structurally instead of route-specific hand coding", () => {
   assert.deepEqual(parseValueShape("number|nil"), {
     kind: "optional",
-    value: { kind: "scalar", name: "number" }
+    value: { kind: "scalar", name: "number" },
   });
   assert.deepEqual(parseValueShape("table<hash, vector3[]>"), {
     kind: "map",
     key: { kind: "defold-value", name: "hash" },
-    value: { kind: "sequence", element: { kind: "defold-value", name: "vector3" } }
+    value: { kind: "sequence", element: { kind: "defold-value", name: "vector3" } },
   });
   assert.deepEqual(parseValueShape("{ index?:integer, enabled:boolean }"), {
     kind: "record",
     fields: [
       { name: "index", optional: true, value: { kind: "scalar", name: "integer" } },
-      { name: "enabled", optional: false, value: { kind: "scalar", name: "boolean" } }
-    ]
+      { name: "enabled", optional: false, value: { kind: "scalar", name: "boolean" } },
+    ],
   });
   assert.deepEqual(parseValueShape("b2Body", ["handle"]), { kind: "handle", name: "b2Body" });
   assert.deepEqual(parseValueShape("fun(self:script_instance)|nil"), {
     kind: "optional",
     value: {
       kind: "callback",
-      parameters: [{ name: "self", optional: false, variadic: false, value: { kind: "named", name: "script_instance" } }],
-      returns: []
-    }
+      parameters: [
+        { name: "self", optional: false, variadic: false, value: { kind: "named", name: "script_instance" } },
+      ],
+      returns: [],
+    },
   });
 });
 
@@ -100,24 +108,43 @@ test("uses the source-registered Lua spelling without suppressing the documented
   assert.deepEqual(route.runtimeModulePath, ["sys"]);
   assert.equal(route.runtimeMember, "set_render_enabled");
   assert.equal(route.registration.token, "registration-corrected");
-  assert.equal(route.generation.semanticHoles.some((hole) => hole.startsWith("registration:")), false);
+  assert.equal(
+    route.generation.semanticHoles.some((hole) => hole.startsWith("registration:")),
+    false,
+  );
 });
 
 test("never promotes absence of a gate correction into source verification", () => {
-  const sourceObserved = generated.rows.find(({ registration }) =>
-    registration.token === "registration-source-observed");
-  const documentationOnly = generated.rows.find(({ registration }) =>
-    registration.token === "registration-documentation-only");
-  const variant = generated.rows.find(({ registration }) =>
-    registration.token === "registration-source-variant");
+  const sourceObserved = generated.rows.find(
+    ({ registration }) => registration.token === "registration-source-observed",
+  );
+  const documentationOnly = generated.rows.find(
+    ({ registration }) => registration.token === "registration-documentation-only",
+  );
+  const variant = generated.rows.find(({ registration }) => registration.token === "registration-source-variant");
   assert.ok(sourceObserved);
-  assert.equal(sourceObserved.registration.authority.targetStates.every((state) => state === "registered"), true);
+  assert.equal(
+    sourceObserved.registration.authority.targetStates.every((state) => state === "registered"),
+    true,
+  );
   assert.ok(documentationOnly);
-  assert.equal(documentationOnly.registration.authority.targetStates.some((state) => state === "registered"), false);
+  assert.equal(
+    documentationOnly.registration.authority.targetStates.some((state) => state === "registered"),
+    false,
+  );
   assert.ok(variant);
-  assert.equal(variant.registration.authority.targetStates.some((state) => state === "registered"), true);
-  assert.equal(variant.registration.authority.targetStates.some((state) => state !== "registered"), true);
-  assert.equal(generated.rows.some(({ registration }) => registration.token === "registration-verified"), false);
+  assert.equal(
+    variant.registration.authority.targetStates.some((state) => state === "registered"),
+    true,
+  );
+  assert.equal(
+    variant.registration.authority.targetStates.some((state) => state !== "registered"),
+    true,
+  );
+  assert.equal(
+    generated.rows.some(({ registration }) => registration.token === "registration-verified"),
+    false,
+  );
 });
 
 test("rejects omitted, duplicated, foreign, and stale route inputs", () => {
@@ -133,12 +160,13 @@ test("rejects omitted, duplicated, foreign, and stale route inputs", () => {
   assert.throws(() => generateScriptProjectionIr(duplicate), /duplicate id/);
 
   const foreign = structuredClone(inputs);
-  foreign.callbacks = replaceJson(foreign.callbacks, (value) => value.routes.push({
-    ...value.routes[0],
-    id: "script:not.real"
-  }));
+  foreign.callbacks = replaceJson(foreign.callbacks, (value) =>
+    value.routes.push({
+      ...value.routes[0],
+      id: "script:not.real",
+    }),
+  );
   assert.throws(() => generateScriptProjectionIr(foreign), /absent from script IR/);
-
 });
 
 test("derives add/remove route drift from the current IR and accounting inputs", () => {
@@ -190,6 +218,6 @@ test("pins every machine-readable input and checks deterministic regeneration", 
   assert.equal(new Set(generated.rows.map(({ stableId }) => stableId)).size, generated.routeCount);
   execFileSync(process.execPath, ["scripts/generate-script-projection-ir.mjs", "--check"], {
     cwd: root,
-    stdio: "pipe"
+    stdio: "pipe",
   });
 });

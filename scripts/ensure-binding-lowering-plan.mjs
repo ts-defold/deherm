@@ -6,7 +6,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import {
   generateBindingLoweringPlan,
   inputPaths,
-  loadBindingLoweringInputs
+  loadBindingLoweringInputs,
 } from "./generate-binding-lowering-plan.mjs";
 
 const scriptDirectory = dirname(fileURLToPath(import.meta.url));
@@ -24,7 +24,7 @@ function parseArguments(argv) {
     sentinel: resolve(repositoryRoot, "packages/bindings/generated/defold-binding-lowering-plan.sentinel.json"),
     check: false,
     deepCheck: false,
-    force: false
+    force: false,
   };
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
@@ -36,7 +36,8 @@ function parseArguments(argv) {
     else if (argument === "--sentinel") options.sentinel = resolve(argv[++index]);
     else throw new Error(`Unknown argument: ${argument}`);
   }
-  if ((options.check || options.deepCheck) && options.force) throw new Error("check modes and --force are mutually exclusive");
+  if ((options.check || options.deepCheck) && options.force)
+    throw new Error("check modes and --force are mutually exclusive");
   return options;
 }
 
@@ -75,7 +76,7 @@ async function cacheIdentity(root, inputs) {
     generatorSha256,
     inputPaths,
     inputHashes,
-    cacheKey: sha256(JSON.stringify({ generatorSha256, inputHashes, inputPaths, rootSchema: 1 }))
+    cacheKey: sha256(JSON.stringify({ generatorSha256, inputHashes, inputPaths, rootSchema: 1 })),
   };
 }
 
@@ -89,14 +90,22 @@ function validateCurrent(identity, sentinel, outputStat) {
 
 export async function ensureBindingLoweringPlan(options = {}) {
   const root = resolve(options.root ?? repositoryRoot);
-  const outputPath = resolve(options.output ?? resolve(root, "packages/bindings/generated/defold-binding-lowering-plan.json"));
-  const sentinelPath = resolve(options.sentinel ?? resolve(root, "packages/bindings/generated/defold-binding-lowering-plan.sentinel.json"));
+  const outputPath = resolve(
+    options.output ?? resolve(root, "packages/bindings/generated/defold-binding-lowering-plan.json"),
+  );
+  const sentinelPath = resolve(
+    options.sentinel ?? resolve(root, "packages/bindings/generated/defold-binding-lowering-plan.sentinel.json"),
+  );
   const inputs = await loadBindingLoweringInputs(root);
   const identity = await cacheIdentity(root, inputs);
   const [sentinelText, outputStat] = await Promise.all([readIfPresent(sentinelPath), statIfPresent(outputPath)]);
   let sentinel = null;
   if (sentinelText) {
-    try { sentinel = JSON.parse(sentinelText); } catch { sentinel = null; }
+    try {
+      sentinel = JSON.parse(sentinelText);
+    } catch {
+      sentinel = null;
+    }
   }
   let staleReason = options.force ? "forced" : validateCurrent(identity, sentinel, outputStat);
   if (!staleReason && options.deepCheck) {
@@ -109,7 +118,8 @@ export async function ensureBindingLoweringPlan(options = {}) {
         const calculatedPlanSha256 = sha256(JSON.stringify(planBody));
         if (planSha256 !== calculatedPlanSha256) staleReason = "plan-internal-digest-mismatch";
         else if (sentinel.planSha256 !== planSha256) staleReason = "plan-identity-mismatch";
-        else if (JSON.stringify(output.inputHashes) !== JSON.stringify(identity.inputHashes)) staleReason = "plan-input-hashes-mismatch";
+        else if (JSON.stringify(output.inputHashes) !== JSON.stringify(identity.inputHashes))
+          staleReason = "plan-input-hashes-mismatch";
         else {
           const expected = `${JSON.stringify(generateBindingLoweringPlan(inputs), null, 2)}\n`;
           if (outputText !== expected) staleReason = "output-does-not-match-declared-inputs";
@@ -131,7 +141,7 @@ export async function ensureBindingLoweringPlan(options = {}) {
     output: "packages/bindings/generated/defold-binding-lowering-plan.json",
     outputBytes: Buffer.byteLength(serialized),
     outputSha256: sha256(serialized),
-    planSha256: plan.planSha256
+    planSha256: plan.planSha256,
   };
   await atomicWrite(outputPath, serialized);
   await atomicWrite(sentinelPath, `${JSON.stringify(nextSentinel, null, 2)}\n`);
@@ -141,9 +151,11 @@ export async function ensureBindingLoweringPlan(options = {}) {
 export async function run(argv = process.argv.slice(2)) {
   const options = parseArguments(argv);
   const result = await ensureBindingLoweringPlan(options);
-  process.stdout.write(result.action === "current"
-    ? `Binding lowering plan is current (${result.cacheKey}). No files written.\n`
-    : `Regenerated binding lowering plan (${result.reason}; ${result.cacheKey}).\n`);
+  process.stdout.write(
+    result.action === "current"
+      ? `Binding lowering plan is current (${result.cacheKey}). No files written.\n`
+      : `Regenerated binding lowering plan (${result.reason}; ${result.cacheKey}).\n`,
+  );
   return result;
 }
 

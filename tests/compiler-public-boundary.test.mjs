@@ -8,8 +8,5 @@ test("the compiler public API exposes pure lowering, not checkout path loading",
   assert.equal(typeof compiler.generateBindingLoweringPlan, "function");
   assert.equal("loadBindingLoweringInputs" in compiler, false);
   assert.equal("run" in compiler, false);
-  await assert.rejects(
-    loadBindingLoweringInputs(),
-    /requires an explicit authenticated or materialized surface root/u
-  );
+  await assert.rejects(loadBindingLoweringInputs(), /requires an explicit authenticated or materialized surface root/u);
 });

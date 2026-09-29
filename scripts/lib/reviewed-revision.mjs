@@ -102,11 +102,12 @@ export function assertReviewedRevision({ input, reviewed, derived, detail, env =
   if (derivation !== derived) {
     throw new Error(
       `${input} was reviewed against Defold ${reviewed}, but ${derived} is being generated` +
-      (detail ? ` (${detail})` : "") + ".\n" +
-      "A reviewed input speaks only for the revision it was read at. Re-review it against the " +
-      "revision being generated, or derive that revision with " +
-      `"node scripts/derive-revision.mjs --revision ${derived} --carry-reviews", which derives ` +
-      "into a scratch workspace and records every carried review for a reviewer."
+        (detail ? ` (${detail})` : "") +
+        ".\n" +
+        "A reviewed input speaks only for the revision it was read at. Re-review it against the " +
+        "revision being generated, or derive that revision with " +
+        `"node scripts/derive-revision.mjs --revision ${derived} --carry-reviews", which derives ` +
+        "into a scratch workspace and records every carried review for a reviewer.",
     );
   }
 
@@ -166,19 +167,22 @@ export function observeReviewedSource({ input, id, source, evidence, reviewed, d
   // what moved could report "3 moved" without the denominator that makes 3
   // readable, and could not tell "nothing moved" apart from "nothing ran".
   {
-    recordAudit({
-      input,
-      id,
-      source: evidence.source ?? evidence.path ?? null,
-      status: verdict.status,
-      reason: verdict.reason,
-      reviewedSha: evidence.sha256,
-      observed: verdict.observed,
-      anchorsHeld: verdict.anchorsHeld,
-      anchorsLost: verdict.anchorsLost,
-      reviewed,
-      derived
-    }, env);
+    recordAudit(
+      {
+        input,
+        id,
+        source: evidence.source ?? evidence.path ?? null,
+        status: verdict.status,
+        reason: verdict.reason,
+        reviewedSha: evidence.sha256,
+        observed: verdict.observed,
+        anchorsHeld: verdict.anchorsHeld,
+        anchorsLost: verdict.anchorsLost,
+        reviewed,
+        derived,
+      },
+      env,
+    );
   }
   return { ...verdict, id };
 }
@@ -212,7 +216,13 @@ export async function loadReviewedSources({ input, defoldRoot, evidence, reviewe
     const relative = record.path ?? record.source;
     const text = await readFile(join(defoldRoot, relative), "utf8").catch(() => null);
     const verdict = observeReviewedSource({
-      input, id: `${relative}`, source: text, evidence: record, reviewed, derived, env
+      input,
+      id: `${relative}`,
+      source: text,
+      evidence: record,
+      reviewed,
+      derived,
+      env,
     });
     verdicts.push(verdict);
     if (verdict.status === VOID) withdrawn.add(relative);
@@ -252,7 +262,7 @@ export function expectReviewedCount({ input, label, expected, observed, env = pr
   if (!derived) {
     throw new Error(
       `${input}: ${label} expected ${expected}, found ${observed}. ` +
-      "This is an ordinary generation, so nothing about Defold moved and this is a regression in this tree."
+        "This is an ordinary generation, so nothing about Defold moved and this is a regression in this tree.",
     );
   }
   recordAudit({ input, id: label, status: MOVED, reason: "census", expected, observed, derived }, env);
@@ -298,12 +308,13 @@ export function expectSameRevision({ label, inputs }) {
   if (!disagreeing.length) return reference.revision;
   throw new Error(
     `${label} inputs use different Defold revisions.\n` +
-    `  ${reference.path}: ${reference.revision}\n` +
-    disagreeing.map(({ path, revision }) => `  ${path}: ${revision}`).join("\n") + "\n" +
-    "These are artifacts this repository derives, not reviews: one describes a different " +
-    "Defold revision from the other, and emitting a surface from both would join rows " +
-    "across revisions. Inside a declared derivation the chain regenerates in dependency " +
-    "order, so a stamp naming the wrong revision means the step that writes it refused " +
-    "earlier in this run - fix that refusal rather than this comparison."
+      `  ${reference.path}: ${reference.revision}\n` +
+      disagreeing.map(({ path, revision }) => `  ${path}: ${revision}`).join("\n") +
+      "\n" +
+      "These are artifacts this repository derives, not reviews: one describes a different " +
+      "Defold revision from the other, and emitting a surface from both would join rows " +
+      "across revisions. Inside a declared derivation the chain regenerates in dependency " +
+      "order, so a stamp naming the wrong revision means the step that writes it refused " +
+      "earlier in this run - fix that refusal rather than this comparison.",
   );
 }

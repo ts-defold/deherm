@@ -52,7 +52,7 @@
 const VARIANT_PATTERNS = Object.freeze([
   Object.freeze({ feature: "box2d-v2", pattern: /box2d[-_]v2|_v2\.cpp/ }),
   Object.freeze({ feature: "box2d-v3", pattern: /box2d[-_]v3|_v3\.cpp/ }),
-  Object.freeze({ feature: "bullet3d", pattern: /bullet3d/ })
+  Object.freeze({ feature: "bullet3d", pattern: /bullet3d/ }),
 ]);
 
 /**
@@ -138,7 +138,7 @@ export function resolveDocumentedDuplication(name, declarations) {
       route: runtime[0],
       reason: "build-variant",
       variants: features.sort(),
-      overloads: runtime.slice(1)
+      overloads: runtime.slice(1),
     };
   }
 
@@ -149,9 +149,10 @@ export function resolveDocumentedDuplication(name, declarations) {
 
   throw new Error(
     `${name} is documented ${runtime.length} times and the duplication cannot be attributed:\n  ` +
-    runtime.map((row) => `${row.source}:${row.line}`).join("\n  ") + "\n" +
-    "It is not the editor surface, not a build variant this repository models, and not " +
-    "alternative signatures in one file. Classify it in " +
-    "scripts/lib/documented-route-duplication.mjs rather than letting one declaration win."
+      runtime.map((row) => `${row.source}:${row.line}`).join("\n  ") +
+      "\n" +
+      "It is not the editor surface, not a build variant this repository models, and not " +
+      "alternative signatures in one file. Classify it in " +
+      "scripts/lib/documented-route-duplication.mjs rather than letting one declaration win.",
   );
 }

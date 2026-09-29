@@ -8,26 +8,28 @@ export const REVISION_OUTPUT_ROOTS = Object.freeze([
   Object.freeze({ root: "packages/static-hermes/src/generated", all: true }),
   Object.freeze({ root: "defold/defold_hermes/include/defold_hermes", prefix: "generated" }),
   Object.freeze({ root: "defold/defold_hermes/src", prefix: "generated" }),
-  Object.freeze({ root: "defold/defold_hermes/lib/web", prefix: "generated" })
+  Object.freeze({ root: "defold/defold_hermes/lib/web", prefix: "generated" }),
 ]);
 
 // These generated-looking files are functions only of package-owned emitters
 // and constants. They are deliberately not revision-policy facts.
-export const STABLE_GENERATED_OUTPUTS = Object.freeze(new Set([
-  "defold/defold_hermes/include/defold_hermes/generated_build_config.h",
-  // Selected per project/build profile by the artifact installer. It is not a
-  // fact derived from a Defold revision and must never enter a published
-  // revision policy merely because a local development run created it.
-  "defold/defold_hermes/include/defold_hermes/generated_runtime_variant.h",
-  "defold/defold_hermes/include/defold_hermes/generated_component_proxy_capability.hpp",
-  "defold/defold_hermes/include/defold_hermes/generated_dmsdk_universal_static_frame.h",
-  "defold/defold_hermes/include/defold_hermes/generated_native_module_jsi.hpp",
-  "defold/defold_hermes/include/defold_hermes/native_module_provider.h",
-  "defold/defold_hermes/src/generated_dmsdk_universal_static_frame.cpp",
-  "defold/defold_hermes/src/generated_native_module_jsi.cpp",
-  "defold/defold_hermes/src/generated_native_module_registry.cpp",
-  "packages/static-hermes/src/generated/dmsdk-universal.ts"
-]));
+export const STABLE_GENERATED_OUTPUTS = Object.freeze(
+  new Set([
+    "defold/defold_hermes/include/defold_hermes/generated_build_config.h",
+    // Selected per project/build profile by the artifact installer. It is not a
+    // fact derived from a Defold revision and must never enter a published
+    // revision policy merely because a local development run created it.
+    "defold/defold_hermes/include/defold_hermes/generated_runtime_variant.h",
+    "defold/defold_hermes/include/defold_hermes/generated_component_proxy_capability.hpp",
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_universal_static_frame.h",
+    "defold/defold_hermes/include/defold_hermes/generated_native_module_jsi.hpp",
+    "defold/defold_hermes/include/defold_hermes/native_module_provider.h",
+    "defold/defold_hermes/src/generated_dmsdk_universal_static_frame.cpp",
+    "defold/defold_hermes/src/generated_native_module_jsi.cpp",
+    "defold/defold_hermes/src/generated_native_module_registry.cpp",
+    "packages/static-hermes/src/generated/dmsdk-universal.ts",
+  ]),
+);
 
 // Target-native artifacts are never package or source-tree inputs to project
 // generation. They are selected from the authenticated Defold target matrix,
@@ -38,8 +40,9 @@ const TARGET_NATIVE_OUTPUT_PATTERN =
 
 export function isTargetNativeOutput(relative) {
   const portable = String(relative).replaceAll(path.sep, "/");
-  return portable === "defold/defold_hermes/include/libhermesvm-config.h" ||
-    TARGET_NATIVE_OUTPUT_PATTERN.test(portable);
+  return (
+    portable === "defold/defold_hermes/include/libhermesvm-config.h" || TARGET_NATIVE_OUTPUT_PATTERN.test(portable)
+  );
 }
 
 export function isRevisionOutput(relative) {

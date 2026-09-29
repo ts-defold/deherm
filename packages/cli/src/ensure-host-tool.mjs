@@ -37,22 +37,26 @@ export function toolCacheRoot(options = {}) {
 }
 
 async function readReleaseTags(options = {}) {
-  const file = options.releaseTagsPath
-    ?? path.join(moduleRoot, "packages", "toolchains", "release-tags.json");
+  const file = options.releaseTagsPath ?? path.join(moduleRoot, "packages", "toolchains", "release-tags.json");
   return JSON.parse(await readFile(file, "utf8"));
 }
 
 async function digestOf(file) {
-  return createHash("sha256").update(await readFile(file)).digest("hex");
+  return createHash("sha256")
+    .update(await readFile(file))
+    .digest("hex");
 }
 
 async function cachedMembersMatch(destination, members, expectedDigests) {
   for (const member of members) {
     const file = path.join(destination, member);
-    const present = await stat(file).then((entry) => entry.isFile(), () => false);
+    const present = await stat(file).then(
+      (entry) => entry.isFile(),
+      () => false,
+    );
     if (!present) return false;
     const expected = expectedDigests[member];
-    if (expected && await digestOf(file).catch(() => null) !== expected) return false;
+    if (expected && (await digestOf(file).catch(() => null)) !== expected) return false;
   }
   return members.length > 0;
 }
@@ -95,13 +99,18 @@ export async function ensureHostFamily(family, host, options = {}) {
       tag: reference.tag,
       assets: [asset],
       destination: staging,
-      onProgress: options.onProgress
+      onProgress: options.onProgress,
     });
     await extractReleaseArchive({ archive: downloaded[0], destination: staging });
     await rm(downloaded[0], { force: true });
     for (const member of members) {
       const file = path.join(staging, member);
-      if (!await stat(file).then(() => true, () => false)) {
+      if (
+        !(await stat(file).then(
+          () => true,
+          () => false,
+        ))
+      ) {
         throw new Error(`${asset} does not contain ${member}`);
       }
       const expected = expectedDigests[member];
@@ -124,7 +133,9 @@ export async function verifyAgainstManifest(file, expectedSha256) {
   if (!expectedSha256) return { verified: false, reason: "manifest records no digest" };
   const actual = await digestOf(file);
   if (actual !== expectedSha256) {
-    throw new Error(`${path.basename(file)} hashes ${actual.slice(0, 12)}, manifest expects ${expectedSha256.slice(0, 12)}`);
+    throw new Error(
+      `${path.basename(file)} hashes ${actual.slice(0, 12)}, manifest expects ${expectedSha256.slice(0, 12)}`,
+    );
   }
   return { verified: true, sha256: actual };
 }

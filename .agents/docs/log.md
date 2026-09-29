@@ -4581,3 +4581,36 @@ identity to remain stable for a second sample, matching the production
 watcher's event debounce instead of treating an in-place truncate/refill as two
 authored saves. Focused and cross-platform results are recorded only after they
 run.
+
+## 2026-09-29 - portable release gates and exact-call regeneration closure
+
+The release-readiness matrix now streams every long-running product command
+through a cross-platform Node wrapper and writes the bounded failure tail to
+the GitHub step summary. The shipping `dehermc` hash-literal path remains in
+`test:dev`; the repository-only raw `ttsc` source-plugin probes have their own
+gate so a Node host compatibility defect cannot make the installed product
+look broken. Windows installed-package fixtures use directory junctions while
+POSIX hosts retain directory symlinks.
+
+Oxc now covers the complete scripts, generator, compiler, CLI, SDK, VS Code,
+and test source surfaces rather than a thirteen-file sample. `pnpm check`
+executes that lint/format gate and the raw source-plugin probes before generated
+state. The first broad pass found an omitted invocation-kind argument in the
+dmSDK universal exact-call materializer: placement-constructor fakes were
+declared `void` while their generated body returned the receiver. The emitter
+now passes the source-derived invocation kind, the dmSDK pipeline regenerated
+its exact twins, and all 26 focused browser/C ABI/JSI exact-call tests compile
+and execute successfully.
+
+Formatting package emitters intentionally rotated the content-addressed
+lowering-plan and policy identities. Both were regenerated from their declared
+inputs; policy realization remains 52 namespaces, 189 subtrees, 25.39 MB, and
+the policy-only SDK reconstruction test materializes the same 28-file surface
+without a Defold checkout. Real War Battles evidence was not edited around the
+identity change: the Deno HTTP/3 plus headless Chrome gate re-recorded a
+32-player WebTransport session with three snapshots and twelve inputs, and the
+deterministic three-profile network impairment matrix was regenerated. Dev
+runtime tests pass 142/142, VS Code tests pass 19/19, Defold WebTransport tests
+pass 75/75, and the War Battles session subset passes 131/131. These are
+generation, compile/exact-call, loopback transport, and product-test claims;
+they are not a visual-quality or every-platform binary release claim.

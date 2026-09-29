@@ -1,14 +1,18 @@
 #!/usr/bin/env node
 
 import { createHash, randomBytes } from "node:crypto";
-import { spawn } from "node:child_process";
 import { cp, mkdir, readFile, readdir, rename, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import { downloadReleaseAssets, extractReleaseArchive } from "../packages/cli/src/release-assets.mjs";
 import { fileURLToPath } from "node:url";
 
-import { allTargetNames, buildInputPath, deriveBundleTargets, readBundleTargets } from "./generate-defold-bundle-targets.mjs";
+import {
+  allTargetNames,
+  buildInputPath,
+  deriveBundleTargets,
+  readBundleTargets,
+} from "./generate-defold-bundle-targets.mjs";
 // The input set that decides these bytes - and therefore the release tag - is
 // declared in one place for all three artifact families. It hashes the Hermes
 // pin and the per-target build recipe, and only the `sdk` and `targets` fields
@@ -20,7 +24,7 @@ import {
   fingerprintFamily,
   publishedAssets,
   targetDebugLibraryName,
-  targetLibraryName
+  targetLibraryName,
 } from "./lib/artifact-releases.mjs";
 
 const FAMILY = "native-artifacts";
@@ -91,9 +95,11 @@ async function install(downloadRoot) {
     // both libraries are found the same way and neither is matched by parsing a
     // flat asset name.
     const find = (name) => {
-      const candidates = available.filter((file) =>
-        path.basename(file) === name && file.split(path.sep).includes(`hermes-${target}`));
-      if (candidates.length > 1) throw new Error(`Expected one ${name} in hermes-${target}, found ${candidates.length}`);
+      const candidates = available.filter(
+        (file) => path.basename(file) === name && file.split(path.sep).includes(`hermes-${target}`),
+      );
+      if (candidates.length > 1)
+        throw new Error(`Expected one ${name} in hermes-${target}, found ${candidates.length}`);
       return candidates[0] ?? null;
     };
     const release = find(targetLibraryName(target, artifact));
@@ -155,7 +161,8 @@ async function record(target) {
   if (!artifact) throw new Error(`Unknown native artifact target ${target}`);
   if (!installable(artifact)) throw new Error(`${target} is ${artifact.status} and carries no digest`);
   const bytes = await readFile(path.join(root, artifact.library));
-  if (bytes.byteLength < 1_000_000) throw new Error(`${target} artifact is implausibly small (${bytes.byteLength} bytes)`);
+  if (bytes.byteLength < 1_000_000)
+    throw new Error(`${target} artifact is implausibly small (${bytes.byteLength} bytes)`);
   artifact.status = "vendored";
   artifact.sha256 = digest(bytes);
   artifact.bytes = bytes.byteLength;
@@ -184,7 +191,9 @@ async function expectedTargets() {
     if (error?.code !== "ENOENT") throw error;
   }
   if (derived && derived.sourceSha256 !== generated.sourceSha256) {
-    throw new Error("packages/toolchains/defold-bundle-targets.json is stale; run node scripts/generate-defold-bundle-targets.mjs");
+    throw new Error(
+      "packages/toolchains/defold-bundle-targets.json is stale; run node scripts/generate-defold-bundle-targets.mjs",
+    );
   }
   return { generated, targets: allTargetNames(generated) };
 }
@@ -204,7 +213,7 @@ async function report() {
       builder: artifact.builder ?? null,
       library: artifact.library ?? null,
       blocker: artifact.blocker ?? null,
-      detail: ""
+      detail: "",
     };
     if (!knownStatuses.has(artifact.status)) {
       row.detail = `unknown status ${artifact.status}`;
@@ -268,7 +277,7 @@ async function report() {
     source: generated.source,
     missingFromManifest,
     unknownInManifest,
-    targets: rows
+    targets: rows,
   };
 }
 
@@ -280,7 +289,7 @@ async function verify(complete, json, selected = new Set()) {
   const known = new Set([
     ...result.targets.map((row) => row.target),
     ...result.missingFromManifest,
-    ...result.unknownInManifest
+    ...result.unknownInManifest,
   ]);
   for (const target of selected) {
     if (!known.has(target)) problems.push(`${target}: unknown Defold bundle target`);
@@ -294,15 +303,22 @@ async function verify(complete, json, selected = new Set()) {
   for (const row of result.targets.filter((candidate) => inScope(candidate.target))) {
     if (row.invalid) problems.push(`${row.target}: ${row.detail}`);
     else if (complete && missingStatuses.has(row.status)) {
-      problems.push(`${row.target}: ${row.status}${row.blocker ? ` (${row.blocker.code}: ${row.blocker.reason})` : ` (${row.detail})`}`);
+      problems.push(
+        `${row.target}: ${row.status}${row.blocker ? ` (${row.blocker.code}: ${row.blocker.reason})` : ` (${row.detail})`}`,
+      );
     }
   }
   if (problems.length) {
-    throw new Error(`Native artifact matrix (${complete ? "complete" : "declared"}) failed:\n${problems.map((problem) => `- ${problem}`).join("\n")}`);
+    throw new Error(
+      `Native artifact matrix (${complete ? "complete" : "declared"}) failed:\n${problems.map((problem) => `- ${problem}`).join("\n")}`,
+    );
   }
   if (!json) {
     const rows = result.targets.filter((candidate) => inScope(candidate.target));
-    for (const row of rows) console.log(`${row.status === "vendored" || row.status === "vendored-source" ? "ok" : "--"} ${row.target}: ${row.status} ${row.detail}`);
+    for (const row of rows)
+      console.log(
+        `${row.status === "vendored" || row.status === "vendored-source" ? "ok" : "--"} ${row.target}: ${row.status} ${row.detail}`,
+      );
     console.log(`ok native artifact matrix (${complete ? "complete" : "declared"}): ${rows.length} target(s)`);
   }
 }
@@ -317,14 +333,6 @@ function selectedTargets(args) {
     index += 1;
   }
   return targets;
-}
-
-function run(command, args) {
-  return new Promise((resolve, reject) => {
-    const child = spawn(command, args, { cwd: root, stdio: "inherit" });
-    child.once("error", reject);
-    child.once("exit", (code, signal) => code === 0 ? resolve() : reject(new Error(`${command} exited ${code ?? signal}`)));
-  });
 }
 
 const [command, ...args] = process.argv.slice(2);
@@ -347,8 +355,7 @@ else if (command === "install") {
 else if (command === "expected-assets") console.log((await expectedAssets()).join("\n"));
 else if (command === "verify") {
   await verify(args.includes("--complete"), args.includes("--json"), selectedTargets(args));
-}
-else if (command === "pull") {
+} else if (command === "pull") {
   // Release assets, not workflow artifacts. A workflow artifact expires, is
   // scoped to one run, and needs an authenticated API call to fetch; none of
   // that survives to a user six months after a release. The tag defaults to
@@ -369,7 +376,7 @@ else if (command === "pull") {
   if (unknownTargets.length) {
     throw new Error(
       `No native artifact is published for ${unknownTargets.join(", ")}; ` +
-      `published targets are ${[...knownTargets].sort().join(", ")}`
+        `published targets are ${[...knownTargets].sort().join(", ")}`,
     );
   }
   const selected = new Set(requestedTargets);
@@ -379,7 +386,7 @@ else if (command === "pull") {
     assets: rows.map((row) => row.asset),
     destination,
     optional: args.includes("--partial"),
-    onProgress: ({ asset, status }) => console.log(`${status === "missing" ? "absent" : "fetched"} ${asset}`)
+    onProgress: ({ asset, status }) => console.log(`${status === "missing" ? "absent" : "fetched"} ${asset}`),
   });
   if (missing.length) console.log(`${missing.length} asset(s) not published for these inputs`);
   // Each asset is one reproducible .tar.gz holding a target's release and
@@ -391,7 +398,7 @@ else if (command === "pull") {
     if (absent.has(row.asset)) continue;
     await extractReleaseArchive({
       archive: path.join(destination, row.asset),
-      destination: path.join(destination, `hermes-${row.target}`)
+      destination: path.join(destination, `hermes-${row.target}`),
     });
   }
   const installed = await install(destination);
@@ -408,7 +415,7 @@ else if (command === "pull") {
 } else {
   throw new Error(
     "Usage: manage-native-artifacts.mjs {fingerprint|tag|release-metadata|expected-assets|report|" +
-    "verify [--complete] [--json] [--target <bundle-target>]|install <dir>|record <target>|" +
-    "pull [--tag <tag>] [--target <bundle-target>] [--partial]}"
+      "verify [--complete] [--json] [--target <bundle-target>]|install <dir>|record <target>|" +
+      "pull [--tag <tag>] [--target <bundle-target>] [--partial]}",
   );
 }

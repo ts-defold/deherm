@@ -51,7 +51,18 @@ test("all 1,361 declarations have unique identities, provenance, shapes, and eff
     assert.ok(row.provenance.line === null || Number.isInteger(row.provenance.line));
     assert.ok(row.signature.result.kind);
     assert.equal(row.signature.parameters.length, row.effects.direction.parameters.length);
-    assert.deepEqual(Object.keys(row.effects), ["direction", "ownership", "lifetime", "context", "thread", "callbacks", "records", "templates", "spans", "availability"]);
+    assert.deepEqual(Object.keys(row.effects), [
+      "direction",
+      "ownership",
+      "lifetime",
+      "context",
+      "thread",
+      "callbacks",
+      "records",
+      "templates",
+      "spans",
+      "availability",
+    ]);
     assert.ok(row.semanticTokensNeeded.includes("native-symbol-linkage"));
     assert.ok(row.semanticTokensNeeded.includes("call-thread-affinity"));
     assert.ok(row.semanticTokensNeeded.includes("target-feature-symbol-matrix"));
@@ -68,10 +79,15 @@ test("unsupported nodes are explicit and cannot silently bypass semantic-token a
       assert.ok(["generated-adapter", "policy-blocked", "lowering-pending"].includes(row.loweringState));
       assert.equal("readiness" in row, false);
     }
-    if (serialized.includes('"kind":"opaque"')) assert.ok(row.semanticTokensNeeded.includes("opaque-type-abi-contract"), row.id);
+    if (serialized.includes('"kind":"opaque"'))
+      assert.ok(row.semanticTokensNeeded.includes("opaque-type-abi-contract"), row.id);
   }
   assert.equal(report.coverage.silentUnknowns, 0);
-  assert.equal(report.constructorSummary.unknown ?? 0, 0, "all current native spellings should lower to a deliberate constructor");
+  assert.equal(
+    report.constructorSummary.unknown ?? 0,
+    0,
+    "all current native spellings should lower to a deliberate constructor",
+  );
   assert.ok(report.constructorSummary.opaque > 0);
   assert.equal(report.algebra.unknownPolicy.includes("no permissive fallback"), true);
 });
@@ -106,8 +122,9 @@ test("representative compound signatures are compositional rather than signature
 
 test("source support types preserve nested enums, variadics, and target-dependent handles", async () => {
   const report = JSON.parse(await readFile(reportPath, "utf8"));
-  const steppedVertexDeclaration = report.rows.find(({ symbol, signature }) =>
-    symbol === "dmGraphics::NewVertexStreamDeclaration" && signature.parameters.length === 2);
+  const steppedVertexDeclaration = report.rows.find(
+    ({ symbol, signature }) => symbol === "dmGraphics::NewVertexStreamDeclaration" && signature.parameters.length === 2,
+  );
   assert.deepEqual(steppedVertexDeclaration.signature.parameters[1].type, {
     kind: "enum",
     name: "dmGraphics::VertexStepFunction",
@@ -117,14 +134,12 @@ test("source support types preserve nested enums, variadics, and target-dependen
 
   const renderConstant = report.rows.find(({ symbol }) => symbol === "dmRender::SetConstantType");
   assert.equal(renderConstant.signature.parameters[1].type.kind, "enum");
-  assert.equal(renderConstant.signature.parameters[1].type.name,
-    "dmRenderDDF::MaterialDesc::ConstantType");
+  assert.equal(renderConstant.signature.parameters[1].type.name, "dmRenderDDF::MaterialDesc::ConstantType");
 
   const vulkanImage = report.rows.find(({ symbol }) => symbol === "dmGraphics::VulkanGetImage");
   assert.equal(vulkanImage.signature.result.kind, "handle");
   assert.equal(vulkanImage.signature.result.representation.targetDependent, true);
-  assert.equal(vulkanImage.signature.result.representation.targetTypes["arm64-osx"],
-    "struct VkImage_T *");
+  assert.equal(vulkanImage.signature.result.representation.targetTypes["arm64-osx"], "struct VkImage_T *");
   assert.equal(vulkanImage.signature.result.representation.targetTypes["wasm-web"], "uint64_t");
 
   const webGpuAdapter = report.rows.find(({ symbol }) => symbol === "dmGraphics::WebGPUGetAdapter");
@@ -138,8 +153,16 @@ test("source support types preserve nested enums, variadics, and target-dependen
       targetDependent: true,
       absentIn: ["wasm-web", "wasm_pthread-web"],
       liveIn: [
-        "arm64-android", "arm64-ios", "arm64-linux", "arm64-osx", "arm64_sim-ios",
-        "armv7-android", "x86_64-android", "x86_64-linux", "x86_64-osx", "x86_64-win32",
+        "arm64-android",
+        "arm64-ios",
+        "arm64-linux",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "armv7-android",
+        "x86_64-android",
+        "x86_64-linux",
+        "x86_64-osx",
+        "x86_64-win32",
       ],
       replacement: {
         include: "webgpu/webgpu_wagyu.h",
@@ -155,7 +178,10 @@ test("source support types preserve nested enums, variadics, and target-dependen
   assert.equal(nativeAppleWindow.signature.result.representation.reason, "target-platform-supplied");
   assert.equal(nativeAppleWindow.signature.result.representation.targetDependent, true);
   assert.deepEqual(nativeAppleWindow.signature.result.representation.absentIn, [
-    "arm64-ios", "arm64-osx", "arm64_sim-ios", "x86_64-osx",
+    "arm64-ios",
+    "arm64-osx",
+    "arm64_sim-ios",
+    "x86_64-osx",
   ]);
   assert.deepEqual(nativeAppleWindow.signature.result.representation.replacement, {
     include: "objc/objc.h",
@@ -164,8 +190,7 @@ test("source support types preserve nested enums, variadics, and target-dependen
 
   const variadics = report.rows.filter(({ signature }) => signature.variadic);
   assert.equal(variadics.length, 7);
-  assert.ok(variadics.every(({ semanticTokensNeeded }) =>
-    semanticTokensNeeded.includes("typed-nonvariadic-facade")));
+  assert.ok(variadics.every(({ semanticTokensNeeded }) => semanticTokensNeeded.includes("typed-nonvariadic-facade")));
 });
 
 test("reconciles generated adapters and policy gates while projecting every pending lowering", async () => {
@@ -173,7 +198,7 @@ test("reconciles generated adapters and policy gates while projecting every pend
   assert.deepEqual(report.loweringSummary, {
     "generated-adapter": 45,
     "policy-blocked": 69,
-    "lowering-pending": 1247
+    "lowering-pending": 1247,
   });
   const hash = report.rows.find(({ symbol }) => symbol === "dmHashBuffer64");
   assert.equal(hash.lowering.state, "generated-adapter");

@@ -12,7 +12,13 @@ function dmSdkScalarType(type) {
 
 function dmSdkScalarName(wrapper) {
   const words = wrapper.replace(/^deherm_dmsdk_/, "").split("_");
-  return words[0] + words.slice(1).map((word) => word[0].toUpperCase() + word.slice(1)).join("");
+  return (
+    words[0] +
+    words
+      .slice(1)
+      .map((word) => word[0].toUpperCase() + word.slice(1))
+      .join("")
+  );
 }
 
 function select(value, keys) {
@@ -25,36 +31,60 @@ function handleRouteForEmission(route) {
     ownership: select(route.ownership, ["projectionToken", "hostWrapper", "underlying"]),
     lifetime: select(route.lifetime, ["projectionToken", "loweringToken"]),
     profiles: select(route.profiles, [
-      "token", "catalogSha256", "documentedFeatures", "runtimeFeatures", "documented",
-      "registration", "registrationMask", "runtime", "runtimeAvailable", "runtimeMask"
+      "token",
+      "catalogSha256",
+      "documentedFeatures",
+      "runtimeFeatures",
+      "documented",
+      "registration",
+      "registrationMask",
+      "runtime",
+      "runtimeAvailable",
+      "runtimeMask",
     ]),
-    targets: select(route.targets, ["nativeDynamicHermes", "nativeStaticHermes", "html5BrowserHost"])
+    targets: select(route.targets, ["nativeDynamicHermes", "nativeStaticHermes", "html5BrowserHost"]),
   };
 }
 
 function handleCoverageForEmission(coverage) {
   return select(coverage, [
-    "selectedRoutes", "descriptorRowsEmitted", "routerCandidates", "blocked",
-    "adapterExecutableRoutes", "nativeAdapterHarnessRoutes", "defoldEngineVerifiedRoutes",
-    "nativeDynamicHermesJsiVerifiedRoutes", "nativeStaticHermesExecutableRoutes",
-    "html5BrowserExecutableRoutes", "runtimeUnavailable", "adapterExecutableRoutesByProfile"
+    "selectedRoutes",
+    "descriptorRowsEmitted",
+    "routerCandidates",
+    "blocked",
+    "adapterExecutableRoutes",
+    "nativeAdapterHarnessRoutes",
+    "defoldEngineVerifiedRoutes",
+    "nativeDynamicHermesJsiVerifiedRoutes",
+    "nativeStaticHermesExecutableRoutes",
+    "html5BrowserExecutableRoutes",
+    "runtimeUnavailable",
+    "adapterExecutableRoutesByProfile",
   ]);
 }
 
 function attachmentProvidersForEmission(providers) {
-  return Object.fromEntries(["*.ts", "*.script.ts", "*.gui.ts", "*.render.ts"]
-    .filter((key) => key in providers)
-    .map((key) => [key, select(providers[key], ["proxyExtension", "context", "state"])]));
+  return Object.fromEntries(
+    ["*.ts", "*.script.ts", "*.gui.ts", "*.render.ts"]
+      .filter((key) => key in providers)
+      .map((key) => [key, select(providers[key], ["proxyExtension", "context", "state"])]),
+  );
 }
 
 export function generateScriptHandleLowering(report) {
   const kinds = report.handleKinds.map(({ id }) => JSON.stringify(id)).join(" | ");
-  const kindRows = report.handleKinds.map(({ id, numericId, representation, ownership }) =>
-    `  ${JSON.stringify(id)}: { numericId: ${numericId}, representation: ${JSON.stringify(representation)}, ownership: ${JSON.stringify(ownership)} },`).join("\n");
-  const routes = report.routes.map((rawRoute) => {
-    const route = handleRouteForEmission(rawRoute);
-    return `  ${JSON.stringify(route.id)}: { stableId: ${route.stableId}, operationClass: ${JSON.stringify(route.operationClass)}, operationEffect: ${JSON.stringify(route.operationEffect)}, context: ${JSON.stringify(route.context)}, invalidation: ${JSON.stringify(route.invalidation)}, inputKinds: ${JSON.stringify(route.inputKinds)}, returnKinds: ${JSON.stringify(route.returnKinds)}, ownership: ${JSON.stringify(route.ownership)}, lifetime: ${JSON.stringify(route.lifetime)}, profiles: ${JSON.stringify(route.profiles)}, targets: ${JSON.stringify(route.targets)} },`;
-  }).join("\n");
+  const kindRows = report.handleKinds
+    .map(
+      ({ id, numericId, representation, ownership }) =>
+        `  ${JSON.stringify(id)}: { numericId: ${numericId}, representation: ${JSON.stringify(representation)}, ownership: ${JSON.stringify(ownership)} },`,
+    )
+    .join("\n");
+  const routes = report.routes
+    .map((rawRoute) => {
+      const route = handleRouteForEmission(rawRoute);
+      return `  ${JSON.stringify(route.id)}: { stableId: ${route.stableId}, operationClass: ${JSON.stringify(route.operationClass)}, operationEffect: ${JSON.stringify(route.operationEffect)}, context: ${JSON.stringify(route.context)}, invalidation: ${JSON.stringify(route.invalidation)}, inputKinds: ${JSON.stringify(route.inputKinds)}, returnKinds: ${JSON.stringify(route.returnKinds)}, ownership: ${JSON.stringify(route.ownership)}, lifetime: ${JSON.stringify(route.lifetime)}, profiles: ${JSON.stringify(route.profiles)}, targets: ${JSON.stringify(route.targets)} },`;
+    })
+    .join("\n");
   return `/** Generated semantic brands for identity-bearing Defold script values. */
 export type SemanticHandleKind = ${kinds};
 
@@ -96,10 +126,17 @@ export function generateScriptUniversalValue(report) {
     maximumArgumentCount: row.maximumArgumentCount,
     minimumResultCount: row.minimumResultCount,
     maximumResultCount: row.maximumResultCount,
-    resultCount: row.maximumResultCount
+    resultCount: row.maximumResultCount,
   }));
   const bounds = select(report.bounds, ["maximumArguments", "maximumDepth", "maximumEntries", "maximumStringBytes"]);
-  const tablePolicy = select(report.tablePolicy, ["arrays", "objects", "maps", "cycles", "duplicateKeys", "unsupportedValues"]);
+  const tablePolicy = select(report.tablePolicy, [
+    "arrays",
+    "objects",
+    "maps",
+    "cycles",
+    "duplicateKeys",
+    "unsupportedValues",
+  ]);
   return `// Generated by scripts/generate-script-universal-value-bindings.mjs. Do not edit.
 export const scriptUniversalValuePolicy = ${JSON.stringify({ bounds, tablePolicy }, null, 2)} as const;
 
@@ -110,8 +147,10 @@ export const scriptUniversalValueBindings = ${JSON.stringify(manifest, null, 2)}
 export function generateScriptBrowserTargetSupport(report) {
   const cases = report.bindings
     .filter(({ browserCallback }) => browserCallback && !browserCallback.registryEligible)
-    .map(({ id, stableId, browserCallback }) =>
-      `    case ${stableId >>> 0}: throw new Error(${JSON.stringify(`${id} is not executable in the HTML5 browser host: ${browserCallback.machineBlock}`)});`)
+    .map(
+      ({ id, stableId, browserCallback }) =>
+        `    case ${stableId >>> 0}: throw new Error(${JSON.stringify(`${id} is not executable in the HTML5 browser host: ${browserCallback.machineBlock}`)});`,
+    )
     .join("\n");
   return `// Generated by scripts/generate-script-universal-value-bindings.mjs. Do not edit.
 export function assertBrowserRouteTargetSupport(stableId: number, target: string | undefined): void {
@@ -128,12 +167,14 @@ export function generateScriptValueTargetSupport(recipe) {
   if (!recipe || !Array.isArray(recipe.browserUnsupported)) {
     throw new Error("script value target-support recipe has no browserUnsupported rows");
   }
-  const cases = recipe.browserUnsupported.map(({ id, stableId }) => {
-    if (typeof id !== "string" || !Number.isInteger(stableId) || stableId < 0 || stableId > 0xffff_ffff) {
-      throw new Error("script value target-support recipe has an invalid route");
-    }
-    return `    case 0x${stableId.toString(16).padStart(8, "0")}: throw new Error(${JSON.stringify(`${id} is not executable in the HTML5 browser host`)});`;
-  }).join("\n");
+  const cases = recipe.browserUnsupported
+    .map(({ id, stableId }) => {
+      if (typeof id !== "string" || !Number.isInteger(stableId) || stableId < 0 || stableId > 0xffff_ffff) {
+        throw new Error("script value target-support recipe has an invalid route");
+      }
+      return `    case 0x${stableId.toString(16).padStart(8, "0")}: throw new Error(${JSON.stringify(`${id} is not executable in the HTML5 browser host`)});`;
+    })
+    .join("\n");
   return `// Generated by scripts/generate-script-value-bindings.mjs. Do not edit.
 export function assertValueRouteTargetSupport(stableId: number, target: string | undefined): void {
   if (target !== "html5-browser-host") return;
@@ -146,16 +187,23 @@ ${cases}
 }
 
 export function generateScriptUrlTargetSupport(recipe) {
-  if (!recipe || !Number.isInteger(recipe.routeCount) || recipe.routeCount < 0 ||
-      !recipe.targetSupport || typeof recipe.targetSupport !== "object") {
+  if (
+    !recipe ||
+    !Number.isInteger(recipe.routeCount) ||
+    recipe.routeCount < 0 ||
+    !recipe.targetSupport ||
+    typeof recipe.targetSupport !== "object"
+  ) {
     throw new Error("script URL target-support recipe is invalid");
   }
-  const targetSupport = Object.fromEntries([
-    "nativeDynamicHermes", "nativeStaticHermes", "html5BrowserHost"
-  ].filter((target) => target in recipe.targetSupport).map((target) => {
-    const support = recipe.targetSupport[target];
-    return [target, { status: support.status, requiredRoute: support.requiredRoute }];
-  }));
+  const targetSupport = Object.fromEntries(
+    ["nativeDynamicHermes", "nativeStaticHermes", "html5BrowserHost"]
+      .filter((target) => target in recipe.targetSupport)
+      .map((target) => {
+        const support = recipe.targetSupport[target];
+        return [target, { status: support.status, requiredRoute: support.requiredRoute }];
+      }),
+  );
   return `// Generated by scripts/generate-script-url-address-classification.mjs. Do not edit.
 export const scriptUrlTargetSupport = ${JSON.stringify(targetSupport, null, 2)} as const;
 export const scriptUrlExecutableRouteCount = ${recipe.routeCount} as const;
@@ -175,20 +223,25 @@ export {};
 
 export function generateDmSdkScalar(report, sdkIr) {
   const declarations = new Map(sdkIr.declarations.map((declaration) => [declaration.id, declaration]));
-  const entries = report.declarations.filter(({ emitted }) => emitted).map((row) => {
-    const declaration = declarations.get(row.id);
-    if (!declaration) throw new Error(`dmSDK scalar declaration is absent from SDK IR: ${row.id}`);
-    return { ...row, declaration };
-  });
+  const entries = report.declarations
+    .filter(({ emitted }) => emitted)
+    .map((row) => {
+      const declaration = declarations.get(row.id);
+      if (!declaration) throw new Error(`dmSDK scalar declaration is absent from SDK IR: ${row.id}`);
+      return { ...row, declaration };
+    });
   const ids = entries.map((entry) => `  ${dmSdkScalarName(entry.wrapper)}: ${entry.bindingId}`).join(",\n");
-  const functions = entries.map((entry) => {
-    const parameters = entry.declaration.parameters
-      .map((parameter) => `${parameter.name}: ${dmSdkScalarType(parameter.type)}`).join(", ");
-    const args = entry.declaration.parameters.map(({ name }) => `, ${name}`).join("");
-    const returnType = dmSdkScalarType(entry.declaration.returns);
-    const name = dmSdkScalarName(entry.wrapper);
-    return `/** ${entry.declaration.name} (${entry.declaration.type}). */\nexport function ${name}(${parameters}): ${returnType} {\n  return scalarModule().call(DmSdkScalarId.${name}${args}) as ${returnType};\n}`;
-  }).join("\n\n");
+  const functions = entries
+    .map((entry) => {
+      const parameters = entry.declaration.parameters
+        .map((parameter) => `${parameter.name}: ${dmSdkScalarType(parameter.type)}`)
+        .join(", ");
+      const args = entry.declaration.parameters.map(({ name }) => `, ${name}`).join("");
+      const returnType = dmSdkScalarType(entry.declaration.returns);
+      const name = dmSdkScalarName(entry.wrapper);
+      return `/** ${entry.declaration.name} (${entry.declaration.type}). */\nexport function ${name}(${parameters}): ${returnType} {\n  return scalarModule().call(DmSdkScalarId.${name}${args}) as ${returnType};\n}`;
+    })
+    .join("\n\n");
   return `// Generated by scripts/generate-dmsdk-scalar-thunks.mjs. Do not edit.
 interface DmSdkScalarModule {
   call(id: number, ...args: readonly (number | boolean | bigint)[]): unknown;
@@ -215,7 +268,9 @@ ${functions}
 
 export function generateDmSdkUniversal(report) {
   const catalogHash = report.sourceHashes.catalog;
-  const ids = report.recipes.map((recipe) => `  ${JSON.stringify(recipe.declarationId)}: ${recipe.numericId},`).join("\n");
+  const ids = report.recipes
+    .map((recipe) => `  ${JSON.stringify(recipe.declarationId)}: ${recipe.numericId},`)
+    .join("\n");
   return `// ${DMSDK_UNIVERSAL_BANNER}
 export const DMSDK_UNIVERSAL_CATALOG_SHA256=${JSON.stringify(catalogHash)};
 export type DmSdkUniversalDeclarationId = keyof typeof DmSdkUniversalId;

@@ -22,11 +22,7 @@ export const conformanceJsonSchema = Object.freeze({
   $schema: "https://json-schema.org/draft/2020-12/schema",
   $id: "https://ts-defold.github.io/deherm/schemas/conformance-v1.json",
   title: "Deherm API conformance artifacts",
-  oneOf: [
-    { $ref: "#/$defs/plan" },
-    { $ref: "#/$defs/observation" },
-    { $ref: "#/$defs/report" }
-  ],
+  oneOf: [{ $ref: "#/$defs/plan" }, { $ref: "#/$defs/observation" }, { $ref: "#/$defs/report" }],
   $defs: {
     stageDisposition: { enum: ["compile-only", "linked", "executable", "skipped-with-reason"] },
     executionPolicy: { enum: ["safe", "destructive", "interactive", "context-blocked", "not-applicable"] },
@@ -41,8 +37,8 @@ export const conformanceJsonSchema = Object.freeze({
         defoldRevision: { type: "string", pattern: "^[a-f0-9]{40}$" },
         target: { type: "string", minLength: 1 },
         shard: { type: "object", required: ["index", "count"] },
-        cases: { type: "array", items: { $ref: "#/$defs/case" } }
-      }
+        cases: { type: "array", items: { $ref: "#/$defs/case" } },
+      },
     },
     case: {
       type: "object",
@@ -54,7 +50,7 @@ export const conformanceJsonSchema = Object.freeze({
         execution: {
           type: "object",
           required: ["policy"],
-          properties: { policy: { $ref: "#/$defs/executionPolicy" } }
+          properties: { policy: { $ref: "#/$defs/executionPolicy" } },
         },
         stages: {
           type: "object",
@@ -63,15 +59,15 @@ export const conformanceJsonSchema = Object.freeze({
             compile: { $ref: "#/$defs/plannedStage" },
             link: { $ref: "#/$defs/plannedStage" },
             runtime: { $ref: "#/$defs/plannedStage" },
-            semantic: { type: "object", required: ["state"], properties: { state: { $ref: "#/$defs/semanticState" } } }
-          }
-        }
-      }
+            semantic: { type: "object", required: ["state"], properties: { state: { $ref: "#/$defs/semanticState" } } },
+          },
+        },
+      },
     },
     plannedStage: {
       type: "object",
       required: ["disposition"],
-      properties: { disposition: { $ref: "#/$defs/stageDisposition" }, reason: { type: "string" } }
+      properties: { disposition: { $ref: "#/$defs/stageDisposition" }, reason: { type: "string" } },
     },
     observation: {
       type: "object",
@@ -80,21 +76,21 @@ export const conformanceJsonSchema = Object.freeze({
         schemaVersion: { const: 1 },
         planId: { type: "string", pattern: "^[a-f0-9]{64}$" },
         target: { type: "string", minLength: 1 },
-        results: { type: "array", items: { $ref: "#/$defs/observedCase" } }
-      }
+        results: { type: "array", items: { $ref: "#/$defs/observedCase" } },
+      },
     },
     observedCase: {
       type: "object",
       required: ["id", "stages"],
       properties: {
         id: { type: "string", minLength: 1 },
-        stages: { type: "object", additionalProperties: { $ref: "#/$defs/observedStage" } }
-      }
+        stages: { type: "object", additionalProperties: { $ref: "#/$defs/observedStage" } },
+      },
     },
     observedStage: {
       type: "object",
       required: ["status"],
-      properties: { status: { $ref: "#/$defs/observedStatus" }, evidence: {}, reason: { type: "string" } }
+      properties: { status: { $ref: "#/$defs/observedStatus" }, evidence: {}, reason: { type: "string" } },
     },
     report: {
       type: "object",
@@ -105,10 +101,10 @@ export const conformanceJsonSchema = Object.freeze({
         target: { type: "string", minLength: 1 },
         caseCount: { type: "integer", minimum: 0 },
         strictPass: { type: "boolean" },
-        cases: { type: "array" }
-      }
-    }
-  }
+        cases: { type: "array" },
+      },
+    },
+  },
 });
 
 const inputFiles = Object.freeze({
@@ -119,7 +115,7 @@ const inputFiles = Object.freeze({
   scriptDispatch: "defold-script-scalar-dispatch.json",
   scriptProbes: "defold-script-real-engine-probes.json",
   dmsdkThunks: "defold-dmsdk-scalar-thunks.json",
-  bindingPlan: "defold-binding-lowering-plan.json"
+  bindingPlan: "defold-binding-lowering-plan.json",
 });
 
 const projectInputFiles = Object.freeze({
@@ -130,7 +126,7 @@ const projectInputFiles = Object.freeze({
   scriptDispatch: "script-scalar-dispatch.json",
   scriptProbes: "script-real-engine-probes.json",
   dmsdkThunks: "dmsdk-scalar-thunks.json",
-  bindingPlan: "binding-lowering-plan.json"
+  bindingPlan: "binding-lowering-plan.json",
 });
 
 function invariant(condition, message) {
@@ -148,13 +144,18 @@ function sha256(value) {
 function stableJson(value) {
   if (Array.isArray(value)) return `[${value.map(stableJson).join(",")}]`;
   if (value && typeof value === "object") {
-    return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${stableJson(value[key])}`).join(",")}}`;
+    return `{${Object.keys(value)
+      .sort()
+      .map((key) => `${JSON.stringify(key)}:${stableJson(value[key])}`)
+      .join(",")}}`;
   }
   return JSON.stringify(value);
 }
 
 function pascal(value) {
-  const words = String(value).split(/[^A-Za-z0-9]+/).filter(Boolean);
+  const words = String(value)
+    .split(/[^A-Za-z0-9]+/)
+    .filter(Boolean);
   const joined = words.map((word) => word[0].toUpperCase() + word.slice(1)).join("") || "Anonymous";
   return /^[A-Za-z_$]/.test(joined) ? joined : `_${joined}`;
 }
@@ -170,9 +171,12 @@ function readJson(relative, root) {
 
 export async function loadConformanceInputs(options = {}) {
   if (typeof options === "string") options = { repositoryRoot: options };
-  const inputRoot = options.inputRoot ?? path.join(options.repositoryRoot ?? packageRoot, "packages", "bindings", "generated");
+  const inputRoot =
+    options.inputRoot ?? path.join(options.repositoryRoot ?? packageRoot, "packages", "bindings", "generated");
   const files = options.layout === "project" ? projectInputFiles : inputFiles;
-  const entries = await Promise.all(Object.entries(files).map(async ([key, relative]) => [key, await readJson(relative, inputRoot)]));
+  const entries = await Promise.all(
+    Object.entries(files).map(async ([key, relative]) => [key, await readJson(relative, inputRoot)]),
+  );
   return Object.fromEntries(entries);
 }
 
@@ -189,20 +193,32 @@ export function parseShard(value = "0/1") {
 
 function conformanceVocabulary(inputs) {
   const { planSha256, ...planBody } = inputs.bindingPlan ?? {};
-  invariant(typeof planSha256 === "string" && planSha256 === sha256(JSON.stringify(planBody)),
-    "binding-lowering plan internal digest is invalid");
+  invariant(
+    typeof planSha256 === "string" && planSha256 === sha256(JSON.stringify(planBody)),
+    "binding-lowering plan internal digest is invalid",
+  );
   const vocabulary = inputs.bindingPlan?.conformanceVocabulary;
   invariant(vocabulary?.schemaVersion === 1, "binding-lowering plan has no conformance vocabulary");
   const expectedSources = ["semanticPolicies", "dmsdkTargetConditionals"];
-  invariant(Array.isArray(vocabulary.sources) && vocabulary.sources.length === expectedSources.length &&
-    expectedSources.every((input) => vocabulary.sources.some((source) => source.input === input &&
-      source.sha256 === inputs.bindingPlan.inputHashes?.[input])),
-  "conformance vocabulary is not authenticated by its lowering-plan input hashes");
-  invariant(Array.isArray(vocabulary.contextRows) && Array.isArray(vocabulary.targetRows) && Array.isArray(vocabulary.targets),
-    "binding-lowering plan conformance vocabulary is malformed");
+  invariant(
+    Array.isArray(vocabulary.sources) &&
+      vocabulary.sources.length === expectedSources.length &&
+      expectedSources.every((input) =>
+        vocabulary.sources.some(
+          (source) => source.input === input && source.sha256 === inputs.bindingPlan.inputHashes?.[input],
+        ),
+      ),
+    "conformance vocabulary is not authenticated by its lowering-plan input hashes",
+  );
+  invariant(
+    Array.isArray(vocabulary.contextRows) && Array.isArray(vocabulary.targetRows) && Array.isArray(vocabulary.targets),
+    "binding-lowering plan conformance vocabulary is malformed",
+  );
   const { digest, sources: _sources, ...unsigned } = vocabulary;
-  invariant(typeof digest === "string" && digest === sha256(JSON.stringify(unsigned)),
-    "conformance vocabulary digest does not match its authenticated rows");
+  invariant(
+    typeof digest === "string" && digest === sha256(JSON.stringify(unsigned)),
+    "conformance vocabulary digest does not match its authenticated rows",
+  );
   return vocabulary;
 }
 
@@ -211,8 +227,10 @@ function targetCatalog(vocabulary) {
   invariant(Array.isArray(rows), "target-availability vocabulary has no generated target census");
   const byTarget = new Map();
   for (const row of rows) {
-    invariant(typeof row.target === "string" && typeof row.group === "string",
-      "generated target census contains a malformed target row");
+    invariant(
+      typeof row.target === "string" && typeof row.group === "string",
+      "generated target census contains a malformed target row",
+    );
     invariant(!byTarget.has(row.target), `generated target census repeats ${row.target}`);
     byTarget.set(row.target, row.group);
   }
@@ -222,7 +240,7 @@ function targetCatalog(vocabulary) {
 function policyRowMatches(row, surface, item) {
   if (row.surface !== surface) return false;
   const root = item.modulePath?.[0] ?? "builtins";
-  const name = surface === "script" ? item.rawName ?? item.name : item.name;
+  const name = surface === "script" ? (item.rawName ?? item.name) : item.name;
   const roots = row.match?.moduleRoots ?? [];
   const prefixes = row.match?.namePrefixes ?? [];
   return roots.includes(root) || prefixes.some((prefix) => name.startsWith(prefix));
@@ -241,10 +259,17 @@ function requiredContexts(surface, item, vocabulary) {
 function behavioralPolicy(name) {
   const full = String(name).toLowerCase();
   const leaf = full.split(/[.:]/).at(-1);
-  if (/^(destroy|delete|remove|clear|reset|reboot|exit|quit|terminate|unregister|free|close|release)$/.test(leaf) || /^(destroy|delete|remove|clear|reset|terminate|unregister|free|close|release)_/.test(leaf)) {
+  if (
+    /^(destroy|delete|remove|clear|reset|reboot|exit|quit|terminate|unregister|free|close|release)$/.test(leaf) ||
+    /^(destroy|delete|remove|clear|reset|terminate|unregister|free|close|release)_/.test(leaf)
+  ) {
     return { policy: "destructive", reason: `operation name '${leaf}' requires an isolated disposable fixture` };
   }
-  if (full.startsWith("dmsdk:dmhid::") || /^dmhid::/.test(full) || ["show_keyboard", "hide_keyboard", "open_url", "get_mouse_lock", "set_mouse_lock"].includes(leaf)) {
+  if (
+    full.startsWith("dmsdk:dmhid::") ||
+    full.startsWith("dmhid::") ||
+    ["show_keyboard", "hide_keyboard", "open_url", "get_mouse_lock", "set_mouse_lock"].includes(leaf)
+  ) {
     return { policy: "interactive", reason: `operation name '${leaf}' requires interactive input or an OS surface` };
   }
   return { policy: "safe" };
@@ -253,10 +278,13 @@ function behavioralPolicy(name) {
 function targetBlock(surface, item, families, target, vocabulary, targets) {
   const row = matchingPolicyRow(vocabulary.targetRows, surface, item);
   const group = targets.get(target);
-  const available = row && ((row.targetIds ?? []).includes(target) || (group && (row.targetGroups ?? []).includes(group)));
+  const available =
+    row && ((row.targetIds ?? []).includes(target) || (group && (row.targetGroups ?? []).includes(group)));
   if (row && available) return undefined;
   if (row) {
-    const required = row.targetIds?.length ? `target ${row.targetIds.join(", ")}` : `target group ${row.targetGroups.join(", ")}`;
+    const required = row.targetIds?.length
+      ? `target ${row.targetIds.join(", ")}`
+      : `target group ${row.targetGroups.join(", ")}`;
     return `${row.id} requires ${required}; selected ${target}`;
   }
   if (!families.includes("platform-gated")) return undefined;
@@ -268,7 +296,7 @@ function applySelectionPolicy(basePolicy, requiredContexts, selectedContexts, ta
   if (!selectedContexts.includes("*") && !requiredContexts.some((context) => selectedContexts.includes(context))) {
     return {
       policy: "context-blocked",
-      reason: `requires one of [${requiredContexts.join(", ")}], selected [${selectedContexts.join(", ")}]`
+      reason: `requires one of [${requiredContexts.join(", ")}], selected [${selectedContexts.join(", ")}]`,
     };
   }
   return basePolicy;
@@ -278,15 +306,13 @@ function scriptTypeAccess(item) {
   const [root, ...nested] = publicScriptModulePath(item.modulePath.length ? item.modulePath : ["builtins"]);
   return {
     moduleType: `${pascal(root)}Api`,
-    path: [...nested.map(camel), item.jsName]
+    path: [...nested.map(camel), item.jsName],
   };
 }
 
 function commonCase({ item, surface, shard, contexts, target, families, requiredContexts, policy }) {
   const stableId = stableBindingId(item.id);
-  const source = surface === "script"
-    ? { path: item.source, line: item.line }
-    : { path: item.header, line: item.line };
+  const source = surface === "script" ? { path: item.source, line: item.line } : { path: item.header, line: item.line };
   return {
     id: item.id,
     stableId,
@@ -300,7 +326,7 @@ function commonCase({ item, surface, shard, contexts, target, families, required
     requiredContexts,
     selectedContexts: contexts,
     execution: policy,
-    families
+    families,
   };
 }
 
@@ -314,7 +340,12 @@ function scriptCase(item, pattern, dispatch, probes, selection, vocabulary, targ
   const families = pattern ? [pattern.loweringFamily, ...(pattern.traits ?? [])] : [];
   const requiredContextsForCase = requiredContexts("script", item, vocabulary);
   const basePolicy = behavioralPolicy(item.rawName);
-  const policy = applySelectionPolicy(basePolicy, requiredContextsForCase, selection.contexts, targetBlock("script", item, families, selection.target, vocabulary, targets));
+  const policy = applySelectionPolicy(
+    basePolicy,
+    requiredContextsForCase,
+    selection.contexts,
+    targetBlock("script", item, families, selection.target, vocabulary, targets),
+  );
   const specialized = item.runtimeStatus === "implemented-generated-lua-bridge";
   const scalarDispatch = Boolean(dispatch);
   const implemented = specialized || scalarDispatch;
@@ -323,7 +354,14 @@ function scriptCase(item, pattern, dispatch, probes, selection, vocabulary, targ
     ? "generated_scalar_lua_descriptors.cpp + script_scalar_lua_adapter.cpp"
     : "generated_lua_bridge.cpp + native/lua_hermes_e2e.cpp";
   return {
-    ...commonCase({ item, surface: "script", ...selection, families, requiredContexts: requiredContextsForCase, policy }),
+    ...commonCase({
+      item,
+      surface: "script",
+      ...selection,
+      families,
+      requiredContexts: requiredContextsForCase,
+      policy,
+    }),
     typeAccess: scriptTypeAccess(item),
     invocation: { kind: "script", modulePath: item.modulePath.join("."), member: item.member },
     stages: {
@@ -337,62 +375,110 @@ function scriptCase(item, pattern, dispatch, probes, selection, vocabulary, targ
       semantic: specialized
         ? { state: "host-conformant", evidence: "native/lua_hermes_e2e.cpp", targetConformant: false }
         : scalarDispatch
-          ? { state: "unverified", reason: "generated scalar dispatch is executable, but per-function behavioral conformance is not claimed", targetConformant: false }
-          : { state: "blocked", reason: "runtime adapter is not implemented" }
+          ? {
+              state: "unverified",
+              reason: "generated scalar dispatch is executable, but per-function behavioral conformance is not claimed",
+              targetConformant: false,
+            }
+          : { state: "blocked", reason: "runtime adapter is not implemented" },
     },
-    generatedDispatch: dispatch ? {
-      stableId: dispatch.stableId,
-      executableStatus: dispatch.executableStatus
-    } : undefined,
-    targetProbeSelection: probes?.length ? {
-      target: selection.target,
-      probeKeys: probes.map(({ key }) => key),
-      claim: "Selected by the generated target harness; only a fresh runtime observation proves execution."
-    } : undefined
+    generatedDispatch: dispatch
+      ? {
+          stableId: dispatch.stableId,
+          executableStatus: dispatch.executableStatus,
+        }
+      : undefined,
+    targetProbeSelection: probes?.length
+      ? {
+          target: selection.target,
+          probeKeys: probes.map(({ key }) => key),
+          claim: "Selected by the generated target harness; only a fresh runtime observation proves execution.",
+        }
+      : undefined,
   };
 }
 
 function dmsdkCase(item, pattern, thunk, selection, vocabulary, targets) {
   const families = pattern?.families ?? item.abiStrategies ?? [];
   const requiredContextsForCase = requiredContexts("dmsdk", item, vocabulary);
-  const basePolicy = callableKinds.has(item.kind) ? behavioralPolicy(item.name) : { policy: "not-applicable", reason: "type metadata is not executable" };
-  const policy = applySelectionPolicy(basePolicy, requiredContextsForCase, selection.contexts, targetBlock("dmsdk", item, families, selection.target, vocabulary, targets));
+  const basePolicy = callableKinds.has(item.kind)
+    ? behavioralPolicy(item.name)
+    : { policy: "not-applicable", reason: "type metadata is not executable" };
+  const policy = applySelectionPolicy(
+    basePolicy,
+    requiredContextsForCase,
+    selection.contexts,
+    targetBlock("dmsdk", item, families, selection.target, vocabulary, targets),
+  );
   const emitted = thunk?.emitted === true;
   const hostLinked = emitted && thunk.stages?.linked?.status?.includes("covered");
   const hostConformant = emitted && thunk.stages?.conformant?.status?.includes("covered");
   const runtimeEligible = hostLinked && policy.policy === "safe";
-  const accessKind = callableKinds.has(item.kind) && item.disposition === "generated-raw-call"
-    ? "call"
-    : typeKinds.has(item.kind)
-      ? "type"
-      : item.kind === "variable" ? "variable" : "metadata";
+  const accessKind =
+    callableKinds.has(item.kind) && item.disposition === "generated-raw-call"
+      ? "call"
+      : typeKinds.has(item.kind)
+        ? "type"
+        : item.kind === "variable"
+          ? "variable"
+          : "metadata";
   return {
-    ...commonCase({ item, surface: "dmsdk", ...selection, families, requiredContexts: requiredContextsForCase, policy }),
+    ...commonCase({
+      item,
+      surface: "dmsdk",
+      ...selection,
+      families,
+      requiredContexts: requiredContextsForCase,
+      policy,
+    }),
     typeAccess: { kind: accessKind, key: accessKind === "metadata" ? item.id : item.name, declarationId: item.id },
     invocation: callableKinds.has(item.kind) ? { kind: "dmsdk", symbol: item.name } : undefined,
     stages: {
       compile: { disposition: "compile-only", expected: "must-pass" },
       link: hostLinked
-        ? { disposition: "linked", evidenceScope: "host-source", evidence: thunk.stages.linked.evidence, targetConformant: false }
+        ? {
+            disposition: "linked",
+            evidenceScope: "host-source",
+            evidence: thunk.stages.linked.evidence,
+            targetConformant: false,
+          }
         : skipped(callableKinds.has(item.kind) ? "native adapter is not linked" : "type metadata has no link stage"),
       runtime: runtimeEligible
-        ? { disposition: "executable", evidenceScope: "host-source", fixture: "generated-runtime-driver", targetConformant: false }
-        : skipped(!callableKinds.has(item.kind) ? "type metadata is not executable" : hostLinked ? policy.reason : "native adapter is not linked"),
+        ? {
+            disposition: "executable",
+            evidenceScope: "host-source",
+            fixture: "generated-runtime-driver",
+            targetConformant: false,
+          }
+        : skipped(
+            !callableKinds.has(item.kind)
+              ? "type metadata is not executable"
+              : hostLinked
+                ? policy.reason
+                : "native adapter is not linked",
+          ),
       semantic: !callableKinds.has(item.kind)
         ? { state: "not-applicable" }
         : hostConformant
           ? { state: "host-conformant", evidence: thunk.stages.conformant.evidence, targetConformant: false }
-          : { state: "blocked", reason: emitted ? "behavioral conformance evidence is missing" : "native adapter is not generated" }
+          : {
+              state: "blocked",
+              reason: emitted ? "behavioral conformance evidence is missing" : "native adapter is not generated",
+            },
     },
-    blockers: pattern?.blockers ?? []
+    blockers: pattern?.blockers ?? [],
   };
 }
 
 function validateCase(item) {
-  invariant(executionPolicies.has(item.execution.policy), `${item.id}: invalid execution policy ${item.execution.policy}`);
+  invariant(
+    executionPolicies.has(item.execution.policy),
+    `${item.id}: invalid execution policy ${item.execution.policy}`,
+  );
   for (const stage of ["compile", "link", "runtime"]) {
     invariant(stageDispositions.has(item.stages[stage].disposition), `${item.id}: invalid ${stage} disposition`);
-    if (item.stages[stage].disposition === "skipped-with-reason") invariant(item.stages[stage].reason, `${item.id}: skipped ${stage} needs a reason`);
+    if (item.stages[stage].disposition === "skipped-with-reason")
+      invariant(item.stages[stage].reason, `${item.id}: skipped ${stage} needs a reason`);
   }
   invariant(semanticStates.has(item.stages.semantic.state), `${item.id}: invalid semantic state`);
 }
@@ -414,9 +500,13 @@ export function buildConformancePlan(inputs, options = {}) {
   // bundle target.
   const target = options.target ?? hostDefoldPlatform();
   const contexts = options.contexts?.length ? [...new Set(options.contexts)].sort() : ["*"];
-  const shard = typeof options.shard === "string" ? parseShard(options.shard) : options.shard ?? { index: 0, count: 1 };
+  const shard =
+    typeof options.shard === "string" ? parseShard(options.shard) : (options.shard ?? { index: 0, count: 1 });
   const surfaces = options.surface && options.surface !== "all" ? [options.surface] : ["script", "dmsdk"];
-  invariant(surfaces.every((value) => value === "script" || value === "dmsdk"), "--surface must be script, dmsdk, or all");
+  invariant(
+    surfaces.every((value) => value === "script" || value === "dmsdk"),
+    "--surface must be script, dmsdk, or all",
+  );
   const vocabulary = conformanceVocabulary(inputs);
   const targets = targetCatalog(vocabulary);
   const revisions = new Set([inputs.scriptIr.defoldRevision, inputs.dmsdkIr.defoldRevision].filter(Boolean));
@@ -437,23 +527,26 @@ export function buildConformancePlan(inputs, options = {}) {
   const selection = { shard, contexts, target };
   const allCases = [];
   if (surfaces.includes("script")) {
-    allCases.push(...inputs.scriptIr.functions.map((item) => scriptCase(
-      item,
-      scriptPatterns.get(item.id),
-      scriptDispatch.get(item.id),
-      scriptProbes.get(item.id),
-      selection,
-      vocabulary,
-      targets)));
+    allCases.push(
+      ...inputs.scriptIr.functions.map((item) =>
+        scriptCase(
+          item,
+          scriptPatterns.get(item.id),
+          scriptDispatch.get(item.id),
+          scriptProbes.get(item.id),
+          selection,
+          vocabulary,
+          targets,
+        ),
+      ),
+    );
   }
   if (surfaces.includes("dmsdk")) {
-    allCases.push(...inputs.dmsdkIr.declarations.map((item) => dmsdkCase(
-      item,
-      dmsdkPatterns.get(item.id),
-      dmsdkThunks.get(item.id),
-      selection,
-      vocabulary,
-      targets)));
+    allCases.push(
+      ...inputs.dmsdkIr.declarations.map((item) =>
+        dmsdkCase(item, dmsdkPatterns.get(item.id), dmsdkThunks.get(item.id), selection, vocabulary, targets),
+      ),
+    );
   }
   const ids = new Set();
   const stableIds = new Map();
@@ -465,7 +558,9 @@ export function buildConformancePlan(inputs, options = {}) {
     stableIds.set(item.stableId, item.id);
     validateCase(item);
   }
-  const cases = allCases.filter((item) => item.shard === shard.index).sort((left, right) => left.id.localeCompare(right.id));
+  const cases = allCases
+    .filter((item) => item.shard === shard.index)
+    .sort((left, right) => left.id.localeCompare(right.id));
   const inputHashes = Object.fromEntries(Object.keys(inputFiles).map((key) => [key, sha256(stableJson(inputs[key]))]));
   const identity = {
     schemaVersion: 1,
@@ -476,10 +571,10 @@ export function buildConformancePlan(inputs, options = {}) {
     shard,
     sourceCounts: {
       script: surfaces.includes("script") ? inputs.scriptIr.functions.length : 0,
-      dmsdk: surfaces.includes("dmsdk") ? inputs.dmsdkIr.declarations.length : 0
+      dmsdk: surfaces.includes("dmsdk") ? inputs.dmsdkIr.declarations.length : 0,
     },
     inputHashes,
-    caseIds: cases.map((item) => item.id)
+    caseIds: cases.map((item) => item.id),
   };
   const planId = sha256(stableJson(identity));
   return {
@@ -492,18 +587,19 @@ export function buildConformancePlan(inputs, options = {}) {
     shard,
     sourceCounts: identity.sourceCounts,
     selectedCaseCount: cases.length,
-    coverageClaim: "Generated dispositions are a test plan. Only attached observations or explicitly scoped baseline evidence prove a stage.",
+    coverageClaim:
+      "Generated dispositions are a test plan. Only attached observations or explicitly scoped baseline evidence prove a stage.",
     summary: {
       surface: countBy(cases, (item) => item.surface),
       executionPolicy: countBy(cases, (item) => item.execution.policy),
       compile: countBy(cases, (item) => item.stages.compile.disposition),
       link: countBy(cases, (item) => item.stages.link.disposition),
       runtime: countBy(cases, (item) => item.stages.runtime.disposition),
-      semantic: countBy(cases, (item) => item.stages.semantic.state)
+      semantic: countBy(cases, (item) => item.stages.semantic.state),
     },
     inputs: Object.fromEntries(Object.entries(inputFiles).map(([key, value]) => [key, value])),
     inputHashes,
-    cases
+    cases,
   };
 }
 
@@ -511,16 +607,20 @@ function typePath(base, parts) {
   return parts.reduce((value, part) => `${value}[${JSON.stringify(part)}]`, base);
 }
 
-export function renderCompileFixture(plan, outputDirectory, sdkRoot = path.join(packageRoot, "packages", "sdk", "src")) {
+export function renderCompileFixture(
+  plan,
+  outputDirectory,
+  sdkRoot = path.join(packageRoot, "packages", "sdk", "src"),
+) {
   const scriptTypes = portable(path.relative(outputDirectory, path.join(sdkRoot, "generated", "script", "types.js")));
   const dmsdkTypes = portable(path.relative(outputDirectory, path.join(sdkRoot, "generated", "dmsdk", "types.js")));
-  const relative = (value) => value.startsWith(".") ? value : `./${value}`;
+  const relative = (value) => (value.startsWith(".") ? value : `./${value}`);
   const lines = [
     "// Generated by @ts-defold/deherm conformance. Do not edit.",
     `// plan ${plan.planId}; target ${plan.target}; shard ${plan.shard.index}/${plan.shard.count}`,
     `import type * as Script from ${JSON.stringify(relative(scriptTypes))};`,
     `import type * as Dm from ${JSON.stringify(relative(dmsdkTypes))};`,
-    ""
+    "",
   ];
   for (const item of plan.cases) {
     const suffix = item.stableIdHex.slice(2);
@@ -557,7 +657,7 @@ export function renderRuntimeFixture(plan) {
     invocation: item.invocation,
     execution: item.execution,
     runtime: item.stages.runtime,
-    semantic: item.stages.semantic
+    semantic: item.stages.semantic,
   }));
   return `// Generated by @ts-defold/deherm conformance. Do not edit.
 export const planId = ${JSON.stringify(plan.planId)};
@@ -614,7 +714,7 @@ export async function writeConformanceHarness(plan, output, options = {}) {
     await Promise.all([
       cp(path.join(options.sdkTemplateRoot, "address.ts"), path.join(sdkRoot, "address.ts")),
       cp(path.join(options.sdkTemplateRoot, "component.ts"), path.join(sdkRoot, "component.ts")),
-      cp(path.join(options.sdkRoot, "generated"), path.join(sdkRoot, "generated"), { recursive: true })
+      cp(path.join(options.sdkRoot, "generated"), path.join(sdkRoot, "generated"), { recursive: true }),
     ]);
   }
   const files = {
@@ -623,40 +723,53 @@ export async function writeConformanceHarness(plan, output, options = {}) {
     compile: path.join(outputDirectory, "compile.ts"),
     runtime: path.join(outputDirectory, "runtime.mjs"),
     observations: path.join(outputDirectory, "observations.example.json"),
-    tsconfig: path.join(outputDirectory, "tsconfig.json")
+    tsconfig: path.join(outputDirectory, "tsconfig.json"),
   };
   await Promise.all([
     writeFile(files.plan, `${JSON.stringify(plan, null, 2)}\n`),
     writeFile(files.schema, `${JSON.stringify(conformanceJsonSchema, null, 2)}\n`),
     writeFile(files.compile, renderCompileFixture(plan, outputDirectory, sdkRoot)),
     writeFile(files.runtime, renderRuntimeFixture(plan)),
-    writeFile(files.observations, `${JSON.stringify({ schemaVersion: 1, planId: plan.planId, target: plan.target, results: [] }, null, 2)}\n`),
-    writeFile(files.tsconfig, `${JSON.stringify({
-      compilerOptions: {
-        target: "ES2020",
-        module: "ESNext",
-        moduleResolution: "Bundler",
-        strict: true,
-        noEmit: true,
-        skipLibCheck: false
-      },
-      files: ["compile.ts"]
-    }, null, 2)}\n`)
+    writeFile(
+      files.observations,
+      `${JSON.stringify({ schemaVersion: 1, planId: plan.planId, target: plan.target, results: [] }, null, 2)}\n`,
+    ),
+    writeFile(
+      files.tsconfig,
+      `${JSON.stringify(
+        {
+          compilerOptions: {
+            target: "ES2020",
+            module: "ESNext",
+            moduleResolution: "Bundler",
+            strict: true,
+            noEmit: true,
+            skipLibCheck: false,
+          },
+          files: ["compile.ts"],
+        },
+        null,
+        2,
+      )}\n`,
+    ),
   ]);
   return { root: outputDirectory, files, plan };
 }
 
 export async function generateConformanceHarness(options = {}) {
-  const inputs = options.inputs ?? await loadConformanceInputs({
-    inputRoot: options.inputRoot,
-    layout: options.inputLayout,
-    repositoryRoot: options.root
-  });
+  const inputs =
+    options.inputs ??
+    (await loadConformanceInputs({
+      inputRoot: options.inputRoot,
+      layout: options.inputLayout,
+      repositoryRoot: options.root,
+    }));
   const plan = buildConformancePlan(inputs, options);
   return writeConformanceHarness(
     plan,
-    options.output ?? path.resolve(process.cwd(), ".deherm", "conformance", `${plan.shard.index}-of-${plan.shard.count}`),
-    { sdkRoot: options.sdkRoot, sdkTemplateRoot: options.sdkTemplateRoot }
+    options.output ??
+      path.resolve(process.cwd(), ".deherm", "conformance", `${plan.shard.index}-of-${plan.shard.count}`),
+    { sdkRoot: options.sdkRoot, sdkTemplateRoot: options.sdkTemplateRoot },
   );
 }
 
@@ -679,15 +792,20 @@ export async function compileConformanceHarness(planPath, output) {
     results: plan.cases.map((item) => ({
       id: item.id,
       stages: {
-        compile: passed
-          ? { status: "passed", evidence }
-          : { status: "failed", reason: diagnostic || evidence }
-      }
-    }))
+        compile: passed ? { status: "passed", evidence } : { status: "failed", reason: diagnostic || evidence },
+      },
+    })),
   };
   const destination = path.resolve(output ?? path.join(directory, "compile-observation.json"));
   await writeFile(destination, `${JSON.stringify(observation, null, 2)}\n`);
-  return { passed, status: result.status, stdout: result.stdout, stderr: result.stderr, output: destination, observation };
+  return {
+    passed,
+    status: result.status,
+    stdout: result.stdout,
+    stderr: result.stderr,
+    output: destination,
+    observation,
+  };
 }
 
 function emptyObserved() {
@@ -695,7 +813,7 @@ function emptyObserved() {
     compile: { status: "not-run" },
     link: { status: "not-run" },
     runtime: { status: "not-run" },
-    semantic: { status: "not-run" }
+    semantic: { status: "not-run" },
   };
 }
 
@@ -704,13 +822,22 @@ export function buildConformanceReport(plan, observations = []) {
   const seen = new Set();
   for (const observation of observations) {
     invariant(observation.schemaVersion === 1, "observation schemaVersion must be 1");
-    invariant(observation.planId === plan.planId, `observation plan ${observation.planId} does not match ${plan.planId}`);
-    invariant(observation.target === plan.target, `observation target ${observation.target} does not match ${plan.target}`);
+    invariant(
+      observation.planId === plan.planId,
+      `observation plan ${observation.planId} does not match ${plan.planId}`,
+    );
+    invariant(
+      observation.target === plan.target,
+      `observation target ${observation.target} does not match ${plan.target}`,
+    );
     invariant(Array.isArray(observation.results), "observation results must be an array");
     for (const result of observation.results) {
       invariant(cases.has(result.id), `observation contains unknown case ${result.id}`);
       for (const [stage, value] of Object.entries(result.stages ?? {})) {
-        invariant(["compile", "link", "runtime", "semantic"].includes(stage), `${result.id}: unknown observed stage ${stage}`);
+        invariant(
+          ["compile", "link", "runtime", "semantic"].includes(stage),
+          `${result.id}: unknown observed stage ${stage}`,
+        );
         invariant(observedStatuses.has(value.status), `${result.id}: invalid observed ${stage} status ${value.status}`);
         const key = `${result.id}:${stage}`;
         invariant(!seen.has(key), `duplicate observation for ${key}`);
@@ -722,12 +849,23 @@ export function buildConformanceReport(plan, observations = []) {
   const values = [...cases.values()];
   const strictFailures = [];
   for (const item of values) {
-    if (item.observed.compile.status !== "passed") strictFailures.push(`${item.id}: compile ${item.observed.compile.status}`);
-    if (item.stages.link.disposition === "linked" && item.observed.link.status !== "passed") strictFailures.push(`${item.id}: link ${item.observed.link.status}`);
-    if (item.stages.runtime.disposition === "executable" && item.execution.policy === "safe" && item.observed.runtime.status !== "passed") {
+    if (item.observed.compile.status !== "passed")
+      strictFailures.push(`${item.id}: compile ${item.observed.compile.status}`);
+    if (item.stages.link.disposition === "linked" && item.observed.link.status !== "passed")
+      strictFailures.push(`${item.id}: link ${item.observed.link.status}`);
+    if (
+      item.stages.runtime.disposition === "executable" &&
+      item.execution.policy === "safe" &&
+      item.observed.runtime.status !== "passed"
+    ) {
       strictFailures.push(`${item.id}: runtime ${item.observed.runtime.status}`);
     }
-    if (item.stages.runtime.disposition === "executable" && item.execution.policy === "safe" && item.stages.semantic.state !== "not-applicable" && item.observed.semantic.status !== "passed") {
+    if (
+      item.stages.runtime.disposition === "executable" &&
+      item.execution.policy === "safe" &&
+      item.stages.semantic.state !== "not-applicable" &&
+      item.observed.semantic.status !== "passed"
+    ) {
       strictFailures.push(`${item.id}: semantic ${item.observed.semantic.status}`);
     }
   }
@@ -743,17 +881,19 @@ export function buildConformanceReport(plan, observations = []) {
       link: countBy(values, (item) => item.observed.link.status),
       runtime: countBy(values, (item) => item.observed.runtime.status),
       semantic: countBy(values, (item) => item.observed.semantic.status),
-      plannedSemantic: countBy(values, (item) => item.stages.semantic.state)
+      plannedSemantic: countBy(values, (item) => item.stages.semantic.state),
     },
     strictPass: strictFailures.length === 0,
     strictFailures,
-    cases: values
+    cases: values,
   };
 }
 
 export async function readConformanceReport(planPath, observationPaths = []) {
   const plan = JSON.parse(await readFile(path.resolve(planPath), "utf8"));
-  const observations = await Promise.all(observationPaths.map((value) => readFile(path.resolve(value), "utf8").then(JSON.parse)));
+  const observations = await Promise.all(
+    observationPaths.map((value) => readFile(path.resolve(value), "utf8").then(JSON.parse)),
+  );
   return buildConformanceReport(plan, observations);
 }
 
@@ -761,5 +901,5 @@ export const conformanceSchema = Object.freeze({
   stageDispositions: [...stageDispositions],
   executionPolicies: [...executionPolicies],
   semanticStates: [...semanticStates],
-  observedStatuses: [...observedStatuses]
+  observedStatuses: [...observedStatuses],
 });

@@ -24,11 +24,13 @@ function command(id, exit = 0, modes = ["focused", "full"]) {
     kind: "command",
     claim: `${id} command evidence`,
     modes,
-    commands: [{
-      id,
-      executable: "$NODE",
-      arguments: [fake, "--stdout", `${id}:out`, "--stderr", `${id}:err`, "--exit", String(exit)],
-    }],
+    commands: [
+      {
+        id,
+        executable: "$NODE",
+        arguments: [fake, "--stdout", `${id}:out`, "--stderr", `${id}:err`, "--exit", String(exit)],
+      },
+    ],
   };
 }
 
@@ -69,7 +71,7 @@ async function walk(directory) {
   const output = [];
   for (const entry of await readdir(directory, { withFileTypes: true })) {
     const child = path.join(directory, entry.name);
-    if (entry.isDirectory()) output.push(...await walk(child));
+    if (entry.isDirectory()) output.push(...(await walk(child)));
     else output.push(child);
   }
   return output;
@@ -132,7 +134,10 @@ test("focused execution fails fast per cell, continues globally, and writes atom
     assert.match(log, /compile-passes:err/);
     assert.deepEqual(JSON.parse(await readFile(reportPath, "utf8")), report);
     assert.deepEqual(JSON.parse(await readFile(path.join(temporary, "latest.json"), "utf8")), report);
-    assert.equal((await walk(temporary)).some((file) => file.includes(".tmp-")), false);
+    assert.equal(
+      (await walk(temporary)).some((file) => file.includes(".tmp-")),
+      false,
+    );
   } finally {
     await rm(temporary, { recursive: true, force: true });
   }
@@ -163,13 +168,21 @@ test("the CLI returns failure only after persisting the complete matrix", async 
     const planPath = path.join(temporary, "plan.json");
     const output = path.join(temporary, "evidence");
     await writeFile(planPath, `${JSON.stringify(fakePlan(), null, 2)}\n`);
-    const result = spawnSync(process.execPath, [
-      "scripts/run-full-wave-verification.mjs",
-      "--plan", planPath,
-      "--output-root", output,
-      "--run-id", "cli-fixture",
-      "--mode", "focused",
-    ], { cwd: root, encoding: "utf8" });
+    const result = spawnSync(
+      process.execPath,
+      [
+        "scripts/run-full-wave-verification.mjs",
+        "--plan",
+        planPath,
+        "--output-root",
+        output,
+        "--run-id",
+        "cli-fixture",
+        "--mode",
+        "focused",
+      ],
+      { cwd: root, encoding: "utf8" },
+    );
     assert.equal(result.status, 1);
     assert.match(result.stdout, /Full-wave verification: failed/);
     const report = JSON.parse(await readFile(path.join(output, "runs/cli-fixture/matrix.json"), "utf8"));

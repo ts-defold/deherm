@@ -9,7 +9,7 @@ import { ensureRevisionWorkspace } from "../scripts/check-defold-revision-matrix
 import {
   makeRevisionWorkspaceMetadata,
   revisionProducerInputIdentity,
-  writeRevisionWorkspaceMetadata
+  writeRevisionWorkspaceMetadata,
 } from "../scripts/lib/revision-workspace-metadata.mjs";
 
 const revision = "0123456789abcdef0123456789abcdef01234567";
@@ -22,9 +22,16 @@ async function writeWorkspace(workspace, input = producerInput, compilerVersion 
   const manifest = path.join(workspace, "packages/bindings/generated/defold-api-policy.json");
   await mkdir(path.dirname(manifest), { recursive: true });
   await writeFile(manifest, `${JSON.stringify({ defoldRevision: revision, policyRoot })}\n`);
-  await writeRevisionWorkspaceMetadata(workspace, makeRevisionWorkspaceMetadata({
-    revision, producerInput: input, packageVersion: compilerVersion, policyRoot, generator: { version: 1 }
-  }));
+  await writeRevisionWorkspaceMetadata(
+    workspace,
+    makeRevisionWorkspaceMetadata({
+      revision,
+      producerInput: input,
+      packageVersion: compilerVersion,
+      policyRoot,
+      generator: { version: 1 },
+    }),
+  );
 }
 
 test("producer input identity covers working-tree edits, additions, deletions, and symlink targets", async () => {
@@ -71,7 +78,9 @@ test("a current historical workspace is reused only with its exact producer iden
     producerInput,
     packageVersion,
     workspaceBoundary: boundary,
-    derive: async () => { called = true; }
+    derive: async () => {
+      called = true;
+    },
   });
   assert.deepEqual(result, { derived: false, reason: null });
   assert.equal(called, false);
@@ -81,18 +90,30 @@ test("a stale producer fingerprint is rejected unless derivation is requested", 
   const boundary = await mkdtemp(path.join(tmpdir(), "deherm-matrix-reject-"));
   const workspace = path.join(boundary, "lane");
   await writeWorkspace(workspace, { ...producerInput, sha256: "c".repeat(64) });
-  await assert.rejects(ensureRevisionWorkspace(lane, workspace, {
-    deriveMissing: false, producerInput, packageVersion, workspaceBoundary: boundary
-  }), /producer input fingerprint is stale.*--derive-missing/u);
+  await assert.rejects(
+    ensureRevisionWorkspace(lane, workspace, {
+      deriveMissing: false,
+      producerInput,
+      packageVersion,
+      workspaceBoundary: boundary,
+    }),
+    /producer input fingerprint is stale.*--derive-missing/u,
+  );
 });
 
 test("a mismatched package/compiler identity cannot reuse an otherwise matching tree", async () => {
   const boundary = await mkdtemp(path.join(tmpdir(), "deherm-matrix-compiler-"));
   const workspace = path.join(boundary, "lane");
   await writeWorkspace(workspace, producerInput, "0.0.0-stale");
-  await assert.rejects(ensureRevisionWorkspace(lane, workspace, {
-    deriveMissing: false, producerInput, packageVersion, workspaceBoundary: boundary
-  }), /current compiler identity is stale/u);
+  await assert.rejects(
+    ensureRevisionWorkspace(lane, workspace, {
+      deriveMissing: false,
+      producerInput,
+      packageVersion,
+      workspaceBoundary: boundary,
+    }),
+    /current compiler identity is stale/u,
+  );
 });
 
 test("derive-missing replaces a stale lane and verifies the fresh metadata before reuse", async () => {
@@ -108,7 +129,7 @@ test("derive-missing replaces a stale lane and verifies the fresh metadata befor
     derive: async (_lane, destination) => {
       await assert.rejects(readFile(path.join(destination, "stale-marker")), /ENOENT/u);
       await writeWorkspace(destination);
-    }
+    },
   });
   assert.equal(result.derived, true);
   assert.equal(result.reason, "producer input fingerprint is stale");
@@ -117,15 +138,18 @@ test("derive-missing replaces a stale lane and verifies the fresh metadata befor
 test("a derivation callback cannot bless a workspace without matching metadata", async () => {
   const boundary = await mkdtemp(path.join(tmpdir(), "deherm-matrix-invalid-"));
   const workspace = path.join(boundary, "lane");
-  await assert.rejects(ensureRevisionWorkspace(lane, workspace, {
-    deriveMissing: true,
-    producerInput,
-    packageVersion,
-    workspaceBoundary: boundary,
-    derive: async (_lane, destination) => {
-      const manifest = path.join(destination, "packages/bindings/generated/defold-api-policy.json");
-      await mkdir(path.dirname(manifest), { recursive: true });
-      await writeFile(manifest, `${JSON.stringify({ defoldRevision: revision, policyRoot })}\n`);
-    }
-  }), /fresh derivation produced a stale workspace \(derivation metadata is missing\)/u);
+  await assert.rejects(
+    ensureRevisionWorkspace(lane, workspace, {
+      deriveMissing: true,
+      producerInput,
+      packageVersion,
+      workspaceBoundary: boundary,
+      derive: async (_lane, destination) => {
+        const manifest = path.join(destination, "packages/bindings/generated/defold-api-policy.json");
+        await mkdir(path.dirname(manifest), { recursive: true });
+        await writeFile(manifest, `${JSON.stringify({ defoldRevision: revision, policyRoot })}\n`);
+      },
+    }),
+    /fresh derivation produced a stale workspace \(derivation metadata is missing\)/u,
+  );
 });

@@ -259,7 +259,11 @@ test("copying a pointee value does not retain the source pointer", () => {
         kind: "BinaryOperator",
         opcode: "=",
         inner: [
-          { kind: "DeclRefExpr", type: { qualType: "float" }, referencedDecl: { kind: "VarDecl", id: "slot", name: "slot" } },
+          {
+            kind: "DeclRefExpr",
+            type: { qualType: "float" },
+            referencedDecl: { kind: "VarDecl", id: "slot", name: "slot" },
+          },
           {
             kind: "ArraySubscriptExpr",
             type: { qualType: "float" },
@@ -313,7 +317,15 @@ test("typedef-backed handle pointers remain pointer effects at the AST boundary"
     "Observe",
     "void (HResource)",
     [handle],
-    [{ kind: "CallExpr", inner: [{ kind: "DeclRefExpr", referencedDecl: { kind: "FunctionDecl", id: "unknown", name: "opaque" } }, parameterRef("handle", "handle", "HResource")] }],
+    [
+      {
+        kind: "CallExpr",
+        inner: [
+          { kind: "DeclRefExpr", referencedDecl: { kind: "FunctionDecl", id: "unknown", name: "opaque" } },
+          parameterRef("handle", "handle", "HResource"),
+        ],
+      },
+    ],
   );
   const result = fact(ast(unresolved), "typedef-handle");
   assert.equal(result.parameters[0].memoryEffect, "unknown");

@@ -12,16 +12,13 @@ function replaceExactlyOnce(source, search, replacement, description) {
 export function createRejectedCandidate(source) {
   const hook = "init() {";
   return replaceExactlyOnce(
-      source,
-      hook,
-      `${hook}\n        throw new Error(${JSON.stringify(rejectedCandidateMarker)});`,
-      "application init hook");
+    source,
+    hook,
+    `${hook}\n        throw new Error(${JSON.stringify(rejectedCandidateMarker)});`,
+    "application init hook",
+  );
 }
 
 export function createValidCandidate(source) {
-  return replaceExactlyOnce(
-      source,
-      "add(20, 22)",
-      "add(40, 44)",
-      "expected module expression");
+  return replaceExactlyOnce(source, "add(20, 22)", "add(40, 44)", "expected module expression");
 }

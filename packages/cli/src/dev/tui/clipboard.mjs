@@ -37,7 +37,8 @@ function writeLocalClipboard(text, options) {
  * rather than claiming success it cannot observe.
  */
 export function copyToClipboard(text, options = {}) {
-  if (typeof text !== "string" || text.length === 0) return { copied: false, transports: [], bytes: 0, reason: "empty selection" };
+  if (typeof text !== "string" || text.length === 0)
+    return { copied: false, transports: [], bytes: 0, reason: "empty selection" };
   const transports = [];
   const writeRaw = options.writeRaw;
   if (typeof writeRaw === "function") {

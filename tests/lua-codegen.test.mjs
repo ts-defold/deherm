@@ -2,14 +2,9 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-import {
-  generateLuaArtifacts,
-  validateLuaSchema
-} from "../scripts/generate-lua-bridge.mjs";
+import { generateLuaArtifacts, validateLuaSchema } from "../scripts/generate-lua-bridge.mjs";
 
-const schema = JSON.parse(
-  await readFile(new URL("../packages/bindings/lua-compat.json", import.meta.url), "utf8")
-);
+const schema = JSON.parse(await readFile(new URL("../packages/bindings/lua-compat.json", import.meta.url), "utf8"));
 
 test("Lua compatibility schema emits specialized stack thunks", () => {
   const artifacts = generateLuaArtifacts(validateLuaSchema(schema));

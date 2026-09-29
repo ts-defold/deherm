@@ -18,6 +18,6 @@ export function materializeDmSdkUsages(usages, options = {}) {
   return materializeWithCatalog(usages, {
     recipes,
     ...options,
-    catalogSha256
+    catalogSha256,
   });
 }

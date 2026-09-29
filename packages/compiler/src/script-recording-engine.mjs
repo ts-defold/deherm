@@ -35,19 +35,14 @@ const SHAPE = Object.freeze({
   record: 15,
   map: 16,
   callback: 17,
-  unsupported: 18
+  unsupported: 18,
 });
 
 export const shapeCodes = SHAPE;
 
 export const transportOrder = Object.freeze(["jsi", "direct-memory", "typed-native"]);
 
-export const targetOrder = Object.freeze([
-  "dynamic-hermes",
-  "static-hermes",
-  "browser-wasm",
-  "lua-stack"
-]);
+export const targetOrder = Object.freeze(["dynamic-hermes", "static-hermes", "browser-wasm", "lua-stack"]);
 
 export const luaAdapterProfile = "generated-runtime-profile-union";
 
@@ -56,14 +51,12 @@ export const undrivableTransports = Object.freeze([
   Object.freeze({
     transport: "lua-stack",
     runtime: "hermes",
-    reason: "lua-stack-driven-by-exact-script-adapter-companion-outside-recorded-trace"
-  })
+    reason: "lua-stack-driven-by-exact-script-adapter-companion-outside-recorded-trace",
+  }),
 ]);
 
 function seedStableId(revision, name, used) {
-  const digest = createHash("sha256")
-    .update(`${revision}\0deherm-recording-handle-seed\0${name}`)
-    .digest();
+  const digest = createHash("sha256").update(`${revision}\0deherm-recording-handle-seed\0${name}`).digest();
   let candidate = digest.readUInt32LE(0);
   while (used.has(candidate)) candidate = (candidate + 1) >>> 0;
   used.add(candidate);
@@ -118,7 +111,7 @@ class ShapeTable {
       code: node.code,
       aux: node.aux ?? 0,
       key: node.key ?? -1,
-      children: node.children ?? []
+      children: node.children ?? [],
     };
     const identity = canonicalJson(record);
     const existing = this.index.get(identity);
@@ -134,8 +127,10 @@ function handleKindLedger(handleLowering) {
   const byRawType = new Map();
   const byId = new Map();
   for (const kind of handleLowering.handleKinds ?? []) {
-    assert(typeof kind.id === "string" && Number.isInteger(kind.numericId),
-      "handle-kind ledger rows need an id and numericId");
+    assert(
+      typeof kind.id === "string" && Number.isInteger(kind.numericId),
+      "handle-kind ledger rows need an id and numericId",
+    );
     byId.set(kind.id, kind.numericId);
     for (const rawType of kind.rawTypes ?? []) byRawType.set(rawType, kind.numericId);
   }
@@ -148,7 +143,7 @@ const legacyTransparentRecordingShapes = Object.freeze({
   Vector3: "vector3",
   Vector4: "vector4",
   Quaternion: "quaternion",
-  Matrix4: "matrix4"
+  Matrix4: "matrix4",
 });
 
 function recordingShapeForValue(name, entry, ledger) {
@@ -181,12 +176,13 @@ function u64Sentinel(seed) {
  * probes, so fill those six templates by operation shape rather than route ID.
  */
 function nativePodVerificationVector(binding) {
-  if (binding.generatedProbe) return {
-    source: "generated-value-binding-probe",
-    key: binding.generatedProbe.key,
-    arguments: binding.generatedProbe.arguments,
-    expectation: binding.generatedProbe.expectation
-  };
+  if (binding.generatedProbe)
+    return {
+      source: "generated-value-binding-probe",
+      key: binding.generatedProbe.key,
+      arguments: binding.generatedProbe.arguments,
+      expectation: binding.generatedProbe.expectation,
+    };
   const template = binding.operation?.template;
   const parameters = binding.operation?.parameters ?? {};
   if (template === "quaternion-axis-rotation") {
@@ -199,35 +195,39 @@ function nativePodVerificationVector(binding) {
       expectation: {
         kind: "components",
         values: axis === "x" ? [1, 0, 0, 0] : axis === "y" ? [0, 1, 0, 0] : [0, 0, 1, 0],
-        tolerance: 0.000001
-      }
+        tolerance: 0.000001,
+      },
     };
   }
-  if (template === "value-unary" && parameters.operator === "length") return {
-    source: "operation-template-default",
-    key: "value-unary.length",
-    arguments: [{ codec: "Vector3", components: [3, 4, 0] }],
-    expectation: { kind: "number", value: 5, tolerance: 0 }
-  };
-  if (template === "value-unary" && parameters.operator === "normalize") return {
-    source: "operation-template-default",
-    key: "value-unary.normalize",
-    arguments: [{ codec: "Vector3", components: [3, 4, 0] }],
-    expectation: { kind: "components", values: [0.6, 0.8, 0], tolerance: 0.000001 }
-  };
+  if (template === "value-unary" && parameters.operator === "length")
+    return {
+      source: "operation-template-default",
+      key: "value-unary.length",
+      arguments: [{ codec: "Vector3", components: [3, 4, 0] }],
+      expectation: { kind: "number", value: 5, tolerance: 0 },
+    };
+  if (template === "value-unary" && parameters.operator === "normalize")
+    return {
+      source: "operation-template-default",
+      key: "value-unary.normalize",
+      arguments: [{ codec: "Vector3", components: [3, 4, 0] }],
+      expectation: { kind: "components", values: [0.6, 0.8, 0], tolerance: 0.000001 },
+    };
   if (template === "value-constructor") {
-    if (parameters.kind === "Quaternion") return {
-      source: "operation-template-default",
-      key: "value-constructor.quaternion-identity",
-      arguments: [],
-      expectation: { kind: "components", values: [0, 0, 0, 1], tolerance: 0 }
-    };
-    if (parameters.kind === "Vector3") return {
-      source: "operation-template-default",
-      key: "value-constructor.vector3-zero",
-      arguments: [],
-      expectation: { kind: "components", values: [0, 0, 0], tolerance: 0 }
-    };
+    if (parameters.kind === "Quaternion")
+      return {
+        source: "operation-template-default",
+        key: "value-constructor.quaternion-identity",
+        arguments: [],
+        expectation: { kind: "components", values: [0, 0, 0, 1], tolerance: 0 },
+      };
+    if (parameters.kind === "Vector3")
+      return {
+        source: "operation-template-default",
+        key: "value-constructor.vector3-zero",
+        arguments: [],
+        expectation: { kind: "components", values: [0, 0, 0], tolerance: 0 },
+      };
   }
   if (template === "hash-string") {
     const input = "deherm_native_pod_exact";
@@ -235,7 +235,7 @@ function nativePodVerificationVector(binding) {
       source: "operation-template-default",
       key: "hash-string.utf8",
       arguments: [input],
-      expectation: { kind: "hash", value: hashDefoldString64(input).toString(), tolerance: 0 }
+      expectation: { kind: "hash", value: hashDefoldString64(input).toString(), tolerance: 0 },
     };
   }
   throw new Error(`${binding.id}: generated native-POD route has no exact verification vector`);
@@ -244,39 +244,56 @@ function nativePodVerificationVector(binding) {
 export function renderShapeSpec(shapes, index, semanticNames, seed = 1) {
   const shape = shapes[index];
   switch (shape.code) {
-    case SHAPE.undefined: return "undef";
-    case SHAPE.null: return "null";
-    case SHAPE.boolean: return `bool:${seed % 2}`;
-    case SHAPE.number: return `num:${seed}`;
-    case SHAPE.string: return `str:d${seed}`;
-    case SHAPE.hash: return `hash:${u64Sentinel(seed)}`;
-    case SHAPE.url: return `url:${Array.from({ length: 4 }, (_, lane) =>
-      u64Sentinel(seed + lane)).join(",")}`;
-    case SHAPE.handle: return `h:${semanticNames[shape.aux] ?? "unknown"}`;
-    case SHAPE.guiNode: return "h:gui-node";
-    case SHAPE.userdata: return "h:lua-userdata";
-    case SHAPE.vector3: return `dv:v3:${seed},${seed + 1},${seed + 2}`;
-    case SHAPE.vector4: return `dv:v4:${seed},${seed + 1},${seed + 2},${seed + 3}`;
-    case SHAPE.quaternion: return `dv:quat:${seed},${seed + 1},${seed + 2},${seed + 3}`;
-    case SHAPE.matrix4: return `dv:mat4:${Array.from({ length: 16 }, (_, lane) => seed + lane).join(",")}`;
+    case SHAPE.undefined:
+      return "undef";
+    case SHAPE.null:
+      return "null";
+    case SHAPE.boolean:
+      return `bool:${seed % 2}`;
+    case SHAPE.number:
+      return `num:${seed}`;
+    case SHAPE.string:
+      return `str:d${seed}`;
+    case SHAPE.hash:
+      return `hash:${u64Sentinel(seed)}`;
+    case SHAPE.url:
+      return `url:${Array.from({ length: 4 }, (_, lane) => u64Sentinel(seed + lane)).join(",")}`;
+    case SHAPE.handle:
+      return `h:${semanticNames[shape.aux] ?? "unknown"}`;
+    case SHAPE.guiNode:
+      return "h:gui-node";
+    case SHAPE.userdata:
+      return "h:lua-userdata";
+    case SHAPE.vector3:
+      return `dv:v3:${seed},${seed + 1},${seed + 2}`;
+    case SHAPE.vector4:
+      return `dv:v4:${seed},${seed + 1},${seed + 2},${seed + 3}`;
+    case SHAPE.quaternion:
+      return `dv:quat:${seed},${seed + 1},${seed + 2},${seed + 3}`;
+    case SHAPE.matrix4:
+      return `dv:mat4:${Array.from({ length: 16 }, (_, lane) => seed + lane).join(",")}`;
     case SHAPE.sequence:
-      return `seq(${shape.children.map((child, childIndex) =>
-        renderShapeSpec(shapes, child, semanticNames, childSentinel(seed, childIndex))).join(",")})`;
+      return `seq(${shape.children
+        .map((child, childIndex) => renderShapeSpec(shapes, child, semanticNames, childSentinel(seed, childIndex)))
+        .join(",")})`;
     case SHAPE.record:
-      return `rec(${shape.children.map((child, childIndex) => {
-        const field = shapes[child];
-        return `${field.keyText}=${renderShapeSpec(
-          shapes, child, semanticNames, childSentinel(seed, childIndex),
-        )}`;
-      }).join(",")})`;
+      return `rec(${shape.children
+        .map((child, childIndex) => {
+          const field = shapes[child];
+          return `${field.keyText}=${renderShapeSpec(shapes, child, semanticNames, childSentinel(seed, childIndex))}`;
+        })
+        .join(",")})`;
     case SHAPE.map:
       return `map(${renderShapeSpec(
-        shapes, shape.children[0], semanticNames, childSentinel(seed, 0),
-      )}=>${renderShapeSpec(
-        shapes, shape.children[1], semanticNames, childSentinel(seed, 1),
-      )})`;
-    case SHAPE.callback: return "cb";
-    default: return "unsupported";
+        shapes,
+        shape.children[0],
+        semanticNames,
+        childSentinel(seed, 0),
+      )}=>${renderShapeSpec(shapes, shape.children[1], semanticNames, childSentinel(seed, 1))})`;
+    case SHAPE.callback:
+      return "cb";
+    default:
+      return "unsupported";
   }
 }
 
@@ -299,11 +316,23 @@ function collectHandleNeeds(shapes, index, into, seen = new Set()) {
 }
 
 export function buildRecordingEngineModel(inputs) {
-  const { projection, universal, handleLowering, valueLayouts, tableRecords, valueBindings, overloadDispatch, loweringPlan, inputHashes } = inputs;
+  const {
+    projection,
+    universal,
+    handleLowering,
+    valueLayouts,
+    tableRecords,
+    valueBindings,
+    overloadDispatch,
+    loweringPlan,
+    inputHashes,
+  } = inputs;
 
   assert(loweringPlan.schemaVersion === 2, "recording engine requires canonical lowering plan schema v2");
-  assert(projection.defoldRevision === universal.defoldRevision,
-    "script projection and universal value bindings pin different Defold revisions");
+  assert(
+    projection.defoldRevision === universal.defoldRevision,
+    "script projection and universal value bindings pin different Defold revisions",
+  );
   const canonicalPlanMatchesRevision = projection.defoldRevision === loweringPlan.defoldRevision;
 
   // The plan is joined by exact route identity, so a byte-level drift in any
@@ -314,24 +343,27 @@ export function buildRecordingEngineModel(inputs) {
     projection: "scriptProjection",
     universal: "scriptUniversalValue",
     handleLowering: "scriptHandleLowering",
-    valueLayouts: "defoldValueLayouts"
+    valueLayouts: "defoldValueLayouts",
   })
     .filter(([local, planKey]) => inputHashes[local] !== loweringPlan.inputHashes[planKey])
     .map(([local, planKey]) => ({
       input: local,
       planInput: planKey,
       planSha256: loweringPlan.inputHashes[planKey],
-      observedSha256: inputHashes[local]
+      observedSha256: inputHashes[local],
     }));
 
   const semanticNames = ["", ...(handleLowering.handleKinds ?? []).map((kind) => kind.id)];
   const ledger = handleKindLedger(handleLowering);
-  assert(valueLayouts?.schemaVersion === 1 && valueLayouts.defoldRevision === projection.defoldRevision,
-    "recording engine requires revision-matched Defold value semantics");
-  const valueSemantics = new Map([
-    ...Object.entries(valueLayouts.transparent ?? {}),
-    ...Object.entries(valueLayouts.opaque ?? {})
-  ].map(([name, entry]) => [name, recordingShapeForValue(name, entry, ledger)]));
+  assert(
+    valueLayouts?.schemaVersion === 1 && valueLayouts.defoldRevision === projection.defoldRevision,
+    "recording engine requires revision-matched Defold value semantics",
+  );
+  const valueSemantics = new Map(
+    [...Object.entries(valueLayouts.transparent ?? {}), ...Object.entries(valueLayouts.opaque ?? {})].map(
+      ([name, entry]) => [name, recordingShapeForValue(name, entry, ledger)],
+    ),
+  );
   const text = new TextTable();
   const shapes = new ShapeTable(text);
 
@@ -341,9 +373,11 @@ export function buildRecordingEngineModel(inputs) {
   const tableRecordRows = new Map((tableRecords?.bindings ?? []).map((row) => [row.id, row]));
   const valueBindingRows = new Map((valueBindings?.bindings ?? []).map((row) => [row.id, row]));
   const overloadRows = new Map((overloadDispatch?.bindings ?? []).map((row) => [row.id, row]));
-  const planUnits = new Map((canonicalPlanMatchesRevision ? loweringPlan.units : [])
-    .filter((unit) => unit.identity.surface === "script")
-    .map((unit) => [unit.identity.id, unit]));
+  const planUnits = new Map(
+    (canonicalPlanMatchesRevision ? loweringPlan.units : [])
+      .filter((unit) => unit.identity.surface === "script")
+      .map((unit) => [unit.identity.id, unit]),
+  );
 
   const projectionContract = (row) => ({
     context: row.context?.token ?? "unspecified",
@@ -353,36 +387,43 @@ export function buildRecordingEngineModel(inputs) {
     callback: row.effects?.callback?.token ?? "unverified",
     invalidation: row.effects?.invalidation?.token ?? "unverified",
     errorModel: "status-return-and-target-exception",
-    scratch: "caller-owned-bounded-reentrant-scratch"
+    scratch: "caller-owned-bounded-reentrant-scratch",
   });
   // Constant universal operations are generated from the revision-derived
   // registration surface rather than the callable projection IR. They still
   // have an exact zero-argument/one-result transport contract, so give the
   // recording model that mechanical contract instead of pretending a
   // function projection row exists.
-  const rowForBinding = (binding) => projectionRows.get(binding.id) ??
-    (binding.loweringFamily === "script-constant" ? {
-      context: { token: "unspecified" },
-      effects: {},
-      runtimeModulePath: binding.modulePath,
-      runtimeMember: binding.member,
-      signature: {
-        parameters: [],
-        returns: [{ value: { kind: "dynamic" } }]
-      }
-    } : null);
-  const fallbackContracts = [...new Set(universal.bindings.map((binding) => {
-    const row = rowForBinding(binding);
-    assert(row, `universal binding ${binding.id} has no projection row`);
-    return canonicalJson(projectionContract(row));
-  }))].sort(compareCodeUnits);
+  const rowForBinding = (binding) =>
+    projectionRows.get(binding.id) ??
+    (binding.loweringFamily === "script-constant"
+      ? {
+          context: { token: "unspecified" },
+          effects: {},
+          runtimeModulePath: binding.modulePath,
+          runtimeMember: binding.member,
+          signature: {
+            parameters: [],
+            returns: [{ value: { kind: "dynamic" } }],
+          },
+        }
+      : null);
+  const fallbackContracts = [
+    ...new Set(
+      universal.bindings.map((binding) => {
+        const row = rowForBinding(binding);
+        assert(row, `universal binding ${binding.id} has no projection row`);
+        return canonicalJson(projectionContract(row));
+      }),
+    ),
+  ].sort(compareCodeUnits);
   const fallbackContractIndex = new Map(fallbackContracts.map((contract, index) => [contract, index]));
   const fallbackMarshallingPrograms = Object.freeze({
     typescriptSdk: 0,
     dynamicHermesJsi: 0,
     staticHermesCAbi: 0,
     luaStack: 0,
-    browserWasmHost: 0
+    browserWasmHost: 0,
   });
 
   const blockers = [];
@@ -428,20 +469,30 @@ export function buildRecordingEngineModel(inputs) {
             recordBlocker(routeId, "unknown-handle-alias", value.name);
             return node(SHAPE.unsupported);
           }
-          return numeric === ledger.byId.get("gui-node")
-            ? node(SHAPE.guiNode, numeric)
-            : node(SHAPE.handle, numeric);
+          return numeric === ledger.byId.get("gui-node") ? node(SHAPE.guiNode, numeric) : node(SHAPE.handle, numeric);
         }
         recordBlocker(routeId, "unsupported-defold-value", `${value.name}:${semantic ?? "unclassified"}`);
         return node(SHAPE.unsupported);
       }
       case "record-ref":
         if (tableRecordRows.has(routeId)) {
-          const fields = tableRecordRows.get(routeId).fields.map((field) => lower(routeId, {
-            kind: "scalar",
-            name: field.codec === "Boolean" ? "boolean" : field.codec === "String" ? "string" :
-              field.codec === "Integer" || field.codec === "Number" ? "number" : "unsupported"
-          }, field.name));
+          const fields = tableRecordRows.get(routeId).fields.map((field) =>
+            lower(
+              routeId,
+              {
+                kind: "scalar",
+                name:
+                  field.codec === "Boolean"
+                    ? "boolean"
+                    : field.codec === "String"
+                      ? "string"
+                      : field.codec === "Integer" || field.codec === "Number"
+                        ? "number"
+                        : "unsupported",
+              },
+              field.name,
+            ),
+          );
           return node(SHAPE.record, 0, fields);
         }
         return node(SHAPE.record, 0, []);
@@ -487,7 +538,7 @@ export function buildRecordingEngineModel(inputs) {
       Vector3: { kind: "defold-value", name: "vector3" },
       Vector4: { kind: "defold-value", name: "vector4" },
       Quaternion: { kind: "defold-value", name: "quaternion" },
-      Matrix4: { kind: "defold-value", name: "matrix4" }
+      Matrix4: { kind: "defold-value", name: "matrix4" },
     };
     assert(values[codec], `${routeId}: unsupported exact overload codec ${codec}`);
     return lower(routeId, values[codec], keyText);
@@ -503,21 +554,27 @@ export function buildRecordingEngineModel(inputs) {
     const unit = canonicalUnit ?? {
       contract: fallbackContract,
       contractDetails: fallbackContractIndex.get(fallbackIdentity),
-      backends: Object.fromEntries(Object.entries(fallbackMarshallingPrograms)
-        .map(([backend, marshallingProgram]) => [backend, { marshallingProgram }]))
+      backends: Object.fromEntries(
+        Object.entries(fallbackMarshallingPrograms).map(([backend, marshallingProgram]) => [
+          backend,
+          { marshallingProgram },
+        ]),
+      ),
     };
 
     const parameters = row.signature.parameters ?? [];
     const returns = row.signature.returns ?? [];
     const argumentCount = Math.min(parameters.length, binding.maximumArgumentCount);
-    let argumentShapes = parameters.slice(0, argumentCount)
+    let argumentShapes = parameters
+      .slice(0, argumentCount)
       .map((parameter) => lower(binding.id, parameter.value, parameter.name));
     const resultCount = Math.min(returns.length, binding.maximumResultCount);
     let resultShapes = returns.slice(0, resultCount).map((result) => lower(binding.id, result.value));
     const overloadShape = overloadRows.get(binding.id)?.callShapes?.[0];
     if (overloadShape) {
       argumentShapes = overloadShape.arguments.map((codec, index) =>
-        lowerExactCodec(binding.id, codec, parameters[index]?.name));
+        lowerExactCodec(binding.id, codec, parameters[index]?.name),
+      );
       resultShapes = [lowerExactCodec(binding.id, overloadShape.resultCodec)];
     }
 
@@ -530,13 +587,18 @@ export function buildRecordingEngineModel(inputs) {
       loweringFamily: binding.loweringFamily,
       contract: unit.contractDetails,
       contractTokens: unit.contract,
-      marshallingPrograms: Object.fromEntries(Object.entries(unit.backends)
-        .map(([backend, disposition]) => [backend, disposition.marshallingProgram])),
-      backendSelections: Object.fromEntries(Object.entries(unit.backends)
-        .map(([backend, disposition]) => [backend, {
-          selection: disposition.selection ?? "emit",
-          blockerSet: disposition.blockerSet ?? 0
-        }])),
+      marshallingPrograms: Object.fromEntries(
+        Object.entries(unit.backends).map(([backend, disposition]) => [backend, disposition.marshallingProgram]),
+      ),
+      backendSelections: Object.fromEntries(
+        Object.entries(unit.backends).map(([backend, disposition]) => [
+          backend,
+          {
+            selection: disposition.selection ?? "emit",
+            blockerSet: disposition.blockerSet ?? 0,
+          },
+        ]),
+      ),
       dynamicHermesSelection: unit.backends.dynamicHermesJsi?.selection ?? "emit",
       loweringPlanEvidence: canonicalUnit ? "canonical-plan" : "projection-derived-unverified-fallback",
       context: row.context?.token ?? "unspecified",
@@ -545,36 +607,42 @@ export function buildRecordingEngineModel(inputs) {
         minimum: binding.minimumResultCount,
         maximum: binding.maximumResultCount,
         declared: binding.resultCount,
-        driven: resultCount
+        driven: resultCount,
       },
       argumentShapes,
       resultShapes,
       transports: {},
-      luaAdapter: { status: "exercise", reason: "", argumentCount: binding.minimumArgumentCount }
+      luaAdapter: { status: "exercise", reason: "", argumentCount: binding.minimumArgumentCount },
     };
 
     if (argumentCount < binding.minimumArgumentCount) {
-      recordBlocker(binding.id, "projected-arity-below-generated-minimum",
-        `${argumentCount} < ${binding.minimumArgumentCount}`);
+      recordBlocker(
+        binding.id,
+        "projected-arity-below-generated-minimum",
+        `${argumentCount} < ${binding.minimumArgumentCount}`,
+      );
     }
     if (resultCount !== binding.resultCount) {
-      recordBlocker(binding.id, "projected-result-count-differs-from-generated",
-        `${resultCount} != ${binding.resultCount}`);
+      recordBlocker(
+        binding.id,
+        "projected-result-count-differs-from-generated",
+        `${resultCount} != ${binding.resultCount}`,
+      );
     }
     routes.push(route);
   }
 
   const shapeList = shapes.entries.map((entry) => ({
     ...entry,
-    keyText: entry.key >= 0 ? text.entries[entry.key] : ""
+    keyText: entry.key >= 0 ? text.entries[entry.key] : "",
   }));
 
-  const has = (route, predicate) => [...route.argumentShapes, ...route.resultShapes]
-    .some((index) => shapeContains(shapeList, index, predicate));
-  const argumentsHave = (route, predicate) => route.argumentShapes
-    .some((index) => shapeContains(shapeList, index, predicate));
-  const resultsHave = (route, predicate) => route.resultShapes
-    .some((index) => shapeContains(shapeList, index, predicate));
+  const has = (route, predicate) =>
+    [...route.argumentShapes, ...route.resultShapes].some((index) => shapeContains(shapeList, index, predicate));
+  const argumentsHave = (route, predicate) =>
+    route.argumentShapes.some((index) => shapeContains(shapeList, index, predicate));
+  const resultsHave = (route, predicate) =>
+    route.resultShapes.some((index) => shapeContains(shapeList, index, predicate));
 
   // Universal skips first: these make a route undrivable on every transport.
   for (const route of routes) {
@@ -590,42 +658,41 @@ export function buildRecordingEngineModel(inputs) {
     const valueBindingRow = valueBindingRows.get(route.id);
     const handleRow = handleRows.get(route.id);
     const universalRow = universalRows.get(route.id);
-    route.luaAdapter.handleCodec = route.loweringFamily === "multi-result" &&
-        argumentsHave(route, (shape) => shape.code === SHAPE.handle)
-      ? "lua-userdata"
-      : (route.loweringFamily === "multi-result" ||
-          valueBindingRow?.targetSupport?.arm64DynamicHermes?.backend === "generated-captured-lua") &&
-          argumentsHave(route, (shape) => shape.code === SHAPE.guiNode)
-      ? "gui-node"
-      : "semantic";
+    route.luaAdapter.handleCodec =
+      route.loweringFamily === "multi-result" && argumentsHave(route, (shape) => shape.code === SHAPE.handle)
+        ? "lua-userdata"
+        : (route.loweringFamily === "multi-result" ||
+              valueBindingRow?.targetSupport?.arm64DynamicHermes?.backend === "generated-captured-lua") &&
+            argumentsHave(route, (shape) => shape.code === SHAPE.guiNode)
+          ? "gui-node"
+          : "semantic";
     const topLevelResultShapes = route.resultShapes.map((index) => shapeList[index]);
     const topLevelGuiNode = topLevelResultShapes.some((shape) => shape.code === SHAPE.guiNode);
-    const resultHasHandle = resultsHave(route,
-      (shape) => shape.code === SHAPE.handle || shape.code === SHAPE.guiNode);
+    const resultHasHandle = resultsHave(route, (shape) => shape.code === SHAPE.handle || shape.code === SHAPE.guiNode);
     route.luaAdapter.resultHandleCodec = !resultHasHandle
       ? "none"
-      : topLevelGuiNode &&
-            valueBindingRow?.targetSupport?.arm64DynamicHermes?.backend === "generated-captured-lua"
+      : topLevelGuiNode && valueBindingRow?.targetSupport?.arm64DynamicHermes?.backend === "generated-captured-lua"
         ? "gui-node"
         : handleRow || universalRow?.resultSemanticKindId > 0
-        ? "semantic"
-        : "lua-userdata";
+          ? "semantic"
+          : "lua-userdata";
     if (universalSkip) {
       route.luaAdapter = { ...route.luaAdapter, status: "skip", reason: universalSkip };
     } else if (route.dynamicHermesSelection === "omit" || handleRow?.profiles?.runtimeAvailable === false) {
       route.luaAdapter = {
         status: "skip",
         reason: "canonical-dynamic-hermes-route-omitted",
-        argumentCount: route.arity.minimum
+        argumentCount: route.arity.minimum,
       };
     } else if (valueBindingRow?.targetSupport?.arm64DynamicHermes?.backend === "generated-native-pod") {
       route.luaAdapter = {
         status: "skip",
         reason: "route-uses-native-pod-not-lua-stack",
-        argumentCount: route.arity.minimum
+        argumentCount: route.arity.minimum,
       };
-    } else if (valueBindingRow?.targetSupport?.arm64DynamicHermes?.backend ===
-        "generated-native-pod-with-addressed-captured-lua") {
+    } else if (
+      valueBindingRow?.targetSupport?.arm64DynamicHermes?.backend === "generated-native-pod-with-addressed-captured-lua"
+    ) {
       route.luaAdapter.argumentCount = route.arity.maximum;
     }
   }
@@ -670,21 +737,23 @@ export function buildRecordingEngineModel(inputs) {
     if (!placed.has(route.id)) ordered.push(route);
   }
 
-  const handleName = (kind) => kind === -1 ? "gui-node" : kind === -2 ? "lua-userdata" : (semanticNames[kind] ?? "unknown");
+  const handleName = (kind) =>
+    kind === -1 ? "gui-node" : kind === -2 ? "lua-userdata" : (semanticNames[kind] ?? "unknown");
 
   // A few public APIs consume retained engine handles for which the documented
   // Lua surface exposes no constructor or return path. A real JSI call still
   // needs a genuine HostObject, not a hand-shaped JavaScript object. Generate
   // deterministic test-only provider routes that mint exactly those missing
   // handle kinds through the same bridge decoder before the route census runs.
-  const missingHandleKinds = [...new Set(routes.flatMap((route) =>
-    [...needs.get(route.id)].filter((kind) => !pool.has(kind))))].sort((left, right) => left - right);
+  const missingHandleKinds = [
+    ...new Set(routes.flatMap((route) => [...needs.get(route.id)].filter((kind) => !pool.has(kind)))),
+  ].sort((left, right) => left - right);
   const usedStableIds = new Set(routes.map(({ stableId }) => stableId));
   const handleSeeds = missingHandleKinds.map((kind) => ({
     name: handleName(kind),
     stableId: seedStableId(projection.defoldRevision, handleName(kind), usedStableIds),
     shapeCode: kind === -1 ? SHAPE.guiNode : kind === -2 ? SHAPE.userdata : SHAPE.handle,
-    semantic: kind > 0 ? kind : 0
+    semantic: kind > 0 ? kind : 0,
   }));
   const seededKinds = new Set(missingHandleKinds);
 
@@ -701,16 +770,13 @@ export function buildRecordingEngineModel(inputs) {
       } else if (transport === "jsi" && missing.length) {
         status = "skip";
         reason = `no-recorded-handle-source:${missing.map(handleName).join("+")}`;
-      } else if (transport !== "jsi" && resultsHave(route,
-        (shape) => shape.code === SHAPE.callback)) {
+      } else if (transport !== "jsi" && resultsHave(route, (shape) => shape.code === SHAPE.callback)) {
         status = "skip";
         reason = "callback-result-is-emitted-only-by-the-jsi-transport";
-      } else if (transport === "direct-memory" && argumentsHave(route,
-        (shape) => shape.code === SHAPE.callback)) {
+      } else if (transport === "direct-memory" && argumentsHave(route, (shape) => shape.code === SHAPE.callback)) {
         status = "skip";
         reason = "callback-input-requires-the-html5-browser-registry";
-      } else if (transport === "typed-native" && argumentsHave(route,
-        (shape) => shape.code === SHAPE.callback)) {
+      } else if (transport === "typed-native" && argumentsHave(route, (shape) => shape.code === SHAPE.callback)) {
         status = "skip";
         reason = "callback-input-falls-back-to-jsi-and-is-not-emitted-in-the-static-frame";
       }
@@ -726,7 +792,7 @@ export function buildRecordingEngineModel(inputs) {
     return {
       status: "blocked",
       lane: "not-emitted",
-      reason: `canonical-lowering-plan-${selection}`
+      reason: `canonical-lowering-plan-${selection}`,
     };
   };
 
@@ -746,30 +812,34 @@ export function buildRecordingEngineModel(inputs) {
     route.targetApplicability = {
       "dynamic-hermes": canonicalApplicability(
         dynamicSelection,
-        nativePod ? "dynamic-hermes-native-pod" : "dynamic-hermes-jsi-lua-stack"
+        nativePod ? "dynamic-hermes-native-pod" : "dynamic-hermes-jsi-lua-stack",
       ),
       "static-hermes": canonicalApplicability(staticSelection, "static-hermes-typed-native"),
       "browser-wasm": canonicalApplicability(
         browserSelection,
-        browserCallback ? "browser-wasm-callback-registry" : "browser-wasm-direct-memory"
+        browserCallback ? "browser-wasm-callback-registry" : "browser-wasm-direct-memory",
       ),
-      "lua-stack": canonicalApplicability(luaSelection, "lua-stack")
+      "lua-stack": canonicalApplicability(luaSelection, "lua-stack"),
     };
     route.exactVector = {
       argumentValues: route.argumentShapes.map((index, slot) =>
-        renderShapeSpec(shapeList, index, semanticNames, slot + 1)),
+        renderShapeSpec(shapeList, index, semanticNames, slot + 1),
+      ),
       resultValues: route.resultShapes.map((index, slot) =>
-        renderShapeSpec(shapeList, index, semanticNames, 257 + slot)),
+        renderShapeSpec(shapeList, index, semanticNames, 257 + slot),
+      ),
       bounds: universalRow?.frameContract ?? null,
-      releaseExpectation: resultsHave(route,
-        (shape) => shape.code === SHAPE.handle || shape.code === SHAPE.guiNode || shape.code === SHAPE.userdata)
+      releaseExpectation: resultsHave(
+        route,
+        (shape) => shape.code === SHAPE.handle || shape.code === SHAPE.guiNode || shape.code === SHAPE.userdata,
+      )
         ? "generated-owned-handle-release"
-        : "no-retained-result-release"
+        : "no-retained-result-release",
     };
     if (nativePod && dynamicSelection === "emit") {
       route.exactVector.laneOverride = {
         lane: "dynamic-hermes-native-pod",
-        ...nativePodVerificationVector(valueBindingRow)
+        ...nativePodVerificationVector(valueBindingRow),
       };
     } else if (browserCallback && browserSelection === "emit") {
       const callbackArgument = 1024 + (route.stableId % 8192);
@@ -778,43 +848,54 @@ export function buildRecordingEngineModel(inputs) {
         lane: "browser-wasm-callback-registry",
         stableId: route.stableId,
         callbackSlots: route.argumentShapes.flatMap((shapeIndex, index) =>
-          shapeList[shapeIndex].code === SHAPE.callback ? [index] : []),
+          shapeList[shapeIndex].code === SHAPE.callback ? [index] : [],
+        ),
         callbackInvocation: {
           argumentValues: [`num:${callbackArgument}`, `str:browser-callback-${route.stableId}`],
-          resultValues: [`num:${callbackResult}`, `str:browser-result-${route.stableId}`]
+          resultValues: [`num:${callbackResult}`, `str:browser-result-${route.stableId}`],
         },
         lifecycle: {
           lifetime: universalRow.browserCallback.lifetime,
           owner: universalRow.browserCallback.owner,
-          threadAffinity: universalRow.browserCallback.threadAffinity
-        }
+          threadAffinity: universalRow.browserCallback.threadAffinity,
+        },
       };
     }
   }
 
-  const targetApplicability = Object.fromEntries(targetOrder.map((target) => {
-    const rows = routes.map((route) => route.targetApplicability[target]);
-    const lanes = {};
-    const status = { exercise: 0, blocked: 0, omit: 0 };
-    for (const row of rows) {
-      status[row.status] += 1;
-      lanes[row.lane] = (lanes[row.lane] ?? 0) + 1;
-    }
-    return [target, { status, lanes }];
-  }));
+  const targetApplicability = Object.fromEntries(
+    targetOrder.map((target) => {
+      const rows = routes.map((route) => route.targetApplicability[target]);
+      const lanes = {};
+      const status = { exercise: 0, blocked: 0, omit: 0 };
+      for (const row of rows) {
+        status[row.status] += 1;
+        lanes[row.lane] = (lanes[row.lane] ?? 0) + 1;
+      }
+      return [target, { status, lanes }];
+    }),
+  );
 
-  const nativePodCount = routes.filter((route) =>
-    route.targetApplicability["dynamic-hermes"].lane === "dynamic-hermes-native-pod").length;
-  const declaredNativePodCount = [...valueBindingRows.values()].filter((binding) =>
-    binding.targetSupport?.arm64DynamicHermes?.backend === "generated-native-pod").length;
-  assert(nativePodCount === declaredNativePodCount,
-    `dynamic native-POD applicability drifted: ${nativePodCount} != ${declaredNativePodCount}`);
-  const browserCallbackCount = routes.filter((route) =>
-    route.targetApplicability["browser-wasm"].lane === "browser-wasm-callback-registry").length;
-  const declaredBrowserCallbackCount = [...universalRows.values()].filter((binding) =>
-    binding.browserCallback?.registryEligible === true).length;
-  assert(browserCallbackCount === declaredBrowserCallbackCount,
-    `browser callback-registry applicability drifted: ${browserCallbackCount} != ${declaredBrowserCallbackCount}`);
+  const nativePodCount = routes.filter(
+    (route) => route.targetApplicability["dynamic-hermes"].lane === "dynamic-hermes-native-pod",
+  ).length;
+  const declaredNativePodCount = [...valueBindingRows.values()].filter(
+    (binding) => binding.targetSupport?.arm64DynamicHermes?.backend === "generated-native-pod",
+  ).length;
+  assert(
+    nativePodCount === declaredNativePodCount,
+    `dynamic native-POD applicability drifted: ${nativePodCount} != ${declaredNativePodCount}`,
+  );
+  const browserCallbackCount = routes.filter(
+    (route) => route.targetApplicability["browser-wasm"].lane === "browser-wasm-callback-registry",
+  ).length;
+  const declaredBrowserCallbackCount = [...universalRows.values()].filter(
+    (binding) => binding.browserCallback?.registryEligible === true,
+  ).length;
+  assert(
+    browserCallbackCount === declaredBrowserCallbackCount,
+    `browser callback-registry applicability drifted: ${browserCallbackCount} != ${declaredBrowserCallbackCount}`,
+  );
 
   // Normalize repeated target dispositions into one lane dictionary and four
   // dense lane IDs per route. The report stays compact while still making the
@@ -849,9 +930,7 @@ export function buildRecordingEngineModel(inputs) {
       exactVectorIds.set(identity, contractId);
       exactVectors.push({ id: contractId, ...contract });
     }
-    route.exactVector = laneOverride === undefined
-      ? { contract: contractId }
-      : { contract: contractId, laneOverride };
+    route.exactVector = laneOverride === undefined ? { contract: contractId } : { contract: contractId, laneOverride };
   }
 
   const summary = {
@@ -861,38 +940,54 @@ export function buildRecordingEngineModel(inputs) {
     marshallingProgramCount: new Set(routes.map((route) => route.marshallingPrograms.dynamicHermesJsi)).size,
     handleKindsMintedByRecordedResults: [...pool].sort((a, b) => a - b).map(handleName),
     handleKindsMintedByGeneratedFixtures: handleSeeds.map(({ name }) => name),
-    harnessByTransport: Object.fromEntries(transportOrder.map((transport) => [transport, {
-      exercised: routes.filter((route) => route.transports[transport].status === "exercise").length,
-      skipped: routes.filter((route) => route.transports[transport].status === "skip").length
-    }])),
+    harnessByTransport: Object.fromEntries(
+      transportOrder.map((transport) => [
+        transport,
+        {
+          exercised: routes.filter((route) => route.transports[transport].status === "exercise").length,
+          skipped: routes.filter((route) => route.transports[transport].status === "skip").length,
+        },
+      ]),
+    ),
     targetApplicability,
     luaAdapter: {
       profile: luaAdapterProfile,
       installed: routes.length,
       exercised: routes.filter((route) => route.luaAdapter.status === "exercise").length,
       skipped: routes.filter((route) => route.luaAdapter.status === "skip").length,
-      failureSchema: "deherm-script-lua-exact-failure/v1"
+      failureSchema: "deherm-script-lua-exact-failure/v1",
     },
     browserCallbackExact: {
-      routeCount: routes.filter((route) =>
-        route.exactVector.laneOverride?.lane === "browser-wasm-callback-registry").length,
-      callbackCount: routes.reduce((count, route) =>
-        count + (route.exactVector.laneOverride?.lane === "browser-wasm-callback-registry"
-          ? route.exactVector.laneOverride.callbackSlots.length : 0), 0),
+      routeCount: routes.filter((route) => route.exactVector.laneOverride?.lane === "browser-wasm-callback-registry")
+        .length,
+      callbackCount: routes.reduce(
+        (count, route) =>
+          count +
+          (route.exactVector.laneOverride?.lane === "browser-wasm-callback-registry"
+            ? route.exactVector.laneOverride.callbackSlots.length
+            : 0),
+        0,
+      ),
       resultSchema: "deherm-script-browser-callback-exact-result/v1",
-      lifecycleCoverage: "generic-token-round-trip"
+      lifecycleCoverage: "generic-token-round-trip",
     },
     browserExact: {
       routeCount: targetApplicability["browser-wasm"].status.exercise,
-      callbackRouteCount: routes.filter((route) =>
-        route.exactVector.laneOverride?.lane === "browser-wasm-callback-registry").length,
-      callbackCount: routes.reduce((count, route) =>
-        count + (route.exactVector.laneOverride?.lane === "browser-wasm-callback-registry"
-          ? route.exactVector.laneOverride.callbackSlots.length : 0), 0),
+      callbackRouteCount: routes.filter(
+        (route) => route.exactVector.laneOverride?.lane === "browser-wasm-callback-registry",
+      ).length,
+      callbackCount: routes.reduce(
+        (count, route) =>
+          count +
+          (route.exactVector.laneOverride?.lane === "browser-wasm-callback-registry"
+            ? route.exactVector.laneOverride.callbackSlots.length
+            : 0),
+        0,
+      ),
       resultSchema: "deherm-script-browser-exact-result/v1",
-      lifecycleCoverage: "generic-token-round-trip"
+      lifecycleCoverage: "generic-token-round-trip",
     },
-    blockerCount: blockers.length
+    blockerCount: blockers.length,
   };
 
   return {
@@ -905,42 +1000,48 @@ export function buildRecordingEngineModel(inputs) {
       "engine: it is not Defold, and nothing here is engine conformance",
       "evidence. Trace records are keyed by the canonical lowering plan's",
       "interned contract index so a later real-engine differential can diff",
-      "against them per contract."
+      "against them per contract.",
     ].join(" "),
-    planSha256: canonicalPlanMatchesRevision ? loweringPlan.planSha256 : sha256(canonicalJson({
-      kind: "projection-derived-recording-fallback",
-      revision: projection.defoldRevision,
-      projection: inputHashes.projection,
-      universal: inputHashes.universal,
-      handleLowering: inputHashes.handleLowering,
-      valueLayouts: inputHashes.valueLayouts,
-      contracts: fallbackContracts
-    })),
-    planFallback: canonicalPlanMatchesRevision ? null : {
-      code: "canonical-lowering-plan-revision-unavailable",
-      severity: "warning",
-      requestedRevision: projection.defoldRevision,
-      availableRevision: loweringPlan.defoldRevision,
-      fallback: "projection-derived-contract-and-universal-marshalling",
-      routeCount: routes.length,
-      proof: "generated-and-recording-harness-unverified-for-this-revision"
-    },
+    planSha256: canonicalPlanMatchesRevision
+      ? loweringPlan.planSha256
+      : sha256(
+          canonicalJson({
+            kind: "projection-derived-recording-fallback",
+            revision: projection.defoldRevision,
+            projection: inputHashes.projection,
+            universal: inputHashes.universal,
+            handleLowering: inputHashes.handleLowering,
+            valueLayouts: inputHashes.valueLayouts,
+            contracts: fallbackContracts,
+          }),
+        ),
+    planFallback: canonicalPlanMatchesRevision
+      ? null
+      : {
+          code: "canonical-lowering-plan-revision-unavailable",
+          severity: "warning",
+          requestedRevision: projection.defoldRevision,
+          availableRevision: loweringPlan.defoldRevision,
+          fallback: "projection-derived-contract-and-universal-marshalling",
+          routeCount: routes.length,
+          proof: "generated-and-recording-harness-unverified-for-this-revision",
+        },
     inputHashes,
     planInputDrift,
     transports: {
       drivable: transportOrder,
-      undrivable: undrivableTransports
+      undrivable: undrivableTransports,
     },
     applicabilityCatalog: {
       schema: "deherm-script-target-applicability/v1",
       targets: targetOrder,
       routeCount: routes.length,
       rule: "canonical-lowering-selection-plus-generated-adapter-specialization",
-      lanes: applicabilityLanes
+      lanes: applicabilityLanes,
     },
     exactVectorCatalog: {
       schema: "deherm-script-exact-vector/v1",
-      vectors: exactVectors
+      vectors: exactVectors,
     },
     semanticHandleKindNames: semanticNames,
     handleSeeds,
@@ -948,9 +1049,10 @@ export function buildRecordingEngineModel(inputs) {
     shapes: shapeList,
     order: ordered.map((route) => route.id),
     routes,
-    blockers: blockers.sort((left, right) =>
-      compareCodeUnits(left.route, right.route) || compareCodeUnits(left.code, right.code)),
-    summary
+    blockers: blockers.sort(
+      (left, right) => compareCodeUnits(left.route, right.route) || compareCodeUnits(left.code, right.code),
+    ),
+    summary,
   };
 }
 
@@ -972,10 +1074,8 @@ export function renderExpectedTrace(model) {
         lines.push(`skip ${head} ${disposition.reason}`);
         continue;
       }
-      const args = route.argumentShapes.map((index, slot) =>
-        renderShapeSpec(model.shapes, index, names, slot + 1));
-      const results = route.resultShapes.map((index, slot) =>
-        renderShapeSpec(model.shapes, index, names, 257 + slot));
+      const args = route.argumentShapes.map((index, slot) => renderShapeSpec(model.shapes, index, names, slot + 1));
+      const results = route.resultShapes.map((index, slot) => renderShapeSpec(model.shapes, index, names, 257 + slot));
       lines.push(`call ${head} arity=${route.arity.driven} args=[${args.join(" ")}] ctx=${route.context}`);
       lines.push(`recv ${head} results=${route.results.driven} [${results.join(" ")}]`);
       lines.push(`end ${head} status=ok`);

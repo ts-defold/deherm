@@ -12,7 +12,7 @@ import {
   conformanceSchema,
   loadConformanceInputs,
   parseShard,
-  writeConformanceHarness
+  writeConformanceHarness,
 } from "../packages/cli/src/conformance.mjs";
 
 test("conformance generator accounts for every script and dmSDK declaration", async () => {
@@ -24,12 +24,18 @@ test("conformance generator accounts for every script and dmSDK declaration", as
   assert.deepEqual(plan.summary.surface, { dmsdk: 2141, script: 926 });
   assert.equal(new Set(plan.cases.map(({ id }) => id)).size, plan.cases.length);
   assert.equal(new Set(plan.cases.map(({ stableId }) => stableId)).size, plan.cases.length);
-  const expectedSpecializedScript = inputs.scriptIr.functions.filter(({ runtimeStatus }) => runtimeStatus === "implemented-generated-lua-bridge").length;
+  const expectedSpecializedScript = inputs.scriptIr.functions.filter(
+    ({ runtimeStatus }) => runtimeStatus === "implemented-generated-lua-bridge",
+  ).length;
   const expectedScalarScript = inputs.scriptDispatch.bindings.length;
-  const expectedLinked = expectedSpecializedScript + expectedScalarScript +
-    inputs.dmsdkThunks.declarations.filter((item) => item.emitted && item.stages?.linked?.status?.includes("covered")).length;
-  const linkedButUnsafe = plan.cases.filter((item) =>
-    item.stages.link.disposition === "linked" && item.execution.policy !== "safe").length;
+  const expectedLinked =
+    expectedSpecializedScript +
+    expectedScalarScript +
+    inputs.dmsdkThunks.declarations.filter((item) => item.emitted && item.stages?.linked?.status?.includes("covered"))
+      .length;
+  const linkedButUnsafe = plan.cases.filter(
+    (item) => item.stages.link.disposition === "linked" && item.execution.policy !== "safe",
+  ).length;
   assert.equal(plan.summary.link.linked, expectedLinked);
   assert.equal(plan.summary.runtime.executable, expectedLinked - linkedButUnsafe);
   assert.equal(plan.summary.semantic["host-conformant"], expectedLinked - expectedScalarScript);
@@ -52,10 +58,7 @@ test("conformance generator accounts for every script and dmSDK declaration", as
   assert.equal(scalar.stages.link.disposition, "linked");
   assert.equal(scalar.stages.runtime.disposition, "executable");
   assert.equal(scalar.stages.semantic.state, "unverified");
-  assert.deepEqual(scalar.targetProbeSelection.probeKeys, [
-    "bit.tohex.explicit-width",
-    "bit.tohex.default-width"
-  ]);
+  assert.deepEqual(scalar.targetProbeSelection.probeKeys, ["bit.tohex.explicit-width", "bit.tohex.default-width"]);
   assert.equal(plan.cases.filter(({ targetProbeSelection }) => targetProbeSelection).length, 12);
 
   const html5 = plan.cases.find(({ id }) => id.startsWith("script:html5."));
@@ -88,14 +91,17 @@ test("conformance inputs load from a generated project's policy-backed IR", asyn
     "defold-script-scalar-dispatch.json": "script-scalar-dispatch.json",
     "defold-script-real-engine-probes.json": "script-real-engine-probes.json",
     "defold-dmsdk-scalar-thunks.json": "dmsdk-scalar-thunks.json",
-    "defold-binding-lowering-plan.json": "binding-lowering-plan.json"
+    "defold-binding-lowering-plan.json": "binding-lowering-plan.json",
   };
-  await Promise.all(Object.entries(files).map(([source, destination]) =>
-    cp(path.join(generated, source), path.join(irRoot, destination))));
+  await Promise.all(
+    Object.entries(files).map(([source, destination]) =>
+      cp(path.join(generated, source), path.join(irRoot, destination)),
+    ),
+  );
 
   const [repositoryInputs, projectInputs] = await Promise.all([
     loadConformanceInputs(),
-    loadConformanceInputs({ inputRoot: irRoot, layout: "project" })
+    loadConformanceInputs({ inputRoot: irRoot, layout: "project" }),
   ]);
   assert.deepEqual(projectInputs, repositoryInputs);
 });
@@ -111,7 +117,7 @@ test("the exhaustive generated TypeScript fixture compiles against the generated
   const tsc = path.resolve("node_modules/typescript/bin/tsc");
   const checked = spawnSync(process.execPath, [tsc, "--project", harness.files.tsconfig, "--pretty", "false"], {
     cwd: process.cwd(),
-    encoding: "utf8"
+    encoding: "utf8",
   });
 
   assert.equal(checked.status, 0, `${checked.stdout}\n${checked.stderr}`);
@@ -130,59 +136,90 @@ test("reports never promote planned evidence into fresh observations", async () 
   const inputs = await loadConformanceInputs();
   const plan = buildConformancePlan(inputs, { surface: "script", shard: "0/128" });
   const first = plan.cases[0];
-  const report = buildConformanceReport(plan, [{
-    schemaVersion: 1,
-    planId: plan.planId,
-    target: plan.target,
-    results: [{ id: first.id, stages: { compile: { status: "passed", evidence: "tsc" } } }]
-  }]);
+  const report = buildConformanceReport(plan, [
+    {
+      schemaVersion: 1,
+      planId: plan.planId,
+      target: plan.target,
+      results: [{ id: first.id, stages: { compile: { status: "passed", evidence: "tsc" } } }],
+    },
+  ]);
 
   assert.equal(report.observationCount, 1);
   assert.equal(report.summary.compile.passed, 1);
   assert.equal(report.summary.link["not-run"], plan.cases.length);
   assert.equal(report.strictPass, false);
   assert.ok(report.strictFailures.length >= plan.cases.length - 1);
-  assert.throws(() => buildConformanceReport(plan, [{
-    schemaVersion: 1,
-    planId: "wrong",
-    target: plan.target,
-    results: []
-  }]), /does not match/);
-  assert.throws(() => buildConformanceReport(plan, [{
-    schemaVersion: 1,
-    planId: plan.planId,
-    target: plan.target,
-    results: [{ id: "missing", stages: { compile: { status: "passed" } } }]
-  }]), /unknown case/);
+  assert.throws(
+    () =>
+      buildConformanceReport(plan, [
+        {
+          schemaVersion: 1,
+          planId: "wrong",
+          target: plan.target,
+          results: [],
+        },
+      ]),
+    /does not match/,
+  );
+  assert.throws(
+    () =>
+      buildConformanceReport(plan, [
+        {
+          schemaVersion: 1,
+          planId: plan.planId,
+          target: plan.target,
+          results: [{ id: "missing", stages: { compile: { status: "passed" } } }],
+        },
+      ]),
+    /unknown case/,
+  );
 });
 
 test("CLI generates sharded plans and writes honest reports", async () => {
   const root = await mkdtemp(path.join(tmpdir(), "defold-hermes-conformance-cli-"));
   const harnessRoot = path.join(root, "harness");
   const cli = path.resolve("bin/deherm.mjs");
-  const generated = spawnSync(process.execPath, [
-    cli,
-    "conformance", "generate",
-    "--output", harnessRoot,
-    "--surface", "script",
-    "--target", "js-web",
-    "--context", "browser,engine",
-    "--shard", "2/16",
-    "--json"
-  ], { cwd: process.cwd(), encoding: "utf8" });
+  const generated = spawnSync(
+    process.execPath,
+    [
+      cli,
+      "conformance",
+      "generate",
+      "--output",
+      harnessRoot,
+      "--surface",
+      "script",
+      "--target",
+      "js-web",
+      "--context",
+      "browser,engine",
+      "--shard",
+      "2/16",
+      "--json",
+    ],
+    { cwd: process.cwd(), encoding: "utf8" },
+  );
   assert.equal(generated.status, 0, `${generated.stdout}\n${generated.stderr}`);
   const summary = JSON.parse(generated.stdout);
   assert.deepEqual(summary.shard, { index: 2, count: 16 });
   assert.deepEqual(summary.contexts, ["browser", "engine"]);
 
   const compileObservation = path.join(root, "compile-observation.json");
-  const compiled = spawnSync(process.execPath, [
-    cli,
-    "conformance", "compile",
-    "--plan", path.join(harnessRoot, "plan.json"),
-    "--output", compileObservation,
-    "--json"
-  ], { cwd: process.cwd(), encoding: "utf8" });
+  const compiled = spawnSync(
+    process.execPath,
+    [
+      cli,
+      "conformance",
+      "compile",
+      "--plan",
+      path.join(harnessRoot, "plan.json"),
+      "--output",
+      compileObservation,
+      "--json",
+    ],
+    { cwd: process.cwd(), encoding: "utf8" },
+  );
   assert.equal(compiled.status, 0, `${compiled.stdout}\n${compiled.stderr}`);
   const compileResult = JSON.parse(compiled.stdout);
   assert.equal(compileResult.passed, true);
@@ -191,27 +228,43 @@ test("CLI generates sharded plans and writes honest reports", async () => {
   assert.ok(observedCompile.results.every((item) => item.stages.compile.status === "passed"));
 
   const reportPath = path.join(root, "report.json");
-  const reported = spawnSync(process.execPath, [
-    cli,
-    "conformance", "report",
-    "--plan", path.join(harnessRoot, "plan.json"),
-    "--observation", compileObservation,
-    "--output", reportPath
-  ], { cwd: process.cwd(), encoding: "utf8" });
+  const reported = spawnSync(
+    process.execPath,
+    [
+      cli,
+      "conformance",
+      "report",
+      "--plan",
+      path.join(harnessRoot, "plan.json"),
+      "--observation",
+      compileObservation,
+      "--output",
+      reportPath,
+    ],
+    { cwd: process.cwd(), encoding: "utf8" },
+  );
   assert.equal(reported.status, 0, `${reported.stdout}\n${reported.stderr}`);
   const report = JSON.parse(await readFile(reportPath, "utf8"));
   assert.equal(report.strictPass, false);
   assert.equal(report.observationCount, summary.selectedCaseCount);
   assert.equal(report.summary.compile.passed, summary.selectedCaseCount);
 
-  const strict = spawnSync(process.execPath, [
-    cli,
-    "conformance", "report",
-    "--plan", path.join(harnessRoot, "plan.json"),
-    "--observation", compileObservation,
-    "--output", reportPath,
-    "--strict"
-  ], { cwd: process.cwd(), encoding: "utf8" });
+  const strict = spawnSync(
+    process.execPath,
+    [
+      cli,
+      "conformance",
+      "report",
+      "--plan",
+      path.join(harnessRoot, "plan.json"),
+      "--observation",
+      compileObservation,
+      "--output",
+      reportPath,
+      "--strict",
+    ],
+    { cwd: process.cwd(), encoding: "utf8" },
+  );
   assert.equal(strict.status, 1);
 });
 
@@ -223,28 +276,32 @@ test("conformance context and target availability follow authenticated policy ro
     surface: "script",
     match: { moduleRoots: ["future"] },
     contexts: ["future-context"],
-    evidence: "synthetic-forward-compatible-vocabulary-fixture"
+    evidence: "synthetic-forward-compatible-vocabulary-fixture",
   });
   {
     const { digest: _digest, sources: _sources, ...unsigned } = future.bindingPlan.conformanceVocabulary;
-    future.bindingPlan.conformanceVocabulary.digest = createHash("sha256").update(JSON.stringify(unsigned)).digest("hex");
+    future.bindingPlan.conformanceVocabulary.digest = createHash("sha256")
+      .update(JSON.stringify(unsigned))
+      .digest("hex");
     const { planSha256: _planSha256, ...planBody } = future.bindingPlan;
     future.bindingPlan.planSha256 = createHash("sha256").update(JSON.stringify(planBody)).digest("hex");
   }
   const source = future.scriptIr.functions.find(({ id }) => id === "script:timer.delay");
-  future.scriptIr.functions = [{
-    ...source,
-    id: "script:future.schedule",
-    rawName: "future.schedule",
-    modulePath: ["future"],
-    member: "schedule",
-    jsName: "schedule"
-  }];
+  future.scriptIr.functions = [
+    {
+      ...source,
+      id: "script:future.schedule",
+      rawName: "future.schedule",
+      modulePath: ["future"],
+      member: "schedule",
+      jsName: "schedule",
+    },
+  ];
   const futurePlan = buildConformancePlan(future, {
     surface: "script",
     target: "js-web",
     contexts: ["future-context"],
-    shard: "0/1"
+    shard: "0/1",
   });
   assert.deepEqual(futurePlan.cases[0].requiredContexts, ["future-context"]);
   assert.equal(futurePlan.cases[0].execution.policy, "safe");
@@ -255,12 +312,15 @@ test("conformance context and target availability follow authenticated policy ro
     surface: "script",
     target: "js-web",
     contexts: ["generic"],
-    shard: "0/1"
+    shard: "0/1",
   });
   assert.deepEqual(fallbackPlan.cases[0].requiredContexts, ["generic"]);
   const conservativeTargetPlan = buildConformancePlan(inputs, { surface: "dmsdk", target: "arm64-osx", shard: "0/1" });
-  const unlistedPlatformCase = conservativeTargetPlan.cases.find((item) =>
-    item.families.includes("platform-gated") && item.execution.reason?.includes("no authenticated target-availability row"));
+  const unlistedPlatformCase = conservativeTargetPlan.cases.find(
+    (item) =>
+      item.families.includes("platform-gated") &&
+      item.execution.reason?.includes("no authenticated target-availability row"),
+  );
   assert.ok(unlistedPlatformCase, "unlisted platform-gated APIs must use the conservative target fallback");
 
   const renamed = structuredClone(inputs);
@@ -268,7 +328,9 @@ test("conformance context and target availability follow authenticated policy ro
   iosTarget.target = "future-ios-name";
   {
     const { digest: _digest, sources: _sources, ...unsigned } = renamed.bindingPlan.conformanceVocabulary;
-    renamed.bindingPlan.conformanceVocabulary.digest = createHash("sha256").update(JSON.stringify(unsigned)).digest("hex");
+    renamed.bindingPlan.conformanceVocabulary.digest = createHash("sha256")
+      .update(JSON.stringify(unsigned))
+      .digest("hex");
     const { planSha256: _planSha256, ...planBody } = renamed.bindingPlan;
     renamed.bindingPlan.planSha256 = createHash("sha256").update(JSON.stringify(planBody)).digest("hex");
   }
@@ -278,7 +340,7 @@ test("conformance context and target availability follow authenticated policy ro
     surface: "dmsdk",
     target: "future-ios-name",
     contexts: ["*"],
-    shard: "0/1"
+    shard: "0/1",
   });
   assert.equal(renamedPlan.cases[0].execution.policy, "safe");
 
@@ -291,12 +353,15 @@ test("conformance context and target availability follow authenticated policy ro
   assert.throws(() => buildConformancePlan(tampered), /conformance vocabulary digest/);
 
   const forgedTargetGroup = structuredClone(inputs);
-  const linux = forgedTargetGroup.bindingPlan.conformanceVocabulary.targets
-    .find(({ target }) => target === "x86_64-linux");
+  const linux = forgedTargetGroup.bindingPlan.conformanceVocabulary.targets.find(
+    ({ target }) => target === "x86_64-linux",
+  );
   linux.group = "ios";
   {
     const { digest: _digest, sources: _sources, ...unsigned } = forgedTargetGroup.bindingPlan.conformanceVocabulary;
-    forgedTargetGroup.bindingPlan.conformanceVocabulary.digest = createHash("sha256").update(JSON.stringify(unsigned)).digest("hex");
+    forgedTargetGroup.bindingPlan.conformanceVocabulary.digest = createHash("sha256")
+      .update(JSON.stringify(unsigned))
+      .digest("hex");
   }
   assert.throws(() => buildConformancePlan(forgedTargetGroup), /lowering plan internal digest/u);
 });

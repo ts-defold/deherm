@@ -21,7 +21,9 @@ const output = "packages/bindings/generated/defold-dmsdk-scratch-scalar-out-plan
 
 export async function generateDmSdkScratchScalarOutPlan({ root: outputRoot = root, check = false } = {}) {
   const texts = Object.fromEntries(
-    await Promise.all(Object.entries(sources).map(async ([key, source]) => [key, await readFile(resolve(outputRoot, source), "utf8")])),
+    await Promise.all(
+      Object.entries(sources).map(async ([key, source]) => [key, await readFile(resolve(outputRoot, source), "utf8")]),
+    ),
   );
   const inputs = {
     texts,
@@ -41,7 +43,9 @@ export async function generateDmSdkScratchScalarOutPlan({ root: outputRoot = roo
     await mkdir(dirname(destination), { recursive: true });
     await writeFile(destination, content);
   }
-  process.stdout.write(`${check ? "Verified" : "Generated"} one scratch-scalar-out plan: ${plan.coverage.selected} selected, ${plan.coverage.universalFallback} fallback.\n`);
+  process.stdout.write(
+    `${check ? "Verified" : "Generated"} one scratch-scalar-out plan: ${plan.coverage.selected} selected, ${plan.coverage.universalFallback} fallback.\n`,
+  );
   return plan;
 }
 

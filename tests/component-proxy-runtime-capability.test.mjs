@@ -4,11 +4,10 @@ import { spawnSync } from "node:child_process";
 import test from "node:test";
 
 const reportPath = "packages/bindings/generated/defold-component-proxy-runtime-capability.json";
-const headerPath = "defold/defold_hermes/include/defold_hermes/generated_component_proxy_capability.hpp";
-
 test("component proxy runtime gate regenerates deterministically", () => {
   const result = spawnSync("node", ["scripts/generate-component-proxy-runtime-capability.mjs", "--check"], {
-    cwd: process.cwd(), encoding: "utf8"
+    cwd: process.cwd(),
+    encoding: "utf8",
   });
   assert.equal(result.status, 0, result.stderr || result.stdout);
 });
@@ -17,7 +16,7 @@ test("all generated Lua ABI methods have stage-qualified native provider evidenc
   const [report, manifest, extension] = await Promise.all([
     readFile(reportPath, "utf8").then(JSON.parse),
     readFile("tests/fixtures/component-proxy/expected/manifest.json", "utf8").then(JSON.parse),
-    readFile("defold/defold_hermes/src/extension.cpp", "utf8")
+    readFile("defold/defold_hermes/src/extension.cpp", "utf8"),
   ]);
   assert.equal(report.capabilityState, "native-provider-capability-present");
   assert.equal(report.harnessEvidenceState, "native-lua-and-dynamic-hermes-harness-proven");
@@ -49,12 +48,25 @@ test("the generated native gate header compiles and exposes every method once", 
     `  static_assert(!defold_hermes::component_proxy::kPackagedDefoldEngineVerified);`,
     `  return defold_hermes::component_proxy::kCapabilityState == "native-provider-capability-present" &&`,
     `      defold_hermes::component_proxy::kHarnessEvidenceState == "native-lua-and-dynamic-hermes-harness-proven" ? 0 : 3;`,
-    `}`
+    `}`,
   ].join("\n");
-  const compile = spawnSync("clang++", [
-    "-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic",
-    "-Idefold/defold_hermes/include", "-x", "c++", "-", "-o", "/tmp/deherm-component-proxy-capability-test"
-  ], { cwd: process.cwd(), encoding: "utf8", input: source });
+  const compile = spawnSync(
+    "clang++",
+    [
+      "-std=c++17",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pedantic",
+      "-Idefold/defold_hermes/include",
+      "-x",
+      "c++",
+      "-",
+      "-o",
+      "/tmp/deherm-component-proxy-capability-test",
+    ],
+    { cwd: process.cwd(), encoding: "utf8", input: source },
+  );
   assert.equal(compile.status, 0, compile.stderr);
   const run = spawnSync("/tmp/deherm-component-proxy-capability-test", [], { encoding: "utf8" });
   assert.equal(run.status, 0, run.stderr || run.stdout);

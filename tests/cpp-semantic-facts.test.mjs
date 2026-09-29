@@ -24,48 +24,57 @@ function digestAst(bytes) {
       { kind: "ParmVarDecl", id: "h4", name: "outputLength" },
       {
         kind: "CompoundStmt",
-        inner: [{
-          kind: "CallExpr",
-          inner: [
-            reference("FunctionDecl", "sink", "WriteOutput"),
-            reference("ParmVarDecl", "h3", "output"),
-            reference("ParmVarDecl", "h4", "outputLength"),
-          ],
-        }],
+        inner: [
+          {
+            kind: "CallExpr",
+            inner: [
+              reference("FunctionDecl", "sink", "WriteOutput"),
+              reference("ParmVarDecl", "h3", "output"),
+              reference("ParmVarDecl", "h4", "outputLength"),
+            ],
+          },
+        ],
       },
     ],
   };
   return {
     kind: "TranslationUnitDecl",
-    inner: [{
-      kind: "NamespaceDecl",
-      name: "dmCrypt",
-      inner: [helper, {
-        kind: "FunctionDecl",
-        name: "RenamedDigest",
-        type: { qualType: "void (const uint8_t *, uint32_t, uint8_t *)" },
-        loc: { line: 12 },
+    inner: [
+      {
+        kind: "NamespaceDecl",
+        name: "dmCrypt",
         inner: [
-          { kind: "ParmVarDecl", id: "p0", name: "input" },
-          { kind: "ParmVarDecl", id: "p1", name: "length" },
-          { kind: "ParmVarDecl", id: "p2", name: "output" },
+          helper,
           {
-            kind: "CompoundStmt",
-            inner: [{
-              kind: "CallExpr",
-              inner: [
-                reference("FunctionDecl", "helper", "DigestHelper"),
-                reference("EnumConstantDecl", "algorithm", "DIGEST_V2"),
-                reference("ParmVarDecl", "p0", "input"),
-                reference("ParmVarDecl", "p1", "length"),
-                reference("ParmVarDecl", "p2", "output"),
-                { kind: "IntegerLiteral", value: String(bytes) },
-              ],
-            }],
+            kind: "FunctionDecl",
+            name: "RenamedDigest",
+            type: { qualType: "void (const uint8_t *, uint32_t, uint8_t *)" },
+            loc: { line: 12 },
+            inner: [
+              { kind: "ParmVarDecl", id: "p0", name: "input" },
+              { kind: "ParmVarDecl", id: "p1", name: "length" },
+              { kind: "ParmVarDecl", id: "p2", name: "output" },
+              {
+                kind: "CompoundStmt",
+                inner: [
+                  {
+                    kind: "CallExpr",
+                    inner: [
+                      reference("FunctionDecl", "helper", "DigestHelper"),
+                      reference("EnumConstantDecl", "algorithm", "DIGEST_V2"),
+                      reference("ParmVarDecl", "p0", "input"),
+                      reference("ParmVarDecl", "p1", "length"),
+                      reference("ParmVarDecl", "p2", "output"),
+                      { kind: "IntegerLiteral", value: String(bytes) },
+                    ],
+                  },
+                ],
+              },
+            ],
           },
         ],
-      }],
-    }],
+      },
+    ],
   };
 }
 
@@ -78,7 +87,8 @@ test("C++ source facts preserve parameter forwarding and constants independently
   assert.equal(definitions.length, 1);
   assert.deepEqual(definitions[0].calls[0], {
     callee: "DigestHelper",
-    calleeIdentity: "dmCrypt::DigestHelper|void (int, const uint8_t *, uint32_t, uint8_t *, uint32_t)|engine/example.cpp|0",
+    calleeIdentity:
+      "dmCrypt::DigestHelper|void (int, const uint8_t *, uint32_t, uint8_t *, uint32_t)|engine/example.cpp|0",
     arguments: [
       { kind: "enum-constant", name: "DIGEST_V2" },
       { kind: "parameter", index: 0, name: "input" },
@@ -110,7 +120,10 @@ test("fixed-output inference ignores an unrelated forwarding call without a caus
   const extent = inferForwardedFixedOutputExtent(definitions, 3);
   assert.equal(extent.state, "resolved");
   assert.equal(extent.bytes, 32);
-  assert.deepEqual(extent.observations.map(({ callee }) => callee), ["DigestHelper"]);
+  assert.deepEqual(
+    extent.observations.map(({ callee }) => callee),
+    ["DigestHelper"],
+  );
 });
 
 test("fixed-output inference reports absent and contradictory source evidence instead of guessing", () => {

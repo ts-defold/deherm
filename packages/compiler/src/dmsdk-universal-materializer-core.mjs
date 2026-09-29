@@ -27,8 +27,13 @@ function cppSymbol(value, label) {
 
 function acknowledgement(usage, name, reason) {
   const value = usage.acknowledgements?.[name];
-  if (!value || typeof value.reason !== "string" || !value.reason.trim() ||
-      typeof value.evidence !== "string" || !value.evidence.trim()) {
+  if (
+    !value ||
+    typeof value.reason !== "string" ||
+    !value.reason.trim() ||
+    typeof value.evidence !== "string" ||
+    !value.evidence.trim()
+  ) {
     throw new Error(
       `${usage.declarationId} needs acknowledgements.${name} with non-empty reason and evidence (${reason})`,
     );
@@ -42,8 +47,10 @@ function compareCodeUnits(left, right) {
 function canonicalJson(value) {
   if (value === null || typeof value !== "object") return JSON.stringify(value);
   if (Array.isArray(value)) return `[${value.map(canonicalJson).join(",")}]`;
-  return `{${Object.keys(value).sort(compareCodeUnits)
-    .map((key) => `${JSON.stringify(key)}:${canonicalJson(value[key])}`).join(",")}}`;
+  return `{${Object.keys(value)
+    .sort(compareCodeUnits)
+    .map((key) => `${JSON.stringify(key)}:${canonicalJson(value[key])}`)
+    .join(",")}}`;
 }
 
 function sha256(value) {
@@ -90,8 +97,7 @@ function nativeType(shape, spelling, substitutions) {
     identifier(from, "type substitution name");
     result = result.replace(new RegExp(`\\b${from}\\b`, "g"), cppType(to, `type substitution ${from}`));
   }
-  if (["unknown", "type-parameter", "template", "template-record"].includes(shape.kind) &&
-      result === spelling) {
+  if (["unknown", "type-parameter", "template", "template-record"].includes(shape.kind) && result === spelling) {
     throw new Error(`Native type ${spelling} needs a usage substitution`);
   }
   result = qualifySourceType(shape, result);
@@ -145,14 +151,17 @@ function tagCheck(shape, slot) {
   if (["f32", "f64"].includes(name)) return `${tag} == DEHERM_DMSDK_UNIVERSAL_F64`;
   if (["i8", "i16", "i32"].includes(name)) {
     const bits = Number(name.slice(1));
-    return `${tag} == DEHERM_DMSDK_UNIVERSAL_I64 && ` +
+    return (
+      `${tag} == DEHERM_DMSDK_UNIVERSAL_I64 && ` +
       `deherm_dmsdk_unpack_i64(arguments[${slot}].payload) >= INT${bits}_MIN && ` +
-      `deherm_dmsdk_unpack_i64(arguments[${slot}].payload) <= INT${bits}_MAX`;
+      `deherm_dmsdk_unpack_i64(arguments[${slot}].payload) <= INT${bits}_MAX`
+    );
   }
   if (signedNames.has(name)) return `${tag} == DEHERM_DMSDK_UNIVERSAL_I64`;
   if (["u8", "u16", "u32"].includes(name)) {
-    return `${tag} == DEHERM_DMSDK_UNIVERSAL_U64 && ` +
-      `arguments[${slot}].payload <= UINT${Number(name.slice(1))}_MAX`;
+    return (
+      `${tag} == DEHERM_DMSDK_UNIVERSAL_U64 && ` + `arguments[${slot}].payload <= UINT${Number(name.slice(1))}_MAX`
+    );
   }
   if (name) return `${tag} == DEHERM_DMSDK_UNIVERSAL_U64`;
   if (shape.kind === "callback") return `${tag} == DEHERM_DMSDK_UNIVERSAL_CALLBACK`;
@@ -166,8 +175,7 @@ function containsUnalignablePointee(shape) {
   let result = false;
   const inspect = (node) => {
     if (!node || typeof node !== "object") return;
-    if (node.kind === "void" ||
-        (["record", "template-record"].includes(node.kind) && node.complete === false)) {
+    if (node.kind === "void" || (["record", "template-record"].includes(node.kind) && node.complete === false)) {
       result = true;
     }
     for (const key of ["to", "target", "representation", "element", "result"]) inspect(node[key]);
@@ -179,32 +187,35 @@ function containsUnalignablePointee(shape) {
 
 function pointerCheck(parameter, slot, usage) {
   const shape = parameter.shape;
-  if (!["cstring", "pointer", "reference", "opaque"].includes(shape.kind) &&
-      !(shape.kind === "handle" && !scalarName(shape))) return null;
+  if (
+    !["cstring", "pointer", "reference", "opaque"].includes(shape.kind) &&
+    !(shape.kind === "handle" && !scalarName(shape))
+  )
+    return null;
   const nullable = shape.kind !== "reference" && usage.nullableParameters?.includes(parameter.position);
   const resolved = nativeType(shape, parameter.nativeType, usage.typeSubstitutions);
-  const base = resolved
-    .replace(/\s*&&?\s*$/, "")
-    .replace(/\*+\s*$/, "");
+  const base = resolved.replace(/\s*&&?\s*$/, "").replace(/\*+\s*$/, "");
   const alignment = containsUnalignablePointee(shape)
     ? "true"
     : `(arguments[${slot}].payload == 0 || arguments[${slot}].payload % alignof(${base}) == 0)`;
-  return `${nullable ? "true" : `arguments[${slot}].payload != 0`} && ` +
+  return (
+    `${nullable ? "true" : `arguments[${slot}].payload != 0`} && ` +
     `deherm_dmsdk_address_fits(arguments[${slot}].payload) && ` +
-    alignment;
+    alignment
+  );
 }
 
 function enumCheck(parameter, slot, usage) {
   if (parameter.shape.kind !== "enum") return null;
-  const values = usage.enumDomains?.[parameter.position] ??
-    parameter.enumeration?.members?.map(({ value }) => value);
+  const values = usage.enumDomains?.[parameter.position] ?? parameter.enumeration?.members?.map(({ value }) => value);
   if (!Array.isArray(values) || !values.length || values.some((value) => !Number.isSafeInteger(value))) {
     throw new Error(
       `${usage.declarationId} enum parameter ${parameter.position} needs a non-empty safe-integer enumDomains.${parameter.position}`,
     );
   }
-  return `(${values.map((value) =>
-    `deherm_dmsdk_unpack_i64(arguments[${slot}].payload) == INT64_C(${value})`).join(" || ")})`;
+  return `(${values
+    .map((value) => `deherm_dmsdk_unpack_i64(arguments[${slot}].payload) == INT64_C(${value})`)
+    .join(" || ")})`;
 }
 
 function resultBody(recipe, expression, resultType, custom) {
@@ -212,34 +223,45 @@ function resultBody(recipe, expression, resultType, custom) {
   const shape = recipe.abi.resultShape;
   if (shape.kind === "void") return `${expression};\n  result->tag = DEHERM_DMSDK_UNIVERSAL_VOID;`;
   if (shape.kind === "handle") {
-    return `auto value = ${expression}; result->payload = deherm_dmsdk_pack_handle(value); ` +
-      `result->tag = ${wireTag(shape)};`;
+    return (
+      `auto value = ${expression}; result->payload = deherm_dmsdk_pack_handle(value); ` +
+      `result->tag = ${wireTag(shape)};`
+    );
   }
   const name = scalarName(shape);
   if (name) {
     if (["f32", "f64"].includes(name)) {
-      return `${resultType} value = ${expression};\n` +
+      return (
+        `${resultType} value = ${expression};\n` +
         "  const double normalized = static_cast<double>(value); memcpy(&result->payload,&normalized,sizeof(normalized));\n" +
-        "  result->tag = DEHERM_DMSDK_UNIVERSAL_F64;";
+        "  result->tag = DEHERM_DMSDK_UNIVERSAL_F64;"
+      );
     }
     if (name === "bool") {
-      return `auto value = ${expression}; result->payload = value ? 1 : 0; ` +
-        "result->tag = DEHERM_DMSDK_UNIVERSAL_BOOL;";
+      return (
+        `auto value = ${expression}; result->payload = value ? 1 : 0; ` + "result->tag = DEHERM_DMSDK_UNIVERSAL_BOOL;"
+      );
     }
     const signed = signedNames.has(name);
-    return `auto value = ${expression}; result->payload = static_cast<uint64_t>(` +
+    return (
+      `auto value = ${expression}; result->payload = static_cast<uint64_t>(` +
       `${signed ? "static_cast<int64_t>(value)" : "value"}); result->tag = ` +
-      `${signed ? "DEHERM_DMSDK_UNIVERSAL_I64" : "DEHERM_DMSDK_UNIVERSAL_U64"};`;
+      `${signed ? "DEHERM_DMSDK_UNIVERSAL_I64" : "DEHERM_DMSDK_UNIVERSAL_U64"};`
+    );
   }
   if (shape.kind === "reference") {
-    return `auto& value = ${expression}; result->payload = ` +
+    return (
+      `auto& value = ${expression}; result->payload = ` +
       "static_cast<uint64_t>(reinterpret_cast<uintptr_t>(&value)); " +
-      "result->tag = DEHERM_DMSDK_UNIVERSAL_ADDRESS;";
+      "result->tag = DEHERM_DMSDK_UNIVERSAL_ADDRESS;"
+    );
   }
   if (["cstring", "pointer", "handle", "callback", "opaque"].includes(shape.kind)) {
-    return `auto value = ${expression}; result->payload = ` +
+    return (
+      `auto value = ${expression}; result->payload = ` +
       "static_cast<uint64_t>(reinterpret_cast<uintptr_t>(value)); " +
-      "result->tag = DEHERM_DMSDK_UNIVERSAL_ADDRESS;";
+      "result->tag = DEHERM_DMSDK_UNIVERSAL_ADDRESS;"
+    );
   }
   throw new Error(`${recipe.declarationId} result (${shape.kind}) needs resultExpression`);
 }
@@ -270,24 +292,31 @@ function invoke(recipe, usage, args, receiverType) {
 }
 
 function renderWrapper({ wrapper, argumentCount, checks, body }) {
-  return `extern "C" DehermDmSdkUniversalStatus ${wrapper}(` +
+  return (
+    `extern "C" DehermDmSdkUniversalStatus ${wrapper}(` +
     "const DehermDmSdkUniversalValue* arguments,uint32_t argument_count," +
     `DehermDmSdkUniversalValue* result){\n` +
     ` if(argument_count != UINT32_C(${argumentCount})) return DEHERM_DMSDK_UNIVERSAL_WRONG_ARITY;\n` +
     " if((argument_count&&!arguments)||!result) return DEHERM_DMSDK_UNIVERSAL_INVALID_STORAGE;" +
     `${checks.length ? `\n if(!(${checks.join(" && ")})) return DEHERM_DMSDK_UNIVERSAL_TYPE_MISMATCH;` : ""}\n` +
-    ` ${body}\n return DEHERM_DMSDK_UNIVERSAL_OK;\n}`;
+    ` ${body}\n return DEHERM_DMSDK_UNIVERSAL_OK;\n}`
+  );
 }
 
 function renderProvider(providerName, installName, manifest, wrapperField) {
-  return `static DehermDmSdkUniversalStatus ${providerName}(` +
+  return (
+    `static DehermDmSdkUniversalStatus ${providerName}(` +
     "void*,const DehermDmSdkUniversalDescriptor* descriptor," +
     "const DehermDmSdkUniversalValue* arguments,uint32_t argument_count," +
     "DehermDmSdkUniversalValue* result){ if(!descriptor)return DEHERM_DMSDK_UNIVERSAL_PROVIDER_ERROR; " +
-    `switch(descriptor->id){\n${manifest.map((entry) =>
-      `case UINT32_C(${entry.numericId}): return ${entry[wrapperField]}(arguments,argument_count,result);`).join("\n")}\n` +
+    `switch(descriptor->id){\n${manifest
+      .map(
+        (entry) => `case UINT32_C(${entry.numericId}): return ${entry[wrapperField]}(arguments,argument_count,result);`,
+      )
+      .join("\n")}\n` +
     "default:return DEHERM_DMSDK_UNIVERSAL_PROVIDER_ERROR;}}\n" +
-    `extern "C" void ${installName}(void){deherm_dmsdk_universal_install_provider(${providerName},nullptr);}`;
+    `extern "C" void ${installName}(void){deherm_dmsdk_universal_install_provider(${providerName},nullptr);}`
+  );
 }
 
 function verificationReturnType(kind, resultType, receiverType) {
@@ -356,7 +385,9 @@ function fixturePlan({ shape, slot, seed, prefix, nativeAlias, enumValues, expre
       const value = deterministicScalar(shape, seed, enumValues);
       cell.value = value;
       if (["f32", "f64"].includes(name)) {
-        setup.push(`{ const double value = ${Number(value).toFixed(2)}; memcpy(&${prefix}_arguments[${slot}].payload,&value,sizeof(value)); }`);
+        setup.push(
+          `{ const double value = ${Number(value).toFixed(2)}; memcpy(&${prefix}_arguments[${slot}].payload,&value,sizeof(value)); }`,
+        );
       } else if (signedNames.has(name)) {
         setup.push(`${prefix}_arguments[${slot}].payload=static_cast<uint64_t>(INT64_C(${value}));`);
       } else {
@@ -366,7 +397,9 @@ function fixturePlan({ shape, slot, seed, prefix, nativeAlias, enumValues, expre
     } else if (shape.kind === "cstring") {
       const fixture = `${prefix}_cstring_${slot}`;
       declarations.push(`static const char ${fixture}[]="deherm_exact_${seed}";`);
-      setup.push(`${prefix}_arguments[${slot}].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(${fixture}));`);
+      setup.push(
+        `${prefix}_arguments[${slot}].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(${fixture}));`,
+      );
       setup.push(`${prefix}_arguments[${slot}].auxiliary=UINT64_C(sizeof(${fixture})-1);`);
       setup.push(`${prefix}_arguments[${slot}].tag=${tag};`);
       cell.fixture = "cstring";
@@ -376,7 +409,9 @@ function fixturePlan({ shape, slot, seed, prefix, nativeAlias, enumValues, expre
       const fixture = `${prefix}_reference_${slot}`;
       const initializer = constructorArguments?.length ? `(${constructorArguments.join(",")})` : "{}";
       declarations.push(`static std::remove_cv_t<std::remove_reference_t<${nativeAlias}>> ${fixture}${initializer};`);
-      setup.push(`${prefix}_arguments[${slot}].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(&${fixture}));`);
+      setup.push(
+        `${prefix}_arguments[${slot}].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(&${fixture}));`,
+      );
       setup.push(`${prefix}_arguments[${slot}].tag=${tag};`);
       cell.fixture = "value-object";
     } else if (shape.kind === "callback") {
@@ -391,7 +426,9 @@ function fixturePlan({ shape, slot, seed, prefix, nativeAlias, enumValues, expre
       } else {
         declarations.push(`static std::max_align_t ${fixture}{};`);
       }
-      setup.push(`${prefix}_arguments[${slot}].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(&${fixture}));`);
+      setup.push(
+        `${prefix}_arguments[${slot}].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(&${fixture}));`,
+      );
       setup.push(`${prefix}_arguments[${slot}].tag=${tag};`);
       cell.fixture = "aligned-address-token";
     }
@@ -418,10 +455,9 @@ function fakeReturnPlan({ shape, seed, prefix, returnAlias, kind, enumValue, con
       cell: { tag: cellTag, value },
       ...(cellTag === "address"
         ? {
-          addressExpression: `deherm_dmsdk_unpack_handle<${returnAlias}>(UINT64_C(${value}))`,
-          addressPayloadExpression:
-            `deherm_dmsdk_pack_handle(deherm_dmsdk_unpack_handle<${returnAlias}>(UINT64_C(${value})))`,
-        }
+            addressExpression: `deherm_dmsdk_unpack_handle<${returnAlias}>(UINT64_C(${value}))`,
+            addressPayloadExpression: `deherm_dmsdk_pack_handle(deherm_dmsdk_unpack_handle<${returnAlias}>(UINT64_C(${value})))`,
+          }
         : {}),
     };
   }
@@ -471,7 +507,7 @@ function fakeReturnPlan({ shape, seed, prefix, returnAlias, kind, enumValue, con
   };
 }
 
-function renderRecordingFake({ fakeCallee, wrapper, kind, receiverType, parameters, plan }) {
+function renderRecordingFake({ fakeCallee, wrapper, receiverType, parameters, plan }) {
   const returnAlias = `DehermExact_${wrapper}_Return`;
   const argumentsList = [];
   const comparisons = [];
@@ -482,43 +518,63 @@ function renderRecordingFake({ fakeCallee, wrapper, kind, receiverType, paramete
   for (const [index, parameter] of parameters.entries()) {
     argumentsList.push(`DehermExact_${wrapper}_Arg${index} argument_${index}`);
     const expected = plan.arguments[index + (receiverType ? 1 : 0)].expectedExpression;
-    comparisons.push(parameter.shape.kind === "reference"
-      ? `&argument_${index}==&(${expected})`
-      : `argument_${index}==${expected}`);
+    comparisons.push(
+      parameter.shape.kind === "reference" ? `&argument_${index}==&(${expected})` : `argument_${index}==${expected}`,
+    );
   }
   const condition = comparisons.length ? comparisons.join(" && ") : "true";
-  return `${returnAlias} ${fakeCallee}(${argumentsList.join(",")}){\n` +
+  return (
+    `${returnAlias} ${fakeCallee}(${argumentsList.join(",")}){\n` +
     ` ++${plan.prefix}_calls; ` +
-    `if(!(${condition})) ++${plan.prefix}_failures; ${plan.result.statement}\n}`;
+    `if(!(${condition})) ++${plan.prefix}_failures; ${plan.result.statement}\n}`
+  );
 }
 
 function declaredOwnershipEffect(shape, direction, role) {
   if (shape.kind === "void") return { transport: "none", direction: direction ?? "value", effect: "no-result" };
-  const transport = shape.kind === "callback" ? "callback" :
-    shape.kind === "handle" ? "handle" :
-      ["cstring", "pointer", "reference", "opaque"].includes(shape.kind) ? "address" : "value";
-  const effect = role === "result"
-    ? transport === "value" ? "copied-result" : "returned-identity-unowned"
-    : transport === "callback" ? "callback-identity-passed" :
-      transport === "handle" ? "handle-identity-borrowed" :
-        transport === "address" ? `${direction ?? "value"}-address-borrowed-for-call` :
-          "copied-value";
+  const transport =
+    shape.kind === "callback"
+      ? "callback"
+      : shape.kind === "handle"
+        ? "handle"
+        : ["cstring", "pointer", "reference", "opaque"].includes(shape.kind)
+          ? "address"
+          : "value";
+  const effect =
+    role === "result"
+      ? transport === "value"
+        ? "copied-result"
+        : "returned-identity-unowned"
+      : transport === "callback"
+        ? "callback-identity-passed"
+        : transport === "handle"
+          ? "handle-identity-borrowed"
+          : transport === "address"
+            ? `${direction ?? "value"}-address-borrowed-for-call`
+            : "copied-value";
   return { transport, direction: direction ?? "value", effect };
 }
 
 function declaredOwnershipContract(recipe, parameters, resultShape, receiverType) {
-  const receiverEffect = !receiverType ? null : {
-    mode: recipe.invocation.receiver?.mode ?? "object",
-    effect: recipe.invocation.kind === "placement-constructor" ? "construct-in-caller-storage" :
-      recipe.invocation.kind === "explicit-destructor" ? "destroy-caller-owned-object" : "borrow-receiver-for-call",
-  };
+  const receiverEffect = !receiverType
+    ? null
+    : {
+        mode: recipe.invocation.receiver?.mode ?? "object",
+        effect:
+          recipe.invocation.kind === "placement-constructor"
+            ? "construct-in-caller-storage"
+            : recipe.invocation.kind === "explicit-destructor"
+              ? "destroy-caller-owned-object"
+              : "borrow-receiver-for-call",
+      };
   const parameterEffects = parameters.map((parameter) => ({
     position: parameter.position,
     ...declaredOwnershipEffect(parameter.shape, parameter.direction, "parameter"),
   }));
   const result = declaredOwnershipEffect(resultShape, "return", "result");
   const unresolvedRequirements = recipe.fallback.requirements.filter((requirement) =>
-    /(ownership|lifetime|callback-registration|receiver-provenance|out-storage|scratch)/.test(requirement));
+    /(ownership|lifetime|callback-registration|receiver-provenance|out-storage|scratch)/.test(requirement),
+  );
   return { receiver: receiverEffect, parameters: parameterEffects, result, unresolvedRequirements };
 }
 
@@ -551,8 +607,9 @@ function constructorFixtureDefinition(recipe) {
   if (recipe.invocation.sourceDefined) return null;
   const type = cppType(recipe.invocation.receiver?.nativeType, "fixture constructor receiver type");
   const member = identifier(recipe.invocation.member, "fixture constructor member");
-  const parameters = recipe.abi.parameters.map((parameter, index) =>
-    `${nativeType(parameter.shape, parameter.nativeType, {})} argument_${index}`);
+  const parameters = recipe.abi.parameters.map(
+    (parameter, index) => `${nativeType(parameter.shape, parameter.nativeType, {})} argument_${index}`,
+  );
   return `${type}::${member}(${parameters.join(",")}){}`;
 }
 
@@ -560,21 +617,27 @@ function referenceConstructorPlan(shape, recipes, seed) {
   const names = new Set(canonicalTypeNames(shape));
   if (!names.size) return null;
   const candidates = recipes
-    .filter((recipe) => recipe.invocation.kind === "placement-constructor" &&
-      names.has(recipe.invocation.receiver?.nativeType))
+    .filter(
+      (recipe) =>
+        recipe.invocation.kind === "placement-constructor" && names.has(recipe.invocation.receiver?.nativeType),
+    )
     .map((recipe) => ({
       recipe,
-      arguments: recipe.abi.parameters.map((parameter, index) =>
-        constructorLiteral(parameter, seed + index + 1)),
+      arguments: recipe.abi.parameters.map((parameter, index) => constructorLiteral(parameter, seed + index + 1)),
     }))
     .filter(({ arguments: values }) => values.every((value) => value !== null))
-    .sort((left, right) => left.arguments.length - right.arguments.length ||
-      compareCodeUnits(left.recipe.declarationId, right.recipe.declarationId));
+    .sort(
+      (left, right) =>
+        left.arguments.length - right.arguments.length ||
+        compareCodeUnits(left.recipe.declarationId, right.recipe.declarationId),
+    );
   const selected = candidates[0];
-  return selected ? {
-    arguments: selected.arguments,
-    definition: constructorFixtureDefinition(selected.recipe),
-  } : null;
+  return selected
+    ? {
+        arguments: selected.arguments,
+        definition: constructorFixtureDefinition(selected.recipe),
+      }
+    : null;
 }
 
 function expectedResultCheck(plan, result = "result") {
@@ -589,7 +652,8 @@ function expectedResultCheck(plan, result = "result") {
   if (cell.tag === "u64" || cell.tag === "bool") {
     return `${result}.tag==DEHERM_DMSDK_UNIVERSAL_${cell.tag.toUpperCase()} && ${result}.payload==UINT64_C(${cell.value})`;
   }
-  const expectedPayload = plan.result.addressPayloadExpression ??
+  const expectedPayload =
+    plan.result.addressPayloadExpression ??
     `static_cast<uint64_t>(reinterpret_cast<uintptr_t>(${plan.result.addressExpression}))`;
   return `${result}.tag==DEHERM_DMSDK_UNIVERSAL_ADDRESS && ${result}.payload==${expectedPayload}`;
 }
@@ -608,14 +672,16 @@ function expectedResultCheck(plan, result = "result") {
  */
 function renderPlatformHeaderPrelude(includes) {
   if (!includes.has("#include <dmsdk/graphics/graphics_native.h>")) return "";
-  return "#if defined(__linux__) && !defined(ANDROID)\n" +
+  return (
+    "#if defined(__linux__) && !defined(ANDROID)\n" +
     "#define Font DehermX11Font\n" +
     "#include <GL/glx.h>\n" +
     "#undef Font\n" +
     "#ifdef None\n" +
     "#undef None\n" +
     "#endif\n" +
-    "#endif\n";
+    "#endif\n"
+  );
 }
 
 export function materializeDmSdkUsages(usages, options = {}) {
@@ -672,8 +738,13 @@ export function materializeDmSdkUsages(usages, options = {}) {
       acknowledgement(usage, "generatedAdapterBypass", "specialized adapter bypass");
     }
     for (const requirement of recipe.fallback.requirements) {
-      if (["callback-trampoline", "record-layout", "native-type-substitution", "typed-nonvariadic-facade"].includes(requirement) ||
-          requirement.startsWith("out-storage") || requirement.startsWith("scratch-")) {
+      if (
+        ["callback-trampoline", "record-layout", "native-type-substitution", "typed-nonvariadic-facade"].includes(
+          requirement,
+        ) ||
+        requirement.startsWith("out-storage") ||
+        requirement.startsWith("scratch-")
+      ) {
         acknowledgement(
           usage,
           requirement.replace(/-([a-z])/g, (_, character) => character.toUpperCase()),
@@ -682,10 +753,7 @@ export function materializeDmSdkUsages(usages, options = {}) {
       }
     }
 
-    const wrapper = identifier(
-      usage.wrapper ?? `deherm_dmsdk_usage_${recipe.numericId}`,
-      "wrapper",
-    );
+    const wrapper = identifier(usage.wrapper ?? `deherm_dmsdk_usage_${recipe.numericId}`, "wrapper");
     if (ids.has(recipe.numericId) || names.has(wrapper)) {
       throw new Error(`duplicate dmSDK materialization: ${usage.declarationId}`);
     }
@@ -702,31 +770,27 @@ export function materializeDmSdkUsages(usages, options = {}) {
         throw new Error(`${usage.declarationId} parameters must use contiguous positions`);
       }
     });
-    const byValueRecord = sourceParameters.find(({ shape }) =>
-      ["record", "template-record"].includes(shape.kind));
+    const byValueRecord = sourceParameters.find(({ shape }) => ["record", "template-record"].includes(shape.kind));
     if (byValueRecord) {
       throw new Error(
         `${usage.declarationId} generic by-value record parameter ${byValueRecord.position} requires a typed size/alignment/lifetime provider`,
       );
     }
     const offset = recipe.abi.argumentOffset;
-    const invocationConsumesReceiver = [
-      "member-function",
-      "placement-constructor",
-      "explicit-destructor",
-    ].includes(recipe.invocation.kind);
+    const invocationConsumesReceiver = ["member-function", "placement-constructor", "explicit-destructor"].includes(
+      recipe.invocation.kind,
+    );
     if (Boolean(offset) !== invocationConsumesReceiver) {
-      throw new Error(
-        `${usage.declarationId} has an inconsistent ${recipe.invocation.kind} argument offset ${offset}`,
-      );
+      throw new Error(`${usage.declarationId} has an inconsistent ${recipe.invocation.kind} argument offset ${offset}`);
     }
     const argumentCount = offset + sourceParameters.length;
     if (argumentCount > maxArguments) {
       throw new Error(`${usage.declarationId} exceeds frame capacity ${maxArguments}`);
     }
-    const recipeReceiverType = recipe.invocation.receiver?.source === "source-derived-nontemplate-owner"
-      ? recipe.invocation.receiver.nativeType
-      : undefined;
+    const recipeReceiverType =
+      recipe.invocation.receiver?.source === "source-derived-nontemplate-owner"
+        ? recipe.invocation.receiver.nativeType
+        : undefined;
     const receiverType = usage.receiverCppType
       ? cppType(usage.receiverCppType, "receiverCppType")
       : recipeReceiverType
@@ -742,7 +806,7 @@ export function materializeDmSdkUsages(usages, options = {}) {
     if (offset) {
       checks.push(
         "arguments[0].tag == DEHERM_DMSDK_UNIVERSAL_ADDRESS && arguments[0].payload != 0 && " +
-        `deherm_dmsdk_address_fits(arguments[0].payload) && arguments[0].payload % alignof(${receiverType}) == 0`,
+          `deherm_dmsdk_address_fits(arguments[0].payload) && arguments[0].payload % alignof(${receiverType}) == 0`,
       );
     }
     const parameters = sourceParameters.map((parameter, index) => {
@@ -753,9 +817,7 @@ export function materializeDmSdkUsages(usages, options = {}) {
       const enumeration = enumCheck(parameter, slot, usage);
       if (enumeration) checks.push(enumeration);
       const expression = usage.argumentExpressions?.[index]
-        ? usage.argumentExpressions[index]
-          .replaceAll("$slot", String(slot))
-          .replaceAll("$arguments", "arguments")
+        ? usage.argumentExpressions[index].replaceAll("$slot", String(slot)).replaceAll("$arguments", "arguments")
         : decode(parameter, slot, usage);
       const resolvedNativeType = nativeType(parameter.shape, parameter.nativeType, usage.typeSubstitutions);
       if (parameter.shape.kind === "callback") {
@@ -766,7 +828,9 @@ export function materializeDmSdkUsages(usages, options = {}) {
         const alias = `DehermCallback_${wrapper}_Arg${index}`;
         const prior = callbackDeclarations.get(symbol);
         if (prior && prior.resolvedNativeType !== resolvedNativeType) {
-          throw new Error(`${usage.declarationId} callback trampoline ${symbol} is reused with incompatible native types`);
+          throw new Error(
+            `${usage.declarationId} callback trampoline ${symbol} is reused with incompatible native types`,
+          );
         }
         callbackDeclarations.set(symbol, { alias, resolvedNativeType });
         callbackMacros.set(symbol, alias);
@@ -811,9 +875,7 @@ export function materializeDmSdkUsages(usages, options = {}) {
     const exactWrapper = identifier(`${wrapper}__exact_call`, "exact verification wrapper");
     const fakeCallee = identifier(`${wrapper}__exact_callee`, "exact verification fake callee");
     const exactExpressions = parameters.map(({ exactExpression }) => exactExpression);
-    const fakeArguments = receiverType
-      ? [receiverExpression(receiverType), ...exactExpressions]
-      : exactExpressions;
+    const fakeArguments = receiverType ? [receiverExpression(receiverType), ...exactExpressions] : exactExpressions;
     const exactCall = `${fakeCallee}(${fakeArguments.join(", ")})`;
     const exactBody = resultBody(effective, exactCall, resultType, usage.resultExpression);
     const fakeDeclarationSource = renderFakeDeclaration({
@@ -836,9 +898,7 @@ export function materializeDmSdkUsages(usages, options = {}) {
         `static uint32_t ${prefix}_calls=0;`,
         `static uint32_t ${prefix}_failures=0;`,
       ],
-      setup: [
-        `memset(${prefix}_arguments,0,sizeof(${prefix}_arguments));`,
-      ],
+      setup: [`memset(${prefix}_arguments,0,sizeof(${prefix}_arguments));`],
       arguments: [],
     };
     if (receiverType) {
@@ -846,7 +906,9 @@ export function materializeDmSdkUsages(usages, options = {}) {
       plan.declarations.push(`alignas(${receiverType}) static unsigned char ${fixture}[sizeof(${receiverType})]{};`);
       plan.setup.push(`${prefix}_arguments[0].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(${fixture}));`);
       plan.setup.push(`${prefix}_arguments[0].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;`);
-      plan.declarations.push(`static ${receiverType}* ${prefix}_expected_receiver=reinterpret_cast<${receiverType}*>(${fixture});`);
+      plan.declarations.push(
+        `static ${receiverType}* ${prefix}_expected_receiver=reinterpret_cast<${receiverType}*>(${fixture});`,
+      );
       plan.arguments.push({
         cell: { slot: 0, tag: "address", fixture: "aligned-receiver-storage" },
         expectedExpression: `${prefix}_expected_receiver`,
@@ -865,13 +927,15 @@ export function materializeDmSdkUsages(usages, options = {}) {
         seed: (recipe.numericId + 1) * 17 + parameter.slot + 1,
         prefix,
         nativeAlias: `DehermExact_${wrapper}_Arg${index}`,
-        enumValues: usage.enumDomains?.[parameter.position] ??
-          parameter.enumeration?.members?.map(({ value }) => value) ?? [],
+        enumValues:
+          usage.enumDomains?.[parameter.position] ?? parameter.enumeration?.members?.map(({ value }) => value) ?? [],
         expression: parameter.exactExpression,
         constructorArguments: constructor?.arguments,
       });
       if (!argumentPlan) {
-        throw new Error(`${usage.declarationId} exact-call driver cannot derive a wire fixture for ${parameter.name} (${parameter.shape.kind})`);
+        throw new Error(
+          `${usage.declarationId} exact-call driver cannot derive a wire fixture for ${parameter.name} (${parameter.shape.kind})`,
+        );
       }
       plan.declarations.push(...argumentPlan.declarations);
       plan.setup.push(...argumentPlan.setup);
@@ -889,13 +953,16 @@ export function materializeDmSdkUsages(usages, options = {}) {
       prefix,
       returnAlias: `DehermExact_${wrapper}_Return`,
       kind: recipe.invocation.kind,
-      enumValue: usage.resultEnumValue ??
+      enumValue:
+        usage.resultEnumValue ??
         (!usage.resultShape ? effective.abi.resultEnumeration?.members?.[0]?.value : undefined),
       constructorArguments: resultConstructor?.arguments,
     });
     if (!plan.result) {
       const detail = effective.abi.resultShape.kind === "enum" ? "; provide a safe-integer resultEnumValue" : "";
-      throw new Error(`${usage.declarationId} exact-call driver cannot derive a fake result for ${effective.abi.resultShape.kind}${detail}`);
+      throw new Error(
+        `${usage.declarationId} exact-call driver cannot derive a fake result for ${effective.abi.resultShape.kind}${detail}`,
+      );
     }
     plan.declarations.push(...plan.result.declarations);
     plan.declaredOwnership = declaredOwnershipContract(recipe, parameters, effective.abi.resultShape, receiverType);
@@ -985,52 +1052,74 @@ export function materializeDmSdkUsages(usages, options = {}) {
   // Pulling every SDK constructor into a one-call materialization breaks the
   // same reachable-only boundary the production linker relies on.
   for (const candidate of recipes) {
-    if (!includes.has(`#include <${candidate.include}>`) ||
-        candidate.publicSdk?.callable === false ||
-        candidate.invocation.kind !== "placement-constructor" ||
-        candidate.invocation.sourceDefined || candidate.abi.parameters.length !== 0 ||
-        candidate.invocation.receiver?.source !== "source-derived-nontemplate-owner") continue;
+    if (
+      !includes.has(`#include <${candidate.include}>`) ||
+      candidate.publicSdk?.callable === false ||
+      candidate.invocation.kind !== "placement-constructor" ||
+      candidate.invocation.sourceDefined ||
+      candidate.abi.parameters.length !== 0 ||
+      candidate.invocation.receiver?.source !== "source-derived-nontemplate-owner"
+    )
+      continue;
     fixtureDefinitions.add(constructorFixtureDefinition(candidate));
   }
 
   const provider = renderProvider(providerName, installName, manifest, "wrapper");
   const exactProvider = renderProvider(exactProviderName, exactInstallName, manifest, "exactWrapper");
-  const callbackDeclarationSource = [...callbackDeclarations.entries()].map(([symbol, { alias, resolvedNativeType }]) =>
-    `using ${alias}=${resolvedNativeType}; static_assert(std::is_pointer_v<${alias}>); extern std::remove_pointer_t<${alias}> ${symbol};`
-  ).join("\n");
-  const callbackMacroSource = [...callbackMacros.entries()].map(([symbol, alias]) =>
-    `#define ${symbol} (&DehermExactCallbackFixture<${alias}>::call)`
-  ).join("\n");
+  const callbackDeclarationSource = [...callbackDeclarations.entries()]
+    .map(
+      ([symbol, { alias, resolvedNativeType }]) =>
+        `using ${alias}=${resolvedNativeType}; static_assert(std::is_pointer_v<${alias}>); extern std::remove_pointer_t<${alias}> ${symbol};`,
+    )
+    .join("\n");
+  const callbackMacroSource = [...callbackMacros.entries()]
+    .map(([symbol, alias]) => `#define ${symbol} (&DehermExactCallbackFixture<${alias}>::call)`)
+    .join("\n");
   const callbackUndefSource = [...callbackMacros.keys()].map((symbol) => `#undef ${symbol}`).join("\n");
   const verificationState = verificationPlans.flatMap((plan) => plan.declarations).join("\n");
   const observationApi =
-    `extern "C" void ${exactResetName}(void){${verificationPlans.map((plan) =>
-      `${plan.prefix}_calls=0;${plan.prefix}_failures=0;`).join("")}}\n` +
-    `extern "C" uint32_t ${exactCallsName}(uint32_t id){switch(id){${verificationPlans.map((plan, index) =>
-      `case UINT32_C(${manifest[index].numericId}):return ${plan.prefix}_calls;`).join("")}default:return UINT32_MAX;}}\n` +
-    `extern "C" uint32_t ${exactFailuresName}(uint32_t id){switch(id){${verificationPlans.map((plan, index) =>
-      `case UINT32_C(${manifest[index].numericId}):return ${plan.prefix}_failures;`).join("")}default:return UINT32_MAX;}}`;
+    `extern "C" void ${exactResetName}(void){${verificationPlans
+      .map((plan) => `${plan.prefix}_calls=0;${plan.prefix}_failures=0;`)
+      .join("")}}\n` +
+    `extern "C" uint32_t ${exactCallsName}(uint32_t id){switch(id){${verificationPlans
+      .map((plan, index) => `case UINT32_C(${manifest[index].numericId}):return ${plan.prefix}_calls;`)
+      .join("")}default:return UINT32_MAX;}}\n` +
+    `extern "C" uint32_t ${exactFailuresName}(uint32_t id){switch(id){${verificationPlans
+      .map((plan, index) => `case UINT32_C(${manifest[index].numericId}):return ${plan.prefix}_failures;`)
+      .join("")}default:return UINT32_MAX;}}`;
   const exactFailureName = identifier(`${installName}_exact_failure`, "exact verification failureName");
-  const exactFailureReporter = `static int ${exactFailureName}(const char* stage,uint32_t vector,uint32_t id,int status=-1){` +
+  const exactFailureReporter =
+    `static int ${exactFailureName}(const char* stage,uint32_t vector,uint32_t id,int status=-1){` +
     `fprintf(stderr,"dmSDK exact-call failure: stage=%s vector=%u id=%u status=%d\\n",stage,vector,id,status);return 1;}`;
-  const verificationDriver = `extern "C" int ${exactDriverName}(void){\n ${exactInstallName}(); ${exactResetName}();\n` +
-    verificationPlans.map((plan, index) => {
-      const argumentPointer = manifest[index].argumentCount ? `${plan.prefix}_arguments` : "nullptr";
-      const resultName = `${plan.prefix}_result`;
-      const id = `UINT32_C(${manifest[index].numericId})`;
-      const statusName = `${plan.prefix}_status`;
-      const preconditionChecks = plan.preconditions.map((check, condition) =>
-        ` if(!(${check.replaceAll("arguments", `${plan.prefix}_arguments`)}))return ` +
-        `${exactFailureName}("precondition-${condition}",UINT32_C(${index}),${id});`).join("\n");
-      return ` ${plan.setup.join("\n ")}\n DehermDmSdkUniversalValue ${resultName}{};\n` +
-        `${preconditionChecks}\n` +
-        ` const DehermDmSdkUniversalStatus ${statusName}=deherm_dmsdk_universal_dispatch(${id},${argumentPointer},UINT32_C(${manifest[index].argumentCount}),&${resultName});\n` +
-        ` if(${statusName}!=DEHERM_DMSDK_UNIVERSAL_OK)return ${exactFailureName}("dispatch",UINT32_C(${index}),${id},static_cast<int>(${statusName}));\n` +
-        ` if(${exactCallsName}(${id})!=UINT32_C(1))return ${exactFailureName}("call-count",UINT32_C(${index}),${id});\n` +
-        ` if(${exactFailuresName}(${id})!=UINT32_C(0))return ${exactFailureName}("arguments",UINT32_C(${index}),${id});\n` +
-        ` if(!(${expectedResultCheck(plan, resultName)}))return ${exactFailureName}("result",UINT32_C(${index}),${id});`;
-    }).join("\n") + "\n return 0;\n}";
-  const preamble = `${renderPlatformHeaderPrelude(includes)}${[...includes].sort().join("\n")}\n` +
+  const verificationDriver =
+    `extern "C" int ${exactDriverName}(void){\n ${exactInstallName}(); ${exactResetName}();\n` +
+    verificationPlans
+      .map((plan, index) => {
+        const argumentPointer = manifest[index].argumentCount ? `${plan.prefix}_arguments` : "nullptr";
+        const resultName = `${plan.prefix}_result`;
+        const id = `UINT32_C(${manifest[index].numericId})`;
+        const statusName = `${plan.prefix}_status`;
+        const preconditionChecks = plan.preconditions
+          .map(
+            (check, condition) =>
+              ` if(!(${check.replaceAll("arguments", `${plan.prefix}_arguments`)}))return ` +
+              `${exactFailureName}("precondition-${condition}",UINT32_C(${index}),${id});`,
+          )
+          .join("\n");
+        return (
+          ` ${plan.setup.join("\n ")}\n DehermDmSdkUniversalValue ${resultName}{};\n` +
+          `${preconditionChecks}\n` +
+          ` const DehermDmSdkUniversalStatus ${statusName}=deherm_dmsdk_universal_dispatch(${id},${argumentPointer},UINT32_C(${manifest[index].argumentCount}),&${resultName});\n` +
+          ` if(${statusName}!=DEHERM_DMSDK_UNIVERSAL_OK)return ${exactFailureName}("dispatch",UINT32_C(${index}),${id},static_cast<int>(${statusName}));\n` +
+          ` if(${exactCallsName}(${id})!=UINT32_C(1))return ${exactFailureName}("call-count",UINT32_C(${index}),${id});\n` +
+          ` if(${exactFailuresName}(${id})!=UINT32_C(0))return ${exactFailureName}("arguments",UINT32_C(${index}),${id});\n` +
+          ` if(!(${expectedResultCheck(plan, resultName)}))return ${exactFailureName}("result",UINT32_C(${index}),${id});`
+        );
+      })
+      .join("\n") +
+    "\n return 0;\n}";
+  const preamble =
+    `${renderPlatformHeaderPrelude(includes)}${[...includes].sort().join("\n")}\n` +
     "[[maybe_unused]] static int deherm_dmsdk_address_fits(uint64_t value){return sizeof(uintptr_t)>=sizeof(uint64_t)||value<=UINTPTR_MAX;}\n" +
     "[[maybe_unused]] static int64_t deherm_dmsdk_unpack_i64(uint64_t bits){int64_t value;memcpy(&value,&bits,sizeof(value));return value;}\n" +
     "[[maybe_unused]] static double deherm_dmsdk_unpack_f64(uint64_t bits){double value;memcpy(&value,&bits,sizeof(value));return value;}\n" +
@@ -1039,7 +1128,8 @@ export function materializeDmSdkUsages(usages, options = {}) {
   const verification = {
     schemaVersion: 1,
     source: "deherm-dmsdk-exact-call-verification",
-    evidenceBoundary: "Generated recording fake callees and the native C-ABI driver execute the exact-call contract for compile-time call-expression/overload resolution, precondition checks, deterministic wire inputs, decoded native arguments, receiver transport, and result encoding; C-ABI observation accessors expose per-vector call and argument-mismatch counts to other transport runners. The fake proves ABI carrier, order, and result handling; it does not prove actual Defold-library linkage, does not execute Defold implementation semantics, and provides no runtime ownership lifecycle evidence. Ownership metadata is a declared contract only.",
+    evidenceBoundary:
+      "Generated recording fake callees and the native C-ABI driver execute the exact-call contract for compile-time call-expression/overload resolution, precondition checks, deterministic wire inputs, decoded native arguments, receiver transport, and result encoding; C-ABI observation accessors expose per-vector call and argument-mismatch counts to other transport runners. The fake proves ABI carrier, order, and result handling; it does not prove actual Defold-library linkage, does not execute Defold implementation semantics, and provides no runtime ownership lifecycle evidence. Ownership metadata is a declared contract only.",
     catalogSha256,
     provider: { function: exactProviderName, install: exactInstallName },
     driver: { function: exactDriverName, transport: "native-c-abi", sourceSha256: sha256(verificationDriver) },
@@ -1055,7 +1145,8 @@ export function materializeDmSdkUsages(usages, options = {}) {
   verification.manifestSha256 = sha256(canonicalJson(verification));
 
   return {
-    source: "// Generated by @deherm/compiler dmSDK usage materializer. Do not edit.\n" +
+    source:
+      "// Generated by @deherm/compiler dmSDK usage materializer. Do not edit.\n" +
       `${preamble}${callbackDeclarationSource}\n${wrappers.join("\n")}\n${provider}\n`,
     verificationSource:
       "// Generated by @deherm/compiler dmSDK exact-call materializer. Do not edit.\n" +

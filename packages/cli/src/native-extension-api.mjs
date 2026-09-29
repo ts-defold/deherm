@@ -8,17 +8,17 @@ import { unzipSync } from "fflate";
 
 import {
   ingestNativeExtensionHeader,
-  renderNativeExtensionBindings
+  renderNativeExtensionBindings,
 } from "../../compiler/src/native-extension-generator.mjs";
 import {
   renderNativeModuleProviderHeader,
-  renderNativeModuleTypescript
+  renderNativeModuleTypescript,
 } from "../../compiler/src/native-module-provider-generator.mjs";
 import {
   PUBLIC_EXTENSION_ZIP_LIMITS,
   assertSafeArchiveEntryName,
   publicIncludeRoot,
-  publicIncludeSuffix
+  publicIncludeSuffix,
 } from "./project.mjs";
 
 const ignoredIncludeDirectories = new Set([".git", ".internal", "build", "node_modules"]);
@@ -29,7 +29,7 @@ const ignoredIncludeDirectories = new Set([".git", ".internal", "build", "node_m
 const infrastructureExtensionNames = new Set([
   "defold_hermes",
   "defold_hermes_typed_native",
-  "deherm_project_native_modules"
+  "deherm_project_native_modules",
 ]);
 
 export function isDehermInfrastructureExtension(extension) {
@@ -46,18 +46,28 @@ function compare(left, right) {
 
 function moduleName(value) {
   const separated = String(value).replace(/([a-z0-9])([A-Z])/g, "$1_$2");
-  const normalized = separated.toLowerCase().replace(/[^a-z0-9_]+/g, "_").replace(/^_+|_+$/g, "") || "extension";
+  const normalized =
+    separated
+      .toLowerCase()
+      .replace(/[^a-z0-9_]+/g, "_")
+      .replace(/^_+|_+$/g, "") || "extension";
   return /^[a-z_]/.test(normalized) ? normalized : `_${normalized}`;
 }
 
 function fileSlug(value) {
-  return String(value).toLowerCase().replace(/[^a-z0-9._-]+/g, "-").replace(/^[-.]+|[-.]+$/g, "") || "header";
+  return (
+    String(value)
+      .toLowerCase()
+      .replace(/[^a-z0-9._-]+/g, "-")
+      .replace(/^[-.]+|[-.]+$/g, "") || "header"
+  );
 }
 
 function headerInclude(relative) {
   const normalized = relative.split(path.sep).join("/");
   const include = publicIncludeSuffix(normalized);
-  if (!include || /[<>"'\\\r\n]/u.test(include)) throw new Error("Public header path cannot be represented safely in a generated include");
+  if (!include || /[<>"'\\\r\n]/u.test(include))
+    throw new Error("Public header path cannot be represented safely in a generated include");
   return include;
 }
 
@@ -65,32 +75,43 @@ function safeArchiveEntry(value) {
   return assertSafeArchiveEntryName(value);
 }
 
-export function resolveNativeExtensionClang({ inventory, clang = process.env.CLANG ?? "clang", execFile = execFileSync }) {
-  const required = inventory.extensions.some((extension) =>
-    !isDehermInfrastructureExtension(extension) &&
-    (extension.bindingSchema
-      ? extension.bindingSchema.document.headers.length > 0
-      : Boolean(extension.publicHeaders?.length)));
+export function resolveNativeExtensionClang({
+  inventory,
+  clang = process.env.CLANG ?? "clang",
+  execFile = execFileSync,
+}) {
+  const required = inventory.extensions.some(
+    (extension) =>
+      !isDehermInfrastructureExtension(extension) &&
+      (extension.bindingSchema
+        ? extension.bindingSchema.document.headers.length > 0
+        : Boolean(extension.publicHeaders?.length)),
+  );
   if (!required) return { required: false };
   let version;
   try {
     version = execFile(clang, ["--version"], { encoding: "utf8", timeout: 10_000, maxBuffer: 1024 * 1024 });
   } catch (error) {
-    throw new Error(`Project native extension generation requires an executable Clang tool (${clang} --version failed)`, { cause: error });
+    throw new Error(
+      `Project native extension generation requires an executable Clang tool (${clang} --version failed)`,
+      { cause: error },
+    );
   }
   if (typeof version !== "string" || !version.trim()) {
-    throw new Error(`Project native extension generation requires Clang to report a stable version identity (${clang})`);
+    throw new Error(
+      `Project native extension generation requires Clang to report a stable version identity (${clang})`,
+    );
   }
   return {
     required: true,
     command: clang,
     version: version.split(/\r?\n/u, 1)[0],
-    versionSha256: sha256(version)
+    versionSha256: sha256(version),
   };
 }
 
 function isExpectedClangParseFailure(error) {
-  const stderr = typeof error?.stderr === "string" ? error.stderr : error?.stderr?.toString?.("utf8") ?? "";
+  const stderr = typeof error?.stderr === "string" ? error.stderr : (error?.stderr?.toString?.("utf8") ?? "");
   return Number.isInteger(error?.status) && error.status !== 0 && /(?:^|\n).*(?:fatal )?error:/u.test(stderr);
 }
 
@@ -152,8 +173,7 @@ async function directoryDigest(root) {
       if (entry.isDirectory()) {
         hash.update(`d\0${relative}\0`);
         await visit(absolute, relative);
-      }
-      else if (entry.isFile()) {
+      } else if (entry.isFile()) {
         const bytes = await readFile(absolute);
         hash.update(`f\0${relative}\0${bytes.byteLength}\0`);
         hash.update(bytes);
@@ -173,12 +193,13 @@ async function localHeader(inventory, extension, detail) {
   }
   const bytes = await readFile(header);
   if (sha256(bytes) !== detail.sha256) throw new Error(`Public header changed after project discovery: ${detail.path}`);
-  if (await localIncludeTree(extensionRoot) !== extension.publicIncludeTreeSha256) {
+  if ((await localIncludeTree(extensionRoot)) !== extension.publicIncludeTreeSha256) {
     throw new Error(`Public include tree changed after project discovery: ${extension.manifestPath}`);
   }
   const segments = relative.split(path.sep);
   const includeIndex = segments.indexOf("include");
-  if (includeIndex < 0 || includeIndex === segments.length - 1) throw new Error(`Discovered public header is not below an exact include path segment: ${detail.path}`);
+  if (includeIndex < 0 || includeIndex === segments.length - 1)
+    throw new Error(`Discovered public header is not below an exact include path segment: ${detail.path}`);
   const include = [];
   for (const root of extension.publicIncludeRoots ?? []) {
     if (root.split("/").at(-1) !== "include") throw new Error(`Invalid public include root: ${root}`);
@@ -213,19 +234,24 @@ function boundedDependencyIncludeEntries(bytes, root) {
       const relative = name.slice(root.length);
       if (publicIncludeSuffix(relative) === null || name.endsWith("/")) return false;
       if (file.originalSize > PUBLIC_EXTENSION_ZIP_LIMITS.selectedEntryBytes) {
-        throw new Error(`Dependency archive entry ${name} exceeds ${PUBLIC_EXTENSION_ZIP_LIMITS.selectedEntryBytes} bytes`);
+        throw new Error(
+          `Dependency archive entry ${name} exceeds ${PUBLIC_EXTENSION_ZIP_LIMITS.selectedEntryBytes} bytes`,
+        );
       }
       selectedBytes += file.originalSize;
       if (selectedBytes > PUBLIC_EXTENSION_ZIP_LIMITS.selectedTotalBytes) {
-        throw new Error(`Selected dependency archive entries exceed ${PUBLIC_EXTENSION_ZIP_LIMITS.selectedTotalBytes} bytes`);
+        throw new Error(
+          `Selected dependency archive entries exceed ${PUBLIC_EXTENSION_ZIP_LIMITS.selectedTotalBytes} bytes`,
+        );
       }
       return true;
-    }
+    },
   });
   const canonicalEntries = Object.create(null);
   for (const [rawName, value] of Object.entries(entries)) {
     const name = safeArchiveEntry(rawName);
-    if (Object.hasOwn(canonicalEntries, name)) throw new Error(`Dependency archive contains duplicate canonical entry: ${name}`);
+    if (Object.hasOwn(canonicalEntries, name))
+      throw new Error(`Dependency archive contains duplicate canonical entry: ${name}`);
     canonicalEntries[name] = value;
   }
   return canonicalEntries;
@@ -236,20 +262,29 @@ async function dependencyHeader(inventory, extension, detail) {
   if (separator < 1) throw new Error(`Invalid dependency public header path: ${detail.path}`);
   const archiveName = detail.path.slice(0, separator);
   const entryName = safeArchiveEntry(detail.path.slice(separator + 1));
-  if (path.posix.basename(extension.archive) !== archiveName) throw new Error(`Dependency header archive mismatch: ${detail.path}`);
+  if (path.posix.basename(extension.archive) !== archiveName)
+    throw new Error(`Dependency header archive mismatch: ${detail.path}`);
   const libraryRoot = await realpath(path.join(inventory.projectRoot, ".internal", "lib"));
   const archive = await realpath(path.resolve(inventory.projectRoot, extension.archive));
   const archiveRelative = path.relative(libraryRoot, archive);
-  if (!archiveRelative || archiveRelative === ".." || archiveRelative.startsWith(`..${path.sep}`) || path.isAbsolute(archiveRelative)) {
+  if (
+    !archiveRelative ||
+    archiveRelative === ".." ||
+    archiveRelative.startsWith(`..${path.sep}`) ||
+    path.isAbsolute(archiveRelative)
+  ) {
     throw new Error(`Dependency archive resolves outside .internal/lib: ${extension.archive}`);
   }
   const root = extension.root ? `${safeArchiveEntry(extension.root)}/` : "";
-  if (!entryName.startsWith(root)) throw new Error(`Dependency public header is outside its extension root: ${detail.path}`);
+  if (!entryName.startsWith(root))
+    throw new Error(`Dependency public header is outside its extension root: ${detail.path}`);
   const entries = boundedDependencyIncludeEntries(await readFile(archive), root);
   if (!entries[entryName]) throw new Error(`Dependency archive is missing discovered public header: ${detail.path}`);
-  if (sha256(entries[entryName]) !== detail.sha256) throw new Error(`Dependency public header changed after project discovery: ${detail.path}`);
-  const includeTreeSha256 = fileSetSha256(Object.entries(entries)
-    .map(([name, bytes]) => ({ path: name.slice(root.length), bytes })));
+  if (sha256(entries[entryName]) !== detail.sha256)
+    throw new Error(`Dependency public header changed after project discovery: ${detail.path}`);
+  const includeTreeSha256 = fileSetSha256(
+    Object.entries(entries).map(([name, bytes]) => ({ path: name.slice(root.length), bytes })),
+  );
   if (includeTreeSha256 !== extension.publicIncludeTreeSha256) {
     throw new Error(`Dependency public include tree changed after project discovery: ${extension.manifestPath}`);
   }
@@ -257,7 +292,8 @@ async function dependencyHeader(inventory, extension, detail) {
   try {
     for (const [rawName, bytes] of Object.entries(entries).sort(([left], [right]) => compare(left, right))) {
       const name = safeArchiveEntry(rawName);
-      if (!name.startsWith(root) || publicIncludeSuffix(name.slice(root.length)) === null || rawName.endsWith("/")) continue;
+      if (!name.startsWith(root) || publicIncludeSuffix(name.slice(root.length)) === null || rawName.endsWith("/"))
+        continue;
       const relative = name.slice(root.length);
       const destination = path.join(temporary, ...relative.split("/"));
       await mkdir(path.dirname(destination), { recursive: true });
@@ -265,10 +301,12 @@ async function dependencyHeader(inventory, extension, detail) {
     }
     const relativeHeader = entryName.slice(root.length);
     const headerSegments = relativeHeader.split("/");
-    if (publicIncludeRoot(relativeHeader) === null) throw new Error(`Dependency public header is not below an exact include path segment: ${detail.path}`);
+    if (publicIncludeRoot(relativeHeader) === null)
+      throw new Error(`Dependency public header is not below an exact include path segment: ${detail.path}`);
     const include = (extension.publicIncludeRoots ?? []).map((includeRoot) => {
       const safeRoot = safeArchiveEntry(includeRoot);
-      if (safeRoot.split("/").at(-1) !== "include") throw new Error(`Invalid dependency public include root: ${includeRoot}`);
+      if (safeRoot.split("/").at(-1) !== "include")
+        throw new Error(`Invalid dependency public include root: ${includeRoot}`);
       return path.join(temporary, ...safeRoot.split("/"));
     });
     if (!include.length) throw new Error(`Dependency extension has no public include roots: ${extension.manifestPath}`);
@@ -276,7 +314,7 @@ async function dependencyHeader(inventory, extension, detail) {
       header: path.join(temporary, ...headerSegments),
       include,
       headerInclude: headerInclude(relativeHeader),
-      cleanup: () => rm(temporary, { recursive: true, force: true })
+      cleanup: () => rm(temporary, { recursive: true, force: true }),
     };
   } catch (error) {
     await rm(temporary, { recursive: true, force: true });
@@ -290,7 +328,13 @@ async function resolvedHeader(inventory, extension, detail) {
     : localHeader(inventory, extension, detail);
 }
 
-export async function materializeProjectNativeExtensionApis({ inventory, outputRoot, defoldRevision, generationKey, clang }) {
+export async function materializeProjectNativeExtensionApis({
+  inventory,
+  outputRoot,
+  defoldRevision,
+  generationKey,
+  clang,
+}) {
   const ownerRoot = path.join(outputRoot, "generated", "native-extensions");
   const generatedRoot = path.dirname(ownerRoot);
   await mkdir(generatedRoot, { recursive: true });
@@ -307,7 +351,7 @@ export async function materializeProjectNativeExtensionApis({ inventory, outputR
         name,
         manifestPath,
         publicHeaderCount: publicHeaders.length,
-        reason: "deherm-runtime-infrastructure"
+        reason: "deherm-runtime-infrastructure",
       }));
     for (const [extensionIndex, extension] of inventory.extensions.entries()) {
       if (isDehermInfrastructureExtension(extension)) continue;
@@ -317,7 +361,7 @@ export async function materializeProjectNativeExtensionApis({ inventory, outputR
         await mkdir(destination, { recursive: true });
         await Promise.all([
           writeFile(path.join(destination, "provider.h"), renderNativeModuleProviderHeader(descriptor)),
-          writeFile(path.join(destination, `${descriptor.name}.ts`), renderNativeModuleTypescript(descriptor))
+          writeFile(path.join(destination, `${descriptor.name}.ts`), renderNativeModuleTypescript(descriptor)),
         ]);
         nativeModules.push({
           extension: extension.name,
@@ -325,26 +369,30 @@ export async function materializeProjectNativeExtensionApis({ inventory, outputR
           name: descriptor.name,
           abiVersion: descriptor.abiVersion,
           methodCount: descriptor.methods.length,
-          output: path.posix.join(defoldRevision, generationKey, relative)
+          output: path.posix.join(defoldRevision, generationKey, relative),
         });
       }
       const details = [...(extension.publicHeaderDetails ?? [])].sort((left, right) => compare(left.path, right.path));
-      if (details.length !== (extension.publicHeaders ?? []).length ||
-          details.some((detail, index) => detail.path !== [...extension.publicHeaders].sort(compare)[index])) {
+      if (
+        details.length !== (extension.publicHeaders ?? []).length ||
+        details.some((detail, index) => detail.path !== [...extension.publicHeaders].sort(compare)[index])
+      ) {
         throw new Error(`Public header detail inventory is incomplete for ${extension.manifestPath}`);
       }
       const schemaHeaders = extension.bindingSchema?.document?.headers ?? null;
-      const schemaByHeader = schemaHeaders
-        ? new Map(schemaHeaders.map((entry) => [entry.path, entry]))
-        : null;
-      const detailsByInclude = new Map(details.map((detail, headerIndex) => {
-        const includePath = publicIncludeSuffix(detail.path);
-        if (!includePath) throw new Error(`Discovered public header has no include-relative path: ${detail.path}`);
-        if (details.some((candidate) => candidate !== detail && publicIncludeSuffix(candidate.path) === includePath)) {
-          throw new Error(`Extension exposes duplicate include-relative header path: ${includePath}`);
-        }
-        return [includePath, { detail, headerIndex }];
-      }));
+      const schemaByHeader = schemaHeaders ? new Map(schemaHeaders.map((entry) => [entry.path, entry])) : null;
+      const detailsByInclude = new Map(
+        details.map((detail, headerIndex) => {
+          const includePath = publicIncludeSuffix(detail.path);
+          if (!includePath) throw new Error(`Discovered public header has no include-relative path: ${detail.path}`);
+          if (
+            details.some((candidate) => candidate !== detail && publicIncludeSuffix(candidate.path) === includePath)
+          ) {
+            throw new Error(`Extension exposes duplicate include-relative header path: ${includePath}`);
+          }
+          return [includePath, { detail, headerIndex }];
+        }),
+      );
       if (schemaByHeader) {
         for (const schemaHeader of schemaHeaders) {
           if (detailsByInclude.has(schemaHeader.path)) continue;
@@ -360,7 +408,7 @@ export async function materializeProjectNativeExtensionApis({ inventory, outputR
             routeCount: 0,
             generatedRouteCount: 0,
             blockedRouteCount: 1,
-            blockers: [blocker]
+            blockers: [blocker],
           });
         }
         for (const [includePath, { detail }] of detailsByInclude) {
@@ -370,7 +418,7 @@ export async function materializeProjectNativeExtensionApis({ inventory, outputR
               kind: extension.kind,
               input: detail.path,
               includePath,
-              reason: "not-selected-by-binding-schema"
+              reason: "not-selected-by-binding-schema",
             });
           }
         }
@@ -395,12 +443,15 @@ export async function materializeProjectNativeExtensionApis({ inventory, outputR
               language: schemaHeader?.language ?? "c",
               symbols: schemaHeader?.symbols ?? null,
               include: resolved.include,
-              clang
+              clang,
             });
           } catch (error) {
             if (!isExpectedClangParseFailure(error)) throw error;
             const languageLabel = (schemaHeader?.language ?? "c") === "c++" ? "C++" : "C";
-            const blocker = { code: "header-parse-failed", message: `Clang rejected this discovered public ${languageLabel} header` };
+            const blocker = {
+              code: "header-parse-failed",
+              message: `Clang rejected this discovered public ${languageLabel} header`,
+            };
             const failedIr = {
               schemaVersion: 1,
               module,
@@ -410,7 +461,7 @@ export async function materializeProjectNativeExtensionApis({ inventory, outputR
               enums: [],
               records: [],
               routes: [],
-              blockers: [blocker]
+              blockers: [blocker],
             };
             await mkdir(destination, { recursive: true });
             await writeFile(path.join(destination, "extension.ir.json"), `${JSON.stringify(failedIr, null, 2)}\n`);
@@ -426,12 +477,15 @@ export async function materializeProjectNativeExtensionApis({ inventory, outputR
               routeCount: 0,
               generatedRouteCount: 0,
               blockedRouteCount: 1,
-              blockers: [blocker]
+              blockers: [blocker],
             });
             continue;
           }
           const generatedNamespace = `${module}_${sha256(`${extension.manifestPath}\0${detail.path}\0${detail.sha256}`).slice(0, 8)}`;
-          const generated = renderNativeExtensionBindings(ir, { headerInclude: resolved.headerInclude, namespace: generatedNamespace });
+          const generated = renderNativeExtensionBindings(ir, {
+            headerInclude: resolved.headerInclude,
+            namespace: generatedNamespace,
+          });
           await mkdir(destination, { recursive: true });
           await Promise.all([
             writeFile(path.join(destination, "extension.ir.json"), `${JSON.stringify(ir, null, 2)}\n`),
@@ -439,11 +493,14 @@ export async function materializeProjectNativeExtensionApis({ inventory, outputR
             writeFile(path.join(destination, `${module}_glue.cpp`), generated.source),
             writeFile(path.join(destination, `${module}_glue.verify.cpp`), generated.verificationSource),
             writeFile(path.join(destination, `${module}_glue.verify.driver.cpp`), generated.verificationDriver),
-            writeFile(path.join(destination, `${module}_glue.verify.json`), `${JSON.stringify(generated.verification, null, 2)}\n`)
+            writeFile(
+              path.join(destination, `${module}_glue.verify.json`),
+              `${JSON.stringify(generated.verification, null, 2)}\n`,
+            ),
           ]);
           const blockers = [
             ...(ir.blockers ?? []),
-            ...ir.routes.flatMap((route) => route.blockers.map((code) => ({ stableId: route.stableId, code })))
+            ...ir.routes.flatMap((route) => route.blockers.map((code) => ({ stableId: route.stableId, code }))),
           ];
           if (!ir.routes.length && !blockers.length) blockers.push({ code: "no-public-functions" });
           headers.push({
@@ -458,9 +515,12 @@ export async function materializeProjectNativeExtensionApis({ inventory, outputR
             output: path.posix.join(defoldRevision, generationKey, leaf),
             routeCount: ir.routes.length,
             generatedRouteCount: generated.generatedRouteCount,
-            blockedRouteCount: generated.blockedRouteCount + (ir.blockers?.length ?? 0) + (!ir.routes.length && !(ir.blockers?.length) ? 1 : 0),
+            blockedRouteCount:
+              generated.blockedRouteCount +
+              (ir.blockers?.length ?? 0) +
+              (!ir.routes.length && !ir.blockers?.length ? 1 : 0),
             blockers,
-            verificationManifestSha256: generated.verification.manifestSha256
+            verificationManifestSha256: generated.verification.manifestSha256,
           });
         } finally {
           await resolved?.cleanup();
@@ -481,7 +541,7 @@ export async function materializeProjectNativeExtensionApis({ inventory, outputR
       ignoredHeaders,
       nativeModuleCount: nativeModules.length,
       nativeModules,
-      headers
+      headers,
     };
     await writeFile(path.join(keyedRoot, "report.json"), `${JSON.stringify(report, null, 2)}\n`);
     const treeSha256 = await directoryDigest(keyedRoot);

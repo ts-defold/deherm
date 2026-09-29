@@ -29,7 +29,7 @@ import {
   collectUserTypes,
   compareText,
   documentedNameOf,
-  interpretRegistrations
+  interpretRegistrations,
 } from "./lib/lua-c-registration.mjs";
 import { deriveConstantValues } from "./lib/defold-constant-values.mjs";
 
@@ -136,9 +136,13 @@ async function collectArchiveTarget(target) {
     filter(file) {
       if (file.name.endsWith("/")) return false;
       listing.push(file.name);
-      return SOURCE_EXTENSIONS.test(file.name) || HEADER_EXTENSIONS.test(file.name) ||
-        file.name.endsWith(".script_api") || posix.basename(file.name) === "ext.manifest";
-    }
+      return (
+        SOURCE_EXTENSIONS.test(file.name) ||
+        HEADER_EXTENSIONS.test(file.name) ||
+        file.name.endsWith(".script_api") ||
+        posix.basename(file.name) === "ext.manifest"
+      );
+    },
   });
   const prefix = target.archiveRoot ?? "";
   const sources = [];
@@ -171,9 +175,9 @@ function declaredFromScriptIr(value) {
       parameters: entry.parameters.map((parameter) => ({
         name: parameter.rawName,
         optional: Boolean(parameter.optional),
-        type: parameter.rawType ?? null
+        type: parameter.rawType ?? null,
       })),
-      returns: entry.returns?.length ?? 0
+      returns: entry.returns?.length ?? 0,
     });
   }
   return rows;
@@ -200,7 +204,11 @@ function declaredFromScriptApi(declarations, diagnostics) {
       continue;
     }
     if (!Array.isArray(parsed)) {
-      diagnostics.push({ code: "script-api-not-a-sequence", path: file.path, detail: "expected a top-level YAML sequence" });
+      diagnostics.push({
+        code: "script-api-not-a-sequence",
+        path: file.path,
+        detail: "expected a top-level YAML sequence",
+      });
       continue;
     }
     for (const module of parsed) {
@@ -221,9 +229,13 @@ function declaredFromScriptApi(declarations, diagnostics) {
             name: marker ? marker[1] : raw,
             optional: declaredOptional || (marker ? marker[2] === "optional" : false),
             optionalitySpelling: marker
-              ? (marker[2] === "optional" ? "trailing-optional-marker" : `unrecognized-name-marker:${marker[2]}`)
-              : declaredOptional ? "optional-key" : "required",
-            type: normalizeDeclaredType(parameter?.type)
+              ? marker[2] === "optional"
+                ? "trailing-optional-marker"
+                : `unrecognized-name-marker:${marker[2]}`
+              : declaredOptional
+                ? "optional-key"
+                : "required",
+            type: normalizeDeclaredType(parameter?.type),
           };
         });
         rows.push({
@@ -234,7 +246,7 @@ function declaredFromScriptApi(declarations, diagnostics) {
           declaredType,
           missingFunctionType: declaredType !== "function" && hasCallShape,
           parameters,
-          returns: (member.returns ?? []).length
+          returns: (member.returns ?? []).length,
         });
       }
     }
@@ -266,31 +278,47 @@ const DECLARED_TYPE_ALIASES = Object.freeze({
   string: "string",
   number: "number",
   boolean: "boolean",
-  "function": "function",
+  function: "function",
   func: "function",
   nil: "nil",
   any: null,
   userdata: "userdata",
   matrix4: "matrix4",
   vector3: "vector3",
-  vector4: "vector4"
+  vector4: "vector4",
 });
 
 const DERIVED_TYPE_VOCABULARY = new Set([
-  "number", "string", "boolean", "table", "function", "userdata", "nil", "thread",
-  "hash", "url", "buffer", "vector3", "vector4", "quat", "matrix4"
+  "number",
+  "string",
+  "boolean",
+  "table",
+  "function",
+  "userdata",
+  "nil",
+  "thread",
+  "hash",
+  "url",
+  "buffer",
+  "vector3",
+  "vector4",
+  "quat",
+  "matrix4",
 ]);
 
 function splitDeclaredType(raw) {
   if (!raw) return null;
-  return String(raw).split("|").map((part) => part.trim().toLowerCase().replace(/\[\]$/, "")).filter(Boolean);
+  return String(raw)
+    .split("|")
+    .map((part) => part.trim().toLowerCase().replace(/\[\]$/, ""))
+    .filter(Boolean);
 }
 
 function mapAtom(token) {
   // A documented `T[]` is a Lua sequence, which reaches C as a table.
-  if (/\[\]$/.test(token)) return "table";
+  if (token.endsWith("[]")) return "table";
   if (Object.hasOwn(DECLARED_TYPE_ALIASES, token)) return DECLARED_TYPE_ALIASES[token];
-  if (/^fun\(/.test(token)) return "function";
+  if (token.startsWith("fun(")) return "function";
   if (/^table[<(]/.test(token)) return "table";
   return undefined;
 }
@@ -313,9 +341,14 @@ function compareParameterType(declaredRaw, derivedTypes) {
   const derivedMapped = [...derivedSet].map((token) => ({ token, mapped: mapAtom(token) ?? token }));
   const unconstrained = declaredMapped.find((item) => item.mapped === null);
   if (unconstrained) return { verdict: "undecided", reason: "declared-type-is-unconstrained" };
-  const unmappedDeclared = declaredMapped.filter((item) => item.mapped === undefined).map((item) => item.token).sort(compareText);
+  const unmappedDeclared = declaredMapped
+    .filter((item) => item.mapped === undefined)
+    .map((item) => item.token)
+    .sort(compareText);
   const unmappedDerived = derivedMapped
-    .filter((item) => !DERIVED_TYPE_VOCABULARY.has(item.mapped)).map((item) => item.token).sort(compareText);
+    .filter((item) => !DERIVED_TYPE_VOCABULARY.has(item.mapped))
+    .map((item) => item.token)
+    .sort(compareText);
   if (unmappedDeclared.length) return { verdict: "undecided", reason: `unmapped-declared-type:${unmappedDeclared[0]}` };
   if (unmappedDerived.length) return { verdict: "undecided", reason: `unmapped-derived-type:${unmappedDerived[0]}` };
   const declaredPrimitives = new Set(declaredMapped.map((item) => item.mapped));
@@ -326,7 +359,10 @@ function compareParameterType(declaredRaw, derivedTypes) {
     return { verdict: "agree", reason: null };
   }
   if (overlap.length) {
-    return { verdict: "agree-partially", reason: `declared=${render(declaredPrimitives)} derived=${render(derivedPrimitives)}` };
+    return {
+      verdict: "agree-partially",
+      reason: `declared=${render(declaredPrimitives)} derived=${render(derivedPrimitives)}`,
+    };
   }
   return { verdict: "disagree", reason: `declared=${render(declaredPrimitives)} derived=${render(derivedPrimitives)}` };
 }
@@ -354,7 +390,7 @@ function registeredRoutes(interpretation, project, helpers, blockers) {
         module,
         member: entry.name,
         cFunction: entry.cFunction,
-        registration: { path: entry.path, line: entry.line, array: entry.array, guard: entry.guard ?? null }
+        registration: { path: entry.path, line: entry.line, array: entry.array, guard: entry.guard ?? null },
       };
       if (definitions.length !== 1) {
         blockers.push({
@@ -364,7 +400,7 @@ function registeredRoutes(interpretation, project, helpers, blockers) {
           line: entry.line,
           detail: definitions.length
             ? `'${symbol}' has ${definitions.length} definitions: ${definitions.map((item) => `${item.path}:${item.line}`).join(", ")}`
-            : `'${symbol}' has no visible definition, so its arity and argument types cannot be derived`
+            : `'${symbol}' has no visible definition, so its arity and argument types cannot be derived`,
         });
         route.body = null;
         routes.push(route);
@@ -380,7 +416,13 @@ function registeredRoutes(interpretation, project, helpers, blockers) {
       const analysis = analyzeFunctionBody(definitions[0], helpers, project);
       route.body = analysis;
       for (const item of analysis.undecided) {
-        blockers.push({ code: item.code, route: fullName, path: analysis.path, line: analysis.line, detail: item.detail });
+        blockers.push({
+          code: item.code,
+          route: fullName,
+          path: analysis.path,
+          line: analysis.line,
+          detail: item.detail,
+        });
       }
       if (!analysis.results.decided) {
         blockers.push({
@@ -388,7 +430,7 @@ function registeredRoutes(interpretation, project, helpers, blockers) {
           route: fullName,
           path: analysis.path,
           line: analysis.line,
-          detail: analysis.results.reason
+          detail: analysis.results.reason,
         });
       }
       for (const parameter of analysis.parameters) {
@@ -398,16 +440,33 @@ function registeredRoutes(interpretation, project, helpers, blockers) {
           route: fullName,
           path: analysis.path,
           line: analysis.line,
-          detail: `argument ${parameter.index} is inside the derived arity but no recognised stack accessor reads it`
+          detail: `argument ${parameter.index} is inside the derived arity but no recognised stack accessor reads it`,
         });
       }
       routes.push(route);
     }
     for (const entry of record.constants) {
-      constants.push({ name: module ? `${module}.${entry.name}` : entry.name, module, member: entry.name, valueKind: entry.valueKind, expression: entry.expression, path: entry.path, line: entry.line });
+      constants.push({
+        name: module ? `${module}.${entry.name}` : entry.name,
+        module,
+        member: entry.name,
+        valueKind: entry.valueKind,
+        expression: entry.expression,
+        path: entry.path,
+        line: entry.line,
+      });
     }
     for (const entry of record.commentedOut ?? []) {
-      commentedOut.push({ name: module ? `${module}.${entry.name}` : entry.name, module, member: entry.name, cFunction: entry.cFunction, array: entry.array, path: entry.path, line: entry.line, evidence: entry.evidence });
+      commentedOut.push({
+        name: module ? `${module}.${entry.name}` : entry.name,
+        module,
+        member: entry.name,
+        cFunction: entry.cFunction,
+        array: entry.array,
+        path: entry.path,
+        line: entry.line,
+        evidence: entry.evidence,
+      });
     }
   }
   routes.sort((left, right) => compareText(left.name, right.name));
@@ -435,7 +494,7 @@ function classifyOptionality(declaredParameter, derivedParameter) {
         classification: "branch-dependent-requirement",
         defect: "undecided",
         severity: "undecided",
-        correction: "none"
+        correction: "none",
       };
     }
     // The documentation permits a call the engine refuses. A binding that
@@ -445,7 +504,7 @@ function classifyOptionality(declaredParameter, derivedParameter) {
       classification: "documentation-permits-refused-call",
       defect: "declaration",
       severity: "blocking",
-      correction: "require-slot"
+      correction: "require-slot",
     };
   }
   if (derivedParameter.evidence === "defaulted") {
@@ -456,7 +515,7 @@ function classifyOptionality(declaredParameter, derivedParameter) {
       classification: "documentation-withholds-default",
       defect: "declaration",
       severity: "advisory",
-      correction: "relax-slot"
+      correction: "relax-slot",
     };
   }
   // The slot is read with a non-raising accessor or behind an explicit presence
@@ -465,12 +524,11 @@ function classifyOptionality(declaredParameter, derivedParameter) {
   // safer contract and following it emits no call the engine rejects, so this is
   // engine laxity to report rather than a signature to change.
   return {
-    classification: derivedParameter.evidence === "presence-guarded"
-      ? "engine-guards-omission"
-      : "engine-tolerates-omission",
+    classification:
+      derivedParameter.evidence === "presence-guarded" ? "engine-guards-omission" : "engine-tolerates-omission",
     defect: "neither",
     severity: "advisory",
-    correction: "none"
+    correction: "none",
   };
 }
 
@@ -485,7 +543,7 @@ function diffRoute(registered, declared) {
   const slots = Math.max(declaredCount, analysis ? analysis.arity.max : 0);
   for (let index = 0; index < slots; index += 1) {
     const declaredParameter = declared.parameters[index] ?? null;
-    const derivedParameter = analysis ? analysis.parameters[index] ?? null : null;
+    const derivedParameter = analysis ? (analysis.parameters[index] ?? null) : null;
     if (!declaredParameter) {
       parameters.push({ index: index + 1, declared: null, derived: derivedParameter, verdict: "registered-only" });
       disagreements += 1;
@@ -500,40 +558,53 @@ function diffRoute(registered, declared) {
         declared: declaredParameter,
         derived: null,
         verdict: decidable ? "declared-only" : "undecided",
-        reason: analysis ? (decidable ? null : "undecided-stack-index") : "no-body-analysis"
+        reason: analysis ? (decidable ? null : "undecided-stack-index") : "no-body-analysis",
       });
-      if (decidable) disagreements += 1; else undecided += 1;
+      if (decidable) disagreements += 1;
+      else undecided += 1;
       continue;
     }
     const type = compareParameterType(declaredParameter.type, derivedParameter.types);
-    const optionalityVerdict = derivedParameter.optional === null
-      ? { verdict: "undecided", reason: "no-stack-access" }
-      : derivedParameter.optional === declaredParameter.optional
-        ? { verdict: "agree", reason: null }
-        : (() => {
-          const classified = classifyOptionality(declaredParameter, derivedParameter);
-          return {
-            // A conditional requirement is not a disagreement: the parse could
-            // not decide whether the engine refuses the omission.
-            verdict: classified.severity === "undecided" ? "undecided" : "disagree",
-            reason: `declared ${declaredParameter.optional ? "optional" : "required"}, derived ${derivedParameter.optional ? "optional" : "required"} from ${derivedParameter.evidence} accessor ${derivedParameter.accessors.join(",") || "<none>"}`,
-            ...classified
-          };
-        })();
-    const verdict = type.verdict === "disagree" || optionalityVerdict.verdict === "disagree"
-      ? "disagree"
-      : type.verdict === "undecided" || optionalityVerdict.verdict === "undecided"
-        ? "undecided"
-        : type.verdict;
+    const optionalityVerdict =
+      derivedParameter.optional === null
+        ? { verdict: "undecided", reason: "no-stack-access" }
+        : derivedParameter.optional === declaredParameter.optional
+          ? { verdict: "agree", reason: null }
+          : (() => {
+              const classified = classifyOptionality(declaredParameter, derivedParameter);
+              return {
+                // A conditional requirement is not a disagreement: the parse could
+                // not decide whether the engine refuses the omission.
+                verdict: classified.severity === "undecided" ? "undecided" : "disagree",
+                reason: `declared ${declaredParameter.optional ? "optional" : "required"}, derived ${derivedParameter.optional ? "optional" : "required"} from ${derivedParameter.evidence} accessor ${derivedParameter.accessors.join(",") || "<none>"}`,
+                ...classified,
+              };
+            })();
+    const verdict =
+      type.verdict === "disagree" || optionalityVerdict.verdict === "disagree"
+        ? "disagree"
+        : type.verdict === "undecided" || optionalityVerdict.verdict === "undecided"
+          ? "undecided"
+          : type.verdict;
     if (verdict === "disagree") disagreements += 1;
     if (verdict === "undecided") undecided += 1;
     parameters.push({
       index: index + 1,
-      declared: { name: declaredParameter.name, optional: declaredParameter.optional, type: declaredParameter.type, optionalitySpelling: declaredParameter.optionalitySpelling ?? null },
-      derived: { optional: derivedParameter.optional, types: derivedParameter.types, accessors: derivedParameter.accessors, evidence: derivedParameter.evidence },
+      declared: {
+        name: declaredParameter.name,
+        optional: declaredParameter.optional,
+        type: declaredParameter.type,
+        optionalitySpelling: declaredParameter.optionalitySpelling ?? null,
+      },
+      derived: {
+        optional: derivedParameter.optional,
+        types: derivedParameter.types,
+        accessors: derivedParameter.accessors,
+        evidence: derivedParameter.evidence,
+      },
       type: type,
       optionality: optionalityVerdict,
-      verdict
+      verdict,
     });
   }
   const declaredMinimum = declared.parameters.filter((parameter) => !parameter.optional).length;
@@ -551,15 +622,23 @@ function diffRoute(registered, declared) {
   };
   const arity = analysis
     ? { derived: analysis.arity, declaredMinimum, declaredMaximum: declaredCount, ...arityVerdict() }
-    : { derived: null, declaredMinimum, declaredMaximum: declaredCount, verdict: "undecided", reason: "no-body-analysis" };
+    : {
+        derived: null,
+        declaredMinimum,
+        declaredMaximum: declaredCount,
+        verdict: "undecided",
+        reason: "no-body-analysis",
+      };
   const results = analysis
     ? {
-      derived: analysis.results.decided ? { min: analysis.results.min, max: analysis.results.max } : null,
-      declared: declared.returns,
-      verdict: !analysis.results.decided
-        ? "undecided"
-        : analysis.results.min === declared.returns && analysis.results.max === declared.returns ? "agree" : "disagree"
-    }
+        derived: analysis.results.decided ? { min: analysis.results.min, max: analysis.results.max } : null,
+        declared: declared.returns,
+        verdict: !analysis.results.decided
+          ? "undecided"
+          : analysis.results.min === declared.returns && analysis.results.max === declared.returns
+            ? "agree"
+            : "disagree",
+      }
     : { derived: null, declared: declared.returns, verdict: "undecided" };
   const verdict = !analysis
     ? "undecided"
@@ -571,28 +650,29 @@ function diffRoute(registered, declared) {
   return { parameters, arity, results, verdict, disagreements, undecided };
 }
 
-async function analyzeTarget(target, policy) {
-  const collected = target.kind === "dependency-archive"
-    ? await collectArchiveTarget(target)
-    : await collectDirectoryTarget(target);
+async function analyzeTarget(target) {
+  const collected =
+    target.kind === "dependency-archive" ? await collectArchiveTarget(target) : await collectDirectoryTarget(target);
 
   const provenance = {
     root: target.root ?? null,
     archive: target.archive ?? null,
     archiveSha256: collected.archiveSha256 ?? null,
     archiveEntries: target.kind === "dependency-archive" ? collected.listing : null,
-    declaredSurface: target.declared.kind === "script-ir" ? target.declared.path : collected.declarations.map((item) => item.path),
+    declaredSurface:
+      target.declared.kind === "script-ir" ? target.declared.path : collected.declarations.map((item) => item.path),
     sourceSha256: sha256(JSON.stringify(collected.sources.map((item) => [item.path, sha256(item.text)]))),
-    variantExclusions: (target.excludeVariants ?? []).map((item) => ({ path: item.path, reason: item.reason }))
+    variantExclusions: (target.excludeVariants ?? []).map((item) => ({ path: item.path, reason: item.reason })),
   };
 
   if (collected.sources.length === 0) {
     // Fail closed. A target that ships a declaration but no implementation
     // cannot be verified at all, and saying nothing would read as agreement.
     const declarationDiagnostics = [];
-    const declaredRows = target.declared.kind === "script-api"
-      ? declaredFromScriptApi(collected.declarations, declarationDiagnostics)
-      : [];
+    const declaredRows =
+      target.declared.kind === "script-api"
+        ? declaredFromScriptApi(collected.declarations, declarationDiagnostics)
+        : [];
     return {
       id: target.id,
       kind: target.kind,
@@ -603,7 +683,7 @@ async function analyzeTarget(target, policy) {
         headerFiles: collected.headers.length,
         declaredRoutes: declaredRows.length,
         registeredRoutes: null,
-        verified: false
+        verified: false,
       },
       blockerHistogram: { "no-native-source-in-target": 1 },
       namespaces: {},
@@ -614,16 +694,22 @@ async function analyzeTarget(target, policy) {
       registeredButUndeclared: [],
       registeredConstants: [],
       commentedOutRegistrations: [],
-      unverifiedDeclarations: declaredRows.map((row) => ({ name: row.name, source: row.source, missingFunctionType: row.missingFunctionType ?? false })),
-      blockers: [{
-        code: "no-native-source-in-target",
-        route: null,
-        path: target.root ?? target.archive ?? target.id,
-        line: 0,
-        detail: `${collected.declarations.length} .script_api declaration file(s) but no C/C++ implementation, so the registered surface cannot be derived and the declaration cannot be verified`
-      }],
+      unverifiedDeclarations: declaredRows.map((row) => ({
+        name: row.name,
+        source: row.source,
+        missingFunctionType: row.missingFunctionType ?? false,
+      })),
+      blockers: [
+        {
+          code: "no-native-source-in-target",
+          route: null,
+          path: target.root ?? target.archive ?? target.id,
+          line: 0,
+          detail: `${collected.declarations.length} .script_api declaration file(s) but no C/C++ implementation, so the registered surface cannot be derived and the declaration cannot be verified`,
+        },
+      ],
       diagnostics: declarationDiagnostics,
-      policyNotes: target.notes ?? null
+      policyNotes: target.notes ?? null,
     };
   }
 
@@ -651,7 +737,7 @@ async function analyzeTarget(target, policy) {
   // wrapper such as Box2D's CheckBody resolves to the user type it checks.
   const helpers = collectBodyDerivedHelpers(project, declaredHelpers, userTypes);
   const interpretation = interpretRegistrations(project);
-  const blockers = [...interpretation.blockers.map((item) => ({ ...item, route: null }))];
+  const blockers = interpretation.blockers.map((item) => ({ ...item, route: null }));
   for (const file of project.files) for (const item of file.blockers) blockers.push({ ...item, route: null });
   const { routes, constants, commentedOut } = registeredRoutes(interpretation, project, helpers, blockers);
   const constantValues = deriveConstantValues([...collected.sources, ...collected.headers], constants);
@@ -687,7 +773,7 @@ async function analyzeTarget(target, policy) {
         route: route.name,
         path: route.registration.path,
         line: route.registration.line,
-        detail: "the same fully-qualified name is registered more than once"
+        detail: "the same fully-qualified name is registered more than once",
       });
       continue;
     }
@@ -709,7 +795,7 @@ async function analyzeTarget(target, policy) {
         // registered spelling, this row is the callable half of a documented
         // name that is not.
         documentedName: route.documentedName ?? null,
-        derivedArity: route.body?.arity ?? null
+        derivedArity: route.body?.arity ?? null,
       });
       continue;
     }
@@ -719,8 +805,13 @@ async function analyzeTarget(target, policy) {
       cFunction: route.cFunction,
       registration: route.registration,
       documentedName: route.documentedName ?? null,
-      declaration: { source: declaration.source, parameters: declaration.parameters.length, returns: declaration.returns, missingFunctionType: declaration.missingFunctionType ?? false },
-      ...diffRoute(route, declaration)
+      declaration: {
+        source: declaration.source,
+        parameters: declaration.parameters.length,
+        returns: declaration.returns,
+        missingFunctionType: declaration.missingFunctionType ?? false,
+      },
+      ...diffRoute(route, declaration),
     });
   }
   comparisons.sort((left, right) => compareText(left.name, right.name));
@@ -735,7 +826,7 @@ async function analyzeTarget(target, policy) {
       source: row.source,
       moduleIsRegistered: [...registeredByName.keys()].some((name) => name.startsWith(`${row.module}.`)),
       // A commented-out registration entry is positive evidence of absence.
-      commentedOutRegistration: commentedByName.get(row.name) ?? null
+      commentedOutRegistration: commentedByName.get(row.name) ?? null,
     }))
     .sort((left, right) => compareText(left.name, right.name));
 
@@ -747,15 +838,19 @@ async function analyzeTarget(target, policy) {
         route: row.name,
         path: row.source,
         line: 0,
-        detail: `no registration array in this target registers any member of '${row.module}'`
+        detail: `no registration array in this target registers any member of '${row.module}'`,
       });
     }
   }
 
-  blockers.sort((left, right) =>
-    compareText(left.code, right.code) || compareText(left.route ?? "", right.route ?? "") ||
-    compareText(left.path ?? "", right.path ?? "") || (left.line ?? 0) - (right.line ?? 0) ||
-    compareText(left.detail ?? "", right.detail ?? ""));
+  blockers.sort(
+    (left, right) =>
+      compareText(left.code, right.code) ||
+      compareText(left.route ?? "", right.route ?? "") ||
+      compareText(left.path ?? "", right.path ?? "") ||
+      (left.line ?? 0) - (right.line ?? 0) ||
+      compareText(left.detail ?? "", right.detail ?? ""),
+  );
 
   const inDeclaredModules = (route) => declaredModules.has(route.module);
   const summary = {
@@ -780,25 +875,38 @@ async function analyzeTarget(target, policy) {
     registeredButUndeclared: registeredButUndeclared.length,
     registeredButUndeclaredInDeclaredNamespaces: registeredButUndeclared.filter((item) => item.inDeclaredModule).length,
     parameterSlotsCompared: comparisons.reduce((count, item) => count + item.parameters.length, 0),
-    parameterSlotsDisagreeing: comparisons.reduce((count, item) =>
-      count + item.parameters.filter((parameter) => parameter.verdict === "disagree" || parameter.verdict === "registered-only" || parameter.verdict === "declared-only").length, 0),
-    parameterSlotsUndecided: comparisons.reduce((count, item) =>
-      count + item.parameters.filter((parameter) => parameter.verdict === "undecided").length, 0),
+    parameterSlotsDisagreeing: comparisons.reduce(
+      (count, item) =>
+        count +
+        item.parameters.filter(
+          (parameter) =>
+            parameter.verdict === "disagree" ||
+            parameter.verdict === "registered-only" ||
+            parameter.verdict === "declared-only",
+        ).length,
+      0,
+    ),
+    parameterSlotsUndecided: comparisons.reduce(
+      (count, item) => count + item.parameters.filter((parameter) => parameter.verdict === "undecided").length,
+      0,
+    ),
     blockers: blockers.length,
-    blockedRoutes: new Set(blockers.map((item) => item.route).filter(Boolean)).size
+    blockedRoutes: new Set(blockers.map((item) => item.route).filter(Boolean)).size,
   };
 
   const blockerHistogram = {};
   for (const blocker of blockers) blockerHistogram[blocker.code] = (blockerHistogram[blocker.code] ?? 0) + 1;
 
   const namespaces = {};
-  for (const [module, record] of [...interpretation.modules.entries()].sort(([left], [right]) => compareText(left, right))) {
+  for (const [module, record] of [...interpretation.modules.entries()].sort(([left], [right]) =>
+    compareText(left, right),
+  )) {
     namespaces[module || "<globals>"] = {
       declared: declaredModules.has(module),
       registeredRoutes: record.functions.length,
       registeredConstants: record.constants.length,
       commentedOutRegistrations: (record.commentedOut ?? []).length,
-      declaredRoutes: declared.filter((row) => row.module === module).length
+      declaredRoutes: declared.filter((row) => row.module === module).length,
     };
   }
   for (const module of [...declaredModules].sort(compareText)) {
@@ -809,7 +917,7 @@ async function analyzeTarget(target, policy) {
       registeredRoutes: 0,
       registeredConstants: 0,
       commentedOutRegistrations: 0,
-      declaredRoutes: declared.filter((row) => row.module === module).length
+      declaredRoutes: declared.filter((row) => row.module === module).length,
     };
   }
 
@@ -829,8 +937,10 @@ async function analyzeTarget(target, policy) {
     registeredConstants: constants,
     commentedOutRegistrations: commentedOut,
     blockers,
-    diagnostics: diagnostics.sort((left, right) => compareText(left.code, right.code) || compareText(left.path, right.path)),
-    policyNotes: target.notes ?? null
+    diagnostics: diagnostics.sort(
+      (left, right) => compareText(left.code, right.code) || compareText(left.path, right.path),
+    ),
+    policyNotes: target.notes ?? null,
   };
 }
 
@@ -869,13 +979,14 @@ export function buildRouteAuthority(targets, engineTargetIds) {
     });
     const registered = targetStates.filter((state) => state === "registered").length;
     const positivelyUnavailable = targetStates.filter((state) => state === "positively-unavailable").length;
-    const state = registered === targetStates.length
-      ? "registered"
-      : registered > 0
-        ? "target-variant"
-        : positivelyUnavailable > 0
-          ? "positive-unavailability-observed"
-          : "documentation-only";
+    const state =
+      registered === targetStates.length
+        ? "registered"
+        : registered > 0
+          ? "target-variant"
+          : positivelyUnavailable > 0
+            ? "positive-unavailability-observed"
+            : "documentation-only";
     // Detailed paths/functions remain in the content-addressed source report.
     // The gate carries only the compact decision plus states aligned with
     // `engineTargets`, avoiding a second copy of the complete source evidence.
@@ -913,8 +1024,8 @@ export function buildGate(targets, engineTargetIds) {
           target: id,
           documentedAt: `${row.registration.path}:${documented.line}`,
           registeredAt: `${row.registration.path}:${row.registration.line}`,
-          registrationArray: row.registration.array
-        }
+          registrationArray: row.registration.array,
+        },
       });
     }
 
@@ -933,8 +1044,8 @@ export function buildGate(targets, engineTargetIds) {
           target: id,
           documentedAt: row.source,
           registeredAt: `${commented.path}:${commented.line}`,
-          registrationArray: commented.array
-        }
+          registrationArray: commented.array,
+        },
       });
     }
 
@@ -955,8 +1066,8 @@ export function buildGate(targets, engineTargetIds) {
             target: id,
             documentedAt: route.declaration.source,
             registeredAt: `${route.registration.path}:${route.registration.line}`,
-            accessors: parameter.derived?.accessors ?? []
-          }
+            accessors: parameter.derived?.accessors ?? [],
+          },
         });
       }
     }
@@ -971,10 +1082,12 @@ export function buildGate(targets, engineTargetIds) {
     if (!agreeing) continue;
     findings.push({ ...finding, evidence: [finding.evidence, ...rest.map((other) => other.get(key).evidence)] });
   }
-  findings.sort((left, right) =>
-    compareText(left.route, right.route) ||
-    (left.parameter?.index ?? 0) - (right.parameter?.index ?? 0) ||
-    compareText(left.kind, right.kind));
+  findings.sort(
+    (left, right) =>
+      compareText(left.route, right.route) ||
+      (left.parameter?.index ?? 0) - (right.parameter?.index ?? 0) ||
+      compareText(left.kind, right.kind),
+  );
 
   const countBy = (selector) => {
     const counts = {};
@@ -987,15 +1100,21 @@ export function buildGate(targets, engineTargetIds) {
     routeAuthority,
     counts: {
       findings: findings.length,
-      routesRemapped: new Set(findings.filter((item) => item.action === "use-registered-name").map((item) => item.route)).size,
-      routesSourceUnavailable: new Set(findings.filter((item) => item.action === "mark-source-unavailable").map((item) => item.route)).size,
+      routesRemapped: new Set(
+        findings.filter((item) => item.action === "use-registered-name").map((item) => item.route),
+      ).size,
+      routesSourceUnavailable: new Set(
+        findings.filter((item) => item.action === "mark-source-unavailable").map((item) => item.route),
+      ).size,
       parametersCorrected: findings.filter((item) => item.action === "require-parameter").length,
       byKind: countBy((item) => item.kind),
       byAction: countBy((item) => item.action),
-      authority: Object.fromEntries([...new Set(routeAuthority.map(({ state }) => state))]
-        .sort(compareText)
-        .map((state) => [state, routeAuthority.filter((route) => route.state === state).length]))
-    }
+      authority: Object.fromEntries(
+        [...new Set(routeAuthority.map(({ state }) => state))]
+          .sort(compareText)
+          .map((state) => [state, routeAuthority.filter((route) => route.state === state).length]),
+      ),
+    },
   };
 }
 
@@ -1016,13 +1135,13 @@ export async function generateLuaRegistrationSurface(options) {
     input: options.policy,
     reviewed: policy.defoldRevision,
     derived: defoldRevision,
-    detail: "the reviewed registration-surface targets and their source roots"
+    detail: "the reviewed registration-surface targets and their source roots",
   });
 
   const targets = {};
   for (const target of policy.targets) {
     if (options.only && target.id !== options.only) continue;
-    targets[target.id] = await analyzeTarget(target, policy);
+    targets[target.id] = await analyzeTarget(target);
   }
   assert(Object.keys(targets).length, `no target matched${options.only ? ` '${options.only}'` : ""}`);
 
@@ -1036,11 +1155,12 @@ export async function generateLuaRegistrationSurface(options) {
     contract: {
       groundTruth: "The Lua C API registration arrays and the C function bodies that read the Lua stack.",
       declaredSurface: "The `.script_api` declaration, or the pinned script API IR for the engine.",
-      failClosed: "A C construct the parser cannot decide is recorded in `blockers` with its reason and never counted as agreement."
+      failClosed:
+        "A C construct the parser cannot decide is recorded in `blockers` with its reason and never counted as agreement.",
     },
     inputEvidence: { policy: options.policy, policySha256: sha256(policyText) },
     totals,
-    targets
+    targets,
   };
   const surface = `${JSON.stringify(report, null, 2)}\n`;
 
@@ -1063,23 +1183,29 @@ export async function generateLuaRegistrationSurface(options) {
     .filter(([, target]) => target.kind === "engine-tree" && target.status === "verified")
     .map(([id]) => id)
     .sort(compareText);
-  const gated = engineTargetIds.length ? buildGate(targets, engineTargetIds) : { findings: [], routeAuthority: [], counts: null };
+  const gated = engineTargetIds.length
+    ? buildGate(targets, engineTargetIds)
+    : { findings: [], routeAuthority: [], counts: null };
   const gate = {
     schemaVersion: 1,
     generator: "scripts/generate-lua-registration-surface.mjs",
     defoldRevision,
-    scope: "A total authority ledger for every documented engine route plus the source-backed corrections a downstream generator may act on. Positive C registration is distinct from unresolved absence and documentation-only declaration.",
+    scope:
+      "A total authority ledger for every documented engine route plus the source-backed corrections a downstream generator may act on. Positive C registration is distinct from unresolved absence and documentation-only declaration.",
     actions: {
-      "use-registered-name": "The engine source registers this function under a different name. Emit the documented TypeScript surface and dispatch it through the registered source name.",
-      "mark-source-unavailable": "Positive source evidence says this route is not registered in every selected engine variant. Keep the API and machinery emitted, but mark the affected profile unavailable.",
-      "require-parameter": "The documented parameter is optional but the C body refuses its omission on every path. A generated signature must mark it required, or block the route."
+      "use-registered-name":
+        "The engine source registers this function under a different name. Emit the documented TypeScript surface and dispatch it through the registered source name.",
+      "mark-source-unavailable":
+        "Positive source evidence says this route is not registered in every selected engine variant. Keep the API and machinery emitted, but mark the affected profile unavailable.",
+      "require-parameter":
+        "The documented parameter is optional but the C body refuses its omission on every path. A generated signature must mark it required, or block the route.",
     },
     sourceReport: defaultOutput,
     sourceReportSha256: sha256(`${JSON.stringify(gateSourceReport, null, 2)}\n`),
     engineTargets: engineTargetIds,
     counts: gated.counts,
     routeAuthority: gated.routeAuthority,
-    findings: gated.findings
+    findings: gated.findings,
   };
   return { surface, gate: `${JSON.stringify(gate, null, 2)}\n` };
 }
@@ -1087,7 +1213,10 @@ export async function generateLuaRegistrationSurface(options) {
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const options = parseArgs(process.argv.slice(2));
   const generated = await generateLuaRegistrationSurface(options);
-  const outputs = [[defaultOutput, generated.surface], [gateOutput, generated.gate]];
+  const outputs = [
+    [defaultOutput, generated.surface],
+    [gateOutput, generated.gate],
+  ];
   for (const [relativePath, text] of outputs) {
     const destination = join(options.outRoot, relativePath);
     if (options.check) {

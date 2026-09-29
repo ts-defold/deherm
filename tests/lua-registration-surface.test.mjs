@@ -13,7 +13,7 @@ import {
   collectBodyDerivedHelpers,
   collectSdkStackHelpers,
   collectUserTypes,
-  interpretRegistrations
+  interpretRegistrations,
 } from "../scripts/lib/lua-c-registration.mjs";
 import { luaRegistrationSurfaceGenerator } from "../scripts/lib/script-generator-pipeline.mjs";
 import { buildRouteAuthority } from "../scripts/generate-lua-registration-surface.mjs";
@@ -22,8 +22,9 @@ import { materializeIngestionProject } from "./fixtures/defold-extension-ingesti
 const execFileAsync = promisify(execFile);
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const reportPath = path.join(repositoryRoot, luaRegistrationSurfaceGenerator.artifacts[0]);
-const pinnedDefoldRevision = (await readFile(path.join(repositoryRoot, "upstream.lock"), "utf8"))
-  .match(/^DEFOLD_REV=(.+)$/m)?.[1];
+const pinnedDefoldRevision = (await readFile(path.join(repositoryRoot, "upstream.lock"), "utf8")).match(
+  /^DEFOLD_REV=(.+)$/m,
+)?.[1];
 assert.match(pinnedDefoldRevision, /^[0-9a-f]{40}$/);
 
 async function readReport() {
@@ -49,7 +50,11 @@ test("route authority is total and only positive C registration earns registered
       routes: [registration("demo.shared", 10), registration("demo.alpha_only", 11), registration("demo.c_only", 12)],
       declaredButUnregistered: [
         { name: "demo.docs_only", source: "doc/demo.lua:1", commentedOutRegistration: null },
-        { name: "demo.disabled", source: "doc/demo.lua:2", commentedOutRegistration: { path: "engine/script.cpp", line: 20, array: "Methods" } },
+        {
+          name: "demo.disabled",
+          source: "doc/demo.lua:2",
+          commentedOutRegistration: { path: "engine/script.cpp", line: 20, array: "Methods" },
+        },
       ],
     },
     beta: {
@@ -58,18 +63,28 @@ test("route authority is total and only positive C registration earns registered
       declaredButUnregistered: [
         { name: "demo.alpha_only", source: "doc/demo.lua:3", commentedOutRegistration: null },
         { name: "demo.docs_only", source: "doc/demo.lua:1", commentedOutRegistration: null },
-        { name: "demo.disabled", source: "doc/demo.lua:2", commentedOutRegistration: { path: "engine/script.cpp", line: 40, array: "Methods" } },
+        {
+          name: "demo.disabled",
+          source: "doc/demo.lua:2",
+          commentedOutRegistration: { path: "engine/script.cpp", line: 40, array: "Methods" },
+        },
       ],
     },
   };
-  const authority = new Map(buildRouteAuthority(targets, ["alpha", "beta"])
-    .map((row) => [row.route, row]));
+  const authority = new Map(buildRouteAuthority(targets, ["alpha", "beta"]).map((row) => [row.route, row]));
   assert.equal(authority.get("demo.shared").state, "registered");
   assert.equal(authority.get("demo.alpha_only").state, "target-variant");
-  assert.equal(authority.get("demo.c_only").state, "target-variant", "C-only routes remain source-observed rather than disappearing");
+  assert.equal(
+    authority.get("demo.c_only").state,
+    "target-variant",
+    "C-only routes remain source-observed rather than disappearing",
+  );
   assert.equal(authority.get("demo.disabled").state, "positive-unavailability-observed");
   assert.equal(authority.get("demo.docs_only").state, "documentation-only");
-  assert.equal(authority.get("demo.docs_only").targetStates.every((state) => state === "unresolved"), true);
+  assert.equal(
+    authority.get("demo.docs_only").targetStates.every((state) => state === "unresolved"),
+    true,
+  );
 });
 
 test("the lane owns its generator, pinned inputs, and artifact", () => {
@@ -93,9 +108,10 @@ test("the lane owns its generator, pinned inputs, and artifact", () => {
 });
 
 test("registration namespaces come from the abstract Lua stack, not from a module list", () => {
-  const sources = [{
-    path: "src/nested.cpp",
-    text: `
+  const sources = [
+    {
+      path: "src/nested.cpp",
+      text: `
       #define LIB_NAME "demo"
       static int Root_Ping(lua_State* L) { lua_pushnumber(L, 1); return 1; }
       static int Leaf_Get(lua_State* L) {
@@ -121,25 +137,36 @@ test("registration namespaces come from the abstract Lua stack, not from a modul
         InitializeLeaf(L);
         lua_pop(L, 1);
       }
-    `
-  }];
+    `,
+    },
+  ];
   const { interpretation } = analyze(sources);
   assert.deepEqual([...interpretation.modules.keys()].sort(), ["demo", "demo.leaf"]);
-  assert.deepEqual(interpretation.modules.get("demo").functions.map((item) => item.name), ["ping"]);
-  assert.deepEqual(interpretation.modules.get("demo.leaf").functions.map((item) => item.name), ["get"]);
-  assert.deepEqual(interpretation.modules.get("demo.leaf").constants.map((item) => item.name), ["SEVEN"]);
+  assert.deepEqual(
+    interpretation.modules.get("demo").functions.map((item) => item.name),
+    ["ping"],
+  );
+  assert.deepEqual(
+    interpretation.modules.get("demo.leaf").functions.map((item) => item.name),
+    ["get"],
+  );
+  assert.deepEqual(
+    interpretation.modules.get("demo.leaf").constants.map((item) => item.name),
+    ["SEVEN"],
+  );
   // A commented-out entry is evidence of absence and must be recorded as such.
   assert.deepEqual(
     (interpretation.modules.get("demo.leaf").commentedOut ?? []).map((item) => item.name),
-    ["removed"]
+    ["removed"],
   );
   assert.deepEqual(interpretation.blockers, []);
 });
 
 test("argument arity, types, and optionality are read out of the C function body", () => {
-  const sources = [{
-    path: "src/shape.cpp",
-    text: `
+  const sources = [
+    {
+      path: "src/shape.cpp",
+      text: `
       static MapData* get_map(lua_State* L, int nArg) {
         const uint16_t id = luaL_optinteger(L, nArg, 0);
         return maps.Get(id);
@@ -162,8 +189,9 @@ test("argument arity, types, and optionality are read out of the C function body
         {"use", demo_use}, {"at", demo_at}, {0, 0}
       };
       static void Initialize(lua_State* L) { luaL_register(L, "demo", Module_methods); lua_pop(L, 1); }
-    `
-  }];
+    `,
+    },
+  ];
   const { project, helpers } = analyze(sources);
   const use = analyzeFunctionBody(project.functionsByName.get("demo_use")[0], helpers, project);
   assert.deepEqual(use.arity, { min: 0, max: 2, variadic: false, branchDependent: false });
@@ -175,7 +203,7 @@ test("argument arity, types, and optionality are read out of the C function body
     types: ["boolean"],
     accessors: ["lua_toboolean"],
     evidence: "probed",
-    requirementUnconditional: false
+    requirementUnconditional: false,
   });
   // The optional slot is typed through a helper whose own body reads it.
   assert.deepEqual(use.parameters[1].types, ["number"]);
@@ -197,22 +225,27 @@ test("a `.script_api` member without `type: function` and a trailing [optional] 
     await mkdir(path.join(root, "src"), { recursive: true });
     await mkdir(path.join(root, "api"), { recursive: true });
     await writeFile(path.join(root, "ext.manifest"), "name: demo\n");
-    await writeFile(path.join(root, "api", "demo.script_api"), [
-      "- name: demo",
-      "  type: table",
-      "  members:",
-      "    - name: use_zero",
-      "      desc: no type key at all",
-      "      parameters:",
-      "        - name: toggle",
-      "          type: boolean",
-      "        - name: map_id[optional]",
-      "          type: number",
-      "    - name: hidden_only_in_c",
-      "      type: function",
-      "      parameters: []"
-    ].join("\n"));
-    await writeFile(path.join(root, "src", "demo.cpp"), `
+    await writeFile(
+      path.join(root, "api", "demo.script_api"),
+      [
+        "- name: demo",
+        "  type: table",
+        "  members:",
+        "    - name: use_zero",
+        "      desc: no type key at all",
+        "      parameters:",
+        "        - name: toggle",
+        "          type: boolean",
+        "        - name: map_id[optional]",
+        "          type: number",
+        "    - name: hidden_only_in_c",
+        "      type: function",
+        "      parameters: []",
+      ].join("\n"),
+    );
+    await writeFile(
+      path.join(root, "src", "demo.cpp"),
+      `
       static int demo_use_zero(lua_State* L) {
         DM_LUA_STACK_CHECK(L, 0);
         bool toggle = lua_toboolean(L, 1);
@@ -225,20 +258,31 @@ test("a `.script_api` member without `type: function` and a trailing [optional] 
         {"use_zero", demo_use_zero}, {"extra", demo_extra}, {0, 0}
       };
       static void Initialize(lua_State* L) { luaL_register(L, "demo", Module_methods); lua_pop(L, 1); }
-    `);
+    `,
+    );
     const policy = path.join(workspace, "policy.json");
-    await writeFile(policy, JSON.stringify({
-      schemaVersion: 1,
-      defoldRevision: pinnedDefoldRevision,
-      targets: [{ id: "demo", kind: "extension-root", root, declared: { kind: "script-api" } }]
-    }));
-    await execFileAsync("node", [
-      path.join(repositoryRoot, "scripts/generate-lua-registration-surface.mjs"),
-      "--policy", policy,
-      "--out-root", workspace
-    ], { cwd: repositoryRoot });
-    const report = JSON.parse(await readFile(
-      path.join(workspace, luaRegistrationSurfaceGenerator.artifacts[0]), "utf8"));
+    await writeFile(
+      policy,
+      JSON.stringify({
+        schemaVersion: 1,
+        defoldRevision: pinnedDefoldRevision,
+        targets: [{ id: "demo", kind: "extension-root", root, declared: { kind: "script-api" } }],
+      }),
+    );
+    await execFileAsync(
+      "node",
+      [
+        path.join(repositoryRoot, "scripts/generate-lua-registration-surface.mjs"),
+        "--policy",
+        policy,
+        "--out-root",
+        workspace,
+      ],
+      { cwd: repositoryRoot },
+    );
+    const report = JSON.parse(
+      await readFile(path.join(workspace, luaRegistrationSurfaceGenerator.artifacts[0]), "utf8"),
+    );
     const target = report.targets.demo;
     assert.equal(target.status, "verified");
 
@@ -254,8 +298,14 @@ test("a `.script_api` member without `type: function` and a trailing [optional] 
     assert.equal(useZero.parameters[0].optionality.verdict, "disagree");
     assert.match(useZero.parameters[0].optionality.reason, /lua_toboolean/);
 
-    assert.deepEqual(target.registeredButUndeclared.map((item) => item.name), ["demo.extra"]);
-    assert.deepEqual(target.declaredButUnregistered.map((item) => item.name), ["demo.hidden_only_in_c"]);
+    assert.deepEqual(
+      target.registeredButUndeclared.map((item) => item.name),
+      ["demo.extra"],
+    );
+    assert.deepEqual(
+      target.declaredButUnregistered.map((item) => item.name),
+      ["demo.hidden_only_in_c"],
+    );
   } finally {
     await rm(workspace, { recursive: true, force: true });
   }
@@ -266,33 +316,48 @@ test("a dependency archive is read without unpacking, and a declaration with no 
   try {
     const { root: project } = await materializeIngestionProject(path.join(workspace, "project"));
     const { readdir, writeFile } = await import("node:fs/promises");
-    const names = (await readdir(path.join(project, ".internal", "lib"))).filter((name) => name.endsWith(".zip")).sort();
+    const names = (await readdir(path.join(project, ".internal", "lib")))
+      .filter((name) => name.endsWith(".zip"))
+      .sort();
     assert.equal(names.length, 2);
     const policy = path.join(workspace, "policy.json");
-    await writeFile(policy, JSON.stringify({
-      schemaVersion: 1,
-      defoldRevision: pinnedDefoldRevision,
-      targets: names.map((name, index) => ({
-        id: `archive-${index}`,
-        kind: "dependency-archive",
-        archive: path.join(project, ".internal", "lib", name),
-        declared: { kind: "script-api" }
-      }))
-    }));
-    await execFileAsync("node", [
-      path.join(repositoryRoot, "scripts/generate-lua-registration-surface.mjs"),
-      "--policy", policy,
-      "--out-root", workspace
-    ], { cwd: repositoryRoot });
-    const report = JSON.parse(await readFile(
-      path.join(workspace, luaRegistrationSurfaceGenerator.artifacts[0]), "utf8"));
+    await writeFile(
+      policy,
+      JSON.stringify({
+        schemaVersion: 1,
+        defoldRevision: pinnedDefoldRevision,
+        targets: names.map((name, index) => ({
+          id: `archive-${index}`,
+          kind: "dependency-archive",
+          archive: path.join(project, ".internal", "lib", name),
+          declared: { kind: "script-api" },
+        })),
+      }),
+    );
+    await execFileAsync(
+      "node",
+      [
+        path.join(repositoryRoot, "scripts/generate-lua-registration-surface.mjs"),
+        "--policy",
+        policy,
+        "--out-root",
+        workspace,
+      ],
+      { cwd: repositoryRoot },
+    );
+    const report = JSON.parse(
+      await readFile(path.join(workspace, luaRegistrationSurfaceGenerator.artifacts[0]), "utf8"),
+    );
     for (const target of Object.values(report.targets)) {
       // The fixture archives carry interface description only. The verifier must
       // say so rather than let an unchecked declaration read as agreement.
       assert.equal(target.status, "unverifiable");
       assert.ok(target.inputs.archiveEntries > 0, "the archive's full entry listing is kept");
       assert.match(target.inputs.archiveSha256, /^[0-9a-f]{64}$/);
-      assert.deepEqual(target.blockers.map((item) => item.code), ["no-native-source-in-target"]);
+      assert.deepEqual(
+        target.blockers.map((item) => item.code),
+        ["no-native-source-in-target"],
+      );
       assert.ok(target.summary.declaredRoutes > 0);
       assert.equal(target.summary.registeredRoutes, null);
       assert.equal(target.summary.verified, false);
@@ -329,7 +394,7 @@ test("the committed engine report is fail-closed and complete", async () => {
   }
   assert.equal(
     engine.summary.blockers,
-    Object.values(engine.blockerHistogram).reduce((total, count) => total + count, 0)
+    Object.values(engine.blockerHistogram).reduce((total, count) => total + count, 0),
   );
   const verdicts = new Set(engine.routes.map((route) => route.verdict));
   for (const verdict of verdicts) {
@@ -337,14 +402,17 @@ test("the committed engine report is fail-closed and complete", async () => {
   }
   assert.equal(
     engine.summary.agreeing + engine.summary.partiallyUndecided + engine.summary.disagreeing + engine.summary.undecided,
-    engine.summary.registeredAndDeclared
+    engine.summary.registeredAndDeclared,
   );
 
   // The fixture extension targets vendor no native source, so they must report
   // as unverifiable rather than as agreement.
   for (const id of ["extension-defold-xmath", "extension-defold-astar"]) {
     assert.equal(report.targets[id].status, "unverifiable");
-    assert.deepEqual(report.targets[id].blockers.map((item) => item.code), ["no-native-source-in-target"]);
+    assert.deepEqual(
+      report.targets[id].blockers.map((item) => item.code),
+      ["no-native-source-in-target"],
+    );
   }
 });
 
@@ -353,9 +421,10 @@ test("the committed engine report is regenerable byte for byte", async () => {
 });
 
 test("a file-scope macro that expands to a Lua C function is read like any other body", () => {
-  const sources = [{
-    path: "src/macro.cpp",
-    text: `
+  const sources = [
+    {
+      path: "src/macro.cpp",
+      text: `
       #define BIT_OP(func, opr) \\
           static int func(lua_State *L) { \\
               lua_Number b = luaL_checknumber(L, 1); \\
@@ -371,25 +440,33 @@ test("a file-scope macro that expands to a Lua C function is read like any other
         {"band", demo_band}, {"get_width", Demo_GetWidth}, {0, 0}
       };
       static void Initialize(lua_State* L) { luaL_register(L, "demo", Demo_methods); lua_pop(L, 1); }
-    `
-  }];
+    `,
+    },
+  ];
   const { project, helpers, interpretation } = analyze(sources);
   // The registration array names symbols that exist only as macro expansions;
   // token pasting must produce `Demo_GetWidth`, not a stringified `Demo_Get#`.
   assert.deepEqual(
-    interpretation.modules.get("demo").functions.map((item) => item.cFunction).sort(),
-    ["Demo_GetWidth", "demo_band"]
+    interpretation.modules
+      .get("demo")
+      .functions.map((item) => item.cFunction)
+      .sort(),
+    ["Demo_GetWidth", "demo_band"],
   );
   const band = analyzeFunctionBody(project.functionsByName.get("demo_band")[0], helpers, project);
   assert.deepEqual(band.arity, { min: 2, max: 2, variadic: false, branchDependent: false });
-  assert.deepEqual(band.parameters.map((item) => item.types), [["number"], ["number"]]);
+  assert.deepEqual(
+    band.parameters.map((item) => item.types),
+    [["number"], ["number"]],
+  );
   assert.equal(band.results.min, 1);
 });
 
 test("an overload that addresses no stack index is decided, not blocked", () => {
-  const sources = [{
-    path: "src/overload.cpp",
-    text: `
+  const sources = [
+    {
+      path: "src/overload.cpp",
+      text: `
       static Scene* Instance_Check(lua_State* L, int index) {
         return (Scene*) lua_touserdata(L, index);
       }
@@ -406,8 +483,9 @@ test("an overload that addresses no stack index is decided, not blocked", () => 
       }
       static const luaL_reg Demo_methods[] = { {"here", demo_here}, {0, 0} };
       static void Initialize(lua_State* L) { luaL_register(L, "demo", Demo_methods); lua_pop(L, 1); }
-    `
-  }];
+    `,
+    },
+  ];
   const { project, helpers } = analyze(sources);
   const here = analyzeFunctionBody(project.functionsByName.get("demo_here")[0], helpers, project);
   // The one-argument overload reads the registry, not an argument, so the route
@@ -417,9 +495,10 @@ test("an overload that addresses no stack index is decided, not blocked", () => 
 });
 
 test("a presence test on a slot outranks a check below it", () => {
-  const sources = [{
-    path: "src/guarded.cpp",
-    text: `
+  const sources = [
+    {
+      path: "src/guarded.cpp",
+      text: `
       static int CheckMaxResults(lua_State* L, int index) {
         if (lua_isnoneornil(L, index)) { return 0; }
         int max_results = luaL_checkinteger(L, index);
@@ -438,8 +517,9 @@ test("a presence test on a slot outranks a check below it", () => {
       }
       static const luaL_reg Demo_methods[] = { {"query", demo_query}, {0, 0} };
       static void Initialize(lua_State* L) { luaL_register(L, "demo", Demo_methods); lua_pop(L, 1); }
-    `
-  }];
+    `,
+    },
+  ];
   const { project, helpers } = analyze(sources);
   const query = analyzeFunctionBody(project.functionsByName.get("demo_query")[0], helpers, project);
   // `CheckMaxResults` returns early when the slot is absent, so its `luaL_check*`
@@ -469,7 +549,7 @@ test("a same-arity non-slot overload does not hide a public helper's body contra
           luaL_argerror(L, index, "url expected");
           return 0;
         }
-      `
+      `,
     },
     {
       path: "src/caller.cpp",
@@ -478,13 +558,15 @@ test("a same-arity non-slot overload does not hide a public helper's body contra
           ResolveURL(L, 1, 0, 0);
           return 0;
         }
-      `
-    }
+      `,
+    },
   ];
-  const headers = [{
-    path: "include/url.h",
-    text: "int ResolveURL(lua_State* L, int index, URL* out, URL* defaults);"
-  }];
+  const headers = [
+    {
+      path: "include/url.h",
+      text: "int ResolveURL(lua_State* L, int index, URL* out, URL* defaults);",
+    },
+  ];
   const { project, helpers } = analyze(sources, headers);
   const route = analyzeFunctionBody(project.functionsByName.get("demo_resolve")[0], helpers, project);
 
@@ -496,34 +578,45 @@ test("a same-arity non-slot overload does not hide a public helper's body contra
 
 test("the gate carries only findings with positive source evidence in every engine variant", async () => {
   const report = await readReport();
-  const gate = JSON.parse(await readFile(
-    path.join(repositoryRoot, luaRegistrationSurfaceGenerator.artifacts[1]), "utf8"));
+  const gate = JSON.parse(
+    await readFile(path.join(repositoryRoot, luaRegistrationSurfaceGenerator.artifacts[1]), "utf8"),
+  );
   assert.equal(gate.schemaVersion, 1);
   assert.equal(gate.sourceReport, luaRegistrationSurfaceGenerator.artifacts[0]);
   assert.deepEqual(gate.engineTargets, ["defold-engine-box2d-v2", "defold-engine-box2d-v3"]);
   assert.ok(gate.findings.length > 0);
   assert.equal(gate.routeAuthority.length, report.targets[gate.engineTargets[0]].summary.declaredRoutes);
   assert.equal(new Set(gate.routeAuthority.map(({ route }) => route)).size, gate.routeAuthority.length);
-  assert.equal(Object.values(gate.counts.authority).reduce((sum, count) => sum + count, 0), gate.routeAuthority.length);
+  assert.equal(
+    Object.values(gate.counts.authority).reduce((sum, count) => sum + count, 0),
+    gate.routeAuthority.length,
+  );
   for (const authority of gate.routeAuthority) {
     assert.equal(authority.targetStates.length, gate.engineTargets.length, authority.route);
     const registered = authority.targetStates.filter((state) => state === "registered");
     if (authority.state === "registered") assert.equal(registered.length, gate.engineTargets.length, authority.route);
     if (authority.state === "documentation-only") assert.equal(registered.length, 0, authority.route);
   }
-  assert.equal(gate.findings.some((finding) => finding.route === "go.set_parent"), false,
-    "go.set_parent must not be narrowed after real-engine zero-argument evidence");
+  assert.equal(
+    gate.findings.some((finding) => finding.route === "go.set_parent"),
+    false,
+    "go.set_parent must not be narrowed after real-engine zero-argument evidence",
+  );
 
   const gatedKinds = new Set([
     "registered-under-a-different-name",
     "registration-commented-out",
-    "documented-optional-slot-required-by-c"
+    "documented-optional-slot-required-by-c",
   ]);
-  const declaredNames = new Set(gate.engineTargets.flatMap((id) =>
-    report.targets[id].declaredButUnregistered.map((row) => row.name)));
+  const declaredNames = new Set(
+    gate.engineTargets.flatMap((id) => report.targets[id].declaredButUnregistered.map((row) => row.name)),
+  );
   for (const finding of gate.findings) {
     assert.ok(gatedKinds.has(finding.kind), finding.kind);
-    assert.ok(["use-registered-name", "mark-source-unavailable", "require-parameter"].includes(finding.action), finding.action);
+    assert.ok(
+      ["use-registered-name", "mark-source-unavailable", "require-parameter"].includes(finding.action),
+      finding.action,
+    );
     // Every finding must be witnessed independently by each engine variant, so a
     // route that differs only between mutually exclusive builds never gates.
     assert.equal(finding.evidence.length, gate.engineTargets.length, finding.route);
@@ -545,6 +638,6 @@ test("the gate carries only findings with positive source evidence in every engi
     .filter((row) => gated.has(row.name));
   assert.deepEqual(
     unexplained.map((row) => row.name).filter((name) => name !== "sys.set_render_enable"),
-    []
+    [],
   );
 });

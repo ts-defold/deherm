@@ -65,7 +65,7 @@ export const paths = Object.freeze({
   sdkArchive: "upstream/defoldsdk.zip",
   ir: "packages/bindings/generated/defold-sdk-ir.json",
   bundleTargets: "packages/toolchains/defold-bundle-targets.json",
-  output: "packages/bindings/generated/defold-dmsdk-symbol-evidence.json"
+  output: "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
 });
 
 export const evidencePath = path.join(root, paths.output);
@@ -73,7 +73,7 @@ export const evidencePath = path.join(root, paths.output);
 /** Members of the SDK archive this pass reads, all of them Defold's own declarations. */
 export const sdkMembers = Object.freeze({
   buildConfig: "defoldsdk/extender/build.yml",
-  variantManifest: (variant) => `defoldsdk/extender/variants/${variant}.appmanifest`
+  variantManifest: (variant) => `defoldsdk/extender/variants/${variant}.appmanifest`,
 });
 
 /**
@@ -110,7 +110,7 @@ function llvmTool(name) {
   return llvmToolCache.get(name);
 }
 
-const compare = (left, right) => left < right ? -1 : left > right ? 1 : 0;
+const compare = (left, right) => (left < right ? -1 : left > right ? 1 : 0);
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 
 function assert(condition, message) {
@@ -118,10 +118,12 @@ function assert(condition, message) {
 }
 
 function parseLock(text) {
-  return Object.fromEntries(text.split(/\r?\n/).flatMap((line) => {
-    const match = /^([A-Z0-9_]+)=(.*)$/.exec(line);
-    return match ? [[match[1], match[2]]] : [];
-  }));
+  return Object.fromEntries(
+    text.split(/\r?\n/).flatMap((line) => {
+      const match = /^([A-Z0-9_]+)=(.*)$/.exec(line);
+      return match ? [[match[1], match[2]]] : [];
+    }),
+  );
 }
 
 /** Text of one member of the pinned SDK archive. */
@@ -136,8 +138,7 @@ async function sdkText(archive, member) {
  * level contributes nothing rather than clearing what an earlier level said.
  */
 function contextChain(platforms, target) {
-  return [platforms.common, platforms[target.group], platforms[target.target]]
-    .map((entry) => entry?.context ?? {});
+  return [platforms.common, platforms[target.group], platforms[target.target]].map((entry) => entry?.context ?? {});
 }
 
 function mergedList(contexts, key) {
@@ -155,9 +156,13 @@ function mergedList(contexts, key) {
  */
 export function archiveDirectories(contexts) {
   const prefix = "{{dynamo_home}}/";
-  return [...new Set(mergedList(contexts, "libPaths")
-    .filter((entry) => entry.startsWith(prefix))
-    .map((entry) => entry.slice(prefix.length)))].sort(compare);
+  return [
+    ...new Set(
+      mergedList(contexts, "libPaths")
+        .filter((entry) => entry.startsWith(prefix))
+        .map((entry) => entry.slice(prefix.length)),
+    ),
+  ].sort(compare);
 }
 
 /**
@@ -204,9 +209,15 @@ export function resolveArchive({ members, directories, name }) {
 }
 
 async function archiveMembers(archive) {
-  const { stdout } = await run("unzip", ["-Z1", archive, "defoldsdk/lib/*", "defoldsdk/ext/lib/*"],
-    { maxBuffer: 256 * 1024 * 1024 });
-  return new Set(stdout.split("\n").map((line) => line.trim()).filter(Boolean));
+  const { stdout } = await run("unzip", ["-Z1", archive, "defoldsdk/lib/*", "defoldsdk/ext/lib/*"], {
+    maxBuffer: 256 * 1024 * 1024,
+  });
+  return new Set(
+    stdout
+      .split("\n")
+      .map((line) => line.trim())
+      .filter(Boolean),
+  );
 }
 
 /**
@@ -254,13 +265,20 @@ async function demangledNames(symbols) {
     const child = spawn(command, prefix, { stdio: ["pipe", "pipe", "ignore"] });
     let output = "";
     child.stdout.setEncoding("utf8");
-    child.stdout.on("data", (chunk) => { output += chunk; });
+    child.stdout.on("data", (chunk) => {
+      output += chunk;
+    });
     child.on("error", () => resolve(""));
     child.on("close", () => resolve(output));
     child.stdin.on("error", () => {});
     child.stdin.end(itanium.join("\n"));
   });
-  return new Set(stdout.split("\n").map((line) => qualifiedName(line.trim())).filter(Boolean));
+  return new Set(
+    stdout
+      .split("\n")
+      .map((line) => qualifiedName(line.trim()))
+      .filter(Boolean),
+  );
 }
 
 /** Externally visible definitions in one archive file. */
@@ -328,18 +346,26 @@ export async function buildSymbolEvidence(options = {}) {
   const lock = parseLock(await read(paths.lock));
   const ir = JSON.parse(await read(paths.ir));
   const bundleTargets = JSON.parse(await read(paths.bundleTargets));
-  assert(bundleTargets.defoldRevision === ir.defoldRevision,
-    "the bundle-target registry and the dmSDK IR describe different Defold revisions");
-  assert(lock.DEFOLD_REV === ir.defoldRevision,
-    `upstream.lock pins ${lock.DEFOLD_REV} but the dmSDK IR was derived at ${ir.defoldRevision}`);
+  assert(
+    bundleTargets.defoldRevision === ir.defoldRevision,
+    "the bundle-target registry and the dmSDK IR describe different Defold revisions",
+  );
+  assert(
+    lock.DEFOLD_REV === ir.defoldRevision,
+    `upstream.lock pins ${lock.DEFOLD_REV} but the dmSDK IR was derived at ${ir.defoldRevision}`,
+  );
 
   const buildConfigText = await sdkText(archive, sdkMembers.buildConfig);
   const platforms = parseYaml(buildConfigText)?.platforms;
   assert(platforms, `${sdkMembers.buildConfig} declares no platforms map`);
-  const variantTexts = Object.fromEntries(await Promise.all(variants.map(async (variant) =>
-    [variant, await sdkText(archive, sdkMembers.variantManifest(variant))])));
-  const variantPlatforms = Object.fromEntries(variants.map((variant) =>
-    [variant, parseYaml(variantTexts[variant])?.platforms ?? {}]));
+  const variantTexts = Object.fromEntries(
+    await Promise.all(
+      variants.map(async (variant) => [variant, await sdkText(archive, sdkMembers.variantManifest(variant))]),
+    ),
+  );
+  const variantPlatforms = Object.fromEntries(
+    variants.map((variant) => [variant, parseYaml(variantTexts[variant])?.platforms ?? {}]),
+  );
 
   const targets = bundleTargets.targets
     .filter(({ kind }) => kind === "bundle")
@@ -361,7 +387,7 @@ export async function buildSymbolEvidence(options = {}) {
       // engine archive Defold could link for this target at this revision.
       unavailableTargets.push({
         target: target.target,
-        reason: `${sdkMembers.buildConfig} declares no {{dynamo_home}} library path`
+        reason: `${sdkMembers.buildConfig} declares no {{dynamo_home}} library path`,
       });
       continue;
     }
@@ -383,14 +409,16 @@ export async function buildSymbolEvidence(options = {}) {
         // Named, never swallowed: these are the external dependencies Defold
         // links from a toolchain SDK rather than from its own published
         // archive, plus anything a platform names but does not ship.
-        unresolvedLibraries: missing
+        unresolvedLibraries: missing,
       };
     }
     plans.push({ target, directories, byVariant });
   }
   assert(plans.length > 0, "the published SDK declares no measurable bundle target link plans");
 
-  const wanted = new Set(plans.flatMap(({ byVariant }) => Object.values(byVariant).flatMap(({ archives }) => archives)));
+  const wanted = new Set(
+    plans.flatMap(({ byVariant }) => Object.values(byVariant).flatMap(({ archives }) => archives)),
+  );
   const work = await mkdtemp(path.join(tmpdir(), "deherm-sdk-"));
   const symbolsByMember = new Map();
   const unreadableArchives = [];
@@ -408,8 +436,10 @@ export async function buildSymbolEvidence(options = {}) {
   } finally {
     await rm(work, { recursive: true, force: true });
   }
-  assert(unreadableArchives.length === 0,
-    `llvm-nm could not read ${unreadableArchives.length} archive(s), starting with ${unreadableArchives[0]}`);
+  assert(
+    unreadableArchives.length === 0,
+    `llvm-nm could not read ${unreadableArchives.length} archive(s), starting with ${unreadableArchives[0]}`,
+  );
 
   const symbolsByTargetVariant = new Map();
   for (const { target, byVariant } of plans) {
@@ -450,8 +480,10 @@ export async function buildSymbolEvidence(options = {}) {
     // A bundle target is MEASURABLE only when clang, parsing for that target's
     // own triple, named the symbol it would emit. Where it could not, that
     // target is unmeasured rather than symbol-free.
-    const unmeasured = plans.filter(({ target }) => !declaration.mangledNames?.[target.target])
-      .map(({ target }) => target.target).sort(compare);
+    const unmeasured = plans
+      .filter(({ target }) => !declaration.mangledNames?.[target.target])
+      .map(({ target }) => target.target)
+      .sort(compare);
     const linkedIn = [];
     for (const { target } of plans) {
       const wantedSymbol = declaration.mangledNames?.[target.target];
@@ -467,7 +499,7 @@ export async function buildSymbolEvidence(options = {}) {
       measuredTargets: plans.length - unmeasured.length,
       unmeasuredTargets: headerOnly ? 0 : unmeasured.length,
       linkedIn,
-      variantCount: variants.length
+      variantCount: variants.length,
     });
     // `absent` is a claim that the archives were asked and said no, so it is
     // reserved for declarations that were fully asked. Where clang never named
@@ -477,16 +509,28 @@ export async function buildSymbolEvidence(options = {}) {
     // `Namespace::Class::Class` is how the inventory spells a constructor;
     // a demangler spells the same thing `Class::Class`.
     const collapsed = declaration.name?.replace(/(^|::)([A-Za-z_]\w*)::\2::/, "$1$2::") ?? "";
-    const nameDefinedElsewhere = !headerOnly && linkedIn.length === 0 &&
-      (definedNames.has(declaration.name) || definedNames.has(collapsed));
-    const linkage = headerOnly ? "header-only"
-      : linkedIn.length ? "external"
-        : nameDefinedElsewhere ? "signature-mismatch"
-          : ["unmeasured", "partially-measured"].includes(availability) ? "unmeasured"
+    const nameDefinedElsewhere =
+      !headerOnly && linkedIn.length === 0 && (definedNames.has(declaration.name) || definedNames.has(collapsed));
+    const linkage = headerOnly
+      ? "header-only"
+      : linkedIn.length
+        ? "external"
+        : nameDefinedElsewhere
+          ? "signature-mismatch"
+          : ["unmeasured", "partially-measured"].includes(availability)
+            ? "unmeasured"
             : "absent";
-    counts[linkage === "header-only" ? "headerOnly" : linkage === "external" ? "external"
-      : linkage === "unmeasured" ? "unmeasured"
-        : linkage === "signature-mismatch" ? "signatureMismatch" : "absent"] += 1;
+    counts[
+      linkage === "header-only"
+        ? "headerOnly"
+        : linkage === "external"
+          ? "external"
+          : linkage === "unmeasured"
+            ? "unmeasured"
+            : linkage === "signature-mismatch"
+              ? "signatureMismatch"
+              : "absent"
+    ] += 1;
     const reported = linkage === "signature-mismatch" ? "signature-mismatch" : availability;
     availabilityCounts[reported] = (availabilityCounts[reported] ?? 0) + 1;
     kindCounts[declaration.kind] = (kindCounts[declaration.kind] ?? 0) + 1;
@@ -497,10 +541,17 @@ export async function buildSymbolEvidence(options = {}) {
       linkage,
       availability: reported,
       ...(headerOnly || unmeasured.length === 0 ? {} : { unmeasuredTargets: unmeasured }),
-      linkedIn: Object.fromEntries(variants
-        .map((variant) => [variant, linkedIn.filter((entry) => entry.variant === variant)
-          .map(({ target }) => target).sort(compare)])
-        .filter(([, list]) => list.length > 0))
+      linkedIn: Object.fromEntries(
+        variants
+          .map((variant) => [
+            variant,
+            linkedIn
+              .filter((entry) => entry.variant === variant)
+              .map(({ target }) => target)
+              .sort(compare),
+          ])
+          .filter(([, list]) => list.length > 0),
+      ),
     };
   }
 
@@ -521,15 +572,19 @@ export async function buildSymbolEvidence(options = {}) {
       "a symbol counts only when the compiler's own mangled name for that target's ABI is defined and externally visible",
       "an inline or static declaration is header-only by design and its absence from every archive is the correct answer",
       "a declaration whose qualified name IS defined but under a different signature is a signature mismatch, not an absence",
-      "a library name the published SDK does not carry is recorded as unresolved, never silently skipped"
+      "a library name the published SDK does not carry is recorded as unresolved, never silently skipped",
     ],
     defoldRevision: ir.defoldRevision,
     sdkArchive: { url: lock.DEFOLD_SDK_URL, sha256: lock.DEFOLD_SDK_SHA256 },
     inputEvidence: {
       buildConfig: sdkMembers.buildConfig,
       buildConfigSha256: sha256(buildConfigText),
-      variantManifests: Object.fromEntries(variants.map((variant) =>
-        [variant, { member: sdkMembers.variantManifest(variant), sha256: sha256(variantTexts[variant]) }]))
+      variantManifests: Object.fromEntries(
+        variants.map((variant) => [
+          variant,
+          { member: sdkMembers.variantManifest(variant), sha256: sha256(variantTexts[variant]) },
+        ]),
+      ),
     },
     variants,
     ...(unavailableTargets.length > 0 ? { unavailableTargets } : {}),
@@ -538,18 +593,25 @@ export async function buildSymbolEvidence(options = {}) {
       group: target.group,
       architecture: target.architecture,
       archiveDirectories: directories,
-      variants: Object.fromEntries(variants.map((variant) => [variant, {
-        defines: byVariant[variant].defines,
-        libraries: byVariant[variant].libraries.length,
-        archives: byVariant[variant].archives.length,
-        unresolvedLibraries: byVariant[variant].unresolvedLibraries,
-        symbols: symbolsByTargetVariant.get(`${target.target}/${variant}`)?.size ?? 0
-      }]))
+      variants: Object.fromEntries(
+        variants.map((variant) => [
+          variant,
+          {
+            defines: byVariant[variant].defines,
+            libraries: byVariant[variant].libraries.length,
+            archives: byVariant[variant].archives.length,
+            unresolvedLibraries: byVariant[variant].unresolvedLibraries,
+            symbols: symbolsByTargetVariant.get(`${target.target}/${variant}`)?.size ?? 0,
+          },
+        ]),
+      ),
     })),
     totals: { declarations: Object.keys(declarations).length, ...counts },
     kindCounts: Object.fromEntries(Object.entries(kindCounts).sort(([left], [right]) => compare(left, right))),
-    availabilityCounts: Object.fromEntries(Object.entries(availabilityCounts).sort(([left], [right]) => compare(left, right))),
-    declarations
+    availabilityCounts: Object.fromEntries(
+      Object.entries(availabilityCounts).sort(([left], [right]) => compare(left, right)),
+    ),
+    declarations,
   };
 }
 
@@ -567,17 +629,21 @@ export async function main(argv = process.argv.slice(2)) {
   if (argv.includes("--check")) {
     const existing = await readFile(evidencePath, "utf8").catch(() => "");
     if (existing !== serialized) {
-      throw new Error("defold-dmsdk-symbol-evidence.json is stale; run node scripts/generate-dmsdk-symbol-evidence.mjs");
+      throw new Error(
+        "defold-dmsdk-symbol-evidence.json is stale; run node scripts/generate-dmsdk-symbol-evidence.mjs",
+      );
     }
     console.log("dmSDK symbol evidence is current");
     return evidence;
   }
   await writeFile(evidencePath, serialized);
   const { declarations: measured, external, headerOnly, absent, unmeasured, signatureMismatch } = evidence.totals;
-  console.log(`dmSDK symbol evidence: ${measured} callable declarations - ${external} external, ` +
-    `${headerOnly} header-only by design, ${absent} absent, ${unmeasured} unmeasured, ` +
-    `${signatureMismatch} defined under a different signature, across ` +
-    `${evidence.targets.length} bundle targets x ${evidence.variants.length} build variants`);
+  console.log(
+    `dmSDK symbol evidence: ${measured} callable declarations - ${external} external, ` +
+      `${headerOnly} header-only by design, ${absent} absent, ${unmeasured} unmeasured, ` +
+      `${signatureMismatch} defined under a different signature, across ` +
+      `${evidence.targets.length} bundle targets x ${evidence.variants.length} build variants`,
+  );
   return evidence;
 }
 

@@ -19,7 +19,8 @@ function registry(): Registry {
 }
 
 export function hmrPersistentState<Value>(key: string, create: () => Value): HmrPersistentCell<Value> {
-  if (typeof key !== "string" || key.length === 0) throw new TypeError("hmrPersistentState key must be a non-empty string");
+  if (typeof key !== "string" || key.length === 0)
+    throw new TypeError("hmrPersistentState key must be a non-empty string");
   const cells = registry();
   const existing = cells[key];
   if (existing !== undefined) return existing as HmrPersistentCell<Value>;

@@ -1,7 +1,11 @@
 import assert from "node:assert/strict";
 
 export const NATIVE_MODULE_ARGUMENT_KINDS = Object.freeze({
-  u32: 1, utf8: 2, bytes: 3, mutableBytes: 4, bool: 5,
+  u32: 1,
+  utf8: 2,
+  bytes: 3,
+  mutableBytes: 4,
+  bool: 5,
 });
 export const NATIVE_MODULE_RESULT_KINDS = Object.freeze({ status: 1, u32: 2 });
 
@@ -10,12 +14,17 @@ export const NATIVE_MODULE_RESULT_KINDS = Object.freeze({ status: 1, u32: 2 });
 export function parseNativeModuleDescriptorJson(source) {
   assert.equal(typeof source, "string");
   let index = 0;
-  const whitespace = () => { while (/\s/u.test(source[index] ?? "")) ++index; };
+  const whitespace = () => {
+    while (/\s/u.test(source[index] ?? "")) ++index;
+  };
   const stringToken = () => {
     const start = index;
     assert.equal(source[index++], '"', "expected JSON string");
     while (index < source.length) {
-      if (source[index] === "\\") { index += 2; continue; }
+      if (source[index] === "\\") {
+        index += 2;
+        continue;
+      }
       if (source[index++] === '"') return JSON.parse(source.slice(start, index));
     }
     throw new Error("unterminated JSON string");
@@ -23,48 +32,79 @@ export function parseNativeModuleDescriptorJson(source) {
   const value = () => {
     whitespace();
     if (source[index] === "{") {
-      ++index; whitespace(); const keys = new Set();
-      if (source[index] === "}") { ++index; return; }
+      ++index;
+      whitespace();
+      const keys = new Set();
+      if (source[index] === "}") {
+        ++index;
+        return;
+      }
       while (index < source.length) {
         const key = stringToken();
         if (keys.has(key)) throw new Error(`duplicate JSON object key: ${key}`);
-        keys.add(key); whitespace(); assert.equal(source[index++], ":", "expected JSON colon");
-        value(); whitespace();
-        if (source[index] === "}") { ++index; return; }
-        assert.equal(source[index++], ",", "expected JSON object comma"); whitespace();
+        keys.add(key);
+        whitespace();
+        assert.equal(source[index++], ":", "expected JSON colon");
+        value();
+        whitespace();
+        if (source[index] === "}") {
+          ++index;
+          return;
+        }
+        assert.equal(source[index++], ",", "expected JSON object comma");
+        whitespace();
       }
       throw new Error("unterminated JSON object");
     }
     if (source[index] === "[") {
-      ++index; whitespace();
-      if (source[index] === "]") { ++index; return; }
+      ++index;
+      whitespace();
+      if (source[index] === "]") {
+        ++index;
+        return;
+      }
       while (index < source.length) {
-        value(); whitespace();
-        if (source[index] === "]") { ++index; return; }
+        value();
+        whitespace();
+        if (source[index] === "]") {
+          ++index;
+          return;
+        }
         assert.equal(source[index++], ",", "expected JSON array comma");
       }
       throw new Error("unterminated JSON array");
     }
-    if (source[index] === '"') { stringToken(); return; }
+    if (source[index] === '"') {
+      stringToken();
+      return;
+    }
     while (index < source.length && !/[\s,}\]]/u.test(source[index])) ++index;
   };
-  value(); whitespace(); assert.equal(index, source.length, "trailing JSON data");
+  value();
+  whitespace();
+  assert.equal(index, source.length, "trailing JSON data");
   return JSON.parse(source);
 }
 
 function identifier(value) {
-  return value.replace(/([a-z0-9])([A-Z])/gu, "$1_$2").replace(/[^A-Za-z0-9_]/gu, "_").toUpperCase();
+  return value
+    .replace(/([a-z0-9])([A-Z])/gu, "$1_$2")
+    .replace(/[^A-Za-z0-9_]/gu, "_")
+    .toUpperCase();
 }
 
 export function assertNativeModuleDescriptor(module) {
   assert.match(module.name, /^[A-Za-z_][A-Za-z0-9_]*$/u);
   assert.ok(Number.isInteger(module.abiVersion) && module.abiVersion > 0);
   assert.ok(Array.isArray(module.methods) && module.methods.length > 0 && module.methods.length <= 32);
-  const ids = new Set(), names = new Set();
+  const ids = new Set(),
+    names = new Set();
   for (const method of module.methods) {
     assert.ok(Number.isInteger(method.id) && method.id > 0 && !ids.has(method.id));
-    assert.match(method.name, /^[A-Za-z_][A-Za-z0-9_]*$/u); assert.ok(!names.has(method.name));
-    ids.add(method.id); names.add(method.name);
+    assert.match(method.name, /^[A-Za-z_][A-Za-z0-9_]*$/u);
+    assert.ok(!names.has(method.name));
+    ids.add(method.id);
+    names.add(method.name);
     assert.ok(Array.isArray(method.args) && method.args.length <= 8);
     const argumentNames = new Set();
     for (const argument of method.args) {
@@ -78,8 +118,11 @@ export function assertNativeModuleDescriptor(module) {
         assert.equal(argument.copyBack.mode, "framedPayload");
         assert.ok(Number.isInteger(argument.copyBack.okStatus));
         assert.ok(Number.isInteger(argument.copyBack.headerBytes) && argument.copyBack.headerBytes > 0);
-        assert.ok(Number.isInteger(argument.copyBack.payloadLengthOffset) && argument.copyBack.payloadLengthOffset >= 0 &&
-          argument.copyBack.payloadLengthOffset + 4 <= argument.copyBack.headerBytes);
+        assert.ok(
+          Number.isInteger(argument.copyBack.payloadLengthOffset) &&
+            argument.copyBack.payloadLengthOffset >= 0 &&
+            argument.copyBack.payloadLengthOffset + 4 <= argument.copyBack.headerBytes,
+        );
       }
     }
     assert.ok(NATIVE_MODULE_RESULT_KINDS[method.returns]);
@@ -96,27 +139,34 @@ export function assertNativeModuleDescriptor(module) {
 export function renderNativeModuleProviderHeader(module, banner = "Generated by deherm. Do not edit.") {
   assertNativeModuleDescriptor(module);
   const prefix = identifier(module.name);
-  const ids = module.methods.map((method) =>
-    `  DEHERM_${prefix}_METHOD_${identifier(method.name)} = ${method.id}`).join(",\n");
-  const methods = module.methods.map((method) => {
-    const kinds = method.args.map((argument) =>
-      `DEHERM_NATIVE_MODULE_ARGUMENT_${identifier(argument.type)}`);
-    while (kinds.length < 8) kinds.push("0");
-    return `    {${method.id}, "${method.name}", ${method.args.length}, {${kinds.join(", ")}}, DEHERM_NATIVE_MODULE_RESULT_${identifier(method.returns)}}`;
-  }).join(",\n");
+  const ids = module.methods
+    .map((method) => `  DEHERM_${prefix}_METHOD_${identifier(method.name)} = ${method.id}`)
+    .join(",\n");
+  const methods = module.methods
+    .map((method) => {
+      const kinds = method.args.map((argument) => `DEHERM_NATIVE_MODULE_ARGUMENT_${identifier(argument.type)}`);
+      while (kinds.length < 8) kinds.push("0");
+      return `    {${method.id}, "${method.name}", ${method.args.length}, {${kinds.join(", ")}}, DEHERM_NATIVE_MODULE_RESULT_${identifier(method.returns)}}`;
+    })
+    .join(",\n");
   const factory = module.name.replace(/([a-z0-9])([A-Z])/gu, "$1_$2").toLowerCase();
-  const constants = Object.entries(module.constants ?? {}).flatMap(([group, value]) => {
-    const groupName = identifier(group);
-    if (typeof value === "number") return [`#define DEHERM_${prefix}_${groupName} (${value})`];
-    if (!value || typeof value !== "object" || Array.isArray(value)) return [];
-    const numeric = Object.entries(value).filter(([, item]) => typeof item === "number");
-    if (!numeric.length) return [];
-    if (numeric.length === Object.keys(value).length) {
-      return [`typedef enum Deherm${module.name}${group[0].toUpperCase()}${group.slice(1)}V1 {\n${numeric.map(([name, item]) =>
-        `  DEHERM_${prefix}_${groupName}_${identifier(name)} = ${item}`).join(",\n")}\n} Deherm${module.name}${group[0].toUpperCase()}${group.slice(1)}V1;`];
-    }
-    return numeric.map(([name, item]) => `#define DEHERM_${prefix}_${groupName}_${identifier(name)} (${item})`);
-  }).join("\n");
+  const constants = Object.entries(module.constants ?? {})
+    .flatMap(([group, value]) => {
+      const groupName = identifier(group);
+      if (typeof value === "number") return [`#define DEHERM_${prefix}_${groupName} (${value})`];
+      if (!value || typeof value !== "object" || Array.isArray(value)) return [];
+      const numeric = Object.entries(value).filter(([, item]) => typeof item === "number");
+      if (!numeric.length) return [];
+      if (numeric.length === Object.keys(value).length) {
+        return [
+          `typedef enum Deherm${module.name}${group[0].toUpperCase()}${group.slice(1)}V1 {\n${numeric
+            .map(([name, item]) => `  DEHERM_${prefix}_${groupName}_${identifier(name)} = ${item}`)
+            .join(",\n")}\n} Deherm${module.name}${group[0].toUpperCase()}${group.slice(1)}V1;`,
+        ];
+      }
+      return numeric.map(([name, item]) => `#define DEHERM_${prefix}_${groupName}_${identifier(name)} (${item})`);
+    })
+    .join("\n");
   return `// ${banner}
 #pragma once
 #include <defold_hermes/native_module_provider.h>
@@ -140,53 +190,52 @@ static inline DehermNativeModuleProviderV1 deherm_${factory}_provider_v1(void* c
  * the generic déherm provider registry. The extension remains independent:
  * this source is materialized only in projects that contain both extensions.
  */
-export function renderNativeModuleProviderAdapterSource(module, providerHeaderInclude,
-  banner = "Generated by deherm. Do not edit.") {
+export function renderNativeModuleProviderAdapterSource(
+  module,
+  providerHeaderInclude,
+  banner = "Generated by deherm. Do not edit.",
+) {
   assertNativeModuleDescriptor(module);
   assert.ok(module.cProvider, `${module.name} has no cProvider recipe`);
   assert.match(providerHeaderInclude, /^[A-Za-z0-9_./-]+\.h$/u);
   const factory = staticPrefix(module);
   const invalidArgument = module.constants?.status?.invalidArgument ?? -1;
-  const cases = module.methods.map((method) => {
-    const validations = method.args.map((argument, index) => {
-      const kind = `DEHERM_NATIVE_MODULE_ARGUMENT_${identifier(argument.type)}`;
-      const checks = [`arguments[${index}].kind != ${kind}`];
-      if (argument.type === "utf8" || argument.type === "bytes") {
-        checks.push(`arguments[${index}].length > UINT32_MAX`);
-        checks.push(`arguments[${index}].length != 0u && arguments[${index}].bytes == nullptr`);
-      } else if (argument.type === "mutableBytes") {
-        checks.push(`arguments[${index}].length > UINT32_MAX`);
-        checks.push(`arguments[${index}].length != 0u && arguments[${index}].mutable_bytes == nullptr`);
-      } else if (argument.type === "bool") {
-        checks.push(`arguments[${index}].u32 > 1u`);
-      }
-      return checks.map((check) => `(${check})`).join(" || ");
-    });
-    const callArguments = method.args.flatMap((argument, index) => {
-      if (argument.type === "u32") return [`arguments[${index}].u32`];
-      if (argument.type === "bool") return [`arguments[${index}].u32 != 0u`];
-      if (argument.type === "utf8") return [
-        `reinterpret_cast<const char*>(arguments[${index}].bytes)`,
-        `static_cast<uint32_t>(arguments[${index}].length)`
-      ];
-      if (argument.type === "bytes") return [
-        `arguments[${index}].bytes`,
-        `static_cast<uint32_t>(arguments[${index}].length)`
-      ];
-      return [
-        `arguments[${index}].mutable_bytes`,
-        `static_cast<uint32_t>(arguments[${index}].length)`
-      ];
-    });
-    const symbol = `${module.cProvider.symbolPrefix}${staticPrefix({ name: method.name })}`;
-    const invocation = `${symbol}(${callArguments.join(", ")})`;
-    const body = method.returns === "u32"
-      ? `result->u32 = ${invocation}; return 0;`
-      : `return ${invocation};`;
-    return `    case ${method.id}u:
+  const cases = module.methods
+    .map((method) => {
+      const validations = method.args.map((argument, index) => {
+        const kind = `DEHERM_NATIVE_MODULE_ARGUMENT_${identifier(argument.type)}`;
+        const checks = [`arguments[${index}].kind != ${kind}`];
+        if (argument.type === "utf8" || argument.type === "bytes") {
+          checks.push(`arguments[${index}].length > UINT32_MAX`);
+          checks.push(`arguments[${index}].length != 0u && arguments[${index}].bytes == nullptr`);
+        } else if (argument.type === "mutableBytes") {
+          checks.push(`arguments[${index}].length > UINT32_MAX`);
+          checks.push(`arguments[${index}].length != 0u && arguments[${index}].mutable_bytes == nullptr`);
+        } else if (argument.type === "bool") {
+          checks.push(`arguments[${index}].u32 > 1u`);
+        }
+        return checks.map((check) => `(${check})`).join(" || ");
+      });
+      const callArguments = method.args.flatMap((argument, index) => {
+        if (argument.type === "u32") return [`arguments[${index}].u32`];
+        if (argument.type === "bool") return [`arguments[${index}].u32 != 0u`];
+        if (argument.type === "utf8")
+          return [
+            `reinterpret_cast<const char*>(arguments[${index}].bytes)`,
+            `static_cast<uint32_t>(arguments[${index}].length)`,
+          ];
+        if (argument.type === "bytes")
+          return [`arguments[${index}].bytes`, `static_cast<uint32_t>(arguments[${index}].length)`];
+        return [`arguments[${index}].mutable_bytes`, `static_cast<uint32_t>(arguments[${index}].length)`];
+      });
+      const symbol = `${module.cProvider.symbolPrefix}${staticPrefix({ name: method.name })}`;
+      const invocation = `${symbol}(${callArguments.join(", ")})`;
+      const body = method.returns === "u32" ? `result->u32 = ${invocation}; return 0;` : `return ${invocation};`;
+      return `    case ${method.id}u:
       if ((argument_count != ${method.args.length}u)${validations.length ? ` || ${validations.map((validation) => `(${validation})`).join(" || ")}` : ""}) return ${invalidArgument};
       ${body}`;
-  }).join("\n");
+    })
+    .join("\n");
   return `// ${banner}
 #include <${providerHeaderInclude}>
 #include <${module.cProvider.header}>
@@ -221,17 +270,32 @@ function tsType(type) {
 function generatedArgumentName(index) {
   return `deherm_argument_${index}`;
 }
-export function renderNativeModuleTypescript(module, moduleRuntimeImport = "../../module-runtime.js", banner = "Generated by deherm. Do not edit.") {
+export function renderNativeModuleTypescript(
+  module,
+  moduleRuntimeImport = "../../module-runtime.js",
+  banner = "Generated by deherm. Do not edit.",
+) {
   assertNativeModuleDescriptor(module);
-  const methods = module.methods.map((method) =>
-    `  ${method.name}(${method.args.map((argument, index) => `${generatedArgumentName(index)}: ${tsType(argument.type)}`).join(", ")}): number;`).join("\n");
-  const forwards = module.methods.map((method) =>
-    `  ${method.name}: (${method.args.map((argument, index) => `${generatedArgumentName(index)}: ${tsType(argument.type)}`).join(", ")}) => native().${method.name}(${method.args.map((_, index) => generatedArgumentName(index)).join(", ")}),`).join("\n");
-  const constants = Object.entries(module.constants ?? {}).map(([name, value]) => {
-    const typeName = `${module.name}${name[0].toUpperCase()}${name.slice(1)}`;
-    if (value && typeof value === "object") return `export const ${typeName} = Object.freeze(${JSON.stringify(value, null, 2)} as const);\nexport type ${typeName} = typeof ${typeName}[keyof typeof ${typeName}];`;
-    return `export const ${typeName} = ${JSON.stringify(value)} as const;`;
-  }).join("\n");
+  const methods = module.methods
+    .map(
+      (method) =>
+        `  ${method.name}(${method.args.map((argument, index) => `${generatedArgumentName(index)}: ${tsType(argument.type)}`).join(", ")}): number;`,
+    )
+    .join("\n");
+  const forwards = module.methods
+    .map(
+      (method) =>
+        `  ${method.name}: (${method.args.map((argument, index) => `${generatedArgumentName(index)}: ${tsType(argument.type)}`).join(", ")}) => native().${method.name}(${method.args.map((_, index) => generatedArgumentName(index)).join(", ")}),`,
+    )
+    .join("\n");
+  const constants = Object.entries(module.constants ?? {})
+    .map(([name, value]) => {
+      const typeName = `${module.name}${name[0].toUpperCase()}${name.slice(1)}`;
+      if (value && typeof value === "object")
+        return `export const ${typeName} = Object.freeze(${JSON.stringify(value, null, 2)} as const);\nexport type ${typeName} = typeof ${typeName}[keyof typeof ${typeName}];`;
+      return `export const ${typeName} = ${JSON.stringify(value)} as const;`;
+    })
+    .join("\n");
   return `// ${banner}
 import { requireDefoldModule } from "${moduleRuntimeImport}";
 ${constants}
@@ -244,7 +308,10 @@ export const ${module.name}: ${module.name}Spec = Object.freeze({\n${forwards}\n
 }
 
 function staticPrefix(module) {
-  return module.name.replace(/([a-z0-9])([A-Z])/gu, "$1_$2").replace(/[^A-Za-z0-9_]/gu, "_").toLowerCase();
+  return module.name
+    .replace(/([a-z0-9])([A-Z])/gu, "$1_$2")
+    .replace(/[^A-Za-z0-9_]/gu, "_")
+    .toLowerCase();
 }
 
 function staticCallee(module, method) {
@@ -269,11 +336,14 @@ export function renderNativeModuleStaticHeader(module, banner = "Generated by de
   assertNativeModuleDescriptor(module);
   const prefix = identifier(module.name);
   const cPrefix = staticPrefix(module);
-  const declarations = module.methods.map((method) => {
-    const scalars = method.args.flatMap((argument, index) =>
-      argument.type === "u32" || argument.type === "bool" ? [`uint32_t argument_${index}`] : []);
-    return `int32_t ${staticCallee(module, method)}(DehermStatic${module.name}FrameV1* frame${scalars.length ? `, ${scalars.join(", ")}` : ""});`;
-  }).join("\n");
+  const declarations = module.methods
+    .map((method) => {
+      const scalars = method.args.flatMap((argument, index) =>
+        argument.type === "u32" || argument.type === "bool" ? [`uint32_t argument_${index}`] : [],
+      );
+      return `int32_t ${staticCallee(module, method)}(DehermStatic${module.name}FrameV1* frame${scalars.length ? `, ${scalars.join(", ")}` : ""});`;
+    })
+    .join("\n");
   return `// ${banner}
 #ifndef DEHERM_STATIC_${prefix}_H
 #define DEHERM_STATIC_${prefix}_H
@@ -303,20 +373,26 @@ export function renderNativeModuleStaticSource(module, headerInclude, banner = "
   const cPrefix = staticPrefix(module);
   const frame = `DehermStatic${module.name}FrameV1`;
   const providerUnavailable = module.constants?.status?.providerUnavailable ?? -7;
-  const methods = module.methods.map((method) => {
-    const scalarArguments = method.args.flatMap((argument, index) =>
-      argument.type === "u32" || argument.type === "bool" ? [{ argument, index }] : []);
-    const signature = scalarArguments.map(({ index }) => `uint32_t argument_${index}`).join(", ");
-    const assignments = scalarArguments.map(({ argument, index }) =>
-      argument.type === "bool"
-        ? `if (argument_${index} > 1u) return DEHERM_NATIVE_MODULE_REGISTRY_INVALID_ARGUMENT; frame->arguments[${index}].kind = DEHERM_NATIVE_MODULE_ARGUMENT_BOOL; frame->arguments[${index}].u32 = argument_${index};`
-        : `frame->arguments[${index}].kind = DEHERM_NATIVE_MODULE_ARGUMENT_U32; frame->arguments[${index}].u32 = argument_${index};`).join(" ");
-    return `extern "C" int32_t ${staticCallee(module, method)}(${frame}* frame${signature ? `, ${signature}` : ""}) {
+  const methods = module.methods
+    .map((method) => {
+      const scalarArguments = method.args.flatMap((argument, index) =>
+        argument.type === "u32" || argument.type === "bool" ? [{ argument, index }] : [],
+      );
+      const signature = scalarArguments.map(({ index }) => `uint32_t argument_${index}`).join(", ");
+      const assignments = scalarArguments
+        .map(({ argument, index }) =>
+          argument.type === "bool"
+            ? `if (argument_${index} > 1u) return DEHERM_NATIVE_MODULE_REGISTRY_INVALID_ARGUMENT; frame->arguments[${index}].kind = DEHERM_NATIVE_MODULE_ARGUMENT_BOOL; frame->arguments[${index}].u32 = argument_${index};`
+            : `frame->arguments[${index}].kind = DEHERM_NATIVE_MODULE_ARGUMENT_U32; frame->arguments[${index}].u32 = argument_${index};`,
+        )
+        .join(" ");
+      return `extern "C" int32_t ${staticCallee(module, method)}(${frame}* frame${signature ? `, ${signature}` : ""}) {
   if (!frame || frame->in_use == 0u) return DEHERM_NATIVE_MODULE_REGISTRY_INVALID_ARGUMENT;
   ${assignments}
   return invoke(frame, UINT32_C(${method.id}), UINT32_C(${method.args.length}));
 }`;
-  }).join("\n");
+    })
+    .join("\n");
   return `// ${banner}
 #include <${headerInclude}>
 #include <defold_hermes/native_module_provider.h>
@@ -402,49 +478,79 @@ function staticTsType(type) {
   return type === "u32" ? "number" : type === "utf8" ? "string" : type === "bool" ? "boolean" : "Array<number>";
 }
 
-export function renderNativeModuleStaticTypescript(module, headerInclude, banner = "Generated by deherm. Do not edit.") {
+export function renderNativeModuleStaticTypescript(
+  module,
+  headerInclude,
+  banner = "Generated by deherm. Do not edit.",
+) {
   assertNativeModuleDescriptor(module);
   const cPrefix = staticPrefix(module);
   const prefix = module.name;
   const frameBytes = staticFrameBytes(module);
-  const externs = module.methods.map((method) => {
-    const args = method.args.flatMap((argument, index) => {
-      const type = staticExternType(argument);
-      return type ? [`argument${index}:${type}`] : [];
-    });
-    return `const __${method.name}=$SHBuiltin.extern_c({include:"${headerInclude}"},function ${staticCallee(module, method)}(frame:c_ptr${args.length ? `,${args.join(",")}` : ""}):c_int{throw 0;});`;
-  }).join("\n");
-  const methods = module.methods.map((method) => {
-    const parameters = method.args.map((argument, index) => `${generatedArgumentName(index)}:${staticTsType(argument.type)}`).join(",");
-    const prepare = method.args.flatMap((argument, index) => {
-      const argumentName = generatedArgumentName(index);
-      if (argument.type === "utf8") return [`__writeUtf8(frame,${index},${argumentName});`];
-      if (argument.type === "bytes") return [`__writeBytes(frame,${index},${argumentName},${NATIVE_MODULE_ARGUMENT_KINDS.bytes});`];
-      if (argument.type === "mutableBytes") return [`__prepareMutable(frame,${index},${argumentName}.length);`];
-      return [];
-    }).join("");
-    const callArguments = method.args.flatMap((argument, index) =>
-      argument.type === "u32" ? [`__u32(${generatedArgumentName(index)})`] : argument.type === "bool" ? [`${generatedArgumentName(index)}?1:0`] : []);
-    const call = `__${method.name}(frame${callArguments.length ? `,${callArguments.join(",")}` : ""})`;
-    const copy = method.args.flatMap((argument, index) => {
-      if (argument.type !== "mutableBytes") return [];
-      const argumentName = generatedArgumentName(index);
-      if (!argument.copyBack) return [`__copyMutable(frame,${index},${argumentName},${argumentName}.length);`];
-      const recipe = argument.copyBack;
-      return [`let copyLength_${index}=${argumentName}.length;if(status===${recipe.okStatus}&&copyLength_${index}>=${recipe.headerBytes}){let payloadLength_${index}=__readByte(frame,${index},${recipe.payloadLengthOffset})|(__readByte(frame,${index},${recipe.payloadLengthOffset + 1})<<8)|(__readByte(frame,${index},${recipe.payloadLengthOffset + 2})<<16)|(__readByte(frame,${index},${recipe.payloadLengthOffset + 3})<<24);let needed_${index}=${recipe.headerBytes}+(payloadLength_${index}>>>0);if(needed_${index}<copyLength_${index})copyLength_${index}=needed_${index};}else if(copyLength_${index}>${recipe.headerBytes})copyLength_${index}=${recipe.headerBytes};__copyMutable(frame,${index},${argumentName},copyLength_${index});`];
-    }).join("");
-    const result = method.returns === "status"
-      ? `${copy}return status;`
-      : `if(status!==0)throw "${module.name}.${method.name} failed";${copy}return __result(frame);`;
-    return `${method.name}:(${parameters})=>{let frame=__acquire();if(!frame)throw "${module.name} Static Hermes frame depth exhausted";try{${prepare}let status=${call};${result}}finally{__release(frame);}},`;
-  }).join("\n");
-  const specification = module.methods.map((method) =>
-    `  ${method.name}: (${method.args.map((argument, index) => `${generatedArgumentName(index)}:${staticTsType(argument.type)}`).join(",")}) => number;`).join("\n");
-  const constants = Object.entries(module.constants ?? {}).map(([name, value]) => {
-    const typeName = `${prefix}${name[0].toUpperCase()}${name.slice(1)}`;
-    if (value && typeof value === "object") return `export const ${typeName}=Object.freeze(${JSON.stringify(value)});\nexport type ${typeName}=number;`;
-    return `export const ${typeName}=${JSON.stringify(value)};`;
-  }).join("\n");
+  const externs = module.methods
+    .map((method) => {
+      const args = method.args.flatMap((argument, index) => {
+        const type = staticExternType(argument);
+        return type ? [`argument${index}:${type}`] : [];
+      });
+      return `const __${method.name}=$SHBuiltin.extern_c({include:"${headerInclude}"},function ${staticCallee(module, method)}(frame:c_ptr${args.length ? `,${args.join(",")}` : ""}):c_int{throw 0;});`;
+    })
+    .join("\n");
+  const methods = module.methods
+    .map((method) => {
+      const parameters = method.args
+        .map((argument, index) => `${generatedArgumentName(index)}:${staticTsType(argument.type)}`)
+        .join(",");
+      const prepare = method.args
+        .flatMap((argument, index) => {
+          const argumentName = generatedArgumentName(index);
+          if (argument.type === "utf8") return [`__writeUtf8(frame,${index},${argumentName});`];
+          if (argument.type === "bytes")
+            return [`__writeBytes(frame,${index},${argumentName},${NATIVE_MODULE_ARGUMENT_KINDS.bytes});`];
+          if (argument.type === "mutableBytes") return [`__prepareMutable(frame,${index},${argumentName}.length);`];
+          return [];
+        })
+        .join("");
+      const callArguments = method.args.flatMap((argument, index) =>
+        argument.type === "u32"
+          ? [`__u32(${generatedArgumentName(index)})`]
+          : argument.type === "bool"
+            ? [`${generatedArgumentName(index)}?1:0`]
+            : [],
+      );
+      const call = `__${method.name}(frame${callArguments.length ? `,${callArguments.join(",")}` : ""})`;
+      const copy = method.args
+        .flatMap((argument, index) => {
+          if (argument.type !== "mutableBytes") return [];
+          const argumentName = generatedArgumentName(index);
+          if (!argument.copyBack) return [`__copyMutable(frame,${index},${argumentName},${argumentName}.length);`];
+          const recipe = argument.copyBack;
+          return [
+            `let copyLength_${index}=${argumentName}.length;if(status===${recipe.okStatus}&&copyLength_${index}>=${recipe.headerBytes}){let payloadLength_${index}=__readByte(frame,${index},${recipe.payloadLengthOffset})|(__readByte(frame,${index},${recipe.payloadLengthOffset + 1})<<8)|(__readByte(frame,${index},${recipe.payloadLengthOffset + 2})<<16)|(__readByte(frame,${index},${recipe.payloadLengthOffset + 3})<<24);let needed_${index}=${recipe.headerBytes}+(payloadLength_${index}>>>0);if(needed_${index}<copyLength_${index})copyLength_${index}=needed_${index};}else if(copyLength_${index}>${recipe.headerBytes})copyLength_${index}=${recipe.headerBytes};__copyMutable(frame,${index},${argumentName},copyLength_${index});`,
+          ];
+        })
+        .join("");
+      const result =
+        method.returns === "status"
+          ? `${copy}return status;`
+          : `if(status!==0)throw "${module.name}.${method.name} failed";${copy}return __result(frame);`;
+      return `${method.name}:(${parameters})=>{let frame=__acquire();if(!frame)throw "${module.name} Static Hermes frame depth exhausted";try{${prepare}let status=${call};${result}}finally{__release(frame);}},`;
+    })
+    .join("\n");
+  const specification = module.methods
+    .map(
+      (method) =>
+        `  ${method.name}: (${method.args.map((argument, index) => `${generatedArgumentName(index)}:${staticTsType(argument.type)}`).join(",")}) => number;`,
+    )
+    .join("\n");
+  const constants = Object.entries(module.constants ?? {})
+    .map(([name, value]) => {
+      const typeName = `${prefix}${name[0].toUpperCase()}${name.slice(1)}`;
+      if (value && typeof value === "object")
+        return `export const ${typeName}=Object.freeze(${JSON.stringify(value)});\nexport type ${typeName}=number;`;
+      return `export const ${typeName}=${JSON.stringify(value)};`;
+    })
+    .join("\n");
   return `// ${banner}
 "use strict";
 const __acquire=$SHBuiltin.extern_c({include:"${headerInclude}"},function deherm_static_${cPrefix}_frame_acquire():c_ptr{throw 0;});

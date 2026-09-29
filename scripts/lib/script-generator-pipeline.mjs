@@ -54,7 +54,7 @@ export const scriptGeneratorSources = Object.freeze([
   "scripts/lib/revision-audit.mjs",
   "scripts/lib/script-lifecycle-callbacks.mjs",
   "scripts/lib/documented-route-duplication.mjs",
-  "packages/compiler/src/names.mjs"
+  "packages/compiler/src/names.mjs",
 ]);
 
 export const scriptPinnedInputs = Object.freeze([
@@ -103,7 +103,7 @@ export const scriptPinnedInputs = Object.freeze([
   // about which documented routes are callable and which documented slots the C
   // body refuses to default.
   "packages/bindings/generated/defold-lua-registration-gate.json",
-  "packages/bindings/generated/defold-lua-registration-surface.json"
+  "packages/bindings/generated/defold-lua-registration-surface.json",
 ]);
 
 export const generatedScriptArtifacts = Object.freeze([
@@ -208,7 +208,7 @@ export const generatedScriptArtifacts = Object.freeze([
   "tests/fixtures/generated_script_recording_browser_callback_driver.js",
   "tests/fixtures/generated_script_recording_driver.cpp",
   "tests/fixtures/generated_script_recording_driver.js",
-  "tests/fixtures/generated_script_recording_expected_trace.txt"
+  "tests/fixtures/generated_script_recording_expected_trace.txt",
 ]);
 
 export const scriptGenerationSteps = Object.freeze([
@@ -243,7 +243,7 @@ export const scriptGenerationSteps = Object.freeze([
   Object.freeze({ runtime: "node", script: "scripts/generate-script-universal-value-bindings.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-script-handle-lowering.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-typed-native-bridge.mjs" }),
-  Object.freeze({ runtime: "node", script: "scripts/generate-script-recording-engine.mjs" })
+  Object.freeze({ runtime: "node", script: "scripts/generate-script-recording-engine.mjs" }),
 ]);
 
 // Build-directory exact verification is executable evidence, not a committed
@@ -255,23 +255,23 @@ export const staticScriptExactVerificationGenerator = Object.freeze({
     "scripts/generate-script-universal-value-bindings.mjs",
     "packages/compiler/src/script-static-exact-verification.mjs",
     "packages/compiler/src/script-recording-engine.mjs",
-    "native/static_script_exact_test.cpp"
+    "native/static_script_exact_test.cpp",
   ]),
   pinnedInputs: Object.freeze([
     "packages/bindings/generated/defold-script-recording-engine.json",
-    "packages/bindings/generated/defold-value-layouts.json"
+    "packages/bindings/generated/defold-value-layouts.json",
   ]),
   buildOutputs: Object.freeze([
     "static-script-exact.c",
     "static_script_exact_fixture.cpp",
     "static_script_exact_fixture.h",
-    "static-script-exact-evidence.json"
+    "static-script-exact-evidence.json",
   ]),
   execution: Object.freeze({
     cmakeTarget: "defold-hermes-static-script-exact-test",
     packageScript: "test:static-script-exact",
-    sanitizerPackageScript: "test:static-script-exact-sanitize"
-  })
+    sanitizerPackageScript: "test:static-script-exact-sanitize",
+  }),
 });
 
 // The Lua-registration ground-truth lane. It derives a target's REGISTERED Lua
@@ -291,26 +291,24 @@ export const luaRegistrationSurfaceGenerator = Object.freeze({
     "scripts/generate-lua-registration-surface.mjs",
     "scripts/lib/lua-c-registration.mjs",
     "scripts/lib/reviewed-revision.mjs",
-    "scripts/lib/revision-audit.mjs"
+    "scripts/lib/revision-audit.mjs",
   ]),
   pinnedInputs: Object.freeze([
     "upstream.lock",
     "packages/bindings/overrides/lua-registration-surface-targets.json",
-    "packages/bindings/generated/defold-script-api-ir.json"
+    "packages/bindings/generated/defold-script-api-ir.json",
   ]),
   artifacts: Object.freeze([
     "packages/bindings/generated/defold-lua-registration-surface.json",
     // The gate: the subset of the report backed by positive evidence in C
     // source and agreed by every mutually exclusive engine build variant. It is
     // small and stable on purpose, because the script graph consumes it.
-    "packages/bindings/generated/defold-lua-registration-gate.json"
+    "packages/bindings/generated/defold-lua-registration-gate.json",
   ]),
-  steps: Object.freeze([
-    Object.freeze({ runtime: "node", script: "scripts/generate-lua-registration-surface.mjs" })
-  ]),
+  steps: Object.freeze([Object.freeze({ runtime: "node", script: "scripts/generate-lua-registration-surface.mjs" })]),
   // Every target's sources are discovered from its declared root or archive
   // rather than listed, so the source tree itself is the pinned evidence.
-  sourceTreeEvidence: Object.freeze(["upstream/defold/engine"])
+  sourceTreeEvidence: Object.freeze(["upstream/defold/engine"]),
 });
 
 // The resource-declaration schema is derived from Bob's own builder annotations
@@ -321,24 +319,21 @@ export const luaRegistrationSurfaceGenerator = Object.freeze({
 export const resourceNamespaceGenerator = Object.freeze({
   sources: Object.freeze([
     "scripts/generate-defold-resource-schema.mjs",
-    "scripts/generate-script-resource-namespace-classification.mjs"
+    "scripts/generate-script-resource-namespace-classification.mjs",
   ]),
-  pinnedInputs: Object.freeze([
-    "upstream.lock",
-    "packages/bindings/generated/defold-script-api-ir.json"
-  ]),
+  pinnedInputs: Object.freeze(["upstream.lock", "packages/bindings/generated/defold-script-api-ir.json"]),
   artifacts: Object.freeze([
     "packages/bindings/generated/defold-resource-declaration-schema.json",
-    "packages/bindings/generated/defold-script-resource-namespaces.json"
+    "packages/bindings/generated/defold-script-resource-namespaces.json",
   ]),
   steps: Object.freeze([
     Object.freeze({ runtime: "node", script: "scripts/generate-defold-resource-schema.mjs" }),
-    Object.freeze({ runtime: "node", script: "scripts/generate-script-resource-namespace-classification.mjs" })
+    Object.freeze({ runtime: "node", script: "scripts/generate-script-resource-namespace-classification.mjs" }),
   ]),
   sourceTreeEvidence: Object.freeze([
     "upstream/defold/engine",
-    "upstream/defold/com.dynamo.cr/com.dynamo.cr.bob/src/com/dynamo/bob/pipeline"
-  ])
+    "upstream/defold/com.dynamo.cr/com.dynamo.cr.bob/src/com/dynamo/bob/pipeline",
+  ]),
 });
 
 // The layered API policy lane. It assembles one Defold revision's derived
@@ -372,7 +367,7 @@ export const apiPolicyGenerator = Object.freeze({
     "packages/compiler/src/binding-lowering-plan-recipe.mjs",
     "packages/compiler/src/revision-output-emitter.mjs",
     "packages/compiler/src/dmsdk-universal-static-frame.mjs",
-    "packages/compiler/src/defold-toolchain-pins.mjs"
+    "packages/compiler/src/defold-toolchain-pins.mjs",
   ]),
   pinnedInputs: Object.freeze([
     "upstream.lock",
@@ -423,18 +418,16 @@ export const apiPolicyGenerator = Object.freeze({
     "packages/sdk/src/generated/dmsdk/scalar.ts",
     "packages/sdk/src/generated/dmsdk/scratch-scalar-out.ts",
     "packages/sdk/src/generated/dmsdk/types.ts",
-    "packages/sdk/src/generated/dmsdk/universal.ts"
+    "packages/sdk/src/generated/dmsdk/universal.ts",
   ]),
   artifacts: Object.freeze([
     "packages/bindings/generated/defold-api-policy.json",
-    "packages/bindings/generated/defold-policy-index.json"
+    "packages/bindings/generated/defold-policy-index.json",
   ]),
   storeRoot: "packages/bindings/generated/policy",
-  steps: Object.freeze([
-    Object.freeze({ runtime: "node", script: "scripts/generate-api-policy.mjs" })
-  ]),
+  steps: Object.freeze([Object.freeze({ runtime: "node", script: "scripts/generate-api-policy.mjs" })]),
   sourceTreeEvidence: Object.freeze([
     "upstream/defold/build_tools/sdk.py",
-    "upstream/defold/share/extender/build_input.yml"
-  ])
+    "upstream/defold/share/extender/build_input.yml",
+  ]),
 });

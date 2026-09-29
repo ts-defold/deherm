@@ -30,7 +30,7 @@ export const BUILD_ARTIFACT_SCHEMA = "deherm.build-artifacts/v1";
 export const BUILD_ARTIFACT_KINDS = new Set(["bundle", "generated-sources"]);
 
 const fingerprintAssignment = new RegExp(
-  `${BUNDLE_FINGERPRINT_GLOBAL}\\s*=\\s*"([0-9a-f]{${BUNDLE_FINGERPRINT_LENGTH}})"`
+  `${BUNDLE_FINGERPRINT_GLOBAL}\\s*=\\s*"([0-9a-f]{${BUNDLE_FINGERPRINT_LENGTH}})"`,
 );
 
 export function sha256(value) {
@@ -141,15 +141,16 @@ export async function digestSourceFiles(baseDirectory, relativePaths) {
 export function buildArtifactRecord({ kind, resource, build, files, artifacts, fingerprint }) {
   if (!BUILD_ARTIFACT_KINDS.has(kind)) throw new Error(`Unknown build artifact kind: ${kind}`);
   const outputs = Object.fromEntries(
-    Object.entries(artifacts ?? {}).sort(([left], [right]) => compareCodeUnits(left, right))
+    Object.entries(artifacts ?? {}).sort(([left], [right]) => compareCodeUnits(left, right)),
   );
   if (!Object.keys(outputs).length) throw new Error(`Build artifact record for ${kind} names no output file`);
   if (kind === "bundle") {
     if (Object.keys(outputs).length !== 1) throw new Error("A bundle record describes exactly one output file");
-    if (!/^[0-9a-f]{64}$/.test(fingerprint ?? "")) throw new Error("A bundle record requires its published fingerprint");
+    if (!/^[0-9a-f]{64}$/.test(fingerprint ?? ""))
+      throw new Error("A bundle record requires its published fingerprint");
   }
   const sourceFiles = Object.fromEntries(
-    Object.entries(files ?? {}).sort(([left], [right]) => compareCodeUnits(left, right))
+    Object.entries(files ?? {}).sort(([left], [right]) => compareCodeUnits(left, right)),
   );
   return {
     kind,
@@ -160,8 +161,8 @@ export function buildArtifactRecord({ kind, resource, build, files, artifacts, f
     sources: {
       digest: sourceBindingDigest({ build: build ?? null, files: sourceFiles }),
       fileCount: Object.keys(sourceFiles).length,
-      files: sourceFiles
-    }
+      files: sourceFiles,
+    },
   };
 }
 
@@ -173,8 +174,9 @@ export function buildArtifactRecord({ kind, resource, build, files, artifacts, f
  */
 function statusSeverity(status) {
   if (status === "fresh") return "ok";
-  return ["unbound", "artifact-absent", "toolchain-drift", "lock-missing", "equivalent-rebuild"]
-    .includes(status) ? "warn" : "error";
+  return ["unbound", "artifact-absent", "toolchain-drift", "lock-missing", "equivalent-rebuild"].includes(status)
+    ? "warn"
+    : "error";
 }
 
 /** Re-derive the roll-up after a caller has escalated individual entries. */
@@ -267,19 +269,24 @@ export async function checkBuildArtifacts({ projectRoot, lock, expected = [], to
       resource: record.resource ?? null,
       status,
       severity: statusSeverity(status),
-      fingerprint: record.kind === "bundle"
-        ? { recorded: record.fingerprint, onDisk: outputs[0]?.fingerprint?.declared ?? null, recomputed: outputs[0]?.fingerprint?.computed ?? null }
-        : null,
+      fingerprint:
+        record.kind === "bundle"
+          ? {
+              recorded: record.fingerprint,
+              onDisk: outputs[0]?.fingerprint?.declared ?? null,
+              recomputed: outputs[0]?.fingerprint?.computed ?? null,
+            }
+          : null,
       sources: {
         recordedDigest: record.sources?.digest ?? null,
         currentDigest,
         fileCount: recordedFiles.length,
         changed,
-        missing
+        missing,
       },
       outputs,
       toolchainDrift: drifted,
-      build: record.build ?? null
+      build: record.build ?? null,
     });
   }
   const bound = new Set(entries.flatMap(({ outputs }) => outputs.map(({ path: file }) => file)));
@@ -298,7 +305,7 @@ export async function checkBuildArtifacts({ projectRoot, lock, expected = [], to
         sources: null,
         outputs: [{ path: candidate.path, status: "missing", expected: null, actual: null }],
         toolchainDrift: [],
-        build: null
+        build: null,
       });
       continue;
     }
@@ -313,7 +320,7 @@ export async function checkBuildArtifacts({ projectRoot, lock, expected = [], to
       sources: null,
       outputs: [{ path: candidate.path, status: "unbound", expected: null, actual: sha256(contents) }],
       toolchainDrift: [],
-      build: null
+      build: null,
     });
   }
   entries.sort((left, right) => compareCodeUnits(left.name, right.name));
@@ -321,7 +328,7 @@ export async function checkBuildArtifacts({ projectRoot, lock, expected = [], to
     schemaVersion: 1,
     schema: BUILD_ARTIFACT_SCHEMA,
     projectRoot: root,
-    entries
+    entries,
   });
 }
 
@@ -340,10 +347,13 @@ export function formatBuildArtifactReport(result, options = {}) {
   for (const entry of result.entries) {
     const marker = entry.severity === "ok" ? "ok" : entry.severity === "warn" ? "--" : "!!";
     if (entry.status === "fresh") {
-      const detail = entry.kind === "bundle"
-        ? `fingerprint ${entry.fingerprint.onDisk}`
-        : `${entry.outputs.length} generated file(s)`;
-      lines.push(`${marker} ${entry.kind} ${entry.name}: ${detail}, ${entry.sources.fileCount} bound source(s) unchanged`);
+      const detail =
+        entry.kind === "bundle"
+          ? `fingerprint ${entry.fingerprint.onDisk}`
+          : `${entry.outputs.length} generated file(s)`;
+      lines.push(
+        `${marker} ${entry.kind} ${entry.name}: ${detail}, ${entry.sources.fileCount} bound source(s) unchanged`,
+      );
     } else if (entry.status === "stale-sources") {
       lines.push(`${marker} ${entry.kind} ${entry.name} is stale: its sources changed after it was built`);
       if (entry.kind === "bundle") {
@@ -354,13 +364,15 @@ export function formatBuildArtifactReport(result, options = {}) {
       lines.push(`   current source digest: ${shortDigest(entry.sources.currentDigest)}`);
       const changes = [
         ...entry.sources.changed.map((file) => `modified ${file}`),
-        ...entry.sources.missing.map((file) => `missing  ${file}`)
+        ...entry.sources.missing.map((file) => `missing  ${file}`),
       ];
       lines.push(`   ${changes.length} of ${entry.sources.fileCount} bound source(s) differ:`);
       for (const change of changes.slice(0, 10)) lines.push(`     ${change}`);
       if (changes.length > 10) lines.push(`     … and ${changes.length - 10} more`);
     } else if (entry.status === "artifact-corrupt") {
-      lines.push(`${marker} ${entry.kind} ${entry.name} does not match its own fingerprint: it was modified after it was built`);
+      lines.push(
+        `${marker} ${entry.kind} ${entry.name} does not match its own fingerprint: it was modified after it was built`,
+      );
       lines.push(`   published fingerprint: ${entry.fingerprint.onDisk ?? "<none>"}`);
       lines.push(`   content fingerprint:   ${entry.fingerprint.recomputed ?? "<none>"}`);
     } else if (entry.status === "artifact-replaced") {
@@ -376,7 +388,9 @@ export function formatBuildArtifactReport(result, options = {}) {
       lines.push(`${marker} ${entry.kind} ${entry.name} is recorded in deherm.lock but missing from the working tree`);
       for (const output of entry.outputs.filter(({ status }) => status === "missing")) lines.push(`   ${output.path}`);
     } else if (entry.status === "artifact-absent") {
-      lines.push(`${marker} ${entry.name} does not exist; Bob would archive nothing for ${entry.resource ?? entry.name}`);
+      lines.push(
+        `${marker} ${entry.name} does not exist; Bob would archive nothing for ${entry.resource ?? entry.name}`,
+      );
     } else if (entry.status === "unbound") {
       lines.push(`${marker} ${entry.kind} ${entry.name} exists but deherm.lock binds it to no sources`);
       if (entry.fingerprint?.onDisk) lines.push(`   fingerprint on disk: ${entry.fingerprint.onDisk}`);
@@ -385,11 +399,17 @@ export function formatBuildArtifactReport(result, options = {}) {
       lines.push(`${marker} ${entry.kind} ${entry.name} was built with TypeScript transforms disabled`);
       lines.push("   --no-ttsc is diagnostic-only; rebuild with 'deherm dev --once' before Bob packages the project.");
     } else if (entry.status === "equivalent-rebuild") {
-      lines.push(`${marker} ${entry.kind} ${entry.name}: its sources changed, but they compile to the artifact on disk`);
-      lines.push(`   ${entry.sources.changed.length + entry.sources.missing.length} bound source(s) differ; the program does not`);
+      lines.push(
+        `${marker} ${entry.kind} ${entry.name}: its sources changed, but they compile to the artifact on disk`,
+      );
+      lines.push(
+        `   ${entry.sources.changed.length + entry.sources.missing.length} bound source(s) differ; the program does not`,
+      );
       lines.push("   The binding in deherm.lock is out of date; rebuilding refreshes it.");
     } else if (entry.status === "toolchain-drift") {
-      lines.push(`${marker} ${entry.kind} ${entry.name} was built by a different toolchain than the one installed here`);
+      lines.push(
+        `${marker} ${entry.kind} ${entry.name} was built by a different toolchain than the one installed here`,
+      );
       for (const drift of entry.toolchainDrift) {
         lines.push(`   ${drift.component}: recorded ${drift.recorded}, installed ${drift.current}`);
       }

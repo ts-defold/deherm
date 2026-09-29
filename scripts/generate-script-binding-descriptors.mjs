@@ -12,7 +12,7 @@ const FAMILY_ENTRIES = [
   ["lua-table", "LuaTable", 4],
   ["borrowed-handle", "BorrowedHandle", 5],
   ["defold-value", "DefoldValue", 6],
-  ["scalar", "Scalar", 7]
+  ["scalar", "Scalar", 7],
 ];
 
 const CODEC_ENTRIES = [
@@ -34,7 +34,7 @@ const CODEC_ENTRIES = [
   // undeclared. Those aliases are documentation Defold added later; the types were
   // always there, and a revision must not become underivable because its docs are
   // thinner.
-  ["unknown", "Unknown", 1 << 8]
+  ["unknown", "Unknown", 1 << 8],
 ];
 
 const TRAIT_ENTRIES = [
@@ -50,16 +50,15 @@ const TRAIT_ENTRIES = [
   // The route takes or returns a type the reference archive names but never
   // declares. Paired with the `unknown` codec above; see that comment for why a
   // revision with thinner documentation must still derive.
-  ["unregistered-type", "UnregisteredType", 1 << 9]
+  ["unregistered-type", "UnregisteredType", 1 << 9],
 ];
 
 const PARAMETER_FLAG_ENTRIES = [
   ["optional", "Optional", 1 << 0],
-  ["variadic", "Variadic", 1 << 1]
+  ["variadic", "Variadic", 1 << 1],
 ];
 
 const FAMILY_VALUE = new Map(FAMILY_ENTRIES.map(([key, , value]) => [key, value]));
-const FAMILY_CPP = new Map(FAMILY_ENTRIES.map(([key, cpp]) => [key, cpp]));
 const CODEC_VALUE = new Map(CODEC_ENTRIES.map(([key, , value]) => [key, value]));
 const TRAIT_VALUE = new Map(TRAIT_ENTRIES.map(([key, , value]) => [key, value]));
 
@@ -122,7 +121,10 @@ function intern(values) {
 
 function validateInputs(ir, patterns) {
   assert(ir.defoldRevision === patterns.defoldRevision, "IR and pattern Defold revisions differ");
-  assert(patterns.coverageClaim === "classification only; no executable binding coverage is claimed", "Pattern report overstates executable coverage");
+  assert(
+    patterns.coverageClaim === "classification only; no executable binding coverage is claimed",
+    "Pattern report overstates executable coverage",
+  );
 
   const pending = ir.functions
     .filter((entry) => entry.runtimeStatus === "requires-universal-lua-bridge")
@@ -132,7 +134,10 @@ function validateInputs(ir, patterns) {
   assert(pending.length === patterns.pendingFunctionCount, "Pattern pending count differs from IR");
   assert(classified.length === patterns.classifiedFunctionCount, "Pattern classified count differs from binding rows");
   assert(pending.length === classified.length, "Pending functions are not classified exactly once");
-  assert(new Set(classified.map((entry) => entry.id)).size === classified.length, "Pattern bindings contain duplicate stable keys");
+  assert(
+    new Set(classified.map((entry) => entry.id)).size === classified.length,
+    "Pattern bindings contain duplicate stable keys",
+  );
 
   for (let index = 0; index < pending.length; index += 1) {
     const functionEntry = pending[index];
@@ -141,50 +146,78 @@ function validateInputs(ir, patterns) {
     assert(functionEntry.rawName === pattern.rawName, `Raw name mismatch for '${functionEntry.id}'`);
     assert(functionEntry.source === pattern.source, `Source mismatch for '${functionEntry.id}'`);
     assert(functionEntry.line === pattern.line, `Source line mismatch for '${functionEntry.id}'`);
-    assert(pattern.runtimeStatus === "classified-not-implemented", `Unexpected runtime claim for '${functionEntry.id}'`);
-    assert(FAMILY_VALUE.has(pattern.loweringFamily), `Unknown family '${pattern.loweringFamily}' in '${functionEntry.id}'`);
-    assert(functionEntry.parameters.length === pattern.parameterCodecs.length, `Parameter count mismatch for '${functionEntry.id}'`);
-    assert(functionEntry.returns.length === pattern.returnCodecs.length, `Return count mismatch for '${functionEntry.id}'`);
+    assert(
+      pattern.runtimeStatus === "classified-not-implemented",
+      `Unexpected runtime claim for '${functionEntry.id}'`,
+    );
+    assert(
+      FAMILY_VALUE.has(pattern.loweringFamily),
+      `Unknown family '${pattern.loweringFamily}' in '${functionEntry.id}'`,
+    );
+    assert(
+      functionEntry.parameters.length === pattern.parameterCodecs.length,
+      `Parameter count mismatch for '${functionEntry.id}'`,
+    );
+    assert(
+      functionEntry.returns.length === pattern.returnCodecs.length,
+      `Return count mismatch for '${functionEntry.id}'`,
+    );
     for (let parameterIndex = 0; parameterIndex < functionEntry.parameters.length; parameterIndex += 1) {
       const parameter = functionEntry.parameters[parameterIndex];
       const codec = pattern.parameterCodecs[parameterIndex];
-      assert(parameter.rawName === codec.name, `Parameter name mismatch for '${functionEntry.id}' at ${parameterIndex}`);
-      assert(parameter.rawType === codec.rawType, `Parameter type mismatch for '${functionEntry.id}' at ${parameterIndex}`);
-      assert(parameter.optional === codec.optional, `Parameter optionality mismatch for '${functionEntry.id}' at ${parameterIndex}`);
+      assert(
+        parameter.rawName === codec.name,
+        `Parameter name mismatch for '${functionEntry.id}' at ${parameterIndex}`,
+      );
+      assert(
+        parameter.rawType === codec.rawType,
+        `Parameter type mismatch for '${functionEntry.id}' at ${parameterIndex}`,
+      );
+      assert(
+        parameter.optional === codec.optional,
+        `Parameter optionality mismatch for '${functionEntry.id}' at ${parameterIndex}`,
+      );
     }
     for (let returnIndex = 0; returnIndex < functionEntry.returns.length; returnIndex += 1) {
       const codec = pattern.returnCodecs[returnIndex];
       assert(codec.index === returnIndex, `Return index mismatch for '${functionEntry.id}' at ${returnIndex}`);
-      assert(functionEntry.returns[returnIndex] === codec.rawType, `Return type mismatch for '${functionEntry.id}' at ${returnIndex}`);
+      assert(
+        functionEntry.returns[returnIndex] === codec.rawType,
+        `Return type mismatch for '${functionEntry.id}' at ${returnIndex}`,
+      );
     }
   }
   return { pending, classified };
 }
 
 function semanticInputHashes(pending, classified) {
-  const irRows = pending.map(({ id, rawName, modulePath, member, jsName, parameters, returns, source, line, runtimeStatus }) => ({
-    id,
-    rawName,
-    modulePath,
-    member,
-    jsName,
-    parameters,
-    returns,
-    source,
-    line,
-    runtimeStatus
-  }));
-  const patternRows = classified.map(({ id, loweringFamily, parameterCodecs, returnCodecs, traits, runtimeStatus }) => ({
-    id,
-    loweringFamily,
-    parameterCodecs,
-    returnCodecs,
-    traits,
-    runtimeStatus
-  }));
+  const irRows = pending.map(
+    ({ id, rawName, modulePath, member, jsName, parameters, returns, source, line, runtimeStatus }) => ({
+      id,
+      rawName,
+      modulePath,
+      member,
+      jsName,
+      parameters,
+      returns,
+      source,
+      line,
+      runtimeStatus,
+    }),
+  );
+  const patternRows = classified.map(
+    ({ id, loweringFamily, parameterCodecs, returnCodecs, traits, runtimeStatus }) => ({
+      id,
+      loweringFamily,
+      parameterCodecs,
+      returnCodecs,
+      traits,
+      runtimeStatus,
+    }),
+  );
   return {
     scriptIrSemanticSha256: sha256(canonicalJson(irRows)),
-    bindingPatternsSemanticSha256: sha256(canonicalJson(patternRows))
+    bindingPatternsSemanticSha256: sha256(canonicalJson(patternRows)),
   };
 }
 
@@ -212,7 +245,7 @@ export function generateScriptBindingDescriptors(ir, patterns) {
     returnCodecUnion: [],
     parameterCodecMask: [],
     parameterFlags: [],
-    returnCodecMask: []
+    returnCodecMask: [],
   };
   const cold = {
     sourceFiles: sourceFiles.table,
@@ -223,7 +256,7 @@ export function generateScriptBindingDescriptors(ir, patterns) {
     members: [],
     sourceFileIndex: [],
     sourceLines: [],
-    modulePathIndex: []
+    modulePathIndex: [],
   };
   const stableIds = new Map();
 
@@ -237,10 +270,16 @@ export function generateScriptBindingDescriptors(ir, patterns) {
     assert(hot.parameterCodecMask.length <= 0xffff, "Parameter codec table exceeds uint16_t offsets");
     assert(hot.returnCodecMask.length <= 0xffff, "Return codec table exceeds uint16_t offsets");
 
-    const parameterMasks = pattern.parameterCodecs.map((parameter) => codecMask(parameter.codecs, `${pattern.id}:${parameter.name}`));
-    const returnMasks = pattern.returnCodecs.map((result) => codecMask(result.codecs, `${pattern.id}:return:${result.index}`));
+    const parameterMasks = pattern.parameterCodecs.map((parameter) =>
+      codecMask(parameter.codecs, `${pattern.id}:${parameter.name}`),
+    );
+    const returnMasks = pattern.returnCodecs.map((result) =>
+      codecMask(result.codecs, `${pattern.id}:return:${result.index}`),
+    );
     const variadic = pattern.traits.includes("variable-arguments");
-    const minimumArity = pattern.parameterCodecs.filter((parameter) => !parameter.optional && parameter.name !== "...").length;
+    const minimumArity = pattern.parameterCodecs.filter(
+      (parameter) => !parameter.optional && parameter.name !== "...",
+    ).length;
     assert(pattern.parameterCodecs.length <= 0xff, `Parameter count exceeds uint8_t in '${pattern.id}'`);
     assert(pattern.returnCodecs.length <= 0xff, `Return count exceeds uint8_t in '${pattern.id}'`);
     assert(minimumArity <= 0xff, `Minimum arity exceeds uint8_t in '${pattern.id}'`);
@@ -257,9 +296,13 @@ export function generateScriptBindingDescriptors(ir, patterns) {
     hot.parameterCodecUnion.push(parameterMasks.reduce((mask, value) => mask | value, 0));
     hot.returnCodecUnion.push(returnMasks.reduce((mask, value) => mask | value, 0));
     hot.parameterCodecMask.push(...parameterMasks);
-    hot.parameterFlags.push(...pattern.parameterCodecs.map((parameter) =>
-      (parameter.optional ? PARAMETER_FLAG_ENTRIES[0][2] : 0) |
-      (parameter.name === "..." ? PARAMETER_FLAG_ENTRIES[1][2] : 0)));
+    hot.parameterFlags.push(
+      ...pattern.parameterCodecs.map(
+        (parameter) =>
+          (parameter.optional ? PARAMETER_FLAG_ENTRIES[0][2] : 0) |
+          (parameter.name === "..." ? PARAMETER_FLAG_ENTRIES[1][2] : 0),
+      ),
+    );
     hot.returnCodecMask.push(...returnMasks);
 
     cold.stableKeys.push(pattern.id);
@@ -284,7 +327,7 @@ export function generateScriptBindingDescriptors(ir, patterns) {
     traits: enumObject(TRAIT_ENTRIES),
     parameterFlags: enumObject(PARAMETER_FLAG_ENTRIES),
     hot,
-    cold
+    cold,
   };
   const descriptorAbiSha256 = sha256(canonicalJson(descriptorPayload));
   const artifact = {
@@ -297,7 +340,8 @@ export function generateScriptBindingDescriptors(ir, patterns) {
       stableId: "32-bit FNV-1a of the canonical stable key; generation fails on collision",
       denseIndex: "zero-based array index",
       ordering: "ascending Unicode code-unit order of stable keys",
-      compatibility: "stable IDs persist when unrelated rows are added; dense indices require an exact descriptor ABI fingerprint"
+      compatibility:
+        "stable IDs persist when unrelated rows are added; dense indices require an exact descriptor ABI fingerprint",
     },
     inputHashes: semanticHashes,
     descriptorAbiSha256,
@@ -309,7 +353,7 @@ export function generateScriptBindingDescriptors(ir, patterns) {
     traits: enumObject(TRAIT_ENTRIES),
     parameterFlags: enumObject(PARAMETER_FLAG_ENTRIES),
     hot,
-    cold
+    cold,
   };
   return { artifact, header: renderCppHeader(artifact) };
 }
@@ -320,11 +364,6 @@ function renderNumbers(values, indent = "    ", columns = 20) {
     lines.push(`${indent}${values.slice(index, index + columns).join(", ")}`);
   }
   return lines.join(",\n");
-}
-
-function renderStrings(values, indent = "    ", columns = 4) {
-  const encoded = values.map((value) => JSON.stringify(value));
-  return renderTokens(encoded, indent, columns);
 }
 
 function renderTokens(values, indent = "    ", columns = 8) {
@@ -460,7 +499,10 @@ async function main(argv = process.argv.slice(2)) {
   const irUrl = new URL("packages/bindings/generated/defold-script-api-ir.json", root);
   const patternUrl = new URL("packages/bindings/generated/defold-script-binding-patterns.json", root);
   const jsonUrl = new URL("packages/bindings/generated/defold-script-binding-descriptors.json", root);
-  const headerUrl = new URL("defold/defold_hermes/include/defold_hermes/generated_script_binding_descriptors.hpp", root);
+  const headerUrl = new URL(
+    "defold/defold_hermes/include/defold_hermes/generated_script_binding_descriptors.hpp",
+    root,
+  );
   const [irText, patternText] = await Promise.all([readFile(irUrl, "utf8"), readFile(patternUrl, "utf8")]);
   assert(sha256(irText) === JSON.parse(patternText).sourceSha256, "Pattern report is stale relative to the script IR");
   const { artifact, header } = generateScriptBindingDescriptors(JSON.parse(irText), JSON.parse(patternText));
@@ -472,7 +514,9 @@ async function main(argv = process.argv.slice(2)) {
   } else {
     await Promise.all([writeFile(jsonUrl, json), writeFile(headerUrl, header)]);
   }
-  console.log(`${check ? "Verified" : "Generated"} ${artifact.bindingCount} script binding descriptors (${artifact.parameterSlotCount} parameters, ${artifact.returnSlotCount} returns)`);
+  console.log(
+    `${check ? "Verified" : "Generated"} ${artifact.bindingCount} script binding descriptors (${artifact.parameterSlotCount} parameters, ${artifact.returnSlotCount} returns)`,
+  );
   console.log(`Descriptor ABI: ${artifact.descriptorAbiSha256}; executable coverage claimed: no`);
 }
 

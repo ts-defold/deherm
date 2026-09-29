@@ -27,25 +27,29 @@ function run(command, args) {
 }
 
 test("compiler JSI exact runner reports callback-only usage without inventing coverage", () => {
-  const rendered = renderDmSdkUniversalJsiExactRunner({ verification: {
-    schemaVersion: 1,
-    catalogSha256: "a".repeat(64),
-    manifestSha256: "b".repeat(64),
-    provider: { install: "install_exact_provider" },
-    driver: { function: "run_native_exact" },
-    observations: {
-      reset: "reset_exact_observations",
-      calls: "exact_call_count",
-      failures: "exact_failure_count",
+  const rendered = renderDmSdkUniversalJsiExactRunner({
+    verification: {
+      schemaVersion: 1,
+      catalogSha256: "a".repeat(64),
+      manifestSha256: "b".repeat(64),
+      provider: { install: "install_exact_provider" },
+      driver: { function: "run_native_exact" },
+      observations: {
+        reset: "reset_exact_observations",
+        calls: "exact_call_count",
+        failures: "exact_failure_count",
+      },
+      vectors: [
+        {
+          declarationId: "dmsdk:fixture-callback",
+          numericId: 7,
+          argumentCount: 1,
+          wireArguments: [{ slot: 0, tag: "callback" }],
+          result: { fakeReturn: { tag: "void", value: 0 } },
+        },
+      ],
     },
-    vectors: [{
-      declarationId: "dmsdk:fixture-callback",
-      numericId: 7,
-      argumentCount: 1,
-      wireArguments: [{ slot: 0, tag: "callback" }],
-      result: { fakeReturn: { tag: "void", value: 0 } },
-    }],
-  } });
+  });
 
   assert.equal(rendered.report.vectorCount, 1);
   assert.equal(rendered.report.executableVectorCount, 0);
@@ -80,10 +84,7 @@ test("dynamic Hermes JSI runner executes exact dmSDK vectors through the product
     return;
   }
   const sdkIr = JSON.parse(await readFile(sdkIrPath, "utf8"));
-  const corpus = materializeDmSdkUniversalReadyCorpus(
-    buildDmSdkCallSymbolIndex(sdkIr, policyCatalog),
-    policyCatalog,
-  );
+  const corpus = materializeDmSdkUniversalReadyCorpus(buildDmSdkCallSymbolIndex(sdkIr, policyCatalog), policyCatalog);
   const { generated } = corpus;
   const runner = renderDmSdkUniversalJsiExactRunner(generated, {
     verificationInclude: "materialized.verify.cpp",
@@ -104,39 +105,47 @@ test("dynamic Hermes JSI runner executes exact dmSDK vectors through the product
 
   const output = await mkdtemp(path.join(tmpdir(), "deherm-dmsdk-jsi-exact-"));
   try {
-    const sdkRoot = path.join(
-      root,
-      "upstream/extender/server/app/sdk",
-      corpus.report.defoldRevision,
-      "defoldsdk",
-    );
+    const sdkRoot = path.join(root, "upstream/extender/server/app/sdk", corpus.report.defoldRevision, "defoldsdk");
     const verification = path.join(output, "materialized.verify.cpp");
     const runnerSource = path.join(output, "jsi-exact-runner.cpp");
     const harness = path.join(output, "harness.cpp");
     const executable = path.join(output, "jsi-exact-runner");
     await writeFile(verification, generated.verificationSource);
     await writeFile(runnerSource, runner.source);
-    await writeFile(harness, `#include "jsi-exact-runner.cpp"\nint main(){return deherm_dmsdk_run_jsi_exact_verification();}\n`);
-    const linkFlags = process.platform === "linux"
-      ? ["-pthread", "-ldl"]
-      : ["-pthread", "-framework", "CoreFoundation"];
+    await writeFile(
+      harness,
+      `#include "jsi-exact-runner.cpp"\nint main(){return deherm_dmsdk_run_jsi_exact_verification();}\n`,
+    );
+    const linkFlags =
+      process.platform === "linux" ? ["-pthread", "-ldl"] : ["-pthread", "-framework", "CoreFoundation"];
     run(compiler, [
-      "-std=c++17", "-Wall", "-Wextra", "-Werror",
-      "-DDLIB_LOG_DOMAIN=\"deherm\"",
+      "-std=c++17",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      '-DDLIB_LOG_DOMAIN="deherm"',
       `-I${path.join(root, "defold/defold_hermes/include")}`,
-      "-isystem", path.join(root, "upstream/defold/engine/dlib/src"),
-      "-isystem", path.join(sdkRoot, "sdk/include"),
-      "-isystem", path.join(sdkRoot, "include"),
-      "-isystem", path.join(sdkRoot, "ext/include"),
-      "-isystem", path.join(root, "upstream/hermes/API"),
-      "-isystem", path.join(root, "upstream/hermes/API/jsi"),
-      "-isystem", path.join(root, "upstream/hermes/public"),
+      "-isystem",
+      path.join(root, "upstream/defold/engine/dlib/src"),
+      "-isystem",
+      path.join(sdkRoot, "sdk/include"),
+      "-isystem",
+      path.join(sdkRoot, "include"),
+      "-isystem",
+      path.join(sdkRoot, "ext/include"),
+      "-isystem",
+      path.join(root, "upstream/hermes/API"),
+      "-isystem",
+      path.join(root, "upstream/hermes/API/jsi"),
+      "-isystem",
+      path.join(root, "upstream/hermes/public"),
       "defold/defold_hermes/src/generated_dmsdk_universal.cpp",
       "defold/defold_hermes/src/generated_dmsdk_universal_jsi.cpp",
       harness,
       hermesArchive,
       ...linkFlags,
-      "-o", executable,
+      "-o",
+      executable,
     ]);
     run(executable, []);
   } finally {

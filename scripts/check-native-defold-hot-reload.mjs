@@ -10,13 +10,21 @@ import { startResourceServer } from "../packages/cli/src/dev/resource-server.mjs
 import {
   createRejectedCandidate,
   createValidCandidate,
-  rejectedCandidateMarker
+  rejectedCandidateMarker,
 } from "./lib/native-hot-reload-fixture.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
 const buildRoot = path.join(root, "defold", "build", "bob");
 const bundleFile = path.join(buildRoot, "deherm", "app.dehermc");
-const executable = path.join(root, "build", "bundle", "Defold Hermes Spike.app", "Contents", "MacOS", "DefoldHermesSpike");
+const executable = path.join(
+  root,
+  "build",
+  "bundle",
+  "Defold Hermes Spike.app",
+  "Contents",
+  "MacOS",
+  "DefoldHermesSpike",
+);
 const resources = path.join(root, "build", "bundle", "Defold Hermes Spike.app", "Contents", "Resources");
 const timeoutMs = Number.parseInt(process.env.DEHERM_HOT_RELOAD_TIMEOUT_MS ?? "15000", 10);
 
@@ -31,7 +39,7 @@ const validCandidate = createValidCandidate(source);
 
 let temporarySequence = 0;
 async function publish(contents) {
-  const temporary = `${bundleFile}.hot-reload-${process.pid}-${temporarySequence += 1}`;
+  const temporary = `${bundleFile}.hot-reload-${process.pid}-${(temporarySequence += 1)}`;
   try {
     await writeFile(temporary, contents);
     await rename(temporary, bundleFile);
@@ -51,7 +59,7 @@ async function reserveServicePort() {
     socket.close();
     throw new Error("Unable to allocate an isolated Defold engine-service port");
   }
-  await new Promise((resolve, reject) => socket.close((error) => error ? reject(error) : resolve()));
+  await new Promise((resolve, reject) => socket.close((error) => (error ? reject(error) : resolve())));
   return address.port;
 }
 
@@ -74,12 +82,7 @@ function waitUntil(transcript, description, predicate, timeout, child) {
 }
 
 function waitFor(transcript, marker, timeout, child, offset = 0) {
-  return waitUntil(
-      transcript,
-      JSON.stringify(marker),
-      (text) => text.indexOf(marker, offset) !== -1,
-      timeout,
-      child);
+  return waitUntil(transcript, JSON.stringify(marker), (text) => text.indexOf(marker, offset) !== -1, timeout, child);
 }
 
 const servicePort = await reserveServicePort();
@@ -88,10 +91,12 @@ const server = await startResourceServer({ root: buildRoot });
 const child = spawn(executable, [`--config=resource.uri=${server.baseUrl}`], {
   cwd: resources,
   env: { ...process.env, DM_SERVICE_PORT: String(servicePort) },
-  stdio: ["ignore", "pipe", "pipe"]
+  stdio: ["ignore", "pipe", "pipe"],
 });
 const transcript = { text: "" };
-const append = (chunk) => { transcript.text += chunk.toString("utf8").replaceAll("\r", ""); };
+const append = (chunk) => {
+  transcript.text += chunk.toString("utf8").replaceAll("\r", "");
+};
 child.stdout.on("data", append);
 child.stderr.on("data", append);
 
@@ -119,11 +124,12 @@ try {
   await postResourceReload(engineServiceUrl, ["/deherm/app.dehermc"], { timeoutMs: 2_000 });
   await waitFor(transcript, "INFO:DEFOLD_HERMES: module:84", timeoutMs, child, validOffset);
   await waitFor(
-      transcript,
-      "INFO:DEFOLD_HERMES: Activated TypeScript bundle generation 3 from '/deherm/app.dehermc'",
-      timeoutMs,
-      child,
-      validOffset);
+    transcript,
+    "INFO:DEFOLD_HERMES: Activated TypeScript bundle generation 3 from '/deherm/app.dehermc'",
+    timeoutMs,
+    child,
+    validOffset,
+  );
   await waitFor(transcript, "INFO:DEFOLD_HERMES: lifecycle:update:1", timeoutMs, child, validOffset);
   const validWindow = transcript.text.slice(validOffset);
   if (!validWindow.includes("INFO:DEFOLD_HERMES: final:ok")) {
@@ -141,7 +147,7 @@ try {
   if (child.exitCode === null) child.kill("SIGTERM");
   await Promise.race([
     new Promise((resolve) => child.once("exit", resolve)),
-    new Promise((resolve) => setTimeout(resolve, 1_000))
+    new Promise((resolve) => setTimeout(resolve, 1_000)),
   ]);
   await server.close();
 }

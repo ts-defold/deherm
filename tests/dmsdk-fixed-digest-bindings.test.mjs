@@ -100,7 +100,10 @@ test("a fixed-digest shape without recoverable implementation extent retains the
       await readFile(join(repositoryRoot, "packages/bindings/generated/defold-dmsdk-abi-shapes.json"), "utf8"),
     );
     const sourceFacts = JSON.parse(
-      await readFile(join(repositoryRoot, "packages/bindings/generated/defold-dmsdk-source-semantic-facts.json"), "utf8"),
+      await readFile(
+        join(repositoryRoot, "packages/bindings/generated/defold-dmsdk-source-semantic-facts.json"),
+        "utf8",
+      ),
     );
     const declaration = ir.declarations.find(({ name }) => name === "dmCrypt::HashSha256");
     const implementation = sourceFacts.declarations.find(({ declarationId }) => declarationId === declaration.id);
@@ -115,13 +118,20 @@ test("a fixed-digest shape without recoverable implementation extent retains the
     const shapesPath = join(output, "shapes.json");
     const sourceFactsPath = join(output, "source-facts.json");
     const planPath = join(output, "bounded-span-plan.json");
-    const policyTexts = Object.fromEntries(await Promise.all([
-      ["fixedDigest", "dmsdk-fixed-digest-bindings.json"],
-      ["base64", "dmsdk-base64-span-bindings.json"],
-      ["astc", "dmsdk-astc-probe-bindings.json"],
-      ["xtea", "dmsdk-xtea-span-bindings.json"],
-      ["hashSpan", "dmsdk-hash-span-bindings.json"],
-    ].map(async ([key, name]) => [key, await readFile(join(repositoryRoot, "packages/bindings/overrides", name), "utf8")])));
+    const policyTexts = Object.fromEntries(
+      await Promise.all(
+        [
+          ["fixedDigest", "dmsdk-fixed-digest-bindings.json"],
+          ["base64", "dmsdk-base64-span-bindings.json"],
+          ["astc", "dmsdk-astc-probe-bindings.json"],
+          ["xtea", "dmsdk-xtea-span-bindings.json"],
+          ["hashSpan", "dmsdk-hash-span-bindings.json"],
+        ].map(async ([key, name]) => [
+          key,
+          await readFile(join(repositoryRoot, "packages/bindings/overrides", name), "utf8"),
+        ]),
+      ),
+    );
     const sourceFactsText = `${JSON.stringify(sourceFacts, null, 2)}\n`;
     await writeFile(irPath, irText);
     await writeFile(shapesPath, shapesText);
@@ -170,7 +180,9 @@ test("fixed-digest semantics come from implementation AST dataflow and survive d
   const [ir, shapes, sourceFacts, policyText] = await Promise.all([
     readFile(join(repositoryRoot, "packages/bindings/generated/defold-sdk-ir.json"), "utf8").then(JSON.parse),
     readFile(join(repositoryRoot, "packages/bindings/generated/defold-dmsdk-abi-shapes.json"), "utf8").then(JSON.parse),
-    readFile(join(repositoryRoot, "packages/bindings/generated/defold-dmsdk-source-semantic-facts.json"), "utf8").then(JSON.parse),
+    readFile(join(repositoryRoot, "packages/bindings/generated/defold-dmsdk-source-semantic-facts.json"), "utf8").then(
+      JSON.parse,
+    ),
     readFile(join(repositoryRoot, "packages/bindings/overrides/dmsdk-fixed-digest-bindings.json"), "utf8"),
   ]);
   const policy = JSON.parse(policyText);

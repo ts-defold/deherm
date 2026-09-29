@@ -32,7 +32,7 @@ import {
   assertPolicySurfaceRealizationIdentity,
   manifestTreeSha256,
   policySurfaceArtifactsSha256,
-  realizeCompilerDocuments
+  realizeCompilerDocuments,
 } from "../../compiler/src/policy-surface-materializer.mjs";
 
 // Every file a surface layer must provide, by the key the generator uses for it.
@@ -58,7 +58,7 @@ export const surfaceIrFiles = Object.freeze({
   dmsdkUniversalPath: "defold-dmsdk-universal-bindings.json",
   resourceSchemaPath: "defold-resource-declaration-schema.json",
   resourceNamespacesPath: "defold-script-resource-namespaces.json",
-  toolchainPath: "defold-toolchain.json"
+  toolchainPath: "defold-toolchain.json",
 });
 
 function sha256(value) {
@@ -66,14 +66,22 @@ function sha256(value) {
 }
 
 function safeRelativePath(value) {
-  return typeof value === "string" && value.length > 0 && !path.isAbsolute(value) &&
-    value.split(/[\\/]/u).every((segment) => segment.length > 0 && segment !== "." && segment !== "..");
+  return (
+    typeof value === "string" &&
+    value.length > 0 &&
+    !path.isAbsolute(value) &&
+    value.split(/[\\/]/u).every((segment) => segment.length > 0 && segment !== "." && segment !== "..")
+  );
 }
 
 function canonical(value) {
   if (Array.isArray(value)) return value.map(canonical);
   if (value && typeof value === "object") {
-    return Object.fromEntries(Object.keys(value).sort().map((key) => [key, canonical(value[key])]));
+    return Object.fromEntries(
+      Object.keys(value)
+        .sort()
+        .map((key) => [key, canonical(value[key])]),
+    );
   }
   return value;
 }
@@ -104,7 +112,7 @@ async function relativeRegularFiles(root, relative = "") {
     const absolute = path.join(root, child);
     const information = await lstat(absolute);
     if (information.isSymbolicLink()) throw new Error(`surface contains symbolic link ${child}`);
-    if (information.isDirectory()) files.push(...await relativeRegularFiles(root, child));
+    if (information.isDirectory()) files.push(...(await relativeRegularFiles(root, child)));
     else if (information.isFile()) files.push(child.split(path.sep).join("/"));
     else throw new Error(`surface contains unsupported filesystem entry ${child}`);
   }
@@ -112,9 +120,15 @@ async function relativeRegularFiles(root, relative = "") {
 }
 
 async function verifyManifestTree({ root, manifest, descriptor, revision, label, includeRecipe = false }) {
-  if (!manifest || typeof manifest !== "object" || Array.isArray(manifest) ||
-      !descriptor || typeof descriptor !== "object" || Array.isArray(descriptor) ||
-      !sameKeys(manifest, descriptor)) {
+  if (
+    !manifest ||
+    typeof manifest !== "object" ||
+    Array.isArray(manifest) ||
+    !descriptor ||
+    typeof descriptor !== "object" ||
+    Array.isArray(descriptor) ||
+    !sameKeys(manifest, descriptor)
+  ) {
     throw new Error(`${label} inventory does not match the authenticated compiler manifest`);
   }
   const actualFiles = (await relativeRegularFiles(root)).sort(compareCodeUnits);
@@ -126,8 +140,12 @@ async function verifyManifestTree({ root, manifest, descriptor, revision, label,
     if (!safeRelativePath(relative)) throw new Error(`${label} record has an unsafe path: ${relative}`);
     const expected = manifest[relative];
     const described = descriptor[relative];
-    if (!/^[0-9a-f]{64}$/u.test(expected?.sha256 ?? "") || described?.sha256 !== expected.sha256 ||
-        described?.mode !== expected.mode || (includeRecipe && described?.recipe !== expected.recipe)) {
+    if (
+      !/^[0-9a-f]{64}$/u.test(expected?.sha256 ?? "") ||
+      described?.sha256 !== expected.sha256 ||
+      described?.mode !== expected.mode ||
+      (includeRecipe && described?.recipe !== expected.recipe)
+    ) {
       throw new Error(`${label} descriptor contradicts the authenticated manifest for ${relative}`);
     }
     const source = await readFile(path.join(root, relative), "utf8");
@@ -144,9 +162,7 @@ export function defoldSurfaceCacheHome(env = process.env, platform = process.pla
   if (env.XDG_CACHE_HOME) return path.join(path.resolve(env.XDG_CACHE_HOME), "deherm");
   if (platform === "darwin") return path.join(userHome, "Library", "Caches", "deherm");
   if (platform === "win32") {
-    const windowsCache = env.LOCALAPPDATA
-      ? path.resolve(env.LOCALAPPDATA)
-      : path.join(userHome, "AppData", "Local");
+    const windowsCache = env.LOCALAPPDATA ? path.resolve(env.LOCALAPPDATA) : path.join(userHome, "AppData", "Local");
     return path.join(windowsCache, "deherm", "cache");
   }
   return path.join(userHome, ".cache", "deherm");
@@ -160,11 +176,7 @@ export function defoldSurfaceCacheHome(env = process.env, platform = process.pla
  * goes to the native cache root. Explicit DEHERM/XDG roots are authoritative
  * and never acquire an implicit fallback.
  */
-export function defoldSurfaceLegacyCacheHome(
-  env = process.env,
-  platform = process.platform,
-  userHome = homedir()
-) {
+export function defoldSurfaceLegacyCacheHome(env = process.env, platform = process.platform, userHome = homedir()) {
   if (env.DEHERM_CACHE_HOME || env.XDG_CACHE_HOME) return null;
   if (platform !== "darwin" && platform !== "win32") return null;
   return path.join(userHome, ".cache", "deherm");
@@ -179,7 +191,7 @@ function cacheSurfaceLayer(layer, cacheHome, revision) {
     irRoot: path.join(root, "ir"),
     sdkRoot: path.join(root, "sdk"),
     repositoryRoot: path.join(root, "repository"),
-    descriptor: path.join(root, "surface.json")
+    descriptor: path.join(root, "surface.json"),
   };
 }
 
@@ -212,7 +224,7 @@ export function defoldSurfaceSearchPath(revision, options = {}) {
       irRoot: path.join(root, "ir"),
       sdkRoot: path.join(root, "sdk"),
       repositoryRoot: path.join(root, "repository"),
-      descriptor: path.join(root, "surface.json")
+      descriptor: path.join(root, "surface.json"),
     });
   }
   if (packageRoot) {
@@ -224,7 +236,7 @@ export function defoldSurfaceSearchPath(revision, options = {}) {
       repositoryRoot: packageRoot,
       descriptor: null,
       repositoryMarker: path.join(packageRoot, "pnpm-workspace.yaml"),
-      policyManifest: path.join(packageRoot, "packages", "bindings", "generated", "defold-api-policy.json")
+      policyManifest: path.join(packageRoot, "packages", "bindings", "generated", "defold-api-policy.json"),
     });
   }
   return layers;
@@ -238,9 +250,13 @@ async function resolveRealizedCandidate(candidate, revision) {
   });
   if (!source) return candidate;
   const pointer = JSON.parse(source);
-  if (pointer.schemaVersion !== 1 || pointer.kind !== "deherm.materialized-defold-surface-pointer" ||
-      pointer.defoldRevision !== revision || !/^[0-9a-f]{64}$/u.test(pointer.realizationId ?? "") ||
-      !/^[0-9a-f]{64}$/u.test(pointer.policyRoot ?? "")) {
+  if (
+    pointer.schemaVersion !== 1 ||
+    pointer.kind !== "deherm.materialized-defold-surface-pointer" ||
+    pointer.defoldRevision !== revision ||
+    !/^[0-9a-f]{64}$/u.test(pointer.realizationId ?? "") ||
+    !/^[0-9a-f]{64}$/u.test(pointer.policyRoot ?? "")
+  ) {
     throw new Error("invalid materialized surface pointer");
   }
   const root = path.join(candidate.root, "r", pointer.realizationId.slice(0, 32));
@@ -251,7 +267,7 @@ async function resolveRealizedCandidate(candidate, revision) {
     sdkRoot: path.join(root, "sdk"),
     repositoryRoot: path.join(root, "repository"),
     descriptor: path.join(root, "surface.json"),
-    expectedRealization: pointer
+    expectedRealization: pointer,
   };
 }
 
@@ -292,26 +308,38 @@ async function layerProvides(candidate, revision) {
     } catch (error) {
       return { ok: false, missing: ["surface.json"], error: error?.code === "ENOENT" ? undefined : error.message };
     }
-    if (descriptor.schemaVersion !== 2 || descriptor.kind !== "deherm.materialized-defold-surface" || descriptor.defoldRevision !== revision) {
+    if (
+      descriptor.schemaVersion !== 2 ||
+      descriptor.kind !== "deherm.materialized-defold-surface" ||
+      descriptor.defoldRevision !== revision
+    ) {
       return { ok: false, missing: [], revision: descriptor.defoldRevision, error: "invalid surface descriptor" };
     }
-    if (candidate.expectedRealization &&
-        (descriptor.policyRoot !== candidate.expectedRealization.policyRoot ||
-         descriptor.realization?.realizationId !== candidate.expectedRealization.realizationId)) {
+    if (
+      candidate.expectedRealization &&
+      (descriptor.policyRoot !== candidate.expectedRealization.policyRoot ||
+        descriptor.realization?.realizationId !== candidate.expectedRealization.realizationId)
+    ) {
       return { ok: false, missing: [], error: "materialized surface pointer and descriptor identities disagree" };
     }
     if (candidate.expectedRealization) {
       try {
         assertPolicySurfaceRealizationIdentity(descriptor.realization, candidate.expectedRealization);
         if (descriptor.realization.policyRoot !== descriptor.policyRoot) {
-          return { ok: false, missing: [], error: "materialized surface realization does not name its descriptor policy root" };
+          return {
+            ok: false,
+            missing: [],
+            error: "materialized surface realization does not name its descriptor policy root",
+          };
         }
       } catch (error) {
         return { ok: false, missing: [], error: error.message };
       }
     }
-    if (!/^[0-9a-f]{64}$/u.test(descriptor.policyRoot ?? "") ||
-        !/^[0-9a-f]{64}$/u.test(descriptor.compilerObjectSha256 ?? "")) {
+    if (
+      !/^[0-9a-f]{64}$/u.test(descriptor.policyRoot ?? "") ||
+      !/^[0-9a-f]{64}$/u.test(descriptor.compilerObjectSha256 ?? "")
+    ) {
       return { ok: false, missing: [], error: "surface descriptor has no authenticated policy identity" };
     }
     try {
@@ -359,7 +387,7 @@ async function layerProvides(candidate, revision) {
             kind: "deherm.policy.compiler-document",
             namespace,
             name: relative,
-            value
+            value,
           }).hash;
           if (actualObjectSha256 !== expectedObjectSha256) {
             return { ok: false, missing: [], error: `surface IR is not authenticated by policy for ${relative}` };
@@ -376,11 +404,20 @@ async function layerProvides(candidate, revision) {
       }
     }
     try {
-      const profiles = JSON.parse(await readFile(path.join(candidate.irRoot, surfaceIrFiles.scriptProfilesPath), "utf8"));
+      const profiles = JSON.parse(
+        await readFile(path.join(candidate.irRoot, surfaceIrFiles.scriptProfilesPath), "utf8"),
+      );
       const selection = profiles.engineProfileSelection;
-      if (selection?.schemaVersion !== 1 || typeof selection.defaultProfileId !== "string" ||
-          !selection.profiles?.[selection.defaultProfileId]) {
-        return { ok: false, missing: [], error: "surface policy predates the engine-profile selection contract and must be refreshed" };
+      if (
+        selection?.schemaVersion !== 1 ||
+        typeof selection.defaultProfileId !== "string" ||
+        !selection.profiles?.[selection.defaultProfileId]
+      ) {
+        return {
+          ok: false,
+          missing: [],
+          error: "surface policy predates the engine-profile selection contract and must be refreshed",
+        };
       }
     } catch (error) {
       return { ok: false, missing: [surfaceIrFiles.scriptProfilesPath], error: error.message };
@@ -391,7 +428,7 @@ async function layerProvides(candidate, revision) {
         manifest: authenticatedCompiler.sdk?.entries,
         descriptor: descriptor.sdk,
         revision,
-        label: "surface SDK"
+        label: "surface SDK",
       });
       if (descriptor.sdkTreeSha256 !== sdkTreeSha256) {
         return { ok: false, missing: [], error: "surface SDK tree digest is not authenticated by policy" };
@@ -402,7 +439,7 @@ async function layerProvides(candidate, revision) {
         descriptor: descriptor.outputs,
         revision,
         label: "surface repository output",
-        includeRecipe: true
+        includeRecipe: true,
       });
       if (descriptor.outputTreeSha256 !== outputTreeSha256) {
         return { ok: false, missing: [], error: "surface output tree digest is not authenticated by policy" };
@@ -413,12 +450,18 @@ async function layerProvides(candidate, revision) {
     const loweringRecipeEntry = authenticatedCompiler.documents?.entries?.[BINDING_LOWERING_RECIPE_NAME];
     if (loweringRecipeEntry) {
       try {
-        const recipeFacts = JSON.parse(await readFile(path.join(candidate.irRoot, BINDING_LOWERING_RECIPE_NAME), "utf8"));
+        const recipeFacts = JSON.parse(
+          await readFile(path.join(candidate.irRoot, BINDING_LOWERING_RECIPE_NAME), "utf8"),
+        );
         const realized = await realizeCompilerDocuments({ [BINDING_LOWERING_RECIPE_NAME]: recipeFacts });
         for (const relative of [surfaceIrFiles.loweringPlanPath, surfaceIrFiles.loweringPlanSentinelPath]) {
           const actual = await readFile(path.join(candidate.irRoot, relative), "utf8");
           if (actual !== json(realized[relative])) {
-            return { ok: false, missing: [], error: `surface ${relative} is not derived from its authenticated recipe` };
+            return {
+              ok: false,
+              missing: [],
+              error: `surface ${relative} is not derived from its authenticated recipe`,
+            };
           }
         }
       } catch (error) {
@@ -439,8 +482,10 @@ async function layerProvides(candidate, revision) {
       }
       const expectedToolchainSha256 = authenticatedPolicy.subtrees?.["@toolchain"];
       const abstractToolchain = JSON.parse(bytes.toString("utf8").split(revision).join(DEFOLD_REVISION_TOKEN));
-      if (!/^[0-9a-f]{64}$/u.test(expectedToolchainSha256 ?? "") ||
-          sealObject(abstractToolchain).hash !== expectedToolchainSha256) {
+      if (
+        !/^[0-9a-f]{64}$/u.test(expectedToolchainSha256 ?? "") ||
+        sealObject(abstractToolchain).hash !== expectedToolchainSha256
+      ) {
         return { ok: false, missing: [], error: "surface toolchain is not authenticated by policy" };
       }
     } catch (error) {
@@ -457,14 +502,18 @@ async function layerProvides(candidate, revision) {
         return { ok: false, missing: ["defold-artifacts.json"], error: error.message };
       }
     }
-    if (candidate.expectedRealization &&
-        policySurfaceArtifactsSha256(artifacts) !== descriptor.realization.options.artifactsSha256) {
+    if (
+      candidate.expectedRealization &&
+      policySurfaceArtifactsSha256(artifacts) !== descriptor.realization.options.artifactsSha256
+    ) {
       return { ok: false, missing: [], error: "surface artifact mapping does not match its realization identity" };
     }
   }
   let declared;
   try {
-    declared = JSON.parse(await readFile(path.join(candidate.irRoot, surfaceIrFiles.scriptIrPath), "utf8")).defoldRevision;
+    declared = JSON.parse(
+      await readFile(path.join(candidate.irRoot, surfaceIrFiles.scriptIrPath), "utf8"),
+    ).defoldRevision;
   } catch (error) {
     return { ok: false, missing: [], error: error.message };
   }
@@ -478,7 +527,8 @@ async function layerProvides(candidate, revision) {
       }
       const objectFile = path.join(candidate.irRoot, "policy", manifest.layoutVersion, "object", `${digest}.json`);
       const bytes = await readFile(objectFile);
-      if (sha256(bytes) !== digest) return { ok: false, missing: [], error: "repository toolchain object digest mismatch" };
+      if (sha256(bytes) !== digest)
+        return { ok: false, missing: [], error: "repository toolchain object digest mismatch" };
       toolchain = JSON.parse(bytes);
       if (toolchain.kind !== "deherm.policy.toolchain") {
         return { ok: false, missing: [], error: "repository toolchain object has invalid kind" };
@@ -491,15 +541,18 @@ async function layerProvides(candidate, revision) {
 }
 
 export async function verifyMaterializedSurfaceRoot(root, revision, expectedRealization) {
-  return layerProvides({
-    layer: "materialized-cache",
-    root,
-    irRoot: path.join(root, "ir"),
-    sdkRoot: path.join(root, "sdk"),
-    repositoryRoot: path.join(root, "repository"),
-    descriptor: path.join(root, "surface.json"),
-    expectedRealization
-  }, revision);
+  return layerProvides(
+    {
+      layer: "materialized-cache",
+      root,
+      irRoot: path.join(root, "ir"),
+      sdkRoot: path.join(root, "sdk"),
+      repositoryRoot: path.join(root, "repository"),
+      descriptor: path.join(root, "surface.json"),
+      expectedRealization,
+    },
+    revision,
+  );
 }
 
 export class DefoldSurfaceError extends Error {
@@ -538,19 +591,23 @@ export async function resolveDefoldSurface(revision, options = {}) {
         descriptor: result.descriptor,
         toolchain: result.toolchain,
         artifacts: result.artifacts,
-        paths: Object.fromEntries(Object.entries(surfaceIrFiles)
-          .map(([key, relative]) => [key, path.join(resolvedCandidate.irRoot, relative)])),
+        paths: Object.fromEntries(
+          Object.entries(surfaceIrFiles).map(([key, relative]) => [key, path.join(resolvedCandidate.irRoot, relative)]),
+        ),
         searched,
-        blocker: null
+        blocker: null,
       };
     }
     searched.push({
       layer: candidate.layer,
       root: candidate.root ?? candidate.irRoot,
-      reason: result.revision ? `holds Defold ${result.revision}` :
-        result.error ? `unreadable: ${result.error}` :
-        result.missing.length === Object.keys(surfaceIrFiles).length ? "absent" :
-        `incomplete, missing ${result.missing.join(", ")}`
+      reason: result.revision
+        ? `holds Defold ${result.revision}`
+        : result.error
+          ? `unreadable: ${result.error}`
+          : result.missing.length === Object.keys(surfaceIrFiles).length
+            ? "absent"
+            : `incomplete, missing ${result.missing.join(", ")}`,
     });
   }
   return {
@@ -571,9 +628,9 @@ export async function resolveDefoldSurface(revision, options = {}) {
         "and materialize its revision-keyed surface using the compiler shipped in this package.",
         "No Defold source checkout or reference archive is required for a published revision.",
         "Until that surface exists, generating for this revision would mean emitting another revision's",
-        "signatures, which is refused."
-      ].join("\n")
-    }
+        "signatures, which is refused.",
+      ].join("\n"),
+    },
   };
 }
 
@@ -600,16 +657,22 @@ function extensionLeaves(extension) {
   for (const source of extension.sourceFiles ?? []) {
     leaves.push({ path: source, kind: "native-source", digest: null });
   }
-  return leaves.sort((left, right) => left.path < right.path ? -1 : left.path > right.path ? 1 : 0);
+  return leaves.sort((left, right) => (left.path < right.path ? -1 : left.path > right.path ? 1 : 0));
 }
 
-export function buildGenerationMerkle({ defoldRevision, surface, extensions = [], engineProfiles = null, generator = null }) {
+export function buildGenerationMerkle({
+  defoldRevision,
+  surface,
+  extensions = [],
+  engineProfiles = null,
+  generator = null,
+}) {
   const engineNode = {
     kind: "engine",
     defoldRevision,
     surfaceLayer: surface?.layer ?? null,
     surfaceInputs: surface?.inputs ?? null,
-    engineProfiles
+    engineProfiles,
   };
   const nativeChildren = [...extensions]
     .map((extension) => {
@@ -622,10 +685,12 @@ export function buildGenerationMerkle({ defoldRevision, surface, extensions = []
         origin: extension.archive ?? extension.root ?? extension.manifestPath,
         manifestPath: extension.manifestPath,
         leaves,
-        digest: digestOf(leaves)
+        digest: digestOf(leaves),
       };
     })
-    .sort((left, right) => left.manifestPath < right.manifestPath ? -1 : left.manifestPath > right.manifestPath ? 1 : 0);
+    .sort((left, right) =>
+      left.manifestPath < right.manifestPath ? -1 : left.manifestPath > right.manifestPath ? 1 : 0,
+    );
   const nativeNode = { kind: "native-inputs", children: nativeChildren };
   const engineRoot = digestOf(engineNode);
   const nativeRoot = digestOf(nativeNode);
@@ -637,6 +702,6 @@ export function buildGenerationMerkle({ defoldRevision, surface, extensions = []
     engineRoot,
     nativeRoot,
     root: digestOf({ generator, engineRoot, nativeRoot }),
-    nodes: { engine: engineNode, native: nativeNode }
+    nodes: { engine: engineNode, native: nativeNode },
   };
 }

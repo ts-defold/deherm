@@ -12,8 +12,16 @@ test("the browser host provides the generated timer contract without Hermes Wasm
   let now = 1_000;
   const context = {
     console,
-    document: { querySelector() { return null; } },
-    performance: { now() { return now; } },
+    document: {
+      querySelector() {
+        return null;
+      },
+    },
+    performance: {
+      now() {
+        return now;
+      },
+    },
     window: {
       setTimeout(callback) {
         const handle = nextBrowserTimer++;
@@ -32,8 +40,8 @@ test("the browser host provides the generated timer contract without Hermes Wasm
       clearInterval(handle) {
         intervals.delete(handle);
         cleared.push(["interval", handle]);
-      }
-    }
+      },
+    },
   };
   vm.runInNewContext(bundle, context, { filename: "web-host.js" });
 
@@ -47,11 +55,18 @@ test("the browser host provides the generated timer contract without Hermes Wasm
   assert.deepEqual(calls, [[oneShot, 0.25]]);
   now = 1_500;
   assert.equal(timer.trigger(oneShot), true);
-  assert.deepEqual(calls, [[oneShot, 0.25], [oneShot, 0.5]]);
+  assert.deepEqual(calls, [
+    [oneShot, 0.25],
+    [oneShot, 0.5],
+  ]);
 
   now = 1_600;
   timeouts.get(100)();
-  assert.deepEqual(calls, [[oneShot, 0.25], [oneShot, 0.5], [oneShot, 0.6]]);
+  assert.deepEqual(calls, [
+    [oneShot, 0.25],
+    [oneShot, 0.5],
+    [oneShot, 0.6],
+  ]);
   assert.equal(timer.trigger(oneShot), false);
 
   now = 2_000;
@@ -71,7 +86,7 @@ test("the browser host provides the generated timer contract without Hermes Wasm
     [repeating, 1],
     [repeating, 1.1],
     [repeating, 0.2],
-    [repeating, 0.9]
+    [repeating, 0.9],
   ]);
   assert.equal(timer.cancel(repeating), true);
   assert.deepEqual(cleared, [["interval", 101]]);

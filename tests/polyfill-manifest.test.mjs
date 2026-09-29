@@ -2,10 +2,9 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-const manifest = JSON.parse(await readFile(
-  new URL("../packages/polyfills/compatibility.json", import.meta.url),
-  "utf8"
-));
+const manifest = JSON.parse(
+  await readFile(new URL("../packages/polyfills/compatibility.json", import.meta.url), "utf8"),
+);
 
 test("polyfill compatibility policy is explicit and deterministic", () => {
   assert.equal(manifest.schemaVersion, 1);

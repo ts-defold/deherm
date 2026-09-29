@@ -11,7 +11,7 @@ function run(command, args, options = {}) {
   const result = spawnSync(command, args, {
     cwd: repositoryRoot,
     encoding: "utf8",
-    ...options
+    ...options,
   });
   assert.equal(result.status, 0, `${command} ${args.join(" ")}\n${result.stdout}\n${result.stderr}`);
   return result;
@@ -23,14 +23,18 @@ function runAsync(command, args, options = {}) {
       cwd: repositoryRoot,
       env: process.env,
       stdio: ["ignore", "pipe", "pipe"],
-      ...options
+      ...options,
     });
     let stdout = "";
     let stderr = "";
     child.stdout.setEncoding("utf8");
     child.stderr.setEncoding("utf8");
-    child.stdout.on("data", (chunk) => { stdout += chunk; });
-    child.stderr.on("data", (chunk) => { stderr += chunk; });
+    child.stdout.on("data", (chunk) => {
+      stdout += chunk;
+    });
+    child.stderr.on("data", (chunk) => {
+      stderr += chunk;
+    });
     child.once("error", reject);
     child.once("exit", (code, signal) => {
       if (code === 0) resolve({ stdout, stderr });
@@ -45,14 +49,20 @@ test("installed package drives the bounded incremental dev loop", async () => {
     "pack",
     "--json",
     "--ignore-scripts",
-    "--cache", path.join(root, "npm-cache"),
-    "--pack-destination", root
+    "--cache",
+    path.join(root, "npm-cache"),
+    "--pack-destination",
+    root,
   ]).stdout;
   const packed = JSON.parse(packedOutput)[0];
   const installRoot = path.join(root, "install");
   await mkdir(installRoot, { recursive: true });
   run("tar", ["-xzf", path.join(root, packed.filename), "-C", installRoot]);
-  await symlink(path.join(repositoryRoot, "node_modules"), path.join(installRoot, "node_modules"), "dir");
+  await symlink(
+    path.join(repositoryRoot, "node_modules"),
+    path.join(installRoot, "node_modules"),
+    process.platform === "win32" ? "junction" : "dir",
+  );
   const packageRoot = path.join(installRoot, "package");
 
   const project = path.join(root, "project");
@@ -60,13 +70,19 @@ test("installed package drives the bounded incremental dev loop", async () => {
   await mkdir(path.join(project, "main"), { recursive: true });
   await mkdir(path.join(project, ".deherm", "ir"), { recursive: true });
   await writeFile(path.join(project, "game.project"), "[project]\ntitle = Installed dev loop\n");
-  await writeFile(path.join(project, "src", "main.ts"), 'import { value } from "./feature.ts";\nconsole.log("dev-loop", value);\n');
+  await writeFile(
+    path.join(project, "src", "main.ts"),
+    'import { value } from "./feature.ts";\nconsole.log("dev-loop", value);\n',
+  );
   await writeFile(path.join(project, "src", "feature.ts"), 'export const value = "first";\n');
-  await writeFile(path.join(project, "main", "battle.gui.ts"), [
-    "function defineComponent<T>(definition: T): T { return definition; }",
-    "export default defineComponent({ update(_dt: number) {} });",
-    ""
-  ].join("\n"));
+  await writeFile(
+    path.join(project, "main", "battle.gui.ts"),
+    [
+      "function defineComponent<T>(definition: T): T { return definition; }",
+      "export default defineComponent({ update(_dt: number) {} });",
+      "",
+    ].join("\n"),
+  );
   await writeFile(path.join(project, "main", "tiles.atlas"), 'images { image: "/main/tile.png" }\n');
   // The installed development loop starts after `deherm generate`, so retain
   // that real precondition in the otherwise network-free fixture. The policy
@@ -74,7 +90,9 @@ test("installed package drives the bounded incremental dev loop", async () => {
   // artifact deliberately ships emitters, not one pinned Defold revision.
   await writeFile(
     path.join(project, ".deherm", "ir", "defold-component-proxy-contract.json"),
-    await readFile(path.join(repositoryRoot, "packages", "bindings", "generated", "defold-component-proxy-contract.json"))
+    await readFile(
+      path.join(repositoryRoot, "packages", "bindings", "generated", "defold-component-proxy-contract.json"),
+    ),
   );
 
   const runner = path.join(repositoryRoot, "tests", "fixtures", "installed-dev-loop-runner.mjs");
@@ -104,6 +122,6 @@ test("installed package drives the bounded incremental dev loop", async () => {
     [compiledNames[0]],
     ["/deherm/app.dehermc"],
     ["/deherm/app.dehermc"],
-    [compiledNames[1]]
+    [compiledNames[1]],
   ]);
 });

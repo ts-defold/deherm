@@ -1,7 +1,8 @@
 import path from "node:path";
 
 function encodeVarint(value) {
-  if (!Number.isSafeInteger(value) || value < 0) throw new TypeError("protobuf varint must be a non-negative safe integer");
+  if (!Number.isSafeInteger(value) || value < 0)
+    throw new TypeError("protobuf varint must be a non-negative safe integer");
   const bytes = [];
   do {
     let byte = value & 0x7f;
@@ -77,7 +78,7 @@ export async function postResourceReload(targetUrl, resources, options = {}) {
       method: "POST",
       headers: { "content-type": "application/octet-stream" },
       body,
-      signal
+      signal,
     });
     if (!response.ok) {
       throw new Error(`Defold reload failed: ${response.status} ${response.statusText}`);
@@ -88,7 +89,7 @@ export async function postResourceReload(targetUrl, resources, options = {}) {
 export async function readTargetState(targetUrl, options = {}) {
   const response = await (options.fetch ?? globalThis.fetch)(new URL("/state", targetUrl), {
     method: "POST",
-    signal: options.signal ?? AbortSignal.timeout(options.timeoutMs ?? 2_000)
+    signal: options.signal ?? AbortSignal.timeout(options.timeoutMs ?? 2_000),
   });
   if (!response.ok) throw new Error(`Defold target state failed: ${response.status} ${response.statusText}`);
   return response.json();

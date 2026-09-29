@@ -29,10 +29,11 @@ function appendRecord(hash, relative, kind, bytes) {
  * symlink targets are inputs too.
  */
 export async function revisionProducerInputIdentity(sourceRoot) {
-  const { stdout } = await run(
-    "git", ["ls-files", "-z", "--cached", "--others", "--exclude-standard"],
-    { cwd: sourceRoot, encoding: "utf8", maxBuffer: 64 * 1024 * 1024 }
-  );
+  const { stdout } = await run("git", ["ls-files", "-z", "--cached", "--others", "--exclude-standard"], {
+    cwd: sourceRoot,
+    encoding: "utf8",
+    maxBuffer: 64 * 1024 * 1024,
+  });
   const files = stdout.split("\0").filter(Boolean).sort(compareCodeUnits);
   const hash = createHash("sha256");
   for (const relative of files) {
@@ -57,10 +58,16 @@ export async function revisionProducerInputIdentity(sourceRoot) {
 }
 
 export function makeRevisionWorkspaceMetadata({ revision, producerInput, packageVersion, policyRoot, generator }) {
-  if (!REVISION.test(revision ?? "") || producerInput?.algorithm !== "sha256" ||
-      !DIGEST.test(producerInput?.sha256 ?? "") || !Number.isSafeInteger(producerInput?.fileCount) ||
-      producerInput.fileCount < 1 || typeof packageVersion !== "string" || !packageVersion ||
-      !DIGEST.test(policyRoot ?? "")) {
+  if (
+    !REVISION.test(revision ?? "") ||
+    producerInput?.algorithm !== "sha256" ||
+    !DIGEST.test(producerInput?.sha256 ?? "") ||
+    !Number.isSafeInteger(producerInput?.fileCount) ||
+    producerInput.fileCount < 1 ||
+    typeof packageVersion !== "string" ||
+    !packageVersion ||
+    !DIGEST.test(policyRoot ?? "")
+  ) {
     throw new Error("Invalid revision workspace metadata input");
   }
   return {
@@ -71,9 +78,9 @@ export function makeRevisionWorkspaceMetadata({ revision, producerInput, package
     producerInput: { ...producerInput },
     currentCompiler: {
       packageVersion,
-      sourceTreeSha256: producerInput.sha256
+      sourceTreeSha256: producerInput.sha256,
     },
-    policy: { root: policyRoot, generator: generator ?? null }
+    policy: { root: policyRoot, generator: generator ?? null },
   };
 }
 
@@ -95,18 +102,26 @@ export async function readRevisionWorkspaceMetadata(workspace) {
 
 export function revisionWorkspaceMetadataMismatch(metadata, expected) {
   if (!metadata) return "derivation metadata is missing";
-  if (metadata.schemaVersion !== 1 || metadata.kind !== "deherm.revision-derivation-workspace" ||
-      metadata.status !== "derived") return "derivation metadata is invalid";
+  if (
+    metadata.schemaVersion !== 1 ||
+    metadata.kind !== "deherm.revision-derivation-workspace" ||
+    metadata.status !== "derived"
+  )
+    return "derivation metadata is invalid";
   if (metadata.revision !== expected.revision) {
     return `metadata names revision ${metadata.revision ?? "missing"}`;
   }
-  if (metadata.producerInput?.algorithm !== "sha256" ||
-      metadata.producerInput?.sha256 !== expected.producerInput.sha256 ||
-      metadata.producerInput?.fileCount !== expected.producerInput.fileCount) {
+  if (
+    metadata.producerInput?.algorithm !== "sha256" ||
+    metadata.producerInput?.sha256 !== expected.producerInput.sha256 ||
+    metadata.producerInput?.fileCount !== expected.producerInput.fileCount
+  ) {
     return "producer input fingerprint is stale";
   }
-  if (metadata.currentCompiler?.packageVersion !== expected.packageVersion ||
-      metadata.currentCompiler?.sourceTreeSha256 !== expected.producerInput.sha256) {
+  if (
+    metadata.currentCompiler?.packageVersion !== expected.packageVersion ||
+    metadata.currentCompiler?.sourceTreeSha256 !== expected.producerInput.sha256
+  ) {
     return "current compiler identity is stale";
   }
   if (metadata.policy?.root !== expected.policyRoot) return "policy root does not match the workspace manifest";

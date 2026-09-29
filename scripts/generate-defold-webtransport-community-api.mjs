@@ -23,7 +23,9 @@ function method(module, name, args, returns) {
   if (!candidate) fail(`bridge descriptor has no ${name} capability`);
   const actual = candidate.args.map((argument) => argument.type);
   if (JSON.stringify(actual) !== JSON.stringify(args) || candidate.returns !== returns) {
-    fail(`${name} bridge shape is ${actual.join(",")} -> ${candidate.returns}, expected ${args.join(",")} -> ${returns}`);
+    fail(
+      `${name} bridge shape is ${actual.join(",")} -> ${candidate.returns}, expected ${args.join(",")} -> ${returns}`,
+    );
   }
   return candidate.name;
 }
@@ -33,23 +35,33 @@ function validateInputs(compatibility, descriptor) {
     fail("unsupported public compatibility generation recipe");
   }
   const streams = compatibility.generation.nativeStreams;
-  if (streams?.implementation !== "extension-local-bounded-structural" ||
-      streams.requiresGlobalReadableStream !== false || streams.requiresGlobalWritableStream !== false ||
-      !Number.isInteger(streams.maximumQueuedItemsPerQueue) || streams.maximumQueuedItemsPerQueue < 1 ||
-      !Number.isInteger(streams.maximumStreamsPerSession) || streams.maximumStreamsPerSession < 1 ||
-      !Number.isInteger(streams.maximumQueuedBytesPerSession) || streams.maximumQueuedBytesPerSession < 1) {
+  if (
+    streams?.implementation !== "extension-local-bounded-structural" ||
+    streams.requiresGlobalReadableStream !== false ||
+    streams.requiresGlobalWritableStream !== false ||
+    !Number.isInteger(streams.maximumQueuedItemsPerQueue) ||
+    streams.maximumQueuedItemsPerQueue < 1 ||
+    !Number.isInteger(streams.maximumStreamsPerSession) ||
+    streams.maximumStreamsPerSession < 1 ||
+    !Number.isInteger(streams.maximumQueuedBytesPerSession) ||
+    streams.maximumQueuedBytesPerSession < 1
+  ) {
     fail("native community facade must own bounded structural streams without DOM globals");
   }
-  if (compatibility.generation.nativeTrust?.mode !== "single-sha-256-certificate-hash-required" ||
-      compatibility.generation.nativeTrust.browserMayUseRootTrust !== true) {
+  if (
+    compatibility.generation.nativeTrust?.mode !== "single-sha-256-certificate-hash-required" ||
+    compatibility.generation.nativeTrust.browserMayUseRootTrust !== true
+  ) {
     fail("native 0.1 trust policy must require one sha-256 certificate hash without constraining browsers");
   }
-  if (compatibility.generation.nativePump?.registration !== "registerNativeModulePump" ||
-      compatibility.generation.nativePump.public !== false ||
-      compatibility.generation.nativePump.browserRegistration !== false ||
-      compatibility.generation.nativePump.lifetime !== "module-singleton" ||
-      !Number.isInteger(compatibility.generation.nativePump.maximumSessions) ||
-      compatibility.generation.nativePump.maximumSessions < 1) {
+  if (
+    compatibility.generation.nativePump?.registration !== "registerNativeModulePump" ||
+    compatibility.generation.nativePump.public !== false ||
+    compatibility.generation.nativePump.browserRegistration !== false ||
+    compatibility.generation.nativePump.lifetime !== "module-singleton" ||
+    !Number.isInteger(compatibility.generation.nativePump.maximumSessions) ||
+    compatibility.generation.nativePump.maximumSessions < 1
+  ) {
     fail("native pump must be private, browser-free, module-singleton, and bounded");
   }
   if (descriptor.schemaVersion !== 1 || descriptor.nativeModules?.length !== 1) {
@@ -69,20 +81,30 @@ function validateInputs(compatibility, descriptor) {
     trySendDatagram: method(module, "trySendDatagram", ["u32", "bytes"], "status"),
     poll: method(module, "poll", ["u32", "mutableBytes"], "status"),
     close: method(module, "close", ["u32", "u32", "utf8"], "status"),
-    destroy: method(module, "destroy", ["u32"], "status")
+    destroy: method(module, "destroy", ["u32"], "status"),
   };
   const poll = module.constants?.pollEvent;
   const fields = Object.fromEntries((poll?.fields ?? []).map((field) => [field.name, field]));
   const expectedFields = {
-    kind: [0, "u32le"], flags: [4, "u32le"], code: [8, "i32le"], requestId: [12, "u32le"],
-    streamHandle: [16, "u32le"], payloadLength: [20, "u32le"], reserved: [24, "u32le"],
-    headerVersion: [28, "u32le"]
+    kind: [0, "u32le"],
+    flags: [4, "u32le"],
+    code: [8, "i32le"],
+    requestId: [12, "u32le"],
+    streamHandle: [16, "u32le"],
+    payloadLength: [20, "u32le"],
+    reserved: [24, "u32le"],
+    headerVersion: [28, "u32le"],
   };
-  if (module.constants.pollHeaderBytes !== 32 || poll?.headerVersion !== 1 ||
-      poll?.retainsEventOnBufferTooSmall !== true ||
-      poll?.bufferTooSmallStatus !== module.constants.status?.bufferTooSmall ||
-      !Number.isInteger(poll?.initialPayloadBytes) || poll.initialPayloadBytes < 1 ||
-      !Number.isInteger(poll?.maximumPayloadBytes) || poll.maximumPayloadBytes < poll.initialPayloadBytes) {
+  if (
+    module.constants.pollHeaderBytes !== 32 ||
+    poll?.headerVersion !== 1 ||
+    poll?.retainsEventOnBufferTooSmall !== true ||
+    poll?.bufferTooSmallStatus !== module.constants.status?.bufferTooSmall ||
+    !Number.isInteger(poll?.initialPayloadBytes) ||
+    poll.initialPayloadBytes < 1 ||
+    !Number.isInteger(poll?.maximumPayloadBytes) ||
+    poll.maximumPayloadBytes < poll.initialPayloadBytes
+  ) {
     fail("unsupported poll event ownership contract");
   }
   for (const [name, [offset, type]] of Object.entries(expectedFields)) {
@@ -276,9 +298,10 @@ function cConstantName(value) {
 
 function renderNativeHeader(inputHash, contract) {
   const { module } = contract;
-  const constants = (prefix, values) => Object.entries(values)
-    .map(([name, value]) => `  DEFOLD_WEBTRANSPORT_NATIVE_V1_${prefix}_${cConstantName(name)} = ${value}`)
-    .join(",\n");
+  const constants = (prefix, values) =>
+    Object.entries(values)
+      .map(([name, value]) => `  DEFOLD_WEBTRANSPORT_NATIVE_V1_${prefix}_${cConstantName(name)} = ${value}`)
+      .join(",\n");
   return `${banner("c", inputHash)}#ifndef DEFOLD_WEBTRANSPORT_NATIVE_V1_H
 #define DEFOLD_WEBTRANSPORT_NATIVE_V1_H
 #include <stdbool.h>
@@ -352,9 +375,7 @@ function renderTypeScript(inputHash, contract, target = "dynamic") {
   // but not the `readonly T[]` shorthand.
   const hashArrayType = "ReadonlyArray<WebTransportHash>";
   const runtimeByteType = staticTarget ? "StaticWebTransportBytes" : "WebTransportBytes";
-  const byteFactory = staticTarget
-    ? "new Array<number>(length).fill(0)"
-    : "new Uint8Array(length)";
+  const byteFactory = staticTarget ? "new Array<number>(length).fill(0)" : "new Uint8Array(length)";
   const byteGuard = staticTarget
     ? "Array.isArray(value) && value.every((entry) => Number.isInteger(entry) && entry >= 0 && entry <= 255)"
     : "value instanceof Uint8Array";
@@ -1130,9 +1151,7 @@ ${constructorExport}
   // non-null assertion. Runtime guards above establish every refined value;
   // the generated strict subset carries that same control flow without `!`.
   return staticTarget
-    ? source
-      .replace(/(?<=[A-Za-z0-9_$\]\)])!(?!=)/gu, "")
-      .replace(/\bprivate\s+(?:readonly\s+)?/gu, "")
+    ? source.replace(/(?<=[A-Za-z0-9_$\])])!(?!=)/gu, "").replace(/\bprivate\s+(?:readonly\s+)?/gu, "")
     : source;
 }
 
@@ -1151,7 +1170,7 @@ export async function generateCommunityApi() {
     [path.join(extensionRoot, outputs.c), renderHeader(inputHash)],
     [path.join(extensionRoot, outputs.nativeC), renderNativeHeader(inputHash, contract)],
     [path.join(extensionRoot, outputs.typescript), renderTypeScript(inputHash, contract, "dynamic")],
-    [path.join(extensionRoot, outputs.typescriptStatic), renderTypeScript(inputHash, contract, "static")]
+    [path.join(extensionRoot, outputs.typescriptStatic), renderTypeScript(inputHash, contract, "static")],
   ]);
 }
 
@@ -1162,14 +1181,21 @@ export async function run(argv = process.argv.slice(2)) {
   for (const [file, content] of outputs) {
     if (check) {
       let actual;
-      try { actual = await readFile(file, "utf8"); } catch (error) { if (error?.code === "ENOENT") fail(`${path.relative(repositoryRoot, file)} is missing`); throw error; }
+      try {
+        actual = await readFile(file, "utf8");
+      } catch (error) {
+        if (error?.code === "ENOENT") fail(`${path.relative(repositoryRoot, file)} is missing`);
+        throw error;
+      }
       if (actual !== content) fail(`${path.relative(repositoryRoot, file)} is stale`);
     } else {
       await mkdir(path.dirname(file), { recursive: true });
       await writeFile(file, content);
     }
   }
-  process.stdout.write(`${check ? "Verified" : "Generated"} ${outputs.size} Defold WebTransport community API surfaces.\n`);
+  process.stdout.write(
+    `${check ? "Verified" : "Generated"} ${outputs.size} Defold WebTransport community API surfaces.\n`,
+  );
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) await run();

@@ -75,14 +75,7 @@ export function checkerReachableRoutes(manifest, retainedInputs) {
  * Returns the verdict rather than throwing so the caller can decide: a
  * development build reports it, a release build refuses to proceed without it.
  */
-export function crossCheckReachability({
-  entryPoint,
-  output,
-  manifest,
-  routeIndex,
-  checkerRouteIds,
-  bundleStableIds
-}) {
+export function crossCheckReachability({ entryPoint, output, manifest, routeIndex, checkerRouteIds, bundleStableIds }) {
   const byId = new Map(Object.values(routeIndex.members).map((member) => [member.id, member]));
   const checkerNamespaces = namespacesOf(checkerRouteIds, routeIndex);
   const bundleNamespaces = namespacesOfStableIds(bundleStableIds, routeIndex);
@@ -94,14 +87,12 @@ export function crossCheckReachability({
     .sort(compareCodeUnits);
   const disagreements = [];
   for (const id of resolvedButNotEmitted) {
-    disagreements.push(
-      `the checker resolved ${id} but the bundler emitted no dispatch for it in ${output}`
-    );
+    disagreements.push(`the checker resolved ${id} but the bundler emitted no dispatch for it in ${output}`);
   }
   if (!manifest.dynamicAccess) {
     for (const namespace of emittedButUnclaimed) {
       disagreements.push(
-        `the bundler retained the '${namespace}' Defold namespace in ${output} but the checker resolved no route in it`
+        `the bundler retained the '${namespace}' Defold namespace in ${output} but the checker resolved no route in it`,
       );
     }
   }
@@ -116,14 +107,15 @@ export function crossCheckReachability({
     bundleNamespaces: [...bundleNamespaces].sort(compareCodeUnits),
     resolvedButNotEmitted,
     emittedNamespacesWithoutResolvedRoute: emittedButUnclaimed,
-    disagreements
+    disagreements,
   };
 }
 
 /** The per-entrypoint Defold API usage document the release planner consumes. */
 export function defoldApiUsageDocument({ entryPoint, output, manifest, routeIndex, checkerRouteIds, crossCheck }) {
-  const byId = new Map(Object.entries(routeIndex.members)
-    .map(([path, member]) => [member.id, { ...member, member: path }]));
+  const byId = new Map(
+    Object.entries(routeIndex.members).map(([path, member]) => [member.id, { ...member, member: path }]),
+  );
   return {
     schemaVersion: 1,
     entryPoint,
@@ -146,9 +138,9 @@ export function defoldApiUsageDocument({ entryPoint, output, manifest, routeInde
       resolvedRoutes: checkerRouteIds.map((id) => ({
         id,
         stableId: byId.get(id)?.stableId ?? null,
-        member: byId.get(id)?.member ?? null
+        member: byId.get(id)?.member ?? null,
       })),
-      crossCheck
-    }
+      crossCheck,
+    },
   };
 }

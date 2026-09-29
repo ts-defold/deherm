@@ -20,8 +20,10 @@ function jsonValue(value) {
 function canonicalJson(value) {
   if (value === null || typeof value !== "object") return JSON.stringify(value);
   if (Array.isArray(value)) return `[${value.map(canonicalJson).join(",")}]`;
-  return `{${Object.keys(value).sort(compareCodeUnits)
-    .map((key) => `${JSON.stringify(key)}:${canonicalJson(value[key])}`).join(",")}}`;
+  return `{${Object.keys(value)
+    .sort(compareCodeUnits)
+    .map((key) => `${JSON.stringify(key)}:${canonicalJson(value[key])}`)
+    .join(",")}}`;
 }
 
 function compareCodeUnits(left, right) {
@@ -29,8 +31,7 @@ function compareCodeUnits(left, right) {
 }
 
 function authenticatedCatalog(catalog, index) {
-  if (!catalog || !Array.isArray(catalog.recipes) ||
-      !/^[0-9a-f]{64}$/.test(catalog.sourceHashes?.catalog ?? "")) {
+  if (!catalog || !Array.isArray(catalog.recipes) || !/^[0-9a-f]{64}$/.test(catalog.sourceHashes?.catalog ?? "")) {
     throw new Error("dmSDK universal-ready corpus requires the authenticated recipe catalog");
   }
   const catalogSha256 = sha256(JSON.stringify(catalog.recipes));
@@ -63,7 +64,9 @@ export function dmSdkUniversalReadyUsages(index, catalog) {
       }
       return Object.freeze({ declarationId, numericId: declaration.numericId });
     })
-    .sort((left, right) => left.numericId - right.numericId || compareCodeUnits(left.declarationId, right.declarationId));
+    .sort(
+      (left, right) => left.numericId - right.numericId || compareCodeUnits(left.declarationId, right.declarationId),
+    );
   if (ready.length !== verified.universalReadyCount) {
     throw new Error("dmSDK universal-ready corpus count disagrees with its authenticated symbol index");
   }

@@ -23,37 +23,40 @@ test("the producer accepts only the exact host-tool bytes and size consumers pin
           dehermc: {
             status: "vendored",
             sha256: sha256(expected),
-            bytes: expected.byteLength
-          }
-        }
-      }
-    }
+            bytes: expected.byteLength,
+          },
+        },
+      },
+    },
   };
 
   await writeFile(file, expected);
-  assert.deepEqual(await verifyPinnedHostToolFile({
-    manifest,
-    host: "linux-x64",
-    tool: "dehermc",
-    file
-  }), {
-    host: "linux-x64",
-    tool: "dehermc",
-    file,
-    bytes: expected.byteLength,
-    sha256: sha256(expected)
-  });
+  assert.deepEqual(
+    await verifyPinnedHostToolFile({
+      manifest,
+      host: "linux-x64",
+      tool: "dehermc",
+      file,
+    }),
+    {
+      host: "linux-x64",
+      tool: "dehermc",
+      file,
+      bytes: expected.byteLength,
+      sha256: sha256(expected),
+    },
+  );
 
   await writeFile(file, Buffer.from("wrong compiler artifact\n"));
   await assert.rejects(
     verifyPinnedHostToolFile({ manifest, host: "linux-x64", tool: "dehermc", file }),
-    /hashes .* manifest expects/u
+    /hashes .* manifest expects/u,
   );
 
   await writeFile(file, Buffer.from("short\n"));
   await assert.rejects(
     verifyPinnedHostToolFile({ manifest, host: "linux-x64", tool: "dehermc", file }),
-    /manifest expects \d+/u
+    /manifest expects \d+/u,
   );
 });
 
@@ -64,15 +67,15 @@ test("the producer refuses undeclared and unpublished host-tool rows", async (t)
   await writeFile(file, "anything");
   await assert.rejects(
     verifyPinnedHostToolFile({ manifest: { hosts: {} }, host: "linux-x64", tool: "dehermc", file }),
-    /declares no dehermc/u
+    /declares no dehermc/u,
   );
   await assert.rejects(
     verifyPinnedHostToolFile({
       manifest: { hosts: { "linux-x64": { tools: { dehermc: { status: "required-missing" } } } } },
       host: "linux-x64",
       tool: "dehermc",
-      file
+      file,
     }),
-    /not a publishable vendored tool/u
+    /not a publishable vendored tool/u,
   );
 });

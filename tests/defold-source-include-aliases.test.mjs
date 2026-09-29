@@ -52,9 +52,10 @@ test("Defold internal module layout precedes its public dmsdk projection", async
       engineRoot,
       sources: [{ path: "source.cpp", text: "#include <alpha/tool.h>\n" }],
     });
-    assert.deepEqual(aliases.map(({ kind, include, source }) => ({ kind, include, source })), [
-      { kind: "include-search", include: "alpha/tool.h", source: "upstream/defold/engine/alpha/src/tool.h" },
-    ]);
+    assert.deepEqual(
+      aliases.map(({ kind, include, source }) => ({ kind, include, source })),
+      [{ kind: "include-search", include: "alpha/tool.h", source: "upstream/defold/engine/alpha/src/tool.h" }],
+    );
   } finally {
     await rm(repositoryRoot, { recursive: true, force: true });
   }
@@ -72,23 +73,26 @@ test("projected module headers retain their source-local include closure", async
       engineRoot,
       sources: [{ path: "source.cpp", text: "#include <font/text_layout.h>\n" }],
     });
-    assert.deepEqual(aliases.map(({ kind, include, source }) => ({ kind, include, source })), [
-      {
-        kind: "include-search",
-        include: "font/markup.h",
-        source: "upstream/defold/engine/font/src/markup.h",
-      },
-      {
-        kind: "include-search",
-        include: "font/text_layout.h",
-        source: "upstream/defold/engine/font/src/text_layout.h",
-      },
-      {
-        kind: "source-local",
-        include: "upstream/defold/engine/font/src/markup.h",
-        source: "upstream/defold/engine/font/src/markup.h",
-      },
-    ]);
+    assert.deepEqual(
+      aliases.map(({ kind, include, source }) => ({ kind, include, source })),
+      [
+        {
+          kind: "include-search",
+          include: "font/markup.h",
+          source: "upstream/defold/engine/font/src/markup.h",
+        },
+        {
+          kind: "include-search",
+          include: "font/text_layout.h",
+          source: "upstream/defold/engine/font/src/text_layout.h",
+        },
+        {
+          kind: "source-local",
+          include: "upstream/defold/engine/font/src/markup.h",
+          source: "upstream/defold/engine/font/src/markup.h",
+        },
+      ],
+    );
   } finally {
     await rm(repositoryRoot, { recursive: true, force: true });
   }
@@ -110,13 +114,16 @@ test("Defold generated relative includes project SDK bytes into their build-tree
       sdkIncludeRoots: [sdkRoot],
       sources: [{ path: sourcePath, text: await readFile(path.join(repositoryRoot, sourcePath), "utf8") }],
     });
-    assert.deepEqual(aliases.map(({ kind, include, source }) => ({ kind, include, source })), [
-      {
-        kind: "virtual-file",
-        include: "upstream/defold/engine/gameobject/src/proto/gameobject/lua_ddf.h",
-        source: "upstream/sdk/include/gameobject/lua_ddf.h",
-      },
-    ]);
+    assert.deepEqual(
+      aliases.map(({ kind, include, source }) => ({ kind, include, source })),
+      [
+        {
+          kind: "virtual-file",
+          include: "upstream/defold/engine/gameobject/src/proto/gameobject/lua_ddf.h",
+          source: "upstream/sdk/include/gameobject/lua_ddf.h",
+        },
+      ],
+    );
     const overlay = await materializeDefoldSourceIncludeAliases({ repositoryRoot, aliases });
     const vfs = JSON.parse(await readFile(overlay.vfsOverlay, "utf8"));
     assert.deepEqual(vfs.roots, [

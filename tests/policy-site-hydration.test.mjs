@@ -5,7 +5,13 @@ import path from "node:path";
 import test from "node:test";
 
 import { buildPolicySite, validateArtifactReferences } from "../scripts/build-policy-site.mjs";
-import { buildArtifactReferences, readSiteConfig, readStore, shippedIndexPath, storeRoot } from "../scripts/generate-api-policy.mjs";
+import {
+  buildArtifactReferences,
+  readSiteConfig,
+  readStore,
+  shippedIndexPath,
+  storeRoot,
+} from "../scripts/generate-api-policy.mjs";
 import { hydratePolicySite } from "../scripts/hydrate-policy-site.mjs";
 
 test("the packaged one-revision store hydrates idempotently from the accumulated website", async () => {
@@ -57,7 +63,7 @@ test("hydration lets the packaged generator replace a published pointer for the 
   assert.equal(result.copied, 0);
   assert.equal(
     await readFile(path.join(hydratedStore, site.layoutVersion, "index", `${revision}.json`), "utf8"),
-    expected
+    expected,
   );
   const index = JSON.parse(await readFile(hydratedIndex, "utf8"));
   assert.notEqual(index.entries[0].generator, staleGenerator);
@@ -72,8 +78,9 @@ test("hydration refuses mutable bytes at a content-addressed path", async () => 
   await buildPolicySite({ output: published });
   await copyFile(shippedIndexPath, hydratedIndex);
 
-  const manifest = JSON.parse(await readFile(path.join(published, site.layoutVersion, "index", "manifest.json"), "utf8"));
-  const revision = manifest.entries[0].defoldRevision;
+  const manifest = JSON.parse(
+    await readFile(path.join(published, site.layoutVersion, "index", "manifest.json"), "utf8"),
+  );
   const root = manifest.entries[0].policyRoot;
   const relative = path.join(site.layoutVersion, "policy", `${root}.json`);
   await mkdir(path.dirname(path.join(hydratedStore, relative)), { recursive: true });
@@ -81,7 +88,7 @@ test("hydration refuses mutable bytes at a content-addressed path", async () => 
 
   await assert.rejects(
     hydratePolicySite({ from: published, store: hydratedStore, index: hydratedIndex, site }),
-    /published and packaged policy bytes disagree/
+    /published and packaged policy bytes disagree/,
   );
 });
 
@@ -95,14 +102,13 @@ test("policy publication can retain a previously complete artifact mapping", asy
   }
   const result = await buildPolicySite({ output: directory, artifactReferences: fallback });
   for (const entry of result.entries) {
-    const document = JSON.parse(await readFile(
-      path.join(directory, site.layoutVersion, "artifacts", `${entry.defoldRevision}.json`),
-      "utf8"
-    ));
+    const document = JSON.parse(
+      await readFile(path.join(directory, site.layoutVersion, "artifacts", `${entry.defoldRevision}.json`), "utf8"),
+    );
     assert.deepEqual(document.artifacts, fallback);
   }
   assert.throws(
     () => validateArtifactReferences({ "native-artifacts": fallback["native-artifacts"] }),
-    /has no hermes-host family/u
+    /has no hermes-host family/u,
   );
 });

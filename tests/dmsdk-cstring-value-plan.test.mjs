@@ -17,9 +17,11 @@ const sources = Object.freeze({
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 
 async function inputs() {
-  const texts = Object.fromEntries(await Promise.all(
-    Object.entries(sources).map(async ([key, source]) => [key, await readFile(new URL(source, root), "utf8")]),
-  ));
+  const texts = Object.fromEntries(
+    await Promise.all(
+      Object.entries(sources).map(async ([key, source]) => [key, await readFile(new URL(source, root), "utf8")]),
+    ),
+  );
   return {
     texts,
     projection: JSON.parse(texts.projection),
@@ -41,7 +43,10 @@ test("one authenticated C-string plan owns every emitted or fallback candidate",
   const report = JSON.parse(reportText);
   indexDmSdkCStringValuePlan(plan, { revision: report.defoldRevision });
   assert.equal(report.sources.hashes.plan, sha256(planText));
-  assert.deepEqual(report.declarations.map(({ id }) => id), plan.decisions.map(({ declarationId }) => declarationId));
+  assert.deepEqual(
+    report.declarations.map(({ id }) => id),
+    plan.decisions.map(({ declarationId }) => declarationId),
+  );
   assert.deepEqual(
     report.declarations.map(({ id, disposition, blocker }) => ({ id, disposition, blocker })),
     plan.decisions.map(({ declarationId, fallback, blocker }) => ({
@@ -70,7 +75,9 @@ test("C-string planning preserves canonical projection order and fixed source-ha
 test("withdrawing public string evidence preserves the universal fallback", async () => {
   const input = await inputs();
   const baseline = buildDmSdkCStringValuePlan(input);
-  const selected = new Set(baseline.decisions.filter(({ fallback }) => !fallback).map(({ declarationId }) => declarationId));
+  const selected = new Set(
+    baseline.decisions.filter(({ fallback }) => !fallback).map(({ declarationId }) => declarationId),
+  );
   for (const declaration of input.sdkIr.declarations.filter(({ id }) => selected.has(id))) {
     declaration.description = "No public string contract is documented.";
     declaration.returnDescription = "";
@@ -95,10 +102,13 @@ test("explicit negative documentation dominates generic positive substrings", as
   const byId = new Map(input.sdkIr.declarations.map((declaration) => [declaration.id, declaration]));
   byId.get(enumResult.declarationId).description = "String representation; may return NULL for an unknown value.";
   const inputDeclaration = byId.get(inputTransform.declarationId);
-  const stringIndex = input.projection.rows.find(({ id }) => id === inputTransform.declarationId)
+  const stringIndex = input.projection.rows
+    .find(({ id }) => id === inputTransform.declarationId)
     .signature.parameters.findIndex(({ type }) => type.kind === "cstring");
-  inputDeclaration.parameters[stringIndex].description = "Path bytes may be NULL, use arbitrary encoding, and are retained asynchronously.";
-  byId.get(nullableResult.declarationId).returnDescription = "Borrowed arbitrary bytes, not NUL terminated; 0 otherwise.";
+  inputDeclaration.parameters[stringIndex].description =
+    "Path bytes may be NULL, use arbitrary encoding, and are retained asynchronously.";
+  byId.get(nullableResult.declarationId).returnDescription =
+    "Borrowed arbitrary bytes, not NUL terminated; 0 otherwise.";
   refreshText(input, "sdkIr");
   input.projection.sources.hashes.ir = sha256(input.texts.sdkIr);
   refreshText(input, "projection");
@@ -107,7 +117,9 @@ test("explicit negative documentation dominates generic positive substrings", as
   assert.equal(decisions.get(enumResult.declarationId).blocker, "cstring-result-nullability-contradiction");
   assert.equal(decisions.get(inputTransform.declarationId).blocker, "cstring-input-nullability-contradiction");
   assert.equal(decisions.get(nullableResult.declarationId).blocker, "cstring-result-codec-contradiction");
-  assert.ok([enumResult, inputTransform, nullableResult].every(({ declarationId }) => decisions.get(declarationId).fallback));
+  assert.ok(
+    [enumResult, inputTransform, nullableResult].every(({ declarationId }) => decisions.get(declarationId).fallback),
+  );
 });
 
 test("same-revision projection and SDK mixtures fail source authentication", async () => {
@@ -156,7 +168,8 @@ test("compiler-owned TypeScript names resolve normalized symbol collisions deter
   input.projection.rows.find(({ id }) => id === selected[1].declarationId).symbol = "dmFooBar::Baz";
   refreshText(input, "projection");
   const changed = buildDmSdkCStringValuePlan(input);
-  const names = changed.decisions.filter(({ declarationId }) => selected.some((entry) => entry.declarationId === declarationId))
+  const names = changed.decisions
+    .filter(({ declarationId }) => selected.some((entry) => entry.declarationId === declarationId))
     .map(({ typescriptName }) => typescriptName);
   assert.equal(new Set(names).size, 2);
   assert.ok(names.every((name) => /^dmFooBarBaz_[0-9a-f]{8}$/u.test(name)));
@@ -165,7 +178,9 @@ test("compiler-owned TypeScript names resolve normalized symbol collisions deter
 test("every C-string candidate retains its universal recipe regardless of specialization", async () => {
   const [input, universal] = await Promise.all([
     inputs(),
-    readFile(new URL("packages/bindings/generated/defold-dmsdk-universal-bindings.json", root), "utf8").then(JSON.parse),
+    readFile(new URL("packages/bindings/generated/defold-dmsdk-universal-bindings.json", root), "utf8").then(
+      JSON.parse,
+    ),
   ]);
   const plan = buildDmSdkCStringValuePlan(input);
   const universalIds = new Set(universal.recipes.map(({ declarationId }) => declarationId));

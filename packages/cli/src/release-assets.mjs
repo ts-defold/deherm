@@ -104,7 +104,7 @@ export async function downloadReleaseAssets({
   assets,
   destination,
   optional = false,
-  onProgress
+  onProgress,
 }) {
   await mkdir(destination, { recursive: true });
   const downloaded = [];
@@ -151,9 +151,17 @@ export async function extractReleaseArchive({ archive, destination }) {
   await mkdir(destination, { recursive: true });
   try {
     const { stdout } = await execFileAsync("tar", ["-tzf", path.resolve(archive)]);
-    const entries = stdout.split(/\r?\n/u).filter(Boolean).map((entry) => entry.startsWith("./") ? entry.slice(2) : entry);
-    if (entries.length === 0 || entries.some((entry) =>
-      entry.length === 0 || entry === "." || entry.includes("/") || entry.includes("\\") || entry.includes("\0"))) {
+    const entries = stdout
+      .split(/\r?\n/u)
+      .filter(Boolean)
+      .map((entry) => (entry.startsWith("./") ? entry.slice(2) : entry));
+    if (
+      entries.length === 0 ||
+      entries.some(
+        (entry) =>
+          entry.length === 0 || entry === "." || entry.includes("/") || entry.includes("\\") || entry.includes("\0"),
+      )
+    ) {
       throw new Error(`${path.basename(archive)} is not a non-empty flat release archive`);
     }
     await execFileAsync("tar", ["-xzf", path.resolve(archive), "-C", path.resolve(destination)]);
@@ -161,7 +169,7 @@ export async function extractReleaseArchive({ archive, destination }) {
     if (error?.code === "ENOENT") {
       throw new Error(
         `Extracting ${path.basename(archive)} needs \`tar\`, which is not on PATH. ` +
-        "tar ships with macOS, with every Linux distribution, and with Windows 10 1803 and later."
+          "tar ships with macOS, with every Linux distribution, and with Windows 10 1803 and later.",
       );
     }
     throw new Error(`tar could not extract ${path.basename(archive)}: ${error?.stderr?.trim() || error?.message}`);

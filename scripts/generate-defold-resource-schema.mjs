@@ -12,13 +12,13 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 import {
   buildResourceDeclarationSchema,
-  parseBuilderAnnotations
+  parseBuilderAnnotations,
 } from "../packages/compiler/src/resource-declaration-schema.mjs";
 
 const root = new URL("../", import.meta.url);
 const builderDirectoryUrl = new URL(
   "upstream/defold/com.dynamo.cr/com.dynamo.cr.bob/src/com/dynamo/bob/pipeline/",
-  root
+  root,
 );
 const protoRootUrl = new URL("upstream/defold/engine/", root);
 const outputUrl = new URL("packages/bindings/generated/defold-resource-declaration-schema.json", root);
@@ -35,7 +35,7 @@ async function collectFiles(directory, accept) {
   const matches = [];
   async function visit(current) {
     const entries = await readdir(current, { withFileTypes: true });
-    entries.sort((left, right) => left.name < right.name ? -1 : left.name > right.name ? 1 : 0);
+    entries.sort((left, right) => (left.name < right.name ? -1 : left.name > right.name ? 1 : 0));
     for (const entry of entries) {
       const absolute = path.join(current, entry.name);
       if (entry.isDirectory()) await visit(absolute);
@@ -74,7 +74,7 @@ export async function generateDefoldResourceSchema() {
   for (const { file, source } of protoFiles) {
     if (usedProtos.has(file)) inputs.push({ path: file, sha256: sha256(source) });
   }
-  inputs.sort((left, right) => left.path < right.path ? -1 : left.path > right.path ? 1 : 0);
+  inputs.sort((left, right) => (left.path < right.path ? -1 : left.path > right.path ? 1 : 0));
 
   const namespaceCount = resources.reduce((count, resource) => count + resource.namespaces.length, 0);
   return {
@@ -85,14 +85,14 @@ export async function generateDefoldResourceSchema() {
       "declaration site = repeated sub-message field whose element carries an identity string field",
       "identity field = a non-resource, non-runtime string field named id or name, else the sole string field",
       "namespace kind = a non-generic identity field name, else the singular primary field name",
-      "sites reached through another declaration site are nested and never become a namespace"
+      "sites reached through another declaration site are nested and never become a namespace",
     ],
     inputs,
     resourceCount: resources.length,
     namespaceCount,
     blockerCount: blockers.length,
     resources,
-    blockers
+    blockers,
   };
 }
 
@@ -103,10 +103,12 @@ async function main(argv = process.argv.slice(2)) {
   const report = await generateDefoldResourceSchema();
   const expected = `${JSON.stringify(report, null, 2)}\n`;
   if (check) {
-    if (await readFile(outputUrl, "utf8") !== expected) throw new Error(`${outputUrl.pathname} is stale`);
+    if ((await readFile(outputUrl, "utf8")) !== expected) throw new Error(`${outputUrl.pathname} is stale`);
   } else await writeFile(outputUrl, expected);
-  console.log(`${check ? "Verified" : "Generated"} ${report.resourceCount} Defold resource kinds ` +
-    `with ${report.namespaceCount} declaration namespaces (${report.blockerCount} blockers).`);
+  console.log(
+    `${check ? "Verified" : "Generated"} ${report.resourceCount} Defold resource kinds ` +
+      `with ${report.namespaceCount} declaration namespaces (${report.blockerCount} blockers).`,
+  );
 }
 
 if (process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url) await main();

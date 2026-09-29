@@ -80,7 +80,8 @@ export function createOccurrenceCollector({
       const [head, ...rest] = value.split("\n");
       const classification = classifyDiagnosticText(head);
       const severe = kind === "event" || severityOf(level) === "error" || classification !== null;
-      const continuation = open !== undefined &&
+      const continuation =
+        open !== undefined &&
         kind !== "event" &&
         open.source === source &&
         when - open.lastAt <= continuationWindowMs &&
@@ -114,7 +115,10 @@ export function createOccurrenceCollector({
 }
 
 function summarizeOccurrence(occurrence) {
-  const frames = occurrence.lines.slice(1).filter((line) => isStackFrameLine(line)).map((line) => line.trim());
+  const frames = occurrence.lines
+    .slice(1)
+    .filter((line) => isStackFrameLine(line))
+    .map((line) => line.trim());
   const { signature, normalizedText, normalizedFrames } = diagnosticSignature({
     classification: occurrence.classification,
     text: occurrence.lines[0],
@@ -154,14 +158,16 @@ export function recordDevEvent(collector, event, origin = "dev-session") {
   }
   const source = FAILURE_EVENTS[event.type];
   if (!source) return;
-  const diagnostic = event.diagnostic ??
+  const diagnostic =
+    event.diagnostic ??
     (event.type === "runtime-activation-rejected"
       ? `runtime rejected bundle ${event.fingerprint ?? "unknown"}`
       : `${event.type}`);
   const changedSources = collector.builds?.get(event.generation);
-  const trigger = changedSources?.length || event.reason
-    ? { ...(event.reason ? { reason: event.reason } : {}), ...(changedSources?.length ? { changedSources } : {}) }
-    : undefined;
+  const trigger =
+    changedSources?.length || event.reason
+      ? { ...(event.reason ? { reason: event.reason } : {}), ...(changedSources?.length ? { changedSources } : {}) }
+      : undefined;
   collector.record({
     at,
     level: "error",
@@ -209,7 +215,10 @@ export function harvestSessionLog(contents, { origin = "dev-session", ...options
 }
 
 /** Harvest occurrences from a raw engine transcript (no timestamps or levels). */
-export function harvestTranscript(transcript, { origin = "packaged-run", at = Date.now(), source = "engine", ...options } = {}) {
+export function harvestTranscript(
+  transcript,
+  { origin = "packaged-run", at = Date.now(), source = "engine", ...options } = {},
+) {
   const collector = createOccurrenceCollector({ continuationWindowMs: Number.MAX_SAFE_INTEGER, ...options });
   for (const line of String(transcript).replaceAll("\r", "").split("\n")) {
     if (!line.trim()) continue;
@@ -235,7 +244,11 @@ function toIso(value) {
  * the only thing this collapses is two sightings of one defect inside the same
  * millisecond - which is the same defect anyway.
  */
-export function mergeOccurrences(pool, occurrences, { occurrenceCap = DEFAULT_OCCURRENCE_CAP, deduplicate = true } = {}) {
+export function mergeOccurrences(
+  pool,
+  occurrences,
+  { occurrenceCap = DEFAULT_OCCURRENCE_CAP, deduplicate = true } = {},
+) {
   const cap = Math.max(1, occurrenceCap);
   let added = 0;
   let created = 0;
@@ -279,7 +292,8 @@ export function mergeOccurrences(pool, occurrences, { occurrenceCap = DEFAULT_OC
     existing.occurrenceCount += 1;
     if (at < existing.firstSeen) existing.firstSeen = at;
     if (at > existing.lastSeen) existing.lastSeen = at;
-    if (!existing.origins.includes(occurrence.origin)) existing.origins = [...existing.origins, occurrence.origin].sort();
+    if (!existing.origins.includes(occurrence.origin))
+      existing.origins = [...existing.origins, occurrence.origin].sort();
     if (!existing.sourceLocation && occurrence.sourceLocation) existing.sourceLocation = occurrence.sourceLocation;
     if (!existing.frames?.length && occurrence.frames.length) existing.frames = occurrence.frames;
     // Bounded storage with an accurate count: keep the first sighting plus the
@@ -293,7 +307,8 @@ export function mergeOccurrences(pool, occurrences, { occurrenceCap = DEFAULT_OC
 /** Deterministic, machine-readable pool document. */
 export function bugPoolDocument(pool, { generatedAt } = {}) {
   const entries = [...pool.entries.values()].sort((left, right) =>
-    left.signature < right.signature ? -1 : left.signature > right.signature ? 1 : 0);
+    left.signature < right.signature ? -1 : left.signature > right.signature ? 1 : 0,
+  );
   const byClassification = {};
   for (const entry of entries) {
     byClassification[entry.classification] = (byClassification[entry.classification] ?? 0) + entry.occurrenceCount;
@@ -396,9 +411,7 @@ export async function harvestBugPool({
     const merged = mergeOccurrences(pool, occurrences, { occurrenceCap });
     sources.push({ path: absolute, kind: "transcript", ...merged });
   }
-  const document = write
-    ? await writeBugPool(target, pool, { generatedAt })
-    : bugPoolDocument(pool, { generatedAt });
+  const document = write ? await writeBugPool(target, pool, { generatedAt }) : bugPoolDocument(pool, { generatedAt });
   return { poolFile: target, sources, document };
 }
 
@@ -424,11 +437,15 @@ export function createBugPoolRecorder({
     const occurrences = collector.flush();
     if (!occurrences.length) return pending;
     pooled += occurrences.length;
-    pending = pending.then(async () => {
-      const pool = await readBugPool(target);
-      mergeOccurrences(pool, occurrences, { occurrenceCap });
-      await writeBugPool(target, pool);
-    }).catch((error) => { onError?.(error); });
+    pending = pending
+      .then(async () => {
+        const pool = await readBugPool(target);
+        mergeOccurrences(pool, occurrences, { occurrenceCap });
+        await writeBugPool(target, pool);
+      })
+      .catch((error) => {
+        onError?.(error);
+      });
     return pending;
   };
   return {
@@ -458,16 +475,20 @@ export function createBugPoolRecorder({
 export function formatBugPool(document, { cwd = process.cwd(), poolFile } = {}) {
   const lines = [];
   const where = poolFile ? path.relative(cwd, poolFile) || poolFile : undefined;
-  lines.push(`runtime bug pool: ${document.entryCount} signature(s), ${document.occurrenceCount} occurrence(s)${where ? ` in ${where}` : ""}`);
+  lines.push(
+    `runtime bug pool: ${document.entryCount} signature(s), ${document.occurrenceCount} occurrence(s)${where ? ` in ${where}` : ""}`,
+  );
   lines.push("evidence about déherm's own runtime behaviour; not conformance evidence");
   if (!document.entryCount) {
     lines.push("-- no classified or unclassified defects observed yet");
     return lines.join("\n");
   }
-  const ordered = [...document.entries].sort((left, right) =>
-    right.occurrenceCount - left.occurrenceCount ||
-    (left.lastSeen < right.lastSeen ? 1 : left.lastSeen > right.lastSeen ? -1 : 0) ||
-    (left.signature < right.signature ? -1 : 1));
+  const ordered = [...document.entries].sort(
+    (left, right) =>
+      right.occurrenceCount - left.occurrenceCount ||
+      (left.lastSeen < right.lastSeen ? 1 : left.lastSeen > right.lastSeen ? -1 : 0) ||
+      (left.signature < right.signature ? -1 : 1),
+  );
   for (const entry of ordered) {
     const location = entry.sourceLocation
       ? `  ${entry.sourceLocation.file}:${entry.sourceLocation.line}${entry.sourceLocation.column === undefined ? "" : `:${entry.sourceLocation.column}`}`

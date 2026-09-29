@@ -22,7 +22,7 @@ const valueOf = (name) => {
 const rows = readAudit(valueOf("audit") ?? process.env[REVISION_AUDIT_ENV] ?? undefined);
 const markdown = renderAuditSummary(rows, {
   revision: valueOf("revision") ?? undefined,
-  reviewed: valueOf("reviewed") ?? undefined
+  reviewed: valueOf("reviewed") ?? undefined,
 });
 
 const out = valueOf("out");

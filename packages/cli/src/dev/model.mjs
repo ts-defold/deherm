@@ -20,11 +20,20 @@ function clearComponentSnapshot(item) {
 }
 
 function validComponentInstances(instances) {
-  return Array.isArray(instances) && instances.every((instance) =>
-    instance !== null && typeof instance === "object" && !Array.isArray(instance) &&
-    typeof instance.componentId === "string" && Array.isArray(instance.properties) &&
-    instance.properties.every((property) =>
-      property !== null && typeof property === "object" && !Array.isArray(property)));
+  return (
+    Array.isArray(instances) &&
+    instances.every(
+      (instance) =>
+        instance !== null &&
+        typeof instance === "object" &&
+        !Array.isArray(instance) &&
+        typeof instance.componentId === "string" &&
+        Array.isArray(instance.properties) &&
+        instance.properties.every(
+          (property) => property !== null && typeof property === "object" && !Array.isArray(property),
+        ),
+    )
+  );
 }
 
 function enrichInstances(model, instances) {
@@ -36,7 +45,7 @@ function enrichInstances(model, instances) {
         ...instance,
         source: declared.source,
         schemaStatus: "stale",
-        expectedSchemaFingerprint: declared.schemaFingerprint
+        expectedSchemaFingerprint: declared.schemaFingerprint,
       };
     }
     const properties = new Map((declared.properties ?? []).map((property) => [property.name, property]));
@@ -47,8 +56,8 @@ function enrichInstances(model, instances) {
       schemaStatus: "current",
       properties: instance.properties.map((property) => ({
         ...property,
-        declaredKind: properties.get(property.name)?.kind
-      }))
+        declaredKind: properties.get(property.name)?.kind,
+      })),
     };
   });
 }
@@ -77,7 +86,7 @@ export function createDevModel(options = {}) {
     // What a release build would retain, recomputed on every compile and never
     // applied: this session links the complete surface on purpose.
     reachability: undefined,
-    startedAt: options.now ?? Date.now()
+    startedAt: options.now ?? Date.now(),
   };
 }
 
@@ -101,7 +110,11 @@ export function applyDevEvent(model, event) {
       if (!Number.isSafeInteger(event.generation) || event.generation <= model.generation) return false;
       model.generation = event.generation;
       model.phase = "building";
-      model.activeBuild = { generation: event.generation, startedAt: at, changedSources: [...(event.changedSources ?? [])] };
+      model.activeBuild = {
+        generation: event.generation,
+        startedAt: at,
+        changedSources: [...(event.changedSources ?? [])],
+      };
       return changed(model);
     }
     case "build-succeeded": {
@@ -114,7 +127,7 @@ export function applyDevEvent(model, event) {
         status: "built",
         durationMs: at - model.activeBuild.startedAt,
         fingerprint: event.fingerprint,
-        resources: [...(event.resources ?? [])]
+        resources: [...(event.resources ?? [])],
       };
       boundedPush(model.history, record, model.historyCapacity);
       model.activeBuild = undefined;
@@ -123,22 +136,36 @@ export function applyDevEvent(model, event) {
     case "build-failed": {
       if (event.generation !== model.generation || model.activeBuild?.generation !== event.generation) return false;
       model.phase = "failed";
-      boundedPush(model.history, {
-        generation: event.generation,
-        status: "failed",
-        durationMs: at - model.activeBuild.startedAt,
-        diagnostic: event.diagnostic
-      }, model.historyCapacity);
+      boundedPush(
+        model.history,
+        {
+          generation: event.generation,
+          status: "failed",
+          durationMs: at - model.activeBuild.startedAt,
+          diagnostic: event.diagnostic,
+        },
+        model.historyCapacity,
+      );
       model.activeBuild = undefined;
-      boundedPush(model.logs, {
-        sequence: model.nextLogSequence++, at, level: "error", source: "build", message: String(event.diagnostic ?? "build failed")
-      }, model.logCapacity);
+      boundedPush(
+        model.logs,
+        {
+          sequence: model.nextLogSequence++,
+          at,
+          level: "error",
+          source: "build",
+          message: String(event.diagnostic ?? "build failed"),
+        },
+        model.logCapacity,
+      );
       return changed(model);
     }
     case "target-connected": {
       const item = target(model, event.id);
-      if (event.connectionEpoch !== undefined &&
-          (item.connectionEpoch === undefined || event.connectionEpoch > item.connectionEpoch)) {
+      if (
+        event.connectionEpoch !== undefined &&
+        (item.connectionEpoch === undefined || event.connectionEpoch > item.connectionEpoch)
+      ) {
         clearComponentSnapshot(item);
         item.connectionEpoch = event.connectionEpoch;
         item.disconnectedConnectionEpoch = undefined;
@@ -154,7 +181,7 @@ export function applyDevEvent(model, event) {
         name: event.name,
         // Which runtime executes game code there. Two targets of one session
         // are not interchangeable, and the console must not imply they are.
-        runtime: event.runtime ?? item.runtime ?? "hermes"
+        runtime: event.runtime ?? item.runtime ?? "hermes",
       });
       return changed(model);
     }
@@ -167,8 +194,12 @@ export function applyDevEvent(model, event) {
     }
     case "target-disconnected": {
       const item = target(model, event.id);
-      if (event.connectionEpoch !== undefined && item.connectionEpoch !== undefined &&
-          event.connectionEpoch !== item.connectionEpoch) return false;
+      if (
+        event.connectionEpoch !== undefined &&
+        item.connectionEpoch !== undefined &&
+        event.connectionEpoch !== item.connectionEpoch
+      )
+        return false;
       clearComponentSnapshot(item);
       item.disconnectedConnectionEpoch = event.connectionEpoch ?? item.connectionEpoch;
       Object.assign(item, { status: "disconnected", disconnectedAt: at });
@@ -178,8 +209,13 @@ export function applyDevEvent(model, event) {
       if (!Array.isArray(event.components)) return false;
       const catalog = new Map();
       for (const component of event.components) {
-        if (!component || typeof component.componentId !== "string" ||
-            typeof component.schemaFingerprint !== "string" || typeof component.source !== "string") continue;
+        if (
+          !component ||
+          typeof component.componentId !== "string" ||
+          typeof component.schemaFingerprint !== "string" ||
+          typeof component.source !== "string"
+        )
+          continue;
         catalog.set(component.componentId, deepCopy(component));
       }
       model.componentCatalog = catalog;
@@ -205,16 +241,29 @@ export function applyDevEvent(model, event) {
       return changed(model);
     }
     case "component-snapshot": {
-      if (event.schemaVersion !== 1 || !validComponentInstances(event.instances) ||
-          !Number.isSafeInteger(event.connectionEpoch) || event.connectionEpoch < 1 ||
-          !Number.isSafeInteger(event.runtimeId) || event.runtimeId < 0 ||
-          !Number.isSafeInteger(event.sequence) || event.sequence < 0) return false;
+      if (
+        event.schemaVersion !== 1 ||
+        !validComponentInstances(event.instances) ||
+        !Number.isSafeInteger(event.connectionEpoch) ||
+        event.connectionEpoch < 1 ||
+        !Number.isSafeInteger(event.runtimeId) ||
+        event.runtimeId < 0 ||
+        !Number.isSafeInteger(event.sequence) ||
+        event.sequence < 0
+      )
+        return false;
       const item = target(model, event.id);
       if (item.connectionEpoch !== undefined && event.connectionEpoch < item.connectionEpoch) return false;
-      if (item.disconnectedConnectionEpoch !== undefined && event.connectionEpoch <= item.disconnectedConnectionEpoch) return false;
+      if (item.disconnectedConnectionEpoch !== undefined && event.connectionEpoch <= item.disconnectedConnectionEpoch)
+        return false;
       const current = item.componentSnapshot;
-      if (current && event.connectionEpoch === current.connectionEpoch &&
-          event.runtimeId === current.runtimeId && event.sequence <= current.sequence) return false;
+      if (
+        current &&
+        event.connectionEpoch === current.connectionEpoch &&
+        event.runtimeId === current.runtimeId &&
+        event.sequence <= current.sequence
+      )
+        return false;
       if (item.connectionEpoch !== event.connectionEpoch) clearComponentSnapshot(item);
       const componentSnapshot = deepCopy(event);
       item.connectionEpoch = event.connectionEpoch;
@@ -245,34 +294,47 @@ export function applyDevEvent(model, event) {
         appliedGeneration: event.generation,
         pendingGeneration: undefined,
         signalledGeneration: undefined,
-        lastReloadAt: at
+        lastReloadAt: at,
       });
       if ([...model.targets.values()].every((entry) => entry.pendingGeneration === undefined)) model.phase = "ready";
       return changed(model);
     }
     case "runtime-activation-observed": {
       const item = target(model, event.id);
-      const record = [...model.history].reverse().find(({ fingerprint }) =>
-        fingerprint === event.fingerprint);
+      const record = [...model.history].reverse().find(({ fingerprint }) => fingerprint === event.fingerprint);
       item.telemetry = {
         ...item.telemetry,
         bundleFingerprint: event.fingerprint,
         resourceGeneration: event.resourceGeneration,
         runtimeId: event.runtimeId,
-        activationObservedAt: at
+        activationObservedAt: at,
       };
       if (!record) {
-        boundedPush(model.logs, {
-          sequence: model.nextLogSequence++, at, level: "warn", source: "runtime",
-          message: `runtime activated unknown bundle ${event.fingerprint}`
-        }, model.logCapacity);
+        boundedPush(
+          model.logs,
+          {
+            sequence: model.nextLogSequence++,
+            at,
+            level: "warn",
+            source: "runtime",
+            message: `runtime activated unknown bundle ${event.fingerprint}`,
+          },
+          model.logCapacity,
+        );
         return changed(model);
       }
       if (item.pendingGeneration !== undefined && item.pendingGeneration > record.generation) {
-        boundedPush(model.logs, {
-          sequence: model.nextLogSequence++, at, level: "info", source: "runtime",
-          message: `runtime activated superseded bundle ${record.generation}; still awaiting ${item.pendingGeneration}`
-        }, model.logCapacity);
+        boundedPush(
+          model.logs,
+          {
+            sequence: model.nextLogSequence++,
+            at,
+            level: "info",
+            source: "runtime",
+            message: `runtime activated superseded bundle ${record.generation}; still awaiting ${item.pendingGeneration}`,
+          },
+          model.logCapacity,
+        );
         return changed(model);
       }
       Object.assign(item, {
@@ -281,7 +343,7 @@ export function applyDevEvent(model, event) {
         pendingGeneration: undefined,
         signalledGeneration: undefined,
         lastReloadAt: at,
-        diagnostic: undefined
+        diagnostic: undefined,
       });
       record.status = "activated";
       record.resourceGeneration = event.resourceGeneration;
@@ -293,22 +355,23 @@ export function applyDevEvent(model, event) {
     }
     case "runtime-activation-rejected": {
       const item = target(model, event.id);
-      const record = event.fingerprint === "unavailable"
-        ? undefined
-        : [...model.history].reverse().find(({ fingerprint }) => fingerprint === event.fingerprint);
+      const record =
+        event.fingerprint === "unavailable"
+          ? undefined
+          : [...model.history].reverse().find(({ fingerprint }) => fingerprint === event.fingerprint);
       item.telemetry = {
         ...item.telemetry,
         rejectedFingerprint: event.fingerprint,
         rejectedResourceGeneration: event.resourceGeneration,
         rejectedRuntimeId: event.runtimeId,
-        activationRejectedAt: at
+        activationRejectedAt: at,
       };
       if (record && item.pendingGeneration === record.generation) {
         Object.assign(item, {
           status: "activation-failed",
           pendingGeneration: undefined,
           signalledGeneration: undefined,
-          diagnostic: `runtime rejected bundle ${record.generation}`
+          diagnostic: `runtime rejected bundle ${record.generation}`,
         });
         record.status = "rejected";
         model.phase = "failed";
@@ -323,16 +386,17 @@ export function applyDevEvent(model, event) {
         status: event.type,
         pendingGeneration: undefined,
         signalledGeneration: undefined,
-        diagnostic: event.diagnostic
+        diagnostic: event.diagnostic,
       });
       model.phase = "failed";
       return changed(model);
     }
     case "telemetry": {
       const item = target(model, event.id);
-      const samples = event.values?.frameDtMs === undefined
-        ? item.telemetry.frameSamples
-        : [...(item.telemetry.frameSamples ?? []), event.values.frameDtMs].slice(-60);
+      const samples =
+        event.values?.frameDtMs === undefined
+          ? item.telemetry.frameSamples
+          : [...(item.telemetry.frameSamples ?? []), event.values.frameDtMs].slice(-60);
       item.telemetry = { ...item.telemetry, ...event.values, frameSamples: samples, at };
       // A target may report, with each sample, which counters it could not
       // measure. Merging them here keeps "unavailable" a first-class answer
@@ -350,30 +414,67 @@ export function applyDevEvent(model, event) {
     }
     case "defold-build-started": {
       model.defoldBuild = { status: "building", reason: event.reason, startedAt: at };
-      boundedPush(model.logs, {
-        sequence: model.nextLogSequence++, at, level: "info", source: "bob", message: `building Defold resources (${event.reason ?? "change"})`
-      }, model.logCapacity);
+      boundedPush(
+        model.logs,
+        {
+          sequence: model.nextLogSequence++,
+          at,
+          level: "info",
+          source: "bob",
+          message: `building Defold resources (${event.reason ?? "change"})`,
+        },
+        model.logCapacity,
+      );
       return changed(model);
     }
     case "defold-build-succeeded": {
-      model.defoldBuild = { status: "ready", reason: event.reason, resources: [...(event.resources ?? [])], finishedAt: at };
-      boundedPush(model.logs, {
-        sequence: model.nextLogSequence++, at, level: "info", source: "bob", message: `Defold build ready; ${event.resources?.length ?? 0} compiled resource(s) changed`
-      }, model.logCapacity);
+      model.defoldBuild = {
+        status: "ready",
+        reason: event.reason,
+        resources: [...(event.resources ?? [])],
+        finishedAt: at,
+      };
+      boundedPush(
+        model.logs,
+        {
+          sequence: model.nextLogSequence++,
+          at,
+          level: "info",
+          source: "bob",
+          message: `Defold build ready; ${event.resources?.length ?? 0} compiled resource(s) changed`,
+        },
+        model.logCapacity,
+      );
       return changed(model);
     }
     case "defold-build-failed": {
       model.defoldBuild = { status: "failed", reason: event.reason, diagnostic: event.diagnostic, finishedAt: at };
-      boundedPush(model.logs, {
-        sequence: model.nextLogSequence++, at, level: "error", source: "bob", message: String(event.diagnostic ?? "Defold build failed")
-      }, model.logCapacity);
+      boundedPush(
+        model.logs,
+        {
+          sequence: model.nextLogSequence++,
+          at,
+          level: "error",
+          source: "bob",
+          message: String(event.diagnostic ?? "Defold build failed"),
+        },
+        model.logCapacity,
+      );
       return changed(model);
     }
     case "engine-started": {
       model.engine = { status: "running", executable: event.executable, pid: event.pid, startedAt: at };
-      boundedPush(model.logs, {
-        sequence: model.nextLogSequence++, at, level: "info", source: "engine", message: `launched pid ${event.pid}`
-      }, model.logCapacity);
+      boundedPush(
+        model.logs,
+        {
+          sequence: model.nextLogSequence++,
+          at,
+          level: "info",
+          source: "engine",
+          message: `launched pid ${event.pid}`,
+        },
+        model.logCapacity,
+      );
       return changed(model);
     }
     case "engine-stopped": {
@@ -382,10 +483,17 @@ export function applyDevEvent(model, event) {
         clearComponentSnapshot(item);
         item.disconnectedConnectionEpoch = item.connectionEpoch;
       }
-      boundedPush(model.logs, {
-        sequence: model.nextLogSequence++, at, level: "info", source: "engine",
-        message: `stopped${event.signal ? ` by ${event.signal}` : ` with code ${event.code ?? "unknown"}`}`
-      }, model.logCapacity);
+      boundedPush(
+        model.logs,
+        {
+          sequence: model.nextLogSequence++,
+          at,
+          level: "info",
+          source: "engine",
+          message: `stopped${event.signal ? ` by ${event.signal}` : ` with code ${event.code ?? "unknown"}`}`,
+        },
+        model.logCapacity,
+      );
       return changed(model);
     }
     case "engine-failed": {
@@ -394,19 +502,31 @@ export function applyDevEvent(model, event) {
         clearComponentSnapshot(item);
         item.disconnectedConnectionEpoch = item.connectionEpoch;
       }
-      boundedPush(model.logs, {
-        sequence: model.nextLogSequence++, at, level: "error", source: "engine", message: String(event.diagnostic)
-      }, model.logCapacity);
+      boundedPush(
+        model.logs,
+        {
+          sequence: model.nextLogSequence++,
+          at,
+          level: "error",
+          source: "engine",
+          message: String(event.diagnostic),
+        },
+        model.logCapacity,
+      );
       return changed(model);
     }
     case "log": {
-      boundedPush(model.logs, {
-        sequence: model.nextLogSequence++,
-        at,
-        level: event.level ?? "info",
-        source: event.source ?? "deherm",
-        message: String(event.message)
-      }, model.logCapacity);
+      boundedPush(
+        model.logs,
+        {
+          sequence: model.nextLogSequence++,
+          at,
+          level: event.level ?? "info",
+          source: event.source ?? "deherm",
+          message: String(event.message),
+        },
+        model.logCapacity,
+      );
       return changed(model);
     }
     case "panel-selected": {
@@ -424,20 +544,30 @@ export function snapshotDevModel(model) {
     componentCatalog: undefined,
     engine: { ...model.engine },
     reachability: model.reachability ? { ...model.reachability } : undefined,
-    defoldBuild: { ...model.defoldBuild, resources: model.defoldBuild.resources ? [...model.defoldBuild.resources] : undefined },
-    activeBuild: model.activeBuild ? { ...model.activeBuild, changedSources: [...model.activeBuild.changedSources] } : undefined,
-    lastBuildMetrics: model.lastBuildMetrics ? {
-      ...model.lastBuildMetrics,
-      modules: model.lastBuildMetrics.modules?.map((value) => ({ ...value }))
-    } : undefined,
+    defoldBuild: {
+      ...model.defoldBuild,
+      resources: model.defoldBuild.resources ? [...model.defoldBuild.resources] : undefined,
+    },
+    activeBuild: model.activeBuild
+      ? { ...model.activeBuild, changedSources: [...model.activeBuild.changedSources] }
+      : undefined,
+    lastBuildMetrics: model.lastBuildMetrics
+      ? {
+          ...model.lastBuildMetrics,
+          modules: model.lastBuildMetrics.modules?.map((value) => ({ ...value })),
+        }
+      : undefined,
     targets: [...model.targets.values()].map((value) => ({
       ...value,
       telemetry: { ...value.telemetry },
       instances: deepCopy(value.instances),
       componentSnapshot: deepCopy(value.componentSnapshot),
-      capabilities: value.capabilities ? value.capabilities.map((capability) => ({ ...capability })) : undefined
+      capabilities: value.capabilities ? value.capabilities.map((capability) => ({ ...capability })) : undefined,
     })),
     logs: model.logs.map((value) => ({ ...value })),
-    history: model.history.map((value) => ({ ...value, resources: value.resources ? [...value.resources] : undefined }))
+    history: model.history.map((value) => ({
+      ...value,
+      resources: value.resources ? [...value.resources] : undefined,
+    })),
   };
 }

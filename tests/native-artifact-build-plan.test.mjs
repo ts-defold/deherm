@@ -5,7 +5,7 @@ import test from "node:test";
 import {
   describeBuildRow,
   githubOutputRecords,
-  planNativeArtifactBuilds
+  planNativeArtifactBuilds,
 } from "../scripts/plan-native-artifact-builds.mjs";
 
 function rows(plan) {
@@ -14,8 +14,12 @@ function rows(plan) {
 
 test("an empty release schedules every publishable asset exactly once", async () => {
   const plan = await planNativeArtifactBuilds();
-  const scheduled = rows(plan).map((row) => row.asset).sort();
-  const expected = Object.values(plan.assets).flatMap((family) => family.expected).sort();
+  const scheduled = rows(plan)
+    .map((row) => row.asset)
+    .sort();
+  const expected = Object.values(plan.assets)
+    .flatMap((family) => family.expected)
+    .sort();
 
   assert.deepEqual(scheduled, expected);
   assert.equal(new Set(scheduled).size, scheduled.length, "a build asset is scheduled twice");
@@ -24,9 +28,7 @@ test("an empty release schedules every publishable asset exactly once", async ()
 
 test("a complete release schedules no work", async () => {
   const initial = await planNativeArtifactBuilds();
-  const present = Object.fromEntries(
-    Object.entries(initial.assets).map(([family, value]) => [family, value.expected])
-  );
+  const present = Object.fromEntries(Object.entries(initial.assets).map(([family, value]) => [family, value.expected]));
   const plan = await planNativeArtifactBuilds(present);
 
   assert.deepEqual(rows(plan), []);
@@ -43,12 +45,15 @@ test("a partial release rebuilds only its missing matrix row", async () => {
   const present = Object.fromEntries(
     Object.entries(initial.assets).map(([family, value]) => [
       family,
-      value.expected.filter((asset) => asset !== missing)
-    ])
+      value.expected.filter((asset) => asset !== missing),
+    ]),
   );
   const plan = await planNativeArtifactBuilds(present);
 
-  assert.deepEqual(rows(plan).map((row) => row.asset), [missing]);
+  assert.deepEqual(
+    rows(plan).map((row) => row.asset),
+    [missing],
+  );
   assert.equal(plan.any.android, true);
   assert.ok(Object.entries(plan.any).every(([lane, value]) => lane === "android" || value === false));
   assert.deepEqual(plan.assets["native-artifacts"].missing, [missing]);
@@ -75,7 +80,7 @@ test("every dehermc row is authenticated and the Linux artifact is consumed befo
   const workflow = await readFile(".github/workflows/native-artifacts.yml", "utf8");
   const packageSmoke = await readFile("tests/package-smoke.test.mjs", "utf8");
   const job = workflow.slice(workflow.indexOf("  go-compiler:"), workflow.indexOf("  # ── Target libraries"));
-  const verify = job.indexOf("manage-host-compilers.mjs verify-file \"$HOST\" dehermc");
+  const verify = job.indexOf('manage-host-compilers.mjs verify-file "$HOST" dehermc');
   const smoke = job.indexOf("DEHERM_PACKAGE_SMOKE_DEHERMC_ARCHIVE=");
   const upload = job.indexOf("upload-release-asset.sh");
   assert.ok(verify >= 0, "the producer never compares its binary with host-compilers.json");
@@ -83,8 +88,11 @@ test("every dehermc row is authenticated and the Linux artifact is consumed befo
   assert.ok(upload > smoke, "the consumer smoke must finish before the release asset is published");
   assert.match(job, /--test-name-pattern "packed npm artifact" tests\/package-smoke\.test\.mjs/u);
   assert.doesNotMatch(job.slice(smoke, upload), /build-dehermc\.sh/u);
-  assert.doesNotMatch(packageSmoke, /build-dehermc\.sh/u,
-    "a consumer smoke must not produce a substitute compiler artifact");
+  assert.doesNotMatch(
+    packageSmoke,
+    /build-dehermc\.sh/u,
+    "a consumer smoke must not produce a substitute compiler artifact",
+  );
 });
 
 test("GitHub job outputs carry numeric slots rather than secret-scanned row data", async () => {
@@ -108,20 +116,20 @@ test("numeric slots resolve back to the canonical build row", async () => {
     runner: "ubuntu-24.04-arm",
     docker_platform: "linux/arm64",
     target: "arm64-linux",
-    asset: "hermes-arm64-linux.tar.gz"
+    asset: "hermes-arm64-linux.tar.gz",
   });
   assert.deepEqual(describeBuildRow(plan, "android=0"), {
     slot: 0,
     abi: "armeabi-v7a",
     api_kind: "android_ndk_api",
     target: "armv7-android",
-    asset: "hermes-armv7-android.tar.gz"
+    asset: "hermes-armv7-android.tar.gz",
   });
   assert.deepEqual(describeBuildRow(plan, "hermes_host=4"), {
     slot: 4,
     runner: "windows-2022",
     host: "win32-x64",
-    asset: "hermes-host-win32-x64.tar.gz"
+    asset: "hermes-host-win32-x64.tar.gz",
   });
   assert.throws(() => describeBuildRow(plan, "android=9"), /has no slot 9/u);
 });
@@ -129,9 +137,8 @@ test("numeric slots resolve back to the canonical build row", async () => {
 test("pre-checkout runner slot maps agree with the planner", async () => {
   const plan = await planNativeArtifactBuilds();
   const workflow = await readFile(".github/workflows/native-artifacts.yml", "utf8");
-  const runners = (lane) => plan.matrices[lane].include
-    .toSorted((left, right) => left.slot - right.slot)
-    .map((row) => row.runner);
+  const runners = (lane) =>
+    plan.matrices[lane].include.toSorted((left, right) => left.slot - right.slot).map((row) => row.runner);
 
   assert.deepEqual(runners("linux"), ["ubuntu-24.04", "ubuntu-24.04-arm"]);
   assert.deepEqual(runners("hermes_host"), [
@@ -139,10 +146,13 @@ test("pre-checkout runner slot maps agree with the planner", async () => {
     "macos-15-intel",
     "ubuntu-22.04",
     "ubuntu-22.04-arm",
-    "windows-2022"
+    "windows-2022",
   ]);
   assert.match(workflow, /fromJSON\('\["ubuntu-24\.04","ubuntu-24\.04-arm"\]'\)\[matrix\.row\]/u);
-  assert.match(workflow, /fromJSON\('\["macos-15","macos-15-intel","ubuntu-22\.04","ubuntu-22\.04-arm","windows-2022"\]'\)\[matrix\.row\]/u);
+  assert.match(
+    workflow,
+    /fromJSON\('\["macos-15","macos-15-intel","ubuntu-22\.04","ubuntu-22\.04-arm","windows-2022"\]'\)\[matrix\.row\]/u,
+  );
 });
 
 test("release publication uses authoritative platform inputs", async () => {
@@ -153,11 +163,11 @@ test("release publication uses authoritative platform inputs", async () => {
   assert.doesNotMatch(workflow, /ANDROID_ABI=\$ANDROID_ABI/u);
   assert.match(
     workflow,
-    /windows:[\s\S]*?if: needs\.plan\.outputs\.windows_any == 'true' && needs\.plan\.outputs\.registry_credential == 'true'/u
+    /windows:[\s\S]*?if: needs\.plan\.outputs\.windows_any == 'true' && needs\.plan\.outputs\.registry_credential == 'true'/u,
   );
   assert.match(
     workflow,
-    /windows-native:[\s\S]*?if: needs\.plan\.outputs\.windows_any == 'true' && needs\.plan\.outputs\.registry_credential != 'true'/u
+    /windows-native:[\s\S]*?if: needs\.plan\.outputs\.windows_any == 'true' && needs\.plan\.outputs\.registry_credential != 'true'/u,
   );
   assert.doesNotMatch(workflow, /windows:[\s\S]*?continue-on-error: true/u);
 });
@@ -168,37 +178,33 @@ test("the Apple archive stages Hermes' configured header from the CMake build ro
   const libraryCmake = await readFile("upstream/hermes/lib/CMakeLists.txt", "utf8");
 
   assert.match(rootCmake, /add_subdirectory\(lib\)/u);
-  assert.match(
-    libraryCmake,
-    /configure_file\(config\/libhermesvm-config\.h\.in config\/libhermesvm-config\.h\)/u
-  );
-  assert.match(
-    builder,
-    /cp "\$cross_build\/lib\/config\/libhermesvm-config\.h" "\$staging\/libhermesvm-config\.h"/u
-  );
+  assert.match(libraryCmake, /configure_file\(config\/libhermesvm-config\.h\.in config\/libhermesvm-config\.h\)/u);
+  assert.match(builder, /cp "\$cross_build\/lib\/config\/libhermesvm-config\.h" "\$staging\/libhermesvm-config\.h"/u);
   assert.doesNotMatch(builder, /\$cross_build\/hermes\/lib\/config\/libhermesvm-config\.h/u);
 });
 
 test("every native builder stages Hermes' configured header from the CMake build root", async () => {
-  const builders = await Promise.all([
-    "toolchains/hermes/Dockerfile.linux",
-    "toolchains/hermes/Dockerfile.android",
-    "toolchains/hermes/Dockerfile.win32",
-    "toolchains/hermes/build-windows.sh"
-  ].map(async (file) => [file, await readFile(file, "utf8")]));
+  const builders = await Promise.all(
+    [
+      "toolchains/hermes/Dockerfile.linux",
+      "toolchains/hermes/Dockerfile.android",
+      "toolchains/hermes/Dockerfile.win32",
+      "toolchains/hermes/build-windows.sh",
+    ].map(async (file) => [file, await readFile(file, "utf8")]),
+  );
 
   for (const [file, builder] of builders) {
     assert.doesNotMatch(
       builder,
       /(?:\/work\/build|\$work)\/hermes\/lib\/config\/libhermesvm-config\.h/u,
-      `${file} must not treat the Hermes source directory as the CMake build root`
+      `${file} must not treat the Hermes source directory as the CMake build root`,
     );
     assert.match(
       builder,
       file.endsWith("build-windows.sh")
         ? /\$work\/lib\/config\/libhermesvm-config\.h/u
         : /\/work\/build\/lib\/config\/libhermesvm-config\.h/u,
-      `${file} must package the configured header emitted under <build>/lib/config`
+      `${file} must package the configured header emitted under <build>/lib/config`,
     );
   }
 });

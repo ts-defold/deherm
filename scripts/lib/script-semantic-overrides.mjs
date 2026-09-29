@@ -19,14 +19,16 @@ export async function loadScriptSemanticOverrides(root) {
     const contents = await readFile(sourceUrl, "utf8");
     const line = contents.split(/\r?\n/)[override.evidence.line - 1] ?? "";
     if (!line.includes(override.evidence.observed)) {
-      throw new Error(`Semantic override evidence is stale for ${override.id} at ${override.evidence.source}:${override.evidence.line}`);
+      throw new Error(
+        `Semantic override evidence is stale for ${override.id} at ${override.evidence.source}:${override.evidence.line}`,
+      );
     }
     validated.set(override.id, {
       parameterOptional: { ...override.parameterOptional },
       evidence: {
         ...override.evidence,
-        sourceSha256: createHash("sha256").update(contents).digest("hex")
-      }
+        sourceSha256: createHash("sha256").update(contents).digest("hex"),
+      },
     });
   }
   return validated;

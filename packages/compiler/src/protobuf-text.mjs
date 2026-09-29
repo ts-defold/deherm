@@ -11,13 +11,16 @@ const NUMBER_PATTERN = /-?(?:0[xX][0-9a-fA-F]+|\d+(?:\.\d+)?(?:[eE][-+]?\d+)?|\.
 function unescape(value) {
   let out = "";
   for (let index = 0; index < value.length; index += 1) {
-    if (value[index] !== "\\") { out += value[index]; continue; }
+    if (value[index] !== "\\") {
+      out += value[index];
+      continue;
+    }
     const escape = value[++index];
     if (escape === "n") out += "\n";
     else if (escape === "r") out += "\r";
     else if (escape === "t") out += "\t";
     else if (escape === "\\") out += "\\";
-    else if (escape === "\"") out += "\"";
+    else if (escape === '"') out += '"';
     else if (escape === "'") out += "'";
     else if (escape === "0") out += "\0";
     else if (escape === "x") {
@@ -43,8 +46,15 @@ class TextReader {
   skipTrivia() {
     while (this.index < this.source.length) {
       const character = this.source[this.index];
-      if (character === "\n") { this.line += 1; this.index += 1; continue; }
-      if (character === " " || character === "\t" || character === "\r" || character === ",") { this.index += 1; continue; }
+      if (character === "\n") {
+        this.line += 1;
+        this.index += 1;
+        continue;
+      }
+      if (character === " " || character === "\t" || character === "\r" || character === ",") {
+        this.index += 1;
+        continue;
+      }
       if (character === "#") {
         while (this.index < this.source.length && this.source[this.index] !== "\n") this.index += 1;
         continue;
@@ -74,7 +84,7 @@ class TextReader {
       if (this.source[this.index] === close) this.index += 1;
       return { kind: "message", message };
     }
-    if (character === "\"") {
+    if (character === '"') {
       let text = "";
       while (true) {
         this.skipTrivia();
@@ -84,7 +94,11 @@ class TextReader {
         const save = this.index;
         const saveLine = this.line;
         this.skipTrivia();
-        if (this.source[this.index] !== "\"") { this.index = save; this.line = saveLine; break; }
+        if (this.source[this.index] !== '"') {
+          this.index = save;
+          this.line = saveLine;
+          break;
+        }
       }
       return { kind: "string", value: text };
     }
@@ -117,7 +131,10 @@ class TextReader {
       if (close && this.source[this.index] === close) break;
       const line = this.line;
       const name = this.match(IDENTIFIER_PATTERN);
-      if (name === null) { this.index += 1; continue; }
+      if (name === null) {
+        this.index += 1;
+        continue;
+      }
       this.skipTrivia();
       if (this.source[this.index] === ":") this.index += 1;
       const value = this.readValue(depth);
