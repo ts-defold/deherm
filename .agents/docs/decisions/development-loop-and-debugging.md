@@ -82,6 +82,30 @@ first bundle activation waits on a bounded CDP readiness predicate for the
 Defold page host; a missing host times out explicitly instead of consuming and
 rejecting the first generation during page bootstrap.
 
+## Generation freshness is part of `dev`
+
+Installing `@ts-defold/deherm` is side-effect free: npm/pnpm installation does
+not inspect a project, download a Defold policy, or write generated files.
+`deherm create` performs the initial project generation, and `deherm generate`
+is the explicit keyed/idempotent reconcile command for CI, repair, and manual
+verification.
+
+`deherm dev` is also a complete entry point. It reconciles the project before
+creating the compiler and then watches the inputs that define the generated API
+surface: `game.project`, local `ext.manifest` and `.script_api` files,
+`defold-hermes.bindings.json`, native source/public-header trees, and the exact
+TypeScript facades declared by local extensions. A relevant edit runs the same
+keyed generator transaction before either the incremental TypeScript compiler
+or Bob may consume the change. Generation failure leaves both downstream build
+steps untouched and a later file event retries the transaction. Ordinary game
+TypeScript does not enter this lane; it keeps the incremental compile/HMR path.
+
+Generated output and the generation lock remain watcher exclusions, preventing
+the reconcile from triggering itself. Updating the installed déherm package is
+the one intentional process boundary: package-manager installation remains
+explicit and the already-running `dev` process must be restarted so it cannot
+mix loaded compiler code from one package version with files from another.
+
 # Reload transaction
 
 TypeScript-only edits do not rebuild Hermes or the custom engine:

@@ -273,6 +273,48 @@ export async function installConfiguredProjectWebTransport(projectRoot, options 
   });
 }
 
+function devGenerationInputs(inventory) {
+  const extensionRoots = new Set();
+  const typescriptFacades = new Set();
+  for (const extension of inventory.extensions) {
+    if (extension.kind !== "local") continue;
+    extensionRoots.add(extension.root);
+    for (const facade of extension.typescriptFacades ?? []) {
+      if (facade.path) typescriptFacades.add(facade.path);
+      if (facade.staticPath) typescriptFacades.add(facade.staticPath);
+    }
+  }
+  return {
+    extensionRoots: [...extensionRoots].sort(),
+    typescriptFacades: [...typescriptFacades].sort()
+  };
+}
+
+async function reconcileDevProject(options, { force = false } = {}) {
+  await installNativeExtension(options.project, { force });
+  await installConfiguredProjectWebTransport(options.project, { force });
+  const inventory = await inspectDefoldProject({ project: options.project, requireDehermRuntime: true });
+  const errors = inventory.diagnostics.filter(({ severity }) => severity === "error");
+  if (errors.length) {
+    throw new Error(`Defold project configuration is not ready for déherm dev:\n${errors.map(({ path, message }) => `- ${path}: ${message}`).join("\n")}`);
+  }
+  const generated = await writeGeneratedProject(inventory, options.outDir, {
+    defoldSdk: options.defoldSdk,
+    bob: options.bob,
+    force,
+    requirePublishedArtifacts: true
+  });
+  await installNativeExtension(inventory.projectRoot, {
+    force,
+    surfaceRepositoryRoot: generated.surfaceRepositoryRoot
+  });
+  return {
+    inventory,
+    generated,
+    generationInputs: devGenerationInputs(inventory)
+  };
+}
+
 function printExtensions(inventory) {
   if (!inventory.extensions.length) console.log("No native extensions found.");
   for (const extension of inventory.extensions) {
@@ -621,30 +663,22 @@ export async function run(argv = process.argv.slice(2)) {
     }
     options.project = await findProjectRoot(process.cwd(), options.project ?? options.entry);
     if (entryFromInvocation) options.entry = entryFromInvocation;
-    // The runtime extension is package-owned. Install its stable skeleton before
-    // inspection so a clean project never needs a checkout symlink merely to
-    // satisfy the project-readiness gate. The policy surface is overlaid after
-    // generation below.
-    await installNativeExtension(options.project);
-    // `dev` is a complete project entry point, not a thinner alias for the
-    // compiler watcher. Materialize the same configured WebTransport source
-    // and target artifact overlay as `generate` before inventory so extension
-    // bindings, Bob inputs, native launch, and HTML5 all observe one tree.
-    await installConfiguredProjectWebTransport(options.project, { force: options.force });
-    const inventory = await inspectDefoldProject({ project: options.project, requireDehermRuntime: true });
-    const errors = inventory.diagnostics.filter(({ severity }) => severity === "error");
-    if (errors.length) {
-      throw new Error(`Defold project configuration is not ready for déherm dev:\n${errors.map(({ path, message }) => `- ${path}: ${message}`).join("\n")}`);
-    }
-    const generated = await writeGeneratedProject(inventory, options.outDir, {
-      defoldSdk: options.defoldSdk,
-      bob: options.bob,
-      requirePublishedArtifacts: true
+    // `dev` owns generation freshness. It reconciles once before the first
+    // compile and supplies the watcher with the same operation so an API input
+    // can never reach TypeScript or Bob against stale generated bindings.
+    const { inventory, generated, generationInputs } = await reconcileDevProject(options, {
+      force: options.force === true
     });
     options.generatedRoot = generated.root;
-    await installNativeExtension(inventory.projectRoot, {
-      surfaceRepositoryRoot: generated.surfaceRepositoryRoot
-    });
+    options.generationInputs = generationInputs;
+    options.regenerateProject = async () => {
+      const reconciled = await reconcileDevProject(options);
+      return {
+        cached: reconciled.generated.cached === true,
+        componentPolicy: reconciled.generated.componentPolicy,
+        generationInputs: reconciled.generationInputs
+      };
+    };
     await generateComponentProxies({
       projectRoot: inventory.projectRoot,
       outputRoot: inventory.projectRoot,

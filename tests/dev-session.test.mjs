@@ -304,3 +304,82 @@ test("one-shot dev session bundles mixed component contexts through the unfilter
   assert.match(bundle, /player\.script/);
   assert.match(bundle, /battle\.gui/);
 });
+
+test("dev reconciles API inputs before compiler and Bob work and retries after a failed reconcile", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "deherm-dev-regeneration-"));
+  const entry = path.join(root, "src", "main.ts");
+  const generatedRoot = path.join(root, ".deherm");
+  await mkdir(path.dirname(entry), { recursive: true });
+  await installComponentPolicy(generatedRoot);
+  await writeFile(entry, "export const running = true;\n");
+  const componentPolicy = JSON.parse(
+    await readFile(path.join(generatedRoot, "ir", "defold-component-proxy-contract.json"), "utf8"),
+  );
+  const order = [];
+  let watchOptions;
+  let attempts = 0;
+  const snapshot = await runDevSession({
+    project: root,
+    entry,
+    generatedRoot,
+    autoLaunch: false,
+    bytecode: false,
+    bugPool: false,
+    components: false,
+    recordBuildArtifacts: false,
+    serve: false,
+    generationInputs: { extensionRoots: [], typescriptFacades: [] },
+    async regenerateProject({ changedFiles }) {
+      order.push(`generate:${changedFiles.join(",")}:${++attempts}`);
+      if (attempts === 1) throw new Error("synthetic generation failure");
+      return { cached: false, componentPolicy, generationInputs: { extensionRoots: [], typescriptFacades: [] } };
+    },
+    services: {
+      async createIncrementalCompiler() {
+        return {};
+      },
+      createCoordinator() {
+        return {
+          async requestBuild(files) {
+            order.push(`compile:${files.join(",")}`);
+          },
+          async reloadResources() {},
+          async close() {},
+        };
+      },
+      async createInspectorBridge() {
+        return { enginePort: 0, async close() {} };
+      },
+      createEngineController() {
+        return { running: () => false, async launch() {}, async stop() {} };
+      },
+      createBrowserTarget() {
+        return { running: () => false, async stop() {} };
+      },
+      async createDefoldBuilder() {
+        return {
+          async build(reason) {
+            order.push(`bob:${reason}`);
+            return { resources: [] };
+          },
+          async close() {},
+        };
+      },
+      async watchProject(options) {
+        watchOptions = options;
+        return { close() {} };
+      },
+      async runDevTui() {
+        await assert.rejects(watchOptions.onBatch(["game.project"]), /synthetic generation failure/u);
+        assert.equal(order.some((item) => item === "compile:game.project"), false);
+        assert.equal(order.some((item) => item === "bob:changed 1 file(s)"), false);
+        await watchOptions.onBatch(["game.project"]);
+      },
+    },
+  });
+  const generation = order.indexOf("generate:game.project:2");
+  const compilation = order.indexOf("compile:game.project");
+  const bob = order.indexOf("bob:changed 1 file(s)");
+  assert.ok(generation >= 0 && generation < compilation && compilation < bob, order.join("\n"));
+  assert.equal(snapshot.phase === "failed", false);
+});

@@ -20,6 +20,7 @@ import { createWatchPathFilter } from "../packages/cli/src/dev/watcher.mjs";
 import {
   compilerRelevantChanges,
   createDevWatchOptions,
+  generationRelevantChanges,
   resourcesForBobReload,
   restartRequiredDefoldChanges,
 } from "../packages/cli/src/dev/session.mjs";
@@ -270,6 +271,34 @@ test("input binding changes do not signal an unchanged compiler bundle", () => {
   assert.deepEqual(compilerRelevantChanges(["input/game.input_binding", "main/player.script.ts"]), [
     "main/player.script.ts",
   ]);
+});
+
+test("dev reconciles only project files that define the generated API surface", () => {
+  const files = [
+    "main/player.script.ts",
+    "game.project",
+    "vendor/example/ext.manifest",
+    "vendor/example/api/example.script_api",
+    "vendor/example/defold-hermes.bindings.json",
+    "vendor/example/include/example/api.hpp",
+    "vendor/example/src/example.cpp",
+    "vendor/example/src/facade.ts",
+    "vendor/example/src/static-facade.ts",
+    "vendor/other/src/not-inventoried.cpp",
+    "src/unrelated.ts",
+  ];
+  assert.deepEqual(
+    generationRelevantChanges(files, {
+      extensionRoots: ["vendor/example"],
+      typescriptFacades: ["vendor/example/src/facade.ts", "vendor\\example\\src\\static-facade.ts"],
+    }),
+    files.slice(1, 9),
+  );
+  assert.deepEqual(
+    generationRelevantChanges(["src/main.ts", "src/native.cpp"], { extensionRoots: ["."] }),
+    ["src/native.cpp"],
+    "a root extension must not turn ordinary game TypeScript into a full generation input",
+  );
 });
 
 test("dev model rejects stale generations and bounds noisy data", () => {

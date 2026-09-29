@@ -234,6 +234,42 @@ export function compilerRelevantChanges(files) {
   return files.filter((file) => !file.endsWith(".input_binding"));
 }
 
+const nativeExtensionSourceSuffixes = [".c", ".cc", ".cpp", ".cxx", ".h", ".hh", ".hpp", ".hxx", ".m", ".mm"];
+
+function portableRelative(file) {
+  return file.replaceAll("\\", "/").replace(/^\.\//u, "");
+}
+
+function isWithinPortableRoot(file, root) {
+  return root === "." || file === root || file.startsWith(`${root}/`);
+}
+
+/**
+ * Project files that define the generated Defold/extension API surface.
+ *
+ * This is deliberately narrower than the compiler watcher. Ordinary game
+ * TypeScript rebuilds incrementally; Defold configuration and local-extension
+ * declarations must first reconcile the complete generated SDK. Facade files
+ * are exact inventory inputs because an extension is allowed to live at the
+ * project root, where treating every `.ts` file as API metadata would turn all
+ * game edits into full generation passes.
+ */
+export function generationRelevantChanges(files, generationInputs = {}) {
+  const extensionRoots = new Set((generationInputs.extensionRoots ?? []).map(portableRelative));
+  const typescriptFacades = new Set((generationInputs.typescriptFacades ?? []).map(portableRelative));
+  return files.filter((candidate) => {
+    const file = portableRelative(candidate);
+    const basename = path.posix.basename(file);
+    if (file === "game.project" || basename === "ext.manifest") return true;
+    if (file.endsWith(".script_api") || basename === "defold-hermes.bindings.json") return true;
+    if (typescriptFacades.has(file)) return true;
+    return (
+      nativeExtensionSourceSuffixes.some((suffix) => file.toLowerCase().endsWith(suffix)) &&
+      [...extensionRoots].some((root) => isWithinPortableRoot(file, root))
+    );
+  });
+}
+
 function needsEngineRestart(files) {
   return restartRequiredDefoldChanges(files).length > 0;
 }
@@ -338,9 +374,10 @@ export async function runDevSession(options = {}) {
   const services = options.services ?? {};
   const projectRoot = path.resolve(options.project ?? process.cwd());
   const generatedRoot = path.resolve(options.generatedRoot ?? path.join(projectRoot, options.outDir ?? ".deherm"));
-  const componentPolicy = JSON.parse(
+  let componentPolicy = JSON.parse(
     await readFile(path.join(generatedRoot, "ir", "defold-component-proxy-contract.json"), "utf8"),
   );
+  let generationInputs = options.generationInputs ?? {};
   const entryPoint = await resolveEntry(projectRoot, options.entry);
   const outputFile = path.resolve(options.outputFile ?? path.join(projectRoot, ".deherm", "dev", "app.dehermc"));
   const sessionLogFile = path.resolve(options.sessionLog ?? path.join(projectRoot, ".deherm", "dev", "session.log"));
@@ -666,6 +703,32 @@ export async function runDevSession(options = {}) {
     enqueue(async () => {
       const files = buildRelevantChanges(batch);
       if (!files.length) return;
+      const generationFiles = generationRelevantChanges(files, generationInputs);
+      if (generationFiles.length) {
+        if (typeof options.regenerateProject !== "function") {
+          throw new Error(
+            `API-defining project inputs changed (${generationFiles.join(", ")}), but this dev session has no project regeneration callback`,
+          );
+        }
+        emit({
+          type: "log",
+          source: "generator",
+          message: `reconciling generated SDK before build: ${generationFiles.join(", ")}`,
+        });
+        const regenerated = await options.regenerateProject({ changedFiles: generationFiles });
+        if (!regenerated?.componentPolicy) {
+          throw new Error("Project regeneration completed without a component proxy policy");
+        }
+        componentPolicy = regenerated.componentPolicy;
+        generationInputs = regenerated.generationInputs ?? generationInputs;
+        generatedComponents = false;
+        reportedMissingSymbolIndexes = false;
+        emit({
+          type: "log",
+          source: "generator",
+          message: regenerated.cached ? "generated SDK is current" : "generated SDK reconciled",
+        });
+      }
       const compilerFiles = compilerRelevantChanges(files);
       if (compilerFiles.length) await coordinator.requestBuild(compilerFiles);
       const requiresDefoldBuild = needsDefoldBuild(files, componentProxyChanged);
