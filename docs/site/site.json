@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 2,
+  "product": "déherm",
+  "repository": "https://github.com/ts-defold/deherm",
+  "tagline": "TypeScript for Defold. Native where it matters.",
+  "description": "Write Defold games in TypeScript with generated engine APIs, a fast local development loop, Hermes on native targets, and the browser's JavaScript engine on HTML5.",
+  "quickStart": {
+    "newProject": {
+      "label": "New game",
+      "commands": [
+        "pnpm dlx @ts-defold/deherm create my-game --name \"My Game\"",
+        "cd my-game",
+        "pnpm install",
+        "pnpm dev"
+      ]
+    },
+    "existingProject": {
+      "label": "Existing Defold game",
+      "commands": [
+        "cd my-defold-game",
+        "pnpm add -D @ts-defold/deherm",
+        "pnpm exec deherm generate",
+        "pnpm exec deherm dev"
+      ]
+    }
+  },
+  "navigation": [
+    { "label": "Quick start", "href": "#quick-start" },
+    { "label": "Developer tools", "href": "#developer-tools" },
+    { "label": "Performance", "href": "#performance" },
+    { "label": "Targets", "href": "#targets" },
+    { "label": "Examples", "href": "#examples" }
+  ],
+  "links": {
+    "repository": "https://github.com/ts-defold/deherm",
+    "vscode": "https://github.com/ts-defold/deherm/tree/main/editors/vscode",
+    "warBattles": "https://github.com/ts-defold/deherm/tree/main/examples/war-battles-online",
+    "webTransport": "https://github.com/ts-defold/deherm/tree/main/extensions/defold-webtransport"
+  }
+}

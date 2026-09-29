@@ -4519,3 +4519,65 @@ outputs. Type checking and 19 extension unit tests pass locally. A new
 Linux/macOS/Windows release-readiness matrix owns the TUI/dev-loop, VS Code,
 minimal Deno, package-contract, and HTML5-backend portable tests; those jobs
 are declared but are not claimed green until GitHub executes them.
+
+## 2026-09-28 - measured docs site
+
+Added `docs/site/site.json` and `scripts/build-docs-site.mjs`, a generated
+developer-first presentation layer for the 0.1 preview. The initial inventory
+dashboard was rejected because checkout totals, CI footprints, and modeled
+War Battles network bytes do not answer how a developer installs or uses the
+product. The replacement leads with separate, executable four-command paths
+for a new scaffold and an existing `game.project`, a real
+`.script.ts` component, the TUI, VS Code/LSP/debug/profile screenshots, runtime
+targets, then examples.
+
+The quick-start audit removed the nonexistent `deherm init` command. The new
+project path now uses `deherm create`, and the existing-project path uses
+`deherm generate`; both lead to the real development TUI. The page names the
+generated `.script` proxy attachment seam and the `p` native / `w` HTML5 play
+keys. The generated HTML and focused four-test suite verify those command names
+and reject a regression to the nonexistent alias.
+
+Size and overhead claims now have two dedicated recorders. Fresh Bob `release`
+bundles measured the complete War Battles arm64-macOS `.app` at 16,810,878
+logical bytes and wasm-web deploy directory at 4,462,782 logical bytes. Against
+stock release engines from the same pinned Bob jar, the linked native Hermes +
+déherm executable delta is 9,318,272 bytes; the browser host's Wasm + JavaScript
+engine-shell delta is 891,437 bytes and embeds no Hermes. The optimized native
+application bytecode is 339,960 bytes. These are logical file-byte totals, not
+compressed store/CDN transfer sizes.
+
+The release transport recorder ran the generated benchmark with
+`CMAKE_BUILD_TYPE=Release`, `DEHERM_PROFILE=OFF`, 20,000 warm-ups and best of
+9 x 100,000 calls, then hash-bound its raw output. It measured a 3.8 ns direct
+C ABI best case, a 64.6 ns median typed-native shape, and 70.9 ns median bridge
+work owned by déherm beyond protected Lua in that run. These are host-harness
+framing costs over stub providers, not Defold operation timings; the Lua harness
+uses pinned PUC Lua 5.1 rather than shipping LuaJIT.
+
+`pnpm check:docs-evidence` validates both records and `pnpm test:docs-site`
+covers quick start, product hierarchy, copied screenshots, release-only claims,
+and the immutable policy link. The policy publication workflow mounts the
+output under `/docs/`; Pages publication remains a CI claim until that workflow
+executes.
+
+## 2026-09-28 - release-readiness CI lifecycle repair
+
+The first three-host release-readiness run exposed two orchestration defects.
+The root package version is stamped into `dehermc` and therefore rotated the
+content-addressed compiler tag, but `package.json` was absent from the native
+artifact workflow's path trigger. The workflow now watches that fingerprint
+input; a manual run was started for the already-pushed 0.1 tag before any
+consumer rerun. Consumer tests continue to refuse a missing compiler artifact
+instead of rebuilding one implicitly.
+
+The browser telemetry tests waited only on an unreferenced production polling
+timer, allowing Node to end an otherwise idle mocked process before the timer
+could fire. Their wait now owns a bounded referenced timeout. DAP pause handling
+is serialized through one queue and its tests await the handler itself, so
+back-to-back pause events cannot race source-map refresh and expose the preceding
+frame. The installed-package polling fixture now requires a changed file
+identity to remain stable for a second sample, matching the production
+watcher's event debounce instead of treating an in-place truncate/refill as two
+authored saves. Focused and cross-platform results are recorded only after they
+run.

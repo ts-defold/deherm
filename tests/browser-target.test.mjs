@@ -32,6 +32,20 @@ async function bundleProject() {
   return { root, bundle };
 }
 
+async function waitForSignal(signal, description, timeoutMs = 1_000) {
+  let timer;
+  try {
+    return await Promise.race([
+      signal,
+      new Promise((_, reject) => {
+        timer = setTimeout(() => reject(new Error(`Timed out waiting for ${description}`)), timeoutMs);
+      })
+    ]);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 test("the newest packaged bundle under the project is the one served", async () => {
   const { root, bundle } = await bundleProject();
   try {
@@ -553,7 +567,7 @@ test("a deferred poll from a closed page cannot populate its replacement epoch",
   });
   try {
     await target.launch();
-    await started;
+    await waitForSignal(started, "the first browser telemetry poll");
     await target.stop();
     await target.launch();
     releaseOldPoll({ result: { value: {
@@ -654,7 +668,7 @@ test("browser telemetry polling is single-flight within one connection epoch", a
   });
   try {
     await target.launch();
-    await started;
+    await waitForSignal(started, "the first browser telemetry poll");
     await new Promise((resolve) => setTimeout(resolve, 20));
     assert.equal(calls, 1, "interval ticks must not overlap an in-flight CDP evaluation");
     releaseFirst();

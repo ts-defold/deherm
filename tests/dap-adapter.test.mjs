@@ -188,7 +188,7 @@ test("DAP adapter maps breakpoints, stack, scopes, variables, evaluate, and relo
     "a DAP replacement removes the preceding CDP breakpoint instead of leaking it"
   );
 
-  listeners.get("Debugger.paused")({
+  await listeners.get("Debugger.paused")({
     reason: "breakpoint",
     callFrames: [{
       callFrameId: "frame-1",
@@ -299,7 +299,7 @@ test("browser DAP breakpoints cover the initial bundle and numbered HMR generati
   assert.equal(replaced.body.breakpoints[0].source.path, fixture.source,
     "the newest HMR script wins even when Chrome returns an older location first");
 
-  listeners.get("Debugger.paused")({
+  await listeners.get("Debugger.paused")({
     reason: "breakpoint",
     callFrames: [{
       callFrameId: "old-frame",
@@ -308,14 +308,11 @@ test("browser DAP breakpoints cover the initial bundle and numbered HMR generati
       scopeChain: []
     }]
   });
-  for (let index = 0; index < 20 && !events.some(({ event }) => event === "stopped"); index += 1) {
-    await new Promise((resolve) => setImmediate(resolve));
-  }
   const oldStack = await adapter.handle(request(43, "stackTrace", { threadId: 1 }));
   assert.equal(oldStack.body.stackFrames[0].source.path, "defold-hermes://app.js",
     "an old live closure is not mapped through the newest generation's source map");
 
-  listeners.get("Debugger.paused")({
+  await listeners.get("Debugger.paused")({
     reason: "exception",
     callFrames: [{
       callFrameId: "foreign-frame",
@@ -324,9 +321,6 @@ test("browser DAP breakpoints cover the initial bundle and numbered HMR generati
       scopeChain: []
     }]
   });
-  for (let index = 0; index < 20 && events.filter(({ event }) => event === "stopped").length < 2; index += 1) {
-    await new Promise((resolve) => setImmediate(resolve));
-  }
   const foreignStack = await adapter.handle(request(44, "stackTrace", { threadId: 1 }));
   assert.equal(foreignStack.body.stackFrames[0].source.path, "https://example.test/app.js",
     "a page script is never projected through the game bundle's TypeScript map");

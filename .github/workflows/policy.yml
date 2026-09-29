@@ -576,6 +576,7 @@ jobs:
           args=(--out build/policy-site)
           if [ -n "$FALLBACK_ARTIFACTS" ]; then args+=(--artifact-references "$FALLBACK_ARTIFACTS"); fi
           node scripts/build-policy-site.mjs "${args[@]}"
+          node scripts/build-docs-site.mjs --out build/policy-site/docs
       - run: node scripts/check-policy-site-resolution.mjs
       - name: Publish accumulated policies to deherm-policy-site
         env:

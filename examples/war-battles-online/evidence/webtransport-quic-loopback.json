@@ -38,9 +38,9 @@
   "minimumSnapshotsApplied": 3,
   "minimumInputsSent": 3,
   "observedSnapshotsApplied": 3,
-  "observedInputsSent": 14,
-  "lastServerTick": 126,
-  "lastLocalTick": 142,
+  "observedInputsSent": 12,
+  "lastServerTick": 60,
+  "lastLocalTick": 70,
   "input": {
     "moveX": 1,
     "moveY": 0,
@@ -50,8 +50,8 @@
   },
   "inputsDropped": 0,
   "presentation": {
-    "localCorrectionMagnitude": 0,
-    "maximumLocalCorrectionMagnitude": 5327,
+    "localCorrectionMagnitude": 27,
+    "maximumLocalCorrectionMagnitude": 2380,
     "remoteInterpolationRebases": 0,
     "maximumRemoteInterpolationRebaseDistance": 0,
     "maximumRemoteInterpolationDiscontinuity": 0,
@@ -65,7 +65,7 @@
     "inputsAcceptedAtLeast": 3,
     "markers": [
       "war-battles-server:listening:https://localhost:<port>",
-      "war-battles-server:health:http://localhost:49346",
+      "war-battles-server:health:http://localhost:60176",
       "war-battles-server:roster:32:bots:2",
       "war-battles-server:incoming:id=1",
       "war-battles-server:quic-accepted:id=1",
@@ -78,7 +78,7 @@
   },
   "runtime": {
     "deno": "deno 2.9.7 (stable, release, aarch64-apple-darwin)",
-    "chrome": "Google Chrome 154.0.8037.57"
+    "chrome": "Google Chrome 154.0.8037.58"
   },
   "sourceInputs": [
     {
@@ -121,8 +121,8 @@
     {
       "path": "package.json",
       "kind": "file",
-      "bytes": 55192,
-      "sha256": "88ed1179e8a16d4103e8fb7fdef1560f8355b3ced8bfbba1cfbdfe374f450cc1"
+      "bytes": 55503,
+      "sha256": "4959a1316ae68fd9bf0cc7232ab58e61be9771a164e0c0693827be4ce6f382a2"
     },
     {
       "path": "pnpm-lock.yaml",
@@ -137,6 +137,6 @@
       "sha256": "6fd5533ae7b9ebb266685f8319dc4bcad914fbba15a26859921d8518ba6536b8"
     }
   ],
-  "sourceKey": "361d5d94722124ab9a240ab98fbd0830caed07049c29bb644ce571602a315282",
+  "sourceKey": "669cf14bd54338cf3bd38f8f23ac5bd5edfe45b072671d5c43728b10e4cfb850",
   "evidenceBoundary": "Real loopback Chrome-to-Deno HTTP/3/WebTransport transport, authoritative welcome/snapshot/input and scalar client-presentation telemetry; server input acceptance is observed from MatchServer stats; the telemetry describes this bounded loopback trace and is not a visual-quality, WAN, ingress, native Defold, allocation, or reliable-lane-persistence claim."
 }

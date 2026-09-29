@@ -174,7 +174,7 @@ function landingPage({ site, plan, defoldRevision, wordmark, ogImage }) {
 <header>
   <img src="deherm-wordmark.png" alt="d\u00e9herm" width="${wordmark.width}" height="${wordmark.height}" fetchpriority="high">
   <p class="tagline">Content-addressed Defold API policies, derived from engine sources.</p>
-  <span class="alpha">Early alpha &middot; nothing here is stable</span>
+  <span class="alpha">0.1 preview &middot; generated policy objects are immutable</span>
 </header>
 
 <p>
@@ -191,6 +191,9 @@ function landingPage({ site, plan, defoldRevision, wordmark, ogImage }) {
   <a href="https://www.npmjs.com/package/@ts-defold/deherm">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M0 7.334v8h6.666v1.332H12v-1.332h12v-8H0zm6.666 6.664H5.334v-4H3.999v4H1.335V8.667h5.331v5.331zm4 0v1.336H8.001V8.667h5.334v5.332h-2.669zm12.001 0h-1.33v-4h-1.336v4h-1.335v-4h-1.33v4h-2.671V8.667h8.002v5.331zM10.665 10H12v2.667h-1.335V10z"/></svg>
     npm
+  </a>
+  <a href="docs/">
+    Docs &amp; examples
   </a>
 </div>
 

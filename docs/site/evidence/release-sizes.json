@@ -1,0 +1,140 @@
+{
+  "schemaVersion": 1,
+  "kind": "deherm.release-size-evidence",
+  "observedOn": "2026-09-29T03:52:15.911Z",
+  "build": {
+    "variant": "release",
+    "nativeCommand": "DEFOLD_HERMES_PROJECT=examples/war-battles-online/defold DEFOLD_HERMES_VARIANT=release pnpm bob:bundle",
+    "webCommand": "DEFOLD_HERMES_PROJECT=examples/war-battles-online/defold DEFOLD_HERMES_VARIANT=release pnpm bob:web:bundle",
+    "bobJarSha256": "8a8a8c4ebc725279d8ddae17c4eb3d72d6db90a498302960ca341e61fa489cb8"
+  },
+  "nativeArm64Macos": {
+    "packageLogicalBytes": 16810878,
+    "engineBytes": 16364928,
+    "stockDefoldEngineBytes": 7046656,
+    "engineOverheadBytes": 9318272,
+    "applicationBytecodeBytes": 339960,
+    "applicationBytecodeSha256": "134d6bf0e5028607af73e47ecf8ad64c045df063454029605d2fa4b6f7dd6a6b",
+    "files": [
+      {
+        "path": "Contents/_CodeSignature/CodeResources",
+        "bytes": 3378,
+        "sha256": "c48f51e1bddc06c27dd41164934aa60397a0a7626b2a9d685f78a6f892d464e1"
+      },
+      {
+        "path": "Contents/Info.plist",
+        "bytes": 1678,
+        "sha256": "72de259652b3022e40405359a31393242b86519aa58639cc5a57d82c6de45c40"
+      },
+      {
+        "path": "Contents/MacOS/WarBattles",
+        "bytes": 16364928,
+        "sha256": "ab8b1c99314ff032b0d4e19f45342f08f65e569d8f5b87b3915762bc3cdb7f5c"
+      },
+      {
+        "path": "Contents/Resources/game.arcd",
+        "bytes": 424419,
+        "sha256": "81e7babb9e174bbf4a969a957559bcf97061c17f1578b0d1ac919ee9babc17ce"
+      },
+      {
+        "path": "Contents/Resources/game.arci",
+        "bytes": 6288,
+        "sha256": "4b7a3af15666d0142f8c44917c6e6fee3ed29fbd9ea5cfb4de259711c033579e"
+      },
+      {
+        "path": "Contents/Resources/game.dmanifest",
+        "bytes": 3799,
+        "sha256": "3f3feb71b3e41747dbbb5d0cbbc90f0685bea40efc8d69fe918373c5ed756047"
+      },
+      {
+        "path": "Contents/Resources/game.projectc",
+        "bytes": 5020,
+        "sha256": "51095065f24bc5f9c3aeee90af1e196970abd52990fe53edc93d4b40fa94236b"
+      },
+      {
+        "path": "Contents/Resources/PrivacyInfo.xcprivacy",
+        "bytes": 1368,
+        "sha256": "5c2a11635c0c20a6340277829498eb6db10304c135cbdf340b73a7c9a78ee762"
+      }
+    ],
+    "baseline": {
+      "path": "libexec/arm64-macos/dmengine_release",
+      "bytes": 7046656,
+      "sha256": "9d005fba398bdd8d933f789f92f6eab4b7e2b9d139881c636401db057892b510"
+    }
+  },
+  "browserWasmWeb": {
+    "packageLogicalBytes": 4462782,
+    "engineWasmBytes": 3355471,
+    "engineJavaScriptBytes": 729192,
+    "stockDefoldEngineWasmBytes": 2909647,
+    "stockDefoldEngineJavaScriptBytes": 283579,
+    "engineShellOverheadBytes": 891437,
+    "embedsHermes": false,
+    "files": [
+      {
+        "path": ".gitattributes",
+        "bytes": 8,
+        "sha256": "705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da"
+      },
+      {
+        "path": "archive/archive_files.json",
+        "bytes": 361,
+        "sha256": "a02e681c431f0faa5272ebac75f0c2daf48902c22dd1709449c128c18a04b3dc"
+      },
+      {
+        "path": "archive/game0.arcd",
+        "bytes": 296227,
+        "sha256": "edb8321f39e2f106de315f9611d4917cf8fac0681eeb616630a3113d281b5272"
+      },
+      {
+        "path": "archive/game0.arci",
+        "bytes": 6288,
+        "sha256": "72be3d955bf351eff38e26bd2fe46f26ad656dea5bcc727f42d63add3b1efedd"
+      },
+      {
+        "path": "archive/game0.dmanifest",
+        "bytes": 3797,
+        "sha256": "70676fbcb688932c2e3ffaa8ee3a35371686daedfe396557938c80545ba8b34a"
+      },
+      {
+        "path": "archive/game0.projectc",
+        "bytes": 5012,
+        "sha256": "02a6834e6814f53a4f6516d38140fe3d591fbad0137affe9f00acad773a1e79c"
+      },
+      {
+        "path": "dmloader.js",
+        "bytes": 54738,
+        "sha256": "d41f34c3f3da810f27564123795dde55544aaeca46068ee23f8c780eadeaee85"
+      },
+      {
+        "path": "index.html",
+        "bytes": 11688,
+        "sha256": "86518dfc940a73a0e65eb240a9e982f92022a8ec51a8e7b0df4ddaeba5cfcede"
+      },
+      {
+        "path": "WarBattles_wasm.js",
+        "bytes": 729192,
+        "sha256": "1af83dcdf9c0d664b84f358afc0d31376dde670b6121a769cb761a30e5acbe93"
+      },
+      {
+        "path": "WarBattles.wasm",
+        "bytes": 3355471,
+        "sha256": "425f3da8acd6a8dd455e850464c962b614773f3970c69ce4627a1a3d9eb120a7"
+      }
+    ],
+    "baseline": {
+      "wasm": {
+        "path": "libexec/wasm-web/dmengine_release.wasm",
+        "bytes": 2909647,
+        "sha256": "680dae3064992ec6a152a6e4a88c435a9d718eca0c8ccc5d5af05ecfaea84673"
+      },
+      "javaScript": {
+        "path": "libexec/wasm-web/dmengine_release.js",
+        "bytes": 283579,
+        "sha256": "5263086c4837e34941cc2f2471448d6504890cf1e8127c9921daa445255b3246"
+      }
+    }
+  },
+  "evidenceBoundary": "Logical file-byte totals from fresh Bob release bundles. Native overhead compares the linked arm64-macOS executable to Bob's stock dmengine_release from the same pinned Bob jar. Browser overhead compares the Wasm and JavaScript engine shell to stock wasm-web release members; HTML5 embeds no Hermes. Signing, compression by a store/CDN, filesystem allocation, and platform packaging outside these bundle directories are excluded."
+}

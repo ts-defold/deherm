@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "kind": "deherm.release-transport-overhead",
+  "observedOn": "2026-09-29T03:52:54.518Z",
+  "host": {
+    "platform": "darwin",
+    "architecture": "arm64",
+    "cpu": "Apple M4"
+  },
+  "build": {
+    "cmakeBuildType": "Release",
+    "profiling": false,
+    "warmupCalls": 20000,
+    "callsPerRepeat": 100000,
+    "repeats": 9
+  },
+  "results": {
+    "directCAbi": {
+      "bestNanoseconds": 3.8,
+      "worstNanoseconds": 5.9
+    },
+    "luaStackMedianNanoseconds": 283.2,
+    "protectedLuaMedianNanoseconds": 211,
+    "luaBridgeOwnedMedianNanoseconds": 70.9,
+    "luaBridgeOwnedRangeNanoseconds": {
+      "minimum": 65.7,
+      "maximum": 75.7
+    },
+    "typedNativeMedianNanoseconds": 64.6,
+    "typedNativeMinimumNanoseconds": 40,
+    "typedNativeMaximumNanoseconds": 695.5,
+    "typedNativeShapes": 19
+  },
+  "source": {
+    "executable": "build/native/defold-hermes-transport-profile-benchmark",
+    "stdoutSha256": "79c7ae82b90629106248e584b348094d191d3c72c4a0cc1f1cef6e7d9b40bbda",
+    "harness": "native/transport_profile_benchmark.cpp"
+  },
+  "evidenceBoundary": "Release host harness over stub providers. This measures generated crossing/framing cost, not the Defold call behind it; the Lua harness uses pinned PUC Lua 5.1 rather than Defold's shipping LuaJIT."
+}

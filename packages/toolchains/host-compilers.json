@@ -55,7 +55,7 @@
           "file": "bin/dehermc",
           "builder": "go-cross-compile",
           "status": "vendored",
-          "sha256": "48567c29adf370a9e97a7876e7d7c3da42f6ebd7add442a1734c39581ac30dd7",
+          "sha256": "d5511546af12a4796c9d06348dcfe99274397b85f42fa178716e30dedf5abba8",
           "bytes": 20418306
         }
       }
@@ -85,7 +85,7 @@
           "file": "bin/dehermc",
           "builder": "go-cross-compile",
           "status": "vendored",
-          "sha256": "bdf4b0569dcb4784b69d37019bcfdacdd7972451f52ff86574984879be28cabd",
+          "sha256": "732c96822badf409b6be0dbf7c5370248f827f36f4cc69200f489b6a3861d7d2",
           "bytes": 21177952
         }
       }
@@ -115,7 +115,7 @@
           "file": "bin/dehermc",
           "builder": "go-cross-compile",
           "status": "vendored",
-          "sha256": "92f37d193e9440906b202de604d954e09df0178d211dd7c8d09ff3028ca1326c",
+          "sha256": "e9b3c785716e0ed8c404e76e3b3fdf32796bc105d2f9e9d336f99820d6c1b393",
           "bytes": 20873342
         }
       }
@@ -145,7 +145,7 @@
           "file": "bin/dehermc",
           "builder": "go-cross-compile",
           "status": "vendored",
-          "sha256": "50914dfde4368b5229ebec784af7995258d846aaf22c89226c9f079f5a39e735",
+          "sha256": "586545787e0138f527e25396ec958dd864d056404e7bde159a4a3d9b0b3c9a58",
           "bytes": 20054142
         }
       }
@@ -175,7 +175,7 @@
           "file": "bin/dehermc.exe",
           "builder": "go-cross-compile",
           "status": "vendored",
-          "sha256": "8bdfd2342bdfcb36d0c5ac22816b65f79d3e0f8ecf70c4681d99594c52aa245b",
+          "sha256": "bbcdc2500d967ac45e86d0b6956e8d1e87fc87862a2499c9d5d303f606bbf30c",
           "bytes": 21334528
         }
       }

@@ -175,7 +175,9 @@ dynamic target WebSocket, while the DAP binds breakpoints by the
 the authored breakpoints. Only the newest matching script is projected through
 the current source map; live closures from an older generation and unrelated
 page scripts retain their raw URLs rather than acquiring a plausible but wrong
-TypeScript location. A fresh War Battles `wasm-web` bundle proves the
+TypeScript location. Pause notifications are consumed by one ordered async
+queue, so a slow source-map refresh cannot let two back-to-back CDP events
+overwrite the frame state out of order. A fresh War Battles `wasm-web` bundle proves the
 public DAP stops Chrome on `arena.script.ts`, maps the top frame, evaluates the
 live `dt`, resumes, and disconnects. The thin VS Code client remains.
 

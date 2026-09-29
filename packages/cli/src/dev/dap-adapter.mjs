@@ -56,6 +56,7 @@ export async function createDapAdapter(options = {}) {
   let nextVariableReference = 1;
   let nextBreakpointId = 1;
   let breakpointQueue = Promise.resolve();
+  let pauseQueue = Promise.resolve();
   const frameById = new Map();
   const objectByReference = new Map();
   const breakpointSources = new Map();
@@ -215,6 +216,14 @@ export async function createDapAdapter(options = {}) {
       ...(params.description ? { description: params.description } : {})
     });
   };
+  const enqueuePause = (params) => {
+    const current = pauseQueue.then(() => onPaused(params));
+    pauseQueue = current.catch((error) => event("output", {
+      category: "stderr",
+      output: `${error.message}\n`
+    }));
+    return current;
+  };
 
   const attach = async (args = {}) => {
     if (client) {
@@ -225,6 +234,7 @@ export async function createDapAdapter(options = {}) {
     }
     scripts.clear();
     newestBundleScriptId = undefined;
+    pauseQueue = Promise.resolve();
     const discovered = await discover({
       projectRoot,
       sessionFile: args.inspectorSession ? path.resolve(projectRoot, args.inspectorSession) : sessionFile,
@@ -264,9 +274,7 @@ export async function createDapAdapter(options = {}) {
         breakpoint: { id: owner.spec.id, verified: true, ...mapped }
       });
     });
-    client.onEvent("Debugger.paused", (params) => {
-      void onPaused(params).catch((error) => event("output", { category: "stderr", output: `${error.message}\n` }));
-    });
+    client.onEvent("Debugger.paused", enqueuePause);
     client.onEvent("Debugger.resumed", () => {
       clearPause();
       event("continued", { threadId: 1, allThreadsContinued: true });

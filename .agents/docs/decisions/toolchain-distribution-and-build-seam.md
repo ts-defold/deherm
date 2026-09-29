@@ -570,6 +570,10 @@ in one file because conflating them has already cost review time. A `sdk` job
 reads the derived SDK pins once and feeds them to the cross builds. The `plan`
 job computes all three tags and decides each family's skip independently, on the
 assets that release actually holds rather than on the tag's existence.
+Every repository path that can change a family fingerprint is also a push-path
+trigger for this workflow. In particular, the root package version is embedded
+in `dehermc`; changing it rotates the compiler tag and must schedule publication
+before consumer gates attempt to download that new tag.
 
 The skip is **per asset**, not merely per complete release.
 `scripts/plan-native-artifact-builds.mjs` maps every publishable asset to exactly

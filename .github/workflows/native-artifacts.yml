@@ -80,6 +80,10 @@ on:
       - toolchains/go/**
       - packages/compiler/go.mod
       - packages/compiler/ttsc/**
+      # The root version is stamped into dehermc and is therefore part of its
+      # content-addressed fingerprint. A version bump must publish the new
+      # compiler before consumer CI tries to download it.
+      - package.json
       - packages/toolchains/defold-bundle-targets.json
       - packages/toolchains/host-compilers.json
       - scripts/lib/artifact-releases.mjs

@@ -43,6 +43,7 @@ async function createPollingWatcher(options) {
   ];
   const filter = createWatchPathFilter(options.root, options);
   const identity = new Map();
+  const pendingIdentity = new Map();
   const readIdentity = async (relative) => {
     try {
       const value = await stat(path.join(options.root, relative));
@@ -61,8 +62,21 @@ async function createPollingWatcher(options) {
       const changed = [];
       for (const relative of candidates) {
         const next = await readIdentity(relative);
-        if (identity.get(relative) === next) continue;
+        if (identity.get(relative) === next) {
+          pendingIdentity.delete(relative);
+          continue;
+        }
+        // `writeFile` truncates and refills in place. A polling fallback can
+        // observe the transient size between those operations and report the
+        // same authored save twice. The real watcher debounces successive fs
+        // events; mirror that contract by requiring one stable poll before a
+        // new identity becomes authoritative.
+        if (pendingIdentity.get(relative) !== next) {
+          pendingIdentity.set(relative, next);
+          continue;
+        }
         identity.set(relative, next);
+        pendingIdentity.delete(relative);
         const included = filter(path.join(options.root, relative));
         if (included) changed.push(included);
       }
