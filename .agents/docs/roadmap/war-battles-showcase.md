@@ -430,6 +430,16 @@ roster: one packaged native Defold/Dynamic-Hermes client and 31 independent
 Chrome WebTransport sessions. It observed 503 bot snapshot applications and
 1,559 bot input sends before success.
 
+The launcher owns the build prerequisite as well as the game stack. With its
+default `http://127.0.0.1:9010` build server it reuses a healthy pinned local
+Extender, prepares it when its pinned jars/environment are absent, or starts the
+prepared service as an owned child before invoking Bob. An explicitly supplied
+remote or alternate build server remains caller-owned. The accepted
+`--headless --exit-when-ready` rerun on 2026-09-29 built through that pinned
+Extender, admitted one native client plus 31 browser WebTransport/QUIC clients,
+and reported 152 applied bot snapshots, 387 sent inputs, and nonzero movement
+for all 31 bots before bounded teardown.
+
 Admission now has an explicit client-side commit point. Receiving WELCOME
 builds bounded client state but does not expose `ready` or call gameplay's
 `onWelcome` until the ordered WELCOME_ACK write returns `sent`; controls and

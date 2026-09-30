@@ -4758,3 +4758,21 @@ and ordered end-to-end dispatch. The corrected graph uses a `policy-v2`
 concurrency epoch so an already-running pre-binding workflow—which cannot reach
 publication under its old CLI invocation—does not indefinitely block the first
 repair; corrected writers still serialize against one another.
+
+## 2026-09-29 - War Battles full-stack acceptance and owned Extender startup
+
+The repaired public policy advanced to root
+`5bd318665e56b0407d9a302c547caf6f4ede8db0ff1d6328d9ef4c6a326f63d3`
+with artifact digest
+`188bac65211aebe1cbdb0363ef23ece38a3f126fb5e16874c5c7278f7c73c057`.
+The first product launch then isolated an orchestration defect rather than a
+game defect: `pnpm stack` selected the pinned local Extender on port 9010 but
+did not start it. After the prepared service started, the finite acceptance run
+built the native arm64-macOS engine, admitted the packaged Defold/Dynamic-Hermes
+client through the native HTTP/3/QUIC extension, admitted 31 independent Chrome
+WebTransport bot clients, applied 152 bot snapshots, sent 387 bot inputs, and
+proved nonzero movement for all 31 before reporting a 32-human roster and
+tearing every session down. The launcher now detects, prepares when needed, and
+starts its default pinned Extender as an owned child; explicit alternate build
+servers remain caller-owned. This is packaged native/network/runtime evidence,
+not visual-quality review of the rendered game.

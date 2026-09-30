@@ -13,8 +13,10 @@ import {
   waitFor as waitForBrowser,
 } from "../../../packages/cli/src/dev/browser-host.mjs";
 import { createDefoldBuilder } from "../../../packages/cli/src/dev/defold-builder.mjs";
+import { DEFAULT_LOCAL_DEV_BUILD_SERVER } from "./dev-launch-config.mjs";
 
 const exampleRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const repositoryRoot = resolve(exampleRoot, "../..");
 if (process.argv.includes("--help") || process.argv.includes("-h")) {
   console.log(`Usage: pnpm stack -- [options]
 
@@ -26,7 +28,7 @@ Starts the Deno HTTP/3 match server, packaged native game, and browser bot dashb
   --quic-port <port>     WebTransport port (default: 4433)
   --health-port <port>   HTTP health/WebSocket port (default: 8080)
   --dashboard-port <p>   bot dashboard port (default: 8090)
-  --build-server <url>   local Defold Extender (default: http://127.0.0.1:9010)
+  --build-server <url>   Defold Extender (default: pinned local service, auto-started)
   --deno <path>          Deno executable (default: DEHERM_DENO or deno)
   --chrome <path>        Chrome executable (default: DEHERM_CHROME or host default)
   --no-build             explicitly reuse an existing packaged native game
@@ -49,7 +51,10 @@ const browserHandles = [];
 let stopping = false;
 
 try {
-  if (!options.noBuild) await buildPackagedGame(options.buildServer);
+  if (!options.noBuild) {
+    await ensureBuildServer(options.buildServer);
+    await buildPackagedGame(options.buildServer);
+  }
   execFileSync(join(exampleRoot, "server/make-cert.sh"), { cwd: exampleRoot, stdio: "inherit" });
   execFileSync(process.execPath, [join(exampleRoot, "bot-dashboard/build.mjs")], {
     cwd: exampleRoot,
@@ -191,6 +196,43 @@ function start(name, command, arguments_) {
   return child;
 }
 
+async function ensureBuildServer(buildServer) {
+  const normalized = buildServer.replace(/\/+$/u, "");
+  if (normalized !== DEFAULT_LOCAL_DEV_BUILD_SERVER) return;
+  const healthUrl = `${normalized}/actuator/health`;
+  if ((await fetch(healthUrl).catch(() => undefined))?.ok === true) {
+    console.log(`war-battles-stack:extender:reused:${normalized}`);
+    return;
+  }
+
+  const extenderScript = join(repositoryRoot, "scripts/extender-local.sh");
+  const preparedFiles = [
+    join(repositoryRoot, "upstream/extender/server/app/extender.jar"),
+    join(repositoryRoot, "upstream/extender/server/app/manifestmergetool.jar"),
+    join(repositoryRoot, "upstream/extender/server/envs/deherm-macos.env"),
+  ];
+  const prepared = await Promise.all(
+    preparedFiles.map((file) =>
+      access(file)
+        .then(() => true)
+        .catch(() => false),
+    ),
+  );
+  if (prepared.some((present) => !present)) {
+    console.log("war-battles-stack:extender:preparing");
+    execFileSync("bash", [extenderScript, "prepare"], { cwd: repositoryRoot, stdio: "inherit" });
+  }
+
+  const extender = start("extender", "bash", [extenderScript, "foreground-prepared"]);
+  await waitFor(
+    async () => (await fetch(healthUrl).catch(() => undefined))?.ok === true,
+    "pinned local Extender",
+    extender,
+    30_000,
+  );
+  console.log(`war-battles-stack:extender:started:${normalized}`);
+}
+
 async function buildPackagedGame(buildServer) {
   // Compile the current TypeScript generation first. Bob consumes that owned
   // resource; launching an older packaged binary against a newer protocol
@@ -320,8 +362,8 @@ function signalOwnedProcess(child, signal) {
   return Promise.resolve();
 }
 
-async function waitFor(predicate, description, child) {
-  const deadline = Date.now() + 20_000;
+async function waitFor(predicate, description, child, timeoutMs = 20_000) {
+  const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
     if (child !== undefined && (child.exitCode !== null || child.signalCode !== null)) {
       throw new Error(`${description} process exited before reporting ready`);
@@ -407,7 +449,7 @@ function parseArguments(arguments_) {
     quicPort: integer("--quic-port", 4433, 1, 65_535),
     healthPort: integer("--health-port", 8080, 1, 65_535),
     dashboardPort: integer("--dashboard-port", 8090, 1, 65_535),
-    buildServer: value("--build-server", process.env.DEHERM_BUILD_SERVER ?? "http://127.0.0.1:9010"),
+    buildServer: value("--build-server", process.env.DEHERM_BUILD_SERVER ?? DEFAULT_LOCAL_DEV_BUILD_SERVER),
     deno: value("--deno", process.env.DEHERM_DENO ?? "deno"),
     chrome: value("--chrome", process.env.DEHERM_CHROME ?? defaultChromeBinary),
     noBuild: arguments_.includes("--no-build"),
