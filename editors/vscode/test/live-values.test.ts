@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import path from "node:path";
 import test from "node:test";
 
 import {
@@ -13,9 +14,12 @@ import {
   type InspectorStateDescriptor,
 } from "../src/live-values.ts";
 
+const projectRoot = path.resolve("/work/game");
+const playerDocument = path.join(projectRoot, "main", "player.script.ts");
+
 const descriptor: InspectorStateDescriptor = {
   sessionId: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
-  projectRoot: "/work/game",
+  projectRoot,
   stateUrl: "http://127.0.0.1:9333/deherm/dev/v1/snapshot",
   authToken: "a".repeat(43),
 };
@@ -28,7 +32,7 @@ test("inspector state discovery accepts only the matching project and authentica
         kind: "deherm-inspector-session",
         ...descriptor,
       },
-      "/work/game",
+      projectRoot,
     ),
     descriptor,
   );
@@ -40,7 +44,7 @@ test("inspector state discovery accepts only the matching project and authentica
         ...descriptor,
         stateUrl: "https://example.com/deherm/dev/v1/snapshot",
       },
-      "/work/game",
+      projectRoot,
     ),
     undefined,
   );
@@ -52,7 +56,7 @@ test("inspector state discovery accepts only the matching project and authentica
         ...descriptor,
         projectRoot: "/work/other",
       },
-      "/work/game",
+      projectRoot,
     ),
     undefined,
   );
@@ -64,7 +68,7 @@ test("inspector state discovery accepts only the matching project and authentica
         ...descriptor,
         authToken: "weak",
       },
-      "/work/game",
+      projectRoot,
     ),
     undefined,
   );
@@ -166,8 +170,8 @@ test("live lenses consume only server-enriched current schemas for the exact aut
   assert.deepEqual(
     liveValueLenses({
       state: fixtureState(),
-      projectRoot: "/work/game",
-      documentPath: "/work/game/main/player.script.ts",
+      projectRoot,
+      documentPath: playerDocument,
       now: 10_500,
     }),
     [
@@ -176,8 +180,8 @@ test("live lenses consume only server-enriched current schemas for the exact aut
         componentId: "player",
         title: '$(pulse) local-engine · player [3:1] · health=100, label="ready"',
         navigation: {
-          projectRoot: "/work/game",
-          documentPath: "/work/game/main/player.script.ts",
+          projectRoot,
+          documentPath: playerDocument,
         },
       },
     ],
@@ -185,8 +189,8 @@ test("live lenses consume only server-enriched current schemas for the exact aut
   assert.deepEqual(
     liveValueLenses({
       state: fixtureState(),
-      projectRoot: "/work/game",
-      documentPath: "/work/game/main/player.ts",
+      projectRoot,
+      documentPath: path.join(projectRoot, "main", "player.ts"),
       now: 10_500,
     }),
     [],
@@ -197,8 +201,8 @@ test("live hints project each authenticated runtime value onto its authored prop
   assert.deepEqual(
     liveValueHints({
       state: fixtureState(),
-      projectRoot: "/work/game",
-      documentPath: "/work/game/main/player.script.ts",
+      projectRoot,
+      documentPath: playerDocument,
       now: 10_500,
     }),
     [

@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import path from "node:path";
 import test from "node:test";
 
 import {
@@ -200,31 +201,27 @@ test("live-value navigation resolves only an absolute authored resource owned by
 });
 
 test("language-server and debug launches use the selected Node executable with exact CLI arguments", () => {
+  const cliPath = path.resolve("/work/node_modules/@ts-defold/deherm/bin/deherm.mjs");
+  const projectRoot = path.resolve("/work/game");
   assert.deepEqual(
     languageServerLaunch({
-      cliPath: "/work/node_modules/@ts-defold/deherm/bin/deherm.mjs",
-      projectRoot: "/work/game",
+      cliPath,
+      projectRoot,
       nodeExecutable: "/Applications/Code/Electron",
       environment: { PATH: "/bin", REMOVE_ME: undefined },
     }),
     {
       command: "/Applications/Code/Electron",
-      args: [
-        "/work/node_modules/@ts-defold/deherm/bin/deherm.mjs",
-        "language-server",
-        "--stdio",
-        "--project",
-        "/work/game",
-      ],
-      cwd: "/work/game",
+      args: [cliPath, "language-server", "--stdio", "--project", projectRoot],
+      cwd: projectRoot,
       env: { PATH: "/bin", ELECTRON_RUN_AS_NODE: "1" },
     },
   );
 
   assert.deepEqual(
     debugAdapterLaunch({
-      cliPath: "/work/node_modules/@ts-defold/deherm/bin/deherm.mjs",
-      projectRoot: "/work/game",
+      cliPath,
+      projectRoot,
       inspectorSession: ".deherm/dev/custom.json",
       replaceDebugger: true,
       nodeExecutable: "/Applications/Code/Electron",
@@ -233,25 +230,27 @@ test("language-server and debug launches use the selected Node executable with e
     {
       command: "/Applications/Code/Electron",
       args: [
-        "/work/node_modules/@ts-defold/deherm/bin/deherm.mjs",
+        cliPath,
         "debug",
         "--project",
-        "/work/game",
+        projectRoot,
         "--inspector-session",
-        "/work/game/.deherm/dev/custom.json",
+        path.join(projectRoot, ".deherm", "dev", "custom.json"),
         "--replace-debugger",
       ],
-      cwd: "/work/game",
+      cwd: projectRoot,
       env: { PATH: "/bin", ELECTRON_RUN_AS_NODE: "1" },
     },
   );
 });
 
 test("profile launches produce canonical CLI captures without replacing an attached debugger", () => {
+  const cliPath = path.resolve("/work/node_modules/@ts-defold/deherm/bin/deherm.mjs");
+  const projectRoot = path.resolve("/work/game");
   assert.deepEqual(
     profileLaunch({
-      cliPath: "/work/node_modules/@ts-defold/deherm/bin/deherm.mjs",
-      projectRoot: "/work/game",
+      cliPath,
+      projectRoot,
       kind: "cpu",
       durationMs: 2_500,
       inspectorSession: ".deherm/dev/custom.json",
@@ -261,18 +260,18 @@ test("profile launches produce canonical CLI captures without replacing an attac
     {
       command: "/Applications/Code/Electron",
       args: [
-        "/work/node_modules/@ts-defold/deherm/bin/deherm.mjs",
+        cliPath,
         "profile",
         "cpu",
         "--project",
-        "/work/game",
+        projectRoot,
         "--json",
         "--duration",
         "2500",
         "--inspector-session",
-        "/work/game/.deherm/dev/custom.json",
+        path.join(projectRoot, ".deherm", "dev", "custom.json"),
       ],
-      cwd: "/work/game",
+      cwd: projectRoot,
       env: { PATH: "/bin", ELECTRON_RUN_AS_NODE: "1" },
     },
   );
