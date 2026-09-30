@@ -199,13 +199,13 @@
   "sourceInputs": [
     {
       "path": "package.json",
-      "bytes": 55503,
-      "sha256": "4959a1316ae68fd9bf0cc7232ab58e61be9771a164e0c0693827be4ce6f382a2"
+      "bytes": 54777,
+      "sha256": "66cc92195d06340f874dbc1d272c21938fa488f98fb24c7f84d85861efa9fa88"
     },
     {
       "path": "packages/bindings/generated/defold-script-api-accounting.json",
       "bytes": 960271,
-      "sha256": "8656460915fad24b11d6f91b18ae227321d526a43754038f98312f92d1830488"
+      "sha256": "6f46b51a07a7f55256f8c7ce5708fc5a1ad8a1c0b9a8a205a6c0f1e807d3a769"
     },
     {
       "path": "packages/bindings/generated/defold-dmsdk-accounting.json",
