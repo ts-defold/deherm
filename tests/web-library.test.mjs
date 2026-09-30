@@ -28,7 +28,7 @@ test("release web runtime stripping preserves the surrounding source layout", ()
 });
 
 test("browser bootstrap installs the generated universal script provider", () => {
-  assert.match(extensionBootstrapSource, /'\$DEFOLD_HERMES_SCRIPT_UNIVERSAL'/);
+  assert.match(extensionBootstrapSource, /["']\$DEFOLD_HERMES_SCRIPT_UNIVERSAL["']/);
   assert.match(extensionBootstrapSource, /__defoldScriptBridgeV1 = DEFOLD_HERMES_SCRIPT_UNIVERSAL\.install\(\)/);
   assert.doesNotMatch(extensionBootstrapSource, /__defoldScriptBridgeV1 = DEFOLD_HERMES_SCRIPT_BRIDGE\.install\(\)/);
 });

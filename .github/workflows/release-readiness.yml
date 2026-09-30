@@ -36,6 +36,13 @@ jobs:
       # platform prebuild so this matrix exercises the package users receive.
       - run: pnpm install --frozen-lockfile
       - run: pnpm check:release-readiness
+      # The real compiler fixtures import the revision-selected project SDK.
+      # Generate it from the same published policy a clean consumer uses;
+      # never let an ignored contributor .deherm tree satisfy this lane.
+      - name: Generate clean project SDK
+        env:
+          DEHERM_WEBTRANSPORT_ARTIFACT_TARGET: web
+        run: node bin/deherm.mjs generate --project examples/war-battles-online/defold --force
       - run: node scripts/run-release-command.mjs pnpm test:dev
       - run: node scripts/run-release-command.mjs pnpm test:vscode
       - run: node scripts/run-release-command.mjs deno task --config examples/defold-webtransport-minimal/deno.json check
