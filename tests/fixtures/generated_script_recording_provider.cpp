@@ -96,6 +96,11 @@ void renderValue(const ScriptValue& value, std::string& out, uint32_t depth) {
       if (value.data && value.length) out.append(static_cast<const char*>(value.data), value.length);
       return;
     }
+    case ScriptValueTag::kBytes: {
+      out += "str:";
+      if (value.data && value.length) out.append(static_cast<const char*>(value.data), value.length);
+      return;
+    }
     case ScriptValueTag::kHandle:
       if (value.handleKind == ScriptHandleKind::kHash) {
         out += "hash:"; appendU64(value.payload, out); return;
@@ -179,7 +184,7 @@ void renderValue(const ScriptValue& value, std::string& out, uint32_t depth) {
 }
 
 /** Structural contract check for one declared argument slot. */
-bool matches(const ScriptValue& value, uint32_t shapeIndex, std::string& failure) {
+bool matches(const ScriptValue& value, uint32_t shapeIndex, bool bytes, std::string& failure) {
   const auto& shape = kDehermRecordingShapes[shapeIndex];
   const auto expectTag = [&](ScriptValueTag tag) {
     if (value.tag == tag) return true;
@@ -192,7 +197,7 @@ bool matches(const ScriptValue& value, uint32_t shapeIndex, std::string& failure
     case DEHERM_RECORDING_SHAPE_BOOLEAN: return expectTag(ScriptValueTag::kBoolean);
     case DEHERM_RECORDING_SHAPE_NUMBER: return expectTag(ScriptValueTag::kNumber);
     case DEHERM_RECORDING_SHAPE_STRING:
-      if (!expectTag(ScriptValueTag::kString)) return false;
+      if (!expectTag(bytes ? ScriptValueTag::kBytes : ScriptValueTag::kString)) return false;
       if (value.length && !value.data) { failure = "string-argument-has-null-storage"; return false; }
       return true;
     case DEHERM_RECORDING_SHAPE_HASH:
@@ -457,7 +462,8 @@ bool Dispatch(void*, ScriptCallFrame* frame) {
       renderValue(frame->arguments[index], observation.arguments, 0);
       std::string failure;
       if (observation.violation.empty() &&
-          !matches(frame->arguments[index], kDehermRecordingShapeRefs[descriptor.argumentFirst + index], failure)) {
+          !matches(frame->arguments[index], kDehermRecordingShapeRefs[descriptor.argumentFirst + index],
+              (descriptor.byteArgumentMask & (UINT32_C(1) << index)) != 0, failure)) {
         observation.violation = failure;
       }
     }
@@ -471,8 +477,8 @@ bool Dispatch(void*, ScriptCallFrame* frame) {
   }
   if (!observation.violation.empty()) {
     ++gViolations;
-    std::snprintf(gLastError, sizeof(gLastError), "recording contract violation: %s",
-        observation.violation.c_str());
+    std::snprintf(gLastError, sizeof(gLastError), "recording contract violation: %s args=[%s]",
+        observation.violation.c_str(), observation.arguments.c_str());
     return false;
   }
 

@@ -7,7 +7,7 @@
 
 namespace defold_hermes::value_tail {
 enum class DispatchStatus : uint8_t { kMissing, kSuccess, kError };
-enum class Codec : uint8_t { kNil, kBoolean, kNumber, kString, kHash, kUrl, kVector3, kMatrix4, kNone };
+enum class Codec : uint8_t { kNil, kBoolean, kNumber, kString, kBytes, kHash, kUrl, kVector3, kMatrix4, kNone };
 enum class Disposition : uint8_t { kCandidate, kBlocked };
 enum class Context : uint8_t { kGameObject, kGui, kRender };
 struct Route { uint16_t index; uint16_t candidateIndex; uint32_t stableId; const char* canonicalId; const char* modulePath; const char* member; const char* sourcePath; const char* sourceSymbol; Disposition disposition; Codec resultCodec; Context context; const char* blocker; };

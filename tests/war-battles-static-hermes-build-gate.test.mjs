@@ -282,6 +282,20 @@ test("link stage stages a temporary extension and consumes Bob output", async ()
   );
   const authoredBytes = await readFile(authoredUnit);
   const fakeJava = path.join(output, "fake-java");
+  const projectLock = JSON.parse(
+    await readFile(path.join(root, "examples/war-battles-online/defold/deherm.lock"), "utf8"),
+  );
+  const family = projectLock.artifacts.artifacts["native-artifacts"];
+  const asset = family.assets["arm64-osx"];
+  family.integrity = {
+    ...family.integrity,
+    "arm64-osx": {
+      asset: `${asset}.integrity.json`,
+      sha256: sha256("test-only publisher integrity reference"),
+    },
+  };
+  const projectLockPath = path.join(output, "deherm.lock");
+  await writeFile(projectLockPath, `${JSON.stringify(projectLock, null, 2)}\n`);
   await writeFile(
     fakeJava,
     `#!/bin/sh
@@ -304,6 +318,7 @@ exit 0
       shermes: path.join(root, "build/native/bin/shermes"),
       allowUnpinnedToolchain: true,
       typedNativeSource: path.join(root, "packages/static-hermes/src/generated/script-typed-native-bridge.ts"),
+      projectLock: projectLockPath,
       link: true,
       java: fakeJava,
       buildServer: "https://fake.invalid",

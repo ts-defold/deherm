@@ -140,6 +140,18 @@ void writeError(char* error, size_t capacity, const char* message) noexcept {
 
 }
 
+struct ScriptAdapter::ProtectedDispatchContext {
+  ScriptAdapter* adapter;
+  ScriptCallFrame* frame;
+  bool ok;
+};
+
+struct ScriptAdapter::ProtectedInstanceContext {
+  ScriptAdapter* adapter;
+  int reference;
+  bool ok;
+};
+
 ScriptAdapter::ScriptAdapter() : luaHandles_(kLuaHandleCapacity) {
   structuredFunctionRefs_.fill(LUA_NOREF);
   fixedTupleFunctionRefs_.fill(LUA_NOREF);
@@ -406,12 +418,97 @@ void ScriptAdapter::detachInstance() noexcept {
   }
 }
 
+int ScriptAdapter::ProtectedCaptureCurrentInstance(lua_State* state) {
+  auto* context = static_cast<ProtectedInstanceContext*>(lua_touserdata(state, 1));
+  context->adapter->instanceApi_.get(state);
+  if (lua_isnil(state, -1)) {
+    lua_pop(state, 1);
+    context->reference = LUA_REFNIL;
+    context->ok = true;
+    return 0;
+  }
+  context->reference = luaL_ref(state, LUA_REGISTRYINDEX);
+  context->ok = context->reference != LUA_NOREF;
+  return 0;
+}
+
+int ScriptAdapter::ProtectedRestoreCurrentInstance(lua_State* state) {
+  auto* context = static_cast<ProtectedInstanceContext*>(lua_touserdata(state, 1));
+  if (context->reference == LUA_REFNIL) lua_pushnil(state);
+  else lua_rawgeti(state, LUA_REGISTRYINDEX, context->reference);
+  context->adapter->instanceApi_.set(state);
+  if (context->reference != LUA_REFNIL) luaL_unref(state, LUA_REGISTRYINDEX, context->reference);
+  context->reference = LUA_NOREF;
+  context->ok = true;
+  return 0;
+}
+
+int ScriptAdapter::ProtectedDispatch(lua_State* state) {
+  auto* context = static_cast<ProtectedDispatchContext*>(lua_touserdata(state, 1));
+  context->ok = context->adapter->dispatchUnsafe(context->frame);
+  return 0;
+}
+
 bool ScriptAdapter::dispatch(ScriptCallFrame* frame) noexcept {
   if (!frame) return fail("Defold script call frame is null");
+  if (!state_) return fail("Defold script adapter is not initialized");
   adapterError_[0] = '\0';
   frame->resultCount = 0;
   frame->stringScratchUsed = 0;
   frame->tableScratchUsed = 0;
+
+  const int top = lua_gettop(state_);
+  const bool scoped = hasSelectedContext() && instanceApi_.get && instanceApi_.set &&
+      instanceRef_ != LUA_NOREF && instanceRef_ != LUA_REFNIL;
+  ProtectedInstanceContext instanceContext{this, LUA_NOREF, false};
+  bool ok = true;
+  if (scoped) {
+    const int captureStatus = lua_cpcall(state_, ProtectedCaptureCurrentInstance, &instanceContext);
+    if (captureStatus != 0) {
+      fail(lua_type(state_, -1) == LUA_TSTRING
+          ? lua_tostring(state_, -1)
+          : "capturing current Defold script instance failed");
+      ok = false;
+    }
+    lua_settop(state_, top);
+    if (ok && !instanceContext.ok) ok = fail("capturing current Defold script instance failed");
+  }
+
+  ProtectedDispatchContext dispatchContext{this, frame, false};
+  if (ok) {
+    const int dispatchStatus = lua_cpcall(state_, ProtectedDispatch, &dispatchContext);
+    if (dispatchStatus != 0) {
+      fail(lua_type(state_, -1) == LUA_TSTRING
+          ? lua_tostring(state_, -1)
+          : "protected Defold script dispatch failed");
+      ok = false;
+    } else {
+      ok = dispatchContext.ok;
+    }
+    lua_settop(state_, top);
+  }
+
+  if (scoped && instanceContext.reference != LUA_NOREF) {
+    instanceContext.ok = false;
+    const int restoreStatus = lua_cpcall(state_, ProtectedRestoreCurrentInstance, &instanceContext);
+    if (restoreStatus != 0 || !instanceContext.ok) {
+      fail(lua_type(state_, -1) == LUA_TSTRING
+          ? lua_tostring(state_, -1)
+          : "restoring current Defold script instance failed");
+      ok = false;
+    }
+    lua_settop(state_, top);
+  }
+  lua_settop(state_, top);
+  if (!ok) {
+    frame->resultCount = 0;
+    frame->stringScratchUsed = 0;
+    frame->tableScratchUsed = 0;
+  }
+  return ok;
+}
+
+bool ScriptAdapter::dispatchUnsafe(ScriptCallFrame* frame) noexcept {
 
   drainReleasedHandles();
   const auto valueStatus = value_binding::dispatch(
@@ -485,7 +582,6 @@ bool ScriptAdapter::dispatch(ScriptCallFrame* frame) noexcept {
   }
 
   ScalarCallArena arena;
-  ScalarCallArena::Frame arenaFrame(arena);
   auto arguments = arena.allocateSpan<ScalarInput>(frame->argumentCount);
   if (frame->argumentCount != 0 && !arguments.data) {
     return fail("Defold script scalar call-local arena is exhausted");
@@ -894,8 +990,11 @@ bool ScriptAdapter::pushStructuredValue(
       lua_pushnumber(state_, value.number);
       return true;
     case ScriptValueTag::kString:
+    case ScriptValueTag::kBytes:
       if (value.length != 0 && !value.data) {
-        return fail("Structured Lua string data is null for a non-empty value");
+        return fail(value.tag == ScriptValueTag::kBytes
+            ? "Structured Lua byte data is null for a non-empty value"
+            : "Structured Lua string data is null for a non-empty value");
       }
       lua_pushlstring(state_,
           value.data ? static_cast<const char*>(value.data) : "",

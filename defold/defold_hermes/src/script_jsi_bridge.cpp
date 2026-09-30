@@ -385,6 +385,30 @@ void encode(
     return;
   }
   auto object = value.asObject(runtime);
+  if (object.isUint8Array(runtime)) {
+    auto array = object.getUint8Array(runtime);
+    auto buffer = array.buffer(runtime);
+    if (buffer.detached(runtime)) throw jsi::JSError(runtime, "Defold byte input is detached");
+    const size_t offset = array.byteOffset(runtime);
+    const size_t length = array.byteLength(runtime);
+    if (offset > buffer.size(runtime) || length > buffer.size(runtime) - offset || length > UINT32_MAX) {
+      throw jsi::JSError(runtime, "Defold byte input has an invalid ABI range");
+    }
+    output.tag = ScriptValueTag::kBytes;
+    output.length = static_cast<uint32_t>(length);
+    output.data = buffer.data(runtime) + offset;
+    return;
+  }
+  if (object.isArrayBuffer(runtime)) {
+    auto buffer = object.getArrayBuffer(runtime);
+    if (buffer.detached(runtime)) throw jsi::JSError(runtime, "Defold byte input is detached");
+    const size_t length = buffer.size(runtime);
+    if (length > UINT32_MAX) throw jsi::JSError(runtime, "Defold byte input exceeds ABI size");
+    output.tag = ScriptValueTag::kBytes;
+    output.length = static_cast<uint32_t>(length);
+    output.data = buffer.data(runtime);
+    return;
+  }
   const auto urlKindValue = object.getProperty(runtime, kDefoldUrlProperty);
   if (urlKindValue.isBool() && urlKindValue.getBool()) {
     const auto socketValue = object.getProperty(runtime, "socket");
@@ -558,6 +582,8 @@ jsi::Value decode(
     case ScriptValueTag::kString:
       return jsi::String::createFromUtf8(
           runtime, static_cast<const uint8_t*>(value.data), value.length);
+    case ScriptValueTag::kBytes:
+      throw jsi::JSError(runtime, "Defold script bridge returned an unsupported byte span");
     case ScriptValueTag::kHandle:
       if (value.handleKind == ScriptHandleKind::kHash) {
         return jsi::Value(runtime, jsi::BigInt::fromUint64(runtime, value.payload));

@@ -48,6 +48,7 @@ ScriptValue vector3() { ScriptValue value{}; value.tag = ScriptValueTag::kDefold
 ScriptValue number() { ScriptValue value{}; value.tag = ScriptValueTag::kNumber; return value; }
 ScriptValue boolean() { ScriptValue value{}; value.tag = ScriptValueTag::kBoolean; return value; }
 ScriptValue string() { ScriptValue value{}; value.tag = ScriptValueTag::kString; value.data = "x"; value.length = 1; return value; }
+ScriptValue bytes() { static const unsigned char valueBytes[] = {0x00, 0x80, 0xff}; ScriptValue value{}; value.tag = ScriptValueTag::kBytes; value.data = valueBytes; value.length = sizeof(valueBytes); return value; }
 }  // namespace
 
 int main() {
@@ -98,6 +99,9 @@ int main() {
     "wrong image.TYPE codec called the backend");
   Storage imageCall(imageType->stableId); imageCall.frame.argumentCount = 6;
   imageCall.arguments = {string(), number(), number(), string(), string(), boolean()};
+  expect(tail::dispatch(&imageCall.frame, imageCall.error.data(), imageCall.error.size(), &api) == tail::DispatchStatus::kError,
+    "UTF-8 text was accepted for a byte-exact texture payload");
+  imageCall.arguments[4] = bytes();
   backend.wrongResult = false;
   expect(tail::dispatch(&imageCall.frame, imageCall.error.data(), imageCall.error.size(), &api) == tail::DispatchStatus::kSuccess,
     "string-compatible image.TYPE candidate was rejected");

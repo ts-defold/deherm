@@ -11,6 +11,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <cstring>
 
 extern "C" {
 #include <dmsdk/lua/lauxlib.h>
@@ -246,6 +247,58 @@ bool NeverInvoke(void*, const defold_hermes::ScriptCallFrame*, void*,
     defold_hermes::ScriptCallbackConsume, char*, size_t) noexcept { return false; }
 void NoopReference(void*) noexcept {}
 
+struct BridgeHarness {
+  defold_hermes::ScriptBridgeApi delegate{};
+  uint32_t byteCalls = 0;
+  std::string error;
+};
+
+bool DispatchHarness(void* raw, defold_hermes::ScriptCallFrame* frame) {
+  auto* harness = static_cast<BridgeHarness*>(raw);
+  if (frame && frame->stableId == UINT32_C(0xf6c4cfba)) {
+    static constexpr unsigned char expected[] = {0x00, 0x80, 0xff, 0x41};
+    if (frame->argumentCount != 6 || !frame->arguments ||
+        frame->arguments[4].tag != defold_hermes::ScriptValueTag::kBytes ||
+        frame->arguments[4].length != sizeof(expected) ||
+        !frame->arguments[4].data ||
+        std::memcmp(frame->arguments[4].data, expected, sizeof(expected)) != 0) {
+      harness->error = "texture payload did not cross JSI as exact bytes";
+      return false;
+    }
+    ++harness->byteCalls;
+    if (!frame->results || frame->resultCapacity == 0) {
+      harness->error = "texture result storage is unavailable";
+      return false;
+    }
+    frame->results[0] = {};
+    frame->results[0].tag = defold_hermes::ScriptValueTag::kBoolean;
+    frame->results[0].number = 1;
+    frame->resultCount = 1;
+    return true;
+  }
+  return harness->delegate.dispatch(harness->delegate.context, frame);
+}
+
+const char* LastHarnessError(void* raw) {
+  auto* harness = static_cast<BridgeHarness*>(raw);
+  return harness->error.empty() ? harness->delegate.lastError(harness->delegate.context) : harness->error.c_str();
+}
+
+void ReleaseHarnessHandle(
+    void* raw,
+    defold_hermes::ScriptHandleKind kind,
+    uint32_t runtime,
+    uint64_t payload) noexcept {
+  auto* harness = static_cast<BridgeHarness*>(raw);
+  if (harness->delegate.releaseHandle) {
+    harness->delegate.releaseHandle(harness->delegate.context, kind, runtime, payload);
+  }
+}
+
+defold_hermes::ScriptBridgeApi HarnessApi(BridgeHarness& harness) {
+  return {&harness, DispatchHarness, LastHarnessError, ReleaseHarnessHandle};
+}
+
 }  // namespace
 
 int main(int argc, char** argv) {
@@ -297,7 +350,8 @@ int main(int argc, char** argv) {
   if (!adapter.captureInstance(-1)) Fail(adapter.lastError());
   lua_pop(state, 1);
   const int baseTop = lua_gettop(state);
-  defold_hermes::installScriptBridgeApi(adapter.api());
+  BridgeHarness bridgeHarness{adapter.api()};
+  defold_hermes::installScriptBridgeApi(HarnessApi(bridgeHarness));
 
   defold_hermes::ScriptCallback ineligibleCallback{
     nullptr, NeverInvoke, NoopReference, NoopReference};
@@ -335,7 +389,8 @@ int main(int argc, char** argv) {
   lua_pushnumber(state, 42);
   if (!adapter.captureInstance(-1)) Fail(adapter.lastError());
   lua_pop(state, 1);
-  defold_hermes::installScriptBridgeApi(adapter.api());
+  bridgeHarness.delegate = adapter.api();
+  defold_hermes::installScriptBridgeApi(HarnessApi(bridgeHarness));
 
   const char savePath[] = "state";
   defold_hermes::ScriptTableEntry invalidMapEntry{};
@@ -404,6 +459,7 @@ int main(int argc, char** argv) {
   if (lua_gettop(state) != baseTop) Fail("Lua stack was not restored");
   if (gObservedCalls != 27) Fail("unexpected number of Lua calls");
   if (gTitle != "deherm") Fail("void scalar call did not execute");
+  if (bridgeHarness.byteCalls != 2) Fail("Uint8Array and ArrayBuffer did not both cross the JSI byte carrier");
 
     runtime.finalize();
   }

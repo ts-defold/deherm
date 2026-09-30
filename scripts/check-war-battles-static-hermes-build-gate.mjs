@@ -8,7 +8,7 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { existsSync } from "node:fs";
-import { chmod, cp, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { chmod, cp, copyFile, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { spawnSync } from "node:child_process";
 import os from "node:os";
 import path from "node:path";
@@ -451,6 +451,7 @@ function localServer(url) {
 
 async function stageTypedNativeProject({
   project,
+  projectLock,
   emittedC,
   emittedApplicationC,
   bobJar,
@@ -468,6 +469,11 @@ async function stageTypedNativeProject({
       );
     },
   });
+  // The provenance stage may be asked to verify a lock outside the authored
+  // project (tests and release reconstruction both use this). The disposable
+  // link project must consume those exact verified bytes rather than silently
+  // falling back to project/deherm.lock.
+  await copyFile(projectLock, path.join(stagedRoot, "deherm.lock"));
   const extension = path.join(stagedRoot, "defold_hermes_typed_native");
   const templatePath = path.join(extension, "src/deherm_typed_native_unit.cpp");
   const template = await readFile(templatePath, "utf8");
@@ -511,10 +517,11 @@ async function stageTypedNativeProject({
   const lock = JSON.parse(await readFile(path.join(stagedRoot, "deherm.lock"), "utf8"));
   const family = lock.artifacts?.artifacts?.["native-artifacts"];
   const asset = family?.assets?.[resolvedTarget.extenderTarget];
+  const integrityReference = family?.integrity?.[resolvedTarget.extenderTarget];
   const members = (family?.contents?.[resolvedTarget.extenderTarget] ?? []).filter(
     (member) => member === "libhermes.a" || member === "libhermes.debug.a" || member === "libhermesvm-config.h",
   );
-  if (!family?.tag || !asset || members.length === 0) {
+  if (!family?.tag || !asset || members.length === 0 || !/^[a-f0-9]{64}$/u.test(integrityReference?.sha256 ?? "")) {
     throw gateError(
       "native-artifact-unavailable",
       `staged project has no locked Hermes artifact mapping for ${resolvedTarget.extenderTarget}`,
@@ -550,6 +557,7 @@ async function stageTypedNativeProject({
         fingerprint: family.fingerprint,
         asset,
         assetSha256: sha256(await readFile(archive)),
+        integritySha256: integrityReference.sha256,
         members,
         hashes,
       },
@@ -1181,6 +1189,7 @@ export async function buildGate(rawOptions = {}) {
         } else {
           const staged = await stageTypedNativeProject({
             project: options.project,
+            projectLock: options.projectLock,
             emittedC: emittedCPath,
             emittedApplicationC: emittedApplicationCPath,
             bobJar: defaultPaths.bob,
@@ -1239,6 +1248,7 @@ export async function buildGate(rawOptions = {}) {
       } else {
         const staged = await stageTypedNativeProject({
           project: options.project,
+          projectLock: options.projectLock,
           emittedC: emittedCPath,
           emittedApplicationC: emittedApplicationCPath,
           bobJar: defaultPaths.bob,

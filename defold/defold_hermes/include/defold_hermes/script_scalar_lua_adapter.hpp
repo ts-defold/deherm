@@ -57,6 +57,12 @@ class ScriptAdapter {
   ScriptBridgeApi api() noexcept;
 
  private:
+  struct ProtectedDispatchContext;
+  struct ProtectedInstanceContext;
+  static int ProtectedDispatch(lua_State* state);
+  static int ProtectedCaptureCurrentInstance(lua_State* state);
+  static int ProtectedRestoreCurrentInstance(lua_State* state);
+  bool dispatchUnsafe(ScriptCallFrame* frame) noexcept;
   static bool DispatchThunk(void* context, ScriptCallFrame* frame) noexcept;
   static const char* ErrorThunk(void* context) noexcept;
   static void ReleaseHandleThunk(

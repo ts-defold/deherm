@@ -2371,7 +2371,7 @@ struct DecodeContext {
     if (depth > DEHERM_SCRIPT_UNIVERSAL_MAX_DEPTH) return reject(DEHERM_SCRIPT_UNIVERSAL_INVALID_VALUE, "Universal wire value graph exceeds the depth bound");
     const auto& wire = values[index];
     *output = {};
-    if (wire.tag > static_cast<uint8_t>(ScriptValueTag::kDefoldValue)) {
+    if (wire.tag > static_cast<uint8_t>(ScriptValueTag::kBytes)) {
       return reject(DEHERM_SCRIPT_UNIVERSAL_INVALID_VALUE, "Universal wire value tag is invalid");
     }
     output->tag = static_cast<ScriptValueTag>(wire.tag);
@@ -2389,6 +2389,13 @@ struct DecodeContext {
       case ScriptValueTag::kString:
         if (!span(wire.data_offset, wire.length, stringBytes) || (wire.length && !strings)) {
           return reject(DEHERM_SCRIPT_UNIVERSAL_INVALID_VALUE, "Universal wire string span is invalid");
+        }
+        output->length = wire.length;
+        output->data = strings ? strings + wire.data_offset : nullptr;
+        return true;
+      case ScriptValueTag::kBytes:
+        if (!span(wire.data_offset, wire.length, stringBytes) || (wire.length && !strings)) {
+          return reject(DEHERM_SCRIPT_UNIVERSAL_INVALID_VALUE, "Universal wire byte span is invalid");
         }
         output->length = wire.length;
         output->data = strings ? strings + wire.data_offset : nullptr;
@@ -2611,6 +2618,8 @@ struct EncodeContext {
       }
       case ScriptValueTag::kCallback:
         return reject(DEHERM_SCRIPT_UNIVERSAL_INVALID_VALUE, "Universal backend returned an unsupported callback");
+      case ScriptValueTag::kBytes:
+        return reject(DEHERM_SCRIPT_UNIVERSAL_INVALID_VALUE, "Universal backend returned bytes for a non-byte result");
     }
     return reject(DEHERM_SCRIPT_UNIVERSAL_INVALID_VALUE, "Universal backend returned an unknown tag");
   }

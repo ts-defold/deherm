@@ -207,7 +207,12 @@ var LibraryDefoldHermesScriptUniversalValue = {
           HEAPU8[pointer] = 6; HEAPU8[pointer + 3] = callback.type; HEAPU32[(pointer + 28) >> 2] = callback.runtime;
           bridge.writeU64(pointer + 16, (BigInt(callback.generation) << BigInt(32)) | BigInt(callback.slot));
         } else if (typeof value === 'object') {
-          if (value.__dehermHandleV1 === true) {
+          if (value instanceof Uint8Array || value instanceof ArrayBuffer) {
+            var byteView = value instanceof Uint8Array ? value : new Uint8Array(value);
+            if (byteView.length > stringCapacity - state.string) throw new RangeError('Universal browser callback byte arena is exhausted');
+            HEAPU8.set(byteView, strings + state.string);
+            HEAPU8[pointer] = 9; HEAPU32[(pointer + 4) >> 2] = byteView.length; HEAPU32[(pointer + 24) >> 2] = state.string; state.string += byteView.length;
+          } else if (value.__dehermHandleV1 === true) {
             if (!Number.isInteger(value.kind) || value.kind < 1 || value.kind > 5 || !Number.isInteger(value.runtime) || value.runtime < 0 || typeof value.payload !== 'bigint') throw new TypeError('Universal callback handle is malformed');
             HEAPU8[pointer] = 5; HEAPU8[pointer + 1] = value.kind; HEAPU8[pointer + 3] = value.semanticKind || 0;
             HEAPU32[(pointer + 28) >> 2] = value.runtime; bridge.writeU64(pointer + 16, value.payload);
@@ -319,7 +324,12 @@ var LibraryDefoldHermesScriptUniversalValue = {
             HEAPU8[pointer] = 6; HEAPU8[pointer + 3] = callback.type; HEAPU32[(pointer + 28) >> 2] = callback.runtime;
             bridge.writeU64(pointer + 16, (BigInt(callback.generation) << BigInt(32)) | BigInt(callback.slot));
           } else if (typeof value === 'object') {
-            if (value.__dehermHandleV1 === true) {
+            if (value instanceof Uint8Array || value instanceof ArrayBuffer) {
+              var byteView = value instanceof Uint8Array ? value : new Uint8Array(value);
+              if (byteView.length > bridge.maximumStringBytes - state.string) throw new RangeError('Universal browser byte arena is exhausted');
+              HEAPU8.set(byteView, strings + state.string);
+              HEAPU8[pointer] = 9; HEAPU32[(pointer + 4) >> 2] = byteView.length; HEAPU32[(pointer + 24) >> 2] = state.string; state.string += byteView.length;
+            } else if (value.__dehermHandleV1 === true) {
               if (!Number.isInteger(value.kind) || value.kind < 1 || value.kind > 5 || !Number.isInteger(value.runtime) || value.runtime < 0 || typeof value.payload !== 'bigint') throw new TypeError('Universal handle is malformed');
               HEAPU8[pointer] = 5; HEAPU8[pointer + 1] = value.kind; HEAPU8[pointer + 3] = value.semanticKind || 0;
               HEAPU32[(pointer + 28) >> 2] = value.runtime; bridge.writeU64(pointer + 16, value.payload);

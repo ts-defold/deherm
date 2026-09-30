@@ -37,6 +37,7 @@ extern "C" {
 namespace scalar = defold_hermes::lua_bridge::scalar;
 namespace handle = defold_hermes::script_handle_lowering;
 using defold_hermes::ScriptCallFrame;
+using defold_hermes::ScriptBridgeApi;
 using defold_hermes::ScriptDefoldValueKind;
 using defold_hermes::ScriptHandleKind;
 using defold_hermes::ScriptMatrix4Arena;
@@ -75,6 +76,15 @@ void* gGameObjectInstance = nullptr;
 void* gGuiInstance = nullptr;
 void* gRenderInstance = nullptr;
 void* gPreviousInstance = nullptr;
+
+struct LuaAllocatorControl { bool failNextGrowth = false; uint64_t calls = 0; };
+void* fixtureLuaAllocator(void* raw, void* pointer, size_t, size_t newSize) {
+  auto* control = static_cast<LuaAllocatorControl*>(raw);
+  ++control->calls;
+  if (newSize == 0) { std::free(pointer); return nullptr; }
+  if (control->failNextGrowth) { control->failNextGrowth = false; return nullptr; }
+  return std::realloc(pointer, newSize);
+}
 
 std::string jsonString(const char* value) {
   std::string out="\"";for(const unsigned char byte:std::string(value?value:"")){if(byte=='\"'||byte=='\\'){out+='\\';out+=static_cast<char>(byte);}else if(byte=='\n')out+="\\n";else if(byte=='\r')out+="\\r";else if(byte=='\t')out+="\\t";else if(byte<0x20){char escaped[7];std::snprintf(escaped,sizeof(escaped),"\\u%04x",byte);out+=escaped;}else out+=static_cast<char>(byte);}return out+="\"";
@@ -377,7 +387,7 @@ std::string scriptSpec(const ScriptValue& value,uint32_t shapeIndex,uint32_t see
     case DEHERM_RECORDING_SHAPE_NULL:return value.tag==ScriptValueTag::kNull?"null":"wrong";
     case DEHERM_RECORDING_SHAPE_BOOLEAN:return value.tag==ScriptValueTag::kBoolean?(value.number?"bool:1":"bool:0"):"wrong";
     case DEHERM_RECORDING_SHAPE_NUMBER:if(value.tag!=ScriptValueTag::kNumber)return"wrong";out="num:";appendNumber(value.number,out);return out;
-    case DEHERM_RECORDING_SHAPE_STRING:if(value.tag!=ScriptValueTag::kString)return"wrong";out="str:";out.append(static_cast<const char*>(value.data),value.length);return out;
+    case DEHERM_RECORDING_SHAPE_STRING:if(value.tag!=ScriptValueTag::kString&&value.tag!=ScriptValueTag::kBytes)return"wrong";out="str:";out.append(static_cast<const char*>(value.data),value.length);return out;
     case DEHERM_RECORDING_SHAPE_HASH:if(value.handleKind!=ScriptHandleKind::kHash)return"wrong";out="hash:";appendU64(value.payload,out);return out;
     case DEHERM_RECORDING_SHAPE_URL:{if(value.handleKind!=ScriptHandleKind::kUrl||!value.data)return"wrong";const auto* slot=static_cast<const ScriptUrlArena<>::Slot*>(value.data);out="url:";appendU64(slot->value.socket,out);out+=",";appendU64(slot->value.reserved,out);out+=",";appendU64(slot->value.path,out);out+=",";appendU64(slot->value.fragment,out);return out;}
     case DEHERM_RECORDING_SHAPE_HANDLE:
@@ -396,8 +406,13 @@ std::string scriptSpec(const ScriptValue& value,uint32_t shapeIndex,uint32_t see
 }
 }
 
-struct Runtime { lua_State* state=nullptr; const handle::RuntimeProfile* profile=nullptr; std::unique_ptr<scalar::ScriptAdapter> adapter; };
-Runtime makeRuntime(const handle::RuntimeProfile& profile){Runtime runtime;runtime.state=luaL_newstate();runtime.profile=&profile;runtime.adapter=std::make_unique<scalar::ScriptAdapter>();expect(runtime.state!=nullptr,"lua-state-create",0,"");luaL_openlibs(runtime.state);installProviders(runtime.state);expect(lua_gettop(runtime.state)==0,"provider-install-stack-leak",0,"");lua_pushlightuserdata(runtime.state,gPreviousInstance);SetInstance(runtime.state);expect(runtime.adapter->initialize(runtime.state,{GetInstance,SetInstance},handle::runtimeProfileHandshake(profile)),"adapter-initialize",0,runtime.adapter->lastError());return runtime;}
+struct Runtime { std::unique_ptr<LuaAllocatorControl> allocator; lua_State* state=nullptr; const handle::RuntimeProfile* profile=nullptr; std::unique_ptr<scalar::ScriptAdapter> adapter; };
+Runtime makeRuntime(const handle::RuntimeProfile& profile){Runtime runtime;runtime.allocator=std::make_unique<LuaAllocatorControl>();runtime.state=lua_newstate(fixtureLuaAllocator,runtime.allocator.get());runtime.profile=&profile;runtime.adapter=std::make_unique<scalar::ScriptAdapter>();expect(runtime.state!=nullptr,"lua-state-create",0,"");luaL_openlibs(runtime.state);installProviders(runtime.state);expect(lua_gettop(runtime.state)==0,"provider-install-stack-leak",0,"");lua_pushlightuserdata(runtime.state,gPreviousInstance);SetInstance(runtime.state);expect(runtime.adapter->initialize(runtime.state,{GetInstance,SetInstance},handle::runtimeProfileHandshake(profile)),"adapter-initialize",0,runtime.adapter->lastError());return runtime;}
+
+bool guardedDispatch(const ScriptBridgeApi& api, ScriptCallFrame* frame, bool* returned) {
+  struct Guard { bool* returned; ~Guard(){*returned=true;} } guard{returned};
+  return api.dispatch(api.context,frame);
+}
 
 int main(){
   int gameObject=0,gui=0,render=0,previous=0;gGameObjectInstance=&gameObject;gGuiInstance=&gui;gRenderInstance=&render;gPreviousInstance=&previous;
@@ -412,6 +427,7 @@ int main(){
     expect(gActiveArgumentCount<=descriptor.argumentCount,"adapter-arity-exceeds-projection",route,"");
     for(uint32_t i=0;i<gActiveArgumentCount;++i){
       storage.arguments[i]=buildValue(adapter,state,storage,kDehermRecordingShapeRefs[descriptor.argumentFirst+i],i+1);
+      if((descriptor.byteArgumentMask&(UINT32_C(1)<<i))!=0){expect(storage.arguments[i].tag==ScriptValueTag::kString,"byte-argument-source-shape",route,"");storage.arguments[i].tag=ScriptValueTag::kBytes;}
     }
     expect(currentInstance(state)==gPreviousInstance,"argument-build-instance-drift",route,"");
     ScriptCallFrame frame{};frame.stableId=descriptor.stableId;frame.arguments=storage.arguments.data();frame.argumentCount=gActiveArgumentCount;frame.results=storage.results.data();frame.resultCapacity=storage.results.size();frame.stringScratch=storage.strings.data();frame.stringScratchCapacity=storage.strings.size();frame.tableScratch=storage.tables.data()+storage.tableUsed;frame.tableScratchCapacity=storage.tables.size()-storage.tableUsed;frame.urlArena=&storage.urls;frame.matrix4Arena=&storage.matrices;
@@ -427,6 +443,10 @@ int main(){
   // A fresh adapter must reject a missing exact member and restore the stack.
   uint32_t probe=DEHERM_RECORDING_ROUTE_COUNT;for(uint32_t route=0;route<DEHERM_RECORDING_ROUTE_COUNT;++route)if(kDehermRecordingRoutes[route].luaAdapterStatus==DEHERM_RECORDING_STATUS_EXERCISE&&!handle::find(kDehermRecordingRoutes[route].stableId)){probe=route;break;}expect(probe<DEHERM_RECORDING_ROUTE_COUNT,"negative-probe-route",0,"");const auto* operation=defold_hermes::universal_value::find(kDehermRecordingRoutes[probe].stableId);expect(operation!=nullptr,"negative-probe-operation",probe,"");
   lua_State* state=defaultRuntime->state;ensureModule(state,operation->modulePath);lua_pushnil(state);lua_setfield(state,-2,operation->member);lua_pop(state,1);scalar::ScriptAdapter missing;expect(missing.initialize(state,{GetInstance,SetInstance},handle::runtimeProfileHandshake(*defaultRuntime->profile)),"negative-adapter-init",probe,missing.lastError());const int negativeTop=lua_gettop(state);ScriptCallFrame absent{};absent.stableId=kDehermRecordingRoutes[probe].stableId;expect(!missing.api().dispatch(missing.api().context,&absent),"missing-member-not-rejected",probe,"");expect(lua_gettop(state)==negativeTop,"missing-member-stack-not-restored",probe,"");missing.shutdown();
-  std::printf("{\"schema\":\"deherm-script-lua-exact-result/v1\",\"installed\":%u,\"exercised\":%u,\"skipped\":%u,\"stackRestored\":true,\"failureProbe\":\"missing-exact-member\"}\n",DEHERM_RECORDING_ROUTE_COUNT,exercised,skipped);
+  // Force Lua's allocator to fail while a unique string argument is being
+  // pushed. The adapter must turn the protected Lua longjmp into false, restore
+  // the stack/current instance, and return through the ordinary C++ frame.
+  constexpr uint32_t allocationProbeId=UINT32_C(161653622);std::array<char,8193> uniqueBytes{};for(size_t i=0;i+1<uniqueBytes.size();++i)uniqueBytes[i]=static_cast<char>('a'+(i%23));ScriptValue allocationArgument{};allocationArgument.tag=ScriptValueTag::kString;allocationArgument.data=uniqueBytes.data();allocationArgument.length=uniqueBytes.size()-1;ScriptCallFrame allocationFrame{};allocationFrame.stableId=allocationProbeId;allocationFrame.arguments=&allocationArgument;allocationFrame.argumentCount=1;const int allocationTop=lua_gettop(state);bool returned=false;defaultRuntime->allocator->failNextGrowth=true;const auto allocationApi=defaultRuntime->adapter->api();expect(!guardedDispatch(allocationApi,&allocationFrame,&returned),"allocator-failure-not-rejected",0,"");expect(returned,"allocator-longjmp-crossed-cxx-frame",0,"");expect(lua_gettop(state)==allocationTop,"allocator-failure-stack-not-restored",0,"");expect(currentInstance(state)==gPreviousInstance,"allocator-failure-instance-not-restored",0,"");expect(std::strlen(defaultRuntime->adapter->lastError())!=0,"allocator-failure-error-missing",0,"");
+  std::printf("{\"schema\":\"deherm-script-lua-exact-result/v1\",\"installed\":%u,\"exercised\":%u,\"skipped\":%u,\"stackRestored\":true,\"failureProbe\":\"missing-exact-member+allocator-longjmp\"}\n",DEHERM_RECORDING_ROUTE_COUNT,exercised,skipped);
   for(auto& runtime:runtimes){runtime.adapter->shutdown();lua_close(runtime.state);}std::puts("script-lua-exact:ok");return 0;
 }

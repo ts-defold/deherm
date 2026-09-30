@@ -55,7 +55,7 @@ test("authenticated policy materializes the complete generated SDK without a Def
   const cacheRoot = await mkdtemp(path.join(tmpdir(), "deherm-policy-surface-test-"));
   const outputRoot = path.join(cacheRoot, "surfaces", policy.revision);
   const first = await materializePolicySurface(policy, { outputRoot });
-  assert.equal(first.descriptor.documents.length, 22);
+  assert.equal(first.descriptor.documents.length, 23);
   assert.equal(first.descriptor.schemaVersion, 2);
   assert.match(first.descriptor.policyRoot, /^[0-9a-f]{64}$/u);
   assert.match(first.descriptor.compilerObjectSha256, /^[0-9a-f]{64}$/u);
@@ -72,6 +72,7 @@ test("authenticated policy materializes the complete generated SDK without a Def
     "defold-script-api-ir.json",
     "defold-script-sdk-documentation.json",
     "defold-script-handle-lowering.json",
+    "defold-script-value-tail-bindings.json",
   ]);
   assert.deepEqual(compiler.value.sdk.entries["script/modules.ts"].inputs, [
     "defold-script-api-ir.json",
@@ -146,9 +147,15 @@ test("authenticated policy materializes the complete generated SDK without a Def
     bytesByMode[first.descriptor.sdk[relative].mode === "render-and-verify" ? "rendered" : "snapshots"] +=
       actual.length;
   }
+  const scriptTypes = await readFile(path.join(outputRoot, "sdk", "generated", "script", "types.ts"), "utf8");
+  assert.match(
+    scriptTypes,
+    /buffer: Uint8Array \| ArrayBuffer/,
+    "policy-only materialization must preserve the source-proven counted-byte carrier",
+  );
   assert.deepEqual(
     bytesByMode,
-    { rendered: 3_908_177, snapshots: 114_960 },
+    { rendered: 3_908_303, snapshots: 114_960 },
     "the local-emitter versus compatibility-snapshot migration debt changed",
   );
 

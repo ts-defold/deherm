@@ -92,14 +92,14 @@ declared plan input whose bytes no longer match the plan's own recorded hash.
 
 # Current census
 
-Generated for 915 callable routes across 82 distinct contracts and 504 distinct
+Generated for 1,056 callable/constant routes across 83 distinct contracts and 505 distinct
 marshalling programs:
 
 | Transport | Exercised | Skipped |
 |---|---|---|
-| `jsi` | 915 | 0 |
-| `direct-memory` | 890 | 25 |
-| `typed-native` | 890 | 25 |
+| `jsi` | 1,056 | 0 |
+| `direct-memory` | 1,031 | 25 |
+| `typed-native` | 1,031 | 25 |
 
 Every skip carries a machine-readable reason:
 
@@ -128,15 +128,15 @@ the registry capacity bound, and whole-registry invalidation. This is exact
 JavaScript/Wasm bridge evidence, not packaged Defold behavior.
 
 The canonical Dynamic-Hermes emitted partition is independently reported and
-must total 913 routes:
+must total 1,054 routes:
 
 | Exact twin | Routes | Current evidence |
 |---|---:|---|
-| Real Lua 5.1 through `ScriptAdapter::api()` | 882 | exact lookup, arguments, results, call count, stack restoration, instance restoration, and missing-member failure |
+| Real Lua 5.1 through `ScriptAdapter::api()` | 1,023 | exact lookup, arguments, results, call count, stack restoration, instance restoration, missing-member failure, and allocator-longjmp recovery |
 | Native POD specialization | 31 | generated real-Hermes exact driver executes the production adapter with exact stable-ID, argument, result, and failure-contract checks; deliberately not mislabeled as Lua-stack evidence |
 | Source/profile omission | 2 | omitted by the canonical profile and retained as machine-readable skips |
 
-The Lua companion still installs providers for all 915 routes. Its success line
+The Lua companion still installs providers for all 1,056 routes. Its success line
 uses `deherm-script-lua-exact-result/v1`; failures use
 `deherm-script-lua-exact-failure/v1` with a route index, stable generated code,
 and detail. GUI/render attachment here is test-fixture capability only. Product
@@ -153,7 +153,8 @@ schema-aware nested handle decoding separately from this exact description of
 the current bridge.
 
 Two formerly blocked value-tail codecs are now pinned to their concrete source
-contracts. `gui.set_texture_data` calls `luaL_checkstring(L, 4)` and accepts the
+contracts. `gui.set_texture_data` calls `luaL_checktype(L, 5, LUA_TSTRING)` and
+reads the counted payload with `lua_tolstring(L, 5, &buffer_size)`; it accepts the
 documented `rgb`, `rgba`, `l`, and `astc` string domain (including the
 string-compatible `image.TYPE` constants); its generated negative assertion
 forbids silently widening that slot to `Number`. `liveupdate.remove_mount`
@@ -161,17 +162,27 @@ stores `dmLiveUpdate::Result` and returns it with `lua_pushinteger`; its generat
 result codec is therefore the numeric/integer carrier for the exported
 `LIVEUPDATE_*` domain.
 
-The Lua signature does not prove byte-exact JavaScript transport. Dynamic JSI
-currently obtains the fourth `gui.set_texture_data` argument through UTF-8
-string conversion, so arbitrary bytes at or above `0x80` need a generated raw
-buffer carrier. [Issue #112](https://github.com/ts-defold/deherm/issues/112)
-tracks that transport correction and its non-ASCII exact-call fixture.
+The source-derived counted-string fact is preserved as a byte semantic instead
+of being narrowed to UTF-8 text. Public TypeScript accepts `Uint8Array |
+ArrayBuffer`; dynamic JSI borrows the exact bytes; the generated Lua adapter uses
+`lua_pushlstring`; and the direct-memory, browser/Wasm, and Static Hermes frame
+transports all carry the same byte tag and length. Exact fixtures include
+`00 80 ff 41`, so the evidence rejects both NUL truncation and UTF-8 rewriting.
+The sound-typed Static Hermes exact runner independently executes all 517 routes
+the canonical plan emits for that target; its route-aware argument planner
+constructs the counted-string slot as `DehermStaticBytes` while retaining the
+source Lua string shape. This is generated bridge/provider evidence, not a live
+Defold GUI-scene call.
 
-Normal value-tail calls execute through a protected Lua call, but some argument
-pushes still happen before that boundary. [Issue #110](https://github.com/ts-defold/deherm/issues/110)
-tracks moving every potentially allocating Lua-stack operation under protection
-and proving allocator-failure containment. This does not weaken the verified
-normal-call, stack-restoration, or zero-warmed-native-allocation evidence.
+Every potentially allocating Lua operation in `ScriptAdapter` now occurs inside
+one `lua_cpcall` boundary. The callback performs argument staging, target lookup,
+the protected member call, result conversion, stack restoration, and instance
+restoration without depending on C++ destructors across a Lua longjmp. The Lua
+exact harness installs a controllable allocator, forces OOM while staging a
+unique 8 KiB string, and proves the call fails closed, preserves stack/current
+instance state, runs no skipped destructor, and permits the next call to
+succeed. This closes the evidence gaps formerly tracked by issues #110 and
+#112; the issue links remain historical provenance, not current blockers.
 
 # Findings
 

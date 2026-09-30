@@ -5,6 +5,7 @@ import { spawnSync } from "node:child_process";
 
 import {
   materializeStaticScriptExactVectors,
+  planStaticScriptExactArgument,
   planStaticScriptExactValue,
 } from "../packages/compiler/src/script-static-exact-verification.mjs";
 import { renderStaticHermes } from "./generate-script-universal-value-bindings.mjs";
@@ -41,6 +42,8 @@ function valueExpression(value) {
       return `new DehermStaticNumber(${JSON.stringify(value.value)})`;
     case "string":
       return `new DehermStaticString(${JSON.stringify(value.value)})`;
+    case "bytes":
+      return `new DehermStaticBytes([${value.values.join(",")}])`;
     case "hash":
       return `new DehermStaticHandle(1,0,0,${value.low},${value.high})`;
     case "gui-node":
@@ -137,9 +140,20 @@ function exactPlan(shapeIndex, specification, seed) {
 
 const executions = vectors
   .map((vector, vectorIndex) => {
-    const arguments_ = vector.argumentShapes.map((shape, slot) =>
-      valueExpression(exactPlan(shape, vector.argumentValues[slot], slot + 1)),
-    );
+    const arguments_ = vector.argumentShapes.map((shape, slot) => {
+      const plan = planStaticScriptExactArgument(
+        recording,
+        shape,
+        slot + 1,
+        (vector.byteArgumentMask & (1 << slot)) !== 0,
+      );
+      assert.equal(
+        plan.specification,
+        vector.argumentValues[slot],
+        `Static Hermes exact runner argument plan drifted for ${vector.id} slot ${slot}`,
+      );
+      return valueExpression(plan);
+    });
     const resultPlans = vector.resultShapes.map((shape, slot) =>
       exactPlan(shape, vector.resultValues[slot], 257 + slot),
     );

@@ -23,6 +23,13 @@ const archivePath = path.join(root, "upstream", "ref-doc.zip");
 const generatedRoot = path.join(root, "packages", "sdk", "src", "generated", "script");
 const irPath = path.join(root, "packages", "bindings", "generated", "defold-script-api-ir.json");
 const documentationPath = path.join(root, "packages", "bindings", "generated", "defold-script-sdk-documentation.json");
+const valueTailPolicyPath = path.join(
+  root,
+  "packages",
+  "bindings",
+  "overrides",
+  "script-defold-value-tail-bindings.json",
+);
 const registrationSurfacePath = path.join(
   root,
   "packages",
@@ -767,16 +774,36 @@ export async function runScriptSdkGenerator({ semanticOnly = false } = {}) {
       ? "implemented-generated-lua-bridge"
       : "requires-universal-lua-bridge";
   }
-  const renderer = createTypeRenderer(model);
+  const typeModel = structuredClone(model);
+  const typeFunctionsById = new Map(typeModel.functions.map((fn) => [fn.id, fn]));
+  const valueTailPolicy = JSON.parse(await readFile(valueTailPolicyPath, "utf8"));
+  for (const family of valueTailPolicy.families ?? []) {
+    const binaryParameters = family.codecEvidence?.binaryParameters ?? [];
+    if (binaryParameters.length === 0) continue;
+    const ids = (family.sourceRoutes ?? []).flatMap(({ ids }) => ids);
+    for (const id of ids) {
+      const fn = typeFunctionsById.get(id);
+      assert.ok(fn, `${id}: binary parameter policy does not match the imported script API`);
+      for (const binary of binaryParameters) {
+        const parameter = fn.parameters[binary.index];
+        assert.equal(parameter?.rawName, binary.name, `${id}: binary parameter name is stale`);
+        assert.equal(parameter.rawType, "string", `${id}: binary parameter must originate as a Lua string`);
+        assert.equal(binary.carrier, "Uint8Array | ArrayBuffer", `${id}: binary carrier is unsupported`);
+        parameter.rawType = "bytes";
+        parameter.description = `${parameter.description ?? ""}${parameter.description ? " " : ""}${binary.note}`;
+      }
+    }
+  }
+  const renderer = createTypeRenderer(typeModel);
   assertUniquePublicScriptRoots(
     new Set([
-      ...model.functions.map(({ modulePath }) => modulePath[0]),
-      ...model.classes
+      ...typeModel.functions.map(({ modulePath }) => modulePath[0]),
+      ...typeModel.classes
         .filter(({ name }) => name.startsWith("defold_api."))
         .map(({ name }) => name.slice("defold_api.".length).split(".")[0]),
     ]),
   );
-  const trees = buildApiTrees(model);
+  const trees = buildApiTrees(typeModel);
 
   // Is a reviewed semantic handle type present at this revision?
   //
@@ -823,7 +850,7 @@ export async function runScriptSdkGenerator({ semanticOnly = false } = {}) {
       `semantic handle types withdrawn at ${defoldRevision} (absent from the archive): ${absentHandleTypes.sort().join(", ")}`,
     );
   }
-  const typesSource = generateTypes(model, renderer, trees, semanticHandleTypes);
+  const typesSource = generateTypes(typeModel, renderer, trees, semanticHandleTypes);
   const constantLowering = semanticOnly ? null : await loadScriptConstantPolicy(defoldRevision, trees);
   const unresolvedTypes = [...renderer.unresolved].sort();
   const ir = {

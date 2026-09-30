@@ -5,8 +5,8 @@
 
 #define DEHERM_RECORDING_SCHEMA_VERSION 2u
 #define DEHERM_RECORDING_DEFOLD_REVISION "7f0f554f41f9dce1e0ddff99bf08200657d1ee05"
-#define DEHERM_RECORDING_PLAN_SHA256 "d843a7ab0335b0faa22dcc454deae98b1a92c907ea88e87d8ab8cbbbdee0e9e7"
-#define DEHERM_RECORDING_EXPECTED_TRACE_SHA256 "a301b6da32baee5cf6a7c7cb154a01a468b239f77e6d965352634a3c6797bf50"
+#define DEHERM_RECORDING_PLAN_SHA256 "6668cbdcd14f1e9f224c0ff6ec0a3ed88a3374ac2dcc66295f6a60ef4f0aaf79"
+#define DEHERM_RECORDING_EXPECTED_TRACE_SHA256 "f5366509557fbec32acfbb3d44487fb1ff9e6c4992d44ecb3dcf134945c35e22"
 #define DEHERM_RECORDING_ROUTE_COUNT 1056u
 #define DEHERM_RECORDING_SHAPE_COUNT 439u
 #define DEHERM_RECORDING_SHAPE_REF_COUNT 2408u
@@ -82,6 +82,7 @@ typedef struct DehermRecordingRoute {
   uint8_t luaResultHandleCodec;
   uint8_t luaArgumentCount;
   uint8_t minimumArgumentCount;
+  uint32_t byteArgumentMask;
 } DehermRecordingRoute;
 
 typedef struct DehermRecordingHandleSeed {

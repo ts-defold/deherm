@@ -10,35 +10,6 @@ namespace {
 
 constexpr int64_t kMaxExactLuaInteger = 9007199254740991LL;
 
-class StackRestore {
- public:
-  StackRestore(lua_State* state, int baseTop) noexcept
-      : state_(state), baseTop_(baseTop) {}
-
-  ~StackRestore() {
-    if (state_) lua_settop(state_, baseTop_);
-  }
-
-  void activateInstance(InstanceApi instanceApi) noexcept {
-    instanceApi_ = instanceApi;
-    instanceActive_ = true;
-  }
-
-  void restoreInstance() noexcept {
-    if (!instanceActive_) return;
-    lua_settop(state_, baseTop_ + 1);
-    instanceApi_.set(state_);
-    instanceActive_ = false;
-    lua_settop(state_, baseTop_);
-  }
-
- private:
-  lua_State* state_;
-  InstanceApi instanceApi_;
-  int baseTop_;
-  bool instanceActive_ = false;
-};
-
 bool tagMatches(ScalarCodec codec, ScalarTag tag) noexcept {
   switch (codec) {
     case ScalarCodec::kBoolean: return tag == ScalarTag::kBoolean;
@@ -223,14 +194,18 @@ bool Dispatcher::bindDense(size_t denseIndex) noexcept {
 
   error_[0] = '\0';
   const int baseTop = lua_gettop(state_);
-  StackRestore restore(state_, baseTop);
   if (!pushModulePath(table.modulePaths[denseIndex])) {
     if (error_[0] == '\0') fail("Lua module is unavailable for scalar binding");
+    lua_settop(state_, baseTop);
     return false;
   }
   lua_getfield(state_, -1, table.members[denseIndex]);
-  if (!lua_isfunction(state_, -1)) return fail("Lua function is unavailable for scalar binding");
+  if (!lua_isfunction(state_, -1)) {
+    lua_settop(state_, baseTop);
+    return fail("Lua function is unavailable for scalar binding");
+  }
   functionRefs_[denseIndex] = luaL_ref(state_, LUA_REGISTRYINDEX);
+  lua_settop(state_, baseTop);
   ++stats_.boundFunctions;
   error_[0] = '\0';
   return true;
@@ -386,7 +361,7 @@ bool Dispatcher::dispatchDense(
   }
 
   const int baseTop = lua_gettop(state_);
-  StackRestore restore(state_, baseTop);
+  bool instanceActive = false;
   if (instanceApi_.get) {
     if (instanceRef_ == LUA_NOREF || instanceRef_ == LUA_REFNIL) {
       return fail("Defold instance hooks are configured but no instance is captured");
@@ -394,7 +369,7 @@ bool Dispatcher::dispatchDense(
     instanceApi_.get(state_);
     lua_rawgeti(state_, LUA_REGISTRYINDEX, instanceRef_);
     instanceApi_.set(state_);
-    restore.activateInstance(instanceApi_);
+    instanceActive = true;
   }
 
   lua_rawgeti(state_, LUA_REGISTRYINDEX, reference);
@@ -416,7 +391,11 @@ bool Dispatcher::dispatchDense(
       succeeded = readResult(denseIndex, output);
     }
   }
-  restore.restoreInstance();
+  if (instanceActive) {
+    lua_settop(state_, baseTop + 1);
+    instanceApi_.set(state_);
+  }
+  lua_settop(state_, baseTop);
   if (succeeded) error_[0] = '\0';
   return succeeded;
 }

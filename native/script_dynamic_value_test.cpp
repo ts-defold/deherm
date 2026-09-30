@@ -171,6 +171,8 @@ struct Backend {
         return false;
       case ScriptValueTag::kCallback: case ScriptValueTag::kTable:
         lua_pushlightuserdata(state, const_cast<ScriptValue*>(&value)); return true;
+      case ScriptValueTag::kBytes:
+        return false;
     }
     return false;
   }

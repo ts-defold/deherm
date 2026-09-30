@@ -55,15 +55,20 @@ test("value-tail generator covers the exact remaining Defold-value accounting ta
   assert.equal(imageEnum.disposition, "candidate");
   assert.equal(imageEnum.family, "image-type-string-codec");
   assert.equal(
-    imageEnum.callShapes.every((shape) => shape[3] === "String"),
+    imageEnum.callShapes.every((shape) => shape[3] === "String" && shape[4] === "Bytes"),
     true,
-    "image.TYPE must not silently widen the luaL_checkstring source contract to Number",
+    "image.TYPE stays text while the counted Lua payload is byte-exact",
   );
   assert.equal(
     imageEnum.callShapes.some((shape) => shape[3] === "Number"),
     false,
   );
   assert.match(imageEnum.codecEvidence.sourceSignature, /luaL_checkstring\(L, 4\)/);
+  assert.equal(imageEnum.binaryParameters[0].name, "buffer");
+  assert.deepEqual(imageEnum.binaryParameters[0].sourceSignatures, [
+    "luaL_checktype(L, 5, LUA_TSTRING)",
+    "const char* buffer = lua_tolstring(L, 5, &buffer_size)",
+  ]);
   assert.deepEqual(imageEnum.codecEvidence.domain, ["rgb", "rgba", "l", "astc"]);
   const namedEnum = report.bindings.find(({ id }) => id === "script:liveupdate.remove_mount");
   assert.equal(namedEnum.disposition, "candidate");
@@ -109,6 +114,7 @@ test("value-tail candidate dispatch is generated as fail-closed metadata", async
   ]);
   assert.match(header, /kRouteCount = 26/);
   assert.match(header, /kCandidateCount = 26/);
+  assert.match(header, /kBytes/);
   assert.match(header, /candidateRouteOffsets/);
   assert.match(source, /captured Lua backend is unavailable/);
   assert.match(source, /arguments do not match a reviewed exact codec shape/);

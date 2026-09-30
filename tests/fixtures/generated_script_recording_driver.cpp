@@ -96,7 +96,7 @@ struct WireInput {
     return push(value);
   }
 
-  uint32_t build(uint32_t shapeIndex, uint32_t seed) {
+  uint32_t build(uint32_t shapeIndex, uint32_t seed, bool byteCarrier = false) {
     const auto& shape = kDehermRecordingShapes[shapeIndex];
     DehermScriptUniversalValue value{};
     switch (shape.code) {
@@ -106,7 +106,9 @@ struct WireInput {
       case DEHERM_RECORDING_SHAPE_NUMBER: return pushNumber(seed);
       case DEHERM_RECORDING_SHAPE_STRING: {
         const std::string literal = "d" + std::to_string(seed);
-        return pushString(literal.c_str());
+        const uint32_t index = pushString(literal.c_str());
+        if (byteCarrier) values[index].tag = static_cast<uint8_t>(defold_hermes::ScriptValueTag::kBytes);
+        return index;
       }
       case DEHERM_RECORDING_SHAPE_HASH:
         value.tag = 5;
@@ -283,7 +285,8 @@ void driveDirectMemory(uint32_t route) {
   WireInput input;
   std::vector<uint32_t> roots;
   for (uint32_t index = 0; index < descriptor.argumentCount; ++index) {
-    roots.push_back(input.build(kDehermRecordingShapeRefs[descriptor.argumentFirst + index], index + 1u));
+    roots.push_back(input.build(kDehermRecordingShapeRefs[descriptor.argumentFirst + index], index + 1u,
+        (descriptor.byteArgumentMask & (UINT32_C(1) << index)) != 0));
   }
   if (!input.failure.empty()) {
     deherm_recording_record_results(route, DEHERM_RECORDING_TRANSPORT_DIRECT_MEMORY, 0, "",
@@ -331,7 +334,7 @@ struct StaticBuilder {
   DehermScriptUniversalStaticFrame* frame;
   std::string failure;
 
-  uint32_t build(uint32_t shapeIndex, uint32_t seed) {
+  uint32_t build(uint32_t shapeIndex, uint32_t seed, bool byteCarrier = false) {
     const auto& shape = kDehermRecordingShapes[shapeIndex];
     switch (shape.code) {
       case DEHERM_RECORDING_SHAPE_UNDEFINED: return deherm_script_static_push_undefined(frame);
@@ -340,7 +343,7 @@ struct StaticBuilder {
       case DEHERM_RECORDING_SHAPE_NUMBER: return deherm_script_static_push_number(frame, seed);
       case DEHERM_RECORDING_SHAPE_STRING: {
         const std::string literal = "d" + std::to_string(seed);
-        return pushString(literal.c_str());
+        return byteCarrier ? pushBytes(literal.c_str()) : pushString(literal.c_str());
       }
       case DEHERM_RECORDING_SHAPE_HASH:
         return deherm_script_static_push_handle(
@@ -411,6 +414,16 @@ struct StaticBuilder {
     const uint32_t index = deherm_script_static_push_string(frame, length);
     for (uint32_t byte = 0; byte < length; ++byte) {
       deherm_script_static_write_string_byte(frame, index, byte,
+          static_cast<uint8_t>(literal[byte]));
+    }
+    return index;
+  }
+
+  uint32_t pushBytes(const char* literal) {
+    const uint32_t length = static_cast<uint32_t>(std::strlen(literal));
+    const uint32_t index = deherm_script_static_push_bytes(frame, length);
+    for (uint32_t byte = 0; byte < length; ++byte) {
+      deherm_script_static_write_bytes_byte(frame, index, byte,
           static_cast<uint8_t>(literal[byte]));
     }
     return index;
@@ -524,7 +537,8 @@ void driveTypedNative(uint32_t route) {
   StaticBuilder builder{frame, {}};
   for (uint32_t index = 0; index < descriptor.argumentCount; ++index) {
     const uint32_t value = builder.build(
-        kDehermRecordingShapeRefs[descriptor.argumentFirst + index], index + 1u);
+        kDehermRecordingShapeRefs[descriptor.argumentFirst + index], index + 1u,
+        (descriptor.byteArgumentMask & (UINT32_C(1) << index)) != 0);
     deherm_script_static_set_argument(frame, index, value);
   }
   if (!builder.failure.empty()) {

@@ -25,6 +25,14 @@ revisions, hashes, counts, and identities.
   rejects a route before Lua when the selected context does not match.
 - `gui.set_texture_data` preserves the pinned `luaL_checkstring` contract for
   `image.TYPE`; a numeric fourth argument is rejected before Lua.
+- The same route's fifth `buffer` argument is not text. Pinned Defold source
+  checks a Lua string value and then reads it with `lua_tolstring(...,
+  &buffer_size)`, so the generated semantic report records a counted-byte
+  parameter. The public SDK exposes `Uint8Array | ArrayBuffer`; JSI borrows the
+  exact byte span for the call, and the Lua adapter pushes it with
+  `lua_pushlstring`. The lowering plan, recording engine, policy-only SDK
+  materializer, and all executable targets consume that same generated token.
+  Text parameters remain `string`; there is no global Lua-string widening.
 - `liveupdate.remove_mount` derives the exported `LIVEUPDATE_*` names from
   `SetConstants` and their integer values from the pinned
   `dmLiveUpdate::Result` enum. The ABI checks domain membership after the exact
@@ -58,7 +66,11 @@ scope across nested calls, and copies Matrix4 results into a bounded frame
 arena. A pinned Defold Lua 5.1 harness reaches all 16 executable value-tail and all eight
 overload descriptors, exercises reentrancy, stale Matrix4 tokens, and arena
 exhaustion, and observes zero warmed C++ `operator new` calls. Dynamic Hermes
-JSI executes `vmath.dot` and `sound.getGroupGain` through the same path.
+JSI executes `vmath.dot` and `sound.getGroupGain` through the same path. The
+byte regression fixtures additionally carry `00 80 ff 41` through the captured
+Lua router and exercise both `Uint8Array` and `ArrayBuffer` through real Hermes
+and JSI. This proves the generated carrier and exact-call boundary; it does not
+claim that Static Hermes or a running GUI scene executed `set_texture_data`.
 
 The eight GUI/render routes are a regression boundary, not merely prose: the
 generated table records their required instance kind, dispatch rejects them

@@ -4639,3 +4639,55 @@ Artifact-reference derivation now lives outside the source-policy generator
 identity. Release tags, URLs, and publisher sidecars may rotate without changing
 the Defold-source-derived Merkle root; publication joins the two independent
 graphs through the hash-bound per-revision pointer.
+
+## 2026-09-29 - Lua failure containment and byte-exact counted strings
+
+The production ScriptAdapter now contains Lua 5.1 allocator and script
+`longjmp`s inside `lua_cpcall` callbacks whose restoration is explicit rather
+than destructor-dependent. The generated Lua exact-call harness injects an
+allocator failure while staging an 8 KiB string and verifies exact stack and
+current-instance restoration, including an original Lua `nil`, followed by a
+successful call. The complete generated script-family sanitizer suite passes
+under ASan/UBSan and retains zero warmed C++ allocation claims for the existing
+instrumented routes. This is host-harness containment evidence, not whole-engine
+or device leak evidence.
+
+`gui.set_texture_data` now derives its fifth parameter from pinned source as a
+counted binary Lua string. The generator emits a byte codec, the TypeScript SDK
+uses `Uint8Array | ArrayBuffer`, JSI recognizes both carriers without converting
+through UTF-8, and the Lua adapter uses the exact byte length. The canonical
+lowering plan, recording engine, and policy-only SDK materializer consume the
+same generated semantic report. Native fixtures preserve `00 80 ff 41` through
+the captured-Lua path, and real Hermes/JSI tests cover both public carriers. The
+sound-typed Static Hermes executable then replayed all 517 emitted routes
+through the production bounded frame and generated recording provider; its
+route-aware planner preserved the byte carrier instead of falling back to the
+underlying Lua string shape. A live Defold GUI-scene call is not claimed by this
+wave.
+The policy remains reconstructible without a Defold checkout: 52 namespaces,
+190 subtrees, and 25.41 MB after adding the byte semantic document.
+
+## 2026-09-29 - Pre-install artifact row resolution is dependency-free
+
+The first publisher-authenticated native-artifact run failed every build row
+before compilation. Public Actions metadata localized the common failure to
+`Resolve the canonical build row`: that step intentionally runs before
+`pnpm install`, but the planner imported the full release-integrity module and
+therefore required its `fflate` archive dependency merely to append
+`.integrity.json` to an asset name.
+
+The validated sidecar naming rule now lives in a dependency-free module. The
+full archive verifier re-exports it for compatibility, while the row planner
+and release-shape module import the lean contract directly. A focused test
+guards the pre-install import boundary, and the native-artifact planning plus
+archive suites pass 34/34. The publisher-integrity input fingerprint includes
+the new module, so all three content-addressed release families rotate instead
+of publishing behavior changed under an existing tag. This is planner and
+archive-contract evidence; the new platform archives remain unclaimed until
+the repaired Actions matrix publishes and verifies them.
+
+The War Battles link gate now copies the exact project lock that its provenance
+stage verified into the disposable Bob project. Its link fixture supplies an
+isolated authenticated artifact reference and all 12 gate tests pass; the
+production example's older lock remains deliberately rejected until the
+repaired publisher emits integrity sidecars and the public policy refreshes.

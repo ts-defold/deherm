@@ -20009,14 +20009,14 @@ export interface GuiApi {
    *
    * @param type texture type  - `"rgb"` or `image.TYPE_RGB` - RGB  - `"rgba"` or `image.TYPE_RGBA` - RGBA  - `"l"` or `image.TYPE_LUMINANCE` - LUMINANCE  - `"astc"` - ASTC compressed format
    *
-   * @param buffer texture data
+   * @param buffer texture data Lua strings are counted byte arrays here; the TypeScript surface must not UTF-8 transcode texture payloads.
    *
    * @param flip flip texture vertically
    *
    * @returns success setting the data was successful
    */
   readonly setTextureData: {
-    (texture: string | DefoldHash, width: number, height: number, type: string | ImageTYPE, buffer: string, flip: boolean): boolean;
+    (texture: string | DefoldHash, width: number, height: number, type: string | ImageTYPE, buffer: Uint8Array | ArrayBuffer, flip: boolean): boolean;
   };
   /**
    * Sets the tracking value of a text node. This value is used to

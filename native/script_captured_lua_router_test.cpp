@@ -135,6 +135,14 @@ int MockOverload(lua_State* state) {
 int MockTail(lua_State* state) {
   if (!hasExpectedInstance(state)) return luaL_error(state, "captured instance differs");
   const auto& route = tail::routes()[static_cast<size_t>(lua_tointeger(state, lua_upvalueindex(1)))];
+  if (route.stableId == UINT32_C(0xf6c4cfba)) {
+    static constexpr unsigned char expected[] = {0x00, 0x80, 0xff, 0x41};
+    size_t length = 0;
+    const char* bytes = lua_tolstring(state, 5, &length);
+    if (!bytes || length != sizeof(expected) || std::memcmp(bytes, expected, sizeof(expected)) != 0) {
+      return luaL_error(state, "texture payload was not byte-exact");
+    }
+  }
   ++gTailCalls;
   if (gRunReentrantCall) {
     gRunReentrantCall = false;
@@ -245,6 +253,7 @@ void installGeneratedRoutes(lua_State* state) {
 ScriptValue tailArgument(tail::Codec codec, ScriptMatrix4Arena& matrices, ScriptUrlArena<>& urls) {
   ScriptValue value{};
   static constexpr char text[] = "generated";
+  static constexpr unsigned char bytes[] = {0x00, 0x80, 0xff, 0x41};
   alignas(16) static constexpr float identity[16] = {
     1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1
   };
@@ -253,6 +262,7 @@ ScriptValue tailArgument(tail::Codec codec, ScriptMatrix4Arena& matrices, Script
     case tail::Codec::kBoolean: value.tag = ScriptValueTag::kBoolean; value.number = 1; break;
     case tail::Codec::kNumber: value.tag = ScriptValueTag::kNumber; value.number = 3; break;
     case tail::Codec::kString: value.tag = ScriptValueTag::kString; value.data = text; value.length = sizeof(text) - 1; break;
+    case tail::Codec::kBytes: value.tag = ScriptValueTag::kBytes; value.data = bytes; value.length = sizeof(bytes); break;
     case tail::Codec::kHash: value.tag = ScriptValueTag::kHandle; value.handleKind = ScriptHandleKind::kHash; value.payload = 17; break;
     case tail::Codec::kUrl: expect(urls.store({1,2,3,4}, &value), "URL arena setup failed"); break;
     case tail::Codec::kVector3: value.tag = ScriptValueTag::kDefoldValue; value.defoldKind = ScriptDefoldValueKind::kVector3; value.defoldValue[0]=1; value.defoldValue[1]=2; value.defoldValue[2]=3; break;

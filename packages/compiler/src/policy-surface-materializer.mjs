@@ -45,6 +45,7 @@ const SCRIPT_DOCUMENTATION = "defold-script-sdk-documentation.json";
 const DMSDK_IR = "defold-sdk-ir.json";
 const DMSDK_DOCUMENTATION = "defold-dmsdk-sdk-documentation.json";
 const HANDLE_LOWERING = "defold-script-handle-lowering.json";
+const VALUE_TAIL_BINDINGS = "defold-script-value-tail-bindings.json";
 const DOCUMENT_RECIPE = "policy.compiler-document.copy-json.v1";
 const DOCUMENT_RECIPES = new Set([
   DOCUMENT_RECIPE,
@@ -188,7 +189,7 @@ function documentationEntries(ir, documentation, { kind, collection }) {
   return entries;
 }
 
-function scriptModel(ir, documentation) {
+function scriptModel(ir, documentation, valueTailBindings) {
   const docs = documentationEntries(ir, documentation, {
     kind: "deherm.script-sdk-documentation",
     collection: "functions",
@@ -198,7 +199,20 @@ function scriptModel(ir, documentation) {
     classes: ir.types.filter(({ kind }) => kind === "class"),
     aliases: ir.types.filter(({ kind }) => kind === "alias"),
     enums: ir.types.filter(({ kind }) => kind === "enum"),
-    functions: ir.functions.map((fn) => ({ ...fn, ...docs.get(fn.id), stableId: stableBindingId(fn.id) })),
+    functions: ir.functions.map((fn) => {
+      const binaryParameters = valueTailBindings.bindings.find(({ id }) => id === fn.id)?.binaryParameters ?? [];
+      const binaryByIndex = new Map(binaryParameters.map((parameter) => [parameter.index, parameter]));
+      const parameters = fn.parameters.map((parameter, index) => {
+        const binary = binaryByIndex.get(index);
+        if (!binary) return parameter;
+        return {
+          ...parameter,
+          rawType: "bytes",
+          description: `${parameter.description ?? ""}${parameter.description ? " " : ""}${binary.note}`,
+        };
+      });
+      return { ...fn, ...docs.get(fn.id), parameters, stableId: stableBindingId(fn.id) };
+    }),
     globals: [],
     duplication: [],
   };
@@ -212,8 +226,8 @@ function semanticHandleTypes(handleLowering) {
   return result;
 }
 
-function renderScriptSdk(scriptIr, documentation, handleLowering, constantLowering) {
-  const model = scriptModel(scriptIr, documentation);
+function renderScriptSdk(scriptIr, documentation, handleLowering, constantLowering, valueTailBindings) {
+  const model = scriptModel(scriptIr, documentation, valueTailBindings);
   const renderer = createScriptTypeRenderer(model);
   const trees = buildApiTrees(model);
   return {
@@ -518,6 +532,7 @@ export async function materializePolicySurface(resolvedPolicy, options = {}) {
     DMSDK_IR,
     DMSDK_DOCUMENTATION,
     HANDLE_LOWERING,
+    VALUE_TAIL_BINDINGS,
   ]) {
     if (!documents[required]) throw new Error(`Policy compiler surface is missing ${required}`);
   }
@@ -549,6 +564,7 @@ export async function materializePolicySurface(resolvedPolicy, options = {}) {
       documents[SCRIPT_DOCUMENTATION],
       documents[HANDLE_LOWERING],
       constantLowering,
+      documents[VALUE_TAIL_BINDINGS],
     ),
     ...renderDmSdk(documents[DMSDK_IR], documents[DMSDK_DOCUMENTATION]),
     "script/handle-lowering.ts": generateScriptHandleLowering(documents[HANDLE_LOWERING]),

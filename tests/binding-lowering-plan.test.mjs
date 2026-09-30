@@ -183,6 +183,26 @@ test("generated implementation lanes join by exact identity and universal fallba
   assert.equal(borrowed.backends.dynamicHermesJsi.selection, "blocked-semantic");
 });
 
+test("source-proven counted Lua strings remain byte carriers in every executable target", () => {
+  const binding = generated.units.find(({ identity }) => identity.id === "script:gui.set_texture_data");
+  assert.ok(binding, "gui.set_texture_data is absent from the canonical plan");
+
+  for (const target of ["dynamicHermesJsi", "staticHermesCAbi", "luaStack", "browserWasmHost"]) {
+    const backend = binding.backends[target];
+    assert.equal(backend.selection, "emit", target);
+    const program = generated.tables.marshallingPrograms[backend.marshallingProgram];
+    assert.ok(
+      program.some(({ op, path, type }) => op === "validate-scalar" && path === "parameters[4]" && type === "bytes"),
+      `${target} lost the source-proven byte carrier`,
+    );
+    assert.equal(
+      program.some(({ path, type }) => path === "parameters[4]" && type === "string"),
+      false,
+      `${target} regressed the counted byte payload to text`,
+    );
+  }
+});
+
 test("typed-native bridge exactly realizes the canonical script selection, including bounded variadics", () => {
   const universal = JSON.parse(inputs.scriptUniversalValue);
   const selection = selectTypedNativeRoutes(generated, universal);

@@ -119,6 +119,20 @@ Defold function may allocate internally. String results are copied into a
 caller-provided bounded buffer before stack restoration; the bridge never
 returns a pointer into a popped Lua value.
 
+Lua 5.1 reports allocation failures and script errors with `longjmp`, which
+cannot safely cross C++ frames that own live non-trivial automatic objects. The
+production adapter now places dispatch preparation, exact invocation, instance
+restoration, and stack restoration inside `lua_cpcall`-protected C callbacks;
+those callbacks use explicit cleanup and no destructor-dependent restoration.
+The generated exact-call harness installs a controllable Lua allocator, forces
+an out-of-memory jump while staging an 8 KiB unique string, and then proves the
+stack top, selected instance (including an original Lua `nil`), and subsequent
+successful dispatch are restored. A destructor guard outside the protected Lua
+region also proves that the jump is contained before returning to ordinary C++.
+The complete generated-family suite passes this probe under ASan/UBSan. This is
+host-side containment evidence, not proof that arbitrary Defold code is
+allocation-free.
+
 ## Stable-ID lookup consolidation
 
 Source inspection reproduced three searches of the same 90-entry scalar table

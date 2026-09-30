@@ -145,6 +145,18 @@ export function canonicalStaticScriptExactValue(recording, shapeIndex, seed) {
   return planStaticScriptExactValue(recording, shapeIndex, seed).specification;
 }
 
+export function planStaticScriptExactArgument(recording, shapeIndex, seed, bytes = false) {
+  const plan = planStaticScriptExactValue(recording, shapeIndex, seed);
+  if (!bytes) return plan;
+  assert(plan.kind === "string", `Static Hermes byte argument ${shapeIndex} is not backed by a string shape`);
+  const values = Array.from(plan.value, (character) => character.codePointAt(0));
+  assert(
+    values.every((value) => value <= 0xff),
+    `Static Hermes byte argument ${shapeIndex} has a non-byte sentinel`,
+  );
+  return { kind: "bytes", values, specification: plan.specification };
+}
+
 const UINT32_MAX = 0xffffffffn;
 
 function compareCodePoints(left, right) {
@@ -298,9 +310,22 @@ export function materializeStaticScriptExactVectors(recording) {
       `${route.id}: exact result shape/value arity drifted`,
     );
     const argumentShapes = staticExactArgumentShapes(recording, route);
+    assert(
+      Number.isSafeInteger(route.byteArgumentMask) && route.byteArgumentMask >= 0,
+      `${route.id}: byte argument mask is invalid`,
+    );
+    assert(
+      route.byteArgumentMask >>> argumentShapes.length === 0,
+      `${route.id}: byte argument mask exceeds driven arity`,
+    );
     const argumentPlans = argumentShapes.map((shape, slot) => {
       const specification = contract.argumentValues[slot];
-      const plan = planStaticScriptExactValue(recording, shape, slot + 1);
+      const plan = planStaticScriptExactArgument(
+        recording,
+        shape,
+        slot + 1,
+        (route.byteArgumentMask & (1 << slot)) !== 0,
+      );
       assert(specification === plan.specification, `${route.id}: exact argument value drifted at slot ${slot}`);
       return plan;
     });
@@ -368,6 +393,7 @@ export function materializeStaticScriptExactVectors(recording) {
         loweringFamily: route.loweringFamily,
         argumentShapes,
         resultShapes: route.resultShapes,
+        byteArgumentMask: route.byteArgumentMask,
         argumentValues: contract.argumentValues.slice(0, argumentShapes.length),
         resultValues: contract.resultValues,
         bounds: contract.bounds,

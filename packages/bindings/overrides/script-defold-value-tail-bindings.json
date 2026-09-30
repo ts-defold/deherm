@@ -68,7 +68,19 @@
         "sourceSignature": "const char* type_str = luaL_checkstring(L, 4)",
         "acceptedLuaType": "string",
         "domain": ["rgb", "rgba", "l", "astc"],
-        "note": "The documented image.TYPE constants are string-compatible values consumed by luaL_checkstring and ToImageType/ToImageCompressionType."
+        "note": "The documented image.TYPE constants are string-compatible values consumed by luaL_checkstring and ToImageType/ToImageCompressionType.",
+        "binaryParameters": [
+          {
+            "index": 4,
+            "name": "buffer",
+            "sourceSignatures": [
+              "luaL_checktype(L, 5, LUA_TSTRING)",
+              "const char* buffer = lua_tolstring(L, 5, &buffer_size)"
+            ],
+            "carrier": "Uint8Array | ArrayBuffer",
+            "note": "Lua strings are counted byte arrays here; the TypeScript surface must not UTF-8 transcode texture payloads."
+          }
+        ]
       },
       "expectedRouteCount": 1,
       "sourceRoutes": [

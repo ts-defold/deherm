@@ -1007,9 +1007,9 @@
     }
   },
   "inputHashes": {
-    "projection": "fef7bb5e399ff87467d6299e578bfcd1207a2ec83076dcd5b19de033cd76c82c",
+    "projection": "d53f5d11d4c6fa3ad1432e8ced29a05b9606e8c9f06ba80c3d5cd5adb33d1df3",
     "callbacks": "2303eaf9998bb4e4de658cc3d8966ebcae540a986d19bfd228954fea49e90c57",
-    "classification": "7dbbb0b6201ce3fe6d0635663cb8917e53aee3860393a34f7133e5ff4327fcfd",
+    "classification": "9f6233b0ff385f40fabd87e2cdb9677276f9428582cf4b334daef1a0afb914cc",
     "policy": "b3175f748511992272cd33980fc6c0737e920c152d9880f1e63e503061e11f7b",
     "layouts": "a905f72450a2164d414d90e37359ea9b0207609ead5c16e928b39400c32f3d5b",
     "constants": "53815679718931177edd274504ea8f2decba28f6dac328f27a039070a2c82198"
@@ -1030,13 +1030,13 @@
     "defold/defold_hermes/include/defold_hermes/generated_script_universal_value_bindings.hpp": "8580590634aa8df02dfa104d52e55792ae16d0826488dc08a1265746497dbe76",
     "defold/defold_hermes/src/generated_script_universal_value_bindings.cpp": "e029b16d32fde263fdffacdb88093c6d4936e87a67b8d3caef826add08b23860",
     "defold/defold_hermes/include/defold_hermes/generated_script_universal_value_capi.h": "4e6b3204a8cc7bb76ade0e451c6e39555432ff199ac3756bf5f87d1df98585d1",
-    "defold/defold_hermes/src/generated_script_universal_value_capi.cpp": "16b437106350a7af105a293f8343d932b669d22fd58b6765022be5160f5b9c0c",
-    "defold/defold_hermes/include/defold_hermes/generated_script_universal_static_frame.h": "ab423b90ed7c9166abb5a9ef238ac0d37a1e951fc03d2dc7d17836406b86cb0e",
-    "defold/defold_hermes/src/generated_script_universal_static_frame.cpp": "ff8844fdada79d445b1f3c8c083c85ff01bcc3fee496a5a0a3fbd790093177a6",
+    "defold/defold_hermes/src/generated_script_universal_value_capi.cpp": "aebd5acad9f47bd6d66e75911dd57946b8372ef881f8d5825b17b5ee2f8c6dd3",
+    "defold/defold_hermes/include/defold_hermes/generated_script_universal_static_frame.h": "8cc1c2e10ff3a6220478df65a987c3ba47ccff8b0c3542a63442473be299057e",
+    "defold/defold_hermes/src/generated_script_universal_static_frame.cpp": "0b239be24b657257d8285f6abf314bb78be2a482dc84b68ab6b077a2d6f2550b",
     "packages/sdk/src/generated/script/universal-value-bindings.ts": "8d1a08c40996df35e2b35c070022948c90a70a3409e64f46d8b5ae40d9b8342f",
     "packages/sdk/src/generated/script/browser-target-support.ts": "4de2ba390aef3354cbdd498617ce92820975a99077d26ce116a43fed4532e9c8",
-    "packages/static-hermes/src/generated/script-universal-value.ts": "33c9581fe6ea668cd266dbfcd3cf905f2f84277d775ef23d65d7c366c9a245b0",
-    "defold/defold_hermes/lib/web/generated_script_universal_value.js": "c4f207e51a4352ce9208b238b17e7a6b1668594725b7579f5dbe53ceefc77dca"
+    "packages/static-hermes/src/generated/script-universal-value.ts": "ab38b4ba983b480a22d1bbe56ed44ea0a55dbb2270dcf757f0415b1d371faf90",
+    "defold/defold_hermes/lib/web/generated_script_universal_value.js": "d08dacbc25c4976d6a73afdbf1ac5e858c014243fb43755c47ec721db8e34cc7"
   },
   "bindings": [
     {

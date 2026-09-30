@@ -378,6 +378,22 @@ export function buildRecordingEngineModel(inputs) {
       .filter((unit) => unit.identity.surface === "script")
       .map((unit) => [unit.identity.id, unit]),
   );
+  const byteArgumentMask = (unit) => {
+    const programIndex = unit.backends.dynamicHermesJsi?.marshallingProgram ?? 0;
+    const program = loweringPlan.tables?.marshallingPrograms?.[programIndex] ?? [];
+    let mask = 0;
+    for (const operation of program) {
+      const match =
+        operation.phase === "input" && operation.type === "bytes"
+          ? operation.path?.match(/^parameters\[(\d+)\]$/)
+          : null;
+      if (!match) continue;
+      const index = Number(match[1]);
+      assert(index < 32, `${unit.identity.id}: byte argument index exceeds recording mask capacity`);
+      mask |= 1 << index;
+    }
+    return mask >>> 0;
+  };
 
   const projectionContract = (row) => ({
     context: row.context?.token ?? "unspecified",
@@ -611,6 +627,7 @@ export function buildRecordingEngineModel(inputs) {
       },
       argumentShapes,
       resultShapes,
+      byteArgumentMask: byteArgumentMask(unit),
       transports: {},
       luaAdapter: { status: "exercise", reason: "", argumentCount: binding.minimumArgumentCount },
     };

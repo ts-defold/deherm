@@ -3,17 +3,17 @@
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "scope": "generated-script-recording-engine",
   "evidenceBoundary": "This harness proves only that the generated binding stack matches this repository's declared contract for each route. It is a null/observer engine: it is not Defold, and nothing here is engine conformance evidence. Trace records are keyed by the canonical lowering plan's interned contract index so a later real-engine differential can diff against them per contract.",
-  "planSha256": "d843a7ab0335b0faa22dcc454deae98b1a92c907ea88e87d8ab8cbbbdee0e9e7",
+  "planSha256": "6668cbdcd14f1e9f224c0ff6ec0a3ed88a3374ac2dcc66295f6a60ef4f0aaf79",
   "planFallback": null,
   "inputHashes": {
-    "projection": "fef7bb5e399ff87467d6299e578bfcd1207a2ec83076dcd5b19de033cd76c82c",
-    "universal": "f36e57acde9e53f614b1f759fa34b2b69cb53d57ba2b602af6df7c0edd769df8",
-    "handleLowering": "af0b12d30c27ee60b8f40bbad68967472e02c7f5e1d11441bc0fa4550f80814f",
+    "projection": "d53f5d11d4c6fa3ad1432e8ced29a05b9606e8c9f06ba80c3d5cd5adb33d1df3",
+    "universal": "2d6180d0eaa118e8bde5530b42f5d8f55a0c8018d72b128f7810ddfd706a64ec",
+    "handleLowering": "b3ba26c03226b9c934e0bd19b6f3ceb1020e0764d7f9d837c704465c2a059684",
     "valueLayouts": "a905f72450a2164d414d90e37359ea9b0207609ead5c16e928b39400c32f3d5b",
-    "tableRecords": "487a3cecb0c54df8bd2f1ad4e6bf8f1f9ad87cebf0f52d7889e63fe77bec1445",
+    "tableRecords": "c614a5772c9bd054f54d9d844189b224b68005fe27402321c61d26bb6cb346a8",
     "valueBindings": "25dad5cf3cdbf82ecf2e8dcde17e2ccc0f908a57a31ecac2a69041673ad68174",
     "overloadDispatch": "4546c4d12e5f811073c14dc9e8470e478dafd671e7cff55a01bc018a2c9d5816",
-    "loweringPlan": "4ecbcd750f19ca5b547382ffda875e43ca8586abe337267b126bccfd34b34018"
+    "loweringPlan": "866f88b307337b2a72cc215c2c556dfe05f3631ecd5e4e003e933ab61b5b8a5d"
   },
   "planInputDrift": [],
   "transports": {
@@ -12287,6 +12287,7 @@
         1
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -12367,6 +12368,7 @@
         3
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -12446,6 +12448,7 @@
         2
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -12526,6 +12529,7 @@
         3
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -12605,6 +12609,7 @@
         4
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -12684,6 +12689,7 @@
         5
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -12764,6 +12770,7 @@
       "resultShapes": [
         6
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -12846,6 +12853,7 @@
         8,
         9
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -12927,6 +12935,7 @@
       "resultShapes": [
         6
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -13006,6 +13015,7 @@
         7
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -13085,6 +13095,7 @@
         10
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -13164,6 +13175,7 @@
         11
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -13242,6 +13254,7 @@
         0
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -13321,6 +13334,7 @@
         12
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -13400,6 +13414,7 @@
         12
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -13479,6 +13494,7 @@
         12
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -13559,6 +13575,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -13639,6 +13656,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -13719,6 +13737,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -13799,6 +13818,7 @@
       "resultShapes": [
         9
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -13879,6 +13899,7 @@
       "resultShapes": [
         9
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -13959,6 +13980,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -14039,6 +14061,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -14119,6 +14142,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -14199,6 +14223,7 @@
       "resultShapes": [
         16
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -14279,6 +14304,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -14359,6 +14385,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -14440,6 +14467,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -14521,6 +14549,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -14601,6 +14630,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -14681,6 +14711,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -14762,6 +14793,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -14843,6 +14875,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -14923,6 +14956,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -15003,6 +15037,7 @@
       "resultShapes": [
         6
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -15083,6 +15118,7 @@
       "resultShapes": [
         20
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -15163,6 +15199,7 @@
       "resultShapes": [
         21
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -15243,6 +15280,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -15323,6 +15361,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -15403,6 +15442,7 @@
       "resultShapes": [
         9
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -15483,6 +15523,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -15563,6 +15604,7 @@
       "resultShapes": [
         6
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -15643,6 +15685,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -15723,6 +15766,7 @@
       "resultShapes": [
         22
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -15801,6 +15845,7 @@
       "resultShapes": [
         23
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -15881,6 +15926,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -15961,6 +16007,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -16042,6 +16089,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -16123,6 +16171,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -16203,6 +16252,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -16283,6 +16333,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -16363,6 +16414,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -16443,6 +16495,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -16523,6 +16576,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -16603,6 +16657,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -16683,6 +16738,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -16761,6 +16817,7 @@
         0
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -16840,6 +16897,7 @@
         12
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -16919,6 +16977,7 @@
         26
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -16998,6 +17057,7 @@
         27
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -17077,6 +17137,7 @@
         12
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -17156,6 +17217,7 @@
         12
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -17235,6 +17297,7 @@
         12
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -17314,6 +17377,7 @@
         28
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -17393,6 +17457,7 @@
         26
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -17472,6 +17537,7 @@
         29
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -17551,6 +17617,7 @@
         30
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -17630,6 +17697,7 @@
         31
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -17709,6 +17777,7 @@
         32
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -17788,6 +17857,7 @@
         12
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -17869,6 +17939,7 @@
         35
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -17949,6 +18020,7 @@
         34
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -18028,6 +18100,7 @@
         36
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -18107,6 +18180,7 @@
         37
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -18183,6 +18257,7 @@
         38
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -18263,6 +18338,7 @@
       "resultShapes": [
         8
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -18343,6 +18419,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -18423,6 +18500,7 @@
       "resultShapes": [
         6
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -18503,6 +18581,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -18583,6 +18662,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -18663,6 +18743,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -18743,6 +18824,7 @@
       "resultShapes": [
         9
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -18823,6 +18905,7 @@
       "resultShapes": [
         23
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -18903,6 +18986,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -18982,6 +19066,7 @@
         40
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -19061,6 +19146,7 @@
         41
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -19140,6 +19226,7 @@
         42
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -19222,6 +19309,7 @@
       "resultShapes": [
         6
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -19303,6 +19391,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -19385,6 +19474,7 @@
       "resultShapes": [
         6
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -19466,6 +19556,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -19547,6 +19638,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -19628,6 +19720,7 @@
       "resultShapes": [
         6
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -19709,6 +19802,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -19790,6 +19884,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -19870,6 +19965,7 @@
         44
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -19951,6 +20047,7 @@
         46
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -20032,6 +20129,7 @@
         47
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -20112,6 +20210,7 @@
         40
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -20192,6 +20291,7 @@
         42
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -20272,6 +20372,7 @@
         48
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -20353,6 +20454,7 @@
         46
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -20435,6 +20537,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -20514,6 +20617,7 @@
       "resultShapes": [
         21
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -20591,6 +20695,7 @@
       "resultShapes": [
         55
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -20668,6 +20773,7 @@
       "resultShapes": [
         23
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -20750,6 +20856,7 @@
       "resultShapes": [
         15
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -20832,6 +20939,7 @@
       "resultShapes": [
         15
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -20914,6 +21022,7 @@
       "resultShapes": [
         15
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -20996,6 +21105,7 @@
       "resultShapes": [
         15
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -21078,6 +21188,7 @@
       "resultShapes": [
         15
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -21160,6 +21271,7 @@
       "resultShapes": [
         15
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -21242,6 +21354,7 @@
       "resultShapes": [
         15
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -21324,6 +21437,7 @@
       "resultShapes": [
         15
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -21406,6 +21520,7 @@
       "resultShapes": [
         15
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -21488,6 +21603,7 @@
       "resultShapes": [
         15
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -21570,6 +21686,7 @@
       "resultShapes": [
         15
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -21652,6 +21769,7 @@
       "resultShapes": [
         15
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -21730,6 +21848,7 @@
         60
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -21809,6 +21928,7 @@
         12
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -21888,6 +22008,7 @@
         12
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -21967,6 +22088,7 @@
         12
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -22047,6 +22169,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -22127,6 +22250,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -22207,6 +22331,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -22287,6 +22412,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -22367,6 +22493,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -22447,6 +22574,7 @@
       "resultShapes": [
         21
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -22527,6 +22655,7 @@
       "resultShapes": [
         21
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -22607,6 +22736,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -22687,6 +22817,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -22767,6 +22898,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -22847,6 +22979,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -22927,6 +23060,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -23007,6 +23141,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -23087,6 +23222,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -23167,6 +23303,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -23247,6 +23384,7 @@
       "resultShapes": [
         15
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -23327,6 +23465,7 @@
       "resultShapes": [
         15
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -23407,6 +23546,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -23487,6 +23627,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -23567,6 +23708,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -23647,6 +23789,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -23727,6 +23870,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -23807,6 +23951,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -23887,6 +24032,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -23967,6 +24113,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -24047,6 +24194,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -24127,6 +24275,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -24207,6 +24356,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -24287,6 +24437,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -24367,6 +24518,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -24447,6 +24599,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -24527,6 +24680,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -24607,6 +24761,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -24687,6 +24842,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -24767,6 +24923,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -24847,6 +25004,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -24927,6 +25085,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -25008,6 +25167,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -25088,6 +25248,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -25169,6 +25330,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -25249,6 +25411,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -25329,6 +25492,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -25410,6 +25574,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -25491,6 +25656,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -25571,6 +25737,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -25651,6 +25818,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -25731,6 +25899,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -25811,6 +25980,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -25891,6 +26061,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -25971,6 +26142,7 @@
       "resultShapes": [
         23
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -26051,6 +26223,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -26131,6 +26304,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -26211,6 +26385,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -26291,6 +26466,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -26371,6 +26547,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -26450,6 +26627,7 @@
         62
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -26529,6 +26707,7 @@
         63
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -26608,6 +26787,7 @@
         64
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -26687,6 +26867,7 @@
         65
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -26766,6 +26947,7 @@
         66
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -26845,6 +27027,7 @@
         62
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -26924,6 +27107,7 @@
         67
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -27003,6 +27187,7 @@
         63
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -27082,6 +27267,7 @@
         68
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -27162,6 +27348,7 @@
         70
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -27242,6 +27429,7 @@
         72
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -27321,6 +27509,7 @@
         62
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -27400,6 +27589,7 @@
         63
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -27479,6 +27669,7 @@
         73
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -27558,6 +27749,7 @@
         74
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -27637,6 +27829,7 @@
         68
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -27716,6 +27909,7 @@
         74
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -27795,6 +27989,7 @@
         5
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -27874,6 +28069,7 @@
         5
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -27953,6 +28149,7 @@
         68
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -28032,6 +28229,7 @@
         75
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -28111,6 +28309,7 @@
         76
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -28190,6 +28389,7 @@
         62
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -28269,6 +28469,7 @@
         34
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -28348,6 +28549,7 @@
         62
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -28427,6 +28629,7 @@
         63
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -28505,6 +28708,7 @@
         60
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -28585,6 +28789,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -28665,6 +28870,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -28745,6 +28951,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -28825,6 +29032,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -28904,6 +29112,7 @@
         12
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -28983,6 +29192,7 @@
         12
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -29062,6 +29272,7 @@
         12
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -29141,6 +29352,7 @@
         12
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -29221,6 +29433,7 @@
       "resultShapes": [
         21
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -29302,6 +29515,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -29382,6 +29596,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -29462,6 +29677,7 @@
       "resultShapes": [
         9
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -29542,6 +29758,7 @@
       "resultShapes": [
         6
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -29622,6 +29839,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -29702,6 +29920,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -29782,6 +30001,7 @@
       "resultShapes": [
         9
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -29862,6 +30082,7 @@
       "resultShapes": [
         6
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -29942,6 +30163,7 @@
       "resultShapes": [
         23
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -30022,6 +30244,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -30105,6 +30328,7 @@
       "resultShapes": [
         6
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -30184,6 +30408,7 @@
         41
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -30264,6 +30489,7 @@
         46
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -30347,6 +30573,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -30432,6 +30659,7 @@
         9,
         6
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -30515,6 +30743,7 @@
       "resultShapes": [
         6
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -30600,6 +30829,7 @@
         9,
         6
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -30683,6 +30913,7 @@
       "resultShapes": [
         9
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -30762,6 +30993,7 @@
         12
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -30841,6 +31073,7 @@
         12
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -30920,6 +31153,7 @@
         12
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -30999,6 +31233,7 @@
         12
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -31078,6 +31313,7 @@
         7
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -31158,6 +31394,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -31238,6 +31475,7 @@
       "resultShapes": [
         6
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -31318,6 +31556,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -31398,6 +31637,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -31478,6 +31718,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -31558,6 +31799,7 @@
       "resultShapes": [
         6
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -31638,6 +31880,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -31718,6 +31961,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -31798,6 +32042,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -31878,6 +32123,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -31958,6 +32204,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -32038,6 +32285,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -32122,6 +32370,7 @@
         9,
         6
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -32206,6 +32455,7 @@
         9,
         6
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -32284,6 +32534,7 @@
         80
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -32365,6 +32616,7 @@
         85
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -32444,6 +32696,7 @@
         86
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -32523,6 +32776,7 @@
         32
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -32603,6 +32857,7 @@
         84
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -32682,6 +32937,7 @@
         75
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -32761,6 +33017,7 @@
         32
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -32841,6 +33098,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -32921,6 +33179,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -33000,6 +33259,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -33080,6 +33340,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -33159,6 +33420,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -33239,6 +33501,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -33319,6 +33582,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -33399,6 +33663,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -33479,6 +33744,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -33559,6 +33825,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -33638,6 +33905,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -33718,6 +33986,7 @@
       "resultShapes": [
         20
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -33799,6 +34068,7 @@
         95
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -33880,6 +34150,7 @@
         95
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -33960,6 +34231,7 @@
       "resultShapes": [
         103
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -34040,6 +34312,7 @@
       "resultShapes": [
         20
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -34121,6 +34394,7 @@
         108,
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -34201,6 +34475,7 @@
       "resultShapes": [
         109
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -34281,6 +34556,7 @@
         111
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -34360,6 +34636,7 @@
         113
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -34439,6 +34716,7 @@
         114
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -34519,6 +34797,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -34599,6 +34878,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -34679,6 +34959,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -34759,6 +35040,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -34839,6 +35121,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -34919,6 +35202,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -34999,6 +35283,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -35079,6 +35364,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -35159,6 +35445,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -35239,6 +35526,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -35319,6 +35607,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -35399,6 +35688,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -35479,6 +35769,7 @@
       "resultShapes": [
         115
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -35560,6 +35851,7 @@
       "resultShapes": [
         116
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -35640,6 +35932,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -35720,6 +36013,7 @@
       "resultShapes": [
         117
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -35801,6 +36095,7 @@
         14,
         115
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -35882,6 +36177,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -35962,6 +36258,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -36042,6 +36339,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -36122,6 +36420,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -36202,6 +36501,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -36282,6 +36582,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -36362,6 +36663,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -36442,6 +36744,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -36522,6 +36825,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -36602,6 +36906,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -36681,6 +36986,7 @@
         114
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -36760,6 +37066,7 @@
         119
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -36839,6 +37146,7 @@
         32
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -36918,6 +37226,7 @@
         120
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -36997,6 +37306,7 @@
         32
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -37076,6 +37386,7 @@
         121
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -37155,6 +37466,7 @@
         40
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -37234,6 +37546,7 @@
         33
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -37313,6 +37626,7 @@
         42
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -37392,6 +37706,7 @@
         122
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -37472,6 +37787,7 @@
         122
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -37554,6 +37870,7 @@
       "resultShapes": [
         127
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -37636,6 +37953,7 @@
       "resultShapes": [
         127
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -37718,6 +38036,7 @@
       "resultShapes": [
         127
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -37800,6 +38119,7 @@
       "resultShapes": [
         127
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -37882,6 +38202,7 @@
       "resultShapes": [
         127
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -37964,6 +38285,7 @@
       "resultShapes": [
         127
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -38046,6 +38368,7 @@
       "resultShapes": [
         127
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -38128,6 +38451,7 @@
       "resultShapes": [
         127
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -38206,6 +38530,7 @@
         128
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -38285,6 +38610,7 @@
         48
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -38365,6 +38691,7 @@
         48
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -38446,6 +38773,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -38527,6 +38855,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -38611,6 +38940,7 @@
         13,
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -38692,6 +39022,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -38773,6 +39104,7 @@
         14,
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -38854,6 +39186,7 @@
         13,
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -38935,6 +39268,7 @@
         14,
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -39015,6 +39349,7 @@
       "resultShapes": [
         124
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -39095,6 +39430,7 @@
       "resultShapes": [
         124
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -39175,6 +39511,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -39257,6 +39594,7 @@
         13,
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -39338,6 +39676,7 @@
         14,
         115
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -39419,6 +39758,7 @@
         14,
         115
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -39499,6 +39839,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -39580,6 +39921,7 @@
         13,
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -39662,6 +40004,7 @@
         13,
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -39744,6 +40087,7 @@
         13,
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -39825,6 +40169,7 @@
         14,
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -39908,6 +40253,7 @@
         13,
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -39991,6 +40337,7 @@
         13,
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -40071,6 +40418,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -40151,6 +40499,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -40231,6 +40580,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -40311,6 +40661,7 @@
       "resultShapes": [
         20
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -40391,6 +40742,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -40471,6 +40823,7 @@
       "resultShapes": [
         131
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -40551,6 +40904,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -40631,6 +40985,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -40712,6 +41067,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -40792,6 +41148,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -40872,6 +41229,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -40955,6 +41313,7 @@
         134
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -41034,6 +41393,7 @@
         135
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -41118,6 +41478,7 @@
         141
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -41198,6 +41559,7 @@
         143
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -41278,6 +41640,7 @@
         122
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -41358,6 +41721,7 @@
         122
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -41437,6 +41801,7 @@
         144
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -41519,6 +41884,7 @@
         141
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -41600,6 +41966,7 @@
         145
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -41680,6 +42047,7 @@
         35
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -41761,6 +42129,7 @@
         72
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -41841,6 +42210,7 @@
         148
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -41923,6 +42293,7 @@
         152
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -42005,6 +42376,7 @@
         133
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -42085,6 +42457,7 @@
         26
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -42165,6 +42538,7 @@
         153
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -42245,6 +42619,7 @@
         154
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -42324,6 +42699,7 @@
       "resultShapes": [
         124
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -42403,6 +42779,7 @@
       "resultShapes": [
         124
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -42480,6 +42857,7 @@
       "resultShapes": [
         156
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -42557,6 +42935,7 @@
       "resultShapes": [
         131
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -42636,6 +43015,7 @@
         2
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -42715,6 +43095,7 @@
         4
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -42795,6 +43176,7 @@
         158
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -42875,6 +43257,7 @@
         159
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -42955,6 +43338,7 @@
         159
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -43035,6 +43419,7 @@
         158
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -43114,6 +43499,7 @@
         160
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -43193,6 +43579,7 @@
         4
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -43271,6 +43658,7 @@
         157
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -43351,6 +43739,7 @@
       "resultShapes": [
         6
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -43431,6 +43820,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -43511,6 +43901,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -43591,6 +43982,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -43671,6 +44063,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -43751,6 +44144,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -43832,6 +44226,7 @@
         13,
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -43912,6 +44307,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -43992,6 +44388,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -44072,6 +44469,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -44152,6 +44550,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -44232,6 +44631,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -44312,6 +44712,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -44392,6 +44793,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -44473,6 +44875,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -44554,6 +44957,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -44634,6 +45038,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -44714,6 +45119,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -44794,6 +45200,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -44874,6 +45281,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -44955,6 +45363,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -45035,6 +45444,7 @@
       "resultShapes": [
         131
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -45116,6 +45526,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -45196,6 +45607,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -45275,6 +45687,7 @@
         26
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -45354,6 +45767,7 @@
         161
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -45433,6 +45847,7 @@
         29
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -45513,6 +45928,7 @@
         163
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -45592,6 +46008,7 @@
         164
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -45671,6 +46088,7 @@
         86
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -45750,6 +46168,7 @@
         26
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -45829,6 +46248,7 @@
         161
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -45908,6 +46328,7 @@
         29
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -45987,6 +46408,7 @@
         165
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -46067,6 +46489,7 @@
         166
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -46147,6 +46570,7 @@
         163
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -46227,6 +46651,7 @@
       "resultShapes": [
         124
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -46307,6 +46732,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -46388,6 +46814,7 @@
         14,
         115
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -46468,6 +46895,7 @@
       "resultShapes": [
         6
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -46548,6 +46976,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -46628,6 +47057,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -46708,6 +47138,7 @@
         122
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -46787,6 +47218,7 @@
         30
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -46871,6 +47303,7 @@
       "resultShapes": [
         9
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -46954,6 +47387,7 @@
         82
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -47059,6 +47493,7 @@
       "resultShapes": [
         6
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -47143,6 +47578,7 @@
       "resultShapes": [
         9
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -47226,6 +47662,7 @@
         82
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -47331,6 +47768,7 @@
       "resultShapes": [
         6
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -47414,6 +47852,7 @@
       "resultShapes": [
         9
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -47497,6 +47936,7 @@
       "resultShapes": [
         9
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -47577,6 +48017,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -47658,6 +48099,7 @@
       "resultShapes": [
         172
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -47738,6 +48180,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -47818,6 +48261,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -47901,6 +48345,7 @@
       "resultShapes": [
         172
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -47984,6 +48429,7 @@
       "resultShapes": [
         172
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -48067,6 +48513,7 @@
       "resultShapes": [
         172
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -48146,6 +48593,7 @@
         86
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -48225,6 +48673,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -48304,6 +48753,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -48381,6 +48831,7 @@
       "resultShapes": [
         175
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -48460,6 +48911,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -48539,6 +48991,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -48618,6 +49071,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -48697,6 +49151,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -48776,6 +49231,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -48855,6 +49311,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -48934,6 +49391,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -49013,6 +49471,7 @@
       "resultShapes": [
         176
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -49092,6 +49551,7 @@
       "resultShapes": [
         176
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -49172,6 +49632,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -49253,6 +49714,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -49331,6 +49793,7 @@
         179
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -49409,6 +49872,7 @@
         180
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -49487,6 +49951,7 @@
         181
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -49565,6 +50030,7 @@
         182
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -49643,6 +50109,7 @@
         183
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -49721,6 +50188,7 @@
         184
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -49799,6 +50267,7 @@
         185
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -49879,6 +50348,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -49962,6 +50432,7 @@
       "resultShapes": [
         189
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -50041,6 +50512,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -50119,6 +50591,7 @@
         190
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -50219,6 +50692,7 @@
         191
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -50296,6 +50770,7 @@
         50
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -50375,6 +50850,7 @@
       "resultShapes": [
         193
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -50454,6 +50930,7 @@
         169
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -50557,6 +51034,7 @@
         25,
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -50636,6 +51114,7 @@
       "resultShapes": [
         9
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -50715,6 +51194,7 @@
       "resultShapes": [
         9
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -50794,6 +51274,7 @@
       "resultShapes": [
         9
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -50872,6 +51353,7 @@
         196
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -50950,6 +51432,7 @@
         197
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -51028,6 +51511,7 @@
         198
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -51106,6 +51590,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -51184,6 +51669,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -51262,6 +51748,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -51340,6 +51827,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -51418,6 +51906,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -51496,6 +51985,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -51574,6 +52064,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -51652,6 +52143,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -51730,6 +52222,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -51808,6 +52301,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -51886,6 +52380,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -51964,6 +52459,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -52042,6 +52538,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -52120,6 +52617,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -52198,6 +52696,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -52276,6 +52775,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -52354,6 +52854,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -52432,6 +52933,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -52510,6 +53012,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -52588,6 +53091,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -52666,6 +53170,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -52744,6 +53249,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -52822,6 +53328,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -52900,6 +53407,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -52978,6 +53486,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -53056,6 +53565,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -53134,6 +53644,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -53212,6 +53723,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -53290,6 +53802,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -53368,6 +53881,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -53446,6 +53960,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -53524,6 +54039,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -53602,6 +54118,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -53680,6 +54197,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -53758,6 +54276,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -53836,6 +54355,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -53914,6 +54434,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -53992,6 +54513,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -54070,6 +54592,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -54148,6 +54671,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -54226,6 +54750,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -54304,6 +54829,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -54382,6 +54908,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -54460,6 +54987,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -54538,6 +55066,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -54616,6 +55145,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -54694,6 +55224,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -54772,6 +55303,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -54850,6 +55382,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -54928,6 +55461,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -55006,6 +55540,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -55084,6 +55619,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -55162,6 +55698,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -55240,6 +55777,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -55318,6 +55856,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -55396,6 +55935,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -55474,6 +56014,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -55552,6 +56093,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -55630,6 +56172,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -55708,6 +56251,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -55786,6 +56330,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -55864,6 +56409,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -55942,6 +56488,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -56019,6 +56566,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -56096,6 +56644,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -56173,6 +56722,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -56250,6 +56800,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -56327,6 +56878,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -56404,6 +56956,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -56481,6 +57034,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -56558,6 +57112,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -56635,6 +57190,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -56712,6 +57268,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -56789,6 +57346,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -56866,6 +57424,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -56943,6 +57502,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -57020,6 +57580,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -57097,6 +57658,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -57174,6 +57736,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -57251,6 +57814,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -57328,6 +57892,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -57405,6 +57970,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -57482,6 +58048,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -57559,6 +58126,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -57636,6 +58204,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -57713,6 +58282,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -57790,6 +58360,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -57867,6 +58438,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -57944,6 +58516,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -58021,6 +58594,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -58098,6 +58672,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -58175,6 +58750,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -58252,6 +58828,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -58329,6 +58906,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -58406,6 +58984,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -58483,6 +59062,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -58560,6 +59140,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -58637,6 +59218,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -58714,6 +59296,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -58791,6 +59374,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -58868,6 +59452,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -58945,6 +59530,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -59022,6 +59608,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -59099,6 +59686,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -59176,6 +59764,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -59253,6 +59842,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -59330,6 +59920,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -59407,6 +59998,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -59484,6 +60076,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -59561,6 +60154,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -59638,6 +60232,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -59715,6 +60310,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -59792,6 +60388,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -59869,6 +60466,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -59946,6 +60544,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -60023,6 +60622,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -60100,6 +60700,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -60177,6 +60778,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -60254,6 +60856,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -60331,6 +60934,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -60408,6 +61012,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -60485,6 +61090,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -60562,6 +61168,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -60639,6 +61246,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -60716,6 +61324,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -60793,6 +61402,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -60870,6 +61480,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -60947,6 +61558,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -61024,6 +61636,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -61101,6 +61714,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -61178,6 +61792,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -61255,6 +61870,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -61332,6 +61948,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -61409,6 +62026,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -61486,6 +62104,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -61563,6 +62182,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -61640,6 +62260,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -61717,6 +62338,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -61794,6 +62416,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -61871,6 +62494,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -61948,6 +62572,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -62027,6 +62652,7 @@
       "resultShapes": [
         193
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -62106,6 +62732,7 @@
       "resultShapes": [
         20
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -62185,6 +62812,7 @@
       "resultShapes": [
         9
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -62264,6 +62892,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -62344,6 +62973,7 @@
       "resultShapes": [
         20
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -62424,6 +63054,7 @@
       "resultShapes": [
         20
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -62501,6 +63132,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -62578,6 +63210,7 @@
         199
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -62655,6 +63288,7 @@
         201
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -62733,6 +63367,7 @@
         202
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -62808,6 +63443,7 @@
       },
       "argumentShapes": [],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -62891,6 +63527,7 @@
       "resultShapes": [
         22
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -62970,6 +63607,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -63048,6 +63686,7 @@
         190
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -63148,6 +63787,7 @@
         191
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -63225,6 +63865,7 @@
         50
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -63303,6 +63944,7 @@
         205
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -63382,6 +64024,7 @@
       "resultShapes": [
         6
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -63463,6 +64106,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -63563,6 +64207,7 @@
         205
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -63642,6 +64287,7 @@
         207
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -63726,6 +64372,7 @@
         190
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -63826,6 +64473,7 @@
         208
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -63904,6 +64552,7 @@
         216
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -63983,6 +64632,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -64064,6 +64714,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -64143,6 +64794,7 @@
       "resultShapes": [
         22
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -64222,6 +64874,7 @@
       "resultShapes": [
         22
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -64301,6 +64954,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -64380,6 +65034,7 @@
       "resultShapes": [
         115
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -64459,6 +65114,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -64538,6 +65194,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -64617,6 +65274,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -64696,6 +65354,7 @@
       "resultShapes": [
         115
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -64775,6 +65434,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -64854,6 +65514,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -64933,6 +65594,7 @@
       "resultShapes": [
         176
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -65013,6 +65675,7 @@
         194
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -65092,6 +65755,7 @@
         218
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -65170,6 +65834,7 @@
         215
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -65248,6 +65913,7 @@
         215
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -65326,6 +65992,7 @@
         215
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -65404,6 +66071,7 @@
         215
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -65481,6 +66149,7 @@
         215
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -65561,6 +66230,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -65641,6 +66311,7 @@
       "resultShapes": [
         176
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -65718,6 +66389,7 @@
       "resultShapes": [
         6
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -65795,6 +66467,7 @@
       "resultShapes": [
         193
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -65879,6 +66552,7 @@
         209
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -65979,6 +66653,7 @@
         223
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -66056,6 +66731,7 @@
         220
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -66135,6 +66811,7 @@
       "resultShapes": [
         224
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -66214,6 +66891,7 @@
       "resultShapes": [
         225
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -66291,6 +66969,7 @@
         220
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -66368,6 +67047,7 @@
         226
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -66447,6 +67127,7 @@
         227
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -66526,6 +67207,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -66605,6 +67287,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -66684,6 +67367,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -66763,6 +67447,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -66842,6 +67527,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -66921,6 +67607,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -67000,6 +67687,7 @@
       "resultShapes": [
         228
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -67079,6 +67767,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -67158,6 +67847,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -67237,6 +67927,7 @@
       "resultShapes": [
         22
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -67316,6 +68007,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -67395,6 +68087,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -67474,6 +68167,7 @@
       "resultShapes": [
         22
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -67553,6 +68247,7 @@
       "resultShapes": [
         22
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -67630,6 +68325,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -67709,6 +68405,7 @@
       "resultShapes": [
         22
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -67788,6 +68485,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -67867,6 +68565,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -67946,6 +68645,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -68025,6 +68725,7 @@
       "resultShapes": [
         22
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -68102,6 +68803,7 @@
       "resultShapes": [
         22
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -68181,6 +68883,7 @@
       "resultShapes": [
         9
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -68258,6 +68961,7 @@
       "resultShapes": [
         230
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -68337,6 +69041,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -68416,6 +69121,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -68495,6 +69201,7 @@
       "resultShapes": [
         22
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -68574,6 +69281,7 @@
       "resultShapes": [
         224
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -68653,6 +69361,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -68732,6 +69441,7 @@
       "resultShapes": [
         228
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -68811,6 +69521,7 @@
       "resultShapes": [
         224
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -68890,6 +69601,7 @@
       "resultShapes": [
         22
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -68969,6 +69681,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -69048,6 +69761,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -69127,6 +69841,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -69206,6 +69921,7 @@
       "resultShapes": [
         115
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -69285,6 +70001,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -69364,6 +70081,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -69443,6 +70161,7 @@
       "resultShapes": [
         228
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -69522,6 +70241,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -69601,6 +70321,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -69680,6 +70401,7 @@
       "resultShapes": [
         228
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -69759,6 +70481,7 @@
       "resultShapes": [
         20
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -69838,6 +70561,7 @@
       "resultShapes": [
         22
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -69917,6 +70641,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -69996,6 +70721,7 @@
       "resultShapes": [
         225
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -70076,6 +70802,7 @@
         13,
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -70155,6 +70882,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -70232,6 +70960,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -70311,6 +71040,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -70390,6 +71120,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -70465,6 +71196,7 @@
       },
       "argumentShapes": [],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -70545,6 +71277,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -70623,6 +71356,7 @@
         231
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -70701,6 +71435,7 @@
         231
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -70781,6 +71516,7 @@
       "resultShapes": [
         224
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -70861,6 +71597,7 @@
       "resultShapes": [
         224
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -70941,6 +71678,7 @@
       "resultShapes": [
         224
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -71021,6 +71759,7 @@
       "resultShapes": [
         224
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -71106,6 +71845,7 @@
         25,
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -71187,6 +71927,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -71267,6 +72008,7 @@
         241
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -71367,6 +72109,7 @@
         242
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -71464,6 +72207,7 @@
       },
       "argumentShapes": [],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -71541,6 +72285,7 @@
         220
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -71616,6 +72361,7 @@
       },
       "argumentShapes": [],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -71696,6 +72442,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -71776,6 +72523,7 @@
         194
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -71854,6 +72602,7 @@
         244
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -71932,6 +72681,7 @@
         245
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -72010,6 +72760,7 @@
         246
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -72088,6 +72839,7 @@
         247
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -72166,6 +72918,7 @@
         248
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -72244,6 +72997,7 @@
         249
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -72322,6 +73076,7 @@
         250
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -72400,6 +73155,7 @@
         48
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -72478,6 +73234,7 @@
         251
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -72556,6 +73313,7 @@
         34
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -72634,6 +73392,7 @@
         252
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -72712,6 +73471,7 @@
         253
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -72790,6 +73550,7 @@
         205
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -72868,6 +73629,7 @@
         215
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -72946,6 +73708,7 @@
         254
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -73024,6 +73787,7 @@
         120
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -73102,6 +73866,7 @@
         255
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -73181,6 +73946,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -73259,6 +74025,7 @@
         257
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -73337,6 +74104,7 @@
         258
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -73415,6 +74183,7 @@
         259
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -73493,6 +74262,7 @@
         260
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -73571,6 +74341,7 @@
         250
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -73650,6 +74421,7 @@
         262
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -73728,6 +74500,7 @@
         233
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -73806,6 +74579,7 @@
         263
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -73884,6 +74658,7 @@
         264
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -73962,6 +74737,7 @@
         33
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -74039,6 +74815,7 @@
         265
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -74117,6 +74894,7 @@
         122
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -74194,6 +74972,7 @@
         184
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -74272,6 +75051,7 @@
         266
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -74350,6 +75130,7 @@
         243
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -74428,6 +75209,7 @@
         250
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -74506,6 +75288,7 @@
         232
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -74584,6 +75367,7 @@
         267
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -74662,6 +75446,7 @@
         268
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -74740,6 +75525,7 @@
         206
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -74818,6 +75604,7 @@
         226
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -74902,6 +75689,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 16,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -74980,6 +75768,7 @@
         269
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -75058,6 +75847,7 @@
         249
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -75136,6 +75926,7 @@
         270
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -75214,6 +76005,7 @@
         270
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -75292,6 +76084,7 @@
         271
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -75370,6 +76163,7 @@
         194
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -75447,6 +76241,7 @@
       "resultShapes": [
         22
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -75535,6 +76330,7 @@
       "resultShapes": [
         20
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -75614,6 +76410,7 @@
       "resultShapes": [
         20
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -75691,6 +76488,7 @@
         169
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -75795,6 +76593,7 @@
         194
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -75896,6 +76695,7 @@
       "resultShapes": [
         283
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -75976,6 +76776,7 @@
       "resultShapes": [
         6
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -76056,6 +76857,7 @@
       "resultShapes": [
         6
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -76136,6 +76938,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -76216,6 +77019,7 @@
       "resultShapes": [
         20
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -76295,6 +77099,7 @@
       "resultShapes": [
         9
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -76374,6 +77179,7 @@
       "resultShapes": [
         20
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -76452,6 +77258,7 @@
         206
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -76534,6 +77341,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -76633,6 +77441,7 @@
       "resultShapes": [
         290
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -76710,6 +77519,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -76789,6 +77599,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -76868,6 +77679,7 @@
       "resultShapes": [
         9
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -76947,6 +77759,7 @@
       "resultShapes": [
         9
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -77026,6 +77839,7 @@
       "resultShapes": [
         9
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -77105,6 +77919,7 @@
       "resultShapes": [
         9
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -77183,6 +77998,7 @@
         196
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -77261,6 +78077,7 @@
         197
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -77339,6 +78156,7 @@
         198
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -77417,6 +78235,7 @@
         292
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -77494,6 +78313,7 @@
         50
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -77573,6 +78393,7 @@
       "resultShapes": [
         6
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -77652,6 +78473,7 @@
       "resultShapes": [
         108
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -77732,6 +78554,7 @@
       "resultShapes": [
         22
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -77811,6 +78634,7 @@
       "resultShapes": [
         294
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -77891,6 +78715,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -77972,6 +78797,7 @@
         190
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -78072,6 +78898,7 @@
         297
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -78150,6 +78977,7 @@
         298
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -78229,6 +79057,7 @@
         48
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -78308,6 +79137,7 @@
         302
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -78385,6 +79215,7 @@
       "resultShapes": [
         173
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -78463,6 +79294,7 @@
         242
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -78564,6 +79396,7 @@
         297
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -78644,6 +79477,7 @@
         304
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -78722,6 +79556,7 @@
         194
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -78805,6 +79640,7 @@
         311
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -78883,6 +79719,7 @@
         307
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -78960,6 +79797,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -79039,6 +79877,7 @@
       "resultShapes": [
         22
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -79119,6 +79958,7 @@
       "resultShapes": [
         6
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -79199,6 +80039,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -79279,6 +80120,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -79359,6 +80201,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -79439,6 +80282,7 @@
       "resultShapes": [
         6
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -79521,6 +80365,7 @@
       "resultShapes": [
         9
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -79601,6 +80446,7 @@
         318
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -79678,6 +80524,7 @@
         169
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -79777,6 +80624,7 @@
         86
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -79855,6 +80703,7 @@
         313
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -79933,6 +80782,7 @@
         239
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -80012,6 +80862,7 @@
         311
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -80091,6 +80942,7 @@
         319
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -80170,6 +81022,7 @@
         320
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -80248,6 +81101,7 @@
         239
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -80326,6 +81180,7 @@
         165
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -80403,6 +81258,7 @@
         50
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -80478,6 +81334,7 @@
         90
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -80553,6 +81410,7 @@
       },
       "argumentShapes": [],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -80630,6 +81488,7 @@
         48
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -80707,6 +81566,7 @@
         48
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -80784,6 +81644,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -80861,6 +81722,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -80938,6 +81800,7 @@
         206
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -81015,6 +81878,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -81092,6 +81956,7 @@
         31
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -81167,6 +82032,7 @@
       },
       "argumentShapes": [],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -81244,6 +82110,7 @@
         184
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -81321,6 +82188,7 @@
         184
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -81398,6 +82266,7 @@
         249
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -81475,6 +82344,7 @@
         323
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -81552,6 +82422,7 @@
         324
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -81629,6 +82500,7 @@
       "resultShapes": [
         325
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -81706,6 +82578,7 @@
         326
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -81781,6 +82654,7 @@
       },
       "argumentShapes": [],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -81858,6 +82732,7 @@
         114
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -81935,6 +82810,7 @@
         328
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -82015,6 +82891,7 @@
         194
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -82093,6 +82970,7 @@
         194
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -82170,6 +83048,7 @@
         194
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -82247,6 +83126,7 @@
         331
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -82324,6 +83204,7 @@
         114
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -82403,6 +83284,7 @@
         334
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -82480,6 +83362,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -82560,6 +83443,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -82640,6 +83524,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -82717,6 +83602,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -82794,6 +83680,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -82871,6 +83758,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -82950,6 +83838,7 @@
       "resultShapes": [
         211
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -83029,6 +83918,7 @@
       "resultShapes": [
         335
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -83107,6 +83997,7 @@
         339
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -83185,6 +84076,7 @@
         341
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -83265,6 +84157,7 @@
         345
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -83343,6 +84236,7 @@
         194
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -83423,6 +84317,7 @@
         349
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -83500,6 +84395,7 @@
         350
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -83577,6 +84473,7 @@
         351
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -83654,6 +84551,7 @@
         352
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -83731,6 +84629,7 @@
         353
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -83808,6 +84707,7 @@
         169
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -83908,6 +84808,7 @@
         354
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -83985,6 +84886,7 @@
         355
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -84063,6 +84965,7 @@
         194
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -84142,6 +85045,7 @@
         236
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -84221,6 +85125,7 @@
         357
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -84298,6 +85203,7 @@
         357
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -84377,6 +85283,7 @@
         360
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -84454,6 +85361,7 @@
         355
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -84534,6 +85442,7 @@
         236
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -84614,6 +85523,7 @@
       "resultShapes": [
         22
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -84694,6 +85604,7 @@
       "resultShapes": [
         22
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -84774,6 +85685,7 @@
       "resultShapes": [
         22
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -84855,6 +85767,7 @@
       "resultShapes": [
         22
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -84938,6 +85851,7 @@
         22,
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -85039,6 +85953,7 @@
       "resultShapes": [
         6
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -85118,6 +86033,7 @@
       "resultShapes": [
         103
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -85197,6 +86113,7 @@
       "resultShapes": [
         6
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -85278,6 +86195,7 @@
       "resultShapes": [
         6
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -85357,6 +86275,7 @@
       "resultShapes": [
         6
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -85436,6 +86355,7 @@
       "resultShapes": [
         103
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -85513,6 +86433,7 @@
         195
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -85591,6 +86512,7 @@
         104
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -85669,6 +86591,7 @@
         320
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -85748,6 +86671,7 @@
         320
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -85826,6 +86750,7 @@
         238
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -85905,6 +86830,7 @@
         104
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -85989,6 +86915,7 @@
         211,
         20
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -86070,6 +86997,7 @@
         9,
         20
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -86148,6 +87076,7 @@
       "resultShapes": [
         20
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -86229,6 +87158,7 @@
         193,
         20
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -86310,6 +87240,7 @@
         20,
         6
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -86391,6 +87322,7 @@
         20,
         6
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -86468,6 +87400,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -86547,6 +87480,7 @@
       "resultShapes": [
         275
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -86626,6 +87560,7 @@
       "resultShapes": [
         275
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -86709,6 +87644,7 @@
         372,
         20
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -86789,6 +87725,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -86866,6 +87803,7 @@
         374
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -86944,6 +87882,7 @@
         211,
         20
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -87022,6 +87961,7 @@
         211,
         20
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -87100,6 +88040,7 @@
         211,
         20
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -87178,6 +88119,7 @@
         211,
         20
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -87257,6 +88199,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -87336,6 +88279,7 @@
       "resultShapes": [
         20
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -87413,6 +88357,7 @@
       "resultShapes": [
         375
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -87494,6 +88439,7 @@
         13,
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -87575,6 +88521,7 @@
         13,
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -87652,6 +88599,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -87729,6 +88677,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -87807,6 +88756,7 @@
         377
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -87888,6 +88838,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -87988,6 +88939,7 @@
         378
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -88066,6 +89018,7 @@
         378
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -88144,6 +89097,7 @@
         379
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -88222,6 +89176,7 @@
         380
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -88302,6 +89257,7 @@
         241
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -88402,6 +89358,7 @@
         297
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -88480,6 +89437,7 @@
         239
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -88558,6 +89516,7 @@
         239
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -88637,6 +89596,7 @@
       "resultShapes": [
         301
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -88716,6 +89676,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -88793,6 +89754,7 @@
         381
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -88872,6 +89834,7 @@
       "resultShapes": [
         6
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -88949,6 +89912,7 @@
       "resultShapes": [
         20
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -89029,6 +89993,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -89109,6 +90074,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -89189,6 +90155,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -89269,6 +90236,7 @@
       "resultShapes": [
         20
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -89346,6 +90314,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -89423,6 +90392,7 @@
       "resultShapes": [
         6
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -89502,6 +90472,7 @@
       "resultShapes": [
         20
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -89579,6 +90550,7 @@
       "resultShapes": [
         9
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -89659,6 +90631,7 @@
       "resultShapes": [
         20
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -89738,6 +90711,7 @@
       "resultShapes": [
         6
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -89817,6 +90791,7 @@
       "resultShapes": [
         301
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -89896,6 +90871,7 @@
       "resultShapes": [
         103
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -89976,6 +90952,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -90078,6 +91055,7 @@
         20,
         20
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -90158,6 +91136,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -90240,6 +91219,7 @@
         397
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -90318,6 +91298,7 @@
         398
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -90397,6 +91378,7 @@
       "resultShapes": [
         20
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -90474,6 +91456,7 @@
         399
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -90552,6 +91535,7 @@
         400
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -90629,6 +91613,7 @@
         401
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -90728,6 +91713,7 @@
         12
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -90805,6 +91791,7 @@
         67
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -90882,6 +91869,7 @@
         402
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -90964,6 +91952,7 @@
         13,
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -91046,6 +92035,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -91128,6 +92118,7 @@
       "resultShapes": [
         406
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -91208,6 +92199,7 @@
       "resultShapes": [
         407
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -91286,6 +92278,7 @@
         297
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -91368,6 +92361,7 @@
         409
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -91447,6 +92441,7 @@
         249
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -91526,6 +92521,7 @@
       "resultShapes": [
         6
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -91605,6 +92601,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -91684,6 +92681,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -91763,6 +92761,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -91842,6 +92841,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -91921,6 +92921,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -92000,6 +93001,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -92079,6 +93081,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -92160,6 +93163,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -92239,6 +93243,7 @@
       "resultShapes": [
         115
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -92343,6 +93348,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -92453,6 +93459,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -92534,6 +93541,7 @@
       "resultShapes": [
         115
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -92636,6 +93644,7 @@
       "resultShapes": [
         176
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -92763,6 +93772,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -92860,6 +93870,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -92959,6 +93970,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -93036,6 +94048,7 @@
       "resultShapes": [
         176
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -93116,6 +94129,7 @@
       "resultShapes": [
         176
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -93233,6 +94247,7 @@
       "resultShapes": [
         176
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -93369,6 +94384,7 @@
       "resultShapes": [
         176
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -93483,6 +94499,7 @@
       "resultShapes": [
         176
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -93618,6 +94635,7 @@
       "resultShapes": [
         176
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -93733,6 +94751,7 @@
       "resultShapes": [
         176
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -93843,6 +94862,7 @@
       "resultShapes": [
         176
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -93958,6 +94978,7 @@
       "resultShapes": [
         176
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -94065,6 +95086,7 @@
       "resultShapes": [
         176
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -94172,6 +95194,7 @@
       "resultShapes": [
         176
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -94279,6 +95302,7 @@
       "resultShapes": [
         176
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -94358,6 +95382,7 @@
       "resultShapes": [
         176
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -94474,6 +95499,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -94553,6 +95579,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -94654,6 +95681,7 @@
       "resultShapes": [
         176
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -94782,6 +95810,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -94885,6 +95914,7 @@
       "resultShapes": [
         115
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -94979,6 +96009,7 @@
       "resultShapes": [
         115
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -95084,6 +96115,7 @@
       "resultShapes": [
         115
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -95203,6 +96235,7 @@
       "resultShapes": [
         115
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -95313,6 +96346,7 @@
       "resultShapes": [
         115
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -95428,6 +96462,7 @@
       "resultShapes": [
         115
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -95523,6 +96558,7 @@
       "resultShapes": [
         115
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -95618,6 +96654,7 @@
       "resultShapes": [
         115
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -95715,6 +96752,7 @@
         13,
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -95795,6 +96833,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -95907,6 +96946,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -95986,6 +97026,7 @@
       "resultShapes": [
         211
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -96063,6 +97104,7 @@
       "resultShapes": [
         14
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -96153,6 +97195,7 @@
       "resultShapes": [
         228
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -96230,6 +97273,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -96307,6 +97351,7 @@
       "resultShapes": [
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -96384,6 +97429,7 @@
       "resultShapes": [
         25
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -96461,6 +97507,7 @@
       "resultShapes": [
         6
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -96539,6 +97586,7 @@
         13,
         13
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -96616,6 +97664,7 @@
         184
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -96693,6 +97742,7 @@
         169
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -96792,6 +97842,7 @@
         436
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -96870,6 +97921,7 @@
         178
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -96948,6 +98000,7 @@
         236
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -97025,6 +98078,7 @@
         437
       ],
       "resultShapes": [],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -97104,6 +98158,7 @@
       "resultShapes": [
         20
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -97183,6 +98238,7 @@
       "resultShapes": [
         20
       ],
+      "byteArgumentMask": 0,
       "transports": {
         "jsi": {
           "status": "exercise",
@@ -97341,16 +98397,16 @@
     "expectedTrace": "tests/fixtures/generated_script_recording_expected_trace.txt"
   },
   "artifactHashes": {
-    "header": "cbe6fd7ada188497574410825ba48b92f77536ff66184dda36aa1b3459401417",
-    "tables": "56b71c87969369afb3c792cc884e6687a688b9e5ce522760237deece654b30b5",
-    "provider": "365eb33c7adda67d2390ac911cd21e28bf9014ef91a6151f7854082db9ac5acd",
-    "luaAdapter": "e8429156d7c289fd90125ab5daeeb8ce1427fc878be61d44cb6a3cf022175862",
+    "header": "2368a88d4cddda0b1f11b221abe6755b3d8c17a9ec4361334f6578544b9524b9",
+    "tables": "6aa7e4fb9d577b41e07ebbacf59dd6f809353ccc8a6a18b19d38cc364307247c",
+    "provider": "55a507f438f60ddbd2ec227c0ac12f2ca197a4defdf9b619a9026a7572773396",
+    "luaAdapter": "815c6f6529f34c1b8682779d0da14ee3ef440db62e7f77a7b5325eaa5ad2b7a5",
     "nativePodDriver": "c60ebe3fd13b85808109d0de95edf6be76fa9c40aff2ea700220d9362c84a676",
     "nativePodDriverJs": "5c86bf82e3f036fc359e61cf370450d44d93ec4119bc4d7b9c2ec98118323d7a",
     "browserCallbackDriver": "99b2c172b7217c241ab441c3162c6e01348ff5cf57430f6e57402a1a703483ec",
-    "browserCallbackDriverJs": "46d940a2660dbbf187016d2be178dbb69b3127f17ccb897c12b00dbc024ec92c",
-    "driver": "a0a2dc3a70dc4dad47cd197d1c0e57da8873be95d72228c2f33f74066ae71630",
-    "driverJs": "45e96075867bdf777c8f5c97d6416acc5025775ee877b6f55ebdb0d44fc0a523",
-    "expectedTrace": "a301b6da32baee5cf6a7c7cb154a01a468b239f77e6d965352634a3c6797bf50"
+    "browserCallbackDriverJs": "f1106280732bb0ef51f02fb0299aa20ffc6333268dc724b7ac8e5c0ada4799cd",
+    "driver": "d67bc8dfcb856d53ac4e9b79c71efd4bdabe9df33442366ce906d9bb0051f2f6",
+    "driverJs": "f12f08c1fc42b0bb58c0086e1e09f38a4e0caf616881edfb699c17824a6f1a26",
+    "expectedTrace": "f5366509557fbec32acfbb3d44487fb1ff9e6c4992d44ecb3dcf134945c35e22"
   }
 }

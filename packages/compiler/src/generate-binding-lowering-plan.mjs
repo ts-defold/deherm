@@ -279,6 +279,33 @@ function scriptConstantUnit(binding, entry, rowIndex) {
   };
 }
 
+function applyScriptValueTailSemanticShapes(units, valueTail) {
+  if (valueTail.schemaVersion !== 1 || !Array.isArray(valueTail.bindings)) {
+    throw new Error("Script value-tail semantic report is malformed");
+  }
+  const unitsById = new Map(
+    units.filter(({ identity }) => identity.surface === "script").map((unit) => [unit.identity.id, unit]),
+  );
+  for (const binding of valueTail.bindings) {
+    const binaryParameters = binding.binaryParameters ?? [];
+    if (binaryParameters.length === 0) continue;
+    const unit = unitsById.get(binding.id);
+    if (!unit) throw new Error(`${binding.id}: byte-aware value-tail route has no script projection unit`);
+    unit.publicSignature = structuredClone(unit.publicSignature);
+    for (const binary of binaryParameters) {
+      const parameter = unit.publicSignature.parameters?.[binary.index];
+      const value = parameter?.value ?? parameter?.type;
+      if (value?.kind !== "scalar" || value.name !== "string" || parameter.name !== binary.name) {
+        throw new Error(`${binding.id}: byte-aware value-tail parameter no longer matches the source projection`);
+      }
+      const byteShape = { ...value, name: "bytes" };
+      if (parameter.value) parameter.value = byteShape;
+      else parameter.type = byteShape;
+    }
+    unit.shapeKinds = shapeKinds(unit.publicSignature);
+  }
+}
+
 function dmsdkUnit(row, rowIndex) {
   const unresolvedTokens = new Set(row.semanticTokensNeeded);
   if (row.loweringState === "lowering-pending") unresolvedTokens.add("lowering:pending");
@@ -1529,6 +1556,7 @@ export function generateBindingLoweringPlan(inputs) {
   if (new Set(units.map(({ identity }) => `${identity.surface}:${identity.id}`)).size !== units.length) {
     throw new Error("Unified lowering plan contains duplicate units");
   }
+  applyScriptValueTailSemanticShapes(units, parsed.scriptValueTail);
   const { resolutions, ruleMatches } = applySemanticPolicies(units, semanticPolicies);
   const conformanceVocabulary = deriveConformanceVocabulary(semanticPolicies, parsed.dmsdkTargetConditionals);
   const conformanceVocabularyDigest = sha256(JSON.stringify(conformanceVocabulary));

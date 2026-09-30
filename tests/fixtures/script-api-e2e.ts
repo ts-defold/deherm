@@ -1,4 +1,4 @@
-import { b2d, bit, defold, render, socket, sound, sys, vmath, window } from "../../packages/sdk/src/generated/script/index";
+import { b2d, bit, defold, gui, render, socket, sound, sys, vmath, window } from "../../packages/sdk/src/generated/script/index";
 
 declare global {
   var __defoldAppV1: { init(): void } | undefined;
@@ -12,6 +12,11 @@ globalThis.__defoldAppV1 = {
     const hex = bit.tohex(255, 4);
     const exists = sys.exists("/known");
     window.setTitle("deherm");
+    const textureBytes = new Uint8Array([0x00, 0x80, 0xff, 0x41]);
+    if (!gui.setTextureData("texture", 1, 1, "rgba", textureBytes, false) ||
+        !gui.setTextureData("texture", 1, 1, "rgba", textureBytes.buffer, false)) {
+      throw new Error("byte-exact texture upload was rejected");
+    }
     globalThis.__defoldHostV1.log("info", `values:${configured}:${width}:${hex}:${exists}`);
 
     const vector = vmath.vector3(3, 4, 0);

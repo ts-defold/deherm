@@ -101,6 +101,7 @@ export function createTypeRenderer(model) {
     ["number", "number"],
     ["integer", "number"],
     ["string", "string"],
+    ["bytes", "Uint8Array | ArrayBuffer"],
     ["void", "void"],
     ["hash", "DefoldHash"],
     ["url", "DefoldUrl"],

@@ -9,6 +9,7 @@ import {
 } from "../packages/compiler/src/script-static-exact-verification.mjs";
 import { renderStaticHermes } from "../scripts/generate-script-universal-value-bindings.mjs";
 import { staticScriptExactVerificationGenerator } from "../scripts/lib/script-generator-pipeline.mjs";
+import { shapeCodes } from "../packages/compiler/src/script-recording-engine.mjs";
 
 const recording = JSON.parse(
   await readFile(
@@ -216,6 +217,18 @@ test("recursive exact plans preserve container kind, keys, and canonical child s
     recording.shapes[route.resultShapes[0]].children.map((index) => recording.shapes[index].keyText),
   );
   assert.equal(plan.specification, contractFor(recording, route).resultValues[0]);
+});
+
+test("Static exact vectors preserve route-level byte carriers over string-shaped Lua parameters", () => {
+  const { vectors } = materializeStaticScriptExactVectors(recording);
+  const vector = vectors.find(({ id }) => id === "script:gui.set_texture_data");
+  assert.ok(vector, "gui.set_texture_data is absent from Static exact vectors");
+  assert.equal(vector.byteArgumentMask, 1 << 4);
+  assert.equal(
+    recording.shapes[vector.argumentShapes[4]].code,
+    shapeCodes.string,
+    "the source Lua parameter must remain string-shaped",
+  );
 });
 
 test("recursive exact plans reject a cyclic shape with the declared fail-closed error", () => {

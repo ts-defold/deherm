@@ -129,6 +129,8 @@ const __dehermRecordPrototype: any = __dehermGlobal.Object.prototype;
 // table kind on both transports rather than two spellings of "an object".
 const __dehermMap: any = __dehermGlobal.Map;
 const __dehermMapPrototype: any = __dehermMap.prototype;
+const __dehermUint8Array: any = __dehermGlobal.Uint8Array;
+const __dehermArrayBuffer: any = __dehermGlobal.ArrayBuffer;
 const __DEHERM_U32: any = BigInt(0xffffffff);
 const __DEHERM_SHIFT32: any = BigInt(32);
 
@@ -160,6 +162,12 @@ function __dehermToStatic(value: any, depth: number): DehermStaticValue {
   if (value instanceof DehermStaticGuiNode) {
     const node: any = value;
     return node.lease;
+  }
+  if (value instanceof __dehermUint8Array || value instanceof __dehermArrayBuffer) {
+    const source: any = value instanceof __dehermUint8Array ? value : new __dehermUint8Array(value);
+    const bytes: Array<number> = [];
+    for (let index: number = 0; index < source.length; ++index) bytes.push(source[index]);
+    return new DehermStaticBytes(bytes);
   }
   // GUI nodes are generated HostObjects on the JSI twin.  Static Hermes has
   // no host-object RTTI, so the generated handle ABI is recognized by the

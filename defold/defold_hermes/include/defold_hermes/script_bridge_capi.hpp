@@ -21,6 +21,8 @@ enum class ScriptValueTag : uint8_t {
   kCallback,
   kTable,
   kDefoldValue,
+  /** Borrowed byte span whose storage remains live for the duration of dispatch. */
+  kBytes,
 };
 
 /** Fixed-layout value kinds copied by value across the JS/native boundary. */

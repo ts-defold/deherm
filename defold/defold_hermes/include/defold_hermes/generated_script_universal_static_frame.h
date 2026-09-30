@@ -31,6 +31,8 @@ uint32_t deherm_script_static_push_boolean(DehermScriptUniversalStaticFrame* fra
 uint32_t deherm_script_static_push_number(DehermScriptUniversalStaticFrame* frame, double value);
 uint32_t deherm_script_static_push_string(DehermScriptUniversalStaticFrame* frame, uint32_t byte_length);
 uint8_t deherm_script_static_write_string_byte(DehermScriptUniversalStaticFrame* frame, uint32_t value_index, uint32_t byte_offset, uint8_t value);
+uint32_t deherm_script_static_push_bytes(DehermScriptUniversalStaticFrame* frame, uint32_t byte_length);
+uint8_t deherm_script_static_write_bytes_byte(DehermScriptUniversalStaticFrame* frame, uint32_t value_index, uint32_t byte_offset, uint8_t value);
 uint32_t deherm_script_static_push_handle(DehermScriptUniversalStaticFrame* frame, uint8_t kind, uint8_t semantic_kind, uint32_t runtime, uint32_t payload_low, uint32_t payload_high);
 uint32_t deherm_script_static_push_defold_value(DehermScriptUniversalStaticFrame* frame, uint8_t kind, float x, float y, float z, float w);
 // Column-major dmVMath::Matrix4 elements copied into the caller-owned float arena.
