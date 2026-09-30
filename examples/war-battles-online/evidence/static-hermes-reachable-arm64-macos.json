@@ -39,7 +39,7 @@
       "main/ui.gui.ts",
       "reference/battle.gui.ts"
     ],
-    "authoredSourceTreeSha256": "78ad56668c71de1136933b3f2c82949f53ab60d8fe4dc2aa281f044429795244",
+    "authoredSourceTreeSha256": "9922a35f0f537fd0a4202e978efc0d792e369d34e45bc1f6311f4163904a5738",
     "loweringPlan": "packages/bindings/generated/defold-binding-lowering-plan.json",
     "loweringPlanSha256": "866f88b307337b2a72cc215c2c556dfe05f3631ecd5e4e003e933ab61b5b8a5d",
     "typedNativeBridge": "packages/bindings/generated/defold-typed-native-bridge.json",
@@ -52,7 +52,7 @@
   "reachability": {
     "profile": "release",
     "dynamicAccess": false,
-    "reachableRouteCount": 31,
+    "reachableRouteCount": 32,
     "reachableRouteIds": [
       "script:camera.get_cameras",
       "script:camera.get_orthographic_auto_zoom",
@@ -76,6 +76,7 @@
       "script:msg.post",
       "script:pprint",
       "script:sound.play",
+      "script:sys.get_config_int",
       "script:sys.get_config_number",
       "script:sys.get_config_string",
       "script:tilemap.set_tile",
@@ -86,7 +87,7 @@
       "script:vmath.vector3",
       "script:vmath.vector4"
     ],
-    "staticReachableRouteCount": 31,
+    "staticReachableRouteCount": 32,
     "staticReachableRouteIds": [
       "script:camera.get_cameras",
       "script:camera.get_orthographic_auto_zoom",
@@ -110,6 +111,7 @@
       "script:msg.post",
       "script:pprint",
       "script:sound.play",
+      "script:sys.get_config_int",
       "script:sys.get_config_number",
       "script:sys.get_config_string",
       "script:tilemap.set_tile",
@@ -227,6 +229,7 @@
       "script:hash_to_hex",
       "script:pprint",
       "script:sound.play",
+      "script:sys.get_config_int",
       "script:sys.get_config_string",
       "script:tilemap.set_tile",
       "script:vmath.vector4"
@@ -241,5 +244,5 @@
     "gameplay": "not-claimed; packaged gameplay belongs to the native Dynamic Hermes projection",
     "blockers": "blocked reachable routes remain explicit and fail closed"
   },
-  "recordSha256": "502598d9012a94032a9bf12216b317f4dac1af8862693845693ac3e5b4d2a6f1"
+  "recordSha256": "384b006ecca8a628584325bfb07ad6108c983553db8b89744c9a1273bef643cc"
 }
