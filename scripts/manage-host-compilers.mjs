@@ -17,7 +17,17 @@ import { createHash } from "node:crypto";
 import { chmod, cp, mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 
-import { downloadReleaseAssets, extractReleaseArchive } from "../packages/cli/src/release-assets.mjs";
+import {
+  downloadReleaseAssets,
+  extractReleaseArchive,
+  resolveGithubReleaseAsset,
+  verifyReleaseAssetBytes,
+} from "../packages/cli/src/release-assets.mjs";
+import {
+  releaseIntegrityAssetName,
+  validateReleaseIntegrity,
+  verifyReleaseArchive,
+} from "../packages/cli/src/release-integrity.mjs";
 import { fileURLToPath } from "node:url";
 
 // What determines the bytes of a host tool is declared in one place for all
@@ -353,9 +363,10 @@ else if (command === "pull") {
     // asset names are the same listing CI checks the release against, so nothing
     // is fetched to discover what to fetch.
     const rows = await publishedAssets(family, { root });
+    const requestedAssets = rows.flatMap((row) => [releaseIntegrityAssetName(row.asset), row.asset]);
     const { missing } = await downloadReleaseAssets({
       tag,
-      assets: rows.map((row) => row.asset),
+      assets: requestedAssets,
       destination,
       optional: args.includes("--partial"),
       onProgress: ({ asset, status }) => console.log(`${status === "missing" ? "absent" : "fetched"} ${asset}`),
@@ -372,11 +383,32 @@ else if (command === "pull") {
     // future path might not.
     const absent = new Set(missing);
     for (const row of rows) {
-      if (absent.has(row.asset)) continue;
-      await extractReleaseArchive({
-        archive: path.join(destination, row.asset),
-        destination: path.join(destination, `host-compilers-${row.host}`, "bin"),
+      const integrityAsset = releaseIntegrityAssetName(row.asset);
+      if (absent.has(row.asset) || absent.has(integrityAsset)) continue;
+      const [integrityMetadata, archiveMetadata] = await Promise.all([
+        resolveGithubReleaseAsset({ tag, asset: integrityAsset }),
+        resolveGithubReleaseAsset({ tag, asset: row.asset }),
+      ]);
+      const integrityBytes = await readFile(path.join(destination, integrityAsset));
+      verifyReleaseAssetBytes(integrityBytes, integrityMetadata, integrityAsset);
+      const integrity = validateReleaseIntegrity(JSON.parse(integrityBytes), {
+        family,
+        tag,
+        asset: row.asset,
+        members: row.files,
       });
+      if (!tag.endsWith(integrity.fingerprint.slice(0, 12))) {
+        throw new Error(`${integrityAsset} fingerprint does not address release ${tag}`);
+      }
+      const archive = path.join(destination, row.asset);
+      verifyReleaseAssetBytes(await readFile(archive), archiveMetadata, row.asset);
+      await verifyReleaseArchive({ archive, integrity });
+      const extracted = path.join(destination, `host-compilers-${row.host}`, "bin");
+      await extractReleaseArchive({
+        archive,
+        destination: extracted,
+      });
+      await verifyReleaseArchive({ archive, integrity, extractedRoot: extracted });
     }
     installed.push(...(await install(destination)));
   }

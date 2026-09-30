@@ -61,6 +61,22 @@ trap 'rm -rf "$staging"' EXIT
 staged="$staging/$asset_name"
 cp "$file" "$staged"
 
+case "$tag" in
+  libs-*) release_family=native-artifacts ;;
+  hermes-*) release_family=hermes-host ;;
+  tools-*) release_family=dehermc ;;
+  defold-webtransport-native-*) release_family=defold-webtransport-native ;;
+  *)
+    echo "Cannot derive the artifact family from release tag $tag" >&2
+    exit 1
+    ;;
+esac
+
+integrity_name="${asset_name}.integrity.json"
+integrity="$staging/$integrity_name"
+node scripts/generate-release-integrity.mjs \
+  "$staged" "$integrity" "$release_family" "$tag" "$release_fingerprint" "$asset_name"
+
 attempts=5
 delay=5
 
@@ -101,57 +117,71 @@ fi
 # publisher may have filled the row after planning, and immutable
 # content-addressed assets must never be overwritten in either case.
 asset_exists() {
+  local candidate="$1"
   gh release view "$tag" --repo "$repo" --json assets \
-    --jq ".assets[] | select(.name == \"$asset_name\") | .name" 2>/dev/null \
-    | grep -Fxq "$asset_name"
+    --jq ".assets[] | select(.name == \"$candidate\") | .name" 2>/dev/null \
+    | grep -Fxq "$candidate"
 }
 
 verify_existing_asset() {
+  local candidate="$1"
+  local candidate_file="$2"
   if [[ "${VERIFY_EXISTING_ASSET:-0}" != "1" ]]; then
     return 0
   fi
   local existing_dir="$staging/existing"
   mkdir -p "$existing_dir"
-  gh release download "$tag" --repo "$repo" --pattern "$asset_name" --dir "$existing_dir"
-  if cmp --silent "$staged" "$existing_dir/$asset_name"; then
-    echo "$tag already carries byte-identical immutable $asset_name"
+  gh release download "$tag" --repo "$repo" --pattern "$candidate" --dir "$existing_dir"
+  if cmp --silent "$candidate_file" "$existing_dir/$candidate"; then
+    echo "$tag already carries byte-identical immutable $candidate"
     return 0
   fi
   local local_sha published_sha
-  local_sha="$(sha256sum "$staged" | awk '{print $1}')"
-  published_sha="$(sha256sum "$existing_dir/$asset_name" | awk '{print $1}')"
-  echo "$tag already carries corrupt/foreign immutable $asset_name" >&2
+  local_sha="$(node -e 'const fs=require("node:fs"),c=require("node:crypto");process.stdout.write(c.createHash("sha256").update(fs.readFileSync(process.argv[1])).digest("hex"))' "$candidate_file")"
+  published_sha="$(node -e 'const fs=require("node:fs"),c=require("node:crypto");process.stdout.write(c.createHash("sha256").update(fs.readFileSync(process.argv[1])).digest("hex"))' "$existing_dir/$candidate")"
+  echo "$tag already carries corrupt/foreign immutable $candidate" >&2
   echo "local SHA-256:     $local_sha" >&2
   echo "published SHA-256: $published_sha" >&2
   echo "The asset will not be overwritten. Quarantine/delete the bad release asset or rotate a real fingerprint input before publishing." >&2
   return 1
 }
 
-if asset_exists; then
-  verify_existing_asset
-  echo "$tag already carries $asset_name; fingerprinted row is current, skipping upload"
-  exit 0
-fi
-
-for attempt in $(seq 1 "$attempts"); do
-  if gh release upload "$tag" "$staged" --repo "$repo"; then
-    exit 0
+upload_immutable() {
+  local candidate="$1"
+  local candidate_file="$2"
+  local current_delay="$delay"
+  if asset_exists "$candidate"; then
+    verify_existing_asset "$candidate" "$candidate_file"
+    echo "$tag already carries $candidate; fingerprinted row is current, skipping upload"
+    return 0
   fi
 
-  # If another publisher won the exact-name race, its immutable asset is now
-  # authoritative. Do not delete and replace it with --clobber.
-  if asset_exists; then
-    verify_existing_asset
-    echo "$tag acquired byte-identical $asset_name while this upload was in flight; keeping the published asset"
-    exit 0
-  fi
+  for attempt in $(seq 1 "$attempts"); do
+    if gh release upload "$tag" "$candidate_file" --repo "$repo"; then
+      return 0
+    fi
 
-  if [[ "$attempt" -eq "$attempts" ]]; then
-    echo "Upload of $asset_name failed after $attempts attempts." >&2
-    exit 1
-  fi
+    # If another publisher won the exact-name race, its immutable asset is now
+    # authoritative. Do not delete and replace it with --clobber.
+    if asset_exists "$candidate"; then
+      verify_existing_asset "$candidate" "$candidate_file"
+      echo "$tag acquired byte-identical $candidate while this upload was in flight; keeping the published asset"
+      return 0
+    fi
 
-  echo "Upload of $asset_name failed (attempt $attempt/$attempts); retrying in ${delay}s." >&2
-  sleep "$delay"
-  delay=$((delay * 2))
-done
+    if [[ "$attempt" -eq "$attempts" ]]; then
+      echo "Upload of $candidate failed after $attempts attempts." >&2
+      return 1
+    fi
+
+    echo "Upload of $candidate failed (attempt $attempt/$attempts); retrying in ${current_delay}s." >&2
+    sleep "$current_delay"
+    current_delay=$((current_delay * 2))
+  done
+}
+
+# The integrity document is the publisher's statement about the archive bytes,
+# not a receipt created by the downloader. Publish it first so a consumer never
+# sees an archive row as complete without its authenticated expectation.
+upload_immutable "$integrity_name" "$integrity"
+upload_immutable "$asset_name" "$staged"

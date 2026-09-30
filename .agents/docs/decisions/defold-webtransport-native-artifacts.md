@@ -142,6 +142,14 @@ final archive rename. Cache concurrency is therefore an explicit operational
 follow-up; callers may retry, and no raced result is trusted without a fresh
 full validation.
 
+All release upload paths now publish a deterministic
+`<archive>.integrity.json` sibling before the archive. The document binds the
+full build-input fingerprint, archive bytes, and exact member bytes. The Hermes
+target/host consumers authenticate those sidecars through the policy artifact
+mapping or GitHub's publisher-side release digest; WebTransport retains its
+existing GitHub asset-digest and embedded-inventory checks and publishes the
+same sidecar so release completeness has one uniform observable shape.
+
 Build jobs run with read-only repository permission and checkouts do not retain
 credentials. A separate publisher job is the sole write-capable job. Published
 same-name assets are downloaded and audited before planning; a digest mismatch

@@ -22,6 +22,12 @@ import { parse as parseYaml } from "yaml";
 
 import { extractReleaseArchive, releaseAssetUrl } from "../packages/cli/src/release-assets.mjs";
 import {
+  buildReleaseIntegrity,
+  releaseIntegrityAssetName,
+  validateReleaseIntegrity,
+  verifyReleaseArchive,
+} from "../packages/cli/src/release-integrity.mjs";
+import {
   artifactFamilyNames,
   expectedAssetNames,
   familyRelease,
@@ -131,6 +137,53 @@ test("an archive round-trips through the download side, flat and still executabl
   // asset loses this, and a compiler that cannot be executed is not installed,
   // merely present.
   assert.equal((await stat(path.join(unpacked, "libhermes.a"))).mode & 0o111, 0o111);
+});
+
+test("publisher integrity binds the archive and every exact member before installation", async (t) => {
+  const directory = await scratch(t);
+  const release = path.join(directory, "libhermes.a");
+  const config = path.join(directory, "libhermesvm-config.h");
+  await writeFile(release, "release archive contents");
+  await writeFile(config, "#define HERMESVM_SIZEOF_VOID_P 8\n");
+  const asset = "hermes-arm64-osx.tar.gz";
+  const archive = path.join(directory, asset);
+  await pack(archive, [release, config]);
+  const identity = {
+    family: "native-artifacts",
+    tag: "libs-0123456789ab",
+    fingerprint: "0123456789ab".padEnd(64, "0"),
+    asset,
+    members: ["libhermes.a", "libhermesvm-config.h"],
+  };
+  const integrity = await buildReleaseIntegrity({ ...identity, archive });
+  validateReleaseIntegrity(integrity, identity);
+  await verifyReleaseArchive({ archive, integrity });
+  const extracted = path.join(directory, "verified");
+  await extractReleaseArchive({ archive, destination: extracted });
+  await verifyReleaseArchive({ archive, integrity, expected: identity, extractedRoot: extracted });
+
+  await writeFile(archive, Buffer.concat([await readFile(archive), Buffer.from([0])]));
+  await assert.rejects(verifyReleaseArchive({ archive, integrity }), /publisher integrity document/u);
+  assert.equal(releaseIntegrityAssetName(asset), `${asset}.integrity.json`);
+});
+
+test("a substituted valid archive is rejected by the original publisher expectation", async (t) => {
+  const directory = await scratch(t);
+  const member = path.join(directory, "dehermc");
+  const asset = "dehermc-linux-x64.tar.gz";
+  const archive = path.join(directory, asset);
+  await writeFile(member, "first valid compiler");
+  await pack(archive, [member]);
+  const integrity = await buildReleaseIntegrity({
+    family: "dehermc",
+    tag: "tools-0123456789ab",
+    fingerprint: "0123456789ab".padEnd(64, "0"),
+    asset,
+    archive,
+  });
+  await writeFile(member, "second valid compiler");
+  await pack(archive, [member]);
+  await assert.rejects(verifyReleaseArchive({ archive, integrity }), /publisher integrity document/u);
 });
 
 test("the packager refuses an input that does not exist rather than shipping a short archive", async (t) => {

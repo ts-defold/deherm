@@ -243,7 +243,7 @@ A static site - GitHub Pages is sufficient - where the path *is* the hash. Every
 object lives under a **single owned prefix**, never at the domain root:
 
 ```
-<base>/v1/index/<defold-sha>.json  -> { "policyRoot": "<hash>", "generator": "<rev>" }
+<base>/v1/index/<defold-sha>.json  -> { "policyRoot": "<hash>", "artifactsSha256": "<hash>", "generator": "<rev>" }
 <base>/v1/artifacts/<defold-sha>.json -> release mappings for that revision
 <base>/v1/policy/<root-hash>.json  -> the policy root, naming its subtrees
 <base>/v1/object/<subtree-hash>.json -> one namespace's derived surface
@@ -286,7 +286,7 @@ The index is **not one global mutable file**, and it is not shipped as an
 authority. It is one small replaceable pointer per Defold revision:
 
 ```
-<base>/v1/index/<defold-sha>.json -> { "policyRoot": "<hash>", "generator": "<rev>" }
+<base>/v1/index/<defold-sha>.json -> { "policyRoot": "<hash>", "artifactsSha256": "<hash>", "generator": "<rev>" }
 ```
 
 Keyed by a sha Defold has already published, each entry's `policyRoot` may be
@@ -350,15 +350,24 @@ rests on and the one a consumer gets wrong first: target archives are keyed by
 the Defold **bundle target** being built and host tools by the user's **host**,
 and neither implies the other.
 
-**The honest caveat.** The artifact document is not content-addressed. It names
-what the build recipe publishes *now*, while the index's sha-to-root statement
-remains immutable. If the Hermes pin or a build recipe moves, the artifact
-document moves to new fingerprinted release tags; the old releases remain
-addressable. The materializer accepts a native family only when its declared
-compatibility digest matches the authenticated Defold toolchain policy. Host
-families are carried even though neither is a function of Defold at all: a user
-resolving a revision wants a working host, and one fetch that answers for both
-is worth more than the purity of omitting two tags that happen not to move.
+The artifact document is replaceable publication metadata, but it is no longer
+accepted as an unauthenticated sibling. The served per-revision pointer carries
+`artifactsSha256`; clients cache the artifact document by that digest and reject
+substituted bytes. Each archive row also names a publisher-produced
+`<archive>.integrity.json` sidecar by exact SHA-256. The sidecar binds the full
+family input fingerprint, tag, asset name, compressed archive byte count and
+digest, and the exact member inventory with per-member byte counts and digests.
+The client validates the sidecar before extraction and validates the complete
+extracted tree before installation. A download receipt is observational cache
+state, never the source of its own expected digest.
+
+If the Hermes pin or a build recipe moves, the artifact document moves to new
+fingerprinted release tags; the old releases remain addressable. The
+materializer accepts a native family only when its declared compatibility digest
+matches the authenticated Defold toolchain policy. Host families are carried
+even though neither is a function of Defold at all: a user resolving a revision
+wants a working host, and one fetch that answers for both is worth more than the
+purity of omitting two tags that happen not to move.
 
 ## What ships in the package
 

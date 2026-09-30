@@ -98,6 +98,9 @@ const fingerprintFiles = Object.freeze([
   manifestRelative,
   "scripts/lib/defold-webtransport-artifacts.mjs",
   "scripts/manage-defold-webtransport-artifacts.mjs",
+  "packages/cli/src/release-integrity.mjs",
+  "scripts/generate-release-integrity.mjs",
+  "scripts/ci/upload-release-asset.sh",
   ".github/workflows/defold-webtransport-native-artifacts.yml",
 ]);
 

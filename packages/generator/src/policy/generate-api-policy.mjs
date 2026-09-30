@@ -44,11 +44,7 @@ import {
   policyPath,
   serializeObject,
 } from "./api-policy.mjs";
-import {
-  buildDefoldTargetMatrix,
-  buildToolchainPins,
-  nativeArtifactCompatibility,
-} from "../../../compiler/src/defold-toolchain-pins.mjs";
+import { buildDefoldTargetMatrix, buildToolchainPins } from "../../../compiler/src/defold-toolchain-pins.mjs";
 import {
   LOCALLY_RENDERED_OUTPUT_INPUTS,
   LOCALLY_RENDERED_OUTPUT_RECIPES,
@@ -60,13 +56,8 @@ import {
   createBindingLoweringRecipeFacts,
 } from "../../../compiler/src/binding-lowering-plan-recipe.mjs";
 import { releaseAssetUrlTemplate } from "../../../cli/src/release-assets.mjs";
-import {
-  artifactFamilies,
-  artifactFamilyNames,
-  familyRelease,
-  publishedAssets,
-} from "../../../../scripts/lib/artifact-releases.mjs";
 import { apiPolicyGenerator } from "../../../../scripts/lib/script-generator-pipeline.mjs";
+export { buildArtifactReferences } from "./artifact-references.mjs";
 
 export const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../..");
 export const storeRoot = path.join(root, "packages", "bindings", "generated", "policy");
@@ -320,71 +311,6 @@ export function reconcileLocalPins({ lock, pins }) {
     );
   }
   return rows;
-}
-
-/**
- * What a client on this Defold revision should download, named exactly.
- *
- * Two content-addressed systems used to have no way to meet: nothing in the
- * policy store named an artifact tag, and nothing in the releases named a
- * Defold revision. The index entry is the per-revision resolution point clients
- * already fetch, so it is the natural place to answer "I am on Defold X, what
- * do I download?".
- *
- * The host families are carried too, even though neither is a function of
- * Defold. A user resolving a revision wants a working host, and one fetch that
- * answers for both is worth more than the purity of omitting the two tags that
- * happen not to move when the engine does.
- *
- * `indexedBy` is the distinction the whole toolchain rests on and the one a
- * consumer gets wrong first: target archives are keyed by the Defold BUNDLE
- * TARGET being built, host tools by the USER'S HOST, and neither implies the
- * other.
- */
-export async function buildArtifactReferences(options = {}) {
-  const sourceRoot = options.sourceRoot ?? root;
-  const bundleTargets = await readJson(path.join(sourceRoot, "packages", "toolchains", "defold-bundle-targets.json"));
-  const compatibility = nativeArtifactCompatibility({
-    pins: {
-      ANDROID_NDK_VERSION: bundleTargets.sdk.androidNdkVersion,
-      ANDROID_NDK_API_VERSION: bundleTargets.sdk.androidNdkApiVersion,
-      ANDROID_64_NDK_API_VERSION: bundleTargets.sdk.android64NdkApiVersion,
-      ANDROID_TARGET_API_LEVEL: bundleTargets.sdk.androidTargetApiLevel,
-      VERSION_IPHONEOS_MIN: bundleTargets.sdk.iphoneosVersionMin,
-      VERSION_MACOSX_MIN: bundleTargets.sdk.macosxVersionMin,
-    },
-    targetMatrix: { targets: bundleTargets.targets },
-  });
-  const families = {};
-  for (const name of artifactFamilyNames) {
-    const family = artifactFamilies[name];
-    const assets = {};
-    const contents = {};
-    for (const row of await publishedAssets(name, { root: sourceRoot })) {
-      // One archive per matrix row, so one asset name per key. `contents` says
-      // what unpacks out of it - the tools, or the release and debugger-enabled
-      // libraries - because a consumer that has downloaded the file still has
-      // to know which member to use.
-      const key = row.host ?? row.target;
-      assets[key] = row.asset;
-      contents[key] = row.files;
-    }
-    const release = await familyRelease(name, { root: sourceRoot });
-    families[name] = {
-      tag: release.tag,
-      // The FULL digest the tag truncates to 16 hex. The tag is what a human
-      // reads and a URL carries; this is what provenance is asserted over, and
-      // keeping both here is what lets the short tag stay short without the
-      // index losing the claim.
-      fingerprint: release.fingerprint,
-      indexedBy: family.tools ? "host" : "bundleTarget",
-      summary: family.summary,
-      assets,
-      contents,
-    };
-    if (name === "native-artifacts") families[name].compatibility = compatibility;
-  }
-  return families;
 }
 
 export async function derivePolicy(options = {}) {
@@ -695,7 +621,8 @@ export function buildShippedIndex({ site, entries }) {
       "artifact references: release tags are a function of the build recipe rather than of the " +
       "engine, so embedding them made a Dockerfile edit drift an unrelated revision's entry. " +
       "Fetch v1/artifacts/<defold-sha>.json for the Hermes archives and host tools that build " +
-      "for a revision, then expand base.releaseAsset with a tag and an asset to get a download " +
+      "for a revision; the served revision pointer binds that document through artifactsSha256. " +
+      "Then expand base.releaseAsset with a tag and an asset to get a download " +
       "URL without hardcoding a forge. That document is emitted at publish time and is the one " +
       "served document that is legitimately rewritten.",
     base: {

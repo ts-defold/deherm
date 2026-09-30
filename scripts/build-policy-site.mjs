@@ -28,7 +28,7 @@ import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import { ARTIFACTS_DOCUMENT_KIND, artifactsPath, hashBytes } from "../packages/compiler/src/api-policy.mjs";
+import { ARTIFACTS_DOCUMENT_KIND, artifactsPath, hashBytes, indexPath } from "../packages/compiler/src/api-policy.mjs";
 import {
   buildArtifactReferences,
   readSiteConfig,
@@ -65,7 +65,7 @@ const wordmarkPath = path.join(root, "docs", "assets", "brand", "deherm-wordmark
 // 1200x630 with the page background (262626) so the card has no seam.
 const ogImagePath = path.join(root, "docs", "assets", "brand", "deherm-og.png");
 
-export function validateArtifactReferences(value, label = "artifact references") {
+export function validateArtifactReferences(value, label = "artifact references", options = {}) {
   const references = value?.kind === ARTIFACTS_DOCUMENT_KIND ? value.artifacts : value;
   if (!references || typeof references !== "object" || Array.isArray(references)) {
     throw new Error(`${label} must be an artifact mapping or published artifacts document`);
@@ -80,6 +80,21 @@ export function validateArtifactReferences(value, label = "artifact references")
     }
     if (!row.assets || typeof row.assets !== "object" || !Object.keys(row.assets).length) {
       throw new Error(`${label} has no ${family} assets`);
+    }
+    if (options.requireIntegrity) {
+      for (const key of Object.keys(row.assets)) {
+        const integrity = row.integrity?.[key];
+        if (
+          !integrity ||
+          typeof integrity.asset !== "string" ||
+          !/^[0-9a-f]{64}$/u.test(integrity.sha256 ?? "") ||
+          !/^[0-9a-f]{64}$/u.test(integrity.archiveSha256 ?? "") ||
+          !Number.isSafeInteger(integrity.archiveBytes) ||
+          integrity.archiveBytes < 1
+        ) {
+          throw new Error(`${label} has no authenticated ${family}/${key} integrity record`);
+        }
+      }
     }
   }
   return references;
@@ -267,20 +282,28 @@ export async function buildPolicySite(options = {}) {
   // stops a build-script edit invalidating a policy derived months earlier.
   //
   // Every indexed revision gets one, naming the tags this publish is current
-  // for. It is the one served document that is legitimately rewritten.
+  // for. Its exact digest is bound into the replaceable revision pointer below;
+  // release metadata can move without entering the immutable policy graph, but
+  // the client never accepts an unbound mapping.
   const artifactReferences = validateArtifactReferences(
-    options.artifactReferences ?? (await buildArtifactReferences()),
+    options.artifactReferences ?? (await buildArtifactReferences({ integrityRoot: options.artifactIntegrityRoot })),
+    "artifact references",
+    { requireIntegrity: Boolean(options.artifactIntegrityRoot) },
   );
   for (const entry of store.entries) {
     const document = {
-      schemaVersion: 1,
+      schemaVersion: 2,
       kind: ARTIFACTS_DOCUMENT_KIND,
       defoldRevision: entry.defoldRevision,
       artifacts: artifactReferences,
     };
+    const documentBytes = Buffer.from(`${JSON.stringify(document, null, 2)}\n`);
+    files.set([...prefix, artifactsPath(site.layoutVersion, entry.defoldRevision)].join("/"), documentBytes);
+    const entryFile = [...prefix, indexPath(site.layoutVersion, entry.defoldRevision)].join("/");
+    const publishedEntry = JSON.parse(files.get(entryFile));
     files.set(
-      [...prefix, artifactsPath(site.layoutVersion, entry.defoldRevision)].join("/"),
-      Buffer.from(`${JSON.stringify(document, null, 2)}\n`),
+      entryFile,
+      Buffer.from(`${JSON.stringify({ ...publishedEntry, artifactsSha256: hashBytes(documentBytes) }, null, 2)}\n`),
     );
   }
   const plan = JSON.parse(await readFile(options.planPath ?? planPath, "utf8"));
@@ -335,6 +358,10 @@ export async function verifyEmittedTree({ output, site, pathPrefix }) {
     const index = JSON.parse(indexBytes);
     if (index.policyRoot !== entry.policyRoot)
       throw new Error(`${entry.defoldRevision}: manifest and index entry disagree`);
+    const artifactBytes = await readFile(at(site.layoutVersion, "artifacts", `${entry.defoldRevision}.json`), "utf8");
+    if (hashBytes(artifactBytes) !== index.artifactsSha256) {
+      throw new Error(`${entry.defoldRevision}: artifact mapping does not match its index entry`);
+    }
     const rootBytes = await readFile(at(site.layoutVersion, "policy", `${index.policyRoot}.json`), "utf8");
     if (hashBytes(rootBytes) !== index.policyRoot)
       throw new Error(`policy ${index.policyRoot} does not hash to its path`);
@@ -354,6 +381,7 @@ async function main(argv = process.argv.slice(2)) {
     if (argument === "--out") options.output = path.resolve(argv[++index]);
     else if (argument === "--base-url") options.baseUrl = argv[++index];
     else if (argument === "--path-prefix") options.pathPrefix = argv[++index];
+    else if (argument === "--artifact-integrity-root") options.artifactIntegrityRoot = path.resolve(argv[++index]);
     else if (argument === "--artifact-references") {
       const file = path.resolve(argv[++index]);
       options.artifactReferences = validateArtifactReferences(
@@ -361,6 +389,9 @@ async function main(argv = process.argv.slice(2)) {
         `artifact references from ${file}`,
       );
     } else throw new Error(`Unknown argument: ${argument}`);
+  }
+  if (!options.artifactReferences && !options.artifactIntegrityRoot) {
+    throw new Error("Policy publication requires --artifact-integrity-root or an authenticated fallback mapping");
   }
   const result = await buildPolicySite(options);
   const verified = await verifyEmittedTree({

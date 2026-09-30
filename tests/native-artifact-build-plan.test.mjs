@@ -19,6 +19,7 @@ test("an empty release schedules every publishable asset exactly once", async ()
     .sort();
   const expected = Object.values(plan.assets)
     .flatMap((family) => family.expected)
+    .filter((asset) => !asset.endsWith(".integrity.json"))
     .sort();
 
   assert.deepEqual(scheduled, expected);
@@ -59,9 +60,26 @@ test("a partial release rebuilds only its missing matrix row", async () => {
   assert.deepEqual(plan.assets["native-artifacts"].missing, [missing]);
 });
 
+test("a row whose archive exists without its publisher integrity document is rebuilt", async () => {
+  const initial = await planNativeArtifactBuilds();
+  const sidecar = "hermes-arm64-android.tar.gz.integrity.json";
+  const present = Object.fromEntries(
+    Object.entries(initial.assets).map(([family, value]) => [
+      family,
+      value.expected.filter((asset) => asset !== sidecar),
+    ]),
+  );
+  const plan = await planNativeArtifactBuilds(present);
+  assert.deepEqual(
+    rows(plan).map((row) => row.asset),
+    ["hermes-arm64-android.tar.gz"],
+  );
+  assert.deepEqual(plan.assets["native-artifacts"].missing, [sidecar]);
+});
+
 test("published fingerprint rows are immutable at the upload boundary", async () => {
   const uploader = await readFile("scripts/ci/upload-release-asset.sh", "utf8");
-  assert.match(uploader, /if asset_exists; then[\s\S]*skipping upload/u);
+  assert.match(uploader, /if asset_exists "\$candidate"; then[\s\S]*skipping upload/u);
   assert.doesNotMatch(uploader, /gh release upload[^\n]*--clobber/u);
 });
 

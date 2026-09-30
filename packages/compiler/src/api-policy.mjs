@@ -734,7 +734,7 @@ export function assertNoRevisionLeak({ rootBytes, objects, revision }) {
 
 /** The index entry for one revision: the only mutable, trust-requiring mapping. */
 /**
- * One Defold revision's resolution point.
+ * One Defold revision's source-policy resolution point.
  *
  * An entry is a pure function of the engine revision, and carries no artifact
  * references. Embedding them here was tried and reverted: release tags are a
@@ -743,7 +743,10 @@ export function assertNoRevisionLeak({ rootBytes, objects, revision }) {
  * build-script edit invalidating the derived API surface of an unrelated engine
  * revision. It also broke the write-once rule the entry's trust argument rests
  * on. The artifact mapping now lives in a sibling document emitted at publish
- * time; see artifactsPath.
+ * time; see artifactsPath. Publication adds `artifactsSha256` to the served
+ * copy of this replaceable pointer so that the sibling artifact document is
+ * authenticated without making release recipes part of the immutable policy
+ * graph. The committed/package copy deliberately carries no release mapping.
  */
 export function buildIndexEntry({ defoldRevision, policyRoot, generator, realizer }) {
   if (

@@ -16,6 +16,7 @@
 import { appendFile, readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 
+import { releaseIntegrityAssetName } from "../packages/cli/src/release-integrity.mjs";
 import { publishedAssets, repositoryRoot } from "./lib/artifact-releases.mjs";
 
 const targetExecutors = Object.freeze({
@@ -65,10 +66,12 @@ export async function planNativeArtifactBuilds(presentByFamily = {}, options = {
   const dehermcRows = await publishedAssets("dehermc", { root });
 
   const lanes = { linux: [], windows: [], android: [], apple: [] };
+  const complete = (family, row) =>
+    present[family].has(row.asset) && present[family].has(releaseIntegrityAssetName(row.asset));
   for (const row of targetRows) {
     const executor = targetExecutors[row.target];
     if (!executor) throw new Error(`No native-artifact executor is declared for ${row.target} (${row.asset})`);
-    if (present["native-artifacts"].has(row.asset)) continue;
+    if (complete("native-artifacts", row)) continue;
     const { lane, ...fields } = executor;
     lanes[lane].push(rowWithKey(row, fields, "target"));
   }
@@ -77,7 +80,7 @@ export async function planNativeArtifactBuilds(presentByFamily = {}, options = {
   for (const row of hermesHostRows) {
     const executor = hostExecutors[row.host];
     if (!executor) throw new Error(`No Hermes host-compiler executor is declared for ${row.host} (${row.asset})`);
-    if (!present["hermes-host"].has(row.asset)) {
+    if (!complete("hermes-host", row)) {
       hermesHosts.push(rowWithKey(row, executor, "host"));
     }
   }
@@ -90,23 +93,29 @@ export async function planNativeArtifactBuilds(presentByFamily = {}, options = {
     if (!hostExecutors[row.host]) {
       throw new Error(`No dehermc host is declared for ${row.host} (${row.asset})`);
     }
-    if (!present.dehermc.has(row.asset)) {
+    if (!complete("dehermc", row)) {
       dehermcHosts.push({ slot: hostExecutors[row.host].slot, host: row.host, asset: row.asset });
     }
   }
 
   const assets = {
     "native-artifacts": {
-      expected: targetRows.map((row) => row.asset),
-      missing: targetRows.filter((row) => !present["native-artifacts"].has(row.asset)).map((row) => row.asset),
+      expected: targetRows.flatMap((row) => [row.asset, releaseIntegrityAssetName(row.asset)]),
+      missing: targetRows
+        .flatMap((row) => [row.asset, releaseIntegrityAssetName(row.asset)])
+        .filter((asset) => !present["native-artifacts"].has(asset)),
     },
     "hermes-host": {
-      expected: hermesHostRows.map((row) => row.asset),
-      missing: hermesHostRows.filter((row) => !present["hermes-host"].has(row.asset)).map((row) => row.asset),
+      expected: hermesHostRows.flatMap((row) => [row.asset, releaseIntegrityAssetName(row.asset)]),
+      missing: hermesHostRows
+        .flatMap((row) => [row.asset, releaseIntegrityAssetName(row.asset)])
+        .filter((asset) => !present["hermes-host"].has(asset)),
     },
     dehermc: {
-      expected: dehermcRows.map((row) => row.asset),
-      missing: dehermcRows.filter((row) => !present.dehermc.has(row.asset)).map((row) => row.asset),
+      expected: dehermcRows.flatMap((row) => [row.asset, releaseIntegrityAssetName(row.asset)]),
+      missing: dehermcRows
+        .flatMap((row) => [row.asset, releaseIntegrityAssetName(row.asset)])
+        .filter((asset) => !present.dehermc.has(asset)),
     },
   };
 

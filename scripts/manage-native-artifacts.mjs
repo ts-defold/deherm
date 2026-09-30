@@ -4,7 +4,17 @@ import { createHash, randomBytes } from "node:crypto";
 import { cp, mkdir, readFile, readdir, rename, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 
-import { downloadReleaseAssets, extractReleaseArchive } from "../packages/cli/src/release-assets.mjs";
+import {
+  downloadReleaseAssets,
+  extractReleaseArchive,
+  resolveGithubReleaseAsset,
+  verifyReleaseAssetBytes,
+} from "../packages/cli/src/release-assets.mjs";
+import {
+  releaseIntegrityAssetName,
+  validateReleaseIntegrity,
+  verifyReleaseArchive,
+} from "../packages/cli/src/release-integrity.mjs";
 import { fileURLToPath } from "node:url";
 
 import {
@@ -381,9 +391,10 @@ else if (command === "verify") {
   }
   const selected = new Set(requestedTargets);
   const rows = selected.size ? published.filter((row) => selected.has(row.target)) : published;
+  const requestedAssets = rows.flatMap((row) => [releaseIntegrityAssetName(row.asset), row.asset]);
   const { missing } = await downloadReleaseAssets({
     tag,
-    assets: rows.map((row) => row.asset),
+    assets: requestedAssets,
     destination,
     optional: args.includes("--partial"),
     onProgress: ({ asset, status }) => console.log(`${status === "missing" ? "absent" : "fetched"} ${asset}`),
@@ -395,11 +406,32 @@ else if (command === "verify") {
   // to re-derive structure by parsing the name it just requested.
   const absent = new Set(missing);
   for (const row of rows) {
-    if (absent.has(row.asset)) continue;
-    await extractReleaseArchive({
-      archive: path.join(destination, row.asset),
-      destination: path.join(destination, `hermes-${row.target}`),
+    const integrityAsset = releaseIntegrityAssetName(row.asset);
+    if (absent.has(row.asset) || absent.has(integrityAsset)) continue;
+    const [integrityMetadata, archiveMetadata] = await Promise.all([
+      resolveGithubReleaseAsset({ tag, asset: integrityAsset }),
+      resolveGithubReleaseAsset({ tag, asset: row.asset }),
+    ]);
+    const integrityBytes = await readFile(path.join(destination, integrityAsset));
+    verifyReleaseAssetBytes(integrityBytes, integrityMetadata, integrityAsset);
+    const integrity = validateReleaseIntegrity(JSON.parse(integrityBytes), {
+      family: FAMILY,
+      tag,
+      asset: row.asset,
+      members: row.files,
     });
+    if (!tag.endsWith(integrity.fingerprint.slice(0, 12))) {
+      throw new Error(`${integrityAsset} fingerprint does not address release ${tag}`);
+    }
+    const archive = path.join(destination, row.asset);
+    verifyReleaseAssetBytes(await readFile(archive), archiveMetadata, row.asset);
+    await verifyReleaseArchive({ archive, integrity });
+    const extracted = path.join(destination, `hermes-${row.target}`);
+    await extractReleaseArchive({
+      archive,
+      destination: extracted,
+    });
+    await verifyReleaseArchive({ archive, integrity, extractedRoot: extracted });
   }
   const installed = await install(destination);
   const missingInstalls = rows.map((row) => row.target).filter((target) => !installed.includes(target));

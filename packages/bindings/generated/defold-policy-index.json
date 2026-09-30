@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "kind": "deherm.policy.index",
-  "comment": "Maps a Defold revision to the policy derived from it. An entry is keyed by a revision Defold has already published. Its policyRoot may be replaced when a newer generator derives a more complete projection from the same fixed engine inputs; the roots and subtrees it names remain immutable. Consumers FETCH the entry they need from v1/index/<defold-sha>.json rather than relying on a shipped copy: Defold publishes nightlies daily, so an index that had to be re-released to stay current would be a pin, not an index. The policy an entry names is content-addressed and therefore self-verifying, so a substituted policy fails its own hash check. An entry carries NO artifact references: release tags are a function of the build recipe rather than of the engine, so embedding them made a Dockerfile edit drift an unrelated revision's entry. Fetch v1/artifacts/<defold-sha>.json for the Hermes archives and host tools that build for a revision, then expand base.releaseAsset with a tag and an asset to get a download URL without hardcoding a forge. That document is emitted at publish time and is the one served document that is legitimately rewritten.",
+  "comment": "Maps a Defold revision to the policy derived from it. An entry is keyed by a revision Defold has already published. Its policyRoot may be replaced when a newer generator derives a more complete projection from the same fixed engine inputs; the roots and subtrees it names remain immutable. Consumers FETCH the entry they need from v1/index/<defold-sha>.json rather than relying on a shipped copy: Defold publishes nightlies daily, so an index that had to be re-released to stay current would be a pin, not an index. The policy an entry names is content-addressed and therefore self-verifying, so a substituted policy fails its own hash check. An entry carries NO artifact references: release tags are a function of the build recipe rather than of the engine, so embedding them made a Dockerfile edit drift an unrelated revision's entry. Fetch v1/artifacts/<defold-sha>.json for the Hermes archives and host tools that build for a revision; the served revision pointer binds that document through artifactsSha256. Then expand base.releaseAsset with a tag and an asset to get a download URL without hardcoding a forge. That document is emitted at publish time and is the one served document that is legitimately rewritten.",
   "base": {
     "url": "https://ts-defold.dev/deherm",
     "pathPrefix": "",
@@ -21,8 +21,8 @@
   "entries": [
     {
       "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-      "policyRoot": "5e781b97716430c6ac909dd82416dabdc5742440213bec2a8a032dcf9ac9863e",
-      "generator": "sha256:9a7530bdcc6d7ce6490213b0f2efc8bddbd9a94339fde3836c6e00dcadef4024",
+      "policyRoot": "f1580c586e80bfa89667273f18f41bab69537910f243418a4926ef6729534171",
+      "generator": "sha256:f2b6a2aea32758ac9bf7db6f35a9a68b71cd0588d855f7369f1fd71416136823",
       "realizer": {
         "minimumPackageVersion": "0.0.0",
         "requiredCapabilities": [

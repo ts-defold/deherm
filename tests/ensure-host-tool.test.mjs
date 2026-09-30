@@ -8,6 +8,8 @@ import test from "node:test";
 import { promisify } from "node:util";
 
 import { ensureHostFamily } from "../packages/cli/src/ensure-host-tool.mjs";
+import { releaseAssetUrl } from "../packages/cli/src/release-assets.mjs";
+import { buildReleaseIntegrity } from "../packages/cli/src/release-integrity.mjs";
 
 const execFileAsync = promisify(execFile);
 
@@ -15,11 +17,39 @@ function sha256(bytes) {
   return createHash("sha256").update(bytes).digest("hex");
 }
 
+async function releaseFixture({ family, tag, fingerprint, asset, archive }) {
+  const integrityName = `${asset}.integrity.json`;
+  const integrityBytes = Buffer.from(
+    `${JSON.stringify(await buildReleaseIntegrity({ family, tag, fingerprint, asset, archive }), null, 2)}\n`,
+  );
+  const archiveBytes = await readFile(archive);
+  const repository = "ts-defold/deherm";
+  const assets = [
+    { name: integrityName, bytes: integrityBytes },
+    { name: asset, bytes: archiveBytes },
+  ].map(({ name, bytes }) => ({
+    name,
+    digest: `sha256:${sha256(bytes)}`,
+    size: bytes.byteLength,
+    browser_download_url: releaseAssetUrl({ repository, tag, asset: name }),
+  }));
+  let fetches = 0;
+  const fetchImpl = async (url) => {
+    fetches += 1;
+    if (String(url).startsWith("https://api.github.com/")) return Response.json({ assets });
+    if (String(url).endsWith(integrityName)) return new Response(integrityBytes, { status: 200 });
+    if (String(url).endsWith(asset)) return new Response(archiveBytes, { status: 200 });
+    return new Response("missing", { status: 404 });
+  };
+  return { fetchImpl, fetches: () => fetches };
+}
+
 test("a digest-mismatched host-tool cache is replaced and the repaired cache is reused", async () => {
   const root = await mkdtemp(path.join(tmpdir(), "deherm-host-tool-cache."));
   const originalFetch = globalThis.fetch;
   try {
     const tag = "tools-test";
+    const fingerprint = "1".repeat(64);
     const host = "test-host";
     const asset = "dehermc-test-host.tar.gz";
     const member = "dehermc";
@@ -39,6 +69,7 @@ test("a digest-mismatched host-tool cache is replaced and the repaired cache is 
         families: {
           dehermc: {
             tag,
+            fingerprint,
             assets: { [host]: asset },
             contents: { [host]: [member] },
           },
@@ -50,12 +81,8 @@ test("a digest-mismatched host-tool cache is replaced and the repaired cache is 
     await mkdir(destination, { recursive: true });
     await writeFile(path.join(destination, member), "corrupt but present\n");
 
-    const archiveBytes = await readFile(archive);
-    let fetches = 0;
-    globalThis.fetch = async () => {
-      fetches += 1;
-      return new Response(archiveBytes, { status: 200 });
-    };
+    const release = await releaseFixture({ family: "dehermc", tag, fingerprint, asset, archive });
+    globalThis.fetch = release.fetchImpl;
 
     const options = {
       expectedDigests: { [member]: expected },
@@ -64,12 +91,12 @@ test("a digest-mismatched host-tool cache is replaced and the repaired cache is 
     };
     const repaired = await ensureHostFamily("dehermc", host, options);
     assert.equal(repaired.cached, false);
-    assert.equal(fetches, 1);
+    assert.equal(release.fetches(), 4);
     assert.equal(sha256(await readFile(path.join(destination, member))), expected);
 
     const reused = await ensureHostFamily("dehermc", host, options);
     assert.equal(reused.cached, true);
-    assert.equal(fetches, 1, "an authenticated cache hit must not download again");
+    assert.equal(release.fetches(), 4, "an authenticated cache hit must not download again");
   } finally {
     globalThis.fetch = originalFetch;
     await rm(root, { recursive: true, force: true });
@@ -81,6 +108,7 @@ test("a downloaded member with the wrong digest never replaces the existing cach
   const originalFetch = globalThis.fetch;
   try {
     const tag = "tools-test";
+    const fingerprint = "2".repeat(64);
     const host = "test-host";
     const asset = "dehermc-test-host.tar.gz";
     const member = "dehermc";
@@ -97,6 +125,7 @@ test("a downloaded member with the wrong digest never replaces the existing cach
         families: {
           dehermc: {
             tag,
+            fingerprint,
             assets: { [host]: asset },
             contents: { [host]: [member] },
           },
@@ -106,8 +135,8 @@ test("a downloaded member with the wrong digest never replaces the existing cach
     const destination = path.join(root, ".deherm", "cache", "toolchains", tag, host);
     await mkdir(destination, { recursive: true });
     await writeFile(path.join(destination, member), "original corrupt cache\n");
-    const archiveBytes = await readFile(archive);
-    globalThis.fetch = async () => new Response(archiveBytes, { status: 200 });
+    const release = await releaseFixture({ family: "dehermc", tag, fingerprint, asset, archive });
+    globalThis.fetch = release.fetchImpl;
 
     await assert.rejects(
       ensureHostFamily("dehermc", host, {

@@ -23,8 +23,14 @@ import { chmod, mkdir, readFile, rename, rm, stat } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { downloadReleaseAssets, extractReleaseArchive } from "./release-assets.mjs";
+import {
+  downloadReleaseAssets,
+  extractReleaseArchive,
+  resolveGithubReleaseAsset,
+  verifyReleaseAssetBytes,
+} from "./release-assets.mjs";
 import { defoldSurfaceCacheHome } from "./defold-surface.mjs";
+import { releaseIntegrityAssetName, validateReleaseIntegrity, verifyReleaseArchive } from "./release-integrity.mjs";
 
 const moduleRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
 
@@ -91,18 +97,38 @@ export async function ensureHostFamily(family, host, options = {}) {
   }
 
   const staging = `${destination}.incoming-${process.pid}`;
+  const downloadRoot = `${staging}.download`;
   await rm(staging, { recursive: true, force: true });
+  await rm(downloadRoot, { recursive: true, force: true });
   await mkdir(staging, { recursive: true });
+  await mkdir(downloadRoot, { recursive: true });
   try {
+    const integrityAsset = releaseIntegrityAssetName(asset);
+    const [integrityMetadata, archiveMetadata] = await Promise.all([
+      resolveGithubReleaseAsset({ repository: tags.repository, tag: reference.tag, asset: integrityAsset }),
+      resolveGithubReleaseAsset({ repository: tags.repository, tag: reference.tag, asset }),
+    ]);
     const { downloaded } = await downloadReleaseAssets({
       repository: tags.repository,
       tag: reference.tag,
-      assets: [asset],
-      destination: staging,
+      assets: [integrityAsset, asset],
+      destination: downloadRoot,
       onProgress: options.onProgress,
     });
-    await extractReleaseArchive({ archive: downloaded[0], destination: staging });
-    await rm(downloaded[0], { force: true });
+    const integrityBytes = await readFile(downloaded[0]);
+    verifyReleaseAssetBytes(integrityBytes, integrityMetadata, integrityAsset);
+    const integrity = validateReleaseIntegrity(JSON.parse(integrityBytes), {
+      family,
+      tag: reference.tag,
+      fingerprint: reference.fingerprint,
+      asset,
+      members,
+    });
+    const archiveBytes = await readFile(downloaded[1]);
+    verifyReleaseAssetBytes(archiveBytes, archiveMetadata, asset);
+    await verifyReleaseArchive({ archive: downloaded[1], integrity });
+    await extractReleaseArchive({ archive: downloaded[1], destination: staging });
+    await verifyReleaseArchive({ archive: downloaded[1], integrity, extractedRoot: staging });
     for (const member of members) {
       const file = path.join(staging, member);
       if (
@@ -125,6 +151,7 @@ export async function ensureHostFamily(family, host, options = {}) {
     return { destination, tag: reference.tag, cached: false, members };
   } finally {
     await rm(staging, { recursive: true, force: true });
+    await rm(downloadRoot, { recursive: true, force: true });
   }
 }
 

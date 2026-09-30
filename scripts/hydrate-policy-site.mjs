@@ -6,6 +6,7 @@
 // no-op nightly would rebuild a one-entry site and erase every older revision.
 
 import { mkdir, readFile, writeFile } from "node:fs/promises";
+import path from "node:path";
 import { pathToFileURL } from "node:url";
 
 import { readSiteConfig, readStore, shippedIndexPath, storeRoot } from "./generate-api-policy.mjs";

@@ -27,6 +27,7 @@
 // across lanes and makes the URL unresolvable.
 
 import { execFile } from "node:child_process";
+import { createHash } from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { promisify } from "node:util";
@@ -57,6 +58,39 @@ export function releaseAssetUrl({ repository = defaultReleaseRepository, tag, as
   // they need no escaping - but encoding them keeps a malformed one from
   // silently producing a URL that resolves to something else.
   return `https://github.com/${repository}/releases/download/${encodeURIComponent(tag)}/${encodeURIComponent(asset)}`;
+}
+
+/** Resolve GitHub's publisher-side digest for one exact immutable release asset. */
+export async function resolveGithubReleaseAsset({
+  repository = defaultReleaseRepository,
+  tag,
+  asset,
+  fetchImpl = fetch,
+}) {
+  const expectedUrl = releaseAssetUrl({ repository, tag, asset });
+  const metadataUrl = `https://api.github.com/repos/${repository}/releases/tags/${encodeURIComponent(tag)}`;
+  const response = await fetchImpl(metadataUrl, {
+    headers: { Accept: "application/vnd.github+json", "User-Agent": "deherm-release-asset-client" },
+  });
+  if (!response.ok) throw new Error(`${metadataUrl} responded ${response.status} ${response.statusText}`);
+  const release = await response.json();
+  const matches = (release.assets ?? []).filter((candidate) => candidate?.name === asset);
+  if (matches.length !== 1) throw new Error(`${tag} exposes ${matches.length} release assets named ${asset}`);
+  const record = matches[0];
+  const digest = /^sha256:([0-9a-f]{64})$/u.exec(record.digest ?? "");
+  if (!digest) throw new Error(`${tag}/${asset} has no publisher-side SHA-256 digest`);
+  if (record.browser_download_url !== expectedUrl) {
+    throw new Error(`${tag}/${asset} resolves to an unexpected release URL`);
+  }
+  return { url: expectedUrl, sha256: digest[1], bytes: record.size };
+}
+
+export function verifyReleaseAssetBytes(bytes, expected, label) {
+  const observed = createHash("sha256").update(bytes).digest("hex");
+  if (observed !== expected.sha256 || (Number.isSafeInteger(expected.bytes) && bytes.byteLength !== expected.bytes)) {
+    throw new Error(`${label} does not match GitHub's publisher-side release digest`);
+  }
+  return observed;
 }
 
 // A 404 is not a transport failure: on a content-addressed release it means

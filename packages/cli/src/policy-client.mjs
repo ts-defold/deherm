@@ -446,7 +446,8 @@ export async function resolvePublishedPolicy(revision, options = {}) {
       if (
         entry.kind !== "deherm.policy.index-entry" ||
         entry.defoldRevision !== revision ||
-        !DIGEST_PATTERN.test(entry.policyRoot ?? "")
+        !DIGEST_PATTERN.test(entry.policyRoot ?? "") ||
+        (index.base.artifacts && !DIGEST_PATTERN.test(entry.artifactsSha256 ?? ""))
       ) {
         throw new Error(`${label}: invalid policy index entry for ${revision}`);
       }
@@ -520,13 +521,17 @@ export async function resolvePublishedPolicy(revision, options = {}) {
   let artifacts = null;
   if (index.base.artifacts) {
     const relative = expand(index.base.artifacts, { defoldRevision: revision });
-    const result = await refreshableFetch({
+    const result = await cachedFetch({
       relative,
-      file: path.join(cacheRoot, "artifacts", `${revision}.json`),
+      file: path.join(cacheRoot, "artifacts", `${entry.artifactsSha256}.json`),
       label: "artifact mapping",
       validate(bytes, label) {
+        if (hashBytes(bytes) !== entry.artifactsSha256) {
+          throw new Error(`${label}: artifact bytes do not hash to ${entry.artifactsSha256}`);
+        }
         const value = parseJson(bytes, label);
         if (
+          value.schemaVersion !== 2 ||
           value.kind !== "deherm.policy.artifacts" ||
           value.defoldRevision !== revision ||
           value.artifacts?.["native-artifacts"]?.indexedBy !== "bundleTarget"

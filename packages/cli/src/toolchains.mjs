@@ -4,6 +4,7 @@ import path from "node:path";
 
 import { downloadReleaseAssets, extractReleaseArchive } from "./release-assets.mjs";
 import { defoldSurfaceCacheHome } from "./defold-surface.mjs";
+import { sha256, validateReleaseIntegrity, verifyReleaseArchive } from "./release-integrity.mjs";
 
 const packageRoot = path.resolve(import.meta.dirname, "../../..");
 const targetCacheReceiptName = ".deherm-target-cache.json";
@@ -263,6 +264,7 @@ async function cachedTargetArtifact(destination, family, target, asset, members)
     receipt.fingerprint !== family.fingerprint ||
     receipt.asset !== asset ||
     !/^[a-f0-9]{64}$/u.test(receipt.assetSha256 ?? "") ||
+    receipt.integritySha256 !== family.integrity?.[target]?.sha256 ||
     JSON.stringify(receipt.members) !== JSON.stringify(members)
   )
     return null;
@@ -311,8 +313,9 @@ export async function ensureProjectNativeArtifact(projectRoot, defoldPlatform, o
   }).catch(() => null);
   if (current) return { ...current, cache: null, installed: [], reused: true };
   const asset = family.assets?.[target.extenderTarget];
+  const integrityReference = family.integrity?.[target.extenderTarget];
   const members = releaseArtifactMembers(family, target.extenderTarget);
-  if (!asset || members.length === 0) {
+  if (!asset || members.length === 0 || !/^[a-f0-9]{64}$/u.test(integrityReference?.sha256 ?? "")) {
     throw new Error(`No published Hermes archive is declared for ${target.extenderTarget} in ${family.tag}`);
   }
   const cacheRoot = options.cacheRoot
@@ -327,20 +330,36 @@ export async function ensureProjectNativeArtifact(projectRoot, defoldPlatform, o
       );
     }
     const staging = `${destination}.incoming-${process.pid}-${randomBytes(5).toString("hex")}`;
+    const downloadRoot = `${staging}.download`;
     await rm(staging, { recursive: true, force: true });
+    await rm(downloadRoot, { recursive: true, force: true });
     await mkdir(staging, { recursive: true });
+    await mkdir(downloadRoot, { recursive: true });
     try {
       const { downloaded } = await downloadReleaseAssets({
         repository: releaseRepository(lock),
         tag: family.tag,
-        assets: [asset],
-        destination: staging,
+        assets: [integrityReference.asset, asset],
+        destination: downloadRoot,
         onProgress: options.onProgress,
       });
-      const assetSha256 = createHash("sha256")
-        .update(await readFile(downloaded[0]))
-        .digest("hex");
-      await extractReleaseArchive({ archive: downloaded[0], destination: staging });
+      const integrityBytes = await readFile(downloaded[0]);
+      if (sha256(integrityBytes) !== integrityReference.sha256) {
+        throw new Error(`${integrityReference.asset} does not match the policy-bound publisher digest`);
+      }
+      const integrity = validateReleaseIntegrity(JSON.parse(integrityBytes), {
+        family: "native-artifacts",
+        tag: family.tag,
+        fingerprint: family.fingerprint,
+        asset,
+        members,
+      });
+      const archive = downloaded[1];
+      await verifyReleaseArchive({ archive, integrity });
+      const assetSha256 = integrity.archive.sha256;
+      await extractReleaseArchive({ archive, destination: staging });
+      await verifyReleaseArchive({ archive, integrity, extractedRoot: staging });
+      await rm(archive, { force: true });
       await rm(downloaded[0], { force: true });
       if (!(await allFilesExist(staging, members))) throw new Error(`${asset} does not contain ${members.join(", ")}`);
       const hashes = await memberDigests(staging, members);
@@ -352,6 +371,7 @@ export async function ensureProjectNativeArtifact(projectRoot, defoldPlatform, o
         fingerprint: family.fingerprint,
         asset,
         assetSha256,
+        integritySha256: integrityReference.sha256,
         members,
         hashes,
       };
@@ -361,6 +381,7 @@ export async function ensureProjectNativeArtifact(projectRoot, defoldPlatform, o
       await rename(staging, destination);
     } finally {
       await rm(staging, { recursive: true, force: true });
+      await rm(downloadRoot, { recursive: true, force: true });
     }
   }
   const hashes = cacheReceipt.hashes;
@@ -406,6 +427,7 @@ export async function ensureProjectNativeArtifact(projectRoot, defoldPlatform, o
         fingerprint: family.fingerprint,
         asset,
         assetSha256: cacheReceipt.assetSha256,
+        integritySha256: cacheReceipt.integritySha256,
         cacheMembers: members,
         installed: {
           [canonicalMember]: hashes[selectedMember],
@@ -505,6 +527,7 @@ export async function assertProjectNativeArtifact(projectRoot, defoldPlatform, o
     receipt.fingerprint === family.fingerprint &&
     receipt.asset === family.assets?.[target.extenderTarget] &&
     /^[a-f0-9]{64}$/u.test(receipt.assetSha256 ?? "") &&
+    receipt.integritySha256 === family.integrity?.[target.extenderTarget]?.sha256 &&
     members.every((member) => receipt.cacheMembers?.includes(member)) &&
     new RegExp(`^#define DEHERM_HERMES_DEBUGGER ${variant === "debug" ? 1 : 0}$`, "m").test(variantHeader)
   ) {

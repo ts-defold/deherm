@@ -42,6 +42,19 @@ const artifactDocument = {
   defoldRevision: policyManifest.defoldRevision,
   artifacts: await buildArtifactReferences(),
 };
+for (const family of Object.values(artifactDocument.artifacts)) {
+  family.integrity = Object.fromEntries(
+    Object.entries(family.assets).map(([key, asset]) => [
+      key,
+      {
+        asset: `${asset}.integrity.json`,
+        sha256: "f".repeat(64),
+        archiveSha256: "e".repeat(64),
+        archiveBytes: 1,
+      },
+    ]),
+  );
+}
 
 async function writeProjectLock(root) {
   await writeFile(
@@ -389,6 +402,7 @@ test("a target release already in the content-addressed cache installs without n
           fingerprint: family.fingerprint,
           asset: family.assets["arm64-osx"],
           assetSha256: "a".repeat(64),
+          integritySha256: family.integrity["arm64-osx"].sha256,
           members: family.contents["arm64-osx"],
           hashes,
         },

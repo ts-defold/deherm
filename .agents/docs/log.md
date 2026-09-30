@@ -4614,3 +4614,28 @@ runtime tests pass 142/142, VS Code tests pass 19/19, Defold WebTransport tests
 pass 75/75, and the War Battles session subset passes 131/131. These are
 generation, compile/exact-call, loopback transport, and product-test claims;
 they are not a visual-quality or every-platform binary release claim.
+
+## 2026-09-29 - Release artifact expectations are publisher-authenticated
+
+The general Hermes target and host-tool download paths no longer create their
+own expected digest from bytes they just downloaded. Every release upload now
+publishes a deterministic `.integrity.json` sibling first, binding the full
+input fingerprint, release identity, compressed archive digest/size, and exact
+member digests/sizes. Missing sidecars make a matrix row incomplete and schedule
+that row again.
+
+Policy publication downloads those sidecars, validates them against the
+generator-owned release matrix, and binds their exact hashes into the served
+artifact document. The served per-revision pointer binds that document through
+`artifactsSha256`; the client caches it by digest and refuses substituted bytes.
+Host-tool first use independently requires GitHub's publisher-side digest for
+both the sidecar and archive, with no `gh` or authenticated session required.
+The target installer verifies the archive before extraction and the exact member
+tree before installation. Focused tests cover a one-byte mutation, a substituted
+but otherwise valid archive, a missing sidecar row, offline reuse, and a tampered
+artifact document.
+
+Artifact-reference derivation now lives outside the source-policy generator
+identity. Release tags, URLs, and publisher sidecars may rotate without changing
+the Defold-source-derived Merkle root; publication joins the two independent
+graphs through the hash-bound per-revision pointer.

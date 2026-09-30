@@ -88,6 +88,8 @@ on:
       - packages/toolchains/host-compilers.json
       - scripts/lib/artifact-releases.mjs
       - scripts/lib/host-compiler-artifact-verification.mjs
+      - packages/cli/src/release-integrity.mjs
+      - scripts/generate-release-integrity.mjs
       - scripts/manage-native-artifacts.mjs
       - scripts/manage-host-compilers.mjs
       - scripts/plan-native-artifact-builds.mjs

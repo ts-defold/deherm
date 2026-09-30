@@ -21,6 +21,8 @@ on:
       - scripts/lib/defold-webtransport-artifacts.mjs
       - scripts/manage-defold-webtransport-artifacts.mjs
       - scripts/ci/upload-release-asset.sh
+      - packages/cli/src/release-integrity.mjs
+      - scripts/generate-release-integrity.mjs
       - .github/workflows/defold-webtransport-native-artifacts.yml
 
 permissions:

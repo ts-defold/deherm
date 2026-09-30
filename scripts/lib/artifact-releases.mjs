@@ -47,6 +47,8 @@
 import { createHash } from "node:crypto";
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
+
+import { releaseIntegrityAssetName } from "../../packages/cli/src/release-integrity.mjs";
 import { fileURLToPath } from "node:url";
 
 import { serializeObject } from "../../packages/compiler/src/api-policy.mjs";
@@ -65,6 +67,11 @@ export const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.met
  * forget, because it is not a compiler and not a pin.
  */
 const archivePackager = "toolchains/hermes/package-archive.sh";
+const publisherIntegrityInputs = Object.freeze([
+  "packages/cli/src/release-integrity.mjs",
+  "scripts/generate-release-integrity.mjs",
+  "scripts/ci/upload-release-asset.sh",
+]);
 
 /**
  * The three published artifact families, each with the exact inputs that decide
@@ -89,7 +96,7 @@ export const artifactFamilies = Object.freeze({
     assetPrefix: "hermes-host",
     tools: ["hermesc", "shermes"],
     lockKeys: ["HERMES_URL", "HERMES_REV"],
-    files: ["toolchains/hermes/build-host-compilers.sh", archivePackager],
+    files: ["toolchains/hermes/build-host-compilers.sh", archivePackager, ...publisherIntegrityInputs],
     json: [],
   },
   dehermc: {
@@ -101,7 +108,7 @@ export const artifactFamilies = Object.freeze({
     // Nothing from upstream.lock. dehermc links the typescript-go compiler that
     // arrives with the pinned ttsc npm package; neither engine is involved.
     lockKeys: [],
-    files: ["toolchains/go/build-dehermc.sh", "packages/compiler/go.mod", archivePackager],
+    files: ["toolchains/go/build-dehermc.sh", "packages/compiler/go.mod", archivePackager, ...publisherIntegrityInputs],
     // Every Go source below this root is linked into dehermc. Enumerating the
     // tree, rather than today's filenames, makes a newly added transform an
     // input automatically instead of silently publishing changed bytes under
@@ -143,6 +150,7 @@ export const artifactFamilies = Object.freeze({
       // `manage-native-artifacts.mjs record` pins.
       "scripts/package-defold-extension.sh",
       archivePackager,
+      ...publisherIntegrityInputs,
     ],
     // `sdk` is what every cross build compiles against and `targets` is the
     // matrix it compiles for. The rest of that file - `defoldRevision`,
@@ -418,4 +426,9 @@ export async function publishedAssets(name, options = {}) {
 /** The flat, sorted asset listing CI checks a release's completeness against. */
 export async function expectedAssetNames(name, options = {}) {
   return (await publishedAssets(name, options)).map((row) => row.asset);
+}
+
+/** Primary archives plus the publisher-authenticated expectation beside each. */
+export async function expectedReleaseAssetNames(name, options = {}) {
+  return (await publishedAssets(name, options)).flatMap((row) => [row.asset, releaseIntegrityAssetName(row.asset)]);
 }

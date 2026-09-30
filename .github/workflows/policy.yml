@@ -528,10 +528,25 @@ jobs:
           done < <(node -e '
             const tags = require("./packages/toolchains/release-tags.json").families;
             for (const [family, row] of Object.entries(tags))
-              for (const asset of Object.values(row.assets))
+              for (const asset of Object.values(row.assets)) {
                 console.log(`${family}\t${row.tag}\t${asset}`);
+                console.log(`${family}\t${row.tag}\t${asset}.integrity.json`);
+              }
           ')
           if [ "${#missing[@]}" -eq 0 ]; then
+            integrity_root="$RUNNER_TEMP/release-integrity"
+            rm -rf "$integrity_root"
+            while IFS=$'\t' read -r family tag asset; do
+              mkdir -p "$integrity_root/$family"
+              gh release download "$tag" --repo "${{ github.repository }}" \
+                --pattern "$asset.integrity.json" --dir "$integrity_root/$family"
+            done < <(node -e '
+              const tags = require("./packages/toolchains/release-tags.json").families;
+              for (const [family, row] of Object.entries(tags))
+                for (const asset of Object.values(row.assets))
+                  console.log(`${family}\t${row.tag}\t${asset}`);
+            ')
+            echo "integrity_root=$integrity_root" >> "$GITHUB_OUTPUT"
             echo 'Current artifact mapping is complete.' >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
@@ -556,8 +571,10 @@ jobs:
           done < <(node -e '
             const refs = require(process.argv[1]);
             for (const [family, row] of Object.entries(refs))
-              for (const asset of Object.values(row.assets))
+              for (const asset of Object.values(row.assets)) {
                 console.log(`${family}\t${row.tag}\t${asset}`);
+                console.log(`${family}\t${row.tag}\t${asset}.integrity.json`);
+              }
           ' "$fallback")
           if [ "${#fallback_missing[@]}" -ne 0 ]; then
             printf 'The prior site mapping is also incomplete:\n%s\n' "${fallback_missing[*]}" >&2
@@ -571,10 +588,15 @@ jobs:
       - name: Build the policy site
         env:
           FALLBACK_ARTIFACTS: ${{ steps.artifact-map.outputs.fallback }}
+          ARTIFACT_INTEGRITY_ROOT: ${{ steps.artifact-map.outputs.integrity_root }}
         run: |
           set -euo pipefail
           args=(--out build/policy-site)
-          if [ -n "$FALLBACK_ARTIFACTS" ]; then args+=(--artifact-references "$FALLBACK_ARTIFACTS"); fi
+          if [ -n "$FALLBACK_ARTIFACTS" ]; then
+            args+=(--artifact-references "$FALLBACK_ARTIFACTS")
+          else
+            args+=(--artifact-integrity-root "$ARTIFACT_INTEGRITY_ROOT")
+          fi
           node scripts/build-policy-site.mjs "${args[@]}"
           node scripts/build-docs-site.mjs --out build/policy-site/docs
       - run: node scripts/check-policy-site-resolution.mjs

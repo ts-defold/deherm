@@ -17,7 +17,15 @@ function json(value) {
   return Buffer.from(`${JSON.stringify(value)}\n`);
 }
 
-function fixture({ tamper = false, entryRealizer, rootRealizer, defoldRevision = revision, fixtureValue = true } = {}) {
+function fixture({
+  tamper = false,
+  tamperArtifacts = false,
+  withArtifacts = false,
+  entryRealizer,
+  rootRealizer,
+  defoldRevision = revision,
+  fixtureValue = true,
+} = {}) {
   const documentNamespace = "@compiler:document:fixture.json";
   const documentBytes = json({
     schemaVersion: 1,
@@ -71,6 +79,13 @@ function fixture({ tamper = false, entryRealizer, rootRealizer, defoldRevision =
     },
   });
   const policyRoot = hashBytes(rootBytes);
+  const artifactsBytes = json({
+    schemaVersion: 2,
+    kind: "deherm.policy.artifacts",
+    defoldRevision,
+    artifacts: { "native-artifacts": { indexedBy: "bundleTarget" } },
+  });
+  const artifactsSha256 = hashBytes(artifactsBytes);
   const entryBytes = json({
     schemaVersion: 1,
     kind: "deherm.policy.index-entry",
@@ -78,6 +93,7 @@ function fixture({ tamper = false, entryRealizer, rootRealizer, defoldRevision =
     policyRoot,
     generator,
     realizer,
+    ...(withArtifacts ? { artifactsSha256 } : {}),
   });
   const routes = new Map([
     [`https://policy.invalid/deherm/v1/index/${defoldRevision}.json`, entryBytes],
@@ -90,12 +106,19 @@ function fixture({ tamper = false, entryRealizer, rootRealizer, defoldRevision =
     ],
     [`https://policy.invalid/deherm/v1/object/${unusedHash}.json`, unusedBytes],
   ]);
+  if (withArtifacts) {
+    routes.set(
+      `https://policy.invalid/deherm/v1/artifacts/${defoldRevision}.json`,
+      tamperArtifacts ? json({ altered: true }) : artifactsBytes,
+    );
+  }
   const index = {
     base: {
       url: "https://policy.invalid/deherm",
       pathPrefix: "",
       layoutVersion: "v1",
       index: "v1/index/{defoldRevision}.json",
+      ...(withArtifacts ? { artifacts: "v1/artifacts/{defoldRevision}.json" } : {}),
       policy: "v1/policy/{policyRoot}.json",
       object: "v1/object/{subtreeHash}.json",
     },
@@ -109,7 +132,16 @@ function fixture({ tamper = false, entryRealizer, rootRealizer, defoldRevision =
       ? new Response(bytes, { status: 200, headers: { "content-type": "application/json" } })
       : new Response("missing", { status: 404 });
   };
-  return { index, fetchImpl, policyRoot, documentHash, unusedHash, requests, materializeImpl: false };
+  return {
+    index,
+    fetchImpl,
+    policyRoot,
+    documentHash,
+    unusedHash,
+    artifactsSha256: withArtifacts ? artifactsSha256 : null,
+    requests,
+    materializeImpl: false,
+  };
 }
 
 async function verifyFixtureSurface(root) {
@@ -322,6 +354,31 @@ test("published policy resolution rejects an object substituted at its digest pa
   await assert.rejects(
     resolvePublishedPolicy(revision, { ...fixture({ tamper: true }), cacheHome }),
     /object bytes do not hash/,
+  );
+});
+
+test("the revision pointer authenticates the exact served artifact mapping", async () => {
+  const cacheHome = await mkdtemp(path.join(tmpdir(), "deherm-policy-client-artifacts-"));
+  const source = fixture({ withArtifacts: true });
+  const resolved = await resolvePublishedPolicy(revision, { ...source, cacheHome });
+  assert.equal(resolved.entry.artifactsSha256, source.artifactsSha256);
+  assert.equal(resolved.artifacts.kind, "deherm.policy.artifacts");
+  const offline = await resolvePublishedPolicy(revision, {
+    ...source,
+    cacheHome,
+    offline: true,
+    fetchImpl: async () => {
+      throw new Error("offline artifact mapping attempted network I/O");
+    },
+  });
+  assert.equal(offline.artifacts.kind, "deherm.policy.artifacts");
+
+  await assert.rejects(
+    resolvePublishedPolicy(revision, {
+      ...fixture({ withArtifacts: true, tamperArtifacts: true }),
+      cacheHome: await mkdtemp(path.join(tmpdir(), "deherm-policy-client-artifacts-tamper-")),
+    }),
+    /artifact bytes do not hash/u,
   );
 });
 

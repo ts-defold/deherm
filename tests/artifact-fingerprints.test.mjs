@@ -13,14 +13,17 @@ import path from "node:path";
 import test from "node:test";
 
 import { releaseAssetUrlTemplate } from "../packages/cli/src/release-assets.mjs";
+import { RELEASE_INTEGRITY_KIND, sha256 } from "../packages/cli/src/release-integrity.mjs";
 import { buildArtifactReferences } from "../scripts/generate-api-policy.mjs";
 import {
   artifactFamilies,
   artifactFamilyNames,
   expectedAssetNames,
+  familyRelease,
   familyTag,
   fingerprintFamily,
   hostArtifactFamilyNames,
+  publishedAssets,
   parseLock,
   readLockKeys,
   repositoryRoot,
@@ -45,6 +48,7 @@ async function scratchCheckout({ lock, bundleTargets } = {}) {
   await symlink(path.join(repositoryRoot, "package.json"), path.join(directory, "package.json"));
   await mkdir(path.join(directory, "packages"), { recursive: true });
   await symlink(path.join(repositoryRoot, "packages", "compiler"), path.join(directory, "packages", "compiler"));
+  await symlink(path.join(repositoryRoot, "packages", "cli"), path.join(directory, "packages", "cli"));
   await mkdir(path.join(directory, "packages", "toolchains"), { recursive: true });
   for (const name of ["host-compilers.json", "native-artifacts.json"]) {
     await symlink(
@@ -263,4 +267,40 @@ test("a client can build a download URL, and the index entry stays free of artif
   }
   assert.equal(references["native-artifacts"].indexedBy, "bundleTarget");
   assert.equal(references["hermes-host"].indexedBy, "host");
+});
+
+test("published artifact references bind every publisher integrity document", async () => {
+  const integrityRoot = await mkdtemp(path.join(tmpdir(), "deherm-artifact-integrity-"));
+  try {
+    for (const family of artifactFamilyNames) {
+      const release = await familyRelease(family);
+      await mkdir(path.join(integrityRoot, family), { recursive: true });
+      for (const row of await publishedAssets(family)) {
+        const document = {
+          schemaVersion: 1,
+          kind: RELEASE_INTEGRITY_KIND,
+          family,
+          tag: release.tag,
+          fingerprint: release.fingerprint,
+          asset: row.asset,
+          archive: { bytes: 7, sha256: "a".repeat(64) },
+          members: row.files.map((name) => ({ name, bytes: 1, sha256: "b".repeat(64) })),
+        };
+        await writeFile(
+          path.join(integrityRoot, family, `${row.asset}.integrity.json`),
+          `${JSON.stringify(document, null, 2)}\n`,
+        );
+      }
+    }
+    const references = await buildArtifactReferences({ integrityRoot });
+    for (const family of artifactFamilyNames) {
+      for (const record of Object.values(references[family].integrity)) {
+        const bytes = await readFile(path.join(integrityRoot, family, record.asset));
+        assert.equal(record.sha256, sha256(bytes));
+        assert.equal(record.archiveSha256, "a".repeat(64));
+      }
+    }
+  } finally {
+    await rm(integrityRoot, { recursive: true, force: true });
+  }
 });
