@@ -16,6 +16,14 @@ function request(seq, command, args = {}) {
   return { seq, type: "request", command, arguments: args };
 }
 
+async function waitFor(predicate, description, timeoutMilliseconds = 2_000) {
+  const deadline = Date.now() + timeoutMilliseconds;
+  while (!predicate()) {
+    if (Date.now() >= deadline) throw new Error(`timed out waiting for ${description}`);
+    await new Promise((resolve) => setTimeout(resolve, 5));
+  }
+}
+
 async function sourceMapFixture(t) {
   const root = await mkdtemp(path.join(tmpdir(), "deherm-dap-"));
   t.after(() => rm(root, { recursive: true, force: true }));
@@ -299,9 +307,7 @@ test("browser DAP breakpoints cover the initial bundle and numbered HMR generati
 
   currentBrowserScript = "hmr-2";
   listeners.get("Debugger.scriptParsed")({ scriptId: "hmr-2", url: "defold-hermes://app.2.js" });
-  for (let index = 0; index < 20 && breakpointSequence < 2; index += 1) {
-    await new Promise((resolve) => setImmediate(resolve));
-  }
+  await waitFor(() => breakpointSequence >= 2, "the queued HMR breakpoint reapplication");
   assert.equal(breakpointSequence, 2, "a numbered browser HMR source reapplies the authored breakpoint");
   listeners.get("Debugger.scriptParsed")({ scriptId: "other", url: "https://example.test/app.js" });
   await new Promise((resolve) => setImmediate(resolve));

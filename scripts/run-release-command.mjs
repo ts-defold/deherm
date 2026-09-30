@@ -6,10 +6,13 @@ import { appendFile } from "node:fs/promises";
 const [command, ...arguments_] = process.argv.slice(2);
 if (!command) throw new Error("usage: run-release-command.mjs <command> [arguments...]");
 
-const executable = process.platform === "win32" && !command.endsWith(".cmd") ? `${command}.cmd` : command;
-const child = spawn(executable, arguments_, {
+// Windows command shims installed by npm/pnpm are `.cmd` scripts. Node cannot
+// execute those directly with shell:false (it fails with EINVAL before the
+// child starts), so let cmd.exe resolve and invoke the shim there. POSIX keeps
+// direct argv execution and therefore retains its ordinary signal semantics.
+const child = spawn(command, arguments_, {
   env: process.env,
-  shell: false,
+  shell: process.platform === "win32",
   stdio: ["inherit", "pipe", "pipe"],
 });
 
