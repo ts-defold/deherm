@@ -4776,3 +4776,18 @@ tearing every session down. The launcher now detects, prepares when needed, and
 starts its default pinned Extender as an owned child; explicit alternate build
 servers remain caller-owned. This is packaged native/network/runtime evidence,
 not visual-quality review of the rendered game.
+
+The acceptance run also refreshed the policy-derived Static Hermes sources and
+thereby exposed a stale typed-native `ext.manifest`: the stack went directly
+from `deherm dev` to Bob, while the repository's standalone Bob wrapper performs
+typed-native assembly in between. The stack now invokes the installed CLI's
+`assemble-typed-native` command after generation and before Bob. A subsequent
+generated-state check proved all 17 typed-native outputs and both source
+bindings current. The finite cold-stack rerun then compiled and linked the
+assembled extension, registered and evaluated its Static Hermes unit in the
+packaged engine, admitted the native client plus 31 independent Chrome
+WebTransport/QUIC bots, observed 137 bot snapshot applications and 300 bot
+input sends, and proved nonzero movement for every bot. The runtime also emitted
+live heap, component-instance, Lua-handle, arena, and frame-time telemetry. This
+is packaged native/link/runtime evidence for arm64 macOS, not evidence for other
+platforms or a visual-quality review.

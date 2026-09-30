@@ -34,62 +34,64 @@ static const SHSrcLoc s_source_locations[] = {
   { .filename_idx = 8, .line = 0, .column = 0 },
 };
 static SHNativeFuncInfo s_function_info_table[] = {
-  { .name_index = 89, .arg_count = 0, .prohibit_invoke = 2, .kind = 0 },
+  { .name_index = 94, .arg_count = 0, .prohibit_invoke = 2, .kind = 0 },
   { .name_index = 35, .arg_count = 0, .prohibit_invoke = 2, .kind = 0 },
   { .name_index = 35, .arg_count = 0, .prohibit_invoke = 2, .kind = 0 },
   { .name_index = 35, .arg_count = 0, .prohibit_invoke = 2, .kind = 0 },
   { .name_index = 35, .arg_count = 0, .prohibit_invoke = 2, .kind = 0 },
   { .name_index = 35, .arg_count = 0, .prohibit_invoke = 2, .kind = 0 },
-  { .name_index = 90, .arg_count = 2, .prohibit_invoke = 2, .kind = 0 },
-  { .name_index = 91, .arg_count = 3, .prohibit_invoke = 2, .kind = 0 },
-  { .name_index = 92, .arg_count = 2, .prohibit_invoke = 2, .kind = 0 },
-  { .name_index = 93, .arg_count = 2, .prohibit_invoke = 2, .kind = 0 },
-  { .name_index = 94, .arg_count = 1, .prohibit_invoke = 2, .kind = 0 },
   { .name_index = 95, .arg_count = 2, .prohibit_invoke = 2, .kind = 0 },
-  { .name_index = 96, .arg_count = 0, .prohibit_invoke = 2, .kind = 0 },
+  { .name_index = 96, .arg_count = 3, .prohibit_invoke = 2, .kind = 0 },
+  { .name_index = 97, .arg_count = 2, .prohibit_invoke = 2, .kind = 0 },
+  { .name_index = 98, .arg_count = 2, .prohibit_invoke = 2, .kind = 0 },
+  { .name_index = 99, .arg_count = 1, .prohibit_invoke = 2, .kind = 0 },
+  { .name_index = 100, .arg_count = 2, .prohibit_invoke = 2, .kind = 0 },
+  { .name_index = 101, .arg_count = 0, .prohibit_invoke = 2, .kind = 0 },
   { .name_index = 0, .arg_count = 3, .prohibit_invoke = 2, .kind = 0 },
   { .name_index = 1, .arg_count = 0, .prohibit_invoke = 2, .kind = 0 },
   { .name_index = 2, .arg_count = 0, .prohibit_invoke = 2, .kind = 0 },
   { .name_index = 3, .arg_count = 0, .prohibit_invoke = 2, .kind = 0 },
-  { .name_index = 97, .arg_count = 0, .prohibit_invoke = 2, .kind = 0 },
+  { .name_index = 102, .arg_count = 0, .prohibit_invoke = 2, .kind = 0 },
   { .name_index = 0, .arg_count = 3, .prohibit_invoke = 2, .kind = 0 },
-  { .name_index = 98, .arg_count = 0, .prohibit_invoke = 2, .kind = 0 },
+  { .name_index = 103, .arg_count = 0, .prohibit_invoke = 2, .kind = 0 },
   { .name_index = 0, .arg_count = 3, .prohibit_invoke = 2, .kind = 0 },
-  { .name_index = 99, .arg_count = 1, .prohibit_invoke = 0, .kind = 0 },
+  { .name_index = 104, .arg_count = 1, .prohibit_invoke = 0, .kind = 0 },
   { .name_index = 0, .arg_count = 3, .prohibit_invoke = 2, .kind = 0 },
-  { .name_index = 100, .arg_count = 1, .prohibit_invoke = 0, .kind = 0 },
+  { .name_index = 105, .arg_count = 1, .prohibit_invoke = 0, .kind = 0 },
   { .name_index = 0, .arg_count = 3, .prohibit_invoke = 2, .kind = 0 },
-  { .name_index = 101, .arg_count = 1, .prohibit_invoke = 0, .kind = 0 },
+  { .name_index = 106, .arg_count = 1, .prohibit_invoke = 0, .kind = 0 },
   { .name_index = 0, .arg_count = 3, .prohibit_invoke = 2, .kind = 0 },
   { .name_index = 1, .arg_count = 0, .prohibit_invoke = 2, .kind = 0 },
-  { .name_index = 102, .arg_count = 5, .prohibit_invoke = 0, .kind = 0 },
+  { .name_index = 107, .arg_count = 1, .prohibit_invoke = 0, .kind = 0 },
+  { .name_index = 0, .arg_count = 3, .prohibit_invoke = 2, .kind = 0 },
+  { .name_index = 108, .arg_count = 5, .prohibit_invoke = 0, .kind = 0 },
   { .name_index = 0, .arg_count = 3, .prohibit_invoke = 2, .kind = 0 },
   { .name_index = 3, .arg_count = 0, .prohibit_invoke = 2, .kind = 0 },
   { .name_index = 4, .arg_count = 0, .prohibit_invoke = 2, .kind = 0 },
-  { .name_index = 103, .arg_count = 5, .prohibit_invoke = 0, .kind = 0 },
+  { .name_index = 109, .arg_count = 5, .prohibit_invoke = 0, .kind = 0 },
   { .name_index = 0, .arg_count = 3, .prohibit_invoke = 2, .kind = 0 },
   { .name_index = 3, .arg_count = 0, .prohibit_invoke = 2, .kind = 0 },
-  { .name_index = 104, .arg_count = 1, .prohibit_invoke = 0, .kind = 0 },
-  { .name_index = 0, .arg_count = 3, .prohibit_invoke = 2, .kind = 0 },
-  { .name_index = 2, .arg_count = 0, .prohibit_invoke = 2, .kind = 0 },
-  { .name_index = 3, .arg_count = 0, .prohibit_invoke = 2, .kind = 0 },
-  { .name_index = 105, .arg_count = 8, .prohibit_invoke = 0, .kind = 0 },
+  { .name_index = 110, .arg_count = 1, .prohibit_invoke = 0, .kind = 0 },
   { .name_index = 0, .arg_count = 3, .prohibit_invoke = 2, .kind = 0 },
   { .name_index = 2, .arg_count = 0, .prohibit_invoke = 2, .kind = 0 },
   { .name_index = 3, .arg_count = 0, .prohibit_invoke = 2, .kind = 0 },
-  { .name_index = 106, .arg_count = 0, .prohibit_invoke = 2, .kind = 0 },
+  { .name_index = 111, .arg_count = 8, .prohibit_invoke = 0, .kind = 0 },
+  { .name_index = 0, .arg_count = 3, .prohibit_invoke = 2, .kind = 0 },
+  { .name_index = 2, .arg_count = 0, .prohibit_invoke = 2, .kind = 0 },
+  { .name_index = 3, .arg_count = 0, .prohibit_invoke = 2, .kind = 0 },
+  { .name_index = 112, .arg_count = 0, .prohibit_invoke = 2, .kind = 0 },
   { .name_index = 5, .arg_count = 5, .prohibit_invoke = 2, .kind = 0 },
   { .name_index = 6, .arg_count = 1, .prohibit_invoke = 2, .kind = 0 },
-  { .name_index = 107, .arg_count = 1, .prohibit_invoke = 0, .kind = 0 },
+  { .name_index = 113, .arg_count = 1, .prohibit_invoke = 0, .kind = 0 },
   { .name_index = 0, .arg_count = 3, .prohibit_invoke = 2, .kind = 0 },
   { .name_index = 2, .arg_count = 0, .prohibit_invoke = 2, .kind = 0 },
-  { .name_index = 108, .arg_count = 2, .prohibit_invoke = 0, .kind = 0 },
+  { .name_index = 114, .arg_count = 2, .prohibit_invoke = 0, .kind = 0 },
   { .name_index = 0, .arg_count = 3, .prohibit_invoke = 2, .kind = 0 },
   { .name_index = 2, .arg_count = 0, .prohibit_invoke = 2, .kind = 0 },
-  { .name_index = 109, .arg_count = 2, .prohibit_invoke = 0, .kind = 0 },
+  { .name_index = 115, .arg_count = 2, .prohibit_invoke = 0, .kind = 0 },
   { .name_index = 0, .arg_count = 3, .prohibit_invoke = 2, .kind = 0 },
   { .name_index = 2, .arg_count = 0, .prohibit_invoke = 2, .kind = 0 },
-  { .name_index = 110, .arg_count = 1, .prohibit_invoke = 0, .kind = 0 },
+  { .name_index = 116, .arg_count = 1, .prohibit_invoke = 0, .kind = 0 },
   { .name_index = 4, .arg_count = 0, .prohibit_invoke = 2, .kind = 0 },
 };
 static SHLegacyValue _0_global(SHRuntime *shr);
@@ -120,35 +122,37 @@ static SHLegacyValue _24_encode_4_(SHRuntime *shr);
 static SHLegacyValue _25_DehermStaticString(SHRuntime *shr);
 static SHLegacyValue _26_encode_5_(SHRuntime *shr);
 static SHLegacyValue _27_asString_1_(SHRuntime *shr);
-static SHLegacyValue _28_DehermStaticHandle(SHRuntime *shr);
+static SHLegacyValue _28_DehermStaticBytes(SHRuntime *shr);
 static SHLegacyValue _29_encode_6_(SHRuntime *shr);
-static SHLegacyValue _30_probeChecksum_1_(SHRuntime *shr);
-static SHLegacyValue _31_dispose(SHRuntime *shr);
-static SHLegacyValue _32_DehermStaticDefoldValue(SHRuntime *shr);
-static SHLegacyValue _33_encode_7_(SHRuntime *shr);
-static SHLegacyValue _34_probeChecksum_2_(SHRuntime *shr);
-static SHLegacyValue _35_DehermStaticMatrix4(SHRuntime *shr);
-static SHLegacyValue _36_encode_8_(SHRuntime *shr);
-static SHLegacyValue _37_probeSize_1_(SHRuntime *shr);
-static SHLegacyValue _38_probeChecksum_3_(SHRuntime *shr);
-static SHLegacyValue _39_DehermStaticUrl(SHRuntime *shr);
-static SHLegacyValue _40_encode_9_(SHRuntime *shr);
-static SHLegacyValue _41_probeSize_2_(SHRuntime *shr);
-static SHLegacyValue _42_probeChecksum_4_(SHRuntime *shr);
-static SHLegacyValue _43_DehermStaticContainer(SHRuntime *shr);
-static SHLegacyValue _44_begin(SHRuntime *shr);
-static SHLegacyValue _45_end(SHRuntime *shr);
-static SHLegacyValue _46_DehermStaticArray(SHRuntime *shr);
-static SHLegacyValue _47_encode_10_(SHRuntime *shr);
-static SHLegacyValue _48_probeSize_3_(SHRuntime *shr);
-static SHLegacyValue _49_DehermStaticRecord(SHRuntime *shr);
-static SHLegacyValue _50_encode_11_(SHRuntime *shr);
-static SHLegacyValue _51_probeSize_4_(SHRuntime *shr);
-static SHLegacyValue _52_DehermStaticMap(SHRuntime *shr);
-static SHLegacyValue _53_encode_12_(SHRuntime *shr);
-static SHLegacyValue _54_probeSize_5_(SHRuntime *shr);
-static SHLegacyValue _55_DehermStaticGuiNode(SHRuntime *shr);
-static SHLegacyValue _56_dispose_1_(SHRuntime *shr);
+static SHLegacyValue _30_DehermStaticHandle(SHRuntime *shr);
+static SHLegacyValue _31_encode_7_(SHRuntime *shr);
+static SHLegacyValue _32_probeChecksum_1_(SHRuntime *shr);
+static SHLegacyValue _33_dispose(SHRuntime *shr);
+static SHLegacyValue _34_DehermStaticDefoldValue(SHRuntime *shr);
+static SHLegacyValue _35_encode_8_(SHRuntime *shr);
+static SHLegacyValue _36_probeChecksum_2_(SHRuntime *shr);
+static SHLegacyValue _37_DehermStaticMatrix4(SHRuntime *shr);
+static SHLegacyValue _38_encode_9_(SHRuntime *shr);
+static SHLegacyValue _39_probeSize_1_(SHRuntime *shr);
+static SHLegacyValue _40_probeChecksum_3_(SHRuntime *shr);
+static SHLegacyValue _41_DehermStaticUrl(SHRuntime *shr);
+static SHLegacyValue _42_encode_10_(SHRuntime *shr);
+static SHLegacyValue _43_probeSize_2_(SHRuntime *shr);
+static SHLegacyValue _44_probeChecksum_4_(SHRuntime *shr);
+static SHLegacyValue _45_DehermStaticContainer(SHRuntime *shr);
+static SHLegacyValue _46_begin(SHRuntime *shr);
+static SHLegacyValue _47_end(SHRuntime *shr);
+static SHLegacyValue _48_DehermStaticArray(SHRuntime *shr);
+static SHLegacyValue _49_encode_11_(SHRuntime *shr);
+static SHLegacyValue _50_probeSize_3_(SHRuntime *shr);
+static SHLegacyValue _51_DehermStaticRecord(SHRuntime *shr);
+static SHLegacyValue _52_encode_12_(SHRuntime *shr);
+static SHLegacyValue _53_probeSize_4_(SHRuntime *shr);
+static SHLegacyValue _54_DehermStaticMap(SHRuntime *shr);
+static SHLegacyValue _55_encode_13_(SHRuntime *shr);
+static SHLegacyValue _56_probeSize_5_(SHRuntime *shr);
+static SHLegacyValue _57_DehermStaticGuiNode(SHRuntime *shr);
+static SHLegacyValue _58_dispose_1_(SHRuntime *shr);
 // .deherm/build/generated/typed-native/deherm_typed_native.ts:3:1
 static SHLegacyValue _0_global(SHRuntime *shr) {
   _SH_MODEL();
@@ -208,7 +212,7 @@ L0:
   _sh_ljs_store_to_env(shr, locals.t0,locals.t3, 4);
   locals.t2 = _sh_ljs_create_closure(shr, NULL, _5_Array_4_, &s_function_info_table[5], shUnit);
   _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t2, get_symbols(shUnit)[33] /*prototype*/, &locals.t3, get_write_prop_cache(shUnit) + 4);
-  locals.t0 = _sh_ljs_create_environment(shr, &locals.t0, 44);
+  locals.t0 = _sh_ljs_create_environment(shr, &locals.t0, 48);
   np0 = _sh_ljs_undefined();
   _sh_ljs_store_to_env(shr, locals.t0,np0, 0);
   _sh_ljs_store_to_env(shr, locals.t0,np0, 1);
@@ -223,7 +227,7 @@ L0:
   _sh_ljs_store_to_env(shr, locals.t0,np0, 10);
   _sh_ljs_store_to_env(shr, locals.t0,np0, 11);
   _sh_ljs_store_to_env(shr, locals.t0,np0, 12);
-  _sh_ljs_store_to_env(shr, locals.t0,np0, 16);
+  _sh_ljs_store_to_env(shr, locals.t0,np0, 13);
   _sh_ljs_store_to_env(shr, locals.t0,np0, 17);
   _sh_ljs_store_to_env(shr, locals.t0,np0, 18);
   _sh_ljs_store_to_env(shr, locals.t0,np0, 19);
@@ -235,17 +239,20 @@ L0:
   _sh_ljs_store_to_env(shr, locals.t0,np0, 25);
   _sh_ljs_store_to_env(shr, locals.t0,np0, 26);
   _sh_ljs_store_to_env(shr, locals.t0,np0, 27);
+  _sh_ljs_store_to_env(shr, locals.t0,np0, 28);
+  _sh_ljs_store_to_env(shr, locals.t0,np0, 29);
   _sh_ljs_store_to_env(shr, locals.t0,np0, 30);
+  _sh_ljs_store_to_env(shr, locals.t0,np0, 33);
   locals.t2 = _sh_ljs_create_closure(shr, NULL, _6___writeUtf8, &s_function_info_table[6], shUnit);
-  _sh_ljs_store_to_env(shr, locals.t0,locals.t2, 13);
-  locals.t2 = _sh_ljs_create_closure(shr, &locals.t0, _7___decode, &s_function_info_table[7], shUnit);
   _sh_ljs_store_to_env(shr, locals.t0,locals.t2, 14);
-  locals.t2 = _sh_ljs_create_closure(shr, &locals.t0, _8_dispatchScriptUniversalValue, &s_function_info_table[8], shUnit);
+  locals.t2 = _sh_ljs_create_closure(shr, &locals.t0, _7___decode, &s_function_info_table[7], shUnit);
   _sh_ljs_store_to_env(shr, locals.t0,locals.t2, 15);
+  locals.t2 = _sh_ljs_create_closure(shr, &locals.t0, _8_dispatchScriptUniversalValue, &s_function_info_table[8], shUnit);
+  _sh_ljs_store_to_env(shr, locals.t0,locals.t2, 16);
   locals.t2 = _sh_ljs_create_closure(shr, &locals.t0, _9___dehermToStatic, &s_function_info_table[9], shUnit);
-  _sh_ljs_store_to_env(shr, locals.t0,locals.t2, 28);
+  _sh_ljs_store_to_env(shr, locals.t0,locals.t2, 31);
   locals.t2 = _sh_ljs_create_closure(shr, &locals.t0, _10___dehermFromStatic, &s_function_info_table[10], shUnit);
-  _sh_ljs_store_to_env(shr, locals.t0,locals.t2, 29);
+  _sh_ljs_store_to_env(shr, locals.t0,locals.t2, 32);
   locals.t2 = _sh_new_typed_non_enum_object_with_buffer(shr, shUnit, &np2, 0, 0);
   locals.t3 = _sh_ljs_create_closure(shr, NULL, _13_encode, &s_function_info_table[13], shUnit);
   _sh_prstore_object(shr, &locals.t2, 0, &locals.t3);
@@ -268,7 +275,7 @@ L0:
   _sh_prstore_object(shr, &locals.t3, 1, &locals.t7);
   _sh_prstore_object(shr, &locals.t3, 2, &locals.t6);
   _sh_prstore_object(shr, &locals.t3, 3, &locals.t5);
-  _sh_ljs_store_to_env(shr, locals.t0,locals.t3, 31);
+  _sh_ljs_store_to_env(shr, locals.t0,locals.t3, 34);
   _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t4, get_symbols(shUnit)[33] /*prototype*/, &locals.t3, get_write_prop_cache(shUnit) + 6);
   locals.t4 = _sh_ljs_create_closure(shr, NULL, _19_DehermStaticNull, &s_function_info_table[19], shUnit);
   _sh_ljs_store_to_env(shr, locals.t0,locals.t4, 1);
@@ -281,7 +288,7 @@ L0:
   _sh_prstore_object(shr, &locals.t3, 1, &locals.t7);
   _sh_prstore_object(shr, &locals.t3, 2, &locals.t6);
   _sh_prstore_object(shr, &locals.t3, 3, &locals.t5);
-  _sh_ljs_store_to_env(shr, locals.t0,locals.t3, 32);
+  _sh_ljs_store_to_env(shr, locals.t0,locals.t3, 35);
   _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t4, get_symbols(shUnit)[33] /*prototype*/, &locals.t3, get_write_prop_cache(shUnit) + 7);
   locals.t4 = _sh_ljs_create_closure(shr, NULL, _21_DehermStaticBoolean, &s_function_info_table[21], shUnit);
   _sh_ljs_store_to_env(shr, locals.t0,locals.t4, 2);
@@ -294,7 +301,7 @@ L0:
   _sh_prstore_object(shr, &locals.t3, 1, &locals.t7);
   _sh_prstore_object(shr, &locals.t3, 2, &locals.t6);
   _sh_prstore_object(shr, &locals.t3, 3, &locals.t5);
-  _sh_ljs_store_to_env(shr, locals.t0,locals.t3, 33);
+  _sh_ljs_store_to_env(shr, locals.t0,locals.t3, 36);
   _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t4, get_symbols(shUnit)[33] /*prototype*/, &locals.t3, get_write_prop_cache(shUnit) + 8);
   locals.t4 = _sh_ljs_create_closure(shr, NULL, _23_DehermStaticNumber, &s_function_info_table[23], shUnit);
   _sh_ljs_store_to_env(shr, locals.t0,locals.t4, 3);
@@ -307,7 +314,7 @@ L0:
   _sh_prstore_object(shr, &locals.t3, 1, &locals.t7);
   _sh_prstore_object(shr, &locals.t3, 2, &locals.t6);
   _sh_prstore_object(shr, &locals.t3, 3, &locals.t5);
-  _sh_ljs_store_to_env(shr, locals.t0,locals.t3, 34);
+  _sh_ljs_store_to_env(shr, locals.t0,locals.t3, 37);
   _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t4, get_symbols(shUnit)[33] /*prototype*/, &locals.t3, get_write_prop_cache(shUnit) + 9);
   locals.t4 = _sh_ljs_create_closure(shr, NULL, _25_DehermStaticString, &s_function_info_table[25], shUnit);
   _sh_ljs_store_to_env(shr, locals.t0,locals.t4, 4);
@@ -320,64 +327,77 @@ L0:
   _sh_prstore_object(shr, &locals.t3, 1, &locals.t7);
   _sh_prstore_object(shr, &locals.t3, 2, &locals.t6);
   _sh_prstore_object(shr, &locals.t3, 3, &locals.t5);
-  _sh_ljs_store_to_env(shr, locals.t0,locals.t3, 35);
+  _sh_ljs_store_to_env(shr, locals.t0,locals.t3, 38);
   _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t4, get_symbols(shUnit)[33] /*prototype*/, &locals.t3, get_write_prop_cache(shUnit) + 10);
-  locals.t4 = _sh_ljs_create_closure(shr, NULL, _28_DehermStaticHandle, &s_function_info_table[28], shUnit);
+  locals.t4 = _sh_ljs_create_closure(shr, NULL, _28_DehermStaticBytes, &s_function_info_table[28], shUnit);
   _sh_ljs_store_to_env(shr, locals.t0,locals.t4, 5);
-  locals.t6 = _sh_prload(shr, locals.t2, 1);
-  locals.t5 = _sh_prload(shr, locals.t2, 2);
-  locals.t3 = _sh_new_typed_non_enum_object_with_buffer(shr, shUnit, &locals.t2, 1, 1);
-  locals.t7 = _sh_ljs_create_closure(shr, NULL, _29_encode_6_, &s_function_info_table[29], shUnit);
-  _sh_prstore_object(shr, &locals.t3, 0, &locals.t7);
-  _sh_prstore_object(shr, &locals.t3, 1, &locals.t6);
-  _sh_prstore_object(shr, &locals.t3, 2, &locals.t5);
-  locals.t5 = _sh_ljs_create_closure(shr, NULL, _30_probeChecksum_1_, &s_function_info_table[30], shUnit);
+  locals.t7 = _sh_prload(shr, locals.t2, 1);
+  locals.t6 = _sh_prload(shr, locals.t2, 2);
+  locals.t5 = _sh_prload(shr, locals.t2, 3);
+  locals.t3 = _sh_new_typed_non_enum_object_with_buffer(shr, shUnit, &locals.t2, 0, 0);
+  locals.t8 = _sh_ljs_create_closure(shr, NULL, _29_encode_6_, &s_function_info_table[29], shUnit);
+  _sh_prstore_object(shr, &locals.t3, 0, &locals.t8);
+  _sh_prstore_object(shr, &locals.t3, 1, &locals.t7);
+  _sh_prstore_object(shr, &locals.t3, 2, &locals.t6);
   _sh_prstore_object(shr, &locals.t3, 3, &locals.t5);
-  locals.t5 = _sh_ljs_create_closure(shr, NULL, _31_dispose, &s_function_info_table[31], shUnit);
-  _sh_prstore_object(shr, &locals.t3, 4, &locals.t5);
-  _sh_ljs_store_to_env(shr, locals.t0,locals.t3, 36);
+  _sh_ljs_store_to_env(shr, locals.t0,locals.t3, 39);
   _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t4, get_symbols(shUnit)[33] /*prototype*/, &locals.t3, get_write_prop_cache(shUnit) + 11);
-  locals.t4 = _sh_ljs_create_closure(shr, NULL, _32_DehermStaticDefoldValue, &s_function_info_table[32], shUnit);
+  locals.t4 = _sh_ljs_create_closure(shr, NULL, _30_DehermStaticHandle, &s_function_info_table[30], shUnit);
   _sh_ljs_store_to_env(shr, locals.t0,locals.t4, 6);
   locals.t6 = _sh_prload(shr, locals.t2, 1);
   locals.t5 = _sh_prload(shr, locals.t2, 2);
-  locals.t3 = _sh_new_typed_non_enum_object_with_buffer(shr, shUnit, &locals.t2, 0, 0);
-  locals.t7 = _sh_ljs_create_closure(shr, NULL, _33_encode_7_, &s_function_info_table[33], shUnit);
+  locals.t3 = _sh_new_typed_non_enum_object_with_buffer(shr, shUnit, &locals.t2, 1, 1);
+  locals.t7 = _sh_ljs_create_closure(shr, NULL, _31_encode_7_, &s_function_info_table[31], shUnit);
   _sh_prstore_object(shr, &locals.t3, 0, &locals.t7);
   _sh_prstore_object(shr, &locals.t3, 1, &locals.t6);
   _sh_prstore_object(shr, &locals.t3, 2, &locals.t5);
-  locals.t5 = _sh_ljs_create_closure(shr, NULL, _34_probeChecksum_2_, &s_function_info_table[34], shUnit);
+  locals.t5 = _sh_ljs_create_closure(shr, NULL, _32_probeChecksum_1_, &s_function_info_table[32], shUnit);
   _sh_prstore_object(shr, &locals.t3, 3, &locals.t5);
-  _sh_ljs_store_to_env(shr, locals.t0,locals.t3, 37);
+  locals.t5 = _sh_ljs_create_closure(shr, NULL, _33_dispose, &s_function_info_table[33], shUnit);
+  _sh_prstore_object(shr, &locals.t3, 4, &locals.t5);
+  _sh_ljs_store_to_env(shr, locals.t0,locals.t3, 40);
   _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t4, get_symbols(shUnit)[33] /*prototype*/, &locals.t3, get_write_prop_cache(shUnit) + 12);
-  locals.t4 = _sh_ljs_create_closure(shr, NULL, _35_DehermStaticMatrix4, &s_function_info_table[35], shUnit);
+  locals.t4 = _sh_ljs_create_closure(shr, NULL, _34_DehermStaticDefoldValue, &s_function_info_table[34], shUnit);
   _sh_ljs_store_to_env(shr, locals.t0,locals.t4, 7);
-  locals.t5 = _sh_prload(shr, locals.t2, 1);
+  locals.t6 = _sh_prload(shr, locals.t2, 1);
+  locals.t5 = _sh_prload(shr, locals.t2, 2);
   locals.t3 = _sh_new_typed_non_enum_object_with_buffer(shr, shUnit, &locals.t2, 0, 0);
-  locals.t6 = _sh_ljs_create_closure(shr, NULL, _36_encode_8_, &s_function_info_table[36], shUnit);
-  _sh_prstore_object(shr, &locals.t3, 0, &locals.t6);
-  _sh_prstore_object(shr, &locals.t3, 1, &locals.t5);
-  locals.t5 = _sh_ljs_create_closure(shr, NULL, _37_probeSize_1_, &s_function_info_table[37], shUnit);
+  locals.t7 = _sh_ljs_create_closure(shr, NULL, _35_encode_8_, &s_function_info_table[35], shUnit);
+  _sh_prstore_object(shr, &locals.t3, 0, &locals.t7);
+  _sh_prstore_object(shr, &locals.t3, 1, &locals.t6);
   _sh_prstore_object(shr, &locals.t3, 2, &locals.t5);
-  locals.t5 = _sh_ljs_create_closure(shr, NULL, _38_probeChecksum_3_, &s_function_info_table[38], shUnit);
+  locals.t5 = _sh_ljs_create_closure(shr, NULL, _36_probeChecksum_2_, &s_function_info_table[36], shUnit);
   _sh_prstore_object(shr, &locals.t3, 3, &locals.t5);
-  _sh_ljs_store_to_env(shr, locals.t0,locals.t3, 38);
+  _sh_ljs_store_to_env(shr, locals.t0,locals.t3, 41);
   _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t4, get_symbols(shUnit)[33] /*prototype*/, &locals.t3, get_write_prop_cache(shUnit) + 13);
-  locals.t4 = _sh_ljs_create_closure(shr, NULL, _39_DehermStaticUrl, &s_function_info_table[39], shUnit);
+  locals.t4 = _sh_ljs_create_closure(shr, NULL, _37_DehermStaticMatrix4, &s_function_info_table[37], shUnit);
   _sh_ljs_store_to_env(shr, locals.t0,locals.t4, 8);
   locals.t5 = _sh_prload(shr, locals.t2, 1);
   locals.t3 = _sh_new_typed_non_enum_object_with_buffer(shr, shUnit, &locals.t2, 0, 0);
-  locals.t6 = _sh_ljs_create_closure(shr, NULL, _40_encode_9_, &s_function_info_table[40], shUnit);
+  locals.t6 = _sh_ljs_create_closure(shr, NULL, _38_encode_9_, &s_function_info_table[38], shUnit);
   _sh_prstore_object(shr, &locals.t3, 0, &locals.t6);
   _sh_prstore_object(shr, &locals.t3, 1, &locals.t5);
-  locals.t5 = _sh_ljs_create_closure(shr, NULL, _41_probeSize_2_, &s_function_info_table[41], shUnit);
+  locals.t5 = _sh_ljs_create_closure(shr, NULL, _39_probeSize_1_, &s_function_info_table[39], shUnit);
   _sh_prstore_object(shr, &locals.t3, 2, &locals.t5);
-  locals.t5 = _sh_ljs_create_closure(shr, NULL, _42_probeChecksum_4_, &s_function_info_table[42], shUnit);
+  locals.t5 = _sh_ljs_create_closure(shr, NULL, _40_probeChecksum_3_, &s_function_info_table[40], shUnit);
   _sh_prstore_object(shr, &locals.t3, 3, &locals.t5);
-  _sh_ljs_store_to_env(shr, locals.t0,locals.t3, 39);
+  _sh_ljs_store_to_env(shr, locals.t0,locals.t3, 42);
   _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t4, get_symbols(shUnit)[33] /*prototype*/, &locals.t3, get_write_prop_cache(shUnit) + 14);
-  locals.t3 = _sh_ljs_create_closure(shr, NULL, _43_DehermStaticContainer, &s_function_info_table[43], shUnit);
-  _sh_ljs_store_to_env(shr, locals.t0,locals.t3, 9);
+  locals.t4 = _sh_ljs_create_closure(shr, NULL, _41_DehermStaticUrl, &s_function_info_table[41], shUnit);
+  _sh_ljs_store_to_env(shr, locals.t0,locals.t4, 9);
+  locals.t5 = _sh_prload(shr, locals.t2, 1);
+  locals.t3 = _sh_new_typed_non_enum_object_with_buffer(shr, shUnit, &locals.t2, 0, 0);
+  locals.t6 = _sh_ljs_create_closure(shr, NULL, _42_encode_10_, &s_function_info_table[42], shUnit);
+  _sh_prstore_object(shr, &locals.t3, 0, &locals.t6);
+  _sh_prstore_object(shr, &locals.t3, 1, &locals.t5);
+  locals.t5 = _sh_ljs_create_closure(shr, NULL, _43_probeSize_2_, &s_function_info_table[43], shUnit);
+  _sh_prstore_object(shr, &locals.t3, 2, &locals.t5);
+  locals.t5 = _sh_ljs_create_closure(shr, NULL, _44_probeChecksum_4_, &s_function_info_table[44], shUnit);
+  _sh_prstore_object(shr, &locals.t3, 3, &locals.t5);
+  _sh_ljs_store_to_env(shr, locals.t0,locals.t3, 43);
+  _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t4, get_symbols(shUnit)[33] /*prototype*/, &locals.t3, get_write_prop_cache(shUnit) + 15);
+  locals.t3 = _sh_ljs_create_closure(shr, NULL, _45_DehermStaticContainer, &s_function_info_table[45], shUnit);
+  _sh_ljs_store_to_env(shr, locals.t0,locals.t3, 10);
   locals.t7 = _sh_prload(shr, locals.t2, 0);
   locals.t6 = _sh_prload(shr, locals.t2, 1);
   locals.t5 = _sh_prload(shr, locals.t2, 2);
@@ -387,62 +407,62 @@ L0:
   _sh_prstore_object(shr, &locals.t2, 1, &locals.t6);
   _sh_prstore_object(shr, &locals.t2, 2, &locals.t5);
   _sh_prstore_object(shr, &locals.t2, 3, &locals.t4);
-  locals.t4 = _sh_ljs_create_closure(shr, NULL, _44_begin, &s_function_info_table[44], shUnit);
+  locals.t4 = _sh_ljs_create_closure(shr, NULL, _46_begin, &s_function_info_table[46], shUnit);
   _sh_prstore_object(shr, &locals.t2, 4, &locals.t4);
-  locals.t4 = _sh_ljs_create_closure(shr, NULL, _45_end, &s_function_info_table[45], shUnit);
+  locals.t4 = _sh_ljs_create_closure(shr, NULL, _47_end, &s_function_info_table[47], shUnit);
   _sh_prstore_object(shr, &locals.t2, 5, &locals.t4);
-  _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t3, get_symbols(shUnit)[33] /*prototype*/, &locals.t2, get_write_prop_cache(shUnit) + 15);
-  locals.t4 = _sh_ljs_create_closure(shr, &locals.t0, _46_DehermStaticArray, &s_function_info_table[46], shUnit);
-  _sh_ljs_store_to_env(shr, locals.t0,locals.t4, 10);
-  locals.t8 = _sh_prload(shr, locals.t2, 1);
-  locals.t7 = _sh_prload(shr, locals.t2, 3);
-  locals.t6 = _sh_prload(shr, locals.t2, 4);
-  locals.t5 = _sh_prload(shr, locals.t2, 5);
-  locals.t3 = _sh_new_typed_non_enum_object_with_buffer(shr, shUnit, &locals.t2, 2, 2);
-  locals.t9 = _sh_ljs_create_closure(shr, NULL, _47_encode_10_, &s_function_info_table[47], shUnit);
-  _sh_prstore_object(shr, &locals.t3, 0, &locals.t9);
-  _sh_prstore_object(shr, &locals.t3, 1, &locals.t8);
-  locals.t8 = _sh_ljs_create_closure(shr, NULL, _48_probeSize_3_, &s_function_info_table[48], shUnit);
-  _sh_prstore_object(shr, &locals.t3, 2, &locals.t8);
-  _sh_prstore_object(shr, &locals.t3, 3, &locals.t7);
-  _sh_prstore_object(shr, &locals.t3, 4, &locals.t6);
-  _sh_prstore_object(shr, &locals.t3, 5, &locals.t5);
-  _sh_ljs_store_to_env(shr, locals.t0,locals.t3, 40);
-  _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t4, get_symbols(shUnit)[33] /*prototype*/, &locals.t3, get_write_prop_cache(shUnit) + 16);
-  locals.t4 = _sh_ljs_create_closure(shr, &locals.t0, _49_DehermStaticRecord, &s_function_info_table[49], shUnit);
+  _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t3, get_symbols(shUnit)[33] /*prototype*/, &locals.t2, get_write_prop_cache(shUnit) + 16);
+  locals.t4 = _sh_ljs_create_closure(shr, &locals.t0, _48_DehermStaticArray, &s_function_info_table[48], shUnit);
   _sh_ljs_store_to_env(shr, locals.t0,locals.t4, 11);
   locals.t8 = _sh_prload(shr, locals.t2, 1);
   locals.t7 = _sh_prload(shr, locals.t2, 3);
   locals.t6 = _sh_prload(shr, locals.t2, 4);
   locals.t5 = _sh_prload(shr, locals.t2, 5);
   locals.t3 = _sh_new_typed_non_enum_object_with_buffer(shr, shUnit, &locals.t2, 2, 2);
-  locals.t9 = _sh_ljs_create_closure(shr, &locals.t0, _50_encode_11_, &s_function_info_table[50], shUnit);
+  locals.t9 = _sh_ljs_create_closure(shr, NULL, _49_encode_11_, &s_function_info_table[49], shUnit);
   _sh_prstore_object(shr, &locals.t3, 0, &locals.t9);
   _sh_prstore_object(shr, &locals.t3, 1, &locals.t8);
-  locals.t8 = _sh_ljs_create_closure(shr, NULL, _51_probeSize_4_, &s_function_info_table[51], shUnit);
+  locals.t8 = _sh_ljs_create_closure(shr, NULL, _50_probeSize_3_, &s_function_info_table[50], shUnit);
   _sh_prstore_object(shr, &locals.t3, 2, &locals.t8);
   _sh_prstore_object(shr, &locals.t3, 3, &locals.t7);
   _sh_prstore_object(shr, &locals.t3, 4, &locals.t6);
   _sh_prstore_object(shr, &locals.t3, 5, &locals.t5);
-  _sh_ljs_store_to_env(shr, locals.t0,locals.t3, 41);
+  _sh_ljs_store_to_env(shr, locals.t0,locals.t3, 44);
   _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t4, get_symbols(shUnit)[33] /*prototype*/, &locals.t3, get_write_prop_cache(shUnit) + 17);
-  locals.t3 = _sh_ljs_create_closure(shr, &locals.t0, _52_DehermStaticMap, &s_function_info_table[52], shUnit);
-  _sh_ljs_store_to_env(shr, locals.t0,locals.t3, 12);
+  locals.t4 = _sh_ljs_create_closure(shr, &locals.t0, _51_DehermStaticRecord, &s_function_info_table[51], shUnit);
+  _sh_ljs_store_to_env(shr, locals.t0,locals.t4, 12);
+  locals.t8 = _sh_prload(shr, locals.t2, 1);
+  locals.t7 = _sh_prload(shr, locals.t2, 3);
+  locals.t6 = _sh_prload(shr, locals.t2, 4);
+  locals.t5 = _sh_prload(shr, locals.t2, 5);
+  locals.t3 = _sh_new_typed_non_enum_object_with_buffer(shr, shUnit, &locals.t2, 2, 2);
+  locals.t9 = _sh_ljs_create_closure(shr, &locals.t0, _52_encode_12_, &s_function_info_table[52], shUnit);
+  _sh_prstore_object(shr, &locals.t3, 0, &locals.t9);
+  _sh_prstore_object(shr, &locals.t3, 1, &locals.t8);
+  locals.t8 = _sh_ljs_create_closure(shr, NULL, _53_probeSize_4_, &s_function_info_table[53], shUnit);
+  _sh_prstore_object(shr, &locals.t3, 2, &locals.t8);
+  _sh_prstore_object(shr, &locals.t3, 3, &locals.t7);
+  _sh_prstore_object(shr, &locals.t3, 4, &locals.t6);
+  _sh_prstore_object(shr, &locals.t3, 5, &locals.t5);
+  _sh_ljs_store_to_env(shr, locals.t0,locals.t3, 45);
+  _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t4, get_symbols(shUnit)[33] /*prototype*/, &locals.t3, get_write_prop_cache(shUnit) + 18);
+  locals.t3 = _sh_ljs_create_closure(shr, &locals.t0, _54_DehermStaticMap, &s_function_info_table[54], shUnit);
+  _sh_ljs_store_to_env(shr, locals.t0,locals.t3, 13);
   locals.t7 = _sh_prload(shr, locals.t2, 1);
   locals.t6 = _sh_prload(shr, locals.t2, 3);
   locals.t5 = _sh_prload(shr, locals.t2, 4);
   locals.t4 = _sh_prload(shr, locals.t2, 5);
   locals.t2 = _sh_new_typed_non_enum_object_with_buffer(shr, shUnit, &locals.t2, 2, 2);
-  locals.t8 = _sh_ljs_create_closure(shr, NULL, _53_encode_12_, &s_function_info_table[53], shUnit);
+  locals.t8 = _sh_ljs_create_closure(shr, NULL, _55_encode_13_, &s_function_info_table[55], shUnit);
   _sh_prstore_object(shr, &locals.t2, 0, &locals.t8);
   _sh_prstore_object(shr, &locals.t2, 1, &locals.t7);
-  locals.t7 = _sh_ljs_create_closure(shr, NULL, _54_probeSize_5_, &s_function_info_table[54], shUnit);
+  locals.t7 = _sh_ljs_create_closure(shr, NULL, _56_probeSize_5_, &s_function_info_table[56], shUnit);
   _sh_prstore_object(shr, &locals.t2, 2, &locals.t7);
   _sh_prstore_object(shr, &locals.t2, 3, &locals.t6);
   _sh_prstore_object(shr, &locals.t2, 4, &locals.t5);
   _sh_prstore_object(shr, &locals.t2, 5, &locals.t4);
-  _sh_ljs_store_to_env(shr, locals.t0,locals.t2, 42);
-  _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t3, get_symbols(shUnit)[33] /*prototype*/, &locals.t2, get_write_prop_cache(shUnit) + 18);
+  _sh_ljs_store_to_env(shr, locals.t0,locals.t2, 46);
+  _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t3, get_symbols(shUnit)[33] /*prototype*/, &locals.t2, get_write_prop_cache(shUnit) + 19);
   locals.t2 = _sh_new_fastarray_with_proto(shr, &locals.t1, 517);
   np1 = _sh_ljs_double(350770);
   _sh_fastarray_push(shr, &np1, &locals.t2);
@@ -1478,49 +1498,53 @@ L0:
   _sh_fastarray_push(shr, &np1, &locals.t2);
   np1 = _sh_ljs_double(((struct HermesValueBase){.raw = 4751256412728852480u}).f64);
   _sh_fastarray_push(shr, &np1, &locals.t2);
-  _sh_ljs_store_to_env(shr, locals.t0,locals.t2, 16);
+  _sh_ljs_store_to_env(shr, locals.t0,locals.t2, 17);
   np1 = _sh_ljs_double(32);
-  _sh_ljs_store_to_env(shr, locals.t0,np1, 17);
+  _sh_ljs_store_to_env(shr, locals.t0,np1, 18);
   np3 = _sh_ljs_double(8);
-  _sh_ljs_store_to_env(shr, locals.t0,np3, 18);
-  locals.t3 = _sh_ljs_create_closure(shr, NULL, _55_DehermStaticGuiNode, &s_function_info_table[55], shUnit);
-  _sh_ljs_store_to_env(shr, locals.t0,locals.t3, 19);
+  _sh_ljs_store_to_env(shr, locals.t0,np3, 19);
+  locals.t3 = _sh_ljs_create_closure(shr, NULL, _57_DehermStaticGuiNode, &s_function_info_table[57], shUnit);
+  _sh_ljs_store_to_env(shr, locals.t0,locals.t3, 20);
   locals.t1 = _sh_new_typed_non_enum_object_with_buffer(shr, shUnit, &np2, 3, 3);
-  locals.t4 = _sh_ljs_create_closure(shr, NULL, _56_dispose_1_, &s_function_info_table[56], shUnit);
+  locals.t4 = _sh_ljs_create_closure(shr, NULL, _58_dispose_1_, &s_function_info_table[58], shUnit);
   _sh_prstore_object(shr, &locals.t1, 0, &locals.t4);
-  _sh_ljs_store_to_env(shr, locals.t0,locals.t1, 43);
-  _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t3, get_symbols(shUnit)[33] /*prototype*/, &locals.t1, get_write_prop_cache(shUnit) + 19);
+  _sh_ljs_store_to_env(shr, locals.t0,locals.t1, 47);
+  _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t3, get_symbols(shUnit)[33] /*prototype*/, &locals.t1, get_write_prop_cache(shUnit) + 20);
   locals.t3 = _sh_ljs_get_global_object(shr);
   locals.t1 = _sh_ljs_try_get_by_id_rjs(shr,&locals.t3, get_symbols(shUnit)[34] /*globalThis*/, get_read_prop_cache(shUnit) + 0);
   locals.t4 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[35] /*Array*/, get_read_prop_cache(shUnit) + 1);
   locals.t4 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t4,get_symbols(shUnit)[36] /*isArray*/, get_read_prop_cache(shUnit) + 2);
-  _sh_ljs_store_to_env(shr, locals.t0,locals.t4, 20);
+  _sh_ljs_store_to_env(shr, locals.t0,locals.t4, 21);
   locals.t4 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[37] /*Object*/, get_read_prop_cache(shUnit) + 3);
   locals.t4 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t4,get_symbols(shUnit)[38] /*getPrototypeOf*/, get_read_prop_cache(shUnit) + 4);
-  _sh_ljs_store_to_env(shr, locals.t0,locals.t4, 21);
+  _sh_ljs_store_to_env(shr, locals.t0,locals.t4, 22);
   locals.t4 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[37] /*Object*/, get_read_prop_cache(shUnit) + 5);
   locals.t4 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t4,get_symbols(shUnit)[33] /*prototype*/, get_read_prop_cache(shUnit) + 6);
-  _sh_ljs_store_to_env(shr, locals.t0,locals.t4, 22);
-  locals.t4 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[39] /*Map*/, get_read_prop_cache(shUnit) + 7);
   _sh_ljs_store_to_env(shr, locals.t0,locals.t4, 23);
-  locals.t4 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t4,get_symbols(shUnit)[33] /*prototype*/, get_read_prop_cache(shUnit) + 8);
+  locals.t4 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[39] /*Map*/, get_read_prop_cache(shUnit) + 7);
   _sh_ljs_store_to_env(shr, locals.t0,locals.t4, 24);
-  frame[3] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t3, get_symbols(shUnit)[40] /*BigInt*/, get_read_prop_cache(shUnit) + 9);
+  locals.t4 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t4,get_symbols(shUnit)[33] /*prototype*/, get_read_prop_cache(shUnit) + 8);
+  _sh_ljs_store_to_env(shr, locals.t0,locals.t4, 25);
+  locals.t4 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[40] /*Uint8Array*/, get_read_prop_cache(shUnit) + 9);
+  _sh_ljs_store_to_env(shr, locals.t0,locals.t4, 26);
+  locals.t4 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[41] /*ArrayBuffer*/, get_read_prop_cache(shUnit) + 10);
+  _sh_ljs_store_to_env(shr, locals.t0,locals.t4, 27);
+  frame[3] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t3, get_symbols(shUnit)[42] /*BigInt*/, get_read_prop_cache(shUnit) + 11);
   frame[1] = _sh_ljs_double(((struct HermesValueBase){.raw = 4751297606873776128u}).f64);
   frame[4] = _sh_ljs_undefined();
   frame[2] = _sh_ljs_undefined();
   locals.t4 = _sh_ljs_call(shr, frame, 1);
-  _sh_ljs_store_to_env(shr, locals.t0,locals.t4, 25);
-  frame[3] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t3, get_symbols(shUnit)[40] /*BigInt*/, get_read_prop_cache(shUnit) + 10);
+  _sh_ljs_store_to_env(shr, locals.t0,locals.t4, 28);
+  frame[3] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t3, get_symbols(shUnit)[42] /*BigInt*/, get_read_prop_cache(shUnit) + 12);
   frame[4] = _sh_ljs_undefined();
   frame[2] = _sh_ljs_undefined();
   frame[1] = _sh_ljs_double(32);
   locals.t3 = _sh_ljs_call(shr, frame, 1);
-  _sh_ljs_store_to_env(shr, locals.t0,locals.t3, 26);
+  _sh_ljs_store_to_env(shr, locals.t0,locals.t3, 29);
   np1 = _sh_ljs_bool(false);
-  _sh_ljs_store_to_env(shr, locals.t0,np1, 27);
-  locals.t4 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[41] /*__defoldScriptBridge...*/, get_read_prop_cache(shUnit) + 11);
-  _sh_ljs_store_to_env(shr, locals.t0,locals.t4, 30);
+  _sh_ljs_store_to_env(shr, locals.t0,np1, 30);
+  locals.t4 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[43] /*__defoldScriptBridge...*/, get_read_prop_cache(shUnit) + 13);
+  _sh_ljs_store_to_env(shr, locals.t0,locals.t4, 33);
   if(_sh_ljs_to_boolean(locals.t4)) goto L1;
   goto L2;
 
@@ -1528,14 +1552,14 @@ L1:
   ;
   locals.t3 = _sh_ljs_create_closure(shr, &locals.t0, _11___dehermTypedNativeCall, &s_function_info_table[11], shUnit);
   locals.t0 = _sh_ljs_new_object(shr);
-  locals.t5 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t4,get_symbols(shUnit)[42] /*target*/, get_read_prop_cache(shUnit) + 12);
-  _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t0, get_symbols(shUnit)[42] /*target*/, &locals.t5, get_write_prop_cache(shUnit) + 20);
-  locals.t4 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t4,get_symbols(shUnit)[43] /*get*/, get_read_prop_cache(shUnit) + 13);
-  _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t0, get_symbols(shUnit)[43] /*get*/, &locals.t4, get_write_prop_cache(shUnit) + 21);
-  _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t0, get_symbols(shUnit)[44] /*call*/, &locals.t3, get_write_prop_cache(shUnit) + 22);
+  locals.t5 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t4,get_symbols(shUnit)[44] /*target*/, get_read_prop_cache(shUnit) + 14);
+  _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t0, get_symbols(shUnit)[44] /*target*/, &locals.t5, get_write_prop_cache(shUnit) + 21);
+  locals.t4 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t4,get_symbols(shUnit)[45] /*get*/, get_read_prop_cache(shUnit) + 15);
+  _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t0, get_symbols(shUnit)[45] /*get*/, &locals.t4, get_write_prop_cache(shUnit) + 22);
+  _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t0, get_symbols(shUnit)[46] /*call*/, &locals.t3, get_write_prop_cache(shUnit) + 23);
   np1 = _sh_fastarray_length(shr, &locals.t2);
-  _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t0, get_symbols(shUnit)[45] /*__dehermTypedNativeR...*/, &np1, get_write_prop_cache(shUnit) + 23);
-  _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t1, get_symbols(shUnit)[41] /*__defoldScriptBridge...*/, &locals.t0, get_write_prop_cache(shUnit) + 24);
+  _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t0, get_symbols(shUnit)[47] /*__dehermTypedNativeR...*/, &np1, get_write_prop_cache(shUnit) + 24);
+  _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t1, get_symbols(shUnit)[43] /*__defoldScriptBridge...*/, &locals.t0, get_write_prop_cache(shUnit) + 25);
   goto L2;
 L2:
   ;
@@ -1627,7 +1651,7 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:58:1
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:61:1
 static SHLegacyValue _6___writeUtf8(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -1675,7 +1699,7 @@ static SHLegacyValue _6___writeUtf8(SHRuntime *shr) {
 L0:
   ;
   locals.t1 = _sh_ljs_param(frame, 2);
-  np0 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[46] /*length*/, get_read_prop_cache(shUnit) + 14);
+  np0 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[48] /*length*/, get_read_prop_cache(shUnit) + 16);
   np2 = _sh_ljs_double(0);
   np1 = _sh_ljs_bool(_sh_ljs_get_double(np2) < _sh_ljs_get_double(np0));
   np22 = _sh_ljs_double(1);
@@ -1699,10 +1723,10 @@ L1:
   ;
   // PhiInst
   // PhiInst
-  locals.t2 = _sh_ljs_try_get_by_id_rjs(shr,&locals.t0, get_symbols(shUnit)[34] /*globalThis*/, get_read_prop_cache(shUnit) + 15);
-  locals.t2 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t2,get_symbols(shUnit)[47] /*String*/, get_read_prop_cache(shUnit) + 16);
-  locals.t2 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t2,get_symbols(shUnit)[33] /*prototype*/, get_read_prop_cache(shUnit) + 17);
-  frame[3] = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t2,get_symbols(shUnit)[48] /*charCodeAt*/, get_read_prop_cache(shUnit) + 18);
+  locals.t2 = _sh_ljs_try_get_by_id_rjs(shr,&locals.t0, get_symbols(shUnit)[34] /*globalThis*/, get_read_prop_cache(shUnit) + 17);
+  locals.t2 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t2,get_symbols(shUnit)[49] /*String*/, get_read_prop_cache(shUnit) + 18);
+  locals.t2 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t2,get_symbols(shUnit)[33] /*prototype*/, get_read_prop_cache(shUnit) + 19);
+  frame[3] = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t2,get_symbols(shUnit)[50] /*charCodeAt*/, get_read_prop_cache(shUnit) + 20);
   frame[4] = _sh_ljs_undefined();
   frame[2] = locals.t1;
   frame[1] = np4;
@@ -1723,7 +1747,7 @@ L2:
 L3:
   ;
   np8 = _sh_ljs_double(_sh_ljs_get_double(np24) + _sh_ljs_get_double(np22));
-  np1 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[46] /*length*/, get_read_prop_cache(shUnit) + 19);
+  np1 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[48] /*length*/, get_read_prop_cache(shUnit) + 21);
   np1 = _sh_ljs_bool(_sh_ljs_get_double(np8) < _sh_ljs_get_double(np1));
   if(_sh_ljs_get_bool(np1)) goto L7;
   goto L4;
@@ -1750,10 +1774,10 @@ L6:
   goto L10;
 L7:
   ;
-  locals.t2 = _sh_ljs_try_get_by_id_rjs(shr,&locals.t0, get_symbols(shUnit)[34] /*globalThis*/, get_read_prop_cache(shUnit) + 20);
-  locals.t2 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t2,get_symbols(shUnit)[47] /*String*/, get_read_prop_cache(shUnit) + 21);
-  locals.t2 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t2,get_symbols(shUnit)[33] /*prototype*/, get_read_prop_cache(shUnit) + 22);
-  frame[3] = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t2,get_symbols(shUnit)[48] /*charCodeAt*/, get_read_prop_cache(shUnit) + 23);
+  locals.t2 = _sh_ljs_try_get_by_id_rjs(shr,&locals.t0, get_symbols(shUnit)[34] /*globalThis*/, get_read_prop_cache(shUnit) + 22);
+  locals.t2 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t2,get_symbols(shUnit)[49] /*String*/, get_read_prop_cache(shUnit) + 23);
+  locals.t2 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t2,get_symbols(shUnit)[33] /*prototype*/, get_read_prop_cache(shUnit) + 24);
+  frame[3] = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t2,get_symbols(shUnit)[50] /*charCodeAt*/, get_read_prop_cache(shUnit) + 25);
   frame[4] = _sh_ljs_undefined();
   frame[2] = locals.t1;
   frame[1] = np8;
@@ -1825,7 +1849,7 @@ L16:
   // PhiInst
   np3 = _sh_ljs_double(_sh_ljs_get_double(np3) + _sh_ljs_get_double(np8));
   np4 = _sh_ljs_double(_sh_ljs_get_double(np1) + _sh_ljs_get_double(np22));
-  np1 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[46] /*length*/, get_read_prop_cache(shUnit) + 24);
+  np1 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[48] /*length*/, get_read_prop_cache(shUnit) + 26);
   np1 = _sh_ljs_bool(_sh_ljs_get_double(np4) < _sh_ljs_get_double(np1));
   np0 = np3;
   if(_sh_ljs_get_bool(np1)) goto L1;
@@ -1843,7 +1867,7 @@ L17:
 
 L18:
   ;
-  np1 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[46] /*length*/, get_read_prop_cache(shUnit) + 25);
+  np1 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[48] /*length*/, get_read_prop_cache(shUnit) + 27);
   np1 = _sh_ljs_bool(_sh_ljs_get_double(np2) < _sh_ljs_get_double(np1));
   np10 = _sh_ljs_double(192);
   np9 = _sh_ljs_double(6);
@@ -1861,10 +1885,10 @@ L19:
   ;
   // PhiInst
   // PhiInst
-  locals.t2 = _sh_ljs_try_get_by_id_rjs(shr,&locals.t0, get_symbols(shUnit)[34] /*globalThis*/, get_read_prop_cache(shUnit) + 26);
-  locals.t2 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t2,get_symbols(shUnit)[47] /*String*/, get_read_prop_cache(shUnit) + 27);
-  locals.t2 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t2,get_symbols(shUnit)[33] /*prototype*/, get_read_prop_cache(shUnit) + 28);
-  frame[3] = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t2,get_symbols(shUnit)[48] /*charCodeAt*/, get_read_prop_cache(shUnit) + 29);
+  locals.t2 = _sh_ljs_try_get_by_id_rjs(shr,&locals.t0, get_symbols(shUnit)[34] /*globalThis*/, get_read_prop_cache(shUnit) + 28);
+  locals.t2 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t2,get_symbols(shUnit)[49] /*String*/, get_read_prop_cache(shUnit) + 29);
+  locals.t2 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t2,get_symbols(shUnit)[33] /*prototype*/, get_read_prop_cache(shUnit) + 30);
+  frame[3] = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t2,get_symbols(shUnit)[50] /*charCodeAt*/, get_read_prop_cache(shUnit) + 31);
   frame[4] = _sh_ljs_undefined();
   frame[2] = locals.t1;
   frame[1] = np3;
@@ -1885,7 +1909,7 @@ L20:
 L21:
   ;
   np23 = _sh_ljs_double(_sh_ljs_get_double(np28) + _sh_ljs_get_double(np22));
-  np1 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[46] /*length*/, get_read_prop_cache(shUnit) + 30);
+  np1 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[48] /*length*/, get_read_prop_cache(shUnit) + 32);
   np1 = _sh_ljs_bool(_sh_ljs_get_double(np23) < _sh_ljs_get_double(np1));
   if(_sh_ljs_get_bool(np1)) goto L25;
   goto L22;
@@ -1912,10 +1936,10 @@ L24:
   goto L28;
 L25:
   ;
-  locals.t2 = _sh_ljs_try_get_by_id_rjs(shr,&locals.t0, get_symbols(shUnit)[34] /*globalThis*/, get_read_prop_cache(shUnit) + 31);
-  locals.t2 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t2,get_symbols(shUnit)[47] /*String*/, get_read_prop_cache(shUnit) + 32);
-  locals.t2 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t2,get_symbols(shUnit)[33] /*prototype*/, get_read_prop_cache(shUnit) + 33);
-  frame[3] = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t2,get_symbols(shUnit)[48] /*charCodeAt*/, get_read_prop_cache(shUnit) + 34);
+  locals.t2 = _sh_ljs_try_get_by_id_rjs(shr,&locals.t0, get_symbols(shUnit)[34] /*globalThis*/, get_read_prop_cache(shUnit) + 33);
+  locals.t2 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t2,get_symbols(shUnit)[49] /*String*/, get_read_prop_cache(shUnit) + 34);
+  locals.t2 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t2,get_symbols(shUnit)[33] /*prototype*/, get_read_prop_cache(shUnit) + 35);
+  frame[3] = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t2,get_symbols(shUnit)[50] /*charCodeAt*/, get_read_prop_cache(shUnit) + 36);
   frame[4] = _sh_ljs_undefined();
   frame[2] = locals.t1;
   frame[1] = np23;
@@ -2020,7 +2044,7 @@ L35:
   ;
   // PhiInst
   np3 = _sh_ljs_double(_sh_ljs_get_double(np1) + _sh_ljs_get_double(np22));
-  np1 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[46] /*length*/, get_read_prop_cache(shUnit) + 35);
+  np1 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[48] /*length*/, get_read_prop_cache(shUnit) + 37);
   np1 = _sh_ljs_bool(_sh_ljs_get_double(np3) < _sh_ljs_get_double(np1));
   np2 = np23;
   if(_sh_ljs_get_bool(np1)) goto L19;
@@ -2033,10 +2057,10 @@ L36:
 
 L37:
   ;
-  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[49] /*deherm Static Hermes...*/);
+  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[51] /*deherm Static Hermes...*/);
   _sh_throw(shr, locals.t0);
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:60:1
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:63:1
 static SHLegacyValue _7___decode(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -2170,7 +2194,7 @@ L11:
 L12:
   ;
   // PhiInst
-  locals.t2 = _sh_ljs_load_from_env(locals.t0, 14);
+  locals.t2 = _sh_ljs_load_from_env(locals.t0, 15);
   frame[2] = _sh_ljs_double((double)(unsigned int)deherm_script_static_entry_key(_sh_ljs_get_native_pointer(np2), (unsigned int)_sh_to_int32_double(_sh_ljs_get_double(np0)), (unsigned int)_sh_to_int32_double(_sh_ljs_get_double(np9))));
   frame[6] = _sh_ljs_undefined();
   frame[5] = locals.t2;
@@ -2204,10 +2228,10 @@ L12:
 
 L13:
   ;
-  locals.t2 = _sh_ljs_load_from_env(locals.t0, 12);
+  locals.t2 = _sh_ljs_load_from_env(locals.t0, 13);
   if (!(_sh_ljs_is_object(locals.t2))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  locals.t2 = _sh_ljs_load_from_env(locals.t0, 42);
-  locals.t5 = _sh_ljs_load_from_env(locals.t0, 9);
+  locals.t2 = _sh_ljs_load_from_env(locals.t0, 46);
+  locals.t5 = _sh_ljs_load_from_env(locals.t0, 10);
   if (!(_sh_ljs_is_object(locals.t5))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
   np7 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t5, 128));
   if(_sh_ljs_get_bool(np7)) goto L15;
@@ -2215,7 +2239,7 @@ L13:
 
 L14:
   ;
-  locals.t5 = _sh_ljs_get_string(shr, get_symbols(shUnit)[50] /*Trying to call a non...*/);
+  locals.t5 = _sh_ljs_get_string(shr, get_symbols(shUnit)[52] /*Trying to call a non...*/);
   _sh_throw_type_error(shr, &locals.t5);
 
 L15:
@@ -2236,7 +2260,7 @@ L16:
 
 L17:
   ;
-  locals.t2 = _sh_ljs_get_string(shr, get_symbols(shUnit)[51] /*deherm map key/value...*/);
+  locals.t2 = _sh_ljs_get_string(shr, get_symbols(shUnit)[53] /*deherm map key/value...*/);
   _sh_throw(shr, locals.t2);
 
 L18:
@@ -2255,7 +2279,7 @@ L18:
 L19:
   ;
   // PhiInst
-  locals.t2 = _sh_ljs_load_from_env(locals.t0, 14);
+  locals.t2 = _sh_ljs_load_from_env(locals.t0, 15);
   frame[2] = _sh_ljs_double((double)(unsigned int)deherm_script_static_entry_key(_sh_ljs_get_native_pointer(np2), (unsigned int)_sh_to_int32_double(_sh_ljs_get_double(np0)), (unsigned int)_sh_to_int32_double(_sh_ljs_get_double(np9))));
   frame[6] = _sh_ljs_undefined();
   frame[5] = locals.t2;
@@ -2299,10 +2323,10 @@ L19:
 
 L20:
   ;
-  locals.t2 = _sh_ljs_load_from_env(locals.t0, 11);
+  locals.t2 = _sh_ljs_load_from_env(locals.t0, 12);
   if (!(_sh_ljs_is_object(locals.t2))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  locals.t2 = _sh_ljs_load_from_env(locals.t0, 41);
-  locals.t5 = _sh_ljs_load_from_env(locals.t0, 9);
+  locals.t2 = _sh_ljs_load_from_env(locals.t0, 45);
+  locals.t5 = _sh_ljs_load_from_env(locals.t0, 10);
   if (!(_sh_ljs_is_object(locals.t5))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
   np7 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t5, 128));
   if(_sh_ljs_get_bool(np7)) goto L22;
@@ -2310,7 +2334,7 @@ L20:
 
 L21:
   ;
-  locals.t5 = _sh_ljs_get_string(shr, get_symbols(shUnit)[50] /*Trying to call a non...*/);
+  locals.t5 = _sh_ljs_get_string(shr, get_symbols(shUnit)[52] /*Trying to call a non...*/);
   _sh_throw_type_error(shr, &locals.t5);
 
 L22:
@@ -2331,7 +2355,7 @@ L23:
 
 L24:
   ;
-  locals.t2 = _sh_ljs_get_string(shr, get_symbols(shUnit)[52] /*deherm record key/va...*/);
+  locals.t2 = _sh_ljs_get_string(shr, get_symbols(shUnit)[54] /*deherm record key/va...*/);
   _sh_throw(shr, locals.t2);
 
 L25:
@@ -2348,7 +2372,7 @@ L25:
 L26:
   ;
   // PhiInst
-  frame[5] = _sh_ljs_load_from_env(locals.t0, 14);
+  frame[5] = _sh_ljs_load_from_env(locals.t0, 15);
   frame[2] = _sh_ljs_double((double)(unsigned int)deherm_script_static_entry_value(_sh_ljs_get_native_pointer(np2), (unsigned int)_sh_to_int32_double(_sh_ljs_get_double(np0)), (unsigned int)_sh_to_int32_double(_sh_ljs_get_double(np8))));
   frame[6] = _sh_ljs_undefined();
   frame[4] = _sh_ljs_double(0);
@@ -2368,10 +2392,10 @@ L26:
 
 L27:
   ;
-  locals.t1 = _sh_ljs_load_from_env(locals.t0, 10);
+  locals.t1 = _sh_ljs_load_from_env(locals.t0, 11);
   if (!(_sh_ljs_is_object(locals.t1))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  locals.t1 = _sh_ljs_load_from_env(locals.t0, 40);
-  locals.t3 = _sh_ljs_load_from_env(locals.t0, 9);
+  locals.t1 = _sh_ljs_load_from_env(locals.t0, 44);
+  locals.t3 = _sh_ljs_load_from_env(locals.t0, 10);
   if (!(_sh_ljs_is_object(locals.t3))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
   np7 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t3, 128));
   if(_sh_ljs_get_bool(np7)) goto L29;
@@ -2379,7 +2403,7 @@ L27:
 
 L28:
   ;
-  locals.t3 = _sh_ljs_get_string(shr, get_symbols(shUnit)[50] /*Trying to call a non...*/);
+  locals.t3 = _sh_ljs_get_string(shr, get_symbols(shUnit)[52] /*Trying to call a non...*/);
   _sh_throw_type_error(shr, &locals.t3);
 
 L29:
@@ -2391,7 +2415,7 @@ L29:
 
 L30:
   ;
-  locals.t1 = _sh_ljs_get_string(shr, get_symbols(shUnit)[53] /*deherm Static Hermes...*/);
+  locals.t1 = _sh_ljs_get_string(shr, get_symbols(shUnit)[55] /*deherm Static Hermes...*/);
   _sh_throw(shr, locals.t1);
 
 L31:
@@ -2403,9 +2427,9 @@ L31:
 
 L32:
   ;
-  locals.t1 = _sh_ljs_load_from_env(locals.t0, 6);
+  locals.t1 = _sh_ljs_load_from_env(locals.t0, 7);
   if (!(_sh_ljs_is_object(locals.t1))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  locals.t1 = _sh_ljs_load_from_env(locals.t0, 37);
+  locals.t1 = _sh_ljs_load_from_env(locals.t0, 41);
   locals.t1 = _sh_new_typed_object_with_buffer(shr, shUnit, &locals.t1, 7, 4);
   np9 = _sh_ljs_untrusted_double(deherm_script_static_value_lane(_sh_ljs_get_native_pointer(np2), (unsigned int)_sh_to_int32_double(_sh_ljs_get_double(np0)), (unsigned int)_sh_to_int32_double(_sh_ljs_get_double(np1))));
   np8 = _sh_ljs_untrusted_double(deherm_script_static_value_lane(_sh_ljs_get_native_pointer(np2), (unsigned int)_sh_to_int32_double(_sh_ljs_get_double(np0)), (unsigned int)_sh_to_int32_double(_sh_ljs_get_double(np5))));
@@ -2439,9 +2463,9 @@ L34:
 
 L35:
   ;
-  locals.t1 = _sh_ljs_load_from_env(locals.t0, 7);
+  locals.t1 = _sh_ljs_load_from_env(locals.t0, 8);
   if (!(_sh_ljs_is_object(locals.t1))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  locals.t1 = _sh_ljs_load_from_env(locals.t0, 38);
+  locals.t1 = _sh_ljs_load_from_env(locals.t0, 42);
   np6 = _sh_fastarray_length(shr, &locals.t2);
   np6 = _sh_ljs_bool(_sh_ljs_get_double(np6) != _sh_ljs_get_double(np7));
   if(_sh_ljs_get_bool(np6)) goto L37;
@@ -2456,7 +2480,7 @@ L36:
 
 L37:
   ;
-  locals.t1 = _sh_ljs_get_string(shr, get_symbols(shUnit)[54] /*deherm Static Hermes...*/);
+  locals.t1 = _sh_ljs_get_string(shr, get_symbols(shUnit)[56] /*deherm Static Hermes...*/);
   _sh_throw(shr, locals.t1);
 
 L38:
@@ -2468,9 +2492,9 @@ L38:
 
 L39:
   ;
-  locals.t1 = _sh_ljs_load_from_env(locals.t0, 5);
+  locals.t1 = _sh_ljs_load_from_env(locals.t0, 6);
   if (!(_sh_ljs_is_object(locals.t1))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  locals.t1 = _sh_ljs_load_from_env(locals.t0, 36);
+  locals.t1 = _sh_ljs_load_from_env(locals.t0, 40);
   locals.t1 = _sh_new_typed_object_with_buffer(shr, shUnit, &locals.t1, 6, 4);
   np9 = _sh_ljs_double((double)(unsigned char)deherm_script_static_value_auxiliary(_sh_ljs_get_native_pointer(np2), (unsigned int)_sh_to_int32_double(_sh_ljs_get_double(np0))));
   np8 = _sh_ljs_double((double)(unsigned int)deherm_script_static_value_runtime(_sh_ljs_get_native_pointer(np2), (unsigned int)_sh_to_int32_double(_sh_ljs_get_double(np0))));
@@ -2488,9 +2512,9 @@ L39:
 
 L40:
   ;
-  locals.t1 = _sh_ljs_load_from_env(locals.t0, 8);
+  locals.t1 = _sh_ljs_load_from_env(locals.t0, 9);
   if (!(_sh_ljs_is_object(locals.t1))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  locals.t1 = _sh_ljs_load_from_env(locals.t0, 39);
+  locals.t1 = _sh_ljs_load_from_env(locals.t0, 43);
   locals.t1 = _sh_new_typed_object_with_buffer(shr, shUnit, &locals.t1, 5, 48);
   np10 = _sh_ljs_double((double)(unsigned int)deherm_script_static_value_url_low(_sh_ljs_get_native_pointer(np2), (unsigned int)_sh_to_int32_double(_sh_ljs_get_double(np0)), (unsigned int)_sh_to_int32_double(_sh_ljs_get_double(np1))));
   np9 = _sh_ljs_double((double)(unsigned int)deherm_script_static_value_url_high(_sh_ljs_get_native_pointer(np2), (unsigned int)_sh_to_int32_double(_sh_ljs_get_double(np0)), (unsigned int)_sh_to_int32_double(_sh_ljs_get_double(np1))));
@@ -2515,7 +2539,7 @@ L41:
   ;
   locals.t1 = _sh_ljs_load_from_env(locals.t0, 4);
   if (!(_sh_ljs_is_object(locals.t1))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  locals.t1 = _sh_ljs_load_from_env(locals.t0, 35);
+  locals.t1 = _sh_ljs_load_from_env(locals.t0, 38);
   locals.t1 = _sh_new_typed_object_with_buffer(shr, shUnit, &locals.t1, 4, 44);
   np5 = _sh_ljs_native_pointer_or_throw(shr, deherm_script_static_value_string(_sh_ljs_get_native_pointer(np2), (unsigned int)_sh_to_int32_double(_sh_ljs_get_double(np0))));
   np4 = _sh_ljs_double((double)(unsigned int)deherm_script_static_value_length(_sh_ljs_get_native_pointer(np2), (unsigned int)_sh_to_int32_double(_sh_ljs_get_double(np0))));
@@ -2529,7 +2553,7 @@ L42:
   ;
   locals.t1 = _sh_ljs_load_from_env(locals.t0, 3);
   if (!(_sh_ljs_is_object(locals.t1))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  locals.t1 = _sh_ljs_load_from_env(locals.t0, 34);
+  locals.t1 = _sh_ljs_load_from_env(locals.t0, 37);
   locals.t1 = _sh_new_typed_object_with_buffer(shr, shUnit, &locals.t1, 4, 26);
   np3 = _sh_ljs_untrusted_double(deherm_script_static_value_number(_sh_ljs_get_native_pointer(np2), (unsigned int)_sh_to_int32_double(_sh_ljs_get_double(np0))));
   _sh_prstore_number(shr, &locals.t1, 0, &np3);
@@ -2540,7 +2564,7 @@ L43:
   ;
   locals.t1 = _sh_ljs_load_from_env(locals.t0, 2);
   if (!(_sh_ljs_is_object(locals.t1))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  locals.t1 = _sh_ljs_load_from_env(locals.t0, 33);
+  locals.t1 = _sh_ljs_load_from_env(locals.t0, 36);
   locals.t1 = _sh_new_typed_object_with_buffer(shr, shUnit, &locals.t1, 4, 25);
   np0 = _sh_ljs_untrusted_double(deherm_script_static_value_number(_sh_ljs_get_native_pointer(np2), (unsigned int)_sh_to_int32_double(_sh_ljs_get_double(np0))));
   np0 = _sh_ljs_bool(_sh_ljs_get_double(np0) != _sh_ljs_get_double(np1));
@@ -2552,7 +2576,7 @@ L44:
   ;
   locals.t1 = _sh_ljs_load_from_env(locals.t0, 1);
   if (!(_sh_ljs_is_object(locals.t1))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  locals.t1 = _sh_ljs_load_from_env(locals.t0, 32);
+  locals.t1 = _sh_ljs_load_from_env(locals.t0, 35);
   locals.t1 = _sh_ljs_new_object_with_parent(shr, &locals.t1);
   _sh_leave(shr, &locals.head, frame);
   return locals.t1;
@@ -2561,17 +2585,17 @@ L45:
   ;
   locals.t1 = _sh_ljs_load_from_env(locals.t0, 0);
   if (!(_sh_ljs_is_object(locals.t1))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  locals.t0 = _sh_ljs_load_from_env(locals.t0, 31);
+  locals.t0 = _sh_ljs_load_from_env(locals.t0, 34);
   locals.t0 = _sh_ljs_new_object_with_parent(shr, &locals.t0);
   _sh_leave(shr, &locals.head, frame);
   return locals.t0;
 
 L46:
   ;
-  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[55] /*deherm Static Hermes...*/);
+  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[57] /*deherm Static Hermes...*/);
   _sh_throw(shr, locals.t0);
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:61:1
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:64:1
 static SHLegacyValue _8_dispatchScriptUniversalValue(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -2626,7 +2650,7 @@ L1:
 
 L2:
   ;
-  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[56] /*deherm Static Hermes...*/);
+  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[58] /*deherm Static Hermes...*/);
   _sh_throw(shr, locals.t0);
 
 L3:
@@ -2705,7 +2729,7 @@ L9:
 L10:
   ;
   // PhiInst
-  frame[5] = _sh_ljs_load_from_env(locals.t8, 14);
+  frame[5] = _sh_ljs_load_from_env(locals.t8, 15);
   frame[2] = _sh_ljs_double((double)(unsigned int)deherm_script_static_result_root(_sh_ljs_get_native_pointer(locals.t1), (unsigned int)_sh_to_int32_double(_sh_ljs_get_double(locals.t3))));
   frame[6] = _sh_ljs_undefined();
   frame[4] = _sh_ljs_double(0);
@@ -2746,7 +2770,7 @@ L13:
 
 L14:
   ;
-  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[57] /*deherm Static Hermes...*/);
+  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[59] /*deherm Static Hermes...*/);
   _sh_throw(shr, locals.t0);
 
 L15:
@@ -2759,7 +2783,7 @@ L15:
 
 L16:
   ;
-  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[58] /*deherm Static Hermes...*/);
+  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[60] /*deherm Static Hermes...*/);
   _sh_throw(shr, locals.t0);
 
 L_catch:
@@ -2776,7 +2800,7 @@ L_catch:
       goto L15;
   }
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:211:1
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:216:1
 static SHLegacyValue _9___dehermToStatic(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -2798,10 +2822,11 @@ static SHLegacyValue _9___dehermToStatic(SHRuntime *shr) {
     SHLegacyValue t15;
     SHLegacyValue t16;
     SHLegacyValue t17;
+    SHLegacyValue t18;
   } locals;
   _sh_check_native_stack_overflow(shr);
   SHLegacyValue *frame = _sh_enter(shr, &locals.head, 11);
-  locals.head.count =18;
+  locals.head.count =19;
   SHUnit *shUnit = shr->units[unit_index];
   locals.t0 = _sh_ljs_undefined();
   locals.t1 = _sh_ljs_undefined();
@@ -2821,6 +2846,7 @@ static SHLegacyValue _9___dehermToStatic(SHRuntime *shr) {
   locals.t15 = _sh_ljs_undefined();
   locals.t16 = _sh_ljs_undefined();
   locals.t17 = _sh_ljs_undefined();
+  locals.t18 = _sh_ljs_undefined();
   SHLegacyValue np0 = _sh_ljs_undefined();
   SHLegacyValue np1 = _sh_ljs_undefined();
   SHLegacyValue np2 = _sh_ljs_undefined();
@@ -2842,313 +2868,327 @@ L0:
   locals.t0 = _sh_ljs_get_env_from_closure(shr, frame[-7]);  locals.t1 = _sh_ljs_param(frame, 1);
   np4 = _sh_ljs_null();
   np0 = _sh_ljs_bool(locals.t1.raw == np4.raw);
-  if(_sh_ljs_get_bool(np0)) goto L102;
+  if(_sh_ljs_get_bool(np0)) goto L115;
   goto L1;
 
 L1:
   ;
   np0 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t1, 1));
-  if(_sh_ljs_get_bool(np0)) goto L101;
+  if(_sh_ljs_get_bool(np0)) goto L114;
   goto L2;
 
 L2:
   ;
   np0 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t1, 32));
-  if(_sh_ljs_get_bool(np0)) goto L100;
+  if(_sh_ljs_get_bool(np0)) goto L113;
   goto L3;
 
 L3:
   ;
   np0 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t1, 16));
-  if(_sh_ljs_get_bool(np0)) goto L99;
+  if(_sh_ljs_get_bool(np0)) goto L112;
   goto L4;
 
 L4:
   ;
   np0 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t1, 4));
-  if(_sh_ljs_get_bool(np0)) goto L98;
+  if(_sh_ljs_get_bool(np0)) goto L111;
   goto L5;
 
 L5:
   ;
   np0 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t1, 64));
-  if(_sh_ljs_get_bool(np0)) goto L97;
+  if(_sh_ljs_get_bool(np0)) goto L110;
   goto L6;
 
 L6:
   ;
-  locals.t2 = _sh_ljs_load_from_env(locals.t0, 19);
+  locals.t2 = _sh_ljs_load_from_env(locals.t0, 20);
   if (!(_sh_ljs_is_object(locals.t2))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
   np0 = _sh_ljs_instance_of_rjs(shr, &locals.t1, &locals.t2);
-  if(_sh_ljs_get_bool(np0)) goto L96;
+  if(_sh_ljs_get_bool(np0)) goto L109;
   goto L7;
 
 L7:
   ;
-  locals.t2 = _sh_ljs_load_from_env(locals.t0, 5);
-  if (!(_sh_ljs_is_object(locals.t2))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  locals.t3 = locals.t2;
+  locals.t3 = _sh_ljs_load_from_env(locals.t0, 26);
   np0 = _sh_ljs_instance_of_rjs(shr, &locals.t1, &locals.t3);
-  if(_sh_ljs_get_bool(np0)) goto L95;
+  if(_sh_ljs_get_bool(np0)) goto L98;
   goto L8;
 
 L8:
   ;
-  np0 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t1, 253));
-  if(_sh_ljs_get_bool(np0)) goto L94;
+  locals.t2 = _sh_ljs_load_from_env(locals.t0, 27);
+  np0 = _sh_ljs_instance_of_rjs(shr, &locals.t1, &locals.t2);
+  if(_sh_ljs_get_bool(np0)) goto L98;
   goto L9;
 
 L9:
   ;
-  np9 = _sh_ljs_param(frame, 2);
-  np0 = _sh_ljs_load_from_env(locals.t0, 18);
-  if (!(_sh_ljs_is_double(np0))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  np0 = _sh_ljs_bool(_sh_ljs_get_double(np9) > _sh_ljs_get_double(np0));
-  if(_sh_ljs_get_bool(np0)) goto L94;
+  locals.t2 = _sh_ljs_load_from_env(locals.t0, 6);
+  if (!(_sh_ljs_is_object(locals.t2))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  locals.t4 = locals.t2;
+  np0 = _sh_ljs_instance_of_rjs(shr, &locals.t1, &locals.t4);
+  if(_sh_ljs_get_bool(np0)) goto L97;
   goto L10;
 
 L10:
   ;
-  locals.t7 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[17] /*kind*/, get_read_prop_cache(shUnit) + 36);
-  locals.t5 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[19] /*runtime*/, get_read_prop_cache(shUnit) + 37);
-  locals.t4 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[30] /*slot*/, get_read_prop_cache(shUnit) + 38);
-  locals.t3 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[31] /*generation*/, get_read_prop_cache(shUnit) + 39);
-  locals.t6 = _sh_ljs_get_string(shr, get_symbols(shUnit)[59] /*gui-node*/);
-  np0 = _sh_ljs_bool(_sh_ljs_strict_equal_inline(locals.t7, locals.t6));
-  if(_sh_ljs_get_bool(np0)) goto L11;
-  goto L21;
+  np0 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t1, 253));
+  if(_sh_ljs_get_bool(np0)) goto L96;
+  goto L11;
 
 L11:
   ;
-  np0 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t5, 32));
-  if(_sh_ljs_get_bool(np0)) goto L12;
-  goto L21;
+  np9 = _sh_ljs_param(frame, 2);
+  np0 = _sh_ljs_load_from_env(locals.t0, 19);
+  if (!(_sh_ljs_is_double(np0))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  np0 = _sh_ljs_bool(_sh_ljs_get_double(np9) > _sh_ljs_get_double(np0));
+  if(_sh_ljs_get_bool(np0)) goto L96;
+  goto L12;
 
 L12:
   ;
-  np0 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t4, 32));
+  locals.t8 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[17] /*kind*/, get_read_prop_cache(shUnit) + 38);
+  locals.t6 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[19] /*runtime*/, get_read_prop_cache(shUnit) + 39);
+  locals.t5 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[30] /*slot*/, get_read_prop_cache(shUnit) + 40);
+  locals.t4 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[31] /*generation*/, get_read_prop_cache(shUnit) + 41);
+  locals.t7 = _sh_ljs_get_string(shr, get_symbols(shUnit)[61] /*gui-node*/);
+  np0 = _sh_ljs_bool(_sh_ljs_strict_equal_inline(locals.t8, locals.t7));
   if(_sh_ljs_get_bool(np0)) goto L13;
-  goto L21;
+  goto L23;
 
 L13:
   ;
-  np0 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t3, 32));
+  np0 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t6, 32));
   if(_sh_ljs_get_bool(np0)) goto L14;
-  goto L21;
+  goto L23;
 
 L14:
   ;
-  locals.t6 = _sh_ljs_get_global_object(shr);
-  locals.t8 = _sh_ljs_try_get_by_id_rjs(shr,&locals.t6, get_symbols(shUnit)[60] /*Number*/, get_read_prop_cache(shUnit) + 40);
-  frame[4] = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t8,get_symbols(shUnit)[61] /*isSafeInteger*/, get_read_prop_cache(shUnit) + 41);
-  np0 = _sh_ljs_undefined();
-  frame[5] = _sh_ljs_undefined();
-  frame[3] = locals.t8;
-  frame[2] = locals.t5;
-  locals.t7 = _sh_ljs_call(shr, frame, 1);
-  if(_sh_ljs_to_boolean(locals.t7)) goto L15;
-  goto L21;
+  np0 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t5, 32));
+  if(_sh_ljs_get_bool(np0)) goto L15;
+  goto L23;
 
 L15:
   ;
-  locals.t8 = _sh_ljs_try_get_by_id_rjs(shr,&locals.t6, get_symbols(shUnit)[60] /*Number*/, get_read_prop_cache(shUnit) + 42);
-  frame[4] = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t8,get_symbols(shUnit)[61] /*isSafeInteger*/, get_read_prop_cache(shUnit) + 43);
+  np0 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t4, 32));
+  if(_sh_ljs_get_bool(np0)) goto L16;
+  goto L23;
+
+L16:
+  ;
+  locals.t7 = _sh_ljs_get_global_object(shr);
+  locals.t9 = _sh_ljs_try_get_by_id_rjs(shr,&locals.t7, get_symbols(shUnit)[62] /*Number*/, get_read_prop_cache(shUnit) + 42);
+  frame[4] = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t9,get_symbols(shUnit)[63] /*isSafeInteger*/, get_read_prop_cache(shUnit) + 43);
+  np0 = _sh_ljs_undefined();
+  frame[5] = _sh_ljs_undefined();
+  frame[3] = locals.t9;
+  frame[2] = locals.t6;
+  locals.t8 = _sh_ljs_call(shr, frame, 1);
+  if(_sh_ljs_to_boolean(locals.t8)) goto L17;
+  goto L23;
+
+L17:
+  ;
+  locals.t9 = _sh_ljs_try_get_by_id_rjs(shr,&locals.t7, get_symbols(shUnit)[62] /*Number*/, get_read_prop_cache(shUnit) + 44);
+  frame[4] = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t9,get_symbols(shUnit)[63] /*isSafeInteger*/, get_read_prop_cache(shUnit) + 45);
+  frame[5] = _sh_ljs_undefined();
+  frame[3] = locals.t9;
+  frame[2] = locals.t5;
+  locals.t8 = _sh_ljs_call(shr, frame, 1);
+  if(_sh_ljs_to_boolean(locals.t8)) goto L18;
+  goto L23;
+
+L18:
+  ;
+  locals.t8 = _sh_ljs_try_get_by_id_rjs(shr,&locals.t7, get_symbols(shUnit)[62] /*Number*/, get_read_prop_cache(shUnit) + 46);
+  frame[4] = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t8,get_symbols(shUnit)[63] /*isSafeInteger*/, get_read_prop_cache(shUnit) + 47);
   frame[5] = _sh_ljs_undefined();
   frame[3] = locals.t8;
   frame[2] = locals.t4;
   locals.t7 = _sh_ljs_call(shr, frame, 1);
-  if(_sh_ljs_to_boolean(locals.t7)) goto L16;
-  goto L21;
-
-L16:
-  ;
-  locals.t7 = _sh_ljs_try_get_by_id_rjs(shr,&locals.t6, get_symbols(shUnit)[60] /*Number*/, get_read_prop_cache(shUnit) + 44);
-  frame[4] = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t7,get_symbols(shUnit)[61] /*isSafeInteger*/, get_read_prop_cache(shUnit) + 45);
-  frame[5] = _sh_ljs_undefined();
-  frame[3] = locals.t7;
-  frame[2] = locals.t3;
-  locals.t6 = _sh_ljs_call(shr, frame, 1);
-  if(_sh_ljs_to_boolean(locals.t6)) goto L17;
-  goto L21;
-
-L17:
-  ;
-  np3 = _sh_ljs_double(0);
-  np0 = _sh_ljs_bool(_sh_ljs_greater_rjs_inline(shr, &locals.t5, &np3));
-  if(_sh_ljs_get_bool(np0)) goto L18;
-  goto L21;
-
-L18:
-  ;
-  np0 = _sh_ljs_bool(_sh_ljs_greater_equal_rjs_inline(shr, &locals.t4, &np3));
-  if(_sh_ljs_get_bool(np0)) goto L19;
-  goto L21;
+  if(_sh_ljs_to_boolean(locals.t7)) goto L19;
+  goto L23;
 
 L19:
   ;
-  np0 = _sh_ljs_bool(_sh_ljs_greater_rjs_inline(shr, &locals.t3, &np3));
+  np3 = _sh_ljs_double(0);
+  np0 = _sh_ljs_bool(_sh_ljs_greater_rjs_inline(shr, &locals.t6, &np3));
   if(_sh_ljs_get_bool(np0)) goto L20;
-  goto L21;
+  goto L23;
 
 L20:
   ;
-  locals.t6 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[4] /*dispose*/, get_read_prop_cache(shUnit) + 46);
-  np0 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t6, 128));
-  if(_sh_ljs_get_bool(np0)) goto L93;
-  goto L21;
+  np0 = _sh_ljs_bool(_sh_ljs_greater_equal_rjs_inline(shr, &locals.t5, &np3));
+  if(_sh_ljs_get_bool(np0)) goto L21;
+  goto L23;
 
 L21:
   ;
-  locals.t7 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[62] /*__dehermHandleV1*/, get_read_prop_cache(shUnit) + 47);
-  locals.t6 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[17] /*kind*/, get_read_prop_cache(shUnit) + 48);
-  locals.t10 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[63] /*payload*/, get_read_prop_cache(shUnit) + 49);
-  np2 = _sh_ljs_bool(true);
-  np0 = _sh_ljs_bool(locals.t7.raw == np2.raw);
+  np0 = _sh_ljs_bool(_sh_ljs_greater_rjs_inline(shr, &locals.t4, &np3));
   if(_sh_ljs_get_bool(np0)) goto L22;
-  goto L29;
+  goto L23;
 
 L22:
   ;
-  np5 = _sh_ljs_double(3);
-  np0 = _sh_ljs_bool(_sh_ljs_strict_equal_inline(locals.t6, np5));
-  if(_sh_ljs_get_bool(np0)) goto L23;
-  goto L29;
+  locals.t7 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[4] /*dispose*/, get_read_prop_cache(shUnit) + 48);
+  np0 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t7, 128));
+  if(_sh_ljs_get_bool(np0)) goto L95;
+  goto L23;
 
 L23:
   ;
-  np0 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t5, 32));
+  locals.t8 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[64] /*__dehermHandleV1*/, get_read_prop_cache(shUnit) + 49);
+  locals.t7 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[17] /*kind*/, get_read_prop_cache(shUnit) + 50);
+  locals.t11 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[65] /*payload*/, get_read_prop_cache(shUnit) + 51);
+  np2 = _sh_ljs_bool(true);
+  np0 = _sh_ljs_bool(locals.t8.raw == np2.raw);
   if(_sh_ljs_get_bool(np0)) goto L24;
-  goto L29;
+  goto L31;
 
 L24:
   ;
-  locals.t7 = _sh_ljs_get_global_object(shr);
-  locals.t8 = _sh_ljs_try_get_by_id_rjs(shr,&locals.t7, get_symbols(shUnit)[60] /*Number*/, get_read_prop_cache(shUnit) + 50);
-  frame[4] = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t8,get_symbols(shUnit)[61] /*isSafeInteger*/, get_read_prop_cache(shUnit) + 51);
-  np0 = _sh_ljs_undefined();
-  frame[5] = _sh_ljs_undefined();
-  frame[3] = locals.t8;
-  frame[2] = locals.t5;
-  locals.t6 = _sh_ljs_call(shr, frame, 1);
-  if(_sh_ljs_to_boolean(locals.t6)) goto L25;
-  goto L29;
+  np5 = _sh_ljs_double(3);
+  np0 = _sh_ljs_bool(_sh_ljs_strict_equal_inline(locals.t7, np5));
+  if(_sh_ljs_get_bool(np0)) goto L25;
+  goto L31;
 
 L25:
   ;
-  np1 = _sh_ljs_double(0);
-  np6 = _sh_ljs_bool(_sh_ljs_greater_rjs_inline(shr, &locals.t5, &np1));
-  if(_sh_ljs_get_bool(np6)) goto L26;
-  goto L29;
+  np0 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t6, 32));
+  if(_sh_ljs_get_bool(np0)) goto L26;
+  goto L31;
 
 L26:
   ;
-  np6 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t10, 64));
-  if(_sh_ljs_get_bool(np6)) goto L27;
-  goto L29;
+  locals.t8 = _sh_ljs_get_global_object(shr);
+  locals.t9 = _sh_ljs_try_get_by_id_rjs(shr,&locals.t8, get_symbols(shUnit)[62] /*Number*/, get_read_prop_cache(shUnit) + 52);
+  frame[4] = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t9,get_symbols(shUnit)[63] /*isSafeInteger*/, get_read_prop_cache(shUnit) + 53);
+  np0 = _sh_ljs_undefined();
+  frame[5] = _sh_ljs_undefined();
+  frame[3] = locals.t9;
+  frame[2] = locals.t6;
+  locals.t7 = _sh_ljs_call(shr, frame, 1);
+  if(_sh_ljs_to_boolean(locals.t7)) goto L27;
+  goto L31;
 
 L27:
   ;
-  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t7, get_symbols(shUnit)[40] /*BigInt*/, get_read_prop_cache(shUnit) + 52);
-  frame[5] = _sh_ljs_undefined();
-  frame[3] = _sh_ljs_undefined();
-  frame[2] = _sh_ljs_double(0);
-  locals.t6 = _sh_ljs_call(shr, frame, 1);
-  np6 = _sh_ljs_bool(_sh_ljs_greater_equal_rjs_inline(shr, &locals.t10, &locals.t6));
+  np1 = _sh_ljs_double(0);
+  np6 = _sh_ljs_bool(_sh_ljs_greater_rjs_inline(shr, &locals.t6, &np1));
   if(_sh_ljs_get_bool(np6)) goto L28;
-  goto L29;
+  goto L31;
 
 L28:
   ;
-  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t7, get_symbols(shUnit)[40] /*BigInt*/, get_read_prop_cache(shUnit) + 53);
-  frame[2] = _sh_ljs_get_string(shr, get_symbols(shUnit)[64] /*0xffffffffffffffff*/);
-  frame[5] = _sh_ljs_undefined();
-  frame[3] = _sh_ljs_undefined();
-  locals.t6 = _sh_ljs_call(shr, frame, 1);
-  np6 = _sh_ljs_bool(_sh_ljs_less_equal_rjs_inline(shr, &locals.t10, &locals.t6));
-  if(_sh_ljs_get_bool(np6)) goto L90;
-  goto L29;
+  np6 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t11, 64));
+  if(_sh_ljs_get_bool(np6)) goto L29;
+  goto L31;
 
 L29:
   ;
-  locals.t6 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[65] /*__dehermValueKind*/, get_read_prop_cache(shUnit) + 54);
-  np6 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t6, 4));
-  if(_sh_ljs_get_bool(np6)) goto L79;
-  goto L30;
+  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t8, get_symbols(shUnit)[42] /*BigInt*/, get_read_prop_cache(shUnit) + 54);
+  frame[5] = _sh_ljs_undefined();
+  frame[3] = _sh_ljs_undefined();
+  frame[2] = _sh_ljs_double(0);
+  locals.t7 = _sh_ljs_call(shr, frame, 1);
+  np6 = _sh_ljs_bool(_sh_ljs_greater_equal_rjs_inline(shr, &locals.t11, &locals.t7));
+  if(_sh_ljs_get_bool(np6)) goto L30;
+  goto L31;
 
 L30:
   ;
-  locals.t8 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[66] /*__dehermUrlV1*/, get_read_prop_cache(shUnit) + 55);
-  np6 = _sh_ljs_bool(locals.t8.raw == np2.raw);
-  if(_sh_ljs_get_bool(np6)) goto L73;
+  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t8, get_symbols(shUnit)[42] /*BigInt*/, get_read_prop_cache(shUnit) + 55);
+  frame[2] = _sh_ljs_get_string(shr, get_symbols(shUnit)[66] /*0xffffffffffffffff*/);
+  frame[5] = _sh_ljs_undefined();
+  frame[3] = _sh_ljs_undefined();
+  locals.t7 = _sh_ljs_call(shr, frame, 1);
+  np6 = _sh_ljs_bool(_sh_ljs_less_equal_rjs_inline(shr, &locals.t11, &locals.t7));
+  if(_sh_ljs_get_bool(np6)) goto L92;
   goto L31;
 
 L31:
   ;
-  frame[4] = _sh_ljs_load_from_env(locals.t0, 20);
-  np12 = _sh_ljs_undefined();
-  frame[5] = _sh_ljs_undefined();
-  frame[3] = _sh_ljs_undefined();
-  frame[2] = locals.t1;
-  locals.t8 = _sh_ljs_call(shr, frame, 1);
-  if(_sh_ljs_to_boolean(locals.t8)) goto L57;
+  locals.t7 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[67] /*__dehermValueKind*/, get_read_prop_cache(shUnit) + 56);
+  np6 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t7, 4));
+  if(_sh_ljs_get_bool(np6)) goto L81;
   goto L32;
 
 L32:
   ;
-  frame[4] = _sh_ljs_load_from_env(locals.t0, 21);
-  frame[5] = _sh_ljs_undefined();
-  frame[3] = _sh_ljs_undefined();
-  frame[2] = locals.t1;
-  locals.t8 = _sh_ljs_call(shr, frame, 1);
-  locals.t9 = _sh_ljs_load_from_env(locals.t0, 24);
-  np6 = _sh_ljs_bool(_sh_ljs_strict_equal_inline(locals.t8, locals.t9));
-  if(_sh_ljs_get_bool(np6)) goto L45;
+  locals.t9 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[68] /*__dehermUrlV1*/, get_read_prop_cache(shUnit) + 57);
+  np6 = _sh_ljs_bool(locals.t9.raw == np2.raw);
+  if(_sh_ljs_get_bool(np6)) goto L75;
   goto L33;
 
 L33:
   ;
-  locals.t9 = _sh_ljs_load_from_env(locals.t0, 22);
-  np6 = _sh_ljs_bool(!_sh_ljs_strict_equal_inline(locals.t8, locals.t9));
-  if(_sh_ljs_get_bool(np6)) goto L34;
-  goto L35;
+  frame[4] = _sh_ljs_load_from_env(locals.t0, 21);
+  np12 = _sh_ljs_undefined();
+  frame[5] = _sh_ljs_undefined();
+  frame[3] = _sh_ljs_undefined();
+  frame[2] = locals.t1;
+  locals.t9 = _sh_ljs_call(shr, frame, 1);
+  if(_sh_ljs_to_boolean(locals.t9)) goto L59;
+  goto L34;
 
 L34:
   ;
-  np4 = _sh_ljs_bool(locals.t8.raw != np4.raw);
-  if(_sh_ljs_get_bool(np4)) goto L44;
+  frame[4] = _sh_ljs_load_from_env(locals.t0, 22);
+  frame[5] = _sh_ljs_undefined();
+  frame[3] = _sh_ljs_undefined();
+  frame[2] = locals.t1;
+  locals.t9 = _sh_ljs_call(shr, frame, 1);
+  locals.t10 = _sh_ljs_load_from_env(locals.t0, 25);
+  np6 = _sh_ljs_bool(_sh_ljs_strict_equal_inline(locals.t9, locals.t10));
+  if(_sh_ljs_get_bool(np6)) goto L47;
   goto L35;
 
 L35:
   ;
-  locals.t8 = _sh_ljs_get_env(shr, locals.t0, 1);
-  locals.t9 = _sh_ljs_load_from_env(locals.t8, 3);
-  locals.t11 = _sh_new_fastarray_with_proto(shr, &locals.t9, 0);
-  locals.t8 = _sh_ljs_load_from_env(locals.t8, 2);
-  locals.t9 = _sh_new_fastarray_with_proto(shr, &locals.t8, 0);
-  // AllocStackInst
-  // AllocStackInst
-  // AllocStackInst
-  // AllocStackInst
-  locals.t12 = locals.t1;
-  // AllocStackInst
-  np4 = _sh_ljs_double(1);
-  np6 = _sh_ljs_double(_sh_ljs_get_double(np9) + _sh_ljs_get_double(np4));
-  locals.t13 = _sh_ljs_get_pname_list_rjs(shr, &locals.t12, &np10, &np8);
-  if (_sh_ljs_is_undefined(locals.t13)) goto L39;
-  goto L36;
+  locals.t10 = _sh_ljs_load_from_env(locals.t0, 23);
+  np6 = _sh_ljs_bool(!_sh_ljs_strict_equal_inline(locals.t9, locals.t10));
+  if(_sh_ljs_get_bool(np6)) goto L36;
+  goto L37;
 
 L36:
   ;
-  locals.t8 = _sh_ljs_get_next_pname_rjs(shr, &locals.t13, &locals.t12, &np10, &np8);
-  if (_sh_ljs_is_undefined(locals.t8)) goto L39;
+  np4 = _sh_ljs_bool(locals.t9.raw != np4.raw);
+  if(_sh_ljs_get_bool(np4)) goto L46;
   goto L37;
 
 L37:
   ;
-  locals.t14 = locals.t8;
-  _sh_fastarray_push(shr, &locals.t14, &locals.t11);
-  frame[4] = _sh_ljs_load_from_env(locals.t0, 28);
-  frame[2] = _sh_ljs_get_by_val_rjs(shr,&locals.t1, &locals.t14);
+  locals.t9 = _sh_ljs_get_env(shr, locals.t0, 1);
+  locals.t10 = _sh_ljs_load_from_env(locals.t9, 3);
+  locals.t12 = _sh_new_fastarray_with_proto(shr, &locals.t10, 0);
+  locals.t9 = _sh_ljs_load_from_env(locals.t9, 2);
+  locals.t10 = _sh_new_fastarray_with_proto(shr, &locals.t9, 0);
+  // AllocStackInst
+  // AllocStackInst
+  // AllocStackInst
+  // AllocStackInst
+  locals.t13 = locals.t1;
+  // AllocStackInst
+  np4 = _sh_ljs_double(1);
+  np6 = _sh_ljs_double(_sh_ljs_get_double(np9) + _sh_ljs_get_double(np4));
+  locals.t14 = _sh_ljs_get_pname_list_rjs(shr, &locals.t13, &np10, &np8);
+  if (_sh_ljs_is_undefined(locals.t14)) goto L41;
+  goto L38;
+
+L38:
+  ;
+  locals.t9 = _sh_ljs_get_next_pname_rjs(shr, &locals.t14, &locals.t13, &np10, &np8);
+  if (_sh_ljs_is_undefined(locals.t9)) goto L41;
+  goto L39;
+
+L39:
+  ;
+  locals.t15 = locals.t9;
+  _sh_fastarray_push(shr, &locals.t15, &locals.t12);
+  frame[4] = _sh_ljs_load_from_env(locals.t0, 31);
+  frame[2] = _sh_ljs_get_by_val_rjs(shr,&locals.t1, &locals.t15);
   frame[5] = _sh_ljs_undefined();
   frame[3] = _sh_ljs_double(0);
   frame[1] = np6;
@@ -3157,119 +3197,101 @@ L37:
   frame[8] = _sh_ljs_native_pointer((void*)0);
   frame[7] = _sh_ljs_native_pointer((void*)0);
   frame[6] = _sh_ljs_native_uint32(2);
-  locals.t14 = _9___dehermToStatic(shr);
-  _sh_fastarray_push(shr, &locals.t14, &locals.t9);
-  np4 = _sh_ljs_load_from_env(locals.t0, 27);
+  locals.t15 = _9___dehermToStatic(shr);
+  _sh_fastarray_push(shr, &locals.t15, &locals.t10);
+  np4 = _sh_ljs_load_from_env(locals.t0, 30);
   if (!(_sh_ljs_is_bool(np4))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  if(_sh_ljs_get_bool(np4)) goto L38;
-  goto L36;
-
-L38:
-  ;
-  locals.t8 = _sh_ljs_load_from_env(locals.t0, 0);
-  if (!(_sh_ljs_is_object(locals.t8))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  locals.t8 = _sh_ljs_load_from_env(locals.t0, 31);
-  locals.t8 = _sh_ljs_new_object_with_parent(shr, &locals.t8);
-  _sh_leave(shr, &locals.head, frame);
-  return locals.t8;
-
-L39:
-  ;
-  locals.t8 = _sh_ljs_load_from_env(locals.t0, 11);
-  if (!(_sh_ljs_is_object(locals.t8))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  locals.t8 = _sh_ljs_load_from_env(locals.t0, 41);
-  locals.t12 = _sh_ljs_load_from_env(locals.t0, 9);
-  if (!(_sh_ljs_is_object(locals.t12))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  np4 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t12, 128));
-  if(_sh_ljs_get_bool(np4)) goto L41;
-  goto L40;
+  if(_sh_ljs_get_bool(np4)) goto L40;
+  goto L38;
 
 L40:
   ;
-  locals.t12 = _sh_ljs_get_string(shr, get_symbols(shUnit)[50] /*Trying to call a non...*/);
-  _sh_throw_type_error(shr, &locals.t12);
+  locals.t9 = _sh_ljs_load_from_env(locals.t0, 0);
+  if (!(_sh_ljs_is_object(locals.t9))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  locals.t9 = _sh_ljs_load_from_env(locals.t0, 34);
+  locals.t9 = _sh_ljs_new_object_with_parent(shr, &locals.t9);
+  _sh_leave(shr, &locals.head, frame);
+  return locals.t9;
 
 L41:
   ;
-  np6 = _sh_fastarray_length(shr, &locals.t11);
-  np4 = _sh_fastarray_length(shr, &locals.t9);
-  np4 = _sh_ljs_bool(_sh_ljs_get_double(np6) != _sh_ljs_get_double(np4));
+  locals.t9 = _sh_ljs_load_from_env(locals.t0, 12);
+  if (!(_sh_ljs_is_object(locals.t9))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  locals.t9 = _sh_ljs_load_from_env(locals.t0, 45);
+  locals.t13 = _sh_ljs_load_from_env(locals.t0, 10);
+  if (!(_sh_ljs_is_object(locals.t13))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  np4 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t13, 128));
   if(_sh_ljs_get_bool(np4)) goto L43;
   goto L42;
 
 L42:
   ;
-  locals.t8 = _sh_new_typed_object_with_buffer(shr, shUnit, &locals.t8, 8, 81);
-  _sh_prstore_object(shr, &locals.t8, 0, &locals.t11);
-  _sh_prstore_object(shr, &locals.t8, 1, &locals.t9);
-  _sh_leave(shr, &locals.head, frame);
-  return locals.t8;
+  locals.t13 = _sh_ljs_get_string(shr, get_symbols(shUnit)[52] /*Trying to call a non...*/);
+  _sh_throw_type_error(shr, &locals.t13);
 
 L43:
   ;
-  locals.t8 = _sh_ljs_get_string(shr, get_symbols(shUnit)[52] /*deherm record key/va...*/);
-  _sh_throw(shr, locals.t8);
+  np6 = _sh_fastarray_length(shr, &locals.t12);
+  np4 = _sh_fastarray_length(shr, &locals.t10);
+  np4 = _sh_ljs_bool(_sh_ljs_get_double(np6) != _sh_ljs_get_double(np4));
+  if(_sh_ljs_get_bool(np4)) goto L45;
+  goto L44;
 
 L44:
   ;
-  _sh_ljs_store_to_env(shr, locals.t0,np2, 27);
-  locals.t8 = _sh_ljs_load_from_env(locals.t0, 0);
-  if (!(_sh_ljs_is_object(locals.t8))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  locals.t8 = _sh_ljs_load_from_env(locals.t0, 31);
-  locals.t8 = _sh_ljs_new_object_with_parent(shr, &locals.t8);
+  locals.t9 = _sh_new_typed_object_with_buffer(shr, shUnit, &locals.t9, 8, 81);
+  _sh_prstore_object(shr, &locals.t9, 0, &locals.t12);
+  _sh_prstore_object(shr, &locals.t9, 1, &locals.t10);
   _sh_leave(shr, &locals.head, frame);
-  return locals.t8;
+  return locals.t9;
 
 L45:
   ;
-  locals.t8 = _sh_ljs_get_env(shr, locals.t0, 1);
-  locals.t9 = _sh_ljs_load_from_env(locals.t8, 2);
-  locals.t11 = _sh_new_fastarray_with_proto(shr, &locals.t9, 0);
-  locals.t8 = _sh_ljs_load_from_env(locals.t8, 2);
-  locals.t9 = _sh_new_fastarray_with_proto(shr, &locals.t8, 0);
-  frame[4] = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[67] /*entries*/, get_read_prop_cache(shUnit) + 56);
-  frame[5] = _sh_ljs_undefined();
-  frame[3] = locals.t1;
-  locals.t8 = _sh_ljs_call(shr, frame, 0);
-  np4 = _sh_ljs_double(1);
-  np4 = _sh_ljs_double(_sh_ljs_get_double(np9) + _sh_ljs_get_double(np4));
-  goto L46;
+  locals.t9 = _sh_ljs_get_string(shr, get_symbols(shUnit)[54] /*deherm record key/va...*/);
+  _sh_throw(shr, locals.t9);
+
 L46:
   ;
-  frame[4] = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t8,get_symbols(shUnit)[68] /*next*/, get_read_prop_cache(shUnit) + 57);
-  frame[5] = _sh_ljs_undefined();
-  frame[3] = locals.t8;
-  locals.t12 = _sh_ljs_call(shr, frame, 0);
-  locals.t13 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t12,get_symbols(shUnit)[69] /*done*/, get_read_prop_cache(shUnit) + 58);
-  np7 = _sh_ljs_bool(locals.t13.raw == np2.raw);
-  if(_sh_ljs_get_bool(np7)) goto L52;
-  goto L47;
+  _sh_ljs_store_to_env(shr, locals.t0,np2, 30);
+  locals.t9 = _sh_ljs_load_from_env(locals.t0, 0);
+  if (!(_sh_ljs_is_object(locals.t9))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  locals.t9 = _sh_ljs_load_from_env(locals.t0, 34);
+  locals.t9 = _sh_ljs_new_object_with_parent(shr, &locals.t9);
+  _sh_leave(shr, &locals.head, frame);
+  return locals.t9;
 
 L47:
   ;
-  locals.t13 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t12,get_symbols(shUnit)[7] /*value*/, get_read_prop_cache(shUnit) + 59);
-  locals.t14 = _sh_ljs_load_from_env(locals.t0, 28);
-  frame[2] = _sh_ljs_get_by_index_rjs(shr,&locals.t13, 0);
+  locals.t9 = _sh_ljs_get_env(shr, locals.t0, 1);
+  locals.t10 = _sh_ljs_load_from_env(locals.t9, 2);
+  locals.t12 = _sh_new_fastarray_with_proto(shr, &locals.t10, 0);
+  locals.t9 = _sh_ljs_load_from_env(locals.t9, 2);
+  locals.t10 = _sh_new_fastarray_with_proto(shr, &locals.t9, 0);
+  frame[4] = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[69] /*entries*/, get_read_prop_cache(shUnit) + 58);
   frame[5] = _sh_ljs_undefined();
-  frame[4] = locals.t14;
-  frame[3] = _sh_ljs_double(0);
-  frame[1] = np4;
-  frame[10] = _sh_ljs_native_pointer(frame);
-  frame[9] = _sh_ljs_native_pointer((void*)0);
-  frame[8] = _sh_ljs_native_pointer((void*)0);
-  frame[7] = _sh_ljs_native_pointer((void*)0);
-  frame[6] = _sh_ljs_native_uint32(2);
-  locals.t12 = _9___dehermToStatic(shr);
-  np7 = _sh_ljs_load_from_env(locals.t0, 27);
-  if (!(_sh_ljs_is_bool(np7))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  if(_sh_ljs_get_bool(np7)) goto L51;
+  frame[3] = locals.t1;
+  locals.t9 = _sh_ljs_call(shr, frame, 0);
+  np4 = _sh_ljs_double(1);
+  np4 = _sh_ljs_double(_sh_ljs_get_double(np9) + _sh_ljs_get_double(np4));
   goto L48;
-
 L48:
   ;
-  frame[2] = _sh_ljs_get_by_index_rjs(shr,&locals.t13, 1);
+  frame[4] = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t9,get_symbols(shUnit)[70] /*next*/, get_read_prop_cache(shUnit) + 59);
   frame[5] = _sh_ljs_undefined();
-  frame[4] = locals.t14;
+  frame[3] = locals.t9;
+  locals.t13 = _sh_ljs_call(shr, frame, 0);
+  locals.t14 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t13,get_symbols(shUnit)[71] /*done*/, get_read_prop_cache(shUnit) + 60);
+  np7 = _sh_ljs_bool(locals.t14.raw == np2.raw);
+  if(_sh_ljs_get_bool(np7)) goto L54;
+  goto L49;
+
+L49:
+  ;
+  locals.t14 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t13,get_symbols(shUnit)[7] /*value*/, get_read_prop_cache(shUnit) + 61);
+  locals.t15 = _sh_ljs_load_from_env(locals.t0, 31);
+  frame[2] = _sh_ljs_get_by_index_rjs(shr,&locals.t14, 0);
+  frame[5] = _sh_ljs_undefined();
+  frame[4] = locals.t15;
   frame[3] = _sh_ljs_double(0);
   frame[1] = np4;
   frame[10] = _sh_ljs_native_pointer(frame);
@@ -3278,122 +3300,140 @@ L48:
   frame[7] = _sh_ljs_native_pointer((void*)0);
   frame[6] = _sh_ljs_native_uint32(2);
   locals.t13 = _9___dehermToStatic(shr);
-  _sh_fastarray_push(shr, &locals.t13, &locals.t9);
-  np7 = _sh_ljs_load_from_env(locals.t0, 27);
+  np7 = _sh_ljs_load_from_env(locals.t0, 30);
   if (!(_sh_ljs_is_bool(np7))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  if(_sh_ljs_get_bool(np7)) goto L50;
-  goto L49;
+  if(_sh_ljs_get_bool(np7)) goto L53;
+  goto L50;
 
-L49:
-  ;
-  _sh_fastarray_push(shr, &locals.t12, &locals.t11);
-  goto L46;
 L50:
   ;
-  locals.t8 = _sh_ljs_load_from_env(locals.t0, 0);
-  if (!(_sh_ljs_is_object(locals.t8))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  locals.t8 = _sh_ljs_load_from_env(locals.t0, 31);
-  locals.t8 = _sh_ljs_new_object_with_parent(shr, &locals.t8);
-  _sh_leave(shr, &locals.head, frame);
-  return locals.t8;
+  frame[2] = _sh_ljs_get_by_index_rjs(shr,&locals.t14, 1);
+  frame[5] = _sh_ljs_undefined();
+  frame[4] = locals.t15;
+  frame[3] = _sh_ljs_double(0);
+  frame[1] = np4;
+  frame[10] = _sh_ljs_native_pointer(frame);
+  frame[9] = _sh_ljs_native_pointer((void*)0);
+  frame[8] = _sh_ljs_native_pointer((void*)0);
+  frame[7] = _sh_ljs_native_pointer((void*)0);
+  frame[6] = _sh_ljs_native_uint32(2);
+  locals.t14 = _9___dehermToStatic(shr);
+  _sh_fastarray_push(shr, &locals.t14, &locals.t10);
+  np7 = _sh_ljs_load_from_env(locals.t0, 30);
+  if (!(_sh_ljs_is_bool(np7))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  if(_sh_ljs_get_bool(np7)) goto L52;
+  goto L51;
 
 L51:
   ;
-  locals.t8 = _sh_ljs_load_from_env(locals.t0, 0);
-  if (!(_sh_ljs_is_object(locals.t8))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  locals.t8 = _sh_ljs_load_from_env(locals.t0, 31);
-  locals.t8 = _sh_ljs_new_object_with_parent(shr, &locals.t8);
-  _sh_leave(shr, &locals.head, frame);
-  return locals.t8;
-
+  _sh_fastarray_push(shr, &locals.t13, &locals.t12);
+  goto L48;
 L52:
   ;
-  locals.t8 = _sh_ljs_load_from_env(locals.t0, 12);
-  if (!(_sh_ljs_is_object(locals.t8))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  locals.t8 = _sh_ljs_load_from_env(locals.t0, 42);
-  locals.t12 = _sh_ljs_load_from_env(locals.t0, 9);
-  if (!(_sh_ljs_is_object(locals.t12))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  np4 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t12, 128));
-  if(_sh_ljs_get_bool(np4)) goto L54;
-  goto L53;
+  locals.t9 = _sh_ljs_load_from_env(locals.t0, 0);
+  if (!(_sh_ljs_is_object(locals.t9))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  locals.t9 = _sh_ljs_load_from_env(locals.t0, 34);
+  locals.t9 = _sh_ljs_new_object_with_parent(shr, &locals.t9);
+  _sh_leave(shr, &locals.head, frame);
+  return locals.t9;
 
 L53:
   ;
-  locals.t12 = _sh_ljs_get_string(shr, get_symbols(shUnit)[50] /*Trying to call a non...*/);
-  _sh_throw_type_error(shr, &locals.t12);
+  locals.t9 = _sh_ljs_load_from_env(locals.t0, 0);
+  if (!(_sh_ljs_is_object(locals.t9))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  locals.t9 = _sh_ljs_load_from_env(locals.t0, 34);
+  locals.t9 = _sh_ljs_new_object_with_parent(shr, &locals.t9);
+  _sh_leave(shr, &locals.head, frame);
+  return locals.t9;
 
 L54:
   ;
-  np6 = _sh_fastarray_length(shr, &locals.t11);
-  np4 = _sh_fastarray_length(shr, &locals.t9);
-  np4 = _sh_ljs_bool(_sh_ljs_get_double(np6) != _sh_ljs_get_double(np4));
+  locals.t9 = _sh_ljs_load_from_env(locals.t0, 13);
+  if (!(_sh_ljs_is_object(locals.t9))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  locals.t9 = _sh_ljs_load_from_env(locals.t0, 46);
+  locals.t13 = _sh_ljs_load_from_env(locals.t0, 10);
+  if (!(_sh_ljs_is_object(locals.t13))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  np4 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t13, 128));
   if(_sh_ljs_get_bool(np4)) goto L56;
   goto L55;
 
 L55:
   ;
-  locals.t8 = _sh_new_typed_object_with_buffer(shr, shUnit, &locals.t8, 8, 81);
-  _sh_prstore_object(shr, &locals.t8, 0, &locals.t11);
-  _sh_prstore_object(shr, &locals.t8, 1, &locals.t9);
-  _sh_leave(shr, &locals.head, frame);
-  return locals.t8;
+  locals.t13 = _sh_ljs_get_string(shr, get_symbols(shUnit)[52] /*Trying to call a non...*/);
+  _sh_throw_type_error(shr, &locals.t13);
 
 L56:
   ;
-  locals.t8 = _sh_ljs_get_string(shr, get_symbols(shUnit)[51] /*deherm map key/value...*/);
-  _sh_throw(shr, locals.t8);
+  np6 = _sh_fastarray_length(shr, &locals.t12);
+  np4 = _sh_fastarray_length(shr, &locals.t10);
+  np4 = _sh_ljs_bool(_sh_ljs_get_double(np6) != _sh_ljs_get_double(np4));
+  if(_sh_ljs_get_bool(np4)) goto L58;
+  goto L57;
 
 L57:
   ;
-  locals.t8 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[46] /*length*/, get_read_prop_cache(shUnit) + 60);
-  if (!(_sh_ljs_is_double(locals.t8))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  np11 = locals.t8;
+  locals.t9 = _sh_new_typed_object_with_buffer(shr, shUnit, &locals.t9, 8, 81);
+  _sh_prstore_object(shr, &locals.t9, 0, &locals.t12);
+  _sh_prstore_object(shr, &locals.t9, 1, &locals.t10);
+  _sh_leave(shr, &locals.head, frame);
+  return locals.t9;
+
+L58:
+  ;
+  locals.t9 = _sh_ljs_get_string(shr, get_symbols(shUnit)[53] /*deherm map key/value...*/);
+  _sh_throw(shr, locals.t9);
+
+L59:
+  ;
+  locals.t9 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[48] /*length*/, get_read_prop_cache(shUnit) + 62);
+  if (!(_sh_ljs_is_double(locals.t9))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  np11 = locals.t9;
   np4 = _sh_ljs_double(0);
   np6 = _sh_ljs_double(16);
   np7 = _sh_ljs_bool(_sh_ljs_get_double(np11) == _sh_ljs_get_double(np6));
   np8 = _sh_ljs_double(1);
   np13 = _sh_ljs_double(0);
-  if(_sh_ljs_get_bool(np7)) goto L58;
-  goto L61;
-
-L58:
-  ;
-  // PhiInst
-  locals.t8 = _sh_ljs_get_by_val_rjs(shr,&locals.t1, &np13);
-  np10 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t8, 479));
-  np7 = _sh_ljs_bool(false);
-  if(_sh_ljs_get_bool(np10)) goto L60;
-  goto L59;
-
-L59:
-  ;
-  np13 = _sh_ljs_double(_sh_ljs_get_double(np13) + _sh_ljs_get_double(np8));
-  np10 = _sh_ljs_bool(_sh_ljs_get_double(np13) < _sh_ljs_get_double(np6));
-  np7 = _sh_ljs_bool(true);
-  if(_sh_ljs_get_bool(np10)) goto L58;
-  goto L60;
+  if(_sh_ljs_get_bool(np7)) goto L60;
+  goto L63;
 
 L60:
   ;
   // PhiInst
-  if(_sh_ljs_get_bool(np7)) goto L68;
+  locals.t9 = _sh_ljs_get_by_val_rjs(shr,&locals.t1, &np13);
+  np10 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t9, 479));
+  np7 = _sh_ljs_bool(false);
+  if(_sh_ljs_get_bool(np10)) goto L62;
   goto L61;
 
 L61:
   ;
-  locals.t8 = _sh_ljs_get_env(shr, locals.t0, 1);
-  locals.t8 = _sh_ljs_load_from_env(locals.t8, 2);
-  locals.t9 = _sh_new_fastarray_with_proto(shr, &locals.t8, 0);
-  np7 = _sh_ljs_bool(_sh_ljs_get_double(np4) < _sh_ljs_get_double(np11));
-  np10 = _sh_ljs_double(_sh_ljs_get_double(np9) + _sh_ljs_get_double(np8));
-  np9 = _sh_ljs_double(0);
-  if(_sh_ljs_get_bool(np7)) goto L62;
-  goto L64;
+  np13 = _sh_ljs_double(_sh_ljs_get_double(np13) + _sh_ljs_get_double(np8));
+  np10 = _sh_ljs_bool(_sh_ljs_get_double(np13) < _sh_ljs_get_double(np6));
+  np7 = _sh_ljs_bool(true);
+  if(_sh_ljs_get_bool(np10)) goto L60;
+  goto L62;
 
 L62:
   ;
   // PhiInst
-  frame[4] = _sh_ljs_load_from_env(locals.t0, 28);
+  if(_sh_ljs_get_bool(np7)) goto L70;
+  goto L63;
+
+L63:
+  ;
+  locals.t9 = _sh_ljs_get_env(shr, locals.t0, 1);
+  locals.t9 = _sh_ljs_load_from_env(locals.t9, 2);
+  locals.t10 = _sh_new_fastarray_with_proto(shr, &locals.t9, 0);
+  np7 = _sh_ljs_bool(_sh_ljs_get_double(np4) < _sh_ljs_get_double(np11));
+  np10 = _sh_ljs_double(_sh_ljs_get_double(np9) + _sh_ljs_get_double(np8));
+  np9 = _sh_ljs_double(0);
+  if(_sh_ljs_get_bool(np7)) goto L64;
+  goto L66;
+
+L64:
+  ;
+  // PhiInst
+  frame[4] = _sh_ljs_load_from_env(locals.t0, 31);
   frame[2] = _sh_ljs_get_by_val_rjs(shr,&locals.t1, &np9);
   frame[5] = _sh_ljs_undefined();
   frame[3] = _sh_ljs_double(0);
@@ -3403,404 +3443,404 @@ L62:
   frame[8] = _sh_ljs_native_pointer((void*)0);
   frame[7] = _sh_ljs_native_pointer((void*)0);
   frame[6] = _sh_ljs_native_uint32(2);
-  locals.t8 = _9___dehermToStatic(shr);
-  _sh_fastarray_push(shr, &locals.t8, &locals.t9);
-  np7 = _sh_ljs_load_from_env(locals.t0, 27);
+  locals.t9 = _9___dehermToStatic(shr);
+  _sh_fastarray_push(shr, &locals.t9, &locals.t10);
+  np7 = _sh_ljs_load_from_env(locals.t0, 30);
   if (!(_sh_ljs_is_bool(np7))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  if(_sh_ljs_get_bool(np7)) goto L67;
-  goto L63;
-
-L63:
-  ;
-  np9 = _sh_ljs_double(_sh_ljs_get_double(np9) + _sh_ljs_get_double(np8));
-  np7 = _sh_ljs_bool(_sh_ljs_get_double(np9) < _sh_ljs_get_double(np11));
-  if(_sh_ljs_get_bool(np7)) goto L62;
-  goto L64;
-
-L64:
-  ;
-  locals.t8 = _sh_ljs_load_from_env(locals.t0, 10);
-  if (!(_sh_ljs_is_object(locals.t8))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  locals.t8 = _sh_ljs_load_from_env(locals.t0, 40);
-  locals.t11 = _sh_ljs_load_from_env(locals.t0, 9);
-  if (!(_sh_ljs_is_object(locals.t11))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  np7 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t11, 128));
-  if(_sh_ljs_get_bool(np7)) goto L66;
+  if(_sh_ljs_get_bool(np7)) goto L69;
   goto L65;
 
 L65:
   ;
-  locals.t11 = _sh_ljs_get_string(shr, get_symbols(shUnit)[50] /*Trying to call a non...*/);
-  _sh_throw_type_error(shr, &locals.t11);
+  np9 = _sh_ljs_double(_sh_ljs_get_double(np9) + _sh_ljs_get_double(np8));
+  np7 = _sh_ljs_bool(_sh_ljs_get_double(np9) < _sh_ljs_get_double(np11));
+  if(_sh_ljs_get_bool(np7)) goto L64;
+  goto L66;
 
 L66:
   ;
-  locals.t8 = _sh_new_typed_object_with_buffer(shr, shUnit, &locals.t8, 9, 47);
-  _sh_prstore_object(shr, &locals.t8, 0, &locals.t9);
-  _sh_leave(shr, &locals.head, frame);
-  return locals.t8;
+  locals.t9 = _sh_ljs_load_from_env(locals.t0, 11);
+  if (!(_sh_ljs_is_object(locals.t9))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  locals.t9 = _sh_ljs_load_from_env(locals.t0, 44);
+  locals.t12 = _sh_ljs_load_from_env(locals.t0, 10);
+  if (!(_sh_ljs_is_object(locals.t12))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  np7 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t12, 128));
+  if(_sh_ljs_get_bool(np7)) goto L68;
+  goto L67;
 
 L67:
   ;
-  locals.t8 = _sh_ljs_load_from_env(locals.t0, 0);
-  if (!(_sh_ljs_is_object(locals.t8))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  locals.t8 = _sh_ljs_load_from_env(locals.t0, 31);
-  locals.t8 = _sh_ljs_new_object_with_parent(shr, &locals.t8);
-  _sh_leave(shr, &locals.head, frame);
-  return locals.t8;
+  locals.t12 = _sh_ljs_get_string(shr, get_symbols(shUnit)[52] /*Trying to call a non...*/);
+  _sh_throw_type_error(shr, &locals.t12);
 
 L68:
   ;
-  locals.t8 = _sh_ljs_get_env(shr, locals.t0, 1);
-  locals.t8 = _sh_ljs_load_from_env(locals.t8, 1);
-  locals.t9 = _sh_new_fastarray_with_proto(shr, &locals.t8, 0);
-  np7 = _sh_ljs_double(0);
-  goto L69;
+  locals.t9 = _sh_new_typed_object_with_buffer(shr, shUnit, &locals.t9, 9, 47);
+  _sh_prstore_object(shr, &locals.t9, 0, &locals.t10);
+  _sh_leave(shr, &locals.head, frame);
+  return locals.t9;
+
 L69:
   ;
-  // PhiInst
-  locals.t8 = _sh_ljs_get_by_val_rjs(shr,&locals.t1, &np7);
-  _sh_fastarray_push(shr, &locals.t8, &locals.t9);
-  np7 = _sh_ljs_double(_sh_ljs_get_double(np7) + _sh_ljs_get_double(np8));
-  np4 = _sh_ljs_bool(_sh_ljs_get_double(np7) < _sh_ljs_get_double(np6));
-  if(_sh_ljs_get_bool(np4)) goto L69;
-  goto L70;
+  locals.t9 = _sh_ljs_load_from_env(locals.t0, 0);
+  if (!(_sh_ljs_is_object(locals.t9))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  locals.t9 = _sh_ljs_load_from_env(locals.t0, 34);
+  locals.t9 = _sh_ljs_new_object_with_parent(shr, &locals.t9);
+  _sh_leave(shr, &locals.head, frame);
+  return locals.t9;
 
 L70:
   ;
-  locals.t8 = _sh_ljs_load_from_env(locals.t0, 7);
-  if (!(_sh_ljs_is_object(locals.t8))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  locals.t8 = _sh_ljs_load_from_env(locals.t0, 38);
-  np4 = _sh_fastarray_length(shr, &locals.t9);
-  np4 = _sh_ljs_bool(_sh_ljs_get_double(np4) != _sh_ljs_get_double(np6));
-  if(_sh_ljs_get_bool(np4)) goto L72;
+  locals.t9 = _sh_ljs_get_env(shr, locals.t0, 1);
+  locals.t9 = _sh_ljs_load_from_env(locals.t9, 1);
+  locals.t10 = _sh_new_fastarray_with_proto(shr, &locals.t9, 0);
+  np7 = _sh_ljs_double(0);
   goto L71;
-
 L71:
   ;
-  locals.t8 = _sh_new_typed_object_with_buffer(shr, shUnit, &locals.t8, 10, 47);
-  _sh_prstore_object(shr, &locals.t8, 0, &locals.t9);
-  _sh_leave(shr, &locals.head, frame);
-  return locals.t8;
+  // PhiInst
+  locals.t9 = _sh_ljs_get_by_val_rjs(shr,&locals.t1, &np7);
+  _sh_fastarray_push(shr, &locals.t9, &locals.t10);
+  np7 = _sh_ljs_double(_sh_ljs_get_double(np7) + _sh_ljs_get_double(np8));
+  np4 = _sh_ljs_bool(_sh_ljs_get_double(np7) < _sh_ljs_get_double(np6));
+  if(_sh_ljs_get_bool(np4)) goto L71;
+  goto L72;
 
 L72:
   ;
-  locals.t8 = _sh_ljs_get_string(shr, get_symbols(shUnit)[54] /*deherm Static Hermes...*/);
-  _sh_throw(shr, locals.t8);
+  locals.t9 = _sh_ljs_load_from_env(locals.t0, 8);
+  if (!(_sh_ljs_is_object(locals.t9))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  locals.t9 = _sh_ljs_load_from_env(locals.t0, 42);
+  np4 = _sh_fastarray_length(shr, &locals.t10);
+  np4 = _sh_ljs_bool(_sh_ljs_get_double(np4) != _sh_ljs_get_double(np6));
+  if(_sh_ljs_get_bool(np4)) goto L74;
+  goto L73;
 
 L73:
   ;
-  locals.t16 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[70] /*socket*/, get_read_prop_cache(shUnit) + 61);
-  locals.t15 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[71] /*reserved*/, get_read_prop_cache(shUnit) + 62);
-  locals.t14 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[72] /*path*/, get_read_prop_cache(shUnit) + 63);
-  locals.t13 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[73] /*fragment*/, get_read_prop_cache(shUnit) + 64);
-  np4 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t16, 64));
-  if(_sh_ljs_get_bool(np4)) goto L74;
-  goto L77;
+  locals.t9 = _sh_new_typed_object_with_buffer(shr, shUnit, &locals.t9, 10, 47);
+  _sh_prstore_object(shr, &locals.t9, 0, &locals.t10);
+  _sh_leave(shr, &locals.head, frame);
+  return locals.t9;
 
 L74:
   ;
-  np4 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t15, 64));
-  if(_sh_ljs_get_bool(np4)) goto L75;
-  goto L77;
+  locals.t9 = _sh_ljs_get_string(shr, get_symbols(shUnit)[56] /*deherm Static Hermes...*/);
+  _sh_throw(shr, locals.t9);
 
 L75:
   ;
-  np4 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t14, 64));
+  locals.t17 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[72] /*socket*/, get_read_prop_cache(shUnit) + 63);
+  locals.t16 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[73] /*reserved*/, get_read_prop_cache(shUnit) + 64);
+  locals.t15 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[74] /*path*/, get_read_prop_cache(shUnit) + 65);
+  locals.t14 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[75] /*fragment*/, get_read_prop_cache(shUnit) + 66);
+  np4 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t17, 64));
   if(_sh_ljs_get_bool(np4)) goto L76;
-  goto L77;
+  goto L79;
 
 L76:
   ;
-  np4 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t13, 64));
-  if(_sh_ljs_get_bool(np4)) goto L78;
-  goto L77;
+  np4 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t16, 64));
+  if(_sh_ljs_get_bool(np4)) goto L77;
+  goto L79;
 
 L77:
   ;
-  _sh_ljs_store_to_env(shr, locals.t0,np2, 27);
-  locals.t8 = _sh_ljs_load_from_env(locals.t0, 0);
-  if (!(_sh_ljs_is_object(locals.t8))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  locals.t8 = _sh_ljs_load_from_env(locals.t0, 31);
-  locals.t8 = _sh_ljs_new_object_with_parent(shr, &locals.t8);
-  _sh_leave(shr, &locals.head, frame);
-  return locals.t8;
+  np4 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t15, 64));
+  if(_sh_ljs_get_bool(np4)) goto L78;
+  goto L79;
 
 L78:
   ;
-  locals.t8 = _sh_ljs_load_from_env(locals.t0, 8);
-  if (!(_sh_ljs_is_object(locals.t8))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  locals.t8 = _sh_ljs_load_from_env(locals.t0, 39);
-  locals.t8 = _sh_new_typed_object_with_buffer(shr, shUnit, &locals.t8, 5, 48);
-  locals.t11 = _sh_ljs_get_global_object(shr);
-  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t11, get_symbols(shUnit)[60] /*Number*/, get_read_prop_cache(shUnit) + 65);
-  locals.t12 = _sh_ljs_load_from_env(locals.t0, 25);
-  frame[2] = _sh_ljs_bit_and_rjs_inline(shr, &locals.t16, &locals.t12);
-  np4 = _sh_ljs_undefined();
-  frame[5] = _sh_ljs_undefined();
-  frame[3] = _sh_ljs_undefined();
-  locals.t9 = _sh_ljs_call(shr, frame, 1);
-  if (!(_sh_ljs_is_double(locals.t9))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  np12 = locals.t9;
-  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t11, get_symbols(shUnit)[60] /*Number*/, get_read_prop_cache(shUnit) + 66);
-  locals.t9 = _sh_ljs_load_from_env(locals.t0, 26);
-  locals.t16 = _sh_ljs_right_shift_rjs_inline(shr, &locals.t16, &locals.t9);
-  frame[2] = _sh_ljs_bit_and_rjs_inline(shr, &locals.t16, &locals.t12);
-  frame[5] = _sh_ljs_undefined();
-  frame[3] = _sh_ljs_undefined();
-  locals.t16 = _sh_ljs_call(shr, frame, 1);
-  if (!(_sh_ljs_is_double(locals.t16))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  np11 = locals.t16;
-  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t11, get_symbols(shUnit)[60] /*Number*/, get_read_prop_cache(shUnit) + 67);
-  frame[2] = _sh_ljs_bit_and_rjs_inline(shr, &locals.t15, &locals.t12);
-  frame[5] = _sh_ljs_undefined();
-  frame[3] = _sh_ljs_undefined();
-  locals.t16 = _sh_ljs_call(shr, frame, 1);
-  if (!(_sh_ljs_is_double(locals.t16))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  np10 = locals.t16;
-  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t11, get_symbols(shUnit)[60] /*Number*/, get_read_prop_cache(shUnit) + 68);
-  locals.t15 = _sh_ljs_right_shift_rjs_inline(shr, &locals.t15, &locals.t9);
-  frame[2] = _sh_ljs_bit_and_rjs_inline(shr, &locals.t15, &locals.t12);
-  frame[5] = _sh_ljs_undefined();
-  frame[3] = _sh_ljs_undefined();
-  locals.t15 = _sh_ljs_call(shr, frame, 1);
-  if (!(_sh_ljs_is_double(locals.t15))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  np9 = locals.t15;
-  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t11, get_symbols(shUnit)[60] /*Number*/, get_read_prop_cache(shUnit) + 69);
-  frame[2] = _sh_ljs_bit_and_rjs_inline(shr, &locals.t14, &locals.t12);
-  frame[5] = _sh_ljs_undefined();
-  frame[3] = _sh_ljs_undefined();
-  locals.t15 = _sh_ljs_call(shr, frame, 1);
-  if (!(_sh_ljs_is_double(locals.t15))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  np8 = locals.t15;
-  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t11, get_symbols(shUnit)[60] /*Number*/, get_read_prop_cache(shUnit) + 70);
-  locals.t14 = _sh_ljs_right_shift_rjs_inline(shr, &locals.t14, &locals.t9);
-  frame[2] = _sh_ljs_bit_and_rjs_inline(shr, &locals.t14, &locals.t12);
-  frame[5] = _sh_ljs_undefined();
-  frame[3] = _sh_ljs_undefined();
-  locals.t14 = _sh_ljs_call(shr, frame, 1);
-  if (!(_sh_ljs_is_double(locals.t14))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  np7 = locals.t14;
-  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t11, get_symbols(shUnit)[60] /*Number*/, get_read_prop_cache(shUnit) + 71);
-  frame[2] = _sh_ljs_bit_and_rjs_inline(shr, &locals.t13, &locals.t12);
-  frame[5] = _sh_ljs_undefined();
-  frame[3] = _sh_ljs_undefined();
-  locals.t14 = _sh_ljs_call(shr, frame, 1);
-  if (!(_sh_ljs_is_double(locals.t14))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  np6 = locals.t14;
-  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t11, get_symbols(shUnit)[60] /*Number*/, get_read_prop_cache(shUnit) + 72);
-  locals.t9 = _sh_ljs_right_shift_rjs_inline(shr, &locals.t13, &locals.t9);
-  frame[2] = _sh_ljs_bit_and_rjs_inline(shr, &locals.t9, &locals.t12);
-  frame[5] = _sh_ljs_undefined();
-  frame[3] = _sh_ljs_undefined();
-  locals.t9 = _sh_ljs_call(shr, frame, 1);
-  if (!(_sh_ljs_is_double(locals.t9))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  np4 = locals.t9;
-  _sh_prstore_number(shr, &locals.t8, 0, &np12);
-  _sh_prstore_number(shr, &locals.t8, 1, &np11);
-  _sh_prstore_number(shr, &locals.t8, 2, &np10);
-  _sh_prstore_number(shr, &locals.t8, 3, &np9);
-  _sh_prstore_number(shr, &locals.t8, 4, &np8);
-  _sh_prstore_number(shr, &locals.t8, 5, &np7);
-  _sh_prstore_number(shr, &locals.t8, 6, &np6);
-  _sh_prstore_number(shr, &locals.t8, 7, &np4);
-  _sh_leave(shr, &locals.head, frame);
-  return locals.t8;
+  np4 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t14, 64));
+  if(_sh_ljs_get_bool(np4)) goto L80;
+  goto L79;
 
 L79:
   ;
-  if (!(_sh_ljs_is_string(locals.t6))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  locals.t13 = locals.t6;
-  locals.t11 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[23] /*x*/, get_read_prop_cache(shUnit) + 73);
-  locals.t9 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[24] /*y*/, get_read_prop_cache(shUnit) + 74);
-  locals.t8 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[25] /*z*/, get_read_prop_cache(shUnit) + 75);
-  np4 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t11, 32));
-  if(_sh_ljs_get_bool(np4)) goto L80;
-  goto L86;
+  _sh_ljs_store_to_env(shr, locals.t0,np2, 30);
+  locals.t9 = _sh_ljs_load_from_env(locals.t0, 0);
+  if (!(_sh_ljs_is_object(locals.t9))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  locals.t9 = _sh_ljs_load_from_env(locals.t0, 34);
+  locals.t9 = _sh_ljs_new_object_with_parent(shr, &locals.t9);
+  _sh_leave(shr, &locals.head, frame);
+  return locals.t9;
 
 L80:
   ;
-  np4 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t9, 32));
-  if(_sh_ljs_get_bool(np4)) goto L81;
-  goto L86;
+  locals.t9 = _sh_ljs_load_from_env(locals.t0, 9);
+  if (!(_sh_ljs_is_object(locals.t9))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  locals.t9 = _sh_ljs_load_from_env(locals.t0, 43);
+  locals.t9 = _sh_new_typed_object_with_buffer(shr, shUnit, &locals.t9, 5, 48);
+  locals.t12 = _sh_ljs_get_global_object(shr);
+  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t12, get_symbols(shUnit)[62] /*Number*/, get_read_prop_cache(shUnit) + 67);
+  locals.t13 = _sh_ljs_load_from_env(locals.t0, 28);
+  frame[2] = _sh_ljs_bit_and_rjs_inline(shr, &locals.t17, &locals.t13);
+  np4 = _sh_ljs_undefined();
+  frame[5] = _sh_ljs_undefined();
+  frame[3] = _sh_ljs_undefined();
+  locals.t10 = _sh_ljs_call(shr, frame, 1);
+  if (!(_sh_ljs_is_double(locals.t10))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  np12 = locals.t10;
+  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t12, get_symbols(shUnit)[62] /*Number*/, get_read_prop_cache(shUnit) + 68);
+  locals.t10 = _sh_ljs_load_from_env(locals.t0, 29);
+  locals.t17 = _sh_ljs_right_shift_rjs_inline(shr, &locals.t17, &locals.t10);
+  frame[2] = _sh_ljs_bit_and_rjs_inline(shr, &locals.t17, &locals.t13);
+  frame[5] = _sh_ljs_undefined();
+  frame[3] = _sh_ljs_undefined();
+  locals.t17 = _sh_ljs_call(shr, frame, 1);
+  if (!(_sh_ljs_is_double(locals.t17))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  np11 = locals.t17;
+  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t12, get_symbols(shUnit)[62] /*Number*/, get_read_prop_cache(shUnit) + 69);
+  frame[2] = _sh_ljs_bit_and_rjs_inline(shr, &locals.t16, &locals.t13);
+  frame[5] = _sh_ljs_undefined();
+  frame[3] = _sh_ljs_undefined();
+  locals.t17 = _sh_ljs_call(shr, frame, 1);
+  if (!(_sh_ljs_is_double(locals.t17))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  np10 = locals.t17;
+  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t12, get_symbols(shUnit)[62] /*Number*/, get_read_prop_cache(shUnit) + 70);
+  locals.t16 = _sh_ljs_right_shift_rjs_inline(shr, &locals.t16, &locals.t10);
+  frame[2] = _sh_ljs_bit_and_rjs_inline(shr, &locals.t16, &locals.t13);
+  frame[5] = _sh_ljs_undefined();
+  frame[3] = _sh_ljs_undefined();
+  locals.t16 = _sh_ljs_call(shr, frame, 1);
+  if (!(_sh_ljs_is_double(locals.t16))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  np9 = locals.t16;
+  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t12, get_symbols(shUnit)[62] /*Number*/, get_read_prop_cache(shUnit) + 71);
+  frame[2] = _sh_ljs_bit_and_rjs_inline(shr, &locals.t15, &locals.t13);
+  frame[5] = _sh_ljs_undefined();
+  frame[3] = _sh_ljs_undefined();
+  locals.t16 = _sh_ljs_call(shr, frame, 1);
+  if (!(_sh_ljs_is_double(locals.t16))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  np8 = locals.t16;
+  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t12, get_symbols(shUnit)[62] /*Number*/, get_read_prop_cache(shUnit) + 72);
+  locals.t15 = _sh_ljs_right_shift_rjs_inline(shr, &locals.t15, &locals.t10);
+  frame[2] = _sh_ljs_bit_and_rjs_inline(shr, &locals.t15, &locals.t13);
+  frame[5] = _sh_ljs_undefined();
+  frame[3] = _sh_ljs_undefined();
+  locals.t15 = _sh_ljs_call(shr, frame, 1);
+  if (!(_sh_ljs_is_double(locals.t15))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  np7 = locals.t15;
+  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t12, get_symbols(shUnit)[62] /*Number*/, get_read_prop_cache(shUnit) + 73);
+  frame[2] = _sh_ljs_bit_and_rjs_inline(shr, &locals.t14, &locals.t13);
+  frame[5] = _sh_ljs_undefined();
+  frame[3] = _sh_ljs_undefined();
+  locals.t15 = _sh_ljs_call(shr, frame, 1);
+  if (!(_sh_ljs_is_double(locals.t15))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  np6 = locals.t15;
+  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t12, get_symbols(shUnit)[62] /*Number*/, get_read_prop_cache(shUnit) + 74);
+  locals.t10 = _sh_ljs_right_shift_rjs_inline(shr, &locals.t14, &locals.t10);
+  frame[2] = _sh_ljs_bit_and_rjs_inline(shr, &locals.t10, &locals.t13);
+  frame[5] = _sh_ljs_undefined();
+  frame[3] = _sh_ljs_undefined();
+  locals.t10 = _sh_ljs_call(shr, frame, 1);
+  if (!(_sh_ljs_is_double(locals.t10))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  np4 = locals.t10;
+  _sh_prstore_number(shr, &locals.t9, 0, &np12);
+  _sh_prstore_number(shr, &locals.t9, 1, &np11);
+  _sh_prstore_number(shr, &locals.t9, 2, &np10);
+  _sh_prstore_number(shr, &locals.t9, 3, &np9);
+  _sh_prstore_number(shr, &locals.t9, 4, &np8);
+  _sh_prstore_number(shr, &locals.t9, 5, &np7);
+  _sh_prstore_number(shr, &locals.t9, 6, &np6);
+  _sh_prstore_number(shr, &locals.t9, 7, &np4);
+  _sh_leave(shr, &locals.head, frame);
+  return locals.t9;
 
 L81:
   ;
-  np4 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t8, 32));
+  if (!(_sh_ljs_is_string(locals.t7))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  locals.t14 = locals.t7;
+  locals.t12 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[23] /*x*/, get_read_prop_cache(shUnit) + 75);
+  locals.t10 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[24] /*y*/, get_read_prop_cache(shUnit) + 76);
+  locals.t9 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[25] /*z*/, get_read_prop_cache(shUnit) + 77);
+  np4 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t12, 32));
   if(_sh_ljs_get_bool(np4)) goto L82;
-  goto L86;
+  goto L88;
 
 L82:
   ;
-  locals.t6 = _sh_ljs_get_string(shr, get_symbols(shUnit)[74] /*vector3*/);
-  np4 = _sh_ljs_bool(_sh_ljs_strict_equal_inline(locals.t13, locals.t6));
-  if(_sh_ljs_get_bool(np4)) goto L89;
-  goto L83;
+  np4 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t10, 32));
+  if(_sh_ljs_get_bool(np4)) goto L83;
+  goto L88;
 
 L83:
   ;
-  locals.t12 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[26] /*w*/, get_read_prop_cache(shUnit) + 76);
-  np4 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t12, 32));
+  np4 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t9, 32));
   if(_sh_ljs_get_bool(np4)) goto L84;
-  goto L86;
+  goto L88;
 
 L84:
   ;
-  locals.t6 = _sh_ljs_get_string(shr, get_symbols(shUnit)[75] /*vector4*/);
-  np4 = _sh_ljs_bool(_sh_ljs_strict_equal_inline(locals.t13, locals.t6));
-  if(_sh_ljs_get_bool(np4)) goto L88;
+  locals.t7 = _sh_ljs_get_string(shr, get_symbols(shUnit)[76] /*vector3*/);
+  np4 = _sh_ljs_bool(_sh_ljs_strict_equal_inline(locals.t14, locals.t7));
+  if(_sh_ljs_get_bool(np4)) goto L91;
   goto L85;
 
 L85:
   ;
-  locals.t6 = _sh_ljs_get_string(shr, get_symbols(shUnit)[76] /*quaternion*/);
-  np4 = _sh_ljs_bool(_sh_ljs_strict_equal_inline(locals.t13, locals.t6));
-  if(_sh_ljs_get_bool(np4)) goto L87;
-  goto L86;
+  locals.t13 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[26] /*w*/, get_read_prop_cache(shUnit) + 78);
+  np4 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t13, 32));
+  if(_sh_ljs_get_bool(np4)) goto L86;
+  goto L88;
 
 L86:
   ;
-  _sh_ljs_store_to_env(shr, locals.t0,np2, 27);
-  locals.t6 = _sh_ljs_load_from_env(locals.t0, 0);
-  if (!(_sh_ljs_is_object(locals.t6))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  locals.t6 = _sh_ljs_load_from_env(locals.t0, 31);
-  locals.t6 = _sh_ljs_new_object_with_parent(shr, &locals.t6);
-  _sh_leave(shr, &locals.head, frame);
-  return locals.t6;
+  locals.t7 = _sh_ljs_get_string(shr, get_symbols(shUnit)[77] /*vector4*/);
+  np4 = _sh_ljs_bool(_sh_ljs_strict_equal_inline(locals.t14, locals.t7));
+  if(_sh_ljs_get_bool(np4)) goto L90;
+  goto L87;
 
 L87:
   ;
-  locals.t6 = _sh_ljs_load_from_env(locals.t0, 6);
-  if (!(_sh_ljs_is_object(locals.t6))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  locals.t6 = _sh_ljs_load_from_env(locals.t0, 37);
-  locals.t6 = _sh_new_typed_object_with_buffer(shr, shUnit, &locals.t6, 7, 4);
-  if (!(_sh_ljs_is_double(locals.t11))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  np7 = locals.t11;
-  if (!(_sh_ljs_is_double(locals.t9))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  np6 = locals.t9;
-  if (!(_sh_ljs_is_double(locals.t8))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  np4 = locals.t8;
-  if (!(_sh_ljs_is_double(locals.t12))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  np2 = locals.t12;
-  np8 = _sh_ljs_double(3);
-  _sh_prstore_number(shr, &locals.t6, 0, &np8);
-  _sh_prstore_number(shr, &locals.t6, 1, &np7);
-  _sh_prstore_number(shr, &locals.t6, 2, &np6);
-  _sh_prstore_number(shr, &locals.t6, 3, &np4);
-  _sh_prstore_number(shr, &locals.t6, 4, &np2);
-  _sh_leave(shr, &locals.head, frame);
-  return locals.t6;
+  locals.t7 = _sh_ljs_get_string(shr, get_symbols(shUnit)[78] /*quaternion*/);
+  np4 = _sh_ljs_bool(_sh_ljs_strict_equal_inline(locals.t14, locals.t7));
+  if(_sh_ljs_get_bool(np4)) goto L89;
+  goto L88;
 
 L88:
   ;
-  locals.t6 = _sh_ljs_load_from_env(locals.t0, 6);
-  if (!(_sh_ljs_is_object(locals.t6))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  locals.t6 = _sh_ljs_load_from_env(locals.t0, 37);
-  locals.t6 = _sh_new_typed_object_with_buffer(shr, shUnit, &locals.t6, 7, 4);
-  if (!(_sh_ljs_is_double(locals.t11))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  np7 = locals.t11;
-  if (!(_sh_ljs_is_double(locals.t9))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  np6 = locals.t9;
-  if (!(_sh_ljs_is_double(locals.t8))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  np4 = locals.t8;
-  if (!(_sh_ljs_is_double(locals.t12))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  np2 = locals.t12;
-  np8 = _sh_ljs_double(2);
-  _sh_prstore_number(shr, &locals.t6, 0, &np8);
-  _sh_prstore_number(shr, &locals.t6, 1, &np7);
-  _sh_prstore_number(shr, &locals.t6, 2, &np6);
-  _sh_prstore_number(shr, &locals.t6, 3, &np4);
-  _sh_prstore_number(shr, &locals.t6, 4, &np2);
+  _sh_ljs_store_to_env(shr, locals.t0,np2, 30);
+  locals.t7 = _sh_ljs_load_from_env(locals.t0, 0);
+  if (!(_sh_ljs_is_object(locals.t7))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  locals.t7 = _sh_ljs_load_from_env(locals.t0, 34);
+  locals.t7 = _sh_ljs_new_object_with_parent(shr, &locals.t7);
   _sh_leave(shr, &locals.head, frame);
-  return locals.t6;
+  return locals.t7;
 
 L89:
   ;
-  locals.t6 = _sh_ljs_load_from_env(locals.t0, 6);
-  if (!(_sh_ljs_is_object(locals.t6))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  locals.t6 = _sh_ljs_load_from_env(locals.t0, 37);
-  locals.t6 = _sh_new_typed_object_with_buffer(shr, shUnit, &locals.t6, 7, 4);
-  if (!(_sh_ljs_is_double(locals.t11))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  np6 = locals.t11;
+  locals.t7 = _sh_ljs_load_from_env(locals.t0, 7);
+  if (!(_sh_ljs_is_object(locals.t7))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  locals.t7 = _sh_ljs_load_from_env(locals.t0, 41);
+  locals.t7 = _sh_new_typed_object_with_buffer(shr, shUnit, &locals.t7, 7, 4);
+  if (!(_sh_ljs_is_double(locals.t12))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  np7 = locals.t12;
+  if (!(_sh_ljs_is_double(locals.t10))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  np6 = locals.t10;
   if (!(_sh_ljs_is_double(locals.t9))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
   np4 = locals.t9;
-  if (!(_sh_ljs_is_double(locals.t8))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  np2 = locals.t8;
-  np7 = _sh_ljs_double(1);
-  _sh_prstore_number(shr, &locals.t6, 0, &np7);
-  _sh_prstore_number(shr, &locals.t6, 1, &np6);
-  _sh_prstore_number(shr, &locals.t6, 2, &np4);
-  _sh_prstore_number(shr, &locals.t6, 3, &np2);
-  np2 = _sh_ljs_double(0);
-  _sh_prstore_number(shr, &locals.t6, 4, &np2);
+  if (!(_sh_ljs_is_double(locals.t13))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  np2 = locals.t13;
+  np8 = _sh_ljs_double(3);
+  _sh_prstore_number(shr, &locals.t7, 0, &np8);
+  _sh_prstore_number(shr, &locals.t7, 1, &np7);
+  _sh_prstore_number(shr, &locals.t7, 2, &np6);
+  _sh_prstore_number(shr, &locals.t7, 3, &np4);
+  _sh_prstore_number(shr, &locals.t7, 4, &np2);
   _sh_leave(shr, &locals.head, frame);
-  return locals.t6;
+  return locals.t7;
 
 L90:
   ;
-  if (!(_sh_ljs_is_object(locals.t2))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  locals.t6 = locals.t2;
-  locals.t6 = _sh_ljs_load_from_env(locals.t0, 36);
-  locals.t11 = _sh_ljs_try_get_by_id_rjs(shr,&locals.t7, get_symbols(shUnit)[60] /*Number*/, get_read_prop_cache(shUnit) + 77);
-  frame[4] = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t11,get_symbols(shUnit)[61] /*isSafeInteger*/, get_read_prop_cache(shUnit) + 78);
-  frame[2] = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[18] /*semanticKind*/, get_read_prop_cache(shUnit) + 79);
-  frame[5] = _sh_ljs_undefined();
-  frame[3] = locals.t11;
-  locals.t9 = _sh_ljs_call(shr, frame, 1);
-  locals.t8 = _sh_ljs_double(0);
-  if(_sh_ljs_to_boolean(locals.t9)) goto L91;
-  goto L92;
+  locals.t7 = _sh_ljs_load_from_env(locals.t0, 7);
+  if (!(_sh_ljs_is_object(locals.t7))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  locals.t7 = _sh_ljs_load_from_env(locals.t0, 41);
+  locals.t7 = _sh_new_typed_object_with_buffer(shr, shUnit, &locals.t7, 7, 4);
+  if (!(_sh_ljs_is_double(locals.t12))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  np7 = locals.t12;
+  if (!(_sh_ljs_is_double(locals.t10))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  np6 = locals.t10;
+  if (!(_sh_ljs_is_double(locals.t9))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  np4 = locals.t9;
+  if (!(_sh_ljs_is_double(locals.t13))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  np2 = locals.t13;
+  np8 = _sh_ljs_double(2);
+  _sh_prstore_number(shr, &locals.t7, 0, &np8);
+  _sh_prstore_number(shr, &locals.t7, 1, &np7);
+  _sh_prstore_number(shr, &locals.t7, 2, &np6);
+  _sh_prstore_number(shr, &locals.t7, 3, &np4);
+  _sh_prstore_number(shr, &locals.t7, 4, &np2);
+  _sh_leave(shr, &locals.head, frame);
+  return locals.t7;
 
 L91:
   ;
-  locals.t8 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[18] /*semanticKind*/, get_read_prop_cache(shUnit) + 80);
-  goto L92;
+  locals.t7 = _sh_ljs_load_from_env(locals.t0, 7);
+  if (!(_sh_ljs_is_object(locals.t7))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  locals.t7 = _sh_ljs_load_from_env(locals.t0, 41);
+  locals.t7 = _sh_new_typed_object_with_buffer(shr, shUnit, &locals.t7, 7, 4);
+  if (!(_sh_ljs_is_double(locals.t12))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  np6 = locals.t12;
+  if (!(_sh_ljs_is_double(locals.t10))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  np4 = locals.t10;
+  if (!(_sh_ljs_is_double(locals.t9))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  np2 = locals.t9;
+  np7 = _sh_ljs_double(1);
+  _sh_prstore_number(shr, &locals.t7, 0, &np7);
+  _sh_prstore_number(shr, &locals.t7, 1, &np6);
+  _sh_prstore_number(shr, &locals.t7, 2, &np4);
+  _sh_prstore_number(shr, &locals.t7, 3, &np2);
+  np2 = _sh_ljs_double(0);
+  _sh_prstore_number(shr, &locals.t7, 4, &np2);
+  _sh_leave(shr, &locals.head, frame);
+  return locals.t7;
+
 L92:
   ;
+  if (!(_sh_ljs_is_object(locals.t2))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  locals.t7 = locals.t2;
+  locals.t7 = _sh_ljs_load_from_env(locals.t0, 40);
+  locals.t12 = _sh_ljs_try_get_by_id_rjs(shr,&locals.t8, get_symbols(shUnit)[62] /*Number*/, get_read_prop_cache(shUnit) + 79);
+  frame[4] = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t12,get_symbols(shUnit)[63] /*isSafeInteger*/, get_read_prop_cache(shUnit) + 80);
+  frame[2] = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[18] /*semanticKind*/, get_read_prop_cache(shUnit) + 81);
+  frame[5] = _sh_ljs_undefined();
+  frame[3] = locals.t12;
+  locals.t10 = _sh_ljs_call(shr, frame, 1);
+  locals.t9 = _sh_ljs_double(0);
+  if(_sh_ljs_to_boolean(locals.t10)) goto L93;
+  goto L94;
+
+L93:
+  ;
+  locals.t9 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[18] /*semanticKind*/, get_read_prop_cache(shUnit) + 82);
+  goto L94;
+L94:
+  ;
   // PhiInst
-  locals.t6 = _sh_new_typed_object_with_buffer(shr, shUnit, &locals.t6, 6, 4);
-  if (!(_sh_ljs_is_double(locals.t8))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  np4 = locals.t8;
-  if (!(_sh_ljs_is_double(locals.t5))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  np2 = locals.t5;
-  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t7, get_symbols(shUnit)[60] /*Number*/, get_read_prop_cache(shUnit) + 81);
-  locals.t9 = _sh_ljs_load_from_env(locals.t0, 25);
-  frame[2] = _sh_ljs_bit_and_rjs_inline(shr, &locals.t10, &locals.t9);
+  locals.t7 = _sh_new_typed_object_with_buffer(shr, shUnit, &locals.t7, 6, 4);
+  if (!(_sh_ljs_is_double(locals.t9))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  np4 = locals.t9;
+  if (!(_sh_ljs_is_double(locals.t6))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  np2 = locals.t6;
+  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t8, get_symbols(shUnit)[62] /*Number*/, get_read_prop_cache(shUnit) + 83);
+  locals.t10 = _sh_ljs_load_from_env(locals.t0, 28);
+  frame[2] = _sh_ljs_bit_and_rjs_inline(shr, &locals.t11, &locals.t10);
+  frame[5] = _sh_ljs_undefined();
+  frame[3] = _sh_ljs_undefined();
+  locals.t9 = _sh_ljs_call(shr, frame, 1);
+  if (!(_sh_ljs_is_double(locals.t9))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  np1 = locals.t9;
+  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t8, get_symbols(shUnit)[62] /*Number*/, get_read_prop_cache(shUnit) + 84);
+  locals.t8 = _sh_ljs_load_from_env(locals.t0, 29);
+  locals.t8 = _sh_ljs_right_shift_rjs_inline(shr, &locals.t11, &locals.t8);
+  frame[2] = _sh_ljs_bit_and_rjs_inline(shr, &locals.t8, &locals.t10);
   frame[5] = _sh_ljs_undefined();
   frame[3] = _sh_ljs_undefined();
   locals.t8 = _sh_ljs_call(shr, frame, 1);
   if (!(_sh_ljs_is_double(locals.t8))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  np1 = locals.t8;
-  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t7, get_symbols(shUnit)[60] /*Number*/, get_read_prop_cache(shUnit) + 82);
-  locals.t7 = _sh_ljs_load_from_env(locals.t0, 26);
-  locals.t7 = _sh_ljs_right_shift_rjs_inline(shr, &locals.t10, &locals.t7);
-  frame[2] = _sh_ljs_bit_and_rjs_inline(shr, &locals.t7, &locals.t9);
-  frame[5] = _sh_ljs_undefined();
-  frame[3] = _sh_ljs_undefined();
-  locals.t7 = _sh_ljs_call(shr, frame, 1);
-  if (!(_sh_ljs_is_double(locals.t7))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  np0 = locals.t7;
-  _sh_prstore_number(shr, &locals.t6, 0, &np5);
-  _sh_prstore_number(shr, &locals.t6, 1, &np4);
-  _sh_prstore_number(shr, &locals.t6, 2, &np2);
-  _sh_prstore_number(shr, &locals.t6, 3, &np1);
-  _sh_prstore_number(shr, &locals.t6, 4, &np0);
+  np0 = locals.t8;
+  _sh_prstore_number(shr, &locals.t7, 0, &np5);
+  _sh_prstore_number(shr, &locals.t7, 1, &np4);
+  _sh_prstore_number(shr, &locals.t7, 2, &np2);
+  _sh_prstore_number(shr, &locals.t7, 3, &np1);
+  _sh_prstore_number(shr, &locals.t7, 4, &np0);
   np0 = _sh_ljs_bool(false);
-  _sh_prstore_bool(shr, &locals.t6, 5, &np0);
+  _sh_prstore_bool(shr, &locals.t7, 5, &np0);
   _sh_leave(shr, &locals.head, frame);
-  return locals.t6;
+  return locals.t7;
 
-L93:
+L95:
   ;
   if (!(_sh_ljs_is_object(locals.t2))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  locals.t2 = _sh_ljs_load_from_env(locals.t0, 36);
+  locals.t2 = _sh_ljs_load_from_env(locals.t0, 40);
   locals.t2 = _sh_new_typed_object_with_buffer(shr, shUnit, &locals.t2, 6, 4);
+  if (!(_sh_ljs_is_double(locals.t6))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  np2 = locals.t6;
   if (!(_sh_ljs_is_double(locals.t5))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  np2 = locals.t5;
+  np1 = locals.t5;
   if (!(_sh_ljs_is_double(locals.t4))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  np1 = locals.t4;
-  if (!(_sh_ljs_is_double(locals.t3))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  np0 = locals.t3;
+  np0 = locals.t4;
   np4 = _sh_ljs_double(3);
   _sh_prstore_number(shr, &locals.t2, 0, &np4);
   _sh_prstore_number(shr, &locals.t2, 1, &np3);
@@ -3812,40 +3852,141 @@ L93:
   _sh_leave(shr, &locals.head, frame);
   return locals.t2;
 
-L94:
+L96:
   ;
   np0 = _sh_ljs_bool(true);
-  _sh_ljs_store_to_env(shr, locals.t0,np0, 27);
+  _sh_ljs_store_to_env(shr, locals.t0,np0, 30);
   locals.t2 = _sh_ljs_load_from_env(locals.t0, 0);
   if (!(_sh_ljs_is_object(locals.t2))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  locals.t2 = _sh_ljs_load_from_env(locals.t0, 31);
+  locals.t2 = _sh_ljs_load_from_env(locals.t0, 34);
   locals.t2 = _sh_ljs_new_object_with_parent(shr, &locals.t2);
   _sh_leave(shr, &locals.head, frame);
   return locals.t2;
 
-L95:
+L97:
   ;
   if (!(_sh_ljs_is_object(locals.t1))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
   locals.t2 = locals.t1;
   _sh_leave(shr, &locals.head, frame);
   return locals.t2;
 
-L96:
+L98:
   ;
-  locals.t2 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[32] /*lease*/, get_read_prop_cache(shUnit) + 83);
+  np0 = _sh_ljs_instance_of_rjs(shr, &locals.t1, &locals.t3);
+  locals.t2 = locals.t1;
+  if(_sh_ljs_get_bool(np0)) goto L100;
+  goto L99;
+
+L99:
+  ;
+  locals.t4 = _sh_ljs_create_this(shr, &locals.t3, &locals.t3, get_read_prop_cache(shUnit) + 85);
+  frame[5] = locals.t3;
+  frame[4] = locals.t3;
+  frame[3] = locals.t4;
+  frame[2] = locals.t1;
+  locals.t3 = _sh_ljs_call(shr, frame, 1);
+  locals.t2 = _sh_ljs_is_object(locals.t3) ? locals.t3 : locals.t4;
+  goto L100;
+L100:
+  ;
+  // PhiInst
+  locals.t3 = _sh_ljs_get_env(shr, locals.t0, 1);
+  locals.t3 = _sh_ljs_load_from_env(locals.t3, 1);
+  locals.t3 = _sh_new_fastarray_with_proto(shr, &locals.t3, 0);
+  locals.t4 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t2,get_symbols(shUnit)[48] /*length*/, get_read_prop_cache(shUnit) + 86);
+  np4 = _sh_ljs_double(0);
+  np0 = _sh_ljs_bool(_sh_ljs_less_rjs_inline(shr, &np4, &locals.t4));
+  np3 = _sh_ljs_double(1);
+  np1 = _sh_ljs_double(0);
+  if(_sh_ljs_get_bool(np0)) goto L101;
+  goto L102;
+
+L101:
+  ;
+  // PhiInst
+  locals.t4 = _sh_ljs_get_by_val_rjs(shr,&locals.t2, &np1);
+  _sh_fastarray_push(shr, &locals.t4, &locals.t3);
+  np1 = _sh_ljs_double(_sh_ljs_get_double(np1) + _sh_ljs_get_double(np3));
+  locals.t4 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t2,get_symbols(shUnit)[48] /*length*/, get_read_prop_cache(shUnit) + 87);
+  np0 = _sh_ljs_bool(_sh_ljs_less_rjs_inline(shr, &np1, &locals.t4));
+  if(_sh_ljs_get_bool(np0)) goto L101;
+  goto L102;
+
+L102:
+  ;
+  locals.t2 = _sh_ljs_load_from_env(locals.t0, 5);
+  if (!(_sh_ljs_is_object(locals.t2))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
+  locals.t2 = _sh_ljs_load_from_env(locals.t0, 39);
+  np0 = _sh_fastarray_length(shr, &locals.t3);
+  np0 = _sh_ljs_bool(_sh_ljs_get_double(np4) < _sh_ljs_get_double(np0));
+  np2 = _sh_ljs_double(255);
+  np1 = _sh_ljs_double(0);
+  if(_sh_ljs_get_bool(np0)) goto L103;
+  goto L107;
+
+L103:
+  ;
+  // PhiInst
+  np0 = _sh_fastarray_load(shr, &locals.t3, _sh_ljs_get_double(np1));
+  np0 = _sh_ljs_bool(_sh_ljs_get_double(np0) < _sh_ljs_get_double(np4));
+  if(_sh_ljs_get_bool(np0)) goto L108;
+  goto L104;
+
+L104:
+  ;
+  np0 = _sh_fastarray_load(shr, &locals.t3, _sh_ljs_get_double(np1));
+  np0 = _sh_ljs_bool(_sh_ljs_get_double(np0) > _sh_ljs_get_double(np2));
+  if(_sh_ljs_get_bool(np0)) goto L108;
+  goto L105;
+
+L105:
+  ;
+  frame[2] = _sh_fastarray_load(shr, &locals.t3, _sh_ljs_get_double(np1));
+  // ImplicitMovInst
+  // ImplicitMovInst
+  // ImplicitMovInst
+  np5 = _sh_ljs_call_builtin(shr, frame, 1, 22);
+  np0 = _sh_fastarray_load(shr, &locals.t3, _sh_ljs_get_double(np1));
+  np0 = _sh_ljs_bool(_sh_ljs_get_double(np5) != _sh_ljs_get_double(np0));
+  if(_sh_ljs_get_bool(np0)) goto L108;
+  goto L106;
+
+L106:
+  ;
+  np1 = _sh_ljs_double(_sh_ljs_get_double(np1) + _sh_ljs_get_double(np3));
+  np0 = _sh_fastarray_length(shr, &locals.t3);
+  np0 = _sh_ljs_bool(_sh_ljs_get_double(np1) < _sh_ljs_get_double(np0));
+  if(_sh_ljs_get_bool(np0)) goto L103;
+  goto L107;
+
+L107:
+  ;
+  locals.t2 = _sh_new_typed_object_with_buffer(shr, shUnit, &locals.t2, 4, 47);
+  _sh_prstore_object(shr, &locals.t2, 0, &locals.t3);
+  _sh_leave(shr, &locals.head, frame);
+  return locals.t2;
+
+L108:
+  ;
+  locals.t2 = _sh_ljs_get_string(shr, get_symbols(shUnit)[79] /*deherm Static Hermes...*/);
+  _sh_throw(shr, locals.t2);
+
+L109:
+  ;
+  locals.t2 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[32] /*lease*/, get_read_prop_cache(shUnit) + 88);
   if (!(_sh_ljs_is_object(locals.t2))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
   _sh_leave(shr, &locals.head, frame);
   return locals.t2;
 
-L97:
+L110:
   ;
-  locals.t2 = _sh_ljs_load_from_env(locals.t0, 5);
+  locals.t2 = _sh_ljs_load_from_env(locals.t0, 6);
   if (!(_sh_ljs_is_object(locals.t2))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  locals.t2 = _sh_ljs_load_from_env(locals.t0, 36);
+  locals.t2 = _sh_ljs_load_from_env(locals.t0, 40);
   locals.t2 = _sh_new_typed_object_with_buffer(shr, shUnit, &locals.t2, 6, 4);
   locals.t3 = _sh_ljs_get_global_object(shr);
-  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t3, get_symbols(shUnit)[60] /*Number*/, get_read_prop_cache(shUnit) + 84);
-  locals.t5 = _sh_ljs_load_from_env(locals.t0, 25);
+  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t3, get_symbols(shUnit)[62] /*Number*/, get_read_prop_cache(shUnit) + 89);
+  locals.t5 = _sh_ljs_load_from_env(locals.t0, 28);
   frame[2] = _sh_ljs_bit_and_rjs_inline(shr, &locals.t1, &locals.t5);
   np0 = _sh_ljs_undefined();
   frame[5] = _sh_ljs_undefined();
@@ -3853,8 +3994,8 @@ L97:
   locals.t4 = _sh_ljs_call(shr, frame, 1);
   if (!(_sh_ljs_is_double(locals.t4))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
   np1 = locals.t4;
-  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t3, get_symbols(shUnit)[60] /*Number*/, get_read_prop_cache(shUnit) + 85);
-  locals.t3 = _sh_ljs_load_from_env(locals.t0, 26);
+  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t3, get_symbols(shUnit)[62] /*Number*/, get_read_prop_cache(shUnit) + 90);
+  locals.t3 = _sh_ljs_load_from_env(locals.t0, 29);
   locals.t3 = _sh_ljs_right_shift_rjs_inline(shr, &locals.t1, &locals.t3);
   frame[2] = _sh_ljs_bit_and_rjs_inline(shr, &locals.t3, &locals.t5);
   frame[5] = _sh_ljs_undefined();
@@ -3874,61 +4015,61 @@ L97:
   _sh_leave(shr, &locals.head, frame);
   return locals.t2;
 
-L98:
+L111:
   ;
   if (!(_sh_ljs_is_string(locals.t1))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
   locals.t3 = locals.t1;
   locals.t2 = _sh_ljs_load_from_env(locals.t0, 4);
   if (!(_sh_ljs_is_object(locals.t2))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  locals.t2 = _sh_ljs_load_from_env(locals.t0, 35);
+  locals.t2 = _sh_ljs_load_from_env(locals.t0, 38);
   locals.t2 = _sh_new_typed_object_with_buffer(shr, shUnit, &locals.t2, 4, 44);
   _sh_prstore_string(shr, &locals.t2, 0, &locals.t3);
   _sh_leave(shr, &locals.head, frame);
   return locals.t2;
 
-L99:
+L112:
   ;
   if (!(_sh_ljs_is_bool(locals.t1))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
   np0 = locals.t1;
   locals.t2 = _sh_ljs_load_from_env(locals.t0, 2);
   if (!(_sh_ljs_is_object(locals.t2))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  locals.t2 = _sh_ljs_load_from_env(locals.t0, 33);
+  locals.t2 = _sh_ljs_load_from_env(locals.t0, 36);
   locals.t2 = _sh_new_typed_object_with_buffer(shr, shUnit, &locals.t2, 4, 25);
   _sh_prstore_bool(shr, &locals.t2, 0, &np0);
   _sh_leave(shr, &locals.head, frame);
   return locals.t2;
 
-L100:
+L113:
   ;
   if (!(_sh_ljs_is_double(locals.t1))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
   np0 = locals.t1;
   locals.t1 = _sh_ljs_load_from_env(locals.t0, 3);
   if (!(_sh_ljs_is_object(locals.t1))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  locals.t1 = _sh_ljs_load_from_env(locals.t0, 34);
+  locals.t1 = _sh_ljs_load_from_env(locals.t0, 37);
   locals.t1 = _sh_new_typed_object_with_buffer(shr, shUnit, &locals.t1, 4, 26);
   _sh_prstore_number(shr, &locals.t1, 0, &np0);
   _sh_leave(shr, &locals.head, frame);
   return locals.t1;
 
-L101:
+L114:
   ;
   locals.t1 = _sh_ljs_load_from_env(locals.t0, 0);
   if (!(_sh_ljs_is_object(locals.t1))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  locals.t1 = _sh_ljs_load_from_env(locals.t0, 31);
+  locals.t1 = _sh_ljs_load_from_env(locals.t0, 34);
   locals.t1 = _sh_ljs_new_object_with_parent(shr, &locals.t1);
   _sh_leave(shr, &locals.head, frame);
   return locals.t1;
 
-L102:
+L115:
   ;
   locals.t1 = _sh_ljs_load_from_env(locals.t0, 1);
   if (!(_sh_ljs_is_object(locals.t1))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  locals.t0 = _sh_ljs_load_from_env(locals.t0, 32);
+  locals.t0 = _sh_ljs_load_from_env(locals.t0, 35);
   locals.t0 = _sh_ljs_new_object_with_parent(shr, &locals.t0);
   _sh_leave(shr, &locals.head, frame);
   return locals.t0;
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:362:1
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:373:1
 static SHLegacyValue _10___dehermFromStatic(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -4000,7 +4141,7 @@ L4:
 
 L5:
   ;
-  locals.t2 = _sh_ljs_load_from_env(locals.t1, 6);
+  locals.t2 = _sh_ljs_load_from_env(locals.t1, 7);
   if (!(_sh_ljs_is_object(locals.t2))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
   np0 = _sh_ljs_instance_of_rjs(shr, &locals.t0, &locals.t2);
   if(_sh_ljs_get_bool(np0)) goto L33;
@@ -4008,7 +4149,7 @@ L5:
 
 L6:
   ;
-  locals.t2 = _sh_ljs_load_from_env(locals.t1, 7);
+  locals.t2 = _sh_ljs_load_from_env(locals.t1, 8);
   if (!(_sh_ljs_is_object(locals.t2))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
   np0 = _sh_ljs_instance_of_rjs(shr, &locals.t0, &locals.t2);
   if(_sh_ljs_get_bool(np0)) goto L30;
@@ -4016,7 +4157,7 @@ L6:
 
 L7:
   ;
-  locals.t2 = _sh_ljs_load_from_env(locals.t1, 5);
+  locals.t2 = _sh_ljs_load_from_env(locals.t1, 6);
   if (!(_sh_ljs_is_object(locals.t2))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
   np0 = _sh_ljs_instance_of_rjs(shr, &locals.t0, &locals.t2);
   if(_sh_ljs_get_bool(np0)) goto L23;
@@ -4024,7 +4165,7 @@ L7:
 
 L8:
   ;
-  locals.t2 = _sh_ljs_load_from_env(locals.t1, 8);
+  locals.t2 = _sh_ljs_load_from_env(locals.t1, 9);
   if (!(_sh_ljs_is_object(locals.t2))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
   np0 = _sh_ljs_instance_of_rjs(shr, &locals.t0, &locals.t2);
   if(_sh_ljs_get_bool(np0)) goto L22;
@@ -4032,7 +4173,7 @@ L8:
 
 L9:
   ;
-  locals.t2 = _sh_ljs_load_from_env(locals.t1, 10);
+  locals.t2 = _sh_ljs_load_from_env(locals.t1, 11);
   if (!(_sh_ljs_is_object(locals.t2))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
   np0 = _sh_ljs_instance_of_rjs(shr, &locals.t0, &locals.t2);
   if(_sh_ljs_get_bool(np0)) goto L19;
@@ -4040,7 +4181,7 @@ L9:
 
 L10:
   ;
-  locals.t2 = _sh_ljs_load_from_env(locals.t1, 11);
+  locals.t2 = _sh_ljs_load_from_env(locals.t1, 12);
   if (!(_sh_ljs_is_object(locals.t2))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
   np0 = _sh_ljs_instance_of_rjs(shr, &locals.t0, &locals.t2);
   if(_sh_ljs_get_bool(np0)) goto L16;
@@ -4048,7 +4189,7 @@ L10:
 
 L11:
   ;
-  locals.t2 = _sh_ljs_load_from_env(locals.t1, 12);
+  locals.t2 = _sh_ljs_load_from_env(locals.t1, 13);
   if (!(_sh_ljs_is_object(locals.t2))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
   np0 = _sh_ljs_instance_of_rjs(shr, &locals.t0, &locals.t2);
   if(_sh_ljs_get_bool(np0)) goto L13;
@@ -4056,13 +4197,13 @@ L11:
 
 L12:
   ;
-  locals.t2 = _sh_ljs_get_string(shr, get_symbols(shUnit)[77] /*deherm typed-native ...*/);
+  locals.t2 = _sh_ljs_get_string(shr, get_symbols(shUnit)[80] /*deherm typed-native ...*/);
   _sh_throw(shr, locals.t2);
 
 L13:
   ;
-  locals.t2 = _sh_ljs_load_from_env(locals.t1, 23);
-  locals.t3 = _sh_ljs_create_this(shr, &locals.t2, &locals.t2, get_read_prop_cache(shUnit) + 86);
+  locals.t2 = _sh_ljs_load_from_env(locals.t1, 24);
+  locals.t3 = _sh_ljs_create_this(shr, &locals.t2, &locals.t2, get_read_prop_cache(shUnit) + 91);
   frame[5] = locals.t2;
   frame[4] = locals.t2;
   frame[3] = locals.t3;
@@ -4082,8 +4223,8 @@ L13:
 L14:
   ;
   // PhiInst
-  locals.t5 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t2,get_symbols(shUnit)[78] /*set*/, get_read_prop_cache(shUnit) + 87);
-  locals.t6 = _sh_ljs_load_from_env(locals.t1, 29);
+  locals.t5 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t2,get_symbols(shUnit)[81] /*set*/, get_read_prop_cache(shUnit) + 92);
+  locals.t6 = _sh_ljs_load_from_env(locals.t1, 32);
   locals.t3 = _sh_prload(shr, locals.t0, 0);
   if (!(_sh_ljs_is_object(locals.t3))) _sh_throw_empty(shr);
   frame[2] = _sh_fastarray_load(shr, &locals.t3, _sh_ljs_get_double(np1));
@@ -4146,7 +4287,7 @@ L17:
   locals.t3 = _sh_prload(shr, locals.t0, 0);
   if (!(_sh_ljs_is_object(locals.t3))) _sh_throw_empty(shr);
   locals.t4 = _sh_fastarray_load(shr, &locals.t3, _sh_ljs_get_double(np1));
-  frame[4] = _sh_ljs_load_from_env(locals.t1, 29);
+  frame[4] = _sh_ljs_load_from_env(locals.t1, 32);
   locals.t3 = _sh_prload(shr, locals.t0, 1);
   if (!(_sh_ljs_is_object(locals.t3))) _sh_throw_empty(shr);
   frame[2] = _sh_fastarray_load(shr, &locals.t3, _sh_ljs_get_double(np1));
@@ -4191,7 +4332,7 @@ L19:
 L20:
   ;
   // PhiInst
-  frame[4] = _sh_ljs_load_from_env(locals.t1, 29);
+  frame[4] = _sh_ljs_load_from_env(locals.t1, 32);
   locals.t3 = _sh_prload(shr, locals.t0, 0);
   if (!(_sh_ljs_is_object(locals.t3))) _sh_throw_empty(shr);
   frame[2] = _sh_fastarray_load(shr, &locals.t3, _sh_ljs_get_double(np1));
@@ -4223,64 +4364,64 @@ L22:
   np0 = _sh_prload(shr, locals.t0, 0);
   frame[2] = _sh_prload(shr, locals.t0, 1);
   locals.t3 = _sh_ljs_get_global_object(shr);
-  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t3, get_symbols(shUnit)[40] /*BigInt*/, get_read_prop_cache(shUnit) + 88);
+  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t3, get_symbols(shUnit)[42] /*BigInt*/, get_read_prop_cache(shUnit) + 93);
   np1 = _sh_ljs_undefined();
   frame[5] = _sh_ljs_undefined();
   frame[3] = _sh_ljs_undefined();
   locals.t4 = _sh_ljs_call(shr, frame, 1);
-  locals.t5 = _sh_ljs_load_from_env(locals.t1, 26);
+  locals.t5 = _sh_ljs_load_from_env(locals.t1, 29);
   locals.t6 = _sh_ljs_left_shift_rjs_inline(shr, &locals.t4, &locals.t5);
-  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t3, get_symbols(shUnit)[40] /*BigInt*/, get_read_prop_cache(shUnit) + 89);
+  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t3, get_symbols(shUnit)[42] /*BigInt*/, get_read_prop_cache(shUnit) + 94);
   frame[5] = _sh_ljs_undefined();
   frame[3] = _sh_ljs_undefined();
   frame[2] = np0;
   locals.t4 = _sh_ljs_call(shr, frame, 1);
   locals.t4 = _sh_ljs_bit_or_rjs_inline(shr, &locals.t6, &locals.t4);
-  _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t2, get_symbols(shUnit)[70] /*socket*/, &locals.t4, get_write_prop_cache(shUnit) + 25);
+  _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t2, get_symbols(shUnit)[72] /*socket*/, &locals.t4, get_write_prop_cache(shUnit) + 26);
   np0 = _sh_prload(shr, locals.t0, 2);
   frame[2] = _sh_prload(shr, locals.t0, 3);
-  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t3, get_symbols(shUnit)[40] /*BigInt*/, get_read_prop_cache(shUnit) + 90);
+  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t3, get_symbols(shUnit)[42] /*BigInt*/, get_read_prop_cache(shUnit) + 95);
   frame[5] = _sh_ljs_undefined();
   frame[3] = _sh_ljs_undefined();
   locals.t4 = _sh_ljs_call(shr, frame, 1);
   locals.t6 = _sh_ljs_left_shift_rjs_inline(shr, &locals.t4, &locals.t5);
-  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t3, get_symbols(shUnit)[40] /*BigInt*/, get_read_prop_cache(shUnit) + 91);
+  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t3, get_symbols(shUnit)[42] /*BigInt*/, get_read_prop_cache(shUnit) + 96);
   frame[5] = _sh_ljs_undefined();
   frame[3] = _sh_ljs_undefined();
   frame[2] = np0;
   locals.t4 = _sh_ljs_call(shr, frame, 1);
   locals.t4 = _sh_ljs_bit_or_rjs_inline(shr, &locals.t6, &locals.t4);
-  _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t2, get_symbols(shUnit)[71] /*reserved*/, &locals.t4, get_write_prop_cache(shUnit) + 26);
+  _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t2, get_symbols(shUnit)[73] /*reserved*/, &locals.t4, get_write_prop_cache(shUnit) + 27);
   np0 = _sh_prload(shr, locals.t0, 4);
   frame[2] = _sh_prload(shr, locals.t0, 5);
-  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t3, get_symbols(shUnit)[40] /*BigInt*/, get_read_prop_cache(shUnit) + 92);
+  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t3, get_symbols(shUnit)[42] /*BigInt*/, get_read_prop_cache(shUnit) + 97);
   frame[5] = _sh_ljs_undefined();
   frame[3] = _sh_ljs_undefined();
   locals.t4 = _sh_ljs_call(shr, frame, 1);
   locals.t6 = _sh_ljs_left_shift_rjs_inline(shr, &locals.t4, &locals.t5);
-  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t3, get_symbols(shUnit)[40] /*BigInt*/, get_read_prop_cache(shUnit) + 93);
+  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t3, get_symbols(shUnit)[42] /*BigInt*/, get_read_prop_cache(shUnit) + 98);
   frame[5] = _sh_ljs_undefined();
   frame[3] = _sh_ljs_undefined();
   frame[2] = np0;
   locals.t4 = _sh_ljs_call(shr, frame, 1);
   locals.t4 = _sh_ljs_bit_or_rjs_inline(shr, &locals.t6, &locals.t4);
-  _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t2, get_symbols(shUnit)[72] /*path*/, &locals.t4, get_write_prop_cache(shUnit) + 27);
+  _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t2, get_symbols(shUnit)[74] /*path*/, &locals.t4, get_write_prop_cache(shUnit) + 28);
   np0 = _sh_prload(shr, locals.t0, 6);
   frame[2] = _sh_prload(shr, locals.t0, 7);
-  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t3, get_symbols(shUnit)[40] /*BigInt*/, get_read_prop_cache(shUnit) + 94);
+  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t3, get_symbols(shUnit)[42] /*BigInt*/, get_read_prop_cache(shUnit) + 99);
   frame[5] = _sh_ljs_undefined();
   frame[3] = _sh_ljs_undefined();
   locals.t4 = _sh_ljs_call(shr, frame, 1);
   locals.t4 = _sh_ljs_left_shift_rjs_inline(shr, &locals.t4, &locals.t5);
-  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t3, get_symbols(shUnit)[40] /*BigInt*/, get_read_prop_cache(shUnit) + 95);
+  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t3, get_symbols(shUnit)[42] /*BigInt*/, get_read_prop_cache(shUnit) + 100);
   frame[5] = _sh_ljs_undefined();
   frame[3] = _sh_ljs_undefined();
   frame[2] = np0;
   locals.t3 = _sh_ljs_call(shr, frame, 1);
   locals.t3 = _sh_ljs_bit_or_rjs_inline(shr, &locals.t4, &locals.t3);
-  _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t2, get_symbols(shUnit)[73] /*fragment*/, &locals.t3, get_write_prop_cache(shUnit) + 28);
+  _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t2, get_symbols(shUnit)[75] /*fragment*/, &locals.t3, get_write_prop_cache(shUnit) + 29);
   np0 = _sh_ljs_bool(true);
-  _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t2, get_symbols(shUnit)[66] /*__dehermUrlV1*/, &np0, get_write_prop_cache(shUnit) + 29);
+  _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t2, get_symbols(shUnit)[68] /*__dehermUrlV1*/, &np0, get_write_prop_cache(shUnit) + 30);
   _sh_leave(shr, &locals.head, frame);
   return locals.t2;
 
@@ -4321,14 +4462,14 @@ L27:
   np1 = _sh_prload(shr, locals.t0, 3);
   frame[2] = _sh_prload(shr, locals.t0, 4);
   locals.t2 = _sh_ljs_get_global_object(shr);
-  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t2, get_symbols(shUnit)[40] /*BigInt*/, get_read_prop_cache(shUnit) + 96);
+  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t2, get_symbols(shUnit)[42] /*BigInt*/, get_read_prop_cache(shUnit) + 101);
   np0 = _sh_ljs_undefined();
   frame[5] = _sh_ljs_undefined();
   frame[3] = _sh_ljs_undefined();
   locals.t4 = _sh_ljs_call(shr, frame, 1);
-  locals.t3 = _sh_ljs_load_from_env(locals.t1, 26);
+  locals.t3 = _sh_ljs_load_from_env(locals.t1, 29);
   locals.t3 = _sh_ljs_left_shift_rjs_inline(shr, &locals.t4, &locals.t3);
-  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t2, get_symbols(shUnit)[40] /*BigInt*/, get_read_prop_cache(shUnit) + 97);
+  frame[4] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t2, get_symbols(shUnit)[42] /*BigInt*/, get_read_prop_cache(shUnit) + 102);
   frame[5] = _sh_ljs_undefined();
   frame[3] = _sh_ljs_undefined();
   frame[2] = np1;
@@ -4339,14 +4480,14 @@ L27:
 
 L28:
   ;
-  locals.t2 = _sh_ljs_get_string(shr, get_symbols(shUnit)[79] /*deherm typed-native ...*/);
+  locals.t2 = _sh_ljs_get_string(shr, get_symbols(shUnit)[82] /*deherm typed-native ...*/);
   _sh_throw(shr, locals.t2);
 
 L29:
   ;
-  locals.t2 = _sh_ljs_load_from_env(locals.t1, 19);
+  locals.t2 = _sh_ljs_load_from_env(locals.t1, 20);
   if (!(_sh_ljs_is_object(locals.t2))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
-  locals.t2 = _sh_ljs_load_from_env(locals.t1, 43);
+  locals.t2 = _sh_ljs_load_from_env(locals.t1, 47);
   locals.t2 = _sh_new_typed_object_with_buffer(shr, shUnit, &locals.t2, 11, 31);
   _sh_prstore_object(shr, &locals.t2, 4, &locals.t0);
   np0 = _sh_prload(shr, locals.t0, 2);
@@ -4355,7 +4496,7 @@ L29:
   _sh_prstore_number(shr, &locals.t2, 1, &np0);
   np0 = _sh_prload(shr, locals.t0, 4);
   _sh_prstore_number(shr, &locals.t2, 2, &np0);
-  locals.t3 = _sh_ljs_get_string(shr, get_symbols(shUnit)[59] /*gui-node*/);
+  locals.t3 = _sh_ljs_get_string(shr, get_symbols(shUnit)[61] /*gui-node*/);
   _sh_prstore_string(shr, &locals.t2, 3, &locals.t3);
   _sh_leave(shr, &locals.head, frame);
   return locals.t2;
@@ -4390,11 +4531,11 @@ L33:
   ;
   locals.t1 = _sh_ljs_new_object(shr);
   np0 = _sh_prload(shr, locals.t0, 1);
-  _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t1, get_symbols(shUnit)[23] /*x*/, &np0, get_write_prop_cache(shUnit) + 30);
+  _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t1, get_symbols(shUnit)[23] /*x*/, &np0, get_write_prop_cache(shUnit) + 31);
   np0 = _sh_prload(shr, locals.t0, 2);
-  _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t1, get_symbols(shUnit)[24] /*y*/, &np0, get_write_prop_cache(shUnit) + 31);
+  _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t1, get_symbols(shUnit)[24] /*y*/, &np0, get_write_prop_cache(shUnit) + 32);
   np0 = _sh_prload(shr, locals.t0, 3);
-  _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t1, get_symbols(shUnit)[25] /*z*/, &np0, get_write_prop_cache(shUnit) + 32);
+  _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t1, get_symbols(shUnit)[25] /*z*/, &np0, get_write_prop_cache(shUnit) + 33);
   np1 = _sh_prload(shr, locals.t0, 0);
   np0 = _sh_ljs_double(1);
   np0 = _sh_ljs_bool(_sh_ljs_get_double(np1) == _sh_ljs_get_double(np0));
@@ -4404,9 +4545,9 @@ L33:
 L34:
   ;
   np0 = _sh_prload(shr, locals.t0, 4);
-  _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t1, get_symbols(shUnit)[26] /*w*/, &np0, get_write_prop_cache(shUnit) + 33);
+  _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t1, get_symbols(shUnit)[26] /*w*/, &np0, get_write_prop_cache(shUnit) + 34);
   np1 = _sh_prload(shr, locals.t0, 0);
-  locals.t2 = _sh_ljs_get_string(shr, get_symbols(shUnit)[76] /*quaternion*/);
+  locals.t2 = _sh_ljs_get_string(shr, get_symbols(shUnit)[78] /*quaternion*/);
   np0 = _sh_ljs_double(2);
   np0 = _sh_ljs_bool(_sh_ljs_get_double(np1) == _sh_ljs_get_double(np0));
   if(_sh_ljs_get_bool(np0)) goto L35;
@@ -4414,19 +4555,19 @@ L34:
 
 L35:
   ;
-  locals.t2 = _sh_ljs_get_string(shr, get_symbols(shUnit)[75] /*vector4*/);
+  locals.t2 = _sh_ljs_get_string(shr, get_symbols(shUnit)[77] /*vector4*/);
   goto L36;
 L36:
   ;
   // PhiInst
-  _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t1, get_symbols(shUnit)[65] /*__dehermValueKind*/, &locals.t2, get_write_prop_cache(shUnit) + 34);
+  _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t1, get_symbols(shUnit)[67] /*__dehermValueKind*/, &locals.t2, get_write_prop_cache(shUnit) + 35);
   _sh_leave(shr, &locals.head, frame);
   return locals.t1;
 
 L37:
   ;
-  locals.t2 = _sh_ljs_get_string(shr, get_symbols(shUnit)[74] /*vector3*/);
-  _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t1, get_symbols(shUnit)[65] /*__dehermValueKind*/, &locals.t2, get_write_prop_cache(shUnit) + 35);
+  locals.t2 = _sh_ljs_get_string(shr, get_symbols(shUnit)[76] /*vector3*/);
+  _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t1, get_symbols(shUnit)[67] /*__dehermValueKind*/, &locals.t2, get_write_prop_cache(shUnit) + 36);
   _sh_leave(shr, &locals.head, frame);
   return locals.t1;
 
@@ -4460,7 +4601,7 @@ L42:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:459:1
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:470:1
 static SHLegacyValue _11___dehermTypedNativeCall(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -4498,10 +4639,10 @@ L0:
   ;
   locals.t0 = _sh_ljs_get_env_from_closure(shr, frame[-7]);  np1 = _sh_ljs_param(frame, 1);
   locals.t2 = _sh_ljs_param(frame, 2);
-  locals.t1 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t2,get_symbols(shUnit)[46] /*length*/, get_read_prop_cache(shUnit) + 98);
+  locals.t1 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t2,get_symbols(shUnit)[48] /*length*/, get_read_prop_cache(shUnit) + 103);
   if (!(_sh_ljs_is_double(locals.t1))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
   np5 = locals.t1;
-  np0 = _sh_ljs_load_from_env(locals.t0, 17);
+  np0 = _sh_ljs_load_from_env(locals.t0, 18);
   if (!(_sh_ljs_is_double(np0))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
   np0 = _sh_ljs_bool(_sh_ljs_get_double(np5) > _sh_ljs_get_double(np0));
   if(_sh_ljs_get_bool(np0)) goto L25;
@@ -4509,7 +4650,7 @@ L0:
 
 L1:
   ;
-  locals.t1 = _sh_ljs_load_from_env(locals.t0, 16);
+  locals.t1 = _sh_ljs_load_from_env(locals.t0, 17);
   if (!(_sh_ljs_is_object(locals.t1))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
   np0 = _sh_fastarray_length(shr, &locals.t1);
   np6 = _sh_ljs_double(1);
@@ -4528,7 +4669,7 @@ L2:
   // PhiInst
   np4 = _sh_ljs_double(_sh_ljs_get_double(np7) + _sh_ljs_get_double(np9));
   np4 = _sh_ljs_right_shift_rjs_inline(shr, &np4, &np6);
-  locals.t1 = _sh_ljs_load_from_env(locals.t0, 16);
+  locals.t1 = _sh_ljs_load_from_env(locals.t0, 17);
   if (!(_sh_ljs_is_object(locals.t1))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
   np10 = _sh_fastarray_load(shr, &locals.t1, _sh_ljs_get_double(np4));
   np11 = _sh_ljs_bool(_sh_ljs_get_double(np10) == _sh_ljs_get_double(np1));
@@ -4569,7 +4710,7 @@ L7:
 
 L8:
   ;
-  _sh_ljs_store_to_env(shr, locals.t0,np0, 27);
+  _sh_ljs_store_to_env(shr, locals.t0,np0, 30);
   locals.t3 = _sh_ljs_get_env(shr, locals.t0, 1);
   locals.t1 = _sh_ljs_load_from_env(locals.t3, 2);
   locals.t4 = _sh_new_fastarray_with_proto(shr, &locals.t1, 0);
@@ -4582,7 +4723,7 @@ L8:
 L9:
   ;
   // PhiInst
-  frame[4] = _sh_ljs_load_from_env(locals.t0, 28);
+  frame[4] = _sh_ljs_load_from_env(locals.t0, 31);
   frame[2] = _sh_ljs_get_by_val_rjs(shr,&locals.t2, &np4);
   frame[5] = _sh_ljs_undefined();
   frame[3] = _sh_ljs_double(0);
@@ -4594,7 +4735,7 @@ L9:
   frame[6] = _sh_ljs_native_uint32(2);
   locals.t1 = _9___dehermToStatic(shr);
   _sh_fastarray_push(shr, &locals.t1, &locals.t4);
-  np3 = _sh_ljs_load_from_env(locals.t0, 27);
+  np3 = _sh_ljs_load_from_env(locals.t0, 30);
   if (!(_sh_ljs_is_bool(np3))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
   if(_sh_ljs_get_bool(np3)) goto L18;
   goto L10;
@@ -4608,7 +4749,7 @@ L10:
 
 L11:
   ;
-  frame[4] = _sh_ljs_load_from_env(locals.t0, 15);
+  frame[4] = _sh_ljs_load_from_env(locals.t0, 16);
   frame[5] = _sh_ljs_undefined();
   frame[3] = _sh_ljs_double(0);
   frame[2] = np1;
@@ -4642,7 +4783,7 @@ L13:
 L14:
   ;
   // PhiInst
-  frame[4] = _sh_ljs_load_from_env(locals.t0, 29);
+  frame[4] = _sh_ljs_load_from_env(locals.t0, 32);
   frame[2] = _sh_fastarray_load(shr, &locals.t1, _sh_ljs_get_double(np4));
   frame[5] = _sh_ljs_undefined();
   frame[3] = _sh_ljs_double(0);
@@ -4665,7 +4806,7 @@ L15:
 
 L16:
   ;
-  frame[4] = _sh_ljs_load_from_env(locals.t0, 29);
+  frame[4] = _sh_ljs_load_from_env(locals.t0, 32);
   frame[2] = _sh_fastarray_load(shr, &locals.t1, _sh_ljs_get_double(np2));
   frame[5] = _sh_ljs_undefined();
   frame[3] = _sh_ljs_double(0);
@@ -4685,20 +4826,20 @@ L17:
 
 L18:
   ;
-  locals.t3 = _sh_ljs_load_from_env(locals.t0, 30);
+  locals.t3 = _sh_ljs_load_from_env(locals.t0, 33);
   if(_sh_ljs_to_boolean(locals.t3)) goto L19;
   goto L24;
 
 L19:
   ;
-  locals.t1 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t3,get_symbols(shUnit)[44] /*call*/, get_read_prop_cache(shUnit) + 99);
+  locals.t1 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t3,get_symbols(shUnit)[46] /*call*/, get_read_prop_cache(shUnit) + 104);
   np2 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t1, 383));
   if(_sh_ljs_get_bool(np2)) goto L24;
   goto L20;
 
 L20:
   ;
-  locals.t1 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t3,get_symbols(shUnit)[44] /*call*/, get_read_prop_cache(shUnit) + 100);
+  locals.t1 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t3,get_symbols(shUnit)[46] /*call*/, get_read_prop_cache(shUnit) + 105);
   if (_sh_ljs_get_builtin_closure(shr, 76).raw == locals.t1.raw) goto L22;
 else goto L21;
 
@@ -4727,25 +4868,25 @@ L23:
 
 L24:
   ;
-  locals.t1 = _sh_ljs_get_string(shr, get_symbols(shUnit)[80] /*deherm typed-native ...*/);
+  locals.t1 = _sh_ljs_get_string(shr, get_symbols(shUnit)[83] /*deherm typed-native ...*/);
   _sh_throw(shr, locals.t1);
 
 L25:
   ;
-  locals.t1 = _sh_ljs_load_from_env(locals.t0, 30);
+  locals.t1 = _sh_ljs_load_from_env(locals.t0, 33);
   if(_sh_ljs_to_boolean(locals.t1)) goto L26;
   goto L31;
 
 L26:
   ;
-  locals.t0 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[44] /*call*/, get_read_prop_cache(shUnit) + 101);
+  locals.t0 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[46] /*call*/, get_read_prop_cache(shUnit) + 106);
   np0 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t0, 383));
   if(_sh_ljs_get_bool(np0)) goto L31;
   goto L27;
 
 L27:
   ;
-  locals.t0 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[44] /*call*/, get_read_prop_cache(shUnit) + 102);
+  locals.t0 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[46] /*call*/, get_read_prop_cache(shUnit) + 107);
   if (_sh_ljs_get_builtin_closure(shr, 76).raw == locals.t0.raw) goto L29;
 else goto L28;
 
@@ -4776,7 +4917,7 @@ L30:
 
 L31:
   ;
-  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[80] /*deherm typed-native ...*/);
+  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[83] /*deherm typed-native ...*/);
   _sh_throw(shr, locals.t0);
 }
 // none:0,0
@@ -4796,7 +4937,7 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:43:33
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:45:33
 static SHLegacyValue _13_encode(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -4810,10 +4951,10 @@ static SHLegacyValue _13_encode(SHRuntime *shr) {
 
 L0:
   ;
-  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[81] /*deherm Static Hermes...*/);
+  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[84] /*deherm Static Hermes...*/);
   _sh_throw(shr, locals.t0);
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:43:160
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:45:160
 static SHLegacyValue _14_asString(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -4827,10 +4968,10 @@ static SHLegacyValue _14_asString(SHRuntime *shr) {
 
 L0:
   ;
-  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[82] /*deherm Static Hermes...*/);
+  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[85] /*deherm Static Hermes...*/);
   _sh_throw(shr, locals.t0);
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:43:232
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:45:232
 static SHLegacyValue _15_probeSize(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -4847,7 +4988,7 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:43:266
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:45:266
 static SHLegacyValue _16_probeChecksum(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -4881,7 +5022,7 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:44:63
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:46:63
 static SHLegacyValue _18_encode_1_(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -4916,7 +5057,7 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:45:58
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:47:58
 static SHLegacyValue _20_encode_2_(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -4934,7 +5075,7 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:46:81
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:48:81
 static SHLegacyValue _21_DehermStaticBoolean(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -4958,7 +5099,7 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:46:130
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:48:130
 static SHLegacyValue _22_encode_3_(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -4992,7 +5133,7 @@ L2:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:47:79
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:49:79
 static SHLegacyValue _23_DehermStaticNumber(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -5016,7 +5157,7 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:47:127
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:49:127
 static SHLegacyValue _24_encode_4_(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -5039,7 +5180,7 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:48:79
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:50:79
 static SHLegacyValue _25_DehermStaticString(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -5065,7 +5206,7 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:48:127
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:50:127
 static SHLegacyValue _26_encode_5_(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -5084,7 +5225,7 @@ static SHLegacyValue _26_encode_5_(SHRuntime *shr) {
 
 L0:
   ;
-  locals.t0 = _sh_ljs_get_env_from_closure(shr, frame[-7]);  frame[4] = _sh_ljs_load_from_env(locals.t0, 13);
+  locals.t0 = _sh_ljs_get_env_from_closure(shr, frame[-7]);  frame[4] = _sh_ljs_load_from_env(locals.t0, 14);
   locals.t0 = frame[-8];
   frame[1] = _sh_prload(shr, locals.t0, 0);
   frame[3] = _sh_ljs_double(0);
@@ -5100,7 +5241,7 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:48:247
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:50:247
 static SHLegacyValue _27_asString_1_(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -5119,8 +5260,169 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return locals.t0;
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:49:172
-static SHLegacyValue _28_DehermStaticHandle(SHRuntime *shr) {
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:51:85
+static SHLegacyValue _28_DehermStaticBytes(SHRuntime *shr) {
+  struct {
+    SHLocals head;
+    SHLegacyValue t0;
+    SHLegacyValue t1;
+  } locals;
+  _sh_check_native_stack_overflow(shr);
+  SHLegacyValue *frame = _sh_enter(shr, &locals.head, 10);
+  locals.head.count =2;
+  SHUnit *shUnit = shr->units[unit_index];
+  locals.t0 = _sh_ljs_undefined();
+  locals.t1 = _sh_ljs_undefined();
+  SHLegacyValue np0 = _sh_ljs_undefined();
+  SHLegacyValue np1 = _sh_ljs_undefined();
+  SHLegacyValue np2 = _sh_ljs_undefined();
+  SHLegacyValue np3 = _sh_ljs_undefined();
+  SHLegacyValue np4 = _sh_ljs_undefined();
+  SHLegacyValue np5 = _sh_ljs_undefined();
+  if (_sh_ljs_is_undefined(frame[-6]))
+    _sh_throw_type_error_ascii(shr, "Class constructor invoked without new");
+
+L0:
+  ;
+  locals.t1 = _sh_ljs_param(frame, 1);
+  np0 = _sh_fastarray_length(shr, &locals.t1);
+  np4 = _sh_ljs_double(0);
+  np0 = _sh_ljs_bool(_sh_ljs_get_double(np4) < _sh_ljs_get_double(np0));
+  np3 = _sh_ljs_double(1);
+  np2 = _sh_ljs_double(255);
+  np1 = _sh_ljs_double(0);
+  if(_sh_ljs_get_bool(np0)) goto L1;
+  goto L5;
+
+L1:
+  ;
+  // PhiInst
+  np0 = _sh_fastarray_load(shr, &locals.t1, _sh_ljs_get_double(np1));
+  np0 = _sh_ljs_bool(_sh_ljs_get_double(np0) < _sh_ljs_get_double(np4));
+  if(_sh_ljs_get_bool(np0)) goto L6;
+  goto L2;
+
+L2:
+  ;
+  np0 = _sh_fastarray_load(shr, &locals.t1, _sh_ljs_get_double(np1));
+  np0 = _sh_ljs_bool(_sh_ljs_get_double(np0) > _sh_ljs_get_double(np2));
+  if(_sh_ljs_get_bool(np0)) goto L6;
+  goto L3;
+
+L3:
+  ;
+  frame[1] = _sh_fastarray_load(shr, &locals.t1, _sh_ljs_get_double(np1));
+  // ImplicitMovInst
+  // ImplicitMovInst
+  // ImplicitMovInst
+  np5 = _sh_ljs_call_builtin(shr, frame, 1, 22);
+  np0 = _sh_fastarray_load(shr, &locals.t1, _sh_ljs_get_double(np1));
+  np0 = _sh_ljs_bool(_sh_ljs_get_double(np5) != _sh_ljs_get_double(np0));
+  if(_sh_ljs_get_bool(np0)) goto L6;
+  goto L4;
+
+L4:
+  ;
+  np1 = _sh_ljs_double(_sh_ljs_get_double(np1) + _sh_ljs_get_double(np3));
+  np0 = _sh_fastarray_length(shr, &locals.t1);
+  np0 = _sh_ljs_bool(_sh_ljs_get_double(np1) < _sh_ljs_get_double(np0));
+  if(_sh_ljs_get_bool(np0)) goto L1;
+  goto L5;
+
+L5:
+  ;
+  locals.t0 = frame[-8];
+  _sh_prstore_object(shr, &locals.t0, 0, &locals.t1);
+  np0 = _sh_ljs_undefined();
+  _sh_leave(shr, &locals.head, frame);
+  return np0;
+
+L6:
+  ;
+  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[79] /*deherm Static Hermes...*/);
+  _sh_throw(shr, locals.t0);
+}
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:51:330
+static SHLegacyValue _29_encode_6_(SHRuntime *shr) {
+  struct {
+    SHLocals head;
+    SHLegacyValue t0;
+    SHLegacyValue t1;
+  } locals;
+  _sh_check_native_stack_overflow(shr);
+  SHLegacyValue *frame = _sh_enter(shr, &locals.head, 1);
+  locals.head.count =2;
+  SHUnit *shUnit = shr->units[unit_index];
+  locals.t0 = _sh_ljs_undefined();
+  locals.t1 = _sh_ljs_undefined();
+  SHLegacyValue np0 = _sh_ljs_undefined();
+  SHLegacyValue np1 = _sh_ljs_undefined();
+  SHLegacyValue np2 = _sh_ljs_undefined();
+  SHLegacyValue np3 = _sh_ljs_undefined();
+  SHLegacyValue np4 = _sh_ljs_undefined();
+
+L0:
+  ;
+  locals.t0 = frame[-8];
+  np4 = _sh_ljs_param(frame, 1);
+  locals.t1 = _sh_prload(shr, locals.t0, 0);
+  if (!(_sh_ljs_is_object(locals.t1))) _sh_throw_empty(shr);
+  np0 = _sh_fastarray_length(shr, &locals.t1);
+  np0 = _sh_ljs_double((double)(unsigned int)deherm_script_static_push_bytes(_sh_ljs_get_native_pointer(np4), (unsigned int)_sh_to_int32_double(_sh_ljs_get_double(np0))));
+  np1 = _sh_ljs_double(((struct HermesValueBase){.raw = 4751297606873776128u}).f64);
+  np1 = _sh_ljs_bool(_sh_ljs_get_double(np0) == _sh_ljs_get_double(np1));
+  if(_sh_ljs_get_bool(np1)) goto L6;
+  goto L1;
+
+L1:
+  ;
+  locals.t1 = _sh_prload(shr, locals.t0, 0);
+  if (!(_sh_ljs_is_object(locals.t1))) _sh_throw_empty(shr);
+  np1 = _sh_fastarray_length(shr, &locals.t1);
+  np3 = _sh_ljs_double(0);
+  np1 = _sh_ljs_bool(_sh_ljs_get_double(np3) < _sh_ljs_get_double(np1));
+  np2 = _sh_ljs_double(1);
+  np3 = _sh_ljs_double(0);
+  if(_sh_ljs_get_bool(np1)) goto L2;
+  goto L5;
+
+L2:
+  ;
+  // PhiInst
+  locals.t1 = _sh_prload(shr, locals.t0, 0);
+  if (!(_sh_ljs_is_object(locals.t1))) _sh_throw_empty(shr);
+  np1 = _sh_fastarray_load(shr, &locals.t1, _sh_ljs_get_double(np3));
+  np1 = _sh_ljs_double((double)(unsigned char)deherm_script_static_write_bytes_byte(_sh_ljs_get_native_pointer(np4), (unsigned int)_sh_to_int32_double(_sh_ljs_get_double(np0)), (unsigned int)_sh_to_int32_double(_sh_ljs_get_double(np3)), (unsigned char)_sh_to_int32_double(_sh_ljs_get_double(np1))));
+  if(_sh_ljs_to_boolean(np1)) goto L4;
+  goto L3;
+
+L3:
+  ;
+  locals.t1 = _sh_ljs_get_string(shr, get_symbols(shUnit)[86] /*deherm Static Hermes...*/);
+  _sh_throw(shr, locals.t1);
+
+L4:
+  ;
+  np3 = _sh_ljs_double(_sh_ljs_get_double(np3) + _sh_ljs_get_double(np2));
+  locals.t1 = _sh_prload(shr, locals.t0, 0);
+  if (!(_sh_ljs_is_object(locals.t1))) _sh_throw_empty(shr);
+  np1 = _sh_fastarray_length(shr, &locals.t1);
+  np1 = _sh_ljs_bool(_sh_ljs_get_double(np3) < _sh_ljs_get_double(np1));
+  if(_sh_ljs_get_bool(np1)) goto L2;
+  goto L5;
+
+L5:
+  ;
+  _sh_leave(shr, &locals.head, frame);
+  return np0;
+
+L6:
+  ;
+  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[87] /*deherm Static Hermes...*/);
+  _sh_throw(shr, locals.t0);
+}
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:52:172
+static SHLegacyValue _30_DehermStaticHandle(SHRuntime *shr) {
   struct {
     SHLocals head;
     SHLegacyValue t0;
@@ -5153,8 +5455,8 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:49:417
-static SHLegacyValue _29_encode_6_(SHRuntime *shr) {
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:52:417
+static SHLegacyValue _31_encode_7_(SHRuntime *shr) {
   struct {
     SHLocals head;
     SHLegacyValue t0;
@@ -5184,8 +5486,8 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:49:606
-static SHLegacyValue _30_probeChecksum_1_(SHRuntime *shr) {
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:52:606
+static SHLegacyValue _32_probeChecksum_1_(SHRuntime *shr) {
   struct {
     SHLocals head;
     SHLegacyValue t0;
@@ -5207,8 +5509,8 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:49:665
-static SHLegacyValue _31_dispose(SHRuntime *shr) {
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:52:665
+static SHLegacyValue _33_dispose(SHRuntime *shr) {
   struct {
     SHLocals head;
     SHLegacyValue t0;
@@ -5247,8 +5549,8 @@ L2:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:50:120
-static SHLegacyValue _32_DehermStaticDefoldValue(SHRuntime *shr) {
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:53:120
+static SHLegacyValue _34_DehermStaticDefoldValue(SHRuntime *shr) {
   struct {
     SHLocals head;
     SHLegacyValue t0;
@@ -5279,8 +5581,8 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:50:237
-static SHLegacyValue _33_encode_7_(SHRuntime *shr) {
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:53:237
+static SHLegacyValue _35_encode_8_(SHRuntime *shr) {
   struct {
     SHLocals head;
     SHLegacyValue t0;
@@ -5310,8 +5612,8 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:50:390
-static SHLegacyValue _34_probeChecksum_2_(SHRuntime *shr) {
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:53:390
+static SHLegacyValue _36_probeChecksum_2_(SHRuntime *shr) {
   struct {
     SHLocals head;
     SHLegacyValue t0;
@@ -5339,8 +5641,8 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:51:90
-static SHLegacyValue _35_DehermStaticMatrix4(SHRuntime *shr) {
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:54:90
+static SHLegacyValue _37_DehermStaticMatrix4(SHRuntime *shr) {
   struct {
     SHLocals head;
     SHLegacyValue t0;
@@ -5376,11 +5678,11 @@ L1:
 
 L2:
   ;
-  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[54] /*deherm Static Hermes...*/);
+  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[56] /*deherm Static Hermes...*/);
   _sh_throw(shr, locals.t0);
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:51:254
-static SHLegacyValue _36_encode_8_(SHRuntime *shr) {
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:54:254
+static SHLegacyValue _38_encode_9_(SHRuntime *shr) {
   struct {
     SHLocals head;
     SHLegacyValue t0;
@@ -5491,11 +5793,11 @@ L1:
 
 L2:
   ;
-  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[83] /*deherm Static Hermes...*/);
+  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[88] /*deherm Static Hermes...*/);
   _sh_throw(shr, locals.t0);
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:51:735
-static SHLegacyValue _37_probeSize_1_(SHRuntime *shr) {
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:54:735
+static SHLegacyValue _39_probeSize_1_(SHRuntime *shr) {
   struct {
     SHLocals head;
   } locals;
@@ -5511,8 +5813,8 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:51:770
-static SHLegacyValue _38_probeChecksum_3_(SHRuntime *shr) {
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:54:770
+static SHLegacyValue _40_probeChecksum_3_(SHRuntime *shr) {
   struct {
     SHLocals head;
     SHLegacyValue t0;
@@ -5559,8 +5861,8 @@ L2:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:52:214
-static SHLegacyValue _39_DehermStaticUrl(SHRuntime *shr) {
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:55:214
+static SHLegacyValue _41_DehermStaticUrl(SHRuntime *shr) {
   struct {
     SHLocals head;
     SHLegacyValue t0;
@@ -5597,8 +5899,8 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:52:592
-static SHLegacyValue _40_encode_9_(SHRuntime *shr) {
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:55:592
+static SHLegacyValue _42_encode_10_(SHRuntime *shr) {
   struct {
     SHLocals head;
     SHLegacyValue t0;
@@ -5643,11 +5945,11 @@ L1:
 
 L2:
   ;
-  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[84] /*deherm Static Hermes...*/);
+  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[89] /*deherm Static Hermes...*/);
   _sh_throw(shr, locals.t0);
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:52:915
-static SHLegacyValue _41_probeSize_2_(SHRuntime *shr) {
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:55:915
+static SHLegacyValue _43_probeSize_2_(SHRuntime *shr) {
   struct {
     SHLocals head;
   } locals;
@@ -5663,8 +5965,8 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:52:949
-static SHLegacyValue _42_probeChecksum_4_(SHRuntime *shr) {
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:55:949
+static SHLegacyValue _44_probeChecksum_4_(SHRuntime *shr) {
   struct {
     SHLocals head;
     SHLegacyValue t0;
@@ -5705,7 +6007,7 @@ L0:
   return np0;
 }
 // none:0,0
-static SHLegacyValue _43_DehermStaticContainer(SHRuntime *shr) {
+static SHLegacyValue _45_DehermStaticContainer(SHRuntime *shr) {
   struct {
     SHLocals head;
   } locals;
@@ -5721,8 +6023,8 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:53:62
-static SHLegacyValue _44_begin(SHRuntime *shr) {
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:56:62
+static SHLegacyValue _46_begin(SHRuntime *shr) {
   struct {
     SHLocals head;
     SHLegacyValue t0;
@@ -5807,21 +6109,21 @@ L6:
 
 L7:
   ;
-  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[85] /*deherm Static Hermes...*/);
+  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[90] /*deherm Static Hermes...*/);
   _sh_throw(shr, locals.t0);
 
 L8:
   ;
-  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[86] /*deherm Static Hermes...*/);
+  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[91] /*deherm Static Hermes...*/);
   _sh_throw(shr, locals.t0);
 
 L9:
   ;
-  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[87] /*deherm Static Hermes...*/);
+  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[92] /*deherm Static Hermes...*/);
   _sh_throw(shr, locals.t0);
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:53:460
-static SHLegacyValue _45_end(SHRuntime *shr) {
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:56:460
+static SHLegacyValue _47_end(SHRuntime *shr) {
   struct {
     SHLocals head;
     SHLegacyValue t0;
@@ -5846,8 +6148,8 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:54:101
-static SHLegacyValue _46_DehermStaticArray(SHRuntime *shr) {
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:57:101
+static SHLegacyValue _48_DehermStaticArray(SHRuntime *shr) {
   struct {
     SHLocals head;
     SHLegacyValue t0;
@@ -5865,7 +6167,7 @@ static SHLegacyValue _46_DehermStaticArray(SHRuntime *shr) {
 
 L0:
   ;
-  locals.t0 = _sh_ljs_get_env_from_closure(shr, frame[-7]);  locals.t0 = _sh_ljs_load_from_env(locals.t0, 9);
+  locals.t0 = _sh_ljs_get_env_from_closure(shr, frame[-7]);  locals.t0 = _sh_ljs_load_from_env(locals.t0, 10);
   if (!(_sh_ljs_is_object(locals.t0))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
   np0 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t0, 128));
   if(_sh_ljs_get_bool(np0)) goto L2;
@@ -5873,7 +6175,7 @@ L0:
 
 L1:
   ;
-  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[50] /*Trying to call a non...*/);
+  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[52] /*Trying to call a non...*/);
   _sh_throw_type_error(shr, &locals.t0);
 
 L2:
@@ -5885,8 +6187,8 @@ L2:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:54:170
-static SHLegacyValue _47_encode_10_(SHRuntime *shr) {
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:57:170
+static SHLegacyValue _49_encode_11_(SHRuntime *shr) {
   struct {
     SHLocals head;
     SHLegacyValue t0;
@@ -6009,7 +6311,7 @@ L7:
 
 L8:
   ;
-  locals.t2 = _sh_ljs_get_string(shr, get_symbols(shUnit)[88] /*deherm Static Hermes...*/);
+  locals.t2 = _sh_ljs_get_string(shr, get_symbols(shUnit)[93] /*deherm Static Hermes...*/);
   _sh_throw(shr, locals.t2);
 
 L9:
@@ -6036,21 +6338,21 @@ L10:
 
 L11:
   ;
-  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[85] /*deherm Static Hermes...*/);
+  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[90] /*deherm Static Hermes...*/);
   _sh_throw(shr, locals.t0);
 
 L12:
   ;
-  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[86] /*deherm Static Hermes...*/);
+  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[91] /*deherm Static Hermes...*/);
   _sh_throw(shr, locals.t0);
 
 L13:
   ;
-  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[87] /*deherm Static Hermes...*/);
+  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[92] /*deherm Static Hermes...*/);
   _sh_throw(shr, locals.t0);
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:54:541
-static SHLegacyValue _48_probeSize_3_(SHRuntime *shr) {
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:57:541
+static SHLegacyValue _50_probeSize_3_(SHRuntime *shr) {
   struct {
     SHLocals head;
     SHLegacyValue t0;
@@ -6071,8 +6373,8 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:55:122
-static SHLegacyValue _49_DehermStaticRecord(SHRuntime *shr) {
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:58:122
+static SHLegacyValue _51_DehermStaticRecord(SHRuntime *shr) {
   struct {
     SHLocals head;
     SHLegacyValue t0;
@@ -6093,7 +6395,7 @@ static SHLegacyValue _49_DehermStaticRecord(SHRuntime *shr) {
 
 L0:
   ;
-  locals.t0 = _sh_ljs_get_env_from_closure(shr, frame[-7]);  locals.t0 = _sh_ljs_load_from_env(locals.t0, 9);
+  locals.t0 = _sh_ljs_get_env_from_closure(shr, frame[-7]);  locals.t0 = _sh_ljs_load_from_env(locals.t0, 10);
   if (!(_sh_ljs_is_object(locals.t0))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
   np0 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t0, 128));
   if(_sh_ljs_get_bool(np0)) goto L2;
@@ -6101,7 +6403,7 @@ L0:
 
 L1:
   ;
-  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[50] /*Trying to call a non...*/);
+  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[52] /*Trying to call a non...*/);
   _sh_throw_type_error(shr, &locals.t0);
 
 L2:
@@ -6125,11 +6427,11 @@ L3:
 
 L4:
   ;
-  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[52] /*deherm record key/va...*/);
+  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[54] /*deherm record key/va...*/);
   _sh_throw(shr, locals.t0);
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:55:304
-static SHLegacyValue _50_encode_11_(SHRuntime *shr) {
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:58:304
+static SHLegacyValue _52_encode_12_(SHRuntime *shr) {
   struct {
     SHLocals head;
     SHLegacyValue t0;
@@ -6231,7 +6533,7 @@ L6:
 L7:
   ;
   // PhiInst
-  frame[5] = _sh_ljs_load_from_env(locals.t1, 13);
+  frame[5] = _sh_ljs_load_from_env(locals.t1, 14);
   locals.t3 = _sh_prload(shr, locals.t2, 0);
   if (!(_sh_ljs_is_object(locals.t3))) _sh_throw_empty(shr);
   frame[2] = _sh_fastarray_load(shr, &locals.t3, _sh_ljs_get_double(np3));
@@ -6266,7 +6568,7 @@ L7:
 
 L8:
   ;
-  locals.t3 = _sh_ljs_get_string(shr, get_symbols(shUnit)[88] /*deherm Static Hermes...*/);
+  locals.t3 = _sh_ljs_get_string(shr, get_symbols(shUnit)[93] /*deherm Static Hermes...*/);
   _sh_throw(shr, locals.t3);
 
 L9:
@@ -6293,21 +6595,21 @@ L10:
 
 L11:
   ;
-  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[85] /*deherm Static Hermes...*/);
+  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[90] /*deherm Static Hermes...*/);
   _sh_throw(shr, locals.t0);
 
 L12:
   ;
-  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[86] /*deherm Static Hermes...*/);
+  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[91] /*deherm Static Hermes...*/);
   _sh_throw(shr, locals.t0);
 
 L13:
   ;
-  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[87] /*deherm Static Hermes...*/);
+  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[92] /*deherm Static Hermes...*/);
   _sh_throw(shr, locals.t0);
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:55:683
-static SHLegacyValue _51_probeSize_4_(SHRuntime *shr) {
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:58:683
+static SHLegacyValue _53_probeSize_4_(SHRuntime *shr) {
   struct {
     SHLocals head;
     SHLegacyValue t0;
@@ -6328,8 +6630,8 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:56:130
-static SHLegacyValue _52_DehermStaticMap(SHRuntime *shr) {
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:59:130
+static SHLegacyValue _54_DehermStaticMap(SHRuntime *shr) {
   struct {
     SHLocals head;
     SHLegacyValue t0;
@@ -6350,7 +6652,7 @@ static SHLegacyValue _52_DehermStaticMap(SHRuntime *shr) {
 
 L0:
   ;
-  locals.t0 = _sh_ljs_get_env_from_closure(shr, frame[-7]);  locals.t0 = _sh_ljs_load_from_env(locals.t0, 9);
+  locals.t0 = _sh_ljs_get_env_from_closure(shr, frame[-7]);  locals.t0 = _sh_ljs_load_from_env(locals.t0, 10);
   if (!(_sh_ljs_is_object(locals.t0))) _sh_throw_type_error_ascii(shr, "Checked cast failed");
   np0 = _sh_ljs_bool(_sh_ljs_typeof_is(locals.t0, 128));
   if(_sh_ljs_get_bool(np0)) goto L2;
@@ -6358,7 +6660,7 @@ L0:
 
 L1:
   ;
-  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[50] /*Trying to call a non...*/);
+  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[52] /*Trying to call a non...*/);
   _sh_throw_type_error(shr, &locals.t0);
 
 L2:
@@ -6382,11 +6684,11 @@ L3:
 
 L4:
   ;
-  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[51] /*deherm map key/value...*/);
+  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[53] /*deherm map key/value...*/);
   _sh_throw(shr, locals.t0);
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:56:320
-static SHLegacyValue _53_encode_12_(SHRuntime *shr) {
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:59:320
+static SHLegacyValue _55_encode_13_(SHRuntime *shr) {
   struct {
     SHLocals head;
     SHLegacyValue t0;
@@ -6524,7 +6826,7 @@ L7:
 
 L8:
   ;
-  locals.t2 = _sh_ljs_get_string(shr, get_symbols(shUnit)[88] /*deherm Static Hermes...*/);
+  locals.t2 = _sh_ljs_get_string(shr, get_symbols(shUnit)[93] /*deherm Static Hermes...*/);
   _sh_throw(shr, locals.t2);
 
 L9:
@@ -6551,21 +6853,21 @@ L10:
 
 L11:
   ;
-  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[85] /*deherm Static Hermes...*/);
+  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[90] /*deherm Static Hermes...*/);
   _sh_throw(shr, locals.t0);
 
 L12:
   ;
-  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[86] /*deherm Static Hermes...*/);
+  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[91] /*deherm Static Hermes...*/);
   _sh_throw(shr, locals.t0);
 
 L13:
   ;
-  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[87] /*deherm Static Hermes...*/);
+  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[92] /*deherm Static Hermes...*/);
   _sh_throw(shr, locals.t0);
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:56:712
-static SHLegacyValue _54_probeSize_5_(SHRuntime *shr) {
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:59:712
+static SHLegacyValue _56_probeSize_5_(SHRuntime *shr) {
   struct {
     SHLocals head;
     SHLegacyValue t0;
@@ -6586,8 +6888,8 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:157:14
-static SHLegacyValue _55_DehermStaticGuiNode(SHRuntime *shr) {
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:160:14
+static SHLegacyValue _57_DehermStaticGuiNode(SHRuntime *shr) {
   struct {
     SHLocals head;
     SHLegacyValue t0;
@@ -6614,14 +6916,14 @@ L0:
   _sh_prstore_number(shr, &locals.t1, 1, &np0);
   np0 = _sh_prload(shr, locals.t0, 4);
   _sh_prstore_number(shr, &locals.t1, 2, &np0);
-  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[59] /*gui-node*/);
+  locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[61] /*gui-node*/);
   _sh_prstore_string(shr, &locals.t1, 3, &locals.t0);
   np0 = _sh_ljs_undefined();
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// .deherm/build/generated/typed-native/deherm_typed_native.ts:164:10
-static SHLegacyValue _56_dispose_1_(SHRuntime *shr) {
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:167:10
+static SHLegacyValue _58_dispose_1_(SHRuntime *shr) {
   struct {
     SHLocals head;
     SHLegacyValue t0;
@@ -6721,6 +7023,8 @@ static const char s_ascii_pool[] = {
   'O', 'b', 'j', 'e', 'c', 't', '\0',
   'g', 'e', 't', 'P', 'r', 'o', 't', 'o', 't', 'y', 'p', 'e', 'O', 'f', '\0',
   'M', 'a', 'p', '\0',
+  'U', 'i', 'n', 't', '8', 'A', 'r', 'r', 'a', 'y', '\0',
+  'A', 'r', 'r', 'a', 'y', 'B', 'u', 'f', 'f', 'e', 'r', '\0',
   'B', 'i', 'g', 'I', 'n', 't', '\0',
   '_', '_', 'd', 'e', 'f', 'o', 'l', 'd', 'S', 'c', 'r', 'i', 'p', 't', 'B', 'r', 'i', 'd', 'g', 'e', 'V', '1', '\0',
   't', 'a', 'r', 'g', 'e', 't', '\0',
@@ -6758,12 +7062,15 @@ static const char s_ascii_pool[] = {
   'v', 'e', 'c', 't', 'o', 'r', '3', '\0',
   'v', 'e', 'c', 't', 'o', 'r', '4', '\0',
   'q', 'u', 'a', 't', 'e', 'r', 'n', 'i', 'o', 'n', '\0',
+  'd', 'e', 'h', 'e', 'r', 'm', ' ', 'S', 't', 'a', 't', 'i', 'c', ' ', 'H', 'e', 'r', 'm', 'e', 's', ' ', 'b', 'y', 't', 'e', ' ', 'v', 'a', 'l', 'u', 'e', ' ', 'i', 's', ' ', 'o', 'u', 't', ' ', 'o', 'f', ' ', 'r', 'a', 'n', 'g', 'e', '\0',
   'd', 'e', 'h', 'e', 'r', 'm', ' ', 't', 'y', 'p', 'e', 'd', '-', 'n', 'a', 't', 'i', 'v', 'e', ' ', 'r', 'o', 'u', 't', 'e', ' ', 'r', 'e', 't', 'u', 'r', 'n', 'e', 'd', ' ', 'a', ' ', 'v', 'a', 'l', 'u', 'e', ' ', 's', 'h', 'a', 'p', 'e', ' ', 't', 'h', 'i', 's', ' ', 't', 'r', 'a', 'n', 's', 'p', 'o', 'r', 't', ' ', 'c', 'a', 'n', 'n', 'o', 't', ' ', 'd', 'e', 'c', 'o', 'd', 'e', '\0',
   's', 'e', 't', '\0',
   'd', 'e', 'h', 'e', 'r', 'm', ' ', 't', 'y', 'p', 'e', 'd', '-', 'n', 'a', 't', 'i', 'v', 'e', ' ', 'r', 'o', 'u', 't', 'e', ' ', 'r', 'e', 't', 'u', 'r', 'n', 'e', 'd', ' ', 'a', ' ', 'r', 'e', 't', 'a', 'i', 'n', 'e', 'd', ' ', 'e', 'n', 'g', 'i', 'n', 'e', ' ', 'h', 'a', 'n', 'd', 'l', 'e', '\0',
   'd', 'e', 'h', 'e', 'r', 'm', ' ', 't', 'y', 'p', 'e', 'd', '-', 'n', 'a', 't', 'i', 'v', 'e', ' ', 'r', 'o', 'u', 't', 'e', ' ', 'd', 'e', 'c', 'l', 'i', 'n', 'e', 'd', ':', ' ', 'J', 'S', 'I', ' ', 'b', 'r', 'i', 'd', 'g', 'e', ' ', 'u', 'n', 'a', 'v', 'a', 'i', 'l', 'a', 'b', 'l', 'e', '\0',
   'd', 'e', 'h', 'e', 'r', 'm', ' ', 'S', 't', 'a', 't', 'i', 'c', ' ', 'H', 'e', 'r', 'm', 'e', 's', ' ', 'a', 'b', 's', 't', 'r', 'a', 'c', 't', ' ', 'v', 'a', 'l', 'u', 'e', '\0',
   'd', 'e', 'h', 'e', 'r', 'm', ' ', 'S', 't', 'a', 't', 'i', 'c', ' ', 'H', 'e', 'r', 'm', 'e', 's', ' ', 'v', 'a', 'l', 'u', 'e', ' ', 'i', 's', ' ', 'n', 'o', 't', ' ', 'a', ' ', 's', 't', 'r', 'i', 'n', 'g', '\0',
+  'd', 'e', 'h', 'e', 'r', 'm', ' ', 'S', 't', 'a', 't', 'i', 'c', ' ', 'H', 'e', 'r', 'm', 'e', 's', ' ', 'b', 'y', 't', 'e', ' ', 'w', 'r', 'i', 't', 'e', ' ', 'f', 'a', 'i', 'l', 'e', 'd', '\0',
+  'd', 'e', 'h', 'e', 'r', 'm', ' ', 'S', 't', 'a', 't', 'i', 'c', ' ', 'H', 'e', 'r', 'm', 'e', 's', ' ', 'b', 'y', 't', 'e', ' ', 'a', 'r', 'e', 'n', 'a', ' ', 'e', 'x', 'h', 'a', 'u', 's', 't', 'e', 'd', '\0',
   'd', 'e', 'h', 'e', 'r', 'm', ' ', 'S', 't', 'a', 't', 'i', 'c', ' ', 'H', 'e', 'r', 'm', 'e', 's', ' ', 'M', 'a', 't', 'r', 'i', 'x', '4', ' ', 'a', 'r', 'e', 'n', 'a', ' ', 'e', 'x', 'h', 'a', 'u', 's', 't', 'e', 'd', '\0',
   'd', 'e', 'h', 'e', 'r', 'm', ' ', 'S', 't', 'a', 't', 'i', 'c', ' ', 'H', 'e', 'r', 'm', 'e', 's', ' ', 'U', 'R', 'L', ' ', 'a', 'r', 'e', 'n', 'a', ' ', 'e', 'x', 'h', 'a', 'u', 's', 't', 'e', 'd', '\0',
   'd', 'e', 'h', 'e', 'r', 'm', ' ', 'S', 't', 'a', 't', 'i', 'c', ' ', 'H', 'e', 'r', 'm', 'e', 's', ' ', 'v', 'a', 'l', 'u', 'e', ' ', 'a', 'r', 'e', 'n', 'a', ' ', 'e', 'x', 'h', 'a', 'u', 's', 't', 'e', 'd', '\0',
@@ -6783,6 +7090,7 @@ static const char s_ascii_pool[] = {
   'D', 'e', 'h', 'e', 'r', 'm', 'S', 't', 'a', 't', 'i', 'c', 'B', 'o', 'o', 'l', 'e', 'a', 'n', '\0',
   'D', 'e', 'h', 'e', 'r', 'm', 'S', 't', 'a', 't', 'i', 'c', 'N', 'u', 'm', 'b', 'e', 'r', '\0',
   'D', 'e', 'h', 'e', 'r', 'm', 'S', 't', 'a', 't', 'i', 'c', 'S', 't', 'r', 'i', 'n', 'g', '\0',
+  'D', 'e', 'h', 'e', 'r', 'm', 'S', 't', 'a', 't', 'i', 'c', 'B', 'y', 't', 'e', 's', '\0',
   'D', 'e', 'h', 'e', 'r', 'm', 'S', 't', 'a', 't', 'i', 'c', 'H', 'a', 'n', 'd', 'l', 'e', '\0',
   'D', 'e', 'h', 'e', 'r', 'm', 'S', 't', 'a', 't', 'i', 'c', 'D', 'e', 'f', 'o', 'l', 'd', 'V', 'a', 'l', 'u', 'e', '\0',
   'D', 'e', 'h', 'e', 'r', 'm', 'S', 't', 'a', 't', 'i', 'c', 'M', 'a', 't', 'r', 'i', 'x', '4', '\0',
@@ -6795,19 +7103,19 @@ static const char s_ascii_pool[] = {
 };
 static const char16_t s_u16_pool[] = {
 };
-static const uint32_t s_strings[] = {0,6,2777575857,7,8,74774626,16,9,1668253718,26,13,1090592680,40,7,2852975540,48,5,3995229732,54,3,1517149248,58,5,3746588989,64,0,0,65,9,418606366,75,10,2598558186,86,11,542270241,98,12,14918013,111,7,2039772073,119,8,3143415144,128,11,875260141,140,12,3848628808,153,4,2973449445,158,12,1950834621,171,7,1591285202,179,10,3986293789,190,11,1198583161,202,8,3332154807,211,1,124921,213,1,123880,215,1,126939,217,1,121606,219,4,2536968949,224,6,544535830,231,8,1646690229,240,4,228590874,245,10,1132387230,256,5,815906287,262,9,2155634493,272,10,4077459857,283,5,3111565995,289,7,1398931944,297,6,2518018554,304,14,403688404,319,3,1559219837,323,6,1873126728,330,22,1217569823,353,6,1365523450,360,3,3425294037,364,4,2730800004,369,29,4080836436,399,6,363462486,406,6,3375710952,413,10,360288817,424,43,2541086296,468,29,2185678664,498,36,3514056041,535,39,153006240,575,43,933612666,619,67,2526016847,687,43,383840441,731,47,1600383064,779,42,1189713117,822,44,792807176,867,8,3769931196,876,6,2833134064,883,13,3349712479,897,16,1051000336,914,7,2486957223,922,18,2415127017,941,17,1537290460,959,13,2554547181,973,7,1696643977,981,4,3324119240,986,4,3042174909,991,6,335247337,998,8,1896627004,1007,4,1760165818,1012,8,900227884,1021,7,883344422,1029,7,883343417,1037,10,1610699248,1048,77,2313360437,1126,3,3139454919,1130,59,1069277335,1190,58,1469319020,1249,35,3492894506,1285,42,1584342099,1328,44,4113562045,1373,40,2995372205,1414,42,2985577240,1457,49,2701002818,1507,42,759142144,1550,42,57225547,1593,6,615793799,1600,11,1816296010,1612,8,4192897444,1621,28,82423744,1650,16,234932750,1667,18,2027256500,1686,23,2764438776,1710,17,162958042,1728,21,3570374322,1750,16,2505366881,1767,19,1667964955,1787,18,4134083789,1806,18,1445416137,1825,18,3737055413,1844,23,4226065310,1868,19,3162855699,1888,15,1811035537,1904,21,2929101741,1926,17,2884663950,1944,18,1971033735,1963,15,1554126140,1979,19,1232501107,};
+static const uint32_t s_strings[] = {0,6,2777575857,7,8,74774626,16,9,1668253718,26,13,1090592680,40,7,2852975540,48,5,3995229732,54,3,1517149248,58,5,3746588989,64,0,0,65,9,418606366,75,10,2598558186,86,11,542270241,98,12,14918013,111,7,2039772073,119,8,3143415144,128,11,875260141,140,12,3848628808,153,4,2973449445,158,12,1950834621,171,7,1591285202,179,10,3986293789,190,11,1198583161,202,8,3332154807,211,1,124921,213,1,123880,215,1,126939,217,1,121606,219,4,2536968949,224,6,544535830,231,8,1646690229,240,4,228590874,245,10,1132387230,256,5,815906287,262,9,2155634493,272,10,4077459857,283,5,3111565995,289,7,1398931944,297,6,2518018554,304,14,403688404,319,3,1559219837,323,10,487979691,334,11,1772137962,346,6,1873126728,353,22,1217569823,376,6,1365523450,383,3,3425294037,387,4,2730800004,392,29,4080836436,422,6,363462486,429,6,3375710952,436,10,360288817,447,43,2541086296,491,29,2185678664,521,36,3514056041,558,39,153006240,598,43,933612666,642,67,2526016847,710,43,383840441,754,47,1600383064,802,42,1189713117,845,44,792807176,890,8,3769931196,899,6,2833134064,906,13,3349712479,920,16,1051000336,937,7,2486957223,945,18,2415127017,964,17,1537290460,982,13,2554547181,996,7,1696643977,1004,4,3324119240,1009,4,3042174909,1014,6,335247337,1021,8,1896627004,1030,4,1760165818,1035,8,900227884,1044,7,883344422,1052,7,883343417,1060,10,1610699248,1071,47,736605604,1119,77,2313360437,1197,3,3139454919,1201,59,1069277335,1261,58,1469319020,1320,35,3492894506,1356,42,1584342099,1399,38,309850414,1438,41,151326699,1480,44,4113562045,1525,40,2995372205,1566,42,2985577240,1609,49,2701002818,1659,42,759142144,1702,42,57225547,1745,6,615793799,1752,11,1816296010,1764,8,4192897444,1773,28,82423744,1802,16,234932750,1819,18,2027256500,1838,23,2764438776,1862,17,162958042,1880,21,3570374322,1902,16,2505366881,1919,19,1667964955,1939,18,4134083789,1958,18,1445416137,1977,17,302128678,1995,18,3737055413,2014,23,4226065310,2038,19,3162855699,2058,15,1811035537,2074,21,2929101741,2096,17,2884663950,2114,18,1971033735,2133,15,1554126140,2149,19,1232501107,};
 #define CREATE_THIS_UNIT sh_export_deherm_typed_native
 struct UnitData {
   SHUnit unit;
-  SHSymbolID symbol_data[111];
-  SHWritePropertyCacheEntry write_prop_cache_data[36];
-  SHReadPropertyCacheEntry read_prop_cache_data[103];
+  SHSymbolID symbol_data[117];
+  SHWritePropertyCacheEntry write_prop_cache_data[37];
+  SHReadPropertyCacheEntry read_prop_cache_data[108];
   SHPrivateNameCacheEntry private_name_cache_data[0];
   SHCompressedPointer object_literal_class_cache[12];
 };
 SHUnit *CREATE_THIS_UNIT(void) {
   struct UnitData *unit_data = (struct UnitData *)calloc(sizeof(struct UnitData), 1);
-  *unit_data = (struct UnitData){.unit = {.index = &unit_index,.num_symbols =111, .num_write_prop_cache_entries = 36, .num_read_prop_cache_entries = 103, .ascii_pool = s_ascii_pool, .u16_pool = s_u16_pool,.strings = s_strings, .symbols = unit_data->symbol_data,.write_prop_cache = unit_data->write_prop_cache_data,.read_prop_cache = unit_data->read_prop_cache_data, .private_name_cache = unit_data->private_name_cache_data, .obj_key_buffer = s_obj_key_buffer, .obj_key_buffer_size = 102, .literal_val_buffer = s_literal_val_buffer, .literal_val_buffer_size = 82, .obj_shape_table = s_obj_shape_table, .obj_shape_table_count = 12, .object_literal_class_cache = unit_data->object_literal_class_cache, .source_locations = s_source_locations, .source_locations_size = 1, .unit_main = _0_global, .unit_main_info = &s_function_info_table[0], .unit_name = "sh_compiled" }};
+  *unit_data = (struct UnitData){.unit = {.index = &unit_index,.num_symbols =117, .num_write_prop_cache_entries = 37, .num_read_prop_cache_entries = 108, .ascii_pool = s_ascii_pool, .u16_pool = s_u16_pool,.strings = s_strings, .symbols = unit_data->symbol_data,.write_prop_cache = unit_data->write_prop_cache_data,.read_prop_cache = unit_data->read_prop_cache_data, .private_name_cache = unit_data->private_name_cache_data, .obj_key_buffer = s_obj_key_buffer, .obj_key_buffer_size = 102, .literal_val_buffer = s_literal_val_buffer, .literal_val_buffer_size = 82, .obj_shape_table = s_obj_shape_table, .obj_shape_table_count = 12, .object_literal_class_cache = unit_data->object_literal_class_cache, .source_locations = s_source_locations, .source_locations_size = 1, .unit_main = _0_global, .unit_main_info = &s_function_info_table[0], .unit_name = "sh_compiled" }};
   return (SHUnit *)unit_data;
 }
 

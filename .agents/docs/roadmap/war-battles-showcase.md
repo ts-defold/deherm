@@ -440,6 +440,15 @@ Extender, admitted one native client plus 31 browser WebTransport/QUIC clients,
 and reported 152 applied bot snapshots, 387 sent inputs, and nonzero movement
 for all 31 bots before bounded teardown.
 
+The build preflight assembles the project-local typed-native extension after
+`deherm dev` refreshes policy-derived Static Hermes sources and before Bob sees
+the project. The stack therefore cannot package a typed-native manifest bound
+to an older policy generation than the dynamic bundle beside it. The finite
+rerun compiled and linked that extension, registered and evaluated one Static
+Hermes unit, admitted the native client plus 31 Chrome WebTransport/QUIC bots,
+observed 137 bot snapshot applications and 300 bot input sends, and proved
+nonzero movement for all 31 network bots.
+
 Admission now has an explicit client-side commit point. Receiving WELCOME
 builds bounded client state but does not expose `ready` or call gameplay's
 `onWelcome` until the ordered WELCOME_ACK write returns `sent`; controls and

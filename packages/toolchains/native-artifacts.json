@@ -19,10 +19,10 @@
       "builder": "macos-native",
       "status": "vendored",
       "library": "defold/defold_hermes/lib/arm64-osx/libhermes.a",
-      "sha256": "1f4b14518abd242913260cfca068468d8157a74ff91cfb18c7af78c7cb81fa7f",
-      "bytes": 10723928,
+      "sha256": "6633d68072031cd7e35684f828602a3da5839f5bb37b8bfe5c0ddd9d2104bb66",
+      "bytes": 10745416,
       "debugLibrary": "defold/defold_hermes/lib/arm64-osx/libhermes.debug.a",
-      "debugSha256": "535e93f184f06bf5398a5bcf47610054d2add0f51c3fa6f434da0177628aac71",
+      "debugSha256": "32cff979dc1b5e24546715e7ea7a460cbfa1fc4e0d582172b6d4435c11559177",
       "debugBytes": 12324816
     },
     "x86_64-osx": {

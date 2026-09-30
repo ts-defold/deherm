@@ -265,6 +265,15 @@ async function buildPackagedGame(buildServer) {
       },
     },
   );
+  // `deherm dev` may refresh the policy-derived Static Hermes sources. Assemble
+  // the project-local typed-native extension from those exact bytes before Bob
+  // snapshots the project; otherwise an older ext.manifest can describe a unit
+  // built from the previous policy while the dynamic bundle is current.
+  execFileSync(
+    process.execPath,
+    [resolve(exampleRoot, "../../bin/deherm.mjs"), "assemble-typed-native", "--project", "defold"],
+    { cwd: exampleRoot, stdio: "inherit" },
+  );
   const builder = await createDefoldBuilder({
     projectRoot: join(exampleRoot, "defold"),
     buildServer,
