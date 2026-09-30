@@ -4,7 +4,7 @@ title: Runtime log harvesting and the deduplicated bug pool
 description: One shared rejected-diagnostic classifier, a normalized-signature harvester over dev session logs and packaged transcripts, and the evidence boundary that keeps the pool out of conformance rows.
 tags: [research, tooling, dev-loop, diagnostics, evidence, hermes, defold]
 status: verified
-generated: { by: claude/opus-5, at: 2026-09-18T00:00:00-04:00 }
+generated: { by: agent/legacy, at: 2026-09-18T00:00:00-04:00 }
 sources:
   - id: dev-session-log
     resource: tests/fixtures/dev-session-war-battles.log

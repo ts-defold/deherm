@@ -33,6 +33,8 @@
   ],
   "links": {
     "repository": "https://github.com/ts-defold/deherm",
+    "tsDefold": "https://ts-defold.dev/",
+    "discord": "https://discord.gg/eukcq5m",
     "vscode": "https://github.com/ts-defold/deherm/tree/main/editors/vscode",
     "warBattles": "https://github.com/ts-defold/deherm/tree/main/examples/war-battles-online",
     "webTransport": "https://github.com/ts-defold/deherm/tree/main/extensions/defold-webtransport"

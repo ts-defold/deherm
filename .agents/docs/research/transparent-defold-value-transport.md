@@ -4,7 +4,7 @@ title: Transparent Defold value records on the typed-native transport
 description: Pinned dmSDK layout derivation, the Matrix4/URL typed frame lanes, and the structural rule that grew typed-native emission from 138 to 325 routes.
 tags: [bindings, static-hermes, defold-values, abi, layout, transports]
 status: active
-generated: { by: claude/opus-5, at: 2026-09-18T00:00:00-04:00 }
+generated: { by: agent/legacy, at: 2026-09-18T00:00:00-04:00 }
 sources:
   - id: vmath
     resource: upstream/defold/engine/dlib/src/dmsdk/dlib/vmath.h

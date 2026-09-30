@@ -4,7 +4,7 @@ title: Lua registration ground truth
 description: A generated verifier that derives a target's registered Lua surface from its C/C++ sources and diffs it against the declared surface, applied to the pinned Defold engine and to the two ingested third-party extensions.
 tags: [research, bindings, script-api, verification, fail-closed, extensions, engine]
 status: verified-generation
-generated: { by: claude/opus-5, at: 2026-09-18T21:30:00-04:00 }
+generated: { by: agent/legacy, at: 2026-09-18T21:30:00-04:00 }
 sources:
   - id: route-availability
     resource: ../../../scripts/generate-script-route-availability-profiles.mjs

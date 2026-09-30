@@ -1,205 +1,255 @@
 <p align="center">
-  <img src="docs/assets/brand/deherm-wordmark-basalt-heart.png" alt="deherm" width="960">
+  <img src="docs/assets/brand/deherm-wordmark-basalt-heart.png" alt="déherm" width="960">
 </p>
 
-# déherm
+<p align="center">
+  <strong>TypeScript for Defold. Native where it matters.</strong>
+</p>
+
+<p align="center">
+  <a href="https://ts-defold.dev/deherm/docs/">Docs</a> ·
+  <a href="#quick-start">Quick start</a> ·
+  <a href="#how-it-runs">How it runs</a> ·
+  <a href="https://discord.gg/eukcq5m">Discord</a> ·
+  <a href="https://ts-defold.dev/">ts-defold</a>
+</p>
 
 > [!IMPORTANT]
-> **0.1 preview release.** The generated API and independently versioned
-> WebTransport extension are being prepared for their first public release.
-> Content-addressed native artifacts and versioned release ZIPs are immutable;
-> pre-1.0 source compatibility may still change through documented releases.
+> déherm is a **0.1 preview**. The generated API, CLI, editor tools, native
+> artifacts, and standalone WebTransport extension are being hardened for the
+> first public release. Pre-1.0 source compatibility may change between
+> documented releases.
 
-An experimental TypeScript runtime for Defold, backed by Hermes on native
-targets and the browser's JavaScript engine on HTML5.
+déherm lets you build Defold games in TypeScript without treating Lua as the
+only execution target. It generates a project SDK from the exact Defold engine
+revision and native extensions your game uses, then selects the runtime that
+fits the target:
 
-TypeScript 7 owns ordinary project type-checking. The precompiled `dehermc`
-host tool runs the checker-aware déherm transforms and feeds their transformed
-sources into esbuild for the dynamic Hermes/browser bundle, so an installed
-project does not cold-build Go tooling. The product target is TypeScript-owned
-game logic with full generated Defold compatibility. TS-to-Lua remains a
-migration and fallback target, not a requirement for the new runtime.
+- Dynamic Hermes for fast native development and hot reload.
+- Static Hermes plus generated C ABI routes for optimized native builds.
+- The browser's JavaScript engine for HTML5, calling the Defold Wasm engine
+  without embedding Hermes in Wasm.
+- A generated Lua compatibility bridge for Defold script APIs exposed through
+  Lua.
 
-This repository is an actively hardened preview. Start with the
-[knowledge base](.agents/docs/index.md), especially the
-[implementation plan](.agents/docs/plan.md) and
-[runtime strategy](.agents/docs/decisions/runtime-strategy.md).
+The same `.script.ts`, `.gui_script.ts`, and `.render_script.ts` conventions
+produce the Defold proxy resources you attach in the editor. Generated context
+projects keep GUI-only and render-only APIs out of places where Defold does not
+make them available.
 
-Repository boundaries are intentional: `packages/*` contains internal product
-modules that compose the single published `@ts-defold/deherm` package, while
-`examples/*` contains private runnable consumers and integration fixtures.
-Every first-level example is a pnpm workspace package with its own dependencies
-and commands; examples are never included in the public npm artifact.
+## What you get
 
-Private workspace modules use the non-published `@deherm/*` scope and resolve
-directly to their canonical raw sources through the root TypeScript path map.
-The npm-facing scope remains `@ts-defold/deherm`; the two namespaces are
-deliberately independent. `@deherm/project` is reserved for each generated,
-context-filtered Defold project SDK rather than a repository package.
+- A deterministic generator for the Defold Script API, dmSDK, and project
+  native extensions.
+- An idiomatic `@deherm/project` TypeScript surface with generated TSDoc.
+- Typed component properties and Defold editor proxy generation.
+- Literal Defold hashes such as `const fire: DefoldHash = "#fire"`, lowered at
+  compile time when the call site requires a hash.
+- A development TUI with watch mode, build and launch controls, hot-reload
+  state, live logs, runtime telemetry, and profiles.
+- A VS Code language server, source-mapped debugger, inline property lenses,
+  `.cpuprofile` capture, and `.heapsnapshot` capture.
+- Tree-shaken release projections: generation exposes the compatible surface;
+  the final application retains only reachable code.
+- Content-addressed host tools and native libraries downloaded once and reused
+  from the platform-native user cache.
 
-The working developer experience is:
+## Quick start
+
+Create a new game:
 
 ```sh
+pnpm dlx @ts-defold/deherm create my-game --name "My Game"
+cd my-game
+pnpm install
+pnpm dev
+```
+
+Add déherm to a Defold project that already contains `game.project`:
+
+```sh
+pnpm add -D @ts-defold/deherm
+pnpm exec deherm generate
+pnpm exec deherm dev
+```
+
+Running `deherm` with no command opens the project/scaffold TUI. `deherm dev`
+generates when inputs change, type-checks the context projects, bundles the
+application, watches source and assets, and coordinates launch and hot reload.
+The explicit `deherm generate` command is always available for CI and manual
+workflows.
+
+The package is not yet published to npm. Until the first preview release, use
+the [source checkout](#working-on-déherm) and the workspace examples below.
+
+## Write a component
+
+Save this as `src/player.script.ts`:
+
+```ts
+import { defold, defineComponent, go, property, vmath } from "@deherm/project";
+
+interface Player {
+  speed: number;
+}
+
+export default defineComponent({
+  properties: {
+    speed: property.number(180),
+  },
+
+  init(): void {
+    defold.log("info", "TypeScript is running in Defold");
+  },
+
+  update(self: Player, dt: number): void {
+    const position = go.getPosition();
+    go.setPosition(vmath.vector3(position.x + self.speed * dt, position.y, position.z));
+  },
+});
+```
+
+Generation creates `/src/player.script`, which is the proxy attached to a game
+object in Defold. The proxy binds the engine instance to the TypeScript
+component and projects its declared properties into the editor.
+
+## How it runs
+
+| Target | Application code | Engine bridge | Why |
+| --- | --- | --- | --- |
+| Native development | Hermes bytecode | generated JSI/Lua adapters | fast iteration and reload without relinking |
+| Native release | Static Hermes typed subset or dynamic profile | generated direct C ABI plus bounded fallbacks | native code where the reachable shape supports it |
+| HTML5 | bundled browser JavaScript | generated Wasm memory/host adapters | use the browser VM; do not ship a second JS engine |
+
+The policy for a Defold revision carries facts derived from that revision. The
+npm package carries version-independent parsers, recipes, emitters, and runtime
+code. `deherm generate` combines them locally with the extensions in the user's
+project. A new Defold release therefore does not require a new npm release
+unless it introduces a genuinely new language or ABI shape the installed
+compiler cannot represent.
+
+Generated files are owned by the generator. Configure their inputs and rerun
+generation instead of editing the output by hand. Generation is keyed and
+idempotent: unchanged inputs reuse the existing materialization; `deherm
+verify-generated` performs the explicit integrity check.
+
+## The generated API
+
+The generator reads Defold's Script API declarations, Lua registration and
+adapter source, public dmSDK headers and implementations, project configuration,
+and each resolved extension's `.script_api` or public C header. It normalizes
+those inputs into one typed IR and emits declarations, runtime routes, exact-call
+twins, context projects, and verification fixtures from that same source.
+
+The public surface is not reduced merely because a route lacks a heavyweight
+live-engine observation. Every discoverable API remains visible. Generated
+exact-call tests verify symbol names, signatures, argument order, result shape,
+and fail-closed routing; deeper runtime observations are tracked separately so
+generation evidence is never misrepresented as engine-behavior evidence.
+
+Inspect a project with:
+
+```sh
+pnpm exec deherm doctor
+pnpm exec deherm extensions
+pnpm exec deherm typecheck
+pnpm exec deherm verify-generated
+```
+
+## Development tools
+
+The CLI is the control plane:
+
+```sh
+pnpm exec deherm dev              # TUI, watcher, compiler, launcher, HMR
+pnpm exec deherm debug            # Debug Adapter Protocol server
+pnpm exec deherm language-server  # Language Server Protocol server
+pnpm exec deherm profile cpu      # standard Hermes .cpuprofile
+pnpm exec deherm profile heap     # standard Hermes .heapsnapshot
+```
+
+The VS Code extension connects these protocols to breakpoints, evaluation,
+resource-aware completion, live instances, property lenses, and standard
+profile files that can also be opened in existing browser developer tools.
+
+## Measured boundary cost
+
+Current unprofiled Release microbenchmarks over stub providers measure the
+generated transport itself, not Defold engine work:
+
+| Boundary | Median/best | Relative to fastest direct ABI |
+| --- | ---: | ---: |
+| direct generated C ABI | 3.8 ns best | 1.0× |
+| Static Hermes typed-native | 64.6 ns median | 17.0× |
+| complete generated Lua crossing | 283.2 ns median | 74.5× |
+
+The protected Lua call in that fixture costs 211.0 ns by itself; déherm owns a
+70.9 ns median staging and transport layer around it. These are boundary
+measurements, not frame-level game benchmarks. See the
+[documentation site](https://ts-defold.dev/deherm/docs/#performance) for the
+recorded build, host, ranges, and release package sizes.
+
+## Examples
+
+### War Battles Online
+
+[`examples/war-battles-online`](examples/war-battles-online) is the full-stack
+dogfood game: generated script and GUI components, native and HTML5 targets,
+Static Hermes reachability, hot reload, bots, 32-player simulation, network
+impairment tests, browser playability checks, and WebTransport/QUIC with a
+WebSocket fallback.
+
+From a source checkout:
+
+```sh
+pnpm install
+pnpm --dir examples/war-battles-online play
+```
+
+Use `pnpm --dir examples/war-battles-online stack` to launch the local game,
+server, and network-bot stack together.
+
+### Defold WebTransport
+
+[`extensions/defold-webtransport`](extensions/defold-webtransport) is a
+standalone Defold extension for the wider Defold community. It exposes the same
+WebTransport-shaped session, stream, and datagram API to Lua, C/C++, déherm,
+native QUIC targets, and browsers. Its README contains installation, API, and
+minimal-client documentation.
+
+## Working on déherm
+
+Requirements: Node.js, pnpm, a JDK compatible with Defold's Bob tool, CMake,
+Ninja, and a host C/C++ toolchain.
+
+```sh
+git clone https://github.com/ts-defold/deherm.git
+cd deherm
 pnpm install
 pnpm bootstrap
 pnpm doctor
 pnpm check
-pnpm build
-pnpm verify
-pnpm build:release-plan
-pnpm check:static-hermes
-pnpm bench:bindings
-pnpm run:native
-pnpm run:device-dev
-pnpm run:web
-pnpm package:defold
-pnpm bob:version
-pnpm bob:web:bundle
-pnpm test:native-defold:runtime
-pnpm test:native-defold:hot-reload
-pnpm test:static-hermes
-pnpm test:conformance
-pnpm cli
-pnpm cli -- doctor --project defold
-pnpm cli -- extensions --project defold
-pnpm cli -- generate --project defold
-pnpm cli -- verify-generated --project defold
-pnpm cli -- materialize-dmsdk --usage defold/deherm.dmsdk.json --output defold/generated/dmsdk-provider.cpp
 ```
 
-## Project CLI
+`pnpm bootstrap` materializes the revisions pinned in `upstream.lock` and the
+checksum-pinned Bob JAR. Platform artifacts are content-addressed GitHub
+Release downloads; contributors can reuse the published artifact for their
+host or build it locally when changing the native toolchain.
 
-The npm package exposes a `deherm` binary. Its first vertical slice
-discovers native extensions already present in a Defold project, including
-Bob-resolved library ZIPs, and generates a stable inventory, declarations,
-executable TypeScript SDK modules, a TypeScript 7 project, and non-destructive
-VS Code setup from extension `.script_api` metadata:
+Repository layout:
 
-```sh
-pnpm add -D @ts-defold/deherm
-pnpm exec deherm
-pnpm exec deherm doctor
-pnpm exec deherm extensions
-pnpm exec deherm generate
-pnpm exec deherm assemble-typed-native --target arm64-macos
-pnpm exec deherm verify-generated
-```
+- `packages/` — internal source packages composed into `@ts-defold/deherm`.
+- `examples/` — private consumers and integration fixtures.
+- `extensions/` — independently packaged Defold extensions.
+- `editors/vscode/` — VS Code client and language tooling.
+- `defold/` — the native Defold/Hermes extension used by the product.
+- `.agents/docs/` — architecture decisions, evidence, and maintainer knowledge.
 
-The npm package does not bundle platform-specific Hermes libraries or their
-generated target config. Native builds select one Defold bundle target from the
-generated project lock, fetch that target's GitHub Release archive on first
-use, and reuse it from the platform-native per-user déherm cache. The archive
-keeps the release library, debugger library, and `libhermesvm-config.h` from the
-same build together. HTML5 uses the packaged browser-host source adapter and
-does not download Hermes Wasm. Host executables (`hermesc`, `shermes`, and
-`dehermc`) follow the same rule: fetch the current host's release archives on
-first use and reuse the verified user cache.
+## License and community
 
-Running `deherm` without arguments launches the project/scaffold TUI. The
-package has not been published yet; use `pnpm cli -- ...` in this checkout
-until the first release. Public C/C++ headers are included in the
-inventory, but direct native bindings are intentionally marked as requiring a
-versioned ABI and lifetime schema rather than being guessed from syntax alone.
-The generator writes a normalized `bindings.ir.json`; both declarations and
-executable SDK modules consume that IR, including collision-checked camelCase
-names and per-target lowering status.
-`verify-generated` is the explicit slow integrity path: it hashes copied IR,
-validates the canonical plan, and checks package, manifest, and lock identities.
-The generated checker transform is active for release reachability and the
-development bundle. Both paths resolve the authenticated, precompiled
-`dehermc` for the user's host; ordinary TypeScript 7 checking still runs first
-for the generated script-context projects.
+déherm is available under the [MIT License](LICENSE).
 
-`run:native` executes the bundle in embedded Hermes through JSI. `run:web`
-executes that same bundle in the browser, without Hermes in Wasm. The sample
-also exercises a typed `DefoldModules.getEnforcing()` lookup whose native
-implementation is a zero-serialization JSI host function.
-
-`bob:web:bundle` builds the actual Defold `wasm-web` game against local
-Extender. It first emits an IIFE application bundle through `dehermc` and esbuild,
-then stores it as the typed `/deherm/app.dehermc` resource in the game archive. Extender
-automatically links the generated module adapter and hand-written host library under the extension's `lib/web`
-directory as Emscripten JavaScript libraries. The HTML5 extension loads the
-archived application and runs it in the browser VM; no Hermes library is added
-to the default web build. See the [HTML5 bundle decision](.agents/docs/decisions/html5-bundle-and-static-wasm.md)
-for the production loader, development reload, and optional Static Hermes AOT
-profile.
-
-Bob archives whatever `/deherm/app.dehermc` is on disk and relates it to
-nothing, so `deherm verify-bundle` compares that artifact against the sources
-`deherm.lock` records it was built from and names both fingerprints when they
-disagree. It is a hash comparison rather than a rebuild, runs before Bob in
-`scripts/bob.sh`, and needs no network - a build server that only ever runs Bob
-against committed artifacts is checked the same way as a machine that runs
-déherm itself.
-
-`run:device-dev` uses the matching host `hermesc` to produce bytecode and loads
-it in the same runtime binary. Published development tooling must keep the
-compiler and runtime revisions paired because Hermes bytecode is versioned.
-
-Normal development uses precompiled complete bindings: edits only run the
-TypeScript transform/bundle/reload loop. Direct imports such as
-`@deherm/sdk/ExampleMath` are tracked per function. `pnpm
-build:release-plan` emits `dist/sample.usage.json` from the actual tree-shaken
-bundle, then creates reachable-only binding projections under
-`build/profiles/release`. Importing the dynamic `DefoldModules` registry is an
-explicit escape hatch that conservatively retains every binding.
-
-## Binding compiler
-
-`packages/bindings/modules.json` is a validated prototype IR rather than a runtime
-schema. One fast code-generation pass emits:
-
-* TypeScript interfaces and type-inferred module lookups;
-* fixed-width C ABI declarations plus `sizeof`/`offsetof` assertions;
-* eager JSI module objects with direct generated host functions;
-* typed Static Hermes `extern_c` imports;
-* fixed Emscripten/Wasm memory layouts and typed-array codecs.
-
-There is no Embind, JSON marshalling, reflection, or generic native dispatcher
-on the scalar call path. Read the binding rationale and next type-lowering
-steps in [the binding compiler decision](.agents/docs/decisions/binding-compiler.md).
-
-Coverage is tracked against two upstream truths. `pnpm
-generate:sdk-inventory` runs Clang across every public dmSDK header; `pnpm
-generate:script-api-inventory` imports Defold's pinned generated Lua
-annotations. At the current pin this accounts for 121 headers / 2,141 native
-declarations and 40 modules / 2,734 script declarations. These are inventory
-numbers, not a claim that each declaration has a finished runtime lowering.
-The status of every declaration is machine-readable under
-`packages/bindings/generated/` and drift-gated by `pnpm check`.
-
-The current generated execution floor is also machine-readable: all 926 script
-functions and 2,141 dmSDK declarations compile as TypeScript types. One bounded
-universal value-graph ABI covers all 915 stable-ID script routes and composes
-with the specialized scalar, value, tuple, URL, handle, overload, and callback
-families. The canonical plan currently emits 911 profile-available routes for
-Dynamic Hermes, the Lua compatibility bridge, and the browser host; the
-Static Hermes typed-native transport emits the 325 routes that cross no Lua
-closure, no retained engine handle, and only Defold value records whose fixed
-layout is derived from the pinned dmSDK headers.
-The two `luasocket` routes that manufacture captured Lua closures fail closed.
-
-Every one of the 1,361 runtime dmSDK declarations has a deterministic universal
-recipe and stable ID. Release checking resolves every authored call to its
-exact recipe. `deherm materialize-dmsdk` currently turns the 486
-declaration-only universal-ready shapes into tree-shakeable C++ thunks; the
-other 875 remain visible and receive source-located specialization diagnostics
-instead of being silently omitted. It reads the revision-matched catalog materialized at
-`.deherm/ir/dmsdk-universal-bindings.json`; `--catalog` can name that policy
-document explicitly. The package ships the catalog-free algorithm, not a
-Defold-version catalog. This is a complete generation path, not a claim that all
-native engine implementations have already been linked and behavior-tested.
-The native exact-call census compiles, links, and executes all 486 ready wrappers
-against generated recording callees, including target-dependent pointer/integer
-handles; that verifies the bridge contract, not Defold implementation semantics.
-The pinned arm64 macOS Defold engine currently proves selected generated calls,
-a packaged TypeScript GUI component, and a transactional Dynamic-Hermes
-reject/retain/recover reload; unobserved plan rows remain unproven.
-
-Exact upstream revisions live in `upstream.lock`; `pnpm bootstrap`
-materializes ignored working copies and downloads the checksum-pinned Bob JAR.
-The current Defold package is an arm64 macOS proof, not yet a multi-platform
-release. A real native-extension build uploads its build payload to the Defold
-build service, so `pnpm bob:build` and `pnpm bob:bundle` require the
-explicit `DEFOLD_HERMES_ALLOW_REMOTE_BUILD=1` opt-in.
+- [Documentation](https://ts-defold.dev/deherm/docs/)
+- [ts-defold](https://ts-defold.dev/)
+- [GitHub](https://github.com/ts-defold/deherm)
+- [Discord](https://discord.gg/eukcq5m)

@@ -4,7 +4,7 @@ title: Build ICU and fbjni statically per Android ABI instead of using Hermes' J
 description: The Android lane selects the ICU unicode backend with HERMES_PLATFORM_UNICODE=3, builds a filtered static ICU and a trimmed static fbjni for each ABI inside the image, and merges both into libhermes.a.
 tags: [decision, android, hermes, icu, fbjni, unicode, toolchain, native-artifacts]
 status: accepted
-generated: { by: claude/opus-5, at: 2026-09-19T00:00:00-04:00 }
+generated: { by: agent/legacy, at: 2026-09-19T00:00:00-04:00 }
 sources:
   - id: hermes-platform-unicode
     resource: https://github.com/facebook/hermes/blob/static_h/include/hermes/Platform/Unicode/PlatformUnicode.h

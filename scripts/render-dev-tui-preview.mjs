@@ -119,8 +119,21 @@ async function renderPreview({ cols, rows }, output) {
     }),
   );
   const elements = [];
+  const clipDefinitions = [];
+  let openClips = 0;
   for (const operation of result.ops) {
-    if (operation.kind === "fillRect") {
+    if (operation.kind === "pushClip") {
+      const clipId = `clip-${clipDefinitions.length}`;
+      clipDefinitions.push(
+        `<clipPath id="${clipId}"><rect x="${operation.x * cellWidth}" y="${operation.y * cellHeight}" width="${operation.w * cellWidth}" height="${operation.h * cellHeight}"/></clipPath>`,
+      );
+      elements.push(`<g clip-path="url(#${clipId})">`);
+      openClips += 1;
+    } else if (operation.kind === "popClip") {
+      if (openClips === 0) throw new Error("TUI preview renderer received an unmatched popClip operation");
+      elements.push("</g>");
+      openClips -= 1;
+    } else if (operation.kind === "fillRect") {
       elements.push(
         `<rect x="${operation.x * cellWidth}" y="${operation.y * cellHeight}" width="${operation.w * cellWidth}" height="${operation.h * cellHeight}" fill="${color(operation.style?.bg ?? operation.style?.fg, "#11151a")}"/>`,
       );
@@ -137,10 +150,12 @@ async function renderPreview({ cols, rows }, output) {
       );
     }
   }
+  if (openClips !== 0) throw new Error(`TUI preview renderer left ${openClips} clip group(s) open`);
   await writeFile(
     output,
     `<svg xmlns="http://www.w3.org/2000/svg" width="${cols * cellWidth}" height="${rows * cellHeight}" viewBox="0 0 ${cols * cellWidth} ${rows * cellHeight}">
 <rect width="100%" height="100%" rx="12" fill="#080a0c"/>
+<defs>${clipDefinitions.join("")}</defs>
 <style>text { font-family: SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 14px; white-space: pre; }</style>
 ${elements.join("\n")}
 </svg>\n`,

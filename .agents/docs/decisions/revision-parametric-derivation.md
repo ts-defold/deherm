@@ -4,7 +4,7 @@ title: Derive another revision in a scratch workspace, never in the checkout
 description: The generated surface is written to fixed repository paths for one revision, so deriving another one happens in a materialised workspace whose committed surface is proven untouched, and reviewed inputs are audited against that revision before anything runs.
 tags: [decision, generator, policy, derivation, reproducibility, ci]
 status: accepted
-generated: { by: claude/opus-5, at: 2026-09-19T12:00:00-04:00 }
+generated: { by: agent/legacy, at: 2026-09-19T12:00:00-04:00 }
 sources:
   - id: layered-cache
     resource: ./layered-api-policy-cache.md

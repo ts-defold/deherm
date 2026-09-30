@@ -4,7 +4,7 @@ title: Generate, report, open issues - a generator never refuses
 description: Every documented route is emitted. A route the generator cannot verify ships marked unverified, with a generated test, an issue, and a doc annotation, because a refusal tells a user nothing and costs hand-written code at every Defold release.
 tags: [decision, generator, policy, verification, derivation, product]
 status: accepted
-generated: { by: claude/opus-5, at: 2026-09-19T14:00:00-04:00 }
+generated: { by: agent/legacy, at: 2026-09-19T14:00:00-04:00 }
 sources:
   - id: revision-parametric
     resource: ./revision-parametric-derivation.md

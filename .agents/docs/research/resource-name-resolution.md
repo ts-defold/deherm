@@ -4,7 +4,7 @@ title: Resource name resolution from Defold project files
 description: Defold resource declarations and separate project-authored message evidence feed one deterministic symbol table without pretending message ids are resource declarations.
 tags: [research, defold, ttsc, compiler, diagnostics, language-service]
 status: active
-generated: { by: claude/opus-5, at: 2026-09-18T21:30:00-04:00 }
+generated: { by: agent/legacy, at: 2026-09-18T21:30:00-04:00 }
 sources:
   - id: defold-protos
     resource: ../../../upstream/defold/engine

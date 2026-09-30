@@ -1,110 +1,220 @@
-# Defold WebTransport release source
+# WebTransport for Defold
 
-This directory is the source boundary for the independently versioned Defold
-WebTransport extension. Run:
+`defold_webtransport` gives Defold games real
+[WebTransport](https://www.w3.org/TR/webtransport/) sessions over HTTP/3 and
+QUIC:
 
-```sh
-pnpm package:defold-webtransport
+- unreliable, unordered datagrams for realtime state;
+- reliable bidirectional and unidirectional byte streams;
+- native macOS, iOS, Linux, Windows, and Android clients;
+- browser-hosted WebTransport on HTML5 builds;
+- an event-driven Lua API that works without déherm; and
+- a Web-standard TypeScript facade when déherm is present.
+
+It is transport infrastructure, not a game protocol. Your application owns
+packet framing, versioning, authentication, rate limits, and routing.
+
+## Install
+
+Add the release ZIP to your Defold `game.project`, then choose
+**Project → Fetch Libraries**:
+
+```ini
+[project]
+dependencies#0 = https://github.com/ts-defold/deherm/releases/download/defold-webtransport-v0.1.0/defold-webtransport-0.1.0.zip
 ```
 
-to create `build/releases/defold-webtransport-<version>.zip`. The ZIP is an
-ordinary Defold library dependency: it contains a root `game.project` and the
-`defold_webtransport/` extension directory, and it does not depend on déherm.
-`VERSION` controls this asset's version independently of the monorepo package.
+The same dependency supports Lua-only and déherm projects. Lua users do not
+need the npm package.
 
-For local dogfood, run `pnpm stage:defold-webtransport`. The command emits the
-same ZIP and materializes its exact root layout at
-`build/defold-webtransport-dogfood/`; the staged files and archived files come
-from the same normalized member map.
+## Minimal Lua client
 
-## Public surfaces
+WebTransport requires HTTPS. Native version 0.1 also requires exactly one
+SHA-256 certificate pin. The pin value is the 32 raw digest bytes, not its
+printable hex representation.
 
-The TypeScript-facing package presents one WebTransport-shaped facade. In a
-native Defold build, the installed provider supplies that facade; in a browser
-build, it delegates to the browser's native `WebTransport`. Application code
-does not branch on the target. Handles, polling, queue envelopes, and provider
-registration are implementation details rather than public gameplay APIs.
-Native does not assume DOM Web Streams: the generated facade owns bounded
-structural streams and registers its frame drain internally. Native 0.1
-requires exactly one SHA-256 certificate pin; browser delegation can use normal
-browser root trust.
+```lua
+local function decode_hex(value)
+    assert(#value == 64, "certificate hash must be 64 hexadecimal characters")
+    return (value:gsub("..", function(pair)
+        return string.char(assert(tonumber(pair, 16), "invalid certificate hash"))
+    end))
+end
 
-The HTML5 backend prefers the current Candidate Recommendation datagram
-factory, `transport.datagrams.createWritable()`, and retains
-`transport.datagrams.writable` for older Deno/browser implementations. Safari
-26.4 introduced WebTransport, but browser feature presence is not an end-to-end
-interop guarantee: applications should exercise the datagram and stream shapes
-they require. On browsers with no usable WebTransport implementation, session
-creation fails explicitly; the extension never disguises WebSocket or WebRTC
-as QUIC. The application owns routing and fallback policy.
-`defold_webtransport/webtransport/public-api-compatibility.json` records the
-versioned required waist and the Candidate Recommendation members reserved for
-additive implementation; it is not a second native method catalog.
+local function on_webtransport_event(self, event)
+    if event.type == "ready" then
+        print("WebTransport ready")
+        assert(defold_webtransport.send_datagram(self.session, "player input"))
+        assert(defold_webtransport.create_bidirectional_stream(self.session))
 
-The Lua surface remains idiomatic and event-driven. It models WebTransport
-sessions, bidirectional and unidirectional streams, datagrams, readiness, and
-close/error events. It does not expose War Battles-specific reliable-channel
-operations.
+    elseif event.type == "stream" and not event.incoming then
+        -- A requested stream is now writable. true sends FIN.
+        assert(defold_webtransport.write(event.stream, "reliable hello", true))
 
-Lua documentation and editor completion are shipped through
-`defold_webtransport/script/defold_webtransport.script_api`. Native consumers
-may integrate through the versioned public C descriptor under
-`defold_webtransport/include/defold_webtransport/`; déherm consumes that seam
-additively through
-`defold_webtransport/webtransport/defold-hermes.bindings.json`, but is not
-required to install or use the extension.
+    elseif event.type == "datagram" then
+        print("datagram: " .. event.data)
 
-`client.h` is the ergonomic callback C API. Advanced runtimes and provider
-authors may instead consume the stable `native_v1.h` handle/poll ABI; that
-single explicitly low-level header is not the recommended application API.
-Release packaging fails closed unless the HTML5 backend and every native
-library declared by `ext.manifest` have been staged.
+    elseif event.type == "data" then
+        print("stream data: " .. event.data)
+        if event.fin then print("peer finished this stream") end
 
-The repository includes `examples/defold-webtransport-minimal`: an ordinary
-Lua Defold client and a tiny Deno QUIC/WebTransport echo server. It exercises
-datagrams and a bidirectional stream without installing déherm or importing
-War Battles protocol code.
+    elseif event.type == "reset" or event.type == "stop_sending" then
+        print(event.type .. ": " .. event.code)
 
-## Native artifacts
+    elseif event.type == "close" then
+        print("closed: " .. event.code .. " " .. (event.reason or ""))
+    end
+end
 
-Native archives are published independently under the content-addressed tag
-reported by `node scripts/manage-defold-webtransport-artifacts.mjs
-release-metadata`. There is one immutable ZIP per native target declared by
-`ext.manifest`; each ZIP embeds the full input fingerprint plus a digest and
-byte count for every bundled library. The standalone versioned release first
-downloads and verifies every target archive, stages them into a clean source
-tree, and only then runs the strict extension packager. A source checkout with
-no native archives is therefore useful for development but cannot accidentally
-be published as an installable release.
+function init(self)
+    self.session = defold_webtransport.connect("https://127.0.0.1:4443/echo", {
+        server_certificate_hashes = {{
+            algorithm = "sha-256",
+            value = decode_hex("PASTE_64_CHARACTER_CERTIFICATE_SHA256_HERE"),
+        }},
+        anticipated_incoming_unidirectional_streams = 4,
+        anticipated_incoming_bidirectional_streams = 4,
+    }, on_webtransport_event)
+end
 
-For a target-local Bob build, stage a verified archive without committing it:
-
-```sh
-node scripts/manage-defold-webtransport-artifacts.mjs stage \
-  --target arm64-osx \
-  --archive build/native-assets/defold-webtransport-native-arm64-osx.zip \
-  --output build/defold-webtransport-native-overlay
-DEHERM_WEBTRANSPORT_ARTIFACT_ROOT=build/defold-webtransport-native-overlay \
-  deherm generate --project examples/war-battles-online/defold
+function final(self)
+    if self.session then
+        defold_webtransport.close(self.session, 0, "game object deleted")
+    end
+end
 ```
 
-`DEHERM_WEBTRANSPORT_ARTIFACT_ROOT` is resolved from the command's working
-directory; `[defold_webtransport] artifacts = ...` is resolved from the Defold
-project directory. The command above is therefore exact when run at the
-repository root.
+Callbacks run on Defold's main thread and retain the originating script
+instance as `self`.
 
-Ordinary npm consumers do not need this repository-only staging command.
-`deherm generate` reads the extension's ABI-bound
-`webtransport/native-artifacts.json`, selects the current host's native target,
-downloads its immutable release ZIP, verifies the exact member set and every
-digest, caches it in déherm's platform-native user cache (shared by projects),
-and installs only the inventoried libraries. `DEHERM_CACHE_HOME` remains the
-explicit cache override. Set `[defold_webtransport] artifact_target = web` (or
-`DEHERM_WEBTRANSPORT_ARTIFACT_TARGET=web`) for an explicitly web-only project;
-otherwise macOS, Linux, and Windows hosts deterministically select their Defold
-native target without committing machine-specific configuration.
+## Lua API
 
-The managed project copy overlays only the verified target libraries, and its
-identity includes the artifact manifest and tree hashes. Bob uploads only the
-selected bundle target's extension context; release assembly remains stricter
-and always requires all native targets.
+### Sessions
+
+| Function | Result | Purpose |
+| --- | --- | --- |
+| `connect(url, options, callback)` | session userdata | Start an HTTPS WebTransport session. `options` may be `nil`. |
+| `close(session, close_code?, reason?)` | — | Request a clean application close. |
+| `max_datagram_size(session)` | number | Maximum outgoing datagram bytes; `0` before ready or when unavailable. |
+
+`options` accepts:
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `server_certificate_hashes` | array of `{ algorithm, value }` | Certificate pins. Native 0.1 requires exactly one `sha-256` pin. |
+| `anticipated_incoming_unidirectional_streams` | integer | Expected incoming unidirectional stream count. |
+| `anticipated_incoming_bidirectional_streams` | integer | Expected incoming bidirectional stream count. |
+
+### Datagrams and streams
+
+| Function | Result | Purpose |
+| --- | --- | --- |
+| `send_datagram(session, bytes)` | boolean | Queue one unreliable datagram. |
+| `create_bidirectional_stream(session)` | boolean | Request a bidirectional stream; receive it later in a `stream` event. |
+| `create_unidirectional_stream(session)` | boolean | Request an outgoing stream; receive it later in a `stream` event. |
+| `write(stream, bytes, fin?)` | boolean | Queue bytes, optionally finishing the sending direction. |
+| `reset_stream(stream, code?)` | boolean | Abort the stream's sending direction. |
+| `stop_sending(stream, code?)` | boolean | Ask the peer to stop its sending direction. |
+
+A `false` result means bounded native backpressure rejected the operation.
+Keep your application state and retry later. Oversized datagrams are also
+rejected.
+
+### Callback events
+
+Every event has `type`, `session`, `code`, `fin`, `bidirectional`,
+and `incoming`. Relevant events also carry `stream`, binary-string `data`,
+or `reason`.
+
+| `event.type` | Meaning |
+| --- | --- |
+| `ready` | The session is ready for streams and datagrams. |
+| `stream` | An incoming stream arrived or a requested outgoing stream opened. |
+| `data` | Stream bytes arrived; `fin` marks the peer's final bytes. |
+| `datagram` | One unreliable datagram arrived. |
+| `reset` | The peer reset a stream. |
+| `stop_sending` | The peer asked this endpoint to stop sending. |
+| `close` | The session closed or connection setup failed. |
+
+Defold editor completion ships in
+`defold_webtransport/script/defold_webtransport.script_api`.
+
+## TypeScript with déherm
+
+Déherm discovers the extension from the Defold project and generates one
+WebTransport-shaped facade for native and HTML5 targets:
+
+```ts
+import { WebTransport } from "@deherm/project";
+
+const certificate = Uint8Array.from(/* 32 SHA-256 bytes */);
+const transport = new WebTransport("https://127.0.0.1:4443/echo", {
+  serverCertificateHashes: [{ algorithm: "sha-256", value: certificate }],
+  anticipatedConcurrentIncomingUnidirectionalStreams: 4,
+  anticipatedConcurrentIncomingBidirectionalStreams: 4,
+});
+
+await transport.ready;
+
+const datagrams = transport.datagrams.writable.getWriter();
+await datagrams.write(new TextEncoder().encode("player input"));
+
+const stream = await transport.createBidirectionalStream();
+const writer = stream.writable.getWriter();
+await writer.write(new TextEncoder().encode("reliable hello"));
+await writer.close();
+
+const reader = stream.readable.getReader();
+for (;;) {
+  const packet = await reader.read();
+  if (packet.done) break;
+  console.log(new TextDecoder().decode(packet.value));
+}
+```
+
+Native targets use the bounded extension provider. HTML5 delegates to the
+browser's `WebTransport`. Application code does not need a target branch.
+
+## Run the echo example
+
+[`examples/defold-webtransport-minimal`](../../examples/defold-webtransport-minimal)
+contains an ordinary Lua client and a small Deno HTTP/3/WebTransport echo
+server. It has no déherm dependency.
+
+```sh
+cd examples/defold-webtransport-minimal
+pnpm install
+pnpm cert
+# Copy the printed certificate_sha256 into main/client.script.
+pnpm server
+```
+
+Open that directory in Defold, fetch libraries, and run the game. The client
+sends a datagram and a bidirectional stream; the server echoes both.
+
+## Target and trust behavior
+
+- Native 0.1 requires one explicit SHA-256 certificate pin.
+- HTML5 uses the browser implementation and security model.
+- Unsupported browsers fail explicitly. The extension never disguises a
+  WebSocket or WebRTC fallback as WebTransport.
+- Your application owns fallback, matchmaking, reconnection, and protocol
+  compatibility policy.
+
+Native artifacts are selected, downloaded, digest-verified, and cached by
+déherm for déherm projects. Lua users receive target libraries in the versioned
+Defold extension ZIP.
+
+## C and C++ extensions
+
+Include `defold_webtransport/client.h` for the same callback-driven session,
+stream, and datagram operations without Lua or déherm. Event payload storage is
+borrowed and valid only during the callback. The lower-level
+`defold_webtransport/native_v1.h` provider ABI is intended for language
+runtimes; game extensions should normally prefer `client.h`.
+
+## License
+
+The extension is MIT licensed. Picoquic, picotls, Mbed TLS, and bundled
+cryptographic dependencies retain their own licenses. Releases include
+`licenses/THIRD_PARTY_NOTICES.md` and the complete license texts.

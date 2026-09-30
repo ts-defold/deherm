@@ -4,7 +4,7 @@ title: Measured binding-transport overhead
 description: Compile-time-switched DEHERM_PROFILE telemetry, the generated per-route transport spans behind it, the measured cost of the Lua bridge against a raw-Lua baseline, and the contract-sized frame that took the typed-native transport from 733-773 ns to 43-68 ns.
 tags: [telemetry, performance, bindings, transports, lua, profiling, measurement, frame-sizing, memory]
 status: host-harness-measured-engine-unverified
-generated: { by: claude/opus-5, at: 2026-09-18T20:45:00-04:00 }
+generated: { by: agent/legacy, at: 2026-09-18T20:45:00-04:00 }
 sources:
   - id: dm-profile
     resource: ../../../upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h

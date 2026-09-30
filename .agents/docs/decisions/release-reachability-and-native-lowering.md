@@ -4,7 +4,7 @@ title: Take release reachability from ttsc, and lower reachable code to native
 description: The checker resolves which API symbols a project actually calls; release builds emit only those, and the reachable surface is progressively lowered from bytecode to extern_c native code.
 tags: [decision, reachability, tree-shaking, ttsc, static-hermes, release, performance]
 status: accepted
-generated: { by: claude/opus-5, at: 2026-09-18T22:40:00-04:00 }
+generated: { by: agent/legacy, at: 2026-09-18T22:40:00-04:00 }
 sources:
   - id: build-seam
     resource: ./toolchain-distribution-and-build-seam.md

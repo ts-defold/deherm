@@ -4,7 +4,7 @@ title: Cache source-derived API policies in layers, keyed by content hash
 description: Extract the registered Lua surface from C source once, ship and commit the result as a hash-keyed policy, and reparse only when no policy matches.
 tags: [decision, generator, cache, extensions, script-api, reproducibility]
 status: proposed
-generated: { by: claude/opus-5, at: 2026-09-18T23:10:00-04:00 }
+generated: { by: agent/legacy, at: 2026-09-18T23:10:00-04:00 }
 sources:
   - id: product-contract
     resource: ./generator-product-contract.md

@@ -4,7 +4,7 @@ title: Publish precompiled target libraries and host tools, and emit C into the 
 description: CI builds Hermes per target and host tools per host, publishes them as release artifacts, and the portable CLI downloads only the selected rows into a per-user cache before Bob or Extender consumes them.
 tags: [decision, packaging, toolchain, bob, extender, static-hermes, ci]
 status: accepted
-generated: { by: claude/opus-5, at: 2026-09-18T23:50:00-04:00 }
+generated: { by: agent/legacy, at: 2026-09-18T23:50:00-04:00 }
 sources:
   - id: build-input
     resource: ../../../upstream/defold/share/extender/build_input.yml

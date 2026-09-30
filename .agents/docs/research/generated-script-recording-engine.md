@@ -4,7 +4,7 @@ title: Generated script recording engine
 description: A generated null/observer Defold that asserts, records, and replays every callable script route through the real binding stack over each drivable transport.
 tags: [bindings, verification, transports, jsi, static-hermes, browser, contracts]
 status: active
-generated: { by: claude/opus-5, at: 2026-09-18T18:40:00-04:00 }
+generated: { by: agent/legacy, at: 2026-09-18T18:40:00-04:00 }
 sources:
   - id: canonical-plan
     resource: ./canonical-lowering-plan.md

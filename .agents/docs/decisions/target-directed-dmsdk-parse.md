@@ -4,7 +4,7 @@ title: Parse the dmSDK under a declared, platform-neutral environment, never the
 description: The declaration inventory is taken with an explicit clang triple and a digest-pinned sysroot, in an assignment where no platform branch is taken, so a Linux runner and a macOS laptop derive the same policy root; which target gets which declaration is answered separately from the same declared macro assignment.
 tags: [decision, generator, dmsdk, derivation, reproducibility, ci, policy]
 status: accepted
-generated: { by: claude/opus-5, at: 2026-09-19T12:00:00-04:00 }
+generated: { by: agent/legacy, at: 2026-09-19T12:00:00-04:00 }
 sources:
   - id: revision-parametric-derivation
     resource: ./revision-parametric-derivation.md

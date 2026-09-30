@@ -247,7 +247,7 @@ admitted with continuous telemetry for more than 60 seconds. The long native
 run is a manual loopback observation; the checked artifacts retain their
 narrower packaged-runtime and short real-WebTransport claims.
 
-Claude's read-only adversarial review first identified the cancel-during-create,
+A read-only adversarial review first identified the cancel-during-create,
 post-ACK tracking, high-RTT history, fallback-queue, persistent-lane, and visual
 evidence-contract risks. Each accepted transport claim now has a targeted
 regression. The VS Code observation was not silently re-recorded: a migration

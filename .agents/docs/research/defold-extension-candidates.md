@@ -4,7 +4,7 @@ title: Real Defold extension candidates for the War Battles showcase
 description: Survey of the published Defold asset ecosystem against deherm's ingestion paths, platform requirements, license provenance, and pinnability, with a recommended adoption order and the generator gaps real extensions expose.
 tags: [research, extensions, ecosystem, war-battles, script-api, header-ingestion, html5, provenance]
 status: active
-generated: { by: claude/opus-5, at: 2026-09-18T00:00:00-04:00 }
+generated: { by: agent/legacy, at: 2026-09-18T00:00:00-04:00 }
 sources:
   - id: asset-portal
     resource: https://github.com/defold/asset-portal/tree/17a1f3d8a3f50e7840fbb6677465d1cb7799a15e

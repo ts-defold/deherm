@@ -4,7 +4,7 @@ title: Real third-party extension ingestion and the `.script_api` blocker taxono
 description: End-to-end ingestion of the published xMath and defold-astar extensions at pinned revisions, the four projection defects real `.script_api` files exposed, the fail-closed blocker taxonomy that replaced silent degradation, and the new blocker families the ecosystem's own spelling conventions surfaced.
 tags: [research, extensions, script-api, ingestion, blockers, provenance, fail-closed]
 status: verified-ingestion
-generated: { by: claude/opus-5, at: 2026-09-18T00:00:00-04:00 }
+generated: { by: agent/legacy, at: 2026-09-18T00:00:00-04:00 }
 sources:
   - id: candidate-survey
     resource: defold-extension-candidates.md

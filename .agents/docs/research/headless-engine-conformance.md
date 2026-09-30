@@ -4,7 +4,7 @@ title: Headless Defold conformance harness
 description: Defold's null backends, headless bundle variant, and in-process engine driving API, and what they change about how binding conformance should be proven.
 tags: [research, defold, conformance, headless, verification]
 status: verified-runtime
-generated: { by: claude/opus-5, at: 2026-09-18T23:40:00-04:00 }
+generated: { by: agent/legacy, at: 2026-09-18T23:40:00-04:00 }
 sources:
   - id: defold-engine-api
     resource: upstream/defold/engine/engine/src/engine.h

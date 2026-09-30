@@ -4,7 +4,7 @@ title: The API policy artifact and its content-addressed static site
 description: The per-namespace policy subtrees derived for the pinned Defold revision, the emitted v1 site, the CI that publishes it, and the determinism boundaries that remain.
 tags: [policy, cache, distribution, ci, reproducibility, toolchain]
 status: verified
-generated: { by: claude/opus-5, at: 2026-09-18T00:00:00-04:00 }
+generated: { by: agent/legacy, at: 2026-09-18T00:00:00-04:00 }
 sources:
   - id: layered-policy
     resource: ../decisions/layered-api-policy-cache.md
