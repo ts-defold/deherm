@@ -48,7 +48,7 @@ import { createHash } from "node:crypto";
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 
-import { releaseIntegrityAssetName } from "../../packages/cli/src/release-integrity.mjs";
+import { releaseIntegrityAssetName } from "../../packages/cli/src/release-integrity-name.mjs";
 import { fileURLToPath } from "node:url";
 
 import { serializeObject } from "../../packages/compiler/src/api-policy.mjs";
@@ -68,6 +68,7 @@ export const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.met
  */
 const archivePackager = "toolchains/hermes/package-archive.sh";
 const publisherIntegrityInputs = Object.freeze([
+  "packages/cli/src/release-integrity-name.mjs",
   "packages/cli/src/release-integrity.mjs",
   "scripts/generate-release-integrity.mjs",
   "scripts/ci/upload-release-asset.sh",

@@ -152,6 +152,19 @@ test("numeric slots resolve back to the canonical build row", async () => {
   assert.throws(() => describeBuildRow(plan, "android=9"), /has no slot 9/u);
 });
 
+test("pre-install row resolution does not import the archive verifier", async () => {
+  const [planner, releases, naming] = await Promise.all([
+    readFile("scripts/plan-native-artifact-builds.mjs", "utf8"),
+    readFile("scripts/lib/artifact-releases.mjs", "utf8"),
+    readFile("packages/cli/src/release-integrity-name.mjs", "utf8"),
+  ]);
+  assert.match(planner, /release-integrity-name\.mjs/u);
+  assert.match(releases, /release-integrity-name\.mjs/u);
+  assert.doesNotMatch(planner, /from ["'][^"']*release-integrity\.mjs["']/u);
+  assert.doesNotMatch(releases, /from ["'][^"']*release-integrity\.mjs["']/u);
+  assert.doesNotMatch(naming, /from ["'](?:fflate|yaml|semver)["']/u);
+});
+
 test("pre-checkout runner slot maps agree with the planner", async () => {
   const plan = await planNativeArtifactBuilds();
   const workflow = await readFile(".github/workflows/native-artifacts.yml", "utf8");

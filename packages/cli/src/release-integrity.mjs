@@ -7,16 +7,11 @@ import { promisify } from "node:util";
 
 import { unzipSync } from "fflate";
 
+export { releaseIntegrityAssetName } from "./release-integrity-name.mjs";
+
 const execFileAsync = promisify(execFile);
 const DIGEST = /^[0-9a-f]{64}$/u;
 export const RELEASE_INTEGRITY_KIND = "deherm.release-asset-integrity";
-
-export function releaseIntegrityAssetName(asset) {
-  if (!/^[A-Za-z0-9][A-Za-z0-9._-]*$/u.test(asset ?? "")) {
-    throw new Error(`Invalid release asset ${JSON.stringify(asset)}`);
-  }
-  return `${asset}.integrity.json`;
-}
 
 export function sha256(bytes) {
   return createHash("sha256").update(bytes).digest("hex");

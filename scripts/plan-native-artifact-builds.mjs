@@ -16,7 +16,7 @@
 import { appendFile, readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 
-import { releaseIntegrityAssetName } from "../packages/cli/src/release-integrity.mjs";
+import { releaseIntegrityAssetName } from "../packages/cli/src/release-integrity-name.mjs";
 import { publishedAssets, repositoryRoot } from "./lib/artifact-releases.mjs";
 
 const targetExecutors = Object.freeze({
