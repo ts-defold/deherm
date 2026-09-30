@@ -188,12 +188,34 @@ remains an immediate read from its predicted/reconciled world, with positional
 and angular reconciliation error decaying over the same bounded 100 ms window.
 The preceding frame delta is consumed before a pending snapshot is installed,
 so a new segment or correction is first rendered at alpha zero.
+When one snapshot is late, remote motion extrapolates for at most one advertised
+snapshot cadence and then freezes; the next sample rebases from the pose that
+was actually presented. Local hull, turret, game object, and camera now consume
+one caller-owned predicted transform, so reconciliation cannot detach those
+views from one another.
 Defold tank components consume this caller-owned sample, while a failed dial,
 pre-welcome reject, or pre-welcome close returns to the offline `PlayableBattle`
 that was created at arena start.
 This is presentation smoothing and connection fallback evidence; compact
 snapshots and reconnect-after-welcome are now covered by focused in-process
 evidence; the broader multiplayer release gate remains open.
+
+Diagnostic full-stack runs deliberately disable authoritative server-bot
+backfill. Their health surface reports `networkClients`, `serverBots`, and
+`idleSlots` separately, and a disconnected browser controller leaves an idle
+slot which coasts to a bounded stop. This makes closing the bot dashboard an
+observable failure instead of silently replacing every departed browser bot
+with an indistinguishable in-process controller. Production servers retain
+server-bot backfill by default. A complete 32-slot local run has observed one
+native Defold WebTransport client plus 31 independent Chromium WebTransport
+clients with `serverBots=0` and `idleSlots=0`.
+
+Tank/on-foot changes remain authoritative lifecycle transitions: tank
+destruction emits eject, an ejection lock prevents immediate reacquisition,
+and reaching a depot emits exactly one tank-acquired event. Focused simulation
+evidence rejects spontaneous mode oscillation. Normal game launches are
+stationary; the scripted tutorial tour is enabled only by the explicit
+`war_battles.demo=1` runtime-evidence configuration.
 
 ## Real browser WebTransport tranche
 

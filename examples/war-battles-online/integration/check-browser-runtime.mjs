@@ -200,6 +200,9 @@ async function run() {
   const { client, pageUrl, profile } = page;
 
   try {
+    await client.send("Page.addScriptToEvaluateOnNewDocument", {
+      source: "globalThis.__warBattlesConfigV1 = { ...(globalThis.__warBattlesConfigV1 ?? {}), demo: true };",
+    });
     const loaded = client.waitForEvent("Page.loadEventFired");
     await client.send("Page.navigate", { url: pageUrl });
     await loaded;

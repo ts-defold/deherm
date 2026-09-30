@@ -21,6 +21,7 @@ import {
   SNAPSHOT_BYTES,
   SNAPSHOT_BASE_HISTORY_FRAMES,
   TICK_MILLISECONDS,
+  VELOCITY_SCALE,
 } from "./constants.ts";
 import { isWeaponId, isWeaponUpgradeId } from "./content.ts";
 import { clamp, createDirection, normalizeInto, type Direction } from "./fixed.ts";
@@ -228,6 +229,8 @@ export class BattleClient implements TransportReceiver {
   private readonly remoteCurrentHullY = new Int16Array(MAX_PLAYERS);
   private readonly remoteCurrentTurretX = new Int16Array(MAX_PLAYERS);
   private readonly remoteCurrentTurretY = new Int16Array(MAX_PLAYERS);
+  private readonly remoteCurrentVelocityX = new Int32Array(MAX_PLAYERS);
+  private readonly remoteCurrentVelocityY = new Int32Array(MAX_PLAYERS);
   private readonly remoteHaveSample = new Uint8Array(MAX_PLAYERS);
   private readonly remoteGeneration = new Uint16Array(MAX_PLAYERS);
   private readonly remoteMode = new Uint8Array(MAX_PLAYERS);
@@ -388,6 +391,11 @@ export class BattleClient implements TransportReceiver {
     const alpha = this.remoteInterpolationAlpha();
     output.x = interpolate(this.remotePreviousX[slot]!, this.remoteCurrentX[slot]!, alpha);
     output.y = interpolate(this.remotePreviousY[slot]!, this.remoteCurrentY[slot]!, alpha);
+    const extrapolationTicks = this.remoteExtrapolationTicks();
+    if (extrapolationTicks > 0) {
+      output.x += Math.trunc((this.remoteCurrentVelocityX[slot]! * extrapolationTicks) / VELOCITY_SCALE);
+      output.y += Math.trunc((this.remoteCurrentVelocityY[slot]! * extrapolationTicks) / VELOCITY_SCALE);
+    }
     interpolateDirectionInto(
       this.remotePreviousHullX[slot]!,
       this.remotePreviousHullY[slot]!,
@@ -423,7 +431,7 @@ export class BattleClient implements TransportReceiver {
     // that may have arrived anywhere inside that interval; a new correction or
     // remote segment must begin at alpha zero on its first render.
     this.remoteInterpolationMilliseconds = Math.min(
-      TICK_MILLISECONDS * this.remoteInterpolationTicks,
+      TICK_MILLISECONDS * this.remoteInterpolationTicks * 2,
       this.remoteInterpolationMilliseconds + Math.max(0, elapsedMilliseconds),
     );
     this.decayLocalCorrection(elapsedMilliseconds);
@@ -830,6 +838,11 @@ export class BattleClient implements TransportReceiver {
       if (haveSample && !lifecycleChanged) {
         presentedX = interpolate(this.remotePreviousX[slot]!, this.remoteCurrentX[slot]!, alpha);
         presentedY = interpolate(this.remotePreviousY[slot]!, this.remoteCurrentY[slot]!, alpha);
+        const extrapolationTicks = this.remoteExtrapolationTicks();
+        if (extrapolationTicks > 0) {
+          presentedX += Math.trunc((this.remoteCurrentVelocityX[slot]! * extrapolationTicks) / VELOCITY_SCALE);
+          presentedY += Math.trunc((this.remoteCurrentVelocityY[slot]! * extrapolationTicks) / VELOCITY_SCALE);
+        }
         interpolateDirectionInto(
           this.remotePreviousHullX[slot]!,
           this.remotePreviousHullY[slot]!,
@@ -868,6 +881,8 @@ export class BattleClient implements TransportReceiver {
       this.remoteCurrentHullY[slot] = world.playerHullY[slot]!;
       this.remoteCurrentTurretX[slot] = world.playerTurretX[slot]!;
       this.remoteCurrentTurretY[slot] = world.playerTurretY[slot]!;
+      this.remoteCurrentVelocityX[slot] = world.playerVelocityX[slot]!;
+      this.remoteCurrentVelocityY[slot] = world.playerVelocityY[slot]!;
       this.remoteGeneration[slot] = generation;
       this.remoteMode[slot] = mode;
       if (!haveSample || lifecycleChanged) {
@@ -901,6 +916,21 @@ export class BattleClient implements TransportReceiver {
 
   private remoteInterpolationAlpha(): number {
     return Math.min(1, this.remoteInterpolationMilliseconds / (TICK_MILLISECONDS * this.remoteInterpolationTicks));
+  }
+
+  /**
+   * A missing snapshot may extend the latest trajectory for at most one
+   * advertised snapshot window. After that the remote actor freezes at the
+   * bounded estimate rather than running unbounded through walls. The next
+   * snapshot rebases from this exact presented position, so recovery does not
+   * introduce a second teleport.
+   */
+  private remoteExtrapolationTicks(): number {
+    const interpolationMilliseconds = TICK_MILLISECONDS * this.remoteInterpolationTicks;
+    return Math.min(
+      this.remoteInterpolationTicks,
+      Math.max(0, (this.remoteInterpolationMilliseconds - interpolationMilliseconds) / TICK_MILLISECONDS),
+    );
   }
 
   private advanceOneTick(): void {

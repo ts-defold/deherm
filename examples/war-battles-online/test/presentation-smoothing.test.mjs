@@ -10,6 +10,7 @@ import {
   SNAPSHOT_BYTES,
   TICK_MILLISECONDS,
   TRANSPORT_CHANNEL_SNAPSHOT,
+  VELOCITY_SCALE,
   createInMemoryTransportPair,
   compactNetworkSnapshot,
   writeNetworkSnapshotKeyframe,
@@ -140,6 +141,43 @@ test("remote lifecycle changes hard-snap and directions interpolate across the s
   client.samplePlayerTransform(remoteSlot, respawned);
   assert.equal(respawned.x, server.world.playerX[remoteSlot]);
   assert.equal(client.stats.remoteLifecycleHardSnaps, 1);
+  assert.deepEqual(errors, []);
+  server.close();
+});
+
+test("a stalled remote snapshot extrapolates one bounded cadence and then freezes", async () => {
+  const { client, errors, server } = await join();
+  const raw = new Uint8Array(SNAPSHOT_BYTES);
+  const network = new Uint8Array(NETWORK_SNAPSHOT_BYTES);
+  const frame = new Uint8Array(NETWORK_SNAPSHOT_MESSAGE_BYTES);
+  const remoteSlot = client.playerId === 1 ? 1 : 0;
+
+  server.world.playerX[remoteSlot] = 1_000;
+  server.world.playerVelocityX[remoteSlot] = 2 * VELOCITY_SCALE;
+  deliverKeyframe(client, server.world, 3, raw, network, frame);
+  client.update(0);
+
+  server.world.playerX[remoteSlot] = 1_006;
+  deliverKeyframe(client, server.world, 6, raw, network, frame);
+  client.update(0);
+  client.update(TICK_MILLISECONDS * 3);
+  const atLatestSnapshot = transform();
+  client.samplePlayerTransform(remoteSlot, atLatestSnapshot);
+  assert.equal(atLatestSnapshot.x, 1_006);
+
+  client.update(TICK_MILLISECONDS * 1.5);
+  const extrapolated = transform();
+  client.samplePlayerTransform(remoteSlot, extrapolated);
+  assert.equal(extrapolated.x, 1_009, "velocity carries the remote tank through a short snapshot stall");
+
+  client.update(TICK_MILLISECONDS * 30);
+  const bounded = transform();
+  client.samplePlayerTransform(remoteSlot, bounded);
+  assert.equal(bounded.x, 1_012, "extrapolation stops after one advertised snapshot cadence");
+  client.update(TICK_MILLISECONDS * 30);
+  const stillBounded = transform();
+  client.samplePlayerTransform(remoteSlot, stillBounded);
+  assert.equal(stillBounded.x, bounded.x);
   assert.deepEqual(errors, []);
   server.close();
 });

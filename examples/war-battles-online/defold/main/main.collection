@@ -37,12 +37,12 @@ instances {
     id: "player"
     properties {
       id: "demo"
-      value: "1.0"
+      value: "0.0"
       type: PROPERTY_TYPE_NUMBER
     }
     properties {
       id: "tour"
-      value: "10.0"
+      value: "0.0"
       type: PROPERTY_TYPE_NUMBER
     }
     properties {

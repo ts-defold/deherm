@@ -82,6 +82,8 @@ export interface MatchServerOptions {
   /** Ticks between authoritative snapshots. 6 is 10 Hz at a 60 Hz tick. */
   readonly snapshotIntervalTicks?: number;
   readonly botSkill?: number;
+  /** Whether unclaimed roster slots are driven by authoritative server bots. */
+  readonly fillVacantSlotsWithBots?: boolean;
   readonly teams?: boolean;
   /** Tick inputs accepted from one session per tick before it is throttled. */
   readonly inputBudgetPerTick?: number;
@@ -105,7 +107,15 @@ export interface MatchServerOptions {
 
 export interface MatchServerStats {
   tick: number;
+  /** Connected transports which currently own a roster slot. */
+  networkClients: number;
+  /** Vacant slots currently driven by the authoritative server bot brain. */
+  serverBots: number;
+  /** Vacant slots deliberately left idle instead of being masked by a fallback bot. */
+  idleSlots: number;
+  /** @deprecated Use networkClients. Retained for health API compatibility. */
   humans: number;
+  /** @deprecated Use serverBots. Retained for health API compatibility. */
   bots: number;
   snapshotsSent: number;
   snapshotBytesSent: number;
@@ -148,6 +158,7 @@ export class MatchServer {
   readonly rosterSize: number;
   readonly snapshotIntervalTicks: number;
   readonly botSkill: number;
+  readonly fillVacantSlotsWithBots: boolean;
   readonly teams: boolean;
   readonly inputBudgetPerTick: number;
   readonly resumeGraceTicks: number;
@@ -174,6 +185,9 @@ export class MatchServer {
 
   readonly stats: MatchServerStats = {
     tick: 0,
+    networkClients: 0,
+    serverBots: 0,
+    idleSlots: 0,
     humans: 0,
     bots: 0,
     snapshotsSent: 0,
@@ -192,6 +206,7 @@ export class MatchServer {
     this.rosterSize = clampInteger(options.rosterSize ?? 8, 2, MAX_PLAYERS);
     this.snapshotIntervalTicks = clampInteger(options.snapshotIntervalTicks ?? 6, 1, 30);
     this.botSkill = clampInteger(options.botSkill ?? 2, 0, 3);
+    this.fillVacantSlotsWithBots = options.fillVacantSlotsWithBots ?? true;
     this.teams = options.teams ?? false;
     this.inputBudgetPerTick = clampInteger(options.inputBudgetPerTick ?? 8, 1, 64);
     this.resumeGraceTicks = clampInteger(options.resumeGraceTicks ?? TICK_RATE * 30, 1, MAX_TICK_SPAN);
@@ -220,8 +235,9 @@ export class MatchServer {
     for (let index = 0; index < SNAPSHOT_BASE_HISTORY_FRAMES; index += 1) {
       this.snapshotBuffers.push(new Uint8Array(SNAPSHOT_BYTES));
     }
-    // Every slot is occupied from the first tick; a joining human takes one over
-    // from a bot, so a match is never empty and never changes size mid-round.
+    // Every slot exists from the first tick. Production matches normally fill
+    // vacancies with server bots; diagnostic stacks can leave them idle so a
+    // disconnected network controller cannot be mistaken for a working one.
     for (let playerId = 1; playerId <= this.rosterSize; playerId += 1) {
       this.world.addPlayer(playerId, this.teams ? (playerId <= this.rosterSize / 2 ? 1 : 2) : 0);
       this.world.setBotSkill(playerId, this.botSkill);
@@ -247,7 +263,7 @@ export class MatchServer {
     for (let playerId = 1; playerId <= this.rosterSize; playerId += 1) {
       const slot = playerId - 1;
       if (this.world.playerActive[slot] === 0) continue;
-      if (this.slotOwner[slot] !== undefined) continue;
+      if (this.slotOwner[slot] !== undefined || !this.fillVacantSlotsWithBots) continue;
       this.botCommand.playerId = playerId;
       this.bots.stage(this.world, this.botCommand, playerId, tick);
       this.world.submitInput(this.botCommand);
@@ -392,8 +408,13 @@ export class MatchServer {
   }
 
   private refreshStats(): void {
-    this.stats.humans = this.countHumans();
-    this.stats.bots = this.rosterSize - this.stats.humans;
+    const networkClients = this.countHumans();
+    const vacant = this.rosterSize - networkClients;
+    this.stats.networkClients = networkClients;
+    this.stats.serverBots = this.fillVacantSlotsWithBots ? vacant : 0;
+    this.stats.idleSlots = this.fillVacantSlotsWithBots ? 0 : vacant;
+    this.stats.humans = networkClients;
+    this.stats.bots = this.stats.serverBots;
   }
 
   private broadcastSnapshot(): void {

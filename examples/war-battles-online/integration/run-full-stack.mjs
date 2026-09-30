@@ -85,6 +85,10 @@ try {
     String(options.roster),
     "--bot-skill",
     String(options.skill),
+    // This stack exists to prove the browser controllers. A disconnected
+    // browser bot must become visibly idle, not be replaced by an
+    // indistinguishable authoritative fallback bot.
+    "--idle-vacant-slots",
   ]);
   await waitFor(
     async () =>
@@ -149,8 +153,9 @@ try {
       if (!response?.ok) return false;
       const health = await response.json();
       return (
-        health.stats?.humans === options.bots + 1 &&
-        health.stats?.bots === options.roster - options.bots - 1 &&
+        health.stats?.networkClients === options.bots + 1 &&
+        health.stats?.serverBots === 0 &&
+        health.stats?.idleSlots === options.roster - options.bots - 1 &&
         health.stats?.inputsAccepted > 0 &&
         saw(game, `war-battles:arena-engaged:players=${options.roster}:`)
       );
@@ -158,7 +163,9 @@ try {
     `${options.roster}-player native presentation and authoritative input`,
     game,
   );
-  console.log(`war-battles-stack:ready:game=1:bots=${options.bots}:server=${webTransportUrl}`);
+  console.log(
+    `war-battles-stack:ready:game=1:network-bots=${options.bots}:server-bots=0:idle=${options.roster - options.bots - 1}:server=${webTransportUrl}`,
+  );
   console.log(`war-battles-stack:dashboard:${dashboardUrl}`);
   if (options.exitWhenReady) {
     console.log(

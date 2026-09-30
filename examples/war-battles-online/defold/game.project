@@ -35,3 +35,6 @@ app = /deherm/app.dehermc
 [defold_webtransport]
 version = 0.1.0
 source = ../../../extensions/defold-webtransport/defold_webtransport
+
+[war_battles]
+demo = 0

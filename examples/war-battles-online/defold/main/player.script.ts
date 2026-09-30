@@ -6,6 +6,7 @@ import {
   hashLiteral,
   msg,
   property,
+  sys,
   vmath,
   type DefoldHash,
   type OnInputAction,
@@ -18,6 +19,7 @@ import {
   PLAYER_MODE_INFANTRY,
   PLAYER_MODE_TANK,
   chassisById,
+  type PlayerTransform,
 } from "../src/generated-war-battles/index";
 
 const UP = hashLiteral("#up");
@@ -97,6 +99,20 @@ interface PlayerSelf {
   z: number;
   chassis: number;
   mode: number;
+  transform: PlayerTransform;
+}
+
+interface WarBattlesPlayerGlobals {
+  __warBattlesConfigV1?: { demo?: boolean };
+}
+
+function scriptedDemoEnabled(): boolean {
+  const browserConfigured = (globalThis as unknown as WarBattlesPlayerGlobals).__warBattlesConfigV1?.demo === true;
+  // Defold's documented command-line override form uses numeric 0/1 values.
+  // Read the project setting through the matching integer accessor so
+  // `--config=war_battles.demo=1` cannot be mistaken for the literal boolean
+  // spelling expected by `sys.get_config_boolean`.
+  return browserConfigured || sys.getConfigInt("war_battles.demo", 0) === 1;
 }
 
 function isMappedPlayerAction(actionId: DefoldHash): boolean {
@@ -186,6 +202,13 @@ export default defineComponent({
   },
 
   init(self: PlayerSelf): void {
+    // The tutorial tour is an explicit evidence/demo mode, never normal
+    // gameplay. This keeps deterministic runtime gates without making a real
+    // player's tank drive itself on launch.
+    if (scriptedDemoEnabled()) {
+      self.demo = 1;
+      self.tour = 10;
+    }
     self.direction = vmath.vector3(0, 0, 0);
     self.aim = vmath.vector3(1, 0, 0);
     self.speed = SPEED;
@@ -206,6 +229,7 @@ export default defineComponent({
     self.z = position.z;
     self.chassis = 0;
     self.mode = -1;
+    self.transform = { x: 0, y: 0, hullX: 0, hullY: 0, turretX: 0, turretY: 0 };
     msg.post("#hero", "disable");
     defold.log("info", `war-battles:player-init:${position.x.toFixed(1)}:${position.y.toFixed(1)}`);
   },
@@ -223,10 +247,14 @@ export default defineComponent({
 
   update(self: PlayerSelf, dt: number): void {
     self.elapsed += dt;
+    const match = arenaMatch();
+    // Online admission engages the arena before this component sees player
+    // input. Follow that authoritative transition instead of continuing the
+    // old scripted tour over the live networked tank.
+    if (!self.engaged && match?.engaged) engage(self);
 
     if (self.engaged) {
       pushControls(self);
-      const match = arenaMatch();
       const world = match?.world;
       const slot = match === undefined ? -1 : match.localSlot;
       if (world === undefined || slot < 0) return;
@@ -253,10 +281,11 @@ export default defineComponent({
       } else if (mode === PLAYER_MODE_TANK && chassisChanged) {
         msg.post("#sprite", "play_animation", { id: CHASSIS_ANIMATIONS[chassisById(chassis).id - 1]! });
       }
-      const x = pixelX(world.playerX[slot]!);
-      const y = pixelY(world.playerY[slot]!);
+      if (!(match?.samplePlayerTransform(slot, self.transform) ?? false)) return;
+      const x = pixelX(self.transform.x);
+      const y = pixelY(self.transform.y);
       go.setPosition(vmath.vector3(x, y, self.z));
-      const facing = directionRadians(world.playerHullX[slot]!, world.playerHullY[slot]!);
+      const facing = directionRadians(self.transform.hullX, self.transform.hullY);
       go.setRotation(vmath.quatRotationZ(facing + (mode === PLAYER_MODE_INFANTRY ? Math.PI / 2 : 0)));
       msg.post(CAMERA, "player_at", { x, y });
       return;

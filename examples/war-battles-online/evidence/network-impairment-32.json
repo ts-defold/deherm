@@ -308,8 +308,8 @@
       "path": "examples/war-battles-online/core",
       "kind": "tree",
       "fileCount": 24,
-      "bytes": 451599,
-      "sha256": "1b1a1ba9ed699576ae2a4fd219368c1d41bddc8969e0e6f315a74a1b85d7ed20"
+      "bytes": 454371,
+      "sha256": "927a0691897b8cd2f503277569aaeb4ab872ab11fb2eb69c8abf975bc7e5e077"
     },
     {
       "path": "examples/war-battles-online/integration/authoritative-load-harness.ts",
@@ -338,14 +338,14 @@
     {
       "path": "package.json",
       "kind": "file",
-      "bytes": 54777,
-      "sha256": "66cc92195d06340f874dbc1d272c21938fa488f98fb24c7f84d85861efa9fa88"
+      "bytes": 54800,
+      "sha256": "4cd3e9384eaa640071c4da2a5c92d2a73b5448f4c78e788d7264c7d7c4d07d6f"
     },
     {
       "path": "pnpm-lock.yaml",
       "kind": "file",
-      "bytes": 94115,
-      "sha256": "38cac917340b6ae482f268bd2f4b4491662602793e2b2ad61ba23addc4911e86"
+      "bytes": 105409,
+      "sha256": "ffe932f2e731fb9fbe05f21cf7558bf938fd4e34b668537e3bd496b0bdd07df3"
     },
     {
       "path": "examples/war-battles-online/integration/network-impairment-matrix.ts",
@@ -360,5 +360,5 @@
       "sha256": "f1d6b752f1eb4b956bd2784eb59cea113e6643a2e70ba9c613fea1344b590734"
     }
   ],
-  "sourceKey": "8c84af815f4baff7d277f86460ae22dde62a9e9476efc96bef60085a25460c44"
+  "sourceKey": "06c8d13f95be25d7a5c961817435581187e28ef0c08a974fba818d99127a444d"
 }

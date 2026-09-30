@@ -34,6 +34,7 @@ import {
   INPUT_BUNDLE_MAX_COMMANDS,
   INPUT_PACKET_BYTES,
   INPUT_SEND_INTERVAL_TICKS,
+  INFANTRY_EJECT_LOCK_TICKS,
   MAP_HEIGHT,
   MAP_WIDTH,
   MAX_PICKUPS,
@@ -66,6 +67,7 @@ import {
   TRANSPORT_CHANNEL_SESSION,
   TRANSPORT_CHANNEL_SNAPSHOT,
   UPGRADE_DAMAGE,
+  VELOCITY_SCALE,
   WEAPON_UPGRADE_CANNON_BLAST,
   WEAPON_UPGRADE_CANNON_PIERCER,
   WELCOME_BYTES,
@@ -1084,6 +1086,34 @@ test("an on-foot pilot acquires a replacement tank at a depot and snapshots pres
   assert.equal(acquired, true);
 });
 
+test("a pilot cannot oscillate between infantry and tank without authoritative lifecycle events", () => {
+  const world = new BattleWorld(77);
+  world.addPlayer(1);
+  const slot = 0;
+  const depot = world.nearestTankDepot(1);
+  world.playerMode[slot] = PLAYER_MODE_INFANTRY;
+  world.playerHealth[slot] = 24;
+  world.playerRespawnTicks[slot] = INFANTRY_EJECT_LOCK_TICKS;
+  world.playerX[slot] = world.map.spawnX[depot];
+  world.playerY[slot] = world.map.spawnY[depot];
+
+  for (let tick = 1; tick < INFANTRY_EJECT_LOCK_TICKS; tick += 1) {
+    world.step();
+    assert.equal(world.playerMode[slot], PLAYER_MODE_INFANTRY, `tick ${tick} must remain on foot`);
+  }
+  world.step();
+  assert.equal(world.playerMode[slot], PLAYER_MODE_TANK, "the unlocked pilot acquires one replacement tank");
+
+  let acquisitions = 0;
+  const event = createBattleEvent();
+  for (let sequence = world.events.oldest(); sequence < world.events.sequence; sequence += 1) {
+    if (world.events.read(sequence, event) && event.kind === EVENT_TANK_ACQUIRED) acquisitions += 1;
+  }
+  assert.equal(acquisitions, 1);
+  for (let tick = 0; tick < INFANTRY_EJECT_LOCK_TICKS * 2; tick += 1) world.step();
+  assert.equal(world.playerMode[slot], PLAYER_MODE_TANK, "no unauthorised mode transition may follow acquisition");
+});
+
 test("a moving hostile tank can run over an on-foot pilot", () => {
   const world = new BattleWorld(77);
   world.addPlayer(1, 1);
@@ -1879,7 +1909,70 @@ test("playable orchestration is deterministic and supports restart and upgrades"
 
 test("authoritative stats expose the initial bot roster before first admission", () => {
   const server = new MatchServer({ rosterSize: 8 });
-  assert.deepEqual({ humans: server.stats.humans, bots: server.stats.bots }, { humans: 0, bots: 8 });
+  assert.deepEqual(
+    {
+      networkClients: server.stats.networkClients,
+      serverBots: server.stats.serverBots,
+      idleSlots: server.stats.idleSlots,
+      humans: server.stats.humans,
+      bots: server.stats.bots,
+    },
+    { networkClients: 0, serverBots: 8, idleSlots: 0, humans: 0, bots: 8 },
+  );
+  server.close();
+});
+
+test("diagnostic matches leave disconnected network slots idle instead of masking them with server bots", async () => {
+  const errors = [];
+  const server = new MatchServer({
+    rosterSize: 2,
+    fillVacantSlotsWithBots: false,
+    snapshotIntervalTicks: 1,
+    onError: (error) => errors.push(error),
+  });
+  assert.deepEqual(
+    {
+      networkClients: server.stats.networkClients,
+      serverBots: server.stats.serverBots,
+      idleSlots: server.stats.idleSlots,
+    },
+    { networkClients: 0, serverBots: 0, idleSlots: 2 },
+  );
+  const client = join(server, "observable-network-bot", errors);
+  await settleUntil(() => client.state === "ready", "diagnostic bot admission");
+  client.setControls({ moveX: 1, moveY: 0, fire: false });
+  for (let tick = 0; tick < 12; tick += 1) {
+    client.update(TICK_MILLISECONDS);
+    await settle();
+    server.step();
+    await settle();
+  }
+  const slot = client.playerId - 1;
+  const movingX = server.world.playerX[slot];
+  client.close(1_000, "dashboard closed");
+  assert.deepEqual(
+    {
+      networkClients: server.stats.networkClients,
+      serverBots: server.stats.serverBots,
+      idleSlots: server.stats.idleSlots,
+    },
+    { networkClients: 0, serverBots: 0, idleSlots: 2 },
+  );
+  let coastTicks = 0;
+  while (
+    (Math.trunc(server.world.playerVelocityX[slot] / VELOCITY_SCALE) !== 0 ||
+      Math.trunc(server.world.playerVelocityY[slot] / VELOCITY_SCALE) !== 0) &&
+    coastTicks < 300
+  ) {
+    server.step();
+    coastTicks += 1;
+  }
+  assert.ok(coastTicks < 300, "a disconnected controller must not drive the slot indefinitely");
+  const stoppedX = server.world.playerX[slot];
+  for (let tick = 0; tick < 30; tick += 1) server.step();
+  assert.equal(server.world.playerX[slot], stoppedX, "a vacated slot must coast to a stop and remain stopped");
+  assert.notEqual(stoppedX, movingX, "the input hold may finish its bounded coast before stopping");
+  assert.deepEqual(errors, []);
   server.close();
 });
 

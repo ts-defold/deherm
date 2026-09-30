@@ -84,6 +84,21 @@ if (arguments_.has("--check-sources")) {
   process.exit(0);
 }
 
+// `deherm dev --once` intentionally stops after compiling and mirroring the
+// current bundle; Bob is the separate step which archives that mirror. Refuse
+// to launch (or record evidence for) an archive that still contains a prior
+// bundle fingerprint. The fingerprint is an ASCII banner in both the source
+// resource and its uncompressed Defold archive entry.
+const bundleSource = await readFile(resolve(exampleRoot, "defold/build/default/deherm/app.dehermc"), "utf8");
+const bundleFingerprint = bundleSource.match(/__DEFOLD_HERMES_BUILD_FINGERPRINT__\s*=\s*"([0-9a-f]{64})"/u)?.[1];
+if (bundleFingerprint === undefined) throw new Error("Packaged bundle source has no deherm build fingerprint");
+const archiveBytes = await readFile(resolve(exampleRoot, "defold/build/default/game.arcd"));
+if (!archiveBytes.includes(Buffer.from(bundleFingerprint, "ascii"))) {
+  throw new Error(
+    `Defold archive does not contain current deherm bundle ${bundleFingerprint}; run a full Bob build before packaged runtime evidence`,
+  );
+}
+
 const artifacts = await Promise.all(artifactPaths.map((path) => sha256Artifact(repositoryRoot, path)));
 
 if (arguments_.has("--check-evidence")) {
@@ -130,6 +145,7 @@ let result;
 try {
   result = await runPackagedRuntimeEvidence({
     command: engine,
+    args: ["--config=war_battles.demo=1"],
     cwd: runtimeCwd,
     timeoutMs,
     settleMs,

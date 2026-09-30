@@ -270,6 +270,8 @@ test("the built project is the arena, and the mockup stays out of the build", as
   assert.match(inputBinding, /input: MOUSE_BUTTON_1[\s\S]*action: "deploy"/);
   assert.match(playerSource, /actionId === DEPLOY/);
   assert.match(playerSource, /msg\.post\(UI, "deploy"\)/);
+  assert.match(playerSource, /sys\.getConfigInt\("war_battles\.demo", 0\) === 1/);
+  assert.match(playerSource, /__warBattlesConfigV1\?\.demo === true/);
   assert.match(playerSource, /msg\.post\(ARENA, "restart"\)/);
   assert.match(arenaSource, /war-battles:arena-restart:round=/);
   assert.match(arenaSource, /sound\.play\(url\)/);

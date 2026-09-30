@@ -72,6 +72,7 @@ function parseArguments(argv: readonly string[]): Options {
     keyPath: "server/certs/localhost.key",
     rosterSize: 8,
     botSkill: 2,
+    fillVacantSlotsWithBots: true,
     snapshotIntervalTicks: 6,
     teams: false,
     worldCheckpointIntervalTicks: TICK_RATE,
@@ -101,6 +102,8 @@ function parseArguments(argv: readonly string[]): Options {
     } else if (argument === "--bot-skill") {
       (options as { botSkill: number }).botSkill = integer(value, argument);
       index += 1;
+    } else if (argument === "--idle-vacant-slots") {
+      (options as { fillVacantSlotsWithBots: boolean }).fillVacantSlotsWithBots = false;
     } else if (argument === "--snapshot-interval") {
       (options as { snapshotIntervalTicks: number }).snapshotIntervalTicks = integer(value, argument);
       index += 1;
@@ -304,6 +307,7 @@ export async function main(argv: readonly string[]): Promise<void> {
     matchId,
     rosterSize,
     botSkill: options.botSkill,
+    fillVacantSlotsWithBots: options.fillVacantSlotsWithBots,
     snapshotIntervalTicks: options.snapshotIntervalTicks,
     teams: options.teams,
     resumeKey,
@@ -456,7 +460,9 @@ export async function main(argv: readonly string[]): Promise<void> {
   console.log(`war-battles-server:listening:https://${options.hostname}:${options.port}`);
   console.log(`war-battles-server:health:http://${options.hostname}:${options.healthPort}`);
   console.log(`war-battles-server:certificate-sha256:${digest}`);
-  console.log(`war-battles-server:roster:${options.rosterSize}:bots:${options.botSkill}`);
+  console.log(
+    `war-battles-server:roster:${options.rosterSize}:bots:${options.botSkill}:vacancies=${options.fillVacantSlotsWithBots ? "server-bot" : "idle"}`,
+  );
 
   // A fixed-step loop driven by wall clock, so a slow tick does not make the
   // match run slow: it makes the next wake-up do more.
