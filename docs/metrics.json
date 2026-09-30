@@ -199,8 +199,8 @@
   "sourceInputs": [
     {
       "path": "package.json",
-      "bytes": 54777,
-      "sha256": "66cc92195d06340f874dbc1d272c21938fa488f98fb24c7f84d85861efa9fa88"
+      "bytes": 54800,
+      "sha256": "4cd3e9384eaa640071c4da2a5c92d2a73b5448f4c78e788d7264c7d7c4d07d6f"
     },
     {
       "path": "packages/bindings/generated/defold-script-api-accounting.json",
