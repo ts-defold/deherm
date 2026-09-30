@@ -191,13 +191,19 @@ test("tarball publisher integrity runs before workspace dependencies are install
   // fflate import therefore reproduces the artifact runner's pre-install
   // failure, while the package-dependency-free tar path remains usable.
   const isolatedIntegrity = await import(pathToFileURL(path.join(isolated, "release-integrity.mjs")).href);
-  const integrity = await isolatedIntegrity.buildReleaseIntegrity({
-    family: "native-artifacts",
-    tag: "libs-0123456789ab",
-    fingerprint: "0123456789ab".padEnd(64, "0"),
-    asset,
-    archive,
-  });
+  const originalPath = process.env.PATH;
+  process.env.PATH = "";
+  const integrity = await isolatedIntegrity
+    .buildReleaseIntegrity({
+      family: "native-artifacts",
+      tag: "libs-0123456789ab",
+      fingerprint: "0123456789ab".padEnd(64, "0"),
+      asset,
+      archive,
+    })
+    .finally(() => {
+      process.env.PATH = originalPath;
+    });
   assert.deepEqual(
     integrity.members.map(({ name }) => name),
     ["libhermes.a"],
@@ -243,6 +249,16 @@ test("the download side refuses nested archive members before extraction", async
   await writeFile(path.join(nested, "libhermes.a"), "nested archive contents");
   const archive = path.join(directory, "nested.tar.gz");
   await execFileAsync("tar", ["-czf", archive, "-C", directory, "nested/libhermes.a"]);
+  await assert.rejects(
+    buildReleaseIntegrity({
+      family: "native-artifacts",
+      tag: "libs-0123456789ab",
+      fingerprint: "0123456789ab".padEnd(64, "0"),
+      asset: path.basename(archive),
+      archive,
+    }),
+    /not a flat release archive/u,
+  );
   await assert.rejects(
     extractReleaseArchive({ archive, destination: path.join(directory, "unpacked") }),
     /not a non-empty flat release archive/u,

@@ -6,8 +6,8 @@
   "releaseAsset": "https://github.com/ts-defold/deherm/releases/download/{tag}/{asset}",
   "families": {
     "hermes-host": {
-      "tag": "hermes-564000e85dfd",
-      "fingerprint": "564000e85dfd9a8bd80a872b117f6451a70c0e6605bb3cd9c79949cb573c76c3",
+      "tag": "hermes-4e285d845536",
+      "fingerprint": "4e285d845536280998364cd901d538ccc1345de7ad443860d017fff3fdef99d0",
       "indexedBy": "host",
       "summary": "hermesc and shermes, per user host",
       "assets": {
@@ -41,8 +41,8 @@
       }
     },
     "dehermc": {
-      "tag": "tools-e6284a986192",
-      "fingerprint": "e6284a9861926e32ca0533b2af4aa22b0054c04e9a7ff19599f3d98149e0e63f",
+      "tag": "tools-947589f92cad",
+      "fingerprint": "947589f92cad5aa04bb3babcbbccd7f35bc33462da5350ebb168a750c26a7c7f",
       "indexedBy": "host",
       "summary": "dehermc, déherm's TypeScript transform compiler, per user host",
       "assets": {
@@ -71,8 +71,8 @@
       }
     },
     "native-artifacts": {
-      "tag": "libs-3c9bb8b828b1",
-      "fingerprint": "3c9bb8b828b1fe6b4099fea39e8aa4d82114b04fe0173faac6c5d7d29eefa239",
+      "tag": "libs-db900fc9f9d8",
+      "fingerprint": "db900fc9f9d8000427e944b544916b6277ab0a8f58034c52c25a0843b73a4ec9",
       "indexedBy": "bundleTarget",
       "summary": "Hermes release/debug libraries plus generated target config, per Defold bundle target",
       "assets": {

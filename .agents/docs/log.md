@@ -4711,3 +4711,15 @@ Defold WebTransport package suite passes 75/75. The publisher module is a
 fingerprinted input, so the general and WebTransport release identities were
 regenerated rather than changing behavior beneath an immutable tag. Platform
 publication remains unclaimed until the new Actions matrices complete.
+
+That matrix then reached publication on every POSIX host, while the Windows
+host-compiler row failed in three seconds before the uploader's retry loop. The
+remaining platform dependency was Node spawning the host `tar` executable to
+inspect the archive. Tarball integrity now uses an in-process, bounded ustar
+reader: it gunzips with Node, validates every header checksum and octal member
+size, accepts only flat regular files, rejects truncated members or incomplete
+terminators, and hashes the exact member bytes without a subprocess or scratch
+extraction. The isolated pre-install test clears `PATH` while authenticating a
+real tarball, and a nested-member fixture now proves the publisher rejects a
+non-flat archive before release. The resulting platform releases remain
+unclaimed until the next matrix completes.

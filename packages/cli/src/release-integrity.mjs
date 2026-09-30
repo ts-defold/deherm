@@ -1,18 +1,90 @@
 import { createHash } from "node:crypto";
-import { execFile } from "node:child_process";
-import { mkdtemp, readFile, readdir, rm } from "node:fs/promises";
-import { tmpdir } from "node:os";
+import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
-import { promisify } from "node:util";
+import { gunzipSync } from "node:zlib";
 
 export { releaseIntegrityAssetName } from "./release-integrity-name.mjs";
 
-const execFileAsync = promisify(execFile);
 const DIGEST = /^[0-9a-f]{64}$/u;
+const TAR_BLOCK_BYTES = 512;
+const TAR_CHECKSUM_OFFSET = 148;
+const TAR_CHECKSUM_BYTES = 8;
 export const RELEASE_INTEGRITY_KIND = "deherm.release-asset-integrity";
 
 export function sha256(bytes) {
   return createHash("sha256").update(bytes).digest("hex");
+}
+
+function tarText(block, offset, length) {
+  const field = block.subarray(offset, offset + length);
+  const terminator = field.indexOf(0);
+  return field.subarray(0, terminator < 0 ? field.length : terminator).toString("utf8");
+}
+
+function tarOctal(block, offset, length, fieldName, archiveName) {
+  const value = tarText(block, offset, length).trim();
+  if (value === "") return 0;
+  if (!/^[0-7]+$/u.test(value)) throw new Error(`${archiveName} has an invalid tar ${fieldName}`);
+  const parsed = Number.parseInt(value, 8);
+  if (!Number.isSafeInteger(parsed) || parsed < 0) {
+    throw new Error(`${archiveName} has an out-of-range tar ${fieldName}`);
+  }
+  return parsed;
+}
+
+function isZeroBlock(block) {
+  return block.every((value) => value === 0);
+}
+
+function validateTarChecksum(block, archiveName) {
+  const expected = tarOctal(block, TAR_CHECKSUM_OFFSET, TAR_CHECKSUM_BYTES, "checksum", archiveName);
+  let observed = 0;
+  for (let index = 0; index < block.length; ++index) {
+    observed += index >= TAR_CHECKSUM_OFFSET && index < TAR_CHECKSUM_OFFSET + TAR_CHECKSUM_BYTES ? 0x20 : block[index];
+  }
+  if (observed !== expected) throw new Error(`${archiveName} has an invalid tar header checksum`);
+}
+
+function extractFlatTarGzipMembers(compressed, archiveName) {
+  let tar;
+  try {
+    tar = gunzipSync(compressed);
+  } catch (error) {
+    throw new Error(`${archiveName} is not a valid gzip archive`, { cause: error });
+  }
+
+  const members = [];
+  let offset = 0;
+  let trailingZeroBlocks = 0;
+  while (offset + TAR_BLOCK_BYTES <= tar.byteLength) {
+    const header = tar.subarray(offset, offset + TAR_BLOCK_BYTES);
+    offset += TAR_BLOCK_BYTES;
+    if (isZeroBlock(header)) {
+      trailingZeroBlocks += 1;
+      continue;
+    }
+    if (trailingZeroBlocks !== 0) throw new Error(`${archiveName} has data after its tar terminator`);
+
+    validateTarChecksum(header, archiveName);
+    const baseName = tarText(header, 0, 100);
+    const prefix = tarText(header, 345, 155);
+    const name = prefix ? `${prefix}/${baseName}` : baseName;
+    const type = header[156];
+    if ((type !== 0 && type !== 0x30) || !baseName || name.includes("/") || name.includes("\\")) {
+      throw new Error(`${archiveName} is not a flat release archive`);
+    }
+
+    const size = tarOctal(header, 124, 12, "member size", archiveName);
+    const paddedSize = Math.ceil(size / TAR_BLOCK_BYTES) * TAR_BLOCK_BYTES;
+    if (offset + paddedSize > tar.byteLength) throw new Error(`${archiveName} has a truncated tar member`);
+    members.push({ name, bytes: Buffer.from(tar.subarray(offset, offset + size)) });
+    offset += paddedSize;
+  }
+
+  if (trailingZeroBlocks < 2 || offset !== tar.byteLength) {
+    throw new Error(`${archiveName} has an incomplete tar terminator`);
+  }
+  return members;
 }
 
 async function extractedMembers(archive) {
@@ -27,19 +99,7 @@ async function extractedMembers(archive) {
     return Object.entries(entries).map(([name, value]) => ({ name, bytes: Buffer.from(value) }));
   }
   if (!archive.endsWith(".tar.gz")) throw new Error(`${path.basename(archive)} is not a supported release archive`);
-  const directory = await mkdtemp(path.join(tmpdir(), "deherm-release-integrity-"));
-  try {
-    await execFileAsync("tar", ["-xzf", path.resolve(archive), "-C", directory]);
-    const entries = await readdir(directory, { withFileTypes: true });
-    if (entries.some((entry) => !entry.isFile())) {
-      throw new Error(`${path.basename(archive)} is not a flat release archive`);
-    }
-    return Promise.all(
-      entries.map(async (entry) => ({ name: entry.name, bytes: await readFile(path.join(directory, entry.name)) })),
-    );
-  } finally {
-    await rm(directory, { recursive: true, force: true });
-  }
+  return extractFlatTarGzipMembers(bytes, path.basename(archive));
 }
 
 export async function buildReleaseIntegrity({ family, tag, fingerprint, asset, archive }) {
