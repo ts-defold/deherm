@@ -69,8 +69,13 @@ export async function resolveGithubReleaseAsset({
 }) {
   const expectedUrl = releaseAssetUrl({ repository, tag, asset });
   const metadataUrl = `https://api.github.com/repos/${repository}/releases/tags/${encodeURIComponent(tag)}`;
+  const token = process.env.GH_TOKEN || process.env.GITHUB_TOKEN;
   const response = await fetchImpl(metadataUrl, {
-    headers: { Accept: "application/vnd.github+json", "User-Agent": "deherm-release-asset-client" },
+    headers: {
+      Accept: "application/vnd.github+json",
+      "User-Agent": "deherm-release-asset-client",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
   });
   if (!response.ok) throw new Error(`${metadataUrl} responded ${response.status} ${response.statusText}`);
   const release = await response.json();

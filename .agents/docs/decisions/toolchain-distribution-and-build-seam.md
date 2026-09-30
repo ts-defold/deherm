@@ -202,6 +202,15 @@ the replacement members there, and only then atomically replaces the corrupt
 family directory. If the downloaded bytes also mismatch, the old cache remains
 in place and resolution still fails closed.
 
+The member digests in `host-compilers.json` are recorded from the exact flat
+archives published under the content-addressed tag, rather than retained from
+an earlier build of the same host tools. The release's companion integrity
+document and GitHub's publisher-side asset digest are both checked before the
+cache is installed. Public downloads need no credentials; CI supplies its
+ephemeral `GH_TOKEN` for publisher-metadata lookups so a platform matrix cannot
+consume GitHub's anonymous API allowance and mistake rate limiting for missing
+toolchain evidence.
+
 CI preserves that same ordering without turning publication latency into a red
 consumer check. A push-time end-to-end run exercises the current Linux host
 assets when both content-addressed releases already contain them. If the same

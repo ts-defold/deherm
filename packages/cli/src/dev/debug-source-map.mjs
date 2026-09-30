@@ -10,8 +10,31 @@ import {
   sourceContentFor,
 } from "@jridgewell/trace-mapping";
 
+function isWindowsAbsolutePath(file) {
+  return /^[A-Za-z]:[\\/]/u.test(file) || /^\\\\[^\\]+\\[^\\]+/u.test(file);
+}
+
+function windowsPathUrl(file) {
+  if (file.startsWith("\\\\")) {
+    return new URL(`file://${file.slice(2).replaceAll("\\", "/")}`).href;
+  }
+  return new URL(`file:///${file.replaceAll("\\", "/")}`).href;
+}
+
 function sourceUrl(file) {
-  return file.startsWith("file:") ? new URL(file).href : pathToFileURL(path.resolve(file)).href;
+  if (file.startsWith("file:")) return new URL(file).href;
+  if (isWindowsAbsolutePath(file)) return windowsPathUrl(file);
+  return pathToFileURL(path.resolve(file)).href;
+}
+
+function sourceMapReference(source) {
+  if (source.startsWith("file:")) return new URL(source).href;
+  if (isWindowsAbsolutePath(source)) return windowsPathUrl(source);
+  if (path.isAbsolute(source)) return pathToFileURL(source).href;
+  // Source-map references are URLs, even when a Windows producer wrote native
+  // separators. Leaving a backslash here makes trace-mapping resolve an
+  // absolute `D:\\...` source below the map's own directory.
+  return source.replaceAll("\\", "/");
 }
 
 function sourcePath(url) {
@@ -31,7 +54,13 @@ export class DebugSourceMap {
     const identity = `${information.mtimeNs}:${information.size}`;
     if (identity === this.identity) return false;
     const document = JSON.parse(await readFile(this.file, "utf8"));
-    const trace = new TraceMap(document, pathToFileURL(this.file).href);
+    const trace = new TraceMap(
+      {
+        ...document,
+        sources: (document.sources ?? []).map(sourceMapReference),
+      },
+      pathToFileURL(this.file).href,
+    );
     this.trace = trace;
     this.sources = trace.resolvedSources.map((url, index) => ({
       index,

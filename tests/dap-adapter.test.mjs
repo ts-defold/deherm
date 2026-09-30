@@ -81,6 +81,27 @@ test("debug source maps round-trip authored TypeScript locations and content", a
   assert.equal(await map.refresh(), false);
 });
 
+test("debug source maps canonicalize absolute Windows source references", async (t) => {
+  const root = await mkdtemp(path.join(tmpdir(), "deherm-dap-windows-map-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  const mapFile = path.join(root, "app.js.map");
+  const source = "D:\\work tree\\main\\player.script.ts";
+  await writeFile(
+    mapFile,
+    JSON.stringify({
+      version: 3,
+      sources: [source],
+      sourcesContent: ["const player = 1;\n"],
+      names: [],
+      mappings: "AAAA",
+    }),
+  );
+  const map = new DebugSourceMap(mapFile);
+  assert.equal(await map.refresh(), true);
+  assert.deepEqual(map.generated(source, 1, 0), { line: 1, column: 0 });
+  assert.equal(map.content(source), "const player = 1;\n");
+});
+
 test("real dehermc transforms compose authored locations into the dev bundle", async (t) => {
   const repositoryRoot = path.resolve(import.meta.dirname, "..");
   const projectRoot = path.join(repositoryRoot, "examples/war-battles-online/defold");
@@ -185,9 +206,7 @@ test("DAP adapter maps breakpoints, stack, scopes, variables, evaluate, and relo
   assert.equal(calls.find(({ method }) => method === "Debugger.setBreakpointByUrl").params.url, session.bundleUrl);
 
   listeners.get("Debugger.scriptParsed")({ scriptId: "script-1", url: session.bundleUrl });
-  for (let index = 0; index < 20 && breakpointSequence < 2; index += 1) {
-    await new Promise((resolve) => setImmediate(resolve));
-  }
+  await waitFor(() => breakpointSequence >= 2, "the queued native HMR breakpoint reapplication");
   assert.equal(breakpointSequence, 2, "HMR script parsing reapplies the authored breakpoint");
   const replaced = await adapter.handle(
     request(31, "setBreakpoints", {

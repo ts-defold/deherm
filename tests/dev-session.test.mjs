@@ -193,7 +193,8 @@ test("default development bundles use a project-keyed native cache outside Defol
     hostPlatform: "linux",
     userHome: "/home/player",
   });
-  assert.match(output, /^\/cache\/deherm\/dev-bundles\/[a-f0-9]{24}$/u);
+  assert.equal(path.dirname(output), path.resolve("/cache", "deherm", "dev-bundles"));
+  assert.match(path.basename(output), /^[a-f0-9]{24}$/u);
   assert.equal(path.relative(project, output).startsWith(".."), true);
   assert.equal(
     defaultDefoldBundleOutput(project, {

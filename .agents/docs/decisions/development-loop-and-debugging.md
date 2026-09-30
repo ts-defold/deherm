@@ -205,6 +205,14 @@ overwrite the frame state out of order. A fresh War Battles `wasm-web` bundle pr
 public DAP stops Chrome on `arena.script.ts`, maps the top frame, evaluates the
 live `dt`, resumes, and disconnects. The thin VS Code client remains.
 
+Source-map ingestion canonicalizes absolute POSIX paths, Windows drive paths,
+UNC paths, and relative references into URLs before trace lookup. This is part
+of debugger correctness, not test portability: without it, an authored
+`D:\\...\\player.script.ts` source can be resolved beneath the map directory and
+every valid breakpoint remains pending. Reload breakpoint reapplication is an
+ordered asynchronous operation; tests wait for that observable operation
+rather than assuming a fixed number of event-loop turns.
+
 # Live instance and property channel
 
 CDP knows JavaScript frames and values, but not which Defold component owns a

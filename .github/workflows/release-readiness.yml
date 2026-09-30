@@ -17,6 +17,11 @@ concurrency:
 jobs:
   portable-tooling:
     name: TUI, VS Code, and release contract (${{ matrix.os }})
+    env:
+      # Product downloads remain usable without GitHub auth, but the matrix
+      # intentionally exercises several release-integrity lookups in parallel.
+      # Authenticate those lookups so CI cannot exhaust the public API quota.
+      GH_TOKEN: ${{ github.token }}
     strategy:
       fail-fast: false
       matrix:
