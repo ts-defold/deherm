@@ -46,7 +46,28 @@ async function copyImmutable(source, destination, relative) {
   return false;
 }
 
-async function importPublishedClosure({ entry, layoutSource, layoutDestination }) {
+// Revision entries are authenticated pointers, not content-addressed objects.
+// Publication legitimately rewrites them to bind the current artifact document,
+// while a checkout may own a newer generator result for the same Defold source.
+// Preserve that checkout-owned pointer when it is already present; otherwise
+// seed or refresh the destination from the published catalogue.
+async function copyRevisionPointer(source, destination, relative, preserveExisting) {
+  const from = path.join(source, relative);
+  const to = path.join(destination, relative);
+  const [bytes, present] = await Promise.all([
+    readFile(from),
+    readFile(to).catch((error) => {
+      if (error.code === "ENOENT") return null;
+      throw error;
+    }),
+  ]);
+  if (present && (preserveExisting || present.equals(bytes))) return false;
+  await mkdir(path.dirname(to), { recursive: true });
+  await writeFile(to, bytes);
+  return true;
+}
+
+async function importPublishedClosure({ entry, layoutSource, layoutDestination, preserveRevisionPointer }) {
   let copied = 0;
   const rootRelative = `policy/${entry.policyRoot}.json`;
   const root = JSON.parse(await readFile(path.join(layoutSource, rootRelative), "utf8"));
@@ -55,7 +76,15 @@ async function importPublishedClosure({ entry, layoutSource, layoutDestination }
     if (await copyImmutable(layoutSource, layoutDestination, `object/${hash}.json`)) copied += 1;
   }
   if (await copyImmutable(layoutSource, layoutDestination, rootRelative)) copied += 1;
-  if (await copyImmutable(layoutSource, layoutDestination, `index/${entry.defoldRevision}.json`)) copied += 1;
+  if (
+    await copyRevisionPointer(
+      layoutSource,
+      layoutDestination,
+      `index/${entry.defoldRevision}.json`,
+      preserveRevisionPointer,
+    )
+  )
+    copied += 1;
   return copied;
 }
 
@@ -125,7 +154,12 @@ export async function hydratePolicySite(options) {
       }
       continue;
     }
-    copied += await importPublishedClosure({ entry, layoutSource, layoutDestination });
+    copied += await importPublishedClosure({
+      entry,
+      layoutSource,
+      layoutDestination,
+      preserveRevisionPointer: Boolean(packaged),
+    });
   }
 
   const merged = new Map(published.entries.map((entry) => [entry.defoldRevision, entry]));

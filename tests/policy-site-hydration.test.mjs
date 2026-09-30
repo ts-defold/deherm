@@ -69,6 +69,29 @@ test("hydration lets the packaged generator replace a published pointer for the 
   assert.notEqual(index.entries[0].generator, staleGenerator);
 });
 
+test("hydration preserves a packaged pointer when publication binds artifact metadata", async () => {
+  const directory = await mkdtemp(path.join(tmpdir(), "deherm-policy-hydration-artifacts-"));
+  const published = path.join(directory, "published");
+  const hydratedStore = path.join(directory, "store");
+  const hydratedIndex = path.join(directory, "defold-policy-index.json");
+  const site = await readSiteConfig();
+  await buildPolicySite({ output: published });
+  await cp(storeRoot, hydratedStore, { recursive: true });
+  await copyFile(shippedIndexPath, hydratedIndex);
+
+  const revision = JSON.parse(await readFile(hydratedIndex, "utf8")).entries[0].defoldRevision;
+  const packagedEntryFile = path.join(hydratedStore, site.layoutVersion, "index", `${revision}.json`);
+  const packagedEntry = await readFile(packagedEntryFile, "utf8");
+  const publishedEntry = JSON.parse(
+    await readFile(path.join(published, site.layoutVersion, "index", `${revision}.json`), "utf8"),
+  );
+  assert.match(publishedEntry.artifactsSha256, /^[a-f0-9]{64}$/u);
+
+  const result = await hydratePolicySite({ from: published, store: hydratedStore, index: hydratedIndex, site });
+  assert.equal(result.copied, 0);
+  assert.equal(await readFile(packagedEntryFile, "utf8"), packagedEntry);
+});
+
 test("hydration refuses mutable bytes at a content-addressed path", async () => {
   const directory = await mkdtemp(path.join(tmpdir(), "deherm-policy-hydration-conflict-"));
   const published = path.join(directory, "published");

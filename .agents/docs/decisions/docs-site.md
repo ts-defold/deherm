@@ -22,6 +22,13 @@ unchanged. The policy landing page links to the docs route, while docs links
 back to source and the relevant OKF decisions. A docs build cannot rewrite a
 policy object.
 
+Hydration distinguishes the two kinds of published data. Policy roots and
+subtree objects are immutable and byte conflicts fail closed. A per-revision
+index is a replaceable authenticated pointer: publication adds the current
+`artifactsSha256`, while the checkout may own a newer generator pointer for the
+same Defold revision. Hydration preserves an existing checkout-owned pointer
+and seeds or refreshes only published revisions the checkout does not own.
+
 # Product hierarchy
 
 The page answers how to use déherm before it discusses implementation or

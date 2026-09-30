@@ -4791,3 +4791,17 @@ input sends, and proved nonzero movement for every bot. The runtime also emitted
 live heap, component-instance, Lua-handle, arena, and frame-time telemetry. This
 is packaged native/link/runtime evidence for arm64 macOS, not evidence for other
 platforms or a visual-quality review.
+
+## 2026-09-29 - Docs and policy publication pointer hydration
+
+The product documentation is built into `docs/` inside the branch-served
+`deherm-policy-site`; the root remains the policy-store landing page and links
+to that human-facing route. A main-branch publication run exposed a category
+error in hydration: it compared the checkout's generated revision index
+byte-for-byte with the published index after publication had legitimately added
+`artifactsSha256`. Revision indices are authenticated replaceable pointers, not
+content-addressed objects. Hydration now preserves an existing checkout-owned
+pointer, refreshes published-only pointers, and retains fail-closed byte checks
+for policy roots and subtree objects. A focused fixture reproduces the
+publication-only artifact binding and proves it no longer blocks docs or policy
+deployment.

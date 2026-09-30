@@ -67,3 +67,16 @@ test("the policy landing page links to docs without changing immutable policy pa
   assert.match(page, /0\.1 preview/u);
   assert.match(page, /v1\/policy\/&lt;root-hash&gt;/u);
 });
+
+test("policy CI mounts docs into the accumulated branch-served Pages tree", async () => {
+  const workflow = await readFile(path.resolve(".github/workflows/policy.yml"), "utf8");
+  const policyBuild = workflow.indexOf('node scripts/build-policy-site.mjs "${args[@]}"');
+  const docsBuild = workflow.indexOf("node scripts/build-docs-site.mjs --out build/policy-site/docs");
+  const accumulatedPublish = workflow.indexOf("cp -R build/policy-site/. /tmp/site/");
+  const pagesBuild = workflow.indexOf('gh api -X POST "repos/${GITHUB_REPOSITORY}/pages/builds" --silent');
+  assert.ok(policyBuild >= 0);
+  assert.ok(policyBuild < docsBuild);
+  assert.ok(docsBuild < accumulatedPublish);
+  assert.ok(accumulatedPublish < pagesBuild);
+  assert.doesNotMatch(workflow, /actions\/deploy-pages/u);
+});
