@@ -5,8 +5,6 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
 
-import { unzipSync } from "fflate";
-
 export { releaseIntegrityAssetName } from "./release-integrity-name.mjs";
 
 const execFileAsync = promisify(execFile);
@@ -20,6 +18,11 @@ export function sha256(bytes) {
 async function extractedMembers(archive) {
   const bytes = await readFile(archive);
   if (archive.endsWith(".zip")) {
+    // Native Hermes artifacts are flat tarballs and their publisher runs
+    // before workspace dependencies are installed. Keep that path free of
+    // package imports; only consumers of ZIP artifacts need the package-owned
+    // decoder.
+    const { unzipSync } = await import("fflate");
     const entries = unzipSync(bytes);
     return Object.entries(entries).map(([name, value]) => ({ name, bytes: Buffer.from(value) }));
   }

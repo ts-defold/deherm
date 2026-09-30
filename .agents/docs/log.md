@@ -4691,3 +4691,23 @@ stage verified into the disposable Bob project. Its link fixture supplies an
 isolated authenticated artifact reference and all 12 gate tests pass; the
 production example's older lock remains deliberately rejected until the
 repaired publisher emits integrity sidecars and the public policy refreshes.
+
+## 2026-09-29 - Pre-install artifact publication is package-dependency-free
+
+The next Actions run proved the planner repair and completed every platform
+build, but all native rows then failed at the common release-upload boundary.
+The publisher's integrity generator eagerly imported the ZIP decoder even
+though every general Hermes and host-tool artifact is a flat `.tar.gz`; only
+the Go compiler rows passed because that lane happens to install the workspace
+before publication.
+
+The archive-integrity module now loads `fflate` only when it is actually asked
+to inspect a ZIP. Tarball publication has no package import and remains usable
+on the intentionally pre-install runners. The regression test copies the
+integrity module and its stable naming dependency beneath a temporary directory
+with no `package.json` or `node_modules` ancestor, then builds and authenticates
+a real deterministic tarball. The focused artifact suites pass 35/35 and the
+Defold WebTransport package suite passes 75/75. The publisher module is a
+fingerprinted input, so the general and WebTransport release identities were
+regenerated rather than changing behavior beneath an immutable tag. Platform
+publication remains unclaimed until the new Actions matrices complete.

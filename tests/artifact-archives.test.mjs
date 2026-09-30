@@ -13,11 +13,12 @@
 import assert from "node:assert/strict";
 import { execFile } from "node:child_process";
 import { createHash } from "node:crypto";
-import { chmod, mkdir, mkdtemp, readFile, rm, stat, utimes, writeFile } from "node:fs/promises";
+import { chmod, copyFile, mkdir, mkdtemp, readFile, rm, stat, utimes, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { promisify } from "node:util";
+import { pathToFileURL } from "node:url";
 import { parse as parseYaml } from "yaml";
 
 import { extractReleaseArchive, releaseAssetUrl } from "../packages/cli/src/release-assets.mjs";
@@ -165,6 +166,42 @@ test("publisher integrity binds the archive and every exact member before instal
   await writeFile(archive, Buffer.concat([await readFile(archive), Buffer.from([0])]));
   await assert.rejects(verifyReleaseArchive({ archive, integrity }), /publisher integrity document/u);
   assert.equal(releaseIntegrityAssetName(asset), `${asset}.integrity.json`);
+});
+
+test("tarball publisher integrity runs before workspace dependencies are installed", async (t) => {
+  const directory = await scratch(t);
+  const isolated = path.join(directory, "isolated-publisher");
+  await mkdir(isolated);
+  await copyFile(
+    path.join(repositoryRoot, "packages/cli/src/release-integrity.mjs"),
+    path.join(isolated, "release-integrity.mjs"),
+  );
+  await copyFile(
+    path.join(repositoryRoot, "packages/cli/src/release-integrity-name.mjs"),
+    path.join(isolated, "release-integrity-name.mjs"),
+  );
+
+  const member = path.join(directory, "libhermes.a");
+  const asset = "hermes-x86_64-linux.tar.gz";
+  const archive = path.join(directory, asset);
+  await writeFile(member, "dependency-free publisher input");
+  await pack(archive, [member]);
+
+  // The copied module has no package.json or node_modules ancestor. An eager
+  // fflate import therefore reproduces the artifact runner's pre-install
+  // failure, while the package-dependency-free tar path remains usable.
+  const isolatedIntegrity = await import(pathToFileURL(path.join(isolated, "release-integrity.mjs")).href);
+  const integrity = await isolatedIntegrity.buildReleaseIntegrity({
+    family: "native-artifacts",
+    tag: "libs-0123456789ab",
+    fingerprint: "0123456789ab".padEnd(64, "0"),
+    asset,
+    archive,
+  });
+  assert.deepEqual(
+    integrity.members.map(({ name }) => name),
+    ["libhermes.a"],
+  );
 });
 
 test("a substituted valid archive is rejected by the original publisher expectation", async (t) => {
