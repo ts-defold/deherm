@@ -83,15 +83,14 @@ test("published fingerprint rows are immutable at the upload boundary", async ()
   assert.doesNotMatch(uploader, /gh release upload[^\n]*--clobber/u);
 });
 
-test("complete artifact publication refreshes both consumer proof and policy mappings", async () => {
+test("complete artifact publication refreshes policy before consumer proof", async () => {
   const workflow = await readFile(".github/workflows/native-artifacts.yml", "utf8");
   const final = workflow.slice(workflow.indexOf("  summary:"));
   const completeness = final.indexOf("Verify every fingerprinted row is published");
-  const endToEnd = final.indexOf("gh workflow run end-to-end.yml");
   const policy = final.indexOf("gh workflow run policy.yml");
   assert.ok(completeness >= 0);
-  assert.ok(endToEnd > completeness, "consumer proof must follow release completeness");
   assert.ok(policy > completeness, "policy artifact mappings must refresh only after release completeness");
+  assert.doesNotMatch(final, /gh workflow run end-to-end\.yml/u);
 });
 
 test("every dehermc row is authenticated and the Linux artifact is consumed before upload", async () => {

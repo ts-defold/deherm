@@ -4723,3 +4723,28 @@ extraction. The isolated pre-install test clears `PATH` while authenticating a
 real tarball, and a nested-member fixture now proves the publisher rejects a
 non-flat archive before release. The resulting platform releases remain
 unclaimed until the next matrix completes.
+## 2026-09-29 - Policy derivation validates without impersonating publication
+
+The first end-to-end War Battles launch after publisher-authenticated artifact
+delivery stopped before Bob because the public revision entry predated the new
+`artifactsSha256` contract. The next policy refresh could not repair it:
+`derive` invoked the hardened site CLI without either of its publication
+inputs, so the CLI correctly failed with `Policy publication requires
+--artifact-integrity-root or an authenticated fallback mapping` before the
+publisher job ran. The workflow now invokes an explicit `--validation-only`
+mode for its disposable pre-parity site. That mode uses package-derived rows
+only to exercise and verify the complete emitted tree; it rejects publication
+inputs, is forbidden from the publisher job by a structural test, and is never
+deployed. The publisher remains fail-closed on current integrity sidecars or a
+last-complete published mapping. This is workflow/site-shape evidence, not yet
+evidence that Pages refreshed or that War Battles admitted its native client
+and browser bots.
+
+The repaired native-artifact run then published every target and host row, but
+its summary dispatched policy refresh and end-to-end as siblings. End-to-end
+failed immediately in published-policy resolution while the refresh was still
+deriving, exactly reproducing the race the artifact ordering was meant to
+remove. Native publication now dispatches only policy. A manually dispatched
+policy graph waits for publication and its clean public consumer smoke, then
+dispatches the full Bob matrix. Structural tests enforce both halves of that
+ordering and reject a direct native-to-end-to-end edge.

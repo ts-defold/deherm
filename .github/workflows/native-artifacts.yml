@@ -661,18 +661,12 @@ jobs:
               row.missing.map((asset) => `${family}: ${asset}`));
             if (missing.length) throw new Error(`fingerprinted release rows remain unpublished:\n${missing.join("\n")}`);
           '
-      # Verification, not whether this invocation happened to compile a row, is
-      # the ordering boundary. A no-op retry may be exactly how a canceled full
-      # consumer run is recovered after all immutable assets already exist.
-      - name: Run full end-to-end after every fingerprinted row is published
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh workflow run end-to-end.yml --repo "${{ github.repository }}" --ref "${{ github.ref_name }}"
       # A policy run may have completed while these rows were still building.
       # It publishes policy objects immediately but retains the last complete
       # artifact mapping rather than exposing deterministic 404s. Re-run the
       # single policy graph now so that mapping advances only after this job's
-      # exact completeness proof.
+      # exact completeness proof. That graph dispatches end-to-end only after
+      # the public-site consumer smoke has resolved the advanced mapping.
       - name: Refresh policy artifact mappings after publication
         env:
           GH_TOKEN: ${{ github.token }}

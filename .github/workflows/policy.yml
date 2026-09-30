@@ -157,7 +157,7 @@ jobs:
           bash scripts/bootstrap-upstreams.sh defold
           node scripts/generate-api-policy.mjs --prune
           node scripts/generate-api-policy.mjs --check
-          node scripts/build-policy-site.mjs --out build/policy-site
+          node scripts/build-policy-site.mjs --out build/policy-site --validation-only
           node scripts/check-policy-site-resolution.mjs
           echo "generated=$generated" >> "$GITHUB_OUTPUT"
           echo "unproven=$unproven" >> "$GITHUB_OUTPUT"
@@ -649,3 +649,21 @@ jobs:
         run: node scripts/check-published-policy.mjs
       - name: Scaffold, generate and typecheck as an npm consumer
         run: node scripts/check-end-to-end.mjs --stage scaffold --stage generate
+
+  dispatch-end-to-end:
+    name: Run full end-to-end after public policy resolution
+    needs: consumer-smoke
+    if: >-
+      needs.consumer-smoke.result == 'success' &&
+      github.event_name == 'workflow_dispatch' &&
+      github.repository == 'ts-defold/deherm' &&
+      github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    permissions:
+      actions: write
+      contents: read
+    steps:
+      - name: Dispatch the full Bob target matrix
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run end-to-end.yml --repo "${{ github.repository }}" --ref "${{ github.ref_name }}"

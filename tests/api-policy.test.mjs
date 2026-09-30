@@ -66,6 +66,7 @@ test("policy host parity materializes every authoritative generator input", asyn
   const parity = workflow.slice(workflow.indexOf("  host-parity:"), workflow.indexOf("  engine-conformance:"));
   const engine = workflow.slice(workflow.indexOf("  engine-conformance:"), workflow.indexOf("  publish-site:"));
   const publish = workflow.slice(workflow.indexOf("  publish-site:"));
+  const derive = workflow.slice(workflow.indexOf("  derive:"), workflow.indexOf("  host-parity:"));
   const packedSurface = workflow.slice(
     workflow.indexOf("      - name: Pack the exact generated surface"),
     workflow.indexOf(
@@ -100,6 +101,11 @@ test("policy host parity materializes every authoritative generator input", asyn
   assert.match(publish, /Select only a completely published artifact mapping/u);
   assert.match(publish, /build\/published-policy-site\/v1\/artifacts/u);
   assert.match(publish, /--artifact-references/u);
+  assert.match(derive, /build-policy-site\.mjs --out build\/policy-site --validation-only/u);
+  assert.doesNotMatch(publish, /--validation-only/u);
+  assert.match(workflow, /dispatch-end-to-end:[\s\S]*needs: consumer-smoke/u);
+  assert.match(workflow, /needs\.consumer-smoke\.result == 'success'/u);
+  assert.match(workflow, /gh workflow run end-to-end\.yml/u);
   assert.match(
     publish,
     /Current fingerprinted releases are still publishing; the site retains its last complete artifact mapping/u,

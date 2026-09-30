@@ -104,6 +104,21 @@ building, the site publishes the new policy objects but retains its previous
 complete artifact mapping, so a deterministic URL never enters the public
 index while it still returns 404. The artifact workflow dispatches both the
 all-target gate and a policy-site refresh after its exact completeness proof.
+That artifact-triggered policy refresh dispatches the full end-to-end Bob matrix
+only after the public consumer smoke resolves the advanced hash-bound mapping.
+Dispatching policy refresh and end-to-end as siblings is forbidden: it races
+Pages publication and turns an expected deployment window into a false consumer
+failure.
+
+The derivation job also builds a disposable site to exercise the site emitter
+before host-parity and publication. That build uses `--validation-only`: its
+package-derived artifact rows prove that every emitted revision pointer binds a
+well-formed artifact document, but they are not availability evidence and the
+tree is never published. The publication job cannot use that mode; it still
+requires either publisher-authenticated integrity sidecars for the current
+mapping or the last complete mapping from the published site. Keeping those two
+inputs explicit prevents an artifact race from turning a public revision entry
+into a pointer with no `artifactsSha256`.
 
 # Per-revision algorithm
 

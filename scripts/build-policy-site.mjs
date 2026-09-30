@@ -382,6 +382,7 @@ async function main(argv = process.argv.slice(2)) {
     else if (argument === "--base-url") options.baseUrl = argv[++index];
     else if (argument === "--path-prefix") options.pathPrefix = argv[++index];
     else if (argument === "--artifact-integrity-root") options.artifactIntegrityRoot = path.resolve(argv[++index]);
+    else if (argument === "--validation-only") options.validationOnly = true;
     else if (argument === "--artifact-references") {
       const file = path.resolve(argv[++index]);
       options.artifactReferences = validateArtifactReferences(
@@ -390,8 +391,18 @@ async function main(argv = process.argv.slice(2)) {
       );
     } else throw new Error(`Unknown argument: ${argument}`);
   }
+  if (options.validationOnly && (options.artifactReferences || options.artifactIntegrityRoot)) {
+    throw new Error("--validation-only cannot be combined with publication artifact inputs");
+  }
   if (!options.artifactReferences && !options.artifactIntegrityRoot) {
-    throw new Error("Policy publication requires --artifact-integrity-root or an authenticated fallback mapping");
+    if (!options.validationOnly) {
+      throw new Error("Policy publication requires --artifact-integrity-root or an authenticated fallback mapping");
+    }
+    // The derive job validates the complete static-site shape before any
+    // publisher is allowed to run.  Its artifact references are disposable
+    // package metadata: they prove the builder emits a self-consistent tree,
+    // but must never be mistaken for authenticated release availability.
+    options.artifactReferences = await buildArtifactReferences();
   }
   const result = await buildPolicySite(options);
   const verified = await verifyEmittedTree({

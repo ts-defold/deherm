@@ -606,12 +606,14 @@ validates its content graph, and the release identity remains the declared
 family fingerprint plus asset name.
 
 The summary job re-reads all three releases and fails if any planned row is
-still absent. When a run actually published changed artifacts, and only after
-that completeness check passes, it dispatches the end-to-end workflow on the
-same ref. A toolchain fingerprint no longer triggers end-to-end directly on the
-original push: that raced publication and deterministically asked the consumer
-test to download a release which could not exist yet. Script-only end-to-end
-changes still run their cheap local stage directly; nightlies and the
+still absent. After that completeness check passes it dispatches the policy
+workflow on the same ref. Policy advances the authenticated artifact mapping,
+waits for the public-site consumer smoke to resolve it, and only then dispatches
+the full end-to-end workflow. The two dispatches cannot be siblings: doing so
+races Pages and makes a healthy publication window look like a broken consumer.
+A toolchain fingerprint no longer triggers end-to-end directly on the original
+push either; that raced artifact publication itself. Script-only end-to-end
+changes still run their cheap local stage directly; nightlies and the ordered
 post-publication dispatch retain the full Bob matrix.
 
 | Lane | Runner | Produces |
