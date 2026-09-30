@@ -169,8 +169,8 @@
       "path": "examples/war-battles-online/core",
       "kind": "tree",
       "fileCount": 24,
-      "bytes": 451599,
-      "sha256": "1b1a1ba9ed699576ae2a4fd219368c1d41bddc8969e0e6f315a74a1b85d7ed20"
+      "bytes": 454371,
+      "sha256": "927a0691897b8cd2f503277569aaeb4ab872ab11fb2eb69c8abf975bc7e5e077"
     },
     {
       "path": "examples/war-battles-online/integration/performance-harness.ts",
@@ -191,6 +191,6 @@
       "sha256": "b8709891a96f1b3aabc8c65ef4aa48860d630b3b5bfc286e4e00663e15a7a19a"
     }
   ],
-  "sourceKey": "ed9d3f526177542c247a9ae703065c999a67d02ed748f01579d87c040f7ce798",
+  "sourceKey": "eefab1ea4fa9477322c20a6540ee1ed4fd67a006af3767ba6e58b9cdd36f3883",
   "evidenceBoundary": "Deterministic in-process simulation/codec operability evidence; no wall-clock, VM allocation, Defold engine, browser, native heap, or WAN claim."
 }
