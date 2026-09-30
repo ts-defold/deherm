@@ -106,6 +106,8 @@ test("policy host parity materializes every authoritative generator input", asyn
   assert.match(workflow, /dispatch-end-to-end:[\s\S]*needs: consumer-smoke/u);
   assert.match(workflow, /needs\.consumer-smoke\.result == 'success'/u);
   assert.match(workflow, /gh workflow run end-to-end\.yml/u);
+  assert.match(workflow, /group: policy-v2-\$\{\{ github\.ref \}\}/u);
+  assert.match(workflow, /inputs\.artifact_refresh_only[\s\S]*derive='\[\]'/u);
   assert.match(
     publish,
     /Current fingerprinted releases are still publishing; the site retains its last complete artifact mapping/u,

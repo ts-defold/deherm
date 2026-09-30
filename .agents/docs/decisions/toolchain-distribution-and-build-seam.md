@@ -616,6 +616,12 @@ push either; that raced artifact publication itself. Script-only end-to-end
 changes still run their cheap local stage directly; nightlies and the ordered
 post-publication dispatch retain the full Bob matrix.
 
+The native summary marks its dispatch `artifact_refresh_only`. The policy graph
+still hydrates, verifies, publishes, waits for Pages, and runs its clean consumer
+proof, but it does not re-derive stable, beta, and alpha merely because release
+assets finished uploading. Those source derivations remain the nightly graph's
+job.
+
 | Lane | Runner | Produces |
 | --- | --- | --- |
 | `linux` | `ubuntu-24.04`, `ubuntu-24.04-arm` | `x86_64-linux`, `arm64-linux` via `Dockerfile.linux` |

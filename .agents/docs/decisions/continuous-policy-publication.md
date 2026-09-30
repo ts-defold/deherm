@@ -110,6 +110,12 @@ Dispatching policy refresh and end-to-end as siblings is forbidden: it races
 Pages publication and turns an expected deployment window into a false consumer
 failure.
 
+The artifact callback sets `artifact_refresh_only=true`. It hydrates and checks
+the accumulated store but deliberately derives no channel revision: release
+availability changed, Defold source did not. Nightly and ordinary manual runs
+retain channel discovery. This keeps an artifact retry proportional to the
+mutable mapping it advances instead of repeating three source derivations.
+
 The derivation job also builds a disposable site to exercise the site emitter
 before host-parity and publication. That build uses `--validation-only`: its
 package-derived artifact rows prove that every emitted revision pointer binds a

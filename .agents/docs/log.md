@@ -4748,3 +4748,13 @@ remove. Native publication now dispatches only policy. A manually dispatched
 policy graph waits for publication and its clean public consumer smoke, then
 dispatches the full Bob matrix. Structural tests enforce both halves of that
 ordering and reject a direct native-to-end-to-end edge.
+
+The live recovery also exposed that the artifact callback used an ordinary
+manual policy dispatch, which discovers and derives every channel revision not
+yet on the site. Artifact availability is independent of that work. The callback
+now selects `artifact_refresh_only`, producing an empty derivation plan while
+retaining hydration, generation checks, host parity, publication, public smoke,
+and ordered end-to-end dispatch. The corrected graph uses a `policy-v2`
+concurrency epoch so an already-running pre-binding workflow—which cannot reach
+publication under its old CLI invocation—does not indefinitely block the first
+repair; corrected writers still serialize against one another.

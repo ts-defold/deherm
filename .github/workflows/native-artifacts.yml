@@ -670,4 +670,6 @@ jobs:
       - name: Refresh policy artifact mappings after publication
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh workflow run policy.yml --repo "${{ github.repository }}" --ref "${{ github.ref_name }}"
+        run: >-
+          gh workflow run policy.yml --repo "${{ github.repository }}"
+          --ref "${{ github.ref_name }}" -f artifact_refresh_only=true

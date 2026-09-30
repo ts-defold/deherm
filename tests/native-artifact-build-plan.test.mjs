@@ -90,6 +90,7 @@ test("complete artifact publication refreshes policy before consumer proof", asy
   const policy = final.indexOf("gh workflow run policy.yml");
   assert.ok(completeness >= 0);
   assert.ok(policy > completeness, "policy artifact mappings must refresh only after release completeness");
+  assert.match(final, /-f artifact_refresh_only=true/u);
   assert.doesNotMatch(final, /gh workflow run end-to-end\.yml/u);
 });
 

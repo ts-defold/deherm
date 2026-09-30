@@ -18,6 +18,10 @@ on:
       revision:
         description: Derive this Defold revision instead of reading stable, beta and alpha
         required: false
+      artifact_refresh_only:
+        description: Re-publish the current policy with a newly complete artifact mapping
+        type: boolean
+        default: false
       carry-reviews:
         description: Carry applicable reviewed lowering hints and report every carry
         type: boolean
@@ -27,7 +31,12 @@ permissions:
   contents: read
 
 concurrency:
-  group: policy-${{ github.ref }}
+  # v2 retires the pre-artifact-binding graph. A run created from the old graph
+  # cannot publish because its derive-stage site build lacks the now-required
+  # artifact input; separating the migration epoch avoids making its unrelated
+  # channel derivations block the first corrected refresh. All v2 writers remain
+  # serialized with one another.
+  group: policy-v2-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
@@ -53,7 +62,9 @@ jobs:
           REQUESTED_REVISION: ${{ inputs.revision }}
         run: |
           set -euo pipefail
-          if [ "${{ github.event_name }}" = workflow_dispatch ] && [ -n "$REQUESTED_REVISION" ]; then
+          if [ "${{ github.event_name }}" = workflow_dispatch ] && [ "${{ inputs.artifact_refresh_only }}" = true ]; then
+            derive='[]'
+          elif [ "${{ github.event_name }}" = workflow_dispatch ] && [ -n "$REQUESTED_REVISION" ]; then
             derive="$(node -e 'process.stdout.write(JSON.stringify([{channel:"manual",sha1:process.env.REQUESTED_REVISION,version:null}]))')"
           elif [ "${{ github.event_name }}" = schedule ] || [ "${{ github.event_name }}" = workflow_dispatch ]; then
             derive="$(node scripts/track-defold-channels.mjs plan --json --index build/published-policy-site/v1/index/manifest.json | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>process.stdout.write(JSON.stringify(JSON.parse(s).derive)))')"
