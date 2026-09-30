@@ -22,7 +22,11 @@ test("War Battles Static Hermes projection records closed release reachability",
   assert.equal(checkedIn.projection.id, PROJECTION_ID);
   assert.equal(checkedIn.reachability.profile, "release");
   assert.equal(checkedIn.reachability.dynamicAccess, false);
-  assert.equal(checkedIn.reachability.reachableRouteCount, 31);
+  assert.equal(checkedIn.reachability.reachableRouteCount, 32);
+  assert.ok(
+    checkedIn.reachability.reachableRouteIds.includes("script:sys.get_config_int"),
+    "the explicit demo/tour configuration gate must remain reachable in release builds",
+  );
   assert.equal(
     checkedIn.reachability.staticReachableRouteCount,
     checkedIn.reachability.reachableRouteCount,
