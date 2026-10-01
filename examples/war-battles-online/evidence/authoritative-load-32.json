@@ -1072,8 +1072,8 @@
     {
       "path": "package.json",
       "kind": "file",
-      "bytes": 54800,
-      "sha256": "4cd3e9384eaa640071c4da2a5c92d2a73b5448f4c78e788d7264c7d7c4d07d6f"
+      "bytes": 54905,
+      "sha256": "d81c83170bcc2388aa5ad132868209907340780bb8d453798353c7787dc536e1"
     },
     {
       "path": "pnpm-lock.yaml",
@@ -1082,5 +1082,5 @@
       "sha256": "ffe932f2e731fb9fbe05f21cf7558bf938fd4e34b668537e3bd496b0bdd07df3"
     }
   ],
-  "sourceKey": "d60c4b927b4a1d8f6bbd1666bf810cb85905ebcf180559538c80b4ddbfb28937"
+  "sourceKey": "22a8cfa2998f159a5b71a124c0fc19fca4d5d9800219d08c80e7318186db1e85"
 }

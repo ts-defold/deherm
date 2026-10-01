@@ -31,6 +31,26 @@ const titleScreenshotPath = resolve(
   process.env.DEHERM_WAR_BATTLES_TITLE_SCREENSHOT ??
     resolve(repositoryRoot, "build/evidence/war-battles-title-html5.png"),
 );
+const TANK_FRAME_HALF_WIDTH = 64;
+const TANK_FRAME_HALF_HEIGHT = 64;
+const HUD_TOP_SAFE_PIXELS = 96;
+const HUD_BOTTOM_SAFE_PIXELS = 76;
+
+function parseCameraSnap(marker) {
+  const match =
+    /^war-battles:camera-snap:player=(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?):view=(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?):extent=(\d+(?:\.\d+)?),(\d+(?:\.\d+)?)$/.exec(
+      marker,
+    );
+  assert.ok(match, `Malformed camera snap marker: ${marker}`);
+  return {
+    playerX: Number(match[1]),
+    playerY: Number(match[2]),
+    viewX: Number(match[3]),
+    viewY: Number(match[4]),
+    halfWidth: Number(match[5]),
+    halfHeight: Number(match[6]),
+  };
+}
 
 async function evaluate(client, expression) {
   const result = await client.send("Runtime.evaluate", {
@@ -118,6 +138,11 @@ async function run() {
       intervalMs: 50,
       what: "keyboard input to engage the arena",
     });
+    await waitFor(() => client.transcript.some((line) => line.startsWith("war-battles:camera-snap:")), {
+      timeoutMs: 3_000,
+      intervalMs: 50,
+      what: "the camera to frame the authoritative local tank",
+    });
     const inputToArenaMs = Date.now() - inputAt;
     await new Promise((resolveDelay) => setTimeout(resolveDelay, 600));
     await key(client, { type: "keyUp", key: "w", code: "KeyW", virtualKeyCode: 87 });
@@ -136,6 +161,9 @@ async function run() {
       what: "the local fire event to play its generated sound",
     });
 
+    const cameraSnapsBeforeRestart = client.transcript.filter((line) =>
+      line.startsWith("war-battles:camera-snap:"),
+    ).length;
     await key(client, { type: "keyDown", key: "r", code: "KeyR", virtualKeyCode: 82 });
     // Keep the key down across several browser/engine frames. Sending down and
     // up back-to-back can leave both events in the Emscripten queue before
@@ -153,6 +181,16 @@ async function run() {
       intervalMs: 50,
       what: "the round restart cue to play",
     });
+    await waitFor(
+      () =>
+        client.transcript.filter((line) => line.startsWith("war-battles:camera-snap:")).length >
+        cameraSnapsBeforeRestart,
+      {
+        timeoutMs: 3_000,
+        intervalMs: 50,
+        what: "the camera to reframe the local tank after restart",
+      },
+    );
     await new Promise((resolveDelay) => setTimeout(resolveDelay, 500));
 
     const graphics = await evaluate(
@@ -236,6 +274,38 @@ async function run() {
     assert.ok(graphics.compositedSample.brightPixels > 1_000, "Composited browser frame is unexpectedly black");
     assert.ok(graphics.compositedSample.colourBuckets > 24, "Composited browser frame lacks expected colour diversity");
     assert.ok(inputToArenaMs < 3_000, `Keyboard-to-arena latency was ${inputToArenaMs}ms`);
+    const cameraSnapMarker = client.transcript.filter((line) => line.startsWith("war-battles:camera-snap:")).at(-1);
+    assert.ok(cameraSnapMarker, "No authoritative camera framing marker was emitted");
+    const cameraSnap = parseCameraSnap(cameraSnapMarker);
+    const screenScaleX = graphics.canvas.width / (cameraSnap.halfWidth * 2);
+    const screenScaleY = graphics.canvas.height / (cameraSnap.halfHeight * 2);
+    const tankFrame = {
+      left:
+        graphics.canvas.width / 2 +
+        (cameraSnap.playerX - cameraSnap.viewX) * screenScaleX -
+        TANK_FRAME_HALF_WIDTH * screenScaleX,
+      right:
+        graphics.canvas.width / 2 +
+        (cameraSnap.playerX - cameraSnap.viewX) * screenScaleX +
+        TANK_FRAME_HALF_WIDTH * screenScaleX,
+      top:
+        graphics.canvas.height / 2 -
+        (cameraSnap.playerY - cameraSnap.viewY) * screenScaleY -
+        TANK_FRAME_HALF_HEIGHT * screenScaleY,
+      bottom:
+        graphics.canvas.height / 2 -
+        (cameraSnap.playerY - cameraSnap.viewY) * screenScaleY +
+        TANK_FRAME_HALF_HEIGHT * screenScaleY,
+    };
+    assert.ok(tankFrame.left >= 0 && tankFrame.right <= graphics.canvas.width, "Local tank is clipped horizontally");
+    assert.ok(
+      tankFrame.top >= HUD_TOP_SAFE_PIXELS,
+      `Local tank is hidden behind the upper HUD: ${JSON.stringify(tankFrame)}`,
+    );
+    assert.ok(
+      tankFrame.bottom <= graphics.canvas.height - HUD_BOTTOM_SAFE_PIXELS,
+      `Local tank is hidden behind the lower HUD: ${JSON.stringify(tankFrame)}`,
+    );
     assert.equal(
       client.transcript.some((line) => line.startsWith("war-battles:player-moved:")),
       false,
@@ -258,6 +328,8 @@ async function run() {
       },
       arenaMarker: client.transcript.find((line) => line.startsWith("war-battles:arena-engaged:")),
       restartMarker: client.transcript.find((line) => line.startsWith("war-battles:arena-restart:")),
+      cameraSnap,
+      tankFrame,
       soundMarkers: client.transcript.filter((line) => line.startsWith("war-battles:sfx:")),
     };
     console.log(`war-battles-browser-playability:ok:${JSON.stringify(report)}`);

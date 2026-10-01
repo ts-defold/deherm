@@ -378,6 +378,8 @@ function spawnTankParts(self: ArenaSelf): void {
   }
 }
 
+const TANK_DEPOT_PRESENTATION_OFFSET_Y = 64;
+
 function syncTankDepots(self: ArenaSelf): void {
   const world = self.match.world;
   if (world === undefined || self.depotMapSeed === world.mapSeed) return;
@@ -386,11 +388,15 @@ function syncTankDepots(self: ArenaSelf): void {
   for (let index = 0; index < SPAWN_POINT_COUNT; index += 1) {
     const worldX = world.map.spawnX[index]!;
     const worldY = world.map.spawnY[index]!;
+    // The authoritative depot coordinate is the apron where pilots enter and
+    // tanks spawn. Present the building behind that apron instead of directly
+    // under the vehicle; overlapping the 1.4x depot art made a local hull read
+    // as part of the building.
     const id = factory.create(
       "#depotfactory",
       vmath.vector3(
         projectedX(worldX, worldY),
-        projectedY(worldX, worldY),
+        projectedY(worldX, worldY) + TANK_DEPOT_PRESENTATION_OFFSET_Y,
         0.16 + isometricDepth(worldX, worldY) * 0.05,
       ),
     ) as DefoldHash | undefined;

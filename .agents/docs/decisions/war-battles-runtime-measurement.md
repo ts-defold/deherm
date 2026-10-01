@@ -32,6 +32,14 @@ native/Wasm allocator counts, and Defold engine frame timing remain null or are
 reported with an unavailability reason. Missing browser APIs are evidence of
 an unobservable metric, not zero.
 
+The packaged browser playability gate is a separate presentation boundary. It
+interrupts the title loop with real keyboard input, enters and restarts an
+offline arena, and requires the authoritative local tank's 128 by 128 sprite
+frame to remain inside the canvas after reserving the upper and lower HUD safe
+areas. Engagement, restart, and respawn each produce one camera-snap marker;
+normal movement retains smoothed follow. The retained composed screenshot is
+human visual evidence, while the numeric frame assertion is the automated gate.
+
 # Allocation boundary
 
 Resident/heap snapshots are not allocation counters. The runtime artifact
@@ -53,4 +61,3 @@ The browser command requires a packaged wasm-web bundle and a browser target;
 without those inputs the artifact keeps browser timing and memory null with a
 reason. Recorded values are machine-dependent observations and must not be
 used as deterministic regression fixtures.
-

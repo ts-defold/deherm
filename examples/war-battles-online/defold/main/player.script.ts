@@ -95,6 +95,9 @@ interface PlayerSelf {
   directionIndex: number;
   moving: boolean;
   mode: number;
+  generation: number;
+  /** Snap the camera on the next authoritative transform sample. */
+  cameraSnapPending: boolean;
   transform: PlayerTransform;
 }
 
@@ -178,6 +181,7 @@ function fire(self: PlayerSelf): void {
 function engage(self: PlayerSelf): void {
   if (self.engaged) return;
   self.engaged = true;
+  self.cameraSnapPending = true;
   self.demoMove = 0;
   self.demoTurn = 0;
   self.direction = vmath.vector3(0, 0, 0);
@@ -239,6 +243,8 @@ export default defineComponent({
     self.directionIndex = -1;
     self.moving = false;
     self.mode = -1;
+    self.generation = -1;
+    self.cameraSnapPending = false;
     self.transform = { x: 0, y: 0, hullX: 0, hullY: 0, turretX: 0, turretY: 0 };
     msg.post("#hero", "disable");
     msg.post("#sprite", "play_animation", { id: tankHullIdleAnimation(0, 1, 4) });
@@ -290,6 +296,11 @@ export default defineComponent({
         }
       }
       if (!(match?.samplePlayerTransform(slot, self.transform) ?? false)) return;
+      const generation = world.playerGeneration[slot]!;
+      if (generation !== self.generation) {
+        self.generation = generation;
+        self.cameraSnapPending = true;
+      }
       const x = projectedX(self.transform.x, self.transform.y);
       const y = projectedY(self.transform.x, self.transform.y);
       const z = 0.2 + isometricDepth(self.transform.x, self.transform.y) * 0.05;
@@ -316,7 +327,8 @@ export default defineComponent({
         const facing = projectedDirectionRadians(self.transform.hullX, self.transform.hullY);
         go.setRotation(vmath.quatRotationZ(facing + Math.PI / 2));
       }
-      msg.post(CAMERA, "player_at", { x, y });
+      msg.post(CAMERA, "player_at", { x, y, snap: self.cameraSnapPending });
+      self.cameraSnapPending = false;
       return;
     }
 
@@ -373,6 +385,7 @@ export default defineComponent({
     if (actionId === RESTART) {
       if (action.pressed) {
         engage(self);
+        self.cameraSnapPending = true;
         msg.post(ARENA, "restart");
       }
       return true;

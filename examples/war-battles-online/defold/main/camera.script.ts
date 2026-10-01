@@ -28,6 +28,8 @@ const MAX_SHAKE_PIXELS = 14;
 interface PlayerAt {
   readonly x: number;
   readonly y: number;
+  /** Snap when ownership moves to a newly spawned authoritative body. */
+  readonly snap?: boolean;
 }
 
 interface CameraImpact {
@@ -54,6 +56,8 @@ interface CameraSelf {
   traceInterval: number;
   /** Editor property: fallback orthographic zoom when no camera component answers. */
   zoom: number;
+  /** Editor property: vertical camera overscan reserved for opaque HUD chrome. */
+  hudVerticalOverscan: number;
 
   halfWidth: number;
   halfHeight: number;
@@ -99,8 +103,12 @@ function resolveBounds(self: CameraSelf): void {
     self.minX = centre;
     self.maxX = centre;
   }
-  self.minY = self.worldMinY + self.halfHeight;
-  self.maxY = self.worldMaxY - self.halfHeight;
+  // The top and bottom HUD occupy part of the visible canvas. Permit a bounded
+  // amount of camera overscan on Y so edge spawns can sit in the playable safe
+  // area instead of behind that chrome. This changes presentation only; the
+  // authoritative arena and its deterministic spawn selection stay untouched.
+  self.minY = self.worldMinY + self.halfHeight - self.hudVerticalOverscan;
+  self.maxY = self.worldMaxY - self.halfHeight + self.hudVerticalOverscan;
   if (self.minY > self.maxY) {
     const centre = (self.worldMinY + self.worldMaxY) * 0.5;
     self.minY = centre;
@@ -148,6 +156,7 @@ export default defineComponent({
     followRate: property.number(7),
     traceInterval: property.number(1),
     zoom: property.number(2),
+    hudVerticalOverscan: property.number(80),
   },
 
   init(self: CameraSelf): void {
@@ -201,8 +210,29 @@ export default defineComponent({
 
   onMessage(self: CameraSelf, messageId: DefoldHash, message: PlayerAt | CameraImpact): void {
     if (messageId === PLAYER_AT) {
-      self.targetX = message.x;
-      self.targetY = message.y;
+      const player = message as PlayerAt;
+      self.targetX = player.x;
+      self.targetY = player.y;
+      if (player.snap === true) {
+        // Engagement, restart and respawn can relocate the authoritative
+        // player by more than a whole screen. Easing from the title-camera
+        // position leaves the tank clipped or absent while gameplay is already
+        // accepting input, so ownership transitions snap exactly once. Normal
+        // movement continues through the smoothed follow path below.
+        self.viewX = player.x;
+        self.viewY = player.y;
+        self.previousTargetX = player.x;
+        self.previousTargetY = player.y;
+        self.leadX = 0;
+        self.leadY = 0;
+        commit(self);
+        defold.log(
+          "info",
+          `war-battles:camera-snap:player=${player.x.toFixed(1)},${player.y.toFixed(1)}` +
+            `:view=${self.viewX.toFixed(1)},${self.viewY.toFixed(1)}` +
+            `:extent=${self.halfWidth.toFixed(1)},${self.halfHeight.toFixed(1)}`,
+        );
+      }
       return;
     }
     if (messageId !== CAMERA_IMPACT) return;

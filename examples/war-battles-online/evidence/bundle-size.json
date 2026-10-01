@@ -6,7 +6,7 @@
   "esbuildVersion": "0.25.10",
   "scope": "JavaScript bundle evidence only; not a Defold package or Hermes bytecode measurement",
   "sourceFileCount": 1155,
-  "sourceBytes": 13106579,
+  "sourceBytes": 13114096,
   "artifacts": {
     "headlessNodeBundle": {
       "bytes": 71436,

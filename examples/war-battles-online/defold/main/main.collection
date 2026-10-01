@@ -108,6 +108,11 @@ instances {
       value: "977.9696961966999"
       type: PROPERTY_TYPE_NUMBER
     }
+    properties {
+      id: "hudVerticalOverscan"
+      value: "80.0"
+      type: PROPERTY_TYPE_NUMBER
+    }
   }
   scale3 {
     x: 1.0

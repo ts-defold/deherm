@@ -142,6 +142,7 @@ function authoredCameraWorldBounds(collection) {
     minY: numberProperty("worldMinY"),
     maxX: numberProperty("worldMaxX"),
     maxY: numberProperty("worldMaxY"),
+    verticalOverscan: numberProperty("hudVerticalOverscan"),
   };
 }
 
@@ -181,11 +182,11 @@ function cameraGeometry(transcript, authoredBounds) {
     "Browser camera maximum X must preserve the authored world bound",
   );
   assert.ok(
-    Math.abs(geometry.minY - geometry.viewHeight / 2 - authoredBounds.minY) < 1,
+    Math.abs(geometry.minY - geometry.viewHeight / 2 + authoredBounds.verticalOverscan - authoredBounds.minY) < 1,
     "Browser camera minimum Y must preserve the authored world bound",
   );
   assert.ok(
-    Math.abs(geometry.maxY + geometry.viewHeight / 2 - authoredBounds.maxY) < 1,
+    Math.abs(geometry.maxY + geometry.viewHeight / 2 - authoredBounds.verticalOverscan - authoredBounds.maxY) < 1,
     "Browser camera maximum Y must preserve the authored world bound",
   );
   return geometry;
