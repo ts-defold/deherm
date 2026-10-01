@@ -8,7 +8,7 @@
     "policy": "packages/bindings/overrides/dmsdk-cstring-value-bindings.json"
   },
   "sourceHashes": {
-    "projection": "71b49d4aac3b9aafffe8680a95ed08bc8fc46a2c7ffeceb5b6c303d9ce4685ba",
+    "projection": "1dbc91963178dfb68e5ee8bc2a66f93a35e5daee04d302a9a4226f6b7b21cee5",
     "sdkIr": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "policy": "f38eb566b09c60d718ef0303af1007baf21893848e45f516d2dc6bbba1ad09c8"
   },

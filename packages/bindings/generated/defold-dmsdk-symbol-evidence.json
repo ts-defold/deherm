@@ -530,11 +530,11 @@
   ],
   "totals": {
     "declarations": 1357,
-    "external": 981,
+    "external": 994,
     "headerOnly": 94,
-    "absent": 156,
+    "absent": 155,
     "unmeasured": 110,
-    "signatureMismatch": 16
+    "signatureMismatch": 4
   },
   "kindCounts": {
     "constructor": 61,
@@ -543,14 +543,14 @@
     "method": 113
   },
   "availabilityCounts": {
-    "all-targets-all-variants": 929,
+    "all-targets-all-variants": 943,
     "header-only": 94,
     "partially-measured": 22,
-    "signature-mismatch": 16,
-    "target-subset": 26,
-    "unlinked": 156,
+    "signature-mismatch": 4,
+    "target-subset": 24,
+    "unlinked": 155,
     "unmeasured": 102,
-    "variant-conditional": 12
+    "variant-conditional": 13
   },
   "declarations": {
     "dmsdk:dmDDF::GetDescriptorFromHash@upstream/defold/engine/ddf/src/dmsdk/ddf/ddf.h:77:3": {
@@ -28794,9 +28794,19 @@
       "name": "dmGameObject::LuaScript::LuaScript",
       "kind": "constructor",
       "header": "upstream/defold/engine/gameobject/src/dmsdk/gameobject/res_lua.h",
-      "linkage": "absent",
-      "availability": "unlinked",
-      "linkedIn": {}
+      "linkage": "external",
+      "availability": "target-subset",
+      "linkedIn": {
+        "debug": [
+          "x86_64-win32"
+        ],
+        "release": [
+          "x86_64-win32"
+        ],
+        "headless": [
+          "x86_64-win32"
+        ]
+      }
     },
     "dmsdk:dmGameObject::PostScriptMessage@upstream/defold/engine/gameobject/src/dmsdk/gameobject/script.h:42:1102": {
       "name": "dmGameObject::PostScriptMessage",
@@ -30544,9 +30554,52 @@
       "name": "dmGameSystem::CompGuiNodeTypeSetNodeDescFn",
       "kind": "function",
       "header": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/gui.h",
-      "linkage": "signature-mismatch",
-      "availability": "signature-mismatch",
-      "linkedIn": {}
+      "linkage": "external",
+      "availability": "all-targets-all-variants",
+      "linkedIn": {
+        "debug": [
+          "arm64-android",
+          "arm64-ios",
+          "arm64-linux",
+          "arm64-osx",
+          "arm64_sim-ios",
+          "armv7-android",
+          "wasm-web",
+          "wasm_pthread-web",
+          "x86_64-android",
+          "x86_64-linux",
+          "x86_64-osx",
+          "x86_64-win32"
+        ],
+        "release": [
+          "arm64-android",
+          "arm64-ios",
+          "arm64-linux",
+          "arm64-osx",
+          "arm64_sim-ios",
+          "armv7-android",
+          "wasm-web",
+          "wasm_pthread-web",
+          "x86_64-android",
+          "x86_64-linux",
+          "x86_64-osx",
+          "x86_64-win32"
+        ],
+        "headless": [
+          "arm64-android",
+          "arm64-ios",
+          "arm64-linux",
+          "arm64-osx",
+          "arm64_sim-ios",
+          "armv7-android",
+          "wasm-web",
+          "wasm_pthread-web",
+          "x86_64-android",
+          "x86_64-linux",
+          "x86_64-osx",
+          "x86_64-win32"
+        ]
+      }
     },
     "dmsdk:dmGameSystem::CompGuiNodeTypeSetUpdateFn@upstream/defold/engine/gamesys/src/dmsdk/gamesys/gui.h:146:1181": {
       "name": "dmGameSystem::CompGuiNodeTypeSetUpdateFn",
@@ -31567,7 +31620,7 @@
       "kind": "function",
       "header": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_data.h",
       "linkage": "external",
-      "availability": "target-subset",
+      "availability": "all-targets-all-variants",
       "linkedIn": {
         "debug": [
           "arm64-android",
@@ -31580,7 +31633,8 @@
           "wasm_pthread-web",
           "x86_64-android",
           "x86_64-linux",
-          "x86_64-osx"
+          "x86_64-osx",
+          "x86_64-win32"
         ],
         "release": [
           "arm64-android",
@@ -31593,7 +31647,8 @@
           "wasm_pthread-web",
           "x86_64-android",
           "x86_64-linux",
-          "x86_64-osx"
+          "x86_64-osx",
+          "x86_64-win32"
         ],
         "headless": [
           "arm64-android",
@@ -31606,7 +31661,8 @@
           "wasm_pthread-web",
           "x86_64-android",
           "x86_64-linux",
-          "x86_64-osx"
+          "x86_64-osx",
+          "x86_64-win32"
         ]
       }
     },
@@ -33522,9 +33578,52 @@
       "name": "dmGraphics::NewVertexStreamDeclaration",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h",
-      "linkage": "signature-mismatch",
-      "availability": "signature-mismatch",
-      "linkedIn": {}
+      "linkage": "external",
+      "availability": "all-targets-all-variants",
+      "linkedIn": {
+        "debug": [
+          "arm64-android",
+          "arm64-ios",
+          "arm64-linux",
+          "arm64-osx",
+          "arm64_sim-ios",
+          "armv7-android",
+          "wasm-web",
+          "wasm_pthread-web",
+          "x86_64-android",
+          "x86_64-linux",
+          "x86_64-osx",
+          "x86_64-win32"
+        ],
+        "release": [
+          "arm64-android",
+          "arm64-ios",
+          "arm64-linux",
+          "arm64-osx",
+          "arm64_sim-ios",
+          "armv7-android",
+          "wasm-web",
+          "wasm_pthread-web",
+          "x86_64-android",
+          "x86_64-linux",
+          "x86_64-osx",
+          "x86_64-win32"
+        ],
+        "headless": [
+          "arm64-android",
+          "arm64-ios",
+          "arm64-linux",
+          "arm64-osx",
+          "arm64_sim-ios",
+          "armv7-android",
+          "wasm-web",
+          "wasm_pthread-web",
+          "x86_64-android",
+          "x86_64-linux",
+          "x86_64-osx",
+          "x86_64-win32"
+        ]
+      }
     },
     "dmsdk:dmGraphics::AddVertexStream@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:942:1374": {
       "name": "dmGraphics::AddVertexStream",
@@ -38528,9 +38627,52 @@
       "name": "dmGraphics::NewProgram",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h",
-      "linkage": "signature-mismatch",
-      "availability": "signature-mismatch",
-      "linkedIn": {}
+      "linkage": "external",
+      "availability": "all-targets-all-variants",
+      "linkedIn": {
+        "debug": [
+          "arm64-android",
+          "arm64-ios",
+          "arm64-linux",
+          "arm64-osx",
+          "arm64_sim-ios",
+          "armv7-android",
+          "wasm-web",
+          "wasm_pthread-web",
+          "x86_64-android",
+          "x86_64-linux",
+          "x86_64-osx",
+          "x86_64-win32"
+        ],
+        "release": [
+          "arm64-android",
+          "arm64-ios",
+          "arm64-linux",
+          "arm64-osx",
+          "arm64_sim-ios",
+          "armv7-android",
+          "wasm-web",
+          "wasm_pthread-web",
+          "x86_64-android",
+          "x86_64-linux",
+          "x86_64-osx",
+          "x86_64-win32"
+        ],
+        "headless": [
+          "arm64-android",
+          "arm64-ios",
+          "arm64-linux",
+          "arm64-osx",
+          "arm64_sim-ios",
+          "armv7-android",
+          "wasm-web",
+          "wasm_pthread-web",
+          "x86_64-android",
+          "x86_64-linux",
+          "x86_64-osx",
+          "x86_64-win32"
+        ]
+      }
     },
     "dmsdk:dmGraphics::DeleteProgram@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1951:1475": {
       "name": "dmGraphics::DeleteProgram",
@@ -39837,9 +39979,28 @@
       "name": "dmGraphics::VulkanCreateDescriptorPool",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h",
-      "linkage": "signature-mismatch",
-      "availability": "signature-mismatch",
-      "linkedIn": {}
+      "linkage": "external",
+      "availability": "variant-conditional",
+      "linkedIn": {
+        "debug": [
+          "arm64-android",
+          "arm64-osx",
+          "armv7-android",
+          "x86_64-android",
+          "x86_64-osx"
+        ],
+        "release": [
+          "arm64-android",
+          "arm64-osx",
+          "armv7-android",
+          "x86_64-android",
+          "x86_64-osx"
+        ],
+        "headless": [
+          "arm64-osx",
+          "x86_64-osx"
+        ]
+      }
     },
     "dmsdk:dmGraphics::WebGPUGetInstance@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:50:1527": {
       "name": "dmGraphics::WebGPUGetInstance",
@@ -43829,7 +43990,7 @@
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
       "linkage": "external",
-      "availability": "target-subset",
+      "availability": "all-targets-all-variants",
       "linkedIn": {
         "debug": [
           "arm64-android",
@@ -43842,7 +44003,8 @@
           "wasm_pthread-web",
           "x86_64-android",
           "x86_64-linux",
-          "x86_64-osx"
+          "x86_64-osx",
+          "x86_64-win32"
         ],
         "release": [
           "arm64-android",
@@ -43855,7 +44017,8 @@
           "wasm_pthread-web",
           "x86_64-android",
           "x86_64-linux",
-          "x86_64-osx"
+          "x86_64-osx",
+          "x86_64-win32"
         ],
         "headless": [
           "arm64-android",
@@ -43868,7 +44031,8 @@
           "wasm_pthread-web",
           "x86_64-android",
           "x86_64-linux",
-          "x86_64-osx"
+          "x86_64-osx",
+          "x86_64-win32"
         ]
       }
     },
@@ -44795,7 +44959,7 @@
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
       "linkage": "external",
-      "availability": "target-subset",
+      "availability": "all-targets-all-variants",
       "linkedIn": {
         "debug": [
           "arm64-android",
@@ -44808,7 +44972,8 @@
           "wasm_pthread-web",
           "x86_64-android",
           "x86_64-linux",
-          "x86_64-osx"
+          "x86_64-osx",
+          "x86_64-win32"
         ],
         "release": [
           "arm64-android",
@@ -44821,7 +44986,8 @@
           "wasm_pthread-web",
           "x86_64-android",
           "x86_64-linux",
-          "x86_64-osx"
+          "x86_64-osx",
+          "x86_64-win32"
         ],
         "headless": [
           "arm64-android",
@@ -44834,7 +45000,8 @@
           "wasm_pthread-web",
           "x86_64-android",
           "x86_64-linux",
-          "x86_64-osx"
+          "x86_64-osx",
+          "x86_64-win32"
         ]
       }
     },
@@ -44842,9 +45009,52 @@
       "name": "dmRender::SetConstantType",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
-      "linkage": "signature-mismatch",
-      "availability": "signature-mismatch",
-      "linkedIn": {}
+      "linkage": "external",
+      "availability": "all-targets-all-variants",
+      "linkedIn": {
+        "debug": [
+          "arm64-android",
+          "arm64-ios",
+          "arm64-linux",
+          "arm64-osx",
+          "arm64_sim-ios",
+          "armv7-android",
+          "wasm-web",
+          "wasm_pthread-web",
+          "x86_64-android",
+          "x86_64-linux",
+          "x86_64-osx",
+          "x86_64-win32"
+        ],
+        "release": [
+          "arm64-android",
+          "arm64-ios",
+          "arm64-linux",
+          "arm64-osx",
+          "arm64_sim-ios",
+          "armv7-android",
+          "wasm-web",
+          "wasm_pthread-web",
+          "x86_64-android",
+          "x86_64-linux",
+          "x86_64-osx",
+          "x86_64-win32"
+        ],
+        "headless": [
+          "arm64-android",
+          "arm64-ios",
+          "arm64-linux",
+          "arm64-osx",
+          "arm64_sim-ios",
+          "armv7-android",
+          "wasm-web",
+          "wasm_pthread-web",
+          "x86_64-android",
+          "x86_64-linux",
+          "x86_64-osx",
+          "x86_64-win32"
+        ]
+      }
     },
     "dmsdk:dmRender::NewNamedConstantBuffer@upstream/defold/engine/render/src/dmsdk/render/render.h:544:1847": {
       "name": "dmRender::NewNamedConstantBuffer",
@@ -45105,9 +45315,52 @@
       "name": "dmRender::SetNamedConstant",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
-      "linkage": "signature-mismatch",
-      "availability": "signature-mismatch",
-      "linkedIn": {}
+      "linkage": "external",
+      "availability": "all-targets-all-variants",
+      "linkedIn": {
+        "debug": [
+          "arm64-android",
+          "arm64-ios",
+          "arm64-linux",
+          "arm64-osx",
+          "arm64_sim-ios",
+          "armv7-android",
+          "wasm-web",
+          "wasm_pthread-web",
+          "x86_64-android",
+          "x86_64-linux",
+          "x86_64-osx",
+          "x86_64-win32"
+        ],
+        "release": [
+          "arm64-android",
+          "arm64-ios",
+          "arm64-linux",
+          "arm64-osx",
+          "arm64_sim-ios",
+          "armv7-android",
+          "wasm-web",
+          "wasm_pthread-web",
+          "x86_64-android",
+          "x86_64-linux",
+          "x86_64-osx",
+          "x86_64-win32"
+        ],
+        "headless": [
+          "arm64-android",
+          "arm64-ios",
+          "arm64-linux",
+          "arm64-osx",
+          "arm64_sim-ios",
+          "armv7-android",
+          "wasm-web",
+          "wasm_pthread-web",
+          "x86_64-android",
+          "x86_64-linux",
+          "x86_64-osx",
+          "x86_64-win32"
+        ]
+      }
     },
     "dmsdk:dmRender::SetNamedConstants@upstream/defold/engine/render/src/dmsdk/render/render.h:598:1853": {
       "name": "dmRender::SetNamedConstants",
@@ -45164,9 +45417,52 @@
       "name": "dmRender::SetNamedConstantAtIndex",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
-      "linkage": "signature-mismatch",
-      "availability": "signature-mismatch",
-      "linkedIn": {}
+      "linkage": "external",
+      "availability": "all-targets-all-variants",
+      "linkedIn": {
+        "debug": [
+          "arm64-android",
+          "arm64-ios",
+          "arm64-linux",
+          "arm64-osx",
+          "arm64_sim-ios",
+          "armv7-android",
+          "wasm-web",
+          "wasm_pthread-web",
+          "x86_64-android",
+          "x86_64-linux",
+          "x86_64-osx",
+          "x86_64-win32"
+        ],
+        "release": [
+          "arm64-android",
+          "arm64-ios",
+          "arm64-linux",
+          "arm64-osx",
+          "arm64_sim-ios",
+          "armv7-android",
+          "wasm-web",
+          "wasm_pthread-web",
+          "x86_64-android",
+          "x86_64-linux",
+          "x86_64-osx",
+          "x86_64-win32"
+        ],
+        "headless": [
+          "arm64-android",
+          "arm64-ios",
+          "arm64-linux",
+          "arm64-osx",
+          "arm64_sim-ios",
+          "armv7-android",
+          "wasm-web",
+          "wasm_pthread-web",
+          "x86_64-android",
+          "x86_64-linux",
+          "x86_64-osx",
+          "x86_64-win32"
+        ]
+      }
     },
     "dmsdk:dmRender::GetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:621:1855": {
       "name": "dmRender::GetNamedConstant",
@@ -45223,9 +45519,52 @@
       "name": "dmRender::GetNamedConstant",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
-      "linkage": "signature-mismatch",
-      "availability": "signature-mismatch",
-      "linkedIn": {}
+      "linkage": "external",
+      "availability": "all-targets-all-variants",
+      "linkedIn": {
+        "debug": [
+          "arm64-android",
+          "arm64-ios",
+          "arm64-linux",
+          "arm64-osx",
+          "arm64_sim-ios",
+          "armv7-android",
+          "wasm-web",
+          "wasm_pthread-web",
+          "x86_64-android",
+          "x86_64-linux",
+          "x86_64-osx",
+          "x86_64-win32"
+        ],
+        "release": [
+          "arm64-android",
+          "arm64-ios",
+          "arm64-linux",
+          "arm64-osx",
+          "arm64_sim-ios",
+          "armv7-android",
+          "wasm-web",
+          "wasm_pthread-web",
+          "x86_64-android",
+          "x86_64-linux",
+          "x86_64-osx",
+          "x86_64-win32"
+        ],
+        "headless": [
+          "arm64-android",
+          "arm64-ios",
+          "arm64-linux",
+          "arm64-osx",
+          "arm64_sim-ios",
+          "armv7-android",
+          "wasm-web",
+          "wasm_pthread-web",
+          "x86_64-android",
+          "x86_64-linux",
+          "x86_64-osx",
+          "x86_64-win32"
+        ]
+      }
     },
     "dmsdk:dmRender::GetNamedConstantCount@upstream/defold/engine/render/src/dmsdk/render/render.h:642:1857": {
       "name": "dmRender::GetNamedConstantCount",
@@ -50658,25 +50997,154 @@
       "name": "dmRig::SetMeshWriteAttributeParams",
       "kind": "function",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
-      "linkage": "signature-mismatch",
-      "availability": "signature-mismatch",
-      "linkedIn": {}
+      "linkage": "external",
+      "availability": "all-targets-all-variants",
+      "linkedIn": {
+        "debug": [
+          "arm64-android",
+          "arm64-ios",
+          "arm64-linux",
+          "arm64-osx",
+          "arm64_sim-ios",
+          "armv7-android",
+          "wasm-web",
+          "wasm_pthread-web",
+          "x86_64-android",
+          "x86_64-linux",
+          "x86_64-osx",
+          "x86_64-win32"
+        ],
+        "release": [
+          "arm64-android",
+          "arm64-ios",
+          "arm64-linux",
+          "arm64-osx",
+          "arm64_sim-ios",
+          "armv7-android",
+          "wasm-web",
+          "wasm_pthread-web",
+          "x86_64-android",
+          "x86_64-linux",
+          "x86_64-osx",
+          "x86_64-win32"
+        ],
+        "headless": [
+          "arm64-android",
+          "arm64-ios",
+          "arm64-linux",
+          "arm64-osx",
+          "arm64_sim-ios",
+          "armv7-android",
+          "wasm-web",
+          "wasm_pthread-web",
+          "x86_64-android",
+          "x86_64-linux",
+          "x86_64-osx",
+          "x86_64-win32"
+        ]
+      }
     },
     "dmsdk:dmRig::GenerateVertexDataFromAttributes@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:195:2053": {
       "name": "dmRig::GenerateVertexDataFromAttributes",
       "kind": "function",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
-      "linkage": "signature-mismatch",
-      "availability": "signature-mismatch",
-      "linkedIn": {}
+      "linkage": "external",
+      "availability": "all-targets-all-variants",
+      "linkedIn": {
+        "debug": [
+          "arm64-android",
+          "arm64-ios",
+          "arm64-linux",
+          "arm64-osx",
+          "arm64_sim-ios",
+          "armv7-android",
+          "wasm-web",
+          "wasm_pthread-web",
+          "x86_64-android",
+          "x86_64-linux",
+          "x86_64-osx",
+          "x86_64-win32"
+        ],
+        "release": [
+          "arm64-android",
+          "arm64-ios",
+          "arm64-linux",
+          "arm64-osx",
+          "arm64_sim-ios",
+          "armv7-android",
+          "wasm-web",
+          "wasm_pthread-web",
+          "x86_64-android",
+          "x86_64-linux",
+          "x86_64-osx",
+          "x86_64-win32"
+        ],
+        "headless": [
+          "arm64-android",
+          "arm64-ios",
+          "arm64-linux",
+          "arm64-osx",
+          "arm64_sim-ios",
+          "armv7-android",
+          "wasm-web",
+          "wasm_pthread-web",
+          "x86_64-android",
+          "x86_64-linux",
+          "x86_64-osx",
+          "x86_64-win32"
+        ]
+      }
     },
     "dmsdk:dmRig::GenerateVertexData@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:196:2054": {
       "name": "dmRig::GenerateVertexData",
       "kind": "function",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
-      "linkage": "signature-mismatch",
-      "availability": "signature-mismatch",
-      "linkedIn": {}
+      "linkage": "external",
+      "availability": "all-targets-all-variants",
+      "linkedIn": {
+        "debug": [
+          "arm64-android",
+          "arm64-ios",
+          "arm64-linux",
+          "arm64-osx",
+          "arm64_sim-ios",
+          "armv7-android",
+          "wasm-web",
+          "wasm_pthread-web",
+          "x86_64-android",
+          "x86_64-linux",
+          "x86_64-osx",
+          "x86_64-win32"
+        ],
+        "release": [
+          "arm64-android",
+          "arm64-ios",
+          "arm64-linux",
+          "arm64-osx",
+          "arm64_sim-ios",
+          "armv7-android",
+          "wasm-web",
+          "wasm_pthread-web",
+          "x86_64-android",
+          "x86_64-linux",
+          "x86_64-osx",
+          "x86_64-win32"
+        ],
+        "headless": [
+          "arm64-android",
+          "arm64-ios",
+          "arm64-linux",
+          "arm64-osx",
+          "arm64_sim-ios",
+          "armv7-android",
+          "wasm-web",
+          "wasm_pthread-web",
+          "x86_64-android",
+          "x86_64-linux",
+          "x86_64-osx",
+          "x86_64-win32"
+        ]
+      }
     },
     "dmsdk:dmRig::GetVertexCount@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:197:2055": {
       "name": "dmRig::GetVertexCount",
@@ -51651,9 +52119,52 @@
       "name": "dmRig::CopyBindPose",
       "kind": "function",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
-      "linkage": "signature-mismatch",
-      "availability": "signature-mismatch",
-      "linkedIn": {}
+      "linkage": "external",
+      "availability": "all-targets-all-variants",
+      "linkedIn": {
+        "debug": [
+          "arm64-android",
+          "arm64-ios",
+          "arm64-linux",
+          "arm64-osx",
+          "arm64_sim-ios",
+          "armv7-android",
+          "wasm-web",
+          "wasm_pthread-web",
+          "x86_64-android",
+          "x86_64-linux",
+          "x86_64-osx",
+          "x86_64-win32"
+        ],
+        "release": [
+          "arm64-android",
+          "arm64-ios",
+          "arm64-linux",
+          "arm64-osx",
+          "arm64_sim-ios",
+          "armv7-android",
+          "wasm-web",
+          "wasm_pthread-web",
+          "x86_64-android",
+          "x86_64-linux",
+          "x86_64-osx",
+          "x86_64-win32"
+        ],
+        "headless": [
+          "arm64-android",
+          "arm64-ios",
+          "arm64-linux",
+          "arm64-osx",
+          "arm64_sim-ios",
+          "armv7-android",
+          "wasm-web",
+          "wasm_pthread-web",
+          "x86_64-android",
+          "x86_64-linux",
+          "x86_64-osx",
+          "x86_64-win32"
+        ]
+      }
     },
     "dmsdk:dmScript::LuaStackCheck::LuaStackCheck@upstream/defold/engine/script/src/dmsdk/script/script.h:74:2078": {
       "name": "dmScript::LuaStackCheck::LuaStackCheck",

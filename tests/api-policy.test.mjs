@@ -36,6 +36,12 @@ import { manifestUrl, missingPublishedEntries } from "../scripts/check-published
 import { fetchPolicyText, validateRebuiltHandshake } from "../scripts/check-policy-site-resolution.mjs";
 import { buildShippedIndex, canonicalizePolicyText, generatorRevision } from "../scripts/generate-api-policy.mjs";
 import { apiPolicyGenerator } from "../scripts/lib/script-generator-pipeline.mjs";
+import {
+  blockerFromLog,
+  planPolicyDerivationIssueReconciliation,
+  stageFromLog,
+} from "../scripts/reconcile-policy-derivation-issues.mjs";
+import { resolveLlvmTool } from "../scripts/generate-dmsdk-symbol-evidence.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const generated = path.join(repositoryRoot, "packages", "bindings", "generated");
@@ -102,6 +108,11 @@ test("policy host parity materializes every authoritative generator input", asyn
   assert.match(publish, /build\/published-policy-site\/v1\/artifacts/u);
   assert.match(publish, /--artifact-references/u);
   assert.match(derive, /build-policy-site\.mjs --out build\/policy-site --validation-only/u);
+  assert.match(derive, /apt-get install -y --no-install-recommends llvm/u);
+  assert.match(derive, /command -v llvm-nm/u);
+  assert.match(derive, /reconcile-policy-derivation-issues\.mjs/u);
+  assert.match(derive, /needs\.plan\.outputs\.any == 'true'/u);
+  assert.doesNotMatch(derive, /title="policy: unproven Defold/u);
   assert.doesNotMatch(publish, /--validation-only/u);
   assert.match(workflow, /dispatch-end-to-end:[\s\S]*needs: consumer-smoke/u);
   assert.match(workflow, /needs\.consumer-smoke\.result == 'success'/u);
@@ -142,6 +153,85 @@ test("policy host parity materializes every authoritative generator input", asyn
   );
   assert.match(workflow, /consumer-smoke:[\s\S]*needs: \[derive, publish-site\]/u);
   assert.match(workflow, /check-published-policy\.mjs/u);
+});
+
+test("LLVM tools resolve versioned Linux binaries and macOS xcrun without false archive failures", () => {
+  const linuxCalls = [];
+  const linux = resolveLlvmTool("llvm-nm", {
+    platform: "linux",
+    spawnSync(command) {
+      linuxCalls.push(command);
+      return command === "llvm-nm-18" ? { status: 0 } : { status: 1 };
+    },
+  });
+  assert.deepEqual(linux, ["llvm-nm-18"]);
+  assert.ok(linuxCalls.includes("llvm-nm-18"));
+
+  const mac = resolveLlvmTool("llvm-cxxfilt", {
+    platform: "darwin",
+    spawnSync(command) {
+      return command === "xcrun" ? { status: 0 } : { status: 1 };
+    },
+  });
+  assert.deepEqual(mac, ["xcrun", "llvm-cxxfilt"]);
+
+  const missing = resolveLlvmTool("llvm-nm", {
+    platform: "linux",
+    spawnSync() {
+      return { status: 1 };
+    },
+  });
+  assert.equal(missing, null);
+});
+
+test("policy derivation failures collapse by generator stage and stale per-revision spam closes", () => {
+  const realSummary = [
+    "Defold aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa is NOT derivable from this checkout.",
+    "Error: llvm-nm could not read one archive",
+    "  blocked by generator at scripts/generate-dmsdk-symbol-evidence.mjs: Command failed",
+    "  committed surface unchanged",
+  ].join("\n");
+  assert.equal(stageFromLog(realSummary), "scripts/generate-dmsdk-symbol-evidence.mjs");
+  assert.equal(blockerFromLog(realSummary), "llvm-nm could not read one archive");
+
+  const actions = planPolicyDerivationIssueReconciliation({
+    existingIssues: [
+      { number: 140, title: "policy: unproven Defold old", state: "OPEN" },
+      { number: 142, title: "policy derivation: generate-dmsdk-symbol-evidence", state: "CLOSED" },
+      { number: 99, title: "Ship playable War Battles", state: "OPEN" },
+    ],
+    failures: [
+      {
+        channel: "stable",
+        revision: "a".repeat(40),
+        version: "1.14.0",
+        stage: "scripts/generate-dmsdk-symbol-evidence.mjs",
+        blocker: "required LLVM tool 'llvm-nm' is unavailable",
+      },
+      {
+        channel: "beta",
+        revision: "b".repeat(40),
+        version: "1.14.1",
+        stage: "scripts/generate-dmsdk-symbol-evidence.mjs",
+        blocker: "required LLVM tool 'llvm-nm' is unavailable",
+      },
+    ],
+    runUrl: "https://example.test/run/1",
+  });
+  assert.deepEqual(
+    actions.map(({ kind, number, title }) => ({ kind, number, title })),
+    [
+      { kind: "reopen", number: 142, title: undefined },
+      { kind: "edit", number: 142, title: undefined },
+      { kind: "close", number: 140, title: undefined },
+    ],
+  );
+  assert.equal(actions.filter(({ kind }) => kind === "create").length, 0);
+  assert.equal(
+    actions.some(({ number }) => number === 99),
+    false,
+  );
+  assert.match(actions.find(({ kind }) => kind === "edit").body, /2 tracked revision\(s\)/u);
 });
 
 test("all workflow artifact actions use their Node 24-compatible official majors", async () => {

@@ -43,18 +43,18 @@
     "hashes": {
       "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
       "classification": "d6ad0e5c99963eca0deacb5f6827d52e26eb1dd630947797d9b343081ed9c52f",
-      "symbolEvidence": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+      "symbolEvidence": "75df7c7179c3241159dbdf67b97d1578062bd2ae8a50146ec66f7f01bc7ec6ee",
       "targetConditionals": "e743b8b82ba78fb8d6c6f49973493f69e3ae53ea3cea05a02ae42bbf8647cdbf",
       "loweringEvidence": {
         "scalar": "9c4621db3613a53b7a470d249d06e25787b3bf917f32e4840315bc2efdc4d291",
         "enumValue": "52e9533abdb4b76dccfbae10f7f9e954003ba5755d9a255be8b5a66198d616a4",
-        "namedScalar": "8e9b149acbf3ab77cb7835329cac4f9f5deed61c1b1a64e113247159dfc6b5cc",
+        "namedScalar": "2142e8db67a1a2363f2ab8a278bf5ea6bb850415b8542cf13dac5a27cc60be68",
         "fixedDigest": "dfb5adf5b7a7421191397a4d1e27bf2ac08c2e3da96fe5ff8473ce9eaf939dcb",
         "base64Span": "e8603b1789f77c90eef3d12c007766f0331d57a724668bc51e473ab361464e51",
         "astcProbe": "26b9ba056c789111bf61bf84c868fbdde63f3db9c2fef57ce9d6aa120603b17f",
         "xteaSpan": "73c8d977ab6c9e5a8599c07262da34105ddf2988e1009c5cfe46eaa502370634",
         "hashSpan": "1ac8e9330772346282796b058505eadb88f7f8cf878532f7a387c85bafd7cc72",
-        "arenaSpan": "701b3d52ba6bc2227a4b8a82d458bce2213fba0384b632304842466c6a55ecb7"
+        "arenaSpan": "67d7a5144a958d8dbcfea00fbfc0145fc80d1a77e40400626f8c72209326f248"
       },
       "headers": {
         "upstream/defold/engine/ddf/src/dmsdk/ddf/ddf.h": "e297d562c49b88a2a72c24ddd52b39157ba497643146629f74fccd1d493f1026",
@@ -188,20 +188,20 @@
     "receiverBound": 186
   },
   "availabilitySummary": {
-    "all-targets-all-variants": 929,
+    "all-targets-all-variants": 943,
     "header-only": 93,
     "partially-measured": 22,
-    "signature-mismatch": 16,
-    "target-subset": 26,
-    "unlinked": 150,
+    "signature-mismatch": 4,
+    "target-subset": 24,
+    "unlinked": 149,
     "unmeasured": 113,
-    "variant-conditional": 12
+    "variant-conditional": 13
   },
   "linkageSummary": {
-    "absent": 150,
-    "external": 981,
+    "absent": 149,
+    "external": 994,
     "header-only": 93,
-    "signature-mismatch": 16,
+    "signature-mismatch": 4,
     "unmeasured": 121
   },
   "accountingSummary": {
@@ -50789,8 +50789,8 @@
           "pairing": "not-applicable"
         },
         "availability": {
-          "kind": "unlinked",
-          "linkage": "absent",
+          "kind": "target-subset",
+          "linkage": "external",
           "platformGated": false,
           "profiles": "measured-engine-archive-linkage",
           "evidence": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json"
@@ -64369,8 +64369,8 @@
           "pairing": "not-applicable"
         },
         "availability": {
-          "kind": "signature-mismatch",
-          "linkage": "signature-mismatch",
+          "kind": "all-targets-all-variants",
+          "linkage": "external",
           "platformGated": false,
           "profiles": "measured-engine-archive-linkage",
           "evidence": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json"
@@ -66291,7 +66291,7 @@
           "pairing": "not-applicable"
         },
         "availability": {
-          "kind": "target-subset",
+          "kind": "all-targets-all-variants",
           "linkage": "external",
           "platformGated": false,
           "profiles": "measured-engine-archive-linkage",
@@ -85549,8 +85549,8 @@
           "pairing": "unspecified-requires-token"
         },
         "availability": {
-          "kind": "signature-mismatch",
-          "linkage": "signature-mismatch",
+          "kind": "all-targets-all-variants",
+          "linkage": "external",
           "platformGated": false,
           "profiles": "measured-engine-archive-linkage",
           "evidence": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json"
@@ -86710,8 +86710,8 @@
           "pairing": "not-applicable"
         },
         "availability": {
-          "kind": "signature-mismatch",
-          "linkage": "signature-mismatch",
+          "kind": "all-targets-all-variants",
+          "linkage": "external",
           "platformGated": false,
           "profiles": "measured-engine-archive-linkage",
           "evidence": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json"
@@ -92648,8 +92648,8 @@
           "pairing": "not-applicable"
         },
         "availability": {
-          "kind": "signature-mismatch",
-          "linkage": "signature-mismatch",
+          "kind": "variant-conditional",
+          "linkage": "external",
           "platformGated": true,
           "profiles": "measured-engine-archive-linkage",
           "evidence": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json"
@@ -120348,7 +120348,7 @@
           "pairing": "not-applicable"
         },
         "availability": {
-          "kind": "target-subset",
+          "kind": "all-targets-all-variants",
           "linkage": "external",
           "platformGated": false,
           "profiles": "measured-engine-archive-linkage",
@@ -121208,7 +121208,7 @@
           "pairing": "not-applicable"
         },
         "availability": {
-          "kind": "target-subset",
+          "kind": "all-targets-all-variants",
           "linkage": "external",
           "platformGated": false,
           "profiles": "measured-engine-archive-linkage",
@@ -121639,8 +121639,8 @@
           "pairing": "not-applicable"
         },
         "availability": {
-          "kind": "signature-mismatch",
-          "linkage": "signature-mismatch",
+          "kind": "all-targets-all-variants",
+          "linkage": "external",
           "platformGated": false,
           "profiles": "measured-engine-archive-linkage",
           "evidence": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json"
@@ -124015,8 +124015,8 @@
           "pairing": "not-applicable"
         },
         "availability": {
-          "kind": "signature-mismatch",
-          "linkage": "signature-mismatch",
+          "kind": "all-targets-all-variants",
+          "linkage": "external",
           "platformGated": false,
           "profiles": "measured-engine-archive-linkage",
           "evidence": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json"
@@ -125272,8 +125272,8 @@
           "pairing": "not-applicable"
         },
         "availability": {
-          "kind": "signature-mismatch",
-          "linkage": "signature-mismatch",
+          "kind": "all-targets-all-variants",
+          "linkage": "external",
           "platformGated": false,
           "profiles": "measured-engine-archive-linkage",
           "evidence": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json"
@@ -125500,8 +125500,8 @@
           "pairing": "not-applicable"
         },
         "availability": {
-          "kind": "signature-mismatch",
-          "linkage": "signature-mismatch",
+          "kind": "all-targets-all-variants",
+          "linkage": "external",
           "platformGated": false,
           "profiles": "measured-engine-archive-linkage",
           "evidence": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json"
@@ -134017,8 +134017,8 @@
           "pairing": "not-applicable"
         },
         "availability": {
-          "kind": "signature-mismatch",
-          "linkage": "signature-mismatch",
+          "kind": "all-targets-all-variants",
+          "linkage": "external",
           "platformGated": false,
           "profiles": "measured-engine-archive-linkage",
           "evidence": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json"
@@ -134380,8 +134380,8 @@
           "pairing": "not-applicable"
         },
         "availability": {
-          "kind": "signature-mismatch",
-          "linkage": "signature-mismatch",
+          "kind": "all-targets-all-variants",
+          "linkage": "external",
           "platformGated": false,
           "profiles": "measured-engine-archive-linkage",
           "evidence": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json"
@@ -134680,8 +134680,8 @@
           "pairing": "unspecified-requires-token"
         },
         "availability": {
-          "kind": "signature-mismatch",
-          "linkage": "signature-mismatch",
+          "kind": "all-targets-all-variants",
+          "linkage": "external",
           "platformGated": false,
           "profiles": "measured-engine-archive-linkage",
           "evidence": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json"
@@ -138294,8 +138294,8 @@
           "pairing": "unspecified-requires-token"
         },
         "availability": {
-          "kind": "signature-mismatch",
-          "linkage": "signature-mismatch",
+          "kind": "all-targets-all-variants",
+          "linkage": "external",
           "platformGated": false,
           "profiles": "measured-engine-archive-linkage",
           "evidence": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json"

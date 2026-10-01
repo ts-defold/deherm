@@ -11361,12 +11361,12 @@
   "productionCatalogSha256": "48d17277c2de6781d37e2abe013b4a2521ffed22fc16f23226b8c0f8e60f076d",
   "exactCatalogSha256": "4a0e1b315aaf0e29f2734763517adaeb7688e19257fc25cefe6307e895eb004a",
   "sourceHashes": {
-    "productionCatalog": "047946a2d49656055ed2d4dfae669ce40d5040fd26cb517b5d4f1b6bd2d04ce5",
+    "productionCatalog": "af5464d7d0d2bdd1f16819ddeaf5de2956f61c792e54ccb90cc2bd0f581e31be",
     "sdkIr": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "familyReports": {
       "arenaCString": {
         "path": "packages/bindings/generated/defold-dmsdk-arena-span-blockers.json",
-        "sha256": "701b3d52ba6bc2227a4b8a82d458bce2213fba0384b632304842466c6a55ecb7"
+        "sha256": "67d7a5144a958d8dbcfea00fbfc0145fc80d1a77e40400626f8c72209326f248"
       },
       "scalar": {
         "path": "packages/bindings/generated/defold-dmsdk-scalar-thunks.json",
@@ -11378,7 +11378,7 @@
       },
       "namedScalar": {
         "path": "packages/bindings/generated/defold-dmsdk-named-scalar-bindings.json",
-        "sha256": "8e9b149acbf3ab77cb7835329cac4f9f5deed61c1b1a64e113247159dfc6b5cc"
+        "sha256": "2142e8db67a1a2363f2ab8a278bf5ea6bb850415b8542cf13dac5a27cc60be68"
       },
       "fixedDigest": {
         "path": "packages/bindings/generated/defold-dmsdk-fixed-digest-bindings.json",
@@ -11402,13 +11402,13 @@
       },
       "cstringValue": {
         "path": "packages/bindings/generated/defold-dmsdk-cstring-value-bindings.json",
-        "sha256": "3c84bc89fd1185bebee73a44d362340fb511fbe5fe4fa9cc6b0ccdebe6a4ea66"
+        "sha256": "dfa5fcc383eacb1f695117f179fdb4f73d657808286b8edd6869e3e6b43b17ce"
       },
       "hashState": {
         "path": "packages/bindings/generated/defold-dmsdk-hash-state-bindings.json",
-        "sha256": "fb8bb8a49e30b7ba572d3b0ddd0b165e3ab0190969216637a92b45515065871c"
+        "sha256": "661b485c4f4a54813dcd6a6f07dec62a57e495eb837f095e25ffe28b5161d22c"
       }
     }
   },
-  "corpusSha256": "815974e20ce70c836025e2d385f1ae112783d1be2cab95a5c9ebd66653e021c2"
+  "corpusSha256": "36f0fce84807c4e4f71d9d97dc117a6646b54078f8e94b01b445327155818f3b"
 }

@@ -109,6 +109,14 @@ jobs:
         with: { python-version: '3.13' }
       - run: pnpm install --frozen-lockfile --ignore-scripts
 
+      - name: Install deterministic cross-target archive inspection
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends llvm
+          command -v llvm-nm
+          command -v llvm-cxxfilt
+          llvm-nm --version
+
       - name: Hydrate the accumulated published store
         run: node scripts/hydrate-policy-site.mjs --from build/published-policy-site
 
@@ -173,9 +181,9 @@ jobs:
           echo "generated=$generated" >> "$GITHUB_OUTPUT"
           echo "unproven=$unproven" >> "$GITHUB_OUTPUT"
 
-      - name: Open or update issues for revisions the generator could not finish
+      - name: Reconcile actionable policy derivation issues
         if: >-
-          steps.derive.outputs.unproven != '0' &&
+          needs.plan.outputs.any == 'true' &&
           github.repository == 'ts-defold/deherm' &&
           github.ref == 'refs/heads/main'
         env:
@@ -183,17 +191,10 @@ jobs:
           RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           set -euo pipefail
-          while IFS=$'\t' read -r channel revision version; do
-            [ -n "$revision" ] || continue
-            title="policy: unproven Defold $revision"
-            body="Automated policy generation could not finish Defold \`$revision\` (${version:-unknown}, observed on \`$channel\`). The rest of the mechanically generated policy store was still published.\n\nRun: $RUN_URL\n\nThis issue tracks the missing generator/default-emission path; review status alone is not a release gate."
-            number="$(gh issue list --state open --search "in:title $title" --json number,title --jq ".[] | select(.title == \"$title\") | .number" 2>/dev/null | head -n1 || true)"
-            if [ -n "$number" ]; then
-              gh issue comment "$number" --body "$body"
-            else
-              gh issue create --title "$title" --body "$body"
-            fi
-          done < "$RUNNER_TEMP/policy-reports/unproven.tsv"
+          node scripts/reconcile-policy-derivation-issues.mjs \
+            --unproven "$RUNNER_TEMP/policy-reports/unproven.tsv" \
+            --reports "$RUNNER_TEMP/policy-reports" \
+            --run-url "$RUN_URL"
 
       - name: Pack the exact generated surface
         run: |

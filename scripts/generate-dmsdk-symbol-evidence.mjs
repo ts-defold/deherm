@@ -102,10 +102,29 @@ export const callableKinds = new Set(["function", "method", "constructor", "dest
  * for a Mac where the binutils live inside Xcode rather than on PATH.
  */
 const llvmToolCache = new Map();
+export function resolveLlvmTool(name, options = {}) {
+  const probe = options.spawnSync ?? spawnSync;
+  const platform = options.platform ?? process.platform;
+  const candidates = [name, ...[20, 19, 18, 17, 16, 15].map((version) => `${name}-${version}`)];
+  for (const candidate of candidates) {
+    const result = probe(candidate, ["--version"], { stdio: "ignore" });
+    if (!result.error && result.status === 0) return [candidate];
+  }
+  if (platform === "darwin") {
+    const result = probe("xcrun", ["--find", name], { stdio: "ignore" });
+    if (!result.error && result.status === 0) return ["xcrun", name];
+  }
+  return null;
+}
+
 function llvmTool(name) {
   if (!llvmToolCache.has(name)) {
-    const onPath = spawnSync(name, ["--version"], { stdio: "ignore" });
-    llvmToolCache.set(name, onPath.error ? ["xcrun", name] : [name]);
+    const resolved = resolveLlvmTool(name);
+    assert(
+      resolved,
+      `required LLVM tool '${name}' is unavailable; install LLVM binutils or put a versioned ${name}-<major> on PATH`,
+    );
+    llvmToolCache.set(name, resolved);
   }
   return llvmToolCache.get(name);
 }
@@ -292,8 +311,11 @@ async function definedSymbols(file) {
     // exact and needs no name reconstruction.
     const [command, ...prefix] = llvmTool("llvm-nm");
     ({ stdout } = await run(command, [...prefix, "--defined-only", file], { maxBuffer: 512 * 1024 * 1024 }));
-  } catch {
-    return null;
+  } catch (error) {
+    return {
+      symbols: null,
+      error: String(error?.stderr || error?.message || error).trim(),
+    };
   }
   for (const line of stdout.split("\n")) {
     // `<addr> <type> <name>`; only externally visible definitions count, so
@@ -304,7 +326,7 @@ async function definedSymbols(file) {
     if (type !== type.toUpperCase()) continue;
     names.add(name.trim());
   }
-  return names;
+  return { symbols: names, error: null };
 }
 
 /**
@@ -342,6 +364,12 @@ export async function buildSymbolEvidence(options = {}) {
   const sourceRoot = options.root ?? root;
   const read = (relative) => readFile(path.join(sourceRoot, relative), "utf8");
   const archive = options.sdkArchive ?? path.join(sourceRoot, paths.sdkArchive);
+
+  // Fail once with the missing host capability instead of misreporting every
+  // cross-target archive as unreadable. Versioned names cover Ubuntu runners;
+  // xcrun remains the explicit macOS fallback.
+  llvmTool("llvm-nm");
+  llvmTool("llvm-cxxfilt");
 
   const lock = parseLock(await read(paths.lock));
   const ir = JSON.parse(await read(paths.ir));
@@ -429,16 +457,16 @@ export async function buildSymbolEvidence(options = {}) {
       await run("unzip", ["-q", "-o", archive, ...batch, "-d", extracted], { maxBuffer: 64 * 1024 * 1024 });
     }
     for (const member of [...wanted].sort(compare)) {
-      const symbols = await definedSymbols(path.join(extracted, member));
-      if (symbols === null) unreadableArchives.push(member);
-      symbolsByMember.set(member, symbols ?? new Set());
+      const result = await definedSymbols(path.join(extracted, member));
+      if (result.symbols === null) unreadableArchives.push({ member, error: result.error });
+      symbolsByMember.set(member, result.symbols ?? new Set());
     }
   } finally {
     await rm(work, { recursive: true, force: true });
   }
   assert(
     unreadableArchives.length === 0,
-    `llvm-nm could not read ${unreadableArchives.length} archive(s), starting with ${unreadableArchives[0]}`,
+    `llvm-nm could not read ${unreadableArchives.length} archive(s), starting with ${unreadableArchives[0]?.member}: ${unreadableArchives[0]?.error}`,
   );
 
   const symbolsByTargetVariant = new Map();

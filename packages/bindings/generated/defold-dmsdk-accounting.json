@@ -22,9 +22,9 @@
     "type-metadata": 773,
     "non-public": 26,
     "variant-gated": 9,
-    "platform-internal": 11,
-    "absent": 134,
-    "pending": 981
+    "platform-internal": 10,
+    "absent": 122,
+    "pending": 994
   },
   "declarations": [
     {
@@ -4711,7 +4711,7 @@
       "id": "dmsdk:dmGameObject::LuaScript::LuaScript@upstream/defold/engine/gameobject/src/dmsdk/gameobject/res_lua.h:27:1100",
       "name": "dmGameObject::LuaScript::LuaScript",
       "header": "upstream/defold/engine/gameobject/src/dmsdk/gameobject/res_lua.h",
-      "category": "absent"
+      "category": "pending"
     },
     {
       "id": "dmsdk:dmGameObject::LuaScript@upstream/defold/engine/gameobject/src/dmsdk/gameobject/res_lua.h:25:1099",
@@ -5569,7 +5569,7 @@
       "id": "dmsdk:dmGameSystem::CompGuiNodeTypeSetNodeDescFn@upstream/defold/engine/gamesys/src/dmsdk/gamesys/gui.h:145:1180",
       "name": "dmGameSystem::CompGuiNodeTypeSetNodeDescFn",
       "header": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/gui.h",
-      "category": "absent"
+      "category": "pending"
     },
     {
       "id": "dmsdk:dmGameSystem::CompGuiNodeTypeSetUpdateFn@upstream/defold/engine/gamesys/src/dmsdk/gamesys/gui.h:146:1181",
@@ -7051,7 +7051,7 @@
       "id": "dmsdk:dmGraphics::NewProgram@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1940:1474",
       "name": "dmGraphics::NewProgram",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h",
-      "category": "absent"
+      "category": "pending"
     },
     {
       "id": "dmsdk:dmGraphics::NewRenderTarget@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1554:1440",
@@ -7093,7 +7093,7 @@
       "id": "dmsdk:dmGraphics::NewVertexStreamDeclaration@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:932:1373",
       "name": "dmGraphics::NewVertexStreamDeclaration",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h",
-      "category": "absent"
+      "category": "pending"
     },
     {
       "id": "dmsdk:dmGraphics::OpenGLGetDefaultFramebufferId@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_opengl.h:47:1505",
@@ -7411,7 +7411,7 @@
       "id": "dmsdk:dmGraphics::VulkanCreateDescriptorPool@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:155:1518",
       "name": "dmGraphics::VulkanCreateDescriptorPool",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h",
-      "category": "platform-internal"
+      "category": "pending"
     },
     {
       "id": "dmsdk:dmGraphics::VulkanGetActiveSwapChainTexture@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:50:1506",
@@ -9325,7 +9325,7 @@
       "id": "dmsdk:dmRender::GetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:634:1856",
       "name": "dmRender::GetNamedConstant",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
-      "category": "absent"
+      "category": "pending"
     },
     {
       "id": "dmsdk:dmRender::GetNamedConstantCount@upstream/defold/engine/render/src/dmsdk/render/render.h:642:1857",
@@ -9577,7 +9577,7 @@
       "id": "dmsdk:dmRender::SetConstantType@upstream/defold/engine/render/src/dmsdk/render/render.h:537:1846",
       "name": "dmRender::SetConstantType",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
-      "category": "absent"
+      "category": "pending"
     },
     {
       "id": "dmsdk:dmRender::SetConstantValues@upstream/defold/engine/render/src/dmsdk/render/render.h:489:1840",
@@ -9613,13 +9613,13 @@
       "id": "dmsdk:dmRender::SetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:589:1852",
       "name": "dmRender::SetNamedConstant",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
-      "category": "absent"
+      "category": "pending"
     },
     {
       "id": "dmsdk:dmRender::SetNamedConstantAtIndex@upstream/defold/engine/render/src/dmsdk/render/render.h:609:1854",
       "name": "dmRender::SetNamedConstantAtIndex",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
-      "category": "absent"
+      "category": "pending"
     },
     {
       "id": "dmsdk:dmRender::SetNamedConstants@upstream/defold/engine/render/src/dmsdk/render/render.h:598:1853",
@@ -10081,7 +10081,7 @@
       "id": "dmsdk:dmRig::CopyBindPose@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:224:2074",
       "name": "dmRig::CopyBindPose",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
-      "category": "absent"
+      "category": "pending"
     },
     {
       "id": "dmsdk:dmRig::DeleteContext@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:168:2045",
@@ -10093,13 +10093,13 @@
       "id": "dmsdk:dmRig::GenerateVertexData@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:196:2054",
       "name": "dmRig::GenerateVertexData",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
-      "category": "absent"
+      "category": "pending"
     },
     {
       "id": "dmsdk:dmRig::GenerateVertexDataFromAttributes@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:195:2053",
       "name": "dmRig::GenerateVertexDataFromAttributes",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
-      "category": "absent"
+      "category": "pending"
     },
     {
       "id": "dmsdk:dmRig::GetAnimation@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:176:2051",
@@ -10351,7 +10351,7 @@
       "id": "dmsdk:dmRig::SetMeshWriteAttributeParams@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:178:2052",
       "name": "dmRig::SetMeshWriteAttributeParams",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
-      "category": "absent"
+      "category": "pending"
     },
     {
       "id": "dmsdk:dmRig::SetModel@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:199:2056",

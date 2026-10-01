@@ -71,7 +71,7 @@
     "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
     "valuePlan": "4dc392035674cdcc5531d3c268441d55aac8049bd172531dae86c4a59b299990",
-    "symbolEvidence": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+    "symbolEvidence": "75df7c7179c3241159dbdf67b97d1578062bd2ae8a50146ec66f7f01bc7ec6ee",
     "policy": "0993c36e00a02fa1547d344365b3b2e64eb0362d1479ddee34a4ad1dff01e586"
   },
   "artifactHashes": {
@@ -134,7 +134,7 @@
       },
       "symbolEvidence": {
         "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
-        "sha256": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+        "sha256": "75df7c7179c3241159dbdf67b97d1578062bd2ae8a50146ec66f7f01bc7ec6ee",
         "linkage": "external",
         "availability": "all-targets-all-variants",
         "linkedIn": {
@@ -260,7 +260,7 @@
       },
       "symbolEvidence": {
         "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
-        "sha256": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+        "sha256": "75df7c7179c3241159dbdf67b97d1578062bd2ae8a50146ec66f7f01bc7ec6ee",
         "linkage": "external",
         "availability": "all-targets-all-variants",
         "linkedIn": {
@@ -376,7 +376,7 @@
       },
       "symbolEvidence": {
         "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
-        "sha256": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+        "sha256": "75df7c7179c3241159dbdf67b97d1578062bd2ae8a50146ec66f7f01bc7ec6ee",
         "linkage": "external",
         "availability": "all-targets-all-variants",
         "linkedIn": {
@@ -502,7 +502,7 @@
       },
       "symbolEvidence": {
         "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
-        "sha256": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+        "sha256": "75df7c7179c3241159dbdf67b97d1578062bd2ae8a50146ec66f7f01bc7ec6ee",
         "linkage": "external",
         "availability": "all-targets-all-variants",
         "linkedIn": {
@@ -628,7 +628,7 @@
       },
       "symbolEvidence": {
         "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
-        "sha256": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+        "sha256": "75df7c7179c3241159dbdf67b97d1578062bd2ae8a50146ec66f7f01bc7ec6ee",
         "linkage": "external",
         "availability": "all-targets-all-variants",
         "linkedIn": {
@@ -744,7 +744,7 @@
       },
       "symbolEvidence": {
         "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
-        "sha256": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+        "sha256": "75df7c7179c3241159dbdf67b97d1578062bd2ae8a50146ec66f7f01bc7ec6ee",
         "linkage": "external",
         "availability": "all-targets-all-variants",
         "linkedIn": {
@@ -870,7 +870,7 @@
       },
       "symbolEvidence": {
         "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
-        "sha256": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+        "sha256": "75df7c7179c3241159dbdf67b97d1578062bd2ae8a50146ec66f7f01bc7ec6ee",
         "linkage": "external",
         "availability": "all-targets-all-variants",
         "linkedIn": {
@@ -1005,7 +1005,7 @@
       },
       "symbolEvidence": {
         "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
-        "sha256": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+        "sha256": "75df7c7179c3241159dbdf67b97d1578062bd2ae8a50146ec66f7f01bc7ec6ee",
         "linkage": "external",
         "availability": "all-targets-all-variants",
         "linkedIn": {
@@ -1140,7 +1140,7 @@
       },
       "symbolEvidence": {
         "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
-        "sha256": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+        "sha256": "75df7c7179c3241159dbdf67b97d1578062bd2ae8a50146ec66f7f01bc7ec6ee",
         "linkage": "external",
         "availability": "all-targets-all-variants",
         "linkedIn": {
@@ -1275,7 +1275,7 @@
       },
       "symbolEvidence": {
         "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
-        "sha256": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+        "sha256": "75df7c7179c3241159dbdf67b97d1578062bd2ae8a50146ec66f7f01bc7ec6ee",
         "linkage": "external",
         "availability": "all-targets-all-variants",
         "linkedIn": {
@@ -1410,7 +1410,7 @@
       },
       "symbolEvidence": {
         "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
-        "sha256": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+        "sha256": "75df7c7179c3241159dbdf67b97d1578062bd2ae8a50146ec66f7f01bc7ec6ee",
         "linkage": "external",
         "availability": "all-targets-all-variants",
         "linkedIn": {
@@ -1545,7 +1545,7 @@
       },
       "symbolEvidence": {
         "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
-        "sha256": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+        "sha256": "75df7c7179c3241159dbdf67b97d1578062bd2ae8a50146ec66f7f01bc7ec6ee",
         "linkage": "external",
         "availability": "all-targets-all-variants",
         "linkedIn": {
@@ -1680,7 +1680,7 @@
       },
       "symbolEvidence": {
         "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
-        "sha256": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+        "sha256": "75df7c7179c3241159dbdf67b97d1578062bd2ae8a50146ec66f7f01bc7ec6ee",
         "linkage": "external",
         "availability": "all-targets-all-variants",
         "linkedIn": {
@@ -1815,7 +1815,7 @@
       },
       "symbolEvidence": {
         "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
-        "sha256": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+        "sha256": "75df7c7179c3241159dbdf67b97d1578062bd2ae8a50146ec66f7f01bc7ec6ee",
         "linkage": "external",
         "availability": "all-targets-all-variants",
         "linkedIn": {
@@ -1950,7 +1950,7 @@
       },
       "symbolEvidence": {
         "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
-        "sha256": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+        "sha256": "75df7c7179c3241159dbdf67b97d1578062bd2ae8a50146ec66f7f01bc7ec6ee",
         "linkage": "external",
         "availability": "all-targets-all-variants",
         "linkedIn": {
@@ -2085,7 +2085,7 @@
       },
       "symbolEvidence": {
         "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
-        "sha256": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+        "sha256": "75df7c7179c3241159dbdf67b97d1578062bd2ae8a50146ec66f7f01bc7ec6ee",
         "linkage": "external",
         "availability": "all-targets-all-variants",
         "linkedIn": {
@@ -2220,7 +2220,7 @@
       },
       "symbolEvidence": {
         "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
-        "sha256": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+        "sha256": "75df7c7179c3241159dbdf67b97d1578062bd2ae8a50146ec66f7f01bc7ec6ee",
         "linkage": "external",
         "availability": "all-targets-all-variants",
         "linkedIn": {
@@ -2355,7 +2355,7 @@
       },
       "symbolEvidence": {
         "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
-        "sha256": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+        "sha256": "75df7c7179c3241159dbdf67b97d1578062bd2ae8a50146ec66f7f01bc7ec6ee",
         "linkage": "external",
         "availability": "all-targets-all-variants",
         "linkedIn": {
@@ -2490,7 +2490,7 @@
       },
       "symbolEvidence": {
         "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
-        "sha256": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+        "sha256": "75df7c7179c3241159dbdf67b97d1578062bd2ae8a50146ec66f7f01bc7ec6ee",
         "linkage": "external",
         "availability": "all-targets-all-variants",
         "linkedIn": {
@@ -2625,7 +2625,7 @@
       },
       "symbolEvidence": {
         "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
-        "sha256": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+        "sha256": "75df7c7179c3241159dbdf67b97d1578062bd2ae8a50146ec66f7f01bc7ec6ee",
         "linkage": "external",
         "availability": "all-targets-all-variants",
         "linkedIn": {
@@ -2720,7 +2720,7 @@
       },
       "symbolEvidence": {
         "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
-        "sha256": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+        "sha256": "75df7c7179c3241159dbdf67b97d1578062bd2ae8a50146ec66f7f01bc7ec6ee",
         "linkage": "absent",
         "availability": "unlinked",
         "linkedIn": {}

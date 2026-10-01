@@ -174,6 +174,16 @@ Status is additive evidence, not an allow-list:
 documentation annotations and deterministic issue links. Repeated nightlies
 update the existing issue instead of opening duplicates.
 
+A derivation-stage or CI-host failure is not an `unproven` API. The Linux
+deriver preflights the cross-target LLVM archive tools before reading the SDK;
+missing tools fail once with their real name instead of making every archive
+appear unreadable. Failures shared by several tracked revisions are grouped
+into one stage-scoped issue listing those revisions. After a complete tracked
+channel run no longer reproduces that stage, the workflow closes the generated
+issue and any superseded per-revision issue automatically. Route-level
+`suspect` and `unproven` issues remain separate because those carry actual API
+identity and generated documentation links.
+
 The deterministic link is a title-keyed repository issue lookup embedded in
 the route-verification artifact. The engine-evidence job materializes that
 contract: it lists the existing route-verification issues once, creates every

@@ -3,23 +3,23 @@
   "kind": "deherm.dmsdk-fallback-audit",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "sourceHashes": {
-    "projection": "71b49d4aac3b9aafffe8680a95ed08bc8fc46a2c7ffeceb5b6c303d9ce4685ba",
+    "projection": "1dbc91963178dfb68e5ee8bc2a66f93a35e5daee04d302a9a4226f6b7b21cee5",
     "sdkIr": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "abiShapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
     "specialized": {
       "scalar": "9c4621db3613a53b7a470d249d06e25787b3bf917f32e4840315bc2efdc4d291",
       "enumValue": "52e9533abdb4b76dccfbae10f7f9e954003ba5755d9a255be8b5a66198d616a4",
-      "namedScalar": "8e9b149acbf3ab77cb7835329cac4f9f5deed61c1b1a64e113247159dfc6b5cc",
+      "namedScalar": "2142e8db67a1a2363f2ab8a278bf5ea6bb850415b8542cf13dac5a27cc60be68",
       "fixedDigest": "dfb5adf5b7a7421191397a4d1e27bf2ac08c2e3da96fe5ff8473ce9eaf939dcb",
       "base64Span": "e8603b1789f77c90eef3d12c007766f0331d57a724668bc51e473ab361464e51",
       "astcProbe": "26b9ba056c789111bf61bf84c868fbdde63f3db9c2fef57ce9d6aa120603b17f",
       "xteaSpan": "73c8d977ab6c9e5a8599c07262da34105ddf2988e1009c5cfe46eaa502370634",
       "hashSpan": "1ac8e9330772346282796b058505eadb88f7f8cf878532f7a387c85bafd7cc72",
-      "arenaCString": "701b3d52ba6bc2227a4b8a82d458bce2213fba0384b632304842466c6a55ecb7",
-      "borrowedHandle": "69c2835ad02648a4598c3cad6d3a83a09854d5ba18212fa8be38e03d62874008",
-      "scratchScalarOut": "432b3c0333b2607cca91b8b2f8754bdee1957d0bd986e6a789a90d5cc0a0f223",
-      "cstringValue": "3c84bc89fd1185bebee73a44d362340fb511fbe5fe4fa9cc6b0ccdebe6a4ea66",
-      "hashState": "fb8bb8a49e30b7ba572d3b0ddd0b165e3ab0190969216637a92b45515065871c"
+      "arenaCString": "67d7a5144a958d8dbcfea00fbfc0145fc80d1a77e40400626f8c72209326f248",
+      "borrowedHandle": "8c23c92008e62c91a4767e47ab6b2bbab2a8579f070e690b23bb63cfa57ea082",
+      "scratchScalarOut": "26d90cbefeed4c0faaa893cd0ee0fd7d1be2bb9d46a07fa66e1707c2632343c9",
+      "cstringValue": "dfa5fcc383eacb1f695117f179fdb4f73d657808286b8edd6869e3e6b43b17ce",
+      "hashState": "661b485c4f4a54813dcd6a6f07dec62a57e495eb837f095e25ffe28b5161d22c"
     },
     "patternPolicies": {
       "borrowedHandle": "53dd87aca30d91e448b686ac854c8529d9cb69727c10b70dab5fcbdb77612a80",
@@ -119987,5 +119987,5 @@
       }
     }
   ],
-  "reportSha256": "ca3dc263e7426dba05316b03a7f949cc1c944598def81113c1d2fff337b12b1c"
+  "reportSha256": "465bb3a7abfcaef751bb7357dfd14d9da1a8025993b19a70efec9c748ac8dc6e"
 }
