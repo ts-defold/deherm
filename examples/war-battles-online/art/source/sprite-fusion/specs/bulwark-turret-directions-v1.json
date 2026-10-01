@@ -1,0 +1,5 @@
+{
+  "name": "bulwark-turret-directions-v1",
+  "operation": "direction-set",
+  "inputs": ["art/source/openai/bulwark-tank-v1/turret-grid-fixed.png"]
+}

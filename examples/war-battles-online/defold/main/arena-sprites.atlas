@@ -1,4 +1,74 @@
 animations {
+  id: "tank-depot"
+  images {
+    image: "/assets/derived/arena/tank-depot.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "landmark-field-bunker"
+  images {
+    image: "/assets/derived/arena/landmark-field-bunker.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "landmark-rock-outcrop"
+  images {
+    image: "/assets/derived/arena/landmark-rock-outcrop.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "landmark-supply-dump"
+  images {
+    image: "/assets/derived/arena/landmark-supply-dump.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "landmark-tank-wreck"
+  images {
+    image: "/assets/derived/arena/landmark-tank-wreck.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "landmark-fuel-cluster"
+  images {
+    image: "/assets/derived/arena/landmark-fuel-cluster.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "landmark-gun-nest"
+  images {
+    image: "/assets/derived/arena/landmark-gun-nest.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "landmark-radio-mast"
+  images {
+    image: "/assets/derived/arena/landmark-radio-mast.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "landmark-scrap-barricade"
+  images {
+    image: "/assets/derived/arena/landmark-scrap-barricade.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "landmark-shell-crater"
+  images {
+    image: "/assets/derived/arena/landmark-shell-crater.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
   id: "tank-blue-hull"
   images {
     image: "/assets/derived/arena/tank-blue-hull-1.png"
@@ -8,6 +78,150 @@ animations {
   }
   playback: PLAYBACK_LOOP_FORWARD
   fps: 12
+}
+animations {
+  id: "tank-blue-hull-se"
+  images {
+    image: "/assets/derived/arena/tank-blue-hull-se-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/tank-blue-hull-se-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 12
+}
+animations {
+  id: "tank-blue-turret-se"
+  images {
+    image: "/assets/derived/arena/tank-blue-turret-se.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "tank-blue-hull-s"
+  images {
+    image: "/assets/derived/arena/tank-blue-hull-s-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/tank-blue-hull-s-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 12
+}
+animations {
+  id: "tank-blue-turret-s"
+  images {
+    image: "/assets/derived/arena/tank-blue-turret-s.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "tank-blue-hull-sw"
+  images {
+    image: "/assets/derived/arena/tank-blue-hull-sw-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/tank-blue-hull-sw-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 12
+}
+animations {
+  id: "tank-blue-turret-sw"
+  images {
+    image: "/assets/derived/arena/tank-blue-turret-sw.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "tank-blue-hull-w"
+  images {
+    image: "/assets/derived/arena/tank-blue-hull-w-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/tank-blue-hull-w-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 12
+}
+animations {
+  id: "tank-blue-turret-w"
+  images {
+    image: "/assets/derived/arena/tank-blue-turret-w.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "tank-blue-hull-e"
+  images {
+    image: "/assets/derived/arena/tank-blue-hull-e-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/tank-blue-hull-e-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 12
+}
+animations {
+  id: "tank-blue-turret-e"
+  images {
+    image: "/assets/derived/arena/tank-blue-turret-e.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "tank-blue-hull-nw"
+  images {
+    image: "/assets/derived/arena/tank-blue-hull-nw-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/tank-blue-hull-nw-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 12
+}
+animations {
+  id: "tank-blue-turret-nw"
+  images {
+    image: "/assets/derived/arena/tank-blue-turret-nw.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "tank-blue-hull-n"
+  images {
+    image: "/assets/derived/arena/tank-blue-hull-n-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/tank-blue-hull-n-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 12
+}
+animations {
+  id: "tank-blue-turret-n"
+  images {
+    image: "/assets/derived/arena/tank-blue-turret-n.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "tank-blue-hull-ne"
+  images {
+    image: "/assets/derived/arena/tank-blue-hull-ne-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/tank-blue-hull-ne-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 12
+}
+animations {
+  id: "tank-blue-turret-ne"
+  images {
+    image: "/assets/derived/arena/tank-blue-turret-ne.png"
+  }
+  playback: PLAYBACK_NONE
 }
 animations {
   id: "tank-red-hull"
@@ -21,6 +235,150 @@ animations {
   fps: 12
 }
 animations {
+  id: "tank-red-hull-se"
+  images {
+    image: "/assets/derived/arena/tank-red-hull-se-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/tank-red-hull-se-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 12
+}
+animations {
+  id: "tank-red-turret-se"
+  images {
+    image: "/assets/derived/arena/tank-red-turret-se.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "tank-red-hull-s"
+  images {
+    image: "/assets/derived/arena/tank-red-hull-s-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/tank-red-hull-s-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 12
+}
+animations {
+  id: "tank-red-turret-s"
+  images {
+    image: "/assets/derived/arena/tank-red-turret-s.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "tank-red-hull-sw"
+  images {
+    image: "/assets/derived/arena/tank-red-hull-sw-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/tank-red-hull-sw-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 12
+}
+animations {
+  id: "tank-red-turret-sw"
+  images {
+    image: "/assets/derived/arena/tank-red-turret-sw.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "tank-red-hull-w"
+  images {
+    image: "/assets/derived/arena/tank-red-hull-w-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/tank-red-hull-w-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 12
+}
+animations {
+  id: "tank-red-turret-w"
+  images {
+    image: "/assets/derived/arena/tank-red-turret-w.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "tank-red-hull-e"
+  images {
+    image: "/assets/derived/arena/tank-red-hull-e-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/tank-red-hull-e-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 12
+}
+animations {
+  id: "tank-red-turret-e"
+  images {
+    image: "/assets/derived/arena/tank-red-turret-e.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "tank-red-hull-nw"
+  images {
+    image: "/assets/derived/arena/tank-red-hull-nw-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/tank-red-hull-nw-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 12
+}
+animations {
+  id: "tank-red-turret-nw"
+  images {
+    image: "/assets/derived/arena/tank-red-turret-nw.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "tank-red-hull-n"
+  images {
+    image: "/assets/derived/arena/tank-red-hull-n-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/tank-red-hull-n-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 12
+}
+animations {
+  id: "tank-red-turret-n"
+  images {
+    image: "/assets/derived/arena/tank-red-turret-n.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "tank-red-hull-ne"
+  images {
+    image: "/assets/derived/arena/tank-red-hull-ne-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/tank-red-hull-ne-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 12
+}
+animations {
+  id: "tank-red-turret-ne"
+  images {
+    image: "/assets/derived/arena/tank-red-turret-ne.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
   id: "tank-green-hull"
   images {
     image: "/assets/derived/arena/tank-green-hull-1.png"
@@ -32,6 +390,150 @@ animations {
   fps: 12
 }
 animations {
+  id: "tank-green-hull-se"
+  images {
+    image: "/assets/derived/arena/tank-green-hull-se-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/tank-green-hull-se-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 12
+}
+animations {
+  id: "tank-green-turret-se"
+  images {
+    image: "/assets/derived/arena/tank-green-turret-se.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "tank-green-hull-s"
+  images {
+    image: "/assets/derived/arena/tank-green-hull-s-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/tank-green-hull-s-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 12
+}
+animations {
+  id: "tank-green-turret-s"
+  images {
+    image: "/assets/derived/arena/tank-green-turret-s.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "tank-green-hull-sw"
+  images {
+    image: "/assets/derived/arena/tank-green-hull-sw-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/tank-green-hull-sw-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 12
+}
+animations {
+  id: "tank-green-turret-sw"
+  images {
+    image: "/assets/derived/arena/tank-green-turret-sw.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "tank-green-hull-w"
+  images {
+    image: "/assets/derived/arena/tank-green-hull-w-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/tank-green-hull-w-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 12
+}
+animations {
+  id: "tank-green-turret-w"
+  images {
+    image: "/assets/derived/arena/tank-green-turret-w.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "tank-green-hull-e"
+  images {
+    image: "/assets/derived/arena/tank-green-hull-e-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/tank-green-hull-e-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 12
+}
+animations {
+  id: "tank-green-turret-e"
+  images {
+    image: "/assets/derived/arena/tank-green-turret-e.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "tank-green-hull-nw"
+  images {
+    image: "/assets/derived/arena/tank-green-hull-nw-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/tank-green-hull-nw-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 12
+}
+animations {
+  id: "tank-green-turret-nw"
+  images {
+    image: "/assets/derived/arena/tank-green-turret-nw.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "tank-green-hull-n"
+  images {
+    image: "/assets/derived/arena/tank-green-hull-n-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/tank-green-hull-n-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 12
+}
+animations {
+  id: "tank-green-turret-n"
+  images {
+    image: "/assets/derived/arena/tank-green-turret-n.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "tank-green-hull-ne"
+  images {
+    image: "/assets/derived/arena/tank-green-hull-ne-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/tank-green-hull-ne-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 12
+}
+animations {
+  id: "tank-green-turret-ne"
+  images {
+    image: "/assets/derived/arena/tank-green-turret-ne.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
   id: "tank-sand-hull"
   images {
     image: "/assets/derived/arena/tank-sand-hull-1.png"
@@ -41,6 +543,150 @@ animations {
   }
   playback: PLAYBACK_LOOP_FORWARD
   fps: 12
+}
+animations {
+  id: "tank-sand-hull-se"
+  images {
+    image: "/assets/derived/arena/tank-sand-hull-se-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/tank-sand-hull-se-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 12
+}
+animations {
+  id: "tank-sand-turret-se"
+  images {
+    image: "/assets/derived/arena/tank-sand-turret-se.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "tank-sand-hull-s"
+  images {
+    image: "/assets/derived/arena/tank-sand-hull-s-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/tank-sand-hull-s-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 12
+}
+animations {
+  id: "tank-sand-turret-s"
+  images {
+    image: "/assets/derived/arena/tank-sand-turret-s.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "tank-sand-hull-sw"
+  images {
+    image: "/assets/derived/arena/tank-sand-hull-sw-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/tank-sand-hull-sw-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 12
+}
+animations {
+  id: "tank-sand-turret-sw"
+  images {
+    image: "/assets/derived/arena/tank-sand-turret-sw.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "tank-sand-hull-w"
+  images {
+    image: "/assets/derived/arena/tank-sand-hull-w-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/tank-sand-hull-w-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 12
+}
+animations {
+  id: "tank-sand-turret-w"
+  images {
+    image: "/assets/derived/arena/tank-sand-turret-w.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "tank-sand-hull-e"
+  images {
+    image: "/assets/derived/arena/tank-sand-hull-e-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/tank-sand-hull-e-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 12
+}
+animations {
+  id: "tank-sand-turret-e"
+  images {
+    image: "/assets/derived/arena/tank-sand-turret-e.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "tank-sand-hull-nw"
+  images {
+    image: "/assets/derived/arena/tank-sand-hull-nw-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/tank-sand-hull-nw-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 12
+}
+animations {
+  id: "tank-sand-turret-nw"
+  images {
+    image: "/assets/derived/arena/tank-sand-turret-nw.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "tank-sand-hull-n"
+  images {
+    image: "/assets/derived/arena/tank-sand-hull-n-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/tank-sand-hull-n-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 12
+}
+animations {
+  id: "tank-sand-turret-n"
+  images {
+    image: "/assets/derived/arena/tank-sand-turret-n.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "tank-sand-hull-ne"
+  images {
+    image: "/assets/derived/arena/tank-sand-hull-ne-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/tank-sand-hull-ne-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 12
+}
+animations {
+  id: "tank-sand-turret-ne"
+  images {
+    image: "/assets/derived/arena/tank-sand-turret-ne.png"
+  }
+  playback: PLAYBACK_NONE
 }
 animations {
   id: "tank-blue-turret"
@@ -110,6 +756,213 @@ animations {
   fps: 10
 }
 animations {
+  id: "chassis-blue-scout-turret"
+  images {
+    image: "/assets/derived/arena/chassis-blue-scout-turret.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-scout-se"
+  images {
+    image: "/assets/derived/arena/chassis-blue-scout-se-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-blue-scout-se-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-blue-scout-se-idle"
+  images {
+    image: "/assets/derived/arena/chassis-blue-scout-se-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-scout-turret-se"
+  images {
+    image: "/assets/derived/arena/chassis-blue-scout-turret-se.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-scout-s"
+  images {
+    image: "/assets/derived/arena/chassis-blue-scout-s-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-blue-scout-s-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-blue-scout-s-idle"
+  images {
+    image: "/assets/derived/arena/chassis-blue-scout-s-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-scout-turret-s"
+  images {
+    image: "/assets/derived/arena/chassis-blue-scout-turret-s.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-scout-sw"
+  images {
+    image: "/assets/derived/arena/chassis-blue-scout-sw-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-blue-scout-sw-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-blue-scout-sw-idle"
+  images {
+    image: "/assets/derived/arena/chassis-blue-scout-sw-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-scout-turret-sw"
+  images {
+    image: "/assets/derived/arena/chassis-blue-scout-turret-sw.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-scout-w"
+  images {
+    image: "/assets/derived/arena/chassis-blue-scout-w-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-blue-scout-w-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-blue-scout-w-idle"
+  images {
+    image: "/assets/derived/arena/chassis-blue-scout-w-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-scout-turret-w"
+  images {
+    image: "/assets/derived/arena/chassis-blue-scout-turret-w.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-scout-e"
+  images {
+    image: "/assets/derived/arena/chassis-blue-scout-e-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-blue-scout-e-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-blue-scout-e-idle"
+  images {
+    image: "/assets/derived/arena/chassis-blue-scout-e-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-scout-turret-e"
+  images {
+    image: "/assets/derived/arena/chassis-blue-scout-turret-e.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-scout-nw"
+  images {
+    image: "/assets/derived/arena/chassis-blue-scout-nw-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-blue-scout-nw-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-blue-scout-nw-idle"
+  images {
+    image: "/assets/derived/arena/chassis-blue-scout-nw-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-scout-turret-nw"
+  images {
+    image: "/assets/derived/arena/chassis-blue-scout-turret-nw.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-scout-n"
+  images {
+    image: "/assets/derived/arena/chassis-blue-scout-n-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-blue-scout-n-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-blue-scout-n-idle"
+  images {
+    image: "/assets/derived/arena/chassis-blue-scout-n-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-scout-turret-n"
+  images {
+    image: "/assets/derived/arena/chassis-blue-scout-turret-n.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-scout-ne"
+  images {
+    image: "/assets/derived/arena/chassis-blue-scout-ne-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-blue-scout-ne-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-blue-scout-ne-idle"
+  images {
+    image: "/assets/derived/arena/chassis-blue-scout-ne-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-scout-turret-ne"
+  images {
+    image: "/assets/derived/arena/chassis-blue-scout-turret-ne.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
   id: "chassis-blue-assault"
   images {
     image: "/assets/derived/arena/chassis-blue-assault-1.png"
@@ -119,6 +972,213 @@ animations {
   }
   playback: PLAYBACK_LOOP_FORWARD
   fps: 10
+}
+animations {
+  id: "chassis-blue-assault-turret"
+  images {
+    image: "/assets/derived/arena/chassis-blue-assault-turret.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-assault-se"
+  images {
+    image: "/assets/derived/arena/chassis-blue-assault-se-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-blue-assault-se-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-blue-assault-se-idle"
+  images {
+    image: "/assets/derived/arena/chassis-blue-assault-se-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-assault-turret-se"
+  images {
+    image: "/assets/derived/arena/chassis-blue-assault-turret-se.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-assault-s"
+  images {
+    image: "/assets/derived/arena/chassis-blue-assault-s-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-blue-assault-s-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-blue-assault-s-idle"
+  images {
+    image: "/assets/derived/arena/chassis-blue-assault-s-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-assault-turret-s"
+  images {
+    image: "/assets/derived/arena/chassis-blue-assault-turret-s.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-assault-sw"
+  images {
+    image: "/assets/derived/arena/chassis-blue-assault-sw-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-blue-assault-sw-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-blue-assault-sw-idle"
+  images {
+    image: "/assets/derived/arena/chassis-blue-assault-sw-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-assault-turret-sw"
+  images {
+    image: "/assets/derived/arena/chassis-blue-assault-turret-sw.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-assault-w"
+  images {
+    image: "/assets/derived/arena/chassis-blue-assault-w-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-blue-assault-w-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-blue-assault-w-idle"
+  images {
+    image: "/assets/derived/arena/chassis-blue-assault-w-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-assault-turret-w"
+  images {
+    image: "/assets/derived/arena/chassis-blue-assault-turret-w.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-assault-e"
+  images {
+    image: "/assets/derived/arena/chassis-blue-assault-e-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-blue-assault-e-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-blue-assault-e-idle"
+  images {
+    image: "/assets/derived/arena/chassis-blue-assault-e-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-assault-turret-e"
+  images {
+    image: "/assets/derived/arena/chassis-blue-assault-turret-e.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-assault-nw"
+  images {
+    image: "/assets/derived/arena/chassis-blue-assault-nw-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-blue-assault-nw-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-blue-assault-nw-idle"
+  images {
+    image: "/assets/derived/arena/chassis-blue-assault-nw-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-assault-turret-nw"
+  images {
+    image: "/assets/derived/arena/chassis-blue-assault-turret-nw.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-assault-n"
+  images {
+    image: "/assets/derived/arena/chassis-blue-assault-n-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-blue-assault-n-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-blue-assault-n-idle"
+  images {
+    image: "/assets/derived/arena/chassis-blue-assault-n-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-assault-turret-n"
+  images {
+    image: "/assets/derived/arena/chassis-blue-assault-turret-n.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-assault-ne"
+  images {
+    image: "/assets/derived/arena/chassis-blue-assault-ne-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-blue-assault-ne-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-blue-assault-ne-idle"
+  images {
+    image: "/assets/derived/arena/chassis-blue-assault-ne-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-assault-turret-ne"
+  images {
+    image: "/assets/derived/arena/chassis-blue-assault-turret-ne.png"
+  }
+  playback: PLAYBACK_NONE
 }
 animations {
   id: "chassis-blue-bulwark"
@@ -132,6 +1192,213 @@ animations {
   fps: 10
 }
 animations {
+  id: "chassis-blue-bulwark-turret"
+  images {
+    image: "/assets/derived/arena/chassis-blue-bulwark-turret.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-bulwark-se"
+  images {
+    image: "/assets/derived/arena/chassis-blue-bulwark-se-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-blue-bulwark-se-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-blue-bulwark-se-idle"
+  images {
+    image: "/assets/derived/arena/chassis-blue-bulwark-se-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-bulwark-turret-se"
+  images {
+    image: "/assets/derived/arena/chassis-blue-bulwark-turret-se.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-bulwark-s"
+  images {
+    image: "/assets/derived/arena/chassis-blue-bulwark-s-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-blue-bulwark-s-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-blue-bulwark-s-idle"
+  images {
+    image: "/assets/derived/arena/chassis-blue-bulwark-s-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-bulwark-turret-s"
+  images {
+    image: "/assets/derived/arena/chassis-blue-bulwark-turret-s.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-bulwark-sw"
+  images {
+    image: "/assets/derived/arena/chassis-blue-bulwark-sw-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-blue-bulwark-sw-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-blue-bulwark-sw-idle"
+  images {
+    image: "/assets/derived/arena/chassis-blue-bulwark-sw-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-bulwark-turret-sw"
+  images {
+    image: "/assets/derived/arena/chassis-blue-bulwark-turret-sw.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-bulwark-w"
+  images {
+    image: "/assets/derived/arena/chassis-blue-bulwark-w-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-blue-bulwark-w-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-blue-bulwark-w-idle"
+  images {
+    image: "/assets/derived/arena/chassis-blue-bulwark-w-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-bulwark-turret-w"
+  images {
+    image: "/assets/derived/arena/chassis-blue-bulwark-turret-w.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-bulwark-e"
+  images {
+    image: "/assets/derived/arena/chassis-blue-bulwark-e-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-blue-bulwark-e-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-blue-bulwark-e-idle"
+  images {
+    image: "/assets/derived/arena/chassis-blue-bulwark-e-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-bulwark-turret-e"
+  images {
+    image: "/assets/derived/arena/chassis-blue-bulwark-turret-e.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-bulwark-nw"
+  images {
+    image: "/assets/derived/arena/chassis-blue-bulwark-nw-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-blue-bulwark-nw-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-blue-bulwark-nw-idle"
+  images {
+    image: "/assets/derived/arena/chassis-blue-bulwark-nw-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-bulwark-turret-nw"
+  images {
+    image: "/assets/derived/arena/chassis-blue-bulwark-turret-nw.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-bulwark-n"
+  images {
+    image: "/assets/derived/arena/chassis-blue-bulwark-n-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-blue-bulwark-n-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-blue-bulwark-n-idle"
+  images {
+    image: "/assets/derived/arena/chassis-blue-bulwark-n-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-bulwark-turret-n"
+  images {
+    image: "/assets/derived/arena/chassis-blue-bulwark-turret-n.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-bulwark-ne"
+  images {
+    image: "/assets/derived/arena/chassis-blue-bulwark-ne-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-blue-bulwark-ne-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-blue-bulwark-ne-idle"
+  images {
+    image: "/assets/derived/arena/chassis-blue-bulwark-ne-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-bulwark-turret-ne"
+  images {
+    image: "/assets/derived/arena/chassis-blue-bulwark-turret-ne.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
   id: "chassis-blue-artillery"
   images {
     image: "/assets/derived/arena/chassis-blue-artillery-1.png"
@@ -141,6 +1408,213 @@ animations {
   }
   playback: PLAYBACK_LOOP_FORWARD
   fps: 10
+}
+animations {
+  id: "chassis-blue-artillery-turret"
+  images {
+    image: "/assets/derived/arena/chassis-blue-artillery-turret.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-artillery-se"
+  images {
+    image: "/assets/derived/arena/chassis-blue-artillery-se-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-blue-artillery-se-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-blue-artillery-se-idle"
+  images {
+    image: "/assets/derived/arena/chassis-blue-artillery-se-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-artillery-turret-se"
+  images {
+    image: "/assets/derived/arena/chassis-blue-artillery-turret-se.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-artillery-s"
+  images {
+    image: "/assets/derived/arena/chassis-blue-artillery-s-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-blue-artillery-s-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-blue-artillery-s-idle"
+  images {
+    image: "/assets/derived/arena/chassis-blue-artillery-s-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-artillery-turret-s"
+  images {
+    image: "/assets/derived/arena/chassis-blue-artillery-turret-s.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-artillery-sw"
+  images {
+    image: "/assets/derived/arena/chassis-blue-artillery-sw-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-blue-artillery-sw-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-blue-artillery-sw-idle"
+  images {
+    image: "/assets/derived/arena/chassis-blue-artillery-sw-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-artillery-turret-sw"
+  images {
+    image: "/assets/derived/arena/chassis-blue-artillery-turret-sw.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-artillery-w"
+  images {
+    image: "/assets/derived/arena/chassis-blue-artillery-w-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-blue-artillery-w-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-blue-artillery-w-idle"
+  images {
+    image: "/assets/derived/arena/chassis-blue-artillery-w-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-artillery-turret-w"
+  images {
+    image: "/assets/derived/arena/chassis-blue-artillery-turret-w.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-artillery-e"
+  images {
+    image: "/assets/derived/arena/chassis-blue-artillery-e-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-blue-artillery-e-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-blue-artillery-e-idle"
+  images {
+    image: "/assets/derived/arena/chassis-blue-artillery-e-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-artillery-turret-e"
+  images {
+    image: "/assets/derived/arena/chassis-blue-artillery-turret-e.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-artillery-nw"
+  images {
+    image: "/assets/derived/arena/chassis-blue-artillery-nw-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-blue-artillery-nw-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-blue-artillery-nw-idle"
+  images {
+    image: "/assets/derived/arena/chassis-blue-artillery-nw-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-artillery-turret-nw"
+  images {
+    image: "/assets/derived/arena/chassis-blue-artillery-turret-nw.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-artillery-n"
+  images {
+    image: "/assets/derived/arena/chassis-blue-artillery-n-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-blue-artillery-n-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-blue-artillery-n-idle"
+  images {
+    image: "/assets/derived/arena/chassis-blue-artillery-n-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-artillery-turret-n"
+  images {
+    image: "/assets/derived/arena/chassis-blue-artillery-turret-n.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-artillery-ne"
+  images {
+    image: "/assets/derived/arena/chassis-blue-artillery-ne-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-blue-artillery-ne-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-blue-artillery-ne-idle"
+  images {
+    image: "/assets/derived/arena/chassis-blue-artillery-ne-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-artillery-turret-ne"
+  images {
+    image: "/assets/derived/arena/chassis-blue-artillery-turret-ne.png"
+  }
+  playback: PLAYBACK_NONE
 }
 animations {
   id: "chassis-red-scout"
@@ -154,6 +1628,213 @@ animations {
   fps: 10
 }
 animations {
+  id: "chassis-red-scout-turret"
+  images {
+    image: "/assets/derived/arena/chassis-red-scout-turret.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-scout-se"
+  images {
+    image: "/assets/derived/arena/chassis-red-scout-se-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-red-scout-se-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-red-scout-se-idle"
+  images {
+    image: "/assets/derived/arena/chassis-red-scout-se-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-scout-turret-se"
+  images {
+    image: "/assets/derived/arena/chassis-red-scout-turret-se.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-scout-s"
+  images {
+    image: "/assets/derived/arena/chassis-red-scout-s-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-red-scout-s-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-red-scout-s-idle"
+  images {
+    image: "/assets/derived/arena/chassis-red-scout-s-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-scout-turret-s"
+  images {
+    image: "/assets/derived/arena/chassis-red-scout-turret-s.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-scout-sw"
+  images {
+    image: "/assets/derived/arena/chassis-red-scout-sw-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-red-scout-sw-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-red-scout-sw-idle"
+  images {
+    image: "/assets/derived/arena/chassis-red-scout-sw-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-scout-turret-sw"
+  images {
+    image: "/assets/derived/arena/chassis-red-scout-turret-sw.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-scout-w"
+  images {
+    image: "/assets/derived/arena/chassis-red-scout-w-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-red-scout-w-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-red-scout-w-idle"
+  images {
+    image: "/assets/derived/arena/chassis-red-scout-w-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-scout-turret-w"
+  images {
+    image: "/assets/derived/arena/chassis-red-scout-turret-w.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-scout-e"
+  images {
+    image: "/assets/derived/arena/chassis-red-scout-e-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-red-scout-e-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-red-scout-e-idle"
+  images {
+    image: "/assets/derived/arena/chassis-red-scout-e-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-scout-turret-e"
+  images {
+    image: "/assets/derived/arena/chassis-red-scout-turret-e.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-scout-nw"
+  images {
+    image: "/assets/derived/arena/chassis-red-scout-nw-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-red-scout-nw-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-red-scout-nw-idle"
+  images {
+    image: "/assets/derived/arena/chassis-red-scout-nw-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-scout-turret-nw"
+  images {
+    image: "/assets/derived/arena/chassis-red-scout-turret-nw.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-scout-n"
+  images {
+    image: "/assets/derived/arena/chassis-red-scout-n-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-red-scout-n-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-red-scout-n-idle"
+  images {
+    image: "/assets/derived/arena/chassis-red-scout-n-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-scout-turret-n"
+  images {
+    image: "/assets/derived/arena/chassis-red-scout-turret-n.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-scout-ne"
+  images {
+    image: "/assets/derived/arena/chassis-red-scout-ne-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-red-scout-ne-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-red-scout-ne-idle"
+  images {
+    image: "/assets/derived/arena/chassis-red-scout-ne-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-scout-turret-ne"
+  images {
+    image: "/assets/derived/arena/chassis-red-scout-turret-ne.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
   id: "chassis-red-assault"
   images {
     image: "/assets/derived/arena/chassis-red-assault-1.png"
@@ -163,6 +1844,213 @@ animations {
   }
   playback: PLAYBACK_LOOP_FORWARD
   fps: 10
+}
+animations {
+  id: "chassis-red-assault-turret"
+  images {
+    image: "/assets/derived/arena/chassis-red-assault-turret.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-assault-se"
+  images {
+    image: "/assets/derived/arena/chassis-red-assault-se-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-red-assault-se-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-red-assault-se-idle"
+  images {
+    image: "/assets/derived/arena/chassis-red-assault-se-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-assault-turret-se"
+  images {
+    image: "/assets/derived/arena/chassis-red-assault-turret-se.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-assault-s"
+  images {
+    image: "/assets/derived/arena/chassis-red-assault-s-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-red-assault-s-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-red-assault-s-idle"
+  images {
+    image: "/assets/derived/arena/chassis-red-assault-s-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-assault-turret-s"
+  images {
+    image: "/assets/derived/arena/chassis-red-assault-turret-s.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-assault-sw"
+  images {
+    image: "/assets/derived/arena/chassis-red-assault-sw-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-red-assault-sw-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-red-assault-sw-idle"
+  images {
+    image: "/assets/derived/arena/chassis-red-assault-sw-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-assault-turret-sw"
+  images {
+    image: "/assets/derived/arena/chassis-red-assault-turret-sw.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-assault-w"
+  images {
+    image: "/assets/derived/arena/chassis-red-assault-w-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-red-assault-w-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-red-assault-w-idle"
+  images {
+    image: "/assets/derived/arena/chassis-red-assault-w-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-assault-turret-w"
+  images {
+    image: "/assets/derived/arena/chassis-red-assault-turret-w.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-assault-e"
+  images {
+    image: "/assets/derived/arena/chassis-red-assault-e-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-red-assault-e-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-red-assault-e-idle"
+  images {
+    image: "/assets/derived/arena/chassis-red-assault-e-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-assault-turret-e"
+  images {
+    image: "/assets/derived/arena/chassis-red-assault-turret-e.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-assault-nw"
+  images {
+    image: "/assets/derived/arena/chassis-red-assault-nw-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-red-assault-nw-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-red-assault-nw-idle"
+  images {
+    image: "/assets/derived/arena/chassis-red-assault-nw-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-assault-turret-nw"
+  images {
+    image: "/assets/derived/arena/chassis-red-assault-turret-nw.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-assault-n"
+  images {
+    image: "/assets/derived/arena/chassis-red-assault-n-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-red-assault-n-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-red-assault-n-idle"
+  images {
+    image: "/assets/derived/arena/chassis-red-assault-n-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-assault-turret-n"
+  images {
+    image: "/assets/derived/arena/chassis-red-assault-turret-n.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-assault-ne"
+  images {
+    image: "/assets/derived/arena/chassis-red-assault-ne-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-red-assault-ne-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-red-assault-ne-idle"
+  images {
+    image: "/assets/derived/arena/chassis-red-assault-ne-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-assault-turret-ne"
+  images {
+    image: "/assets/derived/arena/chassis-red-assault-turret-ne.png"
+  }
+  playback: PLAYBACK_NONE
 }
 animations {
   id: "chassis-red-bulwark"
@@ -176,6 +2064,213 @@ animations {
   fps: 10
 }
 animations {
+  id: "chassis-red-bulwark-turret"
+  images {
+    image: "/assets/derived/arena/chassis-red-bulwark-turret.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-bulwark-se"
+  images {
+    image: "/assets/derived/arena/chassis-red-bulwark-se-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-red-bulwark-se-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-red-bulwark-se-idle"
+  images {
+    image: "/assets/derived/arena/chassis-red-bulwark-se-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-bulwark-turret-se"
+  images {
+    image: "/assets/derived/arena/chassis-red-bulwark-turret-se.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-bulwark-s"
+  images {
+    image: "/assets/derived/arena/chassis-red-bulwark-s-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-red-bulwark-s-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-red-bulwark-s-idle"
+  images {
+    image: "/assets/derived/arena/chassis-red-bulwark-s-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-bulwark-turret-s"
+  images {
+    image: "/assets/derived/arena/chassis-red-bulwark-turret-s.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-bulwark-sw"
+  images {
+    image: "/assets/derived/arena/chassis-red-bulwark-sw-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-red-bulwark-sw-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-red-bulwark-sw-idle"
+  images {
+    image: "/assets/derived/arena/chassis-red-bulwark-sw-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-bulwark-turret-sw"
+  images {
+    image: "/assets/derived/arena/chassis-red-bulwark-turret-sw.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-bulwark-w"
+  images {
+    image: "/assets/derived/arena/chassis-red-bulwark-w-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-red-bulwark-w-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-red-bulwark-w-idle"
+  images {
+    image: "/assets/derived/arena/chassis-red-bulwark-w-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-bulwark-turret-w"
+  images {
+    image: "/assets/derived/arena/chassis-red-bulwark-turret-w.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-bulwark-e"
+  images {
+    image: "/assets/derived/arena/chassis-red-bulwark-e-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-red-bulwark-e-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-red-bulwark-e-idle"
+  images {
+    image: "/assets/derived/arena/chassis-red-bulwark-e-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-bulwark-turret-e"
+  images {
+    image: "/assets/derived/arena/chassis-red-bulwark-turret-e.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-bulwark-nw"
+  images {
+    image: "/assets/derived/arena/chassis-red-bulwark-nw-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-red-bulwark-nw-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-red-bulwark-nw-idle"
+  images {
+    image: "/assets/derived/arena/chassis-red-bulwark-nw-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-bulwark-turret-nw"
+  images {
+    image: "/assets/derived/arena/chassis-red-bulwark-turret-nw.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-bulwark-n"
+  images {
+    image: "/assets/derived/arena/chassis-red-bulwark-n-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-red-bulwark-n-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-red-bulwark-n-idle"
+  images {
+    image: "/assets/derived/arena/chassis-red-bulwark-n-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-bulwark-turret-n"
+  images {
+    image: "/assets/derived/arena/chassis-red-bulwark-turret-n.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-bulwark-ne"
+  images {
+    image: "/assets/derived/arena/chassis-red-bulwark-ne-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-red-bulwark-ne-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-red-bulwark-ne-idle"
+  images {
+    image: "/assets/derived/arena/chassis-red-bulwark-ne-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-bulwark-turret-ne"
+  images {
+    image: "/assets/derived/arena/chassis-red-bulwark-turret-ne.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
   id: "chassis-red-artillery"
   images {
     image: "/assets/derived/arena/chassis-red-artillery-1.png"
@@ -185,6 +2280,213 @@ animations {
   }
   playback: PLAYBACK_LOOP_FORWARD
   fps: 10
+}
+animations {
+  id: "chassis-red-artillery-turret"
+  images {
+    image: "/assets/derived/arena/chassis-red-artillery-turret.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-artillery-se"
+  images {
+    image: "/assets/derived/arena/chassis-red-artillery-se-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-red-artillery-se-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-red-artillery-se-idle"
+  images {
+    image: "/assets/derived/arena/chassis-red-artillery-se-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-artillery-turret-se"
+  images {
+    image: "/assets/derived/arena/chassis-red-artillery-turret-se.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-artillery-s"
+  images {
+    image: "/assets/derived/arena/chassis-red-artillery-s-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-red-artillery-s-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-red-artillery-s-idle"
+  images {
+    image: "/assets/derived/arena/chassis-red-artillery-s-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-artillery-turret-s"
+  images {
+    image: "/assets/derived/arena/chassis-red-artillery-turret-s.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-artillery-sw"
+  images {
+    image: "/assets/derived/arena/chassis-red-artillery-sw-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-red-artillery-sw-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-red-artillery-sw-idle"
+  images {
+    image: "/assets/derived/arena/chassis-red-artillery-sw-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-artillery-turret-sw"
+  images {
+    image: "/assets/derived/arena/chassis-red-artillery-turret-sw.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-artillery-w"
+  images {
+    image: "/assets/derived/arena/chassis-red-artillery-w-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-red-artillery-w-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-red-artillery-w-idle"
+  images {
+    image: "/assets/derived/arena/chassis-red-artillery-w-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-artillery-turret-w"
+  images {
+    image: "/assets/derived/arena/chassis-red-artillery-turret-w.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-artillery-e"
+  images {
+    image: "/assets/derived/arena/chassis-red-artillery-e-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-red-artillery-e-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-red-artillery-e-idle"
+  images {
+    image: "/assets/derived/arena/chassis-red-artillery-e-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-artillery-turret-e"
+  images {
+    image: "/assets/derived/arena/chassis-red-artillery-turret-e.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-artillery-nw"
+  images {
+    image: "/assets/derived/arena/chassis-red-artillery-nw-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-red-artillery-nw-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-red-artillery-nw-idle"
+  images {
+    image: "/assets/derived/arena/chassis-red-artillery-nw-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-artillery-turret-nw"
+  images {
+    image: "/assets/derived/arena/chassis-red-artillery-turret-nw.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-artillery-n"
+  images {
+    image: "/assets/derived/arena/chassis-red-artillery-n-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-red-artillery-n-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-red-artillery-n-idle"
+  images {
+    image: "/assets/derived/arena/chassis-red-artillery-n-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-artillery-turret-n"
+  images {
+    image: "/assets/derived/arena/chassis-red-artillery-turret-n.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-artillery-ne"
+  images {
+    image: "/assets/derived/arena/chassis-red-artillery-ne-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-red-artillery-ne-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-red-artillery-ne-idle"
+  images {
+    image: "/assets/derived/arena/chassis-red-artillery-ne-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-artillery-turret-ne"
+  images {
+    image: "/assets/derived/arena/chassis-red-artillery-turret-ne.png"
+  }
+  playback: PLAYBACK_NONE
 }
 animations {
   id: "chassis-green-scout"
@@ -198,6 +2500,213 @@ animations {
   fps: 10
 }
 animations {
+  id: "chassis-green-scout-turret"
+  images {
+    image: "/assets/derived/arena/chassis-green-scout-turret.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-scout-se"
+  images {
+    image: "/assets/derived/arena/chassis-green-scout-se-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-green-scout-se-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-green-scout-se-idle"
+  images {
+    image: "/assets/derived/arena/chassis-green-scout-se-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-scout-turret-se"
+  images {
+    image: "/assets/derived/arena/chassis-green-scout-turret-se.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-scout-s"
+  images {
+    image: "/assets/derived/arena/chassis-green-scout-s-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-green-scout-s-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-green-scout-s-idle"
+  images {
+    image: "/assets/derived/arena/chassis-green-scout-s-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-scout-turret-s"
+  images {
+    image: "/assets/derived/arena/chassis-green-scout-turret-s.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-scout-sw"
+  images {
+    image: "/assets/derived/arena/chassis-green-scout-sw-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-green-scout-sw-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-green-scout-sw-idle"
+  images {
+    image: "/assets/derived/arena/chassis-green-scout-sw-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-scout-turret-sw"
+  images {
+    image: "/assets/derived/arena/chassis-green-scout-turret-sw.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-scout-w"
+  images {
+    image: "/assets/derived/arena/chassis-green-scout-w-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-green-scout-w-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-green-scout-w-idle"
+  images {
+    image: "/assets/derived/arena/chassis-green-scout-w-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-scout-turret-w"
+  images {
+    image: "/assets/derived/arena/chassis-green-scout-turret-w.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-scout-e"
+  images {
+    image: "/assets/derived/arena/chassis-green-scout-e-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-green-scout-e-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-green-scout-e-idle"
+  images {
+    image: "/assets/derived/arena/chassis-green-scout-e-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-scout-turret-e"
+  images {
+    image: "/assets/derived/arena/chassis-green-scout-turret-e.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-scout-nw"
+  images {
+    image: "/assets/derived/arena/chassis-green-scout-nw-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-green-scout-nw-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-green-scout-nw-idle"
+  images {
+    image: "/assets/derived/arena/chassis-green-scout-nw-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-scout-turret-nw"
+  images {
+    image: "/assets/derived/arena/chassis-green-scout-turret-nw.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-scout-n"
+  images {
+    image: "/assets/derived/arena/chassis-green-scout-n-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-green-scout-n-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-green-scout-n-idle"
+  images {
+    image: "/assets/derived/arena/chassis-green-scout-n-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-scout-turret-n"
+  images {
+    image: "/assets/derived/arena/chassis-green-scout-turret-n.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-scout-ne"
+  images {
+    image: "/assets/derived/arena/chassis-green-scout-ne-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-green-scout-ne-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-green-scout-ne-idle"
+  images {
+    image: "/assets/derived/arena/chassis-green-scout-ne-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-scout-turret-ne"
+  images {
+    image: "/assets/derived/arena/chassis-green-scout-turret-ne.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
   id: "chassis-green-assault"
   images {
     image: "/assets/derived/arena/chassis-green-assault-1.png"
@@ -207,6 +2716,213 @@ animations {
   }
   playback: PLAYBACK_LOOP_FORWARD
   fps: 10
+}
+animations {
+  id: "chassis-green-assault-turret"
+  images {
+    image: "/assets/derived/arena/chassis-green-assault-turret.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-assault-se"
+  images {
+    image: "/assets/derived/arena/chassis-green-assault-se-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-green-assault-se-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-green-assault-se-idle"
+  images {
+    image: "/assets/derived/arena/chassis-green-assault-se-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-assault-turret-se"
+  images {
+    image: "/assets/derived/arena/chassis-green-assault-turret-se.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-assault-s"
+  images {
+    image: "/assets/derived/arena/chassis-green-assault-s-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-green-assault-s-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-green-assault-s-idle"
+  images {
+    image: "/assets/derived/arena/chassis-green-assault-s-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-assault-turret-s"
+  images {
+    image: "/assets/derived/arena/chassis-green-assault-turret-s.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-assault-sw"
+  images {
+    image: "/assets/derived/arena/chassis-green-assault-sw-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-green-assault-sw-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-green-assault-sw-idle"
+  images {
+    image: "/assets/derived/arena/chassis-green-assault-sw-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-assault-turret-sw"
+  images {
+    image: "/assets/derived/arena/chassis-green-assault-turret-sw.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-assault-w"
+  images {
+    image: "/assets/derived/arena/chassis-green-assault-w-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-green-assault-w-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-green-assault-w-idle"
+  images {
+    image: "/assets/derived/arena/chassis-green-assault-w-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-assault-turret-w"
+  images {
+    image: "/assets/derived/arena/chassis-green-assault-turret-w.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-assault-e"
+  images {
+    image: "/assets/derived/arena/chassis-green-assault-e-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-green-assault-e-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-green-assault-e-idle"
+  images {
+    image: "/assets/derived/arena/chassis-green-assault-e-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-assault-turret-e"
+  images {
+    image: "/assets/derived/arena/chassis-green-assault-turret-e.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-assault-nw"
+  images {
+    image: "/assets/derived/arena/chassis-green-assault-nw-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-green-assault-nw-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-green-assault-nw-idle"
+  images {
+    image: "/assets/derived/arena/chassis-green-assault-nw-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-assault-turret-nw"
+  images {
+    image: "/assets/derived/arena/chassis-green-assault-turret-nw.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-assault-n"
+  images {
+    image: "/assets/derived/arena/chassis-green-assault-n-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-green-assault-n-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-green-assault-n-idle"
+  images {
+    image: "/assets/derived/arena/chassis-green-assault-n-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-assault-turret-n"
+  images {
+    image: "/assets/derived/arena/chassis-green-assault-turret-n.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-assault-ne"
+  images {
+    image: "/assets/derived/arena/chassis-green-assault-ne-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-green-assault-ne-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-green-assault-ne-idle"
+  images {
+    image: "/assets/derived/arena/chassis-green-assault-ne-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-assault-turret-ne"
+  images {
+    image: "/assets/derived/arena/chassis-green-assault-turret-ne.png"
+  }
+  playback: PLAYBACK_NONE
 }
 animations {
   id: "chassis-green-bulwark"
@@ -220,6 +2936,213 @@ animations {
   fps: 10
 }
 animations {
+  id: "chassis-green-bulwark-turret"
+  images {
+    image: "/assets/derived/arena/chassis-green-bulwark-turret.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-bulwark-se"
+  images {
+    image: "/assets/derived/arena/chassis-green-bulwark-se-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-green-bulwark-se-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-green-bulwark-se-idle"
+  images {
+    image: "/assets/derived/arena/chassis-green-bulwark-se-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-bulwark-turret-se"
+  images {
+    image: "/assets/derived/arena/chassis-green-bulwark-turret-se.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-bulwark-s"
+  images {
+    image: "/assets/derived/arena/chassis-green-bulwark-s-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-green-bulwark-s-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-green-bulwark-s-idle"
+  images {
+    image: "/assets/derived/arena/chassis-green-bulwark-s-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-bulwark-turret-s"
+  images {
+    image: "/assets/derived/arena/chassis-green-bulwark-turret-s.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-bulwark-sw"
+  images {
+    image: "/assets/derived/arena/chassis-green-bulwark-sw-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-green-bulwark-sw-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-green-bulwark-sw-idle"
+  images {
+    image: "/assets/derived/arena/chassis-green-bulwark-sw-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-bulwark-turret-sw"
+  images {
+    image: "/assets/derived/arena/chassis-green-bulwark-turret-sw.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-bulwark-w"
+  images {
+    image: "/assets/derived/arena/chassis-green-bulwark-w-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-green-bulwark-w-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-green-bulwark-w-idle"
+  images {
+    image: "/assets/derived/arena/chassis-green-bulwark-w-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-bulwark-turret-w"
+  images {
+    image: "/assets/derived/arena/chassis-green-bulwark-turret-w.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-bulwark-e"
+  images {
+    image: "/assets/derived/arena/chassis-green-bulwark-e-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-green-bulwark-e-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-green-bulwark-e-idle"
+  images {
+    image: "/assets/derived/arena/chassis-green-bulwark-e-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-bulwark-turret-e"
+  images {
+    image: "/assets/derived/arena/chassis-green-bulwark-turret-e.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-bulwark-nw"
+  images {
+    image: "/assets/derived/arena/chassis-green-bulwark-nw-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-green-bulwark-nw-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-green-bulwark-nw-idle"
+  images {
+    image: "/assets/derived/arena/chassis-green-bulwark-nw-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-bulwark-turret-nw"
+  images {
+    image: "/assets/derived/arena/chassis-green-bulwark-turret-nw.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-bulwark-n"
+  images {
+    image: "/assets/derived/arena/chassis-green-bulwark-n-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-green-bulwark-n-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-green-bulwark-n-idle"
+  images {
+    image: "/assets/derived/arena/chassis-green-bulwark-n-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-bulwark-turret-n"
+  images {
+    image: "/assets/derived/arena/chassis-green-bulwark-turret-n.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-bulwark-ne"
+  images {
+    image: "/assets/derived/arena/chassis-green-bulwark-ne-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-green-bulwark-ne-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-green-bulwark-ne-idle"
+  images {
+    image: "/assets/derived/arena/chassis-green-bulwark-ne-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-bulwark-turret-ne"
+  images {
+    image: "/assets/derived/arena/chassis-green-bulwark-turret-ne.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
   id: "chassis-green-artillery"
   images {
     image: "/assets/derived/arena/chassis-green-artillery-1.png"
@@ -229,6 +3152,213 @@ animations {
   }
   playback: PLAYBACK_LOOP_FORWARD
   fps: 10
+}
+animations {
+  id: "chassis-green-artillery-turret"
+  images {
+    image: "/assets/derived/arena/chassis-green-artillery-turret.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-artillery-se"
+  images {
+    image: "/assets/derived/arena/chassis-green-artillery-se-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-green-artillery-se-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-green-artillery-se-idle"
+  images {
+    image: "/assets/derived/arena/chassis-green-artillery-se-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-artillery-turret-se"
+  images {
+    image: "/assets/derived/arena/chassis-green-artillery-turret-se.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-artillery-s"
+  images {
+    image: "/assets/derived/arena/chassis-green-artillery-s-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-green-artillery-s-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-green-artillery-s-idle"
+  images {
+    image: "/assets/derived/arena/chassis-green-artillery-s-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-artillery-turret-s"
+  images {
+    image: "/assets/derived/arena/chassis-green-artillery-turret-s.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-artillery-sw"
+  images {
+    image: "/assets/derived/arena/chassis-green-artillery-sw-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-green-artillery-sw-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-green-artillery-sw-idle"
+  images {
+    image: "/assets/derived/arena/chassis-green-artillery-sw-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-artillery-turret-sw"
+  images {
+    image: "/assets/derived/arena/chassis-green-artillery-turret-sw.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-artillery-w"
+  images {
+    image: "/assets/derived/arena/chassis-green-artillery-w-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-green-artillery-w-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-green-artillery-w-idle"
+  images {
+    image: "/assets/derived/arena/chassis-green-artillery-w-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-artillery-turret-w"
+  images {
+    image: "/assets/derived/arena/chassis-green-artillery-turret-w.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-artillery-e"
+  images {
+    image: "/assets/derived/arena/chassis-green-artillery-e-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-green-artillery-e-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-green-artillery-e-idle"
+  images {
+    image: "/assets/derived/arena/chassis-green-artillery-e-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-artillery-turret-e"
+  images {
+    image: "/assets/derived/arena/chassis-green-artillery-turret-e.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-artillery-nw"
+  images {
+    image: "/assets/derived/arena/chassis-green-artillery-nw-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-green-artillery-nw-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-green-artillery-nw-idle"
+  images {
+    image: "/assets/derived/arena/chassis-green-artillery-nw-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-artillery-turret-nw"
+  images {
+    image: "/assets/derived/arena/chassis-green-artillery-turret-nw.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-artillery-n"
+  images {
+    image: "/assets/derived/arena/chassis-green-artillery-n-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-green-artillery-n-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-green-artillery-n-idle"
+  images {
+    image: "/assets/derived/arena/chassis-green-artillery-n-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-artillery-turret-n"
+  images {
+    image: "/assets/derived/arena/chassis-green-artillery-turret-n.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-artillery-ne"
+  images {
+    image: "/assets/derived/arena/chassis-green-artillery-ne-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-green-artillery-ne-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-green-artillery-ne-idle"
+  images {
+    image: "/assets/derived/arena/chassis-green-artillery-ne-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-artillery-turret-ne"
+  images {
+    image: "/assets/derived/arena/chassis-green-artillery-turret-ne.png"
+  }
+  playback: PLAYBACK_NONE
 }
 animations {
   id: "chassis-sand-scout"
@@ -242,6 +3372,213 @@ animations {
   fps: 10
 }
 animations {
+  id: "chassis-sand-scout-turret"
+  images {
+    image: "/assets/derived/arena/chassis-sand-scout-turret.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-scout-se"
+  images {
+    image: "/assets/derived/arena/chassis-sand-scout-se-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-sand-scout-se-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-sand-scout-se-idle"
+  images {
+    image: "/assets/derived/arena/chassis-sand-scout-se-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-scout-turret-se"
+  images {
+    image: "/assets/derived/arena/chassis-sand-scout-turret-se.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-scout-s"
+  images {
+    image: "/assets/derived/arena/chassis-sand-scout-s-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-sand-scout-s-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-sand-scout-s-idle"
+  images {
+    image: "/assets/derived/arena/chassis-sand-scout-s-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-scout-turret-s"
+  images {
+    image: "/assets/derived/arena/chassis-sand-scout-turret-s.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-scout-sw"
+  images {
+    image: "/assets/derived/arena/chassis-sand-scout-sw-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-sand-scout-sw-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-sand-scout-sw-idle"
+  images {
+    image: "/assets/derived/arena/chassis-sand-scout-sw-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-scout-turret-sw"
+  images {
+    image: "/assets/derived/arena/chassis-sand-scout-turret-sw.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-scout-w"
+  images {
+    image: "/assets/derived/arena/chassis-sand-scout-w-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-sand-scout-w-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-sand-scout-w-idle"
+  images {
+    image: "/assets/derived/arena/chassis-sand-scout-w-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-scout-turret-w"
+  images {
+    image: "/assets/derived/arena/chassis-sand-scout-turret-w.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-scout-e"
+  images {
+    image: "/assets/derived/arena/chassis-sand-scout-e-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-sand-scout-e-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-sand-scout-e-idle"
+  images {
+    image: "/assets/derived/arena/chassis-sand-scout-e-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-scout-turret-e"
+  images {
+    image: "/assets/derived/arena/chassis-sand-scout-turret-e.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-scout-nw"
+  images {
+    image: "/assets/derived/arena/chassis-sand-scout-nw-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-sand-scout-nw-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-sand-scout-nw-idle"
+  images {
+    image: "/assets/derived/arena/chassis-sand-scout-nw-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-scout-turret-nw"
+  images {
+    image: "/assets/derived/arena/chassis-sand-scout-turret-nw.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-scout-n"
+  images {
+    image: "/assets/derived/arena/chassis-sand-scout-n-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-sand-scout-n-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-sand-scout-n-idle"
+  images {
+    image: "/assets/derived/arena/chassis-sand-scout-n-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-scout-turret-n"
+  images {
+    image: "/assets/derived/arena/chassis-sand-scout-turret-n.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-scout-ne"
+  images {
+    image: "/assets/derived/arena/chassis-sand-scout-ne-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-sand-scout-ne-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-sand-scout-ne-idle"
+  images {
+    image: "/assets/derived/arena/chassis-sand-scout-ne-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-scout-turret-ne"
+  images {
+    image: "/assets/derived/arena/chassis-sand-scout-turret-ne.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
   id: "chassis-sand-assault"
   images {
     image: "/assets/derived/arena/chassis-sand-assault-1.png"
@@ -251,6 +3588,213 @@ animations {
   }
   playback: PLAYBACK_LOOP_FORWARD
   fps: 10
+}
+animations {
+  id: "chassis-sand-assault-turret"
+  images {
+    image: "/assets/derived/arena/chassis-sand-assault-turret.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-assault-se"
+  images {
+    image: "/assets/derived/arena/chassis-sand-assault-se-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-sand-assault-se-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-sand-assault-se-idle"
+  images {
+    image: "/assets/derived/arena/chassis-sand-assault-se-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-assault-turret-se"
+  images {
+    image: "/assets/derived/arena/chassis-sand-assault-turret-se.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-assault-s"
+  images {
+    image: "/assets/derived/arena/chassis-sand-assault-s-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-sand-assault-s-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-sand-assault-s-idle"
+  images {
+    image: "/assets/derived/arena/chassis-sand-assault-s-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-assault-turret-s"
+  images {
+    image: "/assets/derived/arena/chassis-sand-assault-turret-s.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-assault-sw"
+  images {
+    image: "/assets/derived/arena/chassis-sand-assault-sw-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-sand-assault-sw-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-sand-assault-sw-idle"
+  images {
+    image: "/assets/derived/arena/chassis-sand-assault-sw-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-assault-turret-sw"
+  images {
+    image: "/assets/derived/arena/chassis-sand-assault-turret-sw.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-assault-w"
+  images {
+    image: "/assets/derived/arena/chassis-sand-assault-w-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-sand-assault-w-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-sand-assault-w-idle"
+  images {
+    image: "/assets/derived/arena/chassis-sand-assault-w-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-assault-turret-w"
+  images {
+    image: "/assets/derived/arena/chassis-sand-assault-turret-w.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-assault-e"
+  images {
+    image: "/assets/derived/arena/chassis-sand-assault-e-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-sand-assault-e-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-sand-assault-e-idle"
+  images {
+    image: "/assets/derived/arena/chassis-sand-assault-e-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-assault-turret-e"
+  images {
+    image: "/assets/derived/arena/chassis-sand-assault-turret-e.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-assault-nw"
+  images {
+    image: "/assets/derived/arena/chassis-sand-assault-nw-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-sand-assault-nw-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-sand-assault-nw-idle"
+  images {
+    image: "/assets/derived/arena/chassis-sand-assault-nw-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-assault-turret-nw"
+  images {
+    image: "/assets/derived/arena/chassis-sand-assault-turret-nw.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-assault-n"
+  images {
+    image: "/assets/derived/arena/chassis-sand-assault-n-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-sand-assault-n-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-sand-assault-n-idle"
+  images {
+    image: "/assets/derived/arena/chassis-sand-assault-n-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-assault-turret-n"
+  images {
+    image: "/assets/derived/arena/chassis-sand-assault-turret-n.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-assault-ne"
+  images {
+    image: "/assets/derived/arena/chassis-sand-assault-ne-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-sand-assault-ne-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-sand-assault-ne-idle"
+  images {
+    image: "/assets/derived/arena/chassis-sand-assault-ne-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-assault-turret-ne"
+  images {
+    image: "/assets/derived/arena/chassis-sand-assault-turret-ne.png"
+  }
+  playback: PLAYBACK_NONE
 }
 animations {
   id: "chassis-sand-bulwark"
@@ -264,6 +3808,213 @@ animations {
   fps: 10
 }
 animations {
+  id: "chassis-sand-bulwark-turret"
+  images {
+    image: "/assets/derived/arena/chassis-sand-bulwark-turret.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-bulwark-se"
+  images {
+    image: "/assets/derived/arena/chassis-sand-bulwark-se-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-sand-bulwark-se-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-sand-bulwark-se-idle"
+  images {
+    image: "/assets/derived/arena/chassis-sand-bulwark-se-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-bulwark-turret-se"
+  images {
+    image: "/assets/derived/arena/chassis-sand-bulwark-turret-se.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-bulwark-s"
+  images {
+    image: "/assets/derived/arena/chassis-sand-bulwark-s-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-sand-bulwark-s-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-sand-bulwark-s-idle"
+  images {
+    image: "/assets/derived/arena/chassis-sand-bulwark-s-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-bulwark-turret-s"
+  images {
+    image: "/assets/derived/arena/chassis-sand-bulwark-turret-s.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-bulwark-sw"
+  images {
+    image: "/assets/derived/arena/chassis-sand-bulwark-sw-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-sand-bulwark-sw-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-sand-bulwark-sw-idle"
+  images {
+    image: "/assets/derived/arena/chassis-sand-bulwark-sw-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-bulwark-turret-sw"
+  images {
+    image: "/assets/derived/arena/chassis-sand-bulwark-turret-sw.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-bulwark-w"
+  images {
+    image: "/assets/derived/arena/chassis-sand-bulwark-w-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-sand-bulwark-w-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-sand-bulwark-w-idle"
+  images {
+    image: "/assets/derived/arena/chassis-sand-bulwark-w-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-bulwark-turret-w"
+  images {
+    image: "/assets/derived/arena/chassis-sand-bulwark-turret-w.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-bulwark-e"
+  images {
+    image: "/assets/derived/arena/chassis-sand-bulwark-e-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-sand-bulwark-e-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-sand-bulwark-e-idle"
+  images {
+    image: "/assets/derived/arena/chassis-sand-bulwark-e-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-bulwark-turret-e"
+  images {
+    image: "/assets/derived/arena/chassis-sand-bulwark-turret-e.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-bulwark-nw"
+  images {
+    image: "/assets/derived/arena/chassis-sand-bulwark-nw-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-sand-bulwark-nw-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-sand-bulwark-nw-idle"
+  images {
+    image: "/assets/derived/arena/chassis-sand-bulwark-nw-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-bulwark-turret-nw"
+  images {
+    image: "/assets/derived/arena/chassis-sand-bulwark-turret-nw.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-bulwark-n"
+  images {
+    image: "/assets/derived/arena/chassis-sand-bulwark-n-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-sand-bulwark-n-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-sand-bulwark-n-idle"
+  images {
+    image: "/assets/derived/arena/chassis-sand-bulwark-n-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-bulwark-turret-n"
+  images {
+    image: "/assets/derived/arena/chassis-sand-bulwark-turret-n.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-bulwark-ne"
+  images {
+    image: "/assets/derived/arena/chassis-sand-bulwark-ne-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-sand-bulwark-ne-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-sand-bulwark-ne-idle"
+  images {
+    image: "/assets/derived/arena/chassis-sand-bulwark-ne-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-bulwark-turret-ne"
+  images {
+    image: "/assets/derived/arena/chassis-sand-bulwark-turret-ne.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
   id: "chassis-sand-artillery"
   images {
     image: "/assets/derived/arena/chassis-sand-artillery-1.png"
@@ -273,6 +4024,213 @@ animations {
   }
   playback: PLAYBACK_LOOP_FORWARD
   fps: 10
+}
+animations {
+  id: "chassis-sand-artillery-turret"
+  images {
+    image: "/assets/derived/arena/chassis-sand-artillery-turret.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-artillery-se"
+  images {
+    image: "/assets/derived/arena/chassis-sand-artillery-se-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-sand-artillery-se-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-sand-artillery-se-idle"
+  images {
+    image: "/assets/derived/arena/chassis-sand-artillery-se-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-artillery-turret-se"
+  images {
+    image: "/assets/derived/arena/chassis-sand-artillery-turret-se.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-artillery-s"
+  images {
+    image: "/assets/derived/arena/chassis-sand-artillery-s-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-sand-artillery-s-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-sand-artillery-s-idle"
+  images {
+    image: "/assets/derived/arena/chassis-sand-artillery-s-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-artillery-turret-s"
+  images {
+    image: "/assets/derived/arena/chassis-sand-artillery-turret-s.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-artillery-sw"
+  images {
+    image: "/assets/derived/arena/chassis-sand-artillery-sw-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-sand-artillery-sw-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-sand-artillery-sw-idle"
+  images {
+    image: "/assets/derived/arena/chassis-sand-artillery-sw-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-artillery-turret-sw"
+  images {
+    image: "/assets/derived/arena/chassis-sand-artillery-turret-sw.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-artillery-w"
+  images {
+    image: "/assets/derived/arena/chassis-sand-artillery-w-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-sand-artillery-w-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-sand-artillery-w-idle"
+  images {
+    image: "/assets/derived/arena/chassis-sand-artillery-w-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-artillery-turret-w"
+  images {
+    image: "/assets/derived/arena/chassis-sand-artillery-turret-w.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-artillery-e"
+  images {
+    image: "/assets/derived/arena/chassis-sand-artillery-e-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-sand-artillery-e-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-sand-artillery-e-idle"
+  images {
+    image: "/assets/derived/arena/chassis-sand-artillery-e-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-artillery-turret-e"
+  images {
+    image: "/assets/derived/arena/chassis-sand-artillery-turret-e.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-artillery-nw"
+  images {
+    image: "/assets/derived/arena/chassis-sand-artillery-nw-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-sand-artillery-nw-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-sand-artillery-nw-idle"
+  images {
+    image: "/assets/derived/arena/chassis-sand-artillery-nw-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-artillery-turret-nw"
+  images {
+    image: "/assets/derived/arena/chassis-sand-artillery-turret-nw.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-artillery-n"
+  images {
+    image: "/assets/derived/arena/chassis-sand-artillery-n-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-sand-artillery-n-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-sand-artillery-n-idle"
+  images {
+    image: "/assets/derived/arena/chassis-sand-artillery-n-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-artillery-turret-n"
+  images {
+    image: "/assets/derived/arena/chassis-sand-artillery-turret-n.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-artillery-ne"
+  images {
+    image: "/assets/derived/arena/chassis-sand-artillery-ne-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-sand-artillery-ne-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-sand-artillery-ne-idle"
+  images {
+    image: "/assets/derived/arena/chassis-sand-artillery-ne-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-artillery-turret-ne"
+  images {
+    image: "/assets/derived/arena/chassis-sand-artillery-turret-ne.png"
+  }
+  playback: PLAYBACK_NONE
 }
 animations {
   id: "proj-cannon"

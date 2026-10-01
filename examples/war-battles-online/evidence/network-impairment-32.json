@@ -307,9 +307,9 @@
     {
       "path": "examples/war-battles-online/core",
       "kind": "tree",
-      "fileCount": 24,
-      "bytes": 454371,
-      "sha256": "927a0691897b8cd2f503277569aaeb4ab872ab11fb2eb69c8abf975bc7e5e077"
+      "fileCount": 26,
+      "bytes": 468495,
+      "sha256": "5e7664233ae38183392ddaea342dc5025fda80fc537009ae3dad6a2da157db53"
     },
     {
       "path": "examples/war-battles-online/integration/authoritative-load-harness.ts",
@@ -332,8 +332,8 @@
     {
       "path": "examples/war-battles-online/package.json",
       "kind": "file",
-      "bytes": 8208,
-      "sha256": "002c5496e73a01678526ae390b54e3a0d3c81b34766e8be15a16221d4f5fd5f3"
+      "bytes": 8271,
+      "sha256": "eb550ac312f7ed6f9a9eded13184063d0a510a0c9e5f07a044a60d51d061657f"
     },
     {
       "path": "package.json",
@@ -360,5 +360,5 @@
       "sha256": "f1d6b752f1eb4b956bd2784eb59cea113e6643a2e70ba9c613fea1344b590734"
     }
   ],
-  "sourceKey": "06c8d13f95be25d7a5c961817435581187e28ef0c08a974fba818d99127a444d"
+  "sourceKey": "25815f02b3b68698d0534721a0b40a7094a1a468bef88a876b2fc7f441e79916"
 }

@@ -15,6 +15,7 @@
     "sound:check": "node tools/generate-sound.mjs --check",
     "art": "node tools/generate-art.mjs",
     "art:check": "node tools/generate-art.mjs --check",
+    "art:capture": "node integration/capture-art-gallery.mjs",
     "art:spritefusion": "node tools/sprite-fusion.mjs --spec",
     "world-art": "node tools/generate-world-art.mjs",
     "world-art:check": "node tools/generate-world-art.mjs --check",

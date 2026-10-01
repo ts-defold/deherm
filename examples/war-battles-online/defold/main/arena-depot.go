@@ -1,0 +1,25 @@
+embedded_components {
+  id: "sprite"
+  type: "sprite"
+  data: "tile_set: \"/main/arena-sprites.atlas\"\n"
+  "default_animation: \"tank-depot\"\n"
+  "material: \"/builtins/materials/sprite.material\"\n"
+  "blend_mode: BLEND_MODE_ALPHA\n"
+  ""
+  position {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  scale {
+    x: 1.4
+    y: 1.4
+    z: 1.0
+  }
+}

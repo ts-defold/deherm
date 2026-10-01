@@ -74,10 +74,10 @@ war-battles:arena-init:players=8:online=0
 war-battles:arena-engaged:players=8:skill=2:seed=1463898690:mode=offline
 ```
 
-The browser gate's in-engine component count moved from **five to eight**: the
-arena director, the tank hull/turret renderer and the pickup pad joined the four
-original components and the retained presentation mockup. It is exported from
-the gate as `EXPECTED_COMPONENT_COUNT` and asserted a second time in
+The browser gate's in-engine component count moved from **five to nine**: the
+arena director, the tank hull/turret renderer, the pickup pad, and the
+arena-landmark renderer joined the four original components and the retained
+presentation mockup. It is exported from the gate as `EXPECTED_COMPONENT_COUNT` and asserted a second time in
 `test/integration.test.mjs` against the generated component manifest, so the
 number inside the engine and the number on disk cannot drift apart.
 
@@ -92,13 +92,11 @@ game-owned marker sequence with no `ERROR:`, `FATAL:`, `RESULT_SCRIPT_ERROR`,
 
 ```text
 INFO:DEFOLD_HERMES: war-battles:ui-init
-INFO:DEFOLD_HERMES: war-battles:player-init:560.0:360.0
+INFO:DEFOLD_HERMES: war-battles:player-init:648.0:368.0
 INFO:DEFOLD_HERMES: war-battles:rocket-init:1.00:0.00
-INFO:DEFOLD_HERMES: war-battles:player-fire:560.0:360.0:1.00:0.00
-INFO:DEFOLD_HERMES: war-battles:rocket-hit
-INFO:DEFOLD_HERMES: war-battles:score:100
-INFO:DEFOLD_HERMES: war-battles:player-moved:739.9:360.0
-INFO:DEFOLD_HERMES: war-battles:rocket-explosion-done
+INFO:DEFOLD_HERMES: war-battles:player-fire:648.0:368.0:1.00:0.00
+INFO:DEFOLD_HERMES: war-battles:rocket-expired
+INFO:DEFOLD_HERMES: war-battles:player-moved:1727.9:962.0
 ```
 
 That sequence is the whole tutorial loop:
@@ -107,13 +105,9 @@ That sequence is the whole tutorial loop:
 - a `.script.ts` component read its own position through `go.get_position`;
 - `factory.create` spawned `/main/rocket.go` with a typed `dir` vector3
   property, and the spawned component observed exactly `(1, 0, 0)`;
-- Defold physics delivered `collision_response` from the `rockets` group to the
-  `tanks` group and the rocket deleted the reported `other_id`;
-- `msg.post("/gui#ui", "add_score", { score: 100 })` crossed from a game-object
-  component to a GUI-scene component and the score node was rewritten;
-- `msg.post("#sprite", "play_animation", …)` played the once-forward explosion
-  and Defold returned `animation_done` to the rocket, which deleted itself;
-- `go.set_position` advanced the player 179.9 px over the one-second scripted
+- the projectile ran its generated component lifecycle and deleted itself at
+  its bounded lifetime without leaking into the arena handoff;
+- `go.set_position` advanced the player away from its spawn over the scripted
   move, so the frame loop, not just `init`, drives engine state.
 
 Not observed by the native transcript, and therefore not claimed by that
@@ -123,8 +117,8 @@ projection:
   playability projection, not inferred from this native transcript;
 - keyboard input. The browser playability gate owns the keyboard claim;
 - every arena branch, bot decision, weapon, or multiplayer transport. Dedicated
-  deterministic tests own the 32-player simulation claim, and no real QUIC
-  session has been observed yet.
+  deterministic tests own the 32-player simulation claim, while the separate
+  WebTransport loopback projection owns the real Chrome-to-Deno QUIC claim.
 
 ## Provider defects fixed to reach this point
 

@@ -3,6 +3,42 @@ components {
   component: "/main/arena.script"
 }
 embedded_components {
+  id: "depotfactory"
+  type: "factory"
+  data: "prototype: \"/main/arena-depot.go\"\n"
+  "load_dynamically: false\n"
+  ""
+  position {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+}
+embedded_components {
+  id: "landmarkfactory"
+  type: "factory"
+  data: "prototype: \"/main/arena-landmark.go\"\n"
+  "load_dynamically: false\n"
+  ""
+  position {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+}
+embedded_components {
   id: "tankfactory"
   type: "factory"
   data: "prototype: \"/main/arena-tank.go\"\n"

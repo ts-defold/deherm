@@ -30,6 +30,7 @@
     "releaseConfig": "examples/war-battles-online/defold/tsconfig.deherm.release.json",
     "authoredFiles": [
       ".deherm/sdk/defold.ts",
+      "main/arena-landmark.script.ts",
       "main/arena.script.ts",
       "main/camera.script.ts",
       "main/pickup.script.ts",
@@ -39,7 +40,7 @@
       "main/ui.gui.ts",
       "reference/battle.gui.ts"
     ],
-    "authoredSourceTreeSha256": "9922a35f0f537fd0a4202e978efc0d792e369d34e45bc1f6311f4163904a5738",
+    "authoredSourceTreeSha256": "b478990d56c3000259eff877e288d5539079ac3d3ff55aa2cfdfe9771f43752d",
     "loweringPlan": "packages/bindings/generated/defold-binding-lowering-plan.json",
     "loweringPlanSha256": "866f88b307337b2a72cc215c2c556dfe05f3631ecd5e4e003e933ab61b5b8a5d",
     "typedNativeBridge": "packages/bindings/generated/defold-typed-native-bridge.json",
@@ -244,5 +245,5 @@
     "gameplay": "not-claimed; packaged gameplay belongs to the native Dynamic Hermes projection",
     "blockers": "blocked reachable routes remain explicit and fail closed"
   },
-  "recordSha256": "384b006ecca8a628584325bfb07ad6108c983553db8b89744c9a1273bef643cc"
+  "recordSha256": "4340311a792e8f64ad4c55e39d03c7c3c5cf816b9f4bbe424163c19de4562173"
 }

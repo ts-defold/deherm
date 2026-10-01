@@ -1,0 +1,5 @@
+{
+  "name": "assault-hull-directions-v1",
+  "operation": "direction-set",
+  "inputs": ["art/source/openai/assault-tank-v1/hull-grid-fixed.png"]
+}

@@ -94,6 +94,14 @@ import {
   HAZARD_PULSE_TICKS,
   HAZARD_RADIUS,
   isqrt,
+  isometricControlWorldX,
+  isometricControlWorldY,
+  isometricArcHeight,
+  isometricDirectionX,
+  isometricDirectionY,
+  isometricDirectionIndex,
+  isometricScreenX,
+  isometricScreenY,
   readHello,
   readInputBundle,
   readInputPacket,
@@ -116,11 +124,18 @@ import {
 } from "../core/index.ts";
 import {
   ARENA_DECOR_ROLE_COUNT,
+  ARENA_DECOR_ROLE_CRATER_BASE,
+  ARENA_DECOR_ROLE_SERVICE_ROAD_BASE,
+  ARENA_DECOR_ROLE_STAGING_PAD_BASE,
+  ARENA_GROUND_VARIANT_COUNT,
   ARENA_GROUND_ROLE_WALL_BASE,
+  ARENA_LANDSCAPE_MATERIAL_COUNT,
   ARENA_MARK_ROLE_COUNT,
   ARENA_VISUAL_CELL_COUNT,
   ARENA_WALL_MASK_BITS,
   ARENA_WALL_MASK_TO_FRAME,
+  arenaGroundMaterial,
+  arenaGroundVariant,
   arenaThemeIndex,
   arenaWallMask,
   projectArenaVisualRoles,
@@ -136,6 +151,44 @@ import {
   UPGRADE_MOBILITY,
 } from "../core/content.ts";
 import { NetworkBotClock } from "../bot-dashboard/network-bot-clock.ts";
+
+test("tank facing quantizes to the eight authored isometric views", () => {
+  assert.deepEqual(
+    [
+      [1, -1],
+      [0, -1],
+      [-1, -1],
+      [-1, 0],
+      [1, 0],
+      [-1, 1],
+      [0, 1],
+      [1, 1],
+    ].map(([x, y]) => isometricDirectionIndex(x, y)),
+    [0, 1, 2, 3, 4, 5, 6, 7],
+  );
+  assert.equal(isometricDirectionIndex(0, 0), 4, "idle direction defaults east");
+});
+
+test("one isometric projection drives positions, headings, and screen-relative controls", () => {
+  assert.equal(isometricScreenX(0, 0), 648);
+  assert.equal(isometricScreenY(0, 0), 368);
+
+  // The two Cartesian world axes rise along opposite screen diagonals.
+  assert.ok(isometricDirectionX(1, 0) > 0);
+  assert.ok(isometricDirectionY(1, 0) > 0);
+  assert.ok(isometricDirectionX(0, 1) < 0);
+  assert.ok(isometricDirectionY(0, 1) > 0);
+
+  // Digital screen directions invert into the simulation without changing the
+  // authoritative movement representation.
+  assert.deepEqual([isometricControlWorldX(0, 1), isometricControlWorldY(0, 1)], [1, 1]);
+  assert.deepEqual([isometricControlWorldX(1, 0), isometricControlWorldY(1, 0)], [1, -1]);
+  assert.deepEqual([isometricControlWorldX(0, -1), isometricControlWorldY(0, -1)], [-1, -1]);
+  assert.deepEqual([isometricControlWorldX(-1, 0), isometricControlWorldY(-1, 0)], [-1, 1]);
+  assert.equal(isometricArcHeight(100, 100, 48), 0);
+  assert.equal(isometricArcHeight(50, 100, 48), 48);
+  assert.ok(Math.abs(isometricArcHeight(0, 100, 48)) < 1e-9);
+});
 
 function writeClientKeyframe(frame, tick, rollback) {
   const network = new Uint8Array(NETWORK_SNAPSHOT_BYTES);
@@ -774,9 +827,16 @@ test("one allocation-free semantic projection drives every arena theme", () => {
   const decor = new Uint8Array(ARENA_VISUAL_CELL_COUNT);
   const marks = new Uint8Array(ARENA_VISUAL_CELL_COUNT);
   projectArenaVisualRoles(map, DEFAULT_ARENA_SEED, ground, decor, marks);
-  assert.ok(ground.some((role) => role < 4));
+  assert.ok(ground.some((role) => role < ARENA_GROUND_ROLE_WALL_BASE));
   assert.ok(ground.some((role) => role >= ARENA_GROUND_ROLE_WALL_BASE && role < ARENA_GROUND_ROLE_WALL_BASE + 16));
   assert.ok(decor.some((role) => role > 0 && role < ARENA_DECOR_ROLE_COUNT));
+  assert.ok(
+    decor.some((role) => role >= ARENA_DECOR_ROLE_SERVICE_ROAD_BASE && role < ARENA_DECOR_ROLE_SERVICE_ROAD_BASE + 16),
+  );
+  assert.ok(
+    decor.some((role) => role >= ARENA_DECOR_ROLE_STAGING_PAD_BASE && role < ARENA_DECOR_ROLE_STAGING_PAD_BASE + 4),
+  );
+  assert.ok(decor.some((role) => role >= ARENA_DECOR_ROLE_CRATER_BASE && role < ARENA_DECOR_ROLE_CRATER_BASE + 4));
   assert.ok(marks.some((role) => role > 0 && role < ARENA_MARK_ROLE_COUNT));
   assert.equal(arenaThemeIndex(DEFAULT_ARENA_SEED, DEFAULT_ARENA_SEED, 3), 0);
   assert.equal(arenaThemeIndex(DEFAULT_ARENA_SEED ^ 1, DEFAULT_ARENA_SEED, 3), 1);
@@ -784,6 +844,24 @@ test("one allocation-free semantic projection drives every arena theme", () => {
   assert.throws(
     () => projectArenaVisualRoles(map, DEFAULT_ARENA_SEED ^ 1, ground, decor, marks),
     /visual seed does not match/,
+  );
+});
+
+test("landscape roles form broad symmetric regions and stay inside the byte-sized role table", () => {
+  const counts = new Uint16Array(ARENA_LANDSCAPE_MATERIAL_COUNT);
+  for (let cellY = 0; cellY < MAP_HEIGHT; cellY += 1) {
+    for (let cellX = 0; cellX < MAP_WIDTH; cellX += 1) {
+      const material = arenaGroundMaterial(DEFAULT_ARENA_SEED, cellX, cellY);
+      counts[material] += 1;
+      assert.equal(material, arenaGroundMaterial(DEFAULT_ARENA_SEED, MAP_WIDTH - 1 - cellX, MAP_HEIGHT - 1 - cellY));
+      const role = arenaGroundVariant(DEFAULT_ARENA_SEED, cellX, cellY);
+      assert.ok(role >= 0 && role < ARENA_GROUND_VARIANT_COUNT);
+    }
+  }
+  assert.ok(ARENA_GROUND_ROLE_WALL_BASE + 15 <= 255, "ground and wall roles must remain Uint8-safe");
+  assert.ok(
+    counts.every((count) => count >= 1_000),
+    `every material must own a broad region: ${[...counts]}`,
   );
 });
 

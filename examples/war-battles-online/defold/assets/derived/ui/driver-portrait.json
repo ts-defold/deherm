@@ -271,5 +271,77 @@
         }
       ]
     }
+  },
+  "chrome": {
+    "hud-shell": {
+      "path": "defold/assets/derived/ui/chrome/hud-shell.png",
+      "nativeSize": [
+        32,
+        32
+      ],
+      "slice": 8,
+      "bytes": 183,
+      "sha256": "b1d4a233af3d37fdfa52a26fcfb5ee2efcb835e838d3c6b449b7c50c177d1079"
+    },
+    "hud-card": {
+      "path": "defold/assets/derived/ui/chrome/hud-card.png",
+      "nativeSize": [
+        24,
+        24
+      ],
+      "slice": 6,
+      "bytes": 139,
+      "sha256": "3993f020353e90475fedb1478e3bffe3c59e612ca8f975bb9666de872bf5767d"
+    },
+    "hud-strip": {
+      "path": "defold/assets/derived/ui/chrome/hud-strip.png",
+      "nativeSize": [
+        24,
+        16
+      ],
+      "slice": 5,
+      "bytes": 120,
+      "sha256": "e1ff0ab4e91f4e0f01f03c91800f6ac4447fbb70c86d8c125dc2f9cf27eeb4d3"
+    },
+    "command-button": {
+      "path": "defold/assets/derived/ui/chrome/command-button.png",
+      "nativeSize": [
+        24,
+        16
+      ],
+      "slice": 5,
+      "bytes": 133,
+      "sha256": "24421bfe7e83c62b411a07e71114f1ff4aa723067b5210dce28d6854e64543fe"
+    },
+    "portrait-frame": {
+      "path": "defold/assets/derived/ui/chrome/portrait-frame.png",
+      "nativeSize": [
+        96,
+        96
+      ],
+      "slice": 0,
+      "bytes": 355,
+      "sha256": "4dfdcb31cfb6970260fab40adc7307d8056ab77086751472618674aa665b40fd"
+    },
+    "meter-track": {
+      "path": "defold/assets/derived/ui/chrome/meter-track.png",
+      "nativeSize": [
+        12,
+        12
+      ],
+      "slice": 3,
+      "bytes": 106,
+      "sha256": "ccab9557132fa3408efaad9c9e5c667d99c276ee5ae47e3f689c3ac7f44490e4"
+    },
+    "meter-fill": {
+      "path": "defold/assets/derived/ui/chrome/meter-fill.png",
+      "nativeSize": [
+        8,
+        8
+      ],
+      "slice": 2,
+      "bytes": 88,
+      "sha256": "44f72c85f00d1f8a6029058c96504f82fb127cf2255491e290d7cefc3515b591"
+    }
   }
 }

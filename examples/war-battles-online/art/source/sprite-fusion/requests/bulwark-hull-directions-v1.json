@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_115505e7-8da7-417d-bad1-2e24c9ef8a92",
+  "operation": "direction-set",
+  "prompt": null,
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/openai/bulwark-tank-v1/hull-grid-fixed.png",
+      "bytes": 70788,
+      "sha256": "d88e19c6ee4e5db41926418034b431c93a2a525071683db8eb53ee2a3bd6bdd7"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/bulwark-hull-directions-v1.json",
+    "sha256": "cd87ca23b3acad6e452189caf792106c9ddd75bf0889b3752ebf0fce8e3af998"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "4336647f-4bd5-4a1c-b20b-8e0dd0cc0fca",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 98,
+      "height": 98,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/4336647f-4bd5-4a1c-b20b-8e0dd0cc0fca/image.png?v=1790774053282",
+      "path": "art/source/sprite-fusion/outputs/bulwark-hull-directions-v1/00.png",
+      "bytes": 15218,
+      "sha256": "6678bb4948d9197dded1aa81ad1977ba2848dab8bdb84aca9b085183c5212b6f"
+    },
+    {
+      "index": 1,
+      "assetId": "115938aa-07a2-4384-b752-84582da82dd7",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/115938aa-07a2-4384-b752-84582da82dd7/image.png?v=1790774053969",
+      "path": "art/source/sprite-fusion/outputs/bulwark-hull-directions-v1/01.png",
+      "bytes": 6855,
+      "sha256": "cec7c6a4cee7647b4f61b994fee2502a97215a0aa29ad1b30209b1bcc6e3d34a"
+    },
+    {
+      "index": 2,
+      "assetId": "c42e7acb-ffea-44d2-98f8-062958753c17",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 92,
+      "height": 92,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/c42e7acb-ffea-44d2-98f8-062958753c17/image.png?v=1790774054588",
+      "path": "art/source/sprite-fusion/outputs/bulwark-hull-directions-v1/02.png",
+      "bytes": 14410,
+      "sha256": "497321af848d45f85adf02cfd72e1f3b68559c396654718cfee1e4be42d83bf7"
+    },
+    {
+      "index": 3,
+      "assetId": "56cd02dc-7a6a-44f5-af6b-d8a6e5acb613",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 71,
+      "height": 71,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/56cd02dc-7a6a-44f5-af6b-d8a6e5acb613/image.png?v=1790774055278",
+      "path": "art/source/sprite-fusion/outputs/bulwark-hull-directions-v1/03.png",
+      "bytes": 8645,
+      "sha256": "4bce05e74d74ccaff020b4562161da45f9c9dc6037372ae31a3650611a29d641"
+    },
+    {
+      "index": 4,
+      "assetId": "e5ab8fc0-7c60-458e-9ecd-be55c46690bc",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 72,
+      "height": 72,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/e5ab8fc0-7c60-458e-9ecd-be55c46690bc/image.png?v=1790774055961",
+      "path": "art/source/sprite-fusion/outputs/bulwark-hull-directions-v1/04.png",
+      "bytes": 8732,
+      "sha256": "84be1cd284cf1ba6fc213b30949039b875902fdcee01eab7b66199552e348199"
+    },
+    {
+      "index": 5,
+      "assetId": "c2762b07-473e-4167-bd2c-80e90daa3269",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 87,
+      "height": 87,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/c2762b07-473e-4167-bd2c-80e90daa3269/image.png?v=1790774056647",
+      "path": "art/source/sprite-fusion/outputs/bulwark-hull-directions-v1/05.png",
+      "bytes": 12776,
+      "sha256": "acbca277c545a7c7142c0dc085303587d88260f3f6b95e386549255b012218cd"
+    },
+    {
+      "index": 6,
+      "assetId": "b45bef4f-bfba-47c2-bf7d-863899c384ba",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 69,
+      "height": 69,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/b45bef4f-bfba-47c2-bf7d-863899c384ba/image.png?v=1790774057422",
+      "path": "art/source/sprite-fusion/outputs/bulwark-hull-directions-v1/06.png",
+      "bytes": 10871,
+      "sha256": "3a7f0b032f2aa66db670f7f565c08bf6903ba2856e168e4cbc302b9f632b4f4e"
+    },
+    {
+      "index": 7,
+      "assetId": "4bbeb5bf-babc-411d-89b0-92f1c11d40f6",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 88,
+      "height": 88,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/4bbeb5bf-babc-411d-89b0-92f1c11d40f6/image.png?v=1790774058110",
+      "path": "art/source/sprite-fusion/outputs/bulwark-hull-directions-v1/07.png",
+      "bytes": 14891,
+      "sha256": "daee2207fc4ad8579e6bfb01b4f2be543504bca5ba4d704e26c36d31caad311c"
+    }
+  ],
+  "credits": {
+    "remaining": 3120
+  }
+}

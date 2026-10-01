@@ -26,7 +26,13 @@ import { dirname, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { ArenaMap, CELL_FLOOR } from "../core/arena.ts";
-import { ARENA_VISUAL_CELL_COUNT, arenaThemeIndex, projectArenaVisualRoles } from "../core/arena-visual.ts";
+import {
+  ARENA_GROUND_ROLE_WALL_BASE,
+  ARENA_VISUAL_CELL_COUNT,
+  arenaGroundVariant,
+  arenaThemeIndex,
+  projectArenaVisualRoles,
+} from "../core/arena-visual.ts";
 import { MAP_HEIGHT, MAP_WIDTH } from "../core/constants.ts";
 import { DEFAULT_ARENA_SEED } from "../core/playable.ts";
 import {
@@ -34,6 +40,7 @@ import {
   arenaDecorTileId,
   arenaGroundTileId,
   arenaMarkTileId,
+  arenaWallFaceTileId,
 } from "../defold/src/generated-arena-art.ts";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -45,6 +52,7 @@ const targetPath =
   outputArgument >= 0
     ? resolve(process.cwd(), process.argv[outputArgument + 1] ?? "")
     : resolve(projectRoot, "main/arena.tilemap");
+const faceTargetPath = resolve(projectRoot, "main/arena-wall-faces.tilemap");
 if (outputArgument >= 0 && !process.argv[outputArgument + 1]) throw new Error("--output requires a file path");
 
 const TILE_SOURCE = "/main/arena-tiles.tilesource";
@@ -79,6 +87,7 @@ for (let index = 0; index < ARENA_ART_THEMES.length; index += 1) {
     contract.id !== tiles.themeOrder[index] ||
     !record ||
     JSON.stringify(contract.groundRoleTileIds) !== JSON.stringify(record.groundRoleTileIds) ||
+    JSON.stringify(contract.wallFaceTileIds) !== JSON.stringify(record.wallFaceTileIds) ||
     JSON.stringify(contract.decorRoleTileIds) !== JSON.stringify(record.decorRoleTileIds) ||
     JSON.stringify(contract.markRoleTileIds) !== JSON.stringify(record.markRoleTileIds)
   ) {
@@ -94,16 +103,25 @@ const decorRoles = new Uint8Array(ARENA_VISUAL_CELL_COUNT);
 const markRoles = new Uint8Array(ARENA_VISUAL_CELL_COUNT);
 projectArenaVisualRoles(map, seed, groundRoles, decorRoles, markRoles);
 
-// Two layers, because the art manifest says so: ground and wall tiles are
-// opaque, while crates, sandbags and floor markings are transparent overlays
-// that need something drawn underneath them.
+// The floor is always complete. Wall tops are their own layer. A second,
+// coincident tilemap preserves the generated wall-face contract and runtime
+// update path, but now sits directly behind the top rather than creating the
+// old floating concrete-platform silhouette.
 const groundCells = [];
+const wallCells = [];
+const faceCells = [];
 const decorCells = [];
 const markCells = [];
 for (let index = 0; index < ARENA_VISUAL_CELL_COUNT; index += 1) {
   const x = index % MAP_WIDTH;
   const y = Math.floor(index / MAP_WIDTH);
-  groundCells.push({ x, y, tile: arenaGroundTileId(themeIndex, groundRoles[index]) });
+  groundCells.push({ x, y, tile: arenaGroundTileId(themeIndex, arenaGroundVariant(seed, x, y)) });
+  const groundRole = groundRoles[index];
+  if (groundRole >= ARENA_GROUND_ROLE_WALL_BASE) {
+    const mask = groundRole - ARENA_GROUND_ROLE_WALL_BASE;
+    wallCells.push({ x, y, tile: arenaGroundTileId(themeIndex, groundRole) });
+    faceCells.push({ x, y, tile: arenaWallFaceTileId(themeIndex, mask) });
+  }
   const decor = arenaDecorTileId(themeIndex, decorRoles[index]);
   const mark = arenaMarkTileId(themeIndex, markRoles[index]);
   if (decor !== 0) decorCells.push({ x, y, tile: decor });
@@ -123,7 +141,15 @@ const output = [
   `tile_set: "${TILE_SOURCE}"`,
   emitLayer("ground", "0.0", groundCells),
   emitLayer("decor", "0.05", decorCells),
-  emitLayer("marks", "0.1", markCells),
+  emitLayer("walls", "0.1", wallCells),
+  emitLayer("marks", "0.15", markCells),
+  `material: "${MATERIAL}"`,
+  "",
+].join("\n");
+
+const faceOutput = [
+  `tile_set: "${TILE_SOURCE}"`,
+  emitLayer("faces", "0.075", faceCells),
   `material: "${MATERIAL}"`,
   "",
 ].join("\n");
@@ -140,15 +166,31 @@ if (check) {
     console.error(`war-battles-arena-tilemap:stale:${relative(exampleRoot, targetPath)}`);
     process.exit(1);
   }
-  console.log(`war-battles-arena-tilemap:fresh:${groundCells.length}+${decorCells.length}+${markCells.length} cells`);
+  if (outputArgument < 0) {
+    let existingFaces;
+    try {
+      existingFaces = readFileSync(faceTargetPath, "utf8");
+    } catch {
+      console.error(`war-battles-arena-tilemap:missing:${relative(exampleRoot, faceTargetPath)}`);
+      process.exit(1);
+    }
+    if (existingFaces !== faceOutput) {
+      console.error(`war-battles-arena-tilemap:stale:${relative(exampleRoot, faceTargetPath)}`);
+      process.exit(1);
+    }
+  }
+  console.log(
+    `war-battles-arena-tilemap:fresh:${groundCells.length}+${wallCells.length}+${faceCells.length}+${decorCells.length}+${markCells.length} cells`,
+  );
 } else {
   writeFileSync(targetPath, output);
+  if (outputArgument < 0) writeFileSync(faceTargetPath, faceOutput);
   let solid = 0;
   for (let index = 0; index < MAP_WIDTH * MAP_HEIGHT; index += 1) if (map.cells[index] !== CELL_FLOOR) solid += 1;
   process.stdout.write(
     `Wrote ${relative(exampleRoot, targetPath)}\n` +
       `  arena ${MAP_WIDTH}x${MAP_HEIGHT} tiles (${MAP_WIDTH * 16}x${MAP_HEIGHT * 16} px), seed ${seed}\n` +
       `  theme ${theme.id} (${theme.name})\n` +
-      `  ground cells ${groundCells.length}, solid ${solid} (${((100 * solid) / (MAP_WIDTH * MAP_HEIGHT)).toFixed(1)}%), decor cells ${decorCells.length}, overlay cells ${markCells.length}\n`,
+      `  ground cells ${groundCells.length}, wall tops ${wallCells.length}, wall faces ${faceCells.length}, solid ${solid} (${((100 * solid) / (MAP_WIDTH * MAP_HEIGHT)).toFixed(1)}%), decor cells ${decorCells.length}, overlay cells ${markCells.length}\n`,
   );
 }

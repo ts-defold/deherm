@@ -35,4 +35,53 @@ animations {
   playback: PLAYBACK_LOOP_FORWARD
   fps: 8
 }
+animations {
+  id: "hud-shell"
+  images {
+    image: "/assets/derived/ui/chrome/hud-shell.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "hud-card"
+  images {
+    image: "/assets/derived/ui/chrome/hud-card.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "hud-strip"
+  images {
+    image: "/assets/derived/ui/chrome/hud-strip.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "command-button"
+  images {
+    image: "/assets/derived/ui/chrome/command-button.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "portrait-frame"
+  images {
+    image: "/assets/derived/ui/chrome/portrait-frame.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "meter-track"
+  images {
+    image: "/assets/derived/ui/chrome/meter-track.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "meter-fill"
+  images {
+    image: "/assets/derived/ui/chrome/meter-fill.png"
+  }
+  playback: PLAYBACK_NONE
+}
 extrude_borders: 2

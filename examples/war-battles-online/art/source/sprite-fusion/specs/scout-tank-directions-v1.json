@@ -1,0 +1,5 @@
+{
+  "name": "scout-tank-directions-v1",
+  "operation": "direction-set",
+  "inputs": ["art/source/openai/scout-tank-v1/composite.png"]
+}

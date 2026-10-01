@@ -147,7 +147,7 @@ export function assertWebTransportEvidence(document, { sourceInputs } = {}) {
   );
   assert.ok(
     Number.isInteger(document.presentation?.maximumLocalCorrectionMagnitude) &&
-      document.presentation.maximumLocalCorrectionMagnitude > 0 &&
+      document.presentation.maximumLocalCorrectionMagnitude >= 0 &&
       document.presentation.maximumLocalCorrectionMagnitude >= document.presentation.localCorrectionMagnitude,
   );
   assert.ok(

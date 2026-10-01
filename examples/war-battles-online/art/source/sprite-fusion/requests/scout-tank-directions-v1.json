@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_77f44f69-471f-4de6-a486-109ec146f919",
+  "operation": "direction-set",
+  "prompt": null,
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/openai/scout-tank-v1/composite.png",
+      "bytes": 755001,
+      "sha256": "c7c5696ecde9d13eb684e414b01378c96aa2f4f0a71794e2d2d0ad0910b54af7"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/scout-tank-directions-v1.json",
+    "sha256": "cde61934179ebdd72b357936a1ed2c4973e2da8604ce7103bdc043371f2470ad"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "3348689b-af9c-43ce-b258-1d2a48eb2617",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 70,
+      "height": 70,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/3348689b-af9c-43ce-b258-1d2a48eb2617/image.png?v=1790773237165",
+      "path": "art/source/sprite-fusion/outputs/scout-tank-directions-v1/00.png",
+      "bytes": 9913,
+      "sha256": "3bcae9fabca27833812635c395a000391d68a4c2cbd0bcfe6e91db056e4bf9d9"
+    },
+    {
+      "index": 1,
+      "assetId": "cfba5ed8-9614-4406-a0c1-2383584d111d",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 75,
+      "height": 75,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/cfba5ed8-9614-4406-a0c1-2383584d111d/image.png?v=1790773237922",
+      "path": "art/source/sprite-fusion/outputs/scout-tank-directions-v1/01.png",
+      "bytes": 8256,
+      "sha256": "4ef6fcd3e0f4725cb564d94e4d01ecad26d696f8dd622b27bce6aef31cae0c62"
+    },
+    {
+      "index": 2,
+      "assetId": "7889ee81-98fc-48d8-bfe4-5bee5cacda44",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 95,
+      "height": 95,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/7889ee81-98fc-48d8-bfe4-5bee5cacda44/image.png?v=1790773238538",
+      "path": "art/source/sprite-fusion/outputs/scout-tank-directions-v1/02.png",
+      "bytes": 14070,
+      "sha256": "69c2d090ad7223429f5c0e591b96b6a12143e462fade2b416c57c61f3b844f0a"
+    },
+    {
+      "index": 3,
+      "assetId": "959b2c3d-4a61-42e6-8ca1-f200caf2fc49",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 79,
+      "height": 79,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/959b2c3d-4a61-42e6-8ca1-f200caf2fc49/image.png?v=1790773239365",
+      "path": "art/source/sprite-fusion/outputs/scout-tank-directions-v1/03.png",
+      "bytes": 11568,
+      "sha256": "243c1b7fbcb30bcc1028604ae92cf730764c420c595ff620c06dd906fccbbc17"
+    },
+    {
+      "index": 4,
+      "assetId": "3155929a-6d6a-409e-ba75-eb4670019969",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 77,
+      "height": 77,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/3155929a-6d6a-409e-ba75-eb4670019969/image.png?v=1790773240013",
+      "path": "art/source/sprite-fusion/outputs/scout-tank-directions-v1/04.png",
+      "bytes": 11436,
+      "sha256": "447a89690d49da0a67aa476c8a5ab4917d072637fc83c545b6974def020e8dac"
+    },
+    {
+      "index": 5,
+      "assetId": "dfafcb85-9215-47e4-be78-410751dc009c",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 78,
+      "height": 78,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/dfafcb85-9215-47e4-be78-410751dc009c/image.png?v=1790773240723",
+      "path": "art/source/sprite-fusion/outputs/scout-tank-directions-v1/05.png",
+      "bytes": 11357,
+      "sha256": "0bf0048693cfda67629a57a65c0f876e794bfe40ef95c7988ab6b62b2740f6a3"
+    },
+    {
+      "index": 6,
+      "assetId": "fbe7b23c-2c30-45a2-a4da-ef18cca7c0c2",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/fbe7b23c-2c30-45a2-a4da-ef18cca7c0c2/image.png?v=1790773241439",
+      "path": "art/source/sprite-fusion/outputs/scout-tank-directions-v1/06.png",
+      "bytes": 7461,
+      "sha256": "5811cf416dac00219a7e98f89e5dc339e2f3994b8ff150d8b9a3ec4cd46adddd"
+    },
+    {
+      "index": 7,
+      "assetId": "273d599f-da93-44fa-93ff-d1d4d9be6b8f",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 71,
+      "height": 71,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/273d599f-da93-44fa-93ff-d1d4d9be6b8f/image.png?v=1790773242168",
+      "path": "art/source/sprite-fusion/outputs/scout-tank-directions-v1/07.png",
+      "bytes": 9968,
+      "sha256": "208a94bcc45a9736b23f3099c1f623906a2b57567d83e26b60a9a8c39ab4359c"
+    }
+  ],
+  "credits": {
+    "remaining": 3210
+  }
+}

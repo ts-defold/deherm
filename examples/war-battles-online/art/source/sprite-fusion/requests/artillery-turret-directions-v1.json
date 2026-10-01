@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_f067550a-f478-467b-92a4-e4223cadf2ca",
+  "operation": "direction-set",
+  "prompt": null,
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/openai/artillery-tank-v1/turret-grid-fixed.png",
+      "bytes": 80033,
+      "sha256": "3d08c4830074b29dabed83b9f4c7e0923e4f02d8d710b6a7e27c7d22d10ed8f5"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/artillery-turret-directions-v1.json",
+    "sha256": "f056f764777e0e140e3b96bc68b4eaa4a6a35c72feaa834d7880c1cf0975a263"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "704649d9-1a02-4e5d-8501-a836ed65a9d9",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/704649d9-1a02-4e5d-8501-a836ed65a9d9/image.png?v=1790774209228",
+      "path": "art/source/sprite-fusion/outputs/artillery-turret-directions-v1/00.png",
+      "bytes": 6517,
+      "sha256": "eb493d998cde9b2109d3799eef199acd4531ce65d807a8b3b38861337b2549e0"
+    },
+    {
+      "index": 1,
+      "assetId": "1a21ac67-8390-46f0-bd74-509638052bad",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/1a21ac67-8390-46f0-bd74-509638052bad/image.png?v=1790774209932",
+      "path": "art/source/sprite-fusion/outputs/artillery-turret-directions-v1/01.png",
+      "bytes": 5775,
+      "sha256": "af0a0f648a59bb24ef78c4fcaea50f55523a6400cf22a15a5c174543d3d0e349"
+    },
+    {
+      "index": 2,
+      "assetId": "834edc54-9665-4bda-9bcf-157f0936d8ce",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 66,
+      "height": 66,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/834edc54-9665-4bda-9bcf-157f0936d8ce/image.png?v=1790774210609",
+      "path": "art/source/sprite-fusion/outputs/artillery-turret-directions-v1/02.png",
+      "bytes": 6852,
+      "sha256": "37c0d89a14dc8ee571858bd89a077565e2af568d6f9494b2099b91df4d506a69"
+    },
+    {
+      "index": 3,
+      "assetId": "2c72c198-823b-40ee-9a73-d7fb7aa40167",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 111,
+      "height": 111,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/2c72c198-823b-40ee-9a73-d7fb7aa40167/image.png?v=1790774211288",
+      "path": "art/source/sprite-fusion/outputs/artillery-turret-directions-v1/03.png",
+      "bytes": 12807,
+      "sha256": "d5cebdcd4dae53de5182d21200f1754cde8b550662617bdc3f6a9fc6996abca9"
+    },
+    {
+      "index": 4,
+      "assetId": "89bb78a8-e552-4154-b7d7-d6b9c715493a",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 100,
+      "height": 100,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/89bb78a8-e552-4154-b7d7-d6b9c715493a/image.png?v=1790774212054",
+      "path": "art/source/sprite-fusion/outputs/artillery-turret-directions-v1/04.png",
+      "bytes": 11407,
+      "sha256": "531160ccd192188f59bdd11fbe9f0ffbeac2f348c32a66b60824dda8c4bce2db"
+    },
+    {
+      "index": 5,
+      "assetId": "3af34c74-1882-4ab4-86ef-d0145fbdc9b8",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/3af34c74-1882-4ab4-86ef-d0145fbdc9b8/image.png?v=1790774212780",
+      "path": "art/source/sprite-fusion/outputs/artillery-turret-directions-v1/05.png",
+      "bytes": 5855,
+      "sha256": "aae7700a6857cfb2b3e26adeb4f0d7d62018cf75b3d79e3680e3885051481ed6"
+    },
+    {
+      "index": 6,
+      "assetId": "c51c3779-4a91-4623-a355-0185e0f27fb9",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 84,
+      "height": 84,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/c51c3779-4a91-4623-a355-0185e0f27fb9/image.png?v=1790774213554",
+      "path": "art/source/sprite-fusion/outputs/artillery-turret-directions-v1/06.png",
+      "bytes": 7488,
+      "sha256": "b4da087b3ca29cea58f02a48905244f41b86a1a61e2ba4829b941a975fb41d35"
+    },
+    {
+      "index": 7,
+      "assetId": "9f299216-2aaa-4faf-95cb-8d44bbcf23ee",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/9f299216-2aaa-4faf-95cb-8d44bbcf23ee/image.png?v=1790774214224",
+      "path": "art/source/sprite-fusion/outputs/artillery-turret-directions-v1/07.png",
+      "bytes": 6068,
+      "sha256": "5bac793ffd50a427e12271e45133160dddbd2885360eb076bb2128cec0df7a52"
+    }
+  ],
+  "credits": {
+    "remaining": 3075
+  }
+}

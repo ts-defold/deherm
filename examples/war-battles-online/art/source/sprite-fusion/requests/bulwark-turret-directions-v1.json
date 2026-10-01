@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_e4ffeb31-fe3c-4766-bcee-4c4cc704617c",
+  "operation": "direction-set",
+  "prompt": null,
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/openai/bulwark-tank-v1/turret-grid-fixed.png",
+      "bytes": 76413,
+      "sha256": "1e51e59602ae24b490cb83b878e0c5967b4ec5d939ba0009c8638eac2e8b5ad5"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/bulwark-turret-directions-v1.json",
+    "sha256": "3bc65a861023611750413b349bf85a90b65f8d55cfb1bffc39ebeaafea1e7fab"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "d604cba6-ae6c-4693-b4bd-772704341575",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 72,
+      "height": 72,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/d604cba6-ae6c-4693-b4bd-772704341575/image.png?v=1790774102845",
+      "path": "art/source/sprite-fusion/outputs/bulwark-turret-directions-v1/00.png",
+      "bytes": 9330,
+      "sha256": "4d8d102dfc18a8322fcb9f130de4e065de1dc086cd454045229fa7d2631b6fdb"
+    },
+    {
+      "index": 1,
+      "assetId": "c5937d1c-f838-442a-b508-2093fa2f2b1d",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 91,
+      "height": 91,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/c5937d1c-f838-442a-b508-2093fa2f2b1d/image.png?v=1790774103795",
+      "path": "art/source/sprite-fusion/outputs/bulwark-turret-directions-v1/01.png",
+      "bytes": 13465,
+      "sha256": "f0705be4b3ad9ceeca834e14387ee5e2adf992938bc9044903e04e5f85505fdc"
+    },
+    {
+      "index": 2,
+      "assetId": "a70570be-ca3d-4e94-8209-28854353d8d2",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 72,
+      "height": 72,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/a70570be-ca3d-4e94-8209-28854353d8d2/image.png?v=1790774104755",
+      "path": "art/source/sprite-fusion/outputs/bulwark-turret-directions-v1/02.png",
+      "bytes": 9628,
+      "sha256": "0c3f9dfee3b42aa25965e983669ed2ba8fbf2ad09e6dbd2235bf82734ad93b09"
+    },
+    {
+      "index": 3,
+      "assetId": "52118cb7-3df5-4c4f-9b51-08efcbdc8f38",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/52118cb7-3df5-4c4f-9b51-08efcbdc8f38/image.png?v=1790774105546",
+      "path": "art/source/sprite-fusion/outputs/bulwark-turret-directions-v1/03.png",
+      "bytes": 6674,
+      "sha256": "4142ec2b12e0f4c14dd7c0a483b93594e5326fd77c57f4a8bd4d2300b463be47"
+    },
+    {
+      "index": 4,
+      "assetId": "8d5bdf21-2e04-45e0-8f42-0c2af8596c25",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 70,
+      "height": 70,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/8d5bdf21-2e04-45e0-8f42-0c2af8596c25/image.png?v=1790774106274",
+      "path": "art/source/sprite-fusion/outputs/bulwark-turret-directions-v1/04.png",
+      "bytes": 7410,
+      "sha256": "9bba8516f3a88c5f9d06811732efba3b8d62be98569e350490c4762e7238081c"
+    },
+    {
+      "index": 5,
+      "assetId": "8da7ec7f-028a-43c5-b0eb-884e2de1370d",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 67,
+      "height": 67,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/8da7ec7f-028a-43c5-b0eb-884e2de1370d/image.png?v=1790774106970",
+      "path": "art/source/sprite-fusion/outputs/bulwark-turret-directions-v1/05.png",
+      "bytes": 9128,
+      "sha256": "cb098934df40c8d41d18aa2f75e73dbd6cd72d28947ff60c688baf2818858fe2"
+    },
+    {
+      "index": 6,
+      "assetId": "5b8b3bcd-b2ca-4f12-b9a5-946d40da8558",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 71,
+      "height": 71,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/5b8b3bcd-b2ca-4f12-b9a5-946d40da8558/image.png?v=1790774107656",
+      "path": "art/source/sprite-fusion/outputs/bulwark-turret-directions-v1/06.png",
+      "bytes": 8464,
+      "sha256": "d996744a905aa3ee08c3ae9c0cdc3ea57e6b97a154b332da2e2a6ebe340a7f80"
+    },
+    {
+      "index": 7,
+      "assetId": "44f81037-3b16-4b2a-8954-a3128224dbd8",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 68,
+      "height": 68,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/44f81037-3b16-4b2a-8954-a3128224dbd8/image.png?v=1790774108330",
+      "path": "art/source/sprite-fusion/outputs/bulwark-turret-directions-v1/07.png",
+      "bytes": 7062,
+      "sha256": "39a9d418cb2295758a170db5a42e4ffa324e3987d6bff9b31b745f05903aaf66"
+    }
+  ],
+  "credits": {
+    "remaining": 3105
+  }
+}

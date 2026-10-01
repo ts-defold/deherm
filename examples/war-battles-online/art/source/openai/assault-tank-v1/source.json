@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "status": "source-concept",
+  "operation": "generate-then-layer-edits",
+  "artDirection": "art/direction/gameplay-target-v2.png",
+  "intendedNativeScale": {
+    "logicalTileSize": 16,
+    "tankLengthPixels": [38, 42],
+    "atlasCell": [96, 96],
+    "facingAtZeroRotation": "screen-right",
+    "projection": "three-quarter-isometric-top-down"
+  },
+  "outputs": {
+    "composite": {
+      "path": "art/source/openai/assault-tank-v1/composite.png",
+      "sha256": "ddfca5c2421d69939269729a5603e4a0a39f4bc589c80df4d9eddf3bf7ea72f1"
+    },
+    "hull": {
+      "path": "art/source/openai/assault-tank-v1/hull.png",
+      "sha256": "3803e775aaf412fb021955c6b837e622142e4d397bcc95e83499597640b5e924"
+    },
+    "turret": {
+      "path": "art/source/openai/assault-tank-v1/turret.png",
+      "sha256": "0640786180aeb8e0811bfd92f2d0406301031ad3b33999bfc86ea990c9f39ce6"
+    },
+    "fixedHull": "art/source/openai/assault-tank-v1/hull-grid-fixed.png",
+    "fixedTurret": "art/source/openai/assault-tank-v1/turret-grid-fixed.png"
+  },
+  "pixelFixer": {
+    "repository": "https://github.com/Retro-Diffusion/pixel-art-fixer",
+    "revision": "ef376e57e1c272633ca2dbf5f29ec3fcf6596465",
+    "license": "MIT",
+    "mode": "full",
+    "localEvaluationPatch": "Guard Windows peak-RSS telemetry with cfg(target_os = windows); use zero on other hosts.",
+    "hull": { "cols": 347, "rows": 343, "stepX": 3.9648, "stepY": 3.3351, "consensus": "arbitrated" },
+    "turret": { "cols": 328, "rows": 269, "stepX": 4.1907, "stepY": 4.2561, "consensus": "arbitrated" }
+  },
+  "runtimeProjection": {
+    "hullSize": [52, 44],
+    "hullAnchor": [166, 136],
+    "turretSize": [64, 36],
+    "turretAnchor": [158, 158],
+    "anchorMeaning": "turret-ring centre; projected to atlas-cell centre for independent rotation"
+  }
+}

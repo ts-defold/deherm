@@ -55,13 +55,20 @@ interface UiSelf {
   announcement: Node;
   hudBack: Node;
   portrait: Node;
+  portraitFrame: Node;
   healthBack: Node;
   healthFill: Node;
+  healthLabel: Node;
   armorBack: Node;
   armorFill: Node;
+  armorLabel: Node;
+  telemetry: Node;
   leaderboardBack: Node;
   leaderBack: Node;
   leader: Node;
+  objectiveBack: Node;
+  announcementBack: Node;
+  scoreBack: Node;
   titleBack: Node;
   titleLogo: Node;
   titlePanel: Node;
@@ -70,6 +77,7 @@ interface UiSelf {
   titleFeature: Node;
   titleButton: Node;
   titleDeploy: Node;
+  titlePromptBack: Node;
   titlePrompt: Node;
   titleSponsor: Node;
   view: PlayerView;
@@ -99,24 +107,32 @@ function setTitleVisible(self: UiSelf, visible: boolean): void {
   gui.setEnabled(self.titleFeature, visible);
   gui.setEnabled(self.titleButton, visible);
   gui.setEnabled(self.titleDeploy, visible);
+  gui.setEnabled(self.titlePromptBack, visible);
   gui.setEnabled(self.titlePrompt, visible);
   gui.setEnabled(self.titleSponsor, visible);
 
   const gameplayVisible = !visible;
   gui.setEnabled(self.hudBack, gameplayVisible);
   gui.setEnabled(self.portrait, gameplayVisible);
+  gui.setEnabled(self.portraitFrame, gameplayVisible);
   gui.setEnabled(self.healthBack, gameplayVisible);
   gui.setEnabled(self.healthFill, gameplayVisible);
+  gui.setEnabled(self.healthLabel, gameplayVisible);
   gui.setEnabled(self.armorBack, gameplayVisible);
   gui.setEnabled(self.armorFill, gameplayVisible);
+  gui.setEnabled(self.armorLabel, gameplayVisible);
+  gui.setEnabled(self.telemetry, gameplayVisible);
   gui.setEnabled(self.leaderboardBack, gameplayVisible);
   gui.setEnabled(self.leaderBack, gameplayVisible);
   gui.setEnabled(self.leader, gameplayVisible);
+  gui.setEnabled(self.objectiveBack, gameplayVisible);
+  gui.setEnabled(self.scoreBack, gameplayVisible);
   gui.setEnabled(self.objective, gameplayVisible);
   gui.setEnabled(self.node, gameplayVisible);
   gui.setEnabled(self.status, gameplayVisible);
   gui.setEnabled(self.frags, gameplayVisible);
   gui.setEnabled(self.hint, gameplayVisible);
+  gui.setEnabled(self.announcementBack, gameplayVisible && self.announcementTicks > 0);
   gui.setEnabled(self.announcement, gameplayVisible && self.announcementTicks > 0);
 }
 
@@ -132,41 +148,50 @@ function statusLine(self: UiSelf): string {
   world.readPlayer(slot + 1, self.view);
   if (!self.view.alive) {
     const seconds = (self.view.respawnTicks / 60).toFixed(1);
-    return `WRECKED - RESPAWN IN ${seconds}s`;
+    return `${driverByPlayerId(slot + 1).callSign} // WRECKED // REDEPLOY ${seconds}s`;
   }
   const driver = driverByPlayerId(slot + 1);
+  if (self.view.mode === PLAYER_MODE_INFANTRY) {
+    return `${driver.callSign} // ON FOOT // PISTOL // FIND A TANK`;
+  }
+  const weapon = weaponById(self.view.weaponId);
+  const chassis = chassisById(self.view.chassisId);
+  const branch = (self.view.weaponUpgradeSelections >>> ((weapon.id - 1) * 2)) & 3;
+  const upgradeId = weaponUpgradeId(weapon.id, branch);
+  const upgrade = upgradeId === 0 ? undefined : weaponUpgradeById(upgradeId);
+  const upgradeLabel = upgrade === undefined ? "BASE" : upgrade.name.toUpperCase();
+  return `${driver.callSign} // ${chassis.name.toUpperCase()} // ${weapon.name.toUpperCase()} +${upgradeLabel}`;
+}
+
+function directionArrow(x: number, y: number): string {
+  const horizontal = x > 0 ? "E" : "W";
+  const vertical = y > 0 ? "N" : "S";
+  if (Math.abs(x) > Math.abs(y) * 2) return horizontal;
+  if (Math.abs(y) > Math.abs(x) * 2) return vertical;
+  if (x >= 0) return y >= 0 ? "NE" : "SE";
+  return y >= 0 ? "NW" : "SW";
+}
+
+function telemetryLine(self: UiSelf): string {
+  const match = arenaMatch();
+  const world = match?.world;
+  const slot = match === undefined ? -1 : match.localSlot;
+  if (world === undefined || slot < 0) return "";
+  if (!self.view.alive) return "SYSTEM OFFLINE";
   if (self.view.mode === PLAYER_MODE_INFANTRY) {
     const depot = world.nearestTankDepot(slot + 1);
     const dx = world.map.spawnX[depot]! - self.view.x;
     const dy = world.map.spawnY[depot]! - self.view.y;
     const distance = Math.round(Math.sqrt(dx * dx + dy * dy) / UNITS_PER_PIXEL);
-    const direction = directionArrow(dx, dy);
-    const lock = self.view.respawnTicks > 0 ? `  ACCESS ${Math.ceil(self.view.respawnTicks / 60)}s` : "";
-    return `${driver.callSign} // LAST CHANCE // HP ${self.view.health} // PISTOL // DEPOT ${direction} ${distance}px${lock}`;
+    const lock = self.view.respawnTicks > 0 ? `  LOCK ${Math.ceil(self.view.respawnTicks / 60)}s` : "";
+    return `HP ${self.view.health}\nDEPOT ${directionArrow(dx, dy)} ${distance}m${lock}`;
   }
   const weapon = weaponById(self.view.weaponId);
-  const chassis = chassisById(self.view.chassisId);
   const ammo = weapon.maximumAmmo === 0 ? "INF" : `${self.view.ammo}`;
-  const branch = (self.view.weaponUpgradeSelections >>> ((weapon.id - 1) * 2)) & 3;
-  const upgradeId = weaponUpgradeId(weapon.id, branch);
-  const upgrade = upgradeId === 0 ? undefined : weaponUpgradeById(upgradeId);
-  const upgradeLabel = upgrade === undefined ? "BASE" : upgrade.name.toUpperCase();
-  const overdrive = self.view.overdriveTicks > 0 ? " // OVERDRIVE" : "";
   const hazard = world.activeHazardIndex();
-  const hazardText = hazard < 0 ? " // VENTS COOL" : ` // VENT ${hazard + 1} LIVE`;
-  return (
-    `${driver.callSign} // ${chassis.name.toUpperCase()} // ${weapon.name.toUpperCase()} ${upgradeLabel} // AMMO ${ammo}` +
-    ` // CR ${self.view.credits} // BOOST ${self.view.boostTicks}${overdrive}${hazardText}`
-  );
-}
-
-function directionArrow(x: number, y: number): string {
-  const horizontal = x > 0 ? "→" : "←";
-  const vertical = y > 0 ? "↑" : "↓";
-  if (Math.abs(x) > Math.abs(y) * 2) return horizontal;
-  if (Math.abs(y) > Math.abs(x) * 2) return vertical;
-  if (x >= 0) return y >= 0 ? "↗" : "↘";
-  return y >= 0 ? "↖" : "↙";
+  const hazardText = hazard < 0 ? "VENT SAFE" : `VENT ${hazard + 1} HOT`;
+  const boost = self.view.overdriveTicks > 0 ? "OVERDRIVE" : `BOOST ${self.view.boostTicks}`;
+  return `AMMO ${ammo}  CR ${self.view.credits}\n${boost}  ${hazardText}`;
 }
 
 function leaderboard(self: UiSelf): string {
@@ -192,16 +217,16 @@ function leaderboard(self: UiSelf): string {
   }
   const localSlot = match === undefined ? -1 : match.localSlot;
   const rows = count < LEADERBOARD_ROWS ? count : LEADERBOARD_ROWS;
-  let text = "TOP TANKS       K / D\n";
+  let text = "TOP TANKS       K  D\n";
   for (let row = 0; row < rows; row += 1) {
     const slot = self.order[row]!;
     const marker = slot === localSlot ? ">" : " ";
     const driver = driverByPlayerId(slot + 1);
-    text += `${row + 1} ${marker}${driver.callSign}  ${world.playerScore[slot]!} / ${world.playerDeaths[slot]!}\n`;
+    text += `${row + 1} ${marker}${driver.callSign}  ${world.playerScore[slot]!}  ${world.playerDeaths[slot]!}\n`;
   }
   if (rows > 0) {
     const leader = self.order[0]!;
-    gui.setText(self.leader, `★ LEADER  ${driverByPlayerId(leader + 1).callSign}  //  ${world.playerScore[leader]!}`);
+    gui.setText(self.leader, `LEADER  ${driverByPlayerId(leader + 1).callSign}  //  ${world.playerScore[leader]!}`);
   }
   return text;
 }
@@ -214,8 +239,11 @@ function updatePlayerHud(self: UiSelf): void {
   const chassis = chassisById(self.view.chassisId);
   const healthRatio = Math.max(0, Math.min(1, self.view.health / chassis.maxHealth));
   const armorRatio = Math.max(0, Math.min(1, self.view.armor / 200));
-  gui.setSize(self.healthFill, vmath.vector3(220 * healthRatio, 11, 0));
-  gui.setSize(self.armorFill, vmath.vector3(220 * armorRatio, 8, 0));
+  gui.setSize(self.healthFill, vmath.vector3(180 * healthRatio, 10, 0));
+  gui.setSize(self.armorFill, vmath.vector3(180 * armorRatio, 8, 0));
+  gui.setText(self.healthLabel, `HULL ${self.view.health}`);
+  gui.setText(self.armorLabel, `ARMOR ${self.view.armor}`);
+  gui.setText(self.telemetry, telemetryLine(self));
 }
 
 function objectiveLine(self: UiSelf): string {
@@ -223,14 +251,14 @@ function objectiveLine(self: UiSelf): string {
   const world = match?.world;
   if (world === undefined) return "";
   const localSlot = match === undefined ? -1 : match.localSlot;
-  if (localSlot < 0 || world.playerTeam[localSlot] === 0) return "FREE-FOR-ALL  —  COMMAND BEACON DISABLED";
+  if (localSlot < 0 || world.playerTeam[localSlot] === 0) return "FREE-FOR-ALL  //  BEACON OFFLINE";
   const objective = world.readObjective(self.objectiveView);
   if (objective.teamOneScore === 0 && objective.teamTwoScore === 0 && objective.progress === 0) {
-    return "COMMAND BEACON  —  TEAM MATCH CAPTURE ZONE";
+    return "COMMAND BEACON  //  CAPTURE AND HOLD";
   }
   const owner = objective.owner === 1 ? "BLUE" : objective.owner === 2 ? "RED" : "CONTESTED";
   const percent = Math.round((Math.abs(objective.progress) * 100) / OBJECTIVE_CAPTURE_TICKS);
-  return `COMMAND BEACON  ${owner}  BLUE ${objective.teamOneScore} - ${objective.teamTwoScore} RED  ${percent}%`;
+  return `BEACON ${owner}  //  BLUE ${objective.teamOneScore} - ${objective.teamTwoScore} RED  //  ${percent}%`;
 }
 
 function announce(self: UiSelf, text: string, color: Vector4): void {
@@ -238,6 +266,7 @@ function announce(self: UiSelf, text: string, color: Vector4): void {
   // notice rather than allocating GUI nodes or retaining a queue.
   gui.setText(self.announcement, text);
   gui.setColor(self.announcement, color);
+  gui.setEnabled(self.announcementBack, true);
   gui.setEnabled(self.announcement, true);
   self.announcementTicks = ANNOUNCEMENT_TICKS;
 }
@@ -314,6 +343,7 @@ function ageAnnouncement(self: UiSelf): void {
   self.announcementTicks -= 1;
   if (self.announcementTicks > 0) return;
   gui.setText(self.announcement, "");
+  gui.setEnabled(self.announcementBack, false);
   gui.setEnabled(self.announcement, false);
 }
 
@@ -328,13 +358,20 @@ export default defineComponent({
     self.announcement = gui.getNode("announcement");
     self.hudBack = gui.getNode("hud_back");
     self.portrait = gui.getNode("portrait");
+    self.portraitFrame = gui.getNode("portrait_frame");
     self.healthBack = gui.getNode("health_back");
     self.healthFill = gui.getNode("health_fill");
+    self.healthLabel = gui.getNode("health_label");
     self.armorBack = gui.getNode("armor_back");
     self.armorFill = gui.getNode("armor_fill");
+    self.armorLabel = gui.getNode("armor_label");
+    self.telemetry = gui.getNode("telemetry");
     self.leaderboardBack = gui.getNode("leaderboard_back");
     self.leaderBack = gui.getNode("leader_back");
     self.leader = gui.getNode("leader");
+    self.objectiveBack = gui.getNode("objective_back");
+    self.announcementBack = gui.getNode("announcement_back");
+    self.scoreBack = gui.getNode("score_back");
     self.titleBack = gui.getNode("title_back");
     self.titleLogo = gui.getNode("title_logo");
     self.titlePanel = gui.getNode("title_panel");
@@ -343,6 +380,7 @@ export default defineComponent({
     self.titleFeature = gui.getNode("title_feature");
     self.titleButton = gui.getNode("title_button");
     self.titleDeploy = gui.getNode("title_deploy");
+    self.titlePromptBack = gui.getNode("title_prompt_back");
     self.titlePrompt = gui.getNode("title_prompt");
     self.titleSponsor = gui.getNode("title_sponsor");
     self.view = createPlayerView();
@@ -363,6 +401,7 @@ export default defineComponent({
     gui.setText(self.node, "SCORE 0");
     gui.setText(self.announcement, "");
     gui.setText(self.objective, "");
+    gui.setEnabled(self.announcementBack, false);
     gui.setEnabled(self.announcement, false);
     gui.playFlipbook(self.portrait, "driver-portrait-radio-idle");
     gui.playFlipbook(self.titlePortrait, "driver-portrait-radio-idle");
@@ -377,10 +416,7 @@ export default defineComponent({
     if (match === undefined || !match.engaged) return;
     if (!self.engaged) {
       self.engaged = true;
-      gui.setText(
-        self.hint,
-        "ARROWS/WASD DRIVE  SPACE FIRE  SHIFT BOOST  1-6 WEAPON  7-0 CHASSIS  Q/E BRANCH  R RESTART",
-      );
+      gui.setText(self.hint, "WASD DRIVE  SPACE FIRE  SHIFT BOOST  1-6 GUN");
     }
     gui.setText(self.status, statusLine(self));
     updatePlayerHud(self);

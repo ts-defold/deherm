@@ -9,6 +9,8 @@ export * from "./constants";
 export * from "./content";
 export * from "./events";
 export * from "./fixed";
+export * from "./isometric-direction";
+export * from "./isometric-projection";
 export * from "./playable";
 export * from "./protocol";
 export * from "./ticks";

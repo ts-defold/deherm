@@ -14,6 +14,7 @@ import {
   normalizedDefignoreText,
   REQUIRED_MARKERS,
   REQUIRED_SHUTDOWN_MARKERS,
+  RUNTIME_PLAYER_MOVED_PREFIX,
   RUNTIME_PROFILE_MARKER_PREFIX,
   runPackagedRuntimeEvidence,
   transcriptEvidence,
@@ -44,6 +45,7 @@ const http = require("node:http");
 const markers = ${JSON.stringify(markers)};
 const shutdownMarkers = ${JSON.stringify(shutdownMarkers)};
 const runtimeProfileMarkerPrefix = ${JSON.stringify("INFO:DEFOLD_HERMES: Detected Defold runtime profile 'default-legacy-bullet' from ")};
+const runtimePlayerMovedPrefix = ${JSON.stringify("INFO:DEFOLD_HERMES: war-battles:player-moved:")};
 const server = http.createServer((request, response) => {
   if (request.url === "/post/@system/exit" && request.method === "POST") {
     request.resume();
@@ -66,7 +68,7 @@ server.listen(0, "127.0.0.1", () => {
   const timer = setInterval(() => {
     if (index < markers.length) {
       const marker = markers[index++];
-      process.stdout.write((marker === runtimeProfileMarkerPrefix ? marker + "315 generated Lua symbols" : marker) + "\\n");
+      process.stdout.write((marker === runtimeProfileMarkerPrefix ? marker + "315 generated Lua symbols" : marker === runtimePlayerMovedPrefix ? marker + "1726.4:962.0" : marker) + "\\n");
     }
     else { clearInterval(timer); ${suffix} }
   }, 5);
@@ -90,6 +92,9 @@ test("packaged runtime gate observes every marker, settles, and exits gracefully
   const result = await driveDouble();
   const expected = [...REQUIRED_MARKERS];
   expected[expected.indexOf(RUNTIME_PROFILE_MARKER_PREFIX)] += "315 generated Lua symbols";
+  const movedIndex = expected.indexOf(RUNTIME_PLAYER_MOVED_PREFIX);
+  expected[movedIndex] = result.markers[movedIndex];
+  assert.match(expected[movedIndex], /war-battles:player-moved:-?[0-9]+\.[0-9]+:-?[0-9]+\.[0-9]+/u);
   assert.deepEqual(result.markers, expected);
   assert.deepEqual(result.shutdownMarkers, [...REQUIRED_SHUTDOWN_MARKERS]);
   assert.equal(result.termination.method, "system-exit");
@@ -115,6 +120,7 @@ test("runtime profile evidence keeps the final positive symbol count without pin
   );
   const recorded = [...REQUIRED_MARKERS];
   recorded[recorded.indexOf(RUNTIME_PROFILE_MARKER_PREFIX)] += "315 generated Lua symbols";
+  recorded[recorded.indexOf(RUNTIME_PLAYER_MOVED_PREFIX)] += "1726.4:962.0";
   assert.deepEqual(checkedRequiredMarkers(recorded), recorded);
   const zero = [...recorded];
   zero[REQUIRED_MARKERS.indexOf(RUNTIME_PROFILE_MARKER_PREFIX)] =

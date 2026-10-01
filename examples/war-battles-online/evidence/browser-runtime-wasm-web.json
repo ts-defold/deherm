@@ -13,7 +13,7 @@
     "observed": [
       "A headless-Chrome load of the bundled wasm-web artifact started the Defold Emscripten engine and installed the generated browser host and script bridge.",
       "The generated component registry installed every component, and the archived bundle fingerprint matched the source resource on disk.",
-      "The same tutorial loop reached the browser: camera initialisation and world bounds, GUI initialisation, player initialisation, a factory-spawned rocket, a Box2D collision, the score, the sprite-animation completion callback, and the clamped player walk.",
+      "The same tutorial loop reached the browser: camera initialisation and world bounds, GUI initialisation, player initialisation, a factory-spawned rocket, its bounded lifetime, and the clamped player walk.",
       "Camera samples covering the unclamped, x-clamped and xy-clamped states.",
       "No page error and no uncaught exception."
     ],
@@ -27,13 +27,13 @@
     ]
   },
   "platform": "wasm-web",
-  "bundleFingerprint": "8289d0c1a907f9eb4702b82498d0461b1ddf543c6c50ae66f6b4eef8cb23cba7",
-  "bundleSha256": "17d224d4e8b3c348a8c8c22b6668001abdbf4bffbfadbba756b6a8f870aed067",
+  "bundleFingerprint": "45eeea0c9b9deef86c837f8b2354bef40c7c41bd855003a55adedebd5361b4ef",
+  "bundleSha256": "995fc2375315650f30b92d600951e2928eff0a01def82ad7e3dff20d0410f467",
   "state": {
     "documentReady": "complete",
     "engineStarted": true,
     "hostRuntime": "browser",
-    "componentsRegistered": 8,
+    "componentsRegistered": 9,
     "scriptBridgeInstalled": true,
     "scriptBridgeTarget": "html5-browser-host",
     "modules": [
@@ -42,7 +42,7 @@
       "ExampleMath",
       "Timer"
     ],
-    "bundleFingerprint": "8289d0c1a907f9eb4702b82498d0461b1ddf543c6c50ae66f6b4eef8cb23cba7",
+    "bundleFingerprint": "45eeea0c9b9deef86c837f8b2354bef40c7c41bd855003a55adedebd5361b4ef",
     "canvas": {
       "width": 756,
       "height": 425
@@ -57,45 +57,49 @@
   ],
   "requiredGameMarkers": [
     "war-battles:ui-init",
-    "war-battles:player-init:560.0:360.0",
-    "war-battles:player-fire:560.0:360.0:1.00:0.00",
     "war-battles:rocket-init:1.00:0.00",
-    "war-battles:rocket-hit",
-    "war-battles:score:100",
-    "war-battles:rocket-explosion-done",
-    "war-battles:player-moved:1592.0:1072.0",
+    "war-battles:rocket-expired",
     "war-battles:arena-init:players=8:online=0",
     "war-battles:arena-engaged:players=8:skill=2:seed=1463898690:mode=offline"
   ],
   "requiredGameMarkerPatterns": [
     "^war-battles:camera-init:zoom=([0-9]+(?:\\.[0-9]+)?):view=([0-9]+)x([0-9]+):cameras=1$",
-    "^war-battles:camera-bounds:x=\\[(-?[0-9]+(?:\\.[0-9]+)?),(-?[0-9]+(?:\\.[0-9]+)?)\\]:y=\\[(-?[0-9]+(?:\\.[0-9]+)?),(-?[0-9]+(?:\\.[0-9]+)?)\\]$"
+    "^war-battles:camera-bounds:x=\\[(-?[0-9]+(?:\\.[0-9]+)?),(-?[0-9]+(?:\\.[0-9]+)?)\\]:y=\\[(-?[0-9]+(?:\\.[0-9]+)?),(-?[0-9]+(?:\\.[0-9]+)?)\\]$",
+    "^war-battles:player-init:(-?[0-9]+(?:\\.[0-9]+)?):(-?[0-9]+(?:\\.[0-9]+)?)$",
+    "^war-battles:player-fire:(-?[0-9]+(?:\\.[0-9]+)?):(-?[0-9]+(?:\\.[0-9]+)?):1\\.00:0\\.00$",
+    "^war-battles:player-moved:(-?[0-9]+(?:\\.[0-9]+)?):(-?[0-9]+(?:\\.[0-9]+)?)$"
   ],
   "observedGameMarkers": [
     "war-battles:arena-init:players=8:online=0",
     "war-battles:hmr-reload:edit=initial:tick=0:entities=40:elapsed=0.000",
     "war-battles:camera-init:zoom=1.18:view=1084x610:cameras=1",
-    "war-battles:camera-bounds:x=[230.1,1065.9]:y=[-47.1,783.1]",
+    "war-battles:camera-bounds:x=[-13.8,1309.8]:y=[63.0,673.0]",
     "war-battles:ui-init",
-    "war-battles:player-init:560.0:360.0",
+    "war-battles:player-init:648.0:368.0",
     "war-battles:rocket-init:1.00:0.00",
-    "war-battles:player-fire:560.0:360.0:1.00:0.00",
-    "war-battles:rocket-hit",
-    "war-battles:score:100",
-    "war-battles:rocket-explosion-done",
-    "war-battles:player-moved:1592.0:1072.0",
+    "war-battles:player-fire:648.0:368.0:1.00:0.00",
+    "war-battles:rocket-expired",
+    "war-battles:player-moved:1725.2:962.0",
     "war-battles:arena-engaged:players=8:skill=2:seed=1463898690:mode=offline"
   ],
   "observedCamera": {
     "zoom": 1.18,
     "viewWidth": 1084,
     "viewHeight": 610,
-    "minX": 230.1,
-    "maxX": 1065.9,
-    "minY": -47.1,
-    "maxY": 783.1
+    "minX": -13.8,
+    "maxX": 1309.8,
+    "minY": 63,
+    "maxY": 673
   },
-  "cameraSampleCount": 11,
+  "observedTutorial": {
+    "initialX": 648,
+    "initialY": 368,
+    "firedX": 648,
+    "firedY": 368,
+    "movedX": 1725.2,
+    "movedY": 962
+  },
+  "cameraSampleCount": 12,
   "cameraClampStates": [
     "none",
     "x",

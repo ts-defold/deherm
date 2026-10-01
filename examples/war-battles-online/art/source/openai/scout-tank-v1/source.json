@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "status": "source-concept",
+  "operation": "generate-then-layer-edits",
+  "artDirection": "art/direction/gameplay-target-v2.png",
+  "intendedNativeScale": {
+    "logicalTileSize": 16,
+    "tankLengthPixels": [30, 36],
+    "atlasCell": [96, 96],
+    "facingAtZeroRotation": "screen-right",
+    "projection": "three-quarter-isometric-top-down"
+  },
+  "references": [
+    "defold/assets/units/tank/down/1.png",
+    "art/source/sprite-fusion/outputs/driver-portrait-base-v1/03.png",
+    "art/direction/gameplay-target-v2.png",
+    "Kenney Top-down Tanks Redux (CC0; geometry reference only)"
+  ],
+  "outputs": {
+    "composite": {
+      "path": "art/source/openai/scout-tank-v1/composite.png",
+      "sha256": "c7c5696ecde9d13eb684e414b01378c96aa2f4f0a71794e2d2d0ad0910b54af7"
+    },
+    "hull": {
+      "path": "art/source/openai/scout-tank-v1/hull.png",
+      "sha256": "ee6f6abbc7930839c4007ca4824d32f492c1f41f2f46532b3a6c079906f0947a"
+    },
+    "turret": {
+      "path": "art/source/openai/scout-tank-v1/turret.png",
+      "sha256": "abc49bf91061b81f664c89d2b254d8cd4f0fb4162c41de2257ae1176db5743e4"
+    },
+    "fixedHull": "art/source/openai/scout-tank-v1/hull-grid-fixed.png",
+    "fixedTurret": "art/source/openai/scout-tank-v1/turret-grid-fixed.png"
+  },
+  "pixelFixer": {
+    "repository": "https://github.com/Retro-Diffusion/pixel-art-fixer",
+    "revision": "ef376e57e1c272633ca2dbf5f29ec3fcf6596465",
+    "license": "MIT",
+    "mode": "full",
+    "localEvaluationPatch": "Guard Windows peak-RSS telemetry with cfg(target_os = windows); use zero on other hosts.",
+    "hull": {
+      "cols": 206,
+      "rows": 263,
+      "stepX": 6.6776,
+      "stepY": 4.3553,
+      "consensus": "arbitrated"
+    },
+    "turret": {
+      "cols": 234,
+      "rows": 192,
+      "stepX": 5.8609,
+      "stepY": 5.953,
+      "consensus": "arbitrated"
+    }
+  },
+  "runtimeProjection": {
+    "hullSize": [46, 40],
+    "hullAnchor": [103, 116],
+    "turretSize": [64, 32],
+    "turretAnchor": [103, 116],
+    "anchorMeaning": "turret-ring centre; projected to atlas-cell centre for independent rotation"
+  }
+}

@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_3bd4905e-086e-4ddf-9cf4-2b07dcad815b",
+  "operation": "direction-set",
+  "prompt": null,
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/openai/assault-tank-v1/turret-grid-fixed.png",
+      "bytes": 55686,
+      "sha256": "4b2854c8ea9bc6718233b320c2f112e3d973185d631b1fdbaf9c622b2bc428ef"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/assault-turret-directions-v1.json",
+    "sha256": "e46b23eaf25c9f1188f41c94d7955d645a02100a6144a30a6ca9e35df7ba7d9e"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "1d00c21d-b384-46ad-85ad-3ae662684bb5",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 71,
+      "height": 71,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/1d00c21d-b384-46ad-85ad-3ae662684bb5/image.png?v=1790773973981",
+      "path": "art/source/sprite-fusion/outputs/assault-turret-directions-v1/00.png",
+      "bytes": 7792,
+      "sha256": "49d2de8067e6441feb2561e53aa124fbce7003e904fd3f233b7be8ce77ec016e"
+    },
+    {
+      "index": 1,
+      "assetId": "e798fdca-e0a3-44dd-a896-c943848f9441",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/e798fdca-e0a3-44dd-a896-c943848f9441/image.png?v=1790773975263",
+      "path": "art/source/sprite-fusion/outputs/assault-turret-directions-v1/01.png",
+      "bytes": 7938,
+      "sha256": "bc6b39a71de85fb619f7ebd823fb1cb14e2ab64a94edecef386f2fe9cd2ebcbe"
+    },
+    {
+      "index": 2,
+      "assetId": "dfe5c1a6-c78a-48a1-8d20-61c43099e520",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 71,
+      "height": 71,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/dfe5c1a6-c78a-48a1-8d20-61c43099e520/image.png?v=1790773983733",
+      "path": "art/source/sprite-fusion/outputs/assault-turret-directions-v1/02.png",
+      "bytes": 7563,
+      "sha256": "43a1d0538f11e5589e03fe8af1f6edcf01547179f5037ca6be5456df79bb7f42"
+    },
+    {
+      "index": 3,
+      "assetId": "68a5864d-bbb7-4a35-8ca5-b334241500aa",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/68a5864d-bbb7-4a35-8ca5-b334241500aa/image.png?v=1790773984451",
+      "path": "art/source/sprite-fusion/outputs/assault-turret-directions-v1/03.png",
+      "bytes": 4491,
+      "sha256": "62ca46d2303763c17bc06a87d6d7e8d28ad76eabb42b274b593f98dca5753fe2"
+    },
+    {
+      "index": 4,
+      "assetId": "cf6b79e0-40a6-487f-a7d2-4ee548e7e355",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 86,
+      "height": 86,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/cf6b79e0-40a6-487f-a7d2-4ee548e7e355/image.png?v=1790773985265",
+      "path": "art/source/sprite-fusion/outputs/assault-turret-directions-v1/04.png",
+      "bytes": 8219,
+      "sha256": "90ffb8ce003bb80cb9bbaf08dd18675bb2f0d1cc642e329d2d0288dcce649d5b"
+    },
+    {
+      "index": 5,
+      "assetId": "92c3d925-14a1-478e-8995-4ab2908e61d9",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 67,
+      "height": 67,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/92c3d925-14a1-478e-8995-4ab2908e61d9/image.png?v=1790773990065",
+      "path": "art/source/sprite-fusion/outputs/assault-turret-directions-v1/05.png",
+      "bytes": 7876,
+      "sha256": "96ff4356a8691eba0b6d08357bb2effca34f9b70381eab91e7f3b8a52123286e"
+    },
+    {
+      "index": 6,
+      "assetId": "1166168c-82d5-4307-8aa2-3780a95bf8ec",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/1166168c-82d5-4307-8aa2-3780a95bf8ec/image.png?v=1790773990811",
+      "path": "art/source/sprite-fusion/outputs/assault-turret-directions-v1/06.png",
+      "bytes": 4886,
+      "sha256": "8e021699dcfcd13c3bed57c0ce5b055bd55c238395b055c3bd8be0d738f0d2bb"
+    },
+    {
+      "index": 7,
+      "assetId": "3e4a7378-e7d9-4ceb-97ba-ebf645dd43f9",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/3e4a7378-e7d9-4ceb-97ba-ebf645dd43f9/image.png?v=1790773991584",
+      "path": "art/source/sprite-fusion/outputs/assault-turret-directions-v1/07.png",
+      "bytes": 6846,
+      "sha256": "3689b9524ecda086e1c87dff7f6c3bc251b29f46653af5d4948b5e2efdeb4455"
+    }
+  ],
+  "credits": {
+    "remaining": 3135
+  }
+}

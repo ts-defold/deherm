@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_08b39d61-8e83-481b-880d-4e686f5857da",
+  "operation": "direction-set",
+  "prompt": null,
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/openai/assault-tank-v1/hull-grid-fixed.png",
+      "bytes": 118700,
+      "sha256": "3be428aab9618a7833bcb25d88af1bf1d842fd2cbe7347b690ae8ce51ee64a73"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/assault-hull-directions-v1.json",
+    "sha256": "68a79c3c00d7af1dbe6a542891686d60c567012d518e9301dd44a09b81f1dafb"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "c1259d09-863d-4cef-9306-43746060f947",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 80,
+      "height": 80,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/c1259d09-863d-4cef-9306-43746060f947/image.png?v=1790773916430",
+      "path": "art/source/sprite-fusion/outputs/assault-hull-directions-v1/00.png",
+      "bytes": 11555,
+      "sha256": "543d899b921cada60a80148434443ac1db5da2b6c13ea44b54eed479a7a16830"
+    },
+    {
+      "index": 1,
+      "assetId": "d664781b-cd52-4a41-b2e2-29864ebf9bfe",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 67,
+      "height": 67,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/d664781b-cd52-4a41-b2e2-29864ebf9bfe/image.png?v=1790773917117",
+      "path": "art/source/sprite-fusion/outputs/assault-hull-directions-v1/01.png",
+      "bytes": 8401,
+      "sha256": "5e5f80434710cd9578aa17140d5fd9ac12b7dafde06a06f031d272694ac94407"
+    },
+    {
+      "index": 2,
+      "assetId": "729ddcfc-994b-4eae-8495-cdb06e2729bc",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 87,
+      "height": 87,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/729ddcfc-994b-4eae-8495-cdb06e2729bc/image.png?v=1790773917797",
+      "path": "art/source/sprite-fusion/outputs/assault-hull-directions-v1/02.png",
+      "bytes": 13905,
+      "sha256": "8222a5093a522982c07a200b734acae0a0db2056c524611e9900384b827ff033"
+    },
+    {
+      "index": 3,
+      "assetId": "42a4bf01-405c-4bb0-99af-f819c067bd50",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 85,
+      "height": 85,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/42a4bf01-405c-4bb0-99af-f819c067bd50/image.png?v=1790773918454",
+      "path": "art/source/sprite-fusion/outputs/assault-hull-directions-v1/03.png",
+      "bytes": 13252,
+      "sha256": "682eebdcf35a95fabbcc4c54cd8ab9f5aa11ec91aa17e7b4061a30a8fe8c86f4"
+    },
+    {
+      "index": 4,
+      "assetId": "0c381e9e-c76e-4a80-944a-d99ef08e5e9f",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 66,
+      "height": 66,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/0c381e9e-c76e-4a80-944a-d99ef08e5e9f/image.png?v=1790773919077",
+      "path": "art/source/sprite-fusion/outputs/assault-hull-directions-v1/04.png",
+      "bytes": 10209,
+      "sha256": "5991c3e0e8433e1e09cc077c2be3731aee5bb1a79879a5f1caa7041b2ce1b375"
+    },
+    {
+      "index": 5,
+      "assetId": "2b0247b9-6138-46d0-80da-2b0df027f4cd",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 78,
+      "height": 78,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/2b0247b9-6138-46d0-80da-2b0df027f4cd/image.png?v=1790773919826",
+      "path": "art/source/sprite-fusion/outputs/assault-hull-directions-v1/05.png",
+      "bytes": 12409,
+      "sha256": "5ce62377b42de8af8d821606a6442bd79f74e70c25fc59e97615c00cee682279"
+    },
+    {
+      "index": 6,
+      "assetId": "3cd58ba3-0771-48a5-85f2-d634891e1250",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 76,
+      "height": 76,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/3cd58ba3-0771-48a5-85f2-d634891e1250/image.png?v=1790773920550",
+      "path": "art/source/sprite-fusion/outputs/assault-hull-directions-v1/06.png",
+      "bytes": 10769,
+      "sha256": "00b5b894f5f2ac11adb3299160875d944c82157604c2406243373b5a6818fc97"
+    },
+    {
+      "index": 7,
+      "assetId": "c044f483-04e4-430d-b65e-b38741812da8",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 78,
+      "height": 78,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/c044f483-04e4-430d-b65e-b38741812da8/image.png?v=1790773921283",
+      "path": "art/source/sprite-fusion/outputs/assault-hull-directions-v1/07.png",
+      "bytes": 12103,
+      "sha256": "e432c5396ccbc765dc2afd01d2a3fe5f91aebae308dc44474e220f699755641b"
+    }
+  ],
+  "credits": {
+    "remaining": 3150
+  }
+}

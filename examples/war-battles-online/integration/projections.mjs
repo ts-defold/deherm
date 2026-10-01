@@ -62,7 +62,7 @@ export const WAR_BATTLES_PROJECTIONS = Object.freeze({
     producer: "node examples/war-battles-online/integration/check-packaged-runtime.mjs --record-evidence",
     observed: [
       "The packaged engine loaded the TypeScript bundle into Dynamic Hermes and attached its generated TypeScript components.",
-      "The tutorial loop ran through real Defold APIs: camera initialisation and world bounds, GUI initialisation, player initialisation, a factory-spawned rocket, a Box2D collision, the score, and the sprite-animation completion callback.",
+      "The tutorial loop ran through real Defold APIs: camera initialisation and world bounds, GUI initialisation, player initialisation, a factory-spawned rocket, its bounded lifetime, and the clamped player walk.",
       "The following camera scrolled the 1920x1440 world and the player walk reached its clamped corner.",
       "A graceful `@system/exit`, addressed to this engine's own dynamically assigned service port after proving it was the sole listener, ran component `final()` and the process exited 0.",
       "No rejected engine diagnostic appeared at any point, shutdown included.",
@@ -89,7 +89,7 @@ export const WAR_BATTLES_PROJECTIONS = Object.freeze({
     observed: [
       "A headless-Chrome load of the bundled wasm-web artifact started the Defold Emscripten engine and installed the generated browser host and script bridge.",
       "The generated component registry installed every component, and the archived bundle fingerprint matched the source resource on disk.",
-      "The same tutorial loop reached the browser: camera initialisation and world bounds, GUI initialisation, player initialisation, a factory-spawned rocket, a Box2D collision, the score, the sprite-animation completion callback, and the clamped player walk.",
+      "The same tutorial loop reached the browser: camera initialisation and world bounds, GUI initialisation, player initialisation, a factory-spawned rocket, its bounded lifetime, and the clamped player walk.",
       "Camera samples covering the unclamped, x-clamped and xy-clamped states.",
       "No page error and no uncaught exception.",
     ],

@@ -22,16 +22,16 @@ import { harvestTranscript, mergeOccurrences, readBugPool, writeBugPool } from "
 const exampleRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const repositoryRoot = resolve(exampleRoot, "../..");
 const engine = resolve(exampleRoot, "defold/build/arm64-osx/dmengine");
-const runtimeCwd = resolve(exampleRoot, "defold/build/default");
+const runtimeCwd = resolve(exampleRoot, "defold/build/bob");
 const evidencePath = resolve(exampleRoot, "evidence/packaged-runtime-arm64-macos.json");
 const bugPoolPath = resolve(exampleRoot, "defold/.deherm/dev/bug-pool.json");
 const artifactPaths = [
   "examples/war-battles-online/defold/build/arm64-osx/dmengine",
-  "examples/war-battles-online/defold/build/default/game.arcd",
-  "examples/war-battles-online/defold/build/default/game.arci",
-  "examples/war-battles-online/defold/build/default/game.dmanifest",
-  "examples/war-battles-online/defold/build/default/game.projectc",
-  "examples/war-battles-online/defold/build/default/deherm/app.dehermc",
+  "examples/war-battles-online/defold/build/bob/game.arcd",
+  "examples/war-battles-online/defold/build/bob/game.arci",
+  "examples/war-battles-online/defold/build/bob/game.dmanifest",
+  "examples/war-battles-online/defold/build/bob/game.projectc",
+  "examples/war-battles-online/defold/build/bob/deherm/app.dehermc",
 ];
 const sourceFilePaths = [
   "upstream.lock",
@@ -89,11 +89,27 @@ if (arguments_.has("--check-sources")) {
 // to launch (or record evidence for) an archive that still contains a prior
 // bundle fingerprint. The fingerprint is an ASCII banner in both the source
 // resource and its uncompressed Defold archive entry.
-const bundleSource = await readFile(resolve(exampleRoot, "defold/build/default/deherm/app.dehermc"), "utf8");
+const bundleSource = await readFile(resolve(exampleRoot, "defold/build/bob/deherm/app.dehermc"), "utf8");
 const bundleFingerprint = bundleSource.match(/__DEFOLD_HERMES_BUILD_FINGERPRINT__\s*=\s*"([0-9a-f]{64})"/u)?.[1];
 if (bundleFingerprint === undefined) throw new Error("Packaged bundle source has no deherm build fingerprint");
-const archiveBytes = await readFile(resolve(exampleRoot, "defold/build/default/game.arcd"));
-if (!archiveBytes.includes(Buffer.from(bundleFingerprint, "ascii"))) {
+const archiveBytes = await readFile(resolve(exampleRoot, "defold/build/bob/game.arcd"));
+// Bob's archive writer may split a custom resource at an internal block
+// boundary and place a short binary block header inside the string. Start at
+// the exact assignment marker, skip only non-hex archive bytes, and require all
+// 64 fingerprint digits in order inside one bounded block window.
+const fingerprintMarker = Buffer.from('__DEFOLD_HERMES_BUILD_FINGERPRINT__ = "', "ascii");
+const markerOffset = archiveBytes.indexOf(fingerprintMarker);
+let archivedFingerprint = "";
+if (markerOffset >= 0) {
+  const start = markerOffset + fingerprintMarker.length;
+  for (let offset = start; offset < Math.min(start + 96, archiveBytes.length); offset += 1) {
+    const byte = archiveBytes[offset];
+    const isHex = (byte >= 48 && byte <= 57) || (byte >= 97 && byte <= 102);
+    if (isHex) archivedFingerprint += String.fromCharCode(byte);
+    if (archivedFingerprint.length === 64) break;
+  }
+}
+if (archivedFingerprint !== bundleFingerprint) {
   throw new Error(
     `Defold archive does not contain current deherm bundle ${bundleFingerprint}; run a full Bob build before packaged runtime evidence`,
   );
@@ -149,6 +165,7 @@ try {
     cwd: runtimeCwd,
     timeoutMs,
     settleMs,
+    isolateRemoteryPort: true,
   });
 } catch (error) {
   await harvestRun(String(error?.message ?? error));

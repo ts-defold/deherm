@@ -254,10 +254,10 @@ for both server lanes, the certificate, and the packaged browser proofs.
 ```sh
 pnpm package:defold
 node bin/deherm.mjs generate --project examples/war-battles-online/defold
-node bin/deherm.mjs dev \
-  --project examples/war-battles-online/defold \
-  --entry examples/war-battles-online/defold/main/player.script.ts \
-  --watch examples/war-battles-online/defold \
+pnpm --dir examples/war-battles-online exec deherm dev \
+  --project defold \
+  --entry main/player.script.ts \
+  --watch . \
   --once --headless --no-launch
 node scripts/assemble-typed-native-extension.mjs \
   --project examples/war-battles-online/defold

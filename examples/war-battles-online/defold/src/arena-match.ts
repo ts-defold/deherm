@@ -19,6 +19,10 @@ import {
   UNITS_PER_PIXEL,
   WORLD_PIXEL_ORIGIN_X,
   WORLD_PIXEL_ORIGIN_Y,
+  isometricDirectionX,
+  isometricDirectionY,
+  isometricScreenX,
+  isometricScreenY,
   weaponUpgradeId,
   type PlayerTransform,
   type PlayControls,
@@ -186,8 +190,23 @@ export function pixelY(y: number): number {
   return y / UNITS_PER_PIXEL + WORLD_PIXEL_ORIGIN_Y;
 }
 
+/** Authoritative Cartesian world units projected into the 2:1 renderer. */
+export function projectedX(x: number, y: number): number {
+  return isometricScreenX(x, y);
+}
+
+export function projectedY(x: number, y: number): number {
+  return isometricScreenY(x, y);
+}
+
 /** A Q8 direction as radians, for `vmath.quatRotationZ`. */
 export function directionRadians(x: number, y: number): number {
   if (x === 0 && y === 0) return 0;
   return Math.atan2(y / DIRECTION_SCALE, x / DIRECTION_SCALE);
+}
+
+/** World direction projected into the same screen basis as the tilemap. */
+export function projectedDirectionRadians(x: number, y: number): number {
+  if (x === 0 && y === 0) return 0;
+  return Math.atan2(isometricDirectionY(x, y), isometricDirectionX(x, y));
 }

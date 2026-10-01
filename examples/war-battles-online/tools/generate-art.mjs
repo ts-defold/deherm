@@ -29,14 +29,28 @@ import { deflateSync, inflateSync } from "node:zlib";
 
 import {
   ARENA_DECOR_ROLE_COUNT,
+  ARENA_DECOR_ROLE_CAUTION_PAINT,
+  ARENA_DECOR_ROLE_CRATER_BASE,
+  ARENA_DECOR_ROLE_FIELD_FLOWERS,
   ARENA_DECOR_ROLE_FLOOR_VENT,
+  ARENA_DECOR_ROLE_GRASS,
   ARENA_DECOR_ROLE_LAVA_FISSURE,
+  ARENA_DECOR_ROLE_OIL_SPILL,
   ARENA_DECOR_ROLE_PICKUP_PEDESTAL,
   ARENA_DECOR_ROLE_PIPE_JUNCTION,
   ARENA_DECOR_ROLE_PIPE_RUN,
+  ARENA_DECOR_ROLE_SCORCH,
+  ARENA_DECOR_ROLE_SERVICE_ROAD_BASE,
+  ARENA_DECOR_ROLE_SHELL_CASES,
+  ARENA_DECOR_ROLE_STAGING_PAD_BASE,
+  ARENA_DECOR_ROLE_STONES,
   ARENA_DECOR_ROLE_THERMAL_VENT,
+  ARENA_DECOR_ROLE_TRACKS,
   ARENA_GROUND_ROLE_WALL_BASE,
   ARENA_GROUND_VARIANT_COUNT,
+  ARENA_LANDSCAPE_MASK_COUNT,
+  ARENA_LANDSCAPE_VARIANTS_PER_MASK,
+  ARENA_MEADOW_VARIANT_COUNT,
   ARENA_MARK_ROLE_COUNT,
   ARENA_MARK_ROLE_CRATE,
   ARENA_MARK_ROLE_PICKUP,
@@ -54,11 +68,14 @@ const outputRoot = resolve(assetsRoot, "derived", "arena");
 const worldArtRoot = resolve(assetsRoot, "derived", "world");
 const mainRoot = resolve(projectRoot, "main");
 const sourceRoot = resolve(projectRoot, "src");
+const spriteFusionRoot = resolve(exampleRoot, "art", "source", "sprite-fusion");
+const landmarkSourceRoot = resolve(exampleRoot, "art", "source", "openai", "world-landmarks-v1");
 
 /** Fixed seed keeps every noise field and scatter byte-reproducible. */
 const SEED = 0x41524e41; // "ARNA"
 /** zlib level is pinned so the encoded PNG bytes never drift. */
 const ZLIB_LEVEL = 9;
+const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
 
 // ---------------------------------------------------------------------------
 // PNG codec (8-bit RGBA, non-interlaced)
@@ -699,6 +716,201 @@ const TEAMS = {
 const TEAM_ORDER = ["blue", "red", "green", "sand"];
 
 // ---------------------------------------------------------------------------
+// Production tank source projection
+// ---------------------------------------------------------------------------
+
+const PRODUCTION_TANK_CELL = 128;
+const TANK_CHASSIS = Object.freeze(["scout", "assault", "bulwark", "artillery"]);
+// Sprite Fusion's API emits this stable index order. Keep the transport order
+// explicit and give the rest of the project compass names instead of numeric
+// asset indices.
+const TANK_DIRECTIONS = Object.freeze([
+  Object.freeze({ id: "se", sourceIndex: 0 }),
+  Object.freeze({ id: "s", sourceIndex: 1 }),
+  Object.freeze({ id: "sw", sourceIndex: 2 }),
+  Object.freeze({ id: "w", sourceIndex: 3 }),
+  Object.freeze({ id: "e", sourceIndex: 4 }),
+  Object.freeze({ id: "nw", sourceIndex: 5 }),
+  Object.freeze({ id: "n", sourceIndex: 6 }),
+  Object.freeze({ id: "ne", sourceIndex: 7 }),
+]);
+const productionTankSourceCache = new Map();
+
+function tankDepotSprite() {
+  const selectionPath = resolve(spriteFusionRoot, "selection.json");
+  const selection = JSON.parse(readFileSync(selectionPath, "utf8"));
+  const selected = selection?.world?.tankDepot;
+  if (!selected || selected.disposition !== "approved-source") throw new Error("tank depot has no approved selection");
+  const manifestPath = resolve(spriteFusionRoot, "requests", `${selected.request}.json`);
+  const manifestBytes = readFileSync(manifestPath);
+  const manifest = JSON.parse(manifestBytes.toString("utf8"));
+  if (manifest.schemaVersion !== 1 || manifest.owner !== "tools/sprite-fusion.mjs") {
+    throw new Error("tank depot request manifest is unsupported");
+  }
+  const output = manifest.outputs?.find((candidate) => candidate.index === selected.selectedIndex);
+  if (!output || output.assetId !== selected.assetId || output.path !== selected.source) {
+    throw new Error("tank depot selection disagrees with its request manifest");
+  }
+  const specBytes = readFileSync(resolve(exampleRoot, manifest.spec.path));
+  if (sha256(specBytes) !== manifest.spec.sha256) throw new Error("tank depot request spec hash changed");
+  const sourceBytes = readFileSync(resolve(exampleRoot, selected.source));
+  if (sha256(sourceBytes) !== output.sha256) throw new Error("tank depot source hash changed");
+  const source = decodePng(sourceBytes);
+  if (source.width !== output.width || source.height !== output.height) {
+    throw new Error("tank depot source dimensions disagree with its request manifest");
+  }
+  const target = new Canvas(PRODUCTION_TANK_CELL, PRODUCTION_TANK_CELL);
+  const offsetX = Math.floor((target.width - source.width) / 2);
+  const offsetY = Math.floor((target.height - source.height) / 2);
+  for (let y = 0; y < source.height; y += 1) {
+    for (let x = 0; x < source.width; x += 1) {
+      const offset = (y * source.width + x) * 4;
+      if (source.data[offset + 3] < 32) continue;
+      target.set(offsetX + x, offsetY + y, source.data.subarray(offset, offset + 4));
+    }
+  }
+  return target;
+}
+
+function sourceOpaqueBounds(image) {
+  let x0 = image.width;
+  let y0 = image.height;
+  let x1 = -1;
+  let y1 = -1;
+  for (let y = 0; y < image.height; y += 1) {
+    for (let x = 0; x < image.width; x += 1) {
+      if (image.data[(y * image.width + x) * 4 + 3] < 32) continue;
+      x0 = Math.min(x0, x);
+      y0 = Math.min(y0, y);
+      x1 = Math.max(x1, x);
+      y1 = Math.max(y1, y);
+    }
+  }
+  if (x1 < x0) throw new Error("production tank source has no opaque pixels");
+  return [x0, y0, x1, y1];
+}
+
+function loadProductionTankSource(chassis, layer, direction) {
+  const key = `${chassis}.${layer}.${direction}`;
+  const cached = productionTankSourceCache.get(key);
+  if (cached) return cached;
+  if (!TANK_CHASSIS.includes(chassis) || !["hull", "turret"].includes(layer)) {
+    throw new Error(`unknown production tank source ${key}`);
+  }
+  const directionSpec = TANK_DIRECTIONS.find((candidate) => candidate.id === direction);
+  if (!directionSpec) throw new Error(`unknown production tank direction ${direction}`);
+  const requestName = `${chassis}-${layer}-directions-v1`;
+  const manifestPath = resolve(spriteFusionRoot, "requests", `${requestName}.json`);
+  const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
+  if (manifest.schemaVersion !== 1 || manifest.owner !== "tools/sprite-fusion.mjs") {
+    throw new Error(`unsupported Sprite Fusion manifest ${requestName}`);
+  }
+  if (manifest.operation !== "direction-set" || manifest.outputs?.length !== TANK_DIRECTIONS.length) {
+    throw new Error(`incomplete Sprite Fusion direction set ${requestName}`);
+  }
+  const output = manifest.outputs.find((candidate) => candidate.index === directionSpec.sourceIndex);
+  if (!output) throw new Error(`Sprite Fusion direction set ${requestName} has no ${direction}`);
+  const bytes = readFileSync(resolve(exampleRoot, output.path));
+  const digest = sha256(bytes);
+  if (digest !== output.sha256) {
+    throw new Error(`production tank source ${output.path} changed: expected ${output.sha256}, got ${digest}`);
+  }
+  const source = { image: decodePng(bytes), bounds: null, requestName, output };
+  source.bounds = sourceOpaqueBounds(source.image);
+  if (source.image.width > PRODUCTION_TANK_CELL || source.image.height > PRODUCTION_TANK_CELL) {
+    throw new Error(
+      `production tank source ${output.path} exceeds ${PRODUCTION_TANK_CELL}px cell: ` +
+        `${source.image.width}x${source.image.height}`,
+    );
+  }
+  productionTankSourceCache.set(key, source);
+  return source;
+}
+
+function productionTankColor(red, green, blue, alpha, team) {
+  // Blue panels are deliberately authored identity slots. Reproject only those
+  // panels into the selected team's four-step ramp; preserve the selected
+  // production art everywhere else instead of flattening it back into the
+  // smaller tutorial palette.
+  if (blue > red * 1.22 && blue > green * 1.04 && blue - red > 24) {
+    if (team === "blue") return [red, green, blue, alpha];
+    const targetHue = { red: 0, green: 145, sand: 42 }[team];
+    const source = rgbToHsl(red, green, blue);
+    const [tintedRed, tintedGreen, tintedBlue] = hslToRgb(targetHue, source.s, source.l);
+    return [tintedRed, tintedGreen, tintedBlue, alpha];
+  }
+  return [red, green, blue, alpha];
+}
+
+/**
+ * Project one selected directional layer into a fixed cell. The source is
+ * already pixel art at gameplay scale, so this is a lossless integer copy: no
+ * interpolation, rotation, or runtime resampling is involved.
+ */
+function animateProductionTankTracks(canvas, bounds, direction) {
+  const [x0, y0, x1, y1] = bounds;
+  let changed = 0;
+  for (let y = y0; y <= y1; y += 1) {
+    for (let x = x0; x <= x1; x += 1) {
+      const edgeDistance = Math.min(x - x0, x1 - x, y - y0, y1 - y);
+      if (edgeDistance > 5) continue;
+      const [red, green, blue, alpha] = canvas.get(x, y);
+      if (alpha < 128) continue;
+      const maximum = Math.max(red, green, blue);
+      const minimum = Math.min(red, green, blue);
+      const lightness = (red + green + blue) / 3;
+      // Track links are neutral dark metal around the silhouette. Preserve the
+      // black outline, painted team panels, highlights, and warm driver art.
+      if (maximum - minimum > 28 || lightness < 32 || lightness > 142) continue;
+      const along = direction === "n" || direction === "s" ? y : direction === "e" || direction === "w" ? x : x + y;
+      const delta = along % 6 < 3 ? 18 : -10;
+      canvas.set(x, y, [
+        Math.max(0, Math.min(255, red + delta)),
+        Math.max(0, Math.min(255, green + delta)),
+        Math.max(0, Math.min(255, blue + delta)),
+        alpha,
+      ]);
+      changed += 1;
+    }
+  }
+  if (changed < 4) throw new Error(`production tank ${direction} frame has no detectable track links`);
+}
+
+function productionTankLayer(chassis, layer, direction, team, frame = 0) {
+  const source = loadProductionTankSource(chassis, layer, direction);
+  const target = new Canvas(PRODUCTION_TANK_CELL, PRODUCTION_TANK_CELL);
+  target.rotationAnchor = [PRODUCTION_TANK_CELL / 2, PRODUCTION_TANK_CELL / 2];
+  const offsetX = Math.floor((PRODUCTION_TANK_CELL - source.image.width) / 2);
+  const offsetY = Math.floor((PRODUCTION_TANK_CELL - source.image.height) / 2);
+  for (let y = 0; y < source.image.height; y += 1) {
+    for (let x = 0; x < source.image.width; x += 1) {
+      const index = (y * source.image.width + x) * 4;
+      const alpha = source.image.data[index + 3];
+      if (alpha < 32) continue;
+      target.set(
+        offsetX + x,
+        offsetY + y,
+        productionTankColor(
+          source.image.data[index],
+          source.image.data[index + 1],
+          source.image.data[index + 2],
+          alpha,
+          team,
+        ),
+      );
+    }
+  }
+  if (layer === "hull" && frame === 1) {
+    animateProductionTankTracks(
+      target,
+      [offsetX + source.bounds[0], offsetY + source.bounds[1], offsetX + source.bounds[2], offsetY + source.bounds[3]],
+      direction,
+    );
+  }
+  return target;
+}
+
+// ---------------------------------------------------------------------------
 // Tile sheet
 // ---------------------------------------------------------------------------
 
@@ -805,83 +1017,222 @@ function loadWorldTiles() {
   });
 }
 
-/** Ground: soft two-tone olive blobs, exactly the tutorial's ground language. */
-function groundTile(variant) {
-  const canvas = new Canvas(TILE, TILE);
-  const seed = SEED + variant * 7919;
-  for (let y = 0; y < TILE; ++y) {
-    for (let x = 0; x < TILE; ++x) {
-      const n = octaveNoise(x, y, TILE, seed);
+const GROUND_MACRO_TILES = Math.sqrt(ARENA_MEADOW_VARIANT_COUNT);
+if (!Number.isInteger(GROUND_MACRO_TILES)) throw new Error("meadow variant count must form a square macro");
+const GROUND_MACRO_EDGE = TILE * GROUND_MACRO_TILES;
+
+let landscapeSourceCache = null;
+
+/**
+ * Sprite Fusion contributes value structure and pixel-cluster rhythm only.
+ * Exact topology is generated here: every edge, mask, phase, tile id and seam
+ * remains deterministic and locally verifiable.
+ */
+function landscapeSources() {
+  if (landscapeSourceCache) return landscapeSourceCache;
+  const selection = JSON.parse(readFileSync(resolve(spriteFusionRoot, "selection.json"), "utf8"));
+  const selected = selection?.world?.landscapeTerrain;
+  if (!selected || selected.disposition !== "approved-pattern-sources") {
+    throw new Error("landscape terrain has no approved Sprite Fusion pattern sources");
+  }
+  const manifestPath = resolve(spriteFusionRoot, "requests", `${selected.request}.json`);
+  const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
+  if (manifest.schemaVersion !== 1 || manifest.owner !== "tools/sprite-fusion.mjs") {
+    throw new Error("landscape terrain request manifest is unsupported");
+  }
+  const specBytes = readFileSync(resolve(exampleRoot, manifest.spec.path));
+  if (sha256(specBytes) !== manifest.spec.sha256) throw new Error("landscape terrain request spec hash changed");
+  const sources = {};
+  for (const [material, choice] of Object.entries(selected.materials ?? {})) {
+    const output = manifest.outputs?.find((candidate) => candidate.index === choice.selectedIndex);
+    if (!output || output.assetId !== choice.assetId) {
+      throw new Error(`landscape terrain selection disagrees for ${material}`);
+    }
+    const bytes = readFileSync(resolve(exampleRoot, output.path));
+    if (sha256(bytes) !== output.sha256) throw new Error(`landscape terrain source changed: ${output.path}`);
+    const image = decodePng(bytes);
+    if (image.width !== output.width || image.height !== output.height) {
+      throw new Error(`landscape terrain dimensions disagree: ${output.path}`);
+    }
+    sources[material] = { image, output };
+  }
+  for (const material of ["meadow", "earth", "basalt", "scorch"]) {
+    if (!sources[material]) throw new Error(`landscape terrain has no ${material} pattern source`);
+  }
+  landscapeSourceCache = sources;
+  return sources;
+}
+
+function referenceValue(source, x, y, phase = 0) {
+  const width = source.image.width;
+  const height = source.image.height;
+  const sourceX = (x + phase * 17 + width * 4) % width;
+  const sourceY = (y + phase * 29 + height * 4) % height;
+  const offset = (sourceY * width + sourceX) * 4;
+  const alpha = source.image.data[offset + 3] / 255;
+  const light =
+    (source.image.data[offset] * 3 + source.image.data[offset + 1] * 5 + source.image.data[offset + 2] * 2) / 2550;
+  return { alpha, light };
+}
+
+/** Build one seamless terrain macro instead of a screen-visible repeated stamp. */
+function groundMacro() {
+  const canvas = new Canvas(GROUND_MACRO_EDGE, GROUND_MACRO_EDGE);
+  const meadow = landscapeSources().meadow;
+  for (let y = 0; y < GROUND_MACRO_EDGE; y += 1) {
+    for (let x = 0; x < GROUND_MACRO_EDGE; x += 1) {
+      const broad = tileNoise(x, y, GROUND_MACRO_EDGE, 5, SEED + 1701);
+      const middle = tileNoise(x, y, GROUND_MACRO_EDGE, 13, SEED + 1713);
+      const reflectedX = Math.min(x, GROUND_MACRO_EDGE - 1 - x);
+      const reflectedY = Math.min(y, GROUND_MACRO_EDGE - 1 - y);
+      const reference = referenceValue(meadow, reflectedX, reflectedY);
       let color = C.groundBase;
-      if (n < 0.47) color = C.groundDark;
-      else if (n > 0.63) color = C.groundLight;
+      if (broad < 0.22 || (reference.alpha > 0.5 && reference.light < 0.27)) color = C.groundDark;
+      else if (broad > 0.82 && reference.light > 0.62) color = C.groundLight;
+      if (middle < 0.018) color = C.groundDeep;
       canvas.set(x, y, color);
     }
   }
-  if (variant === 2) {
-    // A dust patch: the tutorial ground drifts into sand at the map's edges.
-    for (let y = 0; y < TILE; ++y) {
-      for (let x = 0; x < TILE; ++x) {
-        const n = octaveNoise(x + 3, y + 5, TILE, seed + 33);
-        if (n > 0.74) canvas.set(x, y, n > 0.82 ? C.dustLight : C.dustMid);
-      }
-    }
+
+  // Sparse grass and worn soil cross tile boundaries inside the macro. That
+  // breaks the stamp-grid silhouette while keeping the battlefield quiet
+  // enough for projectiles and pickups to read.
+  for (let mark = 0; mark < 36; mark += 1) {
+    const x = Math.floor(hash2(mark, 11, SEED + 1801) * GROUND_MACRO_EDGE);
+    const y = Math.floor(hash2(23, mark, SEED + 1811) * GROUND_MACRO_EDGE);
+    const rising = hash2(x, y, SEED + 1823) > 0.5;
+    canvas.set(x, y, C.groundDark);
+    canvas.set(
+      (x + 1) % GROUND_MACRO_EDGE,
+      (y + (rising ? -1 : 1) + GROUND_MACRO_EDGE) % GROUND_MACRO_EDGE,
+      C.groundLight,
+    );
   }
-  if (variant === 3) {
-    // Scrub tufts: single dark pixels, the same trick tile 28 uses.
-    for (let y = 0; y < TILE; ++y) {
-      for (let x = 0; x < TILE; ++x) {
-        if (hash2(x, y, seed + 71) > 0.955) canvas.set(x, y, C.groundDeep);
+  return canvas;
+}
+
+const GROUND_MACRO = groundMacro();
+
+/** Extract one cell from the coherent, wrap-safe terrain macro. */
+function groundTile(variant) {
+  if (variant >= ARENA_MEADOW_VARIANT_COUNT) return landscapeTile(variant);
+  const canvas = new Canvas(TILE, TILE);
+  const originX = (variant % GROUND_MACRO_TILES) * TILE;
+  const originY = Math.floor(variant / GROUND_MACRO_TILES) * TILE;
+  for (let y = 0; y < TILE; y += 1) {
+    for (let x = 0; x < TILE; x += 1) canvas.set(x, y, GROUND_MACRO.get(originX + x, originY + y));
+  }
+  return canvas;
+}
+
+const LANDSCAPE_MATERIALS = Object.freeze([
+  Object.freeze({ id: "earth", palette: [C.woodDark, C.dustMid, C.woodLight, C.dustLight, C.woodHi] }),
+  Object.freeze({ id: "basalt", palette: [C.outline, C.shadowDeep, C.metalDark, C.metalMid, C.metalLight] }),
+  Object.freeze({ id: "scorch", palette: [C.outline, C.shadowDeep, C.smokeDark, C.emberDeep, C.ember] }),
+]);
+
+function landscapeCoverage(mask, x, y) {
+  if (x >= 4 && x <= 11 && y >= 4 && y <= 11) return true;
+  if ((mask & ARENA_WALL_MASK_BITS.north) !== 0 && y <= 7) {
+    const margin = Math.floor(y / 2);
+    if (x >= margin && x < TILE - margin) return true;
+  }
+  if ((mask & ARENA_WALL_MASK_BITS.south) !== 0 && y >= 8) {
+    const margin = Math.floor((TILE - 1 - y) / 2);
+    if (x >= margin && x < TILE - margin) return true;
+  }
+  if ((mask & ARENA_WALL_MASK_BITS.west) !== 0 && x <= 7) {
+    const margin = Math.floor(x / 2);
+    if (y >= margin && y < TILE - margin) return true;
+  }
+  if ((mask & ARENA_WALL_MASK_BITS.east) !== 0 && x >= 8) {
+    const margin = Math.floor((TILE - 1 - x) / 2);
+    if (y >= margin && y < TILE - margin) return true;
+  }
+  return false;
+}
+
+function landscapeShade(material, materialIndex, source, x, y, phase, boundary, connectedEdge) {
+  if (boundary) return material.palette[0];
+  if (connectedEdge) return material.palette[2];
+  const globalX = x + (phase & 1) * TILE;
+  const globalY = y + (phase >> 1) * TILE;
+  const reference = referenceValue(source, globalX, globalY);
+  const detail = hash2(globalX, globalY, SEED + 2203 + materialIndex * 47);
+  if (reference.alpha > 0.28 && reference.light < 0.26 && detail < 0.34) return material.palette[1];
+  if (reference.alpha > 0.45 && reference.light > 0.72 && detail > 0.84) return material.palette[3];
+  if (reference.alpha > 0.55 && reference.light > 0.86 && detail > 0.965) return material.palette[4];
+  return material.palette[2];
+}
+
+/** One of three material families x 16 neighbour masks x four coordinate phases. */
+function landscapeTile(role) {
+  const local = role - ARENA_MEADOW_VARIANT_COUNT;
+  const rolesPerMaterial = ARENA_LANDSCAPE_MASK_COUNT * ARENA_LANDSCAPE_VARIANTS_PER_MASK;
+  const materialIndex = Math.floor(local / rolesPerMaterial);
+  const withinMaterial = local % rolesPerMaterial;
+  const mask = Math.floor(withinMaterial / ARENA_LANDSCAPE_VARIANTS_PER_MASK);
+  const phase = withinMaterial % ARENA_LANDSCAPE_VARIANTS_PER_MASK;
+  const material = LANDSCAPE_MATERIALS[materialIndex];
+  if (!material) throw new Error(`invalid landscape material role ${role}`);
+  const source = landscapeSources()[material.id];
+  const meadowOriginX = (phase & 1) * TILE;
+  const meadowOriginY = (phase >> 1) * TILE;
+  const canvas = new Canvas(TILE, TILE);
+  for (let y = 0; y < TILE; y += 1) {
+    for (let x = 0; x < TILE; x += 1) {
+      if (!landscapeCoverage(mask, x, y)) {
+        canvas.set(x, y, GROUND_MACRO.get(meadowOriginX + x, meadowOriginY + y));
+        continue;
       }
+      const boundary =
+        (x > 0 && !landscapeCoverage(mask, x - 1, y)) ||
+        (x + 1 < TILE && !landscapeCoverage(mask, x + 1, y)) ||
+        (y > 0 && !landscapeCoverage(mask, x, y - 1)) ||
+        (y + 1 < TILE && !landscapeCoverage(mask, x, y + 1));
+      const connectedEdge =
+        (x === 0 && (mask & ARENA_WALL_MASK_BITS.west) !== 0) ||
+        (x === TILE - 1 && (mask & ARENA_WALL_MASK_BITS.east) !== 0) ||
+        (y === 0 && (mask & ARENA_WALL_MASK_BITS.north) !== 0) ||
+        (y === TILE - 1 && (mask & ARENA_WALL_MASK_BITS.south) !== 0);
+      canvas.set(x, y, landscapeShade(material, materialIndex, source, x, y, phase, boundary, connectedEdge));
     }
   }
   return canvas;
 }
 
-/** Shared, seamlessly wrapping concrete field under every wall tile. */
-function concreteField() {
-  const field = new Canvas(TILE, TILE);
-  for (let y = 0; y < TILE; ++y) {
-    for (let x = 0; x < TILE; ++x) {
-      const n = octaveNoise(x, y, TILE, SEED + 4242);
-      let color = C.metalMid;
-      if (n > 0.66) color = C.metalLight;
-      else if (n < 0.3) color = C.shadowDeep;
-      else if (n < 0.42) color = C.metalDark;
-      field.set(x, y, color);
-    }
-  }
-  return field;
+function paintBoulder(canvas, cx, cy, radius, phase) {
+  canvas.disc(cx, cy + 1, radius + 1, C.outline);
+  canvas.disc(cx, cy, radius, phase % 2 === 0 ? C.treadDark : C.shadowDeep);
+  canvas.disc(cx - 0.5, cy - 0.5, Math.max(1, radius - 1), phase % 3 === 0 ? C.woodDark : C.groundDeep);
+  canvas.set(Math.floor(cx - 1), Math.floor(cy - 1), phase % 2 === 0 ? C.dustMid : C.groundLight);
 }
 
-const CONCRETE = concreteField();
-
-/** Bevel bands by depth from the lit (N/W) and shadowed (S/E) block edges. */
-const BEVEL = {
-  N: [C.outline, C.metalHi, C.metalLight],
-  W: [C.outline, C.metalHi, C.metalLight],
-  S: [C.outline, C.shadowDeep, C.metalDark],
-  E: [C.outline, C.shadowDeep, C.metalDark],
-};
-/** Tie-break order gives the corners a clean 45 degree miter. */
-const BEVEL_PRIORITY = ["N", "W", "S", "E"];
-
+/** A low, porous rock field: visible collision cover without raised Lego slabs. */
 function wallTile(edges) {
-  const canvas = CONCRETE.clone();
-  if (edges.length === 0) return canvas;
-  for (let y = 0; y < TILE; ++y) {
-    for (let x = 0; x < TILE; ++x) {
-      const distance = { N: y, S: TILE - 1 - y, W: x, E: TILE - 1 - x };
-      let best = null;
-      for (const edge of BEVEL_PRIORITY) {
-        if (!edges.includes(edge)) continue;
-        if (best === null || distance[edge] < distance[best]) best = edge;
-      }
-      const depth = distance[best];
-      if (depth < BEVEL[best].length) canvas.set(x, y, BEVEL[best][depth]);
-    }
-  }
+  const canvas = new Canvas(TILE, TILE);
+  const edgePhase = edges.reduce((value, edge) => value + edge.charCodeAt(0), 0);
+  const rocks = [
+    [3, 4, 2],
+    [8, 3, 3],
+    [13, 5, 2],
+    [4, 10, 3],
+    [10, 9, 3],
+    [13, 13, 2],
+    [6, 14, 2],
+  ];
+  rocks.forEach(([baseX, baseY, radius], index) => {
+    const phase = edgePhase + index * 17;
+    const x = baseX + ((phase % 3) - 1);
+    const y = baseY + (((phase >> 2) % 3) - 1);
+    paintBoulder(canvas, x, y, radius, phase);
+  });
   return canvas;
+}
+
+/** Retained for the stable generated face-table contract; coincident and hidden behind the top. */
+function wallFaceTile(edges) {
+  return wallTile(edges);
 }
 
 const CRATE = [
@@ -1003,16 +1354,224 @@ function pickupPadTile() {
   return canvas;
 }
 
+/** Cosmetic floor details; transparent and deliberately collision-free. */
+function grassClumpTile() {
+  const canvas = new Canvas(TILE, TILE);
+  for (const [x, y, flip] of [
+    [4, 10, 1],
+    [9, 5, -1],
+    [12, 12, -1],
+  ]) {
+    canvas.set(x, y, C.groundDeep);
+    canvas.set(x, y - 1, C.groundDark);
+    canvas.set(x + flip, y - 2, C.groundLight);
+    canvas.set(x + flip, y - 3, C.groundLight);
+  }
+  return canvas;
+}
+
+function stonesTile() {
+  const canvas = new Canvas(TILE, TILE);
+  for (const [x, y] of [
+    [3, 5],
+    [10, 11],
+    [13, 4],
+  ]) {
+    canvas.set(x + 1, y + 1, C.shadowDeep);
+    canvas.set(x, y, C.metalLight);
+    canvas.set(x + 1, y, C.metalMid);
+    canvas.set(x, y + 1, C.metalDark);
+  }
+  return canvas;
+}
+
+function treadScuffTile() {
+  const canvas = new Canvas(TILE, TILE);
+  for (let step = 0; step < 5; step += 1) {
+    const x = 3 + step * 2;
+    const y = 4 + step;
+    canvas.set(x, y, C.groundDeep);
+    canvas.set(x + 1, y, C.groundDark);
+    canvas.set(x - 1, y + 4, C.groundDark);
+    canvas.set(x, y + 4, C.groundDeep);
+  }
+  return canvas;
+}
+
+function scorchTile() {
+  const canvas = new Canvas(TILE, TILE);
+  const centre = 7.5;
+  for (let y = 2; y < TILE - 2; y += 1) {
+    for (let x = 2; x < TILE - 2; x += 1) {
+      const distance = Math.hypot(x - centre, y - centre);
+      const breakup = hash2(x, y, SEED + 6121);
+      if (distance < 3.2 && breakup > 0.18) canvas.set(x, y, C.smokeDark);
+      else if (distance < 5.5 && breakup > 0.62) canvas.set(x, y, C.groundDeep);
+    }
+  }
+  canvas.set(6, 7, C.emberDeep);
+  canvas.set(9, 8, C.ember);
+  return canvas;
+}
+
+/** Transparent dirt service lane selected by a four-neighbour road mask. */
+function serviceRoadTile(mask) {
+  const canvas = new Canvas(TILE, TILE);
+  const paint = (x0, y0, x1, y1) => {
+    for (let y = y0; y <= y1; y += 1) {
+      for (let x = x0; x <= x1; x += 1) {
+        const edge = x === x0 || x === x1 || y === y0 || y === y1;
+        const fleck = hash2(x, y, SEED + 6203) > 0.84;
+        canvas.set(x, y, edge ? C.groundDark : fleck ? C.dustLight : C.dustMid);
+      }
+    }
+  };
+  paint(2, 2, 13, 13);
+  if (mask & ARENA_WALL_MASK_BITS.north) paint(2, 8, 13, 15);
+  if (mask & ARENA_WALL_MASK_BITS.south) paint(2, 0, 13, 7);
+  if (mask & ARENA_WALL_MASK_BITS.east) paint(8, 2, 15, 13);
+  if (mask & ARENA_WALL_MASK_BITS.west) paint(0, 2, 7, 13);
+
+  // Paired worn ruts keep a long lane readable after the 2:1 projection.
+  if (mask & (ARENA_WALL_MASK_BITS.north | ARENA_WALL_MASK_BITS.south)) {
+    for (let y = 1; y < TILE; y += 3) {
+      if (canvas.alpha(5, y) !== 0) canvas.set(5, y, C.groundDeep);
+      if (canvas.alpha(10, y) !== 0) canvas.set(10, y, C.groundDeep);
+    }
+  }
+  if (mask & (ARENA_WALL_MASK_BITS.east | ARENA_WALL_MASK_BITS.west)) {
+    for (let x = 1; x < TILE; x += 3) {
+      if (canvas.alpha(x, 5) !== 0) canvas.set(x, 5, C.groundDeep);
+      if (canvas.alpha(x, 10) !== 0) canvas.set(x, 10, C.groundDeep);
+    }
+  }
+  return canvas;
+}
+
+function sliceDecal(canvas, cellX, cellY) {
+  const tile = new Canvas(TILE, TILE);
+  for (let y = 0; y < TILE; y += 1) {
+    for (let x = 0; x < TILE; x += 1) tile.set(x, y, canvas.get(cellX * TILE + x, cellY * TILE + y));
+  }
+  return tile;
+}
+
+function stagingPadTiles() {
+  const canvas = new Canvas(TILE * 2, TILE * 2);
+  for (let y = 1; y < canvas.height - 1; y += 1) {
+    for (let x = 1; x < canvas.width - 1; x += 1) {
+      const edge = x < 3 || y < 3 || x >= canvas.width - 3 || y >= canvas.height - 3;
+      const fleck = hash2(x, y, SEED + 6299) > 0.86;
+      canvas.set(x, y, edge ? C.metalDark : fleck ? C.metalLight : C.metalMid);
+    }
+  }
+  // Warm safety paint and a cool repair cross keep the staging bay playful
+  // and legible after the arena's 2:1 projection.
+  for (let offset = 4; offset < 28; offset += 6) {
+    for (let step = 0; step < 3; step += 1) {
+      canvas.set(offset + step, 2, C.goldBase);
+      canvas.set(29, offset + step, C.goldDark);
+    }
+  }
+  for (let y = 11; y <= 20; y += 1) {
+    for (let x = 11; x <= 20; x += 1) {
+      if ((x >= 14 && x <= 17) || (y >= 14 && y <= 17)) canvas.set(x, y, (x + y) & 1 ? C.skyBlue : C.seaBlue);
+    }
+  }
+  return [sliceDecal(canvas, 0, 0), sliceDecal(canvas, 1, 0), sliceDecal(canvas, 0, 1), sliceDecal(canvas, 1, 1)];
+}
+
+function craterTiles() {
+  const canvas = new Canvas(TILE * 2, TILE * 2);
+  const centre = 15.5;
+  for (let y = 0; y < canvas.height; y += 1) {
+    for (let x = 0; x < canvas.width; x += 1) {
+      const angle = Math.atan2(y - centre, x - centre);
+      const wobble = Math.sin(angle * 5) * 1.25 + (hash2(x, y, SEED + 6323) - 0.5) * 1.8;
+      const distance = Math.hypot(x - centre, (y - centre) * 1.08);
+      if (distance < 7.2 + wobble) canvas.set(x, y, hash2(x, y, SEED + 6329) > 0.76 ? C.emberDeep : C.smokeDark);
+      else if (distance < 11.5 + wobble) canvas.set(x, y, hash2(x, y, SEED + 6337) > 0.62 ? C.dustLight : C.groundDeep);
+      else if (distance < 14 + wobble && hash2(x, y, SEED + 6343) > 0.7) canvas.set(x, y, C.dustMid);
+    }
+  }
+  for (const [x, y] of [
+    [10, 9],
+    [20, 12],
+    [14, 22],
+    [23, 19],
+  ])
+    canvas.set(x, y, C.ember);
+  return [sliceDecal(canvas, 0, 0), sliceDecal(canvas, 1, 0), sliceDecal(canvas, 0, 1), sliceDecal(canvas, 1, 1)];
+}
+
+function oilSpillTile() {
+  const canvas = new Canvas(TILE, TILE);
+  for (let y = 3; y < 13; y += 1) {
+    for (let x = 2; x < 14; x += 1) {
+      const distance = Math.hypot(x - 7.5, (y - 7.5) * 1.35);
+      if (distance < 5.2 + (hash2(x, y, SEED + 6361) - 0.5) * 2) canvas.set(x, y, C.shadowDeep);
+    }
+  }
+  canvas.set(6, 5, C.seaBlue);
+  canvas.set(7, 5, C.skyBlue);
+  canvas.set(10, 9, C.ember);
+  return canvas;
+}
+
+function shellCasesTile() {
+  const canvas = new Canvas(TILE, TILE);
+  for (const [x, y, dx] of [
+    [3, 5, 1],
+    [8, 10, -1],
+    [12, 4, -1],
+    [5, 13, 1],
+  ]) {
+    canvas.set(x, y, C.goldLight);
+    canvas.set(x + dx, y, C.goldBase);
+    canvas.set(x - dx, y + 1, C.goldDark);
+  }
+  return canvas;
+}
+
+function fieldFlowersTile() {
+  const canvas = grassClumpTile();
+  for (const [x, y, color] of [
+    [3, 6, C.flame],
+    [10, 11, C.skyBlue],
+    [13, 4, C.hot],
+    [6, 13, C.red],
+  ]) {
+    canvas.set(x, y, color);
+    canvas.set(x - 1, y, C.goldLight);
+  }
+  return canvas;
+}
+
+function cautionPaintTile() {
+  const canvas = new Canvas(TILE, TILE);
+  for (let step = -8; step < 24; step += 6) {
+    for (let y = 4; y < 12; y += 1) {
+      const x = step + Math.floor((y - 4) / 2);
+      if (x >= 0 && x < TILE) canvas.set(x, y, y === 4 || y === 11 ? C.goldDark : C.goldBase);
+      if (x + 1 >= 0 && x + 1 < TILE) canvas.set(x + 1, y, C.goldLight);
+    }
+  }
+  return canvas;
+}
+
 /**
  * Sheet order is Defold tile order: left to right, top row first, 1-based.
  * `layer` says whether a tile replaces the ground or overlays it.
  */
 function buildTileSheet() {
+  const stagingPad = stagingPadTiles();
+  const crater = craterTiles();
   const baseTiles = [
-    { role: "ground.0", layer: "ground", canvas: groundTile(0) },
-    { role: "ground.1", layer: "ground", canvas: groundTile(1) },
-    { role: "ground.2", layer: "ground", canvas: groundTile(2) },
-    { role: "ground.3", layer: "ground", canvas: groundTile(3) },
+    ...Array.from({ length: ARENA_GROUND_VARIANT_COUNT }, (_, variant) => ({
+      role: `ground.${variant}`,
+      layer: "ground",
+      canvas: groundTile(variant),
+    })),
     { role: "wall.centre", layer: "ground", canvas: wallTile([]) },
     { role: "wall.n", layer: "ground", canvas: wallTile(["N"]) },
     { role: "wall.s", layer: "ground", canvas: wallTile(["S"]) },
@@ -1022,10 +1581,34 @@ function buildTileSheet() {
     { role: "wall.nw", layer: "ground", canvas: wallTile(["N", "W"]) },
     { role: "wall.se", layer: "ground", canvas: wallTile(["S", "E"]) },
     { role: "wall.sw", layer: "ground", canvas: wallTile(["S", "W"]) },
+    { role: "wallFace.centre", layer: "wall-face", canvas: wallFaceTile([]) },
+    { role: "wallFace.n", layer: "wall-face", canvas: wallFaceTile(["N"]) },
+    { role: "wallFace.s", layer: "wall-face", canvas: wallFaceTile(["S"]) },
+    { role: "wallFace.e", layer: "wall-face", canvas: wallFaceTile(["E"]) },
+    { role: "wallFace.w", layer: "wall-face", canvas: wallFaceTile(["W"]) },
+    { role: "wallFace.ne", layer: "wall-face", canvas: wallFaceTile(["N", "E"]) },
+    { role: "wallFace.nw", layer: "wall-face", canvas: wallFaceTile(["N", "W"]) },
+    { role: "wallFace.se", layer: "wall-face", canvas: wallFaceTile(["S", "E"]) },
+    { role: "wallFace.sw", layer: "wall-face", canvas: wallFaceTile(["S", "W"]) },
     { role: "crate", layer: "overlay", canvas: crateTile() },
     { role: "sandbag", layer: "overlay", canvas: sandbagTile() },
     { role: "spawnPad", layer: "overlay", canvas: spawnPadTile() },
     { role: "pickupPad", layer: "overlay", canvas: pickupPadTile() },
+    { role: "ambient.grass", layer: "decor", canvas: grassClumpTile() },
+    { role: "ambient.stones", layer: "decor", canvas: stonesTile() },
+    { role: "ambient.tracks", layer: "decor", canvas: treadScuffTile() },
+    { role: "ambient.scorch", layer: "decor", canvas: scorchTile() },
+    ...Array.from({ length: 16 }, (_, mask) => ({
+      role: `road.${mask}`,
+      layer: "decor",
+      canvas: serviceRoadTile(mask),
+    })),
+    ...stagingPad.map((canvas, index) => ({ role: `staging.${index}`, layer: "decor", canvas })),
+    ...crater.map((canvas, index) => ({ role: `crater.${index}`, layer: "decor", canvas })),
+    { role: "ambient.oil-spill", layer: "decor", canvas: oilSpillTile() },
+    { role: "ambient.shell-cases", layer: "decor", canvas: shellCasesTile() },
+    { role: "ambient.field-flowers", layer: "decor", canvas: fieldFlowersTile() },
+    { role: "ambient.caution-paint", layer: "decor", canvas: cautionPaintTile() },
     ...loadWorldTiles(),
   ];
   const tiles = ARENA_THEMES.flatMap((theme) =>
@@ -1053,84 +1636,8 @@ function buildTileSheet() {
 // Tanks
 // ---------------------------------------------------------------------------
 
-const TANK = 32;
-/**
- * Everything below is authored for the top half only and mirrored, which both
- * halves the amount of hand-placed detail and guarantees the opaque bounding
- * box is exactly centred on the rotation pivot.
- *
- * Layout, +X forward:  rows 6-9 tread, rows 10-21 hull body, rows 22-25 tread.
- * The turret sprite covers x 8-23 / rows 12-19, so the hull's team colour lives
- * in the rear deck, the nose and the fender strips that frame the turret.
- */
-const TREAD_X0 = 2;
-const TREAD_X1 = 26;
-/** Hull body spans, top half only: [row, x0, x1]. */
-const HULL_ROWS = [
-  [10, 3, 26],
-  [11, 3, 27],
-  [12, 3, 28],
-  [13, 3, 29],
-  [14, 3, 29],
-  [15, 3, 29],
-];
-/** Turret spans, top half only: [row, x0, x1]. */
-const TURRET_ROWS = [
-  [12, 10, 21],
-  [13, 9, 22],
-  [14, 8, 23],
-  [15, 8, 23],
-];
-
-/** Un-outlined hull, shared by the live tank and by the wreck. */
-function tankHullBody(team, frame) {
-  const ramp = TEAMS[team];
-  const canvas = new Canvas(TANK, TANK);
-
-  // --- track: 4 rows, mirrored to rows 22-25 -------------------------------
-  canvas.hline(TREAD_X0, TREAD_X1, 6, C.treadBase);
-  canvas.hline(TREAD_X0, TREAD_X1, 7, C.treadSheen);
-  canvas.hline(TREAD_X0, TREAD_X1, 8, C.treadBase);
-  canvas.hline(TREAD_X0, TREAD_X1, 9, C.treadDark);
-  const phase = frame === 0 ? 0 : 2;
-  for (let x = TREAD_X0; x <= TREAD_X1; ++x) {
-    if ((x - TREAD_X0 + phase) % 4 !== 0) continue;
-    canvas.vline(x, 6, 8, C.treadDark); // track link, rolling between frames
-  }
-  canvas.rect(TREAD_X0, 7, 2, 2, C.treadSheen); // rear drive sprocket
-  canvas.rect(TREAD_X1 - 1, 7, 2, 2, C.treadSheen); // front idler
-
-  // --- hull body -----------------------------------------------------------
-  for (const [y, x0, x1] of HULL_ROWS) {
-    canvas.hline(x0, x1, y, ramp.base);
-    canvas.hline(Math.max(22, x0), x1, y, ramp.light); // sloped glacis
-    canvas.hline(x1 - 2, x1, y, ramp.highlight); // lit nose edge
-    canvas.hline(x0, x0 + 1, y, ramp.shadow); // rear plate
-  }
-  canvas.hline(3, 26, 10, ramp.shadow); // fender shadow line
-  canvas.vline(21, 10, 15, ramp.shadow); // deck / glacis seam
-  canvas.rect(5, 11, 5, 1, C.metalDark); // engine louvres
-  canvas.rect(5, 13, 5, 1, C.metalDark);
-  canvas.rect(1, 12, 2, 2, C.metalDark); // exhaust stubs
-  canvas.rect(1, 12, 2, 1, C.metalMid);
-
-  // --- turret well: a shallow ring the turret sprite seats into ------------
-  for (let y = 11; y <= 15; ++y) {
-    for (let x = 11; x <= 21; ++x) {
-      const d = Math.hypot(x - 16, y - 15.5);
-      if (d <= 4.2 && d >= 3.2) canvas.set(x, y, ramp.shadow);
-      else if (d < 3.2) canvas.set(x, y, C.metalDark);
-    }
-  }
-
-  return canvas;
-}
-
-function tankHull(team, frame) {
-  const canvas = tankHullBody(team, frame);
-  canvas.mirrorTopToBottom();
-  outline(canvas, C.outline);
-  return canvas;
+function tankHull(team, direction, frame) {
+  return productionTankLayer("scout", "hull", direction, team, frame);
 }
 
 /**
@@ -1138,56 +1645,16 @@ function tankHull(team, frame) {
  * in the same sampled metal palette. Keeping the team as an input is
  * important: a chassis swap must not erase the team colour of the tank.
  */
-function chassisHull(team, kind, frame) {
-  const canvas = tankHull(team, frame);
-  if (kind === "scout") {
-    canvas.rect(25, 11, 4, 2, C.skyBlue);
-    canvas.rect(25, 19, 4, 2, C.seaBlue);
-  } else if (kind === "assault") {
-    canvas.rect(4, 10, 4, 2, C.metalHi);
-    canvas.rect(4, 20, 4, 2, C.metalHi);
-  } else if (kind === "bulwark") {
-    canvas.rect(27, 11, 3, 10, C.metalLight);
-    canvas.rect(26, 13, 2, 6, C.metalHi);
-  } else {
-    canvas.rect(6, 11, 2, 10, C.deepBlue);
-    canvas.rect(23, 11, 2, 10, C.deepBlue);
-  }
-  return canvas;
+function chassisHull(team, kind, direction, frame) {
+  return productionTankLayer(kind, "hull", direction, team, frame);
 }
 
-function tankTurret(team) {
-  const ramp = TEAMS[team];
-  const canvas = new Canvas(TANK, TANK);
+function tankTurret(team, direction) {
+  return productionTankLayer("scout", "turret", direction, team);
+}
 
-  for (const [y, x0, x1] of TURRET_ROWS) {
-    canvas.hline(x0, x1, y, ramp.base);
-    canvas.hline(x0, x0 + 1, y, ramp.shadow); // rear of the turret
-    canvas.hline(17, x1, y, ramp.light); // lit front cheeks
-  }
-  canvas.hline(10, 21, 12, ramp.shadow); // turret rim
-  canvas.hline(17, 22, 15, ramp.highlight);
-  // Commander cupola, sitting at the rear of the ring.
-  for (let y = 12; y <= 15; ++y) {
-    for (let x = 9; x <= 17; ++x) {
-      const d = Math.hypot(x - 13, y - 15.5);
-      if (d <= 3.0 && d >= 2.1) canvas.set(x, y, ramp.shadow);
-      else if (d < 2.1) canvas.set(x, y, ramp.light);
-    }
-  }
-  canvas.rect(20, 13, 4, 3, C.metalDark); // mantlet
-  canvas.rect(20, 15, 4, 1, C.metalMid);
-
-  // --- barrel: a flat 4px tube opening into a 6px muzzle brake -------------
-  canvas.hline(23, 30, 14, C.metalMid);
-  canvas.hline(23, 30, 15, C.metalLight);
-  canvas.hline(28, 30, 13, C.metalDark);
-  canvas.hline(28, 30, 14, C.metalLight);
-  canvas.hline(28, 30, 15, C.metalHi);
-
-  canvas.mirrorTopToBottom();
-  outline(canvas, C.outline);
-  return canvas;
+function chassisTurret(team, kind, direction) {
+  return productionTankLayer(kind, "turret", direction, team);
 }
 
 /**
@@ -1214,37 +1681,33 @@ const CHAR_RAMP = (team) => {
 };
 
 function tankWreck(team) {
-  const hull = tankHullBody(team, 0);
+  const hull = productionTankLayer("scout", "hull", "e", team);
   const char = CHAR_RAMP(team);
-  const canvas = new Canvas(TANK, TANK);
-  for (let y = 0; y < TANK; ++y) {
-    for (let x = 0; x < TANK; ++x) {
+  const canvas = new Canvas(PRODUCTION_TANK_CELL, PRODUCTION_TANK_CELL);
+  canvas.rotationAnchor = hull.rotationAnchor;
+  for (let y = 0; y < PRODUCTION_TANK_CELL; ++y) {
+    for (let x = 0; x < PRODUCTION_TANK_CELL; ++x) {
       if (hull.alpha(x, y) === 0) continue;
       const source = hull.get(x, y);
       canvas.set(x, y, char.get(`${source[0]},${source[1]},${source[2]}`) ?? source);
     }
   }
 
-  // Damage is authored on the top half only, so mirroring keeps the wreck
-  // centred on the same pivot as the tank it replaces.
   const random = mulberry32(SEED + 991);
-  for (let i = 0; i < 16; ++i) {
-    const x = 5 + Math.floor(random() * 22);
-    const y = 11 + Math.floor(random() * 5);
+  for (let i = 0; i < 24; ++i) {
+    const x = 36 + Math.floor(random() * 56);
+    const y = 48 + Math.floor(random() * 32);
     canvas.set(x, y, random() > 0.8 ? C.emberDeep : C.outline);
   }
-  canvas.rect(13, 12, 6, 4, C.outline); // blown turret well
-  canvas.set(14, 13, C.emberDeep);
-  canvas.set(16, 14, C.ember);
-  canvas.set(17, 12, C.emberDeep);
-  canvas.set(15, 15, C.ember);
-  canvas.rect(24, 6, 3, 2, [0, 0, 0, 0]); // track shot off the front idler
-  canvas.set(23, 8, C.smokeDark);
-  canvas.rect(5, 10, 3, 1, [0, 0, 0, 0]); // torn rear fender
-  canvas.set(9, 13, C.woodDark); // rust streaks
-  canvas.set(22, 15, C.woodDark);
-
-  canvas.mirrorTopToBottom();
+  canvas.rect(55, 48, 18, 8, C.outline); // blown turret ring
+  canvas.set(58, 51, C.emberDeep);
+  canvas.set(63, 52, C.ember);
+  canvas.set(69, 50, C.emberDeep);
+  canvas.rect(90, 66, 7, 5, [0, 0, 0, 0]); // track shot off the front idler
+  canvas.set(78, 59, C.smokeDark);
+  canvas.rect(31, 61, 6, 4, [0, 0, 0, 0]); // torn rear fender
+  canvas.set(42, 69, C.woodDark);
+  canvas.set(84, 64, C.woodDark);
   outline(canvas, C.outline);
   return canvas;
 }
@@ -1465,92 +1928,149 @@ function sparkRing(canvas, cx, cy, seed, count, distance, colors) {
   }
 }
 
+/** Long, broken arcade sparks; much more readable in motion than a dotted halo. */
+function sparkStreaks(canvas, cx, cy, seed, count, innerDistance, outerDistance, colors) {
+  const random = mulberry32(seed);
+  const limit = Math.min(cx, cy, canvas.width - 1 - cx, canvas.height - 1 - cy) - 1.5;
+  for (let index = 0; index < count; index += 1) {
+    const angle = (index / count) * Math.PI * 2 + random() * 0.55;
+    const start = innerDistance * (0.82 + random() * 0.28);
+    const end = Math.min(outerDistance * (0.8 + random() * 0.34), limit);
+    for (let distance = start; distance <= end; distance += 1) {
+      if (Math.floor(distance - start) % 3 === 2) continue;
+      const x = Math.round(cx + Math.cos(angle) * distance);
+      const y = Math.round(cy + Math.sin(angle) * distance);
+      canvas.set(
+        x,
+        y,
+        colors[Math.min(colors.length - 1, Math.floor(((distance - start) / (end - start + 1)) * colors.length))],
+      );
+    }
+  }
+}
+
 /**
  * A six/eight frame bloom-then-smoke arc: white-hot core, flame shell, ember
  * shell, then the fire is replaced by expanding, breaking-up smoke puffs.
  */
 function explosionFrames(size, frameCount, seed) {
   const centre = size / 2 - 0.5;
-  const maxR = size * 0.41; // leaves room for the ejected debris ring
+  const maxR = size * 0.32;
   const wobble = wobbleField(seed);
   const frames = [];
   for (let index = 0; index < frameCount; ++index) {
     const t = index / (frameCount - 1);
     const canvas = new Canvas(size, size);
-    const radius = maxR * (0.26 + 0.74 * Math.pow(t, 0.48));
+    const radius = maxR * (0.22 + 0.78 * Math.min(1, t / 0.58));
 
-    if (t < 0.22) {
+    if (t < 0.18) {
       fillBlob(canvas, centre, centre, radius, wobble, [
-        [0.46, C.hot],
-        [0.8, C.flame],
-        [1.0, C.ember],
+        [0.4, C.hot],
+        [0.7, C.goldLight],
+        [1.0, C.flame],
       ]);
-    } else if (t < 0.52) {
+      sparkStreaks(canvas, centre, centre, seed + index, 8, radius * 0.6, radius * 2.2, [C.hot, C.flame]);
+    } else if (t < 0.58) {
       fillBlob(canvas, centre, centre, radius, wobble, [
-        [0.3, C.hot],
-        [0.6, C.flame],
-        [0.84, C.ember],
-        [1.0, C.emberDeep],
+        [0.22, C.hot],
+        [0.46, C.goldLight],
+        [0.7, C.flame],
+        [0.9, C.ember],
+        [1.0, C.red],
       ]);
-    } else if (t < 0.74) {
-      fillBlob(canvas, centre, centre, radius, wobble, [
-        [0.22, C.flame],
-        [0.48, C.ember],
-        [0.72, C.emberDeep],
-        [1.0, C.smokeLight],
+      // Offset flame lobes keep the burst playful and asymmetrical instead of
+      // reading as one grey-edged sticker.
+      const lobe = radius * 0.26;
+      canvas.disc(centre - radius * 0.5, centre - radius * 0.3, lobe, C.flame);
+      canvas.disc(centre + radius * 0.45, centre - radius * 0.46, lobe * 0.86, C.goldLight);
+      canvas.disc(centre + radius * 0.52, centre + radius * 0.28, lobe * 0.74, C.ember);
+      fillBlob(canvas, centre, centre, radius * 0.48, wobble, [
+        [0.4, C.hot],
+        [0.72, C.goldLight],
+        [1.0, C.flame],
       ]);
+      sparkStreaks(canvas, centre, centre, seed + index, size >= 64 ? 12 : 8, radius * 0.72, radius * 1.58, [
+        C.hot,
+        C.flame,
+        C.ember,
+      ]);
+    } else if (t < 0.76) {
+      // Bridge fire into smoke without turning the whole frame into one dark
+      // red silhouette.  The smoke mass establishes the outer shape; a much
+      // smaller, off-centre fire pocket remains visible through it.  This is
+      // the single frame players read most often when the camera is moving,
+      // so preserving separate materials matters more than a smooth radial
+      // interpolation between the neighbouring frames.
       canvas.blit(
-        smokeMass(size, centre, centre, radius, 6, radius * 0.34, seed + 17, C.smokeLight, C.smokeDark, 0),
+        smokeMass(
+          size,
+          centre,
+          centre - radius * 0.08,
+          radius * 0.92,
+          8,
+          radius * 0.27,
+          seed + 17,
+          C.smokeLight,
+          C.shadowDeep,
+          0.1,
+        ),
         0,
         0,
       );
-      fillBlob(canvas, centre, centre, radius * 0.34, wobble, [
-        [0.5, C.flame],
-        [1.0, C.ember],
+      fillBlob(canvas, centre - radius * 0.06, centre + radius * 0.12, radius * 0.58, wobble, [
+        [0.22, C.goldLight],
+        [0.46, C.flame],
+        [0.76, C.ember],
+        [1.0, C.red],
       ]);
-    } else if (t < 0.92) {
+      canvas.disc(centre + radius * 0.24, centre - radius * 0.14, Math.max(1, radius * 0.14), C.flame);
+      sparkStreaks(canvas, centre, centre, seed + index, 9, radius * 0.8, radius * 1.48, [
+        C.goldLight,
+        C.flame,
+        C.ember,
+      ]);
+    } else if (t < 0.94) {
       canvas.blit(
-        smokeMass(size, centre, centre, radius, 7, radius * 0.38, seed + 17, C.smokeLight, C.smokeDark, 0.3),
+        smokeMass(size, centre, centre, radius * 0.92, 8, radius * 0.28, seed + 17, C.smokeLight, C.smokeDark, 0.04),
         0,
         0,
       );
-      fillBlob(canvas, centre, centre, radius * 0.26, wobble, [
-        [0.55, C.ember],
-        [1.0, C.emberDeep],
-      ]);
+      canvas.disc(centre - 2, centre + 1, Math.max(1, radius * 0.16), C.ember);
+      sparkRing(canvas, centre, centre, seed + index, 5, radius * 1.18, [C.flame, C.ember, C.skyBlue]);
     } else {
-      // The last wisp: lighter and thinner, not a darker version of frame 5.
       canvas.blit(
-        smokeMass(size, centre, centre, radius, 7, radius * 0.38, seed + 17, C.smokeLight, C.smokeDark, 0.36),
+        smokeMass(
+          size,
+          centre,
+          centre - radius * 0.08,
+          radius * 0.78,
+          6,
+          radius * 0.24,
+          seed + 17,
+          C.smokeLight,
+          C.smokeDark,
+          0,
+        ),
         0,
         0,
       );
     }
 
-    if (size >= 64 && index >= 1 && index <= 2) {
-      // A shockwave rim the small explosion does not get.
-      const ringRadius = radius * 1.1;
+    if (size >= 64 && index === 1) {
+      const ringRadius = radius * 1.36;
       for (let y = 0; y < size; ++y) {
         for (let x = 0; x < size; ++x) {
           const dx = x - centre;
           const dy = y - centre;
           const d = Math.hypot(dx, dy);
           const edge = ringRadius * wobble(Math.atan2(dy, dx));
-          if (Math.abs(d - edge) <= 0.6) canvas.set(x, y, index === 1 ? C.hot : C.flame);
+          if (Math.abs(d - edge) <= 0.55) canvas.set(x, y, C.goldLight);
         }
       }
     }
 
     dropSmallIslands(canvas, 5);
-    // The tutorial's own explosion frames carry a dark smoke edge rather than
-    // the sprite outline; the first flash and the final wisp carry none at all.
-    if (index > 0 && index < frameCount - 1) outline(canvas, C.smokeDark);
-    // Ejected debris is drawn last: a spark is a single bright pixel and must
-    // not pick up the smoke border, which would turn it into a 3x3 dark box.
-    if (index >= 1 && index <= frameCount - 2) {
-      const heat = t < 0.5 ? [C.hot, C.flame] : t < 0.8 ? [C.flame, C.ember] : [C.ember, C.emberDeep];
-      sparkRing(canvas, centre, centre, seed + index, 9, radius * 1.1, heat);
-    }
+    if (index > 0 && index < frameCount - 1) outline(canvas, t < 0.58 ? C.emberDeep : C.smokeDark);
     frames.push(canvas);
   }
   return frames;
@@ -1830,6 +2350,78 @@ function pickupPadSprite(frame) {
 }
 
 // ---------------------------------------------------------------------------
+// Isometric battlefield landmarks
+// ---------------------------------------------------------------------------
+
+let landmarkSourceCache;
+
+function landmarkSources() {
+  if (landmarkSourceCache) return landmarkSourceCache;
+  const metadataBytes = readFileSync(resolve(landmarkSourceRoot, "source.json"));
+  const metadata = JSON.parse(metadataBytes.toString("utf8"));
+  const sheetBytes = readFileSync(resolve(landmarkSourceRoot, metadata.source));
+  if (metadata.schemaVersion !== 1 || sha256(sheetBytes) !== metadata.sha256) {
+    throw new Error("world landmark source or provenance changed; update source.json deliberately");
+  }
+  const sheet = decodePng(sheetBytes);
+  if (sheet.width !== metadata.dimensions[0] || sheet.height !== metadata.dimensions[1]) {
+    throw new Error("world landmark source dimensions disagree with source.json");
+  }
+  landmarkSourceCache = { metadata, metadataBytes, sheetBytes, sheet };
+  return landmarkSourceCache;
+}
+
+function landmarkSprite(id) {
+  const { metadata, sheet } = landmarkSources();
+  const cut = metadata.cuts[id];
+  if (!Array.isArray(cut) || cut.length !== 4) throw new Error(`world landmark ${id} has no crop`);
+  const [sourceX, sourceY, sourceWidth, sourceHeight] = cut;
+  const scale = metadata.downsample;
+  const sampledWidth = Math.floor(sourceWidth / scale);
+  const sampledHeight = Math.floor(sourceHeight / scale);
+  const sampled = new Canvas(sampledWidth, sampledHeight);
+  for (let y = 0; y < sampledHeight; y += 1) {
+    for (let x = 0; x < sampledWidth; x += 1) {
+      const pixel = sheet.data.subarray(
+        ((sourceY + y * scale + (scale >> 1)) * sheet.width + sourceX + x * scale + (scale >> 1)) * 4,
+        ((sourceY + y * scale + (scale >> 1)) * sheet.width + sourceX + x * scale + (scale >> 1)) * 4 + 4,
+      );
+      // The background-removal pass intentionally feathers only the cutout
+      // edge. Collapse that feather to a hard native-pixel alpha boundary.
+      if (pixel[3] >= 128) sampled.set(x, y, [pixel[0], pixel[1], pixel[2], 255]);
+    }
+  }
+  const bounds = sampled.opaqueBbox();
+  if (!bounds) throw new Error(`world landmark ${id} has no opaque pixels`);
+  const [x0, y0, x1, y1] = bounds;
+  const width = x1 - x0 + 1;
+  const height = y1 - y0 + 1;
+  const [outputWidth, outputHeight] = metadata.outputCell;
+  if (width > outputWidth || height > metadata.groundLine) {
+    throw new Error(`world landmark ${id} does not fit ${outputWidth}x${outputHeight}: ${width}x${height}`);
+  }
+  const canvas = new Canvas(outputWidth, outputHeight);
+  const destinationX = Math.floor((outputWidth - width) / 2);
+  const destinationY = metadata.groundLine - height;
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) canvas.set(destinationX + x, destinationY + y, sampled.get(x0 + x, y0 + y));
+  }
+  return canvas;
+}
+
+const LANDMARK_IDS = Object.freeze([
+  "field-bunker",
+  "rock-outcrop",
+  "supply-dump",
+  "tank-wreck",
+  "fuel-cluster",
+  "gun-nest",
+  "radio-mast",
+  "scrap-barricade",
+  "shell-crater",
+]);
+
+// ---------------------------------------------------------------------------
 // HUD chips
 // ---------------------------------------------------------------------------
 
@@ -1863,7 +2455,7 @@ function hudTick() {
 // Sprite inventory
 // ---------------------------------------------------------------------------
 
-/** `anchored` sprites rotate about their centre, so they must be y-centred. */
+/** Rotating sprites either centre their silhouette or declare a semantic pivot. */
 function buildSprites() {
   const sprites = [];
   const add = (name, canvas, options = {}) => {
@@ -1872,20 +2464,63 @@ function buildSprites() {
       canvas,
       outlineColor: options.outlineColor ?? "#2c2839",
       anchored: !!options.anchored,
+      rotationAnchor: options.rotationAnchor ?? canvas.rotationAnchor ?? null,
       role: options.role,
     });
   };
 
+  add("tank-depot", tankDepotSprite(), { role: "world", outlineColor: null });
+  for (const id of LANDMARK_IDS)
+    add(`landmark-${id}`, landmarkSprite(id), { role: `world.landmark.${id}`, outlineColor: null });
+
   for (const team of TEAM_ORDER) {
-    add(`tank-${team}-hull-1`, tankHull(team, 0), { anchored: true, role: `tank.${team}.hull` });
-    add(`tank-${team}-hull-2`, tankHull(team, 1), { anchored: true, role: `tank.${team}.hull` });
-    add(`tank-${team}-turret`, tankTurret(team), { anchored: true, role: `tank.${team}.turret` });
+    add(`tank-${team}-hull-1`, tankHull(team, "e", 0), { anchored: true, role: `tank.${team}.hull.alias` });
+    add(`tank-${team}-hull-2`, tankHull(team, "e", 1), { anchored: true, role: `tank.${team}.hull.alias` });
+    add(`tank-${team}-turret`, tankTurret(team, "e"), { anchored: true, role: `tank.${team}.turret.alias` });
     add(`tank-${team}-wreck`, tankWreck(team), { anchored: true, role: `tank.${team}.wreck` });
+    for (const { id: direction } of TANK_DIRECTIONS) {
+      add(`tank-${team}-hull-${direction}-1`, tankHull(team, direction, 0), {
+        anchored: true,
+        role: `tank.${team}.hull.${direction}`,
+      });
+      add(`tank-${team}-hull-${direction}-2`, tankHull(team, direction, 1), {
+        anchored: true,
+        role: `tank.${team}.hull.${direction}`,
+      });
+      add(`tank-${team}-turret-${direction}`, tankTurret(team, direction), {
+        anchored: true,
+        role: `tank.${team}.turret.${direction}`,
+      });
+    }
   }
   for (const team of TEAM_ORDER) {
-    for (const kind of ["scout", "assault", "bulwark", "artillery"]) {
-      add(`chassis-${team}-${kind}-1`, chassisHull(team, kind, 0), { anchored: true, role: `chassis.${team}.${kind}` });
-      add(`chassis-${team}-${kind}-2`, chassisHull(team, kind, 1), { anchored: true, role: `chassis.${team}.${kind}` });
+    for (const kind of TANK_CHASSIS) {
+      add(`chassis-${team}-${kind}-1`, chassisHull(team, kind, "e", 0), {
+        anchored: true,
+        role: `chassis.${team}.${kind}.alias`,
+      });
+      add(`chassis-${team}-${kind}-2`, chassisHull(team, kind, "e", 1), {
+        anchored: true,
+        role: `chassis.${team}.${kind}.alias`,
+      });
+      add(`chassis-${team}-${kind}-turret`, chassisTurret(team, kind, "e"), {
+        anchored: true,
+        role: `chassis.${team}.${kind}.turret.alias`,
+      });
+      for (const { id: direction } of TANK_DIRECTIONS) {
+        add(`chassis-${team}-${kind}-${direction}-1`, chassisHull(team, kind, direction, 0), {
+          anchored: true,
+          role: `chassis.${team}.${kind}.hull.${direction}`,
+        });
+        add(`chassis-${team}-${kind}-${direction}-2`, chassisHull(team, kind, direction, 1), {
+          anchored: true,
+          role: `chassis.${team}.${kind}.hull.${direction}`,
+        });
+        add(`chassis-${team}-${kind}-turret-${direction}`, chassisTurret(team, kind, direction), {
+          anchored: true,
+          role: `chassis.${team}.${kind}.turret.${direction}`,
+        });
+      }
     }
   }
 
@@ -1937,14 +2572,34 @@ function buildAnimations() {
   const once = (id, frames, fps) => animations.push({ id, frames, playback: "PLAYBACK_ONCE_FORWARD", fps });
   const still = (id, frame) => animations.push({ id, frames: [frame], playback: "PLAYBACK_NONE" });
 
+  still("tank-depot", "tank-depot");
+  for (const id of LANDMARK_IDS) still(`landmark-${id}`, `landmark-${id}`);
   for (const team of TEAM_ORDER) {
     loop(`tank-${team}-hull`, [`tank-${team}-hull-1`, `tank-${team}-hull-2`], 12);
+    for (const { id: direction } of TANK_DIRECTIONS) {
+      loop(
+        `tank-${team}-hull-${direction}`,
+        [`tank-${team}-hull-${direction}-1`, `tank-${team}-hull-${direction}-2`],
+        12,
+      );
+      still(`tank-${team}-turret-${direction}`, `tank-${team}-turret-${direction}`);
+    }
   }
   for (const team of TEAM_ORDER) still(`tank-${team}-turret`, `tank-${team}-turret`);
   for (const team of TEAM_ORDER) still(`tank-${team}-wreck`, `tank-${team}-wreck`);
   for (const team of TEAM_ORDER) {
-    for (const kind of ["scout", "assault", "bulwark", "artillery"]) {
+    for (const kind of TANK_CHASSIS) {
       loop(`chassis-${team}-${kind}`, [`chassis-${team}-${kind}-1`, `chassis-${team}-${kind}-2`], 10);
+      still(`chassis-${team}-${kind}-turret`, `chassis-${team}-${kind}-turret`);
+      for (const { id: direction } of TANK_DIRECTIONS) {
+        loop(
+          `chassis-${team}-${kind}-${direction}`,
+          [`chassis-${team}-${kind}-${direction}-1`, `chassis-${team}-${kind}-${direction}-2`],
+          10,
+        );
+        still(`chassis-${team}-${kind}-${direction}-idle`, `chassis-${team}-${kind}-${direction}-1`);
+        still(`chassis-${team}-${kind}-turret-${direction}`, `chassis-${team}-${kind}-turret-${direction}`);
+      }
     }
   }
 
@@ -2011,6 +2666,8 @@ function renderTileSource() {
     "  start_tile: 1",
     "  end_tile: 1",
     "}",
+    "extrude_borders: 2",
+    "inner_padding: 0",
     "",
   ].join("\n");
 }
@@ -2027,11 +2684,7 @@ function check(label, condition, detail) {
   if (!condition) failures += 1;
 }
 
-/**
- * Compose a 4x4 block out of the blob set and prove the seams are continuous:
- * every pixel opaque, and the outline colour appears only on the block's own
- * 1px perimeter - never at an interior seam.
- */
+/** Compose a 4x4 field and prove the cover stays porous rather than becoming a slab. */
 function verifyWallSeams(tiles) {
   const layout = [
     ["wall.nw", "wall.n", "wall.n", "wall.ne"],
@@ -2046,29 +2699,117 @@ function verifyWallSeams(tiles) {
     const block = new Canvas(4 * TILE, 4 * TILE);
     layout.forEach((row, j) => row.forEach((role, i) => block.blit(byRole.get(role), i * TILE, j * TILE)));
 
-    let transparent = 0;
-    let interiorOutline = 0;
-    let perimeterNonOutline = 0;
-    const isOutline = (c) => c[0] === C.outline[0] && c[1] === C.outline[1] && c[2] === C.outline[2];
+    let opaque = 0;
+    let fullyOpaqueTileEdges = 0;
     for (let y = 0; y < block.height; ++y) {
       for (let x = 0; x < block.width; ++x) {
-        const pixel = block.get(x, y);
-        if (pixel[3] === 0) transparent += 1;
-        const perimeter = x === 0 || y === 0 || x === block.width - 1 || y === block.height - 1;
-        if (!perimeter && isOutline(pixel)) interiorOutline += 1;
-        if (perimeter && !isOutline(pixel)) perimeterNonOutline += 1;
+        if (block.alpha(x, y) !== 0) opaque += 1;
       }
     }
-    check(`${theme.id} wall block 4x4 is fully opaque`, transparent === 0, `${transparent} transparent px`);
+    for (let seam = TILE; seam < block.width; seam += TILE) {
+      let verticalOpaque = 0;
+      let horizontalOpaque = 0;
+      for (let offset = 0; offset < block.height; offset += 1) {
+        if (block.alpha(seam, offset) !== 0) verticalOpaque += 1;
+        if (block.alpha(offset, seam) !== 0) horizontalOpaque += 1;
+      }
+      if (verticalOpaque === block.height) fullyOpaqueTileEdges += 1;
+      if (horizontalOpaque === block.width) fullyOpaqueTileEdges += 1;
+    }
+    const coverage = opaque / (block.width * block.height);
     check(
-      `${theme.id} wall seams carry no interior outline`,
-      interiorOutline === 0,
-      `${interiorOutline} interior outline px`,
+      `${theme.id} rock cover remains porous`,
+      coverage >= 0.35 && coverage <= 0.82,
+      `${(coverage * 100).toFixed(1)}% opaque`,
     );
     check(
-      `${theme.id} wall block perimeter is a clean 1px border`,
-      perimeterNonOutline === 0,
-      `${perimeterNonOutline} stray px`,
+      `${theme.id} rock cover has no fully opaque tile-grid seam`,
+      fullyOpaqueTileEdges === 0,
+      `${fullyOpaqueTileEdges} solid seams`,
+    );
+  }
+}
+
+function verifyGroundSeams(tiles) {
+  for (const theme of ARENA_THEMES) {
+    const variants = tiles
+      .filter((tile) => tile.theme === theme.id && tile.semanticRole.startsWith("ground."))
+      .map((tile) => tile.canvas);
+    const distance = (left, right) => (left[0] - right[0]) ** 2 + (left[1] - right[1]) ** 2 + (left[2] - right[2]) ** 2;
+    let interiorMaximum = 0;
+    let seamMaximum = 0;
+    for (let tileY = 0; tileY < GROUND_MACRO_TILES; tileY += 1) {
+      for (let tileX = 0; tileX < GROUND_MACRO_TILES; tileX += 1) {
+        const tile = variants[tileY * GROUND_MACRO_TILES + tileX];
+        const east = variants[tileY * GROUND_MACRO_TILES + ((tileX + 1) % GROUND_MACRO_TILES)];
+        const north = variants[((tileY + 1) % GROUND_MACRO_TILES) * GROUND_MACRO_TILES + tileX];
+        for (let offset = 0; offset < TILE; offset += 1) {
+          seamMaximum = Math.max(
+            seamMaximum,
+            distance(tile.get(TILE - 1, offset), east.get(0, offset)),
+            distance(tile.get(offset, TILE - 1), north.get(offset, 0)),
+          );
+        }
+        for (let y = 0; y < TILE; y += 1) {
+          for (let x = 0; x < TILE; x += 1) {
+            if (x + 1 < TILE) interiorMaximum = Math.max(interiorMaximum, distance(tile.get(x, y), tile.get(x + 1, y)));
+            if (y + 1 < TILE) interiorMaximum = Math.max(interiorMaximum, distance(tile.get(x, y), tile.get(x, y + 1)));
+          }
+        }
+      }
+    }
+    check(
+      `${theme.id} ground macro seams are no harsher than an interior transition`,
+      seamMaximum <= interiorMaximum,
+      `seam=${seamMaximum}, interior=${interiorMaximum}`,
+    );
+  }
+}
+
+function verifyLandscapeSeams(tiles) {
+  const rolesPerMaterial = ARENA_LANDSCAPE_MASK_COUNT * ARENA_LANDSCAPE_VARIANTS_PER_MASK;
+  const roleFor = (materialIndex, mask, phase) =>
+    ARENA_MEADOW_VARIANT_COUNT + materialIndex * rolesPerMaterial + mask * ARENA_LANDSCAPE_VARIANTS_PER_MASK + phase;
+  const samePixel = (left, right) =>
+    left[0] === right[0] && left[1] === right[1] && left[2] === right[2] && left[3] === right[3];
+  for (const theme of ARENA_THEMES) {
+    const byRole = new Map(
+      tiles
+        .filter((tile) => tile.theme === theme.id && tile.semanticRole.startsWith("ground."))
+        .map((tile) => [Number(tile.semanticRole.slice("ground.".length)), tile.canvas]),
+    );
+    let horizontalMismatch = 0;
+    let verticalMismatch = 0;
+    for (let materialIndex = 0; materialIndex < LANDSCAPE_MATERIALS.length; materialIndex += 1) {
+      for (let mask = 0; mask < ARENA_LANDSCAPE_MASK_COUNT; mask += 1) {
+        for (let neighbourMask = 0; neighbourMask < ARENA_LANDSCAPE_MASK_COUNT; neighbourMask += 1) {
+          for (let phase = 0; phase < ARENA_LANDSCAPE_VARIANTS_PER_MASK; phase += 1) {
+            const tile = byRole.get(roleFor(materialIndex, mask, phase));
+            if ((mask & ARENA_WALL_MASK_BITS.east) !== 0 && (neighbourMask & ARENA_WALL_MASK_BITS.west) !== 0) {
+              const east = byRole.get(roleFor(materialIndex, neighbourMask, phase ^ 1));
+              for (let offset = 0; offset < TILE; offset += 1) {
+                if (!samePixel(tile.get(TILE - 1, offset), east.get(0, offset))) horizontalMismatch += 1;
+              }
+            }
+            if ((mask & ARENA_WALL_MASK_BITS.north) !== 0 && (neighbourMask & ARENA_WALL_MASK_BITS.south) !== 0) {
+              const north = byRole.get(roleFor(materialIndex, neighbourMask, phase ^ 2));
+              for (let offset = 0; offset < TILE; offset += 1) {
+                if (!samePixel(tile.get(offset, 0), north.get(offset, TILE - 1))) verticalMismatch += 1;
+              }
+            }
+          }
+        }
+      }
+    }
+    check(
+      `${theme.id} landscape east/west masks meet byte-exactly`,
+      horizontalMismatch === 0,
+      `${horizontalMismatch} mismatched edge pixels`,
+    );
+    check(
+      `${theme.id} landscape north/south masks meet byte-exactly`,
+      verticalMismatch === 0,
+      `${verticalMismatch} mismatched edge pixels`,
     );
   }
 }
@@ -2104,10 +2845,22 @@ function verifySprite(sprite, bytes) {
   }
   let centred = null;
   if (sprite.anchored) {
-    const bboxCentreY = (bbox[1] + bbox[3]) / 2;
-    const spriteCentreY = (decoded.height - 1) / 2;
-    centred = Number((bboxCentreY - spriteCentreY).toFixed(2));
-    check(`${sprite.name}: vertically centred for rotation (dy=${centred})`, Math.abs(centred) <= 1);
+    if (sprite.rotationAnchor) {
+      const [anchorX, anchorY] = sprite.rotationAnchor;
+      const centreX = decoded.width / 2;
+      const centreY = decoded.height / 2;
+      centred = Number((anchorY - centreY).toFixed(2));
+      check(
+        `${sprite.name}: semantic rotation anchor is at canvas centre`,
+        anchorX === centreX && anchorY === centreY,
+        `anchor=${JSON.stringify(sprite.rotationAnchor)}, centre=[${centreX},${centreY}]`,
+      );
+    } else {
+      const bboxCentreY = (bbox[1] + bbox[3]) / 2;
+      const spriteCentreY = (decoded.height - 1) / 2;
+      centred = Number((bboxCentreY - spriteCentreY).toFixed(2));
+      check(`${sprite.name}: vertically centred for rotation (dy=${centred})`, Math.abs(centred) <= 1);
+    }
   }
   return { bbox, centred };
 }
@@ -2115,8 +2868,6 @@ function verifySprite(sprite, bytes) {
 // ---------------------------------------------------------------------------
 // Build
 // ---------------------------------------------------------------------------
-
-const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
 
 function buildThemeMap(theme, tiles) {
   const themed = tiles.filter((tile) => tile.theme === theme.id);
@@ -2129,6 +2880,7 @@ function buildThemeMap(theme, tiles) {
     themed.filter((tile) => tile.semanticRole.startsWith("wall.")).map((tile) => [tile.semanticRole.slice(5), tile.id]),
   );
   const wallMaskTileIds = ARENA_WALL_MASK_TO_FRAME.map((role) => wallTileIds[role]);
+  const wallFaceTileIds = ARENA_WALL_MASK_TO_FRAME.map((role) => tileId(`wallFace.${role}`));
   const groundTileIds = Array.from({ length: ARENA_GROUND_VARIANT_COUNT }, (_, index) => tileId(`ground.${index}`));
   const groundRoleTileIds = Array.from({ length: ARENA_GROUND_ROLE_WALL_BASE + 16 }, () => 0);
   groundTileIds.forEach((id, index) => {
@@ -2151,6 +2903,21 @@ function buildThemeMap(theme, tiles) {
   decorRoleTileIds[ARENA_DECOR_ROLE_PIPE_JUNCTION] = tileId("world.pipe-junction");
   decorRoleTileIds[ARENA_DECOR_ROLE_PIPE_RUN] = tileId("world.pipe-run");
   decorRoleTileIds[ARENA_DECOR_ROLE_THERMAL_VENT] = tileId("world.thermal-vent");
+  decorRoleTileIds[ARENA_DECOR_ROLE_GRASS] = tileId("ambient.grass");
+  decorRoleTileIds[ARENA_DECOR_ROLE_STONES] = tileId("ambient.stones");
+  decorRoleTileIds[ARENA_DECOR_ROLE_TRACKS] = tileId("ambient.tracks");
+  decorRoleTileIds[ARENA_DECOR_ROLE_SCORCH] = tileId("ambient.scorch");
+  for (let mask = 0; mask < 16; mask += 1) {
+    decorRoleTileIds[ARENA_DECOR_ROLE_SERVICE_ROAD_BASE + mask] = tileId(`road.${mask}`);
+  }
+  for (let index = 0; index < 4; index += 1) {
+    decorRoleTileIds[ARENA_DECOR_ROLE_STAGING_PAD_BASE + index] = tileId(`staging.${index}`);
+    decorRoleTileIds[ARENA_DECOR_ROLE_CRATER_BASE + index] = tileId(`crater.${index}`);
+  }
+  decorRoleTileIds[ARENA_DECOR_ROLE_OIL_SPILL] = tileId("ambient.oil-spill");
+  decorRoleTileIds[ARENA_DECOR_ROLE_SHELL_CASES] = tileId("ambient.shell-cases");
+  decorRoleTileIds[ARENA_DECOR_ROLE_FIELD_FLOWERS] = tileId("ambient.field-flowers");
+  decorRoleTileIds[ARENA_DECOR_ROLE_CAUTION_PAINT] = tileId("ambient.caution-paint");
 
   return {
     id: theme.id,
@@ -2158,6 +2925,7 @@ function buildThemeMap(theme, tiles) {
     groundTileIds,
     wallTileIds,
     wallMaskTileIds,
+    wallFaceTileIds,
     groundRoleTileIds,
     markRoleTileIds,
     decorRoleTileIds,
@@ -2174,13 +2942,16 @@ function buildThemeMap(theme, tiles) {
 }
 
 function renderArenaArtContract(themeMaps) {
-  const themes = themeMaps.map(({ id, name, groundRoleTileIds, markRoleTileIds, decorRoleTileIds }) => ({
-    id,
-    name,
-    groundRoleTileIds,
-    markRoleTileIds,
-    decorRoleTileIds,
-  }));
+  const themes = themeMaps.map(
+    ({ id, name, groundRoleTileIds, wallFaceTileIds, markRoleTileIds, decorRoleTileIds }) => ({
+      id,
+      name,
+      groundRoleTileIds,
+      wallFaceTileIds,
+      markRoleTileIds,
+      decorRoleTileIds,
+    }),
+  );
   const renderNumberArray = (property, values) => {
     const inline = `    ${property}: [${values.join(", ")}],`;
     if (inline.length <= 120) return [inline];
@@ -2202,6 +2973,7 @@ function renderArenaArtContract(themeMaps) {
     `    id: ${JSON.stringify(theme.id)},`,
     `    name: ${JSON.stringify(theme.name)},`,
     ...renderNumberArray("groundRoleTileIds", theme.groundRoleTileIds),
+    ...renderNumberArray("wallFaceTileIds", theme.wallFaceTileIds),
     ...renderNumberArray("markRoleTileIds", theme.markRoleTileIds),
     ...renderNumberArray("decorRoleTileIds", theme.decorRoleTileIds),
     "  },",
@@ -2218,6 +2990,10 @@ function renderArenaArtContract(themeMaps) {
     "  return ARENA_ART_THEMES[themeIndex]?.groundRoleTileIds[role] ?? 0;",
     "}",
     "",
+    "export function arenaWallFaceTileId(themeIndex: number, mask: number): number {",
+    "  return ARENA_ART_THEMES[themeIndex]?.wallFaceTileIds[mask] ?? 0;",
+    "}",
+    "",
     "export function arenaDecorTileId(themeIndex: number, role: number): number {",
     "  return ARENA_ART_THEMES[themeIndex]?.decorRoleTileIds[role] ?? 0;",
     "}",
@@ -2229,9 +3005,93 @@ function renderArenaArtContract(themeMaps) {
   ].join("\n");
 }
 
+function renderTankArtContract() {
+  const hash = (id) => `hashLiteral(${JSON.stringify(`#${id}`)})`;
+  const hullTeams = TEAM_ORDER.map((team) =>
+    TANK_CHASSIS.map((kind) =>
+      TANK_DIRECTIONS.map(({ id: direction }) => hash(`chassis-${team}-${kind}-${direction}`)),
+    ),
+  );
+  const idleHullTeams = TEAM_ORDER.map((team) =>
+    TANK_CHASSIS.map((kind) =>
+      TANK_DIRECTIONS.map(({ id: direction }) => hash(`chassis-${team}-${kind}-${direction}-idle`)),
+    ),
+  );
+  const turretTeams = TEAM_ORDER.map((team) =>
+    TANK_CHASSIS.map((kind) =>
+      TANK_DIRECTIONS.map(({ id: direction }) => hash(`chassis-${team}-${kind}-turret-${direction}`)),
+    ),
+  );
+  const renderCube = (name, values) => {
+    const lines = [`const ${name}: readonly (readonly (readonly DefoldHash[])[])[] = [`];
+    for (const team of values) {
+      lines.push("  [");
+      for (const chassis of team) {
+        lines.push("    [");
+        for (const animation of chassis) lines.push(`      ${animation},`);
+        lines.push("    ],");
+      }
+      lines.push("  ],");
+    }
+    lines.push("];");
+    return lines;
+  };
+  return [
+    "// Generated by tools/generate-art.mjs. Do not edit.",
+    'import { hashLiteral, type DefoldHash } from "@deherm/project";',
+    "",
+    `export const TANK_DIRECTION_IDS = [${TANK_DIRECTIONS.map(({ id }) => JSON.stringify(id)).join(", ")}] as const;`,
+    "export type TankDirectionId = (typeof TANK_DIRECTION_IDS)[number];",
+    "",
+    ...renderCube("HULL_ANIMATIONS", hullTeams),
+    "",
+    ...renderCube("IDLE_HULL_ANIMATIONS", idleHullTeams),
+    "",
+    ...renderCube("TURRET_ANIMATIONS", turretTeams),
+    "",
+    "const WRECK_ANIMATIONS: readonly DefoldHash[] = [",
+    ...TEAM_ORDER.map((team) => `  ${hash(`tank-${team}-wreck`)},`),
+    "];",
+    "",
+    "function colourIndex(colour: number): number {",
+    "  const value = Math.trunc(colour);",
+    "  return value >= 0 && value < 4 ? value : 0;",
+    "}",
+    "",
+    "function chassisIndex(chassis: number): number {",
+    "  const value = Math.trunc(chassis) - 1;",
+    "  return value >= 0 && value < 4 ? value : 0;",
+    "}",
+    "",
+    "function directionIndex(direction: number): number {",
+    "  const value = Math.trunc(direction);",
+    "  return value >= 0 && value < 8 ? value : 4;",
+    "}",
+    "",
+    "export function tankHullAnimation(colour: number, chassis: number, direction: number): DefoldHash {",
+    "  return HULL_ANIMATIONS[colourIndex(colour)]![chassisIndex(chassis)]![directionIndex(direction)]!;",
+    "}",
+    "",
+    "export function tankHullIdleAnimation(colour: number, chassis: number, direction: number): DefoldHash {",
+    "  return IDLE_HULL_ANIMATIONS[colourIndex(colour)]![chassisIndex(chassis)]![directionIndex(direction)]!;",
+    "}",
+    "",
+    "export function tankTurretAnimation(colour: number, chassis: number, direction: number): DefoldHash {",
+    "  return TURRET_ANIMATIONS[colourIndex(colour)]![chassisIndex(chassis)]![directionIndex(direction)]!;",
+    "}",
+    "",
+    "export function tankWreckAnimation(colour: number): DefoldHash {",
+    "  return WRECK_ANIMATIONS[colourIndex(colour)]!;",
+    "}",
+    "",
+  ].join("\n");
+}
+
 function build() {
   const outputs = new Map(); // absolute path -> Buffer
   const { sheet, tiles, rows, cells } = buildTileSheet();
+  verifyGroundSeams(tiles);
+  verifyLandscapeSeams(tiles);
   verifyWallSeams(tiles);
   for (const theme of ARENA_THEMES) {
     verifySandbagWrap(tiles.find((tile) => tile.theme === theme.id && tile.semanticRole === "sandbag").canvas);
@@ -2259,6 +3119,7 @@ function build() {
       size: [sprite.canvas.width, sprite.canvas.height],
       outline: sprite.outlineColor,
       rotationAnchored: sprite.anchored,
+      rotationAnchor: sprite.rotationAnchor,
       opaqueBbox: verified.bbox,
       verticalCentreOffset: verified.centred,
       sha256: sha256(bytes),
@@ -2286,7 +3147,14 @@ function build() {
       `${theme.id}: all 16 wall masks resolve`,
       theme.wallMaskTileIds.length === 16 && theme.wallMaskTileIds.every(Number.isInteger),
     );
-    check(`${theme.id}: ground role table is total`, theme.groundRoleTileIds.filter(Number.isInteger).length === 32);
+    check(
+      `${theme.id}: all 16 wall faces resolve`,
+      theme.wallFaceTileIds.length === 16 && theme.wallFaceTileIds.every(Number.isInteger),
+    );
+    check(
+      `${theme.id}: ground role table is total`,
+      theme.groundRoleTileIds.filter(Number.isInteger).length === ARENA_GROUND_ROLE_WALL_BASE + 16,
+    );
     check(`${theme.id}: mark role table is total`, theme.markRoleTileIds.every(Number.isInteger));
     check(`${theme.id}: decor role table is total`, theme.decorRoleTileIds.every(Number.isInteger));
   }
@@ -2315,6 +3183,8 @@ function build() {
 
   const artContractText = renderArenaArtContract(themeMaps);
   outputs.set(resolve(sourceRoot, "generated-arena-art.ts"), Buffer.from(artContractText));
+  const tankArtContractText = renderTankArtContract();
+  outputs.set(resolve(sourceRoot, "generated-tank-art.ts"), Buffer.from(tankArtContractText));
 
   const manifest = {
     $schema: "https://json-schema.org/draft/2020-12/schema",
@@ -2328,8 +3198,30 @@ function build() {
       artistCredit: "Luis Zuno",
       license: "../../licenses/defold-tutorial-war-battles-MIT.txt",
       note:
-        "No tutorial pixels are copied. Only the colour histogram of the pinned " +
-        "tutorial PNGs is sampled; every new pixel is drawn from that sampled palette.",
+        "No tutorial pixels are copied. Procedural arena art samples the pinned tutorial palette; " +
+        "production tanks are selected Sprite Fusion direction sets whose blue identity panels are " +
+        "deterministically remapped to the four team ramps.",
+      productionTanks: {
+        provider: "Sprite Fusion",
+        operation: "direction-set",
+        cellSize: [PRODUCTION_TANK_CELL, PRODUCTION_TANK_CELL],
+        chassis: TANK_CHASSIS,
+        directions: TANK_DIRECTIONS.map(({ id, sourceIndex }) => ({ id, sourceIndex })),
+        manifests: TANK_CHASSIS.flatMap((chassis) =>
+          ["hull", "turret"].map((layer) =>
+            relative(exampleRoot, resolve(spriteFusionRoot, "requests", `${chassis}-${layer}-directions-v1.json`)),
+          ),
+        ),
+      },
+      worldLandmarks: {
+        provider: "OpenAI image generation",
+        source: relative(exampleRoot, resolve(landmarkSourceRoot, "sheet.png")),
+        provenance: relative(exampleRoot, resolve(landmarkSourceRoot, "source.json")),
+        sourceSha256: landmarkSources().metadata.sha256,
+        projection: landmarkSources().metadata.projection,
+        ids: LANDMARK_IDS,
+        rule: "explicit nonuniform crops, 4x nearest-neighbour downsample, hard alpha threshold, bottom registration",
+      },
     },
     determinism: {
       seed: SEED,
@@ -2444,6 +3336,11 @@ function build() {
       file: "/src/generated-arena-art.ts",
       sha256: sha256(Buffer.from(artContractText)),
       note: "Generated one-based tile ids for the runtime's semantic arena-role projector.",
+    },
+    tankTypescriptContract: {
+      file: "/src/generated-tank-art.ts",
+      sha256: sha256(Buffer.from(tankArtContractText)),
+      note: "Generated hash tables for every team, chassis, and eight-direction hull/turret animation.",
     },
     rendering: {
       sampling: "nearest-neighbor",

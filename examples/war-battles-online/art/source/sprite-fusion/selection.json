@@ -16,6 +16,15 @@
     "animations": ["radio-idle", "angry", "hurt", "victory"]
   },
   "world": {
+    "tankDepot": {
+      "request": "refinery-tank-depot-v1",
+      "selectedIndex": 7,
+      "assetId": "d5b93c20-0dfa-4dc9-80f1-08af203be622",
+      "source": "art/source/sprite-fusion/outputs/refinery-tank-depot-v1/07.png",
+      "alternateIndices": [2, 5],
+      "disposition": "approved-source",
+      "reason": "The open drive-through ramp remains readable at gameplay scale and gives every replacement-tank spawn a clear world landmark."
+    },
     "pickupPedestal": {
       "request": "refinery-pickup-pedestal-v1",
       "selectedIndex": 0,
@@ -36,6 +45,17 @@
       "request": "refinery-basalt-floor-v1",
       "disposition": "rejected-for-role",
       "reason": "None of the outputs is a seamless, opaque, edge-matched floor tile. The Tilemap Editor autotile workflow must own terrain-edge grammar instead."
+    },
+    "landscapeTerrain": {
+      "request": "frontier-landscape-materials-v1",
+      "disposition": "approved-pattern-sources",
+      "materials": {
+        "meadow": { "selectedIndex": 3, "assetId": "e8799b5e-8a51-4408-8f69-f6d825142419" },
+        "earth": { "selectedIndex": 6, "assetId": "7f964ace-3924-4416-ab62-fe5895a4e0c9" },
+        "basalt": { "selectedIndex": 10, "assetId": "5d12bcb6-fd80-4633-8d62-ab6cbcaeacb0" },
+        "scorch": { "selectedIndex": 11, "assetId": "e3d644ac-c455-437f-88ad-0157ac1ae7b3" }
+      },
+      "reason": "Sprite Fusion supplies the pixel-cluster rhythm and relative value structure. The local generator remaps those sources into the tutorial palette and owns every exact edge, mask, variation, seam check, tile id, and map role."
     }
   },
   "toolingPolicy": {

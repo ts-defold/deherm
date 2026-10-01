@@ -1,5 +1,7 @@
 export * from "./constants.ts";
 export * from "./fixed.ts";
+export * from "./isometric-direction.ts";
+export * from "./isometric-projection.ts";
 export * from "./ticks.ts";
 export * from "./arena.ts";
 export * from "./content.ts";

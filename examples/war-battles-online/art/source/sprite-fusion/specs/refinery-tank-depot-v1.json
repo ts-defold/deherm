@@ -1,0 +1,13 @@
+{
+  "name": "refinery-tank-depot-v1",
+  "operation": "style-reference",
+  "prompt": "A compact top-down armored tank resupply bay for a battlefield map. It has a clear drive-in opening, heavy basalt and olive-steel armor, orange hazard markings, a few hot refinery vents, and a readable square silhouette. Match the supplied military buildings' three-quarter top-down projection, dark outline weight, compact shapes, and restrained highlight density. No text, logo, character, vehicle, surrounding terrain, or background scene.",
+  "size": 64,
+  "inputs": [
+    "defold/assets/buildings/refinery/1.png",
+    "defold/assets/buildings/supply-depot/1.png",
+    "defold/assets/buildings/command-center/1.png",
+    "defold/assets/buildings/barracks/1.png",
+    "defold/assets/buildings/turret/1.png"
+  ]
+}

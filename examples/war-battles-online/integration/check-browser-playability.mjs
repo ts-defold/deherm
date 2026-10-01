@@ -27,6 +27,10 @@ const bundleDirectory =
 const screenshotPath = resolve(
   process.env.DEHERM_WAR_BATTLES_SCREENSHOT ?? resolve(repositoryRoot, "build/evidence/war-battles-html5.png"),
 );
+const titleScreenshotPath = resolve(
+  process.env.DEHERM_WAR_BATTLES_TITLE_SCREENSHOT ??
+    resolve(repositoryRoot, "build/evidence/war-battles-title-html5.png"),
+);
 
 async function evaluate(client, expression) {
   const result = await client.send("Runtime.evaluate", {
@@ -70,7 +74,7 @@ async function run() {
     await cleared;
     await loaded;
 
-    await waitFor(() => client.transcript.includes("war-battles:player-init:560.0:360.0"), {
+    await waitFor(() => client.transcript.some((line) => line.startsWith("war-battles:player-init:")), {
       timeoutMs: 30_000,
       intervalMs: 100,
       what: "the player component to initialize",
@@ -83,11 +87,29 @@ async function run() {
       if (!canvas) throw new Error("Defold did not create a canvas");
       canvas.tabIndex = 0;
       canvas.focus();
-      return { focused: document.activeElement === canvas, width: canvas.width, height: canvas.height };
+      const bounds = canvas.getBoundingClientRect();
+      return {
+        focused: document.activeElement === canvas,
+        width: canvas.width,
+        height: canvas.height,
+        bounds: { x: bounds.x, y: bounds.y, width: bounds.width, height: bounds.height }
+      };
     })()`,
     );
     assert.equal(canvas.focused, true, "Defold canvas did not accept keyboard focus");
     assert.ok(canvas.width > 0 && canvas.height > 0, "Defold canvas has no drawable extent");
+    assert.ok(canvas.bounds.width > 0 && canvas.bounds.height > 0, "Defold title canvas has no visible bounds");
+
+    const titleScreenshot = await client.send("Page.captureScreenshot", {
+      format: "png",
+      fromSurface: true,
+      captureBeyondViewport: false,
+      clip: { ...canvas.bounds, scale: 1 },
+    });
+    const titleScreenshotBytes = Buffer.from(titleScreenshot.data, "base64");
+    assert.ok(titleScreenshotBytes.byteLength > 1_024, "Defold title screenshot is unexpectedly empty");
+    await mkdir(dirname(titleScreenshotPath), { recursive: true });
+    await writeFile(titleScreenshotPath, titleScreenshotBytes);
 
     const inputAt = Date.now();
     await key(client, { type: "keyDown", key: "w", code: "KeyW", virtualKeyCode: 87 });
@@ -228,6 +250,11 @@ async function run() {
         path: screenshotPath,
         bytes: screenshotBytes.byteLength,
         sha256: createHash("sha256").update(screenshotBytes).digest("hex"),
+      },
+      titleScreenshot: {
+        path: titleScreenshotPath,
+        bytes: titleScreenshotBytes.byteLength,
+        sha256: createHash("sha256").update(titleScreenshotBytes).digest("hex"),
       },
       arenaMarker: client.transcript.find((line) => line.startsWith("war-battles:arena-engaged:")),
       restartMarker: client.transcript.find((line) => line.startsWith("war-battles:arena-restart:")),

@@ -17,10 +17,17 @@ import {
   cellOfY,
 } from "./arena.ts";
 import { MAP_HEIGHT, MAP_WIDTH, MAX_HAZARDS, MAX_PICKUPS } from "./constants.ts";
+import { mix32 } from "./fixed.ts";
 
 export const ARENA_VISUAL_CELL_COUNT = MAP_WIDTH * MAP_HEIGHT;
-export const ARENA_GROUND_VARIANT_COUNT = 4;
-export const ARENA_GROUND_ROLE_WALL_BASE = 16;
+export const ARENA_MEADOW_VARIANT_COUNT = 16;
+export const ARENA_LANDSCAPE_MATERIAL_COUNT = 4;
+export const ARENA_LANDSCAPE_MASK_COUNT = 16;
+export const ARENA_LANDSCAPE_VARIANTS_PER_MASK = 4;
+export const ARENA_GROUND_VARIANT_COUNT =
+  ARENA_MEADOW_VARIANT_COUNT +
+  (ARENA_LANDSCAPE_MATERIAL_COUNT - 1) * ARENA_LANDSCAPE_MASK_COUNT * ARENA_LANDSCAPE_VARIANTS_PER_MASK;
+export const ARENA_GROUND_ROLE_WALL_BASE = ARENA_GROUND_VARIANT_COUNT;
 
 export const ARENA_MARK_ROLE_NONE = 0;
 export const ARENA_MARK_ROLE_CRATE = 1;
@@ -36,7 +43,18 @@ export const ARENA_DECOR_ROLE_PICKUP_PEDESTAL = 3;
 export const ARENA_DECOR_ROLE_PIPE_JUNCTION = 4;
 export const ARENA_DECOR_ROLE_PIPE_RUN = 5;
 export const ARENA_DECOR_ROLE_THERMAL_VENT = 6;
-export const ARENA_DECOR_ROLE_COUNT = 7;
+export const ARENA_DECOR_ROLE_GRASS = 7;
+export const ARENA_DECOR_ROLE_STONES = 8;
+export const ARENA_DECOR_ROLE_TRACKS = 9;
+export const ARENA_DECOR_ROLE_SCORCH = 10;
+export const ARENA_DECOR_ROLE_SERVICE_ROAD_BASE = 11;
+export const ARENA_DECOR_ROLE_STAGING_PAD_BASE = ARENA_DECOR_ROLE_SERVICE_ROAD_BASE + 16;
+export const ARENA_DECOR_ROLE_CRATER_BASE = ARENA_DECOR_ROLE_STAGING_PAD_BASE + 4;
+export const ARENA_DECOR_ROLE_OIL_SPILL = ARENA_DECOR_ROLE_CRATER_BASE + 4;
+export const ARENA_DECOR_ROLE_SHELL_CASES = ARENA_DECOR_ROLE_OIL_SPILL + 1;
+export const ARENA_DECOR_ROLE_FIELD_FLOWERS = ARENA_DECOR_ROLE_SHELL_CASES + 1;
+export const ARENA_DECOR_ROLE_CAUTION_PAINT = ARENA_DECOR_ROLE_FIELD_FLOWERS + 1;
+export const ARENA_DECOR_ROLE_COUNT = ARENA_DECOR_ROLE_CAUTION_PAINT + 1;
 
 /** A set bit means the orthogonal neighbour is another concrete wall. */
 export const ARENA_WALL_MASK_BITS = { north: 1, south: 2, east: 4, west: 8 } as const;
@@ -69,11 +87,61 @@ export function arenaThemeIndex(seed: number, defaultSeed: number, themeCount: n
   return ((((seed >>> 0) ^ (defaultSeed >>> 0)) >>> 0) % themeCount) >>> 0;
 }
 
+/**
+ * Broad deterministic landscape patches. Material zero is the shared meadow
+ * substrate; 1..3 are earth, basalt, and scorch. The ellipses are intentionally
+ * much larger than a tile so the battlefield reads as a world, not cell noise.
+ */
+export function arenaGroundMaterial(seed: number, cellX: number, cellY: number): number {
+  let material = 0;
+  let bestScore = 1_000_001;
+  for (let patch = 0; patch < 6; patch += 1) {
+    const key = mix32(seed ^ 0x4c41_4e44, patch + 1);
+    const sourceX = 12 + (key % (MAP_WIDTH - 24));
+    const sourceY = 10 + ((key >>> 8) % (MAP_HEIGHT - 20));
+    const radiusX = 11 + ((key >>> 16) % 11);
+    const radiusY = 8 + ((key >>> 24) % 8);
+    for (let mirror = 0; mirror < 2; mirror += 1) {
+      const centreX = mirror === 0 ? sourceX : MAP_WIDTH - 1 - sourceX;
+      const centreY = mirror === 0 ? sourceY : MAP_HEIGHT - 1 - sourceY;
+      const scaledX = Math.trunc(((cellX - centreX) * 1024) / radiusX);
+      const scaledY = Math.trunc(((cellY - centreY) * 1024) / radiusY);
+      const score = Math.trunc((scaledX * scaledX + scaledY * scaledY) / 1024);
+      if (score <= 1024 && score < bestScore) {
+        bestScore = score;
+        material = 1 + (patch % (ARENA_LANDSCAPE_MATERIAL_COUNT - 1));
+      }
+    }
+  }
+  return material;
+}
+
+export function arenaGroundMaterialMask(seed: number, cellX: number, cellY: number, material: number): number {
+  let mask = 0;
+  if (arenaGroundMaterial(seed, cellX, cellY + 1) === material) mask |= ARENA_WALL_MASK_BITS.north;
+  if (arenaGroundMaterial(seed, cellX, cellY - 1) === material) mask |= ARENA_WALL_MASK_BITS.south;
+  if (arenaGroundMaterial(seed, cellX + 1, cellY) === material) mask |= ARENA_WALL_MASK_BITS.east;
+  if (arenaGroundMaterial(seed, cellX - 1, cellY) === material) mask |= ARENA_WALL_MASK_BITS.west;
+  return mask;
+}
+
 export function arenaGroundVariant(seed: number, cellX: number, cellY: number): number {
-  let hash = ((seed >>> 0) ^ Math.imul(cellX, 0x9e37_79b1) ^ Math.imul(cellY, 0x85eb_ca6b)) >>> 0;
-  hash ^= hash >>> 15;
-  hash = Math.imul(hash, 0x2545_f491) >>> 0;
-  return (hash >>> 3) % ARENA_GROUND_VARIANT_COUNT;
+  const material = arenaGroundMaterial(seed, cellX, cellY);
+  if (material === 0) {
+    const phaseX = (cellX + (seed & 3)) & 3;
+    const phaseY = (cellY + ((seed >>> 2) & 3)) & 3;
+    return phaseY * 4 + phaseX;
+  }
+  const mask = arenaGroundMaterialMask(seed, cellX, cellY, material);
+  const phaseX = (cellX + (seed & 1)) & 1;
+  const phaseY = (cellY + ((seed >>> 1) & 1)) & 1;
+  const variation = phaseY * 2 + phaseX;
+  return (
+    ARENA_MEADOW_VARIANT_COUNT +
+    (material - 1) * ARENA_LANDSCAPE_MASK_COUNT * ARENA_LANDSCAPE_VARIANTS_PER_MASK +
+    mask * ARENA_LANDSCAPE_VARIANTS_PER_MASK +
+    variation
+  );
 }
 
 export function arenaWallMask(map: ArenaMap, cellX: number, cellY: number): number {
@@ -101,6 +169,97 @@ function decorateRole(map: ArenaMap, decor: Uint8Array, cellX: number, cellY: nu
   if (cellX < 0 || cellY < 0 || cellX >= MAP_WIDTH || cellY >= MAP_HEIGHT) return;
   const index = cellY * MAP_WIDTH + cellX;
   if (map.cellAt(cellX, cellY) === CELL_FLOOR && decor[index] === ARENA_DECOR_ROLE_NONE) decor[index] = role;
+}
+
+/** A short, presentation-only service lane leading inward from each depot. */
+function isServiceRoadCell(map: ArenaMap, cellX: number, cellY: number): boolean {
+  if (map.cellAt(cellX, cellY) !== CELL_FLOOR) return false;
+  const centreX = MAP_WIDTH >> 1;
+  const centreY = MAP_HEIGHT >> 1;
+  for (let index = 0; index < SPAWN_POINT_COUNT; index += 1) {
+    const spawnX = cellOfX(map.spawnX[index]!);
+    const spawnY = cellOfY(map.spawnY[index]!);
+    const deltaX = centreX - spawnX;
+    const deltaY = centreY - spawnY;
+    if (Math.abs(deltaX) >= Math.abs(deltaY)) {
+      const end = spawnX + Math.sign(deltaX) * 9;
+      if (cellY === spawnY && cellX >= Math.min(spawnX, end) && cellX <= Math.max(spawnX, end)) return true;
+    } else {
+      const end = spawnY + Math.sign(deltaY) * 9;
+      if (cellX === spawnX && cellY >= Math.min(spawnY, end) && cellY <= Math.max(spawnY, end)) return true;
+    }
+  }
+  return false;
+}
+
+function serviceRoadMask(map: ArenaMap, cellX: number, cellY: number): number {
+  let mask = 0;
+  if (isServiceRoadCell(map, cellX, cellY + 1)) mask |= ARENA_WALL_MASK_BITS.north;
+  if (isServiceRoadCell(map, cellX, cellY - 1)) mask |= ARENA_WALL_MASK_BITS.south;
+  if (isServiceRoadCell(map, cellX + 1, cellY)) mask |= ARENA_WALL_MASK_BITS.east;
+  if (isServiceRoadCell(map, cellX - 1, cellY)) mask |= ARENA_WALL_MASK_BITS.west;
+  return mask;
+}
+
+function canDecorateBlock(map: ArenaMap, decor: Uint8Array, marks: Uint8Array, cellX: number, cellY: number): boolean {
+  if (cellX < 0 || cellY < 0 || cellX + 1 >= MAP_WIDTH || cellY + 1 >= MAP_HEIGHT) return false;
+  for (let y = 0; y < 2; y += 1) {
+    for (let x = 0; x < 2; x += 1) {
+      const index = (cellY + y) * MAP_WIDTH + cellX + x;
+      if (
+        map.cellAt(cellX + x, cellY + y) !== CELL_FLOOR ||
+        decor[index] !== ARENA_DECOR_ROLE_NONE ||
+        marks[index] !== ARENA_MARK_ROLE_NONE
+      ) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+/** Place the NW/NE/SW/SE slices of one 32px decal on a y-up tile grid. */
+function decorateBlock(
+  map: ArenaMap,
+  decor: Uint8Array,
+  marks: Uint8Array,
+  cellX: number,
+  cellY: number,
+  baseRole: number,
+): boolean {
+  if (!canDecorateBlock(map, decor, marks, cellX, cellY)) return false;
+  decor[(cellY + 1) * MAP_WIDTH + cellX] = baseRole;
+  decor[(cellY + 1) * MAP_WIDTH + cellX + 1] = baseRole + 1;
+  decor[cellY * MAP_WIDTH + cellX] = baseRole + 2;
+  decor[cellY * MAP_WIDTH + cellX + 1] = baseRole + 3;
+  return true;
+}
+
+function decorateMirroredCraterPair(
+  map: ArenaMap,
+  decor: Uint8Array,
+  marks: Uint8Array,
+  preferredX: number,
+  preferredY: number,
+): boolean {
+  for (let radius = 0; radius <= 8; radius += 1) {
+    for (let offsetY = -radius; offsetY <= radius; offsetY += 1) {
+      for (let offsetX = -radius; offsetX <= radius; offsetX += 1) {
+        if (Math.max(Math.abs(offsetX), Math.abs(offsetY)) !== radius) continue;
+        const x = preferredX + offsetX;
+        const y = preferredY + offsetY;
+        const mirrorX = MAP_WIDTH - 2 - x;
+        const mirrorY = MAP_HEIGHT - 2 - y;
+        if (!canDecorateBlock(map, decor, marks, x, y) || !canDecorateBlock(map, decor, marks, mirrorX, mirrorY)) {
+          continue;
+        }
+        decorateBlock(map, decor, marks, x, y, ARENA_DECOR_ROLE_CRATER_BASE);
+        decorateBlock(map, decor, marks, mirrorX, mirrorY, ARENA_DECOR_ROLE_CRATER_BASE);
+        return true;
+      }
+    }
+  }
+  return false;
 }
 
 /** Fill caller-owned arrays; the projection allocates nothing after entry. */
@@ -146,5 +305,72 @@ export function projectArenaVisualRoles(
     decorateRole(map, decor, cellX, cellY + 1, ARENA_DECOR_ROLE_THERMAL_VENT);
     decorateRole(map, decor, cellX, cellY - 1, ARENA_DECOR_ROLE_PIPE_JUNCTION);
     decorateRole(map, decor, cellX + (index % 2 === 0 ? 2 : -2), cellY - 1, ARENA_DECOR_ROLE_PIPE_RUN);
+  }
+
+  // Every other depot gets a proper 2x2 staging apron beside its service lane.
+  // These are presentation-only decals derived from authoritative spawn points;
+  // they never become collision or replication state.
+  for (let index = 0; index < SPAWN_POINT_COUNT; index += 2) {
+    const spawnX = cellOfX(map.spawnX[index]!);
+    const spawnY = cellOfY(map.spawnY[index]!);
+    const inwardY = spawnY < MAP_HEIGHT / 2 ? 2 : -3;
+    const preferredX = spawnX + (index % 4 === 0 ? 2 : -3);
+    if (!decorateBlock(map, decor, marks, preferredX, spawnY + inwardY, ARENA_DECOR_ROLE_STAGING_PAD_BASE)) {
+      decorateBlock(
+        map,
+        decor,
+        marks,
+        spawnX + (index % 4 === 0 ? -3 : 2),
+        spawnY + inwardY,
+        ARENA_DECOR_ROLE_STAGING_PAD_BASE,
+      );
+    }
+  }
+
+  // Large mirrored scars give the broad midfield memorable landmarks without
+  // affecting the symmetric authoritative arena. The bounded search only
+  // chooses a nearby clear floor block and performs no heap allocation.
+  decorateMirroredCraterPair(map, decor, marks, 20, 35);
+  decorateMirroredCraterPair(map, decor, marks, 43, 45);
+
+  // Roads are derived from the authoritative depot positions but remain a
+  // cosmetic projection. Hazard fixtures and gameplay marks take precedence.
+  for (let index = 0; index < ARENA_VISUAL_CELL_COUNT; index += 1) {
+    if (decor[index] !== ARENA_DECOR_ROLE_NONE || marks[index] !== ARENA_MARK_ROLE_NONE) continue;
+    const cellX = index % MAP_WIDTH;
+    const cellY = Math.floor(index / MAP_WIDTH);
+    if (!isServiceRoadCell(map, cellX, cellY)) continue;
+    decor[index] = ARENA_DECOR_ROLE_SERVICE_ROAD_BASE + serviceRoadMask(map, cellX, cellY);
+  }
+
+  // Quiet, seed-stable ground details break up broad empty runs without
+  // changing collision, networking, or the authored objective landmarks.
+  // Mirror the hash key around the arena centre so both halves keep the same
+  // visual weight. Existing hazard art and gameplay marks always win.
+  for (let index = 0; index < ARENA_VISUAL_CELL_COUNT; index += 1) {
+    if (decor[index] !== ARENA_DECOR_ROLE_NONE || marks[index] !== ARENA_MARK_ROLE_NONE) continue;
+    const cellX = index % MAP_WIDTH;
+    const cellY = Math.floor(index / MAP_WIDTH);
+    if (map.cellAt(cellX, cellY) !== CELL_FLOOR) continue;
+    const mirroredIndex = Math.min(index, ARENA_VISUAL_CELL_COUNT - 1 - index);
+    const detail = mix32(seed ^ 0x574f_524c, mirroredIndex);
+    if (detail % 43 !== 0) continue;
+    const detailKind = (detail >>> 8) & 15;
+    decor[index] =
+      detailKind === 0
+        ? ARENA_DECOR_ROLE_OIL_SPILL
+        : detailKind === 1
+          ? ARENA_DECOR_ROLE_SHELL_CASES
+          : detailKind === 2
+            ? ARENA_DECOR_ROLE_FIELD_FLOWERS
+            : detailKind === 3
+              ? ARENA_DECOR_ROLE_CAUTION_PAINT
+              : detail & 3
+                ? detail & 2
+                  ? ARENA_DECOR_ROLE_GRASS
+                  : ARENA_DECOR_ROLE_STONES
+                : detail & 4
+                  ? ARENA_DECOR_ROLE_TRACKS
+                  : ARENA_DECOR_ROLE_SCORCH;
   }
 }

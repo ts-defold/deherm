@@ -1,0 +1,159 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_378033b0-d74c-462f-9a07-cc04165aba22",
+  "operation": "style-reference",
+  "prompt": "A compact top-down armored tank resupply bay for a battlefield map. It has a clear drive-in opening, heavy basalt and olive-steel armor, orange hazard markings, a few hot refinery vents, and a readable square silhouette. Match the supplied military buildings' three-quarter top-down projection, dark outline weight, compact shapes, and restrained highlight density. No text, logo, character, vehicle, surrounding terrain, or background scene.",
+  "size": 64,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "defold/assets/buildings/refinery/1.png",
+      "bytes": 1963,
+      "sha256": "9847a7f2e3595509ccc1daf44a47c570e868874754388b1e3f8e5df328af6461"
+    },
+    {
+      "kind": "file",
+      "path": "defold/assets/buildings/supply-depot/1.png",
+      "bytes": 1695,
+      "sha256": "f0dd9b8250c41170b2b16817669e5bd1a2f9e6b45b3b6557984491a2889a15f8"
+    },
+    {
+      "kind": "file",
+      "path": "defold/assets/buildings/command-center/1.png",
+      "bytes": 2335,
+      "sha256": "098f40e906a90976ed45e829bbc4d03a5bd22c70f842197ed261436a91efa7d7"
+    },
+    {
+      "kind": "file",
+      "path": "defold/assets/buildings/barracks/1.png",
+      "bytes": 1535,
+      "sha256": "f251ac9d6dd02313776dba7e8784506bdf590805a6be942a8cdcc5a8becc8b60"
+    },
+    {
+      "kind": "file",
+      "path": "defold/assets/buildings/turret/1.png",
+      "bytes": 692,
+      "sha256": "8e97025e1b5d5bfff9db76f0d820c01fc0c27552d1b780e88a8289329e8a7912"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/refinery-tank-depot-v1.json",
+    "sha256": "fd78c0ac9c2f675b0be47b3cc36f3260b4fa468356d28244ec57d4566ad70005"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "1f58ca74-1b5a-44b3-a7dd-3480cc434b8b",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 68,
+      "height": 68,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/1f58ca74-1b5a-44b3-a7dd-3480cc434b8b/image.png?v=1790766298554",
+      "path": "art/source/sprite-fusion/outputs/refinery-tank-depot-v1/00.png",
+      "bytes": 8438,
+      "sha256": "31704eda41abab1470f7f4b813fa0a6257bd203ccb3eb10e839772a9d104e0a7"
+    },
+    {
+      "index": 1,
+      "assetId": "43ca77d3-2262-4089-b2ea-a553667d1881",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 69,
+      "height": 69,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/43ca77d3-2262-4089-b2ea-a553667d1881/image.png?v=1790766299313",
+      "path": "art/source/sprite-fusion/outputs/refinery-tank-depot-v1/01.png",
+      "bytes": 9003,
+      "sha256": "e0206ecf5f8feb95fa64a4c682bca11b4674dc87f48c5ae3e653e75588911e3b"
+    },
+    {
+      "index": 2,
+      "assetId": "596480da-0351-4851-a5b6-1c8b5c496db2",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 72,
+      "height": 72,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/596480da-0351-4851-a5b6-1c8b5c496db2/image.png?v=1790766300088",
+      "path": "art/source/sprite-fusion/outputs/refinery-tank-depot-v1/02.png",
+      "bytes": 7766,
+      "sha256": "586692a45b69078ed1aa513e185d223554a680c339f6115c97ff9ecc527e8fb9"
+    },
+    {
+      "index": 3,
+      "assetId": "3233dcc4-6bb3-4421-861c-9d0ce185b415",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 68,
+      "height": 68,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/3233dcc4-6bb3-4421-861c-9d0ce185b415/image.png?v=1790766300808",
+      "path": "art/source/sprite-fusion/outputs/refinery-tank-depot-v1/03.png",
+      "bytes": 9146,
+      "sha256": "2ffbcf894b84d0e97c3d265ed67e98732f7cba4d74d99d3f2c49198c590f2097"
+    },
+    {
+      "index": 4,
+      "assetId": "ef1eb5ac-8411-4d76-a0df-74e88499ec27",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 74,
+      "height": 74,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/ef1eb5ac-8411-4d76-a0df-74e88499ec27/image.png?v=1790766301569",
+      "path": "art/source/sprite-fusion/outputs/refinery-tank-depot-v1/04.png",
+      "bytes": 9067,
+      "sha256": "ab15e89131a7c0f0505c0255a9bb4d788c0d3324d462c90eb1e260ff4fc5d46c"
+    },
+    {
+      "index": 5,
+      "assetId": "aa41f18e-43bf-4a57-9a12-241e24a86447",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/aa41f18e-43bf-4a57-9a12-241e24a86447/image.png?v=1790766302473",
+      "path": "art/source/sprite-fusion/outputs/refinery-tank-depot-v1/05.png",
+      "bytes": 8082,
+      "sha256": "14f8766949baefcf53f41ecb9d21de4c94fc784999be201e32560a517cd73cad"
+    },
+    {
+      "index": 6,
+      "assetId": "36cb9184-2ef7-493b-b3e8-bcdfdc54a96e",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 67,
+      "height": 67,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/36cb9184-2ef7-493b-b3e8-bcdfdc54a96e/image.png?v=1790766303269",
+      "path": "art/source/sprite-fusion/outputs/refinery-tank-depot-v1/06.png",
+      "bytes": 6236,
+      "sha256": "b31391a2339c0936157b8016599870628f70997b448d136d13a63f4887e7ba3b"
+    },
+    {
+      "index": 7,
+      "assetId": "d5b93c20-0dfa-4dc9-80f1-08af203be622",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 68,
+      "height": 68,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/d5b93c20-0dfa-4dc9-80f1-08af203be622/image.png?v=1790766304086",
+      "path": "art/source/sprite-fusion/outputs/refinery-tank-depot-v1/07.png",
+      "bytes": 8444,
+      "sha256": "639320a54e9bc1352547c79d94dd93325936bb33cec4941131ef7fa78df6643b"
+    },
+    {
+      "index": 8,
+      "assetId": "2e359e4d-d69f-486d-b506-88ccfd04b6c4",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 69,
+      "height": 69,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/2e359e4d-d69f-486d-b506-88ccfd04b6c4/image.png?v=1790766304819",
+      "path": "art/source/sprite-fusion/outputs/refinery-tank-depot-v1/08.png",
+      "bytes": 8519,
+      "sha256": "59ec9f30fa9952c20fe931870f426dd344ea6be6250541c40a5fed4aa1310041"
+    }
+  ],
+  "credits": {
+    "remaining": 3225
+  }
+}

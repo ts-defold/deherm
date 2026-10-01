@@ -26,14 +26,21 @@ import {
   EVENT_HIT,
   EVENT_KILL,
   EVENT_PICKUP_TAKEN,
+  CELL_FLOOR,
   CELL_CRATE,
   CELL_SANDBAG,
+  CELL_WALL,
   MAX_PICKUPS,
   MAX_PROJECTILES,
   MAX_COVER_PANELS,
   MAP_WIDTH,
+  MAP_HEIGHT,
+  SPAWN_POINT_COUNT,
+  isometricDepth,
   cellOfX,
   cellOfY,
+  cellCentreX,
+  cellCentreY,
   WEAPON_MORTAR,
   createBattleEvent,
   type BattleEvent,
@@ -41,15 +48,30 @@ import {
   type TransportReceiver,
 } from "../src/generated-war-battles/index";
 import {
+  ARENA_GROUND_ROLE_WALL_BASE,
   ARENA_MARK_ROLE_CRATE,
   ARENA_MARK_ROLE_SANDBAG,
   ARENA_VISUAL_CELL_COUNT,
+  arenaGroundVariant,
   arenaThemeIndex,
   projectArenaVisualRoles,
 } from "../src/generated-war-battles/arena-visual";
 import { ArenaMap } from "../src/generated-war-battles/arena";
-import { ARENA_ART_THEMES, arenaDecorTileId, arenaGroundTileId, arenaMarkTileId } from "../src/generated-arena-art";
-import { MAX_VISIBLE_PROJECTILES, pixelX, pixelY, startArena, type ArenaMatch } from "../src/arena-match";
+import {
+  ARENA_ART_THEMES,
+  arenaDecorTileId,
+  arenaGroundTileId,
+  arenaMarkTileId,
+  arenaWallFaceTileId,
+} from "../src/generated-arena-art";
+import {
+  MAX_VISIBLE_PROJECTILES,
+  projectedDirectionRadians,
+  projectedX,
+  projectedY,
+  startArena,
+  type ArenaMatch,
+} from "../src/arena-match";
 
 interface WarBattlesRuntimeConfig {
   /** Browser-only development override; game.project remains authoritative. */
@@ -58,6 +80,8 @@ interface WarBattlesRuntimeConfig {
   serverWebSocket?: string;
   /** Hex SHA-256 for a short-lived self-signed WebTransport certificate. */
   serverCertificateSha256?: string;
+  /** Browser-only visual QA mode: arrange every generated landmark around the local camera. */
+  artGallery?: boolean;
 }
 
 interface WarBattlesRuntimeTelemetry {
@@ -102,8 +126,11 @@ const RESTART = hashLiteral("#restart");
 const CAMERA = "/camera#follow";
 const CAMERA_IMPACT = "camera_impact";
 const ARENA_TILEMAP = "/level#tilemap";
+const ARENA_FACE_TILEMAP = "/level#faces";
 const ARENA_GROUND_LAYER = "ground";
 const ARENA_DECOR_LAYER = "decor";
+const ARENA_WALL_LAYER = "walls";
+const ARENA_FACE_LAYER = "faces";
 const ARENA_MARKS_LAYER = "marks";
 
 const SFX_FIRE = "#sfx_fire";
@@ -166,6 +193,11 @@ interface ArenaSelf {
   visualGroundScratch?: Uint8Array;
   visualDecorScratch?: Uint8Array;
   visualMarkScratch?: Uint8Array;
+  /** Presentation-only world landmarks keyed to the authoritative map seed. */
+  depotIds: DefoldHash[];
+  depotMapSeed?: number;
+  landmarkIds: DefoldHash[];
+  landmarkMapSeed?: number;
   visibleProjectiles: number;
   effectIds: DefoldHash[];
   effectTicks: number[];
@@ -181,6 +213,10 @@ interface ArenaSelf {
 
 function browserGlobals(): WarBattlesBrowserGlobals {
   return globalThis as unknown as WarBattlesBrowserGlobals;
+}
+
+function artGalleryEnabled(): boolean {
+  return browserGlobals().__warBattlesConfigV1?.artGallery === true;
 }
 
 function certificateHash(value: string): ArrayBuffer | undefined {
@@ -313,7 +349,10 @@ function spawnTankParts(self: ArenaSelf): void {
   if (world === undefined) return;
   const localSlot = self.match.localSlot;
   for (let slot = 0; slot < self.players; slot += 1) {
-    const position = vmath.vector3(pixelX(world.playerX[slot]!), pixelY(world.playerY[slot]!), 0.2);
+    const worldX = world.playerX[slot]!;
+    const worldY = world.playerY[slot]!;
+    const depth = 0.2 + isometricDepth(worldX, worldY) * 0.05;
+    const position = vmath.vector3(projectedX(worldX, worldY), projectedY(worldX, worldY), depth);
     // The local hull is the authored `player` game object, so only its turret
     // is spawned here; every other tank gets both parts.
     if (slot !== localSlot) {
@@ -329,7 +368,7 @@ function spawnTankParts(self: ArenaSelf): void {
     }
     factory.create(
       "#tankfactory",
-      vmath.vector3(position.x, position.y, 0.3),
+      vmath.vector3(position.x, position.y, depth + 0.001),
       undefined,
       new Map<string, unknown>([
         ["slot", slot],
@@ -337,6 +376,88 @@ function spawnTankParts(self: ArenaSelf): void {
       ]),
     );
   }
+}
+
+function syncTankDepots(self: ArenaSelf): void {
+  const world = self.match.world;
+  if (world === undefined || self.depotMapSeed === world.mapSeed) return;
+  for (const id of self.depotIds) go.delete(id);
+  self.depotIds.length = 0;
+  for (let index = 0; index < SPAWN_POINT_COUNT; index += 1) {
+    const worldX = world.map.spawnX[index]!;
+    const worldY = world.map.spawnY[index]!;
+    const id = factory.create(
+      "#depotfactory",
+      vmath.vector3(
+        projectedX(worldX, worldY),
+        projectedY(worldX, worldY),
+        0.16 + isometricDepth(worldX, worldY) * 0.05,
+      ),
+    ) as DefoldHash | undefined;
+    if (id !== undefined) self.depotIds.push(id);
+  }
+  self.depotMapSeed = world.mapSeed;
+}
+
+const LANDMARK_ANCHOR_X = [18, 59, 100, 28, 90, 45, 74, 18, 96] as const;
+const LANDMARK_ANCHOR_Y = [20, 18, 22, 44, 45, 68, 70, 70, 68] as const;
+const LANDMARK_REQUIRES_WALL = [true, true, true, false, true, true, true, true, false] as const;
+
+function nearestLandmarkCell(map: ArenaMap, preferredX: number, preferredY: number, wall: boolean): number {
+  for (let radius = 0; radius <= 12; radius += 1) {
+    for (let offsetY = -radius; offsetY <= radius; offsetY += 1) {
+      for (let offsetX = -radius; offsetX <= radius; offsetX += 1) {
+        if (Math.max(Math.abs(offsetX), Math.abs(offsetY)) !== radius) continue;
+        const x = preferredX + offsetX;
+        const y = preferredY + offsetY;
+        if (x < 2 || y < 2 || x >= MAP_WIDTH - 2 || y >= MAP_HEIGHT - 2) continue;
+        const cell = map.cellAt(x, y);
+        if (wall ? cell === CELL_WALL : cell === CELL_FLOOR) return y * MAP_WIDTH + x;
+      }
+    }
+  }
+  throw new Error(`no ${wall ? "wall" : "floor"} cell near landmark anchor ${preferredX},${preferredY}`);
+}
+
+function syncWorldLandmarks(self: ArenaSelf): void {
+  const world = self.match.world;
+  if (world === undefined || self.landmarkMapSeed === world.mapSeed) return;
+  for (const id of self.landmarkIds) go.delete(id);
+  self.landmarkIds.length = 0;
+  for (let kind = 0; kind < LANDMARK_ANCHOR_X.length; kind += 1) {
+    let screenX: number;
+    let screenY: number;
+    let depth: number;
+    if (artGalleryEnabled()) {
+      const localX = world.playerX[0]!;
+      const localY = world.playerY[0]!;
+      const column = kind % 3;
+      const row = Math.floor(kind / 3);
+      screenX = projectedX(localX, localY) + (column - 1) * 176;
+      screenY = projectedY(localX, localY) + (1 - row) * 104;
+      depth = 0.35 + row * 0.01;
+    } else {
+      const cell = nearestLandmarkCell(
+        world.map,
+        LANDMARK_ANCHOR_X[kind]!,
+        LANDMARK_ANCHOR_Y[kind]!,
+        LANDMARK_REQUIRES_WALL[kind]!,
+      );
+      const worldX = cellCentreX(cell % MAP_WIDTH);
+      const worldY = cellCentreY(Math.floor(cell / MAP_WIDTH));
+      screenX = projectedX(worldX, worldY);
+      screenY = projectedY(worldX, worldY);
+      depth = 0.17 + isometricDepth(worldX, worldY) * 0.05;
+    }
+    const id = factory.create(
+      "#landmarkfactory",
+      vmath.vector3(screenX, screenY, depth),
+      undefined,
+      new Map<string, unknown>([["kind", kind]]),
+    ) as DefoldHash | undefined;
+    if (id !== undefined) self.landmarkIds.push(id);
+  }
+  self.landmarkMapSeed = world.mapSeed;
 }
 
 function syncPickups(self: ArenaSelf): void {
@@ -354,7 +475,11 @@ function syncPickups(self: ArenaSelf): void {
     self.spawnedPickup[index] = 1;
     factory.create(
       "#pickupfactory",
-      vmath.vector3(pixelX(world.pickupX[index]!), pixelY(world.pickupY[index]!), 0.1),
+      vmath.vector3(
+        projectedX(world.pickupX[index]!, world.pickupY[index]!),
+        projectedY(world.pickupX[index]!, world.pickupY[index]!),
+        0.1 + isometricDepth(world.pickupX[index]!, world.pickupY[index]!) * 0.05,
+      ),
       undefined,
       new Map<string, unknown>([
         ["index", index],
@@ -385,7 +510,11 @@ function syncProjectiles(self: ArenaSelf): void {
     visible += 1;
     factory.create(
       "#shotfactory",
-      vmath.vector3(pixelX(world.projectileX[slot]!), pixelY(world.projectileY[slot]!), 0.4),
+      vmath.vector3(
+        projectedX(world.projectileX[slot]!, world.projectileY[slot]!),
+        projectedY(world.projectileX[slot]!, world.projectileY[slot]!),
+        0.4 + isometricDepth(world.projectileX[slot]!, world.projectileY[slot]!) * 0.05,
+      ),
       undefined,
       new Map<string, unknown>([
         ["slot", slot],
@@ -467,17 +596,32 @@ function syncArenaVisualMap(self: ArenaSelf): void {
   const nextDecor = self.visualDecorScratch!;
   const nextMarks = self.visualMarkScratch!;
   const priorTheme = self.visualTheme!;
+  const priorSeed = self.visualMapSeed!;
   projectArenaVisualRoles(world.map, seed, nextGround, nextDecor, nextMarks);
   for (let index = 0; index < ARENA_VISUAL_CELL_COUNT; index += 1) {
-    const x = (index % MAP_WIDTH) + 1;
-    const y = Math.floor(index / MAP_WIDTH) + 1;
-    const oldGround = arenaGroundTileId(priorTheme, currentGround[index]!);
-    const newGround = arenaGroundTileId(theme, nextGround[index]!);
+    const cellX = index % MAP_WIDTH;
+    const cellY = Math.floor(index / MAP_WIDTH);
+    const x = cellX + 1;
+    const y = cellY + 1;
+    const oldRole = currentGround[index]!;
+    const newRole = nextGround[index]!;
+    const oldGround = arenaGroundTileId(priorTheme, arenaGroundVariant(priorSeed, cellX, cellY));
+    const newGround = arenaGroundTileId(theme, arenaGroundVariant(seed, cellX, cellY));
+    const oldWall = oldRole >= ARENA_GROUND_ROLE_WALL_BASE ? arenaGroundTileId(priorTheme, oldRole) : 0;
+    const newWall = newRole >= ARENA_GROUND_ROLE_WALL_BASE ? arenaGroundTileId(theme, newRole) : 0;
+    const oldFace =
+      oldRole >= ARENA_GROUND_ROLE_WALL_BASE
+        ? arenaWallFaceTileId(priorTheme, oldRole - ARENA_GROUND_ROLE_WALL_BASE)
+        : 0;
+    const newFace =
+      newRole >= ARENA_GROUND_ROLE_WALL_BASE ? arenaWallFaceTileId(theme, newRole - ARENA_GROUND_ROLE_WALL_BASE) : 0;
     const oldDecor = arenaDecorTileId(priorTheme, currentDecor[index]!);
     const newDecor = arenaDecorTileId(theme, nextDecor[index]!);
     const oldMark = arenaMarkTileId(priorTheme, currentMarks[index]!);
     const newMark = arenaMarkTileId(theme, nextMarks[index]!);
     if (oldGround !== newGround) tilemap.setTile(ARENA_TILEMAP, ARENA_GROUND_LAYER, x, y, newGround);
+    if (oldWall !== newWall) tilemap.setTile(ARENA_TILEMAP, ARENA_WALL_LAYER, x, y, newWall);
+    if (oldFace !== newFace) tilemap.setTile(ARENA_FACE_TILEMAP, ARENA_FACE_LAYER, x, y, newFace);
     if (oldDecor !== newDecor) tilemap.setTile(ARENA_TILEMAP, ARENA_DECOR_LAYER, x, y, newDecor);
     if (oldMark !== newMark) tilemap.setTile(ARENA_TILEMAP, ARENA_MARKS_LAYER, x, y, newMark);
   }
@@ -499,7 +643,7 @@ function spawnEffect(self: ArenaSelf, big: boolean, x: number, y: number): void 
   // Do not retain an absent id: go.delete only accepts a real address.
   const id = factory.create(
     big ? "#boomfactory" : "#sparkfactory",
-    vmath.vector3(pixelX(x), pixelY(y), big ? 0.6 : 0.5),
+    vmath.vector3(projectedX(x, y), projectedY(x, y), (big ? 0.6 : 0.5) + isometricDepth(x, y) * 0.05),
   ) as DefoldHash | undefined;
   if (id === undefined) return;
   self.effectIds.push(id);
@@ -512,8 +656,8 @@ function spawnMuzzle(self: ArenaSelf, x: number, y: number, directionX: number, 
   if (self.effectIds.length >= MAX_EFFECTS) return;
   const id = factory.create(
     "#muzzlefactory",
-    vmath.vector3(pixelX(x), pixelY(y), 0.55),
-    vmath.quatRotationZ(Math.atan2(directionY, directionX)),
+    vmath.vector3(projectedX(x, y), projectedY(x, y), 0.55 + isometricDepth(x, y) * 0.05),
+    vmath.quatRotationZ(projectedDirectionRadians(directionX, directionY)),
   ) as DefoldHash | undefined;
   if (id === undefined) return;
   self.effectIds.push(id);
@@ -525,8 +669,8 @@ function requestCameraImpact(self: ArenaSelf, strength: number, x: number, y: nu
   // explosion immediately after it). Keep one strongest message instead of
   // allocating or queueing a message for every event.
   if (strength <= self.impact.strength) return;
-  self.impact.x = x;
-  self.impact.y = y;
+  self.impact.x = projectedX(x, y);
+  self.impact.y = projectedY(x, y);
   self.impact.strength = strength;
 }
 
@@ -779,6 +923,8 @@ export default defineComponent({
     self.visibleProjectiles = 0;
     self.effectIds = [];
     self.effectTicks = [];
+    self.depotIds = [];
+    self.landmarkIds = [];
     self.impact = { x: 0, y: 0, strength: 0 };
     self.sfxMask = 0;
     self.telemetry = {
@@ -804,6 +950,8 @@ export default defineComponent({
       mapSeed: self.mapSeed > 0 ? Math.trunc(self.mapSeed) : 0,
     });
     syncArenaVisualMap(self);
+    if (!artGalleryEnabled()) syncTankDepots(self);
+    syncWorldLandmarks(self);
     self.online = connectOnline(self);
     updateTelemetry(self);
     defold.log("info", `war-battles:arena-init:players=${players}:online=${self.online ? 1 : 0}`);
@@ -824,6 +972,8 @@ export default defineComponent({
   update(self: ArenaSelf, dt: number): void {
     self.elapsed += dt;
     syncArenaVisualMap(self);
+    if (!artGalleryEnabled()) syncTankDepots(self);
+    syncWorldLandmarks(self);
     // Native transports are poll-driven because their worker threads may not
     // call Hermes, Lua, or Defold. Pump before the engagement gate: receiving
     // the welcome is what changes a dialing arena into an engaged online one.
@@ -846,7 +996,11 @@ export default defineComponent({
 
   final(self: ArenaSelf): void {
     for (const id of self.effectIds) go.delete(id);
+    for (const id of self.depotIds) go.delete(id);
+    for (const id of self.landmarkIds) go.delete(id);
     self.effectIds.length = 0;
+    self.depotIds.length = 0;
+    self.landmarkIds.length = 0;
     self.effectTicks.length = 0;
     if (self.onlineAttempts !== undefined) invalidateOnlineAttempts(self.onlineAttempts);
     self.match.client?.close(1000, "scene teardown");

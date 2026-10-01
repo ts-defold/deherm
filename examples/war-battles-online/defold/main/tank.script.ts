@@ -1,13 +1,23 @@
 import { defineComponent, go, hashLiteral, msg, property, vmath, type DefoldHash } from "@deherm/project";
 
-import { arenaMatch, directionRadians, pixelX, pixelY } from "../src/arena-match";
+import { arenaMatch, projectedDirectionRadians, projectedX, projectedY } from "../src/arena-match";
 import {
   PLAYER_MODE_DEAD,
   PLAYER_MODE_INFANTRY,
   PLAYER_MODE_TANK,
-  chassisById,
+  VELOCITY_SCALE,
+  isometricDepth,
+  isometricDirectionX,
+  isometricDirectionY,
+  isometricDirectionIndex,
   type PlayerTransform,
 } from "../src/generated-war-battles/index";
+import {
+  tankHullAnimation,
+  tankHullIdleAnimation,
+  tankTurretAnimation,
+  tankWreckAnimation,
+} from "../src/generated-tank-art";
 
 /**
  * One visible part of one tank: a hull or a turret.
@@ -26,52 +36,6 @@ import {
 const PART_TURRET = 1;
 const HERO_ANIMATION = hashLiteral("#player-down");
 
-/** Team colours, in the order `arena-sprites.atlas` declares them. */
-const HULL_ANIMATIONS: readonly DefoldHash[] = [
-  hashLiteral("#tank-blue-hull"),
-  hashLiteral("#tank-red-hull"),
-  hashLiteral("#tank-green-hull"),
-  hashLiteral("#tank-sand-hull"),
-];
-const TURRET_ANIMATIONS: readonly DefoldHash[] = [
-  hashLiteral("#tank-blue-turret"),
-  hashLiteral("#tank-red-turret"),
-  hashLiteral("#tank-green-turret"),
-  hashLiteral("#tank-sand-turret"),
-];
-const WRECK_ANIMATIONS: readonly DefoldHash[] = [
-  hashLiteral("#tank-blue-wreck"),
-  hashLiteral("#tank-red-wreck"),
-  hashLiteral("#tank-green-wreck"),
-  hashLiteral("#tank-sand-wreck"),
-];
-const CHASSIS_ANIMATIONS: readonly (readonly DefoldHash[])[] = [
-  [
-    hashLiteral("#chassis-blue-scout"),
-    hashLiteral("#chassis-blue-assault"),
-    hashLiteral("#chassis-blue-bulwark"),
-    hashLiteral("#chassis-blue-artillery"),
-  ],
-  [
-    hashLiteral("#chassis-red-scout"),
-    hashLiteral("#chassis-red-assault"),
-    hashLiteral("#chassis-red-bulwark"),
-    hashLiteral("#chassis-red-artillery"),
-  ],
-  [
-    hashLiteral("#chassis-green-scout"),
-    hashLiteral("#chassis-green-assault"),
-    hashLiteral("#chassis-green-bulwark"),
-    hashLiteral("#chassis-green-artillery"),
-  ],
-  [
-    hashLiteral("#chassis-sand-scout"),
-    hashLiteral("#chassis-sand-assault"),
-    hashLiteral("#chassis-sand-bulwark"),
-    hashLiteral("#chassis-sand-artillery"),
-  ],
-];
-
 interface TankSelf {
   /** Editor property: the simulation slot this part belongs to. */
   slot: number;
@@ -81,6 +45,8 @@ interface TankSelf {
   turret: boolean;
   mode: number;
   chassis: number;
+  direction: number;
+  moving: boolean;
   z: number;
   transform: PlayerTransform;
 }
@@ -106,11 +72,6 @@ function showHero(show: boolean): void {
   if (show) msg.post("#hero", "play_animation", { id: HERO_ANIMATION });
 }
 
-function chassisAnimation(colour: number, chassis: number): DefoldHash {
-  const definition = chassisById(chassis);
-  return CHASSIS_ANIMATIONS[colour]![definition.id - 1]!;
-}
-
 export default defineComponent({
   properties: {
     slot: property.number(0),
@@ -124,6 +85,8 @@ export default defineComponent({
     // invalid sentinel here also makes a respawn and a chassis change follow
     // the same deterministic selection path.
     self.chassis = 0;
+    self.direction = -1;
+    self.moving = false;
     self.z = go.getPosition().z;
     self.transform = { x: 0, y: 0, hullX: 0, hullY: 0, turretX: 0, turretY: 0 };
     const match = arenaMatch();
@@ -131,7 +94,7 @@ export default defineComponent({
     const team = world === undefined ? 0 : world.playerTeam[Math.trunc(self.slot)]!;
     self.colour = tankColour(Math.trunc(self.slot), team, match === undefined ? -1 : match.localSlot);
     msg.post("#hero", "disable");
-    play(self.turret ? TURRET_ANIMATIONS[self.colour]! : HULL_ANIMATIONS[self.colour]!);
+    play(self.turret ? tankTurretAnimation(self.colour, 1, 4) : tankHullIdleAnimation(self.colour, 1, 4));
   },
 
   update(self: TankSelf, _dt: number): void {
@@ -157,29 +120,53 @@ export default defineComponent({
         // A pilot or wreck has no turret to draw. Keep the component alive for
         // the replacement tank, but park it outside the arena meanwhile.
         if (mode !== PLAYER_MODE_TANK) go.setPosition(vmath.vector3(-10_000, -10_000, self.z));
+        else self.direction = -1;
       } else {
         showHero(mode === PLAYER_MODE_INFANTRY);
-        if (mode !== PLAYER_MODE_INFANTRY) {
-          play(mode === PLAYER_MODE_DEAD ? WRECK_ANIMATIONS[self.colour]! : chassisAnimation(self.colour, chassis));
-        }
+        if (mode === PLAYER_MODE_DEAD) play(tankWreckAnimation(self.colour));
+        else if (mode === PLAYER_MODE_TANK) self.direction = -1;
       }
-    } else if (self.turret) {
-      if (mode === PLAYER_MODE_TANK && colourChanged) play(TURRET_ANIMATIONS[self.colour]!);
-    } else if (colourChanged || (mode === PLAYER_MODE_TANK && chassisChanged)) {
-      if (mode !== PLAYER_MODE_INFANTRY) {
-        play(mode === PLAYER_MODE_DEAD ? WRECK_ANIMATIONS[self.colour]! : chassisAnimation(self.colour, chassis));
-      }
+    } else if (!self.turret && mode === PLAYER_MODE_DEAD && colourChanged) {
+      play(tankWreckAnimation(self.colour));
     }
     if (mode !== PLAYER_MODE_TANK && self.turret) return;
 
     const sampled = match?.samplePlayerTransform(slot, self.transform) ?? false;
     if (!sampled) return;
-    go.setPosition(vmath.vector3(pixelX(self.transform.x), pixelY(self.transform.y), self.z));
+    const drawZ = 0.2 + isometricDepth(self.transform.x, self.transform.y) * 0.05 + (self.turret ? 0.001 : 0);
+    go.setPosition(
+      vmath.vector3(
+        projectedX(self.transform.x, self.transform.y),
+        projectedY(self.transform.x, self.transform.y),
+        drawZ,
+      ),
+    );
     if (mode === PLAYER_MODE_DEAD) return;
     const directionX = self.turret ? self.transform.turretX : self.transform.hullX;
     const directionY = self.turret ? self.transform.turretY : self.transform.hullY;
-    go.setRotation(
-      vmath.quatRotationZ(directionRadians(directionX, directionY) + (mode === PLAYER_MODE_INFANTRY ? Math.PI / 2 : 0)),
-    );
+    if (mode === PLAYER_MODE_TANK) {
+      const moving =
+        Math.abs(world.playerVelocityX[slot]!) >= VELOCITY_SCALE ||
+        Math.abs(world.playerVelocityY[slot]!) >= VELOCITY_SCALE;
+      const movementChanged = !self.turret && moving !== self.moving;
+      const direction = isometricDirectionIndex(
+        isometricDirectionX(directionX, directionY),
+        isometricDirectionY(directionX, directionY),
+      );
+      if (direction !== self.direction || colourChanged || chassisChanged || modeChanged || movementChanged) {
+        self.direction = direction;
+        self.moving = moving;
+        play(
+          self.turret
+            ? tankTurretAnimation(self.colour, chassis, direction)
+            : moving
+              ? tankHullAnimation(self.colour, chassis, direction)
+              : tankHullIdleAnimation(self.colour, chassis, direction),
+        );
+      }
+      go.setRotation(vmath.quatRotationZ(0));
+    } else {
+      go.setRotation(vmath.quatRotationZ(projectedDirectionRadians(directionX, directionY) + Math.PI / 2));
+    }
   },
 });

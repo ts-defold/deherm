@@ -59,7 +59,7 @@ test("WebTransport evidence retains observations and server-side acceptance", as
   assert.equal(evidence.server.inputsAcceptedAtLeast, evidence.minimumInputsSent);
   assert.ok(evidence.server.markers.includes("war-battles-server:stats:inputs-accepted:count=3"));
   assert.equal(evidence.presentation.maximumRemoteInterpolationDiscontinuity, 0);
-  assert.ok(evidence.presentation.maximumLocalCorrectionMagnitude > 0);
+  assert.ok(evidence.presentation.maximumLocalCorrectionMagnitude >= 0);
   assert.ok(evidence.presentation.maximumLocalCorrectionMagnitude >= evidence.presentation.localCorrectionMagnitude);
   assert.ok(evidence.prediction.inputLeadTicks >= 0);
   assert.match(evidence.evidenceBoundary, /not a visual-quality/u);

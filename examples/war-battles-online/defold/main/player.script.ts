@@ -13,14 +13,21 @@ import {
   type Vector3,
 } from "@deherm/project";
 
-import { arenaMatch, directionRadians, pixelX, pixelY } from "../src/arena-match";
+import { arenaMatch, projectedDirectionRadians, projectedX, projectedY } from "../src/arena-match";
 import {
   PLAYER_MODE_DEAD,
   PLAYER_MODE_INFANTRY,
   PLAYER_MODE_TANK,
-  chassisById,
+  VELOCITY_SCALE,
+  isometricControlWorldX,
+  isometricControlWorldY,
+  isometricDepth,
+  isometricDirectionX,
+  isometricDirectionY,
+  isometricDirectionIndex,
   type PlayerTransform,
 } from "../src/generated-war-battles/index";
+import { tankHullAnimation, tankHullIdleAnimation, tankWreckAnimation } from "../src/generated-tank-art";
 
 const UP = hashLiteral("#up");
 const DOWN = hashLiteral("#down");
@@ -53,19 +60,6 @@ const CAMERA = "/camera#follow";
 /** The arena director, which owns the match and every factory in the scene. */
 const ARENA = "/arena#arena";
 
-/**
- * The tank hull sprite points +x at rotation zero, which is what
- * `quat_rotation_z` treats as its own zero, so no authored facing offset is
- * needed. (The tutorial's infantry art faced screen-down and did need one.)
- */
-const ART_FACING_OFFSET = 0;
-const CHASSIS_ANIMATIONS: readonly DefoldHash[] = [
-  hashLiteral("#chassis-blue-scout"),
-  hashLiteral("#chassis-blue-assault"),
-  hashLiteral("#chassis-blue-bulwark"),
-  hashLiteral("#chassis-blue-artillery"),
-];
-const WRECK_ANIMATION = hashLiteral("#tank-blue-wreck");
 const HERO_ANIMATION = hashLiteral("#player-down");
 const SPEED = 180;
 
@@ -98,6 +92,8 @@ interface PlayerSelf {
   weapon: number;
   z: number;
   chassis: number;
+  directionIndex: number;
+  moving: boolean;
   mode: number;
   transform: PlayerTransform;
 }
@@ -160,7 +156,13 @@ function step(self: PlayerSelf, dt: number): void {
       position.z,
     ),
   );
-  go.setRotation(vmath.quatRotationZ(Math.atan2(direction.y, direction.x) + ART_FACING_OFFSET));
+  const directionIndex = isometricDirectionIndex(direction.x, direction.y);
+  if (directionIndex !== self.directionIndex || !self.moving) {
+    self.directionIndex = directionIndex;
+    self.moving = true;
+    msg.post("#sprite", "play_animation", { id: tankHullAnimation(0, 1, directionIndex) });
+  }
+  go.setRotation(vmath.quatRotationZ(0));
 }
 
 function fire(self: PlayerSelf): void {
@@ -185,9 +187,15 @@ function engage(self: PlayerSelf): void {
 function pushControls(self: PlayerSelf): void {
   const match = arenaMatch();
   if (match === undefined) return;
-  const moveX = (self.right ? 1 : 0) - (self.left ? 1 : 0);
-  const moveY = (self.up ? 1 : 0) - (self.down ? 1 : 0);
-  match.setControls(moveX, moveY, self.firing, self.boosting, self.weapon);
+  const screenX = (self.right ? 1 : 0) - (self.left ? 1 : 0);
+  const screenY = (self.up ? 1 : 0) - (self.down ? 1 : 0);
+  match.setControls(
+    isometricControlWorldX(screenX, screenY),
+    isometricControlWorldY(screenX, screenY),
+    self.firing,
+    self.boosting,
+    self.weapon,
+  );
   self.weapon = 0;
 }
 
@@ -228,9 +236,12 @@ export default defineComponent({
     const position = go.getPosition();
     self.z = position.z;
     self.chassis = 0;
+    self.directionIndex = -1;
+    self.moving = false;
     self.mode = -1;
     self.transform = { x: 0, y: 0, hullX: 0, hullY: 0, turretX: 0, turretY: 0 };
     msg.post("#hero", "disable");
+    msg.post("#sprite", "play_animation", { id: tankHullIdleAnimation(0, 1, 4) });
     defold.log("info", `war-battles:player-init:${position.x.toFixed(1)}:${position.y.toFixed(1)}`);
   },
 
@@ -274,19 +285,37 @@ export default defineComponent({
         } else {
           msg.post("#hero", "disable");
           msg.post("#sprite", "enable");
-          msg.post("#sprite", "play_animation", {
-            id: mode === PLAYER_MODE_DEAD ? WRECK_ANIMATION : CHASSIS_ANIMATIONS[chassisById(chassis).id - 1]!,
-          });
+          if (mode === PLAYER_MODE_DEAD) msg.post("#sprite", "play_animation", { id: tankWreckAnimation(0) });
+          else self.directionIndex = -1;
         }
-      } else if (mode === PLAYER_MODE_TANK && chassisChanged) {
-        msg.post("#sprite", "play_animation", { id: CHASSIS_ANIMATIONS[chassisById(chassis).id - 1]! });
       }
       if (!(match?.samplePlayerTransform(slot, self.transform) ?? false)) return;
-      const x = pixelX(self.transform.x);
-      const y = pixelY(self.transform.y);
-      go.setPosition(vmath.vector3(x, y, self.z));
-      const facing = directionRadians(self.transform.hullX, self.transform.hullY);
-      go.setRotation(vmath.quatRotationZ(facing + (mode === PLAYER_MODE_INFANTRY ? Math.PI / 2 : 0)));
+      const x = projectedX(self.transform.x, self.transform.y);
+      const y = projectedY(self.transform.x, self.transform.y);
+      const z = 0.2 + isometricDepth(self.transform.x, self.transform.y) * 0.05;
+      go.setPosition(vmath.vector3(x, y, z));
+      if (mode === PLAYER_MODE_TANK) {
+        const moving =
+          Math.abs(world.playerVelocityX[slot]!) >= VELOCITY_SCALE ||
+          Math.abs(world.playerVelocityY[slot]!) >= VELOCITY_SCALE;
+        const directionIndex = isometricDirectionIndex(
+          isometricDirectionX(self.transform.hullX, self.transform.hullY),
+          isometricDirectionY(self.transform.hullX, self.transform.hullY),
+        );
+        if (directionIndex !== self.directionIndex || chassisChanged || modeChanged || moving !== self.moving) {
+          self.directionIndex = directionIndex;
+          self.moving = moving;
+          msg.post("#sprite", "play_animation", {
+            id: moving
+              ? tankHullAnimation(0, chassis, directionIndex)
+              : tankHullIdleAnimation(0, chassis, directionIndex),
+          });
+        }
+        go.setRotation(vmath.quatRotationZ(0));
+      } else if (mode === PLAYER_MODE_INFANTRY) {
+        const facing = projectedDirectionRadians(self.transform.hullX, self.transform.hullY);
+        go.setRotation(vmath.quatRotationZ(facing + Math.PI / 2));
+      }
       msg.post(CAMERA, "player_at", { x, y });
       return;
     }
@@ -295,6 +324,10 @@ export default defineComponent({
     msg.post(CAMERA, "player_at", { x: start.x, y: start.y });
     if (self.demo > 0 && !self.demoFired && self.elapsed >= self.demo) {
       self.demoFired = true;
+      // The tutorial target is evidence-only. It is created for the one
+      // scripted shot and deleted by the rocket collision; normal gameplay
+      // contains no decorative tutorial tanks baked into the collection.
+      factory.create("#demotankfactory", vmath.vector3(860, 360, 0));
       // One second reproduces the original demonstration shot; the tour keeps
       // walking afterwards so the enlarged world visibly scrolls on launch.
       self.demoMove = 1 + self.tour;
@@ -313,6 +346,8 @@ export default defineComponent({
       self.demoMove -= dt;
       if (self.demoMove <= 0) {
         self.direction = vmath.vector3(0, 0, 0);
+        self.moving = false;
+        msg.post("#sprite", "play_animation", { id: tankHullIdleAnimation(0, 1, self.directionIndex) });
         self.demoTurn = 0;
         const position = go.getPosition();
         defold.log("info", `war-battles:player-moved:${position.x.toFixed(1)}:${position.y.toFixed(1)}`);

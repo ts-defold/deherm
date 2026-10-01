@@ -38,6 +38,7 @@ const repositoryRoot = resolve(exampleRoot, "../..");
 const bundleDirectory =
   process.env.DEHERM_WAR_BATTLES_WEB_BUNDLE ?? resolve(repositoryRoot, "build/bundle/War Battles");
 const bundleResource = resolve(exampleRoot, "defold/deherm/app.dehermc");
+const mainCollection = resolve(exampleRoot, "defold/main/main.collection");
 const evidencePath = resolve(exampleRoot, "evidence/browser-runtime-wasm-web.json");
 const chromeBinary = process.env.DEHERM_CHROME ?? defaultChromeBinary;
 
@@ -58,13 +59,8 @@ export const REQUIRED_ENGINE_MARKER_PATTERNS = Object.freeze([
 
 export const REQUIRED_GAME_MARKERS = Object.freeze([
   "war-battles:ui-init",
-  "war-battles:player-init:560.0:360.0",
-  "war-battles:player-fire:560.0:360.0:1.00:0.00",
   "war-battles:rocket-init:1.00:0.00",
-  "war-battles:rocket-hit",
-  "war-battles:score:100",
-  "war-battles:rocket-explosion-done",
-  "war-battles:player-moved:1592.0:1072.0",
+  "war-battles:rocket-expired",
   // The scripted demonstration ends by handing the scene to the arena, which
   // creates the roster, the turrets and the pickup pads. Observing the engage
   // marker is what distinguishes "the tutorial loop ran" from "the game started".
@@ -75,6 +71,9 @@ export const REQUIRED_GAME_MARKERS = Object.freeze([
 export const REQUIRED_GAME_MARKER_PATTERNS = Object.freeze([
   /^war-battles:camera-init:zoom=([0-9]+(?:\.[0-9]+)?):view=([0-9]+)x([0-9]+):cameras=1$/u,
   /^war-battles:camera-bounds:x=\[(-?[0-9]+(?:\.[0-9]+)?),(-?[0-9]+(?:\.[0-9]+)?)\]:y=\[(-?[0-9]+(?:\.[0-9]+)?),(-?[0-9]+(?:\.[0-9]+)?)\]$/u,
+  /^war-battles:player-init:(-?[0-9]+(?:\.[0-9]+)?):(-?[0-9]+(?:\.[0-9]+)?)$/u,
+  /^war-battles:player-fire:(-?[0-9]+(?:\.[0-9]+)?):(-?[0-9]+(?:\.[0-9]+)?):1\.00:0\.00$/u,
+  /^war-battles:player-moved:(-?[0-9]+(?:\.[0-9]+)?):(-?[0-9]+(?:\.[0-9]+)?)$/u,
 ]);
 
 /**
@@ -84,11 +83,11 @@ export const REQUIRED_GAME_MARKER_PATTERNS = Object.freeze([
  * `test/integration.test.mjs` against the generated component manifest, so a
  * component that is authored but never registered - or registered but never
  * authored - shows up as a disagreement rather than as a silent pass. It moved
- * from five to eight with the Ultimate Edition: the arena director, the tank
- * hull/turret renderer and the pickup pad joined the four original components
- * and the retained presentation mockup.
+ * from five to nine with the Ultimate Edition: the arena director, the tank
+ * hull/turret renderer, the pickup pad, and the arena-landmark renderer joined
+ * the four original components and the retained presentation mockup.
  */
-export const EXPECTED_COMPONENT_COUNT = 8;
+export const EXPECTED_COMPONENT_COUNT = 9;
 
 // Camera samples carry a frame-dependent position, so the gate asserts the
 // scroll behaviour rather than one sampled coordinate.
@@ -128,7 +127,25 @@ function missing(transcript) {
   return absent;
 }
 
-function cameraGeometry(transcript) {
+function authoredCameraWorldBounds(collection) {
+  const start = collection.indexOf('instances {\n  id: "camera"');
+  assert.notEqual(start, -1, "Authored main collection has no camera instance");
+  const next = collection.indexOf("\ninstances {", start + 1);
+  const block = collection.slice(start, next === -1 ? undefined : next);
+  const numberProperty = (id) => {
+    const match = new RegExp(`id: "${id}"\\s+value: "(-?[0-9]+(?:\\.[0-9]+)?)"`, "u").exec(block);
+    assert.ok(match, `Authored camera has no numeric ${id} property`);
+    return Number(match[1]);
+  };
+  return {
+    minX: numberProperty("worldMinX"),
+    minY: numberProperty("worldMinY"),
+    maxX: numberProperty("worldMaxX"),
+    maxY: numberProperty("worldMaxY"),
+  };
+}
+
+function cameraGeometry(transcript, authoredBounds) {
   const init = transcript.map((line) => REQUIRED_GAME_MARKER_PATTERNS[0].exec(line)).find(Boolean);
   const bounds = transcript.map((line) => REQUIRED_GAME_MARKER_PATTERNS[1].exec(line)).find(Boolean);
   assert.ok(init, "Browser camera initialization marker is missing");
@@ -156,26 +173,51 @@ function cameraGeometry(transcript) {
     "Browser auto-fit height must project the authored 720-pixel display",
   );
   assert.ok(
-    Math.abs(geometry.minX - geometry.viewWidth / 2 - -312) < 1,
+    Math.abs(geometry.minX - geometry.viewWidth / 2 - authoredBounds.minX) < 1,
     "Browser camera minimum X must preserve the authored world bound",
   );
   assert.ok(
-    Math.abs(geometry.maxX + geometry.viewWidth / 2 - 1608) < 1,
+    Math.abs(geometry.maxX + geometry.viewWidth / 2 - authoredBounds.maxX) < 1,
     "Browser camera maximum X must preserve the authored world bound",
   );
   assert.ok(
-    Math.abs(geometry.minY - geometry.viewHeight / 2 - -352) < 1,
+    Math.abs(geometry.minY - geometry.viewHeight / 2 - authoredBounds.minY) < 1,
     "Browser camera minimum Y must preserve the authored world bound",
   );
   assert.ok(
-    Math.abs(geometry.maxY + geometry.viewHeight / 2 - 1088) < 1,
+    Math.abs(geometry.maxY + geometry.viewHeight / 2 - authoredBounds.maxY) < 1,
     "Browser camera maximum Y must preserve the authored world bound",
+  );
+  return geometry;
+}
+
+function tutorialGeometry(transcript) {
+  const init = transcript.map((line) => REQUIRED_GAME_MARKER_PATTERNS[2].exec(line)).find(Boolean);
+  const fire = transcript.map((line) => REQUIRED_GAME_MARKER_PATTERNS[3].exec(line)).find(Boolean);
+  const moved = transcript.map((line) => REQUIRED_GAME_MARKER_PATTERNS[4].exec(line)).find(Boolean);
+  assert.ok(init, "Browser player initialization marker is missing");
+  assert.ok(fire, "Browser player fire marker is missing");
+  assert.ok(moved, "Browser player movement marker is missing");
+  const geometry = {
+    initialX: Number(init[1]),
+    initialY: Number(init[2]),
+    firedX: Number(fire[1]),
+    firedY: Number(fire[2]),
+    movedX: Number(moved[1]),
+    movedY: Number(moved[2]),
+  };
+  assert.equal(geometry.firedX, geometry.initialX, "Tutorial fire must originate at the initialized player X");
+  assert.equal(geometry.firedY, geometry.initialY, "Tutorial fire must originate at the initialized player Y");
+  assert.ok(
+    geometry.movedX !== geometry.initialX || geometry.movedY !== geometry.initialY,
+    "Tutorial player must move away from its initialized position",
   );
   return geometry;
 }
 
 async function run() {
   const bundleBytes = await readFile(bundleResource);
+  const authoredBounds = authoredCameraWorldBounds(await readFile(mainCollection, "utf8"));
   const expectedFingerprint = /__DEFOLD_HERMES_BUILD_FINGERPRINT__ = "([0-9a-f]{64})"/.exec(
     bundleBytes.toString("utf8"),
   )?.[1];
@@ -257,7 +299,8 @@ async function run() {
     assert.deepEqual(fatal, [], `Browser page errors: ${JSON.stringify(fatal)}`);
 
     const cameraSamples = client.transcript.filter((line) => line.startsWith("war-battles:camera:"));
-    const observedCamera = cameraGeometry(client.transcript);
+    const observedCamera = cameraGeometry(client.transcript, authoredBounds);
+    const observedTutorial = tutorialGeometry(client.transcript);
     const evidence = {
       schemaVersion: 2,
       projection: projectionEnvelope(PROJECTION_ID),
@@ -273,6 +316,7 @@ async function run() {
         (line) => line.startsWith("war-battles:") && !line.startsWith("war-battles:camera:"),
       ),
       observedCamera,
+      observedTutorial,
       cameraSampleCount: cameraSamples.length,
       cameraClampStates: [
         ...new Set(cameraSamples.map((line) => line.slice(line.lastIndexOf(":clamped=") + 9))),

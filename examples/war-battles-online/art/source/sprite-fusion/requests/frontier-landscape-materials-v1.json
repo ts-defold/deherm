@@ -1,0 +1,164 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_c661bb4f-47cb-476f-af48-a1a8be943a1f",
+  "operation": "generate",
+  "prompt": "A seamless top-down landscape ground texture tile for a whimsical retro military pixel-art battlefield. Landscape only: broad olive meadow, trampled ochre earth, dark volcanic basalt, and charcoal scorch belong to one coherent outdoor world. Use large calm color masses with sparse clustered pixel detail so tanks and projectiles remain readable. Restrained 1990s arcade palette, chunky one-pixel texture clusters, warm highlights, dark plum shadows. No buildings, props, roads, walls, cliffs, craters, objects, icons, borders, lettering, UI, isolated patches, perspective, or transparent background.",
+  "size": 64,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/frontier-landscape-materials-v1.json",
+    "sha256": "b1d99738a9b67a749bcba30ae621116aa52480d2c9d692c59adee8fd2ad4a01d"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "dab448f8-4baf-4711-bb8f-0e5fa7f534bc",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/dab448f8-4baf-4711-bb8f-0e5fa7f534bc/image.png?v=1790809479236",
+      "path": "art/source/sprite-fusion/outputs/frontier-landscape-materials-v1/00.png",
+      "bytes": 9028,
+      "sha256": "aeb7d0f32fa9ca60ca32243751aa9a7018d6d1307c723171e859fe48885cb785"
+    },
+    {
+      "index": 1,
+      "assetId": "c6b682ff-7ac7-49ae-adad-f8c1f54769bc",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/c6b682ff-7ac7-49ae-adad-f8c1f54769bc/image.png?v=1790809479969",
+      "path": "art/source/sprite-fusion/outputs/frontier-landscape-materials-v1/01.png",
+      "bytes": 10643,
+      "sha256": "96e490b84bcbe932eee4409c7b2c3eac0de672a8b1b0f23ace83b873cb8c083e"
+    },
+    {
+      "index": 2,
+      "assetId": "d5311b46-b836-484d-96f1-d9c8d0bc46bc",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/d5311b46-b836-484d-96f1-d9c8d0bc46bc/image.png?v=1790809480322",
+      "path": "art/source/sprite-fusion/outputs/frontier-landscape-materials-v1/02.png",
+      "bytes": 10758,
+      "sha256": "a43e555a89ba36985093e0b7a44ae657d9675472ccd938dfb1ffdb2964a8a621"
+    },
+    {
+      "index": 3,
+      "assetId": "e8799b5e-8a51-4408-8f69-f6d825142419",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/e8799b5e-8a51-4408-8f69-f6d825142419/image.png?v=1790809480666",
+      "path": "art/source/sprite-fusion/outputs/frontier-landscape-materials-v1/03.png",
+      "bytes": 12381,
+      "sha256": "c3b73ad989e8d4ec44934a1806fe9d50366e354782bb7bb4190fe508c06531b1"
+    },
+    {
+      "index": 4,
+      "assetId": "0eb4405b-9110-4050-8488-71c60999575b",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/0eb4405b-9110-4050-8488-71c60999575b/image.png?v=1790809481004",
+      "path": "art/source/sprite-fusion/outputs/frontier-landscape-materials-v1/04.png",
+      "bytes": 7797,
+      "sha256": "ca9a64976ddcf4f4041fb9359286350a4002f05237d0c6baf5afac173886f740"
+    },
+    {
+      "index": 5,
+      "assetId": "57443c5c-f1d8-46f0-b3c6-580cd2d9cfef",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 66,
+      "height": 66,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/57443c5c-f1d8-46f0-b3c6-580cd2d9cfef/image.png?v=1790809481661",
+      "path": "art/source/sprite-fusion/outputs/frontier-landscape-materials-v1/05.png",
+      "bytes": 195,
+      "sha256": "d779489144ff6233c13f5214a5cde0eb5e5528d83860b3c16c101fe91d646730"
+    },
+    {
+      "index": 6,
+      "assetId": "7f964ace-3924-4416-ab62-fe5895a4e0c9",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/7f964ace-3924-4416-ab62-fe5895a4e0c9/image.png?v=1790809482230",
+      "path": "art/source/sprite-fusion/outputs/frontier-landscape-materials-v1/06.png",
+      "bytes": 8617,
+      "sha256": "fbd83a29e3e1e2f9dd3374a9c4894a6f678dc10577a58c54f271fcd77add2415"
+    },
+    {
+      "index": 7,
+      "assetId": "230e8673-65cf-4e37-813f-176bae1d014a",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/230e8673-65cf-4e37-813f-176bae1d014a/image.png?v=1790809482815",
+      "path": "art/source/sprite-fusion/outputs/frontier-landscape-materials-v1/07.png",
+      "bytes": 8872,
+      "sha256": "d5d8e931a364cc0d08472bd2abf461e79654b1de9af222280d187834236a7909"
+    },
+    {
+      "index": 8,
+      "assetId": "3b804616-67dc-42d4-bf34-e4042eb13a32",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/3b804616-67dc-42d4-bf34-e4042eb13a32/image.png?v=1790809483385",
+      "path": "art/source/sprite-fusion/outputs/frontier-landscape-materials-v1/08.png",
+      "bytes": 7791,
+      "sha256": "670abc67b9e36eb7345ed3aed15c72ab91636ebf1d9f8062ecef7a19085bb0f6"
+    },
+    {
+      "index": 9,
+      "assetId": "7f9da545-6082-42e9-b5c1-1c9d3ad45191",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/7f9da545-6082-42e9-b5c1-1c9d3ad45191/image.png?v=1790809483972",
+      "path": "art/source/sprite-fusion/outputs/frontier-landscape-materials-v1/09.png",
+      "bytes": 6713,
+      "sha256": "d1c888b43111fefd1e6a2cba68d1bd3cc7e97c96b62923f1682e01cbd81cefe4"
+    },
+    {
+      "index": 10,
+      "assetId": "5d12bcb6-fd80-4633-8d62-ab6cbcaeacb0",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/5d12bcb6-fd80-4633-8d62-ab6cbcaeacb0/image.png?v=1790809484558",
+      "path": "art/source/sprite-fusion/outputs/frontier-landscape-materials-v1/10.png",
+      "bytes": 7865,
+      "sha256": "177c8f63f6615552f2646b5a66b82a1943f937b604551f4171bc066a5bacf418"
+    },
+    {
+      "index": 11,
+      "assetId": "e3d644ac-c455-437f-88ad-0157ac1ae7b3",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/e3d644ac-c455-437f-88ad-0157ac1ae7b3/image.png?v=1790809485206",
+      "path": "art/source/sprite-fusion/outputs/frontier-landscape-materials-v1/11.png",
+      "bytes": 7355,
+      "sha256": "c6806984e43e719afa28564cbbab52a0665f8a8db64c6b8703a759545cd4f98b"
+    }
+  ],
+  "credits": {
+    "remaining": 3060
+  }
+}

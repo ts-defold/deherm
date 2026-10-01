@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "status": "source-concept",
+  "operation": "generate-then-layer-edits",
+  "artDirection": "art/direction/gameplay-target-v2.png",
+  "intendedNativeScale": {
+    "logicalTileSize": 16,
+    "tankLengthPixels": [40, 44],
+    "atlasCell": [96, 96],
+    "facingAtZeroRotation": "screen-right",
+    "projection": "three-quarter-isometric-top-down"
+  },
+  "outputs": {
+    "composite": {
+      "path": "art/source/openai/bulwark-tank-v1/composite.png",
+      "sha256": "781a224ca43bda91fc55e3d83f84f657d5ae4ed288dc1a668f573d50401ea042"
+    },
+    "hull": {
+      "path": "art/source/openai/bulwark-tank-v1/hull.png",
+      "sha256": "3cad8bd99fb27af4bf1cf1ee6e243c64a4d016f3437855ac61ed5657cc10da95"
+    },
+    "turret": {
+      "path": "art/source/openai/bulwark-tank-v1/turret.png",
+      "sha256": "f485b660efdc044a327ff65b63d429aaead274d22534997323154e8a09aada50"
+    },
+    "fixedHull": "art/source/openai/bulwark-tank-v1/hull-grid-fixed.png",
+    "fixedTurret": "art/source/openai/bulwark-tank-v1/turret-grid-fixed.png"
+  },
+  "pixelFixer": {
+    "repository": "https://github.com/Retro-Diffusion/pixel-art-fixer",
+    "revision": "ef376e57e1c272633ca2dbf5f29ec3fcf6596465",
+    "license": "MIT",
+    "mode": "full",
+    "localEvaluationPatch": "Guard Windows peak-RSS telemetry with cfg(target_os = windows); use zero on other hosts.",
+    "hull": { "cols": 259, "rows": 211, "stepX": 5.3108, "stepY": 5.4357, "consensus": "arbitrated" },
+    "turret": { "cols": 360, "rows": 278, "stepX": 3.8185, "stepY": 4.1198, "consensus": "arbitrated" }
+  },
+  "runtimeProjection": {
+    "hullSize": [56, 46],
+    "hullAnchor": [135, 68],
+    "turretSize": [64, 38],
+    "turretAnchor": [181, 156],
+    "anchorMeaning": "turret-ring centre; projected to atlas-cell centre for independent rotation"
+  }
+}

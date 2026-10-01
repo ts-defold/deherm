@@ -157,6 +157,159 @@ async function emit(relativePath, bytes) {
   await writeFile(absolute, bytes);
 }
 
+function surface(width, height) {
+  return { width, height, pixels: Buffer.alloc(width * height * 4) };
+}
+
+function setPixel(image, x, y, color) {
+  if (x < 0 || y < 0 || x >= image.width || y >= image.height) return;
+  const offset = (y * image.width + x) * 4;
+  image.pixels[offset] = color[0];
+  image.pixels[offset + 1] = color[1];
+  image.pixels[offset + 2] = color[2];
+  image.pixels[offset + 3] = color[3] ?? 255;
+}
+
+function fillRect(image, x, y, width, height, color) {
+  for (let row = y; row < y + height; row += 1) {
+    for (let column = x; column < x + width; column += 1) setPixel(image, column, row, color);
+  }
+}
+
+function strokeRect(image, x, y, width, height, color) {
+  fillRect(image, x, y, width, 1, color);
+  fillRect(image, x, y + height - 1, width, 1, color);
+  fillRect(image, x, y, 1, height, color);
+  fillRect(image, x + width - 1, y, 1, height, color);
+}
+
+const chrome = {
+  void: [12, 18, 19, 238],
+  basalt: [28, 34, 31, 248],
+  inset: [18, 29, 28, 224],
+  steelDark: [48, 56, 50, 248],
+  steel: [83, 91, 76, 250],
+  steelLight: [139, 145, 112, 252],
+  cream: [226, 214, 174, 255],
+  amber: [228, 132, 34, 255],
+  hot: [255, 205, 69, 255],
+  white: [255, 255, 255, 255],
+};
+
+function hudShell() {
+  const image = surface(32, 32);
+  fillRect(image, 0, 0, 32, 32, chrome.void);
+  strokeRect(image, 0, 0, 32, 32, chrome.basalt);
+  strokeRect(image, 1, 1, 30, 30, chrome.steel);
+  fillRect(image, 2, 2, 28, 2, chrome.steelLight);
+  fillRect(image, 2, 4, 28, 26, chrome.inset);
+  fillRect(image, 2, 28, 28, 2, chrome.steelDark);
+  fillRect(image, 5, 3, 22, 2, chrome.amber);
+  fillRect(image, 9, 3, 4, 2, chrome.hot);
+  fillRect(image, 20, 3, 3, 2, chrome.hot);
+  for (const [x, y] of [
+    [5, 6],
+    [26, 6],
+    [5, 26],
+    [26, 26],
+  ]) {
+    setPixel(image, x, y, chrome.cream);
+    setPixel(image, x + 1, y, chrome.steelDark);
+  }
+  return image;
+}
+
+function hudCard() {
+  const image = surface(24, 24);
+  fillRect(image, 0, 0, 24, 24, chrome.void);
+  strokeRect(image, 0, 0, 24, 24, chrome.basalt);
+  strokeRect(image, 1, 1, 22, 22, chrome.steel);
+  fillRect(image, 2, 2, 20, 2, chrome.steelLight);
+  fillRect(image, 2, 4, 20, 18, chrome.inset);
+  fillRect(image, 5, 2, 14, 2, chrome.amber);
+  setPixel(image, 4, 5, chrome.cream);
+  setPixel(image, 19, 5, chrome.cream);
+  return image;
+}
+
+function hudStrip() {
+  const image = surface(24, 16);
+  fillRect(image, 0, 0, 24, 16, chrome.void);
+  strokeRect(image, 0, 0, 24, 16, chrome.basalt);
+  strokeRect(image, 1, 1, 22, 14, chrome.steel);
+  fillRect(image, 2, 2, 20, 2, chrome.steelLight);
+  fillRect(image, 2, 4, 20, 10, chrome.inset);
+  fillRect(image, 5, 2, 14, 2, chrome.amber);
+  return image;
+}
+
+function commandButton() {
+  const image = surface(24, 16);
+  fillRect(image, 0, 0, 24, 16, chrome.basalt);
+  strokeRect(image, 1, 1, 22, 14, chrome.cream);
+  fillRect(image, 2, 2, 20, 12, chrome.amber);
+  fillRect(image, 3, 3, 18, 3, chrome.hot);
+  fillRect(image, 3, 6, 18, 7, [190, 82, 24, 255]);
+  fillRect(image, 3, 12, 18, 1, [102, 45, 25, 255]);
+  setPixel(image, 4, 4, chrome.white);
+  setPixel(image, 19, 4, chrome.white);
+  return image;
+}
+
+function portraitFrame() {
+  const image = surface(96, 96);
+  strokeRect(image, 0, 0, 96, 96, chrome.basalt);
+  strokeRect(image, 1, 1, 94, 94, chrome.steel);
+  strokeRect(image, 3, 3, 90, 90, chrome.steelLight);
+  strokeRect(image, 6, 6, 84, 84, chrome.void);
+  for (const [x, y] of [
+    [4, 4],
+    [88, 4],
+    [4, 88],
+    [88, 88],
+  ]) {
+    fillRect(image, x, y, 4, 4, chrome.amber);
+    setPixel(image, x + 1, y + 1, chrome.hot);
+  }
+  fillRect(image, 16, 1, 64, 3, chrome.amber);
+  return image;
+}
+
+function meterTrack() {
+  const image = surface(12, 12);
+  fillRect(image, 0, 0, 12, 12, chrome.void);
+  strokeRect(image, 0, 0, 12, 12, chrome.basalt);
+  strokeRect(image, 1, 1, 10, 10, chrome.steel);
+  fillRect(image, 3, 3, 6, 6, chrome.inset);
+  return image;
+}
+
+function meterFill() {
+  const image = surface(8, 8);
+  fillRect(image, 0, 0, 8, 8, chrome.white);
+  fillRect(image, 0, 0, 8, 2, [255, 255, 255, 210]);
+  fillRect(image, 0, 6, 8, 2, [84, 92, 99, 255]);
+  return image;
+}
+
+const chromeAssets = [
+  { id: "hud-shell", image: hudShell(), slice: 8 },
+  { id: "hud-card", image: hudCard(), slice: 6 },
+  { id: "hud-strip", image: hudStrip(), slice: 5 },
+  { id: "command-button", image: commandButton(), slice: 5 },
+  { id: "portrait-frame", image: portraitFrame(), slice: 0 },
+  { id: "meter-track", image: meterTrack(), slice: 3 },
+  { id: "meter-fill", image: meterFill(), slice: 2 },
+];
+
+for (const asset of chromeAssets) {
+  const bytes = encodeRgbaPng(asset.image.width, asset.image.height, asset.image.pixels);
+  asset.path = `defold/assets/derived/ui/chrome/${asset.id}.png`;
+  asset.bytes = bytes.length;
+  asset.sha256 = sha256(bytes);
+  await emit(asset.path, bytes);
+}
+
 const selection = JSON.parse(await readFile(selectionPath, "utf8"));
 const selectionProjection = Buffer.from(
   `${JSON.stringify({ portrait: selection.portrait, runtimePlan: selection.runtimePlan })}\n`,
@@ -236,6 +389,18 @@ const metadata = {
       frames,
     },
   },
+  chrome: Object.fromEntries(
+    chromeAssets.map((asset) => [
+      asset.id,
+      {
+        path: asset.path,
+        nativeSize: [asset.image.width, asset.image.height],
+        slice: asset.slice,
+        bytes: asset.bytes,
+        sha256: asset.sha256,
+      },
+    ]),
+  ),
 };
 await emit(
   path.relative(exampleRoot, metadataPath).replaceAll(path.sep, "/"),
@@ -261,6 +426,15 @@ const atlas = [
   "  playback: PLAYBACK_LOOP_FORWARD",
   `  fps: ${animation.fps}`,
   "}",
+  ...chromeAssets.flatMap((asset) => [
+    "animations {",
+    `  id: "${asset.id}"`,
+    "  images {",
+    `    image: "/assets/derived/ui/chrome/${asset.id}.png"`,
+    "  }",
+    "  playback: PLAYBACK_NONE",
+    "}",
+  ]),
   "extrude_borders: 2",
   "",
 ].join("\n");

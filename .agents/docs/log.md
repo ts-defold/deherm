@@ -4805,3 +4805,166 @@ pointer, refreshes published-only pointers, and retains fail-closed byte checks
 for policy roots and subtree objects. A focused fixture reproduces the
 publication-only artifact binding and proves it no longer blocks docs or policy
 deployment.
+
+## 2026-09-30 - Explicit native-artifact verification keeps its evidence level
+
+Source review and a focused same-length mutation fixture confirmed an integrity
+gap in the installed target-artifact repair path. The explicit assertion hashed
+the installed member and rejected it, but delegated repair to the normal
+development installer; that installer trusted the authenticated receipt plus
+file size, reused the edited member, and let the assertion return success.
+Repair now requests digest verification from the installer, while ordinary
+unchanged development builds retain the intentional size-only fast path. The
+focused offline-cache fixture mutates the installed library without changing
+its byte count and proves explicit assertion restores the authenticated cached
+bytes. This is local cache/install integrity evidence; it does not re-prove the
+publisher or policy-site chain tracked by issue #113.
+
+## 2026-09-30 - War Battles isometric production-tank projection
+
+The selected production tank sources now materialize as four chassis families,
+four team palettes, eight hull headings, and eight independently selected
+turret headings. The generator validates the Sprite Fusion request manifests,
+output hashes, image dimensions, and direction order before emitting 596 PNG
+resources, 516 atlas animations, and the generated TypeScript animation-hash
+contract. Source generation consumed 150 credits in total and left 3,075. The
+art, HUD, tilemap, sync, TypeScript-context, and focused deterministic game
+checks passed from the current tree.
+
+The second hull frame is derived locally by moving only dark neutral tread-link
+pixels; the generator rejects a direction when it cannot prove that at least
+four pixels changed. Every team, chassis, and direction has a separate still
+animation and moving loop. Game scripts select between those animations from
+authoritative fixed-point velocity, so an idle tank does not churn its tracks
+and the art state does not guess from presentation deltas.
+
+The game now applies a canonical 2:1 presentation transform without changing
+the authoritative Cartesian simulation. One pure module owns screen position,
+projected heading, screen-relative input inversion, painter depth, and mortar
+arc lift; the tilemap, tanks, turrets, projectiles, pickups, effects, camera
+impacts, and local controls consume that seam. A missing remote-tank component
+and stale tutorial-atlas reference were also fixed, explaining the previously
+frozen overlapping bot art. A fresh Bob `wasm-web` bundle was launched in
+Chromium and manually observed rendering moving distinct chassis, independent
+turrets, diamond world geometry, pickups, muzzle flashes, and explosions. This
+is local browser visual/runtime observation. It does not establish native or
+cross-platform visual parity, and the final HUD/environment composition remains
+open. The repository's recorded bundle-size and packaged-native evidence is
+expectedly stale after the source/art change and was not promoted as passing.
+
+## 2026-09-30 - War Battles world landmarks and arcade-effects wave
+
+The ground projection now consumes a seamless 8x8 macro (64 tile roles) rather
+than repeating a 4x4 macro with a hard-coded diagonal dust stroke. Four new
+seeded ambient roles place sparse grass, stones, tread scuffs, and scorch marks
+only on cosmetic floor cells; the authoritative map, collision, snapshots, and
+network state remain unchanged. The projector continues to fill its six
+caller-owned role buffers and allocates nothing on steady frames. Generator
+checks cover all 64 ground roles, 16 wall masks, 11 decor roles, and three
+themes, while the authored default map originally resolved 230 ambient decor cells over
+10,800 ground cells.
+
+The previously approved Sprite Fusion depot selection is now a validated
+landmark rather than unused source art. The generator verifies its selection,
+request manifest, request spec, asset identity, source digest, and dimensions,
+then packs it into the ordinary Defold atlas. Sixteen presentation-only depot
+objects are placed from the authoritative spawn table and refreshed only when
+the map seed changes. They draw behind vehicles and do not participate in
+collision. No additional Sprite Fusion credits were consumed.
+
+Explosion generation now favors compact white/gold/orange/red fire lobes,
+broken radial spark streaks, and late smoke breakup instead of a large grey
+outlined mass. A fresh Bob `wasm-web` bundle compiled the new depot factory and
+atlas; Chromium rendered the new terrain, depot landmarks, moving tanks, and
+the revised effects. This is local browser visual/runtime observation. The
+flat concrete-wall presentation and broader environment structure remain the
+next world-art frontier; the new screenshot is not cross-platform evidence.
+
+## 2026-09-30 - War Battles raised bunker and effect-material pass
+
+The wall presentation now has three generated render strata over the same
+authoritative collision grid: a complete terrain floor, a dark wall facade, and
+the existing wall top. The facade uses the same 16-neighbour-mask projection as
+the top, but a second generated tilemap component draws it five screen pixels
+lower and between the floor and wall-top depth. Adjacent cells therefore merge
+into one bunker mass without introducing game objects, collision state, or
+steady-frame allocation. All three themes carry total wall-face tables; the
+tilemap generator emits and verifies both resources, and the runtime updates
+floor, facade, and top together on a seed change.
+
+The fire-to-smoke transition was also corrected at its most visible frame. The
+outer silhouette is now charcoal/purple smoke with a smaller off-centre
+white/gold/orange fire pocket and separate debris streaks, rather than one dark
+red radial blob. The deterministic art checks, generated-source checks,
+TypeScript context checks, and focused tilemap/art integration tests pass. A
+fresh pinned-Bob `wasm-web` bundle compiled both tilemaps, and Chromium rendered
+the facade under the wall tops plus the revised fire/smoke effects in the live
+32-player arena. This is local browser visual/runtime evidence; native and
+cross-platform visual parity remain unclaimed.
+
+The same semantic projector now derives short four-neighbour service roads from
+the 16 authoritative depot positions. Sixteen composable road-mask tiles form
+wider dirt beds with paired worn ruts; hazard fixtures and gameplay marks win
+on overlaps, and blocked cells naturally break the cosmetic route. The default
+arena now resolves 359 decor cells in total. The first browser pass exposed
+lanes that became rail-thin after the isometric squash, so the generator was
+corrected to use a 12-pixel bed with muted three-pixel-cadence ruts. No authored
+map cells or network state were added.
+
+## 2026-09-30 - War Battles isometric landmark composition wave
+
+The art pipeline now owns a single provenance-pinned isometric source sheet for
+nine large battlefield silhouettes: a field bunker, volcanic outcrop, supply
+dump, wreck, fuel cluster, gun nest, radio mast, scrap barricade, and shell
+crater. Explicit nonuniform crops are reduced by a deterministic 4x nearest-
+neighbour projection, their feathered source alpha is collapsed to a hard pixel
+boundary, and every cutout is bottom-registered in a common 160x128 cell. The
+source digest, crop rectangles, projection, output cell, and ground line are
+recorded beside the immutable source. The ordinary art generator verifies that
+record and emits all nine sprites and atlas animations; no service call or
+Sprite Fusion credit is required to reproduce them.
+
+The arena now places those nine silhouettes once per seeded map. Tall bunker,
+rock, supply, fuel, gun, radio, and barricade art is anchored only to the
+nearest authoritative wall cell; the low wreck and crater use authoritative
+floor cells. Placement is a bounded allocation-free search, refreshes only when
+the map seed changes, and adds no collision, snapshot, or network state. A
+fresh Deherm compile and pinned-Bob `wasm-web` bundle launched in Chromium and
+rendered the new field bunker at gameplay scale over its wall footprint. This
+is local HTML5 render evidence, not native/cross-platform parity, and the full
+map still needs camera tours through every landmark before calling the entire
+composition visually signed off.
+
+## 2026-09-30 - War Battles release-candidate UI and product evidence closeout
+
+The final HUD/title wave replaced the remaining stretched composite controls
+with deterministic small chrome assets, a dedicated title font, a readable
+deploy button, and a compact prompt strip. The owning generators now emit and
+verify those assets alongside the terrain, landmarks, directional tanks,
+projectiles, pickups, and arcade effects. Project generation refreshed the GUI
+resource symbol table before release reachability, which caught the new
+`title_prompt_back` node instead of allowing an unindexed string through the
+compiler.
+
+A fresh installed-package Deherm compile produced bundle fingerprint
+`45eeea0c9b9deef86c837f8b2354bef40c7c41bd855003a55adedebd5361b4ef`.
+Pinned Bob plus the local Extender rebuilt both arm64-macOS and `wasm-web` from
+that bundle. Real Chrome/WebGL2 then passed input, restart, sound, visible-pixel,
+and gameplay-marker checks; the retained title and gameplay captures hash to
+`d98f983590a08ee9cf55aab7efd948c64c144e7290fbd4ea13419daf65b29281`
+and `6018122cf3c3863cf9ed7af11f01a4a74878f9a1b9b6933c89def79a26bfc9ed`.
+The packaged native engine loaded the same bundle, observed component teardown,
+and exited zero. This is native runtime evidence, not native pixel evidence.
+
+The browser product gate no longer pins historical tutorial coordinates. It
+requires current semantic markers, proves fire originates at the initialized
+player position, proves the scripted player moves, and derives the expected
+camera rectangle from the authored Defold collection. That makes an arena or
+viewport revision update the test through its real source of truth instead of
+requiring unrelated literal maintenance. The five projection evidence records
+were re-observed after the claim text changed: native Dynamic Hermes,
+browser/direct-memory, typed-native transport, Static Hermes reachability, and
+real Chrome-to-Deno HTTP/3 WebTransport are all current. The example check
+passed 249/249 tests with no skips; the repository product/policy/editor/docs
+suffix gate also passed. Cross-platform visual parity and a camera tour proving
+every landmark composition remain outside this evidence.

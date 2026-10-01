@@ -1,0 +1,6 @@
+{
+  "name": "frontier-landscape-materials-v1",
+  "operation": "generate",
+  "prompt": "A seamless top-down landscape ground texture tile for a whimsical retro military pixel-art battlefield. Landscape only: broad olive meadow, trampled ochre earth, dark volcanic basalt, and charcoal scorch belong to one coherent outdoor world. Use large calm color masses with sparse clustered pixel detail so tanks and projectiles remain readable. Restrained 1990s arcade palette, chunky one-pixel texture clusters, warm highlights, dark plum shadows. No buildings, props, roads, walls, cliffs, craters, objects, icons, borders, lettering, UI, isolated patches, perspective, or transparent background.",
+  "size": 64
+}

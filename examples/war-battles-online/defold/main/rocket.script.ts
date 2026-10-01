@@ -11,8 +11,15 @@ import {
   type Vector3,
 } from "@deherm/project";
 
-import { MAX_PROJECTILES } from "../src/generated-war-battles/index";
-import { arenaMatch, directionRadians, pixelX, pixelY } from "../src/arena-match";
+import {
+  MAX_PROJECTILES,
+  WEAPON_MORTAR,
+  isometricArcHeight,
+  isometricDepth,
+  weaponById,
+  weaponUpgradeById,
+} from "../src/generated-war-battles/index";
+import { arenaMatch, projectedDirectionRadians, projectedX, projectedY } from "../src/arena-match";
 
 /**
  * A projectile, in either of the two shapes this scene needs.
@@ -60,6 +67,7 @@ interface RocketSelf {
   exploded: boolean;
   arena: boolean;
   z: number;
+  maximumLife: number;
 }
 
 // The explicit type argument keeps the branded `Vector3` descriptor out of the
@@ -77,11 +85,21 @@ export default defineComponent<ComponentDefinition>({
     self.speed = SPEED;
     self.life = LIFETIME;
     self.exploded = false;
+    self.maximumLife = 0;
     if (self.arena) {
       self.z = go.getPosition().z;
       const weapon = Math.trunc(self.weapon);
       const sprite = WEAPON_SPRITES[weapon >= 0 && weapon < WEAPON_SPRITES.length ? weapon : 0]!;
       msg.post("#sprite", "play_animation", { id: sprite });
+      if (weapon === WEAPON_MORTAR) {
+        const world = arenaMatch()?.world;
+        const slot = Math.trunc(self.slot);
+        const upgradeId = world?.projectileUpgrade[slot] ?? 0;
+        self.maximumLife = Math.max(
+          1,
+          weaponById(weapon).lifetimeTicks + (upgradeId === 0 ? 0 : weaponUpgradeById(upgradeId).lifetimeDelta),
+        );
+      }
       return;
     }
     go.setRotation(vmath.quatRotationZ(Math.atan2(self.dir.y, self.dir.x)));
@@ -101,9 +119,20 @@ export default defineComponent<ComponentDefinition>({
         go.delete();
         return;
       }
-      go.setPosition(vmath.vector3(pixelX(world.projectileX[slot]!), pixelY(world.projectileY[slot]!), self.z));
+      const worldX = world.projectileX[slot]!;
+      const worldY = world.projectileY[slot]!;
+      const arc = isometricArcHeight(world.projectileLife[slot]!, self.maximumLife, 48);
+      go.setPosition(
+        vmath.vector3(
+          projectedX(worldX, worldY),
+          projectedY(worldX, worldY) + arc,
+          0.4 + isometricDepth(worldX, worldY) * 0.05,
+        ),
+      );
       go.setRotation(
-        vmath.quatRotationZ(directionRadians(world.projectileDirectionX[slot]!, world.projectileDirectionY[slot]!)),
+        vmath.quatRotationZ(
+          projectedDirectionRadians(world.projectileDirectionX[slot]!, world.projectileDirectionY[slot]!),
+        ),
       );
       return;
     }

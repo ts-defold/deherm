@@ -53,6 +53,16 @@ and Hermes runtime integration for Defold.
 - Preserve unrelated user changes and keep target-specific capability gaps
   explicit in the canonical lowering plan and `.agents/docs/`.
 
+## Art workflows
+
+- For Sprite Fusion generation, Defold pixel-art integration, tilesets,
+  animation atlases, or visual QA, read and follow
+  `.codex/skills/sprite-fusion-defold-art/SKILL.md` before making API requests
+  or editing generated art.
+- Treat generated imagery as source material. Runtime atlases, nine-slice UI,
+  tile roles, collision data, and Defold resources remain deterministic outputs
+  of repository-owned generators.
+
 ## Human authorship and agent provenance
 
 - Git commits are authored and committed only as

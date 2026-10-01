@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "provider": "OpenAI image generation",
+  "source": "sheet.png",
+  "sha256": "eda853abc93d1573877906884e69d017395b9504468231cec7204e24850751b8",
+  "dimensions": [1536, 1024],
+  "background": "transparent RGBA",
+  "projection": "orthographic 2:1 isometric",
+  "purpose": "War Battles Online battlefield landmark source sheet",
+  "downsample": 4,
+  "outputCell": [160, 128],
+  "groundLine": 120,
+  "cuts": {
+    "field-bunker": [36, 8, 540, 354],
+    "rock-outcrop": [574, 30, 478, 336],
+    "supply-dump": [1034, 30, 494, 330],
+    "tank-wreck": [28, 350, 528, 320],
+    "fuel-cluster": [562, 348, 492, 322],
+    "gun-nest": [1034, 354, 494, 318],
+    "radio-mast": [26, 650, 514, 366],
+    "scrap-barricade": [538, 666, 506, 350],
+    "shell-crater": [1018, 664, 510, 352]
+  },
+  "promptSummary": "Nine isolated, colorful modern-retro isometric battlefield landmarks with chunky pixel silhouettes and whimsical arcade military detail.",
+  "license": "Project-generated asset; see repository licensing and provenance policy."
+}

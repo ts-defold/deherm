@@ -138,7 +138,7 @@ pinned local-Extender arm64-macOS engine:
 * The current HTML5 playability gate proves WebGL2 input, restart, sound, and
   visible composed pixels after the auto-fit camera fix. It retains
   `build/evidence/war-battles-html5.png` (SHA-256
-  `1d1f6631f47163a4118024b6fb170d7c07d5009cb856fc1604cd0cccce7507f0`) as
+  `6018122cf3c3863cf9ed7af11f01a4a74878f9a1b9b6933c89def79a26bfc9ed`) as
   human-review evidence; the assertion is the machine-checked playability
   markers and viewport visibility, not screenshot aesthetics alone.
 
@@ -869,13 +869,28 @@ gameplay-role metadata, palette variants, atlas packing, seeded arena
 realization, and freshness checks. Defold's editor remains the native visual
 inspection and optional authoring surface.
 
+The repository-local `sprite-fusion-defold-art` skill now records the official
+operation boundaries and the production workflow. New subjects use `generate`;
+targeted preservation work uses a single focused `edit`; new subjects matching
+the tutorial grammar use `style-reference` with four to eight coherent
+references; `direction-set` receives exactly one clean input and no prompt; and
+`animate` starts only from a corrected action-ready pose. The image API must not
+be asked for grids, contact sheets, atlases, spritesheets, or full autotile sets.
+Those runtime structures remain deterministic local projections. Requests are
+credit-gated one at a time, every variation is inspected, and interrupted SSE
+requests are recovered rather than blindly retried because persisted results
+may already have consumed credits.
+
 The first world-art experiment is intentionally classified rather than silently
 promoted. `refinery-pickup-pedestal-v1` produced a useful prop family and its
 compact first candidate is approved as the common pickup base. The request named
 `refinery-basalt-floor-v1` did not produce seamless opaque floor tiles; selected
-outputs are retained only as vents, fissures, and pipe props. Basalt terrain
-remains unresolved until the checked-in tileset generator emits an explicit
-edge grammar and its edge-continuity checks pass.
+outputs are retained only as vents, fissures, and pipe props. The later
+text-only `frontier-landscape-materials-v1` request supplied twelve pattern
+candidates without uploading repository art. Four selected sources contribute
+value structure and pixel-cluster rhythm for meadow, earth, basalt, and scorch;
+they do not own tile topology. The local generator remaps them into the pinned
+tutorial palette and owns every exact edge, mask, phase, tile id, and map role.
 
 The approved prop subset is now wired through that boundary. The checked
 `generate-world-art.mjs` projection validates the immutable request, asset,
@@ -886,13 +901,24 @@ Terrain realization now has one shared semantic projection instead of two
 similar hand-written maps. `core/arena-visual.ts` projects an authoritative
 `ArenaMap` into caller-owned ground, decor, and mark role buffers. It declares
 the north/south/east/west mask bits and all sixteen four-neighbour wall-mask
-results explicitly. `generate-art.mjs` maps those roles into three complete
-themes (`frontier`, `refinery`, and `canyon`) and emits the TypeScript tile-id
-contract consumed by both the checked `.tilemap` generator and the live Defold
-component. The generator proves opaque wall coverage, clean interior seams, a
-one-pixel perimeter, wrap-safe sandbags, all sixteen masks, and all required
-role tables for every theme. A seeded temporary-output test materializes all
-three native Defold `.tilemap` variants without changing collision rules.
+results explicitly. Six mirrored, seed-derived ellipses create broad landscape
+regions instead of per-cell colour noise. The byte-sized ground grammar contains
+16 meadow macro cells plus earth, basalt, and scorch families with all 16
+neighbour masks and four coordinate phases each: 208 floor roles, followed by
+16 wall roles, remain inside one `Uint8Array`.
+
+`generate-art.mjs` maps those roles into three complete themes (`frontier`,
+`refinery`, and `canyon`) and emits the TypeScript tile-id contract consumed by
+both the checked `.tilemap` generator and the live Defold component. The
+generator proves every connected landscape edge byte-for-byte across every mask
+and phase. Solid collision cover is now a porous, ground-seated boulder field;
+its checks bound coverage and reject fully opaque tile-grid seams rather than
+preserving the superseded raised-steel slab silhouette. The same suite proves
+wrap-safe sandbags and total role tables. The emitted
+Defold tilesource requests two pixels of border extrusion so rotated WebGL
+sampling cannot bleed adjacent atlas cells into diagonal seams. A seeded
+temporary-output test materializes all three native Defold `.tilemap` variants
+without changing collision rules.
 
 The runtime retains six fixed 10,800-byte role buffers and reprojects only when
 the authoritative map seed changes. Steady frames therefore allocate nothing
@@ -913,6 +939,80 @@ the whole production-art pass. The generated palette themes currently reuse
 one structural tile family, and the authored HUD/title/minimap/leader-board,
 driver animation, wreckage, crater, and broader environment-detail targets
 above remain open.
+
+The current art pass also replaces the stretched composite HUD texture with
+generated true nine-slice shell, card, strip, portrait-frame, and meter
+primitives. The second HUD composition removes the full-width 1280x116 blackout
+and uses a 610x94 command pod plus independent score, objective, leader,
+announcement, and standings cards. Loadout, hull, armor, ammunition, credits,
+boost, hazard state, and concise controls now have separate hierarchy rather
+than one debug-text wall; a dedicated 18 px HUD font improves gameplay-scale
+legibility without changing the title typography. A fresh packaged `wasm-web`
+build rendered the result under WebGL2 and passed keyboard, fire, restart,
+sound, and screenshot playability. The capture SHA-256 is
+`cad707de7d93016cfa5b433d2654f061723e3c7a94fbf264eb178d6f8c328528`.
+This is browser runtime and visual evidence for the concrete build, not native
+visual evidence or an aesthetic claim across every aspect ratio. Native visual
+evidence has not yet been renewed for this pass because the desktop capture
+surface was locked. Generated ground variants retain their seam checks. The
+approved `refinery-tank-depot-v1` style-reference request uploaded five
+checked-in tutorial building sprites and returned nine candidates for 15
+credits (`req_378033b0-d74c-462f-9a07-cc04165aba22`; 3,225 credits remain).
+Candidate `07` is the approved source because its drive-through ramp and bay
+remain legible at gameplay scale while matching the tutorial building
+projection and outline grammar. Candidates `02` and `05` remain alternates;
+no follow-up edit or animation request was spent before runtime integration.
+
+The tank-production wave establishes the isometric contract rather than
+rotating one top-down image at runtime. Four selected chassis families
+(`scout`, `assault`, `bulwark`, and `artillery`) each carry an immutable
+Sprite Fusion hull direction set and an independent turret direction set.
+Every set contains eight checked source views in the declared
+`se,s,sw,w,e,nw,n,ne` order. `generate-art.mjs` verifies each request manifest,
+source hash, image dimension, and direction index, applies the four team
+identity palettes, and emits the atlas plus `generated-tank-art.ts`. That
+generated contract owns every Defold animation hash; game scripts select a
+hull or turret by team, chassis, and direction without constructing resource
+names or hashing strings on a frame boundary. The selected direction requests
+plus the exploratory composite consumed 150 Sprite Fusion credits, leaving
+3,075; no further API generation is required to reproduce the selected art.
+
+Isometric presentation is a pure, tested projection over the unchanged
+integer Cartesian simulation. `core/isometric-projection.ts` owns the 2:1
+world-to-screen transform, projected headings, screen-relative control
+inversion, normalized painter depth, and bounded ballistic lift. The Defold
+tilemap applies the matching 45-degree component rotation and 0.5 world-Y
+compression. Tanks and turrets independently quantize projected headings into
+their authored views; players, pickups, effects, camera impacts, and
+projectiles use the same position transform. Mortars retain their authoritative
+flat collision path but add a presentation-only sine arc derived from remaining
+and total lifetime. This boundary keeps rollback, collision, networking, and
+bot navigation untouched while preventing presentation systems from inventing
+slightly different isometric math.
+
+The remote-tank prefab previously omitted `/main/tank.script` and referenced
+the tutorial atlas. As a result, factory-created bot hulls and turrets remained
+frozen tutorial sprites even though authoritative bots were moving. The prefab
+now installs the component, generated arena atlas, and infantry sprite, and an
+integration assertion owns that contract. A fresh `wasm-web` Bob bundle was
+manually observed in Chromium with distinct moving chassis, independent
+turrets, projected world geometry, pickups, muzzle flashes, explosions, and
+screen-relative input. This is local visual/runtime observation, not checked
+cross-platform evidence. Native visual evidence and the final HUD/environment
+composition remain open.
+
+The landscape wave replaces the repeated green carpet with broad meadow, worn
+earth, basalt, and scorched regions while preserving authoritative collision.
+The Sprite Fusion reference wave cost 15 credits and left 3,060. Generated
+pattern detail is intentionally sparse at camera scale; exact connected edges
+come from local code, not image-model promises. A fresh packaged `wasm-web`
+build passed the WebGL2 keyboard, fire, restart, sound, and screenshot
+playability gate after border extrusion removed the observed atlas-bleed lines.
+That is browser runtime evidence for the concrete build, not a claim that the
+environment composition is final. The approved depot is atlas-validated and
+instantiated at every replacement-tank spawn without affecting collision;
+raised walls, roads, large landmarks, and revised explosions remain part of the
+same deterministic art pipeline.
 
 ## Bounded performance and operability evidence tranche
 
@@ -1150,9 +1250,25 @@ profiles, plus a long-running 32-bot soak. Record:
 The showcase is successful when it demonstrates the SDK under real load and
 the same TypeScript gameplay source works across native and HTML5 targets.
 
+The environment pass now separates the generated terrain floor, raised-bunker
+facade, and wall top while retaining one authoritative collision map. A real
+HTML5 bundle has rendered the resulting depth and the revised staged
+fire/debris/smoke effects. Remaining art work is composition rather than a
+renderer workaround: theme-specific road grammar, larger arena landmarks, and
+occlusion-aware foreground props should build on these layers.
+
 The local HTML5 playability gate builds the current project through pinned Bob
 and Extender, engages the arena through real Chrome keyboard events, queries
 the Defold-owned WebGL context, analyzes Chrome's composed frame for visible
 and diverse pixels, and retains a screenshot for human inspection. That is
 input/render evidence under software WebGL, not hardware-GPU parity or an
 aesthetic regression oracle.
+
+The first large-landmark composition set is now reproducible rather than a
+mockup: nine provenance-pinned isometric sources are normalized into common
+bottom-registered sprite cells and placed from the arena seed. Vertical props
+occupy real wall footprints and low wreck/crater art occupies floor, preserving
+the presentation-to-collision truth boundary. The next visual gate is a
+scripted camera tour that captures every landmark and each arena theme, then
+theme-specific landmark recoloring/selection where the shared frontier set is
+too uniform.

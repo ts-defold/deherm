@@ -1,6 +1,7 @@
 import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
 import { lstat, readFile, readdir, readlink, stat } from "node:fs/promises";
+import { createServer } from "node:net";
 import { join, relative, resolve } from "node:path";
 
 // The rejected-diagnostic families are owned by the compiler toolchain so the
@@ -23,6 +24,7 @@ export { REJECTED_DIAGNOSTICS, firstRejectedDiagnostic };
 // projections comparable instead of merely adjacent.
 export const RUNTIME_PROFILE_MARKER_PREFIX =
   "INFO:DEFOLD_HERMES: Detected Defold runtime profile 'default-legacy-bullet' from ";
+export const RUNTIME_PLAYER_MOVED_PREFIX = "INFO:DEFOLD_HERMES: war-battles:player-moved:";
 export const REQUIRED_MARKERS = Object.freeze([
   "INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)",
   // Extensions can add registrations between the early engine probe and the
@@ -31,15 +33,13 @@ export const REQUIRED_MARKERS = Object.freeze([
   RUNTIME_PROFILE_MARKER_PREFIX,
   "INFO:DEFOLD_HERMES: Loaded TypeScript bundle generation 1 from '/deherm/app.dehermc'",
   "INFO:DEFOLD_HERMES: war-battles:camera-init:zoom=2.00:view=640x360:cameras=1",
-  "INFO:DEFOLD_HERMES: war-battles:camera-bounds:x=[8.0,1288.0]:y=[-172.0,908.0]",
+  "INFO:DEFOLD_HERMES: war-battles:camera-bounds:x=[-235.9,1531.9]:y=[-62.0,798.0]",
   "INFO:DEFOLD_HERMES: war-battles:ui-init",
-  "INFO:DEFOLD_HERMES: war-battles:player-init:560.0:360.0",
-  "INFO:DEFOLD_HERMES: war-battles:player-fire:560.0:360.0:1.00:0.00",
+  "INFO:DEFOLD_HERMES: war-battles:player-init:648.0:368.0",
+  "INFO:DEFOLD_HERMES: war-battles:player-fire:648.0:368.0:1.00:0.00",
   "INFO:DEFOLD_HERMES: war-battles:rocket-init:1.00:0.00",
-  "INFO:DEFOLD_HERMES: war-battles:rocket-hit",
-  "INFO:DEFOLD_HERMES: war-battles:score:100",
-  "INFO:DEFOLD_HERMES: war-battles:rocket-explosion-done",
-  "INFO:DEFOLD_HERMES: war-battles:player-moved:1592.0:1072.0",
+  "INFO:DEFOLD_HERMES: war-battles:rocket-expired",
+  RUNTIME_PLAYER_MOVED_PREFIX,
   // The scripted demonstration ends by handing the scene to the arena, which
   // creates the roster, the turrets and the pickup pads. Observing the engage
   // marker is what distinguishes "the tutorial loop ran" from "the game started".
@@ -60,6 +60,15 @@ export function observedRequiredMarkers(transcript, requiredMarkers = REQUIRED_M
     .split("\n")
     .map((line) => line.trimEnd());
   return requiredMarkers.map((marker) => {
+    if (marker === RUNTIME_PLAYER_MOVED_PREFIX) {
+      for (let index = lines.length - 1; index >= 0; index -= 1) {
+        const line = lines[index];
+        if (line.startsWith(marker) && /^-?[0-9]+\.[0-9]+:-?[0-9]+\.[0-9]+$/u.test(line.slice(marker.length))) {
+          return line;
+        }
+      }
+      return null;
+    }
     if (marker !== RUNTIME_PROFILE_MARKER_PREFIX) return lines.find((line) => line === marker) ?? null;
     for (let index = lines.length - 1; index >= 0; index -= 1) {
       const line = lines[index];
@@ -81,8 +90,18 @@ export function checkedRequiredMarkers(recorded, requiredMarkers = REQUIRED_MARK
     throw new Error("Recorded runtime markers do not match the required marker count");
   }
   const expected = requiredMarkers.map((marker, index) => {
-    if (marker !== RUNTIME_PROFILE_MARKER_PREFIX) return marker;
     const candidate = recorded[index];
+    if (marker === RUNTIME_PLAYER_MOVED_PREFIX) {
+      if (
+        typeof candidate !== "string" ||
+        !candidate.startsWith(marker) ||
+        !/^-?[0-9]+\.[0-9]+:-?[0-9]+\.[0-9]+$/u.test(candidate.slice(marker.length))
+      ) {
+        throw new Error("Recorded player-moved marker must carry two finite decimal coordinates");
+      }
+      return candidate;
+    }
+    if (marker !== RUNTIME_PROFILE_MARKER_PREFIX) return marker;
     if (
       typeof candidate !== "string" ||
       !candidate.startsWith(marker) ||
@@ -161,6 +180,23 @@ async function forceKill(child, graceMs) {
   await waitForExitAfterSignal(child, "sigkill", graceMs);
 }
 
+async function freeLoopbackPort() {
+  return new Promise((resolvePort, rejectPort) => {
+    const server = createServer();
+    server.unref();
+    server.once("error", rejectPort);
+    server.listen(0, "127.0.0.1", () => {
+      const address = server.address();
+      if (address === null || typeof address === "string") {
+        server.close();
+        rejectPort(new Error("Could not reserve a dynamic Remotery port"));
+        return;
+      }
+      server.close((error) => (error ? rejectPort(error) : resolvePort(address.port)));
+    });
+  });
+}
+
 export async function runPackagedRuntimeEvidence({
   command,
   args = [],
@@ -171,6 +207,7 @@ export async function runPackagedRuntimeEvidence({
   timeoutMs = 30_000,
   settleMs = 1_500,
   terminationGraceMs = 8_000,
+  isolateRemoteryPort = false,
 }) {
   for (const [name, value] of Object.entries({ timeoutMs, settleMs, terminationGraceMs })) {
     if (!Number.isSafeInteger(value) || value <= 0) throw new Error(`${name} must be a positive integer`);
@@ -190,7 +227,11 @@ export async function runPackagedRuntimeEvidence({
   // The engine service port is what a graceful shutdown is addressed to, and a
   // default port is shared between engines by SO_REUSEPORT. Asking the kernel
   // for one per engine is the half of the fix that no census can substitute.
-  const child = spawn(command, args, {
+  const launchArgs =
+    isolateRemoteryPort && !args.some((argument) => argument.startsWith("--config=profiler.remotery_port="))
+      ? [...args, `--config=profiler.remotery_port=${await freeLoopbackPort()}`]
+      : args;
+  const child = spawn(command, launchArgs, {
     cwd,
     env: { ...env, ...DYNAMIC_SERVICE_PORT_ENV },
     stdio: ["ignore", "pipe", "pipe"],

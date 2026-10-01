@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 
 import { spawn } from "node:child_process";
-import { access } from "node:fs/promises";
+import { access, chmod, stat } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const exampleRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const engine = resolve(exampleRoot, "defold/build/arm64-osx/dmengine");
-const runtimeRoot = resolve(exampleRoot, "defold/build/default");
+const runtimeRoot = resolve(exampleRoot, "defold/build/bob");
 const project = resolve(runtimeRoot, "game.projectc");
 
 try {
@@ -20,6 +20,9 @@ try {
     ].join(" "),
   );
 }
+
+const engineMode = (await stat(engine)).mode;
+if ((engineMode & 0o111) === 0) await chmod(engine, engineMode | 0o755);
 
 const child = spawn(engine, process.argv.slice(2), {
   cwd: runtimeRoot,

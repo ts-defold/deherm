@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "status": "source-concept",
+  "operation": "generate-then-layer-edits",
+  "artDirection": "art/direction/gameplay-target-v2.png",
+  "intendedNativeScale": {
+    "logicalTileSize": 16,
+    "tankLengthPixels": [40, 44],
+    "atlasCell": [96, 96],
+    "facingAtZeroRotation": "screen-right",
+    "projection": "three-quarter-isometric-top-down"
+  },
+  "outputs": {
+    "composite": {
+      "path": "art/source/openai/artillery-tank-v1/composite.png",
+      "sha256": "f135b940426ae0872cbb31e02df46a296dcad590664231e9a964b802bfb292f0"
+    },
+    "hull": {
+      "path": "art/source/openai/artillery-tank-v1/hull.png",
+      "sha256": "0fdf65a167b8f6ad53412cc94ef27100aeb9478eae5d90fc9b447347996308f7"
+    },
+    "turret": {
+      "path": "art/source/openai/artillery-tank-v1/turret.png",
+      "sha256": "567feb3df86b3f2cf21d31c352cde13e8751aa2e9897e5e3ca04c017785b9ffc"
+    },
+    "fixedHull": "art/source/openai/artillery-tank-v1/hull-grid-fixed.png",
+    "fixedTurret": "art/source/openai/artillery-tank-v1/turret-grid-fixed.png"
+  },
+  "pixelFixer": {
+    "repository": "https://github.com/Retro-Diffusion/pixel-art-fixer",
+    "revision": "ef376e57e1c272633ca2dbf5f29ec3fcf6596465",
+    "license": "MIT",
+    "mode": "full",
+    "localEvaluationPatch": "Guard Windows peak-RSS telemetry with cfg(target_os = windows); use zero on other hosts.",
+    "hull": { "cols": 490, "rows": 424, "stepX": 2.8059, "stepY": 2.6997, "consensus": "arbitrated" },
+    "turret": { "cols": 513, "rows": 413, "stepX": 2.6814, "stepY": 2.773, "consensus": "arbitrated" }
+  },
+  "runtimeProjection": {
+    "hullSize": [56, 42],
+    "hullAnchor": [252, 174],
+    "turretSize": [84, 38],
+    "turretAnchor": [197, 252],
+    "anchorMeaning": "turret-ring centre; projected to atlas-cell centre for independent rotation"
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "name": "artillery-hull-directions-v1",
+  "operation": "direction-set",
+  "inputs": ["art/source/openai/artillery-tank-v1/hull-grid-fixed.png"]
+}
