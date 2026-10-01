@@ -112,9 +112,13 @@ installed name, and each installed digest and byte length, so switching modes is
 deterministic. Repeated development builds use the authenticated receipt, target
 fingerprint, selector, and exact sizes as the keyed/idempotent sentinel; they do
 not re-copy or re-hash a ten-megabyte archive. The explicit verification path
-still hashes the bytes. The npm extension template is variant-neutral: checkout
-builds select with the CMake option, while an installed Defold project receives
-its generated selector from the artifact installer.
+still hashes the bytes. If that explicit digest check rejects an installed
+member, repair retains digest verification while selecting the cache or
+reinstalling; it may not fall back to the size-only development reuse path,
+because an equal-length edit would otherwise be reported as repaired without
+being replaced. The npm extension template is variant-neutral: checkout builds
+select with the CMake option, while an installed Defold project receives its
+generated selector from the artifact installer.
 
 ## What a fingerprint may hash, and what it may not
 

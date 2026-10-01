@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
-import { copyFile, link, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { copyFile, link, mkdir, mkdtemp, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -450,6 +450,25 @@ test("a target release already in the content-addressed cache installs without n
       offline: true,
       variant: "release",
     });
+    const installedReleaseBytes = await readFile(verified.file);
+    const sameLengthTamper = Buffer.from(installedReleaseBytes);
+    sameLengthTamper[0] ^= 0xff;
+    await writeFile(verified.file, sameLengthTamper);
+    assert.equal(
+      (await stat(verified.file)).size,
+      installedReleaseBytes.byteLength,
+      "the integrity regression requires a same-length edit that passes the development size check",
+    );
+    await assertProjectNativeArtifact(project, "arm64-macos", {
+      env: { DEHERM_CACHE_HOME: cacheHome },
+      offline: true,
+      variant: "release",
+    });
+    assert.deepEqual(
+      await readFile(verified.file),
+      installedReleaseBytes,
+      "explicit verification must repair a digest mismatch instead of reusing it by size",
+    );
     const installedConfig = path.join(project, "defold_hermes/include/libhermesvm-config.h");
     assert.equal(await readFile(installedConfig, "utf8"), "fixture:libhermesvm-config.h");
     await writeFile(installedConfig, "wrong target config");

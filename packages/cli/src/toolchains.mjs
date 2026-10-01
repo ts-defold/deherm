@@ -309,7 +309,7 @@ export async function ensureProjectNativeArtifact(projectRoot, defoldPlatform, o
     // This is the keyed/idempotent fast path used before every development
     // build. The explicit assertion command still hashes bytes; repeated
     // builds trust the authenticated receipt plus exact file sizes.
-    verifyDigests: false,
+    verifyDigests: options.verifyDigests === true,
   }).catch(() => null);
   if (current) return { ...current, cache: null, installed: [], reused: true };
   const asset = family.assets?.[target.extenderTarget];
@@ -538,7 +538,17 @@ export async function assertProjectNativeArtifact(projectRoot, defoldPlatform, o
       `The installed déherm extension is missing or does not match its receipt: ${path.relative(root, file)}`,
     );
   }
-  await ensureProjectNativeArtifact(root, defoldPlatform, { ...options, lock, variant });
+  // This path is entered only after the explicit assertion above compared the
+  // installed bytes with their authenticated receipt and rejected them. Do not
+  // let the repair call downgrade that evidence to the development size-only
+  // reuse path: a same-length edit would otherwise be accepted as current and
+  // the outer assertion would report success without replacing it.
+  await ensureProjectNativeArtifact(root, defoldPlatform, {
+    ...options,
+    lock,
+    variant,
+    verifyDigests: true,
+  });
   return { target: target.extenderTarget, variant, file, tag: family.tag, fingerprint: family.fingerprint };
 }
 
