@@ -187,13 +187,13 @@
     "evidenceBoundary": "Release host harness over stub providers. This measures generated crossing/framing cost, not the Defold call behind it; the Lua harness uses pinned PUC Lua 5.1 rather than Defold's shipping LuaJIT."
   },
   "editor": {
-    "vscodeEvidenceKey": "d18cc11761519822c22d9f2bea55e6404993baada5e68c56c004e80727cf4010",
+    "vscodeEvidenceKey": "e28e2a38c755876c1e83544eb84e8d6226e52bb1dce57c9b8c7dfc3ddf2ff46a",
     "screenshot": {
       "path": "examples/war-battles-online/evidence/vscode-live-values.png",
-      "bytes": 862023,
-      "sha256": "87a2efcad6fb79e69406bc40c0c7cc36e8d00f63778194bd4d58ba939b72ac33",
-      "width": 2462,
-      "height": 2160
+      "bytes": 821705,
+      "sha256": "3f66fd4c6f2156210aafbc2ba7b4bc2c825af0a1d9485a3bdc4a4d01c08b361b",
+      "width": 2880,
+      "height": 1800
     }
   },
   "sourceInputs": [
@@ -224,8 +224,8 @@
     },
     {
       "path": "examples/war-battles-online/evidence/vscode-live-values.json",
-      "bytes": 2724,
-      "sha256": "cc5a27c1b4b142382a57bc2fe897660766886eb6a75e77a2b6e407c0e5832e3b"
+      "bytes": 2712,
+      "sha256": "a75c6fda282b75bdf9cbd63bc893ffa0975864d45468269a8cc0564be3b0b3bf"
     }
   ],
   "evidenceBoundary": "Only release bundle records and unprofiled Release transport benchmarks are presented as size or overhead evidence. Development artifacts, repository totals, and CI cache sizes are excluded."
