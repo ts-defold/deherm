@@ -85,6 +85,7 @@
     "runtime:measurement:check": "node integration/check-runtime-measurement.mjs --check-evidence",
     "runtime:measurement:sources": "node integration/check-runtime-measurement.mjs --check-sources",
     "runtime:browser:playability": "node integration/check-browser-playability.mjs",
+    "runtime:browser:video": "node integration/record-browser-gameplay.mjs",
     "runtime:browser:record": "node integration/check-browser-runtime.mjs --record-evidence",
     "runtime:browser:check": "node integration/check-browser-runtime.mjs --check-evidence",
     "runtime:installed-hmr": "node integration/check-installed-hmr.mjs",

@@ -23,9 +23,9 @@
     {
       "path": "examples/war-battles-online/core",
       "kind": "tree",
-      "fileCount": 24,
-      "bytes": 451599,
-      "sha256": "1b1a1ba9ed699576ae2a4fd219368c1d41bddc8969e0e6f315a74a1b85d7ed20"
+      "fileCount": 26,
+      "bytes": 468495,
+      "sha256": "5e7664233ae38183392ddaea342dc5025fda80fc537009ae3dad6a2da157db53"
     },
     {
       "path": "examples/war-battles-online/headless/fixture.ts",
@@ -60,22 +60,22 @@
     {
       "path": "examples/war-battles-online/package.json",
       "kind": "file",
-      "bytes": 8208,
-      "sha256": "75a1655aa12376932db5c63e88432b67167f5159c33a8e114293f692aa122a9c"
+      "bytes": 8348,
+      "sha256": "a831d33a0dfc124f618f4cab9c6756610228a8cff18ae7685cd2f42266e858c1"
     },
     {
       "path": "package.json",
       "kind": "file",
-      "bytes": 52000,
-      "sha256": "72a1cbfd0c7471659d4fdc7cf084f0c34a842b2eb61285e0738ebff211e5b6e1"
+      "bytes": 54905,
+      "sha256": "d81c83170bcc2388aa5ad132868209907340780bb8d453798353c7787dc536e1"
     },
     {
       "path": "pnpm-lock.yaml",
       "kind": "file",
-      "bytes": 94071,
-      "sha256": "fbacd2a0d4c0edb257c033ab73b71c0f2d60fb5f42a8c779a37b674c10844dd9"
+      "bytes": 105409,
+      "sha256": "ffe932f2e731fb9fbe05f21cf7558bf938fd4e34b668537e3bd496b0bdd07df3"
     }
   ],
-  "sourceKey": "62a2575e458075a604c4e2979af5c346409fbd95ab0ff864fe6b83a6d638fa5c",
+  "sourceKey": "81270dc59abab8e95f2f9e25005763eed1882a88fba4811ffc0f67d6ec3f340c",
   "evidenceBoundary": "Deterministic in-process simulation and rollback replay only; not network, Defold engine, rendering, VM allocation, or wall-clock performance evidence."
 }

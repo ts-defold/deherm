@@ -39,8 +39,8 @@
   "minimumInputsSent": 3,
   "observedSnapshotsApplied": 3,
   "observedInputsSent": 12,
-  "lastServerTick": 222,
-  "lastLocalTick": 233,
+  "lastServerTick": 54,
+  "lastLocalTick": 66,
   "input": {
     "moveX": 1,
     "moveY": 0,
@@ -51,21 +51,21 @@
   "inputsDropped": 0,
   "presentation": {
     "localCorrectionMagnitude": 0,
-    "maximumLocalCorrectionMagnitude": 0,
-    "remoteInterpolationRebases": 58,
-    "maximumRemoteInterpolationRebaseDistance": 154,
+    "maximumLocalCorrectionMagnitude": 1810,
+    "remoteInterpolationRebases": 62,
+    "maximumRemoteInterpolationRebaseDistance": 311,
     "maximumRemoteInterpolationDiscontinuity": 0,
     "remoteLifecycleHardSnaps": 0
   },
   "prediction": {
-    "inputLeadTicks": 5,
+    "inputLeadTicks": 4,
     "inputLeadDecreases": 0
   },
   "server": {
     "inputsAcceptedAtLeast": 3,
     "markers": [
       "war-battles-server:listening:https://localhost:<port>",
-      "war-battles-server:health:http://localhost:57402",
+      "war-battles-server:health:http://localhost:62735",
       "war-battles-server:roster:32:bots:2:vacancies=server-bot",
       "war-battles-server:incoming:id=1",
       "war-battles-server:quic-accepted:id=1",
@@ -109,8 +109,8 @@
     {
       "path": "examples/war-battles-online/package.json",
       "kind": "file",
-      "bytes": 8271,
-      "sha256": "eb550ac312f7ed6f9a9eded13184063d0a510a0c9e5f07a044a60d51d061657f"
+      "bytes": 8348,
+      "sha256": "a831d33a0dfc124f618f4cab9c6756610228a8cff18ae7685cd2f42266e858c1"
     },
     {
       "path": "examples/war-battles-online/server/deno-main.ts",
@@ -137,6 +137,6 @@
       "sha256": "31fdeff053927fb67441d9dc9435af6a0cb60d279e3113dd8f6399962290143c"
     }
   ],
-  "sourceKey": "bf64dc44e8377c64d912d730edde2d587f2d7c3502772f9e89fa9d9e34cd10b8",
+  "sourceKey": "a1c127ce11db44b5b87b10fd6292b849bee9810c2782dfea50371ea9f2f1934a",
   "evidenceBoundary": "Real loopback Chrome-to-Deno HTTP/3/WebTransport transport, authoritative welcome/snapshot/input and scalar client-presentation telemetry; server input acceptance is observed from MatchServer stats; the telemetry describes this bounded loopback trace and is not a visual-quality, WAN, ingress, native Defold, allocation, or reliable-lane-persistence claim."
 }

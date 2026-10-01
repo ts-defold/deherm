@@ -39,6 +39,10 @@ frame to remain inside the canvas after reserving the upper and lower HUD safe
 areas. Engagement, restart, and respawn each produce one camera-snap marker;
 normal movement retains smoothed follow. The retained composed screenshot is
 human visual evidence, while the numeric frame assertion is the automated gate.
+`pnpm --dir examples/war-battles-online runtime:browser:video` complements that
+still evidence with a short composed H.264 gameplay recording driven through
+real browser input. The recording is review evidence for motion, attachment,
+camera behavior, and effects; it does not replace the numeric runtime gates.
 
 # Allocation boundary
 
