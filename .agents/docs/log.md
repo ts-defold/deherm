@@ -4968,3 +4968,26 @@ real Chrome-to-Deno HTTP/3 WebTransport are all current. The example check
 passed 249/249 tests with no skips; the repository product/policy/editor/docs
 suffix gate also passed. Cross-platform visual parity and a camera tour proving
 every landmark composition remain outside this evidence.
+
+## 2026-09-30 - Ordered publication gate regression coverage
+
+The first hosted end-to-end run after the release-candidate push exposed a
+stale workflow-contract assertion, not a compiler or runtime failure. The
+assertion still required `native-artifacts.yml` to dispatch end-to-end
+directly. The production graph intentionally dispatches an artifact-only
+policy refresh instead; that graph publishes the authenticated mapping, waits
+for Pages, resolves it as a clean consumer, and only then dispatches the full
+Bob target matrix. Direct sibling dispatch would race the public mapping.
+
+The gate now proves that complete ordered chain across both workflow files,
+including the public-store resolution step. It is also part of the ordinary
+repository `pnpm check`, so a future workflow refactor cannot remain locally
+green while retaining a stale hosted-only contract. The focused twelve-test
+gate and style checks pass locally. Because the package manifest is an explicit
+product input, the existing real WebTransport and deterministic congestion
+records correctly became stale. A fresh Chrome-to-Deno HTTP/3 run applied three
+snapshots and sent twelve inputs; the seeded 32-player adverse-network matrix
+also regenerated and passed its convergence, bandwidth, loss, reordering, and
+queue-bound assertions. This is workflow contract and local runtime/simulation
+evidence, not a hosted matrix result; hosted evidence remains pending the
+follow-up push.
