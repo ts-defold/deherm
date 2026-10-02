@@ -1,8 +1,8 @@
 {
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "generator": "sha256:1fb74cee5fecec4f4f51edb631fd154f204996a24545cf214ebecb989475ed23",
+  "generator": "sha256:dbedf2c9e833005ced90274274ef2fde629150cdc833746453d2bc3d65a2ae59",
   "kind": "deherm.policy.index-entry",
-  "policyRoot": "940c1a09e659a93ddb281a761ad8d1e1fd204439641136cd7a7650d750219fa8",
+  "policyRoot": "989e9708f81a9942ff187fa3604c1ae5c531b0e79c876e0bfd4764bb8027fef8",
   "realizer": {
     "minimumPackageVersion": "0.0.0",
     "requiredCapabilities": [
