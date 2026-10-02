@@ -37,8 +37,8 @@ export function blockerFromLog(log) {
   return errors.at(-1) ?? log.trim().split(/\r?\n/u).filter(Boolean).at(-1) ?? "No error message was captured.";
 }
 
-export async function readDerivationFailures({ unprovenPath, reportsDirectory }) {
-  const text = await readFile(unprovenPath, "utf8").catch((error) => {
+export async function readDerivationFailures({ failuresPath, reportsDirectory }) {
+  const text = await readFile(failuresPath, "utf8").catch((error) => {
     if (error?.code === "ENOENT") return "";
     throw error;
   });
@@ -130,13 +130,13 @@ async function applyAction(action, repository) {
 async function main() {
   const args = parseArguments(process.argv.slice(2));
   const repository = args.repository ?? process.env.GITHUB_REPOSITORY;
-  if (!repository || !args.unproven || !args.reports || !args["run-url"]) {
+  if (!repository || !args.failures || !args.reports || !args["run-url"]) {
     throw new Error(
-      "Usage: reconcile-policy-derivation-issues --unproven <tsv> --reports <dir> --run-url <url> [--repository owner/name]",
+      "Usage: reconcile-policy-derivation-issues --failures <tsv> --reports <dir> --run-url <url> [--repository owner/name]",
     );
   }
   const failures = await readDerivationFailures({
-    unprovenPath: args.unproven,
+    failuresPath: args.failures,
     reportsDirectory: args.reports,
   });
   const { stdout } = await run(

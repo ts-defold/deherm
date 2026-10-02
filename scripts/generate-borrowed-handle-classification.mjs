@@ -475,16 +475,16 @@ export function generateBorrowedHandleClassification(inputs) {
   // the kind was withdrawn with its source, or because the route reaches the
   // census on a declared result type this revision spells differently - has no
   // reviewed representation to emit against.
-  const resolvedKinds = (codecs) =>
-    codecs.filter(hasHandle).flatMap((codec) =>
-      codec.rawType
-        .split("|")
-        .map((type) => rawTypeToKind.get(type))
-        .filter(Boolean),
-    );
+  const resolvedKinds = (codec) =>
+    codec.rawType
+      .split("|")
+      .map((type) => rawTypeToKind.get(type))
+      .filter(Boolean);
   for (const id of borrowedById.keys()) {
     const binding = patternById.get(id);
-    if (resolvedKinds(binding.parameterCodecs).length + resolvedKinds(binding.returnCodecs).length) continue;
+    const handleCodecs = [...binding.parameterCodecs, ...binding.returnCodecs].filter(hasHandle);
+    const unresolvedCodecs = handleCodecs.filter((codec) => resolvedKinds(codec).length === 0);
+    if (handleCodecs.length > 0 && unresolvedCodecs.length === 0) continue;
     assert(declaredDerivation(), `${id}: borrowed-handle route has no reviewed handle representation`);
     withdrawnRoutes.add(id);
     recordAudit({
@@ -492,6 +492,7 @@ export function generateBorrowedHandleClassification(inputs) {
       id,
       status: VOID,
       reason: "withdrawn-handle-kind",
+      unresolvedCodecs: unresolvedCodecs.map(({ rawType }) => rawType),
     });
   }
 

@@ -4991,3 +4991,26 @@ also regenerated and passed its convergence, bandwidth, loss, reordering, and
 queue-bound assertions. This is workflow contract and local runtime/simulation
 evidence, not a hosted matrix result; hosted evidence remains pending the
 follow-up push.
+## 2026-10-01 - Defold 1.14 transform routes survive collection-ABI refactoring
+
+The 1.14 beta kept the public `go.get_position`, `go.set_position`, and
+`go.set_rotation` Lua contracts but changed the underlying C++ calls to carry
+an explicit `Collection*`. The reviewed specialization had incorrectly pinned
+the previous local ownership expression and exact argument spelling, so this
+internal refactor aborted policy derivation instead of retaining the route.
+The generator now validates the semantic `ResolveInstance` and transform
+callees without depending on their arguments or local variable names. A focused
+fixture reproducing the collection-explicit 1.14 call shape retains all three
+specializations. The exact beta derivation then exposed the same policy error in
+the borrowed-handle classifier: withdrawal of the reviewed `b2Body` kind left
+mixed `b2World`/`b2Body` routes reaching a whole-generator assertion. Concrete
+handle resolution is now codec-local; a route requiring any withdrawn kind
+withdraws only that optimized lane and remains owned by the universal route.
+Focused fixtures cover both cases, and the complete pinned script-runtime
+generator finishes with 926 functions and 923 descriptors. An isolated
+derivation of beta revision `38e809bccbbaee569866fa1564f9663a3fde4f67`
+then completed all 16 stages and sealed policy root `0f7aa895b828` with 52
+namespaces and 190 content-addressed subtrees while leaving the committed
+surface byte-identical. This is full derivation evidence; host-parity,
+real-engine, and public-site lanes still need to rerun before published 1.14
+support is claimed.

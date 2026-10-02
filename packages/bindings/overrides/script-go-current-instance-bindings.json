@@ -8,7 +8,7 @@
     {
       "id": "script:go.get_position",
       "sourceSymbol": "Script_GetPosition",
-      "sourceOperation": "dmGameObject::GetPosition(instance)",
+      "sourceOperation": ["ResolveInstance", "dmGameObject::GetPosition"],
       "operation": {
         "template": "current-instance-transform-get",
         "parameters": { "property": "position", "kind": "Vector3", "addressed": "pinned-resolve-instance-captured-lua" }
@@ -20,7 +20,7 @@
     {
       "id": "script:go.set_position",
       "sourceSymbol": "Script_SetPosition",
-      "sourceOperation": "dmGameObject::SetPosition(instance, dmVMath::Point3(*v))",
+      "sourceOperation": ["ResolveInstance", "dmGameObject::SetPosition"],
       "operation": {
         "template": "current-instance-transform-set",
         "parameters": { "property": "position", "kind": "Vector3", "rejectNaN": true, "addressed": "pinned-resolve-instance-captured-lua" }
@@ -32,7 +32,7 @@
     {
       "id": "script:go.set_rotation",
       "sourceSymbol": "Script_SetRotation",
-      "sourceOperation": "dmGameObject::SetRotation(instance, *q)",
+      "sourceOperation": ["ResolveInstance", "dmGameObject::SetRotation"],
       "operation": {
         "template": "current-instance-transform-set",
         "parameters": { "property": "rotation", "kind": "Quaternion", "rejectNaN": true, "addressed": "pinned-resolve-instance-captured-lua" }

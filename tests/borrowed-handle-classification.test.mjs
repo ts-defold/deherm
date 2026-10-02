@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { readFile } from "node:fs/promises";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import path from "node:path";
 import test from "node:test";
 
 import { stableBindingId } from "../scripts/lib/binding-identity.mjs";
@@ -239,6 +241,38 @@ test("fails closed on census, exception, stable-ID, kind, and source drift", () 
   const withdrawnSource = structuredClone(sourceInputs);
   withdrawnSource.withdrawnSources = new Set([JSON.parse(withdrawnSource.overrideText).sourceEvidence[0].source]);
   assert.throws(() => generateBorrowedHandleClassification(withdrawnSource), /unknown source evidence/);
+});
+
+test("a withdrawn handle kind removes only its optimized routes during revision derivation", async () => {
+  const derived = structuredClone(sourceInputs);
+  const override = JSON.parse(derived.overrideText);
+  const bodyEvidence = override.sourceEvidence.find(({ id }) => id === "box2d-body");
+  derived.withdrawnSources = new Set([bodyEvidence.source]);
+  const revision = JSON.parse(derived.irText).defoldRevision;
+  const previousRevision = process.env.DEHERM_DERIVED_REVISION;
+  const previousAudit = process.env.DEHERM_REVISION_AUDIT;
+  const auditDirectory = await mkdtemp(path.join(tmpdir(), "deherm-borrowed-handle-"));
+  process.env.DEHERM_DERIVED_REVISION = revision;
+  process.env.DEHERM_REVISION_AUDIT = path.join(auditDirectory, "audit.ndjson");
+  try {
+    const report = generateBorrowedHandleClassification(derived);
+    assert.ok(
+      report.rows.some(({ id }) => id === "script:b2d.get_world"),
+      "unrelated world routes remain optimized",
+    );
+    assert.ok(
+      !report.rows.some(({ inputHandleKinds, returnHandleKinds }) =>
+        [...inputHandleKinds, ...returnHandleKinds].includes("box2d-body"),
+      ),
+      "routes requiring the withdrawn body specialization use the universal fallback",
+    );
+  } finally {
+    if (previousRevision === undefined) delete process.env.DEHERM_DERIVED_REVISION;
+    else process.env.DEHERM_DERIVED_REVISION = previousRevision;
+    if (previousAudit === undefined) delete process.env.DEHERM_REVISION_AUDIT;
+    else process.env.DEHERM_REVISION_AUDIT = previousAudit;
+    await rm(auditDirectory, { recursive: true, force: true });
+  }
 });
 
 test("check command proves the checked-in classification is current", () => {

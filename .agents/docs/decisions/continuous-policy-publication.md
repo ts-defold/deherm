@@ -166,11 +166,13 @@ Status is additive evidence, not an allow-list:
   its generated assertions in a real engine.
 * `suspect`: déherm observed a contradiction, such as a documented name that is
   not registered or a runtime assertion that failed.
-* `unproven`: déherm could emit a conservative/default route but could not yet
-  construct a meaningful test context, or it lacks a generator shape needed to
-  emit a specialized path.
+* `unproven`: déherm emitted the route but could not yet construct a meaningful
+  runtime test context. This is evidence metadata only.
+* `unoptimized`: déherm emitted the universal route because the revision did
+  not match a known specialization recipe. This opens or updates optimization
+  work; it is never a publication gate.
 
-`suspect` and `unproven` entries remain usable. They carry generated
+`suspect`, `unproven`, and `unoptimized` entries remain usable. They carry generated
 documentation annotations and deterministic issue links. Repeated nightlies
 update the existing issue instead of opening duplicates.
 
@@ -197,6 +199,16 @@ harness notes and do not open route issues.
 A new or changed Defold API is not a failed nightly. A missing review, moved
 source hash, changed census, unavailable fixture, unexercised route, or absent
 specialization is report data.
+
+Reviewed specializations match semantic operations, not Defold's incidental
+C++ spelling. A recipe may require that a Lua entry point resolves an instance
+and calls a particular engine operation, but it must not pin local variable
+names, ownership-field paths, or the exact argument list used by one revision.
+If a revision preserves the public Lua contract while refactoring those
+internals, the recipe follows the semantic callees. If the semantic operation
+itself can no longer be established, only that specialization is withdrawn and
+the route uses its universal transport; source-anchor drift must never bypass
+that fallback and abort the revision.
 
 An unclassifiable route is likewise report data when the source-derived pipeline
 can identify it. Its blocker is published beside the usable routes for that

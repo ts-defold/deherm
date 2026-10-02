@@ -173,6 +173,14 @@ function withdrawReviewed(id, reason, message) {
   return false;
 }
 
+class SpecializationEvidenceDrift extends Error {}
+
+function withdrawSpecializationDrift(id, error) {
+  if (!(error instanceof SpecializationEvidenceDrift)) throw error;
+  withdrawReviewed(id, "stale-specialization-evidence", error.message);
+  return [];
+}
+
 // `deriveCallShapes` for a route whose documented signature this revision spells
 // in a way the generator cannot read - Defold 1.13.1 documents overloads as
 // `fun(n)`, with neither parameter types nor a result, where the pinned revision
@@ -327,7 +335,13 @@ function expandDefinitionBindings(definition, functions, patterns, source, layou
             continue;
           continue;
         }
-        const body = functionSource(source, registration.symbol, fn.id);
+        let body;
+        try {
+          body = functionSource(source, registration.symbol, fn.id);
+        } catch (error) {
+          withdrawSpecializationDrift(fn.id, error);
+          continue;
+        }
         const matches = selector.terminalOperations.filter(
           ({ sourceAnchor }) => typeof sourceAnchor === "string" && body.includes(sourceAnchor),
         );
@@ -443,7 +457,13 @@ function expandDefinitionBindings(definition, functions, patterns, source, layou
           withdrawReviewed(fn.id, "absent-registration", `${fn.id}: no reviewed Matrix4 terminal or registration`);
           continue;
         }
-        const body = functionSource(source, registration.symbol, fn.id);
+        let body;
+        try {
+          body = functionSource(source, registration.symbol, fn.id);
+        } catch (error) {
+          withdrawSpecializationDrift(fn.id, error);
+          continue;
+        }
         if (
           typeof terminal.operator !== "string" ||
           typeof terminal.sourceAnchor !== "string" ||
@@ -552,7 +572,29 @@ function expectOperationContract(binding, callShapes, resultCodec) {
 function requireSourceAnchors(binding, functionSource, anchors) {
   for (const anchor of anchors) {
     if (!functionSource.includes(anchor)) {
-      throw new Error(`${binding.id}: ${binding.operation.template} source anchor ${JSON.stringify(anchor)} is stale`);
+      throw new SpecializationEvidenceDrift(
+        `${binding.id}: ${binding.operation.template} source anchor ${JSON.stringify(anchor)} is stale`,
+      );
+    }
+  }
+}
+
+/**
+ * Require semantic call sites without pinning their argument spelling.
+ *
+ * Defold owns the called function's ABI. A revision may add an explicit
+ * collection/context argument while preserving the Lua contract, as happened
+ * to the game-object transform routes in 1.14.0. The lowering decision depends
+ * on which operations the Lua entry point performs, not on the local variable
+ * names or the exact argument list used by that engine revision.
+ */
+function requireSourceCalls(binding, functionSource, callees) {
+  for (const callee of callees) {
+    const escaped = callee.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    if (!new RegExp(`(?:^|[^A-Za-z0-9_])${escaped}\\s*\\(`, "u").test(functionSource)) {
+      throw new SpecializationEvidenceDrift(
+        `${binding.id}: ${binding.operation.template} source call ${JSON.stringify(callee)} is stale`,
+      );
     }
   }
 }
@@ -562,9 +604,9 @@ function functionSource(sourceText, symbol, id) {
     `(?:static\\s+)?int\\s+${symbol.replace(/[.*+?^${}()|[\\]\\]/g, "\\$&")}\\s*\\(lua_State\\*\\s*L\\)`,
   );
   const match = signature.exec(sourceText);
-  if (!match) throw new Error(`${id}: source symbol ${symbol} is stale`);
+  if (!match) throw new SpecializationEvidenceDrift(`${id}: source symbol ${symbol} is stale`);
   const open = sourceText.indexOf("{", match.index + match[0].length);
-  if (open < 0) throw new Error(`${id}: source symbol ${symbol} has no body`);
+  if (open < 0) throw new SpecializationEvidenceDrift(`${id}: source symbol ${symbol} has no body`);
   let depth = 0;
   let mode = "code";
   for (let index = open; index < sourceText.length; ++index) {
@@ -612,7 +654,7 @@ function functionSource(sourceText, symbol, id) {
     if (char === "{") ++depth;
     else if (char === "}" && --depth === 0) return sourceText.slice(match.index, index + 1);
   }
-  throw new Error(`${id}: source symbol ${symbol} has an unterminated body`);
+  throw new SpecializationEvidenceDrift(`${id}: source symbol ${symbol} has an unterminated body`);
 }
 
 function casePrefix(denseIndex) {
@@ -629,21 +671,6 @@ function casePrefix(denseIndex) {
  * socket check, the relative-path resolution and the missing-instance refusal.
  */
 const ADDRESSED_TRANSFORM_BACKEND = "pinned-resolve-instance-captured-lua";
-
-/**
- * Pinned evidence that `ResolveInstance` still owns address resolution, still
- * restricts the address to the calling collection, and still fails closed when
- * the addressed instance does not exist rather than returning a default.
- */
-const RESOLVE_INSTANCE_ANCHORS = [
-  "static Instance* ResolveInstance(lua_State* L, int instance_arg)",
-  "if (lua_gettop(L) == instance_arg && !lua_isnil(L, instance_arg))",
-  "dmScript::ResolveURL(L, instance_arg, &receiver, 0x0);",
-  "if (receiver.m_Socket != dmGameObject::GetMessageSocket(i->m_Instance->m_Collection->m_HCollection))",
-  'luaL_error(L, "function called can only access instances within the same collection.");',
-  "instance = GetInstanceFromIdentifier(instance->m_Collection->m_HCollection, receiver.m_Path);",
-  'luaL_error(L, "Instance %s not found", lua_tostring(L, instance_arg));',
-];
 
 /**
  * Emit the addressed branch of a transform route. The current-instance shape
@@ -1319,13 +1346,12 @@ const OPERATION_TEMPLATES = new Map([
   [
     "current-instance-transform-get",
     {
-      validate(binding, source, definition, moduleSource) {
+      validate(binding, source) {
         exactOperationParameters(binding, [
           { property: "position", kind: "Vector3", addressed: ADDRESSED_TRANSFORM_BACKEND },
         ]);
         expectOperationContract(binding, [[], ["String"], ["Hash"], ["Url"]], "Vector3");
-        requireSourceAnchors(binding, source, ["ResolveInstance(L, 1)", "dmGameObject::GetPosition(instance)"]);
-        requireSourceAnchors(binding, moduleSource, RESOLVE_INSTANCE_ANCHORS);
+        requireSourceCalls(binding, source, ["ResolveInstance", "dmGameObject::GetPosition"]);
       },
       render(binding, denseIndex) {
         return `${casePrefix(denseIndex)}
@@ -1342,7 +1368,7 @@ ${addressedTransformDelegation(binding, "frame->argumentCount != 0")}
   [
     "current-instance-transform-set",
     {
-      validate(binding, source, definition, moduleSource) {
+      validate(binding, source) {
         const position = {
           property: "position",
           kind: "Vector3",
@@ -1359,14 +1385,13 @@ ${addressedTransformDelegation(binding, "frame->argumentCount != 0")}
         const isPosition = equal(binding.operation.parameters, position);
         const value = isPosition ? "Vector3" : "Quaternion";
         expectOperationContract(binding, [[value], [value, "String"], [value, "Hash"], [value, "Url"]], "None");
-        requireSourceAnchors(
+        requireSourceCalls(
           binding,
           source,
           isPosition
-            ? ["ResolveInstance(L, 2)", "dmGameObject::SetPosition(instance, dmVMath::Point3(*v))"]
-            : ["ResolveInstance(L, 2)", "dmGameObject::SetRotation(instance, *q)"],
+            ? ["ResolveInstance", "dmGameObject::SetPosition"]
+            : ["ResolveInstance", "dmGameObject::SetRotation"],
         );
-        requireSourceAnchors(binding, moduleSource, RESOLVE_INSTANCE_ANCHORS);
       },
       render(binding, denseIndex) {
         const prefix = casePrefix(denseIndex);
@@ -1674,9 +1699,12 @@ export function generate(irText, scalarDispatchText, patternsText, inputs) {
           });
           return [];
         }
-        const scopedSource = entry.generatedFamily
-          ? sourceText
-          : functionSource(sourceText, entry.sourceSymbol, entry.id);
+        let scopedSource;
+        try {
+          scopedSource = entry.generatedFamily ? sourceText : functionSource(sourceText, entry.sourceSymbol, entry.id);
+        } catch (error) {
+          return withdrawSpecializationDrift(entry.id, error);
+        }
         const sourceOperations =
           entry.sourceOperation == null
             ? []
@@ -1755,7 +1783,11 @@ export function generate(irText, scalarDispatchText, patternsText, inputs) {
           ownership: definition.ownership,
           targetSupport: targetSupport(entry),
         };
-        validateOperation(binding, scopedSource, definition, sourceText);
+        try {
+          validateOperation(binding, scopedSource, definition, sourceText);
+        } catch (error) {
+          return withdrawSpecializationDrift(entry.id, error);
+        }
         return [binding];
       });
     })

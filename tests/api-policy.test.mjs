@@ -108,6 +108,8 @@ test("policy host parity materializes every authoritative generator input", asyn
   assert.match(publish, /build\/published-policy-site\/v1\/artifacts/u);
   assert.match(publish, /--artifact-references/u);
   assert.match(derive, /build-policy-site\.mjs --out build\/policy-site --validation-only/u);
+  assert.match(derive, /packages\/toolchains\/defold-bundle-targets\.json/u);
+  assert.match(derive, /packages\/toolchains\/defold-platform-pairs\.json/u);
   assert.match(derive, /apt-get install -y --no-install-recommends llvm/u);
   assert.match(derive, /command -v llvm-nm/u);
   assert.match(derive, /reconcile-policy-derivation-issues\.mjs/u);

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "inputSha256": "d00192b035d4eb7c8c8f4d154bb8c8c5aec22e8fcc5f556ca8fbbb8993eb08e6",
+  "inputSha256": "932ac440d40a3fed876737ce488826ac27bc8ddc75e7455b641cd18d66a9b682",
   "sourceEvidence": [
     {
       "path": "upstream/defold/engine/script/src/script_vmath.cpp",
@@ -1332,7 +1332,10 @@
     {
       "id": "script:go.set_position",
       "sourceSymbol": "Script_SetPosition",
-      "sourceOperation": "dmGameObject::SetPosition(instance, dmVMath::Point3(*v))",
+      "sourceOperation": [
+        "ResolveInstance",
+        "dmGameObject::SetPosition"
+      ],
       "operation": {
         "template": "current-instance-transform-set",
         "parameters": {
@@ -3220,7 +3223,10 @@
     {
       "id": "script:go.set_rotation",
       "sourceSymbol": "Script_SetRotation",
-      "sourceOperation": "dmGameObject::SetRotation(instance, *q)",
+      "sourceOperation": [
+        "ResolveInstance",
+        "dmGameObject::SetRotation"
+      ],
       "operation": {
         "template": "current-instance-transform-set",
         "parameters": {
@@ -5812,7 +5818,10 @@
     {
       "id": "script:go.get_position",
       "sourceSymbol": "Script_GetPosition",
-      "sourceOperation": "dmGameObject::GetPosition(instance)",
+      "sourceOperation": [
+        "ResolveInstance",
+        "dmGameObject::GetPosition"
+      ],
       "operation": {
         "template": "current-instance-transform-get",
         "parameters": {

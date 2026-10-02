@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { readFile } from "node:fs/promises";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import path from "node:path";
 import test from "node:test";
 
 import { generate, loadGenerationInputs } from "../scripts/generate-script-value-bindings.mjs";
@@ -403,6 +405,79 @@ test("value operation templates fail closed for unknown and mismatched metadata"
     () => generate(fixture.irText, fixture.scalarDispatchText, fixture.patternsText, staleMatrixTerminal),
     /script:vmath\.inv: invalid or stale reviewed Matrix4 terminal operation/,
   );
+});
+
+test("game-object transform specialization follows semantic calls across Defold collection ABI changes", async () => {
+  const fixture = await loadGenerationInputs();
+  const inputs = fixture.inputs.map((input) => {
+    const definition = JSON.parse(input.definitionText);
+    if (!definition.bindings.some(({ id }) => id === "script:go.get_position")) return input;
+    const sourceText = input.sourceText
+      .replace(
+        "Instance* instance = ResolveInstance(L, 1);",
+        "Collection* collection;\n        Instance* instance = ResolveInstance(L, 1, &collection);",
+      )
+      .replace("dmGameObject::GetPosition(instance)", "dmGameObject::GetPosition(collection, instance)")
+      .replace(
+        "Instance* instance = ResolveInstance(L, 2);\n        dmVMath::Vector3* v",
+        "Collection* collection;\n        Instance* instance = ResolveInstance(L, 2, &collection);\n        dmVMath::Vector3* v",
+      )
+      .replace(
+        "dmGameObject::SetPosition(instance, dmVMath::Point3(*v))",
+        "dmGameObject::SetPosition(collection, instance, dmVMath::Point3(*v))",
+      )
+      .replace(
+        "Instance* instance = ResolveInstance(L, 2);\n        dmVMath::Quat* q",
+        "Collection* collection;\n        Instance* instance = ResolveInstance(L, 2, &collection);\n        dmVMath::Quat* q",
+      )
+      .replace("dmGameObject::SetRotation(instance, *q)", "dmGameObject::SetRotation(collection, instance, *q)")
+      .replace(
+        "if (receiver.m_Socket != dmGameObject::GetMessageSocket(i->m_Instance->m_Collection->m_HCollection))",
+        "if (receiver.m_Socket != dmGameObject::GetMessageSocket(hcollection))",
+      );
+    return { ...input, sourceText };
+  });
+
+  const generated = JSON.parse(
+    generate(fixture.irText, fixture.scalarDispatchText, fixture.patternsText, inputs).report,
+  );
+  for (const id of ["script:go.get_position", "script:go.set_position", "script:go.set_rotation"]) {
+    assert.ok(
+      generated.bindings.some((binding) => binding.id === id),
+      `${id} should retain its specialization`,
+    );
+  }
+});
+
+test("declared revisions withdraw stale fast paths instead of aborting universal generation", async () => {
+  const fixture = await loadGenerationInputs();
+  const ir = JSON.parse(fixture.irText);
+  const inputs = fixture.inputs.map((input) => {
+    const definition = JSON.parse(input.definitionText);
+    if (!definition.bindings.some(({ id }) => id === "script:hash")) return input;
+    return { ...input, sourceText: input.sourceText.replace("luaL_checkstring(L, 1)", "luaL_optstring(L, 1, 0)") };
+  });
+  const previousRevision = process.env.DEHERM_DERIVED_REVISION;
+  const previousAudit = process.env.DEHERM_REVISION_AUDIT;
+  const auditDirectory = await mkdtemp(path.join(tmpdir(), "deherm-value-specialization-"));
+  process.env.DEHERM_DERIVED_REVISION = ir.defoldRevision;
+  process.env.DEHERM_REVISION_AUDIT = path.join(auditDirectory, "audit.ndjson");
+  try {
+    const generated = JSON.parse(
+      generate(fixture.irText, fixture.scalarDispatchText, fixture.patternsText, inputs).report,
+    );
+    assert.ok(
+      ir.functions.some(({ id }) => id === "script:hash"),
+      "the authoritative route remains present",
+    );
+    assert.ok(!generated.bindings.some(({ id }) => id === "script:hash"), "only the stale specialization is withdrawn");
+  } finally {
+    if (previousRevision === undefined) delete process.env.DEHERM_DERIVED_REVISION;
+    else process.env.DEHERM_DERIVED_REVISION = previousRevision;
+    if (previousAudit === undefined) delete process.env.DEHERM_REVISION_AUDIT;
+    else process.env.DEHERM_REVISION_AUDIT = previousAudit;
+    await rm(auditDirectory, { recursive: true, force: true });
+  }
 });
 
 test("value generation rejects numeric stable-ID overlap with scalar dispatch", async () => {

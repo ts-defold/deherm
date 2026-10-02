@@ -94,7 +94,7 @@ jobs:
       issues: write
     outputs:
       generated: ${{ steps.derive.outputs.generated }}
-      unproven: ${{ steps.derive.outputs.unproven }}
+      failed: ${{ steps.derive.outputs.failed }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/checkout@v7
@@ -142,7 +142,7 @@ jobs:
           ' > "$RUNNER_TEMP/policy-revisions.tsv"
 
           generated=0
-          unproven=0
+          failed=0
           while IFS=$'\t' read -r channel revision version; do
             [ -n "$revision" ] || continue
             workspace="$RUNNER_TEMP/derive-$revision"
@@ -165,8 +165,8 @@ jobs:
             if [ "$status" -eq 0 ]; then
               generated=$((generated + 1))
             else
-              unproven=$((unproven + 1))
-              printf '%s\t%s\t%s\n' "$channel" "$revision" "$version" >> "$RUNNER_TEMP/policy-reports/unproven.tsv"
+              failed=$((failed + 1))
+              printf '%s\t%s\t%s\n' "$channel" "$revision" "$version" >> "$RUNNER_TEMP/policy-reports/failures.tsv"
             fi
           done < "$RUNNER_TEMP/policy-revisions.tsv"
 
@@ -179,7 +179,7 @@ jobs:
           node scripts/build-policy-site.mjs --out build/policy-site --validation-only
           node scripts/check-policy-site-resolution.mjs
           echo "generated=$generated" >> "$GITHUB_OUTPUT"
-          echo "unproven=$unproven" >> "$GITHUB_OUTPUT"
+          echo "failed=$failed" >> "$GITHUB_OUTPUT"
 
       - name: Reconcile actionable policy derivation issues
         if: >-
@@ -192,7 +192,7 @@ jobs:
         run: |
           set -euo pipefail
           node scripts/reconcile-policy-derivation-issues.mjs \
-            --unproven "$RUNNER_TEMP/policy-reports/unproven.tsv" \
+            --failures "$RUNNER_TEMP/policy-reports/failures.tsv" \
             --reports "$RUNNER_TEMP/policy-reports" \
             --run-url "$RUN_URL"
 
@@ -200,6 +200,8 @@ jobs:
         run: |
           tar -czf "$RUNNER_TEMP/policy-surface.tar.gz" \
             upstream.lock \
+            packages/toolchains/defold-bundle-targets.json \
+            packages/toolchains/defold-platform-pairs.json \
             packages/bindings/generated \
             packages/abi/src/generated \
             packages/sdk/src/generated \
