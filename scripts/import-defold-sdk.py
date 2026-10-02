@@ -111,6 +111,17 @@ def normalize_generated_value(value: Any, root: Path | str = ROOT) -> Any:
     """Recursively remove host/cache spellings from generated data."""
     if isinstance(value, str):
         normalized = strip_checkout_path(value, root)
+        # Revision derivation can stage the repository below a disposable
+        # workspace while reusing a sysroot cached below the caller's checkout.
+        # Clang reports that physical absolute path in diagnostics.  Normalize
+        # by the owned cache marker rather than only by this process' ROOT so a
+        # Linux-derived inventory compares byte-for-byte on macOS and Windows.
+        rewritten = re.sub(
+            r"(?i)(?:(?:[a-z]:)?(?:[/\\][^/\\\s:\n]+)*[/\\])?"
+            r"upstream[/\\]dmsdk-parse-sysroot[/\\]",
+            "upstream/dmsdk-parse-sysroot/",
+            normalized,
+        )
         # The downloaded SDK is a revision-keyed derivation cache. Clang writes
         # that physical path into provenance and anonymous type spellings, but
         # the policy object itself must be content-addressed and shareable
@@ -119,7 +130,7 @@ def normalize_generated_value(value: Any, root: Path | str = ROOT) -> Any:
         rewritten = re.sub(
             r"upstream[/\\]extender[/\\]server[/\\]app[/\\]sdk[/\\][^/\\]+[/\\]defoldsdk[/\\]",
             "upstream/defold-sdk/",
-            normalized,
+            rewritten,
         )
         return rewritten.replace("\\", "/") if rewritten != normalized else normalized
     if isinstance(value, list):

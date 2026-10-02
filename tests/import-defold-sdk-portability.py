@@ -72,6 +72,25 @@ class GeneratedPathPortabilityTests(unittest.TestCase):
         )
         self.assertEqual(IMPORTER.normalize_generated_value(r"unrelated\value"), r"unrelated\value")
 
+    def test_foreign_checkout_sysroot_diagnostics_are_canonical(self) -> None:
+        linux = (
+            "In file included from "
+            "/home/runner/work/deherm/deherm/upstream/dmsdk-parse-sysroot/"
+            "d09c62c18efcddff/wasi/include/stdio.h:54"
+        )
+        windows = (
+            "In file included from "
+            "D:\\a\\deherm\\deherm\\upstream\\dmsdk-parse-sysroot\\"
+            "d09c62c18efcddff\\wasi\\include\\stdio.h:54"
+        )
+        expected = (
+            "In file included from upstream/dmsdk-parse-sysroot/"
+            "d09c62c18efcddff/wasi/include/stdio.h:54"
+        )
+
+        self.assertEqual(IMPORTER.normalize_generated_value(linux, "/tmp/staged-revision"), expected)
+        self.assertEqual(IMPORTER.normalize_generated_value(windows, r"C:\staged-revision"), expected)
+
 
 if __name__ == "__main__":
     unittest.main()

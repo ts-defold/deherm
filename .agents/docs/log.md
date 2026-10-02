@@ -5029,3 +5029,17 @@ Legacy policy wording no longer claims that missing bespoke execution opens an
 treated every non-contradicted Defold route as verified and limits issues to
 positive source/runtime contradictions; workflow labels and the accepted
 publication decision now state that behavior exactly.
+
+## 2026-10-01 - dmSDK diagnostics are checkout-independent
+
+The first hosted stable/beta/alpha derivation completed all three policy
+surfaces and opened only the two grouped, non-blocking optimization issues, but
+the macOS parity lane found that alpha's dmSDK inventory retained the Linux
+runner's absolute parse-sysroot path in 31 Clang diagnostics. The declaration
+surface itself was identical. The importer now canonicalizes a parse-sysroot
+path by its repository-owned cache marker even when the cache belongs to a
+different staging checkout. A focused portability test covers foreign Linux
+and Windows spellings, and normalizing the hosted Linux artifact plus a local
+macOS regeneration produces equal inventory objects. This is deterministic
+generation evidence; the hosted parity and publication graph must rerun before
+the new multi-channel policies are claimed as published.
