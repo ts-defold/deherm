@@ -103,6 +103,7 @@ export const derivationSteps = Object.freeze([
   Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-sdk.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-symbol-evidence.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-runtime.mjs" }),
+  Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-accounting.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-script-runtime.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/ensure-binding-lowering-plan.mjs", args: ["--force"] }),
   Object.freeze({ runtime: "node", script: "scripts/generate-typed-native-bridge.mjs" }),

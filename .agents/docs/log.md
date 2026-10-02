@@ -5052,3 +5052,24 @@ engine infrastructure failures remain visible as a red Actions job and in the
 uploaded evidence artifact. Issues are reserved for positive route
 contradictions, grouped generator failures, and grouped optimization-family
 opportunities.
+
+The follow-up hosted run proved the inventory normalization on Linux, macOS,
+and Windows, then exposed a parity-context error in the next generator. The
+derived alpha artifact intentionally carries reviewed target-macro recipes
+forward after rechecking their substantive source facts, but parity replayed
+that artifact as an ordinary pinned generation and therefore rejected the
+review revision before comparing bytes. Parity now declares the exact
+`DEFOLD_REV` installed from the artifact as `DEHERM_DERIVED_REVISION` and writes
+its own carry ledger. This does not weaken ordinary generation: outside the
+isolated derivation/parity workflows, a mismatched reviewed revision remains a
+hard error.
+
+That replay then exposed a genuinely omitted derivation output:
+`defold-dmsdk-accounting.json` was packed from the repository's pinned revision
+even though its IR and symbol-evidence inputs had been regenerated for alpha.
+The accounting generator is now an explicit derivation step immediately after
+the complete dmSDK runtime pipeline, and the derivation-order test requires it.
+A replay against the latest hosted alpha artifact proves the target-conditional
+check succeeds in declared carry mode; regenerating accounting produces the
+alpha census (2,157 declarations), after which the accumulated four-entry API
+policy verifies unchanged.

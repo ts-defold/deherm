@@ -389,8 +389,14 @@ test("the derivation chain is declared once, and every step is a repository scri
   const targets = derivationSteps.findIndex(({ script }) => script === "scripts/generate-defold-bundle-targets.mjs");
   const symbols = derivationSteps.findIndex(({ script }) => script === "scripts/generate-dmsdk-symbol-evidence.mjs");
   const dmsdkRuntime = derivationSteps.findIndex(({ script }) => script === "scripts/generate-dmsdk-runtime.mjs");
+  const dmsdkAccounting = derivationSteps.findIndex(({ script }) => script === "scripts/generate-dmsdk-accounting.mjs");
   assert.ok(
-    targets >= 0 && sdk >= 0 && symbols > targets && symbols > sdk && dmsdkRuntime > symbols,
+    targets >= 0 &&
+      sdk >= 0 &&
+      symbols > targets &&
+      symbols > sdk &&
+      dmsdkRuntime > symbols &&
+      dmsdkAccounting > dmsdkRuntime,
     "revision-derived dmSDK consumers must run after symbol evidence is measured from that revision's SDK archive",
   );
   const plan = derivationSteps.findIndex(({ script }) => script === "scripts/ensure-binding-lowering-plan.mjs");
