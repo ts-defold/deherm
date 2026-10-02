@@ -5086,3 +5086,16 @@ authenticated site mapping and publishes the policy anyway. A regression test
 forbids the publish job from reading package release tags, and the projection
 helper tests every archive/sidecar pair. This is local workflow and unit evidence;
 hosted publication and post-publication consumer smoke remain to be rerun.
+
+The same 1.14 artifact proved that publication fallback alone was not enough:
+the derived SDK raises the iOS deployment floor from 11 to 15 and macOS from
+10.15 to 12, which legitimately rotates the native archive fingerprint to
+`libs-ecfc68268957`. The existing artifact workflow only observed the package's
+pinned bundle-target file, so no automation could ever produce that release.
+Policy derivation now dispatches native artifact production with its exact run
+ID. The artifact planner extracts the derived bundle-target registry, publishes
+it as a one-day intra-run input, and every target builder plus the completeness
+summary installs those bytes. Publication continues immediately on the prior
+authenticated mapping; completed artifacts trigger the existing artifact-only
+policy refresh. This is workflow-shape evidence until the hosted derived run,
+artifact matrix, refresh, and consumer smoke complete.

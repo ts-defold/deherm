@@ -409,6 +409,16 @@ finished publishing, the API policy still publishes and retains the site's last
 complete authenticated artifact mapping. A policy revision and an optional
 native optimization archive therefore cannot hold each other hostage.
 
+When a derived surface introduces a new native compatibility fingerprint, the
+policy workflow dispatches artifact production with the exact run artifact as
+its input. The artifact matrix does not reread the package-pinned Defold target
+file: its planner, target builders, and completeness proof all install the
+derived `defold-bundle-targets.json`. Artifact production remains asynchronous,
+and its existing completion hook requests an artifact-only policy refresh after
+every archive and integrity sidecar is present. No source commit or human repin
+is required between discovering a Defold revision and publishing its compatible
+native optimization.
+
 Because objects are content-addressed, a revision whose declaration inputs did
 not change publishes **nothing** - the subtree hashes already exist and the
 index simply gains one more pointer at them. The job's steady-state cost is one

@@ -227,6 +227,26 @@ jobs:
           path: ${{ runner.temp }}/policy-reports
           if-no-files-found: ignore
 
+  request-native-artifacts:
+    name: Request compatible native optimization artifacts
+    needs: [plan, derive]
+    if: >-
+      needs.plan.outputs.any == 'true' &&
+      needs.derive.outputs.generated != '0' &&
+      github.repository == 'ts-defold/deherm' &&
+      github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    permissions:
+      actions: write
+      contents: read
+    steps:
+      - name: Dispatch artifact production from this exact derived surface
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh workflow run native-artifacts.yml --repo "${{ github.repository }}"
+          --ref "${{ github.ref_name }}" -f policy_run_id="${{ github.run_id }}"
+
   host-parity:
     name: ${{ matrix.role }}
     needs: derive

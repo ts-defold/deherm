@@ -94,6 +94,18 @@ test("complete artifact publication refreshes policy before consumer proof", asy
   assert.doesNotMatch(final, /gh workflow run end-to-end\.yml/u);
 });
 
+test("policy-derived SDK compatibility inputs flow through every target artifact job", async () => {
+  const workflow = await readFile(".github/workflows/native-artifacts.yml", "utf8");
+  assert.match(workflow, /policy_run_id:[\s\S]*Download policy-derived artifact inputs/u);
+  assert.match(workflow, /run-id: \$\{\{ inputs\.policy_run_id \}\}/u);
+  assert.match(
+    workflow,
+    /tar -xzf[\s\S]*packages\/toolchains\/defold-bundle-targets\.json[\s\S]*name: native-artifact-inputs/u,
+  );
+  const installs = workflow.match(/name: native-artifact-inputs\s+path: \./gu) ?? [];
+  assert.equal(installs.length, 6, "five target builders and the completeness summary must install derived inputs");
+});
+
 test("every dehermc row is authenticated and the Linux artifact is consumed before upload", async () => {
   const workflow = await readFile(".github/workflows/native-artifacts.yml", "utf8");
   const packageSmoke = await readFile("tests/package-smoke.test.mjs", "utf8");

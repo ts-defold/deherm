@@ -170,6 +170,11 @@ test("policy host parity materializes every authoritative generator input", asyn
   );
   assert.match(workflow, /consumer-smoke:[\s\S]*needs: \[derive, publish-site\]/u);
   assert.match(workflow, /check-published-policy\.mjs/u);
+  assert.match(
+    workflow,
+    /request-native-artifacts:[\s\S]*needs: \[plan, derive\][\s\S]*policy_run_id="\$\{\{ github\.run_id \}\}"/u,
+  );
+  assert.match(workflow, /request-native-artifacts:[\s\S]*needs\.derive\.outputs\.generated != '0'/u);
 });
 
 test("LLVM tools resolve versioned Linux binaries and macOS xcrun without false archive failures", () => {

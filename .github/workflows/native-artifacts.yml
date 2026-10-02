@@ -72,6 +72,10 @@ name: native-artifacts
 
 on:
   workflow_dispatch:
+    inputs:
+      policy_run_id:
+        description: Policy run whose derived bundle-target inputs should be built
+        required: false
   push:
     branches: [main]
     paths:
@@ -161,6 +165,30 @@ jobs:
       registry_credential: ${{ steps.credential.outputs.available }}
     steps:
       - uses: actions/checkout@v7
+      - name: Download policy-derived artifact inputs
+        if: inputs.policy_run_id != ''
+        uses: actions/download-artifact@v7
+        with:
+          name: policy-surface
+          path: ${{ runner.temp }}/policy-source
+          run-id: ${{ inputs.policy_run_id }}
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+      - name: Install policy-derived artifact inputs
+        if: inputs.policy_run_id != ''
+        run: >-
+          tar -xzf "$RUNNER_TEMP/policy-source/policy-surface.tar.gz"
+          packages/toolchains/defold-bundle-targets.json
+      - name: Pack the resolved artifact inputs
+        run: |
+          mkdir -p "$RUNNER_TEMP/native-artifact-inputs/packages/toolchains"
+          cp packages/toolchains/defold-bundle-targets.json \
+            "$RUNNER_TEMP/native-artifact-inputs/packages/toolchains/defold-bundle-targets.json"
+      - uses: actions/upload-artifact@v6
+        with:
+          name: native-artifact-inputs
+          path: ${{ runner.temp }}/native-artifact-inputs
+          retention-days: 1
       - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v7
         with: { node-version: '22', cache: 'pnpm' }
@@ -319,6 +347,10 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with: { submodules: recursive }
+      - uses: actions/download-artifact@v7
+        with:
+          name: native-artifact-inputs
+          path: .
       - uses: actions/setup-node@v7
         with: { node-version: '22' }
       - name: Resolve the canonical build row
@@ -370,6 +402,10 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with: { submodules: recursive }
+      - uses: actions/download-artifact@v7
+        with:
+          name: native-artifact-inputs
+          path: .
       - uses: actions/setup-node@v7
         with: { node-version: '22' }
       - name: Resolve the canonical build row
@@ -419,6 +455,10 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with: { submodules: recursive }
+      - uses: actions/download-artifact@v7
+        with:
+          name: native-artifact-inputs
+          path: .
       - uses: actions/setup-node@v7
         with: { node-version: '22' }
       - name: Resolve the canonical build row
@@ -474,6 +514,10 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with: { submodules: recursive }
+      - uses: actions/download-artifact@v7
+        with:
+          name: native-artifact-inputs
+          path: .
       - uses: actions/setup-node@v7
         with: { node-version: '22' }
       - name: Resolve the canonical build row
@@ -524,6 +568,10 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with: { submodules: recursive }
+      - uses: actions/download-artifact@v7
+        with:
+          name: native-artifact-inputs
+          path: .
       - uses: actions/setup-node@v7
         with: { node-version: '22' }
       - name: Resolve the canonical build row
@@ -616,6 +664,10 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v7
+        with:
+          name: native-artifact-inputs
+          path: .
       - env:
           GH_TOKEN: ${{ github.token }}
         run: |
