@@ -1,0 +1,41 @@
+{
+  "defoldRevision": "9614cb812c53d149ac84eac8c98e7b670b68f4bd",
+  "generator": "sha256:dbedf2c9e833005ced90274274ef2fde629150cdc833746453d2bc3d65a2ae59",
+  "kind": "deherm.policy.index-entry",
+  "policyRoot": "d211eb54489ab15a365488ea7002ebaa4bddbf2ee8a3e6b830074c5745a01bcb",
+  "realizer": {
+    "minimumPackageVersion": "0.0.0",
+    "requiredCapabilities": [
+      "dmsdk.static-hermes-bounded-frame.v1",
+      "output.compatibility-source.copy.v1",
+      "output.dmsdk-universal-jsi-header.render.v1",
+      "output.stable-template.render.v1",
+      "policy.compiler-document.binding-lowering-plan.v1",
+      "policy.compiler-document.component-proxy-contract.v2",
+      "policy.compiler-document.copy-json.v1",
+      "policy.compiler-document.defold-value-layouts.v2",
+      "policy.compiler-document.dmsdk-universal.v1",
+      "policy.compiler-surface.references.v1",
+      "policy.content-addressed-graph.v1",
+      "sdk.compatibility-source.copy.v1",
+      "sdk.dmsdk.browser-arena.render.v1",
+      "sdk.dmsdk.index.render.v1",
+      "sdk.dmsdk.named-scalar.render.v1",
+      "sdk.dmsdk.runtime.render.v1",
+      "sdk.dmsdk.scalar.render.v1",
+      "sdk.dmsdk.types.render.v1",
+      "sdk.dmsdk.universal.render.v1",
+      "sdk.script.browser-target-support.render.v1",
+      "sdk.script.handle-lowering.render.v1",
+      "sdk.script.index.render.v1",
+      "sdk.script.modules.render.v1",
+      "sdk.script.runtime.render.v1",
+      "sdk.script.types.render.v1",
+      "sdk.script.universal-value.render.v1",
+      "sdk.script.url-target-support.render.v1",
+      "sdk.script.value-target-support.render.v1"
+    ]
+  },
+  "schemaVersion": 1,
+  "artifactsSha256": "6271a6e8c52c0671e8adae3819516da1f328a68c4f265301f1f28d33091b6b9a"
+}
