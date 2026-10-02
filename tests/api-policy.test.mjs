@@ -41,6 +41,7 @@ import {
   planPolicyDerivationIssueReconciliation,
   stageFromLog,
 } from "../scripts/reconcile-policy-derivation-issues.mjs";
+import { planPolicyOptimizationIssueReconciliation } from "../scripts/reconcile-policy-optimization-issues.mjs";
 import { resolveLlvmTool } from "../scripts/generate-dmsdk-symbol-evidence.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -113,6 +114,7 @@ test("policy host parity materializes every authoritative generator input", asyn
   assert.match(derive, /apt-get install -y --no-install-recommends llvm/u);
   assert.match(derive, /command -v llvm-nm/u);
   assert.match(derive, /reconcile-policy-derivation-issues\.mjs/u);
+  assert.match(derive, /reconcile-policy-optimization-issues\.mjs/u);
   assert.match(derive, /needs\.plan\.outputs\.any == 'true'/u);
   assert.doesNotMatch(derive, /title="policy: unproven Defold/u);
   assert.doesNotMatch(publish, /--validation-only/u);
@@ -234,6 +236,60 @@ test("policy derivation failures collapse by generator stage and stale per-revis
     false,
   );
   assert.match(actions.find(({ kind }) => kind === "edit").body, /2 tracked revision\(s\)/u);
+});
+
+test("policy optimization withdrawals group by recipe family without blocking publication", () => {
+  const actions = planPolicyOptimizationIssueReconciliation({
+    existingIssues: [
+      { number: 150, title: "policy optimization: script-borrowed-handle-classification", state: "CLOSED" },
+      { number: 151, title: "policy optimization: stale-family", state: "OPEN" },
+      { number: 99, title: "Ship playable War Battles", state: "OPEN" },
+    ],
+    withdrawals: [
+      {
+        input: "packages/bindings/overrides/script-borrowed-handle-classification.json",
+        id: "script:b2d.body.get_world",
+        reason: "withdrawn-handle-kind",
+        unresolvedCodecs: ["b2Body"],
+        revision: "a".repeat(40),
+      },
+      {
+        input: "packages/bindings/overrides/script-borrowed-handle-classification.json",
+        id: "script:b2d.body.get_position",
+        reason: "withdrawn-handle-kind",
+        unresolvedCodecs: ["b2Body"],
+        revision: "a".repeat(40),
+      },
+    ],
+    observedFamilies: new Set(["script-borrowed-handle-classification", "stale-family"]),
+    closeResolved: true,
+    runUrl: "https://example.test/run/2",
+  });
+  assert.deepEqual(
+    actions.map(({ kind, number, title }) => ({ kind, number, title })),
+    [
+      { kind: "reopen", number: 150, title: undefined },
+      { kind: "edit", number: 150, title: undefined },
+      { kind: "close", number: 151, title: undefined },
+    ],
+  );
+  const body = actions.find(({ kind }) => kind === "edit").body;
+  assert.match(body, /universal routes/u);
+  assert.match(body, /not an API support gap or publication blocker/u);
+  assert.match(body, /script:b2d\.body\.get_world/u);
+  assert.equal(
+    actions.some(({ number }) => number === 99),
+    false,
+  );
+
+  const partialActions = planPolicyOptimizationIssueReconciliation({
+    existingIssues: [{ number: 151, title: "policy optimization: stale-family", state: "OPEN" }],
+    withdrawals: [],
+    observedFamilies: new Set(["stale-family"]),
+    closeResolved: false,
+    runUrl: "https://example.test/run/3",
+  });
+  assert.deepEqual(partialActions, []);
 });
 
 test("all workflow artifact actions use their Node 24-compatible official majors", async () => {

@@ -176,6 +176,14 @@ Status is additive evidence, not an allow-list:
 documentation annotations and deterministic issue links. Repeated nightlies
 update the existing issue instead of opening duplicates.
 
+Optimization withdrawals are grouped by reviewed recipe input. One Defold
+refactor that affects many routes updates one `policy optimization: <family>`
+issue; it does not create per-route support-gap spam. The issue states that the
+universal routes were published and lists the affected revision, route ids, and
+withdrawal reasons. A later complete derivation that no longer withdraws the
+family closes the generated issue. A partially failed multi-revision wave may
+update observed opportunities but cannot close an existing optimization issue.
+
 A derivation-stage or CI-host failure is not an `unproven` API. The Linux
 deriver preflights the cross-target LLVM archive tools before reading the SDK;
 missing tools fail once with their real name instead of making every archive

@@ -195,6 +195,10 @@ jobs:
             --failures "$RUNNER_TEMP/policy-reports/failures.tsv" \
             --reports "$RUNNER_TEMP/policy-reports" \
             --run-url "$RUN_URL"
+          node scripts/reconcile-policy-optimization-issues.mjs \
+            --failures "$RUNNER_TEMP/policy-reports/failures.tsv" \
+            --reports "$RUNNER_TEMP/policy-reports" \
+            --run-url "$RUN_URL"
 
       - name: Pack the exact generated surface
         run: |

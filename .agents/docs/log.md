@@ -5014,3 +5014,12 @@ namespaces and 190 content-addressed subtrees while leaving the committed
 surface byte-identical. This is full derivation evidence; host-parity,
 real-engine, and public-site lanes still need to rerun before published 1.14
 support is claimed.
+
+The policy workflow now turns actionable specialization-withdrawal audit rows
+into one durable optimization issue per reviewed recipe family. The issue body
+explicitly says the universal route shipped and records revision, route, codec,
+and reason; stale generated optimization issues close after a complete tracked
+derivation no longer reproduces them. Derivation-stage failures remain a
+separate issue class, and neither issue class changes publication authority.
+Issue closure additionally requires a complete successful derivation wave, so
+partial audit evidence cannot erase previously recorded optimization work.
