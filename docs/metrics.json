@@ -205,12 +205,12 @@
     {
       "path": "packages/bindings/generated/defold-script-api-accounting.json",
       "bytes": 960271,
-      "sha256": "6f46b51a07a7f55256f8c7ce5708fc5a1ad8a1c0b9a8a205a6c0f1e807d3a769"
+      "sha256": "def8531e8846f628209cb02ec1a0dca2fc03d5f891fe09233d539e141f51cf29"
     },
     {
       "path": "packages/bindings/generated/defold-dmsdk-accounting.json",
-      "bytes": 593979,
-      "sha256": "fd36be6a0646863569b7a7356652238947c863e1d72d9282aef8acca16177f38"
+      "bytes": 593981,
+      "sha256": "c05e3bc5b7eb5beb03e5c00e4ec6f5cb58b2babaad3070466183068c9fbae57c"
     },
     {
       "path": "docs/site/evidence/release-sizes.json",
