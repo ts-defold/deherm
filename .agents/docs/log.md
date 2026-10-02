@@ -5043,3 +5043,12 @@ and Windows spellings, and normalizing the hosted Linux artifact plus a local
 macOS regeneration produces equal inventory objects. This is deterministic
 generation evidence; the hosted parity and publication graph must rerun before
 the new multi-channel policies are claimed as published.
+
+The live tracker audit also found a final absence-of-evidence issue emitter in
+the advisory engine lane. It created one `policy: real-engine evidence
+unavailable` issue per revision even though publication and API emission did
+not depend on that evidence. The workflow no longer creates those tickets:
+engine infrastructure failures remain visible as a red Actions job and in the
+uploaded evidence artifact. Issues are reserved for positive route
+contradictions, grouped generator failures, and grouped optimization-family
+opportunities.

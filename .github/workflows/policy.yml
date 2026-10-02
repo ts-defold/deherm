@@ -465,33 +465,6 @@ jobs:
             gh issue comment "$number" --body "Automated route verification no longer finds a source/runtime contradiction for this route."
             gh issue close "$number" --reason completed
           done
-      - name: Reconcile the real-engine evidence issue
-        if: >-
-          always() &&
-          github.repository == 'ts-defold/deherm' &&
-          github.ref == 'refs/heads/main'
-        env:
-          GH_TOKEN: ${{ github.token }}
-          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-        run: |
-          set -euo pipefail
-          revision="$(sed -n 's/^DEFOLD_REV=//p' upstream.lock)"
-          title="policy: real-engine evidence unavailable for $revision"
-          body="The policy was generated and remains published, but the real-engine evidence lane did not complete successfully for \`$revision\`.\n\nRun: $RUN_URL"
-          issue="$(gh issue list --state all --search "in:title $title" --json number,title,state --jq ".[] | select(.title == \"$title\")" 2>/dev/null | head -n1 || true)"
-          number="$(jq -r '.number // empty' <<< "$issue")"
-          state="$(jq -r '.state // empty' <<< "$issue")"
-          if [ "${{ steps.engine.outcome }}" != success ]; then
-            if [ -n "$number" ]; then
-              if [ "$state" = CLOSED ]; then gh issue reopen "$number"; fi
-              gh issue comment "$number" --body "$body"
-            else
-              gh issue create --title "$title" --body "$body"
-            fi
-          elif [ -n "$number" ] && [ "$state" = OPEN ]; then
-            gh issue comment "$number" --body "Real-engine evidence is available again.\n\nRun: $RUN_URL"
-            gh issue close "$number" --reason completed
-          fi
       - name: Enforce engine-lane infrastructure health
         if: always() && steps.engine.outcome != 'success'
         run: |

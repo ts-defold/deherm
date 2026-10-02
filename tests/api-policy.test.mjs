@@ -151,6 +151,11 @@ test("policy host parity materializes every authoritative generator input", asyn
   assert.match(engine, /pnpm test:dmsdk-browser-exact-call/u);
   assert.match(engine, /pnpm test:script-browser-exact-call/u);
   assert.match(engine, /continue-on-error: true/u);
+  assert.doesNotMatch(
+    engine,
+    /policy: real-engine evidence unavailable/u,
+    "missing optional engine evidence belongs in Actions/artifacts, not per-revision API issues",
+  );
   assert.match(
     engine,
     /Enforce engine-lane infrastructure health[\s\S]*steps\.engine\.outcome != 'success'[\s\S]*exit 1/u,
