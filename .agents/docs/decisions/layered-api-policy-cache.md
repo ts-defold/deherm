@@ -394,9 +394,20 @@ and the index entry.
 This is direct publication, not preparation for a review pull request. The
 single `policy` workflow derives all missing channel revisions into one
 accumulated store, runs cross-host reproduction and real-engine evidence lanes,
-reports or opens issues for anything unproven, and pushes the usable result to
-`deherm-policy-site`. Review is for changes to the generator; a mechanically
-derived Defold revision does not wait for a person to authorize its existence.
+reports positive contradictions and grouped optimization opportunities, and
+pushes the usable result to `deherm-policy-site`. Missing bespoke engine evidence
+is not a publication verdict and creates no issue. Review is for changes to the
+generator; a mechanically derived Defold revision does not wait for a person to
+authorize its existence.
+
+Artifact availability follows the same non-blocking rule. The desired release
+mapping is projected from the derived surface installed by that workflow run,
+never from the npm package's pinned `release-tags.json`. If every desired archive
+and integrity sidecar is already published, the site advances to that mapping.
+If a newly derived SDK compatibility fingerprint needs an archive that has not
+finished publishing, the API policy still publishes and retains the site's last
+complete authenticated artifact mapping. A policy revision and an optional
+native optimization archive therefore cannot hold each other hostage.
 
 Because objects are content-addressed, a revision whose declaration inputs did
 not change publishes **nothing** - the subtree hashes already exist and the

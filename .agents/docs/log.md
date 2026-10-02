@@ -5073,3 +5073,16 @@ A replay against the latest hosted alpha artifact proves the target-conditional
 check succeeds in declared carry mode; regenerating accounting produces the
 alpha census (2,157 declarations), after which the accumulated four-entry API
 policy verifies unchanged.
+
+The resulting hosted run then proved the complete derived surface reproduces on
+Linux, macOS, and Windows. Publication alone failed because its release selector
+consulted the npm package's pinned `release-tags.json`: alpha's newly derived SDK
+compatibility fingerprint expected `libs-ecfc68268957`, while the selector had
+downloaded authenticated sidecars for the package's `libs-db900fc9f9d8`. The
+integrity rejection was correct; the choice of authority was not. Publication
+now projects its desired archive rows from the exact installed derived surface.
+If those fingerprinted releases are incomplete it retains the last complete
+authenticated site mapping and publishes the policy anyway. A regression test
+forbids the publish job from reading package release tags, and the projection
+helper tests every archive/sidecar pair. This is local workflow and unit evidence;
+hosted publication and post-publication consumer smoke remain to be rerun.

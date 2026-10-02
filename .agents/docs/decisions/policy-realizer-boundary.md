@@ -92,4 +92,10 @@ The capability registry must become per-recipe rather than filename/mode-based. 
 
 ## Fallback
 
-Source constructs without an optimized recipe select `binding.raw-unverified-fallback.v1`. They remain emitted and usable where the generic transport can represent them, carry unverified documentation/evidence, and feed the automated issue/report pipeline. A nightly is not blocked merely because an optimized specialization is missing.
+Source constructs without an optimized recipe select the compatibility-named
+`binding.raw-unverified-fallback.v1` capability. The historical capability name
+does not define public support status: the route remains emitted, usable, and
+verified by the generated fallback lane's compile/ABI smoke. It feeds a grouped
+optimization-opportunity issue so a later package can make it smaller or faster;
+it does not receive an `unverified` user-facing annotation and never blocks the
+nightly. Only positive source/runtime contradiction can mark a route suspect.

@@ -108,6 +108,12 @@ test("policy host parity materializes every authoritative generator input", asyn
   assert.match(publish, /needs: \[derive, host-parity\]/u);
   assert.match(publish, /needs\.host-parity\.result == 'success'/u);
   assert.match(publish, /Select only a completely published artifact mapping/u);
+  assert.match(publish, /project-artifact-references\.mjs --out/u);
+  assert.doesNotMatch(
+    publish,
+    /packages\/toolchains\/release-tags\.json/u,
+    "revision policy publication must derive desired artifacts from the installed surface",
+  );
   assert.match(publish, /build\/published-policy-site\/v1\/artifacts/u);
   assert.match(publish, /--artifact-references/u);
   assert.match(derive, /build-policy-site\.mjs --out build\/policy-site --validation-only/u);

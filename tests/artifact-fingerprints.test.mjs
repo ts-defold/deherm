@@ -15,6 +15,7 @@ import test from "node:test";
 import { releaseAssetUrlTemplate } from "../packages/cli/src/release-assets.mjs";
 import { RELEASE_INTEGRITY_KIND, sha256 } from "../packages/cli/src/release-integrity.mjs";
 import { buildArtifactReferences } from "../scripts/generate-api-policy.mjs";
+import { artifactAssetRows } from "../scripts/project-artifact-references.mjs";
 import {
   artifactFamilies,
   artifactFamilyNames,
@@ -267,6 +268,26 @@ test("a client can build a download URL, and the index entry stays free of artif
   }
   assert.equal(references["native-artifacts"].indexedBy, "bundleTarget");
   assert.equal(references["hermes-host"].indexedBy, "host");
+});
+
+test("policy publication projects release assets from the installed derived surface", async () => {
+  const references = await buildArtifactReferences();
+  const archives = artifactAssetRows(references);
+  const complete = artifactAssetRows(references, { includeIntegrity: true });
+  assert.equal(complete.length, archives.length * 2);
+  assert.deepEqual(
+    complete.filter((row) => !row.asset.endsWith(".integrity.json")),
+    archives,
+  );
+  for (const archive of archives) {
+    assert.ok(
+      complete.some(
+        (row) =>
+          row.family === archive.family && row.tag === archive.tag && row.asset === `${archive.asset}.integrity.json`,
+      ),
+      `${archive.family}/${archive.asset} has no projected integrity sidecar`,
+    );
+  }
 });
 
 test("published artifact references bind every publisher integrity document", async () => {

@@ -515,20 +515,15 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          current="$RUNNER_TEMP/current-artifact-references.json"
+          node scripts/project-artifact-references.mjs --out "$current"
           missing=()
           while IFS=$'\t' read -r family tag asset; do
             if ! gh release view "$tag" --repo "${{ github.repository }}" \
               --json assets --jq '.assets[].name' 2>/dev/null | grep -Fxq "$asset"; then
               missing+=("$family:$tag:$asset")
             fi
-          done < <(node -e '
-            const tags = require("./packages/toolchains/release-tags.json").families;
-            for (const [family, row] of Object.entries(tags))
-              for (const asset of Object.values(row.assets)) {
-                console.log(`${family}\t${row.tag}\t${asset}`);
-                console.log(`${family}\t${row.tag}\t${asset}.integrity.json`);
-              }
-          ')
+          done < <(node scripts/project-artifact-references.mjs --from "$current" --list all)
           if [ "${#missing[@]}" -eq 0 ]; then
             integrity_root="$RUNNER_TEMP/release-integrity"
             rm -rf "$integrity_root"
@@ -536,12 +531,7 @@ jobs:
               mkdir -p "$integrity_root/$family"
               gh release download "$tag" --repo "${{ github.repository }}" \
                 --pattern "$asset.integrity.json" --dir "$integrity_root/$family"
-            done < <(node -e '
-              const tags = require("./packages/toolchains/release-tags.json").families;
-              for (const [family, row] of Object.entries(tags))
-                for (const asset of Object.values(row.assets))
-                  console.log(`${family}\t${row.tag}\t${asset}`);
-            ')
+            done < <(node scripts/project-artifact-references.mjs --from "$current" --list archives)
             echo "integrity_root=$integrity_root" >> "$GITHUB_OUTPUT"
             echo 'Current artifact mapping is complete.' >> "$GITHUB_STEP_SUMMARY"
             exit 0
@@ -564,14 +554,7 @@ jobs:
               --json assets --jq '.assets[].name' 2>/dev/null | grep -Fxq "$asset"; then
               fallback_missing+=("$family:$tag:$asset")
             fi
-          done < <(node -e '
-            const refs = require(process.argv[1]);
-            for (const [family, row] of Object.entries(refs))
-              for (const asset of Object.values(row.assets)) {
-                console.log(`${family}\t${row.tag}\t${asset}`);
-                console.log(`${family}\t${row.tag}\t${asset}.integrity.json`);
-              }
-          ' "$fallback")
+          done < <(node scripts/project-artifact-references.mjs --from "$fallback" --list all)
           if [ "${#fallback_missing[@]}" -ne 0 ]; then
             printf 'The prior site mapping is also incomplete:\n%s\n' "${fallback_missing[*]}" >&2
             exit 1
