@@ -423,7 +423,7 @@ jobs:
             packages/bindings/generated/defold-headless-conformance-report.json
             .agents/docs/data/headless-conformance.log
           if-no-files-found: ignore
-      - name: Open or update per-route verification issues
+      - name: Open or update source contradiction issues
         if: >-
           always() &&
           github.repository == 'ts-defold/deherm' &&
@@ -462,7 +462,7 @@ jobs:
             number="$(jq -r '.number' <<< "$row")"
             title="$(jq -r '.title' <<< "$row")"
             if jq -e --arg title "$title" 'index($title) != null' "$wanted" >/dev/null; then continue; fi
-            gh issue comment "$number" --body "Automated route verification no longer marks this route suspect or unproven."
+            gh issue comment "$number" --body "Automated route verification no longer finds a source/runtime contradiction for this route."
             gh issue close "$number" --reason completed
           done
       - name: Reconcile the real-engine evidence issue

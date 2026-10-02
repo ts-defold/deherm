@@ -158,7 +158,7 @@ test("route verification never carries runtime observations across a changed pla
 });
 
 test("the policy workflow materializes the issue links emitted for marked routes", () => {
-  const start = policyWorkflow.indexOf("      - name: Open or update per-route verification issues");
+  const start = policyWorkflow.indexOf("      - name: Open or update source contradiction issues");
   const end = policyWorkflow.indexOf("      - name: Reconcile the real-engine evidence issue", start);
   assert.ok(start >= 0 && end > start);
   const step = policyWorkflow.slice(start, end);

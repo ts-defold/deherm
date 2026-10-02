@@ -5023,3 +5023,9 @@ derivation no longer reproduces them. Derivation-stage failures remain a
 separate issue class, and neither issue class changes publication authority.
 Issue closure additionally requires a complete successful derivation wave, so
 partial audit evidence cannot erase previously recorded optimization work.
+
+Legacy policy wording no longer claims that missing bespoke execution opens an
+`unproven` route issue. The generated route-verification artifact has already
+treated every non-contradicted Defold route as verified and limits issues to
+positive source/runtime contradictions; workflow labels and the accepted
+publication decision now state that behavior exactly.

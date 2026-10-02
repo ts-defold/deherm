@@ -172,9 +172,11 @@ Status is additive evidence, not an allow-list:
   not match a known specialization recipe. This opens or updates optimization
   work; it is never a publication gate.
 
-`suspect`, `unproven`, and `unoptimized` entries remain usable. They carry generated
-documentation annotations and deterministic issue links. Repeated nightlies
-update the existing issue instead of opening duplicates.
+`suspect`, `unproven`, and `unoptimized` entries remain usable. `unproven` is
+internal evidence metadata only: it does not annotate the public SDK and does
+not open a route issue. Positive source/runtime contradictions open `suspect`
+issues, while specialization withdrawals open grouped `unoptimized` issues.
+Repeated nightlies update existing issues instead of opening duplicates.
 
 Optimization withdrawals are grouped by reviewed recipe input. One Defold
 refactor that affects many routes updates one `policy optimization: <family>`
@@ -191,16 +193,17 @@ appear unreadable. Failures shared by several tracked revisions are grouped
 into one stage-scoped issue listing those revisions. After a complete tracked
 channel run no longer reproduces that stage, the workflow closes the generated
 issue and any superseded per-revision issue automatically. Route-level
-`suspect` and `unproven` issues remain separate because those carry actual API
-identity and generated documentation links.
+`suspect` issues remain separate because those carry an actual positive
+contradiction tied to API identity. Mere absence of bespoke runtime evidence
+remains in the harness report and never creates an issue.
 
 The deterministic link is a title-keyed repository issue lookup embedded in
 the route-verification artifact. The engine-evidence job materializes that
 contract: it lists the existing route-verification issues once, creates every
-missing `suspect` or `unproven` issue, reopens a matching closed issue if the
-finding recurs, and edits its generated body only when the evidence changed.
-Profile, context, destructive-effect and runtime-producer blockers remain
-harness notes and do not open route issues.
+missing `suspect` issue, reopens a matching closed issue if the contradiction
+recurs, and edits its generated body only when the evidence changed. Profile,
+context, destructive-effect, absent bespoke execution and runtime-producer
+blockers remain harness notes and do not open route issues.
 
 # Failure policy
 
