@@ -419,6 +419,16 @@ every archive and integrity sidecar is present. No source commit or human repin
 is required between discovering a Defold revision and publishing its compatible
 native optimization.
 
+The realized SDK also cannot be held behind that asynchronous archive. If the
+site's last authenticated native mapping describes a different toolchain
+compatibility envelope, the materializer preserves revision-neutral host tools,
+removes the mismatched native assets, and records
+`pending-compatible-build` in the surface descriptor. Types, bindings, language
+service data, and generated glue remain available immediately. A native build
+gets a precise missing-compatible-artifact error at artifact selection time;
+it never downloads the older archive by accident. The completed artifact-only
+refresh turns the same deterministic projection back into `ready`.
+
 Because objects are content-addressed, a revision whose declaration inputs did
 not change publishes **nothing** - the subtree hashes already exist and the
 index simply gains one more pointer at them. The job's steady-state cost is one

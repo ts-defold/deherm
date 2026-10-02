@@ -10,6 +10,7 @@ import { hashBytes, POLICY_REALIZER_CAPABILITIES } from "../../compiler/src/api-
 import {
   assertPolicySurfaceRealizationIdentity,
   materializePolicySurface,
+  projectArtifactsForToolchain,
   policySurfaceRealizationIdentity,
 } from "../../compiler/src/policy-surface-materializer.mjs";
 import { DEFOLD_REVISION_PATTERN } from "./defold-revision.mjs";
@@ -568,6 +569,9 @@ export async function resolvePublishedPolicy(revision, options = {}) {
 
   const surfaceBase = path.resolve(options.surfaceRoot ?? path.join(cacheHome, "surfaces", revision));
   const materialize = options.materializeImpl === false ? null : (options.materializeImpl ?? materializePolicySurface);
+  if (materialize && artifacts) {
+    artifacts = projectArtifactsForToolchain(artifacts, objects.get("@toolchain")?.value).artifacts;
+  }
   const realization = policySurfaceRealizationIdentity({ entry, packageVersion, artifacts });
   let surface = null;
   if (materialize) {

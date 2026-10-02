@@ -7,8 +7,10 @@ import test from "node:test";
 
 import {
   materializePolicySurface,
+  projectArtifactsForToolchain,
   policySurfaceRealizationIdentity,
 } from "../packages/compiler/src/policy-surface-materializer.mjs";
+import { nativeArtifactCompatibility } from "../packages/compiler/src/defold-toolchain-pins.mjs";
 import { resolveDefoldSurface, verifyMaterializedSurfaceRoot } from "../packages/cli/src/defold-surface.mjs";
 import { publishPolicySurface } from "../packages/cli/src/policy-client.mjs";
 import {
@@ -30,6 +32,49 @@ const oldPipelineFixture = JSON.parse(
 function sha256(bytes) {
   return createHash("sha256").update(bytes).digest("hex");
 }
+
+test("an unavailable compatible native build cannot suppress SDK materialization", () => {
+  const toolchain = {
+    pins: {
+      ANDROID_NDK_VERSION: "25b",
+      ANDROID_NDK_API_VERSION: "19",
+      ANDROID_64_NDK_API_VERSION: "21",
+      ANDROID_TARGET_API_LEVEL: "36",
+      VERSION_IPHONEOS_MIN: "15.0",
+      VERSION_MACOSX_MIN: "12.0",
+    },
+    targetMatrix: { targets: [{ target: "arm64-osx", kind: "bundle" }] },
+  };
+  const artifacts = {
+    schemaVersion: 2,
+    kind: "deherm.policy.artifacts",
+    defoldRevision: "1".repeat(40),
+    artifacts: {
+      "hermes-host": { assets: { "darwin-arm64": "host.tar.gz" } },
+      "native-artifacts": {
+        assets: { "arm64-osx": "native.tar.gz" },
+        contents: { "arm64-osx": ["libhermes.a"] },
+        integrity: { "arm64-osx": { asset: "native.tar.gz.integrity.json" } },
+        compatibility: { kind: "deherm.native-artifact-compatibility", sha256: "0".repeat(64) },
+      },
+    },
+  };
+  const pending = projectArtifactsForToolchain(artifacts, toolchain);
+  assert.equal(pending.nativeStatus, "pending-compatible-build");
+  assert.deepEqual(pending.artifacts.artifacts["native-artifacts"].assets, {});
+  assert.deepEqual(pending.artifacts.artifacts["native-artifacts"].integrity, {});
+  assert.deepEqual(pending.artifacts.artifacts["hermes-host"], artifacts.artifacts["hermes-host"]);
+  assert.deepEqual(
+    pending.artifacts.artifacts["native-artifacts"].availability.expectedCompatibility,
+    nativeArtifactCompatibility(toolchain),
+  );
+
+  const readyArtifacts = structuredClone(artifacts);
+  readyArtifacts.artifacts["native-artifacts"].compatibility = nativeArtifactCompatibility(toolchain);
+  const ready = projectArtifactsForToolchain(readyArtifacts, toolchain);
+  assert.equal(ready.nativeStatus, "ready");
+  assert.equal(ready.artifacts, readyArtifacts, "an exact mapping must remain byte-identical");
+});
 
 async function currentResolvedPolicy() {
   const derived = await derivePolicy();

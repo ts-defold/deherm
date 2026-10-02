@@ -5099,3 +5099,13 @@ summary installs those bytes. Publication continues immediately on the prior
 authenticated mapping; completed artifacts trigger the existing artifact-only
 policy refresh. This is workflow-shape evidence until the hosted derived run,
 artifact matrix, refresh, and consumer smoke complete.
+
+One more release gate remained after publication itself was made non-blocking:
+the policy surface materializer rejected the complete generated SDK whenever the
+retained native mapping's exact compatibility digest differed. The artifact map
+is now projected at realization time. Revision-neutral host families survive,
+the mismatched native family loses every selectable asset and integrity row, and
+the descriptor records `pending-compatible-build`; the SDK and compiler outputs
+still materialize. An exact mapping remains byte-identical and reports `ready`.
+Focused tests cover both projections. This keeps unsafe archives unavailable
+without converting artifact latency into API unavailability.

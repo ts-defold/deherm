@@ -84,6 +84,41 @@ export function policySurfaceArtifactsSha256(artifacts) {
   return artifacts ? digestCanonical(artifacts) : null;
 }
 
+/**
+ * Keep policy realization usable while a newly discovered Defold toolchain is
+ * waiting for its content-addressed native archives.
+ *
+ * Host tools are revision-neutral and remain available. Native assets from a
+ * different compatibility envelope are removed rather than trusted or allowed
+ * to suppress SDK generation. The artifact workflow will replace this pending
+ * projection with an exact, integrity-bound mapping when its matrix completes.
+ */
+export function projectArtifactsForToolchain(artifacts, toolchain) {
+  if (!artifacts) return { artifacts: null, nativeStatus: "absent" };
+  const native = artifacts.artifacts?.["native-artifacts"];
+  if (!native || typeof native !== "object") {
+    throw new Error("Published artifact mapping has no native-artifacts family");
+  }
+  const expected = nativeArtifactCompatibility(toolchain);
+  const declared = native.compatibility;
+  if (declared?.kind === expected.kind && declared.sha256 === expected.sha256) {
+    return { artifacts, nativeStatus: "ready" };
+  }
+  const projected = structuredClone(artifacts);
+  projected.artifacts["native-artifacts"] = {
+    ...projected.artifacts["native-artifacts"],
+    assets: {},
+    contents: {},
+    integrity: {},
+    availability: {
+      status: "pending-compatible-build",
+      expectedCompatibility: expected,
+      publishedCompatibility: declared ?? null,
+    },
+  };
+  return { artifacts: projected, nativeStatus: "pending-compatible-build" };
+}
+
 export function policySurfaceRealizationIdentity({ entry, packageVersion, artifacts = null }) {
   const compiler = {
     package: "@ts-defold/deherm",
@@ -645,16 +680,14 @@ export async function materializePolicySurface(resolvedPolicy, options = {}) {
     writes.push("ir/defold-toolchain.json");
   }
   let artifactsSource = null;
+  let nativeArtifactStatus = "absent";
   if (options.artifacts) {
     if (options.artifacts.kind !== "deherm.policy.artifacts" || options.artifacts.defoldRevision !== revision) {
       throw new Error("Published artifact mapping does not describe the materialized Defold revision");
     }
-    const declared = options.artifacts.artifacts?.["native-artifacts"]?.compatibility;
-    const expected = nativeArtifactCompatibility(toolchain);
-    if (declared?.kind !== expected.kind || declared.sha256 !== expected.sha256) {
-      throw new Error("Published native artifacts are incompatible with the selected Defold toolchain policy");
-    }
-    artifactsSource = json(options.artifacts);
+    const projection = projectArtifactsForToolchain(options.artifacts, toolchain);
+    nativeArtifactStatus = projection.nativeStatus;
+    artifactsSource = json(projection.artifacts);
     if (await writeStable(path.join(outputRoot, "ir", "defold-artifacts.json"), artifactsSource, outputBoundary)) {
       writes.push("ir/defold-artifacts.json");
     }
@@ -688,6 +721,7 @@ export async function materializePolicySurface(resolvedPolicy, options = {}) {
     ),
     toolchainSha256: sha256(toolchainSource),
     artifactsSha256: artifactsSource ? sha256(artifactsSource) : null,
+    nativeArtifactStatus,
     sdk: Object.fromEntries(
       Object.entries(sdk)
         .sort(([left], [right]) => left.localeCompare(right))
