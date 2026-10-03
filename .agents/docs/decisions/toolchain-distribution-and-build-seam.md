@@ -198,13 +198,16 @@ without `dehermc` emits a program whose `DefoldHash` literals were never
 lowered and whose reachability manifest was never written - which fails later
 and further from its cause.
 
-Automatic release resolution carries every pinned member digest for the
-requested family into the cache installer. A cache hit therefore means all
-members exist **and** match the manifest, not merely that their filenames are
-present. A mismatch downloads into a sibling staging directory, authenticates
-the replacement members there, and only then atomically replaces the corrupt
-family directory. If the downloaded bytes also mismatch, the old cache remains
-in place and resolution still fails closed.
+Automatic release resolution stores the publisher integrity sidecar beside the
+installed family. Its digest is pinned by `release-tags.json`; every cache hit
+reauthenticates that receipt and then hashes every installed member against its
+exact size and digest. This is independent of optional caller-supplied hashes,
+so same-length corruption cannot enter the size-only reuse path. A mismatch
+downloads into a sibling staging directory, authenticates the replacement
+members there, and only then atomically replaces the corrupt family directory.
+If the downloaded bytes also mismatch, the old cache remains in place and
+resolution still fails closed. Legacy package manifests without a pinned
+sidecar may reuse a cache only when the caller authenticates every member.
 
 The member digests in `host-compilers.json` are recorded from the exact flat
 archives published under the content-addressed tag, rather than retained from
@@ -638,6 +641,14 @@ A toolchain fingerprint no longer triggers end-to-end directly on the original
 push either; that raced artifact publication itself. Script-only end-to-end
 changes still run their cheap local stage directly; nightlies and the ordered
 post-publication dispatch retain the full Bob matrix.
+
+For package-default artifact runs, the summary also runs
+`pnpm check:release-tags:published`: it downloads every sidecar, authenticates
+it against GitHub's publisher digest, reconstructs `release-tags.json`, and
+requires byte equality with the shipped lock. `pnpm generate:release-tags` is
+the corresponding maintainer update command. Policy-derived target runs skip
+this package-lock comparison because they intentionally build a different
+Defold revision's native rows.
 
 The native summary marks its dispatch `artifact_refresh_only`. The policy graph
 still hydrates, verifies, publishes, waits for Pages, and runs its clean consumer

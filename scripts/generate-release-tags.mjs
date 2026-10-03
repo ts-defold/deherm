@@ -14,11 +14,18 @@
 // the same `buildArtifactReferences` the policy site serves, so the package and
 // the site cannot disagree about where an artifact lives.
 
-import { writeFile, readFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { defaultReleaseRepository, releaseAssetUrlTemplate } from "../packages/cli/src/release-assets.mjs";
+import {
+  defaultReleaseRepository,
+  downloadReleaseAssets,
+  releaseAssetUrlTemplate,
+  resolveGithubReleaseAsset,
+  verifyReleaseAssetBytes,
+} from "../packages/cli/src/release-assets.mjs";
 import { buildArtifactReferences } from "./generate-api-policy.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -62,38 +69,82 @@ function assertCompleteIntegrity(value) {
   }
 }
 
+export async function downloadPublishedIntegrity() {
+  const integrityRoot = await mkdtemp(path.join(tmpdir(), "deherm-release-integrity-"));
+  const families = await buildArtifactReferences();
+  try {
+    for (const [familyName, family] of Object.entries(families)) {
+      const destination = path.join(integrityRoot, familyName);
+      await mkdir(destination, { recursive: true });
+      for (const asset of Object.values(family.assets)) {
+        const integrityAsset = `${asset}.integrity.json`;
+        const metadata = await resolveGithubReleaseAsset({
+          repository: defaultReleaseRepository,
+          tag: family.tag,
+          asset: integrityAsset,
+        });
+        const { downloaded } = await downloadReleaseAssets({
+          repository: defaultReleaseRepository,
+          tag: family.tag,
+          assets: [integrityAsset],
+          destination,
+        });
+        verifyReleaseAssetBytes(await readFile(downloaded[0]), metadata, integrityAsset);
+      }
+    }
+    return integrityRoot;
+  } catch (error) {
+    await rm(integrityRoot, { recursive: true, force: true });
+    throw error;
+  }
+}
+
 async function main(argv = process.argv.slice(2)) {
   let check = false;
   let integrityRoot = null;
+  let published = false;
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
     if (argument === "--check") check = true;
+    else if (argument === "--published") published = true;
     else if (argument === "--integrity-root") {
       const value = argv[++index];
       if (!value) throw new Error("--integrity-root requires a directory");
       integrityRoot = path.resolve(value);
     } else throw new Error(`Unknown argument: ${argument}`);
   }
-  const generated = await buildReleaseTags({ integrityRoot });
-  const serialized = `${JSON.stringify(generated, null, 2)}\n`;
-  if (check) {
-    const existingText = await readFile(releaseTagsPath, "utf8").catch(() => "");
-    const existing = existingText ? JSON.parse(existingText) : null;
-    const matches = integrityRoot
-      ? existingText === serialized
-      : JSON.stringify(withoutIntegrity(existing)) === JSON.stringify(withoutIntegrity(generated));
-    if (!matches) {
-      throw new Error("packages/toolchains/release-tags.json is stale; run node scripts/generate-release-tags.mjs");
+  if (published && integrityRoot) throw new Error("--published and --integrity-root are mutually exclusive");
+  let temporaryIntegrityRoot = null;
+  try {
+    if (published) {
+      temporaryIntegrityRoot = await downloadPublishedIntegrity();
+      integrityRoot = temporaryIntegrityRoot;
     }
-    assertCompleteIntegrity(existing);
-    console.log("release tags are current");
-    return;
+    const generated = await buildReleaseTags({ integrityRoot });
+    const serialized = `${JSON.stringify(generated, null, 2)}\n`;
+    if (check) {
+      const existingText = await readFile(releaseTagsPath, "utf8").catch(() => "");
+      const existing = existingText ? JSON.parse(existingText) : null;
+      const matches = integrityRoot
+        ? existingText === serialized
+        : JSON.stringify(withoutIntegrity(existing)) === JSON.stringify(withoutIntegrity(generated));
+      if (!matches) {
+        throw new Error(
+          "packages/toolchains/release-tags.json is stale; run pnpm generate:release-tags after publishing artifacts",
+        );
+      }
+      assertCompleteIntegrity(existing);
+      console.log("release tags are current");
+      return;
+    }
+    if (!integrityRoot) {
+      throw new Error("Generating release-tags.json requires --published or --integrity-root with publisher sidecars");
+    }
+    await writeFile(releaseTagsPath, serialized);
+    console.log(`wrote ${path.relative(root, releaseTagsPath)}`);
+  } finally {
+    if (temporaryIntegrityRoot) await rm(temporaryIntegrityRoot, { recursive: true, force: true });
   }
-  if (!integrityRoot) {
-    throw new Error("Generating release-tags.json requires --integrity-root with publisher sidecars");
-  }
-  await writeFile(releaseTagsPath, serialized);
-  console.log(`wrote ${path.relative(root, releaseTagsPath)}`);
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) await main();

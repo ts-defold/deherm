@@ -87,9 +87,12 @@ test("complete artifact publication refreshes policy before consumer proof", asy
   const workflow = await readFile(".github/workflows/native-artifacts.yml", "utf8");
   const final = workflow.slice(workflow.indexOf("  summary:"));
   const completeness = final.indexOf("Verify every fingerprinted row is published");
+  const releaseLock = final.indexOf("Verify the shipped release lock against publisher sidecars");
   const policy = final.indexOf("gh workflow run policy.yml");
   assert.ok(completeness >= 0);
+  assert.ok(releaseLock > completeness, "the package release lock must be reproduced after release completeness");
   assert.ok(policy > completeness, "policy artifact mappings must refresh only after release completeness");
+  assert.match(final, /if: inputs\.policy_run_id == ''[\s\S]*generate-release-tags\.mjs --check --published/u);
   assert.match(final, /-f artifact_refresh_only=true/u);
   assert.doesNotMatch(final, /gh workflow run end-to-end\.yml/u);
 });
@@ -100,7 +103,7 @@ test("policy-derived SDK compatibility inputs flow through every target artifact
   assert.match(workflow, /run-id: \$\{\{ inputs\.policy_run_id \}\}/u);
   assert.match(
     workflow,
-    /tar -xzf[\s\S]*packages\/toolchains\/defold-bundle-targets\.json[\s\S]*name: native-artifact-inputs/u,
+    /policy-surface\.mjs extract[\s\S]*--path packages\/toolchains\/defold-bundle-targets\.json[\s\S]*name: native-artifact-inputs/u,
   );
   const installs = workflow.match(/name: native-artifact-inputs\s+path: \./gu) ?? [];
   assert.equal(installs.length, 6, "five target builders and the completeness summary must install derived inputs");

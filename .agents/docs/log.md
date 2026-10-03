@@ -5156,3 +5156,15 @@ catalogs; archive installation rejects undeclared or unsafe paths before
 replacing generated roots. Focused policy and cross-revision suites pass 38/38
 and 48/48 respectively. This is transport/structure evidence, not new runtime
 execution evidence.
+
+## 2026-10-03 - Authenticated tool-cache reuse and release-lock reproduction
+
+Host-tool installation now stores the authenticated publisher sidecar with the
+cache entry and verifies every member's size and SHA-256 from that receipt on
+every reuse, without depending on caller-supplied hashes. A focused regression
+changes a cached executable to different same-length bytes and proves the next
+lookup downloads and repairs it. `pnpm check:release-tags:published` downloaded
+and publisher-authenticated every current sidecar and reproduced the committed
+lock byte-for-byte; the package-default native-artifact summary now runs that
+same exact check after release completeness. This is artifact-integrity and
+workflow evidence, not target runtime evidence.

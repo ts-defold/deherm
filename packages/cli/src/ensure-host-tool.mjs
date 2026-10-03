@@ -19,7 +19,7 @@
 // new tag never overwrites an old one in place.
 
 import { createHash } from "node:crypto";
-import { chmod, mkdir, readFile, rename, rm, stat } from "node:fs/promises";
+import { chmod, mkdir, readFile, rename, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -31,9 +31,15 @@ import {
   verifyReleaseAssetBytes,
 } from "./release-assets.mjs";
 import { defoldSurfaceCacheHome } from "./defold-surface.mjs";
-import { releaseIntegrityAssetName, validateReleaseIntegrity, verifyReleaseArchive } from "./release-integrity.mjs";
+import {
+  releaseIntegrityAssetName,
+  sha256,
+  validateReleaseIntegrity,
+  verifyReleaseArchive,
+} from "./release-integrity.mjs";
 
 const moduleRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
+const cacheIntegrityReceipt = ".deherm-release-integrity.json";
 
 /** Platform-native, per-user cache for downloaded host executables. */
 export function toolCacheRoot(options = {}) {
@@ -54,16 +60,52 @@ async function digestOf(file) {
     .digest("hex");
 }
 
-async function cachedMembersMatch(destination, members, expectedDigests) {
+async function cachedMembersMatch({
+  destination,
+  family,
+  tag,
+  fingerprint,
+  asset,
+  members,
+  expectedDigests,
+  pinnedMetadata,
+  pinned,
+  integrityAsset,
+}) {
+  let integrityMembers = null;
+  if (pinnedMetadata) {
+    try {
+      const integrityBytes = await readFile(path.join(destination, cacheIntegrityReceipt));
+      verifyReleaseAssetBytes(integrityBytes, pinnedMetadata.integrity, integrityAsset);
+      const integrity = validateReleaseIntegrity(JSON.parse(integrityBytes), {
+        family,
+        tag,
+        fingerprint,
+        asset,
+        members,
+      });
+      if (integrity.archive.sha256 !== pinned.archiveSha256 || integrity.archive.bytes !== pinned.archiveBytes) {
+        return false;
+      }
+      integrityMembers = new Map(integrity.members.map((member) => [member.name, member]));
+    } catch {
+      return false;
+    }
+  } else if (members.some((member) => !expectedDigests[member])) {
+    // Legacy package manifests have no package-authenticated sidecar identity.
+    // They may reuse a cache only when the caller authenticates every member.
+    return false;
+  }
+
   for (const member of members) {
     const file = path.join(destination, member);
-    const present = await stat(file).then(
-      (entry) => entry.isFile(),
-      () => false,
-    );
-    if (!present) return false;
+    const bytes = await readFile(file).catch(() => null);
+    if (!bytes) return false;
+    const authenticated = integrityMembers?.get(member);
+    if (authenticated && (bytes.byteLength !== authenticated.bytes || sha256(bytes) !== authenticated.sha256))
+      return false;
     const expected = expectedDigests[member];
-    if (expected && (await digestOf(file).catch(() => null)) !== expected) return false;
+    if (expected && sha256(bytes) !== expected) return false;
   }
   return members.length > 0;
 }
@@ -85,6 +127,9 @@ export async function ensureHostFamily(family, host, options = {}) {
   const destination = path.join(toolCacheRoot(options), reference.tag, host);
   const members = reference.contents?.[host] ?? [];
   const expectedDigests = options.expectedDigests ?? {};
+  const integrityAsset = releaseIntegrityAssetName(asset);
+  const pinned = reference.integrity?.[host];
+  const pinnedMetadata = releaseMetadataFromPinnedIntegrity(pinned, integrityAsset, `${family}/${host}`);
   for (const [member, digest] of Object.entries(expectedDigests)) {
     if (!members.includes(member)) {
       throw new Error(`${family} digest manifest names ${member}, which ${asset} does not contain`);
@@ -93,7 +138,20 @@ export async function ensureHostFamily(family, host, options = {}) {
       throw new Error(`${family} digest manifest records an invalid SHA-256 for ${member}`);
     }
   }
-  if (await cachedMembersMatch(destination, members, expectedDigests)) {
+  if (
+    await cachedMembersMatch({
+      destination,
+      family,
+      tag: reference.tag,
+      fingerprint: reference.fingerprint,
+      asset,
+      members,
+      expectedDigests,
+      pinnedMetadata,
+      pinned,
+      integrityAsset,
+    })
+  ) {
     return { destination, tag: reference.tag, cached: true, members };
   }
 
@@ -104,9 +162,6 @@ export async function ensureHostFamily(family, host, options = {}) {
   await mkdir(staging, { recursive: true });
   await mkdir(downloadRoot, { recursive: true });
   try {
-    const integrityAsset = releaseIntegrityAssetName(asset);
-    const pinned = reference.integrity?.[host];
-    const pinnedMetadata = releaseMetadataFromPinnedIntegrity(pinned, integrityAsset, `${family}/${host}`);
     // New packages carry the publisher-authenticated sidecar digest directly.
     // The API lookup remains only for older package manifests, so a current
     // clean install never spends (or depends on) GitHub's anonymous API quota.
@@ -159,6 +214,7 @@ export async function ensureHostFamily(family, host, options = {}) {
       // makes a hand-assembled cache work too.
       await chmod(file, 0o755).catch(() => {});
     }
+    await writeFile(path.join(staging, cacheIntegrityReceipt), integrityBytes);
     await mkdir(path.dirname(destination), { recursive: true });
     await rm(destination, { recursive: true, force: true });
     await rename(staging, destination);

@@ -38,7 +38,12 @@ export const policySurfaceFingerprintRoots = Object.freeze([
   ),
 ]);
 
-const replacementRoots = policySurfaceArchivePaths.filter((entry) => entry.endsWith("/generated"));
+const transportedFiles = new Set([
+  "upstream.lock",
+  "packages/toolchains/defold-bundle-targets.json",
+  "packages/toolchains/defold-platform-pairs.json",
+]);
+const replacementRoots = policySurfaceArchivePaths.filter((entry) => !transportedFiles.has(entry));
 
 function parseArguments(argv) {
   const [command, ...rest] = argv;

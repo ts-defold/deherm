@@ -53,7 +53,7 @@ async function releaseFixture({ family, tag, fingerprint, asset, archive }) {
   };
 }
 
-test("a digest-mismatched host-tool cache is replaced and the repaired cache is reused", async () => {
+test("a pinned sidecar authenticates every host-tool cache hit without caller hashes", async () => {
   const root = await mkdtemp(path.join(tmpdir(), "deherm-host-tool-cache."));
   const originalFetch = globalThis.fetch;
   try {
@@ -97,7 +97,6 @@ test("a digest-mismatched host-tool cache is replaced and the repaired cache is 
     globalThis.fetch = release.fetchImpl;
 
     const options = {
-      expectedDigests: { [member]: expected },
       cacheRoot: path.join(root, ".deherm", "cache", "toolchains"),
       releaseTagsPath,
     };
@@ -109,6 +108,12 @@ test("a digest-mismatched host-tool cache is replaced and the repaired cache is 
     const reused = await ensureHostFamily("dehermc", host, options);
     assert.equal(reused.cached, true);
     assert.equal(release.fetches(), 2, "an authenticated cache hit must not download again");
+
+    await writeFile(path.join(destination, member), Buffer.alloc(goodBytes.byteLength, 0x78));
+    const repairedAgain = await ensureHostFamily("dehermc", host, options);
+    assert.equal(repairedAgain.cached, false, "same-length corruption must invalidate the cache");
+    assert.equal(release.fetches(), 4);
+    assert.equal(sha256(await readFile(path.join(destination, member))), expected);
   } finally {
     globalThis.fetch = originalFetch;
     await rm(root, { recursive: true, force: true });
