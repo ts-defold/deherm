@@ -5168,3 +5168,13 @@ and publisher-authenticated every current sidecar and reproduced the committed
 lock byte-for-byte; the package-default native-artifact summary now runs that
 same exact check after release completeness. This is artifact-integrity and
 workflow evidence, not target runtime evidence.
+
+## 2026-10-03 - Policy transport preserves canonical bytes on Windows
+
+The shared policy-surface installer now accepts an explicit tar executable, and
+the Windows parity lane supplies Git Bash's tar using a native Windows path.
+This preserves the byte behavior of the previously green shell extraction path
+instead of resolving Windows' different system tar from Node. The release-tag
+publisher-sidecar check also imports the dependency-light artifact-reference
+module directly, so the artifact summary job does not need an unrelated package
+installation merely to authenticate the shipped lock.

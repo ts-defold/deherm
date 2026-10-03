@@ -10,6 +10,7 @@ import { promisify } from "node:util";
 
 const execFileAsync = promisify(execFile);
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const tarExecutable = process.env.DEHERM_TAR || "tar";
 
 export const policySurfaceArchivePaths = Object.freeze([
   "upstream.lock",
@@ -77,7 +78,9 @@ async function assertDeclaredInputs() {
 }
 
 async function listArchive(archive) {
-  const { stdout } = await execFileAsync("tar", ["-tzf", archive], { maxBuffer: 64 * 1024 * 1024 });
+  const { stdout } = await execFileAsync(tarExecutable, ["-tzf", archive], {
+    maxBuffer: 64 * 1024 * 1024,
+  });
   const entries = stdout.split(/\r?\n/u).filter(Boolean).map(normalizeArchiveEntry);
   if (
     entries.length === 0 ||
@@ -101,7 +104,7 @@ async function listArchive(archive) {
 export async function packPolicySurface(archive) {
   await assertDeclaredInputs();
   await mkdir(path.dirname(archive), { recursive: true });
-  await execFileAsync("tar", ["-czf", archive, ...policySurfaceArchivePaths], {
+  await execFileAsync(tarExecutable, ["-czf", archive, ...policySurfaceArchivePaths], {
     cwd: root,
     env: { ...process.env, COPYFILE_DISABLE: "1" },
     maxBuffer: 64 * 1024 * 1024,
@@ -111,7 +114,9 @@ export async function packPolicySurface(archive) {
 export async function installPolicySurface(archive) {
   await listArchive(archive);
   for (const entry of replacementRoots) await rm(path.join(root, entry), { recursive: true, force: true });
-  await execFileAsync("tar", ["-xzf", archive, "-C", root], { maxBuffer: 64 * 1024 * 1024 });
+  await execFileAsync(tarExecutable, ["-xzf", archive, "-C", root], {
+    maxBuffer: 64 * 1024 * 1024,
+  });
 }
 
 export async function extractPolicySurfacePath(archive, selectedPath) {
@@ -122,7 +127,7 @@ export async function extractPolicySurfacePath(archive, selectedPath) {
   if (!entries.some((entry) => entry === selectedPath || entry.startsWith(`${selectedPath}/`))) {
     throw new Error(`Policy surface archive does not contain ${selectedPath}`);
   }
-  await execFileAsync("tar", ["-xzf", archive, "-C", root, selectedPath], {
+  await execFileAsync(tarExecutable, ["-xzf", archive, "-C", root, selectedPath], {
     maxBuffer: 64 * 1024 * 1024,
   });
 }

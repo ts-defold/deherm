@@ -262,7 +262,10 @@ jobs:
       - name: Install the generated surface
         run: |
           archive="$RUNNER_TEMP/policy-surface/policy-surface.tar.gz"
-          if [ "$RUNNER_OS" = Windows ]; then archive="$(cygpath -u "$archive")"; fi
+          if [ "$RUNNER_OS" = Windows ]; then
+            DEHERM_TAR="$(cygpath -w "$(command -v tar)")"
+            export DEHERM_TAR
+          fi
           node scripts/policy-surface.mjs install --archive "$archive"
       - name: Declare the installed revision for carried-review replay
         run: |

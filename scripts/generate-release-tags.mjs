@@ -26,7 +26,7 @@ import {
   resolveGithubReleaseAsset,
   verifyReleaseAssetBytes,
 } from "../packages/cli/src/release-assets.mjs";
-import { buildArtifactReferences } from "./generate-api-policy.mjs";
+import { buildArtifactReferences } from "../packages/generator/src/policy/artifact-references.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 export const releaseTagsPath = path.join(root, "packages", "toolchains", "release-tags.json");
