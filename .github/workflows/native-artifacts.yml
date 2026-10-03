@@ -177,8 +177,9 @@ jobs:
       - name: Install policy-derived artifact inputs
         if: inputs.policy_run_id != ''
         run: >-
-          tar -xzf "$RUNNER_TEMP/policy-source/policy-surface.tar.gz"
-          packages/toolchains/defold-bundle-targets.json
+          node scripts/policy-surface.mjs extract
+          --archive "$RUNNER_TEMP/policy-source/policy-surface.tar.gz"
+          --path packages/toolchains/defold-bundle-targets.json
       - name: Pack the resolved artifact inputs
         run: |
           mkdir -p "$RUNNER_TEMP/native-artifact-inputs/packages/toolchains"

@@ -73,6 +73,7 @@ import { generatedDmSdkArtifacts } from "./lib/dmsdk-generator-pipeline.mjs";
 import { generatedBundleTargetArtifacts } from "./generate-defold-bundle-targets.mjs";
 import { CARRIED_REVIEW_LEDGER_ENV, DERIVED_REVISION_ENV, isDefoldRevision } from "./lib/reviewed-revision.mjs";
 import { auditReviewedEvidence } from "./lib/reviewed-evidence.mjs";
+import { policySurfaceFingerprintRoots } from "./policy-surface.mjs";
 import {
   makeRevisionWorkspaceMetadata,
   revisionProducerInputIdentity,
@@ -150,23 +151,7 @@ export const enginePaths = Object.freeze([
  * convenience: a repository-wide `git status` would also see unrelated work in
  * the checkout and could neither prove nor disprove anything about this chain.
  */
-export const derivedSurfaceRoots = Object.freeze([
-  "upstream.lock",
-  "packages/toolchains",
-  "packages/bindings/generated",
-  "packages/sdk/src/generated",
-  "packages/static-hermes/src/generated",
-  // The exact-call verifier imports the revision-specific universal recipe
-  // catalog from here.  Leaving it outside the derived surface paired a newly
-  // derived SDK IR with the checkout's older catalog in downstream jobs.
-  "packages/compiler/src/generated",
-  "defold/defold_hermes/include/defold_hermes",
-  "defold/defold_hermes/src",
-  "defold/defold_hermes/lib/web",
-  "examples/runtime-smoke/src/generated",
-  "tests/fixtures",
-  ".agents/docs/research",
-]);
+export const derivedSurfaceRoots = policySurfaceFingerprintRoots;
 
 /** Documentation the importers own outright, beside the registries' artifact lists. */
 const generatedDocumentation = Object.freeze([

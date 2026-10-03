@@ -201,22 +201,7 @@ jobs:
             --run-url "$RUN_URL"
 
       - name: Pack the exact generated surface
-        run: |
-          tar -czf "$RUNNER_TEMP/policy-surface.tar.gz" \
-            upstream.lock \
-            packages/toolchains/defold-bundle-targets.json \
-            packages/toolchains/defold-platform-pairs.json \
-            packages/bindings/generated \
-            packages/abi/src/generated \
-            packages/sdk/src/generated \
-            packages/static-hermes/src/generated \
-            packages/compiler/src/generated \
-            defold/defold_hermes/include/defold_hermes \
-            defold/defold_hermes/src \
-            defold/defold_hermes/lib/web \
-            examples/runtime-smoke/src/generated \
-            tests/fixtures \
-            .agents/docs/research
+        run: node scripts/policy-surface.mjs pack --archive "$RUNNER_TEMP/policy-surface.tar.gz"
       - uses: actions/upload-artifact@v6
         with:
           name: policy-surface
@@ -276,10 +261,9 @@ jobs:
           path: ${{ runner.temp }}/policy-surface
       - name: Install the generated surface
         run: |
-          rm -rf packages/bindings/generated packages/abi/src/generated packages/sdk/src/generated packages/static-hermes/src/generated packages/compiler/src/generated
           archive="$RUNNER_TEMP/policy-surface/policy-surface.tar.gz"
           if [ "$RUNNER_OS" = Windows ]; then archive="$(cygpath -u "$archive")"; fi
-          tar -xzf "$archive"
+          node scripts/policy-surface.mjs install --archive "$archive"
       - name: Declare the installed revision for carried-review replay
         run: |
           set -euo pipefail
@@ -330,9 +314,7 @@ jobs:
         with:
           name: policy-surface
           path: ${{ runner.temp }}/policy-surface
-      - run: |
-          rm -rf packages/bindings/generated packages/abi/src/generated packages/sdk/src/generated packages/static-hermes/src/generated packages/compiler/src/generated
-          tar -xzf "$RUNNER_TEMP/policy-surface/policy-surface.tar.gz"
+      - run: node scripts/policy-surface.mjs install --archive "$RUNNER_TEMP/policy-surface/policy-surface.tar.gz"
       - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v7
         with: { node-version: '22', cache: 'pnpm' }
@@ -521,9 +503,7 @@ jobs:
         with:
           name: policy-surface
           path: ${{ runner.temp }}/policy-surface
-      - run: |
-          rm -rf packages/bindings/generated packages/abi/src/generated packages/sdk/src/generated packages/static-hermes/src/generated packages/compiler/src/generated
-          tar -xzf "$RUNNER_TEMP/policy-surface/policy-surface.tar.gz"
+      - run: node scripts/policy-surface.mjs install --archive "$RUNNER_TEMP/policy-surface/policy-surface.tar.gz"
       - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v7
         with: { node-version: '22', cache: 'pnpm' }
@@ -638,9 +618,7 @@ jobs:
           name: policy-surface
           path: ${{ runner.temp }}/policy-surface
       - name: Install the exact published surface
-        run: |
-          rm -rf packages/bindings/generated packages/abi/src/generated packages/sdk/src/generated packages/static-hermes/src/generated packages/compiler/src/generated
-          tar -xzf "$RUNNER_TEMP/policy-surface/policy-surface.tar.gz"
+        run: node scripts/policy-surface.mjs install --archive "$RUNNER_TEMP/policy-surface/policy-surface.tar.gz"
       - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v7
         with: { node-version: '22', cache: 'pnpm' }

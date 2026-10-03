@@ -36,6 +36,7 @@ import { manifestUrl, missingPublishedEntries } from "../scripts/check-published
 import { fetchPolicyText, validateRebuiltHandshake } from "../scripts/check-policy-site-resolution.mjs";
 import { buildShippedIndex, canonicalizePolicyText, generatorRevision } from "../scripts/generate-api-policy.mjs";
 import { apiPolicyGenerator } from "../scripts/lib/script-generator-pipeline.mjs";
+import { policySurfaceArchivePaths, policySurfaceFingerprintRoots } from "../scripts/policy-surface.mjs";
 import {
   blockerFromLog,
   planPolicyDerivationIssueReconciliation,
@@ -74,34 +75,25 @@ test("policy host parity materializes every authoritative generator input", asyn
   const engine = workflow.slice(workflow.indexOf("  engine-conformance:"), workflow.indexOf("  publish-site:"));
   const publish = workflow.slice(workflow.indexOf("  publish-site:"));
   const derive = workflow.slice(workflow.indexOf("  derive:"), workflow.indexOf("  host-parity:"));
-  const packedSurface = workflow.slice(
-    workflow.indexOf("      - name: Pack the exact generated surface"),
-    workflow.indexOf(
-      `      - uses: ${node24ArtifactActions.upload}`,
-      workflow.indexOf("      - name: Pack the exact generated surface"),
-    ),
-  );
-
   for (const { root: revisionRoot } of REVISION_OUTPUT_ROOTS) {
     assert.ok(
-      packedSurface.includes(revisionRoot),
+      policySurfaceArchivePaths.includes(revisionRoot),
       `policy-surface archive omits revision-derived root ${revisionRoot}`,
     );
   }
-  assert.match(
-    packedSurface,
-    /packages\/compiler\/src\/generated/u,
+  assert.ok(
+    policySurfaceArchivePaths.includes("packages/compiler/src/generated"),
     "policy-surface archive omits the revision-specific compiler recipe catalog",
   );
-  const compilerCatalogRemovals = parity.match(/rm -rf[^\n]*packages\/compiler\/src\/generated/gu) ?? [];
-  const surfaceExtractions = parity.match(/tar -xzf/gu) ?? [];
-  assert.ok(surfaceExtractions.length > 0, "policy workflow has no generated-surface consumers");
-  assert.equal(
-    compilerCatalogRemovals.length,
-    surfaceExtractions.length,
-    "every policy-surface consumer must remove the stale compiler recipe catalog before extraction",
-  );
-  assert.match(parity, /rm -rf[^\n]*packages\/abi\/src\/generated/u);
+  for (const archived of policySurfaceArchivePaths) {
+    assert.ok(
+      policySurfaceFingerprintRoots.some((root) => archived === root || archived.startsWith(`${root}/`)),
+      `policy-surface fingerprint omits transported path ${archived}`,
+    );
+  }
+  assert.equal((workflow.match(/policy-surface\.mjs pack/gu) ?? []).length, 1);
+  assert.equal((workflow.match(/policy-surface\.mjs install/gu) ?? []).length, 4);
+  assert.doesNotMatch(workflow, /tar -[cx]zf[^\n]*policy-surface/u);
   assert.match(parity, /DEFOLD_REV=\/DEHERM_DERIVED_REVISION=/u);
   assert.match(parity, /DEHERM_CARRIED_REVIEW_LEDGER=/u);
   assert.match(parity, /bootstrap-upstreams\.sh defold ref-doc/u);
@@ -130,8 +122,8 @@ test("policy host parity materializes every authoritative generator input", asyn
   assert.match(publish, /build\/published-policy-site\/v1\/artifacts/u);
   assert.match(publish, /--artifact-references/u);
   assert.match(derive, /build-policy-site\.mjs --out build\/policy-site --validation-only/u);
-  assert.match(derive, /packages\/toolchains\/defold-bundle-targets\.json/u);
-  assert.match(derive, /packages\/toolchains\/defold-platform-pairs\.json/u);
+  assert.ok(policySurfaceArchivePaths.includes("packages/toolchains/defold-bundle-targets.json"));
+  assert.ok(policySurfaceArchivePaths.includes("packages/toolchains/defold-platform-pairs.json"));
   assert.match(derive, /apt-get install -y --no-install-recommends llvm/u);
   assert.match(derive, /command -v llvm-nm/u);
   assert.match(derive, /reconcile-policy-derivation-issues\.mjs/u);
@@ -188,6 +180,11 @@ test("policy host parity materializes every authoritative generator input", asyn
     /request-native-artifacts:[\s\S]*needs: \[plan, derive\][\s\S]*policy_run_id="\$\{\{ github\.run_id \}\}"/u,
   );
   assert.match(workflow, /request-native-artifacts:[\s\S]*needs\.derive\.outputs\.generated != '0'/u);
+  const nativeArtifacts = await readFile(path.join(repositoryRoot, ".github/workflows/native-artifacts.yml"), "utf8");
+  assert.match(
+    nativeArtifacts,
+    /policy-surface\.mjs extract[\s\S]*--path packages\/toolchains\/defold-bundle-targets\.json/u,
+  );
 });
 
 test("LLVM tools resolve versioned Linux binaries and macOS xcrun without false archive failures", () => {

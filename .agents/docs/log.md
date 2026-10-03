@@ -5146,3 +5146,13 @@ number of generated adapters or public-SDK-unavailable declarations are derived
 from the installed revision and checked relationally. This preserves regression
 pressure without making a legitimate future Defold optimization delta fail the
 nightly before its generated fallback can run.
+
+## 2026-10-03 - One policy-surface transport contract
+
+Policy derivation fingerprinting and all CI policy-surface producers and
+consumers now import or invoke `scripts/policy-surface.mjs`. The shared manifest
+covers every declared revision-output root, including the ABI and compiler
+catalogs; archive installation rejects undeclared or unsafe paths before
+replacing generated roots. Focused policy and cross-revision suites pass 38/38
+and 48/48 respectively. This is transport/structure evidence, not new runtime
+execution evidence.

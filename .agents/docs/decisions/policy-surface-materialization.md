@@ -29,6 +29,14 @@ borrowed-handle recipe. It must not contain a list of Defold module names, type
 spellings, route names, context names, or rename decisions that can change when
 Defold changes. Those are policy data even when they appear stable today.
 
+`scripts/policy-surface.mjs` is the single transport manifest for the complete
+revision-derived checkout surface. Derivation fingerprinting imports the same
+manifest used by CI to pack, install, and selectively extract the artifact
+target registry. Archive members are rejected unless they are beneath a
+declared path, and full installation removes the replaceable generated roots
+before extraction. Adding a revision-defined output therefore requires one
+manifest edit rather than synchronized shell lists in every consumer job.
+
 # Realizer compatibility contract
 
 Every published index entry and its authenticated policy root carry the same
