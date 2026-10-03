@@ -24,7 +24,7 @@ import { buildArtifactReferences } from "./generate-api-policy.mjs";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 export const releaseTagsPath = path.join(root, "packages", "toolchains", "release-tags.json");
 
-export async function buildReleaseTags() {
+export async function buildReleaseTags(options = {}) {
   return {
     schemaVersion: 1,
     kind: "deherm.release-tags",
@@ -34,19 +34,63 @@ export async function buildReleaseTags() {
       "be told. Expand releaseAsset with a tag and an asset name to get a download URL.",
     repository: defaultReleaseRepository,
     releaseAsset: releaseAssetUrlTemplate(),
-    families: await buildArtifactReferences(),
+    families: await buildArtifactReferences({ integrityRoot: options.integrityRoot }),
   };
 }
 
+function withoutIntegrity(value) {
+  const copy = structuredClone(value);
+  for (const family of Object.values(copy.families ?? {})) delete family.integrity;
+  return copy;
+}
+
+function assertCompleteIntegrity(value) {
+  for (const [familyName, family] of Object.entries(value.families ?? {})) {
+    for (const key of Object.keys(family.assets ?? {})) {
+      const expectedAsset = `${family.assets[key]}.integrity.json`;
+      const record = family.integrity?.[key];
+      if (
+        record?.asset !== expectedAsset ||
+        !/^[a-f0-9]{64}$/u.test(record.sha256 ?? "") ||
+        !/^[a-f0-9]{64}$/u.test(record.archiveSha256 ?? "") ||
+        !Number.isSafeInteger(record.archiveBytes) ||
+        record.archiveBytes < 1
+      ) {
+        throw new Error(`release-tags.json has no authenticated ${familyName}/${key} integrity record`);
+      }
+    }
+  }
+}
+
 async function main(argv = process.argv.slice(2)) {
-  const serialized = `${JSON.stringify(await buildReleaseTags(), null, 2)}\n`;
-  if (argv.includes("--check")) {
-    const existing = await readFile(releaseTagsPath, "utf8").catch(() => "");
-    if (existing !== serialized) {
+  let check = false;
+  let integrityRoot = null;
+  for (let index = 0; index < argv.length; index += 1) {
+    const argument = argv[index];
+    if (argument === "--check") check = true;
+    else if (argument === "--integrity-root") {
+      const value = argv[++index];
+      if (!value) throw new Error("--integrity-root requires a directory");
+      integrityRoot = path.resolve(value);
+    } else throw new Error(`Unknown argument: ${argument}`);
+  }
+  const generated = await buildReleaseTags({ integrityRoot });
+  const serialized = `${JSON.stringify(generated, null, 2)}\n`;
+  if (check) {
+    const existingText = await readFile(releaseTagsPath, "utf8").catch(() => "");
+    const existing = existingText ? JSON.parse(existingText) : null;
+    const matches = integrityRoot
+      ? existingText === serialized
+      : JSON.stringify(withoutIntegrity(existing)) === JSON.stringify(withoutIntegrity(generated));
+    if (!matches) {
       throw new Error("packages/toolchains/release-tags.json is stale; run node scripts/generate-release-tags.mjs");
     }
+    assertCompleteIntegrity(existing);
     console.log("release tags are current");
     return;
+  }
+  if (!integrityRoot) {
+    throw new Error("Generating release-tags.json requires --integrity-root with publisher sidecars");
   }
   await writeFile(releaseTagsPath, serialized);
   console.log(`wrote ${path.relative(root, releaseTagsPath)}`);

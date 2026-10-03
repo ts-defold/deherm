@@ -7,6 +7,7 @@ import path from "node:path";
 import {
   downloadReleaseAssets,
   extractReleaseArchive,
+  releaseMetadataFromPinnedIntegrity,
   resolveGithubReleaseAsset,
   verifyReleaseAssetBytes,
 } from "../packages/cli/src/release-assets.mjs";
@@ -391,6 +392,11 @@ else if (command === "verify") {
   }
   const selected = new Set(requestedTargets);
   const rows = selected.size ? published.filter((row) => selected.has(row.target)) : published;
+  const releaseTags = JSON.parse(
+    await readFile(path.join(root, "packages", "toolchains", "release-tags.json"), "utf8"),
+  );
+  const pinnedFamily = releaseTags.families?.[FAMILY];
+  const usePinnedIntegrity = pinnedFamily?.tag === tag;
   const requestedAssets = rows.flatMap((row) => [releaseIntegrityAssetName(row.asset), row.asset]);
   const { missing } = await downloadReleaseAssets({
     tag,
@@ -408,18 +414,29 @@ else if (command === "verify") {
   for (const row of rows) {
     const integrityAsset = releaseIntegrityAssetName(row.asset);
     if (absent.has(row.asset) || absent.has(integrityAsset)) continue;
-    const [integrityMetadata, archiveMetadata] = await Promise.all([
-      resolveGithubReleaseAsset({ tag, asset: integrityAsset }),
-      resolveGithubReleaseAsset({ tag, asset: row.asset }),
-    ]);
+    const pinned = usePinnedIntegrity ? pinnedFamily.integrity?.[row.target] : null;
+    const pinnedMetadata = releaseMetadataFromPinnedIntegrity(pinned, integrityAsset, `${FAMILY}/${row.target}`);
+    const [integrityMetadata, archiveMetadata] = pinnedMetadata
+      ? [pinnedMetadata.integrity, pinnedMetadata.archive]
+      : await Promise.all([
+          resolveGithubReleaseAsset({ tag, asset: integrityAsset }),
+          resolveGithubReleaseAsset({ tag, asset: row.asset }),
+        ]);
     const integrityBytes = await readFile(path.join(destination, integrityAsset));
     verifyReleaseAssetBytes(integrityBytes, integrityMetadata, integrityAsset);
     const integrity = validateReleaseIntegrity(JSON.parse(integrityBytes), {
       family: FAMILY,
       tag,
+      ...(pinnedMetadata ? { fingerprint: pinnedFamily.fingerprint } : {}),
       asset: row.asset,
       members: row.files,
     });
+    if (
+      pinnedMetadata &&
+      (integrity.archive.sha256 !== pinned.archiveSha256 || integrity.archive.bytes !== pinned.archiveBytes)
+    ) {
+      throw new Error(`${integrityAsset} disagrees with the package-pinned archive identity`);
+    }
     if (!tag.endsWith(integrity.fingerprint.slice(0, 12))) {
       throw new Error(`${integrityAsset} fingerprint does not address release ${tag}`);
     }

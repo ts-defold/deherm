@@ -41,7 +41,16 @@ async function releaseFixture({ family, tag, fingerprint, asset, archive }) {
     if (String(url).endsWith(asset)) return new Response(archiveBytes, { status: 200 });
     return new Response("missing", { status: 404 });
   };
-  return { fetchImpl, fetches: () => fetches };
+  return {
+    fetchImpl,
+    fetches: () => fetches,
+    integrity: {
+      asset: integrityName,
+      sha256: sha256(integrityBytes),
+      archiveSha256: sha256(archiveBytes),
+      archiveBytes: archiveBytes.byteLength,
+    },
+  };
 }
 
 test("a digest-mismatched host-tool cache is replaced and the repaired cache is reused", async () => {
@@ -59,8 +68,11 @@ test("a digest-mismatched host-tool cache is replaced and the repaired cache is 
     await mkdir(source, { recursive: true });
     await writeFile(path.join(source, member), goodBytes);
     const archive = path.join(root, asset);
-    await execFileAsync("tar", ["-czf", archive, "-C", source, member]);
+    await execFileAsync("tar", ["--format", "ustar", "-czf", archive, "-C", source, member], {
+      env: { ...process.env, COPYFILE_DISABLE: "1" },
+    });
 
+    const release = await releaseFixture({ family: "dehermc", tag, fingerprint, asset, archive });
     const releaseTagsPath = path.join(root, "release-tags.json");
     await writeFile(
       releaseTagsPath,
@@ -72,6 +84,7 @@ test("a digest-mismatched host-tool cache is replaced and the repaired cache is 
             fingerprint,
             assets: { [host]: asset },
             contents: { [host]: [member] },
+            integrity: { [host]: release.integrity },
           },
         },
       }),
@@ -81,7 +94,6 @@ test("a digest-mismatched host-tool cache is replaced and the repaired cache is 
     await mkdir(destination, { recursive: true });
     await writeFile(path.join(destination, member), "corrupt but present\n");
 
-    const release = await releaseFixture({ family: "dehermc", tag, fingerprint, asset, archive });
     globalThis.fetch = release.fetchImpl;
 
     const options = {
@@ -91,12 +103,12 @@ test("a digest-mismatched host-tool cache is replaced and the repaired cache is 
     };
     const repaired = await ensureHostFamily("dehermc", host, options);
     assert.equal(repaired.cached, false);
-    assert.equal(release.fetches(), 4);
+    assert.equal(release.fetches(), 2, "package-pinned integrity avoids GitHub release metadata requests");
     assert.equal(sha256(await readFile(path.join(destination, member))), expected);
 
     const reused = await ensureHostFamily("dehermc", host, options);
     assert.equal(reused.cached, true);
-    assert.equal(release.fetches(), 4, "an authenticated cache hit must not download again");
+    assert.equal(release.fetches(), 2, "an authenticated cache hit must not download again");
   } finally {
     globalThis.fetch = originalFetch;
     await rm(root, { recursive: true, force: true });
@@ -116,7 +128,9 @@ test("a downloaded member with the wrong digest never replaces the existing cach
     await mkdir(source, { recursive: true });
     await writeFile(path.join(source, member), "wrong release bytes\n");
     const archive = path.join(root, asset);
-    await execFileAsync("tar", ["-czf", archive, "-C", source, member]);
+    await execFileAsync("tar", ["--format", "ustar", "-czf", archive, "-C", source, member], {
+      env: { ...process.env, COPYFILE_DISABLE: "1" },
+    });
     const releaseTagsPath = path.join(root, "release-tags.json");
     await writeFile(
       releaseTagsPath,

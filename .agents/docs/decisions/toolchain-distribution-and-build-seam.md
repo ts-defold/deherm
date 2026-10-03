@@ -501,6 +501,16 @@ Each family declares its own `tagPrefix` and `assetPrefix` in that file; the
 tag is `<tagPrefix>-<fp16>` and every asset is `<assetPrefix>-<row>.tar.gz`, so
 neither spelling is restated here.
 
+The shipped `release-tags.json` also pins the SHA-256 of every integrity
+sidecar plus the archive digest and byte length authenticated by that sidecar.
+Those records are generated from the publisher sidecars and committed with the
+package coordinates. A clean install therefore downloads the two known URLs
+and verifies them without calling GitHub's rate-limited release-metadata API.
+The API lookup exists only as a compatibility path for older package manifests
+that predate the pinned records; a malformed record fails closed rather than
+silently taking that fallback. The revision policy carries the same records for
+target archives selected from a project's Defold revision.
+
 | Family | Asset per row | Consumes | Does **not** consume |
 | --- | --- | --- | --- |
 | Hermes host compilers | one archive per host: hermesc + shermes | `HERMES_URL`, `HERMES_REV`, `build-host-compilers.sh`, `package-archive.sh` | anything of Defold's, anything of Go's |

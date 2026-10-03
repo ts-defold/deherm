@@ -88,6 +88,19 @@ test("policy host parity materializes every authoritative generator input", asyn
       `policy-surface archive omits revision-derived root ${revisionRoot}`,
     );
   }
+  assert.match(
+    packedSurface,
+    /packages\/compiler\/src\/generated/u,
+    "policy-surface archive omits the revision-specific compiler recipe catalog",
+  );
+  const compilerCatalogRemovals = parity.match(/rm -rf[^\n]*packages\/compiler\/src\/generated/gu) ?? [];
+  const surfaceExtractions = parity.match(/tar -xzf/gu) ?? [];
+  assert.ok(surfaceExtractions.length > 0, "policy workflow has no generated-surface consumers");
+  assert.equal(
+    compilerCatalogRemovals.length,
+    surfaceExtractions.length,
+    "every policy-surface consumer must remove the stale compiler recipe catalog before extraction",
+  );
   assert.match(parity, /rm -rf[^\n]*packages\/abi\/src\/generated/u);
   assert.match(parity, /DEFOLD_REV=\/DEHERM_DERIVED_REVISION=/u);
   assert.match(parity, /DEHERM_CARRIED_REVIEW_LEDGER=/u);

@@ -26,6 +26,7 @@ import { fileURLToPath } from "node:url";
 import {
   downloadReleaseAssets,
   extractReleaseArchive,
+  releaseMetadataFromPinnedIntegrity,
   resolveGithubReleaseAsset,
   verifyReleaseAssetBytes,
 } from "./release-assets.mjs";
@@ -104,10 +105,17 @@ export async function ensureHostFamily(family, host, options = {}) {
   await mkdir(downloadRoot, { recursive: true });
   try {
     const integrityAsset = releaseIntegrityAssetName(asset);
-    const [integrityMetadata, archiveMetadata] = await Promise.all([
-      resolveGithubReleaseAsset({ repository: tags.repository, tag: reference.tag, asset: integrityAsset }),
-      resolveGithubReleaseAsset({ repository: tags.repository, tag: reference.tag, asset }),
-    ]);
+    const pinned = reference.integrity?.[host];
+    const pinnedMetadata = releaseMetadataFromPinnedIntegrity(pinned, integrityAsset, `${family}/${host}`);
+    // New packages carry the publisher-authenticated sidecar digest directly.
+    // The API lookup remains only for older package manifests, so a current
+    // clean install never spends (or depends on) GitHub's anonymous API quota.
+    const [integrityMetadata, archiveMetadata] = pinnedMetadata
+      ? [pinnedMetadata.integrity, pinnedMetadata.archive]
+      : await Promise.all([
+          resolveGithubReleaseAsset({ repository: tags.repository, tag: reference.tag, asset: integrityAsset }),
+          resolveGithubReleaseAsset({ repository: tags.repository, tag: reference.tag, asset }),
+        ]);
     const { downloaded } = await downloadReleaseAssets({
       repository: tags.repository,
       tag: reference.tag,
@@ -124,6 +132,12 @@ export async function ensureHostFamily(family, host, options = {}) {
       asset,
       members,
     });
+    if (
+      pinnedMetadata &&
+      (integrity.archive.sha256 !== pinned.archiveSha256 || integrity.archive.bytes !== pinned.archiveBytes)
+    ) {
+      throw new Error(`${integrityAsset} disagrees with the package-pinned archive identity`);
+    }
     const archiveBytes = await readFile(downloaded[1]);
     verifyReleaseAssetBytes(archiveBytes, archiveMetadata, asset);
     await verifyReleaseArchive({ archive: downloaded[1], integrity });

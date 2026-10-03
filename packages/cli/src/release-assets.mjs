@@ -98,6 +98,24 @@ export function verifyReleaseAssetBytes(bytes, expected, label) {
   return observed;
 }
 
+/** Resolve the two immutable release assets from a package/policy-bound integrity record. */
+export function releaseMetadataFromPinnedIntegrity(record, integrityAsset, label = integrityAsset) {
+  if (record === undefined || record === null) return null;
+  if (
+    record.asset !== integrityAsset ||
+    !/^[a-f0-9]{64}$/u.test(record.sha256 ?? "") ||
+    !/^[a-f0-9]{64}$/u.test(record.archiveSha256 ?? "") ||
+    !Number.isSafeInteger(record.archiveBytes) ||
+    record.archiveBytes < 1
+  ) {
+    throw new Error(`${label} has an invalid pinned release integrity record`);
+  }
+  return {
+    integrity: { sha256: record.sha256 },
+    archive: { sha256: record.archiveSha256, bytes: record.archiveBytes },
+  };
+}
+
 // A 404 is not a transport failure: on a content-addressed release it means
 // this artifact was never published for these inputs. Callers distinguish the
 // two, because `--partial` tolerates the first and never the second.

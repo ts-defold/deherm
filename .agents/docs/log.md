@@ -5109,3 +5109,40 @@ the descriptor records `pending-compatible-build`; the SDK and compiler outputs
 still materialize. An exact mapping remains byte-identical and reports `ready`.
 Focused tests cover both projections. This keeps unsafe archives unavailable
 without converting artifact latency into API unavailability.
+
+## 2026-10-03 - Cross-revision evidence and offline artifact authentication
+
+The scheduled 1.14 policy run did derive the new dmSDK surface, including 1,375
+universal recipes. Its runtime-evidence job then combined that IR with the
+checkout's 1,361-recipe compiler module because the policy-surface archive did
+not carry `packages/compiler/src/generated`. The reported missing recipe was a
+mixed-revision test installation, not a generator refusal. The compiler catalog
+is now an owned derived-surface root, the workflow archives it, and every
+consumer job removes the stale copy before extraction. Exact-call tests also
+derive declaration counts and the SDK extraction directory from the installed
+IR instead of encoding the repository's pinned revision/count. An isolated
+Defold 1.14.0 derivation completed all 17 deterministic steps and produced
+1,375/1,375 recipes with no blocker. A second isolated derivation of the
+following 1.14.1 alpha revision produced the same complete 1,375/1,375 surface,
+also with no blocker; this distinguishes the workflow transport defect from a
+one-revision fixture accident.
+
+The end-to-end target archive failure was independent: the archive and its
+integrity sidecar were fetched by immutable URL, then the verifier made an
+anonymous GitHub release-metadata request for their publisher digests. GitHub
+returned 403 after the shared runner IP exhausted its quota. All three package
+release families now carry complete integrity records in generated
+`release-tags.json`: sidecar SHA-256, archive SHA-256, and archive byte length.
+Host-tool and target-archive consumers verify those package-bound records and
+do not call the metadata API; older manifests retain the authenticated API
+fallback. Focused tests prove the pinned two-request path, fail-closed malformed
+records, exact release-tag regeneration, and the policy-workflow surface cut.
+
+The final cross-revision exact-call assertions no longer treat the current
+optimization census as an engine invariant. Declaration coverage, stable-ID
+uniqueness, zero silent omissions, authenticated family evidence, contiguous
+adapter IDs, and exact-vector coverage remain blocking. Counts such as the
+number of generated adapters or public-SDK-unavailable declarations are derived
+from the installed revision and checked relationally. This preserves regression
+pressure without making a legitimate future Defold optimization delta fail the
+nightly before its generated fallback can run.

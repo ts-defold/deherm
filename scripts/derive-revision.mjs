@@ -156,6 +156,10 @@ export const derivedSurfaceRoots = Object.freeze([
   "packages/bindings/generated",
   "packages/sdk/src/generated",
   "packages/static-hermes/src/generated",
+  // The exact-call verifier imports the revision-specific universal recipe
+  // catalog from here.  Leaving it outside the derived surface paired a newly
+  // derived SDK IR with the checkout's older catalog in downstream jobs.
+  "packages/compiler/src/generated",
   "defold/defold_hermes/include/defold_hermes",
   "defold/defold_hermes/src",
   "defold/defold_hermes/lib/web",

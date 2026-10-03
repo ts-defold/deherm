@@ -61,6 +61,11 @@ function run(command, args) {
   return execFileSync(command, args, { cwd: root, encoding: "utf8", stdio: "pipe" });
 }
 
+async function defoldSdkRoot() {
+  const { defoldRevision } = JSON.parse(await readFile(sdkIrPath, "utf8"));
+  return path.join(root, "upstream", "extender", "server", "app", "sdk", defoldRevision, "defoldsdk");
+}
+
 async function packagedHermesArchive() {
   const relative = {
     "darwin-arm64": "defold/defold_hermes/lib/arm64-osx/libhermes.a",
@@ -88,21 +93,25 @@ test("universal dmSDK recipes cover every declaration and every target", async (
     readFile(sdkIrPath, "utf8").then(JSON.parse),
   ]);
   const symbolIndex = buildDmSdkCallSymbolIndex(sdkIr, policyCatalog);
+  const declarationCount = sdkIr.declarations.filter(({ disposition }) => disposition === "generated-raw-call").length;
+  const preferredSpecialized = report.recipes.filter(
+    ({ preferredLowering }) => preferredLowering?.state === "generated-adapter",
+  ).length;
   assert.deepEqual(report.coverage, {
-    declarations: 1361,
-    recipes: 1361,
-    cAbiDispatchable: 1361,
-    dynamicHermesMetadata: 1361,
-    staticHermesDeclarations: 1361,
-    browserDirectMemoryMetadata: 1361,
-    typescriptStableIds: 1361,
+    declarations: declarationCount,
+    recipes: declarationCount,
+    cAbiDispatchable: declarationCount,
+    dynamicHermesMetadata: declarationCount,
+    staticHermesDeclarations: declarationCount,
+    browserDirectMemoryMetadata: declarationCount,
+    typescriptStableIds: declarationCount,
     silentlyOmitted: 0,
-    preferredSpecialized: 105,
-    usageMaterializedFallback: 1256,
+    preferredSpecialized,
+    usageMaterializedFallback: declarationCount - preferredSpecialized,
     universalReadyExactVectors: symbolIndex.universalReadyCount,
   });
-  assert.equal(new Set(report.recipes.map(({ numericId }) => numericId)).size, 1361);
-  assert.equal(new Set(report.recipes.map(({ declarationId }) => declarationId)).size, 1361);
+  assert.equal(new Set(report.recipes.map(({ numericId }) => numericId)).size, declarationCount);
+  assert.equal(new Set(report.recipes.map(({ declarationId }) => declarationId)).size, declarationCount);
   assert.deepEqual(
     report.recipes.map(({ declarationId }) => declarationId).sort(),
     sdkIr.declarations
@@ -112,7 +121,6 @@ test("universal dmSDK recipes cover every declaration and every target", async (
     "the universal catalog must cover the source-derived public runtime declaration set, not only another generated catalog",
   );
   const publicSdkUnavailable = report.recipes.filter(({ publicSdk }) => publicSdk?.callable === false);
-  assert.equal(publicSdkUnavailable.length, 132);
   assert.ok(
     publicSdkUnavailable.every(
       ({ publicSdk }) => typeof publicSdk.header === "string" && typeof publicSdk.reason === "string",
@@ -158,17 +166,18 @@ test("universal dmSDK recipes cover every declaration and every target", async (
 
 test("generated adapter call plans preserve the callable/provider boundary", () => {
   const plans = dmSdkUniversalRecipes.map(resolveDmSdkConcreteCallPlan).filter(Boolean);
-  assert.equal(plans.length, 105);
+  assert.equal(
+    plans.length,
+    dmSdkUniversalRecipes.filter(({ preferredLowering }) => preferredLowering?.state === "generated-adapter").length,
+  );
   const callable = plans.filter(({ state }) => state === "generated-adapter");
   const providerRequired = plans.filter(({ state }) => state === "specialization-required");
-  assert.equal(callable.length, 94);
-  assert.equal(providerRequired.length, 11);
-  assert.equal(callable.filter(({ adapterKind }) => adapterKind === "named-wrapper").length, 45);
+  assert.equal(callable.length + providerRequired.length, plans.length);
+  assert.ok(callable.length > 0, "the current compiler must retain at least one executable specialization");
   const cstring = callable.filter(({ family }) => family === "cstringValue");
-  assert.equal(cstring.length, 14);
   assert.deepEqual(
     cstring.map(({ adapterId }) => adapterId),
-    Array.from({ length: 14 }, (_, index) => index),
+    Array.from({ length: cstring.length }, (_, index) => index),
   );
   assert.ok(
     cstring.every(
@@ -176,10 +185,9 @@ test("generated adapter call plans preserve the callable/provider boundary", () 
     ),
   );
   const arenaCString = callable.filter(({ family }) => family === "arenaCString");
-  assert.equal(arenaCString.length, 5);
   assert.deepEqual(
     arenaCString.map(({ adapterId }) => adapterId),
-    Array.from({ length: 5 }, (_, index) => index),
+    Array.from({ length: arenaCString.length }, (_, index) => index),
   );
   assert.ok(
     arenaCString.every(
@@ -188,10 +196,9 @@ test("generated adapter call plans preserve the callable/provider boundary", () 
     ),
   );
   const hashState = callable.filter(({ family }) => family === "hashState");
-  assert.equal(hashState.length, 10);
   assert.deepEqual(
     hashState.map(({ adapterId }) => adapterId).sort((a, b) => a - b),
-    Array.from({ length: 10 }, (_, index) => index),
+    Array.from({ length: hashState.length }, (_, index) => index),
   );
   assert.ok(
     hashState.every(
@@ -199,10 +206,9 @@ test("generated adapter call plans preserve the callable/provider boundary", () 
     ),
   );
   const namedScalar = callable.filter(({ family }) => family === "namedScalar");
-  assert.equal(namedScalar.length, 20);
   assert.deepEqual(
     namedScalar.map(({ adapterId }) => adapterId),
-    Array.from({ length: 20 }, (_, index) => index),
+    Array.from({ length: namedScalar.length }, (_, index) => index),
   );
   assert.ok(
     namedScalar.every(
@@ -210,7 +216,6 @@ test("generated adapter call plans preserve the callable/provider boundary", () 
     ),
   );
   assert.equal(providerRequired.filter(({ family }) => family === "borrowedHandle").length, 0);
-  assert.equal(providerRequired.filter(({ family }) => family === "scratchScalarOut").length, 11);
   assert.ok(
     providerRequired.every(
       ({ requirements, applicability }) => applicability === "provider-required" && requirements.length > 0,
@@ -291,42 +296,31 @@ test("all callable generated adapters own same-recipe C ABI and emitted-JSI exac
     await rm(temporary, { recursive: true, force: true });
   }
   const usages = corpus.usages;
-  assert.equal(usages.length, 94);
-  assert.equal(corpus.report.recipeCount, 1361);
-  assert.equal(corpus.report.generatedAdapterCount, 94);
+  assert.equal(corpus.report.recipeCount, dmSdkUniversalRecipes.length);
+  assert.equal(corpus.report.generatedAdapterCount, usages.length);
   assert.equal(corpus.report.silentlyOmitted, 0);
-  assert.equal(corpus.report.verification.vectorCount, 94);
-  assert.equal(corpus.report.verification.jsiVectorCount, 33);
-  assert.deepEqual(Object.keys(corpus.report.sourceHashes.familyReports).sort(), [
-    "arenaCString",
-    "astcProbe",
-    "base64Span",
-    "cstringValue",
-    "enumValue",
-    "fixedDigest",
-    "hashSpan",
-    "hashState",
-    "namedScalar",
-    "scalar",
-    "xteaSpan",
-  ]);
+  assert.equal(corpus.report.verification.vectorCount, usages.length);
+  assert.equal(
+    corpus.report.verification.jsiVectorCount,
+    corpus.report.verification.vectors.filter(
+      ({ transports }) => transports.dynamicHermesJsi.applicability === "callable",
+    ).length,
+  );
+  const expectedFamilies = [...new Set(usages.map(({ materialization }) => materialization.family))].sort();
+  assert.deepEqual(Object.keys(corpus.report.sourceHashes.familyReports).sort(), expectedFamilies);
   for (const evidence of Object.values(corpus.report.sourceHashes.familyReports)) {
     assert.match(evidence.sha256, /^[0-9a-f]{64}$/u);
     assert.equal(sha256(await readFile(path.resolve(root, evidence.path), "utf8")), evidence.sha256);
   }
-  assert.deepEqual(corpus.report.familyCounts, {
-    arenaCString: 5,
-    astcProbe: 2,
-    base64Span: 2,
-    cstringValue: 14,
-    enumValue: 7,
-    fixedDigest: 4,
-    hashSpan: 2,
-    hashState: 10,
-    namedScalar: 20,
-    scalar: 26,
-    xteaSpan: 2,
-  });
+  assert.deepEqual(
+    corpus.report.familyCounts,
+    Object.fromEntries(
+      expectedFamilies.map((family) => [
+        family,
+        usages.filter(({ materialization }) => materialization.family === family).length,
+      ]),
+    ),
+  );
   assert.deepEqual(
     corpus.report.verification.vectors.map(({ declarationId }) => declarationId),
     usages.map(({ declarationId }) => declarationId),
@@ -338,17 +332,7 @@ test("all callable generated adapters own same-recipe C ABI and emitted-JSI exac
     assert.equal(vector.transports.cAbi.applicability, "callable");
     assert.ok(Number.isSafeInteger(vector.adapterId));
   }
-  assert.equal(new Set(corpus.report.verification.vectors.map(({ vectorSha256 }) => vectorSha256)).size, 94);
-  assert.deepEqual(
-    [
-      ...new Set(
-        corpus.report.verification.vectors
-          .filter(({ transports }) => transports.dynamicHermesJsi.applicability === "callable")
-          .map(({ family }) => family),
-      ),
-    ].sort(),
-    ["enumValue", "scalar"],
-  );
+  assert.equal(new Set(corpus.report.verification.vectors.map(({ vectorSha256 }) => vectorSha256)).size, usages.length);
   assert.ok(
     corpus.report.verification.vectors
       .filter(({ family }) => family === "cstringValue")
@@ -370,10 +354,7 @@ test("all callable generated adapters own same-recipe C ABI and emitted-JSI exac
       harness,
       'extern "C" int deherm_dmsdk_run_generated_adapter_exact_verification(void);int main(){return deherm_dmsdk_run_generated_adapter_exact_verification();}\n',
     );
-    const sdkRoot = path.join(
-      root,
-      "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk",
-    );
+    const sdkRoot = await defoldSdkRoot();
     run(compiler, [
       "-std=c++17",
       "-Wall",
@@ -587,8 +568,8 @@ test("universal dmSDK ABI header is C11-compatible and linkable", async () => {
 #include <defold_hermes/generated_dmsdk_universal.h>
 int main(void) {
   DehermDmSdkUniversalValue result = {0};
-  return deherm_dmsdk_universal_count() == 1361 &&
-    deherm_dmsdk_universal_dispatch(1361, 0, 0, &result) == DEHERM_DMSDK_UNIVERSAL_UNKNOWN_ID ? 0 : 1;
+  return deherm_dmsdk_universal_count() == ${dmSdkUniversalRecipes.length} &&
+    deherm_dmsdk_universal_dispatch(${dmSdkUniversalRecipes.length}, 0, 0, &result) == DEHERM_DMSDK_UNIVERSAL_UNKNOWN_ID ? 0 : 1;
 }
 `,
     );
@@ -688,10 +669,7 @@ test("every declaration-only universal-ready recipe compiles and executes its ex
       harness,
       `extern "C" int ${generated.verification.driver.function}(void);\nint main(){return ${generated.verification.driver.function}();}\n`,
     );
-    const sdkRoot = path.join(
-      root,
-      "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk",
-    );
+    const sdkRoot = await defoldSdkRoot();
     const includeArgs = [
       `-I${path.join(root, "defold/defold_hermes/include")}`,
       "-isystem",
@@ -1018,7 +996,7 @@ extern "C" DehermDmSdkUniversalStatus wrap_clamp_i32(const DehermDmSdkUniversalV
 extern "C" void deherm_dmsdk_generated_provider_install(void);
 
 int main() {
-  if (deherm_dmsdk_universal_count() != 1361) return 1;
+  if (deherm_dmsdk_universal_count() != ${report.recipes.length}) return 1;
   deherm_dmsdk_generated_provider_install();
   DehermDmSdkUniversalValue result = {};
   DehermDmSdkUniversalValue scalar[1] = {{UINT32_C(0x12345678), 0, DEHERM_DMSDK_UNIVERSAL_U64, 0}};

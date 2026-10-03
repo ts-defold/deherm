@@ -305,6 +305,16 @@ revision-bearing source from leaking indirectly through its digest.
 
 # Proven properties
 
+The policy workflow transports the whole revision-derived evidence surface to
+parity, runtime, publication, and consumer jobs. That includes the generated
+compiler recipe catalog under `packages/compiler/src/generated`, not only the
+SDK IR and native glue. Downstream jobs delete the checkout copy before
+extracting the surface. This is required because pairing a newly derived
+`defold-sdk-ir.json` with the package checkout's older universal recipe catalog
+is a mixed-revision state: generation succeeds, but exact-call verification
+correctly reports a declaration with no recipe. The workflow regression test
+requires both the archive member and the pre-extraction removal.
+
 `tests/policy-surface-materializer.test.mjs` materializes into a fresh temporary
 directory and compares all 28 SDK files against size/SHA-256 evidence captured
 from a frozen checkout-backed source-pipeline golden. Normal generation never

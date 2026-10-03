@@ -21,7 +21,11 @@ import { promisify } from "node:util";
 import { pathToFileURL } from "node:url";
 import { parse as parseYaml } from "yaml";
 
-import { extractReleaseArchive, releaseAssetUrl } from "../packages/cli/src/release-assets.mjs";
+import {
+  extractReleaseArchive,
+  releaseAssetUrl,
+  releaseMetadataFromPinnedIntegrity,
+} from "../packages/cli/src/release-assets.mjs";
 import {
   buildReleaseIntegrity,
   releaseIntegrityAssetName,
@@ -40,6 +44,25 @@ import {
 
 const execFileAsync = promisify(execFile);
 const packager = path.join(repositoryRoot, "toolchains/hermes/package-archive.sh");
+
+test("package-pinned integrity is a complete offline release metadata record", () => {
+  const integrityAsset = "tool.tar.gz.integrity.json";
+  const record = {
+    asset: integrityAsset,
+    sha256: "a".repeat(64),
+    archiveSha256: "b".repeat(64),
+    archiveBytes: 42,
+  };
+  assert.deepEqual(releaseMetadataFromPinnedIntegrity(record, integrityAsset), {
+    integrity: { sha256: record.sha256 },
+    archive: { sha256: record.archiveSha256, bytes: 42 },
+  });
+  assert.equal(releaseMetadataFromPinnedIntegrity(undefined, integrityAsset), null);
+  assert.throws(
+    () => releaseMetadataFromPinnedIntegrity({ ...record, sha256: "bad" }, integrityAsset, "host/tool"),
+    /host\/tool has an invalid pinned release integrity record/u,
+  );
+});
 
 function digest(bytes) {
   return createHash("sha256").update(bytes).digest("hex");

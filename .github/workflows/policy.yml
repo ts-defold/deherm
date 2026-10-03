@@ -210,6 +210,7 @@ jobs:
             packages/abi/src/generated \
             packages/sdk/src/generated \
             packages/static-hermes/src/generated \
+            packages/compiler/src/generated \
             defold/defold_hermes/include/defold_hermes \
             defold/defold_hermes/src \
             defold/defold_hermes/lib/web \
@@ -275,7 +276,7 @@ jobs:
           path: ${{ runner.temp }}/policy-surface
       - name: Install the generated surface
         run: |
-          rm -rf packages/bindings/generated packages/abi/src/generated packages/sdk/src/generated packages/static-hermes/src/generated
+          rm -rf packages/bindings/generated packages/abi/src/generated packages/sdk/src/generated packages/static-hermes/src/generated packages/compiler/src/generated
           archive="$RUNNER_TEMP/policy-surface/policy-surface.tar.gz"
           if [ "$RUNNER_OS" = Windows ]; then archive="$(cygpath -u "$archive")"; fi
           tar -xzf "$archive"
@@ -330,7 +331,7 @@ jobs:
           name: policy-surface
           path: ${{ runner.temp }}/policy-surface
       - run: |
-          rm -rf packages/bindings/generated packages/abi/src/generated packages/sdk/src/generated packages/static-hermes/src/generated
+          rm -rf packages/bindings/generated packages/abi/src/generated packages/sdk/src/generated packages/static-hermes/src/generated packages/compiler/src/generated
           tar -xzf "$RUNNER_TEMP/policy-surface/policy-surface.tar.gz"
       - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v7
@@ -521,7 +522,7 @@ jobs:
           name: policy-surface
           path: ${{ runner.temp }}/policy-surface
       - run: |
-          rm -rf packages/bindings/generated packages/abi/src/generated packages/sdk/src/generated packages/static-hermes/src/generated
+          rm -rf packages/bindings/generated packages/abi/src/generated packages/sdk/src/generated packages/static-hermes/src/generated packages/compiler/src/generated
           tar -xzf "$RUNNER_TEMP/policy-surface/policy-surface.tar.gz"
       - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v7
@@ -638,7 +639,7 @@ jobs:
           path: ${{ runner.temp }}/policy-surface
       - name: Install the exact published surface
         run: |
-          rm -rf packages/bindings/generated packages/abi/src/generated packages/sdk/src/generated packages/static-hermes/src/generated
+          rm -rf packages/bindings/generated packages/abi/src/generated packages/sdk/src/generated packages/static-hermes/src/generated packages/compiler/src/generated
           tar -xzf "$RUNNER_TEMP/policy-surface/policy-surface.tar.gz"
       - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v7
