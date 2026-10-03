@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "kind": "deherm.policy.artifacts",
-  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "defoldRevision": "6823d775883a04f4210bf04cd54cbffc468ac0ad",
   "artifacts": {
     "hermes-host": {
       "tag": "hermes-4e285d845536",
