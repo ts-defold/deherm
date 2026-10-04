@@ -45,6 +45,7 @@ import {
   serializeObject,
 } from "./api-policy.mjs";
 import { buildDefoldTargetMatrix, buildToolchainPins } from "../../../compiler/src/defold-toolchain-pins.mjs";
+import { canonicalGeneratedText, generatedTextMatches } from "../../../compiler/src/generated-text.mjs";
 import {
   LOCALLY_RENDERED_OUTPUT_INPUTS,
   LOCALLY_RENDERED_OUTPUT_RECIPES,
@@ -202,7 +203,7 @@ async function readJson(file) {
 // encoding.  Every textual compatibility snapshot must cross this boundary
 // before it is hashed or embedded in a content-addressed object.
 export function canonicalizePolicyText(source) {
-  return source.replace(/\r\n?/g, "\n");
+  return canonicalGeneratedText(source);
 }
 
 export async function discoverCompilerSurfaceOutputs(sourceRoot = root) {
@@ -583,7 +584,8 @@ export async function readStore(directory = storeRoot, layoutVersion = "v1") {
       problems.push(`${file} points at ${rootFile}, which the store does not hold`);
       continue;
     }
-    if (hashBytes(rootBytes) !== entry.policyRoot) problems.push(`${rootFile} does not hash to its own path`);
+    if (hashBytes(canonicalizePolicyText(rootBytes)) !== entry.policyRoot)
+      problems.push(`${rootFile} does not hash to its own path`);
     for (const hash of Object.values(JSON.parse(rootBytes).subtrees)) {
       const object = objectPath(layoutVersion, hash);
       referenced.add(object);
@@ -594,7 +596,7 @@ export async function readStore(directory = storeRoot, layoutVersion = "v1") {
         problems.push(`${rootFile} names ${object}, which the store does not hold`);
         continue;
       }
-      if (hashBytes(bytes) !== hash) problems.push(`${object} does not hash to its own path`);
+      if (hashBytes(canonicalizePolicyText(bytes)) !== hash) problems.push(`${object} does not hash to its own path`);
     }
   }
   const orphans = files.filter((file) => !file.startsWith(`${layoutVersion}/index/`) && !referenced.has(file));
@@ -704,7 +706,7 @@ export async function writeStore({ policy, site, check }) {
     const absolute = path.join(storeRoot, file);
     if (existingSet.has(file)) {
       const current = await readFile(absolute, "utf8");
-      if (current === bytes) continue;
+      if (generatedTextMatches(current, bytes)) continue;
       republished.push(file);
       if (check) continue;
     } else {
@@ -759,9 +761,9 @@ export async function runApiPolicyGenerator(argv = process.argv.slice(2)) {
         `${result.republished.length} stored objects disagree with the derivation: ${result.republished.slice(0, 8).join(", ")}`,
       );
     }
-    if ((await readFile(shippedIndexPath, "utf8").catch(() => "")) !== shippedIndex)
+    if (!generatedTextMatches(await readFile(shippedIndexPath, "utf8").catch(() => ""), shippedIndex))
       failures.push("defold-policy-index.json is stale");
-    if ((await readFile(manifestPath, "utf8").catch(() => "")) !== manifest)
+    if (!generatedTextMatches(await readFile(manifestPath, "utf8").catch(() => ""), manifest))
       failures.push("defold-api-policy.json is stale");
     if (failures.length) throw new Error(`Policy store check failed:\n  ${failures.join("\n  ")}`);
   } else {

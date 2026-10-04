@@ -5181,3 +5181,15 @@ after canonicalization. The release-tag
 publisher-sidecar check also imports the dependency-light artifact-reference
 module directly, so the artifact summary job does not need an unrelated package
 installation merely to authenticate the shipped lock.
+
+## 2026-10-03 - Generated-text parity is semantic across host newlines
+
+Hosted Windows evidence showed that checkout newline materialization can occur
+outside archive installation: the derived dmSDK content matched, but a raw
+string comparison rejected CRLF against canonical LF. Generated-text writers
+still emit LF, while their checks now compare one shared newline-canonical form
+and continue to reject every non-newline content change. Host-parity policy
+objects hash that same canonical text; fetched policy objects and downloaded
+release artifacts retain raw-byte authentication at their consumer boundary.
+The recursive installer rewrite was removed because it was neither the
+authority nor an effective fix.

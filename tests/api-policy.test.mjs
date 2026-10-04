@@ -31,16 +31,13 @@ import {
   DMSDK_UNIVERSAL_STATIC_FRAME_SCHEMA,
 } from "../packages/compiler/src/dmsdk-universal-static-frame.mjs";
 import { buildToolchainPins, parseSdkPins } from "../packages/compiler/src/defold-toolchain-pins.mjs";
+import { canonicalGeneratedText, generatedTextMatches } from "../packages/compiler/src/generated-text.mjs";
 import { isRevisionOutput, REVISION_OUTPUT_ROOTS } from "../packages/compiler/src/revision-output-layout.mjs";
 import { manifestUrl, missingPublishedEntries } from "../scripts/check-published-policy.mjs";
 import { fetchPolicyText, validateRebuiltHandshake } from "../scripts/check-policy-site-resolution.mjs";
 import { buildShippedIndex, canonicalizePolicyText, generatorRevision } from "../scripts/generate-api-policy.mjs";
 import { apiPolicyGenerator } from "../scripts/lib/script-generator-pipeline.mjs";
-import {
-  canonicalizePolicySurfaceText,
-  policySurfaceArchivePaths,
-  policySurfaceFingerprintRoots,
-} from "../scripts/policy-surface.mjs";
+import { policySurfaceArchivePaths, policySurfaceFingerprintRoots } from "../scripts/policy-surface.mjs";
 import {
   blockerFromLog,
   planPolicyDerivationIssueReconciliation,
@@ -197,13 +194,11 @@ test("policy host parity materializes every authoritative generator input", asyn
   );
 });
 
-test("policy surface installation canonicalizes text without touching binary members", () => {
-  assert.equal(
-    canonicalizePolicySurfaceText("generated/value.json", Buffer.from('{\r\n  "value": 1\r\n}\r\n')).toString(),
-    '{\n  "value": 1\n}\n',
-  );
-  const binary = Buffer.from([0, 13, 10, 255]);
-  assert.equal(canonicalizePolicySurfaceText("generated/value.bin", binary), binary);
+test("generated-text checks accept host newlines without accepting content drift", () => {
+  const canonical = '{\n  "value": 1\n}\n';
+  assert.equal(canonicalGeneratedText('{\r\n  "value": 1\r\n}\r\n'), canonical);
+  assert.equal(generatedTextMatches('{\r\n  "value": 1\r\n}\r\n', canonical), true);
+  assert.equal(generatedTextMatches('{\r\n  "value": 2\r\n}\r\n', canonical), false);
 });
 
 test("LLVM tools resolve versioned Linux binaries and macOS xcrun without false archive failures", () => {

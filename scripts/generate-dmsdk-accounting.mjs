@@ -20,6 +20,8 @@ import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { generatedTextMatches } from "../packages/compiler/src/generated-text.mjs";
+
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const generated = path.join(root, "packages", "bindings", "generated");
 export const accountingPath = path.join(generated, "defold-dmsdk-accounting.json");
@@ -116,7 +118,7 @@ async function main(argv = process.argv.slice(2)) {
   const serialized = `${JSON.stringify(report, null, 2)}\n`;
   if (argv.includes("--check")) {
     const existing = await readFile(accountingPath, "utf8").catch(() => "");
-    if (existing !== serialized)
+    if (!generatedTextMatches(existing, serialized))
       throw new Error("defold-dmsdk-accounting.json is stale; run node scripts/generate-dmsdk-accounting.mjs");
   } else await writeFile(accountingPath, serialized);
   const shown = Object.entries(report.counts)

@@ -37,6 +37,7 @@ export const dmSdkGeneratorSources = Object.freeze([
   "scripts/lib/reviewed-revision.mjs",
   "scripts/lib/revision-audit.mjs",
   "scripts/lib/upstream-lock.mjs",
+  "packages/compiler/src/generated-text.mjs",
   "packages/compiler/src/preprocessor-conditions.mjs",
   "packages/compiler/src/dmsdk-call-symbol-index.mjs",
   "packages/compiler/src/dmsdk-concrete-call-plan.mjs",

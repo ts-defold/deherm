@@ -9,6 +9,7 @@ import {
   generateRuntime,
   generateTypes,
 } from "../../../compiler/src/sdk/dmsdk-sdk.mjs";
+import { generatedTextMatches } from "../../../compiler/src/generated-text.mjs";
 
 export { createTypeRenderer, dmSdkRuntimeOverloads, generateRuntime, generateTypes };
 
@@ -171,7 +172,10 @@ async function output(file, contents) {
     } catch {
       current = undefined;
     }
-    assert.equal(current, normalized, `${path.relative(root, file)} is stale; run npm run generate:dmsdk-sdk`);
+    assert.ok(
+      generatedTextMatches(current, normalized),
+      `${path.relative(root, file)} is stale; run npm run generate:dmsdk-sdk`,
+    );
     return;
   }
   await mkdir(path.dirname(file), { recursive: true });

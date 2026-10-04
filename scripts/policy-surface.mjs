@@ -3,7 +3,7 @@
 // One authority for the revision-derived files exchanged between policy jobs.
 
 import { execFile } from "node:child_process";
-import { lstat, mkdir, readFile, readdir, rm, stat, writeFile } from "node:fs/promises";
+import { lstat, mkdir, readdir, rm, stat } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
@@ -11,66 +11,15 @@ import { promisify } from "node:util";
 const execFileAsync = promisify(execFile);
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const tarExecutable = process.env.DEHERM_TAR || "tar";
-const policyTextExtensions = new Set([
-  ".atlas",
-  ".c",
-  ".cc",
-  ".collection",
-  ".cpp",
-  ".css",
-  ".def",
-  ".go",
-  ".gui",
-  ".gui_script",
-  ".h",
-  ".hpp",
-  ".html",
-  ".inc",
-  ".input_binding",
-  ".js",
-  ".json",
-  ".lock",
-  ".log",
-  ".lua",
-  ".manifest",
-  ".mjs",
-  ".md",
-  ".proto",
-  ".project",
-  ".py",
-  ".render_script",
-  ".script",
-  ".script_api",
-  ".sh",
-  ".toml",
-  ".ts",
-  ".tsx",
-  ".txt",
-  ".yaml",
-  ".yml",
-]);
-
 async function runTar(arguments_, options = {}) {
   return execFileAsync(tarExecutable, arguments_, options);
 }
 
-export function canonicalizePolicySurfaceText(file, bytes) {
-  if (path.basename(file) !== "upstream.lock" && !policyTextExtensions.has(path.extname(file))) return bytes;
-  const canonical = Buffer.from(bytes.toString("utf8").replaceAll("\r\n", "\n"));
-  return canonical.equals(bytes) ? bytes : canonical;
-}
-
-async function canonicalizeInstalledPath(target) {
+async function assertNoInstalledSymlinks(target) {
   const metadata = await lstat(target);
   if (metadata.isSymbolicLink()) throw new Error(`Policy surface cannot install a symbolic link: ${target}`);
-  if (metadata.isDirectory()) {
-    for (const entry of await readdir(target)) await canonicalizeInstalledPath(path.join(target, entry));
-    return;
-  }
-  if (!metadata.isFile()) return;
-  const bytes = await readFile(target);
-  const canonical = canonicalizePolicySurfaceText(target, bytes);
-  if (canonical !== bytes) await writeFile(target, canonical);
+  if (!metadata.isDirectory()) return;
+  for (const entry of await readdir(target)) await assertNoInstalledSymlinks(path.join(target, entry));
 }
 
 export const policySurfaceArchivePaths = Object.freeze([
@@ -178,7 +127,7 @@ export async function installPolicySurface(archive) {
   await runTar(["-xzf", archive, "-C", root], {
     maxBuffer: 64 * 1024 * 1024,
   });
-  for (const entry of policySurfaceArchivePaths) await canonicalizeInstalledPath(path.join(root, entry));
+  for (const entry of policySurfaceArchivePaths) await assertNoInstalledSymlinks(path.join(root, entry));
 }
 
 export async function extractPolicySurfacePath(archive, selectedPath) {
@@ -192,7 +141,7 @@ export async function extractPolicySurfacePath(archive, selectedPath) {
   await runTar(["-xzf", archive, "-C", root, selectedPath], {
     maxBuffer: 64 * 1024 * 1024,
   });
-  await canonicalizeInstalledPath(path.join(root, selectedPath));
+  await assertNoInstalledSymlinks(path.join(root, selectedPath));
 }
 
 async function main(argv = process.argv.slice(2)) {
