@@ -21,10 +21,10 @@
   "entries": [
     {
       "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-      "policyRoot": "c8f13b4f978588fdf46af9653af8f0c1c3fde32801a5695e63e63aa7711e748f",
-      "generator": "sha256:d6bf7340f8619f70e696f097acf5f7152d73bf882f115552135823ebb3e41637",
+      "policyRoot": "f3f232af1b15a5a3fd4e2b6b3dc122ac2f73e586297182e3b05ef3fa86edddd8",
+      "generator": "sha256:a9ad7bb63bb20a1e04cb0ad3ac02740f4031fbe08b9c6a1ddefc98b9cdd9e811",
       "realizer": {
-        "minimumPackageVersion": "0.0.0",
+        "minimumPackageVersion": "0.1.0",
         "requiredCapabilities": [
           "dmsdk.static-hermes-bounded-frame.v1",
           "output.compatibility-source.copy.v1",
@@ -52,7 +52,7 @@
           "sdk.script.runtime.render.v1",
           "sdk.script.types.render.v1",
           "sdk.script.universal-value.render.v1",
-          "sdk.script.url-target-support.render.v1",
+          "sdk.script.url-target-support.render.v2",
           "sdk.script.value-target-support.render.v1"
         ]
       }

@@ -56,6 +56,7 @@ import {
   BINDING_LOWERING_RECIPE_NAME,
   createBindingLoweringRecipeFacts,
 } from "../../../compiler/src/binding-lowering-plan-recipe.mjs";
+import { SCRIPT_URL_TARGET_SUPPORT_RECIPE_V2 } from "../../../compiler/src/sdk/support-sdk.mjs";
 import { releaseAssetUrlTemplate } from "../../../cli/src/release-assets.mjs";
 import { apiPolicyGenerator } from "../../../../scripts/lib/script-generator-pipeline.mjs";
 export { buildArtifactReferences } from "./artifact-references.mjs";
@@ -129,7 +130,7 @@ const locallyRenderedSdkRecipes = Object.freeze({
   "dmsdk/universal.ts": "sdk.dmsdk.universal.render.v1",
   "dmsdk/browser-arena.ts": "sdk.dmsdk.browser-arena.render.v1",
   "dmsdk/named-scalar.ts": "sdk.dmsdk.named-scalar.render.v1",
-  "script/url-target-support.ts": "sdk.script.url-target-support.render.v1",
+  "script/url-target-support.ts": SCRIPT_URL_TARGET_SUPPORT_RECIPE_V2,
   "script/value-target-support.ts": "sdk.script.value-target-support.render.v1",
 });
 

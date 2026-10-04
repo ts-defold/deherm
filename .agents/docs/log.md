@@ -5250,3 +5250,22 @@ pass. Headless execution observed 30 contracts with zero mismatches and zero
 engine faults; warmed generated routers reported zero deherm allocations. This
 closes issue #148's structural-evidence acceptance boundary, while retaining
 universal fallback for every withdrawn specialization.
+
+## 2026-10-04 - Published policy recipes are immutable realization contracts
+
+Release-readiness exposed a package-upgrade compatibility defect: the public
+`sdk.script.url-target-support.render.v1` policy omitted a fallback-count input,
+while the compiler had changed that same recipe to emit a new export. Explicit
+hash authentication correctly rejected the reconstructed file. The compiler
+now preserves both published v1 input shapes byte-for-byte and assigns the
+required fallback-count schema to `render.v2`; new policies require the v2
+capability and package 0.1.0. A content-addressed legacy graph regression drives
+the v1 shape through normal materialization and authenticates the public
+`adcb0637...` output. This is policy-realizer compatibility evidence, not native
+runtime evidence. A history sweep also found pre-publication emitter drift in
+pruned graphs; those roots are not treated as released compatibility promises.
+Regenerating the dependent project lock also made the existing headless report
+match its current plan again; its generated route ledger now records 325
+runtime-observed routes, 601 explicit harness gaps, 924 verified routes, and two
+source-authoritative upstream-unavailable routes. No runtime claim was inferred
+from the policy compatibility tests.

@@ -72,6 +72,15 @@ This is the release boundary:
   version labels. They describe machinery such as a schema reader or lowering
   recipe family and never encode route, namespace, or type names.
 
+A recipe identifier becomes an immutable byte-generation contract when a
+policy that names it is published. The installed compiler must continue to
+reproduce every authenticated output accepted by that recipe's published input
+shapes. Changing required inputs or emitted bytes requires a new recipe
+identifier and capability; the materializer retains the older implementation
+for cached and published policies. Direct renderer tests are insufficient for
+this boundary: compatibility tests must pass a content-addressed legacy graph
+through normal materialization and authenticate the resulting files.
+
 Pinned host compilers and native Hermes libraries are a separate distributable
 class. They never ship inside the npm package. Target-generated native config
 such as `libhermesvm-config.h` belongs to the same archive as the library it

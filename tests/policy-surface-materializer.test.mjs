@@ -9,6 +9,7 @@ import {
   materializePolicySurface,
   projectArtifactsForToolchain,
   policySurfaceRealizationIdentity,
+  renderScriptUrlTargetSupportRecipe,
 } from "../packages/compiler/src/policy-surface-materializer.mjs";
 import { nativeArtifactCompatibility } from "../packages/compiler/src/defold-toolchain-pins.mjs";
 import { resolveDefoldSurface, verifyMaterializedSurfaceRoot } from "../packages/cli/src/defold-surface.mjs";
@@ -19,6 +20,11 @@ import {
   BINDING_LOWERING_RECIPE_NAME,
 } from "../packages/compiler/src/binding-lowering-plan-recipe.mjs";
 import { LOCALLY_RENDERED_OUTPUT_RECIPES } from "../packages/compiler/src/revision-output-emitter.mjs";
+import { sealObject } from "../packages/compiler/src/api-policy.mjs";
+import {
+  SCRIPT_URL_TARGET_SUPPORT_RECIPE_V1,
+  SCRIPT_URL_TARGET_SUPPORT_RECIPE_V2,
+} from "../packages/compiler/src/sdk/support-sdk.mjs";
 import { derivePolicy, discoverCompilerSurfaceOutputs } from "../scripts/generate-api-policy.mjs";
 
 const repositoryRoot = path.resolve(import.meta.dirname, "..");
@@ -32,6 +38,39 @@ const oldPipelineFixture = JSON.parse(
 function sha256(bytes) {
   return createHash("sha256").update(bytes).digest("hex");
 }
+
+test("published URL target-support recipes remain byte-compatible across recipe versions", async () => {
+  const report = JSON.parse(
+    await readFile(
+      path.join(repositoryRoot, "packages", "bindings", "generated", "defold-script-url-address-classification.json"),
+      "utf8",
+    ),
+  );
+  const legacyRecipeInput = {
+    routeCount: report.optimizedRouteCount,
+    targetSupport: report.targetSupport,
+  };
+  assert.equal(
+    sha256(renderScriptUrlTargetSupportRecipe(SCRIPT_URL_TARGET_SUPPORT_RECIPE_V1, legacyRecipeInput)),
+    "adcb06373ce840e950f532a49e49eacda85a567998aa96a8dfbdd2c32f1f4a1b",
+  );
+  const countedRecipeInput = {
+    ...legacyRecipeInput,
+    universalFallbackRouteCount: report.universalFallbackRouteCount,
+  };
+  assert.equal(
+    sha256(renderScriptUrlTargetSupportRecipe(SCRIPT_URL_TARGET_SUPPORT_RECIPE_V1, countedRecipeInput)),
+    "2ecbbb9dbd99069feeff111bea8f8525ea510dcf3906c2226120e1b4c8900395",
+  );
+  assert.equal(
+    sha256(renderScriptUrlTargetSupportRecipe(SCRIPT_URL_TARGET_SUPPORT_RECIPE_V2, countedRecipeInput)),
+    "2ecbbb9dbd99069feeff111bea8f8525ea510dcf3906c2226120e1b4c8900395",
+  );
+  assert.throws(
+    () => renderScriptUrlTargetSupportRecipe(SCRIPT_URL_TARGET_SUPPORT_RECIPE_V2, legacyRecipeInput),
+    /recipe is invalid/u,
+  );
+});
 
 test("an unavailable compatible native build cannot suppress SDK materialization", () => {
   const toolchain = {
@@ -95,6 +134,41 @@ async function currentResolvedPolicy() {
   };
 }
 
+function withLegacyUrlTargetSupportPolicy(current) {
+  const legacy = structuredClone(current);
+  const compilerEntry = legacy.objects.get("@compiler");
+  const compiler = compilerEntry.value;
+  const relative = "script/url-target-support.ts";
+  const record = compiler.sdk.entries[relative];
+  compiler.realizationRecipes.sdk[relative] = SCRIPT_URL_TARGET_SUPPORT_RECIPE_V1;
+  record.recipe = SCRIPT_URL_TARGET_SUPPORT_RECIPE_V1;
+  delete record.recipeInput.universalFallbackRouteCount;
+  record.sha256 = "adcb06373ce840e950f532a49e49eacda85a567998aa96a8dfbdd2c32f1f4a1b";
+  const sealedCompiler = sealObject(compiler);
+  compilerEntry.digest = sealedCompiler.hash;
+  legacy.policy.subtrees["@compiler"] = sealedCompiler.hash;
+  legacy.policy.realizer.minimumPackageVersion = "0.0.0";
+  legacy.policy.realizer.requiredCapabilities = legacy.policy.realizer.requiredCapabilities
+    .map((capability) =>
+      capability === SCRIPT_URL_TARGET_SUPPORT_RECIPE_V2 ? SCRIPT_URL_TARGET_SUPPORT_RECIPE_V1 : capability,
+    )
+    .sort();
+  const sealedRoot = sealObject(legacy.policy);
+  legacy.entry.policyRoot = sealedRoot.hash;
+  return legacy;
+}
+
+test("a content-addressed legacy v1 URL policy graph still resolves and materializes", async () => {
+  const legacy = withLegacyUrlTargetSupportPolicy(await currentResolvedPolicy());
+  const cacheRoot = await mkdtemp(path.join(tmpdir(), "deherm-legacy-url-policy-test-"));
+  const outputRoot = path.join(cacheRoot, "surfaces", legacy.revision);
+  const materialized = await materializePolicySurface(legacy, { outputRoot });
+  const source = await readFile(path.join(outputRoot, "sdk", "generated", "script", "url-target-support.ts"));
+  assert.equal(sha256(source), "adcb06373ce840e950f532a49e49eacda85a567998aa96a8dfbdd2c32f1f4a1b");
+  assert.equal(materialized.descriptor.sdk["script/url-target-support.ts"].mode, "render-and-verify");
+  assert.equal(materialized.descriptor.policyRoot, legacy.entry.policyRoot);
+});
+
 test("authenticated policy materializes the complete generated SDK without a Defold tree", async () => {
   const policy = await currentResolvedPolicy();
   const cacheRoot = await mkdtemp(path.join(tmpdir(), "deherm-policy-surface-test-"));
@@ -113,6 +187,10 @@ test("authenticated policy materializes the complete generated SDK without a Def
   }
   assert.equal(Object.keys(first.descriptor.sdk).length, 28);
   const compiler = policy.objects.get("@compiler");
+  assert.equal(
+    compiler.value.realizationRecipes.sdk["script/url-target-support.ts"],
+    SCRIPT_URL_TARGET_SUPPORT_RECIPE_V2,
+  );
   assert.deepEqual(compiler.value.sdk.entries["script/types.ts"].inputs, [
     "defold-script-api-ir.json",
     "defold-script-sdk-documentation.json",

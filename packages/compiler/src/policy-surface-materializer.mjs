@@ -23,8 +23,11 @@ import {
   generateScriptBrowserTargetSupport,
   generateScriptHandleLowering,
   generateScriptUrlTargetSupport,
+  generateScriptUrlTargetSupportV1,
   generateScriptUniversalValue,
   generateScriptValueTargetSupport,
+  SCRIPT_URL_TARGET_SUPPORT_RECIPE_V1,
+  SCRIPT_URL_TARGET_SUPPORT_RECIPE_V2,
 } from "./sdk/support-sdk.mjs";
 import { canonicalize, DEFOLD_REVISION_TOKEN, hashBytes, restoreDefoldRevision, sealObject } from "./api-policy.mjs";
 import { stableBindingId } from "./binding-identity.mjs";
@@ -72,9 +75,23 @@ const SDK_RECIPES = Object.freeze({
   "dmsdk/universal.ts": "sdk.dmsdk.universal.render.v1",
   "dmsdk/browser-arena.ts": "sdk.dmsdk.browser-arena.render.v1",
   "dmsdk/named-scalar.ts": "sdk.dmsdk.named-scalar.render.v1",
-  "script/url-target-support.ts": "sdk.script.url-target-support.render.v1",
+  "script/url-target-support.ts": SCRIPT_URL_TARGET_SUPPORT_RECIPE_V2,
   "script/value-target-support.ts": "sdk.script.value-target-support.render.v1",
 });
+
+const LEGACY_SDK_RECIPES = Object.freeze({
+  "script/url-target-support.ts": Object.freeze([SCRIPT_URL_TARGET_SUPPORT_RECIPE_V1]),
+});
+
+function isSupportedSdkRecipe(relative, recipe, expectedRecipe = SDK_RECIPES[relative]) {
+  return recipe === expectedRecipe || (LEGACY_SDK_RECIPES[relative]?.includes(recipe) ?? false);
+}
+
+export function renderScriptUrlTargetSupportRecipe(recipe, recipeInput) {
+  if (recipe === SCRIPT_URL_TARGET_SUPPORT_RECIPE_V1) return generateScriptUrlTargetSupportV1(recipeInput);
+  if (recipe === SCRIPT_URL_TARGET_SUPPORT_RECIPE_V2) return generateScriptUrlTargetSupport(recipeInput);
+  throw new Error(`unsupported script URL target-support recipe ${JSON.stringify(recipe)}`);
+}
 
 function digestCanonical(value) {
   return hashBytes(Buffer.from(JSON.stringify(canonicalize(value))));
@@ -400,7 +417,7 @@ export function resolveCompilerSurface(resolvedPolicy, revision) {
         : record.mode === "authenticated-compatibility-source"
           ? "sdk.compatibility-source.copy.v1"
           : undefined;
-    if (!expectedRecipe || record.recipe !== expectedRecipe) {
+    if (!expectedRecipe || !isSupportedSdkRecipe(relative, record.recipe, expectedRecipe)) {
       throw new Error(`${relative}: unsupported SDK realization recipe ${JSON.stringify(record.recipe)}`);
     }
     let source;
@@ -611,7 +628,8 @@ export async function materializePolicySurface(resolvedPolicy, options = {}) {
     ),
     ...(compiler.sdk?.["script/url-target-support.ts"]?.mode === "render-and-verify"
       ? {
-          "script/url-target-support.ts": generateScriptUrlTargetSupport(
+          "script/url-target-support.ts": renderScriptUrlTargetSupportRecipe(
+            recipes.sdk?.["script/url-target-support.ts"],
             compiler.sdk["script/url-target-support.ts"].recipeInput,
           ),
         }
@@ -641,7 +659,7 @@ export async function materializePolicySurface(resolvedPolicy, options = {}) {
         : record.mode === "authenticated-compatibility-source"
           ? "sdk.compatibility-source.copy.v1"
           : undefined;
-    if (!expectedRecipe || recipes.sdk?.[relative] !== expectedRecipe) {
+    if (!expectedRecipe || !isSupportedSdkRecipe(relative, recipes.sdk?.[relative], expectedRecipe)) {
       throw new Error(`${relative}: unsupported SDK realization recipe ${JSON.stringify(recipes.sdk?.[relative])}`);
     }
     const source = record.mode === "render-and-verify" ? rendered[relative] : record.source;

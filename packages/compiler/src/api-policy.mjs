@@ -33,6 +33,7 @@ import {
   DMSDK_UNIVERSAL_STATIC_FRAME_CAPACITY,
   DMSDK_UNIVERSAL_STATIC_FRAME_SCHEMA,
 } from "./dmsdk-universal-static-frame.mjs";
+import { SCRIPT_URL_TARGET_SUPPORT_RECIPE_V1, SCRIPT_URL_TARGET_SUPPORT_RECIPE_V2 } from "./sdk/support-sdk.mjs";
 
 export const POLICY_SCHEMA_VERSION = 1;
 
@@ -65,7 +66,8 @@ export const POLICY_REALIZER_CAPABILITY_REGISTRY = Object.freeze({
   "sdk.script.runtime.render.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   "sdk.script.types.render.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   "sdk.script.universal-value.render.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
-  "sdk.script.url-target-support.render.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
+  [SCRIPT_URL_TARGET_SUPPORT_RECIPE_V1]: Object.freeze({ introducedInVersion: "0.0.0" }),
+  [SCRIPT_URL_TARGET_SUPPORT_RECIPE_V2]: Object.freeze({ introducedInVersion: "0.1.0" }),
   "sdk.script.value-target-support.render.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   "output.compatibility-source.copy.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   "output.dmsdk-universal-jsi-header.render.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
