@@ -99,6 +99,11 @@ test("policy host parity materializes every authoritative generator input", asyn
   assert.equal((workflow.match(/policy-surface\.mjs install/gu) ?? []).length, 4);
   assert.doesNotMatch(workflow, /tar -[cx]zf[^\n]*policy-surface/u);
   assert.doesNotMatch(parity, /archive="\$\(cygpath/u);
+  assert.ok(
+    parity.indexOf("pnpm install --frozen-lockfile --ignore-scripts") <
+      parity.indexOf("name: Install the generated surface"),
+    "host setup must finish before canonical policy bytes replace checkout files",
+  );
   assert.match(parity, /DEFOLD_REV=\/DEHERM_DERIVED_REVISION=/u);
   assert.match(parity, /DEHERM_CARRIED_REVIEW_LEDGER=/u);
   assert.match(parity, /bootstrap-upstreams\.sh defold ref-doc/u);

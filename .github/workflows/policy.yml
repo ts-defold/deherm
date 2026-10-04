@@ -259,6 +259,12 @@ jobs:
         with:
           name: policy-surface
           path: ${{ runner.temp }}/policy-surface
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with: { node-version: '22', cache: 'pnpm' }
+      - uses: actions/setup-python@v6
+        with: { python-version: '3.13' }
+      - run: pnpm install --frozen-lockfile --ignore-scripts
       - name: Install the generated surface
         run: |
           archive="$RUNNER_TEMP/policy-surface/policy-surface.tar.gz"
@@ -268,12 +274,6 @@ jobs:
           set -euo pipefail
           sed -n 's/^DEFOLD_REV=/DEHERM_DERIVED_REVISION=/p' upstream.lock >> "$GITHUB_ENV"
           echo "DEHERM_CARRIED_REVIEW_LEDGER=$RUNNER_TEMP/parity-carried-reviews.jsonl" >> "$GITHUB_ENV"
-      - uses: pnpm/action-setup@v6
-      - uses: actions/setup-node@v7
-        with: { node-version: '22', cache: 'pnpm' }
-      - uses: actions/setup-python@v6
-        with: { python-version: '3.13' }
-      - run: pnpm install --frozen-lockfile --ignore-scripts
       - id: sysroot
         run: sed -n 's/^DMSDK_PARSE_SYSROOT_SHA256=/digest=/p' upstream.lock >> "$GITHUB_OUTPUT"
       - uses: actions/cache@v5

@@ -5175,7 +5175,9 @@ The shared policy-surface installer canonicalizes declared generated text to LF
 after extraction while leaving binary members byte-identical. This states and
 enforces the generator's platform-independent byte contract at the transport
 boundary instead of relying on a Windows tar implementation's newline mode.
-Symlinks fail closed. The release-tag
+Symlinks fail closed. Host parity installs that surface after Node, Python, pnpm,
+and dependency setup so no host bootstrap can rehydrate checkout line endings
+after canonicalization. The release-tag
 publisher-sidecar check also imports the dependency-light artifact-reference
 module directly, so the artifact summary job does not need an unrelated package
 installation merely to authenticate the shipped lock.
