@@ -178,17 +178,17 @@ silently returning to the packed emitter modules.
 
 # Current executable cut
 
-The authenticated `@compiler` subtree is now a **65,250-byte manifest**, not a
-21 MB container. It references 20 independently content-addressed semantic
-documents, one compact dmSDK catalog recipe, a 28-entry SDK manifest, and a
-113-entry revision-output manifest. Of those outputs, 17 are package-rendered
-and 96 remain compatibility sources.
+The authenticated `@compiler` subtree is now a **64,781-byte manifest**, not a
+21 MB container. It references 19 independently content-addressed semantic
+documents, three compact recipe-fact objects, a 28-entry SDK manifest, and a
+113-entry revision-output manifest. Of those outputs, 30 are package-rendered
+and 83 remain compatibility sources.
 This keeps each object shareable and makes the remaining migration
 debt enumerable; it does not pretend the referenced bytes have disappeared.
-The current reachable object graph is 22,584,315 bytes across 185 subtrees.
+The current reachable object graph is 21,915,256 bytes across 173 subtrees.
 The 17,778,740-byte canonical lowering plan is already rebuilt locally from a
 2,682,082-byte authenticated recipe-facts object. Twelve SDK support sources
-and 96 revision-output compatibility sources remain to be replaced by compact
+and 83 revision-output compatibility sources remain to be replaced by compact
 facts plus package emitters.
 
 Schema-2 materialized surfaces authenticate policy-derived IR descriptor entries
@@ -205,9 +205,9 @@ policy”. The focused materialization/client suite passes 16/16, and
 realization contract. It restores the selected revision, resolves and validates
 the manifest's authenticated references, regenerates sixteen script and
 dmSDK TypeScript files from semantic documents or compact manifest facts,
-verifies their policy SHA-256 values, writes 12 SDK support files and 96
+verifies their policy SHA-256 values, writes 12 SDK support files and 83
 revision outputs from explicitly labelled authenticated compatibility sources,
-renders 17 revision outputs from package machinery, and records a revision-keyed
+renders 30 revision outputs from package machinery, and records a revision-keyed
 `surface.json` descriptor. The repository generator owns extraction and policy
 production; it no longer owns the public materialization contract.
 
@@ -430,12 +430,12 @@ digest. Sixteen files (3,908,367 bytes) are locally rendered; 12 files
 all 12 so migration debt cannot change silently. A second pass requires zero
 writes, proving keyed idempotence. The materializer invokes no parser and reads
 no Defold checkout. The same test requires all 113 revision outputs (1,964,163
-bytes) to match the source pipeline byte for byte: 17 package-rendered files
-(766,777 bytes) and 96 authenticated snapshots (1,197,386 bytes).
+bytes) to match the source pipeline byte for byte: 30 package-rendered files
+(1,435,417 bytes) and 83 authenticated snapshots (528,746 bytes).
 
-The `<5 MB` compiler-object budget is enforced; the current manifest is 65,250
+The `<5 MB` compiler-object budget is enforced; the current manifest is 64,781
 bytes. This is a structural transfer boundary, not yet a total-size victory.
-The 12 SDK support-source objects and 96 revision-output objects must still be
+The 12 SDK support-source objects and 83 revision-output objects must still be
 replaced by compiler-owned emitters over compact semantic facts. Those changes
 will reduce total transfer size without changing the consumer contract; the
 work is tracked in [#93](https://github.com/ts-defold/deherm/issues/93).

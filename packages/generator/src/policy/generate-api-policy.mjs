@@ -62,6 +62,10 @@ import {
   DMSDK_UNIVERSAL_RECIPE_FACTS_NAME,
 } from "../../../compiler/src/dmsdk-universal-recipe-facts.mjs";
 import { SCRIPT_URL_TARGET_SUPPORT_RECIPE_V2 } from "../../../compiler/src/sdk/support-sdk.mjs";
+import {
+  createScriptValueBindingRecipeFacts,
+  SCRIPT_VALUE_BINDING_RECIPE_FACTS_NAME,
+} from "../../../compiler/src/script-value-binding-output-emitter.mjs";
 import { releaseAssetUrlTemplate } from "../../../cli/src/release-assets.mjs";
 import { apiPolicyGenerator } from "../../../../scripts/lib/script-generator-pipeline.mjs";
 export { buildArtifactReferences } from "./artifact-references.mjs";
@@ -90,6 +94,7 @@ export const compilerSurfaceDocuments = Object.freeze({
   "defold-dmsdk-binding-patterns.json": "defold-dmsdk-binding-patterns.json",
   "defold-script-real-engine-probes.json": "defold-script-real-engine-probes.json",
   "defold-script-api-accounting.json": "defold-script-api-accounting.json",
+  [SCRIPT_VALUE_BINDING_RECIPE_FACTS_NAME]: null,
   "defold-script-universal-value-bindings.json": "defold-script-universal-value-bindings.json",
   "defold-script-route-availability-profiles.json": "defold-script-route-availability-profiles.json",
   "defold-script-handle-lowering.json": "defold-script-handle-lowering.json",
@@ -444,6 +449,14 @@ export async function derivePolicy(options = {}) {
               name,
               createDmSdkUniversalRecipeFacts(
                 await readJson(path.join(artifacts, "defold-dmsdk-universal-bindings.json")),
+              ),
+            ];
+          }
+          if (name === SCRIPT_VALUE_BINDING_RECIPE_FACTS_NAME) {
+            return [
+              name,
+              createScriptValueBindingRecipeFacts(
+                await readJson(path.join(artifacts, "defold-script-value-bindings.json")),
               ),
             ];
           }

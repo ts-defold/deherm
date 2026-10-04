@@ -8,6 +8,7 @@ import { generateComponentProxies } from "../packages/compiler/src/component-pro
 import {
   generateScriptSpecialCallVerification,
   renderScriptSpecialCallVerificationHeader,
+  renderScriptSpecialCallVerificationHeaderFromReport,
 } from "../packages/compiler/src/script-special-call-verification.mjs";
 import { generateArtifacts } from "../scripts/generate-bindings.mjs";
 import { generateLuaArtifacts } from "../scripts/generate-lua-bridge.mjs";
@@ -39,6 +40,17 @@ test("special-call report is a total inventory partition of compiler and module 
   assert.equal(report.counts.componentPropertyCompiler, 8);
   assert.equal(report.counts.separateModule, 3);
   assert.match(report.reportSha256, /^[0-9a-f]{64}$/);
+});
+
+test("the compiler renders the special-call header from authenticated report facts", async () => {
+  const expected = await readFile(
+    new URL(
+      "../defold/defold_hermes/include/defold_hermes/generated_script_special_call_verification.h",
+      import.meta.url,
+    ),
+    "utf8",
+  );
+  assert.equal(renderScriptSpecialCallVerificationHeaderFromReport(report), expected);
 });
 
 test("every compiler-intrinsic vector emits its exact Lua declaration", async () => {

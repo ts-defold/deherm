@@ -19,7 +19,14 @@ import {
   BINDING_LOWERING_RECIPE_EMITTER,
   BINDING_LOWERING_RECIPE_NAME,
 } from "../packages/compiler/src/binding-lowering-plan-recipe.mjs";
-import { LOCALLY_RENDERED_OUTPUT_RECIPES } from "../packages/compiler/src/revision-output-emitter.mjs";
+import {
+  LOCALLY_RENDERED_OUTPUT_INPUTS,
+  LOCALLY_RENDERED_OUTPUT_RECIPES,
+  SCRIPT_BINDING_DESCRIPTOR_RECIPE,
+  SCRIPT_SCALAR_RECIPE,
+  SCRIPT_UNIVERSAL_VALUE_RECIPE,
+  SCRIPT_VALUE_BINDING_RECIPE,
+} from "../packages/compiler/src/revision-output-emitter.mjs";
 import {
   createDmSdkUniversalRecipeFacts,
   DMSDK_UNIVERSAL_RECIPE_FACTS_NAME,
@@ -179,7 +186,7 @@ test("authenticated policy materializes the complete generated SDK without a Def
   const cacheRoot = await mkdtemp(path.join(tmpdir(), "deherm-policy-surface-test-"));
   const outputRoot = path.join(cacheRoot, "surfaces", policy.revision);
   const first = await materializePolicySurface(policy, { outputRoot });
-  assert.equal(first.descriptor.documents.length, 24);
+  assert.equal(first.descriptor.documents.length, 25);
   assert.equal(first.descriptor.schemaVersion, 2);
   assert.match(first.descriptor.policyRoot, /^[0-9a-f]{64}$/u);
   assert.match(first.descriptor.compilerObjectSha256, /^[0-9a-f]{64}$/u);
@@ -187,6 +194,7 @@ test("authenticated policy materializes the complete generated SDK without a Def
     "defold-script-binding-patterns.json",
     "defold-dmsdk-binding-patterns.json",
     "defold-script-real-engine-probes.json",
+    "defold-script-value-binding-recipe-facts.json",
   ]) {
     assert.ok(first.descriptor.documents.includes(name), `materialized conformance input is missing ${name}`);
   }
@@ -318,6 +326,44 @@ test("authenticated policy materializes the complete generated SDK without a Def
     Object.keys(LOCALLY_RENDERED_OUTPUT_RECIPES).sort(),
     "package-owned revision-output emitters changed without updating their explicit inventory",
   );
+  const universalOutputs = Object.keys(LOCALLY_RENDERED_OUTPUT_RECIPES)
+    .filter((relative) => LOCALLY_RENDERED_OUTPUT_RECIPES[relative] === SCRIPT_UNIVERSAL_VALUE_RECIPE)
+    .sort();
+  assert.equal(universalOutputs.length, 8);
+  for (const relative of universalOutputs) {
+    assert.deepEqual(
+      LOCALLY_RENDERED_OUTPUT_INPUTS[relative],
+      ["defold-script-universal-value-bindings.json", "defold-value-layouts.json"],
+      `${relative} must render from the authenticated universal-value and layout documents`,
+    );
+    assert.equal(first.descriptor.outputs[relative].mode, "render-and-verify");
+  }
+  const descriptorOutput = "defold/defold_hermes/include/defold_hermes/generated_script_binding_descriptors.hpp";
+  assert.equal(LOCALLY_RENDERED_OUTPUT_RECIPES[descriptorOutput], SCRIPT_BINDING_DESCRIPTOR_RECIPE);
+  assert.deepEqual(LOCALLY_RENDERED_OUTPUT_INPUTS[descriptorOutput], [
+    "defold-script-api-ir.json",
+    "defold-script-binding-patterns.json",
+  ]);
+  const scalarOutputs = Object.keys(LOCALLY_RENDERED_OUTPUT_RECIPES)
+    .filter((relative) => LOCALLY_RENDERED_OUTPUT_RECIPES[relative] === SCRIPT_SCALAR_RECIPE)
+    .sort();
+  assert.deepEqual(scalarOutputs, [
+    "defold/defold_hermes/include/defold_hermes/generated_scalar_lua_ids.hpp",
+    "defold/defold_hermes/src/generated_scalar_lua_descriptors.cpp",
+  ]);
+  for (const relative of scalarOutputs) {
+    assert.deepEqual(LOCALLY_RENDERED_OUTPUT_INPUTS[relative], ["defold-script-scalar-dispatch.json"]);
+  }
+  const valueBindingOutputs = Object.keys(LOCALLY_RENDERED_OUTPUT_RECIPES)
+    .filter((relative) => LOCALLY_RENDERED_OUTPUT_RECIPES[relative] === SCRIPT_VALUE_BINDING_RECIPE)
+    .sort();
+  assert.deepEqual(valueBindingOutputs, [
+    "defold/defold_hermes/include/defold_hermes/generated_script_value_bindings.hpp",
+    "defold/defold_hermes/src/generated_script_value_bindings.cpp",
+  ]);
+  for (const relative of valueBindingOutputs) {
+    assert.deepEqual(LOCALLY_RENDERED_OUTPUT_INPUTS[relative], ["defold-script-value-binding-recipe-facts.json"]);
+  }
   const outputBytesByMode = { rendered: 0, snapshots: 0 };
   const expectedOutputBytesByMode = { rendered: 0, snapshots: 0 };
   for (const relative of expectedOutputs) {

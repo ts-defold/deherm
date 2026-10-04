@@ -5405,3 +5405,37 @@ unchanged by construction. The reachable policy graph is now 22,584,315 bytes
 across 185 subtrees; 17 of 113 revision outputs are locally rendered and 96
 remain compatibility snapshots. This is generation/materialization evidence,
 not new live-engine runtime evidence.
+
+## 2026-10-04 - Four script families now realize from semantic policy facts
+
+Policy materialization now reconstructs thirteen more revision outputs through
+package-owned compiler projections: eight universal-value native/browser/Static
+Hermes artifacts, two scalar Lua dispatch artifacts, the full descriptor table
+header, and the value-binding header and implementation. The universal renderer
+uses its authenticated report plus the value-layout document; two blocked
+browser callbacks add 436 bytes of explicit semantic facts. Scalar dispatch
+uses its existing authenticated report. Descriptor generation is now a pure
+compiler projection from the already-authenticated script IR and binding-pattern
+catalog. Value bindings use a 27,170-byte normalized recipe with interned
+operations, codec vocabulary, binding rows, and shape tables; generated source
+text never crosses the policy boundary.
+
+The value operation registry is a single compiler-owned authority for both
+source validation and rendering, so the move did not duplicate its 40 template
+implementations. All thirteen outputs remain byte-identical to the frozen old
+pipeline. Focused evidence includes strict C++ descriptor compilation, scalar
+generation checks, universal native compile/link and C ABI execution, bounded
+recursive/reentrant callback behavior, zero warmed native allocations, browser
+round trips, and pinned Static Hermes frontend compilation. Clean-room
+regeneration remains byte-identical across 102 artifacts and keeps exactly 296
+specialized routes: 90 scalar, 78 value, 24 fixed tuple, 70 URL/address, 26
+value-tail, and eight overload routes.
+
+The reachable policy graph is now 21,915,256 bytes across 173 subtrees. Thirty
+of 113 revision outputs (1,435,417 bytes) are locally rendered; 83 outputs
+(528,746 bytes) remain compatibility snapshots. The materializer still produces
+all 113 outputs byte-for-byte without a Defold checkout, accepts released v1
+graphs, fails closed on manifest drift, and is idempotent. These results prove
+generation, native harness behavior for the exercised universal paths, and
+policy realization; they do not promote every Defold engine call to live-engine
+runtime evidence.

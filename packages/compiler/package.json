@@ -19,6 +19,8 @@
     "./dmsdk-universal-materializer": "./src/dmsdk-universal-materializer.mjs",
     "./dmsdk-universal-jsi-exact-runner": "./src/dmsdk-universal-jsi-exact-runner.mjs",
     "./dmsdk-universal-static-frame": "./src/dmsdk-universal-static-frame.mjs",
+    "./script-binding-descriptor-output-emitter": "./src/script-binding-descriptor-output-emitter.mjs",
+    "./script-binding-descriptor-generator": "./src/script-binding-descriptor-generator.mjs",
     "./dmsdk-call-symbol-index": "./src/dmsdk-call-symbol-index.mjs",
     "./dmsdk-concrete-call-plan": "./src/dmsdk-concrete-call-plan.mjs",
     "./dmsdk-pattern-selector": "./src/dmsdk-pattern-selector.mjs",

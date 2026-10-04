@@ -21,8 +21,8 @@
   "entries": [
     {
       "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-      "policyRoot": "89baa5f0787ff491fb0637c89d773adb4243a44a965cdb654e0f0f8280c87f81",
-      "generator": "sha256:39ad9119e817d896cd4d00518e3157893306c209b3e144814e765da4559dae7f",
+      "policyRoot": "6b16182d80f8f140ab34150af2ae6b875b45adfd01125654da043d67818256b2",
+      "generator": "sha256:1c758cb5a68a39970d3022cf9bdbb1596486650abc4c2060d0c528da3aee0add",
       "realizer": {
         "minimumPackageVersion": "0.1.0",
         "requiredCapabilities": [
@@ -31,9 +31,13 @@
           "output.dmsdk-universal-browser.render.v1",
           "output.dmsdk-universal-jsi-header.render.v1",
           "output.dmsdk-universal-runtime.render.v1",
+          "output.script-binding-descriptor.render.v1",
           "output.script-handle-kinds.render.v1",
           "output.script-handle-lowering-header.render.v1",
           "output.script-handle-lowering-source.render.v1",
+          "output.script-scalar.render.v1",
+          "output.script-universal-value.render.v1",
+          "output.script-value-binding.render.v1",
           "output.stable-template.render.v1",
           "policy.compiler-document.binding-lowering-plan.v1",
           "policy.compiler-document.component-proxy-contract.v2",

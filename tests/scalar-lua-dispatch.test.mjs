@@ -2,10 +2,26 @@ import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
+import { renderScriptScalarArtifacts } from "../packages/compiler/src/script-scalar-output-emitter.mjs";
 import { stableBindingId } from "../scripts/lib/binding-identity.mjs";
 import { buildOutputs } from "../scripts/generate-script-real-engine-probes.mjs";
 
 const root = new URL("../", import.meta.url);
+
+test("compiler-owned scalar renderer reproduces native outputs byte for byte", async () => {
+  const report = JSON.parse(
+    await readFile(new URL("packages/bindings/generated/defold-script-scalar-dispatch.json", root), "utf8"),
+  );
+  const rendered = renderScriptScalarArtifacts(report);
+  assert.equal(
+    rendered.header,
+    await readFile(new URL("defold/defold_hermes/include/defold_hermes/generated_scalar_lua_ids.hpp", root), "utf8"),
+  );
+  assert.equal(
+    rendered.source,
+    await readFile(new URL("defold/defold_hermes/src/generated_scalar_lua_descriptors.cpp", root), "utf8"),
+  );
+});
 
 test("scalar Lua descriptors are deterministic and complete", async () => {
   execFileSync(process.execPath, ["scripts/generate-scalar-lua-dispatch.mjs", "--check"], {

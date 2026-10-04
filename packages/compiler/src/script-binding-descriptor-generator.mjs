@@ -1,0 +1,358 @@
+import { createHash } from "node:crypto";
+
+import { stableBindingId } from "./binding-identity.mjs";
+import { renderScriptBindingDescriptorHeader } from "./script-binding-descriptor-output-emitter.mjs";
+
+const FAMILY_ENTRIES = [
+  ["dynamic-values", "DynamicValues", 0],
+  ["callback-lifecycle", "CallbackLifecycle", 1],
+  ["overload-dispatch", "OverloadDispatch", 2],
+  ["multi-result", "MultiResult", 3],
+  ["lua-table", "LuaTable", 4],
+  ["borrowed-handle", "BorrowedHandle", 5],
+  ["defold-value", "DefoldValue", 6],
+  ["scalar", "Scalar", 7],
+];
+
+const CODEC_ENTRIES = [
+  ["scalar", "Scalar", 1 << 0],
+  ["value", "Value", 1 << 1],
+  ["table", "Table", 1 << 2],
+  ["handle", "Handle", 1 << 3],
+  ["callback", "Callback", 1 << 4],
+  ["dynamic", "Dynamic", 1 << 5],
+  ["polymorphic", "Polymorphic", 1 << 6],
+  ["nil", "Nil", 1 << 7],
+  // A type the reference archive NAMES but never declares. `classify-script-bindings.mjs`
+  // has always produced this codec (`unregistered-type:<name>`) and already routes it to
+  // the borrowed-handle family, because a named-but-undeclared type is a distinct opaque
+  // value and nothing more can be said about it. This table simply had no bit for it,
+  // which was invisible at the pinned revision - Defold 1.14.0 declares every type it
+  // references, so the codec never occurs - and fatal at 1.13.1, which declares zero
+  // `---@alias` entries against 1.14.0's 98 and leaves 108 referenced type names
+  // undeclared. Those aliases are documentation Defold added later; the types were
+  // always there, and a revision must not become underivable because its docs are
+  // thinner.
+  ["unknown", "Unknown", 1 << 8],
+];
+
+const TRAIT_ENTRIES = [
+  ["variable-arguments", "VariableArguments", 1 << 0],
+  ["variable-results", "VariableResults", 1 << 1],
+  ["dynamic-any", "DynamicAny", 1 << 2],
+  ["generic-runtime-tag", "GenericRuntimeTag", 1 << 3],
+  ["callback-lifetime", "CallbackLifetime", 1 << 4],
+  ["documented-overload-conformance", "DocumentedOverloadConformance", 1 << 5],
+  ["generic-runtime-dispatch", "GenericRuntimeDispatch", 1 << 6],
+  ["fixed-multi-result", "FixedMultiResult", 1 << 7],
+  ["heterogeneous-union", "HeterogeneousUnion", 1 << 8],
+  // The route takes or returns a type the reference archive names but never
+  // declares. Paired with the `unknown` codec above; see that comment for why a
+  // revision with thinner documentation must still derive.
+  ["unregistered-type", "UnregisteredType", 1 << 9],
+];
+
+const PARAMETER_FLAG_ENTRIES = [
+  ["optional", "Optional", 1 << 0],
+  ["variadic", "Variadic", 1 << 1],
+];
+
+const FAMILY_VALUE = new Map(FAMILY_ENTRIES.map(([key, , value]) => [key, value]));
+const CODEC_VALUE = new Map(CODEC_ENTRIES.map(([key, , value]) => [key, value]));
+const TRAIT_VALUE = new Map(TRAIT_ENTRIES.map(([key, , value]) => [key, value]));
+
+function compareText(left, right) {
+  return left < right ? -1 : left > right ? 1 : 0;
+}
+
+function sha256(value) {
+  return createHash("sha256").update(value).digest("hex");
+}
+
+function canonicalJson(value) {
+  return JSON.stringify(value);
+}
+
+function assert(condition, message) {
+  if (!condition) throw new Error(message);
+}
+
+function enumObject(entries) {
+  return Object.fromEntries(entries.map(([key, , value]) => [key, value]));
+}
+
+function codecMask(codecs, context) {
+  let mask = 0;
+  for (const codec of codecs) {
+    const bit = CODEC_VALUE.get(codec);
+    assert(bit !== undefined, `Unknown codec '${codec}' in ${context}`);
+    mask |= bit;
+  }
+  return mask;
+}
+
+// Some traits carry a parameter after a colon - the union's members, the
+// undeclared type's name. The descriptor table stores the KIND; the parameter
+// is detail for a reader, not a bit.
+const PARAMETERISED_TRAITS = ["heterogeneous-union:", "unregistered-type:"];
+
+function traitKind(trait) {
+  const prefix = PARAMETERISED_TRAITS.find((candidate) => trait.startsWith(candidate));
+  return prefix ? prefix.slice(0, -1) : trait;
+}
+
+function traitMask(traits, context) {
+  let mask = 0;
+  for (const trait of traits) {
+    const kind = traitKind(trait);
+    const bit = TRAIT_VALUE.get(kind);
+    assert(bit !== undefined, `Unknown trait '${trait}' in ${context}`);
+    mask |= bit;
+  }
+  return mask;
+}
+
+function intern(values) {
+  const table = [...new Set(values)].sort(compareText);
+  const index = new Map(table.map((value, position) => [value, position]));
+  return { table, index };
+}
+
+function validateInputs(ir, patterns) {
+  assert(ir.defoldRevision === patterns.defoldRevision, "IR and pattern Defold revisions differ");
+  assert(
+    patterns.coverageClaim === "classification only; no executable binding coverage is claimed",
+    "Pattern report overstates executable coverage",
+  );
+
+  const pending = ir.functions
+    .filter((entry) => entry.runtimeStatus === "requires-universal-lua-bridge")
+    .slice()
+    .sort((left, right) => compareText(left.id, right.id));
+  const classified = patterns.bindings.slice().sort((left, right) => compareText(left.id, right.id));
+  assert(pending.length === patterns.pendingFunctionCount, "Pattern pending count differs from IR");
+  assert(classified.length === patterns.classifiedFunctionCount, "Pattern classified count differs from binding rows");
+  assert(pending.length === classified.length, "Pending functions are not classified exactly once");
+  assert(
+    new Set(classified.map((entry) => entry.id)).size === classified.length,
+    "Pattern bindings contain duplicate stable keys",
+  );
+
+  for (let index = 0; index < pending.length; index += 1) {
+    const functionEntry = pending[index];
+    const pattern = classified[index];
+    assert(functionEntry.id === pattern.id, `Missing or extra classification at '${functionEntry.id}'`);
+    assert(functionEntry.rawName === pattern.rawName, `Raw name mismatch for '${functionEntry.id}'`);
+    assert(functionEntry.source === pattern.source, `Source mismatch for '${functionEntry.id}'`);
+    assert(functionEntry.line === pattern.line, `Source line mismatch for '${functionEntry.id}'`);
+    assert(
+      pattern.runtimeStatus === "classified-not-implemented",
+      `Unexpected runtime claim for '${functionEntry.id}'`,
+    );
+    assert(
+      FAMILY_VALUE.has(pattern.loweringFamily),
+      `Unknown family '${pattern.loweringFamily}' in '${functionEntry.id}'`,
+    );
+    assert(
+      functionEntry.parameters.length === pattern.parameterCodecs.length,
+      `Parameter count mismatch for '${functionEntry.id}'`,
+    );
+    assert(
+      functionEntry.returns.length === pattern.returnCodecs.length,
+      `Return count mismatch for '${functionEntry.id}'`,
+    );
+    for (let parameterIndex = 0; parameterIndex < functionEntry.parameters.length; parameterIndex += 1) {
+      const parameter = functionEntry.parameters[parameterIndex];
+      const codec = pattern.parameterCodecs[parameterIndex];
+      assert(
+        parameter.rawName === codec.name,
+        `Parameter name mismatch for '${functionEntry.id}' at ${parameterIndex}`,
+      );
+      assert(
+        parameter.rawType === codec.rawType,
+        `Parameter type mismatch for '${functionEntry.id}' at ${parameterIndex}`,
+      );
+      assert(
+        parameter.optional === codec.optional,
+        `Parameter optionality mismatch for '${functionEntry.id}' at ${parameterIndex}`,
+      );
+    }
+    for (let returnIndex = 0; returnIndex < functionEntry.returns.length; returnIndex += 1) {
+      const codec = pattern.returnCodecs[returnIndex];
+      assert(codec.index === returnIndex, `Return index mismatch for '${functionEntry.id}' at ${returnIndex}`);
+      assert(
+        functionEntry.returns[returnIndex] === codec.rawType,
+        `Return type mismatch for '${functionEntry.id}' at ${returnIndex}`,
+      );
+    }
+  }
+  return { pending, classified };
+}
+
+function semanticInputHashes(pending, classified) {
+  const irRows = pending.map(
+    ({ id, rawName, modulePath, member, jsName, parameters, returns, source, line, runtimeStatus }) => ({
+      id,
+      rawName,
+      modulePath,
+      member,
+      jsName,
+      parameters,
+      returns,
+      source,
+      line,
+      runtimeStatus,
+    }),
+  );
+  const patternRows = classified.map(
+    ({ id, loweringFamily, parameterCodecs, returnCodecs, traits, runtimeStatus }) => ({
+      id,
+      loweringFamily,
+      parameterCodecs,
+      returnCodecs,
+      traits,
+      runtimeStatus,
+    }),
+  );
+  return {
+    scriptIrSemanticSha256: sha256(canonicalJson(irRows)),
+    bindingPatternsSemanticSha256: sha256(canonicalJson(patternRows)),
+  };
+}
+
+export function generateScriptBindingDescriptors(ir, patterns) {
+  const { pending, classified } = validateInputs(ir, patterns);
+  assert(pending.length <= 0xffff, "Binding count exceeds uint16_t ID capacity");
+
+  const byId = new Map(pending.map((entry) => [entry.id, entry]));
+  const sourceFiles = intern(pending.map((entry) => entry.source));
+  const modulePaths = intern(pending.map((entry) => entry.modulePath.join(".")));
+  assert(sourceFiles.table.length <= 0xff, "Source-file table exceeds uint8_t index capacity");
+  assert(modulePaths.table.length <= 0xff, "Module-path table exceeds uint8_t index capacity");
+
+  const hot = {
+    stableId: [],
+    family: [],
+    parameterBegin: [],
+    parameterCount: [],
+    returnBegin: [],
+    returnCount: [],
+    minimumArity: [],
+    maximumArity: [],
+    traitMask: [],
+    parameterCodecUnion: [],
+    returnCodecUnion: [],
+    parameterCodecMask: [],
+    parameterFlags: [],
+    returnCodecMask: [],
+  };
+  const cold = {
+    sourceFiles: sourceFiles.table,
+    modulePaths: modulePaths.table,
+    stableKeys: [],
+    rawNames: [],
+    jsNames: [],
+    members: [],
+    sourceFileIndex: [],
+    sourceLines: [],
+    modulePathIndex: [],
+  };
+  const stableIds = new Map();
+
+  for (let numericId = 0; numericId < classified.length; numericId += 1) {
+    const pattern = classified[numericId];
+    const functionEntry = byId.get(pattern.id);
+    const persistentId = stableBindingId(pattern.id);
+    const collision = stableIds.get(persistentId);
+    assert(!collision, `Stable binding ID collision: '${collision}' and '${pattern.id}'`);
+    stableIds.set(persistentId, pattern.id);
+    assert(hot.parameterCodecMask.length <= 0xffff, "Parameter codec table exceeds uint16_t offsets");
+    assert(hot.returnCodecMask.length <= 0xffff, "Return codec table exceeds uint16_t offsets");
+
+    const parameterMasks = pattern.parameterCodecs.map((parameter) =>
+      codecMask(parameter.codecs, `${pattern.id}:${parameter.name}`),
+    );
+    const returnMasks = pattern.returnCodecs.map((result) =>
+      codecMask(result.codecs, `${pattern.id}:return:${result.index}`),
+    );
+    const variadic = pattern.traits.includes("variable-arguments");
+    const minimumArity = pattern.parameterCodecs.filter(
+      (parameter) => !parameter.optional && parameter.name !== "...",
+    ).length;
+    assert(pattern.parameterCodecs.length <= 0xff, `Parameter count exceeds uint8_t in '${pattern.id}'`);
+    assert(pattern.returnCodecs.length <= 0xff, `Return count exceeds uint8_t in '${pattern.id}'`);
+    assert(minimumArity <= 0xff, `Minimum arity exceeds uint8_t in '${pattern.id}'`);
+
+    hot.stableId.push(persistentId);
+    hot.family.push(FAMILY_VALUE.get(pattern.loweringFamily));
+    hot.parameterBegin.push(hot.parameterCodecMask.length);
+    hot.parameterCount.push(pattern.parameterCodecs.length);
+    hot.returnBegin.push(hot.returnCodecMask.length);
+    hot.returnCount.push(pattern.returnCodecs.length);
+    hot.minimumArity.push(minimumArity);
+    hot.maximumArity.push(variadic ? 0xff : pattern.parameterCodecs.length);
+    hot.traitMask.push(traitMask(pattern.traits, pattern.id));
+    hot.parameterCodecUnion.push(parameterMasks.reduce((mask, value) => mask | value, 0));
+    hot.returnCodecUnion.push(returnMasks.reduce((mask, value) => mask | value, 0));
+    hot.parameterCodecMask.push(...parameterMasks);
+    hot.parameterFlags.push(
+      ...pattern.parameterCodecs.map(
+        (parameter) =>
+          (parameter.optional ? PARAMETER_FLAG_ENTRIES[0][2] : 0) |
+          (parameter.name === "..." ? PARAMETER_FLAG_ENTRIES[1][2] : 0),
+      ),
+    );
+    hot.returnCodecMask.push(...returnMasks);
+
+    cold.stableKeys.push(pattern.id);
+    cold.rawNames.push(pattern.rawName);
+    cold.jsNames.push(functionEntry.jsName);
+    cold.members.push(functionEntry.member);
+    cold.sourceFileIndex.push(sourceFiles.index.get(pattern.source));
+    cold.sourceLines.push(pattern.line);
+    cold.modulePathIndex.push(modulePaths.index.get(functionEntry.modulePath.join(".")));
+  }
+
+  assert(hot.parameterCodecMask.length <= 0xffff, "Parameter codec table exceeds uint16_t offsets");
+  assert(hot.returnCodecMask.length <= 0xffff, "Return codec table exceeds uint16_t offsets");
+  assert(Math.max(...cold.sourceLines) <= 0xffff, "Source line exceeds uint16_t capacity");
+
+  const semanticHashes = semanticInputHashes(pending, classified);
+  const descriptorPayload = {
+    defoldRevision: ir.defoldRevision,
+    idPolicy: "persistent collision-checked FNV-1a stable IDs plus dense zero-based revision-scoped indices",
+    families: enumObject(FAMILY_ENTRIES),
+    codecs: enumObject(CODEC_ENTRIES),
+    traits: enumObject(TRAIT_ENTRIES),
+    parameterFlags: enumObject(PARAMETER_FLAG_ENTRIES),
+    hot,
+    cold,
+  };
+  const descriptorAbiSha256 = sha256(canonicalJson(descriptorPayload));
+  const artifact = {
+    schemaVersion: 1,
+    defoldRevision: ir.defoldRevision,
+    scope: "runtime-pending Defold script functions only",
+    coverageClaim: "descriptor generation only; no executable binding coverage is claimed",
+    idPolicy: {
+      stableIdentity: "cold.stableKeys[denseIndex]",
+      stableId: "32-bit FNV-1a of the canonical stable key; generation fails on collision",
+      denseIndex: "zero-based array index",
+      ordering: "ascending Unicode code-unit order of stable keys",
+      compatibility:
+        "stable IDs persist when unrelated rows are added; dense indices require an exact descriptor ABI fingerprint",
+    },
+    inputHashes: semanticHashes,
+    descriptorAbiSha256,
+    bindingCount: classified.length,
+    parameterSlotCount: hot.parameterCodecMask.length,
+    returnSlotCount: hot.returnCodecMask.length,
+    families: enumObject(FAMILY_ENTRIES),
+    codecs: enumObject(CODEC_ENTRIES),
+    traits: enumObject(TRAIT_ENTRIES),
+    parameterFlags: enumObject(PARAMETER_FLAG_ENTRIES),
+    hot,
+    cold,
+  };
+  return { artifact, header: renderScriptBindingDescriptorHeader(artifact) };
+}

@@ -20865,6 +20865,24 @@
       }
     ]
   },
+  "outputFacts": {
+    "browserBlockedCallbacks": [
+      {
+        "id": "script:socket.newtry",
+        "stableId": 407150266,
+        "browserCallback": {
+          "machineBlock": "blocked-higher-order-lua-closure"
+        }
+      },
+      {
+        "id": "script:socket.protect",
+        "stableId": 2218837340,
+        "browserCallback": {
+          "machineBlock": "blocked-higher-order-lua-closure"
+        }
+      }
+    ]
+  },
   "artifacts": [
     "defold/defold_hermes/include/defold_hermes/generated_script_universal_value_bindings.hpp",
     "defold/defold_hermes/src/generated_script_universal_value_bindings.cpp",

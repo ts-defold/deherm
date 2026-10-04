@@ -3,7 +3,11 @@ import { execFileSync, spawnSync } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-import { generateScriptBindingDescriptors } from "../scripts/generate-script-binding-descriptors.mjs";
+import { generateScriptBindingDescriptors } from "../packages/compiler/src/script-binding-descriptor-generator.mjs";
+import {
+  renderScriptBindingDescriptorHeader,
+  renderScriptBindingDescriptorJson,
+} from "../packages/compiler/src/script-binding-descriptor-output-emitter.mjs";
 
 const root = new URL("../", import.meta.url);
 const ir = JSON.parse(await readFile(new URL("packages/bindings/generated/defold-script-api-ir.json", root), "utf8"));
@@ -142,6 +146,11 @@ test("is invariant to input array order and exactly matches checked-in outputs",
   assert.equal(reordered.header, generated.header);
   assert.deepEqual(checked, generated.artifact);
   assert.equal(checkedHeader, generated.header);
+});
+
+test("package renderer reproduces authenticated descriptor report bytes", () => {
+  assert.equal(renderScriptBindingDescriptorJson(checked), checkedJsonText);
+  assert.equal(renderScriptBindingDescriptorHeader(checked), checkedHeader);
 });
 
 test("rejects stale or structurally dishonest pattern inputs", () => {

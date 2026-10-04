@@ -1,4 +1,5 @@
 export * from "./binding-identity.mjs";
+export { generateScriptBindingDescriptors } from "./script-binding-descriptor-generator.mjs";
 export * from "./component-proxy-generator.mjs";
 // The public compiler boundary is pure: callers supply policy/materialized
 // inputs. Repository path loading and the CLI runner remain available only via

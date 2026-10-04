@@ -77,6 +77,10 @@ export const POLICY_REALIZER_CAPABILITY_REGISTRY = Object.freeze({
   "output.script-handle-kinds.render.v1": Object.freeze({ introducedInVersion: "0.1.0" }),
   "output.script-handle-lowering-header.render.v1": Object.freeze({ introducedInVersion: "0.1.0" }),
   "output.script-handle-lowering-source.render.v1": Object.freeze({ introducedInVersion: "0.1.0" }),
+  "output.script-binding-descriptor.render.v1": Object.freeze({ introducedInVersion: "0.1.0" }),
+  "output.script-scalar.render.v1": Object.freeze({ introducedInVersion: "0.1.0" }),
+  "output.script-universal-value.render.v1": Object.freeze({ introducedInVersion: "0.1.0" }),
+  "output.script-value-binding.render.v1": Object.freeze({ introducedInVersion: "0.1.0" }),
   "output.stable-template.render.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   "binding.raw-unverified-fallback.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   [DMSDK_UNIVERSAL_STATIC_FRAME_CAPABILITY]: Object.freeze({
