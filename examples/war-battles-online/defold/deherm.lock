@@ -465,7 +465,7 @@
         "script-typed-native-bridge.ts": "9bb322f341469d6c5f3926f478325d34ac5f822051387ae3837964fade630916"
       }
     },
-    "cacheKey": "736465a2826d9f3a0e0b97986f1100caadc9bb9b162c12a1fcdbd820f27a2c91"
+    "cacheKey": "1e4ccc225398b516fdd0557f44dfe2165a9bdb5c3afe3dae99f1c244c92ad4b0"
   },
   "defoldResolution": {
     "schemaVersion": 1,
@@ -475,8 +475,8 @@
     "evidence": {
       "archive": ".internal/cache/arm64-osx/build.zip",
       "platform": "arm64-osx",
-      "size": 9188460,
-      "modifiedMs": 1790736304284
+      "size": 9252202,
+      "modifiedMs": 1791086531915
     }
   },
   "defoldSurface": {
@@ -484,9 +484,9 @@
   },
   "generationMerkle": {
     "schemaVersion": 1,
-    "engineRoot": "8f2ced75a0d3df8c24d8f45f3688f66fb21cfbdf05ca8453e4a4d4cb106f723f",
+    "engineRoot": "1cd672a19cf986a3920e0c4aedfcfd7fbdf720a55665bb666fdbc954c372d672",
     "nativeRoot": "ece4919f47d946e3499304d9a706fb626e97d7f85dfad41a07b2f3c76959725a",
-    "root": "c156d9775c10d94a1bd86d327238f583aa5eb7157c673f815b02fec7358abaf3"
+    "root": "6f09577c4926ba156453d26c55d30d06fc7fc596b8e17d15c0acf95b7e229357"
   },
   "inputs": {
     "valueLayoutsSha256": "a70876547c5c36d0dde6d6a3bf2e51c46dc0d00de6e46918eb01f82b149c7de3",
@@ -497,23 +497,23 @@
     "scriptPatternsSha256": "dfc33630937b6c1e5982c64f3e42262c5f637c210c5c4e0af429dd5efab29a5b",
     "dmsdkPatternsSha256": "f82185471cccd913c313c25f9c075c495daccab8cb5d1135e2ffd0ec73d47a17",
     "scriptProbesSha256": "36e34790845c807a81836e0d643a5b7221a0193a6372fe92b7e19bfd0f14251a",
-    "scriptAccountingSha256": "4ab919eb2a836749c5b9a48b43744805a5bbd71cf90a006bc620718d77f77b91",
-    "scriptUniversalSha256": "5ae6d00b697647b5235a8b7e1c666bfbe2240d1f1851c95caeefd29de4a7ae22",
-    "scriptProfilesSha256": "f969213930371b7a6fc31dd1b6b04723fea4d6edae768adbf8230bb26cacfd51",
-    "loweringPlanSha256": "866f88b307337b2a72cc215c2c556dfe05f3631ecd5e4e003e933ab61b5b8a5d",
-    "loweringPlanSentinelSha256": "fd32909a4309d268eb626bdcfaba38435ddb8f59605098979c1986ff8fe17d95",
+    "scriptAccountingSha256": "f1cc6a72a47ea5d5b24e76e832a3282dd5d75380c112fc4ce470d748634be3da",
+    "scriptUniversalSha256": "6ea7c1309a25fe0f59f608a930f4bcec29b02e64c21693ce913d485e624f17d9",
+    "scriptProfilesSha256": "62e0306d65e6cbf8d89c668987edef2beaf0c1a77e19637fb6369e2e7d5c7cfd",
+    "loweringPlanSha256": "3399b879b2645a9fd0c3155b576e4f8b0aeb35a20ec8d15374cd5e5f896f3e4b",
+    "loweringPlanSentinelSha256": "7ec6cfecb4a5d8425528f42dd9de580fac84905d22310059fa12f677274b5cd7",
     "dmsdkThunksSha256": "a8e78bb9c1b47a41066995aa8fe565698b9871045c865e7b6df69326093af788",
-    "dmsdkUniversalSha256": "5c9bdcc82c4c602f6ca68c2ad2ea1c7dd9611b4a07a9273e778b0ceb2a9b7efe",
+    "dmsdkUniversalSha256": "6ed767f12cd832b82c4293cd6aa5599edc98f9a4db12af171c725622c10a15c8",
     "resourceSchemaSha256": "8115043c9dc8626b254bca01ddbae853a1a4ebfec709d703eacee770ffc7c970",
     "resourceNamespacesSha256": "9893e932b1e41d3064e95c12812884b62456857c27e16274fba3671941e2b728",
     "toolchainSha256": "589ef36b86889b849de798c841ca64230c1729c64252ed040d8df272c2c549a9",
     "sdkSourceSha256": "316150439b8336184a0102044afe1b7fde86f605ea9f360626a9cc015308662f",
-    "repositorySourceSha256": "601109208140a5ce8b331b1a9a6d3648ae225d6b7003ef326ee4c5965cbaa877"
+    "repositorySourceSha256": "ebe353bb46c4150013aa313d9d7d3709c476e56799e4d1ef6d61ea0478103272"
   },
   "generatedOutputs": {
     "output": {
-      "script-contexts.json": "1ac7c220cf1997048db43399fc488b7b40a2ee1113519ec7638bdc17c35c8a49",
-      "generated/native-extensions/index.json": "c3390daf7088be49486e6806ea1c1d887f251523935672164274215fe46e729e",
+      "script-contexts.json": "bc7cbd5f10e21e4f10f36e7b5aa98deb0912480a848e85b7c8e75eaac874d330",
+      "generated/native-extensions/index.json": "c174805e08f8c9625b02c889632efc143f2ff1fc8ebbefe66ca45bbc8b4d333d",
       "sdk/contexts/shared.ts": "e0b43727cad1a334e6d175868002d3338ef2b2c2942884c7a3d754d4c888a928",
       "sdk/contexts/game-object.ts": "ca052dc88c29c0a88aaa168d3ea5eb62c0d00d00f86454f045ee03dd421d5d58",
       "sdk/contexts/gui.ts": "3f2d965cb4eb3f0d8625d7edcb92c8b552b2a68db74a80d78178c91723f262b1",
@@ -537,8 +537,8 @@
     "headerCount": 0,
     "generatedRouteCount": 0,
     "blockedRouteCount": 0,
-    "keyedOutput": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05/736465a2826d9f3a0e0b97986f1100caadc9bb9b162c12a1fcdbd820f27a2c91",
-    "treeSha256": "35237ef532356bae446e7ae5e1f5dd4ad175f39683e5eec482277403dd11b562"
+    "keyedOutput": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05/1e4ccc225398b516fdd0557f44dfe2165a9bdb5c3afe3dae99f1c244c92ad4b0",
+    "treeSha256": "7aa3b843ce2a900b9e9a71aa92522267ee33761530f4d494c5d8eb98016d7a81"
   },
   "engineProfiles": {
     "source": "defold-default",
@@ -618,13 +618,13 @@
           "syntheticInputCount": 1
         },
         "sources": {
-          "digest": "0d0c557c6bc1e05f9b196d791243972fcf84b76dbd591a3466034deed62e5c1b",
+          "digest": "339b83f4acdd07ba647c97070032d288c6c81302970e38283b6d054028b7d94c",
           "fileCount": 83,
           "files": {
             ".deherm/generated/components/registry.ts": "96fbe184ec66aae6b2db44abb80e811b88fa9e9f43359c14579222b4703bbeee",
             ".deherm/generated/dmsdk-call-symbol-index.json": "4115ce6b1d8a256f1a954047808e3601a53898679e24b0fc3300e770704cd99c",
             ".deherm/generated/resource-symbols.json": "9c31808360399e9f6a7a1445d8098bbb14e5ed60b2f57b7603de01ed42f13056",
-            ".deherm/generated/script-route-symbol-index.json": "aa774e9479763fc1cd4497cbf87e33d555a5a20a1694d5227b01c98b3e8679fd",
+            ".deherm/generated/script-route-symbol-index.json": "ef33d6a83750449d5b9556135edb8021cd72c9b61c3b1fcf1ff77bcf499a15d7",
             ".deherm/sdk/address.ts": "78595c555cfff5fd054010b275a071c8f37887711bdd7e7c215f2b4a8c80cfcc",
             ".deherm/sdk/component.ts": "6e9c6ad3c6d79e7ae1fe3f923951ec955be37fa38d5aeea989b2d9c0e3b36d12",
             ".deherm/sdk/contexts/game-object.ts": "ca052dc88c29c0a88aaa168d3ea5eb62c0d00d00f86454f045ee03dd421d5d58",

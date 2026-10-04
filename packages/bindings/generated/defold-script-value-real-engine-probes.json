@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "target": "arm64-macos-dynamic-hermes",
-  "inputSha256": "4583557fe21d3b05b6410b686f1d75a594cb55b00d8d9c21dfb9426fdfdf437f",
+  "inputSha256": "61e8cafd9017eb1a35c42d020f42343e53bc841e003034d3aa610ddeffb922d8",
   "expectedInputMarker": "INFO:DEFOLD_HERMES: script-value-probes:159d527aa0407886a9f2c2dc4a7eecc22ff6d07f85674adf734810e5c8b24e58",
   "instrumentedSemanticSha256": "3a2a975bd72d21bc234ab703322222ffb62c2e9fd9f2a3917d68c89925781e27",
   "coverageClaim": "All 78 generated native value bindings have a deterministic packaged-engine probe disposition for dynamic Hermes on arm64 macOS; 39 family routes are planned-only and are neither emitted nor claimed as observed.",

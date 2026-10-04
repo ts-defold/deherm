@@ -137,7 +137,55 @@ void* currentInstance(lua_State* state) {
   GetInstance(state); void* result = lua_touserdata(state, -1); lua_pop(state, 1); return result;
 }
 
-std::string expectedSpec(uint32_t shapeIndex, uint32_t seed);
+std::string expectedSpec(uint32_t shapeIndex, uint32_t seed,
+    const defold_hermes::universal_value::ResultShapeNode* resultShape = nullptr,
+    bool nested = false);
+const defold_hermes::universal_value::ResultShapeNode* recordingShapeChild(
+    const defold_hermes::universal_value::ResultShapeNode* shape, uint32_t child) {
+  using namespace defold_hermes::universal_value;
+  if (!shape || child >= shape->childCount) return nullptr;
+  const auto* edges = resultShapeEdges();
+  return resultShapes() + edges[shape->firstChild + child].child;
+}
+const defold_hermes::universal_value::ResultShapeNode* recordingShapeFor(
+    const defold_hermes::universal_value::ResultShapeNode* shape, uint32_t shapeIndex) {
+  using namespace defold_hermes::universal_value;
+  if (!shape) return nullptr;
+  const auto& recording = kDehermRecordingShapes[shapeIndex];
+  if (shape->kind == ResultShapeKind::kOptional) return recordingShapeFor(recordingShapeChild(shape, 0), shapeIndex);
+  if (shape->kind == ResultShapeKind::kUnion) {
+    const ResultShapeKind expected = recording.code == DEHERM_RECORDING_SHAPE_HANDLE ||
+        recording.code == DEHERM_RECORDING_SHAPE_GUI_NODE ? ResultShapeKind::kHandle :
+        recording.code == DEHERM_RECORDING_SHAPE_SEQUENCE ? ResultShapeKind::kSequence :
+        recording.code == DEHERM_RECORDING_SHAPE_RECORD ? ResultShapeKind::kRecord :
+        recording.code == DEHERM_RECORDING_SHAPE_MAP ? ResultShapeKind::kMap : ResultShapeKind::kOpaque;
+    for (uint32_t index = 0; index < shape->childCount; ++index) {
+      const auto* child = recordingShapeChild(shape, index);
+      if (child && child->kind == expected) return recordingShapeFor(child, shapeIndex);
+    }
+    return nullptr;
+  }
+  const ResultShapeKind expected = recording.code == DEHERM_RECORDING_SHAPE_HANDLE ||
+      recording.code == DEHERM_RECORDING_SHAPE_GUI_NODE ? ResultShapeKind::kHandle :
+      recording.code == DEHERM_RECORDING_SHAPE_SEQUENCE ? ResultShapeKind::kSequence :
+      recording.code == DEHERM_RECORDING_SHAPE_RECORD ? ResultShapeKind::kRecord :
+      recording.code == DEHERM_RECORDING_SHAPE_MAP ? ResultShapeKind::kMap : ResultShapeKind::kOpaque;
+  if (shape->kind != expected && shape->childCount == 1) {
+    return recordingShapeFor(recordingShapeChild(shape, 0), shapeIndex);
+  }
+  return shape;
+}
+const defold_hermes::universal_value::ResultShapeNode* recordingShapeField(
+    const defold_hermes::universal_value::ResultShapeNode* shape, const char* name) {
+  using namespace defold_hermes::universal_value;
+  if (!shape || shape->kind != ResultShapeKind::kRecord || !name) return nullptr;
+  const auto* edges = resultShapeEdges();
+  for (uint32_t index = 0; index < shape->childCount; ++index) {
+    const auto& edge = edges[shape->firstChild + index];
+    if (edge.key && std::strcmp(edge.key, name) == 0) return resultShapes() + edge.child;
+  }
+  return nullptr;
+}
 std::string luaSpec(lua_State* state, int index, uint32_t shapeIndex, uint32_t seed) {
   const auto& shape = kDehermRecordingShapes[shapeIndex];
   std::string out;
@@ -231,7 +279,9 @@ std::string luaSpec(lua_State* state, int index, uint32_t shapeIndex, uint32_t s
   }
 }
 
-std::string expectedSpec(uint32_t shapeIndex, uint32_t seed) {
+std::string expectedSpec(uint32_t shapeIndex, uint32_t seed,
+    const defold_hermes::universal_value::ResultShapeNode* resultShape,
+    bool nested) {
   const auto& shape = kDehermRecordingShapes[shapeIndex]; std::string out;
   switch (shape.code) {
     case DEHERM_RECORDING_SHAPE_UNDEFINED: return "null";
@@ -242,16 +292,27 @@ std::string expectedSpec(uint32_t shapeIndex, uint32_t seed) {
     case DEHERM_RECORDING_SHAPE_HASH: out = "hash:"; appendU64(u64Sentinel(seed), out); return out;
     case DEHERM_RECORDING_SHAPE_URL: out = "url:"; for (uint32_t lane=0;lane<4;++lane){if(lane)out+=",";appendU64(u64Sentinel(seed+lane),out);} return out;
     case DEHERM_RECORDING_SHAPE_HANDLE:
-    case DEHERM_RECORDING_SHAPE_GUI_NODE: return std::string("h:") + kDehermRecordingSemanticHandleNames[shape.aux];
+    case DEHERM_RECORDING_SHAPE_GUI_NODE: {
+      const auto* selected = resultShape ? recordingShapeFor(resultShape, shapeIndex) : nullptr;
+      if (selected && selected->kind == defold_hermes::universal_value::ResultShapeKind::kHandle) {
+        if (selected->semanticKind == 0) return "h:lua-userdata";
+        return std::string("h:") + kDehermRecordingSemanticHandleNames[shape.aux];
+      }
+      if (!nested && resultShape && kDehermRecordingRoutes[gActiveRoute].luaResultHandleCodec == 1) {
+        return "h:lua-userdata";
+      }
+      if (nested && resultShape) return "h:lua-userdata";
+      return std::string("h:") + kDehermRecordingSemanticHandleNames[shape.aux];
+    }
     case DEHERM_RECORDING_SHAPE_USERDATA: return "h:lua-userdata";
     case DEHERM_RECORDING_SHAPE_VECTOR3: out="dv:v3:"; for(uint32_t i=0;i<3;++i){if(i)out+=",";out+=std::to_string(seed+i);} return out;
     case DEHERM_RECORDING_SHAPE_VECTOR4: out="dv:v4:"; for(uint32_t i=0;i<4;++i){if(i)out+=",";out+=std::to_string(seed+i);} return out;
     case DEHERM_RECORDING_SHAPE_QUATERNION: out="dv:quat:"; for(uint32_t i=0;i<4;++i){if(i)out+=",";out+=std::to_string(seed+i);} return out;
     case DEHERM_RECORDING_SHAPE_MATRIX4: out="dv:mat4:"; for(uint32_t i=0;i<16;++i){if(i)out+=",";out+=std::to_string(seed+i);} return out;
     case DEHERM_RECORDING_SHAPE_CALLBACK: return "cb";
-    case DEHERM_RECORDING_SHAPE_SEQUENCE: out="seq("; if(shape.childCount)out+=expectedSpec(kDehermRecordingShapeRefs[shape.childFirst],childSentinel(seed,0)); return out+")";
-    case DEHERM_RECORDING_SHAPE_RECORD: out="rec("; for(uint32_t i=0;i<shape.childCount;++i){if(i)out+=",";const uint32_t c=kDehermRecordingShapeRefs[shape.childFirst+i];out+=textOf(kDehermRecordingShapes[c].key);out+="=";out+=expectedSpec(c,childSentinel(seed,i));} return out+")";
-    case DEHERM_RECORDING_SHAPE_MAP: return "map("+expectedSpec(kDehermRecordingShapeRefs[shape.childFirst],childSentinel(seed,0))+"=>"+expectedSpec(kDehermRecordingShapeRefs[shape.childFirst+1],childSentinel(seed,1))+")";
+    case DEHERM_RECORDING_SHAPE_SEQUENCE: { out="seq("; const uint32_t c=shape.childCount?kDehermRecordingShapeRefs[shape.childFirst]:0; if(shape.childCount)out+=expectedSpec(c,childSentinel(seed,0),recordingShapeChild(recordingShapeFor(resultShape,shapeIndex),0),true); return out+")"; }
+    case DEHERM_RECORDING_SHAPE_RECORD: { out="rec("; const auto* selected=recordingShapeFor(resultShape,shapeIndex); for(uint32_t i=0;i<shape.childCount;++i){if(i)out+=",";const uint32_t c=kDehermRecordingShapeRefs[shape.childFirst+i];const char* key=textOf(kDehermRecordingShapes[c].key);out+=key;out+="=";out+=expectedSpec(c,childSentinel(seed,i),recordingShapeField(selected,key),true);} return out+")"; }
+    case DEHERM_RECORDING_SHAPE_MAP: { const auto* selected=recordingShapeFor(resultShape,shapeIndex); return "map("+expectedSpec(kDehermRecordingShapeRefs[shape.childFirst],childSentinel(seed,0),recordingShapeChild(selected,0),true)+"=>"+expectedSpec(kDehermRecordingShapeRefs[shape.childFirst+1],childSentinel(seed,1),recordingShapeChild(selected,1),true)+")"; }
     default: return "unsupported";
   }
 }
@@ -309,6 +370,10 @@ void ensureModule(lua_State* state, const char* path) {
   while(dot){segment=dot+1;dot=std::strchr(segment,'.');const size_t n=dot?static_cast<size_t>(dot-segment):std::strlen(segment);name.assign(segment,n);lua_getfield(state,-1,name.c_str());if(!lua_istable(state,-1)){lua_pop(state,1);lua_newtable(state);lua_pushvalue(state,-1);lua_setfield(state,-3,name.c_str());}lua_remove(state,-2);}
 }
 void installProviders(lua_State* state) {
+  // The recording fixture implements these Defold POD carriers directly;
+  // install their pinned Lua type names before fake providers return them.
+  luaL_newmetatable(state, "vector3"); lua_pop(state, 1);
+  luaL_newmetatable(state, "matrix4"); lua_pop(state, 1);
   for(uint32_t route=0;route<DEHERM_RECORDING_ROUTE_COUNT;++route){
     const auto* operation=defold_hermes::universal_value::find(kDehermRecordingRoutes[route].stableId);
     expect(operation!=nullptr,"missing-universal-operation",route,"stable id not found");
@@ -380,7 +445,9 @@ ScriptValue buildValue(scalar::ScriptAdapter& adapter,lua_State* state,CallStora
   }return out;
 }
 
-std::string scriptSpec(const ScriptValue& value,uint32_t shapeIndex,uint32_t seed,bool nested=false){
+std::string scriptSpec(const ScriptValue& value,uint32_t shapeIndex,uint32_t seed,
+    const defold_hermes::universal_value::ResultShapeNode* resultShape=nullptr,
+    bool nested=false){
   const auto& shape=kDehermRecordingShapes[shapeIndex];std::string out;
   switch(shape.code){
     case DEHERM_RECORDING_SHAPE_UNDEFINED:return value.tag==ScriptValueTag::kUndefined?"undef":"wrong";
@@ -391,7 +458,7 @@ std::string scriptSpec(const ScriptValue& value,uint32_t shapeIndex,uint32_t see
     case DEHERM_RECORDING_SHAPE_HASH:if(value.handleKind!=ScriptHandleKind::kHash)return"wrong";out="hash:";appendU64(value.payload,out);return out;
     case DEHERM_RECORDING_SHAPE_URL:{if(value.handleKind!=ScriptHandleKind::kUrl||!value.data)return"wrong";const auto* slot=static_cast<const ScriptUrlArena<>::Slot*>(value.data);out="url:";appendU64(slot->value.socket,out);out+=",";appendU64(slot->value.reserved,out);out+=",";appendU64(slot->value.path,out);out+=",";appendU64(slot->value.fragment,out);return out;}
     case DEHERM_RECORDING_SHAPE_HANDLE:
-    case DEHERM_RECORDING_SHAPE_GUI_NODE:{const uint8_t codec=nested?1:kDehermRecordingRoutes[gActiveRoute].luaResultHandleCodec;const auto expected=codec==1?ScriptHandleKind::kLuaUserdata:codec==2?ScriptHandleKind::kGuiNode:ScriptHandleKind::kLuaSemanticHandle;return value.tag==ScriptValueTag::kHandle&&value.handleKind==expected?std::string("h:")+kDehermRecordingSemanticHandleNames[shape.aux]:"wrong";}
+    case DEHERM_RECORDING_SHAPE_GUI_NODE:{const auto* selected=recordingShapeFor(resultShape,shapeIndex);const bool metadataHandle=selected&&selected->kind==defold_hermes::universal_value::ResultShapeKind::kHandle;const bool semantic=metadataHandle&&selected->semanticKind!=0;const uint8_t codec=metadataHandle?(semantic?3:1):nested?1:kDehermRecordingRoutes[gActiveRoute].luaResultHandleCodec;const auto expected=codec==1?ScriptHandleKind::kLuaUserdata:codec==2?ScriptHandleKind::kGuiNode:ScriptHandleKind::kLuaSemanticHandle;if(value.tag!=ScriptValueTag::kHandle)return"wrong:tag";if(value.handleKind!=expected)return"wrong:handlekind="+std::to_string(static_cast<uint8_t>(value.handleKind));return codec==1?"h:lua-userdata":std::string("h:")+kDehermRecordingSemanticHandleNames[shape.aux];}
     case DEHERM_RECORDING_SHAPE_USERDATA:return value.tag==ScriptValueTag::kHandle&&value.handleKind==ScriptHandleKind::kLuaUserdata?"h:lua-userdata":"wrong";
     case DEHERM_RECORDING_SHAPE_VECTOR3:
     case DEHERM_RECORDING_SHAPE_VECTOR4:
@@ -400,7 +467,7 @@ std::string scriptSpec(const ScriptValue& value,uint32_t shapeIndex,uint32_t see
     case DEHERM_RECORDING_SHAPE_CALLBACK:return value.tag==ScriptValueTag::kCallback?"cb":"wrong";
     case DEHERM_RECORDING_SHAPE_SEQUENCE:
     case DEHERM_RECORDING_SHAPE_RECORD:
-    case DEHERM_RECORDING_SHAPE_MAP:{if(value.tag!=ScriptValueTag::kTable)return"wrong";const auto* entries=static_cast<const ScriptTableEntry*>(value.data);if(shape.code==DEHERM_RECORDING_SHAPE_SEQUENCE){out="seq(";if(shape.childCount&&value.length)out+=scriptSpec(entries[0].value,kDehermRecordingShapeRefs[shape.childFirst],childSentinel(seed,0),true);return out+")";}if(shape.code==DEHERM_RECORDING_SHAPE_RECORD){out="rec(";for(uint32_t i=0;i<shape.childCount;++i){if(i)out+=",";const uint32_t c=kDehermRecordingShapeRefs[shape.childFirst+i];const char* key=textOf(kDehermRecordingShapes[c].key);out+=key;out+="=";const ScriptValue* field=nullptr;for(uint32_t j=0;j<value.length;++j)if(entries[j].key.tag==ScriptValueTag::kString&&entries[j].key.length==std::strlen(key)&&std::memcmp(entries[j].key.data,key,entries[j].key.length)==0){field=&entries[j].value;break;}out+=field?scriptSpec(*field,c,childSentinel(seed,i),true):"missing";}return out+")";}return"map("+scriptSpec(entries[0].key,kDehermRecordingShapeRefs[shape.childFirst],childSentinel(seed,0),true)+"=>"+scriptSpec(entries[0].value,kDehermRecordingShapeRefs[shape.childFirst+1],childSentinel(seed,1),true)+")";}
+    case DEHERM_RECORDING_SHAPE_MAP:{if(value.tag!=ScriptValueTag::kTable)return"wrong";const auto* entries=static_cast<const ScriptTableEntry*>(value.data);const auto* selected=recordingShapeFor(resultShape,shapeIndex);if(shape.code==DEHERM_RECORDING_SHAPE_SEQUENCE){out="seq(";if(shape.childCount&&value.length){const uint32_t child=kDehermRecordingShapeRefs[shape.childFirst];out+=scriptSpec(entries[0].value,child,childSentinel(seed,0),recordingShapeChild(selected,0),true);}return out+")";}if(shape.code==DEHERM_RECORDING_SHAPE_RECORD){out="rec(";for(uint32_t i=0;i<shape.childCount;++i){if(i)out+=",";const uint32_t c=kDehermRecordingShapeRefs[shape.childFirst+i];const char* key=textOf(kDehermRecordingShapes[c].key);out+=key;out+="=";const ScriptValue* field=nullptr;for(uint32_t j=0;j<value.length;++j)if(entries[j].key.tag==ScriptValueTag::kString&&entries[j].key.length==std::strlen(key)&&std::memcmp(entries[j].key.data,key,entries[j].key.length)==0){field=&entries[j].value;break;}out+=field?scriptSpec(*field,c,childSentinel(seed,i),recordingShapeField(selected,key),true):"missing";}return out+")";}return"map("+scriptSpec(entries[0].key,kDehermRecordingShapeRefs[shape.childFirst],childSentinel(seed,0),recordingShapeChild(selected,0),true)+"=>"+scriptSpec(entries[0].value,kDehermRecordingShapeRefs[shape.childFirst+1],childSentinel(seed,1),recordingShapeChild(selected,1),true)+")";}
     default:return"unsupported";
   }
 }
@@ -437,7 +504,7 @@ int main(){
     const bool ok=api.dispatch(api.context,&frame);
     if(pushed){adapter.popComponentContext();}
     expect(ok,"adapter-dispatch",route,api.lastError(api.context));expect(gFailure.code[0]=='\0',gFailure.code,route,gFailure.detail.c_str());const auto* universalOperation=defold_hermes::universal_value::find(descriptor.stableId);expect(universalOperation!=nullptr,"missing-universal-operation",route,"");if(!universalOperation->constant)expect(gCalls[route]==1,"provider-call-count",route,"");expect(lua_gettop(state)==before,"lua-stack-not-restored",route,"");expect(currentInstance(state)==gPreviousInstance,"instance-not-restored",route,"");expect(frame.resultCount==descriptor.resultCount,"result-count-mismatch",route,"");
-    for(uint32_t i=0;i<frame.resultCount;++i){const uint32_t shape=kDehermRecordingShapeRefs[descriptor.resultFirst+i];const auto* tailRoute=defold_hermes::value_tail::find(descriptor.stableId);const bool domainResult=i==0&&tailRoute&&defold_hermes::value_tail::resultDomainCounts()[tailRoute->index];if(domainResult){const double expected=defold_hermes::value_tail::resultDomainValues()[defold_hermes::value_tail::resultDomainOffsets()[tailRoute->index]];expect(frame.results[i].tag==ScriptValueTag::kNumber&&frame.results[i].number==expected,"result-domain-value-mismatch",route,"");continue;}const std::string actual=scriptSpec(frame.results[i],shape,257+i);const std::string expected=expectedSpec(shape,257+i);expect(actual==expected,"result-value-mismatch",route,(actual+" != "+expected).c_str());}
+    for(uint32_t i=0;i<frame.resultCount;++i){const uint32_t shape=kDehermRecordingShapeRefs[descriptor.resultFirst+i];const auto* tailRoute=defold_hermes::value_tail::find(descriptor.stableId);const bool domainResult=i==0&&tailRoute&&defold_hermes::value_tail::resultDomainCounts()[tailRoute->index];if(domainResult){const double expected=defold_hermes::value_tail::resultDomainValues()[defold_hermes::value_tail::resultDomainOffsets()[tailRoute->index]];expect(frame.results[i].tag==ScriptValueTag::kNumber&&frame.results[i].number==expected,"result-domain-value-mismatch",route,"");continue;}const auto* resultRoot=universalOperation?defold_hermes::universal_value::resultShapes()+universalOperation->resultShapeRoot:nullptr;const auto* resultShape=resultRoot&&resultRoot->kind==defold_hermes::universal_value::ResultShapeKind::kTuple?recordingShapeChild(resultRoot,i):resultRoot;const std::string actual=scriptSpec(frame.results[i],shape,257+i,resultShape);const std::string expected=expectedSpec(shape,257+i,resultShape);expect(actual==expected,"result-value-mismatch",route,(actual+" != "+expected).c_str());}
   }
   expect(exercised==DEHERM_RECORDING_LUA_EXACT_COUNT&&skipped==DEHERM_RECORDING_LUA_SKIP_COUNT,"generated-partition-drift",0,"");
   // A fresh adapter must reject a missing exact member and restore the stack.

@@ -522,6 +522,7 @@ add_library(defold-hermes-lua-bridge STATIC
   defold/defold_hermes/src/scalar_lua_dispatch.cpp
   defold/defold_hermes/src/lua_value_registry.cpp
   defold/defold_hermes/src/script_scalar_lua_adapter.cpp
+  defold/defold_hermes/src/value_tail_lua_trampoline.c
   upstream/defold/engine/dlib/src/dlib/array.cpp
   upstream/defold/engine/dlib/src/dlib/dalloca.cpp
   upstream/defold/engine/dlib/src/dlib/hash.cpp

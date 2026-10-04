@@ -8,6 +8,10 @@ import {
   generateScriptDefoldValueTail,
   loadScriptDefoldValueTailInputs,
 } from "../scripts/generate-script-defold-value-tail.mjs";
+import {
+  contextCapability,
+  parseCanonicalLuaRegistrationSurface,
+} from "../scripts/lib/defold-lua-structural-capabilities.mjs";
 import { stableBindingId } from "../scripts/lib/binding-identity.mjs";
 
 const root = new URL("../", import.meta.url);
@@ -41,10 +45,13 @@ test("value-tail generator covers the exact remaining Defold-value accounting ta
     report.bindings
       .filter(({ disposition }) => disposition === "candidate")
       .every(
-        ({ backend, callShapes, sourceAnchor, requiredContext }) =>
+        ({ backend, callShapes, sourceCapabilities, requiredContext }) =>
           backend === "captured-lua-exact-call" &&
           callShapes.length > 0 &&
-          sourceAnchor.length > 0 &&
+          sourceCapabilities.registration.registrationArray !== undefined &&
+          sourceCapabilities.codecs.inputs.length >= 0 &&
+          sourceCapabilities.codecs.result.sourceResultCount >= 0 &&
+          sourceCapabilities.context.evidence.length > 0 &&
           ["script-instance", "gui-script-instance", "render-script-instance"].includes(requiredContext),
       ),
     true,
@@ -101,29 +108,39 @@ test("value-tail generator covers the exact remaining Defold-value accounting ta
     ["Number"],
     ["Nil"],
   ]);
+  const groupName = report.bindings.find(({ id }) => id === "script:sound.get_group_name");
+  assert.deepEqual(groupName.callShapes, [["Hash"]], "canonical source codecs constrain documented unions");
+  assert.equal(groupName.sourceCapabilities.registration.registrationArray, "SOUND_FUNCTIONS");
 });
 
 test("value-tail candidate dispatch is generated as fail-closed metadata", async () => {
-  const [header, source, target] = await Promise.all([
+  const [header, source, target, adapter] = await Promise.all([
     readFile(
       new URL("defold/defold_hermes/include/defold_hermes/generated_script_value_tail_bindings.hpp", root),
       "utf8",
     ),
     readFile(new URL("defold/defold_hermes/src/generated_script_value_tail_bindings.cpp", root), "utf8"),
     readFile(new URL("packages/sdk/src/generated/script/value-tail-target-support.ts", root), "utf8"),
+    readFile(new URL("defold/defold_hermes/src/script_scalar_lua_adapter.cpp", root), "utf8"),
   ]);
   assert.match(header, /kRouteCount = 26/);
   assert.match(header, /kCandidateCount = 26/);
   assert.match(header, /kBytes/);
   assert.match(header, /candidateRouteOffsets/);
   assert.match(source, /captured Lua backend is unavailable/);
-  assert.match(source, /arguments do not match a reviewed exact codec shape/);
+  assert.match(source, /if \(!validShape\(\*route, \*frame\)\) return DispatchStatus::kMissing;/);
+  assert.match(source, /argument storage is null.*DispatchStatus::kError/);
   assert.match(source, /Lua result does not match the reviewed codec/);
   assert.match(source, /kResultDomainValues/);
   assert.doesNotMatch(source, /image-type-union-codec|named-enum-domain-codec/);
   assert.match(source, /candidateIndex >= kCandidateCount/);
   assert.match(source, /candidate shape offsets drifted/);
   assert.match(source, /shape argument offsets drifted/);
+  assert.match(
+    adapter,
+    /value_tail::dispatch\([\s\S]*?if \(valueTailStatus == value_tail::DispatchStatus::kError\) return false;/,
+  );
+  assert.match(adapter, /universal_value::dispatch\(/);
   assert.doesNotMatch(source, /lua_newuserdata|luaL_ref|\bnew\b|malloc|std::vector/);
   assert.match(target, /script:gui\.set_texture_data/);
   assert.match(target, /"accountingDisposition": "universal-fallback-test-fixture-adapter-only"/);
@@ -151,6 +168,37 @@ test("value-tail generation reports stale source evidence and rejects incomplete
   assert.throws(
     () => generateScriptDefoldValueTail({ ...inputs, policyText: JSON.stringify(unsupportedContext) }),
     /invalid or missing value-tail execution context/,
+  );
+});
+
+test("value-tail capabilities ignore registration formatting and withdraw when required context disappears", async () => {
+  const inputs = await loadScriptDefoldValueTailInputs();
+  const surface = parseCanonicalLuaRegistrationSurface(inputs.registrationSurfaceText);
+  const guiPath = "engine/gui/src/gui_script.cpp";
+  const originalText = inputs.sourceTexts.get(guiPath);
+  const route = surface.routes.get("gui.get_layout");
+  assert.equal(route.cFunction, "LuaGetLayout");
+
+  const sourceTexts = new Map(inputs.sourceTexts);
+  sourceTexts.set(
+    guiPath,
+    originalText.replace('{"get_layout",        LuaGetLayout}', '{  "get_layout" , LuaGetLayout  }'),
+  );
+  const original = generateScriptDefoldValueTail(inputs).report.bindings.find(
+    ({ id }) => id === "script:gui.get_layout",
+  );
+  const preserved = generateScriptDefoldValueTail({ ...inputs, sourceTexts }).report.bindings.find(
+    ({ id }) => id === "script:gui.get_layout",
+  );
+  assert.deepEqual(preserved.sourceCapabilities, original.sourceCapabilities);
+
+  const missingContext = originalText.replaceAll("GuiScriptInstance_Check(L)", "GuiInstanceCheckRemoved(L)");
+  assert.equal(contextCapability(missingContext, route.cFunction, "gui-script-instance"), null);
+  assert.equal(contextCapability(originalText, route.cFunction, "gui-script-instance").kind, "gui-script-instance");
+  assert.equal(
+    surface.routes.has("gui.get_layout"),
+    true,
+    "context evidence withdrawal does not withdraw registration",
   );
 });
 

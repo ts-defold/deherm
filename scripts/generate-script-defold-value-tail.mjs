@@ -5,6 +5,11 @@ import { readFile, writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 
 import { stableBindingId } from "./lib/binding-identity.mjs";
+import {
+  contextCapability,
+  parseCanonicalLuaRegistrationSurface,
+  registeredRouteCapability,
+} from "./lib/defold-lua-structural-capabilities.mjs";
 import { declaredDerivation, expectReviewedCount, observeReviewedSource } from "./lib/reviewed-revision.mjs";
 import { VOID, recordAudit } from "./lib/revision-audit.mjs";
 
@@ -19,6 +24,7 @@ const paths = {
   header: new URL("defold/defold_hermes/include/defold_hermes/generated_script_value_tail_bindings.hpp", root),
   source: new URL("defold/defold_hermes/src/generated_script_value_tail_bindings.cpp", root),
   target: new URL("packages/sdk/src/generated/script/value-tail-target-support.ts", root),
+  registrationSurface: new URL("packages/bindings/generated/defold-lua-registration-surface.json", root),
 };
 
 const CODECS = new Map([
@@ -169,22 +175,48 @@ function resultCodec(fn) {
   assert(fn.returns.length <= 1, `${fn.id}: tail candidate has multiple results`);
   return fn.returns.length === 0 ? "None" : codecForType(fn.returns[0], fn.id);
 }
-function tableRegistration(source, member) {
-  const match = source.match(new RegExp(`\\{\\s*"${member}"\\s*,\\s*([A-Za-z_][A-Za-z0-9_:]*)\\s*\\}`));
-  return match && { symbol: match[1], anchor: match[0] };
+function canonicalCodecs(fn, route, sourceText, symbol) {
+  assert(route, `${fn.id}: route is absent from the canonical Lua registration surface`);
+  const sourceParameters = route.parameters ?? [];
+  assert(sourceParameters.length === fn.parameters.length, `${fn.id}: canonical Lua parameter count drifted`);
+  const inputs = fn.parameters.map(({ rawType }, index) => {
+    const expected = splitUnion(rawType)
+      .map((type) => codecForType(type, fn.id))
+      .toSorted(compare);
+    const actual = [...(sourceParameters[index]?.derived?.types ?? [])]
+      .map((type) => codecForType(type, fn.id))
+      .toSorted(compare);
+    const optionalNil = fn.parameters[index].optional ? ["Nil"] : [];
+    const codecs = [...new Set([...actual, ...optionalNil])].toSorted(compare);
+    return {
+      index: index + 1,
+      codecs,
+      documentedCodecs: expected,
+      stackEvidence: sourceParameters[index].derived.accessors,
+    };
+  });
+  const sourceResultCount =
+    route.results?.derived?.min === fn.returns.length && route.results?.derived?.max === fn.returns.length
+      ? route.results.derived.max
+      : fn.returns.length === 0 &&
+          new RegExp(
+            `\\b${symbol}\\s*\\([^)]*\\)[\\s\\S]*?DM_LUA_STACK_CHECK\\s*\\(\\s*L\\s*,\\s*0\\s*\\)[\\s\\S]*?return\\s+0\\s*;`,
+          ).test(sourceText)
+        ? 0
+        : null;
+  assert(sourceResultCount !== null, `${fn.id}: canonical Lua result count drifted`);
+  return {
+    inputs,
+    result: { codec: resultCodec(fn), sourceResultCount, canonicalSurfaceVerdict: route.results.verdict },
+  };
 }
-function globalRegistration(source, member) {
-  const expression = new RegExp(
-    `lua_pushcfunction\\(L,\\s*([A-Za-z_][A-Za-z0-9_]*)\\s*\\);\\s*lua_setglobal\\(L,\\s*"${member}"\\s*\\)`,
-    "m",
-  );
-  const match = source.match(expression);
-  return match && { symbol: match[1], anchor: match[0] };
-}
-function registration(source, member, kind) {
-  const value = kind === "lua-global" ? globalRegistration(source, member) : tableRegistration(source, member);
-  assert(value, `${member}: pinned ${kind ?? "lua-table"} registration is stale`);
-  return value;
+function canonicalCallShapes(fn, route) {
+  const allowed = (route.parameters ?? []).map(({ derived }) => {
+    const codecs = (derived?.types ?? []).map((type) => codecForType(type, fn.id));
+    if (derived?.optional) codecs.push("Nil");
+    return new Set(codecs);
+  });
+  return callShapes(fn).filter((shape) => shape.every((codec, index) => allowed[index]?.has(codec)));
 }
 
 function escapeRegExp(value) {
@@ -284,6 +316,10 @@ function renderRuntime(rows) {
     .replace(
       "  return frame.resultCount == 1 && frame.results && matches(route.resultCodec, frame.results[0]);",
       `  if (frame.resultCount != 1 || !frame.results || !matches(route.resultCodec, frame.results[0])) return false;\n  const uint8_t domainCount = kResultDomainCounts[route.index];\n  if (!domainCount) return true;\n  const double value = frame.results[0].number;\n  const uint16_t domainOffset = kResultDomainOffsets[route.index];\n  for (uint8_t index = 0; index < domainCount; ++index) {\n    if (value == static_cast<double>(kResultDomainValues[domainOffset + index])) return true;\n  }\n  return false;`,
+    )
+    .replace(
+      '  if ((frame->argumentCount && !frame->arguments) || !validShape(*route, *frame)) { fail(error, capacity, "Defold value-tail arguments do not match a reviewed exact codec shape"); return DispatchStatus::kError; }',
+      '  if (frame->argumentCount && !frame->arguments) { fail(error, capacity, "Defold value-tail argument storage is null"); return DispatchStatus::kError; }\n  if (!validShape(*route, *frame)) return DispatchStatus::kMissing;',
     );
   const sourceWithAccessors = sourceWithDomains
     .replace(
@@ -303,6 +339,7 @@ export function generateScriptDefoldValueTail(inputs) {
   const value = JSON.parse(inputs.valueText);
   const url = JSON.parse(inputs.urlText);
   const policy = JSON.parse(inputs.policyText);
+  const registrationSurface = parseCanonicalLuaRegistrationSurface(inputs.registrationSurfaceText);
   validateCrossInputProvenance(
     ir,
     patterns,
@@ -406,11 +443,31 @@ export function generateScriptDefoldValueTail(inputs) {
           accountingDisposition: family.accountingDisposition ?? "generated-family",
           requiredContext: family.requiredContext,
         };
+        const routeName =
+          fn.modulePath.length && fn.modulePath[0] !== "builtins" ? [...fn.modulePath, fn.member].join(".") : fn.member;
+        const registration = registeredRouteCapability(
+          registrationSurface,
+          routeName,
+          source.path.replace(/^engine\//, ""),
+        );
+        assert(registration, `${id}: positive Lua registration is absent from canonical registration surface`);
+        const surfaceRoute = registrationSurface.routes.get(routeName);
+        assert(
+          registration.cFunction === surfaceRoute.cFunction,
+          `${id}: canonical Lua registration symbol is inconsistent`,
+        );
+        const context = contextCapability(text, registration.cFunction, family.requiredContext);
+        assert(context, `${id}: canonical source does not prove ${family.requiredContext} context`);
+        const codecEvidence = canonicalCodecs(fn, surfaceRoute, text, registration.cFunction);
+        entry.sourceCapabilities = {
+          registration,
+          context,
+          codecs: codecEvidence,
+        };
         if (family.disposition === "candidate") {
-          const found = registration(text, fn.member, group.registration);
-          entry.sourceSymbol = found.symbol;
-          entry.sourceAnchor = found.anchor;
-          entry.callShapes = callShapes(fn);
+          entry.sourceSymbol = registration.cFunction;
+          entry.callShapes = canonicalCallShapes(fn, surfaceRoute);
+          assert(entry.callShapes.length > 0, `${id}: canonical Lua codecs prove no documented call shape`);
           entry.binaryParameters = applyBinaryParameters(fn, family, text, entry.callShapes);
           if (entry.binaryParameters.length === 0) delete entry.binaryParameters;
           entry.resultCodec = resultCodec(fn);
@@ -436,9 +493,7 @@ export function generateScriptDefoldValueTail(inputs) {
             typeof family.blocker === "string" && typeof family.detail === "string",
             `${id}: blocked route lacks a machine-readable blocker`,
           );
-          const found = registration(text, fn.member, group.registration);
-          entry.sourceSymbol = found.symbol;
-          entry.sourceAnchor = found.anchor;
+          entry.sourceSymbol = registration.cFunction;
           entry.callShapes = [];
           entry.resultCodec = "None";
           entry.blocker = family.blocker;
@@ -484,6 +539,7 @@ export function generateScriptDefoldValueTail(inputs) {
       bindingPatternsSha256: sha256(inputs.patternsText),
       valueBindingsSha256: sha256(inputs.valueText),
       urlBindingsSha256: sha256(inputs.urlText),
+      luaRegistrationSurfaceSha256: sha256(inputs.registrationSurfaceText),
       reviewedPolicySha256: sha256(inputs.policyText),
       defoldSources: policy.sources
         .map(({ path, sha256: hash }) => ({ path: `upstream/defold/${path}`, sha256: hash }))
@@ -503,12 +559,13 @@ export function generateScriptDefoldValueTail(inputs) {
 }
 
 export async function loadScriptDefoldValueTailInputs() {
-  const [irText, patternsText, valueText, urlText, policyText] = await Promise.all([
+  const [irText, patternsText, valueText, urlText, policyText, registrationSurfaceText] = await Promise.all([
     readFile(paths.ir, "utf8"),
     readFile(paths.patterns, "utf8"),
     readFile(paths.value, "utf8"),
     readFile(paths.url, "utf8"),
     readFile(paths.policy, "utf8"),
+    readFile(paths.registrationSurface, "utf8"),
   ]);
   const policy = JSON.parse(policyText);
   const sourceTexts = new Map(
@@ -516,7 +573,7 @@ export async function loadScriptDefoldValueTailInputs() {
       policy.sources.map(async ({ path }) => [path, await readFile(new URL(`upstream/defold/${path}`, root), "utf8")]),
     ),
   );
-  return { irText, patternsText, valueText, urlText, policyText, sourceTexts };
+  return { irText, patternsText, valueText, urlText, policyText, sourceTexts, registrationSurfaceText };
 }
 
 function renderTarget(report) {

@@ -567,6 +567,13 @@ failures are read from `build/<extender-platform>/log.txt`, so both JSON output
 and the TUI retain the compiler's actionable diagnostic instead of collapsing
 it to the Java process exit code.
 
+The installed soak reserves distinct engine-service and Remotery ports, so a
+developer's already-running game cannot satisfy or block the evidence run. The
+public dev command exposes the same controls as `--service-port` and
+`--remotery-port`. Repeat `--engine-config key=value` to pass an explicit Defold
+runtime precondition; War Battles uses `war_battles.demo=1` for the automated
+tour while normal play keeps that mode disabled.
+
 `deherm language-server --stdio --project <game.project>` is the installed,
 editor-neutral Defold semantic server. It consumes
 `.deherm/generated/resource-symbols.json` and contributes project resource

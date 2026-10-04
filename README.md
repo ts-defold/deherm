@@ -162,6 +162,7 @@ The CLI is the control plane:
 
 ```sh
 pnpm exec deherm dev              # TUI, watcher, compiler, launcher, HMR
+pnpm exec deherm dev --engine-config display.vsync=0  # repeat for Defold key=value overrides
 pnpm exec deherm debug            # Debug Adapter Protocol server
 pnpm exec deherm language-server  # Language Server Protocol server
 pnpm exec deherm profile cpu      # standard Hermes .cpuprofile

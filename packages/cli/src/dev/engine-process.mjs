@@ -138,6 +138,10 @@ export function createEngineController(options) {
     if (options.inspectorPort) {
       launchArguments.push(`--config=defold_hermes.inspector_port=${options.inspectorPort}`);
     }
+    if (options.remoteryPort) {
+      launchArguments.push(`--config=profiler.remotery_port=${options.remoteryPort}`);
+    }
+    for (const config of options.engineConfigs ?? []) launchArguments.push(`--config=${config}`);
     const next = spawn(resolved.executable, launchArguments, {
       cwd: resolved.runtimeRoot,
       env: { ...process.env, ...options.env },

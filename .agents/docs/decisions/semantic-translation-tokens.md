@@ -132,6 +132,28 @@ the public contract. Only positive revision evidence of transfer, retention,
 destruction, deferred completion, incompatible layout, or another violated
 pattern invariant withdraws that specialization.
 
+Structured-value Lua replay uses a separate positive capability join rather
+than private source-text anchors. The canonical Lua registration surface
+supplies the route name, C function, registration table, and source location;
+its source-derived stack facts constrain accepted argument codecs and result
+count. GUI and render instance checks are joined to the registered function
+body, so missing context evidence withdraws only that replay capability. In
+particular, `gui.get_node` is eligible for the structured `Node` recipe only
+when the source proves the active GUI scene, the canonical string/hash input
+codecs and one result, a full `NodeProxy` userdata allocation and field
+initialization, metatable installation, registered `NodeProxy` type identity,
+and checked userdata conversion. Raw Lua userdata is never the transported
+value; the recipe returns the owned generational Node handle. Registration,
+context, codec/result, and userdata/type evidence are independent reusable
+facts, not a citation to one spelling of a helper call or body fragment.
+
+Metamorphic checks preserve a recipe when irrelevant registration formatting
+or local variable names change, and withdraw the GUI Node specialization when
+the required metatable or context capability disappears. Such withdrawal does
+not remove the authoritative Lua route: the universal bridge remains the
+fallback. This keeps specialization admission relational to source capability
+rather than to a frozen route count or a private helper's current spelling.
+
 The integrated anti-regression contract is relational rather than a frozen
 route count. Source IDs and emitted IDs must be equal sets; every ID has exactly
 one preferred selection and one universal base recipe; every structurally

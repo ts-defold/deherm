@@ -145,12 +145,14 @@ and detail. GUI/render attachment here is test-fixture capability only. Product
 
 Result handles are also checked at the carrier boundary. Top-level semantic
 handles must be generation-checked semantic roots, specialized GUI-node results
-must use the GUI-node carrier, and handles nested inside universal tables must
-use the generic rooted Lua-userdata carrier that the current recursive decoder
-actually emits. The last case preserves lifetime but not the nested semantic
-brand; [issue #111](https://github.com/ts-defold/deherm/issues/111) tracks
-schema-aware nested handle decoding separately from this exact description of
-the current bridge.
+must use the GUI-node carrier, and semantic HANDLE/GUI_NODE shapes nested inside
+universal tables use the semantic-handle carrier only when that exact
+route/path is marked as a semantic `Handle` by canonical universal result-shape
+metadata. Opaque metadata paths and explicit USERDATA shapes remain generic
+rooted Lua-userdata carriers, even if the recording fixture's source shape has
+a semantic-looking label. The generated recording oracle checks those
+distinctions recursively; it does not weaken or coerce runtime output to make a
+route pass.
 
 Two formerly blocked value-tail codecs are now pinned to their concrete source
 contracts. `gui.set_texture_data` calls `luaL_checktype(L, 5, LUA_TSTRING)` and
@@ -174,15 +176,24 @@ constructs the counted-string slot as `DehermStaticBytes` while retaining the
 source Lua string shape. This is generated bridge/provider evidence, not a live
 Defold GUI-scene call.
 
-Every potentially allocating Lua operation in `ScriptAdapter` now occurs inside
-one `lua_cpcall` boundary. The callback performs argument staging, target lookup,
-the protected member call, result conversion, stack restoration, and instance
-restoration without depending on C++ destructors across a Lua longjmp. The Lua
-exact harness installs a controllable allocator, forces OOM while staging a
-unique 8 KiB string, and proves the call fails closed, preserves stack/current
-instance state, runs no skipped destructor, and permits the next call to
-succeed. This closes the evidence gaps formerly tracked by issues #110 and
-#112; the issue links remain historical provenance, not current blockers.
+Value-tail Lua work uses a C-only nested protection structure rather than
+relying on C++ destructor triviality. The outer `lua_cpcall` callback saves the
+previous current instance; an inner `lua_pcall` contains function binding,
+argument preparation, target invocation, and result copying. If Lua allocation
+longjmps during a value-tail string push, the inner call returns an error to the
+outer C callback, which restores the prior instance before control returns to
+the C++ adapter. The fixed native argument arrays are prepared before entering
+Lua and bounded by the generated maximum arity. An injected allocator test
+forces OOM on a unique 8 KiB value-tail string and checks fail-closed behavior,
+stack and instance restoration, and subsequent usability. `lua_checkstack`
+reserves stack slots but does not guarantee `lua_pushlstring` or userdata
+allocation succeeds. The public Defold `dmScript::PushHash` remains an explicit
+upstream trust boundary because preserving canonical hash userdata identity
+requires that API; pinned `PushHash`, `CreateLuaHashUserdata`, and
+`PushHashWeakTableKey` use only trivial scalar, pointer, and hash-table locals,
+though their internal C++ frames are not converted into C. This is host
+Lua failure-containment evidence, not allocation-free or packaged-engine
+evidence.
 
 # Findings
 

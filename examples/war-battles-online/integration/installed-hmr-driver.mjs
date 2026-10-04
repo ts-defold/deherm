@@ -6,6 +6,7 @@ import { access, mkdtemp, readFile, readdir, rm, symlink, unlink, writeFile } fr
 import { promisify } from "node:util";
 import path from "node:path";
 import { tmpdir } from "node:os";
+import { createServer } from "node:net";
 
 import { DEFAULT_LOCAL_DEV_BUILD_SERVER, localDevLaunchConfiguration } from "./dev-launch-config.mjs";
 import { HMR_STATE_API, validateHmrRuntimeHealth } from "./hmr-state-soak.mjs";
@@ -22,6 +23,23 @@ export function installedHmrLaunchConfiguration(environment = process.env) {
   // reuse an older authenticated surface for the same Defold revision after
   // the package's stable runtime ABI has advanced.
   return localDevLaunchConfiguration(environment);
+}
+
+async function freeLoopbackPort() {
+  return new Promise((resolvePort, rejectPort) => {
+    const server = createServer();
+    server.unref();
+    server.once("error", rejectPort);
+    server.listen(0, "127.0.0.1", () => {
+      const address = server.address();
+      if (address === null || typeof address === "string") {
+        server.close();
+        rejectPort(new Error("could not reserve a dynamic native HMR port"));
+        return;
+      }
+      server.close((error) => (error ? rejectPort(error) : resolvePort(address.port)));
+    });
+  });
 }
 
 export function dependencyLinkType(platform = process.platform) {
@@ -366,6 +384,7 @@ export async function createWarBattlesHmrDriver({ repositoryRoot, exampleRoot, i
 
   const ownsProcessGroup = process.platform !== "win32";
   const launchConfiguration = installedHmrLaunchConfiguration(process.env);
+  const [servicePort, remoteryPort] = await Promise.all([freeLoopbackPort(), freeLoopbackPort()]);
   const child = spawn(
     process.execPath,
     [
@@ -381,6 +400,12 @@ export async function createWarBattlesHmrDriver({ repositoryRoot, exampleRoot, i
       "--json",
       "--build-server",
       launchConfiguration.buildServer,
+      "--service-port",
+      String(servicePort),
+      "--remotery-port",
+      String(remoteryPort),
+      "--engine-config",
+      "war_battles.demo=1",
     ],
     {
       cwd: packageBoundary.packageRoot,
@@ -522,7 +547,16 @@ export async function createWarBattlesHmrDriver({ repositoryRoot, exampleRoot, i
   async function waitFor(predicate, label, waitTimeout = timeoutMs) {
     const deadline = Date.now() + waitTimeout;
     for (;;) {
-      if (Date.now() > deadline) throw new Error(`${label} timed out${stderr ? `; ${stderr.slice(-1_000)}` : ""}`);
+      if (Date.now() > deadline) {
+        const recentEvents = events
+          .slice(-12)
+          .map((event) => event?.message ?? event?.diagnostic ?? event?.type ?? "unknown event")
+          .join(" | ")
+          .slice(-2_000);
+        throw new Error(
+          `${label} timed out${stderr ? `; stderr=${stderr.slice(-1_000)}` : ""}${recentEvents ? `; events=${recentEvents}` : ""}`,
+        );
+      }
       const result = await predicate();
       if (result !== undefined && result !== false) return result;
       await new Promise((resolve) => setTimeout(resolve, 100));

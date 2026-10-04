@@ -5199,3 +5199,18 @@ objects hash that same canonical text; fetched policy objects and downloaded
 release artifacts retain raw-byte authentication at their consumer boundary.
 The recursive installer rewrite was removed because it was neither the
 authority nor an effective fix.
+
+## 2026-10-04 - Installed-package native HMR is isolated and explicit
+
+The War Battles HMR gate now runs through a freshly packed npm boundary with an
+authenticated publication-shaped policy cache, exact release-identified host
+compilers, and the package-bound native archive receipt. The first live runs
+found two environmental assumptions: a concurrently running game owned
+Remotery's default port, and normal War Battles play now intentionally disables
+the scripted evidence tour. `deherm dev` therefore accepts an explicit
+`--remotery-port` and repeatable `--engine-config key=value`; the gate reserves
+isolated engine-service and profiler ports and declares
+`war_battles.demo=1`. Six native HMR cycles then passed with 40 gameplay
+entities and 61 component instances, with seven telemetry samples and no
+component growth. This is installed Dynamic Hermes/native HMR evidence; it is
+not Static Hermes full-game execution evidence.

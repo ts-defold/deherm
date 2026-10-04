@@ -7,6 +7,10 @@ import test from "node:test";
 
 import { generate, loadGenerationInputs } from "../scripts/generate-script-value-bindings.mjs";
 import { generateScriptValueRealEngineProbes } from "../scripts/generate-script-value-real-engine-probes.mjs";
+import {
+  guiNodeUserdataCapability,
+  parseCanonicalLuaRegistrationSurface,
+} from "../scripts/lib/defold-lua-structural-capabilities.mjs";
 import { stableBindingId } from "../scripts/lib/binding-identity.mjs";
 
 const root = new URL("../", import.meta.url);
@@ -101,6 +105,19 @@ test("Defold value and handle bindings are deterministic structured descriptors"
     ["Node", "Node"],
     ["Node", "Node", "Boolean"],
   ]);
+  const guiNode = report.bindings.find(({ id }) => id === "script:gui.get_node");
+  assert.deepEqual(guiNode.structuralCapabilities.registration, {
+    route: "gui.get_node",
+    module: "gui",
+    cFunction: "LuaGetNode",
+    sourcePath: "gui/src/gui_script.cpp",
+    registrationArray: "Gui_methods",
+    registrationLine: 4986,
+  });
+  assert.equal(guiNode.structuralCapabilities.context.check, "GuiScriptInstance_Check");
+  assert.equal(guiNode.structuralCapabilities.userdata.kind, "full-userdata");
+  assert.equal(guiNode.structuralCapabilities.userdata.metatable, "NodeProxy");
+  assert.deepEqual(guiNode.structuralCapabilities.userdata.metamethods, ["__index", "__newindex", "__eq"]);
   assert.deepEqual(report.bindings.find(({ id }) => id === "script:gui.set_material").implementedCallShapes, [
     ["Node", "String"],
     ["Node", "Hash"],
@@ -197,6 +214,66 @@ test("Defold value and handle bindings are deterministic structured descriptors"
       ),
     true,
   );
+});
+
+test("GUI node structural capability preserves irrelevant body edits and withdraws on metatable loss", async () => {
+  const fixture = await loadGenerationInputs();
+  const guiInputIndex = fixture.inputs.findIndex((input) =>
+    JSON.parse(input.definitionText).bindings.some(({ id }) => id === "script:gui.get_node"),
+  );
+  assert.notEqual(guiInputIndex, -1);
+  const original = fixture.inputs[guiInputIndex];
+  const surface = parseCanonicalLuaRegistrationSurface(original.registrationSurfaceText);
+  const originalCapability = guiNodeUserdataCapability(surface, original.sourceText, {
+    returns: ["node"],
+  });
+  assert.ok(originalCapability);
+
+  const renamed = [...fixture.inputs];
+  renamed[guiInputIndex] = {
+    ...original,
+    sourceText: original.sourceText.replaceAll("node_proxy", "proxy"),
+  };
+  const preserved = JSON.parse(
+    generate(fixture.irText, fixture.scalarDispatchText, fixture.patternsText, renamed).report,
+  ).bindings.find(({ id }) => id === "script:gui.get_node");
+  assert.deepEqual(preserved.structuralCapabilities, originalCapability);
+
+  const withdrawn = [...fixture.inputs];
+  withdrawn[guiInputIndex] = {
+    ...original,
+    sourceText: original.sourceText.replace("lua_setmetatable(L, -2);", ""),
+  };
+  assert.equal(
+    guiNodeUserdataCapability(surface, withdrawn[guiInputIndex].sourceText, { returns: ["node"] }),
+    null,
+    "a full-userdata return without the registered type metatable is not a Node capability",
+  );
+  const previousRevision = process.env.DEHERM_DERIVED_REVISION;
+  const previousAudit = process.env.DEHERM_REVISION_AUDIT;
+  const auditDirectory = await mkdtemp(path.join(tmpdir(), "deherm-gui-node-capability-"));
+  process.env.DEHERM_DERIVED_REVISION = JSON.parse(fixture.irText).defoldRevision;
+  process.env.DEHERM_REVISION_AUDIT = path.join(auditDirectory, "audit.ndjson");
+  try {
+    const generated = JSON.parse(
+      generate(fixture.irText, fixture.scalarDispatchText, fixture.patternsText, withdrawn).report,
+    );
+    assert.equal(
+      generated.bindings.some(({ id }) => id === "script:gui.get_node"),
+      false,
+    );
+    assert.equal(
+      JSON.parse(fixture.irText).functions.some(({ id }) => id === "script:gui.get_node"),
+      true,
+      "withdrawal removes only the optimization recipe; the authoritative API route remains",
+    );
+  } finally {
+    if (previousRevision === undefined) delete process.env.DEHERM_DERIVED_REVISION;
+    else process.env.DEHERM_DERIVED_REVISION = previousRevision;
+    if (previousAudit === undefined) delete process.env.DEHERM_REVISION_AUDIT;
+    else process.env.DEHERM_REVISION_AUDIT = previousAudit;
+    await rm(auditDirectory, { recursive: true, force: true });
+  }
 });
 
 test("generated value implementation stays POD-native and fail-closed", async () => {

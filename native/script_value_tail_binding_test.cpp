@@ -79,8 +79,8 @@ int main() {
   expect(backend.calls == 1 && valid.frame.resultCount == 1 && valid.results[0].tag == ScriptValueTag::kString, "candidate result contract drifted");
 
   Storage invalid(hashToHex->stableId); invalid.frame.argumentCount = 1; invalid.arguments[0].tag = ScriptValueTag::kString;
-  expect(tail::dispatch(&invalid.frame, invalid.error.data(), invalid.error.size(), &api) == tail::DispatchStatus::kError, "wrong candidate argument codec was accepted");
-  expect(backend.calls == 1 && std::strstr(invalid.error.data(), "reviewed exact codec shape"), "wrong codec did not fail closed");
+  expect(tail::dispatch(&invalid.frame, invalid.error.data(), invalid.error.size(), &api) == tail::DispatchStatus::kMissing, "wrong candidate argument codec did not select universal fallback");
+  expect(backend.calls == 1 && invalid.error[0] == '\0', "fallback candidate called the optimized backend");
 
   Storage absentApi(gravity->stableId); absentApi.frame.argumentCount = 1; absentApi.arguments[0] = vector3();
   expect(tail::dispatch(&absentApi.frame, absentApi.error.data(), absentApi.error.size(), nullptr) == tail::DispatchStatus::kError, "uninstalled captured Lua backend was accepted");
@@ -94,14 +94,13 @@ int main() {
 
   Storage badImageType(imageType->stableId); badImageType.frame.argumentCount = 6;
   badImageType.arguments = {string(), number(), number(), number(), string(), boolean()};
-  expect(tail::dispatch(&badImageType.frame, badImageType.error.data(), badImageType.error.size(), &api) == tail::DispatchStatus::kError,
-    "numeric image.TYPE silently widened the pinned luaL_checkstring source contract");
-  expect(backend.calls == 3 && std::strstr(badImageType.error.data(), "reviewed exact codec shape"),
-    "wrong image.TYPE codec called the backend");
+  expect(tail::dispatch(&badImageType.frame, badImageType.error.data(), badImageType.error.size(), &api) == tail::DispatchStatus::kMissing,
+    "numeric image.TYPE did not select universal fallback");
+  expect(backend.calls == 3 && badImageType.error[0] == '\0', "fallback image.TYPE called the optimized backend");
   Storage imageCall(imageType->stableId); imageCall.frame.argumentCount = 6;
   imageCall.arguments = {string(), number(), number(), string(), string(), boolean()};
-  expect(tail::dispatch(&imageCall.frame, imageCall.error.data(), imageCall.error.size(), &api) == tail::DispatchStatus::kError,
-    "UTF-8 text was accepted for a byte-exact texture payload");
+  expect(tail::dispatch(&imageCall.frame, imageCall.error.data(), imageCall.error.size(), &api) == tail::DispatchStatus::kMissing,
+    "UTF-8 text did not select universal fallback for the byte-exact fast path");
   imageCall.arguments[4] = bytes();
   backend.wrongResult = false;
   expect(tail::dispatch(&imageCall.frame, imageCall.error.data(), imageCall.error.size(), &api) == tail::DispatchStatus::kSuccess,

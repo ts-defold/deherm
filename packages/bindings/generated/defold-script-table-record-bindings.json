@@ -38,8 +38,8 @@
   "inputEvidence": {
     "scriptIrSha256": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049",
     "bindingPatternsSha256": "9788b0873228cf8b9145aace14c3437d8b5fe69b7478da536743f0759c1a073e",
-    "accountingSha256": "13009659cb5c80bf84fb03b9791178ab1cb4f3c7a2874139fe1576123d2ef9c1",
-    "tableTupleSchemaSha256": "8d69a6a753d5f89f72a51d646509728bd5f6b6af435a83dc6535174dced362a5",
+    "accountingSha256": "fafd81fadc0ab67ea4e6e1e86eac18e0f1a2031d50c5a72f405d23d5be6bfec2",
+    "tableTupleSchemaSha256": "86c74ff87dd53140cbd781b4c33eb9ab047eadbb79cbb7aab055d5c1b3fc4d4a",
     "reviewedPolicySha256": "7b00663e46ec4018bbcb74226e32bd8eeb06e11c9ccb97cd6dc7596178916968",
     "defoldSources": [
       {

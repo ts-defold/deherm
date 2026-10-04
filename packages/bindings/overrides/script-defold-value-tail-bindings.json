@@ -27,7 +27,7 @@
         { "source": "camera", "ids": ["script:camera.get_projection", "script:camera.get_view"] },
         { "source": "font", "ids": ["script:font.add_font", "script:font.remove_font", "script:font.set_style"] },
         { "source": "go", "ids": ["script:go.get_id", "script:go.get_world_transform", "script:go.world_to_local_transform"] },
-        { "source": "hash", "registration": "lua-global", "ids": ["script:hash_to_hex"] },
+        { "source": "hash", "ids": ["script:hash_to_hex"] },
         { "source": "physics", "ids": ["script:physics.get_gravity", "script:physics.set_gravity"] },
         { "source": "resource", "ids": ["script:resource.release", "script:resource.set_sound"] },
         { "source": "sound", "ids": ["script:sound.get_group_gain", "script:sound.get_group_name", "script:sound.set_group_gain"] }

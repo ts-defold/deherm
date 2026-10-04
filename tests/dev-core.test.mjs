@@ -611,6 +611,8 @@ test("built engine resolution and controller keep engine output inside model eve
   const controller = createEngineController({
     projectRoot: root,
     inspectorPort: 39229,
+    remoteryPort: 39230,
+    engineConfigs: ["war_battles.demo=1"],
     emit: (event) => events.push(event),
     resolveEngine: async () => resolved,
     spawn(_executable, arguments_) {
@@ -628,7 +630,11 @@ test("built engine resolution and controller keep engine output inside model eve
     },
   });
   assert.equal(await controller.launch(), true);
-  assert.deepEqual(spawnedArguments, ["--config=defold_hermes.inspector_port=39229"]);
+  assert.deepEqual(spawnedArguments, [
+    "--config=defold_hermes.inspector_port=39229",
+    "--config=profiler.remotery_port=39230",
+    "--config=war_battles.demo=1",
+  ]);
   await new Promise((resolve) => setImmediate(resolve));
   child.stdout.write("engine online\n");
   child.stdout.write(

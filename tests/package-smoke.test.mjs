@@ -218,6 +218,28 @@ test("command-specific target parsing keeps dev endpoints separate from conforma
   assert.equal(parseArguments(["materialize-dmsdk", "--check"]).check, true);
   assert.equal(parseArguments(["typecheck", "--release"]).release, true);
   assert.equal(parseArguments(["dev", "--no-bytecode"]).bytecode, false);
+  assert.deepEqual(
+    (({ servicePort, remoteryPort, engineConfigs }) => ({ servicePort, remoteryPort, engineConfigs }))(
+      parseArguments([
+        "dev",
+        "--service-port",
+        "18001",
+        "--remotery-port",
+        "17816",
+        "--engine-config",
+        "war_battles.demo=1",
+        "--engine-config",
+        "display.vsync=0",
+      ]),
+    ),
+    {
+      servicePort: 18001,
+      remoteryPort: 17816,
+      engineConfigs: ["war_battles.demo=1", "display.vsync=0"],
+    },
+  );
+  assert.throws(() => parseArguments(["dev", "--remotery-port", "0"]), /--remotery-port/);
+  assert.throws(() => parseArguments(["dev", "--engine-config", "not-a-pair"]), /--engine-config/);
   const profile = parseArguments(["profile", "cpu", "--duration", "250", "--replace-debugger"]);
   assert.deepEqual(
     {

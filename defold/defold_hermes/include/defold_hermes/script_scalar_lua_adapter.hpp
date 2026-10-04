@@ -182,8 +182,6 @@ class ScriptAdapter {
       ScriptCallFrame* frame,
       char* error,
       size_t errorCapacity) noexcept;
-  bool bindValueTail(const value_tail::Route& route) noexcept;
-  bool readValueTailResult(value_tail::Codec codec, ScriptCallFrame* frame) noexcept;
   overload_dispatch::DispatchStatus invokeOverload(
       const overload_dispatch::Operation& operation,
       const overload_dispatch::Shape& shape,

@@ -532,8 +532,8 @@
       "sha256": "5ed8f835390c873174159ff277946fd435efa57640cee5678b419257330bdab2"
     },
     "defold/defold_hermes/src/generated_script_value_tail_bindings.cpp": {
-      "bytes": 13720,
-      "sha256": "12d139eb08e17c59b56a8e0695e67fc0707923237cdcd2a680e8ce8b05e1ff46"
+      "bytes": 13705,
+      "sha256": "b7437402f40396bfb39f1f02ff44599ae1c0acf4af2e61ad2b8d0a48dd690de3"
     },
     "defold/defold_hermes/src/generated_static_hermes_vmath.cpp": {
       "bytes": 3629,
@@ -575,7 +575,7 @@
   "documents": {
     "defold-binding-lowering-plan.json": {
       "bytes": 17599473,
-      "sha256": "c9d740b57d61f7f4aa1797fd681d47ce266323c62b34a6cb28d867f39846bb08"
+      "sha256": "3399b879b2645a9fd0c3155b576e4f8b0aeb35a20ec8d15374cd5e5f896f3e4b"
     }
   }
 }

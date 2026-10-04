@@ -210,6 +210,45 @@ test("managed native extension install is content-keyed and replaces through a s
   );
 });
 
+test("fresh managed extension assembly includes the policy headers transitively required by public runtime headers", async (t) => {
+  const project = await mkdtemp(path.join(tmpdir(), "deherm-policy-extension-project-"));
+  const surface = await mkdtemp(path.join(tmpdir(), "deherm-policy-extension-surface-"));
+  t.after(() =>
+    Promise.all([rm(project, { recursive: true, force: true }), rm(surface, { recursive: true, force: true })]),
+  );
+  await writeFile(path.join(project, "game.project"), "[project]\ntitle = Policy extension fixture\n");
+
+  const surfaceExtension = path.join(surface, "defold", "defold_hermes");
+  const surfaceHeaders = path.join(surfaceExtension, "include", "defold_hermes");
+  await mkdir(surfaceHeaders, { recursive: true });
+  const policyHeaders = ["generated_dmsdk_scalar.h", "generated_dmsdk_universal.h"];
+  for (const header of policyHeaders) {
+    const source = path.resolve("defold/defold_hermes/include/defold_hermes", header);
+    await writeFile(path.join(surfaceHeaders, header), await readFile(source));
+  }
+
+  const result = await installNativeExtension(project, {
+    source: path.resolve("defold/defold_hermes"),
+    surfaceRepositoryRoot: surface,
+  });
+  assert.equal(result.installed, true);
+  const installedHeaders = path.join(project, "defold_hermes", "include", "defold_hermes");
+  const capi = await readFile(path.join(installedHeaders, "capi.h"), "utf8");
+  const universalFrame = await readFile(
+    path.join(installedHeaders, "generated_dmsdk_universal_static_frame.h"),
+    "utf8",
+  );
+  assert.match(capi, /#include <defold_hermes\/generated_dmsdk_scalar\.h>/u);
+  assert.match(universalFrame, /#include <defold_hermes\/generated_dmsdk_universal\.h>/u);
+  for (const header of policyHeaders) {
+    assert.deepEqual(
+      await readFile(path.join(installedHeaders, header)),
+      await readFile(path.join(surfaceHeaders, header)),
+      `${header} must be overlaid from the authenticated revision surface`,
+    );
+  }
+});
+
 test("managed WebTransport source override materializes the same descriptor inventoried by project generation", async (t) => {
   const project = await mkdtemp(path.join(tmpdir(), "deherm-webtransport-project-"));
   const source = await mkdtemp(path.join(tmpdir(), "deherm-webtransport-source-"));

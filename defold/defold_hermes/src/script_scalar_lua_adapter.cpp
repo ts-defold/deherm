@@ -1,4 +1,5 @@
 #include <defold_hermes/script_scalar_lua_adapter.hpp>
+#include <defold_hermes/value_tail_lua_trampoline.h>
 #include <defold_hermes/generated_script_callback_lifecycle.hpp>
 #include <defold_hermes/generated_script_value_bindings.hpp>
 #include <defold_hermes/script_matrix4_arena.hpp>
@@ -1550,96 +1551,161 @@ value_tail::DispatchStatus ScriptAdapter::ValueTailInvokeThunk(
       route, frame, error, errorCapacity);
 }
 
-bool ScriptAdapter::bindValueTail(const value_tail::Route& route) noexcept {
-  if (!state_ || route.candidateIndex >= valueTailFunctionRefs_.size()) {
-    return fail("Defold value-tail operation index is invalid");
-  }
-  int& reference = valueTailFunctionRefs_[route.candidateIndex];
-  if (reference != LUA_NOREF && reference != LUA_REFNIL) return true;
-  const int baseTop = lua_gettop(state_);
-  if (std::strcmp(route.modulePath, "builtins") == 0) {
-    lua_getglobal(state_, route.member);
-  } else {
-    lua_getglobal(state_, route.modulePath);
-    if (lua_istable(state_, -1)) {
-      lua_getfield(state_, -1, route.member);
-      lua_remove(state_, -2);
-    }
-  }
-  if (!lua_isfunction(state_, -1)) {
-    lua_settop(state_, baseTop);
-    return fail("Defold value-tail Lua function is unavailable");
-  }
-  reference = luaL_ref(state_, LUA_REGISTRYINDEX);
-  lua_settop(state_, baseTop);
-  return reference != LUA_NOREF && reference != LUA_REFNIL;
+namespace {
+
+void pushValueTailHash(lua_State* state, uint64_t value) {
+  // The public Defold API preserves the canonical userdata identity used by
+  // Hash_eq. Its pinned implementation is audited separately in the OKF note.
+  dmScript::PushHash(state, static_cast<dmhash_t>(value));
 }
 
-bool ScriptAdapter::readValueTailResult(
-    value_tail::Codec codec,
-    ScriptCallFrame* frame) noexcept {
-  using Codec = value_tail::Codec;
-  if (codec == Codec::kNone) return true;
-  if (!frame->results || frame->resultCapacity < 1) {
-    return fail("Defold value-tail result storage is exhausted");
+int pushValueTailUserdata(lua_State* state, const DehermValueTailLuaArgument* argument) {
+  if (!argument || !argument->data || !argument->metatable) return 0;
+  if (std::strcmp(argument->metatable, "url") == 0 && argument->size == sizeof(dmMessage::URL)) {
+    dmScript::PushURL(state, *static_cast<const dmMessage::URL*>(argument->data));
+    return 1;
+  } else if (std::strcmp(argument->metatable, "vector3") == 0 &&
+      argument->size == sizeof(dmVMath::Vector3)) {
+    dmScript::PushVector3(state, *static_cast<const dmVMath::Vector3*>(argument->data));
+    return 1;
+  } else if (std::strcmp(argument->metatable, "matrix4") == 0 &&
+      argument->size == sizeof(dmVMath::Matrix4)) {
+    dmScript::PushMatrix4(state, *static_cast<const dmVMath::Matrix4*>(argument->data));
+    return 1;
   }
-  ScriptValue& output = frame->results[0];
-  output = {};
-  if (codec == Codec::kBoolean) {
-    if (lua_type(state_, -1) != LUA_TBOOLEAN) return fail("Defold value-tail result is not boolean");
-    output.tag = ScriptValueTag::kBoolean;
-    output.number = lua_toboolean(state_, -1) ? 1.0 : 0.0;
-  } else if (codec == Codec::kNumber) {
-    if (lua_type(state_, -1) != LUA_TNUMBER) return fail("Defold value-tail result is not numeric");
-    output.tag = ScriptValueTag::kNumber;
-    output.number = lua_tonumber(state_, -1);
-  } else if (codec == Codec::kString) {
-    if (lua_type(state_, -1) != LUA_TSTRING) return fail("Defold value-tail result is not a string");
-    size_t length = 0;
-    const char* data = lua_tolstring(state_, -1, &length);
-    if (!frame->stringScratch || length > frame->stringScratchCapacity - frame->stringScratchUsed) {
-      return fail("Defold value-tail string scratch is exhausted");
-    }
-    char* destination = frame->stringScratch + frame->stringScratchUsed;
-    if (length) std::memcpy(destination, data, length);
-    output.tag = ScriptValueTag::kString;
-    output.data = destination;
-    output.length = static_cast<uint32_t>(length);
-    frame->stringScratchUsed += static_cast<uint32_t>(length);
-  } else if (codec == Codec::kHash) {
-    dmhash_t* hash = dmScript::ToHash(state_, -1);
-    if (!hash) return fail("Defold value-tail result is not a hash");
-    output.tag = ScriptValueTag::kHandle;
-    output.handleKind = ScriptHandleKind::kHash;
-    output.payload = *hash;
-  } else if (codec == Codec::kVector3) {
-    dmVMath::Vector3* value = dmScript::ToVector3(state_, -1);
-    if (!value) return fail("Defold value-tail result is not vector3");
-    output.tag = ScriptValueTag::kDefoldValue;
-    output.defoldKind = ScriptDefoldValueKind::kVector3;
-    output.defoldValue[0] = value->getX();
-    output.defoldValue[1] = value->getY();
-    output.defoldValue[2] = value->getZ();
-  } else if (codec == Codec::kMatrix4) {
-    dmVMath::Matrix4* value = dmScript::ToMatrix4(state_, -1);
-    if (!value || !frame->matrix4Arena) {
-      return fail("Defold value-tail Matrix4 result has no frame arena");
-    }
-    alignas(16) float elements[16];
-    for (size_t column = 0; column < 4; ++column) {
-      for (size_t row = 0; row < 4; ++row) {
-        elements[column * 4 + row] = value->getElem(column, row);
-      }
-    }
-    if (!frame->matrix4Arena->store(elements, &output)) {
-      return fail("Defold value-tail Matrix4 frame arena is exhausted");
-    }
-  } else {
-    return fail("Defold value-tail result codec is unsupported");
-  }
-  frame->resultCount = 1;
-  return true;
+  return 0;
 }
+
+int readValueTailVector3(lua_State* state, float* lanes) {
+  dmVMath::Vector3* value = dmScript::ToVector3(state, -1);
+  if (!value || !lanes) return 0;
+  lanes[0] = value->getX();
+  lanes[1] = value->getY();
+  lanes[2] = value->getZ();
+  return 1;
+}
+
+int readValueTailHash(lua_State* state, uint64_t* payload) {
+  dmhash_t* value = dmScript::ToHash(state, -1);
+  if (!value || !payload) return 0;
+  *payload = static_cast<uint64_t>(*value);
+  return 1;
+}
+
+int readValueTailMatrix4(lua_State* state, float* lanes) {
+  dmVMath::Matrix4* value = dmScript::ToMatrix4(state, -1);
+  if (!value || !lanes) return 0;
+  for (size_t column = 0; column < 4; ++column) {
+    for (size_t row = 0; row < 4; ++row) {
+      lanes[column * 4 + row] = value->getElem(column, row);
+    }
+  }
+  return 1;
+}
+
+DehermValueTailLuaKind valueTailLuaKind(value_tail::Codec codec) noexcept {
+  using Codec = value_tail::Codec;
+  switch (codec) {
+    case Codec::kNil: return DEHERM_VALUE_TAIL_LUA_NIL;
+    case Codec::kBoolean: return DEHERM_VALUE_TAIL_LUA_BOOLEAN;
+    case Codec::kNumber: return DEHERM_VALUE_TAIL_LUA_NUMBER;
+    case Codec::kString: return DEHERM_VALUE_TAIL_LUA_STRING;
+    case Codec::kBytes: return DEHERM_VALUE_TAIL_LUA_BYTES;
+    case Codec::kHash: return DEHERM_VALUE_TAIL_LUA_HASH;
+    case Codec::kUrl: return DEHERM_VALUE_TAIL_LUA_USERDATA;
+    case Codec::kVector3: return DEHERM_VALUE_TAIL_LUA_VECTOR3;
+    case Codec::kMatrix4: return DEHERM_VALUE_TAIL_LUA_MATRIX4;
+    case Codec::kNone: return DEHERM_VALUE_TAIL_LUA_NONE;
+  }
+  return DEHERM_VALUE_TAIL_LUA_NONE;
+}
+
+bool stageValueTailArgument(
+    const ScriptValue& value,
+    ScriptCallFrame* frame,
+    DehermValueTailLuaArgument* output,
+    dmMessage::URL* urlStorage,
+    dmVMath::Vector3* vectorStorage,
+    dmVMath::Matrix4* matrixStorage,
+    const char** failure) noexcept {
+  if (failure) *failure = "Defold value-tail argument cannot be staged in its bounded native frame";
+  switch (value.tag) {
+    case ScriptValueTag::kUndefined:
+    case ScriptValueTag::kNull:
+      output->kind = DEHERM_VALUE_TAIL_LUA_NIL;
+      return true;
+    case ScriptValueTag::kBoolean:
+      output->kind = DEHERM_VALUE_TAIL_LUA_BOOLEAN;
+      output->number = value.number;
+      return true;
+    case ScriptValueTag::kNumber:
+      output->kind = DEHERM_VALUE_TAIL_LUA_NUMBER;
+      output->number = value.number;
+      return true;
+    case ScriptValueTag::kString:
+    case ScriptValueTag::kBytes:
+      output->kind = value.tag == ScriptValueTag::kBytes
+          ? DEHERM_VALUE_TAIL_LUA_BYTES : DEHERM_VALUE_TAIL_LUA_STRING;
+      output->data = value.data;
+      output->size = value.length;
+      return value.length == 0 || value.data;
+    case ScriptValueTag::kHandle:
+      if (value.handleKind == ScriptHandleKind::kHash) {
+        output->kind = DEHERM_VALUE_TAIL_LUA_HASH;
+        output->payload = value.payload;
+        return true;
+      }
+      if (value.handleKind == ScriptHandleKind::kUrl && frame && frame->urlArena &&
+          frame->urlArena->copyForPushUrl(value, frame->urlArena->runtimeToken(), urlStorage)) {
+        output->kind = DEHERM_VALUE_TAIL_LUA_USERDATA;
+        output->data = urlStorage;
+        output->size = sizeof(*urlStorage);
+        output->metatable = "url";
+        return true;
+      }
+      if (value.handleKind == ScriptHandleKind::kUrl && failure) {
+        *failure = "Defold value-tail URL token is stale or belongs to another frame arena";
+      }
+      return false;
+    case ScriptValueTag::kDefoldValue:
+      if (value.defoldKind == ScriptDefoldValueKind::kVector3) {
+        *vectorStorage = dmVMath::Vector3(
+            static_cast<float>(value.defoldValue[0]),
+            static_cast<float>(value.defoldValue[1]),
+            static_cast<float>(value.defoldValue[2]));
+        output->kind = DEHERM_VALUE_TAIL_LUA_USERDATA;
+        output->data = vectorStorage;
+        output->size = sizeof(*vectorStorage);
+        output->metatable = "vector3";
+        return true;
+      }
+      if (value.defoldKind == ScriptDefoldValueKind::kMatrix4 && frame && frame->matrix4Arena) {
+        const float* elements = frame->matrix4Arena->resolve(value);
+        if (!elements) {
+          if (failure) *failure = "Defold value-tail Matrix4 token is stale or belongs to another frame arena";
+          return false;
+        }
+        for (size_t index = 0; index < 16; ++index) {
+          if (std::isnan(elements[index])) return false;
+        }
+        *matrixStorage = dmVMath::Matrix4(
+            dmVMath::Vector4(elements[0], elements[1], elements[2], elements[3]),
+            dmVMath::Vector4(elements[4], elements[5], elements[6], elements[7]),
+            dmVMath::Vector4(elements[8], elements[9], elements[10], elements[11]),
+            dmVMath::Vector4(elements[12], elements[13], elements[14], elements[15]));
+        output->kind = DEHERM_VALUE_TAIL_LUA_USERDATA;
+        output->data = matrixStorage;
+        output->size = sizeof(*matrixStorage);
+        output->metatable = "matrix4";
+        return true;
+      }
+      return false;
+    default:
+      return false;
+  }
+}
+
+}  // namespace
 
 value_tail::DispatchStatus ScriptAdapter::invokeValueTail(
     const value_tail::Route& route,
@@ -1647,24 +1713,8 @@ value_tail::DispatchStatus ScriptAdapter::invokeValueTail(
     char* error,
     size_t errorCapacity) noexcept {
   using Status = value_tail::DispatchStatus;
-  if (!state_ || !frame) {
-    writeError(error, errorCapacity, "Defold value-tail Lua backend is not initialized");
-    return Status::kError;
-  }
-  // Reserve the full generated bound before any registry lookup or argument
-  // push. This runs from ProtectedDispatch, which catches allocator longjmp.
-  // Lua's jump still unwinds these C++ helper frames, so keep their automatic
-  // state trivially destructible; native argument staging remains fixed and
-  // allocation-free.
-  constexpr int kValueTailStackReserve =
-      static_cast<int>(value_tail::kMaximumArgumentCount + 3);
-  if (!lua_checkstack(state_, kValueTailStackReserve)) {
-    writeError(error, errorCapacity,
-        "Defold value-tail Lua backend cannot reserve its bounded stack frame");
-    return Status::kError;
-  }
-  if (!bindValueTail(route)) {
-    writeError(error, errorCapacity, lastError());
+  if (!state_ || !frame || route.candidateIndex >= valueTailFunctionRefs_.size()) {
+    writeError(error, errorCapacity, "Defold value-tail Lua backend or route is unavailable");
     return Status::kError;
   }
   const ActiveContext requiredContext = route.context == value_tail::Context::kGui
@@ -1683,29 +1733,107 @@ value_tail::DispatchStatus ScriptAdapter::invokeValueTail(
           : "Defold value-tail call requires a captured game-object script instance");
     return Status::kError;
   }
-  const int baseTop = lua_gettop(state_);
-  instanceApi_.get(state_);
-  lua_rawgeti(state_, LUA_REGISTRYINDEX, instanceRef_);
-  instanceApi_.set(state_);
-  lua_rawgeti(state_, LUA_REGISTRYINDEX, valueTailFunctionRefs_[route.candidateIndex]);
-  bool ok = true;
-  for (uint32_t index = 0; index < frame->argumentCount; ++index) {
-    if (!pushStructuredValue(frame->arguments[index], frame)) { ok = false; break; }
-  }
-  const int resultCount = route.resultCodec == value_tail::Codec::kNone ? 0 : 1;
-  if (ok && lua_pcall(state_, static_cast<int>(frame->argumentCount), resultCount, 0) != 0) {
-    const char* message = lua_tostring(state_, -1);
-    ok = fail(message ? message : "Defold value-tail Lua call failed without an error string");
-  }
-  if (ok) ok = readValueTailResult(route.resultCodec, frame);
-  lua_settop(state_, baseTop + 1);
-  instanceApi_.set(state_);
-  lua_settop(state_, baseTop);
-  if (!ok) {
-    writeError(error, errorCapacity, lastError());
+  if (!instanceApi_.get || !instanceApi_.set || instanceRef_ == LUA_NOREF ||
+      instanceRef_ == LUA_REFNIL) {
+    writeError(error, errorCapacity, "Defold value-tail call has no captured Lua instance");
     return Status::kError;
   }
+  if (frame->argumentCount > value_tail::kMaximumArgumentCount ||
+      (frame->argumentCount && !frame->arguments)) {
+    writeError(error, errorCapacity, "Defold value-tail argument staging exceeds its generated bound");
+    return Status::kError;
+  }
+  std::array<DehermValueTailLuaArgument, value_tail::kMaximumArgumentCount> arguments{};
+  std::array<dmMessage::URL, value_tail::kMaximumArgumentCount> urlStorage{};
+  std::array<dmVMath::Vector3, value_tail::kMaximumArgumentCount> vectorStorage{};
+  std::array<dmVMath::Matrix4, value_tail::kMaximumArgumentCount> matrixStorage{};
+  for (uint32_t index = 0; index < frame->argumentCount; ++index) {
+    const char* stagingFailure = nullptr;
+    if (!stageValueTailArgument(frame->arguments[index], frame, &arguments[index],
+            &urlStorage[index], &vectorStorage[index], &matrixStorage[index], &stagingFailure)) {
+      writeError(error, errorCapacity, stagingFailure);
+      return Status::kError;
+    }
+  }
+  if (route.resultCodec != value_tail::Codec::kNone &&
+      (!frame->results || frame->resultCapacity < 1)) {
+    writeError(error, errorCapacity, "Defold value-tail result storage is exhausted");
+    return Status::kError;
+  }
+  DehermValueTailLuaResult luaResult{};
+  DehermValueTailLuaCall luaCall{};
+  luaCall.module = route.modulePath;
+  luaCall.member = route.member;
+  luaCall.functionReference = &valueTailFunctionRefs_[route.candidateIndex];
+  luaCall.instanceReference = instanceRef_;
+  luaCall.stackReserve = static_cast<int>(value_tail::kMaximumArgumentCount + 3);
+  luaCall.arguments = arguments.data();
+  luaCall.argumentCount = frame->argumentCount;
+  luaCall.resultKind = valueTailLuaKind(route.resultCodec);
+  if (frame->stringScratch && frame->stringScratchUsed <= frame->stringScratchCapacity) {
+    luaCall.stringScratch = frame->stringScratch + frame->stringScratchUsed;
+    luaCall.stringScratchCapacity = frame->stringScratchCapacity - frame->stringScratchUsed;
+  }
+  luaCall.result = &luaResult;
+  luaCall.getInstance = instanceApi_.get;
+  luaCall.setInstance = instanceApi_.set;
+  luaCall.pushHash = pushValueTailHash;
+  luaCall.pushDefoldUserdata = pushValueTailUserdata;
+  luaCall.readHash = readValueTailHash;
+  luaCall.readVector3 = readValueTailVector3;
+  luaCall.readMatrix4 = readValueTailMatrix4;
+  luaCall.error = error;
+  luaCall.errorCapacity = errorCapacity;
+  if (deherm_value_tail_lua_dispatch(state_, &luaCall) != 0) {
+    if (route.resultCodec == value_tail::Codec::kNone) frame->resultCount = 0;
+    writeError(error, errorCapacity,
+        error && errorCapacity ? error : "Protected Defold value-tail Lua dispatch failed");
+    return Status::kError;
+  }
+  if (route.resultCodec == value_tail::Codec::kNone) {
+    frame->resultCount = 0;
+  } else {
+    ScriptValue& output = frame->results[0];
+    output = {};
+    switch (route.resultCodec) {
+      case value_tail::Codec::kBoolean:
+        output.tag = ScriptValueTag::kBoolean;
+        output.number = luaResult.number;
+        break;
+      case value_tail::Codec::kNumber:
+        output.tag = ScriptValueTag::kNumber;
+        output.number = luaResult.number;
+        break;
+      case value_tail::Codec::kString:
+        output.tag = ScriptValueTag::kString;
+        output.data = luaCall.stringScratch;
+        output.length = luaResult.stringLength;
+        frame->stringScratchUsed += luaResult.stringLength;
+        break;
+      case value_tail::Codec::kHash:
+        output.tag = ScriptValueTag::kHandle;
+        output.handleKind = ScriptHandleKind::kHash;
+        output.payload = luaResult.payload;
+        break;
+      case value_tail::Codec::kVector3:
+        output.tag = ScriptValueTag::kDefoldValue;
+        output.defoldKind = ScriptDefoldValueKind::kVector3;
+        for (size_t index = 0; index < 3; ++index) output.defoldValue[index] = luaResult.lanes[index];
+        break;
+      case value_tail::Codec::kMatrix4:
+        if (!frame->matrix4Arena || !frame->matrix4Arena->store(luaResult.lanes, &output)) {
+          writeError(error, errorCapacity, "Defold value-tail Matrix4 frame arena is exhausted");
+          return Status::kError;
+        }
+        break;
+      default:
+        writeError(error, errorCapacity, "Defold value-tail result codec is unsupported");
+        return Status::kError;
+    }
+    frame->resultCount = 1;
+  }
   adapterError_[0] = '\0';
+  if (error && errorCapacity) error[0] = '\0';
   return Status::kSuccess;
 }
 

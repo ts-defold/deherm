@@ -188,21 +188,18 @@ quarter turn the screen-down infantry art required.
 
 ## Scripted demonstration, and how the match starts
 
-`main/main.collection` sets the player's `demo` script property to `1.0` and its
-`tour` property to `10.0`. One second after `init` the player fires one rocket
-at the nearest tutorial tank, so a launch exercises the whole
-factory/physics/message chain without a human at the keyboard; it then drives
-east for five seconds and north for five more, which scrolls the world on both
-axes and drives the player and the camera into their clamps. **That sequence is
-unchanged, and it is what both packaged runtime gates observe.**
+Normal play keeps the player's `demo` and `tour` properties at `0.0`, so the
+game waits for human input. The packaged runtime and installed-HMR gates pass
+`--engine-config war_battles.demo=1` explicitly. In that evidence mode the
+player fires one rocket at the nearest tutorial tank, exercises the whole
+factory/physics/message chain without a human at the keyboard, and drives a
+short camera tour before engaging the arena.
 
-When it ends, the player posts `engage` to the arena director and the match
+When the evidence tour ends, the player posts `engage` to the arena director and the match
 starts: the roster is created, turrets and pickup pads appear, and the tank
 starts being driven by the simulation instead of by the script. **Any input does
-the same thing immediately**, so a human who presses a key is playing within a
-frame and never waits out the demonstration. Set `demo` to `0` for a scene that
-is waiting for you from the first frame, or set the director's
-`autoEngageSeconds` to start without either.
+the same thing immediately**, so normal play begins within a frame. Set the
+director's `autoEngageSeconds` to start without either input or evidence mode.
 
 The four tutorial `tank.go` instances stay in the collection. They are the
 collision targets the demonstration rocket is observed hitting, which is the

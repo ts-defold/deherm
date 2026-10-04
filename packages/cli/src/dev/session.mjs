@@ -597,6 +597,8 @@ export async function runDevSession(options = {}) {
     targetId: "local-engine",
     resourceUri: () => resourceServer?.baseUrl,
     inspectorPort: inspectorBridge?.enginePort,
+    remoteryPort: options.remoteryPort,
+    engineConfigs: options.engineConfigs,
     env: { DM_SERVICE_PORT: String(servicePort) },
   });
   // The HTML5 target of the same session. It is a peer of the native engine,

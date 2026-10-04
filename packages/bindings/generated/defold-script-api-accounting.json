@@ -9,11 +9,11 @@
     "bindingPatternsSha256": "9788b0873228cf8b9145aace14c3437d8b5fe69b7478da536743f0759c1a073e",
     "bindingDescriptorsSha256": "9b249c9e9616ce25bc8a0f3ae3b6204a4c74a0c17890501ce5c5ce95e92afd71",
     "scalarDispatchSha256": "3c1e7bbb6e1a82be0d4f3d2fc2598984ec1c81bfeedd034c2c179fcf57920bd6",
-    "valueBindingsSha256": "797715c02ed33a655c8cdafed2d624071a623cd62968abcc700581a70cf76b42",
+    "valueBindingsSha256": "bf24ad8891c416aff1ca9eab8ef4eb822fb3ccca75afd3a04634d6dbf14b02bc",
     "fixedTupleBindingsSha256": "c50f26549b3da248786c32c442ab87ae6845816b794c9e343f42bd920c30f889",
     "urlBindingsSha256": "72bcd1dc826e69824b4b2b06726ab38537635ad4c4f8661f537b96276d683c53",
-    "valueTailBindingsSha256": "e2b74cb8018cbfd9bd2d8ce866c09854f64c4af82186b53b15c5a2311f90c235",
-    "overloadDispatchSha256": "f2d7114c726cd6d6514902b08ec73a96fc4f20138b68dece333bab45d61787fe",
+    "valueTailBindingsSha256": "992713765044a6a9530df0fde9a91e9aa0b394e01f3f02323c487059c179b500",
+    "overloadDispatchSha256": "c083c1e14d232fec3231225952c43677b7677ded7027902241c1e6b23f4042d9",
     "universalValuePolicySha256": "b3175f748511992272cd33980fc6c0737e920c152d9880f1e63e503061e11f7b",
     "componentProxyPolicySha256": "eb23c1d1330cced51af0ea8d7712b2bc093248384a49acb9ff7257450abe4cf8",
     "universalValueSelectionSha256": "514cd2cb3926a1a0107fa3f90968ab834383ca3257b6b17b159465a95f2acaf0",
@@ -40,7 +40,7 @@
       },
       {
         "definitionPath": "packages/bindings/overrides/script-gui-structured-bindings.json",
-        "definitionSha256": "fea137372567fd70313fdc9b8c0c4d139e5cbde331da2aeeabf357342f7135a5"
+        "definitionSha256": "b1acdc58e748c2765a61da774c60d3121101773394e4e11d63e021913ae6d510"
       }
     ],
     "valueSources": [
@@ -77,7 +77,7 @@
         "sourceSha256": "4a46bc80c0a35a59ddf7ea990cd7dcdf5b6eff86e03e6096739eb76f078064e4"
       }
     ],
-    "aggregateInputSha256": "fb5749b7082a280e38017b7b63f19f49fef2eac77d44ea43704552de6c20d45b"
+    "aggregateInputSha256": "a82c1c8f302da738867bd44c375b44f85ac61b082d72cf0d2680d7a1a0601186"
   },
   "functionCount": 926,
   "categoryCounts": {
@@ -18400,9 +18400,6 @@
         "generator": "captured-lua-value-tail-dispatch",
         "stableId": 2520029065,
         "callShapes": [
-          [
-            "String"
-          ],
           [
             "Hash"
           ]

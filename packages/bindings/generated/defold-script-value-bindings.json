@@ -1,7 +1,8 @@
 {
   "schemaVersion": 1,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "inputSha256": "d8c7c9af2ce34b60b60dc1e7a9e4c9f62813eb20046ec13741710d7b45a0ab97",
+  "inputSha256": "9661450cd3721c7f658baf3f135e01050f348bd3ae1141c7b0903df122861acc",
+  "registrationSurfaceSha256": "3d730e238c5da462d5ebb7bbdb907fd6f5f2924b11ac478c1aae340ce7da255b",
   "sourceEvidence": [
     {
       "path": "upstream/defold/engine/script/src/script_vmath.cpp",
@@ -1079,11 +1080,6 @@
     {
       "id": "script:gui.get_node",
       "sourceSymbol": "LuaGetNode",
-      "sourceOperation": [
-        "GuiScriptInstance_Check(L)",
-        "GetNodeById(scene, id)",
-        "lua_newuserdata(L, sizeof(NodeProxy))"
-      ],
       "operation": {
         "template": "gui-node-lookup",
         "parameters": {
@@ -1107,6 +1103,42 @@
         ]
       ],
       "resultCodec": "Node",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "gui.get_node",
+          "module": "gui",
+          "cFunction": "LuaGetNode",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 4986
+        },
+        "context": {
+          "kind": "active-gui-scene",
+          "check": "GuiScriptInstance_Check"
+        },
+        "inputCodecs": [
+          [
+            "hash",
+            "string"
+          ]
+        ],
+        "result": {
+          "codec": "Node",
+          "source": "one registered Lua result"
+        },
+        "userdata": {
+          "kind": "full-userdata",
+          "cType": "NodeProxy",
+          "metatable": "NodeProxy",
+          "registeredType": "NODE_PROXY_TYPE_HASH",
+          "checkedBy": "dmScript::CheckUserType",
+          "metamethods": [
+            "__index",
+            "__newindex",
+            "__eq"
+          ]
+        }
+      },
       "unhandledShapePolicy": "error",
       "stableId": 509983822,
       "rawName": "gui.get_node",

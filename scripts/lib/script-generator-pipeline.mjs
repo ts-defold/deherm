@@ -52,6 +52,7 @@ export const scriptGeneratorSources = Object.freeze([
   "scripts/lib/script-semantic-overrides.mjs",
   "scripts/lib/reviewed-revision.mjs",
   "scripts/lib/revision-audit.mjs",
+  "scripts/lib/defold-lua-structural-capabilities.mjs",
   "scripts/lib/script-lifecycle-callbacks.mjs",
   "scripts/lib/documented-route-duplication.mjs",
   "packages/compiler/src/names.mjs",

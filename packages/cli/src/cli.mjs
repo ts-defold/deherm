@@ -73,6 +73,8 @@ Options:
   --build-dir <path> Compiled Defold resource root served to targets
   --build-server <url> Defold build service; omit to use Bob's standard service
   --service-port <n> Local Defold engine service port (default: 8001)
+  --remotery-port <n> Local Defold Remotery profiler port (default: 17815)
+  --engine-config <key=value>  Defold engine configuration; may be repeated
   --resource <path>  Generated typed bundle resource (default: /deherm/app.dehermc)
   --target <url>     For dev, a Defold engine service URL; may be repeated
   --web-bundle <path>   Packaged wasm-web bundle the dev HTML5 target serves
@@ -120,6 +122,7 @@ export function parseArguments(argv) {
     targets: [],
     transcripts: [],
     sessionLogs: [],
+    engineConfigs: [],
   };
   const args = [...argv];
   if (args[0] && !args[0].startsWith("-")) options.command = args.shift();
@@ -188,6 +191,8 @@ export function parseArguments(argv) {
     else if (value === "--build-dir") options.buildDir = args.shift();
     else if (value === "--build-server") options.buildServer = args.shift();
     else if (value === "--service-port") options.servicePort = Number(args.shift());
+    else if (value === "--remotery-port") options.remoteryPort = Number(args.shift());
+    else if (value === "--engine-config") options.engineConfigs.push(args.shift());
     else if (value === "--resource") options.resourcePath = args.shift();
     // The HTML5 target of a dev session. The bundle is produced by a wasm-web
     // Bob build; this names where it landed when it is not where Bob usually
@@ -210,6 +215,17 @@ export function parseArguments(argv) {
     (!Number.isSafeInteger(options.servicePort) || options.servicePort < 1 || options.servicePort > 65_535)
   ) {
     throw new Error("--service-port must be an integer from 1 through 65535");
+  }
+  if (
+    options.remoteryPort !== undefined &&
+    (!Number.isSafeInteger(options.remoteryPort) || options.remoteryPort < 1 || options.remoteryPort > 65_535)
+  ) {
+    throw new Error("--remotery-port must be an integer from 1 through 65535");
+  }
+  for (const config of options.engineConfigs) {
+    if (typeof config !== "string" || !/^[A-Za-z0-9_.-]+=[^\r\n]*$/u.test(config)) {
+      throw new Error("--engine-config must use key=value syntax");
+    }
   }
   if (
     options.durationMs !== undefined &&

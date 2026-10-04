@@ -12,9 +12,10 @@
   "inputEvidence": {
     "scriptIrSha256": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049",
     "bindingPatternsSha256": "9788b0873228cf8b9145aace14c3437d8b5fe69b7478da536743f0759c1a073e",
-    "valueBindingsSha256": "797715c02ed33a655c8cdafed2d624071a623cd62968abcc700581a70cf76b42",
+    "valueBindingsSha256": "bf24ad8891c416aff1ca9eab8ef4eb822fb3ccca75afd3a04634d6dbf14b02bc",
     "urlBindingsSha256": "72bcd1dc826e69824b4b2b06726ab38537635ad4c4f8661f537b96276d683c53",
-    "reviewedPolicySha256": "917694f45e1e63cca4132febc0bbf5e279bbe9d125ab3a9465c74568f9c13412",
+    "luaRegistrationSurfaceSha256": "3d730e238c5da462d5ebb7bbdb907fd6f5f2924b11ac478c1aae340ce7da255b",
+    "reviewedPolicySha256": "12b95d0cf89131451aa3b696d8bb8989463c986fb43bbbcd327feec056c986ee",
     "defoldSources": [
       {
         "path": "upstream/defold/engine/gameobject/src/gameobject/gameobject_script.cpp",
@@ -80,8 +81,44 @@
       "backend": "captured-lua-exact-call",
       "accountingDisposition": "generated-family",
       "requiredContext": "script-instance",
+      "sourceCapabilities": {
+        "registration": {
+          "route": "resource.release",
+          "module": "resource",
+          "cFunction": "ReleaseResource",
+          "sourcePath": "gamesys/src/gamesys/scripts/script_resource.cpp",
+          "registrationArray": "Module_methods",
+          "registrationLine": 3454
+        },
+        "context": {
+          "kind": "script-instance",
+          "evidence": "captured-lua-route"
+        },
+        "codecs": {
+          "inputs": [
+            {
+              "index": 1,
+              "codecs": [
+                "Hash",
+                "String"
+              ],
+              "documentedCodecs": [
+                "Hash",
+                "String"
+              ],
+              "stackEvidence": [
+                "dmScript::CheckHashOrString"
+              ]
+            }
+          ],
+          "result": {
+            "codec": "None",
+            "sourceResultCount": 0,
+            "canonicalSurfaceVerdict": "agree"
+          }
+        }
+      },
       "sourceSymbol": "ReleaseResource",
-      "sourceAnchor": "{\"release\",                 ReleaseResource}",
       "callShapes": [
         [
           "Hash"
@@ -106,8 +143,56 @@
       "backend": "captured-lua-exact-call",
       "accountingDisposition": "generated-family",
       "requiredContext": "script-instance",
+      "sourceCapabilities": {
+        "registration": {
+          "route": "sound.set_group_gain",
+          "module": "sound",
+          "cFunction": "Sound_SetGroupGain",
+          "sourcePath": "gamesys/src/gamesys/scripts/script_sound.cpp",
+          "registrationArray": "SOUND_FUNCTIONS",
+          "registrationLine": 743
+        },
+        "context": {
+          "kind": "script-instance",
+          "evidence": "captured-lua-route"
+        },
+        "codecs": {
+          "inputs": [
+            {
+              "index": 1,
+              "codecs": [
+                "Hash",
+                "String"
+              ],
+              "documentedCodecs": [
+                "Hash",
+                "String"
+              ],
+              "stackEvidence": [
+                "CheckGroupName"
+              ]
+            },
+            {
+              "index": 2,
+              "codecs": [
+                "Number"
+              ],
+              "documentedCodecs": [
+                "Number"
+              ],
+              "stackEvidence": [
+                "luaL_checknumber"
+              ]
+            }
+          ],
+          "result": {
+            "codec": "None",
+            "sourceResultCount": 0,
+            "canonicalSurfaceVerdict": "agree"
+          }
+        }
+      },
       "sourceSymbol": "Sound_SetGroupGain",
-      "sourceAnchor": "{\"set_group_gain\", Sound_SetGroupGain}",
       "callShapes": [
         [
           "String",
@@ -134,8 +219,60 @@
       "backend": "captured-lua-exact-call",
       "accountingDisposition": "generated-family",
       "requiredContext": "script-instance",
+      "sourceCapabilities": {
+        "registration": {
+          "route": "font.add_font",
+          "module": "font",
+          "cFunction": "AddFont",
+          "sourcePath": "gamesys/src/gamesys/scripts/script_font.cpp",
+          "registrationArray": "Module_methods",
+          "registrationLine": 407
+        },
+        "context": {
+          "kind": "script-instance",
+          "evidence": "captured-lua-route"
+        },
+        "codecs": {
+          "inputs": [
+            {
+              "index": 1,
+              "codecs": [
+                "Hash",
+                "String"
+              ],
+              "documentedCodecs": [
+                "Hash",
+                "String"
+              ],
+              "stackEvidence": [
+                "dmScript::CheckHashOrString"
+              ]
+            },
+            {
+              "index": 2,
+              "codecs": [
+                "Hash",
+                "String"
+              ],
+              "documentedCodecs": [
+                "Hash",
+                "String"
+              ],
+              "stackEvidence": [
+                "dmScript::CheckHash",
+                "luaL_checkstring",
+                "lua_isstring"
+              ]
+            }
+          ],
+          "result": {
+            "codec": "None",
+            "sourceResultCount": 0,
+            "canonicalSurfaceVerdict": "agree"
+          }
+        }
+      },
       "sourceSymbol": "AddFont",
-      "sourceAnchor": "{\"add_font\", AddFont}",
       "callShapes": [
         [
           "String",
@@ -170,8 +307,42 @@
       "backend": "captured-lua-exact-call",
       "accountingDisposition": "generated-family",
       "requiredContext": "script-instance",
+      "sourceCapabilities": {
+        "registration": {
+          "route": "hash_to_hex",
+          "module": "",
+          "cFunction": "HashToHex",
+          "sourcePath": "script/src/script_hash.cpp",
+          "registrationArray": null,
+          "registrationLine": 449
+        },
+        "context": {
+          "kind": "script-instance",
+          "evidence": "captured-lua-route"
+        },
+        "codecs": {
+          "inputs": [
+            {
+              "index": 1,
+              "codecs": [
+                "Hash"
+              ],
+              "documentedCodecs": [
+                "Hash"
+              ],
+              "stackEvidence": [
+                "dmScript::CheckHash"
+              ]
+            }
+          ],
+          "result": {
+            "codec": "String",
+            "sourceResultCount": 1,
+            "canonicalSurfaceVerdict": "agree"
+          }
+        }
+      },
       "sourceSymbol": "HashToHex",
-      "sourceAnchor": "lua_pushcfunction(L, HashToHex);\n        lua_setglobal(L, \"hash_to_hex\")",
       "callShapes": [
         [
           "Hash"
@@ -193,8 +364,48 @@
       "backend": "captured-lua-exact-call",
       "accountingDisposition": "generated-family",
       "requiredContext": "script-instance",
+      "sourceCapabilities": {
+        "registration": {
+          "route": "camera.get_view",
+          "module": "camera",
+          "cFunction": "RenderScriptCamera_GetView",
+          "sourcePath": "render/src/render/render_script_camera.cpp",
+          "registrationArray": "RenderScriptCamera_Methods",
+          "registrationLine": 541
+        },
+        "context": {
+          "kind": "script-instance",
+          "evidence": "captured-lua-route"
+        },
+        "codecs": {
+          "inputs": [
+            {
+              "index": 1,
+              "codecs": [
+                "Hash",
+                "Nil",
+                "Number",
+                "String",
+                "Url"
+              ],
+              "documentedCodecs": [
+                "Nil",
+                "Number",
+                "Url"
+              ],
+              "stackEvidence": [
+                "CheckRenderCamera"
+              ]
+            }
+          ],
+          "result": {
+            "codec": "Matrix4",
+            "sourceResultCount": 1,
+            "canonicalSurfaceVerdict": "agree"
+          }
+        }
+      },
       "sourceSymbol": "RenderScriptCamera_GetView",
-      "sourceAnchor": "{\"get_view\",                RenderScriptCamera_GetView}",
       "callShapes": [
         [],
         [
@@ -223,8 +434,47 @@
       "backend": "captured-lua-exact-call",
       "accountingDisposition": "universal-fallback-test-fixture-adapter-only",
       "requiredContext": "render-script-instance",
+      "sourceCapabilities": {
+        "registration": {
+          "route": "render.set_compute",
+          "module": "render",
+          "cFunction": "RenderScript_SetCompute",
+          "sourcePath": "render/src/render/render_script.cpp",
+          "registrationArray": "Render_methods",
+          "registrationLine": 3128
+        },
+        "context": {
+          "kind": "render-script-instance",
+          "evidence": "RenderScriptInstance_Check"
+        },
+        "codecs": {
+          "inputs": [
+            {
+              "index": 1,
+              "codecs": [
+                "Hash",
+                "Nil",
+                "String"
+              ],
+              "documentedCodecs": [
+                "Hash",
+                "Nil",
+                "String"
+              ],
+              "stackEvidence": [
+                "dmScript::CheckHashOrString",
+                "lua_isnil"
+              ]
+            }
+          ],
+          "result": {
+            "codec": "None",
+            "sourceResultCount": 0,
+            "canonicalSurfaceVerdict": "agree"
+          }
+        }
+      },
       "sourceSymbol": "RenderScript_SetCompute",
-      "sourceAnchor": "{\"set_compute\",                     RenderScript_SetCompute}",
       "callShapes": [
         [],
         [
@@ -253,8 +503,29 @@
       "backend": "captured-lua-exact-call",
       "accountingDisposition": "generated-family",
       "requiredContext": "script-instance",
+      "sourceCapabilities": {
+        "registration": {
+          "route": "physics.get_gravity",
+          "module": "physics",
+          "cFunction": "Physics_GetGravity",
+          "sourcePath": "gamesys/src/gamesys/scripts/script_physics.cpp",
+          "registrationArray": "PHYSICS_FUNCTIONS",
+          "registrationLine": 2158
+        },
+        "context": {
+          "kind": "script-instance",
+          "evidence": "captured-lua-route"
+        },
+        "codecs": {
+          "inputs": [],
+          "result": {
+            "codec": "Vector3",
+            "sourceResultCount": 1,
+            "canonicalSurfaceVerdict": "agree"
+          }
+        }
+      },
       "sourceSymbol": "Physics_GetGravity",
-      "sourceAnchor": "{\"get_gravity\",     Physics_GetGravity}",
       "callShapes": [
         []
       ],
@@ -274,8 +545,42 @@
       "backend": "captured-lua-exact-call",
       "accountingDisposition": "generated-family",
       "requiredContext": "script-instance",
+      "sourceCapabilities": {
+        "registration": {
+          "route": "physics.set_gravity",
+          "module": "physics",
+          "cFunction": "Physics_SetGravity",
+          "sourcePath": "gamesys/src/gamesys/scripts/script_physics.cpp",
+          "registrationArray": "PHYSICS_FUNCTIONS",
+          "registrationLine": 2157
+        },
+        "context": {
+          "kind": "script-instance",
+          "evidence": "captured-lua-route"
+        },
+        "codecs": {
+          "inputs": [
+            {
+              "index": 1,
+              "codecs": [
+                "Vector3"
+              ],
+              "documentedCodecs": [
+                "Vector3"
+              ],
+              "stackEvidence": [
+                "dmScript::CheckVector3"
+              ]
+            }
+          ],
+          "result": {
+            "codec": "None",
+            "sourceResultCount": 0,
+            "canonicalSurfaceVerdict": "agree"
+          }
+        }
+      },
       "sourceSymbol": "Physics_SetGravity",
-      "sourceAnchor": "{\"set_gravity\",     Physics_SetGravity}",
       "callShapes": [
         [
           "Vector3"
@@ -297,8 +602,43 @@
       "backend": "captured-lua-exact-call",
       "accountingDisposition": "generated-family",
       "requiredContext": "script-instance",
+      "sourceCapabilities": {
+        "registration": {
+          "route": "go.get_id",
+          "module": "go",
+          "cFunction": "Script_GetId",
+          "sourcePath": "gameobject/src/gameobject/gameobject_script.cpp",
+          "registrationArray": "GO_methods",
+          "registrationLine": 2360
+        },
+        "context": {
+          "kind": "script-instance",
+          "evidence": "captured-lua-route"
+        },
+        "codecs": {
+          "inputs": [
+            {
+              "index": 1,
+              "codecs": [
+                "Nil",
+                "String"
+              ],
+              "documentedCodecs": [
+                "String"
+              ],
+              "stackEvidence": [
+                "luaL_checkstring"
+              ]
+            }
+          ],
+          "result": {
+            "codec": "Hash",
+            "sourceResultCount": 1,
+            "canonicalSurfaceVerdict": "agree"
+          }
+        }
+      },
       "sourceSymbol": "Script_GetId",
-      "sourceAnchor": "{\"get_id\",                  Script_GetId}",
       "callShapes": [
         [],
         [
@@ -321,8 +661,47 @@
       "backend": "captured-lua-exact-call",
       "accountingDisposition": "generated-family",
       "requiredContext": "script-instance",
+      "sourceCapabilities": {
+        "registration": {
+          "route": "go.get_world_transform",
+          "module": "go",
+          "cFunction": "Script_GetWorldTransform",
+          "sourcePath": "gameobject/src/gameobject/gameobject_script.cpp",
+          "registrationArray": "GO_methods",
+          "registrationLine": 2358
+        },
+        "context": {
+          "kind": "script-instance",
+          "evidence": "captured-lua-route"
+        },
+        "codecs": {
+          "inputs": [
+            {
+              "index": 1,
+              "codecs": [
+                "Hash",
+                "Nil",
+                "String",
+                "Url"
+              ],
+              "documentedCodecs": [
+                "Hash",
+                "String",
+                "Url"
+              ],
+              "stackEvidence": [
+                "ResolveInstance"
+              ]
+            }
+          ],
+          "result": {
+            "codec": "Matrix4",
+            "sourceResultCount": 1,
+            "canonicalSurfaceVerdict": "agree"
+          }
+        }
+      },
       "sourceSymbol": "Script_GetWorldTransform",
-      "sourceAnchor": "{\"get_world_transform\",     Script_GetWorldTransform}",
       "callShapes": [
         [],
         [
@@ -351,8 +730,42 @@
       "backend": "captured-lua-exact-call",
       "accountingDisposition": "universal-fallback-test-fixture-adapter-only",
       "requiredContext": "render-script-instance",
+      "sourceCapabilities": {
+        "registration": {
+          "route": "render.set_view",
+          "module": "render",
+          "cFunction": "RenderScript_SetView",
+          "sourcePath": "render/src/render/render_script.cpp",
+          "registrationArray": "Render_methods",
+          "registrationLine": 3105
+        },
+        "context": {
+          "kind": "render-script-instance",
+          "evidence": "RenderScriptInstance_Check"
+        },
+        "codecs": {
+          "inputs": [
+            {
+              "index": 1,
+              "codecs": [
+                "Matrix4"
+              ],
+              "documentedCodecs": [
+                "Matrix4"
+              ],
+              "stackEvidence": [
+                "dmScript::CheckMatrix4"
+              ]
+            }
+          ],
+          "result": {
+            "codec": "None",
+            "sourceResultCount": 0,
+            "canonicalSurfaceVerdict": "agree"
+          }
+        }
+      },
       "sourceSymbol": "RenderScript_SetView",
-      "sourceAnchor": "{\"set_view\",                        RenderScript_SetView}",
       "callShapes": [
         [
           "Matrix4"
@@ -374,8 +787,42 @@
       "backend": "captured-lua-exact-call",
       "accountingDisposition": "universal-fallback-test-fixture-adapter-only",
       "requiredContext": "render-script-instance",
+      "sourceCapabilities": {
+        "registration": {
+          "route": "render.set_projection",
+          "module": "render",
+          "cFunction": "RenderScript_SetProjection",
+          "sourcePath": "render/src/render/render_script.cpp",
+          "registrationArray": "Render_methods",
+          "registrationLine": 3106
+        },
+        "context": {
+          "kind": "render-script-instance",
+          "evidence": "RenderScriptInstance_Check"
+        },
+        "codecs": {
+          "inputs": [
+            {
+              "index": 1,
+              "codecs": [
+                "Matrix4"
+              ],
+              "documentedCodecs": [
+                "Matrix4"
+              ],
+              "stackEvidence": [
+                "dmScript::CheckMatrix4"
+              ]
+            }
+          ],
+          "result": {
+            "codec": "None",
+            "sourceResultCount": 0,
+            "canonicalSurfaceVerdict": "agree"
+          }
+        }
+      },
       "sourceSymbol": "RenderScript_SetProjection",
-      "sourceAnchor": "{\"set_projection\",                  RenderScript_SetProjection}",
       "callShapes": [
         [
           "Matrix4"
@@ -397,8 +844,59 @@
       "backend": "captured-lua-exact-call",
       "accountingDisposition": "generated-family",
       "requiredContext": "script-instance",
+      "sourceCapabilities": {
+        "registration": {
+          "route": "go.world_to_local_transform",
+          "module": "go",
+          "cFunction": "Script_WorldToLocalTransfrom",
+          "sourcePath": "gameobject/src/gameobject/gameobject_script.cpp",
+          "registrationArray": "GO_methods",
+          "registrationLine": 2367
+        },
+        "context": {
+          "kind": "script-instance",
+          "evidence": "captured-lua-route"
+        },
+        "codecs": {
+          "inputs": [
+            {
+              "index": 1,
+              "codecs": [
+                "Matrix4"
+              ],
+              "documentedCodecs": [
+                "Matrix4"
+              ],
+              "stackEvidence": [
+                "dmScript::CheckMatrix4"
+              ]
+            },
+            {
+              "index": 2,
+              "codecs": [
+                "Hash",
+                "Nil",
+                "String",
+                "Url"
+              ],
+              "documentedCodecs": [
+                "Hash",
+                "String",
+                "Url"
+              ],
+              "stackEvidence": [
+                "ResolveInstance"
+              ]
+            }
+          ],
+          "result": {
+            "codec": "Matrix4",
+            "sourceResultCount": 1,
+            "canonicalSurfaceVerdict": "agree"
+          }
+        }
+      },
       "sourceSymbol": "Script_WorldToLocalTransfrom",
-      "sourceAnchor": "{\"world_to_local_transform\",Script_WorldToLocalTransfrom}",
       "callShapes": [
         [
           "Matrix4",
@@ -429,8 +927,68 @@
       "backend": "captured-lua-exact-call",
       "accountingDisposition": "generated-family",
       "requiredContext": "script-instance",
+      "sourceCapabilities": {
+        "registration": {
+          "route": "font.set_style",
+          "module": "font",
+          "cFunction": "SetStyle",
+          "sourcePath": "gamesys/src/gamesys/scripts/script_font.cpp",
+          "registrationArray": "Module_methods",
+          "registrationLine": 411
+        },
+        "context": {
+          "kind": "script-instance",
+          "evidence": "captured-lua-route"
+        },
+        "codecs": {
+          "inputs": [
+            {
+              "index": 1,
+              "codecs": [
+                "Hash",
+                "String"
+              ],
+              "documentedCodecs": [
+                "Hash",
+                "String"
+              ],
+              "stackEvidence": [
+                "dmScript::CheckHashOrString"
+              ]
+            },
+            {
+              "index": 2,
+              "codecs": [
+                "String"
+              ],
+              "documentedCodecs": [
+                "String"
+              ],
+              "stackEvidence": [
+                "luaL_checklstring"
+              ]
+            },
+            {
+              "index": 3,
+              "codecs": [
+                "String"
+              ],
+              "documentedCodecs": [
+                "String"
+              ],
+              "stackEvidence": [
+                "luaL_checklstring"
+              ]
+            }
+          ],
+          "result": {
+            "codec": "None",
+            "sourceResultCount": 0,
+            "canonicalSurfaceVerdict": "agree"
+          }
+        }
+      },
       "sourceSymbol": "SetStyle",
-      "sourceAnchor": "{\"set_style\", SetStyle}",
       "callShapes": [
         [
           "String",
@@ -459,8 +1017,48 @@
       "backend": "captured-lua-exact-call",
       "accountingDisposition": "generated-family",
       "requiredContext": "script-instance",
+      "sourceCapabilities": {
+        "registration": {
+          "route": "camera.get_projection",
+          "module": "camera",
+          "cFunction": "RenderScriptCamera_GetProjection",
+          "sourcePath": "render/src/render/render_script_camera.cpp",
+          "registrationArray": "RenderScriptCamera_Methods",
+          "registrationLine": 540
+        },
+        "context": {
+          "kind": "script-instance",
+          "evidence": "captured-lua-route"
+        },
+        "codecs": {
+          "inputs": [
+            {
+              "index": 1,
+              "codecs": [
+                "Hash",
+                "Nil",
+                "Number",
+                "String",
+                "Url"
+              ],
+              "documentedCodecs": [
+                "Nil",
+                "Number",
+                "Url"
+              ],
+              "stackEvidence": [
+                "CheckRenderCamera"
+              ]
+            }
+          ],
+          "result": {
+            "codec": "Matrix4",
+            "sourceResultCount": 1,
+            "canonicalSurfaceVerdict": "agree"
+          }
+        }
+      },
       "sourceSymbol": "RenderScriptCamera_GetProjection",
-      "sourceAnchor": "{\"get_projection\",          RenderScriptCamera_GetProjection}",
       "callShapes": [
         [],
         [
@@ -489,8 +1087,58 @@
       "backend": "captured-lua-exact-call",
       "accountingDisposition": "generated-family",
       "requiredContext": "script-instance",
+      "sourceCapabilities": {
+        "registration": {
+          "route": "font.remove_font",
+          "module": "font",
+          "cFunction": "RemoveFont",
+          "sourcePath": "gamesys/src/gamesys/scripts/script_font.cpp",
+          "registrationArray": "Module_methods",
+          "registrationLine": 408
+        },
+        "context": {
+          "kind": "script-instance",
+          "evidence": "captured-lua-route"
+        },
+        "codecs": {
+          "inputs": [
+            {
+              "index": 1,
+              "codecs": [
+                "Hash",
+                "String"
+              ],
+              "documentedCodecs": [
+                "Hash",
+                "String"
+              ],
+              "stackEvidence": [
+                "dmScript::CheckHashOrString"
+              ]
+            },
+            {
+              "index": 2,
+              "codecs": [
+                "Hash",
+                "String"
+              ],
+              "documentedCodecs": [
+                "Hash",
+                "String"
+              ],
+              "stackEvidence": [
+                "dmScript::CheckHashOrString"
+              ]
+            }
+          ],
+          "result": {
+            "codec": "None",
+            "sourceResultCount": 0,
+            "canonicalSurfaceVerdict": "agree"
+          }
+        }
+      },
       "sourceSymbol": "RemoveFont",
-      "sourceAnchor": "{\"remove_font\", RemoveFont}",
       "callShapes": [
         [
           "String",
@@ -525,12 +1173,44 @@
       "backend": "captured-lua-exact-call",
       "accountingDisposition": "generated-family",
       "requiredContext": "script-instance",
+      "sourceCapabilities": {
+        "registration": {
+          "route": "sound.get_group_name",
+          "module": "sound",
+          "cFunction": "Sound_GetGroupName",
+          "sourcePath": "gamesys/src/gamesys/scripts/script_sound.cpp",
+          "registrationArray": "SOUND_FUNCTIONS",
+          "registrationLine": 746
+        },
+        "context": {
+          "kind": "script-instance",
+          "evidence": "captured-lua-route"
+        },
+        "codecs": {
+          "inputs": [
+            {
+              "index": 1,
+              "codecs": [
+                "Hash"
+              ],
+              "documentedCodecs": [
+                "Hash",
+                "String"
+              ],
+              "stackEvidence": [
+                "dmScript::CheckHash"
+              ]
+            }
+          ],
+          "result": {
+            "codec": "String",
+            "sourceResultCount": 1,
+            "canonicalSurfaceVerdict": "agree"
+          }
+        }
+      },
       "sourceSymbol": "Sound_GetGroupName",
-      "sourceAnchor": "{\"get_group_name\", Sound_GetGroupName}",
       "callShapes": [
-        [
-          "String"
-        ],
         [
           "Hash"
         ]
@@ -551,8 +1231,45 @@
       "backend": "captured-lua-exact-call",
       "accountingDisposition": "universal-fallback-test-fixture-adapter-only",
       "requiredContext": "gui-script-instance",
+      "sourceCapabilities": {
+        "registration": {
+          "route": "gui.delete_texture",
+          "module": "gui",
+          "cFunction": "LuaDeleteTexture",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5018
+        },
+        "context": {
+          "kind": "gui-script-instance",
+          "evidence": "GuiScriptInstance_Check"
+        },
+        "codecs": {
+          "inputs": [
+            {
+              "index": 1,
+              "codecs": [
+                "Hash",
+                "String"
+              ],
+              "documentedCodecs": [
+                "Hash",
+                "String"
+              ],
+              "stackEvidence": [
+                "dmScript::CheckHashOrString",
+                "dmScript::GetStringFromHashOrString"
+              ]
+            }
+          ],
+          "result": {
+            "codec": "None",
+            "sourceResultCount": 0,
+            "canonicalSurfaceVerdict": "agree"
+          }
+        }
+      },
       "sourceSymbol": "LuaDeleteTexture",
-      "sourceAnchor": "{\"delete_texture\",  LuaDeleteTexture}",
       "callShapes": [
         [
           "String"
@@ -577,8 +1294,29 @@
       "backend": "captured-lua-exact-call",
       "accountingDisposition": "universal-fallback-test-fixture-adapter-only",
       "requiredContext": "gui-script-instance",
+      "sourceCapabilities": {
+        "registration": {
+          "route": "gui.get_layout",
+          "module": "gui",
+          "cFunction": "LuaGetLayout",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5028
+        },
+        "context": {
+          "kind": "gui-script-instance",
+          "evidence": "GuiScriptInstance_Check"
+        },
+        "codecs": {
+          "inputs": [],
+          "result": {
+            "codec": "Hash",
+            "sourceResultCount": 1,
+            "canonicalSurfaceVerdict": "agree"
+          }
+        }
+      },
       "sourceSymbol": "LuaGetLayout",
-      "sourceAnchor": "{\"get_layout\",        LuaGetLayout}",
       "callShapes": [
         []
       ],
@@ -598,8 +1336,44 @@
       "backend": "captured-lua-exact-call",
       "accountingDisposition": "generated-family",
       "requiredContext": "script-instance",
+      "sourceCapabilities": {
+        "registration": {
+          "route": "sound.get_group_gain",
+          "module": "sound",
+          "cFunction": "Sound_GetGroupGain",
+          "sourcePath": "gamesys/src/gamesys/scripts/script_sound.cpp",
+          "registrationArray": "SOUND_FUNCTIONS",
+          "registrationLine": 744
+        },
+        "context": {
+          "kind": "script-instance",
+          "evidence": "captured-lua-route"
+        },
+        "codecs": {
+          "inputs": [
+            {
+              "index": 1,
+              "codecs": [
+                "Hash",
+                "String"
+              ],
+              "documentedCodecs": [
+                "Hash",
+                "String"
+              ],
+              "stackEvidence": [
+                "CheckGroupName"
+              ]
+            }
+          ],
+          "result": {
+            "codec": "Number",
+            "sourceResultCount": 1,
+            "canonicalSurfaceVerdict": "agree"
+          }
+        }
+      },
       "sourceSymbol": "Sound_GetGroupGain",
-      "sourceAnchor": "{\"get_group_gain\", Sound_GetGroupGain}",
       "callShapes": [
         [
           "String"
@@ -624,8 +1398,57 @@
       "backend": "captured-lua-exact-call",
       "accountingDisposition": "generated-family",
       "requiredContext": "script-instance",
+      "sourceCapabilities": {
+        "registration": {
+          "route": "resource.set_sound",
+          "module": "resource",
+          "cFunction": "SetSound",
+          "sourcePath": "gamesys/src/gamesys/scripts/script_resource.cpp",
+          "registrationArray": "Module_methods",
+          "registrationLine": 3460
+        },
+        "context": {
+          "kind": "script-instance",
+          "evidence": "captured-lua-route"
+        },
+        "codecs": {
+          "inputs": [
+            {
+              "index": 1,
+              "codecs": [
+                "Hash",
+                "String"
+              ],
+              "documentedCodecs": [
+                "Hash",
+                "String"
+              ],
+              "stackEvidence": [
+                "dmScript::CheckHashOrString"
+              ]
+            },
+            {
+              "index": 2,
+              "codecs": [
+                "String"
+              ],
+              "documentedCodecs": [
+                "String"
+              ],
+              "stackEvidence": [
+                "luaL_checktype",
+                "lua_tolstring"
+              ]
+            }
+          ],
+          "result": {
+            "codec": "None",
+            "sourceResultCount": 0,
+            "canonicalSurfaceVerdict": "undecided"
+          }
+        }
+      },
       "sourceSymbol": "SetSound",
-      "sourceAnchor": "{\"set_sound\",               SetSound}",
       "callShapes": [
         [
           "Hash",
@@ -652,8 +1475,44 @@
       "backend": "captured-lua-exact-call",
       "accountingDisposition": "universal-fallback-test-fixture-adapter-only",
       "requiredContext": "script-instance",
+      "sourceCapabilities": {
+        "registration": {
+          "route": "liveupdate.remove_mount",
+          "module": "liveupdate",
+          "cFunction": "dmLiveUpdate::Resource_RemoveMount",
+          "sourcePath": "liveupdate/src/script_liveupdate.cpp",
+          "registrationArray": "Module_methods",
+          "registrationLine": 174
+        },
+        "context": {
+          "kind": "script-instance",
+          "evidence": "captured-lua-route"
+        },
+        "codecs": {
+          "inputs": [
+            {
+              "index": 1,
+              "codecs": [
+                "Hash",
+                "String"
+              ],
+              "documentedCodecs": [
+                "Hash",
+                "String"
+              ],
+              "stackEvidence": [
+                "dmScript::CheckHashOrString"
+              ]
+            }
+          ],
+          "result": {
+            "codec": "Number",
+            "sourceResultCount": 1,
+            "canonicalSurfaceVerdict": "agree"
+          }
+        }
+      },
       "sourceSymbol": "dmLiveUpdate::Resource_RemoveMount",
-      "sourceAnchor": "{\"remove_mount\",                    dmLiveUpdate::Resource_RemoveMount}",
       "callShapes": [
         [
           "String"
@@ -717,8 +1576,46 @@
       "backend": "captured-lua-exact-call",
       "accountingDisposition": "universal-fallback-test-fixture-adapter-only",
       "requiredContext": "render-script-instance",
+      "sourceCapabilities": {
+        "registration": {
+          "route": "render.enable_material",
+          "module": "render",
+          "cFunction": "RenderScript_EnableMaterial",
+          "sourcePath": "render/src/render/render_script.cpp",
+          "registrationArray": "Render_methods",
+          "registrationLine": 3126
+        },
+        "context": {
+          "kind": "render-script-instance",
+          "evidence": "RenderScriptInstance_Check"
+        },
+        "codecs": {
+          "inputs": [
+            {
+              "index": 1,
+              "codecs": [
+                "Hash",
+                "Nil",
+                "String"
+              ],
+              "documentedCodecs": [
+                "Hash",
+                "String"
+              ],
+              "stackEvidence": [
+                "dmScript::CheckHashOrString",
+                "lua_isnil"
+              ]
+            }
+          ],
+          "result": {
+            "codec": "None",
+            "sourceResultCount": 0,
+            "canonicalSurfaceVerdict": "agree"
+          }
+        }
+      },
       "sourceSymbol": "RenderScript_EnableMaterial",
-      "sourceAnchor": "{\"enable_material\",                 RenderScript_EnableMaterial}",
       "callShapes": [
         [
           "String"
@@ -743,8 +1640,44 @@
       "backend": "captured-lua-exact-call",
       "accountingDisposition": "universal-fallback-test-fixture-adapter-only",
       "requiredContext": "gui-script-instance",
+      "sourceCapabilities": {
+        "registration": {
+          "route": "gui.get_font_resource",
+          "module": "gui",
+          "cFunction": "LuaGetFontResource",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5024
+        },
+        "context": {
+          "kind": "gui-script-instance",
+          "evidence": "GuiScriptInstance_Check"
+        },
+        "codecs": {
+          "inputs": [
+            {
+              "index": 1,
+              "codecs": [
+                "Hash",
+                "String"
+              ],
+              "documentedCodecs": [
+                "Hash",
+                "String"
+              ],
+              "stackEvidence": [
+                "dmScript::CheckHashOrString"
+              ]
+            }
+          ],
+          "result": {
+            "codec": "Hash",
+            "sourceResultCount": 1,
+            "canonicalSurfaceVerdict": "agree"
+          }
+        }
+      },
       "sourceSymbol": "LuaGetFontResource",
-      "sourceAnchor": "{\"get_font_resource\", LuaGetFontResource}",
       "callShapes": [
         [
           "Hash"
@@ -769,8 +1702,107 @@
       "backend": "captured-lua-exact-call",
       "accountingDisposition": "universal-fallback-test-fixture-adapter-only",
       "requiredContext": "gui-script-instance",
+      "sourceCapabilities": {
+        "registration": {
+          "route": "gui.set_texture_data",
+          "module": "gui",
+          "cFunction": "LuaSetTextureData",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5019
+        },
+        "context": {
+          "kind": "gui-script-instance",
+          "evidence": "GuiScriptInstance_Check"
+        },
+        "codecs": {
+          "inputs": [
+            {
+              "index": 1,
+              "codecs": [
+                "Hash",
+                "String"
+              ],
+              "documentedCodecs": [
+                "Hash",
+                "String"
+              ],
+              "stackEvidence": [
+                "dmScript::CheckHashOrString"
+              ]
+            },
+            {
+              "index": 2,
+              "codecs": [
+                "Number"
+              ],
+              "documentedCodecs": [
+                "Number"
+              ],
+              "stackEvidence": [
+                "luaL_checkinteger"
+              ]
+            },
+            {
+              "index": 3,
+              "codecs": [
+                "Number"
+              ],
+              "documentedCodecs": [
+                "Number"
+              ],
+              "stackEvidence": [
+                "luaL_checkinteger"
+              ]
+            },
+            {
+              "index": 4,
+              "codecs": [
+                "String"
+              ],
+              "documentedCodecs": [
+                "String",
+                "String"
+              ],
+              "stackEvidence": [
+                "luaL_checkstring"
+              ]
+            },
+            {
+              "index": 5,
+              "codecs": [
+                "String"
+              ],
+              "documentedCodecs": [
+                "String"
+              ],
+              "stackEvidence": [
+                "luaL_checktype",
+                "lua_tolstring"
+              ]
+            },
+            {
+              "index": 6,
+              "codecs": [
+                "Boolean"
+              ],
+              "documentedCodecs": [
+                "Boolean"
+              ],
+              "stackEvidence": [
+                "luaL_checktype",
+                "lua_toboolean"
+              ]
+            }
+          ],
+          "result": {
+            "codec": "Boolean",
+            "sourceResultCount": 1,
+            "canonicalSurfaceVerdict": "agree"
+          }
+        }
+      },
       "sourceSymbol": "LuaSetTextureData",
-      "sourceAnchor": "{\"set_texture_data\",LuaSetTextureData}",
       "callShapes": [
         [
           "String",
@@ -840,8 +1872,44 @@
       "backend": "captured-lua-exact-call",
       "accountingDisposition": "universal-fallback-test-fixture-adapter-only",
       "requiredContext": "gui-script-instance",
+      "sourceCapabilities": {
+        "registration": {
+          "route": "gui.set_layout",
+          "module": "gui",
+          "cFunction": "LuaSetLayout",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5029
+        },
+        "context": {
+          "kind": "gui-script-instance",
+          "evidence": "GuiScriptInstance_Check"
+        },
+        "codecs": {
+          "inputs": [
+            {
+              "index": 1,
+              "codecs": [
+                "Hash",
+                "String"
+              ],
+              "documentedCodecs": [
+                "Hash",
+                "String"
+              ],
+              "stackEvidence": [
+                "dmScript::CheckHashOrString"
+              ]
+            }
+          ],
+          "result": {
+            "codec": "Boolean",
+            "sourceResultCount": 1,
+            "canonicalSurfaceVerdict": "agree"
+          }
+        }
+      },
       "sourceSymbol": "LuaSetLayout",
-      "sourceAnchor": "{\"set_layout\",        LuaSetLayout}",
       "callShapes": [
         [
           "String"

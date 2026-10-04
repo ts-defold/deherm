@@ -7,6 +7,10 @@ import { pathToFileURL } from "node:url";
 import { hexBindingId, stableBindingId } from "./lib/binding-identity.mjs";
 import { declaredDerivation, expectReviewedCount, observeReviewedSource } from "./lib/reviewed-revision.mjs";
 import { MOVED, VOID, recordAudit } from "./lib/revision-audit.mjs";
+import {
+  guiNodeUserdataCapability,
+  parseCanonicalLuaRegistrationSurface,
+} from "./lib/defold-lua-structural-capabilities.mjs";
 
 const root = new URL("../", import.meta.url);
 const irUrl = new URL("packages/bindings/generated/defold-script-api-ir.json", root);
@@ -24,6 +28,7 @@ const reportUrl = new URL("packages/bindings/generated/defold-script-value-bindi
 const headerUrl = new URL("defold/defold_hermes/include/defold_hermes/generated_script_value_bindings.hpp", root);
 const sourceUrl = new URL("defold/defold_hermes/src/generated_script_value_bindings.cpp", root);
 const targetSupportUrl = new URL("packages/sdk/src/generated/script/value-target-support.ts", root);
+const registrationSurfaceUrl = new URL("packages/bindings/generated/defold-lua-registration-surface.json", root);
 
 const CODECS = new Set([
   "Nil",
@@ -708,10 +713,34 @@ function validateStructuredLuaContract(binding, parameters, callShapes, resultCo
   }
 }
 
-function reviewedStructuredLuaTemplate(parameters, callShapes, resultCodec) {
+function reviewedStructuredLuaTemplate(parameters, callShapes, resultCodec, requiredCapability = null) {
   return {
     validate(binding) {
       validateStructuredLuaContract(binding, parameters, callShapes, resultCodec);
+      if (requiredCapability === "gui-node-userdata") {
+        const proof = binding.structuralCapabilities;
+        if (
+          proof?.registration?.route !== "gui.get_node" ||
+          proof.registration.module !== "gui" ||
+          proof.registration.cFunction !== binding.sourceSymbol ||
+          proof.registration.registrationArray !== "Gui_methods" ||
+          proof.context?.kind !== "active-gui-scene" ||
+          proof.context?.check !== "GuiScriptInstance_Check" ||
+          proof.inputCodecs?.length !== 1 ||
+          !proof.inputCodecs[0]?.includes("hash") ||
+          !proof.inputCodecs[0]?.includes("string") ||
+          proof.result?.codec !== "Node" ||
+          proof.userdata?.kind !== "full-userdata" ||
+          proof.userdata?.metatable !== "NodeProxy" ||
+          proof.userdata?.registeredType !== "NODE_PROXY_TYPE_HASH" ||
+          proof.userdata?.checkedBy !== "dmScript::CheckUserType" ||
+          !proof.userdata?.metamethods?.includes("__index") ||
+          !proof.userdata?.metamethods?.includes("__newindex")
+        ) {
+          throw new Error(`${binding.id}: ${binding.operation.template} lacks GUI node userdata capability evidence`);
+        }
+        return;
+      }
       const evidence = Array.isArray(binding.sourceOperation)
         ? binding.sourceOperation
         : binding.sourceOperation
@@ -1520,6 +1549,7 @@ ${delegation}
       },
       [["String"]],
       "Node",
+      "gui-node-userdata",
     ),
   ],
   [
@@ -1640,7 +1670,7 @@ export function generate(irText, scalarDispatchText, patternsText, inputs) {
   const stableIds = new Map();
   const sourceEvidence = [];
   const bindings = inputs
-    .flatMap(({ definitionText, sourceText, additionalSources = [] }) => {
+    .flatMap(({ definitionText, sourceText, additionalSources = [], registrationSurfaceText }) => {
       const definition = JSON.parse(definitionText);
       if (
         definition.schemaVersion !== 2 ||
@@ -1738,7 +1768,19 @@ export function generate(irText, scalarDispatchText, patternsText, inputs) {
             : Array.isArray(entry.sourceOperation)
               ? entry.sourceOperation
               : [entry.sourceOperation];
-        if (sourceOperations.some((anchor) => typeof anchor !== "string" || !scopedSource.includes(anchor))) {
+        if (entry.id === "script:gui.get_node") {
+          const surface = parseCanonicalLuaRegistrationSurface(registrationSurfaceText);
+          const capabilities = guiNodeUserdataCapability(surface, sourceText, fn);
+          if (!capabilities || capabilities.registration.cFunction !== entry.sourceSymbol) {
+            withdrawReviewed(
+              entry.id,
+              "missing-structural-capability",
+              `${entry.id}: GUI node userdata/context/type capability is incomplete`,
+            );
+            return [];
+          }
+          entry.structuralCapabilities = capabilities;
+        } else if (sourceOperations.some((anchor) => typeof anchor !== "string" || !scopedSource.includes(anchor))) {
           withdrawReviewed(entry.id, "stale-source-anchor", `${entry.id}: scoped source operation evidence is stale`);
           return [];
         }
@@ -1871,16 +1913,28 @@ export function generate(irText, scalarDispatchText, patternsText, inputs) {
     .update(scalarDispatchText)
     .update("\0")
     .update(patternsText);
-  for (const { definitionText, sourceText, additionalSources = [] } of inputs) {
-    inputHash.update("\0").update(definitionText).update("\0").update(sourceText);
+  for (const { definitionText, sourceText, additionalSources = [], registrationSurfaceText = "" } of inputs) {
+    inputHash
+      .update("\0")
+      .update(definitionText)
+      .update("\0")
+      .update(sourceText)
+      .update("\0")
+      .update(registrationSurfaceText);
     for (const source of additionalSources)
       inputHash.update("\0").update(source.source).update("\0").update(source.sourceText);
   }
   const inputSha256 = inputHash.digest("hex");
+  const registrationSurfaceText = inputs.find(
+    ({ registrationSurfaceText }) => registrationSurfaceText,
+  )?.registrationSurfaceText;
   const report = {
     schemaVersion: 1,
     defoldRevision: ir.defoldRevision,
     inputSha256,
+    registrationSurfaceSha256: createHash("sha256")
+      .update(registrationSurfaceText ?? "")
+      .digest("hex"),
     sourceEvidence,
     operationTemplateVocabulary: [...OPERATION_TEMPLATES.keys()],
     coverageClaim:
@@ -2037,10 +2091,11 @@ DispatchStatus complete(bool ok) noexcept { return ok ? DispatchStatus::kSuccess
 }
 
 export async function loadGenerationInputs() {
-  const [irText, scalarDispatchText, patternsText] = await Promise.all([
+  const [irText, scalarDispatchText, patternsText, registrationSurfaceText] = await Promise.all([
     readFile(irUrl, "utf8"),
     readFile(scalarDispatchUrl, "utf8"),
     readFile(patternsUrl, "utf8"),
+    readFile(registrationSurfaceUrl, "utf8"),
   ]);
   const inputs = await Promise.all(
     definitionUrls.map(async (definitionUrl) => {
@@ -2053,7 +2108,7 @@ export async function loadGenerationInputs() {
           sourceText: await readFile(new URL(`upstream/defold/${source}`, root), "utf8"),
         })),
       );
-      return { definitionText, sourceText, additionalSources };
+      return { definitionText, sourceText, additionalSources, registrationSurfaceText };
     }),
   );
   return { irText, scalarDispatchText, patternsText, inputs };
