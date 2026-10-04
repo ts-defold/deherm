@@ -173,8 +173,8 @@
     },
     {
       "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-      "policyRoot": "e56e0aad9f87bbb926a6afef418ffe064dce081301a5c00c48fb85a8c5734236",
-      "generator": "sha256:2276598a6e6174ede829f2e7e94410dd18958025743c88ed6e3e1c8f44f07b2b",
+      "policyRoot": "5b059362c554555cc4bf5e54a657d49f95645121eaa453a90ece6e7062257228",
+      "generator": "sha256:e59d913a761e9fb29e32c52d4d64e2398cfcceda7005af4cdd3f4b6f420f1b06",
       "realizer": {
         "minimumPackageVersion": "0.1.0",
         "requiredCapabilities": [
@@ -211,7 +211,6 @@
           "output.script-url.render.v1",
           "output.script-value-binding.render.v1",
           "output.script-value-tail.render.v1",
-          "output.stable-template.render.v1",
           "output.static-hermes-typed-native-bridge.render.v1",
           "output.static-hermes-vmath.render.v1",
           "policy.compiler-document.binding-lowering-plan.v1",
