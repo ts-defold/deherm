@@ -265,6 +265,8 @@ jobs:
       - uses: actions/setup-python@v6
         with: { python-version: '3.13' }
       - run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Verify policy cache lifecycle on this host
+        run: pnpm test:policy-cache
       - name: Install the generated surface
         run: |
           archive="$RUNNER_TEMP/policy-surface/policy-surface.tar.gz"

@@ -5312,6 +5312,12 @@ contention. These are cache-lifecycle and coordination tests; retained surface
 authenticity continues to come only from the existing full materialized-surface
 verifier.
 
+The policy workflow now executes that same cache-lifecycle suite inside its
+existing Linux, macOS, and Windows host-parity matrix. The simulated sharing-
+violation cases remain deterministic unit evidence, while the matrix separately
+proves that retention, pointer locking, and cleanup execute on each supported
+host filesystem and process model before policy publication.
+
 ## 2026-10-04 - Native target releases are fingerprinted by recipe family
 
 The native target artifact family now has four immutable recipe identities:

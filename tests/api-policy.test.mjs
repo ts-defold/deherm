@@ -76,6 +76,10 @@ test("policy host parity materializes every authoritative generator input", asyn
   const engine = workflow.slice(workflow.indexOf("  engine-conformance:"), workflow.indexOf("  publish-site:"));
   const publish = workflow.slice(workflow.indexOf("  publish-site:"));
   const derive = workflow.slice(workflow.indexOf("  derive:"), workflow.indexOf("  host-parity:"));
+  assert.match(parity, /role: Linux canonical bytes/u);
+  assert.match(parity, /role: macOS reproduces Linux/u);
+  assert.match(parity, /role: Windows reproduces Linux/u);
+  assert.match(parity, /Verify policy cache lifecycle on this host[\s\S]*pnpm test:policy-cache/u);
   for (const { root: revisionRoot } of REVISION_OUTPUT_ROOTS) {
     assert.ok(
       policySurfaceArchivePaths.includes(revisionRoot),

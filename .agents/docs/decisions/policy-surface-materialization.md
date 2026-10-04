@@ -261,6 +261,12 @@ content. Windows `EPERM`, `EACCES`, `EBUSY`, and `ENOTEMPTY` outcomes during
 quarantine or reclamation become retryable, path-specific diagnostics and leave
 the immutable directory untouched.
 
+The cache-lifecycle contract is executed by the policy workflow's existing
+Linux, macOS, and Windows host-parity matrix. Deterministic fault injection
+covers Windows sharing-violation refusal, while executing the complete suite on
+all three hosts proves that retention planning, directory locking, pointer
+coordination, and cleanup are portable before publication can proceed.
+
 ## Compiler document inventory
 
 The manifest references these revision-derived documents. “Copied” means the
