@@ -5374,3 +5374,11 @@ not turn generated outputs into source-derived semantic facts. Future #93
 waves must instead remove ownership seams through composable compiler emitters,
 preserve old-policy compatibility and frozen byte equality, and report compiler
 concept/exception changes separately from storage measurements.
+
+That simplification boundary also preserves performance as a first-class
+invariant. Removing a recipe dialect cannot move a specialized route onto the
+universal fallback, widen its bounded scratch/frame contract, introduce warmed
+allocations, weaken tree shaking, or regress representative hot-path timings.
+Emitter and dispatch migrations must compare route selection and the relevant
+runtime/allocation/benchmark evidence before and after; fewer concepts or bytes
+do not excuse slower generated code.

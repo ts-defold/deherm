@@ -47,12 +47,22 @@ installed compiler cannot express. Specialized fast paths and the universal
 fallback remain projections of the same authoritative facts, not separately
 maintained surfaces.
 
+Simplicity must not flatten specialized routes into a slower generic path.
+Every migration preserves the selected lowering family, emitted ABI, bounded
+scratch/frame profile, warmed allocation behavior, tree-shaking boundary, and
+runtime semantics for the same policy facts. Representative hot-path
+benchmarks are compared before and after when emitter or dispatch code changes;
+an unexplained regression is a failed migration even when the implementation
+has fewer lines or the policy has fewer bytes. Optimization selection should
+become more structural and composable, not less capable.
+
 Each accepted migration must preserve old-policy compatibility and frozen
 old-pipeline byte equality while reporting separately: removed ownership seams,
 new or removed compiler concepts, revision-specific exceptions, policy
 transfer bytes, realized bytes, and npm payload bytes. The first three decide
-whether the design improved; the byte measurements catch regressions and guide
-priority.
+whether the design improved; route-selection parity, allocation/frame evidence,
+and relevant benchmarks prevent performance regressions; the byte measurements
+catch distribution regressions and guide priority.
 
 `scripts/policy-surface.mjs` is the single transport manifest for the complete
 revision-derived checkout surface. Derivation fingerprinting imports the same
