@@ -204,8 +204,8 @@
     },
     {
       "path": "packages/bindings/generated/defold-script-api-accounting.json",
-      "bytes": 960271,
-      "sha256": "13009659cb5c80bf84fb03b9791178ab1cb4f3c7a2874139fe1576123d2ef9c1"
+      "bytes": 960225,
+      "sha256": "fafd81fadc0ab67ea4e6e1e86eac18e0f1a2031d50c5a72f405d23d5be6bfec2"
     },
     {
       "path": "packages/bindings/generated/defold-dmsdk-accounting.json",
