@@ -6,9 +6,23 @@ import { join } from "node:path";
 import test from "node:test";
 
 import { generate, loadInputs } from "../scripts/generate-script-dynamic-values.mjs";
+import { renderScriptDynamicValuesOutputs } from "../packages/compiler/src/script-dynamic-values-output-emitter.mjs";
 import { stableBindingId } from "../scripts/lib/binding-identity.mjs";
 
 const root = new URL("../", import.meta.url);
+
+test("package dynamic-values emitter reproduces generated artifacts byte-for-byte", async () => {
+  const [factsText, header, source, target] = await Promise.all([
+    readFile(new URL("packages/bindings/generated/defold-script-dynamic-values-recipe-facts.json", root), "utf8"),
+    readFile(new URL("defold/defold_hermes/include/defold_hermes/generated_script_dynamic_values.hpp", root), "utf8"),
+    readFile(new URL("defold/defold_hermes/src/generated_script_dynamic_values.cpp", root), "utf8"),
+    readFile(new URL("packages/sdk/src/generated/script/dynamic-values.ts", root), "utf8"),
+  ]);
+  const outputs = renderScriptDynamicValuesOutputs(JSON.parse(factsText));
+  assert.equal(outputs.header, header);
+  assert.equal(outputs.source, source);
+  assert.equal(outputs.target, target);
+});
 
 function generateFrom(inputs, changes = {}) {
   return generate(

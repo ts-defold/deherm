@@ -39,9 +39,40 @@ import {
   renderScriptValueBindingOutputs,
   SCRIPT_VALUE_BINDING_RECIPE_FACTS_NAME,
 } from "./script-value-binding-output-emitter.mjs";
+import {
+  GENERATED_MODULE_FACTS,
+  GENERATED_MODULE_RECIPE,
+  renderGeneratedModuleOutputs,
+} from "./generated-module-output-emitter.mjs";
+import { renderScriptUrlNativeOutputs } from "./script-url-output-emitter.mjs";
+import {
+  renderStaticHermesVmathHeader,
+  renderStaticHermesVmathSource,
+  renderStaticHermesVmathTypescript,
+} from "./static-hermes-vmath-output-emitter.mjs";
+import {
+  renderScriptCallbackLifecycleOutputs,
+  SCRIPT_CALLBACK_LIFECYCLE_FACTS,
+} from "./script-callback-lifecycle-output-emitter.mjs";
+import {
+  renderScriptDynamicValuesOutputs,
+  SCRIPT_DYNAMIC_VALUES_FACTS,
+} from "./script-dynamic-values-output-emitter.mjs";
+import { renderScriptFixedTuplesOutputs, SCRIPT_FIXED_TUPLES_FACTS } from "./script-fixed-tuples-output-emitter.mjs";
+import {
+  renderScriptOverloadDispatchOutputs,
+  SCRIPT_OVERLOAD_DISPATCH_FACTS,
+} from "./script-overload-dispatch-output-emitter.mjs";
+import { renderScriptTableRecordOutputs, SCRIPT_TABLE_RECORD_FACTS } from "./script-table-record-output-emitter.mjs";
+import { renderScriptValueTailOutputs, SCRIPT_VALUE_TAIL_FACTS } from "./script-value-tail-output-emitter.mjs";
+import { LUA_BRIDGE_FACTS, renderLuaBridgeOutputs } from "./lua-bridge-output-emitter.mjs";
+import { renderScriptSpecialCallVerificationHeaderFromReport } from "./script-special-call-verification.mjs";
+import { renderDmSdkUniversalJsiSource } from "./dmsdk-universal-jsi-source-emitter.mjs";
+import { renderTypescript as renderStaticHermesTypedNativeBridge } from "./static-hermes-typed-native-bridge-output-emitter.mjs";
 
 export const STABLE_OUTPUT_RECIPE = "output.stable-template.render.v1";
 export const DMSDK_UNIVERSAL_JSI_HEADER_RECIPE = "output.dmsdk-universal-jsi-header.render.v1";
+export const DMSDK_UNIVERSAL_JSI_SOURCE_RECIPE = "output.dmsdk-universal-jsi-source.render.v1";
 export const DMSDK_UNIVERSAL_HEADER_RECIPE = "output.dmsdk-universal-header.render.v1";
 export const DMSDK_UNIVERSAL_RUNTIME_RECIPE = "output.dmsdk-universal-runtime.render.v1";
 export const DMSDK_UNIVERSAL_BROWSER_RECIPE = "output.dmsdk-universal-browser.render.v1";
@@ -62,6 +93,17 @@ export const DMSDK_NAMED_SCALAR_RECIPE = "output.dmsdk-named-scalar.render.v1";
 export const DMSDK_SCALAR_RECIPE = "output.dmsdk-scalar.render.v1";
 export const DMSDK_SCRATCH_SCALAR_OUT_RECIPE = "output.dmsdk-scratch-scalar-out.render.v1";
 export const DMSDK_HASH_STATE_RECIPE = "output.dmsdk-hash-state.render.v1";
+export const SCRIPT_URL_RECIPE = "output.script-url.render.v1";
+export const STATIC_HERMES_VMATH_RECIPE = "output.static-hermes-vmath.render.v1";
+export const SCRIPT_CALLBACK_LIFECYCLE_RECIPE = "output.script-callback-lifecycle.render.v1";
+export const SCRIPT_DYNAMIC_VALUES_RECIPE = "output.script-dynamic-values.render.v1";
+export const SCRIPT_FIXED_TUPLES_RECIPE = "output.script-fixed-tuples.render.v1";
+export const SCRIPT_OVERLOAD_DISPATCH_RECIPE = "output.script-overload-dispatch.render.v1";
+export const SCRIPT_TABLE_RECORD_RECIPE = "output.script-table-record.render.v1";
+export const SCRIPT_VALUE_TAIL_RECIPE = "output.script-value-tail.render.v1";
+export const LUA_BRIDGE_RECIPE = "output.lua-bridge.render.v1";
+export const SCRIPT_SPECIAL_CALL_VERIFICATION_RECIPE = "output.script-special-call-verification.render.v1";
+export const STATIC_HERMES_TYPED_NATIVE_BRIDGE_RECIPE = "output.static-hermes-typed-native-bridge.render.v1";
 
 const SCRIPT_HANDLE_LOWERING_DOCUMENT = "defold-script-handle-lowering.json";
 const SCRIPT_IR_DOCUMENT = "defold-script-api-ir.json";
@@ -73,6 +115,59 @@ const DMSDK_BORROWED_HANDLE_RECIPE_FACTS_NAME = "defold-dmsdk-borrowed-handle-re
 const DMSDK_ARENA_CSTRING_RECIPE_FACTS_NAME = "defold-dmsdk-arena-cstring-recipe-facts.json";
 const DMSDK_SCRATCH_SCALAR_OUT_RECIPE_FACTS_NAME = "defold-dmsdk-scratch-scalar-out-recipe-facts.json";
 const DMSDK_HASH_STATE_RECIPE_FACTS_NAME = "defold-dmsdk-hash-state-recipe-facts.json";
+const SCRIPT_URL_RECIPE_FACTS_NAME = "defold-script-url-binding-recipe-facts.json";
+const STATIC_HERMES_VMATH_RECIPE_FACTS_NAME = "defold-static-hermes-vmath-recipe-facts.json";
+const SCRIPT_SPECIAL_CALL_VERIFICATION_DOCUMENT = "defold-script-special-call-verification.json";
+const STATIC_HERMES_TYPED_NATIVE_BRIDGE_FACTS = "defold-typed-native-bridge-recipe-facts.json";
+
+const generatedModuleOutputs = Object.freeze([
+  "defold/defold_hermes/include/defold_hermes/generated_modules.h",
+  "defold/defold_hermes/include/defold_hermes/generated_jsi.hpp",
+  "defold/defold_hermes/src/generated_jsi.cpp",
+  "defold/defold_hermes/lib/web/generated_modules.js",
+  "packages/abi/src/generated/layouts.ts",
+  "packages/static-hermes/src/generated/ffi.js",
+]);
+const luaBridgeOutputs = Object.freeze([
+  "defold/defold_hermes/include/defold_hermes/generated_lua_bridge.hpp",
+  "defold/defold_hermes/src/generated_lua_bridge.cpp",
+]);
+const scriptSpecialCallVerificationOutput =
+  "defold/defold_hermes/include/defold_hermes/generated_script_special_call_verification.h";
+const staticHermesTypedNativeBridgeOutput = "packages/static-hermes/src/generated/script-typed-native-bridge.ts";
+const scriptUrlOutputs = Object.freeze([
+  "defold/defold_hermes/include/defold_hermes/generated_script_url_bindings.hpp",
+  "defold/defold_hermes/src/generated_script_url_bindings.cpp",
+]);
+const staticHermesVmathOutputs = Object.freeze([
+  "defold/defold_hermes/include/defold_hermes/generated_static_hermes_vmath.h",
+  "defold/defold_hermes/src/generated_static_hermes_vmath.cpp",
+  "packages/static-hermes/src/generated/script-vmath.ts",
+]);
+const scriptCallbackLifecycleOutputs = Object.freeze([
+  "defold/defold_hermes/include/defold_hermes/generated_script_callback_lifecycle.hpp",
+  "defold/defold_hermes/src/generated_script_callback_lifecycle.cpp",
+]);
+const scriptDynamicValuesOutputs = Object.freeze([
+  "defold/defold_hermes/include/defold_hermes/generated_script_dynamic_values.hpp",
+  "defold/defold_hermes/src/generated_script_dynamic_values.cpp",
+]);
+const scriptFixedTuplesOutputs = Object.freeze([
+  "defold/defold_hermes/include/defold_hermes/generated_script_fixed_tuples.hpp",
+  "defold/defold_hermes/src/generated_script_fixed_tuples.cpp",
+]);
+const scriptOverloadDispatchOutputs = Object.freeze([
+  "defold/defold_hermes/include/defold_hermes/generated_script_overload_dispatch.hpp",
+  "defold/defold_hermes/src/generated_script_overload_dispatch.cpp",
+]);
+const scriptTableRecordOutputs = Object.freeze([
+  "defold/defold_hermes/include/defold_hermes/generated_script_table_record_bindings.hpp",
+  "defold/defold_hermes/src/generated_script_table_record_bindings.cpp",
+]);
+const scriptValueTailOutputs = Object.freeze([
+  "defold/defold_hermes/include/defold_hermes/generated_script_value_tail_bindings.hpp",
+  "defold/defold_hermes/src/generated_script_value_tail_bindings.cpp",
+]);
 
 const dmsdkBoundedFactsByFamily = Object.freeze({
   "fixed-digest": "defold-dmsdk-fixed-digest-recipe-facts.json",
@@ -259,6 +354,7 @@ void installDmSdkScalarModule(facebook::jsi::Runtime& runtime, facebook::jsi::Ob
 export const LOCALLY_RENDERED_OUTPUT_RECIPES = Object.freeze({
   ...Object.fromEntries(Object.keys(stableTemplates).map((relative) => [relative, STABLE_OUTPUT_RECIPE])),
   "defold/defold_hermes/include/defold_hermes/generated_dmsdk_universal_jsi.hpp": DMSDK_UNIVERSAL_JSI_HEADER_RECIPE,
+  "defold/defold_hermes/src/generated_dmsdk_universal_jsi.cpp": DMSDK_UNIVERSAL_JSI_SOURCE_RECIPE,
   "defold/defold_hermes/include/defold_hermes/generated_dmsdk_universal.h": DMSDK_UNIVERSAL_HEADER_RECIPE,
   "defold/defold_hermes/src/generated_dmsdk_universal.cpp": DMSDK_UNIVERSAL_RUNTIME_RECIPE,
   "defold/defold_hermes/lib/web/generated_dmsdk_universal.js": DMSDK_UNIVERSAL_BROWSER_RECIPE,
@@ -286,6 +382,18 @@ export const LOCALLY_RENDERED_OUTPUT_RECIPES = Object.freeze({
   ...Object.fromEntries(Object.keys(dmsdkScalarOutputs).map((relative) => [relative, DMSDK_SCALAR_RECIPE])),
   ...Object.fromEntries(dmsdkScratchScalarOutOutputs.map((relative) => [relative, DMSDK_SCRATCH_SCALAR_OUT_RECIPE])),
   ...Object.fromEntries(dmsdkHashStateRevisionOutputs.map((relative) => [relative, DMSDK_HASH_STATE_RECIPE])),
+  ...Object.fromEntries(generatedModuleOutputs.map((relative) => [relative, GENERATED_MODULE_RECIPE])),
+  ...Object.fromEntries(scriptUrlOutputs.map((relative) => [relative, SCRIPT_URL_RECIPE])),
+  ...Object.fromEntries(staticHermesVmathOutputs.map((relative) => [relative, STATIC_HERMES_VMATH_RECIPE])),
+  ...Object.fromEntries(scriptCallbackLifecycleOutputs.map((relative) => [relative, SCRIPT_CALLBACK_LIFECYCLE_RECIPE])),
+  ...Object.fromEntries(scriptDynamicValuesOutputs.map((relative) => [relative, SCRIPT_DYNAMIC_VALUES_RECIPE])),
+  ...Object.fromEntries(scriptFixedTuplesOutputs.map((relative) => [relative, SCRIPT_FIXED_TUPLES_RECIPE])),
+  ...Object.fromEntries(scriptOverloadDispatchOutputs.map((relative) => [relative, SCRIPT_OVERLOAD_DISPATCH_RECIPE])),
+  ...Object.fromEntries(scriptTableRecordOutputs.map((relative) => [relative, SCRIPT_TABLE_RECORD_RECIPE])),
+  ...Object.fromEntries(scriptValueTailOutputs.map((relative) => [relative, SCRIPT_VALUE_TAIL_RECIPE])),
+  ...Object.fromEntries(luaBridgeOutputs.map((relative) => [relative, LUA_BRIDGE_RECIPE])),
+  [scriptSpecialCallVerificationOutput]: SCRIPT_SPECIAL_CALL_VERIFICATION_RECIPE,
+  [staticHermesTypedNativeBridgeOutput]: STATIC_HERMES_TYPED_NATIVE_BRIDGE_RECIPE,
 });
 
 export const LOCALLY_RENDERED_OUTPUT_INPUTS = Object.freeze({
@@ -293,6 +401,7 @@ export const LOCALLY_RENDERED_OUTPUT_INPUTS = Object.freeze({
   "defold/defold_hermes/include/defold_hermes/generated_dmsdk_universal_jsi.hpp": Object.freeze([
     DMSDK_UNIVERSAL_RECIPE_FACTS_NAME,
   ]),
+  "defold/defold_hermes/src/generated_dmsdk_universal_jsi.cpp": Object.freeze([DMSDK_UNIVERSAL_RECIPE_FACTS_NAME]),
   "defold/defold_hermes/include/defold_hermes/generated_dmsdk_universal.h": Object.freeze([
     DMSDK_UNIVERSAL_RECIPE_FACTS_NAME,
   ]),
@@ -368,6 +477,30 @@ export const LOCALLY_RENDERED_OUTPUT_INPUTS = Object.freeze({
   ...Object.fromEntries(
     dmsdkHashStateRevisionOutputs.map((relative) => [relative, Object.freeze([DMSDK_HASH_STATE_RECIPE_FACTS_NAME])]),
   ),
+  ...Object.fromEntries(generatedModuleOutputs.map((relative) => [relative, Object.freeze([GENERATED_MODULE_FACTS])])),
+  ...Object.fromEntries(scriptUrlOutputs.map((relative) => [relative, Object.freeze([SCRIPT_URL_RECIPE_FACTS_NAME])])),
+  ...Object.fromEntries(
+    staticHermesVmathOutputs.map((relative) => [relative, Object.freeze([STATIC_HERMES_VMATH_RECIPE_FACTS_NAME])]),
+  ),
+  ...Object.fromEntries(
+    scriptCallbackLifecycleOutputs.map((relative) => [relative, Object.freeze([SCRIPT_CALLBACK_LIFECYCLE_FACTS])]),
+  ),
+  ...Object.fromEntries(
+    scriptDynamicValuesOutputs.map((relative) => [relative, Object.freeze([SCRIPT_DYNAMIC_VALUES_FACTS])]),
+  ),
+  ...Object.fromEntries(
+    scriptFixedTuplesOutputs.map((relative) => [relative, Object.freeze([SCRIPT_FIXED_TUPLES_FACTS])]),
+  ),
+  ...Object.fromEntries(
+    scriptOverloadDispatchOutputs.map((relative) => [relative, Object.freeze([SCRIPT_OVERLOAD_DISPATCH_FACTS])]),
+  ),
+  ...Object.fromEntries(
+    scriptTableRecordOutputs.map((relative) => [relative, Object.freeze([SCRIPT_TABLE_RECORD_FACTS])]),
+  ),
+  ...Object.fromEntries(scriptValueTailOutputs.map((relative) => [relative, Object.freeze([SCRIPT_VALUE_TAIL_FACTS])])),
+  ...Object.fromEntries(luaBridgeOutputs.map((relative) => [relative, Object.freeze([LUA_BRIDGE_FACTS])])),
+  [scriptSpecialCallVerificationOutput]: Object.freeze([SCRIPT_SPECIAL_CALL_VERIFICATION_DOCUMENT]),
+  [staticHermesTypedNativeBridgeOutput]: Object.freeze([STATIC_HERMES_TYPED_NATIVE_BRIDGE_FACTS]),
 });
 
 export function generateRevisionOutput(relative, recipe, documents) {
@@ -378,6 +511,11 @@ export function generateRevisionOutput(relative, recipe, documents) {
   }
   if (recipe === DMSDK_UNIVERSAL_JSI_HEADER_RECIPE) {
     return generateDmSdkUniversalJsiHeader(documents["defold-dmsdk-universal-bindings.json"]);
+  }
+  if (recipe === DMSDK_UNIVERSAL_JSI_SOURCE_RECIPE) {
+    return renderDmSdkUniversalJsiSource({
+      catalogSha256: documents["defold-dmsdk-universal-bindings.json"]?.sourceHashes?.catalog,
+    });
   }
   if (recipe === DMSDK_UNIVERSAL_HEADER_RECIPE) {
     return generateDmSdkUniversalHeader(documents["defold-dmsdk-universal-bindings.json"]);
@@ -491,6 +629,56 @@ export function generateRevisionOutput(relative, recipe, documents) {
     const output = renderDmSdkHashStateOutputs(documents[DMSDK_HASH_STATE_RECIPE_FACTS_NAME]).get(relative);
     if (typeof output !== "string") throw new Error(`${relative}: no hash-state output renderer`);
     return output;
+  }
+  if (recipe === GENERATED_MODULE_RECIPE) {
+    const output = renderGeneratedModuleOutputs(documents[GENERATED_MODULE_FACTS]).get(relative);
+    if (typeof output !== "string") throw new Error(`${relative}: no generated-module output renderer`);
+    return output;
+  }
+  if (recipe === SCRIPT_URL_RECIPE) {
+    const rendered = renderScriptUrlNativeOutputs(documents[SCRIPT_URL_RECIPE_FACTS_NAME]);
+    if (relative.endsWith("generated_script_url_bindings.hpp")) return rendered.header;
+    if (relative.endsWith("generated_script_url_bindings.cpp")) return rendered.source;
+    throw new Error(`${relative}: no script URL output renderer`);
+  }
+  if (recipe === STATIC_HERMES_VMATH_RECIPE) {
+    const facts = documents[STATIC_HERMES_VMATH_RECIPE_FACTS_NAME];
+    if (relative.endsWith("generated_static_hermes_vmath.h")) return renderStaticHermesVmathHeader(facts);
+    if (relative.endsWith("generated_static_hermes_vmath.cpp")) return renderStaticHermesVmathSource(facts);
+    if (relative.endsWith("script-vmath.ts")) return renderStaticHermesVmathTypescript(facts);
+    throw new Error(`${relative}: no Static Hermes vmath output renderer`);
+  }
+  const scriptFamily = {
+    [SCRIPT_CALLBACK_LIFECYCLE_RECIPE]: [SCRIPT_CALLBACK_LIFECYCLE_FACTS, renderScriptCallbackLifecycleOutputs],
+    [SCRIPT_DYNAMIC_VALUES_RECIPE]: [SCRIPT_DYNAMIC_VALUES_FACTS, renderScriptDynamicValuesOutputs],
+    [SCRIPT_FIXED_TUPLES_RECIPE]: [SCRIPT_FIXED_TUPLES_FACTS, renderScriptFixedTuplesOutputs],
+    [SCRIPT_OVERLOAD_DISPATCH_RECIPE]: [SCRIPT_OVERLOAD_DISPATCH_FACTS, renderScriptOverloadDispatchOutputs],
+    [SCRIPT_TABLE_RECORD_RECIPE]: [SCRIPT_TABLE_RECORD_FACTS, renderScriptTableRecordOutputs],
+    [SCRIPT_VALUE_TAIL_RECIPE]: [SCRIPT_VALUE_TAIL_FACTS, renderScriptValueTailOutputs],
+  }[recipe];
+  if (scriptFamily) {
+    const [factsName, render] = scriptFamily;
+    const rendered = render(documents[factsName]);
+    if (relative.endsWith(".hpp")) return rendered.header;
+    if (relative.endsWith(".cpp")) return rendered.source;
+    throw new Error(`${relative}: no script-family output renderer`);
+  }
+  if (recipe === LUA_BRIDGE_RECIPE) {
+    const output = renderLuaBridgeOutputs(documents[LUA_BRIDGE_FACTS]).get(relative);
+    if (typeof output !== "string") throw new Error(`${relative}: no Lua bridge output renderer`);
+    return output;
+  }
+  if (recipe === SCRIPT_SPECIAL_CALL_VERIFICATION_RECIPE) {
+    if (relative !== scriptSpecialCallVerificationOutput) {
+      throw new Error(`${relative}: no script special-call verification renderer`);
+    }
+    return renderScriptSpecialCallVerificationHeaderFromReport(documents[SCRIPT_SPECIAL_CALL_VERIFICATION_DOCUMENT]);
+  }
+  if (recipe === STATIC_HERMES_TYPED_NATIVE_BRIDGE_RECIPE) {
+    if (relative !== staticHermesTypedNativeBridgeOutput) {
+      throw new Error(`${relative}: no Static Hermes typed-native bridge renderer`);
+    }
+    return renderStaticHermesTypedNativeBridge(documents[STATIC_HERMES_TYPED_NATIVE_BRIDGE_FACTS]);
   }
   throw new Error(`${relative}: unsupported package-owned revision-output recipe ${JSON.stringify(recipe)}`);
 }

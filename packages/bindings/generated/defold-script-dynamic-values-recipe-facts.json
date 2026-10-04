@@ -1,0 +1,161 @@
+{
+  "schemaVersion": 1,
+  "kind": "deherm.recipe.script-dynamic-values-output",
+  "maximumArgumentCount": 32,
+  "candidates": [
+    {
+      "index": 0,
+      "id": "script:bit.bor",
+      "stableId": "0x0892398e",
+      "modulePath": [
+        "bit"
+      ],
+      "member": "bor",
+      "strategy": "exact-lua-call",
+      "resultMode": "number",
+      "minimumArguments": 1,
+      "maximumArguments": 32,
+      "optimizationProven": true
+    },
+    {
+      "index": 1,
+      "id": "script:types.is_hash",
+      "stableId": "0x206a89ba",
+      "modulePath": [
+        "types"
+      ],
+      "member": "is_hash",
+      "strategy": "exact-lua-type-query",
+      "resultMode": "boolean",
+      "minimumArguments": 0,
+      "maximumArguments": 32,
+      "optimizationProven": true
+    },
+    {
+      "index": 2,
+      "id": "script:bit.band",
+      "stableId": "0x7872f480",
+      "modulePath": [
+        "bit"
+      ],
+      "member": "band",
+      "strategy": "exact-lua-call",
+      "resultMode": "number",
+      "minimumArguments": 1,
+      "maximumArguments": 32,
+      "optimizationProven": true
+    },
+    {
+      "index": 3,
+      "id": "script:bit.bxor",
+      "stableId": "0x948f508c",
+      "modulePath": [
+        "bit"
+      ],
+      "member": "bxor",
+      "strategy": "exact-lua-call",
+      "resultMode": "number",
+      "minimumArguments": 1,
+      "maximumArguments": 32,
+      "optimizationProven": true
+    },
+    {
+      "index": 4,
+      "id": "script:types.is_matrix4",
+      "stableId": "0x9acd4145",
+      "modulePath": [
+        "types"
+      ],
+      "member": "is_matrix4",
+      "strategy": "exact-lua-type-query",
+      "resultMode": "boolean",
+      "minimumArguments": 0,
+      "maximumArguments": 32,
+      "optimizationProven": true
+    },
+    {
+      "index": 5,
+      "id": "script:socket.skip",
+      "stableId": "0x9b0d4932",
+      "modulePath": [
+        "socket"
+      ],
+      "member": "skip",
+      "strategy": "exact-lua-call",
+      "resultMode": "variable-values",
+      "minimumArguments": 1,
+      "maximumArguments": 32,
+      "optimizationProven": true
+    },
+    {
+      "index": 6,
+      "id": "script:types.is_quat",
+      "stableId": "0xc6f91f35",
+      "modulePath": [
+        "types"
+      ],
+      "member": "is_quat",
+      "strategy": "exact-lua-type-query",
+      "resultMode": "boolean",
+      "minimumArguments": 0,
+      "maximumArguments": 32,
+      "optimizationProven": true
+    },
+    {
+      "index": 7,
+      "id": "script:types.is_vector",
+      "stableId": "0xc8496cbd",
+      "modulePath": [
+        "types"
+      ],
+      "member": "is_vector",
+      "strategy": "exact-lua-type-query",
+      "resultMode": "boolean",
+      "minimumArguments": 0,
+      "maximumArguments": 32,
+      "optimizationProven": true
+    },
+    {
+      "index": 8,
+      "id": "script:types.is_vector4",
+      "stableId": "0xd495dbab",
+      "modulePath": [
+        "types"
+      ],
+      "member": "is_vector4",
+      "strategy": "exact-lua-type-query",
+      "resultMode": "boolean",
+      "minimumArguments": 0,
+      "maximumArguments": 32,
+      "optimizationProven": true
+    },
+    {
+      "index": 9,
+      "id": "script:types.is_vector3",
+      "stableId": "0xd995e38a",
+      "modulePath": [
+        "types"
+      ],
+      "member": "is_vector3",
+      "strategy": "exact-lua-type-query",
+      "resultMode": "boolean",
+      "minimumArguments": 0,
+      "maximumArguments": 32,
+      "optimizationProven": true
+    },
+    {
+      "index": 10,
+      "id": "script:types.is_url",
+      "stableId": "0xfaf3e587",
+      "modulePath": [
+        "types"
+      ],
+      "member": "is_url",
+      "strategy": "exact-lua-type-query",
+      "resultMode": "boolean",
+      "minimumArguments": 0,
+      "maximumArguments": 32,
+      "optimizationProven": true
+    }
+  ]
+}

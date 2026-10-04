@@ -1,0 +1,754 @@
+{
+  "schemaVersion": 1,
+  "kind": "deherm.recipe.script-value-tail-output",
+  "targetSupport": {
+    "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+    "nativeStaticHermes": "not-integrated-fail-closed",
+    "html5BrowserHost": "not-executable-no-provider"
+  },
+  "routes": [
+    {
+      "index": 0,
+      "id": "script:resource.release",
+      "stableId": 366027815,
+      "modulePath": [
+        "resource"
+      ],
+      "member": "release",
+      "sourcePath": "engine/gamesys/src/gamesys/scripts/script_resource.cpp",
+      "sourceSymbol": "ReleaseResource",
+      "disposition": "candidate",
+      "family": "captured-lua-exact-codec",
+      "backend": "captured-lua-exact-call",
+      "accountingDisposition": "generated-family",
+      "requiredContext": "script-instance",
+      "resultCodec": "None",
+      "blocker": null,
+      "callShapes": [
+        [
+          "Hash"
+        ],
+        [
+          "String"
+        ]
+      ]
+    },
+    {
+      "index": 1,
+      "id": "script:sound.set_group_gain",
+      "stableId": 497116905,
+      "modulePath": [
+        "sound"
+      ],
+      "member": "set_group_gain",
+      "sourcePath": "engine/gamesys/src/gamesys/scripts/script_sound.cpp",
+      "sourceSymbol": "Sound_SetGroupGain",
+      "disposition": "candidate",
+      "family": "captured-lua-exact-codec",
+      "backend": "captured-lua-exact-call",
+      "accountingDisposition": "generated-family",
+      "requiredContext": "script-instance",
+      "resultCodec": "None",
+      "blocker": null,
+      "callShapes": [
+        [
+          "String",
+          "Number"
+        ],
+        [
+          "Hash",
+          "Number"
+        ]
+      ]
+    },
+    {
+      "index": 2,
+      "id": "script:font.add_font",
+      "stableId": 638454056,
+      "modulePath": [
+        "font"
+      ],
+      "member": "add_font",
+      "sourcePath": "engine/gamesys/src/gamesys/scripts/script_font.cpp",
+      "sourceSymbol": "AddFont",
+      "disposition": "candidate",
+      "family": "captured-lua-exact-codec",
+      "backend": "captured-lua-exact-call",
+      "accountingDisposition": "generated-family",
+      "requiredContext": "script-instance",
+      "resultCodec": "None",
+      "blocker": null,
+      "callShapes": [
+        [
+          "String",
+          "String"
+        ],
+        [
+          "String",
+          "Hash"
+        ],
+        [
+          "Hash",
+          "String"
+        ],
+        [
+          "Hash",
+          "Hash"
+        ]
+      ]
+    },
+    {
+      "index": 3,
+      "id": "script:hash_to_hex",
+      "stableId": 754452606,
+      "modulePath": [
+        "builtins"
+      ],
+      "member": "hash_to_hex",
+      "sourcePath": "engine/script/src/script_hash.cpp",
+      "sourceSymbol": "HashToHex",
+      "disposition": "candidate",
+      "family": "captured-lua-exact-codec",
+      "backend": "captured-lua-exact-call",
+      "accountingDisposition": "generated-family",
+      "requiredContext": "script-instance",
+      "resultCodec": "String",
+      "blocker": null,
+      "callShapes": [
+        [
+          "Hash"
+        ]
+      ]
+    },
+    {
+      "index": 4,
+      "id": "script:camera.get_view",
+      "stableId": 986113063,
+      "modulePath": [
+        "camera"
+      ],
+      "member": "get_view",
+      "sourcePath": "engine/render/src/render/render_script_camera.cpp",
+      "sourceSymbol": "RenderScriptCamera_GetView",
+      "disposition": "candidate",
+      "family": "captured-lua-exact-codec",
+      "backend": "captured-lua-exact-call",
+      "accountingDisposition": "generated-family",
+      "requiredContext": "script-instance",
+      "resultCodec": "Matrix4",
+      "blocker": null,
+      "callShapes": [
+        [],
+        [
+          "Url"
+        ],
+        [
+          "Number"
+        ],
+        [
+          "Nil"
+        ]
+      ]
+    },
+    {
+      "index": 5,
+      "id": "script:render.set_compute",
+      "stableId": 1089182856,
+      "modulePath": [
+        "render"
+      ],
+      "member": "set_compute",
+      "sourcePath": "engine/render/src/render/render_script.cpp",
+      "sourceSymbol": "RenderScript_SetCompute",
+      "disposition": "candidate",
+      "family": "requires-render-script-instance",
+      "backend": "captured-lua-exact-call",
+      "accountingDisposition": "universal-fallback-test-fixture-adapter-only",
+      "requiredContext": "render-script-instance",
+      "resultCodec": "None",
+      "blocker": null,
+      "callShapes": [
+        [],
+        [
+          "String"
+        ],
+        [
+          "Hash"
+        ],
+        [
+          "Nil"
+        ]
+      ]
+    },
+    {
+      "index": 6,
+      "id": "script:physics.get_gravity",
+      "stableId": 1242286766,
+      "modulePath": [
+        "physics"
+      ],
+      "member": "get_gravity",
+      "sourcePath": "engine/gamesys/src/gamesys/scripts/script_physics.cpp",
+      "sourceSymbol": "Physics_GetGravity",
+      "disposition": "candidate",
+      "family": "captured-lua-exact-codec",
+      "backend": "captured-lua-exact-call",
+      "accountingDisposition": "generated-family",
+      "requiredContext": "script-instance",
+      "resultCodec": "Vector3",
+      "blocker": null,
+      "callShapes": [
+        []
+      ]
+    },
+    {
+      "index": 7,
+      "id": "script:physics.set_gravity",
+      "stableId": 1277170138,
+      "modulePath": [
+        "physics"
+      ],
+      "member": "set_gravity",
+      "sourcePath": "engine/gamesys/src/gamesys/scripts/script_physics.cpp",
+      "sourceSymbol": "Physics_SetGravity",
+      "disposition": "candidate",
+      "family": "captured-lua-exact-codec",
+      "backend": "captured-lua-exact-call",
+      "accountingDisposition": "generated-family",
+      "requiredContext": "script-instance",
+      "resultCodec": "None",
+      "blocker": null,
+      "callShapes": [
+        [
+          "Vector3"
+        ]
+      ]
+    },
+    {
+      "index": 8,
+      "id": "script:go.get_id",
+      "stableId": 1477563324,
+      "modulePath": [
+        "go"
+      ],
+      "member": "get_id",
+      "sourcePath": "engine/gameobject/src/gameobject/gameobject_script.cpp",
+      "sourceSymbol": "Script_GetId",
+      "disposition": "candidate",
+      "family": "captured-lua-exact-codec",
+      "backend": "captured-lua-exact-call",
+      "accountingDisposition": "generated-family",
+      "requiredContext": "script-instance",
+      "resultCodec": "Hash",
+      "blocker": null,
+      "callShapes": [
+        [],
+        [
+          "String"
+        ]
+      ]
+    },
+    {
+      "index": 9,
+      "id": "script:go.get_world_transform",
+      "stableId": 1495634860,
+      "modulePath": [
+        "go"
+      ],
+      "member": "get_world_transform",
+      "sourcePath": "engine/gameobject/src/gameobject/gameobject_script.cpp",
+      "sourceSymbol": "Script_GetWorldTransform",
+      "disposition": "candidate",
+      "family": "captured-lua-exact-codec",
+      "backend": "captured-lua-exact-call",
+      "accountingDisposition": "generated-family",
+      "requiredContext": "script-instance",
+      "resultCodec": "Matrix4",
+      "blocker": null,
+      "callShapes": [
+        [],
+        [
+          "String"
+        ],
+        [
+          "Hash"
+        ],
+        [
+          "Url"
+        ]
+      ]
+    },
+    {
+      "index": 10,
+      "id": "script:render.set_view",
+      "stableId": 1992852954,
+      "modulePath": [
+        "render"
+      ],
+      "member": "set_view",
+      "sourcePath": "engine/render/src/render/render_script.cpp",
+      "sourceSymbol": "RenderScript_SetView",
+      "disposition": "candidate",
+      "family": "requires-render-script-instance",
+      "backend": "captured-lua-exact-call",
+      "accountingDisposition": "universal-fallback-test-fixture-adapter-only",
+      "requiredContext": "render-script-instance",
+      "resultCodec": "None",
+      "blocker": null,
+      "callShapes": [
+        [
+          "Matrix4"
+        ]
+      ]
+    },
+    {
+      "index": 11,
+      "id": "script:render.set_projection",
+      "stableId": 2094481018,
+      "modulePath": [
+        "render"
+      ],
+      "member": "set_projection",
+      "sourcePath": "engine/render/src/render/render_script.cpp",
+      "sourceSymbol": "RenderScript_SetProjection",
+      "disposition": "candidate",
+      "family": "requires-render-script-instance",
+      "backend": "captured-lua-exact-call",
+      "accountingDisposition": "universal-fallback-test-fixture-adapter-only",
+      "requiredContext": "render-script-instance",
+      "resultCodec": "None",
+      "blocker": null,
+      "callShapes": [
+        [
+          "Matrix4"
+        ]
+      ]
+    },
+    {
+      "index": 12,
+      "id": "script:go.world_to_local_transform",
+      "stableId": 2265777619,
+      "modulePath": [
+        "go"
+      ],
+      "member": "world_to_local_transform",
+      "sourcePath": "engine/gameobject/src/gameobject/gameobject_script.cpp",
+      "sourceSymbol": "Script_WorldToLocalTransfrom",
+      "disposition": "candidate",
+      "family": "captured-lua-exact-codec",
+      "backend": "captured-lua-exact-call",
+      "accountingDisposition": "generated-family",
+      "requiredContext": "script-instance",
+      "resultCodec": "Matrix4",
+      "blocker": null,
+      "callShapes": [
+        [
+          "Matrix4",
+          "String"
+        ],
+        [
+          "Matrix4",
+          "Hash"
+        ],
+        [
+          "Matrix4",
+          "Url"
+        ]
+      ]
+    },
+    {
+      "index": 13,
+      "id": "script:font.set_style",
+      "stableId": 2283853637,
+      "modulePath": [
+        "font"
+      ],
+      "member": "set_style",
+      "sourcePath": "engine/gamesys/src/gamesys/scripts/script_font.cpp",
+      "sourceSymbol": "SetStyle",
+      "disposition": "candidate",
+      "family": "captured-lua-exact-codec",
+      "backend": "captured-lua-exact-call",
+      "accountingDisposition": "generated-family",
+      "requiredContext": "script-instance",
+      "resultCodec": "None",
+      "blocker": null,
+      "callShapes": [
+        [
+          "String",
+          "String",
+          "String"
+        ],
+        [
+          "Hash",
+          "String",
+          "String"
+        ]
+      ]
+    },
+    {
+      "index": 14,
+      "id": "script:camera.get_projection",
+      "stableId": 2326768707,
+      "modulePath": [
+        "camera"
+      ],
+      "member": "get_projection",
+      "sourcePath": "engine/render/src/render/render_script_camera.cpp",
+      "sourceSymbol": "RenderScriptCamera_GetProjection",
+      "disposition": "candidate",
+      "family": "captured-lua-exact-codec",
+      "backend": "captured-lua-exact-call",
+      "accountingDisposition": "generated-family",
+      "requiredContext": "script-instance",
+      "resultCodec": "Matrix4",
+      "blocker": null,
+      "callShapes": [
+        [],
+        [
+          "Url"
+        ],
+        [
+          "Number"
+        ],
+        [
+          "Nil"
+        ]
+      ]
+    },
+    {
+      "index": 15,
+      "id": "script:font.remove_font",
+      "stableId": 2369627843,
+      "modulePath": [
+        "font"
+      ],
+      "member": "remove_font",
+      "sourcePath": "engine/gamesys/src/gamesys/scripts/script_font.cpp",
+      "sourceSymbol": "RemoveFont",
+      "disposition": "candidate",
+      "family": "captured-lua-exact-codec",
+      "backend": "captured-lua-exact-call",
+      "accountingDisposition": "generated-family",
+      "requiredContext": "script-instance",
+      "resultCodec": "None",
+      "blocker": null,
+      "callShapes": [
+        [
+          "String",
+          "String"
+        ],
+        [
+          "String",
+          "Hash"
+        ],
+        [
+          "Hash",
+          "String"
+        ],
+        [
+          "Hash",
+          "Hash"
+        ]
+      ]
+    },
+    {
+      "index": 16,
+      "id": "script:sound.get_group_name",
+      "stableId": 2520029065,
+      "modulePath": [
+        "sound"
+      ],
+      "member": "get_group_name",
+      "sourcePath": "engine/gamesys/src/gamesys/scripts/script_sound.cpp",
+      "sourceSymbol": "Sound_GetGroupName",
+      "disposition": "candidate",
+      "family": "captured-lua-exact-codec",
+      "backend": "captured-lua-exact-call",
+      "accountingDisposition": "generated-family",
+      "requiredContext": "script-instance",
+      "resultCodec": "String",
+      "blocker": null,
+      "callShapes": [
+        [
+          "Hash"
+        ]
+      ]
+    },
+    {
+      "index": 17,
+      "id": "script:gui.delete_texture",
+      "stableId": 2687333512,
+      "modulePath": [
+        "gui"
+      ],
+      "member": "delete_texture",
+      "sourcePath": "engine/gui/src/gui_script.cpp",
+      "sourceSymbol": "LuaDeleteTexture",
+      "disposition": "candidate",
+      "family": "requires-gui-script-instance",
+      "backend": "captured-lua-exact-call",
+      "accountingDisposition": "universal-fallback-test-fixture-adapter-only",
+      "requiredContext": "gui-script-instance",
+      "resultCodec": "None",
+      "blocker": null,
+      "callShapes": [
+        [
+          "String"
+        ],
+        [
+          "Hash"
+        ]
+      ]
+    },
+    {
+      "index": 18,
+      "id": "script:gui.get_layout",
+      "stableId": 3027276460,
+      "modulePath": [
+        "gui"
+      ],
+      "member": "get_layout",
+      "sourcePath": "engine/gui/src/gui_script.cpp",
+      "sourceSymbol": "LuaGetLayout",
+      "disposition": "candidate",
+      "family": "requires-gui-script-instance",
+      "backend": "captured-lua-exact-call",
+      "accountingDisposition": "universal-fallback-test-fixture-adapter-only",
+      "requiredContext": "gui-script-instance",
+      "resultCodec": "Hash",
+      "blocker": null,
+      "callShapes": [
+        []
+      ]
+    },
+    {
+      "index": 19,
+      "id": "script:sound.get_group_gain",
+      "stableId": 3299788677,
+      "modulePath": [
+        "sound"
+      ],
+      "member": "get_group_gain",
+      "sourcePath": "engine/gamesys/src/gamesys/scripts/script_sound.cpp",
+      "sourceSymbol": "Sound_GetGroupGain",
+      "disposition": "candidate",
+      "family": "captured-lua-exact-codec",
+      "backend": "captured-lua-exact-call",
+      "accountingDisposition": "generated-family",
+      "requiredContext": "script-instance",
+      "resultCodec": "Number",
+      "blocker": null,
+      "callShapes": [
+        [
+          "String"
+        ],
+        [
+          "Hash"
+        ]
+      ]
+    },
+    {
+      "index": 20,
+      "id": "script:resource.set_sound",
+      "stableId": 3353499114,
+      "modulePath": [
+        "resource"
+      ],
+      "member": "set_sound",
+      "sourcePath": "engine/gamesys/src/gamesys/scripts/script_resource.cpp",
+      "sourceSymbol": "SetSound",
+      "disposition": "candidate",
+      "family": "captured-lua-exact-codec",
+      "backend": "captured-lua-exact-call",
+      "accountingDisposition": "generated-family",
+      "requiredContext": "script-instance",
+      "resultCodec": "None",
+      "blocker": null,
+      "callShapes": [
+        [
+          "Hash",
+          "String"
+        ],
+        [
+          "String",
+          "String"
+        ]
+      ]
+    },
+    {
+      "index": 21,
+      "id": "script:liveupdate.remove_mount",
+      "stableId": 3486747409,
+      "modulePath": [
+        "liveupdate"
+      ],
+      "member": "remove_mount",
+      "sourcePath": "engine/liveupdate/src/script_liveupdate.cpp",
+      "sourceSymbol": "dmLiveUpdate::Resource_RemoveMount",
+      "disposition": "candidate",
+      "family": "liveupdate-result-enum-codec",
+      "backend": "captured-lua-exact-call",
+      "accountingDisposition": "universal-fallback-test-fixture-adapter-only",
+      "requiredContext": "script-instance",
+      "resultCodec": "Number",
+      "blocker": null,
+      "callShapes": [
+        [
+          "String"
+        ],
+        [
+          "Hash"
+        ]
+      ],
+      "resultDomain": {
+        "names": [
+          "RESULT_OK",
+          "RESULT_INVALID_HEADER",
+          "RESULT_MEM_ERROR",
+          "RESULT_INVALID_RESOURCE",
+          "RESULT_VERSION_MISMATCH",
+          "RESULT_ENGINE_VERSION_MISMATCH",
+          "RESULT_SIGNATURE_MISMATCH",
+          "RESULT_SCHEME_MISMATCH",
+          "RESULT_BUNDLED_RESOURCE_MISMATCH",
+          "RESULT_FORMAT_ERROR",
+          "RESULT_IO_ERROR",
+          "RESULT_INVAL",
+          "RESULT_NOT_INITIALIZED",
+          "RESULT_UNKNOWN"
+        ],
+        "values": [
+          0,
+          -1,
+          -2,
+          -3,
+          -4,
+          -5,
+          -6,
+          -7,
+          -8,
+          -9,
+          -10,
+          -11,
+          -12,
+          -1000
+        ]
+      }
+    },
+    {
+      "index": 22,
+      "id": "script:render.enable_material",
+      "stableId": 3764411239,
+      "modulePath": [
+        "render"
+      ],
+      "member": "enable_material",
+      "sourcePath": "engine/render/src/render/render_script.cpp",
+      "sourceSymbol": "RenderScript_EnableMaterial",
+      "disposition": "candidate",
+      "family": "requires-render-script-instance",
+      "backend": "captured-lua-exact-call",
+      "accountingDisposition": "universal-fallback-test-fixture-adapter-only",
+      "requiredContext": "render-script-instance",
+      "resultCodec": "None",
+      "blocker": null,
+      "callShapes": [
+        [
+          "String"
+        ],
+        [
+          "Hash"
+        ]
+      ]
+    },
+    {
+      "index": 23,
+      "id": "script:gui.get_font_resource",
+      "stableId": 4047461608,
+      "modulePath": [
+        "gui"
+      ],
+      "member": "get_font_resource",
+      "sourcePath": "engine/gui/src/gui_script.cpp",
+      "sourceSymbol": "LuaGetFontResource",
+      "disposition": "candidate",
+      "family": "requires-gui-script-instance",
+      "backend": "captured-lua-exact-call",
+      "accountingDisposition": "universal-fallback-test-fixture-adapter-only",
+      "requiredContext": "gui-script-instance",
+      "resultCodec": "Hash",
+      "blocker": null,
+      "callShapes": [
+        [
+          "Hash"
+        ],
+        [
+          "String"
+        ]
+      ]
+    },
+    {
+      "index": 24,
+      "id": "script:gui.set_texture_data",
+      "stableId": 4140093370,
+      "modulePath": [
+        "gui"
+      ],
+      "member": "set_texture_data",
+      "sourcePath": "engine/gui/src/gui_script.cpp",
+      "sourceSymbol": "LuaSetTextureData",
+      "disposition": "candidate",
+      "family": "image-type-string-codec",
+      "backend": "captured-lua-exact-call",
+      "accountingDisposition": "universal-fallback-test-fixture-adapter-only",
+      "requiredContext": "gui-script-instance",
+      "resultCodec": "Boolean",
+      "blocker": null,
+      "callShapes": [
+        [
+          "String",
+          "Number",
+          "Number",
+          "String",
+          "Bytes",
+          "Boolean"
+        ],
+        [
+          "Hash",
+          "Number",
+          "Number",
+          "String",
+          "Bytes",
+          "Boolean"
+        ]
+      ]
+    },
+    {
+      "index": 25,
+      "id": "script:gui.set_layout",
+      "stableId": 4235294552,
+      "modulePath": [
+        "gui"
+      ],
+      "member": "set_layout",
+      "sourcePath": "engine/gui/src/gui_script.cpp",
+      "sourceSymbol": "LuaSetLayout",
+      "disposition": "candidate",
+      "family": "requires-gui-script-instance",
+      "backend": "captured-lua-exact-call",
+      "accountingDisposition": "universal-fallback-test-fixture-adapter-only",
+      "requiredContext": "gui-script-instance",
+      "resultCodec": "Boolean",
+      "blocker": null,
+      "callShapes": [
+        [
+          "String"
+        ],
+        [
+          "Hash"
+        ]
+      ]
+    }
+  ]
+}

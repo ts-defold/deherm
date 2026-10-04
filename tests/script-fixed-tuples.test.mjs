@@ -5,10 +5,24 @@ import { tmpdir } from "node:os";
 import test from "node:test";
 
 import { generate, loadInputs } from "../scripts/generate-script-fixed-tuples.mjs";
+import { renderScriptFixedTuplesOutputs } from "../packages/compiler/src/script-fixed-tuples-output-emitter.mjs";
 import { stableBindingId } from "../scripts/lib/binding-identity.mjs";
 
 const root = new URL("../", import.meta.url);
 const derivedRevision = "1".repeat(40);
+
+test("package fixed-tuples emitter reproduces generated artifacts byte-for-byte", async () => {
+  const [factsText, header, source, target] = await Promise.all([
+    readFile(new URL("packages/bindings/generated/defold-script-fixed-tuples-recipe-facts.json", root), "utf8"),
+    readFile(new URL("defold/defold_hermes/include/defold_hermes/generated_script_fixed_tuples.hpp", root), "utf8"),
+    readFile(new URL("defold/defold_hermes/src/generated_script_fixed_tuples.cpp", root), "utf8"),
+    readFile(new URL("packages/sdk/src/generated/script/fixed-tuple-target-support.ts", root), "utf8"),
+  ]);
+  const outputs = renderScriptFixedTuplesOutputs(JSON.parse(factsText));
+  assert.equal(outputs.header, header);
+  assert.equal(outputs.source, source);
+  assert.equal(outputs.target, target);
+});
 
 function withDeclaredDerivation(callback) {
   const previousRevision = process.env.DEHERM_DERIVED_REVISION;

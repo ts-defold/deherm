@@ -9,6 +9,7 @@ import {
   generateScriptDefoldValueTail,
   loadScriptDefoldValueTailInputs,
 } from "../scripts/generate-script-defold-value-tail.mjs";
+import { renderScriptValueTailOutputs } from "../packages/compiler/src/script-value-tail-output-emitter.mjs";
 import {
   contextCapability,
   parseCanonicalLuaRegistrationSurface,
@@ -18,6 +19,22 @@ import { stableBindingId } from "../scripts/lib/binding-identity.mjs";
 const root = new URL("../", import.meta.url);
 const digest = (text) => createHash("sha256").update(text).digest("hex");
 const derivedRevision = "1".repeat(40);
+
+test("package value-tail emitter reproduces generated artifacts byte-for-byte", async () => {
+  const [factsText, header, source, target] = await Promise.all([
+    readFile(new URL("packages/bindings/generated/defold-script-value-tail-recipe-facts.json", root), "utf8"),
+    readFile(
+      new URL("defold/defold_hermes/include/defold_hermes/generated_script_value_tail_bindings.hpp", root),
+      "utf8",
+    ),
+    readFile(new URL("defold/defold_hermes/src/generated_script_value_tail_bindings.cpp", root), "utf8"),
+    readFile(new URL("packages/sdk/src/generated/script/value-tail-target-support.ts", root), "utf8"),
+  ]);
+  const outputs = renderScriptValueTailOutputs(JSON.parse(factsText));
+  assert.equal(outputs.header, header);
+  assert.equal(outputs.source, source);
+  assert.equal(outputs.target, target);
+});
 
 function withDeclaredDerivation(callback) {
   const previousRevision = process.env.DEHERM_DERIVED_REVISION;

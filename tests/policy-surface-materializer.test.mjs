@@ -42,6 +42,7 @@ import {
   emitDmSdkUniversalReport,
 } from "../packages/compiler/src/dmsdk-universal-recipe-facts.mjs";
 import { sealObject } from "../packages/compiler/src/api-policy.mjs";
+import { LUA_BRIDGE_FACTS } from "../packages/compiler/src/lua-bridge-output-emitter.mjs";
 import {
   SCRIPT_URL_TARGET_SUPPORT_RECIPE_V1,
   SCRIPT_URL_TARGET_SUPPORT_RECIPE_V2,
@@ -195,7 +196,7 @@ test("authenticated policy materializes the complete generated SDK without a Def
   const cacheRoot = await mkdtemp(path.join(tmpdir(), "deherm-policy-surface-test-"));
   const outputRoot = path.join(cacheRoot, "surfaces", policy.revision);
   const first = await materializePolicySurface(policy, { outputRoot });
-  assert.equal(first.descriptor.documents.length, 38);
+  assert.equal(first.descriptor.documents.length, 52);
   assert.equal(first.descriptor.schemaVersion, 2);
   assert.match(first.descriptor.policyRoot, /^[0-9a-f]{64}$/u);
   assert.match(first.descriptor.compilerObjectSha256, /^[0-9a-f]{64}$/u);
@@ -291,17 +292,8 @@ test("authenticated policy materializes the complete generated SDK without a Def
     .filter(([, record]) => record.mode === "authenticated-compatibility-source")
     .map(([name]) => name)
     .sort();
-  assert.equal(rendered.length, 20);
-  assert.deepEqual(snapshots, [
-    "script/callback-lifecycle.ts",
-    "script/copied-value-record-blockers.ts",
-    "script/dynamic-values.ts",
-    "script/fixed-tuple-target-support.ts",
-    "script/opaque-record-blockers.ts",
-    "script/overload-dispatch-target-support.ts",
-    "script/table-record-bindings.ts",
-    "script/value-tail-target-support.ts",
-  ]);
+  assert.equal(rendered.length, 28);
+  assert.deepEqual(snapshots, [], "every SDK output must be rebuilt by a package-owned emitter");
   const bytesByMode = { rendered: 0, snapshots: 0 };
 
   for (const relative of Object.keys(first.descriptor.sdk)) {
@@ -321,8 +313,8 @@ test("authenticated policy materializes the complete generated SDK without a Def
   );
   assert.deepEqual(
     bytesByMode,
-    { rendered: 3_985_486, snapshots: 38_193 },
-    "the local-emitter versus compatibility-snapshot migration debt changed",
+    { rendered: 4_023_679, snapshots: 0 },
+    "the package-owned SDK emitter inventory or byte total changed",
   );
 
   const expectedOutputs = await discoverCompilerSurfaceOutputs();
@@ -339,6 +331,14 @@ test("authenticated policy materializes the complete generated SDK without a Def
     renderedOutputs,
     Object.keys(LOCALLY_RENDERED_OUTPUT_RECIPES).sort(),
     "package-owned revision-output emitters changed without updating their explicit inventory",
+  );
+  assert.equal(renderedOutputs.length, 113);
+  assert.deepEqual(
+    Object.entries(first.descriptor.outputs)
+      .filter(([, record]) => record.mode === "authenticated-compatibility-source")
+      .map(([name]) => name),
+    [],
+    "every repository output must be rebuilt by a package-owned emitter",
   );
   const universalOutputs = Object.keys(LOCALLY_RENDERED_OUTPUT_RECIPES)
     .filter((relative) => LOCALLY_RENDERED_OUTPUT_RECIPES[relative] === SCRIPT_UNIVERSAL_VALUE_RECIPE)
@@ -358,6 +358,16 @@ test("authenticated policy materializes the complete generated SDK without a Def
     "defold-script-api-ir.json",
     "defold-script-binding-patterns.json",
   ]);
+  for (const relative of [
+    "defold/defold_hermes/include/defold_hermes/generated_lua_bridge.hpp",
+    "defold/defold_hermes/src/generated_lua_bridge.cpp",
+  ]) {
+    assert.deepEqual(
+      LOCALLY_RENDERED_OUTPUT_INPUTS[relative],
+      [LUA_BRIDGE_FACTS],
+      `${relative} must consume revision-derived Lua bridge facts`,
+    );
+  }
   const scalarOutputs = Object.keys(LOCALLY_RENDERED_OUTPUT_RECIPES)
     .filter((relative) => LOCALLY_RENDERED_OUTPUT_RECIPES[relative] === SCRIPT_SCALAR_RECIPE)
     .sort();

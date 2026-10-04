@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "kind": "deherm.recipe.script-opaque-record-blockers-output",
+  "routes": [
+    {
+      "id": "script:render.draw",
+      "stableId": "0x55b0a5b4",
+      "blocker": "borrowed-predicate-and-owned-command-queue-frustum"
+    },
+    {
+      "id": "script:render.dispatch_compute",
+      "stableId": "0x6d237016",
+      "blocker": "borrowed-constant-buffer-and-render-command-context"
+    }
+  ]
+}

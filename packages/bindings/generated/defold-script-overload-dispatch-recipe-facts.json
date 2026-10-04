@@ -1,0 +1,459 @@
+{
+  "schemaVersion": 1,
+  "kind": "deherm.recipe.script-overload-dispatch-output",
+  "bindings": [
+    {
+      "id": "script:b2d.world.cast_shape",
+      "stableId": 378378773,
+      "generatedFamilyExecutableCandidate": false,
+      "targetSupport": {
+        "nativeDynamicHermes": "blocked-box2d-world-handle-and-multi-result-codecs",
+        "nativeStaticHermes": "blocked-box2d-world-handle-and-multi-result-codecs",
+        "html5BrowserHost": "blocked-box2d-world-handle-and-multi-result-codecs"
+      }
+    },
+    {
+      "id": "script:b2d.world.cast_ray_closest",
+      "stableId": 404878944,
+      "generatedFamilyExecutableCandidate": false,
+      "targetSupport": {
+        "nativeDynamicHermes": "blocked-box2d-world-handle-and-structured-result-codecs",
+        "nativeStaticHermes": "blocked-box2d-world-handle-and-structured-result-codecs",
+        "html5BrowserHost": "blocked-box2d-world-handle-and-structured-result-codecs"
+      }
+    },
+    {
+      "id": "script:b2d.world.cast_ray",
+      "stableId": 508811620,
+      "generatedFamilyExecutableCandidate": false,
+      "targetSupport": {
+        "nativeDynamicHermes": "blocked-box2d-world-handle-and-multi-result-codecs",
+        "nativeStaticHermes": "blocked-box2d-world-handle-and-multi-result-codecs",
+        "html5BrowserHost": "blocked-box2d-world-handle-and-multi-result-codecs"
+      }
+    },
+    {
+      "id": "script:b2d.world.overlap_aabb",
+      "stableId": 634121622,
+      "generatedFamilyExecutableCandidate": false,
+      "targetSupport": {
+        "nativeDynamicHermes": "blocked-box2d-world-handle-and-multi-result-codecs",
+        "nativeStaticHermes": "blocked-box2d-world-handle-and-multi-result-codecs",
+        "html5BrowserHost": "blocked-box2d-world-handle-and-multi-result-codecs"
+      }
+    },
+    {
+      "id": "script:msg.url",
+      "stableId": 806414134,
+      "generatedFamilyExecutableCandidate": false,
+      "targetSupport": {
+        "nativeDynamicHermes": "blocked-captured-instance-url-construction-context",
+        "nativeStaticHermes": "blocked-captured-instance-url-construction-context",
+        "html5BrowserHost": "blocked-captured-instance-url-construction-context"
+      }
+    },
+    {
+      "id": "script:b2d.joint.get_motor_force",
+      "stableId": 1020113598,
+      "generatedFamilyExecutableCandidate": false,
+      "targetSupport": {
+        "nativeDynamicHermes": "blocked-box2d-joint-handle-codec",
+        "nativeStaticHermes": "blocked-box2d-joint-handle-codec",
+        "html5BrowserHost": "blocked-box2d-joint-handle-codec"
+      }
+    },
+    {
+      "id": "script:b2d.world.overlap_shape",
+      "stableId": 1130607345,
+      "generatedFamilyExecutableCandidate": false,
+      "targetSupport": {
+        "nativeDynamicHermes": "blocked-box2d-world-handle-and-multi-result-codecs",
+        "nativeStaticHermes": "blocked-box2d-world-handle-and-multi-result-codecs",
+        "html5BrowserHost": "blocked-box2d-world-handle-and-multi-result-codecs"
+      }
+    },
+    {
+      "id": "script:vmath.matrix4",
+      "stableId": 1238853489,
+      "generatedFamilyExecutableCandidate": true,
+      "targetSupport": {
+        "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+        "nativeStaticHermes": "not-integrated-fail-closed",
+        "html5BrowserHost": "not-executable-no-generated-provider"
+      }
+    },
+    {
+      "id": "script:render.render_target",
+      "stableId": 1410796854,
+      "generatedFamilyExecutableCandidate": false,
+      "targetSupport": {
+        "nativeDynamicHermes": "blocked-render-target-table-and-resource-lifetime-codecs",
+        "nativeStaticHermes": "blocked-render-target-table-and-resource-lifetime-codecs",
+        "html5BrowserHost": "blocked-render-target-table-and-resource-lifetime-codecs"
+      }
+    },
+    {
+      "id": "script:b2d.joint.get_motor_torque",
+      "stableId": 1729897617,
+      "generatedFamilyExecutableCandidate": false,
+      "targetSupport": {
+        "nativeDynamicHermes": "blocked-box2d-joint-handle-codec",
+        "nativeStaticHermes": "blocked-box2d-joint-handle-codec",
+        "html5BrowserHost": "blocked-box2d-joint-handle-codec"
+      }
+    },
+    {
+      "id": "script:vmath.mul_per_elem",
+      "stableId": 1848085754,
+      "generatedFamilyExecutableCandidate": true,
+      "targetSupport": {
+        "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+        "nativeStaticHermes": "not-integrated-fail-closed",
+        "html5BrowserHost": "not-executable-no-generated-provider"
+      }
+    },
+    {
+      "id": "script:vmath.matrix4_scale",
+      "stableId": 2116175008,
+      "generatedFamilyExecutableCandidate": true,
+      "targetSupport": {
+        "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+        "nativeStaticHermes": "not-integrated-fail-closed",
+        "html5BrowserHost": "not-executable-no-generated-provider"
+      }
+    },
+    {
+      "id": "script:vmath.clamp",
+      "stableId": 2532589649,
+      "generatedFamilyExecutableCandidate": true,
+      "targetSupport": {
+        "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+        "nativeStaticHermes": "not-integrated-fail-closed",
+        "html5BrowserHost": "not-executable-no-generated-provider"
+      }
+    },
+    {
+      "id": "script:b2d.joint.get_reaction_torque",
+      "stableId": 2623669505,
+      "generatedFamilyExecutableCandidate": false,
+      "targetSupport": {
+        "nativeDynamicHermes": "blocked-box2d-joint-handle-codec",
+        "nativeStaticHermes": "blocked-box2d-joint-handle-codec",
+        "html5BrowserHost": "blocked-box2d-joint-handle-codec"
+      }
+    },
+    {
+      "id": "script:vmath.dot",
+      "stableId": 2708084985,
+      "generatedFamilyExecutableCandidate": true,
+      "targetSupport": {
+        "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+        "nativeStaticHermes": "not-integrated-fail-closed",
+        "html5BrowserHost": "not-executable-no-generated-provider"
+      }
+    },
+    {
+      "id": "script:b2d.joint.get_reaction_force",
+      "stableId": 2962591790,
+      "generatedFamilyExecutableCandidate": false,
+      "targetSupport": {
+        "nativeDynamicHermes": "blocked-box2d-joint-handle-codec",
+        "nativeStaticHermes": "blocked-box2d-joint-handle-codec",
+        "html5BrowserHost": "blocked-box2d-joint-handle-codec"
+      }
+    },
+    {
+      "id": "script:vmath.slerp",
+      "stableId": 3033910890,
+      "generatedFamilyExecutableCandidate": true,
+      "targetSupport": {
+        "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+        "nativeStaticHermes": "not-integrated-fail-closed",
+        "html5BrowserHost": "not-executable-no-generated-provider"
+      }
+    },
+    {
+      "id": "script:vmath.vector4",
+      "stableId": 3541966743,
+      "generatedFamilyExecutableCandidate": true,
+      "targetSupport": {
+        "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+        "nativeStaticHermes": "not-integrated-fail-closed",
+        "html5BrowserHost": "not-executable-no-generated-provider"
+      }
+    },
+    {
+      "id": "script:b2d.body.create_fixture",
+      "stableId": 3776606414,
+      "generatedFamilyExecutableCandidate": false,
+      "targetSupport": {
+        "nativeDynamicHermes": "blocked-box2d-handle-and-structured-fixture-codecs",
+        "nativeStaticHermes": "blocked-box2d-handle-and-structured-fixture-codecs",
+        "html5BrowserHost": "blocked-box2d-handle-and-structured-fixture-codecs"
+      }
+    },
+    {
+      "id": "script:vmath.lerp",
+      "stableId": 4026227879,
+      "generatedFamilyExecutableCandidate": true,
+      "targetSupport": {
+        "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+        "nativeStaticHermes": "not-integrated-fail-closed",
+        "html5BrowserHost": "not-executable-no-generated-provider"
+      }
+    }
+  ],
+  "nativeBindings": [
+    {
+      "index": 0,
+      "id": "script:vmath.matrix4",
+      "stableId": 1238853489,
+      "modulePath": [
+        "vmath"
+      ],
+      "member": "matrix4",
+      "callShapes": [
+        {
+          "arguments": [],
+          "resultCodec": "Matrix4"
+        },
+        {
+          "arguments": [
+            "Matrix4"
+          ],
+          "resultCodec": "Matrix4"
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "id": "script:vmath.mul_per_elem",
+      "stableId": 1848085754,
+      "modulePath": [
+        "vmath"
+      ],
+      "member": "mul_per_elem",
+      "callShapes": [
+        {
+          "arguments": [
+            "Vector3",
+            "Vector3"
+          ],
+          "resultCodec": "Vector3"
+        },
+        {
+          "arguments": [
+            "Vector4",
+            "Vector4"
+          ],
+          "resultCodec": "Vector4"
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "id": "script:vmath.matrix4_scale",
+      "stableId": 2116175008,
+      "modulePath": [
+        "vmath"
+      ],
+      "member": "matrix4_scale",
+      "callShapes": [
+        {
+          "arguments": [
+            "Vector3"
+          ],
+          "resultCodec": "Matrix4"
+        },
+        {
+          "arguments": [
+            "Number"
+          ],
+          "resultCodec": "Matrix4"
+        },
+        {
+          "arguments": [
+            "Number",
+            "Number",
+            "Number"
+          ],
+          "resultCodec": "Matrix4"
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "id": "script:vmath.clamp",
+      "stableId": 2532589649,
+      "modulePath": [
+        "vmath"
+      ],
+      "member": "clamp",
+      "callShapes": [
+        {
+          "arguments": [
+            "Number",
+            "Number",
+            "Number"
+          ],
+          "resultCodec": "Number"
+        },
+        {
+          "arguments": [
+            "Vector3",
+            "Vector3",
+            "Vector3"
+          ],
+          "resultCodec": "Vector3"
+        },
+        {
+          "arguments": [
+            "Vector4",
+            "Vector4",
+            "Vector4"
+          ],
+          "resultCodec": "Vector4"
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "id": "script:vmath.dot",
+      "stableId": 2708084985,
+      "modulePath": [
+        "vmath"
+      ],
+      "member": "dot",
+      "callShapes": [
+        {
+          "arguments": [
+            "Vector3",
+            "Vector3"
+          ],
+          "resultCodec": "Number"
+        },
+        {
+          "arguments": [
+            "Vector4",
+            "Vector4"
+          ],
+          "resultCodec": "Number"
+        }
+      ]
+    },
+    {
+      "index": 5,
+      "id": "script:vmath.slerp",
+      "stableId": 3033910890,
+      "modulePath": [
+        "vmath"
+      ],
+      "member": "slerp",
+      "callShapes": [
+        {
+          "arguments": [
+            "Number",
+            "Vector3",
+            "Vector3"
+          ],
+          "resultCodec": "Vector3"
+        },
+        {
+          "arguments": [
+            "Number",
+            "Vector4",
+            "Vector4"
+          ],
+          "resultCodec": "Vector4"
+        },
+        {
+          "arguments": [
+            "Number",
+            "Quaternion",
+            "Quaternion"
+          ],
+          "resultCodec": "Quaternion"
+        }
+      ]
+    },
+    {
+      "index": 6,
+      "id": "script:vmath.vector4",
+      "stableId": 3541966743,
+      "modulePath": [
+        "vmath"
+      ],
+      "member": "vector4",
+      "callShapes": [
+        {
+          "arguments": [],
+          "resultCodec": "Vector4"
+        },
+        {
+          "arguments": [
+            "Number"
+          ],
+          "resultCodec": "Vector4"
+        },
+        {
+          "arguments": [
+            "Vector4"
+          ],
+          "resultCodec": "Vector4"
+        },
+        {
+          "arguments": [
+            "Number",
+            "Number",
+            "Number",
+            "Number"
+          ],
+          "resultCodec": "Vector4"
+        }
+      ]
+    },
+    {
+      "index": 7,
+      "id": "script:vmath.lerp",
+      "stableId": 4026227879,
+      "modulePath": [
+        "vmath"
+      ],
+      "member": "lerp",
+      "callShapes": [
+        {
+          "arguments": [
+            "Number",
+            "Vector3",
+            "Vector3"
+          ],
+          "resultCodec": "Vector3"
+        },
+        {
+          "arguments": [
+            "Number",
+            "Vector4",
+            "Vector4"
+          ],
+          "resultCodec": "Vector4"
+        },
+        {
+          "arguments": [
+            "Number",
+            "Quaternion",
+            "Quaternion"
+          ],
+          "resultCodec": "Quaternion"
+        },
+        {
+          "arguments": [
+            "Number",
+            "Number",
+            "Number"
+          ],
+          "resultCodec": "Number"
+        }
+      ]
+    }
+  ]
+}

@@ -10,9 +10,26 @@ import {
   loadScriptCallbackLifecycleInputs,
   selectReviewedCallbackRoutes,
 } from "../scripts/generate-script-callback-lifecycle.mjs";
+import { renderScriptCallbackLifecycleOutputs } from "../packages/compiler/src/script-callback-lifecycle-output-emitter.mjs";
 import { stableBindingId } from "../scripts/lib/binding-identity.mjs";
 
 const root = new URL("../", import.meta.url);
+
+test("package callback-lifecycle emitter reproduces generated artifacts byte-for-byte", async () => {
+  const [factsText, header, source, target] = await Promise.all([
+    readFile(new URL("packages/bindings/generated/defold-script-callback-lifecycle-recipe-facts.json", root), "utf8"),
+    readFile(
+      new URL("defold/defold_hermes/include/defold_hermes/generated_script_callback_lifecycle.hpp", root),
+      "utf8",
+    ),
+    readFile(new URL("defold/defold_hermes/src/generated_script_callback_lifecycle.cpp", root), "utf8"),
+    readFile(new URL("packages/sdk/src/generated/script/callback-lifecycle.ts", root), "utf8"),
+  ]);
+  const outputs = renderScriptCallbackLifecycleOutputs(JSON.parse(factsText));
+  assert.equal(outputs.header, header);
+  assert.equal(outputs.source, source);
+  assert.equal(outputs.target, target);
+});
 
 test("callback lifecycle generator covers the exact classified family with bounded support", async () => {
   execFileSync(process.execPath, ["scripts/generate-script-callback-lifecycle.mjs", "--check"], {

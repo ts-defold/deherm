@@ -1,5 +1,19 @@
 export * from "./binding-identity.mjs";
 export * from "./defold-value-layout-output-emitter.mjs";
+export * from "./generated-module-output-emitter.mjs";
+export * from "./script-url-output-emitter.mjs";
+export * from "./static-hermes-vmath-output-emitter.mjs";
+export * from "./script-copied-value-record-blockers-output-emitter.mjs";
+export * from "./script-opaque-record-blockers-output-emitter.mjs";
+export * from "./script-callback-lifecycle-output-emitter.mjs";
+export * from "./script-dynamic-values-output-emitter.mjs";
+export * from "./script-fixed-tuples-output-emitter.mjs";
+export * from "./script-overload-dispatch-output-emitter.mjs";
+export * from "./script-table-record-output-emitter.mjs";
+export * from "./script-value-tail-output-emitter.mjs";
+export * from "./lua-bridge-output-emitter.mjs";
+export * from "./dmsdk-universal-jsi-source-emitter.mjs";
+export * from "./static-hermes-typed-native-bridge-output-emitter.mjs";
 export { generateScriptBindingDescriptors } from "./script-binding-descriptor-generator.mjs";
 export * from "./component-proxy-generator.mjs";
 // The public compiler boundary is pure: callers supply policy/materialized

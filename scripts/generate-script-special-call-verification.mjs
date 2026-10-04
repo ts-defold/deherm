@@ -4,8 +4,8 @@ import { readFile, writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 
 import {
-  renderScriptSpecialCallVerification,
-  renderScriptSpecialCallVerificationHeader,
+  generateScriptSpecialCallVerification,
+  renderScriptSpecialCallVerificationHeaderFromReport,
 } from "../packages/compiler/src/script-special-call-verification.mjs";
 
 const root = new URL("../", import.meta.url);
@@ -27,9 +27,10 @@ export async function generate() {
     json("packages/bindings/generated/defold-component-proxy-contract.json"),
   ]);
   const inputs = { accounting, moduleSchema, luaSchema, componentPolicy };
+  const reportObject = generateScriptSpecialCallVerification(inputs);
   return {
-    report: renderScriptSpecialCallVerification(inputs),
-    header: renderScriptSpecialCallVerificationHeader(inputs),
+    report: `${JSON.stringify(reportObject, null, 2)}\n`,
+    header: renderScriptSpecialCallVerificationHeaderFromReport(reportObject),
   };
 }
 

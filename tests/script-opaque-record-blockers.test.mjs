@@ -3,6 +3,7 @@ import { execFileSync } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { generate, loadInputs } from "../scripts/generate-script-opaque-record-blockers.mjs";
+import { renderScriptOpaqueRecordBlockersOutput } from "../packages/compiler/src/script-opaque-record-blockers-output-emitter.mjs";
 const root = new URL("../", import.meta.url);
 test("opaque records have exact source-pinned ownership blockers", async () => {
   execFileSync(process.execPath, ["scripts/generate-script-opaque-record-blockers.mjs", "--check"], {
@@ -19,6 +20,24 @@ test("opaque records have exact source-pinned ownership blockers", async () => {
     "script:render.dispatch_compute",
     "script:render.draw",
   ]);
+});
+test("opaque blocker package emitter reproduces the snapshot and rejects unsafe facts", async () => {
+  const facts = JSON.parse(
+    await readFile(
+      new URL("packages/bindings/generated/defold-script-opaque-record-blockers-recipe-facts.json", root),
+      "utf8",
+    ),
+  );
+  const target = await readFile(new URL("packages/sdk/src/generated/script/opaque-record-blockers.ts", root), "utf8");
+  assert.equal(renderScriptOpaqueRecordBlockersOutput(facts), target);
+  assert.throws(
+    () => renderScriptOpaqueRecordBlockersOutput({ ...facts, routes: [...facts.routes, facts.routes[0]] }),
+    /not unique and ordered/,
+  );
+  assert.throws(
+    () => renderScriptOpaqueRecordBlockersOutput({ ...facts, kind: "unknown" }),
+    /Unsupported opaque-record blocker recipe facts/,
+  );
 });
 test("opaque blocker generator reports stale evidence and rejects incomplete coverage", async () => {
   const inputs = await loadInputs();

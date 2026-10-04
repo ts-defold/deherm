@@ -66,6 +66,16 @@ import {
   createScriptValueBindingRecipeFacts,
   SCRIPT_VALUE_BINDING_RECIPE_FACTS_NAME,
 } from "../../../compiler/src/script-value-binding-output-emitter.mjs";
+import { GENERATED_MODULE_FACTS } from "../../../compiler/src/generated-module-output-emitter.mjs";
+import { SCRIPT_COPIED_VALUE_RECORD_BLOCKERS_FACTS } from "../../../compiler/src/script-copied-value-record-blockers-output-emitter.mjs";
+import { SCRIPT_OPAQUE_RECORD_BLOCKERS_FACTS } from "../../../compiler/src/script-opaque-record-blockers-output-emitter.mjs";
+import { SCRIPT_CALLBACK_LIFECYCLE_FACTS } from "../../../compiler/src/script-callback-lifecycle-output-emitter.mjs";
+import { SCRIPT_DYNAMIC_VALUES_FACTS } from "../../../compiler/src/script-dynamic-values-output-emitter.mjs";
+import { SCRIPT_FIXED_TUPLES_FACTS } from "../../../compiler/src/script-fixed-tuples-output-emitter.mjs";
+import { SCRIPT_OVERLOAD_DISPATCH_FACTS } from "../../../compiler/src/script-overload-dispatch-output-emitter.mjs";
+import { SCRIPT_TABLE_RECORD_FACTS } from "../../../compiler/src/script-table-record-output-emitter.mjs";
+import { SCRIPT_VALUE_TAIL_FACTS } from "../../../compiler/src/script-value-tail-output-emitter.mjs";
+import { LUA_BRIDGE_FACTS, projectLuaBridgeFacts } from "../../../compiler/src/lua-bridge-output-emitter.mjs";
 import { releaseAssetUrlTemplate } from "../../../cli/src/release-assets.mjs";
 import { apiPolicyGenerator } from "../../../../scripts/lib/script-generator-pipeline.mjs";
 export { buildArtifactReferences } from "./artifact-references.mjs";
@@ -82,6 +92,7 @@ const generatedDir = path.join(root, "packages", "bindings", "generated");
 // and recipe catalogs, not emitted TypeScript/C++/JavaScript. Keeping the list
 // here makes policy derivation and local materialization agree by filename.
 export const compilerSurfaceDocuments = Object.freeze({
+  "defold-typed-native-bridge-recipe-facts.json": "defold-typed-native-bridge-recipe-facts.json",
   "defold-value-layouts.json": "defold-value-layouts.json",
   "defold-script-api-ir.json": "defold-script-api-ir.json",
   "defold-script-constant-lowering.json": "defold-script-constant-lowering.json",
@@ -91,6 +102,18 @@ export const compilerSurfaceDocuments = Object.freeze({
   "defold-dmsdk-sdk-documentation.json": "defold-dmsdk-sdk-documentation.json",
   "defold-script-scalar-dispatch.json": "defold-script-scalar-dispatch.json",
   "defold-script-binding-patterns.json": "defold-script-binding-patterns.json",
+  [GENERATED_MODULE_FACTS]: GENERATED_MODULE_FACTS,
+  "defold-script-url-binding-recipe-facts.json": "defold-script-url-binding-recipe-facts.json",
+  "defold-static-hermes-vmath-recipe-facts.json": "defold-static-hermes-vmath-recipe-facts.json",
+  [SCRIPT_COPIED_VALUE_RECORD_BLOCKERS_FACTS]: SCRIPT_COPIED_VALUE_RECORD_BLOCKERS_FACTS,
+  [SCRIPT_OPAQUE_RECORD_BLOCKERS_FACTS]: SCRIPT_OPAQUE_RECORD_BLOCKERS_FACTS,
+  [SCRIPT_CALLBACK_LIFECYCLE_FACTS]: SCRIPT_CALLBACK_LIFECYCLE_FACTS,
+  [SCRIPT_DYNAMIC_VALUES_FACTS]: SCRIPT_DYNAMIC_VALUES_FACTS,
+  [SCRIPT_FIXED_TUPLES_FACTS]: SCRIPT_FIXED_TUPLES_FACTS,
+  [SCRIPT_OVERLOAD_DISPATCH_FACTS]: SCRIPT_OVERLOAD_DISPATCH_FACTS,
+  [SCRIPT_TABLE_RECORD_FACTS]: SCRIPT_TABLE_RECORD_FACTS,
+  [SCRIPT_VALUE_TAIL_FACTS]: SCRIPT_VALUE_TAIL_FACTS,
+  [LUA_BRIDGE_FACTS]: null,
   "defold-dmsdk-binding-patterns.json": "defold-dmsdk-binding-patterns.json",
   "defold-dmsdk-arena-cstring-recipe-facts.json": "defold-dmsdk-arena-cstring-recipe-facts.json",
   "defold-dmsdk-borrowed-handle-recipe-facts.json": "defold-dmsdk-borrowed-handle-recipe-facts.json",
@@ -107,6 +130,7 @@ export const compilerSurfaceDocuments = Object.freeze({
   "defold-dmsdk-xtea-span-recipe-facts.json": "defold-dmsdk-xtea-span-recipe-facts.json",
   "defold-script-real-engine-probes.json": "defold-script-real-engine-probes.json",
   "defold-script-api-accounting.json": "defold-script-api-accounting.json",
+  "defold-script-special-call-verification.json": "defold-script-special-call-verification.json",
   [SCRIPT_VALUE_BINDING_RECIPE_FACTS_NAME]: null,
   "defold-script-universal-value-bindings.json": "defold-script-universal-value-bindings.json",
   "defold-script-route-availability-profiles.json": "defold-script-route-availability-profiles.json",
@@ -130,6 +154,14 @@ const locallyRenderedSdkSources = new Set([
   "script/handle-lowering.ts",
   "script/universal-value-bindings.ts",
   "script/browser-target-support.ts",
+  "script/callback-lifecycle.ts",
+  "script/copied-value-record-blockers.ts",
+  "script/opaque-record-blockers.ts",
+  "script/dynamic-values.ts",
+  "script/fixed-tuple-target-support.ts",
+  "script/overload-dispatch-target-support.ts",
+  "script/table-record-bindings.ts",
+  "script/value-tail-target-support.ts",
   "dmsdk/scalar.ts",
   "dmsdk/borrowed-handle.ts",
   "dmsdk/cstring-value.ts",
@@ -153,6 +185,14 @@ const locallyRenderedSdkRecipes = Object.freeze({
   "script/handle-lowering.ts": "sdk.script.handle-lowering.render.v1",
   "script/universal-value-bindings.ts": "sdk.script.universal-value.render.v1",
   "script/browser-target-support.ts": "sdk.script.browser-target-support.render.v1",
+  "script/callback-lifecycle.ts": "sdk.script.callback-lifecycle.render.v1",
+  "script/copied-value-record-blockers.ts": "sdk.script.copied-value-record-blockers.render.v1",
+  "script/opaque-record-blockers.ts": "sdk.script.opaque-record-blockers.render.v1",
+  "script/dynamic-values.ts": "sdk.script.dynamic-values.render.v1",
+  "script/fixed-tuple-target-support.ts": "sdk.script.fixed-tuples.render.v1",
+  "script/overload-dispatch-target-support.ts": "sdk.script.overload-dispatch.render.v1",
+  "script/table-record-bindings.ts": "sdk.script.table-record.render.v1",
+  "script/value-tail-target-support.ts": "sdk.script.value-tail.render.v1",
   "dmsdk/scalar.ts": "sdk.dmsdk.scalar.render.v1",
   "dmsdk/borrowed-handle.ts": "sdk.dmsdk.borrowed-handle.render.v1",
   "dmsdk/cstring-value.ts": "sdk.dmsdk.cstring-value.render.v1",
@@ -181,6 +221,14 @@ const locallyRenderedSdkInputs = Object.freeze({
   "script/handle-lowering.ts": Object.freeze(["defold-script-handle-lowering.json"]),
   "script/universal-value-bindings.ts": Object.freeze(["defold-script-universal-value-bindings.json"]),
   "script/browser-target-support.ts": Object.freeze(["defold-script-universal-value-bindings.json"]),
+  "script/copied-value-record-blockers.ts": Object.freeze([SCRIPT_COPIED_VALUE_RECORD_BLOCKERS_FACTS]),
+  "script/opaque-record-blockers.ts": Object.freeze([SCRIPT_OPAQUE_RECORD_BLOCKERS_FACTS]),
+  "script/callback-lifecycle.ts": Object.freeze([SCRIPT_CALLBACK_LIFECYCLE_FACTS]),
+  "script/dynamic-values.ts": Object.freeze([SCRIPT_DYNAMIC_VALUES_FACTS]),
+  "script/fixed-tuple-target-support.ts": Object.freeze([SCRIPT_FIXED_TUPLES_FACTS]),
+  "script/overload-dispatch-target-support.ts": Object.freeze([SCRIPT_OVERLOAD_DISPATCH_FACTS]),
+  "script/table-record-bindings.ts": Object.freeze([SCRIPT_TABLE_RECORD_FACTS]),
+  "script/value-tail-target-support.ts": Object.freeze([SCRIPT_VALUE_TAIL_FACTS]),
   "dmsdk/scalar.ts": Object.freeze(["defold-dmsdk-scalar-recipe-facts.json"]),
   "dmsdk/borrowed-handle.ts": Object.freeze(["defold-dmsdk-borrowed-handle-recipe-facts.json"]),
   "dmsdk/cstring-value.ts": Object.freeze(["defold-dmsdk-cstring-value-recipe-facts.json"]),
@@ -483,6 +531,12 @@ export async function derivePolicy(options = {}) {
               createScriptValueBindingRecipeFacts(
                 await readJson(path.join(artifacts, "defold-script-value-bindings.json")),
               ),
+            ];
+          }
+          if (name === LUA_BRIDGE_FACTS) {
+            return [
+              name,
+              projectLuaBridgeFacts(await readJson(path.join(root, "packages", "bindings", "lua-compat.json"))),
             ];
           }
           return [name, await readJson(path.join(artifacts, relative))];

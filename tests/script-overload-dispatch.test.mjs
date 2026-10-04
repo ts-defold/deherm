@@ -6,11 +6,28 @@ import { tmpdir } from "node:os";
 import test from "node:test";
 
 import { generate, loadInputs } from "../scripts/generate-script-overload-dispatch.mjs";
+import { renderScriptOverloadDispatchOutputs } from "../packages/compiler/src/script-overload-dispatch-output-emitter.mjs";
 import { stableBindingId } from "../scripts/lib/binding-identity.mjs";
 
 const root = new URL("../", import.meta.url);
 const derivedRevision = "1".repeat(40);
 const digest = (text) => createHash("sha256").update(text).digest("hex");
+
+test("package overload-dispatch emitter reproduces generated artifacts byte-for-byte", async () => {
+  const [factsText, header, source, target] = await Promise.all([
+    readFile(new URL("packages/bindings/generated/defold-script-overload-dispatch-recipe-facts.json", root), "utf8"),
+    readFile(
+      new URL("defold/defold_hermes/include/defold_hermes/generated_script_overload_dispatch.hpp", root),
+      "utf8",
+    ),
+    readFile(new URL("defold/defold_hermes/src/generated_script_overload_dispatch.cpp", root), "utf8"),
+    readFile(new URL("packages/sdk/src/generated/script/overload-dispatch-target-support.ts", root), "utf8"),
+  ]);
+  const outputs = renderScriptOverloadDispatchOutputs(JSON.parse(factsText));
+  assert.equal(outputs.header, header);
+  assert.equal(outputs.source, source);
+  assert.equal(outputs.target, target);
+});
 
 function withDeclaredDerivation(callback) {
   const previousRevision = process.env.DEHERM_DERIVED_REVISION;

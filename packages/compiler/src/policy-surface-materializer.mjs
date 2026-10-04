@@ -52,6 +52,14 @@ import { renderDmSdkCStringValueOutputs } from "./dmsdk-cstring-value-output-emi
 import { renderDmSdkEnumValueOutputs } from "./dmsdk-enum-value-output-emitter.mjs";
 import { renderDmSdkScalarOutputs } from "./dmsdk-scalar-output-emitter.mjs";
 import { renderDmSdkScratchScalarOutOutputs } from "./dmsdk-scratch-scalar-out-output-emitter.mjs";
+import { renderScriptCopiedValueRecordBlockersOutput } from "./script-copied-value-record-blockers-output-emitter.mjs";
+import { renderScriptOpaqueRecordBlockersOutput } from "./script-opaque-record-blockers-output-emitter.mjs";
+import { renderScriptCallbackLifecycleOutputs } from "./script-callback-lifecycle-output-emitter.mjs";
+import { renderScriptDynamicValuesOutputs } from "./script-dynamic-values-output-emitter.mjs";
+import { renderScriptFixedTuplesOutputs } from "./script-fixed-tuples-output-emitter.mjs";
+import { renderScriptOverloadDispatchOutputs } from "./script-overload-dispatch-output-emitter.mjs";
+import { renderScriptTableRecordOutputs } from "./script-table-record-output-emitter.mjs";
+import { renderScriptValueTailOutputs } from "./script-value-tail-output-emitter.mjs";
 
 const SCRIPT_IR = "defold-script-api-ir.json";
 const SCRIPT_CONSTANT_LOWERING = "defold-script-constant-lowering.json";
@@ -83,6 +91,14 @@ const SDK_RECIPES = Object.freeze({
   "script/handle-lowering.ts": "sdk.script.handle-lowering.render.v1",
   "script/universal-value-bindings.ts": "sdk.script.universal-value.render.v1",
   "script/browser-target-support.ts": "sdk.script.browser-target-support.render.v1",
+  "script/callback-lifecycle.ts": "sdk.script.callback-lifecycle.render.v1",
+  "script/copied-value-record-blockers.ts": "sdk.script.copied-value-record-blockers.render.v1",
+  "script/opaque-record-blockers.ts": "sdk.script.opaque-record-blockers.render.v1",
+  "script/dynamic-values.ts": "sdk.script.dynamic-values.render.v1",
+  "script/fixed-tuple-target-support.ts": "sdk.script.fixed-tuples.render.v1",
+  "script/overload-dispatch-target-support.ts": "sdk.script.overload-dispatch.render.v1",
+  "script/table-record-bindings.ts": "sdk.script.table-record.render.v1",
+  "script/value-tail-target-support.ts": "sdk.script.value-tail.render.v1",
   "dmsdk/scalar.ts": "sdk.dmsdk.scalar.render.v1",
   "dmsdk/borrowed-handle.ts": "sdk.dmsdk.borrowed-handle.render.v1",
   "dmsdk/cstring-value.ts": "sdk.dmsdk.cstring-value.render.v1",
@@ -600,10 +616,9 @@ export async function realizeCompilerDocuments(input) {
  * Materialize one complete, revision-keyed engine surface from authenticated
  * policy objects and compiler code shipped in the npm package.
  *
- * Core SDK files are rendered locally and checked against policy hashes.
- * Remaining support files are explicitly tagged compatibility snapshots until
- * their emitters are moved behind this package boundary; callers can therefore
- * distinguish local generation from authenticated materialization.
+ * SDK and repository files are rendered locally and checked against policy
+ * hashes. The policy carries source-derived facts and expected output digests;
+ * package-owned emitters carry the stable rendering machinery.
  */
 export async function materializePolicySurface(resolvedPolicy, options = {}) {
   const revision = String(options.revision ?? resolvedPolicy?.revision ?? "").toLowerCase();
@@ -680,6 +695,62 @@ export async function materializePolicySurface(resolvedPolicy, options = {}) {
           "script/value-target-support.ts": generateScriptValueTargetSupport(
             compiler.sdk["script/value-target-support.ts"].recipeInput,
           ),
+        }
+      : {}),
+    ...(compiler.sdk?.["script/copied-value-record-blockers.ts"]?.mode === "render-and-verify"
+      ? {
+          "script/copied-value-record-blockers.ts": renderScriptCopiedValueRecordBlockersOutput(
+            documents["defold-script-copied-value-record-blockers-recipe-facts.json"],
+          ),
+        }
+      : {}),
+    ...(compiler.sdk?.["script/opaque-record-blockers.ts"]?.mode === "render-and-verify"
+      ? {
+          "script/opaque-record-blockers.ts": renderScriptOpaqueRecordBlockersOutput(
+            documents["defold-script-opaque-record-blockers-recipe-facts.json"],
+          ),
+        }
+      : {}),
+    ...(compiler.sdk?.["script/callback-lifecycle.ts"]?.mode === "render-and-verify"
+      ? {
+          "script/callback-lifecycle.ts": renderScriptCallbackLifecycleOutputs(
+            documents["defold-script-callback-lifecycle-recipe-facts.json"],
+          ).target,
+        }
+      : {}),
+    ...(compiler.sdk?.["script/dynamic-values.ts"]?.mode === "render-and-verify"
+      ? {
+          "script/dynamic-values.ts": renderScriptDynamicValuesOutputs(
+            documents["defold-script-dynamic-values-recipe-facts.json"],
+          ).target,
+        }
+      : {}),
+    ...(compiler.sdk?.["script/fixed-tuple-target-support.ts"]?.mode === "render-and-verify"
+      ? {
+          "script/fixed-tuple-target-support.ts": renderScriptFixedTuplesOutputs(
+            documents["defold-script-fixed-tuples-recipe-facts.json"],
+          ).target,
+        }
+      : {}),
+    ...(compiler.sdk?.["script/overload-dispatch-target-support.ts"]?.mode === "render-and-verify"
+      ? {
+          "script/overload-dispatch-target-support.ts": renderScriptOverloadDispatchOutputs(
+            documents["defold-script-overload-dispatch-recipe-facts.json"],
+          ).target,
+        }
+      : {}),
+    ...(compiler.sdk?.["script/table-record-bindings.ts"]?.mode === "render-and-verify"
+      ? {
+          "script/table-record-bindings.ts": renderScriptTableRecordOutputs(
+            documents["defold-script-table-record-recipe-facts.json"],
+          ).target,
+        }
+      : {}),
+    ...(compiler.sdk?.["script/value-tail-target-support.ts"]?.mode === "render-and-verify"
+      ? {
+          "script/value-tail-target-support.ts": renderScriptValueTailOutputs(
+            documents["defold-script-value-tail-recipe-facts.json"],
+          ).target,
         }
       : {}),
     ...(compiler.sdk?.["dmsdk/named-scalar.ts"]?.mode === "render-and-verify"

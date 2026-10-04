@@ -9,7 +9,9 @@ import {
   generateScriptUrlAddressClassification,
   loadScriptUrlAddressInputs,
   renderScriptUrlAddressRuntime,
+  scriptUrlBindingRecipeFacts,
 } from "../scripts/generate-script-url-address-classification.mjs";
+import { renderScriptUrlNativeOutputs } from "../packages/compiler/src/script-url-output-emitter.mjs";
 
 const root = new URL("../", import.meta.url);
 const sourceInputs = await loadScriptUrlAddressInputs();
@@ -197,6 +199,31 @@ test("generated runtime uses explicit URL branding and preserves the nonzero res
   assert.match(jsi, /setProperty\(runtime, kDefoldUrlProperty, true\)/);
   assert.match(address, /readonly __dehermUrlV1: true/);
   assert.match(address, /readonly reserved: DefoldHash/);
+});
+
+test("package emitter reconstructs URL native outputs from compact source-selected facts", async () => {
+  const [factsRaw, reportRaw, header, source] = await Promise.all([
+    readFile(
+      new URL("../packages/bindings/generated/defold-script-url-binding-recipe-facts.json", import.meta.url),
+      "utf8",
+    ),
+    readFile(
+      new URL("../packages/bindings/generated/defold-script-url-address-classification.json", import.meta.url),
+      "utf8",
+    ),
+    readFile(
+      new URL("../defold/defold_hermes/include/defold_hermes/generated_script_url_bindings.hpp", import.meta.url),
+      "utf8",
+    ),
+    readFile(new URL("../defold/defold_hermes/src/generated_script_url_bindings.cpp", import.meta.url), "utf8"),
+  ]);
+  const facts = JSON.parse(factsRaw);
+  assert.deepEqual(renderScriptUrlNativeOutputs(facts), { header, source });
+  assert.deepEqual(scriptUrlBindingRecipeFacts(JSON.parse(reportRaw)), facts);
+  assert.ok(Buffer.byteLength(JSON.stringify(facts)) < Buffer.byteLength(reportRaw));
+  const malformed = structuredClone(facts);
+  malformed.operations[1].stableId = malformed.operations[0].stableId;
+  assert.throws(() => renderScriptUrlNativeOutputs(malformed), /sorted by unique stable ID/);
 });
 
 test("regenerates the classification byte-identically in a temporary output", async () => {

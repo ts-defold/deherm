@@ -1,0 +1,1348 @@
+{
+  "schemaVersion": 1,
+  "optimizedRouteCount": 70,
+  "universalFallbackRouteCount": 0,
+  "operations": [
+    {
+      "id": "script:physics.destroy_joint",
+      "stableId": 350770,
+      "module": "physics",
+      "member": "destroy_joint",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url"
+        ],
+        [
+          "String",
+          "Hash"
+        ]
+      ],
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCodec": "None"
+    },
+    {
+      "id": "script:physics.wakeup",
+      "stableId": 10300768,
+      "module": "physics",
+      "member": "wakeup",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url"
+        ]
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCodec": "None"
+    },
+    {
+      "id": "script:go.update_world_transform",
+      "stableId": 16978861,
+      "module": "go",
+      "member": "update_world_transform",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url",
+          "Nil"
+        ]
+      ],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 1,
+      "resultCodec": "None"
+    },
+    {
+      "id": "script:camera.get_near_z",
+      "stableId": 94225445,
+      "module": "camera",
+      "member": "get_near_z",
+      "argumentCodecs": [
+        [
+          "Url",
+          "Number",
+          "Nil"
+        ]
+      ],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 1,
+      "resultCodec": "Number"
+    },
+    {
+      "id": "script:model.reset_constant",
+      "stableId": 250460089,
+      "module": "model",
+      "member": "reset_constant",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url"
+        ],
+        [
+          "String",
+          "Hash"
+        ]
+      ],
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCodec": "None"
+    },
+    {
+      "id": "script:camera.set_orthographic_zoom",
+      "stableId": 294035082,
+      "module": "camera",
+      "member": "set_orthographic_zoom",
+      "argumentCodecs": [
+        [
+          "Url",
+          "Number",
+          "Nil"
+        ],
+        [
+          "Number"
+        ]
+      ],
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCodec": "None"
+    },
+    {
+      "id": "script:camera.get_orthographic_auto_zoom",
+      "stableId": 333496520,
+      "module": "camera",
+      "member": "get_orthographic_auto_zoom",
+      "argumentCodecs": [
+        [
+          "Url",
+          "Number",
+          "Nil"
+        ]
+      ],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 1,
+      "resultCodec": "Number"
+    },
+    {
+      "id": "script:go.get_rotation",
+      "stableId": 384109339,
+      "module": "go",
+      "member": "get_rotation",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url",
+          "Nil"
+        ]
+      ],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 1,
+      "resultCodec": "Quaternion"
+    },
+    {
+      "id": "script:go.get_world_scale",
+      "stableId": 457161058,
+      "module": "go",
+      "member": "get_world_scale",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url",
+          "Nil"
+        ]
+      ],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 1,
+      "resultCodec": "Vector3"
+    },
+    {
+      "id": "script:tilemap.set_tile",
+      "stableId": 530608877,
+      "module": "tilemap",
+      "member": "set_tile",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url"
+        ],
+        [
+          "String",
+          "Hash"
+        ],
+        [
+          "Integer"
+        ],
+        [
+          "Integer"
+        ],
+        [
+          "Integer"
+        ],
+        [
+          "Integer",
+          "Nil"
+        ]
+      ],
+      "requiredArgumentCount": 5,
+      "maximumArgumentCount": 6,
+      "resultCodec": "None"
+    },
+    {
+      "id": "script:go.set_parent",
+      "stableId": 593473189,
+      "module": "go",
+      "member": "set_parent",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url",
+          "Nil"
+        ],
+        [
+          "String",
+          "Hash",
+          "Url",
+          "Nil"
+        ],
+        [
+          "Boolean",
+          "Nil"
+        ]
+      ],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 3,
+      "resultCodec": "None"
+    },
+    {
+      "id": "script:sound.set_pan",
+      "stableId": 665323993,
+      "module": "sound",
+      "member": "set_pan",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url"
+        ],
+        [
+          "Number",
+          "Nil"
+        ]
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 2,
+      "resultCodec": "None"
+    },
+    {
+      "id": "script:camera.get_orthographic_mode",
+      "stableId": 780726310,
+      "module": "camera",
+      "member": "get_orthographic_mode",
+      "argumentCodecs": [
+        [
+          "Url",
+          "Number",
+          "Nil"
+        ]
+      ],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 1,
+      "resultCodec": "Integer"
+    },
+    {
+      "id": "script:camera.get_auto_aspect_ratio",
+      "stableId": 815384074,
+      "module": "camera",
+      "member": "get_auto_aspect_ratio",
+      "argumentCodecs": [
+        [
+          "Url",
+          "Number",
+          "Nil"
+        ]
+      ],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 1,
+      "resultCodec": "Boolean"
+    },
+    {
+      "id": "script:factory.unload",
+      "stableId": 826508291,
+      "module": "factory",
+      "member": "unload",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url",
+          "Nil"
+        ]
+      ],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 1,
+      "resultCodec": "None"
+    },
+    {
+      "id": "script:go.get_world_scale_uniform",
+      "stableId": 1055817377,
+      "module": "go",
+      "member": "get_world_scale_uniform",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url",
+          "Nil"
+        ]
+      ],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 1,
+      "resultCodec": "Number"
+    },
+    {
+      "id": "script:physics.get_joint_reaction_force",
+      "stableId": 1120188142,
+      "module": "physics",
+      "member": "get_joint_reaction_force",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url"
+        ],
+        [
+          "String",
+          "Hash"
+        ]
+      ],
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCodec": "Vector3"
+    },
+    {
+      "id": "script:go.cancel_animations",
+      "stableId": 1183026732,
+      "module": "go",
+      "member": "cancel_animations",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url"
+        ],
+        [
+          "String",
+          "Hash",
+          "Nil"
+        ]
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 2,
+      "resultCodec": "None"
+    },
+    {
+      "id": "script:model.get_go",
+      "stableId": 1244796042,
+      "module": "model",
+      "member": "get_go",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url"
+        ],
+        [
+          "String",
+          "Hash"
+        ]
+      ],
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCodec": "Hash"
+    },
+    {
+      "id": "script:go.exists",
+      "stableId": 1311027776,
+      "module": "go",
+      "member": "exists",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url"
+        ]
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCodec": "Boolean"
+    },
+    {
+      "id": "script:physics.get_joint_reaction_torque",
+      "stableId": 1431636929,
+      "module": "physics",
+      "member": "get_joint_reaction_torque",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url"
+        ],
+        [
+          "String",
+          "Hash"
+        ]
+      ],
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCodec": "Number"
+    },
+    {
+      "id": "script:sound.pause",
+      "stableId": 1502096075,
+      "module": "sound",
+      "member": "pause",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url"
+        ],
+        [
+          "Boolean"
+        ]
+      ],
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCodec": "None"
+    },
+    {
+      "id": "script:camera.get_orthographic_zoom",
+      "stableId": 1514123934,
+      "module": "camera",
+      "member": "get_orthographic_zoom",
+      "argumentCodecs": [
+        [
+          "Url",
+          "Number",
+          "Nil"
+        ]
+      ],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 1,
+      "resultCodec": "Number"
+    },
+    {
+      "id": "script:label.get_text",
+      "stableId": 1547809370,
+      "module": "label",
+      "member": "get_text",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url"
+        ]
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCodec": "String"
+    },
+    {
+      "id": "script:collectionfactory.unload",
+      "stableId": 1613326455,
+      "module": "collectionfactory",
+      "member": "unload",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url",
+          "Nil"
+        ]
+      ],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 1,
+      "resultCodec": "None"
+    },
+    {
+      "id": "script:camera.get_fov",
+      "stableId": 1655100321,
+      "module": "camera",
+      "member": "get_fov",
+      "argumentCodecs": [
+        [
+          "Url",
+          "Number",
+          "Nil"
+        ]
+      ],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 1,
+      "resultCodec": "Number"
+    },
+    {
+      "id": "script:sprite.set_hflip",
+      "stableId": 1703142815,
+      "module": "sprite",
+      "member": "set_hflip",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url"
+        ],
+        [
+          "Boolean"
+        ]
+      ],
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCodec": "None"
+    },
+    {
+      "id": "script:physics.get_maskbit",
+      "stableId": 1870095059,
+      "module": "physics",
+      "member": "get_maskbit",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url"
+        ],
+        [
+          "String"
+        ]
+      ],
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCodec": "Boolean"
+    },
+    {
+      "id": "script:label.set_text",
+      "stableId": 1888249062,
+      "module": "label",
+      "member": "set_text",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url"
+        ],
+        [
+          "String",
+          "Number"
+        ]
+      ],
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCodec": "None"
+    },
+    {
+      "id": "script:camera.set_far_z",
+      "stableId": 2081791798,
+      "module": "camera",
+      "member": "set_far_z",
+      "argumentCodecs": [
+        [
+          "Url",
+          "Number",
+          "Nil"
+        ],
+        [
+          "Number"
+        ]
+      ],
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCodec": "None"
+    },
+    {
+      "id": "script:go.set_scale",
+      "stableId": 2172419017,
+      "module": "go",
+      "member": "set_scale",
+      "argumentCodecs": [
+        [
+          "Number",
+          "Vector3"
+        ],
+        [
+          "String",
+          "Hash",
+          "Url",
+          "Nil"
+        ]
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 2,
+      "resultCodec": "None"
+    },
+    {
+      "id": "script:sprite.set_vflip",
+      "stableId": 2316635445,
+      "module": "sprite",
+      "member": "set_vflip",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url"
+        ],
+        [
+          "Boolean"
+        ]
+      ],
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCodec": "None"
+    },
+    {
+      "id": "script:model.get_mesh_enabled",
+      "stableId": 2409536311,
+      "module": "model",
+      "member": "get_mesh_enabled",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url"
+        ],
+        [
+          "String",
+          "Hash",
+          "Url"
+        ]
+      ],
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCodec": "Boolean"
+    },
+    {
+      "id": "script:model.set_mesh_enabled",
+      "stableId": 2492040859,
+      "module": "model",
+      "member": "set_mesh_enabled",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url"
+        ],
+        [
+          "String",
+          "Hash",
+          "Url"
+        ],
+        [
+          "Boolean"
+        ]
+      ],
+      "requiredArgumentCount": 3,
+      "maximumArgumentCount": 3,
+      "resultCodec": "None"
+    },
+    {
+      "id": "script:go.world_to_local_position",
+      "stableId": 2492984466,
+      "module": "go",
+      "member": "world_to_local_position",
+      "argumentCodecs": [
+        [
+          "Vector3"
+        ],
+        [
+          "String",
+          "Hash",
+          "Url"
+        ]
+      ],
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCodec": "Vector3"
+    },
+    {
+      "id": "script:go.get_world_position",
+      "stableId": 2533378019,
+      "module": "go",
+      "member": "get_world_position",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url",
+          "Nil"
+        ]
+      ],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 1,
+      "resultCodec": "Vector3"
+    },
+    {
+      "id": "script:camera.set_near_z",
+      "stableId": 2620899633,
+      "module": "camera",
+      "member": "set_near_z",
+      "argumentCodecs": [
+        [
+          "Url",
+          "Number",
+          "Nil"
+        ],
+        [
+          "Number"
+        ]
+      ],
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCodec": "None"
+    },
+    {
+      "id": "script:camera.set_fov",
+      "stableId": 2734551893,
+      "module": "camera",
+      "member": "set_fov",
+      "argumentCodecs": [
+        [
+          "Url",
+          "Number",
+          "Nil"
+        ],
+        [
+          "Number"
+        ]
+      ],
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCodec": "None"
+    },
+    {
+      "id": "script:go.get_scale",
+      "stableId": 2771038861,
+      "module": "go",
+      "member": "get_scale",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url",
+          "Nil"
+        ]
+      ],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 1,
+      "resultCodec": "Vector3"
+    },
+    {
+      "id": "script:tilemap.get_tile",
+      "stableId": 2810309289,
+      "module": "tilemap",
+      "member": "get_tile",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url"
+        ],
+        [
+          "String",
+          "Hash"
+        ],
+        [
+          "Integer"
+        ],
+        [
+          "Integer"
+        ]
+      ],
+      "requiredArgumentCount": 4,
+      "maximumArgumentCount": 4,
+      "resultCodec": "Integer"
+    },
+    {
+      "id": "script:go.get_world_rotation",
+      "stableId": 2823544550,
+      "module": "go",
+      "member": "get_world_rotation",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url",
+          "Nil"
+        ]
+      ],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 1,
+      "resultCodec": "Quaternion"
+    },
+    {
+      "id": "script:camera.set_orthographic_mode",
+      "stableId": 2873442090,
+      "module": "camera",
+      "member": "set_orthographic_mode",
+      "argumentCodecs": [
+        [
+          "Url",
+          "Number",
+          "Nil"
+        ],
+        [
+          "Integer"
+        ]
+      ],
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCodec": "None"
+    },
+    {
+      "id": "script:physics.set_hflip",
+      "stableId": 2879664679,
+      "module": "physics",
+      "member": "set_hflip",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url"
+        ],
+        [
+          "Boolean"
+        ]
+      ],
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCodec": "None"
+    },
+    {
+      "id": "script:camera.set_aspect_ratio",
+      "stableId": 2940707570,
+      "module": "camera",
+      "member": "set_aspect_ratio",
+      "argumentCodecs": [
+        [
+          "Url",
+          "Number",
+          "Nil"
+        ],
+        [
+          "Number"
+        ]
+      ],
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCodec": "None"
+    },
+    {
+      "id": "script:physics.set_group",
+      "stableId": 3028485791,
+      "module": "physics",
+      "member": "set_group",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url"
+        ],
+        [
+          "String"
+        ]
+      ],
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCodec": "None"
+    },
+    {
+      "id": "script:particlefx.set_constant",
+      "stableId": 3047358751,
+      "module": "particlefx",
+      "member": "set_constant",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url"
+        ],
+        [
+          "String",
+          "Hash"
+        ],
+        [
+          "String",
+          "Hash"
+        ],
+        [
+          "Vector4"
+        ]
+      ],
+      "requiredArgumentCount": 4,
+      "maximumArgumentCount": 4,
+      "resultCodec": "None"
+    },
+    {
+      "id": "script:go.get_parent",
+      "stableId": 3138865481,
+      "module": "go",
+      "member": "get_parent",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url",
+          "Nil"
+        ]
+      ],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 1,
+      "resultCodec": "HashOrNil"
+    },
+    {
+      "id": "script:go.get_scale_uniform",
+      "stableId": 3159049394,
+      "module": "go",
+      "member": "get_scale_uniform",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url",
+          "Nil"
+        ]
+      ],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 1,
+      "resultCodec": "Number"
+    },
+    {
+      "id": "script:physics.set_maskbit",
+      "stableId": 3160984935,
+      "module": "physics",
+      "member": "set_maskbit",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url"
+        ],
+        [
+          "String"
+        ],
+        [
+          "Boolean"
+        ]
+      ],
+      "requiredArgumentCount": 3,
+      "maximumArgumentCount": 3,
+      "resultCodec": "None"
+    },
+    {
+      "id": "script:tilemap.set_visible",
+      "stableId": 3195961805,
+      "module": "tilemap",
+      "member": "set_visible",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url"
+        ],
+        [
+          "String",
+          "Hash"
+        ],
+        [
+          "Boolean"
+        ]
+      ],
+      "requiredArgumentCount": 3,
+      "maximumArgumentCount": 3,
+      "resultCodec": "None"
+    },
+    {
+      "id": "script:camera.world_to_screen",
+      "stableId": 3205603148,
+      "module": "camera",
+      "member": "world_to_screen",
+      "argumentCodecs": [
+        [
+          "Vector3"
+        ],
+        [
+          "Url",
+          "Number",
+          "Nil"
+        ]
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 2,
+      "resultCodec": "Vector3"
+    },
+    {
+      "id": "script:go.set_scale_xy",
+      "stableId": 3492879989,
+      "module": "go",
+      "member": "set_scale_xy",
+      "argumentCodecs": [
+        [
+          "Number",
+          "Vector3"
+        ],
+        [
+          "String",
+          "Hash",
+          "Url",
+          "Nil"
+        ]
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 2,
+      "resultCodec": "None"
+    },
+    {
+      "id": "script:factory.get_status",
+      "stableId": 3501057803,
+      "module": "factory",
+      "member": "get_status",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url",
+          "Nil"
+        ]
+      ],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 1,
+      "resultCodec": "Integer"
+    },
+    {
+      "id": "script:factory.set_prototype",
+      "stableId": 3506659009,
+      "module": "factory",
+      "member": "set_prototype",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url",
+          "Nil"
+        ],
+        [
+          "String",
+          "Nil"
+        ]
+      ],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 2,
+      "resultCodec": "None"
+    },
+    {
+      "id": "script:particlefx.reset_constant",
+      "stableId": 3569310218,
+      "module": "particlefx",
+      "member": "reset_constant",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url"
+        ],
+        [
+          "String",
+          "Hash"
+        ],
+        [
+          "String",
+          "Hash"
+        ]
+      ],
+      "requiredArgumentCount": 3,
+      "maximumArgumentCount": 3,
+      "resultCodec": "None"
+    },
+    {
+      "id": "script:tilemap.reset_constant",
+      "stableId": 3635172296,
+      "module": "tilemap",
+      "member": "reset_constant",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url"
+        ],
+        [
+          "String",
+          "Hash"
+        ]
+      ],
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCodec": "None"
+    },
+    {
+      "id": "script:model.cancel",
+      "stableId": 3654418919,
+      "module": "model",
+      "member": "cancel",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url"
+        ]
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCodec": "None"
+    },
+    {
+      "id": "script:camera.get_enabled",
+      "stableId": 3707335843,
+      "module": "camera",
+      "member": "get_enabled",
+      "argumentCodecs": [
+        [
+          "Url",
+          "Number",
+          "Nil"
+        ]
+      ],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 1,
+      "resultCodec": "Boolean"
+    },
+    {
+      "id": "script:collectionfactory.set_prototype",
+      "stableId": 3724333493,
+      "module": "collectionfactory",
+      "member": "set_prototype",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url",
+          "Nil"
+        ],
+        [
+          "String",
+          "Nil"
+        ]
+      ],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 2,
+      "resultCodec": "None"
+    },
+    {
+      "id": "script:camera.set_auto_aspect_ratio",
+      "stableId": 3812610558,
+      "module": "camera",
+      "member": "set_auto_aspect_ratio",
+      "argumentCodecs": [
+        [
+          "Url",
+          "Number",
+          "Nil"
+        ],
+        [
+          "Boolean"
+        ]
+      ],
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCodec": "None"
+    },
+    {
+      "id": "script:physics.update_mass",
+      "stableId": 3925799645,
+      "module": "physics",
+      "member": "update_mass",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url"
+        ],
+        [
+          "Number"
+        ]
+      ],
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCodec": "None"
+    },
+    {
+      "id": "script:physics.get_group",
+      "stableId": 3971564819,
+      "module": "physics",
+      "member": "get_group",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url"
+        ]
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCodec": "Hash"
+    },
+    {
+      "id": "script:camera.get_far_z",
+      "stableId": 4055682442,
+      "module": "camera",
+      "member": "get_far_z",
+      "argumentCodecs": [
+        [
+          "Url",
+          "Number",
+          "Nil"
+        ]
+      ],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 1,
+      "resultCodec": "Number"
+    },
+    {
+      "id": "script:physics.set_vflip",
+      "stableId": 4109527981,
+      "module": "physics",
+      "member": "set_vflip",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url"
+        ],
+        [
+          "Boolean"
+        ]
+      ],
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCodec": "None"
+    },
+    {
+      "id": "script:camera.screen_xy_to_world",
+      "stableId": 4124133706,
+      "module": "camera",
+      "member": "screen_xy_to_world",
+      "argumentCodecs": [
+        [
+          "Number"
+        ],
+        [
+          "Number"
+        ],
+        [
+          "Url",
+          "Number",
+          "Nil"
+        ]
+      ],
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 3,
+      "resultCodec": "Vector3"
+    },
+    {
+      "id": "script:camera.get_aspect_ratio",
+      "stableId": 4150761990,
+      "module": "camera",
+      "member": "get_aspect_ratio",
+      "argumentCodecs": [
+        [
+          "Url",
+          "Number",
+          "Nil"
+        ]
+      ],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 1,
+      "resultCodec": "Number"
+    },
+    {
+      "id": "script:sprite.reset_constant",
+      "stableId": 4156456045,
+      "module": "sprite",
+      "member": "reset_constant",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url"
+        ],
+        [
+          "String",
+          "Hash"
+        ]
+      ],
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCodec": "None"
+    },
+    {
+      "id": "script:camera.screen_to_world",
+      "stableId": 4212113566,
+      "module": "camera",
+      "member": "screen_to_world",
+      "argumentCodecs": [
+        [
+          "Vector3"
+        ],
+        [
+          "Url",
+          "Number",
+          "Nil"
+        ]
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 2,
+      "resultCodec": "Vector3"
+    },
+    {
+      "id": "script:sound.set_gain",
+      "stableId": 4220725117,
+      "module": "sound",
+      "member": "set_gain",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url"
+        ],
+        [
+          "Number",
+          "Nil"
+        ]
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 2,
+      "resultCodec": "None"
+    },
+    {
+      "id": "script:collectionfactory.get_status",
+      "stableId": 4238240607,
+      "module": "collectionfactory",
+      "member": "get_status",
+      "argumentCodecs": [
+        [
+          "String",
+          "Hash",
+          "Url",
+          "Nil"
+        ]
+      ],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 1,
+      "resultCodec": "Integer"
+    }
+  ]
+}

@@ -10,8 +10,25 @@ import {
   loadInputs,
   maximumTableRecordFieldCount,
 } from "../scripts/generate-script-table-record-bindings.mjs";
+import { renderScriptTableRecordOutputs } from "../packages/compiler/src/script-table-record-output-emitter.mjs";
 
 const root = new URL("../", import.meta.url);
+
+test("package table-record emitter reproduces generated artifacts byte-for-byte", async () => {
+  const [factsText, header, source, target] = await Promise.all([
+    readFile(new URL("packages/bindings/generated/defold-script-table-record-recipe-facts.json", root), "utf8"),
+    readFile(
+      new URL("defold/defold_hermes/include/defold_hermes/generated_script_table_record_bindings.hpp", root),
+      "utf8",
+    ),
+    readFile(new URL("defold/defold_hermes/src/generated_script_table_record_bindings.cpp", root), "utf8"),
+    readFile(new URL("packages/sdk/src/generated/script/table-record-bindings.ts", root), "utf8"),
+  ]);
+  const outputs = renderScriptTableRecordOutputs(JSON.parse(factsText));
+  assert.equal(outputs.header, header);
+  assert.equal(outputs.source, source);
+  assert.equal(outputs.target, target);
+});
 
 async function derive(inputs, run) {
   const revision = JSON.parse(inputs.irText).defoldRevision;

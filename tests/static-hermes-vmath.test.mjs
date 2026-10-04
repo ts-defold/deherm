@@ -5,12 +5,18 @@ import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
+import {
+  renderStaticHermesVmathHeader,
+  renderStaticHermesVmathSource,
+  renderStaticHermesVmathTypescript,
+} from "../packages/compiler/src/static-hermes-vmath-output-emitter.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
 const generator = path.join(root, "scripts/generate-static-hermes-vmath.mjs");
 const descriptorPath = path.join(root, "packages/bindings/generated/defold-script-value-bindings.json");
 const outputFiles = [
   "packages/bindings/generated/defold-static-hermes-vmath.json",
+  "packages/bindings/generated/defold-static-hermes-vmath-recipe-facts.json",
   "defold/defold_hermes/include/defold_hermes/generated_static_hermes_vmath.h",
   "defold/defold_hermes/src/generated_static_hermes_vmath.cpp",
   "packages/static-hermes/src/generated/script-vmath.ts",
@@ -49,6 +55,23 @@ test("Static Hermes vmath bridge is current and covers only sound scalar results
   assert.equal(report.exclusions.length, 75);
 });
 
+test("package emitter reconstructs vmath native outputs from compact selected-shape facts", async () => {
+  const facts = JSON.parse(await readFile(path.join(root, outputFiles[1]), "utf8"));
+  const [header, source, typescript, report] = await Promise.all([
+    readFile(path.join(root, outputFiles[2]), "utf8"),
+    readFile(path.join(root, outputFiles[3]), "utf8"),
+    readFile(path.join(root, outputFiles[4]), "utf8"),
+    readFile(path.join(root, outputFiles[0]), "utf8"),
+  ]);
+  assert.equal(renderStaticHermesVmathHeader(facts), header);
+  assert.equal(renderStaticHermesVmathSource(facts), source);
+  assert.equal(renderStaticHermesVmathTypescript(facts), typescript);
+  assert.ok(Buffer.byteLength(JSON.stringify(facts)) < Buffer.byteLength(report));
+  const duplicate = structuredClone(facts);
+  duplicate.bindings[1].stableId = duplicate.bindings[0].stableId;
+  assert.throws(() => renderStaticHermesVmathHeader(duplicate), /Duplicate Static Hermes vmath binding identity/u);
+});
+
 test("Static Hermes vmath generation is deterministic", async () => {
   const temporary = await mkdtemp(path.join(tmpdir(), "deherm-static-vmath-"));
   try {
@@ -83,8 +106,8 @@ test("Static Hermes vmath generation rejects executable descriptor drift structu
 
 test("generated bridge keeps float32 lanes and stack-only ScriptCallFrame glue", async () => {
   const [typescript, source] = await Promise.all([
+    readFile(path.join(root, outputFiles[4]), "utf8"),
     readFile(path.join(root, outputFiles[3]), "utf8"),
-    readFile(path.join(root, outputFiles[2]), "utf8"),
   ]);
   assert.match(typescript, /arg0X: c_f32/);
   assert.match(typescript, /\): c_f64/);

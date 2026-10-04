@@ -3,10 +3,16 @@ import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import {
+  renderStaticHermesVmathHeader,
+  renderStaticHermesVmathSource,
+  renderStaticHermesVmathTypescript,
+} from "../packages/compiler/src/static-hermes-vmath-output-emitter.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const relativeOutputs = {
   report: "packages/bindings/generated/defold-static-hermes-vmath.json",
+  facts: "packages/bindings/generated/defold-static-hermes-vmath-recipe-facts.json",
   header: "defold/defold_hermes/include/defold_hermes/generated_static_hermes_vmath.h",
   source: "defold/defold_hermes/src/generated_static_hermes_vmath.cpp",
   typescript: "packages/static-hermes/src/generated/script-vmath.ts",
@@ -233,9 +239,14 @@ export async function run(argv = process.argv) {
   assertDescriptor(descriptor, config);
   const { selected, exclusions } = classify(descriptor, config);
   const coverage = validateCoverage(descriptor, selected, exclusions, config);
-  const header = renderHeader(selected);
-  const source = renderSource(selected);
-  const typescript = renderTypescript(selected);
+  const factsObject = {
+    schemaVersion: 1,
+    bindings: selected.map(({ id, stableId, shapes }) => ({ id, stableId, shapes })),
+  };
+  const facts = `${JSON.stringify(factsObject, null, 2)}\n`;
+  const header = renderStaticHermesVmathHeader(factsObject);
+  const source = renderStaticHermesVmathSource(factsObject);
+  const typescript = renderStaticHermesVmathTypescript(factsObject);
   const report = `${JSON.stringify(
     {
       schemaVersion: 1,
@@ -275,6 +286,7 @@ export async function run(argv = process.argv) {
 
   await Promise.all([
     writeOrCheck(path.join(options.outputRoot, relativeOutputs.report), report, options.check),
+    writeOrCheck(path.join(options.outputRoot, relativeOutputs.facts), facts, options.check),
     writeOrCheck(path.join(options.outputRoot, relativeOutputs.header), header, options.check),
     writeOrCheck(path.join(options.outputRoot, relativeOutputs.source), source, options.check),
     writeOrCheck(path.join(options.outputRoot, relativeOutputs.typescript), typescript, options.check),

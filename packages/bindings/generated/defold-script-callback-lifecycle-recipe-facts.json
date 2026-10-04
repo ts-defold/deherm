@@ -1,0 +1,369 @@
+{
+  "schemaVersion": 1,
+  "kind": "deherm.recipe.script-callback-lifecycle-output",
+  "targetSupport": {
+    "nativeDynamicHermes": "generated-registry-metadata-only; each route remains blocked until its reviewed engine adapter and payload codecs are implemented",
+    "nativeStaticHermes": "fail-closed-unverified",
+    "html5BrowserHost": "fail-closed-unverified"
+  },
+  "routes": [
+    {
+      "id": "script:http.request",
+      "stableId": 125289847,
+      "callbackParameter": "callback",
+      "lifetime": "terminal-event",
+      "owner": "http-request",
+      "invocationContext": "captured-script-instance",
+      "threadAffinity": "engine-message-dispatch-thread",
+      "registryEligible": true,
+      "payloadBlockers": [
+        "http.response table codec",
+        "progress/terminal message discriminator",
+        "request cancellation adapter"
+      ]
+    },
+    {
+      "id": "script:bullet3d.world.cast_ray_async",
+      "stableId": 214949730,
+      "callbackParameter": "callback",
+      "lifetime": "one-shot",
+      "owner": "bullet-world-request",
+      "invocationContext": "captured-script-instance",
+      "threadAffinity": "engine-update-thread",
+      "registryEligible": true,
+      "payloadBlockers": [
+        "borrowed Bullet world producer",
+        "bullet3d.world.cast_result[] table codec"
+      ]
+    },
+    {
+      "id": "script:socket.newtry",
+      "stableId": 407150266,
+      "callbackParameter": "finalizer",
+      "lifetime": "higher-order-closure",
+      "owner": "returned-lua-closure",
+      "invocationContext": "synchronous-lua-caller",
+      "threadAffinity": "lua-caller-thread",
+      "registryEligible": false,
+      "payloadBlockers": [
+        "not a retained engine callback",
+        "Lua higher-order closure and varargs semantics"
+      ]
+    },
+    {
+      "id": "script:collectionproxy.load",
+      "stableId": 620577334,
+      "callbackParameter": "callback",
+      "lifetime": "terminal-event",
+      "owner": "collection-proxy-load",
+      "invocationContext": "captured-script-instance",
+      "threadAffinity": "engine-update-thread",
+      "registryEligible": true,
+      "payloadBlockers": [
+        "URL codec",
+        "collectionproxy.load_data table codec",
+        "terminal message adapter"
+      ]
+    },
+    {
+      "id": "script:sound.play",
+      "stableId": 900417529,
+      "callbackParameter": "complete_function",
+      "lifetime": "one-shot",
+      "owner": "sound-voice",
+      "invocationContext": "captured-script-instance",
+      "threadAffinity": "engine-message-dispatch-thread",
+      "registryEligible": true,
+      "payloadBlockers": [
+        "URL codec",
+        "sound.play_properties table codec",
+        "sound.play_completion message codec"
+      ]
+    },
+    {
+      "id": "script:physics.set_event_listener",
+      "stableId": 1107212821,
+      "callbackParameter": "callback",
+      "lifetime": "persistent-replaceable",
+      "owner": "physics-world",
+      "invocationContext": "captured-script-instance",
+      "threadAffinity": "engine-update-thread",
+      "registryEligible": true,
+      "payloadBlockers": [
+        "physics.event[] recursive table codec",
+        "physics-world listener adapter"
+      ]
+    },
+    {
+      "id": "script:html5.set_interaction_listener",
+      "stableId": 1164539114,
+      "callbackParameter": "callback",
+      "lifetime": "persistent-replaceable",
+      "owner": "html5-interaction-singleton",
+      "invocationContext": "captured-script-instance",
+      "threadAffinity": "browser-main-thread",
+      "registryEligible": true,
+      "payloadBlockers": [
+        "HTML5-only host hook",
+        "browser callback registry integration"
+      ]
+    },
+    {
+      "id": "script:model.play_anim",
+      "stableId": 1281580293,
+      "callbackParameter": "complete_function",
+      "lifetime": "one-shot",
+      "owner": "model-animation",
+      "invocationContext": "captured-script-instance",
+      "threadAffinity": "engine-update-thread",
+      "registryEligible": true,
+      "payloadBlockers": [
+        "URL codec",
+        "model.play_properties table codec",
+        "model completion message codec"
+      ]
+    },
+    {
+      "id": "script:window.set_listener",
+      "stableId": 1282520203,
+      "callbackParameter": "callback",
+      "lifetime": "persistent-replaceable",
+      "owner": "window-singleton",
+      "invocationContext": "captured-script-instance",
+      "threadAffinity": "engine-window-event-thread",
+      "registryEligible": true,
+      "payloadBlockers": [
+        "window.event_data table codec",
+        "window singleton adapter"
+      ]
+    },
+    {
+      "id": "script:go.animate",
+      "stableId": 1302980535,
+      "callbackParameter": "complete_function",
+      "lifetime": "one-shot",
+      "owner": "game-object-property-animation",
+      "invocationContext": "captured-script-instance",
+      "threadAffinity": "engine-update-thread",
+      "registryEligible": true,
+      "payloadBlockers": [
+        "URL codec",
+        "property/easing overload dispatch",
+        "Defold value codecs"
+      ]
+    },
+    {
+      "id": "script:gui.animate",
+      "stableId": 1559320978,
+      "callbackParameter": "complete_function",
+      "lifetime": "one-shot",
+      "owner": "gui-node-property-animation",
+      "invocationContext": "captured-gui-script-instance",
+      "threadAffinity": "engine-update-thread",
+      "registryEligible": true,
+      "payloadBlockers": [
+        "GUI node handle",
+        "property/easing overload dispatch",
+        "Defold value codecs"
+      ]
+    },
+    {
+      "id": "script:factory.load",
+      "stableId": 1808015212,
+      "callbackParameter": "complete_function",
+      "lifetime": "one-shot",
+      "owner": "factory-load",
+      "invocationContext": "captured-script-instance",
+      "threadAffinity": "engine-update-thread",
+      "registryEligible": true,
+      "payloadBlockers": [
+        "URL argument/result codec",
+        "component load completion adapter"
+      ]
+    },
+    {
+      "id": "script:gui.play_flipbook",
+      "stableId": 1867420328,
+      "callbackParameter": "complete_function",
+      "lifetime": "one-shot",
+      "owner": "gui-node-flipbook",
+      "invocationContext": "captured-gui-script-instance",
+      "threadAffinity": "engine-update-thread",
+      "registryEligible": true,
+      "payloadBlockers": [
+        "GUI node handle",
+        "play_properties table codec"
+      ]
+    },
+    {
+      "id": "script:render.set_listener",
+      "stableId": 2106330303,
+      "callbackParameter": "callback",
+      "lifetime": "persistent-replaceable",
+      "owner": "render-context",
+      "invocationContext": "captured-render-script-instance",
+      "threadAffinity": "render-script-thread",
+      "registryEligible": true,
+      "payloadBlockers": [
+        "render-context listener adapter"
+      ]
+    },
+    {
+      "id": "script:sprite.play_flipbook",
+      "stableId": 2116188218,
+      "callbackParameter": "complete_function",
+      "lifetime": "one-shot",
+      "owner": "sprite-animation",
+      "invocationContext": "captured-script-instance",
+      "threadAffinity": "engine-message-dispatch-thread",
+      "registryEligible": true,
+      "payloadBlockers": [
+        "URL codec",
+        "sprite.play_properties table codec",
+        "sprite animation_done message codec"
+      ]
+    },
+    {
+      "id": "script:socket.protect",
+      "stableId": 2218837340,
+      "callbackParameter": "func",
+      "lifetime": "higher-order-closure",
+      "owner": "returned-lua-closure",
+      "invocationContext": "synchronous-lua-caller",
+      "threadAffinity": "lua-caller-thread",
+      "registryEligible": false,
+      "payloadBlockers": [
+        "not a retained engine callback",
+        "Lua higher-order closure, varargs, and multi-result semantics"
+      ]
+    },
+    {
+      "id": "script:sys.load_buffer_async",
+      "stableId": 2461929107,
+      "callbackParameter": "status_callback",
+      "lifetime": "one-shot",
+      "owner": "buffer-load-request",
+      "invocationContext": "captured-script-instance",
+      "threadAffinity": "engine-update-thread",
+      "registryEligible": true,
+      "payloadBlockers": [
+        "buffer handle",
+        "sys.load_buffer_result table codec",
+        "job-to-owner-thread handoff adapter"
+      ]
+    },
+    {
+      "id": "script:resource.create_texture_async",
+      "stableId": 2463011221,
+      "callbackParameter": "callback",
+      "lifetime": "one-shot",
+      "owner": "texture-upload-request",
+      "invocationContext": "captured-script-instance",
+      "threadAffinity": "engine-update-thread",
+      "registryEligible": true,
+      "payloadBlockers": [
+        "texture_creation_params table codec",
+        "buffer handle",
+        "texture_creation_result table codec",
+        "failure-path callback cleanup audit"
+      ]
+    },
+    {
+      "id": "script:sys.set_error_handler",
+      "stableId": 2791701985,
+      "callbackParameter": "error_handler",
+      "lifetime": "persistent-replaceable",
+      "owner": "lua-runtime-debug-table",
+      "invocationContext": "no-self-error-unwind",
+      "threadAffinity": "lua-erroring-thread",
+      "registryEligible": true,
+      "payloadBlockers": [
+        "error-unwind reentrancy policy",
+        "global handler replacement adapter"
+      ]
+    },
+    {
+      "id": "script:particlefx.play",
+      "stableId": 2809933664,
+      "callbackParameter": "emitter_state_function",
+      "lifetime": "terminal-event",
+      "owner": "particlefx-playback",
+      "invocationContext": "captured-script-instance",
+      "threadAffinity": "engine-update-thread",
+      "registryEligible": true,
+      "payloadBlockers": [
+        "URL codec",
+        "particle emitter message adapter"
+      ]
+    },
+    {
+      "id": "script:font.prewarm_text",
+      "stableId": 2848412671,
+      "callbackParameter": "callback",
+      "lifetime": "one-shot",
+      "owner": "font-prewarm-request",
+      "invocationContext": "captured-script-instance",
+      "threadAffinity": "engine-update-thread",
+      "registryEligible": true,
+      "payloadBlockers": [
+        "font job completion adapter"
+      ]
+    },
+    {
+      "id": "script:bullet3d.world.cast_shape_async",
+      "stableId": 3637746507,
+      "callbackParameter": "callback",
+      "lifetime": "one-shot",
+      "owner": "bullet-world-request",
+      "invocationContext": "captured-script-instance",
+      "threadAffinity": "engine-update-thread",
+      "registryEligible": true,
+      "payloadBlockers": [
+        "borrowed Bullet world/shape producers",
+        "bullet3d.world.cast_result[] table codec"
+      ]
+    },
+    {
+      "id": "script:liveupdate.add_mount",
+      "stableId": 3865730920,
+      "callbackParameter": "callback",
+      "lifetime": "one-shot",
+      "owner": "liveupdate-add-mount-job",
+      "invocationContext": "captured-script-instance",
+      "threadAffinity": "engine-job-completion-thread",
+      "registryEligible": true,
+      "payloadBlockers": [
+        "liveupdate completion adapter",
+        "verify callback dispatch is serialized onto the Hermes owner thread"
+      ]
+    },
+    {
+      "id": "script:gui.play_particlefx",
+      "stableId": 3924164150,
+      "callbackParameter": "emitter_state_function",
+      "lifetime": "terminal-event",
+      "owner": "gui-particlefx-playback",
+      "invocationContext": "captured-gui-script-instance",
+      "threadAffinity": "engine-update-thread",
+      "registryEligible": true,
+      "payloadBlockers": [
+        "GUI node handle",
+        "particle emitter event adapter"
+      ]
+    },
+    {
+      "id": "script:collectionfactory.load",
+      "stableId": 4139911040,
+      "callbackParameter": "complete_function",
+      "lifetime": "one-shot",
+      "owner": "collection-factory-load",
+      "invocationContext": "captured-script-instance",
+      "threadAffinity": "engine-update-thread",
+      "registryEligible": true,
+      "payloadBlockers": [
+        "URL argument/result codec",
+        "component load completion adapter"
+      ]
+    }
+  ]
+}

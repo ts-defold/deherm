@@ -1,0 +1,690 @@
+{
+  "schemaVersion": 1,
+  "kind": "deherm.recipe.script-fixed-tuples-output",
+  "bindings": [
+    {
+      "index": 0,
+      "id": "script:bullet3d.constraint.get_anchors",
+      "stableId": "0x0127f3cb",
+      "modulePath": [
+        "bullet3d",
+        "constraint"
+      ],
+      "member": "get_anchors",
+      "context": "Global",
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "arguments": [
+        [
+          "LuaUserdata"
+        ]
+      ],
+      "results": [
+        [
+          "Vector3"
+        ],
+        [
+          "Vector3"
+        ]
+      ]
+    },
+    {
+      "index": 1,
+      "id": "script:bullet3d.constraint.get_hinge_motor",
+      "stableId": "0x03109b88",
+      "modulePath": [
+        "bullet3d",
+        "constraint"
+      ],
+      "member": "get_hinge_motor",
+      "context": "Global",
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "arguments": [
+        [
+          "LuaUserdata"
+        ]
+      ],
+      "results": [
+        [
+          "Boolean"
+        ],
+        [
+          "Number"
+        ],
+        [
+          "Number"
+        ]
+      ]
+    },
+    {
+      "index": 2,
+      "id": "script:bullet3d.constraint.get_cone_twist_limits",
+      "stableId": "0x04753021",
+      "modulePath": [
+        "bullet3d",
+        "constraint"
+      ],
+      "member": "get_cone_twist_limits",
+      "context": "Global",
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "arguments": [
+        [
+          "LuaUserdata"
+        ]
+      ],
+      "results": [
+        [
+          "Number"
+        ],
+        [
+          "Number"
+        ],
+        [
+          "Number"
+        ]
+      ]
+    },
+    {
+      "index": 3,
+      "id": "script:bullet3d.constraint.get_hinge_limits",
+      "stableId": "0x25708427",
+      "modulePath": [
+        "bullet3d",
+        "constraint"
+      ],
+      "member": "get_hinge_limits",
+      "context": "Global",
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "arguments": [
+        [
+          "LuaUserdata"
+        ]
+      ],
+      "results": [
+        [
+          "Number"
+        ],
+        [
+          "Number"
+        ]
+      ]
+    },
+    {
+      "index": 4,
+      "id": "script:bullet3d.shape.get_local_transform",
+      "stableId": "0x2d956755",
+      "modulePath": [
+        "bullet3d",
+        "shape"
+      ],
+      "member": "get_local_transform",
+      "context": "Global",
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "arguments": [
+        [
+          "LuaUserdata"
+        ]
+      ],
+      "results": [
+        [
+          "Vector3"
+        ],
+        [
+          "Quaternion"
+        ]
+      ]
+    },
+    {
+      "index": 5,
+      "id": "script:collectionproxy.set_collection",
+      "stableId": "0x2fe0fffb",
+      "modulePath": [
+        "collectionproxy"
+      ],
+      "member": "set_collection",
+      "context": "ScriptInstance",
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 2,
+      "arguments": [
+        [
+          "Hash",
+          "String"
+        ],
+        [
+          "Nil",
+          "String"
+        ]
+      ],
+      "results": [
+        [
+          "Boolean"
+        ],
+        [
+          "Integer"
+        ]
+      ]
+    },
+    {
+      "index": 6,
+      "id": "script:bullet3d.constraint.get_slider_motor",
+      "stableId": "0x513bd984",
+      "modulePath": [
+        "bullet3d",
+        "constraint"
+      ],
+      "member": "get_slider_motor",
+      "context": "Global",
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "arguments": [
+        [
+          "LuaUserdata"
+        ],
+        [
+          "String"
+        ]
+      ],
+      "results": [
+        [
+          "Boolean"
+        ],
+        [
+          "Number"
+        ],
+        [
+          "Number"
+        ]
+      ]
+    },
+    {
+      "index": 7,
+      "id": "script:gui.get_type",
+      "stableId": "0x55520562",
+      "modulePath": [
+        "gui"
+      ],
+      "member": "get_type",
+      "context": "GuiScriptInstance",
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "arguments": [
+        [
+          "GuiNode"
+        ]
+      ],
+      "results": [
+        [
+          "Integer"
+        ],
+        [
+          "Nil",
+          "Number"
+        ]
+      ]
+    },
+    {
+      "index": 8,
+      "id": "script:bullet3d.rigid_body.get_damping",
+      "stableId": "0x55619c24",
+      "modulePath": [
+        "bullet3d",
+        "rigid_body"
+      ],
+      "member": "get_damping",
+      "context": "Global",
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "arguments": [
+        [
+          "LuaUserdata"
+        ]
+      ],
+      "results": [
+        [
+          "Number"
+        ],
+        [
+          "Number"
+        ]
+      ]
+    },
+    {
+      "index": 9,
+      "id": "script:bullet3d.constraint.get_6dof_motor",
+      "stableId": "0x797d3f36",
+      "modulePath": [
+        "bullet3d",
+        "constraint"
+      ],
+      "member": "get_6dof_motor",
+      "context": "Global",
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "arguments": [
+        [
+          "LuaUserdata"
+        ],
+        [
+          "Integer"
+        ]
+      ],
+      "results": [
+        [
+          "Boolean"
+        ],
+        [
+          "Number"
+        ],
+        [
+          "Number"
+        ],
+        [
+          "Number"
+        ]
+      ]
+    },
+    {
+      "index": 10,
+      "id": "script:bullet3d.constraint.get_limit",
+      "stableId": "0x7f5eb33e",
+      "modulePath": [
+        "bullet3d",
+        "constraint"
+      ],
+      "member": "get_limit",
+      "context": "Global",
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "arguments": [
+        [
+          "LuaUserdata"
+        ],
+        [
+          "Integer"
+        ]
+      ],
+      "results": [
+        [
+          "Number"
+        ],
+        [
+          "Number"
+        ]
+      ]
+    },
+    {
+      "index": 11,
+      "id": "script:tilemap.get_bounds",
+      "stableId": "0x80ab2ee8",
+      "modulePath": [
+        "tilemap"
+      ],
+      "member": "get_bounds",
+      "context": "ScriptInstance",
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "arguments": [
+        [
+          "Hash",
+          "String"
+        ]
+      ],
+      "results": [
+        [
+          "Integer"
+        ],
+        [
+          "Integer"
+        ],
+        [
+          "Integer"
+        ],
+        [
+          "Integer"
+        ]
+      ]
+    },
+    {
+      "index": 12,
+      "id": "script:bullet3d.collision_object.get_world_transform",
+      "stableId": "0x8abce1d3",
+      "modulePath": [
+        "bullet3d",
+        "collision_object"
+      ],
+      "member": "get_world_transform",
+      "context": "Global",
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "arguments": [
+        [
+          "LuaUserdata"
+        ]
+      ],
+      "results": [
+        [
+          "Vector3"
+        ],
+        [
+          "Quaternion"
+        ]
+      ]
+    },
+    {
+      "index": 13,
+      "id": "script:sound.get_rms",
+      "stableId": "0x9d103820",
+      "modulePath": [
+        "sound"
+      ],
+      "member": "get_rms",
+      "context": "ScriptInstance",
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "arguments": [
+        [
+          "Hash",
+          "String"
+        ],
+        [
+          "Number"
+        ]
+      ],
+      "results": [
+        [
+          "Number"
+        ],
+        [
+          "Number"
+        ]
+      ]
+    },
+    {
+      "index": 14,
+      "id": "script:vmath.quat_to_euler",
+      "stableId": "0x9d6efd31",
+      "modulePath": [
+        "vmath"
+      ],
+      "member": "quat_to_euler",
+      "context": "Global",
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "arguments": [
+        [
+          "Quaternion"
+        ]
+      ],
+      "results": [
+        [
+          "Number"
+        ],
+        [
+          "Number"
+        ],
+        [
+          "Number"
+        ]
+      ]
+    },
+    {
+      "index": 15,
+      "id": "script:sound.get_peak",
+      "stableId": "0xa241b215",
+      "modulePath": [
+        "sound"
+      ],
+      "member": "get_peak",
+      "context": "ScriptInstance",
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "arguments": [
+        [
+          "Hash",
+          "String"
+        ],
+        [
+          "Number"
+        ]
+      ],
+      "results": [
+        [
+          "Number"
+        ],
+        [
+          "Number"
+        ]
+      ]
+    },
+    {
+      "index": 16,
+      "id": "script:gui.new_texture",
+      "stableId": "0xa8cda9fb",
+      "modulePath": [
+        "gui"
+      ],
+      "member": "new_texture",
+      "context": "GuiScriptInstance",
+      "requiredArgumentCount": 6,
+      "maximumArgumentCount": 6,
+      "arguments": [
+        [
+          "Hash",
+          "String"
+        ],
+        [
+          "Number"
+        ],
+        [
+          "Number"
+        ],
+        [
+          "Integer",
+          "String"
+        ],
+        [
+          "String"
+        ],
+        [
+          "Boolean"
+        ]
+      ],
+      "results": [
+        [
+          "Boolean"
+        ],
+        [
+          "Integer",
+          "Nil"
+        ]
+      ]
+    },
+    {
+      "index": 17,
+      "id": "script:bullet3d.constraint.get_frame_a",
+      "stableId": "0xae915cbc",
+      "modulePath": [
+        "bullet3d",
+        "constraint"
+      ],
+      "member": "get_frame_a",
+      "context": "Global",
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "arguments": [
+        [
+          "LuaUserdata"
+        ]
+      ],
+      "results": [
+        [
+          "Vector3"
+        ],
+        [
+          "Quaternion"
+        ]
+      ]
+    },
+    {
+      "index": 18,
+      "id": "script:bullet3d.constraint.get_frame_b",
+      "stableId": "0xb1916175",
+      "modulePath": [
+        "bullet3d",
+        "constraint"
+      ],
+      "member": "get_frame_b",
+      "context": "Global",
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "arguments": [
+        [
+          "LuaUserdata"
+        ]
+      ],
+      "results": [
+        [
+          "Vector3"
+        ],
+        [
+          "Quaternion"
+        ]
+      ]
+    },
+    {
+      "index": 19,
+      "id": "script:bullet3d.constraint.get_pivots",
+      "stableId": "0xb915411e",
+      "modulePath": [
+        "bullet3d",
+        "constraint"
+      ],
+      "member": "get_pivots",
+      "context": "Global",
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "arguments": [
+        [
+          "LuaUserdata"
+        ]
+      ],
+      "results": [
+        [
+          "Vector3"
+        ],
+        [
+          "Vector3"
+        ]
+      ]
+    },
+    {
+      "index": 20,
+      "id": "script:bullet3d.constraint.get_angles",
+      "stableId": "0xc4ec6ea3",
+      "modulePath": [
+        "bullet3d",
+        "constraint"
+      ],
+      "member": "get_angles",
+      "context": "Global",
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "arguments": [
+        [
+          "LuaUserdata"
+        ]
+      ],
+      "results": [
+        [
+          "Number"
+        ],
+        [
+          "Number"
+        ]
+      ]
+    },
+    {
+      "index": 21,
+      "id": "script:bullet3d.constraint.get_slider_limits",
+      "stableId": "0xca333d93",
+      "modulePath": [
+        "bullet3d",
+        "constraint"
+      ],
+      "member": "get_slider_limits",
+      "context": "Global",
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "arguments": [
+        [
+          "LuaUserdata"
+        ]
+      ],
+      "results": [
+        [
+          "Number"
+        ],
+        [
+          "Number"
+        ],
+        [
+          "Number"
+        ],
+        [
+          "Number"
+        ]
+      ]
+    },
+    {
+      "index": 22,
+      "id": "script:bullet3d.constraint.get_axes",
+      "stableId": "0xd052ca5a",
+      "modulePath": [
+        "bullet3d",
+        "constraint"
+      ],
+      "member": "get_axes",
+      "context": "Global",
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "arguments": [
+        [
+          "LuaUserdata"
+        ]
+      ],
+      "results": [
+        [
+          "Vector3"
+        ],
+        [
+          "Vector3"
+        ]
+      ]
+    },
+    {
+      "index": 23,
+      "id": "script:window.get_size",
+      "stableId": "0xeb7b27de",
+      "modulePath": [
+        "window"
+      ],
+      "member": "get_size",
+      "context": "Global",
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 0,
+      "arguments": [],
+      "results": [
+        [
+          "Integer"
+        ],
+        [
+          "Integer"
+        ]
+      ]
+    }
+  ]
+}

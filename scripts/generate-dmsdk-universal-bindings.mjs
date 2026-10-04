@@ -8,6 +8,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { buildDmSdkCallSymbolIndex } from "../packages/compiler/src/dmsdk-call-symbol-index.mjs";
 import { createDmSdkFallbackAudit } from "../packages/compiler/src/dmsdk-fallback-audit.mjs";
 import { createDmSdkPatternCatalog } from "../packages/compiler/src/dmsdk-pattern-catalog.mjs";
+import { renderDmSdkUniversalJsiSource } from "../packages/compiler/src/dmsdk-universal-jsi-source-emitter.mjs";
 import {
   generateDmSdkUniversalBrowserLibrary,
   generateDmSdkUniversalHeader,
@@ -561,7 +562,7 @@ function collectSpecializationAttempts(specializedReports, patterns) {
   return attempts;
 }
 
-function renderJsiSource(catalogHash) {
+export function renderJsiSource(catalogHash) {
   return `// ${banner}
 #include <defold_hermes/generated_dmsdk_universal_jsi.hpp>
 #if !defined(DM_PLATFORM_HTML5)
@@ -827,7 +828,7 @@ export async function buildUniversalDmSdkBindings({
     [artifacts[1], generateDmSdkUniversalHeader(report)],
     [artifacts[2], generateDmSdkUniversalJsiHeader(report)],
     [artifacts[3], generateDmSdkUniversalRuntimeSource(report)],
-    [artifacts[4], renderJsiSource(catalogHash)],
+    [artifacts[4], renderDmSdkUniversalJsiSource({ catalogSha256: catalogHash })],
     [artifacts[5], generateDmSdkUniversalBrowserLibrary(report)],
     [artifacts[6], renderTypeScript(recipes, catalogHash)],
     [artifacts[7], generateDmSdkBrowserArena(report)],

@@ -10,10 +10,11 @@ import {
   inputPaths,
   loadBindingLoweringInputs,
 } from "../scripts/generate-binding-lowering-plan.mjs";
+import { selectClaimedRoutes as selectTypedNativeRoutes } from "../scripts/generate-typed-native-bridge.mjs";
 import {
+  projectStaticHermesTypedNativeBridgeFacts,
   renderTypescript as renderTypedNativeBridge,
-  selectClaimedRoutes as selectTypedNativeRoutes,
-} from "../scripts/generate-typed-native-bridge.mjs";
+} from "../packages/compiler/src/static-hermes-typed-native-bridge-output-emitter.mjs";
 
 const repositoryRoot = resolve(new URL("..", import.meta.url).pathname);
 const reportPath = join(repositoryRoot, "packages/bindings/generated/defold-binding-lowering-plan.json");
@@ -226,7 +227,7 @@ test("typed-native bridge exactly realizes the canonical script selection, inclu
       .sort(),
     ["script:bit.band", "script:bit.bor", "script:bit.bxor", "script:pprint", "script:socket.skip"],
   );
-  const source = renderTypedNativeBridge(selection);
+  const source = renderTypedNativeBridge(projectStaticHermesTypedNativeBridgeFacts(selection));
   for (const route of selection.claimed.filter(({ arity }) => arity === "bounded-variadic")) {
     assert.match(source, new RegExp(`\\b${route.stableId}\\b`), `${route.id} is absent from the generated route table`);
   }

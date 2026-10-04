@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "kind": "deherm.recipe.script-table-record-output",
+  "bindings": [
+    {
+      "index": 0,
+      "id": "script:b2d.get_version",
+      "stableId": "0x3aac69fd",
+      "modulePath": [
+        "b2d"
+      ],
+      "member": "get_version",
+      "context": "Global",
+      "requiredContext": "global",
+      "argumentCodecs": [],
+      "fields": [
+        {
+          "name": "version",
+          "codec": "String"
+        },
+        {
+          "name": "major",
+          "codec": "Integer"
+        },
+        {
+          "name": "middle",
+          "codec": "Integer"
+        },
+        {
+          "name": "minor",
+          "codec": "Integer"
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "id": "script:image.get_astc_header",
+      "stableId": "0xea93e5f3",
+      "modulePath": [
+        "image"
+      ],
+      "member": "get_astc_header",
+      "context": "Global",
+      "requiredContext": "global",
+      "argumentCodecs": [
+        "String"
+      ],
+      "fields": [
+        {
+          "name": "width",
+          "codec": "Integer"
+        },
+        {
+          "name": "height",
+          "codec": "Integer"
+        },
+        {
+          "name": "depth",
+          "codec": "Integer"
+        },
+        {
+          "name": "block_size_x",
+          "codec": "Integer"
+        },
+        {
+          "name": "block_size_y",
+          "codec": "Integer"
+        },
+        {
+          "name": "block_size_z",
+          "codec": "Integer"
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "id": "script:bullet3d.get_version",
+      "stableId": "0xf808b822",
+      "modulePath": [
+        "bullet3d"
+      ],
+      "member": "get_version",
+      "context": "Global",
+      "requiredContext": "global",
+      "argumentCodecs": [],
+      "fields": [
+        {
+          "name": "version",
+          "codec": "String"
+        },
+        {
+          "name": "number",
+          "codec": "Integer"
+        },
+        {
+          "name": "major",
+          "codec": "Integer"
+        },
+        {
+          "name": "minor",
+          "codec": "Integer"
+        }
+      ]
+    }
+  ]
+}
