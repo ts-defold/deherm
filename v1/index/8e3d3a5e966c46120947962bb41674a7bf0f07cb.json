@@ -1,10 +1,10 @@
 {
-  "defoldRevision": "9614cb812c53d149ac84eac8c98e7b670b68f4bd",
-  "generator": "sha256:dbedf2c9e833005ced90274274ef2fde629150cdc833746453d2bc3d65a2ae59",
+  "defoldRevision": "8e3d3a5e966c46120947962bb41674a7bf0f07cb",
+  "generator": "sha256:a9ad7bb63bb20a1e04cb0ad3ac02740f4031fbe08b9c6a1ddefc98b9cdd9e811",
   "kind": "deherm.policy.index-entry",
-  "policyRoot": "d211eb54489ab15a365488ea7002ebaa4bddbf2ee8a3e6b830074c5745a01bcb",
+  "policyRoot": "ece1dcf6573659581fd68f944e1d15cc6a974758a59d52cf403195729d369f2c",
   "realizer": {
-    "minimumPackageVersion": "0.0.0",
+    "minimumPackageVersion": "0.1.0",
     "requiredCapabilities": [
       "dmsdk.static-hermes-bounded-frame.v1",
       "output.compatibility-source.copy.v1",
@@ -32,10 +32,10 @@
       "sdk.script.runtime.render.v1",
       "sdk.script.types.render.v1",
       "sdk.script.universal-value.render.v1",
-      "sdk.script.url-target-support.render.v1",
+      "sdk.script.url-target-support.render.v2",
       "sdk.script.value-target-support.render.v1"
     ]
   },
   "schemaVersion": 1,
-  "artifactsSha256": "b55bc4e6cb2b2468619af5eba9a78e9bfb7f0b4b03ff1c29c3f9500c21cb992a"
+  "artifactsSha256": "1e480f93266daa2ba84b8c2e08c3c85d7b4d0b6b566c4110d794502f48cf2870"
 }

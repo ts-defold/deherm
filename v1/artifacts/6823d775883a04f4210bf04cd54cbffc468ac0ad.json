@@ -133,8 +133,8 @@
       }
     },
     "native-artifacts": {
-      "tag": "libs-db900fc9f9d8",
-      "fingerprint": "db900fc9f9d8000427e944b544916b6277ab0a8f58034c52c25a0843b73a4ec9",
+      "tag": "libs-ecfc68268957",
+      "fingerprint": "ecfc68268957eb3f895badf770889e47b02d45e4263f04fe14d7c40168ddcb57",
       "indexedBy": "bundleTarget",
       "summary": "Hermes release/debug libraries plus generated target config, per Defold bundle target",
       "assets": {
@@ -204,68 +204,68 @@
       "integrity": {
         "arm64_sim-ios": {
           "asset": "hermes-arm64_sim-ios.tar.gz.integrity.json",
-          "sha256": "87e1c2447cef61abb14674499f0c1201f6224ab5637032305f0ea15e818c31cf",
-          "archiveSha256": "3941f0310a94c3af9f303987a150893391039b52e82e8864dcf6b3763fc53441",
-          "archiveBytes": 7274963
+          "sha256": "39f3691fcdef04bee8b1fed3f7100354644931f7520b7486755d3e3bc1f17fd8",
+          "archiveSha256": "3b07e212c9f95369b36187f5cd67bc6a107c1d2b7221217cbdfd748c9ffe7ed0",
+          "archiveBytes": 7274978
         },
         "arm64-android": {
           "asset": "hermes-arm64-android.tar.gz.integrity.json",
-          "sha256": "0e441695152f2bbc3b8b6f27015c335ce889f7b31d1d0cc6984d5021e4ea9324",
+          "sha256": "08c50ce7e431b9c5710c52bcb0d6feb15400285d20acd97f30392133574a14e8",
           "archiveSha256": "44bbc3185c9053ad2e3f4d60204921bfc6ea9c58b2a5097c198c49a6f4725ed9",
           "archiveBytes": 90221542
         },
         "arm64-ios": {
           "asset": "hermes-arm64-ios.tar.gz.integrity.json",
-          "sha256": "6f46d604cb8964f47eb9611546dfa725e25e11709735ac8c4d42597c835817b7",
-          "archiveSha256": "88dc56f140f6bda5074d9f62cd78f485a928bfc59f9b36975ec2e5852ff0672c",
-          "archiveBytes": 7256633
+          "sha256": "158e9e5b709b9f0db5949fe9e220745a32d4e28b4e71b3689b7577bdf520bff3",
+          "archiveSha256": "2e995519082ddbcca79ec01b75a16ffc4b1f0029977db0497868d3592af0585e",
+          "archiveBytes": 7257664
         },
         "arm64-linux": {
           "asset": "hermes-arm64-linux.tar.gz.integrity.json",
-          "sha256": "a9e0bec167e838f0a7c0668a91843edcbd7983415f455516495305ee810f55e9",
+          "sha256": "144ff9c8afa89246fe69b4ee33e3f8220f36dc0d29d65a63dbeb7fdeb47905f2",
           "archiveSha256": "85f27de7a7d98c6998f49d6ab5fdb77d96790857f5c51376827dd984972c1e56",
           "archiveBytes": 38216220
         },
         "arm64-osx": {
           "asset": "hermes-arm64-osx.tar.gz.integrity.json",
-          "sha256": "3b3312467c420680d86a1a6950547815fbf2d6ddcc35e32e64d854c256179d01",
-          "archiveSha256": "036a03453b6646c86876fc4a8dd97d7908bae392e7d29f757b13df904073c6c8",
-          "archiveBytes": 7275357
+          "sha256": "d46081c2d506a7b56c11abfc3b5fbb210166240671b76932a75d38faa243ef08",
+          "archiveSha256": "7579bec8f1e6fee9b3fceebaa1329c14cae230b3b802f653d62872c81a74a8bf",
+          "archiveBytes": 7275528
         },
         "armv7-android": {
           "asset": "hermes-armv7-android.tar.gz.integrity.json",
-          "sha256": "813d30d10e9ab1a7450a0a3ce4db69d9a25f18b1e366885784c62f4910fa278c",
+          "sha256": "f36a1def6783a57105148aef0512f05c5bd9e299ab82e7a99278b9870d2db881",
           "archiveSha256": "b989d68ce1a865ac822dbce4661ef8c1dbdd3f3ab40cd482ba7610a496c832fd",
           "archiveBytes": 83678133
         },
         "x86_64-android": {
           "asset": "hermes-x86_64-android.tar.gz.integrity.json",
-          "sha256": "6afe15341cb06e91472bc033947fcceeb7ac2ece91e9255b5228e81786615c17",
+          "sha256": "7b32a0f228ba392d52ba360030512e606c19d1690257bb0bd7a0499d9ceb9e20",
           "archiveSha256": "c4b59a35f29cb0e67c38c1163352321cb4e0ded0272f96c995ed47014abc9760",
           "archiveBytes": 87773951
         },
         "x86_64-linux": {
           "asset": "hermes-x86_64-linux.tar.gz.integrity.json",
-          "sha256": "53f40d656c60db6bb6392415722dbcfd20498938a153cc222ed6dbbd13ffd158",
+          "sha256": "e9486b60e35a203ba31547157d5ee4ed14b73be0679960321674d2737f8280cc",
           "archiveSha256": "34528f90e1b1228fde0f565499c6a6c38f5f00244828aec0fca4411c2aa33f9a",
           "archiveBytes": 38396994
         },
         "x86_64-osx": {
           "asset": "hermes-x86_64-osx.tar.gz.integrity.json",
-          "sha256": "b2b4beb8c1b37020d06a848b0ef3b4a3a405284281398e0561d302ed748af3a7",
-          "archiveSha256": "c09906a241ee488b50a91da6bd91ed86f9b7ff5451c4929bba1a0ace3fc70292",
-          "archiveBytes": 7500847
+          "sha256": "566f2fd7a8120407e9d836b567446f7094d2c775d99a16e83f6f6e7c692fb15b",
+          "archiveSha256": "1551ab69679c312c8b7f752d0b4f2b9f44650a2e8ea474136735ab28e02f7644",
+          "archiveBytes": 7500840
         },
         "x86_64-win32": {
           "asset": "hermes-x86_64-win32.tar.gz.integrity.json",
-          "sha256": "5d0d5366cd684c3501d1dd4abe165de8e10820eb397c932e63617613a38de05f",
-          "archiveSha256": "d7f39e531f224b9adb01fdc51b2e0540e9f192557ed9d3e442f4456f1bda5896",
-          "archiveBytes": 11221532
+          "sha256": "48117ebd883c1c6d8c94dc266493ebd0fb17beb5b43d18873b4b3b671bcd9c16",
+          "archiveSha256": "b0f1c035733a9efbd65032f0e35049b516953c680dce8b3b59ef673295879cfe",
+          "archiveBytes": 11221956
         }
       },
       "compatibility": {
         "kind": "deherm.native-artifact-compatibility",
-        "sha256": "201a2a3626b57fa786ff71b3a0966bbcf21943ef5f1ed02d2880c18e4920a584"
+        "sha256": "1f4629b35435861983b84d2839afd2cb2776464e4aa0fd0dc0dc54302d6e49ef"
       }
     }
   }
