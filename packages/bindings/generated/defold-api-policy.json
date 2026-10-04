@@ -5,7 +5,7 @@
   "generator": "sha256:1117c41f485f2a42ce9ffa929b7b461e4261db5f1160411bc0a4fe1dab9e45a2",
   "producerPackageVersion": "0.1.0",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "policyRoot": "25ce61bf4895637bf5fb9971ec42512e92c46d1b2203d3f3735bc2b575358e32",
+  "policyRoot": "a567edc20dcd896c41d310f740d31f5200fb4479d60a2ac0ae3e2cbff12e170d",
   "layoutVersion": "v1",
   "counts": {
     "subtrees": 190,
@@ -59,7 +59,7 @@
       "bytes": 65523
     },
     "@compiler:document:defold-binding-lowering-recipe-facts.json": {
-      "hash": "786046f5de66f56fa76cf82af2eb27d15d6693a4c3f196ea6526ff965af58aef",
+      "hash": "c32a79a1029b2d7f386cd944452803f6377fa81133cff852be1d13018cce5b91",
       "bytes": 2652004
     },
     "@compiler:document:defold-component-proxy-contract.json": {
@@ -87,7 +87,7 @@
       "bytes": 13974
     },
     "@compiler:document:defold-script-api-accounting.json": {
-      "hash": "845bfdad3c0f99346e2ffce9c38a2d2adf36ed4a4be854e9ef1fa1bd45a6bc91",
+      "hash": "594b321ec4ad5dd0f4c81a645999a965f208c4acdf33b3b1e25525b3b7f55900",
       "bytes": 767030
     },
     "@compiler:document:defold-script-api-ir.json": {
@@ -103,7 +103,7 @@
       "bytes": 415014
     },
     "@compiler:document:defold-script-handle-lowering.json": {
-      "hash": "6815e8130f36465066a4acfe48826bf0dab00b439c52f4aac0441ce81d694a78",
+      "hash": "6f571f00f91e806358e69c81d4efe2aa1e410f4f88f85e2927613ea2c29948b6",
       "bytes": 830775
     },
     "@compiler:document:defold-script-real-engine-probes.json": {
@@ -115,7 +115,7 @@
       "bytes": 84816
     },
     "@compiler:document:defold-script-route-availability-profiles.json": {
-      "hash": "95e225f2c9d87863c2bff1bc71557c26ff2c4a73987ab4d5db10a6f7b17e4eb5",
+      "hash": "6e3c7075d2af35d832256a5aa54238b88cca178f53c21594ff7ae28e47f36dfc",
       "bytes": 1222237
     },
     "@compiler:document:defold-script-scalar-dispatch.json": {
@@ -127,11 +127,11 @@
       "bytes": 542
     },
     "@compiler:document:defold-script-universal-value-bindings.json": {
-      "hash": "da357490e508a663948087dd0e47f14b4b115617c7f8bbe727d3bba318e57305",
+      "hash": "d2267708d4d28eaa999581e3ff06fa2241f9d99a9fa87c56fbfee1a40bd79cc9",
       "bytes": 645339
     },
     "@compiler:document:defold-script-value-tail-bindings.json": {
-      "hash": "3740406d75514edf5d4144026da20e575fbadc3585586f53f77fb14d54be10f7",
+      "hash": "41383ebdbab7e7f8249fa6879b61b89a9e5a8744c055f6592491a1c5fc52259e",
       "bytes": 19105
     },
     "@compiler:document:defold-sdk-ir.json": {

@@ -18,7 +18,7 @@
   },
   "routeCount": 926,
   "statusCounts": {
-    "suspect": 2,
+    "upstream-unavailable": 2,
     "verified": 924
   },
   "registrationCounts": {
@@ -46,38 +46,7 @@
     "lua-stack-blocked-capability": 2
   },
   "arityDisagreementCount": 166,
-  "wantsIssue": [
-    {
-      "id": "script:b2d.body.get_user_data",
-      "luaName": "b2d.body.get_user_data",
-      "status": "suspect",
-      "notExecutedHere": "lua-stack-omit-profile",
-      "registration": "commented-out-upstream",
-      "declaredAt": "doc/b2d.lua:611",
-      "annotation": "@suspect commented-out-upstream",
-      "issue": {
-        "key": "script:b2d.body.get_user_data:suspect",
-        "title": "route verification: b2d.body.get_user_data is suspect",
-        "url": "https://github.com/ts-defold/deherm/issues?q=is%3Aissue+in%3Atitle+%22route+verification%3A+b2d.body.get_user_data+is+suspect%22",
-        "body": "Automated route verification marks `b2d.body.get_user_data` as **suspect** for Defold `7f0f554f41f9dce1e0ddff99bf08200657d1ee05`.\n\nEvidence: `commented-out-upstream`\n\nRoute: `script:b2d.body.get_user_data`\nRegistration: `commented-out-upstream`\n\nThis issue is generated from `packages/bindings/generated/defold-route-verification.json`. Repeated policy runs update this issue instead of opening a duplicate."
-      }
-    },
-    {
-      "id": "script:b2d.body.set_user_data",
-      "luaName": "b2d.body.set_user_data",
-      "status": "suspect",
-      "notExecutedHere": "lua-stack-omit-profile",
-      "registration": "commented-out-upstream",
-      "declaredAt": "doc/b2d.lua:840",
-      "annotation": "@suspect commented-out-upstream",
-      "issue": {
-        "key": "script:b2d.body.set_user_data:suspect",
-        "title": "route verification: b2d.body.set_user_data is suspect",
-        "url": "https://github.com/ts-defold/deherm/issues?q=is%3Aissue+in%3Atitle+%22route+verification%3A+b2d.body.set_user_data+is+suspect%22",
-        "body": "Automated route verification marks `b2d.body.set_user_data` as **suspect** for Defold `7f0f554f41f9dce1e0ddff99bf08200657d1ee05`.\n\nEvidence: `commented-out-upstream`\n\nRoute: `script:b2d.body.set_user_data`\nRegistration: `commented-out-upstream`\n\nThis issue is generated from `packages/bindings/generated/defold-route-verification.json`. Repeated policy runs update this issue instead of opening a duplicate."
-      }
-    }
-  ],
+  "wantsIssue": [],
   "routes": [
     {
       "id": "script:b2d.body.apply_angular_impulse",
@@ -558,21 +527,14 @@
     {
       "id": "script:b2d.body.get_user_data",
       "luaName": "b2d.body.get_user_data",
-      "status": "suspect",
+      "status": "upstream-unavailable",
       "notExecutedHere": "lua-stack-omit-profile",
       "runtimeObserved": false,
       "registration": "commented-out-upstream",
       "declaredAt": "doc/b2d.lua:611",
       "commentedOutAt": "gamesys/src/gamesys/scripts/box2d/v3/script_box2d_body_v3.cpp",
       "commentedOutFunction": "Body_GetUserData",
-      "source": "doc/b2d.lua",
-      "annotation": "@suspect commented-out-upstream",
-      "issue": {
-        "key": "script:b2d.body.get_user_data:suspect",
-        "title": "route verification: b2d.body.get_user_data is suspect",
-        "url": "https://github.com/ts-defold/deherm/issues?q=is%3Aissue+in%3Atitle+%22route+verification%3A+b2d.body.get_user_data+is+suspect%22",
-        "body": "Automated route verification marks `b2d.body.get_user_data` as **suspect** for Defold `7f0f554f41f9dce1e0ddff99bf08200657d1ee05`.\n\nEvidence: `commented-out-upstream`\n\nRoute: `script:b2d.body.get_user_data`\nRegistration: `commented-out-upstream`\n\nThis issue is generated from `packages/bindings/generated/defold-route-verification.json`. Repeated policy runs update this issue instead of opening a duplicate."
-      }
+      "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.body.get_world",
@@ -914,21 +876,14 @@
     {
       "id": "script:b2d.body.set_user_data",
       "luaName": "b2d.body.set_user_data",
-      "status": "suspect",
+      "status": "upstream-unavailable",
       "notExecutedHere": "lua-stack-omit-profile",
       "runtimeObserved": false,
       "registration": "commented-out-upstream",
       "declaredAt": "doc/b2d.lua:840",
       "commentedOutAt": "gamesys/src/gamesys/scripts/box2d/v3/script_box2d_body_v3.cpp",
       "commentedOutFunction": "Body_SetUserData",
-      "source": "doc/b2d.lua",
-      "annotation": "@suspect commented-out-upstream",
-      "issue": {
-        "key": "script:b2d.body.set_user_data:suspect",
-        "title": "route verification: b2d.body.set_user_data is suspect",
-        "url": "https://github.com/ts-defold/deherm/issues?q=is%3Aissue+in%3Atitle+%22route+verification%3A+b2d.body.set_user_data+is+suspect%22",
-        "body": "Automated route verification marks `b2d.body.set_user_data` as **suspect** for Defold `7f0f554f41f9dce1e0ddff99bf08200657d1ee05`.\n\nEvidence: `commented-out-upstream`\n\nRoute: `script:b2d.body.set_user_data`\nRegistration: `commented-out-upstream`\n\nThis issue is generated from `packages/bindings/generated/defold-route-verification.json`. Repeated policy runs update this issue instead of opening a duplicate."
-      }
+      "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.chain.destroy",

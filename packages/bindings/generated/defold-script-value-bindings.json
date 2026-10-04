@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "inputSha256": "932ac440d40a3fed876737ce488826ac27bc8ddc75e7455b641cd18d66a9b682",
+  "inputSha256": "d8c7c9af2ce34b60b60dc1e7a9e4c9f62813eb20046ec13741710d7b45a0ab97",
   "sourceEvidence": [
     {
       "path": "upstream/defold/engine/script/src/script_vmath.cpp",
@@ -4478,11 +4478,6 @@
     {
       "id": "script:go.delete",
       "sourceSymbol": "Script_Delete",
-      "sourceOperation": [
-        "ResolveInstance(L, 1)",
-        "dmGameObject::IsBone(instance)",
-        "dmGameObject::Delete(collection, instance, recursive)"
-      ],
       "operation": {
         "template": "game-object-delete",
         "parameters": {

@@ -96,6 +96,14 @@ test("route verification marks only source/runtime contradictions", () => {
       .filter(({ status }) => status === "verified")
       .every((row) => row.annotation === undefined && row.issue === undefined),
   );
+  assert.ok(
+    routeVerification.routes
+      .filter(({ status }) => status === "upstream-unavailable")
+      .every(
+        (row) =>
+          row.registration === "commented-out-upstream" && row.annotation === undefined && row.issue === undefined,
+      ),
+  );
 
   // Every harness gap describes the harness, not the public route. It remains
   // visible in the coverage queue without becoming an API warning.
@@ -115,10 +123,11 @@ test("route verification marks only source/runtime contradictions", () => {
   );
 });
 
-test("source-backed route contradictions stay suspect and go.set_parent is not a false positive", () => {
+test("source-disabled routes are authoritative upstream facts and go.set_parent is not a false positive", () => {
   const suspects = routeVerification.routes.filter(({ status }) => status === "suspect");
+  assert.deepEqual(suspects, []);
   assert.deepEqual(
-    suspects.map(({ id }) => id),
+    routeVerification.routes.filter(({ status }) => status === "upstream-unavailable").map(({ id }) => id),
     ["script:b2d.body.get_user_data", "script:b2d.body.set_user_data"],
   );
   const corrected = routeVerification.routes.find(({ id }) => id === "script:sys.set_render_enable");
@@ -159,7 +168,7 @@ test("route verification never carries runtime observations across a changed pla
 
 test("the policy workflow materializes the issue links emitted for marked routes", () => {
   const start = policyWorkflow.indexOf("      - name: Open or update source contradiction issues");
-  const end = policyWorkflow.indexOf("      - name: Reconcile the real-engine evidence issue", start);
+  const end = policyWorkflow.indexOf("      - name: Enforce engine-lane infrastructure health", start);
   assert.ok(start >= 0 && end > start);
   const step = policyWorkflow.slice(start, end);
   assert.match(step, /if:\s*>-[\s\S]*always\(\)[\s\S]*refs\/heads\/main/u);
@@ -171,13 +180,12 @@ test("the policy workflow materializes the issue links emitted for marked routes
   assert.match(step, /gh issue close/u);
 });
 
-test("the policy workflow closes stale real-engine evidence issues after recovery", () => {
-  const start = policyWorkflow.indexOf("      - name: Reconcile the real-engine evidence issue");
-  const end = policyWorkflow.indexOf("      - name: Enforce engine-lane infrastructure health", start);
+test("the policy workflow fails closed when the real-engine lane is unhealthy", () => {
+  const start = policyWorkflow.indexOf("      - name: Enforce engine-lane infrastructure health");
+  const end = policyWorkflow.indexOf("\n\n  publish-site:", start);
   assert.ok(start >= 0 && end > start);
   const step = policyWorkflow.slice(start, end);
-  assert.match(step, /if:\s*>-[\s\S]*always\(\)[\s\S]*refs\/heads\/main/u);
-  assert.match(step, /steps\.engine\.outcome.*!= success/u);
-  assert.match(step, /gh issue reopen/u);
-  assert.match(step, /gh issue close/u);
+  assert.match(step, /if: always\(\) && steps\.engine\.outcome != 'success'/u);
+  assert.match(step, /real-engine lane failed/u);
+  assert.match(step, /exit 1/u);
 });

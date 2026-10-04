@@ -494,6 +494,15 @@ but undeclared; or unparseable, with a site and a reason.
 Refusals are the load-bearing part. They are what stops a later generation from
 guessing, and they are the queue of real parser work.
 
+Reviewed evidence is scoped to the boundary the generated route actually
+crosses. A captured-Lua handle route records that Defold registers the callable,
+produces a full userdata with its user type, and checks that type when the Lua
+function consumes it. It does not pin private fields or the validator's internal
+identity scheme because the generated route roots the userdata and replays
+Defold's Lua function; it never reads the payload or bypasses that validator.
+Direct engine bypasses require stronger operation-level evidence at the native
+call they replace.
+
 # Consequences
 
 * Users do not re-download or reparse source to regenerate.

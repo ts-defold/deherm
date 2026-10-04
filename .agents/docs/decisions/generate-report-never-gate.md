@@ -112,6 +112,12 @@ Defold. A route that the context-heavy engine harness has not happened to run
 is recorded only in the harness coverage queue. It is not annotated
 `unverified`, does not open an issue, and does not alter the emitted SDK.
 
+An API whose registration is explicitly commented out in the engine source is
+`upstream-unavailable`, not `suspect`. The source is authoritative for the
+callable surface, the registration gate prevents emission, and deherm does not
+open an issue it cannot resolve. This remains visible policy data so a later
+Defold revision that restores the registration is discovered mechanically.
+
 **Upstream bugs become our data.** `engine/engine/src/script/script_engine.cpp`
 documents `@name sys.set_render_enable` and registers
 `{"set_render_enabled", EngineSys_SetRenderEnabled}` - the documented name is

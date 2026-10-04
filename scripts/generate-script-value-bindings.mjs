@@ -692,24 +692,26 @@ function addressedTransformDelegation(binding, condition) {
       }`;
 }
 
+function validateStructuredLuaContract(binding, parameters, callShapes, resultCodec) {
+  exactOperationParameters(binding, [parameters]);
+  if (callShapes) {
+    const expectedCallShapes = typeof callShapes === "function" ? callShapes(binding.callShapes) : callShapes;
+    expectOperationContract(binding, expectedCallShapes, resultCodec);
+  } else if (
+    binding.resultCodec !== resultCodec ||
+    binding.implementedCallShapes.length === 0 ||
+    binding.implementedCallShapes.some((shape) => shape[0] !== "Node")
+  ) {
+    throw new Error(
+      `${binding.id}: ${binding.operation.template} requires Node-first call shapes and ${resultCodec} result`,
+    );
+  }
+}
+
 function reviewedStructuredLuaTemplate(parameters, callShapes, resultCodec) {
   return {
     validate(binding) {
-      exactOperationParameters(binding, [parameters]);
-      if (callShapes) {
-        const expectedCallShapes = typeof callShapes === "function" ? callShapes(binding.callShapes) : callShapes;
-        expectOperationContract(binding, expectedCallShapes, resultCodec);
-      } else {
-        if (
-          binding.resultCodec !== resultCodec ||
-          binding.implementedCallShapes.length === 0 ||
-          binding.implementedCallShapes.some((shape) => shape[0] !== "Node")
-        ) {
-          throw new Error(
-            `${binding.id}: ${binding.operation.template} requires Node-first call shapes and ${resultCodec} result`,
-          );
-        }
-      }
+      validateStructuredLuaContract(binding, parameters, callShapes, resultCodec);
       const evidence = Array.isArray(binding.sourceOperation)
         ? binding.sourceOperation
         : binding.sourceOperation
@@ -732,6 +734,30 @@ function reviewedStructuredLuaTemplate(parameters, callShapes, resultCodec) {
           error,
           errorCapacity);
     }`;
+    },
+  };
+}
+
+/**
+ * A captured-Lua route delegates semantics to Defold's registered function.
+ * Its source proof therefore stops at the actual boundary: the member still
+ * registers the reviewed C function. Its admitted argument classes and result
+ * are already derived from the pinned IR and checked against the generated
+ * codec contract. Private implementation details below that boundary are
+ * Defold's responsibility.
+ */
+function reviewedRegisteredLuaTemplate(parameters, callShapes, resultCodec, member) {
+  const template = reviewedStructuredLuaTemplate(parameters, callShapes, resultCodec);
+  return {
+    ...template,
+    validate(binding, _source, _definition, moduleSource) {
+      validateStructuredLuaContract(binding, parameters, callShapes, resultCodec);
+      const registration = luaRegistration(moduleSource, member);
+      if (!registration || registration.symbol !== binding.sourceSymbol) {
+        throw new SpecializationEvidenceDrift(
+          `${binding.id}: registered Lua callable ${JSON.stringify(member)} no longer resolves to ${binding.sourceSymbol}`,
+        );
+      }
     },
   };
 }
@@ -1467,7 +1493,7 @@ ${delegation}
   ],
   [
     "game-object-delete",
-    reviewedStructuredLuaTemplate(
+    reviewedRegisteredLuaTemplate(
       {
         backend: "captured-lua",
         context: "active-go",
@@ -1480,6 +1506,7 @@ ${delegation}
       },
       [[], ["Hash"]],
       "None",
+      "delete",
     ),
   ],
   [

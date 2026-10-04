@@ -45,6 +45,11 @@
 //   suspect     Our own evidence CONTRADICTS the documentation and cannot be
 //               reconciled mechanically, or an exercised property did not hold.
 //
+//   upstream-unavailable
+//               The engine source explicitly disables the documented route.
+//               Source is authoritative for what can be called, so this is a
+//               verified upstream availability fact rather than a deherm bug.
+//
 // Other reasons we did not execute a route are recorded as notes about our
 // harness - a missing fixture context, a route belonging to a runtime profile
 // this run did not exercise, or a runtime producer the fixture could not root.
@@ -299,14 +304,14 @@ async function main() {
       // suspect. Neither "we did not run it" nor "our parser could not follow
       // the registration form" is a statement about the route.
       // A compile-time intrinsic is not suspect: it has no runtime registration
-      // because it is not a runtime call. Everything else here is our evidence
-      // disagreeing with Defold's documentation, which is worth an issue.
-      const contradicted =
-        registered === "declared-but-unregistered" ||
-        registered === "commented-out-upstream" ||
-        disposition === "mismatched";
+      // because it is not a runtime call. A registration explicitly commented
+      // out by upstream is likewise resolved: source authoritatively says the
+      // documented route is unavailable, and the registration gate blocks its
+      // emission. Only a contradiction deherm can act on becomes suspect.
+      const contradicted = registered === "declared-but-unregistered" || disposition === "mismatched";
       const notExecutedHere = runtimeBlocker.get(fn.id) ?? untestedReason.get(fn.id) ?? "not-in-conformance-plan";
-      const status = contradicted ? "suspect" : "verified";
+      const status =
+        registered === "commented-out-upstream" ? "upstream-unavailable" : contradicted ? "suspect" : "verified";
       const row = {
         id: fn.id,
         luaName,

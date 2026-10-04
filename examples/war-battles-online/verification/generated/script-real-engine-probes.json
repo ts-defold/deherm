@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "target": "arm64-macos-dynamic-hermes",
-  "inputSha256": "3752d45ad8749c676e29ee1fa29e2f3b0ce07105b09639ef8c636462705b1026",
+  "inputSha256": "892fd5964d43d30175ddb86ba280579eee521051f26112c675c31840f8201ac0",
   "coverageClaim": "Five context-specific War Battles harness calls are generated and signature-checked. Compile, link, and runtime behavior remain unverified until the SHA-bound evidence matrix observes them in a packaged engine.",
   "scenarioCount": 5,
   "executableScenarioCount": 5,

@@ -166,6 +166,9 @@ Status is additive evidence, not an allow-list:
   its generated assertions in a real engine.
 * `suspect`: déherm observed a contradiction, such as a documented name that is
   not registered or a runtime assertion that failed.
+* `upstream-unavailable`: Defold source explicitly disables a documented
+  registration. Source is authoritative, so the route is not emitted and no
+  déherm issue is opened.
 * `unproven`: déherm emitted the route but could not yet construct a meaningful
   runtime test context. This is evidence metadata only.
 * `unoptimized`: déherm emitted the universal route because the revision did
@@ -174,8 +177,10 @@ Status is additive evidence, not an allow-list:
 
 `suspect`, `unproven`, and `unoptimized` entries remain usable. `unproven` is
 internal evidence metadata only: it does not annotate the public SDK and does
-not open a route issue. Positive source/runtime contradictions open `suspect`
-issues, while specialization withdrawals open grouped `unoptimized` issues.
+not open a route issue. Positive source/runtime contradictions that déherm can
+act on open `suspect` issues, while specialization withdrawals open grouped
+`unoptimized` issues. Explicit upstream disablement remains policy evidence,
+not a déherm work item.
 Repeated nightlies update existing issues instead of opening duplicates.
 
 Optimization withdrawals are grouped by reviewed recipe input. One Defold

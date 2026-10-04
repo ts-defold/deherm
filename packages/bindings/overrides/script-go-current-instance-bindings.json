@@ -44,7 +44,6 @@
     {
       "id": "script:go.delete",
       "sourceSymbol": "Script_Delete",
-      "sourceOperation": ["ResolveInstance(L, 1)", "dmGameObject::IsBone(instance)", "dmGameObject::Delete(collection, instance, recursive)"],
       "operation": {
         "template": "game-object-delete",
         "parameters": {

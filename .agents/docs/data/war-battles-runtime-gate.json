@@ -16,7 +16,7 @@
       "sha256": "3c1e7bbb6e1a82be0d4f3d2fc2598984ec1c81bfeedd034c2c179fcf57920bd6"
     },
     "packages/bindings/generated/defold-script-value-bindings.json": {
-      "sha256": "4de2a0f9bd0aca7fb49a3a955e7ae343415e9567f4ba8cd6c3a53ea939748beb"
+      "sha256": "797715c02ed33a655c8cdafed2d624071a623cd62968abcc700581a70cf76b42"
     },
     "tests/fixtures/war-battles/.deherm/generated/components/manifest.json": {
       "sha256": "328a26c65307a603a189c4cf815995474ae858a16b91b9ffd78b9002d05aedd0"

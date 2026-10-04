@@ -300,6 +300,38 @@ test("value operation templates fail closed for unknown and mismatched metadata"
     /value-unary source anchor .*Normalize/,
   );
 
+  const unregisteredDelete = fixture.inputs.map((input) => {
+    const definition = JSON.parse(input.definitionText);
+    if (!definition.bindings.some(({ id }) => id === "script:go.delete")) return input;
+    return {
+      ...input,
+      sourceText: input.sourceText.replace(
+        '{"delete",                  Script_Delete}',
+        '{"removed_delete",          Script_Delete}',
+      ),
+    };
+  });
+  assert.throws(
+    () => generate(fixture.irText, fixture.scalarDispatchText, fixture.patternsText, unregisteredDelete),
+    /registered Lua callable "delete" no longer resolves to Script_Delete/,
+  );
+
+  const wrongDeleteShape = mutateBinding(fixture.inputs, "script:go.delete", (binding) => {
+    binding.implementedCallShapes = [[], ["Url"]];
+  });
+  assert.throws(
+    () => generate(fixture.irText, fixture.scalarDispatchText, fixture.patternsText, wrongDeleteShape),
+    /game-object-delete parameters require implemented call shapes \[\[\],\["Hash"\]\]/,
+  );
+
+  const wrongDeleteResult = mutateBinding(fixture.inputs, "script:go.delete", (binding) => {
+    binding.resultCodec = "Hash";
+  });
+  assert.throws(
+    () => generate(fixture.irText, fixture.scalarDispatchText, fixture.patternsText, wrongDeleteResult),
+    /reviewed result codec Hash differs from pinned IR None/,
+  );
+
   const missingHashEvidence = fixture.inputs.map((input) => {
     const definition = JSON.parse(input.definitionText);
     if (!definition.bindings.some(({ id }) => id === "script:hash")) return input;
@@ -434,6 +466,14 @@ test("game-object transform specialization follows semantic calls across Defold 
       .replace(
         "if (receiver.m_Socket != dmGameObject::GetMessageSocket(i->m_Instance->m_Collection->m_HCollection))",
         "if (receiver.m_Socket != dmGameObject::GetMessageSocket(hcollection))",
+      )
+      .replace(
+        "// Resolve argument #1 url\n        dmGameObject::HInstance instance = ResolveInstance(L, 1);\n        if(dmGameObject::IsBone(instance))",
+        "// Resolve argument #1 url\n        Collection* collection;\n        Instance* instance = ResolveGameObjectForDeleteVNext(L, 1, &collection);\n        if(dmGameObject::IsBone(instance))",
+      )
+      .replace(
+        "dmGameObject::HCollection collection = instance->m_Collection->m_HCollection;\n        dmGameObject::Delete(collection, instance, recursive);",
+        "dmGameObject::Delete(collection, instance, recursive);",
       );
     return { ...input, sourceText };
   });
@@ -441,7 +481,7 @@ test("game-object transform specialization follows semantic calls across Defold 
   const generated = JSON.parse(
     generate(fixture.irText, fixture.scalarDispatchText, fixture.patternsText, inputs).report,
   );
-  for (const id of ["script:go.get_position", "script:go.set_position", "script:go.set_rotation"]) {
+  for (const id of ["script:go.delete", "script:go.get_position", "script:go.set_position", "script:go.set_rotation"]) {
     assert.ok(
       generated.bindings.some((binding) => binding.id === id),
       `${id} should retain its specialization`,

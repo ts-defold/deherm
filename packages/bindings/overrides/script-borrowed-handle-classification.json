@@ -44,8 +44,12 @@
       "source": "engine/gamesys/src/gamesys/scripts/box2d/v3/script_box2d_body_v3.cpp",
       "sha256": "ec53ed1eda1094564cbeecbbd8cc0a696c3be1805917583138d4d2c00e35ae95",
       "anchors": [
-        "uint32_t                  m_InstanceGeneration;",
-        "if (!b2Body_IsValid(luabody->m_Body))"
+        "lua_newuserdata(L, sizeof(B2DLuaBody))",
+        "luaL_getmetatable(L, BOX2D_TYPE_NAME_BODY)",
+        "lua_setmetatable(L, -2)",
+        "dmScript::CheckUserType(L, index, TYPE_HASH_BODY",
+        "TYPE_HASH_BODY = dmScript::RegisterUserType(L, BOX2D_TYPE_NAME_BODY, Body_methods, Body_meta)",
+        "luaL_register(L, 0, Body_functions)"
       ]
     },
     {

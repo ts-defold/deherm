@@ -7,6 +7,7 @@ import test from "node:test";
 
 import { stableBindingId } from "../scripts/lib/binding-identity.mjs";
 import { generateBorrowedHandleClassification } from "../scripts/generate-borrowed-handle-classification.mjs";
+import { MOVED, VOID, classifyReviewedSource } from "../scripts/lib/revision-audit.mjs";
 
 const root = new URL("../", import.meta.url);
 
@@ -121,6 +122,31 @@ test("scopes a handle kind's representation to the backend that implements it", 
       sourceEvidence: ["box2d-body"],
     },
   ]);
+});
+
+test("Box2D body evidence proves the rooted-userdata transport boundary, not private payload fields", () => {
+  const override = JSON.parse(sourceInputs.overrideText);
+  const evidence = override.sourceEvidence.find(({ id }) => id === "box2d-body");
+  const source = sourceInputs.sourceTexts.get(evidence.source);
+
+  const privateRepresentationDrift = source
+    .replace("dmGameObject::HCollection m_Collection;", "dmGameObject::HGameObject m_Instance;")
+    .replace("dmhash_t                  m_InstanceId;", "")
+    .replace("uint32_t                  m_InstanceGeneration;", "");
+  const moved = classifyReviewedSource(privateRepresentationDrift, evidence);
+  assert.equal(moved.status, MOVED);
+  assert.deepEqual(moved.anchorsLost, []);
+
+  const failures = [
+    [source.replace("lua_newuserdata(L, sizeof(B2DLuaBody))", "lua_pushlightuserdata(L, body)"), /lua_newuserdata/],
+    [source.replace("luaL_register(L, 0, Body_functions)", "RegisterBodyFunctionsWasRemoved(L)"), /luaL_register/],
+    [source.replace("dmScript::CheckUserType(L, index, TYPE_HASH_BODY", "UncheckedBodyCast(L, index"), /CheckUserType/],
+  ];
+  for (const [changed, lostAnchor] of failures) {
+    const verdict = classifyReviewedSource(changed, evidence);
+    assert.equal(verdict.status, VOID);
+    assert.ok(verdict.anchorsLost.some((anchor) => lostAnchor.test(anchor)));
+  }
 });
 
 test("assigns stable IDs, concrete representations, context, and validity metadata", () => {

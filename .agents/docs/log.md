@@ -5030,6 +5030,12 @@ treated every non-contradicted Defold route as verified and limits issues to
 positive source/runtime contradictions; workflow labels and the accepted
 publication decision now state that behavior exactly.
 
+Explicitly commented-out upstream registrations are now classified as
+`upstream-unavailable` rather than actionable `suspect` routes. Defold source
+remains authoritative, the registration gate continues to prevent emission,
+and issue reconciliation no longer reopens deherm issues for documentation
+drift that only upstream can change.
+
 ## 2026-10-01 - dmSDK diagnostics are checkout-independent
 
 The first hosted stable/beta/alpha derivation completed all three policy
