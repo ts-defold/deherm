@@ -173,7 +173,7 @@
     },
     {
       "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-      "policyRoot": "25ce61bf4895637bf5fb9971ec42512e92c46d1b2203d3f3735bc2b575358e32",
+      "policyRoot": "a567edc20dcd896c41d310f740d31f5200fb4479d60a2ac0ae3e2cbff12e170d",
       "generator": "sha256:1117c41f485f2a42ce9ffa929b7b461e4261db5f1160411bc0a4fe1dab9e45a2",
       "realizer": {
         "minimumPackageVersion": "0.0.0",
