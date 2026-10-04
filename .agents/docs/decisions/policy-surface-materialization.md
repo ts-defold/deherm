@@ -29,6 +29,31 @@ borrowed-handle recipe. It must not contain a list of Defold module names, type
 spellings, route names, context names, or rename decisions that can change when
 Defold changes. Those are policy data even when they appear stable today.
 
+## Optimization objective
+
+Policy migration optimizes **complexity, maintainability, and revision
+resilience**. Transfer size and object count are diagnostics, not the goal. A
+migration is an improvement only when it reduces authoritative
+representations or ownership seams, moves reusable algorithms behind
+composable compiler contracts, and lets a previously unseen Defold revision be
+classified from source-derived structure without a package release.
+
+The project therefore rejects a smaller representation when it merely
+compresses, tokenizes, or relabels generated output; adds a parallel emitter or
+recipe dialect; embeds Defold names or route allowlists in the package; or
+requires package changes for ordinary version-to-version data movement. A new
+package capability is justified only by a genuinely new semantic construct the
+installed compiler cannot express. Specialized fast paths and the universal
+fallback remain projections of the same authoritative facts, not separately
+maintained surfaces.
+
+Each accepted migration must preserve old-policy compatibility and frozen
+old-pipeline byte equality while reporting separately: removed ownership seams,
+new or removed compiler concepts, revision-specific exceptions, policy
+transfer bytes, realized bytes, and npm payload bytes. The first three decide
+whether the design improved; the byte measurements catch regressions and guide
+priority.
+
 `scripts/policy-surface.mjs` is the single transport manifest for the complete
 revision-derived checkout surface. Derivation fingerprinting imports the same
 manifest used by CI to pack, install, and selectively extract the artifact

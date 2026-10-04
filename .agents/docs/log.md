@@ -5360,3 +5360,17 @@ all 1,361 declarations across 122 byte-identical artifacts. This is policy
 transport/materialization and clean-room generation evidence, not execution of
 every Defold implementation. Issue #93 remains open for 12 SDK and 99 revision-
 output compatibility sources plus other large derived semantic documents.
+
+## 2026-10-04 - Policy migration optimizes ownership, not byte count
+
+The remaining policy migration is now explicitly judged by reduced complexity,
+maintainability, and resilience to unseen Defold revisions. Transfer size and
+object count remain measured, but a smaller encoding is rejected when it merely
+compresses generated output, adds another recipe dialect, duplicates an
+emitter, embeds revision-specific names, or makes ordinary Defold changes
+require a new npm release. This boundary rejected a byte-exact lexical encoding
+of the remaining compatibility snapshots: it reduced the object graph but did
+not turn generated outputs into source-derived semantic facts. Future #93
+waves must instead remove ownership seams through composable compiler emitters,
+preserve old-policy compatibility and frozen byte equality, and report compiler
+concept/exception changes separately from storage measurements.
