@@ -44,6 +44,7 @@ export const scriptGeneratorSources = Object.freeze([
   "packages/compiler/src/component-proxy-contract.mjs",
   "packages/compiler/src/defold-hash.mjs",
   "packages/compiler/src/script-special-call-verification.mjs",
+  "packages/compiler/src/script-handle-lowering-output-emitter.mjs",
   "packages/compiler/src/script-recording-engine.mjs",
   "scripts/lib/script-generator-pipeline.mjs",
   "packages/compiler/src/script-public-api-policy.mjs",

@@ -11,10 +11,22 @@ import {
   outputPaths,
   renderArtifacts,
 } from "../scripts/generate-script-handle-lowering.mjs";
+import { renderScriptHandleLoweringArtifacts } from "../packages/compiler/src/script-handle-lowering-output-emitter.mjs";
 
 const root = new URL("../", import.meta.url);
 const inputs = await loadInputs();
 const generated = generateScriptHandleLowering(inputs);
+
+test("compiler-owned renderer reproduces every handle-lowering output byte", async () => {
+  const rendered = renderScriptHandleLoweringArtifacts(generated);
+  for (const name of ["kindHeader", "header", "source", "typescript"]) {
+    assert.equal(
+      rendered[name],
+      await readFile(new URL(`../${outputPaths[name]}`, import.meta.url), "utf8"),
+      `${name} must remain byte-identical to the source-derived generator output`,
+    );
+  }
+});
 
 function replaceJson(text, mutate) {
   const value = JSON.parse(text);

@@ -5382,3 +5382,26 @@ allocations, weaken tree shaking, or regress representative hot-path timings.
 Emitter and dispatch migrations must compare route selection and the relevant
 runtime/allocation/benchmark evidence before and after; fewer concepts or bytes
 do not excuse slower generated code.
+
+## 2026-10-04 - Script handle lowering is realized by compiler-owned emitters
+
+The handle-lowering generator still derives all 407 route descriptors, runtime
+profile masks, semantic handle kinds, codecs, and bounded dispatch contracts
+from its pinned source-derived inputs. Its four pure output renderers now live
+in `@deherm/compiler`; both repository generation and policy materialization
+call that one implementation. The policy therefore no longer transports the
+generated handle-kind header, lowering header, or lowering implementation as
+compatibility snapshots. It transports the existing authenticated semantic
+report and names three package capabilities.
+
+The frozen old-pipeline fixture remains byte-identical for all three outputs
+(292,822 bytes total), the direct compiler renderer test covers all four
+artifacts including the TypeScript SDK projection, and the generated C++ still
+compiles warning-clean. The policy/materializer suite passes legacy-v1 and
+current-policy realization, cache authentication, fail-closed drift, and keyed
+idempotence. No route selection or emitted runtime byte changed, so scratch
+bounds, warmed allocation behavior, tree shaking, and dispatch performance are
+unchanged by construction. The reachable policy graph is now 22,584,315 bytes
+across 185 subtrees; 17 of 113 revision outputs are locally rendered and 96
+remain compatibility snapshots. This is generation/materialization evidence,
+not new live-engine runtime evidence.

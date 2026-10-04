@@ -2,15 +2,15 @@
   "schemaVersion": 1,
   "kind": "deherm.policy.manifest",
   "comment": "A reviewable statement of what this checkout's policy store holds. It is NOT a policy object: it names the revision, which no content-addressed object may, and it records the reconciliation between upstream.lock's restated pins and Defold's own declaration.",
-  "generator": "sha256:4d5fcd509f2ad3f3af8845d27895255af89e6991cf4dcb6b05bf8c4b2b47537b",
+  "generator": "sha256:39ad9119e817d896cd4d00518e3157893306c209b3e144814e765da4559dae7f",
   "producerPackageVersion": "0.1.0",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "policyRoot": "5545f2fa75fb142dff875aedb49019ba8274b277028daa6e0c473441ad441f9f",
+  "policyRoot": "89baa5f0787ff491fb0637c89d773adb4243a44a965cdb654e0f0f8280c87f81",
   "layoutVersion": "v1",
   "counts": {
-    "subtrees": 188,
+    "subtrees": 185,
     "namespaces": 52,
-    "objectBytes": 22887346,
+    "objectBytes": 22584315,
     "indexEntries": 1
   },
   "toolchainPins": {
@@ -55,8 +55,8 @@
   ],
   "subtrees": {
     "@compiler": {
-      "hash": "81951a82747193a4fdffde096fadc3b4bfd8327d13b96b6476d5a8087b02e28a",
-      "bytes": 65468
+      "hash": "04705e058f2e9ab117da677c2ae8a63b3cc14a46727aad18506e956ad9502e91",
+      "bytes": 65250
     },
     "@compiler:document:defold-binding-lowering-recipe-facts.json": {
       "hash": "89f5cf82a0998078e0734ecd41cd371729377cde8b54b0e8bcc199528b1b1668",
@@ -261,14 +261,6 @@
     "@compiler:output:defold/defold_hermes/include/defold_hermes/generated_script_fixed_tuples.hpp": {
       "hash": "0d6999c1547a89a8251160bd46e4295a4ddde0a4dc13c2c81a2c33f9da1532e0",
       "bytes": 1719
-    },
-    "@compiler:output:defold/defold_hermes/include/defold_hermes/generated_script_handle_kinds.hpp": {
-      "hash": "047c958f392af049837c63d1edcfbcf39f6bc0ab3672b6d4a8722fad5db8d80b",
-      "bytes": 1060
-    },
-    "@compiler:output:defold/defold_hermes/include/defold_hermes/generated_script_handle_lowering.hpp": {
-      "hash": "e2083f62dc902e312eee652c679b92910cc92eb1dd4a633433eff00768c11a68",
-      "bytes": 9024
     },
     "@compiler:output:defold/defold_hermes/include/defold_hermes/generated_script_overload_dispatch.hpp": {
       "hash": "e414816972701b4de304bf8dd63b4b9b3aa51f6e01ad04dc9a4923e34b6b2e9a",
@@ -477,10 +469,6 @@
     "@compiler:output:defold/defold_hermes/src/generated_script_fixed_tuples.cpp": {
       "hash": "98b4054ff8c69d4ac1327e6f981f6f035513867c2f7c3e7781c8e12f080f0df1",
       "bytes": 7497
-    },
-    "@compiler:output:defold/defold_hermes/src/generated_script_handle_lowering.cpp": {
-      "hash": "368c3ac8ae952a8039f7153b24808237f863793ab23b7f00238d63f298a3ffed",
-      "bytes": 292729
     },
     "@compiler:output:defold/defold_hermes/src/generated_script_overload_dispatch.cpp": {
       "hash": "f847507c408d3bded1236d6e414220879ff821d194aee516f3a42dc371b6bbd7",
