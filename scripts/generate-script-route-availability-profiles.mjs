@@ -80,14 +80,27 @@ async function loadJson(path, label) {
   }
 }
 
-function canonicalRegistrationRows(surface, spec) {
+export function canonicalRegistrationRows(surface, spec, env = process.env) {
   const targetId = engineRegistrationTargets[spec.feature];
   assert(targetId, `${spec.feature}: no canonical engine registration target is declared`);
   const target = surface.targets?.[targetId];
-  assert(
-    target?.status === "verified" && Array.isArray(target.routes),
-    `${targetId}: canonical registration target is unavailable`,
-  );
+  const unavailable = (reason, detail) => {
+    assert(declaredDerivation(env), detail);
+    recordAudit(
+      {
+        input: "packages/bindings/overrides/script-route-availability-profiles.json",
+        id: `registration: ${spec.path}#${spec.array}`,
+        status: VOID,
+        reason,
+        detail,
+      },
+      env,
+    );
+    return [];
+  };
+  if (target?.status !== "verified" || !Array.isArray(target.routes)) {
+    return unavailable("canonical-target-absent", `${targetId}: canonical registration target is unavailable`);
+  }
   const sourcePath = spec.path.replace(/^upstream\/defold\/engine\//, "");
   const rows = [...target.routes, ...(target.registeredButUndeclared ?? [])].filter(
     (route) =>
@@ -95,7 +108,12 @@ function canonicalRegistrationRows(surface, spec) {
       route.registration?.array === spec.array &&
       route.module === spec.namespace,
   );
-  assert(rows.length > 0, `${spec.path}: canonical registration array '${spec.array}' is empty or absent`);
+  if (rows.length === 0) {
+    return unavailable(
+      "canonical-registration-absent",
+      `${spec.path}: canonical registration array '${spec.array}' is empty or absent`,
+    );
+  }
   assert(
     new Set(rows.map(({ name }) => name)).size === rows.length,
     `${spec.path}: canonical registration array '${spec.array}' contains duplicate names`,

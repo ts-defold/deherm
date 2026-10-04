@@ -30,14 +30,15 @@ test("one IR emits every runtime binding surface", () => {
   assert.deepEqual(
     [...artifacts.keys()],
     [
+      "packages/bindings/generated/defold-generated-module-recipe-facts.json",
       "packages/sdk/src/generated/modules.ts",
+      "packages/bindings/generated/symbol-map.json",
       "packages/abi/src/generated/layouts.ts",
       "defold/defold_hermes/include/defold_hermes/generated_modules.h",
       "defold/defold_hermes/include/defold_hermes/generated_jsi.hpp",
       "defold/defold_hermes/src/generated_jsi.cpp",
       "defold/defold_hermes/lib/web/generated_modules.js",
       "packages/static-hermes/src/generated/ffi.js",
-      "packages/bindings/generated/symbol-map.json",
       "packages/sdk/src/generated/modules/ExampleMath.ts",
       "packages/sdk/src/generated/functions/ExampleMath/add.ts",
       "packages/sdk/src/generated/functions/ExampleMath/multiply.ts",

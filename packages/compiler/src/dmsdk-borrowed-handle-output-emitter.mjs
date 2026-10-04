@@ -28,8 +28,10 @@ const artifacts = DMSDK_BORROWED_HANDLE_ARTIFACTS;
 export const DMSDK_BORROWED_HANDLE_REVISION_OUTPUT_PATHS = Object.freeze([
   artifacts.header,
   artifacts.runtime,
+  artifacts.jsiHeader,
   artifacts.jsi,
   artifacts.browser,
+  artifacts.staticHermes,
 ]);
 export const DMSDK_BORROWED_HANDLE_SDK_OUTPUT_PATH = artifacts.typescript;
 const specializationBlocker = "borrowed-handle-specialization-unverified";

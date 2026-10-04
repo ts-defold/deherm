@@ -21,6 +21,9 @@ const outputFiles = [
   "defold/defold_hermes/src/generated_static_hermes_vmath.cpp",
   "packages/static-hermes/src/generated/script-vmath.ts",
 ];
+const oldPipeline = JSON.parse(
+  await readFile(path.join(root, "tests/fixtures/policy-surface-old-pipeline/manifest.json"), "utf8"),
+);
 
 function run(arguments_) {
   return spawnSync(process.execPath, [generator, ...arguments_], {
@@ -66,6 +69,19 @@ test("package emitter reconstructs vmath native outputs from compact selected-sh
   assert.equal(renderStaticHermesVmathHeader(facts), header);
   assert.equal(renderStaticHermesVmathSource(facts), source);
   assert.equal(renderStaticHermesVmathTypescript(facts), typescript);
+  for (const [relative, contents] of [
+    [outputFiles[2], header],
+    [outputFiles[3], source],
+    [outputFiles[4], typescript],
+  ]) {
+    const frozen = oldPipeline.outputs[relative];
+    assert.equal(Buffer.byteLength(contents), frozen.bytes, `${relative} old-pipeline byte count changed`);
+    assert.equal(
+      createHash("sha256").update(contents).digest("hex"),
+      frozen.sha256,
+      `${relative} old-pipeline bytes changed`,
+    );
+  }
   assert.ok(Buffer.byteLength(JSON.stringify(facts)) < Buffer.byteLength(report));
   const duplicate = structuredClone(facts);
   duplicate.bindings[1].stableId = duplicate.bindings[0].stableId;

@@ -34,7 +34,11 @@ import { stableBindingId } from "./binding-identity.mjs";
 import { assertDmSdkUniversalStaticFrameCapacity } from "./dmsdk-universal-static-frame.mjs";
 import { isRevisionOutput } from "./revision-output-layout.mjs";
 import { nativeArtifactCompatibility } from "./defold-toolchain-pins.mjs";
-import { generateRevisionOutput, LOCALLY_RENDERED_OUTPUT_RECIPES } from "./revision-output-emitter.mjs";
+import {
+  generateRevisionOutput,
+  LOCALLY_RENDERED_OUTPUT_RECIPES,
+  STABLE_OUTPUT_RECIPE,
+} from "./revision-output-emitter.mjs";
 import {
   BINDING_LOWERING_RECIPE_CAPABILITY,
   BINDING_LOWERING_RECIPE_NAME,
@@ -516,7 +520,8 @@ export function resolveCompilerSurface(resolvedPolicy, revision) {
       outputs[relative] = { ...record, inputs, source: restoreDefoldRevision(object.source, revision) };
     } else if (
       record.mode === "render-and-verify" &&
-      record.recipe === LOCALLY_RENDERED_OUTPUT_RECIPES[relative] &&
+      (record.recipe === LOCALLY_RENDERED_OUTPUT_RECIPES[relative] ||
+        (record.recipe === STABLE_OUTPUT_RECIPE && relative in LOCALLY_RENDERED_OUTPUT_RECIPES)) &&
       record.sourceObject === undefined
     ) {
       outputs[relative] = { ...record, inputs };

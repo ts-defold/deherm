@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
@@ -6,25 +7,22 @@ import {
   projectGeneratedModuleFacts,
   renderGeneratedModuleOutputs,
 } from "../packages/compiler/src/generated-module-output-emitter.mjs";
-import {
-  generateAbiLayouts,
-  generateCHeader,
-  generateEmscriptenModules,
-  generateJsiHeader,
-  generateJsiSource,
-  generateStaticHermes,
-} from "../scripts/generate-bindings.mjs";
-
 const schema = JSON.parse(await readFile(new URL("../packages/bindings/modules.json", import.meta.url), "utf8"));
 const facts = projectGeneratedModuleFacts(schema);
-const oldPipeline = new Map([
-  ["packages/abi/src/generated/layouts.ts", generateAbiLayouts(schema)],
-  ["defold/defold_hermes/include/defold_hermes/generated_modules.h", generateCHeader(schema)],
-  ["defold/defold_hermes/include/defold_hermes/generated_jsi.hpp", generateJsiHeader()],
-  ["defold/defold_hermes/src/generated_jsi.cpp", generateJsiSource(schema)],
-  ["defold/defold_hermes/lib/web/generated_modules.js", generateEmscriptenModules(schema)],
-  ["packages/static-hermes/src/generated/ffi.js", generateStaticHermes(schema)],
-]);
+const oldPipeline = JSON.parse(
+  await readFile(new URL("./fixtures/policy-surface-old-pipeline/manifest.json", import.meta.url), "utf8"),
+);
+
+function assertFrozenOutput(path, contents) {
+  const expected = oldPipeline.outputs[path];
+  assert.ok(expected, `${path} is absent from the frozen old-pipeline fixture`);
+  assert.equal(Buffer.byteLength(contents), expected.bytes, `${path} old-pipeline byte count changed`);
+  assert.equal(
+    createHash("sha256").update(contents).digest("hex"),
+    expected.sha256,
+    `${path} old-pipeline bytes changed`,
+  );
+}
 
 test("generated module recipe facts keep only ABI-relevant declarations", () => {
   const originalBytes = Buffer.byteLength(JSON.stringify(schema));
@@ -37,12 +35,12 @@ test("generated module recipe facts keep only ABI-relevant declarations", () => 
   assert.equal("verification" in facts.modules.find(({ name }) => name === "Timer"), false);
 });
 
-test("package emitters preserve exact old-pipeline bytes", async () => {
+test("package emitters preserve frozen old-pipeline bytes and checked-in outputs", async () => {
   const rendered = renderGeneratedModuleOutputs(facts);
   assert.equal(rendered.size, 6);
 
   for (const [path, contents] of rendered) {
-    assert.equal(oldPipeline.get(path), contents, `${path} differs from the old pipeline`);
+    assertFrozenOutput(path, contents);
     assert.equal(await readFile(new URL(`../${path}`, import.meta.url), "utf8"), contents, `${path} is stale`);
   }
 });

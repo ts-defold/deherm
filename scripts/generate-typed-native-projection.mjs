@@ -14,7 +14,7 @@
 
 import { createHash } from "node:crypto";
 
-import { renderTypescript } from "./generate-static-hermes-vmath.mjs";
+import { renderStaticHermesVmathTypescript } from "../packages/compiler/src/static-hermes-vmath-output-emitter.mjs";
 
 function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
@@ -40,7 +40,7 @@ export function generateTypedNativeProjection({ vmathReport, reachableRouteIds, 
   const pruned = vmathReport.included.filter((binding) => !retained.includes(binding));
   const symbolsOf = (bindings) =>
     bindings.flatMap(({ shapes }) => shapes.map(({ cFunction }) => cFunction)).sort(compareCodeUnits);
-  const source = renderTypescript(retained);
+  const source = renderStaticHermesVmathTypescript({ schemaVersion: 1, bindings: retained });
   const body = {
     schemaVersion: 1,
     generator: "scripts/generate-typed-native-projection.mjs",

@@ -35,6 +35,7 @@ import {
   SCRIPT_SCALAR_RECIPE,
   SCRIPT_UNIVERSAL_VALUE_RECIPE,
   SCRIPT_VALUE_BINDING_RECIPE,
+  STABLE_OUTPUT_RECIPE,
 } from "../packages/compiler/src/revision-output-emitter.mjs";
 import {
   createDmSdkUniversalRecipeFacts,
@@ -180,6 +181,42 @@ function withLegacyUrlTargetSupportPolicy(current) {
   return legacy;
 }
 
+function withLegacyStableTemplatePolicy(current) {
+  const legacy = structuredClone(current);
+  const compilerEntry = legacy.objects.get("@compiler");
+  const compiler = compilerEntry.value;
+  const paths = Object.keys(compiler.outputs.entries).filter((relative) =>
+    [
+      "generated_dmsdk_borrowed_handle_jsi.hpp",
+      "generated_dmsdk_cstring_value_jsi.hpp",
+      "generated_dmsdk_enum_value_jsi.hpp",
+      "generated_dmsdk_named_scalar_jsi.hpp",
+      "generated_dmsdk_named_scalar_runtime.h",
+      "generated_dmsdk_scalar_jsi.hpp",
+      "generated_dmsdk_scratch_scalar_out_jsi.hpp",
+      "generated_dmsdk_named_scalar_jsi.cpp",
+      "dmsdk-borrowed-handle.ts",
+      "dmsdk-cstring-value.ts",
+      "dmsdk-scratch-scalar-out.ts",
+    ].some((suffix) => relative.endsWith(suffix)),
+  );
+  assert.equal(paths.length, 11);
+  for (const relative of paths) {
+    compiler.realizationRecipes.outputs[relative] = STABLE_OUTPUT_RECIPE;
+    compiler.outputs.entries[relative].recipe = STABLE_OUTPUT_RECIPE;
+    compiler.outputs.entries[relative].inputs = [];
+  }
+  const sealedCompiler = sealObject(compiler);
+  compilerEntry.digest = sealedCompiler.hash;
+  legacy.policy.subtrees["@compiler"] = sealedCompiler.hash;
+  legacy.policy.realizer.requiredCapabilities = [
+    ...new Set([...legacy.policy.realizer.requiredCapabilities, STABLE_OUTPUT_RECIPE]),
+  ].sort();
+  const sealedRoot = sealObject(legacy.policy);
+  legacy.entry.policyRoot = sealedRoot.hash;
+  return legacy;
+}
+
 test("a content-addressed legacy v1 URL policy graph still resolves and materializes", async () => {
   const legacy = withLegacyUrlTargetSupportPolicy(await currentResolvedPolicy());
   const cacheRoot = await mkdtemp(path.join(tmpdir(), "deherm-legacy-url-policy-test-"));
@@ -189,6 +226,23 @@ test("a content-addressed legacy v1 URL policy graph still resolves and material
   assert.equal(sha256(source), "adcb06373ce840e950f532a49e49eacda85a567998aa96a8dfbdd2c32f1f4a1b");
   assert.equal(materialized.descriptor.sdk["script/url-target-support.ts"].mode, "render-and-verify");
   assert.equal(materialized.descriptor.policyRoot, legacy.entry.policyRoot);
+});
+
+test("legacy stable-template policies delegate to family emitters without duplicate templates", async () => {
+  const legacy = withLegacyStableTemplatePolicy(await currentResolvedPolicy());
+  const cacheRoot = await mkdtemp(path.join(tmpdir(), "deherm-legacy-stable-output-test-"));
+  const outputRoot = path.join(cacheRoot, "surfaces", legacy.revision);
+  const materialized = await materializePolicySurface(legacy, { outputRoot });
+  assert.equal(
+    Object.values(materialized.descriptor.outputs).filter(({ recipe }) => recipe === STABLE_OUTPUT_RECIPE).length,
+    11,
+  );
+  for (const [relative, record] of Object.entries(materialized.descriptor.outputs)) {
+    if (record.recipe !== STABLE_OUTPUT_RECIPE) continue;
+    const bytes = await readFile(path.join(outputRoot, "repository", relative));
+    assert.equal(bytes.length, oldPipelineFixture.outputs[relative].bytes, `${relative} legacy byte count changed`);
+    assert.equal(sha256(bytes), oldPipelineFixture.outputs[relative].sha256, `${relative} legacy bytes changed`);
+  }
 });
 
 test("authenticated policy materializes the complete generated SDK without a Defold tree", async () => {
@@ -333,6 +387,11 @@ test("authenticated policy materializes the complete generated SDK without a Def
     "package-owned revision-output emitters changed without updating their explicit inventory",
   );
   assert.equal(renderedOutputs.length, 113);
+  assert.equal(
+    Object.values(LOCALLY_RENDERED_OUTPUT_RECIPES).filter((recipe) => recipe === STABLE_OUTPUT_RECIPE).length,
+    0,
+    "current policies must use family emitters rather than the legacy stable-template dialect",
+  );
   assert.deepEqual(
     Object.entries(first.descriptor.outputs)
       .filter(([, record]) => record.mode === "authenticated-compatibility-source")

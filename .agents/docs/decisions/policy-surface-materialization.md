@@ -178,14 +178,16 @@ silently returning to the packed emitter modules.
 
 # Current executable cut
 
-The authenticated `@compiler` subtree is now a **65,304-byte manifest**, not a
+The authenticated `@compiler` subtree is now a **65,901-byte manifest**, not a
 21 MB container. It references 49 independently content-addressed semantic or
 compact recipe-fact documents, a 28-entry SDK manifest, and a 113-entry
 revision-output manifest. Every SDK and revision output is package-rendered;
 the current manifests contain zero compatibility-source entries.
 This keeps each object shareable without pretending the referenced facts have
-disappeared. The current reachable object graph is 21,434,700 bytes across 105
-subtrees.
+disappeared. The current 105 content-addressed subtree files occupy 21,421,625
+bytes; with the authenticated 13,637-byte root, the reachable graph is
+21,435,262 bytes. The mutable 5,742-byte revision index is measured separately,
+bringing the published store slice to 21,441,004 bytes.
 The 17,778,740-byte canonical lowering plan is already rebuilt locally from a
 2,682,082-byte authenticated recipe-facts object. The materialized document set
 contains the 49 authenticated documents plus three derived products: the
@@ -210,6 +212,16 @@ revision-keyed `surface.json` descriptor. The repository generator owns
 extraction, semantic selection, and policy production; it no longer owns the
 public materialization contract. Legacy compatibility-source records remain a
 supported v1 input mode, but current policies do not emit them.
+
+Current output realization uses 34 composable family recipe concepts for all
+113 files. The eleven outputs that formerly used the generic
+`output.stable-template.render.v1` dialect now use their borrowed-handle,
+C-string/value, enum/value, named-scalar, scalar, or scratch-scalar-out family
+emitter. The legacy capability remains only as a v1 decoder that delegates a
+known path to its current owning family; it contains no parallel template body.
+Repository generator scripts call the same package emitters, so the duplicated
+module, Lua-bridge, universal-JSI, vmath, and URL renderers are gone rather than
+retained as circular test oracles.
 
 ## Cache reopen authentication
 
@@ -299,9 +311,12 @@ coordination, and cleanup are portable before publication can proceed.
 
 ## Compiler document inventory
 
-The manifest references these revision-derived documents. “Copied” means the
-consumer currently materializes the document unchanged; it is not a claim that
-the document is a minimal policy input.
+The manifest references these revision-derived semantic, recipe, and evidence
+documents. “Copied” means the consumer materializes the authenticated document
+unchanged; it does not mean generated source is copied, and it is not a second
+authority for any emitted file. Further normalization in this table is a policy
+transfer optimization, not compatibility-source debt or a prerequisite for a
+routine Defold revision.
 
 | Document | Compact bytes | Current role | Required steady-state change |
 | --- | ---: | --- | --- |
@@ -440,10 +455,11 @@ no parser and reads no Defold checkout. The same test requires all 113 revision
 outputs (1,964,163 bytes) to be package-rendered, to contain zero compatibility
 sources, and to match the source pipeline byte for byte.
 
-The `<5 MB` compiler-object budget is enforced; the current manifest is 65,304
+The `<5 MB` compiler-object budget is enforced; the current manifest is 65,901
 bytes. This is a structural ownership and transfer boundary, not a claim that
-all semantic policy data is small: the current reachable graph is 21,434,700
-bytes. Issue [#93](https://github.com/ts-defold/deherm/issues/93) is complete
+all semantic policy data is small: the current authenticated root and its 105
+reachable subtree files occupy 21,435,262 bytes. Issue
+[#93](https://github.com/ts-defold/deherm/issues/93) is complete
 only when the package checks, focused runtime evidence, documentation, signed
 commit, and published branch all agree with this zero-snapshot inventory.
 

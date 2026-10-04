@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
 
-import { generate } from "../scripts/generate-script-route-availability-profiles.mjs";
+import { canonicalRegistrationRows, generate } from "../scripts/generate-script-route-availability-profiles.mjs";
 
 const root = new URL("../", import.meta.url);
 const reportPath = new URL("packages/bindings/generated/defold-script-route-availability-profiles.json", root);
@@ -164,6 +164,25 @@ test("canonical registration facts ignore formatting and private bodies but fail
   } finally {
     await rm(outputRoot, { recursive: true, force: true });
   }
+});
+
+test("a backend absent from a declared historical revision withdraws instead of blocking derivation", () => {
+  const spec = {
+    feature: "bullet3d",
+    path: "upstream/defold/engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d.cpp",
+    array: "BULLET3D_FUNCTIONS",
+    namespace: "bullet3d",
+  };
+  const surface = {
+    targets: {
+      "defold-engine-box2d-v3": { status: "verified", routes: [], registeredButUndeclared: [] },
+    },
+  };
+  assert.throws(
+    () => canonicalRegistrationRows(surface, spec, {}),
+    /canonical registration array 'BULLET3D_FUNCTIONS' is empty or absent/,
+  );
+  assert.deepEqual(canonicalRegistrationRows(surface, spec, { DEHERM_DERIVED_REVISION: "0".repeat(40) }), []);
 });
 
 test("runtime capability handshake contracts are complete generated material", async () => {

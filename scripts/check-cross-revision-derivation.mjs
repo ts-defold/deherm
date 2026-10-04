@@ -107,6 +107,7 @@ async function main() {
   const workspace = argv.includes("--workspace")
     ? argv[argv.indexOf("--workspace") + 1]
     : path.join(root, "build", "cross-revision");
+  const upstreamFrom = argv.includes("--upstream-from") ? argv[argv.indexOf("--upstream-from") + 1] : null;
   const update = argv.includes("--update-baseline");
 
   const baseline = JSON.parse(await readFile(baselinePath, "utf8"));
@@ -116,11 +117,40 @@ async function main() {
   // optional here: a control revision is by definition not the one the reviews
   // name, and the point is to measure the GENERATORS, not to rediscover that.
   await rm(workspace, { recursive: true, force: true });
-  await run(
-    process.execPath,
-    ["scripts/derive-revision.mjs", "--revision", revision, "--workspace", workspace, "--carry-reviews"],
-    { cwd: root, maxBuffer: 64 * 1024 * 1024 },
-  ).catch((error) => error);
+  let preparation;
+  try {
+    const derivationArgs = [
+      "scripts/derive-revision.mjs",
+      "--revision",
+      revision,
+      "--workspace",
+      workspace,
+      "--carry-reviews",
+      "--json",
+    ];
+    if (upstreamFrom) derivationArgs.push("--upstream-from", upstreamFrom);
+    const { stdout } = await run(process.execPath, derivationArgs, { cwd: root, maxBuffer: 64 * 1024 * 1024 });
+    preparation = JSON.parse(stdout);
+  } catch (error) {
+    // A generator refusal is an expected result of the preparation pass: the
+    // workspace is complete, and the loop below deliberately runs every step
+    // instead of stopping at that first refusal. Infrastructure/setup errors
+    // do not produce the derive-revision JSON report and must stop here. The
+    // old unconditional catch hid fetch/bootstrap failures and then counted
+    // missing inputs as generator regressions.
+    try {
+      preparation = JSON.parse(error.stdout ?? "");
+    } catch {
+      const detail = [error.stdout, error.stderr].filter(Boolean).join("\n").trim();
+      throw new Error(
+        `Could not prepare the cross-revision workspace for ${revision}` + (detail ? `:\n${detail}` : ""),
+        { cause: error },
+      );
+    }
+  }
+  if (!preparation?.committedSurfaceUnchanged || !["derived", "blocked"].includes(preparation.status)) {
+    throw new Error(`Cross-revision preparation returned an invalid report for ${revision}`);
+  }
 
   const env = {
     ...process.env,

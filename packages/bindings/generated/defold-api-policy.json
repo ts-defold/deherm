@@ -2,15 +2,15 @@
   "schemaVersion": 1,
   "kind": "deherm.policy.manifest",
   "comment": "A reviewable statement of what this checkout's policy store holds. It is NOT a policy object: it names the revision, which no content-addressed object may, and it records the reconciliation between upstream.lock's restated pins and Defold's own declaration.",
-  "generator": "sha256:2276598a6e6174ede829f2e7e94410dd18958025743c88ed6e3e1c8f44f07b2b",
+  "generator": "sha256:e59d913a761e9fb29e32c52d4d64e2398cfcceda7005af4cdd3f4b6f420f1b06",
   "producerPackageVersion": "0.1.0",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "policyRoot": "e56e0aad9f87bbb926a6afef418ffe064dce081301a5c00c48fb85a8c5734236",
+  "policyRoot": "5b059362c554555cc4bf5e54a657d49f95645121eaa453a90ece6e7062257228",
   "layoutVersion": "v1",
   "counts": {
     "subtrees": 105,
     "namespaces": 52,
-    "objectBytes": 21421002,
+    "objectBytes": 21421599,
     "indexEntries": 1
   },
   "toolchainPins": {
@@ -55,8 +55,8 @@
   ],
   "subtrees": {
     "@compiler": {
-      "hash": "04b5c7f59a2f3ee12529e6f4336d9f0554be913934a94c83dbb71dd70d4ccc4f",
-      "bytes": 65304
+      "hash": "16df919e3d6338014697543c46e5494bfb102e120bed0e32dcec052c85907af2",
+      "bytes": 65901
     },
     "@compiler:document:defold-binding-lowering-recipe-facts.json": {
       "hash": "8cea0b2d265ac57f1594a49888b7ca41d6ef0171d02a1def513c2a377828e4d7",
