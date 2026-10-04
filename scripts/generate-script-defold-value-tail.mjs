@@ -450,14 +450,36 @@ export function generateScriptDefoldValueTail(inputs) {
           routeName,
           source.path.replace(/^engine\//, ""),
         );
-        assert(registration, `${id}: positive Lua registration is absent from canonical registration surface`);
+        if (!registration) {
+          const message = `${id}: positive Lua registration is absent from canonical registration surface`;
+          assert(declaredDerivation(), message);
+          recordAudit({
+            input: "packages/bindings/overrides/script-defold-value-tail-bindings.json",
+            id,
+            status: VOID,
+            reason: "canonical-registration-unavailable",
+            detail: message,
+          });
+          continue;
+        }
         const surfaceRoute = registrationSurface.routes.get(routeName);
         assert(
           registration.cFunction === surfaceRoute.cFunction,
           `${id}: canonical Lua registration symbol is inconsistent`,
         );
         const context = contextCapability(text, registration.cFunction, family.requiredContext);
-        assert(context, `${id}: canonical source does not prove ${family.requiredContext} context`);
+        if (!context) {
+          const message = `${id}: canonical source does not prove ${family.requiredContext} context`;
+          assert(declaredDerivation(), message);
+          recordAudit({
+            input: "packages/bindings/overrides/script-defold-value-tail-bindings.json",
+            id,
+            status: VOID,
+            reason: "execution-context-unavailable",
+            detail: message,
+          });
+          continue;
+        }
         const codecEvidence = canonicalCodecs(fn, surfaceRoute, text, registration.cFunction);
         entry.sourceCapabilities = {
           registration,

@@ -10,16 +10,16 @@ export function runContract(report: Report): boolean {
   let ok = true;
   ok = runExercise(report, {
     contract: "contract_0175",
-    route: "script:bullet3d.get_world",
+    route: "script:bullet3d.rigid_body.get_world",
     arity: "required",
-    call: bullet3d.getWorld as unknown as (...args: readonly unknown[]) => unknown,
-    args: [],
+    call: bullet3d.rigidBody.getWorld as unknown as (...args: readonly unknown[]) => unknown,
+    args: [{"kind":"handle","handleKind":"bullet-object","ordinal":0}],
     providers,
-    minimumResultCount: 0,
+    minimumResultCount: 1,
     maximumResultCount: 1,
     resultCodec: null,
     resultNullable: false,
-    minimumArgumentCount: 0,
+    minimumArgumentCount: 1,
     repeatable: true,
     scratchReuse: true,
     errorModel: true

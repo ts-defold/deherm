@@ -12,8 +12,8 @@
   "inputEvidence": {
     "scriptIrSha256": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049",
     "bindingPatternsSha256": "9788b0873228cf8b9145aace14c3437d8b5fe69b7478da536743f0759c1a073e",
-    "valueBindingsSha256": "bf24ad8891c416aff1ca9eab8ef4eb822fb3ccca75afd3a04634d6dbf14b02bc",
-    "urlBindingsSha256": "72bcd1dc826e69824b4b2b06726ab38537635ad4c4f8661f537b96276d683c53",
+    "valueBindingsSha256": "0de2ca48989dedafead7d160f558aae6c7bb3591cc89c7b2bc9539cb34d1f65a",
+    "urlBindingsSha256": "436342bc62211213eb933aabae3da77888ab3c9d5592389c7db4c2286e3ce0bd",
     "luaRegistrationSurfaceSha256": "3d730e238c5da462d5ebb7bbdb907fd6f5f2924b11ac478c1aae340ce7da255b",
     "reviewedPolicySha256": "12b95d0cf89131451aa3b696d8bb8989463c986fb43bbbcd327feec056c986ee",
     "defoldSources": [
@@ -445,7 +445,10 @@
         },
         "context": {
           "kind": "render-script-instance",
-          "evidence": "RenderScriptInstance_Check"
+          "evidence": "registered-instance-userdata-check",
+          "contextType": "render-script-instance",
+          "typeHash": "RENDER_SCRIPT_INSTANCE_TYPE_HASH",
+          "metatable": "RENDER_SCRIPT_INSTANCE"
         },
         "codecs": {
           "inputs": [
@@ -741,7 +744,10 @@
         },
         "context": {
           "kind": "render-script-instance",
-          "evidence": "RenderScriptInstance_Check"
+          "evidence": "registered-instance-userdata-check",
+          "contextType": "render-script-instance",
+          "typeHash": "RENDER_SCRIPT_INSTANCE_TYPE_HASH",
+          "metatable": "RENDER_SCRIPT_INSTANCE"
         },
         "codecs": {
           "inputs": [
@@ -798,7 +804,10 @@
         },
         "context": {
           "kind": "render-script-instance",
-          "evidence": "RenderScriptInstance_Check"
+          "evidence": "registered-instance-userdata-check",
+          "contextType": "render-script-instance",
+          "typeHash": "RENDER_SCRIPT_INSTANCE_TYPE_HASH",
+          "metatable": "RENDER_SCRIPT_INSTANCE"
         },
         "codecs": {
           "inputs": [
@@ -1242,7 +1251,10 @@
         },
         "context": {
           "kind": "gui-script-instance",
-          "evidence": "GuiScriptInstance_Check"
+          "evidence": "registered-instance-userdata-check",
+          "contextType": "gui-scene",
+          "typeHash": "GUI_SCRIPT_INSTANCE_TYPE_HASH",
+          "metatable": "GUI_SCRIPT_INSTANCE"
         },
         "codecs": {
           "inputs": [
@@ -1305,7 +1317,10 @@
         },
         "context": {
           "kind": "gui-script-instance",
-          "evidence": "GuiScriptInstance_Check"
+          "evidence": "registered-instance-userdata-check",
+          "contextType": "gui-scene",
+          "typeHash": "GUI_SCRIPT_INSTANCE_TYPE_HASH",
+          "metatable": "GUI_SCRIPT_INSTANCE"
         },
         "codecs": {
           "inputs": [],
@@ -1587,7 +1602,10 @@
         },
         "context": {
           "kind": "render-script-instance",
-          "evidence": "RenderScriptInstance_Check"
+          "evidence": "registered-instance-userdata-check",
+          "contextType": "render-script-instance",
+          "typeHash": "RENDER_SCRIPT_INSTANCE_TYPE_HASH",
+          "metatable": "RENDER_SCRIPT_INSTANCE"
         },
         "codecs": {
           "inputs": [
@@ -1651,7 +1669,10 @@
         },
         "context": {
           "kind": "gui-script-instance",
-          "evidence": "GuiScriptInstance_Check"
+          "evidence": "registered-instance-userdata-check",
+          "contextType": "gui-scene",
+          "typeHash": "GUI_SCRIPT_INSTANCE_TYPE_HASH",
+          "metatable": "GUI_SCRIPT_INSTANCE"
         },
         "codecs": {
           "inputs": [
@@ -1713,7 +1734,10 @@
         },
         "context": {
           "kind": "gui-script-instance",
-          "evidence": "GuiScriptInstance_Check"
+          "evidence": "registered-instance-userdata-check",
+          "contextType": "gui-scene",
+          "typeHash": "GUI_SCRIPT_INSTANCE_TYPE_HASH",
+          "metatable": "GUI_SCRIPT_INSTANCE"
         },
         "codecs": {
           "inputs": [
@@ -1883,7 +1907,10 @@
         },
         "context": {
           "kind": "gui-script-instance",
-          "evidence": "GuiScriptInstance_Check"
+          "evidence": "registered-instance-userdata-check",
+          "contextType": "gui-scene",
+          "typeHash": "GUI_SCRIPT_INSTANCE_TYPE_HASH",
+          "metatable": "GUI_SCRIPT_INSTANCE"
         },
         "codecs": {
           "inputs": [

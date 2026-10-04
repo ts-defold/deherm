@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "coverageClaim": "All selected routes have generated stable-ID descriptors and one reusable captured-Lua lowering on native dynamic Hermes. Static Hermes, the flat C ABI, and HTML5 remain fail-closed for full structured URLs until their ABIs carry all four exact uint64 lanes.",
   "allocationClaim": "The generated URL sidecar and warmed native bridge path use fixed-capacity inline storage with deterministic exhaustion and no bridge-owned heap fallback. This does not claim that Lua, JSI object construction, or the called Defold engine operation is allocation-free.",
@@ -39,6 +39,15 @@
     "script:gui.set_texture_data",
     "script:resource.set_sound"
   ],
+  "optimizationEvidence": {
+    "requiredSourceEvidence": [
+      "dm-message-url-layout",
+      "dm-script-public-url-api"
+    ],
+    "executionContext": "captured-game-object-script-instance",
+    "codecProof": "exact-script-ir-and-binding-pattern-agreement",
+    "ownership": "ToURL-result-copied-before-Lua-pop-into-frame-local-generation-checked-ScriptUrlArena"
+  },
   "sourceEvidence": [
     {
       "id": "dm-message-url-layout",
@@ -54,24 +63,14 @@
       ]
     },
     {
-      "id": "dm-script-url-resolution",
-      "source": "engine/script/src/script_msg.cpp",
-      "sha256": "089d40349a4f6241743580801fe38d9704f0ba1bb66a666d013ab6ad850a73d2",
-      "anchors": [
-        "void PushURL(lua_State* L, const dmMessage::URL& url)",
-        "dmMessage::Result ResolveURL(lua_State* L, const char* url, dmMessage::URL* out_url, dmMessage::URL* default_url)",
-        "if (dmScript::IsURL(L, index))",
-        "else if (url != 0)",
-        "dmhash_t* phash = dmScript::ToHash(L, index);"
-      ]
-    },
-    {
       "id": "dm-script-public-url-api",
       "source": "engine/script/src/dmsdk/script/script.h",
       "sha256": "99d1dbf413a1ae84dcd3e6071628d50ba7d8177e0a1813bf2882ecbee15b7a9e",
       "anchors": [
-        "void PushURL(lua_State* L, const dmMessage::URL& url);",
-        "int ResolveURL(lua_State* L, int index, dmMessage::URL* out_url, dmMessage::URL* out_default_url);"
+        "void GetInstance(lua_State* L);",
+        "void SetInstance(lua_State* L);",
+        "dmMessage::URL* ToURL(lua_State *L, int index);",
+        "void PushURL(lua_State* L, const dmMessage::URL& url);"
       ]
     }
   ],

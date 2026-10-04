@@ -7,8 +7,6 @@
   "bindings": [
     {
       "id": "script:factory.create",
-      "sourceSymbol": "FactoryComp_Create",
-      "sourceOperation": ["dmScript::CheckGOInstance(L)", "dmScript::GetComponentFromLua(L, 1, FACTORY_EXT", "dmGameObject::PropertyContainerCreateFromLua(L, 4)", "CompFactorySpawn(world, component, collection", "lua_pushnil(L)"],
       "operation": {
         "template": "factory-spawn",
         "parameters": {
@@ -24,7 +22,26 @@
           "allocationPolicy": "engine-property-spawn-resource-may-allocate"
         }
       },
-      "callShapes": [["String"], ["Hash"], ["Url"], ["String", "Vector3"], ["Hash", "Vector3"], ["Url", "Vector3"], ["String", "Vector3", "Quaternion"], ["Hash", "Vector3", "Quaternion"], ["Url", "Vector3", "Quaternion"], ["String", "Vector3", "Quaternion", "Table"], ["Hash", "Vector3", "Quaternion", "Table"], ["Url", "Vector3", "Quaternion", "Table"], ["String", "Vector3", "Quaternion", "Table", "Number"], ["String", "Vector3", "Quaternion", "Table", "Vector3"], ["Hash", "Vector3", "Quaternion", "Table", "Number"], ["Hash", "Vector3", "Quaternion", "Table", "Vector3"], ["Url", "Vector3", "Quaternion", "Table", "Number"], ["Url", "Vector3", "Quaternion", "Table", "Vector3"]],
+      "callShapes": [
+        ["String"],
+        ["Hash"],
+        ["Url"],
+        ["String", "Vector3"],
+        ["Hash", "Vector3"],
+        ["Url", "Vector3"],
+        ["String", "Vector3", "Quaternion"],
+        ["Hash", "Vector3", "Quaternion"],
+        ["Url", "Vector3", "Quaternion"],
+        ["String", "Vector3", "Quaternion", "Table"],
+        ["Hash", "Vector3", "Quaternion", "Table"],
+        ["Url", "Vector3", "Quaternion", "Table"],
+        ["String", "Vector3", "Quaternion", "Table", "Number"],
+        ["String", "Vector3", "Quaternion", "Table", "Vector3"],
+        ["Hash", "Vector3", "Quaternion", "Table", "Number"],
+        ["Hash", "Vector3", "Quaternion", "Table", "Vector3"],
+        ["Url", "Vector3", "Quaternion", "Table", "Number"],
+        ["Url", "Vector3", "Quaternion", "Table", "Vector3"]
+      ],
       "resultCodec": "Hash"
     }
   ]

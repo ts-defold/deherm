@@ -5,14 +5,22 @@
   "inputEvidence": {
     "scriptIrSha256": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049",
     "bindingPatternsSha256": "9788b0873228cf8b9145aace14c3437d8b5fe69b7478da536743f0759c1a073e",
-    "reviewedOverridesSha256": "4fb0ed1ef477c93b10f3b47c7cdd46cb3d041594468544dea0113ed154fe390e"
+    "reviewedOverridesSha256": "be9f5e298afeed007c7ac9b0c0f1a5867a9c301e5281da09295c089497ead83a",
+    "registeredCallableEvidenceSha256": "cd6498761cd0beae3d869c1b7317dc1343414e9b30ee19f5d5122b196715f17c"
   },
   "routeCount": 14,
   "generatedFamilyCandidateCount": 11,
+  "optimizedReplayCount": 11,
+  "universalFallbackCount": 0,
   "blockedCount": 3,
   "maximumArgumentCount": 32,
   "allocationPolicy": "Generated dispatch uses sorted static descriptors and caller-owned ScriptCallFrame storage. The exact Lua backend must cache function references and use fixed-capacity stack/scratch; there is no heap fallback in generated glue.",
-  "evidencePolicy": "Source hashes and implementation anchors prove what was reviewed. Focused native tests prove the generated ABI and compile Defold's exact Lua BitOp implementation; socket.skip uses a source-equivalent local C function and types.* use local type-identity stand-ins, so neither is claimed semantically engine-proven. No route enters global executable accounting until the shared ScriptAdapter/JSI router is integrated, and no packaged-engine or browser execution is claimed.",
+  "evidencePolicy": "Replay admission uses callable registration in every required engine profile plus exact IR/pattern codec shape and registration-derived arity. Private C function names and implementation bodies are non-evidence. Blocked recursive routes retain their separate source-reviewed semantic blockers. Focused native tests prove bounded Lua replay transport, not packaged-engine implementation semantics.",
+  "replayContract": {
+    "executionContext": "global-lua-module",
+    "codecEvidence": "exact-script-ir-and-binding-pattern-shape-plus-registration-derived-arity",
+    "ownership": "synchronous-Lua-results-copied-into-caller-owned-bounded-ScriptCallFrame-before-stack-restore"
+  },
   "blockerCounts": {
     "recursive-json-value-policy": 2,
     "recursive-log-side-effect-policy": 1
@@ -27,17 +35,44 @@
       "member": "bor",
       "strategy": "exact-lua-call",
       "generatedFamilyExecutableCandidate": true,
+      "optimizationProven": true,
+      "optimizationBlockers": [],
       "minimumArguments": 1,
       "maximumArguments": 32,
       "resultMode": "number",
       "blocker": null,
       "blockerDetail": null,
-      "sourceEvidence": {
-        "path": "engine/script/src/bitop/bitop.c",
-        "sha256": "98b344b9d460859c9bfbfeb640c652242f8b823b5080494f63b381c11da1c5eb",
-        "anchor": "BIT_OP\\(bit_bor,\\s*\\|=\\)"
+      "replayEvidence": {
+        "registrations": [
+          {
+            "target": "defold-engine-box2d-v3",
+            "module": "bit",
+            "member": "bor",
+            "minimumArguments": 1,
+            "registrationPath": "script/src/bitop/bitop.c"
+          },
+          {
+            "target": "defold-engine-box2d-v2",
+            "module": "bit",
+            "member": "bor",
+            "minimumArguments": 1,
+            "registrationPath": "script/src/bitop/bitop.c"
+          }
+        ],
+        "executionContext": "global-lua-module",
+        "parameterTypes": [
+          "number",
+          "number"
+        ],
+        "returnTypes": [
+          "number"
+        ],
+        "traits": [
+          "variable-arguments"
+        ],
+        "ownership": "synchronous-Lua-results-copied-into-caller-owned-bounded-ScriptCallFrame-before-stack-restore"
       },
-      "focusedNativeEvidence": "observed-exact-upstream-bitop-implementation",
+      "focusedNativeEvidence": "observed-bounded-registered-Lua-replay-transport",
       "targetSupport": {
         "nativeDynamicHermes": "candidate-awaits-shared-router-integration",
         "nativeStaticHermes": "planned-generated-adapter",
@@ -53,17 +88,43 @@
       "member": "is_hash",
       "strategy": "exact-lua-type-query",
       "generatedFamilyExecutableCandidate": true,
+      "optimizationProven": true,
+      "optimizationBlockers": [],
       "minimumArguments": 0,
       "maximumArguments": 32,
       "resultMode": "boolean",
       "blocker": null,
       "blockerDetail": null,
-      "sourceEvidence": {
-        "path": "engine/script/src/script_types.cpp",
-        "sha256": "c03d49b6265c9dac0597db5296ef3139c2c47ee334c8e3ad40813726c74cd1d2",
-        "anchor": "\\{\\s*\"is_hash\",\\s*Types_IsHash\\s*\\}"
+      "replayEvidence": {
+        "registrations": [
+          {
+            "target": "defold-engine-box2d-v3",
+            "module": "types",
+            "member": "is_hash",
+            "minimumArguments": 0,
+            "registrationPath": "script/src/script_types.cpp"
+          },
+          {
+            "target": "defold-engine-box2d-v2",
+            "module": "types",
+            "member": "is_hash",
+            "minimumArguments": 0,
+            "registrationPath": "script/src/script_types.cpp"
+          }
+        ],
+        "executionContext": "global-lua-module",
+        "parameterTypes": [
+          "any"
+        ],
+        "returnTypes": [
+          "boolean"
+        ],
+        "traits": [
+          "dynamic-any"
+        ],
+        "ownership": "synchronous-Lua-results-copied-into-caller-owned-bounded-ScriptCallFrame-before-stack-restore"
       },
-      "focusedNativeEvidence": "observed-transport-with-local-type-identity-stand-ins",
+      "focusedNativeEvidence": "observed-bounded-registered-Lua-replay-transport",
       "targetSupport": {
         "nativeDynamicHermes": "candidate-awaits-shared-router-integration",
         "nativeStaticHermes": "planned-generated-adapter",
@@ -79,6 +140,10 @@
       "member": "decode",
       "strategy": "blocked",
       "generatedFamilyExecutableCandidate": false,
+      "optimizationProven": false,
+      "optimizationBlockers": [
+        "recursive-json-value-policy"
+      ],
       "minimumArguments": null,
       "maximumArguments": null,
       "resultMode": null,
@@ -105,17 +170,44 @@
       "member": "band",
       "strategy": "exact-lua-call",
       "generatedFamilyExecutableCandidate": true,
+      "optimizationProven": true,
+      "optimizationBlockers": [],
       "minimumArguments": 1,
       "maximumArguments": 32,
       "resultMode": "number",
       "blocker": null,
       "blockerDetail": null,
-      "sourceEvidence": {
-        "path": "engine/script/src/bitop/bitop.c",
-        "sha256": "98b344b9d460859c9bfbfeb640c652242f8b823b5080494f63b381c11da1c5eb",
-        "anchor": "BIT_OP\\(bit_band,\\s*&=\\)"
+      "replayEvidence": {
+        "registrations": [
+          {
+            "target": "defold-engine-box2d-v3",
+            "module": "bit",
+            "member": "band",
+            "minimumArguments": 1,
+            "registrationPath": "script/src/bitop/bitop.c"
+          },
+          {
+            "target": "defold-engine-box2d-v2",
+            "module": "bit",
+            "member": "band",
+            "minimumArguments": 1,
+            "registrationPath": "script/src/bitop/bitop.c"
+          }
+        ],
+        "executionContext": "global-lua-module",
+        "parameterTypes": [
+          "number",
+          "number"
+        ],
+        "returnTypes": [
+          "number"
+        ],
+        "traits": [
+          "variable-arguments"
+        ],
+        "ownership": "synchronous-Lua-results-copied-into-caller-owned-bounded-ScriptCallFrame-before-stack-restore"
       },
-      "focusedNativeEvidence": "observed-exact-upstream-bitop-implementation",
+      "focusedNativeEvidence": "observed-bounded-registered-Lua-replay-transport",
       "targetSupport": {
         "nativeDynamicHermes": "candidate-awaits-shared-router-integration",
         "nativeStaticHermes": "planned-generated-adapter",
@@ -131,17 +223,44 @@
       "member": "bxor",
       "strategy": "exact-lua-call",
       "generatedFamilyExecutableCandidate": true,
+      "optimizationProven": true,
+      "optimizationBlockers": [],
       "minimumArguments": 1,
       "maximumArguments": 32,
       "resultMode": "number",
       "blocker": null,
       "blockerDetail": null,
-      "sourceEvidence": {
-        "path": "engine/script/src/bitop/bitop.c",
-        "sha256": "98b344b9d460859c9bfbfeb640c652242f8b823b5080494f63b381c11da1c5eb",
-        "anchor": "BIT_OP\\(bit_bxor,\\s*\\^=\\)"
+      "replayEvidence": {
+        "registrations": [
+          {
+            "target": "defold-engine-box2d-v3",
+            "module": "bit",
+            "member": "bxor",
+            "minimumArguments": 1,
+            "registrationPath": "script/src/bitop/bitop.c"
+          },
+          {
+            "target": "defold-engine-box2d-v2",
+            "module": "bit",
+            "member": "bxor",
+            "minimumArguments": 1,
+            "registrationPath": "script/src/bitop/bitop.c"
+          }
+        ],
+        "executionContext": "global-lua-module",
+        "parameterTypes": [
+          "number",
+          "number"
+        ],
+        "returnTypes": [
+          "number"
+        ],
+        "traits": [
+          "variable-arguments"
+        ],
+        "ownership": "synchronous-Lua-results-copied-into-caller-owned-bounded-ScriptCallFrame-before-stack-restore"
       },
-      "focusedNativeEvidence": "observed-exact-upstream-bitop-implementation",
+      "focusedNativeEvidence": "observed-bounded-registered-Lua-replay-transport",
       "targetSupport": {
         "nativeDynamicHermes": "candidate-awaits-shared-router-integration",
         "nativeStaticHermes": "planned-generated-adapter",
@@ -157,17 +276,43 @@
       "member": "is_matrix4",
       "strategy": "exact-lua-type-query",
       "generatedFamilyExecutableCandidate": true,
+      "optimizationProven": true,
+      "optimizationBlockers": [],
       "minimumArguments": 0,
       "maximumArguments": 32,
       "resultMode": "boolean",
       "blocker": null,
       "blockerDetail": null,
-      "sourceEvidence": {
-        "path": "engine/script/src/script_types.cpp",
-        "sha256": "c03d49b6265c9dac0597db5296ef3139c2c47ee334c8e3ad40813726c74cd1d2",
-        "anchor": "\\{\\s*\"is_matrix4\",\\s*Types_IsMatrix4\\s*\\}"
+      "replayEvidence": {
+        "registrations": [
+          {
+            "target": "defold-engine-box2d-v3",
+            "module": "types",
+            "member": "is_matrix4",
+            "minimumArguments": 0,
+            "registrationPath": "script/src/script_types.cpp"
+          },
+          {
+            "target": "defold-engine-box2d-v2",
+            "module": "types",
+            "member": "is_matrix4",
+            "minimumArguments": 0,
+            "registrationPath": "script/src/script_types.cpp"
+          }
+        ],
+        "executionContext": "global-lua-module",
+        "parameterTypes": [
+          "any"
+        ],
+        "returnTypes": [
+          "boolean"
+        ],
+        "traits": [
+          "dynamic-any"
+        ],
+        "ownership": "synchronous-Lua-results-copied-into-caller-owned-bounded-ScriptCallFrame-before-stack-restore"
       },
-      "focusedNativeEvidence": "observed-transport-with-local-type-identity-stand-ins",
+      "focusedNativeEvidence": "observed-bounded-registered-Lua-replay-transport",
       "targetSupport": {
         "nativeDynamicHermes": "candidate-awaits-shared-router-integration",
         "nativeStaticHermes": "planned-generated-adapter",
@@ -183,17 +328,46 @@
       "member": "skip",
       "strategy": "exact-lua-call",
       "generatedFamilyExecutableCandidate": true,
+      "optimizationProven": true,
+      "optimizationBlockers": [],
       "minimumArguments": 1,
       "maximumArguments": 32,
       "resultMode": "variable-values",
       "blocker": null,
       "blockerDetail": null,
-      "sourceEvidence": {
-        "path": "engine/script/src/luasocket/luasocket.c",
-        "sha256": "0d6632d082e1790e2175d1aff21a8b22a8870e0bd4f66ba0337e65d188782c3f",
-        "anchor": "int ret = lua_gettop\\(L\\) - amount - 1;\\s*return ret >= 0 \\? ret : 0;"
+      "replayEvidence": {
+        "registrations": [
+          {
+            "target": "defold-engine-box2d-v3",
+            "module": "socket",
+            "member": "skip",
+            "minimumArguments": 1,
+            "registrationPath": "script/src/luasocket/luasocket.c"
+          },
+          {
+            "target": "defold-engine-box2d-v2",
+            "module": "socket",
+            "member": "skip",
+            "minimumArguments": 1,
+            "registrationPath": "script/src/luasocket/luasocket.c"
+          }
+        ],
+        "executionContext": "global-lua-module",
+        "parameterTypes": [
+          "integer",
+          "any"
+        ],
+        "returnTypes": [
+          "..."
+        ],
+        "traits": [
+          "dynamic-any",
+          "variable-arguments",
+          "variable-results"
+        ],
+        "ownership": "synchronous-Lua-results-copied-into-caller-owned-bounded-ScriptCallFrame-before-stack-restore"
       },
-      "focusedNativeEvidence": "observed-transport-with-source-equivalent-test-function",
+      "focusedNativeEvidence": "observed-bounded-registered-Lua-replay-transport",
       "targetSupport": {
         "nativeDynamicHermes": "candidate-awaits-shared-router-integration",
         "nativeStaticHermes": "planned-generated-adapter",
@@ -209,6 +383,10 @@
       "member": "pprint",
       "strategy": "blocked",
       "generatedFamilyExecutableCandidate": false,
+      "optimizationProven": false,
+      "optimizationBlockers": [
+        "recursive-log-side-effect-policy"
+      ],
       "minimumArguments": null,
       "maximumArguments": null,
       "resultMode": null,
@@ -235,6 +413,10 @@
       "member": "encode",
       "strategy": "blocked",
       "generatedFamilyExecutableCandidate": false,
+      "optimizationProven": false,
+      "optimizationBlockers": [
+        "recursive-json-value-policy"
+      ],
       "minimumArguments": null,
       "maximumArguments": null,
       "resultMode": null,
@@ -261,17 +443,43 @@
       "member": "is_quat",
       "strategy": "exact-lua-type-query",
       "generatedFamilyExecutableCandidate": true,
+      "optimizationProven": true,
+      "optimizationBlockers": [],
       "minimumArguments": 0,
       "maximumArguments": 32,
       "resultMode": "boolean",
       "blocker": null,
       "blockerDetail": null,
-      "sourceEvidence": {
-        "path": "engine/script/src/script_types.cpp",
-        "sha256": "c03d49b6265c9dac0597db5296ef3139c2c47ee334c8e3ad40813726c74cd1d2",
-        "anchor": "\\{\\s*\"is_quat\",\\s*Types_IsQuat\\s*\\}"
+      "replayEvidence": {
+        "registrations": [
+          {
+            "target": "defold-engine-box2d-v3",
+            "module": "types",
+            "member": "is_quat",
+            "minimumArguments": 0,
+            "registrationPath": "script/src/script_types.cpp"
+          },
+          {
+            "target": "defold-engine-box2d-v2",
+            "module": "types",
+            "member": "is_quat",
+            "minimumArguments": 0,
+            "registrationPath": "script/src/script_types.cpp"
+          }
+        ],
+        "executionContext": "global-lua-module",
+        "parameterTypes": [
+          "any"
+        ],
+        "returnTypes": [
+          "boolean"
+        ],
+        "traits": [
+          "dynamic-any"
+        ],
+        "ownership": "synchronous-Lua-results-copied-into-caller-owned-bounded-ScriptCallFrame-before-stack-restore"
       },
-      "focusedNativeEvidence": "observed-transport-with-local-type-identity-stand-ins",
+      "focusedNativeEvidence": "observed-bounded-registered-Lua-replay-transport",
       "targetSupport": {
         "nativeDynamicHermes": "candidate-awaits-shared-router-integration",
         "nativeStaticHermes": "planned-generated-adapter",
@@ -287,17 +495,43 @@
       "member": "is_vector",
       "strategy": "exact-lua-type-query",
       "generatedFamilyExecutableCandidate": true,
+      "optimizationProven": true,
+      "optimizationBlockers": [],
       "minimumArguments": 0,
       "maximumArguments": 32,
       "resultMode": "boolean",
       "blocker": null,
       "blockerDetail": null,
-      "sourceEvidence": {
-        "path": "engine/script/src/script_types.cpp",
-        "sha256": "c03d49b6265c9dac0597db5296ef3139c2c47ee334c8e3ad40813726c74cd1d2",
-        "anchor": "\\{\\s*\"is_vector\",\\s*Types_IsVector\\s*\\}"
+      "replayEvidence": {
+        "registrations": [
+          {
+            "target": "defold-engine-box2d-v3",
+            "module": "types",
+            "member": "is_vector",
+            "minimumArguments": 0,
+            "registrationPath": "script/src/script_types.cpp"
+          },
+          {
+            "target": "defold-engine-box2d-v2",
+            "module": "types",
+            "member": "is_vector",
+            "minimumArguments": 0,
+            "registrationPath": "script/src/script_types.cpp"
+          }
+        ],
+        "executionContext": "global-lua-module",
+        "parameterTypes": [
+          "any"
+        ],
+        "returnTypes": [
+          "boolean"
+        ],
+        "traits": [
+          "dynamic-any"
+        ],
+        "ownership": "synchronous-Lua-results-copied-into-caller-owned-bounded-ScriptCallFrame-before-stack-restore"
       },
-      "focusedNativeEvidence": "observed-transport-with-local-type-identity-stand-ins",
+      "focusedNativeEvidence": "observed-bounded-registered-Lua-replay-transport",
       "targetSupport": {
         "nativeDynamicHermes": "candidate-awaits-shared-router-integration",
         "nativeStaticHermes": "planned-generated-adapter",
@@ -313,17 +547,43 @@
       "member": "is_vector4",
       "strategy": "exact-lua-type-query",
       "generatedFamilyExecutableCandidate": true,
+      "optimizationProven": true,
+      "optimizationBlockers": [],
       "minimumArguments": 0,
       "maximumArguments": 32,
       "resultMode": "boolean",
       "blocker": null,
       "blockerDetail": null,
-      "sourceEvidence": {
-        "path": "engine/script/src/script_types.cpp",
-        "sha256": "c03d49b6265c9dac0597db5296ef3139c2c47ee334c8e3ad40813726c74cd1d2",
-        "anchor": "\\{\\s*\"is_vector4\",\\s*Types_IsVector4\\s*\\}"
+      "replayEvidence": {
+        "registrations": [
+          {
+            "target": "defold-engine-box2d-v3",
+            "module": "types",
+            "member": "is_vector4",
+            "minimumArguments": 0,
+            "registrationPath": "script/src/script_types.cpp"
+          },
+          {
+            "target": "defold-engine-box2d-v2",
+            "module": "types",
+            "member": "is_vector4",
+            "minimumArguments": 0,
+            "registrationPath": "script/src/script_types.cpp"
+          }
+        ],
+        "executionContext": "global-lua-module",
+        "parameterTypes": [
+          "any"
+        ],
+        "returnTypes": [
+          "boolean"
+        ],
+        "traits": [
+          "dynamic-any"
+        ],
+        "ownership": "synchronous-Lua-results-copied-into-caller-owned-bounded-ScriptCallFrame-before-stack-restore"
       },
-      "focusedNativeEvidence": "observed-transport-with-local-type-identity-stand-ins",
+      "focusedNativeEvidence": "observed-bounded-registered-Lua-replay-transport",
       "targetSupport": {
         "nativeDynamicHermes": "candidate-awaits-shared-router-integration",
         "nativeStaticHermes": "planned-generated-adapter",
@@ -339,17 +599,43 @@
       "member": "is_vector3",
       "strategy": "exact-lua-type-query",
       "generatedFamilyExecutableCandidate": true,
+      "optimizationProven": true,
+      "optimizationBlockers": [],
       "minimumArguments": 0,
       "maximumArguments": 32,
       "resultMode": "boolean",
       "blocker": null,
       "blockerDetail": null,
-      "sourceEvidence": {
-        "path": "engine/script/src/script_types.cpp",
-        "sha256": "c03d49b6265c9dac0597db5296ef3139c2c47ee334c8e3ad40813726c74cd1d2",
-        "anchor": "\\{\\s*\"is_vector3\",\\s*Types_IsVector3\\s*\\}"
+      "replayEvidence": {
+        "registrations": [
+          {
+            "target": "defold-engine-box2d-v3",
+            "module": "types",
+            "member": "is_vector3",
+            "minimumArguments": 0,
+            "registrationPath": "script/src/script_types.cpp"
+          },
+          {
+            "target": "defold-engine-box2d-v2",
+            "module": "types",
+            "member": "is_vector3",
+            "minimumArguments": 0,
+            "registrationPath": "script/src/script_types.cpp"
+          }
+        ],
+        "executionContext": "global-lua-module",
+        "parameterTypes": [
+          "any"
+        ],
+        "returnTypes": [
+          "boolean"
+        ],
+        "traits": [
+          "dynamic-any"
+        ],
+        "ownership": "synchronous-Lua-results-copied-into-caller-owned-bounded-ScriptCallFrame-before-stack-restore"
       },
-      "focusedNativeEvidence": "observed-transport-with-local-type-identity-stand-ins",
+      "focusedNativeEvidence": "observed-bounded-registered-Lua-replay-transport",
       "targetSupport": {
         "nativeDynamicHermes": "candidate-awaits-shared-router-integration",
         "nativeStaticHermes": "planned-generated-adapter",
@@ -365,17 +651,43 @@
       "member": "is_url",
       "strategy": "exact-lua-type-query",
       "generatedFamilyExecutableCandidate": true,
+      "optimizationProven": true,
+      "optimizationBlockers": [],
       "minimumArguments": 0,
       "maximumArguments": 32,
       "resultMode": "boolean",
       "blocker": null,
       "blockerDetail": null,
-      "sourceEvidence": {
-        "path": "engine/script/src/script_types.cpp",
-        "sha256": "c03d49b6265c9dac0597db5296ef3139c2c47ee334c8e3ad40813726c74cd1d2",
-        "anchor": "\\{\\s*\"is_url\",\\s*Types_IsUrl\\s*\\}"
+      "replayEvidence": {
+        "registrations": [
+          {
+            "target": "defold-engine-box2d-v3",
+            "module": "types",
+            "member": "is_url",
+            "minimumArguments": 0,
+            "registrationPath": "script/src/script_types.cpp"
+          },
+          {
+            "target": "defold-engine-box2d-v2",
+            "module": "types",
+            "member": "is_url",
+            "minimumArguments": 0,
+            "registrationPath": "script/src/script_types.cpp"
+          }
+        ],
+        "executionContext": "global-lua-module",
+        "parameterTypes": [
+          "any"
+        ],
+        "returnTypes": [
+          "boolean"
+        ],
+        "traits": [
+          "dynamic-any"
+        ],
+        "ownership": "synchronous-Lua-results-copied-into-caller-owned-bounded-ScriptCallFrame-before-stack-restore"
       },
-      "focusedNativeEvidence": "observed-transport-with-local-type-identity-stand-ins",
+      "focusedNativeEvidence": "observed-bounded-registered-Lua-replay-transport",
       "targetSupport": {
         "nativeDynamicHermes": "candidate-awaits-shared-router-integration",
         "nativeStaticHermes": "planned-generated-adapter",

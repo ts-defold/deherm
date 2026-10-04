@@ -6,8 +6,8 @@ import path from "node:path";
 import test from "node:test";
 
 import { stableBindingId } from "../scripts/lib/binding-identity.mjs";
+import { luaHandleRepresentationCapability } from "../scripts/lib/defold-lua-structural-capabilities.mjs";
 import { generateBorrowedHandleClassification } from "../scripts/generate-borrowed-handle-classification.mjs";
-import { MOVED, VOID, classifyReviewedSource } from "../scripts/lib/revision-audit.mjs";
 
 const root = new URL("../", import.meta.url);
 
@@ -44,6 +44,9 @@ const checked = JSON.parse(await text("packages/bindings/generated/defold-script
 
 test("partitions all 437 borrowed-handle routes exactly once", () => {
   assert.equal(generated.routeCount, 437);
+  assert.equal(generated.runtimeRouteCount, 429);
+  assert.equal(generated.representationOnlyRouteCount, 375);
+  assert.equal(generated.lifecycleEffectRouteCount, 62);
   assert.deepEqual(generated.operationClassCounts, {
     "checked-handle-input-terminal": 367,
     "checked-child-engine-object-invalidate": 2,
@@ -120,32 +123,77 @@ test("scopes a handle kind's representation to the backend that implements it", 
       representation: "lua-rooted-userdata",
       capturable: true,
       sourceEvidence: ["box2d-body"],
+      structuralCapability: {
+        kind: "full-userdata",
+        sourceEvidence: "box2d-body",
+        allocation: { extent: "sizeof-wrapper-type", constructions: 1 },
+        metatable: "b2body",
+        typeCheck: { api: "dmScript::CheckUserType", identity: "registered-user-type-hash" },
+        registration: {
+          kind: "register-user-type",
+          metatable: "b2body",
+          typeHashRelation: "same-registered-hash",
+        },
+        rooting: "lua-registry-rootable",
+      },
     },
   ]);
 });
 
-test("Box2D body evidence proves the rooted-userdata transport boundary, not private payload fields", () => {
+test("Box2D body structural capability ignores private wrapper/payload spelling and withdraws on shape loss", () => {
   const override = JSON.parse(sourceInputs.overrideText);
   const evidence = override.sourceEvidence.find(({ id }) => id === "box2d-body");
+  const spec = override.handleKinds.find(({ id }) => id === "box2d-body").representationCapability;
   const source = sourceInputs.sourceTexts.get(evidence.source);
 
   const privateRepresentationDrift = source
+    .replaceAll("B2DLuaBody", "PhysicsBodyUserdata")
+    .replaceAll("BOX2D_TYPE_NAME_BODY", "PHYSICS_BODY_METATABLE")
+    .replaceAll("TYPE_HASH_BODY", "PHYSICS_BODY_USERDATA_HASH")
     .replace("dmGameObject::HCollection m_Collection;", "dmGameObject::HGameObject m_Instance;")
     .replace("dmhash_t                  m_InstanceId;", "")
     .replace("uint32_t                  m_InstanceGeneration;", "");
-  const moved = classifyReviewedSource(privateRepresentationDrift, evidence);
-  assert.equal(moved.status, MOVED);
-  assert.deepEqual(moved.anchorsLost, []);
+  assert.deepEqual(
+    luaHandleRepresentationCapability(privateRepresentationDrift, spec),
+    luaHandleRepresentationCapability(source, spec),
+  );
+  const directMetatableLiteral = source
+    .replace('#define BOX2D_TYPE_NAME_BODY "b2body"', "")
+    .replaceAll("BOX2D_TYPE_NAME_BODY", '"b2body"');
+  assert.deepEqual(
+    luaHandleRepresentationCapability(directMetatableLiteral, spec),
+    luaHandleRepresentationCapability(source, spec),
+  );
 
   const failures = [
-    [source.replace("lua_newuserdata(L, sizeof(B2DLuaBody))", "lua_pushlightuserdata(L, body)"), /lua_newuserdata/],
-    [source.replace("luaL_register(L, 0, Body_functions)", "RegisterBodyFunctionsWasRemoved(L)"), /luaL_register/],
-    [source.replace("dmScript::CheckUserType(L, index, TYPE_HASH_BODY", "UncheckedBodyCast(L, index"), /CheckUserType/],
+    [source.replaceAll("lua_newuserdata(L, sizeof(B2DLuaBody))", "lua_pushlightuserdata(L, body)"), /lua_newuserdata/],
+    [source.replaceAll("luaL_getmetatable(L, BOX2D_TYPE_NAME_BODY)", "PushBodyWithoutRegisteredType(L)"), /metatable/],
+    [
+      source.replaceAll("dmScript::CheckUserType(L, index, TYPE_HASH_BODY", "UncheckedBodyCast(L, index"),
+      /CheckUserType/,
+    ],
   ];
-  for (const [changed, lostAnchor] of failures) {
-    const verdict = classifyReviewedSource(changed, evidence);
-    assert.equal(verdict.status, VOID);
-    assert.ok(verdict.anchorsLost.some((anchor) => lostAnchor.test(anchor)));
+  for (const [changed] of failures) {
+    assert.equal(luaHandleRepresentationCapability(changed, spec), null);
+  }
+
+  const commentedOutEvidence = [
+    source.replaceAll(
+      "lua_newuserdata(L, sizeof(B2DLuaBody))",
+      "lua_pushlightuserdata(L, body) /* lua_newuserdata(L, sizeof(B2DLuaBody)) */",
+    ),
+    source.replace(
+      "TYPE_HASH_BODY = dmScript::RegisterUserType(L, BOX2D_TYPE_NAME_BODY, Body_methods, Body_meta);",
+      "TYPE_HASH_BODY = 0; /* TYPE_HASH_BODY = dmScript::RegisterUserType(L, BOX2D_TYPE_NAME_BODY, Body_methods, Body_meta); */",
+    ),
+    source.replace(
+      'dmScript::CheckUserType(L, index, TYPE_HASH_BODY, "Expected user type " BOX2D_TYPE_NAME_BODY)',
+      'lua_touserdata(L, index) /* dmScript::CheckUserType(L, index, TYPE_HASH_BODY, "Expected user type " BOX2D_TYPE_NAME_BODY) */',
+    ),
+  ];
+  for (const changed of commentedOutEvidence) {
+    assert.notEqual(changed, source);
+    assert.equal(luaHandleRepresentationCapability(changed, spec), null);
   }
 });
 
@@ -260,13 +308,25 @@ test("fails closed on census, exception, stable-ID, kind, and source drift", () 
   });
   assert.throws(() => generateBorrowedHandleClassification(missingKind), /no raw handle types/);
 
+  const malformedCapability = structuredClone(sourceInputs);
+  malformedCapability.overrideText = replaceJson(malformedCapability.overrideText, (value) => {
+    delete value.handleKinds.find(({ id }) => id === "box2d-body").representationCapability.metatableLiteral;
+  });
+  assert.throws(
+    () => generateBorrowedHandleClassification(malformedCapability),
+    /representation capability needs metatableLiteral/,
+  );
+
   // A cited source this revision does not have - or has without a reviewed
   // anchor - is withdrawn by `loadReviewedSources` before `generate` sees it.
   // Outside a declared derivation that withdrawal is still fatal, because at
   // the reviewed revision every citation resolves.
   const withdrawnSource = structuredClone(sourceInputs);
   withdrawnSource.withdrawnSources = new Set([JSON.parse(withdrawnSource.overrideText).sourceEvidence[0].source]);
-  assert.throws(() => generateBorrowedHandleClassification(withdrawnSource), /unknown source evidence/);
+  assert.throws(
+    () => generateBorrowedHandleClassification(withdrawnSource),
+    /structural representation capability is absent/,
+  );
 });
 
 test("a withdrawn handle kind removes only its optimized routes during revision derivation", async () => {
@@ -291,6 +351,51 @@ test("a withdrawn handle kind removes only its optimized routes during revision 
         [...inputHandleKinds, ...returnHandleKinds].includes("box2d-body"),
       ),
       "routes requiring the withdrawn body specialization use the universal fallback",
+    );
+  } finally {
+    if (previousRevision === undefined) delete process.env.DEHERM_DERIVED_REVISION;
+    else process.env.DEHERM_DERIVED_REVISION = previousRevision;
+    if (previousAudit === undefined) delete process.env.DEHERM_REVISION_AUDIT;
+    else process.env.DEHERM_REVISION_AUDIT = previousAudit;
+    await rm(auditDirectory, { recursive: true, force: true });
+  }
+});
+
+test("lifecycle withdrawal preserves terminal replay and removes effectful routes only", async () => {
+  const derived = structuredClone(sourceInputs);
+  const override = JSON.parse(derived.overrideText);
+  const bodyEvidence = override.sourceEvidence.find(({ id }) => id === "box2d-body");
+  derived.sourceTexts.set(
+    bodyEvidence.source,
+    derived.sourceTexts.get(bodyEvidence.source).replaceAll("b2Body_IsValid", "PhysicsBodyStateProbe"),
+  );
+  const revision = JSON.parse(derived.irText).defoldRevision;
+  const previousRevision = process.env.DEHERM_DERIVED_REVISION;
+  const previousAudit = process.env.DEHERM_REVISION_AUDIT;
+  const auditDirectory = await mkdtemp(path.join(tmpdir(), "deherm-borrowed-handle-lifecycle-"));
+  process.env.DEHERM_DERIVED_REVISION = revision;
+  process.env.DEHERM_REVISION_AUDIT = path.join(auditDirectory, "audit.ndjson");
+  try {
+    const report = generateBorrowedHandleClassification(derived);
+    const terminal = report.rows.find(({ id }) => id === "script:b2d.body.set_active");
+    assert.ok(terminal, "representation-only terminal replay remains optimized");
+    assert.deepEqual(terminal.evidenceRequirements, {
+      representation: ["box2d-body"],
+      lifecycleEffects: [],
+    });
+    assert.equal(
+      report.rows.find(({ id }) => id === "script:b2d.get_body"),
+      undefined,
+      "a capture whose ownership evidence moved uses the universal fallback",
+    );
+    assert.equal(
+      report.rows.find(({ id }) => id === "script:b2d.body.destroy_shape"),
+      undefined,
+      "an invalidator whose lifecycle evidence moved uses the universal fallback",
+    );
+    assert.ok(
+      report.rows.some(({ id }) => id === "script:b2d.get_world"),
+      "unrelated effects remain optimized",
     );
   } finally {
     if (previousRevision === undefined) delete process.env.DEHERM_DERIVED_REVISION;

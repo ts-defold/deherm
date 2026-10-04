@@ -3,17 +3,17 @@
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "scope": "generated-script-recording-engine",
   "evidenceBoundary": "This harness proves only that the generated binding stack matches this repository's declared contract for each route. It is a null/observer engine: it is not Defold, and nothing here is engine conformance evidence. Trace records are keyed by the canonical lowering plan's interned contract index so a later real-engine differential can diff against them per contract.",
-  "planSha256": "09accb4bfda0932ca1722458d2556caa8381fe3b5d327246becc64f0c969cd0e",
+  "planSha256": "0cd089d88f7ca790696f6f83fbfb113e1f43356952874f89d8ba06bf63da9d85",
   "planFallback": null,
   "inputHashes": {
-    "projection": "eee1a4745b80d329669efc8984304b3745b8db1ece537ca91513b19c551c69fa",
-    "universal": "00dda26308ec9c03bf5ab6a41cf2d48bd6edc6d1dac82cb85c5a3a5488557024",
-    "handleLowering": "e2d6bd9367cc3ea073ba5ae30f90163282ca2589d20f885ac9ee22f3878ae955",
+    "projection": "9f6072dc210528fa3bbc0cbb2957f0984c6fbe3657d31326be639a576e3e063a",
+    "universal": "68cb23eb8aaaf1c2f441911b3929ad2793fc0660e3695ae2f76534e8b8a2652c",
+    "handleLowering": "360df4102b3718144261efe19eb52cc2bcea3f3190e31dcfb49d975e69a69072",
     "valueLayouts": "a905f72450a2164d414d90e37359ea9b0207609ead5c16e928b39400c32f3d5b",
-    "tableRecords": "bd924778e0560cb9e723f01c466144cf1def3d35d48ce38b0783a33069784102",
-    "valueBindings": "bf24ad8891c416aff1ca9eab8ef4eb822fb3ccca75afd3a04634d6dbf14b02bc",
-    "overloadDispatch": "c083c1e14d232fec3231225952c43677b7677ded7027902241c1e6b23f4042d9",
-    "loweringPlan": "3399b879b2645a9fd0c3155b576e4f8b0aeb35a20ec8d15374cd5e5f896f3e4b"
+    "tableRecords": "dd42e5ddfabe4d6858bceb829a1510473a262af4f73073272fb6b25fe2e99963",
+    "valueBindings": "0de2ca48989dedafead7d160f558aae6c7bb3591cc89c7b2bc9539cb34d1f65a",
+    "overloadDispatch": "a88bfc4d62463e92c9217531577f6162bd1184710bb36d94b0c39b0e56865034",
+    "loweringPlan": "cb7df97dec5f7d346ef3ed9cee4f20185dbb3f01662815dbaad84fcb7c58ff0d"
   },
   "planInputDrift": [],
   "transports": {
@@ -98397,7 +98397,7 @@
     "expectedTrace": "tests/fixtures/generated_script_recording_expected_trace.txt"
   },
   "artifactHashes": {
-    "header": "835d50bbb37c3ddc245ca75831b7379f9b71ade3eb4a4e27e775edfca4e05894",
+    "header": "268de591812689a4494fa12e6eb70d65d2bff337b82f21e89ecfcd8ec1ff4b58",
     "tables": "6aa7e4fb9d577b41e07ebbacf59dd6f809353ccc8a6a18b19d38cc364307247c",
     "provider": "55a507f438f60ddbd2ec227c0ac12f2ca197a4defdf9b619a9026a7572773396",
     "luaAdapter": "9a10635f3e3348e9c70ede220ffd7fa1ad0a493cea7e5d70f07faffacb9713f4",
@@ -98407,6 +98407,6 @@
     "browserCallbackDriverJs": "f1106280732bb0ef51f02fb0299aa20ffc6333268dc724b7ac8e5c0ada4799cd",
     "driver": "d67bc8dfcb856d53ac4e9b79c71efd4bdabe9df33442366ce906d9bb0051f2f6",
     "driverJs": "f12f08c1fc42b0bb58c0086e1e09f38a4e0caf616881edfb699c17824a6f1a26",
-    "expectedTrace": "14d173956270212f134a9259005abb49a9decbf37de7e4b1d20b1b2b39b83654"
+    "expectedTrace": "7c7776f89c377283207c61093a2f17c1ef0b56c293446bbd5cfd7cb6f0a5e67f"
   }
 }

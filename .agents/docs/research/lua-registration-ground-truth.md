@@ -517,6 +517,18 @@ missing argument, not that the engine behaves as documented once it has one, and
 `block-emission` says a name is not registered, not that the route is absent from
 the product. Neither has been observed at runtime.
 
+The canonical surface is also the single registration input for fixed-tuple,
+finite-overload, generated value/value-tail, and dynamic-value replay
+selection. Those consumers join its route and C-function identity to their own
+context, codec, result, representation, and lifetime capabilities rather than
+maintaining member-name registration regular expressions. The older
+availability-profile parser has also been removed: profile generation selects
+the canonical report's registered and registered-but-undeclared rows by engine
+target, registration path, array, and module. Private C-function names, body
+facts, line numbers, and comment formatting cannot change availability;
+withdrawing a structural registration does, and the reviewed feature census
+fails closed.
+
 The lane owns its own generator registry
 (`luaRegistrationSurfaceGenerator` in `scripts/lib/script-generator-pipeline.mjs`)
 rather than joining the script clean-room graph, because its inputs cannot be

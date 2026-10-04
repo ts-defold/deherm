@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import test from "node:test";
 
 import {
@@ -16,6 +17,48 @@ import { stableBindingId } from "../scripts/lib/binding-identity.mjs";
 
 const root = new URL("../", import.meta.url);
 const digest = (text) => createHash("sha256").update(text).digest("hex");
+const derivedRevision = "1".repeat(40);
+
+function withDeclaredDerivation(callback) {
+  const previousRevision = process.env.DEHERM_DERIVED_REVISION;
+  const previousAudit = process.env.DEHERM_REVISION_AUDIT;
+  process.env.DEHERM_DERIVED_REVISION = derivedRevision;
+  process.env.DEHERM_REVISION_AUDIT = tmpdir();
+  try {
+    return callback();
+  } finally {
+    if (previousRevision === undefined) delete process.env.DEHERM_DERIVED_REVISION;
+    else process.env.DEHERM_DERIVED_REVISION = previousRevision;
+    if (previousAudit === undefined) delete process.env.DEHERM_REVISION_AUDIT;
+    else process.env.DEHERM_REVISION_AUDIT = previousAudit;
+  }
+}
+
+function derivedInputs(inputs) {
+  const ir = JSON.parse(inputs.irText);
+  ir.defoldRevision = derivedRevision;
+  const irText = JSON.stringify(ir);
+  const patterns = JSON.parse(inputs.patternsText);
+  patterns.defoldRevision = derivedRevision;
+  patterns.sourceSha256 = digest(irText);
+  const patternsText = JSON.stringify(patterns);
+  const value = JSON.parse(inputs.valueText);
+  value.defoldRevision = derivedRevision;
+  const url = JSON.parse(inputs.urlText);
+  url.defoldRevision = derivedRevision;
+  url.inputEvidence.scriptIrSha256 = digest(irText);
+  url.inputEvidence.bindingPatternsSha256 = digest(patternsText);
+  const registrationSurface = JSON.parse(inputs.registrationSurfaceText);
+  registrationSurface.defoldRevision = derivedRevision;
+  return {
+    ...inputs,
+    irText,
+    patternsText,
+    valueText: JSON.stringify(value),
+    urlText: JSON.stringify(url),
+    registrationSurfaceText: JSON.stringify(registrationSurface),
+  };
+}
 
 test("value-tail generator covers the exact remaining Defold-value accounting tail", async () => {
   execFileSync(process.execPath, ["scripts/generate-script-defold-value-tail.mjs", "--check"], {
@@ -192,6 +235,33 @@ test("value-tail capabilities ignore registration formatting and withdraw when r
   );
   assert.deepEqual(preserved.sourceCapabilities, original.sourceCapabilities);
 
+  const renamedContextSources = new Map(inputs.sourceTexts);
+  renamedContextSources.set(guiPath, originalText.replaceAll("GuiScriptInstance_Check", "CheckedGuiSceneFromLuaState"));
+  assert.ok(
+    generateScriptDefoldValueTail({ ...inputs, sourceTexts: renamedContextSources }).report.bindings.some(
+      ({ id }) => id === "script:gui.get_layout",
+    ),
+    "renaming the context helper and all its uses preserves structural GUI context proof",
+  );
+
+  const renderPath = "engine/render/src/render/render_script.cpp";
+  const renderText = inputs.sourceTexts.get(renderPath);
+  const renderRoute = generateScriptDefoldValueTail(inputs).report.bindings.find(
+    ({ requiredContext }) => requiredContext === "render-script-instance",
+  );
+  assert.ok(renderRoute);
+  const renamedRenderSources = new Map(inputs.sourceTexts);
+  renamedRenderSources.set(
+    renderPath,
+    renderText.replaceAll("RenderScriptInstance_Check", "CheckedRenderInstanceFromLuaState"),
+  );
+  assert.ok(
+    generateScriptDefoldValueTail({ ...inputs, sourceTexts: renamedRenderSources }).report.bindings.some(
+      ({ id }) => id === renderRoute.id,
+    ),
+    "renaming the context helper and all its uses preserves structural render context proof",
+  );
+
   const missingContext = originalText.replaceAll("GuiScriptInstance_Check(L)", "GuiInstanceCheckRemoved(L)");
   assert.equal(contextCapability(missingContext, route.cFunction, "gui-script-instance"), null);
   assert.equal(contextCapability(originalText, route.cFunction, "gui-script-instance").kind, "gui-script-instance");
@@ -200,6 +270,81 @@ test("value-tail capabilities ignore registration formatting and withdraw when r
     true,
     "context evidence withdrawal does not withdraw registration",
   );
+  const missingContextSources = new Map(inputs.sourceTexts);
+  missingContextSources.set(guiPath, missingContext);
+  assert.throws(
+    () => generateScriptDefoldValueTail({ ...inputs, sourceTexts: missingContextSources }),
+    /canonical source does not prove gui-script-instance context/,
+  );
+
+  const changedRegistration = JSON.parse(inputs.registrationSurfaceText);
+  changedRegistration.targets["defold-engine-box2d-v3"].routes.find(
+    ({ name }) => name === "gui.get_layout",
+  ).registration.path = "gui/src/registration_moved.cpp";
+  assert.throws(
+    () =>
+      generateScriptDefoldValueTail({
+        ...inputs,
+        registrationSurfaceText: JSON.stringify(changedRegistration),
+      }),
+    /positive Lua registration is absent from canonical registration surface/,
+  );
+
+  const malformed = JSON.parse(inputs.registrationSurfaceText);
+  malformed.targets["defold-engine-box2d-v3"].routes[0].registration.line = "unknown";
+  assert.throws(
+    () => generateScriptDefoldValueTail({ ...inputs, registrationSurfaceText: JSON.stringify(malformed) }),
+    /malformed registered route/,
+  );
+});
+
+test("value-tail derivation withdraws only the affected registration or context specialization", async () => {
+  const inputs = derivedInputs(await loadScriptDefoldValueTailInputs());
+  const registrationMissing = JSON.parse(inputs.registrationSurfaceText);
+  registrationMissing.targets["defold-engine-box2d-v3"].routes.find(
+    ({ name }) => name === "gui.get_layout",
+  ).registration.path = "gui/src/registration_moved.cpp";
+  const missing = withDeclaredDerivation(() =>
+    generateScriptDefoldValueTail({
+      ...inputs,
+      registrationSurfaceText: JSON.stringify(registrationMissing),
+    }),
+  );
+  assert.equal(missing.report.routeCount, 25);
+  assert.equal(missing.report.candidateCount, 25);
+  assert.equal(
+    missing.report.bindings.some(({ id }) => id === "script:gui.get_layout"),
+    false,
+  );
+  assert.equal(
+    missing.report.bindings.some(({ id }) => id === "script:render.set_view"),
+    true,
+  );
+  assert.doesNotMatch(missing.source, /script:gui\.get_layout/);
+  assert.match(missing.source, /if \(!route\) return DispatchStatus::kMissing/);
+
+  const contextMissing = JSON.parse(inputs.registrationSurfaceText);
+  contextMissing.targets["defold-engine-box2d-v3"].routes.find(({ name }) => name === "gui.get_layout").cFunction =
+    "LuaGetLayoutContextRemoved";
+  const context = withDeclaredDerivation(() =>
+    generateScriptDefoldValueTail({
+      ...inputs,
+      registrationSurfaceText: JSON.stringify(contextMissing),
+    }),
+  );
+  assert.equal(context.report.routeCount, 25);
+  assert.equal(context.report.candidateCount, 25);
+  assert.equal(
+    context.report.bindings.some(({ id }) => id === "script:gui.get_layout"),
+    false,
+  );
+  assert.equal(
+    context.report.bindings.some(({ id }) => id === "script:render.set_view"),
+    true,
+  );
+
+  const adapter = await readFile(new URL("defold/defold_hermes/src/script_scalar_lua_adapter.cpp", root), "utf8");
+  assert.match(adapter, /value_tail::dispatch[\s\S]*universal_value::dispatch/);
 });
 
 test("value-tail generation rejects every cross-input provenance drift", async () => {

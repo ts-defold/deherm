@@ -57,6 +57,30 @@ Render targets and textures are numeric `dmGraphics::HAssetHandle` values. They 
 
 Resource declaration values are compiler tokens. They resolve into component property metadata and compiled resource hashes and never enter the runtime registry.
 
+## Structural replay capability versus lifecycle effects
+
+Replay eligibility is now derived from reusable structural capability records,
+not private wrapper names, validator function fragments, or error text. Full
+userdata capabilities prove an opaque `sizeof(wrapper)` allocation joined to
+metatable attachment, registered-type checking, and Lua-registry rootability;
+the wrapper C type spelling is neither configured nor emitted as evidence.
+Light userdata records the absence of a rootable semantic identity. Numeric
+graphics handles prove only their Lua-number representation; asset validity is
+a separate lifecycle fact. Declaration tokens remain compiler-only.
+
+Every classified row names two evidence sets. All 437 rows require their
+handle kinds' representation capabilities. The 429 runtime rows split into 367
+representation-only terminals and 62 lifecycle-effectful routes; eight more
+rows are compiler-only declarations. Lifecycle proof uses structural effect
+classes such as generation/version comparison, native validity, identity
+registry mutation, destroy/invalidate behavior, ownership domain, and scene
+identity rather than exact helper or diagnostic spelling. If only that
+deeper evidence moves, ordinary checked-input terminals remain eligible for the
+generated replay router while effectful routes withdraw to the universal
+fallback. If allocation, metatable, type-check, or rooting capability is lost,
+all optimized routes for that kind withdraw. Malformed capability records fail
+closed rather than degrading into an inferred representation.
+
 ## Allocation claim
 
 After fixed-capacity bridge registries and Lua stack/registry storage are prewarmed, handle-consuming lookup and dispatch glue can avoid C++ heap allocation. This claim is limited to the glue. Lua registry growth, userdata capture, GUI or physics object creation, Box2D/Bullet tracking-table growth, constant-buffer creation, resource work, render commands, and engine/user callbacks may allocate.

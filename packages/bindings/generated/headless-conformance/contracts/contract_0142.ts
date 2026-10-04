@@ -10,12 +10,12 @@ export function runContract(report: Report): boolean {
   let ok = true;
   ok = runExercise(report, {
     contract: "contract_0142",
-    route: "script:b2d.body.get_next",
+    route: "script:b2d.body.get_world",
     arity: "required",
-    call: b2d.body.getNext as unknown as (...args: readonly unknown[]) => unknown,
+    call: b2d.body.getWorld as unknown as (...args: readonly unknown[]) => unknown,
     args: [{"kind":"handle","handleKind":"box2d-body","ordinal":0}],
     providers,
-    minimumResultCount: 0,
+    minimumResultCount: 1,
     maximumResultCount: 1,
     resultCodec: null,
     resultNullable: false,

@@ -545,6 +545,7 @@ const genericImplementationLaneDefinitions = Object.freeze([
 
 const allowedEvidenceStatuses = new Set([
   "observed-exact-upstream-bitop-implementation",
+  "observed-bounded-registered-Lua-replay-transport",
   "observed-transport-with-local-type-identity-stand-ins",
   "observed-transport-with-source-equivalent-test-function",
   "not-applicable-blocked",
@@ -583,6 +584,7 @@ const allowedTargetClaimStatuses = new Set([
   "blocked-missing-handle-producer",
   "reachable",
   "candidate-awaits-shared-router-integration",
+  "universal-fallback-missing-proof",
   "planned-generated-adapter",
   "not-executable-no-generated-provider",
   "blocked-recursive-json-value-policy",
@@ -663,6 +665,8 @@ function genericImplementationRecord(definition, entry, reportRow) {
     "emitted",
     "executableStatus",
     "generatedFamilyExecutableCandidate",
+    "optimizationProven",
+    "optimizationBlockers",
     "registryEligible",
     "blocker",
     "blockers",
@@ -686,11 +690,28 @@ function genericImplementationRecord(definition, entry, reportRow) {
     entry.stages ?? entry.evidence?.stages ?? entry.focusedNativeEvidence,
     `${definition.lane}/${entry.id}`,
   );
+  const structuralEvidence = selectDefined(entry, [
+    "structuralCapabilities",
+    "sourceCapabilities",
+    "replayEvidence",
+    "routing",
+  ]);
+  for (const [name, evidence] of Object.entries(structuralEvidence)) {
+    if (!evidence || typeof evidence !== "object" || Array.isArray(evidence)) {
+      throw new Error(`${definition.lane}/${entry.id}: malformed structural evidence '${name}'`);
+    }
+  }
+  const optimizationProven = entry.optimizationProven;
+  const generatedCandidate = entry.generatedFamilyExecutableCandidate;
+  const admission =
+    optimizationProven === false || generatedCandidate === false ? "universal-fallback" : "proven-specialization";
   return {
     lane: definition.lane,
     reportRow,
+    admission,
     reportState,
     generationIdentity,
+    ...(Object.keys(structuralEvidence).length > 0 ? { structuralEvidence } : {}),
     ...(targetClaims !== undefined ? { targetClaims } : {}),
     ...(evidenceClaims !== undefined ? { evidenceClaims } : {}),
   };
@@ -724,7 +745,7 @@ function implementationLaneIndex(units, inputs, defoldRevision) {
     }
     laneIds.add(key);
     const fallback = existing.find(({ lane }) => fallbackLanes.has(lane));
-    if (fallback && !fallbackLanes.has(implementation.lane)) {
+    if (fallback && !fallbackLanes.has(implementation.lane) && implementation.admission !== "universal-fallback") {
       fallback.supersededLanes.push(implementation.lane);
     }
     existing.push(implementation);

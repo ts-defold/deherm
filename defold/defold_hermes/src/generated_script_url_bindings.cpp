@@ -5,6 +5,7 @@
 #include <cstdio>
 
 namespace defold_hermes::url_binding { namespace {
+constexpr bool kOptimizationProven = true;
 constexpr Operation kOperations[] = {
   {0, 350770u, "script:physics.destroy_joint", "physics", "destroy_joint", 0, 2, 2, ResultCodec::kNone},
   {1, 10300768u, "script:physics.wakeup", "physics", "wakeup", 2, 1, 1, ResultCodec::kNone},
@@ -224,7 +225,7 @@ const uint16_t* argumentCodecs() noexcept { return kArgumentCodecs; }
 const Operation* find(uint32_t stableId) noexcept { size_t first=0,count=kBindingCount; while(count){size_t step=count/2,index=first+step;if(kOperations[index].stableId<stableId){first=index+1;count-=step+1;}else count=step;} return first<kBindingCount&&kOperations[first].stableId==stableId?&kOperations[first]:nullptr; }
 DispatchStatus dispatch(ScriptCallFrame* frame,char* error,size_t capacity,const LuaApi* api) noexcept {
   if(!frame){fail(error,capacity,"URL call frame is null");return DispatchStatus::kError;}
-  const Operation* operation=find(frame->stableId); if(!operation)return DispatchStatus::kMissing; frame->resultCount=0;
+  const Operation* operation=find(frame->stableId); if(!operation||!kOptimizationProven)return DispatchStatus::kMissing; frame->resultCount=0;
   if(frame->argumentCount<operation->requiredArgumentCount||frame->argumentCount>operation->maximumArgumentCount||(frame->argumentCount&&!frame->arguments)){fail(error,capacity,"URL argument count does not match descriptor");return DispatchStatus::kError;}
   for(uint32_t index=0;index<frame->argumentCount;++index){const ScriptValue& value=frame->arguments[index];const uint16_t codec=kArgumentCodecs[operation->argumentOffset+index];if(!(valueMask(value)&codec)){fail(error,capacity,"URL argument tag does not match positional codec");return DispatchStatus::kError;}if(value.tag==ScriptValueTag::kNumber&&(codec&kInteger)&&!(codec&kNumber)&&(!std::isfinite(value.number)||std::trunc(value.number)!=value.number)){fail(error,capacity,"URL integer argument is not exact");return DispatchStatus::kError;}if(value.tag==ScriptValueTag::kString&&value.length&&!value.data){fail(error,capacity,"URL string argument has null data");return DispatchStatus::kError;}if(value.tag==ScriptValueTag::kHandle&&value.handleKind==ScriptHandleKind::kUrl){ScriptResolvedUrl ignored{};if(!frame->urlArena||!frame->urlArena->resolve(value,frame->urlArena->runtimeToken(),&ignored)){fail(error,capacity,"URL argument token is stale, collapsed, or belongs to another arena");return DispatchStatus::kError;}}}
   if(operation->resultCodec!=ResultCodec::kNone&&(!frame->results||frame->resultCapacity<1)){fail(error,capacity,"URL result storage is exhausted");return DispatchStatus::kError;}

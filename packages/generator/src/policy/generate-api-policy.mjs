@@ -412,7 +412,8 @@ export async function derivePolicy(options = {}) {
       emittedCount: namedScalarReport.coverage?.typescriptCallable,
     },
     "script/url-target-support.ts": {
-      routeCount: urlBindingsReport.routeCount,
+      routeCount: urlBindingsReport.optimizedRouteCount,
+      universalFallbackRouteCount: urlBindingsReport.universalFallbackRouteCount,
       targetSupport: urlBindingsReport.targetSupport,
     },
     "script/value-target-support.ts": {

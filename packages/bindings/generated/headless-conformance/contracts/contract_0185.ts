@@ -2,7 +2,7 @@
 // Contract contract_0185: 2 routes intern to this contract,
 // 1 of which are reachable fixtures; 2 are exercised.
 // Fixture profile: engine.
-import { factory, vmath } from "@deherm/sdk";
+import { factory } from "@deherm/sdk";
 import { runExercise, type Report } from "../harness";
 import { providers } from "../providers/engine";
 
@@ -29,7 +29,7 @@ export function runContract(report: Report): boolean {
     route: "script:factory.create",
     arity: "required-and-optional",
     call: factory.create as unknown as (...args: readonly unknown[]) => unknown,
-    args: [{"kind":"literal","value":"/deherm_conformance"}, { kind: "constructed", make: (): unknown => (vmath.vector3()) }, { kind: "constructed", make: (): unknown => (vmath.quat()) }],
+    args: [{"kind":"literal","value":"/deherm_conformance"}, { kind: "constructed", make: (): unknown => ({ "x": 0, "y": 0, "z": 0 }) }, { kind: "constructed", make: (): unknown => ({ "x": 0, "y": 0, "z": 0, "w": 0 }) }],
     providers,
     minimumResultCount: 1,
     maximumResultCount: 1,

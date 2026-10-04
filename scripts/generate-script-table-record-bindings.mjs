@@ -5,6 +5,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { stableBindingId } from "./lib/binding-identity.mjs";
+import { parseCanonicalLuaRegistrationSurface } from "./lib/defold-lua-structural-capabilities.mjs";
 import {
   declaredDerivation,
   expectReviewedCount,
@@ -12,6 +13,7 @@ import {
   loadReviewedSources,
 } from "./lib/reviewed-revision.mjs";
 import { VOID, recordAudit } from "./lib/revision-audit.mjs";
+import { tableRecordStructuralCapability } from "./lib/script-table-record-structural-capability.mjs";
 
 const root = new URL("../", import.meta.url);
 const paths = {
@@ -19,6 +21,7 @@ const paths = {
   patterns: new URL("packages/bindings/generated/defold-script-binding-patterns.json", root),
   accounting: new URL("packages/bindings/generated/defold-script-api-accounting.json", root),
   schemas: new URL("packages/bindings/generated/defold-script-table-tuple-schemas.json", root),
+  registration: new URL("packages/bindings/generated/defold-lua-registration-surface.json", root),
   policy: new URL("packages/bindings/overrides/script-table-record-bindings.json", root),
   report: new URL("packages/bindings/generated/defold-script-table-record-bindings.json", root),
   header: new URL("defold/defold_hermes/include/defold_hermes/generated_script_table_record_bindings.hpp", root),
@@ -51,8 +54,10 @@ function compare(left, right) {
 }
 
 export async function loadInputs() {
-  const [irText, patternsText, accountingText, schemasText, policyText] = await Promise.all(
-    [paths.ir, paths.patterns, paths.accounting, paths.schemas, paths.policy].map((path) => readFile(path, "utf8")),
+  const [irText, patternsText, accountingText, schemasText, registrationSurfaceText, policyText] = await Promise.all(
+    [paths.ir, paths.patterns, paths.accounting, paths.schemas, paths.registration, paths.policy].map((path) =>
+      readFile(path, "utf8"),
+    ),
   );
   const policy = JSON.parse(policyText);
   // Tolerant on purpose: the reviewed policy cites `script_bullet3d.cpp`, a
@@ -70,6 +75,7 @@ export async function loadInputs() {
     patternsText,
     accountingText,
     schemasText,
+    registrationSurfaceText,
     policyText,
     sourceTexts: loaded.texts,
     withdrawnSources: loaded.withdrawn,
@@ -243,9 +249,10 @@ export function generate(inputs) {
     patterns = JSON.parse(inputs.patternsText),
     accounting = JSON.parse(inputs.accountingText),
     schemas = JSON.parse(inputs.schemasText),
+    registrationSurface = parseCanonicalLuaRegistrationSurface(inputs.registrationSurfaceText),
     policy = JSON.parse(inputs.policyText);
   assert(
-    policy.schemaVersion === 1 && Array.isArray(policy.sources) && Array.isArray(policy.routes),
+    policy.schemaVersion === 2 && Array.isArray(policy.sources) && Array.isArray(policy.routes),
     "table-record policy schema is unsupported",
   );
   assert(
@@ -272,6 +279,7 @@ export function generate(inputs) {
   );
   const withdrawnSources = inputs.withdrawnSources ?? new Set();
   const sourceByKey = new Map();
+  const sourceByPath = new Map();
   for (const source of policy.sources) {
     assert(!sourceByKey.has(source.key), `${source.key}: duplicate table-record source`);
     // The reviewed hash was OBSERVED while loading, not asserted: it only
@@ -282,11 +290,20 @@ export function generate(inputs) {
     if (withdrawnSources.has(source.path)) continue;
     const text = inputs.sourceTexts.get(source.path);
     assert(typeof text === "string", `${source.path}: pinned table-record source was not loaded`);
-    sourceByKey.set(source.key, { ...source, text });
+    const loaded = { ...source, text };
+    sourceByKey.set(source.key, loaded);
+    sourceByPath.set(source.path, loaded);
   }
   // A reviewed route whose cited source this revision does not have is
   // withdrawn for this revision rather than emitted on evidence that is gone.
-  const reviewedRoutes = policy.routes.filter(({ source }) => sourceByKey.has(source));
+  const staleOptimizationQueue = [];
+  const routeSourceKeys = (rule) => [rule.registrationSource, ...(rule.outputSources ?? [])];
+  const reviewedRoutes = policy.routes.filter((rule) => {
+    const missing = routeSourceKeys(rule).filter((source) => !sourceByKey.has(source));
+    if (missing.length === 0) return true;
+    staleOptimizationQueue.push({ id: rule.id, reason: "source-unavailable", sources: missing });
+    return false;
+  });
   const fnById = new Map(ir.functions.map((fn) => [fn.id, fn])),
     patternById = new Map(patterns.bindings.map((row) => [row.id, row])),
     schemaById = new Map(schemas.rows.map((row) => [row.id, row])),
@@ -358,12 +375,11 @@ export function generate(inputs) {
       const fn = fnById.get(rule.id),
         schema = schemaById.get(rule.id),
         type = types.get(rule.recordType),
-        source = sourceByKey.get(rule.source);
+        registrationSource = sourceByKey.get(rule.registrationSource),
+        outputSources = (rule.outputSources ?? []).map((key) => sourceByKey.get(key));
       assert(
-        source &&
-          Array.isArray(rule.sourceAnchors) &&
-          rule.sourceAnchors.every((anchor) => source.text.includes(anchor)),
-        `${rule.id}: reviewed source anchor drifted`,
+        registrationSource && outputSources.length > 0 && outputSources.every(Boolean),
+        `${rule.id}: malformed proven-route source storage`,
       );
       const alternatives = fn.returns.length === 1 ? fn.returns[0].split("|").map((value) => value.trim()) : [];
       assert(
@@ -376,6 +392,28 @@ export function generate(inputs) {
       );
       const argumentCodecs = fn.parameters.map(({ rawType }) => scalarTypes.get(rawType));
       assert(argumentCodecs.every(Boolean), `${rule.id}: reviewed scalar argument type drifted`);
+      const fields = type.fields.map((field) => ({ name: field.rawName, codec: fieldCodec(field, rule.id) }));
+      const sourceTexts = new Map([registrationSource, ...outputSources].map((source) => [source.path, source.text]));
+      const structuralCapability = tableRecordStructuralCapability({
+        surface: registrationSurface,
+        routeName: fn.rawName,
+        registrationSource: registrationSource.path,
+        sourceTexts,
+        argumentCodecs,
+        fields,
+      });
+      if (!structuralCapability) {
+        const message = `${rule.id}: structural table-output capability is absent`;
+        assert(declaredDerivation(), message);
+        staleOptimizationQueue.push({ id: rule.id, reason: "structural-output-capability-absent" });
+        recordAudit({
+          input: "packages/bindings/overrides/script-table-record-bindings.json",
+          id: rule.id,
+          status: VOID,
+          reason: "structural-output-capability-absent",
+        });
+        return [];
+      }
       return [
         {
           id: rule.id,
@@ -384,11 +422,11 @@ export function generate(inputs) {
           member: fn.member,
           requiredContext: rule.requiredContext,
           context,
-          source: `upstream/defold/${source.path}`,
-          sourceSha256: source.sha256,
-          sourceAnchors: rule.sourceAnchors,
+          source: `upstream/defold/${structuralCapability.producer.source}`,
+          sourceSha256: sourceByPath.get(structuralCapability.producer.source).sha256,
+          structuralCapability,
           argumentCodecs,
-          fields: type.fields.map((field) => ({ name: field.rawName, codec: fieldCodec(field, rule.id) })),
+          fields,
           reason: rule.reason,
         },
       ];
@@ -464,6 +502,7 @@ export function generate(inputs) {
       bindingPatternsSha256: sha256(inputs.patternsText),
       accountingSha256: sha256(inputs.accountingText),
       tableTupleSchemaSha256: sha256(inputs.schemasText),
+      registrationSurfaceSha256: sha256(inputs.registrationSurfaceText),
       reviewedPolicySha256: sha256(inputs.policyText),
       defoldSources: policy.sources
         .filter(({ path }) => !withdrawnSources.has(path))
@@ -471,6 +510,7 @@ export function generate(inputs) {
     },
     bindings: rows,
     blockedRoutes,
+    staleOptimizationQueue: staleOptimizationQueue.sort((left, right) => compare(left.id, right.id)),
   };
   return { report, ...renderRuntime(rows) };
 }

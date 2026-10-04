@@ -25,6 +25,12 @@ const texts = Object.fromEntries(
   ),
 );
 
+function replaceJson(input, mutate) {
+  const value = JSON.parse(input);
+  mutate(value);
+  return `${JSON.stringify(value, null, 2)}\n`;
+}
+
 function withManifest(mutator) {
   const manifest = JSON.parse(texts.manifest);
   // Synthetic evidence tests must not inherit checked-in observations whose
@@ -85,6 +91,60 @@ test("covers every generated executable route and keeps evidence SHA-bound", asy
   const unprobed = report.routes.find(({ id }) => id === "script:bit.bnot");
   assert.equal(unprobed.scenarioState, "planned");
   assert.match(report.evidencePolicy, /current probe-set fingerprint/i);
+});
+
+test("uses structural registration and URL admission instead of legacy private-source evidence", async () => {
+  const withoutLegacyTupleEvidence = {
+    ...texts,
+    tupleRoutes: replaceJson(texts.tupleRoutes, (report) => {
+      for (const binding of report.bindings) delete binding.sourceEvidence;
+    }),
+  };
+  const structural = await generateScriptRealEngineMatrix(withoutLegacyTupleEvidence);
+  const tupleRoute = structural.routes.find(({ id }) => id === "script:bullet3d.constraint.get_anchors");
+  assert.match(tupleRoute.source, /^upstream\/defold\/engine\//);
+
+  for (const [inputName, collection, field] of [
+    ["valueRoutes", "bindings", "structuralCapabilities"],
+    ["tupleRoutes", "bindings", "sourceCapabilities"],
+    ["overloadRoutes", "bindings", "sourceCapabilities"],
+  ]) {
+    const missing = {
+      ...texts,
+      [inputName]: replaceJson(texts[inputName], (report) => {
+        const row = report[collection].find(
+          (candidate) =>
+            (inputName !== "valueRoutes" || candidate.id !== "script:hash") &&
+            (inputName !== "overloadRoutes" || candidate.generatedFamilyExecutableCandidate),
+        );
+        delete row[field];
+      }),
+    };
+    await assert.rejects(
+      generateScriptRealEngineMatrix(missing),
+      /structural registration evidence is missing or malformed/,
+      inputName,
+    );
+  }
+
+  const urlFallback = {
+    ...texts,
+    urlRoutes: replaceJson(texts.urlRoutes, (report) => {
+      report.optimizedRouteCount = 0;
+      report.universalFallbackRouteCount = report.routeCount;
+      for (const row of report.rows) {
+        row.optimizationProven = false;
+        row.routing.status = "universal-fallback-missing-proof";
+        row.routing.blockers = ["dm-script-public-url-api"];
+      }
+    }),
+  };
+  const fallback = await generateScriptRealEngineMatrix(urlFallback);
+  assert.equal(fallback.routeCount, structural.routeCount - JSON.parse(texts.urlRoutes).routeCount);
+  assert.equal(
+    fallback.routes.some(({ routeKind }) => routeKind === "url-address"),
+    false,
+  );
 });
 
 test("supports explicit engine context, project configuration, and typed script-property setup", async () => {

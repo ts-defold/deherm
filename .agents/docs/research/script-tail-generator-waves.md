@@ -81,6 +81,12 @@ The dispatcher chooses a shape from runtime tags, requires caller-owned result
 storage, validates the exact result kind, and contains no heap container or
 fallback.
 
+Candidate registration now comes from the canonical Lua registration surface.
+The overload generator no longer pins source-registration anchors or reparses
+member arrays; it joins the registered callable to the finite runtime-tag
+shape, context, and result codecs. Missing capability evidence withdraws only
+the optimized dispatcher entry and leaves the universal route available.
+
 The shared adapter caches Lua function references, restores captured instance
 scope across nested calls, and copies Matrix4 results into a bounded frame
 arena. A pinned Defold Lua 5.1 harness reaches all 16 executable value-tail and all eight

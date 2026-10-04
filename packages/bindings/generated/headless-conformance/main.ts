@@ -15,7 +15,7 @@ defineDefoldApp((host) => {
 
   return {
     init() {
-      report(`${MARKER}:harness:${85}:${40}`);
+      report(`${MARKER}:harness:${86}:${34}`);
       selected = String(readCase("deherm_conformance.case") ?? "");
       if (selected === "" || selected === "none") {
         report(`${MARKER}:case-unselected`);

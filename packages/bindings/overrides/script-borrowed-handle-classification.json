@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "expectedCounts": {
     "checked-handle-input-terminal": 367,
@@ -42,141 +42,92 @@
     {
       "id": "box2d-body",
       "source": "engine/gamesys/src/gamesys/scripts/box2d/v3/script_box2d_body_v3.cpp",
-      "sha256": "ec53ed1eda1094564cbeecbbd8cc0a696c3be1805917583138d4d2c00e35ae95",
-      "anchors": [
-        "lua_newuserdata(L, sizeof(B2DLuaBody))",
-        "luaL_getmetatable(L, BOX2D_TYPE_NAME_BODY)",
-        "lua_setmetatable(L, -2)",
-        "dmScript::CheckUserType(L, index, TYPE_HASH_BODY",
-        "TYPE_HASH_BODY = dmScript::RegisterUserType(L, BOX2D_TYPE_NAME_BODY, Body_methods, Body_meta)",
-        "luaL_register(L, 0, Body_functions)"
-      ]
+      "sha256": "ec53ed1eda1094564cbeecbbd8cc0a696c3be1805917583138d4d2c00e35ae95"
     },
     {
       "id": "box2d-joint",
       "source": "engine/gamesys/src/gamesys/scripts/box2d/v3/script_box2d_joint_v3.cpp",
-      "sha256": "071739e89c148fce85b78fb5c9dfbb05870b11c34d87c99a56870f996a0df5f4",
-      "anchors": [
-        "static dmHashTable64<uint8_t> g_JointIds;",
-        "Cannot destroy a joint not created by b2d.joint."
-      ]
+      "sha256": "071739e89c148fce85b78fb5c9dfbb05870b11c34d87c99a56870f996a0df5f4"
     },
     {
       "id": "box2d-shape",
       "source": "engine/gamesys/src/gamesys/scripts/box2d/v3/script_box2d_shape_v3.cpp",
-      "sha256": "5cb292452bdaa01e3b43a772912ee6bd5f2cc61dd5c36ce3f2b9d9ddaf01ee79",
-      "anchors": ["struct B2DLuaShape", "b2Shape_IsValid"]
+      "sha256": "5cb292452bdaa01e3b43a772912ee6bd5f2cc61dd5c36ce3f2b9d9ddaf01ee79"
     },
     {
       "id": "box2d-chain",
       "source": "engine/gamesys/src/gamesys/scripts/box2d/v3/script_box2d_chain_v3.cpp",
-      "sha256": "9769cc82a9fe93c92c2a08ca9a092c5051f235d09f4b80885ffa5c1a39fc72e2",
-      "anchors": ["struct B2DLuaChain", "b2DestroyChain"]
+      "sha256": "9769cc82a9fe93c92c2a08ca9a092c5051f235d09f4b80885ffa5c1a39fc72e2"
     },
     {
       "id": "box2d-world",
       "source": "engine/gamesys/src/gamesys/scripts/box2d/v3/script_box2d_world_v3.cpp",
-      "sha256": "9a9f8517256cc928c05e7838c782f1d82266a01e0d32f05f97447458197d32b0",
-      "anchors": ["struct B2DLuaWorld", "b2World_IsValid"]
+      "sha256": "9a9f8517256cc928c05e7838c782f1d82266a01e0d32f05f97447458197d32b0"
     },
     {
       "id": "bullet-object",
       "source": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_collision_object.cpp",
-      "sha256": "c90f5f10b5b2ccbeb5f77ec3cf986d1dfe36a93eb2a0f79ce9e858e7f35aaf2b",
-      "anchors": [
-        "g_NextBullet3DCollisionObjectId",
-        "ScriptBullet3DInvalidateCollisionObject"
-      ]
+      "sha256": "c90f5f10b5b2ccbeb5f77ec3cf986d1dfe36a93eb2a0f79ce9e858e7f35aaf2b"
     },
     {
       "id": "bullet-rigid-body",
       "source": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_rigid_body.cpp",
-      "sha256": "7fe92ecb9e32332bd612aabaf3e1276f5e78bb83e17cd08667116ab3c1928e1b",
-      "anchors": ["btRigidBody::upcast(collision_object)"]
+      "sha256": "7fe92ecb9e32332bd612aabaf3e1276f5e78bb83e17cd08667116ab3c1928e1b"
     },
     {
       "id": "bullet-shape",
       "source": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_shape.cpp",
-      "sha256": "c64c4c5ba44421c40e17fe0603ec25e5f2bb6b8c6b64f132d4a402675a572285",
-      "anchors": ["uint64_t m_OwnerId;", "uint32_t m_ShapeIndex;"]
+      "sha256": "c64c4c5ba44421c40e17fe0603ec25e5f2bb6b8c6b64f132d4a402675a572285"
     },
     {
       "id": "bullet-constraint",
       "source": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
-      "sha256": "5c162bcb9ef4952fc90c785940d115fd8ed1101f60cdb5d403b5de520d3447f7",
-      "anchors": [
-        "g_NextBullet3DConstraintId",
-        "DestroyConstraintId(lua_constraint->m_Id)"
-      ]
+      "sha256": "5c162bcb9ef4952fc90c785940d115fd8ed1101f60cdb5d403b5de520d3447f7"
     },
     {
       "id": "bullet-world",
       "source": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_world.cpp",
-      "sha256": "a0e72844d9e70b1aa580271e62181edeea39bbc43f8a5d9f81aa20814ad909fc",
-      "anchors": ["g_NextBullet3DWorldId", "ScriptBullet3DInvalidateWorld"]
+      "sha256": "a0e72844d9e70b1aa580271e62181edeea39bbc43f8a5d9f81aa20814ad909fc"
     },
     {
       "id": "gui-script",
       "source": "engine/gui/src/gui_script.cpp",
-      "sha256": "4a46bc80c0a35a59ddf7ea990cd7dcdf5b6eff86e03e6096739eb76f078064e4",
-      "anchors": [
-        "if (np->m_Scene != GetScene(L))",
-        "n->m_Deleted = 1;"
-      ]
+      "sha256": "4a46bc80c0a35a59ddf7ea990cd7dcdf5b6eff86e03e6096739eb76f078064e4"
     },
     {
       "id": "gui-core",
       "source": "engine/gui/src/gui.cpp",
-      "sha256": "09e198339463070e61431f53699736db09a28aeeb6c196f941a28663f45a6a7c",
-      "anchors": [
-        "return n->m_Version == version && n->m_Index == index;",
-        "scene->m_NextVersionNumber"
-      ]
+      "sha256": "09e198339463070e61431f53699736db09a28aeeb6c196f941a28663f45a6a7c"
     },
     {
       "id": "buffer-script",
       "source": "engine/gamesys/src/gamesys/scripts/script_buffer.cpp",
-      "sha256": "9c74a08b7aa39afe4f88c26f78b9bf11fd162b67bc5b0c270f85a523568f7b22",
-      "anchors": [
-        "int                 m_BufferRef;",
-        "dmBuffer::IsBufferValid(stream->m_Buffer)"
-      ]
+      "sha256": "9c74a08b7aa39afe4f88c26f78b9bf11fd162b67bc5b0c270f85a523568f7b22"
     },
     {
       "id": "buffer-sdk",
       "source": "engine/gamesys/src/dmsdk/gamesys/script.h",
-      "sha256": "f81f616a398726257bff530596840acd0ef8bc61ad0dd1f9b1d5c0e614259916",
-      "anchors": ["OWNER_C   = 0", "OWNER_LUA = 1", "OWNER_RES = 2"]
+      "sha256": "f81f616a398726257bff530596840acd0ef8bc61ad0dd1f9b1d5c0e614259916"
     },
     {
       "id": "render-script",
       "source": "engine/render/src/render/render_script.cpp",
-      "sha256": "545d2af669cc9b3952384f30a67ea1b444921267c4a9ab3372a151d3a269106e",
-      "anchors": [
-        "dmGraphics::IsAssetHandleValid(graphics_context, asset_handle)",
-        "DeleteNamedConstantBuffer(cb->m_ConstantBuffer)"
-      ]
+      "sha256": "545d2af669cc9b3952384f30a67ea1b444921267c4a9ab3372a151d3a269106e"
     },
     {
       "id": "resource-script",
       "source": "engine/gamesys/src/gamesys/scripts/script_resource.cpp",
-      "sha256": "0f3df733d31e60508ef8dc312e381a7040906767a8caa7cc04c6bee27d7aff7e",
-      "anchors": [
-        "They can only be used as default values passed to",
-        "The referenced resource is loaded together with the script."
-      ]
+      "sha256": "0f3df733d31e60508ef8dc312e381a7040906767a8caa7cc04c6bee27d7aff7e"
     },
     {
       "id": "go-property",
       "source": "engine/gameobject/src/gameobject/gameobject_script.cpp",
-      "sha256": "529f1ca5693d661173967dc9a44ddd827b73e587f24de0cfb7d3ef0b81accb74",
-      "anchors": ["@name go.property", "resource constructors"]
+      "sha256": "529f1ca5693d661173967dc9a44ddd827b73e587f24de0cfb7d3ef0b81accb74"
     },
     {
       "id": "box2d-world-v2",
       "source": "engine/gamesys/src/gamesys/scripts/box2d/v2/script_box2d_body_v2.cpp",
-      "sha256": "b53c8f37670a3d32525445d7b58a9f979b7a7146175afcf8b517ff6613a43296",
-      "anchors": ["void PushWorld(struct lua_State* L, void* world)", "lua_pushlightuserdata(L, world);"]
+      "sha256": "b53c8f37670a3d32525445d7b58a9f979b7a7146175afcf8b517ff6613a43296"
     }
   ],
   "handleKinds": [
@@ -184,6 +135,18 @@
       "id": "box2d-body",
       "rawTypes": ["b2Body"],
       "representation": "lua-rooted-userdata",
+      "representationCapability": {
+        "kind": "lua-full-userdata",
+        "sourceEvidence": "box2d-body",
+        "metatableLiteral": "b2body"
+      },
+      "lifecycleCapabilities": [
+        {
+          "sourceEvidence": "box2d-body",
+          "effects": ["generation-or-version-check", "native-validity-check"],
+          "subject": "Body"
+        }
+      ],
       "ownership": "borrowed-engine-object",
       "validity": "Validate stored game-object collection/id/generation when present, then b2Body_IsValid on every terminal call.",
       "invalidationBoundary": "Owning collision object, game object, or Box2D world destruction; explicit body-owned child destruction does not transfer ownership to the wrapper.",
@@ -193,6 +156,17 @@
       "id": "box2d-joint",
       "rawTypes": ["b2Joint"],
       "representation": "lua-rooted-userdata",
+      "representationCapability": {
+        "kind": "lua-full-userdata",
+        "sourceEvidence": "box2d-joint",
+        "metatableLiteral": "b2joint"
+      },
+      "lifecycleCapabilities": [
+        {
+          "sourceEvidence": "box2d-joint",
+          "effects": ["identity-registry", "destroy-or-invalidate-effect"]
+        }
+      ],
       "ownership": "borrowed-or-explicit-native-lifecycle",
       "validity": "Validate b2Joint_IsValid on every terminal call and retain source tracking for whether destroy is permitted.",
       "invalidationBoundary": "Explicit destroy, connected body/world destruction, or Box2D generation mismatch.",
@@ -202,12 +176,24 @@
       "id": "box2d-world",
       "rawTypes": ["b2World"],
       "representation": "lua-rooted-userdata",
+      "representationCapability": {
+        "kind": "lua-full-userdata",
+        "sourceEvidence": "box2d-world",
+        "metatableLiteral": "b2world"
+      },
+      "lifecycleCapabilities": [
+        { "sourceEvidence": "box2d-world", "effects": ["native-validity-check"], "subject": "World" }
+      ],
       "representationFeature": "box2d-v3",
       "representationExceptions": [
         {
           "feature": "box2d-v2",
           "representation": "lua-light-userdata",
           "sourceEvidence": "box2d-world-v2",
+          "representationCapability": {
+            "kind": "lua-light-userdata",
+            "sourceEvidence": "box2d-world-v2"
+          },
           "reason": "Box2D v2 pushes the world as a light userdata: no metatable, no generation, and no rooted identity a handle registry can capture or validate."
         }
       ],
@@ -220,6 +206,14 @@
       "id": "box2d-shape",
       "rawTypes": ["b2Shape"],
       "representation": "lua-rooted-userdata",
+      "representationCapability": {
+        "kind": "lua-full-userdata",
+        "sourceEvidence": "box2d-shape",
+        "metatableLiteral": "b2shape"
+      },
+      "lifecycleCapabilities": [
+        { "sourceEvidence": "box2d-shape", "effects": ["native-validity-check"], "subject": "Shape" }
+      ],
       "ownership": "borrowed-body-child",
       "validity": "Validate b2Shape_IsValid on every terminal call.",
       "invalidationBoundary": "Explicit fixture/shape destruction, owning body/world destruction, or Box2D generation mismatch.",
@@ -229,6 +223,12 @@
       "id": "box2d-chain",
       "rawTypes": ["b2Chain"],
       "representation": "lua-rooted-userdata",
+      "representationCapability": {
+        "kind": "lua-full-userdata",
+        "sourceEvidence": "box2d-chain",
+        "metatableLiteral": "b2chain"
+      },
+      "lifecycleCapabilities": [{ "sourceEvidence": "box2d-chain", "effects": ["destroy-or-invalidate-effect"] }],
       "ownership": "borrowed-or-explicit-native-lifecycle",
       "validity": "Validate b2Chain_IsValid on every terminal call.",
       "invalidationBoundary": "Explicit chain destruction, owning body/world destruction, or Box2D generation mismatch.",
@@ -238,6 +238,15 @@
       "id": "bullet-object",
       "rawTypes": ["btCollisionObject", "btRigidBody"],
       "representation": "lua-rooted-userdata",
+      "representationCapability": {
+        "kind": "lua-full-userdata",
+        "sourceEvidence": "bullet-object",
+        "metatableLiteral": "bullet3d_collision_object"
+      },
+      "lifecycleCapabilities": [
+        { "sourceEvidence": "bullet-object", "effects": ["destroy-or-invalidate-effect"] },
+        { "sourceEvidence": "bullet-rigid-body", "effects": ["pointer-upcast-validity"] }
+      ],
       "ownership": "borrowed-component-object",
       "validity": "Resolve the source monotonic collision-object id, validate collection/instance generation, and for btRigidBody require a successful checked upcast.",
       "invalidationBoundary": "Collision-object or game-object destruction invokes source invalidation; owning world teardown also invalidates.",
@@ -247,6 +256,15 @@
       "id": "bullet-shape",
       "rawTypes": ["btCollisionShape"],
       "representation": "lua-rooted-userdata",
+      "representationCapability": {
+        "kind": "lua-full-userdata",
+        "sourceEvidence": "bullet-shape",
+        "metatableLiteral": "bullet3d_shape"
+      },
+      "lifecycleCapabilities": [
+        { "sourceEvidence": "bullet-shape", "effects": ["owner-index-identity"] },
+        { "sourceEvidence": "bullet-object", "effects": ["destroy-or-invalidate-effect"] }
+      ],
       "ownership": "borrowed-object-child-view",
       "validity": "Resolve owner by source monotonic id and bounds-check the stored shape index on every call.",
       "invalidationBoundary": "Owner invalidation or removal of the indexed shape slot.",
@@ -256,6 +274,12 @@
       "id": "bullet-constraint",
       "rawTypes": ["btTypedConstraint"],
       "representation": "lua-rooted-userdata",
+      "representationCapability": {
+        "kind": "lua-full-userdata",
+        "sourceEvidence": "bullet-constraint",
+        "metatableLiteral": "bullet3d_constraint"
+      },
+      "lifecycleCapabilities": [{ "sourceEvidence": "bullet-constraint", "effects": ["destroy-or-invalidate-effect"] }],
       "ownership": "explicit-native-lifecycle",
       "validity": "Resolve the source monotonic constraint id on every call and preserve world-lock checks.",
       "invalidationBoundary": "Explicit destroy, connected body destruction, world destruction, or script Bullet finalization.",
@@ -265,6 +289,12 @@
       "id": "bullet-world",
       "rawTypes": ["btDiscreteDynamicsWorld"],
       "representation": "lua-rooted-userdata",
+      "representationCapability": {
+        "kind": "lua-full-userdata",
+        "sourceEvidence": "bullet-world",
+        "metatableLiteral": "bullet3d_world"
+      },
+      "lifecycleCapabilities": [{ "sourceEvidence": "bullet-world", "effects": ["destroy-or-invalidate-effect"] }],
       "ownership": "borrowed-engine-world",
       "validity": "Resolve the source monotonic world id on every call.",
       "invalidationBoundary": "Physics component-world destruction invokes source invalidation.",
@@ -274,6 +304,18 @@
       "id": "gui-node",
       "rawTypes": ["node"],
       "representation": "lua-rooted-userdata",
+      "representationCapability": {
+        "kind": "lua-full-userdata",
+        "sourceEvidence": "gui-script",
+        "metatableLiteral": "NodeProxy"
+      },
+      "lifecycleCapabilities": [
+        {
+          "sourceEvidence": "gui-script",
+          "effects": ["scene-identity-check", "destroy-or-invalidate-effect", "checked-userdata"]
+        },
+        { "sourceEvidence": "gui-core", "effects": ["generation-or-version-check"] }
+      ],
       "ownership": "borrowed-scene-node",
       "validity": "Require the active GUI scene to equal the proxy scene, then validate the HNode version/index.",
       "invalidationBoundary": "Deferred GUI delete flush, parent subtree deletion, node-slot version change, or scene destruction.",
@@ -283,6 +325,19 @@
       "id": "buffer-data",
       "rawTypes": ["buffer_data"],
       "representation": "lua-rooted-userdata",
+      "representationCapability": {
+        "kind": "lua-full-userdata",
+        "sourceEvidence": "buffer-script",
+        "metatableLiteral": "buffer"
+      },
+      "lifecycleCapabilities": [
+        { "sourceEvidence": "buffer-sdk", "effects": ["ownership-domain"] },
+        {
+          "sourceEvidence": "buffer-script",
+          "effects": ["native-validity-check", "checked-userdata"],
+          "subject": "Buffer"
+        }
+      ],
       "ownership": "wrapper-dependent-owner-c-owner-lua-or-owner-resource",
       "validity": "Preserve the exact LuaHBuffer wrapper and validate resource path/version plus dmBuffer::IsBufferValid.",
       "invalidationBoundary": "Lua-owned GC, resource replacement/release, explicit native destruction, or buffer generation invalidation.",
@@ -292,6 +347,18 @@
       "id": "buffer-stream",
       "rawTypes": ["buffer_stream"],
       "representation": "lua-rooted-userdata",
+      "representationCapability": {
+        "kind": "lua-full-userdata",
+        "sourceEvidence": "buffer-script",
+        "metatableLiteral": "bufferstream"
+      },
+      "lifecycleCapabilities": [
+        {
+          "sourceEvidence": "buffer-script",
+          "effects": ["native-validity-check", "checked-userdata"],
+          "subject": "Buffer"
+        }
+      ],
       "ownership": "borrowed-view-rooting-parent-buffer",
       "validity": "Preserve the stream userdata registry reference to its parent and validate dmBuffer::IsBufferValid before access.",
       "invalidationBoundary": "Parent buffer invalidation; the source view retains a raw stream pointer and therefore must not be flattened.",
@@ -301,6 +368,12 @@
       "id": "render-constant-buffer",
       "rawTypes": ["constant_buffer"],
       "representation": "lua-rooted-userdata",
+      "representationCapability": {
+        "kind": "lua-full-userdata",
+        "sourceEvidence": "render-script",
+        "metatableLiteral": "RenderScriptConstantBuffer"
+      },
+      "lifecycleCapabilities": [{ "sourceEvidence": "render-script", "effects": ["destroy-or-invalidate-effect"] }],
       "ownership": "lua-owned-native-object",
       "validity": "Require the registered constant-buffer userdata type in the active render script.",
       "invalidationBoundary": "Lua userdata finalization deletes the named constant buffer; bridge release must preserve that finalizer boundary.",
@@ -310,6 +383,13 @@
       "id": "graphics-render-target",
       "rawTypes": ["render_target"],
       "representation": "numeric-graphics-asset-handle",
+      "representationCapability": {
+        "kind": "lua-number-asset-handle",
+        "sourceEvidence": "render-script"
+      },
+      "lifecycleCapabilities": [
+        { "sourceEvidence": "render-script", "effects": ["native-validity-check"], "subject": "AssetHandle" }
+      ],
       "ownership": "borrowed-or-explicit-native-lifecycle",
       "validity": "Validate against the active graphics context with IsAssetHandleValid and require ASSET_TYPE_RENDER_TARGET.",
       "invalidationBoundary": "Explicit render-target deletion, resource replacement, or graphics-context teardown.",
@@ -319,6 +399,13 @@
       "id": "graphics-texture",
       "rawTypes": ["texture"],
       "representation": "numeric-graphics-asset-handle",
+      "representationCapability": {
+        "kind": "lua-number-asset-handle",
+        "sourceEvidence": "render-script"
+      },
+      "lifecycleCapabilities": [
+        { "sourceEvidence": "render-script", "effects": ["native-validity-check"], "subject": "AssetHandle" }
+      ],
       "ownership": "borrowed-resource-or-render-target-asset",
       "validity": "Validate against the active graphics context and expected texture asset type before use.",
       "invalidationBoundary": "Owning resource/render-target deletion or graphics-context teardown.",
@@ -328,6 +415,11 @@
       "id": "resource-declaration",
       "rawTypes": ["resource_data"],
       "representation": "declaration-only-token",
+      "representationCapability": {
+        "kind": "declaration-token",
+        "sourceEvidence": "resource-script"
+      },
+      "lifecycleCapabilities": [],
       "ownership": "compiler-owned-metadata",
       "validity": "Accept only inside the go.property declaration compiler and resolve to a compiled resource path/hash.",
       "invalidationBoundary": "Compile-time component schema regeneration; never place this token in the runtime handle registry.",

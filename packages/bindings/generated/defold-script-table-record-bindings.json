@@ -38,9 +38,10 @@
   "inputEvidence": {
     "scriptIrSha256": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049",
     "bindingPatternsSha256": "9788b0873228cf8b9145aace14c3437d8b5fe69b7478da536743f0759c1a073e",
-    "accountingSha256": "fafd81fadc0ab67ea4e6e1e86eac18e0f1a2031d50c5a72f405d23d5be6bfec2",
-    "tableTupleSchemaSha256": "86c74ff87dd53140cbd781b4c33eb9ab047eadbb79cbb7aab055d5c1b3fc4d4a",
-    "reviewedPolicySha256": "7b00663e46ec4018bbcb74226e32bd8eeb06e11c9ccb97cd6dc7596178916968",
+    "accountingSha256": "37ef6cf8e08753302cb9d9d270ff846c16088ea575f8c74f1da1e1c957b8ab86",
+    "tableTupleSchemaSha256": "f97634da4cb09d4b5c897b7a14f0ee60872c083146c60f2d98ef3e9ee67806e5",
+    "registrationSurfaceSha256": "3d730e238c5da462d5ebb7bbdb907fd6f5f2924b11ac478c1aae340ce7da255b",
+    "reviewedPolicySha256": "d4ec0a18cc995cb23ab75cf5cdafb4a58a7f1e56f266e02b37fa73bd524aeea2",
     "defoldSources": [
       {
         "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_image.cpp",
@@ -49,6 +50,10 @@
       {
         "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/box2d/v3/script_box2d_body_v3.cpp",
         "sha256": "ec53ed1eda1094564cbeecbbd8cc0a696c3be1805917583138d4d2c00e35ae95"
+      },
+      {
+        "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/box2d/script_box2d.cpp",
+        "sha256": "7f52762fa051c3ddcd4cd26ee1e5727475bd6830f95d163b9cb84ba26e88d822"
       },
       {
         "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d.cpp",
@@ -68,13 +73,52 @@
       "context": "Global",
       "source": "upstream/defold/engine/gamesys/src/gamesys/scripts/box2d/v3/script_box2d_body_v3.cpp",
       "sourceSha256": "ec53ed1eda1094564cbeecbbd8cc0a696c3be1805917583138d4d2c00e35ae95",
-      "sourceAnchors": [
-        "void PushBox2DVersion(lua_State* L)",
-        "lua_setfield(L, -2, \"version\");",
-        "lua_setfield(L, -2, \"major\");",
-        "lua_setfield(L, -2, \"middle\");",
-        "lua_setfield(L, -2, \"minor\");"
-      ],
+      "structuralCapability": {
+        "registration": {
+          "route": "b2d.get_version",
+          "module": "b2d",
+          "cFunction": "B2D_GetVersion",
+          "sourcePath": "gamesys/src/gamesys/scripts/box2d/script_box2d.cpp",
+          "registrationArray": "BOX2D_FUNCTIONS",
+          "registrationLine": 112
+        },
+        "arguments": {
+          "arity": 0,
+          "codecs": [],
+          "checked": true
+        },
+        "result": {
+          "arity": 1,
+          "kind": "fixed-table-record",
+          "fields": [
+            {
+              "name": "version",
+              "codec": "String"
+            },
+            {
+              "name": "major",
+              "codec": "Integer"
+            },
+            {
+              "name": "middle",
+              "codec": "Integer"
+            },
+            {
+              "name": "minor",
+              "codec": "Integer"
+            }
+          ]
+        },
+        "stackEffect": {
+          "tablePushes": 1,
+          "returnedValues": 1
+        },
+        "producer": {
+          "mode": "one-result-wrapper",
+          "symbol": "PushBox2DVersion",
+          "source": "engine/gamesys/src/gamesys/scripts/box2d/v3/script_box2d_body_v3.cpp"
+        }
+      },
       "argumentCodecs": [],
       "fields": [
         {
@@ -107,12 +151,62 @@
       "context": "Global",
       "source": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_image.cpp",
       "sourceSha256": "0ef39bda9de2db39ec59f97ffb04d916b522b80bd1a51a3cfdc8d07f23f0d281",
-      "sourceAnchors": [
-        "int Image_GetAstcHeader(lua_State* L)",
-        "return luaL_error(L, \"Data is not a valid .astc file\");",
-        "lua_setfield(L, -2, \"block_size_z\");",
-        "{\"get_astc_header\", Image_GetAstcHeader}"
-      ],
+      "structuralCapability": {
+        "registration": {
+          "route": "image.get_astc_header",
+          "module": "image",
+          "cFunction": "Image_GetAstcHeader",
+          "sourcePath": "gamesys/src/gamesys/scripts/script_image.cpp",
+          "registrationArray": "ScriptImage_methods",
+          "registrationLine": 384
+        },
+        "arguments": {
+          "arity": 1,
+          "codecs": [
+            "String"
+          ],
+          "checked": true
+        },
+        "result": {
+          "arity": 1,
+          "kind": "fixed-table-record",
+          "fields": [
+            {
+              "name": "width",
+              "codec": "Integer"
+            },
+            {
+              "name": "height",
+              "codec": "Integer"
+            },
+            {
+              "name": "depth",
+              "codec": "Integer"
+            },
+            {
+              "name": "block_size_x",
+              "codec": "Integer"
+            },
+            {
+              "name": "block_size_y",
+              "codec": "Integer"
+            },
+            {
+              "name": "block_size_z",
+              "codec": "Integer"
+            }
+          ]
+        },
+        "stackEffect": {
+          "tablePushes": 1,
+          "returnedValues": 1
+        },
+        "producer": {
+          "mode": "registered-function",
+          "symbol": "Image_GetAstcHeader",
+          "source": "engine/gamesys/src/gamesys/scripts/script_image.cpp"
+        }
+      },
       "argumentCodecs": [
         "String"
       ],
@@ -155,14 +249,52 @@
       "context": "Global",
       "source": "upstream/defold/engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d.cpp",
       "sourceSha256": "50c51d3d802eaa495eb7c66ffc87b1e9deb31ec7126001c44652c8f5cefd8996",
-      "sourceAnchors": [
-        "static int Bullet3D_GetVersion(lua_State* L)",
-        "lua_setfield(L, -2, \"version\");",
-        "lua_setfield(L, -2, \"number\");",
-        "lua_setfield(L, -2, \"major\");",
-        "lua_setfield(L, -2, \"minor\");",
-        "{ \"get_version\", Bullet3D_GetVersion }"
-      ],
+      "structuralCapability": {
+        "registration": {
+          "route": "bullet3d.get_version",
+          "module": "bullet3d",
+          "cFunction": "Bullet3D_GetVersion",
+          "sourcePath": "gamesys/src/gamesys/scripts/bullet3d/script_bullet3d.cpp",
+          "registrationArray": "BULLET3D_FUNCTIONS",
+          "registrationLine": 271
+        },
+        "arguments": {
+          "arity": 0,
+          "codecs": [],
+          "checked": true
+        },
+        "result": {
+          "arity": 1,
+          "kind": "fixed-table-record",
+          "fields": [
+            {
+              "name": "version",
+              "codec": "String"
+            },
+            {
+              "name": "number",
+              "codec": "Integer"
+            },
+            {
+              "name": "major",
+              "codec": "Integer"
+            },
+            {
+              "name": "minor",
+              "codec": "Integer"
+            }
+          ]
+        },
+        "stackEffect": {
+          "tablePushes": 1,
+          "returnedValues": 1
+        },
+        "producer": {
+          "mode": "registered-function",
+          "symbol": "Bullet3D_GetVersion",
+          "source": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d.cpp"
+        }
+      },
       "argumentCodecs": [],
       "fields": [
         {
@@ -1056,5 +1188,6 @@
       "bucket": "typed-map",
       "blocker": "unbounded-typed-map"
     }
-  ]
+  ],
+  "staleOptimizationQueue": []
 }

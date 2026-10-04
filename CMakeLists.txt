@@ -974,6 +974,7 @@ if(DEHERM_DEFOLD_SDK_PLATFORM
   # Every source the Extender would compile for the extension, so the driver
   # exercises the same translation units the packaged engine does.
   file(GLOB DEHERM_EXTENSION_SOURCES
+    "${CMAKE_CURRENT_SOURCE_DIR}/defold/defold_hermes/src/*.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/defold/defold_hermes/src/*.cpp")
   list(SORT DEHERM_EXTENSION_SOURCES)
 

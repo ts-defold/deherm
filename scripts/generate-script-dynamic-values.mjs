@@ -4,6 +4,10 @@ import { createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 import { stableBindingId } from "./lib/binding-identity.mjs";
+import {
+  parseCanonicalLuaRegistrationSurface,
+  registeredRouteCapability,
+} from "./lib/defold-lua-structural-capabilities.mjs";
 import { declaredDerivation, expectReviewedCount, observeReviewedSource } from "./lib/reviewed-revision.mjs";
 import { VOID, recordAudit } from "./lib/revision-audit.mjs";
 
@@ -11,6 +15,7 @@ const root = new URL("../", import.meta.url);
 const urls = {
   patterns: new URL("packages/bindings/generated/defold-script-binding-patterns.json", root),
   ir: new URL("packages/bindings/generated/defold-script-api-ir.json", root),
+  registrations: new URL("packages/bindings/generated/defold-lua-registration-surface.json", root),
   overrides: new URL("packages/bindings/overrides/script-dynamic-value-bindings.json", root),
   report: new URL("packages/bindings/generated/defold-script-dynamic-value-bindings.json", root),
   header: new URL("defold/defold_hermes/include/defold_hermes/generated_script_dynamic_values.hpp", root),
@@ -40,28 +45,108 @@ function enumName(value) {
     .join("");
 }
 
+function structuralReplayShape(fn, pattern) {
+  const parameterTypes = fn.parameters.map(({ rawType }) => rawType);
+  const patternParameterTypes = pattern.parameterCodecs.map(({ rawType }) => rawType);
+  const returnTypes = [...fn.returns];
+  const patternReturnTypes = pattern.returnCodecs.map(({ rawType }) => rawType);
+  const shapesAgree =
+    JSON.stringify(parameterTypes) === JSON.stringify(patternParameterTypes) &&
+    JSON.stringify(returnTypes) === JSON.stringify(patternReturnTypes);
+  const variableArguments = pattern.traits.includes("variable-arguments");
+  const variableResults = pattern.traits.includes("variable-results");
+  const supportedParameters = parameterTypes.every(
+    (type, index) =>
+      ["number", "integer", "any"].includes(type) &&
+      (index === 0 || !variableArguments || fn.parameters[index].rawName === "..."),
+  );
+  const resultMode =
+    variableResults && returnTypes.length === 1 && returnTypes[0] === "..."
+      ? "variable-values"
+      : returnTypes.length === 1 && ["number", "boolean"].includes(returnTypes[0])
+        ? returnTypes[0]
+        : null;
+  const strategy =
+    resultMode === "boolean" && parameterTypes.length === 1 && parameterTypes[0] === "any"
+      ? "exact-lua-type-query"
+      : resultMode
+        ? "exact-lua-call"
+        : null;
+  return {
+    parameterTypes,
+    returnTypes,
+    traits: [...pattern.traits],
+    proven: shapesAgree && supportedParameters && strategy !== null,
+    strategy,
+    resultMode,
+  };
+}
+
+function canonicalRegistrationSurfaces(registrationsText, targetIds) {
+  const surfaces = new Map();
+  let report = null;
+  for (const targetId of targetIds) {
+    const surface = parseCanonicalLuaRegistrationSurface(registrationsText, targetId);
+    report ??= surface.report;
+    // Canonical extraction can repeat the same registration through equivalent
+    // build paths. Collapse only byte-for-byte equivalent structured rows;
+    // distinct variants remain visible to registeredRouteCapability and make
+    // the optimization withdraw rather than guessing.
+    const routeVariants = new Map(
+      [...surface.routeVariants].map(([routeName, variants]) => [
+        routeName,
+        [...new Map(variants.map((route) => [JSON.stringify(route), route])).values()],
+      ]),
+    );
+    surfaces.set(targetId, { ...surface, routeVariants });
+  }
+  return { report, surfaces };
+}
+
+function replayRegistrationEvidence(registrationSurfaces, fn) {
+  const facts = [];
+  for (const [targetId, surface] of registrationSurfaces) {
+    const capability = registeredRouteCapability(surface, fn.rawName);
+    const route = capability ? surface.routes.get(capability.route) : null;
+    const minimumArguments = route?.arity?.derived?.min;
+    if (
+      !capability ||
+      capability.module !== fn.modulePath.join(".") ||
+      capability.route !== `${capability.module}.${fn.member}` ||
+      !Number.isInteger(minimumArguments) ||
+      minimumArguments < 0 ||
+      minimumArguments > 255
+    ) {
+      return { proven: false, facts };
+    }
+    facts.push({
+      target: targetId,
+      module: capability.module,
+      member: fn.member,
+      minimumArguments,
+      registrationPath: capability.sourcePath,
+    });
+  }
+  return {
+    proven:
+      facts.length === registrationSurfaces.size &&
+      new Set(facts.map(({ minimumArguments }) => minimumArguments)).size === 1,
+    facts,
+  };
+}
+
 const anchors = {
-  "script:bit.band": /BIT_OP\(bit_band,\s*&=\)/,
-  "script:bit.bor": /BIT_OP\(bit_bor,\s*\|=\)/,
-  "script:bit.bxor": /BIT_OP\(bit_bxor,\s*\^=\)/,
-  "script:socket.skip": /int ret = lua_gettop\(L\) - amount - 1;\s*return ret >= 0 \? ret : 0;/,
-  "script:types.is_hash": /\{\s*"is_hash",\s*Types_IsHash\s*\}/,
-  "script:types.is_matrix4": /\{\s*"is_matrix4",\s*Types_IsMatrix4\s*\}/,
-  "script:types.is_quat": /\{\s*"is_quat",\s*Types_IsQuat\s*\}/,
-  "script:types.is_url": /\{\s*"is_url",\s*Types_IsUrl\s*\}/,
-  "script:types.is_vector": /\{\s*"is_vector",\s*Types_IsVector\s*\}/,
-  "script:types.is_vector3": /\{\s*"is_vector3",\s*Types_IsVector3\s*\}/,
-  "script:types.is_vector4": /\{\s*"is_vector4",\s*Types_IsVector4\s*\}/,
   "script:json.decode": /\{\s*"decode",\s*Json_Decode\s*\}/,
   "script:json.encode": /\{\s*"encode",\s*Json_Encode\s*\}/,
   "script:pprint": /int LuaPPrint\(lua_State\* L\)/,
 };
 
 export async function loadInputs() {
-  const [patternsText, irText, overridesText] = await Promise.all([
+  const [patternsText, irText, overridesText, registrationsText] = await Promise.all([
     readFile(urls.patterns, "utf8"),
     readFile(urls.ir, "utf8"),
     readFile(urls.overrides, "utf8"),
+    readFile(urls.registrations, "utf8"),
   ]);
   const overrides = JSON.parse(overridesText);
   const sources = await Promise.all(
@@ -70,10 +155,10 @@ export async function loadInputs() {
       text: await readFile(new URL(`upstream/defold/${source.path}`, root), "utf8").catch(() => null),
     })),
   );
-  return { patternsText, irText, overridesText, sources };
+  return { patternsText, irText, overridesText, registrationsText, sources };
 }
 
-export function generate(patternsText, irText, overridesText, sources) {
+export function generate(patternsText, irText, overridesText, sources, registrationsText) {
   const patterns = JSON.parse(patternsText);
   const ir = JSON.parse(irText);
   const overrides = JSON.parse(overridesText);
@@ -90,12 +175,30 @@ export function generate(patternsText, irText, overridesText, sources) {
     "dynamic-value classified binding count is stale",
   );
   assert(patterns.pendingFunctionCount === patterns.bindings?.length, "dynamic-value pending binding count is stale");
-  assert(overrides.schemaVersion === 1, "dynamic-value override schema drifted");
+  assert(overrides.schemaVersion === 2, "dynamic-value override schema drifted");
   assert(
     Number.isInteger(overrides.maximumArgumentCount) &&
       overrides.maximumArgumentCount > 0 &&
       overrides.maximumArgumentCount <= 255,
     "dynamic-value maximum argument count must fit the generated descriptor",
+  );
+  assert(
+    Array.isArray(overrides.requiredRegistrationTargets) && overrides.requiredRegistrationTargets.length > 0,
+    "dynamic-value replay needs registered-callable targets",
+  );
+  assert(
+    new Set(overrides.requiredRegistrationTargets).size === overrides.requiredRegistrationTargets.length,
+    "dynamic-value replay repeats a registration target",
+  );
+  for (const key of ["executionContext", "codecEvidence", "ownership"])
+    assert(typeof overrides.replayContract?.[key] === "string", `dynamic-value replay contract lacks ${key}`);
+  const canonicalRegistrations = canonicalRegistrationSurfaces(
+    registrationsText,
+    overrides.requiredRegistrationTargets,
+  );
+  assert(
+    canonicalRegistrations.report.defoldRevision === ir.defoldRevision,
+    "dynamic-value registration revision drifted",
   );
   assert(sources.length === overrides.sources.length, "dynamic-value pinned source count drifted");
   const expectedSourceByKey = new Map();
@@ -181,68 +284,95 @@ export function generate(patternsText, irText, overridesText, sources) {
       assert(rule, `${pattern.id}: missing reviewed dynamic-value rule`);
       const fn = irById.get(pattern.id);
       assert(fn, `${pattern.id}: absent from pinned script IR`);
-      const source = sourceByKey.get(rule.source);
-      assert(source, `${pattern.id}: unknown source key ${rule.source}`);
-      if (typeof source.text !== "string" || !anchors[pattern.id]?.test(source.text)) {
-        const message = `${pattern.id}: pinned implementation ${source.text === null ? "source is absent" : "anchor drifted"}`;
-        assert(declaredDerivation(), message);
-        recordAudit({
-          input: "packages/bindings/overrides/script-dynamic-value-bindings.json",
-          id: pattern.id,
-          source: source.path,
-          status: VOID,
-          reason: source.text === null ? "absent-source" : "reviewed-route-anchor-lost",
-          detail: message,
-        });
-        return null;
-      }
       const candidate = rule.strategy !== "blocked";
-      if (candidate) {
-        assert(Number.isInteger(rule.minimumArguments), `${pattern.id}: executable route needs minimumArguments`);
-        assert(
-          ["number", "boolean", "variable-values"].includes(rule.resultMode),
-          `${pattern.id}: unknown result mode`,
-        );
-      } else {
+      if (!candidate) {
+        const source = sourceByKey.get(rule.source);
+        assert(source, `${pattern.id}: unknown source key ${rule.source}`);
+        if (typeof source.text !== "string" || !anchors[pattern.id]?.test(source.text)) {
+          const message = `${pattern.id}: pinned blocker implementation ${source.text === null ? "source is absent" : "anchor drifted"}`;
+          assert(declaredDerivation(), message);
+          recordAudit({
+            input: "packages/bindings/overrides/script-dynamic-value-bindings.json",
+            id: pattern.id,
+            source: source.path,
+            status: VOID,
+            reason: source.text === null ? "absent-source" : "reviewed-route-anchor-lost",
+            detail: message,
+          });
+          return null;
+        }
         assert(rule.blocker && rule.detail, `${pattern.id}: blocked route needs a machine blocker and detail`);
+        return {
+          id: pattern.id,
+          stableId: hex(stableBindingId(pattern.id)),
+          modulePath: fn.modulePath,
+          member: fn.member,
+          strategy: rule.strategy,
+          generatedFamilyExecutableCandidate: false,
+          optimizationProven: false,
+          optimizationBlockers: [rule.blocker],
+          minimumArguments: null,
+          maximumArguments: null,
+          resultMode: null,
+          blocker: rule.blocker,
+          blockerDetail: rule.detail,
+          sourceEvidence: { path: source.path, sha256: source.sha256, anchor: anchors[pattern.id].source },
+          focusedNativeEvidence: "not-applicable-blocked",
+          targetSupport: {
+            nativeDynamicHermes: `blocked-${rule.blocker}`,
+            nativeStaticHermes: `blocked-${rule.blocker}`,
+            html5BrowserHost: `blocked-${rule.blocker}`,
+          },
+        };
       }
+
+      assert(rule.strategy === "registered-replay", `${pattern.id}: candidate strategy is not structural replay`);
+      const shape = structuralReplayShape(fn, pattern);
+      const registration = replayRegistrationEvidence(canonicalRegistrations.surfaces, fn);
+      const optimizationBlockers = [
+        ...(!registration.proven ? ["registered-global-callable-evidence-missing"] : []),
+        ...(!shape.proven ? ["structural-codec-evidence-missing"] : []),
+      ];
+      const optimizationProven = optimizationBlockers.length === 0;
+      const minimumArguments = registration.facts[0]?.minimumArguments ?? 0;
       return {
         id: pattern.id,
         stableId: hex(stableBindingId(pattern.id)),
         modulePath: fn.modulePath,
         member: fn.member,
-        strategy: rule.strategy,
-        generatedFamilyExecutableCandidate: candidate,
-        minimumArguments: candidate ? rule.minimumArguments : null,
-        maximumArguments: candidate ? overrides.maximumArgumentCount : null,
-        resultMode: candidate ? rule.resultMode : null,
-        blocker: candidate ? null : rule.blocker,
-        blockerDetail: candidate ? null : rule.detail,
-        sourceEvidence: { path: source.path, sha256: source.sha256, anchor: anchors[pattern.id].source },
-        focusedNativeEvidence: !candidate
-          ? "not-applicable-blocked"
-          : pattern.id.startsWith("script:bit.")
-            ? "observed-exact-upstream-bitop-implementation"
-            : pattern.id === "script:socket.skip"
-              ? "observed-transport-with-source-equivalent-test-function"
-              : "observed-transport-with-local-type-identity-stand-ins",
-        targetSupport: candidate
-          ? {
-              nativeDynamicHermes: "candidate-awaits-shared-router-integration",
-              nativeStaticHermes: "planned-generated-adapter",
-              html5BrowserHost: "not-executable-no-generated-provider",
-            }
-          : {
-              nativeDynamicHermes: `blocked-${rule.blocker}`,
-              nativeStaticHermes: `blocked-${rule.blocker}`,
-              html5BrowserHost: `blocked-${rule.blocker}`,
-            },
+        strategy: shape.strategy ?? "exact-lua-call",
+        generatedFamilyExecutableCandidate: true,
+        optimizationProven,
+        optimizationBlockers,
+        minimumArguments,
+        maximumArguments: overrides.maximumArgumentCount,
+        resultMode: shape.resultMode ?? "variable-values",
+        blocker: null,
+        blockerDetail: null,
+        replayEvidence: {
+          registrations: registration.facts,
+          executionContext: overrides.replayContract.executionContext,
+          parameterTypes: shape.parameterTypes,
+          returnTypes: shape.returnTypes,
+          traits: shape.traits,
+          ownership: overrides.replayContract.ownership,
+        },
+        focusedNativeEvidence: "observed-bounded-registered-Lua-replay-transport",
+        targetSupport: {
+          nativeDynamicHermes: optimizationProven
+            ? "candidate-awaits-shared-router-integration"
+            : "universal-fallback-missing-proof",
+          nativeStaticHermes: optimizationProven ? "planned-generated-adapter" : "universal-fallback-missing-proof",
+          html5BrowserHost: "not-executable-no-generated-provider",
+        },
       };
     })
     .filter(Boolean)
     .sort((left, right) => Number.parseInt(left.stableId) - Number.parseInt(right.stableId));
   assert(new Set(rows.map(({ stableId }) => stableId)).size === rows.length, "dynamic-value stable ID collision");
   const candidates = rows.filter((row) => row.generatedFamilyExecutableCandidate);
+  const optimizedCandidates = candidates.filter((row) => row.optimizationProven);
+  const universalFallbackCandidates = candidates.filter((row) => !row.optimizationProven);
   const blocked = rows.filter((row) => !row.generatedFamilyExecutableCandidate);
   expectReviewedCount({
     input: "packages/bindings/overrides/script-dynamic-value-bindings.json",
@@ -258,15 +388,23 @@ export function generate(patternsText, irText, overridesText, sources) {
       scriptIrSha256: sha256(irText),
       bindingPatternsSha256: sha256(patternsText),
       reviewedOverridesSha256: sha256(overridesText),
+      registeredCallableEvidenceSha256: sha256(
+        JSON.stringify(
+          candidates.map(({ id, replayEvidence }) => ({ id, registrations: replayEvidence.registrations })),
+        ),
+      ),
     },
     routeCount: rows.length,
     generatedFamilyCandidateCount: candidates.length,
+    optimizedReplayCount: optimizedCandidates.length,
+    universalFallbackCount: universalFallbackCandidates.length,
     blockedCount: blocked.length,
     maximumArgumentCount: overrides.maximumArgumentCount,
     allocationPolicy:
       "Generated dispatch uses sorted static descriptors and caller-owned ScriptCallFrame storage. The exact Lua backend must cache function references and use fixed-capacity stack/scratch; there is no heap fallback in generated glue.",
     evidencePolicy:
-      "Source hashes and implementation anchors prove what was reviewed. Focused native tests prove the generated ABI and compile Defold's exact Lua BitOp implementation; socket.skip uses a source-equivalent local C function and types.* use local type-identity stand-ins, so neither is claimed semantically engine-proven. No route enters global executable accounting until the shared ScriptAdapter/JSI router is integrated, and no packaged-engine or browser execution is claimed.",
+      "Replay admission uses callable registration in every required engine profile plus exact IR/pattern codec shape and registration-derived arity. Private C function names and implementation bodies are non-evidence. Blocked recursive routes retain their separate source-reviewed semantic blockers. Focused native tests prove bounded Lua replay transport, not packaged-engine implementation semantics.",
+    replayContract: overrides.replayContract,
     blockerCounts: Object.fromEntries(
       [...new Set(blocked.map(({ blocker }) => blocker))]
         .sort(compare)
@@ -282,22 +420,47 @@ export function generate(patternsText, irText, overridesText, sources) {
     ? descriptorRows
         .map(
           (row) =>
-            `  {${row.index}, ${row.stableId}u, ${cpp(row.id)}, ${cpp(row.modulePath.join("."))}, ${cpp(row.member)}, Strategy::k${enumName(row.strategy)}, ResultMode::k${enumName(row.resultMode)}, ${row.minimumArguments}, ${row.maximumArguments}},`,
+            `  {${row.index}, ${row.stableId}u, ${cpp(row.id)}, ${cpp(row.modulePath.join("."))}, ${cpp(row.member)}, Strategy::k${enumName(row.strategy)}, ResultMode::k${enumName(row.resultMode)}, ${row.minimumArguments}, ${row.maximumArguments}, ${row.optimizationProven}},`,
         )
         .join("\n")
     : "  {},  // sentinel storage; kBindingCount remains zero";
   const source = `// Generated by scripts/generate-script-dynamic-values.mjs. Do not edit.\n#include <defold_hermes/generated_script_dynamic_values.hpp>\n#include <cstdio>\n\nnamespace defold_hermes::dynamic_value { namespace {\nconstexpr Operation kOperations[] = {\n${descriptorEntries}\n};\nvoid fail(char* error, size_t capacity, const char* message) noexcept { if (error && capacity) std::snprintf(error, capacity, "%s", message); }\nbool resultMatches(const Operation& operation, const ScriptCallFrame& frame) noexcept {\n  if (operation.resultMode == ResultMode::kVariableValues) return frame.resultCount <= frame.resultCapacity;\n  if (frame.resultCount != 1 || !frame.results) return false;\n  return operation.resultMode == ResultMode::kNumber ? frame.results[0].tag == ScriptValueTag::kNumber : frame.results[0].tag == ScriptValueTag::kBoolean;\n}\n}\nconst Operation* find(uint32_t stableId) noexcept { size_t first=0,count=kBindingCount; while(count){const size_t step=count/2,index=first+step;if(kOperations[index].stableId<stableId){first=index+1;count-=step+1;}else count=step;} return first<kBindingCount&&kOperations[first].stableId==stableId?&kOperations[first]:nullptr; }\nDispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t capacity, const LuaApi* api) noexcept {\n  if (!frame) { fail(error,capacity,"Dynamic-value call frame is null"); return DispatchStatus::kError; }\n  const Operation* operation=find(frame->stableId); if(!operation) return DispatchStatus::kMissing; frame->resultCount=0;\n  if(frame->argumentCount<operation->minimumArguments||frame->argumentCount>operation->maximumArguments||(frame->argumentCount&&!frame->arguments)){fail(error,capacity,"Dynamic-value argument count is outside the generated fixed capacity");return DispatchStatus::kError;}\n  if(!frame->results||frame->resultCapacity==0){fail(error,capacity,"Dynamic-value result storage is exhausted");return DispatchStatus::kError;}\n  if(!api||!api->invoke){fail(error,capacity,"Dynamic-value exact Lua backend is unavailable");return DispatchStatus::kError;}\n  const DispatchStatus status=api->invoke(api->context,*operation,frame,error,capacity);\n  if(status!=DispatchStatus::kSuccess){frame->resultCount=0;return status==DispatchStatus::kMissing?DispatchStatus::kError:status;}\n  if(!resultMatches(*operation,*frame)){frame->resultCount=0;fail(error,capacity,"Dynamic-value Lua result does not match the generated result mode");return DispatchStatus::kError;}\n  return DispatchStatus::kSuccess;\n}\n}\n`;
+  const evidenceHeader = header.replace(
+    "uint8_t maximumArguments; };",
+    "uint8_t maximumArguments; bool optimizationProven; };",
+  );
+  const evidenceSource = source.replace(
+    "if(!operation) return DispatchStatus::kMissing; frame->resultCount=0;",
+    "if(!operation||!operation->optimizationProven) return DispatchStatus::kMissing; frame->resultCount=0;",
+  );
+  assert(
+    evidenceHeader.includes("bool optimizationProven;") &&
+      evidenceSource.includes("if(!operation||!operation->optimizationProven) return DispatchStatus::kMissing;"),
+    "dynamic-value replay evidence gate did not attach to generated dispatch",
+  );
   const target = `// Generated by scripts/generate-script-dynamic-values.mjs. Do not edit.\nexport type DynamicBitOperand = number;\nexport type DynamicSocketValue = unknown;\nexport interface DynamicValueApi {\n  readonly bit: {\n    band(x1: DynamicBitOperand, ...values: readonly DynamicBitOperand[]): number;\n    bor(x1: DynamicBitOperand, ...values: readonly DynamicBitOperand[]): number;\n    bxor(x1: DynamicBitOperand, ...values: readonly DynamicBitOperand[]): number;\n  };\n  readonly socket: { skip(drop: number, ...values: readonly DynamicSocketValue[]): readonly DynamicSocketValue[] };\n  readonly types: {\n    is_hash(value?: unknown): boolean;\n    is_matrix4(value?: unknown): boolean;\n    is_quat(value?: unknown): boolean;\n    is_url(value?: unknown): boolean;\n    is_vector(value?: unknown): boolean;\n    is_vector3(value?: unknown): boolean;\n    is_vector4(value?: unknown): boolean;\n  };\n}\nexport const dynamicValueBindingDescriptors = ${JSON.stringify(
-    candidates.map(({ id, stableId, strategy, resultMode }) => ({ id, stableId, strategy, resultMode })),
+    candidates.map(({ id, stableId, strategy, resultMode, optimizationProven }) => ({
+      id,
+      stableId,
+      strategy,
+      resultMode,
+      optimizationProven,
+    })),
     null,
     2,
   )} as const;\nconst unsupportedHtml5Ids: ReadonlySet<string> = new Set(dynamicValueBindingDescriptors.map(({ id }) => id));\nexport function assertDynamicValueTargetSupport(target: string | undefined, canonicalId: string): void {\n  if (target === "html5-browser-host" && unsupportedHtml5Ids.has(canonicalId)) {\n    throw new Error(\`${"${canonicalId}"} is not executable in the HTML5 browser host: no generated dynamic-value provider\`);\n  }\n}\n`;
-  return { report: `${JSON.stringify(report, null, 2)}\n`, header, source, target };
+  return { report: `${JSON.stringify(report, null, 2)}\n`, header: evidenceHeader, source: evidenceSource, target };
 }
 
 export async function run(check = false) {
   const inputs = await loadInputs();
-  const outputs = generate(inputs.patternsText, inputs.irText, inputs.overridesText, inputs.sources);
+  const outputs = generate(
+    inputs.patternsText,
+    inputs.irText,
+    inputs.overridesText,
+    inputs.sources,
+    inputs.registrationsText,
+  );
   for (const [key, contents] of Object.entries(outputs)) {
     if (check)
       assert((await readFile(urls[key], "utf8")) === contents, `${urls[key].pathname}: generated output is stale`);
@@ -310,7 +473,7 @@ if (process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url) 
   run(process.argv.includes("--check"))
     .then((report) => {
       console.log(
-        `Generated ${report.generatedFamilyCandidateCount}/${report.routeCount} dynamic-value executable-family candidates; ${report.blockedCount} are machine-blocked.`,
+        `Generated ${report.optimizedReplayCount}/${report.generatedFamilyCandidateCount} optimized dynamic-value replay candidates, ${report.universalFallbackCount} universal fallbacks; ${report.blockedCount} are machine-blocked.`,
       );
     })
     .catch((error) => {

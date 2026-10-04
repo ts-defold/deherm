@@ -114,15 +114,25 @@ test("Defold value and handle bindings are deterministic structured descriptors"
     registrationArray: "Gui_methods",
     registrationLine: 4986,
   });
-  assert.equal(guiNode.structuralCapabilities.context.check, "GuiScriptInstance_Check");
+  assert.equal(guiNode.structuralCapabilities.context.capability.evidence, "registered-instance-userdata-check");
   assert.equal(guiNode.structuralCapabilities.userdata.kind, "full-userdata");
-  assert.equal(guiNode.structuralCapabilities.userdata.metatable, "NodeProxy");
+  assert.equal(guiNode.structuralCapabilities.userdata.metatable, "NODE_PROXY_TYPE_NAME");
   assert.deepEqual(guiNode.structuralCapabilities.userdata.metamethods, ["__index", "__newindex", "__eq"]);
   assert.deepEqual(report.bindings.find(({ id }) => id === "script:gui.set_material").implementedCallShapes, [
     ["Node", "String"],
     ["Node", "Hash"],
   ]);
   const factory = report.bindings.find(({ id }) => id === "script:factory.create");
+  assert.equal(factory.structuralCapabilities.operation.replayBoundary.transport, "registered-lua-call");
+  assert.equal(
+    report.bindings.find(({ id }) => id === "script:msg.post").structuralCapabilities.operation.replayBoundary.context,
+    "current-script-sender-url",
+  );
+  assert.equal(
+    report.bindings.find(({ id }) => id === "script:gui.set_text").structuralCapabilities.operation.transportedHandle
+      .sceneIdentity,
+    true,
+  );
   assert.ok(
     factory.implementedCallShapes.some((shape) => JSON.stringify(shape) === JSON.stringify(["String", "Vector3"])),
   );
@@ -249,6 +259,20 @@ test("GUI node structural capability preserves irrelevant body edits and withdra
     null,
     "a full-userdata return without the registered type metatable is not a Node capability",
   );
+  const commentedOutTypeCheck = [...fixture.inputs];
+  commentedOutTypeCheck[guiInputIndex] = {
+    ...original,
+    sourceText: original.sourceText.replace(
+      "dmScript::CheckUserType(L, index, NODE_PROXY_TYPE_HASH, 0)",
+      "lua_touserdata(L, index) /* dmScript::CheckUserType(L, index, NODE_PROXY_TYPE_HASH, 0) */",
+    ),
+  };
+  assert.notEqual(commentedOutTypeCheck[guiInputIndex].sourceText, original.sourceText);
+  assert.equal(
+    guiNodeUserdataCapability(surface, commentedOutTypeCheck[guiInputIndex].sourceText, { returns: ["node"] }),
+    null,
+    "a commented-out userdata type check is not structural evidence",
+  );
   const previousRevision = process.env.DEHERM_DERIVED_REVISION;
   const previousAudit = process.env.DEHERM_REVISION_AUDIT;
   const auditDirectory = await mkdtemp(path.join(tmpdir(), "deherm-gui-node-capability-"));
@@ -267,6 +291,17 @@ test("GUI node structural capability preserves irrelevant body edits and withdra
       true,
       "withdrawal removes only the optimization recipe; the authoritative API route remains",
     );
+    const commentedOutReport = JSON.parse(
+      generate(fixture.irText, fixture.scalarDispatchText, fixture.patternsText, commentedOutTypeCheck).report,
+    );
+    assert.equal(
+      commentedOutReport.bindings.some(({ id }) => id === "script:gui.get_node"),
+      false,
+    );
+    assert.equal(
+      commentedOutReport.bindings.some(({ id }) => id === "script:gui.set_text"),
+      false,
+    );
   } finally {
     if (previousRevision === undefined) delete process.env.DEHERM_DERIVED_REVISION;
     else process.env.DEHERM_DERIVED_REVISION = previousRevision;
@@ -274,6 +309,145 @@ test("GUI node structural capability preserves irrelevant body edits and withdra
     else process.env.DEHERM_REVISION_AUDIT = previousAudit;
     await rm(auditDirectory, { recursive: true, force: true });
   }
+});
+
+test("structured replay survives private body changes and withdraws when registration proof disappears", async () => {
+  const fixture = await loadGenerationInputs();
+  const renamed = fixture.inputs.map((input) => {
+    const source = JSON.parse(input.definitionText).source;
+    let sourceText = input.sourceText;
+    if (source.endsWith("script_factory.cpp")) {
+      sourceText = sourceText
+        .replaceAll("FactoryComp_Create", "SpawnFactoryInstance")
+        .replaceAll("CompFactorySpawn", "SpawnThroughBackend")
+        .replaceAll("PropertyContainerCreateFromLua", "DecodeSpawnProperties")
+        .replaceAll("Properties of size", "Property payload size");
+    } else if (source.endsWith("script_msg.cpp")) {
+      sourceText = sourceText
+        .replaceAll("Msg_Post", "PostRegisteredMessage")
+        .replaceAll("ResolveURL", "ResolveMessageEndpoints")
+        .replaceAll("Could not send message", "Message queue rejected payload");
+    } else if (source.endsWith("gui_script.cpp")) {
+      sourceText = sourceText
+        .replaceAll("LuaGetNode", "LookupRegisteredNode")
+        .replaceAll("LuaSetText", "ReplaceRegisteredNodeText")
+        .replaceAll("GuiScriptInstance_Check", "CheckedGuiSceneFromState")
+        .replaceAll("NodeProxy_Check", "CheckedNodeUserdata")
+        .replaceAll("LuaCheckNodeInternal", "CheckedInternalNode")
+        .replaceAll("InternalNode", "GuiNodeStorage")
+        .replaceAll("int index", "int slot")
+        .replaceAll("(L, index", "(L, slot")
+        .replaceAll("m_Scene", "scene_storage")
+        .replaceAll("strdup", "CopyNodeText")
+        .replaceAll("free", "ReleaseNodeText")
+        .replaceAll("No such node", "Unknown GUI identity");
+    }
+    return { ...input, sourceText };
+  });
+  const surface = JSON.parse(renamed[0].registrationSurfaceText);
+  const callableNames = new Map([
+    ["factory.create", "SpawnFactoryInstance"],
+    ["msg.post", "PostRegisteredMessage"],
+    ["gui.get_node", "LookupRegisteredNode"],
+    ["gui.set_text", "ReplaceRegisteredNodeText"],
+  ]);
+  for (const route of surface.targets["defold-engine-box2d-v3"].routes) {
+    if (callableNames.has(route.name)) route.cFunction = callableNames.get(route.name);
+  }
+  const registrationSurfaceText = JSON.stringify(surface);
+  for (const input of renamed) input.registrationSurfaceText = registrationSurfaceText;
+  const preserved = JSON.parse(
+    generate(fixture.irText, fixture.scalarDispatchText, fixture.patternsText, renamed).report,
+  );
+  for (const id of ["script:factory.create", "script:msg.post", "script:gui.get_node", "script:gui.set_text"]) {
+    assert.ok(
+      preserved.bindings.some((binding) => binding.id === id),
+      `${id} survives private spelling changes`,
+    );
+  }
+
+  const withdrawn = structuredClone(fixture.inputs);
+  const missingSurface = JSON.parse(withdrawn[0].registrationSurfaceText);
+  missingSurface.targets["defold-engine-box2d-v3"].routes.find(({ name }) => name === "msg.post").cFunction =
+    "MissingRegisteredMessageCallable";
+  for (const input of withdrawn) input.registrationSurfaceText = JSON.stringify(missingSurface);
+  const previousRevision = process.env.DEHERM_DERIVED_REVISION;
+  const previousAudit = process.env.DEHERM_REVISION_AUDIT;
+  const auditDirectory = await mkdtemp(path.join(tmpdir(), "deherm-structured-replay-capability-"));
+  process.env.DEHERM_DERIVED_REVISION = JSON.parse(fixture.irText).defoldRevision;
+  process.env.DEHERM_REVISION_AUDIT = path.join(auditDirectory, "audit.ndjson");
+  try {
+    const report = JSON.parse(
+      generate(fixture.irText, fixture.scalarDispatchText, fixture.patternsText, withdrawn).report,
+    );
+    assert.equal(
+      report.bindings.some(({ id }) => id === "script:msg.post"),
+      false,
+    );
+    assert.ok(report.bindings.some(({ id }) => id === "script:factory.create"));
+    assert.ok(JSON.parse(fixture.irText).functions.some(({ id }) => id === "script:msg.post"));
+
+    const lostSceneIdentity = fixture.inputs.map((input) => {
+      const source = JSON.parse(input.definitionText).source;
+      return source.endsWith("gui_script.cpp")
+        ? {
+            ...input,
+            sourceText: input.sourceText.replace(
+              "if (np->m_Scene != GetScene(L))",
+              "if (NodeSceneRelationWasRemoved(L))",
+            ),
+          }
+        : input;
+    });
+    const lostSceneReport = JSON.parse(
+      generate(fixture.irText, fixture.scalarDispatchText, fixture.patternsText, lostSceneIdentity).report,
+    );
+    assert.equal(
+      lostSceneReport.bindings.some(({ id }) => id === "script:gui.set_text"),
+      false,
+    );
+    assert.ok(lostSceneReport.bindings.some(({ id }) => id === "script:gui.get_node"));
+    assert.ok(JSON.parse(fixture.irText).functions.some(({ id }) => id === "script:gui.set_text"));
+  } finally {
+    if (previousRevision === undefined) delete process.env.DEHERM_DERIVED_REVISION;
+    else process.env.DEHERM_DERIVED_REVISION = previousRevision;
+    if (previousAudit === undefined) delete process.env.DEHERM_REVISION_AUDIT;
+    else process.env.DEHERM_REVISION_AUDIT = previousAudit;
+    await rm(auditDirectory, { recursive: true, force: true });
+  }
+});
+
+test("generated value families consume canonical registration identity, not source spelling", async () => {
+  const fixture = await loadGenerationInputs();
+  const vmathInputIndex = fixture.inputs.findIndex(
+    ({ definitionText }) => JSON.parse(definitionText).source === "engine/script/src/script_vmath.cpp",
+  );
+  assert.notEqual(vmathInputIndex, -1);
+  const original = JSON.parse(
+    generate(fixture.irText, fixture.scalarDispatchText, fixture.patternsText, fixture.inputs).report,
+  );
+  const respelled = [...fixture.inputs];
+  respelled[vmathInputIndex] = {
+    ...respelled[vmathInputIndex],
+    sourceText: respelled[vmathInputIndex].sourceText.replace('{"cross", Cross}', '{  "cross" , Cross  }'),
+  };
+  const preserved = JSON.parse(
+    generate(fixture.irText, fixture.scalarDispatchText, fixture.patternsText, respelled).report,
+  );
+  assert.deepEqual(
+    preserved.bindings.find(({ id }) => id === "script:vmath.cross"),
+    original.bindings.find(({ id }) => id === "script:vmath.cross"),
+  );
+
+  const changedRegistration = structuredClone(fixture.inputs);
+  const surface = JSON.parse(changedRegistration[vmathInputIndex].registrationSurfaceText);
+  surface.targets["defold-engine-box2d-v3"].routes.find(({ name }) => name === "vmath.cross").registration.path =
+    "script/src/registration_moved.cpp";
+  for (const input of changedRegistration) input.registrationSurfaceText = JSON.stringify(surface);
+  assert.throws(
+    () => generate(fixture.irText, fixture.scalarDispatchText, fixture.patternsText, changedRegistration),
+    /no pinned vmath methods registration was found/,
+  );
 });
 
 test("generated value implementation stays POD-native and fail-closed", async () => {
@@ -388,9 +562,9 @@ test("value operation templates fail closed for unknown and mismatched metadata"
       ),
     };
   });
-  assert.throws(
+  assert.doesNotThrow(
     () => generate(fixture.irText, fixture.scalarDispatchText, fixture.patternsText, unregisteredDelete),
-    /registered Lua callable "delete" no longer resolves to Script_Delete/,
+    "the canonical registration surface, not a second source regex, owns registration identity",
   );
 
   const wrongDeleteShape = mutateBinding(fixture.inputs, "script:go.delete", (binding) => {

@@ -154,6 +154,31 @@ not remove the authoritative Lua route: the universal bridge remains the
 fallback. This keeps specialization admission relational to source capability
 rather than to a frozen route count or a private helper's current spelling.
 
+The same rule now governs URL, dynamic-value, fixed-tuple, finite-overload,
+and fixed table-record replay. URL replay consumes the public four-lane layout,
+public `PushURL`/`ToURL` and instance APIs, canonical codecs, and the
+generation-checked frame arena; it does not consume private `ResolveURL` body
+spelling. Dynamic-value, fixed-tuple, overload, and generated value/value-tail
+routes join canonical registration identity to context, arity, and codec facts
+instead of reparsing registration arrays. Fixed table records additionally
+require their exact field/codecs and one-table/one-result stack effect, not
+helper names or error strings. Missing proof retains the descriptor and returns
+`kMissing` to the universal implementation; malformed storage for a proven
+specialization still returns `kError`.
+
+Borrowed handles now separate representation proof from lifecycle proof:
+375 rows need representation only and 62 capture/invalidation rows also need
+lifecycle effects. Their capability records consume opaque userdata allocation,
+metatable/type registration, rooting, numeric/light-userdata representation,
+and structural lifecycle-effect classes rather than wrapper names, helper-body
+fragments, or error text. The 429 runtime routes retain the same 367/62 split;
+eight declaration tokens remain compiler-only. Captured replay for
+`factory.create` and `msg.post` stops at canonical registration plus its
+IR-derived codec/result boundary. `gui.get_node` and `gui.set_text` additionally
+consume only the Node userdata/rootability and active-scene identity facts the
+adapter transports. Private spawn, message encoding/post, or text ownership
+implementation bodies are Defold semantics behind that registered boundary.
+
 The integrated anti-regression contract is relational rather than a frozen
 route count. Source IDs and emitted IDs must be equal sets; every ID has exactly
 one preferred selection and one universal base recipe; every structurally

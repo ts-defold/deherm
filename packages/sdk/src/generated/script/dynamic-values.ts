@@ -23,67 +23,78 @@ export const dynamicValueBindingDescriptors = [
     "id": "script:bit.bor",
     "stableId": "0x0892398e",
     "strategy": "exact-lua-call",
-    "resultMode": "number"
+    "resultMode": "number",
+    "optimizationProven": true
   },
   {
     "id": "script:types.is_hash",
     "stableId": "0x206a89ba",
     "strategy": "exact-lua-type-query",
-    "resultMode": "boolean"
+    "resultMode": "boolean",
+    "optimizationProven": true
   },
   {
     "id": "script:bit.band",
     "stableId": "0x7872f480",
     "strategy": "exact-lua-call",
-    "resultMode": "number"
+    "resultMode": "number",
+    "optimizationProven": true
   },
   {
     "id": "script:bit.bxor",
     "stableId": "0x948f508c",
     "strategy": "exact-lua-call",
-    "resultMode": "number"
+    "resultMode": "number",
+    "optimizationProven": true
   },
   {
     "id": "script:types.is_matrix4",
     "stableId": "0x9acd4145",
     "strategy": "exact-lua-type-query",
-    "resultMode": "boolean"
+    "resultMode": "boolean",
+    "optimizationProven": true
   },
   {
     "id": "script:socket.skip",
     "stableId": "0x9b0d4932",
     "strategy": "exact-lua-call",
-    "resultMode": "variable-values"
+    "resultMode": "variable-values",
+    "optimizationProven": true
   },
   {
     "id": "script:types.is_quat",
     "stableId": "0xc6f91f35",
     "strategy": "exact-lua-type-query",
-    "resultMode": "boolean"
+    "resultMode": "boolean",
+    "optimizationProven": true
   },
   {
     "id": "script:types.is_vector",
     "stableId": "0xc8496cbd",
     "strategy": "exact-lua-type-query",
-    "resultMode": "boolean"
+    "resultMode": "boolean",
+    "optimizationProven": true
   },
   {
     "id": "script:types.is_vector4",
     "stableId": "0xd495dbab",
     "strategy": "exact-lua-type-query",
-    "resultMode": "boolean"
+    "resultMode": "boolean",
+    "optimizationProven": true
   },
   {
     "id": "script:types.is_vector3",
     "stableId": "0xd995e38a",
     "strategy": "exact-lua-type-query",
-    "resultMode": "boolean"
+    "resultMode": "boolean",
+    "optimizationProven": true
   },
   {
     "id": "script:types.is_url",
     "stableId": "0xfaf3e587",
     "strategy": "exact-lua-type-query",
-    "resultMode": "boolean"
+    "resultMode": "boolean",
+    "optimizationProven": true
   }
 ] as const;
 const unsupportedHtml5Ids: ReadonlySet<string> = new Set(dynamicValueBindingDescriptors.map(({ id }) => id));

@@ -5,6 +5,8 @@
   "coverageClaim": "All selected routes have generated stable-ID descriptors and one reusable captured-Lua lowering on native dynamic Hermes. Static Hermes, the flat C ABI, and HTML5 remain fail-closed for full structured URLs until their ABIs carry all four exact uint64 lanes.",
   "allocationClaim": "The generated URL sidecar and warmed native bridge path use fixed-capacity inline storage with deterministic exhaustion and no bridge-owned heap fallback. This does not claim that Lua, JSI object construction, or the called Defold engine operation is allocation-free.",
   "routeCount": 70,
+  "optimizedRouteCount": 70,
+  "universalFallbackRouteCount": 0,
   "urlParameterCount": 73,
   "moduleCounts": {
     "camera": 19,
@@ -39,6 +41,20 @@
     "hashShorthand": "distinct hash value resolved by Defold as default-socket path with zero fragment",
     "collapsedLegacyUrl": "fail-closed: ScriptHandleKind::kUrl with no sidecar slot is never interpreted as a full URL"
   },
+  "optimizationEvidence": {
+    "requiredSourceEvidence": [
+      "dm-message-url-layout",
+      "dm-script-public-url-api"
+    ],
+    "availableSourceEvidence": [
+      "dm-message-url-layout",
+      "dm-script-public-url-api"
+    ],
+    "missingSourceEvidence": [],
+    "executionContext": "captured-game-object-script-instance",
+    "codecProof": "exact-script-ir-and-binding-pattern-agreement",
+    "ownership": "ToURL-result-copied-before-Lua-pop-into-frame-local-generation-checked-ScriptUrlArena"
+  },
   "targetSupport": {
     "nativeDynamicHermes": {
       "status": "generated-executable",
@@ -56,7 +72,7 @@
   "inputEvidence": {
     "scriptIrSha256": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049",
     "bindingPatternsSha256": "9788b0873228cf8b9145aace14c3437d8b5fe69b7478da536743f0759c1a073e",
-    "classificationOverrideSha256": "4f4e09628358bc6745cb805387631ae736ee39e386e0c5525a1aa62c88a83f1b",
+    "classificationOverrideSha256": "4f9374a5174ba39b74afebfcfd820ea48ccfacb897f7d5809ad6aaed0899fe89",
     "defoldSources": [
       {
         "id": "dm-message-url-layout",
@@ -67,14 +83,9 @@
         "id": "dm-script-public-url-api",
         "path": "upstream/defold/engine/script/src/dmsdk/script/script.h",
         "sha256": "99d1dbf413a1ae84dcd3e6071628d50ba7d8177e0a1813bf2882ecbee15b7a9e"
-      },
-      {
-        "id": "dm-script-url-resolution",
-        "path": "upstream/defold/engine/script/src/script_msg.cpp",
-        "sha256": "089d40349a4f6241743580801fe38d9704f0ba1bb66a666d013ab6ad850a73d2"
       }
     ],
-    "aggregateInputSha256": "dce092f7c1cc0f55006454c79a109d02fb17b4f89cae38155a47e977b8c50263"
+    "aggregateInputSha256": "c2335286f056fc571127845259f0753c6262ddb400609beef12c9b1ef540da21"
   },
   "rows": [
     {
@@ -112,11 +123,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -167,11 +180,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -222,11 +237,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -277,11 +294,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -332,11 +351,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -387,11 +408,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -442,11 +465,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -497,11 +522,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -552,11 +579,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -610,11 +639,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -671,11 +702,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -729,11 +762,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -787,11 +822,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -845,11 +882,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -903,11 +942,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -961,11 +1002,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -1019,11 +1062,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -1077,11 +1122,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -1135,11 +1182,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -1191,11 +1240,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -1251,11 +1302,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -1307,11 +1360,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -1363,11 +1418,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -1423,11 +1480,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -1479,11 +1538,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -1539,11 +1600,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -1594,11 +1657,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -1650,11 +1715,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -1706,11 +1773,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -1762,11 +1831,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -1818,11 +1889,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -1874,11 +1947,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -1930,11 +2005,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -1986,11 +2063,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -2042,11 +2121,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -2118,11 +2199,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -2178,11 +2261,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -2238,11 +2323,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -2294,11 +2381,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -2352,11 +2441,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -2407,11 +2498,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -2466,11 +2559,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -2521,11 +2616,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -2580,11 +2677,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -2650,11 +2749,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -2709,11 +2810,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -2782,11 +2885,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -2845,11 +2950,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -2911,11 +3018,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -2970,11 +3079,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -3025,11 +3136,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -3084,11 +3197,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -3143,11 +3258,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -3201,11 +3318,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -3259,11 +3378,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -3317,11 +3438,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -3378,11 +3501,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -3436,11 +3561,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -3494,11 +3621,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -3549,11 +3678,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -3607,11 +3738,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -3666,11 +3799,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -3725,11 +3860,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -3784,11 +3921,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -3842,11 +3981,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -3900,11 +4041,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -3965,11 +4108,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -4024,11 +4169,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -4096,11 +4243,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",
@@ -4158,11 +4307,13 @@
       "urlResults": [],
       "routing": {
         "status": "generated-native-dynamic",
+        "blockers": [],
         "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
-        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
-        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "stringShorthand": "push unchanged Lua string; callee applies captured-instance address defaults",
+        "hashShorthand": "push unchanged Lua hash; callee applies its default-socket address semantics",
         "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
       },
+      "optimizationProven": true,
       "targetSupport": {
         "nativeDynamicHermes": {
           "status": "generated-executable",

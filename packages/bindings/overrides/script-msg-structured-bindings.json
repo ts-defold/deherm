@@ -7,8 +7,6 @@
   "bindings": [
     {
       "id": "script:msg.post",
-      "sourceSymbol": "Msg_Post",
-      "sourceOperation": ["ResolveURL(L, 1, &receiver, &sender)", "dmDDF::GetDescriptorFromHash(message_id)", "dmScript::CheckTable(L, data, MAX_MESSAGE_DATA_SIZE, 3)", "dmMessage::Post(&sender, &receiver, message_id"],
       "operation": {
         "template": "message-post",
         "parameters": {
@@ -21,8 +19,30 @@
           "allocationPolicy": "engine-message-queue-may-allocate"
         }
       },
-      "callShapes": [["String", "String"], ["String", "Hash"], ["Url", "String"], ["Url", "Hash"], ["Hash", "String"], ["Hash", "Hash"], ["String", "String", "Table"], ["String", "String", "Nil"], ["String", "Hash", "Table"], ["String", "Hash", "Nil"], ["Url", "String", "Table"], ["Url", "String", "Nil"], ["Url", "Hash", "Table"], ["Url", "Hash", "Nil"], ["Hash", "String", "Table"], ["Hash", "String", "Nil"], ["Hash", "Hash", "Table"], ["Hash", "Hash", "Nil"]],
-      "implementedCallShapes": [["String", "String"], ["String", "String", "Table"]],
+      "callShapes": [
+        ["String", "String"],
+        ["String", "Hash"],
+        ["Url", "String"],
+        ["Url", "Hash"],
+        ["Hash", "String"],
+        ["Hash", "Hash"],
+        ["String", "String", "Table"],
+        ["String", "String", "Nil"],
+        ["String", "Hash", "Table"],
+        ["String", "Hash", "Nil"],
+        ["Url", "String", "Table"],
+        ["Url", "String", "Nil"],
+        ["Url", "Hash", "Table"],
+        ["Url", "Hash", "Nil"],
+        ["Hash", "String", "Table"],
+        ["Hash", "String", "Nil"],
+        ["Hash", "Hash", "Table"],
+        ["Hash", "Hash", "Nil"]
+      ],
+      "implementedCallShapes": [
+        ["String", "String"],
+        ["String", "String", "Table"]
+      ],
       "resultCodec": "None"
     }
   ]

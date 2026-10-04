@@ -1,12 +1,51 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import test from "node:test";
 
 import { generate, loadInputs } from "../scripts/generate-script-overload-dispatch.mjs";
 import { stableBindingId } from "../scripts/lib/binding-identity.mjs";
 
 const root = new URL("../", import.meta.url);
+const derivedRevision = "1".repeat(40);
+const digest = (text) => createHash("sha256").update(text).digest("hex");
+
+function withDeclaredDerivation(callback) {
+  const previousRevision = process.env.DEHERM_DERIVED_REVISION;
+  const previousAudit = process.env.DEHERM_REVISION_AUDIT;
+  process.env.DEHERM_DERIVED_REVISION = derivedRevision;
+  process.env.DEHERM_REVISION_AUDIT = tmpdir();
+  try {
+    return callback();
+  } finally {
+    if (previousRevision === undefined) delete process.env.DEHERM_DERIVED_REVISION;
+    else process.env.DEHERM_DERIVED_REVISION = previousRevision;
+    if (previousAudit === undefined) delete process.env.DEHERM_REVISION_AUDIT;
+    else process.env.DEHERM_REVISION_AUDIT = previousAudit;
+  }
+}
+
+function derivedInputs(inputs) {
+  const ir = JSON.parse(inputs.irText);
+  ir.defoldRevision = derivedRevision;
+  const irText = JSON.stringify(ir);
+  const patterns = JSON.parse(inputs.patternsText);
+  patterns.defoldRevision = derivedRevision;
+  patterns.sourceSha256 = digest(irText);
+  const owned = JSON.parse(inputs.ownedText);
+  owned.defoldRevision = derivedRevision;
+  const registrationSurface = JSON.parse(inputs.registrationSurfaceText);
+  registrationSurface.defoldRevision = derivedRevision;
+  return {
+    ...inputs,
+    irText,
+    patternsText: JSON.stringify(patterns),
+    ownedText: JSON.stringify(owned),
+    registrationSurfaceText: JSON.stringify(registrationSurface),
+  };
+}
 
 test("overload-dispatch generator derives the exact disjoint classifier remainder", async () => {
   execFileSync(process.execPath, ["scripts/generate-script-overload-dispatch.mjs", "--check"], { cwd: root });
@@ -48,7 +87,9 @@ test("overload-dispatch generator derives the exact disjoint classifier remainde
     true,
   );
   assert.equal(
-    report.bindings.every(({ sourceEvidence }) => /^[0-9a-f]{64}$/.test(sourceEvidence.sha256)),
+    report.bindings
+      .filter(({ generatedFamilyExecutableCandidate }) => generatedFamilyExecutableCandidate)
+      .every(({ sourceCapabilities }) => sourceCapabilities.registration?.cFunction.length > 0),
     true,
   );
   assert.deepEqual(report.bindings.find(({ id }) => id === "script:vmath.lerp").callShapes, [
@@ -83,12 +124,36 @@ test("generated overload dispatcher fails closed before a backend sees an invali
   assert.match(target, /blocked-box2d-world-handle-and-multi-result-codecs/);
 });
 
-test("overload-dispatch generation reports stale evidence and rejects missing policy or owned-route drift", async () => {
+test("overload-dispatch registration capability is formatting-independent and rejects registration drift", async () => {
   const inputs = await loadInputs();
-  const staleSources = inputs.sources.map((source, index) =>
-    index === 0 ? { ...source, text: `${source.text}\n` } : source,
+  const original = generate(inputs);
+  const irrelevant = JSON.parse(inputs.registrationSurfaceText);
+  irrelevant.targets["defold-engine-box2d-v3"].routes.find(({ name }) => name === "vmath.dot").documentedName = {
+    name: "vmath.dot",
+    line: 1,
+    matchesRegistration: true,
+    irrelevantSpelling: "{  vmath.dot  }",
+  };
+  const preserved = generate({ ...inputs, registrationSurfaceText: JSON.stringify(irrelevant) });
+  assert.deepEqual(JSON.parse(preserved.report).bindings, JSON.parse(original.report).bindings);
+
+  const changedRegistration = JSON.parse(inputs.registrationSurfaceText);
+  changedRegistration.targets["defold-engine-box2d-v3"].routes.find(({ name }) => name === "vmath.dot").cFunction =
+    "DotRemoved";
+  const changed = generate({ ...inputs, registrationSurfaceText: JSON.stringify(changedRegistration) });
+  assert.notDeepEqual(
+    JSON.parse(changed.report).bindings.find(({ id }) => id === "script:vmath.dot").sourceCapabilities,
+    JSON.parse(original.report).bindings.find(({ id }) => id === "script:vmath.dot").sourceCapabilities,
   );
-  assert.doesNotThrow(() => generate({ ...inputs, sources: staleSources }));
+
+  const ambiguous = JSON.parse(inputs.registrationSurfaceText);
+  const ambiguousTarget = ambiguous.targets["defold-engine-box2d-v3"];
+  ambiguousTarget.routes.push(structuredClone(ambiguousTarget.routes.find(({ name }) => name === "vmath.dot")));
+  assert.throws(
+    () => generate({ ...inputs, registrationSurfaceText: JSON.stringify(ambiguous) }),
+    /positive Lua registration is absent or ambiguous/,
+  );
+
   const policy = JSON.parse(inputs.overrideText);
   delete policy.routes["script:vmath.dot"];
   assert.throws(
@@ -101,6 +166,32 @@ test("overload-dispatch generation reports stale evidence and rejects missing po
     () => generate({ ...inputs, ownedText: JSON.stringify(owned) }),
     /binding array\/count drifted|already-owned route is absent/,
   );
+});
+
+test("overload-dispatch derivation withdraws only the affected registration specialization", async () => {
+  const inputs = derivedInputs(await loadInputs());
+  const ambiguous = JSON.parse(inputs.registrationSurfaceText);
+  const target = ambiguous.targets["defold-engine-box2d-v3"];
+  target.routes.push(structuredClone(target.routes.find(({ name }) => name === "vmath.dot")));
+  const outputs = withDeclaredDerivation(() =>
+    generate({ ...inputs, registrationSurfaceText: JSON.stringify(ambiguous) }),
+  );
+  const report = JSON.parse(outputs.report);
+  assert.equal(report.routeCount, 19);
+  assert.equal(report.generatedFamilyCandidateCount, 7);
+  assert.equal(
+    report.bindings.some(({ id }) => id === "script:vmath.dot"),
+    false,
+  );
+  assert.equal(
+    report.bindings.some(({ id }) => id === "script:vmath.lerp"),
+    true,
+  );
+  assert.doesNotMatch(outputs.source, /script:vmath\.dot/);
+  assert.match(outputs.source, /if\(!operation\)return DispatchStatus::kMissing/);
+
+  const adapter = await readFile(new URL("defold/defold_hermes/src/script_scalar_lua_adapter.cpp", root), "utf8");
+  assert.match(adapter, /overload_dispatch::dispatch[\s\S]*universal_value::dispatch/);
 });
 
 test("overload-dispatch rejects already-owned report provenance and identity drift", async () => {

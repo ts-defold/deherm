@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
@@ -8,14 +8,66 @@ import test from "node:test";
 import {
   generateScriptUrlAddressClassification,
   loadScriptUrlAddressInputs,
+  renderScriptUrlAddressRuntime,
 } from "../scripts/generate-script-url-address-classification.mjs";
 
 const root = new URL("../", import.meta.url);
 const sourceInputs = await loadScriptUrlAddressInputs();
 const generated = generateScriptUrlAddressClassification(sourceInputs);
 
+async function runGeneratedDispatchProbe(report, expectedStatus) {
+  const directory = await mkdtemp(join(tmpdir(), "deherm-url-dispatch-"));
+  try {
+    const includeDirectory = join(directory, "defold_hermes");
+    await mkdir(includeDirectory);
+    const runtime = renderScriptUrlAddressRuntime(report);
+    const source = join(directory, "generated_script_url_bindings.cpp");
+    const harness = join(directory, "probe.cpp");
+    const executable = join(directory, "probe");
+    await Promise.all([
+      writeFile(join(includeDirectory, "generated_script_url_bindings.hpp"), runtime.header),
+      writeFile(source, runtime.source),
+      writeFile(
+        harness,
+        `#include <defold_hermes/generated_script_url_bindings.hpp>\n` +
+          `int main() {\n` +
+          `  namespace url = defold_hermes::url_binding;\n` +
+          `  defold_hermes::ScriptCallFrame frame{};\n` +
+          `  frame.stableId = url::operations()[0].stableId;\n` +
+          `  frame.argumentCount = static_cast<uint32_t>(url::operations()[0].maximumArgumentCount) + 1u;\n` +
+          `  return url::dispatch(&frame, nullptr, 0, nullptr) == url::DispatchStatus::${expectedStatus} ? 0 : 1;\n` +
+          `}\n`,
+      ),
+    ]);
+    execFileSync(
+      process.env.CXX || "clang++",
+      [
+        "-std=c++17",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-zero-length-array",
+        "-pedantic",
+        `-I${directory}`,
+        "-Idefold/defold_hermes/include",
+        "-Iupstream/defold/engine/dlib/src",
+        source,
+        harness,
+        "-o",
+        executable,
+      ],
+      { cwd: root, stdio: "pipe" },
+    );
+    execFileSync(executable, [], { stdio: "pipe" });
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+}
+
 test("classifies the exact 70-route URL/address frontier without overlapping Matrix4", async () => {
   assert.equal(generated.routeCount, 70);
+  assert.equal(generated.optimizedRouteCount, 70);
+  assert.equal(generated.universalFallbackRouteCount, 0);
   assert.equal(generated.urlParameterCount, 73);
   assert.deepEqual(generated.moduleCounts, {
     camera: 19,
@@ -54,6 +106,53 @@ test("classifies the exact 70-route URL/address frontier without overlapping Mat
     ),
   );
   assert.match(generated.coverageClaim, /generated stable-ID descriptors/);
+  assert.deepEqual(generated.optimizationEvidence, {
+    requiredSourceEvidence: ["dm-message-url-layout", "dm-script-public-url-api"],
+    availableSourceEvidence: ["dm-message-url-layout", "dm-script-public-url-api"],
+    missingSourceEvidence: [],
+    executionContext: "captured-game-object-script-instance",
+    codecProof: "exact-script-ir-and-binding-pattern-agreement",
+    ownership: "ToURL-result-copied-before-Lua-pop-into-frame-local-generation-checked-ScriptUrlArena",
+  });
+});
+
+test("private URL resolver renames do not affect replay generation", () => {
+  const renamedPrivateImplementation = structuredClone(sourceInputs);
+  renamedPrivateImplementation.sourceTexts.set(
+    "engine/script/src/script_msg.cpp",
+    "private implementation renamed from ResolveURL to ResolveAddress",
+  );
+  assert.deepEqual(generateScriptUrlAddressClassification(renamedPrivateImplementation), generated);
+  assert.ok(
+    !generated.inputEvidence.defoldSources.some(({ path }) => path.endsWith("/script_msg.cpp")),
+    "private URL implementation leaked into replay evidence",
+  );
+});
+
+test("withdrawing public URL ABI or captured-context evidence preserves 70 universal fallbacks", async () => {
+  const override = JSON.parse(sourceInputs.overrideText);
+  const layoutSource = override.sourceEvidence.find(({ id }) => id === "dm-message-url-layout").source;
+  const publicApiSource = override.sourceEvidence.find(({ id }) => id === "dm-script-public-url-api").source;
+
+  const missingLayout = structuredClone(sourceInputs);
+  missingLayout.withdrawnSources = new Set([layoutSource]);
+  const layoutReport = generateScriptUrlAddressClassification(missingLayout);
+  assert.equal(layoutReport.routeCount, 70);
+  assert.equal(layoutReport.optimizedRouteCount, 0);
+  assert.equal(layoutReport.universalFallbackRouteCount, 70);
+  assert.deepEqual(layoutReport.optimizationEvidence.missingSourceEvidence, ["dm-message-url-layout"]);
+  assert.ok(layoutReport.rows.every(({ optimizationProven }) => !optimizationProven));
+
+  const missingPublicApi = structuredClone(sourceInputs);
+  missingPublicApi.withdrawnSources = new Set([publicApiSource]);
+  const contextReport = generateScriptUrlAddressClassification(missingPublicApi);
+  assert.equal(contextReport.optimizedRouteCount, 0);
+  assert.equal(contextReport.universalFallbackRouteCount, 70);
+  assert.deepEqual(contextReport.optimizationEvidence.missingSourceEvidence, ["dm-script-public-url-api"]);
+
+  await runGeneratedDispatchProbe(generated, "kError");
+  await runGeneratedDispatchProbe(layoutReport, "kMissing");
+  await runGeneratedDispatchProbe(contextReport, "kMissing");
 });
 
 test("keeps full URLs distinct from context-sensitive string and hash shorthand", () => {

@@ -5,8 +5,16 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
 
+import { generate } from "../scripts/generate-script-route-availability-profiles.mjs";
+
 const root = new URL("../", import.meta.url);
 const reportPath = new URL("packages/bindings/generated/defold-script-route-availability-profiles.json", root);
+const generatorInputs = {
+  policy: "packages/bindings/overrides/script-route-availability-profiles.json",
+  borrowed: "packages/bindings/generated/defold-script-borrowed-handle-classification.json",
+  scriptIr: "packages/bindings/generated/defold-script-api-ir.json",
+  registrationSurface: "packages/bindings/generated/defold-lua-registration-surface.json",
+};
 
 function run(args, options = {}) {
   return execFileSync(process.execPath, args, { cwd: root, encoding: "utf8", stdio: "pipe", ...options });
@@ -14,6 +22,18 @@ function run(args, options = {}) {
 
 function stableIds(profile) {
   return profile.availableRoutes.map(({ stableId }) => stableId);
+}
+
+function availabilitySemantics(report) {
+  return {
+    catalogSha256: report.catalogSha256,
+    registrationAudit: report.registrationAudit,
+    manifestAudit: report.manifestAudit,
+    handleFeatures: report.handleFeatures,
+    handleProfiles: report.handleProfiles,
+    features: report.features,
+    profiles: report.profiles,
+  };
 }
 
 test("availability profiles regenerate byte-identically from manifests and Lua registrations", async () => {
@@ -104,6 +124,46 @@ test("the six pinned profiles are inferred from Defold manifests and cover full 
   assert.equal(v3Audit.registeredDocumentedRouteCount, 219);
   assert.equal(v3Audit.registrationOnlyRouteCount, 14);
   assert(v3Audit.registrationOnlyNames.every((rawName) => rawName.startsWith("b2d.shape.")));
+});
+
+test("canonical registration facts ignore formatting and private bodies but fail closed on registration withdrawal", async () => {
+  const outputRoot = await mkdtemp(join(tmpdir(), "deherm-route-profile-registration-surface-"));
+  try {
+    const baseline = JSON.parse(await generate(generatorInputs));
+    const surface = JSON.parse(
+      await readFile(new URL("packages/bindings/generated/defold-lua-registration-surface.json", root), "utf8"),
+    );
+    for (const target of Object.values(surface.targets)) {
+      for (const row of [...target.routes, ...(target.registeredButUndeclared ?? [])]) {
+        row.cFunction = `${row.cFunction}_private_rename`;
+        row.registration.line += 1000;
+        if (row.arity?.derived) row.arity.derived = { min: 0, max: 255, variadic: true, branchDependent: true };
+        if (row.derivedArity) row.derivedArity = { min: 0, max: 255, variadic: true, branchDependent: true };
+      }
+      for (const row of target.commentedOutRegistrations ?? []) {
+        row.cFunction = `${row.cFunction}_private_rename`;
+        row.line += 1000;
+        row.evidence = `/* formatting-only */ ${row.evidence}`;
+      }
+    }
+    const formattingSurface = join(outputRoot, "formatting-surface.json");
+    await writeFile(formattingSurface, `${JSON.stringify(surface, null, 2)}\n`);
+    const formatting = JSON.parse(await generate({ ...generatorInputs, registrationSurface: formattingSurface }));
+    assert.deepEqual(availabilitySemantics(formatting), availabilitySemantics(baseline));
+
+    const withdrawn = structuredClone(surface);
+    withdrawn.targets["defold-engine-box2d-v3"].routes = withdrawn.targets["defold-engine-box2d-v3"].routes.filter(
+      ({ name }) => name !== "b2d.body.apply_force",
+    );
+    const withdrawnSurface = join(outputRoot, "withdrawn-surface.json");
+    await writeFile(withdrawnSurface, `${JSON.stringify(withdrawn, null, 2)}\n`);
+    await assert.rejects(
+      generate({ ...generatorInputs, registrationSurface: withdrawnSurface }),
+      /box2d-v3 expectedRegisteredDocumentedCounts expected 219, found 218/,
+    );
+  } finally {
+    await rm(outputRoot, { recursive: true, force: true });
+  }
 });
 
 test("runtime capability handshake contracts are complete generated material", async () => {

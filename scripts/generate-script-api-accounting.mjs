@@ -5,6 +5,10 @@ import { readFile, writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 
 import { stableBindingId } from "./lib/binding-identity.mjs";
+import {
+  parseCanonicalLuaRegistrationSurface,
+  registeredRouteCapability,
+} from "./lib/defold-lua-structural-capabilities.mjs";
 import { generateScriptBindingDescriptors } from "./generate-script-binding-descriptors.mjs";
 import { generateScriptUrlAddressClassification } from "./generate-script-url-address-classification.mjs";
 import { createComponentProxyConstants } from "../packages/compiler/src/component-proxy-contract.mjs";
@@ -27,9 +31,11 @@ const inputUrls = {
   scalar: new URL("packages/bindings/generated/defold-script-scalar-dispatch.json", root),
   value: new URL("packages/bindings/generated/defold-script-value-bindings.json", root),
   tuple: new URL("packages/bindings/generated/defold-script-fixed-tuples.json", root),
+  dynamic: new URL("packages/bindings/generated/defold-script-dynamic-value-bindings.json", root),
   url: new URL("packages/bindings/generated/defold-script-url-address-classification.json", root),
   valueTail: new URL("packages/bindings/generated/defold-script-value-tail-bindings.json", root),
   overload: new URL("packages/bindings/generated/defold-script-overload-dispatch.json", root),
+  registrationSurface: new URL("packages/bindings/generated/defold-lua-registration-surface.json", root),
   componentPolicy: new URL("packages/bindings/generated/defold-component-proxy-contract.json", root),
   universalPolicy: new URL("packages/bindings/overrides/script-universal-value-bindings.json", root),
 };
@@ -88,13 +94,92 @@ function escapeRegex(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-function validateValueDefinitions(valueReport, definitionInputs, irFunctions, patternById) {
+function validateRegisteredCapability(row, field, registrationSurface, label) {
+  const capability = row[field]?.registration;
+  assert(
+    capability && typeof capability.sourcePath === "string",
+    `${row.id}: ${label} lacks structural registration evidence`,
+  );
+  const route = row.rawName ?? row.id.slice("script:".length);
+  assert(
+    sameJson(capability, registeredRouteCapability(registrationSurface, route, capability.sourcePath)),
+    `${row.id}: ${label} structural registration evidence is stale`,
+  );
+  return capability;
+}
+
+function validateDynamicAdmissions(dynamic, patternById) {
+  assert(dynamic.routeCount === dynamic.bindings.length, "dynamic-value route census is stale");
+  const candidates = dynamic.bindings.filter(
+    ({ generatedFamilyExecutableCandidate }) => generatedFamilyExecutableCandidate,
+  );
+  const optimized = candidates.filter(({ optimizationProven }) => optimizationProven);
+  const fallbacks = candidates.filter(({ optimizationProven }) => !optimizationProven);
+  const blocked = dynamic.bindings.filter(
+    ({ generatedFamilyExecutableCandidate }) => !generatedFamilyExecutableCandidate,
+  );
+  assert(
+    dynamic.generatedFamilyCandidateCount === candidates.length &&
+      dynamic.optimizedReplayCount === optimized.length &&
+      dynamic.universalFallbackCount === fallbacks.length &&
+      dynamic.blockedCount === blocked.length,
+    "dynamic-value admission census is stale",
+  );
+  for (const row of dynamic.bindings) {
+    assert(patternById.has(row.id), `${row.id}: dynamic-value descriptor is not runtime-pending`);
+    assert(Array.isArray(row.optimizationBlockers), `${row.id}: dynamic-value admission blockers are missing`);
+    if (!row.generatedFamilyExecutableCandidate) {
+      assert(
+        !row.optimizationProven && row.optimizationBlockers.length > 0,
+        `${row.id}: blocked dynamic route is admitted`,
+      );
+      continue;
+    }
+    assert(
+      row.replayEvidence && Array.isArray(row.replayEvidence.registrations),
+      `${row.id}: replay evidence is missing`,
+    );
+    const registrations = row.replayEvidence.registrations;
+    assert(
+      registrations.length > 0 &&
+        new Set(registrations.map(({ target }) => target)).size === registrations.length &&
+        registrations.every(
+          ({ module, member, minimumArguments }) =>
+            `${module}.${member}` === row.id.slice("script:".length) &&
+            Number.isInteger(minimumArguments) &&
+            minimumArguments === row.minimumArguments,
+        ),
+      `${row.id}: replay registration evidence is stale`,
+    );
+    assert(
+      row.optimizationProven === (row.optimizationBlockers.length === 0),
+      `${row.id}: dynamic-value admission contradicts its blockers`,
+    );
+    const expectedStatus = row.optimizationProven
+      ? "candidate-awaits-shared-router-integration"
+      : "universal-fallback-missing-proof";
+    assert(
+      row.targetSupport?.nativeDynamicHermes === expectedStatus,
+      `${row.id}: dynamic-value target admission is stale`,
+    );
+  }
+}
+
+function validateValueDefinitions(valueReport, definitionInputs, irFunctions, patternById, registrationSurface) {
   const emittedValueIds = new Set(valueReport.bindings.map(({ id }) => id));
+  const emittedValueById = new Map(valueReport.bindings.map((binding) => [binding.id, binding]));
+  const irById = new Map(irFunctions.map((fn) => [fn.id, fn]));
   const expected = [];
   const definitionEvidence = [];
   const sourceEvidence = [];
   for (const input of definitionInputs) {
     const definition = parse(input.definitionText, input.path);
+    const registrationFor = (fn) =>
+      registeredRouteCapability(
+        registrationSurface,
+        fn.modulePath.length ? [...fn.modulePath, fn.member].join(".") : fn.member,
+        definition.source.replace(/^engine\//, ""),
+      );
     assert(definition.schemaVersion === 2, `${input.path} has an unsupported schema`);
     assert(Array.isArray(definition.bindings), `${input.path} has no binding rows`);
     // OBSERVED, not asserted - the same rule the value lane itself applies to
@@ -156,6 +241,27 @@ function validateValueDefinitions(valueReport, definitionInputs, irFunctions, pa
         recordAudit({ input: input.path, id: binding.id, status: VOID, reason: "withdrawn-upstream" });
         continue;
       }
+      const emitted = emittedValueById.get(binding.id);
+      const structuralRegistration = emitted.structuralCapabilities?.registration;
+      if (structuralRegistration) {
+        const expectedRegistration = registrationFor(irById.get(binding.id));
+        assert(
+          expectedRegistration && sameJson(structuralRegistration, expectedRegistration),
+          `${binding.id}: structural registration capability is stale`,
+        );
+        if (["factory-spawn", "message-post", "gui-node-text-set"].includes(binding.operation.template)) {
+          assert(
+            emitted.structuralCapabilities?.operation?.registration?.route === emitted.rawName,
+            `${binding.id}: structural value/effect capability is stale`,
+          );
+        }
+        expected.push(binding);
+        continue;
+      }
+      assert(
+        typeof binding.sourceSymbol === "string" && binding.sourceSymbol.length > 0,
+        `${binding.id}: lacks structural registration evidence`,
+      );
       const sourceSymbol = new RegExp(
         `(?:static\\s+)?int\\s+${escapeRegex(binding.sourceSymbol)}\\s*\\(lua_State\\s*\\*\\s*L\\)`,
       );
@@ -217,10 +323,8 @@ function validateValueDefinitions(valueReport, definitionInputs, irFunctions, pa
             `${row.id}: generated vmath operation is stale`,
           );
           assert(
-            Array.isArray(row.sourceOperation) &&
-              row.sourceOperation.includes(terminal.sourceAnchor) &&
-              row.sourceOperation.every((anchor) => input.sourceText.includes(anchor)),
-            `${row.id}: generated vmath source evidence is stale`,
+            sameJson(row.structuralCapabilities?.registration, registrationFor(fn)),
+            `${row.id}: generated vmath registration evidence is stale`,
           );
           expected.push(row);
         }
@@ -267,12 +371,9 @@ function validateValueDefinitions(valueReport, definitionInputs, irFunctions, pa
               sameJson(row.operation.parameters, expectedParameters),
             `${row.id}: generated Matrix4 operation is stale`,
           );
-          const anchors = [terminal.sourceAnchor, ...(terminal.extraSourceAnchors ?? [])];
           assert(
-            Array.isArray(row.sourceOperation) &&
-              anchors.every((anchor) => row.sourceOperation.includes(anchor)) &&
-              row.sourceOperation.every((anchor) => input.sourceText.includes(anchor)),
-            `${row.id}: generated Matrix4 source evidence is stale`,
+            sameJson(row.structuralCapabilities?.registration, registrationFor(fn)),
+            `${row.id}: generated Matrix4 registration evidence is stale`,
           );
           expected.push(row);
         }
@@ -296,7 +397,7 @@ function validateValueDefinitions(valueReport, definitionInputs, irFunctions, pa
         assert(sameJson(row.operation, family.operation), `${row.id}: generated family operation is stale`);
         assert(sameJson(row.familyTypeCodecs, selector.typeCodecs), `${row.id}: generated family codec map is stale`);
         assert(
-          typeof row.sourceOperation === "string" && input.sourceText.includes(row.sourceOperation),
+          sameJson(row.structuralCapabilities?.registration, registrationFor(fn)),
           `${row.id}: generated family registration evidence is stale`,
         );
         expected.push(row);
@@ -311,14 +412,7 @@ function validateValueDefinitions(valueReport, definitionInputs, irFunctions, pa
   for (const [id, reviewed] of expectedById) {
     const actual = actualById.get(id);
     assert(actual, `${id}: reviewed value binding is missing from the generated value report`);
-    for (const field of [
-      "sourceSymbol",
-      "sourceOperation",
-      "operation",
-      "callShapes",
-      "implementedCallShapes",
-      "resultCodec",
-    ]) {
+    for (const field of ["sourceSymbol", "operation", "callShapes", "implementedCallShapes", "resultCodec"]) {
       if (reviewed[field] !== undefined) {
         assert(sameJson(actual[field], reviewed[field]), `${id}: value report ${field} is stale`);
       }
@@ -353,9 +447,11 @@ export function generateScriptApiAccounting(inputs) {
   const descriptors = parse(inputs.descriptorsText, "binding descriptors");
   const scalar = parse(inputs.scalarText, "scalar dispatch report");
   const value = parse(inputs.valueText, "value binding report");
+  const dynamic = parse(inputs.dynamicText, "dynamic-value binding report");
   const url = parse(inputs.urlText, "URL binding report");
   const valueTail = parse(inputs.valueTailText, "value-tail binding report");
   const overload = parse(inputs.overloadText, "overload-dispatch report");
+  const registrationSurface = parseCanonicalLuaRegistrationSurface(inputs.registrationSurfaceText);
   const universalPolicy = parse(inputs.universalPolicyText, "universal-value fallback policy");
   const componentPolicy = parse(inputs.componentPolicyText, "component proxy policy");
   const componentProxyConstants = createComponentProxyConstants(componentPolicy);
@@ -378,6 +474,10 @@ export function generateScriptApiAccounting(inputs) {
       },
       { path: "packages/bindings/generated/defold-script-scalar-dispatch.json", revision: scalar.defoldRevision },
       { path: "packages/bindings/generated/defold-script-value-bindings.json", revision: value.defoldRevision },
+      {
+        path: "packages/bindings/generated/defold-script-dynamic-value-bindings.json",
+        revision: dynamic.defoldRevision,
+      },
       {
         path: "packages/bindings/generated/defold-script-url-address-classification.json",
         revision: url.defoldRevision,
@@ -468,16 +568,28 @@ export function generateScriptApiAccounting(inputs) {
     "value-tail bindings are stale against their generated inputs",
   );
   assert(
+    value.registrationSurfaceSha256 === sha256(inputs.registrationSurfaceText) &&
+      valueTail.inputEvidence?.luaRegistrationSurfaceSha256 === sha256(inputs.registrationSurfaceText) &&
+      overload.inputEvidence?.luaRegistrationSurfaceSha256 === sha256(inputs.registrationSurfaceText),
+    "generated registration consumers are stale against the canonical Lua registration surface",
+  );
+  assert(
     overload.inputEvidence?.scriptIrSha256 === sha256(inputs.irText) &&
       overload.inputEvidence?.bindingPatternsSha256 === sha256(inputs.patternsText) &&
       overload.inputEvidence?.alreadyOwnedReportSha256 === sha256(inputs.valueText),
     "overload-dispatch bindings are stale against their generated inputs",
+  );
+  assert(
+    dynamic.inputEvidence?.scriptIrSha256 === sha256(inputs.irText) &&
+      dynamic.inputEvidence?.bindingPatternsSha256 === sha256(inputs.patternsText),
+    "dynamic-value bindings are stale against their generated inputs",
   );
   const expectedUrl = generateScriptUrlAddressClassification({
     irText: inputs.irText,
     patternsText: inputs.patternsText,
     overrideText: inputs.urlOverrideText,
     sourceTexts: inputs.urlSourceTexts,
+    withdrawnSources: inputs.urlWithdrawnSources ?? new Set(),
   });
   assert(
     sameJson(canonicalUrlReport(url), canonicalUrlReport(expectedUrl)),
@@ -517,21 +629,40 @@ export function generateScriptApiAccounting(inputs) {
     "scalar dispatch report is stale against scalar-classified bindings",
   );
 
-  const valueEvidence = validateValueDefinitions(value, inputs.valueDefinitions, ir.functions, patternById);
+  const valueEvidence = validateValueDefinitions(
+    value,
+    inputs.valueDefinitions,
+    ir.functions,
+    patternById,
+    registrationSurface,
+  );
   const valueById = uniqueMap(value.bindings, "value binding report");
-  for (const id of valueById.keys()) {
+  for (const [id, row] of valueById) {
     assert(patternById.has(id), `${id}: executable value route is not a runtime-pending descriptor`);
     assert(!scalarById.has(id), `${id}: appears in both scalar and value executable route reports`);
+    if (id !== "script:hash")
+      validateRegisteredCapability(row, "structuralCapabilities", registrationSurface, "value route");
   }
   const tuple = parse(inputs.tupleText, "fixed tuple report");
   const tupleById = uniqueMap(tuple.bindings, "fixed tuple report");
-  for (const id of tupleById.keys()) {
+  for (const [id, row] of tupleById) {
     assert(patternById.has(id), `${id}: executable tuple route is not a runtime-pending descriptor`);
     assert(!scalarById.has(id) && !valueById.has(id), `${id}: executable tuple route overlaps another generator`);
+    validateRegisteredCapability(row, "sourceCapabilities", registrationSurface, "fixed-tuple route");
   }
-  const urlById = uniqueMap(url.rows, "URL binding report");
+  validateDynamicAdmissions(dynamic, patternById);
+  const optimizedUrlRows = url.rows.filter(({ optimizationProven }) => optimizationProven);
+  const fallbackUrlRows = url.rows.filter(({ optimizationProven }) => !optimizationProven);
+  assert(
+    url.optimizedRouteCount === optimizedUrlRows.length &&
+      url.universalFallbackRouteCount === fallbackUrlRows.length &&
+      url.routeCount === optimizedUrlRows.length + fallbackUrlRows.length,
+    "URL binding admission census is stale",
+  );
+  const urlById = uniqueMap(optimizedUrlRows, "optimized URL binding report");
   assert(url.routeCount === url.rows.length, "URL binding routeCount is stale");
-  for (const [id, row] of urlById) {
+  for (const row of url.rows) {
+    const id = row.id;
     assert(
       patternById.get(id)?.loweringFamily === "defold-value",
       `${id}: generated URL route is not a defold-value descriptor`,
@@ -540,11 +671,21 @@ export function generateScriptApiAccounting(inputs) {
       !scalarById.has(id) && !valueById.has(id) && !tupleById.has(id),
       `${id}: generated URL route overlaps another executable generator`,
     );
-    assert(
-      row.routing?.status === "generated-native-dynamic" &&
-        row.targetSupport?.nativeDynamicHermes?.status === "generated-executable",
-      `${id}: URL route lacks generated native-dynamic disposition`,
-    );
+    if (row.optimizationProven) {
+      assert(
+        row.routing?.status === "generated-native-dynamic" &&
+          row.targetSupport?.nativeDynamicHermes?.status === "generated-executable" &&
+          row.routing.blockers.length === 0,
+        `${id}: optimized URL route lacks proven native-dynamic admission`,
+      );
+    } else {
+      assert(
+        row.routing?.status === "universal-fallback-missing-proof" &&
+          row.targetSupport?.nativeDynamicHermes?.status === "universal-fallback-missing-proof" &&
+          row.routing.blockers.length > 0,
+        `${id}: unproven URL route does not retain universal fallback`,
+      );
+    }
   }
   const allValueTailCandidates = valueTail.bindings.filter(({ disposition }) => disposition === "candidate");
   const valueTailCandidates = allValueTailCandidates.filter(
@@ -610,6 +751,7 @@ export function generateScriptApiAccounting(inputs) {
       row.targetSupport?.nativeDynamicHermes === "generated-executable-shared-script-adapter",
       `${id}: overload route lacks generated native-dynamic disposition`,
     );
+    validateRegisteredCapability(row, "sourceCapabilities", registrationSurface, "overload route");
   }
 
   const executableById = new Map();
@@ -618,7 +760,7 @@ export function generateScriptApiAccounting(inputs) {
     ["scalar-lua-dispatch", scalar.bindings],
     ["native-value-dispatch", value.bindings],
     ["fixed-tuple-lua-dispatch", tuple.bindings],
-    ["url-lua-dispatch", url.rows],
+    ["url-lua-dispatch", optimizedUrlRows],
     ["captured-lua-value-tail-dispatch", valueTailCandidates],
     ["captured-lua-overload-dispatch", overloadCandidates],
   ]) {
@@ -714,6 +856,16 @@ export function generateScriptApiAccounting(inputs) {
     });
   }
 
+  for (const row of [
+    ...fallbackUrlRows,
+    ...dynamic.bindings.filter(({ generatedFamilyExecutableCandidate }) => generatedFamilyExecutableCandidate),
+  ]) {
+    assert(
+      executableById.get(row.id)?.generator === "universal-value-fallback",
+      `${row.id}: missing-proof replay descriptor lost its universal fallback`,
+    );
+  }
+
   const descriptorStableIds = new Map(descriptorIds.map((id, index) => [id, descriptors.hot.stableId[index]]));
   for (const [id, executable] of executableById) {
     assert(descriptorStableIds.get(id) === executable.stableId, `${id}: executable and descriptor stable IDs differ`);
@@ -800,6 +952,7 @@ export function generateScriptApiAccounting(inputs) {
     scalarDispatchSha256: sha256(inputs.scalarText),
     valueBindingsSha256: sha256(inputs.valueText),
     fixedTupleBindingsSha256: sha256(inputs.tupleText),
+    dynamicValueBindingsSha256: sha256(inputs.dynamicText),
     urlBindingsSha256: sha256(inputs.urlText),
     valueTailBindingsSha256: sha256(inputs.valueTailText),
     overloadDispatchSha256: sha256(inputs.overloadText),
@@ -877,9 +1030,11 @@ async function loadInputs() {
     scalarText: texts.scalar,
     valueText: texts.value,
     tupleText: texts.tuple,
+    dynamicText: texts.dynamic,
     urlText: texts.url,
     valueTailText: texts.valueTail,
     overloadText: texts.overload,
+    registrationSurfaceText: texts.registrationSurface,
     universalPolicyText: texts.universalPolicy,
     componentPolicyText: texts.componentPolicy,
     urlOverrideText,

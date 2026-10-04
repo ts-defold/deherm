@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "target": "arm64-macos-dynamic-hermes",
-  "inputSha256": "1feec7b1eba2b2a2ebcdb0186f3428692860087e514014a35903658b654efac4",
+  "inputSha256": "d21d4a194f13a9929f78029f817f8bfbf22a09a3af48dbf7f2998d4a18da8c2d",
   "evidencePolicy": "Scenario state records planning/instrumentation only. A route stage is verified exclusively by an explicit, passed, target-matched observation whose repository-confined evidence artifact matches its declared SHA-256. Runtime requires the current probe-set fingerprint and an exact line or explicitly declared line prefix for every scenario.",
   "coverageClaim": "All 296 generated executable script routes have at least one deterministic scenario. No compile, link, or runtime behavior is claimed without a verified observation.",
   "routeCount": 296,
@@ -3418,7 +3418,7 @@
       "stableId": 2327634387,
       "rawName": "bullet3d.collision_object.get_world_transform",
       "routeKind": "fixed-tuple",
-      "source": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_collision_object.cpp",
+      "source": "upstream/defold/engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_collision_object.cpp",
       "line": 0,
       "publicTypeScriptFixture": "blocked-missing-handle-producer",
       "scenarios": [
@@ -3445,7 +3445,7 @@
       "stableId": 2038251318,
       "rawName": "bullet3d.constraint.get_6dof_motor",
       "routeKind": "fixed-tuple",
-      "source": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
+      "source": "upstream/defold/engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
       "line": 0,
       "publicTypeScriptFixture": "blocked-missing-handle-producer",
       "scenarios": [
@@ -3472,7 +3472,7 @@
       "stableId": 19395531,
       "rawName": "bullet3d.constraint.get_anchors",
       "routeKind": "fixed-tuple",
-      "source": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
+      "source": "upstream/defold/engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
       "line": 0,
       "publicTypeScriptFixture": "blocked-missing-handle-producer",
       "scenarios": [
@@ -3499,7 +3499,7 @@
       "stableId": 3303829155,
       "rawName": "bullet3d.constraint.get_angles",
       "routeKind": "fixed-tuple",
-      "source": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
+      "source": "upstream/defold/engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
       "line": 0,
       "publicTypeScriptFixture": "blocked-missing-handle-producer",
       "scenarios": [
@@ -3526,7 +3526,7 @@
       "stableId": 3495086682,
       "rawName": "bullet3d.constraint.get_axes",
       "routeKind": "fixed-tuple",
-      "source": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
+      "source": "upstream/defold/engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
       "line": 0,
       "publicTypeScriptFixture": "blocked-missing-handle-producer",
       "scenarios": [
@@ -3553,7 +3553,7 @@
       "stableId": 74788897,
       "rawName": "bullet3d.constraint.get_cone_twist_limits",
       "routeKind": "fixed-tuple",
-      "source": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
+      "source": "upstream/defold/engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
       "line": 0,
       "publicTypeScriptFixture": "blocked-missing-handle-producer",
       "scenarios": [
@@ -3580,7 +3580,7 @@
       "stableId": 2928762044,
       "rawName": "bullet3d.constraint.get_frame_a",
       "routeKind": "fixed-tuple",
-      "source": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
+      "source": "upstream/defold/engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
       "line": 0,
       "publicTypeScriptFixture": "blocked-missing-handle-producer",
       "scenarios": [
@@ -3607,7 +3607,7 @@
       "stableId": 2979094901,
       "rawName": "bullet3d.constraint.get_frame_b",
       "routeKind": "fixed-tuple",
-      "source": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
+      "source": "upstream/defold/engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
       "line": 0,
       "publicTypeScriptFixture": "blocked-missing-handle-producer",
       "scenarios": [
@@ -3634,7 +3634,7 @@
       "stableId": 628130855,
       "rawName": "bullet3d.constraint.get_hinge_limits",
       "routeKind": "fixed-tuple",
-      "source": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
+      "source": "upstream/defold/engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
       "line": 0,
       "publicTypeScriptFixture": "blocked-missing-handle-producer",
       "scenarios": [
@@ -3661,7 +3661,7 @@
       "stableId": 51420040,
       "rawName": "bullet3d.constraint.get_hinge_motor",
       "routeKind": "fixed-tuple",
-      "source": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
+      "source": "upstream/defold/engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
       "line": 0,
       "publicTypeScriptFixture": "blocked-missing-handle-producer",
       "scenarios": [
@@ -3688,7 +3688,7 @@
       "stableId": 2136912702,
       "rawName": "bullet3d.constraint.get_limit",
       "routeKind": "fixed-tuple",
-      "source": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
+      "source": "upstream/defold/engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
       "line": 0,
       "publicTypeScriptFixture": "blocked-missing-handle-producer",
       "scenarios": [
@@ -3715,7 +3715,7 @@
       "stableId": 3105177886,
       "rawName": "bullet3d.constraint.get_pivots",
       "routeKind": "fixed-tuple",
-      "source": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
+      "source": "upstream/defold/engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
       "line": 0,
       "publicTypeScriptFixture": "blocked-missing-handle-producer",
       "scenarios": [
@@ -3742,7 +3742,7 @@
       "stableId": 3392355731,
       "rawName": "bullet3d.constraint.get_slider_limits",
       "routeKind": "fixed-tuple",
-      "source": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
+      "source": "upstream/defold/engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
       "line": 0,
       "publicTypeScriptFixture": "blocked-missing-handle-producer",
       "scenarios": [
@@ -3769,7 +3769,7 @@
       "stableId": 1362876804,
       "rawName": "bullet3d.constraint.get_slider_motor",
       "routeKind": "fixed-tuple",
-      "source": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
+      "source": "upstream/defold/engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
       "line": 0,
       "publicTypeScriptFixture": "blocked-missing-handle-producer",
       "scenarios": [
@@ -3796,7 +3796,7 @@
       "stableId": 1432460324,
       "rawName": "bullet3d.rigid_body.get_damping",
       "routeKind": "fixed-tuple",
-      "source": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_rigid_body.cpp",
+      "source": "upstream/defold/engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_rigid_body.cpp",
       "line": 0,
       "publicTypeScriptFixture": "blocked-missing-handle-producer",
       "scenarios": [
@@ -3823,7 +3823,7 @@
       "stableId": 764766037,
       "rawName": "bullet3d.shape.get_local_transform",
       "routeKind": "fixed-tuple",
-      "source": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_shape.cpp",
+      "source": "upstream/defold/engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_shape.cpp",
       "line": 0,
       "publicTypeScriptFixture": "blocked-missing-handle-producer",
       "scenarios": [
@@ -4474,7 +4474,7 @@
       "stableId": 803274747,
       "rawName": "collectionproxy.set_collection",
       "routeKind": "fixed-tuple",
-      "source": "engine/gamesys/src/gamesys/scripts/script_collectionproxy.cpp",
+      "source": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_collectionproxy.cpp",
       "line": 0,
       "publicTypeScriptFixture": "reachable",
       "scenarios": [
@@ -4735,7 +4735,7 @@
       "stableId": 96184340,
       "rawName": "factory.create",
       "routeKind": "value",
-      "source": "doc/factory.lua",
+      "source": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_factory.cpp",
       "line": 83,
       "scenarios": [
         "value:factory.create.probe"
@@ -4943,7 +4943,7 @@
       "stableId": 2920192283,
       "rawName": "go.delete",
       "routeKind": "value",
-      "source": "doc/go.lua",
+      "source": "upstream/defold/engine/gameobject/src/gameobject/gameobject_script.cpp",
       "line": 442,
       "scenarios": [
         "value:go.delete.factory-probe"
@@ -5047,7 +5047,7 @@
       "stableId": 3918772974,
       "rawName": "go.get_position",
       "routeKind": "value",
-      "source": "doc/go.lua",
+      "source": "upstream/defold/engine/gameobject/src/gameobject/gameobject_script.cpp",
       "line": 601,
       "scenarios": [
         "value:go.get_position.addressed-hash",
@@ -5313,7 +5313,7 @@
       "stableId": 608141138,
       "rawName": "go.set_position",
       "routeKind": "value",
-      "source": "doc/go.lua",
+      "source": "upstream/defold/engine/gameobject/src/gameobject/gameobject_script.cpp",
       "line": 943,
       "scenarios": [
         "value:go.set_position.addressed-hash",
@@ -5344,7 +5344,7 @@
       "stableId": 2093413559,
       "rawName": "go.set_rotation",
       "routeKind": "value",
-      "source": "doc/go.lua",
+      "source": "upstream/defold/engine/gameobject/src/gameobject/gameobject_script.cpp",
       "line": 966,
       "scenarios": [
         "value:go.set_rotation.addressed-hash",
@@ -5609,7 +5609,7 @@
       "stableId": 509983822,
       "rawName": "gui.get_node",
       "routeKind": "value",
-      "source": "doc/gui.lua",
+      "source": "upstream/defold/engine/gui/src/gui_script.cpp",
       "line": 1246,
       "scenarios": [
         "value:gui.get_node.status"
@@ -5635,7 +5635,7 @@
       "stableId": 1431438690,
       "rawName": "gui.get_type",
       "routeKind": "fixed-tuple",
-      "source": "engine/gui/src/gui_script.cpp",
+      "source": "upstream/defold/engine/gui/src/gui_script.cpp",
       "line": 0,
       "publicTypeScriptFixture": "reachable",
       "scenarios": [
@@ -5714,7 +5714,7 @@
       "stableId": 2832050683,
       "rawName": "gui.new_texture",
       "routeKind": "fixed-tuple",
-      "source": "engine/gui/src/gui_script.cpp",
+      "source": "upstream/defold/engine/gui/src/gui_script.cpp",
       "line": 0,
       "publicTypeScriptFixture": "reachable",
       "scenarios": [
@@ -5793,7 +5793,7 @@
       "stableId": 2124339589,
       "rawName": "gui.set_adjust_mode",
       "routeKind": "value",
-      "source": "doc/gui.lua",
+      "source": "upstream/defold/engine/gui/src/gui_script.cpp",
       "line": 1785,
       "scenarios": [
         "planned:script:gui.set_adjust_mode"
@@ -5819,7 +5819,7 @@
       "stableId": 2749898006,
       "rawName": "gui.set_alpha",
       "routeKind": "value",
-      "source": "doc/gui.lua",
+      "source": "upstream/defold/engine/gui/src/gui_script.cpp",
       "line": 1792,
       "scenarios": [
         "planned:script:gui.set_alpha"
@@ -5845,7 +5845,7 @@
       "stableId": 1874419309,
       "rawName": "gui.set_blend_mode",
       "routeKind": "value",
-      "source": "doc/gui.lua",
+      "source": "upstream/defold/engine/gui/src/gui_script.cpp",
       "line": 1800,
       "scenarios": [
         "planned:script:gui.set_blend_mode"
@@ -5871,7 +5871,7 @@
       "stableId": 344438576,
       "rawName": "gui.set_clipping_inverted",
       "routeKind": "value",
-      "source": "doc/gui.lua",
+      "source": "upstream/defold/engine/gui/src/gui_script.cpp",
       "line": 1807,
       "scenarios": [
         "planned:script:gui.set_clipping_inverted"
@@ -5897,7 +5897,7 @@
       "stableId": 1648551722,
       "rawName": "gui.set_clipping_mode",
       "routeKind": "value",
-      "source": "doc/gui.lua",
+      "source": "upstream/defold/engine/gui/src/gui_script.cpp",
       "line": 1814,
       "scenarios": [
         "planned:script:gui.set_clipping_mode"
@@ -5923,7 +5923,7 @@
       "stableId": 2765276089,
       "rawName": "gui.set_clipping_visible",
       "routeKind": "value",
-      "source": "doc/gui.lua",
+      "source": "upstream/defold/engine/gui/src/gui_script.cpp",
       "line": 1821,
       "scenarios": [
         "planned:script:gui.set_clipping_visible"
@@ -5949,7 +5949,7 @@
       "stableId": 681356529,
       "rawName": "gui.set_color",
       "routeKind": "value",
-      "source": "doc/gui.lua",
+      "source": "upstream/defold/engine/gui/src/gui_script.cpp",
       "line": 1837,
       "scenarios": [
         "planned:script:gui.set_color"
@@ -5975,7 +5975,7 @@
       "stableId": 344287147,
       "rawName": "gui.set_enabled",
       "routeKind": "value",
-      "source": "doc/gui.lua",
+      "source": "upstream/defold/engine/gui/src/gui_script.cpp",
       "line": 1845,
       "scenarios": [
         "planned:script:gui.set_enabled"
@@ -6001,7 +6001,7 @@
       "stableId": 3920485847,
       "rawName": "gui.set_euler",
       "routeKind": "value",
-      "source": "doc/gui.lua",
+      "source": "upstream/defold/engine/gui/src/gui_script.cpp",
       "line": 1853,
       "scenarios": [
         "planned:script:gui.set_euler"
@@ -6027,7 +6027,7 @@
       "stableId": 1932260719,
       "rawName": "gui.set_fill_angle",
       "routeKind": "value",
-      "source": "doc/gui.lua",
+      "source": "upstream/defold/engine/gui/src/gui_script.cpp",
       "line": 1860,
       "scenarios": [
         "planned:script:gui.set_fill_angle"
@@ -6053,7 +6053,7 @@
       "stableId": 3158379927,
       "rawName": "gui.set_flipbook_cursor",
       "routeKind": "value",
-      "source": "doc/gui.lua",
+      "source": "upstream/defold/engine/gui/src/gui_script.cpp",
       "line": 1867,
       "scenarios": [
         "planned:script:gui.set_flipbook_cursor"
@@ -6079,7 +6079,7 @@
       "stableId": 2274625155,
       "rawName": "gui.set_flipbook_playback_rate",
       "routeKind": "value",
-      "source": "doc/gui.lua",
+      "source": "upstream/defold/engine/gui/src/gui_script.cpp",
       "line": 1874,
       "scenarios": [
         "planned:script:gui.set_flipbook_playback_rate"
@@ -6105,7 +6105,7 @@
       "stableId": 3446342703,
       "rawName": "gui.set_font",
       "routeKind": "value",
-      "source": "doc/gui.lua",
+      "source": "upstream/defold/engine/gui/src/gui_script.cpp",
       "line": 1882,
       "scenarios": [
         "planned:script:gui.set_font"
@@ -6131,7 +6131,7 @@
       "stableId": 510669267,
       "rawName": "gui.set_id",
       "routeKind": "value",
-      "source": "doc/gui.lua",
+      "source": "upstream/defold/engine/gui/src/gui_script.cpp",
       "line": 1906,
       "scenarios": [
         "planned:script:gui.set_id"
@@ -6157,7 +6157,7 @@
       "stableId": 2930785382,
       "rawName": "gui.set_inherit_alpha",
       "routeKind": "value",
-      "source": "doc/gui.lua",
+      "source": "upstream/defold/engine/gui/src/gui_script.cpp",
       "line": 1913,
       "scenarios": [
         "planned:script:gui.set_inherit_alpha"
@@ -6183,7 +6183,7 @@
       "stableId": 599811265,
       "rawName": "gui.set_inner_radius",
       "routeKind": "value",
-      "source": "doc/gui.lua",
+      "source": "upstream/defold/engine/gui/src/gui_script.cpp",
       "line": 1921,
       "scenarios": [
         "planned:script:gui.set_inner_radius"
@@ -6209,7 +6209,7 @@
       "stableId": 3974957251,
       "rawName": "gui.set_layer",
       "routeKind": "value",
-      "source": "doc/gui.lua",
+      "source": "upstream/defold/engine/gui/src/gui_script.cpp",
       "line": 1928,
       "scenarios": [
         "planned:script:gui.set_layer"
@@ -6261,7 +6261,7 @@
       "stableId": 1425442548,
       "rawName": "gui.set_leading",
       "routeKind": "value",
-      "source": "doc/gui.lua",
+      "source": "upstream/defold/engine/gui/src/gui_script.cpp",
       "line": 1945,
       "scenarios": [
         "planned:script:gui.set_leading"
@@ -6287,7 +6287,7 @@
       "stableId": 4102050116,
       "rawName": "gui.set_line_break",
       "routeKind": "value",
-      "source": "doc/gui.lua",
+      "source": "upstream/defold/engine/gui/src/gui_script.cpp",
       "line": 1953,
       "scenarios": [
         "planned:script:gui.set_line_break"
@@ -6313,7 +6313,7 @@
       "stableId": 4118133459,
       "rawName": "gui.set_material",
       "routeKind": "value",
-      "source": "doc/gui.lua",
+      "source": "upstream/defold/engine/gui/src/gui_script.cpp",
       "line": 1971,
       "scenarios": [
         "planned:script:gui.set_material"
@@ -6339,7 +6339,7 @@
       "stableId": 1712128015,
       "rawName": "gui.set_outer_bounds",
       "routeKind": "value",
-      "source": "doc/gui.lua",
+      "source": "upstream/defold/engine/gui/src/gui_script.cpp",
       "line": 1978,
       "scenarios": [
         "planned:script:gui.set_outer_bounds"
@@ -6365,7 +6365,7 @@
       "stableId": 852399392,
       "rawName": "gui.set_outline",
       "routeKind": "value",
-      "source": "doc/gui.lua",
+      "source": "upstream/defold/engine/gui/src/gui_script.cpp",
       "line": 1986,
       "scenarios": [
         "planned:script:gui.set_outline"
@@ -6391,7 +6391,7 @@
       "stableId": 3975981566,
       "rawName": "gui.set_parent",
       "routeKind": "value",
-      "source": "doc/gui.lua",
+      "source": "upstream/defold/engine/gui/src/gui_script.cpp",
       "line": 1994,
       "scenarios": [
         "planned:script:gui.set_parent"
@@ -6417,7 +6417,7 @@
       "stableId": 634729758,
       "rawName": "gui.set_particlefx",
       "routeKind": "value",
-      "source": "doc/gui.lua",
+      "source": "upstream/defold/engine/gui/src/gui_script.cpp",
       "line": 2001,
       "scenarios": [
         "planned:script:gui.set_particlefx"
@@ -6443,7 +6443,7 @@
       "stableId": 3222725677,
       "rawName": "gui.set_perimeter_vertices",
       "routeKind": "value",
-      "source": "doc/gui.lua",
+      "source": "upstream/defold/engine/gui/src/gui_script.cpp",
       "line": 2008,
       "scenarios": [
         "planned:script:gui.set_perimeter_vertices"
@@ -6469,7 +6469,7 @@
       "stableId": 3991574614,
       "rawName": "gui.set_pivot",
       "routeKind": "value",
-      "source": "doc/gui.lua",
+      "source": "upstream/defold/engine/gui/src/gui_script.cpp",
       "line": 2015,
       "scenarios": [
         "planned:script:gui.set_pivot"
@@ -6495,7 +6495,7 @@
       "stableId": 1474440329,
       "rawName": "gui.set_position",
       "routeKind": "value",
-      "source": "doc/gui.lua",
+      "source": "upstream/defold/engine/gui/src/gui_script.cpp",
       "line": 2022,
       "scenarios": [
         "planned:script:gui.set_position"
@@ -6547,7 +6547,7 @@
       "stableId": 3759172468,
       "rawName": "gui.set_rotation",
       "routeKind": "value",
-      "source": "doc/gui.lua",
+      "source": "upstream/defold/engine/gui/src/gui_script.cpp",
       "line": 2041,
       "scenarios": [
         "planned:script:gui.set_rotation"
@@ -6599,7 +6599,7 @@
       "stableId": 3923373356,
       "rawName": "gui.set_scale",
       "routeKind": "value",
-      "source": "doc/gui.lua",
+      "source": "upstream/defold/engine/gui/src/gui_script.cpp",
       "line": 2054,
       "scenarios": [
         "planned:script:gui.set_scale"
@@ -6625,7 +6625,7 @@
       "stableId": 2837486932,
       "rawName": "gui.set_screen_position",
       "routeKind": "value",
-      "source": "doc/gui.lua",
+      "source": "upstream/defold/engine/gui/src/gui_script.cpp",
       "line": 2061,
       "scenarios": [
         "planned:script:gui.set_screen_position"
@@ -6651,7 +6651,7 @@
       "stableId": 1482532654,
       "rawName": "gui.set_shadow",
       "routeKind": "value",
-      "source": "doc/gui.lua",
+      "source": "upstream/defold/engine/gui/src/gui_script.cpp",
       "line": 2069,
       "scenarios": [
         "planned:script:gui.set_shadow"
@@ -6677,7 +6677,7 @@
       "stableId": 1335131087,
       "rawName": "gui.set_size",
       "routeKind": "value",
-      "source": "doc/gui.lua",
+      "source": "upstream/defold/engine/gui/src/gui_script.cpp",
       "line": 2078,
       "scenarios": [
         "planned:script:gui.set_size"
@@ -6703,7 +6703,7 @@
       "stableId": 2104597123,
       "rawName": "gui.set_size_mode",
       "routeKind": "value",
-      "source": "doc/gui.lua",
+      "source": "upstream/defold/engine/gui/src/gui_script.cpp",
       "line": 2090,
       "scenarios": [
         "planned:script:gui.set_size_mode"
@@ -6729,7 +6729,7 @@
       "stableId": 3771988895,
       "rawName": "gui.set_slice9",
       "routeKind": "value",
-      "source": "doc/gui.lua",
+      "source": "upstream/defold/engine/gui/src/gui_script.cpp",
       "line": 2097,
       "scenarios": [
         "planned:script:gui.set_slice9"
@@ -6755,7 +6755,7 @@
       "stableId": 1480837389,
       "rawName": "gui.set_text",
       "routeKind": "value",
-      "source": "doc/gui.lua",
+      "source": "upstream/defold/engine/gui/src/gui_script.cpp",
       "line": 2104,
       "scenarios": [
         "value:gui.set_text.status"
@@ -6781,7 +6781,7 @@
       "stableId": 1539901009,
       "rawName": "gui.set_texture",
       "routeKind": "value",
-      "source": "doc/gui.lua",
+      "source": "upstream/defold/engine/gui/src/gui_script.cpp",
       "line": 2142,
       "scenarios": [
         "planned:script:gui.set_texture"
@@ -6833,7 +6833,7 @@
       "stableId": 1740794531,
       "rawName": "gui.set_tracking",
       "routeKind": "value",
-      "source": "doc/gui.lua",
+      "source": "upstream/defold/engine/gui/src/gui_script.cpp",
       "line": 2190,
       "scenarios": [
         "planned:script:gui.set_tracking"
@@ -6859,7 +6859,7 @@
       "stableId": 3757373152,
       "rawName": "gui.set_visible",
       "routeKind": "value",
-      "source": "doc/gui.lua",
+      "source": "upstream/defold/engine/gui/src/gui_script.cpp",
       "line": 2197,
       "scenarios": [
         "planned:script:gui.set_visible"
@@ -6885,7 +6885,7 @@
       "stableId": 2994148867,
       "rawName": "gui.set_xanchor",
       "routeKind": "value",
-      "source": "doc/gui.lua",
+      "source": "upstream/defold/engine/gui/src/gui_script.cpp",
       "line": 2204,
       "scenarios": [
         "planned:script:gui.set_xanchor"
@@ -6911,7 +6911,7 @@
       "stableId": 2042797604,
       "rawName": "gui.set_yanchor",
       "routeKind": "value",
-      "source": "doc/gui.lua",
+      "source": "upstream/defold/engine/gui/src/gui_script.cpp",
       "line": 2211,
       "scenarios": [
         "planned:script:gui.set_yanchor"
@@ -7277,7 +7277,7 @@
       "stableId": 1111726479,
       "rawName": "msg.post",
       "routeKind": "value",
-      "source": "doc/msg.lua",
+      "source": "upstream/defold/engine/script/src/script_msg.cpp",
       "line": 46,
       "scenarios": [
         "value:msg.post.current-object"
@@ -8789,7 +8789,7 @@
       "stableId": 2722214421,
       "rawName": "sound.get_peak",
       "routeKind": "fixed-tuple",
-      "source": "engine/gamesys/src/gamesys/scripts/script_sound.cpp",
+      "source": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_sound.cpp",
       "line": 0,
       "publicTypeScriptFixture": "reachable",
       "scenarios": [
@@ -8816,7 +8816,7 @@
       "stableId": 2635085856,
       "rawName": "sound.get_rms",
       "routeKind": "fixed-tuple",
-      "source": "engine/gamesys/src/gamesys/scripts/script_sound.cpp",
+      "source": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_sound.cpp",
       "line": 0,
       "publicTypeScriptFixture": "reachable",
       "scenarios": [
@@ -9510,7 +9510,7 @@
       "stableId": 2158702312,
       "rawName": "tilemap.get_bounds",
       "routeKind": "fixed-tuple",
-      "source": "engine/gamesys/src/gamesys/scripts/script_tilemap.cpp",
+      "source": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_tilemap.cpp",
       "line": 0,
       "publicTypeScriptFixture": "reachable",
       "scenarios": [
@@ -9667,7 +9667,7 @@
       "stableId": 4233115420,
       "rawName": "vmath.conj",
       "routeKind": "value",
-      "source": "doc/vmath.lua",
+      "source": "upstream/defold/engine/script/src/script_vmath.cpp",
       "line": 84,
       "scenarios": [
         "value:vmath-fixed-pod.conj"
@@ -9695,7 +9695,7 @@
       "stableId": 3022880242,
       "rawName": "vmath.cross",
       "routeKind": "value",
-      "source": "doc/vmath.lua",
+      "source": "upstream/defold/engine/script/src/script_vmath.cpp",
       "line": 108,
       "scenarios": [
         "value:vmath-fixed-pod.cross"
@@ -9749,7 +9749,7 @@
       "stableId": 1329930197,
       "rawName": "vmath.euler_to_quat",
       "routeKind": "value",
-      "source": "doc/vmath.lua",
+      "source": "upstream/defold/engine/script/src/script_vmath.cpp",
       "line": 155,
       "scenarios": [
         "value:vmath-fixed-pod.euler-to-quat"
@@ -9777,7 +9777,7 @@
       "stableId": 3499206161,
       "rawName": "vmath.inv",
       "routeKind": "value",
-      "source": "doc/vmath.lua",
+      "source": "upstream/defold/engine/script/src/script_vmath.cpp",
       "line": 176,
       "scenarios": [
         "value:vmath-matrix4.inv"
@@ -9803,7 +9803,7 @@
       "stableId": 2370510694,
       "rawName": "vmath.length",
       "routeKind": "value",
-      "source": "doc/vmath.lua",
+      "source": "upstream/defold/engine/script/src/script_vmath.cpp",
       "line": 199,
       "scenarios": [
         "value:vmath.length.vector3"
@@ -9831,7 +9831,7 @@
       "stableId": 2981849211,
       "rawName": "vmath.length_sqr",
       "routeKind": "value",
-      "source": "doc/vmath.lua",
+      "source": "upstream/defold/engine/script/src/script_vmath.cpp",
       "line": 215,
       "scenarios": [
         "value:vmath-fixed-pod.length-sqr"
@@ -9911,7 +9911,7 @@
       "stableId": 1732915491,
       "rawName": "vmath.matrix4_axis_angle",
       "routeKind": "value",
-      "source": "doc/vmath.lua",
+      "source": "upstream/defold/engine/script/src/script_vmath.cpp",
       "line": 327,
       "scenarios": [
         "value:vmath-matrix4.axis-angle"
@@ -9937,7 +9937,7 @@
       "stableId": 2501238546,
       "rawName": "vmath.matrix4_compose",
       "routeKind": "value",
-      "source": "doc/vmath.lua",
+      "source": "upstream/defold/engine/script/src/script_vmath.cpp",
       "line": 347,
       "scenarios": [
         "value:vmath-matrix4.compose"
@@ -9963,7 +9963,7 @@
       "stableId": 4245225016,
       "rawName": "vmath.matrix4_frustum",
       "routeKind": "value",
-      "source": "doc/vmath.lua",
+      "source": "upstream/defold/engine/script/src/script_vmath.cpp",
       "line": 371,
       "scenarios": [
         "value:vmath-matrix4.frustum"
@@ -9989,7 +9989,7 @@
       "stableId": 2149531511,
       "rawName": "vmath.matrix4_look_at",
       "routeKind": "value",
-      "source": "doc/vmath.lua",
+      "source": "upstream/defold/engine/script/src/script_vmath.cpp",
       "line": 396,
       "scenarios": [
         "value:vmath-matrix4.look-at"
@@ -10015,7 +10015,7 @@
       "stableId": 2797369728,
       "rawName": "vmath.matrix4_orthographic",
       "routeKind": "value",
-      "source": "doc/vmath.lua",
+      "source": "upstream/defold/engine/script/src/script_vmath.cpp",
       "line": 420,
       "scenarios": [
         "value:vmath-matrix4.orthographic"
@@ -10041,7 +10041,7 @@
       "stableId": 1058276904,
       "rawName": "vmath.matrix4_perspective",
       "routeKind": "value",
-      "source": "doc/vmath.lua",
+      "source": "upstream/defold/engine/script/src/script_vmath.cpp",
       "line": 445,
       "scenarios": [
         "value:vmath-matrix4.perspective"
@@ -10067,7 +10067,7 @@
       "stableId": 3063853257,
       "rawName": "vmath.matrix4_quat",
       "routeKind": "value",
-      "source": "doc/vmath.lua",
+      "source": "upstream/defold/engine/script/src/script_vmath.cpp",
       "line": 461,
       "scenarios": [
         "value:vmath-matrix4.quat"
@@ -10093,7 +10093,7 @@
       "stableId": 2526426471,
       "rawName": "vmath.matrix4_rotation_x",
       "routeKind": "value",
-      "source": "doc/vmath.lua",
+      "source": "upstream/defold/engine/script/src/script_vmath.cpp",
       "line": 477,
       "scenarios": [
         "value:vmath-matrix4.rotation-x"
@@ -10119,7 +10119,7 @@
       "stableId": 2509648852,
       "rawName": "vmath.matrix4_rotation_y",
       "routeKind": "value",
-      "source": "doc/vmath.lua",
+      "source": "upstream/defold/engine/script/src/script_vmath.cpp",
       "line": 493,
       "scenarios": [
         "value:vmath-matrix4.rotation-y"
@@ -10145,7 +10145,7 @@
       "stableId": 2559981709,
       "rawName": "vmath.matrix4_rotation_z",
       "routeKind": "value",
-      "source": "doc/vmath.lua",
+      "source": "upstream/defold/engine/script/src/script_vmath.cpp",
       "line": 509,
       "scenarios": [
         "value:vmath-matrix4.rotation-z"
@@ -10197,7 +10197,7 @@
       "stableId": 889923285,
       "rawName": "vmath.matrix4_translation",
       "routeKind": "value",
-      "source": "doc/vmath.lua",
+      "source": "upstream/defold/engine/script/src/script_vmath.cpp",
       "line": 553,
       "scenarios": [
         "value:vmath-matrix4.translation"
@@ -10249,7 +10249,7 @@
       "stableId": 3582341977,
       "rawName": "vmath.normalize",
       "routeKind": "value",
-      "source": "doc/vmath.lua",
+      "source": "upstream/defold/engine/script/src/script_vmath.cpp",
       "line": 592,
       "scenarios": [
         "value:vmath.normalize.vector3"
@@ -10277,7 +10277,7 @@
       "stableId": 1292408212,
       "rawName": "vmath.ortho_inv",
       "routeKind": "value",
-      "source": "doc/vmath.lua",
+      "source": "upstream/defold/engine/script/src/script_vmath.cpp",
       "line": 613,
       "scenarios": [
         "value:vmath-matrix4.ortho-inv"
@@ -10303,7 +10303,7 @@
       "stableId": 2686972787,
       "rawName": "vmath.project",
       "routeKind": "value",
-      "source": "doc/vmath.lua",
+      "source": "upstream/defold/engine/script/src/script_vmath.cpp",
       "line": 634,
       "scenarios": [
         "value:vmath-fixed-pod.project"
@@ -10331,7 +10331,7 @@
       "stableId": 2756728049,
       "rawName": "vmath.quat",
       "routeKind": "value",
-      "source": "doc/vmath.lua",
+      "source": "upstream/defold/engine/script/src/script_vmath.cpp",
       "line": 667,
       "scenarios": [
         "value:vmath.quat.identity"
@@ -10359,7 +10359,7 @@
       "stableId": 4121318819,
       "rawName": "vmath.quat_axis_angle",
       "routeKind": "value",
-      "source": "doc/vmath.lua",
+      "source": "upstream/defold/engine/script/src/script_vmath.cpp",
       "line": 685,
       "scenarios": [
         "value:vmath-fixed-pod.quat-axis-angle"
@@ -10387,7 +10387,7 @@
       "stableId": 2962238768,
       "rawName": "vmath.quat_basis",
       "routeKind": "value",
-      "source": "doc/vmath.lua",
+      "source": "upstream/defold/engine/script/src/script_vmath.cpp",
       "line": 711,
       "scenarios": [
         "value:vmath-fixed-pod.quat-basis"
@@ -10415,7 +10415,7 @@
       "stableId": 1458980654,
       "rawName": "vmath.quat_from_to",
       "routeKind": "value",
-      "source": "doc/vmath.lua",
+      "source": "upstream/defold/engine/script/src/script_vmath.cpp",
       "line": 733,
       "scenarios": [
         "value:vmath-fixed-pod.quat-from-to"
@@ -10443,7 +10443,7 @@
       "stableId": 3312627817,
       "rawName": "vmath.quat_matrix4",
       "routeKind": "value",
-      "source": "doc/vmath.lua",
+      "source": "upstream/defold/engine/script/src/script_vmath.cpp",
       "line": 741,
       "scenarios": [
         "value:vmath-matrix4.quat-from-matrix"
@@ -10469,7 +10469,7 @@
       "stableId": 619862503,
       "rawName": "vmath.quat_rotation_x",
       "routeKind": "value",
-      "source": "doc/vmath.lua",
+      "source": "upstream/defold/engine/script/src/script_vmath.cpp",
       "line": 757,
       "scenarios": [
         "value:vmath-fixed-pod.quat-rotation-x"
@@ -10497,7 +10497,7 @@
       "stableId": 603084884,
       "rawName": "vmath.quat_rotation_y",
       "routeKind": "value",
-      "source": "doc/vmath.lua",
+      "source": "upstream/defold/engine/script/src/script_vmath.cpp",
       "line": 773,
       "scenarios": [
         "value:vmath-fixed-pod.quat-rotation-y"
@@ -10525,7 +10525,7 @@
       "stableId": 653417741,
       "rawName": "vmath.quat_rotation_z",
       "routeKind": "value",
-      "source": "doc/vmath.lua",
+      "source": "upstream/defold/engine/script/src/script_vmath.cpp",
       "line": 789,
       "scenarios": [
         "value:vmath.quat_rotation_z.pi"
@@ -10553,7 +10553,7 @@
       "stableId": 2641296689,
       "rawName": "vmath.quat_to_euler",
       "routeKind": "fixed-tuple",
-      "source": "engine/script/src/script_vmath.cpp",
+      "source": "upstream/defold/engine/script/src/script_vmath.cpp",
       "line": 0,
       "publicTypeScriptFixture": "reachable",
       "scenarios": [
@@ -10580,7 +10580,7 @@
       "stableId": 3691011585,
       "rawName": "vmath.rotate",
       "routeKind": "value",
-      "source": "doc/vmath.lua",
+      "source": "upstream/defold/engine/script/src/script_vmath.cpp",
       "line": 830,
       "scenarios": [
         "value:vmath-fixed-pod.rotate"
@@ -10634,7 +10634,7 @@
       "stableId": 3491633886,
       "rawName": "vmath.vector3",
       "routeKind": "value",
-      "source": "doc/vmath.lua",
+      "source": "upstream/defold/engine/script/src/script_vmath.cpp",
       "line": 948,
       "scenarios": [
         "value:vmath.vector3.zero"
@@ -10766,7 +10766,7 @@
       "stableId": 3950716894,
       "rawName": "window.get_size",
       "routeKind": "fixed-tuple",
-      "source": "engine/gamesys/src/gamesys/scripts/script_window.cpp",
+      "source": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_window.cpp",
       "line": 0,
       "publicTypeScriptFixture": "reachable",
       "scenarios": [

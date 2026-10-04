@@ -9,7 +9,7 @@ namespace defold_hermes::dynamic_value {
 enum class DispatchStatus : uint8_t { kMissing, kSuccess, kError };
 enum class Strategy : uint8_t { kExactLuaCall, kExactLuaTypeQuery };
 enum class ResultMode : uint8_t { kNumber, kBoolean, kVariableValues };
-struct Operation { uint16_t index; uint32_t stableId; const char* canonicalId; const char* modulePath; const char* member; Strategy strategy; ResultMode resultMode; uint8_t minimumArguments; uint8_t maximumArguments; };
+struct Operation { uint16_t index; uint32_t stableId; const char* canonicalId; const char* modulePath; const char* member; Strategy strategy; ResultMode resultMode; uint8_t minimumArguments; uint8_t maximumArguments; bool optimizationProven; };
 struct LuaApi { void* context = nullptr; DispatchStatus (*invoke)(void*, const Operation&, ScriptCallFrame*, char*, size_t) noexcept = nullptr; };
 inline constexpr size_t kBindingCount = 11;
 inline constexpr size_t kMaximumArgumentCount = 32;

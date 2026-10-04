@@ -6,11 +6,10 @@ import { pathToFileURL } from "node:url";
 
 import { stableBindingId } from "./lib/binding-identity.mjs";
 import {
-  assertReviewedRevision,
-  declaredDerivation,
-  expectReviewedCount,
-  observeReviewedSource,
-} from "./lib/reviewed-revision.mjs";
+  parseCanonicalLuaRegistrationSurface,
+  registeredRouteCapability,
+} from "./lib/defold-lua-structural-capabilities.mjs";
+import { assertReviewedRevision, declaredDerivation, expectReviewedCount } from "./lib/reviewed-revision.mjs";
 import { VOID, recordAudit } from "./lib/revision-audit.mjs";
 
 const root = new URL("../", import.meta.url);
@@ -19,6 +18,7 @@ const urls = {
   patterns: new URL("packages/bindings/generated/defold-script-binding-patterns.json", root),
   override: new URL("packages/bindings/overrides/script-overload-dispatch.json", root),
   owned: new URL("packages/bindings/generated/defold-script-value-bindings.json", root),
+  registrationSurface: new URL("packages/bindings/generated/defold-lua-registration-surface.json", root),
   report: new URL("packages/bindings/generated/defold-script-overload-dispatch.json", root),
   header: new URL("defold/defold_hermes/include/defold_hermes/generated_script_overload_dispatch.hpp", root),
   source: new URL("defold/defold_hermes/src/generated_script_overload_dispatch.cpp", root),
@@ -123,20 +123,14 @@ function shapesFor(fn) {
 }
 
 export async function loadInputs() {
-  const [irText, patternsText, overrideText, ownedText] = await Promise.all([
+  const [irText, patternsText, overrideText, ownedText, registrationSurfaceText] = await Promise.all([
     readFile(urls.ir, "utf8"),
     readFile(urls.patterns, "utf8"),
     readFile(urls.override, "utf8"),
     readFile(urls.owned, "utf8"),
+    readFile(urls.registrationSurface, "utf8"),
   ]);
-  const override = JSON.parse(overrideText);
-  const sources = await Promise.all(
-    override.sources.map(async (entry) => ({
-      ...entry,
-      text: await readFile(new URL(`upstream/defold/${entry.path}`, root), "utf8").catch(() => null),
-    })),
-  );
-  return { irText, patternsText, overrideText, ownedText, sources };
+  return { irText, patternsText, overrideText, ownedText, registrationSurfaceText };
 }
 
 function renderNative(rows) {
@@ -205,7 +199,8 @@ export function generate(inputs) {
   const patterns = JSON.parse(inputs.patternsText);
   const override = JSON.parse(inputs.overrideText);
   const owned = JSON.parse(inputs.ownedText);
-  assert(override.schemaVersion === 1, "overload-dispatch override schema drifted");
+  const registrationSurface = parseCanonicalLuaRegistrationSurface(inputs.registrationSurfaceText);
+  assert(override.schemaVersion === 2, "overload-dispatch override schema drifted");
   assert(ir.schemaVersion === 1 && patterns.schemaVersion === 1, "overload-dispatch input schema drifted");
   assert(ir.defoldRevision === patterns.defoldRevision, "overload-dispatch inputs use different Defold revisions");
   // Reviewed evidence, compared against the revision being generated. The
@@ -279,46 +274,6 @@ export function generate(inputs) {
       omittedFromPatterns.every(({ runtimeStatus }) => runtimeStatus === "implemented-generated-lua-bridge"),
     "overload-dispatch binding-pattern count drifted against script IR",
   );
-  const sourceByKey = new Map();
-  assert(Array.isArray(override.sources), "overload-dispatch reviewed policy has no source evidence");
-  const expectedSourceByKey = new Map();
-  const expectedSourcePaths = new Set();
-  for (const source of override.sources) {
-    assert(
-      typeof source?.key === "string" && source.key.length > 0,
-      "overload-dispatch reviewed policy source has no key",
-    );
-    assert(
-      typeof source.path === "string" && source.path.length > 0,
-      `${source.key}: reviewed policy source has no path`,
-    );
-    assert(!expectedSourceByKey.has(source.key), `${source.key}: duplicate reviewed policy source key`);
-    assert(!expectedSourcePaths.has(source.path), `${source.path}: duplicate reviewed policy source path`);
-    expectedSourceByKey.set(source.key, source);
-    expectedSourcePaths.add(source.path);
-  }
-  assert(inputs.sources.length === override.sources.length, "overload-dispatch pinned source count drifted");
-  for (const source of inputs.sources) {
-    const expected = expectedSourceByKey.get(source.key);
-    assert(
-      expected && expected.path === source.path && expected.sha256 === source.sha256,
-      `${source.key}: unreviewed source evidence`,
-    );
-    // OBSERVED, not asserted. A pinned hash only detects that Defold edited its
-    // own source, which across a release is expected and is the input to this
-    // generator rather than a failure of it. A moved file becomes an audit line
-    // and a restated pin for this revision. What actually checks this policy
-    // against the revision being generated is the census below, which is read
-    // from that revision's IR.
-    observeReviewedSource({
-      input: "packages/bindings/overrides/script-overload-dispatch.json",
-      id: `${source.key}: overload-dispatch`,
-      source: source.text,
-      evidence: source,
-    });
-    assert(!sourceByKey.has(source.key), `${source.key}: duplicate source key`);
-    sourceByKey.set(source.key, source);
-  }
   const classified = patterns.bindings.filter((row) => row.loweringFamily === "overload-dispatch");
   expectReviewedCount({
     input: "packages/bindings/overrides/script-overload-dispatch.json",
@@ -374,23 +329,21 @@ export function generate(inputs) {
       const policy = override.routes[pattern.id];
       assert(fn, `${pattern.id}: selected route is absent from pinned IR`);
       assert(policy, `${pattern.id}: missing reviewed policy`);
-      const source = sourceByKey.get(policy.source);
-      assert(source, `${pattern.id}: unknown reviewed source '${policy.source}'`);
-      if (typeof source.text !== "string" || !source.text.includes(policy.anchor)) {
-        const message = `${pattern.id}: pinned source ${source.text === null ? "is absent" : "anchor drifted"}`;
+      const routeName = [...fn.modulePath, fn.member].join(".");
+      const registration = registeredRouteCapability(registrationSurface, routeName);
+      const candidate = policy.strategy === "generated-defold-value-dispatch";
+      if (candidate && !registration) {
+        const message = `${pattern.id}: positive Lua registration is absent or ambiguous in canonical registration surface`;
         assert(declaredDerivation(), message);
         recordAudit({
           input: "packages/bindings/overrides/script-overload-dispatch.json",
           id: pattern.id,
-          source: source.path,
           status: VOID,
-          reason: source.text === null ? "absent-source" : "reviewed-route-anchor-lost",
-          anchorsLost: [policy.anchor],
+          reason: "canonical-registration-unavailable",
           detail: message,
         });
         return null;
       }
-      const candidate = policy.strategy === "generated-defold-value-dispatch";
       assert(
         candidate || policy.strategy === "blocked",
         `${pattern.id}: unknown reviewed strategy '${policy.strategy}'`,
@@ -425,7 +378,7 @@ export function generate(inputs) {
         generatedFamilyExecutableCandidate: candidate,
         callShapes,
         blocker: candidate ? null : policy.blocker,
-        sourceEvidence: { path: `upstream/defold/${source.path}`, sha256: source.sha256, anchor: policy.anchor },
+        sourceCapabilities: { registration },
         targetSupport: candidate
           ? {
               nativeDynamicHermes: "generated-executable-shared-script-adapter",
@@ -466,9 +419,10 @@ export function generate(inputs) {
       bindingPatternsSha256: sha256(inputs.patternsText),
       reviewedPolicySha256: sha256(inputs.overrideText),
       alreadyOwnedReportSha256: sha256(inputs.ownedText),
+      luaRegistrationSurfaceSha256: sha256(inputs.registrationSurfaceText),
     },
     evidencePolicy:
-      "Pinned source hashes and anchors record the reviewed registration surface. The eight candidates are installed in the shared native-dynamic ScriptAdapter/JSI router; real Defold Lua 5.1 tests reach every candidate descriptor and a local Bob/Extender arm64-osx bundle links the extension. Packaged-engine semantic execution, Static Hermes, and browser-host execution remain unclaimed.",
+      "The canonical source-derived Lua registration surface supplies route identity, C function, registration array, source path, and source line. The eight candidates are installed in the shared native-dynamic ScriptAdapter/JSI router; real Defold Lua 5.1 tests reach every candidate descriptor and a local Bob/Extender arm64-osx bundle links the extension. Packaged-engine semantic execution, Static Hermes, and browser-host execution remain unclaimed.",
     allocationPolicy:
       "Dispatch performs a sorted static descriptor lookup, scans only reviewed fixed call shapes, and uses cached Lua references plus caller-owned frame arenas. The warmed native test observes zero C++ operator-new calls; Lua, Hermes, and engine-internal allocation is outside that claim.",
     blockerCounts: Object.fromEntries(

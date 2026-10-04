@@ -61,7 +61,7 @@ const handleClassificationPath = path.join(
 const check = process.argv.includes("--check");
 let loadScriptSemanticOverrides;
 let assertReviewedRevision;
-let observeReviewedSource;
+let deriveSemanticHandleTypes;
 let VOID;
 let recordAudit;
 let classifyGlobalDeclaration;
@@ -71,59 +71,20 @@ let resolveDocumentedDuplication;
 
 async function loadSemanticHandleTypes(defoldRevision) {
   const policy = JSON.parse(await readFile(handleClassificationPath, "utf8"));
-  assert.equal(policy.schemaVersion, 2, "borrowed-handle classification schema is unsupported");
-  // The reviewed revision, compared against the revision BEING GENERATED. The
-  // byte-level evidence below - every cited source file's SHA-256 and anchors,
-  // read from the checkout of that revision - is what actually establishes that
-  // the review still holds, and runs whether or not the revisions are equal.
+  assert.equal(policy.schemaVersion, 3, "borrowed-handle classification schema is unsupported");
   assertReviewedRevision({
     input: "packages/bindings/overrides/script-borrowed-handle-classification.json",
     reviewed: policy.defoldRevision,
     derived: defoldRevision,
     detail: "the semantic handle kinds the generated script types are built from",
   });
-
-  // Each cited source is OBSERVED, not asserted. A file whose bytes moved while
-  // every reviewed anchor survived still carries its evidence, so its handle
-  // kinds are emitted for this revision and the audit carries the new hash. A
-  // file that lost an anchor has no evidence left, so its handle kinds are
-  // withdrawn FOR THIS REVISION - the raw types they covered fall back to
-  // unreviewed and are emitted as opaque rather than as a semantic kind we can
-  // no longer justify. Withdrawal is a per-revision policy difference and a
-  // queued review, reported in the CI summary; it is not a failure.
-  const evidenceById = new Map();
-  const withdrawn = new Set();
+  const sourceTexts = new Map();
   for (const evidence of policy.sourceEvidence) {
-    assert.ok(!evidenceById.has(evidence.id), `duplicate borrowed-handle evidence id: ${evidence.id}`);
-    const sourcePath = path.join(root, "upstream", "defold", evidence.source);
-    const source = await readFile(sourcePath, "utf8").catch(() => null);
-    const verdict = observeReviewedSource({
-      input: "packages/bindings/overrides/script-borrowed-handle-classification.json",
-      id: `${evidence.id}: borrowed-handle`,
-      source,
-      evidence,
-      reviewed: policy.defoldRevision,
-      derived: defoldRevision,
-    });
-    if (verdict.status === VOID) withdrawn.add(evidence.id);
-    evidenceById.set(evidence.id, evidence);
+    assert.ok(!sourceTexts.has(evidence.source), `duplicate borrowed-handle source: ${evidence.source}`);
+    const source = await readFile(path.join(root, "upstream", "defold", evidence.source), "utf8").catch(() => null);
+    sourceTexts.set(evidence.source, source);
   }
-
-  const rawTypeToKind = new Map();
-  for (const kind of policy.handleKinds) {
-    if (kind.representation === "declaration-only-token") continue;
-    for (const evidenceId of kind.sourceEvidence) {
-      assert.ok(evidenceById.has(evidenceId), `${kind.id}: unknown borrowed-handle source evidence: ${evidenceId}`);
-    }
-    // A kind rests on all of its cited evidence. If any of it went void at this
-    // revision, the kind is not claimed here.
-    if (kind.sourceEvidence.some((evidenceId) => withdrawn.has(evidenceId))) continue;
-    for (const rawType of kind.rawTypes) {
-      assert.ok(!rawTypeToKind.has(rawType), `${rawType}: assigned to multiple semantic handle kinds`);
-      rawTypeToKind.set(rawType, kind.id);
-    }
-  }
-  return rawTypeToKind;
+  return deriveSemanticHandleTypes(policy, sourceTexts);
 }
 
 function splitTopLevel(value, delimiter) {
@@ -679,8 +640,9 @@ export async function runScriptSdkGenerator({ semanticOnly = false } = {}) {
   ({ loadScriptSemanticOverrides } = await import(
     pathToFileURL(path.join(root, "scripts/lib/script-semantic-overrides.mjs"))
   ));
-  ({ assertReviewedRevision, observeReviewedSource } = await import(
-    pathToFileURL(path.join(root, "scripts/lib/reviewed-revision.mjs"))
+  ({ assertReviewedRevision } = await import(pathToFileURL(path.join(root, "scripts/lib/reviewed-revision.mjs"))));
+  ({ deriveSemanticHandleTypes } = await import(
+    pathToFileURL(path.join(root, "scripts/generate-borrowed-handle-classification.mjs"))
   ));
   ({ VOID, recordAudit } = await import(pathToFileURL(path.join(root, "scripts/lib/revision-audit.mjs"))));
   ({ classifyGlobalDeclaration, readLifecycleCallbacks } = await import(

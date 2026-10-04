@@ -21,6 +21,13 @@ const root = new URL("../", import.meta.url);
 const documents = await loadHeadlessConformanceInputs(root);
 const plan = buildHeadlessConformancePlan(documents);
 
+test("the headless driver owns every C and C++ extension translation unit", async () => {
+  const cmake = await readFile(new URL("CMakeLists.txt", root), "utf8");
+  const sourceGlob = /file\(GLOB DEHERM_EXTENSION_SOURCES([\s\S]*?)\)/u.exec(cmake)?.[1] ?? "";
+  assert.match(sourceGlob, /defold_hermes\/src\/\*\.c"/u);
+  assert.match(sourceGlob, /defold_hermes\/src\/\*\.cpp"/u);
+});
+
 test("every script contract is accounted for exactly once", () => {
   const loweringPlan = documents.loweringPlan.value;
   const contractIndexes = new Set(
@@ -78,12 +85,15 @@ test("a contract without a fixture fails closed with machine-readable blockers",
 });
 
 test("string inhabitants are valid absolute Defold resource paths", () => {
-  const resourceContract = plan.contracts.find((contract) =>
-    contract.exercises?.some(({ routeId }) => routeId === "script:resource.load"),
+  const stringInhabitants = plan.contracts.flatMap((contract) =>
+    (contract.exercises ?? []).flatMap((exercise) =>
+      (exercise.arguments ?? []).filter(
+        (argument) => argument.kind === "literal" && typeof argument.value === "string",
+      ),
+    ),
   );
-  assert.ok(resourceContract);
-  const exercise = resourceContract.exercises.find(({ routeId }) => routeId === "script:resource.load");
-  assert.deepEqual(exercise.arguments, [{ kind: "literal", value: "/deherm_conformance" }]);
+  assert.ok(stringInhabitants.length > 0);
+  assert.ok(stringInhabitants.every(({ value }) => value === "/deherm_conformance"));
 });
 
 test("properties are selected by the contract record, never by route identity", () => {

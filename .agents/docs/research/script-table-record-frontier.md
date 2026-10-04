@@ -19,6 +19,21 @@ Three routes are exact flat-record candidates:
 - `b2d.get_version` returns its fixed version record; and
 - `bullet3d.get_version` returns the matching fixed version record.
 
+Their optimization proof is structural. The generator joins the canonical Lua
+registration surface to the registered C function, verifies the consumed
+scalar argument checks, and proves exactly one returned table whose field-name
+and push-codec set matches the source-derived record type. It also follows the
+Box2D one-result wrapper to its table-producing helper without pinning the
+helper's private name. The result-count proof tokenizes normal return edges, so
+equivalent C++ integer spellings (`1`, `1U`, parentheses, comments, and
+formatting) preserve the capability while zero, multiple, or unknown normal
+results withdraw it; `luaL_error` remains an allowed non-returning failure
+edge. Error text, local variable spelling, and other private body details are
+not evidence. Loss of registration, argument checking, a consumed field, its
+codec, or the one-table/one-result stack effect withdraws only that
+optimization to the universal fallback and records it in the stale
+optimization queue. Malformed reviewed source storage remains a hard failure.
+
 The generated C++ layer has fixed descriptor/field arrays, caller-owned result
 and table scratch storage, exact scalar and field-set validation, bounded
 string copying, no heap ownership primitive, and an installed shared

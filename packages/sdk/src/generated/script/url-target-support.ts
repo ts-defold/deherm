@@ -14,3 +14,4 @@ export const scriptUrlTargetSupport = {
   }
 } as const;
 export const scriptUrlExecutableRouteCount = 70 as const;
+export const scriptUrlUniversalFallbackRouteCount = 0 as const;

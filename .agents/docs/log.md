@@ -5214,3 +5214,39 @@ isolated engine-service and profiler ports and declares
 entities and 61 component instances, with seven telemetry samples and no
 component growth. This is installed Dynamic Hermes/native HMR evidence; it is
 not Static Hermes full-game execution evidence.
+
+## 2026-10-04 - Structural Lua replay evidence, first complete family wave
+
+URL replay remains 70/70, dynamic replay 11/11, fixed tuples 24/24, finite
+overloads 8/20, fixed table records 3/148, and borrowed handles 407 descriptors
+with 405 executable routes. Borrowed-handle evidence is split into 375
+representation-only and 62 representation-plus-lifecycle rows. Metamorphic
+tests now preserve these migrated specializations under irrelevant private
+helper, local, and error-text changes, while removal of registration, context,
+ABI, field, stack-effect, representation, or lifecycle facts withdraws the
+affected specialization to universal fallback. API accounting remains 926
+routes with zero omissions; focused native routers report zero warmed deherm
+allocations. The next #148 pass removed the four structured callable/body gates,
+exact GUI/render context-helper names, and borrowed representation/lifecycle
+spelling: canonical registration and IR codecs now bound captured replay;
+userdata/type/rooting and scene facts remain only where the adapter transports a
+Node; borrowed lifecycle rows consume structural effect classes. Wrapper/helper
+renames and private body/error changes preserve selection, while registration,
+metatable/type/rooting, context, or lifecycle-effect loss withdraws only the
+affected specialization. This is generated transport/dispatch evidence, not a
+claim that every Defold implementation was behavior-tested in a live game.
+
+The final adversarial pass exposed three broader proof-boundary defects rather
+than route-specific exceptions. Fixed-record selection now accounts for the
+modeled Lua stack construction and rejects any unmodeled stack mutator in the
+registered function or its one-result producer. All consumed C/C++ evidence is
+lexically comment-free while preserving string literals, so commented-out
+checks cannot satisfy a capability. GUI Node and full-userdata proofs now derive
+parameter, pointee, member, metatable, registration-hash, and checked-hash
+relationships from data flow instead of private identifier spelling. Ten exact
+mutation reproductions and 73 combined focused tests pass; full `pnpm check`,
+ASan/UBSan generated-family execution, and native headless conformance also
+pass. Headless execution observed 30 contracts with zero mismatches and zero
+engine faults; warmed generated routers reported zero deherm allocations. This
+closes issue #148's structural-evidence acceptance boundary, while retaining
+universal fallback for every withdrawn specialization.

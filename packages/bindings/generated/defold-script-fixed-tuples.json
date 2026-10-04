@@ -69,6 +69,20 @@
           ]
         }
       ],
+      "sourceCapabilities": {
+        "registration": {
+          "route": "bullet3d.constraint.get_anchors",
+          "module": "bullet3d.constraint",
+          "cFunction": "Constraint_GetJointAnchors",
+          "sourcePath": "gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
+          "registrationArray": "Constraint_functions",
+          "registrationLine": 1942
+        },
+        "context": {
+          "kind": "global",
+          "evidence": "captured-lua-route"
+        }
+      },
       "sourceEvidence": {
         "path": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
         "sha256": "5c162bcb9ef4952fc90c785940d115fd8ed1101f60cdb5d403b5de520d3447f7",
@@ -128,6 +142,20 @@
           ]
         }
       ],
+      "sourceCapabilities": {
+        "registration": {
+          "route": "bullet3d.constraint.get_hinge_motor",
+          "module": "bullet3d.constraint",
+          "cFunction": "Constraint_GetHingeMotor",
+          "sourcePath": "gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
+          "registrationArray": "Constraint_functions",
+          "registrationLine": 1909
+        },
+        "context": {
+          "kind": "global",
+          "evidence": "captured-lua-route"
+        }
+      },
       "sourceEvidence": {
         "path": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
         "sha256": "5c162bcb9ef4952fc90c785940d115fd8ed1101f60cdb5d403b5de520d3447f7",
@@ -187,6 +215,20 @@
           ]
         }
       ],
+      "sourceCapabilities": {
+        "registration": {
+          "route": "bullet3d.constraint.get_cone_twist_limits",
+          "module": "bullet3d.constraint",
+          "cFunction": "Constraint_GetConeTwistLimits",
+          "sourcePath": "gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
+          "registrationArray": "Constraint_functions",
+          "registrationLine": 1914
+        },
+        "context": {
+          "kind": "global",
+          "evidence": "captured-lua-route"
+        }
+      },
       "sourceEvidence": {
         "path": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
         "sha256": "5c162bcb9ef4952fc90c785940d115fd8ed1101f60cdb5d403b5de520d3447f7",
@@ -239,6 +281,20 @@
           ]
         }
       ],
+      "sourceCapabilities": {
+        "registration": {
+          "route": "bullet3d.constraint.get_hinge_limits",
+          "module": "bullet3d.constraint",
+          "cFunction": "Constraint_GetHingeLimits",
+          "sourcePath": "gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
+          "registrationArray": "Constraint_functions",
+          "registrationLine": 1907
+        },
+        "context": {
+          "kind": "global",
+          "evidence": "captured-lua-route"
+        }
+      },
       "sourceEvidence": {
         "path": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
         "sha256": "5c162bcb9ef4952fc90c785940d115fd8ed1101f60cdb5d403b5de520d3447f7",
@@ -291,6 +347,20 @@
           ]
         }
       ],
+      "sourceCapabilities": {
+        "registration": {
+          "route": "bullet3d.shape.get_local_transform",
+          "module": "bullet3d.shape",
+          "cFunction": "Shape_GetLocalTransform",
+          "sourcePath": "gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_shape.cpp",
+          "registrationArray": "Shape_functions",
+          "registrationLine": 636
+        },
+        "context": {
+          "kind": "global",
+          "evidence": "captured-lua-route"
+        }
+      },
       "sourceEvidence": {
         "path": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_shape.cpp",
         "sha256": "c64c4c5ba44421c40e17fe0603ec25e5f2bb6b8c6b64f132d4a402675a572285",
@@ -358,6 +428,20 @@
           ]
         }
       ],
+      "sourceCapabilities": {
+        "registration": {
+          "route": "collectionproxy.set_collection",
+          "module": "collectionproxy",
+          "cFunction": "CollectionProxy_SetCollection",
+          "sourcePath": "gamesys/src/gamesys/scripts/script_collectionproxy.cpp",
+          "registrationArray": "Module_methods",
+          "registrationLine": 303
+        },
+        "context": {
+          "kind": "script-instance",
+          "evidence": "captured-lua-route"
+        }
+      },
       "sourceEvidence": {
         "path": "engine/gamesys/src/gamesys/scripts/script_collectionproxy.cpp",
         "sha256": "5b8ddb008d2895a95d8be0dda1ee88a3e00e154545766234acfc3d944ec0477a",
@@ -428,6 +512,20 @@
           ]
         }
       ],
+      "sourceCapabilities": {
+        "registration": {
+          "route": "bullet3d.constraint.get_slider_motor",
+          "module": "bullet3d.constraint",
+          "cFunction": "Constraint_GetSliderMotor",
+          "sourcePath": "gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
+          "registrationArray": "Constraint_functions",
+          "registrationLine": 1938
+        },
+        "context": {
+          "kind": "global",
+          "evidence": "captured-lua-route"
+        }
+      },
       "sourceEvidence": {
         "path": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
         "sha256": "5c162bcb9ef4952fc90c785940d115fd8ed1101f60cdb5d403b5de520d3447f7",
@@ -480,6 +578,23 @@
           ]
         }
       ],
+      "sourceCapabilities": {
+        "registration": {
+          "route": "gui.get_type",
+          "module": "gui",
+          "cFunction": "LuaGetType",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 4989
+        },
+        "context": {
+          "kind": "gui-script-instance",
+          "evidence": "registered-instance-userdata-check",
+          "contextType": "gui-scene",
+          "typeHash": "GUI_SCRIPT_INSTANCE_TYPE_HASH",
+          "metatable": "GUI_SCRIPT_INSTANCE"
+        }
+      },
       "sourceEvidence": {
         "path": "engine/gui/src/gui_script.cpp",
         "sha256": "4a46bc80c0a35a59ddf7ea990cd7dcdf5b6eff86e03e6096739eb76f078064e4",
@@ -532,6 +647,20 @@
           ]
         }
       ],
+      "sourceCapabilities": {
+        "registration": {
+          "route": "bullet3d.rigid_body.get_damping",
+          "module": "bullet3d.rigid_body",
+          "cFunction": "RigidBody_GetDamping",
+          "sourcePath": "gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_rigid_body.cpp",
+          "registrationArray": "RigidBody_functions",
+          "registrationLine": 553
+        },
+        "context": {
+          "kind": "global",
+          "evidence": "captured-lua-route"
+        }
+      },
       "sourceEvidence": {
         "path": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_rigid_body.cpp",
         "sha256": "7fe92ecb9e32332bd612aabaf3e1276f5e78bb83e17cd08667116ab3c1928e1b",
@@ -609,6 +738,20 @@
           ]
         }
       ],
+      "sourceCapabilities": {
+        "registration": {
+          "route": "bullet3d.constraint.get_6dof_motor",
+          "module": "bullet3d.constraint",
+          "cFunction": "Constraint_Get6DofMotor",
+          "sourcePath": "gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
+          "registrationArray": "Constraint_functions",
+          "registrationLine": 1927
+        },
+        "context": {
+          "kind": "global",
+          "evidence": "captured-lua-route"
+        }
+      },
       "sourceEvidence": {
         "path": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
         "sha256": "5c162bcb9ef4952fc90c785940d115fd8ed1101f60cdb5d403b5de520d3447f7",
@@ -672,6 +815,20 @@
           ]
         }
       ],
+      "sourceCapabilities": {
+        "registration": {
+          "route": "bullet3d.constraint.get_limit",
+          "module": "bullet3d.constraint",
+          "cFunction": "Constraint_GetLimit",
+          "sourcePath": "gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
+          "registrationArray": "Constraint_functions",
+          "registrationLine": 1921
+        },
+        "context": {
+          "kind": "global",
+          "evidence": "captured-lua-route"
+        }
+      },
       "sourceEvidence": {
         "path": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
         "sha256": "5c162bcb9ef4952fc90c785940d115fd8ed1101f60cdb5d403b5de520d3447f7",
@@ -740,6 +897,20 @@
           ]
         }
       ],
+      "sourceCapabilities": {
+        "registration": {
+          "route": "tilemap.get_bounds",
+          "module": "tilemap",
+          "cFunction": "TileMap_GetBounds",
+          "sourcePath": "gamesys/src/gamesys/scripts/script_tilemap.cpp",
+          "registrationArray": "TILEMAP_FUNCTIONS",
+          "registrationLine": 608
+        },
+        "context": {
+          "kind": "script-instance",
+          "evidence": "captured-lua-route"
+        }
+      },
       "sourceEvidence": {
         "path": "engine/gamesys/src/gamesys/scripts/script_tilemap.cpp",
         "sha256": "2bdf30bc2919fdd76f010910ad5c7876d30efeb3bcdfee10234729f63f4a5cd8",
@@ -792,6 +963,20 @@
           ]
         }
       ],
+      "sourceCapabilities": {
+        "registration": {
+          "route": "bullet3d.collision_object.get_world_transform",
+          "module": "bullet3d.collision_object",
+          "cFunction": "CollisionObject_GetWorldTransform",
+          "sourcePath": "gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_collision_object.cpp",
+          "registrationArray": "CollisionObject_functions",
+          "registrationLine": 581
+        },
+        "context": {
+          "kind": "global",
+          "evidence": "captured-lua-route"
+        }
+      },
       "sourceEvidence": {
         "path": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_collision_object.cpp",
         "sha256": "c90f5f10b5b2ccbeb5f77ec3cf986d1dfe36a93eb2a0f79ce9e858e7f35aaf2b",
@@ -856,6 +1041,20 @@
           ]
         }
       ],
+      "sourceCapabilities": {
+        "registration": {
+          "route": "sound.get_rms",
+          "module": "sound",
+          "cFunction": "Sound_GetRMS",
+          "sourcePath": "gamesys/src/gamesys/scripts/script_sound.cpp",
+          "registrationArray": "SOUND_FUNCTIONS",
+          "registrationLine": 741
+        },
+        "context": {
+          "kind": "script-instance",
+          "evidence": "captured-lua-route"
+        }
+      },
       "sourceEvidence": {
         "path": "engine/gamesys/src/gamesys/scripts/script_sound.cpp",
         "sha256": "0bc38669c545e66b9a4689a82758c119165adf77e3f093e9415469c94d618053",
@@ -914,6 +1113,20 @@
           ]
         }
       ],
+      "sourceCapabilities": {
+        "registration": {
+          "route": "vmath.quat_to_euler",
+          "module": "vmath",
+          "cFunction": "QuatToEuler",
+          "sourcePath": "script/src/script_vmath.cpp",
+          "registrationArray": "methods",
+          "registrationLine": 2873
+        },
+        "context": {
+          "kind": "global",
+          "evidence": "captured-lua-route"
+        }
+      },
       "sourceEvidence": {
         "path": "engine/script/src/script_vmath.cpp",
         "sha256": "529c1e60211178dc28e28151f65fd27f461c35ac3aca322dacd25ef09276bdb2",
@@ -978,6 +1191,20 @@
           ]
         }
       ],
+      "sourceCapabilities": {
+        "registration": {
+          "route": "sound.get_peak",
+          "module": "sound",
+          "cFunction": "Sound_GetPeak",
+          "sourcePath": "gamesys/src/gamesys/scripts/script_sound.cpp",
+          "registrationArray": "SOUND_FUNCTIONS",
+          "registrationLine": 742
+        },
+        "context": {
+          "kind": "script-instance",
+          "evidence": "captured-lua-route"
+        }
+      },
       "sourceEvidence": {
         "path": "engine/gamesys/src/gamesys/scripts/script_sound.cpp",
         "sha256": "0bc38669c545e66b9a4689a82758c119165adf77e3f093e9415469c94d618053",
@@ -1089,6 +1316,23 @@
           ]
         }
       ],
+      "sourceCapabilities": {
+        "registration": {
+          "route": "gui.new_texture",
+          "module": "gui",
+          "cFunction": "LuaNewTexture",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5017
+        },
+        "context": {
+          "kind": "gui-script-instance",
+          "evidence": "registered-instance-userdata-check",
+          "contextType": "gui-scene",
+          "typeHash": "GUI_SCRIPT_INSTANCE_TYPE_HASH",
+          "metatable": "GUI_SCRIPT_INSTANCE"
+        }
+      },
       "sourceEvidence": {
         "path": "engine/gui/src/gui_script.cpp",
         "sha256": "4a46bc80c0a35a59ddf7ea990cd7dcdf5b6eff86e03e6096739eb76f078064e4",
@@ -1141,6 +1385,20 @@
           ]
         }
       ],
+      "sourceCapabilities": {
+        "registration": {
+          "route": "bullet3d.constraint.get_frame_a",
+          "module": "bullet3d.constraint",
+          "cFunction": "Constraint_GetFrameA",
+          "sourcePath": "gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
+          "registrationArray": "Constraint_functions",
+          "registrationLine": 1899
+        },
+        "context": {
+          "kind": "global",
+          "evidence": "captured-lua-route"
+        }
+      },
       "sourceEvidence": {
         "path": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
         "sha256": "5c162bcb9ef4952fc90c785940d115fd8ed1101f60cdb5d403b5de520d3447f7",
@@ -1193,6 +1451,20 @@
           ]
         }
       ],
+      "sourceCapabilities": {
+        "registration": {
+          "route": "bullet3d.constraint.get_frame_b",
+          "module": "bullet3d.constraint",
+          "cFunction": "Constraint_GetFrameB",
+          "sourcePath": "gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
+          "registrationArray": "Constraint_functions",
+          "registrationLine": 1900
+        },
+        "context": {
+          "kind": "global",
+          "evidence": "captured-lua-route"
+        }
+      },
       "sourceEvidence": {
         "path": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
         "sha256": "5c162bcb9ef4952fc90c785940d115fd8ed1101f60cdb5d403b5de520d3447f7",
@@ -1245,6 +1517,20 @@
           ]
         }
       ],
+      "sourceCapabilities": {
+        "registration": {
+          "route": "bullet3d.constraint.get_pivots",
+          "module": "bullet3d.constraint",
+          "cFunction": "Constraint_GetPivots",
+          "sourcePath": "gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
+          "registrationArray": "Constraint_functions",
+          "registrationLine": 1896
+        },
+        "context": {
+          "kind": "global",
+          "evidence": "captured-lua-route"
+        }
+      },
       "sourceEvidence": {
         "path": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
         "sha256": "5c162bcb9ef4952fc90c785940d115fd8ed1101f60cdb5d403b5de520d3447f7",
@@ -1297,6 +1583,20 @@
           ]
         }
       ],
+      "sourceCapabilities": {
+        "registration": {
+          "route": "bullet3d.constraint.get_angles",
+          "module": "bullet3d.constraint",
+          "cFunction": "Constraint_GetJointAngles",
+          "sourcePath": "gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
+          "registrationArray": "Constraint_functions",
+          "registrationLine": 1944
+        },
+        "context": {
+          "kind": "global",
+          "evidence": "captured-lua-route"
+        }
+      },
       "sourceEvidence": {
         "path": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
         "sha256": "5c162bcb9ef4952fc90c785940d115fd8ed1101f60cdb5d403b5de520d3447f7",
@@ -1363,6 +1663,20 @@
           ]
         }
       ],
+      "sourceCapabilities": {
+        "registration": {
+          "route": "bullet3d.constraint.get_slider_limits",
+          "module": "bullet3d.constraint",
+          "cFunction": "Constraint_GetSliderLimits",
+          "sourcePath": "gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
+          "registrationArray": "Constraint_functions",
+          "registrationLine": 1935
+        },
+        "context": {
+          "kind": "global",
+          "evidence": "captured-lua-route"
+        }
+      },
       "sourceEvidence": {
         "path": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
         "sha256": "5c162bcb9ef4952fc90c785940d115fd8ed1101f60cdb5d403b5de520d3447f7",
@@ -1415,6 +1729,20 @@
           ]
         }
       ],
+      "sourceCapabilities": {
+        "registration": {
+          "route": "bullet3d.constraint.get_axes",
+          "module": "bullet3d.constraint",
+          "cFunction": "Constraint_GetJointAxes",
+          "sourcePath": "gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
+          "registrationArray": "Constraint_functions",
+          "registrationLine": 1943
+        },
+        "context": {
+          "kind": "global",
+          "evidence": "captured-lua-route"
+        }
+      },
       "sourceEvidence": {
         "path": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
         "sha256": "5c162bcb9ef4952fc90c785940d115fd8ed1101f60cdb5d403b5de520d3447f7",
@@ -1454,6 +1782,20 @@
           ]
         }
       ],
+      "sourceCapabilities": {
+        "registration": {
+          "route": "window.get_size",
+          "module": "window",
+          "cFunction": "GetSize",
+          "sourcePath": "gamesys/src/gamesys/scripts/script_window.cpp",
+          "registrationArray": "Module_methods",
+          "registrationLine": 464
+        },
+        "context": {
+          "kind": "global",
+          "evidence": "captured-lua-route"
+        }
+      },
       "sourceEvidence": {
         "path": "engine/gamesys/src/gamesys/scripts/script_window.cpp",
         "sha256": "03b4962f55c626f2b73ebe978035be93215eb6e0ef91802bf8c8f12c81c2544b",

@@ -136,7 +136,11 @@ test("generated implementation lanes join by exact identity and universal fallba
   const dynamic = generated.units.find(({ identity }) => identity.id === "script:bit.band");
   const dynamicImplementation = generated.tables.implementationSets[dynamic.implementationSet][0];
   assert.equal(dynamicImplementation.lane, "script-dynamic-values");
+  assert.equal(dynamicImplementation.admission, "proven-specialization");
   assert.equal(dynamicImplementation.reportState.generatedFamilyExecutableCandidate, true);
+  assert.equal(dynamicImplementation.reportState.optimizationProven, true);
+  assert.equal(dynamicImplementation.evidenceClaims, "observed-bounded-registered-Lua-replay-transport");
+  assert.equal(dynamicImplementation.structuralEvidence.replayEvidence.executionContext, "global-lua-module");
   assert.equal(dynamicImplementation.targetClaims.nativeDynamicHermes, "candidate-awaits-shared-router-integration");
   assert.equal(dynamic.backends.dynamicHermesJsi.selection, "emit");
 
@@ -280,6 +284,25 @@ test("implementation lane joins fail closed on identity and census drift", () =>
   const genericCensus = structuredClone(inputs);
   genericCensus.scriptDynamicValues = replaceJson(genericCensus.scriptDynamicValues, (value) => value.bindings.pop());
   assert.throws(() => generateBindingLoweringPlan(genericCensus), /script-dynamic-values: report census drifted/);
+
+  const missingOptimization = structuredClone(inputs);
+  missingOptimization.scriptDynamicValues = replaceJson(missingOptimization.scriptDynamicValues, (value) => {
+    const row = value.bindings.find(({ id }) => id === "script:bit.band");
+    row.optimizationProven = false;
+    row.optimizationBlockers = ["registered-global-callable-evidence-missing"];
+    row.targetSupport.nativeDynamicHermes = "universal-fallback-missing-proof";
+    row.targetSupport.nativeStaticHermes = "universal-fallback-missing-proof";
+    value.optimizedReplayCount -= 1;
+    value.universalFallbackCount += 1;
+  });
+  const fallbackPlan = generateBindingLoweringPlan(missingOptimization);
+  const fallbackUnit = fallbackPlan.units.find(({ identity }) => identity.id === "script:bit.band");
+  const fallbackImplementations = fallbackPlan.tables.implementationSets[fallbackUnit.implementationSet];
+  assert.equal(
+    fallbackImplementations.find(({ lane }) => lane === "script-dynamic-values").admission,
+    "universal-fallback",
+  );
+  assert.deepEqual(fallbackImplementations.find(({ lane }) => lane === "script-universal-value").supersededLanes, []);
 
   const missingRevision = structuredClone(inputs);
   missingRevision.dmsdkNamedScalars = replaceJson(missingRevision.dmsdkNamedScalars, (value) => {

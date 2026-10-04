@@ -29,21 +29,20 @@
     "registration-form-not-traced": 5
   },
   "harnessCoverageGaps": {
-    "not-in-conformance-plan": 476,
-    "context-fixture-missing": 195,
+    "not-in-conformance-plan": 365,
+    "context-fixture-missing": 355,
     "route-unavailable-in-runtime-profile": 110,
-    "unsynthesizable-parameter-type": 53,
-    "multi-result-shape-unmodelled": 28,
+    "multi-result-shape-unmodelled": 22,
     "execution-policy-destructive": 21,
+    "unsynthesizable-parameter-type": 16,
     "handle-kind-outside-fixture-profile": 14,
     "compile-time-intrinsic": 8,
     "execution-policy-interactive": 5,
-    "variadic-argument-shape-unmodelled": 4,
-    "harness-effect-guard": 3,
     "separate-module-adapter": 3,
     "lua-stack-omit-profile": 2,
     "execution-policy-context-blocked": 2,
-    "lua-stack-blocked-capability": 2
+    "lua-stack-blocked-capability": 2,
+    "harness-effect-guard": 1
   },
   "arityDisagreementCount": 166,
   "wantsIssue": [],
@@ -2908,7 +2907,7 @@
       "id": "script:bit.arshift",
       "luaName": "bit.arshift",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/bit.lua"
@@ -2917,7 +2916,7 @@
       "id": "script:bit.band",
       "luaName": "bit.band",
       "status": "verified",
-      "notExecutedHere": "variadic-argument-shape-unmodelled",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "parserBlocker": "dynamic-stack-index",
@@ -2927,7 +2926,7 @@
       "id": "script:bit.bnot",
       "luaName": "bit.bnot",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/bit.lua"
@@ -2936,7 +2935,7 @@
       "id": "script:bit.bor",
       "luaName": "bit.bor",
       "status": "verified",
-      "notExecutedHere": "variadic-argument-shape-unmodelled",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "parserBlocker": "dynamic-stack-index",
@@ -2946,7 +2945,7 @@
       "id": "script:bit.bswap",
       "luaName": "bit.bswap",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/bit.lua"
@@ -2955,7 +2954,7 @@
       "id": "script:bit.bxor",
       "luaName": "bit.bxor",
       "status": "verified",
-      "notExecutedHere": "variadic-argument-shape-unmodelled",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "parserBlocker": "dynamic-stack-index",
@@ -2965,7 +2964,7 @@
       "id": "script:bit.lshift",
       "luaName": "bit.lshift",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/bit.lua"
@@ -2974,7 +2973,7 @@
       "id": "script:bit.rol",
       "luaName": "bit.rol",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/bit.lua"
@@ -2983,7 +2982,7 @@
       "id": "script:bit.ror",
       "luaName": "bit.ror",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/bit.lua"
@@ -2992,7 +2991,7 @@
       "id": "script:bit.rshift",
       "luaName": "bit.rshift",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/bit.lua"
@@ -3001,7 +3000,7 @@
       "id": "script:bit.tobit",
       "luaName": "bit.tobit",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/bit.lua"
@@ -3010,7 +3009,7 @@
       "id": "script:bit.tohex",
       "luaName": "bit.tohex",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/bit.lua"
@@ -3019,7 +3018,7 @@
       "id": "script:buffer.copy_buffer",
       "luaName": "buffer.copy_buffer",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/buffer.lua"
@@ -3028,7 +3027,7 @@
       "id": "script:buffer.copy_stream",
       "luaName": "buffer.copy_stream",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "parserBlocker": "undecided-result-arity",
@@ -3038,7 +3037,7 @@
       "id": "script:buffer.create",
       "luaName": "buffer.create",
       "status": "verified",
-      "notExecutedHere": "unsynthesizable-parameter-type:({ name:hash|string, type:buffer.VALUE_TYPE, count:number })[]",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "arityDisagreement": {
         "documented": [
@@ -3057,7 +3056,7 @@
       "id": "script:buffer.get_bytes",
       "luaName": "buffer.get_bytes",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "arityDisagreement": {
         "documented": [
@@ -3076,7 +3075,7 @@
       "id": "script:buffer.get_metadata",
       "luaName": "buffer.get_metadata",
       "status": "verified",
-      "notExecutedHere": "multi-result-shape-unmodelled",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/buffer.lua"
@@ -3085,7 +3084,7 @@
       "id": "script:buffer.get_stream",
       "luaName": "buffer.get_stream",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/buffer.lua"
@@ -3094,7 +3093,7 @@
       "id": "script:buffer.set_metadata",
       "luaName": "buffer.set_metadata",
       "status": "verified",
-      "notExecutedHere": "unsynthesizable-parameter-type:number[]",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/buffer.lua"
@@ -5377,7 +5376,7 @@
       "id": "script:crash.get_backtrace",
       "luaName": "crash.get_backtrace",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/crash.lua"
@@ -5386,7 +5385,7 @@
       "id": "script:crash.get_extra_data",
       "luaName": "crash.get_extra_data",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/crash.lua"
@@ -5395,7 +5394,7 @@
       "id": "script:crash.get_modules",
       "luaName": "crash.get_modules",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/crash.lua"
@@ -5404,7 +5403,7 @@
       "id": "script:crash.get_signum",
       "luaName": "crash.get_signum",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/crash.lua"
@@ -5413,7 +5412,7 @@
       "id": "script:crash.get_sys_field",
       "luaName": "crash.get_sys_field",
       "status": "verified",
-      "notExecutedHere": "unsynthesizable-parameter-type:crash.SYSFIELD",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/crash.lua"
@@ -5422,7 +5421,7 @@
       "id": "script:crash.get_user_field",
       "luaName": "crash.get_user_field",
       "status": "verified",
-      "notExecutedHere": "unsynthesizable-parameter-type:crash.USERFIELD",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/crash.lua"
@@ -5431,7 +5430,7 @@
       "id": "script:crash.load_previous",
       "luaName": "crash.load_previous",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/crash.lua"
@@ -5449,7 +5448,7 @@
       "id": "script:crash.set_file_path",
       "luaName": "crash.set_file_path",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/crash.lua"
@@ -5458,7 +5457,7 @@
       "id": "script:crash.set_user_field",
       "luaName": "crash.set_user_field",
       "status": "verified",
-      "notExecutedHere": "unsynthesizable-parameter-type:crash.USERFIELD",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/crash.lua"
@@ -5467,7 +5466,7 @@
       "id": "script:crash.write_dump",
       "luaName": "crash.write_dump",
       "status": "verified",
-      "notExecutedHere": "harness-effect-guard:write_dump",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/crash.lua"
@@ -7135,7 +7134,7 @@
       "id": "script:hash",
       "luaName": "hash",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/builtins.lua"
@@ -7144,7 +7143,7 @@
       "id": "script:hash_to_hex",
       "luaName": "hash_to_hex",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/builtins.lua"
@@ -7192,7 +7191,7 @@
       "id": "script:image.get_astc_header",
       "luaName": "image.get_astc_header",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/image.lua"
@@ -7201,7 +7200,7 @@
       "id": "script:image.load",
       "luaName": "image.load",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/image.lua"
@@ -7210,7 +7209,7 @@
       "id": "script:image.load_buffer",
       "luaName": "image.load_buffer",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/image.lua"
@@ -7219,7 +7218,7 @@
       "id": "script:json.decode",
       "luaName": "json.decode",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "parserBlocker": "undecided-result-arity",
@@ -7229,7 +7228,7 @@
       "id": "script:json.encode",
       "luaName": "json.encode",
       "status": "verified",
-      "notExecutedHere": "unsynthesizable-parameter-type:any",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "parserBlocker": "argument-slot-without-stack-access",
@@ -7286,7 +7285,7 @@
       "id": "script:liveupdate.add_mount",
       "luaName": "liveupdate.add_mount",
       "status": "verified",
-      "notExecutedHere": "unsynthesizable-parameter-type:fun(self:script_instance, name:hash, uri:string, result:liveupdate.LIVEUPDATE)",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/liveupdate.lua"
@@ -7295,7 +7294,7 @@
       "id": "script:liveupdate.get_mounts",
       "luaName": "liveupdate.get_mounts",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/liveupdate.lua"
@@ -7304,7 +7303,7 @@
       "id": "script:liveupdate.is_built_with_excluded_files",
       "luaName": "liveupdate.is_built_with_excluded_files",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/liveupdate.lua"
@@ -7558,7 +7557,7 @@
       "id": "script:msg.post",
       "luaName": "msg.post",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/msg.lua"
@@ -7567,7 +7566,7 @@
       "id": "script:msg.url",
       "luaName": "msg.url",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "arityDisagreement": {
         "documented": [
@@ -7894,7 +7893,7 @@
       "id": "script:pprint",
       "luaName": "pprint",
       "status": "verified",
-      "notExecutedHere": "variadic-argument-shape-unmodelled",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "parserBlocker": "unresolved-helper-overload",
@@ -7904,7 +7903,7 @@
       "id": "script:profiler.dump_frame",
       "luaName": "profiler.dump_frame",
       "status": "verified",
-      "notExecutedHere": "harness-effect-guard:dump_frame",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/profiler.lua"
@@ -7913,7 +7912,7 @@
       "id": "script:profiler.enable",
       "luaName": "profiler.enable",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "arityDisagreement": {
         "documented": [
@@ -7932,7 +7931,7 @@
       "id": "script:profiler.enable_ui",
       "luaName": "profiler.enable_ui",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "arityDisagreement": {
         "documented": [
@@ -7951,7 +7950,7 @@
       "id": "script:profiler.get_cpu_usage",
       "luaName": "profiler.get_cpu_usage",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/profiler.lua"
@@ -7960,7 +7959,7 @@
       "id": "script:profiler.get_memory_usage",
       "luaName": "profiler.get_memory_usage",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/profiler.lua"
@@ -7969,7 +7968,7 @@
       "id": "script:profiler.log_text",
       "luaName": "profiler.log_text",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/profiler.lua"
@@ -7978,7 +7977,7 @@
       "id": "script:profiler.recorded_frame_count",
       "luaName": "profiler.recorded_frame_count",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/profiler.lua"
@@ -7987,7 +7986,7 @@
       "id": "script:profiler.scope_begin",
       "luaName": "profiler.scope_begin",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/profiler.lua"
@@ -7996,7 +7995,7 @@
       "id": "script:profiler.scope_end",
       "luaName": "profiler.scope_end",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/profiler.lua"
@@ -8005,7 +8004,7 @@
       "id": "script:profiler.set_ui_mode",
       "luaName": "profiler.set_ui_mode",
       "status": "verified",
-      "notExecutedHere": "unsynthesizable-parameter-type:profiler.MODE",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/profiler.lua"
@@ -8014,7 +8013,7 @@
       "id": "script:profiler.set_ui_view_mode",
       "luaName": "profiler.set_ui_view_mode",
       "status": "verified",
-      "notExecutedHere": "unsynthesizable-parameter-type:profiler.VIEW_MODE",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/profiler.lua"
@@ -8023,7 +8022,7 @@
       "id": "script:profiler.set_ui_vsync_wait_visible",
       "luaName": "profiler.set_ui_vsync_wait_visible",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "arityDisagreement": {
         "documented": [
@@ -8042,7 +8041,7 @@
       "id": "script:profiler.view_recorded_frame",
       "luaName": "profiler.view_recorded_frame",
       "status": "verified",
-      "notExecutedHere": "unsynthesizable-parameter-type:{ distance:integer }|{ frame:integer }",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/profiler.lua"
@@ -8519,7 +8518,7 @@
       "id": "script:resource.create_atlas",
       "luaName": "resource.create_atlas",
       "status": "verified",
-      "notExecutedHere": "unsynthesizable-parameter-type:resource.animation[]@resource.atlas.animations",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "parserBlocker": "undecided-result-arity",
@@ -8529,7 +8528,7 @@
       "id": "script:resource.create_buffer",
       "luaName": "resource.create_buffer",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "parserBlocker": "undecided-result-arity",
@@ -8539,7 +8538,7 @@
       "id": "script:resource.create_sound_data",
       "luaName": "resource.create_sound_data",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "arityDisagreement": {
         "documented": [
@@ -8559,7 +8558,7 @@
       "id": "script:resource.create_texture",
       "luaName": "resource.create_texture",
       "status": "verified",
-      "notExecutedHere": "unsynthesizable-parameter-type:graphics.TEXTURE_TYPE@resource.texture_creation_params.type",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "arityDisagreement": {
         "documented": [
@@ -8579,7 +8578,7 @@
       "id": "script:resource.create_texture_async",
       "luaName": "resource.create_texture_async",
       "status": "verified",
-      "notExecutedHere": "multi-result-shape-unmodelled",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "arityDisagreement": {
         "documented": [
@@ -8609,7 +8608,7 @@
       "id": "script:resource.get_atlas",
       "luaName": "resource.get_atlas",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/resource.lua"
@@ -8618,7 +8617,7 @@
       "id": "script:resource.get_buffer",
       "luaName": "resource.get_buffer",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/resource.lua"
@@ -8627,7 +8626,7 @@
       "id": "script:resource.get_render_target_info",
       "luaName": "resource.get_render_target_info",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/resource.lua"
@@ -8636,7 +8635,7 @@
       "id": "script:resource.get_text_metrics",
       "luaName": "resource.get_text_metrics",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/resource.lua"
@@ -8645,7 +8644,7 @@
       "id": "script:resource.get_texture_info",
       "luaName": "resource.get_texture_info",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/resource.lua"
@@ -8654,7 +8653,7 @@
       "id": "script:resource.load",
       "luaName": "resource.load",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "parserBlocker": "undecided-result-arity",
@@ -8693,7 +8692,7 @@
       "id": "script:resource.set",
       "luaName": "resource.set",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "parserBlocker": "undecided-result-arity",
@@ -8703,7 +8702,7 @@
       "id": "script:resource.set_atlas",
       "luaName": "resource.set_atlas",
       "status": "verified",
-      "notExecutedHere": "unsynthesizable-parameter-type:resource.animation[]@resource.atlas.animations",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "parserBlocker": "undecided-result-arity",
@@ -8713,7 +8712,7 @@
       "id": "script:resource.set_buffer",
       "luaName": "resource.set_buffer",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/resource.lua"
@@ -8722,7 +8721,7 @@
       "id": "script:resource.set_sound",
       "luaName": "resource.set_sound",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "parserBlocker": "undecided-result-arity",
@@ -8732,7 +8731,7 @@
       "id": "script:resource.set_texture",
       "luaName": "resource.set_texture",
       "status": "verified",
-      "notExecutedHere": "unsynthesizable-parameter-type:graphics.TEXTURE_TYPE@resource.texture_update_params.type",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "parserBlocker": "undecided-result-arity",
@@ -8963,7 +8962,7 @@
       "id": "script:sound.get_group_gain",
       "luaName": "sound.get_group_gain",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/sound.lua"
@@ -8972,7 +8971,7 @@
       "id": "script:sound.get_group_name",
       "luaName": "sound.get_group_name",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/sound.lua"
@@ -8981,7 +8980,7 @@
       "id": "script:sound.get_groups",
       "luaName": "sound.get_groups",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/sound.lua"
@@ -8990,7 +8989,7 @@
       "id": "script:sound.get_peak",
       "luaName": "sound.get_peak",
       "status": "verified",
-      "notExecutedHere": "multi-result-shape-unmodelled",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/sound.lua"
@@ -8999,7 +8998,7 @@
       "id": "script:sound.get_rms",
       "luaName": "sound.get_rms",
       "status": "verified",
-      "notExecutedHere": "multi-result-shape-unmodelled",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/sound.lua"
@@ -9008,7 +9007,7 @@
       "id": "script:sound.is_music_playing",
       "luaName": "sound.is_music_playing",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/sound.lua"
@@ -9017,7 +9016,7 @@
       "id": "script:sound.is_phone_call_active",
       "luaName": "sound.is_phone_call_active",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/sound.lua"
@@ -9026,7 +9025,7 @@
       "id": "script:sound.pause",
       "luaName": "sound.pause",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "arityDisagreement": {
         "documented": [
@@ -9045,7 +9044,7 @@
       "id": "script:sound.play",
       "luaName": "sound.play",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/sound.lua"
@@ -9054,7 +9053,7 @@
       "id": "script:sound.set_gain",
       "luaName": "sound.set_gain",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "arityDisagreement": {
         "documented": [
@@ -9073,7 +9072,7 @@
       "id": "script:sound.set_group_gain",
       "luaName": "sound.set_group_gain",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/sound.lua"
@@ -9082,7 +9081,7 @@
       "id": "script:sound.set_pan",
       "luaName": "sound.set_pan",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "arityDisagreement": {
         "documented": [
@@ -9101,7 +9100,7 @@
       "id": "script:sound.stop",
       "luaName": "sound.stop",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/sound.lua"
@@ -9166,7 +9165,7 @@
       "id": "script:sys.deserialize",
       "luaName": "sys.deserialize",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/sys.lua"
@@ -9175,7 +9174,7 @@
       "id": "script:sys.exists",
       "luaName": "sys.exists",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/sys.lua"
@@ -9193,7 +9192,7 @@
       "id": "script:sys.get_application_info",
       "luaName": "sys.get_application_info",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/sys.lua"
@@ -9202,7 +9201,7 @@
       "id": "script:sys.get_application_path",
       "luaName": "sys.get_application_path",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/sys.lua"
@@ -9211,7 +9210,7 @@
       "id": "script:sys.get_config_boolean",
       "luaName": "sys.get_config_boolean",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/sys.lua"
@@ -9220,7 +9219,7 @@
       "id": "script:sys.get_config_int",
       "luaName": "sys.get_config_int",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/sys.lua"
@@ -9229,7 +9228,7 @@
       "id": "script:sys.get_config_number",
       "luaName": "sys.get_config_number",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/sys.lua"
@@ -9238,7 +9237,7 @@
       "id": "script:sys.get_config_string",
       "luaName": "sys.get_config_string",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/sys.lua"
@@ -9247,7 +9246,7 @@
       "id": "script:sys.get_connectivity",
       "luaName": "sys.get_connectivity",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/sys.lua"
@@ -9256,7 +9255,7 @@
       "id": "script:sys.get_engine_info",
       "luaName": "sys.get_engine_info",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/sys.lua"
@@ -9265,7 +9264,7 @@
       "id": "script:sys.get_host_path",
       "luaName": "sys.get_host_path",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/sys.lua"
@@ -9274,7 +9273,7 @@
       "id": "script:sys.get_ifaddrs",
       "luaName": "sys.get_ifaddrs",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/sys.lua"
@@ -9283,7 +9282,7 @@
       "id": "script:sys.get_save_file",
       "luaName": "sys.get_save_file",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/sys.lua"
@@ -9292,7 +9291,7 @@
       "id": "script:sys.get_sys_info",
       "luaName": "sys.get_sys_info",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/sys.lua"
@@ -9301,7 +9300,7 @@
       "id": "script:sys.load",
       "luaName": "sys.load",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/sys.lua"
@@ -9310,7 +9309,7 @@
       "id": "script:sys.load_buffer",
       "luaName": "sys.load_buffer",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/sys.lua"
@@ -9319,7 +9318,7 @@
       "id": "script:sys.load_buffer_async",
       "luaName": "sys.load_buffer_async",
       "status": "verified",
-      "notExecutedHere": "unsynthesizable-parameter-type:fun(self:script_instance, request_id:integer, result:sys.load_buffer_result)",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/sys.lua"
@@ -9328,7 +9327,7 @@
       "id": "script:sys.load_resource",
       "luaName": "sys.load_resource",
       "status": "verified",
-      "notExecutedHere": "multi-result-shape-unmodelled",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/sys.lua"
@@ -9365,7 +9364,7 @@
       "id": "script:sys.save",
       "luaName": "sys.save",
       "status": "verified",
-      "notExecutedHere": "unsynthesizable-parameter-type:table<any, any>",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/sys.lua"
@@ -9374,7 +9373,7 @@
       "id": "script:sys.serialize",
       "luaName": "sys.serialize",
       "status": "verified",
-      "notExecutedHere": "unsynthesizable-parameter-type:table<any, any>",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/sys.lua"
@@ -9383,7 +9382,7 @@
       "id": "script:sys.set_connectivity_host",
       "luaName": "sys.set_connectivity_host",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/sys.lua"
@@ -9392,7 +9391,7 @@
       "id": "script:sys.set_engine_throttle",
       "luaName": "sys.set_engine_throttle",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/sys.lua"
@@ -9401,7 +9400,7 @@
       "id": "script:sys.set_error_handler",
       "luaName": "sys.set_error_handler",
       "status": "verified",
-      "notExecutedHere": "unsynthesizable-parameter-type:fun(source:string, message:string, traceback:string)",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/sys.lua"
@@ -9410,7 +9409,7 @@
       "id": "script:sys.set_render_enable",
       "luaName": "sys.set_render_enable",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "documented-name-mismatch",
       "runtimeLuaName": "sys.set_render_enabled",
@@ -9425,7 +9424,7 @@
       "id": "script:sys.set_update_frequency",
       "luaName": "sys.set_update_frequency",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/sys.lua"
@@ -9434,7 +9433,7 @@
       "id": "script:sys.set_vsync_swap_interval",
       "luaName": "sys.set_vsync_swap_interval",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/sys.lua"
@@ -9576,7 +9575,7 @@
       "id": "script:timer.get_info",
       "luaName": "timer.get_info",
       "status": "verified",
-      "notExecutedHere": "unsynthesizable-parameter-type:timer_handle",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/timer.lua"
@@ -9594,7 +9593,7 @@
       "id": "script:types.is_hash",
       "luaName": "types.is_hash",
       "status": "verified",
-      "notExecutedHere": "unsynthesizable-parameter-type:any",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "arityDisagreement": {
         "documented": [
@@ -9613,7 +9612,7 @@
       "id": "script:types.is_matrix4",
       "luaName": "types.is_matrix4",
       "status": "verified",
-      "notExecutedHere": "unsynthesizable-parameter-type:any",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "arityDisagreement": {
         "documented": [
@@ -9632,7 +9631,7 @@
       "id": "script:types.is_quat",
       "luaName": "types.is_quat",
       "status": "verified",
-      "notExecutedHere": "unsynthesizable-parameter-type:any",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "arityDisagreement": {
         "documented": [
@@ -9651,7 +9650,7 @@
       "id": "script:types.is_url",
       "luaName": "types.is_url",
       "status": "verified",
-      "notExecutedHere": "unsynthesizable-parameter-type:any",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "arityDisagreement": {
         "documented": [
@@ -9670,7 +9669,7 @@
       "id": "script:types.is_vector",
       "luaName": "types.is_vector",
       "status": "verified",
-      "notExecutedHere": "unsynthesizable-parameter-type:any",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "arityDisagreement": {
         "documented": [
@@ -9689,7 +9688,7 @@
       "id": "script:types.is_vector3",
       "luaName": "types.is_vector3",
       "status": "verified",
-      "notExecutedHere": "unsynthesizable-parameter-type:any",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "arityDisagreement": {
         "documented": [
@@ -9708,7 +9707,7 @@
       "id": "script:types.is_vector4",
       "luaName": "types.is_vector4",
       "status": "verified",
-      "notExecutedHere": "unsynthesizable-parameter-type:any",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "arityDisagreement": {
         "documented": [
@@ -9727,7 +9726,7 @@
       "id": "script:vmath.clamp",
       "luaName": "vmath.clamp",
       "status": "verified",
-      "notExecutedHere": "unsynthesizable-parameter-type:T",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/vmath.lua"
@@ -9736,7 +9735,7 @@
       "id": "script:vmath.conj",
       "luaName": "vmath.conj",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/vmath.lua"
@@ -9745,7 +9744,7 @@
       "id": "script:vmath.cross",
       "luaName": "vmath.cross",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/vmath.lua"
@@ -9754,7 +9753,7 @@
       "id": "script:vmath.dot",
       "luaName": "vmath.dot",
       "status": "verified",
-      "notExecutedHere": "unsynthesizable-parameter-type:T",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "arityDisagreement": {
         "documented": [
@@ -9773,7 +9772,7 @@
       "id": "script:vmath.euler_to_quat",
       "luaName": "vmath.euler_to_quat",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "arityDisagreement": {
         "documented": [
@@ -9792,7 +9791,7 @@
       "id": "script:vmath.inv",
       "luaName": "vmath.inv",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/vmath.lua"
@@ -9801,7 +9800,7 @@
       "id": "script:vmath.length",
       "luaName": "vmath.length",
       "status": "verified",
-      "notExecutedHere": "unsynthesizable-parameter-type:vector3|vector4|quaternion",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "arityDisagreement": {
         "documented": [
@@ -9820,7 +9819,7 @@
       "id": "script:vmath.length_sqr",
       "luaName": "vmath.length_sqr",
       "status": "verified",
-      "notExecutedHere": "unsynthesizable-parameter-type:vector3|vector4|quaternion",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "arityDisagreement": {
         "documented": [
@@ -9839,7 +9838,7 @@
       "id": "script:vmath.lerp",
       "luaName": "vmath.lerp",
       "status": "verified",
-      "notExecutedHere": "unsynthesizable-parameter-type:T",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/vmath.lua"
@@ -9848,7 +9847,7 @@
       "id": "script:vmath.matrix4",
       "luaName": "vmath.matrix4",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/vmath.lua"
@@ -9857,7 +9856,7 @@
       "id": "script:vmath.matrix4_axis_angle",
       "luaName": "vmath.matrix4_axis_angle",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/vmath.lua"
@@ -9866,7 +9865,7 @@
       "id": "script:vmath.matrix4_compose",
       "luaName": "vmath.matrix4_compose",
       "status": "verified",
-      "notExecutedHere": "unsynthesizable-parameter-type:vector3|vector4",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/vmath.lua"
@@ -9875,7 +9874,7 @@
       "id": "script:vmath.matrix4_frustum",
       "luaName": "vmath.matrix4_frustum",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/vmath.lua"
@@ -9884,7 +9883,7 @@
       "id": "script:vmath.matrix4_look_at",
       "luaName": "vmath.matrix4_look_at",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/vmath.lua"
@@ -9893,7 +9892,7 @@
       "id": "script:vmath.matrix4_orthographic",
       "luaName": "vmath.matrix4_orthographic",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/vmath.lua"
@@ -9902,7 +9901,7 @@
       "id": "script:vmath.matrix4_perspective",
       "luaName": "vmath.matrix4_perspective",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/vmath.lua"
@@ -9911,7 +9910,7 @@
       "id": "script:vmath.matrix4_quat",
       "luaName": "vmath.matrix4_quat",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/vmath.lua"
@@ -9920,7 +9919,7 @@
       "id": "script:vmath.matrix4_rotation_x",
       "luaName": "vmath.matrix4_rotation_x",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/vmath.lua"
@@ -9929,7 +9928,7 @@
       "id": "script:vmath.matrix4_rotation_y",
       "luaName": "vmath.matrix4_rotation_y",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/vmath.lua"
@@ -9938,7 +9937,7 @@
       "id": "script:vmath.matrix4_rotation_z",
       "luaName": "vmath.matrix4_rotation_z",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/vmath.lua"
@@ -9947,7 +9946,7 @@
       "id": "script:vmath.matrix4_scale",
       "luaName": "vmath.matrix4_scale",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "arityDisagreement": {
         "documented": [
@@ -9966,7 +9965,7 @@
       "id": "script:vmath.matrix4_translation",
       "luaName": "vmath.matrix4_translation",
       "status": "verified",
-      "notExecutedHere": "unsynthesizable-parameter-type:vector3|vector4",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "arityDisagreement": {
         "documented": [
@@ -9985,7 +9984,7 @@
       "id": "script:vmath.mul_per_elem",
       "luaName": "vmath.mul_per_elem",
       "status": "verified",
-      "notExecutedHere": "unsynthesizable-parameter-type:T",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "arityDisagreement": {
         "documented": [
@@ -10004,7 +10003,7 @@
       "id": "script:vmath.normalize",
       "luaName": "vmath.normalize",
       "status": "verified",
-      "notExecutedHere": "unsynthesizable-parameter-type:T",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "arityDisagreement": {
         "documented": [
@@ -10023,7 +10022,7 @@
       "id": "script:vmath.ortho_inv",
       "luaName": "vmath.ortho_inv",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/vmath.lua"
@@ -10032,7 +10031,7 @@
       "id": "script:vmath.project",
       "luaName": "vmath.project",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/vmath.lua"
@@ -10041,7 +10040,7 @@
       "id": "script:vmath.quat",
       "luaName": "vmath.quat",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "arityDisagreement": {
         "documented": [
@@ -10060,7 +10059,7 @@
       "id": "script:vmath.quat_axis_angle",
       "luaName": "vmath.quat_axis_angle",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/vmath.lua"
@@ -10069,7 +10068,7 @@
       "id": "script:vmath.quat_basis",
       "luaName": "vmath.quat_basis",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/vmath.lua"
@@ -10078,7 +10077,7 @@
       "id": "script:vmath.quat_from_to",
       "luaName": "vmath.quat_from_to",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/vmath.lua"
@@ -10087,7 +10086,7 @@
       "id": "script:vmath.quat_matrix4",
       "luaName": "vmath.quat_matrix4",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/vmath.lua"
@@ -10096,7 +10095,7 @@
       "id": "script:vmath.quat_rotation_x",
       "luaName": "vmath.quat_rotation_x",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/vmath.lua"
@@ -10105,7 +10104,7 @@
       "id": "script:vmath.quat_rotation_y",
       "luaName": "vmath.quat_rotation_y",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/vmath.lua"
@@ -10114,7 +10113,7 @@
       "id": "script:vmath.quat_rotation_z",
       "luaName": "vmath.quat_rotation_z",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/vmath.lua"
@@ -10123,7 +10122,7 @@
       "id": "script:vmath.quat_to_euler",
       "luaName": "vmath.quat_to_euler",
       "status": "verified",
-      "notExecutedHere": "multi-result-shape-unmodelled",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/vmath.lua"
@@ -10132,7 +10131,7 @@
       "id": "script:vmath.rotate",
       "luaName": "vmath.rotate",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/vmath.lua"
@@ -10141,7 +10140,7 @@
       "id": "script:vmath.slerp",
       "luaName": "vmath.slerp",
       "status": "verified",
-      "notExecutedHere": "unsynthesizable-parameter-type:T",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "arityDisagreement": {
         "documented": [
@@ -10160,7 +10159,7 @@
       "id": "script:vmath.vector",
       "luaName": "vmath.vector",
       "status": "verified",
-      "notExecutedHere": "unsynthesizable-parameter-type:number[]",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/vmath.lua"
@@ -10169,7 +10168,7 @@
       "id": "script:vmath.vector3",
       "luaName": "vmath.vector3",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "arityDisagreement": {
         "documented": [
@@ -10188,7 +10187,7 @@
       "id": "script:vmath.vector4",
       "luaName": "vmath.vector4",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "arityDisagreement": {
         "documented": [
@@ -10326,7 +10325,7 @@
       "id": "script:zlib.deflate",
       "luaName": "zlib.deflate",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/zlib.lua"
@@ -10335,7 +10334,7 @@
       "id": "script:zlib.inflate",
       "luaName": "zlib.inflate",
       "status": "verified",
-      "notExecutedHere": "not-in-conformance-plan",
+      "notExecutedHere": "context-fixture-missing:generic",
       "runtimeObserved": false,
       "registration": "registered",
       "source": "doc/zlib.lua"

@@ -113,7 +113,39 @@ function validateSetups(manifest) {
   return setups;
 }
 
+function structuralRegistrationSource(binding, field, label) {
+  const registration = binding[field]?.registration;
+  const route = binding.rawName ?? binding.id.slice("script:".length);
+  if (
+    !registration ||
+    registration.route !== route ||
+    typeof registration.module !== "string" ||
+    route !== `${registration.module}.${route.split(".").at(-1)}` ||
+    typeof registration.sourcePath !== "string" ||
+    registration.sourcePath.startsWith("/") ||
+    registration.sourcePath.split("/").includes("..")
+  ) {
+    throw new Error(`${binding.id}: ${label} structural registration evidence is missing or malformed`);
+  }
+  return `upstream/defold/engine/${registration.sourcePath}`;
+}
+
 function routeRows(scalarRoutes, valueRoutes, tupleRoutes, urlRoutes, valueTailRoutes, overloadRoutes) {
+  const optimizedUrlRoutes = urlRoutes.rows.filter(({ optimizationProven }) => optimizationProven);
+  const fallbackUrlRoutes = urlRoutes.rows.filter(({ optimizationProven }) => !optimizationProven);
+  if (
+    urlRoutes.routeCount !== urlRoutes.rows.length ||
+    urlRoutes.optimizedRouteCount !== optimizedUrlRoutes.length ||
+    urlRoutes.universalFallbackRouteCount !== fallbackUrlRoutes.length
+  ) {
+    throw new Error("URL route admission census is stale");
+  }
+  for (const binding of urlRoutes.rows) {
+    const expectedStatus = binding.optimizationProven ? "generated-native-dynamic" : "universal-fallback-missing-proof";
+    if (binding.routing?.status !== expectedStatus || !Array.isArray(binding.routing?.blockers)) {
+      throw new Error(`${binding.id}: URL structural admission is missing or malformed`);
+    }
+  }
   const rows = [
     ...scalarRoutes.bindings.map((binding) => ({
       id: binding.id,
@@ -128,7 +160,10 @@ function routeRows(scalarRoutes, valueRoutes, tupleRoutes, urlRoutes, valueTailR
       stableId: binding.stableId,
       rawName: binding.rawName,
       routeKind: binding.id === "script:hash" ? "handle" : "value",
-      source: binding.source,
+      source:
+        binding.id === "script:hash"
+          ? binding.source
+          : structuralRegistrationSource(binding, "structuralCapabilities", "value route"),
       line: binding.line,
     })),
     ...tupleRoutes.bindings.map((binding) => ({
@@ -136,11 +171,11 @@ function routeRows(scalarRoutes, valueRoutes, tupleRoutes, urlRoutes, valueTailR
       stableId: typeof binding.stableId === "string" ? Number.parseInt(binding.stableId) : binding.stableId,
       rawName: binding.id.slice("script:".length),
       routeKind: "fixed-tuple",
-      source: binding.sourceEvidence.path,
+      source: structuralRegistrationSource(binding, "sourceCapabilities", "fixed-tuple route"),
       line: 0,
       publicTypeScriptFixture: binding.targetSupport.publicTypeScriptFixture,
     })),
-    ...urlRoutes.rows.map((binding) => ({
+    ...optimizedUrlRoutes.map((binding) => ({
       id: binding.id,
       stableId: binding.stableId,
       rawName: binding.rawName,
@@ -165,7 +200,7 @@ function routeRows(scalarRoutes, valueRoutes, tupleRoutes, urlRoutes, valueTailR
         stableId: binding.stableId,
         rawName: binding.id.slice("script:".length),
         routeKind: "captured-lua-overload",
-        source: binding.sourceEvidence.path,
+        source: structuralRegistrationSource(binding, "sourceCapabilities", "overload route"),
         line: 0,
       })),
   ].sort((left, right) => compareText(left.id, right.id));

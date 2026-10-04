@@ -30,9 +30,9 @@
     },
     "hashes": {
       "policy": "68239dfe605ef568c51fd53898744eeadefb6a525fc9a366968f46e806d40546",
-      "projection": "eee1a4745b80d329669efc8984304b3745b8db1ece537ca91513b19c551c69fa",
-      "classification": "9394d602cb98113faddb69fd97a487201e85ad59bf628e2f8fdba78dcacf24b5",
-      "availability": "3e21e946aa005c71d7208c83fee80a128c02598aebe8b6be7937e6950e792fa4"
+      "projection": "9f6072dc210528fa3bbc0cbb2957f0984c6fbe3657d31326be639a576e3e063a",
+      "classification": "cabf4cd6b94a6bea60bea2f4a2aa31b62229c2cc576fcdc75213616f13a39bc7",
+      "availability": "b3da37a662f0bcd54e83cef3e31fdffc5b4052b5b42861c2ecc7585c3deb9f58"
     },
     "availabilityCatalogSha256": "33ab628fb2dc8e58b5296346f189892f54fa2a23ee3f4c5b063300299066936b"
   },
@@ -129,6 +129,19 @@
       "sourceEvidence": [
         "box2d-body"
       ],
+      "lifecycleEvidence": [
+        "box2d-body"
+      ],
+      "lifecycleCapabilities": [
+        {
+          "sourceEvidence": "box2d-body",
+          "effects": [
+            "generation-or-version-check",
+            "native-validity-check"
+          ],
+          "subject": "Body"
+        }
+      ],
       "representationIsFeatureScoped": false,
       "representations": [
         {
@@ -137,7 +150,26 @@
           "capturable": true,
           "sourceEvidence": [
             "box2d-body"
-          ]
+          ],
+          "structuralCapability": {
+            "kind": "full-userdata",
+            "sourceEvidence": "box2d-body",
+            "allocation": {
+              "extent": "sizeof-wrapper-type",
+              "constructions": 1
+            },
+            "metatable": "b2body",
+            "typeCheck": {
+              "api": "dmScript::CheckUserType",
+              "identity": "registered-user-type-hash"
+            },
+            "registration": {
+              "kind": "register-user-type",
+              "metatable": "b2body",
+              "typeHashRelation": "same-registered-hash"
+            },
+            "rooting": "lua-registry-rootable"
+          }
         }
       ],
       "capturableFeatures": null,
@@ -166,6 +198,17 @@
       "sourceEvidence": [
         "box2d-chain"
       ],
+      "lifecycleEvidence": [
+        "box2d-chain"
+      ],
+      "lifecycleCapabilities": [
+        {
+          "sourceEvidence": "box2d-chain",
+          "effects": [
+            "destroy-or-invalidate-effect"
+          ]
+        }
+      ],
       "representationIsFeatureScoped": false,
       "representations": [
         {
@@ -174,7 +217,26 @@
           "capturable": true,
           "sourceEvidence": [
             "box2d-chain"
-          ]
+          ],
+          "structuralCapability": {
+            "kind": "full-userdata",
+            "sourceEvidence": "box2d-chain",
+            "allocation": {
+              "extent": "sizeof-wrapper-type",
+              "constructions": 1
+            },
+            "metatable": "b2chain",
+            "typeCheck": {
+              "api": "dmScript::CheckUserType",
+              "identity": "registered-user-type-hash"
+            },
+            "registration": {
+              "kind": "register-user-type",
+              "metatable": "b2chain",
+              "typeHashRelation": "same-registered-hash"
+            },
+            "rooting": "lua-registry-rootable"
+          }
         }
       ],
       "capturableFeatures": null,
@@ -203,6 +265,18 @@
       "sourceEvidence": [
         "box2d-joint"
       ],
+      "lifecycleEvidence": [
+        "box2d-joint"
+      ],
+      "lifecycleCapabilities": [
+        {
+          "sourceEvidence": "box2d-joint",
+          "effects": [
+            "identity-registry",
+            "destroy-or-invalidate-effect"
+          ]
+        }
+      ],
       "representationIsFeatureScoped": false,
       "representations": [
         {
@@ -211,7 +285,26 @@
           "capturable": true,
           "sourceEvidence": [
             "box2d-joint"
-          ]
+          ],
+          "structuralCapability": {
+            "kind": "full-userdata",
+            "sourceEvidence": "box2d-joint",
+            "allocation": {
+              "extent": "sizeof-wrapper-type",
+              "constructions": 1
+            },
+            "metatable": "b2joint",
+            "typeCheck": {
+              "api": "dmScript::CheckUserType",
+              "identity": "registered-user-type-hash"
+            },
+            "registration": {
+              "kind": "register-user-type",
+              "metatable": "b2joint",
+              "typeHashRelation": "same-registered-hash"
+            },
+            "rooting": "lua-registry-rootable"
+          }
         }
       ],
       "capturableFeatures": null,
@@ -240,6 +333,18 @@
       "sourceEvidence": [
         "box2d-shape"
       ],
+      "lifecycleEvidence": [
+        "box2d-shape"
+      ],
+      "lifecycleCapabilities": [
+        {
+          "sourceEvidence": "box2d-shape",
+          "effects": [
+            "native-validity-check"
+          ],
+          "subject": "Shape"
+        }
+      ],
       "representationIsFeatureScoped": false,
       "representations": [
         {
@@ -248,7 +353,26 @@
           "capturable": true,
           "sourceEvidence": [
             "box2d-shape"
-          ]
+          ],
+          "structuralCapability": {
+            "kind": "full-userdata",
+            "sourceEvidence": "box2d-shape",
+            "allocation": {
+              "extent": "sizeof-wrapper-type",
+              "constructions": 1
+            },
+            "metatable": "b2shape",
+            "typeCheck": {
+              "api": "dmScript::CheckUserType",
+              "identity": "registered-user-type-hash"
+            },
+            "registration": {
+              "kind": "register-user-type",
+              "metatable": "b2shape",
+              "typeHashRelation": "same-registered-hash"
+            },
+            "rooting": "lua-registry-rootable"
+          }
         }
       ],
       "capturableFeatures": null,
@@ -277,6 +401,18 @@
       "sourceEvidence": [
         "box2d-world"
       ],
+      "lifecycleEvidence": [
+        "box2d-world"
+      ],
+      "lifecycleCapabilities": [
+        {
+          "sourceEvidence": "box2d-world",
+          "effects": [
+            "native-validity-check"
+          ],
+          "subject": "World"
+        }
+      ],
       "representationIsFeatureScoped": true,
       "representations": [
         {
@@ -286,6 +422,14 @@
           "sourceEvidence": [
             "box2d-world-v2"
           ],
+          "structuralCapability": {
+            "kind": "light-userdata",
+            "sourceEvidence": "box2d-world-v2",
+            "pushCodec": "lua-light-userdata",
+            "metatable": null,
+            "typeCheck": null,
+            "rooting": "not-rootable-as-semantic-identity"
+          },
           "reason": "Box2D v2 pushes the world as a light userdata: no metatable, no generation, and no rooted identity a handle registry can capture or validate."
         },
         {
@@ -294,7 +438,26 @@
           "capturable": true,
           "sourceEvidence": [
             "box2d-world"
-          ]
+          ],
+          "structuralCapability": {
+            "kind": "full-userdata",
+            "sourceEvidence": "box2d-world",
+            "allocation": {
+              "extent": "sizeof-wrapper-type",
+              "constructions": 1
+            },
+            "metatable": "b2world",
+            "typeCheck": {
+              "api": "dmScript::CheckUserType",
+              "identity": "registered-user-type-hash"
+            },
+            "registration": {
+              "kind": "register-user-type",
+              "metatable": "b2world",
+              "typeHashRelation": "same-registered-hash"
+            },
+            "rooting": "lua-registry-rootable"
+          }
         }
       ],
       "capturableFeatures": [
@@ -324,6 +487,26 @@
         "buffer-sdk",
         "buffer-script"
       ],
+      "lifecycleEvidence": [
+        "buffer-script",
+        "buffer-sdk"
+      ],
+      "lifecycleCapabilities": [
+        {
+          "sourceEvidence": "buffer-sdk",
+          "effects": [
+            "ownership-domain"
+          ]
+        },
+        {
+          "sourceEvidence": "buffer-script",
+          "effects": [
+            "native-validity-check",
+            "checked-userdata"
+          ],
+          "subject": "Buffer"
+        }
+      ],
       "representationIsFeatureScoped": false,
       "representations": [
         {
@@ -331,9 +514,27 @@
           "representation": "lua-rooted-userdata",
           "capturable": true,
           "sourceEvidence": [
-            "buffer-script",
-            "buffer-sdk"
-          ]
+            "buffer-script"
+          ],
+          "structuralCapability": {
+            "kind": "full-userdata",
+            "sourceEvidence": "buffer-script",
+            "allocation": {
+              "extent": "sizeof-wrapper-type",
+              "constructions": 1
+            },
+            "metatable": "buffer",
+            "typeCheck": {
+              "api": "dmScript::CheckUserType",
+              "identity": "registered-user-type-hash"
+            },
+            "registration": {
+              "kind": "registration-record",
+              "metatable": "buffer",
+              "typeHashRelation": "same-registered-hash"
+            },
+            "rooting": "lua-registry-rootable"
+          }
         }
       ],
       "capturableFeatures": null,
@@ -362,6 +563,19 @@
       "sourceEvidence": [
         "buffer-script"
       ],
+      "lifecycleEvidence": [
+        "buffer-script"
+      ],
+      "lifecycleCapabilities": [
+        {
+          "sourceEvidence": "buffer-script",
+          "effects": [
+            "native-validity-check",
+            "checked-userdata"
+          ],
+          "subject": "Buffer"
+        }
+      ],
       "representationIsFeatureScoped": false,
       "representations": [
         {
@@ -370,7 +584,26 @@
           "capturable": true,
           "sourceEvidence": [
             "buffer-script"
-          ]
+          ],
+          "structuralCapability": {
+            "kind": "full-userdata",
+            "sourceEvidence": "buffer-script",
+            "allocation": {
+              "extent": "sizeof-wrapper-type",
+              "constructions": 1
+            },
+            "metatable": "bufferstream",
+            "typeCheck": {
+              "api": "dmScript::CheckUserType",
+              "identity": "registered-user-type-hash"
+            },
+            "registration": {
+              "kind": "registration-record",
+              "metatable": "bufferstream",
+              "typeHashRelation": "same-registered-hash"
+            },
+            "rooting": "lua-registry-rootable"
+          }
         }
       ],
       "capturableFeatures": null,
@@ -399,6 +632,17 @@
       "sourceEvidence": [
         "bullet-constraint"
       ],
+      "lifecycleEvidence": [
+        "bullet-constraint"
+      ],
+      "lifecycleCapabilities": [
+        {
+          "sourceEvidence": "bullet-constraint",
+          "effects": [
+            "destroy-or-invalidate-effect"
+          ]
+        }
+      ],
       "representationIsFeatureScoped": false,
       "representations": [
         {
@@ -407,7 +651,26 @@
           "capturable": true,
           "sourceEvidence": [
             "bullet-constraint"
-          ]
+          ],
+          "structuralCapability": {
+            "kind": "full-userdata",
+            "sourceEvidence": "bullet-constraint",
+            "allocation": {
+              "extent": "sizeof-wrapper-type",
+              "constructions": 1
+            },
+            "metatable": "bullet3d_constraint",
+            "typeCheck": {
+              "api": "dmScript::CheckUserType",
+              "identity": "registered-user-type-hash"
+            },
+            "registration": {
+              "kind": "register-user-type",
+              "metatable": "bullet3d_constraint",
+              "typeHashRelation": "same-registered-hash"
+            },
+            "rooting": "lua-registry-rootable"
+          }
         }
       ],
       "capturableFeatures": null,
@@ -438,6 +701,24 @@
         "bullet-object",
         "bullet-rigid-body"
       ],
+      "lifecycleEvidence": [
+        "bullet-object",
+        "bullet-rigid-body"
+      ],
+      "lifecycleCapabilities": [
+        {
+          "sourceEvidence": "bullet-object",
+          "effects": [
+            "destroy-or-invalidate-effect"
+          ]
+        },
+        {
+          "sourceEvidence": "bullet-rigid-body",
+          "effects": [
+            "pointer-upcast-validity"
+          ]
+        }
+      ],
       "representationIsFeatureScoped": false,
       "representations": [
         {
@@ -445,9 +726,27 @@
           "representation": "lua-rooted-userdata",
           "capturable": true,
           "sourceEvidence": [
-            "bullet-object",
-            "bullet-rigid-body"
-          ]
+            "bullet-object"
+          ],
+          "structuralCapability": {
+            "kind": "full-userdata",
+            "sourceEvidence": "bullet-object",
+            "allocation": {
+              "extent": "sizeof-wrapper-type",
+              "constructions": 2
+            },
+            "metatable": "bullet3d_collision_object",
+            "typeCheck": {
+              "api": "dmScript::CheckUserType",
+              "identity": "registered-user-type-hash"
+            },
+            "registration": {
+              "kind": "register-user-type",
+              "metatable": "bullet3d_collision_object",
+              "typeHashRelation": "same-registered-hash"
+            },
+            "rooting": "lua-registry-rootable"
+          }
         }
       ],
       "capturableFeatures": null,
@@ -477,6 +776,24 @@
         "bullet-shape",
         "bullet-object"
       ],
+      "lifecycleEvidence": [
+        "bullet-object",
+        "bullet-shape"
+      ],
+      "lifecycleCapabilities": [
+        {
+          "sourceEvidence": "bullet-shape",
+          "effects": [
+            "owner-index-identity"
+          ]
+        },
+        {
+          "sourceEvidence": "bullet-object",
+          "effects": [
+            "destroy-or-invalidate-effect"
+          ]
+        }
+      ],
       "representationIsFeatureScoped": false,
       "representations": [
         {
@@ -484,9 +801,27 @@
           "representation": "lua-rooted-userdata",
           "capturable": true,
           "sourceEvidence": [
-            "bullet-object",
             "bullet-shape"
-          ]
+          ],
+          "structuralCapability": {
+            "kind": "full-userdata",
+            "sourceEvidence": "bullet-shape",
+            "allocation": {
+              "extent": "sizeof-wrapper-type",
+              "constructions": 1
+            },
+            "metatable": "bullet3d_shape",
+            "typeCheck": {
+              "api": "dmScript::CheckUserType",
+              "identity": "registered-user-type-hash"
+            },
+            "registration": {
+              "kind": "register-user-type",
+              "metatable": "bullet3d_shape",
+              "typeHashRelation": "same-registered-hash"
+            },
+            "rooting": "lua-registry-rootable"
+          }
         }
       ],
       "capturableFeatures": null,
@@ -515,6 +850,17 @@
       "sourceEvidence": [
         "bullet-world"
       ],
+      "lifecycleEvidence": [
+        "bullet-world"
+      ],
+      "lifecycleCapabilities": [
+        {
+          "sourceEvidence": "bullet-world",
+          "effects": [
+            "destroy-or-invalidate-effect"
+          ]
+        }
+      ],
       "representationIsFeatureScoped": false,
       "representations": [
         {
@@ -523,7 +869,26 @@
           "capturable": true,
           "sourceEvidence": [
             "bullet-world"
-          ]
+          ],
+          "structuralCapability": {
+            "kind": "full-userdata",
+            "sourceEvidence": "bullet-world",
+            "allocation": {
+              "extent": "sizeof-wrapper-type",
+              "constructions": 1
+            },
+            "metatable": "bullet3d_world",
+            "typeCheck": {
+              "api": "dmScript::CheckUserType",
+              "identity": "registered-user-type-hash"
+            },
+            "registration": {
+              "kind": "register-user-type",
+              "metatable": "bullet3d_world",
+              "typeHashRelation": "same-registered-hash"
+            },
+            "rooting": "lua-registry-rootable"
+          }
         }
       ],
       "capturableFeatures": null,
@@ -552,6 +917,18 @@
       "sourceEvidence": [
         "render-script"
       ],
+      "lifecycleEvidence": [
+        "render-script"
+      ],
+      "lifecycleCapabilities": [
+        {
+          "sourceEvidence": "render-script",
+          "effects": [
+            "native-validity-check"
+          ],
+          "subject": "AssetHandle"
+        }
+      ],
       "representationIsFeatureScoped": false,
       "representations": [
         {
@@ -560,7 +937,14 @@
           "capturable": true,
           "sourceEvidence": [
             "render-script"
-          ]
+          ],
+          "structuralCapability": {
+            "kind": "number-asset-handle",
+            "sourceEvidence": "render-script",
+            "pushCodec": "lua-number",
+            "typeCheck": "lua-number",
+            "rooting": "value-copy"
+          }
         }
       ],
       "capturableFeatures": null,
@@ -589,6 +973,18 @@
       "sourceEvidence": [
         "render-script"
       ],
+      "lifecycleEvidence": [
+        "render-script"
+      ],
+      "lifecycleCapabilities": [
+        {
+          "sourceEvidence": "render-script",
+          "effects": [
+            "native-validity-check"
+          ],
+          "subject": "AssetHandle"
+        }
+      ],
       "representationIsFeatureScoped": false,
       "representations": [
         {
@@ -597,7 +993,14 @@
           "capturable": true,
           "sourceEvidence": [
             "render-script"
-          ]
+          ],
+          "structuralCapability": {
+            "kind": "number-asset-handle",
+            "sourceEvidence": "render-script",
+            "pushCodec": "lua-number",
+            "typeCheck": "lua-number",
+            "rooting": "value-copy"
+          }
         }
       ],
       "capturableFeatures": null,
@@ -627,6 +1030,26 @@
         "gui-script",
         "gui-core"
       ],
+      "lifecycleEvidence": [
+        "gui-core",
+        "gui-script"
+      ],
+      "lifecycleCapabilities": [
+        {
+          "sourceEvidence": "gui-script",
+          "effects": [
+            "scene-identity-check",
+            "destroy-or-invalidate-effect",
+            "checked-userdata"
+          ]
+        },
+        {
+          "sourceEvidence": "gui-core",
+          "effects": [
+            "generation-or-version-check"
+          ]
+        }
+      ],
       "representationIsFeatureScoped": false,
       "representations": [
         {
@@ -634,9 +1057,27 @@
           "representation": "lua-rooted-userdata",
           "capturable": true,
           "sourceEvidence": [
-            "gui-core",
             "gui-script"
-          ]
+          ],
+          "structuralCapability": {
+            "kind": "full-userdata",
+            "sourceEvidence": "gui-script",
+            "allocation": {
+              "extent": "sizeof-wrapper-type",
+              "constructions": 3
+            },
+            "metatable": "NodeProxy",
+            "typeCheck": {
+              "api": "dmScript::CheckUserType",
+              "identity": "registered-user-type-hash"
+            },
+            "registration": {
+              "kind": "register-user-type",
+              "metatable": "NodeProxy",
+              "typeHashRelation": "same-registered-hash"
+            },
+            "rooting": "lua-registry-rootable"
+          }
         }
       ],
       "capturableFeatures": null,
@@ -665,6 +1106,17 @@
       "sourceEvidence": [
         "render-script"
       ],
+      "lifecycleEvidence": [
+        "render-script"
+      ],
+      "lifecycleCapabilities": [
+        {
+          "sourceEvidence": "render-script",
+          "effects": [
+            "destroy-or-invalidate-effect"
+          ]
+        }
+      ],
       "representationIsFeatureScoped": false,
       "representations": [
         {
@@ -673,7 +1125,26 @@
           "capturable": true,
           "sourceEvidence": [
             "render-script"
-          ]
+          ],
+          "structuralCapability": {
+            "kind": "full-userdata",
+            "sourceEvidence": "render-script",
+            "allocation": {
+              "extent": "sizeof-wrapper-type",
+              "constructions": 1
+            },
+            "metatable": "RenderScriptConstantBuffer",
+            "typeCheck": {
+              "api": "dmScript::CheckUserType",
+              "identity": "registered-user-type-hash"
+            },
+            "registration": {
+              "kind": "register-user-type",
+              "metatable": "RenderScriptConstantBuffer",
+              "typeHashRelation": "same-registered-hash"
+            },
+            "rooting": "lua-registry-rootable"
+          }
         }
       ],
       "capturableFeatures": null,

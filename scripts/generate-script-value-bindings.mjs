@@ -10,6 +10,8 @@ import { MOVED, VOID, recordAudit } from "./lib/revision-audit.mjs";
 import {
   guiNodeUserdataCapability,
   parseCanonicalLuaRegistrationSurface,
+  registeredRouteCapability,
+  structuredLuaReplayCapability,
 } from "./lib/defold-lua-structural-capabilities.mjs";
 
 const root = new URL("../", import.meta.url);
@@ -150,12 +152,10 @@ function factoryImplementedCallShapes(callShapes) {
   return [...unique.values()];
 }
 
-function luaRegistration(source, member) {
-  const literal = source.match(new RegExp(`\\{\\s*"${member}"\\s*,\\s*([A-Za-z_][A-Za-z0-9_]*)\\s*\\}`));
-  if (literal) return { symbol: literal[1], anchor: literal[0] };
-  const macro = source.match(new RegExp(`REGGETSET\\(\\s*([A-Za-z_][A-Za-z0-9_]*)\\s*,\\s*${member.slice(4)}\\s*\\)`));
-  if (macro) return { symbol: `LuaSet${macro[1]}`, anchor: macro[0] };
-  return null;
+function canonicalRegistrationCapability(surface, fn, expectedSourcePath) {
+  const routeName = fn.modulePath.length ? [...fn.modulePath, fn.member].join(".") : fn.member;
+  const capability = registeredRouteCapability(surface, routeName, expectedSourcePath.replace(/^engine\//, ""));
+  return capability ? { symbol: capability.cFunction, capability } : null;
 }
 
 // A reviewed claim this revision no longer bears out.
@@ -221,7 +221,7 @@ function inDefinitionSource(fn, definition, layoutMoved) {
   return layoutMoved ? true : fn.source === definition.irSource;
 }
 
-function expandDefinitionBindings(definition, functions, patterns, source, layoutMoved) {
+function expandDefinitionBindings(definition, functions, patterns, source, surface, layoutMoved) {
   const expanded = [...(definition.bindings ?? [])];
   for (const family of definition.families ?? []) {
     const selector = family?.selector;
@@ -263,7 +263,7 @@ function expandDefinitionBindings(definition, functions, patterns, source, layou
         observed: selected.length,
       });
       for (const fn of selected) {
-        const registration = luaRegistration(source, fn.member);
+        const registration = canonicalRegistrationCapability(surface, fn, definition.source);
         if (!registration) {
           withdrawReviewed(fn.id, "absent-registration", `${fn.id}: no pinned Gui_methods registration was found`);
           continue;
@@ -273,7 +273,7 @@ function expandDefinitionBindings(definition, functions, patterns, source, layou
         expanded.push({
           id: fn.id,
           sourceSymbol: registration.symbol,
-          sourceOperation: registration.anchor,
+          structuralCapabilities: { registration: registration.capability },
           operation: family.operation,
           callShapes,
           implementedCallShapes: callShapes,
@@ -332,7 +332,7 @@ function expandDefinitionBindings(definition, functions, patterns, source, layou
       });
       const seenOperators = new Set();
       for (const fn of selected) {
-        const registration = luaRegistration(source, fn.member);
+        const registration = canonicalRegistrationCapability(surface, fn, definition.source);
         if (!registration) {
           if (
             withdrawReviewed(fn.id, "absent-registration", `${fn.id}: no pinned vmath methods registration was found`)
@@ -377,7 +377,8 @@ function expandDefinitionBindings(definition, functions, patterns, source, layou
         expanded.push({
           id: fn.id,
           sourceSymbol: registration.symbol,
-          sourceOperation: [registration.anchor, terminal.sourceAnchor],
+          sourceOperation: [terminal.sourceAnchor],
+          structuralCapabilities: { registration: registration.capability },
           operation: {
             template: family.operation.template,
             parameters: { ...family.operation.parameters, operator: terminal.operator },
@@ -457,7 +458,7 @@ function expandDefinitionBindings(definition, functions, patterns, source, layou
       }
       for (const fn of selected) {
         const terminal = terminals.get(fn.id);
-        const registration = luaRegistration(source, fn.member);
+        const registration = canonicalRegistrationCapability(surface, fn, definition.source);
         if (!terminal || !registration) {
           withdrawReviewed(fn.id, "absent-registration", `${fn.id}: no reviewed Matrix4 terminal or registration`);
           continue;
@@ -489,7 +490,8 @@ function expandDefinitionBindings(definition, functions, patterns, source, layou
         expanded.push({
           id: fn.id,
           sourceSymbol: registration.symbol,
-          sourceOperation: [registration.anchor, terminal.sourceAnchor, ...(terminal.extraSourceAnchors ?? [])],
+          sourceOperation: [terminal.sourceAnchor, ...(terminal.extraSourceAnchors ?? [])],
+          structuralCapabilities: { registration: registration.capability },
           operation: {
             template: family.operation.template,
             parameters: { ...family.operation.parameters, operator: terminal.operator },
@@ -723,16 +725,16 @@ function reviewedStructuredLuaTemplate(parameters, callShapes, resultCodec, requ
           proof?.registration?.route !== "gui.get_node" ||
           proof.registration.module !== "gui" ||
           proof.registration.cFunction !== binding.sourceSymbol ||
-          proof.registration.registrationArray !== "Gui_methods" ||
           proof.context?.kind !== "active-gui-scene" ||
-          proof.context?.check !== "GuiScriptInstance_Check" ||
+          proof.context?.capability?.evidence !== "registered-instance-userdata-check" ||
           proof.inputCodecs?.length !== 1 ||
           !proof.inputCodecs[0]?.includes("hash") ||
           !proof.inputCodecs[0]?.includes("string") ||
           proof.result?.codec !== "Node" ||
           proof.userdata?.kind !== "full-userdata" ||
-          proof.userdata?.metatable !== "NodeProxy" ||
-          proof.userdata?.registeredType !== "NODE_PROXY_TYPE_HASH" ||
+          typeof proof.userdata?.metatable !== "string" ||
+          typeof proof.userdata?.registeredType !== "string" ||
+          proof.userdata?.initializedFieldCount < 2 ||
           proof.userdata?.checkedBy !== "dmScript::CheckUserType" ||
           !proof.userdata?.metamethods?.includes("__index") ||
           !proof.userdata?.metamethods?.includes("__newindex")
@@ -741,12 +743,24 @@ function reviewedStructuredLuaTemplate(parameters, callShapes, resultCodec, requ
         }
         return;
       }
+      if (
+        ["factory-spawn", "message-post", "gui-node-text-set"].includes(binding.operation.template) &&
+        binding.structuralCapabilities?.operation?.registration?.route !== binding.rawName
+      ) {
+        throw new Error(
+          `${binding.id}: ${binding.operation.template} lacks structural value/effect capability evidence`,
+        );
+      }
       const evidence = Array.isArray(binding.sourceOperation)
         ? binding.sourceOperation
         : binding.sourceOperation
           ? [binding.sourceOperation]
           : [];
-      if (evidence.length === 0) {
+      if (
+        evidence.length === 0 &&
+        !binding.structuralCapabilities?.operation &&
+        !binding.structuralCapabilities?.registration
+      ) {
         throw new Error(`${binding.id}: ${binding.operation.template} requires scoped source-operation evidence`);
       }
     },
@@ -779,10 +793,14 @@ function reviewedRegisteredLuaTemplate(parameters, callShapes, resultCodec, memb
   const template = reviewedStructuredLuaTemplate(parameters, callShapes, resultCodec);
   return {
     ...template,
-    validate(binding, _source, _definition, moduleSource) {
+    validate(binding) {
       validateStructuredLuaContract(binding, parameters, callShapes, resultCodec);
-      const registration = luaRegistration(moduleSource, member);
-      if (!registration || registration.symbol !== binding.sourceSymbol) {
+      const registration = binding.structuralCapabilities?.registration;
+      if (
+        !registration ||
+        registration.cFunction !== binding.sourceSymbol ||
+        registration.route.split(".").at(-1) !== member
+      ) {
         throw new SpecializationEvidenceDrift(
           `${binding.id}: registered Lua callable ${JSON.stringify(member)} no longer resolves to ${binding.sourceSymbol}`,
         );
@@ -1736,129 +1754,181 @@ export function generate(irText, scalarDispatchText, patternsText, inputs) {
           reason: "documentation-layout",
         });
       }
-      return expandDefinitionBindings(definition, functions, patterns, sourceText, layoutMoved).flatMap((entry) => {
-        const fn = functions.get(entry.id);
-        // A reviewed route this revision does not document where the review found
-        // it. At the reviewed revision that is a regression in this tree and stays
-        // fatal; deriving another revision it is a route that moved or went away -
-        // Defold 1.13.1 documents vmath in `doc/src-script_vmath.cpp_doc.lua`, not
-        // `doc/vmath.lua` - so the reviewed entry is withdrawn and reported rather
-        // than emitted against documentation that is not there.
-        if (!fn || !inDefinitionSource(fn, definition, layoutMoved)) {
-          if (!declaredDerivation()) throw new Error(`${entry.id}: missing pinned ${definition.irSource} IR`);
-          recordAudit({
-            input: "packages/bindings/overrides/defold-value-layouts.json",
-            id: entry.id,
-            status: VOID,
-            reason: "absent-route",
-            source: definition.irSource,
-            observed: fn?.source ?? null,
-          });
-          return [];
-        }
-        let scopedSource;
-        try {
-          scopedSource = entry.generatedFamily ? sourceText : functionSource(sourceText, entry.sourceSymbol, entry.id);
-        } catch (error) {
-          return withdrawSpecializationDrift(entry.id, error);
-        }
-        const sourceOperations =
-          entry.sourceOperation == null
-            ? []
-            : Array.isArray(entry.sourceOperation)
-              ? entry.sourceOperation
-              : [entry.sourceOperation];
-        if (entry.id === "script:gui.get_node") {
-          const surface = parseCanonicalLuaRegistrationSurface(registrationSurfaceText);
-          const capabilities = guiNodeUserdataCapability(surface, sourceText, fn);
-          if (!capabilities || capabilities.registration.cFunction !== entry.sourceSymbol) {
+      const surface = parseCanonicalLuaRegistrationSurface(registrationSurfaceText);
+      return expandDefinitionBindings(definition, functions, patterns, sourceText, surface, layoutMoved).flatMap(
+        (entry) => {
+          const fn = functions.get(entry.id);
+          // A reviewed route this revision does not document where the review found
+          // it. At the reviewed revision that is a regression in this tree and stays
+          // fatal; deriving another revision it is a route that moved or went away -
+          // Defold 1.13.1 documents vmath in `doc/src-script_vmath.cpp_doc.lua`, not
+          // `doc/vmath.lua` - so the reviewed entry is withdrawn and reported rather
+          // than emitted against documentation that is not there.
+          if (!fn || !inDefinitionSource(fn, definition, layoutMoved)) {
+            if (!declaredDerivation()) throw new Error(`${entry.id}: missing pinned ${definition.irSource} IR`);
+            recordAudit({
+              input: "packages/bindings/overrides/defold-value-layouts.json",
+              id: entry.id,
+              status: VOID,
+              reason: "absent-route",
+              source: definition.irSource,
+              observed: fn?.source ?? null,
+            });
+            return [];
+          }
+          const structurallyProvenReplay = new Set([
+            "factory-spawn",
+            "message-post",
+            "gui-node-lookup",
+            "gui-node-text-set",
+          ]).has(entry.operation.template);
+          if (structurallyProvenReplay) {
+            const registration = canonicalRegistrationCapability(surface, fn, definition.source);
+            if (!registration) {
+              withdrawReviewed(
+                entry.id,
+                "absent-registration",
+                `${entry.id}: canonical registered Lua callable is absent`,
+              );
+              return [];
+            }
+            entry.sourceSymbol = registration.symbol;
+            entry.structuralCapabilities = {
+              ...entry.structuralCapabilities,
+              registration: registration.capability,
+            };
+          }
+          if (entry.sourceSymbol && !entry.structuralCapabilities?.registration) {
+            const registration = canonicalRegistrationCapability(surface, fn, definition.source);
+            if (registration?.symbol === entry.sourceSymbol) {
+              entry.structuralCapabilities = {
+                ...entry.structuralCapabilities,
+                registration: registration.capability,
+              };
+            }
+          }
+          let scopedSource;
+          try {
+            scopedSource = entry.generatedFamily
+              ? sourceText
+              : functionSource(sourceText, entry.sourceSymbol, entry.id);
+          } catch (error) {
+            return withdrawSpecializationDrift(entry.id, error);
+          }
+          const sourceOperations =
+            entry.sourceOperation == null
+              ? []
+              : Array.isArray(entry.sourceOperation)
+                ? entry.sourceOperation
+                : [entry.sourceOperation];
+          if (entry.id === "script:gui.get_node") {
+            const capabilities = guiNodeUserdataCapability(surface, sourceText, fn);
+            if (!capabilities) {
+              withdrawReviewed(
+                entry.id,
+                "missing-structural-capability",
+                `${entry.id}: GUI node userdata/context/type capability is incomplete`,
+              );
+              return [];
+            }
+            entry.structuralCapabilities = capabilities;
+          } else if (["factory-spawn", "message-post", "gui-node-text-set"].includes(entry.operation.template)) {
+            const capabilities = structuredLuaReplayCapability({
+              surface,
+              source: sourceText,
+              routeName: fn.rawName,
+              expectedSourcePath: definition.source.replace(/^engine\//, ""),
+              template: entry.operation.template,
+            });
+            if (!capabilities) {
+              withdrawReviewed(
+                entry.id,
+                "missing-structural-capability",
+                `${entry.id}: structured Lua registration/value/effect capability is incomplete`,
+              );
+              return [];
+            }
+            entry.structuralCapabilities = { ...entry.structuralCapabilities, operation: capabilities };
+          } else if (sourceOperations.some((anchor) => typeof anchor !== "string" || !scopedSource.includes(anchor))) {
+            withdrawReviewed(entry.id, "stale-source-anchor", `${entry.id}: scoped source operation evidence is stale`);
+            return [];
+          }
+          if (entry.callShapes.some((shape) => shape.some((codec) => !CODECS.has(codec))))
+            throw new Error(`${entry.id}: unsupported codec`);
+          const familyCodecs = new Map(Object.entries(entry.familyTypeCodecs ?? {}));
+          const derived = reviewedCallShapes(fn, familyCodecs);
+          if (!derived) return [];
+          if (!equal(derived, entry.callShapes)) {
             withdrawReviewed(
               entry.id,
-              "missing-structural-capability",
-              `${entry.id}: GUI node userdata/context/type capability is incomplete`,
+              "stale-call-shapes",
+              `${entry.id}: reviewed call shapes differ from pinned IR: ${JSON.stringify(derived)}`,
             );
             return [];
           }
-          entry.structuralCapabilities = capabilities;
-        } else if (sourceOperations.some((anchor) => typeof anchor !== "string" || !scopedSource.includes(anchor))) {
-          withdrawReviewed(entry.id, "stale-source-anchor", `${entry.id}: scoped source operation evidence is stale`);
-          return [];
-        }
-        if (entry.callShapes.some((shape) => shape.some((codec) => !CODECS.has(codec))))
-          throw new Error(`${entry.id}: unsupported codec`);
-        const familyCodecs = new Map(Object.entries(entry.familyTypeCodecs ?? {}));
-        const derived = reviewedCallShapes(fn, familyCodecs);
-        if (!derived) return [];
-        if (!equal(derived, entry.callShapes)) {
-          withdrawReviewed(
-            entry.id,
-            "stale-call-shapes",
-            `${entry.id}: reviewed call shapes differ from pinned IR: ${JSON.stringify(derived)}`,
-          );
-          return [];
-        }
-        const implementedCallShapes =
-          entry.operation.template === "factory-spawn"
-            ? factoryImplementedCallShapes(entry.callShapes)
-            : (entry.implementedCallShapes ?? entry.callShapes);
-        if (
-          implementedCallShapes.some((shape) => shape.some((codec) => !CODECS.has(codec))) ||
-          implementedCallShapes.some(
-            (shape) => !derived.some((candidate) => equal(candidate, shape)) && !isIrCompatibleShape(fn, shape),
-          )
-        ) {
-          withdrawReviewed(
-            entry.id,
-            "stale-call-shapes",
-            `${entry.id}: implemented call shape is not present in pinned IR`,
-          );
-          return [];
-        }
-        // Same rule for the result: a documented result shape this generator cannot
-        // read at this revision withdraws the route rather than stopping the chain.
-        let derivedResult;
-        try {
-          derivedResult = deriveResultCodec(fn);
-        } catch (error) {
-          withdrawReviewed(entry.id, "unreadable-signature", error.message);
-          return [];
-        }
-        if (derivedResult !== entry.resultCodec) {
-          withdrawReviewed(
-            entry.id,
-            "stale-result-codec",
-            `${entry.id}: reviewed result codec ${entry.resultCodec} differs from pinned IR ${derivedResult}`,
-          );
-          return [];
-        }
-        const id = stableBindingId(entry.id);
-        const scalarOwner = scalarStableIds.get(id);
-        if (scalarOwner) throw new Error(`${entry.id}: stable ID collides with scalar binding ${scalarOwner}`);
-        if (stableIds.has(id)) throw new Error(`Stable ID collision: ${entry.id} and ${stableIds.get(id)}`);
-        stableIds.set(id, entry.id);
-        const unhandledShapePolicy = entry.unhandledShapePolicy ?? "error";
-        if (unhandledShapePolicy !== "error" && unhandledShapePolicy !== "universal-fallback") {
-          throw new Error(`${entry.id}: unknown unhandled-shape policy ${unhandledShapePolicy}`);
-        }
-        const binding = {
-          ...entry,
-          implementedCallShapes,
-          unhandledShapePolicy,
-          stableId: id,
-          rawName: fn.rawName,
-          jsName: fn.jsName,
-          source: fn.source,
-          line: fn.line,
-          ownership: definition.ownership,
-          targetSupport: targetSupport(entry),
-        };
-        try {
-          validateOperation(binding, scopedSource, definition, sourceText);
-        } catch (error) {
-          return withdrawSpecializationDrift(entry.id, error);
-        }
-        return [binding];
-      });
+          const implementedCallShapes =
+            entry.operation.template === "factory-spawn"
+              ? factoryImplementedCallShapes(entry.callShapes)
+              : (entry.implementedCallShapes ?? entry.callShapes);
+          if (
+            implementedCallShapes.some((shape) => shape.some((codec) => !CODECS.has(codec))) ||
+            implementedCallShapes.some(
+              (shape) => !derived.some((candidate) => equal(candidate, shape)) && !isIrCompatibleShape(fn, shape),
+            )
+          ) {
+            withdrawReviewed(
+              entry.id,
+              "stale-call-shapes",
+              `${entry.id}: implemented call shape is not present in pinned IR`,
+            );
+            return [];
+          }
+          // Same rule for the result: a documented result shape this generator cannot
+          // read at this revision withdraws the route rather than stopping the chain.
+          let derivedResult;
+          try {
+            derivedResult = deriveResultCodec(fn);
+          } catch (error) {
+            withdrawReviewed(entry.id, "unreadable-signature", error.message);
+            return [];
+          }
+          if (derivedResult !== entry.resultCodec) {
+            withdrawReviewed(
+              entry.id,
+              "stale-result-codec",
+              `${entry.id}: reviewed result codec ${entry.resultCodec} differs from pinned IR ${derivedResult}`,
+            );
+            return [];
+          }
+          const id = stableBindingId(entry.id);
+          const scalarOwner = scalarStableIds.get(id);
+          if (scalarOwner) throw new Error(`${entry.id}: stable ID collides with scalar binding ${scalarOwner}`);
+          if (stableIds.has(id)) throw new Error(`Stable ID collision: ${entry.id} and ${stableIds.get(id)}`);
+          stableIds.set(id, entry.id);
+          const unhandledShapePolicy = entry.unhandledShapePolicy ?? "error";
+          if (unhandledShapePolicy !== "error" && unhandledShapePolicy !== "universal-fallback") {
+            throw new Error(`${entry.id}: unknown unhandled-shape policy ${unhandledShapePolicy}`);
+          }
+          const binding = {
+            ...entry,
+            implementedCallShapes,
+            unhandledShapePolicy,
+            stableId: id,
+            rawName: fn.rawName,
+            jsName: fn.jsName,
+            source: fn.source,
+            line: fn.line,
+            ownership: definition.ownership,
+            targetSupport: targetSupport(entry),
+          };
+          try {
+            validateOperation(binding, scopedSource, definition, sourceText);
+          } catch (error) {
+            return withdrawSpecializationDrift(entry.id, error);
+          }
+          return [binding];
+        },
+      );
     })
     .sort((left, right) => left.stableId - right.stableId);
 

@@ -47,7 +47,6 @@
   "bindings": [
     {
       "id": "script:gui.get_node",
-      "sourceSymbol": "LuaGetNode",
       "operation": {
         "template": "gui-node-lookup",
         "parameters": {
@@ -63,8 +62,6 @@
     },
     {
       "id": "script:gui.set_text",
-      "sourceSymbol": "LuaSetText",
-      "sourceOperation": ["luaL_checkstring(L, 2)", "strdup(text)"],
       "operation": {
         "template": "gui-node-text-set",
         "parameters": {
@@ -74,8 +71,14 @@
           "numberFormat": "lua-5.1-%.14g"
         }
       },
-      "callShapes": [["Node", "String"], ["Node", "Number"]],
-      "implementedCallShapes": [["Node", "String"], ["Node", "Number"]],
+      "callShapes": [
+        ["Node", "String"],
+        ["Node", "Number"]
+      ],
+      "implementedCallShapes": [
+        ["Node", "String"],
+        ["Node", "Number"]
+      ],
       "resultCodec": "None"
     }
   ]

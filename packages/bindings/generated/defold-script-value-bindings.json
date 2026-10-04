@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "inputSha256": "9661450cd3721c7f658baf3f135e01050f348bd3ae1141c7b0903df122861acc",
+  "inputSha256": "43cad2ed8e63eca99f71cc2422cd16619dde52d9e6901d5059cbfad078d71b64",
   "registrationSurfaceSha256": "3d730e238c5da462d5ebb7bbdb907fd6f5f2924b11ac478c1aae340ce7da255b",
   "sourceEvidence": [
     {
@@ -62,14 +62,6 @@
   "bindings": [
     {
       "id": "script:factory.create",
-      "sourceSymbol": "FactoryComp_Create",
-      "sourceOperation": [
-        "dmScript::CheckGOInstance(L)",
-        "dmScript::GetComponentFromLua(L, 1, FACTORY_EXT",
-        "dmGameObject::PropertyContainerCreateFromLua(L, 4)",
-        "CompFactorySpawn(world, component, collection",
-        "lua_pushnil(L)"
-      ],
       "operation": {
         "template": "factory-spawn",
         "parameters": {
@@ -184,6 +176,31 @@
         ]
       ],
       "resultCodec": "Hash",
+      "sourceSymbol": "FactoryComp_Create",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "factory.create",
+          "module": "factory",
+          "cFunction": "FactoryComp_Create",
+          "sourcePath": "gamesys/src/gamesys/scripts/script_factory.cpp",
+          "registrationArray": "FACTORY_COMP_FUNCTIONS",
+          "registrationLine": 462
+        },
+        "operation": {
+          "registration": {
+            "route": "factory.create",
+            "module": "factory",
+            "cFunction": "FactoryComp_Create",
+            "sourcePath": "gamesys/src/gamesys/scripts/script_factory.cpp",
+            "registrationArray": "FACTORY_COMP_FUNCTIONS",
+            "registrationLine": 462
+          },
+          "replayBoundary": {
+            "context": "current-script-instance",
+            "transport": "registered-lua-call"
+          }
+        }
+      },
       "implementedCallShapes": [
         [
           "String"
@@ -950,7 +967,16 @@
     {
       "id": "script:gui.set_enabled",
       "sourceSymbol": "LuaSetEnabled",
-      "sourceOperation": "{\"set_enabled\",     LuaSetEnabled}",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "gui.set_enabled",
+          "module": "gui",
+          "cFunction": "LuaSetEnabled",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5043
+        }
+      },
       "operation": {
         "template": "gui-node-setter",
         "parameters": {
@@ -1015,7 +1041,16 @@
     {
       "id": "script:gui.set_clipping_inverted",
       "sourceSymbol": "LuaSetClippingInverted",
-      "sourceOperation": "{\"set_clipping_inverted\",LuaSetClippingInverted}",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "gui.set_clipping_inverted",
+          "module": "gui",
+          "cFunction": "LuaSetClippingInverted",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5011
+        }
+      },
       "operation": {
         "template": "gui-node-setter",
         "parameters": {
@@ -1079,7 +1114,6 @@
     },
     {
       "id": "script:gui.get_node",
-      "sourceSymbol": "LuaGetNode",
       "operation": {
         "template": "gui-node-lookup",
         "parameters": {
@@ -1103,6 +1137,7 @@
         ]
       ],
       "resultCodec": "Node",
+      "sourceSymbol": "LuaGetNode",
       "structuralCapabilities": {
         "registration": {
           "route": "gui.get_node",
@@ -1114,7 +1149,13 @@
         },
         "context": {
           "kind": "active-gui-scene",
-          "check": "GuiScriptInstance_Check"
+          "capability": {
+            "kind": "gui-script-instance",
+            "evidence": "registered-instance-userdata-check",
+            "contextType": "gui-scene",
+            "typeHash": "GUI_SCRIPT_INSTANCE_TYPE_HASH",
+            "metatable": "GUI_SCRIPT_INSTANCE"
+          }
         },
         "inputCodecs": [
           [
@@ -1128,8 +1169,9 @@
         },
         "userdata": {
           "kind": "full-userdata",
-          "cType": "NodeProxy",
-          "metatable": "NodeProxy",
+          "allocation": "sizeof-wrapper-type",
+          "initializedFieldCount": 2,
+          "metatable": "NODE_PROXY_TYPE_NAME",
           "registeredType": "NODE_PROXY_TYPE_HASH",
           "checkedBy": "dmScript::CheckUserType",
           "metamethods": [
@@ -1162,7 +1204,16 @@
     {
       "id": "script:gui.set_id",
       "sourceSymbol": "LuaSetId",
-      "sourceOperation": "{\"set_id\",          LuaSetId}",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "gui.set_id",
+          "module": "gui",
+          "cFunction": "LuaSetId",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 4988
+        }
+      },
       "operation": {
         "template": "gui-node-setter",
         "parameters": {
@@ -1235,7 +1286,16 @@
     {
       "id": "script:gui.set_inner_radius",
       "sourceSymbol": "LuaSetInnerRadius",
-      "sourceOperation": "{\"set_inner_radius\", LuaSetInnerRadius}",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "gui.set_inner_radius",
+          "module": "gui",
+          "cFunction": "LuaSetInnerRadius",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5070
+        }
+      },
       "operation": {
         "template": "gui-node-setter",
         "parameters": {
@@ -1301,9 +1361,18 @@
       "id": "script:vmath.quat_rotation_y",
       "sourceSymbol": "Quat_RotationY",
       "sourceOperation": [
-        "{\"quat_rotation_y\", Quat_RotationY}",
         "Quat::rotationY(angle)"
       ],
+      "structuralCapabilities": {
+        "registration": {
+          "route": "vmath.quat_rotation_y",
+          "module": "vmath",
+          "cFunction": "Quat_RotationY",
+          "sourcePath": "script/src/script_vmath.cpp",
+          "registrationArray": "methods",
+          "registrationLine": 2844
+        }
+      },
       "operation": {
         "template": "vmath-fixed-pod",
         "parameters": {
@@ -1412,6 +1481,16 @@
         ]
       ],
       "resultCodec": "None",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "go.set_position",
+          "module": "go",
+          "cFunction": "Script_SetPosition",
+          "sourcePath": "gameobject/src/gameobject/gameobject_script.cpp",
+          "registrationArray": "GO_methods",
+          "registrationLine": 2349
+        }
+      },
       "unhandledShapePolicy": "error",
       "stableId": 608141138,
       "rawName": "go.set_position",
@@ -1436,9 +1515,18 @@
       "id": "script:vmath.quat_rotation_x",
       "sourceSymbol": "Quat_RotationX",
       "sourceOperation": [
-        "{\"quat_rotation_x\", Quat_RotationX}",
         "Quat::rotationX(angle)"
       ],
+      "structuralCapabilities": {
+        "registration": {
+          "route": "vmath.quat_rotation_x",
+          "module": "vmath",
+          "cFunction": "Quat_RotationX",
+          "sourcePath": "script/src/script_vmath.cpp",
+          "registrationArray": "methods",
+          "registrationLine": 2843
+        }
+      },
       "operation": {
         "template": "vmath-fixed-pod",
         "parameters": {
@@ -1499,7 +1587,16 @@
     {
       "id": "script:gui.set_particlefx",
       "sourceSymbol": "LuaSetParticlefx",
-      "sourceOperation": "{\"set_particlefx\",  LuaSetParticlefx}",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "gui.set_particlefx",
+          "module": "gui",
+          "cFunction": "LuaSetParticlefx",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5085
+        }
+      },
       "operation": {
         "template": "gui-node-setter",
         "parameters": {
@@ -1584,6 +1681,16 @@
         ]
       ],
       "resultCodec": "Quaternion",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "vmath.quat_rotation_z",
+          "module": "vmath",
+          "cFunction": "Quat_RotationZ",
+          "sourcePath": "script/src/script_vmath.cpp",
+          "registrationArray": "methods",
+          "registrationLine": 2845
+        }
+      },
       "implementedCallShapes": [
         [
           "Number"
@@ -1612,7 +1719,16 @@
     {
       "id": "script:gui.set_color",
       "sourceSymbol": "LuaSetColor",
-      "sourceOperation": "REGGETSET(Color, color)",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "gui.set_color",
+          "module": "gui",
+          "cFunction": "LuaSetColor",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5098
+        }
+      },
       "operation": {
         "template": "gui-node-setter",
         "parameters": {
@@ -1685,7 +1801,16 @@
     {
       "id": "script:gui.set_outline",
       "sourceSymbol": "LuaSetOutline",
-      "sourceOperation": "REGGETSET(Outline, outline)",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "gui.set_outline",
+          "module": "gui",
+          "cFunction": "LuaSetOutline",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5099
+        }
+      },
       "operation": {
         "template": "gui-node-setter",
         "parameters": {
@@ -1759,10 +1884,19 @@
       "id": "script:vmath.matrix4_translation",
       "sourceSymbol": "Matrix4_Translation",
       "sourceOperation": [
-        "{\"matrix4_translation\", Matrix4_Translation}",
         "Matrix4::translation",
         "t1->getXYZ()"
       ],
+      "structuralCapabilities": {
+        "registration": {
+          "route": "vmath.matrix4_translation",
+          "module": "vmath",
+          "cFunction": "Matrix4_Translation",
+          "sourcePath": "script/src/script_vmath.cpp",
+          "registrationArray": "methods",
+          "registrationLine": 2855
+        }
+      },
       "operation": {
         "template": "vmath-matrix4",
         "parameters": {
@@ -1854,11 +1988,20 @@
       "id": "script:vmath.matrix4_perspective",
       "sourceSymbol": "Matrix4_Perspective",
       "sourceOperation": [
-        "{\"matrix4_perspective\", Matrix4_Perspective}",
         "Matrix4::perspective(fov, aspect, near_z, far_z)",
         "if(near_z == 0.0f)",
         "dmLogWarning"
       ],
+      "structuralCapabilities": {
+        "registration": {
+          "route": "vmath.matrix4_perspective",
+          "module": "vmath",
+          "cFunction": "Matrix4_Perspective",
+          "sourcePath": "script/src/script_vmath.cpp",
+          "registrationArray": "methods",
+          "registrationLine": 2849
+        }
+      },
       "operation": {
         "template": "vmath-matrix4",
         "parameters": {
@@ -1943,13 +2086,6 @@
     },
     {
       "id": "script:msg.post",
-      "sourceSymbol": "Msg_Post",
-      "sourceOperation": [
-        "ResolveURL(L, 1, &receiver, &sender)",
-        "dmDDF::GetDescriptorFromHash(message_id)",
-        "dmScript::CheckTable(L, data, MAX_MESSAGE_DATA_SIZE, 3)",
-        "dmMessage::Post(&sender, &receiver, message_id"
-      ],
       "operation": {
         "template": "message-post",
         "parameters": {
@@ -2060,6 +2196,31 @@
         ]
       ],
       "resultCodec": "None",
+      "sourceSymbol": "Msg_Post",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "msg.post",
+          "module": "msg",
+          "cFunction": "Msg_Post",
+          "sourcePath": "script/src/script_msg.cpp",
+          "registrationArray": "ScriptMsg_methods",
+          "registrationLine": 596
+        },
+        "operation": {
+          "registration": {
+            "route": "msg.post",
+            "module": "msg",
+            "cFunction": "Msg_Post",
+            "sourcePath": "script/src/script_msg.cpp",
+            "registrationArray": "ScriptMsg_methods",
+            "registrationLine": 596
+          },
+          "replayBoundary": {
+            "context": "current-script-sender-url",
+            "transport": "registered-lua-call"
+          }
+        }
+      },
       "unhandledShapePolicy": "error",
       "stableId": 1111726479,
       "rawName": "msg.post",
@@ -2084,9 +2245,18 @@
       "id": "script:vmath.ortho_inv",
       "sourceSymbol": "OrthoInverse",
       "sourceOperation": [
-        "{\"ortho_inv\", OrthoInverse}",
         "dmVMath::OrthoInverse(*m)"
       ],
+      "structuralCapabilities": {
+        "registration": {
+          "route": "vmath.ortho_inv",
+          "module": "vmath",
+          "cFunction": "OrthoInverse",
+          "sourcePath": "script/src/script_vmath.cpp",
+          "registrationArray": "methods",
+          "registrationLine": 2867
+        }
+      },
       "operation": {
         "template": "vmath-matrix4",
         "parameters": {
@@ -2184,9 +2354,18 @@
       "id": "script:vmath.euler_to_quat",
       "sourceSymbol": "EulerToQuat",
       "sourceOperation": [
-        "{\"euler_to_quat\", EulerToQuat}",
         "dmVMath::EulerToQuat"
       ],
+      "structuralCapabilities": {
+        "registration": {
+          "route": "vmath.euler_to_quat",
+          "module": "vmath",
+          "cFunction": "EulerToQuat",
+          "sourcePath": "script/src/script_vmath.cpp",
+          "registrationArray": "methods",
+          "registrationLine": 2874
+        }
+      },
       "operation": {
         "template": "vmath-fixed-pod",
         "parameters": {
@@ -2280,7 +2459,16 @@
     {
       "id": "script:gui.set_size",
       "sourceSymbol": "LuaSetSize",
-      "sourceOperation": "{\"set_size\",        LuaSetSize}",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "gui.set_size",
+          "module": "gui",
+          "cFunction": "LuaSetSize",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5078
+        }
+      },
       "operation": {
         "template": "gui-node-setter",
         "parameters": {
@@ -2353,7 +2541,16 @@
     {
       "id": "script:gui.set_leading",
       "sourceSymbol": "LuaSetLeading",
-      "sourceOperation": "{\"set_leading\",     LuaSetLeading}",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "gui.set_leading",
+          "module": "gui",
+          "cFunction": "LuaSetLeading",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5074
+        }
+      },
       "operation": {
         "template": "gui-node-setter",
         "parameters": {
@@ -2419,9 +2616,18 @@
       "id": "script:vmath.quat_from_to",
       "sourceSymbol": "Quat_FromTo",
       "sourceOperation": [
-        "{\"quat_from_to\", Quat_FromTo}",
         "Quat::rotation(*v1, *v2)"
       ],
+      "structuralCapabilities": {
+        "registration": {
+          "route": "vmath.quat_from_to",
+          "module": "vmath",
+          "cFunction": "Quat_FromTo",
+          "sourcePath": "script/src/script_vmath.cpp",
+          "registrationArray": "methods",
+          "registrationLine": 2840
+        }
+      },
       "operation": {
         "template": "vmath-fixed-pod",
         "parameters": {
@@ -2499,7 +2705,16 @@
     {
       "id": "script:gui.set_position",
       "sourceSymbol": "LuaSetPosition",
-      "sourceOperation": "REGGETSET(Position, position)",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "gui.set_position",
+          "module": "gui",
+          "cFunction": "LuaSetPosition",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5094
+        }
+      },
       "operation": {
         "template": "gui-node-setter",
         "parameters": {
@@ -2571,11 +2786,6 @@
     },
     {
       "id": "script:gui.set_text",
-      "sourceSymbol": "LuaSetText",
-      "sourceOperation": [
-        "luaL_checkstring(L, 2)",
-        "strdup(text)"
-      ],
       "operation": {
         "template": "gui-node-text-set",
         "parameters": {
@@ -2606,6 +2816,41 @@
         ]
       ],
       "resultCodec": "None",
+      "sourceSymbol": "LuaSetText",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "gui.set_text",
+          "module": "gui",
+          "cFunction": "LuaSetText",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5001
+        },
+        "operation": {
+          "registration": {
+            "route": "gui.set_text",
+            "module": "gui",
+            "cFunction": "LuaSetText",
+            "sourcePath": "gui/src/gui_script.cpp",
+            "registrationArray": "Gui_methods",
+            "registrationLine": 5001
+          },
+          "replayBoundary": {
+            "context": "active-gui-scene",
+            "transport": "registered-lua-call"
+          },
+          "transportedHandle": {
+            "codec": "Node",
+            "index": 1,
+            "checkedUserdata": {
+              "api": "dmScript::CheckUserType",
+              "metatable": "NodeProxy",
+              "typeHashRelation": "same-registered-hash"
+            },
+            "sceneIdentity": true
+          }
+        }
+      },
       "unhandledShapePolicy": "error",
       "stableId": 1480837389,
       "rawName": "gui.set_text",
@@ -2629,7 +2874,16 @@
     {
       "id": "script:gui.set_shadow",
       "sourceSymbol": "LuaSetShadow",
-      "sourceOperation": "REGGETSET(Shadow, shadow)",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "gui.set_shadow",
+          "module": "gui",
+          "cFunction": "LuaSetShadow",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5100
+        }
+      },
       "operation": {
         "template": "gui-node-setter",
         "parameters": {
@@ -2702,7 +2956,16 @@
     {
       "id": "script:gui.set_texture",
       "sourceSymbol": "LuaSetTexture",
-      "sourceOperation": "{\"set_texture\",     LuaSetTexture}",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "gui.set_texture",
+          "module": "gui",
+          "cFunction": "LuaSetTexture",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5013
+        }
+      },
       "operation": {
         "template": "gui-node-setter",
         "parameters": {
@@ -2775,7 +3038,16 @@
     {
       "id": "script:gui.set_clipping_mode",
       "sourceSymbol": "LuaSetClippingMode",
-      "sourceOperation": "{\"set_clipping_mode\",  LuaSetClippingMode}",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "gui.set_clipping_mode",
+          "module": "gui",
+          "cFunction": "LuaSetClippingMode",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5007
+        }
+      },
       "operation": {
         "template": "gui-node-setter",
         "parameters": {
@@ -2840,7 +3112,16 @@
     {
       "id": "script:gui.set_outer_bounds",
       "sourceSymbol": "LuaSetOuterBounds",
-      "sourceOperation": "{\"set_outer_bounds\", LuaSetOuterBounds}",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "gui.set_outer_bounds",
+          "module": "gui",
+          "cFunction": "LuaSetOuterBounds",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5072
+        }
+      },
       "operation": {
         "template": "gui-node-setter",
         "parameters": {
@@ -2906,9 +3187,18 @@
       "id": "script:vmath.matrix4_axis_angle",
       "sourceSymbol": "Matrix4_AxisAngle",
       "sourceOperation": [
-        "{\"matrix4_axis_angle\", Matrix4_AxisAngle}",
         "Matrix4::rotation(angle, *axis)"
       ],
+      "structuralCapabilities": {
+        "registration": {
+          "route": "vmath.matrix4_axis_angle",
+          "module": "vmath",
+          "cFunction": "Matrix4_AxisAngle",
+          "sourcePath": "script/src/script_vmath.cpp",
+          "registrationArray": "methods",
+          "registrationLine": 2851
+        }
+      },
       "operation": {
         "template": "vmath-matrix4",
         "parameters": {
@@ -2995,7 +3285,16 @@
     {
       "id": "script:gui.set_tracking",
       "sourceSymbol": "LuaSetTracking",
-      "sourceOperation": "{\"set_tracking\",    LuaSetTracking}",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "gui.set_tracking",
+          "module": "gui",
+          "cFunction": "LuaSetTracking",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5076
+        }
+      },
       "operation": {
         "template": "gui-node-setter",
         "parameters": {
@@ -3060,7 +3359,16 @@
     {
       "id": "script:gui.set_blend_mode",
       "sourceSymbol": "LuaSetBlendMode",
-      "sourceOperation": "{\"set_blend_mode\",  LuaSetBlendMode}",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "gui.set_blend_mode",
+          "module": "gui",
+          "cFunction": "LuaSetBlendMode",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5005
+        }
+      },
       "operation": {
         "template": "gui-node-setter",
         "parameters": {
@@ -3125,7 +3433,16 @@
     {
       "id": "script:gui.set_fill_angle",
       "sourceSymbol": "LuaSetPieFillAngle",
-      "sourceOperation": "{\"set_fill_angle\", LuaSetPieFillAngle}",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "gui.set_fill_angle",
+          "module": "gui",
+          "cFunction": "LuaSetPieFillAngle",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5066
+        }
+      },
       "operation": {
         "template": "gui-node-setter",
         "parameters": {
@@ -3190,7 +3507,16 @@
     {
       "id": "script:gui.set_yanchor",
       "sourceSymbol": "LuaSetYAnchor",
-      "sourceOperation": "{\"set_yanchor\",     LuaSetYAnchor}",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "gui.set_yanchor",
+          "module": "gui",
+          "cFunction": "LuaSetYAnchor",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5034
+        }
+      },
       "operation": {
         "template": "gui-node-setter",
         "parameters": {
@@ -3303,6 +3629,16 @@
         ]
       ],
       "resultCodec": "None",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "go.set_rotation",
+          "module": "go",
+          "cFunction": "Script_SetRotation",
+          "sourcePath": "gameobject/src/gameobject/gameobject_script.cpp",
+          "registrationArray": "GO_methods",
+          "registrationLine": 2350
+        }
+      },
       "unhandledShapePolicy": "error",
       "stableId": 2093413559,
       "rawName": "go.set_rotation",
@@ -3326,7 +3662,16 @@
     {
       "id": "script:gui.set_size_mode",
       "sourceSymbol": "LuaSetSizeMode",
-      "sourceOperation": "{\"set_size_mode\",   LuaSetSizeMode}",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "gui.set_size_mode",
+          "module": "gui",
+          "cFunction": "LuaSetSizeMode",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5050
+        }
+      },
       "operation": {
         "template": "gui-node-setter",
         "parameters": {
@@ -3391,7 +3736,16 @@
     {
       "id": "script:gui.set_adjust_mode",
       "sourceSymbol": "LuaSetAdjustMode",
-      "sourceOperation": "{\"set_adjust_mode\", LuaSetAdjustMode}",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "gui.set_adjust_mode",
+          "module": "gui",
+          "cFunction": "LuaSetAdjustMode",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5047
+        }
+      },
       "operation": {
         "template": "gui-node-setter",
         "parameters": {
@@ -3457,9 +3811,18 @@
       "id": "script:vmath.matrix4_look_at",
       "sourceSymbol": "Matrix4_LookAt",
       "sourceOperation": [
-        "{\"matrix4_look_at\", Matrix4_LookAt}",
         "Matrix4::lookAt(Point3(*CheckVector3(L, 1)), Point3(*CheckVector3(L, 2)), *CheckVector3(L, 3))"
       ],
+      "structuralCapabilities": {
+        "registration": {
+          "route": "vmath.matrix4_look_at",
+          "module": "vmath",
+          "cFunction": "Matrix4_LookAt",
+          "sourcePath": "script/src/script_vmath.cpp",
+          "registrationArray": "methods",
+          "registrationLine": 2847
+        }
+      },
       "operation": {
         "template": "vmath-matrix4",
         "parameters": {
@@ -3563,7 +3926,16 @@
     {
       "id": "script:gui.set_flipbook_playback_rate",
       "sourceSymbol": "LuaSetFlipbookPlaybackRate",
-      "sourceOperation": "{\"set_flipbook_playback_rate\", LuaSetFlipbookPlaybackRate}",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "gui.set_flipbook_playback_rate",
+          "module": "gui",
+          "cFunction": "LuaSetFlipbookPlaybackRate",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5083
+        }
+      },
       "operation": {
         "template": "gui-node-setter",
         "parameters": {
@@ -3652,6 +4024,16 @@
         ]
       ],
       "resultCodec": "Number",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "vmath.length",
+          "module": "vmath",
+          "cFunction": "Length",
+          "sourcePath": "script/src/script_vmath.cpp",
+          "registrationArray": "methods",
+          "registrationLine": 2858
+        }
+      },
       "implementedCallShapes": [
         [
           "Vector3"
@@ -3687,10 +4069,19 @@
       "id": "script:vmath.matrix4_compose",
       "sourceSymbol": "Matrix4_Compose",
       "sourceOperation": [
-        "{\"matrix4_compose\", Matrix4_Compose}",
         "translation_matrix * rotation_matrix * scale_matrix",
         "translation->getXYZ()"
       ],
+      "structuralCapabilities": {
+        "registration": {
+          "route": "vmath.matrix4_compose",
+          "module": "vmath",
+          "cFunction": "Matrix4_Compose",
+          "sourcePath": "script/src/script_vmath.cpp",
+          "registrationArray": "methods",
+          "registrationLine": 2870
+        }
+      },
       "operation": {
         "template": "vmath-matrix4",
         "parameters": {
@@ -3806,9 +4197,18 @@
       "id": "script:vmath.matrix4_rotation_y",
       "sourceSymbol": "Matrix4_RotationY",
       "sourceOperation": [
-        "{\"matrix4_rotation_y\", Matrix4_RotationY}",
         "Matrix4::rotationY((float) luaL_checknumber(L, 1))"
       ],
+      "structuralCapabilities": {
+        "registration": {
+          "route": "vmath.matrix4_rotation_y",
+          "module": "vmath",
+          "cFunction": "Matrix4_RotationY",
+          "sourcePath": "script/src/script_vmath.cpp",
+          "registrationArray": "methods",
+          "registrationLine": 2853
+        }
+      },
       "operation": {
         "template": "vmath-matrix4",
         "parameters": {
@@ -3886,9 +4286,18 @@
       "id": "script:vmath.matrix4_rotation_x",
       "sourceSymbol": "Matrix4_RotationX",
       "sourceOperation": [
-        "{\"matrix4_rotation_x\", Matrix4_RotationX}",
         "Matrix4::rotationX((float) luaL_checknumber(L, 1))"
       ],
+      "structuralCapabilities": {
+        "registration": {
+          "route": "vmath.matrix4_rotation_x",
+          "module": "vmath",
+          "cFunction": "Matrix4_RotationX",
+          "sourcePath": "script/src/script_vmath.cpp",
+          "registrationArray": "methods",
+          "registrationLine": 2852
+        }
+      },
       "operation": {
         "template": "vmath-matrix4",
         "parameters": {
@@ -3966,9 +4375,18 @@
       "id": "script:vmath.matrix4_rotation_z",
       "sourceSymbol": "Matrix4_RotationZ",
       "sourceOperation": [
-        "{\"matrix4_rotation_z\", Matrix4_RotationZ}",
         "Matrix4::rotationZ((float) luaL_checknumber(L, 1))"
       ],
+      "structuralCapabilities": {
+        "registration": {
+          "route": "vmath.matrix4_rotation_z",
+          "module": "vmath",
+          "cFunction": "Matrix4_RotationZ",
+          "sourcePath": "script/src/script_vmath.cpp",
+          "registrationArray": "methods",
+          "registrationLine": 2854
+        }
+      },
       "operation": {
         "template": "vmath-matrix4",
         "parameters": {
@@ -4046,9 +4464,18 @@
       "id": "script:vmath.project",
       "sourceSymbol": "Project",
       "sourceOperation": [
-        "{\"project\", Project}",
         "dmVMath::Dot(*v1, *v2) / sq_len"
       ],
+      "structuralCapabilities": {
+        "registration": {
+          "route": "vmath.project",
+          "module": "vmath",
+          "cFunction": "Project",
+          "sourcePath": "script/src/script_vmath.cpp",
+          "registrationArray": "methods",
+          "registrationLine": 2865
+        }
+      },
       "operation": {
         "template": "vmath-fixed-pod",
         "parameters": {
@@ -4121,7 +4548,16 @@
     {
       "id": "script:gui.set_alpha",
       "sourceSymbol": "LuaSetAlpha",
-      "sourceOperation": "{\"set_alpha\", LuaSetAlpha}",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "gui.set_alpha",
+          "module": "gui",
+          "cFunction": "LuaSetAlpha",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5092
+        }
+      },
       "operation": {
         "template": "gui-node-setter",
         "parameters": {
@@ -4208,6 +4644,16 @@
         ]
       ],
       "resultCodec": "Quaternion",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "vmath.quat",
+          "module": "vmath",
+          "cFunction": "Quat_new",
+          "sourcePath": "script/src/script_vmath.cpp",
+          "registrationArray": "methods",
+          "registrationLine": 2838
+        }
+      },
       "implementedCallShapes": [
         [],
         [
@@ -4243,7 +4689,16 @@
     {
       "id": "script:gui.set_clipping_visible",
       "sourceSymbol": "LuaSetClippingVisible",
-      "sourceOperation": "{\"set_clipping_visible\",LuaSetClippingVisible}",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "gui.set_clipping_visible",
+          "module": "gui",
+          "cFunction": "LuaSetClippingVisible",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5009
+        }
+      },
       "operation": {
         "template": "gui-node-setter",
         "parameters": {
@@ -4309,9 +4764,18 @@
       "id": "script:vmath.matrix4_orthographic",
       "sourceSymbol": "Matrix4_Orthographic",
       "sourceOperation": [
-        "{\"matrix4_orthographic\", Matrix4_Orthographic}",
         "Matrix4::orthographic(left, right, bottom, top, near_z, far_z)"
       ],
+      "structuralCapabilities": {
+        "registration": {
+          "route": "vmath.matrix4_orthographic",
+          "module": "vmath",
+          "cFunction": "Matrix4_Orthographic",
+          "sourcePath": "script/src/script_vmath.cpp",
+          "registrationArray": "methods",
+          "registrationLine": 2848
+        }
+      },
       "operation": {
         "template": "vmath-matrix4",
         "parameters": {
@@ -4403,7 +4867,16 @@
     {
       "id": "script:gui.set_screen_position",
       "sourceSymbol": "LuaSetScreenPosition",
-      "sourceOperation": "{\"set_screen_position\", LuaSetScreenPosition}",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "gui.set_screen_position",
+          "module": "gui",
+          "cFunction": "LuaSetScreenPosition",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5062
+        }
+      },
       "operation": {
         "template": "gui-node-setter",
         "parameters": {
@@ -4562,6 +5035,16 @@
       ],
       "unhandledShapePolicy": "universal-fallback",
       "resultCodec": "None",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "go.delete",
+          "module": "go",
+          "cFunction": "Script_Delete",
+          "sourcePath": "gameobject/src/gameobject/gameobject_script.cpp",
+          "registrationArray": "GO_methods",
+          "registrationLine": 2363
+        }
+      },
       "stableId": 2920192283,
       "rawName": "go.delete",
       "jsName": "delete",
@@ -4584,7 +5067,16 @@
     {
       "id": "script:gui.set_inherit_alpha",
       "sourceSymbol": "LuaSetInheritAlpha",
-      "sourceOperation": "{\"set_inherit_alpha\", LuaSetInheritAlpha}",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "gui.set_inherit_alpha",
+          "module": "gui",
+          "cFunction": "LuaSetInheritAlpha",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5090
+        }
+      },
       "operation": {
         "template": "gui-node-setter",
         "parameters": {
@@ -4650,9 +5142,18 @@
       "id": "script:vmath.quat_basis",
       "sourceSymbol": "Quat_Basis",
       "sourceOperation": [
-        "{\"quat_basis\", Quat_Basis}",
         "PushQuat(L, Quat(m))"
       ],
+      "structuralCapabilities": {
+        "registration": {
+          "route": "vmath.quat_basis",
+          "module": "vmath",
+          "cFunction": "Quat_Basis",
+          "sourcePath": "script/src/script_vmath.cpp",
+          "registrationArray": "methods",
+          "registrationLine": 2842
+        }
+      },
       "operation": {
         "template": "vmath-fixed-pod",
         "parameters": {
@@ -4741,9 +5242,18 @@
       "id": "script:vmath.length_sqr",
       "sourceSymbol": "LengthSqr",
       "sourceOperation": [
-        "{\"length_sqr\", LengthSqr}",
         "dmVMath::LengthSqr(*v)"
       ],
+      "structuralCapabilities": {
+        "registration": {
+          "route": "vmath.length_sqr",
+          "module": "vmath",
+          "cFunction": "LengthSqr",
+          "sourcePath": "script/src/script_vmath.cpp",
+          "registrationArray": "methods",
+          "registrationLine": 2857
+        }
+      },
       "operation": {
         "template": "vmath-fixed-pod",
         "parameters": {
@@ -4818,7 +5328,16 @@
     {
       "id": "script:gui.set_xanchor",
       "sourceSymbol": "LuaSetXAnchor",
-      "sourceOperation": "{\"set_xanchor\",     LuaSetXAnchor}",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "gui.set_xanchor",
+          "module": "gui",
+          "cFunction": "LuaSetXAnchor",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5032
+        }
+      },
       "operation": {
         "template": "gui-node-setter",
         "parameters": {
@@ -4884,9 +5403,18 @@
       "id": "script:vmath.cross",
       "sourceSymbol": "Cross",
       "sourceOperation": [
-        "{\"cross\", Cross}",
         "dmVMath::Cross(*v1, *v2)"
       ],
+      "structuralCapabilities": {
+        "registration": {
+          "route": "vmath.cross",
+          "module": "vmath",
+          "cFunction": "Cross",
+          "sourcePath": "script/src/script_vmath.cpp",
+          "registrationArray": "methods",
+          "registrationLine": 2860
+        }
+      },
       "operation": {
         "template": "vmath-fixed-pod",
         "parameters": {
@@ -4964,9 +5492,18 @@
       "id": "script:vmath.matrix4_quat",
       "sourceSymbol": "Matrix4_Quat",
       "sourceOperation": [
-        "{\"matrix4_quat\", Matrix4_Quat}",
         "Matrix4::rotation(*CheckQuat(L, 1))"
       ],
+      "structuralCapabilities": {
+        "registration": {
+          "route": "vmath.matrix4_quat",
+          "module": "vmath",
+          "cFunction": "Matrix4_Quat",
+          "sourcePath": "script/src/script_vmath.cpp",
+          "registrationArray": "methods",
+          "registrationLine": 2850
+        }
+      },
       "operation": {
         "template": "vmath-matrix4",
         "parameters": {
@@ -5051,7 +5588,16 @@
     {
       "id": "script:gui.set_flipbook_cursor",
       "sourceSymbol": "LuaSetFlipbookCursor",
-      "sourceOperation": "{\"set_flipbook_cursor\", LuaSetFlipbookCursor}",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "gui.set_flipbook_cursor",
+          "module": "gui",
+          "cFunction": "LuaSetFlipbookCursor",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5081
+        }
+      },
       "operation": {
         "template": "gui-node-setter",
         "parameters": {
@@ -5116,7 +5662,16 @@
     {
       "id": "script:gui.set_perimeter_vertices",
       "sourceSymbol": "LuaSetPerimeterVertices",
-      "sourceOperation": "{\"set_perimeter_vertices\", LuaSetPerimeterVertices}",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "gui.set_perimeter_vertices",
+          "module": "gui",
+          "cFunction": "LuaSetPerimeterVertices",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5068
+        }
+      },
       "operation": {
         "template": "gui-node-setter",
         "parameters": {
@@ -5182,9 +5737,18 @@
       "id": "script:vmath.quat_matrix4",
       "sourceSymbol": "Quat_Matrix4",
       "sourceOperation": [
-        "{\"quat_matrix4\", Quat_Matrix4}",
         "dmVMath::Quat(matrix->getUpper3x3())"
       ],
+      "structuralCapabilities": {
+        "registration": {
+          "route": "vmath.quat_matrix4",
+          "module": "vmath",
+          "cFunction": "Quat_Matrix4",
+          "sourcePath": "script/src/script_vmath.cpp",
+          "registrationArray": "methods",
+          "registrationLine": 2869
+        }
+      },
       "operation": {
         "template": "vmath-matrix4",
         "parameters": {
@@ -5269,7 +5833,16 @@
     {
       "id": "script:gui.set_font",
       "sourceSymbol": "LuaSetFont",
-      "sourceOperation": "{\"set_font\",        LuaSetFont}",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "gui.set_font",
+          "module": "gui",
+          "cFunction": "LuaSetFont",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5025
+        }
+      },
       "operation": {
         "template": "gui-node-setter",
         "parameters": {
@@ -5366,6 +5939,16 @@
         ]
       ],
       "resultCodec": "Vector3",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "vmath.vector3",
+          "module": "vmath",
+          "cFunction": "Vector3_new",
+          "sourcePath": "script/src/script_vmath.cpp",
+          "registrationArray": "methods",
+          "registrationLine": 2836
+        }
+      },
       "implementedCallShapes": [
         [],
         [
@@ -5404,9 +5987,18 @@
       "id": "script:vmath.inv",
       "sourceSymbol": "Inverse",
       "sourceOperation": [
-        "{\"inv\", Inverse}",
         "dmVMath::Inverse(*m)"
       ],
+      "structuralCapabilities": {
+        "registration": {
+          "route": "vmath.inv",
+          "module": "vmath",
+          "cFunction": "Inverse",
+          "sourcePath": "script/src/script_vmath.cpp",
+          "registrationArray": "methods",
+          "registrationLine": 2866
+        }
+      },
       "operation": {
         "template": "vmath-matrix4",
         "parameters": {
@@ -5527,6 +6119,16 @@
         ]
       ],
       "resultCodec": "SameDefoldValue",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "vmath.normalize",
+          "module": "vmath",
+          "cFunction": "Normalize",
+          "sourcePath": "script/src/script_vmath.cpp",
+          "registrationArray": "methods",
+          "registrationLine": 2859
+        }
+      },
       "implementedCallShapes": [
         [
           "Vector3"
@@ -5562,9 +6164,18 @@
       "id": "script:vmath.rotate",
       "sourceSymbol": "Rotate",
       "sourceOperation": [
-        "{\"rotate\", Rotate}",
         "dmVMath::Rotate(*q, *v)"
       ],
+      "structuralCapabilities": {
+        "registration": {
+          "route": "vmath.rotate",
+          "module": "vmath",
+          "cFunction": "Rotate",
+          "sourcePath": "script/src/script_vmath.cpp",
+          "registrationArray": "methods",
+          "registrationLine": 2864
+        }
+      },
       "operation": {
         "template": "vmath-fixed-pod",
         "parameters": {
@@ -5642,7 +6253,16 @@
     {
       "id": "script:gui.set_visible",
       "sourceSymbol": "LuaSetVisible",
-      "sourceOperation": "{\"set_visible\",     LuaSetVisible}",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "gui.set_visible",
+          "module": "gui",
+          "cFunction": "LuaSetVisible",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5045
+        }
+      },
       "operation": {
         "template": "gui-node-setter",
         "parameters": {
@@ -5707,7 +6327,16 @@
     {
       "id": "script:gui.set_rotation",
       "sourceSymbol": "LuaSetRotation",
-      "sourceOperation": "REGGETSET(Rotation, rotation)",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "gui.set_rotation",
+          "module": "gui",
+          "cFunction": "LuaSetRotation",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5095
+        }
+      },
       "operation": {
         "template": "gui-node-setter",
         "parameters": {
@@ -5780,7 +6409,16 @@
     {
       "id": "script:gui.set_slice9",
       "sourceSymbol": "LuaSetSlice9",
-      "sourceOperation": "{\"set_slice9\",      LuaSetSlice9}",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "gui.set_slice9",
+          "module": "gui",
+          "cFunction": "LuaSetSlice9",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5040
+        }
+      },
       "operation": {
         "template": "gui-node-setter",
         "parameters": {
@@ -5882,6 +6520,16 @@
         ]
       ],
       "resultCodec": "Vector3",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "go.get_position",
+          "module": "go",
+          "cFunction": "Script_GetPosition",
+          "sourcePath": "gameobject/src/gameobject/gameobject_script.cpp",
+          "registrationArray": "GO_methods",
+          "registrationLine": 2344
+        }
+      },
       "unhandledShapePolicy": "error",
       "stableId": 3918772974,
       "rawName": "go.get_position",
@@ -5905,7 +6553,16 @@
     {
       "id": "script:gui.set_euler",
       "sourceSymbol": "LuaSetEuler",
-      "sourceOperation": "REGGETSET(Euler, euler)",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "gui.set_euler",
+          "module": "gui",
+          "cFunction": "LuaSetEuler",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5096
+        }
+      },
       "operation": {
         "template": "gui-node-setter",
         "parameters": {
@@ -5978,7 +6635,16 @@
     {
       "id": "script:gui.set_scale",
       "sourceSymbol": "LuaSetScale",
-      "sourceOperation": "REGGETSET(Scale, scale)",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "gui.set_scale",
+          "module": "gui",
+          "cFunction": "LuaSetScale",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5097
+        }
+      },
       "operation": {
         "template": "gui-node-setter",
         "parameters": {
@@ -6051,7 +6717,16 @@
     {
       "id": "script:gui.set_layer",
       "sourceSymbol": "LuaSetLayer",
-      "sourceOperation": "{\"set_layer\",        LuaSetLayer}",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "gui.set_layer",
+          "module": "gui",
+          "cFunction": "LuaSetLayer",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5027
+        }
+      },
       "operation": {
         "template": "gui-node-setter",
         "parameters": {
@@ -6124,7 +6799,16 @@
     {
       "id": "script:gui.set_parent",
       "sourceSymbol": "LuaSetParent",
-      "sourceOperation": "{\"set_parent\",      LuaSetParent}",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "gui.set_parent",
+          "module": "gui",
+          "cFunction": "LuaSetParent",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5054
+        }
+      },
       "operation": {
         "template": "gui-node-setter",
         "parameters": {
@@ -6205,7 +6889,16 @@
     {
       "id": "script:gui.set_pivot",
       "sourceSymbol": "LuaSetPivot",
-      "sourceOperation": "{\"set_pivot\",       LuaSetPivot}",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "gui.set_pivot",
+          "module": "gui",
+          "cFunction": "LuaSetPivot",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5036
+        }
+      },
       "operation": {
         "template": "gui-node-setter",
         "parameters": {
@@ -6270,7 +6963,16 @@
     {
       "id": "script:gui.set_line_break",
       "sourceSymbol": "LuaSetLineBreak",
-      "sourceOperation": "{\"set_line_break\",  LuaSetLineBreak}",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "gui.set_line_break",
+          "module": "gui",
+          "cFunction": "LuaSetLineBreak",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5002
+        }
+      },
       "operation": {
         "template": "gui-node-setter",
         "parameters": {
@@ -6335,7 +7037,16 @@
     {
       "id": "script:gui.set_material",
       "sourceSymbol": "LuaSetMaterial",
-      "sourceOperation": "{\"set_material\",    LuaSetMaterial}",
+      "structuralCapabilities": {
+        "registration": {
+          "route": "gui.set_material",
+          "module": "gui",
+          "cFunction": "LuaSetMaterial",
+          "sourcePath": "gui/src/gui_script.cpp",
+          "registrationArray": "Gui_methods",
+          "registrationLine": 5021
+        }
+      },
       "operation": {
         "template": "gui-node-setter",
         "parameters": {
@@ -6409,9 +7120,18 @@
       "id": "script:vmath.quat_axis_angle",
       "sourceSymbol": "Quat_AxisAngle",
       "sourceOperation": [
-        "{\"quat_axis_angle\", Quat_AxisAngle}",
         "Quat::rotation(angle, *axis)"
       ],
+      "structuralCapabilities": {
+        "registration": {
+          "route": "vmath.quat_axis_angle",
+          "module": "vmath",
+          "cFunction": "Quat_AxisAngle",
+          "sourcePath": "script/src/script_vmath.cpp",
+          "registrationArray": "methods",
+          "registrationLine": 2841
+        }
+      },
       "operation": {
         "template": "vmath-fixed-pod",
         "parameters": {
@@ -6483,9 +7203,18 @@
       "id": "script:vmath.conj",
       "sourceSymbol": "Conj",
       "sourceOperation": [
-        "{\"conj\", Conj}",
         "dmVMath::Conjugate(*q)"
       ],
+      "structuralCapabilities": {
+        "registration": {
+          "route": "vmath.conj",
+          "module": "vmath",
+          "cFunction": "Conj",
+          "sourcePath": "script/src/script_vmath.cpp",
+          "registrationArray": "methods",
+          "registrationLine": 2863
+        }
+      },
       "operation": {
         "template": "vmath-fixed-pod",
         "parameters": {
@@ -6555,11 +7284,20 @@
       "id": "script:vmath.matrix4_frustum",
       "sourceSymbol": "Matrix4_Frustum",
       "sourceOperation": [
-        "{\"matrix4_frustum\", Matrix4_Frustum}",
         "Matrix4::frustum(left, right, bottom, top, near_z, far_z)",
         "if(near_z == 0.0f)",
         "dmLogWarning"
       ],
+      "structuralCapabilities": {
+        "registration": {
+          "route": "vmath.matrix4_frustum",
+          "module": "vmath",
+          "cFunction": "Matrix4_Frustum",
+          "sourcePath": "script/src/script_vmath.cpp",
+          "registrationArray": "methods",
+          "registrationLine": 2846
+        }
+      },
       "operation": {
         "template": "vmath-matrix4",
         "parameters": {

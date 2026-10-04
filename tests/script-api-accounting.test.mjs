@@ -5,6 +5,7 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 import { generateScriptApiAccounting } from "../scripts/generate-script-api-accounting.mjs";
+import { generateScriptUrlAddressClassification } from "../scripts/generate-script-url-address-classification.mjs";
 
 const root = new URL("../", import.meta.url);
 
@@ -54,9 +55,11 @@ async function inputs() {
     scalarText: await text("packages/bindings/generated/defold-script-scalar-dispatch.json"),
     valueText: await text("packages/bindings/generated/defold-script-value-bindings.json"),
     tupleText: await text("packages/bindings/generated/defold-script-fixed-tuples.json"),
+    dynamicText: await text("packages/bindings/generated/defold-script-dynamic-value-bindings.json"),
     urlText: await text("packages/bindings/generated/defold-script-url-address-classification.json"),
     valueTailText: await text("packages/bindings/generated/defold-script-value-tail-bindings.json"),
     overloadText: await text("packages/bindings/generated/defold-script-overload-dispatch.json"),
+    registrationSurfaceText: await text("packages/bindings/generated/defold-lua-registration-surface.json"),
     universalPolicyText: await text("packages/bindings/overrides/script-universal-value-bindings.json"),
     componentPolicyText: await text("packages/bindings/generated/defold-component-proxy-contract.json"),
     urlOverrideText,
@@ -147,6 +150,77 @@ test("is invariant to harmless generated-family row ordering", () => {
   const result = generateScriptApiAccounting(reordered);
   assert.deepEqual(result.rows, generated.rows);
   assert.deepEqual(result.categoryCounts, generated.categoryCounts);
+});
+
+test("consumes structural registrations and retains universal fallback when optimization proof is withdrawn", () => {
+  for (const [inputName, collection, field] of [
+    ["valueText", "bindings", "structuralCapabilities"],
+    ["tupleText", "bindings", "sourceCapabilities"],
+    ["overloadText", "bindings", "sourceCapabilities"],
+  ]) {
+    const missing = structuredClone(sourceInputs);
+    missing[inputName] = replaceJson(missing[inputName], (report) => {
+      const row = report[collection].find(
+        (candidate) =>
+          (inputName !== "valueText" || candidate.id !== "script:hash") &&
+          (inputName !== "overloadText" || candidate.generatedFamilyExecutableCandidate),
+      );
+      delete row[field];
+    });
+    if (inputName === "valueText") {
+      const valueHash = createHash("sha256").update(missing.valueText).digest("hex");
+      const tail = JSON.parse(missing.valueTailText);
+      tail.inputEvidence.valueBindingsSha256 = valueHash;
+      missing.valueTailText = `${JSON.stringify(tail, null, 2)}\n`;
+      const overload = JSON.parse(missing.overloadText);
+      overload.inputEvidence.alreadyOwnedReportSha256 = valueHash;
+      missing.overloadText = `${JSON.stringify(overload, null, 2)}\n`;
+    }
+    assert.throws(() => generateScriptApiAccounting(missing), /lacks structural registration evidence/, inputName);
+  }
+
+  const urlFallback = structuredClone(sourceInputs);
+  const urlOverride = JSON.parse(urlFallback.urlOverrideText);
+  const withdrawnSource = urlOverride.optimizationEvidence.requiredSourceEvidence[0];
+  const withdrawnPath = urlOverride.sourceEvidence.find(({ id }) => id === withdrawnSource).source;
+  urlFallback.urlWithdrawnSources = new Set([withdrawnPath]);
+  urlFallback.urlText = `${JSON.stringify(
+    generateScriptUrlAddressClassification({
+      irText: urlFallback.irText,
+      patternsText: urlFallback.patternsText,
+      overrideText: urlFallback.urlOverrideText,
+      sourceTexts: urlFallback.urlSourceTexts,
+      withdrawnSources: urlFallback.urlWithdrawnSources,
+    }),
+    null,
+    2,
+  )}\n`;
+  urlFallback.valueTailText = replaceJson(urlFallback.valueTailText, (report) => {
+    report.inputEvidence.urlBindingsSha256 = createHash("sha256").update(urlFallback.urlText).digest("hex");
+  });
+  const urlResult = generateScriptApiAccounting(urlFallback);
+  assert.equal(JSON.parse(urlFallback.urlText).optimizedRouteCount, 0);
+  assert.equal(
+    urlResult.rows.find(({ id }) => id === "script:camera.get_aspect_ratio").evidence.generator,
+    "universal-value-fallback",
+  );
+
+  const dynamicFallback = structuredClone(sourceInputs);
+  dynamicFallback.dynamicText = replaceJson(dynamicFallback.dynamicText, (report) => {
+    const row = report.bindings.find(({ id }) => id === "script:bit.band");
+    row.optimizationProven = false;
+    row.optimizationBlockers = ["registered-global-callable-evidence-missing"];
+    row.replayEvidence.registrations.pop();
+    row.targetSupport.nativeDynamicHermes = "universal-fallback-missing-proof";
+    row.targetSupport.nativeStaticHermes = "universal-fallback-missing-proof";
+    report.optimizedReplayCount -= 1;
+    report.universalFallbackCount += 1;
+  });
+  const dynamicResult = generateScriptApiAccounting(dynamicFallback);
+  assert.equal(
+    dynamicResult.rows.find(({ id }) => id === "script:bit.band").evidence.generator,
+    "universal-value-fallback",
+  );
 });
 
 test("rejects duplicate, omitted, overlapping, and stale route evidence", () => {

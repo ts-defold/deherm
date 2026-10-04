@@ -3,7 +3,7 @@
 import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, isAbsolute, join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { stableBindingId } from "./lib/binding-identity.mjs";
 import {
@@ -19,8 +19,15 @@ const repositoryRoot = fileURLToPath(new URL("../", import.meta.url));
 const defaultPolicy = "packages/bindings/overrides/script-route-availability-profiles.json";
 const defaultBorrowed = "packages/bindings/generated/defold-script-borrowed-handle-classification.json";
 const defaultScriptIr = "packages/bindings/generated/defold-script-api-ir.json";
+const defaultRegistrationSurface = "packages/bindings/generated/defold-lua-registration-surface.json";
 const defaultOutput = "packages/bindings/generated/defold-script-route-availability-profiles.json";
 const featureBits = { core: 1, "box2d-v2": 2, "box2d-v3": 4, bullet3d: 8 };
+const engineRegistrationTargets = {
+  "box2d-v2": "defold-engine-box2d-v2",
+  "box2d-v3": "defold-engine-box2d-v3",
+  core: "defold-engine-box2d-v3",
+  bullet3d: "defold-engine-box2d-v3",
+};
 
 function fail(message) {
   throw new Error(`script route availability: ${message}`);
@@ -45,6 +52,7 @@ function parseArgs(argv) {
     policy: defaultPolicy,
     borrowed: defaultBorrowed,
     scriptIr: defaultScriptIr,
+    registrationSurface: defaultRegistrationSurface,
   };
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
@@ -53,6 +61,7 @@ function parseArgs(argv) {
     else if (argument === "--policy") options.policy = argv[++index];
     else if (argument === "--borrowed") options.borrowed = argv[++index];
     else if (argument === "--script-ir") options.scriptIr = argv[++index];
+    else if (argument === "--registration-surface") options.registrationSurface = argv[++index];
     else fail(`unknown argument '${argument}'`);
   }
   return options;
@@ -71,17 +80,40 @@ async function loadJson(path, label) {
   }
 }
 
-function registrationNames(text, array, sourcePath) {
-  const escaped = array.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const match = text.match(
-    new RegExp(`static\\s+const\\s+luaL_(?:reg|Reg)\\s+${escaped}\\s*\\[\\s*\\]\\s*=\\s*\\{([\\s\\S]*?)\\n\\s*\\};`),
+function canonicalRegistrationRows(surface, spec) {
+  const targetId = engineRegistrationTargets[spec.feature];
+  assert(targetId, `${spec.feature}: no canonical engine registration target is declared`);
+  const target = surface.targets?.[targetId];
+  assert(
+    target?.status === "verified" && Array.isArray(target.routes),
+    `${targetId}: canonical registration target is unavailable`,
   );
-  assert(match, `${sourcePath}: registration array '${array}' was not found`);
-  const body = match[1].replace(/\/\/.*$/gm, "").replace(/\/\*[\s\S]*?\*\//g, "");
-  const names = [...body.matchAll(/\{\s*"([^"]+)"\s*,\s*[^}]+\}/g)].map((entry) => entry[1]);
-  assert(names.length > 0, `${sourcePath}: registration array '${array}' is empty`);
-  assert(new Set(names).size === names.length, `${sourcePath}: registration array '${array}' contains duplicate names`);
-  return names;
+  const sourcePath = spec.path.replace(/^upstream\/defold\/engine\//, "");
+  const rows = [...target.routes, ...(target.registeredButUndeclared ?? [])].filter(
+    (route) =>
+      route.registration?.path === sourcePath &&
+      route.registration?.array === spec.array &&
+      route.module === spec.namespace,
+  );
+  assert(rows.length > 0, `${spec.path}: canonical registration array '${spec.array}' is empty or absent`);
+  assert(
+    new Set(rows.map(({ name }) => name)).size === rows.length,
+    `${spec.path}: canonical registration array '${spec.array}' contains duplicate names`,
+  );
+  assert(
+    rows.every(({ name, module }) => name.startsWith(`${module}.`)),
+    `${spec.path}: canonical registration route namespace drifted`,
+  );
+  return rows;
+}
+
+function canonicalCommentedRegistration(surface, exception) {
+  const targetId = engineRegistrationTargets[exception.feature];
+  const target = surface.targets?.[targetId];
+  const sourcePath = exception.source.replace(/^upstream\/defold\/engine\//, "");
+  return target?.commentedOutRegistrations?.find(
+    (row) => row.name === exception.id.slice("script:".length) && row.path === sourcePath,
+  );
 }
 
 function manifestListValues(text, field) {
@@ -124,7 +156,7 @@ function featuresFromManifest(text, engineProfileSelection) {
   };
 }
 
-// The cited registration and build-manifest sources, OBSERVED rather than
+// The cited build-manifest sources, OBSERVED rather than
 // asserted. A pinned hash only detects that Defold edited its own source, which
 // across a release is expected and is the input to this job; what scopes the
 // reviewed judgement is the anchors, and a lost anchor withdraws that citation
@@ -183,13 +215,15 @@ function routeSetSha256(rows) {
   return sha256(JSON.stringify(rows.map(({ stableId }) => stableId)));
 }
 
-async function generate(options) {
+export async function generate(options) {
   const policyInput = await loadJson(options.policy, "availability policy");
   const borrowedInput = await loadJson(options.borrowed, "borrowed-handle classification");
   const scriptIrInput = await loadJson(options.scriptIr, "script API IR");
+  const registrationSurfaceInput = await loadJson(options.registrationSurface, "canonical Lua registration surface");
   const policy = policyInput.value;
   const borrowed = borrowedInput.value;
   const scriptIr = scriptIrInput.value;
+  const registrationSurface = registrationSurfaceInput.value;
 
   assert(policy.schemaVersion === 1, "unsupported policy schema");
   assert(
@@ -208,8 +242,13 @@ async function generate(options) {
         path: "packages/bindings/generated/defold-script-borrowed-handle-classification.json",
         revision: borrowed.defoldRevision,
       },
+      {
+        path: "packages/bindings/generated/defold-lua-registration-surface.json",
+        revision: registrationSurface.defoldRevision,
+      },
     ],
   });
+  assert(registrationSurface.schemaVersion === 1, "canonical Lua registration surface schema drifted");
   assert(Array.isArray(borrowed.rows), "borrowed-handle classification has no rows");
   // Reviewed evidence, compared against the revision being generated. The
   // reviewed feature and profile censuses below, and the SHA-256 of every cited
@@ -261,8 +300,6 @@ async function generate(options) {
     );
     manifestAudit.push({ id: manifest.id, ...parsed });
   }
-  const registrationTexts = await validateEvidence(policy.registrations, "Lua registration source");
-
   const unavailableByFeature = new Map();
   const unavailableScriptRoutesByFeature = new Map();
   for (const exception of policy.documentedButUnregistered) {
@@ -271,12 +308,12 @@ async function generate(options) {
     // classify, or whose commented registration evidence is gone, is a review
     // this revision does not bear out. Fatal where it was read; withdrawn and
     // reported in a declared derivation of another revision.
-    const source = registrationTexts.get(exception.source);
+    const commentedRegistration = canonicalCommentedRegistration(registrationSurface, exception);
     const failure =
       row?.id !== exception.id
         ? [`${exception.id}: documented/unregistered stable ID drifted`, "absent-route"]
-        : !source?.includes(exception.anchor)
-          ? [`${exception.id}: commented registration evidence drifted`, "stale-anchor"]
+        : !commentedRegistration
+          ? [`${exception.id}: canonical commented registration evidence withdrew`, "stale-registration"]
           : null;
     if (failure) {
       assert(declaredDerivation(), failure[0]);
@@ -303,13 +340,7 @@ async function generate(options) {
 
   const registrations = new Map();
   for (const spec of policy.registrations) {
-    const text = registrationTexts.get(spec.path);
-    // The citation was withdrawn above - absent at this revision, or present
-    // with a reviewed anchor gone - and is already audited by name. A feature
-    // whose registration source is gone registers nothing here.
-    if (text === undefined) continue;
-    const names = registrationNames(text, spec.array, spec.path);
-    const fullNames = names.map((name) => `${spec.namespace}.${name}`);
+    const fullNames = canonicalRegistrationRows(registrationSurface, spec).map(({ name }) => name);
     const key = `${spec.feature}:${spec.namespace}`;
     const existing = registrations.get(key) ?? [];
     registrations.set(key, [...existing, ...fullNames]);
@@ -548,7 +579,6 @@ async function generate(options) {
       ...new Map([
         ...policy.buildEvidence.map(({ path, sha256: hash }) => [path, hash]),
         ...manifestEntries.map(({ path, sha256: hash }) => [path, hash]),
-        ...policy.registrations.map(({ path, sha256: hash }) => [path, hash]),
       ]),
     ].sort(([left], [right]) => compareText(left, right)),
   );
@@ -565,6 +595,8 @@ async function generate(options) {
       borrowedClassificationSha256: sha256(borrowedInput.text),
       scriptIr: options.scriptIr,
       scriptIrSha256: sha256(scriptIrInput.text),
+      registrationSurface: options.registrationSurface,
+      registrationSurfaceSha256: sha256(registrationSurfaceInput.text),
       sourceHashes,
     },
     handshakeContract: {
@@ -645,13 +677,17 @@ async function generate(options) {
   return `${JSON.stringify(report, null, 2)}\n`;
 }
 
-const options = parseArgs(process.argv.slice(2));
-const output = await generate(options);
-const destination = join(options.outRoot, defaultOutput);
-if (options.check) {
-  const current = await readFile(destination, "utf8");
-  assert(current === output, `${defaultOutput} is stale; regenerate it`);
-} else {
-  await mkdir(dirname(destination), { recursive: true });
-  await writeFile(destination, output);
+export async function main(argv = process.argv.slice(2)) {
+  const options = parseArgs(argv);
+  const output = await generate(options);
+  const destination = join(options.outRoot, defaultOutput);
+  if (options.check) {
+    const current = await readFile(destination, "utf8");
+    assert(current === output, `${defaultOutput} is stale; regenerate it`);
+  } else {
+    await mkdir(dirname(destination), { recursive: true });
+    await writeFile(destination, output);
+  }
 }
+
+if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) await main();

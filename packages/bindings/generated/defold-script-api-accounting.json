@@ -9,11 +9,12 @@
     "bindingPatternsSha256": "9788b0873228cf8b9145aace14c3437d8b5fe69b7478da536743f0759c1a073e",
     "bindingDescriptorsSha256": "9b249c9e9616ce25bc8a0f3ae3b6204a4c74a0c17890501ce5c5ce95e92afd71",
     "scalarDispatchSha256": "3c1e7bbb6e1a82be0d4f3d2fc2598984ec1c81bfeedd034c2c179fcf57920bd6",
-    "valueBindingsSha256": "bf24ad8891c416aff1ca9eab8ef4eb822fb3ccca75afd3a04634d6dbf14b02bc",
-    "fixedTupleBindingsSha256": "c50f26549b3da248786c32c442ab87ae6845816b794c9e343f42bd920c30f889",
-    "urlBindingsSha256": "72bcd1dc826e69824b4b2b06726ab38537635ad4c4f8661f537b96276d683c53",
-    "valueTailBindingsSha256": "992713765044a6a9530df0fde9a91e9aa0b394e01f3f02323c487059c179b500",
-    "overloadDispatchSha256": "c083c1e14d232fec3231225952c43677b7677ded7027902241c1e6b23f4042d9",
+    "valueBindingsSha256": "0de2ca48989dedafead7d160f558aae6c7bb3591cc89c7b2bc9539cb34d1f65a",
+    "fixedTupleBindingsSha256": "e9a75db1eb1e3127099d0795c469688e14c37e32e7b5b4735d4efaf79fef7277",
+    "dynamicValueBindingsSha256": "92e84a4066772766ef776a1a55e5dc30dc6ec85961a7bda65d10e0dc3241dc9c",
+    "urlBindingsSha256": "436342bc62211213eb933aabae3da77888ab3c9d5592389c7db4c2286e3ce0bd",
+    "valueTailBindingsSha256": "dd083b1f19cf487b258c61138c131427c1ad1291edd1c5ed7bcbd634b2a3e2ec",
+    "overloadDispatchSha256": "a88bfc4d62463e92c9217531577f6162bd1184710bb36d94b0c39b0e56865034",
     "universalValuePolicySha256": "b3175f748511992272cd33980fc6c0737e920c152d9880f1e63e503061e11f7b",
     "componentProxyPolicySha256": "eb23c1d1330cced51af0ea8d7712b2bc093248384a49acb9ff7257450abe4cf8",
     "universalValueSelectionSha256": "514cd2cb3926a1a0107fa3f90968ab834383ca3257b6b17b159465a95f2acaf0",
@@ -32,15 +33,15 @@
       },
       {
         "definitionPath": "packages/bindings/overrides/script-msg-structured-bindings.json",
-        "definitionSha256": "8e5965fbd732fa4f1604facc2200bdb32a591da678f73fff6cde9ae8f3201cad"
+        "definitionSha256": "5219be7876f8bbdfb7816bea1c2a5dabaf5db698f4559c4a84e1fc23c5d63074"
       },
       {
         "definitionPath": "packages/bindings/overrides/script-factory-structured-bindings.json",
-        "definitionSha256": "31aaf53d235d4c70d245b4756299f70146be695c3609312e3221915f1ae483af"
+        "definitionSha256": "35d416348067b50ddd3fb1d47a31978290c71daa156a9651a052842b5408ae23"
       },
       {
         "definitionPath": "packages/bindings/overrides/script-gui-structured-bindings.json",
-        "definitionSha256": "b1acdc58e748c2765a61da774c60d3121101773394e4e11d63e021913ae6d510"
+        "definitionSha256": "05aa14d1b6bf57043bf182947428e71c02631d433b520455db0ab2f46f056e78"
       }
     ],
     "valueSources": [
@@ -77,7 +78,7 @@
         "sourceSha256": "4a46bc80c0a35a59ddf7ea990cd7dcdf5b6eff86e03e6096739eb76f078064e4"
       }
     ],
-    "aggregateInputSha256": "a82c1c8f302da738867bd44c375b44f85ac61b082d72cf0d2680d7a1a0601186"
+    "aggregateInputSha256": "056c244f8e9903aa6d6381a3b64763eef8bde031a610289debe3f5479b2a2d89"
   },
   "functionCount": 926,
   "categoryCounts": {

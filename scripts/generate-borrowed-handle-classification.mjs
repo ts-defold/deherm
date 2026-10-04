@@ -6,6 +6,10 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { stableBindingId } from "./lib/binding-identity.mjs";
 import {
+  luaHandleLifecycleCapability,
+  luaHandleRepresentationCapability,
+} from "./lib/defold-lua-structural-capabilities.mjs";
+import {
   assertReviewedRevision,
   declaredDerivation,
   expectReviewedCount,
@@ -151,11 +155,12 @@ function validateSourceEvidence(override, sourceTexts, withdrawnSources) {
   const listed = uniqueMap(override.sourceEvidence, "borrowed-handle source evidence");
   const evidenceById = new Map();
   for (const evidence of override.sourceEvidence) {
-    if (withdrawnSources.has(evidence.source)) continue;
-    assert(
-      typeof sourceTexts.get(evidence.source) === "string",
-      `${evidence.id}: source '${evidence.source}' was not loaded`,
-    );
+    if (!withdrawnSources.has(evidence.source)) {
+      assert(
+        typeof sourceTexts.get(evidence.source) === "string",
+        `${evidence.id}: source '${evidence.source}' was not loaded`,
+      );
+    }
     evidenceById.set(evidence.id, listed.get(evidence.id));
   }
   return evidenceById;
@@ -175,6 +180,13 @@ const REPRESENTATIONS = [
 /** Representations a transport can root as a generation-checked identity. */
 const CAPTURABLE_REPRESENTATIONS = ["lua-rooted-userdata", "numeric-graphics-asset-handle"];
 
+const REPRESENTATION_CAPABILITY_KINDS = Object.freeze({
+  "lua-rooted-userdata": "lua-full-userdata",
+  "lua-light-userdata": "lua-light-userdata",
+  "numeric-graphics-asset-handle": "lua-number-asset-handle",
+  "declaration-only-token": "declaration-token",
+});
+
 /**
  * Representation is a property of the backend that implements a kind, not of
  * the kind's name.
@@ -187,7 +199,22 @@ const CAPTURABLE_REPRESENTATIONS = ["lua-rooted-userdata", "numeric-graphics-ass
  * feature its stated representation was derived from, and one exception entry
  * per feature that implements it differently, each with its own pinned source.
  */
-function representationsFor(kind, evidenceById) {
+function representationCapability(spec, evidenceById, sourceTexts, owner) {
+  assert(spec && typeof spec === "object", `${owner}: missing representation capability`);
+  const evidence = evidenceById.get(spec.sourceEvidence);
+  assert(evidence, `${owner}: representation capability cites unknown source evidence '${spec.sourceEvidence}'`);
+  const capability = luaHandleRepresentationCapability(sourceTexts.get(evidence.source), spec);
+  return capability;
+}
+
+function assertCapabilityMatchesRepresentation(representation, spec, owner) {
+  assert(
+    spec?.kind === REPRESENTATION_CAPABILITY_KINDS[representation],
+    `${owner}: representation '${representation}' disagrees with structural capability '${spec?.kind ?? "missing"}'`,
+  );
+}
+
+function representationsFor(kind, evidenceById, sourceTexts, baseCapability) {
   const exceptions = kind.representationExceptions ?? [];
   if (exceptions.length === 0) {
     assert(
@@ -199,7 +226,8 @@ function representationsFor(kind, evidenceById) {
         feature: null,
         representation: kind.representation,
         capturable: CAPTURABLE_REPRESENTATIONS.includes(kind.representation),
-        sourceEvidence: [...kind.sourceEvidence].sort(compareText),
+        sourceEvidence: [kind.representationCapability.sourceEvidence],
+        structuralCapability: baseCapability,
       },
     ];
   }
@@ -213,7 +241,8 @@ function representationsFor(kind, evidenceById) {
       feature: kind.representationFeature,
       representation: kind.representation,
       capturable: CAPTURABLE_REPRESENTATIONS.includes(kind.representation),
-      sourceEvidence: [...kind.sourceEvidence].sort(compareText),
+      sourceEvidence: [kind.representationCapability.sourceEvidence],
+      structuralCapability: baseCapability,
     },
   ];
   for (const exception of exceptions) {
@@ -227,6 +256,11 @@ function representationsFor(kind, evidenceById) {
       REPRESENTATIONS.includes(exception.representation),
       `${kind.id}: unsupported representation '${exception.representation}' for feature '${exception.feature}'`,
     );
+    assertCapabilityMatchesRepresentation(
+      exception.representation,
+      exception.representationCapability,
+      `${kind.id}:${exception.feature}`,
+    );
     assert(
       evidenceById.has(exception.sourceEvidence),
       `${kind.id}: representation exception cites unknown source evidence '${exception.sourceEvidence}'`,
@@ -235,46 +269,64 @@ function representationsFor(kind, evidenceById) {
       typeof exception.reason === "string" && exception.reason.length > 0,
       `${kind.id}: representation exception for '${exception.feature}' has no reason`,
     );
+    const capability = representationCapability(
+      exception.representationCapability,
+      evidenceById,
+      sourceTexts,
+      `${kind.id}:${exception.feature}`,
+    );
+    assert(
+      exception.representationCapability.sourceEvidence === exception.sourceEvidence,
+      `${kind.id}: representation exception evidence disagrees with its structural capability`,
+    );
+    if (!capability) return null;
     rows.push({
       feature: exception.feature,
       representation: exception.representation,
       capturable: CAPTURABLE_REPRESENTATIONS.includes(exception.representation),
       sourceEvidence: [exception.sourceEvidence],
+      structuralCapability: capability,
       reason: exception.reason,
     });
   }
   return rows.sort((left, right) => compareText(left.feature, right.feature));
 }
 
-function validateHandleKinds(override, evidenceById) {
+function validateHandleKinds(override, evidenceById, sourceTexts) {
   const kindById = uniqueMap(override.handleKinds, "borrowed-handle kinds");
   const rawTypeToKind = new Map();
   const representationsByKind = new Map();
   const withdrawnKinds = new Set();
+  const lifecycleAvailableByKind = new Map();
+  const lifecycleCapabilitiesByKind = new Map();
   for (const kind of override.handleKinds) {
     assert(Array.isArray(kind.rawTypes) && kind.rawTypes.length > 0, `${kind.id}: no raw handle types`);
     assert(
       REPRESENTATIONS.includes(kind.representation),
       `${kind.id}: unsupported representation '${kind.representation}'`,
     );
-    // A kind is known through the sources the reviewer read. If this revision
-    // does not have one of them the kind's ownership, validity and invalidation
-    // boundary rest on nothing, so the kind is withdrawn for this revision and
-    // every route that only reaches the census through it goes with it. At the
-    // reviewed revision every citation is present, so this stays fatal there.
-    const cited = [
-      ...kind.sourceEvidence,
-      ...(kind.representationExceptions ?? []).map(({ sourceEvidence }) => sourceEvidence),
-    ];
-    const missing = cited.filter((evidenceId) => !evidenceById.has(evidenceId));
-    if (missing.length) {
-      assert(declaredDerivation(), `${kind.id}: unknown source evidence '${missing[0]}'`);
+    assertCapabilityMatchesRepresentation(kind.representation, kind.representationCapability, kind.id);
+    assert(Array.isArray(kind.lifecycleCapabilities), `${kind.id}: no lifecycle capability list`);
+    const lifecycleCapabilities = kind.lifecycleCapabilities.map((spec) => {
+      const evidence = evidenceById.get(spec?.sourceEvidence);
+      assert(evidence, `${kind.id}: lifecycle capability cites unknown source evidence '${spec?.sourceEvidence}'`);
+      return luaHandleLifecycleCapability(sourceTexts.get(evidence.source), spec);
+    });
+    lifecycleCapabilitiesByKind.set(kind.id, lifecycleCapabilities.filter(Boolean));
+    lifecycleAvailableByKind.set(
+      kind.id,
+      kind.lifecycleCapabilities.length > 0 && lifecycleCapabilities.every(Boolean),
+    );
+
+    const baseCapability = representationCapability(kind.representationCapability, evidenceById, sourceTexts, kind.id);
+    const representations = baseCapability ? representationsFor(kind, evidenceById, sourceTexts, baseCapability) : null;
+    if (!representations) {
+      assert(declaredDerivation(), `${kind.id}: structural representation capability is absent`);
       recordAudit({
         input: "packages/bindings/overrides/script-borrowed-handle-classification.json",
         id: kind.id,
         status: VOID,
-        reason: "withdrawn-evidence",
-        anchorsLost: missing,
+        reason: "withdrawn-structural-capability",
       });
       withdrawnKinds.add(kind.id);
       continue;
@@ -286,9 +338,38 @@ function validateHandleKinds(override, evidenceById) {
     for (const field of ["ownership", "validity", "invalidationBoundary"]) {
       assert(typeof kind[field] === "string" && kind[field].length > 0, `${kind.id}: missing ${field}`);
     }
-    representationsByKind.set(kind.id, representationsFor(kind, evidenceById));
+    representationsByKind.set(kind.id, representations);
   }
-  return { kindById, rawTypeToKind, representationsByKind, withdrawnKinds };
+  return {
+    kindById,
+    rawTypeToKind,
+    representationsByKind,
+    withdrawnKinds,
+    lifecycleAvailableByKind,
+    lifecycleCapabilitiesByKind,
+  };
+}
+
+/**
+ * Derive the semantic raw-handle type map before route IR exists.
+ *
+ * The SDK generator needs this smaller projection while it is building that
+ * IR. Keeping it here makes representation admission identical to the later
+ * route classifier without making the SDK depend on its own generated output.
+ */
+export function deriveSemanticHandleTypes(override, sourceTexts) {
+  assert(override?.schemaVersion === 3, "borrowed-handle override has an unsupported schema");
+  const evidenceById = uniqueMap(override.sourceEvidence, "borrowed-handle source evidence");
+  const { withdrawnKinds } = validateHandleKinds(override, evidenceById, sourceTexts);
+  const rawTypeToKind = new Map();
+  for (const kind of override.handleKinds) {
+    if (kind.representation === "declaration-only-token" || withdrawnKinds.has(kind.id)) continue;
+    for (const rawType of kind.rawTypes) {
+      assert(!rawTypeToKind.has(rawType), `${rawType}: assigned to multiple semantic handle kinds`);
+      rawTypeToKind.set(rawType, kind.id);
+    }
+  }
+  return rawTypeToKind;
 }
 
 function validateExceptionalRoutes(override, borrowedById) {
@@ -326,7 +407,7 @@ export function generateBorrowedHandleClassification(inputs) {
   const patterns = parse(inputs.patternsText, "script binding patterns");
   const override = parse(inputs.overrideText, "borrowed-handle override");
 
-  assert(override.schemaVersion === 2, "borrowed-handle override has an unsupported schema");
+  assert(override.schemaVersion === 3, "borrowed-handle override has an unsupported schema");
   expectSameRevision({
     label: "borrowed-handle classification",
     inputs: [
@@ -360,8 +441,16 @@ export function generateBorrowedHandleClassification(inputs) {
   const patternById = uniqueMap(patterns.bindings, "script binding patterns");
 
   const withdrawnSources = inputs.withdrawnSources ?? new Set();
+  const effectiveSourceTexts = new Map(inputs.sourceTexts);
+  for (const source of withdrawnSources) effectiveSourceTexts.delete(source);
   const evidenceById = validateSourceEvidence(override, inputs.sourceTexts, withdrawnSources);
-  const { rawTypeToKind, representationsByKind, withdrawnKinds } = validateHandleKinds(override, evidenceById);
+  const {
+    rawTypeToKind,
+    representationsByKind,
+    withdrawnKinds,
+    lifecycleAvailableByKind,
+    lifecycleCapabilitiesByKind,
+  } = validateHandleKinds(override, evidenceById, effectiveSourceTexts);
 
   // Two structural reasons put a route in this census, and the second is what
   // makes a constructor visible to the handle lane at all.
@@ -538,6 +627,28 @@ export function generateBorrowedHandleClassification(inputs) {
       );
     }
 
+    const effectKinds = [...new Set([...inputHandleKinds, ...returnHandleKinds])];
+    const needsLifecycleEvidence =
+      operationClass === "checked-handle-return-capture" ||
+      operationClass === "checked-child-engine-object-invalidate" ||
+      operationClass === "checked-self-engine-object-invalidate";
+    const missingLifecycle = needsLifecycleEvidence
+      ? effectKinds.filter((kind) => lifecycleAvailableByKind.get(kind) !== true)
+      : [];
+    if (missingLifecycle.length > 0) {
+      assert(declaredDerivation(), `${id}: lifecycle/effect evidence is absent for ${missingLifecycle.join(", ")}`);
+      withdrawnRoutes.add(id);
+      recordAudit({
+        input: "packages/bindings/overrides/script-borrowed-handle-classification.json",
+        id,
+        status: VOID,
+        reason: "withdrawn-lifecycle-effect-evidence",
+        operationClass,
+        handleKinds: missingLifecycle,
+      });
+      continue;
+    }
+
     rows.push({
       id,
       stableId,
@@ -561,6 +672,10 @@ export function generateBorrowedHandleClassification(inputs) {
           : operationClass === "declaration-token"
             ? "not-runtime"
             : "preserve",
+      evidenceRequirements: {
+        representation: effectKinds,
+        lifecycleEffects: needsLifecycleEvidence ? effectKinds : [],
+      },
       requiredContext: resolveContext(binding, operationClass, override.contextRules),
       inputHandleKinds,
       returnHandleKinds,
@@ -593,13 +708,17 @@ export function generateBorrowedHandleClassification(inputs) {
     .map(
       ({
         representationExceptions: _representationExceptions,
+        representationCapability: _representationCapability,
         representationFeature: _representationFeature,
+        lifecycleCapabilities: _lifecycleCapabilities,
         ...kind
       }) => {
         const representations = representationsByKind.get(kind.id);
         const featureScoped = representations.some(({ feature }) => feature !== null);
         return {
           ...kind,
+          lifecycleEvidence: [...(kind.lifecycleEvidence ?? kind.sourceEvidence)].sort(compareText),
+          lifecycleCapabilities: lifecycleCapabilitiesByKind.get(kind.id),
           rawTypes: [...kind.rawTypes].sort(compareText),
           // `representation` remains the representation under which this kind is
           // a runtime identity at all; `representations` is the authority on
@@ -636,13 +755,20 @@ export function generateBorrowedHandleClassification(inputs) {
   );
 
   return {
-    schemaVersion: 2,
+    schemaVersion: 3,
     defoldRevision: ir.defoldRevision,
     scope: "Every pending borrowed-handle route in the pinned script API accounting artifact, exactly once",
     coverageClaim: override.coverageClaim,
     allocationClaim: override.allocationClaim,
     inputEvidence,
     routeCount: rows.length,
+    runtimeRouteCount: rows.filter(({ operationClass }) => operationClass !== "declaration-token").length,
+    representationOnlyRouteCount: rows.filter(
+      ({ evidenceRequirements }) => evidenceRequirements.lifecycleEffects.length === 0,
+    ).length,
+    lifecycleEffectRouteCount: rows.filter(
+      ({ evidenceRequirements }) => evidenceRequirements.lifecycleEffects.length > 0,
+    ).length,
     operationClassCounts,
     censusBasisCounts: countBy(rows, ({ censusBasis }) => censusBasis),
     moduleCounts: countBy(rows, ({ rawName }) => rawName.split(".")[0]),
@@ -675,7 +801,10 @@ async function loadInputs() {
   const loaded = await loadReviewedSources({
     input: "packages/bindings/overrides/script-borrowed-handle-classification.json",
     defoldRoot: fileURLToPath(new URL("upstream/defold", root)),
-    evidence: override.sourceEvidence,
+    // Source loading establishes that bytes exist. Representation and
+    // lifecycle claims are evaluated independently below; allowing the old
+    // lifecycle anchors to withdraw the source here would couple them again.
+    evidence: override.sourceEvidence.map(({ anchors: _anchors, ...evidence }) => evidence),
     derived: parse(irText, "script API IR").defoldRevision,
   });
   return {

@@ -504,6 +504,16 @@ ${rows}
 All targets fail closed when a bucket has no target-specific implementation. Browser-host support is not inferred from native captured-Lua support.
 Output strings and Defold values must be copied before the Lua stack is restored; userdata must cross as generation-checked registry handles.
 
+The 24 executable fixed tuples join mechanical IR selection to the canonical
+Lua registration surface, then independently require their reviewed execution
+context and exact positional result codecs. The three executable fixed table
+records additionally require the exact emitted field-name/push-codec set and a
+one-table/one-result stack effect. Private producer-helper names and error
+strings are not evidence. With missing structural proof the authoritative
+descriptor stays available through universal fallback. Equivalent integral
+spellings of the one-result return are accepted; unrelated or unmodelled stack
+mutation must withdraw the specialization.
+
 ## Reviewed semantic exceptions
 
 | Route | Bucket | Reason |

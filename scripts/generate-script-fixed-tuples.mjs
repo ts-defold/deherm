@@ -3,6 +3,11 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { stableBindingId } from "./lib/binding-identity.mjs";
+import {
+  contextCapability,
+  parseCanonicalLuaRegistrationSurface,
+  registeredRouteCapability,
+} from "./lib/defold-lua-structural-capabilities.mjs";
 import { declaredDerivation, expectReviewedCount, loadReviewedSources } from "./lib/reviewed-revision.mjs";
 import { VOID, recordAudit } from "./lib/revision-audit.mjs";
 
@@ -12,6 +17,7 @@ const urls = {
   patterns: new URL("packages/bindings/generated/defold-script-binding-patterns.json", root),
   schemaOverrides: new URL("packages/bindings/overrides/script-table-tuple-schema-overrides.json", root),
   registrations: new URL("packages/bindings/overrides/script-fixed-tuple-registrations.json", root),
+  registrationSurface: new URL("packages/bindings/generated/defold-lua-registration-surface.json", root),
   report: new URL("packages/bindings/generated/defold-script-fixed-tuples.json", root),
   probes: new URL("packages/bindings/generated/defold-script-fixed-tuple-probes.json", root),
   header: new URL("defold/defold_hermes/include/defold_hermes/generated_script_fixed_tuples.hpp", root),
@@ -56,11 +62,12 @@ function codecs(rawType, position) {
 }
 
 export async function loadInputs() {
-  const [irText, patternsText, schemaOverridesText, registrationsText] = await Promise.all([
+  const [irText, patternsText, schemaOverridesText, registrationsText, registrationSurfaceText] = await Promise.all([
     readFile(urls.ir, "utf8"),
     readFile(urls.patterns, "utf8"),
     readFile(urls.schemaOverrides, "utf8"),
     readFile(urls.registrations, "utf8"),
+    readFile(urls.registrationSurface, "utf8"),
   ]);
   const registrations = JSON.parse(registrationsText);
   // Tolerant on purpose: the reviewed registrations cite the whole `bullet3d`
@@ -83,6 +90,7 @@ export async function loadInputs() {
     patternsText,
     schemaOverridesText,
     registrationsText,
+    registrationSurfaceText,
     sources,
     withdrawnSources: loaded.withdrawn,
   };
@@ -93,6 +101,7 @@ export function generate(
   patternsText,
   schemaOverridesText,
   registrationsText,
+  registrationSurfaceText,
   sources,
   withdrawnSources = new Set(),
 ) {
@@ -100,22 +109,26 @@ export function generate(
   const patterns = JSON.parse(patternsText);
   const schemaOverrides = JSON.parse(schemaOverridesText);
   const registrations = JSON.parse(registrationsText);
-  assert(registrations.schemaVersion === 1, "fixed tuple registration schema drifted");
-  const sourceByPrefix = new Map();
+  const registrationSurface = parseCanonicalLuaRegistrationSurface(registrationSurfaceText);
+  assert(registrations.schemaVersion === 2, "fixed tuple registration schema drifted");
+  const sourceByPath = new Map();
   for (const source of sources) {
     // The reviewed hash was observed while loading, where a moved file becomes
     // an audit line rather than a refusal: a pinned hash only detects that
     // Defold edited its own source, which across a release is expected and is
     // the input to this generator. What actually checks this policy against the
     // revision being generated is the census below, read from that revision's IR.
-    assert(!sourceByPrefix.has(source.modulePrefix), `duplicate module source ${source.modulePrefix}`);
-    sourceByPrefix.set(source.modulePrefix, source);
+    const canonicalPath = source.path.replace(/^engine\//, "");
+    assert(!sourceByPath.has(canonicalPath), `duplicate fixed-tuple source ${canonicalPath}`);
+    sourceByPath.set(canonicalPath, source);
   }
   // A module whose reviewed registration source this revision does not have
   // registers nothing here. Its routes are withdrawn rather than asserted
   // against a source that is gone.
-  const withdrawnPrefixes = new Set(
-    registrations.sources.filter(({ path }) => withdrawnSources.has(path)).map(({ modulePrefix }) => modulePrefix),
+  const withdrawnPaths = new Set(
+    registrations.sources
+      .filter(({ path }) => withdrawnSources.has(path))
+      .map(({ path }) => path.replace(/^engine\//, "")),
   );
   const functionById = new Map(ir.functions.map((fn) => [fn.id, fn]));
   const excluded = new Set(schemaOverrides.overrides.map(({ id }) => id));
@@ -142,21 +155,29 @@ export function generate(
         : "fixed-scalar-tuple",
     }))
     .filter(({ id }) => {
-      const module = functionById.get(id)?.modulePath.join(".");
-      if (withdrawnPrefixes.has(module)) return false;
-      if (sourceByPrefix.has(module)) return true;
-      // A multi-result route in a module the review never saw. At the reviewed
-      // revision that is a gap in this tree and stays fatal; in a derivation of
-      // another revision it is a module that revision registers and this one
-      // does not, so it is withdrawn and reported rather than emitted with a
-      // context nobody reviewed.
-      assert(declaredDerivation(), `${id}: no exact source registration`);
+      const fn = functionById.get(id);
+      const routeName = [...fn.modulePath, fn.member].join(".");
+      const registration = registeredRouteCapability(registrationSurface, routeName);
+      if (!registration || withdrawnPaths.has(registration?.sourcePath)) {
+        const message = `${id}: positive Lua registration is absent or its reviewed source was withdrawn`;
+        assert(declaredDerivation(), message);
+        recordAudit({
+          input: "packages/bindings/overrides/script-fixed-tuple-registrations.json",
+          id,
+          status: VOID,
+          reason: registration ? "withdrawn-registration-source" : "canonical-registration-unavailable",
+          detail: message,
+        });
+        return false;
+      }
+      if (sourceByPath.has(registration.sourcePath)) return true;
+      assert(declaredDerivation(), `${id}: canonical registration source has no reviewed execution context`);
       recordAudit({
         input: "packages/bindings/overrides/script-fixed-tuple-registrations.json",
         id,
         status: VOID,
-        reason: "unreviewed-module",
-        module,
+        reason: "unreviewed-context-source",
+        source: registration.sourcePath,
       });
       return false;
     });
@@ -187,11 +208,33 @@ export function generate(
     .map((classified) => {
       const fn = functionById.get(classified.id);
       assert(fn, `${classified.id}: absent from pinned IR`);
-      const module = fn.modulePath.join(".");
-      const evidence = sourceByPrefix.get(module);
-      assert(evidence, `${classified.id}: no exact source registration`);
-      const registration = new RegExp(`["']${fn.member}["']\\s*,`);
-      assert(registration.test(evidence.text), `${classified.id}: Lua registration anchor drifted`);
+      const routeName = [...fn.modulePath, fn.member].join(".");
+      const registration = registeredRouteCapability(registrationSurface, routeName);
+      assert(registration, `${classified.id}: positive Lua registration is absent from canonical registration surface`);
+      const evidence = sourceByPath.get(registration.sourcePath);
+      assert(evidence, `${classified.id}: canonical registration source has no reviewed execution context`);
+      const contextKind =
+        evidence.context === "GuiScriptInstance"
+          ? "gui-script-instance"
+          : evidence.context === "ScriptInstance"
+            ? "script-instance"
+            : evidence.context === "Global"
+              ? "global"
+              : null;
+      assert(contextKind, `${classified.id}: unsupported reviewed execution context`);
+      const context = contextCapability(evidence.text, registration.cFunction, contextKind);
+      if (!context) {
+        const message = `${classified.id}: canonical registered function does not prove ${contextKind} context`;
+        assert(declaredDerivation(), message);
+        recordAudit({
+          input: "packages/bindings/overrides/script-fixed-tuple-registrations.json",
+          id: classified.id,
+          status: VOID,
+          reason: "execution-context-unavailable",
+          detail: message,
+        });
+        return null;
+      }
       const args = fn.parameters.map((parameter, index) => ({
         index,
         rawType: parameter.rawType,
@@ -217,6 +260,7 @@ export function generate(
         maximumArgumentCount: args.length,
         arguments: args,
         results,
+        sourceCapabilities: { registration, context },
         sourceEvidence: { path: evidence.path, sha256: evidence.sha256, registration: fn.member },
         targetSupport: {
           nativeHermes: "generated-executable",
@@ -228,8 +272,15 @@ export function generate(
         },
       };
     })
+    .filter(Boolean)
     .sort((left, right) => Number.parseInt(left.stableId) - Number.parseInt(right.stableId));
   assert(new Set(rows.map(({ stableId }) => stableId)).size === rows.length, "fixed tuple stable ID collision");
+  const emittedBucketCounts = Object.fromEntries(
+    Object.keys(registrations.expectedBucketCounts).map((bucket) => [
+      bucket,
+      rows.filter((row) => row.bucket === bucket).length,
+    ]),
+  );
   const codecVocabulary = [
     ...new Set(
       rows.flatMap((row) => [
@@ -242,7 +293,7 @@ export function generate(
     schemaVersion: 1,
     defoldRevision: ir.defoldRevision,
     bindingCount: rows.length,
-    bucketCounts,
+    bucketCounts: emittedBucketCounts,
     tupleArityCounts: Object.fromEntries(
       [2, 3, 4].map((arity) => [arity, rows.filter((row) => row.results.length === arity).length]),
     ),
