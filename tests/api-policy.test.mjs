@@ -94,7 +94,7 @@ test("policy host parity materializes every authoritative generator input", asyn
   assert.equal((workflow.match(/policy-surface\.mjs pack/gu) ?? []).length, 1);
   assert.equal((workflow.match(/policy-surface\.mjs install/gu) ?? []).length, 4);
   assert.doesNotMatch(workflow, /tar -[cx]zf[^\n]*policy-surface/u);
-  assert.match(parity, /DEHERM_TAR="\$\(cygpath -w "\$\(command -v tar\)"\)"/u);
+  assert.match(parity, /DEHERM_TAR_BASH="\$\(cygpath -w "\$\(command -v bash\)"\)"/u);
   assert.doesNotMatch(parity, /archive="\$\(cygpath/u);
   assert.match(parity, /DEFOLD_REV=\/DEHERM_DERIVED_REVISION=/u);
   assert.match(parity, /DEHERM_CARRIED_REVIEW_LEDGER=/u);

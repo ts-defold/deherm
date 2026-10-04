@@ -5171,10 +5171,11 @@ workflow evidence, not target runtime evidence.
 
 ## 2026-10-03 - Policy transport preserves canonical bytes on Windows
 
-The shared policy-surface installer now accepts an explicit tar executable, and
-the Windows parity lane supplies Git Bash's tar using a native Windows path.
-This preserves the byte behavior of the previously green shell extraction path
-instead of resolving Windows' different system tar from Node. The release-tag
+The shared policy-surface installer now accepts an explicit tar executable or
+Bash host. The Windows parity lane runs tar inside Git Bash, including explicit
+native-to-POSIX path conversion, rather than launching an MSYS tar executable
+directly from Node. This preserves the byte behavior of the previously green
+shell extraction path. The release-tag
 publisher-sidecar check also imports the dependency-light artifact-reference
 module directly, so the artifact summary job does not need an unrelated package
 installation merely to authenticate the shipped lock.

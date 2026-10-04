@@ -11,6 +11,23 @@ import { promisify } from "node:util";
 const execFileAsync = promisify(execFile);
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const tarExecutable = process.env.DEHERM_TAR || "tar";
+const tarBash = process.env.DEHERM_TAR_BASH;
+
+async function runTar(arguments_, options = {}) {
+  if (!tarBash) return execFileAsync(tarExecutable, arguments_, options);
+  return execFileAsync(
+    tarBash,
+    [
+      "--noprofile",
+      "--norc",
+      "-c",
+      'args=(); for arg in "$@"; do case "$arg" in [A-Za-z]:\\\\*) arg="$(cygpath -u "$arg")";; esac; args+=("$arg"); done; exec tar "${args[@]}"',
+      "deherm-tar",
+      ...arguments_,
+    ],
+    options,
+  );
+}
 
 export const policySurfaceArchivePaths = Object.freeze([
   "upstream.lock",
@@ -78,7 +95,7 @@ async function assertDeclaredInputs() {
 }
 
 async function listArchive(archive) {
-  const { stdout } = await execFileAsync(tarExecutable, ["-tzf", archive], {
+  const { stdout } = await runTar(["-tzf", archive], {
     maxBuffer: 64 * 1024 * 1024,
   });
   const entries = stdout.split(/\r?\n/u).filter(Boolean).map(normalizeArchiveEntry);
@@ -104,7 +121,7 @@ async function listArchive(archive) {
 export async function packPolicySurface(archive) {
   await assertDeclaredInputs();
   await mkdir(path.dirname(archive), { recursive: true });
-  await execFileAsync(tarExecutable, ["-czf", archive, ...policySurfaceArchivePaths], {
+  await runTar(["-czf", archive, ...policySurfaceArchivePaths], {
     cwd: root,
     env: { ...process.env, COPYFILE_DISABLE: "1" },
     maxBuffer: 64 * 1024 * 1024,
@@ -114,7 +131,7 @@ export async function packPolicySurface(archive) {
 export async function installPolicySurface(archive) {
   await listArchive(archive);
   for (const entry of replacementRoots) await rm(path.join(root, entry), { recursive: true, force: true });
-  await execFileAsync(tarExecutable, ["-xzf", archive, "-C", root], {
+  await runTar(["-xzf", archive, "-C", root], {
     maxBuffer: 64 * 1024 * 1024,
   });
 }
@@ -127,7 +144,7 @@ export async function extractPolicySurfacePath(archive, selectedPath) {
   if (!entries.some((entry) => entry === selectedPath || entry.startsWith(`${selectedPath}/`))) {
     throw new Error(`Policy surface archive does not contain ${selectedPath}`);
   }
-  await execFileAsync(tarExecutable, ["-xzf", archive, "-C", root, selectedPath], {
+  await runTar(["-xzf", archive, "-C", root, selectedPath], {
     maxBuffer: 64 * 1024 * 1024,
   });
 }
