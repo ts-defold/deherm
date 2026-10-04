@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "kind": "deherm.dmsdk-hash-state-recipe-facts",
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "capacityPerWidth": 16,
+  "entries": [
+    {
+      "denseId": 0,
+      "operation": "Clone",
+      "width": 32,
+      "stateType": "HashState32",
+      "symbol": "dmHashClone32",
+      "declarationId": "dmsdk:dmHashClone32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:214:233",
+      "include": "dmsdk/dlib/hash.h"
+    },
+    {
+      "denseId": 1,
+      "operation": "Clone",
+      "width": 64,
+      "stateType": "HashState64",
+      "symbol": "dmHashClone64",
+      "declarationId": "dmsdk:dmHashClone64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:256:238",
+      "include": "dmsdk/dlib/hash.h"
+    },
+    {
+      "denseId": 2,
+      "operation": "Final",
+      "width": 32,
+      "stateType": "HashState32",
+      "symbol": "dmHashFinal32",
+      "declarationId": "dmsdk:dmHashFinal32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:231:235",
+      "include": "dmsdk/dlib/hash.h"
+    },
+    {
+      "denseId": 3,
+      "operation": "Final",
+      "width": 64,
+      "stateType": "HashState64",
+      "symbol": "dmHashFinal64",
+      "declarationId": "dmsdk:dmHashFinal64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:273:240",
+      "include": "dmsdk/dlib/hash.h"
+    },
+    {
+      "denseId": 4,
+      "operation": "Init",
+      "width": 32,
+      "stateType": "HashState32",
+      "symbol": "dmHashInit32",
+      "declarationId": "dmsdk:dmHashInit32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:204:232",
+      "include": "dmsdk/dlib/hash.h"
+    },
+    {
+      "denseId": 5,
+      "operation": "Init",
+      "width": 64,
+      "stateType": "HashState64",
+      "symbol": "dmHashInit64",
+      "declarationId": "dmsdk:dmHashInit64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:247:237",
+      "include": "dmsdk/dlib/hash.h"
+    },
+    {
+      "denseId": 6,
+      "operation": "Release",
+      "width": 32,
+      "stateType": "HashState32",
+      "symbol": "dmHashRelease32",
+      "declarationId": "dmsdk:dmHashRelease32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:239:236",
+      "include": "dmsdk/dlib/hash.h"
+    },
+    {
+      "denseId": 7,
+      "operation": "Release",
+      "width": 64,
+      "stateType": "HashState64",
+      "symbol": "dmHashRelease64",
+      "declarationId": "dmsdk:dmHashRelease64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:281:241",
+      "include": "dmsdk/dlib/hash.h"
+    },
+    {
+      "denseId": 8,
+      "operation": "UpdateBuffer",
+      "width": 32,
+      "stateType": "HashState32",
+      "symbol": "dmHashUpdateBuffer32",
+      "declarationId": "dmsdk:dmHashUpdateBuffer32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:223:234",
+      "include": "dmsdk/dlib/hash.h"
+    },
+    {
+      "denseId": 9,
+      "operation": "UpdateBuffer",
+      "width": 64,
+      "stateType": "HashState64",
+      "symbol": "dmHashUpdateBuffer64",
+      "declarationId": "dmsdk:dmHashUpdateBuffer64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:265:239",
+      "include": "dmsdk/dlib/hash.h"
+    }
+  ]
+}

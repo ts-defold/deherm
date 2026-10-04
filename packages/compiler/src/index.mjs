@@ -1,4 +1,5 @@
 export * from "./binding-identity.mjs";
+export * from "./defold-value-layout-output-emitter.mjs";
 export { generateScriptBindingDescriptors } from "./script-binding-descriptor-generator.mjs";
 export * from "./component-proxy-generator.mjs";
 // The public compiler boundary is pure: callers supply policy/materialized
@@ -15,11 +16,20 @@ export * from "./dmsdk-call-symbol-index.mjs";
 export * from "./dmsdk-concrete-call-plan.mjs";
 export * from "./dmsdk-pattern-selector.mjs";
 export * from "./dmsdk-bounded-span-plan.mjs";
+export * from "./dmsdk-bounded-output-emitter.mjs";
+export * from "./dmsdk-arena-cstring-output-emitter.mjs";
 export * from "./dmsdk-value-plan.mjs";
 export * from "./dmsdk-hash-state-plan.mjs";
+export * from "./dmsdk-hash-state-output-emitter.mjs";
 export * from "./dmsdk-cstring-value-plan.mjs";
+export * from "./dmsdk-cstring-value-output-emitter.mjs";
+export * from "./dmsdk-enum-value-output-emitter.mjs";
+export * from "./dmsdk-named-scalar-output-emitter.mjs";
+export * from "./dmsdk-scalar-output-emitter.mjs";
 export * from "./dmsdk-borrowed-handle-plan.mjs";
+export * from "./dmsdk-borrowed-handle-output-emitter.mjs";
 export * from "./dmsdk-scratch-scalar-out-plan.mjs";
+export * from "./dmsdk-scratch-scalar-out-output-emitter.mjs";
 export * from "./cpp-ownership-effect-facts.mjs";
 export * from "./dmsdk-cpp-ownership-effect-frontend.mjs";
 export * from "./defold-source-include-aliases.mjs";

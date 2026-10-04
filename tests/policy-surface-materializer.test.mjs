@@ -22,6 +22,15 @@ import {
 import {
   LOCALLY_RENDERED_OUTPUT_INPUTS,
   LOCALLY_RENDERED_OUTPUT_RECIPES,
+  DMSDK_BORROWED_HANDLE_RECIPE,
+  DMSDK_ARENA_CSTRING_RECIPE,
+  DMSDK_BOUNDED_RECIPE,
+  DMSDK_CSTRING_VALUE_RECIPE,
+  DMSDK_ENUM_VALUE_RECIPE,
+  DMSDK_HASH_STATE_RECIPE,
+  DMSDK_NAMED_SCALAR_RECIPE,
+  DMSDK_SCALAR_RECIPE,
+  DMSDK_SCRATCH_SCALAR_OUT_RECIPE,
   SCRIPT_BINDING_DESCRIPTOR_RECIPE,
   SCRIPT_SCALAR_RECIPE,
   SCRIPT_UNIVERSAL_VALUE_RECIPE,
@@ -186,7 +195,7 @@ test("authenticated policy materializes the complete generated SDK without a Def
   const cacheRoot = await mkdtemp(path.join(tmpdir(), "deherm-policy-surface-test-"));
   const outputRoot = path.join(cacheRoot, "surfaces", policy.revision);
   const first = await materializePolicySurface(policy, { outputRoot });
-  assert.equal(first.descriptor.documents.length, 25);
+  assert.equal(first.descriptor.documents.length, 38);
   assert.equal(first.descriptor.schemaVersion, 2);
   assert.match(first.descriptor.policyRoot, /^[0-9a-f]{64}$/u);
   assert.match(first.descriptor.compilerObjectSha256, /^[0-9a-f]{64}$/u);
@@ -218,6 +227,15 @@ test("authenticated policy materializes the complete generated SDK without a Def
     "defold-sdk-ir.json",
     "defold-dmsdk-sdk-documentation.json",
   ]);
+  assert.deepEqual(compiler.value.sdk.entries["dmsdk/scalar.ts"].inputs, ["defold-dmsdk-scalar-recipe-facts.json"]);
+  for (const [relative, fact] of Object.entries({
+    "dmsdk/borrowed-handle.ts": "defold-dmsdk-borrowed-handle-recipe-facts.json",
+    "dmsdk/cstring-value.ts": "defold-dmsdk-cstring-value-recipe-facts.json",
+    "dmsdk/enum-value.ts": "defold-dmsdk-enum-value-recipe-facts.json",
+    "dmsdk/scratch-scalar-out.ts": "defold-dmsdk-scratch-scalar-out-recipe-facts.json",
+  })) {
+    assert.deepEqual(compiler.value.sdk.entries[relative].inputs, [fact]);
+  }
 
   assert.ok(
     policy.policy.realizer.requiredCapabilities.includes(BINDING_LOWERING_RECIPE_CAPABILITY),
@@ -273,12 +291,8 @@ test("authenticated policy materializes the complete generated SDK without a Def
     .filter(([, record]) => record.mode === "authenticated-compatibility-source")
     .map(([name]) => name)
     .sort();
-  assert.equal(rendered.length, 16);
+  assert.equal(rendered.length, 20);
   assert.deepEqual(snapshots, [
-    "dmsdk/borrowed-handle.ts",
-    "dmsdk/cstring-value.ts",
-    "dmsdk/enum-value.ts",
-    "dmsdk/scratch-scalar-out.ts",
     "script/callback-lifecycle.ts",
     "script/copied-value-record-blockers.ts",
     "script/dynamic-values.ts",
@@ -307,7 +321,7 @@ test("authenticated policy materializes the complete generated SDK without a Def
   );
   assert.deepEqual(
     bytesByMode,
-    { rendered: 3_908_367, snapshots: 115_312 },
+    { rendered: 3_985_486, snapshots: 38_193 },
     "the local-emitter versus compatibility-snapshot migration debt changed",
   );
 
@@ -363,6 +377,49 @@ test("authenticated policy materializes the complete generated SDK without a Def
   ]);
   for (const relative of valueBindingOutputs) {
     assert.deepEqual(LOCALLY_RENDERED_OUTPUT_INPUTS[relative], ["defold-script-value-binding-recipe-facts.json"]);
+  }
+  for (const [recipe, fact] of [
+    [DMSDK_BORROWED_HANDLE_RECIPE, "defold-dmsdk-borrowed-handle-recipe-facts.json"],
+    [DMSDK_CSTRING_VALUE_RECIPE, "defold-dmsdk-cstring-value-recipe-facts.json"],
+    [DMSDK_ENUM_VALUE_RECIPE, "defold-dmsdk-enum-value-recipe-facts.json"],
+    [DMSDK_NAMED_SCALAR_RECIPE, "defold-dmsdk-named-scalar-recipe-facts.json"],
+    [DMSDK_SCALAR_RECIPE, "defold-dmsdk-scalar-recipe-facts.json"],
+    [DMSDK_SCRATCH_SCALAR_OUT_RECIPE, "defold-dmsdk-scratch-scalar-out-recipe-facts.json"],
+  ]) {
+    const outputs = Object.keys(LOCALLY_RENDERED_OUTPUT_RECIPES).filter(
+      (relative) => LOCALLY_RENDERED_OUTPUT_RECIPES[relative] === recipe,
+    );
+    assert.ok(outputs.length > 0, `${recipe} must own at least one revision output`);
+    for (const relative of outputs) assert.deepEqual(LOCALLY_RENDERED_OUTPUT_INPUTS[relative], [fact]);
+  }
+  const boundedFacts = new Set([
+    "defold-dmsdk-astc-probe-recipe-facts.json",
+    "defold-dmsdk-base64-span-recipe-facts.json",
+    "defold-dmsdk-fixed-digest-recipe-facts.json",
+    "defold-dmsdk-hash-span-recipe-facts.json",
+    "defold-dmsdk-xtea-span-recipe-facts.json",
+  ]);
+  const boundedOutputs = Object.keys(LOCALLY_RENDERED_OUTPUT_RECIPES).filter(
+    (relative) => LOCALLY_RENDERED_OUTPUT_RECIPES[relative] === DMSDK_BOUNDED_RECIPE,
+  );
+  assert.equal(boundedOutputs.length, 20);
+  for (const relative of boundedOutputs) {
+    const [fact] = LOCALLY_RENDERED_OUTPUT_INPUTS[relative];
+    assert.ok(boundedFacts.has(fact), `${relative} must consume one bounded-family facts document`);
+  }
+  const hashStateOutputs = Object.keys(LOCALLY_RENDERED_OUTPUT_RECIPES).filter(
+    (relative) => LOCALLY_RENDERED_OUTPUT_RECIPES[relative] === DMSDK_HASH_STATE_RECIPE,
+  );
+  assert.equal(hashStateOutputs.length, 2);
+  for (const relative of hashStateOutputs) {
+    assert.deepEqual(LOCALLY_RENDERED_OUTPUT_INPUTS[relative], ["defold-dmsdk-hash-state-recipe-facts.json"]);
+  }
+  const arenaCStringOutputs = Object.keys(LOCALLY_RENDERED_OUTPUT_RECIPES).filter(
+    (relative) => LOCALLY_RENDERED_OUTPUT_RECIPES[relative] === DMSDK_ARENA_CSTRING_RECIPE,
+  );
+  assert.equal(arenaCStringOutputs.length, 2);
+  for (const relative of arenaCStringOutputs) {
+    assert.deepEqual(LOCALLY_RENDERED_OUTPUT_INPUTS[relative], ["defold-dmsdk-arena-cstring-recipe-facts.json"]);
   }
   const outputBytesByMode = { rendered: 0, snapshots: 0 };
   const expectedOutputBytesByMode = { rendered: 0, snapshots: 0 };

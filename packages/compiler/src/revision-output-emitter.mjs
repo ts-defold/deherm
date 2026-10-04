@@ -4,9 +4,33 @@
 
 import {
   generateDmSdkUniversalBrowserLibrary,
+  generateDmSdkUniversalHeader,
+  generateDmSdkUniversalJsiHeader,
   generateDmSdkUniversalRuntimeSource,
 } from "./dmsdk-universal-output-emitter.mjs";
+import {
+  DMSDK_BORROWED_HANDLE_REVISION_OUTPUT_PATHS,
+  renderDmSdkBorrowedHandleOutputs,
+} from "./dmsdk-borrowed-handle-output-emitter.mjs";
+import { DMSDK_ARENA_CSTRING_OUTPUTS, renderDmSdkArenaCStringOutputs } from "./dmsdk-arena-cstring-output-emitter.mjs";
+import { DMSDK_BOUNDED_OUTPUTS, renderDmSdkBoundedOutputs } from "./dmsdk-bounded-output-emitter.mjs";
+import {
+  DMSDK_CSTRING_VALUE_RECIPE_FACTS_NAME,
+  renderDmSdkCStringValueOutputs,
+} from "./dmsdk-cstring-value-output-emitter.mjs";
+import { DMSDK_ENUM_VALUE_RECIPE_FACTS_NAME, renderDmSdkEnumValueOutputs } from "./dmsdk-enum-value-output-emitter.mjs";
+import {
+  DMSDK_NAMED_SCALAR_RECIPE_FACTS_NAME,
+  renderDmSdkNamedScalarOutputs,
+} from "./dmsdk-named-scalar-output-emitter.mjs";
+import { DMSDK_SCALAR_RECIPE_FACTS_NAME, renderDmSdkScalarOutputs } from "./dmsdk-scalar-output-emitter.mjs";
+import {
+  DMSDK_SCRATCH_SCALAR_OUT_OUTPUTS,
+  renderDmSdkScratchScalarOutOutputs,
+} from "./dmsdk-scratch-scalar-out-output-emitter.mjs";
 import { DMSDK_UNIVERSAL_RECIPE_FACTS_NAME } from "./dmsdk-universal-recipe-facts.mjs";
+import { DMSDK_HASH_STATE_OUTPUTS, renderDmSdkHashStateOutputs } from "./dmsdk-hash-state-output-emitter.mjs";
+import { renderDefoldValueLayoutHeader } from "./defold-value-layout-output-emitter.mjs";
 import { generateScriptBindingDescriptors } from "./script-binding-descriptor-generator.mjs";
 import { renderScriptHandleLoweringArtifacts } from "./script-handle-lowering-output-emitter.mjs";
 import { renderScriptScalarArtifacts } from "./script-scalar-output-emitter.mjs";
@@ -18,6 +42,7 @@ import {
 
 export const STABLE_OUTPUT_RECIPE = "output.stable-template.render.v1";
 export const DMSDK_UNIVERSAL_JSI_HEADER_RECIPE = "output.dmsdk-universal-jsi-header.render.v1";
+export const DMSDK_UNIVERSAL_HEADER_RECIPE = "output.dmsdk-universal-header.render.v1";
 export const DMSDK_UNIVERSAL_RUNTIME_RECIPE = "output.dmsdk-universal-runtime.render.v1";
 export const DMSDK_UNIVERSAL_BROWSER_RECIPE = "output.dmsdk-universal-browser.render.v1";
 export const SCRIPT_HANDLE_KINDS_RECIPE = "output.script-handle-kinds.render.v1";
@@ -27,6 +52,16 @@ export const SCRIPT_BINDING_DESCRIPTOR_RECIPE = "output.script-binding-descripto
 export const SCRIPT_SCALAR_RECIPE = "output.script-scalar.render.v1";
 export const SCRIPT_UNIVERSAL_VALUE_RECIPE = "output.script-universal-value.render.v1";
 export const SCRIPT_VALUE_BINDING_RECIPE = "output.script-value-binding.render.v1";
+export const DEFOLD_VALUE_LAYOUT_HEADER_RECIPE = "output.defold-value-layout-header.render.v1";
+export const DMSDK_BORROWED_HANDLE_RECIPE = "output.dmsdk-borrowed-handle.render.v1";
+export const DMSDK_ARENA_CSTRING_RECIPE = "output.dmsdk-arena-cstring.render.v1";
+export const DMSDK_BOUNDED_RECIPE = "output.dmsdk-bounded.render.v1";
+export const DMSDK_CSTRING_VALUE_RECIPE = "output.dmsdk-cstring-value.render.v1";
+export const DMSDK_ENUM_VALUE_RECIPE = "output.dmsdk-enum-value.render.v1";
+export const DMSDK_NAMED_SCALAR_RECIPE = "output.dmsdk-named-scalar.render.v1";
+export const DMSDK_SCALAR_RECIPE = "output.dmsdk-scalar.render.v1";
+export const DMSDK_SCRATCH_SCALAR_OUT_RECIPE = "output.dmsdk-scratch-scalar-out.render.v1";
+export const DMSDK_HASH_STATE_RECIPE = "output.dmsdk-hash-state.render.v1";
 
 const SCRIPT_HANDLE_LOWERING_DOCUMENT = "defold-script-handle-lowering.json";
 const SCRIPT_IR_DOCUMENT = "defold-script-api-ir.json";
@@ -34,6 +69,66 @@ const SCRIPT_BINDING_PATTERNS_DOCUMENT = "defold-script-binding-patterns.json";
 const SCRIPT_SCALAR_DOCUMENT = "defold-script-scalar-dispatch.json";
 const SCRIPT_UNIVERSAL_VALUE_DOCUMENT = "defold-script-universal-value-bindings.json";
 const DEFOLD_VALUE_LAYOUTS_DOCUMENT = "defold-value-layouts.json";
+const DMSDK_BORROWED_HANDLE_RECIPE_FACTS_NAME = "defold-dmsdk-borrowed-handle-recipe-facts.json";
+const DMSDK_ARENA_CSTRING_RECIPE_FACTS_NAME = "defold-dmsdk-arena-cstring-recipe-facts.json";
+const DMSDK_SCRATCH_SCALAR_OUT_RECIPE_FACTS_NAME = "defold-dmsdk-scratch-scalar-out-recipe-facts.json";
+const DMSDK_HASH_STATE_RECIPE_FACTS_NAME = "defold-dmsdk-hash-state-recipe-facts.json";
+
+const dmsdkBoundedFactsByFamily = Object.freeze({
+  "fixed-digest": "defold-dmsdk-fixed-digest-recipe-facts.json",
+  "base64-span": "defold-dmsdk-base64-span-recipe-facts.json",
+  "astc-probe": "defold-dmsdk-astc-probe-recipe-facts.json",
+  "xtea-span": "defold-dmsdk-xtea-span-recipe-facts.json",
+  "hash-span": "defold-dmsdk-hash-span-recipe-facts.json",
+});
+const dmsdkBoundedOutputFacts = Object.freeze(
+  Object.fromEntries(
+    Object.entries(DMSDK_BOUNDED_OUTPUTS).flatMap(([family, outputs]) =>
+      outputs.map((relative) => [relative, dmsdkBoundedFactsByFamily[family]]),
+    ),
+  ),
+);
+
+const dmsdkScalarOutputs = Object.freeze({
+  "defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h": "header",
+  "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp": "source",
+  "defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar_runtime.h": "runtimeHeader",
+  "defold/defold_hermes/src/generated_dmsdk_scalar_runtime.cpp": "runtime",
+  "defold/defold_hermes/src/generated_dmsdk_scalar_jsi.cpp": "jsi",
+  "defold/defold_hermes/lib/web/generated_dmsdk_scalar.js": "browser",
+});
+const dmsdkNamedScalarOutputs = Object.freeze({
+  "defold/defold_hermes/include/defold_hermes/generated_dmsdk_named_scalar.h": "header",
+  "defold/defold_hermes/src/generated_dmsdk_named_scalar_runtime.cpp": "runtime",
+});
+const dmsdkEnumValueOutputs = Object.freeze({
+  "defold/defold_hermes/include/defold_hermes/generated_dmsdk_enum_value.h": "header",
+  "defold/defold_hermes/include/defold_hermes/generated_dmsdk_enum_value_runtime.h": "runtimeHeader",
+  "defold/defold_hermes/src/generated_dmsdk_enum_value_runtime.cpp": "runtime",
+  "defold/defold_hermes/src/generated_dmsdk_enum_value_jsi.cpp": "jsi",
+  "defold/defold_hermes/src/generated_dmsdk_enum_value_buffer.cpp": "sources.buffer",
+  "defold/defold_hermes/src/generated_dmsdk_enum_value_graphics.cpp": "sources.graphics",
+  "defold/defold_hermes/src/generated_dmsdk_enum_value_log.cpp": "sources.log",
+  "defold/defold_hermes/src/generated_dmsdk_enum_value_sound.cpp": "sources.sound",
+});
+const dmsdkCStringValueOutputs = Object.freeze({
+  "defold/defold_hermes/include/defold_hermes/generated_dmsdk_cstring_value.h": "header",
+  "defold/defold_hermes/src/generated_dmsdk_cstring_value_runtime.cpp": "runtime",
+  "defold/defold_hermes/src/generated_dmsdk_cstring_value.cpp": "native",
+  "defold/defold_hermes/src/generated_dmsdk_cstring_value_jsi.cpp": "jsi",
+  "defold/defold_hermes/lib/web/generated_dmsdk_cstring_value.js": "browser",
+});
+const dmsdkScratchScalarOutOutputs = Object.freeze([
+  DMSDK_SCRATCH_SCALAR_OUT_OUTPUTS.header,
+  DMSDK_SCRATCH_SCALAR_OUT_OUTPUTS.runtime,
+  DMSDK_SCRATCH_SCALAR_OUT_OUTPUTS.jsi,
+  DMSDK_SCRATCH_SCALAR_OUT_OUTPUTS.browser,
+]);
+const dmsdkHashStateRevisionOutputs = Object.freeze([DMSDK_HASH_STATE_OUTPUTS.header, DMSDK_HASH_STATE_OUTPUTS.source]);
+const dmsdkArenaCStringRevisionOutputs = Object.freeze([
+  DMSDK_ARENA_CSTRING_OUTPUTS.header,
+  DMSDK_ARENA_CSTRING_OUTPUTS.production,
+]);
 
 const scriptUniversalValueOutputs = Object.freeze([
   "defold/defold_hermes/include/defold_hermes/generated_script_universal_value_bindings.hpp",
@@ -164,6 +259,7 @@ void installDmSdkScalarModule(facebook::jsi::Runtime& runtime, facebook::jsi::Ob
 export const LOCALLY_RENDERED_OUTPUT_RECIPES = Object.freeze({
   ...Object.fromEntries(Object.keys(stableTemplates).map((relative) => [relative, STABLE_OUTPUT_RECIPE])),
   "defold/defold_hermes/include/defold_hermes/generated_dmsdk_universal_jsi.hpp": DMSDK_UNIVERSAL_JSI_HEADER_RECIPE,
+  "defold/defold_hermes/include/defold_hermes/generated_dmsdk_universal.h": DMSDK_UNIVERSAL_HEADER_RECIPE,
   "defold/defold_hermes/src/generated_dmsdk_universal.cpp": DMSDK_UNIVERSAL_RUNTIME_RECIPE,
   "defold/defold_hermes/lib/web/generated_dmsdk_universal.js": DMSDK_UNIVERSAL_BROWSER_RECIPE,
   "defold/defold_hermes/include/defold_hermes/generated_script_handle_kinds.hpp": SCRIPT_HANDLE_KINDS_RECIPE,
@@ -176,11 +272,28 @@ export const LOCALLY_RENDERED_OUTPUT_RECIPES = Object.freeze({
   "defold/defold_hermes/src/generated_scalar_lua_descriptors.cpp": SCRIPT_SCALAR_RECIPE,
   ...Object.fromEntries(scriptUniversalValueOutputs.map((relative) => [relative, SCRIPT_UNIVERSAL_VALUE_RECIPE])),
   ...Object.fromEntries(scriptValueBindingOutputs.map((relative) => [relative, SCRIPT_VALUE_BINDING_RECIPE])),
+  "defold/defold_hermes/include/defold_hermes/generated_defold_value_layout.h": DEFOLD_VALUE_LAYOUT_HEADER_RECIPE,
+  ...Object.fromEntries(
+    DMSDK_BORROWED_HANDLE_REVISION_OUTPUT_PATHS.map((relative) => [relative, DMSDK_BORROWED_HANDLE_RECIPE]),
+  ),
+  ...Object.fromEntries(dmsdkArenaCStringRevisionOutputs.map((relative) => [relative, DMSDK_ARENA_CSTRING_RECIPE])),
+  ...Object.fromEntries(Object.keys(dmsdkBoundedOutputFacts).map((relative) => [relative, DMSDK_BOUNDED_RECIPE])),
+  ...Object.fromEntries(
+    Object.keys(dmsdkCStringValueOutputs).map((relative) => [relative, DMSDK_CSTRING_VALUE_RECIPE]),
+  ),
+  ...Object.fromEntries(Object.keys(dmsdkEnumValueOutputs).map((relative) => [relative, DMSDK_ENUM_VALUE_RECIPE])),
+  ...Object.fromEntries(Object.keys(dmsdkNamedScalarOutputs).map((relative) => [relative, DMSDK_NAMED_SCALAR_RECIPE])),
+  ...Object.fromEntries(Object.keys(dmsdkScalarOutputs).map((relative) => [relative, DMSDK_SCALAR_RECIPE])),
+  ...Object.fromEntries(dmsdkScratchScalarOutOutputs.map((relative) => [relative, DMSDK_SCRATCH_SCALAR_OUT_RECIPE])),
+  ...Object.fromEntries(dmsdkHashStateRevisionOutputs.map((relative) => [relative, DMSDK_HASH_STATE_RECIPE])),
 });
 
 export const LOCALLY_RENDERED_OUTPUT_INPUTS = Object.freeze({
   ...Object.fromEntries(Object.keys(stableTemplates).map((relative) => [relative, Object.freeze([])])),
   "defold/defold_hermes/include/defold_hermes/generated_dmsdk_universal_jsi.hpp": Object.freeze([
+    DMSDK_UNIVERSAL_RECIPE_FACTS_NAME,
+  ]),
+  "defold/defold_hermes/include/defold_hermes/generated_dmsdk_universal.h": Object.freeze([
     DMSDK_UNIVERSAL_RECIPE_FACTS_NAME,
   ]),
   "defold/defold_hermes/src/generated_dmsdk_universal.cpp": Object.freeze([DMSDK_UNIVERSAL_RECIPE_FACTS_NAME]),
@@ -207,32 +320,55 @@ export const LOCALLY_RENDERED_OUTPUT_INPUTS = Object.freeze({
   ...Object.fromEntries(
     scriptValueBindingOutputs.map((relative) => [relative, Object.freeze([SCRIPT_VALUE_BINDING_RECIPE_FACTS_NAME])]),
   ),
+  "defold/defold_hermes/include/defold_hermes/generated_defold_value_layout.h": Object.freeze([
+    DEFOLD_VALUE_LAYOUTS_DOCUMENT,
+  ]),
+  ...Object.fromEntries(
+    DMSDK_BORROWED_HANDLE_REVISION_OUTPUT_PATHS.map((relative) => [
+      relative,
+      Object.freeze([DMSDK_BORROWED_HANDLE_RECIPE_FACTS_NAME]),
+    ]),
+  ),
+  ...Object.fromEntries(
+    dmsdkArenaCStringRevisionOutputs.map((relative) => [
+      relative,
+      Object.freeze([DMSDK_ARENA_CSTRING_RECIPE_FACTS_NAME]),
+    ]),
+  ),
+  ...Object.fromEntries(
+    Object.entries(dmsdkBoundedOutputFacts).map(([relative, facts]) => [relative, Object.freeze([facts])]),
+  ),
+  ...Object.fromEntries(
+    Object.keys(dmsdkCStringValueOutputs).map((relative) => [
+      relative,
+      Object.freeze([DMSDK_CSTRING_VALUE_RECIPE_FACTS_NAME]),
+    ]),
+  ),
+  ...Object.fromEntries(
+    Object.keys(dmsdkEnumValueOutputs).map((relative) => [
+      relative,
+      Object.freeze([DMSDK_ENUM_VALUE_RECIPE_FACTS_NAME]),
+    ]),
+  ),
+  ...Object.fromEntries(
+    Object.keys(dmsdkNamedScalarOutputs).map((relative) => [
+      relative,
+      Object.freeze([DMSDK_NAMED_SCALAR_RECIPE_FACTS_NAME]),
+    ]),
+  ),
+  ...Object.fromEntries(
+    Object.keys(dmsdkScalarOutputs).map((relative) => [relative, Object.freeze([DMSDK_SCALAR_RECIPE_FACTS_NAME])]),
+  ),
+  ...Object.fromEntries(
+    dmsdkScratchScalarOutOutputs.map((relative) => [
+      relative,
+      Object.freeze([DMSDK_SCRATCH_SCALAR_OUT_RECIPE_FACTS_NAME]),
+    ]),
+  ),
+  ...Object.fromEntries(
+    dmsdkHashStateRevisionOutputs.map((relative) => [relative, Object.freeze([DMSDK_HASH_STATE_RECIPE_FACTS_NAME])]),
+  ),
 });
-
-function generateDmSdkUniversalJsiHeader(report) {
-  if (!Array.isArray(report?.recipes)) throw new Error("dmSDK universal JSI header recipe has no catalog recipes");
-  return `// Generated by scripts/generate-dmsdk-universal-bindings.mjs. Do not edit.
-#pragma once
-#include <stdint.h>
-#if !defined(DM_PLATFORM_HTML5)
-#include <jsi/jsi.h>
-#endif
-namespace defold_hermes {
-struct DmSdkUniversalJsiRegistrationMetadata {
-  const char* module_name;
-  const char* method_name;
-  uint32_t recipe_count;
-  uint32_t value_bytes;
-};
-inline constexpr DmSdkUniversalJsiRegistrationMetadata kDmSdkUniversalJsiRegistration = {
-  "DmSdkUniversal", "call", UINT32_C(${report.recipes.length}), UINT32_C(24)
-};
-#if !defined(DM_PLATFORM_HTML5)
-void installDmSdkUniversalModule(facebook::jsi::Runtime& runtime, facebook::jsi::Object& modules);
-#endif
-}
-`;
-}
 
 export function generateRevisionOutput(relative, recipe, documents) {
   if (recipe === STABLE_OUTPUT_RECIPE) {
@@ -242,6 +378,9 @@ export function generateRevisionOutput(relative, recipe, documents) {
   }
   if (recipe === DMSDK_UNIVERSAL_JSI_HEADER_RECIPE) {
     return generateDmSdkUniversalJsiHeader(documents["defold-dmsdk-universal-bindings.json"]);
+  }
+  if (recipe === DMSDK_UNIVERSAL_HEADER_RECIPE) {
+    return generateDmSdkUniversalHeader(documents["defold-dmsdk-universal-bindings.json"]);
   }
   if (recipe === DMSDK_UNIVERSAL_RUNTIME_RECIPE) {
     return generateDmSdkUniversalRuntimeSource(documents["defold-dmsdk-universal-bindings.json"]);
@@ -292,6 +431,66 @@ export function generateRevisionOutput(relative, recipe, documents) {
     if (relative.endsWith("generated_script_value_bindings.hpp")) return artifacts.header;
     if (relative.endsWith("generated_script_value_bindings.cpp")) return artifacts.source;
     throw new Error(`${relative}: no script value-binding output renderer`);
+  }
+  if (recipe === DEFOLD_VALUE_LAYOUT_HEADER_RECIPE) {
+    return renderDefoldValueLayoutHeader(documents[DEFOLD_VALUE_LAYOUTS_DOCUMENT]);
+  }
+  if (recipe === DMSDK_BORROWED_HANDLE_RECIPE) {
+    const output = renderDmSdkBorrowedHandleOutputs(documents[DMSDK_BORROWED_HANDLE_RECIPE_FACTS_NAME]).get(relative);
+    if (typeof output !== "string") throw new Error(`${relative}: no borrowed-handle output renderer`);
+    return output;
+  }
+  if (recipe === DMSDK_ARENA_CSTRING_RECIPE) {
+    const output = renderDmSdkArenaCStringOutputs(documents[DMSDK_ARENA_CSTRING_RECIPE_FACTS_NAME]).get(relative);
+    if (typeof output !== "string") throw new Error(`${relative}: no arena C-string output renderer`);
+    return output;
+  }
+  if (recipe === DMSDK_BOUNDED_RECIPE) {
+    const factsName = dmsdkBoundedOutputFacts[relative];
+    const output = factsName ? renderDmSdkBoundedOutputs(documents[factsName]).get(relative) : undefined;
+    if (typeof output !== "string") throw new Error(`${relative}: no bounded-family output renderer`);
+    return output;
+  }
+  if (recipe === DMSDK_CSTRING_VALUE_RECIPE) {
+    const key = dmsdkCStringValueOutputs[relative];
+    const output = key
+      ? renderDmSdkCStringValueOutputs(documents[DMSDK_CSTRING_VALUE_RECIPE_FACTS_NAME])[key]
+      : undefined;
+    if (typeof output !== "string") throw new Error(`${relative}: no C-string/value output renderer`);
+    return output;
+  }
+  if (recipe === DMSDK_ENUM_VALUE_RECIPE) {
+    const key = dmsdkEnumValueOutputs[relative];
+    const rendered = renderDmSdkEnumValueOutputs(documents[DMSDK_ENUM_VALUE_RECIPE_FACTS_NAME]);
+    const output = key?.startsWith("sources.") ? rendered.sources[key.slice("sources.".length)] : rendered[key];
+    if (typeof output !== "string") throw new Error(`${relative}: no enum-value output renderer`);
+    return output;
+  }
+  if (recipe === DMSDK_NAMED_SCALAR_RECIPE) {
+    const key = dmsdkNamedScalarOutputs[relative];
+    const output = key
+      ? renderDmSdkNamedScalarOutputs(documents[DMSDK_NAMED_SCALAR_RECIPE_FACTS_NAME])[key]
+      : undefined;
+    if (typeof output !== "string") throw new Error(`${relative}: no named-scalar output renderer`);
+    return output;
+  }
+  if (recipe === DMSDK_SCALAR_RECIPE) {
+    const key = dmsdkScalarOutputs[relative];
+    const output = key ? renderDmSdkScalarOutputs(documents[DMSDK_SCALAR_RECIPE_FACTS_NAME])[key] : undefined;
+    if (typeof output !== "string") throw new Error(`${relative}: no scalar output renderer`);
+    return output;
+  }
+  if (recipe === DMSDK_SCRATCH_SCALAR_OUT_RECIPE) {
+    const output = renderDmSdkScratchScalarOutOutputs(documents[DMSDK_SCRATCH_SCALAR_OUT_RECIPE_FACTS_NAME]).get(
+      relative,
+    );
+    if (typeof output !== "string") throw new Error(`${relative}: no scratch-scalar-out output renderer`);
+    return output;
+  }
+  if (recipe === DMSDK_HASH_STATE_RECIPE) {
+    const output = renderDmSdkHashStateOutputs(documents[DMSDK_HASH_STATE_RECIPE_FACTS_NAME]).get(relative);
+    if (typeof output !== "string") throw new Error(`${relative}: no hash-state output renderer`);
+    return output;
   }
   throw new Error(`${relative}: unsupported package-owned revision-output recipe ${JSON.stringify(recipe)}`);
 }

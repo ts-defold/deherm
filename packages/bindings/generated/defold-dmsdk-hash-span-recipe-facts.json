@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "kind": "deherm.dmsdk-bounded-output-recipe-facts",
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "family": "hash-span",
+  "entries": [
+    {
+      "id": 0,
+      "declarationId": "dmsdk:dmHashBuffer32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:69:212",
+      "symbol": "dmHashBuffer32",
+      "include": "dmsdk/dlib/hash.h",
+      "wrapper": "deherm_dmsdk_hash_span_dm_hash_buffer32",
+      "resultBits": 32
+    },
+    {
+      "id": 1,
+      "declarationId": "dmsdk:dmHashBuffer64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:79:213",
+      "symbol": "dmHashBuffer64",
+      "include": "dmsdk/dlib/hash.h",
+      "wrapper": "deherm_dmsdk_hash_span_dm_hash_buffer64",
+      "resultBits": 64
+    }
+  ]
+}

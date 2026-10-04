@@ -47,6 +47,11 @@ import {
   DMSDK_UNIVERSAL_RECIPE_FACTS_NAME,
   emitDmSdkUniversalReport,
 } from "./dmsdk-universal-recipe-facts.mjs";
+import { renderDmSdkBorrowedHandleOutputs } from "./dmsdk-borrowed-handle-output-emitter.mjs";
+import { renderDmSdkCStringValueOutputs } from "./dmsdk-cstring-value-output-emitter.mjs";
+import { renderDmSdkEnumValueOutputs } from "./dmsdk-enum-value-output-emitter.mjs";
+import { renderDmSdkScalarOutputs } from "./dmsdk-scalar-output-emitter.mjs";
+import { renderDmSdkScratchScalarOutOutputs } from "./dmsdk-scratch-scalar-out-output-emitter.mjs";
 
 const SCRIPT_IR = "defold-script-api-ir.json";
 const SCRIPT_CONSTANT_LOWERING = "defold-script-constant-lowering.json";
@@ -79,6 +84,10 @@ const SDK_RECIPES = Object.freeze({
   "script/universal-value-bindings.ts": "sdk.script.universal-value.render.v1",
   "script/browser-target-support.ts": "sdk.script.browser-target-support.render.v1",
   "dmsdk/scalar.ts": "sdk.dmsdk.scalar.render.v1",
+  "dmsdk/borrowed-handle.ts": "sdk.dmsdk.borrowed-handle.render.v1",
+  "dmsdk/cstring-value.ts": "sdk.dmsdk.cstring-value.render.v1",
+  "dmsdk/enum-value.ts": "sdk.dmsdk.enum-value.render.v1",
+  "dmsdk/scratch-scalar-out.ts": "sdk.dmsdk.scratch-scalar-out.render.v1",
   "dmsdk/universal.ts": "sdk.dmsdk.universal.render.v1",
   "dmsdk/browser-arena.ts": "sdk.dmsdk.browser-arena.render.v1",
   "dmsdk/named-scalar.ts": "sdk.dmsdk.named-scalar.render.v1",
@@ -98,6 +107,25 @@ export function renderScriptUrlTargetSupportRecipe(recipe, recipeInput) {
   if (recipe === SCRIPT_URL_TARGET_SUPPORT_RECIPE_V1) return generateScriptUrlTargetSupportV1(recipeInput);
   if (recipe === SCRIPT_URL_TARGET_SUPPORT_RECIPE_V2) return generateScriptUrlTargetSupport(recipeInput);
   throw new Error(`unsupported script URL target-support recipe ${JSON.stringify(recipe)}`);
+}
+
+function renderDmSdkScalarSdk(documents) {
+  const facts = documents["defold-dmsdk-scalar-recipe-facts.json"];
+  return facts
+    ? renderDmSdkScalarOutputs(facts).typescript
+    : generateDmSdkScalar(documents["defold-dmsdk-scalar-thunks.json"], documents[DMSDK_IR]);
+}
+
+function renderDmSdkBorrowedHandleSdk(documents) {
+  return renderDmSdkBorrowedHandleOutputs(documents["defold-dmsdk-borrowed-handle-recipe-facts.json"]).get(
+    "packages/sdk/src/generated/dmsdk/borrowed-handle.ts",
+  );
+}
+
+function renderDmSdkScratchScalarOutSdk(documents) {
+  return renderDmSdkScratchScalarOutOutputs(documents["defold-dmsdk-scratch-scalar-out-recipe-facts.json"]).get(
+    "packages/sdk/src/generated/dmsdk/scratch-scalar-out.ts",
+  );
 }
 
 function digestCanonical(value) {
@@ -659,7 +687,26 @@ export async function materializePolicySurface(resolvedPolicy, options = {}) {
           "dmsdk/named-scalar.ts": generateDmSdkNamedScalar(compiler.sdk["dmsdk/named-scalar.ts"].recipeInput),
         }
       : {}),
-    "dmsdk/scalar.ts": generateDmSdkScalar(documents["defold-dmsdk-scalar-thunks.json"], documents[DMSDK_IR]),
+    ...(compiler.sdk?.["dmsdk/borrowed-handle.ts"]?.mode === "render-and-verify"
+      ? { "dmsdk/borrowed-handle.ts": renderDmSdkBorrowedHandleSdk(documents) }
+      : {}),
+    ...(compiler.sdk?.["dmsdk/cstring-value.ts"]?.mode === "render-and-verify"
+      ? {
+          "dmsdk/cstring-value.ts": renderDmSdkCStringValueOutputs(
+            documents["defold-dmsdk-cstring-value-recipe-facts.json"],
+          ).typescript,
+        }
+      : {}),
+    ...(compiler.sdk?.["dmsdk/enum-value.ts"]?.mode === "render-and-verify"
+      ? {
+          "dmsdk/enum-value.ts": renderDmSdkEnumValueOutputs(documents["defold-dmsdk-enum-value-recipe-facts.json"])
+            .typescript,
+        }
+      : {}),
+    ...(compiler.sdk?.["dmsdk/scratch-scalar-out.ts"]?.mode === "render-and-verify"
+      ? { "dmsdk/scratch-scalar-out.ts": renderDmSdkScratchScalarOutSdk(documents) }
+      : {}),
+    "dmsdk/scalar.ts": renderDmSdkScalarSdk(documents),
     "dmsdk/universal.ts": generateDmSdkUniversal(documents["defold-dmsdk-universal-bindings.json"]),
     "dmsdk/browser-arena.ts": generateDmSdkBrowserArena(documents["defold-dmsdk-universal-bindings.json"]),
   };

@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
+import { readFile } from "node:fs/promises";
 import test from "node:test";
 
+import { renderDefoldValueLayoutHeader } from "../packages/compiler/src/defold-value-layout-output-emitter.mjs";
 import { generateDefoldValueLayouts } from "../scripts/generate-defold-value-layouts.mjs";
 
 function projection(...names) {
@@ -67,4 +70,22 @@ test("a policy entry for an API absent from this revision is dormant, not fatal"
   assert.deepEqual(Object.keys(report.opaque), ["node"]);
   assert.deepEqual(report.dormantPolicyEntries, ["future-only"]);
   assert.equal(report.coverage.dormantPolicyEntries, 1);
+});
+
+test("the compiler-owned value-layout emitter reproduces the frozen source-pipeline header", async () => {
+  const report = JSON.parse(
+    await readFile(new URL("../packages/bindings/generated/defold-value-layouts.json", import.meta.url), "utf8"),
+  );
+  const expected = await readFile(
+    new URL("../defold/defold_hermes/include/defold_hermes/generated_defold_value_layout.h", import.meta.url),
+    "utf8",
+  );
+  const fixture = JSON.parse(
+    await readFile(new URL("./fixtures/policy-surface-old-pipeline/manifest.json", import.meta.url), "utf8"),
+  ).outputs["defold/defold_hermes/include/defold_hermes/generated_defold_value_layout.h"];
+  assert.deepEqual(
+    { bytes: Buffer.byteLength(expected), sha256: createHash("sha256").update(expected).digest("hex") },
+    fixture,
+  );
+  assert.equal(renderDefoldValueLayoutHeader(report), expected);
 });

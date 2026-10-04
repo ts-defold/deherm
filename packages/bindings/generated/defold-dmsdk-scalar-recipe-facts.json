@@ -1,0 +1,537 @@
+{
+  "schemaVersion": 1,
+  "kind": "deherm.recipe.dmsdk-scalar-output",
+  "entries": [
+    {
+      "bindingId": 0,
+      "wrapper": "deherm_dmsdk_dm_endian_byte_swap_u16",
+      "declaration": {
+        "id": "dmsdk:dmEndian::ByteSwap@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:36:194",
+        "name": "dmEndian::ByteSwap",
+        "type": "uint16_t (uint16_t)",
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp",
+        "returns": "uint16_t",
+        "parameters": [
+          {
+            "name": "x",
+            "type": "uint16_t"
+          }
+        ]
+      },
+      "semantics": {
+        "pureValueTransform": true,
+        "mayBlock": false
+      }
+    },
+    {
+      "bindingId": 1,
+      "wrapper": "deherm_dmsdk_dm_endian_byte_swap_u32",
+      "declaration": {
+        "id": "dmsdk:dmEndian::ByteSwap@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:46:195",
+        "name": "dmEndian::ByteSwap",
+        "type": "uint32_t (uint32_t)",
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp",
+        "returns": "uint32_t",
+        "parameters": [
+          {
+            "name": "x",
+            "type": "uint32_t"
+          }
+        ]
+      },
+      "semantics": {
+        "pureValueTransform": true,
+        "mayBlock": false
+      }
+    },
+    {
+      "bindingId": 2,
+      "wrapper": "deherm_dmsdk_dm_endian_byte_swap_u64",
+      "declaration": {
+        "id": "dmsdk:dmEndian::ByteSwap@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:56:196",
+        "name": "dmEndian::ByteSwap",
+        "type": "uint64_t (uint64_t)",
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp",
+        "returns": "uint64_t",
+        "parameters": [
+          {
+            "name": "x",
+            "type": "uint64_t"
+          }
+        ]
+      },
+      "semantics": {
+        "pureValueTransform": true,
+        "mayBlock": false
+      }
+    },
+    {
+      "bindingId": 3,
+      "wrapper": "deherm_dmsdk_dm_endian_to_host_u32",
+      "declaration": {
+        "id": "dmsdk:dmEndian::ToHost@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:104:200",
+        "name": "dmEndian::ToHost",
+        "type": "uint32_t (uint32_t)",
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp",
+        "returns": "uint32_t",
+        "parameters": [
+          {
+            "name": "x",
+            "type": "uint32_t"
+          }
+        ]
+      },
+      "semantics": {
+        "pureValueTransform": true,
+        "mayBlock": false
+      }
+    },
+    {
+      "bindingId": 4,
+      "wrapper": "deherm_dmsdk_dm_endian_to_host_u64",
+      "declaration": {
+        "id": "dmsdk:dmEndian::ToHost@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:128:202",
+        "name": "dmEndian::ToHost",
+        "type": "uint64_t (uint64_t)",
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp",
+        "returns": "uint64_t",
+        "parameters": [
+          {
+            "name": "x",
+            "type": "uint64_t"
+          }
+        ]
+      },
+      "semantics": {
+        "pureValueTransform": true,
+        "mayBlock": false
+      }
+    },
+    {
+      "bindingId": 5,
+      "wrapper": "deherm_dmsdk_dm_endian_to_host_u16",
+      "declaration": {
+        "id": "dmsdk:dmEndian::ToHost@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:80:198",
+        "name": "dmEndian::ToHost",
+        "type": "uint16_t (uint16_t)",
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp",
+        "returns": "uint16_t",
+        "parameters": [
+          {
+            "name": "x",
+            "type": "uint16_t"
+          }
+        ]
+      },
+      "semantics": {
+        "pureValueTransform": true,
+        "mayBlock": false
+      }
+    },
+    {
+      "bindingId": 6,
+      "wrapper": "deherm_dmsdk_dm_endian_to_network_u64",
+      "declaration": {
+        "id": "dmsdk:dmEndian::ToNetwork@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:116:201",
+        "name": "dmEndian::ToNetwork",
+        "type": "uint64_t (uint64_t)",
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp",
+        "returns": "uint64_t",
+        "parameters": [
+          {
+            "name": "x",
+            "type": "uint64_t"
+          }
+        ]
+      },
+      "semantics": {
+        "pureValueTransform": true,
+        "mayBlock": false
+      }
+    },
+    {
+      "bindingId": 7,
+      "wrapper": "deherm_dmsdk_dm_endian_to_network_u16",
+      "declaration": {
+        "id": "dmsdk:dmEndian::ToNetwork@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:68:197",
+        "name": "dmEndian::ToNetwork",
+        "type": "uint16_t (uint16_t)",
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp",
+        "returns": "uint16_t",
+        "parameters": [
+          {
+            "name": "x",
+            "type": "uint16_t"
+          }
+        ]
+      },
+      "semantics": {
+        "pureValueTransform": true,
+        "mayBlock": false
+      }
+    },
+    {
+      "bindingId": 8,
+      "wrapper": "deherm_dmsdk_dm_endian_to_network_u32",
+      "declaration": {
+        "id": "dmsdk:dmEndian::ToNetwork@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:92:199",
+        "name": "dmEndian::ToNetwork",
+        "type": "uint32_t (uint32_t)",
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp",
+        "returns": "uint32_t",
+        "parameters": [
+          {
+            "name": "x",
+            "type": "uint32_t"
+          }
+        ]
+      },
+      "semantics": {
+        "pureValueTransform": true,
+        "mayBlock": false
+      }
+    },
+    {
+      "bindingId": 9,
+      "wrapper": "deherm_dmsdk_dm_time_get_monotonic_time_v",
+      "declaration": {
+        "id": "dmsdk:dmTime::GetMonotonicTime@upstream/defold/engine/dlib/src/dmsdk/dlib/time.h:56:615",
+        "name": "dmTime::GetMonotonicTime",
+        "type": "uint64_t ()",
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/time.h",
+        "returns": "uint64_t",
+        "parameters": []
+      },
+      "semantics": {
+        "pureValueTransform": false,
+        "mayBlock": false
+      }
+    },
+    {
+      "bindingId": 10,
+      "wrapper": "deherm_dmsdk_dm_time_get_time_v",
+      "declaration": {
+        "id": "dmsdk:dmTime::GetTime@upstream/defold/engine/dlib/src/dmsdk/dlib/time.h:38:614",
+        "name": "dmTime::GetTime",
+        "type": "uint64_t ()",
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/time.h",
+        "returns": "uint64_t",
+        "parameters": []
+      },
+      "semantics": {
+        "pureValueTransform": false,
+        "mayBlock": false
+      }
+    },
+    {
+      "bindingId": 11,
+      "wrapper": "deherm_dmsdk_dm_time_sleep_u32",
+      "declaration": {
+        "id": "dmsdk:dmTime::Sleep@upstream/defold/engine/dlib/src/dmsdk/dlib/time.h:64:616",
+        "name": "dmTime::Sleep",
+        "type": "void (uint32_t)",
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/time.h",
+        "returns": "void",
+        "parameters": [
+          {
+            "name": "useconds",
+            "type": "uint32_t"
+          }
+        ]
+      },
+      "semantics": {
+        "pureValueTransform": false,
+        "mayBlock": true
+      }
+    },
+    {
+      "bindingId": 12,
+      "wrapper": "deherm_dmsdk_dm_trig_lookup_cos_f32",
+      "declaration": {
+        "id": "dmsdk:dmTrigLookup::Cos@upstream/defold/engine/dlib/src/dmsdk/dlib/trig_lookup.h:54:646",
+        "name": "dmTrigLookup::Cos",
+        "type": "float (float)",
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/trig_lookup.h",
+        "returns": "float",
+        "parameters": [
+          {
+            "name": "radians",
+            "type": "float"
+          }
+        ]
+      },
+      "semantics": {
+        "pureValueTransform": true,
+        "mayBlock": false
+      }
+    },
+    {
+      "bindingId": 13,
+      "wrapper": "deherm_dmsdk_dm_trig_lookup_sin_f32",
+      "declaration": {
+        "id": "dmsdk:dmTrigLookup::Sin@upstream/defold/engine/dlib/src/dmsdk/dlib/trig_lookup.h:76:647",
+        "name": "dmTrigLookup::Sin",
+        "type": "float (float)",
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/trig_lookup.h",
+        "returns": "float",
+        "parameters": [
+          {
+            "name": "radians",
+            "type": "float"
+          }
+        ]
+      },
+      "semantics": {
+        "pureValueTransform": true,
+        "mayBlock": false
+      }
+    },
+    {
+      "bindingId": 14,
+      "wrapper": "deherm_dmsdk_dm_utf8_is_breaking_u32",
+      "declaration": {
+        "id": "dmsdk:dmUtf8::IsBreaking@upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h:103:668",
+        "name": "dmUtf8::IsBreaking",
+        "type": "bool (uint32_t)",
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h",
+        "returns": "bool",
+        "parameters": [
+          {
+            "name": "c",
+            "type": "uint32_t"
+          }
+        ]
+      },
+      "semantics": {
+        "pureValueTransform": true,
+        "mayBlock": false
+      }
+    },
+    {
+      "bindingId": 15,
+      "wrapper": "deherm_dmsdk_dm_utf8_is_white_space_u32",
+      "declaration": {
+        "id": "dmsdk:dmUtf8::IsWhiteSpace@upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h:86:667",
+        "name": "dmUtf8::IsWhiteSpace",
+        "type": "bool (uint32_t)",
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h",
+        "returns": "bool",
+        "parameters": [
+          {
+            "name": "c",
+            "type": "uint32_t"
+          }
+        ]
+      },
+      "semantics": {
+        "pureValueTransform": true,
+        "mayBlock": false
+      }
+    },
+    {
+      "bindingId": 16,
+      "wrapper": "deherm_dmsdk_endian_swap16_u16",
+      "declaration": {
+        "id": "dmsdk:EndianSwap16@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:65:185",
+        "name": "EndianSwap16",
+        "type": "uint16_t (uint16_t)",
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
+        "returns": "uint16_t",
+        "parameters": [
+          {
+            "name": "x",
+            "type": "uint16_t"
+          }
+        ]
+      },
+      "semantics": {
+        "pureValueTransform": true,
+        "mayBlock": false
+      }
+    },
+    {
+      "bindingId": 17,
+      "wrapper": "deherm_dmsdk_endian_swap32_u32",
+      "declaration": {
+        "id": "dmsdk:EndianSwap32@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:81:186",
+        "name": "EndianSwap32",
+        "type": "uint32_t (uint32_t)",
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
+        "returns": "uint32_t",
+        "parameters": [
+          {
+            "name": "x",
+            "type": "uint32_t"
+          }
+        ]
+      },
+      "semantics": {
+        "pureValueTransform": true,
+        "mayBlock": false
+      }
+    },
+    {
+      "bindingId": 18,
+      "wrapper": "deherm_dmsdk_endian_swap64_u64",
+      "declaration": {
+        "id": "dmsdk:EndianSwap64@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:100:187",
+        "name": "EndianSwap64",
+        "type": "uint64_t (uint64_t)",
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
+        "returns": "uint64_t",
+        "parameters": [
+          {
+            "name": "x",
+            "type": "uint64_t"
+          }
+        ]
+      },
+      "semantics": {
+        "pureValueTransform": true,
+        "mayBlock": false
+      }
+    },
+    {
+      "bindingId": 19,
+      "wrapper": "deherm_dmsdk_endian_to_host16_u16",
+      "declaration": {
+        "id": "dmsdk:EndianToHost16@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:141:189",
+        "name": "EndianToHost16",
+        "type": "uint16_t (uint16_t)",
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
+        "returns": "uint16_t",
+        "parameters": [
+          {
+            "name": "x",
+            "type": "uint16_t"
+          }
+        ]
+      },
+      "semantics": {
+        "pureValueTransform": true,
+        "mayBlock": false
+      }
+    },
+    {
+      "bindingId": 20,
+      "wrapper": "deherm_dmsdk_endian_to_host32_u32",
+      "declaration": {
+        "id": "dmsdk:EndianToHost32@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:169:191",
+        "name": "EndianToHost32",
+        "type": "uint32_t (uint32_t)",
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
+        "returns": "uint32_t",
+        "parameters": [
+          {
+            "name": "x",
+            "type": "uint32_t"
+          }
+        ]
+      },
+      "semantics": {
+        "pureValueTransform": true,
+        "mayBlock": false
+      }
+    },
+    {
+      "bindingId": 21,
+      "wrapper": "deherm_dmsdk_endian_to_host64_u64",
+      "declaration": {
+        "id": "dmsdk:EndianToHost64@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:197:193",
+        "name": "EndianToHost64",
+        "type": "uint64_t (uint64_t)",
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
+        "returns": "uint64_t",
+        "parameters": [
+          {
+            "name": "x",
+            "type": "uint64_t"
+          }
+        ]
+      },
+      "semantics": {
+        "pureValueTransform": true,
+        "mayBlock": false
+      }
+    },
+    {
+      "bindingId": 22,
+      "wrapper": "deherm_dmsdk_endian_to_network16_u16",
+      "declaration": {
+        "id": "dmsdk:EndianToNetwork16@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:125:188",
+        "name": "EndianToNetwork16",
+        "type": "uint16_t (uint16_t)",
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
+        "returns": "uint16_t",
+        "parameters": [
+          {
+            "name": "x",
+            "type": "uint16_t"
+          }
+        ]
+      },
+      "semantics": {
+        "pureValueTransform": true,
+        "mayBlock": false
+      }
+    },
+    {
+      "bindingId": 23,
+      "wrapper": "deherm_dmsdk_endian_to_network32_u32",
+      "declaration": {
+        "id": "dmsdk:EndianToNetwork32@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:153:190",
+        "name": "EndianToNetwork32",
+        "type": "uint32_t (uint32_t)",
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
+        "returns": "uint32_t",
+        "parameters": [
+          {
+            "name": "x",
+            "type": "uint32_t"
+          }
+        ]
+      },
+      "semantics": {
+        "pureValueTransform": true,
+        "mayBlock": false
+      }
+    },
+    {
+      "bindingId": 24,
+      "wrapper": "deherm_dmsdk_endian_to_network64_u64",
+      "declaration": {
+        "id": "dmsdk:EndianToNetwork64@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:181:192",
+        "name": "EndianToNetwork64",
+        "type": "uint64_t (uint64_t)",
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
+        "returns": "uint64_t",
+        "parameters": [
+          {
+            "name": "x",
+            "type": "uint64_t"
+          }
+        ]
+      },
+      "semantics": {
+        "pureValueTransform": true,
+        "mayBlock": false
+      }
+    },
+    {
+      "bindingId": 25,
+      "wrapper": "deherm_dmsdk_profile_is_initialized_v",
+      "declaration": {
+        "id": "dmsdk:ProfileIsInitialized@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:340:531",
+        "name": "ProfileIsInitialized",
+        "type": "bool ()",
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
+        "returns": "bool",
+        "parameters": []
+      },
+      "semantics": {
+        "pureValueTransform": false,
+        "mayBlock": false
+      }
+    }
+  ]
+}

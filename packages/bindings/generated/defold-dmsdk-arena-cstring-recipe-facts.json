@@ -1,0 +1,158 @@
+{
+  "schemaVersion": 1,
+  "kind": "deherm.dmsdk-arena-cstring-recipe-facts",
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "maximumInputBytes": 4095,
+  "maximumOutputBytes": 4096,
+  "entries": [
+    {
+      "bindingId": 0,
+      "candidate": {
+        "id": "dmsdk:dmResource::GetCanonicalPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:151:1970",
+        "symbol": "dmResource::GetCanonicalPath",
+        "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
+        "result": {
+          "role": "scalar:u32",
+          "nativeType": "uint32_t"
+        },
+        "parameters": [
+          {
+            "role": "cstring-in",
+            "nativeType": "const char *"
+          },
+          {
+            "role": "cstring-mutable",
+            "nativeType": "char *"
+          },
+          {
+            "role": "scalar:u32",
+            "nativeType": "uint32_t"
+          }
+        ]
+      },
+      "recipe": {
+        "kind": "canonical-path"
+      }
+    },
+    {
+      "bindingId": 1,
+      "candidate": {
+        "id": "dmsdk:dmStrError@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:174:184",
+        "symbol": "dmStrError",
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h",
+        "result": {
+          "role": "scalar:void",
+          "nativeType": "void"
+        },
+        "parameters": [
+          {
+            "role": "cstring-mutable",
+            "nativeType": "char *"
+          },
+          {
+            "role": "scalar:usize",
+            "nativeType": "size_t"
+          },
+          {
+            "role": "scalar:i32",
+            "nativeType": "int"
+          }
+        ]
+      },
+      "recipe": {
+        "kind": "error-string"
+      }
+    },
+    {
+      "bindingId": 2,
+      "candidate": {
+        "id": "dmsdk:dmStrTrim@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:137:182",
+        "symbol": "dmStrTrim",
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h",
+        "result": {
+          "role": "scalar:usize",
+          "nativeType": "size_t"
+        },
+        "parameters": [
+          {
+            "role": "cstring-mutable",
+            "nativeType": "char *"
+          },
+          {
+            "role": "scalar:usize",
+            "nativeType": "size_t"
+          },
+          {
+            "role": "cstring-in",
+            "nativeType": "const char *"
+          }
+        ]
+      },
+      "recipe": {
+        "kind": "trimmed-string"
+      }
+    },
+    {
+      "bindingId": 3,
+      "candidate": {
+        "id": "dmsdk:dmURI::Encode@upstream/defold/engine/dlib/src/dmsdk/dlib/uri.h:96:655",
+        "symbol": "dmURI::Encode",
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/uri.h",
+        "result": {
+          "role": "enum:dmURI::Result",
+          "nativeType": "Result"
+        },
+        "parameters": [
+          {
+            "role": "cstring-in",
+            "nativeType": "const char *"
+          },
+          {
+            "role": "cstring-mutable",
+            "nativeType": "char *"
+          },
+          {
+            "role": "scalar:u32",
+            "nativeType": "uint32_t"
+          },
+          {
+            "role": "pointer:scalar:u32",
+            "nativeType": "uint32_t *"
+          }
+        ]
+      },
+      "recipe": {
+        "kind": "uri-encode"
+      }
+    },
+    {
+      "bindingId": 4,
+      "candidate": {
+        "id": "dmsdk:ResourceGetCanonicalPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:324:1907",
+        "symbol": "ResourceGetCanonicalPath",
+        "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
+        "result": {
+          "role": "scalar:u32",
+          "nativeType": "uint32_t"
+        },
+        "parameters": [
+          {
+            "role": "cstring-in",
+            "nativeType": "const char *"
+          },
+          {
+            "role": "cstring-mutable",
+            "nativeType": "char *"
+          },
+          {
+            "role": "scalar:u32",
+            "nativeType": "uint32_t"
+          }
+        ]
+      },
+      "recipe": {
+        "kind": "canonical-path"
+      }
+    }
+  ]
+}

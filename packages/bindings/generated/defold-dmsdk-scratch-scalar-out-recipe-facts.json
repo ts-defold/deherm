@@ -1,0 +1,377 @@
+{
+  "schemaVersion": 1,
+  "kind": "deherm.dmsdk-scratch-scalar-out-recipe-facts",
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "handleKinds": [
+    {
+      "name": "HTextLayout",
+      "representation": "opaque"
+    },
+    {
+      "name": "dmBuffer::HBuffer",
+      "representation": "u32"
+    },
+    {
+      "name": "dmGameObject::HInstance",
+      "representation": "opaque"
+    },
+    {
+      "name": "dmGameObject::HPropertyOptions",
+      "representation": "opaque"
+    },
+    {
+      "name": "dmHID::HContext",
+      "representation": "opaque"
+    },
+    {
+      "name": "dmHID::HGamepad",
+      "representation": "opaque"
+    }
+  ],
+  "bindings": [
+    {
+      "declarationId": "dmsdk:dmBuffer::GetCount@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:340:97",
+      "symbol": "dmBuffer::GetCount",
+      "result": {
+        "kind": "enum"
+      },
+      "parameters": [
+        {
+          "position": 0,
+          "name": "buffer",
+          "kind": "handle",
+          "handleName": "dmBuffer::HBuffer",
+          "direction": "value"
+        },
+        {
+          "position": 1,
+          "name": "count",
+          "kind": "u32",
+          "handleName": null,
+          "direction": "inout"
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmBuffer::GetStreamType@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:353:98",
+      "symbol": "dmBuffer::GetStreamType",
+      "result": {
+        "kind": "enum"
+      },
+      "parameters": [
+        {
+          "position": 0,
+          "name": "buffer",
+          "kind": "handle",
+          "handleName": "dmBuffer::HBuffer",
+          "direction": "value"
+        },
+        {
+          "position": 1,
+          "name": "stream_name",
+          "kind": "u64",
+          "handleName": null,
+          "direction": "value"
+        },
+        {
+          "position": 2,
+          "name": "type",
+          "kind": "enum",
+          "handleName": null,
+          "direction": "inout"
+        },
+        {
+          "position": 3,
+          "name": "components",
+          "kind": "u32",
+          "handleName": null,
+          "direction": "inout"
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmBuffer::GetContentVersion@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:392:102",
+      "symbol": "dmBuffer::GetContentVersion",
+      "result": {
+        "kind": "enum"
+      },
+      "parameters": [
+        {
+          "position": 0,
+          "name": "hbuffer",
+          "kind": "handle",
+          "handleName": "dmBuffer::HBuffer",
+          "direction": "value"
+        },
+        {
+          "position": 1,
+          "name": "version",
+          "kind": "u32",
+          "handleName": null,
+          "direction": "inout"
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:TextLayoutGetBounds@upstream/defold/engine/font/src/dmsdk/font/text_layout.h:527:867",
+      "symbol": "TextLayoutGetBounds",
+      "result": {
+        "kind": "void"
+      },
+      "parameters": [
+        {
+          "position": 0,
+          "name": "layout",
+          "kind": "handle",
+          "handleName": "HTextLayout",
+          "direction": "value"
+        },
+        {
+          "position": 1,
+          "name": "width",
+          "kind": "f32",
+          "handleName": null,
+          "direction": "inout"
+        },
+        {
+          "position": 2,
+          "name": "height",
+          "kind": "f32",
+          "handleName": null,
+          "direction": "inout"
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmGameObject::GetComponentId@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:673:1013",
+      "symbol": "dmGameObject::GetComponentId",
+      "result": {
+        "kind": "enum"
+      },
+      "parameters": [
+        {
+          "position": 0,
+          "name": "instance",
+          "kind": "handle",
+          "handleName": "dmGameObject::HInstance",
+          "direction": "value"
+        },
+        {
+          "position": 1,
+          "name": "component_index",
+          "kind": "u16",
+          "handleName": null,
+          "direction": "value"
+        },
+        {
+          "position": 2,
+          "name": "component_id",
+          "kind": "u64",
+          "handleName": null,
+          "direction": "inout"
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmGameObject::GetPropertyOptionsIndex@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:917:1041",
+      "symbol": "dmGameObject::GetPropertyOptionsIndex",
+      "result": {
+        "kind": "enum"
+      },
+      "parameters": [
+        {
+          "position": 0,
+          "name": "options",
+          "kind": "handle",
+          "handleName": "dmGameObject::HPropertyOptions",
+          "direction": "value"
+        },
+        {
+          "position": 1,
+          "name": "options_index",
+          "kind": "u32",
+          "handleName": null,
+          "direction": "value"
+        },
+        {
+          "position": 2,
+          "name": "result",
+          "kind": "i32",
+          "handleName": null,
+          "direction": "out"
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmGameObject::GetPropertyOptionsKey@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:927:1042",
+      "symbol": "dmGameObject::GetPropertyOptionsKey",
+      "result": {
+        "kind": "enum"
+      },
+      "parameters": [
+        {
+          "position": 0,
+          "name": "options",
+          "kind": "handle",
+          "handleName": "dmGameObject::HPropertyOptions",
+          "direction": "value"
+        },
+        {
+          "position": 1,
+          "name": "options_index",
+          "kind": "u32",
+          "handleName": null,
+          "direction": "value"
+        },
+        {
+          "position": 2,
+          "name": "result",
+          "kind": "u64",
+          "handleName": null,
+          "direction": "out"
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmGameObject::GetPropertyAsHash@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:938:1043",
+      "symbol": "dmGameObject::GetPropertyAsHash",
+      "result": {
+        "kind": "enum"
+      },
+      "parameters": [
+        {
+          "position": 0,
+          "name": "instance",
+          "kind": "handle",
+          "handleName": "dmGameObject::HInstance",
+          "direction": "value"
+        },
+        {
+          "position": 1,
+          "name": "component_id",
+          "kind": "u64",
+          "handleName": null,
+          "direction": "value"
+        },
+        {
+          "position": 2,
+          "name": "property_id",
+          "kind": "u64",
+          "handleName": null,
+          "direction": "value"
+        },
+        {
+          "position": 3,
+          "name": "out_value",
+          "kind": "u64",
+          "handleName": null,
+          "direction": "out"
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmGameObject::GetPropertyAsFloat@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:949:1044",
+      "symbol": "dmGameObject::GetPropertyAsFloat",
+      "result": {
+        "kind": "enum"
+      },
+      "parameters": [
+        {
+          "position": 0,
+          "name": "instance",
+          "kind": "handle",
+          "handleName": "dmGameObject::HInstance",
+          "direction": "value"
+        },
+        {
+          "position": 1,
+          "name": "component_id",
+          "kind": "u64",
+          "handleName": null,
+          "direction": "value"
+        },
+        {
+          "position": 2,
+          "name": "property_id",
+          "kind": "u64",
+          "handleName": null,
+          "direction": "value"
+        },
+        {
+          "position": 3,
+          "name": "out_value",
+          "kind": "f32",
+          "handleName": null,
+          "direction": "out"
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmGameObject::GetPropertyAsBool@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:993:1048",
+      "symbol": "dmGameObject::GetPropertyAsBool",
+      "result": {
+        "kind": "enum"
+      },
+      "parameters": [
+        {
+          "position": 0,
+          "name": "instance",
+          "kind": "handle",
+          "handleName": "dmGameObject::HInstance",
+          "direction": "value"
+        },
+        {
+          "position": 1,
+          "name": "component_id",
+          "kind": "u64",
+          "handleName": null,
+          "direction": "value"
+        },
+        {
+          "position": 2,
+          "name": "property_id",
+          "kind": "u64",
+          "handleName": null,
+          "direction": "value"
+        },
+        {
+          "position": 3,
+          "name": "out_value",
+          "kind": "bool",
+          "handleName": null,
+          "direction": "out"
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmHID::GetGamepadUserId@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:619:1616",
+      "symbol": "dmHID::GetGamepadUserId",
+      "result": {
+        "kind": "bool"
+      },
+      "parameters": [
+        {
+          "position": 0,
+          "name": "context",
+          "kind": "handle",
+          "handleName": "dmHID::HContext",
+          "direction": "value"
+        },
+        {
+          "position": 1,
+          "name": "gamepad",
+          "kind": "handle",
+          "handleName": "dmHID::HGamepad",
+          "direction": "value"
+        },
+        {
+          "position": 2,
+          "name": "out",
+          "kind": "u32",
+          "handleName": null,
+          "direction": "out"
+        }
+      ]
+    }
+  ]
+}

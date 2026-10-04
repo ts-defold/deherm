@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "kind": "deherm.dmsdk-bounded-output-recipe-facts",
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "family": "astc-probe",
+  "entries": [
+    {
+      "id": 0,
+      "declarationId": "dmsdk:dmImage::GetAstcBlockSize@upstream/defold/engine/dlib/src/dmsdk/dlib/image.h:133:349",
+      "symbol": "dmImage::GetAstcBlockSize",
+      "include": "dmsdk/dlib/image.h",
+      "wrapper": "deherm_dmsdk_astc_probe_dm_image_get_astc_block_size",
+      "minimumHeaderBytes": 16
+    },
+    {
+      "id": 1,
+      "declarationId": "dmsdk:dmImage::GetAstcDimensions@upstream/defold/engine/dlib/src/dmsdk/dlib/image.h:145:350",
+      "symbol": "dmImage::GetAstcDimensions",
+      "include": "dmsdk/dlib/image.h",
+      "wrapper": "deherm_dmsdk_astc_probe_dm_image_get_astc_dimensions",
+      "minimumHeaderBytes": 16
+    }
+  ]
+}

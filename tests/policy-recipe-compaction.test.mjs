@@ -8,6 +8,8 @@ import {
 } from "../packages/compiler/src/dmsdk-universal-recipe-facts.mjs";
 import {
   generateDmSdkUniversalBrowserLibrary,
+  generateDmSdkUniversalHeader,
+  generateDmSdkUniversalJsiHeader,
   generateDmSdkUniversalRuntimeSource,
 } from "../packages/compiler/src/dmsdk-universal-output-emitter.mjs";
 
@@ -25,10 +27,14 @@ test("dmSDK universal recipe facts losslessly reconstruct the source-derived cat
 });
 
 test("package-side dmSDK universal output emitters match the source pipeline", async () => {
-  const [runtime, browser] = await Promise.all([
+  const [header, jsiHeader, runtime, browser] = await Promise.all([
+    readFile("defold/defold_hermes/include/defold_hermes/generated_dmsdk_universal.h", "utf8"),
+    readFile("defold/defold_hermes/include/defold_hermes/generated_dmsdk_universal_jsi.hpp", "utf8"),
     readFile("defold/defold_hermes/src/generated_dmsdk_universal.cpp", "utf8"),
     readFile("defold/defold_hermes/lib/web/generated_dmsdk_universal.js", "utf8"),
   ]);
+  assert.equal(generateDmSdkUniversalHeader(report), header);
+  assert.equal(generateDmSdkUniversalJsiHeader(report), jsiHeader);
   assert.equal(generateDmSdkUniversalRuntimeSource(report), runtime);
   assert.equal(generateDmSdkUniversalBrowserLibrary(report), browser);
 });

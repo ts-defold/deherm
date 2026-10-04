@@ -28,6 +28,16 @@ function validateReport(report) {
   return report;
 }
 
+export function generateDmSdkUniversalHeader(input) {
+  const report = validateReport(input);
+  return `// ${banner}\n#ifndef DEFOLD_HERMES_GENERATED_DMSDK_UNIVERSAL_H\n#define DEFOLD_HERMES_GENERATED_DMSDK_UNIVERSAL_H\n\n#include <stdint.h>\n\n#define DEHERM_DMSDK_UNIVERSAL_MAX_ARGUMENTS ${report.abi.maxArguments}\n\ntypedef enum DehermDmSdkUniversalStatus {\n  DEHERM_DMSDK_UNIVERSAL_OK = 0,\n  DEHERM_DMSDK_UNIVERSAL_UNKNOWN_ID = 1,\n  DEHERM_DMSDK_UNIVERSAL_WRONG_ARITY = 2,\n  DEHERM_DMSDK_UNIVERSAL_NO_PROVIDER = 3,\n  DEHERM_DMSDK_UNIVERSAL_INVALID_STORAGE = 4,\n  DEHERM_DMSDK_UNIVERSAL_PROVIDER_ERROR = 5,\n  DEHERM_DMSDK_UNIVERSAL_TYPE_MISMATCH = 6\n} DehermDmSdkUniversalStatus;\n\ntypedef enum DehermDmSdkUniversalValueTag {\n  DEHERM_DMSDK_UNIVERSAL_VOID = 0,\n  DEHERM_DMSDK_UNIVERSAL_BOOL = 1,\n  DEHERM_DMSDK_UNIVERSAL_I64 = 2,\n  DEHERM_DMSDK_UNIVERSAL_U64 = 3,\n  DEHERM_DMSDK_UNIVERSAL_F64 = 4,\n  DEHERM_DMSDK_UNIVERSAL_ADDRESS = 5,\n  DEHERM_DMSDK_UNIVERSAL_MEMORY = 6,\n  DEHERM_DMSDK_UNIVERSAL_CALLBACK = 7,\n  DEHERM_DMSDK_UNIVERSAL_NATIVE_VALUE = 8\n} DehermDmSdkUniversalValueTag;\n\ntypedef struct DehermDmSdkUniversalValue {\n  uint64_t payload;\n  uint64_t auxiliary;\n  uint32_t tag;\n  uint32_t type_id;\n} DehermDmSdkUniversalValue;\n\ntypedef struct DehermDmSdkUniversalDescriptor {\n  uint32_t id;\n  uint16_t argument_count;\n  uint8_t declaration_kind;\n  uint8_t flags;\n} DehermDmSdkUniversalDescriptor;\n\ntypedef DehermDmSdkUniversalStatus (*DehermDmSdkUniversalProvider)(\n    void* context, const DehermDmSdkUniversalDescriptor* descriptor,\n    const DehermDmSdkUniversalValue* arguments, uint32_t argument_count,\n    DehermDmSdkUniversalValue* result);\n\n#ifdef __cplusplus\nextern "C" {\n#endif\nuint32_t deherm_dmsdk_universal_count(void);\nconst char* deherm_dmsdk_universal_catalog_sha256(void);\nconst DehermDmSdkUniversalDescriptor* deherm_dmsdk_universal_descriptors(void);\nconst DehermDmSdkUniversalDescriptor* deherm_dmsdk_universal_find(uint32_t id);\nvoid deherm_dmsdk_universal_install_provider(DehermDmSdkUniversalProvider provider, void* context);\nDehermDmSdkUniversalStatus deherm_dmsdk_universal_dispatch(\n    uint32_t id, const DehermDmSdkUniversalValue* arguments, uint32_t argument_count,\n    DehermDmSdkUniversalValue* result);\n#ifdef __cplusplus\n}\n#endif\n\n#endif\n`;
+}
+
+export function generateDmSdkUniversalJsiHeader(input) {
+  const report = validateReport(input);
+  return `// ${banner}\n#pragma once\n#include <stdint.h>\n#if !defined(DM_PLATFORM_HTML5)\n#include <jsi/jsi.h>\n#endif\nnamespace defold_hermes {\nstruct DmSdkUniversalJsiRegistrationMetadata {\n  const char* module_name;\n  const char* method_name;\n  uint32_t recipe_count;\n  uint32_t value_bytes;\n};\ninline constexpr DmSdkUniversalJsiRegistrationMetadata kDmSdkUniversalJsiRegistration = {\n  "DmSdkUniversal", "call", UINT32_C(${report.recipes.length}), UINT32_C(24)\n};\n#if !defined(DM_PLATFORM_HTML5)\nvoid installDmSdkUniversalModule(facebook::jsi::Runtime& runtime, facebook::jsi::Object& modules);\n#endif\n}\n`;
+}
+
 export function generateDmSdkUniversalRuntimeSource(input) {
   const report = validateReport(input);
   const rows = report.recipes

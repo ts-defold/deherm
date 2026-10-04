@@ -116,6 +116,10 @@
     "parameterStorage": "caller-owned contiguous uint64_t slots",
     "resultStorage": "caller-owned uint64_t slot"
   },
+  "recipeFacts": {
+    "path": "packages/bindings/generated/defold-dmsdk-scratch-scalar-out-recipe-facts.json",
+    "kind": "deherm.dmsdk-scratch-scalar-out-recipe-facts"
+  },
   "coverage": {
     "candidates": 30,
     "generated": 11,
@@ -172,6 +176,7 @@
     "defold/defold_hermes/src/generated_dmsdk_scratch_scalar_out_jsi.cpp": "1f0a5979fd19739415c696549f855814c45e1d7bba3d9dc88858bfb444f5cfe7",
     "defold/defold_hermes/src/generated_dmsdk_scratch_scalar_out_runtime.cpp": "51acb703467b818dc56796db673723ddb2c01d27e3aecbfb4a29a579be643189",
     "native/generated_dmsdk_scratch_scalar_out_header_audit.cpp": "c6ea6ff2e608413bf36d417161d5aa2745f395a7ba7774f15e5fa51f32f953eb",
+    "packages/bindings/generated/defold-dmsdk-scratch-scalar-out-recipe-facts.json": "8977137259cd4d1c06189b7e9dda7b502cfab07b5a0b246d6893c198817dd092",
     "packages/sdk/src/generated/dmsdk/scratch-scalar-out.ts": "9b50621c71aed50ea5b7326e8f14857b7fc24e4fe792f4de6bd72bc079f9eb00",
     "packages/static-hermes/src/generated/dmsdk-scratch-scalar-out.ts": "52d6747f223a66f939c6409f0fd692088587bb47796a43621436a27b1cfd43a1"
   },
@@ -182,6 +187,7 @@
     "defold/defold_hermes/src/generated_dmsdk_scratch_scalar_out_jsi.cpp",
     "defold/defold_hermes/src/generated_dmsdk_scratch_scalar_out_runtime.cpp",
     "native/generated_dmsdk_scratch_scalar_out_header_audit.cpp",
+    "packages/bindings/generated/defold-dmsdk-scratch-scalar-out-recipe-facts.json",
     "packages/sdk/src/generated/dmsdk/scratch-scalar-out.ts",
     "packages/static-hermes/src/generated/dmsdk-scratch-scalar-out.ts"
   ],

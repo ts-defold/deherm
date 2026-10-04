@@ -42,6 +42,7 @@ export const scriptGeneratorSources = Object.freeze([
   "scripts/lib/binding-identity.mjs",
   "packages/compiler/src/binding-identity.mjs",
   "packages/compiler/src/component-proxy-contract.mjs",
+  "packages/compiler/src/defold-value-layout-output-emitter.mjs",
   "packages/compiler/src/defold-hash.mjs",
   "packages/compiler/src/script-special-call-verification.mjs",
   "packages/compiler/src/script-binding-descriptor-generator.mjs",

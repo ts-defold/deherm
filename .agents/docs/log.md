@@ -5439,3 +5439,32 @@ graphs, fails closed on manifest drift, and is idempotent. These results prove
 generation, native harness behavior for the exercised universal paths, and
 policy realization; they do not promote every Defold engine call to live-engine
 runtime evidence.
+
+## 2026-10-04 - dmSDK family outputs realize from compact semantic facts
+
+The package compiler now owns the emitters for scalar, named-scalar,
+enum/value, C-string/value, borrowed-handle, scratch-scalar-out, fixed-digest,
+Base64, ASTC, XTEA, hash-span, hash-state, and arena-C-string families. Their
+thirteen revision-derived recipe documents occupy 110,989 authenticated policy
+bytes and contain route selections, source-backed ABI facts, bounds, codecs,
+ownership/lifetime facts, and handle kinds—not generated C++/JavaScript or
+TypeScript snapshots. Repository generators and policy materialization call the
+same emitters; package realization does not parse Defold source or reselect an
+optimization.
+
+The frozen old-pipeline fixture remains byte-identical for every generated SDK
+and repository output. The clean-room dmSDK replay verified 1,361 declarations
+across 135 byte-identical artifacts. Focused native evidence covers exact ABI
+calls, strict compile/link, sanitizer runs, failure clearing, reentrancy and
+bounds, and warmed allocation gates; the script clean room independently kept
+all 102 artifacts and exactly 296 specialized routes byte-identical. No emitted
+runtime byte or selected route changed in this ownership migration.
+
+The reachable policy graph is now 21,513,518 bytes across 127 subtrees, and the
+`@compiler` manifest is 63,671 bytes. Twenty of 28 SDK files (3,985,486 bytes)
+are locally rendered while eight (38,193 bytes) remain snapshots. Eighty-five
+of 113 revision outputs (1,845,392 bytes) are locally rendered while 28
+(118,771 bytes) remain snapshots. Materialization remains compatible with
+published v1 recipes, fail-closed on manifest drift, and keyed/idempotent. This
+is generation, native harness, allocation, and materialization evidence; it is
+not blanket live-engine evidence for every Defold API call.

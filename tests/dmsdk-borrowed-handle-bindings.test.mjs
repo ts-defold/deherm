@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -7,6 +8,13 @@ import { fileURLToPath } from "node:url";
 import test from "node:test";
 
 import { build } from "../scripts/generate-dmsdk-borrowed-handle-bindings.mjs";
+import {
+  DMSDK_BORROWED_HANDLE_ARTIFACTS,
+  DMSDK_BORROWED_HANDLE_RECIPE_FACTS_PATH,
+  DMSDK_BORROWED_HANDLE_REVISION_OUTPUT_PATHS,
+  DMSDK_BORROWED_HANDLE_SDK_OUTPUT_PATH,
+  renderDmSdkBorrowedHandleOutputs,
+} from "../packages/compiler/src/dmsdk-borrowed-handle-output-emitter.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const reportPath = path.join(root, "packages/bindings/generated/defold-dmsdk-borrowed-handle-bindings.json");
@@ -15,6 +23,7 @@ const cxx = process.env.CXX || "clang++";
 const cc = process.env.CC || "clang";
 const run = (command, args, options = {}) =>
   execFileSync(command, args, { cwd: root, encoding: "utf8", stdio: "pipe", ...options });
+const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 const includes = [
   `-I${path.join(root, "defold/defold_hermes/include")}`,
   "-isystem",
@@ -22,6 +31,47 @@ const includes = [
   "-isystem",
   path.join(sdk, "include"),
 ];
+
+test("compiler-owned borrowed-handle recipe reproduces every family output and frozen policy surface byte", async () => {
+  const [recipeText, fixtureText] = await Promise.all([
+    readFile(path.join(root, DMSDK_BORROWED_HANDLE_RECIPE_FACTS_PATH), "utf8"),
+    readFile(path.join(root, "tests/fixtures/policy-surface-old-pipeline/manifest.json"), "utf8"),
+  ]);
+  const recipe = JSON.parse(recipeText);
+  const fixture = JSON.parse(fixtureText);
+  assert.ok(Buffer.byteLength(recipeText) < 90_000, "borrowed-handle recipe must stay below 90 KB");
+  assert.deepEqual(DMSDK_BORROWED_HANDLE_REVISION_OUTPUT_PATHS, [
+    DMSDK_BORROWED_HANDLE_ARTIFACTS.header,
+    DMSDK_BORROWED_HANDLE_ARTIFACTS.runtime,
+    DMSDK_BORROWED_HANDLE_ARTIFACTS.jsi,
+    DMSDK_BORROWED_HANDLE_ARTIFACTS.browser,
+  ]);
+  assert.equal(DMSDK_BORROWED_HANDLE_SDK_OUTPUT_PATH, DMSDK_BORROWED_HANDLE_ARTIFACTS.typescript);
+  const rendered = renderDmSdkBorrowedHandleOutputs(recipe);
+  for (const [relative, content] of rendered) {
+    const actual = await readFile(path.join(root, relative), "utf8");
+    assert.equal(content, actual, `${relative} differs from the source-pipeline output`);
+    const frozen = fixture.outputs[relative];
+    if (frozen) {
+      assert.equal(Buffer.byteLength(content), frozen.bytes, `${relative} frozen byte count drifted`);
+      assert.equal(sha256(content), frozen.sha256, `${relative} differs from the frozen output golden`);
+    }
+  }
+  const frozenSdk = fixture.files["dmsdk/borrowed-handle.ts"];
+  const sdkContent = rendered.get(DMSDK_BORROWED_HANDLE_SDK_OUTPUT_PATH);
+  assert.equal(Buffer.byteLength(sdkContent), frozenSdk.bytes);
+  assert.equal(sha256(sdkContent), frozenSdk.sha256, "borrowed-handle SDK differs from the frozen SDK golden");
+});
+
+test("compiler-owned borrowed-handle recipe fails closed on corrupt semantic indices and arity", async () => {
+  const recipe = JSON.parse(await readFile(path.join(root, DMSDK_BORROWED_HANDLE_RECIPE_FACTS_PATH), "utf8"));
+  const corruptString = structuredClone(recipe);
+  corruptString.entries[0][0] = corruptString.strings.length;
+  assert.throws(() => renderDmSdkBorrowedHandleOutputs(corruptString), /string index is invalid/u);
+  const corruptArity = structuredClone(recipe);
+  corruptArity.maxArguments += 1;
+  assert.throws(() => renderDmSdkBorrowedHandleOutputs(corruptArity), /maximum arity drifted/u);
+});
 
 test("borrowed-handle emission exactly projects the authenticated plan and retains universal coverage", async () => {
   const [report, plan, policy, universal, generator] = await Promise.all([
@@ -99,6 +149,7 @@ test("borrowed-handle generation is clean-room deterministic and treats historic
     for (const artifact of [
       ...report.artifacts,
       "packages/bindings/generated/defold-dmsdk-borrowed-handle-bindings.json",
+      DMSDK_BORROWED_HANDLE_RECIPE_FACTS_PATH,
     ]) {
       assert.equal(
         await readFile(path.join(directory, artifact), "utf8"),

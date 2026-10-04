@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "kind": "deherm.dmsdk-bounded-output-recipe-facts",
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "family": "xtea-span",
+  "entries": [
+    {
+      "id": 0,
+      "declarationId": "dmsdk:dmCrypt::Decrypt@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:76:156",
+      "symbol": "dmCrypt::Decrypt",
+      "include": "dmsdk/dlib/crypt.h",
+      "wrapper": "deherm_dmsdk_xtea_span_dm_crypt_decrypt",
+      "maximumKeyBytes": 16,
+      "algorithmExpression": "dmCrypt::ALGORITHM_XTEA",
+      "successExpression": "dmCrypt::RESULT_OK"
+    },
+    {
+      "id": 1,
+      "declarationId": "dmsdk:dmCrypt::Encrypt@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:65:155",
+      "symbol": "dmCrypt::Encrypt",
+      "include": "dmsdk/dlib/crypt.h",
+      "wrapper": "deherm_dmsdk_xtea_span_dm_crypt_encrypt",
+      "maximumKeyBytes": 16,
+      "algorithmExpression": "dmCrypt::ALGORITHM_XTEA",
+      "successExpression": "dmCrypt::RESULT_OK"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "kind": "deherm.dmsdk-bounded-output-recipe-facts",
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "family": "fixed-digest",
+  "entries": [
+    {
+      "id": 0,
+      "declarationId": "dmsdk:dmCrypt::HashMd5@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:108:160",
+      "symbol": "dmCrypt::HashMd5",
+      "include": "dmsdk/dlib/crypt.h",
+      "wrapper": "deherm_dmsdk_fixed_digest_dm_crypt_hash_md5",
+      "digestBytes": 16
+    },
+    {
+      "id": 1,
+      "declarationId": "dmsdk:dmCrypt::HashSha1@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:84:157",
+      "symbol": "dmCrypt::HashSha1",
+      "include": "dmsdk/dlib/crypt.h",
+      "wrapper": "deherm_dmsdk_fixed_digest_dm_crypt_hash_sha1",
+      "digestBytes": 20
+    },
+    {
+      "id": 2,
+      "declarationId": "dmsdk:dmCrypt::HashSha256@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:92:158",
+      "symbol": "dmCrypt::HashSha256",
+      "include": "dmsdk/dlib/crypt.h",
+      "wrapper": "deherm_dmsdk_fixed_digest_dm_crypt_hash_sha256",
+      "digestBytes": 32
+    },
+    {
+      "id": 3,
+      "declarationId": "dmsdk:dmCrypt::HashSha512@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:100:159",
+      "symbol": "dmCrypt::HashSha512",
+      "include": "dmsdk/dlib/crypt.h",
+      "wrapper": "deherm_dmsdk_fixed_digest_dm_crypt_hash_sha512",
+      "digestBytes": 64
+    }
+  ]
+}
