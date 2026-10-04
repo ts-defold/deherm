@@ -149,7 +149,13 @@ class ScriptAdapter {
       uint32_t ancestorCount,
       ScriptValue* borrowedHandles = nullptr,
       uint32_t borrowedHandleCapacity = 0,
-      uint32_t* borrowedHandleCount = nullptr) noexcept;
+      uint32_t* borrowedHandleCount = nullptr,
+      const universal_value::ResultShapeNode* expectedShape = nullptr) noexcept;
+  bool readUniversalSemanticHandle(
+      const universal_value::ResultShapeNode& shape,
+      int stackIndex,
+      ScriptValue* output,
+      bool* ok) noexcept;
   /**
    * Decide a universal-value result the route declares to be a rooted
    * borrowed handle, capturing it into the semantic registry so it is the

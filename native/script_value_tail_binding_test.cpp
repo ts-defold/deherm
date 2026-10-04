@@ -53,6 +53,7 @@ ScriptValue bytes() { static const unsigned char valueBytes[] = {0x00, 0x80, 0xf
 
 int main() {
   expect(tail::kRouteCount == 26 && tail::kCandidateCount == 26, "generated tail census drifted");
+  expect(tail::kMaximumArgumentCount == 6, "generated tail stack bound drifted");
   const tail::Route* hashToHex = tail::find(UINT32_C(0x2cf8087e));
   const tail::Route* imageType = tail::find(UINT32_C(0xf6c4cfba));
   const tail::Route* namedEnum = tail::find(UINT32_C(0xcfd38b11));

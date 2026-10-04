@@ -41,6 +41,7 @@ import {
   tagDigestLength,
   targetDebugLibraryName,
 } from "../scripts/lib/artifact-releases.mjs";
+import { installNativeArtifacts } from "../scripts/lib/native-artifact-install.mjs";
 
 const execFileAsync = promisify(execFile);
 const packager = path.join(repositoryRoot, "toolchains/hermes/package-archive.sh");
@@ -163,7 +164,7 @@ test("an archive round-trips through the download side, flat and still executabl
   assert.equal((await stat(path.join(unpacked, "libhermes.a"))).mode & 0o111, 0o111);
 });
 
-test("publisher integrity binds the archive and every exact member before installation", async (t) => {
+test("publisher integrity binds the archive, exact target asset, and every member before installation", async (t) => {
   const directory = await scratch(t);
   const release = path.join(directory, "libhermes.a");
   const config = path.join(directory, "libhermesvm-config.h");
@@ -181,6 +182,10 @@ test("publisher integrity binds the archive and every exact member before instal
   };
   const integrity = await buildReleaseIntegrity({ ...identity, archive });
   validateReleaseIntegrity(integrity, identity);
+  assert.throws(
+    () => validateReleaseIntegrity(integrity, { ...identity, asset: "hermes-x86_64-linux.tar.gz" }),
+    /asset mismatch/u,
+  );
   await verifyReleaseArchive({ archive, integrity });
   const extracted = path.join(directory, "verified");
   await extractReleaseArchive({ archive, destination: extracted });
@@ -252,6 +257,120 @@ test("a substituted valid archive is rejected by the original publisher expectat
   await assert.rejects(verifyReleaseArchive({ archive, integrity }), /publisher integrity document/u);
 });
 
+async function installFixture(t) {
+  const directory = await scratch(t);
+  const source = path.join(directory, "source");
+  const downloadRoot = path.join(directory, "download");
+  const extracted = path.join(downloadRoot, "hermes-arm64-osx");
+  await mkdir(source);
+  await mkdir(extracted, { recursive: true });
+  const asset = "hermes-arm64-osx.tar.gz";
+  const fingerprint = "a".repeat(64);
+  const tag = "libs-aaaaaaaaaaaa";
+  const members = ["libhermes.a", "libhermes.debug.a", "libhermesvm-config.h"];
+  const archive = path.join(directory, asset);
+  const release = path.join(source, members[0]);
+  const debug = path.join(source, members[1]);
+  const config = path.join(source, members[2]);
+  await writeFile(release, "publisher release library");
+  await writeFile(debug, "publisher debug library");
+  await writeFile(config, "publisher target config");
+  await pack(archive, [release, debug, config]);
+  const integrity = await buildReleaseIntegrity({
+    family: "native-artifacts",
+    tag,
+    fingerprint,
+    asset,
+    archive,
+  });
+  const artifact = {
+    status: "required-missing",
+    library: "lib/arm64-osx/libhermes.a",
+  };
+  const manifest = { targets: { "arm64-osx": artifact } };
+  const expectedByTarget = new Map([["arm64-osx", { integrity, tag, fingerprint, asset }]]);
+  const installCopy = async (name, bytes) => writeFile(path.join(extracted, name), bytes);
+  return {
+    directory,
+    downloadRoot,
+    source,
+    extracted,
+    archive,
+    integrity,
+    manifest,
+    expectedByTarget,
+    artifact,
+    installCopy,
+  };
+}
+
+test("native install rejects corrupted downloaded library bytes before copying or pinning them", async (t) => {
+  const fixture = await installFixture(t);
+  await fixture.installCopy("libhermes.a", "corrupted release library");
+  await fixture.installCopy("libhermes.debug.a", await readFile(path.join(fixture.source, "libhermes.debug.a")));
+  const destination = path.join(fixture.directory, "lib/arm64-osx/libhermes.a");
+  await mkdir(path.dirname(destination), { recursive: true });
+  await writeFile(destination, "existing trusted library");
+
+  await assert.rejects(
+    installNativeArtifacts({
+      manifest: fixture.manifest,
+      downloadRoot: fixture.downloadRoot,
+      expectedByTarget: fixture.expectedByTarget,
+      root: fixture.directory,
+      minimumBytes: 1,
+    }),
+    /does not match its publisher integrity document/u,
+  );
+  assert.equal(await readFile(destination, "utf8"), "existing trusted library");
+  assert.equal(fixture.artifact.status, "required-missing");
+  assert.equal(fixture.artifact.sha256, undefined);
+});
+
+test("native install rejects a valid substituted library pair against the original publisher expectation", async (t) => {
+  const fixture = await installFixture(t);
+  const substituted = path.join(fixture.directory, "substituted");
+  await mkdir(substituted);
+  const release = path.join(substituted, "libhermes.a");
+  const debug = path.join(substituted, "libhermes.debug.a");
+  const config = path.join(substituted, "libhermesvm-config.h");
+  await writeFile(release, "another valid release library");
+  await writeFile(debug, "another valid debug library");
+  await writeFile(config, "another valid target config");
+  const substitutedArchive = path.join(fixture.directory, "substituted.tar.gz");
+  await pack(substitutedArchive, [release, debug, config]);
+  // This proves the alternate archive is structurally valid and has its own
+  // publisher document; install still has only the original trusted record.
+  const substitutedIntegrity = await buildReleaseIntegrity({
+    family: "native-artifacts",
+    tag: fixture.integrity.tag,
+    fingerprint: fixture.integrity.fingerprint,
+    asset: fixture.integrity.asset,
+    archive: substitutedArchive,
+  });
+  validateReleaseIntegrity(substitutedIntegrity, {
+    family: "native-artifacts",
+    tag: fixture.integrity.tag,
+    fingerprint: fixture.integrity.fingerprint,
+    asset: fixture.integrity.asset,
+  });
+  await fixture.installCopy("libhermes.a", await readFile(release));
+  await fixture.installCopy("libhermes.debug.a", await readFile(debug));
+
+  await assert.rejects(
+    installNativeArtifacts({
+      manifest: fixture.manifest,
+      downloadRoot: fixture.downloadRoot,
+      expectedByTarget: fixture.expectedByTarget,
+      root: fixture.directory,
+      minimumBytes: 1,
+    }),
+    /does not match its publisher integrity document/u,
+  );
+  assert.equal(fixture.artifact.status, "required-missing");
+  assert.equal(fixture.artifact.sha256, undefined);
+});
+
 test("the packager refuses an input that does not exist rather than shipping a short archive", async (t) => {
   const directory = await scratch(t);
   const present = path.join(directory, "libhermes.a");
@@ -302,6 +421,13 @@ test("every family publishes one archive per matrix row, named for that row", as
       assert.ok(key, `${name} row names neither a host nor a bundle target`);
       assert.match(row.asset, /\.tar\.gz$/, `${name} must publish archives, not loose files`);
       assert.ok(row.asset.endsWith(`-${key}.tar.gz`), `${row.asset} is not named for ${key}`);
+      if (name === "native-artifacts") {
+        assert.equal(
+          row.asset,
+          `hermes-${row.target}.tar.gz`,
+          "the authenticated asset name must bind its bundle target",
+        );
+      }
       // An archive that names no contents is an archive the download side
       // cannot look inside, which is how the old flat names got parsed back out
       // of a string in the first place.

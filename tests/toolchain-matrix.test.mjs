@@ -500,6 +500,26 @@ test("a target release already in the content-addressed cache installs without n
   }
 });
 
+test("the publisher-authenticated asset name must identify the requested native target", async () => {
+  const project = await mkdtemp(path.join(tmpdir(), "deherm-target-asset-binding."));
+  try {
+    await writeProjectLock(project);
+    const lock = JSON.parse(await readFile(path.join(project, "deherm.lock"), "utf8"));
+    lock.artifacts.artifacts["native-artifacts"].assets["arm64-osx"] = "hermes-x86_64-linux.tar.gz";
+    await assert.rejects(
+      ensureProjectNativeArtifact(project, "arm64-macos", {
+        lock,
+        offline: true,
+        cacheRoot: path.join(project, "cache"),
+      }),
+      /arm64-osx publisher asset mapping must name hermes-arm64-osx\.tar\.gz/u,
+    );
+    await assert.rejects(stat(path.join(project, "defold_hermes")), { code: "ENOENT" });
+  } finally {
+    await rm(project, { recursive: true, force: true });
+  }
+});
+
 test("deherm doctor reports the matrix and rejects a target Defold does not declare", () => {
   const result = spawnSync(
     process.execPath,

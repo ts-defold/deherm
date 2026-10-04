@@ -313,6 +313,11 @@ export async function ensureProjectNativeArtifact(projectRoot, defoldPlatform, o
   }).catch(() => null);
   if (current) return { ...current, cache: null, installed: [], reused: true };
   const asset = family.assets?.[target.extenderTarget];
+  if (asset !== `hermes-${target.extenderTarget}.tar.gz`) {
+    throw new Error(
+      `${target.extenderTarget} publisher asset mapping must name hermes-${target.extenderTarget}.tar.gz`,
+    );
+  }
   const integrityReference = family.integrity?.[target.extenderTarget];
   const members = releaseArtifactMembers(family, target.extenderTarget);
   if (!asset || members.length === 0 || !/^[a-f0-9]{64}$/u.test(integrityReference?.sha256 ?? "")) {

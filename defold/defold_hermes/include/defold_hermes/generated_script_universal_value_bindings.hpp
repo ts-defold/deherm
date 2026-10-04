@@ -34,6 +34,7 @@ struct Operation {
    * generators from the same pinned classification.
    */
   uint16_t resultSemanticKind;
+  uint32_t resultShapeRoot;
   /**
    * Per-call frame scratch this route's value shapes can reach, derived from
    * the same projected signature the arity fields come from. A transport sizes
@@ -44,6 +45,20 @@ struct Operation {
   uint8_t matrix4Arena;
   uint8_t urlArena;
   uint8_t constant;
+};
+
+enum class ResultShapeKind : uint8_t { kOpaque, kTuple, kScalar, kHandle, kOptional, kUnion, kSequence, kMap, kRecord };
+
+struct ResultShapeNode {
+  ResultShapeKind kind;
+  uint16_t semanticKind;
+  uint32_t firstChild;
+  uint32_t childCount;
+};
+
+struct ResultShapeEdge {
+  uint32_t child;
+  const char* key;
 };
 
 struct LuaApi {
@@ -60,6 +75,8 @@ inline constexpr uint32_t kMaximumStringBytes = 65536;
 
 const Operation* operations() noexcept;
 const Operation* find(uint32_t stableId) noexcept;
+const ResultShapeNode* resultShapes() noexcept;
+const ResultShapeEdge* resultShapeEdges() noexcept;
 DispatchStatus dispatch(ScriptCallFrame*, char*, size_t, const LuaApi*) noexcept;
 
 }  // namespace defold_hermes::universal_value

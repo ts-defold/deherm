@@ -44,6 +44,20 @@ the returned tag plus any named integer domain. The generator derives this tail 
 classifier, and already-owned value/URL reports, so it executes before API
 accounting without a dependency cycle.
 
+The generator also publishes the maximum candidate arity. Before binding a
+value-tail Lua function or pushing its arguments, the adapter reserves that
+fixed maximum plus three stack slots inside `ProtectedDispatch`. This keeps
+Lua stack growth and string interning within the `lua_cpcall` error boundary;
+the native call frame remains the bounded, allocation-free staging area. The
+generated recording-engine harness injects allocator failure on a unique
+value-tail string argument and verifies dispatch rejection, stack and instance
+restoration, and return through an outer C++ destructor guard. The jump does
+cross the C++ helper frames inside the protected callback; the push path uses
+only trivially destructible automatic state, so `lua_cpcall` catches the jump
+before it bypasses a non-trivial C++ destructor. This is host Lua
+failure-containment evidence, not a claim that value-tail calls are allocation
+free or that no C++ frames are crossed.
+
 ## Overload dispatch
 
 The classifier contains 23 overload routes. Three (`vmath.normalize`,

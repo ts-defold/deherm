@@ -119,6 +119,70 @@ bool containsCallback(const ScriptValue& value, uint32_t depth = 0) noexcept {
   return false;
 }
 
+const universal_value::ResultShapeNode* resultShapeChild(
+    const universal_value::ResultShapeNode& shape,
+    uint32_t childIndex) noexcept {
+  if (childIndex >= shape.childCount) return nullptr;
+  const auto* edges = universal_value::resultShapeEdges();
+  const auto* nodes = universal_value::resultShapes();
+  const auto& edge = edges[shape.firstChild + childIndex];
+  return nodes + edge.child;
+}
+
+bool resultShapeMatchesLuaType(
+    lua_State* state,
+    int stackIndex,
+    const universal_value::ResultShapeNode& shape) noexcept {
+  switch (shape.kind) {
+    case universal_value::ResultShapeKind::kOpaque:
+      return true;
+    case universal_value::ResultShapeKind::kTuple:
+    case universal_value::ResultShapeKind::kSequence:
+    case universal_value::ResultShapeKind::kMap:
+    case universal_value::ResultShapeKind::kRecord:
+      return lua_type(state, stackIndex) == LUA_TTABLE;
+    case universal_value::ResultShapeKind::kScalar: {
+      const int type = lua_type(state, stackIndex);
+      return type == LUA_TNIL || type == LUA_TBOOLEAN || type == LUA_TNUMBER || type == LUA_TSTRING;
+    }
+    case universal_value::ResultShapeKind::kHandle:
+      return lua_type(state, stackIndex) == LUA_TUSERDATA || lua_type(state, stackIndex) == LUA_TLIGHTUSERDATA;
+    case universal_value::ResultShapeKind::kOptional: {
+      if (lua_isnil(state, stackIndex)) return true;
+      const auto* child = resultShapeChild(shape, 0);
+      return child && resultShapeMatchesLuaType(state, stackIndex, *child);
+    }
+    case universal_value::ResultShapeKind::kUnion: {
+      for (uint32_t index = 0; index < shape.childCount; ++index) {
+        const auto* child = resultShapeChild(shape, index);
+        if (child && resultShapeMatchesLuaType(state, stackIndex, *child)) return true;
+      }
+      return false;
+    }
+  }
+  return false;
+}
+
+const universal_value::ResultShapeNode* selectResultShape(
+    lua_State* state,
+    int stackIndex,
+    const universal_value::ResultShapeNode* shape) noexcept {
+  if (!shape) return nullptr;
+  if (shape->kind == universal_value::ResultShapeKind::kOptional) {
+    if (lua_isnil(state, stackIndex)) return shape;
+    return selectResultShape(state, stackIndex, resultShapeChild(*shape, 0));
+  }
+  if (shape->kind != universal_value::ResultShapeKind::kUnion) return shape;
+  const universal_value::ResultShapeNode* selected = nullptr;
+  for (uint32_t index = 0; index < shape->childCount; ++index) {
+    const auto* child = resultShapeChild(*shape, index);
+    if (!child || !resultShapeMatchesLuaType(state, stackIndex, *child)) continue;
+    if (selected) return nullptr;
+    selected = child;
+  }
+  return selectResultShape(state, stackIndex, selected);
+}
+
 uint64_t packHandle(Handle handle) noexcept {
   return static_cast<uint64_t>(handle.slot) |
       (static_cast<uint64_t>(handle.generation) << 32u);
@@ -1583,7 +1647,23 @@ value_tail::DispatchStatus ScriptAdapter::invokeValueTail(
     char* error,
     size_t errorCapacity) noexcept {
   using Status = value_tail::DispatchStatus;
-  if (!state_ || !frame || !bindValueTail(route)) {
+  if (!state_ || !frame) {
+    writeError(error, errorCapacity, "Defold value-tail Lua backend is not initialized");
+    return Status::kError;
+  }
+  // Reserve the full generated bound before any registry lookup or argument
+  // push. This runs from ProtectedDispatch, which catches allocator longjmp.
+  // Lua's jump still unwinds these C++ helper frames, so keep their automatic
+  // state trivially destructible; native argument staging remains fixed and
+  // allocation-free.
+  constexpr int kValueTailStackReserve =
+      static_cast<int>(value_tail::kMaximumArgumentCount + 3);
+  if (!lua_checkstack(state_, kValueTailStackReserve)) {
+    writeError(error, errorCapacity,
+        "Defold value-tail Lua backend cannot reserve its bounded stack frame");
+    return Status::kError;
+  }
+  if (!bindValueTail(route)) {
     writeError(error, errorCapacity, lastError());
     return Status::kError;
   }
@@ -2022,10 +2102,17 @@ bool ScriptAdapter::readUniversalValue(
     uint32_t ancestorCount,
     ScriptValue* borrowedHandles,
     uint32_t borrowedHandleCapacity,
-    uint32_t* borrowedHandleCount) noexcept {
+    uint32_t* borrowedHandleCount,
+    const universal_value::ResultShapeNode* expectedShape) noexcept {
   if (!state_ || !output || !frame) return fail("Universal-value result reader is not initialized");
   const int absoluteIndex = stackIndex < 0 ? lua_gettop(state_) + stackIndex + 1 : stackIndex;
   *output = {};
+  expectedShape = selectResultShape(state_, absoluteIndex, expectedShape);
+  if (expectedShape && expectedShape->kind == universal_value::ResultShapeKind::kHandle &&
+      expectedShape->semanticKind != 0) {
+    bool semanticOk = true;
+    if (readUniversalSemanticHandle(*expectedShape, absoluteIndex, output, &semanticOk)) return semanticOk;
+  }
   switch (lua_type(state_, absoluteIndex)) {
     case LUA_TNIL:
       output->tag = ScriptValueTag::kNull;
@@ -2170,12 +2257,35 @@ bool ScriptAdapter::readUniversalValue(
       uint32_t entry = 0;
       lua_pushnil(state_);
       while (lua_next(state_, absoluteIndex) != 0) {
+        const universal_value::ResultShapeNode* keyShape = nullptr;
+        const universal_value::ResultShapeNode* valueShape = nullptr;
+        if (expectedShape) {
+          const auto* edges = universal_value::resultShapeEdges();
+          if (expectedShape->kind == universal_value::ResultShapeKind::kSequence) {
+            valueShape = resultShapeChild(*expectedShape, 0);
+          } else if (expectedShape->kind == universal_value::ResultShapeKind::kMap) {
+            keyShape = resultShapeChild(*expectedShape, 0);
+            valueShape = resultShapeChild(*expectedShape, 1);
+          } else if (expectedShape->kind == universal_value::ResultShapeKind::kRecord &&
+              lua_type(state_, -2) == LUA_TSTRING) {
+            size_t keyLength = 0;
+            const char* keyText = lua_tolstring(state_, -2, &keyLength);
+            for (uint32_t fieldIndex = 0; fieldIndex < expectedShape->childCount; ++fieldIndex) {
+              const auto& edge = edges[expectedShape->firstChild + fieldIndex];
+              if (edge.key && std::strlen(edge.key) == keyLength &&
+                  std::memcmp(edge.key, keyText, keyLength) == 0) {
+                valueShape = universal_value::resultShapes() + edge.child;
+                break;
+              }
+            }
+          }
+        }
         if (!readUniversalValue(-2, &entries[entry].key, frame, depth + 1,
                 nextAncestors.data(), ancestorCount + 1, borrowedHandles,
-                borrowedHandleCapacity, borrowedHandleCount) ||
+                borrowedHandleCapacity, borrowedHandleCount, keyShape) ||
             !readUniversalValue(-1, &entries[entry].value, frame, depth + 1,
                 nextAncestors.data(), ancestorCount + 1, borrowedHandles,
-                borrowedHandleCapacity, borrowedHandleCount)) {
+                borrowedHandleCapacity, borrowedHandleCount, valueShape)) {
           lua_pop(state_, 2);
           return false;
         }
@@ -2246,6 +2356,41 @@ bool ScriptAdapter::readUniversalSemanticHandleResult(
   return true;
 }
 
+bool ScriptAdapter::readUniversalSemanticHandle(
+    const universal_value::ResultShapeNode& shape,
+    int stackIndex,
+    ScriptValue* output,
+    bool* ok) noexcept {
+  if (!output || !ok || shape.kind != universal_value::ResultShapeKind::kHandle ||
+      shape.semanticKind == 0) return false;
+  const int type = lua_type(state_, stackIndex);
+  if (type == LUA_TNIL) return false;
+  if (!handleRouter_) {
+    *ok = fail("Universal-value nested semantic handle has no active handle router");
+    return true;
+  }
+  const auto kind = static_cast<::defold_hermes::script_handle_lowering::SemanticHandleKind>(
+      shape.semanticKind);
+  if (!handleRouter_->capturableKind(kind)) {
+    *ok = fail("Universal-value nested semantic handle kind is not rooted in the active runtime profile");
+    return true;
+  }
+  if (type == LUA_TLIGHTUSERDATA) {
+    *ok = fail("Universal-value nested semantic handle is light userdata with no rooted identity");
+    return true;
+  }
+  if (type != LUA_TUSERDATA) {
+    *ok = fail("Universal-value nested semantic handle is not userdata");
+    return true;
+  }
+  if (!handleRouter_->captureHandle(stackIndex, kind, output)) {
+    *ok = fail("Universal-value nested semantic handle registry is exhausted");
+    return true;
+  }
+  *ok = true;
+  return true;
+}
+
 universal_value::DispatchStatus ScriptAdapter::invokeUniversalValue(
     const universal_value::Operation& operation,
     ScriptCallFrame* frame,
@@ -2305,13 +2450,17 @@ universal_value::DispatchStatus ScriptAdapter::invokeUniversalValue(
     ok = fail("Universal-value Lua result count is outside the generated range");
   }
   const void* ancestors[universal_value::kMaximumDepth]{};
+  const auto* operationShape = universal_value::resultShapes() + operation.resultShapeRoot;
   if (ok) {
     for (int index = 0; index < actualResultCount; ++index) {
+      const auto* resultShape = operationShape->kind == universal_value::ResultShapeKind::kTuple
+          ? resultShapeChild(*operationShape, static_cast<uint32_t>(index))
+          : nullptr;
       if (!readUniversalSemanticHandleResult(operation, callBase + 1 + index,
               actualResultCount, &frame->results[index], &ok)) {
         if (!ok) break;
         if (!readUniversalValue(callBase + 1 + index, &frame->results[index], frame,
-                0, ancestors, 0)) {
+                0, ancestors, 0, nullptr, 0, nullptr, resultShape)) {
           ok = false;
           break;
         }

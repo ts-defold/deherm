@@ -53,6 +53,29 @@ globalThis.__defoldAppV1 = {
       "info",
       `handle:${body.kind}:${body.runtime}:${body.slot}:${body.generation}:${Object.keys(body).sort().join(",")}:true:${typeof body.dispose}`,
     );
+
+    const nestedJoint = b2d.body.getJoints(body)[0]! as typeof body & {
+      readonly kind: string;
+      dispose(): void;
+    };
+    const sameHostHandleShape = nestedJoint.kind === "box2d-joint" &&
+      nestedJoint.runtime === body.runtime && typeof nestedJoint.dispose === "function";
+    const returnedBody = b2d.joint.getBodyA(nestedJoint);
+    const nestedHandleShape = nestedJoint.kind === "box2d-joint" &&
+      returnedBody.kind === "box2d-body" && typeof returnedBody.dispose === "function";
+    nestedJoint.dispose();
+    let nestedStaleRejected = false;
+    try {
+      b2d.joint.getBodyA(nestedJoint);
+    } catch {
+      nestedStaleRejected = true;
+    }
+    globalThis.__defoldHostV1.log(
+      "info",
+      `nested-handle:${nestedJoint.kind}:${sameHostHandleShape && nestedHandleShape}:${nestedStaleRejected}`,
+    );
+    returnedBody.dispose();
+
     body.dispose();
     body.dispose();
     let disposedRejected = false;

@@ -514,6 +514,20 @@ that predate the pinned records; a malformed record fails closed rather than
 silently taking that fallback. The revision policy carries the same records for
 target archives selected from a project's Defold revision.
 
+For native target archives, the trusted matrix maps each bundle target to the
+exact asset name `hermes-<target>.tar.gz`. The authenticated sidecar binds that
+asset name, release tag, recipe fingerprint, archive digest, and per-member
+library digests; the target-to-asset mapping therefore binds the authenticated
+record to the selected target without a second target field. The installer
+copies the library digests from that record into `native-artifacts.json`; it
+never learns the expected digest from downloaded bytes. Both release and
+debugger libraries are verified before either is replaced. The normal public
+`pull` path uses the package-pinned sidecar digest offline for its default tag,
+and the publisher metadata API for an explicitly different tag; neither path
+requires `gh` or an authenticated user session. A directory-only `install`
+request fails closed because it has no authenticated expectation to carry into
+the installation step.
+
 | Family | Asset per row | Consumes | Does **not** consume |
 | --- | --- | --- | --- |
 | Hermes host compilers | one archive per host: hermesc + shermes | `HERMES_URL`, `HERMES_REV`, `build-host-compilers.sh`, `package-archive.sh` | anything of Defold's, anything of Go's |

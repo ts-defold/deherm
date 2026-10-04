@@ -222,6 +222,22 @@ int GetBody(lua_State* state) {
   return 1;
 }
 
+int GetJoints(lua_State* state) {
+  CheckInstance(state);
+  if (!lua_isuserdata(state, 1)) return luaL_error(state, "body userdata missing");
+  lua_createtable(state, 1, 0);
+  lua_newuserdata(state, 16);
+  lua_rawseti(state, -2, 1);
+  return 1;
+}
+
+int GetBodyA(lua_State* state) {
+  ++gObservedCalls;
+  if (!lua_isuserdata(state, 1)) return luaL_error(state, "joint userdata missing");
+  lua_newuserdata(state, 8);
+  return 1;
+}
+
 int DumpBody(lua_State* state) {
   ++gObservedCalls;
   if (!lua_isuserdata(state, 1)) return luaL_error(state, "body userdata missing");
@@ -324,6 +340,8 @@ int main(int argc, char** argv) {
   const luaL_Reg sound[] = {{"get_group_gain", GetGroupGain}, {nullptr, nullptr}};
   const luaL_Reg vmath[] = {{"dot", Dot}, {nullptr, nullptr}};
   const luaL_Reg b2d[] = {{"get_body", GetBody}, {nullptr, nullptr}};
+  const luaL_Reg b2dBody[] = {{"dump", DumpBody}, {"get_joints", GetJoints}, {nullptr, nullptr}};
+  const luaL_Reg b2dJoint[] = {{"get_body_a", GetBodyA}, {nullptr, nullptr}};
   const luaL_Reg socket[] = {
     {"newtry", SocketNewTry}, {"protect", SocketProtect}, {nullptr, nullptr}
   };
@@ -334,13 +352,9 @@ int main(int argc, char** argv) {
   Register(state, "sound", sound);
   Register(state, "vmath", vmath);
   Register(state, "b2d", b2d);
+  Register(state, "b2d.body", b2dBody);
+  Register(state, "b2d.joint", b2dJoint);
   Register(state, "socket", socket);
-  lua_getglobal(state, "b2d");
-  lua_newtable(state);
-  lua_pushcfunction(state, DumpBody);
-  lua_setfield(state, -2, "dump");
-  lua_setfield(state, -2, "body");
-  lua_pop(state, 1);
 
   scalar::ScriptAdapter adapter;
   const auto* runtimeProfile = defold_hermes::script_handle_lowering::findRuntimeProfile("default-legacy-bullet");
@@ -425,7 +439,7 @@ int main(int argc, char** argv) {
     lua_gc(state, LUA_GCCOLLECT, 0);
     if (gCallbackArgumentGc != 1) Fail("successful callback argument userdata root was not released");
 
-  if (host.transcript.size() != 20) Fail("unexpected TypeScript transcript size");
+  if (host.transcript.size() != 21) Fail("unexpected TypeScript transcript size");
   if (host.transcript[0] != "info:values:42:128:00ff:true") Fail("scalar values did not cross the full bridge");
   if (host.transcript[1] != "info:vmath:3:5:0.600000:0.800000:1.000000:4") Fail("Defold values did not cross the full Hermes bridge");
   if (host.transcript[2] != "info:overload-dot:25") Fail("overload route did not cross dynamic Hermes and Lua");
@@ -436,28 +450,29 @@ int main(int argc, char** argv) {
       host.transcript[6].find(":dispose,generation,kind,runtime,slot:true:function") == std::string::npos) {
     Fail("semantic HostObject properties were not exposed");
   }
-  if (host.transcript[7] != "info:handle-disposed:true") Fail("explicit handle dispose was not enforced");
-  if (host.transcript[8] != "info:universal:42:ok:3") Fail("recursive universal value graph did not cross Hermes and Lua");
-  if (host.transcript[9] != "info:universal-cycle:true") Fail("recursive universal value graph did not reject a JS cycle");
-  if (host.transcript[10] != "info:universal-lua-cycle:true") Fail("recursive universal value graph did not reject a Lua cycle");
-  if (host.transcript[11] != "info:callback:42:1:1920:1080") Fail("retained JavaScript callback did not cross Lua");
-  if (host.transcript[12] != "info:closure-success:true:payload") Fail("returned Lua closure lost multi-results");
-  if (host.transcript[13] != "info:closure-error:true:1") Fail("returned Lua closure lost error/finalizer semantics");
-  if (host.transcript[14] != "info:protect-success:ok:7") Fail("protected Lua closure lost callback multi-results");
-  if (host.transcript[15] != "info:protect-error:true:protected-boom:2") Fail("protected Lua closure lost tagged error semantics");
-  if (host.transcript[16] != "info:load-resource:resource-data:true:resource-missing") Fail("variable Lua result arity was not normalized for the SDK tuple");
-  if (host.transcript[17].find("not executable yet") == std::string::npos &&
-      host.transcript[17].find("not in the executable scalar family") == std::string::npos &&
-      host.transcript[17].find("handles, tables, and callbacks are not executable yet") == std::string::npos &&
-      host.transcript[17].find("no generated kind tag") == std::string::npos &&
-      host.transcript[17].find("Universal-value Lua function is unavailable") == std::string::npos) {
+  if (host.transcript[7] != "info:nested-handle:box2d-joint:true:true") Fail("nested universal handle did not share branded identity and stale checks");
+  if (host.transcript[8] != "info:handle-disposed:true") Fail("explicit handle dispose was not enforced");
+  if (host.transcript[9] != "info:universal:42:ok:3") Fail("recursive universal value graph did not cross Hermes and Lua");
+  if (host.transcript[10] != "info:universal-cycle:true") Fail("recursive universal value graph did not reject a JS cycle");
+  if (host.transcript[11] != "info:universal-lua-cycle:true") Fail("recursive universal value graph did not reject a Lua cycle");
+  if (host.transcript[12] != "info:callback:42:1:1920:1080") Fail("retained JavaScript callback did not cross Lua");
+  if (host.transcript[13] != "info:closure-success:true:payload") Fail("returned Lua closure lost multi-results");
+  if (host.transcript[14] != "info:closure-error:true:1") Fail("returned Lua closure lost error/finalizer semantics");
+  if (host.transcript[15] != "info:protect-success:ok:7") Fail("protected Lua closure lost callback multi-results");
+  if (host.transcript[16] != "info:protect-error:true:protected-boom:2") Fail("protected Lua closure lost tagged error semantics");
+  if (host.transcript[17] != "info:load-resource:resource-data:true:resource-missing") Fail("variable Lua result arity was not normalized for the SDK tuple");
+  if (host.transcript[18].find("not executable yet") == std::string::npos &&
+      host.transcript[18].find("not in the executable scalar family") == std::string::npos &&
+      host.transcript[18].find("handles, tables, and callbacks are not executable yet") == std::string::npos &&
+      host.transcript[18].find("no generated kind tag") == std::string::npos &&
+      host.transcript[18].find("Universal-value Lua function is unavailable") == std::string::npos) {
     Fail("unsupported family was not explicit");
   }
-  if (host.transcript[18].find("forced config error") == std::string::npos) Fail("Lua error was not propagated");
-  if (host.transcript[19] != "info:after-error:36") Fail("dispatch did not recover after Lua error");
+  if (host.transcript[19].find("forced config error") == std::string::npos) Fail("Lua error was not propagated");
+  if (host.transcript[20] != "info:after-error:36") Fail("dispatch did not recover after Lua error");
   if (gCurrentInstance != 7) Fail("Defold script instance was not restored");
   if (lua_gettop(state) != baseTop) Fail("Lua stack was not restored");
-  if (gObservedCalls != 27) Fail("unexpected number of Lua calls");
+  if (gObservedCalls != 29) Fail("unexpected number of Lua calls");
   if (gTitle != "deherm") Fail("void scalar call did not execute");
   if (bridgeHarness.byteCalls != 2) Fail("Uint8Array and ArrayBuffer did not both cross the JSI byte carrier");
 

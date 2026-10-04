@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-import { createHash, randomBytes } from "node:crypto";
-import { cp, mkdir, readFile, readdir, rename, rm, stat, writeFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import { mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import {
@@ -24,6 +24,7 @@ import {
   deriveBundleTargets,
   readBundleTargets,
 } from "./generate-defold-bundle-targets.mjs";
+import { installNativeArtifacts } from "./lib/native-artifact-install.mjs";
 // The input set that decides these bytes - and therefore the release tag - is
 // declared in one place for all three artifact families. It hashes the Hermes
 // pin and the per-target build recipe, and only the `sdk` and `targets` fields
@@ -35,7 +36,6 @@ import {
   fingerprintFamily,
   publishedAssets,
   targetDebugLibraryName,
-  targetLibraryName,
 } from "./lib/artifact-releases.mjs";
 
 const FAMILY = "native-artifacts";
@@ -52,19 +52,6 @@ const knownStatuses = new Set(["vendored", "vendored-source", "required-missing"
 
 function digest(bytes) {
   return createHash("sha256").update(bytes).digest("hex");
-}
-
-async function filesBelow(directory) {
-  const files = [];
-  async function visit(current) {
-    for (const entry of await readdir(current, { withFileTypes: true })) {
-      const absolute = path.join(current, entry.name);
-      if (entry.isDirectory()) await visit(absolute);
-      else if (entry.isFile()) files.push(absolute);
-    }
-  }
-  await visit(directory);
-  return files;
 }
 
 function installable(artifact) {
@@ -96,66 +83,9 @@ export function debugLibraryPath(target, artifact) {
   return path.posix.join(path.posix.dirname(artifact.library), targetDebugLibraryName(target, artifact));
 }
 
-async function install(downloadRoot) {
+async function install(downloadRoot, expectedByTarget) {
   const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
-  const available = await filesBelow(path.resolve(downloadRoot));
-  const installed = [];
-  for (const [target, artifact] of Object.entries(manifest.targets)) {
-    if (!installable(artifact)) continue;
-    // The archive unpacks into a directory named for the row it answers for, so
-    // both libraries are found the same way and neither is matched by parsing a
-    // flat asset name.
-    const find = (name) => {
-      const candidates = available.filter(
-        (file) => path.basename(file) === name && file.split(path.sep).includes(`hermes-${target}`),
-      );
-      if (candidates.length > 1)
-        throw new Error(`Expected one ${name} in hermes-${target}, found ${candidates.length}`);
-      return candidates[0] ?? null;
-    };
-    const release = find(targetLibraryName(target, artifact));
-    // A download that carries nothing for a target leaves that target alone, so
-    // one platform's build failing in CI never silently unpins another's digest.
-    if (!release) continue;
-
-    const place = async (source, relative) => {
-      const destination = path.join(root, relative);
-      const temporary = `${destination}.deherm-replace-${process.pid}-${randomBytes(5).toString("hex")}`;
-      await mkdir(path.dirname(destination), { recursive: true });
-      try {
-        await cp(source, temporary, { errorOnExist: true, force: false });
-        // An example/project copy may still share the old inode. Never
-        // truncate it while refreshing the contributor checkout.
-        // Replace the directory entry atomically; never truncate the inode a
-        // project copy may still share with the contributor checkout.
-        await rename(temporary, destination);
-      } finally {
-        await rm(temporary, { force: true });
-      }
-      const bytes = await readFile(destination);
-      if (bytes.byteLength < 1_000_000) throw new Error(`${relative} is implausibly small (${bytes.byteLength} bytes)`);
-      return bytes;
-    };
-
-    const bytes = await place(release, artifact.library);
-    artifact.status = "vendored";
-    artifact.sha256 = digest(bytes);
-    artifact.bytes = bytes.byteLength;
-
-    // The debugger-enabled variant is a second compilation, shipped in the same
-    // archive. It is recorded when present rather than required, because the
-    // locally-packaged macOS artifact is produced by one `libtool` invocation
-    // that has no second build behind it.
-    const debug = find(targetDebugLibraryName(target, artifact));
-    if (debug) {
-      const debugRelative = debugLibraryPath(target, artifact);
-      const debugBytes = await place(debug, debugRelative);
-      artifact.debugLibrary = debugRelative;
-      artifact.debugSha256 = digest(debugBytes);
-      artifact.debugBytes = debugBytes.byteLength;
-    }
-    installed.push(target);
-  }
+  const installed = await installNativeArtifacts({ manifest, downloadRoot, expectedByTarget, root });
   await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
   return installed;
 }
@@ -357,8 +287,7 @@ else if (command === "tag") console.log((await familyRelease(FAMILY, { root })).
 else if (command === "release-metadata") console.log(JSON.stringify(await familyRelease(FAMILY, { root }), null, 2));
 else if (command === "install") {
   if (!args[0]) throw new Error("install requires a downloaded artifact directory");
-  const installed = await install(args[0]);
-  console.log(`installed ${installed.length} native artifact(s): ${installed.join(", ") || "none"}`);
+  throw new Error("Direct install has no publisher-authenticated release expectation; use pull to verify and install");
 } else if (command === "record") {
   if (!args[0]) throw new Error("record requires a target, for example arm64-osx");
   console.log(`recorded ${args[0]} ${await record(args[0])}`);
@@ -411,6 +340,7 @@ else if (command === "verify") {
   // that asked for it, which is what `install` matches on - so nothing here has
   // to re-derive structure by parsing the name it just requested.
   const absent = new Set(missing);
+  const expectedByTarget = new Map();
   for (const row of rows) {
     const integrityAsset = releaseIntegrityAssetName(row.asset);
     if (absent.has(row.asset) || absent.has(integrityAsset)) continue;
@@ -449,8 +379,14 @@ else if (command === "verify") {
       destination: extracted,
     });
     await verifyReleaseArchive({ archive, integrity, extractedRoot: extracted });
+    expectedByTarget.set(row.target, {
+      integrity,
+      tag,
+      fingerprint: integrity.fingerprint,
+      asset: row.asset,
+    });
   }
-  const installed = await install(destination);
+  const installed = await install(destination, expectedByTarget);
   const missingInstalls = rows.map((row) => row.target).filter((target) => !installed.includes(target));
   if (!args.includes("--partial") && missingInstalls.length) {
     throw new Error(`Downloaded archives did not install requested targets: ${missingInstalls.join(", ")}`);
@@ -464,7 +400,7 @@ else if (command === "verify") {
 } else {
   throw new Error(
     "Usage: manage-native-artifacts.mjs {fingerprint|tag|release-metadata|expected-assets|report|" +
-      "verify [--complete] [--json] [--target <bundle-target>]|install <dir>|record <target>|" +
+      "verify [--complete] [--json] [--target <bundle-target>]|record <target>|" +
       "pull [--tag <tag>] [--target <bundle-target>] [--partial]}",
   );
 }

@@ -417,6 +417,20 @@ the same `CapturedLuaRouter` registry instead of reading it as an anonymous
 userdata. 54 routes declare such a result; 21 of them are constructors this
 transport owns.
 
+The same identity now reaches a handle nested in a universal-value result.
+`generate-script-universal-value-bindings.mjs` emits a recursive result-shape
+table from the projected signatures, resolves named record fields through the
+pinned script API IR, and annotates only fields whose exact raw type maps to a
+rooted semantic kind in the borrowed-handle classification. The Lua adapter
+walks that declared shape while reading sequences, maps, and records, captures
+those userdata values into the shared registry, and leaves dynamic, unmapped,
+or ambiguous union values on the opaque userdata path. The existing 48-byte
+wire cell carries the semantic kind in its auxiliary byte, so browser and JSI
+decoders construct the same branded host object used for direct results.
+Release still invalidates the generation-checked registry token; reusing a
+released nested handle is rejected by the same stale-token check as a direct
+handle.
+
 Nothing was added to the handle-lowering table: the table's *consumers* now
 accept what the constructor produces, because both transports produce the same
 identity. The plan records the agreement on that fact rather than on table

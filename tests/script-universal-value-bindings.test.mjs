@@ -110,7 +110,7 @@ test("per-call frame scratch is sized from the same contract the dispatcher enfo
   // descriptor would reject calls the descriptor accepts.
   const declared = [
     ...descriptors.matchAll(
-      /^ {2}\{0x([0-9a-f]{8})u, "([^"]+)", "([^"]*)", "([^"]*)", (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+)\},$/gm,
+      /^ {2}\{0x([0-9a-f]{8})u, "([^"]+)", "([^"]*)", "([^"]*)", (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+)\},$/gm,
     ),
   ].map(
     ([
@@ -125,6 +125,7 @@ test("per-call frame scratch is sized from the same contract the dispatcher enfo
       maximumResultCount,
       ,
       resultSemanticKind,
+      resultShapeRoot,
       inputTableEntryCapacity,
       outputTableEntryCapacity,
       matrix4Arena,
@@ -136,6 +137,7 @@ test("per-call frame scratch is sized from the same contract the dispatcher enfo
       modulePath,
       member,
       resultSemanticKind: Number(resultSemanticKind),
+      resultShapeRoot: Number(resultShapeRoot),
       maximumArgumentCount: Number(maximumArgumentCount),
       maximumResultCount: Number(maximumResultCount),
       inputTableEntryCapacity: Number(inputTableEntryCapacity),
@@ -154,6 +156,7 @@ test("per-call frame scratch is sized from the same contract the dispatcher enfo
     const operation = declared[index];
     const binding = report.bindings[index];
     assert.equal(operation.stableId, binding.stableId, binding.id);
+    assert.equal(operation.resultShapeRoot, binding.resultShapeRoot, binding.id);
     assert.equal(operation.modulePath, binding.modulePath.join("."), binding.id);
     assert.equal(operation.member, binding.member, binding.id);
   }
@@ -171,6 +174,20 @@ test("per-call frame scratch is sized from the same contract the dispatcher enfo
   const constructor = report.bindings.find(({ id }) => id === "script:b2d.joint.create_distance");
   assert.equal(constructor.resultSemanticKind, "box2d-joint");
   assert.equal(constructor.loweringFamily, "lua-table");
+
+  const shapeMetadata = report.resultShapeMetadata;
+  const shapeNode = (index) => shapeMetadata.nodes[index];
+  const shapeChild = (node, index) => shapeMetadata.nodes[shapeMetadata.edges[node.firstChild + index].child];
+  const semanticIdAt = (binding, path) => {
+    let node = shapeNode(binding.resultShapeRoot);
+    for (const child of path) node = shapeChild(node, child);
+    return node.kind === shapeMetadata.kinds.handle ? node.semanticKind : 0;
+  };
+  const overlap = report.bindings.find(({ id }) => id === "script:bullet3d.world.overlap_aabb");
+  assert.equal(shapeNode(overlap.resultShapeRoot).kind, shapeMetadata.kinds.tuple);
+  assert.equal(semanticIdAt(overlap, [0, 0]), 9, "sequence elements carry the bullet-object semantic ID");
+  const rayHits = report.bindings.find(({ id }) => id === "script:bullet3d.world.cast_ray");
+  assert.equal(semanticIdAt(rayHits, [0, 0, 0]), 9, "record fields carry the bullet-object semantic ID");
 
   const profiles = [
     ...dispatcher.matchAll(/&runContractFrame<(\d+)u, (\d+)u, (\d+)u, (\d+)u, (true|false), (true|false)>,/g),
@@ -375,6 +392,9 @@ test("Static Hermes provider type-checks and compiles through the pinned Static 
 });
 
 test("browser provider round-trips recursive direct-memory values and rejects cycles", async () => {
+  const report = JSON.parse(await readFile(reportPath, "utf8"));
+  const nestedHandleStableId = report.bindings.find(({ id }) => id === "script:bullet3d.world.overlap_aabb").stableId;
+  const directHandleStableId = report.bindings.find(({ id }) => id === "script:b2d.joint.get_body_a").stableId;
   const source = await readFile(
     path.join(root, "defold/defold_hermes/lib/web/generated_script_universal_value.js"),
     "utf8",
@@ -408,6 +428,15 @@ test("browser provider round-trips recursive direct-memory values and rejects cy
   const frees = [];
   const liveAllocations = new Map();
   const dispatchPointers = [];
+  function writeHandleCell(pointer, semanticKind) {
+    HEAPU8.fill(0, pointer, pointer + 48);
+    HEAPU8[pointer] = 5;
+    HEAPU8[pointer + 1] = 5;
+    HEAPU8[pointer + 3] = semanticKind;
+    HEAPU32[(pointer + 16) >> 2] = 23;
+    HEAPU32[(pointer + 20) >> 2] = 4;
+    HEAPU32[(pointer + 28) >> 2] = 7;
+  }
   const align = (value) => (value + 15) & ~15;
   const context = {
     HEAPU8,
@@ -515,6 +544,38 @@ test("browser provider round-trips recursive direct-memory values and rejects cy
         HEAPU32[outFloatCount >> 2] = HEAPU32[outUrlCount >> 2] = HEAPU32[resultCount >> 2] = 0;
         return 0;
       }
+      if (stableId === nestedHandleStableId) {
+        HEAPU8.fill(0, outValues, outValues + 3 * 48);
+        HEAPU8.fill(0, outEntries, outEntries + 8);
+        HEAPU8[outValues] = 7;
+        HEAPU8[outValues + 3] = 1;
+        HEAPU32[(outValues + 4) >> 2] = 1;
+        HEAPU32[(outValues + 24) >> 2] = 0;
+        HEAPU8[outValues + 48] = 3;
+        HEAPF64[(outValues + 56) >> 3] = 1;
+        writeHandleCell(outValues + 96, 9);
+        HEAPU32[outEntries >> 2] = 1;
+        HEAPU32[(outEntries + 4) >> 2] = 2;
+        HEAPU32[outValueCount >> 2] = 3;
+        HEAPU32[outEntryCount >> 2] = 1;
+        HEAPU32[outStringCount >> 2] = 0;
+        HEAPU32[outFloatCount >> 2] = 0;
+        HEAPU32[outUrlCount >> 2] = 0;
+        HEAPU32[resultCount >> 2] = 1;
+        HEAPU32[resultRoots >> 2] = 0;
+        return 0;
+      }
+      if (stableId === directHandleStableId) {
+        writeHandleCell(outValues, 1);
+        HEAPU32[outValueCount >> 2] = 1;
+        HEAPU32[outEntryCount >> 2] = 0;
+        HEAPU32[outStringCount >> 2] = 0;
+        HEAPU32[outFloatCount >> 2] = 0;
+        HEAPU32[outUrlCount >> 2] = 0;
+        HEAPU32[resultCount >> 2] = 1;
+        HEAPU32[resultRoots >> 2] = 0;
+        return 0;
+      }
       HEAPU8.copyWithin(outValues, values, values + valueCount * 48);
       HEAPU8.copyWithin(outEntries, entries, entries + entryCount * 8);
       HEAPU8.copyWithin(outStrings, strings, strings + stringCount);
@@ -615,6 +676,19 @@ test("browser provider round-trips recursive direct-memory values and rejects cy
   const outerScratch = dispatchPointers.find(({ stableId }) => stableId === 99).values;
   const nestedScratch = dispatchPointers.find(({ stableId }) => stableId === 100).values;
   assert.notEqual(outerScratch, nestedScratch, "reentrant calls must use separate scratch slots");
+  const nestedHandle = host.call(nestedHandleStableId, [])[0];
+  const directHandle = host.call(directHandleStableId, [0]);
+  assert.equal(nestedHandle.__dehermHandleV1, true);
+  assert.equal(nestedHandle.kind, 5);
+  assert.equal(nestedHandle.semanticKind, 9);
+  assert.equal(nestedHandle.runtime, 7);
+  assert.equal(nestedHandle.payload, (4n << 32n) | 23n);
+  assert.equal(Object.getPrototypeOf(nestedHandle), Object.getPrototypeOf(directHandle));
+  nestedHandle.dispose();
+  nestedHandle.dispose();
+  assert.equal(releases, 1, "nested branded handles use the same idempotent release carrier as direct returns");
+  directHandle.dispose();
+  assert.equal(releases, 2, "direct and nested semantic carriers both release through the host bridge");
   const variableTuple = host.call(0x8993930a, ["resource-data"]);
   assert.deepEqual(
     Array.from(variableTuple),
@@ -629,7 +703,7 @@ test("browser provider round-trips recursive direct-memory values and rejects cy
   const retained = host.call(102, [{ __dehermHandleV1: true, kind: 5, semanticKind: 7, runtime: 3, payload: 12n }]);
   retained.dispose();
   retained.dispose();
-  assert.equal(releases, 1);
+  assert.equal(releases, 3);
 
   let callbackCalls = 0;
   callbackRegistry.runtime = 0x80000001;
@@ -642,7 +716,7 @@ test("browser provider round-trips recursive direct-memory values and rejects cy
         assert.equal(borrowed.borrowed, true);
         assert.equal(borrowed.kind, 3);
         borrowed.dispose();
-        assert.equal(releases, 1, "borrowed callback handles must not release their Lua-owned token from JS");
+        assert.equal(releases, 3, "borrowed callback handles must not release their Lua-owned token from JS");
         return 42.5;
       },
     ]),
