@@ -36,7 +36,11 @@ import { manifestUrl, missingPublishedEntries } from "../scripts/check-published
 import { fetchPolicyText, validateRebuiltHandshake } from "../scripts/check-policy-site-resolution.mjs";
 import { buildShippedIndex, canonicalizePolicyText, generatorRevision } from "../scripts/generate-api-policy.mjs";
 import { apiPolicyGenerator } from "../scripts/lib/script-generator-pipeline.mjs";
-import { policySurfaceArchivePaths, policySurfaceFingerprintRoots } from "../scripts/policy-surface.mjs";
+import {
+  canonicalizePolicySurfaceText,
+  policySurfaceArchivePaths,
+  policySurfaceFingerprintRoots,
+} from "../scripts/policy-surface.mjs";
 import {
   blockerFromLog,
   planPolicyDerivationIssueReconciliation,
@@ -94,7 +98,6 @@ test("policy host parity materializes every authoritative generator input", asyn
   assert.equal((workflow.match(/policy-surface\.mjs pack/gu) ?? []).length, 1);
   assert.equal((workflow.match(/policy-surface\.mjs install/gu) ?? []).length, 4);
   assert.doesNotMatch(workflow, /tar -[cx]zf[^\n]*policy-surface/u);
-  assert.match(parity, /DEHERM_TAR_BASH="\$\(cygpath -w "\$\(command -v bash\)"\)"/u);
   assert.doesNotMatch(parity, /archive="\$\(cygpath/u);
   assert.match(parity, /DEFOLD_REV=\/DEHERM_DERIVED_REVISION=/u);
   assert.match(parity, /DEHERM_CARRIED_REVIEW_LEDGER=/u);
@@ -187,6 +190,15 @@ test("policy host parity materializes every authoritative generator input", asyn
     nativeArtifacts,
     /policy-surface\.mjs extract[\s\S]*--path packages\/toolchains\/defold-bundle-targets\.json/u,
   );
+});
+
+test("policy surface installation canonicalizes text without touching binary members", () => {
+  assert.equal(
+    canonicalizePolicySurfaceText("generated/value.json", Buffer.from('{\r\n  "value": 1\r\n}\r\n')).toString(),
+    '{\n  "value": 1\n}\n',
+  );
+  const binary = Buffer.from([0, 13, 10, 255]);
+  assert.equal(canonicalizePolicySurfaceText("generated/value.bin", binary), binary);
 });
 
 test("LLVM tools resolve versioned Linux binaries and macOS xcrun without false archive failures", () => {
