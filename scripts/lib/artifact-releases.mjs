@@ -75,6 +75,79 @@ const publisherIntegrityInputs = Object.freeze([
 ]);
 
 /**
+ * Target archives do not form one byte-producing recipe. Keep the shared
+ * Hermes pin and archive/integrity machinery common, but fingerprint the four
+ * recipes independently so a packaging edit cannot invalidate unrelated
+ * platforms.
+ *
+ * `targets` is deliberately explicit here: it is also the completeness
+ * boundary checked by the planner and policy projector. A newly derived
+ * bundle target must be classified before it can acquire release coordinates.
+ */
+export const nativeArtifactRecipes = Object.freeze({
+  linux: Object.freeze({
+    targets: Object.freeze(["x86_64-linux", "arm64-linux"]),
+    files: Object.freeze(["toolchains/hermes/Dockerfile.linux", "toolchains/hermes/package-posix.sh"]),
+    sdkFields: Object.freeze([]),
+  }),
+  windows: Object.freeze({
+    targets: Object.freeze(["x86_64-win32"]),
+    files: Object.freeze([
+      "toolchains/hermes/Dockerfile.win32",
+      "toolchains/hermes/build-windows.sh",
+      "toolchains/hermes/package-msvc.sh",
+      "toolchains/hermes/windows-msvc.cmake",
+    ]),
+    sdkFields: Object.freeze([]),
+  }),
+  android: Object.freeze({
+    targets: Object.freeze(["armv7-android", "arm64-android", "x86_64-android"]),
+    files: Object.freeze([
+      "toolchains/hermes/Dockerfile.android",
+      "toolchains/hermes/package-posix.sh",
+      "toolchains/hermes/patches/pass-manager-vector.patch",
+    ]),
+    sdkFields: Object.freeze([
+      "androidNdkVersion",
+      "androidNdkApiVersion",
+      "android64NdkApiVersion",
+      "androidTargetApiLevel",
+    ]),
+  }),
+  apple: Object.freeze({
+    targets: Object.freeze(["arm64-osx", "x86_64-osx", "arm64-ios", "arm64_sim-ios"]),
+    files: Object.freeze(["toolchains/hermes/build-apple.sh"]),
+    sdkFields: Object.freeze(["iphoneosVersionMin", "macosxVersionMin"]),
+  }),
+});
+
+const nativeRecipeByTarget = new Map(
+  Object.entries(nativeArtifactRecipes).flatMap(([recipe, value]) => value.targets.map((target) => [target, recipe])),
+);
+
+// Migration bridge: these four recipe fingerprints are exactly the inputs
+// that produced the already-published aggregate release. Reusing that release
+// is safe because its stronger legacy fingerprint covered the union of all
+// four recipes. As soon as one recipe input changes it leaves this table and
+// acquires its own immutable tag; unchanged recipes keep the proven bytes.
+const nativeArtifactRecipeBaseline = Object.freeze({
+  linux: "82439143d0174285c7032f7c0e2884d3f7835d5494586cd9380e7f38a3075ab2",
+  windows: "5932ac481c7a3e7b882b66e7d7c773b6e07977e969c8c060ee190e820afe05ad",
+  android: "7a0a4206118f668a9a8fa0e031f05248651012f4176a5bc35d94804f965dfbc0",
+  apple: "42a19af934ce7f615e308b673d2dd3a1780dad4149aa32bfb2534fc5e86d5a4a",
+});
+const nativeArtifactLegacyRelease = Object.freeze({
+  tag: "libs-db900fc9f9d8",
+  fingerprint: "db900fc9f9d8000427e944b544916b6277ab0a8f58034c52c25a0843b73a4ec9",
+});
+
+export function nativeArtifactRecipeForTarget(target) {
+  const recipe = nativeRecipeByTarget.get(target);
+  if (!recipe) throw new Error(`No native-artifact recipe is declared for ${target}`);
+  return recipe;
+}
+
+/**
  * The three published artifact families, each with the exact inputs that decide
  * its bytes.
  *
@@ -133,23 +206,11 @@ export const artifactFamilies = Object.freeze({
     assetPrefix: "hermes",
     summary: "Hermes release/debug libraries plus generated target config, per Defold bundle target",
     lockKeys: ["HERMES_URL", "HERMES_REV"],
+    // This union remains the conservative aggregate fingerprint used by old
+    // maintenance commands. Publication uses nativeArtifactRelease(), whose
+    // recipe-specific input graph is the authority for each target row.
     files: [
-      "toolchains/hermes/Dockerfile.linux",
-      "toolchains/hermes/Dockerfile.win32",
-      "toolchains/hermes/Dockerfile.android",
-      "toolchains/hermes/patches/pass-manager-vector.patch",
-      "toolchains/hermes/build-apple.sh",
-      // The fallback Windows lane, which runs whenever no Defold registry
-      // credential is configured. It was missing from the old input list, so a
-      // change to the recipe that actually produced `hermes.lib` on a fork left
-      // the tag - and therefore the published bytes' identity - unchanged.
-      "toolchains/hermes/build-windows.sh",
-      "toolchains/hermes/package-posix.sh",
-      "toolchains/hermes/package-msvc.sh",
-      "toolchains/hermes/windows-msvc.cmake",
-      // The local macOS packaging path, which produces the artifact
-      // `manage-native-artifacts.mjs record` pins.
-      "scripts/package-defold-extension.sh",
+      ...new Set(Object.values(nativeArtifactRecipes).flatMap((recipe) => recipe.files)),
       archivePackager,
       ...publisherIntegrityInputs,
     ],
@@ -254,6 +315,89 @@ export async function fingerprintFamily(name, options = {}) {
     }
   }
   return hash.digest("hex");
+}
+
+async function hashDeclaredFile(hash, root, relative) {
+  const bytes = await readFile(path.join(root, relative));
+  hash.update(`${relative}\0${bytes.byteLength}\0`);
+  hash.update(bytes);
+}
+
+/** Fingerprint one native target recipe at its narrowest safe byte boundary. */
+export async function fingerprintNativeArtifactRecipe(recipeName, options = {}) {
+  const recipe = nativeArtifactRecipes[recipeName];
+  if (!recipe) {
+    throw new Error(
+      `Unknown native-artifact recipe ${recipeName}; declared recipes are ${Object.keys(nativeArtifactRecipes).join(", ")}`,
+    );
+  }
+  const root = options.root ?? repositoryRoot;
+  const hash = createHash("sha256");
+  hash.update(`deherm.native-artifact-recipe\0${recipeName}\0`);
+  const lock = await readLockKeys(path.join(root, "upstream.lock"), ["HERMES_URL", "HERMES_REV"]);
+  for (const key of ["HERMES_URL", "HERMES_REV"]) hash.update(`upstream.lock#${key}\0${lock[key]}\0`);
+  for (const relative of [archivePackager, ...publisherIntegrityInputs, ...recipe.files]) {
+    await hashDeclaredFile(hash, root, relative);
+  }
+  const relative = "packages/toolchains/defold-bundle-targets.json";
+  const document = JSON.parse(await readFile(path.join(root, relative), "utf8"));
+  const targetRecords = Object.fromEntries(
+    recipe.targets.map((target) => {
+      const record = document.targets?.find((candidate) => candidate.target === target);
+      if (!record) throw new Error(`${relative} does not carry ${target}, which ${recipeName} consumes`);
+      return [target, record];
+    }),
+  );
+  const sdk = Object.fromEntries(
+    recipe.sdkFields.map((field) => {
+      if (!(field in (document.sdk ?? {}))) {
+        throw new Error(`${relative}#sdk does not carry ${field}, which ${recipeName} consumes`);
+      }
+      return [field, document.sdk[field]];
+    }),
+  );
+  for (const [field, value] of [
+    ["targets", targetRecords],
+    ["sdk", sdk],
+  ]) {
+    const bytes = Buffer.from(serializeObject(value), "utf8");
+    hash.update(`${relative}#native-recipes.${recipeName}.${field}\0${bytes.byteLength}\0`);
+    hash.update(bytes);
+  }
+  return hash.digest("hex");
+}
+
+export async function nativeArtifactRelease(recipeOrTarget, options = {}) {
+  const recipe = nativeArtifactRecipes[recipeOrTarget] ? recipeOrTarget : nativeArtifactRecipeForTarget(recipeOrTarget);
+  const fingerprint = await fingerprintNativeArtifactRecipe(recipe, options);
+  if (fingerprint === nativeArtifactRecipeBaseline[recipe]) {
+    return {
+      family: "native-artifacts",
+      recipe,
+      ...nativeArtifactLegacyRelease,
+      title: `Hermes target archives ${nativeArtifactLegacyRelease.fingerprint.slice(0, tagDigestLength)}`,
+      notes: `Migration-compatible aggregate release for the unchanged ${recipe} recipe.`,
+    };
+  }
+  const short = fingerprint.slice(0, tagDigestLength);
+  return {
+    family: "native-artifacts",
+    recipe,
+    tag: `libs-${recipe}-${short}`,
+    fingerprint,
+    title: `Hermes ${recipe} target archives ${short}`,
+    notes: [
+      `${artifactFamilies["native-artifacts"].summary}; ${recipe} recipe.`,
+      "",
+      `Input fingerprint (SHA-256): \`${fingerprint}\``,
+      "",
+      "Content-addressed target recipe release. Every row in this release shares exactly this recipe fingerprint.",
+    ].join("\n"),
+  };
+}
+
+export async function artifactReleaseForRow(name, row, options = {}) {
+  return name === "native-artifacts" ? nativeArtifactRelease(row.target, options) : familyRelease(name, options);
 }
 
 /**

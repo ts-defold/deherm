@@ -1,5 +1,24 @@
 # Defold Hermes knowledge log
 
+## 2026-10-04 - Universal catalog recipe compaction
+
+The largest remaining derived compiler catalog is now a compact, lossless
+policy recipe. The policy no longer transports the 3,489,572-byte canonical
+dmSDK universal report object. A package-owned schema/string interpreter
+reconstructs that exact 5,696,531-byte pretty-printed report from a
+1,059,425-byte facts object, preserving every Defold-derived declaration, ABI,
+target, lowering, and public-SDK fact while reducing that object by 2,430,147
+bytes (69.64%). The same reconstructed catalog now renders the 78,195-byte
+native universal dispatcher and 390,388-byte browser direct-memory library
+package-side instead of transporting source snapshots.
+
+The full closure moved from 25,820,704 bytes / 190 subtrees to 22,887,346 bytes
+/ 188 subtrees. The compiler manifest is 65,468 bytes, 14 of 113 revision
+outputs are locally rendered, and all 28 SDK files plus all revision outputs
+still match the frozen old-pipeline fixture byte-for-byte. This is
+generation/materialization equivalence evidence, not new native-runtime
+evidence.
+
 ## 2026-09-28 - Bob archives one runtime representation
 
 The release boundary now treats `/deherm/app.dehermc` as the fingerprinted
@@ -5269,3 +5288,69 @@ match its current plan again; its generated route ledger now records 325
 runtime-observed routes, 601 explicit harness gaps, 924 verified routes, and two
 source-authoritative upstream-unavailable routes. No runtime claim was inferred
 from the policy compatibility tests.
+
+## 2026-10-04 - Immutable policy caches have bounded, coordinated maintenance
+
+`deherm cache` now inventories immutable realized surfaces without trusting
+their directory names or mutable pointer, reports selected/live-project/
+rollback retention reasons and recorded quarantine failures, and defaults to a
+non-mutating dry run. `--apply` deletes only the freshly reported reclaimable
+paths. The default deterministic policy keeps current, every matching live
+project reference, two rollback selections, and one diagnostic quarantine.
+Project markers and a user-cache registry keep active consumers visible while
+stale registry rows do not pin bytes.
+
+Pointer replacement now uses a cross-process directory lock. Online selection
+revalidates the mutable publication entry under that lock, offline selection
+cannot replace a different current identity, and an older installed package
+cannot regress an equivalent newer-package realization. Windows sharing
+violations are returned as retryable path-specific failures rather than a
+destructive partial repair. Focused tests exercise report/apply retention,
+project references, serialized concurrent writers, stale online and offline
+regression attempts, package-version ordering, and simulated Windows handle
+contention. These are cache-lifecycle and coordination tests; retained surface
+authenticity continues to come only from the existing full materialized-surface
+verifier.
+
+## 2026-10-04 - Native target releases are fingerprinted by recipe family
+
+The native target artifact family now has four immutable recipe identities:
+Linux, Windows, Android, and Apple. Shared Hermes and archive/integrity inputs
+remain in every identity, while platform recipes and relevant SDK facts affect
+only the rows that consume them. A migration bridge maps the exact unchanged
+recipe fingerprints to the already-published aggregate release; the first
+changed recipe leaves that bridge and acquires its own tag without rebuilding
+the other platforms. Policy and project-lock consumers accept the legacy
+one-tag shape and the split `releases[target]` shape, but require every asset
+row to have an exact tag/fingerprint coordinate before resolving or caching it.
+The package-level release lock contains host tools only, so a newly published
+native recipe never waits for a prepublication edit to generated package data.
+
+Planner tests prove Windows-only and Linux-only scheduling, shared-Hermes
+invalidation of all four recipes, missing target/executor refusal, asset/release
+index equality, and rejection of an asset listing attributed to the wrong tag.
+The native workflow resolves the tag and full fingerprint from each canonical
+row after checkout, publishes unchanged rows nowhere, and its summary re-reads
+every recipe release before refreshing policy. This is workflow-planning and
+content-identity evidence; no native compiler or runtime execution was added by
+this change.
+
+## 2026-10-04 - dmSDK universal policy data compacts to authenticated recipe facts
+
+The published policy no longer carries the 3,489,572-byte realized dmSDK
+universal catalog or snapshots of its native and browser universal dispatchers.
+It carries a 1,059,425-byte lossless, schema-versioned recipe object instead;
+the installed compiler reconstructs the exact 5,696,531-byte report and renders
+the two dispatch outputs locally. The complete current policy closure fell from
+25,820,704 to 22,887,346 object bytes (11.36%) and from 190 to 188 subtrees.
+Published v1 policies remain supported while v2 declares the new compiler
+capability and minimum package version. Cache verification reconstructs the
+report from authenticated facts rather than trusting a matching local digest.
+
+Focused policy tests authenticate the reconstructed bytes, reject malformed or
+forged recipes, and preserve the old-pipeline fixture. The dmSDK clean-room now
+declares the package-owned universal output emitter as an input and regenerates
+all 1,361 declarations across 122 byte-identical artifacts. This is policy
+transport/materialization and clean-room generation evidence, not execution of
+every Defold implementation. Issue #93 remains open for 12 SDK and 99 revision-
+output compatibility sources plus other large derived semantic documents.

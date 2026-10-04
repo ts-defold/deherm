@@ -29,6 +29,10 @@ import { DEFOLD_REVISION_PATTERN } from "./defold-revision.mjs";
 import { DEFOLD_REVISION_TOKEN, sealObject } from "../../compiler/src/api-policy.mjs";
 import { BINDING_LOWERING_RECIPE_NAME } from "../../compiler/src/binding-lowering-plan-recipe.mjs";
 import {
+  DMSDK_UNIVERSAL_OUTPUT_NAME,
+  DMSDK_UNIVERSAL_RECIPE_FACTS_NAME,
+} from "../../compiler/src/dmsdk-universal-recipe-facts.mjs";
+import {
   assertPolicySurfaceRealizationIdentity,
   manifestTreeSha256,
   policySurfaceArtifactsSha256,
@@ -466,6 +470,25 @@ async function layerProvides(candidate, revision) {
         }
       } catch (error) {
         return { ok: false, missing: [BINDING_LOWERING_RECIPE_NAME], error: error.message };
+      }
+    }
+    const universalRecipeEntry = authenticatedCompiler.documents?.entries?.[DMSDK_UNIVERSAL_RECIPE_FACTS_NAME];
+    if (universalRecipeEntry) {
+      try {
+        const recipeFacts = JSON.parse(
+          await readFile(path.join(candidate.irRoot, DMSDK_UNIVERSAL_RECIPE_FACTS_NAME), "utf8"),
+        );
+        const realized = await realizeCompilerDocuments({ [DMSDK_UNIVERSAL_RECIPE_FACTS_NAME]: recipeFacts });
+        const actual = await readFile(path.join(candidate.irRoot, DMSDK_UNIVERSAL_OUTPUT_NAME), "utf8");
+        if (actual !== json(realized[DMSDK_UNIVERSAL_OUTPUT_NAME])) {
+          return {
+            ok: false,
+            missing: [],
+            error: `surface ${DMSDK_UNIVERSAL_OUTPUT_NAME} is not derived from its authenticated recipe`,
+          };
+        }
+      } catch (error) {
+        return { ok: false, missing: [DMSDK_UNIVERSAL_RECIPE_FACTS_NAME], error: error.message };
       }
     }
     if (!/^[0-9a-f]{64}$/u.test(descriptor.toolchainSha256 ?? "")) {

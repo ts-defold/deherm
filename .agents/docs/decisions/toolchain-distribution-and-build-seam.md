@@ -494,31 +494,40 @@ Bob reads it. The same record shape covers generated extension C - the
 `generated-sources` kind - so the assembler that writes `shermes -emit-c` output
 into the extension inherits the freshness relation rather than inventing one.
 
-# Three families, three tags
+# Three product families, recipe-scoped native tags
 
 Every published artifact is addressed by a SHA-256 fingerprint of the inputs
 that determine its bytes, declared once in `scripts/lib/artifact-releases.mjs`.
-There are three families, and they used to be two.
+There are three product families, and they used to be two. The native family
+is further split into Linux, Windows, Android, and Apple recipe releases. Those
+four releases share the Hermes pin and publisher/archive machinery, but each
+hashes only its own build recipe, relevant SDK fields, and target records.
 
 Each family declares its own `tagPrefix` and `assetPrefix` in that file; the
-tag is `<tagPrefix>-<fp16>` and every asset is `<assetPrefix>-<row>.tar.gz`, so
+tag is `<tagPrefix>-<fp12>` and every asset is `<assetPrefix>-<row>.tar.gz`, so
 neither spelling is restated here.
 
-The shipped `release-tags.json` also pins the SHA-256 of every integrity
-sidecar plus the archive digest and byte length authenticated by that sidecar.
-Those records are generated from the publisher sidecars and committed with the
-package coordinates. A clean install therefore downloads the two known URLs
-and verifies them without calling GitHub's rate-limited release-metadata API.
-The API lookup exists only as a compatibility path for older package manifests
-that predate the pinned records; a malformed record fails closed rather than
-silently taking that fallback. The revision policy carries the same records for
-target archives selected from a project's Defold revision.
+The shipped `release-tags.json` is exclusively the revision-neutral host-tool
+lock. It pins the SHA-256 of every host-tool integrity sidecar plus the archive
+digest and byte length authenticated by that sidecar. Native target coordinates
+do not belong there: they are emitted into the authenticated policy artifacts
+document and copied into each generated project's `deherm.lock`. This avoids a
+circular publication gate where a package commit would need a sidecar digest
+before CI had built and published that sidecar. A clean install therefore uses
+the package lock for host tools and the project lock for target archives; both
+paths download known URLs and verify them without GitHub's rate-limited release
+metadata API. Older packages carrying a legacy native family remain readable,
+but that family is no longer package authority.
 
 For native target archives, the trusted matrix maps each bundle target to the
 exact asset name `hermes-<target>.tar.gz`. The authenticated sidecar binds that
 asset name, release tag, recipe fingerprint, archive digest, and per-member
 library digests; the target-to-asset mapping therefore binds the authenticated
-record to the selected target without a second target field. The installer
+record to the selected target without a second target field. When recipe tags
+differ, the artifacts document carries a `releases[target]` coordinate beside
+the `assets[target]` row; their key sets must be identical. A one-tag legacy
+mapping remains readable and is emitted while every recipe still resolves to
+the already-published aggregate release. The installer
 copies the library digests from that record into `native-artifacts.json`; it
 never learns the expected digest from downloaded bytes. Both release and
 debugger libraries are verified before either is replaced. The normal public
@@ -532,19 +541,19 @@ the installation step.
 | --- | --- | --- | --- |
 | Hermes host compilers | one archive per host: hermesc + shermes | `HERMES_URL`, `HERMES_REV`, `build-host-compilers.sh`, `package-archive.sh` | anything of Defold's, anything of Go's |
 | The transform compiler | one archive per host: dehermc | `ttscVersion`, `packages/compiler/go.mod`, every `.go` source under `packages/compiler/ttsc`, the stamped root package version, `build-dehermc.sh`, `package-archive.sh` | `upstream.lock` at all |
-| Target archives | one archive per bundle target: the library + its `.debug` sibling | `HERMES_URL`, `HERMES_REV`, the per-target build recipe, `package-archive.sh`, and the `sdk` and `targets` fields of `defold-bundle-targets.json` | `DEFOLD_REV`, `sourceSha256` |
+| Target archives | one archive per bundle target: the library + its `.debug` sibling, grouped into Linux/Windows/Android/Apple recipe releases | `HERMES_URL`, `HERMES_REV`, the selected recipe, `package-archive.sh`, relevant SDK fields, and that recipe's target records | other platform recipes, `DEFOLD_REV`, `sourceSha256` |
 
 `package-archive.sh` is in all three input sets because it decides the published
 **bytes** as directly as the compiler does: a changed `--mtime`, member order or
 compression level produces a different file from the same build outputs. It was
 the easy input to forget, being neither a compiler nor a pin.
 
-## Why the tag carries only 16 hex digits
+## Why the tag carries only 12 hex digits
 
-`<fp16>` is the first 16 hex digits of the fingerprint, not all 64.
+`<fp12>` is the first 12 hex digits of the fingerprint, not all 64.
 `native-artifacts-<64 hex>` is 81 characters; it appeared in the release list,
 in every download URL, in the workflow summary and in the policy index, at a
-length no one can compare by eye or quote in a bug report. 64 bits leaves a
+length no one can compare by eye or quote in a bug report. 48 bits leaves a
 collision probability around 1 in 10^11 over a population measured in thousands
 of releases, and a collision would need two **different** input sets to agree -
 not an attack surface, because the tag is derived from this checkout's own files
@@ -578,13 +587,15 @@ the one failure content addressing exists to prevent. A key declared twice is
 refused for the same reason - the whole-file hash could not tell two conflicting
 pins apart.
 
-The engine coupling that is real survives: the `sdk` pins move the target
-archives, because an archive built against a different NDK API level or
+The engine coupling that is real survives: relevant `sdk` pins move their
+recipe archives, because an archive built against a different NDK API level or
 deployment minimum than the engine links against is an ABI mismatch Extender
 only finds at link time. `tests/artifact-fingerprints.test.mjs` asserts both
 directions on a temporary checkout - a Defold repin moves nothing, a Hermes
-repin moves the two Hermes families and not `dehermc`, an `sdk` edit moves the
-target archives and a `defoldRevision` edit does not.
+repin moves every Hermes recipe and not `dehermc`, an Android SDK edit moves the
+Android recipe and a `defoldRevision` edit does not. Dedicated tests also prove
+that `package-msvc.sh` moves Windows alone and `Dockerfile.linux` moves both
+Linux rows alone.
 
 ## Why the host tools are two families and not one
 
@@ -597,7 +608,7 @@ carrying hermesc and shermes, one carrying dehermc.
 ## What is still deliberately over-hashed
 
 Comments are hashed with everything else, so a prose-only edit to
-`Dockerfile.android` rotates a tag and republishes identical bytes. That is
+`Dockerfile.android` rotates the Android tag and republishes identical bytes. That is
 waste, and it is the **safe** direction: the opposite error serves different
 bytes under a tag users have already pinned. Stripping comments would mean
 parsing Dockerfile, shell, CMake, Go and JSON correctly enough to bet artifact
@@ -608,8 +619,9 @@ identity on it, and a parser bug there is silent.
 `.github/workflows/native-artifacts.yml` carries all three matrices, kept apart
 in one file because conflating them has already cost review time. A `sdk` job
 reads the derived SDK pins once and feeds them to the cross builds. The `plan`
-job computes all three tags and decides each family's skip independently, on the
-assets that release actually holds rather than on the tag's existence.
+job computes both host-family tags and every native recipe tag, then decides
+each row's skip against the assets held by that exact release rather than on the
+tag's existence.
 Every repository path that can change a family fingerprint is also a push-path
 trigger for this workflow. In particular, the root package version is embedded
 in `dehermc`; changing it rotates the compiler tag and must schedule publication
@@ -617,8 +629,10 @@ before consumer gates attempt to download that new tag.
 
 The skip is **per asset**, not merely per complete release.
 `scripts/plan-native-artifact-builds.mjs` maps every publishable asset to exactly
-one executor row and subtracts the names already present under that family's
-fingerprinted tag. A partial retry therefore schedules only the missing rows;
+one executor row and subtracts the names already present under that row's
+fingerprinted recipe tag. The planner binds every asset listing to the tag it
+was fetched from and rejects a planner/index mismatch. A partial retry therefore
+schedules only the missing rows;
 tests exercise empty, complete and one-row-missing releases and reject an asset
 that appears in two lanes. The upload boundary repeats the existence check and
 never uses `--clobber`, so a manual dispatch or an external publisher that wins

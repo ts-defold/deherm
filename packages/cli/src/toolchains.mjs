@@ -123,12 +123,23 @@ function nativeArtifactFamily(lock) {
   if (
     !family ||
     family.indexedBy !== "bundleTarget" ||
-    !/^[A-Za-z0-9][A-Za-z0-9._-]*$/u.test(family.tag ?? "") ||
-    !/^[a-f0-9]{64}$/u.test(family.fingerprint ?? "")
+    (!family.releases &&
+      (!/^[A-Za-z0-9][A-Za-z0-9._-]*$/u.test(family.tag ?? "") || !/^[a-f0-9]{64}$/u.test(family.fingerprint ?? "")))
   ) {
     throw new Error("deherm.lock has no published target-artifact mapping; run 'deherm policy' and 'deherm generate'");
   }
   return family;
+}
+
+function nativeArtifactCoordinates(family, target) {
+  const release = family.releases?.[target] ?? family;
+  if (
+    !/^[A-Za-z0-9][A-Za-z0-9._-]*$/u.test(release?.tag ?? "") ||
+    !/^[a-f0-9]{64}$/u.test(release?.fingerprint ?? "")
+  ) {
+    throw new Error(`No immutable native-artifact release coordinate is declared for ${target}`);
+  }
+  return release;
 }
 
 function releaseArtifactMembers(family, target) {
@@ -249,7 +260,7 @@ async function memberDigests(root, members) {
   );
 }
 
-async function cachedTargetArtifact(destination, family, target, asset, members) {
+async function cachedTargetArtifact(destination, family, coordinates, target, asset, members) {
   let receipt;
   try {
     receipt = JSON.parse(await readFile(path.join(destination, targetCacheReceiptName), "utf8"));
@@ -260,8 +271,8 @@ async function cachedTargetArtifact(destination, family, target, asset, members)
     receipt?.schemaVersion !== 1 ||
     receipt.kind !== "deherm.target-artifact-cache" ||
     receipt.target !== target ||
-    receipt.tag !== family.tag ||
-    receipt.fingerprint !== family.fingerprint ||
+    receipt.tag !== coordinates.tag ||
+    receipt.fingerprint !== coordinates.fingerprint ||
     receipt.asset !== asset ||
     !/^[a-f0-9]{64}$/u.test(receipt.assetSha256 ?? "") ||
     receipt.integritySha256 !== family.integrity?.[target]?.sha256 ||
@@ -301,6 +312,7 @@ export async function ensureProjectNativeArtifact(projectRoot, defoldPlatform, o
   }
 
   const family = nativeArtifactFamily(lock);
+  const coordinates = nativeArtifactCoordinates(family, target.extenderTarget);
   const variant = requestedArtifactVariant(options);
   const current = await assertProjectNativeArtifact(root, defoldPlatform, {
     lock,
@@ -321,13 +333,20 @@ export async function ensureProjectNativeArtifact(projectRoot, defoldPlatform, o
   const integrityReference = family.integrity?.[target.extenderTarget];
   const members = releaseArtifactMembers(family, target.extenderTarget);
   if (!asset || members.length === 0 || !/^[a-f0-9]{64}$/u.test(integrityReference?.sha256 ?? "")) {
-    throw new Error(`No published Hermes archive is declared for ${target.extenderTarget} in ${family.tag}`);
+    throw new Error(`No published Hermes archive is declared for ${target.extenderTarget} in ${coordinates.tag}`);
   }
   const cacheRoot = options.cacheRoot
     ? path.resolve(options.cacheRoot)
     : path.join(defoldSurfaceCacheHome(options.env), "artifacts");
-  const destination = path.join(cacheRoot, family.tag, target.extenderTarget);
-  let cacheReceipt = await cachedTargetArtifact(destination, family, target.extenderTarget, asset, members);
+  const destination = path.join(cacheRoot, coordinates.tag, target.extenderTarget);
+  let cacheReceipt = await cachedTargetArtifact(
+    destination,
+    family,
+    coordinates,
+    target.extenderTarget,
+    asset,
+    members,
+  );
   if (!cacheReceipt) {
     if (options.offline || process.env.DEHERM_OFFLINE === "1") {
       throw new Error(
@@ -343,7 +362,7 @@ export async function ensureProjectNativeArtifact(projectRoot, defoldPlatform, o
     try {
       const { downloaded } = await downloadReleaseAssets({
         repository: releaseRepository(lock),
-        tag: family.tag,
+        tag: coordinates.tag,
         assets: [integrityReference.asset, asset],
         destination: downloadRoot,
         onProgress: options.onProgress,
@@ -354,8 +373,8 @@ export async function ensureProjectNativeArtifact(projectRoot, defoldPlatform, o
       }
       const integrity = validateReleaseIntegrity(JSON.parse(integrityBytes), {
         family: "native-artifacts",
-        tag: family.tag,
-        fingerprint: family.fingerprint,
+        tag: coordinates.tag,
+        fingerprint: coordinates.fingerprint,
         asset,
         members,
       });
@@ -372,8 +391,8 @@ export async function ensureProjectNativeArtifact(projectRoot, defoldPlatform, o
         schemaVersion: 1,
         kind: "deherm.target-artifact-cache",
         target: target.extenderTarget,
-        tag: family.tag,
-        fingerprint: family.fingerprint,
+        tag: coordinates.tag,
+        fingerprint: coordinates.fingerprint,
         asset,
         assetSha256,
         integritySha256: integrityReference.sha256,
@@ -416,7 +435,7 @@ export async function ensureProjectNativeArtifact(projectRoot, defoldPlatform, o
     await rm(targetArtifactPath(root, target.extenderTarget, member), { force: true });
   }
   const header = path.join(root, targetVariantHeader);
-  await replaceProjectText(header, renderRuntimeVariantHeader(variant, target.extenderTarget, family.fingerprint));
+  await replaceProjectText(header, renderRuntimeVariantHeader(variant, target.extenderTarget, coordinates.fingerprint));
   installed.push(header);
   await replaceProjectText(
     path.join(root, "defold_hermes", "lib", target.extenderTarget, targetInstallReceiptName),
@@ -428,8 +447,8 @@ export async function ensureProjectNativeArtifact(projectRoot, defoldPlatform, o
         variant,
         selectedMember,
         canonicalMember,
-        tag: family.tag,
-        fingerprint: family.fingerprint,
+        tag: coordinates.tag,
+        fingerprint: coordinates.fingerprint,
         asset,
         assetSha256: cacheReceipt.assetSha256,
         integritySha256: cacheReceipt.integritySha256,
@@ -447,8 +466,8 @@ export async function ensureProjectNativeArtifact(projectRoot, defoldPlatform, o
   return {
     target: target.extenderTarget,
     variant,
-    tag: family.tag,
-    fingerprint: family.fingerprint,
+    tag: coordinates.tag,
+    fingerprint: coordinates.fingerprint,
     cache: destination,
     installed,
   };
@@ -479,6 +498,7 @@ export async function assertProjectNativeArtifact(projectRoot, defoldPlatform, o
     };
   }
   const family = nativeArtifactFamily(lock);
+  const coordinates = nativeArtifactCoordinates(family, target.extenderTarget);
   const variant = requestedArtifactVariant(options);
   const members = releaseArtifactMembers(family, target.extenderTarget);
   const selectedMember = variantLibraryMember(members, variant);
@@ -528,15 +548,15 @@ export async function assertProjectNativeArtifact(projectRoot, defoldPlatform, o
     receipt.selectedMember === selectedMember &&
     receipt.canonicalMember === canonicalMember &&
     receipt.target === target.extenderTarget &&
-    receipt.tag === family.tag &&
-    receipt.fingerprint === family.fingerprint &&
+    receipt.tag === coordinates.tag &&
+    receipt.fingerprint === coordinates.fingerprint &&
     receipt.asset === family.assets?.[target.extenderTarget] &&
     /^[a-f0-9]{64}$/u.test(receipt.assetSha256 ?? "") &&
     receipt.integritySha256 === family.integrity?.[target.extenderTarget]?.sha256 &&
     members.every((member) => receipt.cacheMembers?.includes(member)) &&
     new RegExp(`^#define DEHERM_HERMES_DEBUGGER ${variant === "debug" ? 1 : 0}$`, "m").test(variantHeader)
   ) {
-    return { target: target.extenderTarget, variant, file, tag: family.tag, fingerprint: family.fingerprint };
+    return { target: target.extenderTarget, variant, file, tag: coordinates.tag, fingerprint: coordinates.fingerprint };
   }
   if (options.fetch === false) {
     throw new Error(
@@ -554,27 +574,28 @@ export async function assertProjectNativeArtifact(projectRoot, defoldPlatform, o
     variant,
     verifyDigests: true,
   });
-  return { target: target.extenderTarget, variant, file, tag: family.tag, fingerprint: family.fingerprint };
+  return { target: target.extenderTarget, variant, file, tag: coordinates.tag, fingerprint: coordinates.fingerprint };
 }
 
 export async function nativeArtifactReport(projectRoot) {
   if (!projectRoot) {
-    const tags = JSON.parse(
-      await readFile(path.join(packageRoot, "packages", "toolchains", "release-tags.json"), "utf8"),
+    const manifest = JSON.parse(
+      await readFile(path.join(packageRoot, "packages", "toolchains", "native-artifacts.json"), "utf8"),
     );
-    const family = tags.families?.["native-artifacts"];
     return {
       schemaVersion: 2,
-      source: "published native-artifacts release (target authority requires a generated project)",
-      targets: Object.keys(family?.assets ?? {})
+      source: "native target catalog (release coordinates require an authenticated generated project)",
+      targets: Object.entries(manifest.targets ?? {})
+        .filter(([, record]) => record.status === "vendored" || record.status === "required-missing")
+        .map(([target]) => target)
         .sort()
         .map((target) => ({
           target,
-          kind: "published",
-          status: "published",
+          kind: "policy-resolved",
+          status: "policy-required",
           bundleable: true,
           ok: true,
-          detail: `${family.tag}/${family.assets[target]}`,
+          detail: "resolved from the authenticated Defold policy when a project is generated",
         })),
     };
   }
@@ -584,6 +605,7 @@ export async function nativeArtifactReport(projectRoot) {
   for (const record of lock.toolchain.targetMatrix.targets) {
     if (record.kind !== "bundle") continue;
     const asset = family.assets?.[record.target] ?? null;
+    const coordinates = asset ? nativeArtifactCoordinates(family, record.target) : null;
     const web = record.group === "web";
     const inspected = await assertProjectNativeArtifact(projectRoot, record.target, { lock, fetch: false })
       .then((value) => ({ ok: true, file: value.file }))
@@ -594,7 +616,7 @@ export async function nativeArtifactReport(projectRoot) {
       status: web ? "package-browser-adapter" : asset ? "published" : "unavailable",
       bundleable: web || Boolean(asset),
       ok: web || Boolean(asset),
-      detail: web ? "browser-host source adapter" : asset ? `${family.tag}/${asset}` : "no published archive",
+      detail: web ? "browser-host source adapter" : asset ? `${coordinates.tag}/${asset}` : "no published archive",
       project: inspected,
     });
   }

@@ -15,6 +15,7 @@ import {
 } from "../../compiler/src/policy-surface-materializer.mjs";
 import { DEFOLD_REVISION_PATTERN } from "./defold-revision.mjs";
 import { defoldSurfaceCacheHome, verifyMaterializedSurfaceRoot } from "./defold-surface.mjs";
+import { quarantinePolicySurface, selectPolicySurface } from "./policy-cache-maintenance.mjs";
 
 const defaultSiteConfig = new URL("../../bindings/policy-site.json", import.meta.url);
 const DIGEST_PATTERN = /^[0-9a-f]{64}$/u;
@@ -266,12 +267,9 @@ export async function publishPolicySurface(resolvedPolicy, options) {
         reused: true,
       };
     }
-    const quarantine = path.join(parent, `.bad-${leaf}-${process.pid}-${randomBytes(6).toString("hex")}`);
-    try {
-      await rename(realizationRoot, quarantine);
-    } catch (error) {
-      if (error?.code !== "ENOENT") throw error;
-    }
+    await quarantinePolicySurface(realizationRoot, {
+      reason: verified.error ?? "surface verification failed without a reported reason",
+    });
   }
 
   const stagingRoot = path.join(
@@ -574,6 +572,7 @@ export async function resolvePublishedPolicy(revision, options = {}) {
   }
   const realization = policySurfaceRealizationIdentity({ entry, packageVersion, artifacts });
   let surface = null;
+  let selection = null;
   if (materialize) {
     surface = await publishPolicySurface(
       { revision, entry, policy, objects },
@@ -594,10 +593,49 @@ export async function resolvePublishedPolicy(revision, options = {}) {
       realizationId: realization.realizationId,
       policyRoot: realization.policyRoot,
     };
-    if (
-      await atomicReplace(path.join(surfaceBase, "current.json"), Buffer.from(`${JSON.stringify(pointer, null, 2)}\n`))
-    ) {
-      transfer.cacheWrites += 1;
+    selection = await selectPolicySurface(surfaceBase, pointer, {
+      offline,
+      revalidate: offline
+        ? undefined
+        : async () => {
+            transfer.cacheMisses += 1;
+            const latestBytes = await fetchBytes(`${base}/${entryRelative}`, fetchImpl, options);
+            transfer.transferBytes += latestBytes.length;
+            const latest = parseJson(latestBytes, entryRelative);
+            if (
+              latest.kind !== "deherm.policy.index-entry" ||
+              latest.defoldRevision !== revision ||
+              latest.policyRoot !== entry.policyRoot ||
+              latest.generator !== entry.generator ||
+              latest.artifactsSha256 !== entry.artifactsSha256 ||
+              !sameRealizer(latest.realizer, entry.realizer)
+            ) {
+              const error = new Error(
+                `Published policy for Defold ${revision} advanced while this surface was materializing; retry to select the current policy instead of regressing current.json.`,
+              );
+              error.code = "DEHERM_POLICY_SELECTION_STALE";
+              error.retryable = true;
+              throw error;
+            }
+          },
+    });
+    if (selection.changed) transfer.cacheWrites += 1;
+    if (selection.pointer.realizationId !== realization.realizationId) {
+      const selectedRoot = path.join(surfaceBase, "r", selection.pointer.realizationId.slice(0, 32));
+      const selected = await (options.verifySurfaceImpl ?? verifyMaterializedSurfaceRoot)(selectedRoot, revision);
+      if (!selected.ok) {
+        throw new Error(
+          `Preserved policy-surface selection ${selection.pointer.realizationId} failed verification: ${selected.error}`,
+        );
+      }
+      assertPolicySurfaceRealizationIdentity(selected.descriptor.realization, selection.pointer);
+      surface = {
+        revision,
+        outputRoot: selectedRoot,
+        descriptor: selected.descriptor,
+        written: [],
+        reused: true,
+      };
     }
   }
 
@@ -611,6 +649,7 @@ export async function resolvePublishedPolicy(revision, options = {}) {
     realization,
     receipt: receiptFile,
     surface,
+    selection,
     transfer,
     written: transfer.cacheWrites,
     source: `${base}/${entryRelative}`,

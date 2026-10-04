@@ -31,6 +31,10 @@ import { buildArtifactReferences } from "../packages/generator/src/policy/artifa
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 export const releaseTagsPath = path.join(root, "packages", "toolchains", "release-tags.json");
 
+async function buildHostArtifactReferences(options = {}) {
+  return buildArtifactReferences({ ...options, families: ["hermes-host", "dehermc"] });
+}
+
 export async function buildReleaseTags(options = {}) {
   return {
     schemaVersion: 1,
@@ -41,18 +45,23 @@ export async function buildReleaseTags(options = {}) {
       "be told. Expand releaseAsset with a tag and an asset name to get a download URL.",
     repository: defaultReleaseRepository,
     releaseAsset: releaseAssetUrlTemplate(),
-    families: await buildArtifactReferences({ integrityRoot: options.integrityRoot }),
+    families: await buildHostArtifactReferences({ integrityRoot: options.integrityRoot }),
   };
 }
 
 function withoutIntegrity(value) {
   const copy = structuredClone(value);
+  // Target archive coordinates are authoritative only in the authenticated
+  // per-Defold-revision policy/project lock. Older packages may still carry a
+  // legacy native family; ignore it when checking this host-tool-only lock.
+  delete copy.families?.["native-artifacts"];
   for (const family of Object.values(copy.families ?? {})) delete family.integrity;
   return copy;
 }
 
 function assertCompleteIntegrity(value) {
   for (const [familyName, family] of Object.entries(value.families ?? {})) {
+    if (familyName === "native-artifacts") continue;
     for (const key of Object.keys(family.assets ?? {})) {
       const expectedAsset = `${family.assets[key]}.integrity.json`;
       const record = family.integrity?.[key];
@@ -71,21 +80,23 @@ function assertCompleteIntegrity(value) {
 
 export async function downloadPublishedIntegrity() {
   const integrityRoot = await mkdtemp(path.join(tmpdir(), "deherm-release-integrity-"));
-  const families = await buildArtifactReferences();
+  const families = await buildHostArtifactReferences();
   try {
     for (const [familyName, family] of Object.entries(families)) {
       const destination = path.join(integrityRoot, familyName);
       await mkdir(destination, { recursive: true });
-      for (const asset of Object.values(family.assets)) {
+      for (const [key, asset] of Object.entries(family.assets)) {
+        const tag = family.releases?.[key]?.tag ?? family.tag;
+        if (!tag) throw new Error(`${familyName}/${key} has no immutable release coordinate`);
         const integrityAsset = `${asset}.integrity.json`;
         const metadata = await resolveGithubReleaseAsset({
           repository: defaultReleaseRepository,
-          tag: family.tag,
+          tag,
           asset: integrityAsset,
         });
         const { downloaded } = await downloadReleaseAssets({
           repository: defaultReleaseRepository,
-          tag: family.tag,
+          tag,
           assets: [integrityAsset],
           destination,
         });
@@ -125,9 +136,7 @@ async function main(argv = process.argv.slice(2)) {
     if (check) {
       const existingText = await readFile(releaseTagsPath, "utf8").catch(() => "");
       const existing = existingText ? JSON.parse(existingText) : null;
-      const matches = integrityRoot
-        ? existingText === serialized
-        : JSON.stringify(withoutIntegrity(existing)) === JSON.stringify(withoutIntegrity(generated));
+      const matches = JSON.stringify(withoutIntegrity(existing)) === JSON.stringify(withoutIntegrity(generated));
       if (!matches) {
         throw new Error(
           "packages/toolchains/release-tags.json is stale; run pnpm generate:release-tags after publishing artifacts",

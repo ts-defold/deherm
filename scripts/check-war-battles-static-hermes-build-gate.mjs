@@ -516,12 +516,18 @@ async function stageTypedNativeProject({
   const resolvedTarget = await resolveDefoldPlatform(stagedRoot, target);
   const lock = JSON.parse(await readFile(path.join(stagedRoot, "deherm.lock"), "utf8"));
   const family = lock.artifacts?.artifacts?.["native-artifacts"];
+  const coordinates = family?.releases?.[resolvedTarget.extenderTarget] ?? family;
   const asset = family?.assets?.[resolvedTarget.extenderTarget];
   const integrityReference = family?.integrity?.[resolvedTarget.extenderTarget];
   const members = (family?.contents?.[resolvedTarget.extenderTarget] ?? []).filter(
     (member) => member === "libhermes.a" || member === "libhermes.debug.a" || member === "libhermesvm-config.h",
   );
-  if (!family?.tag || !asset || members.length === 0 || !/^[a-f0-9]{64}$/u.test(integrityReference?.sha256 ?? "")) {
+  if (
+    !coordinates?.tag ||
+    !asset ||
+    members.length === 0 ||
+    !/^[a-f0-9]{64}$/u.test(integrityReference?.sha256 ?? "")
+  ) {
     throw gateError(
       "native-artifact-unavailable",
       `staged project has no locked Hermes artifact mapping for ${resolvedTarget.extenderTarget}`,
@@ -530,11 +536,11 @@ async function stageTypedNativeProject({
   const sourceArtifact = path.join(
     repositoryRoot,
     "build/native-artifact-downloads",
-    family.tag,
+    coordinates.tag,
     `hermes-${resolvedTarget.extenderTarget}`,
   );
   const cacheRoot = path.join(stagedRoot, ".deherm-gate-native-artifact-cache");
-  const cacheTarget = path.join(cacheRoot, family.tag, resolvedTarget.extenderTarget);
+  const cacheTarget = path.join(cacheRoot, coordinates.tag, resolvedTarget.extenderTarget);
   await mkdir(cacheTarget, { recursive: true });
   const hashes = {};
   for (const member of members) {
@@ -553,8 +559,8 @@ async function stageTypedNativeProject({
         schemaVersion: 1,
         kind: "deherm.target-artifact-cache",
         target: resolvedTarget.extenderTarget,
-        tag: family.tag,
-        fingerprint: family.fingerprint,
+        tag: coordinates.tag,
+        fingerprint: coordinates.fingerprint,
         asset,
         assetSha256: sha256(await readFile(archive)),
         integritySha256: integrityReference.sha256,

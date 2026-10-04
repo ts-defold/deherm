@@ -686,8 +686,9 @@ complete the layered cache:
 * Public headers and native sources are currently named in the project Merkle
   tree but not content-digested. Same-path byte edits must move `nativeRoot`
   before extension caching is sound.
-* The canonical lowering plan is now reconstructed locally from authenticated
-  recipe facts, but 12 SDK support sources and 106 revision outputs remain
+* The canonical lowering plan and dmSDK universal catalog are now reconstructed
+  locally from authenticated recipe facts, but 12 SDK support sources and 99
+  revision outputs remain
   referenced compatibility objects. Compiler-owned recipe emitters must replace
   them before the policy is a compact result rather than a correctness-first
   transition artifact. Track the ownership/size migration in

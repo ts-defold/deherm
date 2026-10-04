@@ -22,16 +22,27 @@ export function artifactAssetRows(value, options = {}) {
   const rows = [];
   for (const family of Object.keys(references).sort()) {
     const reference = references[family];
-    if (typeof reference?.tag !== "string" || !reference.assets || typeof reference.assets !== "object") {
+    if (!reference?.assets || typeof reference.assets !== "object") {
       throw new Error(`artifact references have an invalid ${family} family`);
+    }
+    if (reference.releases) {
+      const assetKeys = Object.keys(reference.assets).sort();
+      const releaseKeys = Object.keys(reference.releases).sort();
+      if (JSON.stringify(assetKeys) !== JSON.stringify(releaseKeys)) {
+        throw new Error(`artifact references have mismatched ${family} asset and release indexes`);
+      }
     }
     for (const key of Object.keys(reference.assets).sort()) {
       const asset = reference.assets[key];
       if (typeof asset !== "string" || !asset.length) {
         throw new Error(`artifact references have an invalid ${family}/${key} asset`);
       }
-      rows.push({ family, tag: reference.tag, asset });
-      if (options.includeIntegrity) rows.push({ family, tag: reference.tag, asset: `${asset}.integrity.json` });
+      const tag = reference.releases?.[key]?.tag ?? reference.tag;
+      if (typeof tag !== "string" || !tag.length) {
+        throw new Error(`artifact references have no release coordinate for ${family}/${key}`);
+      }
+      rows.push({ family, key, tag, asset });
+      if (options.includeIntegrity) rows.push({ family, key, tag, asset: `${asset}.integrity.json` });
     }
   }
   return rows;

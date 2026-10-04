@@ -56,6 +56,11 @@ import {
   BINDING_LOWERING_RECIPE_NAME,
   createBindingLoweringRecipeFacts,
 } from "../../../compiler/src/binding-lowering-plan-recipe.mjs";
+import {
+  createDmSdkUniversalRecipeFacts,
+  DMSDK_UNIVERSAL_RECIPE_FACTS_CAPABILITY,
+  DMSDK_UNIVERSAL_RECIPE_FACTS_NAME,
+} from "../../../compiler/src/dmsdk-universal-recipe-facts.mjs";
 import { SCRIPT_URL_TARGET_SUPPORT_RECIPE_V2 } from "../../../compiler/src/sdk/support-sdk.mjs";
 import { releaseAssetUrlTemplate } from "../../../cli/src/release-assets.mjs";
 import { apiPolicyGenerator } from "../../../../scripts/lib/script-generator-pipeline.mjs";
@@ -91,7 +96,7 @@ export const compilerSurfaceDocuments = Object.freeze({
   "defold-script-value-tail-bindings.json": "defold-script-value-tail-bindings.json",
   [BINDING_LOWERING_RECIPE_NAME]: null,
   "defold-dmsdk-scalar-thunks.json": "defold-dmsdk-scalar-thunks.json",
-  "defold-dmsdk-universal-bindings.json": "defold-dmsdk-universal-bindings.json",
+  [DMSDK_UNIVERSAL_RECIPE_FACTS_NAME]: null,
   "defold-resource-declaration-schema.json": "defold-resource-declaration-schema.json",
   "defold-script-resource-namespaces.json": "defold-script-resource-namespaces.json",
 });
@@ -151,8 +156,8 @@ const locallyRenderedSdkInputs = Object.freeze({
   "script/universal-value-bindings.ts": Object.freeze(["defold-script-universal-value-bindings.json"]),
   "script/browser-target-support.ts": Object.freeze(["defold-script-universal-value-bindings.json"]),
   "dmsdk/scalar.ts": Object.freeze(["defold-dmsdk-scalar-thunks.json", "defold-sdk-ir.json"]),
-  "dmsdk/universal.ts": Object.freeze(["defold-dmsdk-universal-bindings.json"]),
-  "dmsdk/browser-arena.ts": Object.freeze(["defold-dmsdk-universal-bindings.json"]),
+  "dmsdk/universal.ts": Object.freeze([DMSDK_UNIVERSAL_RECIPE_FACTS_NAME]),
+  "dmsdk/browser-arena.ts": Object.freeze([DMSDK_UNIVERSAL_RECIPE_FACTS_NAME]),
   "dmsdk/named-scalar.ts": Object.freeze([]),
   "script/url-target-support.ts": Object.freeze([]),
   "script/value-target-support.ts": Object.freeze([]),
@@ -161,7 +166,7 @@ const locallyRenderedSdkInputs = Object.freeze({
 const compilerDocumentRecipes = Object.freeze({
   "defold-value-layouts.json": "policy.compiler-document.defold-value-layouts.v2",
   "defold-component-proxy-contract.json": "policy.compiler-document.component-proxy-contract.v2",
-  "defold-dmsdk-universal-bindings.json": "policy.compiler-document.dmsdk-universal.v1",
+  [DMSDK_UNIVERSAL_RECIPE_FACTS_NAME]: DMSDK_UNIVERSAL_RECIPE_FACTS_CAPABILITY,
   [BINDING_LOWERING_RECIPE_NAME]: BINDING_LOWERING_RECIPE_CAPABILITY,
 });
 
@@ -433,6 +438,14 @@ export async function derivePolicy(options = {}) {
               readJson(path.join(artifacts, "defold-binding-lowering-plan.sentinel.json")),
             ]);
             return [name, createBindingLoweringRecipeFacts(plan, sentinel)];
+          }
+          if (name === DMSDK_UNIVERSAL_RECIPE_FACTS_NAME) {
+            return [
+              name,
+              createDmSdkUniversalRecipeFacts(
+                await readJson(path.join(artifacts, "defold-dmsdk-universal-bindings.json")),
+              ),
+            ];
           }
           return [name, await readJson(path.join(artifacts, relative))];
         }),

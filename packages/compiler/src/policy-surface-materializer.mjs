@@ -41,6 +41,12 @@ import {
   emitBindingLoweringPlan,
   emitBindingLoweringPlanSentinel,
 } from "./binding-lowering-plan-recipe.mjs";
+import {
+  DMSDK_UNIVERSAL_OUTPUT_NAME,
+  DMSDK_UNIVERSAL_RECIPE_FACTS_CAPABILITY,
+  DMSDK_UNIVERSAL_RECIPE_FACTS_NAME,
+  emitDmSdkUniversalReport,
+} from "./dmsdk-universal-recipe-facts.mjs";
 
 const SCRIPT_IR = "defold-script-api-ir.json";
 const SCRIPT_CONSTANT_LOWERING = "defold-script-constant-lowering.json";
@@ -58,6 +64,7 @@ const DOCUMENT_RECIPES = new Set([
   "policy.compiler-document.defold-value-layouts.v1",
   "policy.compiler-document.defold-value-layouts.v2",
   "policy.compiler-document.dmsdk-universal.v1",
+  DMSDK_UNIVERSAL_RECIPE_FACTS_CAPABILITY,
 ]);
 const OUTPUT_RECIPE = "output.compatibility-source.copy.v1";
 const SDK_RECIPES = Object.freeze({
@@ -127,6 +134,7 @@ export function projectArtifactsForToolchain(artifacts, toolchain) {
     assets: {},
     contents: {},
     integrity: {},
+    releases: {},
     availability: {
       status: "pending-compatible-build",
       expectedCompatibility: expected,
@@ -522,38 +530,41 @@ export async function realizeCompilerDocuments(input) {
     const emitterSource = await readFile(new URL("./binding-lowering-plan-recipe.mjs", import.meta.url));
     documents[planName] = emitted.plan;
     documents[sentinelName] = emitBindingLoweringPlanSentinel(recipeFacts, emitted, emitterSource);
-    return documents;
+  } else {
+    const plan = documents[planName];
+    const previousSentinel = documents[sentinelName];
+    if (plan && previousSentinel) {
+      // Policy serialization canonicalizes object keys. The historical plan digest
+      // is insertion-order-sensitive JSON, so copying it after canonicalization
+      // creates a self-inconsistent plan. Realize both identities from the selected
+      // facts and this package's emitter instead of retaining checkout bytes.
+      const { planSha256: _oldPlanSha256, ...planBody } = plan;
+      const realizedPlan = { ...planBody, planSha256: sha256(JSON.stringify(planBody)) };
+      const planSource = json(realizedPlan);
+      const generatorSource = await readFile(new URL("./generate-binding-lowering-plan.mjs", import.meta.url));
+      const generatorSha256 = sha256(generatorSource);
+      const inputPaths = previousSentinel.inputPaths;
+      const inputHashes = realizedPlan.inputHashes;
+      if (!inputPaths || !inputHashes) throw new Error("Lowering-plan policy has no cache identity inputs");
+      const cacheKey = sha256(JSON.stringify({ generatorSha256, inputHashes, inputPaths, rootSchema: 1 }));
+      documents[planName] = realizedPlan;
+      documents[sentinelName] = {
+        schemaVersion: 1,
+        generator: "packages/compiler/src/generate-binding-lowering-plan.mjs",
+        generatorSha256,
+        inputPaths,
+        inputHashes,
+        cacheKey,
+        output: "packages/bindings/generated/defold-binding-lowering-plan.json",
+        outputBytes: Buffer.byteLength(planSource),
+        outputSha256: sha256(planSource),
+        planSha256: realizedPlan.planSha256,
+      };
+    }
   }
-  const plan = documents[planName];
-  const previousSentinel = documents[sentinelName];
-  if (!plan || !previousSentinel) return documents;
-
-  // Policy serialization canonicalizes object keys. The historical plan digest
-  // is insertion-order-sensitive JSON, so copying it after canonicalization
-  // creates a self-inconsistent plan. Realize both identities from the selected
-  // facts and this package's emitter instead of retaining checkout bytes.
-  const { planSha256: _oldPlanSha256, ...planBody } = plan;
-  const realizedPlan = { ...planBody, planSha256: sha256(JSON.stringify(planBody)) };
-  const planSource = json(realizedPlan);
-  const generatorSource = await readFile(new URL("./generate-binding-lowering-plan.mjs", import.meta.url));
-  const generatorSha256 = sha256(generatorSource);
-  const inputPaths = previousSentinel.inputPaths;
-  const inputHashes = realizedPlan.inputHashes;
-  if (!inputPaths || !inputHashes) throw new Error("Lowering-plan policy has no cache identity inputs");
-  const cacheKey = sha256(JSON.stringify({ generatorSha256, inputHashes, inputPaths, rootSchema: 1 }));
-  documents[planName] = realizedPlan;
-  documents[sentinelName] = {
-    schemaVersion: 1,
-    generator: "packages/compiler/src/generate-binding-lowering-plan.mjs",
-    generatorSha256,
-    inputPaths,
-    inputHashes,
-    cacheKey,
-    output: "packages/bindings/generated/defold-binding-lowering-plan.json",
-    outputBytes: Buffer.byteLength(planSource),
-    outputSha256: sha256(planSource),
-    planSha256: realizedPlan.planSha256,
-  };
+  if (documents[DMSDK_UNIVERSAL_RECIPE_FACTS_NAME]) {
+    documents[DMSDK_UNIVERSAL_OUTPUT_NAME] = emitDmSdkUniversalReport(documents[DMSDK_UNIVERSAL_RECIPE_FACTS_NAME]);
+  }
   return documents;
 }
 
@@ -604,7 +615,9 @@ export async function materializePolicySurface(resolvedPolicy, options = {}) {
     const recipe =
       loweringOutput && recipes.documents?.[BINDING_LOWERING_RECIPE_NAME]
         ? recipes.documents[BINDING_LOWERING_RECIPE_NAME]
-        : recipes.documents?.[name];
+        : name === DMSDK_UNIVERSAL_OUTPUT_NAME && recipes.documents?.[DMSDK_UNIVERSAL_RECIPE_FACTS_NAME]
+          ? recipes.documents[DMSDK_UNIVERSAL_RECIPE_FACTS_NAME]
+          : recipes.documents?.[name];
     if (!DOCUMENT_RECIPES.has(recipe)) {
       throw new Error(`${name}: unsupported compiler-document recipe ${JSON.stringify(recipes.documents?.[name])}`);
     }

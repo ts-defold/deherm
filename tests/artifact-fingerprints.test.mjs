@@ -16,6 +16,7 @@ import { releaseAssetUrlTemplate } from "../packages/cli/src/release-assets.mjs"
 import { RELEASE_INTEGRITY_KIND, sha256 } from "../packages/cli/src/release-integrity.mjs";
 import { buildArtifactReferences } from "../scripts/generate-api-policy.mjs";
 import { artifactAssetRows } from "../scripts/project-artifact-references.mjs";
+import { planNativeArtifactBuilds } from "../scripts/plan-native-artifact-builds.mjs";
 import {
   artifactFamilies,
   artifactFamilyNames,
@@ -23,7 +24,10 @@ import {
   familyRelease,
   familyTag,
   fingerprintFamily,
+  fingerprintNativeArtifactRecipe,
   hostArtifactFamilyNames,
+  nativeArtifactRecipes,
+  nativeArtifactRelease,
   publishedAssets,
   parseLock,
   readLockKeys,
@@ -121,6 +125,13 @@ test("repinning Hermes moves the Hermes artifacts and nothing else", async (t) =
   // dehermc links the typescript-go compiler and compiles TypeScript to
   // TypeScript. It has never touched Hermes.
   assert.equal(right.dehermc, left.dehermc, "dehermc must not be a function of HERMES_REV");
+  for (const recipe of Object.keys(nativeArtifactRecipes)) {
+    assert.notEqual(
+      await fingerprintNativeArtifactRecipe(recipe, { root: after }),
+      await fingerprintNativeArtifactRecipe(recipe, { root: before }),
+      `${recipe} target bytes consume HERMES_REV`,
+    );
+  }
 });
 
 test("every dehermc Go source and its stamped package version rotate the tool tag", async (t) => {
@@ -169,6 +180,93 @@ test("Defold's SDK pins still move the target archives, and its provenance field
   const baseline = await fingerprintFamily("native-artifacts", { root: before });
   assert.notEqual(await fingerprintFamily("native-artifacts", { root: pinned }), baseline);
   assert.equal(await fingerprintFamily("native-artifacts", { root: provenance }), baseline);
+});
+
+test("native target recipe fingerprints invalidate only byte-compatible lanes", async (t) => {
+  const checkout = await scratchCheckout();
+  t.after(() => rm(checkout, { recursive: true, force: true }));
+  for (const entry of ["toolchains", "scripts"]) {
+    await rm(path.join(checkout, entry));
+    await cp(path.join(repositoryRoot, entry), path.join(checkout, entry), { recursive: true });
+  }
+  const baseline = Object.fromEntries(
+    await Promise.all(
+      Object.keys(nativeArtifactRecipes).map(async (recipe) => [
+        recipe,
+        await fingerprintNativeArtifactRecipe(recipe, { root: checkout }),
+      ]),
+    ),
+  );
+
+  await writeFile(
+    path.join(checkout, "toolchains/hermes/package-msvc.sh"),
+    `${await readFile(path.join(checkout, "toolchains/hermes/package-msvc.sh"), "utf8")}\n# test\n`,
+  );
+  const afterMsvc = Object.fromEntries(
+    await Promise.all(
+      Object.keys(nativeArtifactRecipes).map(async (recipe) => [
+        recipe,
+        await fingerprintNativeArtifactRecipe(recipe, { root: checkout }),
+      ]),
+    ),
+  );
+  assert.notEqual(afterMsvc.windows, baseline.windows);
+  for (const recipe of ["linux", "android", "apple"]) assert.equal(afterMsvc[recipe], baseline[recipe]);
+
+  await writeFile(
+    path.join(checkout, "toolchains/hermes/Dockerfile.linux"),
+    `${await readFile(path.join(checkout, "toolchains/hermes/Dockerfile.linux"), "utf8")}\n# test\n`,
+  );
+  const afterLinux = Object.fromEntries(
+    await Promise.all(
+      Object.keys(nativeArtifactRecipes).map(async (recipe) => [
+        recipe,
+        await fingerprintNativeArtifactRecipe(recipe, { root: checkout }),
+      ]),
+    ),
+  );
+  assert.notEqual(afterLinux.linux, afterMsvc.linux);
+  for (const recipe of ["windows", "android", "apple"]) assert.equal(afterLinux[recipe], afterMsvc[recipe]);
+});
+
+test("actual target-recipe edits schedule only their consuming build rows", async (t) => {
+  const baselinePlan = await planNativeArtifactBuilds();
+  const publishedByTag = new Map();
+  for (const release of Object.values(baselinePlan.releases)) {
+    const assets = publishedByTag.get(release.tag) ?? new Set();
+    for (const asset of release.expected) assets.add(asset);
+    publishedByTag.set(release.tag, assets);
+  }
+  const presentFor = (plan) =>
+    Object.fromEntries(
+      Object.entries(plan.releases).map(([key, release]) => [
+        key,
+        { tag: release.tag, assets: publishedByTag.get(release.tag) ?? [] },
+      ]),
+    );
+  const scheduledTargets = (plan) =>
+    Object.values(plan.matrices)
+      .flatMap(({ include }) => include)
+      .filter(({ target }) => target)
+      .map(({ target }) => target)
+      .sort();
+
+  for (const [relative, expected] of [
+    ["toolchains/hermes/package-msvc.sh", ["x86_64-win32"]],
+    ["toolchains/hermes/Dockerfile.linux", ["arm64-linux", "x86_64-linux"]],
+  ]) {
+    const checkout = await scratchCheckout();
+    t.after(() => rm(checkout, { recursive: true, force: true }));
+    for (const entry of ["toolchains", "scripts"]) {
+      await rm(path.join(checkout, entry));
+      await cp(path.join(repositoryRoot, entry), path.join(checkout, entry), { recursive: true });
+    }
+    const file = path.join(checkout, relative);
+    await writeFile(file, `${await readFile(file, "utf8")}\n# scheduling regression fixture\n`);
+    const candidate = await planNativeArtifactBuilds({}, { root: checkout });
+    const plan = await planNativeArtifactBuilds(presentFor(candidate), { root: checkout });
+    assert.deepEqual(scheduledTargets(plan), expected, relative);
+  }
 });
 
 test("a consumed lock key that the lock does not carry is a refusal, never a skipped input", async (t) => {
@@ -263,7 +361,14 @@ test("a client can build a download URL, and the index entry stays free of artif
   // the live derivation rather than against a committed file.
   const references = await buildArtifactReferences();
   for (const name of artifactFamilyNames) {
-    assert.equal(references[name].tag, await familyTag(name), `${name} tag is stale`);
+    if (name === "native-artifacts") {
+      for (const target of Object.keys(references[name].assets)) {
+        const release = await nativeArtifactRelease(target);
+        const coordinate = references[name].releases?.[target] ?? references[name];
+        assert.equal(coordinate.tag, release.tag);
+        assert.equal(coordinate.fingerprint, release.fingerprint);
+      }
+    } else assert.equal(references[name].tag, await familyTag(name), `${name} tag is stale`);
     assert.deepEqual(Object.values(references[name].assets).sort(), [...(await expectedAssetNames(name))].sort());
   }
   assert.equal(references["native-artifacts"].indexedBy, "bundleTarget");
@@ -290,13 +395,33 @@ test("policy publication projects release assets from the installed derived surf
   }
 });
 
+test("release projection rejects an omitted or mismatched per-target coordinate", async () => {
+  const references = await buildArtifactReferences();
+  const missing = structuredClone(references);
+  missing["native-artifacts"].releases = Object.fromEntries(
+    Object.keys(missing["native-artifacts"].assets).map((target) => [
+      target,
+      { tag: missing["native-artifacts"].tag, fingerprint: missing["native-artifacts"].fingerprint },
+    ]),
+  );
+  delete missing["native-artifacts"].tag;
+  delete missing["native-artifacts"].fingerprint;
+  delete missing["native-artifacts"].releases["arm64-osx"];
+  assert.throws(() => artifactAssetRows(missing), /mismatched native-artifacts asset and release indexes/u);
+
+  const invalid = structuredClone(missing);
+  invalid["native-artifacts"].releases["arm64-osx"] = { tag: "", fingerprint: "0".repeat(64) };
+  assert.throws(() => artifactAssetRows(invalid), /no release coordinate for native-artifacts\/arm64-osx/u);
+});
+
 test("published artifact references bind every publisher integrity document", async () => {
   const integrityRoot = await mkdtemp(path.join(tmpdir(), "deherm-artifact-integrity-"));
   try {
     for (const family of artifactFamilyNames) {
-      const release = await familyRelease(family);
       await mkdir(path.join(integrityRoot, family), { recursive: true });
       for (const row of await publishedAssets(family)) {
+        const release =
+          family === "native-artifacts" ? await nativeArtifactRelease(row.target) : await familyRelease(family);
         const document = {
           schemaVersion: 1,
           kind: RELEASE_INTEGRITY_KIND,

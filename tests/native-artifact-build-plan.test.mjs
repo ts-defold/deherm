@@ -3,10 +3,12 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 import {
+  assertNativeArtifactPlanCoverage,
   describeBuildRow,
   githubOutputRecords,
   planNativeArtifactBuilds,
 } from "../scripts/plan-native-artifact-builds.mjs";
+import { buildReleaseTags } from "../scripts/generate-release-tags.mjs";
 
 function rows(plan) {
   return Object.values(plan.matrices).flatMap((matrix) => matrix.include);
@@ -77,6 +79,31 @@ test("a row whose archive exists without its publisher integrity document is reb
   assert.deepEqual(plan.assets["native-artifacts"].missing, [sidecar]);
 });
 
+test("recipe releases schedule only rows missing from that immutable tag", async () => {
+  const initial = await planNativeArtifactBuilds();
+  const present = {
+    "hermes-host": initial.assets["hermes-host"].expected,
+    dehermc: initial.assets.dehermc.expected,
+  };
+  for (const [key, release] of Object.entries(initial.releases)) present[key] = release.expected;
+  present["native-artifacts/windows"] = [];
+  const windows = await planNativeArtifactBuilds(present);
+  assert.deepEqual(
+    rows(windows).map((row) => row.target),
+    ["x86_64-win32"],
+  );
+
+  present["native-artifacts/windows"] = initial.releases["native-artifacts/windows"].expected;
+  present["native-artifacts/linux"] = [];
+  const linux = await planNativeArtifactBuilds(present);
+  assert.deepEqual(
+    rows(linux)
+      .map((row) => row.target)
+      .sort(),
+    ["arm64-linux", "x86_64-linux"],
+  );
+});
+
 test("published fingerprint rows are immutable at the upload boundary", async () => {
   const uploader = await readFile("scripts/ci/upload-release-asset.sh", "utf8");
   assert.match(uploader, /if asset_exists "\$candidate"; then[\s\S]*skipping upload/u);
@@ -95,6 +122,24 @@ test("complete artifact publication refreshes policy before consumer proof", asy
   assert.match(final, /if: inputs\.policy_run_id == ''[\s\S]*generate-release-tags\.mjs --check --published/u);
   assert.match(final, /-f artifact_refresh_only=true/u);
   assert.doesNotMatch(final, /gh workflow run end-to-end\.yml/u);
+});
+
+test("target publication is not circularly gated by the package host-tool lock", async () => {
+  const [workflow, generator, policy] = await Promise.all([
+    readFile(".github/workflows/native-artifacts.yml", "utf8"),
+    readFile("scripts/generate-release-tags.mjs", "utf8"),
+    readFile(".github/workflows/policy.yml", "utf8"),
+  ]);
+  const lock = await buildReleaseTags();
+  assert.deepEqual(Object.keys(lock.families).sort(), ["dehermc", "hermes-host"]);
+  assert.match(generator, /families: \["hermes-host", "dehermc"\]/u);
+  assert.match(
+    workflow,
+    /Verify every fingerprinted row is published[\s\S]*generate-release-tags\.mjs --check --published/u,
+  );
+  assert.match(workflow, /generate-release-tags\.mjs --check --published[\s\S]*gh workflow run policy\.yml/u);
+  assert.match(policy, /publish-site:[\s\S]*dispatch-end-to-end/u);
+  assert.match(policy, /dispatch-end-to-end:[\s\S]*needs: consumer-smoke/u);
 });
 
 test("policy-derived SDK compatibility inputs flow through every target artifact job", async () => {
@@ -150,6 +195,11 @@ test("numeric slots resolve back to the canonical build row", async () => {
     docker_platform: "linux/arm64",
     target: "arm64-linux",
     asset: "hermes-arm64-linux.tar.gz",
+    recipe: "linux",
+    release_key: "native-artifacts/linux",
+    release_tag: plan.releases["native-artifacts/linux"].tag,
+    release_fingerprint: plan.releases["native-artifacts/linux"].fingerprint,
+    release_title: plan.releases["native-artifacts/linux"].title,
   });
   assert.deepEqual(describeBuildRow(plan, "android=0"), {
     slot: 0,
@@ -157,6 +207,11 @@ test("numeric slots resolve back to the canonical build row", async () => {
     api_kind: "android_ndk_api",
     target: "armv7-android",
     asset: "hermes-armv7-android.tar.gz",
+    recipe: "android",
+    release_key: "native-artifacts/android",
+    release_tag: plan.releases["native-artifacts/android"].tag,
+    release_fingerprint: plan.releases["native-artifacts/android"].fingerprint,
+    release_title: plan.releases["native-artifacts/android"].title,
   });
   assert.deepEqual(describeBuildRow(plan, "hermes_host=4"), {
     slot: 4,
@@ -165,6 +220,26 @@ test("numeric slots resolve back to the canonical build row", async () => {
     asset: "hermes-host-win32-x64.tar.gz",
   });
   assert.throws(() => describeBuildRow(plan, "android=9"), /has no slot 9/u);
+});
+
+test("planner refuses a derived target omitted from the recipe index", () => {
+  assert.throws(
+    () => assertNativeArtifactPlanCoverage([{ target: "mystery-console", asset: "hermes-mystery-console.tar.gz" }]),
+    /No native-artifact executor is declared/u,
+  );
+});
+
+test("planner rejects an asset listing attributed to the wrong immutable tag", async () => {
+  const initial = await planNativeArtifactBuilds();
+  await assert.rejects(
+    planNativeArtifactBuilds({
+      "native-artifacts/linux": {
+        tag: "libs-linux-wrong",
+        assets: initial.releases["native-artifacts/linux"].expected,
+      },
+    }),
+    /Published-asset index mismatch for native-artifacts\/linux/u,
+  );
 });
 
 test("pre-install row resolution does not import the archive verifier", async () => {
@@ -216,6 +291,10 @@ test("release publication uses authoritative platform inputs", async () => {
     /windows-native:[\s\S]*?if: needs\.plan\.outputs\.windows_any == 'true' && needs\.plan\.outputs\.registry_credential != 'true'/u,
   );
   assert.doesNotMatch(workflow, /windows:[\s\S]*?continue-on-error: true/u);
+  assert.match(workflow, /--list-releases/u);
+  assert.match(workflow, /native_args\+=\(--present "\$release_key@\$tag=\$destination"\)/u);
+  assert.match(workflow, /upload-release-asset\.sh[\s\S]*?"\$RELEASE_TAG"/u);
+  assert.doesNotMatch(workflow, /needs\.plan\.outputs\.target_tag/u);
 });
 
 test("the Apple archive stages Hermes' configured header from the CMake build root", async () => {

@@ -133,10 +133,19 @@ function assertPublishedNativeArtifacts(artifactPolicy, revision) {
   if (!family) throw new Error(`Published Defold policy ${revision} has no native-artifacts mapping`);
   if (
     family.indexedBy !== "bundleTarget" ||
-    !/^[A-Za-z0-9][A-Za-z0-9._-]*$/u.test(family.tag ?? "") ||
-    !/^[0-9a-f]{64}$/u.test(family.fingerprint ?? "")
+    (!family.releases &&
+      (!/^[A-Za-z0-9][A-Za-z0-9._-]*$/u.test(family.tag ?? "") || !/^[0-9a-f]{64}$/u.test(family.fingerprint ?? "")))
   ) {
     throw new Error(`Published Defold policy ${revision} has an invalid native-artifacts mapping`);
+  }
+  for (const target of Object.keys(family.assets ?? {})) {
+    const release = family.releases?.[target] ?? family;
+    if (
+      !/^[A-Za-z0-9][A-Za-z0-9._-]*$/u.test(release.tag ?? "") ||
+      !/^[0-9a-f]{64}$/u.test(release.fingerprint ?? "")
+    ) {
+      throw new Error(`Published Defold policy ${revision} has no immutable release for ${target}`);
+    }
   }
   return family;
 }
@@ -1600,6 +1609,15 @@ async function coreSdkForRevision(requestedRevision, options = {}) {
     unresolved = await resolveDefoldSurface(requestedRevision, surfaceOptions);
   }
   const surface = assertResolvedDefoldSurface(unresolved);
+  if (options.projectRoot && surface.descriptor?.realization) {
+    const { recordProjectSurfaceReference } = await import("./policy-cache-maintenance.mjs");
+    await recordProjectSurfaceReference({
+      cacheHome: defoldSurfaceCacheHome(options.env),
+      projectRoot: options.projectRoot,
+      revision: requestedRevision,
+      realization: surface.descriptor.realization,
+    });
+  }
   if (options.requirePublishedArtifacts === true) assertPublishedNativeArtifacts(surface.artifacts, requestedRevision);
   const sdkSourceRoot = surface.sdkRoot;
   const repositorySourceRoot = surface.repositoryRoot;

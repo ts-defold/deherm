@@ -45,10 +45,10 @@ name: native-artifacts
 # rebuild whose inputs have not changed finds the release already present and
 # does nothing.
 #
-# The tag carries the first 16 hex digits of that fingerprint, not all 64. The
+# The tag carries the first 12 hex digits of that fingerprint, not all 64. The
 # full digest went into the release list, into every download URL and into the
 # policy index entry, at a length no one can compare by eye or quote in a bug
-# report; 64 bits is ample to separate a population of releases derived from
+# report; 48 bits is ample to separate a population of releases derived from
 # this checkout's own files. The full digest is still recorded - in the release
 # notes and beside the tag in the policy index entry - so every provenance claim
 # is still made over all 256 bits.
@@ -124,16 +124,13 @@ jobs:
   plan:
     runs-on: ubuntu-24.04
     outputs:
-      target_tag: ${{ steps.compute.outputs.target_tag }}
       hermes_host_tag: ${{ steps.compute.outputs.hermes_host_tag }}
       dehermc_tag: ${{ steps.compute.outputs.dehermc_tag }}
       # The FULL digest the tag truncates, and the human release title. Both are
       # derived beside the tag in scripts/lib/artifact-releases.mjs and carried
       # to the upload step, so nothing downstream re-derives either.
-      target_fingerprint: ${{ steps.compute.outputs.target_fingerprint }}
       hermes_host_fingerprint: ${{ steps.compute.outputs.hermes_host_fingerprint }}
       dehermc_fingerprint: ${{ steps.compute.outputs.dehermc_fingerprint }}
-      target_title: ${{ steps.compute.outputs.target_title }}
       hermes_host_title: ${{ steps.compute.outputs.hermes_host_title }}
       dehermc_title: ${{ steps.compute.outputs.dehermc_title }}
       # Only numeric slots cross the job-output boundary. GitHub's secret
@@ -218,7 +215,6 @@ jobs:
             ' "$prefix" "$metadata"
             node -e 'process.stdout.write(JSON.parse(process.argv[1]).tag)' "$metadata"
           }
-          target_tag="$(emit target node scripts/manage-native-artifacts.mjs release-metadata)"
           hermes_host_tag="$(emit hermes_host node scripts/manage-host-compilers.mjs release-metadata hermes-host)"
           dehermc_tag="$(emit dehermc node scripts/manage-host-compilers.mjs release-metadata dehermc)"
           # Fingerprints identify releases; asset names identify rows inside a
@@ -234,12 +230,19 @@ jobs:
               : > "$destination"
             fi
           }
-          present "$target_tag" build/ci-present-assets/native-artifacts.txt
           present "$hermes_host_tag" build/ci-present-assets/hermes-host.txt
           present "$dehermc_tag" build/ci-present-assets/dehermc.txt
 
+          native_args=()
+          while IFS=$'\t' read -r release_key tag; do
+            recipe="${release_key#native-artifacts/}"
+            destination="build/ci-present-assets/native-artifacts-$recipe.txt"
+            present "$tag" "$destination"
+            native_args+=(--present "$release_key@$tag=$destination")
+          done < <(node scripts/plan-native-artifact-builds.mjs --list-releases)
+
           node scripts/plan-native-artifact-builds.mjs \
-            --present native-artifacts=build/ci-present-assets/native-artifacts.txt \
+            "${native_args[@]}" \
             --present hermes-host=build/ci-present-assets/hermes-host.txt \
             --present dehermc=build/ci-present-assets/dehermc.txt \
             --github-output "$GITHUB_OUTPUT"
@@ -374,11 +377,9 @@ jobs:
       # names it for the target; renaming a file does not change its bytes.
       - env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_TITLE: ${{ needs.plan.outputs.target_title }}
-          RELEASE_FINGERPRINT: ${{ needs.plan.outputs.target_fingerprint }}
         run: |
           bash scripts/ci/upload-release-asset.sh \
-            "${{ needs.plan.outputs.target_tag }}" "${{ github.repository }}" \
+            "$RELEASE_TAG" "${{ github.repository }}" \
             "build/artifacts/$TARGET/hermes.tar.gz" "$ASSET"
 
   # ── Windows: Defold's own toolchain when we can reach it ────────────────────
@@ -434,11 +435,9 @@ jobs:
             -f toolchains/hermes/Dockerfile.win32 .
       - env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_TITLE: ${{ needs.plan.outputs.target_title }}
-          RELEASE_FINGERPRINT: ${{ needs.plan.outputs.target_fingerprint }}
         run: |
           bash scripts/ci/upload-release-asset.sh \
-            "${{ needs.plan.outputs.target_tag }}" "${{ github.repository }}" \
+            "$RELEASE_TAG" "${{ github.repository }}" \
             "build/artifacts/$TARGET/hermes.tar.gz" "$ASSET"
 
   # Fallback release-producing Windows lane for repositories without the
@@ -498,11 +497,9 @@ jobs:
             "$PWD/build/artifacts/$TARGET/hermes.tar.gz"
       - env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_TITLE: ${{ needs.plan.outputs.target_title }}
-          RELEASE_FINGERPRINT: ${{ needs.plan.outputs.target_fingerprint }}
         run: |
           bash scripts/ci/upload-release-asset.sh \
-            "${{ needs.plan.outputs.target_tag }}" "${{ github.repository }}" \
+            "$RELEASE_TAG" "${{ github.repository }}" \
             "build/artifacts/$TARGET/hermes.tar.gz" "$ASSET"
 
   android:
@@ -546,11 +543,9 @@ jobs:
             -f toolchains/hermes/Dockerfile.android .
       - env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_TITLE: ${{ needs.plan.outputs.target_title }}
-          RELEASE_FINGERPRINT: ${{ needs.plan.outputs.target_fingerprint }}
         run: |
           bash scripts/ci/upload-release-asset.sh \
-            "${{ needs.plan.outputs.target_tag }}" "${{ github.repository }}" \
+            "$RELEASE_TAG" "${{ github.repository }}" \
             "build/artifacts/$TARGET/hermes.tar.gz" "$ASSET"
 
   # macOS x64, iOS and the iOS simulator need the Apple SDKs, so there is no
@@ -591,11 +586,9 @@ jobs:
             "$PWD/build/artifacts/$TARGET/hermes.tar.gz"
       - env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_TITLE: ${{ needs.plan.outputs.target_title }}
-          RELEASE_FINGERPRINT: ${{ needs.plan.outputs.target_fingerprint }}
         run: |
           bash scripts/ci/upload-release-asset.sh \
-            "${{ needs.plan.outputs.target_tag }}" "${{ github.repository }}" \
+            "$RELEASE_TAG" "${{ github.repository }}" \
             "build/artifacts/$TARGET/hermes.tar.gz" "$ASSET"
 
   # ── Host compilers: hermesc and shermes, one pair per user host ─────────────
@@ -674,9 +667,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -uo pipefail
-          for tag in "${{ needs.plan.outputs.target_tag }}" \
-                     "${{ needs.plan.outputs.hermes_host_tag }}" \
-                     "${{ needs.plan.outputs.dehermc_tag }}"; do
+          tags=("${{ needs.plan.outputs.hermes_host_tag }}" "${{ needs.plan.outputs.dehermc_tag }}")
+          while IFS=$'\t' read -r _ tag; do tags+=("$tag"); done \
+            < <(node scripts/plan-native-artifact-builds.mjs --list-releases)
+          for tag in "${tags[@]}"; do
             {
               echo "### $tag"
               echo
@@ -701,11 +695,17 @@ jobs:
               : > "$destination"
             fi
           }
-          present "${{ needs.plan.outputs.target_tag }}" build/ci-final-assets/native-artifacts.txt
           present "${{ needs.plan.outputs.hermes_host_tag }}" build/ci-final-assets/hermes-host.txt
           present "${{ needs.plan.outputs.dehermc_tag }}" build/ci-final-assets/dehermc.txt
+          native_args=()
+          while IFS=$'\t' read -r release_key tag; do
+            recipe="${release_key#native-artifacts/}"
+            destination="build/ci-final-assets/native-artifacts-$recipe.txt"
+            present "$tag" "$destination"
+            native_args+=(--present "$release_key@$tag=$destination")
+          done < <(node scripts/plan-native-artifact-builds.mjs --list-releases)
           node scripts/plan-native-artifact-builds.mjs \
-            --present native-artifacts=build/ci-final-assets/native-artifacts.txt \
+            "${native_args[@]}" \
             --present hermes-host=build/ci-final-assets/hermes-host.txt \
             --present dehermc=build/ci-final-assets/dehermc.txt \
             > build/ci-final-assets/plan.json

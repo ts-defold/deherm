@@ -382,8 +382,9 @@ test("a target release already in the content-addressed cache installs without n
   try {
     await writeProjectLock(project);
     const family = artifactDocument.artifacts["native-artifacts"];
+    const coordinates = family.releases?.["arm64-osx"] ?? family;
     const cacheHome = path.join(project, "user-cache");
-    const cached = path.join(cacheHome, "artifacts", family.tag, "arm64-osx");
+    const cached = path.join(cacheHome, "artifacts", coordinates.tag, "arm64-osx");
     await mkdir(cached, { recursive: true });
     const hashes = {};
     for (const member of family.contents["arm64-osx"]) {
@@ -398,8 +399,8 @@ test("a target release already in the content-addressed cache installs without n
           schemaVersion: 1,
           kind: "deherm.target-artifact-cache",
           target: "arm64-osx",
-          tag: family.tag,
-          fingerprint: family.fingerprint,
+          tag: coordinates.tag,
+          fingerprint: coordinates.fingerprint,
           asset: family.assets["arm64-osx"],
           assetSha256: "a".repeat(64),
           integritySha256: family.integrity["arm64-osx"].sha256,

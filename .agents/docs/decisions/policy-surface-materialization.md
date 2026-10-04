@@ -143,16 +143,17 @@ silently returning to the packed emitter modules.
 
 # Current executable cut
 
-The authenticated `@compiler` subtree is now a **67,380-byte manifest**, not a
+The authenticated `@compiler` subtree is now a **65,468-byte manifest**, not a
 21 MB container. It references 20 independently content-addressed semantic
-documents, a 28-entry SDK manifest, and a 118-entry revision-output manifest.
-Of those outputs, 12 are package-rendered and 106 remain compatibility sources.
+documents, one compact dmSDK catalog recipe, a 28-entry SDK manifest, and a
+113-entry revision-output manifest. Of those outputs, 14 are package-rendered
+and 99 remain compatibility sources.
 This keeps each object shareable and makes the remaining migration
 debt enumerable; it does not pretend the referenced bytes have disappeared.
-The current reachable object graph is 25,078,691 bytes across 194 subtrees.
-The 17,792,680-byte canonical lowering plan is already rebuilt locally from a
-2,689,701-byte authenticated recipe-facts document. Twelve SDK support sources
-and 106 revision-output compatibility sources remain to be replaced by compact
+The current reachable object graph is 22,887,346 bytes across 188 subtrees.
+The 17,778,740-byte canonical lowering plan is already rebuilt locally from a
+2,682,082-byte authenticated recipe-facts object. Twelve SDK support sources
+and 99 revision-output compatibility sources remain to be replaced by compact
 facts plus package emitters.
 
 Schema-2 materialized surfaces authenticate policy-derived IR descriptor entries
@@ -169,9 +170,9 @@ policy”. The focused materialization/client suite passes 16/16, and
 realization contract. It restores the selected revision, resolves and validates
 the manifest's authenticated references, regenerates sixteen script and
 dmSDK TypeScript files from semantic documents or compact manifest facts,
-verifies their policy SHA-256 values, writes 12 SDK support files and 106
+verifies their policy SHA-256 values, writes 12 SDK support files and 99
 revision outputs from explicitly labelled authenticated compatibility sources,
-renders 12 revision outputs from package machinery, and records a revision-keyed
+renders 14 revision outputs from package machinery, and records a revision-keyed
 `surface.json` descriptor. The repository generator owns extraction and policy
 production; it no longer owns the public materialization contract.
 
@@ -229,6 +230,37 @@ policy through both writers, verifies the winning directory, reclaims an
 abandoned stage, corrupts a generated SDK file, and proves the retry quarantines
 and reconstructs the authenticated surface.
 
+Bounded maintenance is explicit and report-first. `deherm cache` performs a
+dry run that reports the whole cache size, managed-surface size, selected full
+identities, retained identities and reasons, quarantine reasons, planned paths,
+and reclaimable bytes. `deherm cache --apply` recomputes that same plan and then
+deletes only its listed paths. Per revision it retains the selected realization,
+every realization named by a live project marker, the two most recently
+selected rollback realizations, and the newest quarantine. Selection history
+uses a lock-serialized integer generation; pre-history entries use directory
+mtime with full identity as a deterministic tie-breaker. Rollback and quarantine
+windows are explicit non-negative CLI options.
+
+Project generation writes a matching marker in the project and a hashed
+reference record in the user cache. A reference is live only while
+`game.project` and the exact matching project marker still exist; a registry
+record alone never pins data forever. Realization descriptors supply full
+identities for inventory. A prefix-named directory with no matching descriptor
+or a symlink is reported as blocked and is never deleted automatically.
+
+`current.json` selection is serialized by a portable directory lock rather
+than platform-specific advisory locking. An online writer re-fetches and
+compares the mutable publication entry while holding the lock, so a process
+that materialized an older policy/artifact identity cannot overwrite a newer
+selection. An offline writer may initialize an absent pointer or reuse an
+identical pointer, but cannot replace a different current selection. For equal
+policy and artifact identities, an older package version likewise cannot
+replace a newer compiler realization. None of these pointer rules authenticate
+a surface; every reader still recomputes the complete identity and verifies all
+content. Windows `EPERM`, `EACCES`, `EBUSY`, and `ENOTEMPTY` outcomes during
+quarantine or reclamation become retryable, path-specific diagnostics and leave
+the immutable directory untouched.
+
 ## Compiler document inventory
 
 The manifest references these revision-derived documents. “Copied” means the
@@ -237,8 +269,8 @@ the document is a minimal policy input.
 
 | Document | Compact bytes | Current role | Required steady-state change |
 | --- | ---: | --- | --- |
-| `defold-binding-lowering-recipe-facts.json` | 2,560,034 | normalized source-derived lowering selections | package emitter rebuilds the plan byte-for-byte |
-| `defold-dmsdk-universal-bindings.json` | 2,985,651 | copied recipe catalog | normalize catalog facts and emit locally |
+| `defold-binding-lowering-recipe-facts.json` | 2,682,082 | normalized source-derived lowering selections | package emitter rebuilds the plan byte-for-byte |
+| `defold-dmsdk-universal-recipe-facts.json` | 1,059,425 | losslessly interned source-derived catalog facts | package emitter reconstructs `defold-dmsdk-universal-bindings.json` byte-for-byte |
 | `defold-sdk-ir.json` | 2,706,350 | source-derived dmSDK semantics | retain as policy facts or normalize without loss |
 | `defold-dmsdk-sdk-documentation.json` | 31,615 | source-derived dmSDK notes and deprecations | retain as policy facts; documentation must not enter runtime ABI identity |
 | `defold-script-api-ir.json` | 1,350,464 | source-derived script semantics | retain as policy facts or normalize without loss |
@@ -263,6 +295,15 @@ plan document or its checkout cache sentinel. Materialization creates both;
 the sentinel key covers the package emitter bytes, source input hashes, and
 source input paths, so an unchanged policy/compiler pair writes nothing while
 an emitter or input-identity change gets a different key.
+
+The dmSDK universal catalog uses the same lossless, schema-driven boundary.
+Its 3,489,572-byte canonical policy object became a 1,059,425-byte facts object,
+a 2,430,147-byte (69.64%) reduction. The package interpreter restores strings,
+object shapes, property order, and every revision fact, then reproduces the
+5,696,531-byte pretty-printed compiler document byte-for-byte. No Defold-defined
+declaration, symbol, ABI, target, lowering, or public-SDK fact moved into npm.
+The reconstructed catalog also renders the two largest dmSDK universal revision
+outputs locally: the native runtime table and browser direct-memory library.
 
 The existing sixteen SDK renderers consume the two primary IR documents, two
 small documentation augmentations, the handle-lowering report, and the
@@ -292,7 +333,9 @@ The 12 remaining SDK snapshots are revision fact projections:
 entries are zero-input stable templates (JSI declarations, three Static Hermes
 dispatch shims, and named-scalar empty-wave support); the universal dmSDK JSI
 header is the twelfth and consumes only the authenticated catalog recipe count.
-Every other one of the 118 outputs remains explicitly classified as a
+The native universal dispatcher and browser direct-memory library are the
+thirteenth and fourteenth and consume the reconstructed catalog. Every other
+one of the 113 outputs remains explicitly classified as a
 revision-source snapshot until its semantic input projection is extracted; the
 materializer does not infer stability from coincidentally unchanged bytes.
 
@@ -341,17 +384,17 @@ implementation-independent equivalence proof. A deliberate semantic change first
 `packages/sdk/src/generated` through the source pipeline and then runs
 `scripts/capture-policy-surface-old-pipeline.mjs --update`; the capture command
 has a check-only default and records the Defold revision plus an aggregate tree
-digest. Sixteen files (3,908,177 bytes) are locally rendered; 12 files
-(104,645 bytes) remain authenticated compatibility sources, and the test names
+digest. Sixteen files (3,908,367 bytes) are locally rendered; 12 files
+(115,312 bytes) remain authenticated compatibility sources, and the test names
 all 12 so migration debt cannot change silently. A second pass requires zero
 writes, proving keyed idempotence. The materializer invokes no parser and reads
-no Defold checkout. The same test requires all 118 revision outputs (1,723,658
-bytes) to match the source pipeline byte for byte: 12 package-rendered files
-(5,372 bytes) and 106 authenticated snapshots (1,720,303 bytes).
+no Defold checkout. The same test requires all 113 revision outputs (1,964,163
+bytes) to match the source pipeline byte for byte: 14 package-rendered files
+(473,955 bytes) and 99 authenticated snapshots (1,490,208 bytes).
 
-The `<5 MB` compiler-object budget is enforced; the current manifest is 67,380
+The `<5 MB` compiler-object budget is enforced; the current manifest is 65,468
 bytes. This is a structural transfer boundary, not yet a total-size victory.
-The 12 SDK support-source objects and 106 revision-output objects must still be
+The 12 SDK support-source objects and 99 revision-output objects must still be
 replaced by compiler-owned emitters over compact semantic facts. Those changes
 will reduce total transfer size without changing the consumer contract; the
 work is tracked in [#93](https://github.com/ts-defold/deherm/issues/93).

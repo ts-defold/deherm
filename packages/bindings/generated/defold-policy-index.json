@@ -21,20 +21,22 @@
   "entries": [
     {
       "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-      "policyRoot": "f3f232af1b15a5a3fd4e2b6b3dc122ac2f73e586297182e3b05ef3fa86edddd8",
-      "generator": "sha256:a9ad7bb63bb20a1e04cb0ad3ac02740f4031fbe08b9c6a1ddefc98b9cdd9e811",
+      "policyRoot": "5545f2fa75fb142dff875aedb49019ba8274b277028daa6e0c473441ad441f9f",
+      "generator": "sha256:4d5fcd509f2ad3f3af8845d27895255af89e6991cf4dcb6b05bf8c4b2b47537b",
       "realizer": {
         "minimumPackageVersion": "0.1.0",
         "requiredCapabilities": [
           "dmsdk.static-hermes-bounded-frame.v1",
           "output.compatibility-source.copy.v1",
+          "output.dmsdk-universal-browser.render.v1",
           "output.dmsdk-universal-jsi-header.render.v1",
+          "output.dmsdk-universal-runtime.render.v1",
           "output.stable-template.render.v1",
           "policy.compiler-document.binding-lowering-plan.v1",
           "policy.compiler-document.component-proxy-contract.v2",
           "policy.compiler-document.copy-json.v1",
           "policy.compiler-document.defold-value-layouts.v2",
-          "policy.compiler-document.dmsdk-universal.v1",
+          "policy.compiler-document.dmsdk-universal.v2",
           "policy.compiler-surface.references.v1",
           "policy.content-addressed-graph.v1",
           "sdk.compatibility-source.copy.v1",

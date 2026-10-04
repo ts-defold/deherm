@@ -58,7 +58,6 @@ export const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "
 export const paths = Object.freeze({
   bundleTargets: "packages/toolchains/defold-bundle-targets.json",
   nativeArtifacts: "packages/toolchains/native-artifacts.json",
-  releaseTags: "packages/toolchains/release-tags.json",
 });
 
 /**
@@ -124,11 +123,10 @@ async function readJson(relative) {
  * ones that cannot be produced; both are quoted rather than paraphrased, so a
  * reason that changes upstream changes here.
  */
-export function buildLedger({ bundleTargets, artifacts, releaseTags }) {
+export function buildLedger({ bundleTargets, artifacts }) {
   const declared = bundleTargets.targets.map((entry) => entry.target);
   const manifest = artifacts.targets ?? {};
   const glossary = artifacts.statuses ?? {};
-  const published = new Set(Object.keys(releaseTags.families?.["native-artifacts"]?.assets ?? {}));
 
   const rows = [];
   const problems = [];
@@ -147,7 +145,7 @@ export function buildLedger({ bundleTargets, artifacts, releaseTags }) {
       group: bundleTargets.targets.find((item) => item.target === target)?.group ?? null,
       status: entry.status,
       builder: entry.builder ?? null,
-      published: published.has(target),
+      published: entry.status === "vendored" || entry.status === "required-missing",
     };
     if (entry.status === "retired-upstream") {
       rows.push({ ...base, disposition: "declined", reason: glossary[entry.status] ?? entry.status });
@@ -187,12 +185,11 @@ export function buildLedger({ bundleTargets, artifacts, releaseTags }) {
 }
 
 export async function readLedger() {
-  const [bundleTargets, artifacts, releaseTags] = await Promise.all([
+  const [bundleTargets, artifacts] = await Promise.all([
     readJson(paths.bundleTargets),
     readJson(paths.nativeArtifacts),
-    readJson(paths.releaseTags),
   ]);
-  return { ...buildLedger({ bundleTargets, artifacts, releaseTags }), defoldRevision: artifacts.defoldRevision };
+  return { ...buildLedger({ bundleTargets, artifacts }), defoldRevision: artifacts.defoldRevision };
 }
 
 // ── Stages ──────────────────────────────────────────────────────────────────
@@ -213,11 +210,22 @@ const stages = {
       index: await readPolicyLocator(),
     });
     const native = resolved.artifacts?.artifacts?.["native-artifacts"];
-    if (native?.indexedBy !== "bundleTarget" || !native.tag || !native.assets) {
+    const targets = Object.keys(native?.assets ?? {});
+    const coordinates = targets.map((target) => native.releases?.[target] ?? native);
+    if (
+      native?.indexedBy !== "bundleTarget" ||
+      targets.length === 0 ||
+      coordinates.some(
+        (release) =>
+          !/^[A-Za-z0-9][A-Za-z0-9._-]*$/u.test(release?.tag ?? "") ||
+          !/^[a-f0-9]{64}$/u.test(release?.fingerprint ?? ""),
+      )
+    ) {
       throw new Error(`${context.defoldRevision}: published policy carries no usable native-artifacts mapping`);
     }
+    const tags = new Set(coordinates.map(({ tag }) => tag));
     return {
-      detail: `resolved ${resolved.entry.policyRoot.slice(0, 12)} and materialized ${native.tag} for ${Object.keys(native.assets).length} target(s)`,
+      detail: `resolved ${resolved.entry.policyRoot.slice(0, 12)} and materialized ${tags.size} immutable native release(s) for ${targets.length} target(s)`,
     };
   },
 

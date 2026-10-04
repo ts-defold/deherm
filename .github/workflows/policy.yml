@@ -333,7 +333,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          tag="$(node scripts/manage-native-artifacts.mjs tag)"
+          tag="$(node scripts/manage-native-artifacts.mjs tag x86_64-linux)"
           asset=hermes-x86_64-linux.tar.gz
           deadline=$((SECONDS + 2700))
           while ! gh release view "$tag" --repo "${{ github.repository }}" --json assets \

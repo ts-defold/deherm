@@ -32,8 +32,8 @@ import { installNativeArtifacts } from "./lib/native-artifact-install.mjs";
 // `defoldRevision` no longer rebuilds and republishes ten unchanged archives.
 import {
   expectedAssetNames,
-  familyRelease,
   fingerprintFamily,
+  nativeArtifactRelease,
   publishedAssets,
   targetDebugLibraryName,
 } from "./lib/artifact-releases.mjs";
@@ -276,39 +276,7 @@ function selectedTargets(args) {
   return targets;
 }
 
-const [command, ...args] = process.argv.slice(2);
-if (command === "fingerprint") console.log(await fingerprintFamily(FAMILY, { root }));
-// The TAG, derived where the expected-asset listing is derived. The workflow
-// used to build it by concatenating a prefix onto `fingerprint` output, which
-// put the prefix in two places and let the tag and the asset listing be
-// computed from different rules; truncating the digest would have made that
-// divergence quiet instead of obvious.
-else if (command === "tag") console.log((await familyRelease(FAMILY, { root })).tag);
-else if (command === "release-metadata") console.log(JSON.stringify(await familyRelease(FAMILY, { root }), null, 2));
-else if (command === "install") {
-  if (!args[0]) throw new Error("install requires a downloaded artifact directory");
-  throw new Error("Direct install has no publisher-authenticated release expectation; use pull to verify and install");
-} else if (command === "record") {
-  if (!args[0]) throw new Error("record requires a target, for example arm64-osx");
-  console.log(`recorded ${args[0]} ${await record(args[0])}`);
-} else if (command === "report") console.log(JSON.stringify(await report(), null, 2));
-else if (command === "expected-assets") console.log((await expectedAssets()).join("\n"));
-else if (command === "verify") {
-  await verify(args.includes("--complete"), args.includes("--json"), selectedTargets(args));
-} else if (command === "pull") {
-  // Release assets, not workflow artifacts. A workflow artifact expires, is
-  // scoped to one run, and needs an authenticated API call to fetch; none of
-  // that survives to a user six months after a release. The tag defaults to
-  // this checkout's own input fingerprint, because the artifacts are
-  // content-addressed: many déherm versions share one artifact release.
-  const tagIndex = args.indexOf("--tag");
-  const tag = tagIndex >= 0 ? args[tagIndex + 1] : (await familyRelease(FAMILY, { root })).tag;
-  const destination = path.join(root, "build", "native-artifact-downloads", tag);
-  await mkdir(destination, { recursive: true });
-  // By URL, not through `gh`: a user vendoring artifacts should not need a
-  // second CLI or an authenticated session. The asset names come from the same
-  // listing the CI completeness check uses, so no release listing is fetched to
-  // discover them - see packages/cli/src/release-assets.mjs.
+async function pullNativeArtifacts(args) {
   const requestedTargets = [...selectedTargets(args)];
   const published = await publishedAssets(FAMILY, { root });
   const knownTargets = new Set(published.map((row) => row.target));
@@ -321,82 +289,119 @@ else if (command === "verify") {
   }
   const selected = new Set(requestedTargets);
   const rows = selected.size ? published.filter((row) => selected.has(row.target)) : published;
+  const tagIndex = args.indexOf("--tag");
+  const tagOverride = tagIndex >= 0 ? args[tagIndex + 1] : null;
+  if (tagIndex >= 0 && !tagOverride) throw new Error("--tag requires a release tag");
   const releaseTags = JSON.parse(
     await readFile(path.join(root, "packages", "toolchains", "release-tags.json"), "utf8"),
   );
   const pinnedFamily = releaseTags.families?.[FAMILY];
-  const usePinnedIntegrity = pinnedFamily?.tag === tag;
-  const requestedAssets = rows.flatMap((row) => [releaseIntegrityAssetName(row.asset), row.asset]);
-  const { missing } = await downloadReleaseAssets({
-    tag,
-    assets: requestedAssets,
-    destination,
-    optional: args.includes("--partial"),
-    onProgress: ({ asset, status }) => console.log(`${status === "missing" ? "absent" : "fetched"} ${asset}`),
-  });
-  if (missing.length) console.log(`${missing.length} asset(s) not published for these inputs`);
-  // Each asset is one reproducible .tar.gz holding a target's release and
-  // debugger-enabled libraries. Unpack each into a directory named for the row
-  // that asked for it, which is what `install` matches on - so nothing here has
-  // to re-derive structure by parsing the name it just requested.
-  const absent = new Set(missing);
-  const expectedByTarget = new Map();
+  const groups = new Map();
   for (const row of rows) {
-    const integrityAsset = releaseIntegrityAssetName(row.asset);
-    if (absent.has(row.asset) || absent.has(integrityAsset)) continue;
-    const pinned = usePinnedIntegrity ? pinnedFamily.integrity?.[row.target] : null;
-    const pinnedMetadata = releaseMetadataFromPinnedIntegrity(pinned, integrityAsset, `${FAMILY}/${row.target}`);
-    const [integrityMetadata, archiveMetadata] = pinnedMetadata
-      ? [pinnedMetadata.integrity, pinnedMetadata.archive]
-      : await Promise.all([
-          resolveGithubReleaseAsset({ tag, asset: integrityAsset }),
-          resolveGithubReleaseAsset({ tag, asset: row.asset }),
-        ]);
-    const integrityBytes = await readFile(path.join(destination, integrityAsset));
-    verifyReleaseAssetBytes(integrityBytes, integrityMetadata, integrityAsset);
-    const integrity = validateReleaseIntegrity(JSON.parse(integrityBytes), {
-      family: FAMILY,
-      tag,
-      ...(pinnedMetadata ? { fingerprint: pinnedFamily.fingerprint } : {}),
-      asset: row.asset,
-      members: row.files,
-    });
-    if (
-      pinnedMetadata &&
-      (integrity.archive.sha256 !== pinned.archiveSha256 || integrity.archive.bytes !== pinned.archiveBytes)
-    ) {
-      throw new Error(`${integrityAsset} disagrees with the package-pinned archive identity`);
-    }
-    if (!tag.endsWith(integrity.fingerprint.slice(0, 12))) {
-      throw new Error(`${integrityAsset} fingerprint does not address release ${tag}`);
-    }
-    const archive = path.join(destination, row.asset);
-    verifyReleaseAssetBytes(await readFile(archive), archiveMetadata, row.asset);
-    await verifyReleaseArchive({ archive, integrity });
-    const extracted = path.join(destination, `hermes-${row.target}`);
-    await extractReleaseArchive({
-      archive,
-      destination: extracted,
-    });
-    await verifyReleaseArchive({ archive, integrity, extractedRoot: extracted });
-    expectedByTarget.set(row.target, {
-      integrity,
-      tag,
-      fingerprint: integrity.fingerprint,
-      asset: row.asset,
-    });
+    const derived = await nativeArtifactRelease(row.target, { root });
+    const coordinates = tagOverride
+      ? { ...derived, tag: tagOverride }
+      : (pinnedFamily?.releases?.[row.target] ?? derived);
+    const key = `${coordinates.tag}\0${coordinates.fingerprint}`;
+    const group = groups.get(key) ?? { ...coordinates, rows: [] };
+    group.rows.push(row);
+    groups.set(key, group);
   }
-  const installed = await install(destination, expectedByTarget);
+
+  const downloadRoot = path.join(root, "build", "native-artifact-downloads");
+  const expectedByTarget = new Map();
+  let missingCount = 0;
+  for (const group of groups.values()) {
+    const destination = path.join(downloadRoot, group.tag);
+    await mkdir(destination, { recursive: true });
+    const requestedAssets = group.rows.flatMap((row) => [releaseIntegrityAssetName(row.asset), row.asset]);
+    const { missing } = await downloadReleaseAssets({
+      tag: group.tag,
+      assets: requestedAssets,
+      destination,
+      optional: args.includes("--partial"),
+      onProgress: ({ asset, status }) => console.log(`${status === "missing" ? "absent" : "fetched"} ${asset}`),
+    });
+    missingCount += missing.length;
+    const absent = new Set(missing);
+    for (const row of group.rows) {
+      const integrityAsset = releaseIntegrityAssetName(row.asset);
+      if (absent.has(row.asset) || absent.has(integrityAsset)) continue;
+      const pinnedCoordinates = pinnedFamily?.releases?.[row.target] ?? pinnedFamily;
+      const usePinned = pinnedCoordinates?.tag === group.tag && pinnedCoordinates?.fingerprint === group.fingerprint;
+      const pinned = usePinned ? pinnedFamily.integrity?.[row.target] : null;
+      const pinnedMetadata = releaseMetadataFromPinnedIntegrity(pinned, integrityAsset, `${FAMILY}/${row.target}`);
+      const [integrityMetadata, archiveMetadata] = pinnedMetadata
+        ? [pinnedMetadata.integrity, pinnedMetadata.archive]
+        : await Promise.all([
+            resolveGithubReleaseAsset({ tag: group.tag, asset: integrityAsset }),
+            resolveGithubReleaseAsset({ tag: group.tag, asset: row.asset }),
+          ]);
+      const integrityBytes = await readFile(path.join(destination, integrityAsset));
+      verifyReleaseAssetBytes(integrityBytes, integrityMetadata, integrityAsset);
+      const integrity = validateReleaseIntegrity(JSON.parse(integrityBytes), {
+        family: FAMILY,
+        tag: group.tag,
+        fingerprint: group.fingerprint,
+        asset: row.asset,
+        members: row.files,
+      });
+      if (
+        pinnedMetadata &&
+        (integrity.archive.sha256 !== pinned.archiveSha256 || integrity.archive.bytes !== pinned.archiveBytes)
+      ) {
+        throw new Error(`${integrityAsset} disagrees with the package-pinned archive identity`);
+      }
+      const archive = path.join(destination, row.asset);
+      verifyReleaseAssetBytes(await readFile(archive), archiveMetadata, row.asset);
+      await verifyReleaseArchive({ archive, integrity });
+      const extracted = path.join(downloadRoot, `hermes-${row.target}`);
+      await extractReleaseArchive({ archive, destination: extracted });
+      await verifyReleaseArchive({ archive, integrity, extractedRoot: extracted });
+      expectedByTarget.set(row.target, {
+        integrity,
+        tag: group.tag,
+        fingerprint: group.fingerprint,
+        asset: row.asset,
+      });
+    }
+  }
+  if (missingCount) console.log(`${missingCount} asset(s) not published for these inputs`);
+  const installed = await install(downloadRoot, expectedByTarget);
   const missingInstalls = rows.map((row) => row.target).filter((target) => !installed.includes(target));
   if (!args.includes("--partial") && missingInstalls.length) {
     throw new Error(`Downloaded archives did not install requested targets: ${missingInstalls.join(", ")}`);
   }
   console.log(`installed ${installed.length} native artifact(s): ${installed.join(", ") || "none"}`);
-  // A targeted pull promises that row, not the entire release. The explicit
-  // missingInstalls check above is its completeness gate; asking verify() for
-  // global completeness here would make `--target x86_64-linux` fail because
-  // an unrelated iOS row was intentionally not downloaded.
   await verify(!args.includes("--partial") && selected.size === 0, false, selected);
+}
+
+const [command, ...args] = process.argv.slice(2);
+if (command === "fingerprint") {
+  console.log(
+    args[0] ? (await nativeArtifactRelease(args[0], { root })).fingerprint : await fingerprintFamily(FAMILY, { root }),
+  );
+}
+// The TAG, derived where the expected-asset listing is derived. The workflow
+// used to build it by concatenating a prefix onto `fingerprint` output, which
+// put the prefix in two places and let the tag and the asset listing be
+// computed from different rules; truncating the digest would have made that
+// divergence quiet instead of obvious.
+else if (command === "tag") console.log((await nativeArtifactRelease(args[0] ?? "x86_64-linux", { root })).tag);
+else if (command === "release-metadata")
+  console.log(JSON.stringify(await nativeArtifactRelease(args[0] ?? "x86_64-linux", { root }), null, 2));
+else if (command === "install") {
+  if (!args[0]) throw new Error("install requires a downloaded artifact directory");
+  throw new Error("Direct install has no publisher-authenticated release expectation; use pull to verify and install");
+} else if (command === "record") {
+  if (!args[0]) throw new Error("record requires a target, for example arm64-osx");
+  console.log(`recorded ${args[0]} ${await record(args[0])}`);
+} else if (command === "report") console.log(JSON.stringify(await report(), null, 2));
+else if (command === "expected-assets") console.log((await expectedAssets()).join("\n"));
+else if (command === "verify") {
+  await verify(args.includes("--complete"), args.includes("--json"), selectedTargets(args));
+} else if (command === "pull") {
+  await pullNativeArtifacts(args);
 } else {
   throw new Error(
     "Usage: manage-native-artifacts.mjs {fingerprint|tag|release-metadata|expected-assets|report|" +

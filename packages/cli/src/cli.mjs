@@ -32,6 +32,7 @@ Commands:
   create       Scaffold a Defold + TypeScript project and generate its SDK
   doctor       Report host compilers, per-target Hermes archives, the project, and its extension APIs
   policy       Fetch, authenticate, and cache the Pages policy for the project's Defold revision
+  cache        Report or reclaim old immutable policy surfaces (dry-run by default)
   extensions   List native extensions and their script API coverage
   generate     Write project inventory, TypeScript SDK, tsconfig, and VS Code setup
   assemble-typed-native  Compile the reachable Static Hermes lane into a Defold extension
@@ -107,6 +108,10 @@ Options:
   --force            Regenerate owned project outputs even when the input key is current
   --project-cache    For policy, pin the realized surface into <project>/.deherm/cache
   --pin              Alias for --project-cache
+  --dry-run          For cache, report planned deletions without changing the cache (default)
+  --apply            For cache, apply the deletions printed by the retention report
+  --rollback <n>     For cache, keep this many prior selected surfaces per revision (default: 2)
+  --keep-quarantines <n>  For cache, keep this many recent rejected surfaces per revision (default: 1)
   --recompute        For verify-bundle, re-bundle current sources to name the fingerprint they produce
   --allow-unbound    For verify-bundle, report an unrecorded or absent artifact without failing
   --json             Print machine-readable JSON
@@ -143,6 +148,11 @@ export function parseArguments(argv) {
     else if (value === "--reconcile") options.reconcile = true;
     else if (value === "--shermes") options.shermes = args.shift();
     else if (value === "--force") options.force = true;
+    else if (value === "--dry-run" && options.command === "cache") options.apply = false;
+    else if (value === "--apply" && options.command === "cache") options.apply = true;
+    else if (value === "--rollback" && options.command === "cache") options.rollbackWindow = Number(args.shift());
+    else if (value === "--keep-quarantines" && options.command === "cache")
+      options.quarantineWindow = Number(args.shift());
     else if ((value === "--project-cache" || value === "--pin") && options.command === "policy")
       options.projectCache = true;
     else if (value === "--recompute") options.recompute = true;
@@ -232,6 +242,18 @@ export function parseArguments(argv) {
     (!Number.isSafeInteger(options.durationMs) || options.durationMs < 1 || options.durationMs > 86_400_000)
   ) {
     throw new Error("--duration must be an integer from 1 through 86400000 milliseconds");
+  }
+  if (
+    options.rollbackWindow !== undefined &&
+    (!Number.isSafeInteger(options.rollbackWindow) || options.rollbackWindow < 0)
+  ) {
+    throw new Error("--rollback must be a non-negative integer");
+  }
+  if (
+    options.quarantineWindow !== undefined &&
+    (!Number.isSafeInteger(options.quarantineWindow) || options.quarantineWindow < 0)
+  ) {
+    throw new Error("--keep-quarantines must be a non-negative integer");
   }
   return options;
 }
@@ -864,6 +886,17 @@ export async function run(argv = process.argv.slice(2)) {
     else console.log(formatBugPool(result.document, { cwd: process.cwd(), poolFile: result.poolFile }));
     return 0;
   }
+  if (options.command === "cache") {
+    const { formatPolicyCacheReport, maintainPolicyCache } = await import("./policy-cache-maintenance.mjs");
+    const report = await maintainPolicyCache({
+      apply: options.apply === true,
+      rollbackWindow: options.rollbackWindow,
+      quarantineWindow: options.quarantineWindow,
+    });
+    if (options.json) console.log(JSON.stringify(report, null, 2));
+    else console.log(formatPolicyCacheReport(report));
+    return report.failures?.length ? 2 : 0;
+  }
   if (options.command === "doctor") return await runDoctor(options);
   if (options.command === "policy") {
     const { assertResolvedDefoldRevision, resolveDefoldRevision } = await import("./defold-revision.mjs");
@@ -888,6 +921,14 @@ export async function run(argv = process.argv.slice(2)) {
       surfaceRoot,
       surfaceBoundary: options.projectCache ? projectRoot : undefined,
     });
+    if (projectRoot && result.surface?.descriptor?.realization) {
+      const { recordProjectSurfaceReference } = await import("./policy-cache-maintenance.mjs");
+      await recordProjectSurfaceReference({
+        projectRoot,
+        revision,
+        realization: result.surface.descriptor.realization,
+      });
+    }
     const summary = {
       schemaVersion: 1,
       defoldRevision: result.revision,

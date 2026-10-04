@@ -210,7 +210,11 @@ export function resolveArtifactUrl({ index, artifacts, family, key, member = nul
       throw new Error(`${family} ${key} carries ${contents.join(", ") || "nothing"}, not ${member}`);
     }
   }
-  return { url: expand(index.base.releaseAsset, { tag: reference.tag, asset }), tag: reference.tag, asset };
+  const release = reference.releases?.[key] ?? reference;
+  if (typeof release.tag !== "string" || !/^[a-f0-9]{64}$/u.test(release.fingerprint ?? "")) {
+    throw new Error(`${family} publishes ${key} without an immutable release coordinate`);
+  }
+  return { url: expand(index.base.releaseAsset, { tag: release.tag, asset }), tag: release.tag, asset };
 }
 
 /**

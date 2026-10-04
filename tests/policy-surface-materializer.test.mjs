@@ -20,6 +20,11 @@ import {
   BINDING_LOWERING_RECIPE_NAME,
 } from "../packages/compiler/src/binding-lowering-plan-recipe.mjs";
 import { LOCALLY_RENDERED_OUTPUT_RECIPES } from "../packages/compiler/src/revision-output-emitter.mjs";
+import {
+  createDmSdkUniversalRecipeFacts,
+  DMSDK_UNIVERSAL_RECIPE_FACTS_NAME,
+  emitDmSdkUniversalReport,
+} from "../packages/compiler/src/dmsdk-universal-recipe-facts.mjs";
 import { sealObject } from "../packages/compiler/src/api-policy.mjs";
 import {
   SCRIPT_URL_TARGET_SUPPORT_RECIPE_V1,
@@ -174,7 +179,7 @@ test("authenticated policy materializes the complete generated SDK without a Def
   const cacheRoot = await mkdtemp(path.join(tmpdir(), "deherm-policy-surface-test-"));
   const outputRoot = path.join(cacheRoot, "surfaces", policy.revision);
   const first = await materializePolicySurface(policy, { outputRoot });
-  assert.equal(first.descriptor.documents.length, 23);
+  assert.equal(first.descriptor.documents.length, 24);
   assert.equal(first.descriptor.schemaVersion, 2);
   assert.match(first.descriptor.policyRoot, /^[0-9a-f]{64}$/u);
   assert.match(first.descriptor.compilerObjectSha256, /^[0-9a-f]{64}$/u);
@@ -234,6 +239,22 @@ test("authenticated policy materializes the complete generated SDK without a Def
   assert.ok(
     Buffer.byteLength(JSON.stringify(recipeObject.value)) < 3_000_000,
     "authenticated lowering recipe facts must stay below 3 MB",
+  );
+  const universalRecipeEntry = documentEntries[DMSDK_UNIVERSAL_RECIPE_FACTS_NAME];
+  assert.ok(universalRecipeEntry, "policy must carry compact dmSDK universal recipe facts");
+  assert.ok(
+    first.descriptor.documents.includes(DMSDK_UNIVERSAL_RECIPE_FACTS_NAME),
+    "materialized surfaces must retain authenticated universal recipe facts",
+  );
+  assert.equal(
+    documentEntries["defold-dmsdk-universal-bindings.json"],
+    undefined,
+    "policy must not copy the derived dmSDK universal report",
+  );
+  const universalRecipeObject = policy.objects.get(universalRecipeEntry.object);
+  assert.ok(
+    Buffer.byteLength(JSON.stringify(universalRecipeObject.value)) < 1_100_000,
+    "authenticated dmSDK universal recipe facts must stay below 1.1 MB",
   );
 
   const rendered = Object.entries(first.descriptor.sdk)
@@ -476,6 +497,21 @@ test("authenticated policy materializes the complete generated SDK without a Def
   );
   assert.match(refusedPlanTamper.searched[0].reason, /not derived from its authenticated recipe/u);
 
+  await materializePolicySurface(policy, { outputRoot });
+  const catalogPath = path.join(outputRoot, "ir", "defold-dmsdk-universal-bindings.json");
+  const forgedCatalog = JSON.parse(await readFile(catalogPath, "utf8"));
+  forgedCatalog.abi.maxArguments += 1;
+  const forgedCatalogSource = `${JSON.stringify(forgedCatalog, null, 2)}\n`;
+  await writeFile(catalogPath, forgedCatalogSource);
+  const forgedCatalogDescriptor = JSON.parse(await readFile(descriptorPath, "utf8"));
+  forgedCatalogDescriptor.ir["defold-dmsdk-universal-bindings.json"].sha256 = sha256(forgedCatalogSource);
+  await writeFile(descriptorPath, `${JSON.stringify(forgedCatalogDescriptor, null, 2)}\n`);
+  const refusedCatalogTamper = await resolveDefoldSurface(policy.revision, {
+    env: { DEHERM_CACHE_HOME: cacheRoot },
+  });
+  assert.ok(refusedCatalogTamper.blocker, "self-consistent catalog output must remain bound to recipe facts");
+  assert.match(refusedCatalogTamper.searched[0].reason, /not derived from its authenticated recipe/u);
+
   const pointerCacheRoot = path.join(cacheRoot, "pointer-layout");
   const realization = policySurfaceRealizationIdentity({
     entry: {
@@ -611,12 +647,13 @@ test("authenticated policy materializes the complete generated SDK without a Def
 test("policy materialization fails closed when the dmSDK catalog exceeds the package frame", async () => {
   const policy = await currentResolvedPolicy();
   const compiler = policy.objects.get("@compiler");
-  const catalogKey = compiler.value.documents.entries["defold-dmsdk-universal-bindings.json"].object;
+  const catalogKey = compiler.value.documents.entries[DMSDK_UNIVERSAL_RECIPE_FACTS_NAME].object;
   const catalogObject = policy.objects.get(catalogKey);
   const value = structuredClone(catalogObject.value);
-  const catalog = value.value;
+  const catalog = emitDmSdkUniversalReport(value.value);
   catalog.abi.maxArguments = 33;
   catalog.recipes[0].abi.argumentCount = 33;
+  value.value = createDmSdkUniversalRecipeFacts(catalog);
   const oversized = {
     ...policy,
     objects: new Map(policy.objects).set(catalogKey, { ...catalogObject, value }),

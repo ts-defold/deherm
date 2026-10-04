@@ -51,6 +51,7 @@ export const POLICY_REALIZER_CAPABILITY_REGISTRY = Object.freeze({
   "policy.compiler-document.defold-value-layouts.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   "policy.compiler-document.defold-value-layouts.v2": Object.freeze({ introducedInVersion: "0.0.0" }),
   "policy.compiler-document.dmsdk-universal.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
+  "policy.compiler-document.dmsdk-universal.v2": Object.freeze({ introducedInVersion: "0.1.0" }),
   "sdk.compatibility-source.copy.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   "sdk.dmsdk.index.render.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   "sdk.dmsdk.browser-arena.render.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
@@ -71,6 +72,8 @@ export const POLICY_REALIZER_CAPABILITY_REGISTRY = Object.freeze({
   "sdk.script.value-target-support.render.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   "output.compatibility-source.copy.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   "output.dmsdk-universal-jsi-header.render.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
+  "output.dmsdk-universal-runtime.render.v1": Object.freeze({ introducedInVersion: "0.1.0" }),
+  "output.dmsdk-universal-browser.render.v1": Object.freeze({ introducedInVersion: "0.1.0" }),
   "output.stable-template.render.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   "binding.raw-unverified-fallback.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   [DMSDK_UNIVERSAL_STATIC_FRAME_CAPABILITY]: Object.freeze({
@@ -83,6 +86,7 @@ export const POLICY_REALIZER_CAPABILITIES = Object.freeze(Object.keys(POLICY_REA
 
 const POLICY_REALIZER_CAPABILITY_IMPLICATIONS = Object.freeze({
   "policy.compiler-document.dmsdk-universal.v1": Object.freeze([DMSDK_UNIVERSAL_STATIC_FRAME_CAPABILITY]),
+  "policy.compiler-document.dmsdk-universal.v2": Object.freeze([DMSDK_UNIVERSAL_STATIC_FRAME_CAPABILITY]),
 });
 
 function versionTuple(version) {

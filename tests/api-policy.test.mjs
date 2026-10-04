@@ -704,27 +704,32 @@ test("policy roots carry only the realization capabilities their payload uses", 
 });
 
 test("dmSDK universal policies require the package-owned bounded Static Hermes frame", () => {
-  const compilerSurface = {
-    documents: {
-      "defold-dmsdk-universal-bindings.json": {},
-    },
-    sdk: {},
-    realizationRecipes: {
+  for (const [name, recipe, minimumPackageVersion] of [
+    ["defold-dmsdk-universal-bindings.json", "policy.compiler-document.dmsdk-universal.v1", "0.0.0"],
+    ["defold-dmsdk-universal-recipe-facts.json", "policy.compiler-document.dmsdk-universal.v2", "0.1.0"],
+  ]) {
+    const compilerSurface = {
       documents: {
-        "defold-dmsdk-universal-bindings.json": "policy.compiler-document.dmsdk-universal.v1",
+        [name]: {},
       },
       sdk: {},
-    },
-  };
-  assert.deepEqual(buildPolicyRealizer({ compilerSurface }), {
-    minimumPackageVersion: "0.0.0",
-    requiredCapabilities: [
-      DMSDK_UNIVERSAL_STATIC_FRAME_CAPABILITY,
-      "policy.compiler-document.dmsdk-universal.v1",
-      "policy.compiler-surface.references.v1",
-      "policy.content-addressed-graph.v1",
-    ],
-  });
+      realizationRecipes: {
+        documents: {
+          [name]: recipe,
+        },
+        sdk: {},
+      },
+    };
+    assert.deepEqual(buildPolicyRealizer({ compilerSurface }), {
+      minimumPackageVersion,
+      requiredCapabilities: [
+        DMSDK_UNIVERSAL_STATIC_FRAME_CAPABILITY,
+        recipe,
+        "policy.compiler-surface.references.v1",
+        "policy.content-addressed-graph.v1",
+      ],
+    });
+  }
   assert.deepEqual(POLICY_REALIZER_CAPABILITY_REGISTRY[DMSDK_UNIVERSAL_STATIC_FRAME_CAPABILITY], {
     introducedInVersion: "0.0.0",
     schema: DMSDK_UNIVERSAL_STATIC_FRAME_SCHEMA,

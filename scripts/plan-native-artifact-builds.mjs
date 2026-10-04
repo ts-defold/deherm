@@ -17,7 +17,12 @@ import { appendFile, readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 
 import { releaseIntegrityAssetName } from "../packages/cli/src/release-integrity-name.mjs";
-import { publishedAssets, repositoryRoot } from "./lib/artifact-releases.mjs";
+import {
+  artifactReleaseForRow,
+  nativeArtifactRecipeForTarget,
+  publishedAssets,
+  repositoryRoot,
+} from "./lib/artifact-releases.mjs";
 
 const targetExecutors = Object.freeze({
   "x86_64-linux": { lane: "linux", slot: 0, runner: "ubuntu-24.04", docker_platform: "linux/amd64" },
@@ -48,6 +53,19 @@ function rowWithKey(row, executor, key) {
   return { ...executor, [key]: row[key], asset: row.asset };
 }
 
+export function assertNativeArtifactPlanCoverage(rows) {
+  for (const row of rows) {
+    const executor = targetExecutors[row.target];
+    if (!executor) throw new Error(`No native-artifact executor is declared for ${row.target} (${row.asset})`);
+    const recipe = nativeArtifactRecipeForTarget(row.target);
+    if (executor.lane !== recipe) {
+      throw new Error(
+        `Native-artifact planner/index mismatch for ${row.target}: executor ${executor.lane}, recipe ${recipe}`,
+      );
+    }
+  }
+}
+
 /**
  * Produce missing-row matrices from already-published asset names.
  *
@@ -58,7 +76,10 @@ function rowWithKey(row, executor, key) {
 export async function planNativeArtifactBuilds(presentByFamily = {}, options = {}) {
   const root = options.root ?? repositoryRoot;
   const present = Object.fromEntries(
-    ["native-artifacts", "hermes-host", "dehermc"].map((family) => [family, new Set(presentByFamily[family] ?? [])]),
+    ["native-artifacts", "hermes-host", "dehermc"].map((family) => [
+      family,
+      new Set(presentByFamily[family]?.assets ?? presentByFamily[family] ?? []),
+    ]),
   );
 
   const targetRows = await publishedAssets("native-artifacts", { root });
@@ -66,14 +87,31 @@ export async function planNativeArtifactBuilds(presentByFamily = {}, options = {
   const dehermcRows = await publishedAssets("dehermc", { root });
 
   const lanes = { linux: [], windows: [], android: [], apple: [] };
+  assertNativeArtifactPlanCoverage(targetRows);
   const complete = (family, row) =>
     present[family].has(row.asset) && present[family].has(releaseIntegrityAssetName(row.asset));
   for (const row of targetRows) {
     const executor = targetExecutors[row.target];
-    if (!executor) throw new Error(`No native-artifact executor is declared for ${row.target} (${row.asset})`);
-    if (complete("native-artifacts", row)) continue;
+    const recipe = nativeArtifactRecipeForTarget(row.target);
+    const releaseKey = `native-artifacts/${recipe}`;
+    const release = await artifactReleaseForRow("native-artifacts", row, { root });
+    const supplied = presentByFamily[releaseKey] ?? presentByFamily["native-artifacts"] ?? [];
+    if (supplied?.tag && supplied.tag !== release.tag) {
+      throw new Error(
+        `Published-asset index mismatch for ${releaseKey}: expected ${release.tag}, observed ${supplied.tag}`,
+      );
+    }
+    const published = new Set(supplied?.assets ?? supplied);
+    if (published.has(row.asset) && published.has(releaseIntegrityAssetName(row.asset))) continue;
     const { lane, ...fields } = executor;
-    lanes[lane].push(rowWithKey(row, fields, "target"));
+    lanes[lane].push({
+      ...rowWithKey(row, fields, "target"),
+      recipe,
+      release_key: releaseKey,
+      release_tag: release.tag,
+      release_fingerprint: release.fingerprint,
+      release_title: release.title,
+    });
   }
 
   const hermesHosts = [];
@@ -98,12 +136,42 @@ export async function planNativeArtifactBuilds(presentByFamily = {}, options = {
     }
   }
 
+  const nativeExpected = [];
+  const nativeMissing = [];
+  const releases = {};
+  for (const row of targetRows) {
+    const recipe = nativeArtifactRecipeForTarget(row.target);
+    const releaseKey = `native-artifacts/${recipe}`;
+    const release = await artifactReleaseForRow("native-artifacts", row, { root });
+    const supplied = presentByFamily[releaseKey] ?? presentByFamily["native-artifacts"] ?? [];
+    if (supplied?.tag && supplied.tag !== release.tag) {
+      throw new Error(
+        `Published-asset index mismatch for ${releaseKey}: expected ${release.tag}, observed ${supplied.tag}`,
+      );
+    }
+    const published = new Set(supplied?.assets ?? supplied);
+    releases[releaseKey] ??= {
+      family: "native-artifacts",
+      recipe,
+      tag: release.tag,
+      fingerprint: release.fingerprint,
+      title: release.title,
+      expected: [],
+      missing: [],
+    };
+    for (const asset of [row.asset, releaseIntegrityAssetName(row.asset)]) {
+      nativeExpected.push(asset);
+      releases[releaseKey].expected.push(asset);
+      if (!published.has(asset)) {
+        nativeMissing.push(asset);
+        releases[releaseKey].missing.push(asset);
+      }
+    }
+  }
   const assets = {
     "native-artifacts": {
-      expected: targetRows.flatMap((row) => [row.asset, releaseIntegrityAssetName(row.asset)]),
-      missing: targetRows
-        .flatMap((row) => [row.asset, releaseIntegrityAssetName(row.asset)])
-        .filter((asset) => !present["native-artifacts"].has(asset)),
+      expected: nativeExpected,
+      missing: nativeMissing,
     },
     "hermes-host": {
       expected: hermesHostRows.flatMap((row) => [row.asset, releaseIntegrityAssetName(row.asset)]),
@@ -137,6 +205,7 @@ export async function planNativeArtifactBuilds(presentByFamily = {}, options = {
       dehermc: dehermcHosts.length > 0,
     },
     assets,
+    releases,
   };
 }
 
@@ -172,11 +241,15 @@ function parseArguments(args) {
     if (argument === "--github-output") result.githubOutput = args[++index];
     else if (argument === "--github-env") result.githubEnv = args[++index];
     else if (argument === "--describe-row") result.describeRow = args[++index];
+    else if (argument === "--list-releases") result.listReleases = true;
     else if (argument === "--present") {
       const value = args[++index] ?? "";
       const separator = value.indexOf("=");
       if (separator < 1) throw new Error("--present requires <family>=<newline-delimited-file>");
-      result.present[value.slice(0, separator)] = value.slice(separator + 1);
+      const identity = value.slice(0, separator);
+      const at = identity.indexOf("@");
+      const key = at < 0 ? identity : identity.slice(0, at);
+      result.present[key] = { tag: at < 0 ? null : identity.slice(at + 1), file: value.slice(separator + 1) };
     } else throw new Error(`Unknown argument ${argument}`);
   }
   return result;
@@ -198,10 +271,16 @@ export function describeBuildRow(plan, specification) {
 async function main(args) {
   const options = parseArguments(args);
   const present = {};
-  for (const [family, file] of Object.entries(options.present)) present[family] = await readNames(file);
+  for (const [family, source] of Object.entries(options.present)) {
+    present[family] = { tag: source.tag, assets: await readNames(source.file) };
+  }
   const plan = await planNativeArtifactBuilds(present);
 
-  if (options.describeRow) {
+  if (options.listReleases) {
+    for (const [key, release] of Object.entries(plan.releases)) {
+      process.stdout.write(`${key}\t${release.tag}\n`);
+    }
+  } else if (options.describeRow) {
     const row = describeBuildRow(plan, options.describeRow);
     if (options.githubEnv) {
       const lines = Object.entries(row).map(([name, value]) => `${name.toUpperCase()}=${value}`);

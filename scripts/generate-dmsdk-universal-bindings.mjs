@@ -9,6 +9,10 @@ import { buildDmSdkCallSymbolIndex } from "../packages/compiler/src/dmsdk-call-s
 import { createDmSdkFallbackAudit } from "../packages/compiler/src/dmsdk-fallback-audit.mjs";
 import { createDmSdkPatternCatalog } from "../packages/compiler/src/dmsdk-pattern-catalog.mjs";
 import {
+  generateDmSdkUniversalBrowserLibrary,
+  generateDmSdkUniversalRuntimeSource,
+} from "../packages/compiler/src/dmsdk-universal-output-emitter.mjs";
+import {
   dmSdkUniversalReadyCorpusArtifacts,
   materializeDmSdkUniversalReadyCorpus,
 } from "../packages/compiler/src/dmsdk-universal-ready-corpus.mjs";
@@ -559,18 +563,6 @@ function renderHeader(maxArguments) {
   return `// ${banner}\n#ifndef DEFOLD_HERMES_GENERATED_DMSDK_UNIVERSAL_H\n#define DEFOLD_HERMES_GENERATED_DMSDK_UNIVERSAL_H\n\n#include <stdint.h>\n\n#define DEHERM_DMSDK_UNIVERSAL_MAX_ARGUMENTS ${maxArguments}\n\ntypedef enum DehermDmSdkUniversalStatus {\n  DEHERM_DMSDK_UNIVERSAL_OK = 0,\n  DEHERM_DMSDK_UNIVERSAL_UNKNOWN_ID = 1,\n  DEHERM_DMSDK_UNIVERSAL_WRONG_ARITY = 2,\n  DEHERM_DMSDK_UNIVERSAL_NO_PROVIDER = 3,\n  DEHERM_DMSDK_UNIVERSAL_INVALID_STORAGE = 4,\n  DEHERM_DMSDK_UNIVERSAL_PROVIDER_ERROR = 5,\n  DEHERM_DMSDK_UNIVERSAL_TYPE_MISMATCH = 6\n} DehermDmSdkUniversalStatus;\n\ntypedef enum DehermDmSdkUniversalValueTag {\n  DEHERM_DMSDK_UNIVERSAL_VOID = 0,\n  DEHERM_DMSDK_UNIVERSAL_BOOL = 1,\n  DEHERM_DMSDK_UNIVERSAL_I64 = 2,\n  DEHERM_DMSDK_UNIVERSAL_U64 = 3,\n  DEHERM_DMSDK_UNIVERSAL_F64 = 4,\n  DEHERM_DMSDK_UNIVERSAL_ADDRESS = 5,\n  DEHERM_DMSDK_UNIVERSAL_MEMORY = 6,\n  DEHERM_DMSDK_UNIVERSAL_CALLBACK = 7,\n  DEHERM_DMSDK_UNIVERSAL_NATIVE_VALUE = 8\n} DehermDmSdkUniversalValueTag;\n\ntypedef struct DehermDmSdkUniversalValue {\n  uint64_t payload;\n  uint64_t auxiliary;\n  uint32_t tag;\n  uint32_t type_id;\n} DehermDmSdkUniversalValue;\n\ntypedef struct DehermDmSdkUniversalDescriptor {\n  uint32_t id;\n  uint16_t argument_count;\n  uint8_t declaration_kind;\n  uint8_t flags;\n} DehermDmSdkUniversalDescriptor;\n\ntypedef DehermDmSdkUniversalStatus (*DehermDmSdkUniversalProvider)(\n    void* context, const DehermDmSdkUniversalDescriptor* descriptor,\n    const DehermDmSdkUniversalValue* arguments, uint32_t argument_count,\n    DehermDmSdkUniversalValue* result);\n\n#ifdef __cplusplus\nextern "C" {\n#endif\nuint32_t deherm_dmsdk_universal_count(void);\nconst char* deherm_dmsdk_universal_catalog_sha256(void);\nconst DehermDmSdkUniversalDescriptor* deherm_dmsdk_universal_descriptors(void);\nconst DehermDmSdkUniversalDescriptor* deherm_dmsdk_universal_find(uint32_t id);\nvoid deherm_dmsdk_universal_install_provider(DehermDmSdkUniversalProvider provider, void* context);\nDehermDmSdkUniversalStatus deherm_dmsdk_universal_dispatch(\n    uint32_t id, const DehermDmSdkUniversalValue* arguments, uint32_t argument_count,\n    DehermDmSdkUniversalValue* result);\n#ifdef __cplusplus\n}\n#endif\n\n#endif\n`;
 }
 
-const kindCode = Object.freeze({ function: 1, method: 2, constructor: 3, destructor: 4, "function-template": 5 });
-
-function renderCpp(recipes, catalogHash) {
-  const rows = recipes
-    .map(
-      (recipe) =>
-        `  {UINT32_C(${recipe.numericId}), UINT16_C(${recipe.abi.argumentCount}), UINT8_C(${kindCode[recipe.declarationKind]}), UINT8_C(${recipe.preferredLowering.state === "generated-adapter" ? 1 : 0})}`,
-    )
-    .join(",\n");
-  return `// ${banner}\n#include <defold_hermes/generated_dmsdk_universal.h>\n\n#include <stddef.h>\n\nnamespace {\nconst DehermDmSdkUniversalDescriptor kDescriptors[] = {\n${rows}\n};\nDehermDmSdkUniversalProvider g_provider = nullptr;\nvoid* g_context = nullptr;\n}\n\nextern "C" {\nuint32_t deherm_dmsdk_universal_count(void) { return UINT32_C(${recipes.length}); }\nconst char* deherm_dmsdk_universal_catalog_sha256(void) { return ${JSON.stringify(catalogHash)}; }\nconst DehermDmSdkUniversalDescriptor* deherm_dmsdk_universal_descriptors(void) { return kDescriptors; }\nconst DehermDmSdkUniversalDescriptor* deherm_dmsdk_universal_find(uint32_t id) {\n  return id < deherm_dmsdk_universal_count() && kDescriptors[id].id == id ? &kDescriptors[id] : nullptr;\n}\nvoid deherm_dmsdk_universal_install_provider(DehermDmSdkUniversalProvider provider, void* context) {\n  g_provider = provider; g_context = context;\n}\nDehermDmSdkUniversalStatus deherm_dmsdk_universal_dispatch(\n    uint32_t id, const DehermDmSdkUniversalValue* arguments, uint32_t argument_count,\n    DehermDmSdkUniversalValue* result) {\n  const DehermDmSdkUniversalDescriptor* descriptor = deherm_dmsdk_universal_find(id);\n  if (!descriptor) return DEHERM_DMSDK_UNIVERSAL_UNKNOWN_ID;\n  if (descriptor->declaration_kind != UINT8_C(5) && argument_count != descriptor->argument_count) return DEHERM_DMSDK_UNIVERSAL_WRONG_ARITY;\n  if (argument_count && !arguments) return DEHERM_DMSDK_UNIVERSAL_INVALID_STORAGE;\n  if (!result) return DEHERM_DMSDK_UNIVERSAL_INVALID_STORAGE;\n  if (!g_provider) return DEHERM_DMSDK_UNIVERSAL_NO_PROVIDER;\n  return g_provider(g_context, descriptor, arguments, argument_count, result);\n}\n}\n`;
-}
-
 function renderJsiHeader(recipeCount) {
   return `// ${banner}\n#pragma once\n#include <stdint.h>\n#if !defined(DM_PLATFORM_HTML5)\n#include <jsi/jsi.h>\n#endif\nnamespace defold_hermes {\nstruct DmSdkUniversalJsiRegistrationMetadata {\n  const char* module_name;\n  const char* method_name;\n  uint32_t recipe_count;\n  uint32_t value_bytes;\n};\ninline constexpr DmSdkUniversalJsiRegistrationMetadata kDmSdkUniversalJsiRegistration = {\n  "DmSdkUniversal", "call", UINT32_C(${recipeCount}), UINT32_C(24)\n};\n#if !defined(DM_PLATFORM_HTML5)\nvoid installDmSdkUniversalModule(facebook::jsi::Runtime& runtime, facebook::jsi::Object& modules);\n#endif\n}\n`;
 }
@@ -597,19 +589,6 @@ void installDmSdkUniversalModule(jsi::Runtime& runtime,jsi::Object& modules){if(
 }
 #endif
 `;
-}
-
-function renderWeb(recipes, maxArguments, catalogHash) {
-  const metadata = recipes.map(({ numericId, declarationId, symbol, declarationKind, abi, projectionId }) => ({
-    id: numericId,
-    declarationId,
-    symbol,
-    declarationKind,
-    argumentCount: abi.argumentCount,
-    resultKind: abi.resultKind,
-    recipeId: projectionId,
-  }));
-  return `// ${banner}\nvar LibraryDefoldHermesDmSdkUniversal={\n  $DEFOLD_HERMES_DMSDK_UNIVERSAL__deps:["deherm_dmsdk_universal_dispatch","deherm_dmsdk_universal_catalog_sha256"],\n  $DEFOLD_HERMES_DMSDK_UNIVERSAL:{\n    catalogSha256:${JSON.stringify(catalogHash)},\n    abi:Object.freeze({valueBytes:24,maxArguments:${maxArguments},dispatch:'direct-memory',embind:false}),\n    recipes:Object.freeze(${JSON.stringify(metadata)}),\n    callRaw:function(id,argumentsPointer,argumentCount,resultPointer){return _deherm_dmsdk_universal_dispatch(id,argumentsPointer,argumentCount,resultPointer);}\n  }\n};\nautoAddDeps(LibraryDefoldHermesDmSdkUniversal,'$DEFOLD_HERMES_DMSDK_UNIVERSAL');\naddToLibrary(LibraryDefoldHermesDmSdkUniversal);\n`;
 }
 
 function renderTypeScript(recipes, catalogHash) {
@@ -853,9 +832,9 @@ export async function buildUniversalDmSdkBindings({
     [artifacts[0], `${JSON.stringify(report, null, 2)}\n`],
     [artifacts[1], renderHeader(maxArguments)],
     [artifacts[2], renderJsiHeader(recipes.length)],
-    [artifacts[3], renderCpp(recipes, catalogHash)],
+    [artifacts[3], generateDmSdkUniversalRuntimeSource(report)],
     [artifacts[4], renderJsiSource(catalogHash)],
-    [artifacts[5], renderWeb(recipes, maxArguments, catalogHash)],
+    [artifacts[5], generateDmSdkUniversalBrowserLibrary(report)],
     [artifacts[6], renderTypeScript(recipes, catalogHash)],
     [artifacts[7], generateDmSdkBrowserArena(report)],
     [artifacts[8], staticFrame.staticHermes],
