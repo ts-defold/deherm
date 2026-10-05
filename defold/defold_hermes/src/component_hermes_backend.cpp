@@ -41,14 +41,25 @@ bool encodeLeaf(lua_State* state, int index, uint8_t codec, Value* output) noexc
   *output = {};
   if (lua_isnil(state, index)) { output->kind = Kind::kNil; return true; }
   if (codec == 1 || (codec == 0 && lua_isnumber(state, index))) {
-    if (!lua_isnumber(state, index)) return false; output->kind = Kind::kNumber; output->number = lua_tonumber(state, index); return true;
+    if (!lua_isnumber(state, index)) return false;
+    output->kind = Kind::kNumber;
+    output->number = lua_tonumber(state, index);
+    return true;
   }
   if (codec == 2 || (codec == 0 && lua_isboolean(state, index))) {
-    if (!lua_isboolean(state, index)) return false; output->kind = Kind::kBoolean; output->boolean = lua_toboolean(state, index) != 0; return true;
+    if (!lua_isboolean(state, index)) return false;
+    output->kind = Kind::kBoolean;
+    output->boolean = lua_toboolean(state, index) != 0;
+    return true;
   }
   if (codec == 3 || (codec == 0 && lua_isstring(state, index))) {
-    if (!lua_isstring(state, index)) return false; size_t length = 0; output->string = lua_tolstring(state, index, &length);
-    if (length > UINT32_MAX) return false; output->kind = Kind::kString; output->stringLength = static_cast<uint32_t>(length); return true;
+    if (!lua_isstring(state, index)) return false;
+    size_t length = 0;
+    output->string = lua_tolstring(state, index, &length);
+    if (length > UINT32_MAX) return false;
+    output->kind = Kind::kString;
+    output->stringLength = static_cast<uint32_t>(length);
+    return true;
   }
   if (codec == 0 && dmScript::IsHash(state, index)) {
     auto* hash = dmScript::ToHash(state, index);
@@ -267,7 +278,9 @@ bool HermesBackend::Attach(void* opaque, const AttachRequest& request, Component
       runtime->setComponentProperty(handle, name, value);
     }
   } catch (const std::exception& exception) {
-    if (handle) runtime->detachComponent(handle); fail(error, capacity, exception.what()); return false;
+    if (handle) runtime->detachComponent(handle);
+    fail(error, capacity, exception.what());
+    return false;
   }
   *output = {handle.slot, handle.generation}; return true;
 }

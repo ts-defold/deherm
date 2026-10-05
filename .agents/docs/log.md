@@ -5756,3 +5756,16 @@ binding-runtime/codegen tests, native component-runtime execution, policy and
 revision derivation, CLI/TUI/debugger/profiler tests, WebTransport and War
 Battles network tests, and release reachability. This is local aggregate
 evidence; hosted Linux evidence remains a separate release-readiness result.
+
+The next hosted Linux aggregate compiled the full native runtime with GCC and
+reached `component_hermes_backend.cpp` after 490 of 500 native build actions.
+GCC's `-Wmisleading-indentation` rejected five compressed same-line condition
+and continuation sequences that Apple Clang had accepted under the same
+`-Wall -Wextra -Werror` contract. The component value codec and attach cleanup
+now express those control-flow boundaries on separate lines without changing
+their branches, ownership, or allocation behavior. The focused native Hermes
+component runtime rebuild and execution pass locally, including all three
+contexts, property/lifecycle/message/input/reload/detach behavior, the bounded
+recursive event codec, generation rebinding, 1,000-cycle HMR soak, and heap
+telemetry. This is focused macOS compile/runtime evidence; the follow-up hosted
+Linux aggregate remains the authoritative GCC result.
