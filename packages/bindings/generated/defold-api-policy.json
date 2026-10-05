@@ -5,7 +5,7 @@
   "generator": "sha256:e59d913a761e9fb29e32c52d4d64e2398cfcceda7005af4cdd3f4b6f420f1b06",
   "producerPackageVersion": "0.1.0",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "policyRoot": "7f73abed9c53a575e8b3795d1787a1f4d6f46bbcd6e188783ffa20bca67341c2",
+  "policyRoot": "bad6c31f5037e3ab589ff3729ac857a345d9e7e1ed728e6ea6128e33ed369b1c",
   "layoutVersion": "v1",
   "counts": {
     "subtrees": 105,
@@ -59,7 +59,7 @@
       "bytes": 65901
     },
     "@compiler:document:defold-binding-lowering-recipe-facts.json": {
-      "hash": "6ebf73a516c8be2c3a3de3d352c12b5252a786ca35f1e55c40d50fd38256fe48",
+      "hash": "3cf48b757167304a42be8d142f1c1a46c353b1cb1da4c3a9ff74b730e21dc765",
       "bytes": 2682082
     },
     "@compiler:document:defold-component-proxy-contract.json": {
@@ -127,7 +127,7 @@
       "bytes": 26072
     },
     "@compiler:document:defold-dmsdk-universal-recipe-facts.json": {
-      "hash": "3b4d959737d74e5f81c0e5d1eae466c0db6f4481bf9c55e52b7e5067393f8b5f",
+      "hash": "bb75ab356f14280ce25dbea0c704ce42f406c01a52104ad7add29c246ed2251f",
       "bytes": 1059425
     },
     "@compiler:document:defold-dmsdk-xtea-span-recipe-facts.json": {

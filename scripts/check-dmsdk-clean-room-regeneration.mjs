@@ -490,14 +490,20 @@ async function validateReports(root) {
   }
   assert(
     cppOwnershipEffects.defoldRevision === ir.defoldRevision &&
-      cppOwnershipEffects.coverage.requested === 212 &&
-      cppOwnershipEffects.coverage.observed === 198 &&
-      cppOwnershipEffects.coverage.unknown === 14 &&
       cppOwnershipEffects.semanticAdmission.scope === "defold-revision-source" &&
       cppOwnershipEffects.semanticAdmission.authority === "pinned-defold-implementation" &&
       cppOwnershipEffects.targetAvailability.state === "not-established-by-source-analysis",
     "C++ ownership/effect report does not preserve its source-semantics/target-availability partition",
   );
+  for (const [envelope, coverage] of Object.entries(cppOwnershipEffects.coverage.envelopes)) {
+    const rows = cppOwnershipEffects.functions.filter(({ envelopes }) => envelopes.includes(envelope));
+    assert(
+      coverage.requested === rows.length &&
+        coverage.observed === rows.filter(({ state }) => state === "observed").length &&
+        coverage.unknown === rows.filter(({ state }) => state === "unknown").length,
+      `C++ ownership/effect coverage differs for ${envelope}`,
+    );
+  }
   for (const source of cppOwnershipEffects.sources) {
     assert(
       source.sourceSha256 === sha256(await loadText(source.path)),

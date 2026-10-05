@@ -15,8 +15,8 @@
     "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
     "projection": "5cf214af96cee8b7dcffe3114441214670524721205837e6ef397c3d53fc52c6",
     "policy": "53dd87aca30d91e448b686ac854c8529d9cb69727c10b70dab5fcbdb77612a80",
-    "effectFacts": "071b3051cd60780a67958cd92266a1460cf1e46479abe1f062da2f43f8b606aa",
-    "plan": "fe53a2d2781a238e2f2f7ec4f45d178977f72f752fa32ee49b2c8ad055f29279"
+    "effectFacts": "cb4da43a063d868ce9922da1ad1670fe3df6b7d30c963621b3a059340348d744",
+    "plan": "a107d3cc4639a880a5a5df1efee32dbfe0fa1577c23df8237c99e110f3a2212e"
   },
   "selector": {
     "schemaVersion": 1,
@@ -640,6 +640,8 @@
           "sourceProof": {
             "state": "unknown",
             "evidenceGaps": [
+              "cpp-effect:completion-unresolved",
+              "cpp-effect:escape-unresolved",
               "cpp-effect:function-ownership-unresolved"
             ]
           }
@@ -1348,8 +1350,15 @@
             }
           ],
           "sourceProof": {
-            "state": "proven",
-            "evidenceGaps": []
+            "state": "unknown",
+            "evidenceGaps": [
+              "cpp-effect:completion-unresolved",
+              "cpp-effect:escape-unresolved",
+              "cpp-effect:function-ownership-unresolved",
+              "cpp-effect:parameter-0-completion-unresolved",
+              "cpp-effect:parameter-0-escape-unresolved",
+              "cpp-effect:parameter-0-ownership-unresolved"
+            ]
           }
         },
         "blockers": [],
@@ -1501,7 +1510,10 @@
             "evidenceGaps": [
               "cpp-effect:completion-unresolved",
               "cpp-effect:escape-unresolved",
-              "cpp-effect:function-ownership-unresolved"
+              "cpp-effect:function-ownership-unresolved",
+              "cpp-effect:parameter-0-completion-unresolved",
+              "cpp-effect:parameter-0-escape-unresolved",
+              "cpp-effect:parameter-0-ownership-unresolved"
             ]
           }
         },
@@ -1598,12 +1610,12 @@
             0,
             1
           ],
-          "evidenceBasis": "cpp-ownership-effect-facts"
+          "evidenceBasis": "defold-public-by-value-resource-borrow"
         },
         "effect": {
           "classification": "trusted-borrowed-default",
           "admission": {
-            "kind": "source-derived",
+            "kind": "defold-contract-trusted",
             "trustDefault": "defold-public-by-value-resource-borrow"
           },
           "taxonomy": {
@@ -1624,8 +1636,15 @@
           "sources": [],
           "signals": [],
           "sourceProof": {
-            "state": "proven",
-            "evidenceGaps": []
+            "state": "unknown",
+            "evidenceGaps": [
+              "cpp-effect:completion-unresolved",
+              "cpp-effect:escape-unresolved",
+              "cpp-effect:function-ownership-unresolved",
+              "cpp-effect:parameter-0-completion-unresolved",
+              "cpp-effect:parameter-0-escape-unresolved",
+              "cpp-effect:parameter-0-ownership-unresolved"
+            ]
           }
         },
         "blockers": [],
@@ -1653,7 +1672,7 @@
           0,
           1
         ],
-        "evidenceBasis": "cpp-ownership-effect-facts"
+        "evidenceBasis": "defold-public-by-value-resource-borrow"
       },
       "engineProviderBlockers": [
         "call-thread-affinity-unresolved",
@@ -2192,6 +2211,7 @@
           "sourceProof": {
             "state": "unknown",
             "evidenceGaps": [
+              "cpp-effect:compiler-diagnostics",
               "cpp-effect:completion-unresolved",
               "cpp-effect:escape-unresolved",
               "cpp-effect:function-ownership-unresolved",
@@ -2274,12 +2294,12 @@
           "handleParameterPositions": [
             0
           ],
-          "evidenceBasis": "cpp-ownership-effect-facts"
+          "evidenceBasis": "defold-public-by-value-resource-borrow"
         },
         "effect": {
           "classification": "trusted-borrowed-default",
           "admission": {
-            "kind": "source-derived",
+            "kind": "defold-contract-trusted",
             "trustDefault": "defold-public-by-value-resource-borrow"
           },
           "taxonomy": {
@@ -2296,8 +2316,10 @@
           "sources": [],
           "signals": [],
           "sourceProof": {
-            "state": "proven",
-            "evidenceGaps": []
+            "state": "unknown",
+            "evidenceGaps": [
+              "cpp-effect:result-provenance-unresolved"
+            ]
           }
         },
         "blockers": [],
@@ -2324,7 +2346,7 @@
         "handleParameterPositions": [
           0
         ],
-        "evidenceBasis": "cpp-ownership-effect-facts"
+        "evidenceBasis": "defold-public-by-value-resource-borrow"
       },
       "engineProviderBlockers": [
         "call-thread-affinity-unresolved",
@@ -3265,12 +3287,12 @@
           "handleParameterPositions": [
             0
           ],
-          "evidenceBasis": "defold-public-by-value-resource-borrow"
+          "evidenceBasis": "cpp-ownership-effect-facts"
         },
         "effect": {
           "classification": "trusted-borrowed-default",
           "admission": {
-            "kind": "defold-contract-trusted",
+            "kind": "source-derived",
             "trustDefault": "defold-public-by-value-resource-borrow"
           },
           "taxonomy": {
@@ -3287,16 +3309,8 @@
           "sources": [],
           "signals": [],
           "sourceProof": {
-            "state": "unknown",
-            "evidenceGaps": [
-              "cpp-effect:compiler-diagnostics",
-              "cpp-effect:completion-unresolved",
-              "cpp-effect:escape-unresolved",
-              "cpp-effect:function-ownership-unresolved",
-              "cpp-effect:parameter-0-completion-unresolved",
-              "cpp-effect:parameter-0-escape-unresolved",
-              "cpp-effect:parameter-0-ownership-unresolved"
-            ]
+            "state": "proven",
+            "evidenceGaps": []
           }
         },
         "blockers": [],
@@ -3323,7 +3337,7 @@
         "handleParameterPositions": [
           0
         ],
-        "evidenceBasis": "defold-public-by-value-resource-borrow"
+        "evidenceBasis": "cpp-ownership-effect-facts"
       },
       "engineProviderBlockers": [
         "call-thread-affinity-unresolved",
@@ -4153,12 +4167,12 @@
           "handleParameterPositions": [
             0
           ],
-          "evidenceBasis": "cpp-ownership-effect-facts"
+          "evidenceBasis": "defold-public-by-value-resource-borrow"
         },
         "effect": {
           "classification": "trusted-borrowed-default",
           "admission": {
-            "kind": "source-derived",
+            "kind": "defold-contract-trusted",
             "trustDefault": "defold-public-by-value-resource-borrow"
           },
           "taxonomy": {
@@ -4175,8 +4189,10 @@
           "sources": [],
           "signals": [],
           "sourceProof": {
-            "state": "proven",
-            "evidenceGaps": []
+            "state": "unknown",
+            "evidenceGaps": [
+              "cpp-effect:result-provenance-unresolved"
+            ]
           }
         },
         "blockers": [],
@@ -4203,7 +4219,7 @@
         "handleParameterPositions": [
           0
         ],
-        "evidenceBasis": "cpp-ownership-effect-facts"
+        "evidenceBasis": "defold-public-by-value-resource-borrow"
       },
       "engineProviderBlockers": [
         "call-thread-affinity-unresolved",
@@ -4304,16 +4320,8 @@
             }
           ],
           "sourceProof": {
-            "state": "unknown",
-            "evidenceGaps": [
-              "cpp-effect:compiler-diagnostics",
-              "cpp-effect:completion-unresolved",
-              "cpp-effect:escape-unresolved",
-              "cpp-effect:function-ownership-unresolved",
-              "cpp-effect:parameter-0-completion-unresolved",
-              "cpp-effect:parameter-0-escape-unresolved",
-              "cpp-effect:parameter-0-ownership-unresolved"
-            ]
+            "state": "proven",
+            "evidenceGaps": []
           }
         },
         "blockers": [],
@@ -4650,12 +4658,12 @@
           "handleParameterPositions": [
             0
           ],
-          "evidenceBasis": "cpp-ownership-effect-facts"
+          "evidenceBasis": "defold-public-by-value-resource-borrow"
         },
         "effect": {
           "classification": "trusted-borrowed-default",
           "admission": {
-            "kind": "source-derived",
+            "kind": "defold-contract-trusted",
             "trustDefault": "defold-public-by-value-resource-borrow"
           },
           "taxonomy": {
@@ -4672,8 +4680,10 @@
           "sources": [],
           "signals": [],
           "sourceProof": {
-            "state": "proven",
-            "evidenceGaps": []
+            "state": "unknown",
+            "evidenceGaps": [
+              "cpp-effect:result-provenance-unresolved"
+            ]
           }
         },
         "blockers": [],
@@ -4700,7 +4710,7 @@
         "handleParameterPositions": [
           0
         ],
-        "evidenceBasis": "cpp-ownership-effect-facts"
+        "evidenceBasis": "defold-public-by-value-resource-borrow"
       },
       "engineProviderBlockers": [
         "call-thread-affinity-unresolved",
@@ -4749,12 +4759,12 @@
           "handleParameterPositions": [
             0
           ],
-          "evidenceBasis": "cpp-ownership-effect-facts"
+          "evidenceBasis": "defold-public-by-value-resource-borrow"
         },
         "effect": {
           "classification": "trusted-borrowed-default",
           "admission": {
-            "kind": "source-derived",
+            "kind": "defold-contract-trusted",
             "trustDefault": "defold-public-by-value-resource-borrow"
           },
           "taxonomy": {
@@ -4771,8 +4781,10 @@
           "sources": [],
           "signals": [],
           "sourceProof": {
-            "state": "proven",
-            "evidenceGaps": []
+            "state": "unknown",
+            "evidenceGaps": [
+              "cpp-effect:result-provenance-unresolved"
+            ]
           }
         },
         "blockers": [],
@@ -4799,7 +4811,7 @@
         "handleParameterPositions": [
           0
         ],
-        "evidenceBasis": "cpp-ownership-effect-facts"
+        "evidenceBasis": "defold-public-by-value-resource-borrow"
       },
       "engineProviderBlockers": [
         "call-thread-affinity-unresolved",
@@ -4848,12 +4860,12 @@
           "handleParameterPositions": [
             0
           ],
-          "evidenceBasis": "cpp-ownership-effect-facts"
+          "evidenceBasis": "defold-public-by-value-resource-borrow"
         },
         "effect": {
           "classification": "trusted-borrowed-default",
           "admission": {
-            "kind": "source-derived",
+            "kind": "defold-contract-trusted",
             "trustDefault": "defold-public-by-value-resource-borrow"
           },
           "taxonomy": {
@@ -4870,8 +4882,10 @@
           "sources": [],
           "signals": [],
           "sourceProof": {
-            "state": "proven",
-            "evidenceGaps": []
+            "state": "unknown",
+            "evidenceGaps": [
+              "cpp-effect:result-provenance-unresolved"
+            ]
           }
         },
         "blockers": [],
@@ -4898,7 +4912,7 @@
         "handleParameterPositions": [
           0
         ],
-        "evidenceBasis": "cpp-ownership-effect-facts"
+        "evidenceBasis": "defold-public-by-value-resource-borrow"
       },
       "engineProviderBlockers": [
         "call-thread-affinity-unresolved",
@@ -4947,12 +4961,12 @@
           "handleParameterPositions": [
             0
           ],
-          "evidenceBasis": "cpp-ownership-effect-facts"
+          "evidenceBasis": "defold-public-by-value-resource-borrow"
         },
         "effect": {
           "classification": "trusted-borrowed-default",
           "admission": {
-            "kind": "source-derived",
+            "kind": "defold-contract-trusted",
             "trustDefault": "defold-public-by-value-resource-borrow"
           },
           "taxonomy": {
@@ -4969,8 +4983,10 @@
           "sources": [],
           "signals": [],
           "sourceProof": {
-            "state": "proven",
-            "evidenceGaps": []
+            "state": "unknown",
+            "evidenceGaps": [
+              "cpp-effect:result-provenance-unresolved"
+            ]
           }
         },
         "blockers": [],
@@ -4997,7 +5013,7 @@
         "handleParameterPositions": [
           0
         ],
-        "evidenceBasis": "cpp-ownership-effect-facts"
+        "evidenceBasis": "defold-public-by-value-resource-borrow"
       },
       "engineProviderBlockers": [
         "call-thread-affinity-unresolved",
@@ -5046,12 +5062,12 @@
           "handleParameterPositions": [
             0
           ],
-          "evidenceBasis": "cpp-ownership-effect-facts"
+          "evidenceBasis": "defold-public-by-value-resource-borrow"
         },
         "effect": {
           "classification": "trusted-borrowed-default",
           "admission": {
-            "kind": "source-derived",
+            "kind": "defold-contract-trusted",
             "trustDefault": "defold-public-by-value-resource-borrow"
           },
           "taxonomy": {
@@ -5068,8 +5084,10 @@
           "sources": [],
           "signals": [],
           "sourceProof": {
-            "state": "proven",
-            "evidenceGaps": []
+            "state": "unknown",
+            "evidenceGaps": [
+              "cpp-effect:result-provenance-unresolved"
+            ]
           }
         },
         "blockers": [],
@@ -5096,7 +5114,7 @@
         "handleParameterPositions": [
           0
         ],
-        "evidenceBasis": "cpp-ownership-effect-facts"
+        "evidenceBasis": "defold-public-by-value-resource-borrow"
       },
       "engineProviderBlockers": [
         "call-thread-affinity-unresolved",
@@ -7257,12 +7275,12 @@
           "handleParameterPositions": [
             0
           ],
-          "evidenceBasis": "defold-public-by-value-resource-borrow"
+          "evidenceBasis": "cpp-ownership-effect-facts"
         },
         "effect": {
           "classification": "trusted-borrowed-default",
           "admission": {
-            "kind": "defold-contract-trusted",
+            "kind": "source-derived",
             "trustDefault": "defold-public-by-value-resource-borrow"
           },
           "taxonomy": {
@@ -7279,15 +7297,8 @@
           "sources": [],
           "signals": [],
           "sourceProof": {
-            "state": "unknown",
-            "evidenceGaps": [
-              "cpp-effect:completion-unresolved",
-              "cpp-effect:escape-unresolved",
-              "cpp-effect:function-ownership-unresolved",
-              "cpp-effect:parameter-0-completion-unresolved",
-              "cpp-effect:parameter-0-escape-unresolved",
-              "cpp-effect:parameter-0-ownership-unresolved"
-            ]
+            "state": "proven",
+            "evidenceGaps": []
           }
         },
         "blockers": [],
@@ -7314,7 +7325,7 @@
         "handleParameterPositions": [
           0
         ],
-        "evidenceBasis": "defold-public-by-value-resource-borrow"
+        "evidenceBasis": "cpp-ownership-effect-facts"
       },
       "engineProviderBlockers": [
         "call-thread-affinity-unresolved",
@@ -7363,12 +7374,12 @@
           "handleParameterPositions": [
             0
           ],
-          "evidenceBasis": "defold-public-by-value-resource-borrow"
+          "evidenceBasis": "cpp-ownership-effect-facts"
         },
         "effect": {
           "classification": "trusted-borrowed-default",
           "admission": {
-            "kind": "defold-contract-trusted",
+            "kind": "source-derived",
             "trustDefault": "defold-public-by-value-resource-borrow"
           },
           "taxonomy": {
@@ -7385,15 +7396,8 @@
           "sources": [],
           "signals": [],
           "sourceProof": {
-            "state": "unknown",
-            "evidenceGaps": [
-              "cpp-effect:completion-unresolved",
-              "cpp-effect:escape-unresolved",
-              "cpp-effect:function-ownership-unresolved",
-              "cpp-effect:parameter-0-completion-unresolved",
-              "cpp-effect:parameter-0-escape-unresolved",
-              "cpp-effect:parameter-0-ownership-unresolved"
-            ]
+            "state": "proven",
+            "evidenceGaps": []
           }
         },
         "blockers": [],
@@ -7420,7 +7424,7 @@
         "handleParameterPositions": [
           0
         ],
-        "evidenceBasis": "defold-public-by-value-resource-borrow"
+        "evidenceBasis": "cpp-ownership-effect-facts"
       },
       "engineProviderBlockers": [
         "call-thread-affinity-unresolved",
@@ -7469,12 +7473,12 @@
           "handleParameterPositions": [
             0
           ],
-          "evidenceBasis": "defold-public-by-value-resource-borrow"
+          "evidenceBasis": "cpp-ownership-effect-facts"
         },
         "effect": {
           "classification": "trusted-borrowed-default",
           "admission": {
-            "kind": "defold-contract-trusted",
+            "kind": "source-derived",
             "trustDefault": "defold-public-by-value-resource-borrow"
           },
           "taxonomy": {
@@ -7491,15 +7495,8 @@
           "sources": [],
           "signals": [],
           "sourceProof": {
-            "state": "unknown",
-            "evidenceGaps": [
-              "cpp-effect:completion-unresolved",
-              "cpp-effect:escape-unresolved",
-              "cpp-effect:function-ownership-unresolved",
-              "cpp-effect:parameter-0-completion-unresolved",
-              "cpp-effect:parameter-0-escape-unresolved",
-              "cpp-effect:parameter-0-ownership-unresolved"
-            ]
+            "state": "proven",
+            "evidenceGaps": []
           }
         },
         "blockers": [],
@@ -7526,7 +7523,7 @@
         "handleParameterPositions": [
           0
         ],
-        "evidenceBasis": "defold-public-by-value-resource-borrow"
+        "evidenceBasis": "cpp-ownership-effect-facts"
       },
       "engineProviderBlockers": [
         "call-thread-affinity-unresolved",
@@ -8059,12 +8056,12 @@
           "handleParameterPositions": [
             0
           ],
-          "evidenceBasis": "cpp-ownership-effect-facts"
+          "evidenceBasis": "defold-public-by-value-resource-borrow"
         },
         "effect": {
           "classification": "trusted-borrowed-default",
           "admission": {
-            "kind": "source-derived",
+            "kind": "defold-contract-trusted",
             "trustDefault": "defold-public-by-value-resource-borrow"
           },
           "taxonomy": {
@@ -8081,8 +8078,10 @@
           "sources": [],
           "signals": [],
           "sourceProof": {
-            "state": "proven",
-            "evidenceGaps": []
+            "state": "unknown",
+            "evidenceGaps": [
+              "cpp-effect:result-provenance-unresolved"
+            ]
           }
         },
         "blockers": [],
@@ -8109,7 +8108,7 @@
         "handleParameterPositions": [
           0
         ],
-        "evidenceBasis": "cpp-ownership-effect-facts"
+        "evidenceBasis": "defold-public-by-value-resource-borrow"
       },
       "engineProviderBlockers": [
         "call-thread-affinity-unresolved",
@@ -10197,12 +10196,12 @@
             0,
             1
           ],
-          "evidenceBasis": "cpp-ownership-effect-facts"
+          "evidenceBasis": "defold-public-by-value-resource-borrow"
         },
         "effect": {
           "classification": "trusted-borrowed-default",
           "admission": {
-            "kind": "source-derived",
+            "kind": "defold-contract-trusted",
             "trustDefault": "defold-public-by-value-resource-borrow"
           },
           "taxonomy": {
@@ -10223,8 +10222,10 @@
           "sources": [],
           "signals": [],
           "sourceProof": {
-            "state": "proven",
-            "evidenceGaps": []
+            "state": "unknown",
+            "evidenceGaps": [
+              "cpp-effect:result-provenance-unresolved"
+            ]
           }
         },
         "blockers": [],
@@ -10252,7 +10253,7 @@
           0,
           1
         ],
-        "evidenceBasis": "cpp-ownership-effect-facts"
+        "evidenceBasis": "defold-public-by-value-resource-borrow"
       },
       "engineProviderBlockers": [
         "call-thread-affinity-unresolved",
@@ -10407,12 +10408,12 @@
             0,
             1
           ],
-          "evidenceBasis": "defold-public-by-value-resource-borrow"
+          "evidenceBasis": "cpp-ownership-effect-facts"
         },
         "effect": {
           "classification": "trusted-borrowed-default",
           "admission": {
-            "kind": "defold-contract-trusted",
+            "kind": "source-derived",
             "trustDefault": "defold-public-by-value-resource-borrow"
           },
           "taxonomy": {
@@ -10433,12 +10434,8 @@
           "sources": [],
           "signals": [],
           "sourceProof": {
-            "state": "unknown",
-            "evidenceGaps": [
-              "cpp-effect:completion-unresolved",
-              "cpp-effect:escape-unresolved",
-              "cpp-effect:function-ownership-unresolved"
-            ]
+            "state": "proven",
+            "evidenceGaps": []
           }
         },
         "blockers": [],
@@ -10466,7 +10463,7 @@
           0,
           1
         ],
-        "evidenceBasis": "defold-public-by-value-resource-borrow"
+        "evidenceBasis": "cpp-ownership-effect-facts"
       },
       "engineProviderBlockers": [
         "call-thread-affinity-unresolved",
@@ -17071,12 +17068,12 @@
           "handleParameterPositions": [
             0
           ],
-          "evidenceBasis": "cpp-ownership-effect-facts"
+          "evidenceBasis": "defold-public-by-value-resource-borrow"
         },
         "effect": {
           "classification": "trusted-borrowed-default",
           "admission": {
-            "kind": "source-derived",
+            "kind": "defold-contract-trusted",
             "trustDefault": "defold-public-by-value-resource-borrow"
           },
           "taxonomy": {
@@ -17093,8 +17090,16 @@
           "sources": [],
           "signals": [],
           "sourceProof": {
-            "state": "proven",
-            "evidenceGaps": []
+            "state": "unknown",
+            "evidenceGaps": [
+              "cpp-effect:compiler-diagnostics",
+              "cpp-effect:completion-unresolved",
+              "cpp-effect:escape-unresolved",
+              "cpp-effect:function-ownership-unresolved",
+              "cpp-effect:parameter-0-completion-unresolved",
+              "cpp-effect:parameter-0-escape-unresolved",
+              "cpp-effect:parameter-0-ownership-unresolved"
+            ]
           }
         },
         "blockers": [],
@@ -17121,7 +17126,7 @@
         "handleParameterPositions": [
           0
         ],
-        "evidenceBasis": "cpp-ownership-effect-facts"
+        "evidenceBasis": "defold-public-by-value-resource-borrow"
       },
       "engineProviderBlockers": [
         "call-thread-affinity-unresolved",
@@ -17170,12 +17175,12 @@
           "handleParameterPositions": [
             0
           ],
-          "evidenceBasis": "cpp-ownership-effect-facts"
+          "evidenceBasis": "defold-public-by-value-resource-borrow"
         },
         "effect": {
           "classification": "trusted-borrowed-default",
           "admission": {
-            "kind": "source-derived",
+            "kind": "defold-contract-trusted",
             "trustDefault": "defold-public-by-value-resource-borrow"
           },
           "taxonomy": {
@@ -17192,8 +17197,10 @@
           "sources": [],
           "signals": [],
           "sourceProof": {
-            "state": "proven",
-            "evidenceGaps": []
+            "state": "unknown",
+            "evidenceGaps": [
+              "cpp-effect:result-provenance-unresolved"
+            ]
           }
         },
         "blockers": [],
@@ -17220,7 +17227,7 @@
         "handleParameterPositions": [
           0
         ],
-        "evidenceBasis": "cpp-ownership-effect-facts"
+        "evidenceBasis": "defold-public-by-value-resource-borrow"
       },
       "engineProviderBlockers": [
         "call-thread-affinity-unresolved",
@@ -18848,16 +18855,8 @@
             }
           ],
           "sourceProof": {
-            "state": "unknown",
-            "evidenceGaps": [
-              "cpp-effect:compiler-diagnostics",
-              "cpp-effect:completion-unresolved",
-              "cpp-effect:escape-unresolved",
-              "cpp-effect:function-ownership-unresolved",
-              "cpp-effect:parameter-1-completion-unresolved",
-              "cpp-effect:parameter-1-escape-unresolved",
-              "cpp-effect:parameter-1-ownership-unresolved"
-            ]
+            "state": "proven",
+            "evidenceGaps": []
           }
         },
         "blockers": [],
@@ -18999,19 +18998,8 @@
             }
           ],
           "sourceProof": {
-            "state": "unknown",
-            "evidenceGaps": [
-              "cpp-effect:compiler-diagnostics",
-              "cpp-effect:completion-unresolved",
-              "cpp-effect:escape-unresolved",
-              "cpp-effect:function-ownership-unresolved",
-              "cpp-effect:parameter-0-completion-unresolved",
-              "cpp-effect:parameter-0-escape-unresolved",
-              "cpp-effect:parameter-0-ownership-unresolved",
-              "cpp-effect:parameter-1-completion-unresolved",
-              "cpp-effect:parameter-1-escape-unresolved",
-              "cpp-effect:parameter-1-ownership-unresolved"
-            ]
+            "state": "proven",
+            "evidenceGaps": []
           }
         },
         "blockers": [],
@@ -19206,12 +19194,12 @@
           "handleParameterPositions": [
             0
           ],
-          "evidenceBasis": "cpp-ownership-effect-facts"
+          "evidenceBasis": "defold-public-by-value-resource-borrow"
         },
         "effect": {
           "classification": "trusted-borrowed-default",
           "admission": {
-            "kind": "source-derived",
+            "kind": "defold-contract-trusted",
             "trustDefault": "defold-public-by-value-resource-borrow"
           },
           "taxonomy": {
@@ -19228,8 +19216,17 @@
           "sources": [],
           "signals": [],
           "sourceProof": {
-            "state": "proven",
-            "evidenceGaps": []
+            "state": "unknown",
+            "evidenceGaps": [
+              "cpp-effect:compiler-diagnostics",
+              "cpp-effect:completion-unresolved",
+              "cpp-effect:escape-unresolved",
+              "cpp-effect:function-ownership-unresolved",
+              "cpp-effect:parameter-0-completion-unresolved",
+              "cpp-effect:parameter-0-escape-unresolved",
+              "cpp-effect:parameter-0-ownership-unresolved",
+              "cpp-effect:result-provenance-unresolved"
+            ]
           }
         },
         "blockers": [],
@@ -19256,7 +19253,7 @@
         "handleParameterPositions": [
           0
         ],
-        "evidenceBasis": "cpp-ownership-effect-facts"
+        "evidenceBasis": "defold-public-by-value-resource-borrow"
       },
       "engineProviderBlockers": [
         "call-thread-affinity-unresolved",
@@ -19305,12 +19302,12 @@
           "handleParameterPositions": [
             0
           ],
-          "evidenceBasis": "cpp-ownership-effect-facts"
+          "evidenceBasis": "defold-public-by-value-resource-borrow"
         },
         "effect": {
           "classification": "trusted-borrowed-default",
           "admission": {
-            "kind": "source-derived",
+            "kind": "defold-contract-trusted",
             "trustDefault": "defold-public-by-value-resource-borrow"
           },
           "taxonomy": {
@@ -19327,8 +19324,16 @@
           "sources": [],
           "signals": [],
           "sourceProof": {
-            "state": "proven",
-            "evidenceGaps": []
+            "state": "unknown",
+            "evidenceGaps": [
+              "cpp-effect:compiler-diagnostics",
+              "cpp-effect:completion-unresolved",
+              "cpp-effect:escape-unresolved",
+              "cpp-effect:function-ownership-unresolved",
+              "cpp-effect:parameter-0-completion-unresolved",
+              "cpp-effect:parameter-0-escape-unresolved",
+              "cpp-effect:parameter-0-ownership-unresolved"
+            ]
           }
         },
         "blockers": [],
@@ -19355,7 +19360,7 @@
         "handleParameterPositions": [
           0
         ],
-        "evidenceBasis": "cpp-ownership-effect-facts"
+        "evidenceBasis": "defold-public-by-value-resource-borrow"
       },
       "engineProviderBlockers": [
         "call-thread-affinity-unresolved",
@@ -19404,12 +19409,12 @@
           "handleParameterPositions": [
             0
           ],
-          "evidenceBasis": "cpp-ownership-effect-facts"
+          "evidenceBasis": "defold-public-by-value-resource-borrow"
         },
         "effect": {
           "classification": "trusted-borrowed-default",
           "admission": {
-            "kind": "source-derived",
+            "kind": "defold-contract-trusted",
             "trustDefault": "defold-public-by-value-resource-borrow"
           },
           "taxonomy": {
@@ -19426,8 +19431,17 @@
           "sources": [],
           "signals": [],
           "sourceProof": {
-            "state": "proven",
-            "evidenceGaps": []
+            "state": "unknown",
+            "evidenceGaps": [
+              "cpp-effect:compiler-diagnostics",
+              "cpp-effect:completion-unresolved",
+              "cpp-effect:escape-unresolved",
+              "cpp-effect:function-ownership-unresolved",
+              "cpp-effect:parameter-0-completion-unresolved",
+              "cpp-effect:parameter-0-escape-unresolved",
+              "cpp-effect:parameter-0-ownership-unresolved",
+              "cpp-effect:result-provenance-unresolved"
+            ]
           }
         },
         "blockers": [],
@@ -19454,7 +19468,7 @@
         "handleParameterPositions": [
           0
         ],
-        "evidenceBasis": "cpp-ownership-effect-facts"
+        "evidenceBasis": "defold-public-by-value-resource-borrow"
       },
       "engineProviderBlockers": [
         "call-thread-affinity-unresolved",
@@ -20137,12 +20151,12 @@
           "handleParameterPositions": [
             0
           ],
-          "evidenceBasis": "cpp-ownership-effect-facts"
+          "evidenceBasis": "defold-public-by-value-resource-borrow"
         },
         "effect": {
           "classification": "trusted-borrowed-default",
           "admission": {
-            "kind": "source-derived",
+            "kind": "defold-contract-trusted",
             "trustDefault": "defold-public-by-value-resource-borrow"
           },
           "taxonomy": {
@@ -20159,8 +20173,10 @@
           "sources": [],
           "signals": [],
           "sourceProof": {
-            "state": "proven",
-            "evidenceGaps": []
+            "state": "unknown",
+            "evidenceGaps": [
+              "cpp-effect:conflicting-source-definitions"
+            ]
           }
         },
         "blockers": [],
@@ -20187,7 +20203,7 @@
         "handleParameterPositions": [
           0
         ],
-        "evidenceBasis": "cpp-ownership-effect-facts"
+        "evidenceBasis": "defold-public-by-value-resource-borrow"
       },
       "engineProviderBlockers": [
         "call-thread-affinity-unresolved",

@@ -252,11 +252,11 @@ plan over the complete global ABI envelope. That migration found eleven
 lifecycle/refcount/state-transition routes inside the former "borrowed"
 tranche and withdrew their specializations without removing their universal
 APIs. The same plan now authenticates and joins the shared C++
-ownership/effect artifact: 73 selected routes are source-derived and 74 are
-explicitly `defold-contract-trusted` under Defold's public by-value-resource convention with
-machine-readable proof gaps. A source-proof withdrawal changes only that
-admission label; lifecycle/refcount contradictions still dominate and select
-the universal route. The emitter never performs either selection.
+ownership/effect artifact: 63 selected routes are source-derived and 85 are
+explicitly `defold-contract-trusted` under Defold's public by-value-resource
+convention with machine-readable proof gaps. A source-proof withdrawal changes
+only that admission label; lifecycle/refcount contradictions still dominate
+and select the universal route. The emitter never performs either selection.
 The scratch scalar-out plan applies that extractor over the complete structural
 envelope and is the sole selection authority consumed by the production
 emitter. New admissions require diagnostic-free exact-one, success-written,
@@ -268,6 +268,17 @@ admission preserves previously generated routes only when the revision-derived
 those rows retain their missing source facts as `evidenceGaps` and are never
 reported as source-proven. This keeps an existing optimization while effect
 recovery catches up, without creating a second selector in the emitter.
+
+Ownership/effect extraction uses one qualified-namespace AST profile on every
+host. Compiler capacity therefore cannot silently switch one source between a
+full and filtered tree. Darwin/glibc assertion wrappers are ignored while their
+child expressions remain analyzed, and stable callable evidence excludes
+host-header type/mangling spellings. Only an exact joined definition becomes a
+policy observation; failed text-search candidates and host-specific compiler
+diagnostics remain ephemeral. Duplicate observations of one inline definition
+collapse to the definition-owning source witness. This preserves the selected
+families while making the generated artifact a function of pinned Defold bytes
+and package rules rather than the derivation host.
 
 Generated-family census checks are structural, not optimization-count locks.
 For a family report, `declarations.length` must equal the revision's

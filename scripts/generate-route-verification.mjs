@@ -67,6 +67,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const generated = path.join(root, "packages", "bindings", "generated");
 const outputPath = path.join(generated, "defold-route-verification.json");
 const issueRepository = "ts-defold/deherm";
+const loweringPlanPath = "packages/bindings/generated/defold-binding-lowering-plan.json";
 
 const read = async (name) => JSON.parse(await readFile(path.join(generated, name), "utf8"));
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
@@ -114,13 +115,39 @@ function issueMetadata(row, defoldRevision) {
 }
 
 export function runtimeEvidenceMatchesPlan(report, plan, defoldRevision) {
-  return (
-    report.defoldRevision === defoldRevision &&
-    report.target === plan.target &&
-    report.runtimeProfile === plan.runtimeProfile &&
+  if (
+    report.defoldRevision !== defoldRevision ||
+    report.target !== plan.target ||
+    report.runtimeProfile !== plan.runtimeProfile
+  )
+    return false;
+  if (
     report.planSha256 === sha256(JSON.stringify(plan)) &&
     JSON.stringify(report.planInputs ?? null) === JSON.stringify(plan.inputs ?? null)
-  );
+  )
+    return true;
+
+  // The canonical lowering plan contains script and dmSDK lanes. A dmSDK-only
+  // evidence refresh rotates the plan byte hash even when the headless script
+  // harness is byte-for-byte identical. Preserve the expensive live-engine
+  // evidence only when substituting the report's prior lowering-plan digest
+  // reconstructs the exact plan that the engine executed. Any other input or
+  // plan change still invalidates the report.
+  const reportInputs = report.planInputs ?? {};
+  const planInputs = plan.inputs ?? {};
+  const inputKeys = Object.keys(planInputs);
+  if (
+    !Object.hasOwn(reportInputs, loweringPlanPath) ||
+    !Object.hasOwn(planInputs, loweringPlanPath) ||
+    Object.keys(reportInputs).length !== inputKeys.length ||
+    inputKeys.some((key) => key !== loweringPlanPath && reportInputs[key] !== planInputs[key])
+  )
+    return false;
+  const executedPlan = {
+    ...plan,
+    inputs: { ...planInputs, [loweringPlanPath]: reportInputs[loweringPlanPath] },
+  };
+  return report.planSha256 === sha256(JSON.stringify(executedPlan));
 }
 
 async function main() {

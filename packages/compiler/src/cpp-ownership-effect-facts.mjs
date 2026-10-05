@@ -200,6 +200,10 @@ function standardExternalRule(identity) {
   return null;
 }
 
+function isHostAssertionCall(identity) {
+  return ["__assert_fail", "__assert_rtn", "__builtin_expect"].includes(identity?.name ?? "");
+}
+
 function validateRule(rule, label) {
   if (!object(rule)) throw new Error(`${label} must be an object`);
   for (const key of Object.keys(rule)) {
@@ -393,6 +397,16 @@ export function extractCppOwnershipEffectFacts(ast, requestedDeclarationIds, opt
       const current = unwrap(node);
       if (!current) return null;
       if (CALL_EXPRESSIONS.has(current.kind)) {
+        const [callee, ...arguments_] = current.inner ?? [];
+        if (isHostAssertionCall(directCallee(callee))) {
+          // libc and compiler assertion plumbing is not part of Defold's
+          // ownership contract. Darwin and glibc spell it differently, but
+          // the asserted expression can still contain meaningful reads or
+          // calls, so retain its child semantics while dropping only the
+          // host-owned wrapper.
+          for (const argument of arguments_) inspectExpression(argument, conditional, "read");
+          return null;
+        }
         return analyzeCall(current, conditional);
       }
       if (current.kind === "CXXNewExpr") {

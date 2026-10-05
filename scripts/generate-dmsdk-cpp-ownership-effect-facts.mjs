@@ -49,7 +49,7 @@ function parseArguments(argv) {
   return options;
 }
 
-async function includeRoots(engineRoot) {
+async function includeRoots(repositoryRoot, engineRoot) {
   // Keep lookup deterministic and faithful to Defold's exported include
   // layout. Source-local quoted includes are resolved by Clang from the
   // translation unit itself; adding every leaf directory here can shadow
@@ -57,16 +57,24 @@ async function includeRoots(engineRoot) {
   const roots = new Set([engineRoot]);
   roots.add(path.join(engineRoot, "dlib", "src"));
   const sdkIncludeRoots = [];
-  const lock = await readFile(path.join(root, "upstream.lock"), "utf8");
+  const lock = await readFile(path.join(repositoryRoot, "upstream.lock"), "utf8");
   const revision = lock.match(/^DEFOLD_REV=(.+)$/mu)?.[1]?.trim();
   if (revision) {
-    const sdkRoot = path.join(root, "upstream", "extender", "server", "app", "sdk", revision, "defoldsdk");
+    const sdkRoot = path.join(repositoryRoot, "upstream", "extender", "server", "app", "sdk", revision, "defoldsdk");
     for (const relative of ["sdk/include", "include", "ext/include"]) {
       const includeRoot = path.join(sdkRoot, relative);
       roots.add(includeRoot);
       sdkIncludeRoots.push(includeRoot);
     }
   }
+  for (const relative of [
+    "dlib/src/mbedtls/defold",
+    "dlib/src/mbedtls",
+    "dlib/src/mbedtls/include",
+    "dlib/src/mbedtls/tf-psa-crypto/include",
+    "dlib/src/mbedtls/tf-psa-crypto/drivers/builtin/include",
+  ])
+    roots.add(path.join(engineRoot, relative));
   return { roots: [...roots].sort(compareCodeUnits), sdkIncludeRoots: sdkIncludeRoots.sort(compareCodeUnits) };
 }
 
@@ -170,49 +178,43 @@ async function runClangAst(file, roots, quoteRoots, vfsOverlay, headers, astFilt
 }
 
 async function clangAst(file, roots, quoteRoots, vfsOverlay = null, headers = [], declarations = []) {
+  if (declarations.length > 0) {
+    const filters = [
+      ...new Set(
+        declarations.map(({ name }) => {
+          const parts = name.split("::");
+          return parts.length > 1 ? parts.slice(0, -1).join("::") : name;
+        }),
+      ),
+    ].sort(compareCodeUnits);
+    try {
+      const nodes = [];
+      const diagnosticRows = [];
+      for (const filter of filters) {
+        const result = await runClangAst(file, roots, quoteRoots, vfsOverlay, headers, filter);
+        nodes.push(...parseJsonSequence(result.stdout));
+        diagnosticRows.push(result.stderr);
+      }
+      return {
+        ast: { kind: "TranslationUnitDecl", inner: nodes },
+        diagnostics: diagnosticRows.join("\n"),
+        complete: true,
+        profile: "qualified-namespace-filter",
+      };
+    } catch (error) {
+      return {
+        ast: null,
+        diagnostics: String(error.stderr ?? error.message ?? "filtered clang failed"),
+        complete: false,
+        profile: "qualified-namespace-filter",
+      };
+    }
+  }
   try {
     const result = await runClangAst(file, roots, quoteRoots, vfsOverlay, headers);
     return { ast: JSON.parse(result.stdout), diagnostics: result.stderr, complete: true, profile: "full" };
   } catch (error) {
     const diagnostics = String(error.stderr ?? error.message ?? "clang failed");
-    const capacityFailure =
-      error.code === "ERR_CHILD_PROCESS_STDIO_MAXBUFFER" ||
-      /maxBuffer|stdout maxBuffer|ENOBUFS|too large|Invalid string length/iu.test(
-        `${error.message ?? ""}\n${diagnostics}`,
-      );
-    const toolFailure = !/(?:^|\n)[^\n]*error:/u.test(diagnostics);
-    if (declarations.length > 0 && (capacityFailure || toolFailure)) {
-      try {
-        const filters = [
-          ...new Set(
-            declarations.map(({ name }) => {
-              const parts = name.split("::");
-              return parts.length > 1 ? parts.slice(0, -1).join("::") : name;
-            }),
-          ),
-        ].sort(compareCodeUnits);
-        const nodes = [];
-        const diagnosticRows = [];
-        for (const filter of filters) {
-          const result = await runClangAst(file, roots, quoteRoots, vfsOverlay, headers, filter);
-          nodes.push(...parseJsonSequence(result.stdout));
-          diagnosticRows.push(result.stderr);
-        }
-        return {
-          ast: { kind: "TranslationUnitDecl", inner: nodes },
-          diagnostics: diagnosticRows.join("\n"),
-          complete: true,
-          profile: "qualified-namespace-filter",
-        };
-      } catch (filteredError) {
-        return {
-          ast: null,
-          diagnostics: String(filteredError.stderr ?? filteredError.message ?? "filtered clang failed"),
-          complete: false,
-          profile: "qualified-namespace-filter",
-        };
-      }
-    }
     return { ast: null, diagnostics, complete: false, profile: "full" };
   }
 }
@@ -326,6 +328,20 @@ function mergeRows(candidates, observations) {
     const distinct = [...new Set(observed.map((row) => semantic(row.fact)))];
     if (distinct.length === 1) {
       const row = observed[0];
+      const byDefinition = new Map();
+      for (const observation of observed) {
+        const key = `${observation.ast.definitionFile}\0${observation.ast.definitionLine}\0${observation.ast.headerDeclarationId}`;
+        const current = byDefinition.get(key);
+        const observationIsDefinition = observation.sourcePath === observation.ast.definitionFile;
+        const currentIsDefinition = current?.sourcePath === current?.ast.definitionFile;
+        if (
+          !current ||
+          (observationIsDefinition && !currentIsDefinition) ||
+          (observationIsDefinition === currentIsDefinition &&
+            compareCodeUnits(observation.sourcePath, current.sourcePath) < 0)
+        )
+          byDefinition.set(key, observation);
+      }
       return {
         declarationId: declaration.id,
         name: declaration.name,
@@ -334,7 +350,7 @@ function mergeRows(candidates, observations) {
         envelopes: declaration.envelopes,
         state: "observed",
         fact: row.fact,
-        observations: observed
+        observations: [...byDefinition.values()]
           .map(({ sourcePath, ast, sourceSha256, translationUnitSha256 }) => ({
             sourcePath,
             sourceSha256,
@@ -353,14 +369,12 @@ function mergeRows(candidates, observations) {
       envelopes: declaration.envelopes,
       state: "unknown",
       fact: null,
-      observations: rows
-        .map(({ sourcePath, ast, sourceSha256, translationUnitSha256 }) => ({
-          sourcePath,
-          sourceSha256,
-          translationUnitSha256,
-          ast,
-        }))
-        .sort((left, right) => compareCodeUnits(left.sourcePath, right.sourcePath)),
+      // A failed text candidate is search telemetry, not semantic evidence.
+      // Retaining host-specific compiler failures here made one pinned Defold
+      // revision produce different policy bytes on macOS and Linux. Unknown
+      // stays fail-closed through its machine-readable diagnostic; only exact
+      // definition joins become observations.
+      observations: [],
       diagnostics: [
         ...new Set(
           distinct.length > 1 ? ["conflicting-source-definitions"] : rows.flatMap(({ diagnostics }) => diagnostics),
@@ -385,7 +399,10 @@ export async function generateDmSdkCppOwnershipEffectFacts({ root: outputRoot = 
   const names = new Set(candidates.map(({ name }) => name.split("::").at(-1)));
   const engineRoot = path.resolve(outputRoot, "upstream/defold/engine");
   const discoveredMatches = [
-    ...(await discoverSources(engineRoot, names)),
+    // The policy records the portable implementation shape. Objective-C++
+    // target replacements depend on the deriving host's platform SDK and made
+    // identical Defold source produce different facts on macOS and Linux.
+    ...(await discoverSources(engineRoot, names, { extensions: [".c", ".cc", ".cpp", ".cxx"] })),
     ...(await discoverHeaderSources(engineRoot, names)),
   ]
     .filter((entry, index, values) => values.findIndex((other) => other.file === entry.file) === index)
@@ -393,7 +410,7 @@ export async function generateDmSdkCppOwnershipEffectFacts({ root: outputRoot = 
   const sourceMatches = discoveredMatches
     .map((entry) => ({ ...entry, relevant: sourceCandidates(candidates, entry.source) }))
     .filter(({ relevant }) => relevant.length > 0);
-  const { roots, sdkIncludeRoots } = await includeRoots(engineRoot);
+  const { roots, sdkIncludeRoots } = await includeRoots(outputRoot, engineRoot);
   const includeAliases = await deriveDefoldSourceIncludeAliases({
     repositoryRoot: outputRoot,
     engineRoot,
@@ -453,6 +470,9 @@ export async function generateDmSdkCppOwnershipEffectFacts({ root: outputRoot = 
   const lock = await readFile(path.resolve(outputRoot, "upstream.lock"), "utf8");
   const revision = lock.match(/^DEFOLD_REV=(.+)$/mu)?.[1]?.trim() ?? "unknown";
   const functions = mergeRows(candidates, observations);
+  const referencedSources = new Set(
+    functions.flatMap(({ observations: rows }) => rows.map(({ sourcePath }) => sourcePath)),
+  );
   const envelopeCoverage = Object.fromEntries(
     ["borrowed-handle", "scratch-scalar-out"].map((envelope) => {
       const rows = functions.filter(({ envelopes }) => envelopes.includes(envelope));
@@ -470,7 +490,7 @@ export async function generateDmSdkCppOwnershipEffectFacts({ root: outputRoot = 
     schemaVersion: 4,
     kind: "deherm.dmsdk-cpp-ownership-effect-facts",
     defoldRevision: revision,
-    extraction: "clang-json-ast/cpp-ownership-effect-v3",
+    extraction: "clang-json-ast/cpp-ownership-effect-v4",
     semanticAdmission: DMSDK_CPP_SOURCE_SEMANTIC_ADMISSION,
     extractionProfiles: [{ id: "host-clang-c++17", defines: [], compiler: "clang++" }],
     targetAvailability: DMSDK_CPP_TARGET_AVAILABILITY,
@@ -493,7 +513,9 @@ export async function generateDmSdkCppOwnershipEffectFacts({ root: outputRoot = 
         diagnostics: "ephemeral-not-policy-input",
       },
     },
-    sources: sourceRecords.sort((left, right) => compareCodeUnits(left.path, right.path)),
+    sources: sourceRecords
+      .filter(({ path: sourcePath }) => referencedSources.has(sourcePath))
+      .sort((left, right) => compareCodeUnits(left.path, right.path)),
     coverage: {
       requested: functions.length,
       observed: functions.filter(({ state }) => state === "observed").length,

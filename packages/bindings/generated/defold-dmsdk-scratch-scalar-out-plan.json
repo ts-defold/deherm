@@ -14,7 +14,7 @@
     "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
     "projection": "5cf214af96cee8b7dcffe3114441214670524721205837e6ef397c3d53fc52c6",
     "policy": "9d2a8a95e9f918bcc517cb2a702df912a067e6a941ef3f4291f96ddd568b3099",
-    "effectFacts": "071b3051cd60780a67958cd92266a1460cf1e46479abe1f062da2f43f8b606aa"
+    "effectFacts": "cb4da43a063d868ce9922da1ad1670fe3df6b7d30c963621b3a059340348d744"
   },
   "eligibility": {
     "schemaVersion": 2,
@@ -109,10 +109,10 @@
     "defoldContractTrusted": 5,
     "universalFallback": 19,
     "blockerCounts": {
-      "ownership": 23,
-      "memory": 20,
+      "ownership": 22,
+      "memory": 19,
       "write": 23,
-      "completion": 23
+      "completion": 22
     }
   },
   "decisions": [
@@ -879,16 +879,13 @@
       "fallback": false,
       "admission": "defold-contract-trusted",
       "facts": {
-        "ownership": "unknown",
-        "memory": "unknown",
+        "ownership": "borrowed-handle-or-scalar-no-transfer",
+        "memory": "exact-one-scalar-no-alias-no-span",
         "write": "unknown",
-        "completion": "unknown",
+        "completion": "synchronous-noescape",
         "source": "cpp-ownership-effect-facts"
       },
       "evidenceGaps": [
-        "completion-facts-unavailable",
-        "memory-facts-unavailable",
-        "ownership-facts-unavailable",
         "write-facts-unavailable"
       ],
       "blockers": [],
@@ -896,9 +893,6 @@
         "state": "universal-fallback",
         "preserved": true,
         "blockers": [
-          "completion-facts-unavailable",
-          "memory-facts-unavailable",
-          "ownership-facts-unavailable",
           "write-facts-unavailable"
         ]
       }

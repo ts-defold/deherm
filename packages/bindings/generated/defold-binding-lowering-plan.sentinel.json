@@ -58,7 +58,7 @@
     "scriptConstantLowering": "53815679718931177edd274504ea8f2decba28f6dac328f27a039070a2c82198",
     "defoldValueLayouts": "a905f72450a2164d414d90e37359ea9b0207609ead5c16e928b39400c32f3d5b",
     "dmsdkProjection": "5cf214af96cee8b7dcffe3114441214670524721205837e6ef397c3d53fc52c6",
-    "dmsdkUniversal": "64258d91ae39d4e675fcefcbcbd666dd7b8305343d2779d9ecbc63b7ec9d55fe",
+    "dmsdkUniversal": "0f8862b1f325148aa8484cd141f92a0cf1aeb068c553d38a9c6521a50d0b1125",
     "dmsdkScalarThunks": "9c4621db3613a53b7a470d249d06e25787b3bf917f32e4840315bc2efdc4d291",
     "dmsdkEnumValues": "52e9533abdb4b76dccfbae10f7f9e954003ba5755d9a255be8b5a66198d616a4",
     "dmsdkNamedScalars": "2142e8db67a1a2363f2ab8a278bf5ea6bb850415b8542cf13dac5a27cc60be68",
@@ -69,7 +69,7 @@
     "dmsdkHashSpans": "07875f2864821a14b05105764d0f8633e90052161d3504dd2122656b9009507e",
     "dmsdkArenaSpanBlockers": "4cf64f6a7a0164fdf56de0b674b37b5bb171ad2a85a33f85025066b11604fd73",
     "dmsdkCStringValue": "20563cd682b105b9f089d72f6914feb584ec048d805abbf27a1d108220869021",
-    "dmsdkBorrowedHandle": "fd97f52ebafc7e2d1d4dcc49bc064c1b710df216fa0a15af92d8e3a2d223ae05",
+    "dmsdkBorrowedHandle": "22fde03a51b833ff325c869eb172b84b059b0177cfd1ed9a2a9799e8ddab7c0c",
     "dmsdkTargetConditionals": "e743b8b82ba78fb8d6c6f49973493f69e3ae53ea3cea05a02ae42bbf8647cdbf",
     "semanticPolicies": "d49b82277fc9267ec3868530dce2d87777108754ac1854c1b21596e8110908f6",
     "typescriptSdk": "81b1278970b1a6efa11c533a979adf61a93174cb9f268cab7bb618a3465a3ec7",
@@ -78,9 +78,9 @@
     "luaStack": "5e0d6961c02d98e1c10cb8cb0fd95af02b3d86181be22facce0d824fb5ab2ea6",
     "browserWasmHost": "ef3c9691506f726586c5ffd2c0da2e3ff60915163d1af7bfd24c3f355f8f1836"
   },
-  "cacheKey": "1cd94b5a7a74bb960d54168c62203df54b53e244eae54d173a8c043bdd0318ae",
+  "cacheKey": "3987cd0d178d3b0d7d36cc6dcbf8c8301486415e0a0f936c48c1d9f33570397e",
   "output": "packages/bindings/generated/defold-binding-lowering-plan.json",
-  "outputBytes": 17778740,
-  "outputSha256": "7e3c528e2f9dae4793ac6ad9b71f464a21580f195e799113fbbaaf2a7b42aa98",
-  "planSha256": "a7f0936469ed8efa6aa9211c2b8f961d23fdd4ec16f0d60caebb36f49bca6034"
+  "outputBytes": 17778872,
+  "outputSha256": "219b28b3470488eb848187d60cb92d72f95e12b49bcc59009315ea47dae3025f",
+  "planSha256": "98fd87f2185c33986f337585ff2a04472915785118096ade274ebf59cedb33fd"
 }

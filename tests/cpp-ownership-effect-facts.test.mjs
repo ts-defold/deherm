@@ -113,6 +113,33 @@ test("delete expressions and free wrappers propagate finalization without public
   assert.equal(wrapped.parameters[0].ownershipEffect, "finalize");
 });
 
+test("host assertion wrappers do not change ownership facts and preserve child effects", () => {
+  const makeTree = (assertionName) => {
+    const p = parameter("assert-p", "value", "Widget *");
+    return ast(
+      fn(
+        "asserted",
+        "Asserted",
+        "void (Widget *)",
+        [p],
+        [
+          call(
+            `host-${assertionName}`,
+            assertionName,
+            parameterRef("assert-p", "value", "Widget *"),
+            call("c-free", "free", parameterRef("assert-p", "value", "Widget *")),
+          ),
+        ],
+      ),
+    );
+  };
+  const darwin = fact(makeTree("__assert_rtn"), "asserted");
+  const glibc = fact(makeTree("__assert_fail"), "asserted");
+  assert.deepEqual(darwin, glibc);
+  assert.equal(darwin.ownershipEffect, "finalize");
+  assert.equal(darwin.parameters[0].ownershipEffect, "finalize");
+});
+
 test("declaration-identity callee rules carry refcount and deferred-transfer semantics", () => {
   const p = parameter("retain-p", "resource", "Resource *");
   const retain = fn(

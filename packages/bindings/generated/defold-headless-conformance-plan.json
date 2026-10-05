@@ -476,7 +476,7 @@
     "physics-3d"
   ],
   "inputs": {
-    "packages/bindings/generated/defold-binding-lowering-plan.json": "7e3c528e2f9dae4793ac6ad9b71f464a21580f195e799113fbbaaf2a7b42aa98",
+    "packages/bindings/generated/defold-binding-lowering-plan.json": "219b28b3470488eb848187d60cb92d72f95e12b49bcc59009315ea47dae3025f",
     "packages/bindings/generated/defold-script-api-ir.json": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049",
     "packages/bindings/generated/defold-script-universal-value-bindings.json": "685823e3882d176e2c52cd33521b049b0bf86a73057caeaf1dfba5a2ec2fdfa7",
     "packages/bindings/generated/defold-script-scalar-dispatch.json": "3c1e7bbb6e1a82be0d4f3d2fc2598984ec1c81bfeedd034c2c179fcf57920bd6",

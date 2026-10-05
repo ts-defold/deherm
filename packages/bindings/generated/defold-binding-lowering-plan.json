@@ -29,7 +29,7 @@
     "scriptConstantLowering": "53815679718931177edd274504ea8f2decba28f6dac328f27a039070a2c82198",
     "defoldValueLayouts": "a905f72450a2164d414d90e37359ea9b0207609ead5c16e928b39400c32f3d5b",
     "dmsdkProjection": "5cf214af96cee8b7dcffe3114441214670524721205837e6ef397c3d53fc52c6",
-    "dmsdkUniversal": "64258d91ae39d4e675fcefcbcbd666dd7b8305343d2779d9ecbc63b7ec9d55fe",
+    "dmsdkUniversal": "0f8862b1f325148aa8484cd141f92a0cf1aeb068c553d38a9c6521a50d0b1125",
     "dmsdkScalarThunks": "9c4621db3613a53b7a470d249d06e25787b3bf917f32e4840315bc2efdc4d291",
     "dmsdkEnumValues": "52e9533abdb4b76dccfbae10f7f9e954003ba5755d9a255be8b5a66198d616a4",
     "dmsdkNamedScalars": "2142e8db67a1a2363f2ab8a278bf5ea6bb850415b8542cf13dac5a27cc60be68",
@@ -40,7 +40,7 @@
     "dmsdkHashSpans": "07875f2864821a14b05105764d0f8633e90052161d3504dd2122656b9009507e",
     "dmsdkArenaSpanBlockers": "4cf64f6a7a0164fdf56de0b674b37b5bb171ad2a85a33f85025066b11604fd73",
     "dmsdkCStringValue": "20563cd682b105b9f089d72f6914feb584ec048d805abbf27a1d108220869021",
-    "dmsdkBorrowedHandle": "fd97f52ebafc7e2d1d4dcc49bc064c1b710df216fa0a15af92d8e3a2d223ae05",
+    "dmsdkBorrowedHandle": "22fde03a51b833ff325c869eb172b84b059b0177cfd1ed9a2a9799e8ddab7c0c",
     "dmsdkTargetConditionals": "e743b8b82ba78fb8d6c6f49973493f69e3ae53ea3cea05a02ae42bbf8647cdbf",
     "semanticPolicies": "d49b82277fc9267ec3868530dce2d87777108754ac1854c1b21596e8110908f6",
     "typescriptSdk": "81b1278970b1a6efa11c533a979adf61a93174cb9f268cab7bb618a3465a3ec7",
@@ -67,7 +67,7 @@
     "scriptConstantLowering": "cf923dc81d26c2d45a21fe9b3691c65d69950adda5fbcb68bbae0331704f4154",
     "defoldValueLayouts": "eac699e8e10722490bda1981edfa002e4b5fe9ac8b1eb1a12898abc5689708ca",
     "dmsdkProjection": "b27b1d2211f5c0d72904c3015671c2aa181b2e715a336edbfef527c23af1fc53",
-    "dmsdkUniversal": "42fbe3db35f6fd9d34eca68fafd38c092f972ead951f92db26f53c354a7cb710",
+    "dmsdkUniversal": "13dcfc00b02df9636f7b84e5f5814c60e026c0e6f0ea4d6abd7704163ac3f4a5",
     "dmsdkScalarThunks": "e832908ae5fecf0e2887b8b03a48076913400f231b2c87f51ccdb5f7b5a39024",
     "dmsdkEnumValues": "bfbbdb3538ef0ada792246dcdbca2854da3988a1fd469006f13ba1b4f411e234",
     "dmsdkNamedScalars": "f477908253d04ac00ee3db90a1ff1923d09d0316f1b19458cd24ea352e3dd5fd",
@@ -78,7 +78,7 @@
     "dmsdkHashSpans": "a9894b84a88b7dad08257313731d72c03fc1d1b52f9b3fd6568b78562ab10a51",
     "dmsdkArenaSpanBlockers": "e032b4982921a8ebbc51d8d987b121f18bf6774afa7e6a16e1987ae4ad7dcf44",
     "dmsdkCStringValue": "985f29c325e37bd250451081889963a6d5681aa2e38b6ccd99ee4765a9e7c281",
-    "dmsdkBorrowedHandle": "82304ff17b0e0d253ba39c6178537a5bfdb95a89482766812543467bc4843480",
+    "dmsdkBorrowedHandle": "71c4341049b6fcf3df4a3008daffd292bc57937045efa462a4e4fb3ad069e229",
     "dmsdkTargetConditionals": "1391e027f73394ee1838287a25e0a244fd9a0d291ce6b585553164af39d9e005",
     "semanticPolicies": "3336271187d4bf1b9d3c0c45efe68a9c9c3710d71fef1a09c5f37973fd52e0f8",
     "typescriptSdk": "9011d6e158517ee59b5da64050507ddcd756a0d69277d9222f9a9c7644b514a3",
@@ -34864,7 +34864,7 @@
             "handleParameterPositions": [
               0
             ],
-            "evidenceBasis": "cpp-ownership-effect-facts"
+            "evidenceBasis": "defold-public-by-value-resource-borrow"
           },
           "evidenceClaims": {
             "generated": "all-five-target-projections-and-exact-call-twin",
@@ -36515,7 +36515,7 @@
             "handleParameterPositions": [
               0
             ],
-            "evidenceBasis": "defold-public-by-value-resource-borrow"
+            "evidenceBasis": "cpp-ownership-effect-facts"
           },
           "evidenceClaims": {
             "generated": "all-five-target-projections-and-exact-call-twin",
@@ -43273,7 +43273,7 @@
             "handleParameterPositions": [
               0
             ],
-            "evidenceBasis": "cpp-ownership-effect-facts"
+            "evidenceBasis": "defold-public-by-value-resource-borrow"
           },
           "evidenceClaims": {
             "generated": "all-five-target-projections-and-exact-call-twin",
@@ -59653,7 +59653,7 @@
             "handleParameterPositions": [
               0
             ],
-            "evidenceBasis": "cpp-ownership-effect-facts"
+            "evidenceBasis": "defold-public-by-value-resource-borrow"
           },
           "evidenceClaims": {
             "generated": "all-five-target-projections-and-exact-call-twin",
@@ -59902,7 +59902,7 @@
             "handleParameterPositions": [
               0
             ],
-            "evidenceBasis": "cpp-ownership-effect-facts"
+            "evidenceBasis": "defold-public-by-value-resource-borrow"
           },
           "evidenceClaims": {
             "generated": "all-five-target-projections-and-exact-call-twin",
@@ -60151,7 +60151,7 @@
             "handleParameterPositions": [
               0
             ],
-            "evidenceBasis": "cpp-ownership-effect-facts"
+            "evidenceBasis": "defold-public-by-value-resource-borrow"
           },
           "evidenceClaims": {
             "generated": "all-five-target-projections-and-exact-call-twin",
@@ -60510,7 +60510,7 @@
             "handleParameterPositions": [
               0
             ],
-            "evidenceBasis": "cpp-ownership-effect-facts"
+            "evidenceBasis": "defold-public-by-value-resource-borrow"
           },
           "evidenceClaims": {
             "generated": "all-five-target-projections-and-exact-call-twin",
@@ -61063,7 +61063,7 @@
             "handleParameterPositions": [
               0
             ],
-            "evidenceBasis": "cpp-ownership-effect-facts"
+            "evidenceBasis": "defold-public-by-value-resource-borrow"
           },
           "evidenceClaims": {
             "generated": "all-five-target-projections-and-exact-call-twin",
@@ -72933,7 +72933,7 @@
               0,
               1
             ],
-            "evidenceBasis": "cpp-ownership-effect-facts"
+            "evidenceBasis": "defold-public-by-value-resource-borrow"
           },
           "evidenceClaims": {
             "generated": "all-five-target-projections-and-exact-call-twin",
@@ -94563,7 +94563,7 @@
             "handleParameterPositions": [
               0
             ],
-            "evidenceBasis": "defold-public-by-value-resource-borrow"
+            "evidenceBasis": "cpp-ownership-effect-facts"
           },
           "evidenceClaims": {
             "generated": "all-five-target-projections-and-exact-call-twin",
@@ -94729,7 +94729,7 @@
             "handleParameterPositions": [
               0
             ],
-            "evidenceBasis": "defold-public-by-value-resource-borrow"
+            "evidenceBasis": "cpp-ownership-effect-facts"
           },
           "evidenceClaims": {
             "generated": "all-five-target-projections-and-exact-call-twin",
@@ -94895,7 +94895,7 @@
             "handleParameterPositions": [
               0
             ],
-            "evidenceBasis": "defold-public-by-value-resource-borrow"
+            "evidenceBasis": "cpp-ownership-effect-facts"
           },
           "evidenceClaims": {
             "generated": "all-five-target-projections-and-exact-call-twin",
@@ -109570,7 +109570,7 @@
             "handleParameterPositions": [
               0
             ],
-            "evidenceBasis": "cpp-ownership-effect-facts"
+            "evidenceBasis": "defold-public-by-value-resource-borrow"
           },
           "evidenceClaims": {
             "generated": "all-five-target-projections-and-exact-call-twin",
@@ -123290,7 +123290,7 @@
               0,
               1
             ],
-            "evidenceBasis": "cpp-ownership-effect-facts"
+            "evidenceBasis": "defold-public-by-value-resource-borrow"
           },
           "evidenceClaims": {
             "generated": "all-five-target-projections-and-exact-call-twin",
@@ -125807,7 +125807,7 @@
               0,
               1
             ],
-            "evidenceBasis": "defold-public-by-value-resource-borrow"
+            "evidenceBasis": "cpp-ownership-effect-facts"
           },
           "evidenceClaims": {
             "generated": "all-five-target-projections-and-exact-call-twin",
@@ -163124,7 +163124,7 @@
             "handleParameterPositions": [
               0
             ],
-            "evidenceBasis": "cpp-ownership-effect-facts"
+            "evidenceBasis": "defold-public-by-value-resource-borrow"
           },
           "evidenceClaims": {
             "generated": "all-five-target-projections-and-exact-call-twin",
@@ -163861,7 +163861,7 @@
             "handleParameterPositions": [
               0
             ],
-            "evidenceBasis": "cpp-ownership-effect-facts"
+            "evidenceBasis": "defold-public-by-value-resource-borrow"
           },
           "evidenceClaims": {
             "generated": "all-five-target-projections-and-exact-call-twin",
@@ -170620,7 +170620,7 @@
             "handleParameterPositions": [
               0
             ],
-            "evidenceBasis": "cpp-ownership-effect-facts"
+            "evidenceBasis": "defold-public-by-value-resource-borrow"
           },
           "evidenceClaims": {
             "generated": "all-five-target-projections-and-exact-call-twin",
@@ -171775,7 +171775,7 @@
             "handleParameterPositions": [
               0
             ],
-            "evidenceBasis": "cpp-ownership-effect-facts"
+            "evidenceBasis": "defold-public-by-value-resource-borrow"
           },
           "evidenceClaims": {
             "generated": "all-five-target-projections-and-exact-call-twin",
@@ -175376,7 +175376,7 @@
             "handleParameterPositions": [
               0
             ],
-            "evidenceBasis": "cpp-ownership-effect-facts"
+            "evidenceBasis": "defold-public-by-value-resource-borrow"
           },
           "evidenceClaims": {
             "generated": "all-five-target-projections-and-exact-call-twin",
@@ -179742,7 +179742,7 @@
             "handleParameterPositions": [
               0
             ],
-            "evidenceBasis": "cpp-ownership-effect-facts"
+            "evidenceBasis": "defold-public-by-value-resource-borrow"
           },
           "evidenceClaims": {
             "generated": "all-five-target-projections-and-exact-call-twin",
@@ -518270,5 +518270,5 @@
       }
     }
   ],
-  "planSha256": "a7f0936469ed8efa6aa9211c2b8f961d23fdd4ec16f0d60caebb36f49bca6034"
+  "planSha256": "98fd87f2185c33986f337585ff2a04472915785118096ade274ebf59cedb33fd"
 }

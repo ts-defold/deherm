@@ -166,6 +166,37 @@ test("route verification never carries runtime observations across a changed pla
   );
 });
 
+test("a dmSDK-only lowering digest rotation preserves exact headless runtime evidence", () => {
+  const loweringPlan = "packages/bindings/generated/defold-binding-lowering-plan.json";
+  const executedPlan = {
+    target: "arm64-macos",
+    runtimeProfile: "default",
+    inputs: { [loweringPlan]: "old", "script.json": "same" },
+    contracts: [{ id: "contract_0001", disposition: "fixture" }],
+  };
+  const report = {
+    defoldRevision: "a".repeat(40),
+    target: executedPlan.target,
+    runtimeProfile: executedPlan.runtimeProfile,
+    planInputs: executedPlan.inputs,
+    planSha256: sha256(JSON.stringify(executedPlan)),
+  };
+  const currentPlan = {
+    ...executedPlan,
+    inputs: { ...executedPlan.inputs, [loweringPlan]: "new" },
+  };
+  assert.equal(runtimeEvidenceMatchesPlan(report, currentPlan, report.defoldRevision), true);
+  assert.equal(runtimeEvidenceMatchesPlan(report, { ...currentPlan, contracts: [] }, report.defoldRevision), false);
+  assert.equal(
+    runtimeEvidenceMatchesPlan(
+      report,
+      { ...currentPlan, inputs: { ...currentPlan.inputs, "script.json": "changed" } },
+      report.defoldRevision,
+    ),
+    false,
+  );
+});
+
 test("the policy workflow materializes the issue links emitted for marked routes", () => {
   const start = policyWorkflow.indexOf("      - name: Open or update source contradiction issues");
   const end = policyWorkflow.indexOf("      - name: Enforce engine-lane infrastructure health", start);

@@ -65,8 +65,12 @@ test("frontend authenticates source identity and extracts by AST declaration ide
 });
 
 test("frontend identities and evidence paths do not depend on the checkout root", () => {
-  const derive = (checkoutRoot) => {
+  const derive = (checkoutRoot, type, mangledName) => {
     const ast = fixtureAst();
+    ast.inner[0].inner[0].type.qualType = type;
+    ast.inner[0].inner[0].mangledName = mangledName;
+    ast.inner[0].inner[1].type.qualType = type;
+    ast.inner[0].inner[1].mangledName = mangledName;
     ast.inner[0].inner[0].loc = {
       line: 12,
       file: `${checkoutRoot}/upstream/defold/engine/dm.h`,
@@ -84,7 +88,10 @@ test("frontend identities and evidence paths do not depend on the checkout root"
       translationUnitText: "canonical invocation + source",
     });
   };
-  assert.deepEqual(derive("/checkout/a"), derive("/private/tmp/checkout-b"));
+  assert.deepEqual(
+    derive("/checkout/a", "void (HHandle)", "_ZN2dm7ObserveEP6Handle"),
+    derive("/private/tmp/checkout-b", "void (struct Handle *) noexcept", "_ZN2dm7ObserveEP6Handle.host"),
+  );
 });
 
 test("source-alias overlay evidence paths do not depend on the checkout root", () => {
@@ -184,10 +191,10 @@ test("generated revision artifact separates source semantics from target availab
   });
   assert.deepEqual(report.coverage, {
     requested: 212,
-    observed: 198,
-    unknown: 14,
+    observed: 197,
+    unknown: 15,
     envelopes: {
-      "borrowed-handle": { requested: 182, observed: 168, unknown: 14 },
+      "borrowed-handle": { requested: 182, observed: 167, unknown: 15 },
       "scratch-scalar-out": { requested: 30, observed: 30, unknown: 0 },
     },
   });

@@ -83,11 +83,9 @@ function canonicalCallableIdentity(row, sourcePath, header = false) {
   const location = header ? { line: row.location.line } : { line: row.location.line, column: row.location.column };
   return sha256(
     JSON.stringify({
-      schemaVersion: 1,
+      schemaVersion: 2,
       kind: row.kind,
       name: row.name,
-      mangledName: row.mangledName,
-      type: row.type,
       parameterCount: row.parameterCount,
       sourcePath: normalizedPath(sourcePath),
       location,

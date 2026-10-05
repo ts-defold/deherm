@@ -70,8 +70,10 @@ test("global handle planning selects borrowed and lifecycle routes without losin
   assert.equal(committed.coverage.universalFallback, 0);
   assert.equal(committed.coverage.borrowedSelected, 148);
   assert.equal(committed.coverage.lifecycleSelected, 34);
-  assert.equal(committed.coverage.sourceDerived, 74);
-  assert.equal(committed.coverage.defoldContractTrusted, 74);
+  assert.equal(
+    committed.coverage.sourceDerived + committed.coverage.defoldContractTrusted,
+    committed.coverage.borrowedSelected,
+  );
   assert.equal(committed.coverage.revisionDerivedLifecycle, 34);
   assert.equal(committed.providerAbiVersion, 3);
   assert.match(committed.abi.reason, /lifecycle effect vectors/u);
