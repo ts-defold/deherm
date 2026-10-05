@@ -96,8 +96,6 @@ test("War Battles Static Hermes gate derives a closed release route set", async 
   try {
     const report = await buildGate({
       output,
-      shermes: path.join(root, "build/native/bin/shermes"),
-      allowUnpinnedToolchain: true,
       typedNativeSource: path.join(root, "packages/static-hermes/src/generated/script-typed-native-bridge.ts"),
       applicationBundle: await lockedApplicationBundle(),
     });
@@ -107,7 +105,7 @@ test("War Battles Static Hermes gate derives a closed release route set", async 
     assert.equal(report.reachability.dynamicAccess, false);
     assert.ok(report.reachability.staticReachableRouteCount > 0);
     assert.ok(report.reachability.blockedReachableRouteCount >= 0);
-    assert.equal(report.stages.find(({ name }) => name === "compile").status, "observed-unpinned");
+    assert.equal(report.stages.find(({ name }) => name === "compile").status, "passed");
     assert.ok(report.stages.find(({ name }) => name === "compile").emittedCBytes > 0);
     assert.equal(report.stages.find(({ name }) => name === "compile").exportedUnit, "deherm_typed_native");
     assert.equal(
@@ -129,7 +127,11 @@ test("War Battles Static Hermes gate derives a closed release route set", async 
       /#define CREATE_THIS_UNIT sh_export_deherm_static_application\b/,
       "compiled application unit must export the symbol consumed by the staged application extension",
     );
-    assert.ok(report.blockers.some(({ code }) => code === "shermes-unpinned-diagnostic"));
+    assert.equal(report.toolchain.shermes.pinned, true);
+    assert.equal(
+      report.blockers.some(({ code }) => code === "shermes-unpinned-diagnostic"),
+      false,
+    );
     assert.ok(report.blockers.some(({ code }) => code === "link-not-requested"));
     assert.match(report.evidenceBoundary.runtime, /not-claimed/);
     const persisted = JSON.parse(await readFile(path.join(output, "report.json"), "utf8"));
@@ -339,20 +341,7 @@ test("link stage stages a temporary extension and consumes Bob output", async ()
   );
   const authoredBytes = await readFile(authoredUnit);
   const fakeJava = path.join(output, "fake-java");
-  const projectLock = JSON.parse(
-    await readFile(path.join(root, "examples/war-battles-online/defold/deherm.lock"), "utf8"),
-  );
-  const family = projectLock.artifacts.artifacts["native-artifacts"];
-  const asset = family.assets["arm64-osx"];
-  family.integrity = {
-    ...family.integrity,
-    "arm64-osx": {
-      asset: `${asset}.integrity.json`,
-      sha256: sha256("test-only publisher integrity reference"),
-    },
-  };
-  const projectLockPath = path.join(output, "deherm.lock");
-  await writeFile(projectLockPath, `${JSON.stringify(projectLock, null, 2)}\n`);
+  const projectLockPath = path.join(root, "examples/war-battles-online/defold/deherm.lock");
   await writeFile(
     fakeJava,
     `#!/bin/sh
@@ -372,8 +361,6 @@ exit 0
   try {
     const report = await buildGate({
       output,
-      shermes: path.join(root, "build/native/bin/shermes"),
-      allowUnpinnedToolchain: true,
       typedNativeSource: path.join(root, "packages/static-hermes/src/generated/script-typed-native-bridge.ts"),
       projectLock: projectLockPath,
       applicationBundle: await lockedApplicationBundle(),
@@ -381,8 +368,8 @@ exit 0
       java: fakeJava,
       buildServer: "https://fake.invalid",
     });
-    assert.equal(report.stages.find(({ name }) => name === "link").status, "observed-unpinned");
-    assert.match(report.evidenceBoundary.linkage, /unpinned diagnostic compiler/u);
+    assert.equal(report.stages.find(({ name }) => name === "link").status, "passed");
+    assert.match(report.evidenceBoundary.linkage, /^observed:/u);
     assert.match(report.stages.find(({ name }) => name === "link").command.join(" "), /fake-java/);
     assert.ok(report.stages.find(({ name }) => name === "link").output.sha256);
     assert.equal(report.stages.find(({ name }) => name === "link").stagedProject.nativeArtifact.target, "arm64-osx");

@@ -5690,3 +5690,14 @@ The focused Static Hermes product gate passes all twelve positive and negative
 cases against that clean-input lock. This is deterministic generation,
 application compilation, and gate-test evidence; hosted aggregate evidence is
 reported separately by release-readiness CI.
+
+The next clean Linux run exposed two more warm-worktree dependencies in that
+focused gate: its positive cases explicitly selected `build/native/bin/shermes`
+and the link staging path seeded a target archive from
+`build/native-artifact-downloads`. Both paths are disposable contributor build
+outputs. The positive gate now resolves the package-pinned `shermes` host
+family, and staged linkage installs the policy-pinned target archive through
+the same authenticated user-cache path as the public CLI. The explicit missing
+compiler case remains fail-closed. This change proves the focused gate can use
+customer-distributed artifacts; it does not itself claim that a hosted
+aggregate or packaged engine run passed.

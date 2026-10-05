@@ -52,12 +52,6 @@ function blocker(code, message, details = {}) {
   return { code, message, ...details };
 }
 
-function gateError(code, message) {
-  const error = new Error(message);
-  error.code = code;
-  return error;
-}
-
 async function verifyLockedApplicationSources(project, lockedApplication) {
   const files = lockedApplication?.sources?.files;
   if (!files || typeof files !== "object" || Array.isArray(files)) {
@@ -507,76 +501,17 @@ async function stageTypedNativeProject({
     `// Temporary gate-owned registration shell; the authored project is never mutated.\n#define LIB_NAME "defold_hermes_static_application"\n#ifndef DLIB_LOG_DOMAIN\n#define DLIB_LOG_DOMAIN LIB_NAME\n#endif\n\n#include <dmsdk/dlib/log.h>\n#include <dmsdk/extension/extension.hpp>\n#include <defold_hermes/static_unit_registry.h>\n\nextern "C" SHUnit* sh_export_deherm_static_application(void);\n\nnamespace {\ndmExtension::Result AppInitializeStaticApplication(dmExtension::AppParams*) {\n  if (!deherm_register_static_application(sh_export_deherm_static_application)) {\n    dmLogError("deherm static application could not be registered; the application slot is occupied");\n    return dmExtension::RESULT_INIT_ERROR;\n  }\n  dmLogInfo("DEHERM_EVENT static-application-registered unit=sh_export_deherm_static_application");\n  return dmExtension::RESULT_OK;\n}\ndmExtension::Result AppFinalizeStaticApplication(dmExtension::AppParams*) { return dmExtension::RESULT_OK; }\ndmExtension::Result InitializeStaticApplication(dmExtension::Params*) { return dmExtension::RESULT_OK; }\ndmExtension::Result FinalizeStaticApplication(dmExtension::Params*) { return dmExtension::RESULT_OK; }\n}\n\nnamespace deherm_static_application_registration {\nDM_DECLARE_EXTENSION(\n    defold_hermes_static_application,\n    LIB_NAME,\n    AppInitializeStaticApplication,\n    AppFinalizeStaticApplication,\n    InitializeStaticApplication,\n    0,\n    0,\n    FinalizeStaticApplication)\n}  // namespace deherm_static_application_registration\n`,
   );
   // Bob's Extender link consumes the target Hermes archive from the extension
-  // project.  The authored example intentionally does not carry a host
-  // install, so populate only the temporary copy through the same locked
-  // installer used by the CLI.  Seed that installer's cache from the checked
-  // in build cache and authenticate its receipt locally; no project or cache
-  // outside the staging directory is mutated by the gate.
+  // project. The authored example intentionally does not carry a target
+  // install, so populate only the temporary copy through the same
+  // content-addressed, publisher-authenticated installer used by the CLI. A
+  // clean checkout downloads into the normal shared user cache; subsequent
+  // projects and gate runs reuse those immutable bytes.
   const { ensureProjectNativeArtifact, resolveDefoldPlatform } = await import("../packages/cli/src/toolchains.mjs");
   const resolvedTarget = await resolveDefoldPlatform(stagedRoot, target);
-  const lock = JSON.parse(await readFile(path.join(stagedRoot, "deherm.lock"), "utf8"));
-  const family = lock.artifacts?.artifacts?.["native-artifacts"];
-  const coordinates = family?.releases?.[resolvedTarget.extenderTarget] ?? family;
-  const asset = family?.assets?.[resolvedTarget.extenderTarget];
-  const integrityReference = family?.integrity?.[resolvedTarget.extenderTarget];
-  const members = (family?.contents?.[resolvedTarget.extenderTarget] ?? []).filter(
-    (member) => member === "libhermes.a" || member === "libhermes.debug.a" || member === "libhermesvm-config.h",
-  );
-  if (
-    !coordinates?.tag ||
-    !asset ||
-    members.length === 0 ||
-    !/^[a-f0-9]{64}$/u.test(integrityReference?.sha256 ?? "")
-  ) {
-    throw gateError(
-      "native-artifact-unavailable",
-      `staged project has no locked Hermes artifact mapping for ${resolvedTarget.extenderTarget}`,
-    );
-  }
-  const sourceArtifact = path.join(
-    repositoryRoot,
-    "build/native-artifact-downloads",
-    coordinates.tag,
-    `hermes-${resolvedTarget.extenderTarget}`,
-  );
-  const cacheRoot = path.join(stagedRoot, ".deherm-gate-native-artifact-cache");
-  const cacheTarget = path.join(cacheRoot, coordinates.tag, resolvedTarget.extenderTarget);
-  await mkdir(cacheTarget, { recursive: true });
-  const hashes = {};
-  for (const member of members) {
-    const source = path.join(sourceArtifact, member);
-    if (!existsSync(source)) throw gateError("native-artifact-unavailable", `locked Hermes cache is missing ${source}`);
-    await cp(source, path.join(cacheTarget, member));
-    hashes[member] = sha256(await readFile(source));
-  }
-  const archive = path.join(path.dirname(sourceArtifact), asset);
-  if (!existsSync(archive)) throw gateError("native-artifact-unavailable", `locked Hermes cache is missing ${archive}`);
-  await cp(archive, path.join(cacheTarget, asset));
-  await writeFile(
-    path.join(cacheTarget, ".deherm-target-cache.json"),
-    `${JSON.stringify(
-      {
-        schemaVersion: 1,
-        kind: "deherm.target-artifact-cache",
-        target: resolvedTarget.extenderTarget,
-        tag: coordinates.tag,
-        fingerprint: coordinates.fingerprint,
-        asset,
-        assetSha256: sha256(await readFile(archive)),
-        integritySha256: integrityReference.sha256,
-        members,
-        hashes,
-      },
-      null,
-      2,
-    )}\n`,
-  );
   let nativeArtifact;
   try {
     nativeArtifact = await ensureProjectNativeArtifact(stagedRoot, resolvedTarget.extenderTarget, {
       variant,
-      offline: true,
-      cacheRoot,
     });
   } catch (error) {
     if (!error.code) error.code = "native-artifact-unavailable";
@@ -640,7 +575,7 @@ async function stageTypedNativeProject({
       variant: nativeArtifact.variant,
       tag: nativeArtifact.tag,
       fingerprint: nativeArtifact.fingerprint,
-      cache: displayPath(cacheTarget),
+      cache: nativeArtifact.cache ? displayPath(nativeArtifact.cache) : null,
       installed,
     },
     bundleProjection: {
