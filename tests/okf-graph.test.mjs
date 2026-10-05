@@ -4,6 +4,7 @@ import { once } from "node:events";
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
+import { DatabaseSync } from "node:sqlite";
 import test from "node:test";
 
 import {
@@ -467,6 +468,33 @@ test("SQL escape hatch is bounded and physically read-only", async () => {
   }
 });
 
+test("SQL escape hatch preserves its contract without the Node SQLite authorizer", async () => {
+  const value = await fixture();
+  const prototype = DatabaseSync.prototype;
+  const authorizer = Object.getOwnPropertyDescriptor(prototype, "setAuthorizer");
+  try {
+    await refreshOkfIndex(value);
+    if (authorizer) delete prototype.setAuthorizer;
+    const [row] = await queryOkfSql({
+      databasePath: value.databasePath,
+      sql: "SELECT count(*) AS count FROM nodes",
+      max: 1,
+    });
+    assert.ok(Number(row.count) > 0);
+    await assert.rejects(
+      queryOkfSql({
+        databasePath: value.databasePath,
+        sql: "WITH/**/RECURSIVE x(n) AS (VALUES(1)) SELECT n FROM x",
+        max: 1,
+      }),
+      /not authorized/u,
+    );
+  } finally {
+    if (authorizer) Object.defineProperty(prototype, "setAuthorizer", authorizer);
+    await rm(value.root, { recursive: true, force: true });
+  }
+});
+
 test("section and SQL byte budgets reject context-volume bypasses", async () => {
   const value = await fixture();
   try {
@@ -522,6 +550,20 @@ ${"x".repeat(250_000)}
       }),
       /not authorized|authorization denied/u,
     );
+    await assert.rejects(
+      queryOkfSql({
+        databasePath: value.databasePath,
+        sql: "WITH /* keyword gap */ RECURSIVE x(n) AS (VALUES(1)) SELECT n FROM x",
+        max: 1,
+      }),
+      /not authorized|authorization denied/u,
+    );
+    const [literal] = await queryOkfSql({
+      databasePath: value.databasePath,
+      sql: "SELECT 'recursive' AS word",
+      max: 1,
+    });
+    assert.equal(literal.word, "recursive");
   } finally {
     await rm(value.root, { recursive: true, force: true });
   }

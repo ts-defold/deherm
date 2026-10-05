@@ -5713,3 +5713,13 @@ staging, target-artifact installation, and command construction have run; the
 assertion prints the complete link stage and blocker set on failure. This is a
 portable link-gate contract with simulated Bob output, not evidence from a real
 Extender link or packaged engine execution.
+
+The next hosted Linux aggregate reached the final OKF graph suite under the
+workflow's supported Node 22 runtime and exposed an API-version assumption:
+`DatabaseSync.setAuthorizer` is not present there. The SQL escape hatch now
+rejects the `RECURSIVE` keyword before SQLite preparation with a scanner that
+skips comments, string literals, and quoted identifiers, then installs the
+SQLite authorizer as defense in depth when the runtime provides it. The
+connection remains physically read-only and the existing row, cell, response,
+and statement bounds remain unchanged. Focused tests cover comment-separated
+recursive syntax and prove that the same word inside a literal stays valid.

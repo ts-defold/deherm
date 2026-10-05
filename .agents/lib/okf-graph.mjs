@@ -25,6 +25,56 @@ function boundedInteger(value, fallback, maximum, name) {
   return parsed;
 }
 
+function sqlKeywords(source) {
+  const keywords = [];
+  for (let index = 0; index < source.length;) {
+    const character = source[index];
+    const next = source[index + 1];
+    if (character === "-" && next === "-") {
+      index = source.indexOf("\n", index + 2);
+      if (index < 0) break;
+      continue;
+    }
+    if (character === "/" && next === "*") {
+      const end = source.indexOf("*/", index + 2);
+      index = end < 0 ? source.length : end + 2;
+      continue;
+    }
+    if (character === "'" || character === '"' || character === "`") {
+      const quote = character;
+      for (++index; index < source.length; ++index) {
+        if (source[index] !== quote) continue;
+        if (source[index + 1] === quote) {
+          ++index;
+          continue;
+        }
+        ++index;
+        break;
+      }
+      continue;
+    }
+    if (character === "[") {
+      const end = source.indexOf("]", index + 1);
+      index = end < 0 ? source.length : end + 1;
+      continue;
+    }
+    if (/[A-Za-z_]/.test(character)) {
+      const start = index++;
+      while (index < source.length && /[A-Za-z0-9_$]/.test(source[index])) ++index;
+      keywords.push(source.slice(start, index).toLowerCase());
+      continue;
+    }
+    ++index;
+  }
+  return keywords;
+}
+
+function assertNonRecursiveSql(source) {
+  if (sqlKeywords(source).includes("recursive")) {
+    throw new Error("recursive SQL queries are not authorized");
+  }
+}
+
 async function markdownFiles(directory) {
   const entries = await readdir(directory, { withFileTypes: true });
   const nested = await Promise.all(entries
@@ -590,12 +640,15 @@ export async function queryOkfSql({ databasePath, sql, max }) {
   if (!/^(?:select|with|explain\s+query\s+plan)\b/i.test(normalized) || normalized.includes(";")) {
     throw new Error("SQL mode accepts exactly one SELECT, WITH, or EXPLAIN QUERY PLAN statement");
   }
+  assertNonRecursiveSql(normalized);
   const database = await openDatabase(databasePath, true);
   try {
     const { constants } = await sqlite();
-    database.setAuthorizer((action) => action === constants.SQLITE_RECURSIVE
-      ? constants.SQLITE_DENY
-      : constants.SQLITE_OK);
+    if (typeof database.setAuthorizer === "function") {
+      database.setAuthorizer((action) => action === constants.SQLITE_RECURSIVE
+        ? constants.SQLITE_DENY
+        : constants.SQLITE_OK);
+    }
     const rows = [];
     let responseBytes = 2;
     for (const row of database.prepare(normalized).iterate()) {

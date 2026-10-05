@@ -93,6 +93,11 @@ non-recursive `WITH`, or `EXPLAIN QUERY PLAN` statement of at most 16 KiB, and
 stops iteration at 50 rows. It is intended for agents that need a precise graph
 join, not as a path around bounded context retrieval.
 
+Recursive-query rejection is enforced before preparation by a lexical scan that
+ignores SQL strings, quoted identifiers, and comments. Runtimes exposing
+SQLite's authorizer API install the equivalent `SQLITE_RECURSIVE` denial as a
+second layer; Node 22 remains supported without weakening the portable contract.
+
 # Verification boundary
 
 `tests/okf-graph.test.mjs` proves content-addressed reuse, structured
