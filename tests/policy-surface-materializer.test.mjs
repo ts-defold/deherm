@@ -48,7 +48,8 @@ import {
   SCRIPT_URL_TARGET_SUPPORT_RECIPE_V1,
   SCRIPT_URL_TARGET_SUPPORT_RECIPE_V2,
 } from "../packages/compiler/src/sdk/support-sdk.mjs";
-import { derivePolicy, discoverCompilerSurfaceOutputs } from "../scripts/generate-api-policy.mjs";
+import { discoverCompilerSurfaceOutputs } from "../scripts/generate-api-policy.mjs";
+import { loadResolvedPolicy } from "../scripts/check-defold-revision-matrix.mjs";
 
 const repositoryRoot = path.resolve(import.meta.dirname, "..");
 const oldPipelineFixture = JSON.parse(
@@ -139,22 +140,7 @@ test("an unavailable compatible native build cannot suppress SDK materialization
 });
 
 async function currentResolvedPolicy() {
-  const derived = await derivePolicy();
-  const objects = new Map(
-    Object.entries(derived.root.subtrees).map(([namespace, digest]) => [
-      namespace,
-      {
-        digest,
-        value: JSON.parse(derived.objects.get(digest)),
-      },
-    ]),
-  );
-  return {
-    revision: derived.defoldRevision,
-    entry: { policyRoot: derived.rootHash },
-    policy: derived.root,
-    objects,
-  };
+  return (await loadResolvedPolicy(repositoryRoot)).resolved;
 }
 
 function withLegacyUrlTargetSupportPolicy(current) {
