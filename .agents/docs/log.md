@@ -5701,3 +5701,15 @@ the same authenticated user-cache path as the public CLI. The explicit missing
 compiler case remains fail-closed. This change proves the focused gate can use
 customer-distributed artifacts; it does not itself claim that a hosted
 aggregate or packaged engine run passed.
+
+The following hosted aggregate reached the link test but reported
+`bob-missing`: the release-readiness job bootstraps pinned source/SDK inputs,
+not the contributor-only `build/tooling/bob.jar` path. The gate now falls back
+to the CLI's revision-pinned, checksum-verifying Bob resolver when that local
+contributor jar is absent, records any resolution error in its blocker, and
+keeps the downloaded cache out of the disposable Extender project copy. Its
+fake-link test injects only the Bob process result after all real provenance,
+staging, target-artifact installation, and command construction have run; the
+assertion prints the complete link stage and blocker set on failure. This is a
+portable link-gate contract with simulated Bob output, not evidence from a real
+Extender link or packaged engine execution.

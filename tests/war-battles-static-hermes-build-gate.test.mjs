@@ -346,15 +346,8 @@ test("link stage stages a temporary extension and consumes Bob output", async ()
     fakeJava,
     `#!/bin/sh
 if [ "$1" = "-version" ]; then exit 0; fi
-output=""
-previous=""
-for argument in "$@"; do
-  if [ "$previous" = "--output" ]; then output="$argument"; fi
-  previous="$argument"
-done
-mkdir -p "$output/arm64-osx"
-printf 'fake linked dmengine' > "$output/arm64-osx/dmengine"
-exit 0
+echo "unexpected direct Bob invocation" >&2
+exit 97
 `,
   );
   await chmod(fakeJava, 0o755);
@@ -367,8 +360,23 @@ exit 0
       link: true,
       java: fakeJava,
       buildServer: "https://fake.invalid",
+      async bobRunner(_java, _command, _cwd, staged) {
+        await mkdir(staged.engineOutput, { recursive: true });
+        await writeFile(path.join(staged.engineOutput, "dmengine"), "fake linked dmengine");
+        return {
+          status: 0,
+          signal: null,
+          timedOut: false,
+          error: null,
+          stdout: "",
+          stderr: "",
+          stdoutTruncatedBytes: 0,
+          stderrTruncatedBytes: 0,
+        };
+      },
     });
-    assert.equal(report.stages.find(({ name }) => name === "link").status, "passed");
+    const link = report.stages.find(({ name }) => name === "link");
+    assert.equal(link.status, "passed", JSON.stringify({ link, blockers: report.blockers }, null, 2));
     assert.match(report.evidenceBoundary.linkage, /^observed:/u);
     assert.match(report.stages.find(({ name }) => name === "link").command.join(" "), /fake-java/);
     assert.ok(report.stages.find(({ name }) => name === "link").output.sha256);

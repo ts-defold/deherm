@@ -17,6 +17,7 @@ import { fileURLToPath } from "node:url";
 import { buildWarBattlesStaticHermesProjection } from "./generate-war-battles-static-hermes-projection.mjs";
 import { sourceBindingDigest } from "../packages/compiler/src/bundle-freshness.mjs";
 import { prepareBobBundleProjection } from "../packages/cli/src/bob-bundle-projection.mjs";
+import { ensureBob } from "../packages/cli/src/dev/defold-builder.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const defaultProject = path.join(repositoryRoot, "examples/war-battles-online/defold");
@@ -459,7 +460,10 @@ async function stageTypedNativeProject({
     filter(source) {
       const relative = path.relative(project, source);
       return (
-        relative === "" || (!relative.startsWith(`build${path.sep}`) && !relative.startsWith(`.internal${path.sep}`))
+        relative === "" ||
+        (!relative.startsWith(`build${path.sep}`) &&
+          !relative.startsWith(`.internal${path.sep}`) &&
+          !relative.startsWith(`.deherm${path.sep}cache${path.sep}`))
       );
     },
   });
@@ -1058,19 +1062,29 @@ export async function buildGate(rawOptions = {}) {
     report.stages.push(stage("application", "blocked", { requested: options.run, executable: null }));
   } else {
     const java = findJava(options.java);
-    const bobPresent = existsSync(defaultPaths.bob);
-    const bobSha = bobPresent ? sha256(await readFile(defaultPaths.bob)) : null;
+    let bob = options.bob;
+    let bobResolutionError = null;
+    if (!existsSync(bob) && bob === defaultPaths.bob) {
+      try {
+        bob = await ensureBob(options.project, loaded.projectLock);
+      } catch (error) {
+        bobResolutionError = error instanceof Error ? error.message : String(error);
+      }
+    }
+    const bobPresent = existsSync(bob);
+    const bobSha = bobPresent ? sha256(await readFile(bob)) : null;
     const bobExpected = loaded.manifest.toolchain?.bob?.sha256 ?? null;
     const bobPinned = Boolean(bobSha && bobExpected && bobSha === bobExpected);
     const linkDetails = {
       requested: true,
       buildServer: options.buildServer,
       bob: {
-        path: relativeToRepo(defaultPaths.bob),
+        path: displayPath(bob),
         present: bobPresent,
         expectedSha256: bobExpected,
         actualSha256: bobSha,
         pinned: bobPinned,
+        resolutionError: bobResolutionError,
       },
       java: { path: java ? displayPath(java) : null, present: Boolean(java), status: null },
       stagedProject: null,
@@ -1079,7 +1093,11 @@ export async function buildGate(rawOptions = {}) {
       output: null,
     };
     if (!bobPresent) {
-      report.blockers.push(blocker("bob-missing", `Pinned Bob is missing at ${relativeToRepo(defaultPaths.bob)}`));
+      report.blockers.push(
+        blocker("bob-missing", `Pinned Bob is missing at ${displayPath(bob)}`, {
+          resolutionError: bobResolutionError,
+        }),
+      );
       report.stages.push(stage("link", "blocked", linkDetails));
     } else if (!bobPinned) {
       report.blockers.push(
@@ -1133,7 +1151,7 @@ export async function buildGate(rawOptions = {}) {
             projectLock: options.projectLock,
             emittedC: emittedCPath,
             emittedApplicationC: emittedApplicationCPath,
-            bobJar: defaultPaths.bob,
+            bobJar: bob,
             buildServer: options.buildServer,
             variant: options.variant,
           });
@@ -1148,7 +1166,7 @@ export async function buildGate(rawOptions = {}) {
             bundleProjection: staged.bundleProjection,
           };
           linkDetails.command = [java, ...staged.command];
-          const result = runBob(java, staged.command, staged.stagedRoot);
+          const result = await (options.bobRunner ?? runBob)(java, staged.command, staged.stagedRoot, staged);
           linkDetails.result = result;
           const executable = [
             path.join(staged.engineOutput, "dmengine"),
@@ -1192,7 +1210,7 @@ export async function buildGate(rawOptions = {}) {
           projectLock: options.projectLock,
           emittedC: emittedCPath,
           emittedApplicationC: emittedApplicationCPath,
-          bobJar: defaultPaths.bob,
+          bobJar: bob,
           buildServer: options.buildServer,
           variant: options.variant,
         });
@@ -1207,7 +1225,7 @@ export async function buildGate(rawOptions = {}) {
           bundleProjection: staged.bundleProjection,
         };
         linkDetails.command = [java, ...staged.command];
-        const result = runBob(java, staged.command, staged.stagedRoot);
+        const result = await (options.bobRunner ?? runBob)(java, staged.command, staged.stagedRoot, staged);
         linkDetails.result = result;
         const executable = [
           path.join(staged.engineOutput, "dmengine"),
