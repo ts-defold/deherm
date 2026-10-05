@@ -535,7 +535,18 @@ test("deherm doctor reports the matrix and rejects a target Defold does not decl
   assert.equal(result.status, 1);
 });
 
-test("the declared matrix verifies and the complete matrix names every gap", () => {
+test("matrix verification reflects checkout hydration and names every gap", () => {
+  const manifestResult = spawnSync(
+    process.execPath,
+    [path.join(repositoryRoot, "scripts", "manage-native-artifacts.mjs"), "report"],
+    {
+      cwd: repositoryRoot,
+      encoding: "utf8",
+    },
+  );
+  assert.equal(manifestResult.status, 0, manifestResult.stderr);
+  const manifest = JSON.parse(manifestResult.stdout);
+
   const declared = spawnSync(
     process.execPath,
     [path.join(repositoryRoot, "scripts", "manage-native-artifacts.mjs"), "verify"],
@@ -544,7 +555,18 @@ test("the declared matrix verifies and the complete matrix names every gap", () 
       encoding: "utf8",
     },
   );
-  assert.equal(declared.status, 0, declared.stderr);
+  const declaredGaps = [
+    ...manifest.missingFromManifest.map((target) => ({ target })),
+    ...manifest.unknownInManifest.map((target) => ({ target })),
+    ...manifest.targets.filter((row) => row.invalid),
+  ];
+  assert.equal(declared.status, declaredGaps.length === 0 ? 0 : 1, `${declared.stdout}${declared.stderr}`);
+  for (const gap of declaredGaps) {
+    assert.ok(declared.stderr.includes(gap.target), `declared verification did not name ${gap.target}`);
+    if (gap.detail) {
+      assert.ok(declared.stderr.includes(gap.detail), `declared verification did not explain ${gap.target}`);
+    }
+  }
 
   const complete = spawnSync(
     process.execPath,
@@ -554,20 +576,15 @@ test("the declared matrix verifies and the complete matrix names every gap", () 
       encoding: "utf8",
     },
   );
-  if (complete.status !== 0) {
-    // The point of --complete is that it names every gap at once; reporting
-    // only the first would make filling the matrix a serial guessing game.
-    const manifest = JSON.parse(
-      spawnSync(process.execPath, [path.join(repositoryRoot, "scripts", "manage-native-artifacts.mjs"), "report"], {
-        cwd: repositoryRoot,
-        encoding: "utf8",
-      }).stdout,
-    );
-    for (const row of manifest.targets) {
-      if (row.status === "required-missing" || row.status === "blocked") {
-        assert.ok(complete.stderr.includes(row.target), `--complete did not name ${row.target}`);
-      }
-    }
+  const completeGaps = [
+    ...declaredGaps,
+    ...manifest.targets.filter((row) => row.status === "required-missing" || row.status === "blocked"),
+  ];
+  assert.equal(complete.status, completeGaps.length === 0 ? 0 : 1, `${complete.stdout}${complete.stderr}`);
+  // The point of --complete is that it names every gap at once; reporting
+  // only the first would make filling the matrix a serial guessing game.
+  for (const gap of completeGaps) {
+    assert.ok(complete.stderr.includes(gap.target), `--complete did not name ${gap.target}`);
   }
 });
 

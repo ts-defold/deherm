@@ -5776,3 +5776,15 @@ backend source digest. The capability was regenerated through its owning
 emitter after the control-flow-only source edit; its schema and emitted header
 are unchanged, and only the backend digest moved. This is generated-state
 provenance, not additional runtime evidence.
+
+The next hosted Linux aggregate passed the complete GCC/Hermes native build and
+advanced to the CLI matrix suite, where one test incorrectly required a clean
+source checkout to contain two ignored, locally hydrated Hermes archives. The
+verification command remains strict: it still fails when a manifest-declared
+archive is absent, foreign, or corrupt. The test now derives that expected
+result from the command's own structured report and requires both declared and
+complete verification to name every applicable gap. The focused matrix suite
+passes both with all four release/debug archives installed and with the two
+vendored target pairs temporarily absent, after which the original local
+artifacts were restored byte-for-byte. This is clean-checkout CLI contract
+evidence; it does not claim an absent archive can be bundled.
