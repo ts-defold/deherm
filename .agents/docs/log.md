@@ -5723,3 +5723,13 @@ SQLite authorizer as defense in depth when the runtime provides it. The
 connection remains physically read-only and the existing row, cell, response,
 and statement bounds remain unchanged. Focused tests cover comment-separated
 recursive syntax and prove that the same word inside a literal stays valid.
+
+That rerun passed the complete Node 22 OKF suite and then exposed three more
+warm-worktree/host-format assumptions in the coverage partition. Two generated
+JSI compile tests found `jsi/jsi.h` only because an ignored packaged-extension
+header copy existed locally; they now include the pinned Hermes checkout's
+actual `API/jsi` root as the other clean-host JSI tests do. The profile
+compile-out proof also searched for Mach-O's leading underscore on two C symbol
+names, which ELF intentionally omits; it now matches the source-level symbol
+identity common to both formats. These changes repair test inputs and symbol
+inspection only; no generated binding or production transport changed.

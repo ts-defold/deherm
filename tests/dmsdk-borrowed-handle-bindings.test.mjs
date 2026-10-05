@@ -255,6 +255,7 @@ test("C ABI, Dynamic Hermes adapter, browser descriptor, and TypeScript projecti
       "-pedantic",
       ...includes,
       `-I${path.join(root, "upstream/hermes/API")}`,
+      `-I${path.join(root, "upstream/hermes/API/jsi")}`,
       "-c",
       "defold/defold_hermes/src/generated_dmsdk_borrowed_handle_jsi.cpp",
       "-o",

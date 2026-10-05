@@ -234,6 +234,7 @@ test("C ABI, Dynamic Hermes, Static Hermes, browser, and TypeScript projections 
       "-pedantic",
       ...includes,
       `-I${path.join(root, "upstream/hermes/API")}`,
+      `-I${path.join(root, "upstream/hermes/API/jsi")}`,
       "-c",
       "defold/defold_hermes/src/generated_dmsdk_scratch_scalar_out_jsi.cpp",
       "-o",

@@ -33,8 +33,10 @@ export const telemetrySymbolMarkers = Object.freeze([
   // Generated identity resolvers, one per instrumented transport.
   "defold_hermes::script_handle_lowering::profileContractShape(",
   "defold_hermes::script_handle_lowering::profileRouteName(",
-  "_deherm_dmsdk_borrowed_profile_name",
-  "_deherm_script_universal_profile_name",
+  // Mach-O prefixes these C symbols with `_`; ELF does not. Match the
+  // source-level identity so the same marker works on both object formats.
+  "deherm_dmsdk_borrowed_profile_name",
+  "deherm_script_universal_profile_name",
 ]);
 
 export const telemetryStringMarkers = Object.freeze([
