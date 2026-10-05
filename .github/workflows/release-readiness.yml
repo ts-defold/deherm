@@ -48,6 +48,15 @@ jobs:
         env:
           DEHERM_WEBTRANSPORT_ARTIFACT_TARGET: web
         run: node bin/deherm.mjs generate --project examples/war-battles-online/defold --force
+      - name: Cache aggregate upstream inputs
+        if: runner.os == 'Linux'
+        uses: actions/cache@v5
+        with:
+          path: upstream
+          key: release-readiness-upstreams-${{ runner.os }}-${{ hashFiles('upstream.lock') }}
+      - name: Bootstrap aggregate upstream inputs
+        if: runner.os == 'Linux'
+        run: ./scripts/bootstrap-upstreams.sh
       - name: Aggregate test gate
         if: runner.os == 'Linux'
         run: node scripts/run-release-command.mjs pnpm test
