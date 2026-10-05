@@ -5671,3 +5671,22 @@ regress: borrowed handles remain 182/182 specialized, scratch scalar-out remains
 classified, and all 1,361 dmSDK declarations retain universal recipes. This is
 cross-host derivation and generated-plan evidence, not new packaged-engine
 runtime evidence.
+
+## 2026-10-05 - War Battles lock represents clean-checkout generation
+
+Hosted release-readiness exposed a stale example lock after the aggregate gate
+began reconstructing its application bundle instead of depending on an ignored
+local artifact. A clean `deherm generate --force` produced
+`.deherm/generated/script-route-symbol-index.json` with SHA-256
+`634553382b39fafa897eb8472529da42d78a9fb4b1cc69933dede3f4624f3a35`, while
+the committed application source inventory still named the prior warm-worktree
+digest. The example was regenerated and compiled through the public CLI; no
+lock or generated output was edited manually. The recorded source digest now
+matches clean generation, and the rebuilt application bundle remains
+byte-identical at
+`e24e93f24c7cd6f601659c2d25c38e19c0ad33668993cc64af26a08731eb363b`.
+
+The focused Static Hermes product gate passes all twelve positive and negative
+cases against that clean-input lock. This is deterministic generation,
+application compilation, and gate-test evidence; hosted aggregate evidence is
+reported separately by release-readiness CI.
