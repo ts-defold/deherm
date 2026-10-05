@@ -5576,3 +5576,20 @@ engine faults. A real Chrome-to-Deno WebTransport loopback run observed three
 authoritative snapshots and fifteen inputs. These are bounded runtime claims;
 they do not promote the remaining planned or unavailable routes to live-engine
 evidence.
+
+## 2026-10-04 - Source-semantic generation is host-independent
+
+The first hosted aggregate run exposed a host leak in the bounded-span
+source-semantic generator: macOS admitted the Apple-only Objective-C++ crypto
+replacement while Linux rejected it for unavailable Apple SDK headers, and the
+artifact also serialized compiler-specific diagnostic hashes. The policy fact
+set now derives only from Defold's canonical portable C/C++ implementations;
+target replacement sources remain the responsibility of the existing target
+build matrix. Rejected translation units retain the stable source digest and a
+boolean diagnostic-presence fact, never host/compiler wording.
+
+The change preserves 10/10 observed bounded-span declarations and the existing
+optimized lowering outputs. Local deterministic regeneration and the focused
+source-semantic suite pass. This proves host-independent inputs for this fact
+artifact; target-specific implementation equivalence remains bounded by the
+cross-platform native build evidence.

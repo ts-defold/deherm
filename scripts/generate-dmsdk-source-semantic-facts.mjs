@@ -63,9 +63,12 @@ function tokenPattern(names) {
   return new RegExp(`\\b(?:${escaped.join("|")})\\s*\\(`, "u");
 }
 
-export async function discoverSources(engineRoot, names) {
+const allSourceExtensions = Object.freeze([".c", ".cc", ".cpp", ".cxx", ".mm"]);
+const portableSourceExtensions = Object.freeze([".c", ".cc", ".cpp", ".cxx"]);
+
+export async function discoverSources(engineRoot, names, options = {}) {
   const pattern = tokenPattern(names);
-  const extensions = new Set([".c", ".cc", ".cpp", ".cxx", ".mm"]);
+  const extensions = new Set(options.extensions ?? allSourceExtensions);
   const files = await filesBelow(engineRoot);
   const matches = [];
   for (const file of files) {
@@ -183,7 +186,11 @@ export async function buildDmSdkSourceSemanticFacts(options = {}) {
   });
   const names = new Set(candidates.map(({ declaration }) => declaration.name.split("::").at(-1)));
   const engineRoot = path.join(repositoryRoot, "upstream", "defold", "engine");
-  const sources = await discoverSources(engineRoot, names);
+  // These facts describe the canonical portable implementation shape. Target
+  // replacements (for example crypt_apple.mm) remain available to target-aware
+  // analyses and the build matrix, but must not make this policy artifact
+  // depend on the derivation host's SDK headers.
+  const sources = await discoverSources(engineRoot, names, { extensions: portableSourceExtensions });
   const roots = await includeRoots(engineRoot);
   const requestedNames = new Set(candidates.map(({ declaration }) => declaration.name));
   const parsed = [];
@@ -196,7 +203,7 @@ export async function buildDmSdkSourceSemanticFacts(options = {}) {
         path: relative,
         sha256: sha256(source),
         astState: "rejected-with-diagnostics",
-        diagnosticsSha256: sha256(result.diagnostics),
+        diagnosticsPresent: result.diagnostics.length > 0,
       });
       continue;
     }
@@ -206,7 +213,6 @@ export async function buildDmSdkSourceSemanticFacts(options = {}) {
         path: relative,
         sha256: sha256(source),
         astState: "complete",
-        diagnosticsSha256: sha256(result.diagnostics),
         definitions,
       });
     }
@@ -234,7 +240,7 @@ export async function buildDmSdkSourceSemanticFacts(options = {}) {
   const report = {
     schemaVersion: 1,
     defoldRevision: ir.defoldRevision,
-    extraction: "clang-json-ast/compact-dataflow-v1",
+    extraction: "clang-json-ast/portable-compact-dataflow-v2",
     scope: "structurally eligible bounded-span declarations",
     sources: parsed
       .map(({ definitions: _definitions, ...source }) => source)

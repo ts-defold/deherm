@@ -2,22 +2,22 @@
   "schemaVersion": 1,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "sourceHashes": {
-    "projection": "1dbc91963178dfb68e5ee8bc2a66f93a35e5daee04d302a9a4226f6b7b21cee5",
+    "projection": "46fcc32bad3e248d1ded2bd3129823c7e081220e857d92a3733b0fb4cdcf6a37",
     "sdkIr": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "abiShapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
     "specialized": {
       "scalar": "9c4621db3613a53b7a470d249d06e25787b3bf917f32e4840315bc2efdc4d291",
       "enumValue": "52e9533abdb4b76dccfbae10f7f9e954003ba5755d9a255be8b5a66198d616a4",
       "namedScalar": "2142e8db67a1a2363f2ab8a278bf5ea6bb850415b8542cf13dac5a27cc60be68",
-      "fixedDigest": "dfb5adf5b7a7421191397a4d1e27bf2ac08c2e3da96fe5ff8473ce9eaf939dcb",
-      "base64Span": "e8603b1789f77c90eef3d12c007766f0331d57a724668bc51e473ab361464e51",
-      "astcProbe": "26b9ba056c789111bf61bf84c868fbdde63f3db9c2fef57ce9d6aa120603b17f",
-      "xteaSpan": "73c8d977ab6c9e5a8599c07262da34105ddf2988e1009c5cfe46eaa502370634",
-      "hashSpan": "1ac8e9330772346282796b058505eadb88f7f8cf878532f7a387c85bafd7cc72",
-      "arenaCString": "67d7a5144a958d8dbcfea00fbfc0145fc80d1a77e40400626f8c72209326f248",
-      "borrowedHandle": "8c23c92008e62c91a4767e47ab6b2bbab2a8579f070e690b23bb63cfa57ea082",
-      "scratchScalarOut": "bbbebedd578d0bc3fe34ea8084dd837cabf53d3ab52597679a474b9dd1baeeb0",
-      "cstringValue": "dfa5fcc383eacb1f695117f179fdb4f73d657808286b8edd6869e3e6b43b17ce",
+      "fixedDigest": "f2865af46353feb601484b6fd2d5b5a2c08eb41544949eb65ee775c9108c74f5",
+      "base64Span": "161b6157d2e6efcff1dc91b744bb43b11776a992da130b9949b59707194a54b4",
+      "astcProbe": "2889e4e26348c3036a43dae9ab61c54c809c7fb3569900ae0a67909e4f9705f4",
+      "xteaSpan": "fe467f9b890352d24d6d7e03bab8a82602fe244c5487a2038afe743971060336",
+      "hashSpan": "7c6cfc07c08ba766e2a56304251530e6da6bde9f142ec3b23a11019689fe2952",
+      "arenaCString": "3a26664bcd1f4cae3a5db02cbe927dbfdf52fc554aeb7335b3166ebc9dcb0de6",
+      "borrowedHandle": "5dbb3e915db40be9b521b096dbbb4fad77ed7fa1320112fe8b685f809fc72eac",
+      "scratchScalarOut": "b92efe97c8d12ce8c9054406b27450a3ee49204d1303e51f61f48724ebd93fc7",
+      "cstringValue": "2c81397692e62f366a8521d953e3958f588e881404521726dbc22ed5d00576f7",
       "hashState": "661b485c4f4a54813dcd6a6f07dec62a57e495eb837f095e25ffe28b5161d22c"
     },
     "patternPolicies": {
@@ -483,7 +483,7 @@
       ],
       "requiredHeadersSha256": "b332e968c991eec3d9ef64f504264c500efa2dddc8a035445b26e676b3c90d2c"
     },
-    "aggregate": "5217ee5f399fa232666ae368bded11400bac5bbf050bf242e22012e888d1b62e",
+    "aggregate": "573b836122500eded2566f94188d7ce9b656f522f26bdf2c26a5cbbd23666e32",
     "catalog": "48d17277c2de6781d37e2abe013b4a2521ffed22fc16f23226b8c0f8e60f076d"
   },
   "coverage": {
@@ -186670,7 +186670,7 @@
   ],
   "fallbackAudit": {
     "artifact": "packages/bindings/generated/defold-dmsdk-fallback-audit.json",
-    "reportSha256": "4e5445655cdd49d88aa3925167fabc4bfd7f78aa156d66d65a1f501b8db7357a",
+    "reportSha256": "55ab3b1d1a06639cf68fdf8e695373f6c2e4d770b4695172b6d71df97258b47d",
     "coverage": {
       "declarations": 1361,
       "preferredSpecialized": 105,
