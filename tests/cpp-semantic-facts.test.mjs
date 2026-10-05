@@ -138,3 +138,104 @@ test("fixed-output inference reports absent and contradictory source evidence in
   assert.equal(result.state, "contradictory");
   assert.deepEqual(result.values, [32, 64]);
 });
+
+test("external call identity excludes host-specific declaration spelling", () => {
+  function astWithExternalType(type) {
+    return {
+      kind: "TranslationUnitDecl",
+      inner: [
+        {
+          kind: "FunctionDecl",
+          name: "Portable",
+          type: { qualType: "void (void *, const void *, size_t)" },
+          loc: { line: 3 },
+          inner: [
+            { kind: "ParmVarDecl", id: "p0", name: "output" },
+            { kind: "ParmVarDecl", id: "p1", name: "input" },
+            { kind: "ParmVarDecl", id: "p2", name: "size" },
+            {
+              kind: "CompoundStmt",
+              inner: [
+                {
+                  kind: "CallExpr",
+                  inner: [
+                    {
+                      kind: "DeclRefExpr",
+                      referencedDecl: {
+                        kind: "FunctionDecl",
+                        id: "external",
+                        name: "memcpy",
+                        type: { qualType: type },
+                      },
+                    },
+                    reference("ParmVarDecl", "p0", "output"),
+                    reference("ParmVarDecl", "p1", "input"),
+                    reference("ParmVarDecl", "p2", "size"),
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+  }
+
+  const darwin = extractCppImplementationFacts(
+    astWithExternalType("void *(void *, const void *, size_t)"),
+    ["Portable"],
+    "example.cpp",
+  );
+  const linux = extractCppImplementationFacts(
+    astWithExternalType("void *(void *__restrict, const void *__restrict, size_t) noexcept(true)"),
+    ["Portable"],
+    "example.cpp",
+  );
+  assert.deepEqual(linux, darwin);
+  assert.equal(darwin[0].calls[0].calleeIdentity, "external:memcpy");
+  assert.equal("calleeType" in darwin[0].calls[0], false);
+});
+
+test("host assertion plumbing is discarded without discarding its semantic guard", () => {
+  const ast = {
+    kind: "TranslationUnitDecl",
+    inner: [
+      {
+        kind: "FunctionDecl",
+        name: "Guarded",
+        type: { qualType: "void (uint32_t)" },
+        loc: { line: 7 },
+        inner: [
+          { kind: "ParmVarDecl", id: "keylen", name: "keylen" },
+          {
+            kind: "CompoundStmt",
+            inner: [
+              {
+                kind: "CallExpr",
+                inner: [
+                  reference("FunctionDecl", "assert", "__assert_fail"),
+                  {
+                    kind: "BinaryOperator",
+                    opcode: "<=",
+                    inner: [reference("ParmVarDecl", "keylen", "keylen"), { kind: "IntegerLiteral", value: "16" }],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  };
+
+  const [definition] = extractCppImplementationFacts(ast, ["Guarded"], "example.cpp");
+  assert.deepEqual(definition.calls, []);
+  assert.deepEqual(definition.operations, [
+    {
+      operator: "<=",
+      left: { kind: "parameter", index: 0, name: "keylen" },
+      right: { kind: "integer", value: 16 },
+      conditions: [],
+    },
+  ]);
+});

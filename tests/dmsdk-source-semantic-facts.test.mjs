@@ -30,7 +30,7 @@ test("bounded-span source facts regenerate deterministically from pinned C/C++ i
     assert.equal(actual, expected);
     const report = JSON.parse(actual);
     assert.deepEqual(report.coverage, { requested: 10, observed: 10, missing: 0 });
-    assert.equal(report.extraction, "clang-json-ast/portable-compact-dataflow-v2");
+    assert.equal(report.extraction, "clang-json-ast/portable-compact-dataflow-v3");
     assert.ok(
       report.sources.every(({ path, sha256 }) => path.startsWith("upstream/defold/") && /^[0-9a-f]{64}$/u.test(sha256)),
     );

@@ -7,9 +7,9 @@
     "plan": "packages/bindings/generated/defold-dmsdk-cstring-value-plan.json",
     "policy": "packages/bindings/overrides/dmsdk-cstring-value-bindings.json",
     "hashes": {
-      "projection": "46fcc32bad3e248d1ded2bd3129823c7e081220e857d92a3733b0fb4cdcf6a37",
+      "projection": "5cf214af96cee8b7dcffe3114441214670524721205837e6ef397c3d53fc52c6",
       "sdkIr": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
-      "plan": "4b7a9ca9c955972c0f890fc230ee4af2ba30bd3d07516829aecc891bcaa60f6f",
+      "plan": "ede1c2e6bb31b2b14b057a2a8112b7af0afacee7c42f08d4b84bae081ca278ed",
       "policy": "f38eb566b09c60d718ef0303af1007baf21893848e45f516d2dc6bbba1ad09c8"
     }
   },

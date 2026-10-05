@@ -12,8 +12,8 @@
   "sourceHashes": {
     "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
-    "sourceFacts": "2c0dc7d13880b0712a05183188883d42451a3794360cb212901a805672b7ac7a",
-    "plan": "40d5904b27aab3583e82c3fb5e6a8176e8168e5be28036b139e589f50a3de3c1",
+    "sourceFacts": "d70c2f518ea4c7b6e8e36b2cb3552c32ad56ced4529a307dd291e54b588fe73b",
+    "plan": "f2f8ee93647fcdef73e7c3eb3b4ff4149c2a3abc051d829b562cfedd31bba3bc",
     "policy": "52a25ca0a83b7410dd0dbadb4847c4de8e922a56c93b46857c37f2696de2e31c"
   },
   "policy": {
@@ -205,8 +205,8 @@
             "source": "upstream/defold/engine/dlib/src/dlib/crypt_mbedtls.cpp",
             "line": 89,
             "callee": "mbedtls_base64_decode",
-            "calleeIdentity": "external:mbedtls_base64_decode|int (unsigned char *, size_t, size_t *, const unsigned char *, size_t)",
-            "calleeType": "int (unsigned char *, size_t, size_t *, const unsigned char *, size_t)",
+            "calleeIdentity": "external:mbedtls_base64_decode",
+            "calleeType": null,
             "resultVariable": "r",
             "mode": "decode"
           }
@@ -299,8 +299,8 @@
             "source": "upstream/defold/engine/dlib/src/dlib/crypt_mbedtls.cpp",
             "line": 54,
             "callee": "mbedtls_base64_encode",
-            "calleeIdentity": "external:mbedtls_base64_encode|int (unsigned char *, size_t, size_t *, const unsigned char *, size_t)",
-            "calleeType": "int (unsigned char *, size_t, size_t *, const unsigned char *, size_t)",
+            "calleeIdentity": "external:mbedtls_base64_encode",
+            "calleeType": null,
             "resultVariable": "r",
             "mode": "encode"
           }

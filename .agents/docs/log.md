@@ -5593,3 +5593,31 @@ optimized lowering outputs. Local deterministic regeneration and the focused
 source-semantic suite pass. This proves host-independent inputs for this fact
 artifact; target-specific implementation equivalence remains bounded by the
 cross-platform native build evidence.
+
+## 2026-10-04 - Source-semantic host parity is byte-for-byte
+
+The first portability pass above was incomplete: hosted Linux still rejected
+the committed artifact because compiler and libc spelling remained inside
+external-call identities, and Darwin/Linux assertion macros expanded into
+different call trees. The compact projection now identifies unresolved
+external calls by callee name rather than host-header function spelling and
+omits only host assertion plumbing (`__assert_rtn`, `__assert_fail`, and
+`__builtin_expect`). It retains the assertion expression itself, including the
+XTEA `keylen <= 16` capacity proof.
+
+The generator was run from the same read-only checkout on macOS and in an
+Ubuntu container with Clang 18.1.3. The two
+`defold-dmsdk-source-semantic-facts.json` files were byte-identical. Focused
+tests cover external-call spelling normalization, assertion-plumbing removal,
+semantic-guard retention, deterministic regeneration, bounded-span causality,
+and the XTEA native bounds/allocation harness. Full dmSDK regeneration retained
+10/10 observed source facts, 12 selected bounded-span routes with zero fallback,
+and the existing family census: fixed digest 4/4, Base64 2/2, ASTC 2/2, XTEA
+2/2, and hash span 2/2. This is cross-host generation and focused native-harness
+evidence; it is not new packaged-engine behavior evidence.
+
+The literal aggregate `pnpm test` gate also passed after running outside the
+filesystem sandbox so its loopback-only dev, debugger, profiler, and reload
+tests could bind `127.0.0.1`. The existing real-engine report was regenerated
+from Defold rather than edited: 30 observations, zero mismatches, zero engine
+faults, four blocked fixtures, and 52 unreachable fixtures.

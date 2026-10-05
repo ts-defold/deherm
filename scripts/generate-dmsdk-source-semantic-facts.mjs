@@ -240,7 +240,7 @@ export async function buildDmSdkSourceSemanticFacts(options = {}) {
   const report = {
     schemaVersion: 1,
     defoldRevision: ir.defoldRevision,
-    extraction: "clang-json-ast/portable-compact-dataflow-v2",
+    extraction: "clang-json-ast/portable-compact-dataflow-v3",
     scope: "structurally eligible bounded-span declarations",
     sources: parsed
       .map(({ definitions: _definitions, ...source }) => source)

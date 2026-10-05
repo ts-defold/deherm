@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "extraction": "clang-json-ast/portable-compact-dataflow-v2",
+  "extraction": "clang-json-ast/portable-compact-dataflow-v3",
   "scope": "structurally eligible bounded-span declarations",
   "sources": [
     {
@@ -76,7 +76,6 @@
           "calls": [
             {
               "callee": "memcpy",
-              "calleeType": "void *(void *, const void *, size_t)",
               "arguments": [
                 {
                   "kind": "variable",
@@ -127,11 +126,10 @@
                   "branch": true
                 }
               ],
-              "calleeIdentity": "external:memcpy|void *(void *, const void *, size_t)"
+              "calleeIdentity": "external:memcpy"
             },
             {
               "callee": "memset",
-              "calleeType": "void *(void *, int, size_t)",
               "arguments": [
                 {
                   "kind": "binary",
@@ -189,11 +187,10 @@
                   "branch": true
                 }
               ],
-              "calleeIdentity": "external:memset|void *(void *, int, size_t)"
+              "calleeIdentity": "external:memset"
             },
             {
               "callee": "mbedtls_base64_decode",
-              "calleeType": "int (unsigned char *, size_t, size_t *, const unsigned char *, size_t)",
               "arguments": [
                 {
                   "kind": "parameter",
@@ -229,7 +226,7 @@
                 }
               ],
               "conditions": [],
-              "calleeIdentity": "external:mbedtls_base64_decode|int (unsigned char *, size_t, size_t *, const unsigned char *, size_t)"
+              "calleeIdentity": "external:mbedtls_base64_decode"
             }
           ],
           "fixedArrays": [],
@@ -292,7 +289,6 @@
               "initializer": {
                 "kind": "call",
                 "callee": "mbedtls_base64_decode",
-                "calleeType": "int (unsigned char *, size_t, size_t *, const unsigned char *, size_t)",
                 "arguments": [
                   {
                     "kind": "parameter",
@@ -327,7 +323,7 @@
                     "name": "src_len"
                   }
                 ],
-                "calleeIdentity": "external:mbedtls_base64_decode|int (unsigned char *, size_t, size_t *, const unsigned char *, size_t)"
+                "calleeIdentity": "external:mbedtls_base64_decode"
               },
               "conditions": []
             }
@@ -1020,7 +1016,6 @@
           "calls": [
             {
               "callee": "mbedtls_base64_encode",
-              "calleeType": "int (unsigned char *, size_t, size_t *, const unsigned char *, size_t)",
               "arguments": [
                 {
                   "kind": "parameter",
@@ -1056,7 +1051,7 @@
                 }
               ],
               "conditions": [],
-              "calleeIdentity": "external:mbedtls_base64_encode|int (unsigned char *, size_t, size_t *, const unsigned char *, size_t)"
+              "calleeIdentity": "external:mbedtls_base64_encode"
             }
           ],
           "fixedArrays": [],
@@ -1076,7 +1071,6 @@
               "initializer": {
                 "kind": "call",
                 "callee": "mbedtls_base64_encode",
-                "calleeType": "int (unsigned char *, size_t, size_t *, const unsigned char *, size_t)",
                 "arguments": [
                   {
                     "kind": "parameter",
@@ -1111,7 +1105,7 @@
                     "name": "src_len"
                   }
                 ],
-                "calleeIdentity": "external:mbedtls_base64_encode|int (unsigned char *, size_t, size_t *, const unsigned char *, size_t)"
+                "calleeIdentity": "external:mbedtls_base64_encode"
               },
               "conditions": []
             }
@@ -1618,7 +1612,6 @@
               "calls": [
                 {
                   "callee": "__builtin_bswap32",
-                  "calleeType": "unsigned int (unsigned int) noexcept",
                   "arguments": [
                     {
                       "kind": "parameter",
@@ -1627,7 +1620,7 @@
                     }
                   ],
                   "conditions": [],
-                  "calleeIdentity": "external:__builtin_bswap32|unsigned int (unsigned int) noexcept"
+                  "calleeIdentity": "external:__builtin_bswap32"
                 }
               ],
               "fixedArrays": [],
@@ -1637,7 +1630,6 @@
                 {
                   "kind": "call",
                   "callee": "__builtin_bswap32",
-                  "calleeType": "unsigned int (unsigned int) noexcept",
                   "arguments": [
                     {
                       "kind": "parameter",
@@ -1646,7 +1638,7 @@
                     }
                   ],
                   "conditions": [],
-                  "calleeIdentity": "external:__builtin_bswap32|unsigned int (unsigned int) noexcept"
+                  "calleeIdentity": "external:__builtin_bswap32"
                 }
               ],
               "identity": "EndianSwap32|uint32_t (uint32_t)|upstream/defold/engine/dlib/src/dlib/crypt.cpp|81"
@@ -1660,7 +1652,6 @@
               "calls": [
                 {
                   "callee": "__builtin_bswap64",
-                  "calleeType": "unsigned long long (unsigned long long) noexcept",
                   "arguments": [
                     {
                       "kind": "parameter",
@@ -1669,7 +1660,7 @@
                     }
                   ],
                   "conditions": [],
-                  "calleeIdentity": "external:__builtin_bswap64|unsigned long long (unsigned long long) noexcept"
+                  "calleeIdentity": "external:__builtin_bswap64"
                 }
               ],
               "fixedArrays": [],
@@ -1679,7 +1670,6 @@
                 {
                   "kind": "call",
                   "callee": "__builtin_bswap64",
-                  "calleeType": "unsigned long long (unsigned long long) noexcept",
                   "arguments": [
                     {
                       "kind": "parameter",
@@ -1688,7 +1678,7 @@
                     }
                   ],
                   "conditions": [],
-                  "calleeIdentity": "external:__builtin_bswap64|unsigned long long (unsigned long long) noexcept"
+                  "calleeIdentity": "external:__builtin_bswap64"
                 }
               ],
               "identity": "EndianSwap64|uint64_t (uint64_t)|upstream/defold/engine/dlib/src/dlib/crypt.cpp|100"
@@ -2797,61 +2787,7 @@
               "line": 42,
               "calls": [
                 {
-                  "callee": "__builtin_expect",
-                  "calleeType": "long (long, long) noexcept",
-                  "arguments": [
-                    {
-                      "kind": "unary",
-                      "operator": "!",
-                      "operand": {
-                        "kind": "binary",
-                        "operator": "<=",
-                        "left": {
-                          "kind": "parameter",
-                          "index": 3,
-                          "name": "keylen"
-                        },
-                        "right": {
-                          "kind": "integer",
-                          "value": 16
-                        }
-                      }
-                    },
-                    {
-                      "kind": "integer",
-                      "value": 0
-                    }
-                  ],
-                  "conditions": [],
-                  "calleeIdentity": "external:__builtin_expect|long (long, long) noexcept"
-                },
-                {
-                  "callee": "__assert_rtn",
-                  "calleeType": "void (const char *, const char *, int, const char *) __attribute__((noreturn))",
-                  "arguments": [
-                    {
-                      "kind": "expression",
-                      "expressionKind": "PredefinedExpr"
-                    },
-                    {
-                      "kind": "string",
-                      "value": "\"crypt.cpp\""
-                    },
-                    {
-                      "kind": "integer",
-                      "value": 44
-                    },
-                    {
-                      "kind": "string",
-                      "value": "\"keylen <= 16\""
-                    }
-                  ],
-                  "conditions": [],
-                  "calleeIdentity": "external:__assert_rtn|void (const char *, const char *, int, const char *) __attribute__((noreturn))"
-                },
-                {
                   "callee": "memcpy",
-                  "calleeType": "void *(void *, const void *, size_t)",
                   "arguments": [
                     {
                       "kind": "variable",
@@ -2869,11 +2805,10 @@
                     }
                   ],
                   "conditions": [],
-                  "calleeIdentity": "external:memcpy|void *(void *, const void *, size_t)"
+                  "calleeIdentity": "external:memcpy"
                 },
                 {
                   "callee": "memcpy",
-                  "calleeType": "void *(void *, const void *, size_t)",
                   "arguments": [
                     {
                       "kind": "variable",
@@ -2889,7 +2824,7 @@
                     }
                   ],
                   "conditions": [],
-                  "calleeIdentity": "external:memcpy|void *(void *, const void *, size_t)"
+                  "calleeIdentity": "external:memcpy"
                 },
                 {
                   "callee": "EncryptXTea",
@@ -2909,7 +2844,6 @@
                 },
                 {
                   "callee": "memcpy",
-                  "calleeType": "void *(void *, const void *, size_t)",
                   "arguments": [
                     {
                       "kind": "unary",
@@ -2930,11 +2864,10 @@
                     }
                   ],
                   "conditions": [],
-                  "calleeIdentity": "external:memcpy|void *(void *, const void *, size_t)"
+                  "calleeIdentity": "external:memcpy"
                 },
                 {
                   "callee": "memcpy",
-                  "calleeType": "void *(void *, const void *, size_t)",
                   "arguments": [
                     {
                       "kind": "parameter",
@@ -2955,7 +2888,7 @@
                     }
                   ],
                   "conditions": [],
-                  "calleeIdentity": "external:memcpy|void *(void *, const void *, size_t)"
+                  "calleeIdentity": "external:memcpy"
                 },
                 {
                   "callee": "EncryptXTea",
@@ -3446,7 +3379,6 @@
               "calls": [
                 {
                   "callee": "__builtin_bswap32",
-                  "calleeType": "unsigned int (unsigned int) noexcept",
                   "arguments": [
                     {
                       "kind": "parameter",
@@ -3455,7 +3387,7 @@
                     }
                   ],
                   "conditions": [],
-                  "calleeIdentity": "external:__builtin_bswap32|unsigned int (unsigned int) noexcept"
+                  "calleeIdentity": "external:__builtin_bswap32"
                 }
               ],
               "fixedArrays": [],
@@ -3465,7 +3397,6 @@
                 {
                   "kind": "call",
                   "callee": "__builtin_bswap32",
-                  "calleeType": "unsigned int (unsigned int) noexcept",
                   "arguments": [
                     {
                       "kind": "parameter",
@@ -3474,7 +3405,7 @@
                     }
                   ],
                   "conditions": [],
-                  "calleeIdentity": "external:__builtin_bswap32|unsigned int (unsigned int) noexcept"
+                  "calleeIdentity": "external:__builtin_bswap32"
                 }
               ],
               "identity": "EndianSwap32|uint32_t (uint32_t)|upstream/defold/engine/dlib/src/dlib/crypt.cpp|81"
@@ -3488,7 +3419,6 @@
               "calls": [
                 {
                   "callee": "__builtin_bswap64",
-                  "calleeType": "unsigned long long (unsigned long long) noexcept",
                   "arguments": [
                     {
                       "kind": "parameter",
@@ -3497,7 +3427,7 @@
                     }
                   ],
                   "conditions": [],
-                  "calleeIdentity": "external:__builtin_bswap64|unsigned long long (unsigned long long) noexcept"
+                  "calleeIdentity": "external:__builtin_bswap64"
                 }
               ],
               "fixedArrays": [],
@@ -3507,7 +3437,6 @@
                 {
                   "kind": "call",
                   "callee": "__builtin_bswap64",
-                  "calleeType": "unsigned long long (unsigned long long) noexcept",
                   "arguments": [
                     {
                       "kind": "parameter",
@@ -3516,7 +3445,7 @@
                     }
                   ],
                   "conditions": [],
-                  "calleeIdentity": "external:__builtin_bswap64|unsigned long long (unsigned long long) noexcept"
+                  "calleeIdentity": "external:__builtin_bswap64"
                 }
               ],
               "identity": "EndianSwap64|uint64_t (uint64_t)|upstream/defold/engine/dlib/src/dlib/crypt.cpp|100"
@@ -4625,61 +4554,7 @@
               "line": 42,
               "calls": [
                 {
-                  "callee": "__builtin_expect",
-                  "calleeType": "long (long, long) noexcept",
-                  "arguments": [
-                    {
-                      "kind": "unary",
-                      "operator": "!",
-                      "operand": {
-                        "kind": "binary",
-                        "operator": "<=",
-                        "left": {
-                          "kind": "parameter",
-                          "index": 3,
-                          "name": "keylen"
-                        },
-                        "right": {
-                          "kind": "integer",
-                          "value": 16
-                        }
-                      }
-                    },
-                    {
-                      "kind": "integer",
-                      "value": 0
-                    }
-                  ],
-                  "conditions": [],
-                  "calleeIdentity": "external:__builtin_expect|long (long, long) noexcept"
-                },
-                {
-                  "callee": "__assert_rtn",
-                  "calleeType": "void (const char *, const char *, int, const char *) __attribute__((noreturn))",
-                  "arguments": [
-                    {
-                      "kind": "expression",
-                      "expressionKind": "PredefinedExpr"
-                    },
-                    {
-                      "kind": "string",
-                      "value": "\"crypt.cpp\""
-                    },
-                    {
-                      "kind": "integer",
-                      "value": 44
-                    },
-                    {
-                      "kind": "string",
-                      "value": "\"keylen <= 16\""
-                    }
-                  ],
-                  "conditions": [],
-                  "calleeIdentity": "external:__assert_rtn|void (const char *, const char *, int, const char *) __attribute__((noreturn))"
-                },
-                {
                   "callee": "memcpy",
-                  "calleeType": "void *(void *, const void *, size_t)",
                   "arguments": [
                     {
                       "kind": "variable",
@@ -4697,11 +4572,10 @@
                     }
                   ],
                   "conditions": [],
-                  "calleeIdentity": "external:memcpy|void *(void *, const void *, size_t)"
+                  "calleeIdentity": "external:memcpy"
                 },
                 {
                   "callee": "memcpy",
-                  "calleeType": "void *(void *, const void *, size_t)",
                   "arguments": [
                     {
                       "kind": "variable",
@@ -4717,7 +4591,7 @@
                     }
                   ],
                   "conditions": [],
-                  "calleeIdentity": "external:memcpy|void *(void *, const void *, size_t)"
+                  "calleeIdentity": "external:memcpy"
                 },
                 {
                   "callee": "EncryptXTea",
@@ -4737,7 +4611,6 @@
                 },
                 {
                   "callee": "memcpy",
-                  "calleeType": "void *(void *, const void *, size_t)",
                   "arguments": [
                     {
                       "kind": "unary",
@@ -4758,11 +4631,10 @@
                     }
                   ],
                   "conditions": [],
-                  "calleeIdentity": "external:memcpy|void *(void *, const void *, size_t)"
+                  "calleeIdentity": "external:memcpy"
                 },
                 {
                   "callee": "memcpy",
-                  "calleeType": "void *(void *, const void *, size_t)",
                   "arguments": [
                     {
                       "kind": "parameter",
@@ -4783,7 +4655,7 @@
                     }
                   ],
                   "conditions": [],
-                  "calleeIdentity": "external:memcpy|void *(void *, const void *, size_t)"
+                  "calleeIdentity": "external:memcpy"
                 },
                 {
                   "callee": "EncryptXTea",
@@ -5271,7 +5143,6 @@
               "calls": [
                 {
                   "callee": "mbedtls_md_info_from_type",
-                  "calleeType": "const mbedtls_md_info_t *(mbedtls_md_type_t)",
                   "arguments": [
                     {
                       "kind": "parameter",
@@ -5280,11 +5151,10 @@
                     }
                   ],
                   "conditions": [],
-                  "calleeIdentity": "external:mbedtls_md_info_from_type|const mbedtls_md_info_t *(mbedtls_md_type_t)"
+                  "calleeIdentity": "external:mbedtls_md_info_from_type"
                 },
                 {
                   "callee": "mbedtls_md",
-                  "calleeType": "int (const mbedtls_md_info_t *, const unsigned char *, size_t, unsigned char *)",
                   "arguments": [
                     {
                       "kind": "variable",
@@ -5307,11 +5177,10 @@
                     }
                   ],
                   "conditions": [],
-                  "calleeIdentity": "external:mbedtls_md|int (const mbedtls_md_info_t *, const unsigned char *, size_t, unsigned char *)"
+                  "calleeIdentity": "external:mbedtls_md"
                 },
                 {
                   "callee": "memset",
-                  "calleeType": "void *(void *, int, size_t)",
                   "arguments": [
                     {
                       "kind": "parameter",
@@ -5345,7 +5214,7 @@
                       "branch": true
                     }
                   ],
-                  "calleeIdentity": "external:memset|void *(void *, int, size_t)"
+                  "calleeIdentity": "external:memset"
                 }
               ],
               "fixedArrays": [],
@@ -5356,7 +5225,6 @@
                   "initializer": {
                     "kind": "call",
                     "callee": "mbedtls_md_info_from_type",
-                    "calleeType": "const mbedtls_md_info_t *(mbedtls_md_type_t)",
                     "arguments": [
                       {
                         "kind": "parameter",
@@ -5364,7 +5232,7 @@
                         "name": "type"
                       }
                     ],
-                    "calleeIdentity": "external:mbedtls_md_info_from_type|const mbedtls_md_info_t *(mbedtls_md_type_t)"
+                    "calleeIdentity": "external:mbedtls_md_info_from_type"
                   },
                   "conditions": []
                 },
@@ -5459,7 +5327,6 @@
               "calls": [
                 {
                   "callee": "mbedtls_md_info_from_type",
-                  "calleeType": "const mbedtls_md_info_t *(mbedtls_md_type_t)",
                   "arguments": [
                     {
                       "kind": "parameter",
@@ -5468,11 +5335,10 @@
                     }
                   ],
                   "conditions": [],
-                  "calleeIdentity": "external:mbedtls_md_info_from_type|const mbedtls_md_info_t *(mbedtls_md_type_t)"
+                  "calleeIdentity": "external:mbedtls_md_info_from_type"
                 },
                 {
                   "callee": "mbedtls_md",
-                  "calleeType": "int (const mbedtls_md_info_t *, const unsigned char *, size_t, unsigned char *)",
                   "arguments": [
                     {
                       "kind": "variable",
@@ -5495,11 +5361,10 @@
                     }
                   ],
                   "conditions": [],
-                  "calleeIdentity": "external:mbedtls_md|int (const mbedtls_md_info_t *, const unsigned char *, size_t, unsigned char *)"
+                  "calleeIdentity": "external:mbedtls_md"
                 },
                 {
                   "callee": "memset",
-                  "calleeType": "void *(void *, int, size_t)",
                   "arguments": [
                     {
                       "kind": "parameter",
@@ -5533,7 +5398,7 @@
                       "branch": true
                     }
                   ],
-                  "calleeIdentity": "external:memset|void *(void *, int, size_t)"
+                  "calleeIdentity": "external:memset"
                 }
               ],
               "fixedArrays": [],
@@ -5544,7 +5409,6 @@
                   "initializer": {
                     "kind": "call",
                     "callee": "mbedtls_md_info_from_type",
-                    "calleeType": "const mbedtls_md_info_t *(mbedtls_md_type_t)",
                     "arguments": [
                       {
                         "kind": "parameter",
@@ -5552,7 +5416,7 @@
                         "name": "type"
                       }
                     ],
-                    "calleeIdentity": "external:mbedtls_md_info_from_type|const mbedtls_md_info_t *(mbedtls_md_type_t)"
+                    "calleeIdentity": "external:mbedtls_md_info_from_type"
                   },
                   "conditions": []
                 },
@@ -5647,7 +5511,6 @@
               "calls": [
                 {
                   "callee": "mbedtls_md_info_from_type",
-                  "calleeType": "const mbedtls_md_info_t *(mbedtls_md_type_t)",
                   "arguments": [
                     {
                       "kind": "parameter",
@@ -5656,11 +5519,10 @@
                     }
                   ],
                   "conditions": [],
-                  "calleeIdentity": "external:mbedtls_md_info_from_type|const mbedtls_md_info_t *(mbedtls_md_type_t)"
+                  "calleeIdentity": "external:mbedtls_md_info_from_type"
                 },
                 {
                   "callee": "mbedtls_md",
-                  "calleeType": "int (const mbedtls_md_info_t *, const unsigned char *, size_t, unsigned char *)",
                   "arguments": [
                     {
                       "kind": "variable",
@@ -5683,11 +5545,10 @@
                     }
                   ],
                   "conditions": [],
-                  "calleeIdentity": "external:mbedtls_md|int (const mbedtls_md_info_t *, const unsigned char *, size_t, unsigned char *)"
+                  "calleeIdentity": "external:mbedtls_md"
                 },
                 {
                   "callee": "memset",
-                  "calleeType": "void *(void *, int, size_t)",
                   "arguments": [
                     {
                       "kind": "parameter",
@@ -5721,7 +5582,7 @@
                       "branch": true
                     }
                   ],
-                  "calleeIdentity": "external:memset|void *(void *, int, size_t)"
+                  "calleeIdentity": "external:memset"
                 }
               ],
               "fixedArrays": [],
@@ -5732,7 +5593,6 @@
                   "initializer": {
                     "kind": "call",
                     "callee": "mbedtls_md_info_from_type",
-                    "calleeType": "const mbedtls_md_info_t *(mbedtls_md_type_t)",
                     "arguments": [
                       {
                         "kind": "parameter",
@@ -5740,7 +5600,7 @@
                         "name": "type"
                       }
                     ],
-                    "calleeIdentity": "external:mbedtls_md_info_from_type|const mbedtls_md_info_t *(mbedtls_md_type_t)"
+                    "calleeIdentity": "external:mbedtls_md_info_from_type"
                   },
                   "conditions": []
                 },
@@ -5835,7 +5695,6 @@
               "calls": [
                 {
                   "callee": "mbedtls_md_info_from_type",
-                  "calleeType": "const mbedtls_md_info_t *(mbedtls_md_type_t)",
                   "arguments": [
                     {
                       "kind": "parameter",
@@ -5844,11 +5703,10 @@
                     }
                   ],
                   "conditions": [],
-                  "calleeIdentity": "external:mbedtls_md_info_from_type|const mbedtls_md_info_t *(mbedtls_md_type_t)"
+                  "calleeIdentity": "external:mbedtls_md_info_from_type"
                 },
                 {
                   "callee": "mbedtls_md",
-                  "calleeType": "int (const mbedtls_md_info_t *, const unsigned char *, size_t, unsigned char *)",
                   "arguments": [
                     {
                       "kind": "variable",
@@ -5871,11 +5729,10 @@
                     }
                   ],
                   "conditions": [],
-                  "calleeIdentity": "external:mbedtls_md|int (const mbedtls_md_info_t *, const unsigned char *, size_t, unsigned char *)"
+                  "calleeIdentity": "external:mbedtls_md"
                 },
                 {
                   "callee": "memset",
-                  "calleeType": "void *(void *, int, size_t)",
                   "arguments": [
                     {
                       "kind": "parameter",
@@ -5909,7 +5766,7 @@
                       "branch": true
                     }
                   ],
-                  "calleeIdentity": "external:memset|void *(void *, int, size_t)"
+                  "calleeIdentity": "external:memset"
                 }
               ],
               "fixedArrays": [],
@@ -5920,7 +5777,6 @@
                   "initializer": {
                     "kind": "call",
                     "callee": "mbedtls_md_info_from_type",
-                    "calleeType": "const mbedtls_md_info_t *(mbedtls_md_type_t)",
                     "arguments": [
                       {
                         "kind": "parameter",
@@ -5928,7 +5784,7 @@
                         "name": "type"
                       }
                     ],
-                    "calleeIdentity": "external:mbedtls_md_info_from_type|const mbedtls_md_info_t *(mbedtls_md_type_t)"
+                    "calleeIdentity": "external:mbedtls_md_info_from_type"
                   },
                   "conditions": []
                 },

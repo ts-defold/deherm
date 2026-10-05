@@ -144,13 +144,17 @@ function controlChildren(node, parameters, conditions, visit) {
   return true;
 }
 
+function isHostAssertionCall(name) {
+  return ["__assert_fail", "__assert_rtn", "__builtin_expect"].includes(name);
+}
+
 function callFacts(body, parameters) {
   const calls = [];
   function visit(node, conditions = []) {
     if (node.kind === "CallExpr" || node.kind === "CXXMemberCallExpr" || node.kind === "RecoveryExpr") {
       const [callee, ...arguments_] = node.inner ?? [];
       const identity = calleeIdentity(callee);
-      if (identity?.name)
+      if (identity?.name && !isHostAssertionCall(identity.name))
         calls.push({
           callee: identity.name,
           ...(identity.rawDeclarationId ? { _calleeDeclarationId: identity.rawDeclarationId } : {}),
@@ -294,24 +298,31 @@ export function extractCppImplementationFacts(ast, requestedNames, source) {
     ),
   );
   for (const definition of allDefinitions) definition.identity = stableIdentity(definition);
+  function normalizeCallIdentity(value) {
+    const target = definitionsByRawId.get(value._calleeDeclarationId);
+    if (target) value.calleeIdentity = target.identity;
+    else {
+      // The external declaration's spelled type belongs to the host headers and
+      // compiler, not to Defold's implementation semantics. For example,
+      // Darwin and glibc disagree about restrict/noexcept spelling and the
+      // underlying C type of uint64_t. The callee name is the portable identity
+      // we can prove from the pinned translation unit; argument dataflow remains
+      // available separately.
+      value.calleeIdentity = `external:${value.callee}`;
+      delete value.calleeType;
+    }
+    delete value._calleeDeclarationId;
+  }
   function normalizeExpressionIdentities(value) {
     if (!value || typeof value !== "object") return;
-    if (value.kind === "call") {
-      const target = definitionsByRawId.get(value._calleeDeclarationId);
-      value.calleeIdentity = target?.identity ?? `external:${value.callee}|${value.calleeType ?? ""}`;
-      delete value._calleeDeclarationId;
-    }
+    if (value.kind === "call") normalizeCallIdentity(value);
     for (const child of Object.values(value)) {
       if (Array.isArray(child)) child.forEach(normalizeExpressionIdentities);
       else normalizeExpressionIdentities(child);
     }
   }
   for (const definition of allDefinitions) {
-    for (const call of definition.calls) {
-      const target = definitionsByRawId.get(call._calleeDeclarationId);
-      call.calleeIdentity = target?.identity ?? `external:${call.callee}|${call.calleeType ?? ""}`;
-      delete call._calleeDeclarationId;
-    }
+    for (const call of definition.calls) normalizeCallIdentity(call);
     normalizeExpressionIdentities(definition.variables);
     normalizeExpressionIdentities(definition.operations);
     normalizeExpressionIdentities(definition.returns);
