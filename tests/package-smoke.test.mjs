@@ -122,6 +122,7 @@ export async function prepareCurrentHostDehermc(root, dehermCacheHome, options =
   }
 
   let source = suppliedBinary ? path.resolve(suppliedBinary) : null;
+  let sourceVerified = false;
   if (suppliedArchive) {
     const extracted = path.join(root, "supplied-dehermc");
     await extractReleaseArchive({ archive: path.resolve(suppliedArchive), destination: extracted });
@@ -133,14 +134,14 @@ export async function prepareCurrentHostDehermc(root, dehermCacheHome, options =
       path.join(repositoryRoot, manifest.hosts[host].directory, record.file),
     ];
     for (const candidate of candidates) {
-      if (
-        await readFile(candidate).then(
-          () => true,
-          () => false,
-        )
-      ) {
+      try {
+        await verifyPinnedHostToolFile({ manifest, host, tool: "dehermc", file: candidate });
         source = candidate;
+        sourceVerified = true;
         break;
+      } catch (error) {
+        if (error?.code === "ENOENT" || /manifest expects/u.test(error?.message ?? "")) continue;
+        throw error;
       }
     }
     if (!source) {
@@ -159,7 +160,7 @@ export async function prepareCurrentHostDehermc(root, dehermCacheHome, options =
       };
     }
   }
-  await verifyPinnedHostToolFile({ manifest, host, tool: "dehermc", file: source });
+  if (!sourceVerified) await verifyPinnedHostToolFile({ manifest, host, tool: "dehermc", file: source });
   const cacheRoot = path.join(root, "tool-cache");
   const destination = path.join(cacheRoot, tags.families.dehermc.tag, host, executable);
   await mkdir(path.dirname(destination), { recursive: true });

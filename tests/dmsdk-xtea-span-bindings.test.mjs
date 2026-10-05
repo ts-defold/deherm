@@ -1,51 +1,41 @@
 import assert from "node:assert/strict";
-import { execFileSync } from "node:child_process";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { dirname, join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { join } from "node:path";
 import test from "node:test";
 
 import { extractXteaSpanSemantics } from "../scripts/generate-dmsdk-xtea-span-bindings.mjs";
-const root = resolve(dirname(fileURLToPath(import.meta.url)), ".."),
-  sdk = join(root, "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk"),
-  run = (c, a) => execFileSync(c, a, { cwd: root, encoding: "utf8", stdio: "pipe" }),
-  inc = [
-    `-I${join(root, "defold/defold_hermes/include")}`,
-    "-isystem",
-    join(sdk, "sdk/include"),
-    "-isystem",
-    join(sdk, "include"),
-  ];
+import {
+  assertGeneratedCppHasNoHeapOwnership,
+  cxx,
+  generateAndCompareFamily,
+  pinnedSdkRoot as sdk,
+  repositoryRoot as root,
+  run,
+  sdkIncludeArgs,
+} from "./helpers/dmsdk-binding-family.mjs";
+
+const generator = "scripts/generate-dmsdk-xtea-span-bindings.mjs";
+const report = "packages/bindings/generated/defold-dmsdk-xtea-span-bindings.json";
 test("xtea generation is deterministic and evidence-bound", async () => {
-  const o = await mkdtemp(join(tmpdir(), "deherm-xtea-"));
-  try {
-    run(process.execPath, ["scripts/generate-dmsdk-xtea-span-bindings.mjs", "--out-root", o]);
-    const r = JSON.parse(
-      await readFile(join(root, "packages/bindings/generated/defold-dmsdk-xtea-span-bindings.json"), "utf8"),
-    );
-    assert.deepEqual(r.coverage, {
-      baselineRuntimePending: 1361,
-      discovered: 2,
-      structurallyEligible: 2,
-      emitted: 2,
-      policyBlocked: 0,
-      hostBehaviorVerified: 2,
-      remainingWithoutGeneratedAdapters: 1318,
-    });
-    assert.equal(r.declarations.length, 2);
-    assert.equal(r.fallbackAudit.count, 0);
-    assert.equal(Object.keys(r.artifactHashes).length, r.artifacts.length);
-    for (const d of r.declarations) {
-      assert.equal(typeof d.bindingId, "number");
-      assert.equal(d.patternDecision, "span.in-place-keyed-transform");
-      assert.equal(d.evidence.semanticSource, "revision-implementation-ast+abi-shape");
-      assert.equal(d.stages.runtime, "packaged-sdk-host-behavior-test");
-    }
-    for (const f of [...r.artifacts, "packages/bindings/generated/defold-dmsdk-xtea-span-bindings.json"])
-      assert.equal(await readFile(join(o, f), "utf8"), await readFile(join(root, f), "utf8"));
-  } finally {
-    await rm(o, { recursive: true, force: true });
+  const current = await generateAndCompareFamily({ generator, report, tempPrefix: "deherm-xtea-" });
+  assert.deepEqual(current.coverage, {
+    baselineRuntimePending: 1361,
+    discovered: 2,
+    structurallyEligible: 2,
+    emitted: 2,
+    policyBlocked: 0,
+    hostBehaviorVerified: 2,
+    remainingWithoutGeneratedAdapters: 1318,
+  });
+  assert.equal(current.declarations.length, 2);
+  assert.equal(current.fallbackAudit.count, 0);
+  assert.equal(Object.keys(current.artifactHashes).length, current.artifacts.length);
+  for (const declaration of current.declarations) {
+    assert.equal(typeof declaration.bindingId, "number");
+    assert.equal(declaration.patternDecision, "span.in-place-keyed-transform");
+    assert.equal(declaration.evidence.semanticSource, "revision-implementation-ast+abi-shape");
+    assert.equal(declaration.stages.runtime, "packaged-sdk-host-behavior-test");
   }
 });
 test("xtea span derives bounds and results from implementation dataflow without route allowlists", async () => {
@@ -99,13 +89,13 @@ test("xtea packaged link, bounds, behavior, and warmed allocation gate", async (
   const o = await mkdtemp(join(tmpdir(), "deherm-xtea-host-"));
   try {
     const exe = join(o, "host");
-    run(process.env.CXX || "clang++", [
+    run(cxx, [
       "-std=c++17",
       "-Wall",
       "-Wextra",
       "-Werror",
       "-pedantic",
-      ...inc,
+      ...sdkIncludeArgs(),
       "defold/defold_hermes/src/generated_dmsdk_xtea_span_crypt.cpp",
       "defold/defold_hermes/src/generated_dmsdk_xtea_span_runtime.cpp",
       "native/dmsdk_xtea_span_host_test.cpp",
@@ -125,9 +115,5 @@ test("xtea packaged link, bounds, behavior, and warmed allocation gate", async (
   }
 });
 test("xtea glue has no heap primitive", async () => {
-  for (const f of [
-    "defold/defold_hermes/src/generated_dmsdk_xtea_span_crypt.cpp",
-    "defold/defold_hermes/src/generated_dmsdk_xtea_span_runtime.cpp",
-  ])
-    assert.doesNotMatch(await readFile(join(root, f), "utf8"), /\b(?:new|delete|malloc|calloc|realloc|free)\b/);
+  await assertGeneratedCppHasNoHeapOwnership(report);
 });

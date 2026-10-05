@@ -1,0 +1,28 @@
+{
+  "compiler-emission": {
+    "script": "test:compiler-contracts:raw",
+    "include": [
+      "packages/compiler/src/defold-value-layout-output-emitter.mjs",
+      "packages/compiler/src/dmsdk-arena-cstring-output-emitter.mjs",
+      "packages/compiler/src/dmsdk-borrowed-handle-output-emitter.mjs",
+      "packages/compiler/src/dmsdk-bounded-output-emitter.mjs",
+      "packages/compiler/src/dmsdk-cstring-value-output-emitter.mjs",
+      "packages/compiler/src/dmsdk-enum-value-output-emitter.mjs",
+      "packages/compiler/src/dmsdk-hash-state-output-emitter.mjs",
+      "packages/compiler/src/dmsdk-named-scalar-output-emitter.mjs",
+      "packages/compiler/src/dmsdk-scalar-output-emitter.mjs",
+      "packages/compiler/src/dmsdk-scratch-scalar-out-output-emitter.mjs",
+      "packages/compiler/src/dmsdk-universal-output-emitter.mjs",
+      "packages/compiler/src/generated-module-output-emitter.mjs",
+      "packages/compiler/src/lua-bridge-output-emitter.mjs",
+      "packages/compiler/src/script-universal-value-output-emitter.mjs",
+      "packages/compiler/src/script-value-binding-output-emitter.mjs",
+      "packages/compiler/src/static-hermes-typed-native-bridge-output-emitter.mjs"
+    ],
+    "thresholds": {
+      "lines": 90,
+      "branches": 80,
+      "functions": 95
+    }
+  }
+}

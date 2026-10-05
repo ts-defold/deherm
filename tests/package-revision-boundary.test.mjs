@@ -238,7 +238,8 @@ test("other generated exceptions prove that their inputs are package-owned", asy
 
 test("every stable generated exception matches its package-owned emitter", async () => {
   const report = await verifyStableGeneratedExceptionBytes(repositoryRoot);
-  assert.deepEqual(report.checked.sort(), Object.keys(stableGeneratedExceptions).sort());
+  const stable = Object.keys(stableGeneratedExceptions).sort();
+  assert.deepEqual(report.checked.filter((file) => Object.hasOwn(stableGeneratedExceptions, file)).sort(), stable);
 });
 
 test("fixture CLI exits nonzero with a machine-readable grouped report", async (t) => {

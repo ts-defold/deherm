@@ -476,9 +476,9 @@
     "physics-3d"
   ],
   "inputs": {
-    "packages/bindings/generated/defold-binding-lowering-plan.json": "cb7df97dec5f7d346ef3ed9cee4f20185dbb3f01662815dbaad84fcb7c58ff0d",
+    "packages/bindings/generated/defold-binding-lowering-plan.json": "56aa4c0777e7e4613becf2fde00aae6bf1f8fc8bb7ace5c8eab6fd02c58f1b89",
     "packages/bindings/generated/defold-script-api-ir.json": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049",
-    "packages/bindings/generated/defold-script-universal-value-bindings.json": "68cb23eb8aaaf1c2f441911b3929ad2793fc0660e3695ae2f76534e8b8a2652c",
+    "packages/bindings/generated/defold-script-universal-value-bindings.json": "685823e3882d176e2c52cd33521b049b0bf86a73057caeaf1dfba5a2ec2fdfa7",
     "packages/bindings/generated/defold-script-scalar-dispatch.json": "3c1e7bbb6e1a82be0d4f3d2fc2598984ec1c81bfeedd034c2c179fcf57920bd6",
     "packages/bindings/generated/defold-script-borrowed-handle-classification.json": "cabf4cd6b94a6bea60bea2f4a2aa31b62229c2cc576fcdc75213616f13a39bc7",
     "packages/bindings/generated/defold-script-route-availability-profiles.json": "b3da37a662f0bcd54e83cef3e31fdffc5b4052b5b42861c2ecc7585c3deb9f58",

@@ -165,7 +165,9 @@ export function ingest(): number {
 `,
   );
 
-  const output = await writeGeneratedProject(inventory);
+  const output = await writeGeneratedProject(inventory, ".deherm", {
+    env: { DEHERM_CACHE_HOME: path.join(root, ".deherm-test-cache") },
+  });
   assert.equal(output.moduleCount, 2);
   assert.equal(generateExtensionTypes(inventory), await readFile(path.join(output.root, "extensions.d.ts"), "utf8"));
   assert.deepEqual(JSON.parse(await readFile(path.join(output.root, "bindings.ir.json"), "utf8")), ir);

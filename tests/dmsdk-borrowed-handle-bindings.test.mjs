@@ -43,8 +43,10 @@ test("compiler-owned borrowed-handle recipe reproduces every family output and f
   assert.deepEqual(DMSDK_BORROWED_HANDLE_REVISION_OUTPUT_PATHS, [
     DMSDK_BORROWED_HANDLE_ARTIFACTS.header,
     DMSDK_BORROWED_HANDLE_ARTIFACTS.runtime,
+    DMSDK_BORROWED_HANDLE_ARTIFACTS.jsiHeader,
     DMSDK_BORROWED_HANDLE_ARTIFACTS.jsi,
     DMSDK_BORROWED_HANDLE_ARTIFACTS.browser,
+    DMSDK_BORROWED_HANDLE_ARTIFACTS.staticHermes,
   ]);
   assert.equal(DMSDK_BORROWED_HANDLE_SDK_OUTPUT_PATH, DMSDK_BORROWED_HANDLE_ARTIFACTS.typescript);
   const rendered = renderDmSdkBorrowedHandleOutputs(recipe);

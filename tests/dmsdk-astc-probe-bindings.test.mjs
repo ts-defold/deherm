@@ -1,54 +1,42 @@
 import assert from "node:assert/strict";
-import { execFileSync } from "node:child_process";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { dirname, join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { join } from "node:path";
 import test from "node:test";
 
 import { extractAstcProbeSemantics } from "../scripts/generate-dmsdk-astc-probe-bindings.mjs";
-const root = resolve(dirname(fileURLToPath(import.meta.url)), ".."),
-  reportPath = join(root, "packages/bindings/generated/defold-dmsdk-astc-probe-bindings.json"),
-  sdk = join(root, "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk"),
-  cxx = process.env.CXX || "clang++",
-  cc = process.env.CC || "clang";
-const run = (c, a) => execFileSync(c, a, { cwd: root, encoding: "utf8", stdio: "pipe" });
-const includes = [
-  `-I${join(root, "defold/defold_hermes/include")}`,
-  "-isystem",
-  join(sdk, "sdk/include"),
-  "-isystem",
-  join(sdk, "include"),
-  "-isystem",
-  join(root, "upstream/defold/engine/dlib/src"),
-];
+import {
+  assertGeneratedCppHasNoHeapOwnership,
+  cc,
+  cxx,
+  generateAndCompareFamily,
+  repositoryRoot as root,
+  run,
+  sdkIncludeArgs,
+} from "./helpers/dmsdk-binding-family.mjs";
+
+const generator = "scripts/generate-dmsdk-astc-probe-bindings.mjs";
+const report = "packages/bindings/generated/defold-dmsdk-astc-probe-bindings.json";
+const includes = sdkIncludeArgs("-isystem", join(root, "upstream/defold/engine/dlib/src"));
 test("astc-probe generation is deterministic, census-complete, and evidence-bound", async () => {
-  const out = await mkdtemp(join(tmpdir(), "deherm-astc-"));
-  try {
-    run(process.execPath, ["scripts/generate-dmsdk-astc-probe-bindings.mjs", "--out-root", out]);
-    const report = JSON.parse(await readFile(reportPath, "utf8"));
-    assert.deepEqual(report.coverage, {
-      baselineRuntimePending: 1361,
-      discovered: 2,
-      structurallyEligible: 2,
-      emitted: 2,
-      policyBlocked: 0,
-      hostBehaviorVerified: 2,
-      remainingWithoutGeneratedAdapters: 1320,
-    });
-    assert.equal(report.fallbackAudit.count, 0);
-    for (const f of [...report.artifacts, "packages/bindings/generated/defold-dmsdk-astc-probe-bindings.json"])
-      assert.equal(await readFile(join(out, f), "utf8"), await readFile(join(root, f), "utf8"));
-    assert.deepEqual(
-      report.declarations.map(({ mode, patternDecision }) => ({ mode, patternDecision })),
-      [
-        { mode: "block-size", patternDecision: "span.fixed-three-u32-probe" },
-        { mode: "dimensions", patternDecision: "span.fixed-three-u32-probe" },
-      ],
-    );
-  } finally {
-    await rm(out, { recursive: true, force: true });
-  }
+  const current = await generateAndCompareFamily({ generator, report, tempPrefix: "deherm-astc-" });
+  assert.deepEqual(current.coverage, {
+    baselineRuntimePending: 1361,
+    discovered: 2,
+    structurallyEligible: 2,
+    emitted: 2,
+    policyBlocked: 0,
+    hostBehaviorVerified: 2,
+    remainingWithoutGeneratedAdapters: 1320,
+  });
+  assert.equal(current.fallbackAudit.count, 0);
+  assert.deepEqual(
+    current.declarations.map(({ mode, patternDecision }) => ({ mode, patternDecision })),
+    [
+      { mode: "block-size", patternDecision: "span.fixed-three-u32-probe" },
+      { mode: "dimensions", patternDecision: "span.fixed-three-u32-probe" },
+    ],
+  );
 });
 test("astc-probe semantics come from implementation dataflow plus ABI, not names or documentation prose", async () => {
   const [ir, shapes, sourceFacts] = await Promise.all([
@@ -134,7 +122,5 @@ test("astc C ABI and bounded runtime compile, link to pinned parser source, beha
   }
 });
 test("astc generated C++ has no heap ownership primitive", async () => {
-  const r = JSON.parse(await readFile(reportPath, "utf8"));
-  for (const f of r.artifacts.filter((x) => x.endsWith(".cpp")))
-    assert.doesNotMatch(await readFile(join(root, f), "utf8"), /\b(?:new|delete|malloc|calloc|realloc|free)\b/);
+  await assertGeneratedCppHasNoHeapOwnership(report);
 });

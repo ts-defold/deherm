@@ -229,7 +229,11 @@ test("no layer-0 surface exists for an unknown revision and generation refuses t
   );
   assert.equal(surface.searched[2].reason, `holds Defold ${bundled}`);
 
-  const bundledSurface = await resolveDefoldSurface(bundled, { packageRoot, projectRoot: root });
+  const bundledSurface = await resolveDefoldSurface(bundled, {
+    packageRoot,
+    projectRoot: root,
+    env: { DEHERM_CACHE_HOME: path.join(root, "bundled-cache") },
+  });
   assert.equal(bundledSurface.layer, "repository-checkout");
   assert.equal(bundledSurface.blocker, null);
 });
@@ -387,8 +391,9 @@ test("generation refuses a project whose revision cannot be resolved, and record
   );
 
   const resolved = await project(`[project]\ntitle = Resolved\n[defold_hermes]\ndefold_sdk = ${bundled}\n`);
+  const resolvedEnv = { ...emptyEnv, DEHERM_CACHE_HOME: path.join(resolved, "cache") };
   const output = await writeGeneratedProject(await inspectDefoldProject({ project: resolved }), ".deherm", {
-    env: emptyEnv,
+    env: resolvedEnv,
   });
   assert.equal(output.defoldRevision, bundled);
   assert.equal(output.defoldResolution.source, "game-project");
@@ -402,7 +407,7 @@ test("generation refuses a project whose revision cannot be resolved, and record
 
   // The recorded resolution makes the next generation cheap without making it
   // an assumption: the lock now says how it was decided.
-  const reused = await resolveDefoldRevision({ projectRoot: resolved, env: emptyEnv });
+  const reused = await resolveDefoldRevision({ projectRoot: resolved, env: resolvedEnv });
   assert.equal(reused.revision, bundled);
 });
 

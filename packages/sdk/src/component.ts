@@ -46,35 +46,57 @@ export interface ComponentDefinition {
  * direct fields for ergonomic `this.speed` access, or supply the property map
  * generic and use the allocation-free `this.props.speed` view.
  */
-export class ScriptComponent<Properties extends PropertyMap = PropertyMap> {
+export interface ScriptComponent<Properties extends PropertyMap = PropertyMap> {
+  readonly props: ComponentSelf<Properties>;
+  init?(): void;
+  update?(dt: number): void;
+  lateUpdate?(dt: number): void;
+  fixedUpdate?(dt: number): void;
+  final?(): void;
+  onMessage?(messageId: DefoldHash, message: unknown, sender: DefoldUrl): void;
+  onInput?(actionId: DefoldHash, action: unknown): boolean;
+  onReload?(): void;
+}
+
+const ScriptComponentBase = class ScriptComponentRuntime<Properties extends PropertyMap = PropertyMap> {
   get props(): ComponentSelf<Properties> {
     return this as unknown as ComponentSelf<Properties>;
   }
+};
 
-  declare init?: () => void;
-  declare update?: (dt: number) => void;
-  declare lateUpdate?: (dt: number) => void;
-  declare fixedUpdate?: (dt: number) => void;
-  declare final?: () => void;
-  declare onMessage?: (messageId: DefoldHash, message: unknown, sender: DefoldUrl) => void;
-  declare onInput?: (actionId: DefoldHash, action: unknown) => boolean;
-  declare onReload?: () => void;
-}
+export const ScriptComponent = ScriptComponentBase as unknown as {
+  new <Properties extends PropertyMap = PropertyMap>(): ScriptComponent<Properties>;
+};
 
 /** Class authoring contract for a `*.gui.ts` component. */
-export class GuiComponent<Properties extends PropertyMap = PropertyMap> extends ScriptComponent<Properties> {}
+export interface GuiComponent<Properties extends PropertyMap = PropertyMap> extends ScriptComponent<Properties> {}
+
+const GuiComponentBase = class GuiComponentRuntime<
+  Properties extends PropertyMap = PropertyMap,
+> extends ScriptComponent<Properties> {};
+
+export const GuiComponent = GuiComponentBase as unknown as {
+  new <Properties extends PropertyMap = PropertyMap>(): GuiComponent<Properties>;
+};
 
 /** Class authoring contract for a `*.render.ts` component. */
-export class RenderComponent<Properties extends PropertyMap = PropertyMap> {
+export interface RenderComponent<Properties extends PropertyMap = PropertyMap> {
+  readonly props: ComponentSelf<Properties>;
+  init?(): void;
+  update?(dt: number): void;
+  onMessage?(messageId: DefoldHash, message: unknown, sender: DefoldUrl): void;
+  onReload?(): void;
+}
+
+const RenderComponentBase = class RenderComponentRuntime<Properties extends PropertyMap = PropertyMap> {
   get props(): ComponentSelf<Properties> {
     return this as unknown as ComponentSelf<Properties>;
   }
+};
 
-  declare init?: () => void;
-  declare update?: (dt: number) => void;
-  declare onMessage?: (messageId: DefoldHash, message: unknown, sender: DefoldUrl) => void;
-  declare onReload?: () => void;
-}
+export const RenderComponent = RenderComponentBase as unknown as {
+  new <Properties extends PropertyMap = PropertyMap>(): RenderComponent<Properties>;
+};
 
 export type ComponentClassInstance<Properties extends PropertyMap = PropertyMap> =
   | ScriptComponent<Properties>

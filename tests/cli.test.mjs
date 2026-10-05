@@ -791,7 +791,9 @@ test("dmSDK usage materialization is deterministic and checkable", async () => {
   );
 
   const adapterRecipe = dmSdkUniversalRecipes.find(
-    ({ preferredLowering }) => preferredLowering?.state === "generated-adapter",
+    ({ declarationId, preferredLowering }) =>
+      preferredLowering?.state === "generated-adapter" &&
+      checkerIndex.index.declarations[declarationId]?.materialization?.state === "generated-adapter",
   );
   assert.ok(adapterRecipe);
   const adapterUsage = {
@@ -1692,19 +1694,40 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   assert.match(manifest.generation.nativeExtensionClang.versionSha256, /^[0-9a-f]{64}$/);
   assert.match(manifest.generation.nativeExtensionGeneratorSha256, /^[0-9a-f]{64}$/);
   assert.match(manifest.defoldRevision, /^[a-f0-9]{40}$/);
-  assert.equal(manifest.coverage.script.functions, 926);
-  assert.equal(manifest.coverage.script.constants, 141);
-  assert.equal(manifest.coverage.script.typeSurfaceUnresolved, 0);
-  assert.equal(manifest.coverage.script.universalRecipes, 915);
-  assert.equal(manifest.coverage.script.constantUniversalRecipes, 141);
-  assert.equal(manifest.coverage.script.universalRecipeTotal, 1056);
-  assert.equal(manifest.coverage.script.universalExclusions, 8);
-  assert.deepEqual(manifest.coverage.script.accounting, {
-    "executable-stable-id": 915,
-    "component-property-compiler": 8,
-    "separate-module": 3,
-    pending: 0,
-  });
+  const generatedScriptIr = JSON.parse(await readFile(path.join(output.root, "ir", "script-api.json"), "utf8"));
+  const generatedScriptUniversal = JSON.parse(
+    await readFile(path.join(output.root, "ir", "script-universal-value-bindings.json"), "utf8"),
+  );
+  const generatedScriptAccounting = JSON.parse(
+    await readFile(path.join(output.root, "ir", "script-api-accounting.json"), "utf8"),
+  );
+  const generatedScriptDispatch = JSON.parse(
+    await readFile(path.join(output.root, "ir", "script-scalar-dispatch.json"), "utf8"),
+  );
+  const generatedDmSdkIr = JSON.parse(await readFile(path.join(output.root, "ir", "dmsdk.json"), "utf8"));
+  const generatedDmSdkUniversal = JSON.parse(
+    await readFile(path.join(output.root, "ir", "dmsdk-universal-bindings.json"), "utf8"),
+  );
+  const generatedDmSdkScalarThunks = JSON.parse(
+    await readFile(path.join(output.root, "ir", "dmsdk-scalar-thunks.json"), "utf8"),
+  );
+  const generatedScriptConstants = generatedScriptUniversal.bindings.filter(
+    ({ loweringFamily }) => loweringFamily === "script-constant",
+  ).length;
+  const generatedScriptFunctions = generatedScriptUniversal.bindings.length - generatedScriptConstants;
+
+  // This test owns the project manifest projection. Inventory completeness and
+  // exact revision counts belong to coverage.test.mjs; do not duplicate them
+  // here. Every manifest value must instead be derived from the generated IR
+  // that the project actually received.
+  assert.equal(manifest.coverage.script.functions, generatedScriptIr.counts.functions);
+  assert.equal(manifest.coverage.script.constants, generatedScriptConstants);
+  assert.equal(manifest.coverage.script.typeSurfaceUnresolved, generatedScriptIr.typeSurfaceUnresolvedCount);
+  assert.equal(manifest.coverage.script.universalRecipes, generatedScriptFunctions);
+  assert.equal(manifest.coverage.script.constantUniversalRecipes, generatedScriptConstants);
+  assert.equal(manifest.coverage.script.universalRecipeTotal, generatedScriptUniversal.candidateCount);
+  assert.equal(manifest.coverage.script.universalExclusions, generatedScriptUniversal.excludedCount);
+  assert.deepEqual(manifest.coverage.script.accounting, generatedScriptAccounting.categoryCounts);
   // Dynamic Hermes roots Lua-owned closure results, so it alone reaches 913 by
   // promoting socket.newtry/socket.protect. Browser and raw Lua-stack transport
   // keep those two routes blocked below.
@@ -1722,19 +1745,19 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
     "separate-module": 3,
   });
   assert.deepEqual(manifest.coverage.script.runtimeLanes, {
-    generatedScalarDispatch: 90,
-    universalStableId: 915,
-    constantStableId: 141,
+    generatedScalarDispatch: generatedScriptDispatch.bindingCount,
+    universalStableId: generatedScriptFunctions,
+    constantStableId: generatedScriptConstants,
   });
-  assert.equal(manifest.coverage.dmsdk.declarations, 2141);
-  assert.equal(manifest.coverage.dmsdk.typeSurfaceUnresolved, 0);
-  assert.equal(manifest.coverage.dmsdk.runtimeDeclarations, 1361);
-  assert.equal(manifest.coverage.dmsdk.universalRecipes, 1361);
-  assert.equal(manifest.coverage.dmsdk.silentlyOmitted, 0);
+  assert.equal(manifest.coverage.dmsdk.declarations, generatedDmSdkIr.declarationCount);
+  assert.equal(manifest.coverage.dmsdk.typeSurfaceUnresolved, generatedDmSdkIr.typeSurfaceUnresolvedCount);
+  assert.equal(manifest.coverage.dmsdk.runtimeDeclarations, generatedDmSdkUniversal.coverage.declarations);
+  assert.equal(manifest.coverage.dmsdk.universalRecipes, generatedDmSdkUniversal.coverage.recipes);
+  assert.equal(manifest.coverage.dmsdk.silentlyOmitted, generatedDmSdkUniversal.coverage.silentlyOmitted);
   assert.deepEqual(manifest.coverage.dmsdk.runtimeLanes, {
-    generatedScalarThunks: 26,
-    preferredSpecialized: 101,
-    usageMaterializedFallback: 1260,
+    generatedScalarThunks: generatedDmSdkScalarThunks.coverage.generated,
+    preferredSpecialized: generatedDmSdkUniversal.coverage.preferredSpecialized,
+    usageMaterializedFallback: generatedDmSdkUniversal.coverage.usageMaterializedFallback,
     projectMaterialized: 0,
   });
   // The conformance target is the HOST this run would execute on, not a label
@@ -1785,12 +1808,12 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   assert.equal(manifest.engineProfiles.handshakeSchema, "deherm.script-route-capabilities/v1");
   assert.deepEqual(manifest.loweringPlan, {
     sha256: loweringPlan.planSha256,
-    units: 2428,
-    backendRecords: 12140,
+    units: loweringPlan.coverage.units,
+    backendRecords: loweringPlan.coverage.backendRecords,
   });
   assert.equal(
     JSON.parse(await readFile(path.join(output.root, "ir", "dmsdk-scalar-thunks.json"), "utf8")).coverage.generated,
-    26,
+    generatedDmSdkScalarThunks.coverage.generated,
   );
   const lock = JSON.parse(await readFile(path.join(project, "deherm.lock"), "utf8"));
   assert.equal(lock.defoldRevision, manifest.defoldRevision);

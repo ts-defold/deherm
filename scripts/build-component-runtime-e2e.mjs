@@ -8,6 +8,12 @@ const outputRoot = path.resolve("build/component-runtime-e2e/bundle");
 await rm(path.resolve("build/component-runtime-e2e"), { recursive: true, force: true });
 await mkdir(projectRoot, { recursive: true });
 await cp(path.resolve("tests/fixtures/component-runtime"), projectRoot, { recursive: true });
+const irRoot = path.join(projectRoot, ".deherm", "ir");
+await mkdir(irRoot, { recursive: true });
+await cp(
+  path.resolve("packages/bindings/generated/defold-component-proxy-contract.json"),
+  path.join(irRoot, "defold-component-proxy-contract.json"),
+);
 const result = await buildComponentRegistry({ projectRoot, outputRoot });
 const byContext = new Map(result.manifest.components.map((component) => [component.contextKind, component]));
 const contexts = ["game-object", "gui-scene", "render-instance+graphics"];

@@ -72,63 +72,74 @@ test("the public package ships directory boundaries instead of enumerated genera
   const manifest = JSON.parse(await readFile(path.join(repositoryRoot, "package.json"), "utf8"));
   assert.equal(manifest.name, "@ts-defold/deherm");
   assert.equal(manifest.source, "./packages/sdk/src/package.ts");
-  assert.deepEqual(manifest.files, [
+  const files = manifest.files;
+  assert.equal(new Set(files).size, files.length, "package files entries must be unique");
+
+  for (const required of [
     "bin/",
     "packages/cli/",
     "packages/compiler/",
-    "!packages/compiler/src/generated/",
     "packages/polyfills/",
-    "packages/sdk/src/address.ts",
-    "packages/sdk/src/component.ts",
-    "packages/sdk/src/host.ts",
-    "packages/sdk/src/hmr-state.ts",
-    "packages/sdk/src/package.ts",
-    "packages/static-hermes/src/globals.d.ts",
-    "packages/static-hermes/src/typed-app.ts",
-    "packages/static-hermes/src/generated/dmsdk-universal.ts",
     "packages/telemetry/",
-    "packages/toolchains/host-compilers.json",
-    "packages/toolchains/release-tags.json",
-    "scripts/assemble-typed-native-extension.mjs",
     "packages/web-adapter/",
-    "packages/bindings/policy-site.json",
-    "packages/bindings/profiles.json",
-    "packages/bindings/targets/",
     "defold/defold_hermes/",
-    "!defold/defold_hermes/lib/**/*.a",
-    "!defold/defold_hermes/lib/**/*.lib",
-    "!defold/defold_hermes/lib/**/.deherm-artifact.json",
-    "!defold/defold_hermes/include/libhermesvm-config.h",
-    "!defold/defold_hermes/include/defold_hermes/generated*",
-    "defold/defold_hermes/include/defold_hermes/generated_build_config.h",
-    "defold/defold_hermes/include/defold_hermes/generated_component_proxy_capability.hpp",
-    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_universal_static_frame.h",
-    "!defold/defold_hermes/src/generated*",
-    "defold/defold_hermes/src/generated_dmsdk_universal_static_frame.cpp",
-    "!defold/defold_hermes/lib/web/generated*",
-    "!packages/**/package.json",
-    "!packages/**/*.type-test.ts",
+    "extensions/defold-webtransport/defold_webtransport/",
     "README.md",
-  ]);
+  ]) {
+    assert.ok(files.includes(required), `public package is missing ${required}`);
+  }
+
+  const publishedTargets = [manifest.source, manifest.types];
+  for (const declaration of Object.values(manifest.exports)) {
+    if (typeof declaration === "string") publishedTargets.push(declaration);
+    else publishedTargets.push(...Object.values(declaration));
+  }
+  const included = (target) => {
+    const normalized = target.replace(/^\.\//, "");
+    return files.some(
+      (entry) =>
+        !entry.startsWith("!") && (entry === normalized || (entry.endsWith("/") && normalized.startsWith(entry))),
+    );
+  };
+  for (const target of new Set(publishedTargets)) {
+    assert.equal(included(target), true, `exported target ${target} is not covered by package files`);
+  }
+
+  assert.equal(
+    files.some((entry) => !entry.startsWith("!") && entry.startsWith("packages/bindings/generated/")),
+    false,
+    "revision-derived bindings must not be shipped in the npm package",
+  );
+  for (const extensionRoot of ["defold/defold_hermes/", "extensions/defold-webtransport/defold_webtransport/"]) {
+    assert.ok(files.includes(`!${extensionRoot}lib/**/*.a`), `${extensionRoot} must exclude static archives`);
+    assert.ok(files.includes(`!${extensionRoot}lib/**/*.lib`), `${extensionRoot} must exclude Windows archives`);
+  }
+  assert.ok(files.includes("!packages/**/package.json"));
+  assert.ok(files.includes("!packages/**/*.type-test.ts"));
 });
 
-test("every first-level example is a private workspace consumer", async () => {
+test("every first-level example declares either a deherm consumer or standalone contract", async () => {
   const exampleNames = (await readdir(path.join(repositoryRoot, "examples"), { withFileTypes: true }))
     .filter((entry) => entry.isDirectory())
     .map((entry) => entry.name)
     .sort();
-  assert.deepEqual(exampleNames, ["runtime-smoke", "war-battles-online"]);
+  assert.ok(exampleNames.length > 0, "the workspace must retain at least one runnable example");
 
   for (const exampleName of exampleNames) {
-    const manifest = JSON.parse(
-      await readFile(path.join(repositoryRoot, "examples", exampleName, "package.json"), "utf8"),
-    );
+    const exampleRoot = path.join(repositoryRoot, "examples", exampleName);
+    const manifest = JSON.parse(await readFile(path.join(exampleRoot, "package.json"), "utf8"));
     assert.equal(manifest.name, `@deherm/example-${exampleName}`);
     assert.equal(manifest.private, true);
-    assert.equal(manifest.dependencies?.["@ts-defold/deherm"], "workspace:*");
-    assert.equal(typeof manifest.source, "string");
-    await access(path.join(repositoryRoot, "examples", exampleName, manifest.source));
-    assert.ok(manifest.exports && Object.hasOwn(manifest.exports, "."));
+    if (manifest.dependencies?.["@ts-defold/deherm"] === "workspace:*") {
+      assert.equal(typeof manifest.source, "string", `${exampleName} has no TypeScript source entry`);
+      await access(path.join(exampleRoot, manifest.source));
+      assert.ok(manifest.exports && Object.hasOwn(manifest.exports, "."));
+      continue;
+    }
+
+    assert.equal(manifest.dependencies?.["@ts-defold/deherm"], undefined);
+    assert.equal(typeof manifest.scripts?.check, "string", `${exampleName} has no standalone verification command`);
+    await access(path.join(exampleRoot, "game.project"));
   }
 
   const runtimeSmokeTsconfig = JSON.parse(

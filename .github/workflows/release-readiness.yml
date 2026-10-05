@@ -48,8 +48,15 @@ jobs:
         env:
           DEHERM_WEBTRANSPORT_ARTIFACT_TARGET: web
         run: node bin/deherm.mjs generate --project examples/war-battles-online/defold --force
-      - run: node scripts/run-release-command.mjs pnpm test:dev
+      - name: Aggregate test gate
+        if: runner.os == 'Linux'
+        run: node scripts/run-release-command.mjs pnpm test
+      - name: Portable development tooling
+        if: runner.os != 'Linux'
+        run: node scripts/run-release-command.mjs pnpm test:dev
       - run: node scripts/run-release-command.mjs pnpm test:vscode
       - run: node scripts/run-release-command.mjs deno task --config examples/defold-webtransport-minimal/deno.json check
-      - run: node scripts/run-release-command.mjs node --test tests/defold-webtransport-package.test.mjs tests/defold-webtransport-minimal-example.test.mjs tests/defold-webtransport-public-api.test.mjs
-      - run: node scripts/run-release-command.mjs node native/webtransport-cpp/test/browser_backend_test.mjs
+      - if: runner.os != 'Linux'
+        run: node scripts/run-release-command.mjs node --test tests/defold-webtransport-package.test.mjs tests/defold-webtransport-minimal-example.test.mjs tests/defold-webtransport-public-api.test.mjs
+      - if: runner.os != 'Linux'
+        run: node scripts/run-release-command.mjs node native/webtransport-cpp/test/browser_backend_test.mjs

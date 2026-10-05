@@ -5548,3 +5548,31 @@ of 113 revision outputs (1,845,392 bytes) are locally rendered while 28
 published v1 recipes, fail-closed on manifest drift, and keyed/idempotent. This
 is generation, native harness, allocation, and materialization evidence; it is
 not blanket live-engine evidence for every Defold API call.
+
+## 2026-10-04 - The aggregate test graph is complete and non-duplicating
+
+The fast aggregate owns 164 unique root test files and the complete `verify`
+partition owns all 169 root test files, with no file scheduled twice inside
+either graph. A checked test-suite audit now rejects duplicate scheduling,
+unowned root suites, and near-duplicate test sources that share at least twenty
+four-line blocks covering 80% of the smaller file. The five bounded-span family
+suites share one deterministic generation, provenance, compiler, and native
+heap-scan harness while retaining their distinct semantic, exact-call, link,
+allocation, and failure-path assertions; the highest substantial static overlap
+is now 32.4%.
+
+The compiler-emission partition executes once under Node's source coverage gate.
+Its package-owned emitter scope currently measures 94.52% line, 84.00% branch,
+and 96.94% function coverage against required floors of 90%, 80%, and 95%.
+Coverage ownership is explicit in `tests/coverage-partitions.json`, and the
+runner reuses the leaf test script rather than copying its test inventory.
+
+Focused runtime evidence also passed after the audit exposed stale seams: the
+component proxy fixture now materializes the same project-local component IR
+boundary used by generated projects; its Lua and Hermes E2E gates pass with zero
+warmed Lua allocations. The current headless Defold plan was re-executed against
+the real local engine: 30 contracts were observed with zero mismatches and zero
+engine faults. A real Chrome-to-Deno WebTransport loopback run observed three
+authoritative snapshots and fifteen inputs. These are bounded runtime claims;
+they do not promote the remaining planned or unavailable routes to live-engine
+evidence.

@@ -129,7 +129,7 @@
     },
     "componentSdk": {
       "path": "packages/sdk/src/component.ts",
-      "sha256": "6e9c6ad3c6d79e7ae1fe3f923951ec955be37fa38d5aeea989b2d9c0e3b36d12"
+      "sha256": "d55d7eec24909bc27bc3d7213b53722624e1b9b46ad5278240a6460cb98337bc"
     },
     "nativeLuaHarness": {
       "path": "tests/native/component_proxy_lua_gate/component_proxy_lua_gate_test.cpp",
