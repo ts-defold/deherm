@@ -54,6 +54,9 @@ jobs:
         with:
           path: upstream
           key: release-readiness-upstreams-${{ runner.os }}-${{ hashFiles('upstream.lock') }}
+      - name: Install aggregate native headers
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install --yes libgl-dev
       - name: Bootstrap aggregate upstream inputs
         if: runner.os == 'Linux'
         run: ./scripts/bootstrap-upstreams.sh
