@@ -113,7 +113,7 @@
     },
     "hermesBackend": {
       "path": "defold/defold_hermes/src/component_hermes_backend.cpp",
-      "sha256": "b598030bc9136228288cc8a805df5ee2a6ab18f483b916f69be21cad2817f332"
+      "sha256": "d81e5fe0ee9644bfe63a4e31c4030c63e5a1496458db7811ecf5118f0f3e336a"
     },
     "webBackend": {
       "path": "defold/defold_hermes/src/component_web_backend.cpp",

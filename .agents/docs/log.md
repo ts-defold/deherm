@@ -5769,3 +5769,10 @@ contexts, property/lifecycle/message/input/reload/detach behavior, the bounded
 recursive event codec, generation rebinding, 1,000-cycle HMR soak, and heap
 telemetry. This is focused macOS compile/runtime evidence; the follow-up hosted
 Linux aggregate remains the authoritative GCC result.
+
+The first follow-up correctly failed the package-revision boundary before the
+native build because the component runtime capability records the production
+backend source digest. The capability was regenerated through its owning
+emitter after the control-flow-only source edit; its schema and emitted header
+are unchanged, and only the backend digest moved. This is generated-state
+provenance, not additional runtime evidence.
