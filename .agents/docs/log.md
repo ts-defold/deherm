@@ -1,5 +1,45 @@
 # Defold Hermes knowledge log
 
+## 2026-10-05 - One compatibility report for Defold, Turbo, Nitro, and JSI modules
+
+The module boundary now has one pure compatibility projection and one CLI
+scanner. `deherm module report <local-path>` recognizes Defold extension
+metadata, script APIs, public C/C++ headers, versioned déherm providers,
+TurboModule specs, Nitro specs, and plain JSI sources, then reports every
+current Defold bundle target. Implemented Defold routes are
+`generation-supported`; recognized Turbo/Nitro/JSI inputs remain
+`adapter-required` until their source importers emit the existing provider IR.
+Compile and runtime evidence are separate stages and cannot be inferred from a
+manifest or successful generation.
+
+Package inspection now retains the platform facts the author supplied instead
+of treating every recognized React Native spec as mobile-wide. Codegen target
+configuration, Nitro's `HybridObject` platform parameter, platform source
+sets, Windows/macOS dependencies, `.web` implementations, shared C/C++ cores,
+and explicit Emscripten/WASI references are named in the report. An adapter
+frontend with package facts is `adapter-required` only for the matching target
+groups; the other rows are `platform-unproven`. Static platform exclusions in
+`react-native.config.js` are reported as `platform-declared-unsupported`
+without importing or executing third-party JavaScript. A portable C++ core is not
+promoted to wasm without web/wasm evidence.
+
+`deherm module list` reads the package-owned known-module catalog. The catalog
+does not select generated code and cannot make an unknown name compatible; it
+only attaches independently recorded target evidence to structurally inspected
+facts. Defold WebTransport is the first entry. Its arm64-macOS and wasm-web
+product runs are recorded as runtime evidence, while the other ten current
+bundle targets remain generation evidence. The catalog and reports are both
+validated against the single Defold-derived target matrix.
+
+Focused tests exercise the real WebTransport tree plus a synthetic Nitro
+package. They prove target-matrix coverage, conservative runtime promotion,
+provider/method census, framework dependency detection, and an
+`adapter-required` result on the two iOS targets named by a Nitro PlatformSpec,
+three explicitly excluded Android targets, and the other seven targets
+`platform-unproven`. This is
+inspection/generation evidence; it does not claim arbitrary third-party module
+compilation.
+
 ## 2026-10-04 - Output realization has one package-owned implementation
 
 Issue #93's final ownership cleanup removes the duplicate renderer/oracle layer

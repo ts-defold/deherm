@@ -152,7 +152,9 @@ game.project -> Bob resolve -> extension inventory -> canonical binding IR
              -> TypeScript bundle + native adapters -> Bob build/bundle
 ```
 
-The initial CLI implements `doctor`, `extensions`, and `generate`. A clean npm
-tarball install has been exercised against the repository's sample Defold
-project. Build, watch, and run orchestration will be layered on this inventory
-rather than duplicating extension configuration.
+The CLI implements `doctor`, `extensions`, `generate`, and the project-agnostic
+`module report <path>` compatibility inspection. The report reuses the same
+binding-schema parser and Defold-derived target matrix; it does not keep a
+parallel platform table. A clean npm tarball install has been exercised against
+the repository's sample Defold project. Build, watch, and run orchestration is
+layered on this inventory rather than duplicating extension configuration.

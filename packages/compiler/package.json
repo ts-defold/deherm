@@ -62,6 +62,7 @@
     "./dmsdk-cpp-ownership-effect-frontend": "./src/dmsdk-cpp-ownership-effect-frontend.mjs",
     "./defold-source-include-aliases": "./src/defold-source-include-aliases.mjs",
     "./native-extension-generator": "./src/native-extension-generator.mjs",
+    "./native-module-compatibility": "./src/native-module-compatibility.mjs",
     "./defold-hash": "./src/defold-hash.mjs",
     "./ttsc": "./ttsc.mjs"
   }

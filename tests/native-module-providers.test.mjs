@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { transform } from "esbuild";
@@ -9,9 +10,63 @@ import {
   repositoryNativeModuleArtifactPath,
 } from "../scripts/generate-native-module-providers.mjs";
 import { parseNativeModuleDescriptorJson } from "../packages/compiler/src/native-module-provider-generator.mjs";
+import { inspectNativeModuleCompatibility, listKnownNativeModules } from "../packages/cli/src/module-compatibility.mjs";
 
 const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
 const schema = JSON.parse(await readFile(path.join(root, WEBTRANSPORT_SCHEMA), "utf8"));
+
+test("module compatibility uses one target matrix for the catalog and arbitrary module reports", async (t) => {
+  const known = await listKnownNativeModules({ packageRoot: root });
+  assert.deepEqual(
+    known.map(({ id }) => id),
+    ["defold-webtransport"],
+  );
+  assert.deepEqual(known[0].report.summary, { "generation-supported": 10, "runtime-verified": 2 });
+
+  const webtransport = await inspectNativeModuleCompatibility(
+    path.join(root, "extensions/defold-webtransport/defold_webtransport"),
+    { packageRoot: root },
+  );
+  assert.equal(webtransport.knownCatalogId, "defold-webtransport");
+  assert.equal(webtransport.report.capabilities.nativeProviders, 1);
+  assert.equal(webtransport.report.capabilities.nativeMethods, 12);
+  assert.equal(webtransport.report.platforms.find(({ target }) => target === "arm64-osx").status, "runtime-verified");
+  assert.equal(
+    webtransport.report.platforms.find(({ target }) => target === "arm64-android").status,
+    "generation-supported",
+  );
+
+  const nitro = await mkdtemp(path.join(tmpdir(), "deherm-module-report-"));
+  t.after(() => rm(nitro, { recursive: true, force: true }));
+  await writeFile(
+    path.join(nitro, "package.json"),
+    `${JSON.stringify({
+      name: "react-native-example",
+      version: "1.2.3",
+      dependencies: { "react-native-nitro-modules": "1.0.0" },
+    })}\n`,
+  );
+  await writeFile(
+    path.join(nitro, "Example.nitro.ts"),
+    'import type { HybridObject } from "react-native-nitro-modules";\nexport interface Example extends HybridObject<{ ios: "c++" }> {}\n',
+  );
+  await writeFile(
+    path.join(nitro, "react-native.config.js"),
+    "module.exports = { dependency: { platforms: { android: null } } };\n",
+  );
+  const report = await inspectNativeModuleCompatibility(nitro, { packageRoot: root });
+  assert.deepEqual(report.report.frontends, ["nitro-module-spec"]);
+  assert.deepEqual(report.report.frameworkDependencies, ["react-native-nitro-modules"]);
+  assert.deepEqual(report.report.summary, {
+    "adapter-required": 2,
+    "platform-declared-unsupported": 3,
+    "platform-unproven": 7,
+  });
+  assert.deepEqual(
+    report.report.platforms.filter(({ status }) => status === "adapter-required").map(({ target }) => target),
+    ["arm64_sim-ios", "arm64-ios"],
+  );
+});
 
 test("extension schema owns the generic provider and WebTransport artifacts", async () => {
   const artifacts = generateNativeModuleProviderArtifacts(schema, { artifactPath: repositoryNativeModuleArtifactPath });

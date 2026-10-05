@@ -25,6 +25,7 @@ export * from "./dmsdk-universal-materializer.mjs";
 export * from "./dmsdk-universal-jsi-exact-runner.mjs";
 export * from "./dmsdk-universal-static-frame.mjs";
 export * from "./native-extension-generator.mjs";
+export * from "./native-module-compatibility.mjs";
 export * from "./defold-hash.mjs";
 export * from "./dmsdk-call-symbol-index.mjs";
 export * from "./dmsdk-concrete-call-plan.mjs";

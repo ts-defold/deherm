@@ -47,6 +47,40 @@ compatibility. A later adapter may ingest a conservative subset of
 TurboModule or `*.nitro.ts` specs, but generated C++ must target the
 Defold-owned installer ABI.
 
+All module families enter one compatibility frontend. Defold `ext.manifest`,
+`.script_api`, public C/C++ headers, and `defold-hermes.bindings.json` are
+implemented inputs. TurboModule specs, `*.nitro.ts`, and plain JSI installers
+are recognized inputs whose report currently names the required adapter. They
+must not grow independent target matrices or registries: their eventual
+importers normalize into the same runtime-neutral module IR and emit the same
+Defold-owned provider ABI.
+
+`deherm module report <local-path>` projects that normalized evidence over the
+Defold-derived bundle-target matrix. `deherm module list` reads a checked-in
+known-module catalog. A target is `generation-supported`, `compile-verified`,
+or `runtime-verified`; those stages are deliberately not promoted into one
+another. `adapter-required` means the source pattern was recognized but its
+frontend cannot emit the provider ABI yet. Manifest `platforms` keys are
+reported as build-context overrides, not misread as an allowlist.
+
+The inspector first uses package-owned facts: React Native `codegenConfig`,
+Nitro `HybridObject` platform specs, Android/iOS/Windows/macOS source sets,
+platform-specific web sources, shared C/C++ cores, and explicit Emscripten or
+WASI source. A package fact makes an adapter candidate visible only on the
+matching target group; targets with no such fact are `platform-unproven`.
+Static `react-native.config.js` platform exclusions are retained as
+`platform-declared-unsupported` without executing package code.
+Shared C++ is a native portability fact, not automatic wasm proof. Web becomes
+a candidate only from a web implementation or explicit wasm toolchain source.
+Compile/runtime catalog evidence can then strengthen that result.
+
+The catalog is evidence, not a name-based compiler switch. Catalog entries may
+upgrade a target's independently recorded compile/runtime stage, while route
+selection still comes from inspected module facts. Its initial entry is Defold
+WebTransport: arm64 macOS and wasm-web have recorded product runtime evidence;
+the remaining Defold targets retain generation evidence until their own gates
+run.
+
 # Implemented proof
 
 The sample resolves a typed `ExampleMath` module and calls `add(20, 22)`.
@@ -243,9 +277,11 @@ materialized project SDK projection.
 
 # Follow-up
 
-Add pointer/out-parameter lowering for general modules, callbacks, promises,
-and hybrid-object lifetime. Complete the ttsc AST lowering and combined
-high-level Static Hermes gate described above. Run the packaged native game
-against the authoritative server. The generated provider bridge is complete at
-its named boundary; transport-library interoperability and packaged-engine
-runtime evidence remain separate.
+Implement TurboModule and Nitro spec importers as frontends to the existing IR,
+then add pointer/out-parameter lowering for general modules, callbacks,
+promises, and hybrid-object lifetime. Complete the ttsc AST lowering and
+combined high-level Static Hermes gate described above. Each known module must
+gain target evidence through compile/runtime gates rather than catalog prose.
+The generated provider bridge is complete at its named boundary;
+transport-library interoperability and packaged-engine runtime evidence remain
+separate.

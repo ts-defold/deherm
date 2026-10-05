@@ -156,6 +156,22 @@ pnpm exec deherm typecheck
 pnpm exec deherm verify-generated
 ```
 
+Inspect a module before adopting it, or list modules with recorded target
+evidence:
+
+```sh
+pnpm exec deherm module report ./path/to/module
+pnpm exec deherm module report ./node_modules/some-native-module --target arm64-ios,wasm-web
+pnpm exec deherm module list
+```
+
+The report recognizes Defold extensions, déherm providers, TurboModule specs,
+Nitro specs, and plain JSI sources. It distinguishes a route the generator can
+emit from an independently compile- or runtime-verified target. Turbo/Nitro
+source shapes currently report `adapter-required`; they are designed to feed
+the same Defold-owned provider IR rather than importing the React Native
+runtime.
+
 ## Development tools
 
 The CLI is the control plane:

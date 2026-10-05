@@ -34,6 +34,8 @@ Commands:
   policy       Fetch, authenticate, and cache the Pages policy for the project's Defold revision
   cache        Report or reclaim old immutable policy surfaces (dry-run by default)
   extensions   List native extensions and their script API coverage
+  module list  List modules with recorded compatibility evidence
+  module report <path>  Inspect a local Defold, TurboModule, Nitro, or JSI module and report every target
   generate     Write project inventory, TypeScript SDK, tsconfig, and VS Code setup
   assemble-typed-native  Compile the reachable Static Hermes lane into a Defold extension
   prepare-bob  Project the runtime bundle Bob may archive for one target/variant
@@ -133,6 +135,15 @@ export function parseArguments(argv) {
   if (args[0] && !args[0].startsWith("-")) options.command = args.shift();
   if (options.command === "conformance" && args[0] && !args[0].startsWith("-")) options.action = args.shift();
   if (options.command === "profile" && args[0] && !args[0].startsWith("-")) options.action = args.shift();
+  if (options.command === "module" && args[0] && !args[0].startsWith("-")) options.action = args.shift();
+  if (
+    options.command === "module" &&
+    ["report", "inspect"].includes(options.action) &&
+    args[0] &&
+    !args[0].startsWith("-")
+  ) {
+    options.modulePath = args.shift();
+  }
   if (options.command === "create" && args[0] && !args[0].startsWith("-")) options.directory = args.shift();
   while (args.length) {
     const value = args.shift();
@@ -885,6 +896,49 @@ export async function run(argv = process.argv.slice(2)) {
       );
     else console.log(formatBugPool(result.document, { cwd: process.cwd(), poolFile: result.poolFile }));
     return 0;
+  }
+  if (options.command === "module") {
+    const { formatNativeModuleCompatibility, inspectNativeModuleCompatibility, listKnownNativeModules } =
+      await import("./module-compatibility.mjs");
+    if (options.action === "list") {
+      const modules = await listKnownNativeModules();
+      if (options.json) console.log(JSON.stringify({ schemaVersion: 1, modules }, null, 2));
+      else {
+        if (!modules.length) console.log("No modules have recorded compatibility evidence.");
+        for (const module of modules) {
+          const summary = Object.entries(module.report.summary)
+            .map(([status, count]) => `${count} ${status}`)
+            .join(", ");
+          console.log(`${module.id}  ${module.name}  ${summary}`);
+          console.log(`  ${module.source}`);
+        }
+      }
+      return 0;
+    }
+    if (!["report", "inspect"].includes(options.action) || !options.modulePath) {
+      throw new Error("module requires 'list' or 'report <local-path>'");
+    }
+    const result = await inspectNativeModuleCompatibility(options.modulePath);
+    if (options.target) {
+      const requested = new Set(
+        options.target
+          .split(",")
+          .map((value) => value.trim())
+          .filter(Boolean),
+      );
+      result.report.platforms = result.report.platforms.filter(({ target }) => requested.has(target));
+      const found = new Set(result.report.platforms.map(({ target }) => target));
+      const unknown = [...requested].filter((target) => !found.has(target));
+      if (unknown.length) throw new Error(`Unknown Defold target(s): ${unknown.join(", ")}`);
+      result.report.summary = Object.fromEntries(
+        [...new Set(result.report.platforms.map(({ status }) => status))]
+          .sort()
+          .map((status) => [status, result.report.platforms.filter((row) => row.status === status).length]),
+      );
+    }
+    if (options.json) console.log(JSON.stringify({ schemaVersion: 1, ...result }, null, 2));
+    else console.log(formatNativeModuleCompatibility(result));
+    return options.strict && result.report.platforms.some(({ status }) => status === "blocked") ? 1 : 0;
   }
   if (options.command === "cache") {
     const { formatPolicyCacheReport, maintainPolicyCache } = await import("./policy-cache-maintenance.mjs");
