@@ -3,8 +3,9 @@ import { createHash } from "node:crypto";
 import { chmod, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import test from "node:test";
+import test, { after } from "node:test";
 
+import { createIncrementalCompiler } from "../packages/cli/src/dev/compiler.mjs";
 import {
   buildGate,
   hostFamilyExpectedDigests,
@@ -13,6 +14,48 @@ import {
 
 const root = path.resolve(import.meta.dirname, "..");
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
+const warBattlesProject = path.join(root, "examples/war-battles-online/defold");
+let applicationFixtureRoot;
+let applicationFixturePromise;
+
+async function lockedApplicationBundle() {
+  applicationFixturePromise ??= (async () => {
+    applicationFixtureRoot = await mkdtemp(path.join(tmpdir(), "deherm-static-application-fixture-"));
+    const projectLock = JSON.parse(await readFile(path.join(warBattlesProject, "deherm.lock"), "utf8"));
+    const locked = projectLock.buildArtifacts.artifacts["deherm/app.dehermc"];
+    const build = locked.build;
+    const outputFile = path.join(applicationFixtureRoot, "app.dehermc");
+    const compiler = await createIncrementalCompiler({
+      entryPoint: path.join(warBattlesProject, build.entryPoint),
+      preludeEntries: build.preludeEntries.map((entry) => path.join(warBattlesProject, entry)),
+      tsconfig: path.join(warBattlesProject, build.tsconfig),
+      outputFile,
+      mirrors: [],
+      resourcePath: locked.resource,
+      useTtsc: build.ttsc,
+      target: build.target,
+      sourcemap: build.sourcemap,
+      bytecode: false,
+      ...(build.define ? { define: build.define } : {}),
+    });
+    try {
+      await compiler.rebuild();
+    } finally {
+      await compiler.dispose();
+    }
+    assert.equal(
+      sha256(await readFile(outputFile)),
+      locked.outputs["deherm/app.dehermc"],
+      "clean-room application bundle differs from deherm.lock",
+    );
+    return outputFile;
+  })();
+  return applicationFixturePromise;
+}
+
+after(async () => {
+  if (applicationFixtureRoot) await rm(applicationFixtureRoot, { recursive: true, force: true });
+});
 
 async function copyLockedApplicationSources(sourceRoot, project, projectLock) {
   const lockedApplication = projectLock.buildArtifacts.artifacts["deherm/app.dehermc"];
@@ -56,6 +99,7 @@ test("War Battles Static Hermes gate derives a closed release route set", async 
       shermes: path.join(root, "build/native/bin/shermes"),
       allowUnpinnedToolchain: true,
       typedNativeSource: path.join(root, "packages/static-hermes/src/generated/script-typed-native-bridge.ts"),
+      applicationBundle: await lockedApplicationBundle(),
     });
     assert.equal(report.schemaVersion, 1);
     assert.equal(report.kind, "deherm.war-battles.static-hermes-build-gate");
@@ -98,7 +142,11 @@ test("War Battles Static Hermes gate derives a closed release route set", async 
 test("default toolchain policy fails closed before unpinned emission", async () => {
   const output = await mkdtemp(path.join(tmpdir(), "deherm-static-gate-"));
   try {
-    const report = await buildGate({ output, shermes: path.join(output, "missing-shermes") });
+    const report = await buildGate({
+      output,
+      shermes: path.join(output, "missing-shermes"),
+      applicationBundle: await lockedApplicationBundle(),
+    });
     assert.equal(report.status, "blocked");
     assert.ok(report.blockers.length > 0);
     assert.equal(report.stages.find(({ name }) => name === "compile")?.status, "blocked");
@@ -142,7 +190,7 @@ test("Static product gate rejects an application bundle outside the project lock
   const output = await mkdtemp(path.join(tmpdir(), "deherm-static-gate-bundle-drift-"));
   try {
     const applicationBundle = path.join(output, "app.dehermc");
-    const source = await readFile(path.join(root, "examples/war-battles-online/defold/deherm/app.dehermc"));
+    const source = await readFile(await lockedApplicationBundle());
     await writeFile(applicationBundle, Buffer.concat([source, Buffer.from("\n// stale replacement\n")]));
     const report = await buildGate({ applicationBundle, output: path.join(output, "gate") });
     assert.equal(report.status, "blocked");
@@ -164,7 +212,7 @@ test("Static product gate rejects a lock and bundle that are stale against curre
     await writeFile(path.join(project, "src/generated-war-battles/world.ts"), "// stale imported source\n");
     const report = await buildGate({
       project,
-      applicationBundle: path.join(sourceRoot, "deherm/app.dehermc"),
+      applicationBundle: await lockedApplicationBundle(),
       output: path.join(output, "gate"),
     });
     assert.equal(report.status, "blocked");
@@ -191,6 +239,7 @@ test("Static product gate rejects a truncated application source inventory", asy
     const report = await buildGate({
       project: sourceRoot,
       projectLock: projectLockPath,
+      applicationBundle: await lockedApplicationBundle(),
       output: path.join(output, "gate"),
     });
     assert.equal(report.status, "blocked");
@@ -224,7 +273,7 @@ test("Static product gate rejects an authored source tree newer than its locked 
     const report = await buildGate({
       project,
       output: path.join(output, "gate"),
-      applicationBundle: path.join(sourceRoot, "deherm/app.dehermc"),
+      applicationBundle: await lockedApplicationBundle(),
       projectLock: path.join(sourceRoot, "deherm.lock"),
     });
     assert.equal(report.status, "blocked");
@@ -246,7 +295,11 @@ test("Static product gate rejects a lowering-plan override outside the checked p
     plan.units[0].identity.stableId ^= 1;
     const loweringPlan = path.join(output, "lowering-plan.json");
     await writeFile(loweringPlan, `${JSON.stringify(plan, null, 2)}\n`);
-    const report = await buildGate({ loweringPlan, output: path.join(output, "gate") });
+    const report = await buildGate({
+      loweringPlan,
+      applicationBundle: await lockedApplicationBundle(),
+      output: path.join(output, "gate"),
+    });
     assert.equal(report.status, "blocked");
     assert.match(report.blockers[0]?.message ?? "", /different canonical lowering plan/u);
     assert.deepEqual(report.stages, [{ name: "provenance", status: "blocked" }]);
@@ -265,7 +318,11 @@ test("Static product gate rejects a self-consistent replacement projection", asy
     projection.recordSha256 = sha256(JSON.stringify(body));
     const replacement = path.join(output, "projection.json");
     await writeFile(replacement, `${JSON.stringify(projection, null, 2)}\n`);
-    const report = await buildGate({ projection: replacement, output: path.join(output, "gate") });
+    const report = await buildGate({
+      projection: replacement,
+      applicationBundle: await lockedApplicationBundle(),
+      output: path.join(output, "gate"),
+    });
     assert.equal(report.status, "blocked");
     assert.match(report.blockers[0]?.message ?? "", /not an independently reconstructed release projection/u);
     assert.deepEqual(report.stages, [{ name: "provenance", status: "blocked" }]);
@@ -319,6 +376,7 @@ exit 0
       allowUnpinnedToolchain: true,
       typedNativeSource: path.join(root, "packages/static-hermes/src/generated/script-typed-native-bridge.ts"),
       projectLock: projectLockPath,
+      applicationBundle: await lockedApplicationBundle(),
       link: true,
       java: fakeJava,
       buildServer: "https://fake.invalid",
