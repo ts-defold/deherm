@@ -103,7 +103,7 @@ test("astc C ABI and bounded runtime compile, link to pinned parser source, beha
       ...includes,
       "defold/defold_hermes/src/generated_dmsdk_astc_probe_image.cpp",
       "upstream/defold/engine/dlib/src/dlib/image.cpp",
-      "-Wl,-dead_strip",
+      process.platform === "darwin" ? "-Wl,-dead_strip" : "-Wl,--gc-sections",
     ];
     const cabi = join(out, "cabi");
     run(cxx, [...common, cobj, "-o", cabi]);

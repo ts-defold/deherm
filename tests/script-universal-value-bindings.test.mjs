@@ -6,6 +6,8 @@ import path from "node:path";
 import test from "node:test";
 import vm from "node:vm";
 
+import { requireHostTool } from "../packages/cli/src/host-compilers.mjs";
+
 const root = path.resolve(import.meta.dirname, "..");
 const reportPath = path.join(root, "packages/bindings/generated/defold-script-universal-value-bindings.json");
 
@@ -287,6 +289,7 @@ test("portable C ABI compiles as C, runs recursive/reentrant native behavior, an
       [
         "#include <defold_hermes/generated_script_universal_value_capi.h>",
         "int main(void) { DehermScriptUniversalValue value = {0}; return (int)value.tag; }",
+        "",
       ].join("\n"),
     );
     run(process.env.CC ?? "clang", [
@@ -367,7 +370,7 @@ test("Static Hermes provider type-checks and compiles through the pinned Static 
     "packages/static-hermes/src/generated/script-universal-value.ts",
     "tests/fixtures/static-hermes-universal-types.ts",
   ]);
-  const shermes = path.join(root, "build/native/bin/shermes");
+  const shermes = (await requireHostTool("shermes")).path;
   const output = path.join(tmpdir(), `deherm-script-universal-static-${process.pid}.c`);
   const staticSource = await readFile(
     path.join(root, "packages/static-hermes/src/generated/script-universal-value.ts"),
@@ -388,6 +391,7 @@ test("Static Hermes provider type-checks and compiles through the pinned Static 
     ]);
   } finally {
     await rm(staticInput, { force: true });
+    await rm(output, { force: true });
   }
 });
 

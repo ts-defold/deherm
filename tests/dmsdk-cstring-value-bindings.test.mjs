@@ -321,6 +321,7 @@ test("generated sources compile against the complete pinned SDK", async () => {
         "-pedantic",
         ...includes,
         `-I${path.join(root, "upstream/hermes/API")}`,
+        `-I${path.join(root, "upstream/hermes/API/jsi")}`,
         "-c",
         source,
         "-o",

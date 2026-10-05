@@ -183,6 +183,7 @@ test("every emitted module compiles to an object against pinned Defold headers",
     `-I${join(repositoryRoot, "defold/defold_hermes/include")}`,
     "-isystem",
     join(repositoryRoot, "upstream/defold/engine/dlib/src"),
+    `-I${join(repositoryRoot, "upstream/hermes/API/jsi")}`,
     '-DDLIB_LOG_DOMAIN="deherm"',
   ];
   const outputDirectory = await mkdtemp(join(tmpdir(), "deherm-dmsdk-scalar-objects-"));

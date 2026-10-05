@@ -85,7 +85,13 @@ test("xtea span derives bounds and results from implementation dataflow without 
     assert.equal(extractXteaSpanSemantics(declaration, candidate, enums, policy.recipe, { definitions: [] }), null);
   }
 });
-test("xtea packaged link, bounds, behavior, and warmed allocation gate", async () => {
+test("xtea packaged link, bounds, behavior, and warmed allocation gate", async (context) => {
+  if (process.platform !== "darwin" || process.arch !== "arm64") {
+    context.skip(
+      `pinned packaged-library runtime harness requires arm64-macos, got ${process.arch}-${process.platform}`,
+    );
+    return;
+  }
   const o = await mkdtemp(join(tmpdir(), "deherm-xtea-host-"));
   try {
     const exe = join(o, "host");

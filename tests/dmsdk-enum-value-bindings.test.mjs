@@ -28,6 +28,7 @@ function includeArgs() {
     join(sdkRoot, "sdk/include"),
     "-isystem",
     join(sdkRoot, "include"),
+    `-I${join(repositoryRoot, "upstream/hermes/API/jsi")}`,
     '-DDLIB_LOG_DOMAIN="deherm"',
   ];
 }

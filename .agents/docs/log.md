@@ -5733,3 +5733,26 @@ compile-out proof also searched for Mach-O's leading underscore on two C symbol
 names, which ELF intentionally omits; it now matches the source-level symbol
 identity common to both formats. These changes repair test inputs and symbol
 inspection only; no generated binding or production transport changed.
+
+The subsequent hosted aggregate reached the later binding-runtime/codegen
+partition and exposed four more clean-host assumptions. Three generated JSI
+translation-unit tests now name the pinned Hermes `API/jsi` include root rather
+than relying on an ignored extension-header copy. The ASTC harness selects the
+host linker's dead-code-elimination spelling, while the XTEA packaged-library
+harness now states its existing arm64-macOS scope explicitly, consistent with
+the sibling packaged-library tests. The portable C probe now ends in a newline
+under `-Werror`, and the Static Hermes compile test resolves the authenticated,
+package-pinned `shermes` artifact instead of a contributor build directory.
+
+With the ignored extension JSI headers removed during the run, all 42 focused
+tests pass on arm64 macOS, including the generated translation units, native
+ASTC/XTEA execution, warmed allocation checks, the portable C ABI, and Static
+Hermes emission. This is focused host compile/runtime evidence; the aggregate
+and hosted release-readiness gates are recorded only after their own runs.
+
+The literal aggregate `pnpm test` gate then passed on arm64 macOS. That run
+included the complete generated-state and clean-room checks, 307/307
+binding-runtime/codegen tests, native component-runtime execution, policy and
+revision derivation, CLI/TUI/debugger/profiler tests, WebTransport and War
+Battles network tests, and release reachability. This is local aggregate
+evidence; hosted Linux evidence remains a separate release-readiness result.
