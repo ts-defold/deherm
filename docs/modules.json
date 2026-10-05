@@ -1,0 +1,140 @@
+{
+  "schemaVersion": 1,
+  "entries": [
+    {
+      "id": "defold-webtransport",
+      "name": "Defold WebTransport",
+      "description": "WebTransport-shaped Defold extension with Lua, C, dynamic Hermes/JSI, Static Hermes, and browser backends.",
+      "moduleKind": "headless",
+      "source": "https://github.com/ts-defold/deherm/tree/main/extensions/defold-webtransport",
+      "summary": {
+        "generation-supported": 10,
+        "runtime-verified": 2
+      },
+      "platforms": [
+        {
+          "target": "arm64_sim-ios",
+          "group": "ios",
+          "status": "generation-supported",
+          "route": "deherm-native-provider",
+          "evidence": {
+            "stage": "generation",
+            "source": "module-compatibility-analyzer"
+          }
+        },
+        {
+          "target": "arm64-android",
+          "group": "android",
+          "status": "generation-supported",
+          "route": "deherm-native-provider",
+          "evidence": {
+            "stage": "generation",
+            "source": "module-compatibility-analyzer"
+          }
+        },
+        {
+          "target": "arm64-ios",
+          "group": "ios",
+          "status": "generation-supported",
+          "route": "deherm-native-provider",
+          "evidence": {
+            "stage": "generation",
+            "source": "module-compatibility-analyzer"
+          }
+        },
+        {
+          "target": "arm64-linux",
+          "group": "linux",
+          "status": "generation-supported",
+          "route": "deherm-native-provider",
+          "evidence": {
+            "stage": "generation",
+            "source": "module-compatibility-analyzer"
+          }
+        },
+        {
+          "target": "arm64-osx",
+          "group": "osx",
+          "status": "runtime-verified",
+          "route": "deherm-native-provider",
+          "evidence": {
+            "stage": "runtime",
+            "source": ".agents/docs/log.md#2026-09-23---war-battles-chassis-vertical-slice",
+            "detail": "Packaged arm64 Defold runtime loaded and exercised the generated provider path."
+          }
+        },
+        {
+          "target": "armv7-android",
+          "group": "android",
+          "status": "generation-supported",
+          "route": "deherm-native-provider",
+          "evidence": {
+            "stage": "generation",
+            "source": "module-compatibility-analyzer"
+          }
+        },
+        {
+          "target": "wasm_pthread-web",
+          "group": "web",
+          "status": "generation-supported",
+          "route": "deherm-native-provider",
+          "evidence": {
+            "stage": "generation",
+            "source": "module-compatibility-analyzer"
+          }
+        },
+        {
+          "target": "wasm-web",
+          "group": "web",
+          "status": "runtime-verified",
+          "route": "browser-webtransport",
+          "evidence": {
+            "stage": "runtime",
+            "source": ".agents/docs/log.md#2026-09-23---war-battles-chassis-vertical-slice",
+            "detail": "Bob wasm-web bundle ran in Chrome/WebGL with the browser WebTransport backend."
+          }
+        },
+        {
+          "target": "x86_64-android",
+          "group": "android",
+          "status": "generation-supported",
+          "route": "deherm-native-provider",
+          "evidence": {
+            "stage": "generation",
+            "source": "module-compatibility-analyzer"
+          }
+        },
+        {
+          "target": "x86_64-linux",
+          "group": "linux",
+          "status": "generation-supported",
+          "route": "deherm-native-provider",
+          "evidence": {
+            "stage": "generation",
+            "source": "module-compatibility-analyzer"
+          }
+        },
+        {
+          "target": "x86_64-osx",
+          "group": "osx",
+          "status": "generation-supported",
+          "route": "deherm-native-provider",
+          "evidence": {
+            "stage": "generation",
+            "source": "module-compatibility-analyzer"
+          }
+        },
+        {
+          "target": "x86_64-win32",
+          "group": "win32",
+          "status": "generation-supported",
+          "route": "deherm-native-provider",
+          "evidence": {
+            "stage": "generation",
+            "source": "module-compatibility-analyzer"
+          }
+        }
+      ]
+    }
+  ]
+}

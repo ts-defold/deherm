@@ -196,6 +196,146 @@
       "height": 1800
     }
   },
+  "modules": {
+    "schemaVersion": 1,
+    "entries": [
+      {
+        "id": "defold-webtransport",
+        "name": "Defold WebTransport",
+        "description": "WebTransport-shaped Defold extension with Lua, C, dynamic Hermes/JSI, Static Hermes, and browser backends.",
+        "moduleKind": "headless",
+        "source": "https://github.com/ts-defold/deherm/tree/main/extensions/defold-webtransport",
+        "summary": {
+          "generation-supported": 10,
+          "runtime-verified": 2
+        },
+        "platforms": [
+          {
+            "target": "arm64_sim-ios",
+            "group": "ios",
+            "status": "generation-supported",
+            "route": "deherm-native-provider",
+            "evidence": {
+              "stage": "generation",
+              "source": "module-compatibility-analyzer"
+            }
+          },
+          {
+            "target": "arm64-android",
+            "group": "android",
+            "status": "generation-supported",
+            "route": "deherm-native-provider",
+            "evidence": {
+              "stage": "generation",
+              "source": "module-compatibility-analyzer"
+            }
+          },
+          {
+            "target": "arm64-ios",
+            "group": "ios",
+            "status": "generation-supported",
+            "route": "deherm-native-provider",
+            "evidence": {
+              "stage": "generation",
+              "source": "module-compatibility-analyzer"
+            }
+          },
+          {
+            "target": "arm64-linux",
+            "group": "linux",
+            "status": "generation-supported",
+            "route": "deherm-native-provider",
+            "evidence": {
+              "stage": "generation",
+              "source": "module-compatibility-analyzer"
+            }
+          },
+          {
+            "target": "arm64-osx",
+            "group": "osx",
+            "status": "runtime-verified",
+            "route": "deherm-native-provider",
+            "evidence": {
+              "stage": "runtime",
+              "source": ".agents/docs/log.md#2026-09-23---war-battles-chassis-vertical-slice",
+              "detail": "Packaged arm64 Defold runtime loaded and exercised the generated provider path."
+            }
+          },
+          {
+            "target": "armv7-android",
+            "group": "android",
+            "status": "generation-supported",
+            "route": "deherm-native-provider",
+            "evidence": {
+              "stage": "generation",
+              "source": "module-compatibility-analyzer"
+            }
+          },
+          {
+            "target": "wasm_pthread-web",
+            "group": "web",
+            "status": "generation-supported",
+            "route": "deherm-native-provider",
+            "evidence": {
+              "stage": "generation",
+              "source": "module-compatibility-analyzer"
+            }
+          },
+          {
+            "target": "wasm-web",
+            "group": "web",
+            "status": "runtime-verified",
+            "route": "browser-webtransport",
+            "evidence": {
+              "stage": "runtime",
+              "source": ".agents/docs/log.md#2026-09-23---war-battles-chassis-vertical-slice",
+              "detail": "Bob wasm-web bundle ran in Chrome/WebGL with the browser WebTransport backend."
+            }
+          },
+          {
+            "target": "x86_64-android",
+            "group": "android",
+            "status": "generation-supported",
+            "route": "deherm-native-provider",
+            "evidence": {
+              "stage": "generation",
+              "source": "module-compatibility-analyzer"
+            }
+          },
+          {
+            "target": "x86_64-linux",
+            "group": "linux",
+            "status": "generation-supported",
+            "route": "deherm-native-provider",
+            "evidence": {
+              "stage": "generation",
+              "source": "module-compatibility-analyzer"
+            }
+          },
+          {
+            "target": "x86_64-osx",
+            "group": "osx",
+            "status": "generation-supported",
+            "route": "deherm-native-provider",
+            "evidence": {
+              "stage": "generation",
+              "source": "module-compatibility-analyzer"
+            }
+          },
+          {
+            "target": "x86_64-win32",
+            "group": "win32",
+            "status": "generation-supported",
+            "route": "deherm-native-provider",
+            "evidence": {
+              "stage": "generation",
+              "source": "module-compatibility-analyzer"
+            }
+          }
+        ]
+      }
+    ]
+  },
   "sourceInputs": [
     {
       "path": "package.json",
@@ -226,6 +366,16 @@
       "path": "examples/war-battles-online/evidence/vscode-live-values.json",
       "bytes": 2712,
       "sha256": "a75c6fda282b75bdf9cbd63bc893ffa0975864d45468269a8cc0564be3b0b3bf"
+    },
+    {
+      "path": "packages/compiler/data/native-module-catalog.json",
+      "bytes": 1336,
+      "sha256": "a825fc8664b3d1cb967fb7d6a42a845048fc786a4578cb1810b62e1e3ba8fac2"
+    },
+    {
+      "path": "packages/toolchains/defold-bundle-targets.json",
+      "bytes": 2162,
+      "sha256": "65a25d0043db47b09903d8b07b1708f59de16f425700203888e63dd35204db44"
     }
   ],
   "evidenceBoundary": "Only release bundle records and unprofiled Release transport benchmarks are presented as size or overhead evidence. Development artifacts, repository totals, and CI cache sizes are excluded."
