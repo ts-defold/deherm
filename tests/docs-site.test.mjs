@@ -17,6 +17,7 @@ test("docs lead with truthful new- and existing-project quick starts", async () 
     .replaceAll("&lt;", "<")
     .replaceAll("&gt;", ">");
   const metrics = JSON.parse(await readFile(path.join(output, "metrics.json"), "utf8"));
+  const modules = JSON.parse(await readFile(path.join(output, "modules.json"), "utf8"));
 
   assert.match(visibleText, /pnpm dlx @ts-defold\/deherm create my-game --name/u);
   assert.match(visibleText, /pnpm add -D @ts-defold\/deherm/u);
@@ -33,6 +34,11 @@ test("docs lead with truthful new- and existing-project quick starts", async () 
   assert.match(page, /<span style="color:/u);
   assert.match(page, /Build, launch, inspect, reload/u);
   assert.match(page, /Your game, alive in the editor/u);
+  assert.match(page, /Native module directory/u);
+  assert.match(page, /Portable capability, with receipts/u);
+  assert.match(page, /deherm module report &lt;package&gt; --directory/u);
+  assert.match(page, /<summary>Target evidence<\/summary>/u);
+  assert.match(page, /blob\/main\/\.agents\/docs\/log\.md#2026-09-23/u);
   assert.match(page, /class="shot shot-vscode"/u);
   assert.match(page, /data-section-link/u);
   assert.match(page, /aria-current/u);
@@ -55,6 +61,12 @@ test("docs lead with truthful new- and existing-project quick starts", async () 
   assert.equal(metrics.release.browserWasmWeb.embedsHermes, false);
   assert.equal(metrics.transport.build.cmakeBuildType, "Release");
   assert.equal(metrics.transport.build.profiling, false);
+  assert.deepEqual(
+    modules.entries.map(({ id, moduleKind }) => [id, moduleKind]),
+    [["defold-webtransport", "headless"]],
+  );
+  assert.equal(modules.entries[0].platforms.length, 12);
+  assert.equal(modules.entries[0].platforms.find(({ target }) => target === "arm64-osx").status, "runtime-verified");
   assert.ok(metrics.sourceInputs.every((input) => input.bytes > 0 && /^[0-9a-f]{64}$/u.test(input.sha256)));
 });
 

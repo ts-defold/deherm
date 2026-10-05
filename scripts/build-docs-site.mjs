@@ -6,6 +6,10 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { createHighlighter } from "shiki";
+import {
+  analyzeNativeModuleCompatibility,
+  assertNativeModuleCatalog,
+} from "../packages/compiler/src/native-module-compatibility.mjs";
 
 export const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 export const defaultOutputDirectory = path.join(repositoryRoot, "build", "docs-site");
@@ -71,6 +75,29 @@ function renderPage({ site, metrics, samples }) {
       (release.browserWasmWeb.stockDefoldEngineWasmBytes + release.browserWasmWeb.stockDefoldEngineJavaScriptBytes)) *
     100
   ).toFixed(0);
+  const moduleCards = metrics.modules.entries
+    .filter((entry) => entry.moduleKind !== "ui")
+    .map((entry) => {
+      const stages = Object.entries(entry.summary)
+        .map(([stage, count]) => `<span>${html(String(count))} ${html(stage)}</span>`)
+        .join("");
+      const targets = entry.platforms
+        .map(({ target, status, evidence }) => {
+          const source = evidence?.source ?? "";
+          const evidenceUrl = source.startsWith(".agents/")
+            ? `${site.links.repository}/blob/main/${source}`
+            : /^https?:\/\//u.test(source)
+              ? source
+              : null;
+          const receipt = evidenceUrl
+            ? `<a href="${html(evidenceUrl)}">${html(evidence.stage)} ↗</a>`
+            : html(evidence?.stage ?? "unproven");
+          return `<tr><th scope="row">${html(target)}</th><td>${html(status)}</td><td>${receipt}</td></tr>`;
+        })
+        .join("");
+      return `<article class="module-card"><div class="module-title"><div><div class="kicker">${html(entry.moduleKind)}</div><h3>${html(entry.name)}</h3></div><a href="${html(entry.source)}">Source ↗</a></div><p>${html(entry.description)}</p><div class="pills">${stages}</div><details><summary>Target evidence</summary><div class="module-targets"><table><thead><tr><th scope="col">Defold target</th><th scope="col">Status</th><th scope="col">Evidence</th></tr></thead><tbody>${targets}</tbody></table></div></details><code>deherm module list</code></article>`;
+    })
+    .join("");
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -123,16 +150,19 @@ function renderPage({ site, metrics, samples }) {
     .shot { background:#141820; border:1px solid #343c48; border-radius:18px; padding:10px; box-shadow:0 35px 80px #0009; overflow:hidden; transition:transform 260ms ease,border-color 260ms ease,box-shadow 260ms ease; } .shot:hover { transform:translateY(-3px); border-color:#495464; box-shadow:0 42px 90px #000b; } .shot img { display:block; width:100%; height:auto; border-radius:10px; }
     .shot-vscode { aspect-ratio:16/10; }
     .shot-vscode img { width:111%; max-width:none; transform:translateX(-10%); }
-    .bench-grid,.size-grid,.target-grid,.example-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+    .bench-grid,.size-grid,.target-grid,.example-grid,.module-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
     .metric { border:1px solid var(--line); border-radius:18px; padding:27px; background:var(--panel); min-height:220px; transition:transform 200ms ease,border-color 200ms ease,background-color 200ms ease; } .metric:hover { transform:translateY(-3px); border-color:#414b59; background:#151a22; } .metric strong { display:block; font-size:clamp(2rem,4vw,3.2rem); letter-spacing:-.06em; color:var(--gold); line-height:1; margin:20px 0 14px; } .metric h3 { margin:0; font-size:.9rem; } .metric p { color:var(--muted); font-size:.84rem; margin:0; }
     .boundary { margin-top:18px; color:#7f8994; font-size:.74rem; max-width:900px; }
     .size-grid { grid-template-columns:1fr 1fr; margin-top:80px; } .size-card { border-radius:20px; padding:32px; border:1px solid var(--line); background:linear-gradient(145deg,#181e27,#10141a); } .size-card .big { font-size:clamp(2.6rem,6vw,5rem); font-weight:850; letter-spacing:-.075em; line-height:1; margin:15px 0; } .size-card dl { display:grid; grid-template-columns:1fr auto; gap:9px 20px; color:var(--muted); font-size:.82rem; } .size-card dt,.size-card dd { margin:0; } .size-card dd { color:#e7ebee; font-family:ui-monospace,monospace; }
     .target-grid { grid-template-columns:repeat(3,1fr); } .target { min-height:290px; padding:28px; border:1px solid var(--line); background:var(--panel); border-radius:18px; } .target .symbol { font-size:2rem; color:var(--cyan); } .target h3 { font-size:1.35rem; margin:22px 0 10px; } .target p { color:var(--muted); font-size:.9rem; } .target code { color:var(--gold); font-size:.78rem; }
+    .module-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .module-card { border:1px solid var(--line); border-radius:18px; padding:28px; background:var(--panel); } .module-card h3 { margin:5px 0 0; font-size:1.5rem; } .module-card p { color:var(--muted); } .module-card code { display:block; margin-top:22px; color:var(--gold); font-size:.78rem; } .module-title { display:flex; align-items:flex-start; justify-content:space-between; gap:18px; } .module-title a { color:var(--cyan); font-size:.78rem; text-decoration:none; white-space:nowrap; }
+    .module-card details { margin-top:18px; } .module-card summary { color:var(--cyan); cursor:pointer; font-size:.85rem; } .module-targets { max-height:260px; overflow:auto; margin-top:12px; border:1px solid var(--line); border-radius:10px; } .module-targets table { border-collapse:collapse; width:100%; font-size:.75rem; } .module-targets th,.module-targets td { text-align:left; padding:8px 10px; border-bottom:1px solid var(--line); } .module-targets thead th { color:var(--gold); } .module-targets tbody th { font-weight:500; color:#d6dce2; }
+    .module-targets a { color:var(--cyan); text-decoration:none; white-space:nowrap; }
     .example-grid { grid-template-columns:1.3fr .7fr; } .example { border:1px solid var(--line); border-radius:20px; padding:35px; min-height:310px; background:linear-gradient(135deg,#171c25,#0d1015); display:flex; flex-direction:column; justify-content:flex-end; position:relative; overflow:hidden; } .example:before { content:""; position:absolute; inset:-30% -20% 20% 40%; background:radial-gradient(circle,#ff672e30,transparent 65%); } .example h3,.example p,.example a { position:relative; } .example h3 { font-size:2rem; margin:0 0 8px; letter-spacing:-.04em; } .example p { color:var(--muted); } .example a { color:var(--cyan); text-decoration:none; font-weight:700; }
     footer { padding:25px 0; color:var(--muted); border-top:1px solid var(--line); font-size:.78rem; } footer .shell { display:flex; justify-content:space-between; align-items:center; gap:22px; } .footer-brand { display:flex; align-items:baseline; gap:9px; } .footer-brand strong { color:var(--ink); font-size:.93rem; letter-spacing:-.025em; } .footer-links { display:flex; align-items:center; gap:7px; } .footer-links a { display:inline-flex; align-items:center; gap:7px; min-height:34px; padding:6px 9px; border-radius:8px; color:#adb6bf; text-decoration:none; transition:color 160ms ease,background-color 160ms ease; } .footer-links a:hover { color:#fff; background:#ffffff0b; } .footer-links svg { width:15px; height:15px; fill:currentColor; flex:none; }
     @keyframes terminal-arrive { from { opacity:0; transform:perspective(1000px) rotateY(-4deg) rotateX(1deg) translateY(14px); } to { opacity:1; transform:perspective(1000px) rotateY(-4deg) rotateX(1deg) translateY(0); } }
     @keyframes ambient-glow { from { transform:translate3d(-12px,-4px,0) scale(.98); opacity:.78; } to { transform:translate3d(18px,12px,0) scale(1.04); opacity:1; } }
-    @media (max-width:860px) { .nav-links { display:none; } .hero { min-height:auto; } .hero-grid,.setup-grid,.quick-grid,.feature,.size-grid,.example-grid { grid-template-columns:1fr; } .feature.reverse .copy { order:initial; } .bench-grid,.target-grid { grid-template-columns:1fr; } .terminal { transform:none; } .hero-grid { gap:45px; } footer .shell { align-items:flex-start; flex-direction:column; gap:12px; } }
+    @media (max-width:860px) { .nav-links { display:none; } .hero { min-height:auto; } .hero-grid,.setup-grid,.quick-grid,.feature,.size-grid,.example-grid,.module-grid { grid-template-columns:1fr; } .feature.reverse .copy { order:initial; } .bench-grid,.target-grid { grid-template-columns:1fr; } .terminal { transform:none; } .hero-grid { gap:45px; } footer .shell { align-items:flex-start; flex-direction:column; gap:12px; } }
     @media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } *,*:before,*:after { animation-duration:.01ms!important; animation-iteration-count:1!important; transition-duration:.01ms!important; } }
   </style>
 </head>
@@ -148,6 +178,8 @@ function renderPage({ site, metrics, samples }) {
   <div class="size-grid"><article class="size-card"><div class="kicker">arm64 macOS release</div><div class="big">${compactBytes(release.nativeArm64Macos.packageLogicalBytes)}</div><p>Complete War Battles <code>.app</code> logical file bytes.</p><dl><dt>Linked déherm engine</dt><dd>${compactBytes(release.nativeArm64Macos.engineBytes)}</dd><dt>Stock Defold release engine</dt><dd>${compactBytes(release.nativeArm64Macos.stockDefoldEngineBytes)}</dd><dt>Hermes + déherm engine delta</dt><dd>+${compactBytes(release.nativeArm64Macos.engineOverheadBytes)} (${overheadPercent}%)</dd><dt>Optimized game bytecode</dt><dd>${compactBytes(release.nativeArm64Macos.applicationBytecodeBytes)}</dd></dl></article><article class="size-card"><div class="kicker">HTML5 / wasm-web release</div><div class="big">${compactBytes(release.browserWasmWeb.packageLogicalBytes)}</div><p>Complete deployable browser directory. The browser lane does not embed Hermes.</p><dl><dt>Wasm engine</dt><dd>${compactBytes(release.browserWasmWeb.engineWasmBytes)}</dd><dt>Engine JavaScript</dt><dd>${compactBytes(release.browserWasmWeb.engineJavaScriptBytes)}</dd><dt>Déherm browser-host delta</dt><dd>+${compactBytes(release.browserWasmWeb.engineShellOverheadBytes)} (${webOverheadPercent}%)</dd><dt>Hermes embedded</dt><dd>no</dd></dl></article></div><p class="boundary">${html(release.evidenceBoundary)}</p></div></section>
 
   <section class="band" id="targets"><div class="shell"><div class="section-head"><div class="kicker">One authored surface</div><h2>The runtime follows the target.</h2><p>The generator emits the whole compatible API once. The build keeps only reachable code and selects the transport that belongs on the target.</p></div><div class="target-grid"><article class="target"><div class="symbol">◆</div><h3>Native development</h3><p>Dynamic Hermes keeps iteration immediate: bundle JavaScript to Hermes bytecode, load it in the Defold extension, and hot reload without relinking the engine.</p><code>Hermes bytecode + JSI</code></article><article class="target"><div class="symbol">▲</div><h3>Native release</h3><p>Static Hermes can compile the reachable typed subset through generated C ABI bindings. Dynamic Hermes remains available where the selected profile needs it.</p><code>typed-native + generated fallback</code></article><article class="target"><div class="symbol">●</div><h3>HTML5</h3><p>Use the JavaScript engine already in the browser. Generated direct-memory bindings call into Defold’s Wasm engine without embedding another VM or using embind.</p><code>browser JS + Wasm direct memory</code></article></div></div></section>
+
+  <section class="band soft" id="modules"><div class="shell"><div class="section-head"><div class="kicker">Native module directory</div><h2>Portable capability, with receipts.</h2><p>This is the smaller, déherm-specific directory: headless or mixed native capabilities whose Defold targets and evidence are recorded. Use <code>deherm module report &lt;package&gt; --directory</code> to inspect an installed Expo, Turbo, Nitro, JSI, or Defold module and enrich the report from <a href="https://reactnative.directory/">React Native Directory</a>. Ecosystem declarations nominate candidates; only déherm compile and runtime records earn those labels here.</p></div><div class="module-grid">${moduleCards}</div></div></section>
 
   <section class="band soft" id="examples"><div class="shell"><div class="section-head"><div class="kicker">Ship something</div><h2>Examples that exercise the product.</h2><p>Start small, then inspect the dogfood game and the standalone networking extension when you need the full stack.</p></div><div class="example-grid"><article class="example"><h3>War Battles Online</h3><p>A complete Defold game written in TypeScript: generated components, GUI, native and browser targets, hot reload, Static Hermes reachability, bots, and a 32-player network simulation.</p><a href="${html(site.links.warBattles)}">Explore the game →</a></article><article class="example"><h3>WebTransport</h3><p>A separately usable Defold extension with a Lua API, C API, TypeScript surface, browser backend, native QUIC backend, and minimal Deno echo server.</p><a href="${html(site.links.webTransport)}">Use the extension →</a></article></div></div></section>
   <footer><div class="shell"><div class="footer-brand"><strong>déherm</strong><span>TypeScript for Defold · MIT licensed</span></div><nav class="footer-links" aria-label="Community links"><a href="${html(site.links.tsDefold)}" target="_blank" rel="noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm6.9 6h-3.1a15.8 15.8 0 0 0-1.3-3.1A8.1 8.1 0 0 1 18.9 8ZM12 4c.8 1 1.5 2.3 1.9 4h-3.8c.4-1.7 1.1-3 1.9-4ZM4.3 14a8 8 0 0 1 0-4h3.4a16.6 16.6 0 0 0 0 4H4.3Zm.8 2h3.1a15.8 15.8 0 0 0 1.3 3.1A8.1 8.1 0 0 1 5.1 16Zm3.1-8H5.1a8.1 8.1 0 0 1 4.4-3.1A15.8 15.8 0 0 0 8.2 8ZM12 20c-.8-1-1.5-2.3-1.9-4h3.8c-.4 1.7-1.1 3-1.9 4Zm2.3-6H9.7a14.8 14.8 0 0 1 0-4h4.6a14.8 14.8 0 0 1 0 4Zm.2 5.1a15.8 15.8 0 0 0 1.3-3.1h3.1a8.1 8.1 0 0 1-4.4 3.1Zm1.8-5.1a16.6 16.6 0 0 0 0-4h3.4a8 8 0 0 1 0 4h-3.4Z"/></svg><span>ts-defold</span></a><a href="${html(site.links.repository)}" target="_blank" rel="noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .7a11.5 11.5 0 0 0-3.6 22.4c.6.1.8-.2.8-.5v-2.2c-3.3.7-4-1.4-4-1.4-.5-1.4-1.3-1.8-1.3-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.2 1.2a11 11 0 0 1 5.8 0c2.2-1.5 3.2-1.2 3.2-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.4-2.8 5.4-5.5 5.7.4.4.8 1.1.8 2.2v3.2c0 .3.2.6.8.5A11.5 11.5 0 0 0 12 .7Z"/></svg><span>GitHub</span></a><a href="${html(site.links.discord)}" target="_blank" rel="noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 5.3A17.2 17.2 0 0 0 15.2 4l-.5 1a15.8 15.8 0 0 0-5.4 0l-.5-1a17.4 17.4 0 0 0-4.3 1.3C1.8 9.3 1.1 13.2 1.4 17a17.6 17.6 0 0 0 5.3 2.7l1.3-1.8-1.8-.9.4-.3c3.5 1.6 7.3 1.6 10.8 0l.5.3-1.9.9 1.3 1.8a17.6 17.6 0 0 0 5.3-2.7c.4-4.4-.7-8.2-3.1-11.7ZM8.3 14.7c-1.1 0-1.9-1-1.9-2.2s.8-2.2 1.9-2.2 2 1 1.9 2.2c0 1.2-.8 2.2-1.9 2.2Zm7.4 0c-1.1 0-1.9-1-1.9-2.2s.8-2.2 1.9-2.2 2 1 1.9 2.2c0 1.2-.8 2.2-1.9 2.2Z"/></svg><span>Discord</span></a></nav></div></footer>
@@ -183,14 +215,18 @@ function renderPage({ site, metrics, samples }) {
 
 export async function buildDocsSite({ output = defaultOutputDirectory } = {}) {
   const site = JSON.parse(await readText("docs/site/site.json"));
-  const [packageJson, scriptAccounting, dmsdkAccounting, release, transport, vscode] = await Promise.all([
-    readJson("package.json"),
-    readJson("packages/bindings/generated/defold-script-api-accounting.json"),
-    readJson("packages/bindings/generated/defold-dmsdk-accounting.json"),
-    readJson("docs/site/evidence/release-sizes.json"),
-    readJson("docs/site/evidence/transport-overhead.json"),
-    readJson("examples/war-battles-online/evidence/vscode-live-values.json"),
-  ]);
+  const [packageJson, scriptAccounting, dmsdkAccounting, release, transport, vscode, moduleCatalog, targetMatrix] =
+    await Promise.all([
+      readJson("package.json"),
+      readJson("packages/bindings/generated/defold-script-api-accounting.json"),
+      readJson("packages/bindings/generated/defold-dmsdk-accounting.json"),
+      readJson("docs/site/evidence/release-sizes.json"),
+      readJson("docs/site/evidence/transport-overhead.json"),
+      readJson("examples/war-battles-online/evidence/vscode-live-values.json"),
+      readJson("packages/compiler/data/native-module-catalog.json"),
+      readJson("packages/toolchains/defold-bundle-targets.json"),
+    ]);
+  assertNativeModuleCatalog(moduleCatalog.value, targetMatrix.value);
   const quickStartSource = await readText("docs/site/quick-start.script.ts");
   const syntax = await highlighter();
   const samples = {
@@ -209,6 +245,38 @@ export async function buildDocsSite({ output = defaultOutputDirectory } = {}) {
     release: release.value,
     transport: transport.value,
     editor: { vscodeEvidenceKey: vscode.value.evidenceKey, screenshot: vscode.value.screenshot },
+    modules: {
+      schemaVersion: 1,
+      entries: moduleCatalog.value.modules.map((entry) => {
+        const report = analyzeNativeModuleCompatibility(
+          {
+            schemaVersion: 1,
+            name: entry.name,
+            sourceKind: "catalog",
+            sourceDigest: null,
+            frontends: entry.frontends,
+            moduleKind: entry.moduleKind ?? "unknown",
+          },
+          targetMatrix.value,
+          entry,
+        );
+        return {
+          id: entry.id,
+          name: entry.name,
+          description: entry.description,
+          moduleKind: entry.moduleKind ?? "unknown",
+          source: entry.source,
+          summary: report.summary,
+          platforms: report.platforms.map(({ target, group, status, route, evidence }) => ({
+            target,
+            group,
+            status,
+            route,
+            evidence,
+          })),
+        };
+      }),
+    },
     sourceInputs: [
       source("package.json", packageJson),
       source("packages/bindings/generated/defold-script-api-accounting.json", scriptAccounting),
@@ -216,6 +284,8 @@ export async function buildDocsSite({ output = defaultOutputDirectory } = {}) {
       source("docs/site/evidence/release-sizes.json", release),
       source("docs/site/evidence/transport-overhead.json", transport),
       source("examples/war-battles-online/evidence/vscode-live-values.json", vscode),
+      source("packages/compiler/data/native-module-catalog.json", moduleCatalog),
+      source("packages/toolchains/defold-bundle-targets.json", targetMatrix),
     ],
     evidenceBoundary:
       "Only release bundle records and unprofiled Release transport benchmarks are presented as size or overhead evidence. Development artifacts, repository totals, and CI cache sizes are excluded.",
@@ -234,6 +304,7 @@ export async function buildDocsSite({ output = defaultOutputDirectory } = {}) {
   ]);
   await writeFile(path.join(output, "index.html"), renderPage({ site, metrics, samples }));
   await writeFile(path.join(output, "metrics.json"), `${json(metrics)}\n`);
+  await writeFile(path.join(output, "modules.json"), `${json(metrics.modules)}\n`);
   return { output, metrics };
 }
 

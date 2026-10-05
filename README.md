@@ -162,15 +162,22 @@ evidence:
 ```sh
 pnpm exec deherm module report ./path/to/module
 pnpm exec deherm module report ./node_modules/some-native-module --target arm64-ios,wasm-web
+pnpm exec deherm module report ./node_modules/some-native-module --directory
 pnpm exec deherm module list
 ```
 
-The report recognizes Defold extensions, déherm providers, TurboModule specs,
-Nitro specs, and plain JSI sources. It distinguishes a route the generator can
-emit from an independently compile- or runtime-verified target. Turbo/Nitro
-source shapes currently report `adapter-required`; they are designed to feed
-the same Defold-owned provider IR rather than importing the React Native
-runtime.
+The report recognizes Defold extensions, déherm providers, Expo Modules,
+TurboModule specs, Nitro specs, and plain JSI sources. It distinguishes a route
+the generator can emit from an independently compile- or runtime-verified
+target. Expo/Turbo/Nitro source shapes currently report `adapter-required`;
+they are designed to feed the same Defold-owned provider IR rather than import
+their original application runtime.
+
+`--directory` refreshes React Native Directory metadata into the platform-native
+déherm user cache. That community metadata nominates candidates; exact local
+package sources outrank it, and it never becomes compile or runtime proof. The
+docs site publishes a much smaller déherm module directory: non-UI native
+capabilities with target-by-target generation, compile, or runtime evidence.
 
 ## Development tools
 

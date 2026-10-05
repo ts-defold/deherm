@@ -49,7 +49,8 @@ Defold-owned installer ABI.
 
 All module families enter one compatibility frontend. Defold `ext.manifest`,
 `.script_api`, public C/C++ headers, and `defold-hermes.bindings.json` are
-implemented inputs. TurboModule specs, `*.nitro.ts`, and plain JSI installers
+implemented inputs. Expo Modules (`expo-module.config.json` and native source),
+TurboModule specs, `*.nitro.ts`, and plain JSI installers
 are recognized inputs whose report currently names the required adapter. They
 must not grow independent target matrices or registries: their eventual
 importers normalize into the same runtime-neutral module IR and emit the same
@@ -64,7 +65,8 @@ frontend cannot emit the provider ABI yet. Manifest `platforms` keys are
 reported as build-context overrides, not misread as an allowlist.
 
 The inspector first uses package-owned facts: React Native `codegenConfig`,
-Nitro `HybridObject` platform specs, Android/iOS/Windows/macOS source sets,
+Expo module platform/autolinking declarations, Nitro `HybridObject` platform
+specs, Android/iOS/Windows/macOS source sets,
 platform-specific web sources, shared C/C++ cores, and explicit Emscripten or
 WASI source. A package fact makes an adapter candidate visible only on the
 matching target group; targets with no such fact are `platform-unproven`.
@@ -74,12 +76,35 @@ Shared C++ is a native portability fact, not automatic wasm proof. Web becomes
 a candidate only from a web implementation or explicit wasm toolchain source.
 Compile/runtime catalog evidence can then strengthen that result.
 
+React Native Directory is an optional ecosystem evidence source. `deherm module
+report <package> --directory` refreshes the public entry by exact npm package
+name into the platform-native user cache; ordinary reports read that cached
+record offline. The cache records retrieval time, source URL, and content
+digest. Its platform flags are attached to target rows as catalog claims. They
+do not turn an unproven target into an adapter candidate when the installed
+package has no matching source or config fact, and they never establish a
+successful déherm compile or runtime call. A directory entry describes the
+ecosystem, not necessarily the installed version. macOS and Windows remain
+separate target groups. Expo's broad `apple` declaration establishes iOS
+autolinking; macOS requires a macOS source/podspec/platform fact.
+
+The inspector classifies a module as `headless`, `mixed`, `ui`, or `unknown`
+from local source markers. This is an inspection heuristic, not compatibility
+proof. The public déherm module directory is a generated view of the
+package-owned catalog and Defold target matrix, filtered to non-UI entries.
+It shows only entries with déherm-specific evidence and preserves the exact
+generation, compile, and runtime status; React Native Directory is the wider
+candidate source, not the public déherm compatibility list.
+
 The catalog is evidence, not a name-based compiler switch. Catalog entries may
 upgrade a target's independently recorded compile/runtime stage, while route
 selection still comes from inspected module facts. Its initial entry is Defold
 WebTransport: arm64 macOS and wasm-web have recorded product runtime evidence;
 the remaining Defold targets retain generation evidence until their own gates
 run.
+Evidence lookup also requires the inspected source digest to match the catalog
+entry. A different module with the same public name or provider name cannot
+inherit the recorded product runtime result.
 
 # Implemented proof
 
@@ -277,7 +302,7 @@ materialized project SDK projection.
 
 # Follow-up
 
-Implement TurboModule and Nitro spec importers as frontends to the existing IR,
+Implement Expo, TurboModule, and Nitro spec importers as frontends to the existing IR,
 then add pointer/out-parameter lowering for general modules, callbacks,
 promises, and hybrid-object lifetime. Complete the ttsc AST lowering and
 combined high-level Static Hermes gate described above. Each known module must

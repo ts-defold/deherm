@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -10,7 +10,12 @@ import {
   repositoryNativeModuleArtifactPath,
 } from "../scripts/generate-native-module-providers.mjs";
 import { parseNativeModuleDescriptorJson } from "../packages/compiler/src/native-module-provider-generator.mjs";
-import { inspectNativeModuleCompatibility, listKnownNativeModules } from "../packages/cli/src/module-compatibility.mjs";
+import {
+  inspectNativeModuleCompatibility,
+  listKnownNativeModules,
+  readReactNativeDirectoryCache,
+  refreshReactNativeDirectoryEntry,
+} from "../packages/cli/src/module-compatibility.mjs";
 
 const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
 const schema = JSON.parse(await readFile(path.join(root, WEBTRANSPORT_SCHEMA), "utf8"));
@@ -22,17 +27,29 @@ test("module compatibility uses one target matrix for the catalog and arbitrary 
     ["defold-webtransport"],
   );
   assert.deepEqual(known[0].report.summary, { "generation-supported": 10, "runtime-verified": 2 });
+  assert.equal(known[0].report.moduleKind, "headless");
 
   const webtransport = await inspectNativeModuleCompatibility(
     path.join(root, "extensions/defold-webtransport/defold_webtransport"),
     { packageRoot: root },
   );
   assert.equal(webtransport.knownCatalogId, "defold-webtransport");
+  assert.equal(webtransport.report.moduleKind, "headless");
   assert.equal(webtransport.report.capabilities.nativeProviders, 1);
   assert.equal(webtransport.report.capabilities.nativeMethods, 12);
   assert.equal(webtransport.report.platforms.find(({ target }) => target === "arm64-osx").status, "runtime-verified");
   assert.equal(
     webtransport.report.platforms.find(({ target }) => target === "arm64-android").status,
+    "generation-supported",
+  );
+
+  const lookalike = await mkdtemp(path.join(tmpdir(), "deherm-module-lookalike-"));
+  t.after(() => rm(lookalike, { recursive: true, force: true }));
+  await writeFile(path.join(lookalike, "defold-hermes.bindings.json"), `${JSON.stringify(schema)}\n`);
+  const lookalikeReport = await inspectNativeModuleCompatibility(lookalike, { packageRoot: root });
+  assert.equal(lookalikeReport.knownCatalogId, null, "matching module names cannot inherit another build's proof");
+  assert.equal(
+    lookalikeReport.report.platforms.find(({ target }) => target === "arm64-osx").status,
     "generation-supported",
   );
 
@@ -66,6 +83,75 @@ test("module compatibility uses one target matrix for the catalog and arbitrary 
     report.report.platforms.filter(({ status }) => status === "adapter-required").map(({ target }) => target),
     ["arm64_sim-ios", "arm64-ios"],
   );
+});
+
+test("Expo modules and React Native Directory declarations feed one evidence-ranked report", async (t) => {
+  const expo = await mkdtemp(path.join(tmpdir(), "deherm-expo-report-"));
+  const cacheHome = await mkdtemp(path.join(tmpdir(), "deherm-module-directory-"));
+  t.after(() => rm(expo, { recursive: true, force: true }));
+  t.after(() => rm(cacheHome, { recursive: true, force: true }));
+  await writeFile(
+    path.join(expo, "package.json"),
+    `${JSON.stringify({
+      name: "expo-headless-example",
+      version: "2.0.0",
+      peerDependencies: { "expo-modules-core": "*" },
+    })}\n`,
+  );
+  await writeFile(
+    path.join(expo, "expo-module.config.json"),
+    `${JSON.stringify({
+      platforms: ["android", "apple", "web"],
+      android: { modules: ["example.HeadlessModule"] },
+      apple: { modules: ["HeadlessModule"] },
+    })}\n`,
+  );
+  await writeFile(
+    path.join(expo, "HeadlessModule.kt"),
+    'package example\nimport expo.modules.kotlin.modules.Module\nclass HeadlessModule: Module() { override fun definition() = ModuleDefinition { AsyncFunction("ping") { 1 } } }\n',
+  );
+  await mkdir(path.join(expo, "example"));
+  await writeFile(
+    path.join(expo, "example", "package.json"),
+    `${JSON.stringify({ name: "not-the-module", dependencies: { "react-native-windows": "*" } })}\n`,
+  );
+  await writeFile(path.join(expo, "example", "Demo.tsx"), "export function View() { return null; }\n");
+  const directoryRecord = await refreshReactNativeDirectoryEntry("expo-headless-example", {
+    cacheHome,
+    now: () => new Date("2026-10-05T00:00:00.000Z"),
+    fetchImplementation: async (url) => ({
+      ok: true,
+      status: 200,
+      async json() {
+        assert.match(String(url), /name=expo-headless-example/u);
+        return {
+          "expo-headless-example": {
+            npmPkg: "expo-headless-example",
+            android: true,
+            ios: true,
+            web: true,
+            macos: true,
+            windows: true,
+            npm: { latestRelease: "2.0.0" },
+          },
+        };
+      },
+    }),
+  });
+  assert.deepEqual(await readReactNativeDirectoryCache("expo-headless-example", { cacheHome }), directoryRecord);
+
+  const result = await inspectNativeModuleCompatibility(expo, {
+    packageRoot: root,
+    reactNativeDirectoryRecord: directoryRecord,
+  });
+  assert.deepEqual(result.report.frontends, ["expo-module"]);
+  assert.equal(result.report.moduleKind, "headless");
+  assert.deepEqual(result.report.summary, { "adapter-required": 7, "platform-unproven": 5 });
+  assert.equal(
+    result.report.platforms.find(({ target }) => target === "x86_64-win32").evidence.ecosystemFacts[0].source,
+    "react-native.directory#windows",
+  );
+  assert.equal(result.report.platforms.find(({ target }) => target === "x86_64-linux").status, "platform-unproven");
 });
 
 test("extension schema owns the generic provider and WebTransport artifacts", async () => {

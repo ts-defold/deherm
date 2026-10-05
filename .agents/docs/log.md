@@ -1,5 +1,33 @@
 # Defold Hermes knowledge log
 
+## 2026-10-05 - Expo inspection and a generated module directory
+
+The local module reporter now recognizes Expo Modules from
+`expo-module.config.json`, `expo-modules-core`, and native source markers.
+Expo's `apple` declaration is conservatively mapped to iOS; macOS requires
+its own package evidence. The reporter also identifies headless, mixed, and
+UI modules from source markers to narrow the portable capability candidates.
+These markers are discovery evidence; no Expo spec importer or runtime adapter
+was added in this wave.
+
+React Native Directory can be refreshed explicitly with `deherm module report
+<package> --directory`, then read offline from the normal déherm user cache.
+The cached record includes source URL, retrieval time, and content digest.
+Directory flags are exposed as ecosystem facts on matching Defold target rows,
+including Windows and macOS separately. A flag does not upgrade a row to
+`adapter-required` without matching installed-package evidence, nor does it
+become compile or runtime proof. The docs build now emits `modules.json` and
+renders the non-UI compatibility directory from the package catalog and
+Defold target matrix, including exact status per target. Catalog runtime
+evidence is now bound to the inspected source digest as well as module identity;
+a same-name package with different source cannot inherit WebTransport's result.
+The first listed module remains Defold WebTransport.
+
+Focused tests use a synthetic Expo module and a mocked Directory API response
+to verify platform mapping, local cache, and evidence ranking. Docs tests
+verify the generated directory output. They are scanner and presentation
+evidence, not an Expo module compiled through Defold.
+
 ## 2026-10-05 - One compatibility report for Defold, Turbo, Nitro, and JSI modules
 
 The module boundary now has one pure compatibility projection and one CLI

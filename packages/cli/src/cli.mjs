@@ -34,8 +34,8 @@ Commands:
   policy       Fetch, authenticate, and cache the Pages policy for the project's Defold revision
   cache        Report or reclaim old immutable policy surfaces (dry-run by default)
   extensions   List native extensions and their script API coverage
-  module list  List modules with recorded compatibility evidence
-  module report <path>  Inspect a local Defold, TurboModule, Nitro, or JSI module and report every target
+  module list  List the déherm compatibility directory
+  module report <path>  Inspect a local Defold, Expo, TurboModule, Nitro, or JSI module and report every target
   generate     Write project inventory, TypeScript SDK, tsconfig, and VS Code setup
   assemble-typed-native  Compile the reachable Static Hermes lane into a Defold extension
   prepare-bob  Project the runtime bundle Bob may archive for one target/variant
@@ -100,6 +100,7 @@ Options:
   --no-bytecode      Keep the development bundle as JavaScript (offline diagnostic)
   --shard <i/n>      Stable zero-based shard selection (default: 0/1)
   --strict           Fail a report unless every required selected stage passed
+  --directory        Refresh React Native Directory metadata for module report, then cache it locally
   --release          Type-check with release reachability and write release usage manifests
   --variant <name>   Bob build variant for prepare-bob: debug or release
   --application-mode <name>  dynamic or static application for prepare-bob
@@ -150,6 +151,7 @@ export function parseArguments(argv) {
     if (value === "--json") options.json = true;
     else if (value === "--check" && options.command === "materialize-dmsdk") options.check = true;
     else if (value === "--strict") options.strict = true;
+    else if (value === "--directory" && options.command === "module") options.refreshDirectory = true;
     else if (value === "--release") options.release = true;
     else if (value === "--profile") options.profile = true;
     else if (value === "--variant") options.variant = args.shift();
@@ -898,8 +900,12 @@ export async function run(argv = process.argv.slice(2)) {
     return 0;
   }
   if (options.command === "module") {
-    const { formatNativeModuleCompatibility, inspectNativeModuleCompatibility, listKnownNativeModules } =
-      await import("./module-compatibility.mjs");
+    const {
+      formatNativeModuleCompatibility,
+      inspectNativeModuleCompatibility,
+      listKnownNativeModules,
+      refreshReactNativeDirectoryEntry,
+    } = await import("./module-compatibility.mjs");
     if (options.action === "list") {
       const modules = await listKnownNativeModules();
       if (options.json) console.log(JSON.stringify({ schemaVersion: 1, modules }, null, 2));
@@ -918,7 +924,12 @@ export async function run(argv = process.argv.slice(2)) {
     if (!["report", "inspect"].includes(options.action) || !options.modulePath) {
       throw new Error("module requires 'list' or 'report <local-path>'");
     }
-    const result = await inspectNativeModuleCompatibility(options.modulePath);
+    let result = await inspectNativeModuleCompatibility(options.modulePath);
+    if (options.refreshDirectory) {
+      if (!result.packageName) throw new Error("--directory requires a package.json with a package name");
+      const reactNativeDirectoryRecord = await refreshReactNativeDirectoryEntry(result.packageName);
+      result = await inspectNativeModuleCompatibility(options.modulePath, { reactNativeDirectoryRecord });
+    }
     if (options.target) {
       const requested = new Set(
         options.target
@@ -938,7 +949,12 @@ export async function run(argv = process.argv.slice(2)) {
     }
     if (options.json) console.log(JSON.stringify({ schemaVersion: 1, ...result }, null, 2));
     else console.log(formatNativeModuleCompatibility(result));
-    return options.strict && result.report.platforms.some(({ status }) => status === "blocked") ? 1 : 0;
+    return options.strict &&
+      result.report.platforms.some(
+        ({ status }) => !["generation-supported", "compile-verified", "runtime-verified"].includes(status),
+      )
+      ? 1
+      : 0;
   }
   if (options.command === "cache") {
     const { formatPolicyCacheReport, maintainPolicyCache } = await import("./policy-cache-maintenance.mjs");

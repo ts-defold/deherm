@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { createRequire } from "node:module";
-import { readFile, readdir, stat } from "node:fs/promises";
+import { mkdir, readFile, readdir, rename, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import { parse as parseYaml } from "yaml";
@@ -11,14 +11,27 @@ import {
 } from "../../compiler/src/native-module-compatibility.mjs";
 import { parseNativeModuleDescriptorJson } from "../../compiler/src/native-module-provider-generator.mjs";
 import { normalizeNativeExtensionBindingSchema } from "./project.mjs";
+import { defoldSurfaceCacheHome } from "./defold-surface.mjs";
 
-const ignoredDirectories = new Set([".git", ".deherm", "build", "dist", "node_modules"]);
+const ignoredDirectories = new Set([
+  ".git",
+  ".deherm",
+  "build",
+  "dist",
+  "node_modules",
+  "example",
+  "examples",
+  "test",
+  "tests",
+  "__tests__",
+]);
 const maximumFiles = 10_000;
 const maximumSelectedBytes = 32 * 1024 * 1024;
 const maximumFileBytes = 2 * 1024 * 1024;
 const sourcePattern = /\.(?:c|cc|cpp|cxx|h|hh|hpp|hxx|m|mm|swift|java|kt|js|jsx|ts|tsx)$/iu;
 const buildMetadataPattern =
   /(?:^|\/)(?:CMakeLists\.txt|react-native\.config\.js|nitro\.json)$|\.(?:podspec|gradle|vcxproj)$/iu;
+const reactNativeDirectoryApi = "https://reactnative.directory/api/library";
 
 function portable(value) {
   return value.split(path.sep).join("/");
@@ -84,6 +97,7 @@ async function selectedFiles(input) {
       const basename = path.basename(relative);
       const relevant =
         basename === "package.json" ||
+        basename === "expo-module.config.json" ||
         basename === "ext.manifest" ||
         basename === "defold-hermes.bindings.json" ||
         relative.endsWith(".script_api") ||
@@ -136,6 +150,16 @@ function detectFrameworks(files, dependencies, packageDocuments) {
     files.some(({ relative }) => relative.endsWith(".nitro.ts")) ||
     /\bHybridObject\b/u.test(source);
   const hasJsi = /(?:[<"]jsi\/jsi\.h[>"])|\bfacebook::jsi\b/u.test(source);
+  const hasExpo =
+    dependencies.includes("expo-modules-core") ||
+    files.some(({ relative }) => path.basename(relative) === "expo-module.config.json") ||
+    /\bexpo\.modules\.|\bExpoModulesCore\b/u.test(source);
+  const hasUi =
+    /\b(?:codegenNativeComponent|HostComponent|requireNativeViewManager|RCTViewManager)\b|\bView\s*\(/u.test(source);
+  const hasCallable = /\b(?:Function|AsyncFunction|Property)\s*\(|\bextends\s+TurboModule\b|\bHybridObject\b/u.test(
+    source,
+  );
+  if (hasExpo) frontends.push("expo-module");
   if (hasTurbo) frontends.push("turbo-module-spec");
   if (hasNitro) frontends.push("nitro-module-spec");
   if (hasJsi) frontends.push("plain-jsi");
@@ -144,15 +168,27 @@ function detectFrameworks(files, dependencies, packageDocuments) {
       dependency === "react" ||
       dependency === "react-native" ||
       dependency === "react-native-nitro-modules" ||
+      dependency === "expo" ||
+      dependency === "expo-modules-core" ||
       dependency.startsWith("@react-native/")
     ) {
       frameworkDependencies.push(dependency);
     }
   }
-  return { frontends, frameworkDependencies };
+  return {
+    frontends,
+    frameworkDependencies,
+    moduleKind: hasUi
+      ? hasCallable
+        ? "mixed"
+        : "ui"
+      : hasExpo || hasTurbo || hasNitro || hasJsi
+        ? "headless"
+        : "unknown",
+  };
 }
 
-function platformEvidence(files, packageDocuments, frameworkSource) {
+function platformEvidence(files, packageDocuments, expoDocuments, frameworkSource) {
   const paths = files.map(({ relative }) => relative);
   const facts = [];
   const add = (fact) => {
@@ -185,6 +221,26 @@ function platformEvidence(files, packageDocuments, frameworkSource) {
       }
     }
   }
+  for (const document of expoDocuments) {
+    const platforms = new Set(document.platforms ?? []);
+    if (document.android?.modules?.length || platforms.has("android")) {
+      add({ groups: ["android"], kind: "expo-module-config", source: "expo-module.config.json#android" });
+    }
+    if (
+      document.apple?.modules?.length ||
+      document.ios?.modules?.length ||
+      platforms.has("apple") ||
+      platforms.has("ios")
+    ) {
+      add({ groups: ["ios"], kind: "expo-module-config", source: "expo-module.config.json#apple" });
+    }
+    if (document.macos?.modules?.length || platforms.has("macos")) {
+      add({ groups: ["osx"], kind: "expo-module-config", source: "expo-module.config.json#macos" });
+    }
+    if (platforms.has("web")) {
+      add({ groups: ["web"], kind: "expo-module-config", source: "expo-module.config.json#platforms" });
+    }
+  }
   if (has(/(?:^|\/)android(?:\/|$)|\.(?:java|kt)$/iu)) {
     add({ groups: ["android"], kind: "implementation-source", source: "android source set" });
   }
@@ -196,6 +252,9 @@ function platformEvidence(files, packageDocuments, frameworkSource) {
   }
   if (has(/(?:^|\/)macos(?:\/|$)/iu) || dependencies.includes("react-native-macos")) {
     add({ groups: ["osx"], kind: "implementation-source", source: "React Native macOS source set" });
+  }
+  if (/\b(?:osx|macos)\s*=>|\.platform\s*=\s*:osx\b/iu.test(frameworkSource)) {
+    add({ groups: ["osx"], kind: "podspec-platform", source: "CocoaPods platform declaration" });
   }
   if (has(/\.web\.(?:js|jsx|ts|tsx)$/iu)) {
     add({ groups: ["web"], kind: "javascript-implementation", source: "platform-specific .web source" });
@@ -215,10 +274,91 @@ function platformEvidence(files, packageDocuments, frameworkSource) {
   return facts.sort((left, right) => JSON.stringify(left).localeCompare(JSON.stringify(right)));
 }
 
+function reactNativeDirectoryEvidence(entry) {
+  if (!entry || typeof entry !== "object") return [];
+  const mapping = {
+    android: "android",
+    ios: "ios",
+    macos: "osx",
+    web: "web",
+    windows: "win32",
+  };
+  return Object.entries(mapping)
+    .filter(([platform]) => entry[platform] === true)
+    .map(([platform, group]) => ({
+      groups: [group],
+      kind: "ecosystem-platform-declaration",
+      source: `react-native.directory#${platform}`,
+      upstreamPlatform: platform,
+    }));
+}
+
+function safeCacheName(packageName) {
+  const digest = createHash("sha256").update(packageName).digest("hex").slice(0, 12);
+  return `${packageName.replaceAll(/[^a-zA-Z0-9._-]/gu, "_")}-${digest}`;
+}
+
+export async function readReactNativeDirectoryCache(packageName, { cacheHome } = {}) {
+  const root = cacheHome ?? defoldSurfaceCacheHome();
+  const file = path.join(root, "module-directory", "react-native-directory", `${safeCacheName(packageName)}.json`);
+  try {
+    const record = JSON.parse(await readFile(file, "utf8"));
+    if (
+      record.schemaVersion !== 1 ||
+      record.packageName !== packageName ||
+      !record.entry ||
+      typeof record.entry !== "object" ||
+      record.entry.npmPkg !== packageName ||
+      record.sha256 !== createHash("sha256").update(JSON.stringify(record.entry)).digest("hex")
+    ) {
+      throw new Error(`Invalid React Native Directory cache record: ${file}`);
+    }
+    return record;
+  } catch (error) {
+    if (error?.code === "ENOENT") return null;
+    throw error;
+  }
+}
+
+export async function refreshReactNativeDirectoryEntry(
+  packageName,
+  { cacheHome, fetchImplementation = globalThis.fetch, now = () => new Date() } = {},
+) {
+  if (!packageName || typeof packageName !== "string")
+    throw new Error("React Native Directory lookup needs a package name");
+  if (typeof fetchImplementation !== "function") throw new Error("This Node runtime does not provide fetch");
+  const url = new URL(reactNativeDirectoryApi);
+  url.searchParams.set("name", packageName);
+  const response = await fetchImplementation(url, { headers: { accept: "application/json" } });
+  if (!response.ok) throw new Error(`React Native Directory returned HTTP ${response.status}`);
+  const document = await response.json();
+  const entry = document?.[packageName] ?? null;
+  if (!entry) throw new Error(`React Native Directory has no entry for ${packageName}`);
+  if (entry.npmPkg !== packageName)
+    throw new Error(`React Native Directory returned a mismatched package for ${packageName}`);
+  const canonical = JSON.stringify(entry);
+  const record = {
+    schemaVersion: 1,
+    packageName,
+    source: url.href,
+    fetchedAt: now().toISOString(),
+    sha256: createHash("sha256").update(canonical).digest("hex"),
+    entry,
+  };
+  const root = cacheHome ?? defoldSurfaceCacheHome();
+  const directory = path.join(root, "module-directory", "react-native-directory");
+  const file = path.join(directory, `${safeCacheName(packageName)}.json`);
+  await mkdir(directory, { recursive: true });
+  const temporary = `${file}.${process.pid}.tmp`;
+  await writeFile(temporary, `${JSON.stringify(record, null, 2)}\n`, { mode: 0o600 });
+  await rename(temporary, file);
+  return record;
+}
+
 function platformExclusions(files) {
   const groups = new Set();
   const group = { android: "android", ios: "ios", windows: "win32", macos: "osx", web: "web" };
-  for (const file of files.filter(({ relative }) => path.basename(relative) === "react-native.config.js")) {
+  for (const file of files.filter(({ relative }) => relative === "react-native.config.js")) {
     const source = file.bytes.toString("utf8");
     for (const match of source.matchAll(/["']?(android|ios|windows|macos|web)["']?\s*:\s*null/giu)) {
       groups.add(group[match[1].toLowerCase()]);
@@ -227,13 +367,14 @@ function platformExclusions(files) {
   return [...groups].sort();
 }
 
-function catalogMatch(catalog, { nativeModuleNames, packageName, root }) {
+function catalogMatch(catalog, { nativeModuleNames, packageName, root, sourceDigest }) {
   return (
     catalog.modules.find(
       (entry) =>
-        entry.packageNames?.includes(packageName) ||
-        entry.moduleNames?.some((name) => nativeModuleNames.includes(name)) ||
-        portable(root).endsWith(entry.repositoryPath ?? "\0"),
+        entry.sourceDigest === sourceDigest &&
+        (entry.packageNames?.includes(packageName) ||
+          entry.moduleNames?.some((name) => nativeModuleNames.includes(name)) ||
+          portable(root).endsWith(entry.repositoryPath ?? "\0")),
     ) ?? null
   );
 }
@@ -247,7 +388,10 @@ export async function loadNativeModuleCompatibilityAuthorities(packageRoot) {
   return { targetMatrix, catalog };
 }
 
-export async function inspectNativeModuleCompatibility(input, { packageRoot } = {}) {
+export async function inspectNativeModuleCompatibility(
+  input,
+  { packageRoot, reactNativeDirectoryRecord = undefined } = {},
+) {
   const resolvedPackageRoot = packageRoot ?? path.resolve(import.meta.dirname, "../../..");
   const [{ targetMatrix, catalog }, selection] = await Promise.all([
     loadNativeModuleCompatibilityAuthorities(resolvedPackageRoot),
@@ -257,11 +401,13 @@ export async function inspectNativeModuleCompatibility(input, { packageRoot } = 
   const manifests = [];
   const descriptors = [];
   const packageDocuments = [];
+  const expoDocuments = [];
   let scriptApiModules = 0;
   for (const file of selection.files) {
     const basename = path.basename(file.relative);
     try {
-      if (basename === "package.json") packageDocuments.push(JSON.parse(file.bytes.toString("utf8")));
+      if (file.relative === "package.json") packageDocuments.push(JSON.parse(file.bytes.toString("utf8")));
+      else if (file.relative === "expo-module.config.json") expoDocuments.push(JSON.parse(file.bytes.toString("utf8")));
       else if (basename === "ext.manifest") manifests.push(parseYaml(file.bytes.toString("utf8")) ?? {});
       else if (basename === "defold-hermes.bindings.json") {
         descriptors.push(
@@ -291,11 +437,17 @@ export async function inspectNativeModuleCompatibility(input, { packageRoot } = 
   if (headers.length || publicHeaders.length) frontends.push("defold-c-header");
   if (nativeModules.length) frontends.push("deherm-native-provider");
   const packageDocument = packageDocuments[0] ?? {};
+  const directoryRecord =
+    reactNativeDirectoryRecord === undefined && packageDocument.name
+      ? await readReactNativeDirectoryCache(packageDocument.name)
+      : reactNativeDirectoryRecord;
+  const sourceDigest = hashFiles(selection.files);
   const nativeModuleNames = nativeModules.map(({ name }) => name);
   const known = catalogMatch(catalog, {
     nativeModuleNames,
     packageName: packageDocument.name,
     root: selection.root,
+    sourceDigest,
   });
   const name =
     known?.name ??
@@ -307,11 +459,13 @@ export async function inspectNativeModuleCompatibility(input, { packageRoot } = 
     name,
     ...(typeof packageDocument.version === "string" ? { version: packageDocument.version } : {}),
     sourceKind: manifests.length ? "defold-extension" : packageDocuments.length ? "package" : "source-tree",
-    sourceDigest: hashFiles(selection.files),
+    sourceDigest,
     frontends,
+    moduleKind: framework.moduleKind === "unknown" ? (known?.moduleKind ?? "unknown") : framework.moduleKind,
     declaredPlatformContexts: manifests.flatMap((manifest) => Object.keys(manifest.platforms ?? {})),
     frameworkDependencies: framework.frameworkDependencies,
-    platformEvidence: platformEvidence(selection.files, packageDocuments, frameworkSource),
+    platformEvidence: platformEvidence(selection.files, packageDocuments, expoDocuments, frameworkSource),
+    ecosystemEvidence: reactNativeDirectoryEvidence(directoryRecord?.entry),
     platformExclusions: platformExclusions(selection.files),
     blockers,
     capabilities: {
@@ -323,8 +477,17 @@ export async function inspectNativeModuleCompatibility(input, { packageRoot } = 
   };
   return {
     input: selection.root,
+    packageName: packageDocument.name ?? null,
     knownCatalogId: known?.id ?? null,
     selectedFileCount: selection.files.length,
+    reactNativeDirectory: directoryRecord
+      ? {
+          source: directoryRecord.source,
+          fetchedAt: directoryRecord.fetchedAt,
+          sha256: directoryRecord.sha256,
+          npmVersion: directoryRecord.entry?.npm?.latestRelease ?? null,
+        }
+      : null,
     report: analyzeNativeModuleCompatibility(module, targetMatrix, known),
   };
 }
@@ -341,6 +504,7 @@ export async function listKnownNativeModules({ packageRoot } = {}) {
         sourceKind: "catalog",
         sourceDigest: null,
         frontends: entry.frontends,
+        moduleKind: entry.moduleKind ?? "unknown",
       },
       targetMatrix,
       entry,
@@ -355,8 +519,14 @@ export function formatNativeModuleCompatibility(result) {
     `  source: ${result.input}`,
     `  digest: ${report.module.sourceDigest ?? "catalog"}`,
     `  frontends: ${report.frontends.join(", ") || "none"}`,
+    `  module kind: ${report.moduleKind}`,
     `  known catalog: ${result.knownCatalogId ?? "no"}`,
   ];
+  if (result.reactNativeDirectory) {
+    lines.push(
+      `  React Native Directory: ${result.reactNativeDirectory.source} (${result.reactNativeDirectory.fetchedAt})`,
+    );
+  }
   if (report.declaredPlatformContexts.length) {
     lines.push(
       `  manifest contexts: ${report.declaredPlatformContexts.join(", ")} (context overrides, not an allowlist)`,
@@ -370,6 +540,12 @@ export function formatNativeModuleCompatibility(result) {
       lines.push(
         `    - ${(fact.targets ?? fact.groups ?? [fact.portability]).join(", ")}: ${fact.kind} (${fact.source})`,
       );
+    }
+  }
+  if (report.ecosystemEvidence.length) {
+    lines.push("  ecosystem platform evidence:");
+    for (const fact of report.ecosystemEvidence) {
+      lines.push(`    - ${fact.groups.join(", ")}: ${fact.kind} (${fact.source})`);
     }
   }
   if (report.platformExclusions.length) {

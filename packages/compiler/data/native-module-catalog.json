@@ -6,6 +6,8 @@
       "name": "Defold WebTransport",
       "source": "https://github.com/ts-defold/deherm/tree/main/extensions/defold-webtransport",
       "description": "WebTransport-shaped Defold extension with Lua, C, dynamic Hermes/JSI, Static Hermes, and browser backends.",
+      "moduleKind": "headless",
+      "sourceDigest": "65345d6b8f52d61d21d69e3ac634ae3208ea322597d0e1efbc2c09ac7d159533",
       "moduleNames": ["NativeWebTransport"],
       "repositoryPath": "extensions/defold-webtransport/defold_webtransport",
       "frontends": ["defold-script-api", "deherm-native-provider"],

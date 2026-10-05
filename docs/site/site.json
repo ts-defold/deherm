@@ -29,6 +29,7 @@
     { "label": "Developer tools", "href": "#developer-tools" },
     { "label": "Performance", "href": "#performance" },
     { "label": "Targets", "href": "#targets" },
+    { "label": "Modules", "href": "#modules" },
     { "label": "Examples", "href": "#examples" }
   ],
   "links": {

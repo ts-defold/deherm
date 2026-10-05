@@ -4,7 +4,7 @@ export const NATIVE_MODULE_COMPATIBILITY_SCHEMA_VERSION = 1;
 
 const CURRENT_FRONTENDS = new Set(["defold-script-api", "defold-c-header", "deherm-native-provider"]);
 
-const ADAPTER_FRONTENDS = new Set(["turbo-module-spec", "nitro-module-spec", "plain-jsi"]);
+const ADAPTER_FRONTENDS = new Set(["expo-module", "turbo-module-spec", "nitro-module-spec", "plain-jsi"]);
 
 function unique(values) {
   return [...new Set(values)].sort();
@@ -27,6 +27,12 @@ function packageEvidence(module, { target, group }) {
       fact.groups?.includes(group) ||
       (fact.portability === "native-cpp" && group !== "web") ||
       (fact.portability === "wasm-candidate" && group === "web"),
+  );
+}
+
+function ecosystemEvidence(module, { target, group }) {
+  return (module.ecosystemEvidence ?? []).filter(
+    (fact) => fact.targets?.includes(target) || fact.groups?.includes(group),
   );
 }
 
@@ -57,6 +63,7 @@ export function analyzeNativeModuleCompatibility(module, targetMatrix, catalogEn
   const platforms = targetRows(targetMatrix).map(({ target, group, architecture }) => {
     const evidence = catalogEvidence(catalogEntry, target);
     const packageFacts = packageEvidence(module, { target, group });
+    const ecosystemFacts = ecosystemEvidence(module, { target, group });
     let status;
     let route;
     if (platformExclusions.includes(group)) {
@@ -94,6 +101,7 @@ export function analyzeNativeModuleCompatibility(module, targetMatrix, catalogEn
             stage: hasCurrentRoute ? "generation" : "inspection",
             source: "module-compatibility-analyzer",
             ...(packageFacts.length ? { packageFacts } : {}),
+            ...(ecosystemFacts.length ? { ecosystemFacts } : {}),
           },
       ...(blockers.length && status === "blocked" ? { blockers } : {}),
     };
@@ -109,6 +117,7 @@ export function analyzeNativeModuleCompatibility(module, targetMatrix, catalogEn
       sourceDigest: module.sourceDigest,
     },
     frontends,
+    moduleKind: module.moduleKind ?? "unknown",
     declaredPlatformContexts: unique(module.declaredPlatformContexts ?? []),
     capabilities: {
       scriptApiModules: module.capabilities?.scriptApiModules ?? 0,
@@ -118,6 +127,7 @@ export function analyzeNativeModuleCompatibility(module, targetMatrix, catalogEn
     },
     frameworkDependencies: unique(module.frameworkDependencies ?? []),
     platformEvidence: module.platformEvidence ?? [],
+    ecosystemEvidence: module.ecosystemEvidence ?? [],
     platformExclusions,
     blockers,
     platforms,
@@ -141,6 +151,8 @@ export function assertNativeModuleCatalog(catalog, targetMatrix) {
     ids.add(entry.id);
     assert.equal(typeof entry.name, "string");
     assert.equal(typeof entry.source, "string");
+    if (entry.evidence?.length) assert.match(entry.sourceDigest, /^[0-9a-f]{64}$/u);
+    assert.ok(["headless", "mixed", "ui", "unknown"].includes(entry.moduleKind ?? "unknown"));
     assert.ok(Array.isArray(entry.frontends));
     if (entry.moduleNames !== undefined) assert.ok(Array.isArray(entry.moduleNames));
     if (entry.packageNames !== undefined) assert.ok(Array.isArray(entry.packageNames));
