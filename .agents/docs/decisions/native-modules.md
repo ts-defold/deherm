@@ -34,6 +34,18 @@ JSI; Static Hermes uses `extern_c`; Lua uses ordinary native-extension bindings;
 and HTML5 reaches it through Emscripten. This keeps target-specific VM objects
 out of the durable engine interface.
 
+Async TypeScript calls do not use Lua coroutines as their scheduler. A native
+provider may finish work later, but it must publish completion to the Defold
+engine-owned thread before resolving or rejecting a Hermes Promise; worker
+threads must not enter Hermes or Lua. The engine-frame module pump and its
+microtask checkpoint are the existing dynamic-Hermes mechanism. HTML5 uses
+browser Promises and the browser event loop for browser-backed providers. A
+Lua-facing extension may independently offer callbacks or a coroutine wrapper,
+but that is an optional consumer of the native completion contract, not the
+backend for TypeScript. General generated request/completion/cancellation
+lowering is follow-up work; the current WebTransport facade must not be
+mistaken for proof that arbitrary module methods already have it.
+
 # Compatibility stance
 
 TurboModules provide useful typed-spec and enforcing-registry conventions, but
@@ -301,6 +313,15 @@ the project checker excludes their source locations and checks only their
 materialized project SDK projection.
 
 # Follow-up
+
+Before claiming general async module compatibility, add a generated bounded
+request/completion contract with explicit request IDs, success/error payloads,
+cancellation, and runtime-generation teardown. Prove a completion from a later
+engine frame resolves or rejects a TypeScript Promise on dynamic Hermes and
+the browser host, with no worker-thread VM entry and no leaked pending requests.
+Then use a broad-platform installed module as a compatibility fixture; ordinary
+storage persistence alone is not evidence of async interoperability. Keep Lua
+coroutine convenience out of this gate.
 
 Implement Expo, TurboModule, and Nitro spec importers as frontends to the existing IR,
 then add pointer/out-parameter lowering for general modules, callbacks,
