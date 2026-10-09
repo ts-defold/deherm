@@ -29,7 +29,7 @@ import { pathToFileURL } from "node:url";
 
 import { hashBytes } from "../packages/compiler/src/api-policy.mjs";
 import { releaseAssetUrl } from "../packages/cli/src/release-assets.mjs";
-import { buildPolicySite } from "./build-policy-site.mjs";
+import { buildPolicySite, validateArtifactReferences } from "./build-policy-site.mjs";
 import { readSiteConfig, shippedIndexPath } from "./generate-api-policy.mjs";
 
 function serve(directory) {
@@ -267,7 +267,26 @@ export function validateRebuiltHandshake({ profiles, revision, profileId }) {
   return handshake;
 }
 
-async function main() {
+async function main(argv = process.argv.slice(2)) {
+  let artifactReferences;
+  let sourceStoreRoot;
+  let sourceIndexPath = shippedIndexPath;
+  for (let index = 0; index < argv.length; index += 1) {
+    const argument = argv[index];
+    const value = argv[index + 1];
+    if (!value) {
+      throw new Error(`Unknown or incomplete argument: ${argv[index]}`);
+    }
+    index += 1;
+    if (argument === "--artifact-references") {
+      artifactReferences = validateArtifactReferences(
+        JSON.parse(await readFile(path.resolve(value), "utf8")),
+        "consumer-check artifact references",
+      );
+    } else if (argument === "--store-root") sourceStoreRoot = path.resolve(value);
+    else if (argument === "--shipped-index") sourceIndexPath = path.resolve(value);
+    else throw new Error(`Unknown argument: ${argument}`);
+  }
   const site = await readSiteConfig();
   const output = await mkdtemp(path.join(tmpdir(), "deherm-policy-site-"));
   const host = await serve(output);
@@ -276,9 +295,16 @@ async function main() {
     // owned prefix, proving the consumer follows the index's data rather than a
     // constant compiled into it.
     const relocated = { baseUrl: host.origin, pathPrefix: "deherm-relocated" };
-    await buildPolicySite({ site, output, ...relocated });
+    await buildPolicySite({
+      site,
+      output,
+      artifactReferences,
+      storeRoot: sourceStoreRoot,
+      shippedIndexPath: sourceIndexPath,
+      ...relocated,
+    });
 
-    const shipped = JSON.parse(await readFile(shippedIndexPath, "utf8"));
+    const shipped = JSON.parse(await readFile(sourceIndexPath, "utf8"));
     const index = { ...shipped, base: { ...shipped.base, url: relocated.baseUrl, pathPrefix: relocated.pathPrefix } };
     const { trace, results } = await resolvePolicy({ index });
 
@@ -328,15 +354,24 @@ async function main() {
     // unrelated revision's entry. Fetching it here is what proves a consumer
     // can still get from a revision to a download without that coupling.
     //
-    // One bundle-target archive and one host archive, because the two are
-    // indexed differently and a consumer that conflated them would download the
-    // wrong file for the right-looking reason.
+    // Resolve every native target independently: four target recipes may name
+    // four different immutable releases, even when one checkout happens to
+    // publish them under a shared legacy tag. Check a host key separately.
     for (const { revision, artifacts } of results) {
-      for (const [family, key, member] of [
-        ["native-artifacts", "arm64-osx", "libhermes.a"],
-        ["hermes-host", "linux-x64", "hermesc"],
-      ]) {
+      const native = artifacts.artifacts["native-artifacts"];
+      const coordinates = Object.keys(native.assets)
+        .sort()
+        .map((key) => ["native-artifacts", key, native.contents?.[key]?.[0]]);
+      for (const [family, key, member] of [...coordinates, ["hermes-host", "linux-x64", "hermesc"]]) {
+        if (typeof member !== "string" || !member.length) {
+          throw new Error(`${revision}: ${family}/${key} has no declared archive member`);
+        }
         const resolved = resolveArtifactUrl({ index, artifacts, family, key, member });
+        const reference = artifacts.artifacts[family];
+        const release = reference.releases?.[key] ?? reference;
+        if (resolved.tag !== release.tag || resolved.asset !== reference.assets[key]) {
+          throw new Error(`${revision}: ${family}/${key} resolved a different immutable release or asset`);
+        }
         // The vendoring path builds the same URL from the same tag and asset
         // without ever reading the index. If these two disagree, a user who
         // followed the index would download something `pull` would not.

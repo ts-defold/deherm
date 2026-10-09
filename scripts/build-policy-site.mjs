@@ -29,6 +29,7 @@ import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { ARTIFACTS_DOCUMENT_KIND, artifactsPath, hashBytes, indexPath } from "../packages/compiler/src/api-policy.mjs";
+import { releaseIntegrityAssetName } from "../packages/cli/src/release-integrity-name.mjs";
 import {
   buildArtifactReferences,
   readSiteConfig,
@@ -36,10 +37,35 @@ import {
   shippedIndexPath,
   storeRoot,
 } from "./generate-api-policy.mjs";
-import { artifactFamilyNames } from "./lib/artifact-releases.mjs";
+import { artifactFamilyNames, familyArchiveName, nativeArtifactRecipeForTarget } from "./lib/artifact-releases.mjs";
 
 export const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 export const defaultOutputDirectory = path.join(root, "build", "policy-site");
+
+const releaseTagPattern = /^[A-Za-z0-9][A-Za-z0-9._-]*$/u;
+const fingerprintPattern = /^[0-9a-f]{64}$/u;
+
+function record(value) {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+function validReleaseIdentity(value) {
+  return (
+    record(value) &&
+    typeof value.tag === "string" &&
+    releaseTagPattern.test(value.tag) &&
+    typeof value.fingerprint === "string" &&
+    fingerprintPattern.test(value.fingerprint)
+  );
+}
+
+function nativeRecipe(key, label) {
+  try {
+    return nativeArtifactRecipeForTarget(key);
+  } catch {
+    throw new Error(`${label} names undeclared native-artifacts target ${key}`);
+  }
+}
 
 async function walk(directory, prefix = "") {
   const out = [];
@@ -72,21 +98,60 @@ export function validateArtifactReferences(value, label = "artifact references",
   }
   for (const family of artifactFamilyNames) {
     const row = references[family];
-    if (!row || typeof row !== "object" || Array.isArray(row)) {
+    if (!record(row)) {
       throw new Error(`${label} has no ${family} family`);
     }
-    if (typeof row.tag !== "string" || !row.tag.length || !/^[0-9a-f]{64}$/u.test(row.fingerprint ?? "")) {
-      throw new Error(`${label} has an invalid ${family} release identity`);
-    }
-    if (!row.assets || typeof row.assets !== "object" || !Object.keys(row.assets).length) {
+    if (!record(row.assets) || !Object.keys(row.assets).length) {
       throw new Error(`${label} has no ${family} assets`);
     }
+    const assetKeys = Object.keys(row.assets).sort();
+    for (const key of assetKeys) {
+      if (typeof row.assets[key] !== "string" || !row.assets[key].length) {
+        throw new Error(`${label} has an invalid ${family}/${key} asset`);
+      }
+      if (family === "native-artifacts" && row.assets[key] !== familyArchiveName(family, key)) {
+        throw new Error(`${label} has an asset mismatch for ${family}/${key}`);
+      }
+    }
+    if (family === "native-artifacts" && Object.hasOwn(row, "releases")) {
+      // The producer emits exactly one of these shapes. Accepting both would
+      // make the effective release depend on which consumer reads the mapping.
+      if (Object.hasOwn(row, "tag") || Object.hasOwn(row, "fingerprint")) {
+        throw new Error(`${label} mixes family and per-target native-artifacts release coordinates`);
+      }
+      if (!record(row.releases)) {
+        throw new Error(`${label} has a malformed native-artifacts releases map`);
+      }
+      const releaseKeys = Object.keys(row.releases).sort();
+      if (JSON.stringify(releaseKeys) !== JSON.stringify(assetKeys)) {
+        throw new Error(`${label} has mismatched native-artifacts asset and release indexes`);
+      }
+      for (const key of assetKeys) {
+        const release = row.releases[key];
+        if (!validReleaseIdentity(release)) {
+          throw new Error(`${label} has an invalid native-artifacts/${key} release identity`);
+        }
+        if (release.recipe !== nativeRecipe(key, label)) {
+          throw new Error(`${label} has an invalid native-artifacts/${key} recipe`);
+        }
+      }
+    } else {
+      if (Object.hasOwn(row, "releases") || !validReleaseIdentity(row)) {
+        throw new Error(`${label} has an invalid ${family} release identity`);
+      }
+      if (family === "native-artifacts") {
+        for (const key of assetKeys) nativeRecipe(key, label);
+      }
+    }
     if (options.requireIntegrity) {
-      for (const key of Object.keys(row.assets)) {
+      if (!record(row.integrity) || JSON.stringify(Object.keys(row.integrity).sort()) !== JSON.stringify(assetKeys)) {
+        throw new Error(`${label} has mismatched ${family} asset and integrity indexes`);
+      }
+      for (const key of assetKeys) {
         const integrity = row.integrity?.[key];
         if (
-          !integrity ||
-          typeof integrity.asset !== "string" ||
+          !record(integrity) ||
+          integrity.asset !== releaseIntegrityAssetName(row.assets[key]) ||
           !/^[0-9a-f]{64}$/u.test(integrity.sha256 ?? "") ||
           !/^[0-9a-f]{64}$/u.test(integrity.archiveSha256 ?? "") ||
           !Number.isSafeInteger(integrity.archiveBytes) ||
@@ -288,7 +353,7 @@ export async function buildPolicySite(options = {}) {
   const artifactReferences = validateArtifactReferences(
     options.artifactReferences ?? (await buildArtifactReferences({ integrityRoot: options.artifactIntegrityRoot })),
     "artifact references",
-    { requireIntegrity: Boolean(options.artifactIntegrityRoot) },
+    { requireIntegrity: Boolean(options.artifactIntegrityRoot || options.requireIntegrity) },
   );
   for (const entry of store.entries) {
     const document = {
@@ -388,7 +453,9 @@ async function main(argv = process.argv.slice(2)) {
       options.artifactReferences = validateArtifactReferences(
         JSON.parse(await readFile(file, "utf8")),
         `artifact references from ${file}`,
+        { requireIntegrity: true },
       );
+      options.requireIntegrity = true;
     } else throw new Error(`Unknown argument: ${argument}`);
   }
   if (options.validationOnly && (options.artifactReferences || options.artifactIntegrityRoot)) {

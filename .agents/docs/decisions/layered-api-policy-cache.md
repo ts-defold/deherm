@@ -324,13 +324,27 @@ carries the answer without mutating the immutable sha-to-policy mapping:
 
 ```
 "artifacts": {
-  "native-artifacts": { "tag": "native-artifacts-<fp>", "indexedBy": "bundleTarget",
-                        "assets": { "arm64-osx": "hermes-arm64-osx-libhermes.a", … } },
-  "hermes-host":      { "tag": "hermes-host-<fp>",      "indexedBy": "host",
-                        "assets": { "linux-x64": { "hermesc": …, "shermes": … }, … } },
-  "dehermc":          { "tag": "dehermc-<fp>",          "indexedBy": "host", "assets": { … } }
+  "native-artifacts": { "indexedBy": "bundleTarget",
+                        "assets": { "arm64-osx": "hermes-arm64-osx.tar.gz", … },
+                        "releases": { "arm64-osx": { "recipe": "apple",
+                          "tag": "libs-<short-fp>", "fingerprint": "<sha256>" }, … } },
+  "hermes-host":      { "tag": "hermes-<short-fp>", "fingerprint": "<sha256>",
+                        "indexedBy": "host", "assets": { "linux-x64": "hermes-host-linux-x64.tar.gz", … } },
+  "dehermc":          { "tag": "tools-<short-fp>", "fingerprint": "<sha256>",
+                        "indexedBy": "host", "assets": { … } }
 }
 ```
+
+When all native targets share one release, the producer instead puts its
+`tag`/`fingerprint` on the native family and omits `releases`. Publication
+accepts exactly one shape: a family identity, or one complete per-target
+identity for every declared native asset. Mixed coordinates, missing or extra
+target keys, invalid identities, and mismatched recipes are errors. The
+publisher also requires each exact archive asset to have a matching integrity
+sidecar, including when publication reuses an authenticated last-complete
+mapping. A new Defold SDK pin may legitimately split native recipes without
+changing the script/API policy, so site validation must not demand a fabricated
+family-wide native release.
 
 and the served index gains one more template beside the three path templates:
 

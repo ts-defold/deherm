@@ -15,6 +15,7 @@ import test from "node:test";
 import { releaseAssetUrlTemplate } from "../packages/cli/src/release-assets.mjs";
 import { RELEASE_INTEGRITY_KIND, sha256 } from "../packages/cli/src/release-integrity.mjs";
 import { buildArtifactReferences } from "../scripts/generate-api-policy.mjs";
+import { validateArtifactReferences } from "../scripts/build-policy-site.mjs";
 import { artifactAssetRows } from "../scripts/project-artifact-references.mjs";
 import { planNativeArtifactBuilds } from "../scripts/plan-native-artifact-builds.mjs";
 import {
@@ -180,6 +181,23 @@ test("Defold's SDK pins still move the target archives, and its provenance field
   const baseline = await fingerprintFamily("native-artifacts", { root: before });
   assert.notEqual(await fingerprintFamily("native-artifacts", { root: pinned }), baseline);
   assert.equal(await fingerprintFamily("native-artifacts", { root: provenance }), baseline);
+});
+
+test("a real per-target producer projection passes the site publication validator", async (t) => {
+  const checkout = await scratchCheckout({
+    bundleTargets: (targets) => ({ ...targets, sdk: { ...targets.sdk, macosxVersionMin: "11.0" } }),
+  });
+  t.after(() => rm(checkout, { recursive: true, force: true }));
+  const references = await buildArtifactReferences({ sourceRoot: checkout });
+  const native = references["native-artifacts"];
+  assert.equal(native.tag, undefined, "divergent recipes cannot be collapsed to one family tag");
+  assert.deepEqual(Object.keys(native.releases).sort(), Object.keys(native.assets).sort());
+  assert.equal(validateArtifactReferences(references), references);
+  for (const target of Object.keys(native.assets)) {
+    const expected = await nativeArtifactRelease(target, { root: checkout });
+    assert.equal(native.releases[target].tag, expected.tag, target);
+    assert.equal(native.releases[target].fingerprint, expected.fingerprint, target);
+  }
 });
 
 test("native target recipe fingerprints invalidate only byte-compatible lanes", async (t) => {
