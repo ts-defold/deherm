@@ -94,16 +94,20 @@ ensure_release() {
   if gh release view "$tag" --repo "$repo" >/dev/null 2>&1; then
     return 0
   fi
-  local target_args=()
+  # macOS ships Bash 3.2. With `set -u`, expanding an empty array via
+  # "${target_args[@]}" is an unbound-variable error there. Keep the optional
+  # argument in explicit branches so the Apple publisher works with /bin/bash.
   if [[ -n "$release_target" ]]; then
-    target_args=(--target "$release_target")
+    gh release create "$tag" \
+      --repo "$repo" --title "$release_title" --notes "$release_notes" \
+      --target "$release_target" --prerelease >/dev/null || true
+  else
+    gh release create "$tag" \
+      --repo "$repo" --title "$release_title" --notes "$release_notes" \
+      --prerelease >/dev/null || true
   fi
-  gh release create "$tag" \
-    --repo "$repo" \
-    --title "$release_title" \
-    --notes "$release_notes" \
-    "${target_args[@]}" \
-    --prerelease >/dev/null 2>&1 || true
+  # A competing lane may have created the release. Creation failure is only
+  # benign if the release now exists; otherwise propagate failure to the job.
   gh release view "$tag" --repo "$repo" >/dev/null 2>&1
 }
 
@@ -185,3 +189,20 @@ upload_immutable() {
 # sees an archive row as complete without its authenticated expectation.
 upload_immutable "$integrity_name" "$integrity"
 upload_immutable "$asset_name" "$staged"
+
+# Never report a green upload step merely because `gh release upload` returned
+# zero. The published release must actually contain both immutable files.
+for candidate in "$integrity_name" "$asset_name"; do
+  published=0
+  for attempt in 1 2 3 4 5; do
+    if asset_exists "$candidate"; then
+      published=1
+      break
+    fi
+    [[ "$attempt" -eq 5 ]] || sleep 2
+  done
+  if [[ "$published" -ne 1 ]]; then
+    echo "Upload step finished but $tag does not contain $candidate" >&2
+    exit 1
+  fi
+done

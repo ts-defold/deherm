@@ -638,6 +638,15 @@ that appears in two lanes. The upload boundary repeats the existence check and
 never uses `--clobber`, so a manual dispatch or an external publisher that wins
 after planning cannot overwrite immutable bytes.
 
+The release uploader supports macOS's system Bash 3.2: an absent optional
+`RELEASE_TARGET` is selected by a scalar branch, not an empty array expanded
+under `set -u`. After uploading, it checks that both the archive and integrity
+sidecar are visible under the release; a missing release or either missing
+asset must make the matrix row fail. The completeness summary is a second,
+cross-row gate, not a substitute for truthful row exit statuses. To repair a
+run whose Apple build rows falsely passed but published no files, dispatch the
+whole workflow on the fixed commit. “Rerun failed jobs” would omit those rows.
+
 Only integer row slots cross GitHub's job-output boundary. Run
 `35460053961` proved that GitHub's secret-output heuristic can discard a full
 public JSON matrix: all six matrix outputs were omitted as "may contain secret",
