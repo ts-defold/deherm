@@ -8,7 +8,7 @@ import {
   githubOutputRecords,
   planNativeArtifactBuilds,
 } from "../scripts/plan-native-artifact-builds.mjs";
-import { buildReleaseTags } from "../scripts/generate-release-tags.mjs";
+import { assertReleaseTagsCurrent, buildReleaseTags } from "../scripts/generate-release-tags.mjs";
 
 function rows(plan) {
   return Object.values(plan.matrices).flatMap((matrix) => matrix.include);
@@ -114,11 +114,16 @@ test("complete artifact publication refreshes policy before consumer proof", asy
   const workflow = await readFile(".github/workflows/native-artifacts.yml", "utf8");
   const final = workflow.slice(workflow.indexOf("  summary:"));
   const completeness = final.indexOf("Verify every fingerprinted row is published");
-  const releaseLock = final.indexOf("Verify the shipped release lock against publisher sidecars");
+  const releaseLock = final.indexOf("Regenerate and verify the published release lock");
+  const regenerate = final.indexOf("generate-release-tags.mjs --published");
+  const reverify = final.indexOf("generate-release-tags.mjs --check --published");
+  const preserved = final.indexOf("name: published-release-tags");
   const policy = final.indexOf("gh workflow run policy.yml");
   assert.ok(completeness >= 0);
-  assert.ok(releaseLock > completeness, "the package release lock must be reproduced after release completeness");
-  assert.ok(policy > completeness, "policy artifact mappings must refresh only after release completeness");
+  assert.ok(releaseLock > completeness, "release-lock derivation must follow release completeness");
+  assert.ok(regenerate > releaseLock, "the published lock must be regenerated before checking it");
+  assert.ok(reverify > regenerate, "the regenerated lock must be re-verified against published sidecars");
+  assert.ok(preserved > reverify && policy > preserved, "only a verified, preserved lock may precede policy refresh");
   assert.match(final, /if: inputs\.policy_run_id == ''[\s\S]*generate-release-tags\.mjs --check --published/u);
   assert.match(final, /-f artifact_refresh_only=true/u);
   assert.doesNotMatch(final, /gh workflow run end-to-end\.yml/u);
@@ -140,6 +145,20 @@ test("target publication is not circularly gated by the package host-tool lock",
   assert.match(workflow, /generate-release-tags\.mjs --check --published[\s\S]*gh workflow run policy\.yml/u);
   assert.match(policy, /publish-site:[\s\S]*dispatch-end-to-end/u);
   assert.match(policy, /dispatch-end-to-end:[\s\S]*needs: consumer-smoke/u);
+});
+
+test("authenticated release-lock verification rejects a complete but stale sidecar digest", async () => {
+  const expected = JSON.parse(await readFile("packages/toolchains/release-tags.json", "utf8"));
+  const stale = structuredClone(expected);
+  stale.families["hermes-host"].integrity["darwin-arm64"].sha256 = "0".repeat(64);
+  assert.doesNotThrow(() => assertReleaseTagsCurrent(expected, expected, { authenticated: true }));
+  assert.throws(
+    () => assertReleaseTagsCurrent(stale, expected, { authenticated: true }),
+    /release-tags\.json is stale/u,
+  );
+  // Offline checks lack publisher sidecars and intentionally verify only
+  // coordinates plus a complete local integrity shape.
+  assert.doesNotThrow(() => assertReleaseTagsCurrent(stale, expected));
 });
 
 test("policy-derived SDK compatibility inputs flow through every target artifact job", async () => {

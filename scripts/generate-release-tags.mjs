@@ -78,6 +78,21 @@ function assertCompleteIntegrity(value) {
   }
 }
 
+export function assertReleaseTagsCurrent(existing, generated, { authenticated = false } = {}) {
+  // An offline checkout can compare release coordinates but cannot recover
+  // publisher sidecar digests. Once sidecars were supplied or downloaded,
+  // compare the entire document: a complete but stale integrity map is not a
+  // verified package lock.
+  const observed = authenticated ? existing : withoutIntegrity(existing);
+  const expected = authenticated ? generated : withoutIntegrity(generated);
+  if (JSON.stringify(observed) !== JSON.stringify(expected)) {
+    throw new Error(
+      "packages/toolchains/release-tags.json is stale; run pnpm generate:release-tags after publishing artifacts",
+    );
+  }
+  assertCompleteIntegrity(existing);
+}
+
 export async function downloadPublishedIntegrity() {
   const integrityRoot = await mkdtemp(path.join(tmpdir(), "deherm-release-integrity-"));
   const families = await buildHostArtifactReferences();
@@ -136,13 +151,7 @@ async function main(argv = process.argv.slice(2)) {
     if (check) {
       const existingText = await readFile(releaseTagsPath, "utf8").catch(() => "");
       const existing = existingText ? JSON.parse(existingText) : null;
-      const matches = JSON.stringify(withoutIntegrity(existing)) === JSON.stringify(withoutIntegrity(generated));
-      if (!matches) {
-        throw new Error(
-          "packages/toolchains/release-tags.json is stale; run pnpm generate:release-tags after publishing artifacts",
-        );
-      }
-      assertCompleteIntegrity(existing);
+      assertReleaseTagsCurrent(existing, generated, { authenticated: Boolean(integrityRoot) });
       console.log("release tags are current");
       return;
     }

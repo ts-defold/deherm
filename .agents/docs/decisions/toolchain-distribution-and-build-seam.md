@@ -679,13 +679,20 @@ push either; that raced artifact publication itself. Script-only end-to-end
 changes still run their cheap local stage directly; nightlies and the ordered
 post-publication dispatch retain the full Bob matrix.
 
-For package-default artifact runs, the summary also runs
-`pnpm check:release-tags:published`: it downloads every sidecar, authenticates
-it against GitHub's publisher digest, reconstructs `release-tags.json`, and
-requires byte equality with the shipped lock. `pnpm generate:release-tags` is
-the corresponding maintainer update command. Policy-derived target runs skip
-this package-lock comparison because they intentionally build a different
-Defold revision's native rows.
+For package-default artifact runs, the summary regenerates `release-tags.json`
+from every published host-tool sidecar, authenticates each sidecar against
+GitHub's publisher digest, then runs `--check --published` on the regenerated
+lock. Authenticated checking compares the full lock, including each integrity
+record; offline checking compares coordinates and integrity completeness but
+cannot prove sidecar digests. CI preserves the verified file as the
+`published-release-tags` workflow
+artifact before dispatching policy refresh. A stale checked-in lock after newly
+published host-tool inputs is an expected maintainer update, not a reason to
+hold back an otherwise complete native artifact mapping. CI emits an explicit
+notice if the file differs; `pnpm generate:release-tags` is the corresponding
+signed maintainer update command, and packaging must use the updated lock.
+Policy-derived target runs skip this package-lock reconstruction because they
+intentionally build a different Defold revision's native rows.
 
 The native summary marks its dispatch `artifact_refresh_only`. The policy graph
 still hydrates, verifies, publishes, waits for Pages, and runs its clean consumer

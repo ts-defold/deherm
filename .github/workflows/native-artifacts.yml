@@ -715,11 +715,28 @@ jobs:
               row.missing.map((asset) => `${family}: ${asset}`));
             if (missing.length) throw new Error(`fingerprinted release rows remain unpublished:\n${missing.join("\n")}`);
           '
-      - name: Verify the shipped release lock against publisher sidecars
+      # Publication can legitimately rotate the host-tool fingerprints after
+      # checkout. Reconstruct the package lock from the authenticated release
+      # sidecars in this job before checking it; the checked-in copy is updated
+      # separately by a signed maintainer commit, not by an unsigned CI push.
+      - name: Regenerate and verify the published release lock
         if: inputs.policy_run_id == ''
         env:
           GH_TOKEN: ${{ github.token }}
-        run: node scripts/generate-release-tags.mjs --check --published
+        run: |
+          set -euo pipefail
+          node scripts/generate-release-tags.mjs --published
+          node scripts/generate-release-tags.mjs --check --published
+          if ! git diff --quiet -- packages/toolchains/release-tags.json; then
+            echo "::notice::Published host-tool coordinates changed. Commit the regenerated packages/toolchains/release-tags.json with the maintainer's signed identity before packaging a release."
+          fi
+      - name: Preserve the verified published release lock
+        if: inputs.policy_run_id == ''
+        uses: actions/upload-artifact@v6
+        with:
+          name: published-release-tags
+          path: packages/toolchains/release-tags.json
+          if-no-files-found: error
       # A policy run may have completed while these rows were still building.
       # It publishes policy objects immediately but retains the last complete
       # artifact mapping rather than exposing deterministic 404s. Re-run the
