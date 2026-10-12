@@ -30,6 +30,17 @@ native-link diagnostic survives to the caller. The exact hosted Linux
 failure remains open until the next CI run exposes that diagnostic; no local
 macOS success is promoted to runner success.
 
+The diagnostic run (`38299637237`) finally exposed the concrete gap: a clean
+source checkout lacks the ignored, pinned Hermes public-header closure, so
+Bob's Linux compiler could not find `jsi/jsi.h`. The published npm package
+includes these headers through its `prepack` staging step; the monorepo
+`workspace:*` dependency used by our own smoke does not run that step. The
+reusable workflow now stages the exact pinned Hermes headers only for its
+source-workspace dogfood in `ts-defold/deherm`, before native build steps.
+Normal external consumers continue to use the packaged headers and do not
+clone Hermes. This distinction is asserted by the workflow test; runner
+closure awaits the next smoke result.
+
 ## 2026-10-12 - Expose a three-mode consumer build workflow
 
 The repository now carries a single-target composite Action, a reusable

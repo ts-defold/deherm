@@ -13,6 +13,8 @@ on:
       - packages/cli/src/ci-bundle.mjs
       - packages/cli/src/cli.mjs
       - packages/cli/src/dev/defold-builder.mjs
+      - scripts/stage-hermes-public-headers.mjs
+      - scripts/bootstrap-upstreams.sh
       - package.json
   workflow_dispatch:
     inputs:

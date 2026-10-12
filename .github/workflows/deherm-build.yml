@@ -213,6 +213,15 @@ jobs:
             fi
             cli_dir="$(dirname "$cli_dir")"
           done
+      - name: Stage pinned Hermes headers for source-workspace dogfood
+        if: github.repository == 'ts-defold/deherm' && matrix.entry.group != 'web'
+        run: |
+          set -euo pipefail
+          if [ ! -f project/defold/defold_hermes/include/jsi/jsi.h ]; then
+            cd project
+            bash scripts/bootstrap-upstreams.sh hermes
+            node scripts/stage-hermes-public-headers.mjs
+          fi
       - name: Enable arm64 Docker builders
         if: inputs.mode == 'local' && matrix.entry.group == 'linux'
         uses: docker/setup-qemu-action@v3
@@ -339,6 +348,15 @@ jobs:
             fi
             cli_dir="$(dirname "$cli_dir")"
           done
+      - name: Stage pinned Hermes headers for source-workspace dogfood
+        if: github.repository == 'ts-defold/deherm'
+        run: |
+          set -euo pipefail
+          if [ ! -f project/defold/defold_hermes/include/jsi/jsi.h ]; then
+            cd project
+            bash scripts/bootstrap-upstreams.sh hermes
+            node scripts/stage-hermes-public-headers.mjs
+          fi
       - name: Start pinned local Apple Extender
         if: inputs.mode == 'local'
         run: |

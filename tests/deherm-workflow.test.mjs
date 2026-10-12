@@ -75,6 +75,10 @@ test("reusable workflow has an explicit immutable action ref and runner-owned lo
     const build = job.steps.find((step) => step.id === "build");
     assert.equal(build.uses, "./.deherm-action");
     assert.match(build.with["build-server"], /inputs\.mode == 'local'/);
+    assert.equal(build.env.GITHUB_TOKEN, "${{ github.token }}");
+    const headerStage = job.steps.find((step) => step.name === "Stage pinned Hermes headers for source-workspace dogfood");
+    assert.match(headerStage.if, /github\.repository == 'ts-defold\/deherm'/);
+    assert.match(headerStage.run, /scripts\/stage-hermes-public-headers\.mjs/);
     const archive = job.steps.find((step) => step.id === "archive");
     assert.match(archive.run, /tar -czf/);
     assert.equal(archive.env.BUNDLE_PATH, "${{ steps.build.outputs.bundle-path }}");
@@ -91,6 +95,7 @@ test("War Battles dogfood invokes the public workflow at its own commit", () => 
   assert.equal(smoke.jobs["war-battles"].uses, "./.github/workflows/deherm-build.yml");
   assert.equal(smoke.jobs["war-battles"].with["action-ref"], "${{ github.sha }}");
   assert.equal(smoke.jobs["war-battles"].with.project, "examples/war-battles-online/defold");
+  assert.equal(smoke.jobs["war-battles"].with.entry, "main/player.script.ts");
   assert.ok(smoke.on.push.paths.includes("action.yml"));
   assert.ok(smoke.on.push.paths.includes("packages/cli/src/ci-bundle.mjs"));
 });
