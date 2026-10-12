@@ -1,5 +1,33 @@
 # Defold Hermes knowledge log
 
+## 2026-10-12 - Separate War Battles transport loss from replay divergence
+
+Two focused product-network tests remain red on clean `main`: the seeded
+one-client 120±60 ms/20% loss case accepts 540 inputs with 21 late (gates:
+at least 550 and at most 13), and the 16-client edge case reaches a 1,233-unit
+raw local correction (ceiling 1,024). Its worst sample occurs at workload tick
+88, client index 5, replaying snapshot tick 78 to local tick 103; the sampled
+presented step is 196 units, below the separate 256-unit visible-step ceiling.
+These are deterministic application-payload harness observations, not QUIC
+packet captures or live visual evidence.
+
+Bounded experiments were reverted, leaving no game-source change. Adding two
+lead-safety ticks when observed snapshot age exceeded six ticks reduced some
+late arrivals but worsened the 32-client mobile correction ratio. Increasing
+authoritative late-feedback increments from 2/1 to 4/2 reached 13 late in the
+one-client severe case but still accepted only 538 inputs. A six-command resend
+window, with its age flags widened from two to three bits, raised acceptance to
+575 but left 20 late and increased the packet budget from 50 to 62 bytes at
+full occupancy. Combining it with faster feedback still left 18 late. Skipping
+client-side body separation made the 16-client edge correction worse (1,982
+units). None of these is a shippable one-knob fix.
+
+Next work should distinguish lost input windows from commands arriving after
+their authoritative tick, then address replay disagreement around remote
+motion/body contacts independently. Preserve the established 30 Hz input
+cadence, bandwidth accounting, visible-step gate, and source-bound evidence;
+do not relax thresholds or promote these experiments to production proof.
+
 ## 2026-10-09 - Recover online ticks after render stalls without over-leading admission
 
 The packaged War Battles Chromium/WebGL2 client exposed two coupled clock
