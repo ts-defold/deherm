@@ -419,7 +419,10 @@ test("release projection rejects an omitted or mismatched per-target coordinate"
   missing["native-artifacts"].releases = Object.fromEntries(
     Object.keys(missing["native-artifacts"].assets).map((target) => [
       target,
-      { tag: missing["native-artifacts"].tag, fingerprint: missing["native-artifacts"].fingerprint },
+      {
+        tag: (references["native-artifacts"].releases?.[target] ?? references["native-artifacts"]).tag,
+        fingerprint: (references["native-artifacts"].releases?.[target] ?? references["native-artifacts"]).fingerprint,
+      },
     ]),
   );
   delete missing["native-artifacts"].tag;
