@@ -217,6 +217,14 @@ cache is installed. Public downloads need no credentials; CI supplies its
 ephemeral `GH_TOKEN` for publisher-metadata lookups so a platform matrix cannot
 consume GitHub's anonymous API allowance and mistake rate limiting for missing
 toolchain evidence.
+Release-readiness CI also runs a read-only pin audit on main pushes and manual
+dispatches: it resolves each declared host row from the shared artifact-release
+helpers, authenticates the immutable sidecar against GitHub's publisher digest
+and `release-tags.json`, validates the exact family/tag/archive/member identity,
+then compares every host-tool SHA-256 and byte size with `host-compilers.json`.
+The audit never downloads compiler archives or changes pins. Pull requests run
+the same injected-fixture regressions offline, so GitHub availability cannot
+masquerade as a semantic pin mismatch in PR checks.
 Publisher-metadata lookups retry only transient network errors, HTTP 429, and
 HTTP 5xx with bounded delays. Missing assets, invalid identities, and digest
 mismatches remain immediate hard failures; a transient GitHub 504 must not make

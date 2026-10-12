@@ -359,7 +359,7 @@ test("CI publishes content-addressed rows immutably and release assembly consume
     (nativeWorkflow.match(/actions\/checkout@v7/gu) ?? []).length,
     (nativeWorkflow.match(/persist-credentials: false/gu) ?? []).length,
   );
-  assert.match(releaseWorkflow, /needs: native-artifacts/u);
+  assert.match(releaseWorkflow, /package-and-release:\n    needs: \[validate-release-provenance, native-artifacts\]/u);
   assert.match(releaseWorkflow, /gh release download "\$NATIVE_TAG"/u);
   assert.match(releaseWorkflow, /manage-defold-webtransport-artifacts\.mjs assemble/u);
   assert.match(releaseWorkflow, /--source build\/defold-webtransport-release-source/u);

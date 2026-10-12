@@ -5,7 +5,6 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const releaseVersion = "0.1.0";
 
 async function json(relative) {
   return JSON.parse(await readFile(path.join(root, relative), "utf8"));
@@ -33,28 +32,38 @@ async function workspaceManifests() {
 }
 
 const failures = [];
+const rootPackage = await json("package.json");
+const workspaceVersion = rootPackage.version;
+if (!workspaceVersion) failures.push("package.json: missing root workspace version");
 for (const manifestFile of await workspaceManifests()) {
   const manifest = await json(manifestFile);
-  if (manifest.version !== releaseVersion) {
-    failures.push(`${manifestFile}: expected version ${releaseVersion}, received ${manifest.version ?? "<missing>"}`);
+  if (manifest.version !== workspaceVersion) {
+    failures.push(
+      `${manifestFile}: expected workspace version ${workspaceVersion ?? "<missing>"}, received ${manifest.version ?? "<missing>"}`,
+    );
   }
 }
 
 const standaloneVersion = (await readFile(path.join(root, "extensions/defold-webtransport/VERSION"), "utf8")).trim();
-if (standaloneVersion !== releaseVersion) failures.push(`Defold WebTransport VERSION is ${standaloneVersion}`);
 const standaloneProject = await readFile(path.join(root, "extensions/defold-webtransport/game.project"), "utf8");
-if (!new RegExp(`^version\\s*=\\s*${releaseVersion.replaceAll(".", "\\.")}\\s*$`, "mu").test(standaloneProject)) {
+const standaloneProjectVersion = /^version\s*=\s*([^\s#]+)\s*$/mu.exec(standaloneProject)?.[1];
+if (standaloneProjectVersion !== standaloneVersion) {
   failures.push("Defold WebTransport game.project does not match VERSION");
 }
+const expectedDependencyUrl = `https://github.com/ts-defold/deherm/releases/download/defold-webtransport-v${standaloneVersion}/defold-webtransport-${standaloneVersion}.zip`;
+const standaloneReadme = await readFile(path.join(root, "extensions/defold-webtransport/README.md"), "utf8");
+if (!standaloneReadme.includes(expectedDependencyUrl)) {
+  failures.push("Defold WebTransport README dependency URL does not match VERSION");
+}
 
-for (const changelog of [
-  "CHANGELOG.md",
-  "editors/vscode/CHANGELOG.md",
-  "extensions/defold-webtransport/defold_webtransport/CHANGELOG.md",
-]) {
+for (const changelog of ["CHANGELOG.md", "editors/vscode/CHANGELOG.md"]) {
   const source = await readFile(path.join(root, changelog), "utf8");
-  if (!source.includes(`## ${releaseVersion} - Unreleased`))
-    failures.push(`${changelog}: missing ${releaseVersion} entry`);
+  if (!source.includes(`## ${workspaceVersion} - Unreleased`))
+    failures.push(`${changelog}: missing ${workspaceVersion} entry`);
+}
+const standaloneChangelog = "extensions/defold-webtransport/defold_webtransport/CHANGELOG.md";
+if (!(await readFile(path.join(root, standaloneChangelog), "utf8")).includes(`## ${standaloneVersion} - Unreleased`)) {
+  failures.push(`${standaloneChangelog}: missing ${standaloneVersion} entry`);
 }
 
 for (const required of [
@@ -80,5 +89,5 @@ if (failures.length > 0) {
   throw new Error(`release readiness failed:\n- ${failures.join("\n- ")}`);
 }
 console.log(
-  `release-readiness: ${releaseVersion}; ${await workspaceManifests().then((files) => files.length)} workspace packages aligned`,
+  `release-readiness: workspace ${workspaceVersion}, Defold WebTransport ${standaloneVersion}; ${await workspaceManifests().then((files) => files.length)} workspace packages aligned`,
 );

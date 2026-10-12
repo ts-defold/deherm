@@ -76,12 +76,31 @@ by its statically linked native dependencies. Packaging fails closed if any
 required license file or `CHANGELOG.md` is absent. Release notes come from that
 changelog; a tag never overwrites an existing non-identical asset.
 
-The release workflow assembles all content-addressed native targets, runs the
-generic JSI and Static Hermes facades, executes the native fixed-storage core
-under ASan and UBSan, then uses Bob to compile the staged ordinary Lua example
-for x86_64 Linux and HTML5 before attaching the ZIP. The minimal example owns
-only a Lua client and Deno WebTransport echo server; it does not depend on
-déherm or any War Battles transport or protocol module.
+The release workflow first requires its commit to be reachable from `main`; a
+tag-triggered run also requires the tag to point at that exact commit and match
+the extension's `VERSION`. It assembles all content-addressed native targets,
+runs the generic JSI and Static Hermes facades, executes the native
+fixed-storage core under ASan and UBSan, and packages the dependency ZIP. The
+workflow then stages the minimal Lua example from the package command's
+archive-derived dogfood tree and uses Bob to compile it for x86_64 Linux and
+HTML5 before attaching the ZIP. This verifies the release members are accepted
+by Bob through the ordinary Lua project layout.
+
+This compile gate is not a live echo smoke. The example's certificate hash is
+an editor-set script property with a deliberate placeholder, and this workflow
+has no existing packaged-engine runner that provisions that property, starts
+the Deno TLS echo server, launches the native game, and waits for both Lua echo
+events. Keep the live gate explicit: generate a temporary certificate and key,
+start the example's Deno server with those files, set the client hash to the
+certificate SHA-256, install the exact release ZIP into a clean copy of the
+example, build and launch the packaged Linux game under a virtual display, then
+require both `datagram echo: hello datagram` and `stream echo: hello stream`
+before a bounded timeout. HTML5 needs the same ZIP install plus a secure-origin
+browser runner and browser WebTransport support; Bob compilation alone does
+not prove either runtime exchange.
+
+The minimal example owns only a Lua client and Deno WebTransport echo server;
+it does not depend on déherm or any War Battles transport or protocol module.
 
 The browser backend treats `datagrams.createWritable()` as the current
 WebTransport contract and retains `datagrams.writable` as an explicit legacy

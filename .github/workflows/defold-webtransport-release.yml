@@ -35,13 +35,52 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  validate-release-provenance:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Require a main-derived release commit and exact version tag
+        env:
+          REQUESTED_VERSION: ${{ inputs.version || '' }}
+          RELEASE_SHA: ${{ github.sha }}
+          RELEASE_REF: ${{ github.ref }}
+          RELEASE_REF_TYPE: ${{ github.ref_type }}
+          RELEASE_REF_NAME: ${{ github.ref_name }}
+        run: |
+          git fetch --no-tags origin +refs/heads/main:refs/remotes/origin/main
+          git merge-base --is-ancestor "$RELEASE_SHA" refs/remotes/origin/main || {
+            echo "Release commit $RELEASE_SHA is not reachable from main" >&2
+            exit 1
+          }
+          if [[ "$RELEASE_REF_TYPE" == "tag" ]]; then
+            tag_commit="$(git rev-parse "${RELEASE_REF}^{commit}")"
+            [[ "$tag_commit" == "$RELEASE_SHA" ]] || {
+              echo "Release tag $RELEASE_REF_NAME does not point at $RELEASE_SHA" >&2
+              exit 1
+            }
+          fi
+          version="$(tr -d '[:space:]' < extensions/defold-webtransport/VERSION)"
+          expected_tag="defold-webtransport-v${version}"
+          if [[ "$RELEASE_REF_TYPE" == "tag" && "$RELEASE_REF_NAME" != "$expected_tag" ]]; then
+            echo "Tag $RELEASE_REF_NAME does not match VERSION-derived tag $expected_tag" >&2
+            exit 1
+          fi
+          if [[ -n "$REQUESTED_VERSION" && "$REQUESTED_VERSION" != "$version" ]]; then
+            echo "Requested version $REQUESTED_VERSION does not match VERSION $version" >&2
+            exit 1
+          fi
+
   native-artifacts:
     uses: ./.github/workflows/defold-webtransport-native-artifacts.yml
+    needs: validate-release-provenance
     permissions:
       contents: write
 
   package-and-release:
-    needs: native-artifacts
+    needs: [validate-release-provenance, native-artifacts]
     runs-on: ubuntu-24.04
     outputs:
       version: ${{ steps.release.outputs.version }}
@@ -63,7 +102,7 @@ jobs:
         with:
           deno-version: v2.x
       - run: pnpm install --frozen-lockfile --ignore-scripts
-      - name: Verify 0.1 release metadata and standalone example
+      - name: Verify standalone release metadata and example
         run: |
           pnpm check:release-readiness
           deno task --config examples/defold-webtransport-minimal/deno.json check
@@ -129,7 +168,7 @@ jobs:
         run: |
           ./scripts/bootstrap-bob.sh
           node scripts/stage-defold-webtransport-minimal-example.mjs \
-            --extension build/defold-webtransport-release-source \
+            --extension build/defold-webtransport-dogfood \
             --output build/defold-webtransport-minimal
           java -jar build/tooling/bob.jar \
             --root build/defold-webtransport-minimal \

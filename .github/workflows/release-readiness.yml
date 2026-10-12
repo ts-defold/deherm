@@ -40,6 +40,11 @@ jobs:
       # The TUI owns a native PTY dependency. Let pnpm install its verified
       # platform prebuild so this matrix exercises the package users receive.
       - run: pnpm install --frozen-lockfile
+      - name: Host compiler pin fixtures (offline)
+        run: node --test tests/host-compiler-release-pins.test.mjs
+      - name: Verify host compiler pins against published releases
+        if: runner.os == 'Linux' && github.event_name != 'pull_request'
+        run: pnpm check:host-compiler-release-pins
       - run: pnpm check:release-readiness
       # The real compiler fixtures import the revision-selected project SDK.
       # Generate it from the same published policy a clean consumer uses;

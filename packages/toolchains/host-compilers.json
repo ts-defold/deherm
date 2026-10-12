@@ -161,14 +161,14 @@
           "file": "bin/hermesc.exe",
           "builder": "windows-msvc-native",
           "status": "vendored",
-          "sha256": "0657c4d85240cf8d084ab8cc85c5740a22b06dfc147837447e7fa84edfce1a73",
+          "sha256": "4f8ad9aaf8bb49f17e12916584e9f87af499241b07b8306c3fc34b5ead866048",
           "bytes": 2884096
         },
         "shermes": {
           "file": "bin/shermes.exe",
           "builder": "windows-msvc-native",
           "status": "vendored",
-          "sha256": "b1465bccf227fa434e6e09cd930a2ecef8ab75d8b5b07e89fcbfa320f9d9d8d2",
+          "sha256": "53729d06ca263b0a7b01d0fb4cd90c364e1db8b830c7516a3241c97ec852722c",
           "bytes": 2445312
         },
         "dehermc": {
