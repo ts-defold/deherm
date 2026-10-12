@@ -12,6 +12,7 @@
 
 extern "C" SHUnit* sh_export_deherm_static_ffi();
 extern "C" SHUnit* sh_export_deherm_static_app();
+extern "C" SHUnit* sh_export_deherm_static_flow_compatible();
 extern "C" SHUnit* sh_export_deherm_static_vmath();
 extern "C" SHUnit* sh_export_deherm_static_universal();
 
@@ -48,6 +49,7 @@ uint32_t gLifecycleMask = 0;
 double gLifecycleUpdate = 0.0;
 double gLifecycleMessageLength = 0.0;
 double gLifecycleFinalUpdates = 0.0;
+double gFlowCompatibleResults[3]{};
 double gVmathResults[8]{};
 uint32_t gUniversalResults = 0;
 uint32_t gUniversalRecordEntries = 0;
@@ -92,6 +94,10 @@ extern "C" void defold_hermes_static_lifecycle_report(
   if (stage == 4) gLifecycleFinalUpdates = value;
 }
 
+extern "C" void deherm_static_flow_compatible_report(uint32_t stage, double value) {
+  if (stage >= 1 && stage <= 3) gFlowCompatibleResults[stage - 1] = value;
+}
+
 extern "C" void defold_hermes_static_vmath_report(
     uint32_t stage,
     double value) {
@@ -111,14 +117,30 @@ extern "C" void defold_hermes_static_universal_value_report(
   if (stage >= 1 && stage <= 5) gUniversalValueChecksums[stage - 1] = checksum;
 }
 
-int main() {
+int main(int argc, char** argv) {
   try {
     ConsoleHost host;
     defold_hermes::installScriptBridgeApi(
         {nullptr, StaticUniversalDispatch, StaticUniversalLastError, nullptr});
     defold_hermes::Runtime runtime(host);
+    if (argc == 2 && std::string(argv[1]) == "--flow-compatible-only") {
+      const defold_hermes::StaticUnitCreator flowCompatibleUnits[] = {
+        sh_export_deherm_static_ffi,
+        sh_export_deherm_static_flow_compatible,
+        sh_export_deherm_static_app,
+      };
+      runtime.loadStatic(flowCompatibleUnits, 3, "defold-hermes://flow-compatible-smoke");
+      if (gFlowCompatibleResults[0] != 40.0 || gFlowCompatibleResults[1] != 41.0 ||
+          gFlowCompatibleResults[2] != 42.0) {
+        throw std::runtime_error(
+            "Typed function-expression, arrow, or method return annotation failed");
+      }
+      std::cout << "static.typed-flow-compatible:function-expression,arrow,class-method\n";
+      return 0;
+    }
     const defold_hermes::StaticUnitCreator units[] = {
       sh_export_deherm_static_ffi,
+      sh_export_deherm_static_flow_compatible,
       sh_export_deherm_static_app,
       sh_export_deherm_static_vmath,
       sh_export_deherm_static_universal,
@@ -128,6 +150,10 @@ int main() {
       throw std::runtime_error("Strict Static Hermes C ABI probe did not return 42");
     }
     std::cout << "static.ffi:" << gStaticFfiResult << '\n';
+    if (gFlowCompatibleResults[0] != 40.0 || gFlowCompatibleResults[1] != 41.0 || gFlowCompatibleResults[2] != 42.0) {
+      throw std::runtime_error("Typed function-expression, arrow, or method return annotation failed");
+    }
+    std::cout << "static.typed-flow-compatible:function-expression,arrow,class-method\n";
     const double expectedVmath[] = {13.0, 5.0, 1.0, 2.0, 169.0, 30.0, 9.0, 1.0};
     for (size_t index = 0; index < 8; ++index) {
       if (std::fabs(gVmathResults[index] - expectedVmath[index]) > 0.000001) {

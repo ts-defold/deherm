@@ -19,6 +19,10 @@ assert.ok(outputDirectory, "--output-dir is required");
 
 await mkdir(outputDirectory, { recursive: true });
 const generatedFfi = await readFile("packages/static-hermes/src/generated/ffi.js", "utf8");
+const flowCompatibleFixture = await readFile(
+  "tests/fixtures/static-hermes-flow-compatible-function-return-types.ts",
+  "utf8",
+);
 const generatedVmath = await readFile(typedNativeSource, "utf8");
 const generatedUniversal = (
   await readFile("packages/static-hermes/src/generated/script-universal-value.ts", "utf8")
@@ -44,6 +48,7 @@ const typedSource = `${generatedFfi}\n\nconst __ffi_deherm_static_probe_report =
 const typedInput = path.join(outputDirectory, "static-ffi.js");
 const typedOutput = path.join(outputDirectory, "static-ffi.c");
 const appOutput = path.join(outputDirectory, "static-app.c");
+const flowCompatibleOutput = path.join(outputDirectory, "static-flow-compatible.c");
 const vmathInput = path.join(outputDirectory, "static-vmath.ts");
 const vmathOutput = path.join(outputDirectory, "static-vmath.c");
 const universalInput = path.join(outputDirectory, "static-universal.ts");
@@ -103,6 +108,22 @@ compile([
   "-o",
   appOutput,
 ]);
+const flowCompatibleInput = path.join(outputDirectory, "static-flow-compatible.ts");
+await writeFile(flowCompatibleInput, flowCompatibleFixture);
+compile([
+  // This is a typed Flow-compatible parser/runtime smoke, not TS2Flow: the
+  // pinned converter rejects these expression return annotations under
+  // -parse-ts until the upstream visitor fix lands and the Hermes pin moves.
+  "-fno-std-globals",
+  "-typed",
+  "-strict",
+  "-O",
+  "-emit-c",
+  "-exported-unit=deherm_static_flow_compatible",
+  flowCompatibleInput,
+  "-o",
+  flowCompatibleOutput,
+]);
 compile([
   "-typed",
   "-strict",
@@ -131,4 +152,6 @@ compile([
 const compatibilityOutput = path.join(outputDirectory, "static-compat-app.c");
 compile(["-O", "-emit-c", "-exported-unit=deherm_static_compat_app", "dist/sample.js", "-o", compatibilityOutput]);
 
-console.log(`Static Hermes emitted sound-typed ABI/lifecycle/vmath/universal units and ${compatibilityOutput}`);
+console.log(
+  `Static Hermes emitted sound-typed ABI/lifecycle/Flow-compatible/vmath/universal units and ${compatibilityOutput}`,
+);

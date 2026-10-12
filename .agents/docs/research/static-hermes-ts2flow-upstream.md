@@ -129,9 +129,36 @@ if (expression(39) + arrow(39) + new ReturnTypes().method(39) !== 126) {
 TypeScript `number` return annotations already map to Flow's existing
 `NumberTypeAnnotation` inside the existing `TypeAnnotation` wrapper. The
 change is parity in the TS-to-Flow conversion path, not a new type-system or
-optimization feature. The compile/run test would show that the converted
-annotations reach the existing typed checker and execute; it would not prove
-a performance gain or validate a whole application.
+optimization feature. The compile/run test shows that the converted
+annotations reach the existing typed checker and execute; it does not prove a
+performance gain or validate a whole application.
+
+## Deherm parser/runtime smoke boundary (2026-10-12)
+
+The Deherm fixture
+`tests/fixtures/static-hermes-flow-compatible-function-return-types.ts` is
+compiled without `-parse-ts`, so it exercises the typed Flow-compatible
+grammar and runtime only. It is not evidence for TS2Flow conversion. The
+manifest-verified cached compiler accepts it with
+`-fno-std-globals -typed -strict -O -emit-c`; the CMake-integrated runner also
+executes it using the local source-built compiler from the same upstream
+revision (not the manifest-identical binary).
+
+Adding `-parse-ts` to that same pinned compiler fails on all four annotated
+function expressions: the extern callback, ordinary function expression,
+arrow function, and class method each retain `TSTypeAnnotation`. Therefore the
+fixture and runner are labeled as a typed Flow-compatible parser/runtime smoke;
+only the separate Hermes lit test and PR diff are TS2Flow conversion evidence.
+The focused command is:
+
+```sh
+cmake --build build/native --target defold-hermes-static-runner --parallel 4
+build/native/defold-hermes-static-runner --flow-compatible-only
+```
+
+This is a compile-and-run smoke against the application runtime, not an
+independent upstream lit-suite pass, TS2Flow conversion test, or evidence that
+the complete game bundle is sound-typed.
 
 I attempted a fresh read of draft PR #2188, but GitHub was unavailable in this
 environment (`gh` could not connect to `api.github.com`, and `git fetch` could

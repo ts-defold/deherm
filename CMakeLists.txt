@@ -208,10 +208,11 @@ find_program(DEFOLD_HERMES_NODE_EXECUTABLE node REQUIRED)
 set(DEFOLD_HERMES_STATIC_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated/static-hermes")
 set(DEFOLD_HERMES_STATIC_FFI_C "${DEFOLD_HERMES_STATIC_OUTPUT_DIR}/static-ffi.c")
 set(DEFOLD_HERMES_STATIC_APP_C "${DEFOLD_HERMES_STATIC_OUTPUT_DIR}/static-app.c")
+set(DEFOLD_HERMES_STATIC_FLOW_COMPATIBLE_C "${DEFOLD_HERMES_STATIC_OUTPUT_DIR}/static-flow-compatible.c")
 set(DEFOLD_HERMES_STATIC_VMATH_C "${DEFOLD_HERMES_STATIC_OUTPUT_DIR}/static-vmath.c")
 set(DEFOLD_HERMES_STATIC_UNIVERSAL_C "${DEFOLD_HERMES_STATIC_OUTPUT_DIR}/static-universal.c")
 add_custom_command(
-  OUTPUT "${DEFOLD_HERMES_STATIC_FFI_C}" "${DEFOLD_HERMES_STATIC_APP_C}" "${DEFOLD_HERMES_STATIC_VMATH_C}" "${DEFOLD_HERMES_STATIC_UNIVERSAL_C}"
+  OUTPUT "${DEFOLD_HERMES_STATIC_FFI_C}" "${DEFOLD_HERMES_STATIC_APP_C}" "${DEFOLD_HERMES_STATIC_FLOW_COMPATIBLE_C}" "${DEFOLD_HERMES_STATIC_VMATH_C}" "${DEFOLD_HERMES_STATIC_UNIVERSAL_C}"
   COMMAND "${DEFOLD_HERMES_NODE_EXECUTABLE}"
     "${CMAKE_CURRENT_SOURCE_DIR}/scripts/build-static-hermes.mjs"
     --shermes "$<TARGET_FILE:shermes>"
@@ -224,6 +225,7 @@ add_custom_command(
     "${CMAKE_CURRENT_SOURCE_DIR}/packages/static-hermes/src/generated/script-universal-value.ts"
     "${CMAKE_CURRENT_SOURCE_DIR}/packages/bindings/generated/defold-script-universal-value-bindings.json"
     "${CMAKE_CURRENT_SOURCE_DIR}/packages/static-hermes/src/typed-app.ts"
+    "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/static-hermes-flow-compatible-function-return-types.ts"
     "${CMAKE_CURRENT_SOURCE_DIR}/dist/sample.js"
   WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
   VERBATIM
@@ -231,6 +233,7 @@ add_custom_command(
 set_source_files_properties(
   "${DEFOLD_HERMES_STATIC_FFI_C}"
   "${DEFOLD_HERMES_STATIC_APP_C}"
+  "${DEFOLD_HERMES_STATIC_FLOW_COMPATIBLE_C}"
   "${DEFOLD_HERMES_STATIC_VMATH_C}"
   "${DEFOLD_HERMES_STATIC_UNIVERSAL_C}"
   PROPERTIES GENERATED TRUE
@@ -243,6 +246,7 @@ add_executable(defold-hermes-static-runner
   defold/defold_hermes/src/generated_script_universal_static_frame.cpp
   "${DEFOLD_HERMES_STATIC_FFI_C}"
   "${DEFOLD_HERMES_STATIC_APP_C}"
+  "${DEFOLD_HERMES_STATIC_FLOW_COMPATIBLE_C}"
   "${DEFOLD_HERMES_STATIC_VMATH_C}"
   "${DEFOLD_HERMES_STATIC_UNIVERSAL_C}"
 )
