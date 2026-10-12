@@ -76,7 +76,9 @@ test("reusable workflow has an explicit immutable action ref and runner-owned lo
     assert.equal(build.uses, "./.deherm-action");
     assert.match(build.with["build-server"], /inputs\.mode == 'local'/);
     assert.equal(build.env.GITHUB_TOKEN, "${{ github.token }}");
-    const headerStage = job.steps.find((step) => step.name === "Stage pinned Hermes headers for source-workspace dogfood");
+    const headerStage = job.steps.find(
+      (step) => step.name === "Stage pinned Hermes headers for source-workspace dogfood",
+    );
     assert.match(headerStage.if, /github\.repository == 'ts-defold\/deherm'/);
     assert.match(headerStage.run, /scripts\/stage-hermes-public-headers\.mjs/);
     const archive = job.steps.find((step) => step.id === "archive");
