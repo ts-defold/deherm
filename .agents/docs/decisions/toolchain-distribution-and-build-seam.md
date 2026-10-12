@@ -217,6 +217,10 @@ cache is installed. Public downloads need no credentials; CI supplies its
 ephemeral `GH_TOKEN` for publisher-metadata lookups so a platform matrix cannot
 consume GitHub's anonymous API allowance and mistake rate limiting for missing
 toolchain evidence.
+Publisher-metadata lookups retry only transient network errors, HTTP 429, and
+HTTP 5xx with bounded delays. Missing assets, invalid identities, and digest
+mismatches remain immediate hard failures; a transient GitHub 504 must not make
+an otherwise published immutable release appear absent.
 
 CI preserves that same ordering without turning publication latency into a red
 consumer check. A push-time end-to-end run exercises the current Linux host

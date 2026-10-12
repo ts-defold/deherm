@@ -66,18 +66,33 @@ export async function resolveGithubReleaseAsset({
   tag,
   asset,
   fetchImpl = fetch,
+  retryDelaysMs = [250, 500, 1_000],
+  waitImpl = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds)),
 }) {
   const expectedUrl = releaseAssetUrl({ repository, tag, asset });
   const metadataUrl = `https://api.github.com/repos/${repository}/releases/tags/${encodeURIComponent(tag)}`;
   const token = process.env.GH_TOKEN || process.env.GITHUB_TOKEN;
-  const response = await fetchImpl(metadataUrl, {
+  const request = {
     headers: {
       Accept: "application/vnd.github+json",
       "User-Agent": "deherm-release-asset-client",
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
-  });
-  if (!response.ok) throw new Error(`${metadataUrl} responded ${response.status} ${response.statusText}`);
+  };
+  let response;
+  for (let attempt = 0; attempt <= retryDelaysMs.length; attempt += 1) {
+    try {
+      response = await fetchImpl(metadataUrl, request);
+    } catch (error) {
+      if (attempt === retryDelaysMs.length) throw error;
+      await waitImpl(retryDelaysMs[attempt]);
+      continue;
+    }
+    if (response.ok) break;
+    const failure = new Error(`${metadataUrl} responded ${response.status} ${response.statusText}`);
+    if (attempt === retryDelaysMs.length || (response.status !== 429 && response.status < 500)) throw failure;
+    await waitImpl(retryDelaysMs[attempt]);
+  }
   const release = await response.json();
   const matches = (release.assets ?? []).filter((candidate) => candidate?.name === asset);
   if (matches.length !== 1) throw new Error(`${tag} exposes ${matches.length} release assets named ${asset}`);

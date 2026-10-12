@@ -25,6 +25,7 @@ import {
   extractReleaseArchive,
   releaseAssetUrl,
   releaseMetadataFromPinnedIntegrity,
+  resolveGithubReleaseAsset,
 } from "../packages/cli/src/release-assets.mjs";
 import {
   buildReleaseIntegrity,
@@ -45,6 +46,46 @@ import { installNativeArtifacts } from "../scripts/lib/native-artifact-install.m
 
 const execFileAsync = promisify(execFile);
 const packager = path.join(repositoryRoot, "toolchains/hermes/package-archive.sh");
+
+test("release metadata retries transient GitHub failures without weakening identity checks", async () => {
+  const tag = "libs-test";
+  const asset = "tool.tar.gz";
+  const url = releaseAssetUrl({ tag, asset });
+  const release = {
+    assets: [{ name: asset, digest: `sha256:${"a".repeat(64)}`, size: 42, browser_download_url: url }],
+  };
+  const statuses = [504, 429, 200];
+  const waits = [];
+  const result = await resolveGithubReleaseAsset({
+    tag,
+    asset,
+    retryDelaysMs: [1, 2],
+    waitImpl: async (milliseconds) => waits.push(milliseconds),
+    fetchImpl: async () => {
+      const status = statuses.shift();
+      return { ok: status === 200, status, statusText: String(status), json: async () => release };
+    },
+  });
+  assert.deepEqual(result, { url, sha256: "a".repeat(64), bytes: 42 });
+  assert.deepEqual(waits, [1, 2]);
+  assert.deepEqual(statuses, []);
+
+  let attempts = 0;
+  await assert.rejects(
+    resolveGithubReleaseAsset({
+      tag,
+      asset,
+      retryDelaysMs: [1],
+      waitImpl: async () => assert.fail("404 must not be retried"),
+      fetchImpl: async () => {
+        attempts += 1;
+        return { ok: false, status: 404, statusText: "Not Found" };
+      },
+    }),
+    /responded 404 Not Found/u,
+  );
+  assert.equal(attempts, 1);
+});
 
 test("package-pinned integrity is a complete offline release metadata record", () => {
   const integrityAsset = "tool.tar.gz.integrity.json";
