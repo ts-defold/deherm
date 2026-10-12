@@ -251,6 +251,8 @@ jobs:
       - name: Build ${{ matrix.entry.target }}
         id: build
         uses: ./.deherm-action
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         with:
           project: project/${{ inputs.project }}
           target: ${{ matrix.entry.target }}
@@ -347,6 +349,8 @@ jobs:
       - name: Build ${{ matrix.entry.target }}
         id: build
         uses: ./.deherm-action
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         with:
           project: project/${{ inputs.project }}
           target: ${{ matrix.entry.target }}

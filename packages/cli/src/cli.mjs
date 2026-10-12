@@ -333,7 +333,14 @@ export async function installConfiguredProjectWebTransport(projectRoot, options 
     projectValue: configuration?.artifacts,
     projectRoot: resolvedProject,
   });
-  const configuredTarget = environment.DEHERM_WEBTRANSPORT_ARTIFACT_TARGET ?? configuration?.artifact_target;
+  const configuredTarget =
+    (source || configuration || artifacts
+      ? options.artifactTarget?.endsWith("-web")
+        ? "web"
+        : options.artifactTarget
+      : null) ??
+    environment.DEHERM_WEBTRANSPORT_ARTIFACT_TARGET ??
+    configuration?.artifact_target;
   const artifactTarget = selectWebTransportArtifactTarget({
     configuredTarget,
     hasSource: Boolean(source || configuration),
@@ -374,7 +381,10 @@ function devGenerationInputs(inventory) {
 
 async function reconcileDevProject(options, { force = false } = {}) {
   await installNativeExtension(options.project, { force });
-  await installConfiguredProjectWebTransport(options.project, { force });
+  await installConfiguredProjectWebTransport(options.project, {
+    force,
+    artifactTarget: options.webTransportArtifactTarget,
+  });
   const inventory = await inspectDefoldProject({ project: options.project, requireDehermRuntime: true });
   const errors = inventory.diagnostics.filter(({ severity }) => severity === "error");
   if (errors.length) {
@@ -639,7 +649,7 @@ export async function run(argv = process.argv.slice(2)) {
     };
     validateBundleRequest(request);
     const { inventory, generated } = await reconcileDevProject(
-      { ...options, project: projectRoot },
+      { ...options, project: projectRoot, webTransportArtifactTarget: options.target },
       { force: options.force === true },
     );
     await generateComponentProxies({

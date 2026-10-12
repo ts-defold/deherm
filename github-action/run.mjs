@@ -120,15 +120,29 @@ export function parseBundleOutput(stdout) {
 
 async function runCli(cli, args, cwd) {
   return await new Promise((resolve, reject) => {
-    const child = spawn(process.execPath, [cli, ...args], { cwd, stdio: ["ignore", "pipe", "inherit"] });
+    const child = spawn(process.execPath, [cli, ...args], { cwd, stdio: ["ignore", "pipe", "pipe"] });
     let stdout = "";
+    let stderrTail = "";
     child.stdout.setEncoding("utf8");
+    child.stderr.setEncoding("utf8");
     child.stdout.on("data", (chunk) => {
       stdout += chunk;
       if (stdout.length > 1024 * 1024) child.kill();
     });
+    child.stderr.on("data", (chunk) => {
+      process.stderr.write(chunk);
+      stderrTail = (stderrTail + chunk).slice(-8192);
+    });
     child.on("error", reject);
-    child.on("close", (code) => (code === 0 ? resolve(stdout) : reject(new Error(`deherm bundle exited ${code}`))));
+    child.on("close", (code) => {
+      if (code === 0) return resolve(stdout);
+      const diagnostic = stderrTail
+        .split(/\r?\n/u)
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .at(-1);
+      reject(new Error(`deherm bundle exited ${code}${diagnostic ? `: ${diagnostic}` : ""}`));
+    });
   });
 }
 
@@ -162,6 +176,11 @@ function parseBooleanInput(value) {
 if (process.argv[1] && path.resolve(process.argv[1]) === path.join(actionDirectory, "run.mjs")) {
   main().catch((error) => {
     process.stderr.write(`Déherm Action: ${error.message}\n`);
+    const annotation = `Déherm Action: ${error.message}`
+      .replaceAll("%", "%25")
+      .replaceAll("\r", "%0D")
+      .replaceAll("\n", "%0A");
+    process.stdout.write(`::error::${annotation}\n`);
     process.exitCode = 1;
   });
 }

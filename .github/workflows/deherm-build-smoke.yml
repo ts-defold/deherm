@@ -39,4 +39,5 @@ jobs:
       mode: ${{ inputs.mode || 'defold' }}
       targets: ${{ inputs.targets || '["wasm-web","x86_64-linux"]' }}
       project: examples/war-battles-online/defold
+      entry: main/player.script.ts
     secrets: inherit

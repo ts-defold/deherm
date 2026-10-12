@@ -348,11 +348,43 @@ test("packaged WebTransport config installs package source for a web-only projec
       "",
     ].join("\n"),
   );
-  const installed = await installConfiguredProjectWebTransport(project, { environment: {} });
+  const installed = await installConfiguredProjectWebTransport(project, {
+    environment: {},
+    artifactTarget: "wasm-web",
+    fetchImpl: async () => {
+      throw new Error("web bundles must not fetch native WebTransport artifacts");
+    },
+  });
   assert.equal(installed.installed, true);
   assert.equal(installed.source, "managed-local");
   assert.match(await readFile(path.join(project, "defold_webtransport/ext.manifest"), "utf8"), /defold_webtransport/u);
   assert.equal((await installConfiguredProjectWebTransport(project, { environment: {} })).installed, false);
+});
+
+test("configured WebTransport selects the requested native bundle target, not the host", async (t) => {
+  const project = await mkdtemp(path.join(tmpdir(), "deherm-webtransport-cross-target-"));
+  t.after(() => rm(project, { recursive: true, force: true }));
+  await writeFile(
+    path.join(project, "game.project"),
+    "[project]\ntitle = Cross-target WebTransport\n\n[defold_webtransport]\nversion = 0.1.0\n",
+  );
+  const { tag } = JSON.parse(
+    await readFile(
+      path.resolve("extensions/defold-webtransport/defold_webtransport/webtransport/native-artifacts.json"),
+      "utf8",
+    ),
+  );
+  await assert.rejects(
+    installConfiguredProjectWebTransport(project, {
+      environment: {},
+      artifactTarget: "x86_64-linux",
+      fetchImpl: async () => ({
+        ok: true,
+        json: async () => ({ tag_name: tag, assets: [] }),
+      }),
+    }),
+    /defold-webtransport-native-x86_64-linux\.zip/u,
+  );
 });
 
 test("managed WebTransport install overlays and content-keys validated native artifacts", async (t) => {

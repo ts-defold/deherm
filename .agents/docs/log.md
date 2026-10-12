@@ -1,5 +1,26 @@
 # Defold Hermes knowledge log
 
+## 2026-10-12 - Cross-target consumer bundle and first GitHub smoke
+
+The first public-workflow smoke (`38296983292`) passed its caller-policy plan and
+`wasm-web` bundle but failed the `x86_64-linux` Action step. Its public check
+annotation exposed only exit code 1, not a diagnostic; the exact CI cause is
+therefore not yet established. The workflow now passes its read-only GitHub
+token to artifact lookups and the Action emits its last CLI diagnostic as a
+GitHub error annotation, so a repeated failure is actionable without log
+access. The smoke explicitly selects the game's `main/player.script.ts` entry.
+
+A separate local reproduction found that a macOS host bundling `x86_64-linux`
+installed host `arm64-osx` WebTransport libraries. The one-shot bundle now
+selects the requested native target and preserves the browser-only `web`
+selection for `wasm-web`. Focused tests cover both selections. With that fix,
+the real War Battles `x86_64-linux` release bundle fetched the pinned target
+artifacts, Defold's production Extender accepted job
+`job7215170240180201283`, and Bob completed a Hermes-bytecode bundle. This
+proves the cross-target build on this host, not yet the GitHub runner or game
+runtime. The normal one-shot development generator restored the example's
+checked-in bundle lock after the test.
+
 ## 2026-10-12 - Expose a three-mode consumer build workflow
 
 The repository now carries a single-target composite Action, a reusable
