@@ -691,6 +691,12 @@ push either; that raced artifact publication itself. Script-only end-to-end
 changes still run their cheap local stage directly; nightlies and the ordered
 post-publication dispatch retain the full Bob matrix.
 
+Both end-to-end consumer jobs carry the workflow's read-only GitHub token at
+job scope. Release metadata requests for published host tools and per-target
+archives must authenticate even though the releases are public: unauthenticated
+API rate limiting previously made an otherwise valid Linux Bob row fail during
+`target-archives`. The end-to-end gate asserts both jobs retain the token.
+
 For package-default artifact runs, the summary regenerates `release-tags.json`
 from every published host-tool sidecar, authenticates each sidecar against
 GitHub's publisher digest, then runs `--check --published` on the regenerated

@@ -128,6 +128,15 @@ test("the Bob matrix prints and preserves the target's Extender failure log", as
   assert.match(workflow, /build\/end-to-end\/project\/build\/\$\{\{ matrix\.target \}\}\/log\.txt/u);
 });
 
+test("both consumer jobs authenticate GitHub release metadata reads", async () => {
+  const workflow = await readFile(new URL("../.github/workflows/end-to-end.yml", import.meta.url), "utf8");
+  const local = workflow.slice(workflow.indexOf("  local:"), workflow.indexOf("  extension-headers:"));
+  const bob = workflow.slice(workflow.indexOf("  bob:"));
+  const jobToken = /runs-on: ubuntu-24\.04\n\s+env:\n\s+GH_TOKEN: \$\{\{ github\.token \}\}/u;
+  assert.match(local, jobToken);
+  assert.match(bob, jobToken);
+});
+
 test("the Bob matrix consumes the package's pinned Hermes public headers", async () => {
   const workflow = await readFile(new URL("../.github/workflows/end-to-end.yml", import.meta.url), "utf8");
   const headers = workflow.slice(workflow.indexOf("  extension-headers:"), workflow.indexOf("  bob:"));
