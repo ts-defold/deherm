@@ -187,11 +187,11 @@
     "evidenceBoundary": "Release host harness over stub providers. This measures generated crossing/framing cost, not the Defold call behind it; the Lua harness uses pinned PUC Lua 5.1 rather than Defold's shipping LuaJIT."
   },
   "editor": {
-    "vscodeEvidenceKey": "e28e2a38c755876c1e83544eb84e8d6226e52bb1dce57c9b8c7dfc3ddf2ff46a",
+    "vscodeEvidenceKey": "5c9426788a060aa65f14439e96289ad98e3b73dc0744afda6ffc3a1d4bb75d60",
     "screenshot": {
       "path": "examples/war-battles-online/evidence/vscode-live-values.png",
-      "bytes": 821705,
-      "sha256": "3f66fd4c6f2156210aafbc2ba7b4bc2c825af0a1d9485a3bdc4a4d01c08b361b",
+      "bytes": 840143,
+      "sha256": "b3c378ed42d8768ecb880a6b6773be3cd458ca8e5bd4b04c2fb2609cb07e3fec",
       "width": 2880,
       "height": 1800
     }
@@ -364,8 +364,8 @@
     },
     {
       "path": "examples/war-battles-online/evidence/vscode-live-values.json",
-      "bytes": 2712,
-      "sha256": "a75c6fda282b75bdf9cbd63bc893ffa0975864d45468269a8cc0564be3b0b3bf"
+      "bytes": 3114,
+      "sha256": "5be487f593c594adfcfe43393166ce1afb300c8de790bedc32ce69e1e3f4bd92"
     },
     {
       "path": "packages/compiler/data/native-module-catalog.json",
