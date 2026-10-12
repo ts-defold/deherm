@@ -39,10 +39,12 @@ import {
   INPUT_SEND_INTERVAL_TICKS,
   MESSAGE_PONG,
   MESSAGE_REJECT,
+  MESSAGE_ROUND_STATE,
   MESSAGE_SNAPSHOT,
   MESSAGE_WELCOME,
   PING_BYTES,
   PONG_FEEDBACK_BYTES,
+  ROUND_STATE_BYTES,
   REJECT_RATE_LIMITED,
   RESUME_TOKEN_BYTES,
   SNAPSHOT_KEYFRAME,
@@ -51,6 +53,7 @@ import {
   createInputCommand,
   messageKind,
   readReject,
+  readRoundState,
   readSnapshotTick,
   readWelcome,
   writeControl,
@@ -60,6 +63,7 @@ import {
   writeWelcomeAck,
   type InputCommand,
   type RejectMessage,
+  type RoundStateMessage,
   type WelcomeMessage,
 } from "./protocol";
 import {
@@ -215,6 +219,17 @@ export interface ClientStats {
 
 export class BattleClient implements TransportReceiver {
   state: ClientState = "idle";
+  /** Additive server-authoritative round state; old servers imply round one. */
+  readonly roundState: RoundStateMessage = {
+    round: 1,
+    phase: 0,
+    winnerPlayerId: 0,
+    winnerTeam: 0,
+    ticksRemaining: 0,
+  };
+  get lastReject(): Readonly<RejectMessage> | undefined {
+    return this.reject.code === 0 ? undefined : this.reject;
+  }
   world?: BattleWorld;
   playerId = 0;
   team = 0;
@@ -288,6 +303,13 @@ export class BattleClient implements TransportReceiver {
     resumeToken: new Uint8Array(RESUME_TOKEN_BYTES),
   };
   private readonly reject: RejectMessage = { code: 0, reason: "" };
+  private readonly incomingRoundState: RoundStateMessage = {
+    round: 1,
+    phase: 0,
+    winnerPlayerId: 0,
+    winnerTeam: 0,
+    ticksRemaining: 0,
+  };
   private readonly helloBuffer = new Uint8Array(HELLO_BYTES);
   private readonly controlBuffer = new Uint8Array(CONTROL_BYTES);
   private readonly pingBuffer = new Uint8Array(PING_BYTES);
@@ -738,7 +760,21 @@ export class BattleClient implements TransportReceiver {
       const kind = messageKind(payload);
       if (kind === MESSAGE_WELCOME) this.handleWelcome(payload);
       else if (kind === MESSAGE_REJECT) this.handleReject(payload);
-      else if (kind === MESSAGE_SNAPSHOT) this.handleSnapshot(payload);
+      else if (kind === MESSAGE_ROUND_STATE) {
+        if (channel !== TRANSPORT_CHANNEL_SESSION) throw new Error("round state must use the reliable session lane");
+        if (payload.byteLength !== ROUND_STATE_BYTES) throw new Error("round state has unexpected length");
+        readRoundState(payload, this.incomingRoundState);
+        if (tickAfter(this.roundState.round, this.incomingRoundState.round)) return;
+        if (
+          this.roundState.phase === 1 &&
+          this.incomingRoundState.phase === 0 &&
+          this.roundState.round === this.incomingRoundState.round
+        )
+          return;
+        const roundChanged = this.incomingRoundState.round !== this.roundState.round;
+        Object.assign(this.roundState, this.incomingRoundState);
+        if (roundChanged) this.resetPredictionForRound();
+      } else if (kind === MESSAGE_SNAPSHOT) this.handleSnapshot(payload);
       else if (kind === MESSAGE_PONG) this.handlePong(payload);
       else if (channel === TRANSPORT_CHANNEL_SNAPSHOT) throw new Error("snapshot lane carried a non-snapshot message");
     } catch (error: unknown) {
@@ -918,6 +954,37 @@ export class BattleClient implements TransportReceiver {
     this.state = "rejected";
     this.options.onReject?.(this.reject);
     this.options.onLog?.(`client-rejected:${this.reject.code}:${this.reject.reason}`);
+  }
+
+  private resetPredictionForRound(): void {
+    if (this.world === undefined || this.welcome.maximumPlayers === 0) return;
+    const tick = this.stats.lastServerTick || this.world.tick;
+    const world = new BattleWorld(this.welcome.matchId, this.welcome.mapSeed, false);
+    for (let playerId = 1; playerId <= this.welcome.maximumPlayers; playerId += 1) {
+      world.addPlayer(playerId, playerId === this.playerId ? this.team : 0);
+    }
+    world.tick = tick;
+    this.world = world;
+    this.localTick = tick;
+    this.historyTick.fill(-1);
+    this.lastInputSendSequence = -1;
+    this.snapshotHistoryTicks.fill(-1);
+    this.snapshotHistoryCursor = 0;
+    this.snapshotScratch.baselineTick = -1;
+    this.pendingSnapshotReady = false;
+    this.pendingSnapshotTick = -1;
+    this.pendingSnapshotKeyframe = false;
+    this.awaitingSnapshotKeyframe = true;
+    this.snapshotAckBits = 0;
+    this.remoteHaveSample.fill(0);
+    this.remoteInterpolationMilliseconds = 0;
+    this.localCorrectionX = 0;
+    this.localCorrectionY = 0;
+    this.localHullCorrectionRadians = 0;
+    this.localTurretCorrectionRadians = 0;
+    this.localCorrectionMilliseconds = 0;
+    for (let tickOffset = 0; tickOffset < this.inputLeadTicks; tickOffset += 1) world.step();
+    this.localTick = world.tick;
   }
 
   private handleSnapshot(payload: Uint8Array): void {

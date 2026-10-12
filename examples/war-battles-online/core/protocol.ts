@@ -298,6 +298,8 @@ export const MESSAGE_CONTROL = 5;
 export const MESSAGE_PING = 6;
 export const MESSAGE_PONG = 7;
 export const MESSAGE_WELCOME_ACK = 8;
+/** Additive control-plane update; snapshot layout and protocol version stay stable. */
+export const MESSAGE_ROUND_STATE = 9;
 
 export const RESUME_TOKEN_BYTES = SESSION_TOKEN_BYTES;
 export const PLAYER_NAME_BYTES = 16;
@@ -307,6 +309,7 @@ const WELCOME_BASE_BYTES = ENVELOPE_BYTES + 4 + 4 + 4 + 4 + RESUME_TOKEN_BYTES;
 /** The trailing cadence byte is part of the version-6 welcome frame. */
 export const WELCOME_BYTES = WELCOME_BASE_BYTES + 1;
 export const WELCOME_ACK_BYTES = ENVELOPE_BYTES + RESUME_TOKEN_BYTES;
+export const ROUND_STATE_BYTES = ENVELOPE_BYTES + 12;
 export const CONTROL_BYTES = ENVELOPE_BYTES + 4;
 export const PING_BYTES = ENVELOPE_BYTES + 8;
 /** Optional, backwards-readable per-session input timing appended to PONG. */
@@ -386,6 +389,18 @@ export interface PingMessage {
 export interface RejectMessage {
   code: number;
   reason: string;
+}
+
+export interface RoundStateMessage {
+  round: number;
+  /** Zero is playing; one is the fixed post-win countdown. */
+  phase: number;
+  /** FFA winner, or zero when the win belongs to a team/no winner yet. */
+  winnerPlayerId: number;
+  /** Team winner 1/2, or zero for FFA/no winner. */
+  winnerTeam: number;
+  /** Remaining authoritative ticks before the server restarts the round. */
+  ticksRemaining: number;
 }
 
 export function messageKind(payload: Uint8Array): number {
@@ -544,6 +559,58 @@ export function readReject(payload: Uint8Array, output: RejectMessage): RejectMe
   const length = view.getUint8(5);
   if (payload.byteLength < REJECT_HEADER_BYTES + length) throw new Error("reject reason is truncated");
   output.reason = decodeAscii(payload.subarray(REJECT_HEADER_BYTES, REJECT_HEADER_BYTES + length));
+  return output;
+}
+
+export function writeRoundState(target: Uint8Array, message: Readonly<RoundStateMessage>): number {
+  requireCapacity(target, ROUND_STATE_BYTES);
+  unsigned(message.round, 0xffff_ffff, "round");
+  if (message.round === 0) throw new RangeError("round must be positive");
+  unsigned(message.phase, 1, "round phase");
+  unsigned(message.winnerPlayerId, MAX_PLAYERS, "round winner player");
+  unsigned(message.winnerTeam, 2, "round winner team");
+  if (message.winnerPlayerId !== 0 && message.winnerTeam !== 0) {
+    throw new RangeError("round state cannot declare both a player and team winner");
+  }
+  unsigned(message.ticksRemaining, 0xffff_ffff, "round countdown");
+  if ((message.phase === 0) !== (message.ticksRemaining === 0)) {
+    throw new RangeError("playing round state must have no countdown and intermission must have one");
+  }
+  if ((message.phase === 0) !== (message.winnerPlayerId === 0 && message.winnerTeam === 0)) {
+    throw new RangeError("round phase and winner fields disagree");
+  }
+  const view = envelope(target, MESSAGE_ROUND_STATE);
+  view.setUint32(4, message.round >>> 0, true);
+  view.setUint8(8, message.phase);
+  view.setUint8(9, message.winnerPlayerId);
+  view.setUint8(10, message.winnerTeam);
+  view.setUint8(11, 0);
+  view.setUint32(12, message.ticksRemaining >>> 0, true);
+  return ROUND_STATE_BYTES;
+}
+
+export function readRoundState(payload: Uint8Array, output: RoundStateMessage): RoundStateMessage {
+  const view = expect(payload, MESSAGE_ROUND_STATE, ROUND_STATE_BYTES);
+  if (payload.byteLength !== ROUND_STATE_BYTES) throw new Error("round state has unexpected trailing bytes");
+  output.round = view.getUint32(4, true);
+  if (output.round === 0) throw new Error("round must be positive");
+  output.phase = view.getUint8(8);
+  output.winnerPlayerId = view.getUint8(9);
+  output.winnerTeam = view.getUint8(10);
+  if (view.getUint8(11) !== 0) throw new Error("round state reserved byte must be zero");
+  output.ticksRemaining = view.getUint32(12, true);
+  unsigned(output.phase, 1, "round phase");
+  unsigned(output.winnerPlayerId, MAX_PLAYERS, "round winner player");
+  unsigned(output.winnerTeam, 2, "round winner team");
+  if ((output.phase === 0) !== (output.ticksRemaining === 0)) {
+    throw new Error("round state phase and countdown disagree");
+  }
+  if (output.winnerPlayerId !== 0 && output.winnerTeam !== 0) {
+    throw new Error("round state cannot declare both a player and team winner");
+  }
+  if ((output.phase === 0) !== (output.winnerPlayerId === 0 && output.winnerTeam === 0)) {
+    throw new Error("round phase and winner fields disagree");
+  }
   return output;
 }
 

@@ -19,6 +19,7 @@ import {
   EVENT_TANK_ACQUIRED,
   INFANTRY_HEALTH,
   MAX_PLAYERS,
+  REJECT_FULL,
   OBJECTIVE_CAPTURE_TICKS,
   PLAYER_MODE_INFANTRY,
   UNITS_PER_PIXEL,
@@ -111,6 +112,7 @@ interface UiSelf {
   scoreboardTouchId: number;
   scoreboardTouchSuppressionFrames: number;
   portraitVariant: number;
+  roundResultKey: string;
 }
 
 function setScoreboardVisible(self: UiSelf, visible: boolean): void {
@@ -368,7 +370,21 @@ function drainPresentation(self: UiSelf, match: ReturnType<typeof arenaMatch>): 
   // PlayableBattle owns the authoritative round counter. The event ring is
   // presentation-only, so round changes are sampled once at the same boundary
   // and rendered through the same coalescing/expiry path.
-  const round = match.mode === "offline" ? match.battle.round : self.round;
+  const onlineRound = match.client?.roundState;
+  if (onlineRound?.phase === 1) {
+    const resultKey = `${onlineRound.round}:${onlineRound.winnerPlayerId}:${onlineRound.winnerTeam}`;
+    if (self.roundResultKey !== resultKey) {
+      self.roundResultKey = resultKey;
+      const winner =
+        onlineRound.winnerTeam !== 0
+          ? `TEAM ${onlineRound.winnerTeam === 1 ? "BLUE" : "RED"}`
+          : `PLAYER ${onlineRound.winnerPlayerId}`;
+      announce(self, `${winner} WINS // ROUND ${onlineRound.round} RESTARTING`, self.roundColor);
+    }
+  } else if (onlineRound?.phase === 0) {
+    self.roundResultKey = "";
+  }
+  const round = match.mode === "offline" ? match.battle.round : (onlineRound?.round ?? self.round);
   if (self.round === 0) {
     self.round = round;
   } else if (round !== self.round) {
@@ -480,6 +496,7 @@ export default defineComponent({
     self.eventCursor = 0;
     self.announcementTicks = 0;
     self.round = 0;
+    self.roundResultKey = "";
     self.engaged = false;
     self.titleVisible = true;
     self.touchVisible = false;
@@ -501,7 +518,14 @@ export default defineComponent({
 
   update(self: UiSelf, _dt: number): void {
     if (self.scoreboardTouchSuppressionFrames > 0) self.scoreboardTouchSuppressionFrames -= 1;
-    if (self.titleVisible) return;
+    if (self.titleVisible) {
+      const full = arenaMatch()?.client?.lastReject?.code === REJECT_FULL;
+      gui.setText(
+        self.titlePrompt,
+        full ? "ROOM FULL // PRESS ANY KEY TO RETRY" : "PRESS ANY KEY OR BUTTON TO TAKE COMMAND",
+      );
+      return;
+    }
     const match = arenaMatch();
     if (match === undefined || !match.engaged) return;
     if (!self.engaged) {

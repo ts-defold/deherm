@@ -1498,6 +1498,28 @@ do not claim that a particular kill or round notice was observed during their
 short fixed runtime windows; event-specific visual observation remains a
 separate runtime scenario.
 
+## Server-authoritative online round and full-room behavior
+
+The online `MatchServer` now applies the same 25-frag / three-command-beacon
+win thresholds as the offline arena and holds the authoritative winner through
+a five-second (300 simulation tick) result window. It then replaces the world,
+retains the roster and bot policy, and forces each session onto a fresh
+keyframe. Simulation ticks stay globally monotonic across rounds so existing
+input and resume clocks do not rewind. An additive fixed-width `round-state`
+message uses reliable session kind 9; protocol version 15, snapshot layouts,
+and input packets are unchanged. New clients validate the message and reset
+prediction when the round advances; old clients ignore the unknown reliable
+session kind and continue to consume the unchanged snapshots.
+
+`REJECT_FULL` remains a terminal admission result: the Defold client no longer
+converts it to the offline solo arena. The title screen explains that the room
+is full and any key or button retries online admission. Focused tests cover
+winner delivery, 16/32-player bot rosters, disconnect/resume during the result
+window, monotonic round restart and keyframe recovery, plus a third client
+remaining rejected when a two-slot room is full. A bounded fair wait queue is
+not implemented; queue position, cancellation, expiry, and slot reservation
+need a separate protocol/session lifecycle design.
+
 ## Bounded compact snapshot tranche
 
 Authoritative snapshots use a session-local, fixed-capacity acknowledged

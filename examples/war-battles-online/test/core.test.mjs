@@ -43,6 +43,7 @@ import {
   INPUT_SEND_INTERVAL_TICKS,
   PING_BYTES,
   PONG_FEEDBACK_BYTES,
+  PROTOCOL_VERSION,
   INFANTRY_RADIUS,
   INFANTRY_HEALTH,
   INFANTRY_EJECT_LOCK_TICKS,
@@ -64,6 +65,7 @@ import {
   REJECT_FULL,
   REJECT_MAXIMUM_BYTES,
   REJECT_RATE_LIMITED,
+  ROUND_STATE_BYTES,
   PlayableBattle,
   RESUME_TOKEN_BYTES,
   SNAPSHOT_BYTES,
@@ -122,6 +124,7 @@ import {
   readInputBundle,
   readInputPacket,
   readReject,
+  readRoundState,
   readSnapshotFrame,
   readWelcome,
   readWelcomeAck,
@@ -131,6 +134,7 @@ import {
   writeInputPacket,
   writeInputBundle,
   writeReject,
+  writeRoundState,
   writeSnapshotDelta,
   writeSnapshotKeyframe,
   writeNetworkSnapshotDelta,
@@ -505,6 +509,22 @@ test("session messages round-trip and reject a foreign kind", () => {
   assert.throws(() => readHello(welcome, observedHello), /not kind/);
   hello[2] -= 1;
   assert.throws(() => readHello(hello, observedHello), /version mismatch/);
+});
+
+test("additive round state is fixed-width, validated, and leaves snapshot protocol unchanged", () => {
+  const frame = new Uint8Array(ROUND_STATE_BYTES);
+  const input = { round: 7, phase: 1, winnerPlayerId: 0, winnerTeam: 2, ticksRemaining: 180 };
+  writeRoundState(frame, input);
+  assert.deepEqual(readRoundState(frame, { ...input }), input);
+  assert.throws(() => writeRoundState(frame, { ...input, winnerPlayerId: 4 }), /both a player and team winner/);
+  assert.throws(() => writeRoundState(frame, { ...input, phase: 0 }), /countdown/);
+  assert.throws(() => writeRoundState(frame, { ...input, phase: 0, ticksRemaining: 0 }), /phase and winner/);
+  const teamWin = { round: 2, phase: 1, winnerPlayerId: 0, winnerTeam: 1, ticksRemaining: 300 };
+  writeRoundState(frame, teamWin);
+  assert.deepEqual(readRoundState(frame, { ...teamWin }), teamWin);
+  frame[11] = 1;
+  assert.throws(() => readRoundState(frame, { ...input }), /reserved byte/);
+  assert.equal(PROTOCOL_VERSION, 15, "round presentation state does not alter snapshot or input layout");
 });
 
 test("team command beacon capture is authoritative and snapshot-safe", () => {
@@ -3301,6 +3321,89 @@ test("a welcome enqueued without credential acknowledgement keeps the previous t
   await settleUntil(() => retry.state === "ready", "old-token retry");
   assert.equal(retry.state, "ready");
   assert.equal(server.sessionLedger.generation[0], generation + 1);
+  server.close();
+  assert.deepEqual(errors, []);
+});
+
+test("server-owned rounds end once, survive disconnect/resume, and restart cleanly at 16/32 players", async () => {
+  for (const rosterSize of [16, 32]) {
+    const errors = [];
+    const server = new MatchServer({ rosterSize, snapshotIntervalTicks: 1, resumeGraceTicks: 600 });
+    const first = join(server, `round-${rosterSize}`, errors);
+    await settleUntil(() => first.state === "ready", `${rosterSize}-player welcome`);
+    assert.deepEqual(first.roundState, {
+      round: 1,
+      phase: 0,
+      winnerPlayerId: 0,
+      winnerTeam: 0,
+      ticksRemaining: 0,
+    });
+    assert.equal(server.stats.serverBots, rosterSize - 1);
+    for (let slot = 0; slot < rosterSize; slot += 1) assert.equal(server.world.playerActive[slot], 1);
+
+    const resumeToken = first.resumeToken.slice();
+    server.world.playerScore[0] = 25;
+    server.step();
+    assert.deepEqual(first.roundState, {
+      round: 1,
+      phase: 1,
+      winnerPlayerId: 1,
+      winnerTeam: 0,
+      ticksRemaining: 300,
+    });
+    for (let tick = 0; tick < 3; tick += 1) server.step();
+    first.close(1_001, "test disconnect during round result");
+    const resumed = join(server, `round-${rosterSize}-resumed`, errors, { resumeToken });
+    await settleUntil(() => resumed.state === "ready", `${rosterSize}-player resumed session`);
+    assert.equal(resumed.playerId, 1);
+    assert.equal(resumed.roundState.phase, 1);
+    assert.equal(resumed.roundState.ticksRemaining, 297);
+    const roundBoundaryTick = server.world.tick + 297;
+    for (let tick = 0; tick < 297; tick += 1) server.step();
+    assert.equal(server.round, 2);
+    assert.equal(server.world.tick, roundBoundaryTick, "world state resets without rewinding the global tick");
+    assert.equal(server.stats.tick, roundBoundaryTick);
+    assert.deepEqual(resumed.roundState, {
+      round: 2,
+      phase: 0,
+      winnerPlayerId: 0,
+      winnerTeam: 0,
+      ticksRemaining: 0,
+    });
+    resumed.update(0);
+    assert.equal(resumed.hasAuthoritativeSnapshot, true, "the new-round keyframe restores reset client prediction");
+    assert.equal(resumed.world.playerScore[0], 0);
+    assert.equal(server.countHumans(), 1);
+    assert.equal(server.stats.serverBots, rosterSize - 1);
+    assert.deepEqual(errors, []);
+    server.close();
+  }
+
+  const teamErrors = [];
+  const teamServer = new MatchServer({ rosterSize: 16, teams: true });
+  const teamClient = join(teamServer, "team-round-winner", teamErrors);
+  await settleUntil(() => teamClient.state === "ready", "team round welcome");
+  teamServer.world.objectiveTeamTwoScore = 3;
+  teamServer.step();
+  assert.equal(teamClient.roundState.winnerPlayerId, 0);
+  assert.equal(teamClient.roundState.winnerTeam, 2);
+  assert.equal(teamClient.roundState.phase, 1);
+  teamServer.close();
+  assert.deepEqual(teamErrors, []);
+});
+
+test("a full online roster remains a terminal rejection and never welcomes a solo fallback", async () => {
+  const errors = [];
+  const server = new MatchServer({ rosterSize: 2 });
+  const first = join(server, "full-room-first", errors);
+  const second = join(server, "full-room-second", errors);
+  await settleUntil(() => first.state === "ready" && second.state === "ready", "room capacity filled");
+  const rejected = join(server, "full-room-third", errors);
+  await settleUntil(() => rejected.state === "rejected", "full-room rejection");
+  assert.equal(rejected.state, "rejected");
+  assert.equal(rejected.lastReject?.code, REJECT_FULL);
+  assert.equal(server.countHumans(), 2);
+  assert.equal(rejected.world, undefined, "a rejected client is not assigned an offline solo world");
   server.close();
   assert.deepEqual(errors, []);
 });

@@ -20,6 +20,7 @@ import {
   PLAYER_MODE_DEAD,
   PLAYER_MODE_INFANTRY,
   PLAYER_MODE_TANK,
+  REJECT_FULL,
   VELOCITY_SCALE,
   driverByPlayerId,
   hexReliefLiftAtSimulation,
@@ -531,6 +532,13 @@ export default defineComponent({
     // cancel its deterministic shot and movement markers. Normal launches
     // leave `demo` at zero and retain the regular input behavior below.
     if (self.demo > 0 && !self.engaged) return true;
+    const client = arenaMatch()?.client;
+    if (client?.state === "rejected" && client.lastReject?.code === REJECT_FULL) {
+      if (action.pressed || action.touch?.some((touch) => touch.pressed) === true) {
+        msg.post(ARENA, "retry_online");
+      }
+      return true;
+    }
     if (actionId === TOUCH && action.touch !== undefined) {
       const [screenWidth] = window.getSize();
       updateVirtualControls(self.touch, action.touch, screenWidth);

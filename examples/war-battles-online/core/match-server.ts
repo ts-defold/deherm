@@ -15,6 +15,7 @@ import {
   MAX_PLAYERS,
   NETWORK_PLAYER_SNAPSHOT_BYTES,
   NETWORK_SNAPSHOT_BYTES,
+  OBJECTIVE_SCORE_LIMIT,
   SNAPSHOT_BASE_HISTORY_FRAMES,
   SNAPSHOT_BYTES,
   TICK_RATE,
@@ -39,6 +40,7 @@ import {
   RESUME_TOKEN_BYTES,
   NETWORK_SNAPSHOT_MESSAGE_BYTES,
   PONG_FEEDBACK_BYTES,
+  ROUND_STATE_BYTES,
   PING_BYTES,
   SNAPSHOT_NORMAL_MAX_BYTES,
   SNAPSHOT_RECOVERY_INTERVAL_MILLISECONDS,
@@ -54,12 +56,14 @@ import {
   readWelcomeAck,
   writePongFeedback,
   writePing,
+  writeRoundState,
   writeReject,
   writeWelcome,
   type ControlMessage,
   type HelloMessage,
   type InputCommand,
   type PingMessage,
+  type RoundStateMessage,
   type WelcomeAckMessage,
 } from "./protocol.ts";
 import { compactNetworkSnapshot, writeNetworkSnapshotDelta, writeNetworkSnapshotKeyframe } from "./snapshot.ts";
@@ -162,9 +166,15 @@ interface SnapshotStreamSend {
   readonly staleAtMilliseconds: number;
 }
 const WELCOME_ACK_TIMEOUT_TICKS = TICK_RATE * 5;
+const ONLINE_FRAG_LIMIT = 25;
+const ONLINE_ROUND_COUNTDOWN_TICKS = TICK_RATE * 5;
 
 export class MatchServer {
-  readonly world: BattleWorld;
+  world: BattleWorld;
+  round = 1;
+  private roundCountdown = 0;
+  private roundWinnerPlayerId = 0;
+  private roundWinnerTeam = 0;
   readonly rosterSize: number;
   readonly snapshotIntervalTicks: number;
   readonly botSkill: number;
@@ -179,6 +189,7 @@ export class MatchServer {
   private readonly bots = new BotController();
   private readonly botCommand: InputCommand;
   private readonly snapshotBuffers: Uint8Array[] = [];
+  private readonly roundStateBuffer = new Uint8Array(ROUND_STATE_BYTES);
   private readonly snapshotTicks = new Uint32Array(SNAPSHOT_BASE_HISTORY_FRAMES);
   private readonly snapshotValid = new Uint8Array(SNAPSHOT_BASE_HISTORY_FRAMES);
   private snapshotBufferCursor = 0;
@@ -285,7 +296,83 @@ export class MatchServer {
     for (const session of this.sessions) session.beginTick();
     this.world.step();
     this.stats.tick = this.world.tick;
+    this.updateRound();
     if (this.world.tick % this.snapshotIntervalTicks === 0) this.broadcastSnapshot();
+  }
+
+  private updateRound(): void {
+    if (this.roundCountdown === 0) {
+      const winner = this.findRoundWinner();
+      if (winner === undefined) return;
+      this.roundWinnerPlayerId = winner.playerId;
+      this.roundWinnerTeam = winner.team;
+      this.roundCountdown = ONLINE_ROUND_COUNTDOWN_TICKS;
+      this.broadcastRoundState();
+      this.log(`round-won:${this.round}:player=${winner.playerId}:team=${winner.team}`);
+      return;
+    }
+    this.roundCountdown -= 1;
+    if (this.roundCountdown === 0) {
+      const previousTick = this.world.tick;
+      this.world = new BattleWorld(this.world.matchId, this.world.mapSeed);
+      // Simulation ticks remain globally monotonic across rounds. That keeps
+      // input, snapshot and admission clocks unambiguous for existing peers.
+      this.world.tick = previousTick;
+      for (let playerId = 1; playerId <= this.rosterSize; playerId += 1) {
+        this.world.addPlayer(playerId, this.teams ? (playerId <= this.rosterSize / 2 ? 1 : 2) : 0);
+        this.world.setBotSkill(playerId, this.botSkill);
+      }
+      this.bots.reset();
+      this.round += 1;
+      this.roundWinnerPlayerId = 0;
+      this.roundWinnerTeam = 0;
+      this.stats.tick = previousTick;
+      this.snapshotValid.fill(0);
+      this.snapshotBufferCursor = 0;
+      for (const session of this.sessions) session.resetRoundState();
+      this.broadcastRoundState();
+      this.log(`round-started:${this.round}`);
+      return;
+    }
+    if (this.roundCountdown % TICK_RATE === 0) this.broadcastRoundState();
+  }
+
+  private findRoundWinner(): { playerId: number; team: number } | undefined {
+    if (this.teams) {
+      if (this.world.objectiveTeamOneScore >= OBJECTIVE_SCORE_LIMIT) return { playerId: 0, team: 1 };
+      if (this.world.objectiveTeamTwoScore >= OBJECTIVE_SCORE_LIMIT) return { playerId: 0, team: 2 };
+    }
+    let leader = 0;
+    let score = -1;
+    for (let slot = 0; slot < this.rosterSize; slot += 1) {
+      const candidate = this.world.playerScore[slot]!;
+      if (candidate > score) {
+        score = candidate;
+        leader = slot + 1;
+      }
+    }
+    return score >= ONLINE_FRAG_LIMIT ? { playerId: leader, team: 0 } : undefined;
+  }
+
+  private roundState(): RoundStateMessage {
+    return {
+      round: this.round,
+      phase: this.roundCountdown === 0 ? 0 : 1,
+      winnerPlayerId: this.roundWinnerPlayerId,
+      winnerTeam: this.roundWinnerTeam,
+      ticksRemaining: this.roundCountdown,
+    };
+  }
+
+  private broadcastRoundState(): void {
+    const length = writeRoundState(this.roundStateBuffer, this.roundState());
+    for (const session of this.sessions)
+      if (session.ready) session.sendRoundState(this.roundStateBuffer.subarray(0, length));
+  }
+
+  sendRoundState(session: ServerSession): void {
+    const length = writeRoundState(this.roundStateBuffer, this.roundState());
+    session.sendRoundState(this.roundStateBuffer.subarray(0, length));
   }
 
   /** Steps paid whole ticks without losing fractional time at each timer wake-up. */
@@ -556,6 +643,27 @@ export class ServerSession implements TransportReceiver {
 
   attach(transport: GameTransport): void {
     this.transport = transport;
+  }
+
+  /** @internal Sends current match-level state after the identity handshake. */
+  sendRoundState(payload: Uint8Array): void {
+    if (this.ready && !this.closed) this.sendReliable(TRANSPORT_CHANNEL_SESSION, payload);
+  }
+
+  /** @internal Invalidates tick-relative state after the authoritative world resets. */
+  resetRoundState(): void {
+    this.snapshotBaselineTick = -1;
+    this.snapshotBaseline.fill(0);
+    this.snapshotCurrent.fill(0);
+    this.snapshotFramesSinceKeyframe = 0;
+    this.forceSnapshotKeyframe = true;
+    this.acceptedInputTicks.fill(-1);
+    this.lateInputTicks.fill(-1);
+    this.preReadyInputBytes = 0;
+    for (let index = 0; index < this.snapshotSends.length; index += 1) {
+      this.snapshotSends[index]?.controller.abort("round restarted");
+      this.snapshotSends[index] = undefined;
+    }
   }
 
   /** @internal */
@@ -974,6 +1082,7 @@ export class ServerSession implements TransportReceiver {
     this.resumeCommitted = true;
     this.ready = true;
     this.server.log(`session-joined:${this.name}:slot=${this.slot + 1}`);
+    this.server.sendRoundState(this);
   }
 
   private handleControl(payload: Uint8Array): void {

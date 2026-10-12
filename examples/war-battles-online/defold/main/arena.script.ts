@@ -29,6 +29,7 @@ import {
   EVENT_PICKUP_TAKEN,
   INFANTRY_FIRE_COOLDOWN_TICKS,
   INFANTRY_HEALTH,
+  REJECT_FULL,
   CELL_CRATE,
   CELL_SANDBAG,
   MAX_PICKUPS,
@@ -191,6 +192,7 @@ interface WarBattlesBrowserGlobals {
 
 const ENGAGE = hashLiteral("#engage");
 const RESTART = hashLiteral("#restart");
+const RETRY_ONLINE = hashLiteral("#retry_online");
 const REMOTE_LIFECYCLE_CUE = hashLiteral("#remote_lifecycle_cue");
 const CAMERA = "/camera#follow";
 const CAMERA_IMPACT = "camera_impact";
@@ -1074,9 +1076,17 @@ function connectOnline(self: ArenaSelf): boolean {
     leadTicks: INITIAL_ONLINE_INPUT_LEAD_TICKS,
     onLog: (line: string) => defold.log("info", `war-battles:net:${line}`),
     onError: (error: unknown) => defold.log("info", `war-battles:net-error:${String(error)}`),
-    onReject: (reject) => fallback(`reject:${reject.code}:${reject.reason}`),
+    onReject: (reject) => {
+      if (reject.code === REJECT_FULL) {
+        defold.log("info", `war-battles:arena-online-room-full:${reject.reason}`);
+        return;
+      }
+      fallback(`reject:${reject.code}:${reject.reason}`);
+    },
     onClose: (close) => {
-      if (!close.welcomed) fallback(`close:${close.code}:${close.reason}`);
+      if (!close.welcomed && !(close.state === "rejected" && client.lastReject?.code === REJECT_FULL)) {
+        fallback(`close:${close.code}:${close.reason}`);
+      }
     },
     onWelcome: (welcome) => {
       // The authoritative roster is selected by the server. Adopt it before
@@ -1267,7 +1277,15 @@ export default defineComponent({
   onMessage(self: ArenaSelf, messageId: DefoldHash, message: RemoteLifecycleCueMessage): void {
     if (messageId === ENGAGE) engage(self);
     else if (messageId === RESTART) restart(self);
-    else if (messageId === REMOTE_LIFECYCLE_CUE) {
+    else if (messageId === RETRY_ONLINE) {
+      const client = self.match.client;
+      if (client?.state !== "rejected" || client.lastReject?.code !== REJECT_FULL) return;
+      if (self.onlineAttempts !== undefined) invalidateOnlineAttempts(self.onlineAttempts);
+      client.close(1000, "retrying full room admission");
+      self.match.client = undefined;
+      self.online = connectOnline(self);
+      defold.log("info", `war-battles:arena-online-retry:${self.online ? "started" : "unavailable"}`);
+    } else if (messageId === REMOTE_LIFECYCLE_CUE) {
       if (!Number.isFinite(message?.x) || !Number.isFinite(message?.y)) return;
       if (message.cue === REMOTE_CUE_EJECT) {
         if (spawnEffect(self, true, message.x, message.y)) self.telemetry.remoteEjectEffects += 1;
