@@ -103,11 +103,24 @@ test("War Battles Static Hermes gate derives a closed release route set", async 
     assert.equal(report.kind, "deherm.war-battles.static-hermes-build-gate");
     assert.equal(report.reachability.profile, "release");
     assert.equal(report.reachability.dynamicAccess, false);
+    assert.equal(report.variant, "release");
     assert.ok(report.reachability.staticReachableRouteCount > 0);
     assert.ok(report.reachability.blockedReachableRouteCount >= 0);
     assert.equal(report.stages.find(({ name }) => name === "compile").status, "passed");
     assert.ok(report.stages.find(({ name }) => name === "compile").emittedCBytes > 0);
     assert.equal(report.stages.find(({ name }) => name === "compile").exportedUnit, "deherm_typed_native");
+    assert.equal(report.stages.find(({ name }) => name === "compile").typedNative.typed, true);
+    assert.equal(report.stages.find(({ name }) => name === "compile").typedNative.strict, true);
+    assert.equal(report.stages.find(({ name }) => name === "compile").staticApplication.typed, false);
+    assert.equal(report.stages.find(({ name }) => name === "compile").staticApplication.strict, false);
+    assert.equal(
+      report.stages.find(({ name }) => name === "compile").staticApplication.inputKind,
+      "fingerprinted-javascript-bundle",
+    );
+    assert.doesNotMatch(
+      report.stages.find(({ name }) => name === "compile").staticApplication.command.join(" "),
+      /(?:^|\s)-(?:typed|strict)(?:\s|$)/u,
+    );
     assert.equal(
       report.stages.find(({ name }) => name === "compile").staticApplication.exportedUnit,
       "deherm_static_application",

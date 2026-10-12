@@ -90,6 +90,55 @@ python3 build/native/bin/hermes-lit -sv \
 
 Observed result: `Expected Passes: 5`.
 
+# Compile/run preflight (2026-10-12)
+
+The pinned checkout is still `4947871513667919bf2fe225134af3e3a1a3772c`.
+Its source has the special `FunctionDeclarationNode` visitor that converts
+`_returnType`, but no equivalent visitors for `FunctionExpressionNode` or
+`ArrowFunctionExpressionNode`. The manifest-verified cached `shermes`
+(`48fbc165eb43d9bd7925a17142a52bbad3eebedbf064b182bc8b54a4e258befd`) reports
+the three expected remaining-`TSTypeAnnotation` errors for a function
+expression, arrow, and class method under:
+
+```sh
+shermes -fno-std-globals -typed -parse-ts \
+  -dump-transpiled-ast -pretty -script repro.ts
+```
+
+The same pinned source build executes an explicitly typed function declaration
+with `-parse-ts -typed -strict -script -exec` and prints `42`. This confirms
+the compile/run invocation; it does not clear the expression/arrow regression.
+
+The PR's AST regression should be supplemented with this focused
+compile-and-run lit test after the visitor fix. It covers the same two visitor
+paths and the class-method representation, then checks the observable result:
+
+```ts
+// RUN: %shermes -fno-std-globals -typed -strict -parse-ts -script -exec %s
+
+const expression = function (value: number): number { return value + 1; };
+const arrow = (value: number): number => value + 2;
+class ReturnTypes {
+  method(value: number): number { return value + 3; }
+}
+if (expression(39) + arrow(39) + new ReturnTypes().method(39) !== 126) {
+  throw "return-type smoke failed";
+}
+```
+
+TypeScript `number` return annotations already map to Flow's existing
+`NumberTypeAnnotation` inside the existing `TypeAnnotation` wrapper. The
+change is parity in the TS-to-Flow conversion path, not a new type-system or
+optimization feature. The compile/run test would show that the converted
+annotations reach the existing typed checker and execute; it would not prove
+a performance gain or validate a whole application.
+
+I attempted a fresh read of draft PR #2188, but GitHub was unavailable in this
+environment (`gh` could not connect to `api.github.com`, and `git fetch` could
+not resolve `github.com`). The pinned source and the prior recorded PR identity
+remain locally inspectable; the current remote diff, checks, and CLA state
+could not be independently refreshed in this preflight.
+
 # Carry and removal policy
 
 Keep `HERMES_REV` on the verified upstream commit in `upstream.lock`; do not

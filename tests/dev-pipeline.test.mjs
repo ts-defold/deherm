@@ -10,11 +10,13 @@ import { HotReloadCoordinator } from "../packages/cli/src/dev/coordinator.mjs";
 test("incremental compiler fingerprints, mirrors, and reports bundle deltas", async (t) => {
   const root = await mkdtemp(path.join(tmpdir(), "deherm-compiler-"));
   const entry = path.join(root, "main.ts");
+  const dependency = path.join(root, "constants.ts");
   const output = path.join(root, ".deherm", "dev", "app.js");
   const mirror = path.join(root, "build", "app.js");
+  await writeFile(dependency, "export const answer = 42;\n");
   await writeFile(
     entry,
-    "declare const __DEFOLD_HERMES_BUILD_FINGERPRINT__: string; console.log(`bundle:${__DEFOLD_HERMES_BUILD_FINGERPRINT__}`, __DEFOLD_HERMES_BUILD_FINGERPRINT__, 42);\n",
+    'import { answer } from "./constants.js"; declare const __DEFOLD_HERMES_BUILD_FINGERPRINT__: string; console.log(`bundle:${__DEFOLD_HERMES_BUILD_FINGERPRINT__}`, __DEFOLD_HERMES_BUILD_FINGERPRINT__, answer);\n',
   );
   const compiler = await createIncrementalCompiler({
     entryPoint: entry,
@@ -29,7 +31,8 @@ test("incremental compiler fingerprints, mirrors, and reports bundle deltas", as
   assert.deepEqual(first.resourcePaths, ["/app.js"]);
   assert.equal(await readFile(output, "utf8"), await readFile(mirror, "utf8"));
   assert.match(await readFile(output, "utf8"), new RegExp(first.fingerprint));
-  assert.equal(first.metrics.moduleCount, 1);
+  assert.equal(first.metrics.moduleCount, 2);
+  assert.deepEqual(first.metrics.modules.map(({ file }) => file).sort(), [dependency, entry].sort());
   assert.equal(
     (await readdir(path.dirname(output))).some((file) => file.includes(".deherm-tmp-")),
     false,

@@ -118,6 +118,9 @@ fi
 # Bob must see exactly one executable application representation. Native
 # release builds compile the verified JavaScript to optimized Hermes bytecode;
 # browser releases retain JavaScript; Static Hermes builds retain neither.
+# `variant=release` selects Bob's optimized engine build and defaults the
+# application projection to Dynamic Hermes. Static packaging is selected
+# separately and does not establish a sound-typed application compile.
 # `.defignore` hides every sibling representation before Bob walks resources.
 application_mode="${DEFOLD_HERMES_APPLICATION_MODE:-dynamic}"
 node "$repo_root/bin/deherm.mjs" prepare-bob \

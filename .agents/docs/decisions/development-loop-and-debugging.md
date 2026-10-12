@@ -106,6 +106,12 @@ the one intentional process boundary: package-manager installation remains
 explicit and the already-running `dev` process must be restarted so it cannot
 mix loaded compiler code from one package version with files from another.
 
+The incremental compiler resolves esbuild metafile input and output keys from
+the configured `absWorkingDir`, because relative metafile paths use that base
+rather than the Node process cwd. This keeps the lock's source closure complete
+and retained-module metrics accurate when a project is compiled from elsewhere
+or when the host uses Windows path separators.
+
 # Reload transaction
 
 TypeScript-only edits do not rebuild Hermes or the custom engine:

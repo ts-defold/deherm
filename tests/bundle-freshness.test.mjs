@@ -110,6 +110,9 @@ test("a recorded bundle goes stale when its sources change and fresh again when 
 
   const lock = await readProjectLock(root);
   assert.equal(lock.buildArtifacts.schema, BUILD_ARTIFACT_SCHEMA);
+  // bundleProject lives in the OS temp directory, outside this test's repo
+  // cwd. Relative esbuild metafile inputs must resolve from absWorkingDir.
+  assert.ok(first.build.sources.includes(path.join(root, "src", "constants.ts")));
   assert.ok(lock.buildArtifacts.artifacts["deherm/app.dehermc"].sources.files["src/constants.ts"]);
   // Regenerating the lock's other sections must not discard the binding, and
   // recording an unchanged build must not churn the file.

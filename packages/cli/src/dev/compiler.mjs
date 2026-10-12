@@ -53,6 +53,13 @@ function resolveMapSource(mapFile, sourceMap, source) {
   return path.resolve(path.dirname(mapFile), sourceMap.sourceRoot ?? "", source);
 }
 
+function resolveMetafilePath(file, absWorkingDir) {
+  // esbuild makes metafile paths relative to absWorkingDir when possible.
+  // Accept either separator so a key is interpreted consistently on Windows
+  // and POSIX hosts, then resolve it from the same base esbuild used.
+  return path.resolve(absWorkingDir, file.replace(/[\\/]/g, path.sep));
+}
+
 // esbuild composes an input map only when the transformed module carries one.
 // dehermc writes external .js.map files, while the onLoad plugin presents a
 // virtual module at the original .ts path. Normalize the one-source map to
@@ -212,12 +219,13 @@ export async function createIncrementalCompiler(options) {
         },
       }
     : { entryPoints: [entryPoint] };
+  const absWorkingDir = path.dirname(tsconfig ?? entryPoint);
   const buildContext = await context({
     ...input,
     // esbuild's default is process.cwd(), which made the same project emit
     // different source comments (and bundle hashes) in the CLI and a
     // clean-room build launched from the monorepo root.
-    absWorkingDir: path.dirname(tsconfig ?? entryPoint),
+    absWorkingDir,
     outfile: outputFile,
     bundle: true,
     format: "iife",
@@ -300,12 +308,20 @@ export async function createIncrementalCompiler(options) {
       // is only as honest as this list, so it is the bundler's whole input
       // closure and not the retained-module census below.
       const sources = [
-        ...new Set([...Object.keys(result.metafile.inputs).map((file) => path.resolve(file)), ...transformInputFiles]),
+        ...new Set([
+          ...Object.keys(result.metafile.inputs).map((file) => resolveMetafilePath(file, absWorkingDir)),
+          ...transformInputFiles,
+        ]),
       ].sort();
-      const output = Object.entries(result.metafile.outputs).find(([file]) => path.resolve(file) === outputFile)?.[1];
+      const output = Object.entries(result.metafile.outputs).find(
+        ([file]) => resolveMetafilePath(file, absWorkingDir) === outputFile,
+      )?.[1];
       const bytes = Buffer.byteLength(finalSource);
       const modules = Object.entries(output?.inputs ?? {})
-        .map(([file, contribution]) => ({ file, bytes: contribution.bytesInOutput }))
+        .map(([file, contribution]) => ({
+          file: resolveMetafilePath(file, absWorkingDir),
+          bytes: contribution.bytesInOutput,
+        }))
         .filter(({ bytes: retained }) => retained > 0)
         .sort((left, right) => right.bytes - left.bytes || left.file.localeCompare(right.file));
       const metrics = {

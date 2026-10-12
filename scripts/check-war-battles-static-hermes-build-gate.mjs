@@ -948,6 +948,8 @@ export async function buildGate(rawOptions = {}) {
       report.stages.push(
         stage("compile", pinned ? "passed" : "observed-unpinned", {
           typedNative: {
+            typed: true,
+            strict: true,
             command: [
               relativeToRepo(tool.selected),
               "-typed",
@@ -965,6 +967,9 @@ export async function buildGate(rawOptions = {}) {
             directStaticFrameCallCount: (emitted.toString().match(/\bdeherm_script_static_[a-z_0-9]*\(/g) ?? []).length,
           },
           staticApplication: {
+            typed: false,
+            strict: false,
+            inputKind: "fingerprinted-javascript-bundle",
             command: [
               relativeToRepo(tool.selected),
               "-O",

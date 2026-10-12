@@ -292,6 +292,15 @@ and before Bob reads resources.
 | HTML5 browser host | JavaScript |
 | Native debug | JavaScript |
 
+The Bob `release` variant is independent of application typing. `bob.sh`
+defaults `DEFOLD_HERMES_APPLICATION_MODE` to `dynamic`, so a native release
+uses optimized Hermes bytecode. Selecting `static` only excludes dynamic app
+resources; it does not make the authored application a sound-typed Static
+Hermes program. The War Battles gate currently compiles the typed-native
+bridge with `-typed -strict`, then emits its fingerprinted JavaScript bundle
+as application C without those flags. Its report records these as separate
+compile modes.
+
 The package-owned `.defignore` block excludes every non-selected sibling. In
 particular, `.map` files never cross the release boundary and a native Dynamic
 release never archives JavaScript source beside its bytecode. A Bob settings
