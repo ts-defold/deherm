@@ -355,7 +355,10 @@ async function pullNativeArtifacts(args) {
       const archive = path.join(destination, row.asset);
       verifyReleaseAssetBytes(await readFile(archive), archiveMetadata, row.asset);
       await verifyReleaseArchive({ archive, integrity });
-      const extracted = path.join(downloadRoot, `hermes-${row.target}`);
+      // Keep extracted members under their immutable release tag. A developer
+      // may cache several releases of the same target; installation must never
+      // select an identically named library from an older release.
+      const extracted = path.join(destination, `hermes-${row.target}`);
       await extractReleaseArchive({ archive, destination: extracted });
       await verifyReleaseArchive({ archive, integrity, extractedRoot: extracted });
       expectedByTarget.set(row.target, {

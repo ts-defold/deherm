@@ -71,17 +71,17 @@ export const paths = Object.freeze({
  * THEIR build server.
  */
 export function buildServerForDefoldRef(ref) {
-  return String(ref).trim().toLowerCase() === "stable" ? "https://build.defold.com" : "https://build-stage.defold.com";
+  const channel = String(ref).trim().toLowerCase();
+  return channel === "alpha" || channel === "beta" ? "https://build-stage.defold.com" : "https://build.defold.com";
 }
 
 const pinnedDefoldRef = /^DEFOLD_REF=(.+)$/mu.exec(readFileSync(path.join(root, "upstream.lock"), "utf8"))?.[1];
 if (!pinnedDefoldRef) throw new Error("upstream.lock has no DEFOLD_REF");
 
-// Defold publishes pending SDK/Extender changes to the staging service. A dev,
-// alpha or beta SDK can therefore be newer than production Extender's build.yml
-// schema even when both services are healthy. Keep the consumer proof on the
-// service belonging to the pinned channel; an explicit --build-server still
-// overrides this for a maintainer testing another deployment.
+// Mirror the pinned Defold Editor's connection-properties rule: alpha and beta
+// use staging; dev and stable use production. Bob itself defaults to production.
+// The deployments can independently lag a pinned SDK, so an explicit
+// --build-server remains available for diagnosing a particular deployment.
 export const defaultBuildServer = buildServerForDefoldRef(pinnedDefoldRef);
 
 /**

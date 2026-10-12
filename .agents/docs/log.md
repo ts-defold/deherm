@@ -1,5 +1,29 @@
 # Defold Hermes knowledge log
 
+## 2026-10-12 - Match Defold's hosted builder selection and isolate Apple routing
+
+The pinned Defold Editor sends `alpha` and `beta` builds to staging but leaves
+`dev` and `stable` on production. The end-to-end gate had sent every non-stable
+channel to staging. All four staging Apple rows in run `38278885486` were
+rejected before compilation, while an earlier production run failed on an
+`r8Cmd` schema mismatch; neither historical result establishes today's server
+capability. On 2026-10-12, pinned Bob submitted an ordinary WebTransport
+extension to production as `arm64-osx` with SDK
+`7f0f554f41f9dce1e0ddff99bf08200657d1ee05`; Extender accepted and built
+it (trace `6acd1d585e015c706318e5d1531b729e`). The gate now mirrors the Editor
+default. After explicit approval for the source upload, the generated déherm
+project also passed pinned Bob → production Extender compilation/link for all
+four Apple targets: `arm64-osx`, `x86_64-osx`, `arm64-ios`, and `arm64_sim-ios`.
+Local déherm generation/type-checking and the full `pnpm check` passed. These
+are build results, not proof of on-device execution or release-mode performance.
+
+The consumer attempt also found that `pull --target arm64-osx` failed with four
+cached `libhermes.a` candidates from distinct releases. The installer now
+selects the exact authenticated tag/target directory; a fixture with a stale
+release passed, as did the focused archive/gate suites. A subsequent pull
+installed and verified the published Apple archive. No native link or runtime
+evidence follows from that local installation.
+
 ## 2026-10-12 - Separate War Battles transport loss from replay divergence
 
 Two focused product-network tests remain red on clean `main`: the seeded

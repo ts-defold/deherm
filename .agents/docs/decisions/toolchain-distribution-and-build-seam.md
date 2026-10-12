@@ -26,6 +26,10 @@ sources:
     resource: ../../../upstream/defold/com.dynamo.cr/com.dynamo.cr.bob/src/com/dynamo/bob/Bob.java
     title: Bob bundle variants and build server selection
     author: team:defold
+  - id: editor-build-server
+    resource: ../../../upstream/defold/editor/src/clj/editor/connection_properties.clj
+    title: Editor channel-to-Extender deployment selection
+    author: team:defold
 ---
 
 # The division of labour
@@ -706,9 +710,29 @@ against the same refused staging worker while the other nine targets passed.
 The retry commit's full run `38278885486` instead received explicit
 `Platform '<target>' is not supported on the current server` responses for all
 four Apple targets from staging. That is not a transient connection refusal or
-an extension compile result; it remains a red external-service capability gate.
-Do not reclassify it as a passing target, retry it as a transport error, or
-quietly use production Extender for a beta SDK.
+an extension compile result. The first production test of this pinned `dev`
+revision had previously failed all targets on Extender's older `r8Cmd` schema,
+but the deployments changed afterward. The pinned Defold Editor selects staging
+only for `alpha` and `beta`; `dev` and `stable` select production. The consumer
+gate now mirrors that rule, and the explicit build-server override remains for
+deployment diagnosis. On 2026-10-12, pinned Bob submitted a conventional
+WebTransport extension for `arm64-osx` and the exact pinned SDK SHA to
+production; Extender accepted and completed the build. After explicit approval
+for uploading the generated déherm extension to production, the same pinned
+Bob and SDK also built the generated déherm project for `arm64-osx`,
+`x86_64-osx`, `arm64-ios`, and `arm64_sim-ios`. Each target reached Extender
+compilation and link; the four local Bob stages returned success. This is
+hosted build evidence for these four targets, not device-runtime evidence.
+Do not reclassify the failed staging rows as passing, retry them as transport
+errors, or quietly use production Extender for an `alpha`/`beta` SDK.
+
+The same local consumer attempt exposed an independent archive-cache bug:
+`pull --target arm64-osx` found four old `libhermes.a` candidates because the
+installer recursively searched every cached release. Extraction and selection
+now live under the authenticated release tag and target; a regression fixture
+keeps an older target archive beside the selected one. The published member
+hash still has to match its sidecar before installation. This is local artifact
+selection evidence, not a hosted déherm build result.
 
 For package-default artifact runs, the summary regenerates `release-tags.json`
 from every published host-tool sidecar, authenticates each sidecar against

@@ -17,28 +17,20 @@ export async function installNativeArtifacts({
   if (!(expectedByTarget instanceof Map)) {
     throw new Error("Native artifact installation requires publisher-authenticated release metadata");
   }
-  const available = [];
-  async function visit(directory) {
-    for (const entry of await readdir(directory, { withFileTypes: true })) {
-      const absolute = path.join(directory, entry.name);
-      if (entry.isDirectory()) await visit(absolute);
-      else if (entry.isFile()) available.push(absolute);
-    }
-  }
-  await visit(path.resolve(downloadRoot));
-
   const installed = [];
   for (const [target, artifact] of Object.entries(manifest.targets)) {
     if (artifact.status !== "vendored" && artifact.status !== "required-missing") continue;
     const expected = expectedByTarget.get(target);
     if (!expected) continue;
     const directory = `hermes-${target}`;
+    if (!/^[A-Za-z0-9][A-Za-z0-9._-]*$/u.test(expected.tag ?? "")) {
+      throw new Error(`${target} has an invalid publisher release tag`);
+    }
+    const extractedRoot = path.join(path.resolve(downloadRoot), expected.tag, directory);
+    const entries = await readdir(extractedRoot, { withFileTypes: true });
     const find = (name) => {
-      const candidates = available.filter(
-        (file) => path.basename(file) === name && file.split(path.sep).includes(directory),
-      );
-      if (candidates.length > 1) throw new Error(`Expected one ${name} in ${directory}, found ${candidates.length}`);
-      return candidates[0] ?? null;
+      const entry = entries.find((candidate) => candidate.name === name && candidate.isFile());
+      return entry ? path.join(extractedRoot, entry.name) : null;
     };
     const releaseName = path.posix.basename(artifact.library);
     const debugName = `${releaseName.slice(0, -path.posix.extname(releaseName).length)}.debug${path.posix.extname(releaseName)}`;

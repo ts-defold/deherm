@@ -116,9 +116,22 @@ test("the implicit hosted Extender follows the pinned Defold channel", async () 
   const ref = /^DEFOLD_REF=(.+)$/mu.exec(lock)?.[1];
   assert.equal(module.defaultBuildServer, buildServerForDefoldRef(ref));
   assert.equal(buildServerForDefoldRef("stable"), "https://build.defold.com");
-  for (const channel of ["dev", "alpha", "beta"]) {
+  assert.equal(buildServerForDefoldRef("dev"), "https://build.defold.com");
+  for (const channel of ["alpha", "beta"]) {
     assert.equal(buildServerForDefoldRef(channel), "https://build-stage.defold.com");
   }
+});
+
+test("hosted Extender defaults mirror the pinned Defold Editor channel rule", async () => {
+  const source = await readFile(
+    new URL("../upstream/defold/editor/src/clj/editor/connection_properties.clj", import.meta.url),
+    "utf8",
+  );
+  assert.match(source, /:build-server-url "https:\/\/build\.defold\.com"/u);
+  for (const channel of ["alpha", "beta"]) {
+    assert.match(source, new RegExp(`"${channel}" "https://build-stage\\.defold\\.com"`, "u"));
+  }
+  assert.doesNotMatch(source, /"dev" "https:\/\/build-stage\.defold\.com"/u);
 });
 
 test("hosted Bob retries only a fresh Extender worker connection refusal, at most twice", () => {

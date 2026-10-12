@@ -302,12 +302,12 @@ async function installFixture(t) {
   const directory = await scratch(t);
   const source = path.join(directory, "source");
   const downloadRoot = path.join(directory, "download");
-  const extracted = path.join(downloadRoot, "hermes-arm64-osx");
-  await mkdir(source);
-  await mkdir(extracted, { recursive: true });
   const asset = "hermes-arm64-osx.tar.gz";
   const fingerprint = "a".repeat(64);
   const tag = "libs-aaaaaaaaaaaa";
+  const extracted = path.join(downloadRoot, tag, "hermes-arm64-osx");
+  await mkdir(source);
+  await mkdir(extracted, { recursive: true });
   const members = ["libhermes.a", "libhermes.debug.a", "libhermesvm-config.h"];
   const archive = path.join(directory, asset);
   const release = path.join(source, members[0]);
@@ -366,6 +366,29 @@ test("native install rejects corrupted downloaded library bytes before copying o
   assert.equal(await readFile(destination, "utf8"), "existing trusted library");
   assert.equal(fixture.artifact.status, "required-missing");
   assert.equal(fixture.artifact.sha256, undefined);
+});
+
+test("native install selects only the authenticated release directory when old target archives remain cached", async (t) => {
+  const fixture = await installFixture(t);
+  const oldRelease = path.join(fixture.downloadRoot, "libs-old", "hermes-arm64-osx");
+  await mkdir(oldRelease, { recursive: true });
+  await writeFile(path.join(oldRelease, "libhermes.a"), "obsolete release library");
+  await writeFile(path.join(oldRelease, "libhermes.debug.a"), "obsolete debugger library");
+  await fixture.installCopy("libhermes.a", await readFile(path.join(fixture.source, "libhermes.a")));
+  await fixture.installCopy("libhermes.debug.a", await readFile(path.join(fixture.source, "libhermes.debug.a")));
+
+  const installed = await installNativeArtifacts({
+    manifest: fixture.manifest,
+    downloadRoot: fixture.downloadRoot,
+    expectedByTarget: fixture.expectedByTarget,
+    root: fixture.directory,
+    minimumBytes: 1,
+  });
+  assert.deepEqual(installed, ["arm64-osx"]);
+  assert.equal(
+    await readFile(path.join(fixture.directory, fixture.artifact.library), "utf8"),
+    "publisher release library",
+  );
 });
 
 test("native install rejects a valid substituted library pair against the original publisher expectation", async (t) => {
