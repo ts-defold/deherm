@@ -253,8 +253,8 @@
     },
     {
       "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-      "policyRoot": "bad6c31f5037e3ab589ff3729ac857a345d9e7e1ed728e6ea6128e33ed369b1c",
-      "generator": "sha256:e59d913a761e9fb29e32c52d4d64e2398cfcceda7005af4cdd3f4b6f420f1b06",
+      "policyRoot": "13b63402d3f834b34c4b6bffb7542d4be0a1eaff9096e02e87026014b5ea94eb",
+      "generator": "sha256:7ef94acd580ad9593ad815eca230f5441665dad4d892bd41316aaf1a5c3e2e5f",
       "realizer": {
         "minimumPackageVersion": "0.1.0",
         "requiredCapabilities": [
