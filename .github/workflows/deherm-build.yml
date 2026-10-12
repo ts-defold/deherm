@@ -1,0 +1,378 @@
+name: déherm build
+
+# Reusable, consumer-facing workflow. The caller repository is checked out under
+# project/; the action and pinned Extender bootstrap live in a separate checkout.
+# This prevents our tooling checkout from becoming part of the Defold project.
+on:
+  workflow_call:
+    inputs:
+      action-ref:
+        description: Immutable déherm commit SHA or release tag containing this workflow and action
+        required: true
+        type: string
+      mode:
+        description: defold (hosted), local (Extender on this runner), or external (user-provided Extender)
+        required: false
+        default: defold
+        type: string
+      build-server:
+        description: HTTPS Extender URL; required only in external mode
+        required: false
+        default: ''
+        type: string
+      targets:
+        description: JSON array of Defold bundle targets; empty selects all supported targets in the caller project's generated policy
+        required: false
+        default: '[]'
+        type: string
+      project:
+        description: Path to the Defold project relative to the caller repository root
+        required: false
+        default: '.'
+        type: string
+      variant:
+        description: Defold build variant
+        required: false
+        default: release
+        type: string
+      application-mode:
+        description: déherm application mode
+        required: false
+        default: dynamic
+        type: string
+      entry:
+        description: TypeScript entry point, if the project needs an explicit entry
+        required: false
+        default: ''
+        type: string
+    secrets:
+      extender-registry-json:
+        description: Optional Google Artifact Registry service-account JSON for local Docker Extender images
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  plan:
+    runs-on: ubuntu-24.04
+    outputs:
+      nonapple: ${{ steps.matrix.outputs.nonapple }}
+      apple: ${{ steps.matrix.outputs.apple }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          path: project
+          persist-credentials: false
+      - uses: actions/checkout@v7
+        with:
+          repository: ts-defold/deherm
+          ref: ${{ inputs.action-ref }}
+          path: .deherm-action
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Install caller project dependencies and generate its resolved policy
+        env:
+          DEHERM_PROJECT: ${{ inputs.project }}
+        run: |
+          set -euo pipefail
+          project_dir="$(realpath "project/$DEHERM_PROJECT")"
+          case "$project_dir" in "$GITHUB_WORKSPACE/project"|"$GITHUB_WORKSPACE/project/"*) ;; *) echo 'project must remain inside the caller checkout' >&2; exit 2;; esac
+          install_dir="$project_dir"
+          while [ ! -f "$install_dir/pnpm-lock.yaml" ] && [ ! -f "$install_dir/package-lock.json" ]; do
+            if [ "$install_dir" = "$GITHUB_WORKSPACE/project" ]; then
+              echo 'Expected pnpm-lock.yaml or package-lock.json in the caller project or a parent workspace' >&2
+              exit 2
+            fi
+            install_dir="$(dirname "$install_dir")"
+          done
+          cd "$install_dir"
+          if [ -f pnpm-lock.yaml ]; then corepack enable; corepack pnpm install --frozen-lockfile
+          else npm ci
+          fi
+          cli_dir="$project_dir"
+          while [ ! -f "$cli_dir/node_modules/@ts-defold/deherm/bin/deherm.mjs" ]; do
+            if [ "$cli_dir" = "$GITHUB_WORKSPACE/project" ]; then
+              echo '@ts-defold/deherm is not installed in the caller workspace' >&2
+              exit 2
+            fi
+            cli_dir="$(dirname "$cli_dir")"
+          done
+          node "$cli_dir/node_modules/@ts-defold/deherm/bin/deherm.mjs" generate --project "$project_dir" --json
+      - id: matrix
+        name: Validate build mode and derive the target matrix
+        env:
+          DEHERM_MODE: ${{ inputs.mode }}
+          DEHERM_BUILD_SERVER: ${{ inputs.build-server }}
+          DEHERM_TARGETS: ${{ inputs.targets }}
+          DEHERM_PROJECT: ${{ inputs.project }}
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import path from 'node:path';
+          const mode = process.env.DEHERM_MODE;
+          const server = process.env.DEHERM_BUILD_SERVER;
+          if (!['defold', 'local', 'external'].includes(mode)) throw new Error(`Unsupported déherm mode: ${mode}`);
+          if (mode === 'external') {
+            if (!/^https:\/\/[^/]+/.test(server)) throw new Error('external mode requires an HTTPS build-server URL');
+          } else if (server) {
+            throw new Error(`${mode} mode must not receive build-server; the workflow selects its own endpoint`);
+          }
+          const caller = fs.realpathSync('project');
+          const project = fs.realpathSync(path.resolve(caller, process.env.DEHERM_PROJECT));
+          if (project !== caller && !project.startsWith(`${caller}${path.sep}`)) throw new Error('project must remain inside the caller checkout');
+          const lock = JSON.parse(fs.readFileSync(path.join(project, 'deherm.lock'), 'utf8'));
+          const matrix = lock.toolchain?.targetMatrix;
+          if (!Array.isArray(matrix?.targets) || !Array.isArray(matrix?.platformPairs) || !matrix?.authority?.targets) {
+            throw new Error('Caller deherm.lock has no authenticated Defold target matrix; deherm generate must succeed first');
+          }
+          const supported = new Map(matrix.targets.filter(row => row.kind === 'bundle').map(row => [row.target, row]));
+          const requested = JSON.parse(process.env.DEHERM_TARGETS);
+          if (!Array.isArray(requested) || requested.some(value => typeof value !== 'string')) {
+            throw new Error('targets must be a JSON array of target names');
+          }
+          // Browser pthread requires a separate engine/host bridge not provided
+          // by this product. No release-target status comes from this Action
+          // checkout's Defold revision: all other rows belong to the caller.
+          const unsupported = row => row.group === 'web' && row.architecture === 'wasm_pthread';
+          const selected = requested.length ? requested : [...supported.values()].filter(row => !unsupported(row)).map(row => row.target);
+          if (new Set(selected).size !== selected.length) throw new Error('targets contains duplicates');
+          for (const target of selected) {
+            if (!supported.has(target)) throw new Error(`Unsupported Defold bundle target: ${target}`);
+            const row = supported.get(target);
+            if (unsupported(row)) throw new Error(`${target} is unsupported (web-pthread-browser-host-unproven): the browser pthread bridge is not implemented`);
+            if (!['android', 'web', 'linux', 'win32', 'ios', 'osx'].includes(row.group)) {
+              throw new Error(`No GitHub runner route for Defold target ${target} in group ${row.group}`);
+            }
+            if (!matrix.platformPairs.some(pair => pair.extenderTarget === target)) {
+              throw new Error(`No Bob platform pair for Defold target ${target} in ${matrix.authority.pairs}`);
+            }
+          }
+          const nonapple = [], apple = [];
+          for (const target of selected) {
+            const row = supported.get(target);
+            const entry = { target, group: row.group };
+            (['ios', 'osx'].includes(row.group) ? apple : nonapple).push(entry);
+          }
+          fs.appendFileSync(process.env.GITHUB_OUTPUT, `nonapple=${JSON.stringify(nonapple)}\napple=${JSON.stringify(apple)}\n`);
+          NODE
+
+  nonapple:
+    needs: plan
+    if: needs.plan.outputs.nonapple != '[]'
+    name: ${{ matrix.entry.target }} (${{ inputs.mode }})
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        entry: ${{ fromJSON(needs.plan.outputs.nonapple) }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          path: project
+          persist-credentials: false
+      - uses: actions/checkout@v7
+        with:
+          repository: ts-defold/deherm
+          ref: ${{ inputs.action-ref }}
+          path: .deherm-action
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '25'
+      - name: Install caller project dependencies
+        env:
+          DEHERM_PROJECT: ${{ inputs.project }}
+        run: |
+          set -euo pipefail
+          project_dir="$(realpath "project/$DEHERM_PROJECT")"
+          case "$project_dir" in "$GITHUB_WORKSPACE/project"|"$GITHUB_WORKSPACE/project/"*) ;; *) echo 'project must remain inside the caller checkout' >&2; exit 2;; esac
+          install_dir="$project_dir"
+          while [ ! -f "$install_dir/pnpm-lock.yaml" ] && [ ! -f "$install_dir/package-lock.json" ]; do
+            if [ "$install_dir" = "$GITHUB_WORKSPACE/project" ]; then
+              echo 'Expected pnpm-lock.yaml or package-lock.json in the caller project or a parent workspace' >&2
+              exit 2
+            fi
+            install_dir="$(dirname "$install_dir")"
+          done
+          cd "$install_dir"
+          if [ -f pnpm-lock.yaml ]; then corepack enable; corepack pnpm install --frozen-lockfile
+          else npm ci
+          fi
+          cli_dir="$project_dir"
+          while [ ! -f "$cli_dir/node_modules/@ts-defold/deherm/bin/deherm.mjs" ]; do
+            if [ "$cli_dir" = "$GITHUB_WORKSPACE/project" ]; then
+              echo '@ts-defold/deherm is not installed in the caller workspace' >&2
+              exit 2
+            fi
+            cli_dir="$(dirname "$cli_dir")"
+          done
+      - name: Enable arm64 Docker builders
+        if: inputs.mode == 'local' && matrix.entry.group == 'linux'
+        uses: docker/setup-qemu-action@v3
+      - name: Authenticate to Defold image registry when supplied
+        if: inputs.mode == 'local'
+        env:
+          EXTENDER_REGISTRY_JSON: ${{ secrets.extender-registry-json }}
+        run: |
+          if [ -n "$EXTENDER_REGISTRY_JSON" ]; then
+            printf '%s' "$EXTENDER_REGISTRY_JSON" | docker login europe-west1-docker.pkg.dev -u _json_key --password-stdin
+          fi
+      - name: Start pinned local Docker Extender
+        if: inputs.mode == 'local'
+        env:
+          EXTENDER_PROFILE: ${{ matrix.entry.group == 'win32' && 'windows' || matrix.entry.group }}
+        run: |
+          set -euo pipefail
+          bash .deherm-action/scripts/bootstrap-upstreams.sh extender
+          cd .deherm-action/upstream/extender
+          ./gradlew server:bootJar manifestmergetool:mainJar
+          compose=(docker compose -p deherm -f server/docker/docker-compose.yml --profile "$EXTENDER_PROFILE")
+          "${compose[@]}" pull
+          "${compose[@]}" up --pull never -d
+          # The upstream compose file uses mutable image tags. Record the exact
+          # image identities used by this run; a pull/build failure is fatal.
+          "${compose[@]}" images >> "$GITHUB_STEP_SUMMARY"
+          for attempt in {1..90}; do
+            if curl --silent --fail --max-time 2 http://127.0.0.1:9000/actuator/health >/dev/null; then exit 0; fi
+            echo "Waiting for local Extender health ($attempt/90)"
+            sleep 2
+          done
+          "${compose[@]}" ps >&2
+          "${compose[@]}" logs --tail=200 >&2
+          echo 'Local Extender did not become healthy at 127.0.0.1:9000' >&2
+          exit 1
+      - name: Build ${{ matrix.entry.target }}
+        id: build
+        uses: ./.deherm-action
+        with:
+          project: project/${{ inputs.project }}
+          target: ${{ matrix.entry.target }}
+          variant: ${{ inputs.variant }}
+          application-mode: ${{ inputs.application-mode }}
+          entry: ${{ inputs.entry }}
+          mode: ${{ inputs.mode }}
+          build-server: ${{ inputs.mode == 'local' && 'http://127.0.0.1:9000' || inputs.build-server }}
+      - name: Archive runnable bundle
+        id: archive
+        env:
+          BUNDLE_PATH: ${{ steps.build.outputs.bundle-path }}
+          DEHERM_TARGET: ${{ matrix.entry.target }}
+        run: |
+          set -euo pipefail
+          archive="$RUNNER_TEMP/deherm-$DEHERM_TARGET.tar.gz"
+          tar -czf "$archive" -C "$(dirname "$BUNDLE_PATH")" "$(basename "$BUNDLE_PATH")"
+          echo "archive-path=$archive" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v6
+        with:
+          name: deherm-${{ matrix.entry.target }}
+          path: ${{ steps.archive.outputs.archive-path }}
+          if-no-files-found: error
+      - name: Report local Extender failure
+        if: failure() && inputs.mode == 'local'
+        run: docker compose -p deherm -f .deherm-action/upstream/extender/server/docker/docker-compose.yml --profile '${{ matrix.entry.group == 'win32' && 'windows' || matrix.entry.group }}' logs --tail=200 || true
+      - name: Stop local Extender
+        if: always() && inputs.mode == 'local'
+        run: docker compose -p deherm -f .deherm-action/upstream/extender/server/docker/docker-compose.yml --profile '${{ matrix.entry.group == 'win32' && 'windows' || matrix.entry.group }}' down || true
+
+  apple:
+    needs: plan
+    if: needs.plan.outputs.apple != '[]'
+    name: ${{ matrix.entry.target }} (${{ inputs.mode }})
+    # Hosted/external builds only need Bob, not an Apple host. Local Extender
+    # must run with Xcode on Apple silicon, not in a Linux container.
+    runs-on: ${{ inputs.mode == 'local' && 'macos-26' || 'ubuntu-24.04' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        entry: ${{ fromJSON(needs.plan.outputs.apple) }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          path: project
+          persist-credentials: false
+      - uses: actions/checkout@v7
+        with:
+          repository: ts-defold/deherm
+          ref: ${{ inputs.action-ref }}
+          path: .deherm-action
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '25'
+      - name: Install caller project dependencies
+        env:
+          DEHERM_PROJECT: ${{ inputs.project }}
+        run: |
+          set -euo pipefail
+          project_dir="$(realpath "project/$DEHERM_PROJECT")"
+          case "$project_dir" in "$GITHUB_WORKSPACE/project"|"$GITHUB_WORKSPACE/project/"*) ;; *) echo 'project must remain inside the caller checkout' >&2; exit 2;; esac
+          install_dir="$project_dir"
+          while [ ! -f "$install_dir/pnpm-lock.yaml" ] && [ ! -f "$install_dir/package-lock.json" ]; do
+            if [ "$install_dir" = "$GITHUB_WORKSPACE/project" ]; then
+              echo 'Expected pnpm-lock.yaml or package-lock.json in the caller project or a parent workspace' >&2
+              exit 2
+            fi
+            install_dir="$(dirname "$install_dir")"
+          done
+          cd "$install_dir"
+          if [ -f pnpm-lock.yaml ]; then corepack enable; corepack pnpm install --frozen-lockfile
+          else npm ci
+          fi
+          cli_dir="$project_dir"
+          while [ ! -f "$cli_dir/node_modules/@ts-defold/deherm/bin/deherm.mjs" ]; do
+            if [ "$cli_dir" = "$GITHUB_WORKSPACE/project" ]; then
+              echo '@ts-defold/deherm is not installed in the caller workspace' >&2
+              exit 2
+            fi
+            cli_dir="$(dirname "$cli_dir")"
+          done
+      - name: Start pinned local Apple Extender
+        if: inputs.mode == 'local'
+        run: |
+          set -euo pipefail
+          bash .deherm-action/scripts/bootstrap-upstreams.sh extender
+          bash .deherm-action/scripts/extender-local.sh start
+          curl --fail --silent http://127.0.0.1:9010/actuator/health
+      - name: Build ${{ matrix.entry.target }}
+        id: build
+        uses: ./.deherm-action
+        with:
+          project: project/${{ inputs.project }}
+          target: ${{ matrix.entry.target }}
+          variant: ${{ inputs.variant }}
+          application-mode: ${{ inputs.application-mode }}
+          entry: ${{ inputs.entry }}
+          mode: ${{ inputs.mode }}
+          build-server: ${{ inputs.mode == 'local' && 'http://127.0.0.1:9010' || inputs.build-server }}
+      - name: Archive runnable bundle
+        id: archive
+        env:
+          BUNDLE_PATH: ${{ steps.build.outputs.bundle-path }}
+          DEHERM_TARGET: ${{ matrix.entry.target }}
+        run: |
+          set -euo pipefail
+          archive="$RUNNER_TEMP/deherm-$DEHERM_TARGET.tar.gz"
+          tar -czf "$archive" -C "$(dirname "$BUNDLE_PATH")" "$(basename "$BUNDLE_PATH")"
+          echo "archive-path=$archive" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v6
+        with:
+          name: deherm-${{ matrix.entry.target }}
+          path: ${{ steps.archive.outputs.archive-path }}
+          if-no-files-found: error
+      - name: Report local Apple Extender failure
+        if: failure() && inputs.mode == 'local'
+        run: tail -n 200 .deherm-action/upstream/extender/server/app/logs/error.log .deherm-action/upstream/extender/server/app/logs/stdout.log || true
+      - name: Stop local Apple Extender
+        if: always() && inputs.mode == 'local'
+        run: bash .deherm-action/scripts/extender-local.sh stop || true

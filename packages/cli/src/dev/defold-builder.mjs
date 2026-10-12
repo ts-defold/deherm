@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { spawn as spawnProcess } from "node:child_process";
+import { spawn as spawnProcess, spawnSync } from "node:child_process";
 import { constants } from "node:fs";
 import { access, chmod, mkdir, readFile, readdir, rename, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -78,16 +78,25 @@ export async function ensureBob(projectRoot, lock, options = {}) {
   return target;
 }
 
-async function resolveJava(options = {}) {
-  const candidates = [
-    options.java,
-    process.env.DEHERM_JAVA,
-    process.env.JAVA_HOME ? path.join(process.env.JAVA_HOME, "bin", "java") : undefined,
-    "/opt/homebrew/opt/openjdk@25/bin/java",
-    "/usr/local/opt/openjdk@25/bin/java",
-  ].filter(Boolean);
-  for (const candidate of candidates) if (await exists(candidate, constants.X_OK)) return candidate;
-  return "java";
+export async function resolveJava(options = {}) {
+  // Explicit overrides are the caller's responsibility. For autodetection,
+  // macOS's executable /usr/bin/java launcher is not evidence of an installed
+  // JDK: it exits nonzero when no runtime is registered.
+  const environment = options.env ?? process.env;
+  if (options.java || environment.DEHERM_JAVA) return options.java ?? environment.DEHERM_JAVA;
+  const candidates =
+    options.candidates ??
+    [
+      environment.JAVA_HOME ? path.join(environment.JAVA_HOME, "bin", "java") : undefined,
+      "/opt/homebrew/opt/openjdk@25/bin/java",
+      "/usr/local/opt/openjdk@25/bin/java",
+      "java",
+    ].filter(Boolean);
+  for (const candidate of candidates) {
+    if (candidate.includes(path.sep) && !(await exists(candidate, constants.X_OK))) continue;
+    if ((options.probe ?? spawnSync)(candidate, ["-version"], { stdio: "ignore" }).status === 0) return candidate;
+  }
+  throw new Error("A working JDK is required. Set DEHERM_JAVA or JAVA_HOME, or install OpenJDK 25.");
 }
 
 function pipeLines(stream, source, emit) {

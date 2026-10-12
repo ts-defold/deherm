@@ -630,6 +630,49 @@ bytes under a tag users have already pinned. Stripping comments would mean
 parsing Dockerfile, shell, CMake, Go and JSON correctly enough to bet artifact
 identity on it, and a parser bug there is silent.
 
+## Consumer GitHub Actions build seam
+
+The public one-target composite Action invokes the **installed**
+`@ts-defold/deherm` CLI. Its `deherm bundle` command refreshes the generated
+project surface, type-checks, compiles and records the TypeScript application,
+verifies that the resource Bob will archive is current, selects the exact
+target's authenticated Hermes archive, projects one runtime representation,
+downloads the `deherm.lock`-pinned Bob jar if absent, and asks Bob to bundle.
+The bundle output stays outside the Defold project tree in a project-keyed
+cache: Bob may rediscover an in-tree output as an input on a later build.
+
+The reusable workflow owns the matrix and runner selection; the composite
+Action handles exactly one target on one runner. Its Extender modes are
+deliberately distinct:
+
+The matrix is derived from the **caller's generated `deherm.lock`**, including
+its resolved Defold target and Bob-platform pairs. The Action repository's
+pinned Defold revision does not choose the consumer's target surface or decide
+which native targets are blocked. The browser pthread target is excluded by a
+product capability rule until its distinct host bridge exists. A clean
+matrix job installs the caller's locked dependencies; `deherm bundle` refreshes
+generation again on that runner before compiling.
+
+| Mode | Native compilation location | Bob server argument |
+| --- | --- | --- |
+| `defold` | Defold's hosted Extender | omitted, so Bob selects its channel default |
+| `local` | an Extender started on the same GitHub runner | loopback URL only |
+| `external` | the caller's separately hosted Extender | explicit caller URL |
+
+The non-Apple local lane uses Defold's pinned Extender Docker profiles;
+macOS/iOS local lanes need a macOS runner, Xcode, and standalone Extender.
+Each workflow job tars its bundle before GitHub artifact upload so executable
+bits and bundle layout survive the artifact service's ZIP normalization.
+Docker image tags and runner toolchains are recorded at build time but are not
+presently an immutable SDK distribution contract. A green static Action test
+or a healthy local Extender is not evidence that an arbitrary project linked;
+the consumer matrix must run Bob and retain its per-target log and bundle.
+`application-mode=dynamic` is the supported default. The one-shot command
+rejects authored static-application mode until the packaged compiler emits
+the authored Static Hermes unit, rather than silently publishing a dynamic
+application with a static label. That constraint does not remove the existing
+typed-native bridge for supported routes.
+
 # What builds what
 
 `.github/workflows/native-artifacts.yml` carries all three matrices, kept apart

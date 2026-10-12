@@ -42,7 +42,7 @@ function isComponentSource(file) {
   return componentSourceSuffixes.some((suffix) => file.endsWith(suffix));
 }
 
-async function resolveEntry(projectRoot, requested) {
+export async function resolveEntry(projectRoot, requested) {
   if (requested) return path.isAbsolute(requested) ? requested : path.resolve(projectRoot, requested);
   const candidates = [path.join(projectRoot, "src", "main.ts"), path.join(projectRoot, "src", "main.script.ts")];
   for (const candidate of candidates) if (await exists(candidate)) return candidate;
@@ -87,7 +87,7 @@ function waitForSignal() {
   });
 }
 
-async function entryTsconfig(projectRoot, entryPoint) {
+export async function entryTsconfig(projectRoot, entryPoint) {
   // A development bundle composes every authored component through the
   // generated registry. It therefore needs the unfiltered runtime SDK while
   // the separate context projects remain the authoritative typecheck gates.

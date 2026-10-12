@@ -39,6 +39,7 @@ Commands:
   generate     Write project inventory, TypeScript SDK, tsconfig, and VS Code setup
   assemble-typed-native  Compile the reachable Static Hermes lane into a Defold extension
   prepare-bob  Project the runtime bundle Bob may archive for one target/variant
+  bundle       Generate, compile, and bundle one Defold target for CI
   materialize-dmsdk  Emit reachable dmSDK provider + exact-call twin from checker usage
   generate-extension-api  Parse a C header and emit native-extension IR, TypeScript, and C ABI glue
   typecheck    Type-check shared, game-object, GUI, and render TypeScript projects
@@ -102,8 +103,8 @@ Options:
   --strict           Fail a report unless every required selected stage passed
   --directory        Refresh React Native Directory metadata for module report, then cache it locally
   --release          Type-check with release reachability and write release usage manifests
-  --variant <name>   Bob build variant for prepare-bob: debug or release
-  --application-mode <name>  dynamic or static application for prepare-bob
+  --variant <name>   Bob build variant for bundle/prepare-bob: debug or release
+  --application-mode <name>  dynamic or static application for bundle/prepare-bob
   --profile          Enable typed-native transport telemetry in the assembled extension
   --reconcile        Only reconcile typed-native upload eligibility for --target
   --shermes <path>   Static Hermes compiler override for assemble-typed-native
@@ -622,6 +623,38 @@ export async function run(argv = process.argv.slice(2)) {
       console.log(
         `Bob bundle: ${result.representation}${result.resource ? ` at ${result.resource}` : " (no dynamic resource)"}`,
       );
+    return 0;
+  }
+  if (options.command === "bundle") {
+    if (!options.project) throw new Error("deherm bundle requires --project <game.project or directory>");
+    const { validateBundleRequest, bundleProject } = await import("./ci-bundle.mjs");
+    const projectRoot = await findProjectRoot(process.cwd(), options.project);
+    const request = {
+      projectRoot,
+      target: options.target,
+      variant: options.variant,
+      applicationMode: options.applicationMode,
+      buildServer: options.buildServer,
+      entry: options.entry,
+    };
+    validateBundleRequest(request);
+    const { inventory, generated } = await reconcileDevProject(
+      { ...options, project: projectRoot },
+      { force: options.force === true },
+    );
+    await generateComponentProxies({
+      projectRoot,
+      outputRoot: projectRoot,
+      componentPolicy: generated.componentPolicy,
+    });
+    await writeProjectResourceSymbols(projectRoot, generated.root);
+    await writeProjectRouteSymbolIndex(generated.root);
+    await writeProjectDmSdkCallSymbolIndex(generated.root);
+    const checked = await typecheckGeneratedProject(projectRoot, { release: options.variant === "release" });
+    if (!checked.passed) throw new Error(`TypeScript typecheck failed:\n${checked.stderr || checked.stdout}`);
+    const result = await bundleProject(request);
+    if (options.json) console.log(JSON.stringify(result, null, 2));
+    else console.log(`Bundled ${inventory.projectRoot} for ${result.bobPlatform}: ${result.bundleOutput}`);
     return 0;
   }
   if (options.command === "materialize-dmsdk") {

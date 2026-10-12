@@ -1,5 +1,57 @@
 # Defold Hermes knowledge log
 
+## 2026-10-12 - Expose a three-mode consumer build workflow
+
+The repository now carries a single-target composite Action, a reusable
+target-matrix workflow, and a packaged `deherm bundle` command. The Action
+distinguishes Defold-hosted Extender, Extender on the GitHub runner, and a
+separately hosted caller Extender. The one-shot CLI compiles and verifies the
+TypeScript resource before pinned Bob bundles it; it does not put mutable Bob
+output below the project root. Authored Static Hermes application mode fails
+closed in this command until its application-unit compiler path is packaged.
+
+Focused command, Action, and workflow tests establish argument routing,
+ordering, output shape, target disposition, and URL constraints. They are not
+GitHub-runner native-link evidence. A fresh scaffold pinned to Defold SDK
+`7f0f554f41f9dce1e0ddff99bf08200657d1ee05` passed the one-shot command
+for x86_64-linux debug and release through Defold's hosted Extender. The
+release represented the app as Hermes bytecode. The `wasm-web` release also
+passed hosted Extender and produced a JavaScript application bundle (job
+`job8530591958688855931`). The same scaffold passed
+`arm64-osx` release through a local Apple Extender on this Mac; Bob accepted
+job `job638203663052185107` and produced a 15,327,816-byte executable.
+The first local attempt was sandbox-blocked from loopback, then rerun with
+loopback permission. These are packaged-engine link/bundle observations,
+not on-device runtime evidence. No consumer workflow has yet completed
+the local Extender matrix; upstream Docker image tags are mutable and each
+run must record the resolved image identities. The preview must not be called
+cross-platform CI proven until a tagged workflow builds real consumer games
+in all selected target lanes.
+
+The workflow plan now generates the caller project and derives its matrix
+from that project's `deherm.lock` rather than the Action checkout's pinned
+Defold ledger. A follow-up review found that default target filtering still
+consulted the Action checkout's revision-pinned native-artifact ledger; that
+filter was removed. Only the structural browser-pthread capability exclusion
+remains, and selected native targets proceed to the caller lock's exact
+artifact resolution. A fixture changes the consumer matrix without changing the
+Action package and observes the changed job set. Each build job installs
+locked dependencies; the one-shot CLI handles generation on the build runner.
+A War Battles consumer workflow now dogfoods the public reusable workflow at
+its own commit when this build seam changes, with manual dispatch for other
+profiles; its results remain future CI evidence, not evidence claimed by this
+local run.
+
+`pnpm test:cli`, `pnpm check:types`, focused Action/workflow tests, `actionlint`,
+`pnpm check:knowledge`, and the refreshed real loopback WebTransport producer
+passed. The first `pnpm check` reached the War Battles network-impairment gate
+and rejected its stale source inventory: adding tests to root `package.json`
+changed a fingerprinted input. The deterministic impairment producer passed
+its bounds and regenerated the evidence; its measured gameplay fields were
+byte-identical, with only the root package digest/source key updated. The
+subsequent full `pnpm check` passed. None of these local checks establish
+GitHub-runner CI behavior; the consumer build smoke is the next evidence gate.
+
 ## 2026-10-12 - Match Defold's hosted builder selection and isolate Apple routing
 
 The pinned Defold Editor sends `alpha` and `beta` builds to staging but leaves

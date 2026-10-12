@@ -82,6 +82,49 @@ workflows.
 The package is not yet published to npm. Until the first preview release, use
 the [source checkout](#working-on-déherm) and the workspace examples below.
 
+## Build in GitHub Actions
+
+The [reusable build workflow](.github/workflows/deherm-build.yml) runs one job
+per selected Defold target. Each job installs the game's dependencies, runs the
+packaged `deherm bundle` command, and uploads a tarball of the resulting bundle
+so executable permissions survive artifact download. The game
+must declare `@ts-defold/deherm` as a dependency or dev dependency; the Action
+uses that installed CLI rather than a second, repository-only build script.
+
+```yaml
+jobs:
+  game:
+    uses: ts-defold/deherm/.github/workflows/deherm-build.yml@<release-sha>
+    with:
+      action-ref: <release-sha>
+      project: .
+      targets: '["wasm-web", "x86_64-linux"]'
+      mode: defold
+```
+
+`mode: defold` uses Bob's ordinary hosted Extender selection and needs no
+server URL. `mode: local` starts Extender on each GitHub runner: Docker for
+non-Apple targets and standalone Extender with Xcode on an Apple runner.
+`mode: external` sends the native-extension build to the Extender URL supplied
+as `build-server`. The local and external modes are different: local performs
+the native compile on the GitHub runner, while external uses infrastructure
+you operate elsewhere. Native extension sources and libraries are sent to the
+selected Extender in every mode. See the workflow inputs and the
+[build-seam decision](.agents/docs/decisions/toolchain-distribution-and-build-seam.md)
+before configuring a private service. The current `external` mode accepts an
+HTTPS origin but has no credential or custom-header input; authenticated
+private Extenders need a runner-side network/auth proxy for now.
+
+The [consumer build smoke](.github/workflows/deherm-build-smoke.yml) runs when
+the Action/build seam changes and can also be dispatched manually. It invokes
+this same reusable workflow against War Battles from a clean checkout and
+defaults to web and Linux targets.
+
+The Action and workflow are preview code until the published package and
+tagged workflow pass their own consumer build matrix. The one-shot CLI currently
+defaults to the dynamic application; authored Static Hermes application mode
+is not yet available through this Action and fails closed when requested.
+
 ## Write a component
 
 Save this as `src/player.script.ts`:

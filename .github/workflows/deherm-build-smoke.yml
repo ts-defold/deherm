@@ -1,0 +1,42 @@
+name: déherm consumer build smoke
+
+# Dogfood the public workflow from a clean checkout when the consumer-build
+# seam changes. Manual dispatch also allows the local Extender mode.
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/deherm-build.yml
+      - .github/workflows/deherm-build-smoke.yml
+      - action.yml
+      - github-action/**
+      - packages/cli/src/ci-bundle.mjs
+      - packages/cli/src/cli.mjs
+      - packages/cli/src/dev/defold-builder.mjs
+      - package.json
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Extender location
+        type: choice
+        options:
+          - defold
+          - local
+        default: defold
+      targets:
+        description: JSON array of War Battles bundle targets
+        type: string
+        default: '["wasm-web","x86_64-linux"]'
+
+permissions:
+  contents: read
+
+jobs:
+  war-battles:
+    uses: ./.github/workflows/deherm-build.yml
+    with:
+      action-ref: ${{ github.sha }}
+      mode: ${{ inputs.mode || 'defold' }}
+      targets: ${{ inputs.targets || '["wasm-web","x86_64-linux"]' }}
+      project: examples/war-battles-online/defold
+    secrets: inherit

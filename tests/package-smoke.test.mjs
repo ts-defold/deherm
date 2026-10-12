@@ -282,6 +282,7 @@ test("packed npm artifact loads its CLI and one-shot dev compiler", async (t) =>
   );
   for (const relative of [
     "bin/deherm-language-server.mjs",
+    "packages/cli/src/ci-bundle.mjs",
     "packages/cli/src/lsp/server.mjs",
     "packages/cli/src/lsp/resource-semantics.mjs",
     "packages/sdk/src/host.ts",

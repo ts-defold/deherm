@@ -1,0 +1,54 @@
+name: Déherm bundle
+description: Build one Defold target with the project's installed déherm CLI and Bob.
+inputs:
+  project:
+    description: Directory containing game.project, relative to the checkout.
+    required: false
+    default: .
+  target:
+    description: One Defold bundle target (for example x86_64-linux).
+    required: true
+  variant:
+    description: Bob build variant (debug or release).
+    required: false
+    default: release
+  application-mode:
+    description: Déherm application mode (dynamic or static).
+    required: false
+    default: dynamic
+  entry:
+    description: Optional TypeScript entry point relative to the project.
+    required: false
+    default: ''
+  mode:
+    description: 'Extender location: defold, local, or external.'
+    required: false
+    default: defold
+  build-server:
+    description: Extender origin for local or external mode; leave empty for defold.
+    required: false
+    default: ''
+  allow-insecure-http:
+    description: Explicitly permit HTTP to a non-loopback external Extender.
+    required: false
+    default: 'false'
+outputs:
+  bundle-path:
+    description: Absolute path to the completed Defold bundle.
+    value: ${{ steps.bundle.outputs.bundle-path }}
+runs:
+  using: composite
+  steps:
+    - name: Build Defold bundle
+      id: bundle
+      shell: bash
+      env:
+        DEHERM_ACTION_PROJECT: ${{ inputs.project }}
+        DEHERM_ACTION_TARGET: ${{ inputs.target }}
+        DEHERM_ACTION_VARIANT: ${{ inputs.variant }}
+        DEHERM_ACTION_APPLICATION_MODE: ${{ inputs.application-mode }}
+        DEHERM_ACTION_ENTRY: ${{ inputs.entry }}
+        DEHERM_ACTION_MODE: ${{ inputs.mode }}
+        DEHERM_ACTION_BUILD_SERVER: ${{ inputs.build-server }}
+        DEHERM_ACTION_ALLOW_INSECURE_HTTP: ${{ inputs.allow-insecure-http }}
+      run: node "$GITHUB_ACTION_PATH/github-action/run.mjs"
