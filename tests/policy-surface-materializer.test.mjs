@@ -353,8 +353,11 @@ test("authenticated policy materializes the complete generated SDK without a Def
   );
   assert.deepEqual(
     bytesByMode,
-    { rendered: 4_023_679, snapshots: 0 },
-    "the package-owned SDK emitter inventory or byte total changed",
+    {
+      rendered: Object.values(oldPipelineFixture.files).reduce((total, file) => total + file.bytes, 0),
+      snapshots: 0,
+    },
+    "the package-owned SDK emitters must reproduce the complete frozen SDK without snapshots",
   );
 
   const expectedOutputs = await discoverCompilerSurfaceOutputs();

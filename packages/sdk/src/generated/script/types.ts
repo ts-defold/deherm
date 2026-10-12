@@ -15793,7 +15793,7 @@ export interface GoApi {
    * @param recursive optional boolean, set to true to recursively delete child hiearchy in child to parent order
    */
   readonly delete: {
-    (id?: DefoldAddress, recursive?: boolean): void;
+    (id?: string | DefoldHash | DefoldUrl | ReadonlyArray<string | DefoldHash | DefoldUrl>, recursive?: boolean): void;
   };
   /**
    * This function can check for game objects in any collection by specifying
@@ -16240,7 +16240,7 @@ export interface GoApi {
    * @param value default value of the property. In the case of a url, only the empty constructor msg.url() is allowed. In the case of a resource one of the resource constructors (eg resource.atlas(), resource.font() etc) is expected.
    */
   readonly property: {
-    (name: string, value: DefoldAddress): void;
+    (name: string, value: number | DefoldHash | string | DefoldUrl | Vector3 | Vector4 | Quaternion | ResourceData | boolean): void;
   };
   /**
    * sets a named property of the specified game object or component, or a material constant
@@ -16317,7 +16317,7 @@ export interface GoApi {
    * @param options optional property access options
    */
   readonly set: {
-    (url: DefoldAddress, property: string | DefoldHash, value: DefoldAddress, options?: GoPropertyOptions): void;
+    (url: DefoldAddress, property: string | DefoldHash, value: number | boolean | DefoldHash | string | DefoldUrl | Vector3 | Vector4 | Quaternion | ResourceData, options?: GoPropertyOptions): void;
   };
   /**
    * Sets the parent for a game object instance. This means that the instance will exist in the geometrical space of its parent,

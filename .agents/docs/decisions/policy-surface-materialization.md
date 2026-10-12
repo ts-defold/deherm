@@ -427,6 +427,14 @@ source. Policy production additionally requires snapshot digests to be
 computed after replacing the Defold SHA with `${DEFOLD_REVISION}`, preventing a
 revision-bearing source from leaking indirectly through its digest.
 
+When a package emitter changes the bytes of a rendered SDK file, the
+checkout-backed SDK, frozen source-pipeline fixture, and content-addressed
+policy must be regenerated together. The materialization test checks every
+file against the fixture's byte count and digest; its rendered-byte total is
+derived from that fixture rather than maintained as a second hard-coded
+golden. A published policy made before the emitter change remains an
+independent immutable graph and cannot authenticate the new output bytes.
+
 # Proven properties
 
 The policy workflow transports the whole revision-derived evidence surface to

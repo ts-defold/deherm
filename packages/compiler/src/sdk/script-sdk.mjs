@@ -268,7 +268,13 @@ function renderParameters(fn, renderType) {
       const laterRequired = fn.parameters.slice(index + 1).some((later) => !later.optional && later.rawName !== "...");
       const optional = param.optional && !laterRequired;
       const rawUnion = new Set(splitTopLevel(param.rawType, "|"));
-      const rendered = rawUnion.has("string") && rawUnion.has("url") ? "DefoldAddress" : renderType(param.rawType);
+      // Collapse only a pure address union. A documented value such as
+      // go.set(number|boolean|hash|string|url|vector3|vector4|...) must not
+      // lose its non-address alternatives just because it also contains URL.
+      const addressTypes = new Set(["string", "hash", "url"]);
+      const pureAddressUnion =
+        rawUnion.has("string") && rawUnion.has("url") && [...rawUnion].every((type) => addressTypes.has(type));
+      const rendered = pureAddressUnion ? "DefoldAddress" : renderType(param.rawType);
       const type = `${rendered}${param.optional && laterRequired ? " | undefined" : ""}`;
       return `${parameterName(param.rawName, index)}${optional ? "?" : ""}: ${type}`;
     })

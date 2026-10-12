@@ -214,6 +214,10 @@ export async function createIncrementalCompiler(options) {
     : { entryPoints: [entryPoint] };
   const buildContext = await context({
     ...input,
+    // esbuild's default is process.cwd(), which made the same project emit
+    // different source comments (and bundle hashes) in the CLI and a
+    // clean-room build launched from the monorepo root.
+    absWorkingDir: path.dirname(tsconfig ?? entryPoint),
     outfile: outputFile,
     bundle: true,
     format: "iife",
