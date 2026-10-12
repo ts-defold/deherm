@@ -697,6 +697,13 @@ archives must authenticate even though the releases are public: unauthenticated
 API rate limiting previously made an otherwise valid Linux Bob row fail during
 `target-archives`. The end-to-end gate asserts both jobs retain the token.
 
+The hosted Bob stage retries at most twice only when a new Extender log reports
+its build worker refused a connection. Each attempt remains an actual Bob
+upload/build; the target stays failed if the worker remains unavailable. Local
+Extender failures, compile/link diagnostics, and unchanged/stale logs are never
+retried. Run `38274874382` established this need: all four Apple rows failed
+against the same refused staging worker while the other nine targets passed.
+
 For package-default artifact runs, the summary regenerates `release-tags.json`
 from every published host-tool sidecar, authenticates each sidecar against
 GitHub's publisher digest, then runs `--check --published` on the regenerated

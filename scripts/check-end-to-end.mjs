@@ -49,6 +49,7 @@ import { execFile } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { readFile, rm } from "node:fs/promises";
 import path from "node:path";
+import { setTimeout as delay } from "node:timers/promises";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 
@@ -101,6 +102,20 @@ export const defaultBuildServer = buildServerForDefoldRef(pinnedDefoldRef);
 export const scratchProject = "build/end-to-end/project";
 
 export const stageNames = Object.freeze(["policy", "host-tools", "target-archives", "scaffold", "generate", "bob"]);
+
+// A refused connection to Extender's own build worker is neither an extension
+// diagnostic nor a successful compile. Retry only this observed transport
+// failure, and only when Bob wrote a fresh log for the failed attempt.
+export function shouldRetryHostedExtenderFailure({ buildServer, priorLog, currentLog, attempt }) {
+  return (
+    buildServer.startsWith("https://") &&
+    attempt < 3 &&
+    currentLog !== priorLog &&
+    currentLog.includes("Failed to communicate with Extender service") &&
+    currentLog.includes("HttpHostConnectException") &&
+    currentLog.includes("Connection refused")
+  );
+}
 
 export function scaffoldArguments({ project, defoldRevision, name = "deherm end to end" }) {
   if (!/^[a-f0-9]{40}$/u.test(defoldRevision ?? "")) {
@@ -287,28 +302,54 @@ const stages = {
   async bob(context) {
     const failures = [];
     for (const row of context.rows.filter((item) => item.disposition === "exercise")) {
-      try {
-        await run(path.join(root, "scripts", "bob.sh"), ["build"], {
-          cwd: root,
-          maxBuffer: 256 * 1024 * 1024,
-          env: {
-            ...process.env,
-            DEFOLD_HERMES_PLATFORM: row.target,
-            DEFOLD_HERMES_PROJECT: context.project,
-            DEFOLD_HERMES_BUILD_SERVER: context.buildServer,
-            DEFOLD_HERMES_ALLOW_REMOTE_BUILD: "1",
-          },
-        });
-        context.targetResult(row.target, "bob", { detail: `built against ${context.buildServer}` });
-      } catch (error) {
-        const output = [error.stdout, error.stderr].filter(Boolean).join("\n").trim().split("\n").slice(-8).join("\n");
-        const projectRoot = path.resolve(root, context.project);
-        const extenderLogPath = path.join(projectRoot, "build", row.target, "log.txt");
-        const extenderLog = await readFile(extenderLogPath, "utf8").catch(() => "");
-        const diagnostic = extenderLog.trim()
-          ? `Extender log (${path.relative(root, extenderLogPath)}):\n${extenderLog.trimEnd()}`
-          : output || error.message;
-        failures.push(`${row.target}:\n${diagnostic}`);
+      const projectRoot = path.resolve(root, context.project);
+      const extenderLogPath = path.join(projectRoot, "build", row.target, "log.txt");
+      for (let attempt = 1; attempt <= 3; attempt += 1) {
+        const priorLog = await readFile(extenderLogPath, "utf8").catch(() => "");
+        try {
+          await run(path.join(root, "scripts", "bob.sh"), ["build"], {
+            cwd: root,
+            maxBuffer: 256 * 1024 * 1024,
+            env: {
+              ...process.env,
+              DEFOLD_HERMES_PLATFORM: row.target,
+              DEFOLD_HERMES_PROJECT: context.project,
+              DEFOLD_HERMES_BUILD_SERVER: context.buildServer,
+              DEFOLD_HERMES_ALLOW_REMOTE_BUILD: "1",
+            },
+          });
+          context.targetResult(row.target, "bob", { detail: `built against ${context.buildServer}` });
+          break;
+        } catch (error) {
+          const output = [error.stdout, error.stderr]
+            .filter(Boolean)
+            .join("\n")
+            .trim()
+            .split("\n")
+            .slice(-8)
+            .join("\n");
+          const extenderLog = await readFile(extenderLogPath, "utf8").catch(() => "");
+          if (
+            shouldRetryHostedExtenderFailure({
+              buildServer: context.buildServer,
+              priorLog,
+              currentLog: extenderLog,
+              attempt,
+            })
+          ) {
+            const delaySeconds = attempt === 1 ? 5 : 15;
+            console.error(
+              `${row.target}: Extender build worker refused connection; retrying Bob ${attempt + 1}/3 in ${delaySeconds}s`,
+            );
+            await delay(delaySeconds * 1000);
+            continue;
+          }
+          const diagnostic = extenderLog.trim()
+            ? `Extender log (${path.relative(root, extenderLogPath)}):\n${extenderLog.trimEnd()}`
+            : output || error.message;
+          failures.push(`${row.target}:\n${diagnostic}`);
+          break;
+        }
       }
     }
     if (failures.length) throw new Error(failures.join("\n\n"));

@@ -7,6 +7,7 @@ import {
   buildServerForDefoldRef,
   readLedger,
   scaffoldArguments,
+  shouldRetryHostedExtenderFailure,
   stageNames,
 } from "../scripts/check-end-to-end.mjs";
 
@@ -118,6 +119,24 @@ test("the implicit hosted Extender follows the pinned Defold channel", async () 
   for (const channel of ["dev", "alpha", "beta"]) {
     assert.equal(buildServerForDefoldRef(channel), "https://build-stage.defold.com");
   }
+});
+
+test("hosted Bob retries only a fresh Extender worker connection refusal, at most twice", () => {
+  const refusal =
+    "Job id: new Failed to communicate with Extender service.org.apache.http.conn.HttpHostConnectException: Connection refused";
+  const baseline = { buildServer: "https://build-stage.defold.com", priorLog: "", currentLog: refusal };
+  assert.equal(shouldRetryHostedExtenderFailure({ ...baseline, attempt: 1 }), true);
+  assert.equal(shouldRetryHostedExtenderFailure({ ...baseline, attempt: 2 }), true);
+  assert.equal(shouldRetryHostedExtenderFailure({ ...baseline, attempt: 3 }), false);
+  assert.equal(
+    shouldRetryHostedExtenderFailure({ ...baseline, buildServer: "http://localhost:9010", attempt: 1 }),
+    false,
+  );
+  assert.equal(shouldRetryHostedExtenderFailure({ ...baseline, priorLog: refusal, attempt: 1 }), false);
+  assert.equal(
+    shouldRetryHostedExtenderFailure({ ...baseline, currentLog: "error: undefined symbol in libhermes.a", attempt: 1 }),
+    false,
+  );
 });
 
 test("the Bob matrix prints and preserves the target's Extender failure log", async () => {
