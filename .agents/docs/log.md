@@ -9487,3 +9487,33 @@ lock's `hermes-35d2ed2efe6c` / `tools-2fc387335a8d`. The summary-dispatched
 artifact-refresh run 38058436093 is a second, serialized policy run; no
 result is claimed for it here. The repository-wide local `pnpm check` remains
 blocked at the unrelated stale frozen SDK golden in this dirty checkout.
+
+### 2026-10-12 - Npm clean-consumer release gate
+
+The existing source-workspace Action smoke cannot prove an independent npm
+consumer because the packed-package test symlinks this checkout's dependencies.
+A local manual `npm pack` produced `@ts-defold/deherm@0.1.0` at 934,335 bytes
+with SHA-256 `e3513cfa61452e841b161d652e1021a01418eeaff9d7085e48c1771eeb4e488d`.
+The tarball was installed outside the monorepo without a package symlink; its
+CLI scaffolded from the published policy, type-checked the new project, and
+Bob-bundled browser release JavaScript plus Linux release Hermes bytecode.
+Defold hosted Extender jobs `job7886604478045212855` and
+`job143934541425965810` completed compilation/linking. This is not packaged
+runtime evidence and does not establish Windows, Apple, Android, or npm registry
+publication readiness.
+
+`node scripts/prove-npm-consumer.mjs` and a manual, read-only release-candidate CI workflow
+now encode the sequence. `actionlint`, `node --check`, and `pnpm check:knowledge`
+passed locally. A first automation run was interrupted after it stalled without
+stage output; the script now emits stage commands and bounds each subprocess.
+The networked rerun was rejected by the local approval guard: the earlier
+authorized Apple upload did not cover this browser/Linux payload. The CI
+workflow has not run, and the automated consumer gate must not be called green.
+The first `pnpm check` reached War Battles projection evidence and failed
+because adding a convenience root `package.json` script changed its recorded
+source fingerprint. The workflow now invokes the proof script directly, so
+this npm gate does not churn unrelated game evidence; a follow-up full check
+established that it restores the frozen inventory. `pnpm check` then passed
+through the complete repository gate. The clean-consumer CI workflow itself
+remains unrun, and its browser/Linux Extender upload still requires distinct
+authorization in this local environment.

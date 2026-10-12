@@ -48,6 +48,7 @@ okf_version: "0.2"
 * [Upstream contribution policy](upstream-contributions.md) - Evidence and quality gates for focused Static Hermes and Defold pull requests.
 * [War Battles TypeScript showcase](roadmap/war-battles-showcase.md) - Post-binding-gate port and 32-player multiplayer expansion plan.
 * [Ordered execution goal](roadmap/next-execution-goal.md) - Complete next-task sequence from exact-call verification through policy realization, all-target delivery, tooling, War Battles, and reserved frontiers.
+* [npm and Action release readiness](roadmap/npm-and-action-release-readiness.md) - Prove a standalone npm tarball and consumer build before publishing a versioned Action tag.
 
 ## Research
 
