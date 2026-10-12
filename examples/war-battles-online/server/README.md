@@ -40,12 +40,13 @@ or, from this package, `pnpm serve`.
 | `--hostname`, `--port`        | QUIC bind address; default `0.0.0.0:4433`                           |
 | `--health-port`               | Plain HTTP liveness/readiness port; default `8080`                  |
 | `--cert`, `--key`             | PEM paths; default `server/certs/localhost.{crt,key}`               |
-| `--roster`                    | Total tanks, humans plus bots. Default 8, maximum 32                |
+| `--roster`                    | Total tanks, humans plus bots. Default 16, maximum 32               |
 | `--bot-skill`                 | 0 recruit, 1 regular, 2 veteran, 3 nightmare                        |
 | `--snapshot-interval`         | Ticks between authoritative snapshots; default 6 is 10 Hz           |
 | `--teams`                     | Two teams instead of a free-for-all                                 |
 | `--world-checkpoint`          | Fixed authoritative state file; also `WAR_BATTLES_WORLD_CHECKPOINT` |
 | `--world-checkpoint-interval` | Ticks between control-plane world writes; default 60                |
+| `--smoke-round-after-inputs`  | Loopback-only test fast-forward; never use in a deployment          |
 
 It prints its listening address, the certificate digest and the roster, then one
 line per session join and leave.
@@ -100,7 +101,14 @@ can therefore use the same exact base without making the stream window grow.
 **Two clients:** open the bundle in two browser windows, or two separate Chrome
 profiles. Each gets its own `WebTransport` session, its own slot and its own
 resume token; the remaining six tanks stay bots. There is no matchmaking, so
-both simply connect to the same URL. To watch the join and the handover, tail
+both simply connect to the same URL. A full human roster keeps up to 32 fresh
+connections in a server-authoritative FIFO wait queue. The client receives a
+versioned one-based position and total waiting count, remains on the title
+screen, and is promoted when an unreserved slot opens; disconnect removes a
+waiter and updates following positions. A previously welcomed player's slot
+remains reserved for its authenticated resume grace, so fresh waiters cannot
+steal it until expiry. The queue rejects overflow and a 120-second wait
+timeout explicitly; neither condition begins offline play. To watch the join and the handover, tail
 the server: it prints `session-joined:<name>:slot=<n>` and the bot count drops.
 
 **Network bots:** keep the match server running, then start the separate bot
@@ -182,8 +190,9 @@ Docker mounts `server/state/world.bin` beside the resume ledger.
 Proven by `test/core.test.mjs` over the in-memory transport pair: two
 clients joining one authoritative match and replacing bots; the client's local
 prediction agreeing with the server's state exactly; a client that falls behind
-reconciling by replaying its own inputs; a session being refused when the match
-is full; a session's forged packet for another player's slot being rejected; and
+reconciling by replaying its own inputs; bounded FIFO admission, overflow,
+timeout, cancellation, resume priority, and 16/32-player promotion; a session's
+forged packet for another player's slot being rejected; and
 an upgrade purchased over the reliable control lane.
 
 `pnpm runtime:webtransport` separately proves the production adapter against
@@ -218,12 +227,17 @@ whose kind fixes the lane it is allowed on:
 | `hello`         | session  | client → server | 68                                          |
 | `welcome`       | session  | server → client | 61                                          |
 | `welcome-ack`   | session  | client → server | 44                                          |
+| `round-state`   | session  | server → client | 20 (includes round start tick)              |
+| `round-ack`     | session  | client → server | 8                                           |
 | `reject`        | session  | server → client | ≤ 102                                       |
 | `ping` / `pong` | session  | both            | 12                                          |
 | `control`       | control  | client → server | 8                                           |
 | `snapshot`      | snapshot | server → client | ≤ 10,160 recovery; compact delta after join |
 
-`PROTOCOL_VERSION` is 15: bounded input-command redundancy remains on the wire,
+`PROTOCOL_VERSION` is 17: round-start tick and explicit round acknowledgement
+keep independently completing snapshot/session lanes from seeding a discarded
+cross-round delta baseline. The earlier queue status frame and revised round
+layout fail closed against older peers. Bounded input-command redundancy remains on the wire,
 simulation tick ordering plus last-input validity are unambiguously uint32
 across wrap, and player countdown/input coordinates are stable against the
 snapshot tick. Snapshots carry the authoritative command-beacon

@@ -61,6 +61,8 @@ interface Options extends MatchServerOptions {
   sessionStatePath?: string;
   worldCheckpointPath?: string;
   worldCheckpointIntervalTicks: number;
+  /** Loopback-only deterministic integration trigger; never set in deployment. */
+  smokeRoundAfterInputs?: number;
   allowedOrigins: string[];
 }
 
@@ -102,6 +104,9 @@ function parseArguments(argv: readonly string[]): Options {
       index += 1;
     } else if (argument === "--bot-skill") {
       (options as { botSkill: number }).botSkill = integer(value, argument);
+      index += 1;
+    } else if (argument === "--smoke-round-after-inputs") {
+      options.smokeRoundAfterInputs = integer(value, argument);
       index += 1;
     } else if (argument === "--idle-vacant-slots") {
       (options as { fillVacantSlotsWithBots: boolean }).fillVacantSlotsWithBots = false;
@@ -266,6 +271,12 @@ const rejectedReceiver: TransportReceiver = {
 
 export async function main(argv: readonly string[]): Promise<void> {
   const options = parseArguments(argv);
+  if (
+    options.smokeRoundAfterInputs !== undefined &&
+    (options.smokeRoundAfterInputs < 1 || !["localhost", "127.0.0.1", "::1"].includes(options.hostname))
+  ) {
+    throw new Error("--smoke-round-after-inputs requires a positive threshold and loopback hostname");
+  }
   const allowedOrigins = configuredOrigins(options.allowedOrigins, Deno.env.get("WAR_BATTLES_ALLOWED_ORIGINS"));
   const statePath = options.sessionStatePath ?? Deno.env.get("WAR_BATTLES_SESSION_STATE");
   const worldPath = options.worldCheckpointPath ?? Deno.env.get("WAR_BATTLES_WORLD_CHECKPOINT");
@@ -350,7 +361,7 @@ export async function main(argv: readonly string[]): Promise<void> {
     port: options.port,
     cert,
     key,
-    maximumSessions: 32,
+    maximumSessions: server.rosterSize + server.admissionQueueCapacity,
     onLifecycle: logTransportLifecycle,
     receiverForSession: (): TransportReceiver => {
       // The adapter still needs a receiver to finish and close an already
@@ -400,7 +411,7 @@ export async function main(argv: readonly string[]): Promise<void> {
         if (stopping || !ready || !admission.allowed) {
           return new Response("server is not accepting sessions\n", { status: 503 });
         }
-        if (activeWebSocketSessions >= 32) {
+        if (activeWebSocketSessions >= server.rosterSize + server.admissionQueueCapacity) {
           return new Response("websocket session limit reached\n", { status: 503 });
         }
         const session = admitNewSession(admission, () => server.createSession());
@@ -473,12 +484,25 @@ export async function main(argv: readonly string[]): Promise<void> {
   // the real gate must observe that the authoritative server accepted input.
   const inputMilestone = 3;
   let inputMilestoneLogged = false;
+  let smokeRoundTriggered = false;
   let nextWorldCheckpointTick = server.world.tick + Math.max(1, options.worldCheckpointIntervalTicks);
   const timer = setInterval(() => {
     const now = Date.now();
     const elapsed = now - previous;
     previous = now;
     server.advance(elapsed, 8);
+    if (
+      !smokeRoundTriggered &&
+      options.smokeRoundAfterInputs !== undefined &&
+      server.stats.inputsAccepted >= options.smokeRoundAfterInputs &&
+      server.stats.networkClients > 0
+    ) {
+      smokeRoundTriggered = true;
+      // Integration-only fast-forward through the actual authoritative round
+      // transition. Browser evidence still observes its countdown and restart.
+      server.world.playerScore[0] = 25;
+      console.log("war-battles-server:smoke-round-triggered");
+    }
     if (worldPersistence !== undefined && server.world.tick >= nextWorldCheckpointTick) {
       nextWorldCheckpointTick = server.world.tick + Math.max(1, options.worldCheckpointIntervalTicks);
       void worldPersistence

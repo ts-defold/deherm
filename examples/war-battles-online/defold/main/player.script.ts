@@ -533,7 +533,14 @@ export default defineComponent({
     // leave `demo` at zero and retain the regular input behavior below.
     if (self.demo > 0 && !self.engaged) return true;
     const client = arenaMatch()?.client;
-    if (client?.state === "rejected" && client.lastReject?.code === REJECT_FULL) {
+    // A queued HELLO has no authoritative identity or world. Input must not
+    // dismiss the title into the offline demonstration while it waits.
+    if (client?.state === "queued") return true;
+    if (
+      client !== undefined &&
+      ((client.state === "rejected" && client.lastReject?.code === REJECT_FULL) ||
+        (client.state === "closed" && client.queueStatus.position > 0))
+    ) {
       if (action.pressed || action.touch?.some((touch) => touch.pressed) === true) {
         msg.post(ARENA, "retry_online");
       }

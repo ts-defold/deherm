@@ -114,6 +114,11 @@ interface WarBattlesRuntimeTelemetry {
   inputLane: "datagram" | "reliable-fallback" | null;
   playerId: number;
   rosterSize: number;
+  round: number;
+  roundPhase: number;
+  roundStartTick: number;
+  lastRoundKeyframeTick: number;
+  queuePosition: number;
   snapshotsApplied: number;
   inputsSent: number;
   inputsDropped: number;
@@ -379,6 +384,11 @@ function updateTelemetry(self: ArenaSelf): void {
   telemetry.state = client?.state ?? (self.engaged ? "offline-running" : "offline-ready");
   telemetry.playerId = client?.playerId ?? 1;
   telemetry.rosterSize = client?.rosterSize ?? self.players;
+  telemetry.round = client?.roundState.round ?? 1;
+  telemetry.roundPhase = client?.roundState.phase ?? 0;
+  telemetry.roundStartTick = client?.roundState.startTick ?? 0;
+  telemetry.lastRoundKeyframeTick = client?.stats.lastRoundKeyframeTick ?? -1;
+  telemetry.queuePosition = client?.queueStatus.position ?? 0;
   telemetry.snapshotsApplied = client?.stats.snapshotsApplied ?? 0;
   telemetry.inputsSent = client?.stats.inputsSent ?? 0;
   telemetry.inputsDropped = client?.stats.inputsDropped ?? 0;
@@ -967,6 +977,9 @@ function ageEffects(self: ArenaSelf): void {
 
 function engage(self: ArenaSelf): void {
   if (self.engaged) return;
+  // The offline world exists as an attract-mode fixture while the network
+  // handshake is pending. It must not become playable behind a queue title.
+  if (self.match.mode === "offline" && self.match.client !== undefined) return;
   // WELCOME proves admission, not the spawn pose. Keep the title on screen
   // until the first authoritative keyframe is restored; otherwise the camera
   // follows the locally guessed roster and visibly jumps on correction.
@@ -1083,8 +1096,15 @@ function connectOnline(self: ArenaSelf): boolean {
       }
       fallback(`reject:${reject.code}:${reject.reason}`);
     },
+    onQueue: (status) => {
+      defold.log("info", `war-battles:arena-online-queued:${status.position}/${status.waiting}`);
+    },
     onClose: (close) => {
-      if (!close.welcomed && !(close.state === "rejected" && client.lastReject?.code === REJECT_FULL)) {
+      if (
+        !close.welcomed &&
+        client.queueStatus.position === 0 &&
+        !(close.state === "rejected" && client.lastReject?.code === REJECT_FULL)
+      ) {
         fallback(`close:${close.code}:${close.reason}`);
       }
     },
@@ -1179,6 +1199,11 @@ export default defineComponent({
       inputLane: null,
       playerId: 0,
       rosterSize: 0,
+      round: 1,
+      roundPhase: 0,
+      roundStartTick: 0,
+      lastRoundKeyframeTick: -1,
+      queuePosition: 0,
       snapshotsApplied: 0,
       inputsSent: 0,
       inputsDropped: 0,
@@ -1279,7 +1304,14 @@ export default defineComponent({
     else if (messageId === RESTART) restart(self);
     else if (messageId === RETRY_ONLINE) {
       const client = self.match.client;
-      if (client?.state !== "rejected" || client.lastReject?.code !== REJECT_FULL) return;
+      if (
+        client === undefined ||
+        !(
+          (client.state === "rejected" && client.lastReject?.code === REJECT_FULL) ||
+          (client.state === "closed" && client.queueStatus.position > 0)
+        )
+      )
+        return;
       if (self.onlineAttempts !== undefined) invalidateOnlineAttempts(self.onlineAttempts);
       client.close(1000, "retrying full room admission");
       self.match.client = undefined;

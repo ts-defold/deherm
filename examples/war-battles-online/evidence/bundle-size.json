@@ -5,18 +5,18 @@
   "observedOn": "2026-10-08",
   "esbuildVersion": "0.25.10",
   "scope": "JavaScript bundle evidence only; not a Defold package or Hermes bytecode measurement",
-  "sourceFileCount": 1503,
-  "sourceBytes": 16530418,
+  "sourceFileCount": 1504,
+  "sourceBytes": 16568875,
   "artifacts": {
     "headlessNodeBundle": {
-      "bytes": 87149,
-      "gzipBytes": 26058,
-      "sha256": "0d71ededc4662a68067b8590ac7e41827f83069c381bce26777a9ad8c4c837b1"
+      "bytes": 87197,
+      "gzipBytes": 26081,
+      "sha256": "4b1594aa57766c8eb49ad80bbf61afdd7411ae27e881f18b4f13a9709c574b20"
     },
     "defoldGuiDiagnosticBundle": {
-      "bytes": 90604,
-      "gzipBytes": 27399,
-      "sha256": "554920f2dd7c3ae3d4a2e88be23a9368f5e79896bea3c8ab28b22ea25cde24f6"
+      "bytes": 90629,
+      "gzipBytes": 27414,
+      "sha256": "d46696b3d58442292084cf4a5c01ca7972e179651d310102c072beea5d16088c"
     }
   }
 }

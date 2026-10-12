@@ -38,13 +38,16 @@ import {
   INPUT_BUNDLE_MAX_COMMANDS,
   INPUT_SEND_INTERVAL_TICKS,
   MESSAGE_PONG,
+  MESSAGE_QUEUE_STATUS,
   MESSAGE_REJECT,
   MESSAGE_ROUND_STATE,
   MESSAGE_SNAPSHOT,
   MESSAGE_WELCOME,
   PING_BYTES,
   PONG_FEEDBACK_BYTES,
+  QUEUE_STATUS_BYTES,
   ROUND_STATE_BYTES,
+  ROUND_ACK_BYTES,
   REJECT_RATE_LIMITED,
   RESUME_TOKEN_BYTES,
   SNAPSHOT_KEYFRAME,
@@ -53,6 +56,7 @@ import {
   createInputCommand,
   messageKind,
   readReject,
+  readQueueStatus,
   readRoundState,
   readSnapshotTick,
   readWelcome,
@@ -60,9 +64,11 @@ import {
   writeHello,
   writeInputBundle,
   writePing,
+  writeRoundAck,
   writeWelcomeAck,
   type InputCommand,
   type RejectMessage,
+  type QueueStatusMessage,
   type RoundStateMessage,
   type WelcomeMessage,
 } from "./protocol";
@@ -85,7 +91,7 @@ import {
 import { BattleWorld } from "./world";
 import { tickAdd, tickAfter, tickDistance, tickNext } from "./ticks";
 
-export type ClientState = "idle" | "connecting" | "ready" | "rejected" | "closed";
+export type ClientState = "idle" | "connecting" | "queued" | "ready" | "rejected" | "closed";
 
 /** A caller-owned presentation transform. Values are simulation units/directions. */
 export interface PlayerTransform {
@@ -150,6 +156,7 @@ export interface BattleClientOptions {
   readonly assistAim?: boolean;
   readonly onWelcome?: (welcome: Readonly<WelcomeMessage>) => void;
   readonly onReject?: (reject: Readonly<RejectMessage>) => void;
+  readonly onQueue?: (status: Readonly<QueueStatusMessage>) => void;
   readonly onClose?: (close: Readonly<ClientClose>) => void;
   readonly onError?: (error: unknown) => void;
   readonly onLog?: (line: string) => void;
@@ -157,6 +164,8 @@ export interface BattleClientOptions {
 
 export interface ClientStats {
   snapshotsApplied: number;
+  /** Post-round-state authoritative keyframe tick, or -1 while awaiting one. */
+  lastRoundKeyframeTick: number;
   snapshotsIgnored: number;
   replayedTicks: number;
   inputsSent: number;
@@ -219,6 +228,7 @@ export interface ClientStats {
 
 export class BattleClient implements TransportReceiver {
   state: ClientState = "idle";
+  readonly queueStatus: QueueStatusMessage = { position: 0, waiting: 0, capacity: 0 };
   /** Additive server-authoritative round state; old servers imply round one. */
   readonly roundState: RoundStateMessage = {
     round: 1,
@@ -226,6 +236,7 @@ export class BattleClient implements TransportReceiver {
     winnerPlayerId: 0,
     winnerTeam: 0,
     ticksRemaining: 0,
+    startTick: 0,
   };
   get lastReject(): Readonly<RejectMessage> | undefined {
     return this.reject.code === 0 ? undefined : this.reject;
@@ -241,6 +252,7 @@ export class BattleClient implements TransportReceiver {
   readonly resumeToken = new Uint8Array(RESUME_TOKEN_BYTES);
   readonly stats: ClientStats = {
     snapshotsApplied: 0,
+    lastRoundKeyframeTick: -1,
     snapshotsIgnored: 0,
     replayedTicks: 0,
     inputsSent: 0,
@@ -309,11 +321,13 @@ export class BattleClient implements TransportReceiver {
     winnerPlayerId: 0,
     winnerTeam: 0,
     ticksRemaining: 0,
+    startTick: 0,
   };
   private readonly helloBuffer = new Uint8Array(HELLO_BYTES);
   private readonly controlBuffer = new Uint8Array(CONTROL_BYTES);
   private readonly pingBuffer = new Uint8Array(PING_BYTES);
   private readonly welcomeAckBuffer = new Uint8Array(WELCOME_ACK_BYTES);
+  private readonly roundAckBuffer = new Uint8Array(ROUND_ACK_BYTES);
   private readonly inputBuffer = new Uint8Array(INPUT_BUNDLE_BYTES);
   private readonly history: InputCommand[] = [];
   // Float64 preserves the local -1 sentinel and every uint32 tick exactly.
@@ -455,6 +469,8 @@ export class BattleClient implements TransportReceiver {
   attach(transport: GameTransport): void {
     this.transport = transport;
     this.state = "connecting";
+    this.queueStatus.position = 0;
+    this.queueStatus.waiting = 0;
     // A transport from the previous attempt may have closed while its ordered
     // write promise was still pending. The new connection owns a new stream
     // and admission transaction; neither that promise nor its ACK guard may
@@ -760,7 +776,14 @@ export class BattleClient implements TransportReceiver {
       const kind = messageKind(payload);
       if (kind === MESSAGE_WELCOME) this.handleWelcome(payload);
       else if (kind === MESSAGE_REJECT) this.handleReject(payload);
-      else if (kind === MESSAGE_ROUND_STATE) {
+      else if (kind === MESSAGE_QUEUE_STATUS) {
+        if (channel !== TRANSPORT_CHANNEL_SESSION || (this.state !== "connecting" && this.state !== "queued"))
+          throw new Error("queue status is outside admission on the session lane");
+        if (payload.byteLength !== QUEUE_STATUS_BYTES) throw new Error("queue status has unexpected length");
+        readQueueStatus(payload, this.queueStatus);
+        this.state = "queued";
+        this.options.onQueue?.(this.queueStatus);
+      } else if (kind === MESSAGE_ROUND_STATE) {
         if (channel !== TRANSPORT_CHANNEL_SESSION) throw new Error("round state must use the reliable session lane");
         if (payload.byteLength !== ROUND_STATE_BYTES) throw new Error("round state has unexpected length");
         readRoundState(payload, this.incomingRoundState);
@@ -773,7 +796,11 @@ export class BattleClient implements TransportReceiver {
           return;
         const roundChanged = this.incomingRoundState.round !== this.roundState.round;
         Object.assign(this.roundState, this.incomingRoundState);
-        if (roundChanged) this.resetPredictionForRound();
+        if (roundChanged) {
+          this.resetPredictionForRound();
+          writeRoundAck(this.roundAckBuffer, this.roundState.round);
+          void this.send(TRANSPORT_CHANNEL_SESSION, this.roundAckBuffer.slice());
+        }
       } else if (kind === MESSAGE_SNAPSHOT) this.handleSnapshot(payload);
       else if (kind === MESSAGE_PONG) this.handlePong(payload);
       else if (channel === TRANSPORT_CHANNEL_SNAPSHOT) throw new Error("snapshot lane carried a non-snapshot message");
@@ -806,10 +833,12 @@ export class BattleClient implements TransportReceiver {
   // --- internals ------------------------------------------------------------
 
   private handleWelcome(payload: Uint8Array): void {
-    if (this.state !== "connecting" || this.welcomeAcknowledging) {
+    if ((this.state !== "connecting" && this.state !== "queued") || this.welcomeAcknowledging) {
       throw new Error("unexpected or duplicate welcome");
     }
     this.welcomeAcknowledging = true;
+    this.queueStatus.position = 0;
+    this.queueStatus.waiting = 0;
     readWelcome(payload, this.welcome);
     this.playerId = this.welcome.playerId;
     this.team = this.welcome.team;
@@ -830,6 +859,8 @@ export class BattleClient implements TransportReceiver {
     for (const snapshot of this.snapshotHistory) snapshot.fill(0);
     this.snapshotHistoryTicks.fill(-1);
     this.snapshotHistoryCursor = 0;
+    this.appliedSnapshotTick = -1;
+    this.stats.lastRoundKeyframeTick = -1;
     this.snapshotDecoded.fill(0);
     this.pendingNetworkSnapshot.fill(0);
     this.pendingSnapshot.fill(0);
@@ -928,7 +959,7 @@ export class BattleClient implements TransportReceiver {
   private async acknowledgeWelcome(): Promise<void> {
     const transport = this.transport;
     const disposition = await this.send(TRANSPORT_CHANNEL_SESSION, this.welcomeAckBuffer);
-    if (this.transport !== transport || this.state !== "connecting") return;
+    if (this.transport !== transport || (this.state !== "connecting" && this.state !== "queued")) return;
     this.welcomeAcknowledging = false;
     if (disposition !== "sent") {
       this.options.onError?.(new Error(`welcome acknowledgement was not sent: ${disposition ?? "detached"}`));
@@ -970,6 +1001,8 @@ export class BattleClient implements TransportReceiver {
     this.lastInputSendSequence = -1;
     this.snapshotHistoryTicks.fill(-1);
     this.snapshotHistoryCursor = 0;
+    this.appliedSnapshotTick = -1;
+    this.stats.lastRoundKeyframeTick = -1;
     this.snapshotScratch.baselineTick = -1;
     this.pendingSnapshotReady = false;
     this.pendingSnapshotTick = -1;
@@ -998,6 +1031,10 @@ export class BattleClient implements TransportReceiver {
     }
     try {
       const tick = readSnapshotTick(payload);
+      if (this.roundState.round > 1 && tickAfter(this.roundState.startTick, tick)) {
+        this.stats.snapshotsIgnored += 1;
+        return;
+      }
       if (
         (this.appliedSnapshotTick >= 0 && !tickAfter(tick, this.appliedSnapshotTick)) ||
         (this.pendingSnapshotTick >= 0 && !tickAfter(tick, this.pendingSnapshotTick))
@@ -1124,6 +1161,7 @@ export class BattleClient implements TransportReceiver {
     this.appliedSnapshotTick = snapshotTick;
     this.snapshotAckBits = ((this.snapshotAckBits << 1) | 1) >>> 0;
     this.stats.snapshotsApplied += 1;
+    if (snapshotKeyframe && this.roundState.round > 1) this.stats.lastRoundKeyframeTick = snapshotTick;
     this.stats.lastServerTick = snapshotTick;
     if (snapshotKeyframe) this.awaitingSnapshotKeyframe = false;
 

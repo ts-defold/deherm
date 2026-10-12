@@ -24,6 +24,11 @@ import { WEAPON_COUNT } from "./content";
  * protocol bump so older peers fail closed rather than interpreting a frame
  * with the wrong layout.
  */
+// Version 17 adds a round start tick and explicit round acknowledgement so
+// snapshot and session lanes cannot establish a stale cross-round delta base.
+// Version 16 adds a bounded server-authoritative admission queue status frame.
+// Older clients and servers reject the version at the envelope before treating
+// a queued connection as an admitted player.
 // Version 15 carries player deltas as schema fields instead of generic changed-
 // byte runs. Version 14 makes countdown expiries and accepted-input coordinates stable
 // against the enclosing snapshot tick, so ordinary sparse deltas carry state
@@ -32,7 +37,7 @@ import { WEAPON_COUNT } from "./content";
 // tick, and sequence header. Version 12 separated the compact fixed-point
 // network image from the broad rollback image and packed each projectile into
 // an exact 15-byte record.
-export const PROTOCOL_VERSION = 15;
+export const PROTOCOL_VERSION = 17;
 export const INPUT_PACKET_BYTES = 32;
 /**
  * One unreliable transport datagram carries the two commands sampled since the
@@ -299,8 +304,10 @@ export const MESSAGE_CONTROL = 5;
 export const MESSAGE_PING = 6;
 export const MESSAGE_PONG = 7;
 export const MESSAGE_WELCOME_ACK = 8;
-/** Additive control-plane update; snapshot layout and protocol version stay stable. */
+/** Round control is versioned separately from the unchanged snapshot layout. */
 export const MESSAGE_ROUND_STATE = 9;
+export const MESSAGE_QUEUE_STATUS = 10;
+export const MESSAGE_ROUND_ACK = 11;
 
 export const RESUME_TOKEN_BYTES = SESSION_TOKEN_BYTES;
 export const PLAYER_NAME_BYTES = 16;
@@ -310,7 +317,9 @@ const WELCOME_BASE_BYTES = ENVELOPE_BYTES + 4 + 4 + 4 + 4 + RESUME_TOKEN_BYTES;
 /** The trailing cadence byte is part of the version-6 welcome frame. */
 export const WELCOME_BYTES = WELCOME_BASE_BYTES + 1;
 export const WELCOME_ACK_BYTES = ENVELOPE_BYTES + RESUME_TOKEN_BYTES;
-export const ROUND_STATE_BYTES = ENVELOPE_BYTES + 12;
+export const ROUND_STATE_BYTES = ENVELOPE_BYTES + 16;
+export const ROUND_ACK_BYTES = ENVELOPE_BYTES + 4;
+export const QUEUE_STATUS_BYTES = ENVELOPE_BYTES + 6;
 export const CONTROL_BYTES = ENVELOPE_BYTES + 4;
 export const PING_BYTES = ENVELOPE_BYTES + 8;
 /** Optional, backwards-readable per-session input timing appended to PONG. */
@@ -402,6 +411,15 @@ export interface RoundStateMessage {
   winnerTeam: number;
   /** Remaining authoritative ticks before the server restarts the round. */
   ticksRemaining: number;
+  /** First authoritative tick belonging to this round. */
+  startTick: number;
+}
+
+export interface QueueStatusMessage {
+  /** One-based FIFO place. Zero is never sent as a waiting status. */
+  position: number;
+  waiting: number;
+  capacity: number;
 }
 
 export function messageKind(payload: Uint8Array): number {
@@ -563,6 +581,31 @@ export function readReject(payload: Uint8Array, output: RejectMessage): RejectMe
   return output;
 }
 
+export function writeQueueStatus(target: Uint8Array, message: Readonly<QueueStatusMessage>): number {
+  requireCapacity(target, QUEUE_STATUS_BYTES);
+  unsigned(message.position, 0xffff, "queue position");
+  unsigned(message.waiting, 0xffff, "queue length");
+  unsigned(message.capacity, 0xffff, "queue capacity");
+  if (message.position === 0 || message.position > message.waiting || message.waiting > message.capacity)
+    throw new RangeError("queue status is inconsistent");
+  const view = envelope(target, MESSAGE_QUEUE_STATUS);
+  view.setUint16(4, message.position, true);
+  view.setUint16(6, message.waiting, true);
+  view.setUint16(8, message.capacity, true);
+  return QUEUE_STATUS_BYTES;
+}
+
+export function readQueueStatus(payload: Uint8Array, output: QueueStatusMessage): QueueStatusMessage {
+  const view = expect(payload, MESSAGE_QUEUE_STATUS, QUEUE_STATUS_BYTES);
+  if (payload.byteLength !== QUEUE_STATUS_BYTES) throw new Error("queue status has unexpected trailing bytes");
+  output.position = view.getUint16(4, true);
+  output.waiting = view.getUint16(6, true);
+  output.capacity = view.getUint16(8, true);
+  if (output.position === 0 || output.position > output.waiting || output.waiting > output.capacity)
+    throw new Error("queue status is inconsistent");
+  return output;
+}
+
 export function writeRoundState(target: Uint8Array, message: Readonly<RoundStateMessage>): number {
   requireCapacity(target, ROUND_STATE_BYTES);
   unsigned(message.round, 0xffff_ffff, "round");
@@ -574,6 +617,7 @@ export function writeRoundState(target: Uint8Array, message: Readonly<RoundState
     throw new RangeError("round state cannot declare both a player and team winner");
   }
   unsigned(message.ticksRemaining, 0xffff_ffff, "round countdown");
+  unsigned(message.startTick, 0xffff_ffff, "round start tick");
   if ((message.phase === 0) !== (message.ticksRemaining === 0)) {
     throw new RangeError("playing round state must have no countdown and intermission must have one");
   }
@@ -587,6 +631,7 @@ export function writeRoundState(target: Uint8Array, message: Readonly<RoundState
   view.setUint8(10, message.winnerTeam);
   view.setUint8(11, 0);
   view.setUint32(12, message.ticksRemaining >>> 0, true);
+  view.setUint32(16, message.startTick >>> 0, true);
   return ROUND_STATE_BYTES;
 }
 
@@ -600,6 +645,7 @@ export function readRoundState(payload: Uint8Array, output: RoundStateMessage): 
   output.winnerTeam = view.getUint8(10);
   if (view.getUint8(11) !== 0) throw new Error("round state reserved byte must be zero");
   output.ticksRemaining = view.getUint32(12, true);
+  output.startTick = view.getUint32(16, true);
   unsigned(output.phase, 1, "round phase");
   unsigned(output.winnerPlayerId, MAX_PLAYERS, "round winner player");
   unsigned(output.winnerTeam, 2, "round winner team");
@@ -613,6 +659,22 @@ export function readRoundState(payload: Uint8Array, output: RoundStateMessage): 
     throw new Error("round phase and winner fields disagree");
   }
   return output;
+}
+
+export function writeRoundAck(target: Uint8Array, round: number): number {
+  requireCapacity(target, ROUND_ACK_BYTES);
+  unsigned(round, 0xffff_ffff, "acknowledged round");
+  if (round === 0) throw new RangeError("acknowledged round must be positive");
+  envelope(target, MESSAGE_ROUND_ACK).setUint32(4, round, true);
+  return ROUND_ACK_BYTES;
+}
+
+export function readRoundAck(payload: Uint8Array): number {
+  const view = expect(payload, MESSAGE_ROUND_ACK, ROUND_ACK_BYTES);
+  if (payload.byteLength !== ROUND_ACK_BYTES) throw new Error("round acknowledgement has unexpected length");
+  const round = view.getUint32(4, true);
+  if (round === 0) throw new Error("acknowledged round must be positive");
+  return round;
 }
 
 export function readSnapshotTick(payload: Uint8Array): number {

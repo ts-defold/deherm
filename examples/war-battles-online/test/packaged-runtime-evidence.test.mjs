@@ -26,6 +26,38 @@ import {
   listeningPids,
 } from "../integration/graceful-shutdown.mjs";
 import { projectionEnvelope } from "../integration/projections.mjs";
+import { matchesPackagedBundleFingerprint } from "../integration/packaged-bundle-fingerprint.mjs";
+
+test("packaged fingerprint guard anchors exact and bounded-marker archive bytes", () => {
+  const fingerprint = "a".repeat(32) + "b".repeat(32);
+  const marker = '__DEFOLD_HERMES_BUILD_FINGERPRINT__ = "';
+  assert.equal(
+    matchesPackagedBundleFingerprint(Buffer.from(`prefix${marker}${fingerprint}"suffix`), fingerprint),
+    true,
+  );
+  assert.equal(
+    matchesPackagedBundleFingerprint(
+      Buffer.from(`${marker}${fingerprint.slice(0, 31)}\0\x01${fingerprint.slice(35)}"`),
+      fingerprint,
+    ),
+    true,
+  );
+  assert.equal(
+    matchesPackagedBundleFingerprint(
+      Buffer.from(`${marker}${fingerprint.slice(0, 31)}\0\x01${fingerprint.slice(36)}"`),
+      fingerprint,
+    ),
+    false,
+    "a marker cannot hide five digits",
+  );
+  assert.equal(matchesPackagedBundleFingerprint(Buffer.from(`${marker}${"a".repeat(64)}"`), fingerprint), false);
+  assert.equal(
+    matchesPackagedBundleFingerprint(Buffer.from(`${marker}${fingerprint}`), fingerprint),
+    false,
+    "a closing quote is required",
+  );
+  assert.throws(() => matchesPackagedBundleFingerprint(Buffer.alloc(0), "invalid"), /64-digit/);
+});
 
 // An engine double: it does what the parts of dmengine this gate addresses do,
 // and nothing else. It serves an engine-service port the kernel assigned,

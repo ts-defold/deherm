@@ -18,6 +18,7 @@ import {
   transcriptEvidence,
 } from "./packaged-runtime-evidence.mjs";
 import { harvestTranscript, mergeOccurrences, readBugPool, writeBugPool } from "@ts-defold/deherm/dev/bug-pool";
+import { matchesPackagedBundleFingerprint } from "./packaged-bundle-fingerprint.mjs";
 
 const exampleRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const repositoryRoot = resolve(exampleRoot, "../..");
@@ -93,23 +94,7 @@ const bundleSource = await readFile(resolve(exampleRoot, "defold/build/bob/deher
 const bundleFingerprint = bundleSource.match(/__DEFOLD_HERMES_BUILD_FINGERPRINT__\s*=\s*"([0-9a-f]{64})"/u)?.[1];
 if (bundleFingerprint === undefined) throw new Error("Packaged bundle source has no deherm build fingerprint");
 const archiveBytes = await readFile(resolve(exampleRoot, "defold/build/bob/game.arcd"));
-// Bob's archive writer may split a custom resource at an internal block
-// boundary and place a short binary block header inside the string. Start at
-// the exact assignment marker, skip only non-hex archive bytes, and require all
-// 64 fingerprint digits in order inside one bounded block window.
-const fingerprintMarker = Buffer.from('__DEFOLD_HERMES_BUILD_FINGERPRINT__ = "', "ascii");
-const markerOffset = archiveBytes.indexOf(fingerprintMarker);
-let archivedFingerprint = "";
-if (markerOffset >= 0) {
-  const start = markerOffset + fingerprintMarker.length;
-  for (let offset = start; offset < Math.min(start + 96, archiveBytes.length); offset += 1) {
-    const byte = archiveBytes[offset];
-    const isHex = (byte >= 48 && byte <= 57) || (byte >= 97 && byte <= 102);
-    if (isHex) archivedFingerprint += String.fromCharCode(byte);
-    if (archivedFingerprint.length === 64) break;
-  }
-}
-if (archivedFingerprint !== bundleFingerprint) {
+if (!matchesPackagedBundleFingerprint(archiveBytes, bundleFingerprint)) {
   throw new Error(
     `Defold archive does not contain current deherm bundle ${bundleFingerprint}; run a full Bob build before packaged runtime evidence`,
   );

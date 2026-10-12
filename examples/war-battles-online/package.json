@@ -81,6 +81,7 @@
     "runtime:websocket": "node integration/check-websocket-fallback.mjs",
     "runtime:websocket:docker": "node integration/check-websocket-fallback.mjs --docker",
     "runtime:browser:online": "node integration/check-packaged-online.mjs",
+    "runtime:browser:round-loop": "node integration/check-packaged-online.mjs --round-loop",
     "runtime:browser:online:motion": "node integration/check-packaged-online.mjs --motion",
     "runtime:browser:online:cadence": "node integration/check-packaged-online.mjs --cadence",
     "runtime:browser:online:loss": "node integration/check-packaged-online.mjs --loss --cadence",

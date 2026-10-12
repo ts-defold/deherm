@@ -519,10 +519,19 @@ export default defineComponent({
   update(self: UiSelf, _dt: number): void {
     if (self.scoreboardTouchSuppressionFrames > 0) self.scoreboardTouchSuppressionFrames -= 1;
     if (self.titleVisible) {
-      const full = arenaMatch()?.client?.lastReject?.code === REJECT_FULL;
+      const client = arenaMatch()?.client;
+      const full = client?.lastReject?.code === REJECT_FULL;
+      const queued = client?.state === "queued";
+      const queueLost = client?.state === "closed" && client.queueStatus.position > 0;
       gui.setText(
         self.titlePrompt,
-        full ? "ROOM FULL // PRESS ANY KEY TO RETRY" : "PRESS ANY KEY OR BUTTON TO TAKE COMMAND",
+        queued
+          ? `WAITING FOR SERVER // PLACE ${client.queueStatus.position} OF ${client.queueStatus.waiting}`
+          : queueLost
+            ? "QUEUE CONNECTION LOST // PRESS ANY KEY TO RETRY"
+            : full
+              ? "QUEUE FULL // PRESS ANY KEY TO RETRY"
+              : "PRESS ANY KEY OR BUTTON TO TAKE COMMAND",
       );
       return;
     }

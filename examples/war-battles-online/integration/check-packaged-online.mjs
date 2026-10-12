@@ -8,10 +8,10 @@
 // and snapshots.
 
 import assert from "node:assert/strict";
-import { execFileSync, spawn } from "node:child_process";
+import { execFileSync, spawn, spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { createSocket } from "node:dgram";
-import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -23,6 +23,7 @@ import {
   waitFor,
 } from "../../../packages/cli/src/dev/browser-host.mjs";
 import { startBrowserVideo } from "./browser-video.mjs";
+import { matchesPackagedBundleFingerprint } from "./packaged-bundle-fingerprint.mjs";
 import { PLAYER_MODE_DEAD, PLAYER_MODE_INFANTRY, PLAYER_MODE_TANK } from "../core/constants.ts";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -30,6 +31,44 @@ const exampleRoot = resolve(here, "..");
 const repositoryRoot = resolve(exampleRoot, "../..");
 const bundleDirectory =
   process.env.DEHERM_WAR_BATTLES_WEB_BUNDLE ?? resolve(repositoryRoot, "build/bundle/War Battles");
+
+async function assertPackagedBundleMatchesCurrentSources() {
+  const checked = spawnSync(
+    process.execPath,
+    [
+      resolve(repositoryRoot, "bin/deherm.mjs"),
+      "verify-bundle",
+      "--project",
+      resolve(exampleRoot, "defold"),
+      "--recompute",
+      "--json",
+    ],
+    { cwd: repositoryRoot, encoding: "utf8" },
+  );
+  if (checked.error) throw checked.error;
+  if (!checked.stdout) throw new Error(`bundle source verification failed: ${checked.stderr.trim()}`);
+  const report = JSON.parse(checked.stdout);
+  const bundle = report.entries.find((entry) => entry.kind === "bundle" && entry.resource === "/deherm/app.dehermc");
+  const fingerprint = bundle?.fingerprint?.fromCurrentSources;
+  assert.equal(
+    report.ok,
+    true,
+    `the deherm bundle must be bound to current sources: ${bundle?.status ?? report.status}`,
+  );
+  assert.match(fingerprint ?? "", /^[0-9a-f]{64}$/u, "the current bundle needs a full build fingerprint");
+  assert.equal(bundle.fingerprint.onDisk, fingerprint, "the compiled app resource is not from current sources");
+  const archiveRoot = join(bundleDirectory, "archive");
+  const archives = (await readdir(archiveRoot)).filter((name) => /^game\d+\.arcd$/u.test(name));
+  assert.ok(archives.length > 0, "the packaged HTML5 game has no Defold archive");
+  let matched = false;
+  for (const name of archives) {
+    const bytes = await readFile(join(archiveRoot, name));
+    matched = matchesPackagedBundleFingerprint(bytes, fingerprint);
+    if (matched) break;
+  }
+  assert.ok(matched, "the packaged HTML5 archive does not contain the current-source build fingerprint; rebuild Bob");
+  return fingerprint;
+}
 const denoBinary = process.env.DEHERM_DENO ?? "deno";
 const chromeBinary = process.env.DEHERM_CHROME ?? defaultChromeBinary;
 // Client-side `inputsSent` is only an attempted write. The owner gate must
@@ -46,7 +85,8 @@ for (const argument of argumentSet) {
     argument !== "--loss" &&
     argument !== "--latency" &&
     argument !== "--video" &&
-    argument !== "--soak"
+    argument !== "--soak" &&
+    argument !== "--round-loop"
   )
     throw new Error(`Unknown argument: ${argument}`);
 }
@@ -57,6 +97,7 @@ const lossMode = argumentSet.has("--loss");
 const latencyMode = argumentSet.has("--latency");
 const videoMode = argumentSet.has("--video");
 const soakMode = argumentSet.has("--soak");
+const roundLoopMode = argumentSet.has("--round-loop");
 const impairmentMode = lossMode || latencyMode;
 const lossPercent = lossMode ? Number(process.env.DEHERM_WAR_BATTLES_PACKET_LOSS_PERCENT ?? 10) : 0;
 const latencyMilliseconds = latencyMode ? Number(process.env.DEHERM_WAR_BATTLES_LATENCY_MS ?? 65) : 0;
@@ -618,6 +659,8 @@ async function createImpairmentProxy(serverPort, dropPercent, latencyMs, jitterM
 }
 
 async function run() {
+  const packagedFingerprint = await assertPackagedBundleMatchesCurrentSources();
+  console.log(`war-battles-packaged-online:source-fingerprint=${packagedFingerprint}`);
   const scratch = await mkdtemp(join(tmpdir(), "war-battles-packaged-online."));
   const serverLines = [];
   let server;
@@ -668,6 +711,7 @@ async function run() {
         String(rosterSize),
         "--bot-skill",
         "2",
+        ...(roundLoopMode ? ["--smoke-round-after-inputs", "30"] : []),
       ],
       { cwd: exampleRoot, stdio: ["ignore", "pipe", "pipe"] },
     );
@@ -808,6 +852,30 @@ async function run() {
     assert.ok(Number.isInteger(telemetry.inputLeadTicks) && telemetry.inputLeadTicks >= 0);
     assert.ok(Number.isFinite(telemetry.maximumLocalCorrectionMagnitude));
     assert.ok(Number.isInteger(telemetry.remoteInterpolationRebases));
+    if (roundLoopMode) {
+      await waitFor(
+        async () => {
+          const value = await readTelemetry(page.client);
+          return value?.state === "ready" && value.round === 1 && value.roundPhase === 1 ? value : false;
+        },
+        { timeoutMs: 12_000, intervalMs: 100, what: "the browser client to observe authoritative round countdown" },
+      );
+      await waitFor(
+        async () => {
+          const value = await readTelemetry(page.client);
+          if (value?.state !== "ready" || value.mode !== "online") return false;
+          return value.round === 2 &&
+            value.roundPhase === 0 &&
+            value.lastRoundKeyframeTick >= value.roundStartTick &&
+            value.snapshotsApplied > telemetry.snapshotsApplied
+            ? value
+            : false;
+        },
+        { timeoutMs: 20_000, intervalMs: 100, what: "a post-round-state authoritative second-round keyframe" },
+      );
+      assert.ok(serverLines.some((line) => line.includes("war-battles-server:smoke-round-triggered")));
+      assert.ok(serverLines.some((line) => line.includes("war-battles-server:round-started:2")));
+    }
     assert.ok(Number.isFinite(telemetry.maximumRemoteInterpolationRebaseDistance));
     assert.ok(Number.isInteger(telemetry.remoteLifecycleHardSnaps));
     assert.ok(Number.isInteger(telemetry.remoteEjectEffects));
@@ -901,6 +969,8 @@ async function run() {
       },
     );
     assert.ok(authoritativeHealth.stats.inputsAccepted >= minimumInputsAccepted);
+    if (roundLoopMode)
+      assert.equal(authoritativeHealth.stats.serverBots, rosterSize - 1, "all vacant roster slots use server bots");
     assert.ok(serverLines.includes(acceptedInputMarker));
     assert.equal(
       expectedFallbackFailures.length,
@@ -1015,6 +1085,7 @@ async function run() {
         `inputs=${telemetry.inputsSent}`,
         `accepted=${authoritativeHealth.stats.inputsAccepted}`,
         `serverTick=${telemetry.lastServerTick}`,
+        ...(roundLoopMode ? ["roundLoop=authoritative-admission-countdown-restart"] : []),
         `lead=${telemetry.inputLeadTicks}`,
         `maxCorrection=${telemetry.maximumLocalCorrectionMagnitude}`,
         ...(motionMode ? [`viewport=${JSON.stringify(viewport)}`] : []),

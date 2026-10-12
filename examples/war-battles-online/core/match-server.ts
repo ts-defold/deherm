@@ -31,6 +31,7 @@ import {
   MESSAGE_CONTROL,
   MESSAGE_HELLO,
   MESSAGE_PING,
+  MESSAGE_ROUND_ACK,
   MESSAGE_WELCOME_ACK,
   REJECT_FULL,
   REJECT_BAD_RESUME,
@@ -40,6 +41,8 @@ import {
   RESUME_TOKEN_BYTES,
   NETWORK_SNAPSHOT_MESSAGE_BYTES,
   PONG_FEEDBACK_BYTES,
+  ROUND_ACK_BYTES,
+  QUEUE_STATUS_BYTES,
   ROUND_STATE_BYTES,
   PING_BYTES,
   SNAPSHOT_NORMAL_MAX_BYTES,
@@ -53,8 +56,10 @@ import {
   readHello,
   readInputBundle,
   readPing,
+  readRoundAck,
   readWelcomeAck,
   writePongFeedback,
+  writeQueueStatus,
   writePing,
   writeRoundState,
   writeReject,
@@ -98,6 +103,10 @@ export interface MatchServerOptions {
   readonly inputBudgetPerTick?: number;
   /** Ticks a disconnected authenticated slot remains reserved for resume. */
   readonly resumeGraceTicks?: number;
+  /** Maximum fresh connections waiting behind occupied/reserved roster slots. */
+  readonly admissionQueueCapacity?: number;
+  /** Maximum authoritative ticks a fresh connection may wait for promotion. */
+  readonly admissionQueueTimeoutTicks?: number;
   /** Legacy deterministic test seam; production callers should provide resumeKey. */
   readonly resumeSecret?: number;
   /** HMAC key material for authenticated resume credentials. */
@@ -118,6 +127,7 @@ export interface MatchServerStats {
   tick: number;
   /** Connected transports which currently own a roster slot. */
   networkClients: number;
+  admissionQueued: number;
   /** Vacant slots currently driven by the authoritative server bot brain. */
   serverBots: number;
   /** Vacant slots deliberately left idle instead of being masked by a fallback bot. */
@@ -168,10 +178,13 @@ interface SnapshotStreamSend {
 const WELCOME_ACK_TIMEOUT_TICKS = TICK_RATE * 5;
 const ONLINE_FRAG_LIMIT = 25;
 const ONLINE_ROUND_COUNTDOWN_TICKS = TICK_RATE * 5;
+const DEFAULT_ADMISSION_QUEUE_CAPACITY = 32;
+const DEFAULT_ADMISSION_QUEUE_TIMEOUT_TICKS = TICK_RATE * 120;
 
 export class MatchServer {
   world: BattleWorld;
   round = 1;
+  private roundStartTick = 0;
   private roundCountdown = 0;
   private roundWinnerPlayerId = 0;
   private roundWinnerTeam = 0;
@@ -182,8 +195,11 @@ export class MatchServer {
   readonly teams: boolean;
   readonly inputBudgetPerTick: number;
   readonly resumeGraceTicks: number;
+  readonly admissionQueueCapacity: number;
+  readonly admissionQueueTimeoutTicks: number;
 
   private readonly sessions = new Set<ServerSession>();
+  private readonly admissionQueue: ServerSession[] = [];
   /** Slot ownership: index is a slot, value is the owning session or undefined. */
   private readonly slotOwner: (ServerSession | undefined)[] = [];
   private readonly bots = new BotController();
@@ -209,6 +225,7 @@ export class MatchServer {
   readonly stats: MatchServerStats = {
     tick: 0,
     networkClients: 0,
+    admissionQueued: 0,
     serverBots: 0,
     idleSlots: 0,
     humans: 0,
@@ -235,6 +252,16 @@ export class MatchServer {
     this.teams = options.teams ?? false;
     this.inputBudgetPerTick = clampInteger(options.inputBudgetPerTick ?? 8, 1, 64);
     this.resumeGraceTicks = clampInteger(options.resumeGraceTicks ?? TICK_RATE * 30, 1, MAX_TICK_SPAN);
+    this.admissionQueueCapacity = clampInteger(
+      options.admissionQueueCapacity ?? DEFAULT_ADMISSION_QUEUE_CAPACITY,
+      1,
+      256,
+    );
+    this.admissionQueueTimeoutTicks = clampInteger(
+      options.admissionQueueTimeoutTicks ?? DEFAULT_ADMISSION_QUEUE_TIMEOUT_TICKS,
+      1,
+      MAX_TICK_SPAN,
+    );
     this.onError = options.onError ?? (() => {});
     this.onLog = options.onLog ?? (() => {});
     this.nowMilliseconds = options.nowMilliseconds ?? (() => performance.now());
@@ -284,6 +311,8 @@ export class MatchServer {
 
   step(): void {
     if (this.closed) return;
+    this.expireAdmissionQueue();
+    this.promoteAdmissionQueue();
     const tick = tickNext(this.world.tick);
     for (let playerId = 1; playerId <= this.rosterSize; playerId += 1) {
       const slot = playerId - 1;
@@ -296,6 +325,10 @@ export class MatchServer {
     for (const session of this.sessions) session.beginTick();
     this.world.step();
     this.stats.tick = this.world.tick;
+    // A quiet full roster may not change positions for minutes. A small
+    // periodic status frame both confirms the position and keeps the waiting
+    // control session active until its bounded admission deadline.
+    if (this.admissionQueue.length > 0 && this.world.tick % (TICK_RATE * 5) === 0) this.publishAdmissionQueue();
     this.updateRound();
     if (this.world.tick % this.snapshotIntervalTicks === 0) this.broadcastSnapshot();
   }
@@ -318,6 +351,7 @@ export class MatchServer {
       // Simulation ticks remain globally monotonic across rounds. That keeps
       // input, snapshot and admission clocks unambiguous for existing peers.
       this.world.tick = previousTick;
+      this.roundStartTick = previousTick;
       for (let playerId = 1; playerId <= this.rosterSize; playerId += 1) {
         this.world.addPlayer(playerId, this.teams ? (playerId <= this.rosterSize / 2 ? 1 : 2) : 0);
         this.world.setBotSkill(playerId, this.botSkill);
@@ -361,6 +395,7 @@ export class MatchServer {
       winnerPlayerId: this.roundWinnerPlayerId,
       winnerTeam: this.roundWinnerTeam,
       ticksRemaining: this.roundCountdown,
+      startTick: this.roundStartTick,
     };
   }
 
@@ -448,24 +483,76 @@ export class MatchServer {
       this.refreshStats();
       return resumed;
     }
+    // Never let a new anonymous HELLO bypass someone already waiting. A bot
+    // is only a vacant-slot controller, not an admission reservation.
+    const slot = this.admissionQueue.length === 0 ? this.findFreshSlot() : -1;
+    if (slot >= 0) {
+      this.slotOwner[slot] = session;
+      this.refreshStats();
+      return slot;
+    }
+    if (this.admissionQueue.length >= this.admissionQueueCapacity) return -1;
+    session.queuedUntilTick = tickDeadline(this.sessionTick(), this.admissionQueueTimeoutTicks);
+    this.admissionQueue.push(session);
+    this.publishAdmissionQueue();
+    this.promoteAdmissionQueue();
+    return -2;
+  }
+
+  private findFreshSlot(): number {
     for (let slot = 0; slot < this.rosterSize; slot += 1) {
       if (this.slotOwner[slot] !== undefined) continue;
-      // A slot that has already welcomed a human remains reserved through the
-      // bounded resume grace period. Fresh anonymous joins may only take a slot
-      // that has never authenticated, or one whose reservation has expired.
       if (this.sessionLedger.generation[slot] !== 0 && this.sessionLedger.isReserved(slot, this.sessionTick()))
         continue;
-      this.slotOwner[slot] = session;
-      // A human takes the slot over exactly as it stands: the bot's score, its
-      // position and its ammunition all continue. Nothing is reset mid-round.
-      this.refreshStats();
       return slot;
     }
     return -1;
   }
 
+  private publishAdmissionQueue(): void {
+    this.stats.admissionQueued = this.admissionQueue.length;
+    for (let index = 0; index < this.admissionQueue.length; index += 1) {
+      this.admissionQueue[index]!.sendQueueStatus(index + 1, this.admissionQueue.length, this.admissionQueueCapacity);
+    }
+  }
+
+  private expireAdmissionQueue(): void {
+    let changed = false;
+    for (let index = this.admissionQueue.length - 1; index >= 0; index -= 1) {
+      const session = this.admissionQueue[index]!;
+      if (!tickAfter(this.sessionTick(), session.queuedUntilTick)) continue;
+      this.admissionQueue.splice(index, 1);
+      changed = true;
+      session.rejectQueueTimeout();
+    }
+    if (changed) this.publishAdmissionQueue();
+  }
+
+  private promoteAdmissionQueue(): void {
+    let changed = false;
+    while (this.admissionQueue.length > 0) {
+      const slot = this.findFreshSlot();
+      if (slot < 0) break;
+      const session = this.admissionQueue.shift()!;
+      changed = true;
+      if (session.closed) continue;
+      this.slotOwner[slot] = session;
+      this.refreshStats();
+      void session.completeAdmission(slot).catch((error: unknown) => {
+        this.report(error);
+        session.close(4_003, "admission failed");
+      });
+    }
+    if (changed) this.publishAdmissionQueue();
+  }
+
   /** @internal */
   releaseSlot(session: ServerSession): void {
+    const queueIndex = this.admissionQueue.indexOf(session);
+    if (queueIndex >= 0) {
+      this.admissionQueue.splice(queueIndex, 1);
+      this.publishAdmissionQueue();
+    }
     for (let slot = 0; slot < MAX_PLAYERS; slot += 1) {
       if (this.slotOwner[slot] !== session) continue;
       this.slotOwner[slot] = undefined;
@@ -479,6 +566,7 @@ export class MatchServer {
     }
     this.sessions.delete(session);
     this.refreshStats();
+    if (!this.closed) this.promoteAdmissionQueue();
   }
 
   /** @internal Issues and commits an authenticated credential. */
@@ -592,6 +680,8 @@ export class ServerSession implements TransportReceiver {
   private readonly lateInputTicks = new Float64Array(INPUT_HISTORY_TICKS);
   private readonly welcomeBuffer = new Uint8Array(WELCOME_BYTES);
   private readonly rejectBuffer = new Uint8Array(REJECT_MAXIMUM_BYTES);
+  private readonly queueStatusBuffer = new Uint8Array(QUEUE_STATUS_BYTES);
+  queuedUntilTick = 0;
   private readonly pingBuffer = new Uint8Array(PONG_FEEDBACK_BYTES);
   private readonly pingPrefix = this.pingBuffer.subarray(0, PING_BYTES);
   private inputsAccepted = 0;
@@ -601,6 +691,8 @@ export class ServerSession implements TransportReceiver {
   private readonly snapshotCurrent = new Uint8Array(NETWORK_SNAPSHOT_BYTES);
   private readonly snapshotFrame = new Uint8Array(NETWORK_SNAPSHOT_MESSAGE_BYTES);
   private snapshotBaselineTick = -1;
+  private awaitingRoundAck = false;
+  private roundAckBarrierTick = -1;
   private snapshotFramesSinceKeyframe = 0;
   private forceSnapshotKeyframe = true;
   private readonly snapshotSends: Array<SnapshotStreamSend | undefined> = Array.from({
@@ -650,9 +742,30 @@ export class ServerSession implements TransportReceiver {
     if (this.ready && !this.closed) this.sendReliable(TRANSPORT_CHANNEL_SESSION, payload);
   }
 
+  /** @internal One versioned, explicit FIFO status update on the session lane. */
+  sendQueueStatus(position: number, waiting: number, capacity: number): void {
+    if (this.closed) return;
+    const length = writeQueueStatus(this.queueStatusBuffer, { position, waiting, capacity });
+    // Status can change again before an ordered transport actually writes it.
+    this.sendReliable(TRANSPORT_CHANNEL_SESSION, this.queueStatusBuffer.slice(0, length), (disposition) => {
+      if (disposition !== "sent") this.close(1_001, "queue status delivery failed");
+    });
+  }
+
+  /** @internal The bounded wait ended without ownership. */
+  rejectQueueTimeout(): void {
+    if (this.closed) return;
+    const length = writeReject(this.rejectBuffer, { code: REJECT_FULL, reason: "admission queue timed out; retry" });
+    this.sendReliable(TRANSPORT_CHANNEL_SESSION, this.rejectBuffer.slice(0, length), () => {
+      this.close(4_004, "admission queue timed out");
+    });
+  }
+
   /** @internal Invalidates tick-relative state after the authoritative world resets. */
   resetRoundState(): void {
     this.snapshotBaselineTick = -1;
+    this.awaitingRoundAck = true;
+    this.roundAckBarrierTick = -1;
     this.snapshotBaseline.fill(0);
     this.snapshotCurrent.fill(0);
     this.snapshotFramesSinceKeyframe = 0;
@@ -972,11 +1085,27 @@ export class ServerSession implements TransportReceiver {
       this.handleWelcomeAck(payload);
       return;
     }
+    if (kind === MESSAGE_ROUND_ACK) {
+      if (!this.ready || payload.byteLength !== ROUND_ACK_BYTES || readRoundAck(payload) !== this.server.round) {
+        throw new Error("unexpected round acknowledgement");
+      }
+      if (this.awaitingRoundAck) {
+        this.awaitingRoundAck = false;
+        // A snapshot sent before this session-lane acknowledgement can arrive
+        // first on another stream. Only an ACK for a later keyframe may seed a
+        // delta baseline for the reset client.
+        this.roundAckBarrierTick = this.server.world.tick;
+        this.snapshotBaselineTick = -1;
+        this.forceSnapshotKeyframe = true;
+      }
+      return;
+    }
     if (kind !== MESSAGE_HELLO) throw new Error("first session message must be a hello");
     if (this.ready || this.sessionHandling) throw new Error("session handshake already established or pending");
     this.sessionHandling = true;
     readHello(payload, this.hello);
     const slot = await this.server.claimSlot(this, this.hello.resumeToken);
+    if (slot === -2) return;
     if (slot < 0) {
       const hasResumeToken = !isZeroToken(this.hello.resumeToken);
       const length = writeReject(
@@ -985,10 +1114,17 @@ export class ServerSession implements TransportReceiver {
           ? { code: REJECT_BAD_RESUME, reason: "resume token is invalid, stale, or belongs to another match" }
           : { code: REJECT_FULL, reason: "match is full" },
       );
-      this.sendReliable(TRANSPORT_CHANNEL_SESSION, this.rejectBuffer.subarray(0, length));
-      this.close(hasResumeToken ? 4_005 : 4_004, hasResumeToken ? "resume refused" : "match is full");
+      this.sendReliable(TRANSPORT_CHANNEL_SESSION, this.rejectBuffer.slice(0, length), () => {
+        this.close(hasResumeToken ? 4_005 : 4_004, hasResumeToken ? "resume refused" : "admission queue full");
+      });
       return;
     }
+    await this.completeAdmission(slot);
+  }
+
+  /** @internal Completes either immediate admission or FIFO promotion. */
+  async completeAdmission(slot: number): Promise<void> {
+    if (this.closed || !this.server.ownsSlot(this, slot)) return;
     this.slot = slot;
     this.name = this.hello.name === "" ? `player${slot + 1}` : this.hello.name;
     const stagedResumeGeneration = await this.server.prepareResumeToken(slot, this.resumeToken);
@@ -1164,12 +1300,18 @@ export class ServerSession implements TransportReceiver {
 
   private observeSnapshotAcknowledgement(command: Readonly<InputCommand>): void {
     if ((command.snapshotAckBits & 1) === 0) return;
+    if (
+      this.awaitingRoundAck ||
+      (this.roundAckBarrierTick >= 0 && !tickAfter(command.latestSnapshotTick, this.roundAckBarrierTick))
+    )
+      return;
     if (this.snapshotBaselineTick >= 0 && !tickAfter(command.latestSnapshotTick, this.snapshotBaselineTick)) return;
     if (tickAfter(command.latestSnapshotTick, this.server.world.tick)) return;
     const acknowledged = this.server.snapshotAt(command.latestSnapshotTick);
     if (acknowledged === undefined) return;
     compactNetworkSnapshot(acknowledged, this.snapshotBaseline);
     this.snapshotBaselineTick = command.latestSnapshotTick;
+    this.roundAckBarrierTick = -1;
     this.forceSnapshotKeyframe = false;
     for (let index = 0; index < this.snapshotSends.length; index += 1) {
       const send = this.snapshotSends[index];

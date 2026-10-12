@@ -3,6 +3,8 @@ import type { GameTransport, TransportReceiver } from "./transport.ts";
 
 export interface DenoQuicIncomingLike {
   accept(): Promise<unknown>;
+  /** Deno's synchronous pre-handshake refusal; never creates an async task. */
+  refuse(): void;
 }
 
 export interface DenoQuicListenerLike extends AsyncIterable<DenoQuicIncomingLike> {}
@@ -109,7 +111,11 @@ export class DenoWebTransportServer {
         this.nextConnectionId += 1;
         this.trace(options, { phase: "incoming", connectionId });
         if (this.activeSessions >= maximumSessions) {
-          void this.rejectOne(runtime, incoming, options, connectionId);
+          try {
+            incoming.refuse();
+          } catch (error: unknown) {
+            options.onError(error);
+          }
           continue;
         }
         void this.acceptOne(runtime, incoming, options, connectionId);
@@ -178,40 +184,6 @@ export class DenoWebTransportServer {
           options.onError(closeError);
         }
       }
-      options.onError(error);
-    }
-  }
-
-  private async rejectOne(
-    runtime: DenoQuicRuntimeLike,
-    incoming: DenoQuicIncomingLike,
-    options: DenoWebTransportServerOptions,
-    connectionId: number,
-  ): Promise<void> {
-    let session: (WebTransportSessionLike & { readonly url: string }) | undefined;
-    let closeAttempted = false;
-    const closeSession = (closeCode: number, reason: string): void => {
-      if (session === undefined || closeAttempted) return;
-      closeAttempted = true;
-      try {
-        session.close({ closeCode, reason });
-      } catch (error: unknown) {
-        options.onError(error);
-      }
-    };
-    try {
-      const connection = await incoming.accept();
-      this.trace(options, { phase: "quic-accepted", connectionId });
-      session = await runtime.upgradeWebTransport(connection);
-      this.trace(options, { phase: "webtransport-upgraded", connectionId, url: session.url });
-      // This connection is already over capacity. Closing must not depend on a
-      // readiness promise that the peer can leave pending forever. Observe a
-      // later rejection so it cannot become unhandled, but release this task
-      // and the upgraded session immediately.
-      void session.ready.catch((error: unknown) => options.onError(error));
-      closeSession(4_001, "server session limit reached");
-    } catch (error: unknown) {
-      closeSession(4_006, "session readiness failed");
       options.onError(error);
     }
   }

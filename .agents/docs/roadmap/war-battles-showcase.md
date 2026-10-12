@@ -44,7 +44,39 @@ multiplayer showcase. The port is the first full-product acceptance test for
 the generated Defold script API, raw dmSDK access, native extension discovery,
 browser adapter, dynamic Hermes, and Static Hermes profiles.
 
-## Current product gate (2026-10-09)
+## Current product gate (2026-10-12)
+
+### October 12 authoritative admission and online round smoke
+
+The online server now uses protocol 17 for an explicit bounded FIFO admission
+queue. A full 16- or 32-player roster may retain up to 32 fresh waiters;
+versioned session-lane status frames provide one-based position and total
+waiting count. Promotion is server-owned and respects authenticated resume
+reservations, including their expiry; cancellation and transport close remove
+waiters and update positions. Queue overflow and a 120-second wait timeout are
+explicit terminal rejections, never a local solo admission. Queued control
+frames fail closed. The Deno QUIC and WebSocket session caps now leave headroom
+for roster plus queue. Focused deterministic in-memory tests cover 16/32 full
+rosters, bot takeover, overflow, cancellation, resume priority, reservation
+expiry, timeout, version mismatch, and status-before-welcome ordering.
+
+A source-fingerprint-verified HTML5 Bob bundle then passed the repeatable
+`pnpm --dir examples/war-battles-online runtime:browser:round-loop` gate:
+packaged Chrome used WebTransport/QUIC datagrams against local Deno, accepted
+authoritative inputs, observed the normal round-one countdown and live round-
+two restart, and kept the other roster slots under server bots. The test's
+loopback-only flag fast-forwards one score after accepted inputs; this proves
+the transport/client round transition, including a post-round-state
+authoritative keyframe, not that a human organically won an entire match.
+Hosted ingress, browser network-bot coexistence at capacity,
+cross-version deployment coordination, Wavedash integration/publication, and
+external-user end-to-end testing remain open release gates.
+The example's source-bound evidence tests pass after owner regeneration, and a
+fresh native Bob archive passes packaged runtime startup and graceful exit.
+The aggregate example suite is **not** green: two deterministic networking
+ceilings already fail on clean `515b864d` (edge 16-player raw correction
+1,233/1,024 units; severe one-client link 21/13 late inputs and 540/550
+accepted). Neither threshold was weakened in this admission change.
 
 The current release-source projection reaches 36 Script API routes. Thirty-five
 select the Static Hermes C ABI; `gui.pick_node` remains an explicit
@@ -1506,19 +1538,20 @@ a five-second (300 simulation tick) result window. It then replaces the world,
 retains the roster and bot policy, and forces each session onto a fresh
 keyframe. Simulation ticks stay globally monotonic across rounds so existing
 input and resume clocks do not rewind. An additive fixed-width `round-state`
-message uses reliable session kind 9; protocol version 15, snapshot layouts,
-and input packets are unchanged. New clients validate the message and reset
-prediction when the round advances; old clients ignore the unknown reliable
-session kind and continue to consume the unchanged snapshots.
+message uses reliable session kind 9. Protocol version 17 adds the round-start
+tick and a kind-11 round acknowledgement; older peers fail closed. A session
+cannot use a new-round snapshot ACK as a delta base until it receives that
+acknowledgement and the client then acknowledges a later keyframe. New clients
+reject stale pre-round keyframes after reset. Snapshot and input layouts stay
+unchanged.
 
 `REJECT_FULL` remains a terminal admission result: the Defold client no longer
 converts it to the offline solo arena. The title screen explains that the room
 is full and any key or button retries online admission. Focused tests cover
 winner delivery, 16/32-player bot rosters, disconnect/resume during the result
-window, monotonic round restart and keyframe recovery, plus a third client
-remaining rejected when a two-slot room is full. A bounded fair wait queue is
-not implemented; queue position, cancellation, expiry, and slot reservation
-need a separate protocol/session lifecycle design.
+window, monotonic round restart, cross-lane keyframe recovery, and bounded FIFO
+queue promotion. The current queue behavior is documented in the product gate
+above.
 
 ## Bounded compact snapshot tranche
 

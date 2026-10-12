@@ -43,6 +43,7 @@ import {
   INPUT_SEND_INTERVAL_TICKS,
   PING_BYTES,
   PONG_FEEDBACK_BYTES,
+  QUEUE_STATUS_BYTES,
   PROTOCOL_VERSION,
   INFANTRY_RADIUS,
   INFANTRY_HEALTH,
@@ -65,6 +66,7 @@ import {
   REJECT_FULL,
   REJECT_MAXIMUM_BYTES,
   REJECT_RATE_LIMITED,
+  ROUND_ACK_BYTES,
   ROUND_STATE_BYTES,
   PlayableBattle,
   RESUME_TOKEN_BYTES,
@@ -76,6 +78,7 @@ import {
   SNAPSHOT_KEYFRAME_INTERVAL,
   SNAPSHOT_MESSAGE_BYTES,
   TICK_MILLISECONDS,
+  TICK_RATE,
   TILE_UNITS,
   UNITS_PER_PIXEL,
   TRANSPORT_CHANNEL_CONTROL,
@@ -124,7 +127,9 @@ import {
   readInputBundle,
   readInputPacket,
   readReject,
+  readQueueStatus,
   readRoundState,
+  readRoundAck,
   readSnapshotFrame,
   readWelcome,
   readWelcomeAck,
@@ -134,7 +139,9 @@ import {
   writeInputPacket,
   writeInputBundle,
   writeReject,
+  writeQueueStatus,
   writeRoundState,
+  writeRoundAck,
   writeSnapshotDelta,
   writeSnapshotKeyframe,
   writeNetworkSnapshotDelta,
@@ -511,20 +518,28 @@ test("session messages round-trip and reject a foreign kind", () => {
   assert.throws(() => readHello(hello, observedHello), /version mismatch/);
 });
 
-test("additive round state is fixed-width, validated, and leaves snapshot protocol unchanged", () => {
+test("versioned round state and acknowledgement are fixed-width and reject contradictory winners", () => {
   const frame = new Uint8Array(ROUND_STATE_BYTES);
-  const input = { round: 7, phase: 1, winnerPlayerId: 0, winnerTeam: 2, ticksRemaining: 180 };
+  const input = { round: 7, phase: 1, winnerPlayerId: 0, winnerTeam: 2, ticksRemaining: 180, startTick: 300 };
   writeRoundState(frame, input);
   assert.deepEqual(readRoundState(frame, { ...input }), input);
   assert.throws(() => writeRoundState(frame, { ...input, winnerPlayerId: 4 }), /both a player and team winner/);
   assert.throws(() => writeRoundState(frame, { ...input, phase: 0 }), /countdown/);
   assert.throws(() => writeRoundState(frame, { ...input, phase: 0, ticksRemaining: 0 }), /phase and winner/);
-  const teamWin = { round: 2, phase: 1, winnerPlayerId: 0, winnerTeam: 1, ticksRemaining: 300 };
+  const teamWin = { round: 2, phase: 1, winnerPlayerId: 0, winnerTeam: 1, ticksRemaining: 300, startTick: 60 };
   writeRoundState(frame, teamWin);
   assert.deepEqual(readRoundState(frame, { ...teamWin }), teamWin);
   frame[11] = 1;
   assert.throws(() => readRoundState(frame, { ...input }), /reserved byte/);
-  assert.equal(PROTOCOL_VERSION, 15, "round presentation state does not alter snapshot or input layout");
+  frame[11] = 0;
+  frame[9] = 4;
+  assert.throws(() => readRoundState(frame, { ...input }), /both a player and team winner/);
+  assert.equal(PROTOCOL_VERSION, 17, "round epoch and explicit acknowledgement bump the envelope version");
+  const ack = new Uint8Array(ROUND_ACK_BYTES);
+  assert.equal(writeRoundAck(ack, 7), ROUND_ACK_BYTES);
+  assert.equal(readRoundAck(ack), 7);
+  ack[3] = 9;
+  assert.throws(() => readRoundAck(ack), /not kind/);
 });
 
 test("team command beacon capture is authoritative and snapshot-safe", () => {
@@ -3337,6 +3352,7 @@ test("server-owned rounds end once, survive disconnect/resume, and restart clean
       winnerPlayerId: 0,
       winnerTeam: 0,
       ticksRemaining: 0,
+      startTick: 0,
     });
     assert.equal(server.stats.serverBots, rosterSize - 1);
     for (let slot = 0; slot < rosterSize; slot += 1) assert.equal(server.world.playerActive[slot], 1);
@@ -3350,6 +3366,7 @@ test("server-owned rounds end once, survive disconnect/resume, and restart clean
       winnerPlayerId: 1,
       winnerTeam: 0,
       ticksRemaining: 300,
+      startTick: 0,
     });
     for (let tick = 0; tick < 3; tick += 1) server.step();
     first.close(1_001, "test disconnect during round result");
@@ -3369,6 +3386,7 @@ test("server-owned rounds end once, survive disconnect/resume, and restart clean
       winnerPlayerId: 0,
       winnerTeam: 0,
       ticksRemaining: 0,
+      startTick: roundBoundaryTick,
     });
     resumed.update(0);
     assert.equal(resumed.hasAuthoritativeSnapshot, true, "the new-round keyframe restores reset client prediction");
@@ -3392,20 +3410,215 @@ test("server-owned rounds end once, survive disconnect/resume, and restart clean
   assert.deepEqual(teamErrors, []);
 });
 
-test("a full online roster remains a terminal rejection and never welcomes a solo fallback", async () => {
+test("new-round snapshot overtaking round state cannot seed a discarded delta baseline", async () => {
   const errors = [];
-  const server = new MatchServer({ rosterSize: 2 });
-  const first = join(server, "full-room-first", errors);
-  const second = join(server, "full-room-second", errors);
-  await settleUntil(() => first.state === "ready" && second.state === "ready", "room capacity filled");
-  const rejected = join(server, "full-room-third", errors);
-  await settleUntil(() => rejected.state === "rejected", "full-room rejection");
-  assert.equal(rejected.state, "rejected");
-  assert.equal(rejected.lastReject?.code, REJECT_FULL);
-  assert.equal(server.countHumans(), 2);
-  assert.equal(rejected.world, undefined, "a rejected client is not assigned an offline solo world");
+  const server = new MatchServer({ rosterSize: 2, snapshotIntervalTicks: 1 });
+  const client = join(server, "reordered-round", errors);
+  await settleUntil(() => client.state === "ready", "reordered-round welcome");
+  const session = client.session;
+  const underlying = session.transport;
+  let delayedRoundState;
+  const deliveredSnapshots = [];
+  session.attach({
+    capabilities: underlying.capabilities,
+    sendReliable(channel, payload, signal) {
+      if (
+        channel === TRANSPORT_CHANNEL_SESSION &&
+        payload[3] === 9 &&
+        new DataView(payload.buffer, payload.byteOffset).getUint32(4, true) === 2
+      ) {
+        delayedRoundState = payload.slice();
+        return Promise.resolve("sent");
+      }
+      if (channel === TRANSPORT_CHANNEL_SNAPSHOT)
+        deliveredSnapshots.push({
+          tick: new DataView(payload.buffer, payload.byteOffset).getUint32(4, true),
+          keyframe: payload[8] === SNAPSHOT_KEYFRAME,
+        });
+      return underlying.sendReliable(channel, payload, signal);
+    },
+    trySendDatagram: (payload) => underlying.trySendDatagram(payload),
+    close: (code, reason) => underlying.close(code, reason),
+  });
+  server.world.playerScore[0] = 25;
+  server.step();
+  for (let tick = 0; tick < 300; tick += 1) server.step();
+  assert.equal(server.round, 2);
+  assert.ok(delayedRoundState, "the new-round session frame is held behind the snapshot lane");
+  const firstNewRoundKeyframe = deliveredSnapshots.find((frame) => frame.tick >= server.world.tick && frame.keyframe);
+  assert.ok(firstNewRoundKeyframe, "a new-round keyframe overtook the session frame");
+  client.update(0);
+  assert.equal(session.awaitingRoundAck, true);
+  assert.equal(session.snapshotBaselineTick, -1, "a pre-barrier ACK cannot seed a delta baseline");
+  client.onReliable(TRANSPORT_CHANNEL_SESSION, delayedRoundState);
+  await settleUntil(() => session.awaitingRoundAck === false, "round acknowledgement");
+  assert.equal(client.hasAuthoritativeSnapshot, false, "round-state reset invalidates the overtaking keyframe");
+  assert.equal(client.stats.lastRoundKeyframeTick, -1);
+  server.step();
+  client.update(0);
+  assert.ok(
+    client.stats.lastRoundKeyframeTick > firstNewRoundKeyframe.tick,
+    "the client must apply a post-barrier keyframe",
+  );
+  assert.ok(deliveredSnapshots.at(-1).keyframe, "the first post-ack frame cannot be a delta");
+  assert.deepEqual(errors, []);
+  server.close();
+});
+
+test("the versioned FIFO admission queue is bounded, ordered, and never starts solo play at 16/32 players", async () => {
+  for (const rosterSize of [16, 32]) {
+    const errors = [];
+    const server = new MatchServer({ rosterSize, admissionQueueCapacity: 2, resumeGraceTicks: 2 });
+    assert.equal(server.stats.serverBots, rosterSize);
+    const occupants = Array.from({ length: rosterSize }, (_, index) => join(server, `owner-${index}`, errors));
+    await settleUntil(() => occupants.every((client) => client.state === "ready"), "full roster", 4_000);
+    assert.equal(server.stats.serverBots, 0);
+    const events = [];
+    const first = join(server, "wait-first", errors, {
+      onQueue: (status) => events.push(`queue:${status.position}/${status.waiting}`),
+      onWelcome: () => events.push("welcome:first"),
+    });
+    const second = join(server, "wait-second", errors, {
+      onQueue: (status) => events.push(`second:${status.position}/${status.waiting}`),
+      onWelcome: () => events.push("welcome:second"),
+    });
+    await settleUntil(() => first.state === "queued" && second.state === "queued", "queued joins");
+    assert.equal(first.queueStatus.position, 1);
+    assert.equal(second.queueStatus.position, 2);
+    assert.equal(server.stats.admissionQueued, 2);
+    assert.equal(first.world, undefined, "waiting never creates a local offline world");
+    const overflow = join(server, "overflow", errors);
+    await settleUntil(() => overflow.state === "rejected", "bounded queue overflow");
+    assert.equal(overflow.lastReject?.code, REJECT_FULL);
+    assert.equal(overflow.world, undefined);
+    assert.equal(overflow.session.closed, true, "capacity rejection closes after its control frame is delivered");
+    // Cancelling the head updates positions; the second waiter is now first.
+    first.close(1_000, "cancel waiting");
+    await settleUntil(() => second.queueStatus.position === 1, "FIFO position update");
+    assert.equal(server.stats.admissionQueued, 1);
+    const departed = occupants[0];
+    const oldToken = departed.resumeToken.slice();
+    departed.close(1_001, "link churn");
+    assert.equal(server.stats.serverBots, 1, "server bot takes the vacant slot while its owner may resume");
+    const resumed = join(server, "resume-owner", errors, { resumeToken: oldToken });
+    await settleUntil(() => resumed.state === "ready", "reserved owner resume");
+    assert.equal(resumed.playerId, departed.playerId, "a fresh queue cannot steal a valid resume reservation");
+    assert.equal(second.state, "queued");
+    resumed.close(1_001, "leave again");
+    for (let index = 0; index < 4; index += 1) server.step();
+    await settleUntil(() => second.state === "ready", "FIFO promotion after grace");
+    assert.equal(second.playerId, departed.playerId);
+    assert.ok(events.indexOf("second:1/1") < events.indexOf("welcome:second"), "status precedes welcome");
+    assert.equal(server.stats.admissionQueued, 0);
+    assert.equal(server.stats.serverBots, 0);
+    assert.deepEqual(errors, []);
+    server.close();
+  }
+});
+
+test("admission queue timeout rejects explicitly and a v15 hello fails closed", async () => {
+  const errors = [];
+  const server = new MatchServer({
+    rosterSize: 2,
+    admissionQueueTimeoutTicks: 2,
+    onError: (error) => errors.push(error),
+  });
+  const owners = [join(server, "owner-a", errors), join(server, "owner-b", errors)];
+  await settleUntil(() => owners.every((client) => client.state === "ready"), "timeout roster");
+  const waiter = join(server, "wait-timeout", errors);
+  await settleUntil(() => waiter.state === "queued", "timeout waiter");
+  for (let index = 0; index < 4; index += 1) server.step();
+  await settleUntil(() => waiter.state === "rejected", "queue timeout reject");
+  assert.equal(waiter.lastReject?.code, REJECT_FULL);
+  assert.equal(waiter.world, undefined);
+  assert.equal(server.stats.admissionQueued, 0);
+  const frame = new Uint8Array(QUEUE_STATUS_BYTES);
+  writeQueueStatus(frame, { position: 1, waiting: 2, capacity: 3 });
+  assert.deepEqual(readQueueStatus(frame, { position: 0, waiting: 0, capacity: 0 }), {
+    position: 1,
+    waiting: 2,
+    capacity: 3,
+  });
+  frame[2] = 15;
+  assert.throws(() => readQueueStatus(frame, { position: 0, waiting: 0, capacity: 0 }), /version mismatch/u);
   server.close();
   assert.deepEqual(errors, []);
+
+  const oldErrors = [];
+  const oldServer = new MatchServer({ rosterSize: 2, onError: (error) => oldErrors.push(error) });
+  const oldSession = oldServer.createSession();
+  const closes = [];
+  oldSession.attach({
+    capabilities: { protocol: "in-memory", reliableStreams: true, datagrams: false, maxDatagramBytes: 0 },
+    sendReliable: async () => "sent",
+    trySendDatagram: async () => "closed",
+    close(code, reason) {
+      closes.push([code, reason]);
+      oldSession.onClose(code, reason);
+    },
+  });
+  const oldHello = new Uint8Array(HELLO_BYTES);
+  writeHello(oldHello, {
+    clientSalt: 1,
+    name: "v15",
+    resumeToken: new Uint8Array(RESUME_TOKEN_BYTES),
+    preferredTeam: 0,
+  });
+  oldHello[2] = 15;
+  oldSession.onReliable(TRANSPORT_CHANNEL_SESSION, oldHello);
+  await settleUntil(() => oldSession.closed, "old HELLO rejection");
+  assert.deepEqual(closes, [[4_003, "protocol error"]]);
+  assert.equal(oldServer.countHumans(), 0);
+  assert.match(String(oldErrors[0]), /version mismatch/u);
+  oldServer.close();
+});
+
+test("two reserved vacancies promote queued clients in FIFO order after grace expires", async () => {
+  const errors = [];
+  const server = new MatchServer({ rosterSize: 2, resumeGraceTicks: 1, onError: (error) => errors.push(error) });
+  const owners = [join(server, "owner-a", errors), join(server, "owner-b", errors)];
+  await settleUntil(() => owners.every((client) => client.state === "ready"), "FIFO owners");
+  let statusFrames = 0;
+  const first = join(server, "FIFO first", errors, {
+    onQueue: () => {
+      statusFrames += 1;
+    },
+  });
+  const second = join(server, "FIFO second", errors);
+  await settleUntil(() => first.state === "queued" && second.state === "queued", "FIFO waiters");
+  for (let index = 0; index < TICK_RATE * 5; index += 1) server.step();
+  assert.ok(statusFrames >= 2, "a quiet full roster refreshes the wait status before transport idleness");
+  owners.forEach((client) => client.close(1_001, "vacate reserved slot"));
+  assert.equal(server.stats.serverBots, 2);
+  for (let index = 0; index < 3; index += 1) server.step();
+  await settleUntil(() => first.state === "ready" && second.state === "ready", "FIFO promotions");
+  assert.deepEqual([first.playerId, second.playerId], [1, 2]);
+  assert.equal(server.stats.admissionQueued, 0);
+  assert.equal(server.stats.serverBots, 0);
+  assert.deepEqual(errors, []);
+  server.close();
+});
+
+test("a queued connection rejects control before welcome without blocking the next waiter", async () => {
+  const errors = [];
+  const server = new MatchServer({ rosterSize: 2, resumeGraceTicks: 1, onError: (error) => errors.push(error) });
+  const owners = [join(server, "owner-a", errors), join(server, "owner-b", errors)];
+  await settleUntil(() => owners.every((client) => client.state === "ready"), "control roster");
+  const violator = join(server, "queued-violator", errors);
+  const next = join(server, "queued-next", errors);
+  await settleUntil(() => violator.state === "queued" && next.state === "queued", "ordered queued HELLOs");
+  const control = new Uint8Array(CONTROL_BYTES);
+  writeControl(control, { action: CONTROL_SUICIDE, argument: 0 });
+  violator.session.onReliable(TRANSPORT_CHANNEL_CONTROL, control);
+  await settleUntil(() => violator.session.closed, "queued control rejection");
+  assert.equal(next.queueStatus.position, 1);
+  assert.equal(server.stats.admissionQueued, 1);
+  owners[0].close(1_001, "free reserved owner");
+  for (let index = 0; index < 3; index += 1) server.step();
+  await settleUntil(() => next.state === "ready", "next waiter promotion");
+  assert.match(String(errors[0]), /control message before hello/u);
+  assert.equal(errors.length, 1);
+  server.close();
 });
 
 test("a failed resumed welcome preserves the original grace deadline", async () => {
@@ -4295,21 +4508,20 @@ test("client close lifecycle reports a pre-welcome failure", () => {
   assert.deepEqual(closes, [{ code: 4_002, reason: "dial failed", state: "closed", welcomed: false }]);
 });
 
-test("a session may only move its own tank and the match refuses a ninth human", async () => {
+test("a session may only move its own tank while a full match queues a new human", async () => {
   const errors = [];
   const server = new MatchServer({ rosterSize: 2, onError: (error) => errors.push(error) });
   const alpha = join(server, "alpha", errors);
   const bravo = join(server, "bravo", errors);
-  const rejected = [];
-  const charlie = join(server, "charlie", errors, { onReject: (reject) => rejected.push({ ...reject }) });
+  const charlie = join(server, "charlie", errors);
   await settle();
   server.step();
   await settle();
   assert.equal(alpha.state, "ready");
   assert.equal(bravo.state, "ready");
-  assert.equal(charlie.state, "rejected");
-  assert.equal(rejected.length, 1);
-  assert.match(rejected[0].reason, /full/);
+  assert.equal(charlie.state, "queued");
+  assert.equal(charlie.queueStatus.position, 1);
+  assert.equal(charlie.world, undefined);
 
   // Alpha forges a packet claiming Bravo's slot and pushes it down its own
   // session. The server must refuse it rather than move somebody else's tank.
@@ -4531,25 +4743,22 @@ test("Deno WebTransport readiness failure closes and releases the pending receiv
   matchServer.close();
 });
 
-test("Deno WebTransport rejects a max-session connection without awaiting readiness", async () => {
+test("Deno WebTransport refuses an over-cap handshake synchronously without async upgrade work", async () => {
   const errors = [];
-  let closeCount = 0;
-  let closeOptions;
-  const failedSession = {
-    url: "https://war.invalid/at-capacity",
-    ready: new Promise(() => {}),
-    closed: Promise.resolve({}),
-    close(options) {
-      closeCount += 1;
-      closeOptions = options;
-    },
-  };
+  let refused = 0;
   const incomingInFlight = { accept: () => new Promise(() => {}) };
-  const incomingAtCapacity = { accept: async () => ({ id: 2 }) };
+  const excess = Array.from({ length: 1_000 }, () => ({
+    accept() {
+      throw new Error("over-cap incoming must not be accepted");
+    },
+    refuse() {
+      refused += 1;
+    },
+  }));
   const listener = {
     async *[Symbol.asyncIterator]() {
       yield incomingInFlight;
-      yield incomingAtCapacity;
+      for (const incoming of excess) yield incoming;
     },
   };
   const endpoint = {
@@ -4564,9 +4773,8 @@ test("Deno WebTransport rejects a max-session connection without awaiting readin
         return endpoint;
       }
     },
-    async upgradeWebTransport(connection) {
-      assert.equal(connection.id, 2);
-      return failedSession;
+    async upgradeWebTransport() {
+      throw new Error("over-cap incoming must not be upgraded");
     },
   };
   const server = DenoWebTransportServer.start({
@@ -4588,8 +4796,7 @@ test("Deno WebTransport rejects a max-session connection without awaiting readin
   });
   await server.completed;
   await settle();
-  assert.equal(closeCount, 1, "a rejected max-session handshake must close exactly once");
-  assert.deepEqual(closeOptions, { closeCode: 4_001, reason: "server session limit reached" });
+  assert.equal(refused, excess.length, "flooded handshakes must be refused without pending tasks");
   assert.equal(errors.length, 0);
   server.close();
 });

@@ -277,10 +277,16 @@ QUIC datagrams are unordered relative to the reliable admission stream. If a
 client's first input overtakes `WELCOME_ACK`, the server retains exactly the
 latest structurally valid input bundle in fixed storage and admits it only on
 the first authoritative tick after the acknowledgement is validated. It never
-executes pre-admission input and never grows a queue while admission is pending.
+executes pre-admission input. The separate, bounded server-authoritative
+admission queue is control-plane state: it holds up to 32 full-roster waiters,
+reports explicit FIFO positions, respects authenticated resume reservations,
+and promotes only when a slot is available. A waiting client neither starts a
+local solo match nor sends game inputs. Overflow and timeout are explicit
+rejections; disconnect removes the waiter and shifts following positions.
 
 **What is and is not proven.** The two-client match, the prediction agreeing with
-the server exactly, the reconciliation replay, the full-match refusal, the
+the server exactly, the reconciliation replay, bounded 16/32-player FIFO queue
+promotion/cancellation/timeout, the
 rejection of a packet claiming another player's slot, and the reliable control
 lane are covered by `test/core.test.mjs` over the in-memory transport. The
 separate `pnpm runtime:webtransport` gate opens a real loopback
@@ -305,6 +311,19 @@ endpoint and require `stats.inputsAccepted >= 3` plus the exact
 `transport=webtransport-h3-quic` and `inputLane=datagram`; these are mutually
 exclusive packaged observations, not labels copied from a standalone adapter
 harness.
+
+After a clean HTML5 Bob bundle, `pnpm runtime:browser:round-loop` is a
+repeatable loopback Deno + packaged Chrome + authoritative-bot check. It first
+recomputes the current gameplay bundle fingerprint and requires a matching
+anchored banner in the packaged HTML5 archive, refusing a stale bundle. The
+archive comparison tolerates Bob's bounded substitution of up to four hash
+characters, so it is a provenance guard, not cryptographic authentication of
+every archive byte. The
+server's loopback-only smoke flag advances one score after 30 accepted live
+inputs; the browser must observe the normal round-one countdown and a live
+round-two restart with a post-round-state authoritative keyframe over its actual WebTransport connection. This verifies the
+round transition transport and client presentation, not organically earned
+combat or hosted deployment. Never pass the smoke flag to a hosted server.
 
 To inspect the browser's input cadence while the main thread is busy, first
 build the HTML5 game bundle, then run
