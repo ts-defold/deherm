@@ -1,0 +1,5 @@
+{
+  "name": "bulwark-turret-directions-v2",
+  "operation": "direction-set",
+  "inputs": ["art/source/sprite-fusion/outputs/bulwark-turret-v2/01.png"]
+}

@@ -1,0 +1,12 @@
+{
+  "name": "frontier-hex-ash-earth-edge-v1",
+  "operation": "style-reference",
+  "size": 64,
+  "prompt": "A single walkable transition hex for a three-quarter-view volcanic frontier battlefield. Dry ochre dirt is invaded by charcoal ash and fine black cinders across the broad level top, with one or two restrained ember fissures and layered dark rock-and-earth sides. Match the reference tiles' six-sided footprint, upper-left light, chunky pixel clusters, and muted military palette. The dark part has a dark perimeter, no pale silver fringe. No character, tank, building, lettering, or other tile.",
+  "inputs": [
+    "art/source/sprite-fusion/outputs/frontier-hex-ochre-detail-v2/02.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-ochre-detail-v2/07.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-dark-ash-v3/00.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-dark-ash-v3/05.png"
+  ]
+}

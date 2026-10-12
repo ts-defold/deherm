@@ -1,0 +1,6 @@
+{
+  "name": "artillery-low-deck-directions-v3b",
+  "operation": "direction-set",
+  "size": 64,
+  "inputs": ["asset:62fc12b4-7275-4182-8e82-42deceb10ec4"]
+}

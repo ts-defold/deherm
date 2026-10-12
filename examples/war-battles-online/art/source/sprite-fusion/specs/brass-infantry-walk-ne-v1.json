@@ -1,0 +1,8 @@
+{
+  "name": "brass-infantry-walk-ne-v1",
+  "operation": "animate",
+  "inputs": ["asset:f3582fe4-3750-4f05-9ec7-2a521ba5ecbc"],
+  "prompt": "A quick grounded rear three-quarter walk cycle preserving this exact back-facing perspective, with alternating boot contact and a small opposite-arm swing. Brass remains an older stocky driver with an ochre cap, brass-rimmed goggles, cream scarf, olive mechanic jacket and compact sidearm held low. Keep palette, outline, proportions, and identity consistent. Seamless loop without turning toward the camera, jumping, or adding objects.",
+  "outputFrames": 4,
+  "colors": 24
+}

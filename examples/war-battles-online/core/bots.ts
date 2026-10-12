@@ -19,6 +19,7 @@ import {
   INPUT_BUTTON_FIRE,
   MAX_PICKUPS,
   MAX_PLAYERS,
+  PLAYER_RADIUS,
   PLAYER_MODE_INFANTRY,
   TILE_UNITS,
   VELOCITY_SCALE,
@@ -50,6 +51,8 @@ export interface BotDifficulty {
   readonly reactionTicks: number;
   /** Aim jitter, in 1/256ths of a right angle. */
   readonly aimError: number;
+  /** Additional persistent aim error per tile of range. */
+  readonly distanceAimErrorPerTile: number;
   /** Percentage of the correct target lead that is actually applied. */
   readonly leadAccuracy: number;
   /** Health-plus-armour percentage below which the bot disengages for a pad. */
@@ -72,6 +75,7 @@ export const BOT_DIFFICULTIES: readonly BotDifficulty[] = Object.freeze([
     name: "recruit",
     reactionTicks: 36,
     aimError: 120,
+    distanceAimErrorPerTile: 2,
     leadAccuracy: 0,
     retreatHealth: 25,
     trigger: 48,
@@ -84,6 +88,7 @@ export const BOT_DIFFICULTIES: readonly BotDifficulty[] = Object.freeze([
     name: "regular",
     reactionTicks: 24,
     aimError: 70,
+    distanceAimErrorPerTile: 2,
     leadAccuracy: 35,
     retreatHealth: 35,
     trigger: 105,
@@ -95,7 +100,8 @@ export const BOT_DIFFICULTIES: readonly BotDifficulty[] = Object.freeze([
     id: 2,
     name: "veteran",
     reactionTicks: 15,
-    aimError: 38,
+    aimError: 40,
+    distanceAimErrorPerTile: 1,
     leadAccuracy: 70,
     retreatHealth: 45,
     trigger: 165,
@@ -108,7 +114,8 @@ export const BOT_DIFFICULTIES: readonly BotDifficulty[] = Object.freeze([
     name: "nightmare",
     reactionTicks: 8,
     aimError: 16,
-    leadAccuracy: 95,
+    distanceAimErrorPerTile: 1,
+    leadAccuracy: 85,
     retreatHealth: 55,
     trigger: 225,
     fireCone: 246,
@@ -119,6 +126,11 @@ export const BOT_DIFFICULTIES: readonly BotDifficulty[] = Object.freeze([
 
 export function botDifficulty(id: number): BotDifficulty {
   return BOT_DIFFICULTIES[clamp(Math.trunc(id), 0, BOT_DIFFICULTIES.length - 1)]!;
+}
+
+/** Deterministic range handicap; long shots never become pixel-perfect. */
+export function botAimErrorBudget(skill: BotDifficulty, distanceUnits: number): number {
+  return Math.min(192, skill.aimError + Math.trunc(distanceUnits / TILE_UNITS) * skill.distanceAimErrorPerTile);
 }
 
 const GOAL_FIGHT = 0;
@@ -165,11 +177,21 @@ export class BotController {
   reset(): void {
     this.goal.fill(GOAL_FIGHT);
     this.goalTarget.fill(-1);
+    this.goalX.fill(0);
+    this.goalY.fill(0);
+    this.aimTargetX.fill(0);
+    this.aimTargetY.fill(0);
     this.decideAt.fill(-1);
+    this.strafeSign.fill(1);
+    this.avoidSign.fill(1);
     this.stuckTicks.fill(0);
+    this.routeX.fill(0);
+    this.routeY.fill(0);
     this.routeCost.fill(0);
     this.routeReplans.fill(0);
     this.routeFailures.fill(0);
+    this.lastX.fill(0);
+    this.lastY.fill(0);
   }
 
   routeCostFor(playerId: number): number {
@@ -241,7 +263,8 @@ export class BotController {
       if (normalizeInto(rawX, rawY, this.aim)) {
         // The bias is persistent for this reaction window. Easy bots commit to
         // a bad shot instead of receiving a fresh roll that converges on target.
-        const error = mixSigned(this.decideAt[slot]!, (slot + 1) * 0x9e37, skill.aimError);
+        const errorBudget = botAimErrorBudget(skill, distance);
+        const error = mixSigned(this.decideAt[slot]!, (slot + 1) * 0x9e37, errorBudget);
         // Nudge the aim sideways by the error, then renormalise: an integer
         // approximation of a small rotation, with no trigonometry.
         if (
@@ -499,6 +522,28 @@ export class BotController {
       this.move.x = 0;
       this.move.y = 0;
       return;
+    }
+
+    // Tank-size body contacts are expensive to predict from delayed remote
+    // snapshots. Give bots room to fight without steering through each other.
+    // This is ordinary input steering, not a client-only collision exemption.
+    const spacing = PLAYER_RADIUS * 4;
+    let repelX = 0;
+    let repelY = 0;
+    for (let other = 0; other < MAX_PLAYERS; other += 1) {
+      if (other === slot || world.playerActive[other] === 0 || world.playerHealth[other]! <= 0) continue;
+      const awayX = selfX - world.playerX[other]!;
+      const awayY = selfY - world.playerY[other]!;
+      const distanceSquared = awayX * awayX + awayY * awayY;
+      if (distanceSquared === 0 || distanceSquared >= spacing * spacing) continue;
+      const distance = length(awayX, awayY);
+      const strength = Math.trunc(((spacing - distance) * DIRECTION_SCALE * 3) / spacing);
+      repelX += Math.trunc((awayX * strength) / distance);
+      repelY += Math.trunc((awayY * strength) / distance);
+    }
+    if (!normalizeInto(this.move.x + repelX, this.move.y + repelY, this.move)) {
+      this.move.x = 0;
+      this.move.y = 0;
     }
 
     // Obstacle avoidance: probe ahead, and if the way is blocked commit to one

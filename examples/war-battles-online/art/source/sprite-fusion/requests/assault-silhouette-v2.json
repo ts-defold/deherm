@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_9b84a7ce-39b4-46dd-99f1-a3a0a628ed97",
+  "operation": "style-reference",
+  "prompt": "A medium assault tank for the same three-quarter isometric top-down arcade battlefield as the reference vehicle. Distinct broad low wedge hull, deep side skirts over stout tracks, two short heavy autocannon barrels on a forward compact turret, battered sloped front armor and rear exhaust stacks. Basalt-grey armor, warm cream highlights, restrained orange signal markings, dark readable outline. No visible driver, no face. Its aggressive mid-weight silhouette must differ clearly from the long-gun artillery reference.",
+  "size": 64,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/artillery-silhouette-v2/06.png",
+      "bytes": 6694,
+      "sha256": "35bc14823ff7bb405030a156a7f2bf267204d34c73c1b60cb98ac0b62e42928e"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/assault-silhouette-v2.json",
+    "sha256": "84f508c59f081095c68f5472a8892068dcf73e4023269b596c9efbdef2c5f310"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "8b7e5992-e6b4-48fd-8bdd-e1ce06367e09",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 71,
+      "height": 71,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/8b7e5992-e6b4-48fd-8bdd-e1ce06367e09/image.png?v=1791426534787",
+      "path": "art/source/sprite-fusion/outputs/assault-silhouette-v2/00.png",
+      "bytes": 8999,
+      "sha256": "d6ab063a8dcbcf72f16b5bcb25107869671850817d1e8c42f94830ea081aa92b"
+    },
+    {
+      "index": 1,
+      "assetId": "13083721-116b-4169-b0eb-e5aa6484e5a7",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 73,
+      "height": 73,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/13083721-116b-4169-b0eb-e5aa6484e5a7/image.png?v=1791426535369",
+      "path": "art/source/sprite-fusion/outputs/assault-silhouette-v2/01.png",
+      "bytes": 8696,
+      "sha256": "923d0a472dd28f46000b0c8c00956a9b5c0e9787dd2110b6db3043b4a862432e"
+    },
+    {
+      "index": 2,
+      "assetId": "89b02710-25f9-43ef-a4c6-40ec8248cfbc",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 83,
+      "height": 83,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/89b02710-25f9-43ef-a4c6-40ec8248cfbc/image.png?v=1791426535866",
+      "path": "art/source/sprite-fusion/outputs/assault-silhouette-v2/02.png",
+      "bytes": 10408,
+      "sha256": "90bf79e453efba966933a8956cbd4598d07baecf1832be979f1e1330a67f2322"
+    },
+    {
+      "index": 3,
+      "assetId": "0677b99c-af0f-499b-be40-93a11ec83e12",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 73,
+      "height": 73,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/0677b99c-af0f-499b-be40-93a11ec83e12/image.png?v=1791426536442",
+      "path": "art/source/sprite-fusion/outputs/assault-silhouette-v2/03.png",
+      "bytes": 9185,
+      "sha256": "119efe1362179c23565672c38dce5adc1fc83cfbf533bec066bf8a591d23f594"
+    },
+    {
+      "index": 4,
+      "assetId": "f603cd82-416a-455d-867b-915fbe065761",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 78,
+      "height": 78,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/f603cd82-416a-455d-867b-915fbe065761/image.png?v=1791426536921",
+      "path": "art/source/sprite-fusion/outputs/assault-silhouette-v2/04.png",
+      "bytes": 9586,
+      "sha256": "7c754f081c9e3a3ec32f2e167b74a93a6314d0a77c90a7ac16afe9bfee63192b"
+    },
+    {
+      "index": 5,
+      "assetId": "66b4c015-8c84-4b85-a957-7fe4eca6892f",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 78,
+      "height": 78,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/66b4c015-8c84-4b85-a957-7fe4eca6892f/image.png?v=1791426537435",
+      "path": "art/source/sprite-fusion/outputs/assault-silhouette-v2/05.png",
+      "bytes": 10650,
+      "sha256": "7d471baa4a79bb0e90a69bbc5c5e6afeea0690fafa1793a3c9c2f0aa298c7f6c"
+    },
+    {
+      "index": 6,
+      "assetId": "0ba5899f-dd36-4a82-bcda-5bbb536fa458",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 70,
+      "height": 70,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/0ba5899f-dd36-4a82-bcda-5bbb536fa458/image.png?v=1791426537936",
+      "path": "art/source/sprite-fusion/outputs/assault-silhouette-v2/06.png",
+      "bytes": 8706,
+      "sha256": "274b716e6f7bb330c20ebaf7decd6633a8f94655b4334b78afd6789d701dcf5d"
+    },
+    {
+      "index": 7,
+      "assetId": "8b8ca38b-258b-4825-9106-5bb1852b97af",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 83,
+      "height": 83,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/8b8ca38b-258b-4825-9106-5bb1852b97af/image.png?v=1791426538444",
+      "path": "art/source/sprite-fusion/outputs/assault-silhouette-v2/07.png",
+      "bytes": 10238,
+      "sha256": "0ec904e1804c681bd329c77a62f80e43f85815cf38130ba9e562c20d2c6602cd"
+    },
+    {
+      "index": 8,
+      "assetId": "2dd0491e-5480-4206-9542-f8477585dcf2",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 83,
+      "height": 83,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/2dd0491e-5480-4206-9542-f8477585dcf2/image.png?v=1791426538935",
+      "path": "art/source/sprite-fusion/outputs/assault-silhouette-v2/08.png",
+      "bytes": 10843,
+      "sha256": "959e19798f500de81238e841ee8a28f82c95f769291763242c65f5441940eb3a"
+    }
+  ],
+  "credits": {
+    "remaining": 2625
+  }
+}

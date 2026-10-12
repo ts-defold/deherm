@@ -1,0 +1,12 @@
+{
+  "name": "frontier-hex-ash-detail-v2",
+  "operation": "style-reference",
+  "size": 64,
+  "prompt": "A single walkable volcanic ash hex for a three-quarter-view tank battlefield. Dark graphite stone plates and charcoal cinders, with a few narrow molten orange fractures and chipped light-gray edges; short layered basalt side face. Heat stays in small cracks, with a large calm dark top that keeps tank silhouettes readable. Match the reference tiles' six-sided footprint, upper-left light, and chunky pixel clusters. No character, vehicle, building, lettering, or other tile.",
+  "inputs": [
+    "art/source/sprite-fusion/outputs/frontier-hex-ash-ridge-v1/00.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-lava-fracture-v1/01.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-basalt-ash-edge-v1/03.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-basalt-cliff-v1/04.png"
+  ]
+}

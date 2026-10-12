@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_0413405d-7cba-40a8-8d82-ed31242250be",
+  "operation": "animate",
+  "prompt": "A quick grounded north-facing rear walk cycle with alternating boot contact and a small opposite-arm swing. Spark remains a young tan-skinned mechanic with short spiky black hair, orange headband, raised brass goggles, teal collar, olive jacket and compact sidearm held low. Keep his exact source perspective, palette, outline, proportions, and identity consistent. Seamless loop without turning, jumping, or adding objects.",
+  "size": null,
+  "outputFrames": 4,
+  "colors": 24,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "87d80106-24e9-476d-a3c2-885d6249c13e"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/spark-infantry-walk-n-v1.json",
+    "sha256": "7167e8683fd56b748ec33bcef6850081c78b66c5667b2678f27b613d987c9775"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "08a6990f-1f3a-414d-99b9-a3eb7f76645e",
+      "type": "animation",
+      "contentType": "image/webp",
+      "width": 28,
+      "height": 43,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/08a6990f-1f3a-414d-99b9-a3eb7f76645e/animation.webp?v=1791526673056",
+      "path": "art/source/sprite-fusion/outputs/spark-infantry-walk-n-v1/00.webp",
+      "bytes": 1848,
+      "sha256": "e53eefd027dac465f09898d4186a8f06d1347d7ffe298e34f5d46fe80f026949",
+      "spritesheet": {
+        "url": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/08a6990f-1f3a-414d-99b9-a3eb7f76645e/spritesheet.png?v=1791526673056",
+        "path": "art/source/sprite-fusion/outputs/spark-infantry-walk-n-v1/00-sheet.png",
+        "bytes": 1645,
+        "sha256": "b45a139c7353dd9ea86853de6ec404085f77c545c061286ba8ff937cc204f6d0"
+      },
+      "frameCount": 4,
+      "fps": 8
+    }
+  ],
+  "credits": {
+    "remaining": 1365
+  }
+}

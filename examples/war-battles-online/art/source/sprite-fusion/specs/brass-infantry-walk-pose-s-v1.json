@@ -1,0 +1,6 @@
+{
+  "name": "brass-infantry-walk-pose-s-v1",
+  "operation": "edit",
+  "inputs": ["asset:dba1137a-d8a2-42a7-b513-475e8b719ec9"],
+  "prompt": "Change only Brass's body pose to a grounded front-facing walk mid-stride toward the viewer: one boot forward, the other planted, opposite arm swinging, compact sidearm low. Preserve his full white beard and moustache, brass-rimmed goggles, ochre leather cap, cream scarf, olive mechanic jacket, stocky build, original colors, outlines, and exact front viewing angle. No turn, extra person, platform, text, or scenery."
+}

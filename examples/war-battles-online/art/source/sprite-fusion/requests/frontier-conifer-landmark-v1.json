@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_4a9c3616-36a2-4032-875f-dc7d91de7b37",
+  "operation": "style-reference",
+  "prompt": "One compact but lush conifer tree for a three-quarter isometric arcade tank battlefield. Layered deep-green boughs with warm sunlit tips, sturdy dark trunk, a few roots and small tan rocks at the foot. The trunk has a clear single ground contact point and the canopy is uneven and natural, not a symmetric triangle. Match the references' chunky outlined pixel clusters and earthy olive, basalt, and cream palette. A free-standing tree silhouette, not a hexagonal tile or raised platform; no vehicle, text, UI, or scene background.",
+  "size": 96,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "defold/assets/derived/arena/hex-cliff-9.png",
+      "bytes": 8009,
+      "sha256": "47917790c62a0cbdf0500f2dd2aa3d094abd55946d870c42aab283173b61d7ea"
+    },
+    {
+      "kind": "file",
+      "path": "defold/assets/derived/arena/landmark-rock-outcrop.png",
+      "bytes": 16062,
+      "sha256": "39c8c0b2193accd9266a9ac0089163f7a33a6f79b4a6b6237c8ceed85fb440cc"
+    },
+    {
+      "kind": "file",
+      "path": "defold/assets/derived/arena/cover-sandbag-a.png",
+      "bytes": 1686,
+      "sha256": "30dbdf1faefbe70d371cae284bcacfe8417ab151ee10786908117cea6a2716ba"
+    },
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-v1/00.png",
+      "bytes": 5740,
+      "sha256": "03ec5ccd9edcaf750e89400e9c1fe911128666059710d66a7fb0e82069d29f1a"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/frontier-conifer-landmark-v1.json",
+    "sha256": "10390d216fd5d8d54ad2dfa1a5ef8ab4c15363e1b84f57bf90ffcba025aab648"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "32dd1a8f-f217-464b-846b-fd35b1f117ba",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 96,
+      "height": 96,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/32dd1a8f-f217-464b-846b-fd35b1f117ba/image.png?v=1791428524527",
+      "path": "art/source/sprite-fusion/outputs/frontier-conifer-landmark-v1/00.png",
+      "bytes": 6033,
+      "sha256": "9c811d2a831d5400b14674a916c5eaf4082235f6dd0ef22cbd05e2d7bc042b9d"
+    },
+    {
+      "index": 1,
+      "assetId": "a5def02e-90f2-483e-8103-ee5769e2c2e2",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 96,
+      "height": 96,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/a5def02e-90f2-483e-8103-ee5769e2c2e2/image.png?v=1791428525076",
+      "path": "art/source/sprite-fusion/outputs/frontier-conifer-landmark-v1/01.png",
+      "bytes": 6390,
+      "sha256": "a8d1fba838dd907ff6a700d01e719977bf1f249aa75bc7e27f7461f7e4c902ee"
+    },
+    {
+      "index": 2,
+      "assetId": "1a30b3b4-2e0e-45c0-b8b8-e6ee6b75285d",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 96,
+      "height": 96,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/1a30b3b4-2e0e-45c0-b8b8-e6ee6b75285d/image.png?v=1791428525654",
+      "path": "art/source/sprite-fusion/outputs/frontier-conifer-landmark-v1/02.png",
+      "bytes": 6297,
+      "sha256": "d04510c0082bbc1785d6bea34b4b5ab6d7488e65c52caae923634c51df14ea21"
+    },
+    {
+      "index": 3,
+      "assetId": "3a2573fb-3b85-4387-80b0-a0783e9e00ca",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 96,
+      "height": 96,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/3a2573fb-3b85-4387-80b0-a0783e9e00ca/image.png?v=1791428526160",
+      "path": "art/source/sprite-fusion/outputs/frontier-conifer-landmark-v1/03.png",
+      "bytes": 6129,
+      "sha256": "0c13e0f00f14801a420efbfa9f425acc643ebe0e9d03b65979d2b315e1610068"
+    },
+    {
+      "index": 4,
+      "assetId": "11f25fdc-1b8a-4864-8793-9829114ce4a3",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 96,
+      "height": 96,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/11f25fdc-1b8a-4864-8793-9829114ce4a3/image.png?v=1791428526651",
+      "path": "art/source/sprite-fusion/outputs/frontier-conifer-landmark-v1/04.png",
+      "bytes": 7066,
+      "sha256": "e3ad78cc843a92789b03d975b11ca3ae94a8a849b610935f5c59ca2702fabee3"
+    },
+    {
+      "index": 5,
+      "assetId": "918c53d2-2072-43f6-9c1e-532a350cfced",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 96,
+      "height": 96,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/918c53d2-2072-43f6-9c1e-532a350cfced/image.png?v=1791428527158",
+      "path": "art/source/sprite-fusion/outputs/frontier-conifer-landmark-v1/05.png",
+      "bytes": 7315,
+      "sha256": "9c0411bd6e146cc1c8f674bbda359f87ae397e5032633b8c8d21917feefd423a"
+    },
+    {
+      "index": 6,
+      "assetId": "5ab0b87c-3ac6-4677-9965-9880f6595e0b",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 96,
+      "height": 96,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/5ab0b87c-3ac6-4677-9965-9880f6595e0b/image.png?v=1791428527691",
+      "path": "art/source/sprite-fusion/outputs/frontier-conifer-landmark-v1/06.png",
+      "bytes": 7110,
+      "sha256": "dcf27cf15b33cdd442c2bbbe0fd6fdda3c78aebccd4b1449eb9a9152d2b9615b"
+    },
+    {
+      "index": 7,
+      "assetId": "92655a44-0390-4a59-aeb1-97ce57e9bbc9",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 96,
+      "height": 96,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/92655a44-0390-4a59-aeb1-97ce57e9bbc9/image.png?v=1791428528247",
+      "path": "art/source/sprite-fusion/outputs/frontier-conifer-landmark-v1/07.png",
+      "bytes": 6472,
+      "sha256": "ad3dc0729dbe078d4b0d42e4befc24a79a230eb92618940031c8fa6660a32405"
+    },
+    {
+      "index": 8,
+      "assetId": "bd58e500-5560-4b8f-8597-ce7c2a5b15e8",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 96,
+      "height": 96,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/bd58e500-5560-4b8f-8597-ce7c2a5b15e8/image.png?v=1791428528889",
+      "path": "art/source/sprite-fusion/outputs/frontier-conifer-landmark-v1/08.png",
+      "bytes": 7634,
+      "sha256": "6aca57b10616f99a54b3231db5169bcc3241030a0543ea971bb410cf02f76a33"
+    }
+  ],
+  "credits": {
+    "remaining": 2520
+  }
+}

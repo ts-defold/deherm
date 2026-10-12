@@ -33,7 +33,7 @@ export const REQUIRED_MARKERS = Object.freeze([
   RUNTIME_PROFILE_MARKER_PREFIX,
   "INFO:DEFOLD_HERMES: Loaded TypeScript bundle generation 1 from '/deherm/app.dehermc'",
   "INFO:DEFOLD_HERMES: war-battles:camera-init:zoom=2.00:view=640x360:cameras=1",
-  "INFO:DEFOLD_HERMES: war-battles:camera-bounds:x=[-235.9,1531.9]:y=[-142.0,878.0]",
+  "INFO:DEFOLD_HERMES: war-battles:camera-bounds:x=[-235.9,1531.9]:y=[-152.0,888.0]",
   "INFO:DEFOLD_HERMES: war-battles:ui-init",
   "INFO:DEFOLD_HERMES: war-battles:player-init:648.0:368.0",
   "INFO:DEFOLD_HERMES: war-battles:player-fire:648.0:368.0:1.00:0.00",
@@ -43,8 +43,8 @@ export const REQUIRED_MARKERS = Object.freeze([
   // The scripted demonstration ends by handing the scene to the arena, which
   // creates the roster, the turrets and the pickup pads. Observing the engage
   // marker is what distinguishes "the tutorial loop ran" from "the game started".
-  "INFO:DEFOLD_HERMES: war-battles:arena-init:players=8:online=0",
-  "INFO:DEFOLD_HERMES: war-battles:arena-engaged:players=8:skill=2:seed=1463898690:mode=offline",
+  "INFO:DEFOLD_HERMES: war-battles:arena-init:players=16:online=0",
+  "INFO:DEFOLD_HERMES: war-battles:arena-engaged:players=16:skill=2:seed=1463898690:mode=offline",
   "INFO:DEFOLD_HERMES: Extension update entered (application initialized: false)",
 ]);
 

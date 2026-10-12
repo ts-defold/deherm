@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_80dfc4e9-5275-44b4-be9e-55433714e7d4",
+  "operation": "animate",
+  "prompt": "A grounded north-facing rear walk loop with alternating boot contact and a small opposite-arm swing. Preserve Mud's ochre helmet, dark respirator, orange goggles, rust scarf, olive jacket, compact sidearm, proportions, colors, and rear view. Keep the complete helmet, boots, sidearm, and arms inside the canvas throughout the motion.",
+  "size": null,
+  "outputFrames": 4,
+  "colors": 24,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/inputs/mud-infantry-walk-pose-n-v1-0-padded-64.png",
+      "bytes": 1695,
+      "sha256": "6da25909533db7eb96cebac2778298468d2405973cfc3f26977d9ceeb21a3212"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/mud-infantry-walk-n-padded-v2.json",
+    "sha256": "3ba0b6c3ad379de4b967d4cc475fbf3a97820adf4a425c70bc767f9b28747269"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "6edb92cf-6243-406f-85d9-c30f6d7d4bee",
+      "type": "animation",
+      "contentType": "image/webp",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/6edb92cf-6243-406f-85d9-c30f6d7d4bee/animation.webp?v=1791566045754",
+      "path": "art/source/sprite-fusion/outputs/mud-infantry-walk-n-padded-v2/00.webp",
+      "bytes": 1668,
+      "sha256": "4456365c0f1256bf1e300ef373d80006f1c1245150b632c37f869f05f98d8a27",
+      "spritesheet": {
+        "url": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/6edb92cf-6243-406f-85d9-c30f6d7d4bee/spritesheet.png?v=1791566045754",
+        "path": "art/source/sprite-fusion/outputs/mud-infantry-walk-n-padded-v2/00-sheet.png",
+        "bytes": 1802,
+        "sha256": "5e0596dfc30e74e6133e02d7d52cde26a4a10cf9c17e2561659429957f1a48a2"
+      },
+      "frameCount": 4,
+      "fps": 8
+    }
+  ],
+  "credits": {
+    "remaining": 30
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_aa8539a5-eee1-443a-b481-45bdf0b8c0bc",
+  "operation": "animate",
+  "prompt": "A quick grounded right-facing side view, later flipped for west walk cycle with alternating boot contact and a small opposite-arm swing. Spark remains a young tan-skinned mechanic with short spiky black hair, orange headband, raised brass goggles, teal collar, olive jacket and compact sidearm held low. Keep his exact source perspective, palette, outline, proportions, and identity consistent. Seamless loop without turning, jumping, or adding objects.",
+  "size": null,
+  "outputFrames": 4,
+  "colors": 24,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "f6763fd4-7fee-45dc-9335-63ba5876ff4c"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/spark-infantry-walk-w-v1.json",
+    "sha256": "3b9572faebaf9523c63200b4f2710f7f64f17c899c9bac1ce6868791a83b34b4"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "e6f83100-6d79-46cf-836a-389bb98671b8",
+      "type": "animation",
+      "contentType": "image/webp",
+      "width": 27,
+      "height": 48,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/e6f83100-6d79-46cf-836a-389bb98671b8/animation.webp?v=1791526514207",
+      "path": "art/source/sprite-fusion/outputs/spark-infantry-walk-w-v1/00.webp",
+      "bytes": 2018,
+      "sha256": "bd740b7e68802a8489e66df23c4a3a9e4461680ce8b7a747fa81561d1118df09",
+      "spritesheet": {
+        "url": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/e6f83100-6d79-46cf-836a-389bb98671b8/spritesheet.png?v=1791526514207",
+        "path": "art/source/sprite-fusion/outputs/spark-infantry-walk-w-v1/00-sheet.png",
+        "bytes": 1819,
+        "sha256": "6d1d56a01a69cc086137d6e785414cc5d2e27aee0e64b3eb04c6fac3dd86da3b"
+      },
+      "frameCount": 4,
+      "fps": 8
+    }
+  ],
+  "credits": {
+    "remaining": 1410
+  }
+}

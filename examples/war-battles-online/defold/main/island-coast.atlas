@@ -1,0 +1,7 @@
+animations {
+  id: "island-coast"
+  images {
+    image: "/assets/derived/world/island-coast.png"
+  }
+}
+extrude_borders: 2

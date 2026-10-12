@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_a41d45d9-fd03-4692-bbc9-e14576bacd22",
+  "operation": "edit",
+  "prompt": "Change only Rook's body pose to a grounded northeast-facing three-quarter rear walk mid-stride: front boot stepping, rear boot planted, opposite arm swinging, compact sidearm still held low. Keep her exact ochre helmet, cream scarf, olive jacket, colors, outline, proportions, and rear three-quarter perspective. Do not turn her toward the camera or add a prop, platform, text, scenery, or second person.",
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "fc8f57a6-40c6-437a-8414-cbb73739aca5"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/rook-infantry-walk-pose-ne-v1.json",
+    "sha256": "2856be6b73db81b26d2de5a13b9e59d279a5836a220e7484b7ed20a7d8085b68"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "66bd12c9-b32e-4a4e-a987-78578fd18044",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 34,
+      "height": 41,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/66bd12c9-b32e-4a4e-a987-78578fd18044/image.png?v=1791522193912",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-walk-pose-ne-v1/00.png",
+      "bytes": 3225,
+      "sha256": "a44ff5f249602fa98cfc3fe94acce2e8aca69db072c4fd4d79db0578f1a4f1b4"
+    },
+    {
+      "index": 1,
+      "assetId": "0aafb9e2-d118-4c72-b68f-f2498a544966",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 26,
+      "height": 39,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/0aafb9e2-d118-4c72-b68f-f2498a544966/image.png?v=1791522195026",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-walk-pose-ne-v1/01.png",
+      "bytes": 2611,
+      "sha256": "81e44465e7642ce15ac04b3c85fd9a0e0bcbcc9650ebcdbf075e5a475e21bd7e"
+    }
+  ],
+  "credits": {
+    "remaining": 1995
+  }
+}

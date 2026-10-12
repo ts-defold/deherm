@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "provider": "OpenAI image generation",
+  "purpose": "War Battles Online destructible world-space cover",
+  "projection": "orthographic isometric",
+  "sprites": {
+    "cover-sandbag-a": {
+      "source": "sandbags.png",
+      "sha256": "f961ae6825b021d5d431e7cf784a12260ca7e6d29072b21367be323ba110bb42",
+      "dimensions": [1536, 1024],
+      "cut": [490, 320, 430, 410],
+      "downsample": 16,
+      "outputCell": [36, 32],
+      "groundLine": 29
+    },
+    "cover-sandbag-b": {
+      "source": "sandbags.png",
+      "sha256": "f961ae6825b021d5d431e7cf784a12260ca7e6d29072b21367be323ba110bb42",
+      "dimensions": [1536, 1024],
+      "cut": [865, 450, 450, 330],
+      "downsample": 16,
+      "outputCell": [36, 32],
+      "groundLine": 29
+    },
+    "cover-crate": {
+      "source": "crate.png",
+      "sha256": "c9589dbc50f37286477314df4173bed0b3d0ec8d3106ddbd93f389f87629c543",
+      "dimensions": [1254, 1254],
+      "cut": [180, 170, 930, 950],
+      "downsample": 27,
+      "outputCell": [40, 40],
+      "groundLine": 38
+    }
+  },
+  "cutRule": "Explicit per-sprite crops; nearest-neighbor downsample; hard alpha threshold; bottom registration into padded runtime cells.",
+  "license": "Project-generated asset; see repository licensing and provenance policy."
+}

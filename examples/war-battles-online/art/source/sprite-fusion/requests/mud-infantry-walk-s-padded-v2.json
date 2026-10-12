@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_655a5670-85a9-4fce-9e8a-920e0f6fbe4a",
+  "operation": "animate",
+  "prompt": "A grounded south-facing walk loop with alternating boots and opposite-arm swing. Preserve Mud's hood, dark visor, red scarf, compact sidearm, proportions, palette, and front view. Keep the complete character inside the canvas through the motion.",
+  "size": null,
+  "outputFrames": 4,
+  "colors": 24,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/inputs/mud-infantry-walk-pose-s-v1-1-padded-64.png",
+      "bytes": 2555,
+      "sha256": "90fb7d1e8aa730e3ffc4a27ab964ad1149a6481e0f1adf3b77b8f9138b970070"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/mud-infantry-walk-s-padded-v2.json",
+    "sha256": "e9873fd71bd8d8c0088fe98027ff40d5234729464b07d1911689fc86e8378303"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "4fd41a64-8e2e-4ff4-9ed6-1ff9384e3a43",
+      "type": "animation",
+      "contentType": "image/webp",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/4fd41a64-8e2e-4ff4-9ed6-1ff9384e3a43/animation.webp?v=1791548202808",
+      "path": "art/source/sprite-fusion/outputs/mud-infantry-walk-s-padded-v2/00.webp",
+      "bytes": 2188,
+      "sha256": "520486d31644a7dde9c2275595b6208f52f7ffb33ff9ccac29294541382ebc04",
+      "spritesheet": {
+        "url": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/4fd41a64-8e2e-4ff4-9ed6-1ff9384e3a43/spritesheet.png?v=1791548202808",
+        "path": "art/source/sprite-fusion/outputs/mud-infantry-walk-s-padded-v2/00-sheet.png",
+        "bytes": 2467,
+        "sha256": "019dcd9e17edc6d27e5d2f5aa028973e5899dc0d8b532ca31dd0d410cde3b536"
+      },
+      "frameCount": 4,
+      "fps": 8
+    }
+  ],
+  "credits": {
+    "remaining": 210
+  }
+}

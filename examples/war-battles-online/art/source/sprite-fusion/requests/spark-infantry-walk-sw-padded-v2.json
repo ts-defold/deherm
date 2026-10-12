@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_e5377c60-ed38-4727-8217-646b356a2c45",
+  "operation": "animate",
+  "prompt": "A grounded southwest-facing walk loop with alternating boot contact and opposite-arm swing. Preserve Spark's blue-orange goggles, dark cap, orange scarf, blue jacket, slim silhouette, low sidearm, palette, and exact three-quarter front view. Keep the full character and equipment inside every frame with clear room on all sides.",
+  "size": null,
+  "outputFrames": 4,
+  "colors": 24,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/inputs/spark-infantry-walk-pose-sw-v1-1-padded-80.png",
+      "bytes": 3383,
+      "sha256": "e03891d733846c84a80edf696aab41ca860dea1110eeec533c01f78cd2eede1c"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/spark-infantry-walk-sw-padded-v2.json",
+    "sha256": "b78be0d607b3a9af3fe7a261b552de675313b04a838ab722e5e1f115156cf1c9"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "90e8c5c7-c73d-4bf8-a801-6a1df375ad14",
+      "type": "animation",
+      "contentType": "image/webp",
+      "width": 80,
+      "height": 80,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/90e8c5c7-c73d-4bf8-a801-6a1df375ad14/animation.webp?v=1791564260308",
+      "path": "art/source/sprite-fusion/outputs/spark-infantry-walk-sw-padded-v2/00.webp",
+      "bytes": 2578,
+      "sha256": "dc1b926a83385a79118adfa0cd9c6fbbd0d9b3843183377ae043c01370c8ac7c",
+      "spritesheet": {
+        "url": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/90e8c5c7-c73d-4bf8-a801-6a1df375ad14/spritesheet.png?v=1791564260308",
+        "path": "art/source/sprite-fusion/outputs/spark-infantry-walk-sw-padded-v2/00-sheet.png",
+        "bytes": 3391,
+        "sha256": "a8a513523c6d373f2b67d20ebec5006c0aed00a1a7beed9b12ef3136ebb46ff7"
+      },
+      "frameCount": 4,
+      "fps": 8
+    }
+  ],
+  "credits": {
+    "remaining": 45
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "brass-infantry-death-pose-e-v1",
+  "operation": "edit",
+  "inputs": ["asset:70f82057-5070-454b-a96f-67bee71794c5"],
+  "prompt": "Keep Brass in the exact same side-on east-facing view as this input. Change him into a clearly defeated collapsed pose: one heavy knee on the ground, torso and brown helmet bowed low forward, one hand braced on the ground, sidearm lowered, silhouette shorter and wider than standing. Preserve his older stocky identity, white beard profile, goggles, cream scarf, olive jacket, boots and knee on one ground line, colors and dark outline. No perspective turn, blood, injury detail, explosion, extra prop, scenery, platform, text, or second person."
+}

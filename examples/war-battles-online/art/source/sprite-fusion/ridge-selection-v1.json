@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "kind": "war-battles.meadow-ridge-selection",
+  "disposition": "retired-source",
+  "request": "frontier-meadow-ridge-v1",
+  "requestId": "req_cf9fdcd0-51c2-4e40-ab02-d2057b8ab57b",
+  "variants": [
+    { "index": 0, "assetId": "e8609972-9dc2-41c8-8e3a-c6bdafe9be51", "role": "high three-lobe escarpment" },
+    { "index": 2, "assetId": "6c190501-8906-4447-8ed8-36edd167a86d", "role": "low extended escarpment" },
+    { "index": 8, "assetId": "13f6ad91-71f4-465b-b70d-4934279183d0", "role": "broken stepped escarpment" }
+  ],
+  "outputCell": [160, 128],
+  "groundLine": 120,
+  "orientations": ["wide", "tall-mirrored"],
+  "reason": "The pinned request and selected variants are retained for provenance, but their thin raised plateau silhouettes looked like floating tiles in the playable game. Ground-seated rock and scrap cover replaced this runtime family; no ridge output is generated or packaged."
+}

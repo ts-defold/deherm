@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_372f60b2-dddf-4610-bec2-6723431d9a3f",
+  "operation": "animate",
+  "prompt": "A grounded west-facing walk loop with alternating boot contact and a small opposite-arm swing. Preserve Mud's gas-mask helmet, orange eye lenses, scarf, compact backpack, olive fatigues, low sidearm, silhouette, palette, and exact side view. Keep the complete character and equipment inside every frame with visible space around the head, boots, and both sides.",
+  "size": null,
+  "outputFrames": 4,
+  "colors": 24,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/inputs/mud-infantry-walk-pose-w-v1-0-padded-64.png",
+      "bytes": 2352,
+      "sha256": "a529d0b22f18752e65fadbe38f220f9a5e2c4f4c92e707f84de39cebb11afcfb"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/mud-infantry-walk-w-padded-v2.json",
+    "sha256": "2961b5634fdeb52e53391a7692f3be0b8971b4f5e9eeef35d51d5e9ffc579fc2"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "f2faad47-2de3-427a-8a69-5a9816d93cc9",
+      "type": "animation",
+      "contentType": "image/webp",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/f2faad47-2de3-427a-8a69-5a9816d93cc9/animation.webp?v=1791564221476",
+      "path": "art/source/sprite-fusion/outputs/mud-infantry-walk-w-padded-v2/00.webp",
+      "bytes": 1996,
+      "sha256": "1e6dce7e2bc980bf6f6bc349e18e3b7c88257132bd89f6ad6aacb5e09a0c6590",
+      "spritesheet": {
+        "url": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/f2faad47-2de3-427a-8a69-5a9816d93cc9/spritesheet.png?v=1791564221476",
+        "path": "art/source/sprite-fusion/outputs/mud-infantry-walk-w-padded-v2/00-sheet.png",
+        "bytes": 2100,
+        "sha256": "c68c8a5cf447b4fa4bfb64b9152d054accd5dfd784506f4cf9f406f22dfc01ab"
+      },
+      "frameCount": 4,
+      "fps": 8
+    }
+  ],
+  "credits": {
+    "remaining": 60
+  }
+}

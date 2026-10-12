@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_13bd51d3-0660-4502-8192-e4d4ff407b08",
+  "operation": "edit",
+  "prompt": "Remove only the raised rotating turret and gun from this medium assault tank. Preserve its angular wedge hull, broad side-skirt armor, twin exposed track assemblies, orange signal marks, exact isometric view, palette, outline and ground contact. Finish the top deck with a visible dark circular turret socket. One isolated assault hull, no weapon.",
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/assault-silhouette-v2/02.png",
+      "bytes": 10408,
+      "sha256": "90bf79e453efba966933a8956cbd4598d07baecf1832be979f1e1330a67f2322"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/assault-hull-v2.json",
+    "sha256": "2662ab539bccf90ae587052a79ab778266184de246ce2f647bb9ce868e699332"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "6d12b626-127e-407b-876d-b60ba2880d68",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 83,
+      "height": 69,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/6d12b626-127e-407b-876d-b60ba2880d68/image.png?v=1791432348977",
+      "path": "art/source/sprite-fusion/outputs/assault-hull-v2/00.png",
+      "bytes": 9741,
+      "sha256": "ba950b2e9a81f9748a347414d59a50d2f4f7a3af4f76ffc9962976d4a6ba6c4f"
+    },
+    {
+      "index": 1,
+      "assetId": "06b44f12-2ceb-46db-a408-f8adafc73d3b",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 69,
+      "height": 48,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/06b44f12-2ceb-46db-a408-f8adafc73d3b/image.png?v=1791432350105",
+      "path": "art/source/sprite-fusion/outputs/assault-hull-v2/01.png",
+      "bytes": 5411,
+      "sha256": "714ad1ac1a689af38c4d9ec314023576201e67a4ca6d2cca4fb2b93b7feb9b10"
+    }
+  ],
+  "credits": {
+    "remaining": 2445
+  }
+}

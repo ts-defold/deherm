@@ -56,6 +56,18 @@ export function isometricDepth(worldX: number, worldY: number): number {
   return (worldX + worldY - minimum) / span;
 }
 
+/**
+ * One painter-order band for every grounded world sprite. The contact point,
+ * not the sprite's tall visual bounds or cosmetic lift, decides its depth.
+ * Defold draws larger Z in front. Screen Y grows toward the back of this
+ * isometric world, so front/low-foot objects must receive larger Z values.
+ * Tiny biases only break ties at the same contact point (turret over hull,
+ * landmark over supporting cliff); a meaningful screen-Y move wins over them.
+ */
+export function isometricSortZ(worldX: number, worldY: number, bias = 0): number {
+  return 0.56 - isometricDepth(worldX, worldY) * 0.38 + bias;
+}
+
 /** Presentation-only ballistic lift over an authoritative flat trajectory. */
 export function isometricArcHeight(remainingTicks: number, totalTicks: number, apexPixels: number): number {
   if (totalTicks <= 0 || apexPixels <= 0) return 0;

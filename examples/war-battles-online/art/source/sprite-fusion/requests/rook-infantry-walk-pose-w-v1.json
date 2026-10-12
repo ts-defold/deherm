@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_b4ee7314-339b-4989-8613-9943c5c4e592",
+  "operation": "edit",
+  "prompt": "Change only Rook's body pose to a grounded west-facing side-profile walk mid-stride: forward boot stepping, rear boot planted, opposite arm swinging, compact sidearm still held low. Keep her exact helmet, goggles, cream scarf, olive jacket, colors, outline, proportions, and west side view. Do not turn her or add a prop, platform, text, scenery, or second person.",
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "9e23cfb6-6654-4594-a191-faf8b516dd8e"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/rook-infantry-walk-pose-w-v1.json",
+    "sha256": "1993731087ee34201604d0ae638ffe79d80efc3098a86bec4ca5344dc9b616d1"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "32d56a7a-9fa2-446c-84cf-1c9c9c781316",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 23,
+      "height": 45,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/32d56a7a-9fa2-446c-84cf-1c9c9c781316/image.png?v=1791522010662",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-walk-pose-w-v1/00.png",
+      "bytes": 2406,
+      "sha256": "a1be21c45360736cdf8682ca467bd9a7893922a51ebfaecc3f3c1c272a9d66e6"
+    },
+    {
+      "index": 1,
+      "assetId": "f7306cee-afaa-4cf3-954b-233b523b69f7",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 20,
+      "height": 45,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/f7306cee-afaa-4cf3-954b-233b523b69f7/image.png?v=1791522011670",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-walk-pose-w-v1/01.png",
+      "bytes": 2599,
+      "sha256": "ce46f705bb40783ff17174e9c1df1088d30a71f801f54a141ab230cfb1eb225c"
+    }
+  ],
+  "credits": {
+    "remaining": 2055
+  }
+}

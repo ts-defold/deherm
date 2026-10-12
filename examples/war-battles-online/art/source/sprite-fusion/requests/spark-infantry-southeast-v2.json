@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_c4c174e5-9e17-4301-aa3f-2f4f9da2cf1a",
+  "operation": "style-reference",
+  "prompt": "Spark, a young tan-skinned tank mechanic, full-body southeast-facing three-quarter isometric standing pose for the same game as the reference. Distinct short spiky black hair, narrow orange headband, brass welding goggles above the eyes, teal collar, olive mechanic jacket, dark trousers, sturdy boots, compact sidearm held low. Match the reference's grounded scale, chunky silhouette, dark outline, muted palette, and viewing angle. Make Spark clearly different from the reference's helmeted woman. One character only; no vehicle, pedestal, scenery, text, or extra figures.",
+  "size": 32,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "d62dd927-7809-4bd6-a18e-1c87fcf23e9f"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/spark-infantry-southeast-v2.json",
+    "sha256": "f1205b4418ed1b78f25e1b7edd40bd5bcbb39b80dad92bb42cefaff1fa33dd6e"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "c7fba0d2-364c-4e1b-8213-d67e6b8ce2f8",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 53,
+      "height": 53,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/c7fba0d2-364c-4e1b-8213-d67e6b8ce2f8/image.png?v=1791525837450",
+      "path": "art/source/sprite-fusion/outputs/spark-infantry-southeast-v2/00.png",
+      "bytes": 3801,
+      "sha256": "b8a3a6ec93c12e79acf4b5e5f00bec3b4b65369d1ffe12c0d9dfba8aa1f4f819"
+    },
+    {
+      "index": 1,
+      "assetId": "7f341868-c31f-4ec6-9a73-adb6aea1b4a8",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 55,
+      "height": 55,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/7f341868-c31f-4ec6-9a73-adb6aea1b4a8/image.png?v=1791525838054",
+      "path": "art/source/sprite-fusion/outputs/spark-infantry-southeast-v2/01.png",
+      "bytes": 4134,
+      "sha256": "801930491b34e71f8fb8acc921c6bf9a7ee4fb4b7bf9ca818469df81d73f3beb"
+    },
+    {
+      "index": 2,
+      "assetId": "0844474e-70ad-4d9a-9c4c-cbe423fdcdbf",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 53,
+      "height": 53,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/0844474e-70ad-4d9a-9c4c-cbe423fdcdbf/image.png?v=1791525838583",
+      "path": "art/source/sprite-fusion/outputs/spark-infantry-southeast-v2/02.png",
+      "bytes": 3839,
+      "sha256": "b1f3bed1a5cc1464a49eeaafea71b32583bc2b3b92fdc6622ddb8734689fea4a"
+    },
+    {
+      "index": 3,
+      "assetId": "f79317e8-04f3-4000-832b-cd3ebc2f7fb4",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 59,
+      "height": 59,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/f79317e8-04f3-4000-832b-cd3ebc2f7fb4/image.png?v=1791525839071",
+      "path": "art/source/sprite-fusion/outputs/spark-infantry-southeast-v2/03.png",
+      "bytes": 3714,
+      "sha256": "6aa344e6ab56a1f5fe0e95c220cc048a4e17aa5d43264ba1290cff6af3cc0f3b"
+    },
+    {
+      "index": 4,
+      "assetId": "620bebe0-79bc-4e53-98bf-8fddee0e2076",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 58,
+      "height": 58,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/620bebe0-79bc-4e53-98bf-8fddee0e2076/image.png?v=1791525839597",
+      "path": "art/source/sprite-fusion/outputs/spark-infantry-southeast-v2/04.png",
+      "bytes": 4526,
+      "sha256": "bc03942f7f9bce71df26cdaeee0fb2d913eb18b9d2e7a83c4cb438abaad129b8"
+    },
+    {
+      "index": 5,
+      "assetId": "d8fc1c55-a81e-414e-824f-25cbf65c1194",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 55,
+      "height": 55,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/d8fc1c55-a81e-414e-824f-25cbf65c1194/image.png?v=1791525840181",
+      "path": "art/source/sprite-fusion/outputs/spark-infantry-southeast-v2/05.png",
+      "bytes": 4749,
+      "sha256": "ec98c51fc736f9f8ab8f7a46afd82148ce83da7330cb2039031be6c24b8600a2"
+    },
+    {
+      "index": 6,
+      "assetId": "f54bc585-121c-47c1-84ce-5da2c62580f3",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 54,
+      "height": 54,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/f54bc585-121c-47c1-84ce-5da2c62580f3/image.png?v=1791525840784",
+      "path": "art/source/sprite-fusion/outputs/spark-infantry-southeast-v2/06.png",
+      "bytes": 4087,
+      "sha256": "d9a9e2c7bdcb73134a5ea742634b8cf19859ea84efc6e722bf3d69e1ff88d80a"
+    },
+    {
+      "index": 7,
+      "assetId": "072a449c-2408-4440-970f-ffd21244793f",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 73,
+      "height": 73,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/072a449c-2408-4440-970f-ffd21244793f/image.png?v=1791525841475",
+      "path": "art/source/sprite-fusion/outputs/spark-infantry-southeast-v2/07.png",
+      "bytes": 5878,
+      "sha256": "e0755cbb8453373b086183e7f094c712f04a840407500860ad4c771ed8ae2e19"
+    },
+    {
+      "index": 8,
+      "assetId": "27ccccaf-2f45-4aa9-a431-d1f9392ee94f",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 54,
+      "height": 54,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/27ccccaf-2f45-4aa9-a431-d1f9392ee94f/image.png?v=1791525842093",
+      "path": "art/source/sprite-fusion/outputs/spark-infantry-southeast-v2/08.png",
+      "bytes": 3840,
+      "sha256": "41921569a3bb24c44745707bc525f07b3497aab4b09cd1cfb356920d298671e8"
+    }
+  ],
+  "credits": {
+    "remaining": 1605
+  }
+}

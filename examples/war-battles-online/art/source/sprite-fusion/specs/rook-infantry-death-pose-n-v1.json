@@ -1,0 +1,6 @@
+{
+  "name": "rook-infantry-death-pose-n-v1",
+  "operation": "edit",
+  "inputs": ["asset:3d6102ad-f3a9-4560-b79c-b80dd25721f9"],
+  "prompt": "Keep Rook viewed strictly from behind facing north. Change the body into a clearly defeated collapsed pose: one knee on the ground, torso and helmet bowed low forward, one hand braced against the ground, sidearm lowered, silhouette shorter and wider than standing. Preserve the same back-facing perspective, boots and knee touching one ground line, brown helmet, olive jacket, cream scarf edge, blue goggles only if visible from this angle, colors, outline, and exact character identity. No turn toward the viewer, blood, injury detail, explosion, extra prop, scenery, platform, text, or second person."
+}

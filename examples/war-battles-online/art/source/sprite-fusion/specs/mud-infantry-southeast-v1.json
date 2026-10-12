@@ -1,0 +1,7 @@
+{
+  "name": "mud-infantry-southeast-v1",
+  "operation": "style-reference",
+  "inputs": ["asset:d62dd927-7809-4bd6-a18e-1c87fcf23e9f"],
+  "prompt": "Mud, a rugged dust-covered tank driver, full-body southeast-facing three-quarter isometric standing pose for the same game as the reference. Distinct dark respirator mask over his nose and mouth, low ochre helmet with orange-rimmed goggles, rust-red scarf, heavy dark olive work jacket, dark trousers, sturdy brown boots and compact sidearm held low. Match the reference's grounded scale, chunky silhouette, dark outline, muted military palette, and viewing angle. Make Mud clearly different from the reference's helmeted woman. One character only; no vehicle, pedestal, scenery, text, or extra figures.",
+  "size": 32
+}

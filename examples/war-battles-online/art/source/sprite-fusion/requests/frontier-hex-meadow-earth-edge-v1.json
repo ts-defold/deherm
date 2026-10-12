@@ -1,0 +1,164 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_9cc856fc-b9ab-4359-a8d5-eff83233c2ab",
+  "operation": "generate",
+  "prompt": "One isolated isometric six-sided terrain tile for a retro pixel-art tank strategy game. Broad flat driveable top where olive meadow grass naturally breaks into compacted ochre earth across the middle, sparse dry yellow tufts and pebbles, short dark layered volcanic cliff sides. Warm sunset lighting, precise readable pixels, no hard dividing stripe. Single tile centered on transparent background, no character, vehicle, building, text, border, or other tiles.",
+  "size": 64,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/frontier-hex-meadow-earth-edge-v1.json",
+    "sha256": "02d1f14e411c76d1a9f5ed897c3a2fcec1fddd4091ec5539d5510197c96e0be8"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "e338dccc-7596-4fb1-8af3-f0159ec80d07",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/e338dccc-7596-4fb1-8af3-f0159ec80d07/image.png?v=1791407930881",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/00.png",
+      "bytes": 7246,
+      "sha256": "a7e0b718e3d1ec27c46e934472e74fb51872823cf43ac14d7438b65584bb1723"
+    },
+    {
+      "index": 1,
+      "assetId": "098b250a-90f7-47a5-b8d7-bceff458d16d",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/098b250a-90f7-47a5-b8d7-bceff458d16d/image.png?v=1791407932384",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/01.png",
+      "bytes": 8696,
+      "sha256": "e37bda730b6818fb64105471fbcfac2c18ddde05c6112807252969b8173107be"
+    },
+    {
+      "index": 2,
+      "assetId": "29f63e28-b156-4370-a5d8-e2da9c68111e",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/29f63e28-b156-4370-a5d8-e2da9c68111e/image.png?v=1791407933083",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/02.png",
+      "bytes": 7623,
+      "sha256": "6059323fdadde0fadee5e7b4c5c770dc5bc33dc0aaad2326f147ee19f54b4a9d"
+    },
+    {
+      "index": 3,
+      "assetId": "39693af2-69eb-43c5-815e-40a3cdfc260f",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/39693af2-69eb-43c5-815e-40a3cdfc260f/image.png?v=1791407933764",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/03.png",
+      "bytes": 7118,
+      "sha256": "16afe29e26c5184dddcace3d729a619e3f3dad6affe6d70df610b33ae0129071"
+    },
+    {
+      "index": 4,
+      "assetId": "bc1feb43-4568-4bbe-afd7-64ea9309a93f",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/bc1feb43-4568-4bbe-afd7-64ea9309a93f/image.png?v=1791407934344",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/04.png",
+      "bytes": 7443,
+      "sha256": "e29d6867ef324f720ea5656fbbb687d810e5a2cde2bb88be2de9c44d5d48fd30"
+    },
+    {
+      "index": 5,
+      "assetId": "3b2de9e8-aedc-4a22-892f-cd1d9968c9c8",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/3b2de9e8-aedc-4a22-892f-cd1d9968c9c8/image.png?v=1791407934768",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/05.png",
+      "bytes": 7649,
+      "sha256": "faf4cc2a6116cb4f087fe23e7b54ed874646963ec91306db8f88d0d84ff2f55f"
+    },
+    {
+      "index": 6,
+      "assetId": "d770d35a-7312-4b99-b4ba-223d7226031f",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/d770d35a-7312-4b99-b4ba-223d7226031f/image.png?v=1791407935358",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/06.png",
+      "bytes": 7688,
+      "sha256": "c74797ca5a48ba940c4618c769de24f39ec50ecf5a69bd9ad70a32361e4fa2b0"
+    },
+    {
+      "index": 7,
+      "assetId": "f954402e-60d6-48e4-b14f-73502ef8d815",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/f954402e-60d6-48e4-b14f-73502ef8d815/image.png?v=1791407936037",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/07.png",
+      "bytes": 7615,
+      "sha256": "216036e69f72c037e91cee13d51215481eabb609e8c34d5b1444b78b0c7e557b"
+    },
+    {
+      "index": 8,
+      "assetId": "4441aaee-2032-40dd-8f45-2e504899b493",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/4441aaee-2032-40dd-8f45-2e504899b493/image.png?v=1791407937260",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/08.png",
+      "bytes": 7466,
+      "sha256": "89c17f386141a3c67a506d45d687e1f0643b178fa83b7e24aa7c19480ae900bc"
+    },
+    {
+      "index": 9,
+      "assetId": "abe5b48d-55bb-40a7-9ff9-807695a2f96b",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/abe5b48d-55bb-40a7-9ff9-807695a2f96b/image.png?v=1791407938056",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/09.png",
+      "bytes": 7584,
+      "sha256": "d0f1adfed355c301634b331dcbf19507dfc0954a4f7128a17c124f8d3918c163"
+    },
+    {
+      "index": 10,
+      "assetId": "65a805c4-9ab2-4d9c-a559-4d916dcacbc8",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/65a805c4-9ab2-4d9c-a559-4d916dcacbc8/image.png?v=1791407938809",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/10.png",
+      "bytes": 7398,
+      "sha256": "a23c0540cb5d1f2ed91bc70d620f482d97770b9e3d79d2120eaf451223f64a36"
+    },
+    {
+      "index": 11,
+      "assetId": "1cd8ec43-e0c5-4a5a-9bb1-ca23bf506d49",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/1cd8ec43-e0c5-4a5a-9bb1-ca23bf506d49/image.png?v=1791407939484",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/11.png",
+      "bytes": 8197,
+      "sha256": "dd5be53d2d6d1725eef8846300812fe77c7e3dd93f334275aaa1fc4065f23f5f"
+    }
+  ],
+  "credits": {
+    "remaining": 2940
+  }
+}

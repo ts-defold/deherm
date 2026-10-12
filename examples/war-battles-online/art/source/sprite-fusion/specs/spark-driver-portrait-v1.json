@@ -1,0 +1,10 @@
+{
+  "name": "spark-driver-portrait-v1",
+  "operation": "style-reference",
+  "size": 64,
+  "inputs": [
+    "art/source/sprite-fusion/outputs/rook-driver-portrait-v1/00.png",
+    "art/source/sprite-fusion/outputs/driver-portrait-base-v1/03.png"
+  ],
+  "prompt": "A communications portrait of Spark, a young tan-skinned tank mechanic with short spiky black hair, a narrow orange headband, brass welding goggles pushed above the eyes, a teal work collar, and an eager clever grin. Head and shoulders fill the frame, three-quarter view facing right. Match the reference portraits' chunky military arcade pixel-art rendering, dark outline, and warm face lighting. Clearly a different person from both reference drivers. No portrait frame, text, vehicle, or background scene."
+}

@@ -15,6 +15,9 @@ import {
   encodeReliableFrame,
 } from "./webtransport-framing.ts";
 const DATAGRAM_STAGING_SLOTS = 4;
+// Two 60 Hz input-bundle windows plus transport jitter. A queued command
+// older than this is less useful than the next redundant 30 Hz bundle.
+const INPUT_DATAGRAM_MAX_AGE_MILLISECONDS = 150;
 // Reliable control/session frames are events: unlike snapshots, they cannot
 // be replaced. Keep their userland queue deliberately small and fail closed
 // rather than allowing a stalled peer to grow memory without bound.
@@ -45,6 +48,8 @@ export interface WebTransportDatagramsLike {
   /** Legacy WebTransport API still exposed by Chromium and Deno. */
   readonly writable?: WritableStreamLike<Uint8Array>;
   readonly maxDatagramSize?: number;
+  /** Current browser API; absent from the native extension's compatibility facade. */
+  outgoingMaxAge?: number | null;
 }
 
 function createDatagramWriter(datagrams: WebTransportDatagramsLike): WritableStreamWriterLike<Uint8Array> {
@@ -164,6 +169,18 @@ export class WebTransportGameClient implements GameTransport {
       datagrams: maxDatagramBytes > 0,
       maxDatagramBytes,
     });
+    // desiredSize bounds admission at the WritableStream edge, but the user
+    // agent has its own outgoing queue. Expire a stale input there as well;
+    // native WebTransport has a separate bounded send queue and no such API.
+    if (reliableStreamMode === "client" && "outgoingMaxAge" in session.datagrams) {
+      try {
+        session.datagrams.outgoingMaxAge = INPUT_DATAGRAM_MAX_AGE_MILLISECONDS;
+      } catch {
+        // Some hosts expose the property but throw when assigning it (Deno's
+        // current WebTransport implementation does). Expiry is a queue hint,
+        // not a prerequisite for the bounded datagram transport.
+      }
+    }
     this.datagramWriter = createDatagramWriter(session.datagrams);
     // A datagram write may remain pending after the caller reuses its input
     // buffer. Own at most four in-flight datagrams in preallocated storage;

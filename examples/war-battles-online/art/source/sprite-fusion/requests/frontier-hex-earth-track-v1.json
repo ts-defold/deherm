@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_1c350f5f-af72-463b-a6fb-d58a80f4dddb",
+  "operation": "style-reference",
+  "prompt": "A single driveable ochre earth hex for a three-quarter-view retro tank battlefield. Broad level top with a compacted diagonal vehicle track, short interrupted tread marks, scattered pebbles and sparse dry grass; subtle dark layered earth side face. Match the reference tiles' six-sided footprint, upper-left light, chunky pixel clusters, and muted olive-and-ochre military palette. Keep the track irregular and grounded, not a bright graphic stripe. No vehicle, character, building, lettering, or other tile.",
+  "size": 64,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-detail-v2/01.png",
+      "bytes": 8787,
+      "sha256": "3a4cf4cfb6e1c0ad73b7d4d883c45f117e4cfb4b9c14898d1be09bae2e35c3a4"
+    },
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-detail-v2/04.png",
+      "bytes": 9507,
+      "sha256": "aa0b6816217c1e0ca96a77aed9810e92c63d23c52ba452194c4daab656d01ac8"
+    },
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-worn-route-v1/01.png",
+      "bytes": 9796,
+      "sha256": "a3492fccd8bdb99b3802e868ad8c5c7a534a99e3037b7298aaaa1e57970c418d"
+    },
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-worn-route-v1/05.png",
+      "bytes": 9524,
+      "sha256": "e734f1a89eeb5d36f1dab1c43d4a3d3adbab70aa41174c060ea63058fa905213"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/frontier-hex-earth-track-v1.json",
+    "sha256": "1314271134ca26f90d6b47c8820d75b5c54531755b846b79d82ff0343ef5b620"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "f8146a68-00d4-4a78-a8ee-beca5054162b",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 70,
+      "height": 70,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/f8146a68-00d4-4a78-a8ee-beca5054162b/image.png?v=1791417675488",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-track-v1/00.png",
+      "bytes": 10099,
+      "sha256": "82ee2bb4a086e1bef54fd5c862e8f99861fad074f3d7850ec64601fdef170ec5"
+    },
+    {
+      "index": 1,
+      "assetId": "7e73a29c-5f09-4d84-ba04-3e5b23ec0a0c",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/7e73a29c-5f09-4d84-ba04-3e5b23ec0a0c/image.png?v=1791417676035",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-track-v1/01.png",
+      "bytes": 8155,
+      "sha256": "840827cda69cf92b890308f8a5f81a75dfd1854cb2b7fefcdaae428f4a009a4c"
+    },
+    {
+      "index": 2,
+      "assetId": "b98384f0-73c7-423a-841d-4702959bb59c",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/b98384f0-73c7-423a-841d-4702959bb59c/image.png?v=1791417676745",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-track-v1/02.png",
+      "bytes": 8745,
+      "sha256": "a8ccc873dfec725be92b8e9f3aa9958a263f12e9c4278d951202afdca3691982"
+    },
+    {
+      "index": 3,
+      "assetId": "b224b65c-1ef0-411f-be3f-041f10e8d5e5",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 69,
+      "height": 69,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/b224b65c-1ef0-411f-be3f-041f10e8d5e5/image.png?v=1791417677288",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-track-v1/03.png",
+      "bytes": 10048,
+      "sha256": "dae8833ec4216033e06282f70cf4b68e6c3e25fce1e9a2617907e6aaa09cca48"
+    },
+    {
+      "index": 4,
+      "assetId": "31b2a5fc-5b00-4f64-96be-e50686546309",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 69,
+      "height": 69,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/31b2a5fc-5b00-4f64-96be-e50686546309/image.png?v=1791417677836",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-track-v1/04.png",
+      "bytes": 8968,
+      "sha256": "c0272116e20af3589a4091f1904172a8d9d11b6e1bff005b1b610f44d8166e6b"
+    },
+    {
+      "index": 5,
+      "assetId": "3ec4a71e-6342-4998-b9cb-a34fc2704ef5",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 70,
+      "height": 70,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/3ec4a71e-6342-4998-b9cb-a34fc2704ef5/image.png?v=1791417678432",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-track-v1/05.png",
+      "bytes": 9527,
+      "sha256": "531465624881365bbc46a682af955a25237fe99aa46c58c5100ec9f8ed8b642d"
+    },
+    {
+      "index": 6,
+      "assetId": "34f81683-956f-46d2-aae6-0ff8760b2e6a",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 67,
+      "height": 67,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/34f81683-956f-46d2-aae6-0ff8760b2e6a/image.png?v=1791417679091",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-track-v1/06.png",
+      "bytes": 9420,
+      "sha256": "402b60c46807a7e25de3557fbc2c61e430700919ef33ba5ec5ab400a5c62c928"
+    },
+    {
+      "index": 7,
+      "assetId": "f4c5e575-a1d9-4871-8b0a-377385980338",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 69,
+      "height": 69,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/f4c5e575-a1d9-4871-8b0a-377385980338/image.png?v=1791417679716",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-track-v1/07.png",
+      "bytes": 8942,
+      "sha256": "830ee6cb3d94421b04417ce27a6912f243cec588474025ea2b01e3a5c47c48e5"
+    },
+    {
+      "index": 8,
+      "assetId": "e824b93e-9ebf-447c-b454-2d4024ed59d7",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 71,
+      "height": 71,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/e824b93e-9ebf-447c-b454-2d4024ed59d7/image.png?v=1791417680325",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-track-v1/08.png",
+      "bytes": 10020,
+      "sha256": "980d0d0665d14663f08ab122ea81e87510f2087051de1d1d5ac181d06eae51b5"
+    }
+  ],
+  "credits": {
+    "remaining": 2685
+  }
+}

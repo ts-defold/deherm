@@ -1,0 +1,10 @@
+{
+  "name": "mud-infantry-walk-nw-v1",
+  "operation": "animate",
+  "inputs": [
+    "asset:98485228-7ec2-4a73-b2b0-31aab87c3e3d"
+  ],
+  "prompt": "A quick grounded northwest-facing three-quarter rear walk cycle with alternating boot contact and a small opposite-arm swing. Mud remains a rugged driver with a dark respirator mask, ochre helmet, orange-rimmed goggles, rust-red scarf, heavy olive jacket and compact sidearm held low. Keep his exact source perspective, palette, outline, proportions, and identity consistent. Seamless loop without turning, jumping, or adding objects.",
+  "outputFrames": 4,
+  "colors": 24
+}

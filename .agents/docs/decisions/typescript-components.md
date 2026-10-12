@@ -148,6 +148,16 @@ debugging. Without a Defold editor plugin, the Defold editor indexes the
 generated `.script`, not the `.script.ts` source. A future editor plugin may
 associate the two resources, but the build does not depend on it.
 
+The VS Code property/default-value inlays and live-instance navigation are
+source-path and property-declaration based, not tied to `defineComponent`.
+A focused class-source regression checks static `properties` anchors, `= value`
+inlays, and authenticated live-value lens/hint projection. Generator and SDK
+tests also cover class metadata, proxy lowering, instance state and HMR.
+This is editor-helper and adapter evidence; a packaged-engine class-authored
+component remains a separate end-to-end observation gate. War Battles still
+mostly authors its components with the object form, so the example does not
+yet demonstrate the class style in a live game.
+
 # Runtime model
 
 This section defines the runtime model. The generated capability gate now finds

@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_967a353f-3ac2-4ca6-863b-5d8bc198e824",
+  "operation": "edit",
+  "prompt": "Change only Mud's body pose to a grounded left-facing side view, to be flipped for the east runtime direction walk mid-stride: one boot forward, the other planted, opposite arm swinging, compact sidearm low. Preserve his respirator mask, ochre helmet, orange-rimmed goggles, rust-red scarf, dark olive jacket, rugged build, original colors, outline, scale, and exact source viewing angle. No turn, extra person, platform, text, or scenery.",
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "d2264ddd-63ae-4361-933f-aef441d93983"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/mud-infantry-walk-pose-e-v1.json",
+    "sha256": "9d4f0dd26536e81a6560efc758bcec58c0459ecf645f1fee0179a3ca62bfe269"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "73449adf-5c09-4d87-b6aa-997bbffe5841",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 27,
+      "height": 50,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/73449adf-5c09-4d87-b6aa-997bbffe5841/image.png?v=1791527311791",
+      "path": "art/source/sprite-fusion/outputs/mud-infantry-walk-pose-e-v1/00.png",
+      "bytes": 3486,
+      "sha256": "85e08fd533c7bff43ab6e693402d29cd60b7c5215600e57212f6d51494b0c5bf"
+    }
+  ],
+  "credits": {
+    "remaining": 1245
+  }
+}

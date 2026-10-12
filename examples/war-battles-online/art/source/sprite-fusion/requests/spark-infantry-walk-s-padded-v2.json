@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_edc76603-30c1-430b-b593-ab7e2f09454a",
+  "operation": "animate",
+  "prompt": "A grounded south-facing walk loop with alternating boots and opposite-arm swing. Preserve Spark's dark headgear, red scarf, goggles, compact sidearm, proportions, palette, and front view. Keep the complete character inside the canvas through the motion.",
+  "size": null,
+  "outputFrames": 4,
+  "colors": 24,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/inputs/spark-infantry-walk-pose-s-v1-0-padded-64.png",
+      "bytes": 3301,
+      "sha256": "9e8fc1224df2522abcf64b8c2714b6a6de8e71897ece7333f2b75625ef523ba2"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/spark-infantry-walk-s-padded-v2.json",
+    "sha256": "041bbb78c10f23422a3ebb62cdae9d9301525eea62f17c920e31649a54da0fe9"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "82a9e983-d347-4364-b0ab-491efdd511ee",
+      "type": "animation",
+      "contentType": "image/webp",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/82a9e983-d347-4364-b0ab-491efdd511ee/animation.webp?v=1791548120030",
+      "path": "art/source/sprite-fusion/outputs/spark-infantry-walk-s-padded-v2/00.webp",
+      "bytes": 2484,
+      "sha256": "d8dd79367939afbfced1f68bfe546cf4f7851299f2ed3adf3d668d3b451f115f",
+      "spritesheet": {
+        "url": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/82a9e983-d347-4364-b0ab-491efdd511ee/spritesheet.png?v=1791548120030",
+        "path": "art/source/sprite-fusion/outputs/spark-infantry-walk-s-padded-v2/00-sheet.png",
+        "bytes": 2669,
+        "sha256": "09a9db6ffed7e0dcbf09e1bff328a6b525fa28836267657f58a44539fcc2ba2e"
+      },
+      "frameCount": 4,
+      "fps": 8
+    }
+  ],
+  "credits": {
+    "remaining": 225
+  }
+}

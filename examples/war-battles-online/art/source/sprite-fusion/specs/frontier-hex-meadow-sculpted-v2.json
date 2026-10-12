@@ -1,0 +1,13 @@
+{
+  "name": "frontier-hex-meadow-sculpted-v2",
+  "operation": "style-reference",
+  "size": 128,
+  "prompt": "One complete walkable hexagonal olive meadow landform for an isometric tank battlefield. A broad level grass top with a few clustered tufts, cream flowers, slate pebbles, and small ochre patches; a short sculpted earth-and-basalt side wall gives real elevation. Match the references' three-quarter viewpoint, upper-left light, dense hand-placed pixel clusters, muted military palette, and clear six-sided silhouette. No tank, building, text, border, or second tile.",
+  "inputs": [
+    "asset:bd93b0e2-417d-4553-b8ab-8c4637ff088e",
+    "art/source/imagegen/hex-style-reference/meadow.png",
+    "art/source/imagegen/hex-style-reference/earth.png",
+    "art/source/imagegen/hex-style-reference/basalt.png",
+    "art/source/imagegen/hex-style-reference/steel.png"
+  ]
+}

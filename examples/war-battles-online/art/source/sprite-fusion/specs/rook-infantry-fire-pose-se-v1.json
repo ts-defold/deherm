@@ -1,0 +1,6 @@
+{
+  "name": "rook-infantry-fire-pose-se-v1",
+  "operation": "edit",
+  "inputs": ["asset:b0168c9c-877f-46f1-8ee7-e12b93565d18"],
+  "prompt": "Change only Rook's southeast-facing body pose: plant both boots and extend the compact sidearm forward at chest height, with a slight braced recoil in the shoulders. Keep the same person, exact helmet, blue goggle lens, cream scarf, olive jacket, colors, outline, proportions, and three-quarter perspective. Keep the feet on the same ground line. No muzzle flash, projectile, new prop, platform, text, scenery, or second person."
+}

@@ -51,7 +51,7 @@ nodes {
   position { x: 372.0 y: 323.0 z: 0.9 }
   size { x: 140.0 y: 140.0 }
   type: TYPE_BOX
-  texture: "hud/driver-portrait-radio-idle"
+  texture: "hud/driver-portrait-0"
   id: "title_portrait"
   pivot: PIVOT_CENTER
 }
@@ -70,8 +70,8 @@ nodes {
   size { x: 480.0 y: 30.0 }
   color { x: 0.62 y: 0.9 z: 1.0 w: 1.0 }
   type: TYPE_TEXT
-  text: "32 TANKS  //  6 WEAPONS  //  NO MERCY"
-  font: "hud_font"
+  text: "16 PLAYER MATCH  //  6 WEAPONS  //  NO MERCY"
+  font: "title_font"
   id: "title_feature"
   pivot: PIVOT_CENTER
 }
@@ -116,6 +116,16 @@ nodes {
   pivot: PIVOT_CENTER
 }
 nodes {
+  position { x: 640.0 y: 44.0 z: 0.85 }
+  size { x: 504.0 y: 38.0 }
+  type: TYPE_BOX
+  texture: "hud/hud-strip"
+  id: "title_sponsor_back"
+  pivot: PIVOT_CENTER
+  size_mode: SIZE_MODE_MANUAL
+  slice9 { x: 5.0 y: 5.0 z: 5.0 w: 5.0 }
+}
+nodes {
   position { x: 640.0 y: 44.0 z: 0.9 }
   size { x: 900.0 y: 24.0 }
   color { x: 1.0 y: 0.84 z: 0.2 w: 1.0 }
@@ -127,7 +137,7 @@ nodes {
 }
 nodes {
   position { x: 12.0 y: 12.0 z: 0.0 }
-  size { x: 610.0 y: 94.0 }
+  size { x: 680.0 y: 118.0 }
   color { x: 1.0 y: 1.0 z: 1.0 w: 1.0 }
   type: TYPE_BOX
   texture: "hud/hud-shell"
@@ -137,24 +147,24 @@ nodes {
   slice9 { x: 8.0 y: 8.0 z: 8.0 w: 8.0 }
 }
 nodes {
-  position { x: 24.0 y: 23.0 z: 0.2 }
-  size { x: 72.0 y: 72.0 }
+  position { x: 26.0 y: 29.0 z: 0.2 }
+  size { x: 80.0 y: 80.0 }
   type: TYPE_BOX
-  texture: "hud/driver-portrait-radio-idle"
+  texture: "hud/driver-portrait-0"
   id: "portrait"
   pivot: PIVOT_SW
 }
 nodes {
-  position { x: 20.0 y: 19.0 z: 0.3 }
-  size { x: 80.0 y: 80.0 }
+  position { x: 20.0 y: 23.0 z: 0.3 }
+  size { x: 92.0 y: 92.0 }
   type: TYPE_BOX
   texture: "hud/portrait-frame"
   id: "portrait_frame"
   pivot: PIVOT_SW
 }
 nodes {
-  position { x: 112.0 y: 58.0 z: 0.1 }
-  size { x: 180.0 y: 14.0 }
+  position { x: 126.0 y: 76.0 z: 0.1 }
+  size { x: 184.0 y: 20.0 }
   color { x: 1.0 y: 1.0 z: 1.0 w: 1.0 }
   type: TYPE_BOX
   texture: "hud/meter-track"
@@ -164,8 +174,8 @@ nodes {
   slice9 { x: 3.0 y: 3.0 z: 3.0 w: 3.0 }
 }
 nodes {
-  position { x: 112.0 y: 58.0 z: 0.2 }
-  size { x: 180.0 y: 10.0 }
+  position { x: 129.0 y: 76.0 z: 0.2 }
+  size { x: 178.0 y: 12.0 }
   color { x: 0.94 y: 0.25 z: 0.12 w: 1.0 }
   type: TYPE_BOX
   texture: "hud/meter-fill"
@@ -175,8 +185,8 @@ nodes {
   slice9 { x: 2.0 y: 2.0 z: 2.0 w: 2.0 }
 }
 nodes {
-  position { x: 112.0 y: 38.0 z: 0.1 }
-  size { x: 180.0 y: 12.0 }
+  position { x: 126.0 y: 50.0 z: 0.1 }
+  size { x: 184.0 y: 20.0 }
   color { x: 1.0 y: 1.0 z: 1.0 w: 1.0 }
   type: TYPE_BOX
   texture: "hud/meter-track"
@@ -186,8 +196,8 @@ nodes {
   slice9 { x: 3.0 y: 3.0 z: 3.0 w: 3.0 }
 }
 nodes {
-  position { x: 112.0 y: 38.0 z: 0.2 }
-  size { x: 90.0 y: 8.0 }
+  position { x: 129.0 y: 50.0 z: 0.2 }
+  size { x: 178.0 y: 12.0 }
   color { x: 0.18 y: 0.7 z: 0.94 w: 1.0 }
   type: TYPE_BOX
   texture: "hud/meter-fill"
@@ -197,28 +207,28 @@ nodes {
   slice9 { x: 2.0 y: 2.0 z: 2.0 w: 2.0 }
 }
 nodes {
-  position { x: 304.0 y: 58.0 z: 0.3 }
-  size { x: 128.0 y: 20.0 }
+  position { x: 320.0 y: 76.0 z: 0.3 }
+  size { x: 136.0 y: 24.0 }
   color { x: 0.98 y: 0.9 z: 0.66 w: 1.0 }
   type: TYPE_TEXT
   text: "HULL 100"
-  font: "hud_font"
+  font: "title_font"
   id: "health_label"
   pivot: PIVOT_W
 }
 nodes {
-  position { x: 304.0 y: 38.0 z: 0.3 }
-  size { x: 128.0 y: 20.0 }
+  position { x: 320.0 y: 50.0 z: 0.3 }
+  size { x: 136.0 y: 24.0 }
   color { x: 0.55 y: 0.86 z: 1.0 w: 1.0 }
   type: TYPE_TEXT
   text: "ARMOR 0"
-  font: "hud_font"
+  font: "title_font"
   id: "armor_label"
   pivot: PIVOT_W
 }
 nodes {
-  position { x: 430.0 y: 48.0 z: 0.3 }
-  size { x: 174.0 y: 44.0 }
+  position { x: 474.0 y: 64.0 z: 0.3 }
+  size { x: 194.0 y: 42.0 }
   color { x: 0.78 y: 0.88 z: 0.78 w: 1.0 }
   type: TYPE_TEXT
   text: "AMMO INF\nCR 0  BOOST 90"
@@ -228,8 +238,8 @@ nodes {
   line_break: true
 }
 nodes {
-  position { x: 1048.0 y: 564.0 z: 0.0 }
-  size { x: 220.0 y: 144.0 }
+  position { x: 1008.0 y: 530.0 z: 0.0 }
+  size { x: 260.0 y: 178.0 }
   color { x: 1.0 y: 1.0 z: 1.0 w: 1.0 }
   type: TYPE_BOX
   texture: "hud/hud-card"
@@ -239,8 +249,8 @@ nodes {
   slice9 { x: 6.0 y: 6.0 z: 6.0 w: 6.0 }
 }
 nodes {
-  position { x: 490.0 y: 680.0 z: 0.0 }
-  size { x: 300.0 y: 30.0 }
+  position { x: 460.0 y: 680.0 z: 0.0 }
+  size { x: 360.0 y: 32.0 }
   color { x: 1.0 y: 1.0 z: 1.0 w: 1.0 }
   type: TYPE_BOX
   texture: "hud/hud-strip"
@@ -251,16 +261,16 @@ nodes {
 }
 nodes {
   position { x: 640.0 y: 700.0 z: 0.1 }
-  size { x: 280.0 y: 22.0 }
+  size { x: 340.0 y: 26.0 }
   color { x: 1.0 y: 0.82 z: 0.16 w: 1.0 }
   type: TYPE_TEXT
   text: "LEADER  P1  0"
-  font: "hud_font"
+  font: "title_font"
   id: "leader"
   pivot: PIVOT_N
 }
 nodes {
-  position { x: 420.0 y: 640.0 z: 0.0 }
+  position { x: 12.0 y: 638.0 z: 0.0 }
   size { x: 440.0 y: 32.0 }
   color { x: 1.0 y: 1.0 z: 1.0 w: 1.0 }
   type: TYPE_BOX
@@ -271,7 +281,7 @@ nodes {
   slice9 { x: 5.0 y: 5.0 z: 5.0 w: 5.0 }
 }
 nodes {
-  position { x: 640.0 y: 663.0 z: 0.1 }
+  position { x: 232.0 y: 663.0 z: 0.1 }
   size { x: 420.0 y: 22.0 }
   color { x: 0.48 y: 0.88 z: 1.0 w: 1.0 }
   type: TYPE_TEXT
@@ -281,13 +291,13 @@ nodes {
   pivot: PIVOT_N
 }
 nodes {
-  position { x: 380.0 y: 590.0 z: 0.0 }
+  position { x: 640.0 y: 632.0 z: 0.0 }
   size { x: 520.0 y: 42.0 }
   color { x: 1.0 y: 1.0 z: 1.0 w: 1.0 }
   type: TYPE_BOX
   texture: "hud/hud-card"
   id: "announcement_back"
-  pivot: PIVOT_SW
+  pivot: PIVOT_N
   size_mode: SIZE_MODE_MANUAL
   slice9 { x: 6.0 y: 6.0 z: 6.0 w: 6.0 }
   enabled: false
@@ -325,36 +335,80 @@ nodes {
   pivot: PIVOT_N
 }
 nodes {
-  position { x: 112.0 y: 86.0 z: 0.3 }
-  size { x: 490.0 y: 22.0 }
+  position { x: 126.0 y: 108.0 z: 0.3 }
+  size { x: 542.0 y: 26.0 }
   color { x: 0.86 y: 1.0 z: 0.6 w: 1.0 }
   type: TYPE_TEXT
   text: ""
-  font: "hud_font"
+  font: "title_font"
   id: "status"
   pivot: PIVOT_W
 }
 nodes {
-  position { x: 1064.0 y: 692.0 z: 0.1 }
-  size { x: 188.0 y: 112.0 }
+  position { x: 1022.0 y: 692.0 z: 0.1 }
+  size { x: 232.0 y: 156.0 }
   color { x: 0.76 y: 0.9 z: 1.0 w: 1.0 }
   type: TYPE_TEXT
   text: ""
-  font: "hud_font"
+  font: "title_font"
   id: "frags"
   pivot: PIVOT_NW
   line_break: true
 }
 nodes {
-  position { x: 112.0 y: 20.0 z: 0.3 }
-  size { x: 490.0 y: 18.0 }
-  color { x: 0.58 y: 0.66 z: 0.64 w: 1.0 }
+  position { x: 126.0 y: 22.0 z: 0.3 }
+  size { x: 542.0 y: 24.0 }
+  color { x: 0.78 y: 0.86 z: 0.82 w: 1.0 }
   type: TYPE_TEXT
-  text: "WASD DRIVE  SPACE FIRE  SHIFT BOOST  1-6 GUN"
-  font: "score_font"
+  text: "WASD DRIVE   MOUSE AIM   SPACE FIRE   TAB SCORES"
+  font: "hud_font"
   id: "hint"
   pivot: PIVOT_W
 }
 material: "/builtins/materials/gui.material"
+nodes {
+  position { x: 142.0 y: 235.0 z: 0.65 }
+  size { x: 132.0 y: 132.0 }
+  color { x: 0.24 y: 0.79 z: 0.79 w: 0.55 }
+  type: TYPE_PIE
+  id: "touch_move_back"
+  pivot: PIVOT_CENTER
+  innerRadius: 51.0
+  perimeterVertices: 6
+  enabled: false
+}
+nodes {
+  position { x: 142.0 y: 235.0 z: 0.66 }
+  size { x: 160.0 y: 36.0 }
+  color { x: 0.8 y: 1.0 z: 0.9 w: 1.0 }
+  type: TYPE_TEXT
+  text: "DRIVE / BOOST"
+  font: "hud_font"
+  id: "touch_move_label"
+  pivot: PIVOT_CENTER
+  enabled: false
+}
+nodes {
+  position { x: 1138.0 y: 235.0 z: 0.65 }
+  size { x: 132.0 y: 132.0 }
+  color { x: 1.0 y: 0.48 z: 0.25 w: 0.55 }
+  type: TYPE_PIE
+  id: "touch_fire_back"
+  pivot: PIVOT_CENTER
+  innerRadius: 51.0
+  perimeterVertices: 6
+  enabled: false
+}
+nodes {
+  position { x: 1138.0 y: 235.0 z: 0.66 }
+  size { x: 160.0 y: 36.0 }
+  color { x: 1.0 y: 0.88 z: 0.7 w: 1.0 }
+  type: TYPE_TEXT
+  text: "AIM / FIRE"
+  font: "hud_font"
+  id: "touch_fire_label"
+  pivot: PIVOT_CENTER
+  enabled: false
+}
 adjust_reference: ADJUST_REFERENCE_PARENT
 max_nodes: 48

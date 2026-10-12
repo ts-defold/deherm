@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "request": "frontier-conifer-landmark-v1",
+  "disposition": "approved-source",
+  "role": "collision-aligned meadow landmark",
+  "outputCell": [160, 128],
+  "groundLine": 120,
+  "variants": [
+    {
+      "id": "conifer-tall",
+      "index": 0,
+      "assetId": "32dd1a8f-f217-464b-846b-fd35b1f117ba"
+    },
+    {
+      "id": "conifer-broad",
+      "index": 1,
+      "assetId": "a5def02e-90f2-483e-8103-ee5769e2c2e2"
+    },
+    {
+      "id": "conifer-leaning",
+      "index": 4,
+      "assetId": "11f25fdc-1b8a-4864-8793-9829114ce4a3"
+    }
+  ]
+}

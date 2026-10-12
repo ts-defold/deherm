@@ -1,0 +1,7 @@
+{
+  "name": "scout-silhouette-v2",
+  "operation": "style-reference",
+  "size": 64,
+  "inputs": ["art/source/sprite-fusion/outputs/artillery-silhouette-v2/06.png"],
+  "prompt": "A fast light scout tank for the same three-quarter isometric top-down arcade battlefield as the reference vehicle. Distinct narrow arrowhead hull, two short exposed tracks with large front drive wheels, a tiny low-profile swiveling turret with a slim short gun, a tall whip antenna, and little side exhausts. Basalt-grey armor, warm cream highlights, restrained orange signal markings, dark readable outline. No visible driver, no face. Its small agile silhouette must look different from the long-gun artillery reference."
+}

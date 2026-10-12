@@ -14,27 +14,27 @@
       "generation": 1
     },
     "componentId": "deherm.component/v1/1b5cd6bc1e1ea3d250982bba082705186607d6bd01c00e264f8cfd865c654d8f",
-    "schemaFingerprint": "042631f74443b5497a8a332d52d240c4137599d52705cb97c0c4c400954c0b9d",
+    "schemaFingerprint": "9b5db549f9aadf8fc22864357f4cd216a2ca8bbaabcbdcaf5753008e31a27271",
     "schemaStatus": "current",
     "properties": {
-      "players": 8,
+      "players": 16,
       "botSkill": 2,
       "mapSeed": 0,
       "autoEngageSeconds": 0
     },
     "inlineValueTexts": [
-      "= 8",
+      "= 16",
       "= 1",
       "= 0",
       "= 0"
     ],
-    "projectedInstanceCount": 13,
+    "projectedInstanceCount": 36,
     "omittedInstanceCount": 0
   },
   "screenshot": {
     "path": "examples/war-battles-online/evidence/vscode-live-values.png",
-    "bytes": 821705,
-    "sha256": "3f66fd4c6f2156210aafbc2ba7b4bc2c825af0a1d9485a3bdc4a4d01c08b361b",
+    "bytes": 840143,
+    "sha256": "b3c378ed42d8768ecb880a6b6773be3cd458ca8e5bd4b04c2fb2609cb07e3fec",
     "width": 2880,
     "height": 1800
   },
@@ -43,7 +43,7 @@
     "vsix": {
       "path": "editors/vscode/dist/deherm.vsix",
       "bytes": 95269,
-      "sha256": "a780dc723b9ba52fb3ae6175da93ee4c5459a98ecc9d3733611cab1c306fa33f"
+      "sha256": "87ea346a2ed7def935309ad885350a77941d4abb8b65beaedce33e5f18e21add"
     }
   },
   "arenaPropertyProjection": {
@@ -51,7 +51,7 @@
     "declarations": [
       {
         "name": "players",
-        "value": 8
+        "value": 16
       },
       {
         "name": "botSkill",
@@ -87,7 +87,17 @@
       "path": "packages/cli/src/dev/inspector-bridge.mjs",
       "bytes": 12293,
       "sha256": "0ca625a4864a3f0685b01ec906548203304f2f7a7534b669b0d0a41a2ef94acc"
+    },
+    {
+      "path": "examples/war-battles-online/integration/check-vscode-visual.mjs",
+      "bytes": 7820,
+      "sha256": "822b894a831cfe9385247f7157f51d361030133e5ce7703193fad4837194e6e2"
+    },
+    {
+      "path": "examples/war-battles-online/integration/vscode-visual-evidence.mjs",
+      "bytes": 9955,
+      "sha256": "63a6a20c35c20ed1bd20072d2faf8520944b10417dd23eedd09f17f32c6d70f8"
     }
   ],
-  "evidenceKey": "e28e2a38c755876c1e83544eb84e8d6226e52bb1dce57c9b8c7dfc3ddf2ff46a"
+  "evidenceKey": "5c9426788a060aa65f14439e96289ad98e3b73dc0744afda6ffc3a1d4bb75d60"
 }

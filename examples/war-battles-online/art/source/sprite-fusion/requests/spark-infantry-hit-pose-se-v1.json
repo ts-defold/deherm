@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_0b8bf19d-37fe-4ead-9f8f-318573a82f52",
+  "operation": "edit",
+  "prompt": "Spark takes a heavy hit while facing southeast: make his lean body recoil diagonally with one knee buckling, upper body tilted backward, free forearm up protecting his face, compact sidearm arm hanging low. Both boots remain grounded on the same line. The silhouette should read as staggered, not standing or firing. Preserve the same spiky dark hair, orange goggles, teal scarf, olive sleeves, small backpack, colors, outlines, and three-quarter isometric perspective. No blood, projectile, flash, extra prop, scenery, text, or second person.",
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "8b192a54-6797-4897-b1de-09fe7a5c58eb"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/spark-infantry-hit-pose-se-v1.json",
+    "sha256": "e457d04b7a2e78232b4b52862d31859a812f6ac24b73b8d2006baa3c0b4391a1"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "05cdc1ce-25b6-4fd2-aaa6-dae51d622dcf",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 42,
+      "height": 50,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/05cdc1ce-25b6-4fd2-aaa6-dae51d622dcf/image.png?v=1791536048216",
+      "path": "art/source/sprite-fusion/outputs/spark-infantry-hit-pose-se-v1/00.png",
+      "bytes": 3561,
+      "sha256": "55ec2f61c77d1b911cbb5abdcd7d8db27e27b83d5cde8ddee1d684a29e50cc26"
+    },
+    {
+      "index": 1,
+      "assetId": "c6056780-dc3f-49c7-b9d7-437c4d9a638a",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 38,
+      "height": 56,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/c6056780-dc3f-49c7-b9d7-437c4d9a638a/image.png?v=1791536049495",
+      "path": "art/source/sprite-fusion/outputs/spark-infantry-hit-pose-se-v1/01.png",
+      "bytes": 4660,
+      "sha256": "13ed5f5fe45cc8fd19d98795e1641af47736ee4c943dc04c32d2a0923bde18a5"
+    }
+  ],
+  "credits": {
+    "remaining": 555
+  }
+}

@@ -1,5 +1,7 @@
 export * from "./constants.ts";
 export * from "./fixed.ts";
+export * from "./hex-cliffs.ts";
+export * from "./hex-landscape.ts";
 export * from "./isometric-direction.ts";
 export * from "./isometric-projection.ts";
 export * from "./ticks.ts";
@@ -11,6 +13,7 @@ export * from "./network-bot.ts";
 export * from "./playable.ts";
 export * from "./protocol.ts";
 export * from "./transport.ts";
+export * from "./virtual-controls.ts";
 export * from "./webtransport-framing.ts";
 export * from "./browser-webtransport.ts";
 export * from "./browser-websocket.ts";

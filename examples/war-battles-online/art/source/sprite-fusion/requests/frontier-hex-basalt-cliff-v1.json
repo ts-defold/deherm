@@ -1,0 +1,139 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_12cac4b5-c7e8-4d30-845a-19edb7f59c51",
+  "operation": "style-reference",
+  "prompt": "One isometric hexagonal basalt terrain landform with a broad walkable top, a short faceted cliff side, a few glowing orange fissures, and sparse olive grass on the rim. Match the reference tile's six-sided shape and the volcanic rock reference's color and lighting. No tank, building, text, or second tile.",
+  "size": 64,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "bd93b0e2-417d-4553-b8ab-8c4637ff088e"
+    },
+    {
+      "kind": "file",
+      "path": "art/source/imagegen/hex-style-reference/basalt.png",
+      "bytes": 59718,
+      "sha256": "f087878b6301148ea95b9d91a319aacbd5ccfbc67f0b8183df7d248e845e4ed9"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/frontier-hex-basalt-cliff-v1.json",
+    "sha256": "1bc62cb0cbec2918d0110a86bbc8f31e5885a9e64d34152361770b7e86ec765a"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "c10cf40b-aea8-4702-b4f7-2bcf17419d7e",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/c10cf40b-aea8-4702-b4f7-2bcf17419d7e/image.png?v=1791407194169",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-cliff-v1/00.png",
+      "bytes": 2981,
+      "sha256": "2a2f2d48d553347fa410aa47f769a204fac8fbb98d581d3a0ad831f12ad6e0ae"
+    },
+    {
+      "index": 1,
+      "assetId": "9eaf9923-aeee-4a50-9e41-99ee723f5644",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/9eaf9923-aeee-4a50-9e41-99ee723f5644/image.png?v=1791407194798",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-cliff-v1/01.png",
+      "bytes": 4088,
+      "sha256": "bd76ca5524362d8cd629acb334d91ee019aa4ce335e48102aa3c300cb0454b27"
+    },
+    {
+      "index": 2,
+      "assetId": "fa7ce036-456f-4afb-adb4-be681d61f1af",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/fa7ce036-456f-4afb-adb4-be681d61f1af/image.png?v=1791407195516",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-cliff-v1/02.png",
+      "bytes": 3610,
+      "sha256": "0b71f8ec2f59e8f738bc8e24cae7119774d7e022632e41ac45c1bb2e99955cc0"
+    },
+    {
+      "index": 3,
+      "assetId": "4ab98373-396b-4e03-b68f-6c525e93e61c",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/4ab98373-396b-4e03-b68f-6c525e93e61c/image.png?v=1791407196133",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-cliff-v1/03.png",
+      "bytes": 3707,
+      "sha256": "dea50c860a842a236c5045007c61795ed1f3acd653d6e0ea99b435cecf54f568"
+    },
+    {
+      "index": 4,
+      "assetId": "e987b985-135f-48e7-8294-a804bec5481e",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/e987b985-135f-48e7-8294-a804bec5481e/image.png?v=1791407196812",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-cliff-v1/04.png",
+      "bytes": 4098,
+      "sha256": "7e6b4cead2a0d5e17460e064d7fe971edb5324cebfbdb8c7dbfcf86c8fc8ed06"
+    },
+    {
+      "index": 5,
+      "assetId": "bd836866-88f4-4688-8181-e9e5f9d296ef",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/bd836866-88f4-4688-8181-e9e5f9d296ef/image.png?v=1791407197419",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-cliff-v1/05.png",
+      "bytes": 3744,
+      "sha256": "f5fac0d6f90a80b8a0fd9d2f0c163f0e1d263b710b86ba34ddde71ac6835a8d5"
+    },
+    {
+      "index": 6,
+      "assetId": "cb0919af-e26d-4efa-ad14-a40a2dade7d2",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/cb0919af-e26d-4efa-ad14-a40a2dade7d2/image.png?v=1791407198039",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-cliff-v1/06.png",
+      "bytes": 3220,
+      "sha256": "77bc4a64b05bd2a0fafa28ba051692a2a102ef7943430d7dbaaac652a6ea0e04"
+    },
+    {
+      "index": 7,
+      "assetId": "adb9bf9a-ba15-4cbe-a1f5-c310f5b748a7",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/adb9bf9a-ba15-4cbe-a1f5-c310f5b748a7/image.png?v=1791407198651",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-cliff-v1/07.png",
+      "bytes": 3672,
+      "sha256": "19fd0698d6280bc8163e98252a59d5b56eb12eb9253b00fc0dc13fa7d90c5538"
+    },
+    {
+      "index": 8,
+      "assetId": "e61bd843-38f9-4208-a599-0c62f72b60ee",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/e61bd843-38f9-4208-a599-0c62f72b60ee/image.png?v=1791407199340",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-cliff-v1/08.png",
+      "bytes": 4080,
+      "sha256": "8c689a827e3edd66eae825eeec4ac5cc08d6ef27ed420d43ad56680372a3b105"
+    }
+  ],
+  "credits": {
+    "remaining": 3030
+  }
+}

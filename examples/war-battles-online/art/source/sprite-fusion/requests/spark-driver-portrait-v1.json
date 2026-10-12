@@ -1,0 +1,141 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_af57ede4-4fb1-480d-8049-52f0c010315e",
+  "operation": "style-reference",
+  "prompt": "A communications portrait of Spark, a young tan-skinned tank mechanic with short spiky black hair, a narrow orange headband, brass welding goggles pushed above the eyes, a teal work collar, and an eager clever grin. Head and shoulders fill the frame, three-quarter view facing right. Match the reference portraits' chunky military arcade pixel-art rendering, dark outline, and warm face lighting. Clearly a different person from both reference drivers. No portrait frame, text, vehicle, or background scene.",
+  "size": 64,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/rook-driver-portrait-v1/00.png",
+      "bytes": 8752,
+      "sha256": "e996883fff8f3153d763f8e3ea50887991fb5a1aabb90c22012540c9875fe8e4"
+    },
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/driver-portrait-base-v1/03.png",
+      "bytes": 6988,
+      "sha256": "e7ba1ca42b3c55dcddd426d2bbb0051eb2f4aa35732538ba05a85663e21cec7e"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/spark-driver-portrait-v1.json",
+    "sha256": "37a3560597eff265acdf9bb8b3da2e25e852323e6c3c37f1f3f68eda60dafa82"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "bd451900-477e-4522-a49d-15ac7e16beb6",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 69,
+      "height": 69,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/bd451900-477e-4522-a49d-15ac7e16beb6/image.png?v=1791427341898",
+      "path": "art/source/sprite-fusion/outputs/spark-driver-portrait-v1/00.png",
+      "bytes": 10213,
+      "sha256": "7b39ac908130244274703d5305df509b141c2391b8df93dc1fbf050cb6706f07"
+    },
+    {
+      "index": 1,
+      "assetId": "1c8ac72e-f42a-4749-b57b-38b3c89b76e8",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 71,
+      "height": 71,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/1c8ac72e-f42a-4749-b57b-38b3c89b76e8/image.png?v=1791427342489",
+      "path": "art/source/sprite-fusion/outputs/spark-driver-portrait-v1/01.png",
+      "bytes": 8999,
+      "sha256": "9195c62e2eb4e4ef276b16526432666477c109e1fe4ed736c3c428d6ae03ac80"
+    },
+    {
+      "index": 2,
+      "assetId": "2e8c896a-063f-4185-a87c-cc827db986d3",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 68,
+      "height": 68,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/2e8c896a-063f-4185-a87c-cc827db986d3/image.png?v=1791427343050",
+      "path": "art/source/sprite-fusion/outputs/spark-driver-portrait-v1/02.png",
+      "bytes": 8476,
+      "sha256": "6edd48047922cd4c0d5982a2eb05e483ff3fb9058167b59ed7989af4bb3b1491"
+    },
+    {
+      "index": 3,
+      "assetId": "8e6e1165-e481-4912-a846-45f74613e896",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 67,
+      "height": 67,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/8e6e1165-e481-4912-a846-45f74613e896/image.png?v=1791427343625",
+      "path": "art/source/sprite-fusion/outputs/spark-driver-portrait-v1/03.png",
+      "bytes": 8374,
+      "sha256": "cd480a934b060ae036f320479711670af47f157e9c2d8390b0148438819b2e16"
+    },
+    {
+      "index": 4,
+      "assetId": "c1f4627d-415c-4b50-9be3-d68a63716dc1",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 67,
+      "height": 67,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/c1f4627d-415c-4b50-9be3-d68a63716dc1/image.png?v=1791427344200",
+      "path": "art/source/sprite-fusion/outputs/spark-driver-portrait-v1/04.png",
+      "bytes": 9223,
+      "sha256": "f526d0f6bff2ecfc14a7ec4f9ef46b60e90d4640c5b28757ba389eddd7fb1f4c"
+    },
+    {
+      "index": 5,
+      "assetId": "60fe1067-03c1-4402-be40-105a104188a2",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 69,
+      "height": 69,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/60fe1067-03c1-4402-be40-105a104188a2/image.png?v=1791427344731",
+      "path": "art/source/sprite-fusion/outputs/spark-driver-portrait-v1/05.png",
+      "bytes": 8163,
+      "sha256": "edf56284a15f220964eeddf75f57e58f84f2cd8cab1487c3e0e30d251a4ea34a"
+    },
+    {
+      "index": 6,
+      "assetId": "3d88c949-51ed-45f7-9053-014581550a12",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 72,
+      "height": 72,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/3d88c949-51ed-45f7-9053-014581550a12/image.png?v=1791427345253",
+      "path": "art/source/sprite-fusion/outputs/spark-driver-portrait-v1/06.png",
+      "bytes": 9616,
+      "sha256": "92f28e714a3dca89c81eaa10f118b242dbf3d0dea7709a5d0d538612650c27ab"
+    },
+    {
+      "index": 7,
+      "assetId": "ce9205ab-9878-4537-aa46-f357adb8de66",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 77,
+      "height": 77,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/ce9205ab-9878-4537-aa46-f357adb8de66/image.png?v=1791427345793",
+      "path": "art/source/sprite-fusion/outputs/spark-driver-portrait-v1/07.png",
+      "bytes": 10256,
+      "sha256": "f7cecc6b4a2ca4e49419adb71530b5625f51219e14ce34109ded8daa50d01871"
+    },
+    {
+      "index": 8,
+      "assetId": "6a4e8757-e56c-4edb-94b3-ae09132947a0",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 72,
+      "height": 72,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/6a4e8757-e56c-4edb-94b3-ae09132947a0/image.png?v=1791427346360",
+      "path": "art/source/sprite-fusion/outputs/spark-driver-portrait-v1/08.png",
+      "bytes": 8842,
+      "sha256": "92feeeeffd3149aedc844a8a72b1d4bc1d9c0af6129dcf6d83cde975922d527f"
+    }
+  ],
+  "credits": {
+    "remaining": 2550
+  }
+}

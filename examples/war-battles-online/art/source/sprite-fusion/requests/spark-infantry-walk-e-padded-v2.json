@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_23a54618-9ce8-4c98-9c39-d2998e19a316",
+  "operation": "animate",
+  "prompt": "A grounded left-facing walk loop with alternating boot contact and a small opposite-arm swing. Preserve Spark's spiky black hair, orange headband, raised brass goggles, teal collar, olive jacket, tan skin, compact low sidearm, proportions, colors, and exact side view. Keep the complete hair, boots, sidearm, and arms inside the canvas throughout the motion.",
+  "size": null,
+  "outputFrames": 4,
+  "colors": 24,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/inputs/spark-infantry-walk-pose-e-v1-0-padded-64.png",
+      "bytes": 3334,
+      "sha256": "33b529caa04658cba03cbd1dac1a863b4e7d155f4fe55e5461f24ced15f3935a"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/spark-infantry-walk-e-padded-v2.json",
+    "sha256": "7481d4b5da7da15a8c24524e77987840b8809610b3a93996749d270cb6919a67"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "2fd393bb-53ea-4735-930e-22243b63cfd1",
+      "type": "animation",
+      "contentType": "image/webp",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/2fd393bb-53ea-4735-930e-22243b63cfd1/animation.webp?v=1791562460819",
+      "path": "art/source/sprite-fusion/outputs/spark-infantry-walk-e-padded-v2/00.webp",
+      "bytes": 2256,
+      "sha256": "2b735c8c141a0ad38d605daa96fe8050606336c9edbc629e13ba060db98dff34",
+      "spritesheet": {
+        "url": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/2fd393bb-53ea-4735-930e-22243b63cfd1/spritesheet.png?v=1791562460819",
+        "path": "art/source/sprite-fusion/outputs/spark-infantry-walk-e-padded-v2/00-sheet.png",
+        "bytes": 2724,
+        "sha256": "abf6c2343f0ee4af87c8b1db24a9b61fd525a1abd746e283170fa2a35e6f57e8"
+      },
+      "frameCount": 4,
+      "fps": 8
+    }
+  ],
+  "credits": {
+    "remaining": 120
+  }
+}

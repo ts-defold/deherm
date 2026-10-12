@@ -7,7 +7,12 @@ import { fileURLToPath } from "node:url";
 
 const exampleRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const engine = resolve(exampleRoot, "defold/build/arm64-osx/dmengine");
-const runtimeRoot = resolve(exampleRoot, "defold/build/bob");
+const arguments_ = process.argv.slice(2);
+// The interactive full stack uses createDefoldBuilder's native output. The
+// standalone `pnpm play` command uses the separately packaged Bob archive.
+// Never launch a native engine against a prior HTML5 archive in build/bob.
+const useDevBuild = arguments_[0] === "--dev-build";
+const runtimeRoot = resolve(exampleRoot, useDevBuild ? "defold/build/default" : "defold/build/bob");
 const project = resolve(runtimeRoot, "game.projectc");
 
 try {
@@ -24,7 +29,7 @@ try {
 const engineMode = (await stat(engine)).mode;
 if ((engineMode & 0o111) === 0) await chmod(engine, engineMode | 0o755);
 
-const child = spawn(engine, process.argv.slice(2), {
+const child = spawn(engine, useDevBuild ? arguments_.slice(1) : arguments_, {
   cwd: runtimeRoot,
   stdio: "inherit",
 });

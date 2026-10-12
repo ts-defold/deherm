@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_995e0f9f-2272-40bc-9915-4946142597f7",
+  "operation": "animate",
+  "prompt": "A quick grounded south-facing walk cycle, alternating boot contact and a small opposite-arm swing. Keep Rook's compact sidearm low and her helmet, goggles, scarf, proportions, colors, and viewing angle consistent. Seamless loop without turning or jumping.",
+  "size": null,
+  "outputFrames": 4,
+  "colors": 24,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "ee1d4941-ed51-4714-a4a3-7f239c620f8f"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/rook-infantry-walk-s-v1.json",
+    "sha256": "aea438654257e0c81daaaa806fd8e195599ba887902376f076d9087b230260fc"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "dcd8b501-5393-4965-9287-653aa929d8a9",
+      "type": "animation",
+      "contentType": "image/webp",
+      "width": 32,
+      "height": 49,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/dcd8b501-5393-4965-9287-653aa929d8a9/animation.webp?v=1791522276884",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-walk-s-v1/00.webp",
+      "bytes": 2682,
+      "sha256": "5146ac544c809e680868b28c3d7f30ded154383a1f0735088f79041ec7bb1c9e",
+      "spritesheet": {
+        "url": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/dcd8b501-5393-4965-9287-653aa929d8a9/spritesheet.png?v=1791522276884",
+        "path": "art/source/sprite-fusion/outputs/rook-infantry-walk-s-v1/00-sheet.png",
+        "bytes": 2238,
+        "sha256": "560bfbee1386b7d8e345c6cef733eaf2026de7e1f2b4ea275787086830392917"
+      },
+      "frameCount": 4,
+      "fps": 8
+    }
+  ],
+  "credits": {
+    "remaining": 1980
+  }
+}

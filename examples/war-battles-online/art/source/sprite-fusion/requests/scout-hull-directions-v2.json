@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_bb1111c0-931f-45e3-a574-79a0403ae7c6",
+  "operation": "direction-set",
+  "prompt": null,
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/scout-hull-v2/00.png",
+      "bytes": 4533,
+      "sha256": "10e2ad00d7893daa6f427e1e57c9575a79d98a62e62d82d201ae8748f1e268d9"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/scout-hull-directions-v2.json",
+    "sha256": "683edf995fb4b4197db24b308f214a99e99bf177ea0efa32e5003533ac6960b3"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "e92c2b15-652d-44a5-a132-25e286d88256",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/e92c2b15-652d-44a5-a132-25e286d88256/image.png?v=1791432538831",
+      "path": "art/source/sprite-fusion/outputs/scout-hull-directions-v2/00.png",
+      "bytes": 3086,
+      "sha256": "f952dcaa1a611586600c02b98083bdb525b55dd793bd74f909dcec53068c8e82"
+    },
+    {
+      "index": 1,
+      "assetId": "b645c73d-8fee-434e-b4fc-87f09f4c44a2",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/b645c73d-8fee-434e-b4fc-87f09f4c44a2/image.png?v=1791432539380",
+      "path": "art/source/sprite-fusion/outputs/scout-hull-directions-v2/01.png",
+      "bytes": 2595,
+      "sha256": "2b8b5ce3cd90fadc47611b3b43225bad2b6393544b1b2871a4c153ab2bf6bb77"
+    },
+    {
+      "index": 2,
+      "assetId": "74a4c880-7c04-4b4a-86e7-c04a79c0cab1",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/74a4c880-7c04-4b4a-86e7-c04a79c0cab1/image.png?v=1791432539997",
+      "path": "art/source/sprite-fusion/outputs/scout-hull-directions-v2/02.png",
+      "bytes": 2779,
+      "sha256": "128959a96c28decad48ffef2de7ce01fc307735942896c199cde8328709538cc"
+    },
+    {
+      "index": 3,
+      "assetId": "70b21e6b-39c4-46ec-a6aa-05578c22528e",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/70b21e6b-39c4-46ec-a6aa-05578c22528e/image.png?v=1791432540490",
+      "path": "art/source/sprite-fusion/outputs/scout-hull-directions-v2/03.png",
+      "bytes": 2995,
+      "sha256": "6826c3a058560a45555594733bc05c430221c1da21ca4b44e52c14930ab0b402"
+    },
+    {
+      "index": 4,
+      "assetId": "6e2d25e5-5d5e-4599-85d4-ee8f40edc42f",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/6e2d25e5-5d5e-4599-85d4-ee8f40edc42f/image.png?v=1791432541081",
+      "path": "art/source/sprite-fusion/outputs/scout-hull-directions-v2/04.png",
+      "bytes": 3061,
+      "sha256": "d29df7e4e65b89d007f9be9a126d864b37b6bad207ec6372eea2b1dc56b0b5a5"
+    },
+    {
+      "index": 5,
+      "assetId": "2d80ffea-4c79-48e3-bc25-2d9cabdaefd0",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/2d80ffea-4c79-48e3-bc25-2d9cabdaefd0/image.png?v=1791432541648",
+      "path": "art/source/sprite-fusion/outputs/scout-hull-directions-v2/05.png",
+      "bytes": 3526,
+      "sha256": "925f17700ec81e61f02b1de02fcd9db0cbb5d4f825be539b9fd99332085b56b3"
+    },
+    {
+      "index": 6,
+      "assetId": "7af00798-9027-42c2-9fa4-373c37afed0f",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/7af00798-9027-42c2-9fa4-373c37afed0f/image.png?v=1791432542115",
+      "path": "art/source/sprite-fusion/outputs/scout-hull-directions-v2/06.png",
+      "bytes": 2639,
+      "sha256": "d3488537c967dd22127a26eba77815388c814b627c8b106a083685d8b6dccad5"
+    },
+    {
+      "index": 7,
+      "assetId": "e0bc9f3b-0c70-4126-b102-0fff11e521c3",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/e0bc9f3b-0c70-4126-b102-0fff11e521c3/image.png?v=1791432542697",
+      "path": "art/source/sprite-fusion/outputs/scout-hull-directions-v2/07.png",
+      "bytes": 3765,
+      "sha256": "1aca254caca4ca332ceae48f994b67d77e3cf4834be0d9d91da630ec7aaf3e15"
+    }
+  ],
+  "credits": {
+    "remaining": 2370
+  }
+}

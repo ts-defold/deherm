@@ -1,0 +1,12 @@
+{
+  "name": "frontier-hex-service-scar-v1",
+  "operation": "style-reference",
+  "size": 64,
+  "prompt": "A single walkable steel service-deck hex for a three-quarter-view volcanic refinery battlefield. Broad level top of worn charcoal steel plates with a small recessed grated drain, chipped edges, a few amber rivets, dust in seams, and one subtle heat stain; short dark steel side face. Match the reference tiles' six-sided footprint, upper-left light, chunky pixel clusters, and muted military palette. Keep the geometry practical and low contrast so combat silhouettes remain readable. No vehicle, character, building, lettering, or other tile.",
+  "inputs": [
+    "art/source/sprite-fusion/outputs/frontier-hex-steel-detail-v2/03.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-steel-detail-v2/07.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-service-deck-v1/06.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-refinery-grate-v1/08.png"
+  ]
+}

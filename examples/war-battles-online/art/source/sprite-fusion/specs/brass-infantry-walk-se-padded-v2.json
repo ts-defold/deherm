@@ -1,0 +1,10 @@
+{
+  "name": "brass-infantry-walk-se-padded-v2",
+  "operation": "animate",
+  "inputs": [
+    "art/source/sprite-fusion/inputs/brass-infantry-walk-pose-se-v1-1-padded-80.png"
+  ],
+  "prompt": "A grounded southeast-facing walk loop with alternating boot contact and a small opposite-arm swing. Preserve Brass's round goggles, steel helmet, cream scarf, orange accents, sidearm, proportions, colors, and southeast-facing perspective. Keep the complete helmet, boots, sidearm, and arms inside the canvas throughout the motion.",
+  "outputFrames": 4,
+  "colors": 24
+}

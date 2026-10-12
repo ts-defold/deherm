@@ -1,0 +1,10 @@
+{
+  "name": "spark-infantry-walk-sw-padded-v2",
+  "operation": "animate",
+  "inputs": [
+    "art/source/sprite-fusion/inputs/spark-infantry-walk-pose-sw-v1-1-padded-80.png"
+  ],
+  "prompt": "A grounded southwest-facing walk loop with alternating boot contact and opposite-arm swing. Preserve Spark's blue-orange goggles, dark cap, orange scarf, blue jacket, slim silhouette, low sidearm, palette, and exact three-quarter front view. Keep the full character and equipment inside every frame with clear room on all sides.",
+  "outputFrames": 4,
+  "colors": 24
+}

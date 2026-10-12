@@ -4,7 +4,7 @@
 import assert from "node:assert/strict";
 import { execFileSync, spawn } from "node:child_process";
 import { createHash } from "node:crypto";
-import { cp, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { cp, mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -23,9 +23,13 @@ const exampleRoot = resolve(here, "..");
 const denoBinary = process.env.DEHERM_DENO ?? "deno";
 const chromeBinary = process.env.DEHERM_CHROME ?? defaultChromeBinary;
 const botCount = Number.parseInt(process.env.DEHERM_NETWORK_BOTS ?? "32", 10);
+const observeMilliseconds = Number(process.env.DEHERM_NETWORK_BOT_OBSERVE_MS ?? 0);
 const rosterSize = Math.max(2, botCount);
 if (!Number.isInteger(botCount) || botCount < 1 || botCount > 32) {
   throw new RangeError("DEHERM_NETWORK_BOTS must be an integer in [1, 32]");
+}
+if (!Number.isInteger(observeMilliseconds) || observeMilliseconds < 0 || observeMilliseconds > 120_000) {
+  throw new RangeError("DEHERM_NETWORK_BOT_OBSERVE_MS must be an integer in [0, 120000]");
 }
 
 async function run() {
@@ -161,9 +165,60 @@ async function run() {
       assert.ok(bot.pongsReceived > 0, `bot ${bot.index} must receive protocol-ping telemetry`);
     }
     assert.equal(page.client.failures.length, 0);
+    await page.client.send("Emulation.setDeviceMetricsOverride", {
+      width: 1280,
+      height: 900,
+      deviceScaleFactor: 1,
+      mobile: false,
+    });
+    const tableShape = await page.client.send("Runtime.evaluate", {
+      expression: `({ headers: document.querySelector("#bots")?.closest("table")?.querySelectorAll("th").length, cells: document.querySelector("#bots tr")?.cells.length })`,
+      returnByValue: true,
+    });
+    assert.equal(tableShape.exceptionDetails, undefined);
+    assert.deepEqual(tableShape.result.value, { headers: 12, cells: 12 });
+    const screenshot = await page.client.send("Page.captureScreenshot", {
+      format: "png",
+      fromSurface: true,
+      captureBeyondViewport: false,
+    });
+    const screenshotPath = resolve(exampleRoot, "build/evidence/network-bot-dashboard.png");
+    await mkdir(dirname(screenshotPath), { recursive: true });
+    await writeFile(screenshotPath, Buffer.from(screenshot.data, "base64"));
+    console.log(`war-battles-network-bots:dashboard:${screenshotPath}`);
 
-    const playersBeforeRedeploy = [...observed.players];
-    const countersBeforeRedeploy = observed.bots.map((bot) => ({
+    let sustained = observed;
+    if (observeMilliseconds > 0) {
+      await new Promise((done) => setTimeout(done, observeMilliseconds));
+      const result = await page.client.send("Runtime.evaluate", {
+        expression: "globalThis.__warBattlesNetworkBots.summary()",
+        returnByValue: true,
+      });
+      sustained = result.result.value;
+      assert.equal(sustained.ready, botCount, "every bot must remain ready through the observation window");
+      assert.equal(sustained.failed, 0);
+      assert.deepEqual(sustained.players, observed.players, "bot sessions must remain attached to their player slots");
+      for (let index = 0; index < botCount; index += 1) {
+        assert.ok(sustained.bots[index].snapshotsApplied > observed.bots[index].snapshotsApplied);
+        assert.ok(sustained.bots[index].inputsSent > observed.bots[index].inputsSent);
+        assert.ok(sustained.bots[index].observedTravelUnits > observed.bots[index].observedTravelUnits);
+      }
+      const ejections = sustained.bots.reduce((sum, bot) => sum + bot.observedEjections, 0);
+      const tankReentries = sustained.bots.reduce((sum, bot) => sum + bot.observedTankReentries, 0);
+      const respawns = sustained.bots.reduce((sum, bot) => sum + bot.observedRespawns, 0);
+      const maximumModeTransitions = Math.max(...sustained.bots.map((bot) => bot.observedModeTransitions));
+      const transitionIntervals = sustained.bots
+        .map((bot) => bot.minimumModeTransitionIntervalTicks)
+        .filter((ticks) => Number.isInteger(ticks));
+      const minimumModeTransitionIntervalTicks =
+        transitionIntervals.length === 0 ? "none" : Math.min(...transitionIntervals);
+      console.log(
+        `war-battles-network-bots:observe:milliseconds=${observeMilliseconds}:snapshots=${sustained.snapshotsApplied}:inputs=${sustained.inputsSent}:ejections=${ejections}:depot-reentries=${tankReentries}:respawns=${respawns}:maximum-mode-transitions=${maximumModeTransitions}:minimum-mode-interval-ticks=${minimumModeTransitionIntervalTicks}`,
+      );
+    }
+
+    const playersBeforeRedeploy = [...sustained.players];
+    const countersBeforeRedeploy = sustained.bots.map((bot) => ({
       snapshotsApplied: bot.snapshotsApplied,
       inputsSent: bot.inputsSent,
     }));

@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_d4893120-8c07-4b5e-a401-b34b30137ada",
+  "operation": "edit",
+  "prompt": "Keep Brass facing straight south toward the viewer. Change his stocky body into a clearly defeated collapsed pose: one heavy knee on the ground, torso and brown helmet bowed low forward, one hand braced on the ground, sidearm lowered, silhouette shorter and wider than standing. Preserve the same older driver, white beard, goggles, cream scarf, olive jacket, boots and knee on one ground line, colors and dark outline. No turn away from the viewer, blood, injury detail, explosion, extra prop, scenery, platform, text, or second person.",
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "dba1137a-d8a2-42a7-b513-475e8b719ec9"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/brass-infantry-death-pose-s-v1.json",
+    "sha256": "d42af627eb0cf9b08302d4d41861843f8cf7a8ea47302d26a88011b11583e13a"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "f00d36b3-221f-4f6c-a31a-79598706c9fc",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 46,
+      "height": 50,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/f00d36b3-221f-4f6c-a31a-79598706c9fc/image.png?v=1791535480383",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-death-pose-s-v1/00.png",
+      "bytes": 4792,
+      "sha256": "135572eb2a5e5d87660d0a2a0d81a88f101bfff0e6b8a74e0956246b0e2115bf"
+    },
+    {
+      "index": 1,
+      "assetId": "12636463-ad75-4e04-ac81-ff756a00f7cd",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 44,
+      "height": 41,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/12636463-ad75-4e04-ac81-ff756a00f7cd/image.png?v=1791535481526",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-death-pose-s-v1/01.png",
+      "bytes": 4191,
+      "sha256": "27a8d8866e546ce146bf1b21837f9d662ff4f588ac362184cc990526e55b705e"
+    }
+  ],
+  "credits": {
+    "remaining": 675
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "artillery-silhouette-v2",
+  "operation": "generate",
+  "size": 64,
+  "prompt": "Three-quarter isometric top-down self-propelled artillery vehicle for a lively retro arcade tank game. Distinct long, low chassis with two wide separated tracks, a high rear casemate, an extremely long narrow rail cannon aimed toward the lower right, and folded stabilizer legs behind it. Angular basalt-grey armor, warm cream edge highlights, a few restrained orange signal markings, dark readable outline. The driver is enclosed; no face or character above the hull. A single vehicle viewed from above on clear empty ground, visually readable as a tiny moving game sprite."
+}

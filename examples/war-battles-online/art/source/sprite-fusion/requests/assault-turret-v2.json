@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_bd1c9b64-fa69-4df9-ab76-757e85f1e901",
+  "operation": "edit",
+  "prompt": "Isolate only this assault tank's angular rotating turret and short autocannon assembly as one detached weapon sprite. Remove the entire tracked hull and chassis underneath, keeping the same three-quarter isometric direction, basalt armor palette, orange signal marks and dark outline. The compact turret base should sit on the matching assault hull socket. One isolated turret, no hull.",
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/assault-silhouette-v2/02.png",
+      "bytes": 10408,
+      "sha256": "90bf79e453efba966933a8956cbd4598d07baecf1832be979f1e1330a67f2322"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/assault-turret-v2.json",
+    "sha256": "4b5105c0a78d0642ddbdf689447480fff9fa6493b75e7610b4fad76fb7bdd351"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "b70e18ba-2a38-4d7a-8326-79e12fc733fc",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 56,
+      "height": 50,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/b70e18ba-2a38-4d7a-8326-79e12fc733fc/image.png?v=1791432411168",
+      "path": "art/source/sprite-fusion/outputs/assault-turret-v2/00.png",
+      "bytes": 5791,
+      "sha256": "278c27253dfc5057b1f57ddeb3bf94631e90a32f0b97e8fc0f5bbcf3342ae1cf"
+    },
+    {
+      "index": 1,
+      "assetId": "56d78f7a-dc4c-44b3-9d20-417c96d5bf79",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 52,
+      "height": 39,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/56d78f7a-dc4c-44b3-9d20-417c96d5bf79/image.png?v=1791432412018",
+      "path": "art/source/sprite-fusion/outputs/assault-turret-v2/01.png",
+      "bytes": 3355,
+      "sha256": "608609da34bf8521c92bb157c743002c9ef10b38478f3d34bbfb93aa3d7a9f7b"
+    }
+  ],
+  "credits": {
+    "remaining": 2400
+  }
+}

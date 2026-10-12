@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_0033e466-0fc3-475b-bbb5-f9646a98c1e1",
+  "operation": "style-reference",
+  "prompt": "A defensive fortress tank for the same three-quarter isometric top-down arcade battlefield as the reference vehicle. Distinct very wide squat hull with two massive protruding armored side tracks, layered vertical shield plates on its blunt front, an oversized circular turret with a short thick cannon, rear stowage. Basalt-grey armor, warm cream highlights, restrained orange signal markings, dark readable outline. No visible driver, no face. Its heavy almost turtle-like silhouette must differ clearly from the long-gun artillery reference.",
+  "size": 64,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/artillery-silhouette-v2/06.png",
+      "bytes": 6694,
+      "sha256": "35bc14823ff7bb405030a156a7f2bf267204d34c73c1b60cb98ac0b62e42928e"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/bulwark-silhouette-v2.json",
+    "sha256": "24a79d931727fd664c230eade5a560ef150bca59c56e4e1f478f275ebf6d9eae"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "356871c5-5c53-465d-8434-f250d62dbe21",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 75,
+      "height": 75,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/356871c5-5c53-465d-8434-f250d62dbe21/image.png?v=1791426828242",
+      "path": "art/source/sprite-fusion/outputs/bulwark-silhouette-v2/00.png",
+      "bytes": 9817,
+      "sha256": "f680e9486ac5b1f68f9957f2904541569739b08909eec2d6fcae785abc7f4ddf"
+    },
+    {
+      "index": 1,
+      "assetId": "cf3c89cc-cf8f-406f-9016-8ce64052e904",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 77,
+      "height": 77,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/cf3c89cc-cf8f-406f-9016-8ce64052e904/image.png?v=1791426828832",
+      "path": "art/source/sprite-fusion/outputs/bulwark-silhouette-v2/01.png",
+      "bytes": 9656,
+      "sha256": "359a0a8df3231c670f336b86fb9a504b8b58a6383e1d856c2a8a479eb92b193a"
+    },
+    {
+      "index": 2,
+      "assetId": "76e0cb6c-d0cd-4bec-8664-7f8a8c2dd94a",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 73,
+      "height": 73,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/76e0cb6c-d0cd-4bec-8664-7f8a8c2dd94a/image.png?v=1791426829397",
+      "path": "art/source/sprite-fusion/outputs/bulwark-silhouette-v2/02.png",
+      "bytes": 10221,
+      "sha256": "e03e7d30c39d967f44698cd844dd2d763bffb0c6239dab31b85110b78d07b154"
+    }
+  ],
+  "credits": {
+    "remaining": 2610
+  }
+}

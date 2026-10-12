@@ -1,0 +1,8 @@
+{
+  "name": "mud-infantry-walk-pose-nw-v1",
+  "operation": "edit",
+  "inputs": [
+    "asset:e9724581-922b-4e50-9fff-30919bc0efc7"
+  ],
+  "prompt": "Change only Mud's body pose to a grounded northwest-facing three-quarter rear walk mid-stride: one boot forward, the other planted, opposite arm swinging, compact sidearm low. Preserve his respirator mask, ochre helmet, orange-rimmed goggles, rust-red scarf, dark olive jacket, rugged build, original colors, outline, scale, and exact source viewing angle. No turn, extra person, platform, text, or scenery."
+}

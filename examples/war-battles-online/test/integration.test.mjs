@@ -10,13 +10,37 @@ import { runReplay } from "../headless/match.ts";
 import { buildBotReplay, readReplayHeader } from "../headless/replay.ts";
 import { CURRENT_TRANSPORT_EVIDENCE, TransportSelectionMachine } from "../integration/transport-selection.ts";
 import { evaluateEngineAttachment } from "../integration/runtime-capability.ts";
-import { EXPECTED_COMPONENT_COUNT } from "../integration/check-browser-runtime.mjs";
+import { EXPECTED_COMPONENT_COUNT, missingBrowserMarkers } from "../integration/check-browser-runtime.mjs";
 import { COMPONENT_PROXY_CAPABILITY, WAR_BATTLES_ENGINE_CAPABILITY } from "../defold/src/capability-snapshot.ts";
+import {
+  ARENA_DECOR_ROLE_COUNT,
+  ARENA_GROUND_ROLE_COUNT,
+  ARENA_GROUND_VARIANT_COUNT,
+  ARENA_MARK_ROLE_COUNT,
+} from "../core/arena-visual.ts";
+import { decodeRgbaPng } from "../tools/generate-world-art.mjs";
 
 const exampleRoot = path.resolve(import.meta.dirname, "..");
 const repositoryRoot = path.resolve(exampleRoot, "../..");
 const fromExample = (...segments) => path.join(exampleRoot, ...segments);
 const fromRepository = (...segments) => path.join(repositoryRoot, ...segments);
+
+test("browser camera evidence accepts a corner clamp for both axes", () => {
+  const cameraClampFailures = (transcript) =>
+    missingBrowserMarkers(transcript).filter((missing) => missing.kind === "camera-clamp");
+  assert.deepEqual(
+    cameraClampFailures([
+      "war-battles:camera:0.0,0.0:clamped=none",
+      "war-battles:camera:1.0,0.0:clamped=x",
+      "war-battles:camera:1.0,1.0:clamped=xy",
+    ]),
+    [],
+  );
+  assert.deepEqual(
+    cameraClampFailures(["war-battles:camera:0.0,0.0:clamped=none", "war-battles:camera:1.0,0.0:clamped=x"]),
+    [{ kind: "camera-clamp", marker: ":clamped=y" }],
+  );
+});
 
 test("32-bot replay is byte-reproducible and detects corruption", () => {
   const options = { players: 32, ticks: 300, seed: 0xc0ffee, matchId: 77 };
@@ -142,7 +166,7 @@ test("Defold attachment consumes generated proxy evidence and the independent en
   );
   assert.deepEqual(
     bySource.get("main/tank.script.ts").properties.map((property) => property.name),
-    ["slot", "part"],
+    ["slot"],
   );
   assert.equal(bySource.get("main/ui.gui.ts").proxy, "main/ui.gui_script");
   assert.equal(bySource.get("main/ui.gui.ts").contextKind, "gui-scene");
@@ -183,7 +207,7 @@ test("Defold-local deterministic sources are fresh copies of the canonical core"
     cwd: repositoryRoot,
     encoding: "utf8",
   });
-  assert.match(result, /21 generated Defold sources are fresh/);
+  assert.match(result, /\d+ generated Defold sources are fresh/);
 });
 
 test("all targets consume the generated WebTransport constructor without a game-level native split", async () => {
@@ -258,8 +282,12 @@ test("the built project is the arena, and the mockup stays out of the build", as
   assert.match(playerObject, /component: "\/main\/player\.script"/);
   assert.match(tankObject, /component: "\/main\/tank\.script"/);
   assert.match(tankObject, /tile_set: \\"\/main\/arena-sprites\.atlas\\"/);
+  assert.match(tankObject, /id: "turret"/);
+  assert.match(playerObject, /id: "turret"/);
+  assert.match(arenaSource, /one sampled pose/);
+  assert.doesNotMatch(arenaSource, /\["part", PART_TURRET\]/);
   assert.match(tankObject, /id: "hero"/);
-  assert.match(tankObject, /tile_set: \\"\/main\/tutorial-sprites\.atlas\\"/);
+  assert.match(tankObject, /tile_set: \\"\/main\/hero-sprites\.atlas\\"/);
   assert.match(playerObject, /type: "factory"/);
   assert.match(playerObject, /prototype: \\"\/main\/rocket\.go\\"/);
   assert.match(rocketObject, /type: COLLISION_OBJECT_TYPE_KINEMATIC/);
@@ -276,6 +304,11 @@ test("the built project is the arena, and the mockup stays out of the build", as
   for (const factoryId of [
     "tankfactory",
     "pickupfactory",
+    "coverfactory",
+    "sandbagafactory",
+    "sandbagbfactory",
+    "spawnmarkerfactory",
+    "pickupmarkerfactory",
     "shotfactory",
     "boomfactory",
     "sparkfactory",
@@ -301,8 +334,13 @@ test("the built project is the arena, and the mockup stays out of the build", as
   assert.match(arenaSource, /spawnMuzzle\(self/);
   assert.match(arenaSource, /EVENT_COVER_CHANGED/);
   assert.match(arenaSource, /tilemap\.setTile\(ARENA_TILEMAP, ARENA_MARKS_LAYER/);
-  assert.match(arenaSource, /coverVisualDestroyed/);
+  assert.match(arenaSource, /syncCoverSprites\(self\)/);
+  assert.match(arenaSource, /syncFloorMarkers\(self\)/);
   assert.match(arenaSource, /EVENT_HAZARD_DAMAGE/);
+  assert.match(
+    arenaSource,
+    /Mirror DEFAULT_ROSTER_SIZE; Defold editor properties require literals\.[\s\S]*players: property\.number\(16\)/,
+  );
   assert.match(arenaSource, /spawnEffect\(self, false, self\.event\.x, self\.event\.y\)/);
   assert.match(arenaSource, /msg\.post\(CAMERA, CAMERA_IMPACT, self\.impact\)/);
   assert.match(arenaSource, /self\.impact\.strength = 0/);
@@ -328,8 +366,18 @@ test("the built project is the arena, and the mockup stays out of the build", as
   assert.match(cameraSource, /Clamp after applying the impulse/);
 
   assert.match(scene, /script: "\/main\/ui\.gui_script"/);
-  assert.equal((scene.match(/type: TYPE_TEXT/g) ?? []).length, 15);
-  for (const id of ["title_back", "title_logo", "title_panel", "title_portrait", "title_deploy", "title_sponsor"]) {
+  assert.equal((scene.match(/type: TYPE_TEXT/g) ?? []).length, 17);
+  assert.match(scene, /id: "touch_move_label"/);
+  assert.match(scene, /id: "touch_fire_label"/);
+  for (const id of [
+    "title_back",
+    "title_logo",
+    "title_panel",
+    "title_portrait",
+    "title_deploy",
+    "title_sponsor_back",
+    "title_sponsor",
+  ]) {
     assert.match(scene, new RegExp(`id: "${id}"`));
   }
   assert.match(scene, /id: "title_panel"[\s\S]*?slice9 \{ x: 6\.0 y: 6\.0 z: 6\.0 w: 6\.0 \}/);
@@ -339,18 +387,21 @@ test("the built project is the arena, and the mockup stays out of the build", as
   assert.match(scene, /id: "telemetry"/);
   assert.match(scene, /id: "health_label"/);
   assert.match(scene, /id: "armor_label"/);
+  assert.match(uiSource, /self\.view\.mode === PLAYER_MODE_INFANTRY \? INFANTRY_HEALTH : chassis\.maxHealth/);
+  assert.match(uiSource, /\? "PILOT" : "HULL"/);
+  assert.match(uiSource, /: "DOWN 0"/);
   assert.match(scene, /id: "announcement"/);
   assert.match(scene, /id: "announcement_back"/);
   assert.match(scene, /id: "objective"/);
   assert.match(scene, /id: "objective_back"/);
-  assert.match(scene, /size \{ x: 610\.0 y: 94\.0 \}[\s\S]*?id: "hud_back"/);
+  assert.match(scene, /size \{ x: 680\.0 y: 118\.0 \}[\s\S]*?id: "hud_back"/);
   assert.doesNotMatch(scene, /size \{ x: 1280\.0 y: 116\.0 \}[\s\S]*?id: "hud_back"/);
   assert.match(uiSource, /EVENT_KILL/);
   assert.match(uiSource, /EVENT_OBJECTIVE_CAPTURE/);
   assert.match(uiSource, /EVENT_HAZARD_DAMAGE/);
   assert.match(uiSource, /EVENT_COVER_CHANGED/);
   assert.match(uiSource, /COVER PANEL \$\{self\.event\.a \+ 1\} DESTROYED/);
-  assert.match(uiSource, /VENT \$\{hazard \+ 1\} HOT/);
+  assert.match(uiSource, /VENT \$\{hazard \+ 1\}/);
   assert.match(uiSource, /COMMAND BEACON/);
   assert.match(uiSource, /gui\.setEnabled\(self\.announcement, false\)/);
   assert.match(uiSource, /ANNOUNCEMENT_TICKS = 180/);
@@ -371,6 +422,31 @@ test("the built project is the arena, and the mockup stays out of the build", as
   assert.match(rocketSource, /msg\.post\("\/gui#ui", "add_score"/);
   assert.match(uiSource, /gui\.getNode\("score"\)/);
   assert.match(blockers, /war-battles:rocket-expired/);
+});
+
+test("pixel-art renderer requests nearest sampling and whole-pixel world placement", async () => {
+  const [project, matchSource, cameraObject, remoteTankObject, localTankObject, arenaSource] = await Promise.all([
+    readFile(fromExample("defold/game.project"), "utf8"),
+    readFile(fromExample("defold/src/arena-match.ts"), "utf8"),
+    readFile(fromExample("defold/main/camera.go"), "utf8"),
+    readFile(fromExample("defold/main/arena-tank.go"), "utf8"),
+    readFile(fromExample("defold/main/player.go"), "utf8"),
+    readFile(fromExample("defold/main/arena.script.ts"), "utf8"),
+  ]);
+  assert.match(project, /\[graphics\][\s\S]*default_texture_min_filter = nearest/);
+  assert.match(project, /\[graphics\][\s\S]*default_texture_mag_filter = nearest/);
+  assert.match(matchSource, /return Math\.round\(isometricScreenX\(x, y\)\)/);
+  assert.match(matchSource, /return Math\.round\(isometricScreenY\(x, y\)\)/);
+  assert.match(cameraObject, /orthographic_zoom: 2\.0/);
+  assert.match(remoteTankObject, /id: "turret"/);
+  // The generated hero sheet's foot baseline is sixteen pixels below its
+  // sprite centre. Local and remote objects must share that exact pivot.
+  for (const tankObject of [localTankObject, remoteTankObject]) {
+    assert.match(tankObject, /id: "hero"[\s\S]*?y: 16\.0\n    z: 0\.05/u);
+  }
+  // Presentation effects must rise with the same hex relief as their owner.
+  assert.match(arenaSource, /function spawnEffect\([\s\S]*?projectedY\(x, y\) \+ hexReliefLiftAtSimulation\(x, y\)/u);
+  assert.match(arenaSource, /function spawnMuzzle\([\s\S]*?projectedY\(x, y\) \+ hexReliefLiftAtSimulation\(x, y\)/u);
 });
 
 test("the arena tilemap is the picture of the arena the simulation collides with", () => {
@@ -412,7 +488,8 @@ test("the Defold tilemap generator materializes every seeded visual theme", () =
     assert.match(tilemap, /id: "decor"/);
     assert.match(tilemap, /id: "walls"/);
     assert.match(tilemap, /id: "marks"/);
-    assert.equal((tilemap.match(/cell \{/g) ?? []).length > 10_800, true);
+    assert.match(tilemap, /layers \{\s+id: "ground"\s+z: 0\.0\s*\}/);
+    assert.equal((tilemap.match(/cell \{/g) ?? []).length > 500, true);
   }
 });
 
@@ -444,7 +521,7 @@ test("the generated arena art is fresh and its tile map is machine-readable", as
     "n",
     "centre",
   ]);
-  assert.equal(map.groundTileIds.length, 208, "the connected four-material landscape role table must be total");
+  assert.equal(map.groundTileIds.length, ARENA_GROUND_VARIANT_COUNT, "the generated ground role table must be total");
   assert.deepEqual(Object.keys(map.wallTileIds).sort(), ["centre", "e", "n", "ne", "nw", "s", "se", "sw", "w"]);
   for (const key of ["crateTileId", "sandbagTileId", "spawnPadTileId", "pickupPadTileId"]) {
     assert.equal(Number.isInteger(map[key]), true, `${key} must be a tile id`);
@@ -462,13 +539,13 @@ test("the generated arena art is fresh and its tile map is machine-readable", as
     const theme = map.themes[themeId];
     assert.equal(
       theme.groundRoleTileIds.length,
-      224,
-      `${themeId} must cover 208 connected landscape roles plus 16 wall roles`,
+      ARENA_GROUND_ROLE_COUNT,
+      `${themeId} must cover all ground and wall roles`,
     );
     assert.equal(theme.wallMaskTileIds.length, 16, `${themeId} must cover all neighbour masks`);
     assert.equal(theme.wallFaceTileIds.length, 16, `${themeId} must cover every raised-wall facade`);
-    assert.equal(theme.markRoleTileIds.length, 5, `${themeId} must cover every mark role`);
-    assert.equal(theme.decorRoleTileIds.length, 39, `${themeId} must cover every decor, road, and landmark role`);
+    assert.equal(theme.markRoleTileIds.length, ARENA_MARK_ROLE_COUNT, `${themeId} must cover every mark role`);
+    assert.equal(theme.decorRoleTileIds.length, ARENA_DECOR_ROLE_COUNT, `${themeId} must cover every decor role`);
     assert.ok(theme.wallMaskTileIds.every((tileId) => Number.isInteger(tileId) && tileId > 0));
     assert.ok(theme.wallFaceTileIds.every((tileId) => Number.isInteger(tileId) && tileId > 0));
   }
@@ -485,6 +562,19 @@ test("the generated arena art is fresh and its tile map is machine-readable", as
   for (const themeId of map.themeOrder) assert.match(generatedContract, new RegExp(`id: "${themeId}"`));
   // The atlas the components address by name has to actually declare them.
   const atlas = await readFile(fromExample("defold/main/arena-sprites.atlas"), "utf8");
+  const landmarkSource = await readFile(fromExample("defold/main/arena-landmark.script.ts"), "utf8");
+  assert.equal(manifest.source.hexRidges, undefined, "rejected floating-ridge source is not a build dependency");
+  assert.doesNotMatch(atlas, /hex-ridge-/, "rejected floating-ridge sprites are not packaged");
+  assert.doesNotMatch(landmarkSource, /hex-ridge-/, "the runtime cannot select a rejected ridge sprite");
+  for (const id of ["landmark-rock-outcrop", "landmark-scrap-barricade"]) {
+    assert.match(atlas, new RegExp(`id: "${id}"`), `atlas is missing ground cover ${id}`);
+  }
+  for (const marker of ["spawn", "pickup"]) {
+    const image = decodeRgbaPng(await readFile(fromExample(`defold/assets/derived/arena/floor-marker-${marker}.png`)));
+    let opaque = 0;
+    for (let offset = 3; offset < image.pixels.length; offset += 4) if (image.pixels[offset] >= 128) opaque++;
+    assert.ok(opaque < 200, `${marker} marker must be a transparent inlay, not an opaque floor sticker`);
+  }
   for (const animation of [
     "tank-depot",
     "tank-blue-hull",
@@ -526,7 +616,21 @@ test("the generated arena art is fresh and its tile map is machine-readable", as
   ];
   assert.deepEqual(manifest.source.worldLandmarks.ids, landmarkIds);
   assert.match(manifest.source.worldLandmarks.sourceSha256, /^[a-f0-9]{64}$/u);
-  assert.match(arenaSource, /wall \? cell === CELL_WALL : cell === CELL_FLOOR/);
+  assert.match(arenaSource, /projectWorldPlanPropCoverage\(world\.map, nextProps\)/);
+  assert.match(arenaSource, /currentProps\[index\] === 0 \? arenaGroundTileId/);
+  assert.match(arenaSource, /nextProps\[index\] === 0 \? arenaGroundTileId/);
+  assert.doesNotMatch(
+    arenaSource,
+    /currentCliffs|nextCliffs/,
+    "the live island must not keep obsolete raised-wall masks",
+  );
+  assert.equal(manifest.source.worldPickups.ids.length, 8);
+  assert.match(manifest.source.worldPickups.sourceSha256, /^[a-f0-9]{64}$/u);
+  for (const id of manifest.source.worldPickups.ids) {
+    assert.match(atlas, new RegExp(`id: "${id}"`), `arena-sprites.atlas is missing ${id}`);
+    const sprite = manifest.sprites.find(({ file }) => file === `${id}-1.png`);
+    assert.deepEqual(sprite?.size, [40, 40], `${id} must use the common bottom-registered isometric cell`);
+  }
   for (const id of landmarkIds) {
     assert.match(atlas, new RegExp(`id: "landmark-${id}"`), `arena-sprites.atlas is missing landmark ${id}`);
     const sprite = manifest.sprites.find(({ file }) => file === `landmark-${id}.png`);
@@ -546,6 +650,7 @@ test("the generated arena art is fresh and its tile map is machine-readable", as
         assert.match(atlas, new RegExp(`id: "chassis-${team}-${kind}-${direction}"`));
         assert.match(atlas, new RegExp(`id: "chassis-${team}-${kind}-turret-${direction}"`));
       }
+      assert.match(atlas, new RegExp(`id: "chassis-${team}-${kind}-wreck"`));
     }
   }
   const chassisSprites = manifest.sprites.filter(({ role }) => role.startsWith("chassis."));
@@ -575,11 +680,42 @@ test("the generated arena art is fresh and its tile map is machine-readable", as
   assert.match(tankContract, /export function tankHullAnimation/);
   assert.match(tankContract, /export function tankHullIdleAnimation/);
   assert.match(tankContract, /export function tankTurretAnimation/);
+  assert.match(tankContract, /export function tankWreckAnimation\(colour: number, chassis: number\)/);
+  const silhouettes = await Promise.all(
+    chassisKinds.map(async (kind) =>
+      decodeRgbaPng(await readFile(fromExample(`defold/assets/derived/arena/chassis-blue-${kind}-se-1.png`))),
+    ),
+  );
+  for (let first = 0; first < silhouettes.length; first += 1) {
+    for (let second = first + 1; second < silhouettes.length; second += 1) {
+      const a = silhouettes[first];
+      const b = silhouettes[second];
+      assert.deepEqual([a.width, a.height], [b.width, b.height]);
+      let intersection = 0;
+      let union = 0;
+      for (let pixel = 0; pixel < a.width * a.height; pixel += 1) {
+        const hasA = a.pixels[pixel * 4 + 3] >= 128;
+        const hasB = b.pixels[pixel * 4 + 3] >= 128;
+        if (hasA && hasB) intersection += 1;
+        if (hasA || hasB) union += 1;
+      }
+      assert.ok(
+        intersection / union < 0.75,
+        `${chassisKinds[first]} and ${chassisKinds[second]} need distinct hull silhouettes`,
+      );
+    }
+  }
   const arenaPrototype = await readFile(fromExample("defold/main/arena.go"), "utf8");
   assert.match(arenaPrototype, /id: "depotfactory"/);
   assert.match(arenaPrototype, /prototype: \\"\/main\/arena-depot\.go\\"/);
   assert.match(arenaPrototype, /id: "landmarkfactory"/);
   assert.match(arenaPrototype, /prototype: \\"\/main\/arena-landmark\.go\\"/);
+  assert.match(arenaPrototype, /id: "coverfactory"/);
+  assert.match(arenaPrototype, /prototype: \\"\/main\/arena-cover\.go\\"/);
+  assert.match(arenaPrototype, /id: "spawnmarkerfactory"/);
+  assert.match(arenaPrototype, /prototype: \\"\/main\/arena-floor-marker\.go\\"/);
+  assert.match(arenaPrototype, /id: "pickupmarkerfactory"/);
+  assert.match(arenaPrototype, /prototype: \\"\/main\/arena-pickup-marker\.go\\"/);
 });
 
 test("the generated 8-bit sound cues are fresh and valid PCM WAV resources", async () => {

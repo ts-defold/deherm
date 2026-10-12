@@ -1,0 +1,8 @@
+{
+  "name": "mud-infantry-walk-pose-e-v1",
+  "operation": "edit",
+  "inputs": [
+    "asset:d2264ddd-63ae-4361-933f-aef441d93983"
+  ],
+  "prompt": "Change only Mud's body pose to a grounded left-facing side view, to be flipped for the east runtime direction walk mid-stride: one boot forward, the other planted, opposite arm swinging, compact sidearm low. Preserve his respirator mask, ochre helmet, orange-rimmed goggles, rust-red scarf, dark olive jacket, rugged build, original colors, outline, scale, and exact source viewing angle. No turn, extra person, platform, text, or scenery."
+}

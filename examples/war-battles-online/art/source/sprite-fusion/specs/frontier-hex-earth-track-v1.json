@@ -1,0 +1,12 @@
+{
+  "name": "frontier-hex-earth-track-v1",
+  "operation": "style-reference",
+  "size": 64,
+  "prompt": "A single driveable ochre earth hex for a three-quarter-view retro tank battlefield. Broad level top with a compacted diagonal vehicle track, short interrupted tread marks, scattered pebbles and sparse dry grass; subtle dark layered earth side face. Match the reference tiles' six-sided footprint, upper-left light, chunky pixel clusters, and muted olive-and-ochre military palette. Keep the track irregular and grounded, not a bright graphic stripe. No vehicle, character, building, lettering, or other tile.",
+  "inputs": [
+    "art/source/sprite-fusion/outputs/frontier-hex-ochre-detail-v2/01.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-ochre-detail-v2/04.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-worn-route-v1/01.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-worn-route-v1/05.png"
+  ]
+}

@@ -1,0 +1,1307 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/preview-sprite-fusion-hex-world.mjs",
+  "purpose": "art-direction composition study; not a runtime terrain asset",
+  "selection": "art/source/sprite-fusion/hex-tile-selection-v2.json",
+  "seed": 20903,
+  "output": "art/preview/hex-source-composition-v1.png",
+  "sha256": "04e995957e5cb995e6afa271fba06fdb0b0948389efc8e6b7715b97ac37cc965",
+  "cells": [
+    {
+      "q": 0,
+      "r": 0,
+      "role": "G",
+      "request": "frontier-hex-meadow-detail-v2",
+      "index": 8,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-detail-v2/08.png",
+      "sha256": "7d7b3bd5ebd7a47b5ad1d86a1cc8995cf88da3c4c5e3352d2dcae734605fec1d"
+    },
+    {
+      "q": 2,
+      "r": 0,
+      "role": "GB",
+      "request": "frontier-hex-meadow-basalt-edge-v1",
+      "index": 9,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-basalt-edge-v1/09.png",
+      "sha256": "eeb323fe9fc68f7aa60293d92521af85688f894c579c80c9ff52009c944f2d07"
+    },
+    {
+      "q": 4,
+      "r": 0,
+      "role": "G",
+      "request": "frontier-hex-meadow-detail-v2",
+      "index": 7,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-detail-v2/07.png",
+      "sha256": "7ab2a75f079d6ac3b65916165bd4a1dc3d606277c4fa121379f10b0ad52f77de"
+    },
+    {
+      "q": 6,
+      "r": 0,
+      "role": "G",
+      "request": "frontier-hex-wild-meadow-v1",
+      "index": 8,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-wild-meadow-v1/08.png",
+      "sha256": "b1544ae060b168e6e1f0da369f8a93b84d7955208e06c1d00d5cd9e4e8b9ed5b"
+    },
+    {
+      "q": 8,
+      "r": 0,
+      "role": "G",
+      "request": "frontier-hex-meadow-detail-v2",
+      "index": 7,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-detail-v2/07.png",
+      "sha256": "7ab2a75f079d6ac3b65916165bd4a1dc3d606277c4fa121379f10b0ad52f77de"
+    },
+    {
+      "q": 10,
+      "r": 0,
+      "role": "G",
+      "request": "frontier-hex-meadow-detail-v2",
+      "index": 0,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-detail-v2/00.png",
+      "sha256": "2e9b618b2c2d6b76f3969d0968dafecdc47e8e7bbb74320f07fca46aaf2e5f52"
+    },
+    {
+      "q": 1,
+      "r": 0,
+      "role": "GB",
+      "request": "frontier-hex-meadow-basalt-edge-v1",
+      "index": 6,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-basalt-edge-v1/06.png",
+      "sha256": "0a58a5deb18446c425c5d18850b0e9b4ff213ded9a2a8a8178781e5c36092740"
+    },
+    {
+      "q": 3,
+      "r": 0,
+      "role": "GB",
+      "request": "frontier-hex-meadow-basalt-detail-v2",
+      "index": 2,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-basalt-detail-v2/02.png",
+      "sha256": "adf4cc170ddb3bfe3111e430e52044f182e13ad1cafeb86b1bd16a29b555a6f9"
+    },
+    {
+      "q": 5,
+      "r": 0,
+      "role": "G",
+      "request": "frontier-hex-meadow-cliff-v1",
+      "index": 4,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/04.png",
+      "sha256": "e475f8f5c048798c01c722cd1efef78e8bd22d5e750fc5939b87dc5679d6e240"
+    },
+    {
+      "q": 7,
+      "r": 0,
+      "role": "G",
+      "request": "frontier-hex-meadow-detail-v2",
+      "index": 5,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-detail-v2/05.png",
+      "sha256": "3f19f9c11961f1fd1de6277544b6c483d1ff1f2e4be693fb4d44852f105dfeb1"
+    },
+    {
+      "q": 9,
+      "r": 0,
+      "role": "G",
+      "request": "frontier-hex-wild-meadow-v1",
+      "index": 8,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-wild-meadow-v1/08.png",
+      "sha256": "b1544ae060b168e6e1f0da369f8a93b84d7955208e06c1d00d5cd9e4e8b9ed5b"
+    },
+    {
+      "q": 11,
+      "r": 0,
+      "role": "G",
+      "request": "frontier-hex-wild-meadow-v1",
+      "index": 7,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-wild-meadow-v1/07.png",
+      "sha256": "f4ebdba92370c346a3cbf1668699239b58b20c11a50e568607648ed4897249b8"
+    },
+    {
+      "q": 0,
+      "r": 1,
+      "role": "GB",
+      "request": "frontier-hex-meadow-basalt-detail-v2",
+      "index": 2,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-basalt-detail-v2/02.png",
+      "sha256": "adf4cc170ddb3bfe3111e430e52044f182e13ad1cafeb86b1bd16a29b555a6f9"
+    },
+    {
+      "q": 2,
+      "r": 1,
+      "role": "BA",
+      "request": "frontier-hex-basalt-ash-edge-v1",
+      "index": 4,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-ash-edge-v1/04.png",
+      "sha256": "51d1aa783f51e20b0ec2cc0ab7230a0b3299cfb85ee8831e2853af5e3af2fc1f"
+    },
+    {
+      "q": 4,
+      "r": 1,
+      "role": "GB",
+      "request": "frontier-hex-meadow-basalt-edge-v1",
+      "index": 11,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-basalt-edge-v1/11.png",
+      "sha256": "bc9d27af42df19eef2d874ad2a791296a5ec5258e0e2b1dd30ed611ce66f38bf"
+    },
+    {
+      "q": 6,
+      "r": 1,
+      "role": "G",
+      "request": "frontier-hex-wild-meadow-v1",
+      "index": 0,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-wild-meadow-v1/00.png",
+      "sha256": "417457deb990ef258d19bb633d2867d69736325af69886a81635c76021ca5a41"
+    },
+    {
+      "q": 8,
+      "r": 1,
+      "role": "G",
+      "request": "frontier-hex-meadow-cliff-v1",
+      "index": 10,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/10.png",
+      "sha256": "93e921fce6e88e6ddc16d5e4f255629643e7e30f6847187ae5e26b8e22efbef4"
+    },
+    {
+      "q": 10,
+      "r": 1,
+      "role": "G",
+      "request": "frontier-hex-wild-meadow-v1",
+      "index": 8,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-wild-meadow-v1/08.png",
+      "sha256": "b1544ae060b168e6e1f0da369f8a93b84d7955208e06c1d00d5cd9e4e8b9ed5b"
+    },
+    {
+      "q": 1,
+      "r": 1,
+      "role": "A",
+      "request": "frontier-hex-lava-fracture-v1",
+      "index": 2,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-lava-fracture-v1/02.png",
+      "sha256": "855b46dd602f0c35af326d9faeb38caa6a0445c1efda8619615522ea6247fce6"
+    },
+    {
+      "q": 3,
+      "r": 1,
+      "role": "B",
+      "request": "frontier-hex-basalt-detail-v2",
+      "index": 7,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-detail-v2/07.png",
+      "sha256": "3d68d3f56699712878fd71cb09b489947670bddb887599fbc1a397a07f5220ed"
+    },
+    {
+      "q": 5,
+      "r": 1,
+      "role": "GD",
+      "request": "frontier-hex-meadow-earth-edge-v1",
+      "index": 7,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/07.png",
+      "sha256": "216036e69f72c037e91cee13d51215481eabb609e8c34d5b1444b78b0c7e557b"
+    },
+    {
+      "q": 7,
+      "r": 1,
+      "role": "G",
+      "request": "frontier-hex-meadow-detail-v2",
+      "index": 7,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-detail-v2/07.png",
+      "sha256": "7ab2a75f079d6ac3b65916165bd4a1dc3d606277c4fa121379f10b0ad52f77de"
+    },
+    {
+      "q": 9,
+      "r": 1,
+      "role": "G",
+      "request": "frontier-hex-wild-meadow-v1",
+      "index": 4,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-wild-meadow-v1/04.png",
+      "sha256": "68b3bfe420fe497f780852bb8d6243c5a059f3153ec779f7245342e392cba4d3"
+    },
+    {
+      "q": 11,
+      "r": 1,
+      "role": "GD",
+      "request": "frontier-hex-meadow-earth-edge-v1",
+      "index": 5,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/05.png",
+      "sha256": "faf4cc2a6116cb4f087fe23e7b54ed874646963ec91306db8f88d0d84ff2f55f"
+    },
+    {
+      "q": 0,
+      "r": 2,
+      "role": "DA",
+      "request": "frontier-hex-ash-earth-edge-v1",
+      "index": 5,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ash-earth-edge-v1/05.png",
+      "sha256": "df1b4e25f68315b12494556d2ee885dc8103ebecee629b49690fd8b26285a9af"
+    },
+    {
+      "q": 2,
+      "r": 2,
+      "role": "BA",
+      "request": "frontier-hex-basalt-ash-edge-v1",
+      "index": 6,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-ash-edge-v1/06.png",
+      "sha256": "6e1462e624aba8e3117765fd89298bca8d4df2e750e9a82495742c6e8fbf6a83"
+    },
+    {
+      "q": 4,
+      "r": 2,
+      "role": "DB",
+      "request": "frontier-hex-earth-basalt-edge-v1",
+      "index": 1,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-basalt-edge-v1/01.png",
+      "sha256": "f3c737e2b22e48f62cf7e72030b449632e04ac58644a9be30a3c1f5c9d5d54dd"
+    },
+    {
+      "q": 6,
+      "r": 2,
+      "role": "G",
+      "request": "frontier-hex-meadow-cliff-v1",
+      "index": 6,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/06.png",
+      "sha256": "2328c5d326dbc5ebf9c2fd396795c49f446e73dc40b347f683512c9c1d96b66b"
+    },
+    {
+      "q": 8,
+      "r": 2,
+      "role": "GM",
+      "request": "frontier-hex-meadow-steel-edge-v1",
+      "index": 8,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-steel-edge-v1/08.png",
+      "sha256": "17f500a60677bae6f3adf201a19976a2a0927bdbe20504f2f5b77f9f88beac34"
+    },
+    {
+      "q": 10,
+      "r": 2,
+      "role": "G",
+      "request": "frontier-hex-meadow-detail-v2",
+      "index": 5,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-detail-v2/05.png",
+      "sha256": "3f19f9c11961f1fd1de6277544b6c483d1ff1f2e4be693fb4d44852f105dfeb1"
+    },
+    {
+      "q": 1,
+      "r": 2,
+      "role": "A",
+      "request": "frontier-hex-dark-ash-v3",
+      "index": 8,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-dark-ash-v3/08.png",
+      "sha256": "43fc6396af10d6b42fe0b8305cb117f66a8cb7b6016f4d701702009065e8f380"
+    },
+    {
+      "q": 3,
+      "r": 2,
+      "role": "B",
+      "request": "frontier-hex-basalt-cliff-v1",
+      "index": 7,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-cliff-v1/07.png",
+      "sha256": "19fd0698d6280bc8163e98252a59d5b56eb12eb9253b00fc0dc13fa7d90c5538"
+    },
+    {
+      "q": 5,
+      "r": 2,
+      "role": "GD",
+      "request": "frontier-hex-meadow-earth-edge-v1",
+      "index": 3,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/03.png",
+      "sha256": "16afe29e26c5184dddcace3d729a619e3f3dad6affe6d70df610b33ae0129071"
+    },
+    {
+      "q": 7,
+      "r": 2,
+      "role": "GM",
+      "request": "frontier-hex-meadow-steel-edge-v1",
+      "index": 5,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-steel-edge-v1/05.png",
+      "sha256": "dead218682268eb00938c41b3743e7d52ced8645310d4791d39dcac028bdeebe"
+    },
+    {
+      "q": 9,
+      "r": 2,
+      "role": "GM",
+      "request": "frontier-hex-meadow-steel-edge-v1",
+      "index": 4,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-steel-edge-v1/04.png",
+      "sha256": "d72d74181183cb9a9586b4bd3f38d8fe7088df207b1545c1032cb0efa2aca5cc"
+    },
+    {
+      "q": 11,
+      "r": 2,
+      "role": "GD",
+      "request": "frontier-hex-meadow-earth-edge-v1",
+      "index": 9,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/09.png",
+      "sha256": "d0f1adfed355c301634b331dcbf19507dfc0954a4f7128a17c124f8d3918c163"
+    },
+    {
+      "q": 0,
+      "r": 3,
+      "role": "GB",
+      "request": "frontier-hex-meadow-basalt-detail-v2",
+      "index": 7,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-basalt-detail-v2/07.png",
+      "sha256": "9f780b9e3ef85f82cae9f09281ecdb755f86dbb5d06119f6d89d5b1e286ba77c"
+    },
+    {
+      "q": 2,
+      "r": 3,
+      "role": "BA",
+      "request": "frontier-hex-basalt-ash-edge-v1",
+      "index": 2,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-ash-edge-v1/02.png",
+      "sha256": "cbf94757250bb91f009d1912d2392ec388fe189a60bb00921dabbf983e730c13"
+    },
+    {
+      "q": 4,
+      "r": 3,
+      "role": "GB",
+      "request": "frontier-hex-meadow-basalt-detail-v2",
+      "index": 1,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-basalt-detail-v2/01.png",
+      "sha256": "6f019974bfddcf306a47ab2b71f8466053c48a7229085d257c6483a8a23429e6"
+    },
+    {
+      "q": 6,
+      "r": 3,
+      "role": "GM",
+      "request": "frontier-hex-meadow-steel-edge-v1",
+      "index": 1,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-steel-edge-v1/01.png",
+      "sha256": "5d38ef0f986f66286ef1687ede19371cbd38e801ca6d449d53c1c110f09ba618"
+    },
+    {
+      "q": 8,
+      "r": 3,
+      "role": "M",
+      "request": "frontier-hex-steel-detail-v2",
+      "index": 6,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-steel-detail-v2/06.png",
+      "sha256": "8f3866b3092b6286c71e67eee1b483785b029870b6fe691b08a4c8358896cac2"
+    },
+    {
+      "q": 10,
+      "r": 3,
+      "role": "GM",
+      "request": "frontier-hex-meadow-steel-edge-v1",
+      "index": 5,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-steel-edge-v1/05.png",
+      "sha256": "dead218682268eb00938c41b3743e7d52ced8645310d4791d39dcac028bdeebe"
+    },
+    {
+      "q": 1,
+      "r": 3,
+      "role": "BA",
+      "request": "frontier-hex-basalt-ash-edge-v1",
+      "index": 0,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-ash-edge-v1/00.png",
+      "sha256": "1962fcc8100b8b00e6acdb7bd9dba9a206be7ff6f5ad3961d589380a639896a4"
+    },
+    {
+      "q": 3,
+      "r": 3,
+      "role": "GB",
+      "request": "frontier-hex-meadow-basalt-detail-v2",
+      "index": 4,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-basalt-detail-v2/04.png",
+      "sha256": "664a8f8eef20e6399c89b7652708fd70b0f210d8259845c2ba5256d098bc2594"
+    },
+    {
+      "q": 5,
+      "r": 3,
+      "role": "GD",
+      "request": "frontier-hex-meadow-earth-edge-v1",
+      "index": 2,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/02.png",
+      "sha256": "6059323fdadde0fadee5e7b4c5c770dc5bc33dc0aaad2326f147ee19f54b4a9d"
+    },
+    {
+      "q": 7,
+      "r": 3,
+      "role": "M",
+      "request": "frontier-hex-refinery-grate-v1",
+      "index": 2,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-refinery-grate-v1/02.png",
+      "sha256": "aab1e450fa2dee7f4d744816dc3b1fe7c9b6443fb0b947db5e8b40f1089f34c0"
+    },
+    {
+      "q": 9,
+      "r": 3,
+      "role": "M",
+      "request": "frontier-hex-steel-detail-v2",
+      "index": 2,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-steel-detail-v2/02.png",
+      "sha256": "c51c2c48dc87cbd0cc6407f3ef3bb414e9c65264f12b4bb7100ee0b988ed4c55"
+    },
+    {
+      "q": 11,
+      "r": 3,
+      "role": "G",
+      "request": "frontier-hex-wild-meadow-v1",
+      "index": 3,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-wild-meadow-v1/03.png",
+      "sha256": "eb87860fa0369a5c5e7ff295be8b19117c11dd43fa4aed136bb8fc40e88f1eb7"
+    },
+    {
+      "q": 0,
+      "r": 4,
+      "role": "GB",
+      "request": "frontier-hex-meadow-basalt-detail-v2",
+      "index": 1,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-basalt-detail-v2/01.png",
+      "sha256": "6f019974bfddcf306a47ab2b71f8466053c48a7229085d257c6483a8a23429e6"
+    },
+    {
+      "q": 2,
+      "r": 4,
+      "role": "GB",
+      "request": "frontier-hex-meadow-basalt-edge-v1",
+      "index": 8,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-basalt-edge-v1/08.png",
+      "sha256": "b1e032911efa05977cbcb44c2b434ab8be9e82377466d7c0aa0f8ba418b78d38"
+    },
+    {
+      "q": 4,
+      "r": 4,
+      "role": "G",
+      "request": "frontier-hex-wild-meadow-v1",
+      "index": 6,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-wild-meadow-v1/06.png",
+      "sha256": "10a982f35a565a8c78f20ea7de86e20479fdabae44d7aadc67f05604956e0c1c"
+    },
+    {
+      "q": 6,
+      "r": 4,
+      "role": "DM",
+      "request": "frontier-hex-earth-steel-edge-v1",
+      "index": 4,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-steel-edge-v1/04.png",
+      "sha256": "409600afeb81db4984a58637d7a9a5228eceba4e3d2ce3d4d5530779f28d9dc2"
+    },
+    {
+      "q": 8,
+      "r": 4,
+      "role": "M",
+      "request": "frontier-hex-service-deck-v1",
+      "index": 10,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-service-deck-v1/10.png",
+      "sha256": "1577dcff19222642e475e886fc708e9f00cedb4ed61b488595b0c1031ffceb3c"
+    },
+    {
+      "q": 10,
+      "r": 4,
+      "role": "GM",
+      "request": "frontier-hex-meadow-steel-edge-v1",
+      "index": 6,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-steel-edge-v1/06.png",
+      "sha256": "3df7dd872ab6192ab6fa91fd86474f58c4ea911c865e65cf37745bfd49e44f35"
+    },
+    {
+      "q": 1,
+      "r": 4,
+      "role": "GB",
+      "request": "frontier-hex-meadow-basalt-edge-v1",
+      "index": 0,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-basalt-edge-v1/00.png",
+      "sha256": "e8889524a457080a1015a825610bf49a40b52bef7f9a4689b51f1a16cfee4b79"
+    },
+    {
+      "q": 3,
+      "r": 4,
+      "role": "G",
+      "request": "frontier-hex-meadow-cliff-v1",
+      "index": 5,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/05.png",
+      "sha256": "030bb92323763b351d4cbf8c42c568596225df2c357d21e7e6224966591733da"
+    },
+    {
+      "q": 5,
+      "r": 4,
+      "role": "GD",
+      "request": "frontier-hex-meadow-earth-edge-v1",
+      "index": 8,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/08.png",
+      "sha256": "89c17f386141a3c67a506d45d687e1f0643b178fa83b7e24aa7c19480ae900bc"
+    },
+    {
+      "q": 7,
+      "r": 4,
+      "role": "DM",
+      "request": "frontier-hex-earth-steel-edge-v1",
+      "index": 0,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-steel-edge-v1/00.png",
+      "sha256": "0d7e3807066ac8807240ccde039e3719932bbd1bb3822fbdcda896152f47665a"
+    },
+    {
+      "q": 9,
+      "r": 4,
+      "role": "M",
+      "request": "frontier-hex-service-deck-v1",
+      "index": 8,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-service-deck-v1/08.png",
+      "sha256": "13a5ec474ab16a47373adf4cb6d2c5abee9c00e4cc75a2f8c4138938b96a256a"
+    },
+    {
+      "q": 11,
+      "r": 4,
+      "role": "G",
+      "request": "frontier-hex-meadow-cliff-v1",
+      "index": 9,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/09.png",
+      "sha256": "a6dd4567aeb14d5fdc3cb6721adeb25f828d6d6dff4601648d8989b95f33e8a8"
+    },
+    {
+      "q": 0,
+      "r": 5,
+      "role": "G",
+      "request": "frontier-hex-meadow-detail-v2",
+      "index": 4,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-detail-v2/04.png",
+      "sha256": "04783f3048a6e8e864c5333df35cf819c5ea375068f7df8343d5b6cab10d265a"
+    },
+    {
+      "q": 2,
+      "r": 5,
+      "role": "G",
+      "request": "frontier-hex-wild-meadow-v1",
+      "index": 0,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-wild-meadow-v1/00.png",
+      "sha256": "417457deb990ef258d19bb633d2867d69736325af69886a81635c76021ca5a41"
+    },
+    {
+      "q": 4,
+      "r": 5,
+      "role": "GD",
+      "request": "frontier-hex-meadow-earth-edge-v1",
+      "index": 9,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/09.png",
+      "sha256": "d0f1adfed355c301634b331dcbf19507dfc0954a4f7128a17c124f8d3918c163"
+    },
+    {
+      "q": 6,
+      "r": 5,
+      "role": "D",
+      "request": "frontier-hex-worn-route-v1",
+      "index": 1,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-worn-route-v1/01.png",
+      "sha256": "a3492fccd8bdb99b3802e868ad8c5c7a534a99e3037b7298aaaa1e57970c418d"
+    },
+    {
+      "q": 8,
+      "r": 5,
+      "role": "M",
+      "request": "frontier-hex-refinery-grate-v1",
+      "index": 2,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-refinery-grate-v1/02.png",
+      "sha256": "aab1e450fa2dee7f4d744816dc3b1fe7c9b6443fb0b947db5e8b40f1089f34c0"
+    },
+    {
+      "q": 10,
+      "r": 5,
+      "role": "GM",
+      "request": "frontier-hex-meadow-steel-edge-v1",
+      "index": 7,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-steel-edge-v1/07.png",
+      "sha256": "4e2813073e3e03ce7205b3c393c8eeff8017623651202c8a75c47baa90d71852"
+    },
+    {
+      "q": 1,
+      "r": 5,
+      "role": "G",
+      "request": "frontier-hex-wild-meadow-v1",
+      "index": 4,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-wild-meadow-v1/04.png",
+      "sha256": "68b3bfe420fe497f780852bb8d6243c5a059f3153ec779f7245342e392cba4d3"
+    },
+    {
+      "q": 3,
+      "r": 5,
+      "role": "GD",
+      "request": "frontier-hex-meadow-earth-edge-v1",
+      "index": 9,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/09.png",
+      "sha256": "d0f1adfed355c301634b331dcbf19507dfc0954a4f7128a17c124f8d3918c163"
+    },
+    {
+      "q": 5,
+      "r": 5,
+      "role": "D",
+      "request": "frontier-hex-ochre-detail-v2",
+      "index": 1,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-detail-v2/01.png",
+      "sha256": "3a4cf4cfb6e1c0ad73b7d4d883c45f117e4cfb4b9c14898d1be09bae2e35c3a4"
+    },
+    {
+      "q": 7,
+      "r": 5,
+      "role": "GM",
+      "request": "frontier-hex-meadow-steel-edge-v1",
+      "index": 1,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-steel-edge-v1/01.png",
+      "sha256": "5d38ef0f986f66286ef1687ede19371cbd38e801ca6d449d53c1c110f09ba618"
+    },
+    {
+      "q": 9,
+      "r": 5,
+      "role": "M",
+      "request": "frontier-hex-refinery-grate-v1",
+      "index": 8,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-refinery-grate-v1/08.png",
+      "sha256": "a86c996c8ee1e395681381ec27bd0b15fb5a0843ac733f8c01357735748a5d41"
+    },
+    {
+      "q": 11,
+      "r": 5,
+      "role": "G",
+      "request": "frontier-hex-meadow-detail-v2",
+      "index": 5,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-detail-v2/05.png",
+      "sha256": "3f19f9c11961f1fd1de6277544b6c483d1ff1f2e4be693fb4d44852f105dfeb1"
+    },
+    {
+      "q": 0,
+      "r": 6,
+      "role": "G",
+      "request": "frontier-hex-meadow-detail-v2",
+      "index": 4,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-detail-v2/04.png",
+      "sha256": "04783f3048a6e8e864c5333df35cf819c5ea375068f7df8343d5b6cab10d265a"
+    },
+    {
+      "q": 2,
+      "r": 6,
+      "role": "G",
+      "request": "frontier-hex-meadow-detail-v2",
+      "index": 0,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-detail-v2/00.png",
+      "sha256": "2e9b618b2c2d6b76f3969d0968dafecdc47e8e7bbb74320f07fca46aaf2e5f52"
+    },
+    {
+      "q": 4,
+      "r": 6,
+      "role": "D",
+      "request": "frontier-hex-ochre-cliff-v1",
+      "index": 10,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-cliff-v1/10.png",
+      "sha256": "cd0f868fbb856150d7ad1033e7e64170dbcc2790bccd9f1b2d1a5f17a3ca50ce"
+    },
+    {
+      "q": 6,
+      "r": 6,
+      "role": "GD",
+      "request": "frontier-hex-meadow-earth-edge-v1",
+      "index": 0,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/00.png",
+      "sha256": "a7e0b718e3d1ec27c46e934472e74fb51872823cf43ac14d7438b65584bb1723"
+    },
+    {
+      "q": 8,
+      "r": 6,
+      "role": "M",
+      "request": "frontier-hex-service-deck-v1",
+      "index": 7,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-service-deck-v1/07.png",
+      "sha256": "0c949e553e6e63d76f266fc820560d1f141de94e23e32fa5a1d1348aff4d866a"
+    },
+    {
+      "q": 10,
+      "r": 6,
+      "role": "GM",
+      "request": "frontier-hex-meadow-steel-edge-v1",
+      "index": 7,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-steel-edge-v1/07.png",
+      "sha256": "4e2813073e3e03ce7205b3c393c8eeff8017623651202c8a75c47baa90d71852"
+    },
+    {
+      "q": 1,
+      "r": 6,
+      "role": "G",
+      "request": "frontier-hex-wild-meadow-v1",
+      "index": 4,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-wild-meadow-v1/04.png",
+      "sha256": "68b3bfe420fe497f780852bb8d6243c5a059f3153ec779f7245342e392cba4d3"
+    },
+    {
+      "q": 3,
+      "r": 6,
+      "role": "GD",
+      "request": "frontier-hex-meadow-earth-edge-v1",
+      "index": 7,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/07.png",
+      "sha256": "216036e69f72c037e91cee13d51215481eabb609e8c34d5b1444b78b0c7e557b"
+    },
+    {
+      "q": 5,
+      "r": 6,
+      "role": "D",
+      "request": "frontier-hex-ochre-cliff-v1",
+      "index": 9,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-cliff-v1/09.png",
+      "sha256": "28ab76381f8876b72d01f14fb729832b60a76b82337695a5e73047f6fa4ce2e8"
+    },
+    {
+      "q": 7,
+      "r": 6,
+      "role": "GM",
+      "request": "frontier-hex-meadow-steel-edge-v1",
+      "index": 3,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-steel-edge-v1/03.png",
+      "sha256": "2a6f778e64e3fbe15c68c1db3f70c2071a8532189d9f0ff3e857fecd1c61ba21"
+    },
+    {
+      "q": 9,
+      "r": 6,
+      "role": "M",
+      "request": "frontier-hex-refinery-grate-v1",
+      "index": 5,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-refinery-grate-v1/05.png",
+      "sha256": "6c95433d88091e488f87777ba86b42c6bb80a231497c5e361ba46e4d548b8ffa"
+    },
+    {
+      "q": 11,
+      "r": 6,
+      "role": "G",
+      "request": "frontier-hex-wild-meadow-v1",
+      "index": 8,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-wild-meadow-v1/08.png",
+      "sha256": "b1544ae060b168e6e1f0da369f8a93b84d7955208e06c1d00d5cd9e4e8b9ed5b"
+    },
+    {
+      "q": 0,
+      "r": 7,
+      "role": "G",
+      "request": "frontier-hex-meadow-cliff-v1",
+      "index": 9,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/09.png",
+      "sha256": "a6dd4567aeb14d5fdc3cb6721adeb25f828d6d6dff4601648d8989b95f33e8a8"
+    },
+    {
+      "q": 2,
+      "r": 7,
+      "role": "GD",
+      "request": "frontier-hex-meadow-earth-edge-v1",
+      "index": 0,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/00.png",
+      "sha256": "a7e0b718e3d1ec27c46e934472e74fb51872823cf43ac14d7438b65584bb1723"
+    },
+    {
+      "q": 4,
+      "r": 7,
+      "role": "D",
+      "request": "frontier-hex-ochre-detail-v2",
+      "index": 1,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-detail-v2/01.png",
+      "sha256": "3a4cf4cfb6e1c0ad73b7d4d883c45f117e4cfb4b9c14898d1be09bae2e35c3a4"
+    },
+    {
+      "q": 6,
+      "r": 7,
+      "role": "GD",
+      "request": "frontier-hex-meadow-earth-edge-v1",
+      "index": 7,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/07.png",
+      "sha256": "216036e69f72c037e91cee13d51215481eabb609e8c34d5b1444b78b0c7e557b"
+    },
+    {
+      "q": 8,
+      "r": 7,
+      "role": "GM",
+      "request": "frontier-hex-meadow-steel-edge-v1",
+      "index": 2,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-steel-edge-v1/02.png",
+      "sha256": "899195688c085d757d3e2a9cbeaea3b1c90c9797b582fc08b5eee5d20abcb732"
+    },
+    {
+      "q": 10,
+      "r": 7,
+      "role": "GM",
+      "request": "frontier-hex-meadow-steel-edge-v1",
+      "index": 1,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-steel-edge-v1/01.png",
+      "sha256": "5d38ef0f986f66286ef1687ede19371cbd38e801ca6d449d53c1c110f09ba618"
+    },
+    {
+      "q": 1,
+      "r": 7,
+      "role": "GD",
+      "request": "frontier-hex-meadow-earth-edge-v1",
+      "index": 3,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/03.png",
+      "sha256": "16afe29e26c5184dddcace3d729a619e3f3dad6affe6d70df610b33ae0129071"
+    },
+    {
+      "q": 3,
+      "r": 7,
+      "role": "D",
+      "request": "frontier-hex-ochre-cliff-v1",
+      "index": 10,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-cliff-v1/10.png",
+      "sha256": "cd0f868fbb856150d7ad1033e7e64170dbcc2790bccd9f1b2d1a5f17a3ca50ce"
+    },
+    {
+      "q": 5,
+      "r": 7,
+      "role": "GD",
+      "request": "frontier-hex-meadow-earth-edge-v1",
+      "index": 9,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/09.png",
+      "sha256": "d0f1adfed355c301634b331dcbf19507dfc0954a4f7128a17c124f8d3918c163"
+    },
+    {
+      "q": 7,
+      "r": 7,
+      "role": "G",
+      "request": "frontier-hex-wild-meadow-v1",
+      "index": 4,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-wild-meadow-v1/04.png",
+      "sha256": "68b3bfe420fe497f780852bb8d6243c5a059f3153ec779f7245342e392cba4d3"
+    },
+    {
+      "q": 9,
+      "r": 7,
+      "role": "GM",
+      "request": "frontier-hex-meadow-steel-edge-v1",
+      "index": 1,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-steel-edge-v1/01.png",
+      "sha256": "5d38ef0f986f66286ef1687ede19371cbd38e801ca6d449d53c1c110f09ba618"
+    },
+    {
+      "q": 11,
+      "r": 7,
+      "role": "G",
+      "request": "frontier-hex-meadow-detail-v2",
+      "index": 1,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-detail-v2/01.png",
+      "sha256": "8f909277e5825659c37839d0e32d23a271160403ddcf2be6172fc207307e8cd1"
+    },
+    {
+      "q": 0,
+      "r": 8,
+      "role": "G",
+      "request": "frontier-hex-meadow-detail-v2",
+      "index": 2,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-detail-v2/02.png",
+      "sha256": "df8d776e7586b27e3218bcf73b0a02ef8523048bc94a3d90c7251124ab8903e3"
+    },
+    {
+      "q": 2,
+      "r": 8,
+      "role": "D",
+      "request": "frontier-hex-worn-route-v1",
+      "index": 5,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-worn-route-v1/05.png",
+      "sha256": "e734f1a89eeb5d36f1dab1c43d4a3d3adbab70aa41174c060ea63058fa905213"
+    },
+    {
+      "q": 4,
+      "r": 8,
+      "role": "GD",
+      "request": "frontier-hex-meadow-earth-edge-v1",
+      "index": 6,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/06.png",
+      "sha256": "c74797ca5a48ba940c4618c769de24f39ec50ecf5a69bd9ad70a32361e4fa2b0"
+    },
+    {
+      "q": 6,
+      "r": 8,
+      "role": "G",
+      "request": "frontier-hex-wild-meadow-v1",
+      "index": 1,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-wild-meadow-v1/01.png",
+      "sha256": "c6c244a769803724b188656dad0ed7e3f7ed641d3b42dffa36efe2ca8375fc94"
+    },
+    {
+      "q": 8,
+      "r": 8,
+      "role": "G",
+      "request": "frontier-hex-wild-meadow-v1",
+      "index": 0,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-wild-meadow-v1/00.png",
+      "sha256": "417457deb990ef258d19bb633d2867d69736325af69886a81635c76021ca5a41"
+    },
+    {
+      "q": 10,
+      "r": 8,
+      "role": "G",
+      "request": "frontier-hex-meadow-cliff-v1",
+      "index": 5,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/05.png",
+      "sha256": "030bb92323763b351d4cbf8c42c568596225df2c357d21e7e6224966591733da"
+    },
+    {
+      "q": 1,
+      "r": 8,
+      "role": "GD",
+      "request": "frontier-hex-meadow-earth-edge-v1",
+      "index": 6,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/06.png",
+      "sha256": "c74797ca5a48ba940c4618c769de24f39ec50ecf5a69bd9ad70a32361e4fa2b0"
+    },
+    {
+      "q": 3,
+      "r": 8,
+      "role": "D",
+      "request": "frontier-hex-ochre-cliff-v1",
+      "index": 10,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-cliff-v1/10.png",
+      "sha256": "cd0f868fbb856150d7ad1033e7e64170dbcc2790bccd9f1b2d1a5f17a3ca50ce"
+    },
+    {
+      "q": 5,
+      "r": 8,
+      "role": "G",
+      "request": "frontier-hex-wild-meadow-v1",
+      "index": 2,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-wild-meadow-v1/02.png",
+      "sha256": "c1820b1cee3d86b0f9c4bcb294fb5144c7f9a636f83fd1b1241d9668b188bf4a"
+    },
+    {
+      "q": 7,
+      "r": 8,
+      "role": "G",
+      "request": "frontier-hex-meadow-cliff-v1",
+      "index": 10,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/10.png",
+      "sha256": "93e921fce6e88e6ddc16d5e4f255629643e7e30f6847187ae5e26b8e22efbef4"
+    },
+    {
+      "q": 9,
+      "r": 8,
+      "role": "G",
+      "request": "frontier-hex-meadow-cliff-v1",
+      "index": 9,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/09.png",
+      "sha256": "a6dd4567aeb14d5fdc3cb6721adeb25f828d6d6dff4601648d8989b95f33e8a8"
+    },
+    {
+      "q": 11,
+      "r": 8,
+      "role": "G",
+      "request": "frontier-hex-wild-meadow-v1",
+      "index": 7,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-wild-meadow-v1/07.png",
+      "sha256": "f4ebdba92370c346a3cbf1668699239b58b20c11a50e568607648ed4897249b8"
+    },
+    {
+      "q": 0,
+      "r": 9,
+      "role": "G",
+      "request": "frontier-hex-meadow-cliff-v1",
+      "index": 5,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/05.png",
+      "sha256": "030bb92323763b351d4cbf8c42c568596225df2c357d21e7e6224966591733da"
+    },
+    {
+      "q": 2,
+      "r": 9,
+      "role": "D",
+      "request": "frontier-hex-worn-route-v1",
+      "index": 1,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-worn-route-v1/01.png",
+      "sha256": "a3492fccd8bdb99b3802e868ad8c5c7a534a99e3037b7298aaaa1e57970c418d"
+    },
+    {
+      "q": 4,
+      "r": 9,
+      "role": "GD",
+      "request": "frontier-hex-meadow-earth-edge-v1",
+      "index": 10,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/10.png",
+      "sha256": "a23c0540cb5d1f2ed91bc70d620f482d97770b9e3d79d2120eaf451223f64a36"
+    },
+    {
+      "q": 6,
+      "r": 9,
+      "role": "G",
+      "request": "frontier-hex-meadow-detail-v2",
+      "index": 8,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-detail-v2/08.png",
+      "sha256": "7d7b3bd5ebd7a47b5ad1d86a1cc8995cf88da3c4c5e3352d2dcae734605fec1d"
+    },
+    {
+      "q": 8,
+      "r": 9,
+      "role": "G",
+      "request": "frontier-hex-meadow-detail-v2",
+      "index": 3,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-detail-v2/03.png",
+      "sha256": "f9b8539ca05c4e9889b408998a30a9c0c44c63803482cc3408e4ef13eefa75f0"
+    },
+    {
+      "q": 10,
+      "r": 9,
+      "role": "G",
+      "request": "frontier-hex-meadow-detail-v2",
+      "index": 4,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-detail-v2/04.png",
+      "sha256": "04783f3048a6e8e864c5333df35cf819c5ea375068f7df8343d5b6cab10d265a"
+    },
+    {
+      "q": 1,
+      "r": 9,
+      "role": "GD",
+      "request": "frontier-hex-meadow-earth-edge-v1",
+      "index": 3,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/03.png",
+      "sha256": "16afe29e26c5184dddcace3d729a619e3f3dad6affe6d70df610b33ae0129071"
+    },
+    {
+      "q": 3,
+      "r": 9,
+      "role": "D",
+      "request": "frontier-hex-ochre-cliff-v1",
+      "index": 10,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-cliff-v1/10.png",
+      "sha256": "cd0f868fbb856150d7ad1033e7e64170dbcc2790bccd9f1b2d1a5f17a3ca50ce"
+    },
+    {
+      "q": 5,
+      "r": 9,
+      "role": "G",
+      "request": "frontier-hex-meadow-cliff-v1",
+      "index": 6,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/06.png",
+      "sha256": "2328c5d326dbc5ebf9c2fd396795c49f446e73dc40b347f683512c9c1d96b66b"
+    },
+    {
+      "q": 7,
+      "r": 9,
+      "role": "G",
+      "request": "frontier-hex-wild-meadow-v1",
+      "index": 1,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-wild-meadow-v1/01.png",
+      "sha256": "c6c244a769803724b188656dad0ed7e3f7ed641d3b42dffa36efe2ca8375fc94"
+    },
+    {
+      "q": 9,
+      "r": 9,
+      "role": "G",
+      "request": "frontier-hex-meadow-detail-v2",
+      "index": 5,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-detail-v2/05.png",
+      "sha256": "3f19f9c11961f1fd1de6277544b6c483d1ff1f2e4be693fb4d44852f105dfeb1"
+    },
+    {
+      "q": 11,
+      "r": 9,
+      "role": "G",
+      "request": "frontier-hex-meadow-cliff-v1",
+      "index": 7,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/07.png",
+      "sha256": "f8058f8f02159071b4b6314488e4f69ced8eb7429c71dde54006f615255939f4"
+    },
+    {
+      "q": 0,
+      "r": 10,
+      "role": "G",
+      "request": "frontier-hex-meadow-cliff-v1",
+      "index": 10,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/10.png",
+      "sha256": "93e921fce6e88e6ddc16d5e4f255629643e7e30f6847187ae5e26b8e22efbef4"
+    },
+    {
+      "q": 2,
+      "r": 10,
+      "role": "GD",
+      "request": "frontier-hex-meadow-earth-edge-v1",
+      "index": 5,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/05.png",
+      "sha256": "faf4cc2a6116cb4f087fe23e7b54ed874646963ec91306db8f88d0d84ff2f55f"
+    },
+    {
+      "q": 4,
+      "r": 10,
+      "role": "GD",
+      "request": "frontier-hex-meadow-earth-edge-v1",
+      "index": 5,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/05.png",
+      "sha256": "faf4cc2a6116cb4f087fe23e7b54ed874646963ec91306db8f88d0d84ff2f55f"
+    },
+    {
+      "q": 6,
+      "r": 10,
+      "role": "G",
+      "request": "frontier-hex-wild-meadow-v1",
+      "index": 5,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-wild-meadow-v1/05.png",
+      "sha256": "4c65396c8009b0d2af2e3d946dbfa130c2278ceb2de6d8a6d3d2c1ba819350e2"
+    },
+    {
+      "q": 8,
+      "r": 10,
+      "role": "G",
+      "request": "frontier-hex-meadow-detail-v2",
+      "index": 5,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-detail-v2/05.png",
+      "sha256": "3f19f9c11961f1fd1de6277544b6c483d1ff1f2e4be693fb4d44852f105dfeb1"
+    },
+    {
+      "q": 10,
+      "r": 10,
+      "role": "G",
+      "request": "frontier-hex-meadow-detail-v2",
+      "index": 4,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-detail-v2/04.png",
+      "sha256": "04783f3048a6e8e864c5333df35cf819c5ea375068f7df8343d5b6cab10d265a"
+    },
+    {
+      "q": 1,
+      "r": 10,
+      "role": "G",
+      "request": "frontier-hex-meadow-cliff-v1",
+      "index": 5,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/05.png",
+      "sha256": "030bb92323763b351d4cbf8c42c568596225df2c357d21e7e6224966591733da"
+    },
+    {
+      "q": 3,
+      "r": 10,
+      "role": "GD",
+      "request": "frontier-hex-meadow-earth-edge-v1",
+      "index": 9,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/09.png",
+      "sha256": "d0f1adfed355c301634b331dcbf19507dfc0954a4f7128a17c124f8d3918c163"
+    },
+    {
+      "q": 5,
+      "r": 10,
+      "role": "G",
+      "request": "frontier-hex-meadow-cliff-v1",
+      "index": 4,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/04.png",
+      "sha256": "e475f8f5c048798c01c722cd1efef78e8bd22d5e750fc5939b87dc5679d6e240"
+    },
+    {
+      "q": 7,
+      "r": 10,
+      "role": "G",
+      "request": "frontier-hex-wild-meadow-v1",
+      "index": 4,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-wild-meadow-v1/04.png",
+      "sha256": "68b3bfe420fe497f780852bb8d6243c5a059f3153ec779f7245342e392cba4d3"
+    },
+    {
+      "q": 9,
+      "r": 10,
+      "role": "G",
+      "request": "frontier-hex-wild-meadow-v1",
+      "index": 7,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-wild-meadow-v1/07.png",
+      "sha256": "f4ebdba92370c346a3cbf1668699239b58b20c11a50e568607648ed4897249b8"
+    },
+    {
+      "q": 11,
+      "r": 10,
+      "role": "G",
+      "request": "frontier-hex-meadow-detail-v2",
+      "index": 7,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-detail-v2/07.png",
+      "sha256": "7ab2a75f079d6ac3b65916165bd4a1dc3d606277c4fa121379f10b0ad52f77de"
+    },
+    {
+      "q": 0,
+      "r": 11,
+      "role": "G",
+      "request": "frontier-hex-meadow-cliff-v1",
+      "index": 4,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/04.png",
+      "sha256": "e475f8f5c048798c01c722cd1efef78e8bd22d5e750fc5939b87dc5679d6e240"
+    },
+    {
+      "q": 2,
+      "r": 11,
+      "role": "G",
+      "request": "frontier-hex-meadow-cliff-v1",
+      "index": 6,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/06.png",
+      "sha256": "2328c5d326dbc5ebf9c2fd396795c49f446e73dc40b347f683512c9c1d96b66b"
+    },
+    {
+      "q": 4,
+      "r": 11,
+      "role": "G",
+      "request": "frontier-hex-meadow-detail-v2",
+      "index": 0,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-detail-v2/00.png",
+      "sha256": "2e9b618b2c2d6b76f3969d0968dafecdc47e8e7bbb74320f07fca46aaf2e5f52"
+    },
+    {
+      "q": 6,
+      "r": 11,
+      "role": "G",
+      "request": "frontier-hex-meadow-detail-v2",
+      "index": 1,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-detail-v2/01.png",
+      "sha256": "8f909277e5825659c37839d0e32d23a271160403ddcf2be6172fc207307e8cd1"
+    },
+    {
+      "q": 8,
+      "r": 11,
+      "role": "G",
+      "request": "frontier-hex-meadow-cliff-v1",
+      "index": 7,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/07.png",
+      "sha256": "f8058f8f02159071b4b6314488e4f69ced8eb7429c71dde54006f615255939f4"
+    },
+    {
+      "q": 10,
+      "r": 11,
+      "role": "G",
+      "request": "frontier-hex-wild-meadow-v1",
+      "index": 7,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-wild-meadow-v1/07.png",
+      "sha256": "f4ebdba92370c346a3cbf1668699239b58b20c11a50e568607648ed4897249b8"
+    },
+    {
+      "q": 1,
+      "r": 11,
+      "role": "G",
+      "request": "frontier-hex-wild-meadow-v1",
+      "index": 0,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-wild-meadow-v1/00.png",
+      "sha256": "417457deb990ef258d19bb633d2867d69736325af69886a81635c76021ca5a41"
+    },
+    {
+      "q": 3,
+      "r": 11,
+      "role": "G",
+      "request": "frontier-hex-meadow-cliff-v1",
+      "index": 10,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/10.png",
+      "sha256": "93e921fce6e88e6ddc16d5e4f255629643e7e30f6847187ae5e26b8e22efbef4"
+    },
+    {
+      "q": 5,
+      "r": 11,
+      "role": "G",
+      "request": "frontier-hex-wild-meadow-v1",
+      "index": 1,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-wild-meadow-v1/01.png",
+      "sha256": "c6c244a769803724b188656dad0ed7e3f7ed641d3b42dffa36efe2ca8375fc94"
+    },
+    {
+      "q": 7,
+      "r": 11,
+      "role": "G",
+      "request": "frontier-hex-meadow-cliff-v1",
+      "index": 7,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/07.png",
+      "sha256": "f8058f8f02159071b4b6314488e4f69ced8eb7429c71dde54006f615255939f4"
+    },
+    {
+      "q": 9,
+      "r": 11,
+      "role": "G",
+      "request": "frontier-hex-meadow-detail-v2",
+      "index": 4,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-detail-v2/04.png",
+      "sha256": "04783f3048a6e8e864c5333df35cf819c5ea375068f7df8343d5b6cab10d265a"
+    },
+    {
+      "q": 11,
+      "r": 11,
+      "role": "G",
+      "request": "frontier-hex-meadow-detail-v2",
+      "index": 3,
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-detail-v2/03.png",
+      "sha256": "f9b8539ca05c4e9889b408998a30a9c0c44c63803482cc3408e4ef13eefa75f0"
+    }
+  ]
+}

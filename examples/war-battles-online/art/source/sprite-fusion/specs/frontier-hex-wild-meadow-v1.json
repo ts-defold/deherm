@@ -1,0 +1,12 @@
+{
+  "name": "frontier-hex-wild-meadow-v1",
+  "operation": "style-reference",
+  "size": 64,
+  "prompt": "One six-sided walkable meadow landform for an isometric volcanic frontier battlefield. Olive grass top with hand-clustered cream wildflowers, long dark blades, a few pale stones, and a short basalt-and-earth side wall. Keep the same compact hex silhouette, three-quarter projection, upper-left light, and chunky military pixel clusters as the references. No tank, building, lettering, or second tile.",
+  "inputs": [
+    "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/04.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/07.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-ochre-cliff-v1/07.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-basalt-cliff-v1/04.png"
+  ]
+}

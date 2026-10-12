@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_85d8f172-284c-45f5-8999-c1a4adabbb45",
+  "operation": "style-reference",
+  "prompt": "Rook, the young Black woman scout tank driver from the reference portrait, standing full-body in a southeast-facing three-quarter isometric arcade-game view. Keep her warm brown skin, ochre flight helmet with one raised blue goggle lens, cream scarf, olive field jacket, dark trousers, and sturdy boots. Small sidearm held low; separate readable arms and legs; compact military silhouette with a dark outline. One isolated character, no vehicle, platform, portrait crop, scenery, lettering, or second person.",
+  "size": 32,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "dc87d396-5988-4bc2-b20f-7e6c52213c4e"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/rook-infantry-southeast-v1.json",
+    "sha256": "50aea628704a0165070d7179b8239dda454db21ccf02d117499f3207de266ba7"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "d62dd927-7809-4bd6-a18e-1c87fcf23e9f",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 84,
+      "height": 84,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/d62dd927-7809-4bd6-a18e-1c87fcf23e9f/image.png?v=1791521246638",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-southeast-v1/00.png",
+      "bytes": 7939,
+      "sha256": "11e5096eb64aa0912ead127a8409d5148b1fce496fb7a5159779f1862c6aaa72"
+    },
+    {
+      "index": 1,
+      "assetId": "d8816987-8b1f-4b15-832a-fb871cff11c2",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 88,
+      "height": 88,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/d8816987-8b1f-4b15-832a-fb871cff11c2/image.png?v=1791521247217",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-southeast-v1/01.png",
+      "bytes": 7180,
+      "sha256": "271ccb56ccac4a39e0cf3ab154a3aa64ba2a9241031cecc938ae049e77a1296a"
+    },
+    {
+      "index": 2,
+      "assetId": "99c9aa26-5239-4715-9c40-8c8f82354d7e",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 77,
+      "height": 77,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/99c9aa26-5239-4715-9c40-8c8f82354d7e/image.png?v=1791521247816",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-southeast-v1/02.png",
+      "bytes": 7325,
+      "sha256": "1d26d06577f55cc27bd997796fbeb8e930357dcea6946509a7564d80b86809e2"
+    },
+    {
+      "index": 3,
+      "assetId": "b907559a-5285-4c2b-9407-4aec736d64ad",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 85,
+      "height": 85,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/b907559a-5285-4c2b-9407-4aec736d64ad/image.png?v=1791521248337",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-southeast-v1/03.png",
+      "bytes": 7882,
+      "sha256": "103c5d8f08b6122b742e6aa5293bad3ae403d12d87c57ec886508ffff3a1a19c"
+    },
+    {
+      "index": 4,
+      "assetId": "4c918580-87f5-4313-ada1-e92d698ade65",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 84,
+      "height": 84,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/4c918580-87f5-4313-ada1-e92d698ade65/image.png?v=1791521248882",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-southeast-v1/04.png",
+      "bytes": 8598,
+      "sha256": "808cb48406ce74e96434b5f84e37bdf01a9b016a76626b661a82190c04bdbb52"
+    },
+    {
+      "index": 5,
+      "assetId": "32c8eea1-df89-46ff-88ad-e92b682bf1f3",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 86,
+      "height": 86,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/32c8eea1-df89-46ff-88ad-e92b682bf1f3/image.png?v=1791521249393",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-southeast-v1/05.png",
+      "bytes": 7776,
+      "sha256": "3cbd24df8898ec380dd5602a3af9509e4bcc29739cadd6d005cad4cf7a203578"
+    },
+    {
+      "index": 6,
+      "assetId": "bd78378a-0d7f-4c5d-bde5-f05635240ea0",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 75,
+      "height": 75,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/bd78378a-0d7f-4c5d-bde5-f05635240ea0/image.png?v=1791521249946",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-southeast-v1/06.png",
+      "bytes": 8036,
+      "sha256": "b09913b97ef847ab43a65f0f9aedac04948057e11473bd7ab173de72ae578080"
+    },
+    {
+      "index": 7,
+      "assetId": "61ab1f37-15b5-4db8-ad4c-085209d295ed",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 83,
+      "height": 83,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/61ab1f37-15b5-4db8-ad4c-085209d295ed/image.png?v=1791521250504",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-southeast-v1/07.png",
+      "bytes": 8536,
+      "sha256": "d04335a35a602fcb8d5b0cb56e57a9ae0494dbfdf98d19bf368ca8d7a28c0491"
+    },
+    {
+      "index": 8,
+      "assetId": "de89f360-0010-4fcf-a7f7-43123a61e869",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 85,
+      "height": 85,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/de89f360-0010-4fcf-a7f7-43123a61e869/image.png?v=1791521251155",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-southeast-v1/08.png",
+      "bytes": 7784,
+      "sha256": "59718f8838c0b6ff8d761ff5ca6d8bdede492b01125f35cc613f97aa99c06e8a"
+    }
+  ],
+  "credits": {
+    "remaining": 2145
+  }
+}

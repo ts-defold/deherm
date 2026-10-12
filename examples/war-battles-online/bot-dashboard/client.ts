@@ -1,5 +1,6 @@
 import {
   BattleClient,
+  INITIAL_ONLINE_INPUT_LEAD_TICKS,
   NetworkBotDriver,
   TRANSPORT_CHANNEL_SNAPSHOT,
   WebTransportGameClient,
@@ -8,6 +9,7 @@ import {
   type WebTransportConnectionOptions,
 } from "../core/index.ts";
 import { NetworkBotClock } from "./network-bot-clock.ts";
+import { PLAYER_MODE_DEAD, PLAYER_MODE_INFANTRY, PLAYER_MODE_TANK } from "../core/constants.ts";
 
 interface DashboardConfig {
   readonly webTransportUrl: string;
@@ -47,6 +49,12 @@ export interface NetworkBotDashboardBotSummary {
   readonly chassisRequests: number;
   readonly weaponUpgradeRequests: number;
   readonly observedTravelUnits: number;
+  readonly observedMode: number | undefined;
+  readonly observedModeTransitions: number;
+  readonly observedEjections: number;
+  readonly observedTankReentries: number;
+  readonly observedRespawns: number;
+  readonly minimumModeTransitionIntervalTicks: number | undefined;
 }
 
 export interface NetworkBotDashboardSummary {
@@ -212,6 +220,7 @@ function makeBot(index: number, skill: number): BotRow {
   const row = {} as BotRow;
   const client = new BattleClient({
     name: `netbot-${String(index + 1).padStart(2, "0")}`,
+    leadTicks: INITIAL_ONLINE_INPUT_LEAD_TICKS,
     assistAim: false,
     onWelcome: () => {
       row.state = "ready";
@@ -302,6 +311,12 @@ function summary(): NetworkBotDashboardSummary {
       chassisRequests: row.driver.stats.chassisRequests,
       weaponUpgradeRequests: row.driver.stats.weaponUpgradeRequests,
       observedTravelUnits: row.clock.observedTravelUnits,
+      observedMode: row.clock.observedMode,
+      observedModeTransitions: row.clock.observedModeTransitions,
+      observedEjections: row.clock.observedEjections,
+      observedTankReentries: row.clock.observedTankReentries,
+      observedRespawns: row.clock.observedRespawns,
+      minimumModeTransitionIntervalTicks: row.clock.minimumModeTransitionIntervalTicks,
     });
   }
   return {
@@ -350,11 +365,21 @@ function closeRows(reason: string, preserveResumeTokens: boolean): void {
 
 function render(): void {
   const total = summary();
+  const ejections = total.bots.reduce((sum, bot) => sum + bot.observedEjections, 0);
+  const depotReturns = total.bots.reduce((sum, bot) => sum + bot.observedTankReentries, 0);
+  const respawns = total.bots.reduce((sum, bot) => sum + bot.observedRespawns, 0);
   status.textContent =
     total.requested === 0
       ? "Idle — start a bot wave against the running match server."
-      : `${total.ready}/${total.requested} ready · ${total.snapshotsApplied} snapshots · ${total.inputsSent} inputs · ${total.inputsDropped} dropped`;
+      : `${total.ready}/${total.requested} ready · ${total.snapshotsApplied} snapshots · ${total.inputsSent} inputs · ${total.inputsDropped} dropped · ${ejections} eject / ${depotReturns} depot / ${respawns} respawn`;
   botTable.replaceChildren(...rows.map(renderBot));
+}
+
+function modeLabel(mode: number | undefined): string {
+  if (mode === PLAYER_MODE_TANK) return "tank";
+  if (mode === PLAYER_MODE_INFANTRY) return "pilot";
+  if (mode === PLAYER_MODE_DEAD) return "dead";
+  return "—";
 }
 
 function renderBot(row: BotRow): HTMLTableRowElement {
@@ -364,12 +389,14 @@ function renderBot(row: BotRow): HTMLTableRowElement {
   const values = [
     `BOT ${String(row.index + 1).padStart(2, "0")}`,
     row.state,
+    modeLabel(row.clock.observedMode),
     row.client.playerId || "—",
     row.client.stats.lastServerTick,
     row.client.stats.snapshotsApplied,
     row.client.stats.inputsSent,
     row.client.stats.inputsDropped,
     row.clock.observedTravelUnits,
+    row.clock.observedModeTransitions,
     row.client.stats.lastRoundTripMilliseconds || "—",
     row.error || "—",
   ];

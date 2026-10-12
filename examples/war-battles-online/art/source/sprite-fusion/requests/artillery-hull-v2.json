@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_b2cb2456-a3c9-4ffa-8272-f32966f15c07",
+  "operation": "edit",
+  "prompt": "Remove only the raised gun mount and long barrel from this siege artillery vehicle. Preserve its unmistakably long low rail-platform hull, rear armored casemate, folded stabilizers, long tracks, exact isometric view, palette, outline and ground contact. Finish the top deck with a visible dark circular weapon socket. One isolated artillery hull, no weapon.",
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/artillery-silhouette-v2/06.png",
+      "bytes": 6694,
+      "sha256": "35bc14823ff7bb405030a156a7f2bf267204d34c73c1b60cb98ac0b62e42928e"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/artillery-hull-v2.json",
+    "sha256": "451236099e2a43e0805f4ee37700a9c27f546ec69f13170fdf6dbcfd8b0d106d"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "67216e2a-e5a6-4e89-8094-d182ef33d7d6",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 76,
+      "height": 58,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/67216e2a-e5a6-4e89-8094-d182ef33d7d6/image.png?v=1791432353059",
+      "path": "art/source/sprite-fusion/outputs/artillery-hull-v2/00.png",
+      "bytes": 7095,
+      "sha256": "69c6405240445c389824ebe142f6bd928ba0cd984542b842eb13eb42c6400b94"
+    },
+    {
+      "index": 1,
+      "assetId": "4a642c54-e4b2-4460-a9d7-51e01d625ff7",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 84,
+      "height": 71,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/4a642c54-e4b2-4460-a9d7-51e01d625ff7/image.png?v=1791432354164",
+      "path": "art/source/sprite-fusion/outputs/artillery-hull-v2/01.png",
+      "bytes": 8458,
+      "sha256": "b35aadd26c8ddc978bbeadbd0b10dc19d78cddc8239028dc44033465df3f5a57"
+    }
+  ],
+  "credits": {
+    "remaining": 2430
+  }
+}

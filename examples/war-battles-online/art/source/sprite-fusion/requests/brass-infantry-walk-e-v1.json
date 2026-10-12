@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_704ec730-ee10-4167-9bd8-b24641b929e4",
+  "operation": "animate",
+  "prompt": "A quick grounded side-view walk cycle preserving this source's exact perspective, with alternating boot contact and a small opposite-arm swing. Brass remains an older stocky driver with a full snowy beard, brass-rimmed goggles, ochre cap, cream scarf, olive mechanic jacket and compact sidearm held low. Keep palette, outline, proportions, and identity consistent. Seamless loop without turning, jumping, mirroring, or adding objects.",
+  "size": null,
+  "outputFrames": 4,
+  "colors": 24,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "bb26da76-7445-402b-b852-b282768e54e5"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/brass-infantry-walk-e-v1.json",
+    "sha256": "fd4b13a1d1c5f31f64450ff910d741b64a113609ff57499aba133dbbea0ba8fe"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "aa1387cc-0a9a-47bc-a942-83cb68f5c7f1",
+      "type": "animation",
+      "contentType": "image/webp",
+      "width": 34,
+      "height": 48,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/aa1387cc-0a9a-47bc-a942-83cb68f5c7f1/animation.webp?v=1791524369616",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-walk-e-v1/00.webp",
+      "bytes": 2522,
+      "sha256": "34059bfbfadf7a6393fcb8ee3263da6995936053907afc7f7533a6fd9b66b9a6",
+      "spritesheet": {
+        "url": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/aa1387cc-0a9a-47bc-a942-83cb68f5c7f1/spritesheet.png?v=1791524369616",
+        "path": "art/source/sprite-fusion/outputs/brass-infantry-walk-e-v1/00-sheet.png",
+        "bytes": 2312,
+        "sha256": "92f4ace41a02bb18736e6f62099556b341a19f6605f992df41611de476702c1b"
+      },
+      "frameCount": 4,
+      "fps": 8
+    }
+  ],
+  "credits": {
+    "remaining": 1665
+  }
+}

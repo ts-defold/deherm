@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_01f18b87-abc1-4429-a7cc-2570860ede8c",
+  "operation": "direction-set",
+  "prompt": null,
+  "size": 32,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "2b2fb264-89d8-4144-a216-674ec3b0651f"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/spark-infantry-fire-directions-v1.json",
+    "sha256": "9a3510b0375b44ae2be9096cb6db770648567fd3e5e6f2471e87582a9ee11c45"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "1d6e3f4d-d189-44db-8adb-8c96fb94d607",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 39,
+      "height": 39,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/1d6e3f4d-d189-44db-8adb-8c96fb94d607/image.png?v=1791532275453",
+      "path": "art/source/sprite-fusion/outputs/spark-infantry-fire-directions-v1/00.png",
+      "bytes": 2348,
+      "sha256": "efa2147430d7199a2decbdb0f06a9903d92b2f802b66fabe385fb23095dc59b6"
+    },
+    {
+      "index": 1,
+      "assetId": "61e0d47e-555a-463e-ab99-bf74d4481957",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 36,
+      "height": 36,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/61e0d47e-555a-463e-ab99-bf74d4481957/image.png?v=1791532276048",
+      "path": "art/source/sprite-fusion/outputs/spark-infantry-fire-directions-v1/01.png",
+      "bytes": 2241,
+      "sha256": "a9b04e1c2c4733439a7f44ea67e9c1a70cbd17e3ee1ac8e7ad37b14e7f498be1"
+    },
+    {
+      "index": 2,
+      "assetId": "0d16f039-c0db-4e87-9893-00147f48fcab",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 39,
+      "height": 39,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/0d16f039-c0db-4e87-9893-00147f48fcab/image.png?v=1791532276596",
+      "path": "art/source/sprite-fusion/outputs/spark-infantry-fire-directions-v1/02.png",
+      "bytes": 2233,
+      "sha256": "16c7d731ed70cceb86b77bbf3ddad7f9f884f89e9277c5c2cd73e2b04e6300cd"
+    },
+    {
+      "index": 3,
+      "assetId": "29038ee8-47cb-4d87-b9f4-efe921ed4eec",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 40,
+      "height": 40,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/29038ee8-47cb-4d87-b9f4-efe921ed4eec/image.png?v=1791532277245",
+      "path": "art/source/sprite-fusion/outputs/spark-infantry-fire-directions-v1/03.png",
+      "bytes": 2065,
+      "sha256": "4aa53842c6497e842f1d4037c3b8948f8f492126617867eea592c8ed96cb6690"
+    },
+    {
+      "index": 4,
+      "assetId": "55889b19-3f72-4545-8bdc-751a66259424",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 39,
+      "height": 39,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/55889b19-3f72-4545-8bdc-751a66259424/image.png?v=1791532277785",
+      "path": "art/source/sprite-fusion/outputs/spark-infantry-fire-directions-v1/04.png",
+      "bytes": 2027,
+      "sha256": "b5aca9a9badcea1a5ea9aa8f743b4e99b4674e1ec322884e01d72e1eb5bc0670"
+    },
+    {
+      "index": 5,
+      "assetId": "d5ee6b06-ddec-4e20-a7a8-e74ca3b7d889",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 35,
+      "height": 35,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/d5ee6b06-ddec-4e20-a7a8-e74ca3b7d889/image.png?v=1791532278447",
+      "path": "art/source/sprite-fusion/outputs/spark-infantry-fire-directions-v1/05.png",
+      "bytes": 1698,
+      "sha256": "3fc01505c497bc60883c7202b86d662971fb233dcf4b5093144fcc53da7742a9"
+    },
+    {
+      "index": 6,
+      "assetId": "b207eccf-b7c8-4f1f-bc1a-1ec7df7aec3c",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 35,
+      "height": 35,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/b207eccf-b7c8-4f1f-bc1a-1ec7df7aec3c/image.png?v=1791532279092",
+      "path": "art/source/sprite-fusion/outputs/spark-infantry-fire-directions-v1/06.png",
+      "bytes": 1933,
+      "sha256": "ca6545903d67c1b2c5f92c12319cc05f15612047fd52cc8756da97451585aba0"
+    },
+    {
+      "index": 7,
+      "assetId": "214ae05a-9ef3-47f7-9632-cb04ebc70fd0",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 35,
+      "height": 35,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/214ae05a-9ef3-47f7-9632-cb04ebc70fd0/image.png?v=1791532279810",
+      "path": "art/source/sprite-fusion/outputs/spark-infantry-fire-directions-v1/07.png",
+      "bytes": 1796,
+      "sha256": "fbcd3abb2347277f43cc76ec0aec55530991e68c7790c441951ca1a57cd89d15"
+    }
+  ],
+  "credits": {
+    "remaining": 975
+  }
+}

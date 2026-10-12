@@ -1,0 +1,12 @@
+{
+  "name": "frontier-hex-dark-ash-v3",
+  "operation": "style-reference",
+  "size": 64,
+  "prompt": "A single walkable dark volcanic hex for a three-quarter-view tank battlefield. Broad level top of charcoal basalt plates and black cinders, a few narrow orange ember cracks, and a short layered dark stone side face. Match the reference tiles' footprint, upper-left light, and chunky hand-placed pixel clusters. Keep the perimeter dark, without pale silver or white outlines, so it joins dark neighboring rock cleanly. No tank, character, building, lettering, or other tile.",
+  "inputs": [
+    "art/source/sprite-fusion/outputs/frontier-hex-lava-fracture-v1/01.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-lava-fracture-v1/06.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-basalt-ash-edge-v1/03.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-basalt-cliff-v1/04.png"
+  ]
+}

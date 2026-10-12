@@ -1,0 +1,4 @@
+image: "/assets/derived/world/hex-meadow.png"
+tile_width: 1920
+tile_height: 1440
+extrude_borders: 2

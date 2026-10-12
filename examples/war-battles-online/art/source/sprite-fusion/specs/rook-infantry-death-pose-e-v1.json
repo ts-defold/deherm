@@ -1,0 +1,6 @@
+{
+  "name": "rook-infantry-death-pose-e-v1",
+  "operation": "edit",
+  "inputs": ["asset:36fd7018-9aed-4f39-b606-c73e936c2bc6"],
+  "prompt": "Keep Rook in this exact east-facing side profile. Change his body into a clearly defeated low collapsed pose: down on one knee, torso and helmet bowed forward, one hand braced against the ground, sidearm lowered. Make the silhouette shorter and wider than standing. Preserve the strict side-profile facing, boots and knee on one ground line, exact helmet, blue goggles, cream scarf, olive jacket, colors, outlines, and character identity. No turn, blood, injury detail, flash, extra prop, scenery, platform, text, or second person."
+}

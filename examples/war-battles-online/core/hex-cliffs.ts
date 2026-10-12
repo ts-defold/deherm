@@ -1,0 +1,98 @@
+/** Cold-path anchors for the seeded island's grounded scenery and depots. */
+import { ArenaMap, cellCentreX, cellCentreY } from "./arena.ts";
+import { MAP_CELLS, MAP_WIDTH } from "./constants.ts";
+import { worldPropVariant } from "./world-visual-footprints.ts";
+import {
+  WORLD_PLAN_VISIBLE_DEPOT_SLOTS,
+  WORLD_PROP_BUILDING,
+  WORLD_PROP_DEPOT,
+  WORLD_PROP_ROCK,
+  WORLD_PROP_TREE,
+} from "./world-plan.ts";
+
+export { HEX_LANDMARK_SPRITE_OFFSET_Y } from "./world-visual-footprints.ts";
+
+// The coast compositor derives its shallow face palette from these selected
+// rock-source families. No raised wall stamp is created by the live island.
+export const HEX_CLIFF_VARIANT_FAMILIES = {
+  B: { start: 0, count: 3 },
+  A: { start: 3, count: 6 },
+  G: { start: 9, count: 3 },
+  D: { start: 12, count: 1 },
+  M: { start: 15, count: 3 },
+} as const;
+export const HEX_CLIFF_VARIANT_COUNT = 18;
+
+/** Indices match the compile-time animation table in arena-landmark.script.ts. */
+export const HEX_LANDMARK_KIND = {
+  fieldBunker: 0,
+  rockOutcrop: 1,
+  supplyDump: 2,
+  tankWreck: 3,
+  fuelCluster: 4,
+  gunNest: 5,
+  radioMast: 6,
+  scrapBarricade: 7,
+  shellCrater: 8,
+  coniferTall: 9,
+  coniferBroad: 10,
+  coniferLeaning: 11,
+  lowCoverEarth: 12,
+  lowCoverStone: 13,
+  lowCoverTimber: 14,
+  lowCoverRubble: 15,
+  lowCoverNeutral: 16,
+} as const;
+
+/** One visible, foot-sorted sprite for every immutable world-plan collider. */
+export interface WorldPlanPropAnchor {
+  readonly propIndex: number;
+  readonly cellX: number;
+  readonly cellY: number;
+  readonly worldX: number;
+  readonly worldY: number;
+  readonly kind: number;
+}
+
+export function deriveWorldPlanPropAnchors(map: ArenaMap): WorldPlanPropAnchor[] {
+  const result: WorldPlanPropAnchor[] = [];
+  const plan = map.plan;
+  for (let propIndex = 0; propIndex < plan.propCount; propIndex++) {
+    const cell = plan.propCells[propIndex]!;
+    const cellX = cell % MAP_WIDTH;
+    const cellY = Math.floor(cell / MAP_WIDTH);
+    const propKind = plan.propKinds[propIndex]!;
+    if (propKind === WORLD_PROP_DEPOT) continue;
+    const variation = worldPropVariant(map.seed, cell, propKind);
+    const kind =
+      propKind === WORLD_PROP_BUILDING
+        ? [HEX_LANDMARK_KIND.fieldBunker, HEX_LANDMARK_KIND.supplyDump, HEX_LANDMARK_KIND.gunNest][variation]!
+        : propKind === WORLD_PROP_TREE
+          ? HEX_LANDMARK_KIND.coniferTall + variation
+          : propKind === WORLD_PROP_ROCK
+            ? // All three are grounded, compact stone silhouettes on the same
+              // atlas canvas. The plan reserves the larger outcrop footprint,
+              // so smaller variants cannot create a new visual overlap.
+              [HEX_LANDMARK_KIND.rockOutcrop, HEX_LANDMARK_KIND.lowCoverStone, HEX_LANDMARK_KIND.lowCoverRubble][
+                variation
+              ]!
+            : -1;
+    if (kind < 0) throw new Error(`world plan prop ${propIndex} has unknown kind ${propKind}`);
+    result.push({ propIndex, cellX, cellY, worldX: cellCentreX(cellX), worldY: cellCentreY(cellY), kind });
+  }
+  return result;
+}
+
+/**
+ * The four visible depot facades are grounded, collidable WorldPlan records.
+ * Gameplay still has all sixteen authoritative tank-reacquisition aprons.
+ */
+export function deriveTankDepotPresentationSites(map: ArenaMap): number[] {
+  return WORLD_PLAN_VISIBLE_DEPOT_SLOTS.filter((slot) => map.plan.depotFacadeCells[slot]! >= 0);
+}
+
+/** Hide square wall/face tiles beneath the grounded sprite owning each collider. */
+export function projectWorldPlanPropCoverage(map: ArenaMap, output: Uint8Array): void {
+  if (output.length !== MAP_CELLS) throw new RangeError(`world prop coverage needs ${MAP_CELLS} cells`);
+  output.set(map.plan.propSolid);
+}

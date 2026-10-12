@@ -1,0 +1,8 @@
+{
+  "name": "spark-infantry-walk-se-v1",
+  "operation": "animate",
+  "inputs": ["asset:843b6f2e-6d1f-44a7-8aea-fd993741a14c"],
+  "prompt": "A quick grounded southeast-facing walk cycle with alternating boot contact and a small opposite-arm swing. Spark remains a young tan-skinned mechanic with short spiky black hair, orange headband, raised brass goggles, teal collar, olive jacket and compact sidearm held low. Keep his exact perspective, palette, outline, proportions, and identity consistent. Seamless loop without turning, jumping, or adding objects.",
+  "outputFrames": 4,
+  "colors": 24
+}

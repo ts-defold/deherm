@@ -1,0 +1,6 @@
+{
+  "name": "rook-infantry-hit-pose-se-v2",
+  "operation": "edit",
+  "inputs": ["asset:b0168c9c-877f-46f1-8ee7-e12b93565d18"],
+  "prompt": "Rook takes a heavy impact while facing southeast: make a dramatic diagonal recoil silhouette, knees buckling, torso leaning backward, free forearm thrown up across his face, sidearm arm hanging low. Shift one boot behind him but keep both boots grounded on the same baseline. The pose must read as staggered rather than standing or firing even at tiny game size. Preserve the same driver, helmet, blue goggle lens, cream scarf, olive jacket, color palette, outline weight, and isometric three-quarter perspective. No blood, projectile, flash, new prop, scenery, text, or other character."
+}

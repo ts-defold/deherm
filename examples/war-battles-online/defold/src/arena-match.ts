@@ -13,6 +13,7 @@
 import {
   BattleClient,
   BattleWorld,
+  DEFAULT_ROSTER_SIZE,
   DIRECTION_SCALE,
   PlayableBattle,
   TICK_MILLISECONDS,
@@ -30,7 +31,7 @@ import {
 import { hmrPersistentState } from "@deherm/project";
 
 export const MAX_VISIBLE_PROJECTILES = 64;
-export const DEFAULT_ROSTER = 8;
+export const DEFAULT_ROSTER = DEFAULT_ROSTER_SIZE;
 
 export type MatchMode = "offline" | "online";
 
@@ -52,8 +53,12 @@ export class ArenaMatch {
   /** False until the player has taken control or the opening demo has ended. */
   engaged = false;
   ticksStepped = 0;
+  onlineReportedElapsedMilliseconds = 0;
+  onlineWallElapsedMilliseconds = 0;
+  onlineMaximumWallDeltaMilliseconds = 0;
 
   private accumulator = 0;
+  private lastOnlineFrameAtMilliseconds?: number;
   private readonly controls: PlayControls = { moveX: 0, moveY: 0, fire: false, boost: false, weapon: 0 };
 
   constructor(options: ArenaOptions) {
@@ -84,6 +89,12 @@ export class ArenaMatch {
     output.hullY = world.playerHullY[slot]!;
     output.turretX = world.playerTurretX[slot]!;
     output.turretY = world.playerTurretY[slot]!;
+    output.active = world.playerActive[slot]!;
+    output.generation = world.playerGeneration[slot]!;
+    output.mode = world.playerMode[slot]!;
+    output.chassis = world.playerChassis[slot]!;
+    output.velocityX = world.playerVelocityX[slot]!;
+    output.velocityY = world.playerVelocityY[slot]!;
     return true;
   }
 
@@ -103,6 +114,16 @@ export class ArenaMatch {
     this.controls.weapon = weapon;
     if (this.mode === "online") this.client?.setControls(this.controls);
     else this.battle.setControls(this.controls);
+  }
+
+  setAim(x: number, y: number): void {
+    if (this.mode === "online") this.client?.setAim(x, y);
+    else this.battle.setAim(x, y);
+  }
+
+  clearAim(): void {
+    if (this.mode === "online") this.client?.clearAim();
+    else this.battle.clearAim();
   }
 
   /** Reliable online control or deterministic offline purchase for a chassis. */
@@ -146,25 +167,41 @@ export class ArenaMatch {
   }
 
   /** Advances by `dt` seconds of wall clock, in whole 60 Hz ticks. */
-  advance(dt: number, maximumSteps = 5): number {
+  advance(dt: number, maximumSteps?: number): number {
     if (!this.engaged) return 0;
-    if (this.mode === "online") {
-      const client = this.client;
-      if (client === undefined) return 0;
-      const stepped = client.update(dt * 1000, maximumSteps);
-      this.ticksStepped += stepped;
-      return stepped;
-    }
+    if (this.mode === "online") return this.advanceOnline(dt, maximumSteps);
     this.accumulator += dt * 1000;
     let steps = 0;
-    while (this.accumulator >= TICK_MILLISECONDS && steps < maximumSteps) {
+    const offlineMaximumSteps = maximumSteps ?? 5;
+    while (this.accumulator >= TICK_MILLISECONDS && steps < offlineMaximumSteps) {
       this.accumulator -= TICK_MILLISECONDS;
       this.battle.step();
       steps += 1;
     }
-    if (steps === maximumSteps) this.accumulator = 0;
+    if (steps === offlineMaximumSteps) this.accumulator = 0;
     this.ticksStepped += steps;
     return steps;
+  }
+
+  /** Advance the online clock even while waiting for the first renderable snapshot. */
+  advanceOnline(dt: number, maximumSteps = 8): number {
+    if (this.mode !== "online" || this.client === undefined) return 0;
+    // Defold's update dt can be capped after a slow frame. That loses time
+    // against a continuously ticking remote authority, leaving subsequent
+    // inputs permanently late. Use the host clock for online simulation only;
+    // BattleClient still bounds the per-frame work and retained tick debt.
+    const now = Date.now();
+    const elapsed =
+      this.lastOnlineFrameAtMilliseconds === undefined
+        ? Math.max(0, dt * 1000)
+        : Math.max(0, Math.min(now - this.lastOnlineFrameAtMilliseconds, 500));
+    this.lastOnlineFrameAtMilliseconds = now;
+    this.onlineReportedElapsedMilliseconds += Math.max(0, dt * 1000);
+    this.onlineWallElapsedMilliseconds += elapsed;
+    this.onlineMaximumWallDeltaMilliseconds = Math.max(this.onlineMaximumWallDeltaMilliseconds, elapsed);
+    const stepped = this.client.update(elapsed, maximumSteps);
+    this.ticksStepped += stepped;
+    return stepped;
   }
 }
 
@@ -192,11 +229,11 @@ export function pixelY(y: number): number {
 
 /** Authoritative Cartesian world units projected into the 2:1 renderer. */
 export function projectedX(x: number, y: number): number {
-  return isometricScreenX(x, y);
+  return Math.round(isometricScreenX(x, y));
 }
 
 export function projectedY(x: number, y: number): number {
-  return isometricScreenY(x, y);
+  return Math.round(isometricScreenY(x, y));
 }
 
 /** A Q8 direction as radians, for `vmath.quatRotationZ`. */

@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_865e68cd-6bc2-4aa7-911a-64105a8921e7",
+  "operation": "direction-set",
+  "prompt": null,
+  "size": 32,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "e274caf0-59fd-4f7a-81ef-4708a705e7eb"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/rook-infantry-death-directions-v1.json",
+    "sha256": "bdf836d3c6685c23ff0c9660fcde29e79d44c5f332729bf647165feb456c1cb3"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "af07f0bf-d84f-477b-ae4f-90c9b2bea362",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 35,
+      "height": 35,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/af07f0bf-d84f-477b-ae4f-90c9b2bea362/image.png?v=1791533515853",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-death-directions-v1/00.png",
+      "bytes": 1960,
+      "sha256": "cbeff9f3c17edc24c9882dcea89459a5d7aca383216ebd73abee56e8d6a80c48"
+    },
+    {
+      "index": 1,
+      "assetId": "30c78cb6-9dbf-47f9-9508-dafb1a98eca9",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 32,
+      "height": 32,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/30c78cb6-9dbf-47f9-9508-dafb1a98eca9/image.png?v=1791533516438",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-death-directions-v1/01.png",
+      "bytes": 2020,
+      "sha256": "5fa0f82913300c2feb2f278339af209fac58310a7c820fe77ca3364bf366908b"
+    },
+    {
+      "index": 2,
+      "assetId": "c86fbf10-b41a-4ace-b7de-8e765399cdfb",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 35,
+      "height": 35,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/c86fbf10-b41a-4ace-b7de-8e765399cdfb/image.png?v=1791533517029",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-death-directions-v1/02.png",
+      "bytes": 1859,
+      "sha256": "acb5575d7855ba9cadc23f75e4f2db17bf37f09f96eb2f0f5d07566b2e3be4a9"
+    },
+    {
+      "index": 3,
+      "assetId": "5503e696-1845-409d-9011-32b494c67377",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 33,
+      "height": 33,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/5503e696-1845-409d-9011-32b494c67377/image.png?v=1791533517625",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-death-directions-v1/03.png",
+      "bytes": 1729,
+      "sha256": "fd7f093e9e71f91f913d5bb5cf8f7da4331e1b612f136fa9f830394076b0899c"
+    },
+    {
+      "index": 4,
+      "assetId": "cec79aaa-771f-4681-b29c-52c9dbbb3d31",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 32,
+      "height": 32,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/cec79aaa-771f-4681-b29c-52c9dbbb3d31/image.png?v=1791533518204",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-death-directions-v1/04.png",
+      "bytes": 1500,
+      "sha256": "14665eb7943621c5e1b354b44aa921d963a63b6fba908c559a82b2f9befd3d03"
+    },
+    {
+      "index": 5,
+      "assetId": "26a70f32-9294-404c-8eb6-39169551ab2d",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 32,
+      "height": 32,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/26a70f32-9294-404c-8eb6-39169551ab2d/image.png?v=1791533518882",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-death-directions-v1/05.png",
+      "bytes": 1558,
+      "sha256": "0fb9853cdec43556fb4fc1821194a70c16a476bbba8329d9496f99c85a1bf9f0"
+    },
+    {
+      "index": 6,
+      "assetId": "ae4d51c6-9eb6-4eb9-ac1a-a3cd3be2489b",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 33,
+      "height": 33,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/ae4d51c6-9eb6-4eb9-ac1a-a3cd3be2489b/image.png?v=1791533519426",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-death-directions-v1/06.png",
+      "bytes": 1576,
+      "sha256": "310f43cab09f1b014408c6d04be6520bc8c7772cc6cece19dec7cf6e8c96e528"
+    },
+    {
+      "index": 7,
+      "assetId": "099842b1-827c-4e73-8bb4-45d50a153edc",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 32,
+      "height": 32,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/099842b1-827c-4e73-8bb4-45d50a153edc/image.png?v=1791533519959",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-death-directions-v1/07.png",
+      "bytes": 1404,
+      "sha256": "ee44914512dfbbea5caeed68f6049d0fb36ba5330213bad2ec81fa9acc5d74db"
+    }
+  ],
+  "credits": {
+    "remaining": 870
+  }
+}

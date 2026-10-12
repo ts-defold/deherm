@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_1c3beca1-36eb-4595-818b-e4aed1c92eaf",
+  "operation": "edit",
+  "prompt": "Mud takes a heavy hit while facing southeast: make his rugged body recoil diagonally with one knee buckling, upper body tilted backward, free forearm up protecting his helmet, compact sidearm arm hanging low. Both boots remain grounded on the same line. The silhouette should read as staggered, not standing or firing. Preserve the same tan helmet, orange goggles, dark face covering, red scarf, olive jacket, colors, outlines, and three-quarter isometric perspective. No blood, projectile, flash, extra prop, scenery, text, or second person.",
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "9fdf7cd0-5dba-42eb-b1cc-d0de760e689c"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/mud-infantry-hit-pose-se-v1.json",
+    "sha256": "9a0ed738b1e17cd756a134b8213c898f9ba512022fad518eebfd958dbd1e21d4"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "12ba9c69-107e-4c36-8082-39298207c116",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 30,
+      "height": 41,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/12ba9c69-107e-4c36-8082-39298207c116/image.png?v=1791536046592",
+      "path": "art/source/sprite-fusion/outputs/mud-infantry-hit-pose-se-v1/00.png",
+      "bytes": 2860,
+      "sha256": "358f0e0c65b40eab48f8483178cd9adc4a854b3b949d92e4facc2eb0e495715f"
+    },
+    {
+      "index": 1,
+      "assetId": "5e2d5e6f-5671-4d8f-8aae-bf65e978137b",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 27,
+      "height": 39,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/5e2d5e6f-5671-4d8f-8aae-bf65e978137b/image.png?v=1791536047819",
+      "path": "art/source/sprite-fusion/outputs/mud-infantry-hit-pose-se-v1/01.png",
+      "bytes": 2737,
+      "sha256": "3583542ca159a3ea78cacfc352d0fda803966f776a66ea0fb67b470d43f6af23"
+    }
+  ],
+  "credits": {
+    "remaining": 570
+  }
+}

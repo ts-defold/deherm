@@ -1,0 +1,7 @@
+{
+  "name": "rook-infantry-southeast-v1",
+  "operation": "style-reference",
+  "size": 32,
+  "inputs": ["asset:dc87d396-5988-4bc2-b20f-7e6c52213c4e"],
+  "prompt": "Rook, the young Black woman scout tank driver from the reference portrait, standing full-body in a southeast-facing three-quarter isometric arcade-game view. Keep her warm brown skin, ochre flight helmet with one raised blue goggle lens, cream scarf, olive field jacket, dark trousers, and sturdy boots. Small sidearm held low; separate readable arms and legs; compact military silhouette with a dark outline. One isolated character, no vehicle, platform, portrait crop, scenery, lettering, or second person."
+}

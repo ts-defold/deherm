@@ -36,6 +36,34 @@ animations {
   fps: 8
 }
 animations {
+  id: "driver-portrait-0"
+  images {
+    image: "/assets/derived/ui/driver-portrait/family-0.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "driver-portrait-1"
+  images {
+    image: "/assets/derived/ui/driver-portrait/family-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "driver-portrait-2"
+  images {
+    image: "/assets/derived/ui/driver-portrait/family-2.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "driver-portrait-3"
+  images {
+    image: "/assets/derived/ui/driver-portrait/family-3.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
   id: "hud-shell"
   images {
     image: "/assets/derived/ui/chrome/hud-shell.png"

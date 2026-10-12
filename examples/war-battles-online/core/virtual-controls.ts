@@ -1,0 +1,106 @@
+/** Allocation-free two-thumb controls in Defold screen coordinates. */
+export interface VirtualTouch {
+  readonly id: number;
+  readonly pressed: boolean;
+  readonly released: boolean;
+  readonly x: number;
+  readonly y: number;
+  readonly screenX?: number;
+  readonly screenY?: number;
+}
+
+export interface VirtualControls {
+  moveId: number;
+  aimId: number;
+  moveOriginX: number;
+  moveOriginY: number;
+  aimOriginX: number;
+  aimOriginY: number;
+  moveX: number;
+  moveY: number;
+  aimX: number;
+  aimY: number;
+  hasAim: boolean;
+  fire: boolean;
+  boost: boolean;
+}
+
+export function createVirtualControls(): VirtualControls {
+  return {
+    moveId: -1,
+    aimId: -1,
+    moveOriginX: 0,
+    moveOriginY: 0,
+    aimOriginX: 0,
+    aimOriginY: 0,
+    moveX: 0,
+    moveY: 0,
+    aimX: 0,
+    aimY: 0,
+    hasAim: false,
+    fire: false,
+    boost: false,
+  };
+}
+
+function axis(value: number): number {
+  return value < -14 ? -1 : value > 14 ? 1 : 0;
+}
+
+/** Left thumb drives and boosts at the outer radius; right thumb aims and fires. */
+export function updateVirtualControls(
+  state: VirtualControls,
+  touches: readonly VirtualTouch[],
+  screenWidth: number,
+): void {
+  for (const touch of touches) {
+    // HTML5 Defold 1.14 supplies x/y in this action even when the optional
+    // screen-coordinate fields are absent. Both are in canvas coordinates for
+    // the virtual-stick split; prefer screen space when available.
+    const x = touch.screenX ?? touch.x;
+    const y = touch.screenY ?? touch.y;
+    if (touch.pressed && !touch.released) {
+      if (x < screenWidth * 0.55 && state.moveId < 0) {
+        state.moveId = touch.id;
+        state.moveOriginX = x;
+        state.moveOriginY = y;
+      } else if (x >= screenWidth * 0.55 && state.aimId < 0) {
+        state.aimId = touch.id;
+        state.aimOriginX = x;
+        state.aimOriginY = y;
+      }
+    }
+    if (touch.id === state.moveId) {
+      if (touch.released) {
+        state.moveId = -1;
+        state.moveX = 0;
+        state.moveY = 0;
+        state.boost = false;
+      } else {
+        const dx = x - state.moveOriginX;
+        const dy = y - state.moveOriginY;
+        state.moveX = axis(dx);
+        state.moveY = axis(dy);
+        state.boost = dx * dx + dy * dy > 100 * 100;
+      }
+    }
+    if (touch.id === state.aimId) {
+      if (touch.released) {
+        state.aimId = -1;
+        state.aimX = 0;
+        state.aimY = 0;
+        state.hasAim = false;
+        state.fire = false;
+      } else {
+        const dx = x - state.aimOriginX;
+        const dy = y - state.aimOriginY;
+        if (dx * dx + dy * dy > 14 * 14) {
+          state.aimX = dx;
+          state.aimY = dy;
+          state.hasAim = true;
+        }
+        state.fire = true;
+      }
+    }
+  }
+}

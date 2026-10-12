@@ -1,0 +1,12 @@
+{
+  "name": "frontier-hex-ochre-detail-v2",
+  "operation": "style-reference",
+  "size": 64,
+  "prompt": "A single walkable ochre earth hex for a three-quarter-view volcanic frontier battlefield. Warm compacted soil top with low tire-rut scars, sparse yellow dry grass, pebble clusters, and a few dark cinders; short layered earth-and-basalt side face. Match the reference tiles' six-sided footprint, upper-left light, chunky readable pixel clusters, and muted military palette. No tank, character, building, lettering, or other tile.",
+  "inputs": [
+    "art/source/sprite-fusion/outputs/frontier-hex-ochre-cliff-v1/06.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-worn-route-v1/01.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/06.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-earth-basalt-edge-v1/04.png"
+  ]
+}

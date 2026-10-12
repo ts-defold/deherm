@@ -1,0 +1,7 @@
+{
+  "name": "assault-silhouette-v2",
+  "operation": "style-reference",
+  "size": 64,
+  "inputs": ["art/source/sprite-fusion/outputs/artillery-silhouette-v2/06.png"],
+  "prompt": "A medium assault tank for the same three-quarter isometric top-down arcade battlefield as the reference vehicle. Distinct broad low wedge hull, deep side skirts over stout tracks, two short heavy autocannon barrels on a forward compact turret, battered sloped front armor and rear exhaust stacks. Basalt-grey armor, warm cream highlights, restrained orange signal markings, dark readable outline. No visible driver, no face. Its aggressive mid-weight silhouette must differ clearly from the long-gun artillery reference."
+}

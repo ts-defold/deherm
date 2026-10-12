@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 4,
+  "families": [
+    {
+      "variant": 0,
+      "character": "rook",
+      "idleRequest": "rook-infantry-directions-v1",
+      "fireRequest": "rook-infantry-fire-directions-v1",
+      "hitRequest": "rook-infantry-hit-directions-v2",
+      "deathSources": {
+        "se": { "request": "rook-infantry-death-pose-se-v1", "outputIndex": 0 },
+        "s": { "request": "rook-infantry-death-pose-s-v1", "outputIndex": 0 },
+        "sw": { "request": "rook-infantry-death-pose-sw-v1", "outputIndex": 0 },
+        "w": { "request": "rook-infantry-death-pose-w-v1", "outputIndex": 1 },
+        "e": { "request": "rook-infantry-death-pose-e-v1", "outputIndex": 1 },
+        "nw": { "request": "rook-infantry-death-pose-nw-v1", "outputIndex": 0 },
+        "n": { "request": "rook-infantry-death-pose-n-v1", "outputIndex": 1 },
+        "ne": { "request": "rook-infantry-death-pose-ne-v1", "outputIndex": 0 }
+      },
+      "walkRequestPrefix": "rook-infantry-walk-",
+      "walkRequestSuffix": "-v1",
+      "walkOutputIndex": 0,
+      "walkOverrides": {
+        "se": { "request": "rook-infantry-walk-se-padded-v2", "outputIndex": 0 },
+        "e": { "request": "rook-infantry-walk-e-padded-v2", "outputIndex": 0 },
+        "s": { "request": "rook-infantry-walk-s-padded-v2", "outputIndex": 0 },
+        "w": { "request": "rook-infantry-walk-w-padded-v2", "outputIndex": 0 },
+        "n": { "request": "rook-infantry-walk-n-padded-v2", "outputIndex": 0 },
+        "ne": { "request": "rook-infantry-walk-ne-padded-v2", "outputIndex": 0 }
+      },
+      "flipHorizontal": ["w"]
+    },
+    {
+      "variant": 1,
+      "character": "brass",
+      "idleRequest": "brass-infantry-directions-v1",
+      "fireRequest": "brass-infantry-fire-directions-v1",
+      "hitRequest": "brass-infantry-hit-directions-v2",
+      "deathSources": {
+        "se": { "request": "brass-infantry-death-pose-se-v1", "outputIndex": 1 },
+        "s": { "request": "brass-infantry-death-pose-s-v1", "outputIndex": 1 },
+        "sw": { "request": "brass-infantry-death-pose-sw-v1", "outputIndex": 1 },
+        "w": { "request": "brass-infantry-death-pose-w-v1", "outputIndex": 0 },
+        "e": { "request": "brass-infantry-death-pose-e-v1", "outputIndex": 0 },
+        "nw": { "request": "brass-infantry-death-pose-nw-v1", "outputIndex": 0 },
+        "n": { "request": "brass-infantry-death-pose-n-v1", "outputIndex": 0 },
+        "ne": { "request": "brass-infantry-death-pose-ne-v1", "outputIndex": 0 }
+      },
+      "walkRequestPrefix": "brass-infantry-walk-",
+      "walkRequestSuffix": "-v1",
+      "walkOutputIndex": 0,
+      "walkOverrides": {
+        "se": { "request": "brass-infantry-walk-se-padded-v2", "outputIndex": 0 },
+        "s": { "request": "brass-infantry-walk-s-padded-v2", "outputIndex": 0 },
+        "w": { "request": "brass-infantry-walk-w-padded-v2", "outputIndex": 0 },
+        "n": { "request": "brass-infantry-walk-n-padded-v2", "outputIndex": 0 },
+        "ne": { "request": "brass-infantry-walk-ne-padded-v2", "outputIndex": 0 }
+      },
+      "flipHorizontal": ["w", "e"]
+    },
+    {
+      "variant": 2,
+      "character": "spark",
+      "idleRequest": "spark-infantry-directions-v1",
+      "fireRequest": "spark-infantry-fire-directions-v1",
+      "hitRequest": "spark-infantry-hit-directions-v1",
+      "deathSources": {
+        "se": { "request": "spark-infantry-death-pose-se-v1", "outputIndex": 0 },
+        "s": { "request": "spark-infantry-death-pose-s-v1", "outputIndex": 0 },
+        "sw": { "request": "spark-infantry-death-pose-sw-v1", "outputIndex": 0 },
+        "w": { "request": "spark-infantry-death-pose-w-v1", "outputIndex": 1 },
+        "e": { "request": "spark-infantry-death-pose-e-v1", "outputIndex": 1 },
+        "nw": { "request": "spark-infantry-death-pose-nw-v1", "outputIndex": 0 },
+        "n": { "request": "spark-infantry-death-pose-n-v1", "outputIndex": 0 },
+        "ne": { "request": "spark-infantry-death-pose-ne-v1", "outputIndex": 0 }
+      },
+      "walkRequestPrefix": "spark-infantry-walk-",
+      "walkRequestSuffix": "-v1",
+      "walkOutputIndex": 0,
+      "walkOverrides": {
+        "s": { "request": "spark-infantry-walk-s-padded-v2", "outputIndex": 0 },
+        "e": { "request": "spark-infantry-walk-e-padded-v2", "outputIndex": 0 },
+        "sw": { "request": "spark-infantry-walk-sw-padded-v2", "outputIndex": 0 }
+      },
+      "flipHorizontal": ["w", "e"]
+    },
+    {
+      "variant": 3,
+      "character": "mud",
+      "idleRequest": "mud-infantry-directions-v1",
+      "fireRequest": "mud-infantry-fire-directions-v1",
+      "hitRequest": "mud-infantry-hit-directions-v1",
+      "deathSources": {
+        "se": { "request": "mud-infantry-death-pose-se-v1", "outputIndex": 0 },
+        "s": { "request": "mud-infantry-death-pose-s-v1", "outputIndex": 0 },
+        "sw": { "request": "mud-infantry-death-pose-sw-v1", "outputIndex": 1 },
+        "w": { "request": "mud-infantry-death-pose-w-v1", "outputIndex": 1 },
+        "e": { "request": "mud-infantry-death-pose-e-v1", "outputIndex": 0 },
+        "nw": { "request": "mud-infantry-death-pose-nw-v1", "outputIndex": 0 },
+        "n": { "request": "mud-infantry-death-pose-n-v1", "outputIndex": 0 },
+        "ne": { "request": "mud-infantry-death-pose-ne-v1", "outputIndex": 0 }
+      },
+      "walkRequestPrefix": "mud-infantry-walk-",
+      "walkRequestSuffix": "-v1",
+      "walkOutputIndex": 0,
+      "walkOverrides": {
+        "s": { "request": "mud-infantry-walk-s-padded-v2", "outputIndex": 0 },
+        "e": { "request": "mud-infantry-walk-e-padded-v2", "outputIndex": 0 },
+        "w": { "request": "mud-infantry-walk-w-padded-v2", "outputIndex": 0 },
+        "n": { "request": "mud-infantry-walk-n-padded-v2", "outputIndex": 0 }
+      },
+      "flipHorizontal": ["w", "e"]
+    }
+  ],
+  "directions": ["se", "s", "sw", "w", "e", "nw", "n", "ne"],
+  "canvas": [40, 40],
+  "subjectHeight": 32,
+  "deathHeight": 24,
+  "footBaseline": 36,
+  "spriteOffsetY": 16
+}

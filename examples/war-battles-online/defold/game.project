@@ -14,6 +14,16 @@ width = 1280
 height = 720
 high_dpi = 1
 
+[graphics]
+default_texture_min_filter = nearest
+default_texture_mag_filter = nearest
+
+[html5]
+scale_mode = fit
+cssfile = /main/war-battles.css
+show_fullscreen_button = 0
+show_made_with_defold = 0
+
 [physics]
 scale = 0.02
 

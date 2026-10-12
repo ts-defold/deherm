@@ -7,10 +7,6 @@
 // the machine assertions for correctness.
 
 import assert from "node:assert/strict";
-import { createHash } from "node:crypto";
-import { spawn } from "node:child_process";
-import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
-import { tmpdir } from "node:os";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -20,6 +16,7 @@ import {
   openBundlePage,
   waitFor,
 } from "../../../packages/cli/src/dev/browser-host.mjs";
+import { startBrowserVideo } from "./browser-video.mjs";
 
 const exampleRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const repositoryRoot = resolve(exampleRoot, "../..");
@@ -28,7 +25,6 @@ const bundleDirectory =
 const outputPath = resolve(
   process.env.DEHERM_WAR_BATTLES_VIDEO ?? resolve(repositoryRoot, "build/evidence/war-battles-gameplay.mp4"),
 );
-const frameRate = 30;
 
 const sleep = (durationMs) => new Promise((done) => setTimeout(done, durationMs));
 
@@ -58,49 +54,7 @@ async function hold(client, keys, durationMs) {
   for (const input of keys.toReversed()) await key(client, { type: "keyUp", ...input });
 }
 
-function runFfmpeg(frameDirectory, capturedFps) {
-  return new Promise((done, failed) => {
-    const child = spawn(
-      process.env.FFMPEG ?? "ffmpeg",
-      [
-        "-hide_banner",
-        "-loglevel",
-        "error",
-        "-y",
-        "-framerate",
-        capturedFps.toFixed(3),
-        "-start_number",
-        "1",
-        "-i",
-        resolve(frameDirectory, "frame-%06d.jpg"),
-        "-vf",
-        "scale=trunc(iw/2)*2:trunc(ih/2)*2",
-        "-c:v",
-        "libx264",
-        "-preset",
-        "medium",
-        "-crf",
-        "20",
-        "-pix_fmt",
-        "yuv420p",
-        "-movflags",
-        "+faststart",
-        "-r",
-        String(frameRate),
-        outputPath,
-      ],
-      { stdio: ["ignore", "inherit", "inherit"] },
-    );
-    child.once("error", failed);
-    child.once("exit", (code, signal) => {
-      if (code === 0) done();
-      else failed(new Error(`ffmpeg exited ${code ?? signal}`));
-    });
-  });
-}
-
 async function run() {
-  const frameDirectory = await mkdtemp(resolve(tmpdir(), "war-battles-video."));
   const page = await openBundlePage({
     bundleDirectory,
     port: await freeLoopbackPort(),
@@ -109,13 +63,7 @@ async function run() {
     retain: true,
   });
   const { client } = page;
-  const frameBuffers = [];
-  let recording = false;
-  const removeFrameListener = client.onEvent("Page.screencastFrame", ({ data, sessionId }) => {
-    // ACK immediately so Chrome's compositor never waits on filesystem I/O.
-    void client.send("Page.screencastFrameAck", { sessionId }, { timeoutMs: 1_000 }).catch(() => {});
-    if (recording) frameBuffers.push(Buffer.from(data, "base64"));
-  });
+  let video;
 
   try {
     await waitFor(() => client.transcript.some((line) => line.startsWith("war-battles:player-init:")), {
@@ -132,24 +80,7 @@ async function run() {
       })()`,
     });
 
-    recording = true;
-    const captureStartedAt = Date.now();
-    // Chrome 154's headless compositor starts delivering frames but does not
-    // always answer this command while a SwiftShader WebGL canvas is active.
-    // Bound the response independently; the first-frame event is authoritative
-    // evidence that capture actually started.
-    void client
-      .send(
-        "Page.startScreencast",
-        { format: "jpeg", quality: 90, maxWidth: 960, maxHeight: 540, everyNthFrame: 1 },
-        { timeoutMs: 2_000 },
-      )
-      .catch(() => {});
-    await waitFor(() => frameBuffers.length > 0, {
-      timeoutMs: 3_000,
-      intervalMs: 25,
-      what: "the first Chrome compositor video frame",
-    });
+    video = await startBrowserVideo(client, outputPath);
     await sleep(500);
 
     const forward = { key: "w", code: "KeyW", virtualKeyCode: 87 };
@@ -171,41 +102,19 @@ async function run() {
     await hold(client, [forward], 900);
     await sleep(900);
 
-    recording = false;
-    await client.send("Page.stopScreencast", {}, { timeoutMs: 2_000 }).catch(() => {});
-    const captureSeconds = (Date.now() - captureStartedAt) / 1_000;
-    const capturedFps = frameBuffers.length / captureSeconds;
-    assert.ok(frameBuffers.length >= 90, `Gameplay recording captured only ${frameBuffers.length} frames`);
-    assert.ok(capturedFps >= 12, `Gameplay recording captured only ${capturedFps.toFixed(2)} frames per second`);
+    const recording = await video.stop();
     const fatal = client.failures.filter((failure) => !failure.url?.endsWith("/favicon.ico"));
     assert.deepEqual(fatal, [], `Browser page errors: ${JSON.stringify(fatal)}`);
-
-    await mkdir(dirname(outputPath), { recursive: true });
-    await Promise.all(
-      frameBuffers.map((bytes, index) =>
-        writeFile(resolve(frameDirectory, `frame-${String(index + 1).padStart(6, "0")}.jpg`), bytes),
-      ),
-    );
-    await runFfmpeg(frameDirectory, capturedFps);
-    const bytes = await readFile(outputPath);
     const report = {
-      path: outputPath,
-      bytes: bytes.byteLength,
-      sha256: createHash("sha256").update(bytes).digest("hex"),
-      frames: frameBuffers.length,
-      capturedFps: Number(capturedFps.toFixed(2)),
-      encodedFps: frameRate,
-      encodedSeconds: Number(captureSeconds.toFixed(2)),
+      ...recording,
       arenaMarker: client.transcript.find((line) => line.startsWith("war-battles:arena-engaged:")),
       fireEvents: client.transcript.filter((line) => line === "war-battles:sfx:fire").length,
     };
     console.log(`war-battles-browser-video:ok:${JSON.stringify(report)}`);
     return report;
   } finally {
-    recording = false;
-    removeFrameListener();
+    await video?.abort();
     await page.close();
-    await rm(frameDirectory, { recursive: true, force: true });
   }
 }
 

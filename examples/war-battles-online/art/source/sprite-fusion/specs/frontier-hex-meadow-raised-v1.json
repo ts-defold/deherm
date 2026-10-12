@@ -1,0 +1,10 @@
+{
+  "name": "frontier-hex-meadow-raised-v1",
+  "operation": "style-reference",
+  "size": 64,
+  "prompt": "A single isometric six-sided meadow terrain tile for a volcanic frontier strategy battlefield, with a broad flat olive grass top, a few warm yellow dry-grass tufts, a thin exposed dark-earth cliff side, and clean readable pixel-art edges. Match the reference tile's shape and the concept's mossy volcanic palette. One tile only, isolated, no tank, building, lettering, border, or second tile.",
+  "inputs": [
+    "asset:bd93b0e2-417d-4553-b8ab-8c4637ff088e",
+    "art/source/imagegen/hex-style-reference/meadow.png"
+  ]
+}

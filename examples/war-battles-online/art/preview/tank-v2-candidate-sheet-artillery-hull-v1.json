@@ -1,0 +1,1653 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/preview-tank-v2.mjs",
+  "candidate": "-artillery-hull-v1",
+  "directions": [
+    "se",
+    "s",
+    "sw",
+    "w",
+    "e",
+    "nw",
+    "n",
+    "ne"
+  ],
+  "chassis": [
+    {
+      "id": "scout",
+      "hullRequest": "scout-hull-directions-v2",
+      "turretRequest": "scout-turret-directions-v2b",
+      "turretScale": 0.66,
+      "registration": "unverified-canvas-centred",
+      "entries": [
+        {
+          "direction": "se",
+          "sourceIndex": 0,
+          "hull": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              11,
+              15,
+              51,
+              48
+            ],
+            "opaqueCenter": [
+              31,
+              31.5
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "f952dcaa1a611586600c02b98083bdb525b55dd793bd74f909dcec53068c8e82",
+            "assetId": "e92c2b15-652d-44a5-a132-25e286d88256"
+          },
+          "turret": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              17,
+              10,
+              46,
+              53
+            ],
+            "opaqueCenter": [
+              31.5,
+              31.5
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "f8e5c41a621b341674e3957d5875645d4dabf84b1f68b39ccc0aebf332c026d0",
+            "assetId": "0a93abf1-b22c-4dfa-aea2-5a0f0dce409c"
+          }
+        },
+        {
+          "direction": "s",
+          "sourceIndex": 1,
+          "hull": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              18,
+              15,
+              45,
+              47
+            ],
+            "opaqueCenter": [
+              31.5,
+              31
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "2b8b5ce3cd90fadc47611b3b43225bad2b6393544b1b2871a4c153ab2bf6bb77",
+            "assetId": "b645c73d-8fee-434e-b4fc-87f09f4c44a2"
+          },
+          "turret": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              19,
+              3,
+              43,
+              59
+            ],
+            "opaqueCenter": [
+              31,
+              31
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "1c8ccbd3e85b0e24fec543a596f01eb2684f52442d434fe9a9bc7bbbe65a7fee",
+            "assetId": "e6732ada-2529-4707-b446-8e925c5e4223"
+          }
+        },
+        {
+          "direction": "sw",
+          "sourceIndex": 2,
+          "hull": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              14,
+              15,
+              49,
+              48
+            ],
+            "opaqueCenter": [
+              31.5,
+              31.5
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "128959a96c28decad48ffef2de7ce01fc307735942896c199cde8328709538cc",
+            "assetId": "74a4c880-7c04-4b4a-86e7-c04a79c0cab1"
+          },
+          "turret": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              18,
+              6,
+              44,
+              56
+            ],
+            "opaqueCenter": [
+              31,
+              31
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "a367823e5097883a9a662c27e0d0e71fd9d0ec6bedf7e47fdb6d079b1d02a4c3",
+            "assetId": "a6c88bb7-1308-4740-9da8-f03d5aea1aae"
+          }
+        },
+        {
+          "direction": "w",
+          "sourceIndex": 4,
+          "hull": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              11,
+              15,
+              51,
+              48
+            ],
+            "opaqueCenter": [
+              31,
+              31.5
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "d29df7e4e65b89d007f9be9a126d864b37b6bad207ec6372eea2b1dc56b0b5a5",
+            "assetId": "6e2d25e5-5d5e-4599-85d4-ee8f40edc42f"
+          },
+          "turret": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              15,
+              11,
+              48,
+              52
+            ],
+            "opaqueCenter": [
+              31.5,
+              31.5
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "c774130d0912a343d0a912cbcb5cfca8a7741d6ced593a7010f497efd554b28c",
+            "assetId": "4730c0b2-8f88-4f0a-8d93-a1edb1cfc10e"
+          }
+        },
+        {
+          "direction": "e",
+          "sourceIndex": 3,
+          "hull": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              12,
+              15,
+              50,
+              48
+            ],
+            "opaqueCenter": [
+              31,
+              31.5
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "6826c3a058560a45555594733bc05c430221c1da21ca4b44e52c14930ab0b402",
+            "assetId": "70b21e6b-39c4-46ec-a6aa-05578c22528e"
+          },
+          "turret": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              17,
+              11,
+              46,
+              52
+            ],
+            "opaqueCenter": [
+              31.5,
+              31.5
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "0721ae09f316648e9a3f70a5c0dca5b96fb61d95081390b71e466add5116e97b",
+            "assetId": "dd9ce8cd-a046-4494-a765-56f6196182c0"
+          }
+        },
+        {
+          "direction": "nw",
+          "sourceIndex": 7,
+          "hull": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              9,
+              13,
+              54,
+              49
+            ],
+            "opaqueCenter": [
+              31.5,
+              31
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "1aca254caca4ca332ceae48f994b67d77e3cf4834be0d9d91da630ec7aaf3e15",
+            "assetId": "e0bc9f3b-0c70-4126-b102-0fff11e521c3"
+          },
+          "turret": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              11,
+              10,
+              52,
+              52
+            ],
+            "opaqueCenter": [
+              31.5,
+              31
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "b82e94a3d30cce45ff82777352f09316e493bc7b6321f75dbddde325384b39fe",
+            "assetId": "b81c2784-8554-41d0-b7da-589e4cc92f9f"
+          }
+        },
+        {
+          "direction": "n",
+          "sourceIndex": 6,
+          "hull": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              16,
+              16,
+              47,
+              46
+            ],
+            "opaqueCenter": [
+              31.5,
+              31
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "d3488537c967dd22127a26eba77815388c814b627c8b106a083685d8b6dccad5",
+            "assetId": "7af00798-9027-42c2-9fa4-373c37afed0f"
+          },
+          "turret": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              18,
+              12,
+              44,
+              50
+            ],
+            "opaqueCenter": [
+              31,
+              31
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "7afb6c4d596d3f4845b063b80b757d6861eb0fd842646da1c25fed67fdc26106",
+            "assetId": "508feef1-c4f8-4f0d-b331-cbad1a532c08"
+          }
+        },
+        {
+          "direction": "ne",
+          "sourceIndex": 5,
+          "hull": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              10,
+              13,
+              52,
+              50
+            ],
+            "opaqueCenter": [
+              31,
+              31.5
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "925f17700ec81e61f02b1de02fcd9db0cbb5d4f825be539b9fd99332085b56b3",
+            "assetId": "2d80ffea-4c79-48e3-bc25-2d9cabdaefd0"
+          },
+          "turret": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              18,
+              10,
+              44,
+              52
+            ],
+            "opaqueCenter": [
+              31,
+              31
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "bbc5a34037691735a78b9383f2c33c5410da62eeebac00bc678469cda40cb1a6",
+            "assetId": "a30ea33b-1d57-44fc-bd50-b4f2755815b0"
+          }
+        }
+      ]
+    },
+    {
+      "id": "assault",
+      "hullRequest": "assault-hull-directions-v2",
+      "turretRequest": "assault-turret-directions-v2",
+      "turretScale": 0.76,
+      "registration": "unverified-canvas-centred",
+      "entries": [
+        {
+          "direction": "se",
+          "sourceIndex": 0,
+          "hull": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              5,
+              7,
+              58,
+              56
+            ],
+            "opaqueCenter": [
+              31.5,
+              31.5
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "e59c68df53a827bf268306680cd242910e7f3c036aae625754580ea4e4a33d74",
+            "assetId": "a1f7c5ef-39fb-46e2-9ef3-bfaf2ff4b0b3"
+          },
+          "turret": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              11,
+              14,
+              52,
+              49
+            ],
+            "opaqueCenter": [
+              31.5,
+              31.5
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "2ca7b91f42e244698e5e60ead663867f41b1cc16dffb2922496cd0009c227ff6",
+            "assetId": "5087c1f6-73c4-4696-ba27-f290f83850a6"
+          }
+        },
+        {
+          "direction": "s",
+          "sourceIndex": 1,
+          "hull": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              13,
+              11,
+              50,
+              51
+            ],
+            "opaqueCenter": [
+              31.5,
+              31
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "578927a392fc31bbe5b546b24adf8ea2613de5908ec6858f8aa9c247c106a256",
+            "assetId": "7e4afc99-11ea-45ce-953d-ab2610855cc2"
+          },
+          "turret": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              14,
+              13,
+              48,
+              49
+            ],
+            "opaqueCenter": [
+              31,
+              31
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "4199f1567225ed8c6a9934e7d43f1b1c58bdf07b45bf71dd27dfb515494a9f29",
+            "assetId": "e3870e3b-c00f-4102-a97c-1ff6ba1971fa"
+          }
+        },
+        {
+          "direction": "sw",
+          "sourceIndex": 2,
+          "hull": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              5,
+              7,
+              58,
+              56
+            ],
+            "opaqueCenter": [
+              31.5,
+              31.5
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "c31c09317b4f9ed8f73dcdaf7ced2d832d6ceae149ed1b2def4e4ef2e394955e",
+            "assetId": "016a1910-9f24-4dba-ba93-589b3ee2030a"
+          },
+          "turret": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              11,
+              14,
+              52,
+              49
+            ],
+            "opaqueCenter": [
+              31.5,
+              31.5
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "d22b9446e4c9c9bbb0d32d1e1502caffcf968d7bf63e7f3e06503567fd70d100",
+            "assetId": "f91c17a3-2a59-434f-8fa8-85fc8ccaf58e"
+          }
+        },
+        {
+          "direction": "w",
+          "sourceIndex": 4,
+          "hull": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              12,
+              15,
+              51,
+              47
+            ],
+            "opaqueCenter": [
+              31.5,
+              31
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "ae8b7578c7e011e4b0dc72481d042fe306ff16f86dbfb4bc65bf0d40abddc8bb",
+            "assetId": "8935b16e-3329-41e2-9ea0-21a2865641d9"
+          },
+          "turret": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              7,
+              15,
+              55,
+              48
+            ],
+            "opaqueCenter": [
+              31,
+              31.5
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "de5db966e797e8504a1f3441f9cb0342a2797a712fa4d6a71dd838e6da781725",
+            "assetId": "8b2a6fd7-72f4-455d-8420-a13b920c8747"
+          }
+        },
+        {
+          "direction": "e",
+          "sourceIndex": 3,
+          "hull": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              7,
+              16,
+              55,
+              47
+            ],
+            "opaqueCenter": [
+              31,
+              31.5
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "0816fa0298f6370f5f7eefc4bf93a337e6056e818006687987e7101c227029a1",
+            "assetId": "f2e0ac9b-27fe-4331-bcbe-21d70670c491"
+          },
+          "turret": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              9,
+              15,
+              54,
+              48
+            ],
+            "opaqueCenter": [
+              31.5,
+              31.5
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "e9437f3a0d7054b236949a62af69a31385ed62d8408a6eb786a5f519bdbe801b",
+            "assetId": "5d56f5a5-5b48-49e3-9564-2788bf7b62ef"
+          }
+        },
+        {
+          "direction": "nw",
+          "sourceIndex": 7,
+          "hull": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              15,
+              15,
+              48,
+              48
+            ],
+            "opaqueCenter": [
+              31.5,
+              31.5
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "1a49d1b63f8d671bbdb609d0d47515c7651833d8244775fb2beb124d79a069d5",
+            "assetId": "104a5513-e4ff-41b7-a357-7e9d149c1014"
+          },
+          "turret": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              12,
+              9,
+              50,
+              54
+            ],
+            "opaqueCenter": [
+              31,
+              31.5
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "59637c6523c49be14e09cc10b399499477d057911812aa9a182f96152f3732ba",
+            "assetId": "5dcb4488-e34e-49f2-868f-a6f47c6258e6"
+          }
+        },
+        {
+          "direction": "n",
+          "sourceIndex": 6,
+          "hull": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              15,
+              15,
+              48,
+              48
+            ],
+            "opaqueCenter": [
+              31.5,
+              31.5
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "d06bfae5e415e936a64425e5deb194dc32f54cb841fb0007d14c5e1dfefb28af",
+            "assetId": "ccbae967-c91f-476f-988c-44f0528d2306"
+          },
+          "turret": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              14,
+              6,
+              48,
+              56
+            ],
+            "opaqueCenter": [
+              31,
+              31
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "f80c402b557b17db44969c72c3dccd609c72a356141a8cd9d3ee3e83e6e9976a",
+            "assetId": "7e1339f6-bcb6-4393-b14a-d594f17fcf3c"
+          }
+        },
+        {
+          "direction": "ne",
+          "sourceIndex": 5,
+          "hull": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              6,
+              15,
+              56,
+              48
+            ],
+            "opaqueCenter": [
+              31,
+              31.5
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "bb1766ca934f317cff335cd226ab499b8155b9ddbc90624fa3f3ab6c295f050e",
+            "assetId": "6e3343f3-d078-47d3-acf6-569c6f5395ef"
+          },
+          "turret": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              11,
+              9,
+              51,
+              54
+            ],
+            "opaqueCenter": [
+              31,
+              31.5
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "2990f2464418613754239c90e7ce1f74db46d24271e15dd7bbfb37a1df66e19d",
+            "assetId": "42aa7823-d348-40ef-afa1-ee8a191ca4af"
+          }
+        }
+      ]
+    },
+    {
+      "id": "bulwark",
+      "hullRequest": "bulwark-hull-directions-v2",
+      "turretRequest": "bulwark-turret-directions-v2",
+      "turretScale": 0.9,
+      "registration": "unverified-canvas-centred",
+      "entries": [
+        {
+          "direction": "se",
+          "sourceIndex": 0,
+          "hull": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              3,
+              4,
+              60,
+              58
+            ],
+            "opaqueCenter": [
+              31.5,
+              31
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "77a4f53707b208a08d2a6c9fb633cd9705f05d417c900552c9d4b5c585e593fa",
+            "assetId": "89f9fe23-47d1-43e3-a695-076122652c84"
+          },
+          "turret": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              15,
+              16,
+              47,
+              46
+            ],
+            "opaqueCenter": [
+              31,
+              31
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "8c362c03dc87063e23e2c28bb14e245e302508ef98f87692019de29f64c51b56",
+            "assetId": "a0f04394-7e89-41d3-b00c-1d29163e9f3b"
+          }
+        },
+        {
+          "direction": "s",
+          "sourceIndex": 1,
+          "hull": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              9,
+              10,
+              53,
+              53
+            ],
+            "opaqueCenter": [
+              31,
+              31.5
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "ca4f98158007581804eef540fbc1b16d605134b5fbbf727c0a4af015d845d0d9",
+            "assetId": "a3887362-6c7e-4273-9bc0-e487ce041afb"
+          },
+          "turret": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              20,
+              15,
+              42,
+              48
+            ],
+            "opaqueCenter": [
+              31,
+              31.5
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "ded1bb690aaffec91a16a43b23e71d37ada6c5c4aaf3ffc41c478e4ecacbef46",
+            "assetId": "f471d8db-11fa-4fe9-90f5-ce08a5dca8ba"
+          }
+        },
+        {
+          "direction": "sw",
+          "sourceIndex": 2,
+          "hull": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              8,
+              5,
+              55,
+              58
+            ],
+            "opaqueCenter": [
+              31.5,
+              31.5
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "30135122245a99f7085c801a0c226cb40ce05fea555702b43b2e251e2fdf9c97",
+            "assetId": "6858efe0-1d8d-4d5e-ba19-265e29c3d1e6"
+          },
+          "turret": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              12,
+              16,
+              50,
+              46
+            ],
+            "opaqueCenter": [
+              31,
+              31
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "1b2db175d9878b876a2091c66de1cfb5ba6242c874b10b4e646dbf48295c4b67",
+            "assetId": "3aefbea6-b799-4769-b86d-369bcbd69382"
+          }
+        },
+        {
+          "direction": "w",
+          "sourceIndex": 4,
+          "hull": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              4,
+              9,
+              58,
+              53
+            ],
+            "opaqueCenter": [
+              31,
+              31
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "bc258a3f497c73d40418a4def0c7ed2e0d0ad5230d39794f09218b491c7a7b03",
+            "assetId": "0131f3f9-4aaf-4a8e-9460-afe28da467df"
+          },
+          "turret": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              13,
+              21,
+              49,
+              41
+            ],
+            "opaqueCenter": [
+              31,
+              31
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "9d72b50f851adddebd637175e71eaf3448bbf2b6a5ea752139ec1ef4aca03d0b",
+            "assetId": "7d35308e-fd50-440e-8225-e0d5d5cddda5"
+          }
+        },
+        {
+          "direction": "e",
+          "sourceIndex": 3,
+          "hull": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              4,
+              9,
+              58,
+              53
+            ],
+            "opaqueCenter": [
+              31,
+              31
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "4f50932d45ca6bbed34466a0fbb4a07aa65e1f4465c257787b445f845a5691fc",
+            "assetId": "18817f1b-3afd-4b9c-9d1b-05834fea4e06"
+          },
+          "turret": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              13,
+              21,
+              49,
+              41
+            ],
+            "opaqueCenter": [
+              31,
+              31
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "1287323d8a67dae1542ab54f7416955f78b6600939977c3bead43589b548525a",
+            "assetId": "3ecd2ac9-bd74-4df4-9ecf-687dca9f55ba"
+          }
+        },
+        {
+          "direction": "nw",
+          "sourceIndex": 7,
+          "hull": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              6,
+              8,
+              57,
+              54
+            ],
+            "opaqueCenter": [
+              31.5,
+              31
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "05f25bb95c23585b0633f857011bcfa48268cf34611c2a81368003d42b1cbe4e",
+            "assetId": "f0fa5361-c5ef-4e85-a369-7ba065665e5e"
+          },
+          "turret": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              16,
+              13,
+              47,
+              49
+            ],
+            "opaqueCenter": [
+              31.5,
+              31
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "25850830921510d4ba00d526c7c2e4d52aea70e18098d5369fecdf617b77f619",
+            "assetId": "16bfc0a9-b0b1-44dc-b66c-8017acd67cf1"
+          }
+        },
+        {
+          "direction": "n",
+          "sourceIndex": 6,
+          "hull": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              9,
+              12,
+              53,
+              51
+            ],
+            "opaqueCenter": [
+              31,
+              31.5
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "a6e4fb69bcb7374af8ab054dae6c3b38a2f15e30102fd24feb2b490322ea63c5",
+            "assetId": "ca4c18df-11b1-421f-b59d-0830dffb072c"
+          },
+          "turret": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              19,
+              14,
+              44,
+              49
+            ],
+            "opaqueCenter": [
+              31.5,
+              31.5
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "10d3cf1a902d1605453908384a8d273fdf91aeffa9966eb182e6307cc8cc3fa5",
+            "assetId": "1684f85b-a817-46fd-8721-0ddaaed4dc90"
+          }
+        },
+        {
+          "direction": "ne",
+          "sourceIndex": 5,
+          "hull": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              8,
+              9,
+              55,
+              54
+            ],
+            "opaqueCenter": [
+              31.5,
+              31.5
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "27446ccfd52a6af220baeb746d8e1e35fbe6f78f5f23ab130e9718bbd14db21b",
+            "assetId": "cd1481e5-8833-4fa1-a467-a56c7c18e8b3"
+          },
+          "turret": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              16,
+              13,
+              47,
+              49
+            ],
+            "opaqueCenter": [
+              31.5,
+              31
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "4fcb1c645870774c2e8f6b2f595496a78e5fa1b92e5e27959d05bf902cdf3ed4",
+            "assetId": "b0c47add-afea-4e30-b1a4-e3166412f458"
+          }
+        }
+      ]
+    },
+    {
+      "id": "artillery",
+      "hullRequest": "artillery-hull-directions-v1",
+      "turretRequest": "artillery-turret-directions-v2",
+      "turretScale": 1,
+      "registration": "unverified-canvas-centred",
+      "entries": [
+        {
+          "direction": "se",
+          "sourceIndex": 0,
+          "hull": {
+            "dimensions": [
+              81,
+              81
+            ],
+            "bounds": [
+              0,
+              5,
+              80,
+              74
+            ],
+            "opaqueCenter": [
+              40,
+              39.5
+            ],
+            "canvasCenter": [
+              40.5,
+              40.5
+            ],
+            "edgeContact": true,
+            "sha256": "f67a2c72734d0055b31e14a4b0f6a61489618a858d9510db5a53b797a097ee1c",
+            "assetId": "9f2d7189-c824-4d2e-879b-614b54381a81"
+          },
+          "turret": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              3,
+              9,
+              59,
+              53
+            ],
+            "opaqueCenter": [
+              31,
+              31
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "b320a7f74df4cde9aca801555df9c4136241a73f47facbc19e1e2888a39a0e45",
+            "assetId": "a8841579-a203-4801-8525-5fcba46c0da7"
+          }
+        },
+        {
+          "direction": "s",
+          "sourceIndex": 1,
+          "hull": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              4,
+              2,
+              58,
+              60
+            ],
+            "opaqueCenter": [
+              31,
+              31
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "298e56319b4155f9fd233fb7e00a45964fd450833308a247791811d59866c022",
+            "assetId": "de88b5a2-5c34-4752-bfd6-f8763ddfbb20"
+          },
+          "turret": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              12,
+              7,
+              50,
+              56
+            ],
+            "opaqueCenter": [
+              31,
+              31.5
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "7f625d48626b853ac4c5866cf306dccf7b0e6670be64928d054d73cb9fa876af",
+            "assetId": "b4644d96-1a0c-4498-b752-585255965494"
+          }
+        },
+        {
+          "direction": "sw",
+          "sourceIndex": 2,
+          "hull": {
+            "dimensions": [
+              80,
+              80
+            ],
+            "bounds": [
+              0,
+              10,
+              79,
+              68
+            ],
+            "opaqueCenter": [
+              39.5,
+              39
+            ],
+            "canvasCenter": [
+              40,
+              40
+            ],
+            "edgeContact": true,
+            "sha256": "9ab3a68d6d98fe0f3a48abc61172e86781786fd0f207277744c3eb4f28fbb219",
+            "assetId": "e8b73cc4-1724-4d2a-9293-01dac3a9e2fe"
+          },
+          "turret": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              4,
+              9,
+              59,
+              53
+            ],
+            "opaqueCenter": [
+              31.5,
+              31
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "3ef0633a8286dfc32ca25927626213308a134ec9985cebfc9a63b5b87439bff6",
+            "assetId": "6fc43ad1-3efb-4482-9c3c-978dc5f93439"
+          }
+        },
+        {
+          "direction": "w",
+          "sourceIndex": 4,
+          "hull": {
+            "dimensions": [
+              83,
+              83
+            ],
+            "bounds": [
+              0,
+              19,
+              82,
+              62
+            ],
+            "opaqueCenter": [
+              41,
+              40.5
+            ],
+            "canvasCenter": [
+              41.5,
+              41.5
+            ],
+            "edgeContact": true,
+            "sha256": "afe33f918af4a81b12a09bcea7550782085495ee6c989e57717e20f11020dd24",
+            "assetId": "2d7a4834-8d6b-4f38-9f0b-4063d63386de"
+          },
+          "turret": {
+            "dimensions": [
+              67,
+              67
+            ],
+            "bounds": [
+              0,
+              13,
+              66,
+              52
+            ],
+            "opaqueCenter": [
+              33,
+              32.5
+            ],
+            "canvasCenter": [
+              33.5,
+              33.5
+            ],
+            "edgeContact": true,
+            "sha256": "9feb7e89eb378a0c075f659daf5831210c355a533e59b5be248591de5871ecc2",
+            "assetId": "2359638f-74cd-4e4a-ba95-57354bda2838"
+          }
+        },
+        {
+          "direction": "e",
+          "sourceIndex": 3,
+          "hull": {
+            "dimensions": [
+              84,
+              84
+            ],
+            "bounds": [
+              0,
+              20,
+              83,
+              63
+            ],
+            "opaqueCenter": [
+              41.5,
+              41.5
+            ],
+            "canvasCenter": [
+              42,
+              42
+            ],
+            "edgeContact": true,
+            "sha256": "d33f0d7cbc6d2048fabcfae82122d1902f5a9f00c9b70f99e829687c50814118",
+            "assetId": "0a67a958-f20a-4bf1-8c8d-32774941dc84"
+          },
+          "turret": {
+            "dimensions": [
+              67,
+              67
+            ],
+            "bounds": [
+              0,
+              13,
+              66,
+              52
+            ],
+            "opaqueCenter": [
+              33,
+              32.5
+            ],
+            "canvasCenter": [
+              33.5,
+              33.5
+            ],
+            "edgeContact": true,
+            "sha256": "793ab3e74d0ee7df669094d46a4f027958ef8b3cd370695f272cfadda180dbd8",
+            "assetId": "d3ea0445-e319-46a2-abdc-2a3de3fc8ec7"
+          }
+        },
+        {
+          "direction": "nw",
+          "sourceIndex": 7,
+          "hull": {
+            "dimensions": [
+              88,
+              88
+            ],
+            "bounds": [
+              0,
+              13,
+              87,
+              73
+            ],
+            "opaqueCenter": [
+              43.5,
+              43
+            ],
+            "canvasCenter": [
+              44,
+              44
+            ],
+            "edgeContact": true,
+            "sha256": "f204e7b6010f9bd20c8e405e66a8a7ed80657a595d6e6184076e9a18f80a6355",
+            "assetId": "feab8559-b573-4bf0-a589-c71afdf63bc7"
+          },
+          "turret": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              8,
+              5,
+              55,
+              58
+            ],
+            "opaqueCenter": [
+              31.5,
+              31.5
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "341bf722b2353e499f820a19c8055695f9ce599f3b772a1d3cdf26e88eeee634",
+            "assetId": "b0c4f041-d71c-4dbe-aa30-2327e71de7b6"
+          }
+        },
+        {
+          "direction": "n",
+          "sourceIndex": 6,
+          "hull": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              4,
+              2,
+              59,
+              61
+            ],
+            "opaqueCenter": [
+              31.5,
+              31.5
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "6e3b32bf8ec93045550205378841be64fbb88a30d1ec9cc57868106be71d6059",
+            "assetId": "9f42c878-2caa-4a60-8638-41a84ae70e08"
+          },
+          "turret": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              13,
+              2,
+              50,
+              60
+            ],
+            "opaqueCenter": [
+              31.5,
+              31
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "b664cb11c7dec25d855370a7d1931053e96fa766aa4289120ff4d9ed2afaa24f",
+            "assetId": "9325685c-903e-426b-bb57-6226b01c41b4"
+          }
+        },
+        {
+          "direction": "ne",
+          "sourceIndex": 5,
+          "hull": {
+            "dimensions": [
+              84,
+              84
+            ],
+            "bounds": [
+              0,
+              12,
+              83,
+              71
+            ],
+            "opaqueCenter": [
+              41.5,
+              41.5
+            ],
+            "canvasCenter": [
+              42,
+              42
+            ],
+            "edgeContact": true,
+            "sha256": "1ccb5c6aff9aeaf5e81e319f68eef41529c0b342f8675cda7ec7960cbad1ab3e",
+            "assetId": "75901264-1036-47a9-988d-3686250891b1"
+          },
+          "turret": {
+            "dimensions": [
+              64,
+              64
+            ],
+            "bounds": [
+              7,
+              6,
+              55,
+              56
+            ],
+            "opaqueCenter": [
+              31,
+              31
+            ],
+            "canvasCenter": [
+              32,
+              32
+            ],
+            "edgeContact": false,
+            "sha256": "67bab2095b90458ed4f43fb8ed8df5b37881577c63812837c98004aa68c7e07d",
+            "assetId": "0dbc8daa-5980-43e5-bf90-5f1bac5f1c6d"
+          }
+        }
+      ]
+    }
+  ]
+}

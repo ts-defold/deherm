@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_e7e15c58-183e-4b67-9893-1b50f56b75e8",
+  "operation": "animate",
+  "prompt": "A grounded northeast-facing walk loop with alternating boot contact and a small opposite-arm swing. Preserve Rook's brown helmet, blue goggles, cream scarf, sidearm, proportions, colors, and northeast-facing perspective. Keep the complete helmet, boots, sidearm, and arms inside the canvas throughout the motion.",
+  "size": null,
+  "outputFrames": 4,
+  "colors": 24,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/inputs/rook-infantry-walk-pose-ne-v1-0-padded-64.png",
+      "bytes": 3256,
+      "sha256": "2684ca490ab720c179d7e359422897f130bf6f6cae4b80c8bc4aaa9033cfc033"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/rook-infantry-walk-ne-padded-v2.json",
+    "sha256": "6ccb69bfdcad85cb3285f76755d100ac56dffa0814d303d5600547cfec36ebad"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "c5bf7ee5-ab4f-47b6-945c-771c62d3e0e8",
+      "type": "animation",
+      "contentType": "image/webp",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/c5bf7ee5-ab4f-47b6-945c-771c62d3e0e8/animation.webp?v=1791566122980",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-walk-ne-padded-v2/00.webp",
+      "bytes": 2250,
+      "sha256": "916d6a79c9f03f66a24b9e77445b19dc8a9d2429f9215288570db3942c6b85dd",
+      "spritesheet": {
+        "url": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/c5bf7ee5-ab4f-47b6-945c-771c62d3e0e8/spritesheet.png?v=1791566122980",
+        "path": "art/source/sprite-fusion/outputs/rook-infantry-walk-ne-padded-v2/00-sheet.png",
+        "bytes": 2704,
+        "sha256": "6a914ef183ecd1a75c02fcbe4a2818cb497b9c86d67797a6524c2fd46232c93c"
+      },
+      "frameCount": 4,
+      "fps": 8
+    }
+  ],
+  "credits": {
+    "remaining": 15
+  }
+}

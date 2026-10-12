@@ -1,0 +1,12 @@
+{
+  "name": "frontier-hex-steel-detail-v2",
+  "operation": "style-reference",
+  "size": 64,
+  "prompt": "A single walkable refinery service-deck hex for a three-quarter-view volcanic frontier battlefield. Weathered slate steel plate top with rivets, a small dark grate, worn brass caution marks, and subtle olive grime; short layered industrial side face. Match the reference tiles' six-sided footprint, upper-left light, chunky readable pixel clusters, and restrained military palette. No machinery, vehicle, character, lettering, or other tile.",
+  "inputs": [
+    "art/source/sprite-fusion/outputs/frontier-hex-service-deck-v1/07.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-refinery-grate-v1/05.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-meadow-steel-edge-v1/06.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-basalt-cliff-v1/04.png"
+  ]
+}

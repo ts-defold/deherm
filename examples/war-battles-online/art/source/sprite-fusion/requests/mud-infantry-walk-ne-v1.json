@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_a0c60812-49ad-4d4b-a97b-c529cc7dcf48",
+  "operation": "animate",
+  "prompt": "A quick grounded northeast-facing three-quarter rear walk cycle with alternating boot contact and a small opposite-arm swing. Mud remains a rugged driver with a dark respirator mask, ochre helmet, orange-rimmed goggles, rust-red scarf, heavy olive jacket and compact sidearm held low. Keep his exact source perspective, palette, outline, proportions, and identity consistent. Seamless loop without turning, jumping, or adding objects.",
+  "size": null,
+  "outputFrames": 4,
+  "colors": 24,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "f7cb5416-27be-4322-8a04-62f79f83723a"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/mud-infantry-walk-ne-v1.json",
+    "sha256": "5b29b8db59c0a7ebeac8270e9cc44438d5b686135cac77864ad46a56af8640aa"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "b88ace5f-b3b1-4e05-8056-6d15798cdbe8",
+      "type": "animation",
+      "contentType": "image/webp",
+      "width": 27,
+      "height": 51,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/b88ace5f-b3b1-4e05-8056-6d15798cdbe8/animation.webp?v=1791527688602",
+      "path": "art/source/sprite-fusion/outputs/mud-infantry-walk-ne-v1/00.webp",
+      "bytes": 1968,
+      "sha256": "b7d3af5ae7392cd9b4c9a1e1f2f7275bdc01345d5bee7054c882c587c971c54f",
+      "spritesheet": {
+        "url": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/b88ace5f-b3b1-4e05-8056-6d15798cdbe8/spritesheet.png?v=1791527688602",
+        "path": "art/source/sprite-fusion/outputs/mud-infantry-walk-ne-v1/00-sheet.png",
+        "bytes": 1917,
+        "sha256": "9487b036d1fdba956a50d72571be7ea90766205a4d950053fbe0774451ed615e"
+      },
+      "frameCount": 4,
+      "fps": 8
+    }
+  ],
+  "credits": {
+    "remaining": 1080
+  }
+}

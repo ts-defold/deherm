@@ -131,6 +131,25 @@ function extractFrame(sheet, index, frameWidth, frameHeight, padding) {
   return { width: cellWidth, height: cellHeight, pixels };
 }
 
+function fitPortrait(source, size) {
+  const scale = Math.min(1, size / source.width, size / source.height);
+  const width = Math.max(1, Math.floor(source.width * scale));
+  const height = Math.max(1, Math.floor(source.height * scale));
+  const pixels = Buffer.alloc(size * size * 4);
+  const offsetX = Math.floor((size - width) / 2);
+  const offsetY = Math.floor((size - height) / 2);
+  for (let y = 0; y < height; y += 1) {
+    const sourceY = Math.min(source.height - 1, Math.floor(((y + 0.5) * source.height) / height));
+    for (let x = 0; x < width; x += 1) {
+      const sourceX = Math.min(source.width - 1, Math.floor(((x + 0.5) * source.width) / width));
+      const from = (sourceY * source.width + sourceX) * 4;
+      const to = ((y + offsetY) * size + x + offsetX) * 4;
+      source.pixels.copy(pixels, to, from, from + 4);
+    }
+  }
+  return { width: size, height: size, pixels };
+}
+
 function edgeContact(sheet, index, frameWidth, frameHeight) {
   const sourceX = index * frameWidth;
   const counts = { top: 0, right: 0, bottom: 0, left: 0 };
@@ -184,12 +203,12 @@ function strokeRect(image, x, y, width, height, color) {
 }
 
 const chrome = {
-  void: [12, 18, 19, 238],
-  basalt: [28, 34, 31, 248],
-  inset: [18, 29, 28, 224],
-  steelDark: [48, 56, 50, 248],
-  steel: [83, 91, 76, 250],
-  steelLight: [139, 145, 112, 252],
+  void: [29, 35, 39, 255],
+  basalt: [44, 54, 57, 255],
+  inset: [53, 66, 70, 255],
+  steelDark: [76, 84, 84, 255],
+  steel: [109, 124, 126, 255],
+  steelLight: [182, 188, 174, 255],
   cream: [226, 214, 174, 255],
   amber: [228, 132, 34, 255],
   hot: [255, 205, 69, 255],
@@ -201,17 +220,14 @@ function hudShell() {
   fillRect(image, 0, 0, 32, 32, chrome.void);
   strokeRect(image, 0, 0, 32, 32, chrome.basalt);
   strokeRect(image, 1, 1, 30, 30, chrome.steel);
-  fillRect(image, 2, 2, 28, 2, chrome.steelLight);
-  fillRect(image, 2, 4, 28, 26, chrome.inset);
-  fillRect(image, 2, 28, 28, 2, chrome.steelDark);
-  fillRect(image, 5, 3, 22, 2, chrome.amber);
-  fillRect(image, 9, 3, 4, 2, chrome.hot);
-  fillRect(image, 20, 3, 3, 2, chrome.hot);
+  fillRect(image, 2, 2, 28, 1, chrome.steelLight);
+  fillRect(image, 2, 3, 28, 26, chrome.inset);
+  fillRect(image, 2, 29, 28, 1, chrome.steelDark);
   for (const [x, y] of [
     [5, 6],
     [26, 6],
-    [5, 26],
-    [26, 26],
+    [5, 25],
+    [26, 25],
   ]) {
     setPixel(image, x, y, chrome.cream);
     setPixel(image, x + 1, y, chrome.steelDark);
@@ -224,11 +240,11 @@ function hudCard() {
   fillRect(image, 0, 0, 24, 24, chrome.void);
   strokeRect(image, 0, 0, 24, 24, chrome.basalt);
   strokeRect(image, 1, 1, 22, 22, chrome.steel);
-  fillRect(image, 2, 2, 20, 2, chrome.steelLight);
-  fillRect(image, 2, 4, 20, 18, chrome.inset);
-  fillRect(image, 5, 2, 14, 2, chrome.amber);
-  setPixel(image, 4, 5, chrome.cream);
-  setPixel(image, 19, 5, chrome.cream);
+  fillRect(image, 2, 2, 20, 1, chrome.steelLight);
+  fillRect(image, 2, 3, 20, 18, chrome.inset);
+  fillRect(image, 2, 21, 20, 1, chrome.steelDark);
+  fillRect(image, 3, 3, 2, 2, chrome.amber);
+  fillRect(image, 19, 3, 2, 2, chrome.amber);
   return image;
 }
 
@@ -237,9 +253,11 @@ function hudStrip() {
   fillRect(image, 0, 0, 24, 16, chrome.void);
   strokeRect(image, 0, 0, 24, 16, chrome.basalt);
   strokeRect(image, 1, 1, 22, 14, chrome.steel);
-  fillRect(image, 2, 2, 20, 2, chrome.steelLight);
-  fillRect(image, 2, 4, 20, 10, chrome.inset);
-  fillRect(image, 5, 2, 14, 2, chrome.amber);
+  fillRect(image, 2, 2, 20, 1, chrome.steelLight);
+  fillRect(image, 2, 3, 20, 10, chrome.inset);
+  fillRect(image, 2, 13, 20, 1, chrome.steelDark);
+  fillRect(image, 3, 3, 2, 2, chrome.amber);
+  fillRect(image, 19, 3, 2, 2, chrome.amber);
   return image;
 }
 
@@ -312,7 +330,7 @@ for (const asset of chromeAssets) {
 
 const selection = JSON.parse(await readFile(selectionPath, "utf8"));
 const selectionProjection = Buffer.from(
-  `${JSON.stringify({ portrait: selection.portrait, runtimePlan: selection.runtimePlan })}\n`,
+  `${JSON.stringify({ portrait: selection.portrait, driverFamilies: selection.driverFamilies, runtimePlan: selection.runtimePlan })}\n`,
 );
 const animationManifest = JSON.parse(await readFile(animationManifestPath, "utf8"));
 const animation = animationManifest.outputs[0];
@@ -352,13 +370,60 @@ const paddedBaseBytes = encodeRgbaPng(paddedBase.width, paddedBase.height, padde
 const basePath = "defold/assets/derived/ui/driver-portrait/base.png";
 await emit(basePath, paddedBaseBytes);
 
+if (!Array.isArray(selection.driverFamilies) || selection.driverFamilies.length !== 4) {
+  throw new Error("driverFamilies must select exactly four portrait families");
+}
+const driverFamilies = [];
+const selectedPortraitAssets = new Set();
+for (const [index, family] of selection.driverFamilies.entries()) {
+  const manifestPath = `art/source/sprite-fusion/requests/${family.request}.json`;
+  const manifest = JSON.parse(await readFile(path.join(exampleRoot, manifestPath), "utf8"));
+  if (manifest.schemaVersion !== 1 || manifest.owner !== "tools/sprite-fusion.mjs") {
+    throw new Error(`Unsupported driver portrait manifest: ${family.request}`);
+  }
+  const specBytes = await readFile(path.join(exampleRoot, manifest.spec.path));
+  if (sha256(specBytes) !== manifest.spec.sha256) {
+    throw new Error(`Driver portrait request spec changed: ${family.request}`);
+  }
+  const output = manifest.outputs?.find((candidate) => candidate.index === family.selectedIndex);
+  if (!output || output.assetId !== family.assetId || output.path !== family.source) {
+    throw new Error(`Driver portrait selection does not match ${family.request}`);
+  }
+  if (selectedPortraitAssets.has(output.assetId)) {
+    throw new Error(`Driver portrait asset selected more than once: ${output.assetId}`);
+  }
+  selectedPortraitAssets.add(output.assetId);
+  const sourceBytes = await readFile(path.join(exampleRoot, family.source));
+  if (sha256(sourceBytes) !== output.sha256) throw new Error(`Driver portrait source changed: ${family.source}`);
+  const source = decodeRgbaPng(sourceBytes);
+  if (source.width !== output.width || source.height !== output.height) {
+    throw new Error(`Driver portrait dimensions changed: ${family.source}`);
+  }
+  const fitted = fitPortrait(source, frameWidth);
+  const padded = extractFrame(fitted, 0, frameWidth, frameHeight, padding);
+  const bytes = encodeRgbaPng(padded.width, padded.height, padded.pixels);
+  const relativePath = `defold/assets/derived/ui/driver-portrait/family-${index}.png`;
+  await emit(relativePath, bytes);
+  driverFamilies.push({
+    index,
+    name: family.name,
+    requestId: manifest.requestId,
+    assetId: output.assetId,
+    source: family.source,
+    sourceSha256: output.sha256,
+    sourceSize: [source.width, source.height],
+    path: relativePath,
+    sha256: sha256(bytes),
+  });
+}
+
 const metadata = {
   schemaVersion: 1,
   owner: "tools/generate-hud-art.mjs",
   sources: {
     selection: {
       path: path.relative(exampleRoot, selectionPath).replaceAll(path.sep, "/"),
-      keys: ["portrait", "runtimePlan"],
+      keys: ["portrait", "driverFamilies", "runtimePlan"],
       projectionSha256: sha256(selectionProjection),
     },
     animation: {
@@ -382,6 +447,7 @@ const metadata = {
     bytes: paddedBaseBytes.length,
     sha256: sha256(paddedBaseBytes),
   },
+  driverFamilies,
   animations: {
     "radio-idle": {
       fps: animation.fps,
@@ -426,6 +492,15 @@ const atlas = [
   "  playback: PLAYBACK_LOOP_FORWARD",
   `  fps: ${animation.fps}`,
   "}",
+  ...driverFamilies.flatMap((family) => [
+    "animations {",
+    `  id: "driver-portrait-${family.index}"`,
+    "  images {",
+    `    image: "/assets/derived/ui/driver-portrait/family-${family.index}.png"`,
+    "  }",
+    "  playback: PLAYBACK_NONE",
+    "}",
+  ]),
   ...chromeAssets.flatMap((asset) => [
     "animations {",
     `  id: "${asset.id}"`,

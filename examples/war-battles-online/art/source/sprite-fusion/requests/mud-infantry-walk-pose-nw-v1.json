@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_f436e416-67fd-40df-9574-156fca95fad6",
+  "operation": "edit",
+  "prompt": "Change only Mud's body pose to a grounded northwest-facing three-quarter rear walk mid-stride: one boot forward, the other planted, opposite arm swinging, compact sidearm low. Preserve his respirator mask, ochre helmet, orange-rimmed goggles, rust-red scarf, dark olive jacket, rugged build, original colors, outline, scale, and exact source viewing angle. No turn, extra person, platform, text, or scenery.",
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "e9724581-922b-4e50-9fff-30919bc0efc7"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/mud-infantry-walk-pose-nw-v1.json",
+    "sha256": "f66b86a4756e4d438f7c2891b0df9517aad59bf59db16c7e93ed322b0957f6ab"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "98485228-7ec2-4a73-b2b0-31aab87c3e3d",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 29,
+      "height": 39,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/98485228-7ec2-4a73-b2b0-31aab87c3e3d/image.png?v=1791527364908",
+      "path": "art/source/sprite-fusion/outputs/mud-infantry-walk-pose-nw-v1/00.png",
+      "bytes": 2328,
+      "sha256": "8b078a7ee8f13b3a6804a63e95a25212d6a9c5e213fc07fc3440990506689d0a"
+    },
+    {
+      "index": 1,
+      "assetId": "f55b30e4-4a42-47f0-8483-e668f7aa83ca",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 25,
+      "height": 43,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/f55b30e4-4a42-47f0-8483-e668f7aa83ca/image.png?v=1791527365977",
+      "path": "art/source/sprite-fusion/outputs/mud-infantry-walk-pose-nw-v1/01.png",
+      "bytes": 2435,
+      "sha256": "7867bfba471db1236183b2a2575c821d35276f48a23fbcd831c3c5fc638e1579"
+    }
+  ],
+  "credits": {
+    "remaining": 1230
+  }
+}

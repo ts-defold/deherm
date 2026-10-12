@@ -1,0 +1,6 @@
+{
+  "name": "frontier-hex-ochre-cliff-v1",
+  "operation": "generate",
+  "size": 64,
+  "prompt": "One isolated isometric six-sided terrain tile for a retro pixel-art tank strategy game. Broad flat driveable top of compacted ochre earth, warm amber grit, a little gravel, and short dark layered volcanic rock cliff sides. Sunset lighting, dramatic readable shape, no lava and no tall object. Single tile centered on transparent background, no character, vehicle, building, text, border, or other tiles."
+}

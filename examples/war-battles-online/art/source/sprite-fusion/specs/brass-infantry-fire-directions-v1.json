@@ -1,0 +1,6 @@
+{
+  "name": "brass-infantry-fire-directions-v1",
+  "operation": "direction-set",
+  "inputs": ["asset:eb8e58b6-8d87-4a7e-bfef-80eba71f867d"],
+  "size": 32
+}

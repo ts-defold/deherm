@@ -1,5 +1,19 @@
 name: "war_battles"
 instances {
+  id: "island_coast"
+  prototype: "/main/island-coast.go"
+  position {
+    x: 648.0
+    y: 368.0
+    z: -0.5
+  }
+  scale3 {
+    x: 2.0
+    y: 2.0
+    z: 1.0
+  }
+}
+instances {
   id: "level"
   prototype: "/main/level.go"
   position {
@@ -138,7 +152,7 @@ instances {
     id: "arena"
     properties {
       id: "players"
-      value: "8.0"
+      value: "16.0"
       type: PROPERTY_TYPE_NUMBER
     }
     properties {

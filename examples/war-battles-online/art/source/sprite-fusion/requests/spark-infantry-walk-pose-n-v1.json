@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_71cb6c6c-8ffa-4a6b-9c14-e41171aa2156",
+  "operation": "edit",
+  "prompt": "Change only Spark's body pose to a grounded north-facing rear walk mid-stride: one boot forward, the other planted, opposite arm swinging, compact sidearm held low. Preserve his tan skin, short spiky black hair, orange headband, raised brass goggles, teal collar, olive jacket, youthful build, original colors, outline, scale, and exact source viewing angle. No turn, extra person, platform, text, or scenery.",
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "fbb98166-c3d3-47b2-ad50-b6a73271e4ec"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/spark-infantry-walk-pose-n-v1.json",
+    "sha256": "db690c061b5e585a137030fbe3c28af740622a2364b7369029fc7923fa30a674"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "87d80106-24e9-476d-a3c2-885d6249c13e",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 28,
+      "height": 43,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/87d80106-24e9-476d-a3c2-885d6249c13e/image.png?v=1791526351203",
+      "path": "art/source/sprite-fusion/outputs/spark-infantry-walk-pose-n-v1/00.png",
+      "bytes": 2422,
+      "sha256": "f72955d293cd4ffc1e0ca6d747312054f62bfc2ac7342f36a6d874ad3fc49afc"
+    },
+    {
+      "index": 1,
+      "assetId": "1e91bb24-43a5-4910-a53b-ae58d4364e27",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 30,
+      "height": 53,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/1e91bb24-43a5-4910-a53b-ae58d4364e27/image.png?v=1791526352209",
+      "path": "art/source/sprite-fusion/outputs/spark-infantry-walk-pose-n-v1/01.png",
+      "bytes": 3291,
+      "sha256": "d19ddd009a58d71d8dc232c5ec5216cdfc13d90782471a107723023884e57224"
+    }
+  ],
+  "credits": {
+    "remaining": 1470
+  }
+}

@@ -1,0 +1,30 @@
+import { PLAYER_MODE_DEAD, PLAYER_MODE_INFANTRY, PLAYER_MODE_TANK } from "./constants.ts";
+
+export const REMOTE_CUE_NONE = 0;
+export const REMOTE_CUE_EJECT = 1;
+export const REMOTE_CUE_REARM = 2;
+
+/**
+ * The snapshot lane carries state, not the server's event ring. Derive a
+ * presentation cue only from two authoritative samples of the same remote
+ * slot; a first sighting must not look like a new spawn. Generation catches
+ * a death-and-respawn cycle hidden between two snapshots.
+ */
+export function remoteLifecycleCue(
+  previousMode: number,
+  previousGeneration: number,
+  mode: number,
+  generation: number,
+): number {
+  if (previousMode < 0) return REMOTE_CUE_NONE;
+  if (previousMode === PLAYER_MODE_TANK && (mode === PLAYER_MODE_INFANTRY || mode === PLAYER_MODE_DEAD)) {
+    return REMOTE_CUE_EJECT;
+  }
+  if (
+    mode === PLAYER_MODE_TANK &&
+    (previousMode === PLAYER_MODE_INFANTRY || previousMode === PLAYER_MODE_DEAD || generation !== previousGeneration)
+  ) {
+    return REMOTE_CUE_REARM;
+  }
+  return REMOTE_CUE_NONE;
+}

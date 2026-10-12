@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_1193987d-f4cd-45ca-839e-3e6b08f9ff7d",
+  "operation": "edit",
+  "prompt": "Keep Brass viewed strictly from behind at the same northeast three-quarter angle. Change his stocky body into a clearly defeated collapsed pose: one heavy knee on the ground, torso and brown helmet bowed low forward, one hand braced on the ground, sidearm lowered, silhouette shorter and wider than standing. Preserve his back-facing perspective, white scarf edge, olive jacket, boots and knee on one ground line, colors and dark outline. Do not turn his face toward the viewer. No blood, injury detail, explosion, extra prop, scenery, platform, text, or second person.",
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "076406b5-d0f8-4e25-8b83-abffa9c8d919"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/brass-infantry-death-pose-ne-v1.json",
+    "sha256": "d143ed3a84013be7c0656a9ff329bea1cd39f6672dbec2132d736d9ddc05d101"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "c86dd986-f965-430f-bda6-b461a554c8ac",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 37,
+      "height": 36,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/c86dd986-f965-430f-bda6-b461a554c8ac/image.png?v=1791535567910",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-death-pose-ne-v1/00.png",
+      "bytes": 2571,
+      "sha256": "a7bbe137db44c6cdf401d7c049efd0f3e4c0479eb2e6954953f39a2836bcfe7f"
+    },
+    {
+      "index": 1,
+      "assetId": "6806b093-eee0-405b-8fb3-b0d25ce21962",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 35,
+      "height": 34,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/6806b093-eee0-405b-8fb3-b0d25ce21962/image.png?v=1791535568958",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-death-pose-ne-v1/01.png",
+      "bytes": 2782,
+      "sha256": "9054feea264f4aa50973fe98d5d2acf9fa9af7d0b896e886f445344cd9efcc06"
+    }
+  ],
+  "credits": {
+    "remaining": 585
+  }
+}

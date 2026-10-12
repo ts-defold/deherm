@@ -1,0 +1,6 @@
+{
+  "name": "artillery-low-deck-hull-v3",
+  "operation": "edit",
+  "prompt": "Replace only the raised square gun-house on this tracked artillery hull with a low, flat armored deck and a small recessed circular turret mounting ring. Keep the two tracks, chassis outline, diagonal isometric viewing angle, warm brass and charcoal palette, pixel clusters, shading, and native sprite scale unchanged. This is a hull underneath a separately aimed turret: no gun barrel, no weapon, no second cabin.",
+  "inputs": ["asset:784847e8-d095-4583-9b6b-4b449454fb3d"]
+}

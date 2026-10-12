@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_95dda100-03c4-40e3-bd33-dc39c4169106",
+  "operation": "edit",
+  "prompt": "Change only Spark's body pose to a grounded right-facing side view, to be flipped for the west runtime direction walk mid-stride: one boot forward, the other planted, opposite arm swinging, compact sidearm held low. Preserve his tan skin, short spiky black hair, orange headband, raised brass goggles, teal collar, olive jacket, youthful build, original colors, outline, scale, and exact source viewing angle. No turn, extra person, platform, text, or scenery.",
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "ba0f9e1f-a661-4886-a45f-92b74a25b349"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/spark-infantry-walk-pose-w-v1.json",
+    "sha256": "7fab873a01f773edb45886223ace8108e1dfedc0276fd7a1f50a6e33da16cf7e"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "f6763fd4-7fee-45dc-9335-63ba5876ff4c",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 27,
+      "height": 48,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/f6763fd4-7fee-45dc-9335-63ba5876ff4c/image.png?v=1791526214475",
+      "path": "art/source/sprite-fusion/outputs/spark-infantry-walk-pose-w-v1/00.png",
+      "bytes": 2752,
+      "sha256": "c40fe14481d94b501f386d0aa1b58c30f4eaa33b60a307ac88687b075516c3ef"
+    },
+    {
+      "index": 1,
+      "assetId": "d18178d8-f4e9-44ac-aace-a4f84913170b",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 30,
+      "height": 60,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/d18178d8-f4e9-44ac-aace-a4f84913170b/image.png?v=1791526215471",
+      "path": "art/source/sprite-fusion/outputs/spark-infantry-walk-pose-w-v1/01.png",
+      "bytes": 4310,
+      "sha256": "70ab4481513cd889277f0960bec10f6c94c2cea3f3fbfd1ae20498077965192a"
+    }
+  ],
+  "credits": {
+    "remaining": 1515
+  }
+}

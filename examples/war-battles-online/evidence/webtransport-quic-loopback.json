@@ -38,9 +38,9 @@
   "minimumSnapshotsApplied": 3,
   "minimumInputsSent": 3,
   "observedSnapshotsApplied": 3,
-  "observedInputsSent": 15,
-  "lastServerTick": 282,
-  "lastLocalTick": 296,
+  "observedInputsSent": 11,
+  "lastServerTick": 318,
+  "lastLocalTick": 325,
   "input": {
     "moveX": 1,
     "moveY": 0,
@@ -51,21 +51,21 @@
   "inputsDropped": 0,
   "presentation": {
     "localCorrectionMagnitude": 0,
-    "maximumLocalCorrectionMagnitude": 27668,
-    "remoteInterpolationRebases": 51,
-    "maximumRemoteInterpolationRebaseDistance": 156,
+    "maximumLocalCorrectionMagnitude": 0,
+    "remoteInterpolationRebases": 49,
+    "maximumRemoteInterpolationRebaseDistance": 9,
     "maximumRemoteInterpolationDiscontinuity": 0,
-    "remoteLifecycleHardSnaps": 3
+    "remoteLifecycleHardSnaps": 6
   },
   "prediction": {
-    "inputLeadTicks": 5,
+    "inputLeadTicks": 3,
     "inputLeadDecreases": 0
   },
   "server": {
     "inputsAcceptedAtLeast": 3,
     "markers": [
       "war-battles-server:listening:https://localhost:<port>",
-      "war-battles-server:health:http://localhost:62146",
+      "war-battles-server:health:http://localhost:49559",
       "war-battles-server:roster:32:bots:2:vacancies=server-bot",
       "war-battles-server:incoming:id=1",
       "war-battles-server:quic-accepted:id=1",
@@ -78,15 +78,15 @@
   },
   "runtime": {
     "deno": "deno 2.9.7 (stable, release, aarch64-apple-darwin)",
-    "chrome": "Google Chrome 154.0.8037.93"
+    "chrome": "Google Chrome 154.0.8037.99"
   },
   "sourceInputs": [
     {
       "path": "examples/war-battles-online/core",
       "kind": "tree",
-      "fileCount": 26,
-      "bytes": 468495,
-      "sha256": "5e7664233ae38183392ddaea342dc5025fda80fc537009ae3dad6a2da157db53"
+      "fileCount": 33,
+      "bytes": 561293,
+      "sha256": "f792753d8ce7b6f48eeee35d6500981937a412d42dc4622ee9e0d85689092b41"
     },
     {
       "path": "examples/war-battles-online/integration/check-real-webtransport.mjs",
@@ -109,20 +109,20 @@
     {
       "path": "examples/war-battles-online/package.json",
       "kind": "file",
-      "bytes": 8348,
-      "sha256": "a831d33a0dfc124f618f4cab9c6756610228a8cff18ae7685cd2f42266e858c1"
+      "bytes": 10943,
+      "sha256": "2f9fecd966ae12269fd0b464376bea7e2064eb4c6ea37cc440c070149ade6d2c"
     },
     {
       "path": "examples/war-battles-online/server/deno-main.ts",
       "kind": "file",
-      "bytes": 21264,
-      "sha256": "80dc0e9b862dfb089ff8c5fe3e433d99eff456c7323ebd2269aac38f6e8774c5"
+      "bytes": 21323,
+      "sha256": "aa2d2ad4979ea3a03b78b66bd11dfaf848359deb31d437c3010b12a1b99665ee"
     },
     {
       "path": "package.json",
       "kind": "file",
-      "bytes": 56824,
-      "sha256": "fe2413f385c4cb687f20670bcfbd308bd24cc49b9e02825fab53a61c0c06fed5"
+      "bytes": 56902,
+      "sha256": "4c5eb336fc5ef5fa5699b4b37f376527c82cb2ab8390fe215c7c9a83bf2beca5"
     },
     {
       "path": "pnpm-lock.yaml",
@@ -137,6 +137,6 @@
       "sha256": "31fdeff053927fb67441d9dc9435af6a0cb60d279e3113dd8f6399962290143c"
     }
   ],
-  "sourceKey": "d43f992ca9c148b560e568d8dc7ba2faf68f72ffb80c4f57a4c37f3d447208f2",
+  "sourceKey": "6d02bd08b998e48f65aab78ec4c58e0a85a942cd77a1fa33856cbc5402207bcc",
   "evidenceBoundary": "Real loopback Chrome-to-Deno HTTP/3/WebTransport transport, authoritative welcome/snapshot/input and scalar client-presentation telemetry; server input acceptance is observed from MatchServer stats; the telemetry describes this bounded loopback trace and is not a visual-quality, WAN, ingress, native Defold, allocation, or reliable-lane-persistence claim."
 }

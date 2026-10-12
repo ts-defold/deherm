@@ -1,0 +1,10 @@
+{
+  "name": "spark-infantry-walk-e-padded-v2",
+  "operation": "animate",
+  "inputs": [
+    "art/source/sprite-fusion/inputs/spark-infantry-walk-pose-e-v1-0-padded-64.png"
+  ],
+  "prompt": "A grounded left-facing walk loop with alternating boot contact and a small opposite-arm swing. Preserve Spark's spiky black hair, orange headband, raised brass goggles, teal collar, olive jacket, tan skin, compact low sidearm, proportions, colors, and exact side view. Keep the complete hair, boots, sidearm, and arms inside the canvas throughout the motion.",
+  "outputFrames": 4,
+  "colors": 24
+}

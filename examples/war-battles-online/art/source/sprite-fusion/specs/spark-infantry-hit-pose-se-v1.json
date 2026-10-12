@@ -1,0 +1,6 @@
+{
+  "name": "spark-infantry-hit-pose-se-v1",
+  "operation": "edit",
+  "inputs": ["asset:8b192a54-6797-4897-b1de-09fe7a5c58eb"],
+  "prompt": "Spark takes a heavy hit while facing southeast: make his lean body recoil diagonally with one knee buckling, upper body tilted backward, free forearm up protecting his face, compact sidearm arm hanging low. Both boots remain grounded on the same line. The silhouette should read as staggered, not standing or firing. Preserve the same spiky dark hair, orange goggles, teal scarf, olive sleeves, small backpack, colors, outlines, and three-quarter isometric perspective. No blood, projectile, flash, extra prop, scenery, text, or second person."
+}

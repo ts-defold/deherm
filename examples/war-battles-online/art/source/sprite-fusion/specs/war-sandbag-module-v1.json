@@ -1,0 +1,13 @@
+{
+  "name": "war-sandbag-module-v1",
+  "operation": "style-reference",
+  "size": 64,
+  "inputs": [
+    "defold/assets/derived/arena/cover-sandbag-a.png",
+    "asset:ee94b30f-2584-4e4f-abb0-344a381580b2",
+    "asset:e94e72cd-9741-4d2e-9c4a-547290e10143",
+    "asset:fd903d58-0c23-455a-b59a-b5d51e0b1f81",
+    "asset:d837acc3-adde-4bf1-afc8-4eaa059a9629"
+  ],
+  "prompt": "One compact, low modular military sandbag cover section for a three-quarter isometric arcade tank battlefield. Two or three grounded olive canvas bags with dark basalt-shadow outlines, warm ochre worn seams, and a readable bottom contact line. Match the references' chunky muted military palette and density. The module should look natural when repeated along a short defensive line. No vehicle, person, building, lettering, UI, raised platform, or scene background."
+}

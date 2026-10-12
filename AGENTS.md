@@ -55,6 +55,10 @@ and Hermes runtime integration for Defold.
 
 ## Art workflows
 
+- For deterministic isometric hex-world planning, prop/collision placement,
+  coast, elevation, and seeded visual QA, read and follow
+  `.codex/skills/defold-hex-world/SKILL.md`. Its scripts reuse the owning
+  generators and focused tests; they do not replace packaged-game visual QA.
 - For Sprite Fusion generation, Defold pixel-art integration, tilesets,
   animation atlases, or visual QA, read and follow
   `.codex/skills/sprite-fusion-defold-art/SKILL.md` before making API requests

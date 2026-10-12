@@ -1,0 +1,5 @@
+{
+  "name": "artillery-hull-directions-v2",
+  "operation": "direction-set",
+  "inputs": ["art/source/sprite-fusion/outputs/artillery-hull-v2/01.png"]
+}

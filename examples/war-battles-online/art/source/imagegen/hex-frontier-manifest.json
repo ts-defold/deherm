@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "kind": "war-battles.hex-frontier-source-art",
+  "tool": "built-in image generation",
+  "directionReference": {
+    "path": "art/source/imagegen/hex-frontier-direction-v1.png",
+    "sha256": "7e00ff69ee7632d1c8f9f203b08b0a813f398d606cdc456709ddd005ddffdcba",
+    "prompt": "Art-direction revision of the isometric tank battlefield: contiguous large flat-top hex landforms for a real-time volcanic frontier refinery, with meadow, ochre earth, basalt, steel service deck and hot fissures. Original premium 1990s arcade pixel-art craftsmanship; no square tiles or static backdrop."
+  },
+  "prototypeLandform": {
+    "path": "art/source/imagegen/hex-meadow-landform-v1.png",
+    "sha256": "128ce7da3fa0057fd4193972cdb262c4d9ae962ddbe70e63c7f4aa087eda351f",
+    "decision": "kept as a concept; its repeated whole-landform detail was too conspicuous at gameplay scale"
+  },
+  "textures": {
+    "G": {
+      "path": "art/source/imagegen/hex-meadow-texture-v1.png",
+      "sha256": "0998e77e1c9662972180e39c6da81d44c67450f9c212fa5f41b38f9c2f23056f",
+      "prompt": "Square overhead pixel-art olive frontier meadow material, small hand-clustered grass tufts, dry gold blades, slate pebbles, a few white wildflowers and ochre soil flecks; even coverage, no tile borders or large objects."
+    },
+    "D": {
+      "path": "art/source/imagegen/hex-earth-texture-v1.png",
+      "sha256": "db9a88ce94d77303b36830d011a0347dd804591de6d007ee045a56d865b4659b",
+      "prompt": "Companion square overhead pixel-art ochre compacted earth with straw tufts, small stones, shell grit, tire-scuffed patches and tiny grass intrusions; same material scale as meadow, no tile borders."
+    },
+    "B": {
+      "path": "art/source/imagegen/hex-basalt-texture-v1.png",
+      "sha256": "e60e8616661b8290d8ea3c570cba8582a710cb73534c97847362fe42be5fc9a5",
+      "prompt": "Companion square overhead pixel-art dark slate basalt, irregular angular plates and cracks, charcoal facets, warm olive dust and sparse mineral highlights; flat material, no cliff or tile border."
+    },
+    "A": {
+      "path": "art/source/imagegen/hex-basalt-texture-v1.png",
+      "sha256": "e60e8616661b8290d8ea3c570cba8582a710cb73534c97847362fe42be5fc9a5",
+      "recipe": "basalt source graded to ash with generated orange fissures"
+    },
+    "M": {
+      "path": "art/source/imagegen/hex-steel-texture-v1.png",
+      "sha256": "c0b3c0a82259b90c47f33b8df1d8b90fe5ae25fb55439a22e978fac58e1ae430",
+      "prompt": "Companion square overhead pixel-art worn refinery steel deck, small gunmetal plates, grates, rivets, rust, cream scuffs and restrained industrial-yellow paint; flat material, no tile border."
+    }
+  }
+}

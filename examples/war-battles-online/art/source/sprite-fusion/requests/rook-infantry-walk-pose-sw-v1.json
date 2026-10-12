@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_2c3de146-ab2f-497e-947d-d27d97050444",
+  "operation": "edit",
+  "prompt": "Change only Rook's body pose to a grounded southwest-facing three-quarter walk mid-stride: front boot stepping, rear boot planted, opposite arm swinging, compact sidearm still held low. Keep her exact helmet, blue goggle lens, cream scarf, face, olive jacket, colors, outline, proportions, and viewing angle. Do not turn her or add a prop, platform, text, scenery, or second person.",
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "c4c082f9-d41e-497b-a38c-80520006f1d9"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/rook-infantry-walk-pose-sw-v1.json",
+    "sha256": "4aa7f7f1efdbfa60c015ef6e2cdbe17d0eed57e13a0847891a8c1e9986891a87"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "5ef46308-a582-4fa8-ad1a-76c8d0f43f0b",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 29,
+      "height": 46,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/5ef46308-a582-4fa8-ad1a-76c8d0f43f0b/image.png?v=1791521970092",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-walk-pose-sw-v1/00.png",
+      "bytes": 3094,
+      "sha256": "52feb87b6a2b8b252f2dc621829379ad2522cc2aa9de521ec2333af3c3ef0986"
+    },
+    {
+      "index": 1,
+      "assetId": "c638bdb1-27e7-465d-8772-1a38eba4c1b5",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 28,
+      "height": 47,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/c638bdb1-27e7-465d-8772-1a38eba4c1b5/image.png?v=1791521971301",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-walk-pose-sw-v1/01.png",
+      "bytes": 3304,
+      "sha256": "17aeb373e37ef6418ef39aed8d45b7fa4d16a0ad3074f6051c389092305f9263"
+    }
+  ],
+  "credits": {
+    "remaining": 2070
+  }
+}

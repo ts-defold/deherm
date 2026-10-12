@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_e73e127f-654a-407a-bec7-aac3e76565af",
+  "operation": "direction-set",
+  "prompt": null,
+  "size": 32,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "510d0d69-2fc7-4082-8dfe-74f4fa4e13b1"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/mud-infantry-fire-directions-v1.json",
+    "sha256": "6719aec377685c19e92f9c0191dbd021fdefac494ce73b65f16770f381ed964a"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "476d9686-6f4c-45bc-8d55-08239d452190",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 38,
+      "height": 38,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/476d9686-6f4c-45bc-8d55-08239d452190/image.png?v=1791532273575",
+      "path": "art/source/sprite-fusion/outputs/mud-infantry-fire-directions-v1/00.png",
+      "bytes": 2437,
+      "sha256": "96151105abef109538717a92cd2f054830cbf39844902ebd31a11c7e6e399beb"
+    },
+    {
+      "index": 1,
+      "assetId": "be4a4f94-c693-4bee-a7b9-8afe6fbf1d4d",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 39,
+      "height": 39,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/be4a4f94-c693-4bee-a7b9-8afe6fbf1d4d/image.png?v=1791532274100",
+      "path": "art/source/sprite-fusion/outputs/mud-infantry-fire-directions-v1/01.png",
+      "bytes": 2690,
+      "sha256": "61a3b584883f5a7f3cbb0fe71ca57a8000dfb989b475410b5ff54380e0b371d1"
+    },
+    {
+      "index": 2,
+      "assetId": "00312b41-7f09-497c-927d-8535ec01e3a8",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 38,
+      "height": 38,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/00312b41-7f09-497c-927d-8535ec01e3a8/image.png?v=1791532274659",
+      "path": "art/source/sprite-fusion/outputs/mud-infantry-fire-directions-v1/02.png",
+      "bytes": 2254,
+      "sha256": "f145e5188bbc96c4357011d4d64d1c1aaa8ed166703f7c9d952b18e8ea7fbe5d"
+    },
+    {
+      "index": 3,
+      "assetId": "d94e980b-6dd7-4a81-81e8-ab34bdaf4387",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 35,
+      "height": 35,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/d94e980b-6dd7-4a81-81e8-ab34bdaf4387/image.png?v=1791532275175",
+      "path": "art/source/sprite-fusion/outputs/mud-infantry-fire-directions-v1/03.png",
+      "bytes": 1985,
+      "sha256": "b7c68deb1fd2000e2a9dd3bb2184c99ed2afcfc7a776e0054a72207d7cce08e5"
+    },
+    {
+      "index": 4,
+      "assetId": "4a7175f6-ff8d-4724-95c6-559adfd46579",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 34,
+      "height": 34,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/4a7175f6-ff8d-4724-95c6-559adfd46579/image.png?v=1791532275714",
+      "path": "art/source/sprite-fusion/outputs/mud-infantry-fire-directions-v1/04.png",
+      "bytes": 1761,
+      "sha256": "7ae6145d7f039fbd257456251d3f0c7a85b78a80feb0a2ba631cf2ca859083ae"
+    },
+    {
+      "index": 5,
+      "assetId": "04c55dd5-1118-41ac-b138-c9ed6e64aa9f",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 39,
+      "height": 39,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/04c55dd5-1118-41ac-b138-c9ed6e64aa9f/image.png?v=1791532276242",
+      "path": "art/source/sprite-fusion/outputs/mud-infantry-fire-directions-v1/05.png",
+      "bytes": 2342,
+      "sha256": "a4589e6963bca3b138c083cc9425b8eff89a04f103d9d38b3fe9f2d5c7662aa9"
+    },
+    {
+      "index": 6,
+      "assetId": "0ced1bc1-fb4d-4e0b-a79f-8f625453df33",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 36,
+      "height": 36,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/0ced1bc1-fb4d-4e0b-a79f-8f625453df33/image.png?v=1791532276729",
+      "path": "art/source/sprite-fusion/outputs/mud-infantry-fire-directions-v1/06.png",
+      "bytes": 1971,
+      "sha256": "e0cc59f8dd782c99e2b86c646b5393725cd54d5a28edb8e9bf9b2262f4363695"
+    },
+    {
+      "index": 7,
+      "assetId": "459e42bc-26e3-4c2f-a1a2-53f7bd2fe22b",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 36,
+      "height": 36,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/459e42bc-26e3-4c2f-a1a2-53f7bd2fe22b/image.png?v=1791532277290",
+      "path": "art/source/sprite-fusion/outputs/mud-infantry-fire-directions-v1/07.png",
+      "bytes": 2274,
+      "sha256": "ccf02933e1950b1f12d510b483b3b43e5fd446b7817bbf0e66931443748f74f8"
+    }
+  ],
+  "credits": {
+    "remaining": 990
+  }
+}

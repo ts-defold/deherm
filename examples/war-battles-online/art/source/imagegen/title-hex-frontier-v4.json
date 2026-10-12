@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "tool": "built-in image generation",
+  "status": "selected source for title background; runtime projection is generator-owned",
+  "path": "art/source/imagegen/title-hex-frontier-v4.png",
+  "sha256": "9c8ef090784984b8006a47a243f9fc096661c06cd152adf9464868eec02107ce",
+  "width": 1672,
+  "height": 941,
+  "references": [
+    "art/source/imagegen/hex-frontier-direction-v1.png (style reference)",
+    "evidence/hex-cliff-centered-browser-2026-10-08.png (actual game camera and scale reference)"
+  ],
+  "prompt": "Use case: stylized-concept. Create a NEW 16:9 game-title BACKGROUND image, not a mockup or an edit of either input. Image 1 is a visual style reference for the desired dramatic SNK-inspired isometric hex-tile art direction; image 2 shows the actual War Battles game camera, ground scale, military palette, and tank size. The new artwork must bridge those: recognizably the same game's hex battlefield, just with premium hand-pixelled arcade key-art finish. Composition: a continuous raised volcanic island battlefield viewed from a high three-quarter isometric strategy camera, with a coherent FLAT-TOP HEX GRID of grass, ochre earth, dark basalt, and gray steel route tiles. Hex edges are precisely aligned and edge-to-edge; there are 2–3 subtle terrace levels, not disconnected platforms. The world descends at the far bottom edge in a broad jagged basalt cliff into vivid turquoise sea. A compact worn refinery skyline on the distant left and a volcano beyond the sea; no tropical palms. An olive scout tank with an expressive small driver appears at the near left border, and a red/steel heavy tank fires from the near right border, both firmly grounded at compatible game scale, with crisp orange muzzle blast, smoke, and a few tiny background combatants. Make the tanks read clearly against the battlefield, not giant props. The CENTER 45% of the image is purposefully quiet medium-dark olive/basalt terrain with fine but low-contrast hex seams: the game separately draws a very large logo and menu card over this region. Bottom center remains quiet for a separately drawn sponsor credit. Extreme corners and horizon can be richly detailed. Bold late-1990s Japanese arcade action-game pixel-art styling, hard nearest-neighbor pixel clusters, sharp dark outlines, disciplined shadow ramps, warm explosive orange versus teal ocean, strong illustrative light/dark focal structure; vivid, playful military energy rather than grim realism. No text, logo, letters, interface panels, borders, watermark, smooth airbrushed gradients, 3D rendering, fuzzy edges, floating structures, impossibly tall tile pillars, random rocks sitting on hex seams, or disconnected overlay tiles."
+}

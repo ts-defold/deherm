@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "sourceRequest": "spark-infantry-walk-pose-e-v1",
+  "outputIndex": 0,
+  "sourceSha256": "dcf71ace76abd4c2e1b7b222f1f7e69b8eb1a9ee70e0d8e53bcf9b0b0503d9c9",
+  "canvas": 64,
+  "footRow": 56,
+  "sourceBounds": [
+    0,
+    0,
+    27,
+    46
+  ],
+  "paddedBounds": [
+    18,
+    9,
+    45,
+    55
+  ],
+  "sha256": "33b529caa04658cba03cbd1dac1a863b4e7d155f4fe55e5461f24ced15f3935a"
+}

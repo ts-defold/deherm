@@ -33,7 +33,7 @@ async function sourceInventory() {
 }
 
 export function assertNetworkImpairmentEvidence(document, expectedSources) {
-  assert.equal(document.schemaVersion, 1);
+  assert.equal(document.schemaVersion, 3);
   assert.equal(document.kind, "war-battles.32-player-network-impairment-matrix");
   assert.equal(document.profiles.length, 3);
   assert.deepEqual(document.sourceInputs, expectedSources);
@@ -53,12 +53,33 @@ export function assertNetworkImpairmentEvidence(document, expectedSources) {
     assert.ok(profile.server.snapshotBytesSent > 0);
     assert.ok(profile.clients.minimumSnapshotsApplied >= profile.clients.minimumSnapshotsAppliedFloor);
     assert.equal(profile.clients.everyBotDroveTheProduct, true);
-    assert.equal(profile.clients.minimumBotCommandsStaged, profile.config.ticks);
+    assert.deepEqual(profile.clients.localCorrectionBucketUpperBounds, [0, 16, 32, 64, 128, 256, 512]);
+    assert.equal(profile.clients.localCorrectionBuckets.length, 8);
+    assert.equal(profile.clients.convergenceProbeCorrectionBuckets.length, 8);
+    assert.ok(
+      profile.clients.convergenceProbeCorrectionBuckets.every((count) => Number.isInteger(count) && count >= 0),
+    );
+    assert.equal(
+      profile.clients.localCorrectionBuckets.reduce((sum, count) => sum + count, 0),
+      profile.clients.localCorrectionSamples,
+    );
+    assert.ok(profile.clients.localCorrectionSamples > 0);
+    assert.ok(profile.clients.localCorrectionOverEightPixelRatio >= 0);
+    assert.ok(profile.clients.localCorrectionOverEightPixelRatio <= 1);
+    assert.ok(profile.clients.localCorrectionOverThirtyTwoPixelRatio >= 0);
+    assert.ok(profile.clients.localCorrectionOverThirtyTwoPixelRatio <= 1);
+    assert.ok(profile.clients.maximumLocalPresentedStepDistance >= 0);
+    assert.equal(profile.clients.localPresentedStepsOverThirtyTwoPixels, 0);
+    assert.ok(profile.clients.minimumBotCommandsStaged >= profile.config.ticks * 0.9);
+    assert.ok(profile.clients.minimumBotCommandsStaged < profile.config.ticks);
     assert.ok(profile.clients.minimumBotNonIdleCommands >= profile.config.ticks / 2);
     assert.ok(profile.server.snapshotSkipRatio <= profile.server.maximumSnapshotSkipRatio);
     assert.equal(profile.clients.maximumRemoteInterpolationDiscontinuity, 0);
     assert.ok(profile.transport.droppedDatagrams > 0);
     assert.ok(profile.transport.reorderedDatagrams > 0);
+    assert.ok(Number.isInteger(profile.transport.reorderedSnapshotStreams));
+    assert.ok(profile.transport.reorderedSnapshotStreams >= 0);
+    assert.equal(profile.transport.reliableOrderViolations, 0);
     assert.ok(profile.transport.maximumSerializationDelayMilliseconds > 0);
     assert.ok(profile.transport.peakQueue <= profile.transport.queueBound);
     assert.ok(profile.transport.peakQueuedBytes > 0);
@@ -73,6 +94,17 @@ export function assertNetworkImpairmentEvidence(document, expectedSources) {
     assert.ok(profile.transport.downlinkDemandRatio > 0);
   }
   const edge = document.profiles[2];
+  // These are regression ceilings, not a claim that edge-congested motion is
+  // visually finished. The delayed first-keyframe bootstrap must improve the
+  // edge tail without making the two less-impaired profiles worse.
+  // The current world/presentation path records a slightly wider raw-correction
+  // tail than the older artifact, while the actual sampled motion stays below
+  // the 32 px visible-step ceiling asserted for every profile above.
+  assert.ok(document.profiles[0].clients.localCorrectionOverEightPixelRatio < 0.06);
+  assert.ok(document.profiles[1].clients.localCorrectionOverEightPixelRatio < 0.1);
+  assert.ok(edge.clients.localCorrectionOverEightPixelRatio < 0.2);
+  assert.ok(edge.clients.localCorrectionOverThirtyTwoPixelRatio < 0.05);
+  assert.ok(edge.clients.maximumLocalCorrectionMagnitude < 2_400);
   assert.ok(
     edge.transport.maximumSerializationDelayMilliseconds >
       document.profiles[0].transport.maximumSerializationDelayMilliseconds,

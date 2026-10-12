@@ -1,0 +1,6 @@
+{
+  "name": "rook-infantry-hit-directions-v2",
+  "operation": "direction-set",
+  "inputs": ["asset:b9209ba9-29c6-46e3-b868-16b17e56a323"],
+  "size": 32
+}

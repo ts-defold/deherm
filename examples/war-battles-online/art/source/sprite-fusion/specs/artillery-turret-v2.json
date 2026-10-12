@@ -1,0 +1,6 @@
+{
+  "name": "artillery-turret-v2",
+  "operation": "edit",
+  "inputs": ["art/source/sprite-fusion/outputs/artillery-silhouette-v2/06.png"],
+  "prompt": "Isolate only this siege artillery vehicle's long-barreled rotating gun mount as one detached weapon sprite. Remove the entire tracked rail-platform hull and chassis underneath. Preserve the unmistakably extended barrel, compact rear armored gun housing, same three-quarter isometric direction, palette and dark outline. The gun mount base should sit on the matching artillery hull socket. One isolated turret, no hull."
+}

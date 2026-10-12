@@ -1,0 +1,5 @@
+{
+  "name": "scout-turret-directions-v2",
+  "operation": "direction-set",
+  "inputs": ["art/source/sprite-fusion/outputs/scout-turret-v2/01.png"]
+}

@@ -1,0 +1,6 @@
+{
+  "name": "brass-infantry-directions-v1",
+  "operation": "direction-set",
+  "inputs": ["asset:349aa42d-70b7-4c50-87cd-aa1892c3bbe1"],
+  "size": 32
+}

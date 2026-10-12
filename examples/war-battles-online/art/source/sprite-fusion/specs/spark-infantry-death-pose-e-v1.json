@@ -1,0 +1,8 @@
+{
+  "name": "spark-infantry-death-pose-e-v1",
+  "operation": "edit",
+  "inputs": [
+    "asset:b790f264-3051-4526-84d6-aded5e73741e"
+  ],
+  "prompt": "Keep spark viewed in the exact same side-on east-facing view. Change the body into a clearly defeated collapsed pose: one knee on the ground, torso and head bowed low forward, one hand braced on the ground, sidearm lowered, silhouette much shorter and wider than standing. Preserve the same lean build, spiky dark hair, orange goggles, teal scarf, olive sleeves, dark uniform, and small backpack, boots and knee on one ground line, colors, dark outlines, identity, and original perspective. Do not turn toward another direction. No blood, injury detail, explosion, extra prop, scenery, platform, text, or second person."
+}

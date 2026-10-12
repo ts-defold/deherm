@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_28df2042-932e-42e5-b6bf-273680e1ef93",
+  "operation": "animate",
+  "prompt": "A quick grounded left-facing side view, later flipped for east walk cycle with alternating boot contact and a small opposite-arm swing. Mud remains a rugged driver with a dark respirator mask, ochre helmet, orange-rimmed goggles, rust-red scarf, heavy olive jacket and compact sidearm held low. Keep his exact source perspective, palette, outline, proportions, and identity consistent. Seamless loop without turning, jumping, or adding objects.",
+  "size": null,
+  "outputFrames": 4,
+  "colors": 24,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "73449adf-5c09-4d87-b6aa-997bbffe5841"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/mud-infantry-walk-e-v1.json",
+    "sha256": "215919fb120f92b77e4cc3c6cd27e5e1b1c0343a179407931df582ddf6337ae6"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "30cd4a00-4ee3-48d2-b8b0-8fdc7da5919d",
+      "type": "animation",
+      "contentType": "image/webp",
+      "width": 27,
+      "height": 50,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/30cd4a00-4ee3-48d2-b8b0-8fdc7da5919d/animation.webp?v=1791527623530",
+      "path": "art/source/sprite-fusion/outputs/mud-infantry-walk-e-v1/00.webp",
+      "bytes": 2166,
+      "sha256": "a86188c46b0c2e61c0f85f75c8200b6521ff6c9dc3265ca2228384d09dd487dc",
+      "spritesheet": {
+        "url": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/30cd4a00-4ee3-48d2-b8b0-8fdc7da5919d/spritesheet.png?v=1791527623530",
+        "path": "art/source/sprite-fusion/outputs/mud-infantry-walk-e-v1/00-sheet.png",
+        "bytes": 2067,
+        "sha256": "d0ceaaf0a39213465d89da2fa2e8c42559fc946220415857dfbdb66add6c7d6d"
+      },
+      "frameCount": 4,
+      "fps": 8
+    }
+  ],
+  "credits": {
+    "remaining": 1125
+  }
+}

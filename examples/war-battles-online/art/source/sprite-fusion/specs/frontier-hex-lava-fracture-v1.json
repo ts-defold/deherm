@@ -1,0 +1,12 @@
+{
+  "name": "frontier-hex-lava-fracture-v1",
+  "operation": "style-reference",
+  "size": 64,
+  "prompt": "One six-sided volcanic basalt landform in an isometric frontier battlefield. A dark flat walkable rock top has a few narrow glowing orange magma fractures and angular slate chips; a short stratified cliff face shows restrained molten seams. Keep the same compact hex silhouette, three-quarter projection, upper-left light, dark rock palette, and chunky pixel clusters as the references. No large lava pool, tank, building, lettering, or second tile.",
+  "inputs": [
+    "art/source/sprite-fusion/outputs/frontier-hex-basalt-cliff-v1/04.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-basalt-cliff-v1/08.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-ash-ridge-v1/05.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-ochre-cliff-v1/07.png"
+  ]
+}

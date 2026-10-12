@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "tool": "built-in image generation",
+  "status": "archived source study; the continuous outer face was replaced by staggered generated hex cells",
+  "runtimeEvidence": "evidence/island-coast-east-browser-2026-10-08.png",
+  "replacementEvidence": "evidence/hex-stacked-coast-browser-2026-10-08.png",
+  "limits": "The source no longer feeds the runtime coast. The replacement has a packaged WebGL2 screenshot; native visual inspection remains open.",
+  "path": "art/source/imagegen/frontier-cliff-edge-study-v1.png",
+  "sha256": "1e86bf312151f0972e3a49d36488e36930dee18d5d4b6a3cbb8da4b61f63fb18",
+  "prompt": "A single transparent, wide, hand-pixeled SNK-era isometric cliff-face segment for the War Battles volcanic-refinery terrain edge. Rugged warm basalt strata, thin irregular grass lip, dark contact shadow; cliff wall dominates, not a raised hex platform. No tanks, buildings, roads, lettering, tile-grid lines, or repeated identical boulders."
+}

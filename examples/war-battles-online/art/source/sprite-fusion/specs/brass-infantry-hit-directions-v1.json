@@ -1,0 +1,6 @@
+{
+  "name": "brass-infantry-hit-directions-v1",
+  "operation": "direction-set",
+  "inputs": ["asset:e2f81e82-451e-42c6-94e1-af49071db1a8"],
+  "size": 32
+}

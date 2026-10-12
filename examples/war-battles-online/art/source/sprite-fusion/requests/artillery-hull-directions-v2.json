@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_2db87fa2-1f43-4bf0-94f9-73a35282baae",
+  "operation": "direction-set",
+  "prompt": null,
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/artillery-hull-v2/01.png",
+      "bytes": 8458,
+      "sha256": "b35aadd26c8ddc978bbeadbd0b10dc19d78cddc8239028dc44033465df3f5a57"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/artillery-hull-directions-v2.json",
+    "sha256": "a328025a690f4c16f45ee126f7b5ff3ecb7bbc36afa0cf8a92f14ebf2fb3d481"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "784847e8-d095-4583-9b6b-4b449454fb3d",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/784847e8-d095-4583-9b6b-4b449454fb3d/image.png?v=1791432862257",
+      "path": "art/source/sprite-fusion/outputs/artillery-hull-directions-v2/00.png",
+      "bytes": 4182,
+      "sha256": "8fb1a9f6c95a8a177b26d86f4c8ed669240c408767a1c704c666eaadec542178"
+    },
+    {
+      "index": 1,
+      "assetId": "58751c10-4b44-4f00-8887-ddb3d13385a2",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/58751c10-4b44-4f00-8887-ddb3d13385a2/image.png?v=1791432862849",
+      "path": "art/source/sprite-fusion/outputs/artillery-hull-directions-v2/01.png",
+      "bytes": 3315,
+      "sha256": "ab0712a919f4098668dd42fb21a6e99ffca4ada763d5187be8d62386132e122d"
+    },
+    {
+      "index": 2,
+      "assetId": "b9a32e2c-15d9-40dd-9b96-9cc11a7ba202",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/b9a32e2c-15d9-40dd-9b96-9cc11a7ba202/image.png?v=1791432863432",
+      "path": "art/source/sprite-fusion/outputs/artillery-hull-directions-v2/02.png",
+      "bytes": 4284,
+      "sha256": "11e6b7366ffaa293cb73c848ae35ad8dbdb5943ac87419ee90d742a3c059b481"
+    },
+    {
+      "index": 3,
+      "assetId": "3e99fa29-92c6-456f-bb8f-4322884ab67e",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/3e99fa29-92c6-456f-bb8f-4322884ab67e/image.png?v=1791432863947",
+      "path": "art/source/sprite-fusion/outputs/artillery-hull-directions-v2/03.png",
+      "bytes": 3901,
+      "sha256": "43fefd501e938cc0aa1326b8131add5ef86a12e0f009fcbb3981fafdc59dcf69"
+    },
+    {
+      "index": 4,
+      "assetId": "51377622-0b31-43fe-8249-09a1d15c4164",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/51377622-0b31-43fe-8249-09a1d15c4164/image.png?v=1791432864516",
+      "path": "art/source/sprite-fusion/outputs/artillery-hull-directions-v2/04.png",
+      "bytes": 3910,
+      "sha256": "bd1c3d2d30be7d350ee3d4bb584e6a60b013c14abce76dd2ffa8a0a2315a6e63"
+    },
+    {
+      "index": 5,
+      "assetId": "ce07c8f0-08e1-492a-a77b-d68062bb3354",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/ce07c8f0-08e1-492a-a77b-d68062bb3354/image.png?v=1791432865059",
+      "path": "art/source/sprite-fusion/outputs/artillery-hull-directions-v2/05.png",
+      "bytes": 4084,
+      "sha256": "2e70ce9dee6717283455b27f3c31ed6975ed4997baafe742532a6f22323ca9a4"
+    },
+    {
+      "index": 6,
+      "assetId": "e55c591e-305f-415a-bc0d-5652b6f9e96c",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/e55c591e-305f-415a-bc0d-5652b6f9e96c/image.png?v=1791432865530",
+      "path": "art/source/sprite-fusion/outputs/artillery-hull-directions-v2/06.png",
+      "bytes": 3862,
+      "sha256": "94bf0b567e27ab7588e7d563dca485512e47ff32fb5bb2572e31cbbf541ef380"
+    },
+    {
+      "index": 7,
+      "assetId": "adfcff6c-3b09-4a53-9d0f-ffcd57487b77",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/adfcff6c-3b09-4a53-9d0f-ffcd57487b77/image.png?v=1791432866105",
+      "path": "art/source/sprite-fusion/outputs/artillery-hull-directions-v2/07.png",
+      "bytes": 4246,
+      "sha256": "d6e619ca85dd71cd6001a2ddc753bd519e8276f3c69302b183965cf9adc8c12f"
+    }
+  ],
+  "credits": {
+    "remaining": 2250
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_0a647d42-f91b-4191-8305-a3a1ba8d90af",
+  "operation": "animate",
+  "prompt": "A quick grounded northwest-facing three-quarter rear walk cycle with alternating boot contact and a small opposite-arm swing. Spark remains a young tan-skinned mechanic with short spiky black hair, orange headband, raised brass goggles, teal collar, olive jacket and compact sidearm held low. Keep his exact source perspective, palette, outline, proportions, and identity consistent. Seamless loop without turning, jumping, or adding objects.",
+  "size": null,
+  "outputFrames": 4,
+  "colors": 24,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "89336000-50a3-4433-9090-aab18f28bc44"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/spark-infantry-walk-nw-v1.json",
+    "sha256": "60b6122905b0cb597d42177e11f2b2e742b577caf15232d31e259d2ea572b8b8"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "0e47f90b-8629-4e84-87fe-64dacf27cc32",
+      "type": "animation",
+      "contentType": "image/webp",
+      "width": 27,
+      "height": 51,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/0e47f90b-8629-4e84-87fe-64dacf27cc32/animation.webp?v=1791526655213",
+      "path": "art/source/sprite-fusion/outputs/spark-infantry-walk-nw-v1/00.webp",
+      "bytes": 2074,
+      "sha256": "baf795f66ccde97098755aeb992be2fed878bd3a165830e73b7254c98a883f16",
+      "spritesheet": {
+        "url": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/0e47f90b-8629-4e84-87fe-64dacf27cc32/spritesheet.png?v=1791526655213",
+        "path": "art/source/sprite-fusion/outputs/spark-infantry-walk-nw-v1/00-sheet.png",
+        "bytes": 2101,
+        "sha256": "33853b7a7647f7f8cb3ec01c2c170f98ed5bc11b74540e1861d815a25e7256de"
+      },
+      "frameCount": 4,
+      "fps": 8
+    }
+  ],
+  "credits": {
+    "remaining": 1380
+  }
+}

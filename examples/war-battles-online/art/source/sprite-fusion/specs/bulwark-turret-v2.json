@@ -1,0 +1,6 @@
+{
+  "name": "bulwark-turret-v2",
+  "operation": "edit",
+  "inputs": ["art/source/sprite-fusion/outputs/bulwark-silhouette-v2/00.png"],
+  "prompt": "Isolate only this heavy bulwark tank's low broad rotating turret and short heavy cannon as one detached weapon sprite. Remove the entire tracked hull and chassis underneath, keeping the same three-quarter isometric direction, palette and dark outline. The wide low turret base should sit on the matching bulwark hull socket. One isolated turret, no hull."
+}

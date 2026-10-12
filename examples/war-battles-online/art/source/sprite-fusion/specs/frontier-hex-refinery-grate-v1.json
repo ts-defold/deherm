@@ -1,0 +1,12 @@
+{
+  "name": "frontier-hex-refinery-grate-v1",
+  "operation": "style-reference",
+  "size": 64,
+  "prompt": "One six-sided walkable maintenance deck landform in an isometric volcanic refinery battlefield. A compact dark steel top has one inset grate, worn riveted plates, faint ochre safety paint, and a tiny warm vent glow; the short side is layered steel over basalt. Keep the same hex silhouette, three-quarter projection, upper-left light, restrained military palette, and chunky pixel clusters as the references. No tank, building, lettering, or second tile.",
+  "inputs": [
+    "art/source/sprite-fusion/outputs/frontier-hex-service-deck-v1/09.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-service-deck-v1/10.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-basalt-cliff-v1/04.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-ochre-cliff-v1/07.png"
+  ]
+}

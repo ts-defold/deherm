@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_adc7452b-364c-4bfa-8971-1d34833219ed",
+  "operation": "direction-set",
+  "prompt": null,
+  "size": 32,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "06912d48-6348-40f1-95ec-973e5f6a68d2"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/brass-infantry-death-directions-v1.json",
+    "sha256": "1cf181e1a702d0dc8e6fc472582c8e552c896a6924baf59d386d8dc1ba2e3609"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "9b7c484d-ed55-4adb-ae9c-ae4d8637fd97",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 34,
+      "height": 34,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/9b7c484d-ed55-4adb-ae9c-ae4d8637fd97/image.png?v=1791535352553",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-death-directions-v1/00.png",
+      "bytes": 2640,
+      "sha256": "19d8cdedab8165262515eed9b79d25cd7459e6f39202b670aa4c79453ee3dec4"
+    },
+    {
+      "index": 1,
+      "assetId": "3f5009fd-db98-41a0-bc6b-103c62f88cec",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 36,
+      "height": 36,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/3f5009fd-db98-41a0-bc6b-103c62f88cec/image.png?v=1791535353179",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-death-directions-v1/01.png",
+      "bytes": 2961,
+      "sha256": "20a60c096b58a3047ba1483697c697fce8434d0bb4ef07d3c62db61e4d817694"
+    },
+    {
+      "index": 2,
+      "assetId": "a4184b28-208d-4a30-a75e-9b1f93bc4016",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 34,
+      "height": 34,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/a4184b28-208d-4a30-a75e-9b1f93bc4016/image.png?v=1791535353765",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-death-directions-v1/02.png",
+      "bytes": 2521,
+      "sha256": "3eebe5491171872a2c941e7166ca85fed36093a319951b952e0fd5198c876ff0"
+    },
+    {
+      "index": 3,
+      "assetId": "03891c98-e358-4f0f-bcbf-03a3312d8533",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 33,
+      "height": 33,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/03891c98-e358-4f0f-bcbf-03a3312d8533/image.png?v=1791535354385",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-death-directions-v1/03.png",
+      "bytes": 1826,
+      "sha256": "c06f4172b741b31b3d4014472aa5fbf4b64acdb8e925bd1f253335e654ec3005"
+    },
+    {
+      "index": 4,
+      "assetId": "7b715af0-c0ea-4b00-be37-3db0424c2e9f",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 33,
+      "height": 33,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/7b715af0-c0ea-4b00-be37-3db0424c2e9f/image.png?v=1791535355034",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-death-directions-v1/04.png",
+      "bytes": 1832,
+      "sha256": "de3c71dc511c3e6e23474e37d8bf0f5922ebcdad454a9074c0a86e0a2f614230"
+    },
+    {
+      "index": 5,
+      "assetId": "f279a83c-269a-4de0-9546-bdbce36a74e0",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 32,
+      "height": 32,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/f279a83c-269a-4de0-9546-bdbce36a74e0/image.png?v=1791535355575",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-death-directions-v1/05.png",
+      "bytes": 2034,
+      "sha256": "f66e5674f0694773bf05bf2d4827f37a372b04170ef0be45f702756d477483e7"
+    },
+    {
+      "index": 6,
+      "assetId": "d9540d60-1d97-4f78-9775-f392269820f4",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 32,
+      "height": 32,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/d9540d60-1d97-4f78-9775-f392269820f4/image.png?v=1791535356222",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-death-directions-v1/06.png",
+      "bytes": 1845,
+      "sha256": "fa2f659bbb9f1dac2c7c1e392d560befe9221d0d0d96b2619d6e13945887b1a5"
+    },
+    {
+      "index": 7,
+      "assetId": "4ab8e6fd-fb67-4ecd-bba7-bf56210a9589",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 32,
+      "height": 32,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/4ab8e6fd-fb67-4ecd-bba7-bf56210a9589/image.png?v=1791535356854",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-death-directions-v1/07.png",
+      "bytes": 1997,
+      "sha256": "d3cac1a74762f36dfe24a32ebef5c950761c963dc42b645d33092ac0b694fed3"
+    }
+  ],
+  "credits": {
+    "remaining": 690
+  }
+}

@@ -35,14 +35,14 @@ export const PROTOCOL_VERSION = 15;
 export const INPUT_PACKET_BYTES = 32;
 /**
  * One unreliable transport datagram carries the two commands sampled since the
- * previous 30 Hz send plus that packet's two-command window. This is the same
+ * previous 30 Hz sends plus their four-command window. This is the same
  * loss-tolerance shape used by classic arena shooters: losing one datagram does
  * not necessarily lose the input transition it carried, and no retransmission
  * queue can make stale movement arrive late.
  */
 /** Sample at 60 Hz but emit one command datagram every two simulation ticks. */
 export const INPUT_SEND_INTERVAL_TICKS = 2;
-/** Two new commands plus the previous two-command packet window. */
+/** Two new commands plus the previous packet's two-command window. */
 export const INPUT_BUNDLE_MAX_COMMANDS = 4;
 const INPUT_BUNDLE_HEADER_BYTES = 24;
 const INPUT_BUNDLE_COMMAND_BYTES = 6;
@@ -309,15 +309,18 @@ export const WELCOME_BYTES = WELCOME_BASE_BYTES + 1;
 export const WELCOME_ACK_BYTES = ENVELOPE_BYTES + RESUME_TOKEN_BYTES;
 export const CONTROL_BYTES = ENVELOPE_BYTES + 4;
 export const PING_BYTES = ENVELOPE_BYTES + 8;
+/** Optional, backwards-readable per-session input timing appended to PONG. */
+export const PONG_FEEDBACK_BYTES = PING_BYTES + 8;
 /** Snapshot frames carry a small codec header after the reliable envelope. */
 export const SNAPSHOT_FRAME_HEADER_BYTES = ENVELOPE_BYTES + 12;
 export const SNAPSHOT_KEYFRAME = 0;
 export const SNAPSHOT_DELTA = 1;
 /** Exact field-aware player delta plus generic non-player runs. */
 export const SNAPSHOT_SCHEMA_DELTA = 2;
-/** A keyframe is required often enough to bound late-join/recovery cost. */
-/** Four seconds at the default 10 Hz cadence; ACK-driven recovery may keyframe sooner. */
-export const SNAPSHOT_KEYFRAME_INTERVAL = 40;
+/** Five seconds at the default 10 Hz cadence; ACK-driven recovery may keyframe
+ * sooner. The 50-frame interval stays below the 64-frame acknowledged-base
+ * history, preserving a margin for delayed acknowledgements. */
+export const SNAPSHOT_KEYFRAME_INTERVAL = 50;
 export const SNAPSHOT_MESSAGE_BYTES = SNAPSHOT_FRAME_HEADER_BYTES + SNAPSHOT_BYTES;
 export const NETWORK_SNAPSHOT_MESSAGE_BYTES = SNAPSHOT_FRAME_HEADER_BYTES + NETWORK_SNAPSHOT_BYTES;
 /** Ordinary latest-state packets above this size consume recovery credit. */
@@ -498,6 +501,21 @@ export function writePing(target: Uint8Array, message: Readonly<PingMessage>, po
   view.setUint32(4, message.clientTime >>> 0, true);
   view.setUint32(8, message.serverTick >>> 0, true);
   return PING_BYTES;
+}
+
+/** Keep the original PONG prefix so older peers can still read the echo. */
+export function writePongFeedback(
+  target: Uint8Array,
+  message: Readonly<PingMessage>,
+  inputsAccepted: number,
+  inputsLate: number,
+): number {
+  requireCapacity(target, PONG_FEEDBACK_BYTES);
+  writePing(target, message, true);
+  const view = new DataView(target.buffer, target.byteOffset, target.byteLength);
+  view.setUint32(PING_BYTES, inputsAccepted >>> 0, true);
+  view.setUint32(PING_BYTES + 4, inputsLate >>> 0, true);
+  return PONG_FEEDBACK_BYTES;
 }
 
 export function readPing(payload: Uint8Array, output: PingMessage): PingMessage {

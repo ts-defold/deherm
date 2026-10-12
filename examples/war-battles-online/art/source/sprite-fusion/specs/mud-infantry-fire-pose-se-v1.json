@@ -1,0 +1,6 @@
+{
+  "name": "mud-infantry-fire-pose-se-v1",
+  "operation": "edit",
+  "inputs": ["asset:9fdf7cd0-5dba-42eb-b1cc-d0de760e689c"],
+  "prompt": "Change only Mud's southeast-facing body pose: plant both boots in a low defensive stance and aim the compact sidearm forward at chest height. Keep the same rugged driver, red goggles, dark helmet, brown jacket, colors, outline, proportions, and three-quarter perspective. Keep the feet on the same ground line. No muzzle flash, projectile, new prop, platform, text, scenery, or second person."
+}

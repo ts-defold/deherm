@@ -1,0 +1,6 @@
+{
+  "name": "brass-infantry-death-directions-v1",
+  "operation": "direction-set",
+  "inputs": ["asset:06912d48-6348-40f1-95ec-973e5f6a68d2"],
+  "size": 32
+}

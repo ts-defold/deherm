@@ -22,17 +22,29 @@ test("War Battles Static Hermes projection records closed release reachability",
   assert.equal(checkedIn.projection.id, PROJECTION_ID);
   assert.equal(checkedIn.reachability.profile, "release");
   assert.equal(checkedIn.reachability.dynamicAccess, false);
-  assert.equal(checkedIn.reachability.reachableRouteCount, 32);
+  // New authored UI routes may grow the set; the reconstruction test below
+  // proves the exact list while this floor catches an accidental shrink.
+  assert.ok(checkedIn.reachability.reachableRouteCount >= 32);
   assert.ok(
     checkedIn.reachability.reachableRouteIds.includes("script:sys.get_config_int"),
     "the explicit demo/tour configuration gate must remain reachable in release builds",
   );
   assert.equal(
-    checkedIn.reachability.staticReachableRouteCount,
+    checkedIn.reachability.staticReachableRouteCount + checkedIn.reachability.blockedReachableRouteCount,
     checkedIn.reachability.reachableRouteCount,
-    "every reachable War Battles route must remain selected for Static Hermes",
+    "every reachable route must have an explicit Static Hermes disposition",
   );
-  assert.equal(checkedIn.reachability.blockedReachableRouteCount, 0);
+  assert.deepEqual(
+    checkedIn.reachability.blockedReachableRoutes.map(({ id, selection, blockers }) => ({ id, selection, blockers })),
+    [
+      {
+        id: "script:gui.pick_node",
+        selection: "blocked-capability",
+        blockers: ["current-backend:projection-emitted-backend-policy-required", "value-type:node"],
+      },
+    ],
+    "the GUI touch-pick gap is explicit and must not silently grow",
+  );
   assert.ok(checkedIn.source.authoredFiles.length > 0);
   assert.match(checkedIn.source.authoredSourceTreeSha256, /^[0-9a-f]{64}$/u);
   assert.ok(checkedIn.adapter.observedTypedNativeRouteCount > 0);

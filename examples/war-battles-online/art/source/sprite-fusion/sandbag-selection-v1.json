@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "disposition": "approved-source",
+  "request": "war-sandbag-module-v1",
+  "outputCell": [36, 32],
+  "groundLine": 28,
+  "scale": [5, 8],
+  "variants": [
+    {
+      "id": "cover-sandbag-a",
+      "index": 5,
+      "assetId": "90f37353-6b1c-4fe8-a454-0ee319c3eebe"
+    },
+    {
+      "id": "cover-sandbag-b",
+      "index": 3,
+      "assetId": "6a1af8e8-b496-403e-9d6a-08760ed2da5d"
+    }
+  ]
+}

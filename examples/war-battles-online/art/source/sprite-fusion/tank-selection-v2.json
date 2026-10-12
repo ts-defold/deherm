@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/generate-art.mjs",
+  "sourceDirectionOrder": ["se", "s", "sw", "e", "w", "ne", "n", "nw"],
+  "chassis": {
+    "scout": {
+      "hullRequest": "scout-hull-directions-v2",
+      "turretRequest": "scout-turret-directions-v2b",
+      "turretScale": 0.66,
+      "mountRegistration": {
+        "schemaVersion": 1,
+        "hullRequest": "scout-hull-directions-v2",
+        "turretRequest": "scout-turret-directions-v2b",
+        "targetCellPixel": [64, 54],
+        "hullMountByDirection": {
+          "se": [28, 20], "s": [32, 20], "sw": [36, 20], "w": [35, 20],
+          "e": [29, 20], "nw": [34, 19], "n": [32, 20], "ne": [30, 19]
+        },
+        "turretMountByDirection": {
+          "se": [30, 49], "s": [32, 53], "sw": [34, 49], "w": [34, 48],
+          "e": [30, 48], "nw": [33, 48], "n": [32, 47], "ne": [31, 48]
+        }
+      },
+      "livery": { "armorPigment": [47, 136, 146], "hullStrength": 0.86, "turretStrength": 0.94, "signature": "twin-rails", "signaturePigment": [222, 244, 227] },
+      "visualRole": "narrow arrowhead light interceptor"
+    },
+    "assault": {
+      "hullRequest": "assault-hull-directions-v2",
+      "turretRequest": "assault-turret-directions-v2",
+      "turretScale": 0.76,
+      "mountRegistration": {
+        "schemaVersion": 1,
+        "hullRequest": "assault-hull-directions-v2",
+        "turretRequest": "assault-turret-directions-v2",
+        "targetCellPixel": [64, 56],
+        "hullMountByDirection": {
+          "se": [32, 25], "s": [32, 25], "sw": [32, 25], "w": [32, 25],
+          "e": [32, 25], "nw": [32, 24], "n": [32, 24], "ne": [32, 24]
+        },
+        "turretMountByDirection": {
+          "se": [30, 46], "s": [32, 47], "sw": [34, 46], "w": [34, 46],
+          "e": [30, 46], "nw": [33, 50], "n": [32, 51], "ne": [31, 50]
+        }
+      },
+      "livery": { "armorPigment": [168, 76, 67], "hullStrength": 0.88, "turretStrength": 0.96, "signature": "breach-chevron", "signaturePigment": [255, 187, 86] },
+      "visualRole": "angular skirted linebreaker"
+    },
+    "bulwark": {
+      "hullRequest": "bulwark-hull-directions-v2",
+      "turretRequest": "bulwark-turret-directions-v2",
+      "turretScale": 0.9,
+      "mountRegistration": {
+        "schemaVersion": 1,
+        "hullRequest": "bulwark-hull-directions-v2",
+        "turretRequest": "bulwark-turret-directions-v2",
+        "targetCellPixel": [64, 56],
+        "hullMountByDirection": {
+          "se": [31, 24], "s": [32, 23], "sw": [33, 24], "w": [32, 23],
+          "e": [32, 23], "nw": [32, 22], "n": [32, 22], "ne": [32, 22]
+        },
+        "turretMountByDirection": {
+          "se": [31, 41], "s": [32, 42], "sw": [33, 41], "w": [33, 37],
+          "e": [31, 37], "nw": [33, 43], "n": [32, 43], "ne": [31, 43]
+        }
+      },
+      "livery": { "armorPigment": [126, 139, 53], "hullStrength": 0.92, "turretStrength": 0.96, "signature": "shield-bar", "signaturePigment": [229, 226, 153] },
+      "visualRole": "wide blunt armored anchor"
+    },
+    "artillery": {
+      "hullRequest": "artillery-low-deck-directions-v3b",
+      "turretRequest": "artillery-turret-directions-v2",
+      "turretScale": 1,
+      "mountRegistration": {
+        "schemaVersion": 1,
+        "hullRequest": "artillery-low-deck-directions-v3b",
+        "turretRequest": "artillery-turret-directions-v2",
+        "targetCellPixel": [64, 56],
+        "hullMountByDirection": {
+          "se": [32, 25], "s": [32, 22], "sw": [32, 25], "w": [32, 22],
+          "e": [32, 22], "nw": [32, 23], "n": [32, 19], "ne": [32, 23]
+        },
+        "turretMountByDirection": {
+          "se": [24, 40], "s": [32, 42], "sw": [40, 40], "w": [42, 43],
+          "e": [25, 43], "nw": [40, 46], "n": [32, 46], "ne": [24, 46]
+        }
+      },
+      "livery": { "armorPigment": [176, 149, 91], "hullStrength": 0.82, "turretStrength": 0.92, "signature": "range-spine", "signaturePigment": [255, 216, 131] },
+      "muzzleRepair": "two side-facing source frames touch their bounds; extend a two-pixel terminal cap into the padded runtime cell",
+      "visualRole": "long-gun siege platform"
+    }
+  }
+}

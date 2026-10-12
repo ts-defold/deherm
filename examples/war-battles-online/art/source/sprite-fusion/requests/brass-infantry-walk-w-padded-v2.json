@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_081097de-c1b1-499c-a5a0-8879843ef5c9",
+  "operation": "animate",
+  "prompt": "A grounded side-view walk loop with alternating boot contact and a small opposite-arm swing. Preserve Brass's older stocky build, snowy beard, brass-rimmed goggles, ochre cap, cream scarf, olive jacket, sidearm, colors, and exact viewing angle. Keep the complete sidearm, helmet, and both boots inside the canvas throughout the motion.",
+  "size": null,
+  "outputFrames": 4,
+  "colors": 24,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/inputs/brass-infantry-walk-pose-w-v1-1-padded-80.png",
+      "bytes": 3617,
+      "sha256": "d7b43de5382d58b923ea12257799d7951ab6c308758aa990a04d0e97109bf14d"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/brass-infantry-walk-w-padded-v2.json",
+    "sha256": "b119e7c8c6cb434f065830e9851927bb73cbb7f6bf25c8323fd153ee2df152a5"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "0faac2de-2460-4a44-8739-d81b4a4cdb62",
+      "type": "animation",
+      "contentType": "image/webp",
+      "width": 80,
+      "height": 80,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/0faac2de-2460-4a44-8739-d81b4a4cdb62/animation.webp?v=1791557529462",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-walk-w-padded-v2/00.webp",
+      "bytes": 2622,
+      "sha256": "0547c080041d191f7c03c80fa9764e04e10441e71a11bf7b51606c8ffe87484e",
+      "spritesheet": {
+        "url": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/0faac2de-2460-4a44-8739-d81b4a4cdb62/spritesheet.png?v=1791557529462",
+        "path": "art/source/sprite-fusion/outputs/brass-infantry-walk-w-padded-v2/00-sheet.png",
+        "bytes": 3157,
+        "sha256": "d1684b1a2273b69a0fe368c8f67a10952781e0a6f5f7cbbee12e3f875b0fb057"
+      },
+      "frameCount": 4,
+      "fps": 8
+    }
+  ],
+  "credits": {
+    "remaining": 150
+  }
+}

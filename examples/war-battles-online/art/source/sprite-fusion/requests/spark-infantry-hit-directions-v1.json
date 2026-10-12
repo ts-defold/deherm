@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_8a353cd3-e9e9-4272-b513-3f02c3389dc8",
+  "operation": "direction-set",
+  "prompt": null,
+  "size": 32,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "05cdc1ce-25b6-4fd2-aaa6-dae51d622dcf"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/spark-infantry-hit-directions-v1.json",
+    "sha256": "eb92a9cb583a73906aa59b4faf3d2805d8c43cc0ca9f969a6960f14f870144d5"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "9ea37915-92a7-454b-bd0f-0a486ae548f2",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 61,
+      "height": 61,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/9ea37915-92a7-454b-bd0f-0a486ae548f2/image.png?v=1791536144042",
+      "path": "art/source/sprite-fusion/outputs/spark-infantry-hit-directions-v1/00.png",
+      "bytes": 4128,
+      "sha256": "c24c25b39b6ac281eea8e028623dee11437ff0a00cafffd7ee9758f03cafcfc0"
+    },
+    {
+      "index": 1,
+      "assetId": "643e54a3-77fa-4968-98ab-b49604fc7443",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 43,
+      "height": 43,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/643e54a3-77fa-4968-98ab-b49604fc7443/image.png?v=1791536144663",
+      "path": "art/source/sprite-fusion/outputs/spark-infantry-hit-directions-v1/01.png",
+      "bytes": 2663,
+      "sha256": "e0a8b7763c1d2ea8901f370258274b2bc94c8d267cf63f3affdbb7529e1aaf83"
+    },
+    {
+      "index": 2,
+      "assetId": "4585076f-fdf2-4fd7-a999-44ca50e3ef81",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 43,
+      "height": 43,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/4585076f-fdf2-4fd7-a999-44ca50e3ef81/image.png?v=1791536145259",
+      "path": "art/source/sprite-fusion/outputs/spark-infantry-hit-directions-v1/02.png",
+      "bytes": 3043,
+      "sha256": "710f72ef586a26b832ee7b0d3542e2186519fa2c0fb4a764691afd4f49f5d0de"
+    },
+    {
+      "index": 3,
+      "assetId": "6585be9d-0ab7-4f37-81da-e5382ed59f51",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 48,
+      "height": 48,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/6585be9d-0ab7-4f37-81da-e5382ed59f51/image.png?v=1791536145865",
+      "path": "art/source/sprite-fusion/outputs/spark-infantry-hit-directions-v1/03.png",
+      "bytes": 2665,
+      "sha256": "c27599fa04a78bb3ba9f67da6f66a48ebd3f6bd341057ecb361db3a1caaf2d53"
+    },
+    {
+      "index": 4,
+      "assetId": "4a5af608-ccd9-4d6e-b9d6-718adbdb4fa1",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 49,
+      "height": 49,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/4a5af608-ccd9-4d6e-b9d6-718adbdb4fa1/image.png?v=1791536146456",
+      "path": "art/source/sprite-fusion/outputs/spark-infantry-hit-directions-v1/04.png",
+      "bytes": 2855,
+      "sha256": "57149ed55bf9203480c1387278a31fea97d54fb698733bb93519b4839eceaa82"
+    },
+    {
+      "index": 5,
+      "assetId": "97a04b15-645a-4562-ad13-d874d30e6558",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 45,
+      "height": 45,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/97a04b15-645a-4562-ad13-d874d30e6558/image.png?v=1791536147060",
+      "path": "art/source/sprite-fusion/outputs/spark-infantry-hit-directions-v1/05.png",
+      "bytes": 2424,
+      "sha256": "8305cd074300c615d56093d8aa1ab1fc4c0f6172e2d46bf12e1f8bf0b93811c8"
+    },
+    {
+      "index": 6,
+      "assetId": "5b8b477f-8319-4de5-b52e-692555a393d4",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 49,
+      "height": 49,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/5b8b477f-8319-4de5-b52e-692555a393d4/image.png?v=1791536147694",
+      "path": "art/source/sprite-fusion/outputs/spark-infantry-hit-directions-v1/06.png",
+      "bytes": 2904,
+      "sha256": "d54e4c18e406c34626ea16fedac0852b04edf6188d4988d112b27e3536c5cb97"
+    },
+    {
+      "index": 7,
+      "assetId": "9fd9b9a3-d3cd-4c5a-9f82-3e1db0f54759",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 48,
+      "height": 48,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/9fd9b9a3-d3cd-4c5a-9f82-3e1db0f54759/image.png?v=1791536148256",
+      "path": "art/source/sprite-fusion/outputs/spark-infantry-hit-directions-v1/07.png",
+      "bytes": 2883,
+      "sha256": "b601c1fd8cd929a7d4f8c0872d36541f4b5fa80c4239a6a01128de1d48120200"
+    }
+  ],
+  "credits": {
+    "remaining": 540
+  }
+}

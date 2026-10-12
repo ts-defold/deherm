@@ -22,10 +22,14 @@
 // file and lean only on `node:zlib`.
 
 import { createHash } from "node:crypto";
-import { mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, statSync, unlinkSync, writeFileSync } from "node:fs";
 import { dirname, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { deflateSync, inflateSync } from "node:zlib";
+import { loadHexFamilySources, readHexSourceSelection } from "./hex-source-selection.mjs";
+import { paintTankArmor } from "./tank-livery.mjs";
+import { tankLayerPlacement } from "./tank-registration.mjs";
+import { HEX_CLIFF_VARIANT_COUNT } from "../core/hex-cliffs.ts";
 
 import {
   ARENA_DECOR_ROLE_COUNT,
@@ -40,12 +44,13 @@ import {
   ARENA_DECOR_ROLE_PIPE_JUNCTION,
   ARENA_DECOR_ROLE_PIPE_RUN,
   ARENA_DECOR_ROLE_SCORCH,
-  ARENA_DECOR_ROLE_SERVICE_ROAD_BASE,
   ARENA_DECOR_ROLE_SHELL_CASES,
   ARENA_DECOR_ROLE_STAGING_PAD_BASE,
   ARENA_DECOR_ROLE_STONES,
   ARENA_DECOR_ROLE_THERMAL_VENT,
   ARENA_DECOR_ROLE_TRACKS,
+  ARENA_GROUND_ROLE_BORDER_BASE,
+  ARENA_GROUND_ROLE_COUNT,
   ARENA_GROUND_ROLE_WALL_BASE,
   ARENA_GROUND_VARIANT_COUNT,
   ARENA_LANDSCAPE_MASK_COUNT,
@@ -69,7 +74,12 @@ const worldArtRoot = resolve(assetsRoot, "derived", "world");
 const mainRoot = resolve(projectRoot, "main");
 const sourceRoot = resolve(projectRoot, "src");
 const spriteFusionRoot = resolve(exampleRoot, "art", "source", "sprite-fusion");
+const coniferSelectionPath = resolve(spriteFusionRoot, "conifer-selection-v1.json");
+const lowCoverSelectionPath = resolve(spriteFusionRoot, "low-cover-selection-v1.json");
+const sandbagSelectionPath = resolve(spriteFusionRoot, "sandbag-selection-v1.json");
 const landmarkSourceRoot = resolve(exampleRoot, "art", "source", "openai", "world-landmarks-v1");
+const pickupSourceRoot = resolve(exampleRoot, "art", "source", "openai", "pickups-v1");
+const coverSourceRoot = resolve(exampleRoot, "art", "source", "openai", "cover-v1");
 
 /** Fixed seed keeps every noise field and scatter byte-reproducible. */
 const SEED = 0x41524e41; // "ARNA"
@@ -721,20 +731,32 @@ const TEAM_ORDER = ["blue", "red", "green", "sand"];
 
 const PRODUCTION_TANK_CELL = 128;
 const TANK_CHASSIS = Object.freeze(["scout", "assault", "bulwark", "artillery"]);
-// Sprite Fusion's API emits this stable index order. Keep the transport order
-// explicit and give the rest of the project compass names instead of numeric
-// asset indices.
+// The selected Sprite Fusion direction sets return side and rear-diagonal
+// pairs in the opposite index order to our game-facing compass contract.
+// Verify against the pinned source gallery when replacing any request set.
 const TANK_DIRECTIONS = Object.freeze([
   Object.freeze({ id: "se", sourceIndex: 0 }),
   Object.freeze({ id: "s", sourceIndex: 1 }),
   Object.freeze({ id: "sw", sourceIndex: 2 }),
-  Object.freeze({ id: "w", sourceIndex: 3 }),
-  Object.freeze({ id: "e", sourceIndex: 4 }),
-  Object.freeze({ id: "nw", sourceIndex: 5 }),
+  Object.freeze({ id: "w", sourceIndex: 4 }),
+  Object.freeze({ id: "e", sourceIndex: 3 }),
+  Object.freeze({ id: "nw", sourceIndex: 7 }),
   Object.freeze({ id: "n", sourceIndex: 6 }),
-  Object.freeze({ id: "ne", sourceIndex: 7 }),
+  Object.freeze({ id: "ne", sourceIndex: 5 }),
 ]);
 const productionTankSourceCache = new Map();
+const productionTankSelectionPath = resolve(spriteFusionRoot, "tank-selection-v2.json");
+const productionTankSelectionBytes = readFileSync(productionTankSelectionPath);
+const productionTankSelection = JSON.parse(productionTankSelectionBytes.toString("utf8"));
+if (
+  productionTankSelection.schemaVersion !== 1 ||
+  productionTankSelection.owner !== "tools/generate-art.mjs" ||
+  JSON.stringify(productionTankSelection.sourceDirectionOrder) !==
+    JSON.stringify([...TANK_DIRECTIONS].sort((a, b) => a.sourceIndex - b.sourceIndex).map(({ id }) => id)) ||
+  TANK_CHASSIS.some((chassis) => !productionTankSelection.chassis?.[chassis]?.livery)
+) {
+  throw new Error("production tank source selection is incomplete or has an incompatible direction order");
+}
 
 function tankDepotSprite() {
   const selectionPath = resolve(spriteFusionRoot, "selection.json");
@@ -799,7 +821,8 @@ function loadProductionTankSource(chassis, layer, direction) {
   }
   const directionSpec = TANK_DIRECTIONS.find((candidate) => candidate.id === direction);
   if (!directionSpec) throw new Error(`unknown production tank direction ${direction}`);
-  const requestName = `${chassis}-${layer}-directions-v1`;
+  const selected = productionTankSelection.chassis[chassis];
+  const requestName = layer === "hull" ? selected.hullRequest : selected.turretRequest;
   const manifestPath = resolve(spriteFusionRoot, "requests", `${requestName}.json`);
   const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
   if (manifest.schemaVersion !== 1 || manifest.owner !== "tools/sprite-fusion.mjs") {
@@ -837,6 +860,14 @@ function productionTankColor(red, green, blue, alpha, team) {
     const targetHue = { red: 0, green: 145, sand: 42 }[team];
     const source = rgbToHsl(red, green, blue);
     const [tintedRed, tintedGreen, tintedBlue] = hslToRgb(targetHue, source.s, source.l);
+    return [tintedRed, tintedGreen, tintedBlue, alpha];
+  }
+  // The v2 silhouettes use small orange signal panels instead of the old
+  // blue identity slots. Retint those panels only; the armor material is shared.
+  if (red > 116 && red > green * 1.28 && green > blue * 1.23 && red - blue > 58) {
+    const targetHue = { blue: 212, red: 5, green: 145, sand: 42 }[team];
+    const source = rgbToHsl(red, green, blue);
+    const [tintedRed, tintedGreen, tintedBlue] = hslToRgb(targetHue, Math.max(source.s, 0.68), source.l);
     return [tintedRed, tintedGreen, tintedBlue, alpha];
   }
   return [red, green, blue, alpha];
@@ -880,25 +911,64 @@ function productionTankLayer(chassis, layer, direction, team, frame = 0) {
   const source = loadProductionTankSource(chassis, layer, direction);
   const target = new Canvas(PRODUCTION_TANK_CELL, PRODUCTION_TANK_CELL);
   target.rotationAnchor = [PRODUCTION_TANK_CELL / 2, PRODUCTION_TANK_CELL / 2];
-  const offsetX = Math.floor((PRODUCTION_TANK_CELL - source.image.width) / 2);
-  const offsetY = Math.floor((PRODUCTION_TANK_CELL - source.image.height) / 2);
-  for (let y = 0; y < source.image.height; y += 1) {
-    for (let x = 0; x < source.image.width; x += 1) {
-      const index = (y * source.image.width + x) * 4;
+  const selected = productionTankSelection.chassis[chassis];
+  const scale = layer === "turret" ? selected.turretScale : 1;
+  const placement = tankLayerPlacement(
+    selected,
+    layer,
+    direction,
+    source.image.width,
+    source.image.height,
+    PRODUCTION_TANK_CELL,
+  );
+  const { x: offsetX, y: offsetY, width: drawnWidth, height: drawnHeight } = placement;
+  for (let y = 0; y < drawnHeight; y += 1) {
+    for (let x = 0; x < drawnWidth; x += 1) {
+      const sourceX = Math.min(source.image.width - 1, Math.floor(x / scale));
+      const sourceY = Math.min(source.image.height - 1, Math.floor(y / scale));
+      const index = (sourceY * source.image.width + sourceX) * 4;
       const alpha = source.image.data[index + 3];
       if (alpha < 32) continue;
+      // Team identity belongs to the source's signal slots. Class armor and
+      // markings are a separate pass so an orange class mark cannot be
+      // mistaken for a team slot and recolored away.
+      const teamPixel = productionTankColor(
+        source.image.data[index],
+        source.image.data[index + 1],
+        source.image.data[index + 2],
+        alpha,
+        team,
+      );
       target.set(
         offsetX + x,
         offsetY + y,
-        productionTankColor(
-          source.image.data[index],
-          source.image.data[index + 1],
-          source.image.data[index + 2],
-          alpha,
-          team,
-        ),
+        paintTankArmor(...teamPixel, productionTankSelection.chassis[chassis].livery, layer, {
+          x: sourceX,
+          y: sourceY,
+          width: source.image.width,
+          height: source.image.height,
+          direction,
+        }),
       );
     }
+  }
+  // The artillery direction-set extends two side-facing muzzle tips exactly to
+  // its source bounds. Recover a bounded terminal cap in our padded 128px cell
+  // so those frames do not end in a cropped, flat barrel edge.
+  if (chassis === "artillery" && layer === "turret" && (direction === "w" || direction === "e")) {
+    const side = direction === "w" ? -1 : 1;
+    const edgeX = side < 0 ? offsetX : offsetX + drawnWidth - 1;
+    const sourceEdgeX = side < 0 ? 0 : source.image.width - 1;
+    const edgeRows = [];
+    for (let y = 0; y < source.image.height; y += 1) {
+      if (source.image.data[(y * source.image.width + sourceEdgeX) * 4 + 3] >= 128) edgeRows.push(y);
+    }
+    if (edgeRows.length < 3 || edgeRows.length > 8) throw new Error(`artillery ${direction} muzzle source changed`);
+    for (const y of edgeRows) target.set(edgeX + side, offsetY + y, target.get(edgeX, offsetY + y));
+    const centerY = offsetY + Math.floor((edgeRows[0] + edgeRows[edgeRows.length - 1]) / 2);
+    target.set(edgeX + side * 2, centerY - 1, [28, 23, 25, 255]);
+    target.set(edgeX + side * 2, centerY, productionTankColor(225, 85, 9, 255, team));
+    target.set(edgeX + side * 2, centerY + 1, [28, 23, 25, 255]);
   }
   if (layer === "hull" && frame === 1) {
     animateProductionTankTracks(
@@ -1077,38 +1147,9 @@ function referenceValue(source, x, y, phase = 0) {
 
 /** Build one seamless terrain macro instead of a screen-visible repeated stamp. */
 function groundMacro() {
-  const canvas = new Canvas(GROUND_MACRO_EDGE, GROUND_MACRO_EDGE);
-  const meadow = landscapeSources().meadow;
-  for (let y = 0; y < GROUND_MACRO_EDGE; y += 1) {
-    for (let x = 0; x < GROUND_MACRO_EDGE; x += 1) {
-      const broad = tileNoise(x, y, GROUND_MACRO_EDGE, 5, SEED + 1701);
-      const middle = tileNoise(x, y, GROUND_MACRO_EDGE, 13, SEED + 1713);
-      const reflectedX = Math.min(x, GROUND_MACRO_EDGE - 1 - x);
-      const reflectedY = Math.min(y, GROUND_MACRO_EDGE - 1 - y);
-      const reference = referenceValue(meadow, reflectedX, reflectedY);
-      let color = C.groundBase;
-      if (broad < 0.22 || (reference.alpha > 0.5 && reference.light < 0.27)) color = C.groundDark;
-      else if (broad > 0.82 && reference.light > 0.62) color = C.groundLight;
-      if (middle < 0.018) color = C.groundDeep;
-      canvas.set(x, y, color);
-    }
-  }
-
-  // Sparse grass and worn soil cross tile boundaries inside the macro. That
-  // breaks the stamp-grid silhouette while keeping the battlefield quiet
-  // enough for projectiles and pickups to read.
-  for (let mark = 0; mark < 36; mark += 1) {
-    const x = Math.floor(hash2(mark, 11, SEED + 1801) * GROUND_MACRO_EDGE);
-    const y = Math.floor(hash2(23, mark, SEED + 1811) * GROUND_MACRO_EDGE);
-    const rising = hash2(x, y, SEED + 1823) > 0.5;
-    canvas.set(x, y, C.groundDark);
-    canvas.set(
-      (x + 1) % GROUND_MACRO_EDGE,
-      (y + (rising ? -1 : 1) + GROUND_MACRO_EDGE) % GROUND_MACRO_EDGE,
-      C.groundLight,
-    );
-  }
-  return canvas;
+  // Legacy square-grid ground roles remain addressable for generated ABI
+  // stability, but are not drawn. The separate hex tilemap owns the floor.
+  return new Canvas(GROUND_MACRO_EDGE, GROUND_MACRO_EDGE);
 }
 
 const GROUND_MACRO = groundMacro();
@@ -1118,7 +1159,8 @@ function groundTile(variant) {
   if (variant >= ARENA_MEADOW_VARIANT_COUNT) return landscapeTile(variant);
   const canvas = new Canvas(TILE, TILE);
   const originX = (variant % GROUND_MACRO_TILES) * TILE;
-  const originY = Math.floor(variant / GROUND_MACRO_TILES) * TILE;
+  // PNG rows descend; Defold cells ascend. Reverse whole macro cell rows.
+  const originY = (GROUND_MACRO_TILES - 1 - Math.floor(variant / GROUND_MACRO_TILES)) * TILE;
   for (let y = 0; y < TILE; y += 1) {
     for (let x = 0; x < TILE; x += 1) canvas.set(x, y, GROUND_MACRO.get(originX + x, originY + y));
   }
@@ -1201,14 +1243,115 @@ function landscapeTile(role) {
   return canvas;
 }
 
-function paintBoulder(canvas, cx, cy, radius, phase) {
-  canvas.disc(cx, cy + 1, radius + 1, C.outline);
-  canvas.disc(cx, cy, radius, phase % 2 === 0 ? C.treadDark : C.shadowDeep);
-  canvas.disc(cx - 0.5, cy - 0.5, Math.max(1, radius - 1), phase % 3 === 0 ? C.woodDark : C.groundDeep);
-  canvas.set(Math.floor(cx - 1), Math.floor(cy - 1), phase % 2 === 0 ? C.dustMid : C.groundLight);
+const HEX_CLIFF_SOURCES = Object.freeze([
+  { role: "B", request: "frontier-hex-basalt-cliff-v1", index: 0 },
+  { role: "B", request: "frontier-hex-basalt-cliff-v1", index: 4 },
+  { role: "B", request: "frontier-hex-basalt-cliff-v1", index: 8 },
+  { role: "A", request: "frontier-hex-ash-ridge-v1", index: 0 },
+  { role: "A", request: "frontier-hex-ash-ridge-v1", index: 5 },
+  { role: "A", request: "frontier-hex-ash-ridge-v1", index: 9 },
+  { role: "A", request: "frontier-hex-lava-fracture-v1", index: 1 },
+  { role: "A", request: "frontier-hex-lava-fracture-v1", index: 6 },
+  { role: "A", request: "frontier-hex-lava-fracture-v1", index: 7 },
+  { role: "G", request: "frontier-hex-meadow-cliff-v1", index: 4 },
+  { role: "G", request: "frontier-hex-meadow-cliff-v1", index: 6 },
+  { role: "G", request: "frontier-hex-meadow-cliff-v1", index: 9 },
+  { role: "D", request: "frontier-hex-ochre-cliff-v1", index: 6 },
+  { role: "D", request: "frontier-hex-ochre-cliff-v1", index: 7 },
+  { role: "D", request: "frontier-hex-ochre-cliff-v1", index: 8 },
+  { role: "M", request: "frontier-hex-service-deck-v1", index: 6 },
+  { role: "M", request: "frontier-hex-service-deck-v1", index: 7 },
+  { role: "M", request: "frontier-hex-service-deck-v1", index: 8 },
+]);
+if (HEX_CLIFF_SOURCES.length !== HEX_CLIFF_VARIANT_COUNT)
+  throw new Error("hex cliff source count disagrees with runtime");
+const hexLandformSourceCache = new Map();
+function hexLandformSources(role) {
+  if (hexLandformSourceCache.has(role)) return hexLandformSourceCache.get(role);
+  const { selection } = readHexSourceSelection(exampleRoot);
+  const sources = loadHexFamilySources(exampleRoot, selection, role, decodePng);
+  hexLandformSourceCache.set(role, sources);
+  return sources;
+}
+const hexCoverSources = () => hexLandformSources("B");
+
+function hexCliffSprite(variant) {
+  const descriptor = HEX_CLIFF_SOURCES[variant];
+  if (!descriptor) throw new Error(`hex cliff variant ${variant} is not declared`);
+  const source = hexLandformSources(descriptor.role).find(
+    (candidate) => candidate.request === descriptor.request && candidate.index === descriptor.index,
+  )?.image;
+  if (!source) throw new Error(`hex cliff variant ${variant} is missing its source`);
+  let minX = source.width;
+  let minY = source.height;
+  let maxX = -1;
+  let maxY = -1;
+  for (let y = 0; y < source.height; y++) {
+    for (let x = 0; x < source.width; x++) {
+      if (source.data[(y * source.width + x) * 4 + 3] < 128) continue;
+      minX = Math.min(minX, x);
+      minY = Math.min(minY, y);
+      maxX = Math.max(maxX, x);
+      maxY = Math.max(maxY, y);
+    }
+  }
+  if (maxX < minX || minX <= 0 || minY <= 0 || maxX >= source.width - 1 || maxY >= source.height - 1)
+    throw new Error(`hex cliff variant ${variant} is empty or clipped at its source boundary`);
+  const sourceWidth = maxX - minX + 1;
+  const sourceHeight = maxY - minY + 1;
+  const scale = Math.min(1.4, 76 / sourceWidth, 68 / sourceHeight);
+  const targetWidth = Math.max(1, Math.round(sourceWidth * scale));
+  const targetHeight = Math.max(1, Math.round(sourceHeight * scale));
+  const canvas = new Canvas(160, 128);
+  const targetX = Math.floor((canvas.width - targetWidth) / 2);
+  const targetY = 121 - targetHeight;
+  for (let y = 0; y < targetHeight; y++) {
+    const sy = minY + Math.min(sourceHeight - 1, Math.floor((y * sourceHeight) / targetHeight));
+    for (let x = 0; x < targetWidth; x++) {
+      const sx = minX + Math.min(sourceWidth - 1, Math.floor((x * sourceWidth) / targetWidth));
+      const offset = (sy * source.width + sx) * 4;
+      if (source.data[offset + 3] >= 128) {
+        const red = source.data[offset];
+        const green = source.data[offset + 1];
+        const blue = source.data[offset + 2];
+        // The source's mustard top is a useful raised-hex shape, but a literal
+        // copy breaks the meadow's palette in the live scene. Only its warm
+        // top-face pixels become grass; the dark front face becomes warm stone.
+        // Both keep their source value structure and their pinned source pixels.
+        const top =
+          descriptor.role === "G" && sy < minY + sourceHeight * 0.58 && green >= red * 0.82 && blue < green * 0.65;
+        const side = descriptor.role === "G" && sy >= minY + sourceHeight * 0.48 && blue >= green * 0.9;
+        const colour = top
+          ? [Math.round(red * 0.65), Math.round(green * 0.93), Math.round(green * 0.43), 255]
+          : side
+            ? [Math.round(red * 1.2), Math.round(green * 0.91), Math.round(blue * 0.75), 255]
+            : [red, green, blue, 255];
+        canvas.set(targetX + x, targetY + y, colour);
+      }
+    }
+  }
+  const bounds = canvas.opaqueBbox();
+  if (!bounds || bounds[3] !== 120) throw new Error(`hex cliff variant ${variant} has no bottom-registered contact`);
+  return canvas;
 }
 
-/** A low, porous rock field: visible collision cover without raised Lego slabs. */
+function paintBoulder(canvas, cx, cy, radius, phase) {
+  const source = hexCoverSources()[phase % hexCoverSources().length].image;
+  canvas.disc(cx, cy + 1, radius + 1, C.shadowDeep);
+  for (let y = Math.floor(cy - radius); y <= Math.ceil(cy + radius); y++) {
+    for (let x = Math.floor(cx - radius); x <= Math.ceil(cx + radius); x++) {
+      const dx = x - cx;
+      const dy = y - cy;
+      if (dx * dx + dy * dy > radius * radius) continue;
+      const sx = 32 + Math.round(dx * 3);
+      const sy = 22 + Math.round(dy * 2);
+      const offset = (sy * source.width + sx) * 4;
+      if (source.data[offset + 3] >= 128) canvas.set(x, y, source.data.subarray(offset, offset + 4));
+    }
+  }
+}
+
+/** A low, porous rock field for internal bunkers. */
 function wallTile(edges) {
   const canvas = new Canvas(TILE, TILE);
   const edgePhase = edges.reduce((value, edge) => value + edge.charCodeAt(0), 0);
@@ -1219,7 +1362,6 @@ function wallTile(edges) {
     [4, 10, 3],
     [10, 9, 3],
     [13, 13, 2],
-    [6, 14, 2],
   ];
   rocks.forEach(([baseX, baseY, radius], index) => {
     const phase = edgePhase + index * 17;
@@ -1227,6 +1369,34 @@ function wallTile(edges) {
     const y = baseY + (((phase >> 2) % 3) - 1);
     paintBoulder(canvas, x, y, radius, phase);
   });
+  return canvas;
+}
+
+/** A thin guarded rim retained for the stable tile contract. */
+function borderRimTile(edges) {
+  const canvas = new Canvas(TILE, TILE);
+  const paint = (x, y, distance, along) => {
+    const grain = hash2(x, y, SEED + 0x424f_5244);
+    const color =
+      distance === 0
+        ? C.outline
+        : distance === 1
+          ? C.metalLight
+          : along % 8 < 4 && grain > 0.2
+            ? C.goldDark
+            : C.metalDark;
+    canvas.set(x, y, color);
+  };
+  // The generated border role remains available to consumers, but the game
+  // now presents its solid perimeter as large grounded rock anchors instead.
+  for (let along = 4; along < TILE - 4; along++) {
+    for (let distance = 0; distance < 3; distance++) {
+      if (edges.includes("N")) paint(along, distance, distance, along);
+      if (edges.includes("S")) paint(along, TILE - 1 - distance, distance, along);
+      if (edges.includes("E")) paint(TILE - 1 - distance, along, distance, along);
+      if (edges.includes("W")) paint(distance, along, distance, along);
+    }
+  }
   return canvas;
 }
 
@@ -1266,91 +1436,97 @@ function crateTile() {
 }
 
 /**
- * Sandbags. The bag grid wraps in both axes so a run of sandbag tiles reads as
- * one continuous barrier; each bag carries its own dark seam instead of the
- * shared silhouette outline, which would otherwise cut the barrier at a seam.
+ * One low sandbag barricade module. The old four-row overhead weave filled
+ * every pixel of a 5x2 cover stamp and read as a flat square carpet over the
+ * hex world. A continuous dark plinth preserves the blocked footprint, while
+ * two raised, rounded bags per module establish the isometric cover height.
  */
 function sandbagTile() {
   const canvas = new Canvas(TILE, TILE);
-  const bagWidth = 8;
-  const bagHeight = 4;
-  for (let row = 0; row < TILE / bagHeight; ++row) {
-    const offset = row % 2 === 0 ? 0 : bagWidth / 2;
-    for (let x = 0; x < TILE; ++x) {
-      const local = (((x - offset) % bagWidth) + bagWidth) % bagWidth;
-      for (let j = 0; j < bagHeight; ++j) {
-        const y = row * bagHeight + j;
-        let color;
-        if (j === bagHeight - 1 || local === bagWidth - 1) color = C.woodDark;
-        else if (j === 0) {
-          if (local === 0) color = C.woodDark; // rounded bag corner
-          else if (local === 1 || local >= bagWidth - 2) color = C.dustMid;
-          else color = C.dustLight;
-        } else if (j === 1) color = local === 0 ? C.woodBase : C.dustLight;
-        else color = local === 0 ? C.woodBase : C.dustMid;
-        canvas.set(x, y, color);
+  for (let y = 10; y < TILE; y += 1) {
+    for (let x = 0; x < TILE; x += 1) {
+      const color = y === 15 ? C.outline : y >= 12 ? C.woodDark : C.woodBase;
+      canvas.set(x, y, color);
+    }
+  }
+  for (const startX of [0, 8]) {
+    for (let y = 3; y <= 9; y += 1) {
+      for (let localX = 0; localX < 8; localX += 1) {
+        const inset = y === 3 || y === 9 ? 2 : y === 4 || y === 8 ? 1 : 0;
+        if (localX < inset || localX >= 8 - inset) continue;
+        const color =
+          y === 9 || localX === 0 || localX === 7
+            ? C.woodDark
+            : y <= 4
+              ? localX >= 2 && localX <= 5
+                ? C.dustLight
+                : C.dustMid
+              : y <= 6
+                ? C.dustMid
+                : C.woodBase;
+        canvas.set(startX + localX, y, color);
       }
     }
   }
   return canvas;
 }
 
-/**
- * Spawn pad: two painted chevrons pointing +X. Floor paint gets a darker gold
- * leading edge rather than the sprite silhouette outline, so it reads as paint
- * on the ground instead of an object standing on it.
- */
-function spawnPadTile() {
+/** A small hexagonal floor inlay, never the square-grid arrows or pedestal. */
+function hexPadTile(rim, face, center) {
   const canvas = new Canvas(TILE, TILE);
-  for (const originX of [2, 7]) {
-    for (let step = 0; step <= 5; ++step) {
-      canvas.set(originX + step - 1, 2 + step, C.goldDark);
-      canvas.set(originX + step, 2 + step, C.goldLight);
-      canvas.set(originX + step + 1, 2 + step, C.goldBase);
-      canvas.set(originX + step - 1, 13 - step, C.goldDark);
-      canvas.set(originX + step, 13 - step, C.goldBase);
-      canvas.set(originX + step + 1, 13 - step, C.goldBase);
+  for (let y = 2; y <= 13; y += 1) {
+    for (let x = 2; x <= 13; x += 1) {
+      const dx = Math.abs(x - 7.5);
+      const dy = Math.abs(y - 7.5);
+      // Pointy hex: narrow at its tips, wide through its shoulder.
+      if (dy > 5.5 || dx > 5.5 - dy * 0.48) continue;
+      const edge = dy > 4.2 || dx > 4.3 - dy * 0.48;
+      canvas.set(x, y, edge ? rim : face);
     }
   }
-  for (const [cx, cy, sx, sy] of [
-    [0, 0, 1, 1],
-    [15, 0, -1, 1],
-    [0, 15, 1, -1],
-    [15, 15, -1, -1],
-  ]) {
-    for (let i = 0; i < 3; ++i) {
-      canvas.set(cx + i * sx, cy, C.goldDark);
-      canvas.set(cx, cy + i * sy, C.goldDark);
-    }
-  }
+  canvas.set(7, 7, center);
+  canvas.set(8, 7, center);
+  canvas.set(7, 8, center);
+  canvas.set(8, 8, center);
   return canvas;
 }
 
-/** Pickup pad: a cool blue painted ring, deliberately unlike the gold spawn. */
+function spawnPadTile() {
+  return hexPadTile(C.goldDark, C.metalDark, C.goldLight);
+}
+
+/** Pickup pad: a restrained blue hex floor inlay below the world-space item. */
 function pickupPadTile() {
-  const canvas = new Canvas(TILE, TILE);
-  const cx = 7.5;
-  const cy = 7.5;
-  for (let y = 0; y < TILE; ++y) {
-    for (let x = 0; x < TILE; ++x) {
-      const d = Math.hypot(x - cx, y - cy);
-      if (d <= 6.4 && d >= 5.0) canvas.set(x, y, C.skyBlue);
-      else if (d <= 5.0 && d >= 4.2) canvas.set(x, y, C.seaBlue);
+  return hexPadTile(C.deepBlue, C.metalDark, C.skyBlue);
+}
+
+/** A full world-space 2:1 hex footprint, registered at its floor centre. */
+function isometricFloorMarker(kind) {
+  const canvas = new Canvas(48, 24);
+  const spawn = kind === "spawn";
+  const rim = spawn ? C.goldDark : C.deepBlue;
+  const highlight = spawn ? C.goldLight : C.skyBlue;
+  for (let y = 1; y <= 21; y += 1) {
+    const shoulder = y <= 6 ? y - 1 : y <= 16 ? 5 : 21 - y;
+    const halfWidth = 5 + shoulder * 3.7;
+    const left = Math.ceil(23.5 - halfWidth);
+    const right = Math.floor(23.5 + halfWidth);
+    for (let x = left; x <= right; x += 1) {
+      const edge = y <= 2 || y >= 20 || x <= left + 1 || x >= right - 1;
+      if (edge) canvas.set(x, y, rim);
     }
   }
-  for (const [x, y] of [
-    [7, 0],
-    [8, 0],
-    [7, 15],
-    [8, 15],
-    [0, 7],
-    [0, 8],
-    [15, 7],
-    [15, 8],
-  ]) {
-    canvas.set(x, y, C.seaBlue);
+  // Leave the whole inner footprint transparent. The previous dark fill was
+  // wider than the inlaid opening and read as a gray square in the live world.
+  canvas.hline(17, 30, 5, highlight);
+  canvas.hline(17, 30, 17, highlight);
+  if (spawn) {
+    canvas.hline(21, 26, 10, highlight);
+    canvas.hline(23, 24, 11, highlight);
+  } else {
+    canvas.hline(21, 26, 10, highlight);
+    canvas.vline(23, 8, 13, highlight);
   }
-  outline(canvas, C.deepBlue);
   return canvas;
 }
 
@@ -1411,40 +1587,6 @@ function scorchTile() {
   }
   canvas.set(6, 7, C.emberDeep);
   canvas.set(9, 8, C.ember);
-  return canvas;
-}
-
-/** Transparent dirt service lane selected by a four-neighbour road mask. */
-function serviceRoadTile(mask) {
-  const canvas = new Canvas(TILE, TILE);
-  const paint = (x0, y0, x1, y1) => {
-    for (let y = y0; y <= y1; y += 1) {
-      for (let x = x0; x <= x1; x += 1) {
-        const edge = x === x0 || x === x1 || y === y0 || y === y1;
-        const fleck = hash2(x, y, SEED + 6203) > 0.84;
-        canvas.set(x, y, edge ? C.groundDark : fleck ? C.dustLight : C.dustMid);
-      }
-    }
-  };
-  paint(2, 2, 13, 13);
-  if (mask & ARENA_WALL_MASK_BITS.north) paint(2, 8, 13, 15);
-  if (mask & ARENA_WALL_MASK_BITS.south) paint(2, 0, 13, 7);
-  if (mask & ARENA_WALL_MASK_BITS.east) paint(8, 2, 15, 13);
-  if (mask & ARENA_WALL_MASK_BITS.west) paint(0, 2, 7, 13);
-
-  // Paired worn ruts keep a long lane readable after the 2:1 projection.
-  if (mask & (ARENA_WALL_MASK_BITS.north | ARENA_WALL_MASK_BITS.south)) {
-    for (let y = 1; y < TILE; y += 3) {
-      if (canvas.alpha(5, y) !== 0) canvas.set(5, y, C.groundDeep);
-      if (canvas.alpha(10, y) !== 0) canvas.set(10, y, C.groundDeep);
-    }
-  }
-  if (mask & (ARENA_WALL_MASK_BITS.east | ARENA_WALL_MASK_BITS.west)) {
-    for (let x = 1; x < TILE; x += 3) {
-      if (canvas.alpha(x, 5) !== 0) canvas.set(x, 5, C.groundDeep);
-      if (canvas.alpha(x, 10) !== 0) canvas.set(x, 10, C.groundDeep);
-    }
-  }
   return canvas;
 }
 
@@ -1581,6 +1723,15 @@ function buildTileSheet() {
     { role: "wall.nw", layer: "ground", canvas: wallTile(["N", "W"]) },
     { role: "wall.se", layer: "ground", canvas: wallTile(["S", "E"]) },
     { role: "wall.sw", layer: "ground", canvas: wallTile(["S", "W"]) },
+    { role: "border.centre", layer: "ground", canvas: borderRimTile([]) },
+    { role: "border.n", layer: "ground", canvas: borderRimTile(["N"]) },
+    { role: "border.s", layer: "ground", canvas: borderRimTile(["S"]) },
+    { role: "border.e", layer: "ground", canvas: borderRimTile(["E"]) },
+    { role: "border.w", layer: "ground", canvas: borderRimTile(["W"]) },
+    { role: "border.ne", layer: "ground", canvas: borderRimTile(["N", "E"]) },
+    { role: "border.nw", layer: "ground", canvas: borderRimTile(["N", "W"]) },
+    { role: "border.se", layer: "ground", canvas: borderRimTile(["S", "E"]) },
+    { role: "border.sw", layer: "ground", canvas: borderRimTile(["S", "W"]) },
     { role: "wallFace.centre", layer: "wall-face", canvas: wallFaceTile([]) },
     { role: "wallFace.n", layer: "wall-face", canvas: wallFaceTile(["N"]) },
     { role: "wallFace.s", layer: "wall-face", canvas: wallFaceTile(["S"]) },
@@ -1598,11 +1749,6 @@ function buildTileSheet() {
     { role: "ambient.stones", layer: "decor", canvas: stonesTile() },
     { role: "ambient.tracks", layer: "decor", canvas: treadScuffTile() },
     { role: "ambient.scorch", layer: "decor", canvas: scorchTile() },
-    ...Array.from({ length: 16 }, (_, mask) => ({
-      role: `road.${mask}`,
-      layer: "decor",
-      canvas: serviceRoadTile(mask),
-    })),
     ...stagingPad.map((canvas, index) => ({ role: `staging.${index}`, layer: "decor", canvas })),
     ...crater.map((canvas, index) => ({ role: `crater.${index}`, layer: "decor", canvas })),
     { role: "ambient.oil-spill", layer: "decor", canvas: oilSpillTile() },
@@ -1680,8 +1826,8 @@ const CHAR_RAMP = (team) => {
   ]);
 };
 
-function tankWreck(team) {
-  const hull = productionTankLayer("scout", "hull", "e", team);
+function tankWreck(team, kind = "scout") {
+  const hull = productionTankLayer(kind, "hull", "e", team);
   const char = CHAR_RAMP(team);
   const canvas = new Canvas(PRODUCTION_TANK_CELL, PRODUCTION_TANK_CELL);
   canvas.rotationAnchor = hull.rotationAnchor;
@@ -2069,6 +2215,31 @@ function explosionFrames(size, frameCount, seed) {
       }
     }
 
+    if (size >= 64 && t >= 0.14 && t <= 0.72) {
+      // The flame rises from the impact point; its shockwave stays on the
+      // isometric ground plane. A shallow ellipse and outward metal fragments
+      // make large hits read as area impacts, not a hovering fire sticker.
+      const waveX = 8 + t * 25;
+      const waveY = 3 + t * 9;
+      const waveColor = t < 0.45 ? C.goldLight : C.ember;
+      for (let step = 0; step < 64; step += 1) {
+        const angle = (step * Math.PI * 2) / 64;
+        canvas.set(
+          Math.round(centre + Math.cos(angle) * waveX),
+          Math.round(centre + 7 + Math.sin(angle) * waveY),
+          waveColor,
+        );
+      }
+      for (let shard = 0; shard < 10; shard += 1) {
+        const angle = (shard * Math.PI * 2) / 10 + (seed % 7) * 0.13;
+        const reach = 8 + t * (24 + (shard % 3) * 3);
+        const x = Math.round(centre + Math.cos(angle) * reach);
+        const y = Math.round(centre + Math.sin(angle) * reach * 0.7);
+        canvas.set(x, y, shard % 3 === 0 ? C.hot : C.flame);
+        if (t < 0.55) canvas.set(x, y - 1, C.goldLight);
+      }
+    }
+
     dropSmallIslands(canvas, 5);
     if (index > 0 && index < frameCount - 1) outline(canvas, t < 0.58 ? C.emberDeep : C.smokeDark);
     frames.push(canvas);
@@ -2321,10 +2492,60 @@ const PICKUP_ICONS = {
 };
 
 function pickupSprite(name, frame) {
+  if (name in pickupSources().metadata.cuts) return sourcedPickupSprite(name, frame);
   const spec = PICKUP_ICONS[name];
   const canvas = new Canvas(TILE, TILE);
   stamp(canvas, spec.art, 2, frame === 0 ? 2 : 1, spec.ramp());
   outline(canvas, C.outline);
+  return canvas;
+}
+
+let pickupSourceCache;
+
+function pickupSources() {
+  if (pickupSourceCache) return pickupSourceCache;
+  const metadata = JSON.parse(readFileSync(resolve(pickupSourceRoot, "source.json"), "utf8"));
+  const sheetBytes = readFileSync(resolve(pickupSourceRoot, metadata.source));
+  if (metadata.schemaVersion !== 1 || sha256(sheetBytes) !== metadata.sha256) {
+    throw new Error("pickup source or provenance changed; update source.json deliberately");
+  }
+  const sheet = decodePng(sheetBytes);
+  if (sheet.width !== metadata.dimensions[0] || sheet.height !== metadata.dimensions[1]) {
+    throw new Error("pickup source dimensions disagree with source.json");
+  }
+  pickupSourceCache = { metadata, sheet };
+  return pickupSourceCache;
+}
+
+function sourcedPickupSprite(name, frame) {
+  const { metadata, sheet } = pickupSources();
+  const [sourceX, sourceY, sourceWidth, sourceHeight] = metadata.cuts[name];
+  const scale = metadata.downsample;
+  const sampled = new Canvas(Math.floor(sourceWidth / scale), Math.floor(sourceHeight / scale));
+  for (let y = 0; y < sampled.height; y += 1) {
+    for (let x = 0; x < sampled.width; x += 1) {
+      const offset = ((sourceY + y * scale + (scale >> 1)) * sheet.width + sourceX + x * scale + (scale >> 1)) * 4;
+      const alpha = sheet.data[offset + 3];
+      if (alpha >= 128) {
+        sampled.set(x, y, [sheet.data[offset], sheet.data[offset + 1], sheet.data[offset + 2], 255]);
+      }
+    }
+  }
+  const bounds = sampled.opaqueBbox();
+  if (!bounds) throw new Error(`pickup ${name} has no opaque pixels`);
+  const [x0, y0, x1, y1] = bounds;
+  const width = x1 - x0 + 1;
+  const height = y1 - y0 + 1;
+  const [outputWidth, outputHeight] = metadata.outputCell;
+  if (width > outputWidth || height > metadata.groundLine - 1) {
+    throw new Error(`pickup ${name} does not fit ${outputWidth}x${outputHeight}: ${width}x${height}`);
+  }
+  const canvas = new Canvas(outputWidth, outputHeight);
+  const destinationX = Math.floor((outputWidth - width) / 2);
+  const destinationY = metadata.groundLine - height - frame;
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) canvas.set(destinationX + x, destinationY + y, sampled.get(x0 + x, y0 + y));
+  }
   return canvas;
 }
 
@@ -2355,6 +2576,181 @@ function pickupPadSprite(frame) {
 
 let landmarkSourceCache;
 
+let coniferSourceCache;
+function coniferSources() {
+  if (coniferSourceCache) return coniferSourceCache;
+  const selectionBytes = readFileSync(coniferSelectionPath);
+  const selection = JSON.parse(selectionBytes.toString("utf8"));
+  if (selection.schemaVersion !== 1 || selection.disposition !== "approved-source") {
+    throw new Error("conifer selection is not an approved source recipe");
+  }
+  const manifestPath = resolve(spriteFusionRoot, "requests", `${selection.request}.json`);
+  const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
+  if (manifest.schemaVersion !== 1 || manifest.owner !== "tools/sprite-fusion.mjs") {
+    throw new Error("conifer Sprite Fusion manifest is unsupported");
+  }
+  const specBytes = readFileSync(resolve(exampleRoot, manifest.spec.path));
+  if (sha256(specBytes) !== manifest.spec.sha256) throw new Error("conifer request spec changed");
+  const variants = new Map();
+  for (const variant of selection.variants) {
+    const output = manifest.outputs.find((candidate) => candidate.index === variant.index);
+    if (!output || output.assetId !== variant.assetId) {
+      throw new Error(`conifer selection disagrees with request output ${variant.id}`);
+    }
+    const bytes = readFileSync(resolve(exampleRoot, output.path));
+    if (sha256(bytes) !== output.sha256) throw new Error(`conifer source changed: ${output.path}`);
+    const image = decodePng(bytes);
+    if (image.width !== output.width || image.height !== output.height) {
+      throw new Error(`conifer source dimensions changed: ${output.path}`);
+    }
+    variants.set(variant.id, { image, output });
+  }
+  coniferSourceCache = { selection, selectionSha256: sha256(selectionBytes), manifest, variants };
+  return coniferSourceCache;
+}
+
+function coniferSprite(id) {
+  const { selection, variants } = coniferSources();
+  const source = variants.get(id)?.image;
+  if (!source) throw new Error(`unknown conifer source ${id}`);
+  let minX = source.width;
+  let minY = source.height;
+  let maxX = -1;
+  let maxY = -1;
+  for (let y = 0; y < source.height; y++) {
+    for (let x = 0; x < source.width; x++) {
+      if (source.data[(y * source.width + x) * 4 + 3] < 128) continue;
+      minX = Math.min(minX, x);
+      minY = Math.min(minY, y);
+      maxX = Math.max(maxX, x);
+      maxY = Math.max(maxY, y);
+    }
+  }
+  if (maxX < minX || minX <= 0 || minY <= 0 || maxX >= source.width - 1 || maxY >= source.height - 1) {
+    throw new Error(`conifer ${id} has an empty or clipped source silhouette`);
+  }
+  const width = maxX - minX + 1;
+  const height = maxY - minY + 1;
+  const scale = Math.min(1.2, 84 / width, 96 / height);
+  const targetWidth = Math.max(1, Math.round(width * scale));
+  const targetHeight = Math.max(1, Math.round(height * scale));
+  const canvas = new Canvas(...selection.outputCell);
+  const targetX = Math.floor((canvas.width - targetWidth) / 2);
+  const targetY = selection.groundLine + 1 - targetHeight;
+  for (let y = 0; y < targetHeight; y++) {
+    const sourceY = minY + Math.min(height - 1, Math.floor((y * height) / targetHeight));
+    for (let x = 0; x < targetWidth; x++) {
+      const sourceX = minX + Math.min(width - 1, Math.floor((x * width) / targetWidth));
+      const offset = (sourceY * source.width + sourceX) * 4;
+      if (source.data[offset + 3] >= 128) {
+        canvas.set(targetX + x, targetY + y, [
+          source.data[offset],
+          source.data[offset + 1],
+          source.data[offset + 2],
+          255,
+        ]);
+      }
+    }
+  }
+  const bounds = canvas.opaqueBbox();
+  if (!bounds || bounds[3] !== selection.groundLine) throw new Error(`conifer ${id} lost its ground contact`);
+  return canvas;
+}
+
+let lowCoverSourceCache;
+function lowCoverSources() {
+  if (lowCoverSourceCache) return lowCoverSourceCache;
+  const selectionBytes = readFileSync(lowCoverSelectionPath);
+  const selection = JSON.parse(selectionBytes.toString("utf8"));
+  if (selection.schemaVersion !== 1 || selection.disposition !== "approved-source") {
+    throw new Error("low-cover selection is not an approved source recipe");
+  }
+  if (JSON.stringify(selection.outputCell) !== JSON.stringify([160, 128]) || selection.groundLine !== 119) {
+    throw new Error("low-cover selection has an unsupported atlas registration");
+  }
+  const variants = new Map();
+  const manifests = new Map();
+  for (const variant of selection.variants) {
+    if (variants.has(variant.id)) throw new Error(`duplicate low-cover id ${variant.id}`);
+    let manifest = manifests.get(variant.request);
+    if (!manifest) {
+      manifest = JSON.parse(readFileSync(resolve(spriteFusionRoot, "requests", `${variant.request}.json`), "utf8"));
+      if (manifest.schemaVersion !== 1 || manifest.owner !== "tools/sprite-fusion.mjs") {
+        throw new Error(`unsupported low-cover request ${variant.request}`);
+      }
+      const specBytes = readFileSync(resolve(exampleRoot, manifest.spec.path));
+      if (sha256(specBytes) !== manifest.spec.sha256)
+        throw new Error(`low-cover request spec changed: ${variant.request}`);
+      manifests.set(variant.request, manifest);
+    }
+    const output = manifest.outputs.find((candidate) => candidate.index === variant.index);
+    if (!output || output.assetId !== variant.assetId) {
+      throw new Error(`low-cover selection disagrees with request output ${variant.id}`);
+    }
+    const bytes = readFileSync(resolve(exampleRoot, output.path));
+    if (sha256(bytes) !== output.sha256) throw new Error(`low-cover source changed: ${output.path}`);
+    const image = decodePng(bytes);
+    if (image.width !== output.width || image.height !== output.height) {
+      throw new Error(`low-cover source dimensions changed: ${output.path}`);
+    }
+    variants.set(variant.id, { image, output, requestId: manifest.requestId });
+  }
+  if (variants.size !== LOW_COVER_IDS.length || LOW_COVER_IDS.some((id) => !variants.has(id))) {
+    throw new Error("low-cover source selection does not match the runtime art contract");
+  }
+  lowCoverSourceCache = { selection, selectionSha256: sha256(selectionBytes), variants };
+  return lowCoverSourceCache;
+}
+
+function lowCoverSprite(id) {
+  const { selection, variants } = lowCoverSources();
+  const source = variants.get(id)?.image;
+  if (!source) throw new Error(`unknown low-cover source ${id}`);
+  let minX = source.width;
+  let minY = source.height;
+  let maxX = -1;
+  let maxY = -1;
+  let leftContacts = 0;
+  let rightContacts = 0;
+  for (let y = 0; y < source.height; y++) {
+    for (let x = 0; x < source.width; x++) {
+      if (source.data[(y * source.width + x) * 4 + 3] < 128) continue;
+      minX = Math.min(minX, x);
+      minY = Math.min(minY, y);
+      maxX = Math.max(maxX, x);
+      maxY = Math.max(maxY, y);
+      if (x === 0) leftContacts += 1;
+      if (x === source.width - 1) rightContacts += 1;
+    }
+  }
+  const width = maxX - minX + 1;
+  const height = maxY - minY + 1;
+  // A few grass tips may touch a source edge; a broad edge would be a clipped
+  // rock/earth silhouette and must be rejected before it reaches the atlas.
+  if (maxX < minX || width > 86 || height > 52 || leftContacts > 5 || rightContacts > 5) {
+    throw new Error(`low-cover ${id} is empty, oversized, or clipped at the source boundary`);
+  }
+  const canvas = new Canvas(...selection.outputCell);
+  const targetX = Math.floor((canvas.width - width) / 2);
+  const targetY = selection.groundLine - height + 1;
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const offset = ((minY + y) * source.width + minX + x) * 4;
+      if (source.data[offset + 3] >= 128) {
+        canvas.set(targetX + x, targetY + y, [
+          source.data[offset],
+          source.data[offset + 1],
+          source.data[offset + 2],
+          255,
+        ]);
+      }
+    }
+  }
+  const bounds = canvas.opaqueBbox();
+  if (!bounds || bounds[3] !== selection.groundLine) throw new Error(`low-cover ${id} lost its ground contact`);
+  return canvas;
+}
+
 function landmarkSources() {
   if (landmarkSourceCache) return landmarkSourceCache;
   const metadataBytes = readFileSync(resolve(landmarkSourceRoot, "source.json"));
@@ -2372,11 +2768,19 @@ function landmarkSources() {
 }
 
 function landmarkSprite(id) {
+  if (id.startsWith("conifer-")) return coniferSprite(id);
+  if (id.startsWith("low-cover-")) return lowCoverSprite(id);
   const { metadata, sheet } = landmarkSources();
   const cut = metadata.cuts[id];
   if (!Array.isArray(cut) || cut.length !== 4) throw new Error(`world landmark ${id} has no crop`);
   const [sourceX, sourceY, sourceWidth, sourceHeight] = cut;
-  const scale = metadata.downsample;
+  // Broad source props must sit within a continuous ridge's visible top face.
+  // Sample them directly from the high-resolution source at their production
+  // size rather than shrinking a previously downsampled pixel grid.
+  const scale = id === "shell-crater" ? metadata.downsample : metadata.elevatedDownsample;
+  if (!Number.isInteger(scale) || scale < metadata.downsample) {
+    throw new Error(`world landmark ${id} has no valid elevated sampling scale`);
+  }
   const sampledWidth = Math.floor(sourceWidth / scale);
   const sampledHeight = Math.floor(sourceHeight / scale);
   const sampled = new Canvas(sampledWidth, sampledHeight);
@@ -2409,7 +2813,7 @@ function landmarkSprite(id) {
   return canvas;
 }
 
-const LANDMARK_IDS = Object.freeze([
+const SHEET_LANDMARK_IDS = Object.freeze([
   "field-bunker",
   "rock-outcrop",
   "supply-dump",
@@ -2420,6 +2824,179 @@ const LANDMARK_IDS = Object.freeze([
   "scrap-barricade",
   "shell-crater",
 ]);
+const CONIFER_IDS = Object.freeze(["conifer-tall", "conifer-broad", "conifer-leaning"]);
+const LOW_COVER_IDS = Object.freeze([
+  "low-cover-earth",
+  "low-cover-stone",
+  "low-cover-timber",
+  "low-cover-rubble",
+  "low-cover-neutral",
+]);
+const LANDMARK_IDS = Object.freeze([...SHEET_LANDMARK_IDS, ...CONIFER_IDS, ...LOW_COVER_IDS]);
+
+let coverSourceCache;
+let sandbagSourceCache;
+
+function sandbagSources() {
+  if (sandbagSourceCache) return sandbagSourceCache;
+  const selectionBytes = readFileSync(sandbagSelectionPath);
+  const selection = JSON.parse(selectionBytes.toString("utf8"));
+  if (selection.schemaVersion !== 1 || selection.disposition !== "approved-source") {
+    throw new Error("sandbag selection is not an approved source recipe");
+  }
+  if (
+    JSON.stringify(selection.outputCell) !== JSON.stringify([36, 32]) ||
+    selection.groundLine !== 28 ||
+    JSON.stringify(selection.scale) !== JSON.stringify([5, 8])
+  ) {
+    throw new Error("sandbag selection has an unsupported atlas registration");
+  }
+  const manifest = JSON.parse(readFileSync(resolve(spriteFusionRoot, "requests", `${selection.request}.json`), "utf8"));
+  if (
+    manifest.schemaVersion !== 1 ||
+    manifest.owner !== "tools/sprite-fusion.mjs" ||
+    manifest.operation !== "style-reference"
+  ) {
+    throw new Error(`unsupported sandbag request ${selection.request}`);
+  }
+  const specBytes = readFileSync(resolve(exampleRoot, manifest.spec.path));
+  if (sha256(specBytes) !== manifest.spec.sha256) throw new Error("sandbag request spec changed");
+  const variants = new Map();
+  for (const variant of selection.variants) {
+    if (variants.has(variant.id)) throw new Error(`duplicate sandbag id ${variant.id}`);
+    const output = manifest.outputs.find((candidate) => candidate.index === variant.index);
+    if (!output || output.assetId !== variant.assetId) {
+      throw new Error(`sandbag selection disagrees with request output ${variant.id}`);
+    }
+    const bytes = readFileSync(resolve(exampleRoot, output.path));
+    if (sha256(bytes) !== output.sha256) throw new Error(`sandbag source changed: ${output.path}`);
+    const image = decodePng(bytes);
+    if (image.width !== output.width || image.height !== output.height || image.width !== 64 || image.height !== 64) {
+      throw new Error(`sandbag source dimensions changed: ${output.path}`);
+    }
+    variants.set(variant.id, { image, output });
+  }
+  if (variants.size !== 2 || !variants.has("cover-sandbag-a") || !variants.has("cover-sandbag-b")) {
+    throw new Error("sandbag selection does not match the runtime art contract");
+  }
+  sandbagSourceCache = {
+    selection,
+    selectionSha256: sha256(selectionBytes),
+    requestId: manifest.requestId,
+    variants,
+  };
+  return sandbagSourceCache;
+}
+
+function sandbagSprite(id) {
+  const { selection, variants } = sandbagSources();
+  const source = variants.get(id)?.image;
+  if (!source) throw new Error(`unknown sandbag source ${id}`);
+  let minX = source.width;
+  let minY = source.height;
+  let maxX = -1;
+  let maxY = -1;
+  for (let y = 0; y < source.height; y++) {
+    for (let x = 0; x < source.width; x++) {
+      if (source.data[(y * source.width + x) * 4 + 3] < 128) continue;
+      minX = Math.min(minX, x);
+      minY = Math.min(minY, y);
+      maxX = Math.max(maxX, x);
+      maxY = Math.max(maxY, y);
+    }
+  }
+  if (maxX < minX || minX < 2 || minY < 2 || maxX >= source.width - 2 || maxY >= source.height - 2) {
+    throw new Error(`sandbag ${id} is empty or reaches its source boundary`);
+  }
+  const sourceWidth = maxX - minX + 1;
+  const sourceHeight = maxY - minY + 1;
+  const [numerator, denominator] = selection.scale;
+  const width = Math.round((sourceWidth * numerator) / denominator);
+  const height = Math.round((sourceHeight * numerator) / denominator);
+  const canvas = new Canvas(...selection.outputCell);
+  const targetX = Math.floor((canvas.width - width) / 2);
+  const targetY = selection.groundLine + 1 - height;
+  if (targetX < 2 || targetX + width > canvas.width - 2 || targetY < 2) {
+    throw new Error(`sandbag ${id} exceeds its padded runtime cell`);
+  }
+  for (let y = 0; y < height; y++) {
+    const sourceY = minY + Math.min(sourceHeight - 1, Math.floor(((y + 0.5) * denominator) / numerator));
+    for (let x = 0; x < width; x++) {
+      const sourceX = minX + Math.min(sourceWidth - 1, Math.floor(((x + 0.5) * denominator) / numerator));
+      const offset = (sourceY * source.width + sourceX) * 4;
+      if (source.data[offset + 3] >= 128) {
+        canvas.set(targetX + x, targetY + y, [
+          source.data[offset],
+          source.data[offset + 1],
+          source.data[offset + 2],
+          255,
+        ]);
+      }
+    }
+  }
+  const bounds = canvas.opaqueBbox();
+  if (!bounds || bounds[3] !== selection.groundLine) throw new Error(`sandbag ${id} lost its ground contact`);
+  return canvas;
+}
+
+function coverSources() {
+  if (coverSourceCache) return coverSourceCache;
+  const metadata = JSON.parse(readFileSync(resolve(coverSourceRoot, "source.json"), "utf8"));
+  if (metadata.schemaVersion !== 1) throw new Error("unsupported world cover source schema");
+  const images = new Map();
+  for (const record of Object.values(metadata.sprites)) {
+    if (images.has(record.source)) continue;
+    const bytes = readFileSync(resolve(coverSourceRoot, record.source));
+    if (sha256(bytes) !== record.sha256) throw new Error(`world cover source changed: ${record.source}`);
+    const image = decodePng(bytes);
+    if (image.width !== record.dimensions[0] || image.height !== record.dimensions[1]) {
+      throw new Error(`world cover source dimensions disagree: ${record.source}`);
+    }
+    images.set(record.source, image);
+  }
+  coverSourceCache = { metadata, images };
+  return coverSourceCache;
+}
+
+function coverSprite(id) {
+  if (id === "cover-sandbag-a" || id === "cover-sandbag-b") return sandbagSprite(id);
+  const { metadata, images } = coverSources();
+  const record = metadata.sprites[id];
+  if (!record) throw new Error(`unknown world cover source: ${id}`);
+  const source = images.get(record.source);
+  const [sourceX, sourceY, sourceWidth, sourceHeight] = record.cut;
+  const scale = record.downsample;
+  if (sourceX < 0 || sourceY < 0 || sourceX + sourceWidth > source.width || sourceY + sourceHeight > source.height) {
+    throw new Error(`world cover ${id} crop exceeds source`);
+  }
+  const sampled = new Canvas(Math.floor(sourceWidth / scale), Math.floor(sourceHeight / scale));
+  for (let y = 0; y < sampled.height; y += 1) {
+    for (let x = 0; x < sampled.width; x += 1) {
+      const offset = ((sourceY + y * scale + (scale >> 1)) * source.width + sourceX + x * scale + (scale >> 1)) * 4;
+      if (source.data[offset + 3] >= 128) {
+        sampled.set(x, y, [source.data[offset], source.data[offset + 1], source.data[offset + 2], 255]);
+      }
+    }
+  }
+  const bounds = sampled.opaqueBbox();
+  if (!bounds) throw new Error(`world cover ${id} has no opaque pixels`);
+  const [x0, y0, x1, y1] = bounds;
+  const width = x1 - x0 + 1;
+  const height = y1 - y0 + 1;
+  const [outputWidth, outputHeight] = record.outputCell;
+  if (width > outputWidth || height > record.groundLine) {
+    throw new Error(`world cover ${id} exceeds its ${outputWidth}x${outputHeight} cell: ${width}x${height}`);
+  }
+  const canvas = new Canvas(outputWidth, outputHeight);
+  const destinationX = Math.floor((outputWidth - width) / 2);
+  const destinationY = record.groundLine - height;
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) canvas.set(destinationX + x, destinationY + y, sampled.get(x0 + x, y0 + y));
+  }
+  return canvas;
+}
+
+const COVER_IDS = Object.freeze(["cover-sandbag-a", "cover-sandbag-b", "cover-crate"]);
 
 // ---------------------------------------------------------------------------
 // HUD chips
@@ -2472,6 +3049,8 @@ function buildSprites() {
   add("tank-depot", tankDepotSprite(), { role: "world", outlineColor: null });
   for (const id of LANDMARK_IDS)
     add(`landmark-${id}`, landmarkSprite(id), { role: `world.landmark.${id}`, outlineColor: null });
+  for (let variant = 0; variant < HEX_CLIFF_SOURCES.length; variant++)
+    add(`hex-cliff-${variant}`, hexCliffSprite(variant), { role: "world.hex-cliff", outlineColor: null });
 
   for (const team of TEAM_ORDER) {
     add(`tank-${team}-hull-1`, tankHull(team, "e", 0), { anchored: true, role: `tank.${team}.hull.alias` });
@@ -2495,6 +3074,10 @@ function buildSprites() {
   }
   for (const team of TEAM_ORDER) {
     for (const kind of TANK_CHASSIS) {
+      add(`chassis-${team}-${kind}-wreck`, tankWreck(team, kind), {
+        anchored: true,
+        role: `chassis.${team}.${kind}.wreck`,
+      });
       add(`chassis-${team}-${kind}-1`, chassisHull(team, kind, "e", 0), {
         anchored: true,
         role: `chassis.${team}.${kind}.alias`,
@@ -2551,6 +3134,9 @@ function buildSprites() {
   }
   add("pickup-pad-1", pickupPadSprite(0), { role: "pickup", outlineColor: null });
   add("pickup-pad-2", pickupPadSprite(1), { role: "pickup", outlineColor: null });
+  add("floor-marker-spawn", isometricFloorMarker("spawn"), { role: "world-marker", outlineColor: null });
+  add("floor-marker-pickup", isometricFloorMarker("pickup"), { role: "world-marker", outlineColor: null });
+  for (const id of COVER_IDS) add(id, coverSprite(id), { role: "cover", outlineColor: null });
 
   add("hud-bar-back", hudBarBack(), { role: "ui", outlineColor: null });
   add("hud-bar-fill", hudBarFill(), { role: "ui", outlineColor: null });
@@ -2573,7 +3159,12 @@ function buildAnimations() {
   const still = (id, frame) => animations.push({ id, frames: [frame], playback: "PLAYBACK_NONE" });
 
   still("tank-depot", "tank-depot");
+  still("floor-marker-spawn", "floor-marker-spawn");
+  still("floor-marker-pickup", "floor-marker-pickup");
   for (const id of LANDMARK_IDS) still(`landmark-${id}`, `landmark-${id}`);
+  for (const id of COVER_IDS) still(id, id);
+  for (let variant = 0; variant < HEX_CLIFF_SOURCES.length; variant++)
+    still(`hex-cliff-${variant}`, `hex-cliff-${variant}`);
   for (const team of TEAM_ORDER) {
     loop(`tank-${team}-hull`, [`tank-${team}-hull-1`, `tank-${team}-hull-2`], 12);
     for (const { id: direction } of TANK_DIRECTIONS) {
@@ -2589,6 +3180,7 @@ function buildAnimations() {
   for (const team of TEAM_ORDER) still(`tank-${team}-wreck`, `tank-${team}-wreck`);
   for (const team of TEAM_ORDER) {
     for (const kind of TANK_CHASSIS) {
+      still(`chassis-${team}-${kind}-wreck`, `chassis-${team}-${kind}-wreck`);
       loop(`chassis-${team}-${kind}`, [`chassis-${team}-${kind}-1`, `chassis-${team}-${kind}-2`], 10);
       still(`chassis-${team}-${kind}-turret`, `chassis-${team}-${kind}-turret`);
       for (const { id: direction } of TANK_DIRECTIONS) {
@@ -2684,7 +3276,7 @@ function check(label, condition, detail) {
   if (!condition) failures += 1;
 }
 
-/** Compose a 4x4 field and prove the cover stays porous rather than becoming a slab. */
+/** Compose a 4x4 blocked field and keep the internal boulders porous. */
 function verifyWallSeams(tiles) {
   const layout = [
     ["wall.nw", "wall.n", "wall.n", "wall.ne"],
@@ -2718,12 +3310,12 @@ function verifyWallSeams(tiles) {
     }
     const coverage = opaque / (block.width * block.height);
     check(
-      `${theme.id} rock cover remains porous`,
+      `${theme.id} internal boulders have readable porous coverage`,
       coverage >= 0.35 && coverage <= 0.82,
       `${(coverage * 100).toFixed(1)}% opaque`,
     );
     check(
-      `${theme.id} rock cover has no fully opaque tile-grid seam`,
+      `${theme.id} internal boulders do not become square rails`,
       fullyOpaqueTileEdges === 0,
       `${fullyOpaqueTileEdges} solid seams`,
     );
@@ -2747,7 +3339,7 @@ function verifyGroundSeams(tiles) {
           seamMaximum = Math.max(
             seamMaximum,
             distance(tile.get(TILE - 1, offset), east.get(0, offset)),
-            distance(tile.get(offset, TILE - 1), north.get(offset, 0)),
+            distance(tile.get(offset, 0), north.get(offset, TILE - 1)),
           );
         }
         for (let y = 0; y < TILE; y += 1) {
@@ -2816,12 +3408,12 @@ function verifyLandscapeSeams(tiles) {
 
 function verifySandbagWrap(canvas) {
   let mismatched = 0;
-  for (let y = 0; y < TILE; ++y) {
-    // A wrapping barrier must have no dark seam artefact at the tile join:
-    // column 0 must continue column 15's bag run.
+  for (let y = 10; y < TILE; ++y) {
+    // The raised bags may have transparent rounded corners, but the blocked
+    // plinth must stay continuous through every horizontal tile join.
     if (canvas.alpha(0, y) === 0 || canvas.alpha(TILE - 1, y) === 0) mismatched += 1;
   }
-  check("sandbag tile is edge-to-edge opaque (wraps as a barrier)", mismatched === 0, `${mismatched} gap rows`);
+  check("sandbag plinth is edge-to-edge opaque (reads as cover)", mismatched === 0, `${mismatched} gap rows`);
 }
 
 function verifySprite(sprite, bytes) {
@@ -2880,21 +3472,25 @@ function buildThemeMap(theme, tiles) {
     themed.filter((tile) => tile.semanticRole.startsWith("wall.")).map((tile) => [tile.semanticRole.slice(5), tile.id]),
   );
   const wallMaskTileIds = ARENA_WALL_MASK_TO_FRAME.map((role) => wallTileIds[role]);
+  const borderMaskTileIds = ARENA_WALL_MASK_TO_FRAME.map((role) => tileId(`border.${role}`));
   const wallFaceTileIds = ARENA_WALL_MASK_TO_FRAME.map((role) => tileId(`wallFace.${role}`));
   const groundTileIds = Array.from({ length: ARENA_GROUND_VARIANT_COUNT }, (_, index) => tileId(`ground.${index}`));
-  const groundRoleTileIds = Array.from({ length: ARENA_GROUND_ROLE_WALL_BASE + 16 }, () => 0);
+  const groundRoleTileIds = Array.from({ length: ARENA_GROUND_ROLE_COUNT }, () => 0);
   groundTileIds.forEach((id, index) => {
     groundRoleTileIds[index] = id;
   });
   wallMaskTileIds.forEach((id, mask) => {
     groundRoleTileIds[ARENA_GROUND_ROLE_WALL_BASE + mask] = id;
   });
+  borderMaskTileIds.forEach((id, mask) => {
+    groundRoleTileIds[ARENA_GROUND_ROLE_BORDER_BASE + mask] = id;
+  });
 
   const markRoleTileIds = Array.from({ length: ARENA_MARK_ROLE_COUNT }, () => 0);
   markRoleTileIds[ARENA_MARK_ROLE_CRATE] = tileId("crate");
   markRoleTileIds[ARENA_MARK_ROLE_SANDBAG] = tileId("sandbag");
   markRoleTileIds[ARENA_MARK_ROLE_SPAWN] = tileId("spawnPad");
-  markRoleTileIds[ARENA_MARK_ROLE_PICKUP] = tileId("world.pickup-pedestal");
+  markRoleTileIds[ARENA_MARK_ROLE_PICKUP] = tileId("pickupPad");
 
   const decorRoleTileIds = Array.from({ length: ARENA_DECOR_ROLE_COUNT }, () => 0);
   decorRoleTileIds[ARENA_DECOR_ROLE_FLOOR_VENT] = tileId("world.floor-vent");
@@ -2907,9 +3503,6 @@ function buildThemeMap(theme, tiles) {
   decorRoleTileIds[ARENA_DECOR_ROLE_STONES] = tileId("ambient.stones");
   decorRoleTileIds[ARENA_DECOR_ROLE_TRACKS] = tileId("ambient.tracks");
   decorRoleTileIds[ARENA_DECOR_ROLE_SCORCH] = tileId("ambient.scorch");
-  for (let mask = 0; mask < 16; mask += 1) {
-    decorRoleTileIds[ARENA_DECOR_ROLE_SERVICE_ROAD_BASE + mask] = tileId(`road.${mask}`);
-  }
   for (let index = 0; index < 4; index += 1) {
     decorRoleTileIds[ARENA_DECOR_ROLE_STAGING_PAD_BASE + index] = tileId(`staging.${index}`);
     decorRoleTileIds[ARENA_DECOR_ROLE_CRATER_BASE + index] = tileId(`crater.${index}`);
@@ -3049,8 +3642,12 @@ function renderTankArtContract() {
     "",
     ...renderCube("TURRET_ANIMATIONS", turretTeams),
     "",
-    "const WRECK_ANIMATIONS: readonly DefoldHash[] = [",
-    ...TEAM_ORDER.map((team) => `  ${hash(`tank-${team}-wreck`)},`),
+    "const WRECK_ANIMATIONS: readonly (readonly DefoldHash[])[] = [",
+    ...TEAM_ORDER.flatMap((team) => [
+      "  [",
+      ...TANK_CHASSIS.map((kind) => `    ${hash(`chassis-${team}-${kind}-wreck`)},`),
+      "  ],",
+    ]),
     "];",
     "",
     "function colourIndex(colour: number): number {",
@@ -3080,8 +3677,8 @@ function renderTankArtContract() {
     "  return TURRET_ANIMATIONS[colourIndex(colour)]![chassisIndex(chassis)]![directionIndex(direction)]!;",
     "}",
     "",
-    "export function tankWreckAnimation(colour: number): DefoldHash {",
-    "  return WRECK_ANIMATIONS[colourIndex(colour)]!;",
+    "export function tankWreckAnimation(colour: number, chassis: number): DefoldHash {",
+    "  return WRECK_ANIMATIONS[colourIndex(colour)]![chassisIndex(chassis)]!;",
     "}",
     "",
   ].join("\n");
@@ -3153,7 +3750,7 @@ function build() {
     );
     check(
       `${theme.id}: ground role table is total`,
-      theme.groundRoleTileIds.filter(Number.isInteger).length === ARENA_GROUND_ROLE_WALL_BASE + 16,
+      theme.groundRoleTileIds.filter(Number.isInteger).length === ARENA_GROUND_ROLE_COUNT,
     );
     check(`${theme.id}: mark role table is total`, theme.markRoleTileIds.every(Number.isInteger));
     check(`${theme.id}: decor role table is total`, theme.decorRoleTileIds.every(Number.isInteger));
@@ -3199,17 +3796,27 @@ function build() {
       license: "../../licenses/defold-tutorial-war-battles-MIT.txt",
       note:
         "No tutorial pixels are copied. Procedural arena art samples the pinned tutorial palette; " +
-        "production tanks are selected Sprite Fusion direction sets whose blue identity panels are " +
-        "deterministically remapped to the four team ramps.",
+        "production tanks are selected, separate Sprite Fusion hull and turret direction sets " +
+        "whose neutral armor and team-signal panels are deterministically finished by declared recipes.",
       productionTanks: {
         provider: "Sprite Fusion",
         operation: "direction-set",
+        selection: relative(exampleRoot, productionTankSelectionPath),
+        selectionSha256: sha256(productionTankSelectionBytes),
+        liveryEmitter: "tools/tank-livery.mjs",
         cellSize: [PRODUCTION_TANK_CELL, PRODUCTION_TANK_CELL],
         chassis: TANK_CHASSIS,
         directions: TANK_DIRECTIONS.map(({ id, sourceIndex }) => ({ id, sourceIndex })),
         manifests: TANK_CHASSIS.flatMap((chassis) =>
           ["hull", "turret"].map((layer) =>
-            relative(exampleRoot, resolve(spriteFusionRoot, "requests", `${chassis}-${layer}-directions-v1.json`)),
+            relative(
+              exampleRoot,
+              resolve(
+                spriteFusionRoot,
+                "requests",
+                `${layer === "hull" ? productionTankSelection.chassis[chassis].hullRequest : productionTankSelection.chassis[chassis].turretRequest}.json`,
+              ),
+            ),
           ),
         ),
       },
@@ -3219,8 +3826,87 @@ function build() {
         provenance: relative(exampleRoot, resolve(landmarkSourceRoot, "source.json")),
         sourceSha256: landmarkSources().metadata.sha256,
         projection: landmarkSources().metadata.projection,
-        ids: LANDMARK_IDS,
+        ids: SHEET_LANDMARK_IDS,
         rule: "explicit nonuniform crops, 4x nearest-neighbour downsample, hard alpha threshold, bottom registration",
+      },
+      worldConifers: {
+        provider: "Sprite Fusion",
+        selection: relative(exampleRoot, coniferSelectionPath),
+        selectionSha256: coniferSources().selectionSha256,
+        requestId: coniferSources().manifest.requestId,
+        variants: CONIFER_IDS.map((id) => ({
+          id,
+          assetId: coniferSources().variants.get(id).output.assetId,
+          sourceSha256: coniferSources().variants.get(id).output.sha256,
+        })),
+        rule: "SHA-pinned source, hard alpha, nearest-neighbour scaling, bottom-ground registration",
+      },
+      worldLowCover: {
+        provider: "Sprite Fusion",
+        selection: relative(exampleRoot, lowCoverSelectionPath),
+        selectionSha256: lowCoverSources().selectionSha256,
+        variants: LOW_COVER_IDS.map((id) => ({
+          id,
+          requestId: lowCoverSources().variants.get(id).requestId,
+          assetId: lowCoverSources().variants.get(id).output.assetId,
+          sourceSha256: lowCoverSources().variants.get(id).output.sha256,
+        })),
+        rule: "SHA-pinned source, bounded edge-contact QA, hard alpha, native-grid crop, bottom-ground registration",
+      },
+      worldPickups: {
+        provider: "OpenAI image generation",
+        source: relative(exampleRoot, resolve(pickupSourceRoot, "sheet.png")),
+        provenance: relative(exampleRoot, resolve(pickupSourceRoot, "source.json")),
+        sourceSha256: pickupSources().metadata.sha256,
+        projection: pickupSources().metadata.projection,
+        ids: Object.keys(pickupSources().metadata.cuts),
+        rule: "explicit grid cuts, 12x nearest-neighbour downsample, hard alpha threshold, bottom registration",
+      },
+      worldCoverSprites: {
+        provider: "OpenAI image generation",
+        provenance: relative(exampleRoot, resolve(coverSourceRoot, "source.json")),
+        projection: coverSources().metadata.projection,
+        sprites: Object.fromEntries(
+          Object.entries(coverSources().metadata.sprites)
+            .filter(([id]) => id === "cover-crate")
+            .map(([id, record]) => [
+              id,
+              { ...record, source: relative(exampleRoot, resolve(coverSourceRoot, record.source)) },
+            ]),
+        ),
+        rule: coverSources().metadata.cutRule,
+      },
+      worldSandbagSprites: {
+        provider: "Sprite Fusion",
+        selection: relative(exampleRoot, sandbagSelectionPath),
+        selectionSha256: sandbagSources().selectionSha256,
+        requestId: sandbagSources().requestId,
+        variants: ["cover-sandbag-a", "cover-sandbag-b"].map((id) => ({
+          id,
+          assetId: sandbagSources().variants.get(id).output.assetId,
+          sourceSha256: sandbagSources().variants.get(id).output.sha256,
+        })),
+        rule: "SHA-pinned source, source-edge gutter, hard alpha, 5:8 nearest-neighbour reduction, bottom-ground registration",
+      },
+      hexCover: {
+        provider: "Sprite Fusion",
+        selection: "art/source/sprite-fusion/hex-tile-selection-v2.json",
+        family: "B",
+        sources: hexCoverSources().map(({ index, path, sha256 }) => ({ index, path, sha256 })),
+        rule: "selected basalt top-face pixels sampled into collision-aligned porous rock cover",
+      },
+      hexCliffs: {
+        provider: "Sprite Fusion",
+        selection: "art/source/sprite-fusion/hex-tile-selection-v2.json",
+        outputCell: [160, 128],
+        groundLine: 120,
+        sources: HEX_CLIFF_SOURCES.map(({ role, request, index }, variant) => {
+          const source = hexLandformSources(role).find(
+            (candidate) => candidate.request === request && candidate.index === index,
+          );
+          return { variant, role, request, index, assetId: source.assetId, path: source.path, sha256: source.sha256 };
+        }),
+        rule: "opaque-bounds crop, nearest-neighbour fit, meadow top/face palette grade, bottom registration; runtime anchors require solid wall stamps",
       },
     },
     determinism: {
@@ -3359,9 +4045,38 @@ function build() {
 // Entry point
 // ---------------------------------------------------------------------------
 
+/** Prune only files named by the previous generated manifest, never source art. */
+function retiredGeneratedSprites(outputs) {
+  let previous;
+  try {
+    previous = JSON.parse(readFileSync(resolve(outputRoot, "arena-art.json"), "utf8"));
+  } catch (error) {
+    if (error?.code === "ENOENT") return [];
+    throw error;
+  }
+  if (!Array.isArray(previous.sprites)) throw new SystemExitError("previous generated art manifest has no sprite list");
+  const retired = [];
+  for (const sprite of previous.sprites) {
+    if (typeof sprite.file !== "string" || !/^[a-z0-9][a-z0-9-]*\.png$/u.test(sprite.file)) {
+      throw new SystemExitError("previous generated art manifest has an invalid sprite path");
+    }
+    const path = resolve(outputRoot, sprite.file);
+    if (outputs.has(path)) continue;
+    try {
+      if (!statSync(path).isFile()) throw new SystemExitError(`retired sprite is not a file: ${sprite.file}`);
+    } catch (error) {
+      if (error?.code === "ENOENT") continue;
+      throw error;
+    }
+    retired.push(path);
+  }
+  return retired;
+}
+
 function main() {
   const checkOnly = process.argv.includes("--check");
   const { outputs, manifest } = build();
+  const retired = retiredGeneratedSprites(outputs);
 
   for (const assertion of assertions) {
     process.stdout.write(
@@ -3371,6 +4086,11 @@ function main() {
   if (failures > 0) throw new SystemExitError(`${failures} verification assertion(s) failed`);
 
   if (checkOnly) {
+    if (retired.length > 0) {
+      throw new SystemExitError(
+        `retired generated art remains: ${retired.map((path) => relative(exampleRoot, path)).join(", ")}`,
+      );
+    }
     for (const [path, bytes] of outputs) {
       let current = null;
       try {
@@ -3386,6 +4106,7 @@ function main() {
     return;
   }
 
+  for (const path of retired) unlinkSync(path);
   for (const [path, bytes] of outputs) {
     mkdirSync(dirname(path), { recursive: true });
     writeFileSync(path, bytes);

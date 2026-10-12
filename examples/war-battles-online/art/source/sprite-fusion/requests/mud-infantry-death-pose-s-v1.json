@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_b239f3a1-b79b-495f-b797-8c6e18d2b286",
+  "operation": "edit",
+  "prompt": "Keep mud viewed straight south toward the viewer. Change the body into a clearly defeated collapsed pose: one knee on the ground, torso and head bowed low forward, one hand braced on the ground, sidearm lowered, silhouette much shorter and wider than standing. Preserve the same rugged build, tan helmet, orange goggles, dark face covering, red scarf, and olive jacket, boots and knee on one ground line, colors, dark outlines, identity, and original perspective. Do not turn toward another direction. No blood, injury detail, explosion, extra prop, scenery, platform, text, or second person.",
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "29c7eb63-a1a7-4f0c-8bc8-daa74e3f3a15"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/mud-infantry-death-pose-s-v1.json",
+    "sha256": "6f8576bece0d8d46efd333ff9d5eb3846eec880bf2c4ef90e7c96e7ca75bb92d"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "71c07b63-e7e1-4aba-a286-d007cc3f58fe",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 30,
+      "height": 39,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/71c07b63-e7e1-4aba-a286-d007cc3f58fe/image.png?v=1791536439664",
+      "path": "art/source/sprite-fusion/outputs/mud-infantry-death-pose-s-v1/00.png",
+      "bytes": 2618,
+      "sha256": "0ad8007e199bf71e1ced6298a63d02e342c4bc3106d367ddb43c89f1d055b2bb"
+    },
+    {
+      "index": 1,
+      "assetId": "7b355385-be8f-4b9b-b83f-d268ff84199a",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 34,
+      "height": 36,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/7b355385-be8f-4b9b-b83f-d268ff84199a/image.png?v=1791536440825",
+      "path": "art/source/sprite-fusion/outputs/mud-infantry-death-pose-s-v1/01.png",
+      "bytes": 3088,
+      "sha256": "d7c5d93d83610bc16688d28df83cd4e461828a134374af36c2648e22f77c542e"
+    }
+  ],
+  "credits": {
+    "remaining": 390
+  }
+}

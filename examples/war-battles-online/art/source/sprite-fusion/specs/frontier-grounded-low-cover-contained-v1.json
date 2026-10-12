@@ -1,0 +1,6 @@
+{
+  "name": "frontier-grounded-low-cover-contained-v1",
+  "operation": "edit",
+  "inputs": ["asset:f7fc3f42-8b19-432b-99f0-b2d3fab89170"],
+  "prompt": "Keep this compact isometric grass-and-stone berm, its chunky pixel clusters, muted palette, lighting, and continuous ground contact. Fit its complete left and right ends inside the existing canvas with visible empty margins so no stones, earth, or grass are cut off. Do not add a raised platform, lava, scene background, lettering, or other objects."
+}

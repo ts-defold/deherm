@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_e6c82c81-1646-413a-a233-c4d15e5e3d29",
+  "operation": "edit",
+  "prompt": "Change only Spark's southeast-facing body pose: crouch lightly on planted boots and extend the compact sidearm forward at chest height for a quick, precise shot. Keep the same lean driver, orange goggles, green helmet, dark uniform, colors, outline, proportions, and three-quarter perspective. Keep the feet on the same ground line. No muzzle flash, projectile, new prop, platform, text, scenery, or second person.",
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "8b192a54-6797-4897-b1de-09fe7a5c58eb"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/spark-infantry-fire-pose-se-v1.json",
+    "sha256": "783803bee15859024a8352a0518d0d4e256a428332e6b1c8fb2691cc31d62b28"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "2b2fb264-89d8-4144-a216-674ec3b0651f",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 37,
+      "height": 46,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/2b2fb264-89d8-4144-a216-674ec3b0651f/image.png?v=1791532208234",
+      "path": "art/source/sprite-fusion/outputs/spark-infantry-fire-pose-se-v1/00.png",
+      "bytes": 3077,
+      "sha256": "8a57d036e644119577ebef57ecce95610289c8fb0593a6f54e0c43a2e3aec89d"
+    },
+    {
+      "index": 1,
+      "assetId": "862e0d45-2d05-4a50-be81-1c7544c8b7a0",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 36,
+      "height": 51,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/862e0d45-2d05-4a50-be81-1c7544c8b7a0/image.png?v=1791532209301",
+      "path": "art/source/sprite-fusion/outputs/spark-infantry-fire-pose-se-v1/01.png",
+      "bytes": 4089,
+      "sha256": "1910e7b0d57a5c13ed393a5a75df890619902cbb254a5f552d66660a1936e06b"
+    }
+  ],
+  "credits": {
+    "remaining": 1005
+  }
+}

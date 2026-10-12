@@ -12,8 +12,8 @@
     "height": 16,
     "columns": 6,
     "rows": 1,
-    "bytes": 3622,
-    "sha256": "f7918d8507d6c09ddb95f060ab4d07b327dab93af6831aa2842bb47bc9dc298a"
+    "bytes": 375,
+    "sha256": "a355825ffee1f63712aa3e48f1dba04f9c748a40cf473b9545b129e4aca45b10"
   },
   "sources": {
     "selection": {
@@ -23,6 +23,11 @@
       ],
       "projectionSha256": "7abfe7f14b73c74313114e7b7e10279eb45b66ae4e53184837a08efd1b8e51ea"
     }
+  },
+  "rendering": {
+    "method": "hand-authored 16px motifs",
+    "palette": "sampled tutorial palette",
+    "reason": "Selected source motifs exceed the 16px logical tile and lose their role silhouettes when reduced."
   },
   "roles": [
     {
@@ -57,13 +62,14 @@
         8,
         8
       ],
+      "renderMode": "authored-16px-motif",
       "cell": [
         0,
         0,
         16,
         16
       ],
-      "outputSha256": "9da832600065a8b4fd349f7ddfb621f75bad1e767d8a5915401df7cd5fe319e8"
+      "outputSha256": "453772a22c21e7b4bc9ec105b3872842176113d18f45f751feee4bcfea40166f"
     },
     {
       "id": "thermal-vent",
@@ -97,13 +103,14 @@
         8,
         8
       ],
+      "renderMode": "authored-16px-motif",
       "cell": [
         16,
         0,
         16,
         16
       ],
-      "outputSha256": "564c1be460afbb2a2f804e3922760ed014136ca4970adefde7ed22b97d5359e7"
+      "outputSha256": "16c4e80909a068d403bb13f2a107fa1604b51665c9cdf28bc4692e5f480d0a26"
     },
     {
       "id": "lava-fissure",
@@ -137,13 +144,14 @@
         8,
         8
       ],
+      "renderMode": "authored-16px-motif",
       "cell": [
         32,
         0,
         16,
         16
       ],
-      "outputSha256": "736767727e42eedc0aeb59a6c3dc7d648717a345849df64522d5852103034360"
+      "outputSha256": "9bc8d962ff5c9a29a4d00a2ce0f27c106ca0a338cd650bbd89f8e3c1e62365b2"
     },
     {
       "id": "floor-vent",
@@ -177,13 +185,14 @@
         8,
         8
       ],
+      "renderMode": "authored-16px-motif",
       "cell": [
         48,
         0,
         16,
         16
       ],
-      "outputSha256": "72f437dbbf6cbe469b65cc1a1e71f370436a6ac2ed4670758c6e95ee4216f1ad"
+      "outputSha256": "df721a6b9122c65e999102ce0f058bcc873ad9e482c473aebb25a0393525a416"
     },
     {
       "id": "pipe-junction",
@@ -217,13 +226,14 @@
         8,
         8
       ],
+      "renderMode": "authored-16px-motif",
       "cell": [
         64,
         0,
         16,
         16
       ],
-      "outputSha256": "33b939501a98f43ce94a50582c6a52fdf360424ea16e80f8de097ae1136a39ed"
+      "outputSha256": "e7aab9b9c21e3a247718f7dc3497320434c9a086f26cdc34036d85c5c9f88690"
     },
     {
       "id": "pipe-run",
@@ -257,13 +267,14 @@
         8,
         8
       ],
+      "renderMode": "authored-16px-motif",
       "cell": [
         80,
         0,
         16,
         16
       ],
-      "outputSha256": "e4a6a41217b0a01337d9627feab56e1e5766aa6b3651a9ce6e53f814f85bc617"
+      "outputSha256": "6c6fa5958ebb19eb85f21726fa09e387c92df426b0c25e17a2c15d7d3548025a"
     }
   ]
 }

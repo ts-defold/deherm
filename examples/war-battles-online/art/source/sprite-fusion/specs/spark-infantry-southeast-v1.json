@@ -1,0 +1,10 @@
+{
+  "name": "spark-infantry-southeast-v1",
+  "operation": "style-reference",
+  "inputs": [
+    "asset:d62dd927-7809-4bd6-a18e-1c87fcf23e9f",
+    "asset:bd451900-477e-4522-a49d-15ac7e16beb6"
+  ],
+  "prompt": "Spark, the young tan-skinned tank mechanic from the portrait reference, standing full-body in the infantry reference's southeast-facing three-quarter isometric arcade-game view. Short spiky black hair, narrow orange headband, brass welding goggles above the eyes, teal work collar, eager clever expression, olive work jacket, dark trousers and sturdy boots. Compact sidearm held low. Match the standing infantry reference's grounded scale, chunky silhouette, dark outline, and viewing angle while keeping Spark visibly distinct. One isolated character, no vehicle, platform, portrait crop, scenery, lettering, or second person.",
+  "size": 32
+}

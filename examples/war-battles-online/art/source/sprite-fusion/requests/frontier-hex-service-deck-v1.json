@@ -1,0 +1,164 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_3b001601-cfe9-4c5c-981a-a8e345c9d22a",
+  "operation": "generate",
+  "prompt": "One isolated isometric six-sided industrial terrain tile for a retro pixel-art tank strategy game. Broad flat driveable top made of dark slate steel refinery deck panels, a few precise rivets and amber hazard paint marks, short shadowed basalt side. Crisp readable pixel clusters, restrained details, warm sunset rim light. Single tile centered on transparent background, no character, vehicle, building, text, border, or other tiles.",
+  "size": 64,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/frontier-hex-service-deck-v1.json",
+    "sha256": "06b2f08b2d8aee75b271c8ad9aa2a88f253f02d83490b480c87b13ba26b5c04d"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "8adc947b-dcfb-4a05-9a3d-e4e9bf1737e3",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/8adc947b-dcfb-4a05-9a3d-e4e9bf1737e3/image.png?v=1791407522674",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-service-deck-v1/00.png",
+      "bytes": 7856,
+      "sha256": "50dcc47cba73e7991246bf7340fa2837b7e4c686589dfb864f0268fe4191f5eb"
+    },
+    {
+      "index": 1,
+      "assetId": "a8eec3c8-2c90-4663-92f0-6679cff10d81",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/a8eec3c8-2c90-4663-92f0-6679cff10d81/image.png?v=1791407523312",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-service-deck-v1/01.png",
+      "bytes": 5783,
+      "sha256": "6bc0193340edaa7293cc3f6649d2afdaf755c9f7f4973d0757ac6aab986356df"
+    },
+    {
+      "index": 2,
+      "assetId": "874be99b-d378-4170-9f3b-b3eae9758357",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/874be99b-d378-4170-9f3b-b3eae9758357/image.png?v=1791407523686",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-service-deck-v1/02.png",
+      "bytes": 9536,
+      "sha256": "21175173f9215957cc0b299c5fc8545b8232b508629b62ee52d63241e32b888a"
+    },
+    {
+      "index": 3,
+      "assetId": "70fcd174-9cb3-41af-8cdf-1e05eca51fcc",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/70fcd174-9cb3-41af-8cdf-1e05eca51fcc/image.png?v=1791407524071",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-service-deck-v1/03.png",
+      "bytes": 10927,
+      "sha256": "b4ccb22bfd8ae31699e4ef87d1603a12c7284e62603f6eae530e836e15f62e1c"
+    },
+    {
+      "index": 4,
+      "assetId": "da0fb854-0b25-4f05-9aa1-4457b16dfe89",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/da0fb854-0b25-4f05-9aa1-4457b16dfe89/image.png?v=1791407524407",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-service-deck-v1/04.png",
+      "bytes": 8656,
+      "sha256": "7f1a0d4e21d6de1d38b6f30c5604f62442a903a71cf9ba41d964e234006bc4da"
+    },
+    {
+      "index": 5,
+      "assetId": "165053a3-5296-471c-9856-5e5fe1129815",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/165053a3-5296-471c-9856-5e5fe1129815/image.png?v=1791407525047",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-service-deck-v1/05.png",
+      "bytes": 8158,
+      "sha256": "4651c9204c987c1ebd52d8395c27321c8d11c0c67683d13d3b5779ffcb2156ff"
+    },
+    {
+      "index": 6,
+      "assetId": "07f8b547-29e8-4585-87f1-0f8ff67c7b95",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/07f8b547-29e8-4585-87f1-0f8ff67c7b95/image.png?v=1791407525657",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-service-deck-v1/06.png",
+      "bytes": 6003,
+      "sha256": "9dd8795e21c53cac5e447603de27da93c41fe46c49ac8e067ccf4438bef22055"
+    },
+    {
+      "index": 7,
+      "assetId": "221d2cd9-1418-483a-bba0-47b04d4c2056",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/221d2cd9-1418-483a-bba0-47b04d4c2056/image.png?v=1791407526271",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-service-deck-v1/07.png",
+      "bytes": 8743,
+      "sha256": "0c949e553e6e63d76f266fc820560d1f141de94e23e32fa5a1d1348aff4d866a"
+    },
+    {
+      "index": 8,
+      "assetId": "2214284b-be14-4bc4-80c1-6b38daedfbc3",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/2214284b-be14-4bc4-80c1-6b38daedfbc3/image.png?v=1791407526911",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-service-deck-v1/08.png",
+      "bytes": 8444,
+      "sha256": "13a5ec474ab16a47373adf4cb6d2c5abee9c00e4cc75a2f8c4138938b96a256a"
+    },
+    {
+      "index": 9,
+      "assetId": "dcc8cd21-57d3-40d2-93d4-cd83f6783755",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/dcc8cd21-57d3-40d2-93d4-cd83f6783755/image.png?v=1791407527559",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-service-deck-v1/09.png",
+      "bytes": 8414,
+      "sha256": "a288fa5d2c07ceb85bca1924ed5bb719e220a1cfc5de5225b57b5c40f35a5b8b"
+    },
+    {
+      "index": 10,
+      "assetId": "e3af572a-032e-4d6b-b72e-b60b1cb719fc",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/e3af572a-032e-4d6b-b72e-b60b1cb719fc/image.png?v=1791407528118",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-service-deck-v1/10.png",
+      "bytes": 8237,
+      "sha256": "1577dcff19222642e475e886fc708e9f00cedb4ed61b488595b0c1031ffceb3c"
+    },
+    {
+      "index": 11,
+      "assetId": "10485896-19e2-4719-8313-66db21a8464a",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/10485896-19e2-4719-8313-66db21a8464a/image.png?v=1791407528734",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-service-deck-v1/11.png",
+      "bytes": 7807,
+      "sha256": "29a6e97ec883ac2666bb25741ba1cf9e073979f9ee6ec6581dcc89419a579a87"
+    }
+  ],
+  "credits": {
+    "remaining": 2985
+  }
+}

@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_38dd2062-08bc-4025-ba34-79213c78ac9b",
+  "operation": "style-reference",
+  "prompt": "A fast light scout tank for the same three-quarter isometric top-down arcade battlefield as the reference vehicle. Distinct narrow arrowhead hull, two short exposed tracks with large front drive wheels, a tiny low-profile swiveling turret with a slim short gun, a tall whip antenna, and little side exhausts. Basalt-grey armor, warm cream highlights, restrained orange signal markings, dark readable outline. No visible driver, no face. Its small agile silhouette must look different from the long-gun artillery reference.",
+  "size": 64,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/artillery-silhouette-v2/06.png",
+      "bytes": 6694,
+      "sha256": "35bc14823ff7bb405030a156a7f2bf267204d34c73c1b60cb98ac0b62e42928e"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/scout-silhouette-v2.json",
+    "sha256": "7844395f5cd3c65ae7b536f770736beabd1f3849c8cd5e1a0199730a38c8e122"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "792be629-9583-4ae3-b3c8-6c7812a17c5b",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/792be629-9583-4ae3-b3c8-6c7812a17c5b/image.png?v=1791426448081",
+      "path": "art/source/sprite-fusion/outputs/scout-silhouette-v2/00.png",
+      "bytes": 4387,
+      "sha256": "d9af25f26120dcb4019ad0fbb9487442207f0fe5d17689b2c225d97b79ca3266"
+    },
+    {
+      "index": 1,
+      "assetId": "8054d7b6-20c4-4faa-9592-b2390648220e",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/8054d7b6-20c4-4faa-9592-b2390648220e/image.png?v=1791426448631",
+      "path": "art/source/sprite-fusion/outputs/scout-silhouette-v2/01.png",
+      "bytes": 4793,
+      "sha256": "67677f9e568a0192f4edc66879ea86a31ad8818485bae1ea39310884665fbf6d"
+    },
+    {
+      "index": 2,
+      "assetId": "be4d00c2-0ac8-4f31-8c96-ca17fb26c071",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/be4d00c2-0ac8-4f31-8c96-ca17fb26c071/image.png?v=1791426449165",
+      "path": "art/source/sprite-fusion/outputs/scout-silhouette-v2/02.png",
+      "bytes": 4822,
+      "sha256": "6c3c58b529a37c364335c1b87c78b66a2e42fa0083755ded09606be1f00b45fb"
+    },
+    {
+      "index": 3,
+      "assetId": "286e053e-b2f8-488e-896c-1b058b4226d8",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/286e053e-b2f8-488e-896c-1b058b4226d8/image.png?v=1791426449750",
+      "path": "art/source/sprite-fusion/outputs/scout-silhouette-v2/03.png",
+      "bytes": 3970,
+      "sha256": "ca0019c3771753ee255e366962be96be9e4d62a1b5e8425ef7f3c9900e93a033"
+    },
+    {
+      "index": 4,
+      "assetId": "6439e6f9-16f7-44d8-8e1c-986e90d955ad",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/6439e6f9-16f7-44d8-8e1c-986e90d955ad/image.png?v=1791426450335",
+      "path": "art/source/sprite-fusion/outputs/scout-silhouette-v2/04.png",
+      "bytes": 5011,
+      "sha256": "2eedec4fd01181a1eb4c5146e984806b5ce69c63ef9a9e9db40305a779f7cdbc"
+    },
+    {
+      "index": 5,
+      "assetId": "ff305db6-4348-4abd-a661-789f061f93b7",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/ff305db6-4348-4abd-a661-789f061f93b7/image.png?v=1791426450844",
+      "path": "art/source/sprite-fusion/outputs/scout-silhouette-v2/05.png",
+      "bytes": 5060,
+      "sha256": "f22158b46cb622ebd8039e0425e3d303654a6befde98d98081656faefba1c370"
+    },
+    {
+      "index": 6,
+      "assetId": "97821134-9ab4-4571-be7b-935fffb2711c",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/97821134-9ab4-4571-be7b-935fffb2711c/image.png?v=1791426451370",
+      "path": "art/source/sprite-fusion/outputs/scout-silhouette-v2/06.png",
+      "bytes": 4639,
+      "sha256": "02f562e9190d370fb50adcde216ae36497953fef7569c995b8e7b488d4caa50f"
+    },
+    {
+      "index": 7,
+      "assetId": "006bef97-cc0e-4cdf-b282-2633b3d316b0",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/006bef97-cc0e-4cdf-b282-2633b3d316b0/image.png?v=1791426451983",
+      "path": "art/source/sprite-fusion/outputs/scout-silhouette-v2/07.png",
+      "bytes": 4310,
+      "sha256": "f330b75968c3e4c586c00723feface193b99db9d4a0d7a342d0da398f3fdc632"
+    },
+    {
+      "index": 8,
+      "assetId": "75f90f88-3524-49c0-bd20-8cab8e172e52",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/75f90f88-3524-49c0-bd20-8cab8e172e52/image.png?v=1791426452518",
+      "path": "art/source/sprite-fusion/outputs/scout-silhouette-v2/08.png",
+      "bytes": 4182,
+      "sha256": "6f76528b7136ddab9b5d0183a13e95e729cc65c5f0e2ccb9173cd901c885499c"
+    }
+  ],
+  "credits": {
+    "remaining": 2640
+  }
+}

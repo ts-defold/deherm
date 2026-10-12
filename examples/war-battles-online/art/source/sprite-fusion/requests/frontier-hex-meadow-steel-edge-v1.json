@@ -1,0 +1,145 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_98f397f8-609b-472c-887c-2e41f612264d",
+  "operation": "style-reference",
+  "prompt": "One isometric six-sided battlefield terrain tile where olive meadow turf meets a worn refinery steel service deck. A driveable top face with irregular grass pushing into riveted plates, a few cream wildflowers, weathered steel edges and a short dark side face. The references establish the matching hex silhouette, palette, and chunky military rendering. No vehicle, character, building, lettering, or multiple tiles.",
+  "size": 64,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "41690abf-768f-4848-8606-07f54141ceaa"
+    },
+    {
+      "kind": "asset",
+      "assetId": "8adc947b-dcfb-4a05-9a3d-e4e9bf1737e3"
+    },
+    {
+      "kind": "asset",
+      "assetId": "c06b74db-59f1-49aa-b166-ec1abb7f6d6a"
+    },
+    {
+      "kind": "asset",
+      "assetId": "e338dccc-7596-4fb1-8af3-f0159ec80d07"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/frontier-hex-meadow-steel-edge-v1.json",
+    "sha256": "8b0e3de69544e92f8944f3bd12201d0ab0b1a0e035b54324d8b91c2fb156a07a"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "394d19f9-b4c4-453b-86b7-8286fa8137c7",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/394d19f9-b4c4-453b-86b7-8286fa8137c7/image.png?v=1791413121565",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-steel-edge-v1/00.png",
+      "bytes": 8304,
+      "sha256": "1342205b4b66f0a7eceac3d8b0b8f888f0052fb23c316a884dad9936487800bb"
+    },
+    {
+      "index": 1,
+      "assetId": "94d883c8-9943-4be3-8a5b-cb332175e38a",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 65,
+      "height": 65,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/94d883c8-9943-4be3-8a5b-cb332175e38a/image.png?v=1791413122156",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-steel-edge-v1/01.png",
+      "bytes": 8727,
+      "sha256": "5d38ef0f986f66286ef1687ede19371cbd38e801ca6d449d53c1c110f09ba618"
+    },
+    {
+      "index": 2,
+      "assetId": "157d30e2-f218-4576-bc5b-4fa5d8cc118b",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/157d30e2-f218-4576-bc5b-4fa5d8cc118b/image.png?v=1791413122713",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-steel-edge-v1/02.png",
+      "bytes": 7806,
+      "sha256": "899195688c085d757d3e2a9cbeaea3b1c90c9797b582fc08b5eee5d20abcb732"
+    },
+    {
+      "index": 3,
+      "assetId": "367250fa-accd-4782-aee4-5980428fb110",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 69,
+      "height": 69,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/367250fa-accd-4782-aee4-5980428fb110/image.png?v=1791413123335",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-steel-edge-v1/03.png",
+      "bytes": 9750,
+      "sha256": "2a6f778e64e3fbe15c68c1db3f70c2071a8532189d9f0ff3e857fecd1c61ba21"
+    },
+    {
+      "index": 4,
+      "assetId": "03ab3950-2ea4-4d69-9856-641c4e52cd34",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 68,
+      "height": 68,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/03ab3950-2ea4-4d69-9856-641c4e52cd34/image.png?v=1791413123862",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-steel-edge-v1/04.png",
+      "bytes": 9286,
+      "sha256": "d72d74181183cb9a9586b4bd3f38d8fe7088df207b1545c1032cb0efa2aca5cc"
+    },
+    {
+      "index": 5,
+      "assetId": "9943eaaa-0363-4ca5-965b-eb61e9b17f79",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 66,
+      "height": 66,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/9943eaaa-0363-4ca5-965b-eb61e9b17f79/image.png?v=1791413124407",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-steel-edge-v1/05.png",
+      "bytes": 8728,
+      "sha256": "dead218682268eb00938c41b3743e7d52ced8645310d4791d39dcac028bdeebe"
+    },
+    {
+      "index": 6,
+      "assetId": "0a73b0fc-614d-477f-921f-fa2cc64e4779",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 71,
+      "height": 71,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/0a73b0fc-614d-477f-921f-fa2cc64e4779/image.png?v=1791413124920",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-steel-edge-v1/06.png",
+      "bytes": 9183,
+      "sha256": "3df7dd872ab6192ab6fa91fd86474f58c4ea911c865e65cf37745bfd49e44f35"
+    },
+    {
+      "index": 7,
+      "assetId": "b24e83b4-886f-4213-aca6-e35ae2141877",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 73,
+      "height": 73,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/b24e83b4-886f-4213-aca6-e35ae2141877/image.png?v=1791413125499",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-steel-edge-v1/07.png",
+      "bytes": 9574,
+      "sha256": "4e2813073e3e03ce7205b3c393c8eeff8017623651202c8a75c47baa90d71852"
+    },
+    {
+      "index": 8,
+      "assetId": "83105542-6ace-4523-b9ab-090edcfd6ee1",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 70,
+      "height": 70,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/83105542-6ace-4523-b9ab-090edcfd6ee1/image.png?v=1791413126082",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-steel-edge-v1/08.png",
+      "bytes": 9051,
+      "sha256": "17f500a60677bae6f3adf201a19976a2a0927bdbe20504f2f5b77f9f88beac34"
+    }
+  ],
+  "credits": {
+    "remaining": 2865
+  }
+}

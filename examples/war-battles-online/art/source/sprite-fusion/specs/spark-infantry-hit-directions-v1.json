@@ -1,0 +1,6 @@
+{
+  "name": "spark-infantry-hit-directions-v1",
+  "operation": "direction-set",
+  "inputs": ["asset:05cdc1ce-25b6-4fd2-aaa6-dae51d622dcf"],
+  "size": 32
+}

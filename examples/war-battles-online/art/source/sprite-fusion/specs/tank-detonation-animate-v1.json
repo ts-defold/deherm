@@ -1,0 +1,8 @@
+{
+  "name": "tank-detonation-animate-v1",
+  "operation": "animate",
+  "inputs": ["art/source/sprite-fusion/outputs/tank-detonation-core-v1/07.png"],
+  "outputFrames": 8,
+  "colors": 24,
+  "prompt": "One-shot tank-shell detonation: the hot core punches outward, orange flame lobes expand asymmetrically, then break into sparks and dark smoke wisps that dissipate. Energetic impact with a stable center; do not loop."
+}

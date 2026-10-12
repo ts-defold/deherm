@@ -1,0 +1,12 @@
+{
+  "name": "frontier-coastal-water-v1",
+  "operation": "style-reference",
+  "size": 64,
+  "inputs": [
+    "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/04.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-basalt-cliff-v1/04.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-ochre-cliff-v1/07.png",
+    "defold/assets/derived/arena/landmark-rock-outcrop.png"
+  ],
+  "prompt": "One small open coastal-sea surface patch viewed from the same three-quarter isometric battlefield angle. Deep turquoise water with a few thin pale-foam ripples and dark blue-green shadow clusters, calm enough for a readable tank game. Only water, no island, cliff, shore, hex border, boat, text, or interface."
+}

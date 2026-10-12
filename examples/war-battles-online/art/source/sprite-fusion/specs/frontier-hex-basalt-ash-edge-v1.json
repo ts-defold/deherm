@@ -1,0 +1,12 @@
+{
+  "name": "frontier-hex-basalt-ash-edge-v1",
+  "operation": "style-reference",
+  "size": 64,
+  "prompt": "One isometric six-sided volcanic battlefield tile where solid charcoal basalt becomes hot fractured ash rock. The driveable top has dark stone plates, ember-lit cracks and sparse orange heat, with a short chunky cliff side. Match the reference hex silhouette and restrained refinery palette so this can border both cooled basalt and glowing lava. No vehicle, character, building, lettering, or multiple tiles.",
+  "inputs": [
+    "asset:c10cf40b-aea8-4702-b4f7-2bcf17419d7e",
+    "asset:9df0ea78-425a-4f60-9fba-911e5aaf90b6",
+    "asset:814fdb71-9cac-43a9-87f9-0e89d8a1ad9e",
+    "asset:5eb59893-5c94-4d23-b34b-adfdc9320198"
+  ]
+}

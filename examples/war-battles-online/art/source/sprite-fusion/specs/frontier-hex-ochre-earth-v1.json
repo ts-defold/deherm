@@ -1,0 +1,10 @@
+{
+  "name": "frontier-hex-ochre-earth-v1",
+  "operation": "style-reference",
+  "size": 64,
+  "prompt": "A single isometric six-sided terrain tile of compacted ochre earth and amber grit for a volcanic frontier strategy battlefield. Broad flat driveable top with sparse gravel and a small dark soil cliff side; crisp pixel-art clusters, warm rim light, and the same footprint and perspective as the reference hex. One isolated tile only, no tank, building, lettering, border, or second tile.",
+  "inputs": [
+    "asset:bd93b0e2-417d-4553-b8ab-8c4637ff088e",
+    "art/source/imagegen/hex-style-reference/earth.png"
+  ]
+}

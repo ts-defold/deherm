@@ -517,11 +517,31 @@ const TURRET_ANIMATIONS: readonly (readonly (readonly DefoldHash[])[])[] = [
   ],
 ];
 
-const WRECK_ANIMATIONS: readonly DefoldHash[] = [
-  hashLiteral("#tank-blue-wreck"),
-  hashLiteral("#tank-red-wreck"),
-  hashLiteral("#tank-green-wreck"),
-  hashLiteral("#tank-sand-wreck"),
+const WRECK_ANIMATIONS: readonly (readonly DefoldHash[])[] = [
+  [
+    hashLiteral("#chassis-blue-scout-wreck"),
+    hashLiteral("#chassis-blue-assault-wreck"),
+    hashLiteral("#chassis-blue-bulwark-wreck"),
+    hashLiteral("#chassis-blue-artillery-wreck"),
+  ],
+  [
+    hashLiteral("#chassis-red-scout-wreck"),
+    hashLiteral("#chassis-red-assault-wreck"),
+    hashLiteral("#chassis-red-bulwark-wreck"),
+    hashLiteral("#chassis-red-artillery-wreck"),
+  ],
+  [
+    hashLiteral("#chassis-green-scout-wreck"),
+    hashLiteral("#chassis-green-assault-wreck"),
+    hashLiteral("#chassis-green-bulwark-wreck"),
+    hashLiteral("#chassis-green-artillery-wreck"),
+  ],
+  [
+    hashLiteral("#chassis-sand-scout-wreck"),
+    hashLiteral("#chassis-sand-assault-wreck"),
+    hashLiteral("#chassis-sand-bulwark-wreck"),
+    hashLiteral("#chassis-sand-artillery-wreck"),
+  ],
 ];
 
 function colourIndex(colour: number): number {
@@ -551,6 +571,6 @@ export function tankTurretAnimation(colour: number, chassis: number, direction: 
   return TURRET_ANIMATIONS[colourIndex(colour)]![chassisIndex(chassis)]![directionIndex(direction)]!;
 }
 
-export function tankWreckAnimation(colour: number): DefoldHash {
-  return WRECK_ANIMATIONS[colourIndex(colour)]!;
+export function tankWreckAnimation(colour: number, chassis: number): DefoldHash {
+  return WRECK_ANIMATIONS[colourIndex(colour)]![chassisIndex(chassis)]!;
 }

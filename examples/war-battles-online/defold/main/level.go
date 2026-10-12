@@ -1,4 +1,12 @@
 components {
+  id: "landscape"
+  component: "/main/hex-meadow.tilemap"
+  rotation {
+    z: 0.3826834323650898
+    w: 0.9238795325112867
+  }
+}
+components {
   id: "tilemap"
   component: "/main/arena.tilemap"
   rotation {

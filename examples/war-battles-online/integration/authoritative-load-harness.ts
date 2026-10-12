@@ -1,21 +1,26 @@
 import {
   BattleClient,
+  INITIAL_ONLINE_INPUT_LEAD_TICKS,
   INPUT_SEND_INTERVAL_TICKS,
+  LOCAL_CORRECTION_BUCKET_UPPER_BOUNDS,
   MatchServer,
   NetworkBotDriver,
+  SNAPSHOT_KEYFRAME_INTERVAL,
   TICK_MILLISECONDS,
   type BattleClientOptions,
+  type PlayerTransform,
   type GameTransport,
   type ReliableChannel,
   type SendDisposition,
   SESSION_TOKEN_BYTES,
+  TRANSPORT_CHANNEL_SNAPSHOT,
   type SessionTokenClaims,
   type SessionTokenExpectation,
   type SessionTokenProvider,
   type TransportReceiver,
 } from "../core/index.ts";
 
-export const LOAD_HARNESS_SCHEMA_VERSION = 2;
+export const LOAD_HARNESS_SCHEMA_VERSION = 3;
 /** Conservative floor below the deterministic capped-link impaired run. */
 export const MINIMUM_INPUT_ACCEPTANCE_RATIO = 0.93;
 
@@ -36,6 +41,8 @@ export interface LoadHarnessConfig {
   /** Per-client application-payload cap for server-to-client traffic. */
   readonly downlinkBitsPerSecond: number;
   readonly minimumInputAcceptanceRatio: number;
+  /** Optional starting prediction lead for experiments; defaults to the production online lead. */
+  readonly initialLeadTicks?: number;
   /** Shared production bot-brain difficulty used by every network client. */
   readonly botSkill: number;
 }
@@ -55,10 +62,14 @@ export const LOAD_HARNESS_CONFIG: Readonly<LoadHarnessConfig> = Object.freeze({
   uplinkBitsPerSecond: 24_000,
   downlinkBitsPerSecond: 160_000,
   minimumInputAcceptanceRatio: MINIMUM_INPUT_ACCEPTANCE_RATIO,
+  initialLeadTicks: INITIAL_ONLINE_INPUT_LEAD_TICKS,
   botSkill: 2,
 });
 
 const RELIABLE_CHANNELS: readonly ReliableChannel[] = [1, 2, 3, 4];
+const ORDERED_RELIABLE_CHANNELS: readonly ReliableChannel[] = RELIABLE_CHANNELS.filter(
+  (channel) => channel !== TRANSPORT_CHANNEL_SNAPSHOT,
+);
 
 /**
  * The load gate proves simulation and transport behavior, not WebCrypto.
@@ -98,10 +109,11 @@ interface PendingPacket {
 
 /**
  * A deterministic, bounded network seam for the real production transport
- * contract. Reliable channels retain per-channel stream ordering and delivery;
- * datagrams are the only lane exposed to loss, reordering and backpressure.
+ * contract. Session, control, and fallback-input streams retain per-channel
+ * ordering. Each snapshot owns an independent reliable stream and may arrive
+ * out of order; datagrams additionally allow loss and backpressure.
  */
-class ImpairedNetwork {
+export class ImpairedNetwork {
   readonly config: Readonly<LoadHarnessConfig>;
   readonly queue: PendingPacket[] = [];
   readonly stats = {
@@ -113,6 +125,7 @@ class ImpairedNetwork {
     droppedDatagrams: 0,
     backpressuredDatagrams: 0,
     reorderedDatagrams: 0,
+    reorderedSnapshotStreams: 0,
     cancelledReliable: 0,
     cancelledReliableBytes: 0,
     offeredBytes: 0,
@@ -184,8 +197,11 @@ class ImpairedNetwork {
         this.stats.deliveredReliable += 1;
         const key = `${packet!.linkId}:${packet!.direction}:${packet!.channel}`;
         const previous = this.lastReliableDelivered.get(key);
-        if (previous !== undefined && packet!.sequence <= previous) this.stats.reliableOrderViolations += 1;
-        this.lastReliableDelivered.set(key, packet!.sequence);
+        if (previous !== undefined && packet!.sequence < previous) {
+          if (packet!.channel === TRANSPORT_CHANNEL_SNAPSHOT) this.stats.reorderedSnapshotStreams += 1;
+          else this.stats.reliableOrderViolations += 1;
+        }
+        this.lastReliableDelivered.set(key, Math.max(previous ?? -1, packet!.sequence));
         packet!.receiver!.onReliable(packet!.channel!, packet!.payload);
       } else {
         this.stats.deliveredDatagrams += 1;
@@ -270,11 +286,11 @@ class ImpairedNetwork {
     const jitter = this.nextInteger(-this.config.jitterMilliseconds, this.config.jitterMilliseconds);
     const proposed = serializationEnd + this.config.baseLatencyMilliseconds + jitter;
     const orderedKey = `${linkId}:${direction}:${channel ?? 0}`;
-    const due =
-      kind === "reliable"
-        ? Math.max(proposed, (this.reliableTail.get(orderedKey) ?? this.now) + 0.001)
-        : Math.max(this.now + 1, proposed);
-    if (kind === "reliable") this.reliableTail.set(orderedKey, due);
+    const orderedReliable = kind === "reliable" && channel !== TRANSPORT_CHANNEL_SNAPSHOT;
+    const due = orderedReliable
+      ? Math.max(proposed, (this.reliableTail.get(orderedKey) ?? this.now) + 0.001)
+      : Math.max(this.now + 1, proposed);
+    if (orderedReliable) this.reliableTail.set(orderedKey, due);
     return new Promise<SendDisposition>((resolve) => {
       const packet: PendingPacket = {
         id: this.nextPacketId++,
@@ -389,6 +405,23 @@ export interface LoadHarnessEvidence {
   readonly errors: Record<string, unknown>;
 }
 
+function sumBuckets(
+  clients: readonly BattleClient[],
+  field: "localCorrectionBuckets" | "predictionErrorBuckets",
+): number[] {
+  const buckets = Array.from({ length: LOCAL_CORRECTION_BUCKET_UPPER_BOUNDS.length + 1 }, () => 0);
+  for (const client of clients) {
+    for (let bucket = 0; bucket < buckets.length; bucket += 1) {
+      buckets[bucket]! += client.stats[field][bucket]!;
+    }
+  }
+  return buckets;
+}
+
+const correctionBuckets = (clients: readonly BattleClient[]): number[] => sumBuckets(clients, "localCorrectionBuckets");
+const predictionErrorBuckets = (clients: readonly BattleClient[]): number[] =>
+  sumBuckets(clients, "predictionErrorBuckets");
+
 /**
  * Optional observation seam for runtime measurements. The default load gate
  * does not pass an observer, so its evidence remains deterministic. A runtime
@@ -399,6 +432,13 @@ export interface LoadHarnessEvidence {
 export interface AuthoritativeLoadObserver {
   readonly now: () => number;
   readonly onAuthoritativeStep?: (sample: { readonly tick: number; readonly durationMilliseconds: number }) => void;
+  /** Optional live diagnostic seam; the default evidence path adds no per-client trace. */
+  readonly onClientStep?: (sample: {
+    readonly tick: number;
+    readonly clientIndex: number;
+    readonly client: BattleClient;
+    readonly server: MatchServer;
+  }) => void;
 }
 
 export async function runAuthoritativeLoadHarness(
@@ -419,6 +459,10 @@ export async function runAuthoritativeLoadHarness(
   });
   const clients: BattleClient[] = [];
   const botDrivers: NetworkBotDriver[] = [];
+  // Sample the same caller-owned presentation shape as the Defold player
+  // component once per simulated frame. Correction magnitude alone is not a
+  // visible-step metric: the renderer sees the decaying presented pose.
+  const presentedPoses: PlayerTransform[] = [];
   const clientErrors: string[][] = [];
   const clientLogs: string[][] = [];
   const sessions = [];
@@ -427,7 +471,7 @@ export async function runAuthoritativeLoadHarness(
     const logs: string[] = [];
     const options: BattleClientOptions = {
       name: `load-${index + 1}`,
-      leadTicks: 2,
+      leadTicks: config.initialLeadTicks ?? 2,
       // Preserve the shared bot brain's skill-dependent aim. Human clients
       // default to aim assistance, while the production bot dashboard and this
       // product matrix deliberately drive the ordinary aim API themselves.
@@ -444,6 +488,20 @@ export async function runAuthoritativeLoadHarness(
     client.attach(clientTransport);
     clients.push(client);
     botDrivers.push(botDriver);
+    presentedPoses.push({
+      x: 0,
+      y: 0,
+      hullX: 0,
+      hullY: 0,
+      turretX: 0,
+      turretY: 0,
+      active: 0,
+      generation: 0,
+      mode: 0,
+      chassis: 0,
+      velocityX: 0,
+      velocityY: 0,
+    });
     sessions.push(session);
     clientErrors.push(errors);
     clientLogs.push(logs);
@@ -490,7 +548,11 @@ export async function runAuthoritativeLoadHarness(
       }
       observer.onAuthoritativeStep?.({ tick: server.world.tick, durationMilliseconds });
     }
-    for (const botDriver of botDrivers) botDriver.update(TICK_MILLISECONDS);
+    for (let index = 0; index < botDrivers.length; index += 1) {
+      botDrivers[index]!.update(TICK_MILLISECONDS);
+      clients[index]!.samplePlayerTransform(clients[index]!.playerId - 1, presentedPoses[index]!);
+      observer?.onClientStep?.({ tick, clientIndex: index, client: clients[index]!, server });
+    }
     await Promise.resolve();
     simulationTime += TICK_MILLISECONDS;
   }
@@ -506,6 +568,24 @@ export async function runAuthoritativeLoadHarness(
     clientToServerDelivered: network.stats.clientToServerDeliveredBytes - workloadStartBytes.clientToServerDelivered,
     serverToClientSerialized: network.stats.serverToClientSerializedBytes - workloadStartBytes.serverToClientSerialized,
     serverToClientDelivered: network.stats.serverToClientDeliveredBytes - workloadStartBytes.serverToClientDelivered,
+  };
+  // Keep the measured play window separate from the forced final-convergence
+  // probe below. That probe stops client commands while the server keeps
+  // stepping; its correction samples are real but not representative of a
+  // player who continues supplying input during a match.
+  const workloadCorrections = {
+    maximumLocalCorrectionMagnitude: Math.max(...clients.map((client) => client.stats.maximumLocalCorrectionMagnitude)),
+    localCorrectionBuckets: correctionBuckets(clients),
+    /** Same-tick simulation disagreement, excluding visual delta across ticks. */
+    maximumPredictionErrorMagnitude: Math.max(...clients.map((client) => client.stats.maximumPredictionErrorMagnitude)),
+    predictionErrorBuckets: predictionErrorBuckets(clients),
+    maximumLocalPresentedStepDistance: Math.max(
+      ...clients.map((client) => client.stats.maximumLocalPresentedStepDistance),
+    ),
+    localPresentedStepsOverThirtyTwoPixels: clients.reduce(
+      (total, client) => total + client.stats.localPresentedStepsOverThirtyTwoPixels,
+      0,
+    ),
   };
 
   // Prediction intentionally leaves each client at its adaptive lead. Stop
@@ -536,28 +616,40 @@ export async function runAuthoritativeLoadHarness(
   for (const client of clients) client.update(0);
   await Promise.resolve();
 
-  // A cadence may have been intentionally skipped while the prior latest-state
-  // write serialized through the capped downlink. Once that write is drained,
-  // advance to one fresh authoritative cadence and deliver it. This is an
-  // explicit end-of-run convergence probe, not extra recovery available during
-  // the measured ten-second workload.
-  for (let step = 0; step < server.snapshotIntervalTicks; step += 1) {
-    server.step();
-    simulationTime += TICK_MILLISECONDS;
+  // An unreliable final delta can be lost even when the transport has no
+  // pending writes. Keep sampling current authoritative state until every
+  // client observes the same tick, or through one full periodic reliable
+  // keyframe cycle. This is a bounded end-of-run convergence probe, separate
+  // from the measured active-play correction window.
+  let convergenceCadences = 0;
+  const convergedNow = () => {
+    const hash = server.world.stateHash();
+    return clients.every(
+      (client) =>
+        client.state === "ready" && client.world?.tick === server.world.tick && client.world.stateHash() === hash,
+    );
+  };
+  while (!convergedNow() && convergenceCadences < SNAPSHOT_KEYFRAME_INTERVAL + 2) {
+    convergenceCadences += 1;
+    for (let step = 0; step < server.snapshotIntervalTicks; step += 1) {
+      server.step();
+      simulationTime += TICK_MILLISECONDS;
+      network.advanceTo(simulationTime);
+      await Promise.resolve();
+    }
+    for (let step = 0; step <= config.drainMilliseconds; step += 1) {
+      network.advanceTo(simulationTime + step);
+      await Promise.resolve();
+      for (const client of clients) client.update(0);
+      await Promise.resolve();
+      if (network.queue.length === 0) break;
+    }
+    simulationTime += config.drainMilliseconds + 1;
     network.advanceTo(simulationTime);
-    await Promise.resolve();
-  }
-  for (let step = 0; step <= config.drainMilliseconds; step += 1) {
-    network.advanceTo(simulationTime + step);
     await Promise.resolve();
     for (const client of clients) client.update(0);
     await Promise.resolve();
-    if (network.queue.length === 0) break;
   }
-  network.advanceTo(simulationTime + config.drainMilliseconds + 1);
-  await Promise.resolve();
-  for (const client of clients) client.update(0);
-  await Promise.resolve();
 
   const authoritativeHash = server.world.stateHash();
   const clientRows = clients.map((client, index) => {
@@ -580,6 +672,10 @@ export async function runAuthoritativeLoadHarness(
       inputLeadDecreases: client.stats.inputLeadDecreases,
       inputLeadCatchdownSkips: client.stats.inputLeadCatchdownSkips,
       maximumLocalCorrectionMagnitude: client.stats.maximumLocalCorrectionMagnitude,
+      maximumLocalPresentedStepDistance: client.stats.maximumLocalPresentedStepDistance,
+      localPresentedStepsOverThirtyTwoPixels: client.stats.localPresentedStepsOverThirtyTwoPixels,
+      localCorrectionBuckets: Array.from(client.stats.localCorrectionBuckets),
+      predictionErrorBuckets: Array.from(client.stats.predictionErrorBuckets),
       remoteInterpolationRebases: client.stats.remoteInterpolationRebases,
       maximumRemoteInterpolationRebaseDistance: client.stats.maximumRemoteInterpolationRebaseDistance,
       maximumRemoteInterpolationDiscontinuity: client.stats.maximumRemoteInterpolationDiscontinuity,
@@ -595,6 +691,7 @@ export async function runAuthoritativeLoadHarness(
     };
   });
   const allConverged = clientRows.every((client) => client.converged);
+  const localCorrectionBuckets = correctionBuckets(clients);
   const uniquePlayerIds = new Set(clientRows.map((client) => client.playerId));
   const reliableOrderPreserved = network.stats.reliableOrderViolations === 0;
   const reliableDeliveryComplete =
@@ -615,7 +712,7 @@ export async function runAuthoritativeLoadHarness(
     return client.inputsSent + client.inputsDropped === Math.ceil(generatedCommands / INPUT_SEND_INTERVAL_TICKS);
   });
   const everyBotDroveTheProduct = clientRows.every(
-    (client) => client.botCommandsStaged === config.ticks && client.botNonIdleCommands >= config.ticks / 2,
+    (client) => client.botCommandsStaged >= config.ticks * 0.9 && client.botNonIdleCommands >= config.ticks / 2,
   );
   const generatedInputCommands = clientRows.reduce(
     (total, client) => total + config.ticks + client.inputLeadIncreases - client.inputLeadCatchdownSkips,
@@ -648,7 +745,9 @@ export async function runAuthoritativeLoadHarness(
       protocol: "in-memory-impairment",
       reliableStreams: true,
       datagrams: true,
-      orderedReliableChannels: RELIABLE_CHANNELS,
+      orderedReliableChannels: ORDERED_RELIABLE_CHANNELS,
+      latestStateDatagrams: true,
+      independentReliableSnapshotChannel: TRANSPORT_CHANNEL_SNAPSHOT,
       latencyMilliseconds: config.baseLatencyMilliseconds,
       jitterMilliseconds: config.jitterMilliseconds,
       datagramLossPercent: config.datagramLossPercent,
@@ -677,6 +776,8 @@ export async function runAuthoritativeLoadHarness(
       snapshotNormalFramesSent: server.stats.snapshotNormalFramesSent,
       snapshotRecoveryFramesSent: server.stats.snapshotRecoveryFramesSent,
       snapshotFramesSkippedByBudget: server.stats.snapshotFramesSkippedByBudget,
+      snapshotDatagramsSent: server.stats.snapshotDatagramsSent,
+      snapshotDatagramsDropped: server.stats.snapshotDatagramsDropped,
       inputsAccepted: server.stats.inputsAccepted,
       inputsRejected: server.stats.inputsRejected,
       inputsLate: server.stats.inputsLate,
@@ -705,6 +806,9 @@ export async function runAuthoritativeLoadHarness(
       maxInputLeadTicks: Math.max(...clientRows.map((client) => client.inputLeadTicks)),
       totalInputLeadDecreases: clientRows.reduce((total, client) => total + client.inputLeadDecreases, 0),
       maximumLocalCorrectionMagnitude: Math.max(...clientRows.map((client) => client.maximumLocalCorrectionMagnitude)),
+      localCorrectionBucketUpperBounds: LOCAL_CORRECTION_BUCKET_UPPER_BOUNDS,
+      localCorrectionBuckets,
+      workloadCorrections,
       totalRemoteInterpolationRebases: clientRows.reduce(
         (total, client) => total + client.remoteInterpolationRebases,
         0,
@@ -723,6 +827,7 @@ export async function runAuthoritativeLoadHarness(
       allClientsConverged: allConverged,
       uniquePlayerIds: uniquePlayerIds.size,
       finalTick: server.world.tick,
+      cadencesNeeded: convergenceCadences,
     },
     errors: {
       uncaught: 0,

@@ -1,0 +1,12 @@
+{
+  "name": "frontier-broadleaf-landmark-v1",
+  "operation": "style-reference",
+  "size": 96,
+  "inputs": [
+    "asset:32dd1a8f-f217-464b-846b-fd35b1f117ba",
+    "asset:a5def02e-90f2-483e-8103-ee5769e2c2e2",
+    "asset:11f25fdc-1b8a-4864-8793-9829114ce4a3",
+    "defold/assets/derived/arena/landmark-rock-outcrop.png"
+  ],
+  "prompt": "One broad low deciduous tree for the same three-quarter isometric arcade tank battlefield as the references. A wide irregular crown of dense deep-green leaves with warm olive sunlit clusters, visible sturdy dark trunk, roots and a little earth at one clear ground contact point. Its silhouette should differ decisively from the pointed conifers: rounded and asymmetrical, with layered foliage and a few gaps showing branches. Match the references' chunky outlined pixel clusters and natural earthy palette. A free-standing tree only, no platform, hexagonal tile, vehicle, text, UI, or scene background."
+}

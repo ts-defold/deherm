@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "sourceRequest": "mud-infantry-walk-pose-e-v1",
+  "outputIndex": 0,
+  "sourceSha256": "85e08fd533c7bff43ab6e693402d29cd60b7c5215600e57212f6d51494b0c5bf",
+  "canvas": 80,
+  "footRow": 72,
+  "sourceBounds": [
+    0,
+    0,
+    26,
+    49
+  ],
+  "paddedBounds": [
+    26,
+    22,
+    52,
+    71
+  ],
+  "sha256": "5e379c01d88f06c4b4d467d381be2e1b4258c89a921b45f1c4d47d9ed4afd02e"
+}

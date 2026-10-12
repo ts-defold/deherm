@@ -1,0 +1,6 @@
+{
+  "name": "scout-hull-v2",
+  "operation": "edit",
+  "inputs": ["art/source/sprite-fusion/outputs/scout-silhouette-v2/05.png"],
+  "prompt": "Remove only the raised rotating turret, cannon and antenna from this light scout tank. Preserve the narrow pointed armored hull, exposed short tracks, exact isometric view, palette, outline and ground contact. Finish the top deck as a low armored hull with a visible dark circular turret socket. One isolated hull, no weapon."
+}

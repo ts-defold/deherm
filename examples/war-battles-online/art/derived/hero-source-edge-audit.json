@@ -1,0 +1,3082 @@
+{
+  "schemaVersion": 1,
+  "meaning": "Source-cell edge contact is a clipping risk, not proof that pixels are missing; runtime canvas gutters cannot repair a clipped source.",
+  "selectedSourceFrames": 256,
+  "edgeContactFrames": 181,
+  "walkSourceFrames": 128,
+  "walkHorizontalEdgeContactFrames": 18,
+  "frames": [
+    {
+      "label": "rook/se/idle",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-directions-v1/00.png",
+      "canvas": [47, 47],
+      "opaqueBounds": [11, 0, 34, 46],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "rook/se/fire",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-fire-directions-v1/00.png",
+      "canvas": [35, 35],
+      "opaqueBounds": [6, 0, 27, 34],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "rook/se/hit",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-hit-directions-v2/00.png",
+      "canvas": [37, 37],
+      "opaqueBounds": [7, 0, 28, 36],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "rook/se/death",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-death-pose-se-v1/00.png",
+      "canvas": [44, 41],
+      "opaqueBounds": [0, 0, 43, 40],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "rook/se/walk-1",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-walk-se-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [19, 9, 43, 55],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "rook/se/walk-2",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-walk-se-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [21, 9, 41, 55],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "rook/se/walk-3",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-walk-se-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [23, 8, 41, 55],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "rook/se/walk-4",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-walk-se-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [22, 7, 41, 55],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "rook/s/idle",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-directions-v1/01.png",
+      "canvas": [49, 49],
+      "opaqueBounds": [8, 0, 40, 48],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "rook/s/fire",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-fire-directions-v1/01.png",
+      "canvas": [32, 32],
+      "opaqueBounds": [9, 0, 22, 31],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "rook/s/hit",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-hit-directions-v2/01.png",
+      "canvas": [38, 38],
+      "opaqueBounds": [5, 0, 32, 37],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "rook/s/death",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-death-pose-s-v1/00.png",
+      "canvas": [34, 49],
+      "opaqueBounds": [0, 0, 33, 48],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "rook/s/walk-1",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-walk-s-padded-v2/00-sheet.png",
+      "canvas": [80, 80],
+      "opaqueBounds": [24, 23, 55, 71],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "rook/s/walk-2",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-walk-s-padded-v2/00-sheet.png",
+      "canvas": [80, 80],
+      "opaqueBounds": [25, 21, 54, 71],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "rook/s/walk-3",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-walk-s-padded-v2/00-sheet.png",
+      "canvas": [80, 80],
+      "opaqueBounds": [24, 21, 54, 71],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "rook/s/walk-4",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-walk-s-padded-v2/00-sheet.png",
+      "canvas": [80, 80],
+      "opaqueBounds": [23, 20, 55, 71],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "rook/sw/idle",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-directions-v1/02.png",
+      "canvas": [46, 46],
+      "opaqueBounds": [9, 0, 35, 45],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "rook/sw/fire",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-fire-directions-v1/02.png",
+      "canvas": [35, 35],
+      "opaqueBounds": [6, 0, 27, 34],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "rook/sw/hit",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-hit-directions-v2/02.png",
+      "canvas": [37, 37],
+      "opaqueBounds": [7, 0, 28, 36],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "rook/sw/death",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-death-pose-sw-v1/00.png",
+      "canvas": [38, 44],
+      "opaqueBounds": [0, 0, 37, 43],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "rook/sw/walk-1",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-walk-sw-v1/00-sheet.png",
+      "canvas": [29, 46],
+      "opaqueBounds": [0, 0, 28, 45],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "rook/sw/walk-2",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-walk-sw-v1/00-sheet.png",
+      "canvas": [29, 46],
+      "opaqueBounds": [2, 0, 25, 45],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "rook/sw/walk-3",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-walk-sw-v1/00-sheet.png",
+      "canvas": [29, 46],
+      "opaqueBounds": [2, 0, 24, 44],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "rook/sw/walk-4",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-walk-sw-v1/00-sheet.png",
+      "canvas": [29, 46],
+      "opaqueBounds": [2, 0, 25, 44],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "rook/w/idle",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-directions-v1/03.png",
+      "canvas": [45, 45],
+      "opaqueBounds": [13, 0, 30, 44],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "rook/w/fire",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-fire-directions-v1/03.png",
+      "canvas": [32, 32],
+      "opaqueBounds": [5, 0, 26, 31],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "rook/w/hit",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-hit-directions-v2/03.png",
+      "canvas": [41, 41],
+      "opaqueBounds": [10, 0, 29, 40],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "rook/w/death",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-death-pose-w-v1/01.png",
+      "canvas": [60, 52],
+      "opaqueBounds": [0, 0, 59, 51],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "rook/w/walk-1",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-walk-w-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [20, 11, 42, 55],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "rook/w/walk-2",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-walk-w-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [22, 12, 39, 55],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "rook/w/walk-3",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-walk-w-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [22, 10, 39, 55],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "rook/w/walk-4",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-walk-w-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [22, 10, 42, 55],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "rook/e/idle",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-directions-v1/04.png",
+      "canvas": [43, 43],
+      "opaqueBounds": [11, 0, 31, 42],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "rook/e/fire",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-fire-directions-v1/04.png",
+      "canvas": [32, 32],
+      "opaqueBounds": [5, 0, 25, 31],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "rook/e/hit",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-hit-directions-v2/04.png",
+      "canvas": [41, 41],
+      "opaqueBounds": [10, 0, 29, 40],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "rook/e/death",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-death-pose-e-v1/01.png",
+      "canvas": [49, 42],
+      "opaqueBounds": [0, 0, 48, 41],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "rook/e/walk-1",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-walk-e-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [18, 11, 45, 55],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "rook/e/walk-2",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-walk-e-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [21, 9, 41, 54],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "rook/e/walk-3",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-walk-e-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [21, 8, 41, 54],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "rook/e/walk-4",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-walk-e-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [21, 9, 43, 54],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "rook/nw/idle",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-directions-v1/05.png",
+      "canvas": [41, 41],
+      "opaqueBounds": [10, 0, 29, 40],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "rook/nw/fire",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-fire-directions-v1/05.png",
+      "canvas": [32, 32],
+      "opaqueBounds": [5, 0, 25, 30],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "rook/nw/hit",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-hit-directions-v2/05.png",
+      "canvas": [40, 40],
+      "opaqueBounds": [8, 0, 31, 39],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "rook/nw/death",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-death-pose-nw-v1/00.png",
+      "canvas": [42, 45],
+      "opaqueBounds": [0, 0, 41, 44],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "rook/nw/walk-1",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-walk-nw-v1/00-sheet.png",
+      "canvas": [25, 41],
+      "opaqueBounds": [0, 0, 24, 40],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "rook/nw/walk-2",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-walk-nw-v1/00-sheet.png",
+      "canvas": [25, 41],
+      "opaqueBounds": [1, 1, 23, 40],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "rook/nw/walk-3",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-walk-nw-v1/00-sheet.png",
+      "canvas": [25, 41],
+      "opaqueBounds": [3, 0, 22, 38],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "rook/nw/walk-4",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-walk-nw-v1/00-sheet.png",
+      "canvas": [25, 41],
+      "opaqueBounds": [1, 0, 22, 40],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "rook/n/idle",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-directions-v1/06.png",
+      "canvas": [45, 45],
+      "opaqueBounds": [9, 0, 34, 44],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "rook/n/fire",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-fire-directions-v1/06.png",
+      "canvas": [32, 32],
+      "opaqueBounds": [8, 0, 23, 30],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "rook/n/hit",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-hit-directions-v2/06.png",
+      "canvas": [39, 39],
+      "opaqueBounds": [5, 0, 32, 38],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "rook/n/death",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-death-pose-n-v1/01.png",
+      "canvas": [32, 38],
+      "opaqueBounds": [0, 0, 31, 37],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "rook/n/walk-1",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-walk-n-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [19, 11, 44, 55],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "rook/n/walk-2",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-walk-n-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [19, 9, 44, 53],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "rook/n/walk-3",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-walk-n-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [18, 11, 46, 55],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "rook/n/walk-4",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-walk-n-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [18, 9, 45, 54],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "rook/ne/idle",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-directions-v1/07.png",
+      "canvas": [41, 41],
+      "opaqueBounds": [5, 0, 35, 40],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "rook/ne/fire",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-fire-directions-v1/07.png",
+      "canvas": [32, 32],
+      "opaqueBounds": [6, 0, 24, 30],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "rook/ne/hit",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-hit-directions-v2/07.png",
+      "canvas": [39, 39],
+      "opaqueBounds": [6, 0, 31, 38],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "rook/ne/death",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-death-pose-ne-v1/00.png",
+      "canvas": [36, 41],
+      "opaqueBounds": [0, 0, 35, 40],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "rook/ne/walk-1",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-walk-ne-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [15, 15, 48, 55],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "rook/ne/walk-2",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-walk-ne-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [19, 16, 47, 55],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "rook/ne/walk-3",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-walk-ne-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [19, 15, 44, 55],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "rook/ne/walk-4",
+      "source": "art/source/sprite-fusion/outputs/rook-infantry-walk-ne-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [19, 14, 46, 55],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "brass/se/idle",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-directions-v1/00.png",
+      "canvas": [50, 50],
+      "opaqueBounds": [8, 0, 41, 49],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "brass/se/fire",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-fire-directions-v1/00.png",
+      "canvas": [37, 37],
+      "opaqueBounds": [8, 0, 27, 36],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "brass/se/hit",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-hit-directions-v2/00.png",
+      "canvas": [38, 38],
+      "opaqueBounds": [5, 0, 31, 37],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "brass/se/death",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-death-pose-se-v1/01.png",
+      "canvas": [48, 49],
+      "opaqueBounds": [0, 0, 47, 48],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "brass/se/walk-1",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-walk-se-padded-v2/00-sheet.png",
+      "canvas": [80, 80],
+      "opaqueBounds": [22, 21, 57, 71],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "brass/se/walk-2",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-walk-se-padded-v2/00-sheet.png",
+      "canvas": [80, 80],
+      "opaqueBounds": [25, 21, 54, 71],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "brass/se/walk-3",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-walk-se-padded-v2/00-sheet.png",
+      "canvas": [80, 80],
+      "opaqueBounds": [28, 19, 53, 71],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "brass/se/walk-4",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-walk-se-padded-v2/00-sheet.png",
+      "canvas": [80, 80],
+      "opaqueBounds": [27, 19, 53, 71],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "brass/s/idle",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-directions-v1/01.png",
+      "canvas": [50, 50],
+      "opaqueBounds": [5, 0, 43, 49],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "brass/s/fire",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-fire-directions-v1/01.png",
+      "canvas": [43, 43],
+      "opaqueBounds": [9, 0, 33, 42],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "brass/s/hit",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-hit-directions-v2/01.png",
+      "canvas": [38, 38],
+      "opaqueBounds": [5, 0, 31, 37],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "brass/s/death",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-death-pose-s-v1/01.png",
+      "canvas": [44, 41],
+      "opaqueBounds": [0, 0, 43, 40],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "brass/s/walk-1",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-walk-s-padded-v2/00-sheet.png",
+      "canvas": [80, 80],
+      "opaqueBounds": [22, 17, 56, 71],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "brass/s/walk-2",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-walk-s-padded-v2/00-sheet.png",
+      "canvas": [80, 80],
+      "opaqueBounds": [23, 16, 57, 70],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "brass/s/walk-3",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-walk-s-padded-v2/00-sheet.png",
+      "canvas": [80, 80],
+      "opaqueBounds": [23, 14, 56, 69],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "brass/s/walk-4",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-walk-s-padded-v2/00-sheet.png",
+      "canvas": [80, 80],
+      "opaqueBounds": [24, 16, 55, 71],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "brass/sw/idle",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-directions-v1/02.png",
+      "canvas": [50, 50],
+      "opaqueBounds": [8, 0, 41, 49],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "brass/sw/fire",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-fire-directions-v1/02.png",
+      "canvas": [37, 37],
+      "opaqueBounds": [6, 0, 29, 36],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "brass/sw/hit",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-hit-directions-v2/02.png",
+      "canvas": [38, 38],
+      "opaqueBounds": [7, 0, 29, 37],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "brass/sw/death",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-death-pose-sw-v1/01.png",
+      "canvas": [41, 39],
+      "opaqueBounds": [0, 0, 40, 38],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "brass/sw/walk-1",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-walk-sw-v1/00-sheet.png",
+      "canvas": [35, 52],
+      "opaqueBounds": [0, 0, 34, 51],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "brass/sw/walk-2",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-walk-sw-v1/00-sheet.png",
+      "canvas": [35, 52],
+      "opaqueBounds": [0, 1, 33, 51],
+      "edgeContacts": {
+        "left": true,
+        "top": false,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "brass/sw/walk-3",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-walk-sw-v1/00-sheet.png",
+      "canvas": [35, 52],
+      "opaqueBounds": [4, 0, 29, 51],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "brass/sw/walk-4",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-walk-sw-v1/00-sheet.png",
+      "canvas": [35, 52],
+      "opaqueBounds": [3, 0, 27, 51],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "brass/w/idle",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-directions-v1/03.png",
+      "canvas": [48, 48],
+      "opaqueBounds": [11, 0, 36, 47],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "brass/w/fire",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-fire-directions-v1/03.png",
+      "canvas": [43, 43],
+      "opaqueBounds": [9, 0, 33, 42],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "brass/w/hit",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-hit-directions-v2/03.png",
+      "canvas": [43, 43],
+      "opaqueBounds": [11, 0, 30, 42],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "brass/w/death",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-death-pose-w-v1/00.png",
+      "canvas": [49, 47],
+      "opaqueBounds": [0, 0, 48, 46],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "brass/w/walk-1",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-walk-w-padded-v2/00-sheet.png",
+      "canvas": [80, 80],
+      "opaqueBounds": [26, 23, 52, 71],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "brass/w/walk-2",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-walk-w-padded-v2/00-sheet.png",
+      "canvas": [80, 80],
+      "opaqueBounds": [26, 23, 51, 71],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "brass/w/walk-3",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-walk-w-padded-v2/00-sheet.png",
+      "canvas": [80, 80],
+      "opaqueBounds": [25, 22, 51, 71],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "brass/w/walk-4",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-walk-w-padded-v2/00-sheet.png",
+      "canvas": [80, 80],
+      "opaqueBounds": [23, 22, 53, 71],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "brass/e/idle",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-directions-v1/04.png",
+      "canvas": [48, 48],
+      "opaqueBounds": [11, 0, 36, 47],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "brass/e/fire",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-fire-directions-v1/04.png",
+      "canvas": [42, 42],
+      "opaqueBounds": [8, 0, 33, 41],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "brass/e/hit",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-hit-directions-v2/04.png",
+      "canvas": [43, 43],
+      "opaqueBounds": [11, 0, 30, 42],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "brass/e/death",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-death-pose-e-v1/00.png",
+      "canvas": [47, 48],
+      "opaqueBounds": [0, 0, 46, 47],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "brass/e/walk-1",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-walk-e-v1/00-sheet.png",
+      "canvas": [34, 48],
+      "opaqueBounds": [0, 0, 33, 47],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "brass/e/walk-2",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-walk-e-v1/00-sheet.png",
+      "canvas": [34, 48],
+      "opaqueBounds": [2, 1, 29, 47],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "brass/e/walk-3",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-walk-e-v1/00-sheet.png",
+      "canvas": [34, 48],
+      "opaqueBounds": [4, 0, 28, 47],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "brass/e/walk-4",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-walk-e-v1/00-sheet.png",
+      "canvas": [34, 48],
+      "opaqueBounds": [0, 0, 28, 47],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "brass/nw/idle",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-directions-v1/05.png",
+      "canvas": [37, 37],
+      "opaqueBounds": [8, 0, 28, 36],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "brass/nw/fire",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-fire-directions-v1/05.png",
+      "canvas": [36, 36],
+      "opaqueBounds": [8, 0, 26, 35],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "brass/nw/hit",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-hit-directions-v2/05.png",
+      "canvas": [40, 40],
+      "opaqueBounds": [9, 0, 30, 39],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "brass/nw/death",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-death-pose-nw-v1/00.png",
+      "canvas": [36, 36],
+      "opaqueBounds": [0, 0, 35, 35],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "brass/nw/walk-1",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-walk-nw-v1/00-sheet.png",
+      "canvas": [25, 48],
+      "opaqueBounds": [0, 0, 24, 47],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "brass/nw/walk-2",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-walk-nw-v1/00-sheet.png",
+      "canvas": [25, 48],
+      "opaqueBounds": [1, 0, 24, 47],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "brass/nw/walk-3",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-walk-nw-v1/00-sheet.png",
+      "canvas": [25, 48],
+      "opaqueBounds": [1, 0, 22, 44],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "brass/nw/walk-4",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-walk-nw-v1/00-sheet.png",
+      "canvas": [25, 48],
+      "opaqueBounds": [1, 0, 22, 45],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "brass/n/idle",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-directions-v1/06.png",
+      "canvas": [38, 38],
+      "opaqueBounds": [5, 0, 32, 37],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "brass/n/fire",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-fire-directions-v1/06.png",
+      "canvas": [35, 35],
+      "opaqueBounds": [7, 0, 27, 34],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "brass/n/hit",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-hit-directions-v2/06.png",
+      "canvas": [40, 40],
+      "opaqueBounds": [7, 0, 31, 39],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "brass/n/death",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-death-pose-n-v1/00.png",
+      "canvas": [31, 36],
+      "opaqueBounds": [0, 0, 30, 35],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "brass/n/walk-1",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-walk-n-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [16, 8, 47, 55],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "brass/n/walk-2",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-walk-n-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [16, 9, 47, 55],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "brass/n/walk-3",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-walk-n-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [16, 8, 46, 55],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "brass/n/walk-4",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-walk-n-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [16, 9, 46, 55],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "brass/ne/idle",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-directions-v1/07.png",
+      "canvas": [38, 38],
+      "opaqueBounds": [6, 0, 30, 37],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "brass/ne/fire",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-fire-directions-v1/07.png",
+      "canvas": [36, 36],
+      "opaqueBounds": [7, 0, 27, 35],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "brass/ne/hit",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-hit-directions-v2/07.png",
+      "canvas": [40, 40],
+      "opaqueBounds": [9, 0, 30, 39],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "brass/ne/death",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-death-pose-ne-v1/00.png",
+      "canvas": [37, 36],
+      "opaqueBounds": [0, 0, 36, 35],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "brass/ne/walk-1",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-walk-ne-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [19, 17, 43, 55],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "brass/ne/walk-2",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-walk-ne-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [20, 15, 41, 54],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "brass/ne/walk-3",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-walk-ne-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [21, 16, 39, 53],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "brass/ne/walk-4",
+      "source": "art/source/sprite-fusion/outputs/brass-infantry-walk-ne-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [22, 15, 39, 53],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "spark/se/idle",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-directions-v1/00.png",
+      "canvas": [46, 46],
+      "opaqueBounds": [9, 0, 36, 45],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "spark/se/fire",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-fire-directions-v1/00.png",
+      "canvas": [39, 39],
+      "opaqueBounds": [7, 0, 31, 38],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "spark/se/hit",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-hit-directions-v1/00.png",
+      "canvas": [61, 61],
+      "opaqueBounds": [15, 0, 44, 60],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "spark/se/death",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-death-pose-se-v1/00.png",
+      "canvas": [45, 43],
+      "opaqueBounds": [0, 0, 44, 42],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "spark/se/walk-1",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-walk-se-v1/00-sheet.png",
+      "canvas": [36, 56],
+      "opaqueBounds": [0, 0, 35, 55],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "spark/se/walk-2",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-walk-se-v1/00-sheet.png",
+      "canvas": [36, 56],
+      "opaqueBounds": [1, 0, 34, 54],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "spark/se/walk-3",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-walk-se-v1/00-sheet.png",
+      "canvas": [36, 56],
+      "opaqueBounds": [4, 0, 33, 54],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "spark/se/walk-4",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-walk-se-v1/00-sheet.png",
+      "canvas": [36, 56],
+      "opaqueBounds": [4, 0, 33, 54],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "spark/s/idle",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-directions-v1/01.png",
+      "canvas": [47, 47],
+      "opaqueBounds": [9, 0, 37, 46],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "spark/s/fire",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-fire-directions-v1/01.png",
+      "canvas": [36, 36],
+      "opaqueBounds": [6, 0, 29, 35],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "spark/s/hit",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-hit-directions-v1/01.png",
+      "canvas": [43, 43],
+      "opaqueBounds": [8, 0, 33, 42],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "spark/s/death",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-death-pose-s-v1/00.png",
+      "canvas": [36, 41],
+      "opaqueBounds": [0, 0, 35, 40],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "spark/s/walk-1",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-walk-s-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [17, 8, 46, 55],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "spark/s/walk-2",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-walk-s-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [18, 9, 47, 55],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "spark/s/walk-3",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-walk-s-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [18, 7, 47, 55],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "spark/s/walk-4",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-walk-s-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [18, 8, 47, 55],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "spark/sw/idle",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-directions-v1/02.png",
+      "canvas": [46, 46],
+      "opaqueBounds": [10, 0, 35, 45],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "spark/sw/fire",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-fire-directions-v1/02.png",
+      "canvas": [39, 39],
+      "opaqueBounds": [8, 0, 30, 38],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "spark/sw/hit",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-hit-directions-v1/02.png",
+      "canvas": [43, 43],
+      "opaqueBounds": [5, 0, 36, 42],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "spark/sw/death",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-death-pose-sw-v1/00.png",
+      "canvas": [40, 42],
+      "opaqueBounds": [0, 0, 39, 41],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "spark/sw/walk-1",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-walk-sw-padded-v2/00-sheet.png",
+      "canvas": [80, 80],
+      "opaqueBounds": [24, 22, 54, 71],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "spark/sw/walk-2",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-walk-sw-padded-v2/00-sheet.png",
+      "canvas": [80, 80],
+      "opaqueBounds": [28, 22, 50, 71],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "spark/sw/walk-3",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-walk-sw-padded-v2/00-sheet.png",
+      "canvas": [80, 80],
+      "opaqueBounds": [28, 21, 50, 71],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "spark/sw/walk-4",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-walk-sw-padded-v2/00-sheet.png",
+      "canvas": [80, 80],
+      "opaqueBounds": [26, 20, 50, 70],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "spark/w/idle",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-directions-v1/03.png",
+      "canvas": [48, 48],
+      "opaqueBounds": [12, 0, 34, 47],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "spark/w/fire",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-fire-directions-v1/03.png",
+      "canvas": [40, 40],
+      "opaqueBounds": [8, 0, 31, 39],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "spark/w/hit",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-hit-directions-v1/03.png",
+      "canvas": [48, 48],
+      "opaqueBounds": [11, 0, 35, 47],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "spark/w/death",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-death-pose-w-v1/01.png",
+      "canvas": [52, 45],
+      "opaqueBounds": [0, 0, 51, 44],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "spark/w/walk-1",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-walk-w-v1/00-sheet.png",
+      "canvas": [27, 48],
+      "opaqueBounds": [0, 0, 26, 47],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "spark/w/walk-2",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-walk-w-v1/00-sheet.png",
+      "canvas": [27, 48],
+      "opaqueBounds": [1, 0, 23, 47],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "spark/w/walk-3",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-walk-w-v1/00-sheet.png",
+      "canvas": [27, 48],
+      "opaqueBounds": [1, 0, 23, 47],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "spark/w/walk-4",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-walk-w-v1/00-sheet.png",
+      "canvas": [27, 48],
+      "opaqueBounds": [1, 0, 25, 47],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "spark/e/idle",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-directions-v1/04.png",
+      "canvas": [47, 47],
+      "opaqueBounds": [11, 0, 35, 46],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "spark/e/fire",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-fire-directions-v1/04.png",
+      "canvas": [39, 39],
+      "opaqueBounds": [6, 0, 31, 38],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "spark/e/hit",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-hit-directions-v1/04.png",
+      "canvas": [49, 49],
+      "opaqueBounds": [11, 0, 37, 48],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "spark/e/death",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-death-pose-e-v1/01.png",
+      "canvas": [46, 40],
+      "opaqueBounds": [0, 0, 45, 39],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "spark/e/walk-1",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-walk-e-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [18, 9, 45, 55],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "spark/e/walk-2",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-walk-e-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [18, 8, 42, 55],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "spark/e/walk-3",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-walk-e-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [18, 7, 42, 55],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "spark/e/walk-4",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-walk-e-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [18, 8, 42, 55],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "spark/nw/idle",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-directions-v1/05.png",
+      "canvas": [42, 42],
+      "opaqueBounds": [10, 0, 31, 41],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "spark/nw/fire",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-fire-directions-v1/05.png",
+      "canvas": [35, 35],
+      "opaqueBounds": [8, 0, 26, 34],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "spark/nw/hit",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-hit-directions-v1/05.png",
+      "canvas": [45, 45],
+      "opaqueBounds": [11, 0, 33, 44],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "spark/nw/death",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-death-pose-nw-v1/00.png",
+      "canvas": [33, 41],
+      "opaqueBounds": [0, 0, 32, 40],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "spark/nw/walk-1",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-walk-nw-v1/00-sheet.png",
+      "canvas": [27, 51],
+      "opaqueBounds": [0, 0, 26, 50],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "spark/nw/walk-2",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-walk-nw-v1/00-sheet.png",
+      "canvas": [27, 51],
+      "opaqueBounds": [1, 1, 26, 50],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "spark/nw/walk-3",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-walk-nw-v1/00-sheet.png",
+      "canvas": [27, 51],
+      "opaqueBounds": [3, 0, 23, 48],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "spark/nw/walk-4",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-walk-nw-v1/00-sheet.png",
+      "canvas": [27, 51],
+      "opaqueBounds": [2, 0, 23, 48],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "spark/n/idle",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-directions-v1/06.png",
+      "canvas": [42, 42],
+      "opaqueBounds": [7, 0, 34, 41],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "spark/n/fire",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-fire-directions-v1/06.png",
+      "canvas": [35, 35],
+      "opaqueBounds": [5, 0, 28, 34],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "spark/n/hit",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-hit-directions-v1/06.png",
+      "canvas": [49, 49],
+      "opaqueBounds": [10, 0, 37, 48],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "spark/n/death",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-death-pose-n-v1/00.png",
+      "canvas": [35, 40],
+      "opaqueBounds": [0, 0, 34, 39],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "spark/n/walk-1",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-walk-n-v1/00-sheet.png",
+      "canvas": [28, 43],
+      "opaqueBounds": [0, 0, 27, 42],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "spark/n/walk-2",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-walk-n-v1/00-sheet.png",
+      "canvas": [28, 43],
+      "opaqueBounds": [2, 0, 26, 42],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "spark/n/walk-3",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-walk-n-v1/00-sheet.png",
+      "canvas": [28, 43],
+      "opaqueBounds": [3, 0, 25, 41],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "spark/n/walk-4",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-walk-n-v1/00-sheet.png",
+      "canvas": [28, 43],
+      "opaqueBounds": [2, 0, 26, 42],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "spark/ne/idle",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-directions-v1/07.png",
+      "canvas": [42, 42],
+      "opaqueBounds": [10, 0, 30, 41],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "spark/ne/fire",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-fire-directions-v1/07.png",
+      "canvas": [35, 35],
+      "opaqueBounds": [7, 0, 27, 34],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "spark/ne/hit",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-hit-directions-v1/07.png",
+      "canvas": [48, 48],
+      "opaqueBounds": [11, 0, 35, 47],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "spark/ne/death",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-death-pose-ne-v1/00.png",
+      "canvas": [38, 40],
+      "opaqueBounds": [0, 0, 37, 39],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "spark/ne/walk-1",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-walk-ne-v1/00-sheet.png",
+      "canvas": [32, 54],
+      "opaqueBounds": [0, 0, 31, 53],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "spark/ne/walk-2",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-walk-ne-v1/00-sheet.png",
+      "canvas": [32, 54],
+      "opaqueBounds": [4, 1, 28, 52],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "spark/ne/walk-3",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-walk-ne-v1/00-sheet.png",
+      "canvas": [32, 54],
+      "opaqueBounds": [5, 0, 26, 51],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "spark/ne/walk-4",
+      "source": "art/source/sprite-fusion/outputs/spark-infantry-walk-ne-v1/00-sheet.png",
+      "canvas": [32, 54],
+      "opaqueBounds": [4, 1, 26, 52],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "mud/se/idle",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-directions-v1/00.png",
+      "canvas": [43, 43],
+      "opaqueBounds": [8, 0, 33, 42],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "mud/se/fire",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-fire-directions-v1/00.png",
+      "canvas": [38, 38],
+      "opaqueBounds": [4, 0, 33, 37],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "mud/se/hit",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-hit-directions-v1/00.png",
+      "canvas": [34, 34],
+      "opaqueBounds": [6, 0, 26, 33],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "mud/se/death",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-death-pose-se-v1/00.png",
+      "canvas": [42, 37],
+      "opaqueBounds": [0, 0, 41, 36],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "mud/se/walk-1",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-walk-se-v1/00-sheet.png",
+      "canvas": [34, 53],
+      "opaqueBounds": [0, 0, 33, 52],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "mud/se/walk-2",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-walk-se-v1/00-sheet.png",
+      "canvas": [34, 53],
+      "opaqueBounds": [1, 1, 32, 51],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "mud/se/walk-3",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-walk-se-v1/00-sheet.png",
+      "canvas": [34, 53],
+      "opaqueBounds": [4, 0, 28, 51],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "mud/se/walk-4",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-walk-se-v1/00-sheet.png",
+      "canvas": [34, 53],
+      "opaqueBounds": [4, 0, 30, 51],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "mud/s/idle",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-directions-v1/01.png",
+      "canvas": [42, 42],
+      "opaqueBounds": [9, 0, 32, 41],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "mud/s/fire",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-fire-directions-v1/01.png",
+      "canvas": [39, 39],
+      "opaqueBounds": [3, 0, 34, 38],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "mud/s/hit",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-hit-directions-v1/01.png",
+      "canvas": [32, 32],
+      "opaqueBounds": [6, 0, 24, 30],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "mud/s/death",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-death-pose-s-v1/00.png",
+      "canvas": [30, 39],
+      "opaqueBounds": [0, 0, 29, 38],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "mud/s/walk-1",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-walk-s-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [20, 12, 43, 55],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "mud/s/walk-2",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-walk-s-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [20, 10, 43, 55],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "mud/s/walk-3",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-walk-s-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [20, 9, 43, 54],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "mud/s/walk-4",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-walk-s-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [20, 11, 43, 55],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "mud/sw/idle",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-directions-v1/02.png",
+      "canvas": [43, 43],
+      "opaqueBounds": [9, 0, 32, 42],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "mud/sw/fire",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-fire-directions-v1/02.png",
+      "canvas": [38, 38],
+      "opaqueBounds": [5, 0, 31, 37],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "mud/sw/hit",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-hit-directions-v1/02.png",
+      "canvas": [34, 34],
+      "opaqueBounds": [7, 0, 26, 33],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "mud/sw/death",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-death-pose-sw-v1/01.png",
+      "canvas": [38, 37],
+      "opaqueBounds": [0, 0, 37, 36],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "mud/sw/walk-1",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-walk-sw-v1/00-sheet.png",
+      "canvas": [28, 45],
+      "opaqueBounds": [0, 0, 27, 44],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "mud/sw/walk-2",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-walk-sw-v1/00-sheet.png",
+      "canvas": [28, 45],
+      "opaqueBounds": [1, 1, 25, 44],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "mud/sw/walk-3",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-walk-sw-v1/00-sheet.png",
+      "canvas": [28, 45],
+      "opaqueBounds": [4, 0, 23, 43],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "mud/sw/walk-4",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-walk-sw-v1/00-sheet.png",
+      "canvas": [28, 45],
+      "opaqueBounds": [3, 0, 22, 43],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "mud/w/idle",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-directions-v1/03.png",
+      "canvas": [42, 42],
+      "opaqueBounds": [11, 0, 30, 41],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "mud/w/fire",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-fire-directions-v1/03.png",
+      "canvas": [35, 35],
+      "opaqueBounds": [3, 0, 30, 34],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "mud/w/hit",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-hit-directions-v1/03.png",
+      "canvas": [38, 38],
+      "opaqueBounds": [10, 0, 27, 37],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "mud/w/death",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-death-pose-w-v1/01.png",
+      "canvas": [56, 46],
+      "opaqueBounds": [0, 0, 55, 45],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "mud/w/walk-1",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-walk-w-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [21, 14, 42, 55],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "mud/w/walk-2",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-walk-w-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [21, 14, 40, 55],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "mud/w/walk-3",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-walk-w-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [21, 13, 40, 55],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "mud/w/walk-4",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-walk-w-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [21, 13, 40, 55],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "mud/e/idle",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-directions-v1/04.png",
+      "canvas": [40, 40],
+      "opaqueBounds": [10, 0, 29, 39],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "mud/e/fire",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-fire-directions-v1/04.png",
+      "canvas": [34, 34],
+      "opaqueBounds": [4, 0, 28, 33],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "mud/e/hit",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-hit-directions-v1/04.png",
+      "canvas": [33, 33],
+      "opaqueBounds": [7, 0, 24, 32],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "mud/e/death",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-death-pose-e-v1/00.png",
+      "canvas": [38, 38],
+      "opaqueBounds": [0, 0, 37, 37],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "mud/e/walk-1",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-walk-e-padded-v2/00-sheet.png",
+      "canvas": [80, 80],
+      "opaqueBounds": [26, 22, 52, 71],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "mud/e/walk-2",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-walk-e-padded-v2/00-sheet.png",
+      "canvas": [80, 80],
+      "opaqueBounds": [28, 21, 52, 71],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "mud/e/walk-3",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-walk-e-padded-v2/00-sheet.png",
+      "canvas": [80, 80],
+      "opaqueBounds": [28, 20, 52, 71],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "mud/e/walk-4",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-walk-e-padded-v2/00-sheet.png",
+      "canvas": [80, 80],
+      "opaqueBounds": [27, 20, 52, 71],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "mud/nw/idle",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-directions-v1/05.png",
+      "canvas": [38, 38],
+      "opaqueBounds": [6, 0, 31, 37],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "mud/nw/fire",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-fire-directions-v1/05.png",
+      "canvas": [39, 39],
+      "opaqueBounds": [6, 0, 32, 38],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "mud/nw/hit",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-hit-directions-v1/05.png",
+      "canvas": [32, 32],
+      "opaqueBounds": [7, 0, 24, 31],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "mud/nw/death",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-death-pose-nw-v1/00.png",
+      "canvas": [37, 37],
+      "opaqueBounds": [0, 0, 36, 36],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "mud/nw/walk-1",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-walk-nw-v1/00-sheet.png",
+      "canvas": [29, 39],
+      "opaqueBounds": [0, 0, 28, 38],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "mud/nw/walk-2",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-walk-nw-v1/00-sheet.png",
+      "canvas": [29, 39],
+      "opaqueBounds": [1, 1, 27, 38],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "mud/nw/walk-3",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-walk-nw-v1/00-sheet.png",
+      "canvas": [29, 39],
+      "opaqueBounds": [3, 0, 25, 37],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "mud/nw/walk-4",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-walk-nw-v1/00-sheet.png",
+      "canvas": [29, 39],
+      "opaqueBounds": [3, 0, 24, 38],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "mud/n/idle",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-directions-v1/06.png",
+      "canvas": [37, 37],
+      "opaqueBounds": [8, 0, 28, 36],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "mud/n/fire",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-fire-directions-v1/06.png",
+      "canvas": [36, 36],
+      "opaqueBounds": [5, 0, 29, 35],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "mud/n/hit",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-hit-directions-v1/06.png",
+      "canvas": [35, 35],
+      "opaqueBounds": [7, 0, 26, 34],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "mud/n/death",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-death-pose-n-v1/00.png",
+      "canvas": [31, 30],
+      "opaqueBounds": [0, 0, 30, 29],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "mud/n/walk-1",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-walk-n-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [21, 19, 42, 55],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "mud/n/walk-2",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-walk-n-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [20, 20, 42, 55],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "mud/n/walk-3",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-walk-n-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [21, 20, 42, 55],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "mud/n/walk-4",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-walk-n-padded-v2/00-sheet.png",
+      "canvas": [64, 64],
+      "opaqueBounds": [21, 19, 42, 55],
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "mud/ne/idle",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-directions-v1/07.png",
+      "canvas": [43, 43],
+      "opaqueBounds": [11, 0, 31, 42],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "mud/ne/fire",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-fire-directions-v1/07.png",
+      "canvas": [36, 36],
+      "opaqueBounds": [3, 0, 32, 35],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "mud/ne/hit",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-hit-directions-v1/07.png",
+      "canvas": [32, 32],
+      "opaqueBounds": [7, 0, 24, 31],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "mud/ne/death",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-death-pose-ne-v1/00.png",
+      "canvas": [35, 42],
+      "opaqueBounds": [0, 0, 34, 41],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "mud/ne/walk-1",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-walk-ne-v1/00-sheet.png",
+      "canvas": [27, 51],
+      "opaqueBounds": [0, 0, 26, 50],
+      "edgeContacts": {
+        "left": true,
+        "top": true,
+        "right": true,
+        "bottom": true
+      }
+    },
+    {
+      "label": "mud/ne/walk-2",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-walk-ne-v1/00-sheet.png",
+      "canvas": [27, 51],
+      "opaqueBounds": [2, 0, 24, 50],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": true
+      }
+    },
+    {
+      "label": "mud/ne/walk-3",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-walk-ne-v1/00-sheet.png",
+      "canvas": [27, 51],
+      "opaqueBounds": [5, 0, 24, 48],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": false
+      }
+    },
+    {
+      "label": "mud/ne/walk-4",
+      "source": "art/source/sprite-fusion/outputs/mud-infantry-walk-ne-v1/00-sheet.png",
+      "canvas": [27, 51],
+      "opaqueBounds": [2, 0, 24, 48],
+      "edgeContacts": {
+        "left": false,
+        "top": true,
+        "right": false,
+        "bottom": false
+      }
+    }
+  ]
+}

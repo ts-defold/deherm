@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_cad92e99-e15b-4b90-a937-90c762ff8a53",
+  "operation": "edit",
+  "prompt": "Remove only the raised rotating turret and gun from this heavy bulwark tank. Preserve its unmistakably wide, low armored turtle hull, blunt reinforced nose, huge side armor, broad tracks, exact isometric view, palette, outline and ground contact. Finish the top deck with a visible dark circular turret socket. One isolated heavy hull, no weapon.",
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/bulwark-silhouette-v2/00.png",
+      "bytes": 9817,
+      "sha256": "f680e9486ac5b1f68f9957f2904541569739b08909eec2d6fcae785abc7f4ddf"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/bulwark-hull-v2.json",
+    "sha256": "2d5e6ba0d5b66a9880dd8a636aba03f0b307d8a09d8937516203150da5d39764"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "3a378753-6370-4dc5-aef3-a28957ed7f66",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 75,
+      "height": 74,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/3a378753-6370-4dc5-aef3-a28957ed7f66/image.png?v=1791432352013",
+      "path": "art/source/sprite-fusion/outputs/bulwark-hull-v2/00.png",
+      "bytes": 9458,
+      "sha256": "691ee48a5a168df3328e2ff0f5f58a47cc5daa0aec5c87f636bfae1f22bb04d1"
+    },
+    {
+      "index": 1,
+      "assetId": "0374008f-1553-4b70-868a-ee36a7d57d0f",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 62,
+      "height": 55,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/0374008f-1553-4b70-868a-ee36a7d57d0f/image.png?v=1791432353261",
+      "path": "art/source/sprite-fusion/outputs/bulwark-hull-v2/01.png",
+      "bytes": 5826,
+      "sha256": "dee7ae3001344481310ea8ec13b5bab799b00beffbee6802e726ec2371b678c9"
+    }
+  ],
+  "credits": {
+    "remaining": 2460
+  }
+}

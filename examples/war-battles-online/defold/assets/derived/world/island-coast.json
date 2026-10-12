@@ -1,0 +1,129 @@
+{
+  "schemaVersion": 2,
+  "owner": "tools/generate-coast.mjs",
+  "worldPlan": {
+    "seed": 1463898690,
+    "rulesVersion": 7,
+    "landHexes": 290
+  },
+  "source": {
+    "generator": "tools/generate-art.mjs",
+    "cells": [
+      {
+        "file": "hex-cliff-0.png",
+        "sha256": "65d4790a71073a09586a50c523a8ab56dda42875bc3d99df4953fdd8feb3b51c"
+      },
+      {
+        "file": "hex-cliff-1.png",
+        "sha256": "2b9f3bccfff56971ca949ebab3c949dfba87f8d42d13c1c8b2d92e687b0e75b6"
+      },
+      {
+        "file": "hex-cliff-2.png",
+        "sha256": "3c6a49ccb762730163ad65e63e0f90357f04cf5083c6b714ff52096978ab9c8b"
+      },
+      {
+        "file": "hex-cliff-3.png",
+        "sha256": "3c8f519266f24b418f0c882c788682c6dd67b3b763411c6be692ed88c963277d"
+      },
+      {
+        "file": "hex-cliff-4.png",
+        "sha256": "4c19ea5761cd95dbdefccd8096d4fe6d584e389b460d5745ec5193e3f816639d"
+      },
+      {
+        "file": "hex-cliff-5.png",
+        "sha256": "229d6f4af26b4e67d1c41b8197b36865e8be5ecef5207cfd62e6d98f330e761b"
+      },
+      {
+        "file": "hex-cliff-6.png",
+        "sha256": "3260ea762b19246555323a3c304389d5a4d9ec205c512b6bff78156d7c5b93ef"
+      },
+      {
+        "file": "hex-cliff-7.png",
+        "sha256": "f0a3a721a580bd568f606f89b8937b4d8e109257603ae167bd9386cd583ac69c"
+      },
+      {
+        "file": "hex-cliff-8.png",
+        "sha256": "a65cb0d0ffb4e43f60f264bbc13cd620071ee223a43b3c99152705bcbc11298d"
+      },
+      {
+        "file": "hex-cliff-9.png",
+        "sha256": "a2fa6693164eceb92b97e5bcbf24eb96be8e4d56f36af2e26abbb8780e46395f"
+      },
+      {
+        "file": "hex-cliff-10.png",
+        "sha256": "cee7f9be4dacb995b7c1261b63da01c4004102b08c3dec16f77d9d00253b7b3f"
+      },
+      {
+        "file": "hex-cliff-11.png",
+        "sha256": "c4761c2459f10c0d7f169667c8f016fd0c8718b54e734a3003d8bfbfe206c4d5"
+      },
+      {
+        "file": "hex-cliff-12.png",
+        "sha256": "a8d19082d9802339312c349b1be893c94ea697b7ddc16c405aac25c33561f538"
+      },
+      {
+        "file": "hex-cliff-15.png",
+        "sha256": "cb83a02c3bd3cd1e8be1ad383694a37419addb2ec4d80e4883ae06dcbfba35d9"
+      },
+      {
+        "file": "hex-cliff-16.png",
+        "sha256": "e3568eefa2282a7fa49d3bdea5fd7600bc5806c11bd7df90fb44163b986b8468"
+      },
+      {
+        "file": "hex-cliff-17.png",
+        "sha256": "593b3c30e8696b6a91462c4fb723965ae13e4ec2b5586b3a258b6e5f90636cca"
+      }
+    ]
+  },
+  "waterSource": {
+    "requestId": "req_1ff3a909-23cc-4442-a5bb-80c3af69b1c0",
+    "assetId": "c0269178-51b5-4f42-be09-a2057966a4bd",
+    "path": "art/source/sprite-fusion/outputs/frontier-coastal-water-v1/01.png",
+    "sha256": "8d9c021501935e53d9866062730473929b7250d2e5f40c29eebd0c8cf49acfe6"
+  },
+  "image": {
+    "width": 1536,
+    "height": 800,
+    "sha256": "ac7a3423dbaa9b63334c73866974fed4fa9ffcd027fe60d2d761aff8c709c5a7"
+  },
+  "placement": {
+    "centreX": 648,
+    "centreY": 368,
+    "z": -0.5,
+    "scale": 2
+  },
+  "animation": {
+    "owner": "main/island-coast.fp",
+    "maskAlpha": 252,
+    "cadenceHz": 4,
+    "pixelCell": 1,
+    "rule": "one-pixel segmented foam rows over tagged sea only; no game-script update or extra full-screen frames"
+  },
+  "wavelets": {
+    "source": "art/source/sprite-fusion/outputs/frontier-coastal-water-v1/01.png",
+    "sourceBounds": [
+      6,
+      13,
+      57,
+      49
+    ],
+    "sourceSampling": "nearest-neighbor half-size, clipped to water material alpha",
+    "step": [
+      103,
+      83
+    ],
+    "count": 100,
+    "pixels": 29621
+  },
+  "coastWall": {
+    "shape": "forward-facing water pixels extruded from the exact planned hex top-face mask",
+    "faceDepthByTier": [
+      3,
+      5,
+      7
+    ],
+    "palette": "median lower-wall source colors from the selected raised-hex family",
+    "anchor": "logical floor top-face; relief is entirely below the land mask"
+  },
+  "transparency": "planned land reveals the matching hex floor; planned water receives animated sea or a shallow source-colored forward face"
+}

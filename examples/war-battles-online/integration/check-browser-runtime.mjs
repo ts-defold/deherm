@@ -64,8 +64,8 @@ export const REQUIRED_GAME_MARKERS = Object.freeze([
   // The scripted demonstration ends by handing the scene to the arena, which
   // creates the roster, the turrets and the pickup pads. Observing the engage
   // marker is what distinguishes "the tutorial loop ran" from "the game started".
-  "war-battles:arena-init:players=8:online=0",
-  "war-battles:arena-engaged:players=8:skill=2:seed=1463898690:mode=offline",
+  "war-battles:arena-init:players=16:online=0",
+  "war-battles:arena-engaged:players=16:skill=2:seed=1463898690:mode=offline",
 ]);
 
 export const REQUIRED_GAME_MARKER_PATTERNS = Object.freeze([
@@ -92,7 +92,9 @@ export const EXPECTED_COMPONENT_COUNT = 9;
 // Camera samples carry a frame-dependent position, so the gate asserts the
 // scroll behaviour rather than one sampled coordinate.
 export const REQUIRED_GAME_MARKER_PREFIXES = Object.freeze(["war-battles:camera:"]);
-export const REQUIRED_GAME_MARKER_SUBSTRINGS = Object.freeze([":clamped=none", ":clamped=x", ":clamped=xy"]);
+// The world may reach one edge, then a corner. `xy` proves both axes clamped
+// even when no standalone `y` sample occurs at the capture cadence.
+export const REQUIRED_GAME_MARKER_SUBSTRINGS = Object.freeze([":clamped=none", ":clamped=x", ":clamped=y"]);
 
 const argumentSet = new Set(process.argv.slice(2));
 for (const argument of argumentSet) {
@@ -101,7 +103,7 @@ for (const argument of argumentSet) {
   }
 }
 
-function missing(transcript) {
+export function missingBrowserMarkers(transcript) {
   const absent = [];
   for (const marker of [...REQUIRED_ENGINE_MARKERS, ...REQUIRED_GAME_MARKERS]) {
     if (!transcript.some((line) => line === marker)) absent.push({ kind: "exact", marker });
@@ -120,7 +122,14 @@ function missing(transcript) {
     if (!transcript.some((line) => line.startsWith(prefix))) absent.push({ kind: "prefix", marker: prefix });
   }
   for (const part of REQUIRED_GAME_MARKER_SUBSTRINGS) {
-    if (!transcript.some((line) => line.startsWith("war-battles:camera:") && line.endsWith(part))) {
+    const requiredMode = part.slice(":clamped=".length);
+    if (
+      !transcript.some((line) => {
+        if (!line.startsWith("war-battles:camera:")) return false;
+        const mode = line.split(":clamped=")[1];
+        return requiredMode === "none" ? mode === "none" : mode === requiredMode || mode === "xy";
+      })
+    ) {
       absent.push({ kind: "camera-clamp", marker: part });
     }
   }
@@ -165,13 +174,18 @@ function cameraGeometry(transcript, authoredBounds) {
     Math.abs(geometry.viewWidth / geometry.viewHeight - 16 / 9) < 0.01,
     "Browser camera view must preserve the authored 16:9 aspect ratio",
   );
+  // The engine marker rounds zoom to two decimals and each view extent to a
+  // whole pixel. Reconstructing the authored display from those rounded
+  // fields has at most half a printed unit of error from each operand.
+  const widthPrintTolerance = geometry.viewWidth * 0.005 + geometry.zoom * 0.5 + 1;
+  const heightPrintTolerance = geometry.viewHeight * 0.005 + geometry.zoom * 0.5 + 1;
   assert.ok(
-    Math.abs(geometry.zoom * geometry.viewWidth - 1280) < 2,
-    "Browser auto-fit width must project the authored 1280-pixel display",
+    Math.abs(geometry.zoom * geometry.viewWidth - 1280) <= widthPrintTolerance,
+    `Browser auto-fit width must project the authored 1280-pixel display: ${JSON.stringify(geometry)}`,
   );
   assert.ok(
-    Math.abs(geometry.zoom * geometry.viewHeight - 720) < 2,
-    "Browser auto-fit height must project the authored 720-pixel display",
+    Math.abs(geometry.zoom * geometry.viewHeight - 720) <= heightPrintTolerance,
+    `Browser auto-fit height must project the authored 720-pixel display: ${JSON.stringify(geometry)}`,
   );
   assert.ok(
     Math.abs(geometry.minX - geometry.viewWidth / 2 - authoredBounds.minX) < 1,
@@ -182,11 +196,21 @@ function cameraGeometry(transcript, authoredBounds) {
     "Browser camera maximum X must preserve the authored world bound",
   );
   assert.ok(
-    Math.abs(geometry.minY - geometry.viewHeight / 2 + authoredBounds.verticalOverscan - authoredBounds.minY) < 1,
+    Math.abs(
+      geometry.minY -
+        geometry.viewHeight / 2 +
+        Math.max(authoredBounds.verticalOverscan, geometry.viewHeight / 4) -
+        authoredBounds.minY,
+    ) < 1,
     "Browser camera minimum Y must preserve the authored world bound",
   );
   assert.ok(
-    Math.abs(geometry.maxY + geometry.viewHeight / 2 - authoredBounds.verticalOverscan - authoredBounds.maxY) < 1,
+    Math.abs(
+      geometry.maxY +
+        geometry.viewHeight / 2 -
+        Math.max(authoredBounds.verticalOverscan, geometry.viewHeight / 4) -
+        authoredBounds.maxY,
+    ) < 1,
     "Browser camera maximum Y must preserve the authored world bound",
   );
   return geometry;
@@ -252,16 +276,16 @@ async function run() {
 
     const timeoutMs = Number.parseInt(process.env.DEHERM_WAR_BATTLES_BROWSER_TIMEOUT_MS ?? "45000", 10);
     try {
-      await waitFor(async () => missing(client.transcript).length === 0, {
+      await waitFor(async () => missingBrowserMarkers(client.transcript).length === 0, {
         timeoutMs,
         intervalMs: 250,
-        what: `the required marker set (absent: ${JSON.stringify(missing(client.transcript))})`,
+        what: "the required browser marker set",
       });
     } catch (error) {
       const head = client.transcript.slice(0, 40);
       const tail = client.transcript.slice(-40);
       throw new Error(
-        `${error.message}\nTranscript head: ${JSON.stringify(head)}\nTranscript tail: ${JSON.stringify(tail)}\nPage failures: ${JSON.stringify(client.failures)}`,
+        `${error.message}\nCurrent absent: ${JSON.stringify(missingBrowserMarkers(client.transcript))}\nTranscript head: ${JSON.stringify(head)}\nTranscript tail: ${JSON.stringify(tail)}\nPage failures: ${JSON.stringify(client.failures)}`,
       );
     }
 
@@ -296,7 +320,7 @@ async function run() {
       expectedFingerprint,
       "Browser bundle fingerprint does not match the source resource",
     );
-    assert.deepEqual(missing(client.transcript), [], "Required browser markers are missing");
+    assert.deepEqual(missingBrowserMarkers(client.transcript), [], "Required browser markers are missing");
     assert.deepEqual(fatal, [], `Browser page errors: ${JSON.stringify(fatal)}`);
 
     const cameraSamples = client.transcript.filter((line) => line.startsWith("war-battles:camera:"));

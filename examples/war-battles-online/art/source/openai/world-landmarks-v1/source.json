@@ -8,6 +8,7 @@
   "projection": "orthographic 2:1 isometric",
   "purpose": "War Battles Online battlefield landmark source sheet",
   "downsample": 4,
+  "elevatedDownsample": 6,
   "outputCell": [160, 128],
   "groundLine": 120,
   "cuts": {

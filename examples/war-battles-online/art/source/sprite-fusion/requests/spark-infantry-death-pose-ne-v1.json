@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_9e29b06b-042e-4220-a1a3-66bef3a3d732",
+  "operation": "edit",
+  "prompt": "Keep spark viewed from behind at the same northeast three-quarter angle. Change the body into a clearly defeated collapsed pose: one knee on the ground, torso and head bowed low forward, one hand braced on the ground, sidearm lowered, silhouette much shorter and wider than standing. Preserve the same lean build, spiky dark hair, orange goggles, teal scarf, olive sleeves, dark uniform, and small backpack, boots and knee on one ground line, colors, dark outlines, identity, and original perspective. Do not turn toward another direction. No blood, injury detail, explosion, extra prop, scenery, platform, text, or second person.",
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "2436986a-e9b3-45c0-82e3-5a533ff9df55"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/spark-infantry-death-pose-ne-v1.json",
+    "sha256": "cbfeaf65e4b7cab96ad0b1506b8250e40a7c36d866302b759e47a0f379513033"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "51269c7f-8bf9-4cde-a953-bfd0d24ab77f",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 38,
+      "height": 40,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/51269c7f-8bf9-4cde-a953-bfd0d24ab77f/image.png?v=1791536360343",
+      "path": "art/source/sprite-fusion/outputs/spark-infantry-death-pose-ne-v1/00.png",
+      "bytes": 2461,
+      "sha256": "51bfb7281fd503dd73da8c5c5e97626c859998d155f60185d0384108f4ca9fb3"
+    },
+    {
+      "index": 1,
+      "assetId": "f45f070e-d03f-4198-b5ff-b1b694bc9a2d",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 34,
+      "height": 36,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/f45f070e-d03f-4198-b5ff-b1b694bc9a2d/image.png?v=1791536361198",
+      "path": "art/source/sprite-fusion/outputs/spark-infantry-death-pose-ne-v1/01.png",
+      "bytes": 2653,
+      "sha256": "fa0a1b2886889e4861a58d64144ab8644951ab7bf75f1fd2e523dbd221897f24"
+    }
+  ],
+  "credits": {
+    "remaining": 435
+  }
+}

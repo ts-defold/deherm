@@ -720,6 +720,16 @@ per instance. Source ownership is accepted only from the server-enriched
 disconnected, replaced-session, failed, or older-than-five-second state clears
 instead of presenting stale values.
 
+The War Battles visual recorder uses the exact arena editor URI and reads only
+Monaco rows inside its viewport for inline default hints. Current VS Code does
+not include those hints in `document.body.innerText`; querying the full page
+can miss real hints or accept text from an unrelated tab. Each displayed
+`= value` must share its property declaration row. The recorder also saves the
+editor screenshot, binds its own code into the source inventory, and
+authenticates the native instance through the inspector descriptor. A changed
+default or missing visible hint fails the receipt until a fresh live capture
+is made.
+
 A fresh local-Extender arm64-macOS War Battles build exercised this path through
 the installed-style public dev command. Its packaged Defold engine connected as
 the native Hermes target, emitted monotonically advancing snapshots, and the

@@ -1,0 +1,6 @@
+{
+  "name": "assault-hull-v2",
+  "operation": "edit",
+  "inputs": ["art/source/sprite-fusion/outputs/assault-silhouette-v2/02.png"],
+  "prompt": "Remove only the raised rotating turret and gun from this medium assault tank. Preserve its angular wedge hull, broad side-skirt armor, twin exposed track assemblies, orange signal marks, exact isometric view, palette, outline and ground contact. Finish the top deck with a visible dark circular turret socket. One isolated assault hull, no weapon."
+}

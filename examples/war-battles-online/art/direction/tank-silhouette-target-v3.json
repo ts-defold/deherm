@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "role": "concept-only",
+  "file": "tank-silhouette-target-v3.png",
+  "sha256": "bd86ced0ba03d070c15dbb1805a6137a76545a4476f7998f4a3f9692c02bfa3d",
+  "generator": "Codex built-in image generation",
+  "prompt": "Four genuinely different War Battles Online tanks on a clean 2x2 contact sheet, each isolated, same isometric three-quarter overhead view and lower-right heading. High-quality 1990s arcade military sci-fi pixel art; crisp integer pixels, dark plum outlines, warm highlights, readable 64x64 logical silhouettes. Scout: tiny cyan arrowhead interceptor with swept fins, short tracks, antenna, compact gun. Assault: medium red-iron linebreaker with broad wedge plow, heavy side skirts, twin stubby autocannons. Bulwark: massive olive squat turtle with near-square hull, slab shield nose, huge side armor pods, short heavy gun. Artillery: long pale-brass rail platform with high rear casemate, extra-long cannon, rear stabilizer outriggers. Preserve four different silhouettes in monochrome; color is secondary. No people, UI, explosions, text, logos, clipping, or terrain.",
+  "runtimeSource": false,
+  "limitations": [
+    "one facing only",
+    "uneven logical pixel scale",
+    "no independent hull and turret layers",
+    "no foot-contact anchors"
+  ]
+}

@@ -26,10 +26,11 @@ import { dirname, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { ArenaMap, CELL_FLOOR } from "../core/arena.ts";
+import { projectWorldPlanPropCoverage } from "../core/hex-cliffs.ts";
 import {
+  ARENA_GROUND_ROLE_BORDER_BASE,
   ARENA_GROUND_ROLE_WALL_BASE,
   ARENA_VISUAL_CELL_COUNT,
-  arenaGroundVariant,
   arenaThemeIndex,
   projectArenaVisualRoles,
 } from "../core/arena-visual.ts";
@@ -59,6 +60,14 @@ const TILE_SOURCE = "/main/arena-tiles.tilesource";
 const MATERIAL = "/builtins/materials/tile_map.material";
 
 const check = process.argv.includes("--check");
+const omitLayersArgument = process.argv.indexOf("--omit-layers");
+const omitLayers = new Set(
+  omitLayersArgument < 0 ? [] : (process.argv[omitLayersArgument + 1] ?? "").split(",").filter(Boolean),
+);
+if ([...omitLayers].some((layer) => !["decor", "walls", "marks", "faces"].includes(layer))) {
+  throw new Error("--omit-layers accepts decor,walls,marks,faces only");
+}
+if (check && omitLayers.size > 0) throw new Error("--check verifies only the complete gameplay tilemap");
 const seedArgument = process.argv.indexOf("--seed");
 const seed = seedArgument >= 0 ? Number(process.argv[seedArgument + 1]) : DEFAULT_ARENA_SEED;
 if (!Number.isInteger(seed) || seed < 0 || seed > 0xffff_ffff) {
@@ -96,17 +105,19 @@ for (let index = 0; index < ARENA_ART_THEMES.length; index += 1) {
 }
 
 const map = new ArenaMap(seed);
+const propCoverage = new Uint8Array(ARENA_VISUAL_CELL_COUNT);
+projectWorldPlanPropCoverage(map, propCoverage);
 const themeIndex = arenaThemeIndex(seed, DEFAULT_ARENA_SEED, ARENA_ART_THEMES.length);
 const theme = ARENA_ART_THEMES[themeIndex];
-const groundRoles = new Uint8Array(ARENA_VISUAL_CELL_COUNT);
+const groundRoles = new Uint16Array(ARENA_VISUAL_CELL_COUNT);
 const decorRoles = new Uint8Array(ARENA_VISUAL_CELL_COUNT);
 const markRoles = new Uint8Array(ARENA_VISUAL_CELL_COUNT);
 projectArenaVisualRoles(map, seed, groundRoles, decorRoles, markRoles);
 
-// The floor is always complete. Wall tops are their own layer. A second,
-// coincident tilemap preserves the generated wall-face contract and runtime
-// update path, but now sits directly behind the top rather than creating the
-// old floating concrete-platform silhouette.
+// The 1152px hex terrain owns every floor pixel. Keep an empty ground layer for
+// resource compatibility; collision-derived walls, faces, decor and marks are
+// still projected from the authoritative map. An opaque square floor here
+// would hide the hex landforms at exactly the place players actually drive.
 const groundCells = [];
 const wallCells = [];
 const faceCells = [];
@@ -115,12 +126,16 @@ const markCells = [];
 for (let index = 0; index < ARENA_VISUAL_CELL_COUNT; index += 1) {
   const x = index % MAP_WIDTH;
   const y = Math.floor(index / MAP_WIDTH);
-  groundCells.push({ x, y, tile: arenaGroundTileId(themeIndex, arenaGroundVariant(seed, x, y)) });
   const groundRole = groundRoles[index];
-  if (groundRole >= ARENA_GROUND_ROLE_WALL_BASE) {
-    const mask = groundRole - ARENA_GROUND_ROLE_WALL_BASE;
+  if (
+    groundRole >= ARENA_GROUND_ROLE_WALL_BASE &&
+    groundRole < ARENA_GROUND_ROLE_BORDER_BASE &&
+    propCoverage[index] === 0
+  ) {
     wallCells.push({ x, y, tile: arenaGroundTileId(themeIndex, groundRole) });
-    faceCells.push({ x, y, tile: arenaWallFaceTileId(themeIndex, mask) });
+    if (groundRole < ARENA_GROUND_ROLE_BORDER_BASE) {
+      faceCells.push({ x, y, tile: arenaWallFaceTileId(themeIndex, groundRole - ARENA_GROUND_ROLE_WALL_BASE) });
+    }
   }
   const decor = arenaDecorTileId(themeIndex, decorRoles[index]);
   const mark = arenaMarkTileId(themeIndex, markRoles[index]);
@@ -130,7 +145,7 @@ for (let index = 0; index < ARENA_VISUAL_CELL_COUNT; index += 1) {
 
 function emitLayer(id, z, cells) {
   const lines = ["layers {", `  id: "${id}"`, `  z: ${z}`];
-  for (const cell of cells) {
+  for (const cell of omitLayers.has(id) ? [] : cells) {
     lines.push("  cell {", `    x: ${cell.x}`, `    y: ${cell.y}`, `    tile: ${cell.tile - 1}`, "  }");
   }
   lines.push("}");
@@ -180,7 +195,7 @@ if (check) {
     }
   }
   console.log(
-    `war-battles-arena-tilemap:fresh:${groundCells.length}+${wallCells.length}+${faceCells.length}+${decorCells.length}+${markCells.length} cells`,
+    `war-battles-arena-tilemap:fresh:hex-floor+${wallCells.length}+${faceCells.length}+${decorCells.length}+${markCells.length} cells`,
   );
 } else {
   writeFileSync(targetPath, output);
@@ -189,8 +204,9 @@ if (check) {
   for (let index = 0; index < MAP_WIDTH * MAP_HEIGHT; index += 1) if (map.cells[index] !== CELL_FLOOR) solid += 1;
   process.stdout.write(
     `Wrote ${relative(exampleRoot, targetPath)}\n` +
+      (omitLayers.size > 0 ? `  DIAGNOSTIC: omitted ${[...omitLayers].join(",")} (restore with pnpm tilemap)\n` : "") +
       `  arena ${MAP_WIDTH}x${MAP_HEIGHT} tiles (${MAP_WIDTH * 16}x${MAP_HEIGHT * 16} px), seed ${seed}\n` +
       `  theme ${theme.id} (${theme.name})\n` +
-      `  ground cells ${groundCells.length}, wall tops ${wallCells.length}, wall faces ${faceCells.length}, solid ${solid} (${((100 * solid) / (MAP_WIDTH * MAP_HEIGHT)).toFixed(1)}%), decor cells ${decorCells.length}, overlay cells ${markCells.length}\n`,
+      `  hex terrain floor, wall tops ${wallCells.length}, wall faces ${faceCells.length}, solid ${solid} (${((100 * solid) / (MAP_WIDTH * MAP_HEIGHT)).toFixed(1)}%), decor cells ${decorCells.length}, overlay cells ${markCells.length}\n`,
   );
 }

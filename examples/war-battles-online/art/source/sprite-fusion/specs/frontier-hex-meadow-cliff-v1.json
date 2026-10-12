@@ -1,0 +1,6 @@
+{
+  "name": "frontier-hex-meadow-cliff-v1",
+  "operation": "generate",
+  "size": 64,
+  "prompt": "One isolated isometric six-sided terrain tile for a retro pixel-art tank strategy game. Broad flat olive-green meadow top with a few yellow grass tufts, short dark basalt cliff sides, warm sunset light, dramatic readable shape. Single tile centered on transparent background, no character, vehicle, building, text, border, or other tiles."
+}

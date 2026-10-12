@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_dba41f19-281b-4d23-be30-6b4a66f17200",
+  "operation": "direction-set",
+  "prompt": null,
+  "size": 32,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "6bfaf614-03ac-4461-a7fb-7437e8addba3"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/rook-infantry-fire-directions-v1.json",
+    "sha256": "bd33e259789190d998b56be571529ea326088d8100155b2b8840551785a7222a"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "1f3533eb-dda9-4da8-b54e-e68ec031479d",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 35,
+      "height": 35,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/1f3533eb-dda9-4da8-b54e-e68ec031479d/image.png?v=1791531002365",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-fire-directions-v1/00.png",
+      "bytes": 1765,
+      "sha256": "17e302bce7709c78906f069a1f942dfe8996e36a15677401c028909f780f255c"
+    },
+    {
+      "index": 1,
+      "assetId": "08d2f9ed-afaf-4b48-a4ce-e07a5876270d",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 32,
+      "height": 32,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/08d2f9ed-afaf-4b48-a4ce-e07a5876270d/image.png?v=1791531003023",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-fire-directions-v1/01.png",
+      "bytes": 1438,
+      "sha256": "9986b7eef2959ed9f16b5927cc017f0a58f191af27de32f33b700319db6a12dc"
+    },
+    {
+      "index": 2,
+      "assetId": "fa4beaef-a1f9-4752-a567-e3c0e420f69b",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 35,
+      "height": 35,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/fa4beaef-a1f9-4752-a567-e3c0e420f69b/image.png?v=1791531003700",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-fire-directions-v1/02.png",
+      "bytes": 1774,
+      "sha256": "cda99288c1e92855340d8aca3bb61d020a614759a947a5dfd24023dc8fe097d7"
+    },
+    {
+      "index": 3,
+      "assetId": "9d2828ca-d08d-44af-8494-db080d8cc999",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 32,
+      "height": 32,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/9d2828ca-d08d-44af-8494-db080d8cc999/image.png?v=1791531004290",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-fire-directions-v1/03.png",
+      "bytes": 1499,
+      "sha256": "e0842369a64514ff3ff2c364113b9eabcb37d061633b35580030c0c59350732c"
+    },
+    {
+      "index": 4,
+      "assetId": "16478387-1add-4718-8930-171ceb59a068",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 32,
+      "height": 32,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/16478387-1add-4718-8930-171ceb59a068/image.png?v=1791531004879",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-fire-directions-v1/04.png",
+      "bytes": 1455,
+      "sha256": "de2ea57afc7deb83cab90d7ba9c56a3076afc89ba3854927fd053f03fc2ff832"
+    },
+    {
+      "index": 5,
+      "assetId": "471a7079-ab20-4219-8efd-24ac7ba684c0",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 32,
+      "height": 32,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/471a7079-ab20-4219-8efd-24ac7ba684c0/image.png?v=1791531005475",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-fire-directions-v1/05.png",
+      "bytes": 1509,
+      "sha256": "c32b6ae400effd3fcd9fceb98edebca29bdc4b4262d9e09d3e379f9c1cfdd1eb"
+    },
+    {
+      "index": 6,
+      "assetId": "186a0ca5-c441-4661-8413-c3a6bc0bca54",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 32,
+      "height": 32,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/186a0ca5-c441-4661-8413-c3a6bc0bca54/image.png?v=1791531006055",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-fire-directions-v1/06.png",
+      "bytes": 1425,
+      "sha256": "91563d0b6023fa19b45cdd277ad18f921e09b30dca62ef3f14bb29fd70e9b843"
+    },
+    {
+      "index": 7,
+      "assetId": "47d4f200-8fac-423c-9c13-657bf8620345",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 32,
+      "height": 32,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/47d4f200-8fac-423c-9c13-657bf8620345/image.png?v=1791531006821",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-fire-directions-v1/07.png",
+      "bytes": 1404,
+      "sha256": "069eec82f434b0615f541c4c08fd02b643de18b4dbcbaa62f678a078becf1ffe"
+    }
+  ],
+  "credits": {
+    "remaining": 1050
+  }
+}

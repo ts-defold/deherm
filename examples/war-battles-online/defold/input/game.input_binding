@@ -94,7 +94,15 @@ key_trigger {
   input: KEY_R
   action: "restart"
 }
+key_trigger {
+  input: KEY_TAB
+  action: "scoreboard"
+}
 mouse_trigger {
   input: MOUSE_BUTTON_1
   action: "deploy"
+}
+touch_trigger {
+  input: TOUCH_MULTI
+  action: "touch_multi"
 }

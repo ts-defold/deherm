@@ -13,6 +13,10 @@ test("the packaged online owner exposes a real QUIC-to-TCP fallback proof", asyn
   // `pnpm runtime:browser:online:fallback`, while these assertions prevent a
   // future gate from silently regressing to a standalone adapter harness.
   assert.match(gate, /argumentSet\.has\("--fallback"\)/u);
+  assert.match(gate, /argumentSet\.has\("--motion"\)/u);
+  assert.match(gate, /sampleMotion\(page\.client, healthUrl, authoritativeHealth\)/u);
+  assert.match(gate, /real keyboard input must move the local tank/u);
+  assert.match(gate, /authority must keep accepting the moving client's datagrams/u);
   assert.match(gate, /DEHERM_WAR_BATTLES_WEB_BUNDLE/u);
   assert.match(gate, /Page\.addScriptToEvaluateOnNewDocument/u);
   assert.match(gate, /serverWebSocket: websocketUrl/u);

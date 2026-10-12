@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-// Derive the approved SpriteFusion world motifs without contacting SpriteFusion.
-// The files under art/source/sprite-fusion are immutable inputs: this tool only
-// validates them and emits a deterministic, nearest-neighbour 16px prop atlas.
+// Derive the approved SpriteFusion world references without contacting
+// SpriteFusion. The source files remain immutable; deterministic local pixel
+// motifs provide sharper gameplay silhouettes on the native 16px tile grid.
 
 import { createHash } from "node:crypto";
 import { deflateSync, inflateSync } from "node:zlib";
@@ -18,6 +18,155 @@ const outputRelativePath = "defold/assets/derived/world/refinery-props.png";
 const metadataRelativePath = "defold/assets/derived/world/refinery-props.json";
 const cellSize = 16;
 const signature = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+
+// The imported refinery details are useful reference material, but their
+// 18–23px source canvases become noisy when squeezed into one 16px map tile.
+// These compact, hand-authored motifs retain the selected sources as
+// provenance while giving each gameplay role a clear silhouette at native
+// scale. Colours are sampled from the game's existing tutorial palette.
+const motifPalette = {
+  o: [44, 40, 57, 255], // outline
+  d: [69, 58, 78, 255], // deep shadow
+  m: [81, 84, 84, 255], // metal shadow
+  s: [115, 132, 133, 255], // steel
+  h: [188, 204, 204, 255], // steel highlight
+  r: [201, 94, 43, 255], // ember
+  f: [252, 187, 102, 255], // hot highlight
+  g: [204, 170, 57, 255], // refinery gold
+};
+
+const motifs = {
+  "pickup-pedestal": [
+    "................",
+    "................",
+    ".....oooooo.....",
+    "....ohhhhhho....",
+    "...ohhgggghho...",
+    "...ohggffggho...",
+    "...ohhgggghho...",
+    "....ohhhhhho....",
+    ".....ommmmo.....",
+    "....omssssmo....",
+    "...omssssssmo...",
+    "...ommmmmmmmo...",
+    "....ooddddoo....",
+    ".....oooooo.....",
+    "................",
+    "................",
+  ],
+  "thermal-vent": [
+    "................",
+    ".......rr.......",
+    "......rffr......",
+    ".......rr.......",
+    "......ommo......",
+    ".....omssmo.....",
+    "....omssssmo....",
+    "....omssssmo....",
+    "....ommmmmmo....",
+    "...omssssssmo...",
+    "...ommmmmmmmo...",
+    "..oommmmmmmmoo..",
+    "..oooooooooooo..",
+    "...dddddddddd...",
+    "................",
+    "................",
+  ],
+  "lava-fissure": [
+    "................",
+    "................",
+    "................",
+    ".......o........",
+    "......oro.......",
+    ".....orfo.......",
+    "....orffro......",
+    "...odrffro......",
+    "....odrffro.....",
+    ".....odrro......",
+    "......odro.......",
+    ".......oo........",
+    "................",
+    "................",
+    "................",
+    "................",
+  ],
+  "floor-vent": [
+    "................",
+    "................",
+    "................",
+    "...oooooooooo...",
+    "..ommmmmmmmmo...",
+    "..omsssssssmo...",
+    "..omsssssssmo...",
+    "..ommmmmmmmmo...",
+    "..omgmgmgmgmo...",
+    "..ommmmmmmmmo...",
+    "...ooooooooo....",
+    "................",
+    "......rr........",
+    ".....rffr.......",
+    "......rr........",
+    "................",
+  ],
+  "pipe-junction": [
+    "................",
+    "......oooo......",
+    ".....ommmmo.....",
+    ".....omssmo.....",
+    ".....omhhmo.....",
+    ".....omssmo.....",
+    "..ooooomssmooooo",
+    "..omsssssmmmmmmo",
+    "..omsssssmmmmmmo",
+    "..oooooooooooooo",
+    ".....omssmo.....",
+    ".....omhhmo.....",
+    ".....omssmo.....",
+    ".....ommmmo.....",
+    "......oooo......",
+    "................",
+  ],
+  "pipe-run": [
+    "................",
+    "................",
+    "................",
+    "................",
+    "..oooo........oo",
+    ".ommmmo......ommm",
+    ".omssmooooooomssm",
+    ".omshmmmmmmmomshm",
+    ".omssmooooooomssm",
+    ".ommmmo......ommm",
+    "..oooo........oo",
+    "................",
+    "................",
+    "................",
+    "................",
+    "................",
+  ],
+};
+
+function drawMotif(role) {
+  const rows = motifs[role];
+  if (
+    !rows ||
+    rows.length !== cellSize ||
+    rows.some((row) => row.length > cellSize + 2 || [...row].some((glyph) => glyph !== "." && !motifPalette[glyph]))
+  ) {
+    fail(`${role} has no valid ${cellSize}px authored motif`);
+  }
+  const pixels = Buffer.alloc(cellSize * cellSize * 4);
+  for (let y = 0; y < cellSize; y += 1) {
+    for (let x = 0; x < cellSize; x += 1) {
+      const rowOffset = Math.floor((rows[y].length - cellSize) / 2);
+      const glyph = rows[y][x + rowOffset] ?? ".";
+      const color = motifPalette[glyph];
+      if (!color) continue;
+      pixels.set(color, (y * cellSize + x) * 4);
+    }
+  }
+  return { width: cellSize, height: cellSize, pixels };
+}
 
 const crcTable = (() => {
   const table = new Uint32Array(256);
@@ -46,7 +195,7 @@ function paeth(left, above, upperLeft) {
   return aboveDistance <= cornerDistance ? above : upperLeft;
 }
 
-/** Decode the 8-bit RGBA, non-interlaced PNGs emitted by SpriteFusion. */
+/** Decode non-interlaced 8-bit RGB/RGBA source PNGs into one RGBA buffer. */
 function decodeRgbaPng(bytes) {
   if (!bytes.subarray(0, 8).equals(signature)) fail("source is not a PNG");
   const width = bytes.readUInt32BE(16);
@@ -54,8 +203,8 @@ function decodeRgbaPng(bytes) {
   const bitDepth = bytes[24];
   const colorType = bytes[25];
   const interlace = bytes[28];
-  if (!width || !height || bitDepth !== 8 || colorType !== 6 || interlace !== 0) {
-    fail("source PNG must be non-interlaced 8-bit RGBA");
+  if (!width || !height || bitDepth !== 8 || (colorType !== 2 && colorType !== 6) || interlace !== 0) {
+    fail("source PNG must be non-interlaced 8-bit RGB or RGBA");
   }
 
   let offset = 8;
@@ -72,8 +221,9 @@ function decodeRgbaPng(bytes) {
   if (!idat.length) fail("source PNG has no IDAT chunk");
 
   const encoded = inflateSync(Buffer.concat(idat));
-  const stride = width * 4;
-  const pixels = Buffer.alloc(stride * height);
+  const channels = colorType === 6 ? 4 : 3;
+  const stride = width * channels;
+  const decoded = Buffer.alloc(stride * height);
   const expectedLength = (stride + 1) * height;
   if (encoded.length !== expectedLength)
     fail(`source PNG scanline length is ${encoded.length}, expected ${expectedLength}`);
@@ -85,9 +235,9 @@ function decodeRgbaPng(bytes) {
     const previous = row - stride;
     for (let x = 0; x < stride; x += 1) {
       const raw = encoded[cursor++];
-      const left = x >= 4 ? pixels[row + x - 4] : 0;
-      const above = y > 0 ? pixels[previous + x] : 0;
-      const upperLeft = y > 0 && x >= 4 ? pixels[previous + x - 4] : 0;
+      const left = x >= channels ? decoded[row + x - channels] : 0;
+      const above = y > 0 ? decoded[previous + x] : 0;
+      const upperLeft = y > 0 && x >= channels ? decoded[previous + x - channels] : 0;
       let value;
       if (filter === 0) value = raw;
       else if (filter === 1) value = raw + left;
@@ -95,8 +245,14 @@ function decodeRgbaPng(bytes) {
       else if (filter === 3) value = raw + ((left + above) >> 1);
       else if (filter === 4) value = raw + paeth(left, above, upperLeft);
       else fail(`unsupported PNG filter ${filter}`);
-      pixels[row + x] = value & 0xff;
+      decoded[row + x] = value & 0xff;
     }
+  }
+  if (channels === 4) return { width, height, pixels: decoded };
+  const pixels = Buffer.alloc(width * height * 4);
+  for (let pixel = 0; pixel < width * height; pixel += 1) {
+    decoded.copy(pixels, pixel * 4, pixel * 3, pixel * 3 + 3);
+    pixels[pixel * 4 + 3] = 255;
   }
   return { width, height, pixels };
 }
@@ -301,8 +457,9 @@ async function buildWorldArt({ exampleRoot = defaultExampleRoot, check = false }
   const atlasPixels = Buffer.alloc(props.length * cellSize * cellSize * 4);
   const cellBytes = [];
   for (let index = 0; index < props.length; index += 1) {
-    props[index].normalized.pixels.copy(atlasPixels, index * cellSize * cellSize * 4);
-    cellBytes.push(encodeRgbaPng(cellSize, cellSize, props[index].normalized.pixels));
+    const motif = drawMotif(props[index].role);
+    motif.pixels.copy(atlasPixels, index * cellSize * cellSize * 4);
+    cellBytes.push(encodeRgbaPng(cellSize, cellSize, motif.pixels));
   }
   const atlasBytes = encodeRgbaPng(props.length * cellSize, cellSize, atlasPixels);
   const atlasSha256 = sha256(atlasBytes);
@@ -310,6 +467,7 @@ async function buildWorldArt({ exampleRoot = defaultExampleRoot, check = false }
     const { normalized: _normalized, ...metadataProp } = prop;
     return {
       ...metadataProp,
+      renderMode: "authored-16px-motif",
       cell: [index * cellSize, 0, cellSize, cellSize],
       outputSha256: sha256(cellBytes[index]),
     };
@@ -334,6 +492,11 @@ async function buildWorldArt({ exampleRoot = defaultExampleRoot, check = false }
         keys: ["world"],
         projectionSha256: sha256(selectionProjection),
       },
+    },
+    rendering: {
+      method: "hand-authored 16px motifs",
+      palette: "sampled tutorial palette",
+      reason: "Selected source motifs exceed the 16px logical tile and lose their role silhouettes when reduced.",
     },
     roles: outputProps,
   };

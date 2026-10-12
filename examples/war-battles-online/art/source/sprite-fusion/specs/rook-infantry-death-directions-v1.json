@@ -1,0 +1,6 @@
+{
+  "name": "rook-infantry-death-directions-v1",
+  "operation": "direction-set",
+  "inputs": ["asset:e274caf0-59fd-4f7a-81ef-4708a705e7eb"],
+  "size": 32
+}

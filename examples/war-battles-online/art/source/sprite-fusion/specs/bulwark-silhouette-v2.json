@@ -1,0 +1,7 @@
+{
+  "name": "bulwark-silhouette-v2",
+  "operation": "style-reference",
+  "size": 64,
+  "inputs": ["art/source/sprite-fusion/outputs/artillery-silhouette-v2/06.png"],
+  "prompt": "A defensive fortress tank for the same three-quarter isometric top-down arcade battlefield as the reference vehicle. Distinct very wide squat hull with two massive protruding armored side tracks, layered vertical shield plates on its blunt front, an oversized circular turret with a short thick cannon, rear stowage. Basalt-grey armor, warm cream highlights, restrained orange signal markings, dark readable outline. No visible driver, no face. Its heavy almost turtle-like silhouette must differ clearly from the long-gun artillery reference."
+}

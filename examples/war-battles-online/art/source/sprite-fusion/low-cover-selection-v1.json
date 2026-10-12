@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "disposition": "approved-source",
+  "role": "compact ground-seated cover on collision-aligned wall stamps",
+  "outputCell": [160, 128],
+  "groundLine": 119,
+  "variants": [
+    {
+      "id": "low-cover-earth",
+      "request": "frontier-grounded-low-cover-v1",
+      "index": 0,
+      "assetId": "ee94b30f-2584-4e4f-abb0-344a381580b2"
+    },
+    {
+      "id": "low-cover-stone",
+      "request": "frontier-grounded-low-cover-v1",
+      "index": 2,
+      "assetId": "e94e72cd-9741-4d2e-9c4a-547290e10143"
+    },
+    {
+      "id": "low-cover-timber",
+      "request": "frontier-grounded-low-cover-v1",
+      "index": 5,
+      "assetId": "fd903d58-0c23-455a-b59a-b5d51e0b1f81"
+    },
+    {
+      "id": "low-cover-rubble",
+      "request": "frontier-grounded-low-cover-v1",
+      "index": 8,
+      "assetId": "d837acc3-adde-4bf1-afc8-4eaa059a9629"
+    },
+    {
+      "id": "low-cover-neutral",
+      "request": "frontier-grounded-low-cover-contained-v1",
+      "index": 0,
+      "assetId": "1d46fbb0-4bec-4299-b05c-0e8a88f299f4"
+    }
+  ]
+}

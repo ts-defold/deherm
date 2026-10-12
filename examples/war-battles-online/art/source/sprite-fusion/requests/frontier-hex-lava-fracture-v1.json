@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_37900f5a-0889-4cfe-ae6e-e8ef9c74a09f",
+  "operation": "style-reference",
+  "prompt": "One six-sided volcanic basalt landform in an isometric frontier battlefield. A dark flat walkable rock top has a few narrow glowing orange magma fractures and angular slate chips; a short stratified cliff face shows restrained molten seams. Keep the same compact hex silhouette, three-quarter projection, upper-left light, dark rock palette, and chunky pixel clusters as the references. No large lava pool, tank, building, lettering, or second tile.",
+  "size": 64,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-cliff-v1/04.png",
+      "bytes": 4098,
+      "sha256": "7e6b4cead2a0d5e17460e064d7fe971edb5324cebfbdb8c7dbfcf86c8fc8ed06"
+    },
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-cliff-v1/08.png",
+      "bytes": 4080,
+      "sha256": "8c689a827e3edd66eae825eeec4ac5cc08d6ef27ed420d43ad56680372a3b105"
+    },
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ash-ridge-v1/05.png",
+      "bytes": 7255,
+      "sha256": "9a1ee4b21812b71adf568e6a4ed647c367c2446d1bd19deafe86d47c6de601d7"
+    },
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-cliff-v1/07.png",
+      "bytes": 7054,
+      "sha256": "22fc9b62174d4459e7a64b591570915b2dfd14bceac49cfed0634c63f60b2aae"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/frontier-hex-lava-fracture-v1.json",
+    "sha256": "6e7ee5c1e6eafb6a933a263a0cd41ab6f59f8623e10f6883c73cbddaafefbd6c"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "9df0ea78-425a-4f60-9fba-911e5aaf90b6",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/9df0ea78-425a-4f60-9fba-911e5aaf90b6/image.png?v=1791410242560",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-lava-fracture-v1/00.png",
+      "bytes": 7382,
+      "sha256": "6dc9dc7d098218af8656032c6547faceeb81214532e7adf75d7cad9b51f17ac5"
+    },
+    {
+      "index": 1,
+      "assetId": "e750f8f8-0458-483a-906f-7b77cd5f1a13",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/e750f8f8-0458-483a-906f-7b77cd5f1a13/image.png?v=1791410243171",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-lava-fracture-v1/01.png",
+      "bytes": 6874,
+      "sha256": "7d3544111820cb212b1077e0ef491ed78081fd66b75001502fe232b8d34a14b8"
+    },
+    {
+      "index": 2,
+      "assetId": "5601c4a3-cd79-41dd-bfea-aa50e724d47b",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/5601c4a3-cd79-41dd-bfea-aa50e724d47b/image.png?v=1791410243749",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-lava-fracture-v1/02.png",
+      "bytes": 7725,
+      "sha256": "855b46dd602f0c35af326d9faeb38caa6a0445c1efda8619615522ea6247fce6"
+    },
+    {
+      "index": 3,
+      "assetId": "6f4a0f39-846b-4e4e-851e-97de5d7f2165",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 65,
+      "height": 65,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/6f4a0f39-846b-4e4e-851e-97de5d7f2165/image.png?v=1791410244326",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-lava-fracture-v1/03.png",
+      "bytes": 7147,
+      "sha256": "b367703cacab26ffe435b8e6ac07b0bf201c50a551fb2fe97759cc31aa230c13"
+    },
+    {
+      "index": 4,
+      "assetId": "8ba2509e-6263-42de-8d6a-7a5d388ca967",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 70,
+      "height": 70,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/8ba2509e-6263-42de-8d6a-7a5d388ca967/image.png?v=1791410244903",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-lava-fracture-v1/04.png",
+      "bytes": 9176,
+      "sha256": "a6455647f9675de70d228598b3165cbf4308209e42a132e32f2640fe7ece00c0"
+    },
+    {
+      "index": 5,
+      "assetId": "e0e81aaf-3be4-44fa-813a-2d28464a3f09",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 65,
+      "height": 65,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/e0e81aaf-3be4-44fa-813a-2d28464a3f09/image.png?v=1791410245447",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-lava-fracture-v1/05.png",
+      "bytes": 6816,
+      "sha256": "d02b8949dd310a48a50fb480523bda424c6ed4630541fead0ad41c65f0e26428"
+    },
+    {
+      "index": 6,
+      "assetId": "93ea92d4-cf3f-40fa-bf75-3cab08346cb4",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/93ea92d4-cf3f-40fa-bf75-3cab08346cb4/image.png?v=1791410246010",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-lava-fracture-v1/06.png",
+      "bytes": 7376,
+      "sha256": "03ae0349e990ea6a830af7619784af69ed5011ce5ae3987cad59a678874cb375"
+    },
+    {
+      "index": 7,
+      "assetId": "18e9638d-8c00-4dfb-9492-c37100b07734",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/18e9638d-8c00-4dfb-9492-c37100b07734/image.png?v=1791410246565",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-lava-fracture-v1/07.png",
+      "bytes": 6431,
+      "sha256": "74c9f0a17de97230960e726ef85b9908ca53ef4492afc38351b027ef7d7ea57a"
+    },
+    {
+      "index": 8,
+      "assetId": "64e3123e-9e0e-4b70-adb7-07db3eba68e7",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/64e3123e-9e0e-4b70-adb7-07db3eba68e7/image.png?v=1791410247128",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-lava-fracture-v1/08.png",
+      "bytes": 7022,
+      "sha256": "5bfcf92f15d400ab4d903b710986287e09954e7d742107186755a89b3279d8a9"
+    }
+  ],
+  "credits": {
+    "remaining": 2895
+  }
+}

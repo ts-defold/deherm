@@ -1,0 +1,6 @@
+{
+  "name": "scout-turret-v2",
+  "operation": "edit",
+  "inputs": ["art/source/sprite-fusion/outputs/scout-silhouette-v2/05.png"],
+  "prompt": "Isolate only this scout tank's small rotating turret, slim short gun and whip antenna as one detached weapon sprite. Remove the entire tracked hull and chassis underneath, leaving the turret in the same three-quarter isometric direction, palette and outline. The turret should retain a compact base that can sit on the matching scout hull's circular socket. One isolated turret, no hull."
+}

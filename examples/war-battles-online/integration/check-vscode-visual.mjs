@@ -4,7 +4,7 @@ import { execFile } from "node:child_process";
 import { access, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { promisify } from "node:util";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import WebSocket from "ws";
 
 import {
@@ -14,6 +14,7 @@ import {
   refreshVisualEvidenceSourceContract,
   sha256,
   verifyVisualEvidence,
+  ARENA_SOURCE_PATH,
   VISUAL_EVIDENCE_SOURCE_PATHS,
 } from "./vscode-visual-evidence.mjs";
 
@@ -111,10 +112,32 @@ const call = (method, params = {}) =>
     socket.send(JSON.stringify({ id, method, params }));
   });
 
+const arenaUri = pathToFileURL(path.join(repositoryRoot, ARENA_SOURCE_PATH)).href;
 const rendered = await call("Runtime.evaluate", {
-  expression: "({text: document.body.innerText, title: document.title, userAgent: navigator.userAgent})",
+  // Current VS Code renders Monaco's inlay hints inside editor view lines,
+  // but not in document.body.innerText. Read only rows actually visible in
+  // the authored file: an offscreen hint or unrelated tab must not pass.
+  expression: `(() => {
+    const uri = ${JSON.stringify(arenaUri)};
+    const editor = [...document.querySelectorAll(".monaco-editor[data-uri]")].find((element) => {
+      const rect = element.getBoundingClientRect();
+      return element.getAttribute("data-uri") === uri && rect.width > 0 && rect.height > 0;
+    });
+    const bounds = editor?.getBoundingClientRect();
+    const text = bounds === undefined ? "" : [...editor.querySelectorAll(".view-line")]
+      .filter((line) => {
+        const rect = line.getBoundingClientRect();
+        return rect.height > 0 && rect.bottom > bounds.top && rect.top < bounds.bottom;
+      })
+      .map((line) => line.textContent ?? "")
+      .join("\\n");
+    return { text, title: document.title, userAgent: navigator.userAgent };
+  })()`,
   returnByValue: true,
 });
+if (rendered.exceptionDetails || rendered.result?.value === undefined) {
+  throw new Error(`VS Code visible-row capture failed: ${rendered.exceptionDetails?.text ?? "no value"}`);
+}
 const screenshot = await call("Page.captureScreenshot", { format: "png", captureBeyondViewport: false });
 socket.close();
 const screenshotBytes = Buffer.from(screenshot.data, "base64");

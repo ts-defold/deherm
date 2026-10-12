@@ -1,12 +1,83 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { cp, mkdtemp, readFile, readFile as readBytes, stat, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { test } from "node:test";
 
-import { buildWorldArt, decodeRgbaPng } from "../tools/generate-world-art.mjs";
+import { alphaBounds, buildWorldArt, decodeRgbaPng } from "../tools/generate-world-art.mjs";
+import { buildTitleBackground } from "../tools/generate-title-art.mjs";
 
 const exampleRoot = path.resolve(import.meta.dirname, "..");
+const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
+
+test("large blast expands into a bounded ground shockwave without clipping its atlas cell", async () => {
+  const first = decodeRgbaPng(
+    await readBytes(path.join(exampleRoot, "defold/assets/derived/arena/explosion-big-1.png")),
+  );
+  const peak = decodeRgbaPng(
+    await readBytes(path.join(exampleRoot, "defold/assets/derived/arena/explosion-big-5.png")),
+  );
+  assert.deepEqual([first.width, first.height, peak.width, peak.height], [64, 64, 64, 64]);
+  const firstBounds = alphaBounds(first);
+  const peakBounds = alphaBounds(peak);
+  assert.ok(peakBounds[2] - peakBounds[0] >= 46, "the big blast needs a legible expanding shockwave");
+  assert.ok(peakBounds[2] - peakBounds[0] > firstBounds[2] - firstBounds[0] + 30);
+  assert.ok(
+    peakBounds.every((edge) => edge >= 2 && edge <= 61),
+    "the shockwave needs an atlas gutter",
+  );
+});
+
+test("selected Sprite Fusion sandbags retain source provenance and grounded runtime gutters", async () => {
+  const selectionBytes = await readBytes(path.join(exampleRoot, "art/source/sprite-fusion/sandbag-selection-v1.json"));
+  const selection = JSON.parse(selectionBytes);
+  const manifest = JSON.parse(
+    await readFile(path.join(exampleRoot, `art/source/sprite-fusion/requests/${selection.request}.json`), "utf8"),
+  );
+  const arenaArt = JSON.parse(
+    await readFile(path.join(exampleRoot, "defold/assets/derived/arena/arena-art.json"), "utf8"),
+  );
+  assert.equal(arenaArt.source.worldSandbagSprites.provider, "Sprite Fusion");
+  assert.equal(arenaArt.source.worldSandbagSprites.selectionSha256, sha256(selectionBytes));
+  assert.equal(arenaArt.source.worldSandbagSprites.requestId, manifest.requestId);
+  assert.deepEqual(selection.outputCell, [36, 32]);
+  assert.deepEqual(selection.scale, [5, 8]);
+  assert.deepEqual(
+    selection.variants.map(({ id }) => id),
+    ["cover-sandbag-a", "cover-sandbag-b"],
+  );
+  const runtimeImages = [];
+  for (const variant of selection.variants) {
+    const source = manifest.outputs.find(({ index }) => index === variant.index);
+    assert.equal(source.assetId, variant.assetId);
+    const sourceBytes = await readBytes(path.join(exampleRoot, source.path));
+    assert.equal(sha256(sourceBytes), source.sha256);
+    const sourceBounds = alphaBounds(decodeRgbaPng(sourceBytes));
+    assert.ok(sourceBounds[0] >= 2 && sourceBounds[1] >= 2 && sourceBounds[2] <= 61 && sourceBounds[3] <= 61);
+    const runtimeBytes = await readBytes(path.join(exampleRoot, `defold/assets/derived/arena/${variant.id}.png`));
+    const runtime = decodeRgbaPng(runtimeBytes);
+    assert.deepEqual([runtime.width, runtime.height], selection.outputCell);
+    const bounds = alphaBounds(runtime);
+    assert.ok(bounds[0] >= 2 && bounds[2] <= 33, `${variant.id} needs horizontal atlas gutter`);
+    assert.equal(bounds[3], selection.groundLine, `${variant.id} lost the ground-contact line`);
+    runtimeImages.push(runtimeBytes);
+  }
+  assert.notDeepEqual(runtimeImages[0], runtimeImages[1], "two sandbag variants must remain visually distinct");
+  assert.deepEqual(Object.keys(arenaArt.source.worldCoverSprites.sprites), ["cover-crate"]);
+});
+
+test("the selected SNK hex title source deterministically fills the Defold title backdrop", async () => {
+  const generated = buildTitleBackground();
+  const installed = await readBytes(path.join(exampleRoot, "defold/assets/ui/title-screen/background.png"));
+  assert.deepEqual(installed, generated);
+  const background = decodeRgbaPng(generated);
+  assert.deepEqual([background.width, background.height], [1280, 720]);
+  assert.match(
+    await readFile(path.join(exampleRoot, "defold/main/tutorial-presentation.atlas"), "utf8"),
+    /id: "battlefield-background"\s+images \{\s+image: "\/assets\/ui\/title-screen\/background\.png"/,
+  );
+});
 
 async function fixtureRoot() {
   const root = await mkdtemp(path.join(os.tmpdir(), "war-battles-world-art-"));
@@ -55,6 +126,19 @@ test("world-art atlas preserves transparency and reports bounded 16px cells", as
     atlas.pixels.some((value, index) => index % 4 === 3 && value === 0),
     "atlas must retain transparent pixels",
   );
+  assert.equal(result.metadata.rendering.method, "hand-authored 16px motifs");
+  for (let cell = 0; cell < result.metadata.roles.length; cell += 1) {
+    let opaque = 0;
+    for (let y = 0; y < 16; y += 1) {
+      for (let x = 0; x < 16; x += 1) {
+        if (atlas.pixels[(y * atlas.width + cell * 16 + x) * 4 + 3] > 0) opaque += 1;
+      }
+    }
+    assert.ok(
+      opaque >= 64 && opaque <= 128,
+      `${result.metadata.roles[cell].role} has a legible native-scale silhouette`,
+    );
+  }
 });
 
 test("world-art output is byte-for-byte deterministic and --check is zero-write", async () => {

@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_21da4e67-e0c7-4726-bb55-7e0ab9647a6f",
+  "operation": "style-reference",
+  "prompt": "An older stocky tank driver named Brass, full-body isometric three-quarter southeast-facing standing pose for the same game as the reference. Distinct snowy white beard and moustache, weathered face, brass-rimmed round goggles on an ochre leather aviator cap, cream neck scarf, olive mechanic jacket, sturdy dark boots, compact sidearm held low. Keep the reference's chunky pixel silhouettes, dark outlines, restrained olive/ochre palette, grounded scale, and angle, but make this a clearly different older character. One standing character only; no vehicle, pedestal, scenery, text, or extra figures.",
+  "size": 32,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "d62dd927-7809-4bd6-a18e-1c87fcf23e9f"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/brass-infantry-southeast-v1.json",
+    "sha256": "a2ec17d751582702b671e2004dc5d117fd2b64f7d9e6c6aa6c916e1f1ab2c6db"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "349aa42d-70b7-4c50-87cd-aa1892c3bbe1",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 71,
+      "height": 71,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/349aa42d-70b7-4c50-87cd-aa1892c3bbe1/image.png?v=1791523414106",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-southeast-v1/00.png",
+      "bytes": 6509,
+      "sha256": "57cf6cecdb70669c0368fdab8c480da6a6ada08e5f7f4cf089a02abd22dc40b4"
+    },
+    {
+      "index": 1,
+      "assetId": "dba8bdaf-bad4-48db-8262-4d6e1438c81c",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 71,
+      "height": 71,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/dba8bdaf-bad4-48db-8262-4d6e1438c81c/image.png?v=1791523414659",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-southeast-v1/01.png",
+      "bytes": 8140,
+      "sha256": "2608f151740a6a0253a817cc47745b1baf46d1fb162140b32bd07ad2d08fedc4"
+    },
+    {
+      "index": 2,
+      "assetId": "79116eff-dfa8-47b2-9bdb-25c83b9e3752",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 70,
+      "height": 70,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/79116eff-dfa8-47b2-9bdb-25c83b9e3752/image.png?v=1791523415221",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-southeast-v1/02.png",
+      "bytes": 8012,
+      "sha256": "f743b4a96fa8c8042fc3662e1c7de454f9a88c10ee34e276cc8e2f2caaf28523"
+    },
+    {
+      "index": 3,
+      "assetId": "5272b449-c5f0-4c43-b033-712ad007f636",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 74,
+      "height": 74,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/5272b449-c5f0-4c43-b033-712ad007f636/image.png?v=1791523415764",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-southeast-v1/03.png",
+      "bytes": 7092,
+      "sha256": "66719cef09b488d74edf59912c973de48ca42642d4b1488efe9c98af2c980909"
+    },
+    {
+      "index": 4,
+      "assetId": "5c099e44-2778-4586-ab0f-58896c08f3c5",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 74,
+      "height": 74,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/5c099e44-2778-4586-ab0f-58896c08f3c5/image.png?v=1791523416292",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-southeast-v1/04.png",
+      "bytes": 7553,
+      "sha256": "e79a0dc8d78b4593dd5bd29e94d9750f19ee674f671387b81e51d54000277cc5"
+    },
+    {
+      "index": 5,
+      "assetId": "33a089fc-162e-4ada-9b8a-d849e7d4915f",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 72,
+      "height": 72,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/33a089fc-162e-4ada-9b8a-d849e7d4915f/image.png?v=1791523416814",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-southeast-v1/05.png",
+      "bytes": 7885,
+      "sha256": "00fa2bdb576e5d4358368eacb9a127f5e1ad500f0474db2b600d5b8660fe153a"
+    },
+    {
+      "index": 6,
+      "assetId": "68c805db-3006-4ff0-b0e5-97dd3c26cd9e",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 74,
+      "height": 74,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/68c805db-3006-4ff0-b0e5-97dd3c26cd9e/image.png?v=1791523417296",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-southeast-v1/06.png",
+      "bytes": 7401,
+      "sha256": "97a4950118b823532bd356c586e069c095eb144ce0cdd640dac194200edd22f6"
+    },
+    {
+      "index": 7,
+      "assetId": "121f3564-7db2-4192-b8b7-e2c15e910751",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 75,
+      "height": 75,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/121f3564-7db2-4192-b8b7-e2c15e910751/image.png?v=1791523417832",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-southeast-v1/07.png",
+      "bytes": 7291,
+      "sha256": "57a1b0aae3aa789b15d11c7465d997386dd8e55744b0f44e6cefbf67e0f0814a"
+    },
+    {
+      "index": 8,
+      "assetId": "17b1d643-615a-4517-bc4a-8a9f21146d93",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 74,
+      "height": 74,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/17b1d643-615a-4517-bc4a-8a9f21146d93/image.png?v=1791523418351",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-southeast-v1/08.png",
+      "bytes": 6841,
+      "sha256": "1edf8c08a53cc74f4bca6c167a49687edef6c7505f4320a1502e069cceb8f655"
+    }
+  ],
+  "credits": {
+    "remaining": 1875
+  }
+}

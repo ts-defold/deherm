@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_b1afb029-4904-4e04-ba57-a51bbb822fa2",
+  "operation": "edit",
+  "prompt": "Change only Rook's body pose to a grounded southeast-facing walk mid-stride: front boot stepping, rear boot planted, opposite arm swinging, compact sidearm still held low. Keep her exact helmet, blue goggle lens, cream scarf, face, olive jacket, colors, outline, proportions, and three-quarter perspective. No new prop, platform, text, scenery, or second person.",
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "b0168c9c-877f-46f1-8ee7-e12b93565d18"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/rook-infantry-walk-pose-se-v1.json",
+    "sha256": "8457e3a67e464ea63c1ee915de9aefd02473c11ff49ca2ba7c3e3a9bcc19239e"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "c4ea12e0-fc5a-43f1-8b0e-15b801c0c065",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 25,
+      "height": 47,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/c4ea12e0-fc5a-43f1-8b0e-15b801c0c065/image.png?v=1791521676474",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-walk-pose-se-v1/00.png",
+      "bytes": 2805,
+      "sha256": "0c446f6eb2fbb58b551ed056c03c02a56e5fc746ff1e7c0c2408a204f11ece21"
+    },
+    {
+      "index": 1,
+      "assetId": "d4d9360e-a2c4-46e6-8fec-24645f13bdb6",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 25,
+      "height": 46,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/d4d9360e-a2c4-46e6-8fec-24645f13bdb6/image.png?v=1791521677501",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-walk-pose-se-v1/01.png",
+      "bytes": 2808,
+      "sha256": "93e2584ce4da8caa31d541e4225ac7830f5e7acbef02db6947c74ef3599a72c1"
+    }
+  ],
+  "credits": {
+    "remaining": 2115
+  }
+}

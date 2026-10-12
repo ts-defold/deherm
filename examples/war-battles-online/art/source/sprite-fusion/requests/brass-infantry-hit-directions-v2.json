@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_da335eff-c957-4475-a820-b22e74243474",
+  "operation": "direction-set",
+  "prompt": null,
+  "size": 32,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "e2341780-c543-4b84-a3ae-4dc871309e31"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/brass-infantry-hit-directions-v2.json",
+    "sha256": "f0d2b3dbcedda8ae6fa2956ed2b567f469b0d05f9685ce3144b5b4d13e09d98f"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "0b972f77-2a31-433a-8081-5b748592aa42",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 38,
+      "height": 38,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/0b972f77-2a31-433a-8081-5b748592aa42/image.png?v=1791535132365",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-hit-directions-v2/00.png",
+      "bytes": 2656,
+      "sha256": "03d552e76c715f94d6961d9f60a45dcda81c023a77754203a464f7577272b1cb"
+    },
+    {
+      "index": 1,
+      "assetId": "5c6a127b-0fb0-44b6-a9b1-46744f3b0e30",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 38,
+      "height": 38,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/5c6a127b-0fb0-44b6-a9b1-46744f3b0e30/image.png?v=1791535132950",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-hit-directions-v2/01.png",
+      "bytes": 2743,
+      "sha256": "3e2c310364756deb69faba2e25ff3ed5917e69437c6170d1751b03b042caae77"
+    },
+    {
+      "index": 2,
+      "assetId": "070564ab-17be-49a2-8b35-2493f49a6ff2",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 38,
+      "height": 38,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/070564ab-17be-49a2-8b35-2493f49a6ff2/image.png?v=1791535133529",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-hit-directions-v2/02.png",
+      "bytes": 2385,
+      "sha256": "2da01ed317b64d1b406aac7a45ac336130177a1f111dbb80f7e7a14cea688946"
+    },
+    {
+      "index": 3,
+      "assetId": "539d42fb-574a-4b0d-9a63-1c452a91ff3b",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 43,
+      "height": 43,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/539d42fb-574a-4b0d-9a63-1c452a91ff3b/image.png?v=1791535134113",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-hit-directions-v2/03.png",
+      "bytes": 2346,
+      "sha256": "5021c0bf6475efa636a5e61d3bb7d96e5fac055a0ed066fa694d2a2428f9dab4"
+    },
+    {
+      "index": 4,
+      "assetId": "8f66f688-52d1-435b-ad4f-3cdd6c228b00",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 43,
+      "height": 43,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/8f66f688-52d1-435b-ad4f-3cdd6c228b00/image.png?v=1791535134704",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-hit-directions-v2/04.png",
+      "bytes": 2334,
+      "sha256": "368276f5ef68fc530cf814fd3ab94334a86b921acca5c7c2a08ac05e0cc912de"
+    },
+    {
+      "index": 5,
+      "assetId": "35f043b4-ef15-4f25-bc6e-6d66c2910fa9",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 40,
+      "height": 40,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/35f043b4-ef15-4f25-bc6e-6d66c2910fa9/image.png?v=1791535135282",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-hit-directions-v2/05.png",
+      "bytes": 2279,
+      "sha256": "f07a4b777d3e4e76353a29e779c94156aa66bafc6a4093706e8e0ea8aae3750b"
+    },
+    {
+      "index": 6,
+      "assetId": "7e307742-bcd3-44ef-8903-1cdad43de2d2",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 40,
+      "height": 40,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/7e307742-bcd3-44ef-8903-1cdad43de2d2/image.png?v=1791535135884",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-hit-directions-v2/06.png",
+      "bytes": 2484,
+      "sha256": "8fd42d9a4865cfb94a58343f17d407d7240e82048c44c58af01f420ade009018"
+    },
+    {
+      "index": 7,
+      "assetId": "e04848c8-a47c-48ea-95a3-f5441af59585",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 40,
+      "height": 40,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/e04848c8-a47c-48ea-95a3-f5441af59585/image.png?v=1791535136458",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-hit-directions-v2/07.png",
+      "bytes": 2295,
+      "sha256": "67b925dca1db14f15eb13454b484b2a6ce98b53704103bf87d4ed14f858188dd"
+    }
+  ],
+  "credits": {
+    "remaining": 720
+  }
+}

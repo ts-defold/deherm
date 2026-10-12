@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "sourceRequest": "rook-infantry-walk-pose-ne-v1",
+  "outputIndex": 0,
+  "sourceSha256": "a44ff5f249602fa98cfc3fe94acce2e8aca69db072c4fd4d79db0578f1a4f1b4",
+  "canvas": 64,
+  "footRow": 56,
+  "sourceBounds": [
+    0,
+    0,
+    33,
+    40
+  ],
+  "paddedBounds": [
+    15,
+    15,
+    48,
+    55
+  ],
+  "sha256": "2684ca490ab720c179d7e359422897f130bf6f6cae4b80c8bc4aaa9033cfc033"
+}

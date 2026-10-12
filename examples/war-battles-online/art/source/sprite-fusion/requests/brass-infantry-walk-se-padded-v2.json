@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_2549e431-0d74-4cc9-ac4c-8a4acaa86cd5",
+  "operation": "animate",
+  "prompt": "A grounded southeast-facing walk loop with alternating boot contact and a small opposite-arm swing. Preserve Brass's round goggles, steel helmet, cream scarf, orange accents, sidearm, proportions, colors, and southeast-facing perspective. Keep the complete helmet, boots, sidearm, and arms inside the canvas throughout the motion.",
+  "size": null,
+  "outputFrames": 4,
+  "colors": 24,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/inputs/brass-infantry-walk-pose-se-v1-1-padded-80.png",
+      "bytes": 4286,
+      "sha256": "5f60e2c231a686c39fa17e447707db257140e5b40024cf58df8d690e303ad723"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/brass-infantry-walk-se-padded-v2.json",
+    "sha256": "0d7a0a60ca74188054383b1f6f7e7e1ec932d08495034737b3e3538ecc24979d"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "d982d896-fc14-4a80-ad97-4f3c5d14e242",
+      "type": "animation",
+      "contentType": "image/webp",
+      "width": 80,
+      "height": 80,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/d982d896-fc14-4a80-ad97-4f3c5d14e242/animation.webp?v=1791566159999",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-walk-se-padded-v2/00.webp",
+      "bytes": 2716,
+      "sha256": "1fb144c85924a34e933b6722e30e09fd3411cfde62be5e5434ec652be2f0b630",
+      "spritesheet": {
+        "url": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/d982d896-fc14-4a80-ad97-4f3c5d14e242/spritesheet.png?v=1791566159999",
+        "path": "art/source/sprite-fusion/outputs/brass-infantry-walk-se-padded-v2/00-sheet.png",
+        "bytes": 3285,
+        "sha256": "992b74bc9f8c4967a3fe9c52fe36253a2b8e9d5fd3c158fa72b39535f2092cfd"
+      },
+      "frameCount": 4,
+      "fps": 8
+    }
+  ],
+  "credits": {
+    "remaining": 0
+  }
+}

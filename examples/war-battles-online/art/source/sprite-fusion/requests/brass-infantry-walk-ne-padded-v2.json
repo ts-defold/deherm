@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_a5ed8d3a-ff0a-4664-8a10-7feb1f714d20",
+  "operation": "animate",
+  "prompt": "A grounded northeast-facing walk loop away from the viewer with alternating boot contact and opposite-arm swing. Preserve Brass's ochre cap, brass goggles, cream scarf, olive jacket, stocky shape, low sidearm, and exact three-quarter rear view. Keep the full character and equipment inside every frame with clear space at every edge.",
+  "size": null,
+  "outputFrames": 4,
+  "colors": 24,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/inputs/brass-infantry-walk-pose-ne-v1-1-padded-64.png",
+      "bytes": 2353,
+      "sha256": "3e2e96db8bdbf5d9cb81b306ae818b42bc0d686f09dabcbfde2e93b753a48c86"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/brass-infantry-walk-ne-padded-v2.json",
+    "sha256": "0d89dffc1f678c38387e1454201ac297df55d15b325c77d4c2250361a9d3a7ac"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "0875548f-da90-4566-9603-3bee9d579a38",
+      "type": "animation",
+      "contentType": "image/webp",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/0875548f-da90-4566-9603-3bee9d579a38/animation.webp?v=1791564139079",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-walk-ne-padded-v2/00.webp",
+      "bytes": 1724,
+      "sha256": "f547761867d3069ebaa10ba1cdeb047278b7887a0aaff5577e88fef4c9667137",
+      "spritesheet": {
+        "url": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/0875548f-da90-4566-9603-3bee9d579a38/spritesheet.png?v=1791564139079",
+        "path": "art/source/sprite-fusion/outputs/brass-infantry-walk-ne-padded-v2/00-sheet.png",
+        "bytes": 1917,
+        "sha256": "9104f7af282d001920ee4c68cdfe88996c6196bd8d82e5758f84c07edb7847cb"
+      },
+      "frameCount": 4,
+      "fps": 8
+    }
+  ],
+  "credits": {
+    "remaining": 75
+  }
+}

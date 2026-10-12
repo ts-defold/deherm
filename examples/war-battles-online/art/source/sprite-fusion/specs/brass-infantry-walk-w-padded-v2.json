@@ -1,0 +1,10 @@
+{
+  "name": "brass-infantry-walk-w-padded-v2",
+  "operation": "animate",
+  "inputs": [
+    "art/source/sprite-fusion/inputs/brass-infantry-walk-pose-w-v1-1-padded-80.png"
+  ],
+  "prompt": "A grounded side-view walk loop with alternating boot contact and a small opposite-arm swing. Preserve Brass's older stocky build, snowy beard, brass-rimmed goggles, ochre cap, cream scarf, olive jacket, sidearm, colors, and exact viewing angle. Keep the complete sidearm, helmet, and both boots inside the canvas throughout the motion.",
+  "outputFrames": 4,
+  "colors": 24
+}

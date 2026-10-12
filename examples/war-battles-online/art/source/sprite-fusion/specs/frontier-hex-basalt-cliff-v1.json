@@ -1,0 +1,10 @@
+{
+  "name": "frontier-hex-basalt-cliff-v1",
+  "operation": "style-reference",
+  "size": 64,
+  "prompt": "One isometric hexagonal basalt terrain landform with a broad walkable top, a short faceted cliff side, a few glowing orange fissures, and sparse olive grass on the rim. Match the reference tile's six-sided shape and the volcanic rock reference's color and lighting. No tank, building, text, or second tile.",
+  "inputs": [
+    "asset:bd93b0e2-417d-4553-b8ab-8c4637ff088e",
+    "art/source/imagegen/hex-style-reference/basalt.png"
+  ]
+}

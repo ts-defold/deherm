@@ -1,9 +1,9 @@
 # War Battles Online — Ultimate Edition
 
-A top-down arena deathmatch, authored end to end in TypeScript and running as
+A hex-isometric arena deathmatch, authored end to end in TypeScript and running as
 real Defold game objects: a tank you drive rather than a sprite you teleport,
 six weapons that fight differently, Quake-style pickups on respawn timers, a
-scrolling tilemap of cover and chokepoints, bots worth fighting, and a
+seeded hex island of cover and chokepoints, bots worth fighting, and a
 server-authoritative online mode over the WebTransport/QUIC boundary in `core/`.
 
 No Lua is authored anywhere in this example. Every component is a `.script.ts`
@@ -28,7 +28,7 @@ pnpm install                      # once, at the repository root
 cd examples/war-battles-online
 pnpm generate                     # SDK, component proxies, synced sources
 pnpm check                        # generated state, art, tilemap, types, focused tests
-pnpm play                         # the built arm64-macOS engine
+pnpm play                         # the last native Bob archive (offline)
 pnpm stack                        # server + native game + browser network-bot dashboard
 ```
 
@@ -37,19 +37,27 @@ open `defold/` as the developer workspace: it is the nested Defold engine
 project, while this directory owns `package.json`, the simulation, server,
 tests, generated-art tools, and editor configuration.
 
-`pnpm play` launches the already-built game in offline authoritative mode; bots
-fill every slot not occupied by a human. `pnpm stack` reuses or creates the
+`pnpm play` launches the already-built native Bob archive in offline
+authoritative mode; run a native Bob build after any HTML5 build before using
+it, since both Bob wrapper commands currently write `defold/build/bob`.
+Bots fill every slot not occupied by a human. `pnpm stack` builds and launches
+its own native archive in `defold/build/default`, independent of that shared
+Bob output. It reuses or creates the
 local WebTransport certificate, starts the authoritative Deno HTTP/3 server,
 launches the native game with its certificate pin, hosts and opens the browser
 bot command plane, and fills every slot after the native game takes the first.
-The default is now the complete 32-player roster: one native client
-plus 31 real browser WebTransport clients. It reports ready only after Defold
+The default is a 16-player roster: one native client plus 15 real browser
+WebTransport clients. Pass `-- --roster 32` to exercise the maximum. It reports ready only after Defold
 renders that authoritative roster, the server accepts input, and every browser
 bot has applied snapshots and observed movement. Closing the game or pressing
 Ctrl-C tears the owned process groups down.
 Pass `-- --bots 0 --no-browser` for only the server and game. `pnpm dev` builds,
 launches, watches, and hot-reloads through the TUI by default; run it once when
-the packaged native game has not been built yet. CI-style local proof is
+the packaged native game has not been built yet. It also syncs changes from
+the authoritative `core/` TypeScript into Defold's generated project mirror
+before compiling and during watch mode; `pnpm stack` syncs before its build.
+Direct Bob commands require `pnpm sync` first, and `pnpm sync:check` rejects a
+stale mirror. CI-style local proof is
 `pnpm stack -- --headless --exit-when-ready`.
 
 | Keys          | Action                                                                              |
@@ -60,6 +68,13 @@ the packaged native game has not been built yet. CI-style local proof is
 | `1`–`6`       | Cannon, autocannon, railgun, scatter, mortar, ricochet                              |
 | `7`–`0`       | Purchase/select scout, assault, bulwark, artillery chassis                          |
 | `Q` / `E`     | Purchase/select branch 1 / 2 for the held weapon (selection is free after purchase) |
+| Tab           | Hold to show the expanded leaderboard; release to clear the battlefield             |
+| Leader ribbon | Click or tap to toggle the expanded leaderboard                                     |
+
+In the HTML5 game, phones play in landscape. Portrait shows a full-screen
+rotate prompt rather than shrinking the battlefield and controls into a narrow
+strip. In landscape, the left thumb drives and the right thumb aims/fires;
+pressing farther from the left-stick origin boosts.
 
 The scene opens on the tutorial's scripted demonstration, which is what the
 packaged runtime gates observe; **any key starts the match immediately**, and it
@@ -186,6 +201,37 @@ pixels; Defold and our checked-in generators own tile IDs, layers, collision,
 map structure, and reproducibility. Every stage is byte-reproducible and has a
 `--check` mode wired into `pnpm check`.
 
+The Sprite Fusion hex set is integrated in two deliberate ways. A curated
+pool of 167 landforms across twelve material/transition families provides top-face
+detail for the seamless hex floor; 18 meadow, ochre, basalt, lava, and steel
+variants provide raised art only where a solid, collision-aligned wall stamp
+is not already covered by a grounded building, tree, or rock/scrap cluster. The generator verifies
+the saved request and image hashes before building either output. The catalog
+is `art/source/sprite-fusion/hex-tile-selection-v2.json`. Run
+`pnpm hex-terrain && pnpm art && pnpm tilemap` after changing the selection;
+`pnpm hex:preview` rebuilds the 144-cell source-art composition at
+`art/preview/hex-source-composition-v1.png`; `pnpm hex:catalog` lays out all
+167 accepted sources at `art/preview/hex-source-catalog-v2.png`, with source
+identity and grid coordinates in the adjacent JSON. All five tools have `--check`
+counterparts in `pnpm verify:generated`. An actual HTML5 gameplay capture of
+this wave is at `evidence/hex-185-relief-browser-2026-10-07.png`; it is a
+historical composition, not the current visual signoff. The current 12×12
+macro paints connected earth roads, a narrow service route, and one
+earth-rimmed volcanic scar over a continuous meadow. Source material roles
+remain seeded and versioned, but isolated hex-shaped ground lifts were removed
+after a live-game review showed that they read as floating tiles. Driveable
+collision remains flat; seeded wall stamps supply cover, with long meadow
+stamps shown by grounded landmarks, trees, or paired low rocks/scrap instead
+of thin raised plates. The two newest Sprite Fusion floor groups—earth-track
+and service-scar—were rejected after visual review because their raised
+platform silhouettes looked like floating objects. Their immutable requests
+remain archived, but they no longer feed the floor. The 167-tile source catalog is larger
+than the 144-cell macro: each rebuild deterministically selects a subset; the
+catalog is not a claim that every tile appears in one camera frame. The boundary uses separate segmented posts instead of
+painting the internal rock-wall tile over the floor. The visible height and
+refinery prop density still fall short of the direction mockup; adding source
+variants alone will not solve composition.
+
 ## Online
 
 `core/match-server.ts` is the authoritative match: one `BattleWorld`, one session
@@ -259,6 +305,50 @@ endpoint and require `stats.inputsAccepted >= 3` plus the exact
 `transport=webtransport-h3-quic` and `inputLane=datagram`; these are mutually
 exclusive packaged observations, not labels copied from a standalone adapter
 harness.
+
+To inspect the browser's input cadence while the main thread is busy, first
+build the HTML5 game bundle, then run
+`pnpm runtime:browser:online:cadence`. This loads the actual packaged game,
+samples the Deno authority's accepted-input counter from an independent Node
+poller, and compares a normal 2.5-second window with a 4.5-second window
+containing four deliberate 180 ms JavaScript main-thread stalls. The output
+reports accepted **commands** (a datagram can redundantly carry several),
+largest observed gap between counter increments, client-reported datagram
+drops, and actual stall durations. It is a localhost main-thread scheduling
+probe, not a UDP-loss injector, QUIC packet capture, or wire-departure clock.
+For real loopback QUIC packet loss, run
+`pnpm runtime:browser:online:loss` (10% by default) or set
+`DEHERM_WAR_BATTLES_PACKET_LOSS_PERCENT=20` before that command. Its local
+UDP proxy forwards the actual encrypted browser/server packets, starts
+dropping only after the session is admitted, and reports per-direction packet
+counts alongside the same cadence measurements. This is one browser client on
+loopback, not a WAN or 16-client load test.
+Use `pnpm runtime:browser:online:loss:motion` with the same optional loss
+percentage to assert sustained keyboard movement, snapshots, and authoritative
+input acceptance through that lossy path.
+Use `pnpm runtime:browser:online:latency:motion` to add 65 ms one-way delay
+with ±15 ms jitter, or `pnpm runtime:browser:online:impaired:motion` to combine
+that delay with 10% packet loss. The UDP hop starts impairing only after the
+game is admitted. Set `DEHERM_WAR_BATTLES_LATENCY_MS`,
+`DEHERM_WAR_BATTLES_JITTER_MS`, and
+`DEHERM_WAR_BATTLES_MOTION_PHASE_MS` to change the conditions and duration;
+the default motion trace holds two movement directions for 2.5 seconds each.
+The output includes accepted and late inputs, snapshots, same-life movement,
+and corrections over 32 pixels. Motion probes request a 1280×720 browser
+viewport and report the actual Defold canvas backing size; the current
+headless Chrome surface renders 1205×678 rather than the full requested size.
+These are real packaged-browser loopback probes, not a bandwidth-capped WAN
+emulation.
+To inspect the rendered movement and scenery, run
+`pnpm runtime:browser:online:impaired:video` after the HTML5 bundle is built.
+It records the same delayed/lossy packaged game to
+`build/evidence/war-battles-online-impaired.mp4`; set
+`DEHERM_WAR_BATTLES_MOTION_PHASE_MS=5000` for the ten-second path across the
+dry-earth arena. The screencast is visual evidence, not a fair performance
+benchmark, because frame capture can perturb browser scheduling.
+An unimpeded `--motion --video` run writes
+`build/evidence/war-battles-online-clean.mp4` instead, so it does not overwrite
+the impaired capture.
 
 The Deno host can also persist the authoritative match. Configure
 `--world-checkpoint` or `WAR_BATTLES_WORLD_CHECKPOINT` to store a fixed-size,
@@ -355,6 +445,7 @@ manifest so the two cannot drift.
 | `pnpm generate`                                                       | Project SDK, component proxies, synced `core/` sources                    |
 | `pnpm check`                                                          | Generated state, art and tilemap freshness, types, tests                  |
 | `pnpm art` / `pnpm art:check`                                         | Regenerate or verify the pixel art                                        |
+| `pnpm hex:preview` / `pnpm hex:preview:check`                         | Rebuild or verify the raised-hex art-direction composition                |
 | `pnpm tilemap` / `pnpm tilemap:check`                                 | Regenerate or verify the arena tilemap                                    |
 | `pnpm play`                                                           | Launch the built native engine                                            |
 | `pnpm play:headless`, `pnpm soak`                                     | Deterministic matches with no engine                                      |
@@ -362,6 +453,7 @@ manifest so the two cannot drift.
 | `pnpm dev`                                                            | Compiler, watcher and hot-reload control plane                            |
 | `pnpm runtime:packaged`, `pnpm runtime:browser`                       | The two packaged runtime gates                                            |
 | `pnpm runtime:browser:online`, `pnpm runtime:browser:online:fallback` | Packaged online WebTransport/QUIC and forced WebSocket/TCP fallback gates |
+| `pnpm runtime:browser:online:impaired:soak`                           | 30-second packaged QUIC motion gate with packet loss and latency          |
 | `pnpm test:websocket`, `pnpm runtime:websocket`                       | Deterministic and real-browser WebSocket/TCP fallback gates               |
 | `pnpm runtime:projections`                                            | The projection-set gate                                                   |
 | `pnpm bundle:size`, `pnpm bundle:size:update`                         | Bundle measurement                                                        |
@@ -380,8 +472,8 @@ runtime. It deliberately describes semantics instead of naming a vendor:
 
 - reliable messages have a typed lane (`session`, `control`, `snapshot`, or
   cancellable `input-fallback`);
-- latest-only input datagrams return `backpressured` instead of accumulating an
-  unbounded stale queue;
+- latest-only input and compact-snapshot datagrams return `backpressured`
+  instead of accumulating an unbounded stale queue;
 - the negotiated maximum datagram size is checked for every send;
 - unsupported datagrams never silently become “UDP”; and
 - reconnect/session resume lives above the connection. A new connection presents
@@ -394,8 +486,14 @@ runtime. It deliberately describes semantics instead of naming a vendor:
   explicit 32-byte secret and persists a fixed-capacity generation ledger at
   lifecycle checkpoints.
 
-The WebTransport adapter places replaceable snapshot state on independent,
-cancellable unidirectional streams. Client-originated session/control events
+For the first playable 16-player roster, compact snapshot deltas use
+latest-only QUIC datagrams when every packed actor record and the actual
+encoded frame fit the negotiated datagram size. Each delta references an
+acknowledged base; lost or reordered frames can be ignored without poisoning
+the next frame. The server gives a backpressured datagram writer a one-second
+reliable-path cooldown. Full keyframes, oversized recovery frames and the
+32-player roster still use independent, cancellable unidirectional streams.
+Client-originated session/control events
 share one ordered bidirectional stream, while server session/control events
 share their ordered bounded lane. This avoids QUIC stream-order head-of-line
 blocking; the streams still share connection congestion capacity. Two
@@ -426,8 +524,9 @@ unordered, not flow-controlled, and limited by the negotiated path/peer maximum.
 The moq-dev documentation calls out an approximately 1.2 KB minimum MTU floor;
 the protocol still uses the runtime-reported limit and does not hard-code 1,200.
 Input packets carry tick and sequence numbers, so duplicates, loss, and reordering
-are harmless. The 32-bit acknowledgement window supports snapshot delta choice,
-but delta encoding itself is not in this slice.
+are harmless. Snapshot deltas carry their exact acknowledged base tick and are
+validated before replacing any client state. The 32-bit acknowledgement window
+supports the bounded delta history.
 
 ## Server/runtime decision matrix (validated 2026-09-18)
 

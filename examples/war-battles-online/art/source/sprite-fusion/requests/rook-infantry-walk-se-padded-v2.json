@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_977861c8-97e0-4c8d-8190-2b7638551298",
+  "operation": "animate",
+  "prompt": "A grounded southeast-facing walk cycle with alternating boots and a small opposite-arm swing. Preserve Rook's helmet, goggles, scarf, sidearm, proportions, palette, and three-quarter facing. Keep the whole character and equipment comfortably inside the canvas in every frame.",
+  "size": null,
+  "outputFrames": 4,
+  "colors": 24,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/inputs/rook-infantry-walk-pose-se-v1-0-padded-64.png",
+      "bytes": 2844,
+      "sha256": "038a4fdbfb55047d267e14c067ac3f85efd33528c6192be39b628d7cf1eb1d40"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/rook-infantry-walk-se-padded-v2.json",
+    "sha256": "feb4824a5dfbadc8edbb980118c7ce8005151b6181a4cd1c3d750c8b9fed22e2"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "b2fc97fd-015a-46d8-904e-0ae5510e8c5b",
+      "type": "animation",
+      "contentType": "image/webp",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/b2fc97fd-015a-46d8-904e-0ae5510e8c5b/animation.webp?v=1791550011835",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-walk-se-padded-v2/00.webp",
+      "bytes": 2192,
+      "sha256": "905afe3c16d5dd5b398c2e055552a0a4e3aaf5bc8e5c071f45201d36cf19c5e6",
+      "spritesheet": {
+        "url": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/b2fc97fd-015a-46d8-904e-0ae5510e8c5b/spritesheet.png?v=1791550011835",
+        "path": "art/source/sprite-fusion/outputs/rook-infantry-walk-se-padded-v2/00-sheet.png",
+        "bytes": 2544,
+        "sha256": "ab83758ca185b54ad3fd658ad4f92df6d23b7e30a327b52b97f8900e7e5fb74a"
+      },
+      "frameCount": 4,
+      "fps": 8
+    }
+  ],
+  "credits": {
+    "remaining": 195
+  }
+}

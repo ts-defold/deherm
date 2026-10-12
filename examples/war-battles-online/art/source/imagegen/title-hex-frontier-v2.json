@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "tool": "built-in image generation",
+  "status": "selected source for title background; runtime projection is generator-owned",
+  "path": "art/source/imagegen/title-hex-frontier-v2.png",
+  "sha256": "87df7526fa0e631a375416b77d98d02db10770c6f0636c0b2bddca47b3dacf54",
+  "width": 1672,
+  "height": 941,
+  "prompt": "Use case: stylized-concept. Asset type: production title-screen BACKGROUND for a 1280×720 isometric multiplayer tank game, War Battles Online. Generate a NEW 16:9 scene, no typography or UI. Premium late-1990s Japanese arcade pixel-art direction: hand-placed chunky pixels, disciplined 2–3 shade material clusters, bold readable silhouettes, warm orange blast light against deep olive, basalt charcoal, dusty ochre and turquoise sea. A coherent flat-top hexagonal battlefield stretches across a volcanic coastal island, every hex aligned on the same visible lattice, with subtle low/standard/high relief; a sweeping cliff edge falls into richly animated-looking turquoise ocean along the bottom. A few distinct armored tank silhouettes (scout, heavy, artillery), precisely isometric and grounded on the tiles, one strong foreground tank at far left and another at far right; tiny distant tanks and shellfire establish a 16-player battle. Low industrial refinery and mountain silhouette sit at the far edges, never as floating props. Make this more cinematic and vivid than a quiet tactical map: composition has explosive energy at the edges, heat, smoke, muzzle flashes and depth, yet deliberately leave a dark low-detail CLEAR CENTRAL AREA from approximately x=25% to 75%, y=25% to 75% for a separate logo, portrait, menu panel and deploy button. Keep the lower center quiet for a sponsor strip. No title text, lettering, symbols, buttons, frames, readable signs, collage, blur, glossy 3D, or watermark. This is the background art only, to be placed behind existing Defold GUI nodes."
+}

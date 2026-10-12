@@ -1,0 +1,151 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_b3d54a8b-8f96-44bf-adaa-17cad5c61e2d",
+  "operation": "style-reference",
+  "prompt": "One compact, low modular military sandbag cover section for a three-quarter isometric arcade tank battlefield. Two or three grounded olive canvas bags with dark basalt-shadow outlines, warm ochre worn seams, and a readable bottom contact line. Match the references' chunky muted military palette and density. The module should look natural when repeated along a short defensive line. No vehicle, person, building, lettering, UI, raised platform, or scene background.",
+  "size": 64,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "defold/assets/derived/arena/cover-sandbag-a.png",
+      "bytes": 1686,
+      "sha256": "30dbdf1faefbe70d371cae284bcacfe8417ab151ee10786908117cea6a2716ba"
+    },
+    {
+      "kind": "asset",
+      "assetId": "ee94b30f-2584-4e4f-abb0-344a381580b2"
+    },
+    {
+      "kind": "asset",
+      "assetId": "e94e72cd-9741-4d2e-9c4a-547290e10143"
+    },
+    {
+      "kind": "asset",
+      "assetId": "fd903d58-0c23-455a-b59a-b5d51e0b1f81"
+    },
+    {
+      "kind": "asset",
+      "assetId": "d837acc3-adde-4bf1-afc8-4eaa059a9629"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/war-sandbag-module-v1.json",
+    "sha256": "c38fee13797de24ef637912cf9e07a94dd858e60a2c15c3e76ca761afd4413bd"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "901b5b4b-484c-410f-b148-8510b8a2356d",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/901b5b4b-484c-410f-b148-8510b8a2356d/image.png?v=1791552571893",
+      "path": "art/source/sprite-fusion/outputs/war-sandbag-module-v1/00.png",
+      "bytes": 3239,
+      "sha256": "6377a345ba5dea5d1864940f7df3a488ddb8257291523a0c04e83941701aa852"
+    },
+    {
+      "index": 1,
+      "assetId": "bf4695ea-9706-4b4f-bbac-2e33de8a906c",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/bf4695ea-9706-4b4f-bbac-2e33de8a906c/image.png?v=1791552572582",
+      "path": "art/source/sprite-fusion/outputs/war-sandbag-module-v1/01.png",
+      "bytes": 3198,
+      "sha256": "3753cd714f74b82fffe8ea2ed189ec1f18d34014200d392d63eb98c172a45bc3"
+    },
+    {
+      "index": 2,
+      "assetId": "8fee1d66-74c5-4e23-a53b-3cbc3114fc7e",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/8fee1d66-74c5-4e23-a53b-3cbc3114fc7e/image.png?v=1791552573267",
+      "path": "art/source/sprite-fusion/outputs/war-sandbag-module-v1/02.png",
+      "bytes": 2946,
+      "sha256": "2bb9e5faae9ba8664b2d3d6ee512e29fb961b1583733fc3ed2d83176dd631acc"
+    },
+    {
+      "index": 3,
+      "assetId": "6a1af8e8-b496-403e-9d6a-08760ed2da5d",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/6a1af8e8-b496-403e-9d6a-08760ed2da5d/image.png?v=1791552573938",
+      "path": "art/source/sprite-fusion/outputs/war-sandbag-module-v1/03.png",
+      "bytes": 3209,
+      "sha256": "4cb6120847983adc6e453032ebef3bbd7c17d62c19222126c99e3cdc11d58b21"
+    },
+    {
+      "index": 4,
+      "assetId": "b8159a57-b2a7-47d6-94ce-00399e870c20",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/b8159a57-b2a7-47d6-94ce-00399e870c20/image.png?v=1791552574609",
+      "path": "art/source/sprite-fusion/outputs/war-sandbag-module-v1/04.png",
+      "bytes": 3355,
+      "sha256": "a0e209552b1fdf2fce5fba4b364409568a42faaaaefe430264ceafc8b19f9ce0"
+    },
+    {
+      "index": 5,
+      "assetId": "90f37353-6b1c-4fe8-a454-0ee319c3eebe",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/90f37353-6b1c-4fe8-a454-0ee319c3eebe/image.png?v=1791552575256",
+      "path": "art/source/sprite-fusion/outputs/war-sandbag-module-v1/05.png",
+      "bytes": 3633,
+      "sha256": "e0ce81739dabcbc8194fb73044b828b996db058e9caef10f1b3e610f5fe6bcc5"
+    },
+    {
+      "index": 6,
+      "assetId": "bf441fec-0978-4dd0-a8ce-cade5bab60f0",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/bf441fec-0978-4dd0-a8ce-cade5bab60f0/image.png?v=1791552575954",
+      "path": "art/source/sprite-fusion/outputs/war-sandbag-module-v1/06.png",
+      "bytes": 3533,
+      "sha256": "40f4222b594e6121db9c77eb13067dc6abb1c95a54145511e53e00d80a6b1449"
+    },
+    {
+      "index": 7,
+      "assetId": "d2e920fc-4147-458c-98dc-f30a07bf1493",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/d2e920fc-4147-458c-98dc-f30a07bf1493/image.png?v=1791552576593",
+      "path": "art/source/sprite-fusion/outputs/war-sandbag-module-v1/07.png",
+      "bytes": 3445,
+      "sha256": "d99820ddf2b8469252d0c805fabbb829ebd3e69a49cf50a7d36d004f285121ce"
+    },
+    {
+      "index": 8,
+      "assetId": "271aaa60-2d2b-4638-ada4-988c4a0796ff",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/271aaa60-2d2b-4638-ada4-988c4a0796ff/image.png?v=1791552577198",
+      "path": "art/source/sprite-fusion/outputs/war-sandbag-module-v1/08.png",
+      "bytes": 3493,
+      "sha256": "e521c49b24834a661ef57e6e78836380193db300695967ec133fc3b4968a0f2d"
+    }
+  ],
+  "credits": {
+    "remaining": 180
+  }
+}

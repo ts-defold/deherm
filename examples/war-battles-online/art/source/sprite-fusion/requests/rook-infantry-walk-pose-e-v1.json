@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_f7586fa0-6742-484d-8559-7059a44917fb",
+  "operation": "edit",
+  "prompt": "Change only Rook's body pose to a grounded east-facing side-profile walk mid-stride: forward boot stepping, rear boot planted, opposite arm swinging, compact sidearm still held low. Keep her exact helmet, goggles, cream scarf, olive jacket, colors, outline, proportions, and east side view. Do not turn her or add a prop, platform, text, scenery, or second person.",
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "36fd7018-9aed-4f39-b606-c73e936c2bc6"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/rook-infantry-walk-pose-e-v1.json",
+    "sha256": "8a7a15f1c4bc8fab0ca5485812257338ce20718f64302f616ca04cf69a6913a6"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "bbac95d6-ab2f-4d68-bba3-3e563b70b91d",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 28,
+      "height": 45,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/bbac95d6-ab2f-4d68-bba3-3e563b70b91d/image.png?v=1791522053332",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-walk-pose-e-v1/00.png",
+      "bytes": 2774,
+      "sha256": "83689d44f81bcd438e5d173d97770fd324d8d15a9dba8dffa7e01c09942c6572"
+    },
+    {
+      "index": 1,
+      "assetId": "f34c64e6-ee96-4c58-b467-97ae644e13c8",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 25,
+      "height": 46,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/f34c64e6-ee96-4c58-b467-97ae644e13c8/image.png?v=1791522054367",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-walk-pose-e-v1/01.png",
+      "bytes": 2987,
+      "sha256": "808386da1bd680e3daf54b6a65a6505a3ec238089c71bdf45994a14a4f321ec9"
+    }
+  ],
+  "credits": {
+    "remaining": 2040
+  }
+}

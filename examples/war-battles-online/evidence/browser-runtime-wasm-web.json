@@ -27,8 +27,8 @@
     ]
   },
   "platform": "wasm-web",
-  "bundleFingerprint": "45eeea0c9b9deef86c837f8b2354bef40c7c41bd855003a55adedebd5361b4ef",
-  "bundleSha256": "995fc2375315650f30b92d600951e2928eff0a01def82ad7e3dff20d0410f467",
+  "bundleFingerprint": "18c46d8bf36608e8e71233d477dcdca49432643ecbff40e26c3c850c2a0ef14e",
+  "bundleSha256": "744a7802fe4e3ed757a754ed59f7c2cd11912b6fc5da27bf98ce4a0d2577b166",
   "state": {
     "documentReady": "complete",
     "engineStarted": true,
@@ -42,10 +42,10 @@
       "ExampleMath",
       "Timer"
     ],
-    "bundleFingerprint": "45eeea0c9b9deef86c837f8b2354bef40c7c41bd855003a55adedebd5361b4ef",
+    "bundleFingerprint": "18c46d8bf36608e8e71233d477dcdca49432643ecbff40e26c3c850c2a0ef14e",
     "canvas": {
-      "width": 756,
-      "height": 425
+      "width": 734,
+      "height": 413
     }
   },
   "requiredEngineMarkers": [
@@ -59,8 +59,8 @@
     "war-battles:ui-init",
     "war-battles:rocket-init:1.00:0.00",
     "war-battles:rocket-expired",
-    "war-battles:arena-init:players=8:online=0",
-    "war-battles:arena-engaged:players=8:skill=2:seed=1463898690:mode=offline"
+    "war-battles:arena-init:players=16:online=0",
+    "war-battles:arena-engaged:players=16:skill=2:seed=1463898690:mode=offline"
   ],
   "requiredGameMarkerPatterns": [
     "^war-battles:camera-init:zoom=([0-9]+(?:\\.[0-9]+)?):view=([0-9]+)x([0-9]+):cameras=1$",
@@ -70,26 +70,27 @@
     "^war-battles:player-moved:(-?[0-9]+(?:\\.[0-9]+)?):(-?[0-9]+(?:\\.[0-9]+)?)$"
   ],
   "observedGameMarkers": [
-    "war-battles:arena-init:players=8:online=0",
-    "war-battles:hmr-reload:edit=initial:tick=0:entities=40:elapsed=0.000",
-    "war-battles:camera-init:zoom=1.18:view=1084x610:cameras=1",
-    "war-battles:camera-bounds:x=[-13.8,1309.8]:y=[63.0,673.0]",
+    "war-battles:arena-init:players=16:online=0",
+    "war-battles:hmr-reload:edit=initial:tick=0:entities=48:elapsed=0.000",
+    "war-battles:camera-init:zoom=1.15:view=1116x628:cameras=1",
+    "war-battles:camera-bounds:x=[2.1,1293.9]:y=[-85.0,821.0]",
     "war-battles:ui-init",
     "war-battles:player-init:648.0:368.0",
     "war-battles:rocket-init:1.00:0.00",
     "war-battles:player-fire:648.0:368.0:1.00:0.00",
     "war-battles:rocket-expired",
     "war-battles:player-moved:1725.2:962.0",
-    "war-battles:arena-engaged:players=8:skill=2:seed=1463898690:mode=offline"
+    "war-battles:arena-engaged:players=16:skill=2:seed=1463898690:mode=offline",
+    "war-battles:camera-snap:player=478.0,549.0:view=478.0,549.0:extent=558.0,313.9"
   ],
   "observedCamera": {
-    "zoom": 1.18,
-    "viewWidth": 1084,
-    "viewHeight": 610,
-    "minX": -13.8,
-    "maxX": 1309.8,
-    "minY": 63,
-    "maxY": 673
+    "zoom": 1.15,
+    "viewWidth": 1116,
+    "viewHeight": 628,
+    "minX": 2.1,
+    "maxX": 1293.9,
+    "minY": -85,
+    "maxY": 821
   },
   "observedTutorial": {
     "initialX": 648,

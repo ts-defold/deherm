@@ -1,0 +1,6 @@
+{
+  "name": "assault-turret-v2",
+  "operation": "edit",
+  "inputs": ["art/source/sprite-fusion/outputs/assault-silhouette-v2/02.png"],
+  "prompt": "Isolate only this assault tank's angular rotating turret and short autocannon assembly as one detached weapon sprite. Remove the entire tracked hull and chassis underneath, keeping the same three-quarter isometric direction, basalt armor palette, orange signal marks and dark outline. The compact turret base should sit on the matching assault hull socket. One isolated turret, no hull."
+}

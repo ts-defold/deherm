@@ -1,0 +1,10 @@
+{
+  "name": "mud-infantry-walk-w-padded-v2",
+  "operation": "animate",
+  "inputs": [
+    "art/source/sprite-fusion/inputs/mud-infantry-walk-pose-w-v1-0-padded-64.png"
+  ],
+  "prompt": "A grounded west-facing walk loop with alternating boot contact and a small opposite-arm swing. Preserve Mud's gas-mask helmet, orange eye lenses, scarf, compact backpack, olive fatigues, low sidearm, silhouette, palette, and exact side view. Keep the complete character and equipment inside every frame with visible space around the head, boots, and both sides.",
+  "outputFrames": 4,
+  "colors": 24
+}

@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_633ba1b1-28f1-41d7-9c9c-1405b542d44d",
+  "operation": "animate",
+  "prompt": "A quick grounded southeast-facing walk cycle with alternating boot contact and a small opposite-arm swing. Brass remains an older stocky driver with a full snowy beard, brass-rimmed goggles, ochre cap, cream scarf, olive mechanic jacket and compact sidearm held low. Keep his exact perspective, palette, outline, proportions, and identity consistent. Seamless loop without turning, jumping, or adding objects.",
+  "size": null,
+  "outputFrames": 4,
+  "colors": 24,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "d3ee8ea4-dbe0-45af-af77-7079eaecc0b9"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/brass-infantry-walk-se-v1.json",
+    "sha256": "e27ff0e561e59716511728584304968b81a14625335f2b04dd78a1b08bd4df9c"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "9b86ab0f-0266-4303-ad7c-342bdaae1266",
+      "type": "animation",
+      "contentType": "image/webp",
+      "width": 36,
+      "height": 51,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/9b86ab0f-0266-4303-ad7c-342bdaae1266/animation.webp?v=1791523643058",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-walk-se-v1/00.webp",
+      "bytes": 2722,
+      "sha256": "5b85932829c8df457d5c7eb1e98e829f5c86862538435401a11626ff477133d3",
+      "spritesheet": {
+        "url": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/9b86ab0f-0266-4303-ad7c-342bdaae1266/spritesheet.png?v=1791523643058",
+        "path": "art/source/sprite-fusion/outputs/brass-infantry-walk-se-v1/00-sheet.png",
+        "bytes": 2507,
+        "sha256": "bd27734f4ea36f8d357ff9918073ff5d064b00d2564183b466217487d1417dee"
+      },
+      "frameCount": 4,
+      "fps": 8
+    }
+  ],
+  "credits": {
+    "remaining": 1830
+  }
+}

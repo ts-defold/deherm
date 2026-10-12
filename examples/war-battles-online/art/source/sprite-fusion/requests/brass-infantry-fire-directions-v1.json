@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_d5c2bc85-9f48-418f-a0c0-1e58da622a6e",
+  "operation": "direction-set",
+  "prompt": null,
+  "size": 32,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "eb8e58b6-8d87-4a7e-bfef-80eba71f867d"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/brass-infantry-fire-directions-v1.json",
+    "sha256": "17e476e27ea730773908742aa10ae7b83097a734075db90b8a6f4600a76179ba"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "d3522d8e-15fd-496c-9be5-e772f16075ab",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 37,
+      "height": 37,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/d3522d8e-15fd-496c-9be5-e772f16075ab/image.png?v=1791532274129",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-fire-directions-v1/00.png",
+      "bytes": 2073,
+      "sha256": "3323963de725bd3269db22b69f896febd222d7ff2f5783ba16be76ada7634cf4"
+    },
+    {
+      "index": 1,
+      "assetId": "61d92d84-dab1-4ecd-8a35-34b4da10f7f3",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 43,
+      "height": 43,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/61d92d84-dab1-4ecd-8a35-34b4da10f7f3/image.png?v=1791532274719",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-fire-directions-v1/01.png",
+      "bytes": 2839,
+      "sha256": "d2bc987d97c79511603de0fcc935b643ac69680a4724fd0de70f0ac52128b58a"
+    },
+    {
+      "index": 2,
+      "assetId": "fa2bc6dd-c9f4-4eb9-a61f-b54125e10aad",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 37,
+      "height": 37,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/fa2bc6dd-c9f4-4eb9-a61f-b54125e10aad/image.png?v=1791532275262",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-fire-directions-v1/02.png",
+      "bytes": 2425,
+      "sha256": "d4469251a4fceab3a6cfddea73d84f212b3f95d0c56a686bd84c3c1d4ea17ee4"
+    },
+    {
+      "index": 3,
+      "assetId": "50604ccc-080c-426d-9d58-d4c71fad25a2",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 43,
+      "height": 43,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/50604ccc-080c-426d-9d58-d4c71fad25a2/image.png?v=1791532275801",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-fire-directions-v1/03.png",
+      "bytes": 2240,
+      "sha256": "5d8e2155baf615ea80d0f73535cedf21be7f4c6b09e40cb587b1b90ff9664c15"
+    },
+    {
+      "index": 4,
+      "assetId": "857ed89f-f7e7-48a4-8d11-b199221d7824",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 42,
+      "height": 42,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/857ed89f-f7e7-48a4-8d11-b199221d7824/image.png?v=1791532276391",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-fire-directions-v1/04.png",
+      "bytes": 2352,
+      "sha256": "9c59c2b65f1500d1027cfa1a1f446223e2908621da63914f4e0f53187fa78d98"
+    },
+    {
+      "index": 5,
+      "assetId": "5d7f02d5-5f09-40be-802c-a74a9d2048f9",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 36,
+      "height": 36,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/5d7f02d5-5f09-40be-802c-a74a9d2048f9/image.png?v=1791532276959",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-fire-directions-v1/05.png",
+      "bytes": 1855,
+      "sha256": "7774a86d1318a52f1eba22ae999f2f5572eed0626265efff5bf898c6b26c657e"
+    },
+    {
+      "index": 6,
+      "assetId": "b674b8ee-bce9-47c7-9502-ca948d41ed6c",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 35,
+      "height": 35,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/b674b8ee-bce9-47c7-9502-ca948d41ed6c/image.png?v=1791532277487",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-fire-directions-v1/06.png",
+      "bytes": 1880,
+      "sha256": "e40662fd458c5a2d7d44955a09931291ecc2a6828bfdd66581b993ce20ebf8f6"
+    },
+    {
+      "index": 7,
+      "assetId": "8476cd6c-4f80-4dd5-aa39-205256cc0369",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 36,
+      "height": 36,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/8476cd6c-4f80-4dd5-aa39-205256cc0369/image.png?v=1791532278016",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-fire-directions-v1/07.png",
+      "bytes": 2079,
+      "sha256": "2ee74d9cf5557cf23df2b410ff7a428dbcfab3acb3e590ba36a4f1df2b7edf2d"
+    }
+  ],
+  "credits": {
+    "remaining": 960
+  }
+}

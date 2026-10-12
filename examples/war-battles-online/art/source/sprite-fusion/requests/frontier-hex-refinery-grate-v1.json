@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_8e72cd69-30a9-4ea6-b6c9-d9726c71bb84",
+  "operation": "style-reference",
+  "prompt": "One six-sided walkable maintenance deck landform in an isometric volcanic refinery battlefield. A compact dark steel top has one inset grate, worn riveted plates, faint ochre safety paint, and a tiny warm vent glow; the short side is layered steel over basalt. Keep the same hex silhouette, three-quarter projection, upper-left light, restrained military palette, and chunky pixel clusters as the references. No tank, building, lettering, or second tile.",
+  "size": 64,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-service-deck-v1/09.png",
+      "bytes": 8414,
+      "sha256": "a288fa5d2c07ceb85bca1924ed5bb719e220a1cfc5de5225b57b5c40f35a5b8b"
+    },
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-service-deck-v1/10.png",
+      "bytes": 8237,
+      "sha256": "1577dcff19222642e475e886fc708e9f00cedb4ed61b488595b0c1031ffceb3c"
+    },
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-cliff-v1/04.png",
+      "bytes": 4098,
+      "sha256": "7e6b4cead2a0d5e17460e064d7fe971edb5324cebfbdb8c7dbfcf86c8fc8ed06"
+    },
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-cliff-v1/07.png",
+      "bytes": 7054,
+      "sha256": "22fc9b62174d4459e7a64b591570915b2dfd14bceac49cfed0634c63f60b2aae"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/frontier-hex-refinery-grate-v1.json",
+    "sha256": "521a232aedc04ead859cd49e82ea3e93bd72f400ca97ed32c794a01dc32f5161"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "c06b74db-59f1-49aa-b166-ec1abb7f6d6a",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 66,
+      "height": 66,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/c06b74db-59f1-49aa-b166-ec1abb7f6d6a/image.png?v=1791410248232",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-refinery-grate-v1/00.png",
+      "bytes": 8882,
+      "sha256": "40947621c6bb7174dc33c05a8fc7f32e999e7bc6965fcd6ab9d0a017e8c882c2"
+    },
+    {
+      "index": 1,
+      "assetId": "b2073b2a-1405-4987-aa13-17b1a92c803f",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/b2073b2a-1405-4987-aa13-17b1a92c803f/image.png?v=1791410248834",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-refinery-grate-v1/01.png",
+      "bytes": 7559,
+      "sha256": "e5bcdc583d3c75b190792c8afc222b8334b624f89a643cef87dea71d7b35cbc8"
+    },
+    {
+      "index": 2,
+      "assetId": "c22a13d5-0e64-49ee-934a-ee1044e56bc0",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/c22a13d5-0e64-49ee-934a-ee1044e56bc0/image.png?v=1791410249389",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-refinery-grate-v1/02.png",
+      "bytes": 8767,
+      "sha256": "aab1e450fa2dee7f4d744816dc3b1fe7c9b6443fb0b947db5e8b40f1089f34c0"
+    },
+    {
+      "index": 3,
+      "assetId": "5709f83e-179a-4125-ba4b-b316a2a5319a",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/5709f83e-179a-4125-ba4b-b316a2a5319a/image.png?v=1791410249952",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-refinery-grate-v1/03.png",
+      "bytes": 7985,
+      "sha256": "b91a1ed990cf0739df93a2b30ef73ba9a43e84c613034ac92a4ab948cb00ee8c"
+    },
+    {
+      "index": 4,
+      "assetId": "07060173-9907-4e46-b4ff-330627ca7853",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 65,
+      "height": 65,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/07060173-9907-4e46-b4ff-330627ca7853/image.png?v=1791410250509",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-refinery-grate-v1/04.png",
+      "bytes": 8370,
+      "sha256": "e74a843f45a579b66d8d1cfa93c4139f5a6e681f6f232492f09f06790458c80e"
+    },
+    {
+      "index": 5,
+      "assetId": "c2fec152-8cb4-4d0f-adc0-64147ebe157f",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/c2fec152-8cb4-4d0f-adc0-64147ebe157f/image.png?v=1791410251064",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-refinery-grate-v1/05.png",
+      "bytes": 8020,
+      "sha256": "6c95433d88091e488f87777ba86b42c6bb80a231497c5e361ba46e4d548b8ffa"
+    },
+    {
+      "index": 6,
+      "assetId": "8921880a-14cd-4c24-b924-a44afcbac38b",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/8921880a-14cd-4c24-b924-a44afcbac38b/image.png?v=1791410251663",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-refinery-grate-v1/06.png",
+      "bytes": 7964,
+      "sha256": "cc8219b190361393c5cace70a0707315355c77a9994d32314a55b6a209394b9c"
+    },
+    {
+      "index": 7,
+      "assetId": "dfba1b65-46eb-476a-ae31-195beca96044",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/dfba1b65-46eb-476a-ae31-195beca96044/image.png?v=1791410252242",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-refinery-grate-v1/07.png",
+      "bytes": 7478,
+      "sha256": "7d9b5d3df8b0d4f92f25ee9a24e7021b8c62cdf2bc870ddc2db7a2d7a6945f62"
+    },
+    {
+      "index": 8,
+      "assetId": "ca06ac7c-56b2-4928-a37d-2146f1c675fc",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/ca06ac7c-56b2-4928-a37d-2146f1c675fc/image.png?v=1791410252818",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-refinery-grate-v1/08.png",
+      "bytes": 7736,
+      "sha256": "a86c996c8ee1e395681381ec27bd0b15fb5a0843ac733f8c01357735748a5d41"
+    }
+  ],
+  "credits": {
+    "remaining": 2880
+  }
+}

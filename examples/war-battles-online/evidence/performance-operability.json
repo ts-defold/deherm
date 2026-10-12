@@ -16,44 +16,44 @@
     "wallClockObserved": false,
     "simulation": {
       "samples": 540,
-      "p50": 860,
-      "p95": 936,
-      "p99": 972,
-      "maximum": 1067
+      "p50": 887,
+      "p95": 1014,
+      "p99": 1073,
+      "maximum": 1113
     },
     "frame": {
       "samples": 540,
-      "p50": 878,
-      "p95": 2402,
-      "p99": 2665,
-      "maximum": 7419
+      "p50": 926,
+      "p95": 2408,
+      "p99": 2991,
+      "maximum": 6860
     },
     "evidenceBoundary": "Percentiles are source-bound operation-cost signals, not wall-clock milliseconds or VM/JIT timings."
   },
   "snapshotBandwidth": {
     "intervalTicks": 6,
     "frames": 100,
-    "keyframes": 3,
-    "deltas": 97,
-    "totalBytes": 77567,
-    "bytesPerSimulatedSecond": 7756.7,
-    "bitsPerSimulatedSecond": 62053.6,
-    "aggregateServerPayloadBytesPerSecond": 248214.4,
-    "aggregateServerPayloadBitsPerSecond": 1985715.2,
+    "keyframes": 2,
+    "deltas": 98,
+    "totalBytes": 77957,
+    "bytesPerSimulatedSecond": 7795.7,
+    "bitsPerSimulatedSecond": 62365.6,
+    "aggregateServerPayloadBytesPerSecond": 249462.4,
+    "aggregateServerPayloadBitsPerSecond": 1995699.2,
     "inputPayloadBytesPerSecondPerClient": 1500,
     "inputPayloadBitsPerSecondPerClient": 12000,
     "aggregateInputPayloadBytesPerSecond": 48000,
     "frameBytes": {
       "samples": 100,
-      "p50": 705,
-      "p95": 921,
-      "p99": 2573,
-      "maximum": 3300
+      "p50": 708,
+      "p95": 1014,
+      "p99": 2159,
+      "maximum": 2936
     },
-    "keyframeBytes": 3300,
+    "keyframeBytes": 2936,
     "fixedFrameCapacity": 10160,
-    "normalFrames": 99,
-    "recoveryFrames": 1,
+    "normalFrames": 100,
+    "recoveryFrames": 0,
     "normalFrameMaximumBytes": 3072,
     "recoveryFrameMaximumBytes": 12288,
     "worstCaseBound": {
@@ -68,12 +68,12 @@
     },
     "byteAttribution": {
       "frameHeaders": 1600,
-      "runHeaders": 4644,
-      "worldHeader": 234,
-      "players": 57169,
-      "projectiles": 12683,
-      "pickups": 1077,
-      "cover": 160
+      "runHeaders": 2962,
+      "worldHeader": 212,
+      "players": 56824,
+      "projectiles": 15796,
+      "pickups": 512,
+      "cover": 51
     },
     "targets": {
       "downstreamBytesPerSecondPerClient": 24000,
@@ -98,12 +98,12 @@
     "error": {
       "samples": 100,
       "p50": 0,
-      "p95": 42,
+      "p95": 64,
       "p99": 75,
-      "maximum": 75
+      "maximum": 77
     },
-    "maximumError": 75,
-    "correctedSnapshots": 18,
+    "maximumError": 77,
+    "correctedSnapshots": 26,
     "postRestoreError": 0
   },
   "fixedPools": {
@@ -114,7 +114,7 @@
     },
     "projectiles": {
       "capacity": 512,
-      "highWater": 28,
+      "highWater": 39,
       "failures": 0
     },
     "pickups": {
@@ -124,14 +124,14 @@
     },
     "presentationEvents": {
       "capacity": 256,
-      "highWater": 28,
+      "highWater": 14,
       "failures": 0,
       "droppedByOverflow": 0,
       "overflowPolicy": "drop-oldest"
     },
     "snapshotFrame": {
       "capacity": 10160,
-      "highWater": 3300,
+      "highWater": 2936,
       "failures": 0
     },
     "arena": {
@@ -168,9 +168,9 @@
     {
       "path": "examples/war-battles-online/core",
       "kind": "tree",
-      "fileCount": 26,
-      "bytes": 468495,
-      "sha256": "5e7664233ae38183392ddaea342dc5025fda80fc537009ae3dad6a2da157db53"
+      "fileCount": 33,
+      "bytes": 561293,
+      "sha256": "f792753d8ce7b6f48eeee35d6500981937a412d42dc4622ee9e0d85689092b41"
     },
     {
       "path": "examples/war-battles-online/integration/performance-harness.ts",
@@ -191,6 +191,6 @@
       "sha256": "b8709891a96f1b3aabc8c65ef4aa48860d630b3b5bfc286e4e00663e15a7a19a"
     }
   ],
-  "sourceKey": "e8c7405976e71f424a28ceaf5e6a7c2cb7596c015baad49e20e8d0c110c028cd",
+  "sourceKey": "403b75501953b79c5fee43749ec8c072e1516911cb8ae5aa3290f8da9da00acf",
   "evidenceBoundary": "Deterministic in-process simulation/codec operability evidence; no wall-clock, VM allocation, Defold engine, browser, native heap, or WAN claim."
 }

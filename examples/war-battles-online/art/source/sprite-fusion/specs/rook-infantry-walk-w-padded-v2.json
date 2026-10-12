@@ -1,0 +1,10 @@
+{
+  "name": "rook-infantry-walk-w-padded-v2",
+  "operation": "animate",
+  "inputs": [
+    "art/source/sprite-fusion/inputs/rook-infantry-walk-pose-w-v1-0-padded-64.png"
+  ],
+  "prompt": "A grounded side-profile walk loop with alternating boot contact and a small opposite-arm swing. Preserve Rook's brown helmet, blue goggles, cream scarf, sidearm, proportions, colors, and the input pose's exact facing. Keep the complete helmet, boots, sidearm, and arms inside the canvas throughout the motion. Do not mirror or turn her.",
+  "outputFrames": 4,
+  "colors": 24
+}

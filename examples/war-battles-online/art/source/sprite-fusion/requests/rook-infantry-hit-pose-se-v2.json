@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_e67ac876-10b8-4b48-946b-a58f57a8a2c9",
+  "operation": "edit",
+  "prompt": "Rook takes a heavy impact while facing southeast: make a dramatic diagonal recoil silhouette, knees buckling, torso leaning backward, free forearm thrown up across his face, sidearm arm hanging low. Shift one boot behind him but keep both boots grounded on the same baseline. The pose must read as staggered rather than standing or firing even at tiny game size. Preserve the same driver, helmet, blue goggle lens, cream scarf, olive jacket, color palette, outline weight, and isometric three-quarter perspective. No blood, projectile, flash, new prop, scenery, text, or other character.",
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "b0168c9c-877f-46f1-8ee7-e12b93565d18"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/rook-infantry-hit-pose-se-v2.json",
+    "sha256": "f7ce35492a8da8cc238bb1647c9bd7f6c96284d57fcd925cfbd750c044784337"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "b9209ba9-29c6-46e3-b868-16b17e56a323",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 28,
+      "height": 47,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/b9209ba9-29c6-46e3-b868-16b17e56a323/image.png?v=1791533294795",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-hit-pose-se-v2/00.png",
+      "bytes": 2894,
+      "sha256": "3ce0aec67b99ff39298219d2a8c2f15ad8a539ba00018d6d87274895eba1121c"
+    },
+    {
+      "index": 1,
+      "assetId": "da6fe859-3935-4d8e-a5a8-93512d326611",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 29,
+      "height": 53,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/da6fe859-3935-4d8e-a5a8-93512d326611/image.png?v=1791533295678",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-hit-pose-se-v2/01.png",
+      "bytes": 4092,
+      "sha256": "37bb27ff72aeb33b72a06f613437814a3b374197396a495dde866411ba28b9b2"
+    }
+  ],
+  "credits": {
+    "remaining": 915
+  }
+}

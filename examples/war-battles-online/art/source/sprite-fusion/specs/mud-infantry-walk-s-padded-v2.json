@@ -1,0 +1,10 @@
+{
+  "name": "mud-infantry-walk-s-padded-v2",
+  "operation": "animate",
+  "inputs": [
+    "art/source/sprite-fusion/inputs/mud-infantry-walk-pose-s-v1-1-padded-64.png"
+  ],
+  "prompt": "A grounded south-facing walk loop with alternating boots and opposite-arm swing. Preserve Mud's hood, dark visor, red scarf, compact sidearm, proportions, palette, and front view. Keep the complete character inside the canvas through the motion.",
+  "outputFrames": 4,
+  "colors": 24
+}

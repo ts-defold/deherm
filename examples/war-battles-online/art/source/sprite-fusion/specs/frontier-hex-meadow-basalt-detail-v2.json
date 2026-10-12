@@ -1,0 +1,12 @@
+{
+  "name": "frontier-hex-meadow-basalt-detail-v2",
+  "operation": "style-reference",
+  "size": 64,
+  "prompt": "A single walkable transition hex for a three-quarter-view volcanic frontier battlefield. Olive meadow grass and cream flower tufts yielding irregularly to dark fractured basalt across the broad level top; a short earth-and-basalt side face. Make the terrain transition natural and clustered, not a straight stripe. Match the reference tiles' six-sided footprint, upper-left light, chunky pixel clusters, and muted military palette. No character, vehicle, building, lettering, or other tile.",
+  "inputs": [
+    "art/source/sprite-fusion/outputs/frontier-hex-meadow-basalt-edge-v1/04.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-meadow-basalt-edge-v1/07.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/04.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-basalt-cliff-v1/04.png"
+  ]
+}

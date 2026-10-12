@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_cc23b1d6-87d3-4d0a-8553-f3d678b96256",
+  "operation": "animate",
+  "prompt": "One-shot tank-shell detonation: the hot core punches outward, orange flame lobes expand asymmetrically, then break into sparks and dark smoke wisps that dissipate. Energetic impact with a stable center; do not loop.",
+  "size": null,
+  "outputFrames": 8,
+  "colors": 24,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/tank-detonation-core-v1/07.png",
+      "bytes": 3219,
+      "sha256": "dd5316f93f4fd70b87284398e412ac326dffe8776a20d286beea8f77d2ee60ff"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/tank-detonation-animate-v1.json",
+    "sha256": "ad9a19891d1d7379f1794550ee94b386fd2c8ce7d2ea034e4fb9ee52a4a9b6b3"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "1f962fec-da44-4c59-93b2-f04a2c7a84b3",
+      "type": "animation",
+      "contentType": "image/webp",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/1f962fec-da44-4c59-93b2-f04a2c7a84b3/animation.webp?v=1791427002163",
+      "path": "art/source/sprite-fusion/outputs/tank-detonation-animate-v1/00.webp",
+      "bytes": 5648,
+      "sha256": "27bfda88542059db1cefa5e5b02b9afd2400addd6df4acd3142df2ac09ad4d3a",
+      "spritesheet": {
+        "url": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/1f962fec-da44-4c59-93b2-f04a2c7a84b3/spritesheet.png?v=1791427002163",
+        "path": "art/source/sprite-fusion/outputs/tank-detonation-animate-v1/00-sheet.png",
+        "bytes": 7844,
+        "sha256": "b083d380b759621cec4af8e78d5076d6a98a6095061cd33eeddd272a7ecca936"
+      },
+      "frameCount": 8,
+      "fps": 8
+    }
+  ],
+  "credits": {
+    "remaining": 2580
+  }
+}

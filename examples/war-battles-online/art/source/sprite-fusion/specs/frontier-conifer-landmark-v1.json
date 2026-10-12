@@ -1,0 +1,12 @@
+{
+  "name": "frontier-conifer-landmark-v1",
+  "operation": "style-reference",
+  "size": 96,
+  "inputs": [
+    "defold/assets/derived/arena/hex-cliff-9.png",
+    "defold/assets/derived/arena/landmark-rock-outcrop.png",
+    "defold/assets/derived/arena/cover-sandbag-a.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-meadow-v1/00.png"
+  ],
+  "prompt": "One compact but lush conifer tree for a three-quarter isometric arcade tank battlefield. Layered deep-green boughs with warm sunlit tips, sturdy dark trunk, a few roots and small tan rocks at the foot. The trunk has a clear single ground contact point and the canopy is uneven and natural, not a symmetric triangle. Match the references' chunky outlined pixel clusters and earthy olive, basalt, and cream palette. A free-standing tree silhouette, not a hexagonal tile or raised platform; no vehicle, text, UI, or scene background."
+}

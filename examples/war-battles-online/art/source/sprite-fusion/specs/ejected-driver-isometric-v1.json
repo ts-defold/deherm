@@ -1,0 +1,12 @@
+{
+  "name": "ejected-driver-isometric-v1",
+  "operation": "style-reference",
+  "size": 32,
+  "inputs": [
+    "defold/assets/units/infantry/down/1.png",
+    "defold/assets/units/infantry/down-d/1.png",
+    "defold/assets/units/infantry/side/1.png",
+    "defold/assets/units/infantry/up-d/1.png"
+  ],
+  "prompt": "A full-body tank driver on foot in a live-action isometric military arcade game, standing in a southeast-facing three-quarter view with a compact sidearm. Chunky readable boots and hands, ochre flight helmet with one raised blue goggle lens, cream scarf, olive field jacket, dark-plum outline. Match the references' small grounded character silhouette and oblique perspective. One isolated person, no vehicle, portrait frame, text, or scenery."
+}

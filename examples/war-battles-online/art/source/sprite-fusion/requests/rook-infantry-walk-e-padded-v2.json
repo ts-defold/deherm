@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_1bbd2f22-9c6b-4f87-82d6-4d14e6822210",
+  "operation": "animate",
+  "prompt": "A quick grounded east-facing walk cycle, alternating boot contact and a small opposite-arm swing. Preserve Rook's helmet, goggles, scarf, sidearm, proportions, colors, and viewing angle. Keep the complete character and equipment inside the canvas throughout the loop.",
+  "size": null,
+  "outputFrames": 4,
+  "colors": 24,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/inputs/rook-infantry-walk-pose-e-v1-0-padded-64.png",
+      "bytes": 2821,
+      "sha256": "e1c7e4ec380cc621e6707457b623f819a4aba7633edf418342944b799057c082"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/rook-infantry-walk-e-padded-v2.json",
+    "sha256": "5219bf63c30bc7003a79590c0a5bd5f8feafb51ca4ab03e3df35fdd7cfe13558"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "94945107-b69a-41b9-a04b-f1571966d64e",
+      "type": "animation",
+      "contentType": "image/webp",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/94945107-b69a-41b9-a04b-f1571966d64e/animation.webp?v=1791545940313",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-walk-e-padded-v2/00.webp",
+      "bytes": 2188,
+      "sha256": "a916bca0f7c805a43df35c0cbe82627e83542a9c7e1372e7118c7f7984655c05",
+      "spritesheet": {
+        "url": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/94945107-b69a-41b9-a04b-f1571966d64e/spritesheet.png?v=1791545940313",
+        "path": "art/source/sprite-fusion/outputs/rook-infantry-walk-e-padded-v2/00-sheet.png",
+        "bytes": 2535,
+        "sha256": "b6c62e47e1b479271096b9048946de5a6d7ec1dc39745da78f09a974878e8db4"
+      },
+      "frameCount": 4,
+      "fps": 8
+    }
+  ],
+  "credits": {
+    "remaining": 270
+  }
+}

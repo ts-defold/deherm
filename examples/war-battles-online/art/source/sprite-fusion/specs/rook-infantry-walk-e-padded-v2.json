@@ -1,0 +1,10 @@
+{
+  "name": "rook-infantry-walk-e-padded-v2",
+  "operation": "animate",
+  "inputs": [
+    "art/source/sprite-fusion/inputs/rook-infantry-walk-pose-e-v1-0-padded-64.png"
+  ],
+  "prompt": "A quick grounded east-facing walk cycle, alternating boot contact and a small opposite-arm swing. Preserve Rook's helmet, goggles, scarf, sidearm, proportions, colors, and viewing angle. Keep the complete character and equipment inside the canvas throughout the loop.",
+  "outputFrames": 4,
+  "colors": 24
+}

@@ -1,0 +1,6 @@
+{
+  "name": "frontier-hex-meadow-earth-edge-v1",
+  "operation": "generate",
+  "size": 64,
+  "prompt": "One isolated isometric six-sided terrain tile for a retro pixel-art tank strategy game. Broad flat driveable top where olive meadow grass naturally breaks into compacted ochre earth across the middle, sparse dry yellow tufts and pebbles, short dark layered volcanic cliff sides. Warm sunset lighting, precise readable pixels, no hard dividing stripe. Single tile centered on transparent background, no character, vehicle, building, text, border, or other tiles."
+}

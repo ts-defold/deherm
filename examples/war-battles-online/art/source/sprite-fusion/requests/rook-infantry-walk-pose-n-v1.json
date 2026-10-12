@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_90bd6c85-310f-4575-ae36-718171061cc6",
+  "operation": "edit",
+  "prompt": "Change only Rook's body pose to a grounded north-facing rear walk mid-stride: one boot forward, the other planted, opposite arm swinging, compact sidearm still held low. Keep her exact ochre helmet, cream scarf, olive jacket, colors, outline, proportions, and straight rear view. Do not turn her toward the camera or add a prop, platform, text, scenery, or second person.",
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "3d6102ad-f3a9-4560-b79c-b80dd25721f9"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/rook-infantry-walk-pose-n-v1.json",
+    "sha256": "3086c90e56ad3104d7082b5783bd0d273b332e23f204025beac7c76cbfd46808"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "9e3d7023-74bd-4b99-8134-7e0d17fc5b60",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 26,
+      "height": 45,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/9e3d7023-74bd-4b99-8134-7e0d17fc5b60/image.png?v=1791522150508",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-walk-pose-n-v1/00.png",
+      "bytes": 2614,
+      "sha256": "908ff5e69ffd26e4492bcc77089f698d31ef8140f10d71eaee43c358e01fa632"
+    },
+    {
+      "index": 1,
+      "assetId": "13000596-9d29-4d22-81f2-c1e6d59dbf71",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 23,
+      "height": 45,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/13000596-9d29-4d22-81f2-c1e6d59dbf71/image.png?v=1791522151304",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-walk-pose-n-v1/01.png",
+      "bytes": 2556,
+      "sha256": "de034ebbc06aac7ee1974f561ddb8ec93bda6025e708b37057c23fc85f7a725f"
+    }
+  ],
+  "credits": {
+    "remaining": 2010
+  }
+}

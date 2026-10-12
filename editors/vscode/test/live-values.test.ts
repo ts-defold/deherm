@@ -288,6 +288,46 @@ test("literal property defaults are always available without a running engine", 
   ]);
 });
 
+test("class-authored components keep property inlays and live-value navigation on the same source", () => {
+  const source = [
+    'import { component, property, ScriptComponent } from "@deherm/project";',
+    "class Player extends ScriptComponent {",
+    "  static readonly properties = {",
+    "    health: property.number(100),",
+    '    label: property.string("ready"),',
+    "  } as const;",
+    "  declare health: number;",
+    "  declare label: string;",
+    "  update(_dt: number): void {}",
+    "}",
+    "export default component(Player);",
+  ].join("\n");
+  assert.deepEqual(findPropertyDeclarationAnchors(source, new Set(["health", "label"])), [
+    { propertyName: "health", line: 3 },
+    { propertyName: "label", line: 4 },
+  ]);
+  assert.deepEqual(
+    propertyDefaultHints(source).map(({ propertyName, line, label }) => ({ propertyName, line, label })),
+    [
+      { propertyName: "health", line: 3, label: "= 100" },
+      { propertyName: "label", line: 4, label: '= "ready"' },
+    ],
+  );
+  assert.deepEqual(
+    liveValueHints({ state: fixtureState(), projectRoot, documentPath: playerDocument, now: 10_500 }).map(
+      ({ propertyName, label }) => ({ propertyName, label }),
+    ),
+    [
+      { propertyName: "health", label: "= 100" },
+      { propertyName: "label", label: '= "ready"' },
+    ],
+  );
+  assert.equal(
+    liveValueLenses({ state: fixtureState(), projectRoot, documentPath: playerDocument, now: 10_500 }).length,
+    1,
+  );
+});
+
 test("raw component snapshot rows are never joined locally even if they mimic enrichment fields", () => {
   const state = fixtureState();
   const target = state.targets[0] as {

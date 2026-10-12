@@ -19,6 +19,7 @@
 import {
   MatchServer,
   DurableSessionPersistence,
+  DEFAULT_ROSTER_SIZE,
   SessionLedger,
   TICK_RATE,
   TICK_MILLISECONDS,
@@ -70,7 +71,7 @@ function parseArguments(argv: readonly string[]): Options {
     healthPort: 8080,
     certPath: "server/certs/localhost.crt",
     keyPath: "server/certs/localhost.key",
-    rosterSize: 8,
+    rosterSize: DEFAULT_ROSTER_SIZE,
     botSkill: 2,
     fillVacantSlotsWithBots: true,
     snapshotIntervalTicks: 6,
@@ -276,7 +277,7 @@ export async function main(argv: readonly string[]): Promise<void> {
   if (resumeKeyPath !== undefined) configuredResumeKeyText = (await Deno.readTextFile(resumeKeyPath)).trim();
   const resumeKey = configuredResumeKey(configuredResumeKeyText, statePath);
   const matchId = options.matchId ?? 77;
-  const rosterSize = options.rosterSize ?? 8;
+  const rosterSize = options.rosterSize ?? DEFAULT_ROSTER_SIZE;
   let ready = true;
   let stopping = false;
   const admission = createSessionAdmissionGate(true);

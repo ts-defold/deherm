@@ -6,6 +6,7 @@ import {
   vmath,
   type DefoldHash,
   type Node,
+  type OnInputAction,
   type Vector4,
 } from "@deherm/project";
 
@@ -16,6 +17,7 @@ import {
   EVENT_KILL,
   EVENT_OBJECTIVE_CAPTURE,
   EVENT_TANK_ACQUIRED,
+  INFANTRY_HEALTH,
   MAX_PLAYERS,
   OBJECTIVE_CAPTURE_TICKS,
   PLAYER_MODE_INFANTRY,
@@ -23,8 +25,6 @@ import {
   createPlayerView,
   createObjectiveView,
   chassisById,
-  weaponUpgradeById,
-  weaponUpgradeId,
   weaponById,
   createBattleEvent,
   driverByPlayerId,
@@ -37,10 +37,16 @@ import { arenaMatch } from "../src/arena-match";
 
 const ADD_SCORE = hashLiteral("#add_score");
 const DEPLOY = hashLiteral("#deploy");
+const TOUCH_ENABLED = hashLiteral("#touch_enabled");
+const SCOREBOARD = hashLiteral("#scoreboard");
+const TOUCH_MULTI = hashLiteral("#touch_multi");
 
 /** Frames between leaderboard rebuilds. The bar itself updates every frame. */
 const LEADERBOARD_INTERVAL = 15;
 const LEADERBOARD_ROWS = 5;
+const VITALS_FILL_WIDTH = 178;
+const VITALS_FILL_HEIGHT = 12;
+const DRIVER_PORTRAITS = ["driver-portrait-0", "driver-portrait-1", "driver-portrait-2", "driver-portrait-3"] as const;
 /** Characters in the health and ammunition bars. */
 /** Presentation notices live for exactly three seconds at the 60 Hz update rate. */
 const ANNOUNCEMENT_TICKS = 180;
@@ -52,6 +58,10 @@ interface UiSelf {
   objective: Node;
   frags: Node;
   hint: Node;
+  touchMoveBack: Node;
+  touchMoveLabel: Node;
+  touchFireBack: Node;
+  touchFireLabel: Node;
   announcement: Node;
   hudBack: Node;
   portrait: Node;
@@ -79,6 +89,7 @@ interface UiSelf {
   titleDeploy: Node;
   titlePromptBack: Node;
   titlePrompt: Node;
+  titleSponsorBack: Node;
   titleSponsor: Node;
   view: PlayerView;
   objectiveView: ObjectiveView;
@@ -95,6 +106,20 @@ interface UiSelf {
   round: number;
   engaged: boolean;
   titleVisible: boolean;
+  touchVisible: boolean;
+  scoreboardVisible: boolean;
+  scoreboardTouchId: number;
+  scoreboardTouchSuppressionFrames: number;
+  portraitVariant: number;
+}
+
+function setScoreboardVisible(self: UiSelf, visible: boolean): void {
+  if (self.scoreboardVisible === visible) return;
+  self.scoreboardVisible = visible;
+  const show = !self.titleVisible && visible;
+  gui.setEnabled(self.leaderboardBack, show);
+  gui.setEnabled(self.frags, show);
+  defold.log("info", `war-battles:scoreboard:visible=${show ? 1 : 0}`);
 }
 
 function setTitleVisible(self: UiSelf, visible: boolean): void {
@@ -109,6 +134,7 @@ function setTitleVisible(self: UiSelf, visible: boolean): void {
   gui.setEnabled(self.titleDeploy, visible);
   gui.setEnabled(self.titlePromptBack, visible);
   gui.setEnabled(self.titlePrompt, visible);
+  gui.setEnabled(self.titleSponsorBack, visible);
   gui.setEnabled(self.titleSponsor, visible);
 
   const gameplayVisible = !visible;
@@ -122,7 +148,7 @@ function setTitleVisible(self: UiSelf, visible: boolean): void {
   gui.setEnabled(self.armorFill, gameplayVisible);
   gui.setEnabled(self.armorLabel, gameplayVisible);
   gui.setEnabled(self.telemetry, gameplayVisible);
-  gui.setEnabled(self.leaderboardBack, gameplayVisible);
+  gui.setEnabled(self.leaderboardBack, gameplayVisible && self.scoreboardVisible);
   gui.setEnabled(self.leaderBack, gameplayVisible);
   gui.setEnabled(self.leader, gameplayVisible);
   gui.setEnabled(self.objectiveBack, gameplayVisible);
@@ -130,8 +156,11 @@ function setTitleVisible(self: UiSelf, visible: boolean): void {
   gui.setEnabled(self.objective, gameplayVisible);
   gui.setEnabled(self.node, gameplayVisible);
   gui.setEnabled(self.status, gameplayVisible);
-  gui.setEnabled(self.frags, gameplayVisible);
+  gui.setEnabled(self.frags, gameplayVisible && self.scoreboardVisible);
   gui.setEnabled(self.hint, gameplayVisible);
+  for (const node of [self.touchMoveBack, self.touchMoveLabel, self.touchFireBack, self.touchFireLabel]) {
+    gui.setEnabled(node, gameplayVisible && self.touchVisible);
+  }
   gui.setEnabled(self.announcementBack, gameplayVisible && self.announcementTicks > 0);
   gui.setEnabled(self.announcement, gameplayVisible && self.announcementTicks > 0);
 }
@@ -148,19 +177,15 @@ function statusLine(self: UiSelf): string {
   world.readPlayer(slot + 1, self.view);
   if (!self.view.alive) {
     const seconds = (self.view.respawnTicks / 60).toFixed(1);
-    return `${driverByPlayerId(slot + 1).callSign} // WRECKED // REDEPLOY ${seconds}s`;
+    return `${driverByPlayerId(slot + 1).callSign} // DESTROYED // RESPAWNING ${seconds}s`;
   }
   const driver = driverByPlayerId(slot + 1);
   if (self.view.mode === PLAYER_MODE_INFANTRY) {
-    return `${driver.callSign} // ON FOOT // PISTOL // FIND A TANK`;
+    return `${driver.callSign} // ON FOOT // PISTOL // GET A TANK`;
   }
   const weapon = weaponById(self.view.weaponId);
   const chassis = chassisById(self.view.chassisId);
-  const branch = (self.view.weaponUpgradeSelections >>> ((weapon.id - 1) * 2)) & 3;
-  const upgradeId = weaponUpgradeId(weapon.id, branch);
-  const upgrade = upgradeId === 0 ? undefined : weaponUpgradeById(upgradeId);
-  const upgradeLabel = upgrade === undefined ? "BASE" : upgrade.name.toUpperCase();
-  return `${driver.callSign} // ${chassis.name.toUpperCase()} // ${weapon.name.toUpperCase()} +${upgradeLabel}`;
+  return `${driver.callSign} // ${chassis.name.toUpperCase()} // ${weapon.name.toUpperCase()}`;
 }
 
 function directionArrow(x: number, y: number): string {
@@ -184,12 +209,12 @@ function telemetryLine(self: UiSelf): string {
     const dy = world.map.spawnY[depot]! - self.view.y;
     const distance = Math.round(Math.sqrt(dx * dx + dy * dy) / UNITS_PER_PIXEL);
     const lock = self.view.respawnTicks > 0 ? `  LOCK ${Math.ceil(self.view.respawnTicks / 60)}s` : "";
-    return `HP ${self.view.health}\nDEPOT ${directionArrow(dx, dy)} ${distance}m${lock}`;
+    return `DEPOT ${directionArrow(dx, dy)} ${distance}m${lock}`;
   }
   const weapon = weaponById(self.view.weaponId);
   const ammo = weapon.maximumAmmo === 0 ? "INF" : `${self.view.ammo}`;
   const hazard = world.activeHazardIndex();
-  const hazardText = hazard < 0 ? "VENT SAFE" : `VENT ${hazard + 1} HOT`;
+  const hazardText = hazard < 0 ? "VENT SAFE" : `VENT ${hazard + 1}`;
   const boost = self.view.overdriveTicks > 0 ? "OVERDRIVE" : `BOOST ${self.view.boostTicks}`;
   return `AMMO ${ammo}  CR ${self.view.credits}\n${boost}  ${hazardText}`;
 }
@@ -217,12 +242,13 @@ function leaderboard(self: UiSelf): string {
   }
   const localSlot = match === undefined ? -1 : match.localSlot;
   const rows = count < LEADERBOARD_ROWS ? count : LEADERBOARD_ROWS;
-  let text = "TOP TANKS       K  D\n";
+  let text = "TOP 5          K D\n";
   for (let row = 0; row < rows; row += 1) {
     const slot = self.order[row]!;
     const marker = slot === localSlot ? ">" : " ";
     const driver = driverByPlayerId(slot + 1);
-    text += `${row + 1} ${marker}${driver.callSign}  ${world.playerScore[slot]!}  ${world.playerDeaths[slot]!}\n`;
+    const callSign = driver.callSign.slice(0, 8).padEnd(8, " ");
+    text += `${row + 1} ${marker}${callSign} ${world.playerScore[slot]!} ${world.playerDeaths[slot]!}\n`;
   }
   if (rows > 0) {
     const leader = self.order[0]!;
@@ -236,12 +262,21 @@ function updatePlayerHud(self: UiSelf): void {
   const world = match?.world;
   const slot = match === undefined ? -1 : match.localSlot;
   if (world === undefined || slot < 0) return;
+  const portraitVariant = driverByPlayerId(slot + 1).variant;
+  if (self.portraitVariant !== portraitVariant) {
+    gui.playFlipbook(self.portrait, DRIVER_PORTRAITS[portraitVariant]!);
+    self.portraitVariant = portraitVariant;
+  }
   const chassis = chassisById(self.view.chassisId);
-  const healthRatio = Math.max(0, Math.min(1, self.view.health / chassis.maxHealth));
+  const maximumHealth = self.view.mode === PLAYER_MODE_INFANTRY ? INFANTRY_HEALTH : chassis.maxHealth;
+  const healthRatio = Math.max(0, Math.min(1, self.view.health / maximumHealth));
   const armorRatio = Math.max(0, Math.min(1, self.view.armor / 200));
-  gui.setSize(self.healthFill, vmath.vector3(180 * healthRatio, 10, 0));
-  gui.setSize(self.armorFill, vmath.vector3(180 * armorRatio, 8, 0));
-  gui.setText(self.healthLabel, `HULL ${self.view.health}`);
+  gui.setSize(self.healthFill, vmath.vector3(VITALS_FILL_WIDTH * healthRatio, VITALS_FILL_HEIGHT, 0));
+  gui.setSize(self.armorFill, vmath.vector3(VITALS_FILL_WIDTH * armorRatio, VITALS_FILL_HEIGHT, 0));
+  gui.setText(
+    self.healthLabel,
+    self.view.alive ? `${self.view.mode === PLAYER_MODE_INFANTRY ? "PILOT" : "HULL"} ${self.view.health}` : "DOWN 0",
+  );
   gui.setText(self.armorLabel, `ARMOR ${self.view.armor}`);
   gui.setText(self.telemetry, telemetryLine(self));
 }
@@ -263,7 +298,11 @@ function objectiveLine(self: UiSelf): string {
 
 function announce(self: UiSelf, text: string, color: Vector4): void {
   // This is deliberately one authored node. A kill storm replaces the current
-  // notice rather than allocating GUI nodes or retaining a queue.
+  // notice rather than allocating GUI nodes or retaining a queue. Its centered
+  // nine-slice only occupies the width needed by the message; a short round
+  // marker should not black out half the battlefield.
+  const width = Math.min(520, Math.max(144, text.length * 11 + 44));
+  gui.setSize(self.announcementBack, vmath.vector3(width, 42, 0));
   gui.setText(self.announcement, text);
   gui.setColor(self.announcement, color);
   gui.setEnabled(self.announcementBack, true);
@@ -355,6 +394,10 @@ export default defineComponent({
     self.objective = gui.getNode("objective");
     self.frags = gui.getNode("frags");
     self.hint = gui.getNode("hint");
+    self.touchMoveBack = gui.getNode("touch_move_back");
+    self.touchMoveLabel = gui.getNode("touch_move_label");
+    self.touchFireBack = gui.getNode("touch_fire_back");
+    self.touchFireLabel = gui.getNode("touch_fire_label");
     self.announcement = gui.getNode("announcement");
     self.hudBack = gui.getNode("hud_back");
     self.portrait = gui.getNode("portrait");
@@ -382,7 +425,48 @@ export default defineComponent({
     self.titleDeploy = gui.getNode("title_deploy");
     self.titlePromptBack = gui.getNode("title_prompt_back");
     self.titlePrompt = gui.getNode("title_prompt");
+    self.titleSponsorBack = gui.getNode("title_sponsor_back");
     self.titleSponsor = gui.getNode("title_sponsor");
+    const bottomLeftNodes = [
+      self.hudBack,
+      self.portrait,
+      self.portraitFrame,
+      self.healthBack,
+      self.healthFill,
+      self.healthLabel,
+      self.armorBack,
+      self.armorFill,
+      self.armorLabel,
+      self.telemetry,
+      self.status,
+      self.hint,
+    ];
+    for (const node of bottomLeftNodes) {
+      gui.setXanchor(node, gui.ANCHOR_LEFT);
+      gui.setYanchor(node, gui.ANCHOR_BOTTOM);
+    }
+    for (const node of [self.leaderboardBack, self.frags]) {
+      gui.setXanchor(node, gui.ANCHOR_RIGHT);
+      gui.setYanchor(node, gui.ANCHOR_TOP);
+    }
+    for (const node of [self.leaderBack, self.leader, self.objectiveBack, self.objective]) {
+      gui.setYanchor(node, gui.ANCHOR_TOP);
+    }
+    for (const node of [self.announcementBack, self.announcement]) {
+      gui.setYanchor(node, gui.ANCHOR_TOP);
+    }
+    for (const node of [self.scoreBack, self.node]) {
+      gui.setXanchor(node, gui.ANCHOR_LEFT);
+      gui.setYanchor(node, gui.ANCHOR_TOP);
+    }
+    for (const node of [self.touchMoveBack, self.touchMoveLabel]) {
+      gui.setXanchor(node, gui.ANCHOR_LEFT);
+      gui.setYanchor(node, gui.ANCHOR_BOTTOM);
+    }
+    for (const node of [self.touchFireBack, self.touchFireLabel]) {
+      gui.setXanchor(node, gui.ANCHOR_RIGHT);
+      gui.setYanchor(node, gui.ANCHOR_BOTTOM);
+    }
     self.view = createPlayerView();
     self.objectiveView = createObjectiveView();
     self.order = new Int32Array(MAX_PLAYERS);
@@ -398,25 +482,36 @@ export default defineComponent({
     self.round = 0;
     self.engaged = false;
     self.titleVisible = true;
+    self.touchVisible = false;
+    self.scoreboardVisible = false;
+    self.scoreboardTouchId = -1;
+    self.scoreboardTouchSuppressionFrames = 0;
+    self.portraitVariant = -1;
     gui.setText(self.node, "SCORE 0");
     gui.setText(self.announcement, "");
     gui.setText(self.objective, "");
     gui.setEnabled(self.announcementBack, false);
     gui.setEnabled(self.announcement, false);
-    gui.playFlipbook(self.portrait, "driver-portrait-radio-idle");
-    gui.playFlipbook(self.titlePortrait, "driver-portrait-radio-idle");
-    gui.setText(self.titleFeature, `${driverByPlayerId(1).callSign} // 32 DRIVERS // 6 WEAPONS // NO MERCY`);
+    gui.playFlipbook(self.portrait, DRIVER_PORTRAITS[0]);
+    gui.playFlipbook(self.titlePortrait, DRIVER_PORTRAITS[driverByPlayerId(1).variant]!);
+    gui.setText(self.titleFeature, `${driverByPlayerId(1).callSign} // 16 PLAYERS // 6 WEAPONS`);
     setTitleVisible(self, true);
     defold.log("info", "war-battles:ui-init");
   },
 
   update(self: UiSelf, _dt: number): void {
+    if (self.scoreboardTouchSuppressionFrames > 0) self.scoreboardTouchSuppressionFrames -= 1;
     if (self.titleVisible) return;
     const match = arenaMatch();
     if (match === undefined || !match.engaged) return;
     if (!self.engaged) {
       self.engaged = true;
-      gui.setText(self.hint, "WASD DRIVE  SPACE FIRE  SHIFT BOOST  1-6 GUN");
+      gui.setText(
+        self.hint,
+        self.touchVisible
+          ? "LEFT DRIVE   RIGHT AIM + FIRE   TAP LEADER: SCORES"
+          : "WASD DRIVE   MOUSE AIM   SPACE FIRE   TAB SCORES",
+      );
     }
     gui.setText(self.status, statusLine(self));
     updatePlayerHud(self);
@@ -437,6 +532,12 @@ export default defineComponent({
   },
 
   onMessage(self: UiSelf, messageId: DefoldHash, message: AddScore): void {
+    if (messageId === TOUCH_ENABLED) {
+      self.touchVisible = true;
+      gui.setText(self.hint, "LEFT DRIVE   RIGHT AIM + FIRE   TAP LEADER: SCORES");
+      setTitleVisible(self, self.titleVisible);
+      return;
+    }
     if (messageId === DEPLOY) {
       defold.log("info", "war-battles:title-hidden-by-deploy");
       setTitleVisible(self, false);
@@ -451,5 +552,52 @@ export default defineComponent({
     self.score += message.score;
     if (!self.titleVisible) gui.setText(self.node, `SCORE ${self.score}`);
     defold.log("info", `war-battles:score:${self.score}`);
+  },
+
+  onInput(self: UiSelf, actionId: DefoldHash, action: OnInputAction): boolean {
+    if (self.titleVisible) return false;
+    if (actionId === SCOREBOARD) {
+      if (action.pressed) setScoreboardVisible(self, true);
+      else if (action.released) setScoreboardVisible(self, false);
+      return true;
+    }
+    // HTML5 can dispatch a mouse-style press before the touch action and a
+    // mouse release afterward. Activating pointers on release lets the touch
+    // path consume the tap first. Keep suppressing mouse actions for the full
+    // lifetime of that finger, not just a fixed number of held frames.
+    if (actionId === DEPLOY && (self.scoreboardTouchId >= 0 || self.scoreboardTouchSuppressionFrames > 0)) {
+      return true;
+    }
+    if (
+      actionId === DEPLOY &&
+      action.released &&
+      action.x !== undefined &&
+      action.y !== undefined &&
+      gui.pickNode(self.leaderBack, action.x, action.y)
+    ) {
+      setScoreboardVisible(self, !self.scoreboardVisible);
+      return true;
+    }
+    if (actionId === TOUCH_MULTI && action.touch !== undefined) {
+      for (const touch of action.touch) {
+        if (touch.released && touch.id === self.scoreboardTouchId) {
+          self.scoreboardTouchId = -1;
+          self.scoreboardTouchSuppressionFrames = 20;
+          return true;
+        }
+        if (self.scoreboardTouchId >= 0 || !touch.pressed || !gui.pickNode(self.leaderBack, touch.x, touch.y)) {
+          continue;
+        }
+        self.scoreboardTouchId = touch.id;
+        setScoreboardVisible(self, !self.scoreboardVisible);
+        return true;
+      }
+      if (self.scoreboardTouchId >= 0 && action.touch.length === 0) {
+        self.scoreboardTouchId = -1;
+        self.scoreboardTouchSuppressionFrames = 20;
+        return true;
+      }
+    }
+    return false;
   },
 });

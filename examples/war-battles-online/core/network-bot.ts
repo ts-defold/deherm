@@ -59,6 +59,19 @@ export class NetworkBotDriver {
     if (this.client.state !== "ready" || world === undefined || playerId <= 0) {
       return this.client.update(elapsedMilliseconds, maximumSteps);
     }
+    if (!this.client.hasAuthoritativeSnapshot) {
+      // A welcome creates a local roster guess. Do not let an autonomous
+      // controller drive from it: unlike a human title screen, a headless bot
+      // would otherwise move before its real spawn pose arrives. Neutral
+      // updates still advance the clock and apply the pending keyframe.
+      this.controls.moveX = 0;
+      this.controls.moveY = 0;
+      this.controls.fire = false;
+      this.controls.boost = false;
+      this.controls.weapon = 0;
+      this.client.setControls(this.controls);
+      return this.client.update(elapsedMilliseconds, maximumSteps);
+    }
 
     // Bot skill is decision state rather than an authoritative gameplay
     // mutation. Reapply the dashboard-selected row after each snapshot restore.

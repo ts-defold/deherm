@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_cf9fdcd0-51c2-4e40-ab02-d2057b8ab57b",
+  "operation": "style-reference",
+  "prompt": "One long irregular meadow escarpment for a three-quarter isometric arcade tank battlefield. A connected grassy plateau edge stretching left-to-right about three tank widths, with uneven lobes, shallow elevation steps, a rugged warm-brown basalt front, dark plum crevices, and sparse grass tufts. One continuous bottom contact line and upper-left light. This is a broad natural ridge, not a separate hexagon tile, round stump, or stack of little pedestals. No tank, character, tree, building, road, lettering, UI, or complete scene.",
+  "size": 128,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "defold/assets/derived/arena/hex-cliff-9.png",
+      "bytes": 6952,
+      "sha256": "a2fa6693164eceb92b97e5bcbf24eb96be8e4d56f36af2e26abbb8780e46395f"
+    },
+    {
+      "kind": "file",
+      "path": "defold/assets/derived/arena/hex-cliff-12.png",
+      "bytes": 7967,
+      "sha256": "a8d19082d9802339312c349b1be893c94ea697b7ddc16c405aac25c33561f538"
+    },
+    {
+      "kind": "file",
+      "path": "defold/assets/derived/arena/landmark-rock-outcrop.png",
+      "bytes": 16062,
+      "sha256": "39c8c0b2193accd9266a9ac0089163f7a33a6f79b4a6b6237c8ceed85fb440cc"
+    },
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-wild-meadow-v1/00.png",
+      "bytes": 5318,
+      "sha256": "417457deb990ef258d19bb633d2867d69736325af69886a81635c76021ca5a41"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/frontier-meadow-ridge-v1.json",
+    "sha256": "8b92ef5f210f1a834df4cf9ebacd7c7b5a0617a11668e61c9d8e3c20281e2fdd"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "e8609972-9dc2-41c8-8e3a-c6bdafe9be51",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 128,
+      "height": 128,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/e8609972-9dc2-41c8-8e3a-c6bdafe9be51/image.png?v=1791430288723",
+      "path": "art/source/sprite-fusion/outputs/frontier-meadow-ridge-v1/00.png",
+      "bytes": 12049,
+      "sha256": "bbb9a3cd40dc6a3e44f6306b67c11e0775c3dd07e249e8b8e645cd0630db25eb"
+    },
+    {
+      "index": 1,
+      "assetId": "37c9d4e9-60f3-4565-9998-d0a13823b191",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 128,
+      "height": 128,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/37c9d4e9-60f3-4565-9998-d0a13823b191/image.png?v=1791430289261",
+      "path": "art/source/sprite-fusion/outputs/frontier-meadow-ridge-v1/01.png",
+      "bytes": 18723,
+      "sha256": "0d5003d60501bf04880d5f86face283887dd030b8ae39b8ba73a9cd5db5cddfc"
+    },
+    {
+      "index": 2,
+      "assetId": "6c190501-8906-4447-8ed8-36edd167a86d",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 128,
+      "height": 128,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/6c190501-8906-4447-8ed8-36edd167a86d/image.png?v=1791430289789",
+      "path": "art/source/sprite-fusion/outputs/frontier-meadow-ridge-v1/02.png",
+      "bytes": 11270,
+      "sha256": "03a2c4c10dd1e11c952d26424c9d5ad4d0657e6d1ad5727a8a962c2159a6fdfd"
+    },
+    {
+      "index": 3,
+      "assetId": "00cea78c-b03e-417c-808f-00d7de37bbab",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 128,
+      "height": 128,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/00cea78c-b03e-417c-808f-00d7de37bbab/image.png?v=1791430290330",
+      "path": "art/source/sprite-fusion/outputs/frontier-meadow-ridge-v1/03.png",
+      "bytes": 17923,
+      "sha256": "9b3be4a469b4f1e050f291be111ffd4df5e4a9ea1a198e424e926bc56fdbd386"
+    },
+    {
+      "index": 4,
+      "assetId": "630254f8-a516-44d1-9c90-0111066e89ad",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 134,
+      "height": 134,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/630254f8-a516-44d1-9c90-0111066e89ad/image.png?v=1791430290858",
+      "path": "art/source/sprite-fusion/outputs/frontier-meadow-ridge-v1/04.png",
+      "bytes": 21765,
+      "sha256": "dd476173c2139c17bb2426043027777b0af125322e1b4e54d7bb21e6319b6b98"
+    },
+    {
+      "index": 5,
+      "assetId": "d87b44af-a302-45dc-bea9-30ceb7e9a5d8",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 266,
+      "height": 266,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/d87b44af-a302-45dc-bea9-30ceb7e9a5d8/image.png?v=1791430291400",
+      "path": "art/source/sprite-fusion/outputs/frontier-meadow-ridge-v1/05.png",
+      "bytes": 116170,
+      "sha256": "a4202946020cae84e7a18c66504738aff47abfea90124be5158ee0193d5b9606"
+    },
+    {
+      "index": 6,
+      "assetId": "07b08e73-e041-4f22-8d90-c8e2bf9b011d",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 242,
+      "height": 242,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/07b08e73-e041-4f22-8d90-c8e2bf9b011d/image.png?v=1791430292035",
+      "path": "art/source/sprite-fusion/outputs/frontier-meadow-ridge-v1/06.png",
+      "bytes": 99048,
+      "sha256": "fff499ca64a5ad91f49959b36ec689547fdbf4fadd2172a836757532bc438177"
+    },
+    {
+      "index": 7,
+      "assetId": "110298db-8986-408c-b085-371b0d4867eb",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 128,
+      "height": 128,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/110298db-8986-408c-b085-371b0d4867eb/image.png?v=1791430292637",
+      "path": "art/source/sprite-fusion/outputs/frontier-meadow-ridge-v1/07.png",
+      "bytes": 12837,
+      "sha256": "57bc4e6e1eb1b1b7a50e7352428a5960770121127e8f04c7cd99525841232084"
+    },
+    {
+      "index": 8,
+      "assetId": "13f6ad91-71f4-465b-b70d-4934279183d0",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 128,
+      "height": 128,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/13f6ad91-71f4-465b-b70d-4934279183d0/image.png?v=1791430293114",
+      "path": "art/source/sprite-fusion/outputs/frontier-meadow-ridge-v1/08.png",
+      "bytes": 12333,
+      "sha256": "b6ee07a057441d449cc906e9884ffd85c4c207e3008e06513d34d311515bd96e"
+    }
+  ],
+  "credits": {
+    "remaining": 2505
+  }
+}

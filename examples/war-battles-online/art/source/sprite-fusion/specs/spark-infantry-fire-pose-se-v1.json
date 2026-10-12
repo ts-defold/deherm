@@ -1,0 +1,6 @@
+{
+  "name": "spark-infantry-fire-pose-se-v1",
+  "operation": "edit",
+  "inputs": ["asset:8b192a54-6797-4897-b1de-09fe7a5c58eb"],
+  "prompt": "Change only Spark's southeast-facing body pose: crouch lightly on planted boots and extend the compact sidearm forward at chest height for a quick, precise shot. Keep the same lean driver, orange goggles, green helmet, dark uniform, colors, outline, proportions, and three-quarter perspective. Keep the feet on the same ground line. No muzzle flash, projectile, new prop, platform, text, scenery, or second person."
+}

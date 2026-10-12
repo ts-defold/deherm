@@ -1,0 +1,6 @@
+{
+  "name": "artillery-hull-v2",
+  "operation": "edit",
+  "inputs": ["art/source/sprite-fusion/outputs/artillery-silhouette-v2/06.png"],
+  "prompt": "Remove only the raised gun mount and long barrel from this siege artillery vehicle. Preserve its unmistakably long low rail-platform hull, rear armored casemate, folded stabilizers, long tracks, exact isometric view, palette, outline and ground contact. Finish the top deck with a visible dark circular weapon socket. One isolated artillery hull, no weapon."
+}

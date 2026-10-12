@@ -1,0 +1,12 @@
+{
+  "name": "frontier-hex-meadow-detail-v2",
+  "operation": "style-reference",
+  "size": 64,
+  "prompt": "A single walkable olive meadow hex for a three-quarter-view volcanic frontier battlefield. Dense hand-placed grass clusters, scattered cream wildflowers, little slate pebbles, and a few warm ochre soil scars on a broad level top; a short dark basalt-and-earth side face. Match the reference tiles' six-sided footprint, upper-left light, chunky readable pixel clusters, and muted military palette. No character, vehicle, building, lettering, or other tile.",
+  "inputs": [
+    "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/04.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-wild-meadow-v1/01.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/06.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-ochre-cliff-v1/07.png"
+  ]
+}

@@ -19,9 +19,11 @@ import {
   INPUT_HISTORY_TICKS,
   MAX_PLAYERS,
   NETWORK_SNAPSHOT_BYTES,
+  PLAYER_MODE_DEAD,
   SNAPSHOT_BYTES,
   SNAPSHOT_BASE_HISTORY_FRAMES,
   TICK_MILLISECONDS,
+  UNITS_PER_PIXEL,
   VELOCITY_SCALE,
 } from "./constants";
 import { isWeaponId, isWeaponUpgradeId } from "./content";
@@ -40,6 +42,7 @@ import {
   MESSAGE_SNAPSHOT,
   MESSAGE_WELCOME,
   PING_BYTES,
+  PONG_FEEDBACK_BYTES,
   REJECT_RATE_LIMITED,
   RESUME_TOKEN_BYTES,
   SNAPSHOT_KEYFRAME,
@@ -76,7 +79,7 @@ import {
   type TransportReceiver,
 } from "./transport";
 import { BattleWorld } from "./world";
-import { tickAfter, tickDistance, tickNext } from "./ticks";
+import { tickAdd, tickAfter, tickDistance, tickNext } from "./ticks";
 
 export type ClientState = "idle" | "connecting" | "ready" | "rejected" | "closed";
 
@@ -88,6 +91,13 @@ export interface PlayerTransform {
   hullY: number;
   turretX: number;
   turretY: number;
+  /** Presentation lifecycle from the same snapshot as the remote pose. */
+  active: number;
+  generation: number;
+  mode: number;
+  chassis: number;
+  velocityX: number;
+  velocityY: number;
 }
 
 export interface ClientClose {
@@ -100,10 +110,31 @@ export interface ClientClose {
 
 /** Default cadence used by legacy welcomes and callers without a configuration. */
 export const REMOTE_INTERPOLATION_TICKS = 3;
+// A coalesced or delayed snapshot can be much farther from the last presented
+// remote pose than one advertised cadence of travel. Give that segment enough
+// time to avoid turning a lost-snapshot gap into a visible catch-up sprint.
+const MAX_REMOTE_PRESENTATION_STEP = 16 * UNITS_PER_PIXEL;
+const MAX_REMOTE_INTERPOLATION_TICKS = 30;
 const MAXIMUM_INPUT_LEAD_TICKS = 16;
+// The last received server tick is already one transport leg old. Reserve the
+// 30 Hz packet cadence plus timer/jitter margin for the return leg as well.
 const INPUT_LEAD_SAFETY_TICKS = 3;
+const FIRST_KEYFRAME_RECOVERY_LEAD_TICKS = 10;
+const INPUT_TRANSIT_WINDOW = 12;
 const INPUT_LEAD_DECREASE_OBSERVATIONS = 12;
-const LOCAL_CORRECTION_MILLISECONDS = 100;
+/** Only sustained authoritative lateness changes the lead; an isolated lost datagram does not. */
+const INPUT_FEEDBACK_LATE_PERCENT = 8;
+const INPUT_FEEDBACK_QUIET_PONGS = 4;
+/** One small session-lane probe per half second, not one per simulation tick. */
+const PING_INTERVAL_MILLISECONDS = 500;
+const MIN_LOCAL_CORRECTION_MILLISECONDS = 100;
+const MAX_LOCAL_CORRECTION_MILLISECONDS = 300;
+/** Target five pixels per 60 Hz tick for a large same-life correction, with a 300 ms latency cap. */
+const LOCAL_CORRECTION_PIXELS_PER_TICK = 5;
+/** Retain at most half a second of fixed-step debt after a stalled frame. */
+const MAXIMUM_RECOVERY_TICKS = 30;
+/** Fixed-world-unit upper bounds: zero, 1, 2, 4, 8, 16, 32, >32 pixels. */
+export const LOCAL_CORRECTION_BUCKET_UPPER_BOUNDS = [0, 16, 32, 64, 128, 256, 512] as const;
 
 export interface BattleClientOptions {
   readonly name?: string;
@@ -132,11 +163,36 @@ export interface ClientStats {
   inputLeadTicks: number;
   inputLeadIncreases: number;
   inputLeadDecreases: number;
+  /** Minimum lead requested by actual per-session late-input feedback. */
+  inputFeedbackLeadTicks: number;
+  authoritativeInputsAccepted: number;
+  authoritativeInputsLate: number;
   /** Wall-clock ticks deliberately held so a lead decrease never rewinds simulation. */
   inputLeadCatchdownSkips: number;
   /** Current and maximum local positional presentation error, in fixed world units. */
   localCorrectionMagnitude: number;
   maximumLocalCorrectionMagnitude: number;
+  /** Last >32 px same-life correction; scalar fields avoid allocating on the snapshot path. */
+  lastLargeCorrectionMagnitude: number;
+  lastLargeCorrectionPredictionErrorMagnitude: number;
+  lastLargeCorrectionPredictionComparable: boolean;
+  lastLargeCorrectionSnapshotTick: number;
+  lastLargeCorrectionLocalTick: number;
+  lastLargeCorrectionPredictedX: number;
+  lastLargeCorrectionPredictedY: number;
+  lastLargeCorrectionPresentedX: number;
+  lastLargeCorrectionPresentedY: number;
+  lastLargeCorrectionCorrectedX: number;
+  lastLargeCorrectionCorrectedY: number;
+  lastLargeCorrectionGeneration: number;
+  lastLargeCorrectionMode: number;
+  /** Snapshot correction distribution, in the exported fixed-width buckets. */
+  localCorrectionBuckets: Uint32Array;
+  /** Last and maximum same-tick prediction/authority disagreement, before visual smoothing. */
+  lastPredictionErrorMagnitude: number;
+  maximumPredictionErrorMagnitude: number;
+  /** Same-tick prediction errors; excludes first spawn and lifecycle changes. */
+  predictionErrorBuckets: Uint32Array;
   /** Remote segments rebased from an in-flight rendered pose rather than their old target. */
   remoteInterpolationRebases: number;
   maximumRemoteInterpolationRebaseDistance: number;
@@ -144,6 +200,12 @@ export interface ClientStats {
   maximumRemoteInterpolationDiscontinuity: number;
   /** Generation or player-mode changes intentionally hard-snapped for presentation. */
   remoteLifecycleHardSnaps: number;
+  /** Largest same-lifecycle displacement between two actually sampled remote poses. */
+  maximumRemotePresentedStepDistance: number;
+  remotePresentedStepsOverThirtyTwoPixels: number;
+  /** Largest same-lifecycle displacement between two actually sampled local poses. */
+  maximumLocalPresentedStepDistance: number;
+  localPresentedStepsOverThirtyTwoPixels: number;
   /** Non-terminal server throttling notices received on the control lane. */
   rateLimitAdvisories: number;
   lastServerTick: number;
@@ -172,13 +234,37 @@ export class BattleClient implements TransportReceiver {
     inputLeadTicks: 0,
     inputLeadIncreases: 0,
     inputLeadDecreases: 0,
+    inputFeedbackLeadTicks: 0,
+    authoritativeInputsAccepted: 0,
+    authoritativeInputsLate: 0,
     inputLeadCatchdownSkips: 0,
     localCorrectionMagnitude: 0,
     maximumLocalCorrectionMagnitude: 0,
+    lastLargeCorrectionMagnitude: 0,
+    lastLargeCorrectionPredictionErrorMagnitude: 0,
+    lastLargeCorrectionPredictionComparable: false,
+    lastLargeCorrectionSnapshotTick: 0,
+    lastLargeCorrectionLocalTick: 0,
+    lastLargeCorrectionPredictedX: 0,
+    lastLargeCorrectionPredictedY: 0,
+    lastLargeCorrectionPresentedX: 0,
+    lastLargeCorrectionPresentedY: 0,
+    lastLargeCorrectionCorrectedX: 0,
+    lastLargeCorrectionCorrectedY: 0,
+    lastLargeCorrectionGeneration: 0,
+    lastLargeCorrectionMode: 0,
+    localCorrectionBuckets: new Uint32Array(LOCAL_CORRECTION_BUCKET_UPPER_BOUNDS.length + 1),
+    lastPredictionErrorMagnitude: 0,
+    maximumPredictionErrorMagnitude: 0,
+    predictionErrorBuckets: new Uint32Array(LOCAL_CORRECTION_BUCKET_UPPER_BOUNDS.length + 1),
     remoteInterpolationRebases: 0,
     maximumRemoteInterpolationRebaseDistance: 0,
     maximumRemoteInterpolationDiscontinuity: 0,
     remoteLifecycleHardSnaps: 0,
+    maximumRemotePresentedStepDistance: 0,
+    remotePresentedStepsOverThirtyTwoPixels: 0,
+    maximumLocalPresentedStepDistance: 0,
+    localPresentedStepsOverThirtyTwoPixels: 0,
     rateLimitAdvisories: 0,
     lastServerTick: 0,
     lastRoundTripMilliseconds: 0,
@@ -232,16 +318,45 @@ export class BattleClient implements TransportReceiver {
   private readonly remoteCurrentTurretY = new Int16Array(MAX_PLAYERS);
   private readonly remoteCurrentVelocityX = new Int32Array(MAX_PLAYERS);
   private readonly remoteCurrentVelocityY = new Int32Array(MAX_PLAYERS);
+  private readonly remoteInterpolationDurationTicks = new Uint8Array(MAX_PLAYERS);
   private readonly remoteHaveSample = new Uint8Array(MAX_PLAYERS);
+  private readonly remoteActive = new Uint8Array(MAX_PLAYERS);
   private readonly remoteGeneration = new Uint16Array(MAX_PLAYERS);
   private readonly remoteMode = new Uint8Array(MAX_PLAYERS);
+  private readonly remoteChassis = new Uint8Array(MAX_PLAYERS);
+  private readonly remotePresentedX = new Int32Array(MAX_PLAYERS);
+  private readonly remotePresentedY = new Int32Array(MAX_PLAYERS);
+  private readonly remotePresentedGeneration = new Uint16Array(MAX_PLAYERS);
+  private readonly remotePresentedMode = new Uint8Array(MAX_PLAYERS);
+  private readonly remotePresentedHaveSample = new Uint8Array(MAX_PLAYERS);
   private readonly presentationDirection = createDirection();
+  private localDeadPinned = false;
+  private localDeadGeneration = 0;
+  private localDeadX = 0;
+  private localDeadY = 0;
+  private localPresentedHaveSample = false;
+  private localPresentedX = 0;
+  private localPresentedY = 0;
+  private localPresentedGeneration = 0;
+  private localPresentedMode = 0;
 
   private accumulator = 0;
   private inputLeadTicks: number;
   private leadCatchupTicks = 0;
+  /** First keyframe's authoritative clock jump must not count frame time twice. */
+  private firstKeyframeClockCreditTicks = 0;
   private leadCatchdownTicks = 0;
   private inputLeadDecreaseObservations = 0;
+  private inputFeedbackLeadTicks: number;
+  private inputFeedbackQuietPongs = 0;
+  private lastPongFeedbackTick = -1;
+  private lastPongInputsAccepted = 0;
+  private lastPongInputsLate = 0;
+  private pingElapsedMilliseconds = 0;
+  private readonly observedSnapshotAge = new Uint8Array(INPUT_TRANSIT_WINDOW);
+  private readonly sortedSnapshotAge = new Uint8Array(INPUT_TRANSIT_WINDOW);
+  private observedSnapshotAgeCount = 0;
+  private observedSnapshotAgeCursor = 0;
   private remoteInterpolationMilliseconds = 0;
   private remoteInterpolationTicks = REMOTE_INTERPOLATION_TICKS;
   private localCorrectionX = 0;
@@ -294,7 +409,9 @@ export class BattleClient implements TransportReceiver {
     this.options = options;
     this.minimumInputLeadTicks = clamp(Math.trunc(options.leadTicks ?? 2), 0, MAXIMUM_INPUT_LEAD_TICKS);
     this.inputLeadTicks = this.minimumInputLeadTicks;
+    this.inputFeedbackLeadTicks = this.minimumInputLeadTicks;
     this.stats.inputLeadTicks = this.inputLeadTicks;
+    this.stats.inputFeedbackLeadTicks = this.inputFeedbackLeadTicks;
     this.snapshotHistoryTicks.fill(-1);
     this.assistAim = options.assistAim ?? true;
     this.configuredSnapshotIntervalTicks =
@@ -307,6 +424,11 @@ export class BattleClient implements TransportReceiver {
     this.historyTick.fill(-1);
   }
 
+  /** True only after this connection has restored an authoritative spawn pose. */
+  get hasAuthoritativeSnapshot(): boolean {
+    return this.appliedSnapshotTick >= 0;
+  }
+
   /** Attaches a connected transport and sends the session hello. */
   attach(transport: GameTransport): void {
     this.transport = transport;
@@ -317,6 +439,7 @@ export class BattleClient implements TransportReceiver {
     // serialize or reject the new HELLO/WELCOME pair.
     this.reliableSendTail = Promise.resolve();
     this.welcomeAcknowledging = false;
+    this.pingElapsedMilliseconds = 0;
     // A transport reconnect starts a fresh snapshot stream. Keep the resume
     // credential and predicted world until the new welcome arrives, but make
     // any late frame from the old connection unable to seed the new baseline.
@@ -352,18 +475,52 @@ export class BattleClient implements TransportReceiver {
     }
   }
 
+  clearAim(): void {
+    this.hasExplicitAim = false;
+  }
+
   /**
-   * Samples one tank for presentation into caller-owned storage. The local
-   * predicted tank is always read immediately from `world`; remote tanks use
-   * the bounded pair of authoritative samples at the advertised cadence.
+   * Samples one tank for presentation into caller-owned storage. A welcome
+   * creates a prediction world but no renderable spawn pose; the first server
+   * snapshot establishes that pose. Later the local tank reads prediction
+   * immediately, while remote tanks use bounded authoritative samples.
    */
   samplePlayerTransform(slot: number, output: PlayerTransform): boolean {
     const world = this.world;
-    if (world === undefined || !Number.isInteger(slot) || slot < 0 || slot >= MAX_PLAYERS) return false;
+    if (
+      world === undefined ||
+      !this.hasAuthoritativeSnapshot ||
+      !Number.isInteger(slot) ||
+      slot < 0 ||
+      slot >= MAX_PLAYERS
+    ) {
+      return false;
+    }
     if (slot === this.playerId - 1 || this.remoteHaveSample[slot] === 0) {
       const local = slot === this.playerId - 1;
+      output.active = world.playerActive[slot]!;
+      output.generation = world.playerGeneration[slot]!;
+      output.mode = world.playerMode[slot]!;
+      output.chassis = world.playerChassis[slot]!;
+      output.velocityX = world.playerVelocityX[slot]!;
+      output.velocityY = world.playerVelocityY[slot]!;
       output.x = world.playerX[slot]! + (local ? this.localCorrectionX : 0);
       output.y = world.playerY[slot]! + (local ? this.localCorrectionY : 0);
+      if (local) {
+        if (output.active !== 0 && output.mode === PLAYER_MODE_DEAD) {
+          // A wreck no longer moves or collides. Preserve where this client
+          // actually saw it die; late corpse-position reconciliation should
+          // not drag the camera or a static wreck across the battlefield.
+          if (!this.localDeadPinned || this.localDeadGeneration !== output.generation) {
+            this.localDeadX = output.x;
+            this.localDeadY = output.y;
+            this.localDeadGeneration = output.generation;
+            this.localDeadPinned = true;
+          }
+          output.x = this.localDeadX;
+          output.y = this.localDeadY;
+        } else this.localDeadPinned = false;
+      }
       if (local && this.localCorrectionMilliseconds > 0) {
         rotateDirectionInto(
           world.playerHullX[slot]!,
@@ -387,12 +544,19 @@ export class BattleClient implements TransportReceiver {
         output.turretX = world.playerTurretX[slot]!;
         output.turretY = world.playerTurretY[slot]!;
       }
+      if (local) this.recordLocalPresentedStep(output);
       return true;
     }
-    const alpha = this.remoteInterpolationAlpha();
+    output.active = this.remoteActive[slot]!;
+    output.generation = this.remoteGeneration[slot]!;
+    output.mode = this.remoteMode[slot]!;
+    output.chassis = this.remoteChassis[slot]!;
+    output.velocityX = this.remoteCurrentVelocityX[slot]!;
+    output.velocityY = this.remoteCurrentVelocityY[slot]!;
+    const alpha = this.remoteInterpolationAlpha(slot);
     output.x = interpolate(this.remotePreviousX[slot]!, this.remoteCurrentX[slot]!, alpha);
     output.y = interpolate(this.remotePreviousY[slot]!, this.remoteCurrentY[slot]!, alpha);
-    const extrapolationTicks = this.remoteExtrapolationTicks();
+    const extrapolationTicks = this.remoteExtrapolationTicks(slot);
     if (extrapolationTicks > 0) {
       output.x += Math.trunc((this.remoteCurrentVelocityX[slot]! * extrapolationTicks) / VELOCITY_SCALE);
       output.y += Math.trunc((this.remoteCurrentVelocityY[slot]! * extrapolationTicks) / VELOCITY_SCALE);
@@ -417,7 +581,60 @@ export class BattleClient implements TransportReceiver {
     );
     output.turretX = this.presentationDirection.x;
     output.turretY = this.presentationDirection.y;
+    this.recordRemotePresentedStep(slot, output);
     return true;
+  }
+
+  private recordRemotePresentedStep(slot: number, pose: PlayerTransform): void {
+    if (pose.active === 0) {
+      this.remotePresentedHaveSample[slot] = 0;
+      return;
+    }
+    if (
+      this.remotePresentedHaveSample[slot] !== 0 &&
+      this.remotePresentedGeneration[slot] === pose.generation &&
+      this.remotePresentedMode[slot] === pose.mode
+    ) {
+      const step = correctionMagnitude(pose.x - this.remotePresentedX[slot]!, pose.y - this.remotePresentedY[slot]!);
+      this.stats.maximumRemotePresentedStepDistance = Math.max(this.stats.maximumRemotePresentedStepDistance, step);
+      if (step > 32 * UNITS_PER_PIXEL) {
+        this.stats.remotePresentedStepsOverThirtyTwoPixels += 1;
+        this.options.onLog?.(
+          `remote-presented-step:slot=${slot + 1}:pixels=${Math.round(step / UNITS_PER_PIXEL)}` +
+            `:snapshot=${this.stats.lastServerTick}:alpha=${this.remoteInterpolationAlpha(slot).toFixed(2)}` +
+            `:windowTicks=${this.remoteInterpolationDurationTicks[slot]}:elapsedMs=${Math.round(this.remoteInterpolationMilliseconds)}` +
+            `:from=${Math.round(this.remotePresentedX[slot]! / UNITS_PER_PIXEL)},${Math.round(this.remotePresentedY[slot]! / UNITS_PER_PIXEL)}` +
+            `:to=${Math.round(pose.x / UNITS_PER_PIXEL)},${Math.round(pose.y / UNITS_PER_PIXEL)}` +
+            `:generation=${pose.generation}:mode=${pose.mode}`,
+        );
+      }
+    }
+    this.remotePresentedX[slot] = pose.x;
+    this.remotePresentedY[slot] = pose.y;
+    this.remotePresentedGeneration[slot] = pose.generation;
+    this.remotePresentedMode[slot] = pose.mode;
+    this.remotePresentedHaveSample[slot] = 1;
+  }
+
+  private recordLocalPresentedStep(pose: PlayerTransform): void {
+    if (pose.active === 0) {
+      this.localPresentedHaveSample = false;
+      return;
+    }
+    if (
+      this.localPresentedHaveSample &&
+      this.localPresentedGeneration === pose.generation &&
+      this.localPresentedMode === pose.mode
+    ) {
+      const step = correctionMagnitude(pose.x - this.localPresentedX, pose.y - this.localPresentedY);
+      this.stats.maximumLocalPresentedStepDistance = Math.max(this.stats.maximumLocalPresentedStepDistance, step);
+      if (step > 32 * UNITS_PER_PIXEL) this.stats.localPresentedStepsOverThirtyTwoPixels += 1;
+    }
+    this.localPresentedX = pose.x;
+    this.localPresentedY = pose.y;
+    this.localPresentedGeneration = pose.generation;
+    this.localPresentedMode = pose.mode;
+    this.localPresentedHaveSample = true;
   }
 
   /**
@@ -427,17 +644,32 @@ export class BattleClient implements TransportReceiver {
    */
   update(elapsedMilliseconds: number, maximumSteps = 8): number {
     if (this.state !== "ready" || this.world === undefined) return 0;
+    // Observe the real return path even when snapshots happen to take a fast
+    // route. One bounded probe per update prevents a tab wake-up from flooding
+    // the reliable session lane with accumulated pings.
+    this.pingElapsedMilliseconds += Math.max(0, elapsedMilliseconds);
+    if (this.pingElapsedMilliseconds >= PING_INTERVAL_MILLISECONDS) {
+      this.pingElapsedMilliseconds %= PING_INTERVAL_MILLISECONDS;
+      this.ping(Date.now());
+    }
     // `elapsedMilliseconds` belongs to the presentation segment that was
     // visible since the previous update. Consume it before installing a frame
     // that may have arrived anywhere inside that interval; a new correction or
     // remote segment must begin at alpha zero on its first render.
     this.remoteInterpolationMilliseconds = Math.min(
-      TICK_MILLISECONDS * this.remoteInterpolationTicks * 2,
+      TICK_MILLISECONDS * (MAX_REMOTE_INTERPOLATION_TICKS + this.remoteInterpolationTicks),
       this.remoteInterpolationMilliseconds + Math.max(0, elapsedMilliseconds),
     );
     this.decayLocalCorrection(elapsedMilliseconds);
     this.applyPendingSnapshot();
-    this.accumulator += elapsedMilliseconds;
+    const elapsed = Math.max(0, elapsedMilliseconds);
+    this.accumulator = Math.max(
+      0,
+      this.accumulator +
+        elapsed -
+        Math.min(this.firstKeyframeClockCreditTicks * TICK_MILLISECONDS, this.accumulator + elapsed),
+    );
+    this.firstKeyframeClockCreditTicks = 0;
     let steps = 0;
     let iterations = 0;
     while (this.leadCatchupTicks > 0 && iterations < maximumSteps) {
@@ -457,7 +689,13 @@ export class BattleClient implements TransportReceiver {
         steps += 1;
       }
     }
-    if (iterations === maximumSteps) this.accumulator = 0;
+    // A tab stall or scheduler spike can exceed the per-frame work budget.
+    // Throwing all remaining time away leaves local prediction behind the
+    // server and turns the next snapshot into a visible catch-up teleport.
+    // Carry bounded debt into subsequent frames without an unbounded spiral.
+    if (iterations === maximumSteps) {
+      this.accumulator = Math.min(this.accumulator, TICK_MILLISECONDS * MAXIMUM_RECOVERY_TICKS);
+    }
     return steps;
   }
 
@@ -509,9 +747,16 @@ export class BattleClient implements TransportReceiver {
   }
 
   onDatagram(payload: Uint8Array): void {
-    // The server never sends datagrams in this protocol; a stray one is data the
-    // client did not ask for and is dropped rather than parsed.
-    void payload;
+    // Compact state deltas use the latest-only lane. The common snapshot
+    // validator still enforces version, kind, bounds, base availability and
+    // monotonic tick order; loss or reordering cannot make an old frame win.
+    try {
+      if (messageKind(payload) !== MESSAGE_SNAPSHOT)
+        throw new Error("snapshot datagram carried a non-snapshot message");
+      this.handleSnapshot(payload);
+    } catch (error: unknown) {
+      this.options.onError?.(error);
+    }
   }
 
   onClose(code: number, reason: string): void {
@@ -539,7 +784,10 @@ export class BattleClient implements TransportReceiver {
       payload.byteLength >= WELCOME_BYTES
         ? clamp(Math.trunc(this.welcome.snapshotIntervalTicks ?? REMOTE_INTERPOLATION_TICKS), 1, 30)
         : (this.configuredSnapshotIntervalTicks ?? REMOTE_INTERPOLATION_TICKS);
-    this.world = new BattleWorld(this.welcome.matchId, this.welcome.mapSeed);
+    // Spawn selection consults the whole live roster. A predicting client has
+    // older remote positions and can choose a completely different apron, so
+    // only the server is allowed to materialize automatic respawns.
+    this.world = new BattleWorld(this.welcome.matchId, this.welcome.mapSeed, false);
     // A welcome is the authentication boundary for this connection. The
     // server's first post-welcome snapshot is always a keyframe, so discard
     // every byte and acknowledgement bit belonging to the previous stream.
@@ -570,12 +818,25 @@ export class BattleClient implements TransportReceiver {
     // Retimestamping made the client apply input N at tick N while the server
     // applied it at N + leadTicks, guaranteeing a correction every snapshot.
     this.inputLeadTicks = this.minimumInputLeadTicks;
+    this.inputFeedbackLeadTicks = this.minimumInputLeadTicks;
+    this.inputFeedbackQuietPongs = 0;
+    this.lastPongFeedbackTick = -1;
+    this.lastPongInputsAccepted = 0;
+    this.lastPongInputsLate = 0;
     this.leadCatchupTicks = 0;
+    this.firstKeyframeClockCreditTicks = 0;
     this.leadCatchdownTicks = 0;
     this.inputLeadDecreaseObservations = 0;
+    this.observedSnapshotAgeCount = 0;
+    this.observedSnapshotAgeCursor = 0;
+    this.pingElapsedMilliseconds = 0;
+    this.stats.lastRoundTripMilliseconds = 0;
     this.stats.inputLeadTicks = this.inputLeadTicks;
     this.stats.inputLeadIncreases = 0;
     this.stats.inputLeadDecreases = 0;
+    this.stats.inputFeedbackLeadTicks = this.inputFeedbackLeadTicks;
+    this.stats.authoritativeInputsAccepted = 0;
+    this.stats.authoritativeInputsLate = 0;
     this.stats.inputLeadCatchdownSkips = 0;
     for (let tick = 0; tick < this.inputLeadTicks; tick += 1) this.world.step();
     this.localTick = this.world.tick;
@@ -597,10 +858,34 @@ export class BattleClient implements TransportReceiver {
     this.localCorrectionMilliseconds = 0;
     this.stats.localCorrectionMagnitude = 0;
     this.stats.maximumLocalCorrectionMagnitude = 0;
+    this.stats.lastLargeCorrectionMagnitude = 0;
+    this.stats.lastLargeCorrectionPredictionErrorMagnitude = 0;
+    this.stats.lastLargeCorrectionPredictionComparable = false;
+    this.stats.lastLargeCorrectionSnapshotTick = 0;
+    this.stats.lastLargeCorrectionLocalTick = 0;
+    this.stats.lastLargeCorrectionPredictedX = 0;
+    this.stats.lastLargeCorrectionPredictedY = 0;
+    this.stats.lastLargeCorrectionPresentedX = 0;
+    this.stats.lastLargeCorrectionPresentedY = 0;
+    this.stats.lastLargeCorrectionCorrectedX = 0;
+    this.stats.lastLargeCorrectionCorrectedY = 0;
+    this.stats.lastLargeCorrectionGeneration = 0;
+    this.stats.lastLargeCorrectionMode = 0;
+    this.stats.localCorrectionBuckets.fill(0);
+    this.stats.lastPredictionErrorMagnitude = 0;
+    this.stats.maximumPredictionErrorMagnitude = 0;
+    this.stats.predictionErrorBuckets.fill(0);
     this.stats.remoteInterpolationRebases = 0;
     this.stats.maximumRemoteInterpolationRebaseDistance = 0;
     this.stats.maximumRemoteInterpolationDiscontinuity = 0;
     this.stats.remoteLifecycleHardSnaps = 0;
+    this.stats.maximumRemotePresentedStepDistance = 0;
+    this.stats.remotePresentedStepsOverThirtyTwoPixels = 0;
+    this.remotePresentedHaveSample.fill(0);
+    this.stats.maximumLocalPresentedStepDistance = 0;
+    this.stats.localPresentedStepsOverThirtyTwoPixels = 0;
+    this.localPresentedHaveSample = false;
+    this.localDeadPinned = false;
     void this.acknowledgeWelcome();
   }
 
@@ -687,11 +972,44 @@ export class BattleClient implements TransportReceiver {
   }
 
   private handlePong(payload: Uint8Array): void {
+    if (payload.byteLength !== PING_BYTES && payload.byteLength !== PONG_FEEDBACK_BYTES) {
+      throw new Error("pong has an invalid length");
+    }
     const view = new DataView(payload.buffer, payload.byteOffset, payload.byteLength);
     const clientTime = view.getUint32(4, true);
-    this.stats.lastServerTick = view.getUint32(8, true);
+    // A reliable PONG may be retransmitted after newer snapshot datagrams.
+    // lastServerTick measures applied state, not an older echo's send time.
     this.stats.lastRoundTripMilliseconds = ((Date.now() & 0xffff_ffff) - clientTime) >>> 0;
     this.stats.pongsReceived += 1;
+    if (payload.byteLength !== PONG_FEEDBACK_BYTES) return;
+    const serverTick = view.getUint32(8, true);
+    // Independent QUIC streams may deliver an older PONG after a newer one.
+    if (this.lastPongFeedbackTick >= 0 && !tickAfter(serverTick, this.lastPongFeedbackTick)) return;
+    const accepted = view.getUint32(PING_BYTES, true);
+    const late = view.getUint32(PING_BYTES + 4, true);
+    const acceptedDelta = (accepted - this.lastPongInputsAccepted) >>> 0;
+    const lateDelta = (late - this.lastPongInputsLate) >>> 0;
+    this.lastPongFeedbackTick = serverTick;
+    this.lastPongInputsAccepted = accepted;
+    this.lastPongInputsLate = late;
+    this.stats.authoritativeInputsAccepted = accepted;
+    this.stats.authoritativeInputsLate = late;
+    const observed = acceptedDelta + lateDelta;
+    if (observed >= 8 && lateDelta > 0 && lateDelta * 100 >= observed * INPUT_FEEDBACK_LATE_PERCENT) {
+      const increase = lateDelta >= 4 ? 2 : 1;
+      this.inputFeedbackLeadTicks = Math.min(
+        MAXIMUM_INPUT_LEAD_TICKS,
+        Math.max(this.inputFeedbackLeadTicks, this.inputLeadTicks) + increase,
+      );
+      this.inputFeedbackQuietPongs = 0;
+    } else if (acceptedDelta >= 8 && lateDelta === 0) {
+      this.inputFeedbackQuietPongs += 1;
+      if (this.inputFeedbackQuietPongs >= INPUT_FEEDBACK_QUIET_PONGS) {
+        this.inputFeedbackLeadTicks = Math.max(this.minimumInputLeadTicks, this.inputFeedbackLeadTicks - 1);
+        this.inputFeedbackQuietPongs = 0;
+      }
+    } else this.inputFeedbackQuietPongs = 0;
+    this.stats.inputFeedbackLeadTicks = this.inputFeedbackLeadTicks;
   }
 
   private applyPendingSnapshot(): void {
@@ -708,6 +1026,9 @@ export class BattleClient implements TransportReceiver {
     const world = this.world;
     const target = this.localTick;
     const localSlot = this.playerId - 1;
+    const hadPresentedSnapshot = this.appliedSnapshotTick >= 0;
+    const previousPredictedX = world.playerX[localSlot]!;
+    const previousPredictedY = world.playerY[localSlot]!;
     const previousPresentedX = world.playerX[localSlot]! + this.localCorrectionX;
     const previousPresentedY = world.playerY[localSlot]! + this.localCorrectionY;
     const previousPresentedHullRadians =
@@ -739,29 +1060,50 @@ export class BattleClient implements TransportReceiver {
     this.stats.lastServerTick = snapshotTick;
     if (snapshotKeyframe) this.awaitingSnapshotKeyframe = false;
 
-    // Snapshot arrival exposes one-way timing without a wall-clock protocol
-    // field: localTick - snapshotTick is the configured lead plus observed
-    // delivery lag. Subtract the effective lead to avoid a self-amplifying
-    // estimate and retain three ticks of jitter margin. Growth is limited to
-    // one tick per authoritative frame. Shrinkage requires a sustained lower
-    // estimate and is realized by holding one future wall-clock tick rather
-    // than ever rewinding simulation or retimestamping an input.
+    // Snapshot arrival exposes an upper bound on one-way transit without a
+    // wall-clock protocol field: localTick - snapshotTick is the configured
+    // lead plus delivery age. The minimum of a jittery window is too
+    // optimistic: one unusually fast inbound snapshot can pin input lead low
+    // while most commands arrive after their authoritative tick. Use the
+    // bounded upper quartile instead; this ignores isolated slow packets but
+    // tracks the sustained return-path budget. After the first keyframe,
+    // growth remains limited to one tick per frame.
+    // Shrinkage requires a sustained lower estimate and is realized by
+    // holding one future wall-clock tick rather than ever rewinding
+    // simulation or retimestamping an input.
     const targetDistance = tickAfter(target, snapshotTick) ? tickDistance(target, snapshotTick) : 0;
     const effectiveLeadTicks = this.inputLeadTicks + this.leadCatchdownTicks;
-    const observedTransitTicks = Math.max(0, targetDistance - effectiveLeadTicks);
+    const currentTransitTicks = Math.max(0, targetDistance - effectiveLeadTicks);
+    this.observedSnapshotAge[this.observedSnapshotAgeCursor] = Math.min(currentTransitTicks, 255);
+    this.observedSnapshotAgeCursor = (this.observedSnapshotAgeCursor + 1) % INPUT_TRANSIT_WINDOW;
+    this.observedSnapshotAgeCount = Math.min(this.observedSnapshotAgeCount + 1, INPUT_TRANSIT_WINDOW);
+    const observedTransitTicks = upperQuartileSnapshotAge(
+      this.observedSnapshotAge,
+      this.observedSnapshotAgeCount,
+      this.sortedSnapshotAge,
+    );
     const desiredLeadTicks = clamp(
-      observedTransitTicks + INPUT_LEAD_SAFETY_TICKS,
+      Math.max(observedTransitTicks + INPUT_LEAD_SAFETY_TICKS, this.inputFeedbackLeadTicks),
       this.minimumInputLeadTicks,
       MAXIMUM_INPUT_LEAD_TICKS,
     );
     if (this.leadCatchdownTicks > 0) {
       this.inputLeadDecreaseObservations = 0;
     } else if (desiredLeadTicks > this.inputLeadTicks) {
-      this.inputLeadTicks += 1;
-      this.leadCatchupTicks += 1;
+      // Before a first authoritative pose has been presented, catch up to the
+      // measured transit lead in one bounded burst. Waiting for several more
+      // six-tick snapshots leaves the first second of commands behind the
+      // server even on an otherwise healthy 65 ms link. Later snapshots keep
+      // the conservative one-tick ramp.
+      const catchup =
+        this.stats.snapshotsApplied === 1
+          ? Math.max(1, Math.min(desiredLeadTicks, FIRST_KEYFRAME_RECOVERY_LEAD_TICKS) - this.inputLeadTicks)
+          : 1;
+      this.inputLeadTicks += catchup;
+      this.leadCatchupTicks += catchup;
       this.inputLeadDecreaseObservations = 0;
       this.stats.inputLeadTicks = this.inputLeadTicks;
-      this.stats.inputLeadIncreases += 1;
+      this.stats.inputLeadIncreases += catchup;
     } else if (desiredLeadTicks < this.inputLeadTicks) {
       this.inputLeadDecreaseObservations += 1;
       if (this.inputLeadDecreaseObservations >= INPUT_LEAD_DECREASE_OBSERVATIONS) {
@@ -775,14 +1117,37 @@ export class BattleClient implements TransportReceiver {
       this.inputLeadDecreaseObservations = 0;
     }
 
-    // Replay the local inputs the server has not yet folded in. If the client
-    // had fallen behind the server, there is nothing to replay and the local
-    // clock jumps forward instead.
-    if (!tickAfter(target, world.tick)) {
+    // A slow admission can let the first keyframe overtake the clock seeded by
+    // Welcome. Replaying only to the old target would erase the configured
+    // lead, then every new input would arrive after its authoritative tick.
+    // Nothing was presented before this keyframe, so seed a bounded future
+    // timeline here without retimestamping an already-predicted command.
+    const replayTarget =
+      !hadPresentedSnapshot && effectiveLeadTicks >= INPUT_LEAD_SAFETY_TICKS && targetDistance < effectiveLeadTicks
+        ? tickAdd(snapshotTick, this.inputLeadTicks + INPUT_LEAD_SAFETY_TICKS)
+        : target;
+    if (!hadPresentedSnapshot && tickAfter(replayTarget, target)) {
+      // This jump already advances the clock across time before the first
+      // keyframe. The current frame's elapsed time (and any carried debt) may
+      // cover the same interval; do not charge it again below. The replay
+      // target also includes the new lead, so no second lead burst is needed.
+      this.firstKeyframeClockCreditTicks = tickDistance(replayTarget, target);
+      this.leadCatchupTicks = 0;
+    }
+    if (!hadPresentedSnapshot) {
+      this.options.onLog?.(
+        `first-keyframe-clock:welcome=${this.welcome.serverTick}:snapshot=${snapshotTick}` +
+          `:target=${target}:replay=${replayTarget}:lead=${this.inputLeadTicks}` +
+          `:transit=${currentTransitTicks}:desiredLead=${desiredLeadTicks}`,
+      );
+    }
+    // Replay the local inputs the server has not yet folded in. A later
+    // snapshot overtaking prediction is still adopted without rewinding.
+    if (!tickAfter(replayTarget, world.tick)) {
       this.localTick = world.tick;
     } else {
       let replayed = 0;
-      while (tickAfter(target, world.tick) && replayed < INPUT_HISTORY_TICKS) {
+      while (tickAfter(replayTarget, world.tick) && replayed < INPUT_HISTORY_TICKS) {
         const next = tickNext(world.tick);
         const slot = next % INPUT_HISTORY_TICKS;
         if (this.historyTick[slot] === next) world.submitInput(this.history[slot]!);
@@ -796,7 +1161,11 @@ export class BattleClient implements TransportReceiver {
     // the local presentation retains the old visual position and decays that
     // error, preventing a small reconciliation from looking like the server is
     // yanking the tank backwards. Spawn/mode changes remain hard snaps.
-    if (world.playerGeneration[localSlot] === previousGeneration && world.playerMode[localSlot] === previousMode) {
+    if (
+      hadPresentedSnapshot &&
+      world.playerGeneration[localSlot] === previousGeneration &&
+      world.playerMode[localSlot] === previousMode
+    ) {
       this.localCorrectionX = previousPresentedX - world.playerX[localSlot]!;
       this.localCorrectionY = previousPresentedY - world.playerY[localSlot]!;
       this.localHullCorrectionRadians = shortestAngleDifference(
@@ -807,10 +1176,45 @@ export class BattleClient implements TransportReceiver {
         Math.atan2(world.playerTurretY[localSlot]!, world.playerTurretX[localSlot]!),
         previousPresentedTurretRadians,
       );
-      this.localCorrectionMilliseconds = LOCAL_CORRECTION_MILLISECONDS;
       const magnitude = correctionMagnitude(this.localCorrectionX, this.localCorrectionY);
+      this.localCorrectionMilliseconds = clamp(
+        Math.ceil((magnitude * TICK_MILLISECONDS) / (LOCAL_CORRECTION_PIXELS_PER_TICK * UNITS_PER_PIXEL)),
+        MIN_LOCAL_CORRECTION_MILLISECONDS,
+        MAX_LOCAL_CORRECTION_MILLISECONDS,
+      );
       this.stats.localCorrectionMagnitude = magnitude;
       this.stats.maximumLocalCorrectionMagnitude = Math.max(this.stats.maximumLocalCorrectionMagnitude, magnitude);
+      this.stats.localCorrectionBuckets[correctionBucket(magnitude)]! += 1;
+      // Only compare poses from the same simulation tick. When an incoming
+      // snapshot is newer than our local clock, a cross-tick distance is not a
+      // prediction error and must not be reported as one.
+      if (this.localTick === target) {
+        const predictionError = correctionMagnitude(
+          previousPredictedX - world.playerX[localSlot]!,
+          previousPredictedY - world.playerY[localSlot]!,
+        );
+        this.stats.lastPredictionErrorMagnitude = predictionError;
+        this.stats.maximumPredictionErrorMagnitude = Math.max(
+          this.stats.maximumPredictionErrorMagnitude,
+          predictionError,
+        );
+        this.stats.predictionErrorBuckets[correctionBucket(predictionError)]! += 1;
+      } else this.stats.lastPredictionErrorMagnitude = 0;
+      if (magnitude > 32 * UNITS_PER_PIXEL) {
+        this.stats.lastLargeCorrectionMagnitude = magnitude;
+        this.stats.lastLargeCorrectionPredictionErrorMagnitude = this.stats.lastPredictionErrorMagnitude;
+        this.stats.lastLargeCorrectionPredictionComparable = this.localTick === target;
+        this.stats.lastLargeCorrectionSnapshotTick = snapshotTick;
+        this.stats.lastLargeCorrectionLocalTick = this.localTick;
+        this.stats.lastLargeCorrectionPredictedX = previousPredictedX;
+        this.stats.lastLargeCorrectionPredictedY = previousPredictedY;
+        this.stats.lastLargeCorrectionPresentedX = previousPresentedX;
+        this.stats.lastLargeCorrectionPresentedY = previousPresentedY;
+        this.stats.lastLargeCorrectionCorrectedX = world.playerX[localSlot]!;
+        this.stats.lastLargeCorrectionCorrectedY = world.playerY[localSlot]!;
+        this.stats.lastLargeCorrectionGeneration = world.playerGeneration[localSlot]!;
+        this.stats.lastLargeCorrectionMode = world.playerMode[localSlot]!;
+      }
     } else {
       this.localCorrectionX = 0;
       this.localCorrectionY = 0;
@@ -818,11 +1222,11 @@ export class BattleClient implements TransportReceiver {
       this.localTurretCorrectionRadians = 0;
       this.localCorrectionMilliseconds = 0;
       this.stats.localCorrectionMagnitude = 0;
+      this.stats.lastPredictionErrorMagnitude = 0;
     }
   }
 
   private captureRemoteSnapshot(world: BattleWorld): void {
-    const alpha = this.remoteInterpolationAlpha();
     for (let slot = 0; slot < MAX_PLAYERS; slot += 1) {
       if (slot === this.playerId - 1) continue;
       const haveSample = this.remoteHaveSample[slot] !== 0;
@@ -837,9 +1241,10 @@ export class BattleClient implements TransportReceiver {
       let presentedTurretX = world.playerTurretX[slot]!;
       let presentedTurretY = world.playerTurretY[slot]!;
       if (haveSample && !lifecycleChanged) {
+        const alpha = this.remoteInterpolationAlpha(slot);
         presentedX = interpolate(this.remotePreviousX[slot]!, this.remoteCurrentX[slot]!, alpha);
         presentedY = interpolate(this.remotePreviousY[slot]!, this.remoteCurrentY[slot]!, alpha);
-        const extrapolationTicks = this.remoteExtrapolationTicks();
+        const extrapolationTicks = this.remoteExtrapolationTicks(slot);
         if (extrapolationTicks > 0) {
           presentedX += Math.trunc((this.remoteCurrentVelocityX[slot]! * extrapolationTicks) / VELOCITY_SCALE);
           presentedY += Math.trunc((this.remoteCurrentVelocityY[slot]! * extrapolationTicks) / VELOCITY_SCALE);
@@ -884,8 +1289,18 @@ export class BattleClient implements TransportReceiver {
       this.remoteCurrentTurretY[slot] = world.playerTurretY[slot]!;
       this.remoteCurrentVelocityX[slot] = world.playerVelocityX[slot]!;
       this.remoteCurrentVelocityY[slot] = world.playerVelocityY[slot]!;
+      const distance = correctionMagnitude(
+        this.remoteCurrentX[slot]! - presentedX,
+        this.remoteCurrentY[slot]! - presentedY,
+      );
+      this.remoteInterpolationDurationTicks[slot] = Math.min(
+        MAX_REMOTE_INTERPOLATION_TICKS,
+        Math.max(this.remoteInterpolationTicks, Math.ceil(distance / MAX_REMOTE_PRESENTATION_STEP)),
+      );
+      this.remoteActive[slot] = world.playerActive[slot]!;
       this.remoteGeneration[slot] = generation;
       this.remoteMode[slot] = mode;
+      this.remoteChassis[slot] = world.playerChassis[slot]!;
       if (!haveSample || lifecycleChanged) {
         this.remotePreviousX[slot] = this.remoteCurrentX[slot]!;
         this.remotePreviousY[slot] = this.remoteCurrentY[slot]!;
@@ -915,8 +1330,9 @@ export class BattleClient implements TransportReceiver {
     this.remoteInterpolationMilliseconds = 0;
   }
 
-  private remoteInterpolationAlpha(): number {
-    return Math.min(1, this.remoteInterpolationMilliseconds / (TICK_MILLISECONDS * this.remoteInterpolationTicks));
+  private remoteInterpolationAlpha(slot: number): number {
+    const durationTicks = this.remoteInterpolationDurationTicks[slot] || this.remoteInterpolationTicks;
+    return Math.min(1, this.remoteInterpolationMilliseconds / (TICK_MILLISECONDS * durationTicks));
   }
 
   /**
@@ -926,8 +1342,9 @@ export class BattleClient implements TransportReceiver {
    * snapshot rebases from this exact presented position, so recovery does not
    * introduce a second teleport.
    */
-  private remoteExtrapolationTicks(): number {
-    const interpolationMilliseconds = TICK_MILLISECONDS * this.remoteInterpolationTicks;
+  private remoteExtrapolationTicks(slot: number): number {
+    const interpolationMilliseconds =
+      TICK_MILLISECONDS * (this.remoteInterpolationDurationTicks[slot] || this.remoteInterpolationTicks);
     return Math.min(
       this.remoteInterpolationTicks,
       Math.max(0, (this.remoteInterpolationMilliseconds - interpolationMilliseconds) / TICK_MILLISECONDS),
@@ -951,22 +1368,22 @@ export class BattleClient implements TransportReceiver {
   private stageCommand(command: InputCommand, tick: number): void {
     const world = this.world;
     const slot = this.playerId - 1;
-    if (world !== undefined && this.assistAim && assistedAim(world, slot, this.aim)) {
-      this.aimX = this.aim.x;
-      this.aimY = this.aim.y;
-    } else if (!this.hasExplicitAim && (this.moveX !== 0 || this.moveY !== 0)) {
+    if (!this.hasExplicitAim && (this.moveX !== 0 || this.moveY !== 0)) {
       if (normalizeInto(this.moveX, this.moveY, this.aim)) {
         this.aimX = this.aim.x;
         this.aimY = this.aim.y;
       }
     }
+    this.aim.x = this.aimX;
+    this.aim.y = this.aimY;
+    if (world !== undefined && !this.hasExplicitAim && this.assistAim) assistedAim(world, slot, this.aim);
     this.sequence = (this.sequence + 1) & 0xffff;
     command.tick = tick;
     command.sequence = this.sequence;
     command.moveX = this.moveX;
     command.moveY = this.moveY;
-    command.aimX = clamp(Math.trunc((this.aimX * 127) / DIRECTION_SCALE), -127, 127);
-    command.aimY = clamp(Math.trunc((this.aimY * 127) / DIRECTION_SCALE), -127, 127);
+    command.aimX = clamp(Math.trunc((this.aim.x * 127) / DIRECTION_SCALE), -127, 127);
+    command.aimY = clamp(Math.trunc((this.aim.y * 127) / DIRECTION_SCALE), -127, 127);
     command.buttons = (this.fire ? INPUT_BUTTON_FIRE : 0) | (this.boost ? INPUT_BUTTON_BOOST : 0);
     command.weaponRequest = this.weapon;
     command.fireSubtick = this.fire ? 127 : 255;
@@ -1082,12 +1499,40 @@ export class BattleClient implements TransportReceiver {
   }
 }
 
+/** The 75th-percentile age of one fixed-size observation window, without allocating. */
+export function upperQuartileSnapshotAge(samples: Uint8Array, count: number, scratch: Uint8Array): number {
+  if (!Number.isInteger(count) || count < 1 || count > samples.length || count > scratch.length) {
+    throw new RangeError("snapshot age window is invalid");
+  }
+  for (let index = 0; index < count; index += 1) {
+    const value = samples[index]!;
+    let insertion = index;
+    while (insertion > 0 && scratch[insertion - 1]! > value) {
+      scratch[insertion] = scratch[insertion - 1]!;
+      insertion -= 1;
+    }
+    scratch[insertion] = value;
+  }
+  return scratch[Math.floor(((count - 1) * 3) / 4)]!;
+}
+
 function interpolate(previous: number, current: number, alpha: number): number {
   return Math.trunc(previous + (current - previous) * alpha);
 }
 
 function correctionMagnitude(x: number, y: number): number {
   return Math.max(Math.abs(x), Math.abs(y));
+}
+
+function correctionBucket(magnitude: number): number {
+  let bucket = 0;
+  while (
+    bucket < LOCAL_CORRECTION_BUCKET_UPPER_BOUNDS.length &&
+    magnitude > LOCAL_CORRECTION_BUCKET_UPPER_BOUNDS[bucket]!
+  ) {
+    bucket += 1;
+  }
+  return bucket;
 }
 
 function shortestAngleDifference(fromRadians: number, toRadians: number): number {

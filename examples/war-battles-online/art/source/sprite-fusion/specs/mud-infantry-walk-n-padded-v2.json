@@ -1,0 +1,10 @@
+{
+  "name": "mud-infantry-walk-n-padded-v2",
+  "operation": "animate",
+  "inputs": [
+    "art/source/sprite-fusion/inputs/mud-infantry-walk-pose-n-v1-0-padded-64.png"
+  ],
+  "prompt": "A grounded north-facing rear walk loop with alternating boot contact and a small opposite-arm swing. Preserve Mud's ochre helmet, dark respirator, orange goggles, rust scarf, olive jacket, compact sidearm, proportions, colors, and rear view. Keep the complete helmet, boots, sidearm, and arms inside the canvas throughout the motion.",
+  "outputFrames": 4,
+  "colors": 24
+}

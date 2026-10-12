@@ -1,0 +1,1267 @@
+{
+  "schemaVersion": 3,
+  "owner": "tools/generate-hex-terrain.mjs",
+  "worldPlan": {
+    "seed": 1463898690,
+    "rulesVersion": 7,
+    "landHexes": 290,
+    "propCount": 32
+  },
+  "source": {
+    "requestId": "req_63ea6bca-d218-47f9-b4dc-bc0a70368e94",
+    "assetId": "bd93b0e2-417d-4553-b8ab-8c4637ff088e",
+    "index": 0,
+    "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-v1/00.png",
+    "sha256": "03ec5ccd9edcaf750e89400e9c1fe911128666059710d66a7fb0e82069d29f1a"
+  },
+  "textureSources": {
+    "G": {
+      "path": "art/source/imagegen/hex-meadow-texture-v1.png",
+      "sha256": "0998e77e1c9662972180e39c6da81d44c67450f9c212fa5f41b38f9c2f23056f",
+      "prompt": "Square overhead pixel-art olive frontier meadow material, small hand-clustered grass tufts, dry gold blades, slate pebbles, a few white wildflowers and ochre soil flecks; even coverage, no tile borders or large objects."
+    },
+    "D": {
+      "path": "art/source/imagegen/hex-earth-texture-v1.png",
+      "sha256": "db9a88ce94d77303b36830d011a0347dd804591de6d007ee045a56d865b4659b",
+      "prompt": "Companion square overhead pixel-art ochre compacted earth with straw tufts, small stones, shell grit, tire-scuffed patches and tiny grass intrusions; same material scale as meadow, no tile borders."
+    },
+    "B": {
+      "path": "art/source/imagegen/hex-basalt-texture-v1.png",
+      "sha256": "e60e8616661b8290d8ea3c570cba8582a710cb73534c97847362fe42be5fc9a5",
+      "prompt": "Companion square overhead pixel-art dark slate basalt, irregular angular plates and cracks, charcoal facets, warm olive dust and sparse mineral highlights; flat material, no cliff or tile border."
+    },
+    "A": {
+      "path": "art/source/imagegen/hex-basalt-texture-v1.png",
+      "sha256": "e60e8616661b8290d8ea3c570cba8582a710cb73534c97847362fe42be5fc9a5",
+      "recipe": "basalt source graded to ash with generated orange fissures"
+    },
+    "M": {
+      "path": "art/source/imagegen/hex-steel-texture-v1.png",
+      "sha256": "c0b3c0a82259b90c47f33b8df1d8b90fe5ae25fb55439a22e978fac58e1ae430",
+      "prompt": "Companion square overhead pixel-art worn refinery steel deck, small gunmetal plates, grates, rivets, rust, cream scuffs and restrained industrial-yellow paint; flat material, no tile border."
+    }
+  },
+  "spriteFusionTiles": {
+    "selection": "art/source/sprite-fusion/hex-tile-selection-v2.json",
+    "sha256": "d793d9bc57cff91b57d465448c3103f4d7f0e57e77ec2c4f877eb9bea28d26ed",
+    "families": {
+      "G": [
+        {
+          "request": "frontier-hex-meadow-cliff-v1",
+          "index": 4,
+          "assetId": "3dc545b3-e200-4c43-ae96-f20fc116cbf5",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/04.png",
+          "sha256": "e475f8f5c048798c01c722cd1efef78e8bd22d5e750fc5939b87dc5679d6e240"
+        },
+        {
+          "request": "frontier-hex-meadow-cliff-v1",
+          "index": 5,
+          "assetId": "1ba50ae5-0bec-47cf-905a-1fb2549a66f1",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/05.png",
+          "sha256": "030bb92323763b351d4cbf8c42c568596225df2c357d21e7e6224966591733da"
+        },
+        {
+          "request": "frontier-hex-meadow-cliff-v1",
+          "index": 6,
+          "assetId": "5177d357-8d0b-444d-bd66-a371a6f6e562",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/06.png",
+          "sha256": "2328c5d326dbc5ebf9c2fd396795c49f446e73dc40b347f683512c9c1d96b66b"
+        },
+        {
+          "request": "frontier-hex-meadow-cliff-v1",
+          "index": 7,
+          "assetId": "969fe6ee-9a0a-4a27-9084-7a023a6e2757",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/07.png",
+          "sha256": "f8058f8f02159071b4b6314488e4f69ced8eb7429c71dde54006f615255939f4"
+        },
+        {
+          "request": "frontier-hex-meadow-cliff-v1",
+          "index": 9,
+          "assetId": "9874760a-3c13-44b8-91b5-9f3a0ac0d485",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/09.png",
+          "sha256": "a6dd4567aeb14d5fdc3cb6721adeb25f828d6d6dff4601648d8989b95f33e8a8"
+        },
+        {
+          "request": "frontier-hex-meadow-cliff-v1",
+          "index": 10,
+          "assetId": "f85a011e-723a-4d97-bcc0-ef3d84f8a11a",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/10.png",
+          "sha256": "93e921fce6e88e6ddc16d5e4f255629643e7e30f6847187ae5e26b8e22efbef4"
+        },
+        {
+          "request": "frontier-hex-meadow-cliff-v1",
+          "index": 11,
+          "assetId": "a80539a3-ad83-4701-9eb6-40d44a27a598",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/11.png",
+          "sha256": "5076d8c7dbb5f4d321a60823234ba887a1f26fb41ad63486af8fde687bbf6ce9"
+        },
+        {
+          "request": "frontier-hex-wild-meadow-v1",
+          "index": 0,
+          "assetId": "4c54b0f7-41d9-4cf7-a06a-a8001bdf6545",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-wild-meadow-v1/00.png",
+          "sha256": "417457deb990ef258d19bb633d2867d69736325af69886a81635c76021ca5a41"
+        },
+        {
+          "request": "frontier-hex-wild-meadow-v1",
+          "index": 1,
+          "assetId": "384e2588-e320-4fed-a571-1b45ca0d909f",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-wild-meadow-v1/01.png",
+          "sha256": "c6c244a769803724b188656dad0ed7e3f7ed641d3b42dffa36efe2ca8375fc94"
+        },
+        {
+          "request": "frontier-hex-wild-meadow-v1",
+          "index": 2,
+          "assetId": "c79db2fc-d292-4cb3-bb7d-eb487b4fd801",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-wild-meadow-v1/02.png",
+          "sha256": "c1820b1cee3d86b0f9c4bcb294fb5144c7f9a636f83fd1b1241d9668b188bf4a"
+        },
+        {
+          "request": "frontier-hex-wild-meadow-v1",
+          "index": 3,
+          "assetId": "69ac51b7-a51b-47b7-9d47-3016b7e08901",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-wild-meadow-v1/03.png",
+          "sha256": "eb87860fa0369a5c5e7ff295be8b19117c11dd43fa4aed136bb8fc40e88f1eb7"
+        },
+        {
+          "request": "frontier-hex-wild-meadow-v1",
+          "index": 4,
+          "assetId": "1a9612c9-972c-432d-96fd-058b2ec943aa",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-wild-meadow-v1/04.png",
+          "sha256": "68b3bfe420fe497f780852bb8d6243c5a059f3153ec779f7245342e392cba4d3"
+        },
+        {
+          "request": "frontier-hex-wild-meadow-v1",
+          "index": 5,
+          "assetId": "cf82f2b1-e304-4a1c-93b5-c443909becc0",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-wild-meadow-v1/05.png",
+          "sha256": "4c65396c8009b0d2af2e3d946dbfa130c2278ceb2de6d8a6d3d2c1ba819350e2"
+        },
+        {
+          "request": "frontier-hex-wild-meadow-v1",
+          "index": 6,
+          "assetId": "3a7d2fec-432b-48e4-b508-7925ab9a80e5",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-wild-meadow-v1/06.png",
+          "sha256": "10a982f35a565a8c78f20ea7de86e20479fdabae44d7aadc67f05604956e0c1c"
+        },
+        {
+          "request": "frontier-hex-wild-meadow-v1",
+          "index": 7,
+          "assetId": "0617694b-4692-4c6b-8222-30e523db3161",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-wild-meadow-v1/07.png",
+          "sha256": "f4ebdba92370c346a3cbf1668699239b58b20c11a50e568607648ed4897249b8"
+        },
+        {
+          "request": "frontier-hex-wild-meadow-v1",
+          "index": 8,
+          "assetId": "4f130f1c-b40f-4ea5-8422-eaa2bdbbc659",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-wild-meadow-v1/08.png",
+          "sha256": "b1544ae060b168e6e1f0da369f8a93b84d7955208e06c1d00d5cd9e4e8b9ed5b"
+        },
+        {
+          "request": "frontier-hex-meadow-detail-v2",
+          "index": 0,
+          "assetId": "37242bea-4749-4739-9eff-6b4dd7083d48",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-detail-v2/00.png",
+          "sha256": "2e9b618b2c2d6b76f3969d0968dafecdc47e8e7bbb74320f07fca46aaf2e5f52"
+        },
+        {
+          "request": "frontier-hex-meadow-detail-v2",
+          "index": 1,
+          "assetId": "194cd879-1f29-4938-bf78-82ed9b0a9d9c",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-detail-v2/01.png",
+          "sha256": "8f909277e5825659c37839d0e32d23a271160403ddcf2be6172fc207307e8cd1"
+        },
+        {
+          "request": "frontier-hex-meadow-detail-v2",
+          "index": 2,
+          "assetId": "5562efcb-e17c-4957-b89b-1698b69afb55",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-detail-v2/02.png",
+          "sha256": "df8d776e7586b27e3218bcf73b0a02ef8523048bc94a3d90c7251124ab8903e3"
+        },
+        {
+          "request": "frontier-hex-meadow-detail-v2",
+          "index": 3,
+          "assetId": "3560ab27-4645-4dc5-bd7d-3fc885944ac7",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-detail-v2/03.png",
+          "sha256": "f9b8539ca05c4e9889b408998a30a9c0c44c63803482cc3408e4ef13eefa75f0"
+        },
+        {
+          "request": "frontier-hex-meadow-detail-v2",
+          "index": 4,
+          "assetId": "91a01d5f-e5bb-4712-94fa-8cdec4107d76",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-detail-v2/04.png",
+          "sha256": "04783f3048a6e8e864c5333df35cf819c5ea375068f7df8343d5b6cab10d265a"
+        },
+        {
+          "request": "frontier-hex-meadow-detail-v2",
+          "index": 5,
+          "assetId": "258d7e0f-6e28-4a31-b47b-e60ab58c9778",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-detail-v2/05.png",
+          "sha256": "3f19f9c11961f1fd1de6277544b6c483d1ff1f2e4be693fb4d44852f105dfeb1"
+        },
+        {
+          "request": "frontier-hex-meadow-detail-v2",
+          "index": 6,
+          "assetId": "404497f5-bd83-4c06-b787-ba3fea4e4429",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-detail-v2/06.png",
+          "sha256": "cefb231950e1224686308ecd7311ed38dac4ce8f5b433116a50231e9a05dc024"
+        },
+        {
+          "request": "frontier-hex-meadow-detail-v2",
+          "index": 7,
+          "assetId": "94c4a573-a034-4c62-b3fc-5fce4fcc68e3",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-detail-v2/07.png",
+          "sha256": "7ab2a75f079d6ac3b65916165bd4a1dc3d606277c4fa121379f10b0ad52f77de"
+        },
+        {
+          "request": "frontier-hex-meadow-detail-v2",
+          "index": 8,
+          "assetId": "3c666434-0e5c-4697-8df5-b125a94595d4",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-detail-v2/08.png",
+          "sha256": "7d7b3bd5ebd7a47b5ad1d86a1cc8995cf88da3c4c5e3352d2dcae734605fec1d"
+        }
+      ],
+      "D": [
+        {
+          "request": "frontier-hex-ochre-cliff-v1",
+          "index": 6,
+          "assetId": "46741cd9-7795-4b14-9451-7929bbbe8ac9",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-cliff-v1/06.png",
+          "sha256": "2fb43c4832779a6aa1feef9486e439179bce95907dd66bf74ece4adffcfa1e69"
+        },
+        {
+          "request": "frontier-hex-ochre-cliff-v1",
+          "index": 7,
+          "assetId": "17dd624a-c92c-414e-bee3-8864c43c01e0",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-cliff-v1/07.png",
+          "sha256": "22fc9b62174d4459e7a64b591570915b2dfd14bceac49cfed0634c63f60b2aae"
+        },
+        {
+          "request": "frontier-hex-ochre-cliff-v1",
+          "index": 8,
+          "assetId": "534e018d-506d-4756-b535-93fb96003f1f",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-cliff-v1/08.png",
+          "sha256": "cdcf5d6c879ceb856ebc168d358b05db253130c91956341ab82d694bfc862c4c"
+        },
+        {
+          "request": "frontier-hex-ochre-cliff-v1",
+          "index": 9,
+          "assetId": "cfe37822-fce0-4e0d-bae0-19183a938d83",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-cliff-v1/09.png",
+          "sha256": "28ab76381f8876b72d01f14fb729832b60a76b82337695a5e73047f6fa4ce2e8"
+        },
+        {
+          "request": "frontier-hex-ochre-cliff-v1",
+          "index": 10,
+          "assetId": "34868ccf-9fd5-4f35-b9f4-3acbd8bc17c0",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-cliff-v1/10.png",
+          "sha256": "cd0f868fbb856150d7ad1033e7e64170dbcc2790bccd9f1b2d1a5f17a3ca50ce"
+        },
+        {
+          "request": "frontier-hex-ochre-cliff-v1",
+          "index": 11,
+          "assetId": "a78dd7b3-e6f8-4ef2-9df9-a2e3c7d5c85a",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-cliff-v1/11.png",
+          "sha256": "513a9d3971406e2b627a9cb63e6d0b555db7c9e4f0686ab4e53bc62338f19638"
+        },
+        {
+          "request": "frontier-hex-worn-route-v1",
+          "index": 1,
+          "assetId": "4a7fc3d2-704d-40ad-8c52-7312469a9e4b",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-worn-route-v1/01.png",
+          "sha256": "a3492fccd8bdb99b3802e868ad8c5c7a534a99e3037b7298aaaa1e57970c418d"
+        },
+        {
+          "request": "frontier-hex-worn-route-v1",
+          "index": 2,
+          "assetId": "92d83993-c498-43bd-b594-83f5afb28ff8",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-worn-route-v1/02.png",
+          "sha256": "a4c7bde1ac2d634fc4f9276e1199f9e36c3d3476a39befef0b3c45dd7e701743"
+        },
+        {
+          "request": "frontier-hex-worn-route-v1",
+          "index": 3,
+          "assetId": "5126f543-afe5-4e55-be51-448ae743ce23",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-worn-route-v1/03.png",
+          "sha256": "e408cf2d752be05e7ac040a9b2d033a97489645fe3496ee5e73d98dde460e71b"
+        },
+        {
+          "request": "frontier-hex-worn-route-v1",
+          "index": 5,
+          "assetId": "cca9cc5b-8979-4686-9b86-0fc15cdd80bc",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-worn-route-v1/05.png",
+          "sha256": "e734f1a89eeb5d36f1dab1c43d4a3d3adbab70aa41174c060ea63058fa905213"
+        },
+        {
+          "request": "frontier-hex-ochre-detail-v2",
+          "index": 0,
+          "assetId": "8a7d4ecd-3f7b-4bc8-a574-9d2517a809ad",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-detail-v2/00.png",
+          "sha256": "7df420265db978e6ad886739145fac46d679ba27d528e6d08ccb5ded2c11b066"
+        },
+        {
+          "request": "frontier-hex-ochre-detail-v2",
+          "index": 1,
+          "assetId": "a2b7d650-da2e-4757-ba22-4b414bbd3b88",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-detail-v2/01.png",
+          "sha256": "3a4cf4cfb6e1c0ad73b7d4d883c45f117e4cfb4b9c14898d1be09bae2e35c3a4"
+        },
+        {
+          "request": "frontier-hex-ochre-detail-v2",
+          "index": 2,
+          "assetId": "bf4d1538-b025-42d1-b286-7503420dac45",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-detail-v2/02.png",
+          "sha256": "95523f75f47cb0f13550c3fa344a3afb2bff76edb1439540d3f4b1f6354f9640"
+        },
+        {
+          "request": "frontier-hex-ochre-detail-v2",
+          "index": 3,
+          "assetId": "fe5eab1e-1eae-4f9f-9b00-0cfb16901638",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-detail-v2/03.png",
+          "sha256": "17662f835b72f191157e0e47c2c4a4fa28cc5d74721095580cb7169483bd9059"
+        },
+        {
+          "request": "frontier-hex-ochre-detail-v2",
+          "index": 4,
+          "assetId": "bf848e3e-0631-43c5-8dd2-087a0d76bf6c",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-detail-v2/04.png",
+          "sha256": "aa0b6816217c1e0ca96a77aed9810e92c63d23c52ba452194c4daab656d01ac8"
+        },
+        {
+          "request": "frontier-hex-ochre-detail-v2",
+          "index": 5,
+          "assetId": "bc0652ed-0a89-44fa-b75f-3b585ecbfa58",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-detail-v2/05.png",
+          "sha256": "decd4529074f90371999eaad6a37441d951ed3ba974a7f588898b987d1bad1b6"
+        },
+        {
+          "request": "frontier-hex-ochre-detail-v2",
+          "index": 6,
+          "assetId": "11a7e387-edaf-41e1-8459-91dca5b3642d",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-detail-v2/06.png",
+          "sha256": "c58fc4b0c10f00090562653db1b71b41d292df01e563ddc7e7f344b3e6c32145"
+        },
+        {
+          "request": "frontier-hex-ochre-detail-v2",
+          "index": 7,
+          "assetId": "0441fb91-4670-4e52-b011-5972991bf3ba",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-detail-v2/07.png",
+          "sha256": "18a8d1996450fd79fc65bef10df984a27b344a0b0efdd4c6ed73276a9a2421c9"
+        },
+        {
+          "request": "frontier-hex-ochre-detail-v2",
+          "index": 8,
+          "assetId": "c8b04133-850c-4279-afc3-2f6a317c431f",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-detail-v2/08.png",
+          "sha256": "9bc6205174a82256786d474e0b1d0f550ba1b0922fc495d2d13f6fe8f39829e3"
+        }
+      ],
+      "B": [
+        {
+          "request": "frontier-hex-basalt-cliff-v1",
+          "index": 0,
+          "assetId": "c10cf40b-aea8-4702-b4f7-2bcf17419d7e",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-cliff-v1/00.png",
+          "sha256": "2a2f2d48d553347fa410aa47f769a204fac8fbb98d581d3a0ad831f12ad6e0ae"
+        },
+        {
+          "request": "frontier-hex-basalt-cliff-v1",
+          "index": 1,
+          "assetId": "9eaf9923-aeee-4a50-9e41-99ee723f5644",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-cliff-v1/01.png",
+          "sha256": "bd76ca5524362d8cd629acb334d91ee019aa4ce335e48102aa3c300cb0454b27"
+        },
+        {
+          "request": "frontier-hex-basalt-cliff-v1",
+          "index": 2,
+          "assetId": "fa7ce036-456f-4afb-adb4-be681d61f1af",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-cliff-v1/02.png",
+          "sha256": "0b71f8ec2f59e8f738bc8e24cae7119774d7e022632e41ac45c1bb2e99955cc0"
+        },
+        {
+          "request": "frontier-hex-basalt-cliff-v1",
+          "index": 3,
+          "assetId": "4ab98373-396b-4e03-b68f-6c525e93e61c",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-cliff-v1/03.png",
+          "sha256": "dea50c860a842a236c5045007c61795ed1f3acd653d6e0ea99b435cecf54f568"
+        },
+        {
+          "request": "frontier-hex-basalt-cliff-v1",
+          "index": 4,
+          "assetId": "e987b985-135f-48e7-8294-a804bec5481e",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-cliff-v1/04.png",
+          "sha256": "7e6b4cead2a0d5e17460e064d7fe971edb5324cebfbdb8c7dbfcf86c8fc8ed06"
+        },
+        {
+          "request": "frontier-hex-basalt-cliff-v1",
+          "index": 5,
+          "assetId": "bd836866-88f4-4688-8181-e9e5f9d296ef",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-cliff-v1/05.png",
+          "sha256": "f5fac0d6f90a80b8a0fd9d2f0c163f0e1d263b710b86ba34ddde71ac6835a8d5"
+        },
+        {
+          "request": "frontier-hex-basalt-cliff-v1",
+          "index": 6,
+          "assetId": "cb0919af-e26d-4efa-ad14-a40a2dade7d2",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-cliff-v1/06.png",
+          "sha256": "77bc4a64b05bd2a0fafa28ba051692a2a102ef7943430d7dbaaac652a6ea0e04"
+        },
+        {
+          "request": "frontier-hex-basalt-cliff-v1",
+          "index": 7,
+          "assetId": "adb9bf9a-ba15-4cbe-a1f5-c310f5b748a7",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-cliff-v1/07.png",
+          "sha256": "19fd0698d6280bc8163e98252a59d5b56eb12eb9253b00fc0dc13fa7d90c5538"
+        },
+        {
+          "request": "frontier-hex-basalt-cliff-v1",
+          "index": 8,
+          "assetId": "e61bd843-38f9-4208-a599-0c62f72b60ee",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-cliff-v1/08.png",
+          "sha256": "8c689a827e3edd66eae825eeec4ac5cc08d6ef27ed420d43ad56680372a3b105"
+        },
+        {
+          "request": "frontier-hex-basalt-detail-v2",
+          "index": 0,
+          "assetId": "a2a583e4-8c23-47e3-90c6-637de65f643a",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-detail-v2/00.png",
+          "sha256": "8d17c6a2fa2cb75bba0471bb487a898c677d71a964c690c9a6163e2f34e06279"
+        },
+        {
+          "request": "frontier-hex-basalt-detail-v2",
+          "index": 1,
+          "assetId": "d5a1ba85-1db1-46dc-9b52-e792f87f3217",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-detail-v2/01.png",
+          "sha256": "e6cf2098f9a18fccfe13c50854796863a8805786c0dec1eac51423f83dfd2d9b"
+        },
+        {
+          "request": "frontier-hex-basalt-detail-v2",
+          "index": 2,
+          "assetId": "e2d97cde-8669-4a63-bf9b-70ff0891b75c",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-detail-v2/02.png",
+          "sha256": "04962664ff0b6513bf71b7827e5a4be4d3c203c2d1000015d37ff8566d775a54"
+        },
+        {
+          "request": "frontier-hex-basalt-detail-v2",
+          "index": 3,
+          "assetId": "378be7f7-b975-4e23-b36f-2cd7ee428b54",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-detail-v2/03.png",
+          "sha256": "5d53b0c0f3a490a5f873d1f7c1d7e15a7935dae9cf585361b977b4c4c4333b07"
+        },
+        {
+          "request": "frontier-hex-basalt-detail-v2",
+          "index": 4,
+          "assetId": "73dfac47-7d36-4927-89a9-dbf0da399b3b",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-detail-v2/04.png",
+          "sha256": "a82c53ea09266a8f847844ef94e80e2ab837048d723f08f41b340d8bae2251e2"
+        },
+        {
+          "request": "frontier-hex-basalt-detail-v2",
+          "index": 5,
+          "assetId": "2e005c48-2ece-4a37-8481-1867f6b4cdc2",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-detail-v2/05.png",
+          "sha256": "ccc403656de69315cbd7f8a27b12d37885d89004dbd368b87603caf9f9201ae0"
+        },
+        {
+          "request": "frontier-hex-basalt-detail-v2",
+          "index": 6,
+          "assetId": "9eb1f02c-18ed-4f9a-8ddf-6b902801d716",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-detail-v2/06.png",
+          "sha256": "02bf90eb41c6431fb1b506e6f9caf1d89c221fb85c83167eefdcd6308e05db01"
+        },
+        {
+          "request": "frontier-hex-basalt-detail-v2",
+          "index": 7,
+          "assetId": "b1c095b0-64de-4602-a284-7e09dcdd2af8",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-detail-v2/07.png",
+          "sha256": "3d68d3f56699712878fd71cb09b489947670bddb887599fbc1a397a07f5220ed"
+        },
+        {
+          "request": "frontier-hex-basalt-detail-v2",
+          "index": 8,
+          "assetId": "da0c6f88-6085-4728-a64e-67d2962a8e15",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-detail-v2/08.png",
+          "sha256": "f5cafa459d59f42456af65c3e65b7da53ce513966b8f4867d3df1b91d06f36f8"
+        }
+      ],
+      "A": [
+        {
+          "request": "frontier-hex-ash-ridge-v1",
+          "index": 0,
+          "assetId": "814fdb71-9cac-43a9-87f9-0e89d8a1ad9e",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-ash-ridge-v1/00.png",
+          "sha256": "506dc93ee0e52e6d299e45325133efcc6b88470e99b98808f6a52c1a2b02fe96"
+        },
+        {
+          "request": "frontier-hex-ash-ridge-v1",
+          "index": 5,
+          "assetId": "8860ceb3-b976-48e1-a908-52ed8fe1bf2d",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-ash-ridge-v1/05.png",
+          "sha256": "9a1ee4b21812b71adf568e6a4ed647c367c2446d1bd19deafe86d47c6de601d7"
+        },
+        {
+          "request": "frontier-hex-ash-ridge-v1",
+          "index": 9,
+          "assetId": "5e759f7d-3569-4159-8fe7-376d93a9d222",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-ash-ridge-v1/09.png",
+          "sha256": "e620e8ffdd49d5f52ae0d0991981289b322ffc3a685c9060f9d661c30695c8be"
+        },
+        {
+          "request": "frontier-hex-lava-fracture-v1",
+          "index": 0,
+          "assetId": "9df0ea78-425a-4f60-9fba-911e5aaf90b6",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-lava-fracture-v1/00.png",
+          "sha256": "6dc9dc7d098218af8656032c6547faceeb81214532e7adf75d7cad9b51f17ac5"
+        },
+        {
+          "request": "frontier-hex-lava-fracture-v1",
+          "index": 1,
+          "assetId": "e750f8f8-0458-483a-906f-7b77cd5f1a13",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-lava-fracture-v1/01.png",
+          "sha256": "7d3544111820cb212b1077e0ef491ed78081fd66b75001502fe232b8d34a14b8"
+        },
+        {
+          "request": "frontier-hex-lava-fracture-v1",
+          "index": 2,
+          "assetId": "5601c4a3-cd79-41dd-bfea-aa50e724d47b",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-lava-fracture-v1/02.png",
+          "sha256": "855b46dd602f0c35af326d9faeb38caa6a0445c1efda8619615522ea6247fce6"
+        },
+        {
+          "request": "frontier-hex-lava-fracture-v1",
+          "index": 6,
+          "assetId": "93ea92d4-cf3f-40fa-bf75-3cab08346cb4",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-lava-fracture-v1/06.png",
+          "sha256": "03ae0349e990ea6a830af7619784af69ed5011ce5ae3987cad59a678874cb375"
+        },
+        {
+          "request": "frontier-hex-lava-fracture-v1",
+          "index": 7,
+          "assetId": "18e9638d-8c00-4dfb-9492-c37100b07734",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-lava-fracture-v1/07.png",
+          "sha256": "74c9f0a17de97230960e726ef85b9908ca53ef4492afc38351b027ef7d7ea57a"
+        },
+        {
+          "request": "frontier-hex-lava-fracture-v1",
+          "index": 8,
+          "assetId": "64e3123e-9e0e-4b70-adb7-07db3eba68e7",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-lava-fracture-v1/08.png",
+          "sha256": "5bfcf92f15d400ab4d903b710986287e09954e7d742107186755a89b3279d8a9"
+        },
+        {
+          "request": "frontier-hex-dark-ash-v3",
+          "index": 0,
+          "assetId": "cad2aab9-d85c-4342-bf1a-b05eb240f37a",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-dark-ash-v3/00.png",
+          "sha256": "11b046ecea5217ce882829feaec4d1cbe4aadafb01e70f122eb1d6f6ad8ef13a"
+        },
+        {
+          "request": "frontier-hex-dark-ash-v3",
+          "index": 1,
+          "assetId": "acf05fba-0433-45e0-92dc-d5203295d23d",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-dark-ash-v3/01.png",
+          "sha256": "2693c63c79222364898f0d9fd9e9c1db7f4cb4716684db3251f2d8e343e6e0a2"
+        },
+        {
+          "request": "frontier-hex-dark-ash-v3",
+          "index": 4,
+          "assetId": "0a5a56ba-eb87-477d-9583-933648180356",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-dark-ash-v3/04.png",
+          "sha256": "f70586e032b9e10952fe805c2a7b26759e27e08cb5466853eb4ca6cdbb2c5eaf"
+        },
+        {
+          "request": "frontier-hex-dark-ash-v3",
+          "index": 5,
+          "assetId": "c928552b-8a9d-46b5-85a0-2bf23c9f3500",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-dark-ash-v3/05.png",
+          "sha256": "55abd81fea86fa9c992b4b18229bd6af13abce62b995102c85c1b6212df11323"
+        },
+        {
+          "request": "frontier-hex-dark-ash-v3",
+          "index": 6,
+          "assetId": "56f7dced-858b-4c00-9e9c-c7eb31f84874",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-dark-ash-v3/06.png",
+          "sha256": "af89721382c31de74aa2224d4ec5ce78cddb87d917b9eff2abcc1f1dae9038b8"
+        },
+        {
+          "request": "frontier-hex-dark-ash-v3",
+          "index": 7,
+          "assetId": "06b85655-62ca-4ce5-b76a-1c6519821657",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-dark-ash-v3/07.png",
+          "sha256": "dd5d1dd53cf4f0e815c21101d6772bd29b3cb35313935f15b02db5b7889172f6"
+        },
+        {
+          "request": "frontier-hex-dark-ash-v3",
+          "index": 8,
+          "assetId": "92ee172d-f1fa-4b21-8e44-7ab0f7d58671",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-dark-ash-v3/08.png",
+          "sha256": "43fc6396af10d6b42fe0b8305cb117f66a8cb7b6016f4d701702009065e8f380"
+        }
+      ],
+      "M": [
+        {
+          "request": "frontier-hex-service-deck-v1",
+          "index": 6,
+          "assetId": "07f8b547-29e8-4585-87f1-0f8ff67c7b95",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-service-deck-v1/06.png",
+          "sha256": "9dd8795e21c53cac5e447603de27da93c41fe46c49ac8e067ccf4438bef22055"
+        },
+        {
+          "request": "frontier-hex-service-deck-v1",
+          "index": 7,
+          "assetId": "221d2cd9-1418-483a-bba0-47b04d4c2056",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-service-deck-v1/07.png",
+          "sha256": "0c949e553e6e63d76f266fc820560d1f141de94e23e32fa5a1d1348aff4d866a"
+        },
+        {
+          "request": "frontier-hex-service-deck-v1",
+          "index": 8,
+          "assetId": "2214284b-be14-4bc4-80c1-6b38daedfbc3",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-service-deck-v1/08.png",
+          "sha256": "13a5ec474ab16a47373adf4cb6d2c5abee9c00e4cc75a2f8c4138938b96a256a"
+        },
+        {
+          "request": "frontier-hex-service-deck-v1",
+          "index": 9,
+          "assetId": "dcc8cd21-57d3-40d2-93d4-cd83f6783755",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-service-deck-v1/09.png",
+          "sha256": "a288fa5d2c07ceb85bca1924ed5bb719e220a1cfc5de5225b57b5c40f35a5b8b"
+        },
+        {
+          "request": "frontier-hex-service-deck-v1",
+          "index": 10,
+          "assetId": "e3af572a-032e-4d6b-b72e-b60b1cb719fc",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-service-deck-v1/10.png",
+          "sha256": "1577dcff19222642e475e886fc708e9f00cedb4ed61b488595b0c1031ffceb3c"
+        },
+        {
+          "request": "frontier-hex-service-deck-v1",
+          "index": 11,
+          "assetId": "10485896-19e2-4719-8313-66db21a8464a",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-service-deck-v1/11.png",
+          "sha256": "29a6e97ec883ac2666bb25741ba1cf9e073979f9ee6ec6581dcc89419a579a87"
+        },
+        {
+          "request": "frontier-hex-refinery-grate-v1",
+          "index": 1,
+          "assetId": "b2073b2a-1405-4987-aa13-17b1a92c803f",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-refinery-grate-v1/01.png",
+          "sha256": "e5bcdc583d3c75b190792c8afc222b8334b624f89a643cef87dea71d7b35cbc8"
+        },
+        {
+          "request": "frontier-hex-refinery-grate-v1",
+          "index": 2,
+          "assetId": "c22a13d5-0e64-49ee-934a-ee1044e56bc0",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-refinery-grate-v1/02.png",
+          "sha256": "aab1e450fa2dee7f4d744816dc3b1fe7c9b6443fb0b947db5e8b40f1089f34c0"
+        },
+        {
+          "request": "frontier-hex-refinery-grate-v1",
+          "index": 3,
+          "assetId": "5709f83e-179a-4125-ba4b-b316a2a5319a",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-refinery-grate-v1/03.png",
+          "sha256": "b91a1ed990cf0739df93a2b30ef73ba9a43e84c613034ac92a4ab948cb00ee8c"
+        },
+        {
+          "request": "frontier-hex-refinery-grate-v1",
+          "index": 5,
+          "assetId": "c2fec152-8cb4-4d0f-adc0-64147ebe157f",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-refinery-grate-v1/05.png",
+          "sha256": "6c95433d88091e488f87777ba86b42c6bb80a231497c5e361ba46e4d548b8ffa"
+        },
+        {
+          "request": "frontier-hex-refinery-grate-v1",
+          "index": 6,
+          "assetId": "8921880a-14cd-4c24-b924-a44afcbac38b",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-refinery-grate-v1/06.png",
+          "sha256": "cc8219b190361393c5cace70a0707315355c77a9994d32314a55b6a209394b9c"
+        },
+        {
+          "request": "frontier-hex-refinery-grate-v1",
+          "index": 7,
+          "assetId": "dfba1b65-46eb-476a-ae31-195beca96044",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-refinery-grate-v1/07.png",
+          "sha256": "7d9b5d3df8b0d4f92f25ee9a24e7021b8c62cdf2bc870ddc2db7a2d7a6945f62"
+        },
+        {
+          "request": "frontier-hex-refinery-grate-v1",
+          "index": 8,
+          "assetId": "ca06ac7c-56b2-4928-a37d-2146f1c675fc",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-refinery-grate-v1/08.png",
+          "sha256": "a86c996c8ee1e395681381ec27bd0b15fb5a0843ac733f8c01357735748a5d41"
+        },
+        {
+          "request": "frontier-hex-steel-detail-v2",
+          "index": 0,
+          "assetId": "21ac60f5-6bc1-419f-985d-ff36e7900dca",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-steel-detail-v2/00.png",
+          "sha256": "6d34dae42cf55fc15f21713c001c40531c3fc634a46e59790336e1bff2f134dd"
+        },
+        {
+          "request": "frontier-hex-steel-detail-v2",
+          "index": 1,
+          "assetId": "96ca0fd0-c639-409a-92db-0e6fe0ce753a",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-steel-detail-v2/01.png",
+          "sha256": "c05055754d06523d88a45accd77cf1aa34e9555b1965477bbff78d3836ea60c1"
+        },
+        {
+          "request": "frontier-hex-steel-detail-v2",
+          "index": 2,
+          "assetId": "aa648c1f-c899-46fb-858d-575fc7d18bed",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-steel-detail-v2/02.png",
+          "sha256": "c51c2c48dc87cbd0cc6407f3ef3bb414e9c65264f12b4bb7100ee0b988ed4c55"
+        },
+        {
+          "request": "frontier-hex-steel-detail-v2",
+          "index": 3,
+          "assetId": "8a889f90-fccc-4bed-beaf-d5fca1e7558b",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-steel-detail-v2/03.png",
+          "sha256": "e8eb88e9fc7fa0b85b7b64a76ac479330c636a90266b9e83708c5c56f9bc8fe7"
+        },
+        {
+          "request": "frontier-hex-steel-detail-v2",
+          "index": 4,
+          "assetId": "3bdf408c-53bf-4183-8497-61aa8b4356d5",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-steel-detail-v2/04.png",
+          "sha256": "604f6751521787131ba8566a904141d561a31c857e549cbc8e987d85af0bbca0"
+        },
+        {
+          "request": "frontier-hex-steel-detail-v2",
+          "index": 5,
+          "assetId": "71353b23-748e-4996-b59a-160a6a3501aa",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-steel-detail-v2/05.png",
+          "sha256": "3cb5f218b7b6abc1701f72e158eb99452b75944d6304c6eef39a5e2ca6f8bae1"
+        },
+        {
+          "request": "frontier-hex-steel-detail-v2",
+          "index": 6,
+          "assetId": "50a7effa-7484-4d52-986f-b17829e05d48",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-steel-detail-v2/06.png",
+          "sha256": "8f3866b3092b6286c71e67eee1b483785b029870b6fe691b08a4c8358896cac2"
+        },
+        {
+          "request": "frontier-hex-steel-detail-v2",
+          "index": 7,
+          "assetId": "fb9c0d58-d66a-49a2-9516-cd23883c56d3",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-steel-detail-v2/07.png",
+          "sha256": "e4d14abdd702800cb9d7e886923855e6433cff6170a84c96b538b7f3ccbb3f23"
+        },
+        {
+          "request": "frontier-hex-steel-detail-v2",
+          "index": 8,
+          "assetId": "61bbb79f-2077-41c7-ad99-37a533e1e89d",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-steel-detail-v2/08.png",
+          "sha256": "4c89f2b8db7aa3b813cb5d1793d57d5264f929fe2ff1cf7b3fb8f5f620bb9e14"
+        }
+      ],
+      "GD": [
+        {
+          "request": "frontier-hex-meadow-earth-edge-v1",
+          "index": 0,
+          "assetId": "e338dccc-7596-4fb1-8af3-f0159ec80d07",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/00.png",
+          "sha256": "a7e0b718e3d1ec27c46e934472e74fb51872823cf43ac14d7438b65584bb1723"
+        },
+        {
+          "request": "frontier-hex-meadow-earth-edge-v1",
+          "index": 2,
+          "assetId": "29f63e28-b156-4370-a5d8-e2da9c68111e",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/02.png",
+          "sha256": "6059323fdadde0fadee5e7b4c5c770dc5bc33dc0aaad2326f147ee19f54b4a9d"
+        },
+        {
+          "request": "frontier-hex-meadow-earth-edge-v1",
+          "index": 3,
+          "assetId": "39693af2-69eb-43c5-815e-40a3cdfc260f",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/03.png",
+          "sha256": "16afe29e26c5184dddcace3d729a619e3f3dad6affe6d70df610b33ae0129071"
+        },
+        {
+          "request": "frontier-hex-meadow-earth-edge-v1",
+          "index": 5,
+          "assetId": "3b2de9e8-aedc-4a22-892f-cd1d9968c9c8",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/05.png",
+          "sha256": "faf4cc2a6116cb4f087fe23e7b54ed874646963ec91306db8f88d0d84ff2f55f"
+        },
+        {
+          "request": "frontier-hex-meadow-earth-edge-v1",
+          "index": 6,
+          "assetId": "d770d35a-7312-4b99-b4ba-223d7226031f",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/06.png",
+          "sha256": "c74797ca5a48ba940c4618c769de24f39ec50ecf5a69bd9ad70a32361e4fa2b0"
+        },
+        {
+          "request": "frontier-hex-meadow-earth-edge-v1",
+          "index": 7,
+          "assetId": "f954402e-60d6-48e4-b14f-73502ef8d815",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/07.png",
+          "sha256": "216036e69f72c037e91cee13d51215481eabb609e8c34d5b1444b78b0c7e557b"
+        },
+        {
+          "request": "frontier-hex-meadow-earth-edge-v1",
+          "index": 8,
+          "assetId": "4441aaee-2032-40dd-8f45-2e504899b493",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/08.png",
+          "sha256": "89c17f386141a3c67a506d45d687e1f0643b178fa83b7e24aa7c19480ae900bc"
+        },
+        {
+          "request": "frontier-hex-meadow-earth-edge-v1",
+          "index": 9,
+          "assetId": "abe5b48d-55bb-40a7-9ff9-807695a2f96b",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/09.png",
+          "sha256": "d0f1adfed355c301634b331dcbf19507dfc0954a4f7128a17c124f8d3918c163"
+        },
+        {
+          "request": "frontier-hex-meadow-earth-edge-v1",
+          "index": 10,
+          "assetId": "65a805c4-9ab2-4d9c-a559-4d916dcacbc8",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/10.png",
+          "sha256": "a23c0540cb5d1f2ed91bc70d620f482d97770b9e3d79d2120eaf451223f64a36"
+        }
+      ],
+      "GB": [
+        {
+          "request": "frontier-hex-meadow-basalt-edge-v1",
+          "index": 0,
+          "assetId": "5eb59893-5c94-4d23-b34b-adfdc9320198",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-basalt-edge-v1/00.png",
+          "sha256": "e8889524a457080a1015a825610bf49a40b52bef7f9a4689b51f1a16cfee4b79"
+        },
+        {
+          "request": "frontier-hex-meadow-basalt-edge-v1",
+          "index": 4,
+          "assetId": "b24e83c1-0970-453b-a661-25dea911189f",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-basalt-edge-v1/04.png",
+          "sha256": "099b7dfd7500bf7251c4f0aadfc6e0250518bb522a9ace9312399c6ed8729718"
+        },
+        {
+          "request": "frontier-hex-meadow-basalt-edge-v1",
+          "index": 5,
+          "assetId": "2cefa41e-90c5-47f3-8183-778fba7e053c",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-basalt-edge-v1/05.png",
+          "sha256": "c9a943a7fd12e08af5ba47e4f7cbc693eed11d8ded4a05ca61cd33cb155938ab"
+        },
+        {
+          "request": "frontier-hex-meadow-basalt-edge-v1",
+          "index": 6,
+          "assetId": "db3b06fd-e230-45cc-979f-5b83a0b8be08",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-basalt-edge-v1/06.png",
+          "sha256": "0a58a5deb18446c425c5d18850b0e9b4ff213ded9a2a8a8178781e5c36092740"
+        },
+        {
+          "request": "frontier-hex-meadow-basalt-edge-v1",
+          "index": 7,
+          "assetId": "6a79c899-29e5-478b-8c0f-7fa547b605fa",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-basalt-edge-v1/07.png",
+          "sha256": "ef38f37fbc5a2efe7f5ca3d957da70e28e93ba59b868cb2cf0733720d12aaa48"
+        },
+        {
+          "request": "frontier-hex-meadow-basalt-edge-v1",
+          "index": 8,
+          "assetId": "6e4b5e8e-4604-4d6e-be35-62145bac5371",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-basalt-edge-v1/08.png",
+          "sha256": "b1e032911efa05977cbcb44c2b434ab8be9e82377466d7c0aa0f8ba418b78d38"
+        },
+        {
+          "request": "frontier-hex-meadow-basalt-edge-v1",
+          "index": 9,
+          "assetId": "ddc98f4f-3c5d-4162-ab75-6f0d8795bfa0",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-basalt-edge-v1/09.png",
+          "sha256": "eeb323fe9fc68f7aa60293d92521af85688f894c579c80c9ff52009c944f2d07"
+        },
+        {
+          "request": "frontier-hex-meadow-basalt-edge-v1",
+          "index": 10,
+          "assetId": "4f42ccbc-b640-4fdd-b25a-fd4b6b898f3f",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-basalt-edge-v1/10.png",
+          "sha256": "4df17658712eba66a163216e09780746454fd698156f930103bb943f770e217e"
+        },
+        {
+          "request": "frontier-hex-meadow-basalt-edge-v1",
+          "index": 11,
+          "assetId": "14ddf8b1-9ef2-4e5c-acce-c113fa183966",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-basalt-edge-v1/11.png",
+          "sha256": "bc9d27af42df19eef2d874ad2a791296a5ec5258e0e2b1dd30ed611ce66f38bf"
+        },
+        {
+          "request": "frontier-hex-meadow-basalt-detail-v2",
+          "index": 0,
+          "assetId": "6b74877c-dbbf-4648-963e-8baaa3614099",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-basalt-detail-v2/00.png",
+          "sha256": "b35e29f49c8883bd1838dc39d8548542f594078f28a9aef61a227204f231dd32"
+        },
+        {
+          "request": "frontier-hex-meadow-basalt-detail-v2",
+          "index": 1,
+          "assetId": "5f760ff7-2e37-4211-b8db-297d2c31c1c5",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-basalt-detail-v2/01.png",
+          "sha256": "6f019974bfddcf306a47ab2b71f8466053c48a7229085d257c6483a8a23429e6"
+        },
+        {
+          "request": "frontier-hex-meadow-basalt-detail-v2",
+          "index": 2,
+          "assetId": "530e1df8-4994-40e1-ad35-cf981e4fc342",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-basalt-detail-v2/02.png",
+          "sha256": "adf4cc170ddb3bfe3111e430e52044f182e13ad1cafeb86b1bd16a29b555a6f9"
+        },
+        {
+          "request": "frontier-hex-meadow-basalt-detail-v2",
+          "index": 3,
+          "assetId": "95321cac-3e4b-45f5-b6ba-9222bdb98ecc",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-basalt-detail-v2/03.png",
+          "sha256": "5701ca094eb51d52551ddaac50cc8e6be3b6a75ea43050c1ab0a62db76fd13f4"
+        },
+        {
+          "request": "frontier-hex-meadow-basalt-detail-v2",
+          "index": 4,
+          "assetId": "8149a4fb-327e-4c84-9cfb-edf2784037ac",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-basalt-detail-v2/04.png",
+          "sha256": "664a8f8eef20e6399c89b7652708fd70b0f210d8259845c2ba5256d098bc2594"
+        },
+        {
+          "request": "frontier-hex-meadow-basalt-detail-v2",
+          "index": 5,
+          "assetId": "a92b3a85-ba39-4e1e-a005-49b5f32cbfd4",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-basalt-detail-v2/05.png",
+          "sha256": "5eca81470f3a30e267d07600e527cd38d54f5170607fbe7aba2e945f8e4fccef"
+        },
+        {
+          "request": "frontier-hex-meadow-basalt-detail-v2",
+          "index": 6,
+          "assetId": "3b627e71-1973-4259-ac30-d0645d6d89d6",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-basalt-detail-v2/06.png",
+          "sha256": "3774125ca4bb03f889eb01a86002fc637bd3df0c056aee3f8c665d963bca5878"
+        },
+        {
+          "request": "frontier-hex-meadow-basalt-detail-v2",
+          "index": 7,
+          "assetId": "639cb586-9139-43f5-9198-1402f1640d52",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-basalt-detail-v2/07.png",
+          "sha256": "9f780b9e3ef85f82cae9f09281ecdb755f86dbb5d06119f6d89d5b1e286ba77c"
+        },
+        {
+          "request": "frontier-hex-meadow-basalt-detail-v2",
+          "index": 8,
+          "assetId": "81584492-2136-47ec-a9a8-d2d39b990283",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-basalt-detail-v2/08.png",
+          "sha256": "4b32ab720aed9b5cbd6f7d7103332be929799946a4507c473c8868129943bb5f"
+        }
+      ],
+      "GM": [
+        {
+          "request": "frontier-hex-meadow-steel-edge-v1",
+          "index": 0,
+          "assetId": "394d19f9-b4c4-453b-86b7-8286fa8137c7",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-steel-edge-v1/00.png",
+          "sha256": "1342205b4b66f0a7eceac3d8b0b8f888f0052fb23c316a884dad9936487800bb"
+        },
+        {
+          "request": "frontier-hex-meadow-steel-edge-v1",
+          "index": 1,
+          "assetId": "94d883c8-9943-4be3-8a5b-cb332175e38a",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-steel-edge-v1/01.png",
+          "sha256": "5d38ef0f986f66286ef1687ede19371cbd38e801ca6d449d53c1c110f09ba618"
+        },
+        {
+          "request": "frontier-hex-meadow-steel-edge-v1",
+          "index": 2,
+          "assetId": "157d30e2-f218-4576-bc5b-4fa5d8cc118b",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-steel-edge-v1/02.png",
+          "sha256": "899195688c085d757d3e2a9cbeaea3b1c90c9797b582fc08b5eee5d20abcb732"
+        },
+        {
+          "request": "frontier-hex-meadow-steel-edge-v1",
+          "index": 3,
+          "assetId": "367250fa-accd-4782-aee4-5980428fb110",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-steel-edge-v1/03.png",
+          "sha256": "2a6f778e64e3fbe15c68c1db3f70c2071a8532189d9f0ff3e857fecd1c61ba21"
+        },
+        {
+          "request": "frontier-hex-meadow-steel-edge-v1",
+          "index": 4,
+          "assetId": "03ab3950-2ea4-4d69-9856-641c4e52cd34",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-steel-edge-v1/04.png",
+          "sha256": "d72d74181183cb9a9586b4bd3f38d8fe7088df207b1545c1032cb0efa2aca5cc"
+        },
+        {
+          "request": "frontier-hex-meadow-steel-edge-v1",
+          "index": 5,
+          "assetId": "9943eaaa-0363-4ca5-965b-eb61e9b17f79",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-steel-edge-v1/05.png",
+          "sha256": "dead218682268eb00938c41b3743e7d52ced8645310d4791d39dcac028bdeebe"
+        },
+        {
+          "request": "frontier-hex-meadow-steel-edge-v1",
+          "index": 6,
+          "assetId": "0a73b0fc-614d-477f-921f-fa2cc64e4779",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-steel-edge-v1/06.png",
+          "sha256": "3df7dd872ab6192ab6fa91fd86474f58c4ea911c865e65cf37745bfd49e44f35"
+        },
+        {
+          "request": "frontier-hex-meadow-steel-edge-v1",
+          "index": 7,
+          "assetId": "b24e83b4-886f-4213-aca6-e35ae2141877",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-steel-edge-v1/07.png",
+          "sha256": "4e2813073e3e03ce7205b3c393c8eeff8017623651202c8a75c47baa90d71852"
+        },
+        {
+          "request": "frontier-hex-meadow-steel-edge-v1",
+          "index": 8,
+          "assetId": "83105542-6ace-4523-b9ab-090edcfd6ee1",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-steel-edge-v1/08.png",
+          "sha256": "17f500a60677bae6f3adf201a19976a2a0927bdbe20504f2f5b77f9f88beac34"
+        }
+      ],
+      "DB": [
+        {
+          "request": "frontier-hex-earth-basalt-edge-v1",
+          "index": 0,
+          "assetId": "e642e8f0-d300-494d-aac7-53fd16cc21c7",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-basalt-edge-v1/00.png",
+          "sha256": "486613b22886de9d7e053d1c2b0d6b1fc74ae731a784ebc554d9957203dea98a"
+        },
+        {
+          "request": "frontier-hex-earth-basalt-edge-v1",
+          "index": 1,
+          "assetId": "6292e2d2-3422-4e2d-b372-a56310f16369",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-basalt-edge-v1/01.png",
+          "sha256": "f3c737e2b22e48f62cf7e72030b449632e04ac58644a9be30a3c1f5c9d5d54dd"
+        },
+        {
+          "request": "frontier-hex-earth-basalt-edge-v1",
+          "index": 2,
+          "assetId": "384ff128-61fb-4fdd-bd59-bec72f5828f4",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-basalt-edge-v1/02.png",
+          "sha256": "08c8fc88a96596eecc32cf61682fc18e38aecd6be08509050deb7917f96de82f"
+        },
+        {
+          "request": "frontier-hex-earth-basalt-edge-v1",
+          "index": 3,
+          "assetId": "b252784a-bcd0-4f9e-a767-15858f0d62d3",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-basalt-edge-v1/03.png",
+          "sha256": "5a5d80791d2eb34e3465a8084d9cd6d54dbf811be393af4b97dbcba42f40caa8"
+        },
+        {
+          "request": "frontier-hex-earth-basalt-edge-v1",
+          "index": 4,
+          "assetId": "8298785c-103c-4978-91c6-e6cf043ca676",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-basalt-edge-v1/04.png",
+          "sha256": "c9df9e2e3afb07c85f87953c82c2052ff27401cfb9f11d63fd8cda67d5e80b7e"
+        },
+        {
+          "request": "frontier-hex-earth-basalt-edge-v1",
+          "index": 5,
+          "assetId": "e77fee65-0b94-4e30-be17-d0637c5dbb43",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-basalt-edge-v1/05.png",
+          "sha256": "cc1120f6d2f58a111ac547465305511e1e681136bba3fbf71e9a4607be91e98e"
+        },
+        {
+          "request": "frontier-hex-earth-basalt-edge-v1",
+          "index": 6,
+          "assetId": "6196554a-e242-452f-aa93-d07946b01c23",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-basalt-edge-v1/06.png",
+          "sha256": "df55f691ded750e51f4feb71933e5e86254467eb3470a347792909e2a65cf81c"
+        },
+        {
+          "request": "frontier-hex-earth-basalt-edge-v1",
+          "index": 7,
+          "assetId": "78cc4193-560f-4f7e-a3c9-b6122dc44bf4",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-basalt-edge-v1/07.png",
+          "sha256": "2529ed5a0578e6405ba52717a8287db7c7efef2b1882111c91d2fc5c297061d7"
+        },
+        {
+          "request": "frontier-hex-earth-basalt-edge-v1",
+          "index": 8,
+          "assetId": "18265ab6-1a53-4022-bcc2-50fb04246b83",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-basalt-edge-v1/08.png",
+          "sha256": "ab1cb18fb0d23c371b952299a1b610246433d0afb290b8af48d6e01e410d0a6f"
+        }
+      ],
+      "BA": [
+        {
+          "request": "frontier-hex-basalt-ash-edge-v1",
+          "index": 0,
+          "assetId": "10cbc627-0080-45a4-8f19-023fbc13b41e",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-ash-edge-v1/00.png",
+          "sha256": "1962fcc8100b8b00e6acdb7bd9dba9a206be7ff6f5ad3961d589380a639896a4"
+        },
+        {
+          "request": "frontier-hex-basalt-ash-edge-v1",
+          "index": 2,
+          "assetId": "e751098e-c169-4de7-a502-a0287123cb8e",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-ash-edge-v1/02.png",
+          "sha256": "cbf94757250bb91f009d1912d2392ec388fe189a60bb00921dabbf983e730c13"
+        },
+        {
+          "request": "frontier-hex-basalt-ash-edge-v1",
+          "index": 3,
+          "assetId": "418a5681-cfe0-4f4b-bba4-a6dfd5433fe2",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-ash-edge-v1/03.png",
+          "sha256": "4f3bb6a12ea701f180edcba2ce46c42113bee86783d378d5047b18e0458d29da"
+        },
+        {
+          "request": "frontier-hex-basalt-ash-edge-v1",
+          "index": 4,
+          "assetId": "5a799055-1e04-4c2f-9b3e-161c4d7478c6",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-ash-edge-v1/04.png",
+          "sha256": "51d1aa783f51e20b0ec2cc0ab7230a0b3299cfb85ee8831e2853af5e3af2fc1f"
+        },
+        {
+          "request": "frontier-hex-basalt-ash-edge-v1",
+          "index": 5,
+          "assetId": "e5634e15-28da-49ff-982e-3f95a27f2dc6",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-ash-edge-v1/05.png",
+          "sha256": "379d0cfa36a89eba0179fefe4b9760558dc52f169cdac4a38e47216eaf6cc5ed"
+        },
+        {
+          "request": "frontier-hex-basalt-ash-edge-v1",
+          "index": 6,
+          "assetId": "faaba2fe-8887-40b0-8907-b071d7a6f031",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-ash-edge-v1/06.png",
+          "sha256": "6e1462e624aba8e3117765fd89298bca8d4df2e750e9a82495742c6e8fbf6a83"
+        },
+        {
+          "request": "frontier-hex-basalt-ash-edge-v1",
+          "index": 7,
+          "assetId": "e8b1f142-8ad1-4424-afc0-132127290275",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-ash-edge-v1/07.png",
+          "sha256": "6e418d09429a906686f42aa6c86cc9ece8b86ce2ee34c67551cb6befb0a23e38"
+        }
+      ],
+      "DA": [
+        {
+          "request": "frontier-hex-ash-earth-edge-v1",
+          "index": 3,
+          "assetId": "2dc52f6f-1d5e-4865-88ce-a202b17e7bc4",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-ash-earth-edge-v1/03.png",
+          "sha256": "cd38ec5a11d9e0a4a3588354e9fcbf240507b887b6c52810bf2ee54e5da207fa"
+        },
+        {
+          "request": "frontier-hex-ash-earth-edge-v1",
+          "index": 4,
+          "assetId": "2eecb769-42a2-4dea-8305-ab5ed31cf179",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-ash-earth-edge-v1/04.png",
+          "sha256": "1c7be2f4b545713a2c7572bc2dca2bfcff9ad5d24907baf651cd8c2d81c9d4c4"
+        },
+        {
+          "request": "frontier-hex-ash-earth-edge-v1",
+          "index": 5,
+          "assetId": "16696913-b61e-4ffd-8654-ec4c2398c7fa",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-ash-earth-edge-v1/05.png",
+          "sha256": "df1b4e25f68315b12494556d2ee885dc8103ebecee629b49690fd8b26285a9af"
+        },
+        {
+          "request": "frontier-hex-ash-earth-edge-v1",
+          "index": 6,
+          "assetId": "eda79924-c5d1-4ded-a38a-4e65826a103a",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-ash-earth-edge-v1/06.png",
+          "sha256": "0ad0a691ae025864906fcf3bef6115e3323f97c6b30be97e2d535d4ca7b192c8"
+        },
+        {
+          "request": "frontier-hex-ash-earth-edge-v1",
+          "index": 7,
+          "assetId": "819bdad8-62ed-43fd-8cd9-3ba613ffe816",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-ash-earth-edge-v1/07.png",
+          "sha256": "c5f8d82add10b158476cf89d235405aa8ed9316f9a7f506abb5c2920c003fde1"
+        },
+        {
+          "request": "frontier-hex-ash-earth-edge-v1",
+          "index": 8,
+          "assetId": "a5304a41-b899-468f-b6cd-85f8d79ef0e7",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-ash-earth-edge-v1/08.png",
+          "sha256": "8478a82f9df186d3cd687d413a8355736d33afe8f2648c3be21417c49a2eaf10"
+        }
+      ],
+      "DM": [
+        {
+          "request": "frontier-hex-earth-steel-edge-v1",
+          "index": 0,
+          "assetId": "e36c4324-f9eb-489d-8f21-2c12fc1028bf",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-steel-edge-v1/00.png",
+          "sha256": "0d7e3807066ac8807240ccde039e3719932bbd1bb3822fbdcda896152f47665a"
+        },
+        {
+          "request": "frontier-hex-earth-steel-edge-v1",
+          "index": 1,
+          "assetId": "d1120eb9-4972-4a87-961a-937b10a1964f",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-steel-edge-v1/01.png",
+          "sha256": "820ac5ef16bcb139616a75bc7fa2fa4ea26a5fab6f8a0ef26b70c5e529f21d78"
+        },
+        {
+          "request": "frontier-hex-earth-steel-edge-v1",
+          "index": 2,
+          "assetId": "96612e5a-a77f-4469-a150-2b84a7be15f0",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-steel-edge-v1/02.png",
+          "sha256": "0b8a8c14882fb3770b59056b8949f92b170c5a2f1cff44d07c3ad356d5f0b413"
+        },
+        {
+          "request": "frontier-hex-earth-steel-edge-v1",
+          "index": 3,
+          "assetId": "43da9719-2ae4-4576-a628-f329c7c8e286",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-steel-edge-v1/03.png",
+          "sha256": "54385029bfb94d90f06077cd558ae45538c3de6f4c63ca34f1d6b14de463da32"
+        },
+        {
+          "request": "frontier-hex-earth-steel-edge-v1",
+          "index": 4,
+          "assetId": "912b648a-0da0-4ae3-84a3-242f9fbaed6f",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-steel-edge-v1/04.png",
+          "sha256": "409600afeb81db4984a58637d7a9a5228eceba4e3d2ce3d4d5530779f28d9dc2"
+        },
+        {
+          "request": "frontier-hex-earth-steel-edge-v1",
+          "index": 5,
+          "assetId": "b04773e8-eed2-49db-82a5-d50453ab8e3a",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-steel-edge-v1/05.png",
+          "sha256": "2cccb40b2e26bba968b23cf4823a40e72e8daf49cc08fa4ed6387b3d0236b640"
+        },
+        {
+          "request": "frontier-hex-earth-steel-edge-v1",
+          "index": 6,
+          "assetId": "6b9f7112-dc39-4b52-8f77-9902fc4c0ac4",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-steel-edge-v1/06.png",
+          "sha256": "b30def5da9cec9d1e30067c7895de794de42a1be770a5536a7b16239af94994f"
+        },
+        {
+          "request": "frontier-hex-earth-steel-edge-v1",
+          "index": 7,
+          "assetId": "16b95d68-b6e7-4c03-ad1a-f43aea442b92",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-steel-edge-v1/07.png",
+          "sha256": "e3f7bd8ef2d76d7e014b32063a8be0399a73f646c66f7adbec5f3206196a3b22"
+        },
+        {
+          "request": "frontier-hex-earth-steel-edge-v1",
+          "index": 8,
+          "assetId": "191e7ca0-e5f8-4b11-bcb8-bc40239bc94e",
+          "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-steel-edge-v1/08.png",
+          "sha256": "4ae92478675fd019a09a3d73d43e084ca1e48f8d5e09a3da736d97bf0a93b5ae"
+        }
+      ]
+    },
+    "use": "selected top-face samples for seamless floor projection, graded to the meadow palette; raised side faces emitted on collision-aligned wall stamps"
+  },
+  "materialRoles": [
+    "G",
+    "D",
+    "B",
+    "A",
+    "M"
+  ],
+  "tileSize": [
+    1920,
+    1440
+  ],
+  "topology": {
+    "kind": "flat-top-hex",
+    "axes": [
+      "u=x-y",
+      "v=x+y"
+    ],
+    "columnStride": 96,
+    "rowStride": 96,
+    "oddColumnOffset": 48
+  },
+  "projection": "scene applies 45 degree rotation and 0.5 vertical scale",
+  "purpose": "one seed-pinned irregular island floor; water hexes are transparent over the coast resource"
+}

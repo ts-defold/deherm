@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_fdeeabb0-c55e-4070-925f-7810b7616b77",
+  "operation": "edit",
+  "prompt": "Change only Mud's southeast-facing body pose: plant both boots in a low defensive stance and aim the compact sidearm forward at chest height. Keep the same rugged driver, red goggles, dark helmet, brown jacket, colors, outline, proportions, and three-quarter perspective. Keep the feet on the same ground line. No muzzle flash, projectile, new prop, platform, text, scenery, or second person.",
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "9fdf7cd0-5dba-42eb-b1cc-d0de760e689c"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/mud-infantry-fire-pose-se-v1.json",
+    "sha256": "ff7468d2640d85ec244af9710b1d48717d1b21b59867fa663028b290ccfdf2c3"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "510d0d69-2fc7-4082-8dfe-74f4fa4e13b1",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 38,
+      "height": 43,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/510d0d69-2fc7-4082-8dfe-74f4fa4e13b1/image.png?v=1791532208399",
+      "path": "art/source/sprite-fusion/outputs/mud-infantry-fire-pose-se-v1/00.png",
+      "bytes": 3040,
+      "sha256": "029da438a0706cddcf7e284b7dacf6bc8d4473d8213cd750bc7f50d2198c3d5a"
+    },
+    {
+      "index": 1,
+      "assetId": "46e84305-8e6d-4bed-bd17-02a61a1fb249",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 31,
+      "height": 41,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/46e84305-8e6d-4bed-bd17-02a61a1fb249/image.png?v=1791532209535",
+      "path": "art/source/sprite-fusion/outputs/mud-infantry-fire-pose-se-v1/01.png",
+      "bytes": 2867,
+      "sha256": "59ca6264c31dde7b088150ac8ca1bb601055dcafc55098cdef0ecef46dde1ba8"
+    }
+  ],
+  "credits": {
+    "remaining": 1020
+  }
+}

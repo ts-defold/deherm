@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_4ea9491c-a311-4513-8f50-6f359cbf5cb6",
+  "operation": "animate",
+  "prompt": "A grounded back-facing walk loop with alternating boot contact and opposite-arm swing. Preserve Brass's older stocky silhouette, ochre cap, brass goggles, cream scarf, olive jacket, and low sidearm. Keep the full character and equipment inside every frame, with clear space around the head, boots, and both sides.",
+  "size": null,
+  "outputFrames": 4,
+  "colors": 24,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/inputs/brass-infantry-walk-pose-n-v1-1-padded-64.png",
+      "bytes": 3531,
+      "sha256": "d4055503083034595e9d6ec65c5134c779860ba3bfd2a057547fba6a079e8537"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/brass-infantry-walk-n-padded-v2.json",
+    "sha256": "fe5b167b09fe9368130c8108984fb9354aa893ea379372092b55f2d9c78c8698"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "05fbd6ea-f8e7-4c03-814f-1ce836257bba",
+      "type": "animation",
+      "contentType": "image/webp",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/05fbd6ea-f8e7-4c03-814f-1ce836257bba/animation.webp?v=1791563986223",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-walk-n-padded-v2/00.webp",
+      "bytes": 2294,
+      "sha256": "6406a700d429c89c930c08bfc2c22e6004b0ed827a03c84e99e1234b66cac94d",
+      "spritesheet": {
+        "url": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/05fbd6ea-f8e7-4c03-814f-1ce836257bba/spritesheet.png?v=1791563986223",
+        "path": "art/source/sprite-fusion/outputs/brass-infantry-walk-n-padded-v2/00-sheet.png",
+        "bytes": 2534,
+        "sha256": "d517efa2d8132596590611ce75748259780cb8b9bc81905668b2ef97a6165bf6"
+      },
+      "frameCount": 4,
+      "fps": 8
+    }
+  ],
+  "credits": {
+    "remaining": 105
+  }
+}

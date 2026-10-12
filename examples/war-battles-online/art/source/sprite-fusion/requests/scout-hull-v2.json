@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_32718179-b6d3-45f4-9c03-de19585629cb",
+  "operation": "edit",
+  "prompt": "Remove only the raised rotating turret, cannon and antenna from this light scout tank. Preserve the narrow pointed armored hull, exposed short tracks, exact isometric view, palette, outline and ground contact. Finish the top deck as a low armored hull with a visible dark circular turret socket. One isolated hull, no weapon.",
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/scout-silhouette-v2/05.png",
+      "bytes": 5060,
+      "sha256": "f22158b46cb622ebd8039e0425e3d303654a6befde98d98081656faefba1c370"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/scout-hull-v2.json",
+    "sha256": "bd0db3527361cea7e596e565d473e21c11f397009f4eedd3b3c0b8e7d4fb64ac"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "121b6fe8-4362-4485-8cd1-d2895b05d1c3",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 50,
+      "height": 48,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/121b6fe8-4362-4485-8cd1-d2895b05d1c3/image.png?v=1791432201252",
+      "path": "art/source/sprite-fusion/outputs/scout-hull-v2/00.png",
+      "bytes": 4533,
+      "sha256": "10e2ad00d7893daa6f427e1e57c9575a79d98a62e62d82d201ae8748f1e268d9"
+    },
+    {
+      "index": 1,
+      "assetId": "21f046b9-68a1-45cf-9ffe-ffe3b7535213",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 61,
+      "height": 51,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/21f046b9-68a1-45cf-9ffe-ffe3b7535213/image.png?v=1791432202299",
+      "path": "art/source/sprite-fusion/outputs/scout-hull-v2/01.png",
+      "bytes": 5695,
+      "sha256": "72d9d4b08e64dd927980483f2c09e022b59f3c003eb8b5a39212e3d9652193e0"
+    }
+  ],
+  "credits": {
+    "remaining": 2490
+  }
+}

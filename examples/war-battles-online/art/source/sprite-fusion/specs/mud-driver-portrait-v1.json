@@ -1,0 +1,10 @@
+{
+  "name": "mud-driver-portrait-v1",
+  "operation": "style-reference",
+  "size": 64,
+  "inputs": [
+    "art/source/sprite-fusion/outputs/rook-driver-portrait-v1/00.png",
+    "art/source/sprite-fusion/outputs/driver-portrait-base-v1/03.png"
+  ],
+  "prompt": "A communications portrait of Mud, a broad-shouldered salvage driver with an olive armored tanker helmet, a dark half-face dust respirator, expressive dark eyes under a battered visor, and a bulky rust-red collar. Head and shoulders fill the frame, three-quarter view facing right. Match the reference portraits' chunky military arcade pixel-art rendering, dark outline, and warm face lighting. A rugged masked silhouette, clearly different from both reference drivers. No portrait frame, text, vehicle, or background scene."
+}

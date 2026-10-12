@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_97293f1b-b22a-486d-b5e7-45c2e390ec5b",
+  "operation": "edit",
+  "prompt": "Change only Brass's southeast-facing body pose: brace his heavy boots and aim the compact sidearm forward at chest height with broad shoulders absorbing recoil. Keep the same older stocky driver, white beard, goggles, helmet, cream scarf, olive jacket, colors, outline, proportions, and three-quarter perspective. Keep the feet on the same ground line. No muzzle flash, projectile, new prop, platform, text, scenery, or second person.",
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "40f0c359-ea92-4cf1-9e04-6a6d658f20a3"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/brass-infantry-fire-pose-se-v1.json",
+    "sha256": "f7dbbe4381aa3a189c45e50050ddee1e571f43f95f744b50c29f379c66ada142"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "eb8e58b6-8d87-4a7e-bfef-80eba71f867d",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 45,
+      "height": 50,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/eb8e58b6-8d87-4a7e-bfef-80eba71f867d/image.png?v=1791532144301",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-fire-pose-se-v1/00.png",
+      "bytes": 4239,
+      "sha256": "19ad48c72048c4f4e82eb0c561ce4f2a998aea1985fdca6efb1e452eb7583eed"
+    },
+    {
+      "index": 1,
+      "assetId": "bc500016-f92a-4b7f-a6dd-563181e32c5a",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 38,
+      "height": 50,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/bc500016-f92a-4b7f-a6dd-563181e32c5a/image.png?v=1791532145506",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-fire-pose-se-v1/01.png",
+      "bytes": 4056,
+      "sha256": "dd62109ff1bf1d35923bc746a47d5bd9f0e5ed6d737c6711a3c6651a8823b8ab"
+    }
+  ],
+  "credits": {
+    "remaining": 1035
+  }
+}

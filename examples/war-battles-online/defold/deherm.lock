@@ -185,8 +185,8 @@
     "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
     "artifacts": {
       "hermes-host": {
-        "tag": "hermes-4e285d845536",
-        "fingerprint": "4e285d845536280998364cd901d538ccc1345de7ad443860d017fff3fdef99d0",
+        "tag": "hermes-35d2ed2efe6c",
+        "fingerprint": "35d2ed2efe6c877e52e974424b9f66cb60a7f788a631f754ad477f280f2313d4",
         "indexedBy": "host",
         "summary": "hermesc and shermes, per user host",
         "assets": {
@@ -221,39 +221,39 @@
         "integrity": {
           "darwin-arm64": {
             "asset": "hermes-host-darwin-arm64.tar.gz.integrity.json",
-            "sha256": "81d46294ec02167092d8891dfa4a7e15c1bb1bc9e3ad5b1399b3bfa0ddc0e8ac",
+            "sha256": "45be97dc942067ad59b4be13c3544a028d1957cac1c6c4e7b727299bc007180c",
             "archiveSha256": "32464ae4b49f5037962d07134cc0e8cd4b81787eb6fd8a2fba9255f00c6871e8",
             "archiveBytes": 2121118
           },
           "darwin-x64": {
             "asset": "hermes-host-darwin-x64.tar.gz.integrity.json",
-            "sha256": "bc26b28f8a3a025e5fee278e284c6d8850dea0bb5f5c2a9c9d0b7c2398f9fe54",
+            "sha256": "8673a22e245e48dcdbb34811ca6a52507ed6a7df451db44a8023af67dd3a9383",
             "archiveSha256": "0c56fed00f61a6f13294b0d11069e759f39779ec705319d262360f3783ad28a5",
             "archiveBytes": 2285959
           },
           "linux-arm64": {
             "asset": "hermes-host-linux-arm64.tar.gz.integrity.json",
-            "sha256": "4cd0a8e791e3c7892e64def9ad7d89bbf940df25e5b36e4a0a9eefb2038b4a83",
+            "sha256": "2d020ed264e70a4bcb3417c3efd5795d1f8ac82c7b1482a342213f21ae094be4",
             "archiveSha256": "b415b966e637d8365cc92bb642ec9410fd55128930111780624e7bfb71d5fb95",
             "archiveBytes": 3350282
           },
           "linux-x64": {
             "asset": "hermes-host-linux-x64.tar.gz.integrity.json",
-            "sha256": "cbfbf9eb7b58f60246f1ff287d176a6083f3af6028b536f0b22277a32b24ac06",
+            "sha256": "af66c811d15599556dd92b24bd9c3ab573b71eb7f2b631762a955995b449d619",
             "archiveSha256": "d19278790cea2e88a8b42812abe82f8216475772cc78aa89e4d3e0e490d420e6",
             "archiveBytes": 3391333
           },
           "win32-x64": {
             "asset": "hermes-host-win32-x64.tar.gz.integrity.json",
-            "sha256": "e70446cd54d43fbcee1433e7fc70d9b2808cf3c23e4c6d84ed1d78616d238a78",
-            "archiveSha256": "5ac44496312e22f3c787faf886d19b216d1ba24e44f99791e3cc7ef943556103",
-            "archiveBytes": 2324081
+            "sha256": "7af58054008587c516009cdb356e480e0f7be4f1795caaf836fe1af5f56f033f",
+            "archiveSha256": "e173c81352fe814ab8c87e4536792de0c3445959cac060933c16ff87d9f186b2",
+            "archiveBytes": 2324080
           }
         }
       },
       "dehermc": {
-        "tag": "tools-947589f92cad",
-        "fingerprint": "947589f92cad5aa04bb3babcbbccd7f35bc33462da5350ebb168a750c26a7c7f",
+        "tag": "tools-2fc387335a8d",
+        "fingerprint": "2fc387335a8df9d14737a09787462a33438f415cc630eb945ae71da63cb5d491",
         "indexedBy": "host",
         "summary": "dehermc, déherm's TypeScript transform compiler, per user host",
         "assets": {
@@ -283,39 +283,89 @@
         "integrity": {
           "darwin-arm64": {
             "asset": "dehermc-darwin-arm64.tar.gz.integrity.json",
-            "sha256": "cc0f93242c817a9cf03d05384c8d3188bf35de66885e796514b009031307b91e",
+            "sha256": "7baee8c0aec883191709642ff209770173e46178770062b7edf06288ef5ab127",
             "archiveSha256": "1c12bbbc10f54ff43730feb88fb2e97db73ab29f1ff7817982290a1fb443724b",
             "archiveBytes": 6815510
           },
           "darwin-x64": {
             "asset": "dehermc-darwin-x64.tar.gz.integrity.json",
-            "sha256": "7da8f4789baa5b7716499c60eb184bbe232e723abcb3c7dfc120a6ab33ec0fc7",
+            "sha256": "f25a1863e904261e158425c805271d37c7261e4c4ae994953d68668ef2375332",
             "archiveSha256": "9fad68e3c7a88783dc3b17e03224687dc59dcb3d50f50bfa2f9168a964654c7a",
             "archiveBytes": 7216868
           },
           "linux-arm64": {
             "asset": "dehermc-linux-arm64.tar.gz.integrity.json",
-            "sha256": "739d08d79de17d8116c80a390a9c809c236d6204e0d33fc8b55685cccceb4f4a",
+            "sha256": "b02906c1de3ad75526630cc1e607935daa7e17b83fcc424802112ce4835c1451",
             "archiveSha256": "91d1ad43e85b73103c040ecea3ebcd7a29bc1d7e06d1771550eae0f3c2faeb3d",
             "archiveBytes": 6576219
           },
           "linux-x64": {
             "asset": "dehermc-linux-x64.tar.gz.integrity.json",
-            "sha256": "bc9f9c0393fb06605845e3b1ae61d76e33d1278b7b05ac3fc60bb4b3029bb665",
+            "sha256": "01fc4c057fbaced955cf6833797ceb3a829626792ab412aabd30e0eb694f698d",
             "archiveSha256": "2d2005c7f47bfe9939e7de7e13036389a6bb54696d47b0c060bc5ec498efde1e",
             "archiveBytes": 7139922
           },
           "win32-x64": {
             "asset": "dehermc-win32-x64.tar.gz.integrity.json",
-            "sha256": "b0c0c830fd9fddc07cfcd175ade4dd85259e3fcbf2a1f91ed0934f233c8226f0",
+            "sha256": "7472f718a83a699c4f18ad0959fd991112c0aecdf628692d01d612d9a4daf277",
             "archiveSha256": "3cb8cf6b2cc7f1122b6b8db02f568d9f6837399fae81ab39285d0eac993c818e",
             "archiveBytes": 7269269
           }
         }
       },
       "native-artifacts": {
-        "tag": "libs-db900fc9f9d8",
-        "fingerprint": "db900fc9f9d8000427e944b544916b6277ab0a8f58034c52c25a0843b73a4ec9",
+        "releases": {
+          "arm64_sim-ios": {
+            "recipe": "apple",
+            "tag": "libs-apple-dcf85f379935",
+            "fingerprint": "dcf85f379935615d3796493f44967054d8aa4cfd697708641655c5b550ffc855"
+          },
+          "arm64-android": {
+            "recipe": "android",
+            "tag": "libs-android-25166c45a4df",
+            "fingerprint": "25166c45a4df98742545ce1730977cc31e197d28ee1017a3b42bf176a4c4facf"
+          },
+          "arm64-ios": {
+            "recipe": "apple",
+            "tag": "libs-apple-dcf85f379935",
+            "fingerprint": "dcf85f379935615d3796493f44967054d8aa4cfd697708641655c5b550ffc855"
+          },
+          "arm64-linux": {
+            "recipe": "linux",
+            "tag": "libs-linux-ee0720bc4a9c",
+            "fingerprint": "ee0720bc4a9ce37ae025217c1c0a915a2cdd41a916bb23461ce41260c616e48c"
+          },
+          "arm64-osx": {
+            "recipe": "apple",
+            "tag": "libs-apple-dcf85f379935",
+            "fingerprint": "dcf85f379935615d3796493f44967054d8aa4cfd697708641655c5b550ffc855"
+          },
+          "armv7-android": {
+            "recipe": "android",
+            "tag": "libs-android-25166c45a4df",
+            "fingerprint": "25166c45a4df98742545ce1730977cc31e197d28ee1017a3b42bf176a4c4facf"
+          },
+          "x86_64-android": {
+            "recipe": "android",
+            "tag": "libs-android-25166c45a4df",
+            "fingerprint": "25166c45a4df98742545ce1730977cc31e197d28ee1017a3b42bf176a4c4facf"
+          },
+          "x86_64-linux": {
+            "recipe": "linux",
+            "tag": "libs-linux-ee0720bc4a9c",
+            "fingerprint": "ee0720bc4a9ce37ae025217c1c0a915a2cdd41a916bb23461ce41260c616e48c"
+          },
+          "x86_64-osx": {
+            "recipe": "apple",
+            "tag": "libs-apple-dcf85f379935",
+            "fingerprint": "dcf85f379935615d3796493f44967054d8aa4cfd697708641655c5b550ffc855"
+          },
+          "x86_64-win32": {
+            "recipe": "windows",
+            "tag": "libs-windows-bd2f3b20fc31",
+            "fingerprint": "bd2f3b20fc31cbf693fc733cc92cac55844a831fd78416c01729baa2cb8b328d"
+          }
+        },
         "indexedBy": "bundleTarget",
         "summary": "Hermes release/debug libraries plus generated target config, per Defold bundle target",
         "assets": {
@@ -385,63 +435,63 @@
         "integrity": {
           "arm64_sim-ios": {
             "asset": "hermes-arm64_sim-ios.tar.gz.integrity.json",
-            "sha256": "87e1c2447cef61abb14674499f0c1201f6224ab5637032305f0ea15e818c31cf",
-            "archiveSha256": "3941f0310a94c3af9f303987a150893391039b52e82e8864dcf6b3763fc53441",
-            "archiveBytes": 7274963
+            "sha256": "a6a55f5a3dd5d00a788622021d24561c7e108de36c60fa817892a84cd8e741c0",
+            "archiveSha256": "ad7524c4a082e5a7eb42f8ef67f282c285197f8985bfb57aa1ed9ca8dd27386b",
+            "archiveBytes": 7274758
           },
           "arm64-android": {
             "asset": "hermes-arm64-android.tar.gz.integrity.json",
-            "sha256": "0e441695152f2bbc3b8b6f27015c335ce889f7b31d1d0cc6984d5021e4ea9324",
+            "sha256": "8e6eacafad05634ea5ade5bce0a7a1b257c13e67030e999d11c475fa126ef954",
             "archiveSha256": "44bbc3185c9053ad2e3f4d60204921bfc6ea9c58b2a5097c198c49a6f4725ed9",
             "archiveBytes": 90221542
           },
           "arm64-ios": {
             "asset": "hermes-arm64-ios.tar.gz.integrity.json",
-            "sha256": "6f46d604cb8964f47eb9611546dfa725e25e11709735ac8c4d42597c835817b7",
-            "archiveSha256": "88dc56f140f6bda5074d9f62cd78f485a928bfc59f9b36975ec2e5852ff0672c",
-            "archiveBytes": 7256633
+            "sha256": "e3ac07ee776c7bdb7a6f6ee4e01f72273cf794f80999798e58b1a009e8db6da5",
+            "archiveSha256": "62ac1d6945c5b35ef1c91190ff399e727f9bcaca050031fc8508a4e017921616",
+            "archiveBytes": 7256684
           },
           "arm64-linux": {
             "asset": "hermes-arm64-linux.tar.gz.integrity.json",
-            "sha256": "a9e0bec167e838f0a7c0668a91843edcbd7983415f455516495305ee810f55e9",
+            "sha256": "13096c4088c3c32ec51487713d72fdb73c98022fe1bb0645388975042f287a83",
             "archiveSha256": "85f27de7a7d98c6998f49d6ab5fdb77d96790857f5c51376827dd984972c1e56",
             "archiveBytes": 38216220
           },
           "arm64-osx": {
             "asset": "hermes-arm64-osx.tar.gz.integrity.json",
-            "sha256": "3b3312467c420680d86a1a6950547815fbf2d6ddcc35e32e64d854c256179d01",
-            "archiveSha256": "036a03453b6646c86876fc4a8dd97d7908bae392e7d29f757b13df904073c6c8",
-            "archiveBytes": 7275357
+            "sha256": "80003d80f81d68b7515201421009a5fc5abb44218e5b6ea0564393fe4a23bc44",
+            "archiveSha256": "b9c5203b41fe256446a08376b5ed1abc3712fffe9c34658a5026d07fc56b7bba",
+            "archiveBytes": 7275168
           },
           "armv7-android": {
             "asset": "hermes-armv7-android.tar.gz.integrity.json",
-            "sha256": "813d30d10e9ab1a7450a0a3ce4db69d9a25f18b1e366885784c62f4910fa278c",
+            "sha256": "a47473a4935d731f99026babd0689345b2428c6f15e4a58debe5d712961c5901",
             "archiveSha256": "b989d68ce1a865ac822dbce4661ef8c1dbdd3f3ab40cd482ba7610a496c832fd",
             "archiveBytes": 83678133
           },
           "x86_64-android": {
             "asset": "hermes-x86_64-android.tar.gz.integrity.json",
-            "sha256": "6afe15341cb06e91472bc033947fcceeb7ac2ece91e9255b5228e81786615c17",
+            "sha256": "07e14a78e2f369f0a9015735c75039285d503d7f822037bf0f6200beba4e375d",
             "archiveSha256": "c4b59a35f29cb0e67c38c1163352321cb4e0ded0272f96c995ed47014abc9760",
             "archiveBytes": 87773951
           },
           "x86_64-linux": {
             "asset": "hermes-x86_64-linux.tar.gz.integrity.json",
-            "sha256": "53f40d656c60db6bb6392415722dbcfd20498938a153cc222ed6dbbd13ffd158",
+            "sha256": "61f226942428f8523161f6678f6f1510cd4eb9760ee8d02bea9a7293c7c616f7",
             "archiveSha256": "34528f90e1b1228fde0f565499c6a6c38f5f00244828aec0fca4411c2aa33f9a",
             "archiveBytes": 38396994
           },
           "x86_64-osx": {
             "asset": "hermes-x86_64-osx.tar.gz.integrity.json",
-            "sha256": "b2b4beb8c1b37020d06a848b0ef3b4a3a405284281398e0561d302ed748af3a7",
-            "archiveSha256": "c09906a241ee488b50a91da6bd91ed86f9b7ff5451c4929bba1a0ace3fc70292",
-            "archiveBytes": 7500847
+            "sha256": "24b3f31c6260959f8d778fdf47bd8546e6b5a73283943f28cef8d9eeaf429a94",
+            "archiveSha256": "593303eecfce87dea25b85f0f31cab538f6396c643aab676f2d688337a98dcc9",
+            "archiveBytes": 7500487
           },
           "x86_64-win32": {
             "asset": "hermes-x86_64-win32.tar.gz.integrity.json",
-            "sha256": "5d0d5366cd684c3501d1dd4abe165de8e10820eb397c932e63617613a38de05f",
-            "archiveSha256": "d7f39e531f224b9adb01fdc51b2e0540e9f192557ed9d3e442f4456f1bda5896",
-            "archiveBytes": 11221532
+            "sha256": "6c26a19ea69f251135a2a155d664f34452cf4b3a827352c7d99a3dd35b10f22c",
+            "archiveSha256": "ebca08b900c2b448e4e081bccd22ef43bad8816efbadec252656d33c8553a8b6",
+            "archiveBytes": 11221629
           }
         },
         "compatibility": {
@@ -465,7 +515,7 @@
         "script-typed-native-bridge.ts": "9bb322f341469d6c5f3926f478325d34ac5f822051387ae3837964fade630916"
       }
     },
-    "cacheKey": "f57afefa5839f03a7f3a0e13ecbd1ed59d8238eb1242c07655a4da924ef5206a"
+    "cacheKey": "1d6c802e40a9a95cfbe287f5ae93801563728b5929e208635b343fb83ad5b61f"
   },
   "defoldResolution": {
     "schemaVersion": 1,
@@ -475,8 +525,8 @@
     "evidence": {
       "archive": ".internal/cache/arm64-osx/build.zip",
       "platform": "arm64-osx",
-      "size": 9252202,
-      "modifiedMs": 1791086531915
+      "size": 9252267,
+      "modifiedMs": 1791390309715
     },
     "via": "deherm-lock"
   },
@@ -485,9 +535,9 @@
   },
   "generationMerkle": {
     "schemaVersion": 1,
-    "engineRoot": "02efe4eb196bb0ba78f5a90a95d19225dc27ba50587e796188ef5e5d6bd04852",
+    "engineRoot": "5fd59954b09901f54b0e67277f115c33f1b6c6178f8ee5083b9a689ba1fb4ba0",
     "nativeRoot": "ece4919f47d946e3499304d9a706fb626e97d7f85dfad41a07b2f3c76959725a",
-    "root": "da287e741d02ace4e1185c957712263d5a45086fc3c09c272dd964c62cfed27a"
+    "root": "41e44375fea54b6d0127383a04b1f1c04122f45bdd8c410f60980b887306b2cd"
   },
   "inputs": {
     "valueLayoutsSha256": "a70876547c5c36d0dde6d6a3bf2e51c46dc0d00de6e46918eb01f82b149c7de3",
@@ -508,13 +558,13 @@
     "resourceSchemaSha256": "8115043c9dc8626b254bca01ddbae853a1a4ebfec709d703eacee770ffc7c970",
     "resourceNamespacesSha256": "9893e932b1e41d3064e95c12812884b62456857c27e16274fba3671941e2b728",
     "toolchainSha256": "589ef36b86889b849de798c841ca64230c1729c64252ed040d8df272c2c549a9",
-    "sdkSourceSha256": "876ebff33f8d0e0d3a719c20d0fab8b24994186542a96d64e4d2eedafc2a9488",
+    "sdkSourceSha256": "67203b2deab6a529c3e646ea836aa71802f56ea6d0d423fd3dc1fe4313012a4c",
     "repositorySourceSha256": "166f6dfc741b1ac4225d2c7dddd28361366f7d26d1f08f08a1d0c83e75e91f80"
   },
   "generatedOutputs": {
     "output": {
       "script-contexts.json": "1213eb463159030657c9a36b20d2ee06881568355c270a88f0a5622612448eba",
-      "generated/native-extensions/index.json": "4de8a82b35f553d3c1b1dfd8150804e17c093c04cf51235bcd3f0c9aa3070d82",
+      "generated/native-extensions/index.json": "c15912f66416b96c186f4b6de78dfa9cc5228e89eb7a7c8f34d5f7692a336572",
       "sdk/contexts/shared.ts": "e0b43727cad1a334e6d175868002d3338ef2b2c2942884c7a3d754d4c888a928",
       "sdk/contexts/game-object.ts": "ca052dc88c29c0a88aaa168d3ea5eb62c0d00d00f86454f045ee03dd421d5d58",
       "sdk/contexts/gui.ts": "3f2d965cb4eb3f0d8625d7edcb92c8b552b2a68db74a80d78178c91723f262b1",
@@ -533,13 +583,13 @@
       "tsconfig.deherm.json": "0666a9440af963a2797ddb9ecea8cebd95783bfe0ce2f6a6b8c614b25ce4c6ba"
     }
   },
-  "generatedSdkSha256": "23180ca4fb547554545a5c766198a24308734531787af0e6d4fd97cdd4ba4c2f",
+  "generatedSdkSha256": "1b6b00fd3d9722b953e3f51f9615654ee35daf41b204125664a22e8144fcae15",
   "nativeExtensions": {
     "headerCount": 0,
     "generatedRouteCount": 0,
     "blockedRouteCount": 0,
-    "keyedOutput": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05/f57afefa5839f03a7f3a0e13ecbd1ed59d8238eb1242c07655a4da924ef5206a",
-    "treeSha256": "4bf0eef896b4166cfd8776d23ecdc829443af14613c607a602d5b58a670b40e0"
+    "keyedOutput": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05/1d6c802e40a9a95cfbe287f5ae93801563728b5929e208635b343fb83ad5b61f",
+    "treeSha256": "9d79be096b7cac37fc742de6e274ebf99c19b2b8a1f5dc988b6436b2fd0fee38"
   },
   "engineProfiles": {
     "source": "defold-default",
@@ -596,9 +646,9 @@
       "deherm/app.dehermc": {
         "kind": "bundle",
         "resource": "/deherm/app.dehermc",
-        "fingerprint": "0d0467c037255c6412e0e133eb9bc8d2795e43951b269d4b25065b63274ffb3e",
+        "fingerprint": "385d1e658f646bbc1f172f589ab991c79022630f022f19e8c2a24644eec5d16b",
         "outputs": {
-          "deherm/app.dehermc": "e24e93f24c7cd6f601659c2d25c38e19c0ad33668993cc64af26a08731eb363b"
+          "deherm/app.dehermc": "2aa2df7da951ece0134ec88dd8e0bc460b365966f9a8f441cd85b0f57985e953"
         },
         "build": {
           "entryPoint": "main/player.script.ts",
@@ -616,15 +666,15 @@
             "deherm": "0.1.0",
             "esbuild": "0.25.10"
           },
-          "syntheticInputCount": 1
+          "syntheticInputCount": 67
         },
         "sources": {
-          "digest": "94f27ffda49adfcc8aa3da503f7a8691e4509f3d122362e010d25ab1fd02f84a",
-          "fileCount": 83,
+          "digest": "95d16528a728e0ca7cffff2b84d0d6ad02eedd4bc8bc4dfb9d85383092ecb63f",
+          "fileCount": 92,
           "files": {
-            ".deherm/generated/components/registry.ts": "96fbe184ec66aae6b2db44abb80e811b88fa9e9f43359c14579222b4703bbeee",
+            ".deherm/generated/components/registry.ts": "939a66efd7488835968f3c9c59857435aabb29740e54c867a690ef08d083d637",
             ".deherm/generated/dmsdk-call-symbol-index.json": "4115ce6b1d8a256f1a954047808e3601a53898679e24b0fc3300e770704cd99c",
-            ".deherm/generated/resource-symbols.json": "9c31808360399e9f6a7a1445d8098bbb14e5ed60b2f57b7603de01ed42f13056",
+            ".deherm/generated/resource-symbols.json": "d49df504862dd6e7f83aac5e474d3ceade6fa0088ac116b89fd38957c77fb485",
             ".deherm/generated/script-route-symbol-index.json": "634553382b39fafa897eb8472529da42d78a9fb4b1cc69933dede3f4624f3a35",
             ".deherm/sdk/address.ts": "78595c555cfff5fd054010b275a071c8f37887711bdd7e7c215f2b4a8c80cfcc",
             ".deherm/sdk/component.ts": "d55d7eec24909bc27bc3d7213b53722624e1b9b46ad5278240a6460cb98337bc",
@@ -658,7 +708,7 @@
             ".deherm/sdk/generated/script/overload-dispatch-target-support.ts": "5aaaa6feff48b476caa22535e5e84a92afcaf41234a658eaa13c9c14988db37d",
             ".deherm/sdk/generated/script/runtime.ts": "d1ea23efc516baddf661c9d89f3dabfd0b1016a641365e7b91d8cc7576749072",
             ".deherm/sdk/generated/script/table-record-bindings.ts": "b207593ee61f9932240e3f6c282d257e9a4df58636d226786650390cc9f7abb4",
-            ".deherm/sdk/generated/script/types.ts": "d62184ab8806c7588b068d36e3776f9c93b5c5e4784025bd6ae55d7b2cefd2ae",
+            ".deherm/sdk/generated/script/types.ts": "ade8e98e9f8e19d834f8205869f04c33eda65dfc0a41a8d7fd20460a0ab9a2cb",
             ".deherm/sdk/generated/script/universal-value-bindings.ts": "8d1a08c40996df35e2b35c070022948c90a70a3409e64f46d8b5ae40d9b8342f",
             ".deherm/sdk/generated/script/url-target-support.ts": "2ecbbb9dbd99069feeff111bea8f8525ea510dcf3906c2226120e1b4c8900395",
             ".deherm/sdk/generated/script/value-tail-target-support.ts": "b53f885a0948fbef97230b46571f4e5a9a61f65905dab8ec2abbf44d1533b192",
@@ -669,40 +719,49 @@
             ".deherm/sdk/module-runtime.ts": "20b47106508e1b9a9c4ab91f4690b14bd37f50b2c86e4bcd5c8df39d0e2c6d36",
             ".deherm/sdk/modules/defold_webtransport.ts": "152fab21442eecdf67d95f193cba8d816bf27a0a4e61612a40b5ae3bc2979dca",
             ".deherm/sdk/runtime.ts": "84a733642d38d5887bc16b1f472c5f1834ba8dc69928e8eace97cebe6ecf8988",
-            "main/arena-landmark.script.ts": "0e2d80a091cf85308c812db988b416fff57267f981fa29edfce5cb1cb4fa5574",
-            "main/arena.script.ts": "07e8c11244eaf952371db9e6526396e5710ad6b52cd73e3aa4a7c2a6d42ee8cb",
-            "main/camera.script.ts": "638aa7c37692faf398f6ec13231e6b6885c37e7ab7990bc033b7d037033690b3",
+            "main/arena-landmark.script.ts": "9dc6845dbb478ea8c45842e43ac9da5ea62645ea4fb42b32d9b4ff2c9535be5c",
+            "main/arena.script.ts": "181830ac056130460aeea50fede4d3fba37d932b82be1cbbfe17e4b86a44b335",
+            "main/camera.script.ts": "7f4be40b6cbb87bbb617a7f089dc0d2ec5c756e2f0eaa31b5f37cc1664640d86",
             "main/pickup.script.ts": "a3d751d7f3776a88e877256913df446d6f94c43c5b9d07e6d7cb9629ca11e537",
-            "main/player.script.ts": "69e0f0fe1d8823bd0f215a3231a3d2a36d361398b5f67036ee64a239b3befa90",
-            "main/rocket.script.ts": "d4a86b93a0cbed7ff917a3211932d5eb241a36b2dcbaea675b40ffdc9789a1ac",
-            "main/tank.script.ts": "9e6c0aebcae098513aa2af208e7e5df15f9cd47d49538a53df43f931f99f667e",
-            "main/ui.gui.ts": "3d376f00bdf338d846100722cf163025b3ee8ab5622d96d80fa1d7092aa02b1d",
+            "main/player.script.ts": "93990b7a1b999e6181a0307daabf48e07e411302a6356ca81e32d2eeef1d494b",
+            "main/rocket.script.ts": "d556933b9e6170247155bbcecb21859b4590782809e1771d039fcd16bccbbe1b",
+            "main/tank.script.ts": "4baa909e78e064ab0431ff52e0f08da1b6a6516c7822d33b1cacc9f646420541",
+            "main/ui.gui.ts": "8fb777f56b1b7299df1c564068a7000f96e4d357595f2031281e68600eb75257",
             "reference/battle.gui.ts": "dd62661cd377a1ab2fa6f28ab3963045dc09dbac9b22f990b7bf3195174fcae9",
-            "src/arena-match.ts": "60df90351bd083af57cda610f3bfc030f634da5157e646c2646fb0a8f3c92297",
+            "src/arena-match.ts": "a2f6b4ac651f1efd518339f7217c86f7edc4ff98c5286bd21d44dd4610a76e6c",
             "src/capability-snapshot.ts": "1cc3bcb6342ff5dbbe53769645d426bb24e0f99eec5067a3995762e091625bf7",
-            "src/generated-arena-art.ts": "33f050ba2ccb7e415074bc250c2322cb2faf2bf2020c66085649e9b7ab0f977c",
-            "src/generated-tank-art.ts": "2d0cb151ee40e484bac7d5cc3055aa6025015f5a5736ca09ecd06e4f0c59ebce",
-            "src/generated-war-battles/arena-visual.ts": "d45bd45dc628f1c31cb287ade0aaf4c3c279287261db4b90c9c2be619a7411b8",
-            "src/generated-war-battles/arena.ts": "8c0d746798337b9f4a7c63c1a5336197c3d95a8314bebccfd6ad9161d4ddc6e4",
-            "src/generated-war-battles/bots.ts": "02b4e438139a60b36044a034f2cf4c54e993286db513bfe93691d82ca97d6e24",
+            "src/generated-arena-art.ts": "bc0c6889cfd5fae6b8e84d2f9fd991f4da475a3f2cd806ac6fb1896a6e7a5609",
+            "src/generated-hero-art.ts": "64b9c81088cd26513b18f47c0a8559b3b3a8e1ac43ba080b772fc3a0aaeb1d5e",
+            "src/generated-tank-art.ts": "7f9e12b72bf1523d24c62ee09969ef4ca94fcb07c2801e068ed49b8e100351cd",
+            "src/generated-war-battles/arena-visual.ts": "9ae01097b13021ad02161b7db3ead9e6422a22ebe239ee9e2f087ce46847f82b",
+            "src/generated-war-battles/arena.ts": "cd36fb59c332d16be6609344b31e31e91ee41a22f761b6a515e74a69ca334b45",
+            "src/generated-war-battles/bots.ts": "f8e7c84b93fd95df5e9bbe28198ad0b839faeb41ca7d860ec9f166a07b75e259",
             "src/generated-war-battles/browser-websocket.ts": "aff36c8e49dbf1415922702b6f7bc0cba0b83cc3c91e965e9515733205781528",
-            "src/generated-war-battles/browser-webtransport.ts": "ad547e7a7138b1ea6bb11d14417aa08b5a8bb9eadf03ef65c0da1c7b9d1a4c4e",
-            "src/generated-war-battles/client.ts": "c3f8262392bcacc62b8344add092f9040ed743875cecccfc1f61bb765bf4c625",
-            "src/generated-war-battles/constants.ts": "c0eab2ce4e07a9c27e327be5e22f14710f252b42d49155b328a3d6034110f40d",
+            "src/generated-war-battles/browser-webtransport.ts": "d1931f8f72e63da9baa26b4808df034bbd78ea32ba900182535cc437e276c84c",
+            "src/generated-war-battles/camera-framing.ts": "ca705f481c1575d7b554e7f75aebfa836cb0115cdfdc067fb966541d38eeba54",
+            "src/generated-war-battles/client.ts": "0c1405e1cfb5a2855365ced52d18203a225700ba6554fd2664276e8132f52638",
+            "src/generated-war-battles/constants.ts": "a36634250288a4b836428ecba7e796421ae615908c02fa32343f8a7e79c36b3d",
             "src/generated-war-battles/content.ts": "b95ef0175eea497ba6f3689686ce848e875d439bd4ac5865fae6da190d1e322b",
             "src/generated-war-battles/events.ts": "f6dbef6f45fd8c485017971a6b6d8284be0279b55ae6188d859a9d2af95bf453",
             "src/generated-war-battles/fixed.ts": "d0cf2a0d5341ad92a878926f0164c00ec6627edf66b533fff8776fbc4ea6e654",
-            "src/generated-war-battles/index.ts": "51f9c7650946c1d6c660e4691a295ec627c3227ce3a91fb251b1d958b0c49e41",
-            "src/generated-war-battles/isometric-direction.ts": "6a2500361b978651aed5561e0b04d34cc0f0f3ec45b99b299c5532883d21fa1e",
-            "src/generated-war-battles/isometric-projection.ts": "1708a2acf945ab12e5960562d2e4c31f2f287a1626851e16be2717411c869282",
-            "src/generated-war-battles/playable.ts": "f509d1e4db144daf49fbef757ca8bbc82d657f79755ee5fb24b5315193c7ad50",
-            "src/generated-war-battles/protocol.ts": "ad1529068d8a5a5e061e4b9b25b1256521102599d8186c5d0c5351bb5878f92e",
+            "src/generated-war-battles/hex-cliffs.ts": "470f77ad0aba262f4a45d898a696715dba44e133a29b668b3e417fc63364e71f",
+            "src/generated-war-battles/hex-landscape.ts": "8aa3c67a63e9dc85f2e56eb6d20da298b363a3ce1de83adda49878290c6e21eb",
+            "src/generated-war-battles/index.ts": "61d525d7e1586086a0cbf9e6fb43906277b1f2693d8271641668a5c2e43b4598",
+            "src/generated-war-battles/isometric-direction.ts": "2d9c24dcf7ff7dd45c8351dcd5fc07667fab9b1c809ffff80b61c3af994d8abe",
+            "src/generated-war-battles/isometric-projection.ts": "40246555bbcfa984f57b9d596c682aaed8d1016d2eba9e8aefd534a6a245bed8",
+            "src/generated-war-battles/playable.ts": "12599307a47dd97303faf35e79c79c8360be48214282ff6ea1eb519a1e321b66",
+            "src/generated-war-battles/protocol.ts": "d79353f7cabb47c6b00e06a1b5064904af6a2e603c02124471b2944bc91ed7c3",
+            "src/generated-war-battles/remote-lifecycle.ts": "ab163f8e0c567d7352ee271dee744238016a9a55c8a75eb545d2aea95fa42082",
             "src/generated-war-battles/snapshot.ts": "3c3be12bdb0bdeef30f80ab5f571f01b5ff625eb397a57a43ca191b52762c8d6",
             "src/generated-war-battles/ticks.ts": "56af336a2159b003bba8c8983d4f68632e1ea1b4f92b0a8334e9ef52e31ac610",
             "src/generated-war-battles/transport-selection.ts": "b1240eb8d85506a796d4ffb3d93be5349bb6020fc5b71d023c4f4723abf5e27e",
             "src/generated-war-battles/transport.ts": "d3c70fce2e4dbdeb14398b04a942a0b1364103d3c2c4c00612210e987e07f86f",
+            "src/generated-war-battles/virtual-controls.ts": "89211c3aaf86abc72d32adf6045859acfd1837d3e6b3c352c37261c50a132c02",
             "src/generated-war-battles/webtransport-framing.ts": "83575e5c22780b5fd8dc705488c0f529cdfc6b3c5cc308d59b54900acc793884",
-            "src/generated-war-battles/world.ts": "8a6605c6d7cbbed9f29df5e834d98797b42d22e2e5b40d3eb018e05e609aa380",
+            "src/generated-war-battles/world-plan.ts": "23c72addab3beb2fcfc4d1663a2f079294816f715de28f54bf25c679554bc1e5",
+            "src/generated-war-battles/world-visual-footprints.ts": "28c532b1ba5d1daf7648e797a14f1bdde44bdd1935dda98f81e60e52a7da7bc9",
+            "src/generated-war-battles/world.ts": "295d4590d4798a986ac8ed3c5c4c7627fa18f29e3ed72c6dcbe3506b71cb2d31",
+            "src/hero-presentation.ts": "76f501bba4077f5c58796f4f971618a00560fd1fe27a3273e1c293f56f769910",
             "tsconfig.deherm.base.json": "0c877d4615c6356293850c647d0f603d348803b80030dace8bf8f887c7c26b36",
             "tsconfig.deherm.bundle.json": "042637c2c0cf1ac36dc94bbd49bd607e12ae7bb0a79bb5e9c52923b96d1e65b0"
           }

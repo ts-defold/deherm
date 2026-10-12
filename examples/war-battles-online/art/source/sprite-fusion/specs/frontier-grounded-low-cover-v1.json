@@ -1,0 +1,12 @@
+{
+  "name": "frontier-grounded-low-cover-v1",
+  "operation": "style-reference",
+  "size": 64,
+  "inputs": [
+    "defold/assets/derived/arena/landmark-tank-wreck.png",
+    "defold/assets/derived/arena/landmark-scrap-barricade.png",
+    "defold/assets/derived/arena/cover-sandbag-a.png",
+    "defold/assets/derived/arena/landmark-conifer-broad.png"
+  ],
+  "prompt": "One low, irregular earth-and-stone defensive berm for a three-quarter isometric arcade tank battlefield. A warm brown soil body with a few dark slate stones and small olive grass tufts, grounded on one continuous bottom contact line. Match the references' chunky outlined pixel clusters and muted military palette. A compact obstacle only, lower than a tank hull; no raised hex platform, glowing lava, tree, building, vehicle, lettering, UI, or scene background."
+}

@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_a46df114-0753-409a-af87-f3217c65b3d2",
+  "operation": "edit",
+  "prompt": "Change only Mud's body pose to a grounded southwest-facing three-quarter front walk mid-stride: one boot forward, the other planted, opposite arm swinging, compact sidearm low. Preserve his respirator mask, ochre helmet, orange-rimmed goggles, rust-red scarf, dark olive jacket, rugged build, original colors, outline, scale, and exact source viewing angle. No turn, extra person, platform, text, or scenery.",
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "034d538b-3e26-46fb-9af6-8edd673b97ed"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/mud-infantry-walk-pose-sw-v1.json",
+    "sha256": "05e75e72821b38062ea2d136daac19ceaf6a51857014a3030f15c6d6008ee5d4"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "e9b4af2d-3ad2-4870-8939-2f74abcf00d4",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 26,
+      "height": 43,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/e9b4af2d-3ad2-4870-8939-2f74abcf00d4/image.png?v=1791527136328",
+      "path": "art/source/sprite-fusion/outputs/mud-infantry-walk-pose-sw-v1/00.png",
+      "bytes": 2711,
+      "sha256": "3587dbca041d8d88ad1c5fd6199c8d0912bdfc4cafbb2fd201ab1976494a7dde"
+    },
+    {
+      "index": 1,
+      "assetId": "90e39456-5dba-4841-af00-0d8fe31392ee",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 28,
+      "height": 45,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/90e39456-5dba-4841-af00-0d8fe31392ee/image.png?v=1791527137533",
+      "path": "art/source/sprite-fusion/outputs/mud-infantry-walk-pose-sw-v1/01.png",
+      "bytes": 3036,
+      "sha256": "87c557328963002b9ed22268681fbbed21b30b053bf4dbc538ac4fe563548b18"
+    }
+  ],
+  "credits": {
+    "remaining": 1275
+  }
+}

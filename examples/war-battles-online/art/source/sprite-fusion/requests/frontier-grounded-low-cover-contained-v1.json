@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_aee86e8f-d04a-426a-ad5c-91cac150c1e5",
+  "operation": "edit",
+  "prompt": "Keep this compact isometric grass-and-stone berm, its chunky pixel clusters, muted palette, lighting, and continuous ground contact. Fit its complete left and right ends inside the existing canvas with visible empty margins so no stones, earth, or grass are cut off. Do not add a raised platform, lava, scene background, lettering, or other objects.",
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "f7fc3f42-8b19-432b-99f0-b2d3fab89170"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/frontier-grounded-low-cover-contained-v1.json",
+    "sha256": "a7ac844f24836bcde9c30d63eaf822ff7f5a5ba58542c4ae5ff241e9f714d8a0"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "1d46fbb0-4bec-4299-b05c-0e8a88f299f4",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 76,
+      "height": 39,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/1d46fbb0-4bec-4299-b05c-0e8a88f299f4/image.png?v=1791489880544",
+      "path": "art/source/sprite-fusion/outputs/frontier-grounded-low-cover-contained-v1/00.png",
+      "bytes": 6848,
+      "sha256": "255d2acd801cea5f616cced8422094ccb8e6a6d451c99a2df1557af3f4e8aa39"
+    },
+    {
+      "index": 1,
+      "assetId": "51b8b872-cca5-46ae-be29-eb4d1cce7525",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 86,
+      "height": 42,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/51b8b872-cca5-46ae-be29-eb4d1cce7525/image.png?v=1791489881748",
+      "path": "art/source/sprite-fusion/outputs/frontier-grounded-low-cover-contained-v1/01.png",
+      "bytes": 9016,
+      "sha256": "c6fddd35ed50a5581bf9c67435b74aa59a4d6d6b2c1690d1f3a04f36f4dfcb30"
+    }
+  ],
+  "credits": {
+    "remaining": 2220
+  }
+}

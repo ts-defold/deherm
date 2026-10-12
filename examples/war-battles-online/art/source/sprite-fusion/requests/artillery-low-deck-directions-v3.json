@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_0345eb61-c4fd-4999-ab91-26922b68676e",
+  "operation": "direction-set",
+  "prompt": null,
+  "size": 64,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "f909f3d9-79e9-4016-b2ff-fe06c689eb73"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/artillery-low-deck-directions-v3.json",
+    "sha256": "a9a6f3bf5b96c38440e86553dc6188b8fafe90a77677b7da7a4248be1c4381ba"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "b595eac1-098d-474a-b1e4-535b36fff552",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/b595eac1-098d-474a-b1e4-535b36fff552/image.png?v=1791516619219",
+      "path": "art/source/sprite-fusion/outputs/artillery-low-deck-directions-v3/00.png",
+      "bytes": 2503,
+      "sha256": "917015b4cd8c74f18b08c46389e1b3e8ce87b2aa3a6c4915a84cab63e9e18cb9"
+    },
+    {
+      "index": 1,
+      "assetId": "0905c816-855c-4e9e-89f4-e888ffc97e80",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/0905c816-855c-4e9e-89f4-e888ffc97e80/image.png?v=1791516619796",
+      "path": "art/source/sprite-fusion/outputs/artillery-low-deck-directions-v3/01.png",
+      "bytes": 2561,
+      "sha256": "8ee5b95163ca0c223f09ae9299cb8aebc5ec1d94a2e93eb55b51c2b86f1c4835"
+    },
+    {
+      "index": 2,
+      "assetId": "45cebd95-7d27-49a2-b6d9-e6842d3a42f1",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/45cebd95-7d27-49a2-b6d9-e6842d3a42f1/image.png?v=1791516620302",
+      "path": "art/source/sprite-fusion/outputs/artillery-low-deck-directions-v3/02.png",
+      "bytes": 2635,
+      "sha256": "7d49e77161124ee7ed05d4736d940d987a3806e2a5ac44a0890155d5198706b2"
+    },
+    {
+      "index": 3,
+      "assetId": "a106225d-1563-4cb4-b457-8b5b710bc6ab",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/a106225d-1563-4cb4-b457-8b5b710bc6ab/image.png?v=1791516620819",
+      "path": "art/source/sprite-fusion/outputs/artillery-low-deck-directions-v3/03.png",
+      "bytes": 3119,
+      "sha256": "b1a25de81379f7c4abf16d76b3f522467142d4a0bbfa60da6ab9410e23999f7f"
+    },
+    {
+      "index": 4,
+      "assetId": "887ccdcd-086e-4d7a-9b7a-ee1f3ee57a82",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/887ccdcd-086e-4d7a-9b7a-ee1f3ee57a82/image.png?v=1791516621419",
+      "path": "art/source/sprite-fusion/outputs/artillery-low-deck-directions-v3/04.png",
+      "bytes": 2782,
+      "sha256": "48cb67649c5716a6f7799d8aed990333c63f1c6e53fd5ed85dac1472dc63480d"
+    },
+    {
+      "index": 5,
+      "assetId": "433a1721-e577-4305-929e-df287ee06001",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/433a1721-e577-4305-929e-df287ee06001/image.png?v=1791516621967",
+      "path": "art/source/sprite-fusion/outputs/artillery-low-deck-directions-v3/05.png",
+      "bytes": 2667,
+      "sha256": "39c0a259d0201ddbcd3d3174580ac4e282db511cb3a58275e2e0e80408020f03"
+    },
+    {
+      "index": 6,
+      "assetId": "fa464be3-754b-41d6-a590-e2ed00885bbb",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/fa464be3-754b-41d6-a590-e2ed00885bbb/image.png?v=1791516622467",
+      "path": "art/source/sprite-fusion/outputs/artillery-low-deck-directions-v3/06.png",
+      "bytes": 2169,
+      "sha256": "c31b37adc384206f4faff62f5729c6ddddddf3d53fbd8e55ed6c84cdf8335dea"
+    },
+    {
+      "index": 7,
+      "assetId": "d58ae30e-61ce-454f-8909-00df7cd543d5",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/d58ae30e-61ce-454f-8909-00df7cd543d5/image.png?v=1791516622948",
+      "path": "art/source/sprite-fusion/outputs/artillery-low-deck-directions-v3/07.png",
+      "bytes": 2920,
+      "sha256": "7ebb0f2378d935447b703b6c2aa221621d615c58c4ed6b358cd069f8ad0842a0"
+    }
+  ],
+  "credits": {
+    "remaining": 2175
+  }
+}

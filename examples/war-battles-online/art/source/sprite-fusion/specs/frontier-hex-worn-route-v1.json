@@ -1,0 +1,12 @@
+{
+  "name": "frontier-hex-worn-route-v1",
+  "operation": "style-reference",
+  "size": 64,
+  "prompt": "One six-sided walkable ochre earth landform in an isometric volcanic frontier battlefield. The broad flat top has two subtle parallel tank tread impressions, scattered gravel, and small olive grass tufts; the compact edge reveals layered sandstone and dark rock. Keep the same hex silhouette, three-quarter projection, upper-left light, muted military palette, and chunky pixel clusters as the references. No tank, building, lettering, or second tile.",
+  "inputs": [
+    "art/source/sprite-fusion/outputs/frontier-hex-ochre-cliff-v1/07.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-ochre-cliff-v1/09.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/04.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-service-deck-v1/09.png"
+  ]
+}

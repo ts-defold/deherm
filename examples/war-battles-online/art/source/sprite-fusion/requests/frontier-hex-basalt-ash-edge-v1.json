@@ -1,0 +1,145 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_c89e9d0c-f2a6-4c11-8084-38c709dc680c",
+  "operation": "style-reference",
+  "prompt": "One isometric six-sided volcanic battlefield tile where solid charcoal basalt becomes hot fractured ash rock. The driveable top has dark stone plates, ember-lit cracks and sparse orange heat, with a short chunky cliff side. Match the reference hex silhouette and restrained refinery palette so this can border both cooled basalt and glowing lava. No vehicle, character, building, lettering, or multiple tiles.",
+  "size": 64,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "c10cf40b-aea8-4702-b4f7-2bcf17419d7e"
+    },
+    {
+      "kind": "asset",
+      "assetId": "9df0ea78-425a-4f60-9fba-911e5aaf90b6"
+    },
+    {
+      "kind": "asset",
+      "assetId": "814fdb71-9cac-43a9-87f9-0e89d8a1ad9e"
+    },
+    {
+      "kind": "asset",
+      "assetId": "5eb59893-5c94-4d23-b34b-adfdc9320198"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/frontier-hex-basalt-ash-edge-v1.json",
+    "sha256": "30b4d327cb45ebfed6b39b821ab851583fcd374c38a1eb91dc0098eecea52edd"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "10cbc627-0080-45a4-8f19-023fbc13b41e",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 67,
+      "height": 67,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/10cbc627-0080-45a4-8f19-023fbc13b41e/image.png?v=1791413304259",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-ash-edge-v1/00.png",
+      "bytes": 8063,
+      "sha256": "1962fcc8100b8b00e6acdb7bd9dba9a206be7ff6f5ad3961d589380a639896a4"
+    },
+    {
+      "index": 1,
+      "assetId": "5f9b3688-8175-4217-9edc-826e0e3b50cb",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/5f9b3688-8175-4217-9edc-826e0e3b50cb/image.png?v=1791413304820",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-ash-edge-v1/01.png",
+      "bytes": 7814,
+      "sha256": "0e921705939f67bad321bf3abc1a3ecdd7b588b5e8c42a144fef571ef41d7bfc"
+    },
+    {
+      "index": 2,
+      "assetId": "e751098e-c169-4de7-a502-a0287123cb8e",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/e751098e-c169-4de7-a502-a0287123cb8e/image.png?v=1791413305397",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-ash-edge-v1/02.png",
+      "bytes": 7378,
+      "sha256": "cbf94757250bb91f009d1912d2392ec388fe189a60bb00921dabbf983e730c13"
+    },
+    {
+      "index": 3,
+      "assetId": "418a5681-cfe0-4f4b-bba4-a6dfd5433fe2",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 65,
+      "height": 65,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/418a5681-cfe0-4f4b-bba4-a6dfd5433fe2/image.png?v=1791413305967",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-ash-edge-v1/03.png",
+      "bytes": 8564,
+      "sha256": "4f3bb6a12ea701f180edcba2ce46c42113bee86783d378d5047b18e0458d29da"
+    },
+    {
+      "index": 4,
+      "assetId": "5a799055-1e04-4c2f-9b3e-161c4d7478c6",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/5a799055-1e04-4c2f-9b3e-161c4d7478c6/image.png?v=1791413306556",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-ash-edge-v1/04.png",
+      "bytes": 7334,
+      "sha256": "51d1aa783f51e20b0ec2cc0ab7230a0b3299cfb85ee8831e2853af5e3af2fc1f"
+    },
+    {
+      "index": 5,
+      "assetId": "e5634e15-28da-49ff-982e-3f95a27f2dc6",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/e5634e15-28da-49ff-982e-3f95a27f2dc6/image.png?v=1791413307123",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-ash-edge-v1/05.png",
+      "bytes": 7850,
+      "sha256": "379d0cfa36a89eba0179fefe4b9760558dc52f169cdac4a38e47216eaf6cc5ed"
+    },
+    {
+      "index": 6,
+      "assetId": "faaba2fe-8887-40b0-8907-b071d7a6f031",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 65,
+      "height": 65,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/faaba2fe-8887-40b0-8907-b071d7a6f031/image.png?v=1791413307751",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-ash-edge-v1/06.png",
+      "bytes": 7922,
+      "sha256": "6e1462e624aba8e3117765fd89298bca8d4df2e750e9a82495742c6e8fbf6a83"
+    },
+    {
+      "index": 7,
+      "assetId": "e8b1f142-8ad1-4424-afc0-132127290275",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 69,
+      "height": 69,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/e8b1f142-8ad1-4424-afc0-132127290275/image.png?v=1791413308394",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-ash-edge-v1/07.png",
+      "bytes": 7902,
+      "sha256": "6e418d09429a906686f42aa6c86cc9ece8b86ce2ee34c67551cb6befb0a23e38"
+    },
+    {
+      "index": 8,
+      "assetId": "8a8dd4cd-978a-4cf5-bdde-a982b368160a",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/8a8dd4cd-978a-4cf5-bdde-a982b368160a/image.png?v=1791413309014",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-ash-edge-v1/08.png",
+      "bytes": 7718,
+      "sha256": "d10e4e32b33b048fa81347f96d51fa4cd1091e1e192dcba54731e22477ccf74d"
+    }
+  ],
+  "credits": {
+    "remaining": 2835
+  }
+}

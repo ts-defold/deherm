@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_1ff3a909-23cc-4442-a5bb-80c3af69b1c0",
+  "operation": "style-reference",
+  "prompt": "One small open coastal-sea surface patch viewed from the same three-quarter isometric battlefield angle. Deep turquoise water with a few thin pale-foam ripples and dark blue-green shadow clusters, calm enough for a readable tank game. Only water, no island, cliff, shore, hex border, boat, text, or interface.",
+  "size": 64,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/04.png",
+      "bytes": 7402,
+      "sha256": "e475f8f5c048798c01c722cd1efef78e8bd22d5e750fc5939b87dc5679d6e240"
+    },
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-cliff-v1/04.png",
+      "bytes": 4098,
+      "sha256": "7e6b4cead2a0d5e17460e064d7fe971edb5324cebfbdb8c7dbfcf86c8fc8ed06"
+    },
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-cliff-v1/07.png",
+      "bytes": 7054,
+      "sha256": "22fc9b62174d4459e7a64b591570915b2dfd14bceac49cfed0634c63f60b2aae"
+    },
+    {
+      "kind": "file",
+      "path": "defold/assets/derived/arena/landmark-rock-outcrop.png",
+      "bytes": 7418,
+      "sha256": "6b99e3f70d707f8dab20bbfe63bf77518cc10a6078f29bd6050fcdc061445306"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/frontier-coastal-water-v1.json",
+    "sha256": "940927acfe98d67d2a00d118bc2c13115450512d4776c394bba8ad0742caec1a"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "face6885-40a5-400b-a2ca-7d538f2c59f1",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 79,
+      "height": 79,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/face6885-40a5-400b-a2ca-7d538f2c59f1/image.png?v=1791491565247",
+      "path": "art/source/sprite-fusion/outputs/frontier-coastal-water-v1/00.png",
+      "bytes": 5225,
+      "sha256": "94157a4bb3ac9850bcd7c63cb0dec7a6a4e2018c64d5a2e0914d4061eaf55981"
+    },
+    {
+      "index": 1,
+      "assetId": "c0269178-51b5-4f42-be09-a2057966a4bd",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/c0269178-51b5-4f42-be09-a2057966a4bd/image.png?v=1791491565848",
+      "path": "art/source/sprite-fusion/outputs/frontier-coastal-water-v1/01.png",
+      "bytes": 3644,
+      "sha256": "8d9c021501935e53d9866062730473929b7250d2e5f40c29eebd0c8cf49acfe6"
+    },
+    {
+      "index": 2,
+      "assetId": "e8099023-bd1a-4147-9820-b1551d537cd0",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/e8099023-bd1a-4147-9820-b1551d537cd0/image.png?v=1791491566430",
+      "path": "art/source/sprite-fusion/outputs/frontier-coastal-water-v1/02.png",
+      "bytes": 4218,
+      "sha256": "6d9536c5231af1d2f013edd6d15bea0327171c6e3ed9eb17be2caf5f4359a099"
+    },
+    {
+      "index": 3,
+      "assetId": "15a0bb95-3468-49cb-a8cb-13eeaf3551a2",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 66,
+      "height": 66,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/15a0bb95-3468-49cb-a8cb-13eeaf3551a2/image.png?v=1791491567016",
+      "path": "art/source/sprite-fusion/outputs/frontier-coastal-water-v1/03.png",
+      "bytes": 4464,
+      "sha256": "f4d955b1220afe55d9e90d3def926e511d003e565b407da97bfdc95e830824d7"
+    },
+    {
+      "index": 4,
+      "assetId": "457ec030-9c17-4e9c-944e-c6484fdfa160",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/457ec030-9c17-4e9c-944e-c6484fdfa160/image.png?v=1791491567597",
+      "path": "art/source/sprite-fusion/outputs/frontier-coastal-water-v1/04.png",
+      "bytes": 3612,
+      "sha256": "ceae6fc59e4e5398ecf42e796d1c28dae7ed38c08545ff45ff824b9231af04c3"
+    },
+    {
+      "index": 5,
+      "assetId": "575715ee-754b-4eef-9bed-9e048a49f662",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/575715ee-754b-4eef-9bed-9e048a49f662/image.png?v=1791491568196",
+      "path": "art/source/sprite-fusion/outputs/frontier-coastal-water-v1/05.png",
+      "bytes": 4050,
+      "sha256": "9d43399d7f0e682d12c6ee8a532f632fd924b51b4d5f8b6af373556efc537bc2"
+    },
+    {
+      "index": 6,
+      "assetId": "79755120-491b-4224-b498-71e8f041375f",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/79755120-491b-4224-b498-71e8f041375f/image.png?v=1791491568753",
+      "path": "art/source/sprite-fusion/outputs/frontier-coastal-water-v1/06.png",
+      "bytes": 4019,
+      "sha256": "266ff6bfaf133444cca33b57019b0a04165381340306b0a949d36bf717fb7b66"
+    },
+    {
+      "index": 7,
+      "assetId": "0d032b68-2ed5-4080-ac15-95db63e39fd9",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/0d032b68-2ed5-4080-ac15-95db63e39fd9/image.png?v=1791491569289",
+      "path": "art/source/sprite-fusion/outputs/frontier-coastal-water-v1/07.png",
+      "bytes": 3961,
+      "sha256": "5e824a6203383139a4c4d01cf90f689ac1aa53986aa00d9e34d25b81622a4889"
+    },
+    {
+      "index": 8,
+      "assetId": "c17b1846-af09-4a32-a2ce-3de44b00a8d3",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/c17b1846-af09-4a32-a2ce-3de44b00a8d3/image.png?v=1791491569879",
+      "path": "art/source/sprite-fusion/outputs/frontier-coastal-water-v1/08.png",
+      "bytes": 4381,
+      "sha256": "45cf4bcebe59d48008f8d14b4aeb521bf9c27f6487054d2396863f1d1ef0bc42"
+    }
+  ],
+  "credits": {
+    "remaining": 2205
+  }
+}

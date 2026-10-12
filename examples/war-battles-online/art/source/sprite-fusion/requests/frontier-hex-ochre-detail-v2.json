@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_3f62d75d-e366-4483-8a67-76c0ae008b42",
+  "operation": "style-reference",
+  "prompt": "A single walkable ochre earth hex for a three-quarter-view volcanic frontier battlefield. Warm compacted soil top with low tire-rut scars, sparse yellow dry grass, pebble clusters, and a few dark cinders; short layered earth-and-basalt side face. Match the reference tiles' six-sided footprint, upper-left light, chunky readable pixel clusters, and muted military palette. No tank, character, building, lettering, or other tile.",
+  "size": 64,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-cliff-v1/06.png",
+      "bytes": 7370,
+      "sha256": "2fb43c4832779a6aa1feef9486e439179bce95907dd66bf74ece4adffcfa1e69"
+    },
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-worn-route-v1/01.png",
+      "bytes": 9796,
+      "sha256": "a3492fccd8bdb99b3802e868ad8c5c7a534a99e3037b7298aaaa1e57970c418d"
+    },
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-earth-edge-v1/06.png",
+      "bytes": 7688,
+      "sha256": "c74797ca5a48ba940c4618c769de24f39ec50ecf5a69bd9ad70a32361e4fa2b0"
+    },
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-basalt-edge-v1/04.png",
+      "bytes": 8320,
+      "sha256": "c9df9e2e3afb07c85f87953c82c2052ff27401cfb9f11d63fd8cda67d5e80b7e"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/frontier-hex-ochre-detail-v2.json",
+    "sha256": "62d48c490d90ff623708c3538ab8d444e71d3b605d461cad4169c2472766054e"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "8a7d4ecd-3f7b-4bc8-a574-9d2517a809ad",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/8a7d4ecd-3f7b-4bc8-a574-9d2517a809ad/image.png?v=1791414977297",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-detail-v2/00.png",
+      "bytes": 8732,
+      "sha256": "7df420265db978e6ad886739145fac46d679ba27d528e6d08ccb5ded2c11b066"
+    },
+    {
+      "index": 1,
+      "assetId": "a2b7d650-da2e-4757-ba22-4b414bbd3b88",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 65,
+      "height": 65,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/a2b7d650-da2e-4757-ba22-4b414bbd3b88/image.png?v=1791414978226",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-detail-v2/01.png",
+      "bytes": 8787,
+      "sha256": "3a4cf4cfb6e1c0ad73b7d4d883c45f117e4cfb4b9c14898d1be09bae2e35c3a4"
+    },
+    {
+      "index": 2,
+      "assetId": "bf4d1538-b025-42d1-b286-7503420dac45",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 65,
+      "height": 65,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/bf4d1538-b025-42d1-b286-7503420dac45/image.png?v=1791414978813",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-detail-v2/02.png",
+      "bytes": 9046,
+      "sha256": "95523f75f47cb0f13550c3fa344a3afb2bff76edb1439540d3f4b1f6354f9640"
+    },
+    {
+      "index": 3,
+      "assetId": "fe5eab1e-1eae-4f9f-9b00-0cfb16901638",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 67,
+      "height": 67,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/fe5eab1e-1eae-4f9f-9b00-0cfb16901638/image.png?v=1791414979411",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-detail-v2/03.png",
+      "bytes": 9940,
+      "sha256": "17662f835b72f191157e0e47c2c4a4fa28cc5d74721095580cb7169483bd9059"
+    },
+    {
+      "index": 4,
+      "assetId": "bf848e3e-0631-43c5-8dd2-087a0d76bf6c",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 67,
+      "height": 67,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/bf848e3e-0631-43c5-8dd2-087a0d76bf6c/image.png?v=1791414980057",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-detail-v2/04.png",
+      "bytes": 9507,
+      "sha256": "aa0b6816217c1e0ca96a77aed9810e92c63d23c52ba452194c4daab656d01ac8"
+    },
+    {
+      "index": 5,
+      "assetId": "bc0652ed-0a89-44fa-b75f-3b585ecbfa58",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 67,
+      "height": 67,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/bc0652ed-0a89-44fa-b75f-3b585ecbfa58/image.png?v=1791414980648",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-detail-v2/05.png",
+      "bytes": 9874,
+      "sha256": "decd4529074f90371999eaad6a37441d951ed3ba974a7f588898b987d1bad1b6"
+    },
+    {
+      "index": 6,
+      "assetId": "11a7e387-edaf-41e1-8459-91dca5b3642d",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 65,
+      "height": 65,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/11a7e387-edaf-41e1-8459-91dca5b3642d/image.png?v=1791414981233",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-detail-v2/06.png",
+      "bytes": 9515,
+      "sha256": "c58fc4b0c10f00090562653db1b71b41d292df01e563ddc7e7f344b3e6c32145"
+    },
+    {
+      "index": 7,
+      "assetId": "0441fb91-4670-4e52-b011-5972991bf3ba",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 66,
+      "height": 66,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/0441fb91-4670-4e52-b011-5972991bf3ba/image.png?v=1791414981848",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-detail-v2/07.png",
+      "bytes": 8774,
+      "sha256": "18a8d1996450fd79fc65bef10df984a27b344a0b0efdd4c6ed73276a9a2421c9"
+    },
+    {
+      "index": 8,
+      "assetId": "c8b04133-850c-4279-afc3-2f6a317c431f",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 66,
+      "height": 66,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/c8b04133-850c-4279-afc3-2f6a317c431f/image.png?v=1791414982486",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-detail-v2/08.png",
+      "bytes": 10087,
+      "sha256": "9bc6205174a82256786d474e0b1d0f550ba1b0922fc495d2d13f6fe8f39829e3"
+    }
+  ],
+  "credits": {
+    "remaining": 2790
+  }
+}

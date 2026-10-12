@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_9a22776d-1e2a-4dd7-a7b6-b1beafb22dff",
+  "operation": "edit",
+  "prompt": "Isolate only this siege artillery vehicle's long-barreled rotating gun mount as one detached weapon sprite. Remove the entire tracked rail-platform hull and chassis underneath. Preserve the unmistakably extended barrel, compact rear armored gun housing, same three-quarter isometric direction, palette and dark outline. The gun mount base should sit on the matching artillery hull socket. One isolated turret, no hull.",
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/artillery-silhouette-v2/06.png",
+      "bytes": 6694,
+      "sha256": "35bc14823ff7bb405030a156a7f2bf267204d34c73c1b60cb98ac0b62e42928e"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/artillery-turret-v2.json",
+    "sha256": "2d41eba932263bcda369079a988b8d5d023b189cce9b47003881d8e896f17419"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "8f63c4f5-1b0f-48ab-b431-ccb7ac526471",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 79,
+      "height": 54,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/8f63c4f5-1b0f-48ab-b431-ccb7ac526471/image.png?v=1791432418167",
+      "path": "art/source/sprite-fusion/outputs/artillery-turret-v2/00.png",
+      "bytes": 5872,
+      "sha256": "647b86a5d24a48e4e86e6a9e501cea0e5fb93003331ddf1d443ad50a9ea93e69"
+    },
+    {
+      "index": 1,
+      "assetId": "1af6d221-cd13-4c31-a047-b5f3febbfb09",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 80,
+      "height": 69,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/1af6d221-cd13-4c31-a047-b5f3febbfb09/image.png?v=1791432419186",
+      "path": "art/source/sprite-fusion/outputs/artillery-turret-v2/01.png",
+      "bytes": 6574,
+      "sha256": "0b043363a6211e2933c3fa67f6aa55a17d2eb9902ea7cbfc3fe8f357c49dfff0"
+    }
+  ],
+  "credits": {
+    "remaining": 2385
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "name": "frontier-hex-meadow-steel-edge-v1",
+  "operation": "style-reference",
+  "size": 64,
+  "prompt": "One isometric six-sided battlefield terrain tile where olive meadow turf meets a worn refinery steel service deck. A driveable top face with irregular grass pushing into riveted plates, a few cream wildflowers, weathered steel edges and a short dark side face. The references establish the matching hex silhouette, palette, and chunky military rendering. No vehicle, character, building, lettering, or multiple tiles.",
+  "inputs": [
+    "asset:41690abf-768f-4848-8606-07f54141ceaa",
+    "asset:8adc947b-dcfb-4a05-9a3d-e4e9bf1737e3",
+    "asset:c06b74db-59f1-49aa-b166-ec1abb7f6d6a",
+    "asset:e338dccc-7596-4fb1-8af3-f0159ec80d07"
+  ]
+}

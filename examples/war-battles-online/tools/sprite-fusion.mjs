@@ -124,6 +124,20 @@ async function main() {
     throw new Error(`Inline SpriteFusion inputs exceed ${inlineTotalLimit} total bytes`);
   }
 
+  // A repeated paid request must fail before POST, not after the provider has
+  // generated and billed another batch. Recover an interrupted request from
+  // its persisted manifest/output instead of automatically resubmitting it.
+  const outputRoot = path.join(exampleRoot, "art/source/sprite-fusion/outputs", spec.name);
+  const manifestPath = path.join(exampleRoot, "art/source/sprite-fusion/requests", `${spec.name}.json`);
+  for (const destination of [outputRoot, manifestPath]) {
+    try {
+      await access(destination);
+      throw new Error(`SpriteFusion request already exists: ${path.relative(exampleRoot, destination)}`);
+    } catch (error) {
+      if (error.code !== "ENOENT") throw error;
+    }
+  }
+
   const apiKey = await loadApiKey();
   const response = await fetch(`${apiRoot}/generate`, {
     method: "POST",
@@ -149,13 +163,6 @@ async function main() {
     );
   }
 
-  const outputRoot = path.join(exampleRoot, "art/source/sprite-fusion/outputs", spec.name);
-  try {
-    await access(outputRoot);
-    throw new Error(`SpriteFusion output directory already exists: ${path.relative(exampleRoot, outputRoot)}`);
-  } catch (error) {
-    if (error.code !== "ENOENT") throw error;
-  }
   await mkdir(outputRoot, { recursive: true });
 
   const outputs = [];
@@ -203,7 +210,6 @@ async function main() {
     outputs,
     credits: completed.credits ?? null,
   };
-  const manifestPath = path.join(exampleRoot, "art/source/sprite-fusion/requests", `${spec.name}.json`);
   await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
   console.log(
     `sprite-fusion:ok:${spec.name}:request=${manifest.requestId}:outputs=${outputs.length}:credits=${manifest.credits?.remaining ?? "unknown"}`,

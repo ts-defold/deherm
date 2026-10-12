@@ -11,6 +11,17 @@ export const TANK_DIRECTION_NW = 5;
 export const TANK_DIRECTION_N = 6;
 export const TANK_DIRECTION_NE = 7;
 
+const DIRECTION_ANGLES = [
+  -Math.PI / 4,
+  -Math.PI / 2,
+  (-3 * Math.PI) / 4,
+  Math.PI,
+  0,
+  (3 * Math.PI) / 4,
+  Math.PI / 2,
+  Math.PI / 4,
+] as const;
+
 /** Quantize a world-space direction to one of the eight authored views. */
 export function isometricDirectionIndex(x: number, y: number): number {
   if (x === 0 && y === 0) return TANK_DIRECTION_E;
@@ -34,4 +45,20 @@ export function isometricDirectionIndex(x: number, y: number): number {
     default:
       return TANK_DIRECTION_E;
   }
+}
+
+/**
+ * Keep an authored facing until the projected direction moves beyond its
+ * sector boundary. Network interpolation and fixed-point steering can hover
+ * on a 22.5-degree boundary; switching art on every crossing reads as a tank
+ * shaking or briefly pointing the wrong way. This affects presentation only.
+ */
+export function isometricDirectionIndexHysteretic(x: number, y: number, previous: number): number {
+  const next = isometricDirectionIndex(x, y);
+  if (previous === next || (x === 0 && y === 0)) return previous >= 0 && previous <= 7 ? previous : next;
+  const prior = DIRECTION_ANGLES[previous];
+  if (prior === undefined) return next;
+  const angle = Math.atan2(y, x);
+  const delta = Math.atan2(Math.sin(angle - prior), Math.cos(angle - prior));
+  return Math.abs(delta) <= Math.PI / 8 + Math.PI / 36 ? previous : next;
 }

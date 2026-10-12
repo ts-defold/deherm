@@ -76,6 +76,13 @@ platform_input="${DEFOLD_HERMES_PLATFORM:-arm64-macos}"
 platform_identity="$(node "$repo_root/scripts/resolve-defold-platform.mjs" "$platform_input" "$project_root")"
 IFS=$'\t' read -r bundle_target bob_platform <<< "$platform_identity"
 variant="${DEFOLD_HERMES_VARIANT:-debug}"
+# Bob's incremental Lua bytecode cache is target-sensitive. Keep the browser
+# target out of the native runtime directory so alternating native and HTML5
+# builds cannot archive a chunk compiled for the other Lua VM.
+bob_output="build/bob"
+if [[ "$bob_platform" == "wasm-web" ]]; then
+  bob_output="build/bob-wasm-web"
+fi
 
 # A `shermes -emit-c` unit is a transport of the Hermes runtime. Bob discovers
 # extensions by walking the project, and an ext.manifest cannot exclude a
@@ -119,7 +126,7 @@ node "$repo_root/bin/deherm.mjs" prepare-bob \
 
 arguments=(
   --root "$project_root"
-  --output build/bob
+  --output "$bob_output"
   --bundle-output build/bundle
   --platform "$bob_platform"
   --architectures "$bob_platform"

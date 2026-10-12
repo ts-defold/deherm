@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_661c60fa-fc96-4a3f-847d-0af4bd913900",
+  "operation": "edit",
+  "prompt": "Change only Rook's southeast-facing body pose: plant both boots and extend the compact sidearm forward at chest height, with a slight braced recoil in the shoulders. Keep the same person, exact helmet, blue goggle lens, cream scarf, olive jacket, colors, outline, proportions, and three-quarter perspective. Keep the feet on the same ground line. No muzzle flash, projectile, new prop, platform, text, scenery, or second person.",
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "b0168c9c-877f-46f1-8ee7-e12b93565d18"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/rook-infantry-fire-pose-se-v1.json",
+    "sha256": "adf709383054471a69bb8ddfe5f71f504e9a8368b7d578eda9ec2caf29802fa6"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "6bfaf614-03ac-4461-a7fb-7437e8addba3",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 33,
+      "height": 47,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/6bfaf614-03ac-4461-a7fb-7437e8addba3/image.png?v=1791530932350",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-fire-pose-se-v1/00.png",
+      "bytes": 2894,
+      "sha256": "58e61dd3a504f81a040749dd7817af10dec34f1686b8bd7c3f00dc2dcb895f69"
+    },
+    {
+      "index": 1,
+      "assetId": "4db740ec-1e5f-4d32-a398-0d9b98c5dce0",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 25,
+      "height": 47,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/4db740ec-1e5f-4d32-a398-0d9b98c5dce0/image.png?v=1791530933396",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-fire-pose-se-v1/01.png",
+      "bytes": 2950,
+      "sha256": "1f6279da5fa29224550d3d66c6a5665c61700ceec99e9e46403deb9fb06a014c"
+    }
+  ],
+  "credits": {
+    "remaining": 1065
+  }
+}

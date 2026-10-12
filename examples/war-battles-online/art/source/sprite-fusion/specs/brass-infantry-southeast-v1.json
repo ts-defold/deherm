@@ -1,0 +1,7 @@
+{
+  "name": "brass-infantry-southeast-v1",
+  "operation": "style-reference",
+  "inputs": ["asset:d62dd927-7809-4bd6-a18e-1c87fcf23e9f"],
+  "prompt": "An older stocky tank driver named Brass, full-body isometric three-quarter southeast-facing standing pose for the same game as the reference. Distinct snowy white beard and moustache, weathered face, brass-rimmed round goggles on an ochre leather aviator cap, cream neck scarf, olive mechanic jacket, sturdy dark boots, compact sidearm held low. Keep the reference's chunky pixel silhouettes, dark outlines, restrained olive/ochre palette, grounded scale, and angle, but make this a clearly different older character. One standing character only; no vehicle, pedestal, scenery, text, or extra figures.",
+  "size": 32
+}

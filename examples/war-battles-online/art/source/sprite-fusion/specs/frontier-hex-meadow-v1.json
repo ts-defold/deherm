@@ -1,0 +1,6 @@
+{
+  "name": "frontier-hex-meadow-v1",
+  "operation": "generate",
+  "prompt": "A single flat hexagonal patch of sunlit olive grass and dusty ochre earth for an isometric military arcade battlefield. Broad quiet grass masses, a few small straw tufts and scattered warm pebbles, painterly clustered pixel shading with dark plum shadows and cream highlights. Flat ground viewed from above at an isometric angle, six clean edges that join neighboring terrain, grass reaches every edge. The grass surface dominates. No raised slab, no side walls, no black perimeter outline, no buildings, no props, no UI. Original playful 1990s arcade military mood.",
+  "size": 64
+}

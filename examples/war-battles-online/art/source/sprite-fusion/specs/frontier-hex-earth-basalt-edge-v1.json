@@ -1,0 +1,12 @@
+{
+  "name": "frontier-hex-earth-basalt-edge-v1",
+  "operation": "style-reference",
+  "size": 64,
+  "prompt": "One isometric six-sided battlefield terrain tile where compacted ochre earth meets fractured black volcanic basalt. Its driveable top blends dusty wheel-worn soil into rough dark stone, with a few pebbles and a short layered cliff side. Match the reference tiles' hex silhouette, warm highlights, dark outlines, and chunky military style. No vehicle, character, building, lettering, or multiple tiles.",
+  "inputs": [
+    "asset:b04adb2b-5bed-4801-b7a5-73096d4c5345",
+    "asset:c10cf40b-aea8-4702-b4f7-2bcf17419d7e",
+    "asset:5eb59893-5c94-4d23-b34b-adfdc9320198",
+    "asset:9df0ea78-425a-4f60-9fba-911e5aaf90b6"
+  ]
+}

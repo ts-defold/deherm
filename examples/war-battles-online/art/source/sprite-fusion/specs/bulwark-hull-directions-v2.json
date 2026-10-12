@@ -1,0 +1,5 @@
+{
+  "name": "bulwark-hull-directions-v2",
+  "operation": "direction-set",
+  "inputs": ["art/source/sprite-fusion/outputs/bulwark-hull-v2/00.png"]
+}

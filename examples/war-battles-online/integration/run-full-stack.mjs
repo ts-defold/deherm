@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { execFileSync, spawn } from "node:child_process";
+import { X509Certificate } from "node:crypto";
 import { access, readFile, rm } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -13,6 +14,7 @@ import {
   waitFor as waitForBrowser,
 } from "../../../packages/cli/src/dev/browser-host.mjs";
 import { createDefoldBuilder } from "../../../packages/cli/src/dev/defold-builder.mjs";
+import { DEFAULT_ROSTER_SIZE } from "../core/constants.ts";
 import { DEFAULT_LOCAL_DEV_BUILD_SERVER } from "./dev-launch-config.mjs";
 
 const exampleRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -23,7 +25,7 @@ if (process.argv.includes("--help") || process.argv.includes("-h")) {
 Starts the Deno HTTP/3 match server, packaged native game, and browser bot dashboard.
 
   --bots <0-31>          browser network bots (default: roster - 1)
-  --roster <2-32>        authoritative roster size (default: 32)
+  --roster <2-32>        authoritative roster size (default: ${DEFAULT_ROSTER_SIZE})
   --skill <0-3>          server and network bot difficulty (default: 1)
   --quic-port <port>     WebTransport port (default: 4433)
   --health-port <port>   HTTP health/WebSocket port (default: 8080)
@@ -55,7 +57,25 @@ try {
     await ensureBuildServer(options.buildServer);
     await buildPackagedGame(options.buildServer);
   }
-  execFileSync(join(exampleRoot, "server/make-cert.sh"), { cwd: exampleRoot, stdio: "inherit" });
+  // This local orchestrator owns both the certificate and every pin it passes
+  // to the native client and browser dashboard. Rotate only an expired cert;
+  // the standalone certificate tool still refuses implicit rotation.
+  let rotateExpiredCertificate = false;
+  try {
+    const existing = new X509Certificate(await readFile(certificate));
+    rotateExpiredCertificate = Date.parse(existing.validTo) <= Date.now();
+  } catch (error) {
+    if (error?.code !== "ENOENT") {
+      // Let make-cert.sh diagnose malformed or incomplete credentials without
+      // silently replacing a certificate that may still be pinned elsewhere.
+      console.warn(`war-battles-stack:certificate-check:${error.message}`);
+    }
+  }
+  if (rotateExpiredCertificate) console.log("war-battles-stack:certificate-expired:rotating-local-pin");
+  execFileSync(join(exampleRoot, "server/make-cert.sh"), rotateExpiredCertificate ? ["--force"] : [], {
+    cwd: exampleRoot,
+    stdio: "inherit",
+  });
   execFileSync(process.execPath, [join(exampleRoot, "bot-dashboard/build.mjs")], {
     cwd: exampleRoot,
     stdio: "inherit",
@@ -123,6 +143,7 @@ try {
 
   const game = start("game", process.execPath, [
     "integration/play-packaged.mjs",
+    "--dev-build",
     `--config=war_battles.server=${webTransportUrl}`,
     `--config=war_battles.server_certificate_sha256=${fingerprint}`,
   ]);
@@ -244,6 +265,13 @@ async function buildPackagedGame(buildServer) {
   // Compile the current TypeScript generation first. Bob consumes that owned
   // resource; launching an older packaged binary against a newer protocol
   // server otherwise fails closed only after an opaque admission timeout.
+  // Shared core modules are authoritative outside defold/. The project-local
+  // mirror must be refreshed before the compiler sees it, just as `pnpm dev`
+  // does continuously while watching source edits.
+  execFileSync(process.execPath, [resolve(exampleRoot, "integration/sync-defold-sources.mjs")], {
+    cwd: exampleRoot,
+    stdio: "inherit",
+  });
   execFileSync(
     process.execPath,
     [
@@ -455,7 +483,7 @@ function parseArguments(arguments_) {
     return parsed;
   };
   const noBrowser = arguments_.includes("--no-browser");
-  const roster = integer("--roster", 32, 2, 32);
+  const roster = integer("--roster", DEFAULT_ROSTER_SIZE, 2, 32);
   const bots = integer("--bots", noBrowser ? 0 : roster - 1, 0, roster - 1);
   if (noBrowser && bots !== 0) throw new Error("--no-browser requires --bots 0 because browser bots run in Chrome");
   return {

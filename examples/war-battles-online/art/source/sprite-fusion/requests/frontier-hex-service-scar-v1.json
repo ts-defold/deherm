@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_003a4f70-01ea-4142-b86e-2777a2178210",
+  "operation": "style-reference",
+  "prompt": "A single walkable steel service-deck hex for a three-quarter-view volcanic refinery battlefield. Broad level top of worn charcoal steel plates with a small recessed grated drain, chipped edges, a few amber rivets, dust in seams, and one subtle heat stain; short dark steel side face. Match the reference tiles' six-sided footprint, upper-left light, chunky pixel clusters, and muted military palette. Keep the geometry practical and low contrast so combat silhouettes remain readable. No vehicle, character, building, lettering, or other tile.",
+  "size": 64,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-steel-detail-v2/03.png",
+      "bytes": 7306,
+      "sha256": "e8eb88e9fc7fa0b85b7b64a76ac479330c636a90266b9e83708c5c56f9bc8fe7"
+    },
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-steel-detail-v2/07.png",
+      "bytes": 6468,
+      "sha256": "e4d14abdd702800cb9d7e886923855e6433cff6170a84c96b538b7f3ccbb3f23"
+    },
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-service-deck-v1/06.png",
+      "bytes": 6003,
+      "sha256": "9dd8795e21c53cac5e447603de27da93c41fe46c49ac8e067ccf4438bef22055"
+    },
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-refinery-grate-v1/08.png",
+      "bytes": 7736,
+      "sha256": "a86c996c8ee1e395681381ec27bd0b15fb5a0843ac733f8c01357735748a5d41"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/frontier-hex-service-scar-v1.json",
+    "sha256": "72082ce449f92458e06188366b5f7a26d2b150ddd4ba39fd9557d23a84b68e36"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "5088c3ec-bfdb-4521-98a1-51deba992d89",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 65,
+      "height": 65,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/5088c3ec-bfdb-4521-98a1-51deba992d89/image.png?v=1791417754308",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-service-scar-v1/00.png",
+      "bytes": 7156,
+      "sha256": "65edef06c94c971ee0cbb554c2d8ce0ae4b15bb71b1e4a01a314ac79c601a600"
+    },
+    {
+      "index": 1,
+      "assetId": "1921ad52-1a6f-45c5-9f18-7265306620de",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/1921ad52-1a6f-45c5-9f18-7265306620de/image.png?v=1791417755026",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-service-scar-v1/01.png",
+      "bytes": 7439,
+      "sha256": "ddb2238be733d572abf575d8dd8aef4075f1089d23e7deb81e54dbf829815d1d"
+    },
+    {
+      "index": 2,
+      "assetId": "d2c9aaa8-63ec-42fd-8b5e-26c8d0f2a182",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/d2c9aaa8-63ec-42fd-8b5e-26c8d0f2a182/image.png?v=1791417755649",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-service-scar-v1/02.png",
+      "bytes": 6107,
+      "sha256": "c53fe35eb4ea24c744a1d6788e79af75c9f7638b071c7a946523eb1e298374de"
+    },
+    {
+      "index": 3,
+      "assetId": "3c80cac5-2bda-4756-afd3-8c108ca741ad",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/3c80cac5-2bda-4756-afd3-8c108ca741ad/image.png?v=1791417756239",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-service-scar-v1/03.png",
+      "bytes": 7333,
+      "sha256": "cb4a6e53aca32f9ffdbb9e8ba80db8cb34990c9c88de479da45e780f46cbc93b"
+    },
+    {
+      "index": 4,
+      "assetId": "a7042735-2760-49a9-95fd-c650affb00a7",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/a7042735-2760-49a9-95fd-c650affb00a7/image.png?v=1791417756824",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-service-scar-v1/04.png",
+      "bytes": 7363,
+      "sha256": "794b00b1606d13eb99e33eba0c3967884213faf9272760cdc4140b4237815cd9"
+    },
+    {
+      "index": 5,
+      "assetId": "387a32d6-ce88-40f7-85cc-b9224a27a057",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/387a32d6-ce88-40f7-85cc-b9224a27a057/image.png?v=1791417757383",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-service-scar-v1/05.png",
+      "bytes": 7356,
+      "sha256": "678ae57906d3905b44a4db8bd6c966501de30042d1535d9aea6c4a7733191664"
+    },
+    {
+      "index": 6,
+      "assetId": "eeb82d00-4f12-425f-91b8-5d30d49bf995",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/eeb82d00-4f12-425f-91b8-5d30d49bf995/image.png?v=1791417757992",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-service-scar-v1/06.png",
+      "bytes": 7271,
+      "sha256": "6a65f853fa82589c254ab83786e003f214def798999465ed1c294b6764dbaea8"
+    },
+    {
+      "index": 7,
+      "assetId": "a26ce6a6-b9bf-4585-9397-9a4c6f077e13",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 65,
+      "height": 65,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/a26ce6a6-b9bf-4585-9397-9a4c6f077e13/image.png?v=1791417758512",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-service-scar-v1/07.png",
+      "bytes": 5449,
+      "sha256": "20151e61ef3740df69e593c28c919496fa440f43c514fe34700538a2b27c3ae3"
+    },
+    {
+      "index": 8,
+      "assetId": "e237be29-c9b0-49c0-adca-bc3e46107916",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/e237be29-c9b0-49c0-adca-bc3e46107916/image.png?v=1791417759058",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-service-scar-v1/08.png",
+      "bytes": 7674,
+      "sha256": "6f987a747ce843cfbc522028e8043193c33750282976bdfd885fa65103e42008"
+    }
+  ],
+  "credits": {
+    "remaining": 2670
+  }
+}

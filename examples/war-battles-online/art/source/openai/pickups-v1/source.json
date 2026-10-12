@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "provider": "OpenAI image generation",
+  "source": "sheet.png",
+  "sha256": "0b90ac398a85bac84bc258435c1eb42d8de7d1228a9ba4d48176f2e3c3bf93f4",
+  "dimensions": [1774, 887],
+  "background": "transparent RGBA",
+  "projection": "orthographic isometric",
+  "purpose": "War Battles Online raised pickup world sprites",
+  "downsample": 12,
+  "outputCell": [40, 40],
+  "groundLine": 38,
+  "cuts": {
+    "pickup-machinegun": [0, 0, 443, 443],
+    "pickup-railgun": [443, 0, 444, 443],
+    "pickup-scatter": [887, 0, 443, 443],
+    "pickup-mortar": [1330, 0, 444, 443],
+    "pickup-ricochet": [0, 443, 443, 444],
+    "pickup-health": [443, 443, 444, 444],
+    "pickup-armor": [887, 443, 443, 444],
+    "pickup-overdrive": [1330, 443, 444, 444]
+  },
+  "promptSummary": "Eight isolated SNK-inspired isometric war-game pickups, each on a common hexagonal steel pedestal, no labels, transparent gutters.",
+  "license": "Project-generated asset; see repository licensing and provenance policy."
+}

@@ -1,0 +1,12 @@
+{
+  "name": "frontier-hex-basalt-detail-v2",
+  "operation": "style-reference",
+  "size": 64,
+  "prompt": "A single walkable dark basalt hex for a three-quarter-view volcanic frontier battlefield. Broad flat slate rock top with fractured stone plates, a few loose angular pebbles, pale chipped edges, and sparse moss at cracks; a short stacked basalt side face. Match the reference tiles' six-sided footprint, upper-left light, chunky readable pixel clusters, and muted military palette. No lava, character, vehicle, building, lettering, or other tile.",
+  "inputs": [
+    "art/source/sprite-fusion/outputs/frontier-hex-basalt-cliff-v1/00.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-basalt-cliff-v1/04.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-meadow-basalt-edge-v1/05.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-basalt-ash-edge-v1/03.png"
+  ]
+}

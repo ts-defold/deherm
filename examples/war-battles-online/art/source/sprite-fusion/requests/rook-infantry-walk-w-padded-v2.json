@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_c164883e-08c2-466f-bc30-eab81b401248",
+  "operation": "animate",
+  "prompt": "A grounded side-profile walk loop with alternating boot contact and a small opposite-arm swing. Preserve Rook's brown helmet, blue goggles, cream scarf, sidearm, proportions, colors, and the input pose's exact facing. Keep the complete helmet, boots, sidearm, and arms inside the canvas throughout the motion. Do not mirror or turn her.",
+  "size": null,
+  "outputFrames": 4,
+  "colors": 24,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/inputs/rook-infantry-walk-pose-w-v1-0-padded-64.png",
+      "bytes": 2435,
+      "sha256": "cb0fe5f7d3af12bafc7730a4c2f541d13ed72c3c8f601e5eb0c433b10c5ade01"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/rook-infantry-walk-w-padded-v2.json",
+    "sha256": "22e77f6f47d5c9a6b778c8916832cb16c7abd81a172c2db95267b4053a88b4be"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "534e23fa-0327-47de-8854-857c942129c3",
+      "type": "animation",
+      "contentType": "image/webp",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/534e23fa-0327-47de-8854-857c942129c3/animation.webp?v=1791560403092",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-walk-w-padded-v2/00.webp",
+      "bytes": 1976,
+      "sha256": "2fcd0bc1e8b25b5b609459c5bfa690187384a2f71b975816bc8ce5c33ce533e0",
+      "spritesheet": {
+        "url": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/534e23fa-0327-47de-8854-857c942129c3/spritesheet.png?v=1791560403092",
+        "path": "art/source/sprite-fusion/outputs/rook-infantry-walk-w-padded-v2/00-sheet.png",
+        "bytes": 2286,
+        "sha256": "f645edd9281120ca832620933c0874e901dd14240b8ff522c2d4f8bd0ada963d"
+      },
+      "frameCount": 4,
+      "fps": 8
+    }
+  ],
+  "credits": {
+    "remaining": 135
+  }
+}

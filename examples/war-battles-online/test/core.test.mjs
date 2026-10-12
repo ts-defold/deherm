@@ -1,14 +1,20 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { cellCentreX, cellCentreY } from "../core/arena.ts";
+import { upperQuartileSnapshotAge } from "../core/client.ts";
+import { WORLD_PROP_BUILDING, WORLD_PROP_DEPOT, WORLD_PROP_ROCK, WORLD_PROP_TREE } from "../core/world-plan.ts";
 
 import {
   ArenaMap,
   adoptServerWebTransportSession,
   BattleClient,
+  CELL_CRATE,
+  CELL_SANDBAG,
   CELL_WALL,
   cellOfX,
   cellOfY,
   BattleWorld,
+  BASE_HEALTH,
   BotController,
   WebTransportGameClient,
   DenoWebTransportServer,
@@ -19,6 +25,7 @@ import {
   CONTROL_SET_WEAPON_UPGRADE,
   CONTROL_SUICIDE,
   DEFAULT_ARENA_SEED,
+  DEFAULT_ROSTER_SIZE,
   DIRECTION_SCALE,
   EVENT_KILL,
   EVENT_EJECT,
@@ -34,7 +41,12 @@ import {
   INPUT_BUNDLE_MAX_COMMANDS,
   INPUT_PACKET_BYTES,
   INPUT_SEND_INTERVAL_TICKS,
+  PING_BYTES,
+  PONG_FEEDBACK_BYTES,
+  INFANTRY_RADIUS,
+  INFANTRY_HEALTH,
   INFANTRY_EJECT_LOCK_TICKS,
+  INFANTRY_EJECT_PROTECT_TICKS,
   MAP_HEIGHT,
   MAP_WIDTH,
   MAX_PICKUPS,
@@ -42,6 +54,7 @@ import {
   MAX_COVER_PANELS,
   COVER_MAX_HEALTH,
   MAX_PLAYERS,
+  PLAYER_RADIUS,
   MatchServer,
   NETWORK_SNAPSHOT_BYTES,
   NetworkBotDriver,
@@ -62,6 +75,7 @@ import {
   SNAPSHOT_MESSAGE_BYTES,
   TICK_MILLISECONDS,
   TILE_UNITS,
+  UNITS_PER_PIXEL,
   TRANSPORT_CHANNEL_CONTROL,
   TRANSPORT_CHANNEL_INPUT_FALLBACK,
   TRANSPORT_CHANNEL_SESSION,
@@ -100,8 +114,10 @@ import {
   isometricDirectionX,
   isometricDirectionY,
   isometricDirectionIndex,
+  isometricDirectionIndexHysteretic,
   isometricScreenX,
   isometricScreenY,
+  isometricSortZ,
   readHello,
   readInputBundle,
   readInputPacket,
@@ -119,18 +135,19 @@ import {
   writeSnapshotKeyframe,
   writeNetworkSnapshotDelta,
   writeNetworkSnapshotKeyframe,
+  writePing,
+  writePongFeedback,
   writeWelcome,
   writeWelcomeAck,
 } from "../core/index.ts";
 import {
   ARENA_DECOR_ROLE_COUNT,
   ARENA_DECOR_ROLE_CRATER_BASE,
-  ARENA_DECOR_ROLE_SERVICE_ROAD_BASE,
   ARENA_DECOR_ROLE_STAGING_PAD_BASE,
   ARENA_GROUND_VARIANT_COUNT,
+  ARENA_GROUND_ROLE_BORDER_BASE,
   ARENA_GROUND_ROLE_WALL_BASE,
   ARENA_LANDSCAPE_MATERIAL_COUNT,
-  ARENA_MARK_ROLE_COUNT,
   ARENA_VISUAL_CELL_COUNT,
   ARENA_WALL_MASK_BITS,
   ARENA_WALL_MASK_TO_FRAME,
@@ -152,6 +169,119 @@ import {
 } from "../core/content.ts";
 import { NetworkBotClock } from "../bot-dashboard/network-bot-clock.ts";
 
+test("snapshot-age lead estimator follows sustained jitter without chasing one slow packet", () => {
+  const scratch = new Uint8Array(12);
+  assert.equal(
+    upperQuartileSnapshotAge(Uint8Array.from([2, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]), 12, scratch),
+    10,
+  );
+  assert.equal(upperQuartileSnapshotAge(Uint8Array.from([5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 30]), 12, scratch), 5);
+  assert.equal(upperQuartileSnapshotAge(Uint8Array.from([12, 1, 11, 2, 10, 3, 9, 4, 8, 5, 7, 6]), 12, scratch), 9);
+  assert.equal(upperQuartileSnapshotAge(Uint8Array.from([7]), 1, scratch), 7);
+  assert.throws(() => upperQuartileSnapshotAge(Uint8Array.from([1]), 0, scratch), RangeError);
+});
+
+test("client probes the live round trip at a bounded cadence", async () => {
+  const errors = [];
+  const server = new MatchServer({
+    rosterSize: 1,
+    fillVacantSlotsWithBots: false,
+    onError: (error) => errors.push(error),
+  });
+  const client = join(server, "ping-cadence", errors);
+  await settle();
+  assert.equal(client.state, "ready");
+  client.update(499);
+  await settle();
+  assert.equal(client.stats.pongsReceived, 0, "no probe before the half-second boundary");
+  client.update(1);
+  await settle();
+  assert.equal(client.stats.pongsReceived, 1);
+  assert.ok(client.stats.lastRoundTripMilliseconds < 1_000);
+  client.update(5_000);
+  await settle();
+  assert.equal(client.stats.pongsReceived, 2, "a stalled frame emits one probe, not ten");
+  assert.deepEqual(errors, []);
+  server.close();
+});
+
+test("a delayed reliable pong cannot regress the last applied server snapshot tick", async () => {
+  const errors = [];
+  const server = new MatchServer({
+    rosterSize: 1,
+    fillVacantSlotsWithBots: false,
+    onError: (error) => errors.push(error),
+  });
+  const client = join(server, "delayed-pong", errors);
+  await settle();
+  for (let tick = 0; tick < 6; tick += 1) server.step();
+  await settle();
+  client.update(0);
+  assert.ok(client.stats.lastServerTick >= 6);
+  const appliedTick = client.stats.lastServerTick;
+  const pong = new Uint8Array(PING_BYTES);
+  writePing(pong, { clientTime: Date.now() >>> 0, serverTick: 1 }, true);
+  client.onReliable(TRANSPORT_CHANNEL_SESSION, pong);
+  assert.equal(client.stats.lastServerTick, appliedTick);
+  assert.equal(client.stats.pongsReceived, 1);
+  assert.deepEqual(errors, []);
+  server.close();
+});
+
+test("authoritative late-input feedback raises lead without trusting an older pong", async () => {
+  const errors = [];
+  const server = new MatchServer({
+    rosterSize: 1,
+    fillVacantSlotsWithBots: false,
+    onError: (error) => errors.push(error),
+  });
+  const client = join(server, "late-feedback", errors, { leadTicks: 8 });
+  await settle();
+  const pong = new Uint8Array(PONG_FEEDBACK_BYTES);
+  const deliver = (serverTick, accepted, late) => {
+    writePongFeedback(pong, { clientTime: Date.now() >>> 0, serverTick }, accepted, late);
+    client.onReliable(TRANSPORT_CHANNEL_SESSION, pong);
+  };
+  deliver(10, 20, 8);
+  assert.equal(client.stats.inputFeedbackLeadTicks, 10);
+  assert.equal(client.stats.authoritativeInputsLate, 8);
+  deliver(9, 10, 0);
+  assert.equal(client.stats.inputFeedbackLeadTicks, 10, "an older independent stream cannot replace feedback");
+  assert.equal(client.stats.authoritativeInputsLate, 8);
+  for (let tick = 11; tick <= 14; tick += 1) deliver(tick, 20 + (tick - 10) * 20, 8);
+  assert.equal(client.stats.inputFeedbackLeadTicks, 9, "four clean reporting windows relax one lead tick");
+  assert.deepEqual(errors, []);
+  server.close();
+});
+
+test("late-input feedback belongs only to the session that sent the late command", async () => {
+  const errors = [];
+  const server = new MatchServer({
+    rosterSize: 2,
+    fillVacantSlotsWithBots: false,
+    onError: (error) => errors.push(error),
+  });
+  const lateClient = join(server, "late-session", errors);
+  const healthyClient = join(server, "healthy-session", errors);
+  await settleUntil(() => lateClient.state === "ready" && healthyClient.state === "ready", "both session welcomes");
+  for (let tick = 0; tick < 6; tick += 1) server.step();
+  const command = createInputCommand(server.world.matchId, lateClient.playerId);
+  command.tick = 1;
+  command.sequence = 1;
+  const packet = new Uint8Array(INPUT_PACKET_BYTES);
+  writeInputPacket(packet, 0, command);
+  lateClient.session.onDatagram(packet);
+  assert.equal(server.stats.inputsLate, 1);
+  lateClient.ping(Date.now());
+  healthyClient.ping(Date.now());
+  await settle();
+  assert.equal(lateClient.stats.authoritativeInputsLate, 1);
+  assert.equal(healthyClient.stats.authoritativeInputsLate, 0);
+  assert.equal(healthyClient.stats.inputFeedbackLeadTicks, healthyClient.leadTicks);
+  assert.deepEqual(errors, []);
+  server.close();
+});
+
 test("tank facing quantizes to the eight authored isometric views", () => {
   assert.deepEqual(
     [
@@ -169,9 +299,26 @@ test("tank facing quantizes to the eight authored isometric views", () => {
   assert.equal(isometricDirectionIndex(0, 0), 4, "idle direction defaults east");
 });
 
+test("presented tank facing does not flicker across a sector boundary", () => {
+  const direction = (degrees) => [Math.cos((degrees * Math.PI) / 180), Math.sin((degrees * Math.PI) / 180)];
+  const near = direction(24);
+  const beyond = direction(31);
+  const reverseNear = direction(21);
+  const reverseBeyond = direction(14);
+  assert.equal(isometricDirectionIndex(...near), 7, "raw quantization already selects northeast");
+  assert.equal(isometricDirectionIndexHysteretic(...near, 4), 4, "keep east during minor jitter");
+  assert.equal(isometricDirectionIndexHysteretic(...beyond, 4), 7, "switch after a deliberate turn");
+  assert.equal(isometricDirectionIndexHysteretic(...reverseNear, 7), 7, "keep northeast across reverse jitter");
+  assert.equal(isometricDirectionIndexHysteretic(...reverseBeyond, 7), 4, "switch back after a deliberate turn");
+  assert.equal(isometricDirectionIndexHysteretic(0, 0, 7), 7, "idle retains last authored facing");
+});
+
 test("one isometric projection drives positions, headings, and screen-relative controls", () => {
   assert.equal(isometricScreenX(0, 0), 648);
   assert.equal(isometricScreenY(0, 0), 368);
+  assert.ok(isometricSortZ(0, 2 * TILE_UNITS, 0.001) < isometricSortZ(0, 0, -0.002));
+  assert.ok(isometricSortZ(0, 0, 0.001) > isometricSortZ(0, 0));
+  assert.ok(isometricSortZ(0, 0) < isometricSortZ(0, -2 * TILE_UNITS));
 
   // The two Cartesian world axes rise along opposite screen diagonals.
   assert.ok(isometricDirectionX(1, 0) > 0);
@@ -443,54 +590,76 @@ test("32-player snapshot deltas are compact and keyframes recover the baseline",
   assert.throws(() => readSnapshotFrame(validDelta, missingBase), /base is unavailable/);
 });
 
-test("the bounded 32-player bot trace keeps snapshot bandwidth reproducible", () => {
-  const world = new BattleWorld(77);
-  const bots = new BotController();
-  for (let playerId = 1; playerId <= MAX_PLAYERS; playerId += 1) {
-    world.addPlayer(playerId);
-    world.setBotSkill(playerId, 2);
-  }
-  const previous = new Uint8Array(SNAPSHOT_BYTES);
-  const current = new Uint8Array(SNAPSHOT_BYTES);
-  const frame = new Uint8Array(SNAPSHOT_MESSAGE_BYTES);
-  const lengths = [];
-  const normal = [];
-  let baselineTick = -1;
-  let framesSinceKeyframe = SNAPSHOT_KEYFRAME_INTERVAL;
-  let keyframes = 0;
-  for (let tick = 1; tick <= 600; tick += 1) {
+test("the bounded 32-player bot trace stays collision-clear with reproducible snapshot bandwidth", () => {
+  assert.ok(
+    SNAPSHOT_KEYFRAME_INTERVAL < SNAPSHOT_BASE_HISTORY_FRAMES,
+    "periodic keyframes retain a margin inside the acknowledged baseline ring",
+  );
+  const runTrace = () => {
+    const world = new BattleWorld(77);
+    const bots = new BotController();
     for (let playerId = 1; playerId <= MAX_PLAYERS; playerId += 1) {
-      const input = createInputCommand(77, playerId);
-      bots.stage(world, input, playerId, tick);
-      world.submitInput(input);
+      world.addPlayer(playerId);
+      world.setBotSkill(playerId, 2);
     }
-    world.step();
-    if (world.tick % 3 !== 0) continue;
-    world.writeSnapshot(current);
-    let length = -1;
-    if (framesSinceKeyframe < SNAPSHOT_KEYFRAME_INTERVAL - 1) {
-      length = writeSnapshotDelta(frame, world.tick, baselineTick, previous, current);
+    const previous = new Uint8Array(SNAPSHOT_BYTES);
+    const current = new Uint8Array(SNAPSHOT_BYTES);
+    const frame = new Uint8Array(SNAPSHOT_MESSAGE_BYTES);
+    const lengths = [];
+    const normal = [];
+    const resolved = { x: 0, y: 0, hitX: false, hitY: false };
+    let baselineTick = -1;
+    let framesSinceKeyframe = SNAPSHOT_KEYFRAME_INTERVAL;
+    let keyframes = 0;
+    for (let tick = 1; tick <= 600; tick += 1) {
+      for (let playerId = 1; playerId <= MAX_PLAYERS; playerId += 1) {
+        const input = createInputCommand(77, playerId);
+        bots.stage(world, input, playerId, tick);
+        world.submitInput(input);
+      }
+      world.step();
+      for (let slot = 0; slot < MAX_PLAYERS; slot += 1) {
+        if (world.playerActive[slot] === 0 || world.playerHealth[slot] <= 0) continue;
+        const radius = world.playerMode[slot] === PLAYER_MODE_INFANTRY ? INFANTRY_RADIUS : PLAYER_RADIUS;
+        world.map.resolveCircle(world.playerX[slot], world.playerY[slot], radius, resolved);
+        assert.deepEqual(
+          [resolved.x, resolved.y],
+          [world.playerX[slot], world.playerY[slot]],
+          `tick ${tick}, slot ${slot} must finish outside solid cover`,
+        );
+      }
+      if (world.tick % 3 !== 0) continue;
+      world.writeSnapshot(current);
+      let length = -1;
+      if (framesSinceKeyframe < SNAPSHOT_KEYFRAME_INTERVAL - 1) {
+        length = writeSnapshotDelta(frame, world.tick, baselineTick, previous, current);
+      }
+      if (length < 0) {
+        length = writeSnapshotKeyframe(frame, world.tick, current);
+        framesSinceKeyframe = 0;
+        keyframes += 1;
+      } else {
+        framesSinceKeyframe += 1;
+        normal.push(length);
+      }
+      lengths.push(length);
+      previous.set(current);
+      baselineTick = world.tick;
     }
-    if (length < 0) {
-      length = writeSnapshotKeyframe(frame, world.tick, current);
-      framesSinceKeyframe = 0;
-      keyframes += 1;
-    } else {
-      framesSinceKeyframe += 1;
-      normal.push(length);
-    }
-    lengths.push(length);
-    previous.set(current);
-    baselineTick = world.tick;
-  }
-  lengths.sort((left, right) => left - right);
-  assert.equal(lengths.length, 200);
-  assert.equal(lengths[0], 1_268);
-  assert.equal(lengths.at(-1), 4_228);
-  assert.equal(lengths[Math.floor(lengths.length / 2)], 1_493);
-  assert.equal(keyframes, 5);
-  normal.sort((left, right) => left - right);
-  assert.equal(normal.at(-1), 1_902);
+    lengths.sort((left, right) => left - right);
+    normal.sort((left, right) => left - right);
+    return { lengths, normal, keyframes };
+  };
+  const trace = runTrace();
+  assert.deepEqual(runTrace(), trace, "the seeded 32-player wire trace is reproducible");
+  assert.equal(trace.lengths.length, 200);
+  assert.equal(trace.keyframes, 4);
+  // The island may move bots differently than the old symmetric map. Guard
+  // transfer cost as a budget instead of pinning incidental exact frame bytes.
+  assert.ok(trace.lengths[0] >= 1_000, `smallest frame is unexpectedly short: ${trace.lengths[0]}`);
+  assert.ok(trace.lengths.at(-1) <= 5_000, `largest frame exceeds budget: ${trace.lengths.at(-1)}`);
+  assert.ok(trace.lengths[100] <= 2_000, `median frame exceeds budget: ${trace.lengths[100]}`);
+  assert.ok(trace.normal.at(-1) <= 2_500, `largest delta exceeds budget: ${trace.normal.at(-1)}`);
 });
 
 test("snapshot admission stays bounded when a host ignores stream completion", async () => {
@@ -703,41 +872,104 @@ test("a closed snapshot send releases the server session", async () => {
 
 // --- arena ------------------------------------------------------------------
 
-test("the arena is reproducible from its seed, point-symmetric and fully connected", () => {
+test("seeded island cover is reproducible, connected, bounded and never orphaned", () => {
   const first = new ArenaMap(0x57_41_52_42);
   const second = new ArenaMap(0x57_41_52_42);
   assert.deepEqual([...first.cells], [...second.cells]);
   const other = new ArenaMap(0x0bad_f00d);
   assert.notDeepEqual([...first.cells], [...other.cells]);
-
-  for (let cellY = 0; cellY < MAP_HEIGHT; cellY += 1) {
-    for (let cellX = 0; cellX < MAP_WIDTH; cellX += 1) {
-      assert.equal(
-        first.cellAt(cellX, cellY),
-        first.cellAt(MAP_WIDTH - 1 - cellX, MAP_HEIGHT - 1 - cellY),
-        `arena is not point-symmetric at ${cellX},${cellY}`,
-      );
+  // Every open cell must be reachable. A coast pocket sealed by a clipped
+  // cover stamp could otherwise trap a bot or contain an uncontestable pickup.
+  for (let ordinal = 0; ordinal <= 512; ordinal += 1) {
+    const seed = ordinal === 512 ? 0xffff_ffff : ordinal;
+    const map = new ArenaMap(seed);
+    const seen = new Uint8Array(MAP_WIDTH * MAP_HEIGHT);
+    const queue = new Int32Array(MAP_WIDTH * MAP_HEIGHT);
+    let head = 0;
+    let tail = 0;
+    const firstOpen = map.cells.indexOf(CELL_FLOOR);
+    assert.ok(firstOpen >= 0, `seed ${seed} has open land`);
+    queue[tail++] = firstOpen;
+    seen[firstOpen] = 1;
+    while (head < tail) {
+      const cell = queue[head++];
+      const x = cell % MAP_WIDTH;
+      const y = Math.floor(cell / MAP_WIDTH);
+      for (const next of [
+        x > 0 ? cell - 1 : -1,
+        x < MAP_WIDTH - 1 ? cell + 1 : -1,
+        y > 0 ? cell - MAP_WIDTH : -1,
+        y < MAP_HEIGHT - 1 ? cell + MAP_WIDTH : -1,
+      ]) {
+        if (next < 0 || seen[next] !== 0 || map.cells[next] !== CELL_FLOOR) continue;
+        seen[next] = 1;
+        queue[tail++] = next;
+      }
+    }
+    assert.equal(tail, map.openCellCount(), `seed ${seed} contains disconnected floor`);
+    assert.ok(map.coverPanelCount > 0, `seed ${seed} retains a destructible cover encounter`);
+    assert.ok(map.coverPanelCount <= MAX_COVER_PANELS, `seed ${seed} exceeds cover capacity`);
+    for (let cell = 0; cell < map.cells.length; cell += 1) {
+      const kind = map.cells[cell];
+      if (kind === CELL_CRATE || kind === CELL_SANDBAG) {
+        assert.ok(map.coverPanelByCell[cell] >= 0, `seed ${seed} has orphaned cover at ${cell}`);
+      }
+      if (map.plan.cellLand[cell] === 0 || map.plan.propSolid[cell] !== 0) {
+        assert.equal(kind, CELL_WALL, `seed ${seed} leaves plan-owned collision open at ${cell}`);
+      }
     }
   }
+});
 
-  // Every open cell must be reachable: a pocket of floor nothing can enter is a
-  // pickup nobody can contest and a bot goal nobody can satisfy.
-  const seen = new Uint8Array(MAP_WIDTH * MAP_HEIGHT);
-  const stack = [[MAP_WIDTH >> 1, MAP_HEIGHT >> 1]];
-  let reached = 0;
-  while (stack.length > 0) {
-    const [cellX, cellY] = stack.pop();
-    if (cellX < 0 || cellY < 0 || cellX >= MAP_WIDTH || cellY >= MAP_HEIGHT) continue;
-    const index = cellY * MAP_WIDTH + cellX;
-    if (seen[index] === 1 || first.solidAt(cellX, cellY)) continue;
-    seen[index] = 1;
-    reached += 1;
-    stack.push([cellX + 1, cellY], [cellX - 1, cellY], [cellX, cellY + 1], [cellX, cellY - 1]);
+test("one arena has tank-scale room and distinct collision-clear starts for all 32 players", () => {
+  for (const seed of [DEFAULT_ARENA_SEED, 0, 77, 0xffff_ffff]) {
+    const world = new PlayableBattle({ players: MAX_PLAYERS, mapSeed: seed }).world;
+    const resolved = { x: 0, y: 0, hitX: false, hitY: false };
+    for (let slot = 0; slot < MAX_PLAYERS; slot += 1) {
+      const x = world.playerX[slot];
+      const y = world.playerY[slot];
+      assert.equal(world.map.solidAtWorld(x, y), false, `${seed}: slot ${slot} starts on floor`);
+      world.map.resolveCircle(x, y, PLAYER_RADIUS, resolved);
+      assert.deepEqual([resolved.x, resolved.y], [x, y], `${seed}: slot ${slot} clears nearby cover`);
+      for (let other = 0; other < slot; other += 1) {
+        const separation = Math.hypot(x - world.playerX[other], y - world.playerY[other]);
+        assert.ok(separation >= 8 * TILE_UNITS, `${seed}: slots ${other},${slot} keep eight-cell combat spacing`);
+      }
+    }
   }
-  assert.equal(reached, first.openCellCount());
-  // Cover, but still an arena: somewhere between a field and a maze.
-  const solid = MAP_WIDTH * MAP_HEIGHT - first.openCellCount();
-  assert.ok(solid > 800 && solid < 3_000, `arena has ${solid} solid cells`);
+});
+
+test("seeded tank depots reserve full hull clearance", () => {
+  const resolved = { x: 0, y: 0, hitX: false, hitY: false };
+  for (let seed = 0; seed < 256; seed += 1) {
+    const map = new ArenaMap(seed);
+    for (let depot = 0; depot < map.spawnX.length; depot += 1) {
+      const x = map.spawnX[depot];
+      const y = map.spawnY[depot];
+      map.resolveCircle(x, y, PLAYER_RADIUS, resolved);
+      assert.deepEqual([resolved.x, resolved.y], [x, y], `seed ${seed}, depot ${depot} fits a tank`);
+    }
+  }
+});
+
+test("arena collision treats every exterior edge as solid without cover-table aliasing", () => {
+  const map = new ArenaMap(DEFAULT_ARENA_SEED);
+  for (const x of [-1, 0, MAP_WIDTH - 1, MAP_WIDTH]) {
+    assert.equal(map.solidAt(x, -1), true, `bottom exterior at x=${x}`);
+    assert.equal(map.solidAt(x, MAP_HEIGHT), true, `top exterior at x=${x}`);
+  }
+  for (const y of [0, MAP_HEIGHT >> 1, MAP_HEIGHT - 1]) {
+    assert.equal(map.solidAt(-1, y), true, `left exterior at y=${y}`);
+    assert.equal(map.solidAt(MAP_WIDTH, y), true, `right exterior at y=${y}`);
+  }
+  const resolved = { x: 0, y: 0, hitX: false, hitY: false };
+  const edgeX = map.spawnX[0];
+  // A tank centred one radius inside an exterior cell is pushed back toward
+  // the arena. This checks the same resolver used by authoritative movement.
+  const outsideY = -(MAP_HEIGHT * TILE_UNITS) / 2 - PLAYER_RADIUS / 2;
+  map.resolveCircle(edgeX, outsideY, PLAYER_RADIUS, resolved);
+  assert.equal(resolved.hitY, true);
+  assert.ok(resolved.y > outsideY);
 });
 
 test("arena routing finds deterministic visible waypoints around blocked direct paths", () => {
@@ -823,21 +1055,22 @@ test("the arena visual projector owns an explicit and exhaustive four-neighbour 
 
 test("one allocation-free semantic projection drives every arena theme", () => {
   const map = new ArenaMap(DEFAULT_ARENA_SEED);
-  const ground = new Uint8Array(ARENA_VISUAL_CELL_COUNT);
+  const ground = new Uint16Array(ARENA_VISUAL_CELL_COUNT);
   const decor = new Uint8Array(ARENA_VISUAL_CELL_COUNT);
   const marks = new Uint8Array(ARENA_VISUAL_CELL_COUNT);
   projectArenaVisualRoles(map, DEFAULT_ARENA_SEED, ground, decor, marks);
   assert.ok(ground.some((role) => role < ARENA_GROUND_ROLE_WALL_BASE));
-  assert.ok(ground.some((role) => role >= ARENA_GROUND_ROLE_WALL_BASE && role < ARENA_GROUND_ROLE_WALL_BASE + 16));
+  assert.ok(ground.some((role) => role >= ARENA_GROUND_ROLE_WALL_BASE && role < ARENA_GROUND_ROLE_BORDER_BASE));
+  assert.ok(ground.some((role) => role >= ARENA_GROUND_ROLE_BORDER_BASE && role < ARENA_GROUND_ROLE_BORDER_BASE + 16));
   assert.ok(decor.some((role) => role > 0 && role < ARENA_DECOR_ROLE_COUNT));
   assert.ok(
-    decor.some((role) => role >= ARENA_DECOR_ROLE_SERVICE_ROAD_BASE && role < ARENA_DECOR_ROLE_SERVICE_ROAD_BASE + 16),
+    decor.every((role) => role < ARENA_DECOR_ROLE_STAGING_PAD_BASE || role >= ARENA_DECOR_ROLE_CRATER_BASE + 4),
+    "the hex world must not receive square-grid staging or crater overlays",
   );
   assert.ok(
-    decor.some((role) => role >= ARENA_DECOR_ROLE_STAGING_PAD_BASE && role < ARENA_DECOR_ROLE_STAGING_PAD_BASE + 4),
+    marks.every((role) => role === 0),
+    "cover, spawn and pickup marks belong to isometric world sprites",
   );
-  assert.ok(decor.some((role) => role >= ARENA_DECOR_ROLE_CRATER_BASE && role < ARENA_DECOR_ROLE_CRATER_BASE + 4));
-  assert.ok(marks.some((role) => role > 0 && role < ARENA_MARK_ROLE_COUNT));
   assert.equal(arenaThemeIndex(DEFAULT_ARENA_SEED, DEFAULT_ARENA_SEED, 3), 0);
   assert.equal(arenaThemeIndex(DEFAULT_ARENA_SEED ^ 1, DEFAULT_ARENA_SEED, 3), 1);
   assert.equal(arenaThemeIndex(DEFAULT_ARENA_SEED ^ 2, DEFAULT_ARENA_SEED, 3), 2);
@@ -847,7 +1080,7 @@ test("one allocation-free semantic projection drives every arena theme", () => {
   );
 });
 
-test("landscape roles form broad symmetric regions and stay inside the byte-sized role table", () => {
+test("landscape roles form symmetric accents and stay inside the ground role table", () => {
   const counts = new Uint16Array(ARENA_LANDSCAPE_MATERIAL_COUNT);
   for (let cellY = 0; cellY < MAP_HEIGHT; cellY += 1) {
     for (let cellX = 0; cellX < MAP_WIDTH; cellX += 1) {
@@ -858,11 +1091,12 @@ test("landscape roles form broad symmetric regions and stay inside the byte-size
       assert.ok(role >= 0 && role < ARENA_GROUND_VARIANT_COUNT);
     }
   }
-  assert.ok(ARENA_GROUND_ROLE_WALL_BASE + 15 <= 255, "ground and wall roles must remain Uint8-safe");
+  assert.ok(ARENA_GROUND_ROLE_WALL_BASE + 15 <= 65535, "ground and wall roles must remain Uint16-safe");
   assert.ok(
-    counts.every((count) => count >= 1_000),
-    `every material must own a broad region: ${[...counts]}`,
+    counts.every((count) => count >= 200),
+    `every material must remain visible: ${[...counts]}`,
   );
+  assert.ok(counts[0] > MAP_WIDTH * MAP_HEIGHT * 0.6, "meadow must remain the primary readable battlefield");
 });
 
 test("line of sight is blocked by cover and spawn pads stand in the open", () => {
@@ -890,8 +1124,15 @@ test("rotating hazard vents are deterministic, open, and authoritative", () => {
   const second = new ArenaMap(0x57_41_52_42);
   assert.deepEqual([...first.hazardX], [...second.hazardX]);
   assert.deepEqual([...first.hazardY], [...second.hazardY]);
-  assert.equal(first.hazardX[0], first.hazardX[1] * -1);
-  assert.equal(first.hazardY[0], first.hazardY[2] * -1);
+  for (let left = 0; left < MAX_HAZARDS; left += 1) {
+    for (let right = left + 1; right < MAX_HAZARDS; right += 1) {
+      assert.ok(
+        Math.hypot(first.hazardX[left] - first.hazardX[right], first.hazardY[left] - first.hazardY[right]) >
+          20 * TILE_UNITS,
+        "seeded vents must occupy separate driveable island regions",
+      );
+    }
+  }
   for (let index = 0; index < MAX_HAZARDS; index += 1) {
     assert.equal(first.solidAtWorld(first.hazardX[index], first.hazardY[index]), false);
   }
@@ -944,18 +1185,25 @@ test("rotating hazard vents are deterministic, open, and authoritative", () => {
 
 test("destructible cover is fixed-capacity, authoritative, and snapshot-safe", () => {
   const world = new BattleWorld(77, 0x57_41_52_42);
-  const panel = 0;
+  let panel = -1;
   assert.equal(world.map.coverHealth.length, MAX_COVER_PANELS);
   assert.ok(world.map.coverPanelCount > 0 && world.map.coverPanelCount <= MAX_COVER_PANELS);
-  assert.equal(world.map.coverPanelCount % 2, 0, "bounded cover must be selected in symmetric pairs");
+  const coverCells = new Set();
   for (let index = 0; index < world.map.coverPanelCount; index += 1) {
-    const mirrorX = -world.map.coverX[index];
-    const mirrorY = -world.map.coverY[index];
+    const x = world.map.coverX[index];
+    const y = world.map.coverY[index];
+    const cell = world.map.index(cellOfX(x), cellOfY(y));
+    assert.equal(coverCells.has(cell), false, "each accepted island cover cell owns one panel");
+    coverCells.add(cell);
+    assert.equal(world.map.plan.cellLand[cell], 1, "destructible cover stays on land");
+    assert.equal(world.map.plan.propSolid[cell], 0, "destructible cover never replaces an immutable prop");
     assert.ok(
-      world.map.coverPanelAtWorld(mirrorX, mirrorY) >= 0,
-      "every destructible panel must include its point mirror",
+      world.map.cellAt(cellOfX(x), cellOfY(y)) === CELL_CRATE ||
+        world.map.cellAt(cellOfX(x), cellOfY(y)) === CELL_SANDBAG,
     );
+    if (panel < 0 && !world.map.solidAtWorld(x - TILE_UNITS, y)) panel = index;
   }
+  assert.ok(panel >= 0, "at least one cover panel has an open west firing lane");
   assert.equal(world.map.coverHealth[panel], COVER_MAX_HEALTH);
   const x = world.map.coverX[panel];
   const y = world.map.coverY[panel];
@@ -1062,6 +1310,116 @@ test("a tank carries momentum rather than teleporting, and cover stops it", () =
   assert.equal(world.map.solidAtWorld(view.x, view.y), false, "a tank must never end inside cover");
 });
 
+test("authoritative tank drive stops at plan-owned tree, rock, building, and depot colliders", () => {
+  for (const kind of [WORLD_PROP_TREE, WORLD_PROP_ROCK, WORLD_PROP_BUILDING, WORLD_PROP_DEPOT]) {
+    const world = new BattleWorld(77, DEFAULT_ARENA_SEED);
+    world.addPlayer(1);
+    const map = world.map;
+    const resolved = { x: 0, y: 0, hitX: false, hitY: false };
+    let approach;
+    for (let prop = 0; prop < map.plan.propCount && approach === undefined; prop += 1) {
+      if (map.plan.propKinds[prop] !== kind) continue;
+      const cell = map.plan.propCells[prop];
+      const x = cell % MAP_WIDTH;
+      const y = Math.floor(cell / MAP_WIDTH);
+      const startX = cellCentreX(x - 7);
+      const startY = cellCentreY(y);
+      map.resolveCircle(startX, startY, PLAYER_RADIUS, resolved);
+      if (resolved.x !== startX || resolved.y !== startY) continue;
+      let corridorClear = true;
+      for (let candidateX = x - 7; candidateX < x - 2; candidateX += 1) {
+        if (map.solidAt(candidateX, y)) corridorClear = false;
+      }
+      if (!corridorClear) continue;
+      let blockingCellX = x;
+      while (map.plan.propSolid[y * MAP_WIDTH + blockingCellX - 1] !== 0) blockingCellX -= 1;
+      approach = { x: startX, y: startY, barrierX: cellCentreX(blockingCellX) - TILE_UNITS / 2 - PLAYER_RADIUS };
+    }
+    assert.ok(approach, `default seed needs an open drive approach to prop kind ${kind}`);
+    world.playerX[0] = approach.x;
+    world.playerY[0] = approach.y;
+    world.playerVelocityX[0] = 0;
+    world.playerVelocityY[0] = 0;
+    let farthestX = approach.x;
+    for (let tick = 1; tick <= 100; tick += 1) {
+      world.submitInput(command(1, tick, { moveX: 127 }));
+      world.step();
+      farthestX = Math.max(farthestX, world.playerX[0]);
+      map.resolveCircle(world.playerX[0], world.playerY[0], PLAYER_RADIUS, resolved);
+      assert.deepEqual(
+        [resolved.x, resolved.y],
+        [world.playerX[0], world.playerY[0]],
+        `prop kind ${kind} never leaves the tank overlapping a solid cell`,
+      );
+    }
+    assert.ok(farthestX >= approach.barrierX - TILE_UNITS, `tank approached prop kind ${kind}`);
+    assert.ok(farthestX <= approach.barrierX, `tank did not drive through prop kind ${kind}`);
+  }
+});
+
+test("an embedded tank is projected fully outside a plan-owned prop", () => {
+  const map = new ArenaMap(DEFAULT_ARENA_SEED);
+  const resolved = { x: 0, y: 0, hitX: false, hitY: false };
+  for (const kind of [WORLD_PROP_TREE, WORLD_PROP_ROCK, WORLD_PROP_BUILDING, WORLD_PROP_DEPOT]) {
+    const prop = map.plan.propKinds.findIndex((value, index) => index < map.plan.propCount && value === kind);
+    assert.ok(prop >= 0, `default seed has prop kind ${kind}`);
+    const cell = map.plan.propCells[prop];
+    map.resolveCircle(
+      cellCentreX(cell % MAP_WIDTH),
+      cellCentreY(Math.floor(cell / MAP_WIDTH)),
+      PLAYER_RADIUS,
+      resolved,
+    );
+    assert.ok(resolved.hitX || resolved.hitY, `embedded tank hits prop kind ${kind}`);
+    for (let cellY = cellOfY(resolved.y - PLAYER_RADIUS); cellY <= cellOfY(resolved.y + PLAYER_RADIUS); cellY += 1) {
+      for (let cellX = cellOfX(resolved.x - PLAYER_RADIUS); cellX <= cellOfX(resolved.x + PLAYER_RADIUS); cellX += 1) {
+        if (!map.solidAt(cellX, cellY)) continue;
+        const left = cellCentreX(cellX) - TILE_UNITS / 2;
+        const bottom = cellCentreY(cellY) - TILE_UNITS / 2;
+        const closestX = Math.max(left, Math.min(resolved.x, left + TILE_UNITS));
+        const closestY = Math.max(bottom, Math.min(resolved.y, bottom + TILE_UNITS));
+        const distanceSquared = (resolved.x - closestX) ** 2 + (resolved.y - closestY) ** 2;
+        assert.ok(distanceSquared >= PLAYER_RADIUS ** 2, `prop kind ${kind} leaves no embedded hull overlap`);
+      }
+    }
+  }
+});
+
+test("tank separation beside a wall preserves both wall clearance and body clearance", () => {
+  const world = new BattleWorld(77);
+  const wallX = 60;
+  const wallY = 45;
+  for (let y = wallY - 3; y <= wallY + 3; y += 1) {
+    for (let x = wallX - 3; x <= wallX + 4; x += 1) {
+      world.map.cells[world.map.index(x, y)] = CELL_FLOOR;
+    }
+  }
+  const wall = world.map.index(wallX, wallY);
+  world.map.cells[wall] = CELL_WALL;
+  world.map.coverPanelByCell[wall] = -1;
+  world.addPlayer(1);
+  world.addPlayer(2);
+  const wallRight = cellCentreX(wallX) + TILE_UNITS / 2;
+  const y = cellCentreY(wallY);
+  world.playerX[0] = wallRight + PLAYER_RADIUS + 1;
+  world.playerX[1] = world.playerX[0] + 100;
+  world.playerY[0] = y;
+  world.playerY[1] = y;
+
+  world.step();
+
+  const resolved = { x: 0, y: 0, hitX: false, hitY: false };
+  for (const slot of [0, 1]) {
+    world.map.resolveCircle(world.playerX[slot], world.playerY[slot], PLAYER_RADIUS, resolved);
+    assert.deepEqual(
+      [resolved.x, resolved.y],
+      [world.playerX[slot], world.playerY[slot]],
+      `tank ${slot} remains outside the wall after body separation`,
+    );
+  }
+  assert.ok(world.playerX[1] - world.playerX[0] >= PLAYER_RADIUS * 2, "the tanks also remain separated");
+});
+
 test("the authoritative tick boundary enforces the documented impulse-speed ceiling", () => {
   const world = new BattleWorld(77);
   const centre = { x: 0, y: 0 };
@@ -1105,7 +1463,20 @@ test("armour absorbs damage, tank destruction ejects the pilot, and the terminal
   let ejected = false;
   let killed = false;
   for (let tick = 1; tick <= 1_800 && !killed; tick += 1) {
-    world.submitInput(command(1, tick, { buttons: INPUT_BUTTON_FIRE, aimX: 127, aimY: 0 }));
+    // The island is larger than the old rectangular fixture and shell
+    // knockback moves an ejected pilot. Track the actual target as a player
+    // would, so this tests the tank-to-pilot lifecycle rather than a fixed
+    // firing ray through where the target used to stand.
+    const dx = world.playerX[1] - world.playerX[0];
+    const dy = world.playerY[1] - world.playerY[0];
+    const distance = Math.max(1, Math.hypot(dx, dy));
+    world.submitInput(
+      command(1, tick, {
+        buttons: INPUT_BUTTON_FIRE,
+        aimX: Math.round((dx / distance) * 127),
+        aimY: Math.round((dy / distance) * 127),
+      }),
+    );
     world.step();
     world.readPlayer(2, target);
     ejected ||= target.mode === PLAYER_MODE_INFANTRY;
@@ -1133,6 +1504,28 @@ test("armour absorbs damage, tank destruction ejects the pilot, and the terminal
   world.readPlayer(2, target);
   assert.equal(target.alive, true, "a wreck must come back");
   assert.ok(target.spawnProtectTicks >= 0);
+  assert.ok(world.playerGeneration[1] > 1, "respawn advances lifecycle even when snapshots skip death");
+});
+
+test("ejection leaves a brief, vulnerable pilot escape window", () => {
+  const world = new BattleWorld(77);
+  world.addPlayer(1, 1);
+  world.addPlayer(2, 2);
+  world.playerArmor[0] = 0;
+  world.playerSpawnProtectTicks[0] = 0;
+  world.applyDamage(0, BASE_HEALTH, 1, world.playerX[0], world.playerY[0]);
+  assert.equal(world.playerMode[0], PLAYER_MODE_INFANTRY);
+  assert.equal(world.playerSpawnProtectTicks[0], INFANTRY_EJECT_PROTECT_TICKS);
+
+  for (let hit = 0; hit < 3; hit += 1) {
+    world.applyDamage(0, 8, 1, world.playerX[0], world.playerY[0]);
+  }
+  assert.equal(world.playerHealth[0], 12, "the pilot can survive several immediate hits but is not invulnerable");
+  for (let tick = 0; tick < INFANTRY_EJECT_PROTECT_TICKS; tick += 1) world.step();
+  assert.equal(world.playerSpawnProtectTicks[0], 0);
+  world.applyDamage(0, 8, 1, world.playerX[0], world.playerY[0]);
+  world.applyDamage(0, 8, 1, world.playerX[0], world.playerY[0]);
+  assert.equal(world.playerMode[0], PLAYER_MODE_DEAD, "the pilot remains easy to finish once the window ends");
 });
 
 test("an on-foot pilot acquires a replacement tank at a depot and snapshots preserve the mode", () => {
@@ -1153,8 +1546,10 @@ test("an on-foot pilot acquires a replacement tank at a depot and snapshots pres
   world.restoreSnapshot(snapshot);
   assert.equal(world.playerMode[slot], PLAYER_MODE_INFANTRY);
 
+  const generation = world.playerGeneration[slot];
   world.step();
   assert.equal(world.playerMode[slot], PLAYER_MODE_TANK);
+  assert.equal(world.playerGeneration[slot], generation + 1, "replacement tank is a new presentation lifecycle");
   assert.equal(world.playerHealth[slot], 100);
   const event = createBattleEvent();
   let acquired = false;
@@ -1162,6 +1557,64 @@ test("an on-foot pilot acquires a replacement tank at a depot and snapshots pres
     if (world.events.read(sequence, event) && event.kind === EVENT_TANK_ACQUIRED) acquired = true;
   }
   assert.equal(acquired, true);
+});
+
+test("a predicting client waits for the server's respawn apron instead of choosing its own", () => {
+  const authoritative = new BattleWorld(77);
+  const predicted = new BattleWorld(77, authoritative.mapSeed, false);
+  authoritative.addPlayer(1);
+  predicted.addPlayer(1);
+  for (const world of [authoritative, predicted]) {
+    world.playerMode[0] = PLAYER_MODE_DEAD;
+    world.playerHealth[0] = 0;
+    world.playerRespawnTicks[0] = 1;
+  }
+  authoritative.step();
+  predicted.step();
+  assert.equal(authoritative.playerMode[0], PLAYER_MODE_TANK);
+  assert.equal(authoritative.playerGeneration[0], 2);
+  assert.equal(predicted.playerMode[0], PLAYER_MODE_DEAD);
+  assert.equal(predicted.playerGeneration[0], 1);
+  assert.equal(predicted.playerRespawnTicks[0], 0);
+  predicted.step();
+  assert.equal(predicted.playerMode[0], PLAYER_MODE_DEAD, "a stalled snapshot cannot trigger a second predicted spawn");
+});
+
+test("a predicting client never invents an ejection or replacement tank from sampled combat", () => {
+  const authoritative = new BattleWorld(77);
+  const predicted = new BattleWorld(77, authoritative.mapSeed, false);
+  const centre = { x: 0, y: 0 };
+  authoritative.map.nearestOpen(0, 0, centre);
+  for (const world of [authoritative, predicted]) {
+    world.addPlayer(1, 0, centre.x, centre.y);
+    world.playerHealth[0] = 1;
+    world.playerArmor[0] = 0;
+    world.playerSpawnProtectTicks[0] = 0;
+    world.projectileActive[0] = 1;
+    world.projectileOwner[0] = 0;
+    world.projectileWeapon[0] = WEAPON_MORTAR;
+    world.projectileLife[0] = 0;
+    world.projectileX[0] = centre.x;
+    world.projectileY[0] = centre.y;
+    world.step();
+  }
+  assert.equal(authoritative.playerMode[0], PLAYER_MODE_INFANTRY, "the server resolves the lethal blast");
+  assert.equal(predicted.playerMode[0], PLAYER_MODE_TANK, "the client waits for the next authoritative lifecycle");
+  assert.equal(predicted.playerHealth[0], 1, "sampled projectiles cannot mutate predicted health");
+
+  const depot = authoritative.nearestTankDepot(1);
+  for (const world of [authoritative, predicted]) {
+    world.playerMode[0] = PLAYER_MODE_INFANTRY;
+    world.playerHealth[0] = INFANTRY_HEALTH;
+    world.playerRespawnTicks[0] = 0;
+    world.playerX[0] = world.map.spawnX[depot];
+    world.playerY[0] = world.map.spawnY[depot];
+    world.playerVelocityX[0] = 0;
+    world.playerVelocityY[0] = 0;
+    world.step();
+  }
+  assert.equal(authoritative.playerMode[0], PLAYER_MODE_TANK, "the server awards the depot tank");
+  assert.equal(predicted.playerMode[0], PLAYER_MODE_INFANTRY, "the client does not predict tank acquisition");
 });
 
 test("a pilot cannot oscillate between infantry and tank without authoritative lifecycle events", () => {
@@ -1271,22 +1724,49 @@ test("splash damage reaches past a miss, hurts the shooter, and throws both", ()
 
 test("a bouncing projectile survives a wall the cannon would have died on", () => {
   const seed = 0x57_41_52_42;
-  const counts = [];
+  const map = new ArenaMap(seed);
+  let firingCell = -1;
+  for (let y = 12; y < MAP_HEIGHT - 12 && firingCell < 0; y += 1) {
+    for (let x = 12; x < MAP_WIDTH - 12; x += 1) {
+      let clear = true;
+      for (let dy = -2; dy <= 2 && clear; dy += 1) {
+        for (let dx = -2; dx <= 4; dx += 1) {
+          if (map.solidAt(x + dx, y + dy)) {
+            clear = false;
+            break;
+          }
+        }
+      }
+      if (clear) {
+        firingCell = map.index(x, y);
+        break;
+      }
+    }
+  }
+  assert.ok(firingCell >= 0, "island contains an open wall-impact firing lane");
+  const firingX = firingCell % MAP_WIDTH;
+  const firingY = Math.floor(firingCell / MAP_WIDTH);
+  const outcomes = [];
   for (const weapon of [WEAPON_RICOCHET, WEAPON_AUTOCANNON]) {
     const world = new BattleWorld(77, seed);
-    // Back into a corner and shoot at it.
-    world.addPlayer(1, 0, world.map.spawnX[0], world.map.spawnY[0]);
+    // Place the same one-cell-thick wall in a verified open lane. The old
+    // continuous-fire count conflated bounce behavior with weapon fire rate.
+    for (let dy = -1; dy <= 1; dy += 1) world.map.cells[world.map.index(firingX + 3, firingY + dy)] = CELL_WALL;
+    world.addPlayer(1, 0, cellCentreX(firingX), cellCentreY(firingY));
+    world.playerTurretX[0] = DIRECTION_SCALE;
+    world.playerTurretY[0] = 0;
     world.setWeapon(1, weapon);
-    world.grantAmmo(1, weapon, 400);
-    let alive = 0;
-    for (let tick = 1; tick <= 240; tick += 1) {
-      world.submitInput(command(1, tick, { buttons: INPUT_BUTTON_FIRE, aimX: -127, aimY: -127 }));
+    world.grantAmmo(1, weapon, 1);
+    for (let tick = 1; tick <= 4; tick += 1) {
+      world.submitInput(command(1, tick, { buttons: tick === 1 ? INPUT_BUTTON_FIRE : 0, aimX: 127, aimY: 0 }));
       world.step();
-      for (let slot = 0; slot < world.projectileActive.length; slot += 1) alive += world.projectileActive[slot];
     }
-    counts.push(alive);
+    outcomes.push({ active: world.projectileActive[0], bounces: world.projectileBounces[0] });
   }
-  assert.ok(counts[0] > counts[1], `ricochet should outlive the autocannon against a wall (${counts.join(" vs ")})`);
+  assert.deepEqual(outcomes, [
+    { active: 1, bounces: 3 },
+    { active: 0, bounces: 0 },
+  ]);
 });
 
 test("a scatter shot releases a fan of pellets from one trigger pull", () => {
@@ -1529,14 +2009,25 @@ test("bots use selected branch splash safety instead of base weapon tactics", ()
     world.addPlayer(2, 2);
     world.setBotSkill(1, 3);
     let found = false;
-    for (let cellY = 1; cellY < MAP_HEIGHT - 1 && !found; cellY += 1) {
-      for (let cellX = 1; cellX < MAP_WIDTH - 2; cellX += 1) {
-        if (world.map.solidAt(cellX, cellY) || world.map.solidAt(cellX + 1, cellY)) continue;
-        const x = cellX * 256 + 128;
-        const y = cellY * 256 + 128;
+    for (let cellY = 3; cellY < MAP_HEIGHT - 3 && !found; cellY += 1) {
+      for (let cellX = 3; cellX < MAP_WIDTH - 6; cellX += 1) {
+        let clear = true;
+        for (let dy = -2; dy <= 2 && clear; dy += 1) {
+          for (let dx = -2; dx <= 5; dx += 1) {
+            if (world.map.solidAt(cellX + dx, cellY + dy)) {
+              clear = false;
+              break;
+            }
+          }
+        }
+        if (!clear) continue;
+        const x = cellCentreX(cellX);
+        const y = cellCentreY(cellY);
         world.playerX[0] = x;
         world.playerY[0] = y;
-        world.playerX[1] = x + 256;
+        // Two tank hulls clear one another, yet the target remains inside the
+        // blast branch's 512-unit self-damage exclusion radius.
+        world.playerX[1] = x + 480;
         world.playerY[1] = y;
         found = true;
         break;
@@ -1552,16 +2043,46 @@ test("bots use selected branch splash safety instead of base weapon tactics", ()
     const bots = new BotController();
     bots.goalTarget[0] = 1;
     bots.decideAt[0] = 0;
-    const staged = createInputCommand(77, 1);
-    bots.stage(world, staged, 1, 1);
-    return staged.buttons;
+    let fired = false;
+    for (let tick = 1; tick <= 64; tick += 1) {
+      const staged = createInputCommand(77, 1);
+      bots.stage(world, staged, 1, tick);
+      fired ||= (staged.buttons & INPUT_BUTTON_FIRE) !== 0;
+    }
+    return fired;
   };
 
-  assert.notEqual(stageAtCloseRange(false) & INPUT_BUTTON_FIRE, 0, "base cannon may fire at one-cell range");
-  assert.equal(stageAtCloseRange(true) & INPUT_BUTTON_FIRE, 0, "blast branch respects its larger self-damage radius");
+  assert.equal(stageAtCloseRange(false), true, "base cannon may fire inside the blast branch's unsafe range");
+  assert.equal(stageAtCloseRange(true), false, "blast branch respects its larger self-damage radius");
 });
 
 // --- bots -------------------------------------------------------------------
+
+test("bot steering leaves room for a nearby tank without disabling body collision", () => {
+  const world = new BattleWorld(77);
+  world.addPlayer(1);
+  world.addPlayer(2);
+  const x = world.map.spawnX[0];
+  const y = world.map.spawnY[0];
+  world.playerX[0] = x;
+  world.playerY[0] = y;
+  world.playerX[1] = x + PLAYER_RADIUS * 2 + PLAYER_RADIUS / 4;
+  world.playerY[1] = y;
+  const bots = new BotController();
+  bots.goal[0] = 1;
+  bots.goalTarget[0] = -1;
+  bots.goalX[0] = x + TILE_UNITS * 8;
+  bots.goalY[0] = y;
+  bots.routeX[0] = bots.goalX[0];
+  bots.routeY[0] = y;
+  bots.decideAt[0] = 1000;
+  const command = createInputCommand(77, 1);
+  bots.stage(world, command, 1, 1);
+  assert.ok(command.moveX < 0, "a close tank temporarily wins over the route goal");
+  world.playerActive[1] = 0;
+  bots.stage(world, command, 1, 2);
+  assert.ok(command.moveX > 0, "the bot resumes its route when the tank leaves");
+});
 
 test("network bots adapt the shared bot brain through ordinary client controls", () => {
   const world = new BattleWorld(71, 0xace0);
@@ -1581,6 +2102,7 @@ test("network bots adapt the shared bot brain through ordinary client controls",
   const weaponUpgradeRequests = [];
   const client = {
     state: "ready",
+    hasAuthoritativeSnapshot: true,
     world,
     playerId: 1,
     setControls(value) {
@@ -1616,6 +2138,29 @@ test("network bots adapt the shared bot brain through ordinary client controls",
   assert.equal(driver.stats.nonIdleCommands, 1);
   assert.deepEqual(chassisRequests, []);
   assert.deepEqual(weaponUpgradeRequests, []);
+});
+
+test("network bots stay neutral until the first authoritative spawn pose", () => {
+  const world = new BattleWorld(74, 0xace3);
+  world.addPlayer(1);
+  world.addPlayer(2);
+  const controls = [];
+  const client = {
+    state: "ready",
+    hasAuthoritativeSnapshot: false,
+    world,
+    playerId: 1,
+    setControls(value) {
+      controls.push({ ...value });
+    },
+    update() {
+      return 1;
+    },
+  };
+  const driver = new NetworkBotDriver(client, { skill: 2 });
+  assert.equal(driver.update(TICK_MILLISECONDS), 1);
+  assert.deepEqual(controls, [{ moveX: 0, moveY: 0, fire: false, boost: false, weapon: 0 }]);
+  assert.equal(driver.stats.commandsStaged, 0);
 });
 
 test("network bot aim reaches the ordinary BattleClient input wire path", async () => {
@@ -1664,14 +2209,31 @@ test("network bot aim reaches the ordinary BattleClient input wire path", async 
   client.world.playerY[1] = 12 * TILE_UNITS;
   client.world.setBotSkill(1, 2);
 
+  const raw = new Uint8Array(SNAPSHOT_BYTES);
+  const network = new Uint8Array(NETWORK_SNAPSHOT_BYTES);
+  const frame = new Uint8Array(SNAPSHOT_MESSAGE_BYTES);
+  client.world.writeSnapshot(raw);
+  compactNetworkSnapshot(raw, network);
+  const frameLength = writeNetworkSnapshotKeyframe(frame, client.world.tick, network);
+  client.onReliable(TRANSPORT_CHANNEL_SNAPSHOT, frame.subarray(0, frameLength));
+  client.update(0);
+  assert.equal(client.hasAuthoritativeSnapshot, true);
+  datagrams.length = 0;
+
   const driver = new NetworkBotDriver(client, { skill: 2 });
+  let stagedAtSend;
   assert.equal(driver.update(TICK_MILLISECONDS), 1);
   await settle();
+  if (datagrams.length > 0) stagedAtSend = { ...driver.staged };
+  assert.equal(driver.update(TICK_MILLISECONDS), 1);
+  await settle();
+  if (stagedAtSend === undefined && datagrams.length > 0) stagedAtSend = { ...driver.staged };
   assert.equal(datagrams.length, 1);
   const decoded = Array.from({ length: INPUT_BUNDLE_MAX_COMMANDS }, () => createInputCommand(0, 1));
   const count = readInputBundle(datagrams[0], datagrams[0].byteLength, decoded);
   const transmitted = decoded[count - 1];
-  const staged = driver.staged;
+  const staged = stagedAtSend;
+  assert.ok(staged, "the compared bot intent must be sampled when the input datagram is sent");
   assert.notEqual(staged.moveX + staged.moveY, 0, "fixture must exercise aim while the bot is moving");
   const normalizedAim = { x: 0, y: 0 };
   assert.equal(normalizeInto(staged.aimX, staged.aimY, normalizedAim), true);
@@ -1689,6 +2251,7 @@ test("network bots send predicted weapon purchases over the authoritative contro
   const weaponUpgradeRequests = [];
   const client = {
     state: "ready",
+    hasAuthoritativeSnapshot: true,
     world,
     playerId: 1,
     setControls() {},
@@ -1742,11 +2305,35 @@ test("network bot snapshot clocks keep driving when dashboard timers are throttl
     [50, 8],
   ]);
   assert.equal(clock.observedTravelUnits, 32);
+  assert.equal(clock.observedMode, PLAYER_MODE_TANK);
+  assert.equal(clock.observedModeTransitions, 0);
 
   // A long suspended interval remains bounded instead of causing a packet
   // storm when the browser delivers the next network event.
   assert.equal(clock.onSnapshot(2_000), 1);
   assert.deepEqual(updates.at(-1), [250, 8]);
+
+  // Ignore the first observed mode and count only later authoritative changes.
+  world.playerMode[0] = PLAYER_MODE_INFANTRY;
+  world.tick = 100;
+  assert.equal(clock.onSnapshot(2_050), 1);
+  assert.equal(clock.observedModeTransitions, 1);
+  assert.equal(clock.observedEjections, 1);
+  world.playerMode[0] = PLAYER_MODE_TANK;
+  world.tick = 150;
+  assert.equal(clock.onSnapshot(2_100), 1);
+  assert.equal(clock.observedModeTransitions, 2);
+  assert.equal(clock.observedTankReentries, 1);
+  assert.equal(clock.minimumModeTransitionIntervalTicks, 50);
+  world.playerMode[0] = PLAYER_MODE_DEAD;
+  world.tick = 180;
+  assert.equal(clock.onSnapshot(2_150), 1);
+  world.playerMode[0] = PLAYER_MODE_TANK;
+  world.tick = 210;
+  assert.equal(clock.onSnapshot(2_200), 1);
+  assert.equal(clock.observedTankReentries, 1, "death respawn is not a depot reacquisition");
+  assert.equal(clock.observedRespawns, 1);
+  assert.equal(clock.minimumModeTransitionIntervalTicks, 30);
 });
 
 test("client gates control until WELCOME_ACK and preserves ordered control writes", async () => {
@@ -1883,6 +2470,34 @@ test("a reconnect is not blocked by the previous transport's pending acknowledge
   assert.equal(client.state, "ready", "the stale ACK completion cannot mutate the replacement connection");
 });
 
+test("bot reset clears per-match steering and movement history", () => {
+  const world = new BattleWorld(77, 0xace0);
+  world.addPlayer(1);
+  world.addPlayer(2);
+  world.setBotSkill(2, 2);
+  const slot = 1;
+  const reused = new BotController();
+  // Model a previous match that ended with the bot committed to the opposite
+  // strafe/avoidance side and carrying a stale stuck detector position.
+  reused.strafeSign[slot] = -1;
+  reused.avoidSign[slot] = -1;
+  reused.stuckTicks[slot] = 19;
+  reused.lastX[slot] = world.playerX[slot] + 100_000;
+  reused.lastY[slot] = world.playerY[slot] - 100_000;
+  reused.routeX[slot] = -50_000;
+  reused.routeY[slot] = 50_000;
+  reused.goalTarget[slot] = 0;
+  reused.reset();
+
+  const afterReset = createInputCommand(77, 2);
+  const fresh = createInputCommand(77, 2);
+  reused.stage(world, afterReset, 2, 1);
+  new BotController().stage(world, fresh, 2, 1);
+  assert.deepEqual(afterReset, fresh, "a restarted bot must make the same first decision as a new controller");
+  assert.equal(reused.routeReplansFor(2), 1);
+  assert.equal(reused.routeFailuresFor(2), 0);
+});
+
 test("bots fight, score, stay out of cover and pick their arena up", () => {
   const world = new BattleWorld(77);
   const bots = new BotController();
@@ -1998,6 +2613,65 @@ test("authoritative stats expose the initial bot roster before first admission",
     { networkClients: 0, serverBots: 8, idleSlots: 0, humans: 0, bots: 8 },
   );
   server.close();
+});
+
+test("the 16-player product default admits sixteen live clients over bot-filled slots", async () => {
+  const errors = [];
+  const offline = new PlayableBattle();
+  const server = new MatchServer({ onError: (error) => errors.push(error) });
+  assert.equal(DEFAULT_ROSTER_SIZE, 16);
+  assert.equal(offline.playerCount, 16);
+  assert.equal(server.rosterSize, 16);
+  assert.equal(server.stats.bots, 16, "unclaimed roster slots start as active server bots");
+
+  const clients = Array.from({ length: DEFAULT_ROSTER_SIZE }, (_, index) =>
+    join(server, `sixteen-${index + 1}`, errors),
+  );
+  await settleUntil(() => clients.every((client) => client.state === "ready"), "all 16 welcomes", 3_000);
+  assert.equal(new Set(clients.map((client) => client.playerId)).size, DEFAULT_ROSTER_SIZE);
+  assert.deepEqual(
+    clients.map((client) => client.playerId).sort((a, b) => a - b),
+    Array.from({ length: DEFAULT_ROSTER_SIZE }, (_, index) => index + 1),
+  );
+  assert.equal(server.countHumans(), 16);
+  assert.equal(server.stats.bots, 0, "each admitted client takes over one bot's live roster slot");
+
+  for (let tick = 0; tick < 12; tick += 1) {
+    for (const client of clients) {
+      client.setControls({ moveX: client.playerId % 2 === 0 ? -1 : 1, moveY: 0, fire: false });
+      client.update(TICK_MILLISECONDS);
+    }
+    await settle();
+    server.step();
+    await settle();
+  }
+  for (const client of clients) {
+    client.update(0);
+    assert.ok(client.stats.snapshotsApplied > 0, `client ${client.playerId} must receive authoritative snapshots`);
+    assert.ok(client.stats.inputsSent > 0, `client ${client.playerId} must send live inputs`);
+  }
+  assert.ok(server.stats.inputsAccepted >= 16, "the authority must accept input from the full roster");
+  assert.deepEqual(errors, []);
+  for (const client of clients) client.close(1000, "acceptance complete");
+  server.close();
+});
+
+test("authoritative server bot skill settings produce a measurable combat curve", () => {
+  const fragsAtSkill = (skill) => {
+    const server = new MatchServer({ rosterSize: 8, botSkill: skill });
+    for (let tick = 0; tick < 5_400; tick += 1) server.step();
+    const frags = server.world.playerScore.slice(0, 8).reduce((sum, score) => sum + score, 0);
+    server.close();
+    return frags;
+  };
+  const recruitFrags = fragsAtSkill(0);
+  const nightmareFrags = fragsAtSkill(3);
+  assert.equal(fragsAtSkill(0), recruitFrags, "the recruit trace is seed-reproducible");
+  assert.equal(fragsAtSkill(3), nightmareFrags, "the nightmare trace is seed-reproducible");
+  assert.ok(
+    nightmareFrags > recruitFrags * 1.5,
+    `the authoritative bot skill curve must remain visible (${recruitFrags} vs ${nightmareFrags})`,
+  );
 });
 
 test("diagnostic matches leave disconnected network slots idle instead of masking them with server bots", async () => {
@@ -2120,7 +2794,7 @@ test("server preserves HELLO, acknowledgement, and control order across async ad
   server.close();
 });
 
-test("server retains the newest input datagram that overtakes WELCOME_ACK out of order", async () => {
+test("server stages reordered input ticks and retains the newest pre-ACK datagram", async () => {
   const errors = [];
   const reliable = [];
   const server = new MatchServer({
@@ -2216,6 +2890,31 @@ test("server retains the newest input datagram that overtakes WELCOME_ACK out of
     server.world.playerX[welcome.playerId - 1] > initialX,
     "the latest input replaces the older buffered datagram",
   );
+
+  // Datagram delivery has no global order. A later tick can arrive first;
+  // both future commands still belong in their own simulation slots.
+  const later = createInputCommand(welcome.matchId, welcome.playerId);
+  later.tick = 5;
+  later.sequence = 6;
+  later.moveX = 127;
+  const laterPacket = new Uint8Array(INPUT_PACKET_BYTES);
+  writeInputPacket(laterPacket, 0, later);
+  session.onDatagram(laterPacket);
+
+  const earlier = createInputCommand(welcome.matchId, welcome.playerId);
+  earlier.tick = 4;
+  earlier.sequence = 5;
+  earlier.moveX = 127;
+  const earlierPacket = new Uint8Array(INPUT_PACKET_BYTES);
+  writeInputPacket(earlierPacket, 0, earlier);
+  session.onDatagram(earlierPacket);
+  session.onDatagram(earlierPacket);
+  assert.equal(server.stats.inputsAccepted, 3, "both reordered future ticks are accepted, duplicate is dropped");
+
+  server.step();
+  assert.equal(server.world.playerLastInputTick[welcome.playerId - 1], 4);
+  server.step();
+  assert.equal(server.world.playerLastInputTick[welcome.playerId - 1], 5);
   assert.deepEqual(errors, []);
   server.close();
 });
@@ -2679,7 +3378,7 @@ test("snapshot decode rejects foreign bases and advances only after applied ackn
   server.step();
   server.step();
   await settle();
-  client.update(0);
+  client.update(0, 0);
   const baseline = new Uint8Array(SNAPSHOT_BYTES);
   server.world.writeSnapshot(baseline);
   const nextWorld = new BattleWorld(server.world.matchId, server.world.mapSeed);
@@ -2704,11 +3403,11 @@ test("snapshot decode rejects foreign bases and advances only after applied ackn
   // client acknowledges only state that entered its simulation timeline.
   const recoveredDeltaLength = writeClientDelta(frame, 15, 12, baseline, next);
   client.onReliable(TRANSPORT_CHANNEL_SNAPSHOT, frame.subarray(0, recoveredDeltaLength));
-  client.update(0);
+  client.update(0, 0);
   assert.equal(client.stats.snapshotsApplied, 2, "the complete keyframe must apply before dependent state");
   const nextDeltaLength = writeClientDelta(frame, 18, 12, baseline, next);
   client.onReliable(TRANSPORT_CHANNEL_SNAPSHOT, frame.subarray(0, nextDeltaLength));
-  client.update(0);
+  client.update(0, 0);
   assert.equal(client.stats.snapshotsApplied, 3, "the recovered delta chain must remain usable");
   nextWorld.tick = 18;
   assert.equal(client.world.stateHash(), nextWorld.stateHash());
@@ -2727,7 +3426,7 @@ test("independent deltas sharing one acknowledged base coalesce without losing t
   await settle();
   for (let tick = 0; tick < 3; tick += 1) server.step();
   await settle();
-  client.update(0);
+  client.update(0, 0);
 
   const baseline = new Uint8Array(SNAPSHOT_BYTES);
   server.world.writeSnapshot(baseline);
@@ -2744,7 +3443,7 @@ test("independent deltas sharing one acknowledged base coalesce without losing t
   client.onReliable(TRANSPORT_CHANNEL_SNAPSHOT, frame.subarray(0, length));
   length = writeClientDelta(frame, 9, 3, baseline, second);
   client.onReliable(TRANSPORT_CHANNEL_SNAPSHOT, frame.subarray(0, length));
-  client.update(0);
+  client.update(0, 0);
 
   assert.equal(client.stats.snapshotsApplied, 2, "the newest complete sibling delta is applied once");
   future.tick = 9;
@@ -2860,12 +3559,28 @@ test("two clients join one authoritative match, replace bots and stay in sync", 
     await settle();
   }
 
+  // Prediction intentionally leads authority. Compare the two worlds only
+  // after the authority reaches that same tick and the client applies its
+  // resulting snapshot; a raw cross-tick position gap is not correction error.
+  const leadTicks = alpha.world.tick - server.world.tick;
+  assert.ok(leadTicks > 0 && leadTicks <= alpha.stats.inputLeadTicks, `unexpected prediction lead: ${leadTicks}`);
+  for (let tick = 0; tick < leadTicks; tick += 1) {
+    server.step();
+    await settle();
+  }
+  alpha.update(0);
+  assert.equal(alpha.world.tick, server.world.tick, "convergence is compared at the same simulation tick");
+
   const authoritative = playerView();
   const predicted = playerView();
   server.world.readPlayer(alpha.playerId, authoritative);
   alpha.world.readPlayer(alpha.playerId, predicted);
-  assert.equal(predicted.x, authoritative.x);
-  assert.equal(predicted.y, authoritative.y);
+  // With an equal-tick authority snapshot, the local predicted world should
+  // converge instead of carrying a persistent correction through gameplay.
+  assert.ok(
+    Math.hypot(predicted.x - authoritative.x, predicted.y - authoritative.y) <= UNITS_PER_PIXEL,
+    `the predicted player stays within one pixel of the authoritative player (authoritative=${authoritative.x},${authoritative.y}; predicted=${predicted.x},${predicted.y}; ticks=${server.world.tick}/${alpha.world.tick}; snapshots=${alpha.stats.snapshotsApplied})`,
+  );
   assert.ok(alpha.stats.snapshotsApplied >= 40);
   assert.ok(server.stats.inputsAccepted > 500);
   assert.equal(server.stats.inputsRejected, 0);
@@ -3075,6 +3790,7 @@ test("prediction lead advances the local clock without retimestamping input", as
 test("server deltas use the latest client-applied snapshot as their exact base", async () => {
   const errors = [];
   const frames = [];
+  const routes = [];
   const server = new MatchServer({
     rosterSize: 2,
     snapshotIntervalTicks: 3,
@@ -3085,8 +3801,17 @@ test("server deltas use the latest client-applied snapshot as their exact base",
   const [clientTransport, serverTransport] = createInMemoryTransportPair(client, session);
   const sendReliable = serverTransport.sendReliable.bind(serverTransport);
   serverTransport.sendReliable = (channel, payload, signal) => {
-    if (channel === TRANSPORT_CHANNEL_SNAPSHOT) frames.push(payload.slice());
+    if (channel === TRANSPORT_CHANNEL_SNAPSHOT) {
+      frames.push(payload.slice());
+      routes.push("reliable");
+    }
     return sendReliable(channel, payload, signal);
+  };
+  const sendDatagram = serverTransport.trySendDatagram.bind(serverTransport);
+  serverTransport.trySendDatagram = (payload) => {
+    frames.push(payload.slice());
+    routes.push("datagram");
+    return sendDatagram(payload);
   };
   session.attach(serverTransport);
   client.attach(clientTransport);
@@ -3101,7 +3826,94 @@ test("server deltas use the latest client-applied snapshot as their exact base",
   for (let tick = 0; tick < 3; tick += 1) server.step();
   await settle();
   assert.equal(frames[1][8], SNAPSHOT_SCHEMA_DELTA);
+  assert.deepEqual(routes, ["reliable", "datagram"], "keyframes are reliable; compact deltas are latest-only");
   assert.equal(new DataView(frames[1].buffer, frames[1].byteOffset).getUint32(10, true), 3);
+  assert.deepEqual(errors, []);
+  server.close();
+});
+
+test("a roster wider than one negotiated datagram keeps its snapshots on reliable streams", async () => {
+  const errors = [];
+  const reliable = [];
+  let datagrams = 0;
+  const server = new MatchServer({ rosterSize: 32, snapshotIntervalTicks: 3, onError: (error) => errors.push(error) });
+  const client = new BattleClient({ name: "wide-roster", onError: (error) => errors.push(error) });
+  const session = server.createSession();
+  const [clientTransport, serverTransport] = createInMemoryTransportPair(client, session);
+  const sendReliable = serverTransport.sendReliable.bind(serverTransport);
+  serverTransport.sendReliable = (channel, payload, signal) => {
+    if (channel === TRANSPORT_CHANNEL_SNAPSHOT) reliable.push(payload.slice());
+    return sendReliable(channel, payload, signal);
+  };
+  const sendDatagram = serverTransport.trySendDatagram.bind(serverTransport);
+  serverTransport.trySendDatagram = (payload) => {
+    datagrams += 1;
+    return sendDatagram(payload);
+  };
+  session.attach(serverTransport);
+  client.attach(clientTransport);
+  await settle();
+  for (let tick = 0; tick < 3; tick += 1) server.step();
+  await settle();
+  client.update(0);
+  client.update(TICK_MILLISECONDS);
+  await settle();
+  for (let tick = 0; tick < 3; tick += 1) server.step();
+  await settle();
+  assert.equal(reliable[0][8], SNAPSHOT_KEYFRAME);
+  assert.equal(reliable[1][8], SNAPSHOT_SCHEMA_DELTA);
+  assert.equal(datagrams, 0);
+  assert.deepEqual(errors, []);
+  server.close();
+});
+
+test("snapshot datagram backpressure briefly restores bounded reliable delivery", async () => {
+  const errors = [];
+  const routes = [];
+  let clock = 0;
+  let rejectNextDatagram = true;
+  const server = new MatchServer({
+    rosterSize: 2,
+    snapshotIntervalTicks: 3,
+    nowMilliseconds: () => clock,
+    onError: (error) => errors.push(error),
+  });
+  const client = new BattleClient({ name: "snapshot-backpressure", onError: (error) => errors.push(error) });
+  const session = server.createSession();
+  const [clientTransport, serverTransport] = createInMemoryTransportPair(client, session);
+  const sendReliable = serverTransport.sendReliable.bind(serverTransport);
+  serverTransport.sendReliable = (channel, payload, signal) => {
+    if (channel === TRANSPORT_CHANNEL_SNAPSHOT) routes.push("reliable");
+    return sendReliable(channel, payload, signal);
+  };
+  const sendDatagram = serverTransport.trySendDatagram.bind(serverTransport);
+  serverTransport.trySendDatagram = (payload) => {
+    routes.push("datagram");
+    if (rejectNextDatagram) {
+      rejectNextDatagram = false;
+      return Promise.resolve("backpressured");
+    }
+    return sendDatagram(payload);
+  };
+  session.attach(serverTransport);
+  client.attach(clientTransport);
+  await settle();
+  for (let tick = 0; tick < 3; tick += 1) server.step();
+  await settle();
+  client.update(TICK_MILLISECONDS);
+  await settle();
+  for (let tick = 0; tick < 3; tick += 1) server.step();
+  await settle();
+  assert.equal(server.stats.snapshotDatagramsDropped, 1);
+  for (let tick = 0; tick < 3; tick += 1) server.step();
+  await settle();
+  assert.deepEqual(routes, ["reliable", "datagram", "reliable"]);
+  clock = 1_001;
+  client.update(TICK_MILLISECONDS);
+  await settle();
+  for (let tick = 0; tick < 3; tick += 1) server.step();
+  await settle();
+  assert.deepEqual(routes, ["reliable", "datagram", "reliable", "datagram"]);
   assert.deepEqual(errors, []);
   server.close();
 });
@@ -3114,16 +3926,18 @@ test("input datagrams repeat a bounded command window and survive deterministic 
   const slot = client.playerId - 1;
   const startX = server.world.playerX[slot];
   client.setControls({ moveX: 1, moveY: 0, fire: false });
+  let predictedSteps = 0;
   for (let tick = 0; tick < 180; tick += 1) {
-    client.update(TICK_MILLISECONDS);
+    predictedSteps += client.update(TICK_MILLISECONDS);
     await settle();
     server.step();
     await settle();
   }
+  assert.ok(predictedSteps >= 180, "the client must sample at least once per wall-clock tick");
   assert.equal(
     client.stats.inputsSent + client.stats.inputsDropped,
-    180 / INPUT_SEND_INTERVAL_TICKS,
-    "60 Hz sampling must produce exactly 30 unreliable datagrams per second",
+    Math.ceil(predictedSteps / INPUT_SEND_INTERVAL_TICKS),
+    "the 30 Hz datagram lane includes adaptive lead-catchup samples",
   );
   assert.ok(client.stats.inputCommandsSent >= client.stats.inputsSent * 2);
   assert.ok(client.stats.inputCommandsSent <= client.stats.inputsSent * INPUT_BUNDLE_MAX_COMMANDS);
@@ -3171,6 +3985,66 @@ test("a client that falls behind reconciles by replaying its own inputs", async 
   }
   assert.ok(client.stats.replayedTicks > 0, "falling behind must produce a reconciliation replay");
   assert.ok(client.stats.snapshotsApplied > 0);
+  assert.equal(client.stats.localCorrectionBuckets.length, 8);
+  assert.ok(
+    client.stats.localCorrectionBuckets.reduce((sum, count) => sum + count, 0) > 0,
+    "the live reconciliation path records its correction distribution",
+  );
+  assert.deepEqual(errors, []);
+  server.close();
+});
+
+test("authoritative clock carries sub-tick timer remainders and bounds catch-up work", () => {
+  const server = new MatchServer({ rosterSize: 1, fillVacantSlotsWithBots: false });
+  let stepped = 0;
+  for (let wake = 0; wake < 60; wake += 1) {
+    stepped += server.advance(wake % 3 === 0 ? 16 : 17);
+  }
+  assert.equal(stepped, 60, "16/17 ms timer jitter must still pay exactly sixty world ticks per second");
+  assert.equal(server.world.tick, 60);
+  assert.equal(server.advance(150, 8), 8, "one wake-up retains its fixed work budget");
+  assert.equal(server.advance(0, 8), 1, "the unspent ninth tick must carry to the next wake-up");
+  assert.equal(server.world.tick, 69);
+  assert.throws(() => server.advance(-1), /elapsedMilliseconds/);
+  server.close();
+});
+
+test("a stalled client drains bounded fixed-step debt instead of discarding prediction time", async () => {
+  const errors = [];
+  const server = new MatchServer({ rosterSize: 2, onError: (error) => errors.push(error) });
+  const client = join(server, "frame-stall", errors, { leadTicks: 0 });
+  await settle();
+  assert.equal(client.state, "ready");
+  const startTick = client.world.tick;
+  assert.equal(client.update(TICK_MILLISECONDS * 12, 4), 4, "one render frame still has a fixed work budget");
+  assert.equal(client.update(0, 4), 4, "debt from the stalled frame carries to the next render frame");
+  assert.equal(client.update(0, 4), 4, "the remainder drains without new wall-clock time");
+  assert.equal(client.world.tick, startTick + 12);
+  assert.equal(client.update(0, 4), 0, "drained debt does not simulate an extra tick");
+  let recovered = client.update(TICK_MILLISECONDS * 120, 4);
+  for (let frame = 0; frame < 10; frame += 1) recovered += client.update(0, 4);
+  assert.ok(recovered <= 34, "a multi-second pause retains no more than thirty recovery ticks");
+  assert.ok(recovered >= 30, "the bounded debt still gives prediction time to recover");
+  assert.deepEqual(errors, []);
+  server.close();
+});
+
+test("first keyframe catch-up does not charge the same stalled frame twice", async () => {
+  const errors = [];
+  const server = new MatchServer({ rosterSize: 2, snapshotIntervalTicks: 3, onError: (error) => errors.push(error) });
+  const client = join(server, "first-keyframe-clock", errors, { leadTicks: 8 });
+  await settle();
+  assert.equal(client.state, "ready");
+  for (let tick = 0; tick < 9; tick += 1) server.step();
+  await settle();
+  const applied = client.update(TICK_MILLISECONDS * 9);
+  assert.ok(client.stats.snapshotsApplied > 0, "the authoritative keyframe must be pending");
+  assert.equal(applied, 0, "a replay jump has already paid for the nine-tick render stall");
+  assert.equal(
+    client.world.tick - client.stats.lastServerTick,
+    11,
+    "the first pose keeps only the configured lead and safety over the applied keyframe",
+  );
   assert.deepEqual(errors, []);
   server.close();
 });
@@ -3202,7 +4076,16 @@ test("remote presentation uses the server cadence while local stays predicted", 
   client.update(0);
   const atSnapshot = { ...first };
   assert.equal(client.samplePlayerTransform(remoteSlot, atSnapshot), true);
-  assert.deepEqual(atSnapshot, first, "a new snapshot starts the remote interpolation at the prior sample");
+  assert.deepEqual(
+    [atSnapshot.x, atSnapshot.y, atSnapshot.hullX, atSnapshot.hullY, atSnapshot.turretX, atSnapshot.turretY],
+    [first.x, first.y, first.hullX, first.hullY, first.turretX, first.turretY],
+    "a new snapshot starts its remote pose interpolation at the prior sample",
+  );
+  assert.equal(
+    atSnapshot.velocityX,
+    server.world.playerVelocityX[remoteSlot],
+    "motion metadata follows the new sample",
+  );
   client.update(25);
   const halfway = { ...first };
   assert.equal(client.samplePlayerTransform(remoteSlot, halfway), true);
@@ -3225,15 +4108,16 @@ test("local authoritative corrections decay in presentation without delaying sim
   const server = new MatchServer({ rosterSize: 2, onError: (error) => errors.push(error) });
   const client = join(server, "correction-smoothing", errors);
   await settle();
-  for (let tick = 0; tick < 3; tick += 1) server.step();
+  for (let tick = 0; tick < server.snapshotIntervalTicks; tick += 1) server.step();
   await settle();
   client.update(0);
+  assert.ok(client.stats.snapshotsApplied > 0, "establish a visible authoritative pose before testing correction");
   const slot = client.playerId - 1;
   client.world.playerX[slot] += TILE_UNITS * 4;
   const before = { x: 0, y: 0, hullX: 0, hullY: 0, turretX: 0, turretY: 0 };
   client.samplePlayerTransform(slot, before);
 
-  for (let tick = 0; tick < 3; tick += 1) server.step();
+  for (let tick = 0; tick < server.snapshotIntervalTicks; tick += 1) server.step();
   await settle();
   client.update(0);
   const correctedTruth = client.world.playerX[slot];
@@ -3242,11 +4126,22 @@ test("local authoritative corrections decay in presentation without delaying sim
   client.samplePlayerTransform(slot, continuous);
   assert.equal(continuous.x, before.x, "presentation must be continuous on the correction frame");
 
-  client.update(50);
+  client.update(TICK_MILLISECONDS);
+  const firstFrame = { ...before };
+  client.samplePlayerTransform(slot, firstFrame);
+  assert.ok(
+    Math.abs(firstFrame.x - before.x) <= 5 * UNITS_PER_PIXEL + 1,
+    "a large correction must advance by at most five pixels on its first 60 Hz presentation frame",
+  );
+  client.update(50 - TICK_MILLISECONDS);
   const halfway = { ...before };
   client.samplePlayerTransform(slot, halfway);
   assert.ok(Math.abs(halfway.x - correctedTruth) < Math.abs(before.x - correctedTruth));
   client.update(50);
+  const stillSmoothing = { ...before };
+  client.samplePlayerTransform(slot, stillSmoothing);
+  assert.notEqual(stillSmoothing.x, correctedTruth, "a large correction must not traverse four tiles in 100 ms");
+  client.update(200);
   const settled = { ...before };
   client.samplePlayerTransform(slot, settled);
   assert.equal(settled.x, client.world.playerX[slot]);
@@ -3998,6 +4893,7 @@ test("WebTransport datagrams support the current createWritable API", async () =
     });
     datagrams = {
       maxDatagramSize: 8,
+      outgoingMaxAge: null,
       readable: new ReadableStream(),
       createWritable: () => {
         this.createWritableCalls += 1;
@@ -4036,12 +4932,33 @@ test("WebTransport datagrams support the current createWritable API", async () =
   );
 
   assert.equal(session.createWritableCalls, 1);
+  assert.equal(session.datagrams.outgoingMaxAge, 150, "browser queue drops input bundles that aged past usefulness");
   assert.equal(await client.trySendDatagram(Uint8Array.of(3, 4)), "sent");
   assert.deepEqual(
     session.writes.map((chunk) => [...chunk]),
     [[3, 4]],
   );
   client.close(12, "finished");
+
+  const brokenExpirySession = new CurrentDatagramSession();
+  Object.defineProperty(brokenExpirySession.datagrams, "outgoingMaxAge", {
+    get: () => null,
+    set: () => {
+      throw new ReferenceError("NumberIsNaN is not defined");
+    },
+  });
+  class BrokenExpiryConstructor {
+    constructor() {
+      return brokenExpirySession;
+    }
+  }
+  const clientWithBrokenExpiry = await WebTransportGameClient.connect(
+    "https://example.invalid",
+    { onReliable() {}, onDatagram() {}, onClose() {} },
+    BrokenExpiryConstructor,
+  );
+  assert.equal(await clientWithBrokenExpiry.trySendDatagram(Uint8Array.of(5, 6)), "sent");
+  clientWithBrokenExpiry.close(12, "finished");
 });
 
 test("client hello and control frames share one ordered stream", async () => {

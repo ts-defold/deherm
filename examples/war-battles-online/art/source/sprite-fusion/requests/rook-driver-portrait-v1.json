@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_f2c075b1-87f6-42b1-87ec-13f154922953",
+  "operation": "style-reference",
+  "prompt": "A communications portrait of Rook, a young Black woman scout driver with close-cropped hair, warm brown skin, a slim ochre flight helmet with one raised blue goggle lens, a cream scarf, and a confident half-smile. Head and shoulders fill the frame, three-quarter view facing right. Match the references' chunky military arcade pixel-art rendering and warm face lighting. Clearly a different person from the white-bearded driver reference. No portrait frame, text, vehicle, or background scene.",
+  "size": 64,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/driver-portrait-base-v1/03.png",
+      "bytes": 6988,
+      "sha256": "e7ba1ca42b3c55dcddd426d2bbb0051eb2f4aa35732538ba05a85663e21cec7e"
+    },
+    {
+      "kind": "file",
+      "path": "defold/assets/ui/faces/captain/angry.png",
+      "bytes": 1453,
+      "sha256": "5f4a96d75a3408ba1e27a880e00166ec15a357445082e5646d77b986c9e0642d"
+    },
+    {
+      "kind": "file",
+      "path": "defold/assets/ui/faces/driver/happy.png",
+      "bytes": 2013,
+      "sha256": "e0fa47e74b24d0233532b52da8ca21de69c831b71a466d2716a3eb1b9ef34bb8"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/rook-driver-portrait-v1.json",
+    "sha256": "0ba670b6c4b1da80efbb1f27f4141b0f33d2504fb40bca19a33dc9fde97cfd97"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "dc87d396-5988-4bc2-b20f-7e6c52213c4e",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/dc87d396-5988-4bc2-b20f-7e6c52213c4e/image.png?v=1791427240046",
+      "path": "art/source/sprite-fusion/outputs/rook-driver-portrait-v1/00.png",
+      "bytes": 8752,
+      "sha256": "e996883fff8f3153d763f8e3ea50887991fb5a1aabb90c22012540c9875fe8e4"
+    },
+    {
+      "index": 1,
+      "assetId": "b04d2bac-5f29-483d-816c-de457e7ead45",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/b04d2bac-5f29-483d-816c-de457e7ead45/image.png?v=1791427240605",
+      "path": "art/source/sprite-fusion/outputs/rook-driver-portrait-v1/01.png",
+      "bytes": 6681,
+      "sha256": "8ea701028a66e2a7e12039cb1113b58551ca0295ec6fb8166aa4187d19cc6654"
+    },
+    {
+      "index": 2,
+      "assetId": "d9b02213-cfef-4113-a90e-a7fc56f2ba35",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/d9b02213-cfef-4113-a90e-a7fc56f2ba35/image.png?v=1791427241224",
+      "path": "art/source/sprite-fusion/outputs/rook-driver-portrait-v1/02.png",
+      "bytes": 8048,
+      "sha256": "ad977ca6e0741baeb116aed586895d51e09a03722a3e872c1051a312b212a33c"
+    },
+    {
+      "index": 3,
+      "assetId": "cfa52bef-37cf-4f0c-9266-f93f842788d6",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/cfa52bef-37cf-4f0c-9266-f93f842788d6/image.png?v=1791427241761",
+      "path": "art/source/sprite-fusion/outputs/rook-driver-portrait-v1/03.png",
+      "bytes": 6347,
+      "sha256": "40481021f2889ca9a8d6b9f3f261dda8452ff97776267f7dae95906b1a1f4261"
+    },
+    {
+      "index": 4,
+      "assetId": "ecf01ffe-a65f-46ce-8fa5-f4770a5ce09d",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/ecf01ffe-a65f-46ce-8fa5-f4770a5ce09d/image.png?v=1791427242368",
+      "path": "art/source/sprite-fusion/outputs/rook-driver-portrait-v1/04.png",
+      "bytes": 6633,
+      "sha256": "3d098d3a2e998b2b7bb6b9feeddda947ec4d7e5cb010a2b954cd996072a48328"
+    },
+    {
+      "index": 5,
+      "assetId": "645ee4e0-207d-496f-b574-96c8f744f972",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/645ee4e0-207d-496f-b574-96c8f744f972/image.png?v=1791427242913",
+      "path": "art/source/sprite-fusion/outputs/rook-driver-portrait-v1/05.png",
+      "bytes": 5995,
+      "sha256": "842db3a69f2ee2c4d91fe0a1494130a30973f028f31848e4a724e2f2a28ab97e"
+    },
+    {
+      "index": 6,
+      "assetId": "cd384276-5cb2-420d-b212-85404402ed58",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/cd384276-5cb2-420d-b212-85404402ed58/image.png?v=1791427243453",
+      "path": "art/source/sprite-fusion/outputs/rook-driver-portrait-v1/06.png",
+      "bytes": 7028,
+      "sha256": "66e008845b87e4608daab4b6749d13eed58d2f3e25200951cd8e286eaa2b92f9"
+    },
+    {
+      "index": 7,
+      "assetId": "56afbcfb-219b-4848-bdc5-ccf473929981",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/56afbcfb-219b-4848-bdc5-ccf473929981/image.png?v=1791427244066",
+      "path": "art/source/sprite-fusion/outputs/rook-driver-portrait-v1/07.png",
+      "bytes": 7154,
+      "sha256": "c7eb47f6b315c50d80365221c66b25dbd7a48e5de4398d844afbf9ecf3ebd4ed"
+    },
+    {
+      "index": 8,
+      "assetId": "a0179b9d-d686-4c88-884e-2d3d3ce9ed99",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/a0179b9d-d686-4c88-884e-2d3d3ce9ed99/image.png?v=1791427244662",
+      "path": "art/source/sprite-fusion/outputs/rook-driver-portrait-v1/08.png",
+      "bytes": 6483,
+      "sha256": "8f124497bffb5aaca7cc2078d0ba0022a51d208fc65211fac9cd75b92156bc29"
+    }
+  ],
+  "credits": {
+    "remaining": 2565
+  }
+}

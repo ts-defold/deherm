@@ -9,6 +9,8 @@ import {
   vmath,
   type DefoldHash,
 } from "@deherm/project";
+import { LandwardCameraFramer, type CameraFrameTarget } from "../src/generated-war-battles/camera-framing";
+import { arenaMatch } from "../src/arena-match";
 
 /**
  * The follow target reports itself instead of being sampled.
@@ -56,7 +58,7 @@ interface CameraSelf {
   traceInterval: number;
   /** Editor property: fallback orthographic zoom when no camera component answers. */
   zoom: number;
-  /** Editor property: vertical camera overscan reserved for opaque HUD chrome. */
+  /** Editor property: minimum vertical camera overscan reserved for opaque HUD chrome. */
   hudVerticalOverscan: number;
 
   halfWidth: number;
@@ -82,6 +84,8 @@ interface CameraSelf {
   shakeElapsed: number;
   shakeAmplitude: number;
   shakePhase: number;
+  landFramer?: LandwardCameraFramer;
+  frameTarget: CameraFrameTarget;
 }
 
 function clamp(value: number, minimum: number, maximum: number): number {
@@ -103,12 +107,15 @@ function resolveBounds(self: CameraSelf): void {
     self.minX = centre;
     self.maxX = centre;
   }
-  // The top and bottom HUD occupy part of the visible canvas. Permit a bounded
-  // amount of camera overscan on Y so edge spawns can sit in the playable safe
-  // area instead of behind that chrome. This changes presentation only; the
-  // authoritative arena and its deterministic spawn selection stay untouched.
-  self.minY = self.worldMinY + self.halfHeight - self.hudVerticalOverscan;
-  self.maxY = self.worldMaxY - self.halfHeight + self.hudVerticalOverscan;
+  // The top and bottom HUD occupy part of the visible canvas. An absolute
+  // editor value alone is insufficient when auto-fit increases the world-space
+  // view on a smaller browser window: the edge spawn can end up under the HUD
+  // even though it fitted at the reference resolution. Keep the authored value
+  // as a minimum and reserve half the actual vertical half-view at every size.
+  // This is presentation-only; simulation bounds and spawn selection do not move.
+  const hudOverscan = Math.max(self.hudVerticalOverscan, self.halfHeight * 0.5);
+  self.minY = self.worldMinY + self.halfHeight - hudOverscan;
+  self.maxY = self.worldMaxY - self.halfHeight + hudOverscan;
   if (self.minY > self.maxY) {
     const centre = (self.worldMinY + self.worldMaxY) * 0.5;
     self.minY = centre;
@@ -205,24 +212,35 @@ export default defineComponent({
     self.shakeElapsed = 0;
     self.shakeAmplitude = 0;
     self.shakePhase = 0;
+    self.landFramer = undefined;
+    self.frameTarget = { x: self.targetX, y: self.targetY };
     commit(self);
   },
 
   onMessage(self: CameraSelf, messageId: DefoldHash, message: PlayerAt | CameraImpact): void {
     if (messageId === PLAYER_AT) {
       const player = message as PlayerAt;
-      self.targetX = player.x;
-      self.targetY = player.y;
+      const plan = arenaMatch()?.world?.map.plan;
+      if (plan !== undefined && self.landFramer?.seed !== plan.seed) self.landFramer = new LandwardCameraFramer(plan);
+      if (plan === undefined) self.landFramer = undefined;
+      if (self.landFramer !== undefined) {
+        self.landFramer.frame(player.x, player.y, self.halfWidth, self.halfHeight, self.frameTarget);
+      } else {
+        self.frameTarget.x = player.x;
+        self.frameTarget.y = player.y;
+      }
+      self.targetX = self.frameTarget.x;
+      self.targetY = self.frameTarget.y;
       if (player.snap === true) {
         // Engagement, restart and respawn can relocate the authoritative
         // player by more than a whole screen. Easing from the title-camera
         // position leaves the tank clipped or absent while gameplay is already
         // accepting input, so ownership transitions snap exactly once. Normal
         // movement continues through the smoothed follow path below.
-        self.viewX = player.x;
-        self.viewY = player.y;
-        self.previousTargetX = player.x;
-        self.previousTargetY = player.y;
+        self.viewX = self.targetX;
+        self.viewY = self.targetY;
+        self.previousTargetX = self.targetX;
+        self.previousTargetY = self.targetY;
         self.leadX = 0;
         self.leadY = 0;
         commit(self);

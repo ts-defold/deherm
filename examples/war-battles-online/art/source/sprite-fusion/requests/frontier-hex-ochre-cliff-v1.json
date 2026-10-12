@@ -1,0 +1,164 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_034a4f80-5108-4e23-846c-dee58718bead",
+  "operation": "generate",
+  "prompt": "One isolated isometric six-sided terrain tile for a retro pixel-art tank strategy game. Broad flat driveable top of compacted ochre earth, warm amber grit, a little gravel, and short dark layered volcanic rock cliff sides. Sunset lighting, dramatic readable shape, no lava and no tall object. Single tile centered on transparent background, no character, vehicle, building, text, border, or other tiles.",
+  "size": 64,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/frontier-hex-ochre-cliff-v1.json",
+    "sha256": "f85b19f5d12beb6805ca3134c751c8798d616cb1dc7f75725542ebe174c8fd7d"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "b04adb2b-5bed-4801-b7a5-73096d4c5345",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/b04adb2b-5bed-4801-b7a5-73096d4c5345/image.png?v=1791407542593",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-cliff-v1/00.png",
+      "bytes": 7520,
+      "sha256": "f22d6890061f968e38ab472a0bb7b7e2bda47df1f318ec6f19892868c2cc07a3"
+    },
+    {
+      "index": 1,
+      "assetId": "2ba7f05a-ff10-41bb-a287-bbeffe0106fd",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/2ba7f05a-ff10-41bb-a287-bbeffe0106fd/image.png?v=1791407543312",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-cliff-v1/01.png",
+      "bytes": 9025,
+      "sha256": "3f4b466ee827b735f01d0ecb12ece884b94a06c8940f12cbfc740a4ced1c1d1a"
+    },
+    {
+      "index": 2,
+      "assetId": "58ed3ae0-38fa-4748-9651-3695583ced22",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/58ed3ae0-38fa-4748-9651-3695583ced22/image.png?v=1791407543661",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-cliff-v1/02.png",
+      "bytes": 6768,
+      "sha256": "009f4419d98ce63247e659da304c27965c1f4d62e84e0da4078a93a0c31682be"
+    },
+    {
+      "index": 3,
+      "assetId": "d36d129b-c9e5-4066-89de-0037df89478e",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/d36d129b-c9e5-4066-89de-0037df89478e/image.png?v=1791407544147",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-cliff-v1/03.png",
+      "bytes": 10948,
+      "sha256": "38379116b888dcce757b0502b4e7bfb4ce284c1b8d1cd4b224d18bf67a333b6c"
+    },
+    {
+      "index": 4,
+      "assetId": "d9ea8b9b-dcf7-438f-a4dc-e697892f907c",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/d9ea8b9b-dcf7-438f-a4dc-e697892f907c/image.png?v=1791407544510",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-cliff-v1/04.png",
+      "bytes": 6954,
+      "sha256": "f2da4d5d0b83f5f69418e9181bab8b983afff1e16258167d53b7aee73e6b5f82"
+    },
+    {
+      "index": 5,
+      "assetId": "ab9f97c6-3a65-44fb-b2eb-d92451334971",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/ab9f97c6-3a65-44fb-b2eb-d92451334971/image.png?v=1791407545111",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-cliff-v1/05.png",
+      "bytes": 6736,
+      "sha256": "a2d7abb43d5a88d277012b4d8be01aff1298255c01e317cdd54e7c1ff5539120"
+    },
+    {
+      "index": 6,
+      "assetId": "46741cd9-7795-4b14-9451-7929bbbe8ac9",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/46741cd9-7795-4b14-9451-7929bbbe8ac9/image.png?v=1791407545747",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-cliff-v1/06.png",
+      "bytes": 7370,
+      "sha256": "2fb43c4832779a6aa1feef9486e439179bce95907dd66bf74ece4adffcfa1e69"
+    },
+    {
+      "index": 7,
+      "assetId": "17dd624a-c92c-414e-bee3-8864c43c01e0",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/17dd624a-c92c-414e-bee3-8864c43c01e0/image.png?v=1791407546403",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-cliff-v1/07.png",
+      "bytes": 7054,
+      "sha256": "22fc9b62174d4459e7a64b591570915b2dfd14bceac49cfed0634c63f60b2aae"
+    },
+    {
+      "index": 8,
+      "assetId": "534e018d-506d-4756-b535-93fb96003f1f",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/534e018d-506d-4756-b535-93fb96003f1f/image.png?v=1791407547041",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-cliff-v1/08.png",
+      "bytes": 7796,
+      "sha256": "cdcf5d6c879ceb856ebc168d358b05db253130c91956341ab82d694bfc862c4c"
+    },
+    {
+      "index": 9,
+      "assetId": "cfe37822-fce0-4e0d-bae0-19183a938d83",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/cfe37822-fce0-4e0d-bae0-19183a938d83/image.png?v=1791407547663",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-cliff-v1/09.png",
+      "bytes": 5278,
+      "sha256": "28ab76381f8876b72d01f14fb729832b60a76b82337695a5e73047f6fa4ce2e8"
+    },
+    {
+      "index": 10,
+      "assetId": "34868ccf-9fd5-4f35-b9f4-3acbd8bc17c0",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/34868ccf-9fd5-4f35-b9f4-3acbd8bc17c0/image.png?v=1791407548307",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-cliff-v1/10.png",
+      "bytes": 6030,
+      "sha256": "cd0f868fbb856150d7ad1033e7e64170dbcc2790bccd9f1b2d1a5f17a3ca50ce"
+    },
+    {
+      "index": 11,
+      "assetId": "a78dd7b3-e6f8-4ef2-9df9-a2e3c7d5c85a",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/a78dd7b3-e6f8-4ef2-9df9-a2e3c7d5c85a/image.png?v=1791407549004",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-cliff-v1/11.png",
+      "bytes": 6278,
+      "sha256": "513a9d3971406e2b627a9cb63e6d0b555db7c9e4f0686ab4e53bc62338f19638"
+    }
+  ],
+  "credits": {
+    "remaining": 2970
+  }
+}

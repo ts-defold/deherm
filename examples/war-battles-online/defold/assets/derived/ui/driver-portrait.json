@@ -6,9 +6,10 @@
       "path": "art/source/sprite-fusion/selection.json",
       "keys": [
         "portrait",
+        "driverFamilies",
         "runtimePlan"
       ],
-      "projectionSha256": "42ad4788782a9f909ae1b918339cbb01e23b640d81743bd8ccc17af1d85b2ca3"
+      "projectionSha256": "390f335cfde9eae80366c09a3bb29797d3235f4107f1f3e3368bc3aa978a6f1c"
     },
     "animation": {
       "path": "art/source/sprite-fusion/requests/driver-portrait-radio-idle-v1.json",
@@ -40,6 +41,64 @@
     "bytes": 6956,
     "sha256": "ac859b2f6a828d42a4aa3a83e96eb8e58f6ce2637b3cab0b100e43c8b9ec881d"
   },
+  "driverFamilies": [
+    {
+      "index": 0,
+      "name": "rook",
+      "requestId": "req_f2c075b1-87f6-42b1-87ec-13f154922953",
+      "assetId": "dc87d396-5988-4bc2-b20f-7e6c52213c4e",
+      "source": "art/source/sprite-fusion/outputs/rook-driver-portrait-v1/00.png",
+      "sourceSha256": "e996883fff8f3153d763f8e3ea50887991fb5a1aabb90c22012540c9875fe8e4",
+      "sourceSize": [
+        64,
+        64
+      ],
+      "path": "defold/assets/derived/ui/driver-portrait/family-0.png",
+      "sha256": "db82b05100c1e193a17d93e3416ee34bfea9342f0c2378d9de2aa6deac068443"
+    },
+    {
+      "index": 1,
+      "name": "brass",
+      "requestId": "req_7a8f3f14-a08d-4ccc-8ec5-7d067ad1a89e",
+      "assetId": "2c537204-68a9-47a8-a8b4-8d05335e912d",
+      "source": "art/source/sprite-fusion/outputs/driver-portrait-base-v1/03.png",
+      "sourceSha256": "e7ba1ca42b3c55dcddd426d2bbb0051eb2f4aa35732538ba05a85663e21cec7e",
+      "sourceSize": [
+        64,
+        64
+      ],
+      "path": "defold/assets/derived/ui/driver-portrait/family-1.png",
+      "sha256": "ac859b2f6a828d42a4aa3a83e96eb8e58f6ce2637b3cab0b100e43c8b9ec881d"
+    },
+    {
+      "index": 2,
+      "name": "spark",
+      "requestId": "req_af57ede4-4fb1-480d-8049-52f0c010315e",
+      "assetId": "bd451900-477e-4522-a49d-15ac7e16beb6",
+      "source": "art/source/sprite-fusion/outputs/spark-driver-portrait-v1/00.png",
+      "sourceSha256": "7b39ac908130244274703d5305df509b141c2391b8df93dc1fbf050cb6706f07",
+      "sourceSize": [
+        69,
+        69
+      ],
+      "path": "defold/assets/derived/ui/driver-portrait/family-2.png",
+      "sha256": "101aa6f7be860e9f632630fca9c2da8cc433fae09c678e8f3fd749137583a6ca"
+    },
+    {
+      "index": 3,
+      "name": "mud",
+      "requestId": "req_8d2f52df-b3d9-465b-a9e1-a51d48973858",
+      "assetId": "3b7369f9-d515-4ae7-b2b0-7b711f72ac2b",
+      "source": "art/source/sprite-fusion/outputs/mud-driver-portrait-v1/00.png",
+      "sourceSha256": "e4c331d121284b49de8d8087ec90c3737367b54675a864be1d49d551aa66a3f4",
+      "sourceSize": [
+        67,
+        67
+      ],
+      "path": "defold/assets/derived/ui/driver-portrait/family-3.png",
+      "sha256": "0a7a805caf69ecc2fee6bb9fd29792aa0158ab94e40d5b282ba23cc01bba193c"
+    }
+  ],
   "animations": {
     "radio-idle": {
       "fps": 8,
@@ -280,8 +339,8 @@
         32
       ],
       "slice": 8,
-      "bytes": 183,
-      "sha256": "b1d4a233af3d37fdfa52a26fcfb5ee2efcb835e838d3c6b449b7c50c177d1079"
+      "bytes": 153,
+      "sha256": "625b11ca15056de544fa0a38004f3adde4240719c4c351d90e72bf02d27861b5"
     },
     "hud-card": {
       "path": "defold/assets/derived/ui/chrome/hud-card.png",
@@ -290,8 +349,8 @@
         24
       ],
       "slice": 6,
-      "bytes": 139,
-      "sha256": "3993f020353e90475fedb1478e3bffe3c59e612ca8f975bb9666de872bf5767d"
+      "bytes": 135,
+      "sha256": "d461cad781a4606ab44509958a59f544eb4d58140e00497dcc1023e9d3a18f81"
     },
     "hud-strip": {
       "path": "defold/assets/derived/ui/chrome/hud-strip.png",
@@ -300,8 +359,8 @@
         16
       ],
       "slice": 5,
-      "bytes": 120,
-      "sha256": "e1ff0ab4e91f4e0f01f03c91800f6ac4447fbb70c86d8c125dc2f9cf27eeb4d3"
+      "bytes": 128,
+      "sha256": "9cb9dabebb2213393343f2aa19e91ff39522a0f31a5143157c72b43f2ce9bd77"
     },
     "command-button": {
       "path": "defold/assets/derived/ui/chrome/command-button.png",
@@ -310,8 +369,8 @@
         16
       ],
       "slice": 5,
-      "bytes": 133,
-      "sha256": "24421bfe7e83c62b411a07e71114f1ff4aa723067b5210dce28d6854e64543fe"
+      "bytes": 132,
+      "sha256": "34ed0ecf53d19fc43c037371521349049d630b38b243b33ed80a1530f118f3be"
     },
     "portrait-frame": {
       "path": "defold/assets/derived/ui/chrome/portrait-frame.png",
@@ -320,8 +379,8 @@
         96
       ],
       "slice": 0,
-      "bytes": 355,
-      "sha256": "4dfdcb31cfb6970260fab40adc7307d8056ab77086751472618674aa665b40fd"
+      "bytes": 351,
+      "sha256": "7afb4f544bde66c5911046cb4df1df6dfe76768177d9ec2f201f0ee6c7e15104"
     },
     "meter-track": {
       "path": "defold/assets/derived/ui/chrome/meter-track.png",
@@ -330,8 +389,8 @@
         12
       ],
       "slice": 3,
-      "bytes": 106,
-      "sha256": "ccab9557132fa3408efaad9c9e5c667d99c276ee5ae47e3f689c3ac7f44490e4"
+      "bytes": 103,
+      "sha256": "60db23e19a941a572461c22f2c421b480b490da44bbaf0b01980e8531132f9fe"
     },
     "meter-fill": {
       "path": "defold/assets/derived/ui/chrome/meter-fill.png",

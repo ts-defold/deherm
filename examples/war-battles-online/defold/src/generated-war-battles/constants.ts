@@ -16,6 +16,8 @@ export const TICK_RATE = 60;
 export const TICK_MILLISECONDS = 1000 / TICK_RATE;
 
 export const MAX_PLAYERS = 32;
+/** Product roster default; 32 remains the supported capacity and soak target. */
+export const DEFAULT_ROSTER_SIZE = 16;
 export const MAX_PROJECTILES = 512;
 export const MAX_PICKUPS = 32;
 /** Fixed environmental hazard vents; their positions are derived from mapSeed. */
@@ -24,6 +26,8 @@ export const MAX_HAZARDS = 4;
 export const MAX_COVER_PANELS = 64;
 export const COVER_MAX_HEALTH = 100;
 export const INPUT_HISTORY_TICKS = 256;
+/** The showcase's online admission lead; adaptive control may shrink it later. */
+export const INITIAL_ONLINE_INPUT_LEAD_TICKS = 8;
 /** Fixed protocol width of the authenticated session-resume credential. */
 export const SESSION_TOKEN_BYTES = 40;
 /** Axes stay held this long without a fresh input before they are released. */
@@ -130,6 +134,8 @@ export const INFANTRY_FIRE_DAMAGE = 8;
 export const INFANTRY_FIRE_COOLDOWN_TICKS = 18;
 /** Brief lockout prevents a tank destroyed on a depot from being reclaimed instantly. */
 export const INFANTRY_EJECT_LOCK_TICKS = 45;
+/** A half-second, half-damage escape window gives the ejected pilot time to act. */
+export const INFANTRY_EJECT_PROTECT_TICKS = 30;
 export const TANK_DEPOT_RADIUS = 24 * UNITS_PER_PIXEL;
 /** Any hostile tank touching an on-foot pilot at speed finishes the job. */
 export const INFANTRY_CRUSH_DAMAGE = 0x7fff;

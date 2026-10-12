@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_95cf1548-938c-492d-b197-5750355862d5",
+  "operation": "edit",
+  "prompt": "Replace only the raised square gun-house on this tracked artillery hull with a low, flat armored deck and a small recessed circular turret mounting ring. Keep the two tracks, chassis outline, diagonal isometric viewing angle, warm brass and charcoal palette, pixel clusters, shading, and native sprite scale unchanged. This is a hull underneath a separately aimed turret: no gun barrel, no weapon, no second cabin.",
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "784847e8-d095-4583-9b6b-4b449454fb3d"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/artillery-low-deck-hull-v3.json",
+    "sha256": "50e58e728e150235f2b05d9adcbd062a47d345f7180758f4ff0ec0dc46c29eca"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "f909f3d9-79e9-4016-b2ff-fe06c689eb73",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 54,
+      "height": 40,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/f909f3d9-79e9-4016-b2ff-fe06c689eb73/image.png?v=1791516507849",
+      "path": "art/source/sprite-fusion/outputs/artillery-low-deck-hull-v3/00.png",
+      "bytes": 3406,
+      "sha256": "b72e243f0aebb2197db32db1941838573b568868f4f3a9ba63f204ad1a7a2595"
+    },
+    {
+      "index": 1,
+      "assetId": "62fc12b4-7275-4182-8e82-42deceb10ec4",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 68,
+      "height": 42,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/62fc12b4-7275-4182-8e82-42deceb10ec4/image.png?v=1791516508840",
+      "path": "art/source/sprite-fusion/outputs/artillery-low-deck-hull-v3/01.png",
+      "bytes": 4923,
+      "sha256": "986ab9d1bbb5a135e4e7682dd239559d1763403ad3881cec7b6f37d09edd6782"
+    }
+  ],
+  "credits": {
+    "remaining": 2190
+  }
+}

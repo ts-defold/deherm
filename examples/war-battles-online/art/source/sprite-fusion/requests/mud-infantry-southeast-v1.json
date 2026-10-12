@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_aad308f5-a067-4365-bf3f-a1e286fa50c5",
+  "operation": "style-reference",
+  "prompt": "Mud, a rugged dust-covered tank driver, full-body southeast-facing three-quarter isometric standing pose for the same game as the reference. Distinct dark respirator mask over his nose and mouth, low ochre helmet with orange-rimmed goggles, rust-red scarf, heavy dark olive work jacket, dark trousers, sturdy brown boots and compact sidearm held low. Match the reference's grounded scale, chunky silhouette, dark outline, muted military palette, and viewing angle. Make Mud clearly different from the reference's helmeted woman. One character only; no vehicle, pedestal, scenery, text, or extra figures.",
+  "size": 32,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "d62dd927-7809-4bd6-a18e-1c87fcf23e9f"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/mud-infantry-southeast-v1.json",
+    "sha256": "095113caa67ce03d2eb872de1529d1aec3c09b6d959fbb6174929c9a5235f755"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "553ee484-f4e3-4121-b09f-3db950afc8c7",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 63,
+      "height": 63,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/553ee484-f4e3-4121-b09f-3db950afc8c7/image.png?v=1791526885630",
+      "path": "art/source/sprite-fusion/outputs/mud-infantry-southeast-v1/00.png",
+      "bytes": 4925,
+      "sha256": "e80e0adaf63652095e2b05bb5c01bdbe4a6db7eea9d4de2e6a4a58cde3e42e75"
+    },
+    {
+      "index": 1,
+      "assetId": "4eb49c51-4bd1-41e3-8d0b-d2ca9874dd6c",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 66,
+      "height": 66,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/4eb49c51-4bd1-41e3-8d0b-d2ca9874dd6c/image.png?v=1791526886372",
+      "path": "art/source/sprite-fusion/outputs/mud-infantry-southeast-v1/01.png",
+      "bytes": 5940,
+      "sha256": "45c2836524ef443fbc3c71e59f639d4d16d1aba93c4120ca79d2dbcb22697f98"
+    },
+    {
+      "index": 2,
+      "assetId": "6252c4d8-e671-4226-856e-e2123b4cfe80",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 61,
+      "height": 61,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/6252c4d8-e671-4226-856e-e2123b4cfe80/image.png?v=1791526887093",
+      "path": "art/source/sprite-fusion/outputs/mud-infantry-southeast-v1/02.png",
+      "bytes": 5066,
+      "sha256": "2defe0817b970d368a9ffb751221fbe6f66c3692aa81733e9e3907e72d9cf5ce"
+    },
+    {
+      "index": 3,
+      "assetId": "bc5bdc68-348f-4034-acd6-4da55b23baa1",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 65,
+      "height": 65,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/bc5bdc68-348f-4034-acd6-4da55b23baa1/image.png?v=1791526887659",
+      "path": "art/source/sprite-fusion/outputs/mud-infantry-southeast-v1/03.png",
+      "bytes": 5993,
+      "sha256": "089ce2e607cc13153d6e306ce598d9d65dd63f65e5995deb698514fe7206c662"
+    },
+    {
+      "index": 4,
+      "assetId": "644767e7-52a3-4881-b179-ba87480f27af",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 59,
+      "height": 59,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/644767e7-52a3-4881-b179-ba87480f27af/image.png?v=1791526888270",
+      "path": "art/source/sprite-fusion/outputs/mud-infantry-southeast-v1/04.png",
+      "bytes": 5306,
+      "sha256": "8ecff3213fbd10a9fad8b82dc071b117b840be32c637c5fff7a43e67b126980e"
+    },
+    {
+      "index": 5,
+      "assetId": "486301f9-f801-4e39-a39b-bd86ad6bb12f",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 65,
+      "height": 65,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/486301f9-f801-4e39-a39b-bd86ad6bb12f/image.png?v=1791526888900",
+      "path": "art/source/sprite-fusion/outputs/mud-infantry-southeast-v1/05.png",
+      "bytes": 6031,
+      "sha256": "679669b9489d50a6f5d395d2e26d1150e95ee15a744b769daf7e749bec7e4fac"
+    },
+    {
+      "index": 6,
+      "assetId": "31ef125b-05f6-47f7-b2ca-6959997d6c4a",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 62,
+      "height": 62,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/31ef125b-05f6-47f7-b2ca-6959997d6c4a/image.png?v=1791526889456",
+      "path": "art/source/sprite-fusion/outputs/mud-infantry-southeast-v1/06.png",
+      "bytes": 5515,
+      "sha256": "09a62e4a3849686299bbc738befff0f2683dbe10ba11353c4f354dba574bfc49"
+    },
+    {
+      "index": 7,
+      "assetId": "271533e4-85ba-45d2-b03c-692bd87feba7",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 67,
+      "height": 67,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/271533e4-85ba-45d2-b03c-692bd87feba7/image.png?v=1791526890171",
+      "path": "art/source/sprite-fusion/outputs/mud-infantry-southeast-v1/07.png",
+      "bytes": 5933,
+      "sha256": "309fe44dd2730bf95bd3c5f194bc422e6ea541c44b23144eea5453420b3d3fb7"
+    },
+    {
+      "index": 8,
+      "assetId": "a45be573-6667-45be-921e-8c5a6fe76f20",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 63,
+      "height": 63,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/a45be573-6667-45be-921e-8c5a6fe76f20/image.png?v=1791526890829",
+      "path": "art/source/sprite-fusion/outputs/mud-infantry-southeast-v1/08.png",
+      "bytes": 5139,
+      "sha256": "8291a0a1b81571a69c4d2eef9e0b96596b374e9477314e359b8e5fa4c652b4a4"
+    }
+  ],
+  "credits": {
+    "remaining": 1335
+  }
+}

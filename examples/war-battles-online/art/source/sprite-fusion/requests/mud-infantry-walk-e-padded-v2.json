@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_3fb6ba94-ef7e-4e28-abb4-32e1fc489731",
+  "operation": "animate",
+  "prompt": "A grounded east-facing walk loop with alternating boots and a small opposite-arm swing. Preserve Mud's gas-mask helmet, orange eye lenses, scarf, compact backpack, olive fatigues, low sidearm, silhouette, palette, and exact side view. Keep the complete character and equipment inside every frame with clear space on all four sides.",
+  "size": null,
+  "outputFrames": 4,
+  "colors": 24,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/inputs/mud-infantry-walk-pose-e-v1-0-padded-80.png",
+      "bytes": 3586,
+      "sha256": "5e379c01d88f06c4b4d467d381be2e1b4258c89a921b45f1c4d47d9ed4afd02e"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/mud-infantry-walk-e-padded-v2.json",
+    "sha256": "fb7dae5d5eaf5a084d9b94b887c0bd7d6a83b890f6d46989b8edbc3b8c625090"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "6588e58b-8e41-437b-ab1f-01f177898540",
+      "type": "animation",
+      "contentType": "image/webp",
+      "width": 80,
+      "height": 80,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/6588e58b-8e41-437b-ab1f-01f177898540/animation.webp?v=1791564095224",
+      "path": "art/source/sprite-fusion/outputs/mud-infantry-walk-e-padded-v2/00.webp",
+      "bytes": 2202,
+      "sha256": "04b040bec896e552886bc4763de150c5e281a45bffadbb63fb9cd8c18f716124",
+      "spritesheet": {
+        "url": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/6588e58b-8e41-437b-ab1f-01f177898540/spritesheet.png?v=1791564095224",
+        "path": "art/source/sprite-fusion/outputs/mud-infantry-walk-e-padded-v2/00-sheet.png",
+        "bytes": 2788,
+        "sha256": "8eecea7dbb776dba67c6578fa5845da4aae6e5a0b297352309848c0a96cf7ada"
+      },
+      "frameCount": 4,
+      "fps": 8
+    }
+  ],
+  "credits": {
+    "remaining": 90
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_40f9114f-22b0-4e93-a71c-da8acd26b15b",
+  "operation": "edit",
+  "prompt": "Keep Rook in this exact southwest-facing three-quarter perspective. Change his body into a clearly defeated low collapsed pose: down on one knee, torso and helmet bowed forward, one hand braced against the ground, sidearm lowered. Make the silhouette shorter and wider than standing. Preserve the same facing, boots and knee on one ground line, exact helmet, blue goggles, cream scarf, olive jacket, colors, outlines, and character identity. No turn, blood, injury detail, flash, extra prop, scenery, platform, text, or second person.",
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "c4c082f9-d41e-497b-a38c-80520006f1d9"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/rook-infantry-death-pose-sw-v1.json",
+    "sha256": "5b4fe4d07bf55a3599cf5dc315cb461c2c51310048d1aea93ef53a1f5da4681b"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "8002a69f-edf6-423a-b17e-86b183425df9",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 38,
+      "height": 44,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/8002a69f-edf6-423a-b17e-86b183425df9/image.png?v=1791533711528",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-death-pose-sw-v1/00.png",
+      "bytes": 3397,
+      "sha256": "05c11b9366ba07fb8795d3d9d676b3ab67a06f81ab70337c8cc6515ee3c47829"
+    },
+    {
+      "index": 1,
+      "assetId": "84b0c8ff-b1ee-4712-adbd-1fa3a6264c82",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 31,
+      "height": 33,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/84b0c8ff-b1ee-4712-adbd-1fa3a6264c82/image.png?v=1791533712641",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-death-pose-sw-v1/01.png",
+      "bytes": 2538,
+      "sha256": "2a3e3e9df855789e1e9830f5b4dacae2f411e2d50f2af41c182cf8903c648a82"
+    }
+  ],
+  "credits": {
+    "remaining": 825
+  }
+}

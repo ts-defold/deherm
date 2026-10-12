@@ -1,0 +1,164 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_7489bafa-7b0d-42bf-8078-acc3bb7250d2",
+  "operation": "generate",
+  "prompt": "Three-quarter isometric top-down self-propelled artillery vehicle for a lively retro arcade tank game. Distinct long, low chassis with two wide separated tracks, a high rear casemate, an extremely long narrow rail cannon aimed toward the lower right, and folded stabilizer legs behind it. Angular basalt-grey armor, warm cream edge highlights, a few restrained orange signal markings, dark readable outline. The driver is enclosed; no face or character above the hull. A single vehicle viewed from above on clear empty ground, visually readable as a tiny moving game sprite.",
+  "size": 64,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/artillery-silhouette-v2.json",
+    "sha256": "706affc670fb4c58389dd235720a68723e941b681a4c5f02587aabf33c3ec6a5"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "dfbf8442-7f9a-4462-81d5-832141bfb0c5",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 74,
+      "height": 74,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/dfbf8442-7f9a-4462-81d5-832141bfb0c5/image.png?v=1791426337226",
+      "path": "art/source/sprite-fusion/outputs/artillery-silhouette-v2/00.png",
+      "bytes": 5921,
+      "sha256": "da7faf0bf363424caf2d6427b14add928b4347e79ed7288c941e4c60697985ec"
+    },
+    {
+      "index": 1,
+      "assetId": "e347f7c2-bce4-434e-b5de-74b5ec604aee",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/e347f7c2-bce4-434e-b5de-74b5ec604aee/image.png?v=1791426337730",
+      "path": "art/source/sprite-fusion/outputs/artillery-silhouette-v2/01.png",
+      "bytes": 8179,
+      "sha256": "00cbcbe01d1173b628ba9adaefee1b58ebc94e14d53d1da41188bc5d606ef1ab"
+    },
+    {
+      "index": 2,
+      "assetId": "4e3a991f-d088-485d-be03-1fffa6c98f95",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/4e3a991f-d088-485d-be03-1fffa6c98f95/image.png?v=1791426338109",
+      "path": "art/source/sprite-fusion/outputs/artillery-silhouette-v2/02.png",
+      "bytes": 9080,
+      "sha256": "380ea0695e5ffae748a8ab925e86b54bfa18d04926108ebd13f32b81234529f6"
+    },
+    {
+      "index": 3,
+      "assetId": "2d276a86-2c36-4c73-9acc-a8477e5389c6",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/2d276a86-2c36-4c73-9acc-a8477e5389c6/image.png?v=1791426338414",
+      "path": "art/source/sprite-fusion/outputs/artillery-silhouette-v2/03.png",
+      "bytes": 11701,
+      "sha256": "aea73ef44ba1c3425e673617647fbafdae4213428be18d997de76e41222a08a6"
+    },
+    {
+      "index": 4,
+      "assetId": "7066a19f-90be-4504-a415-7afa79dc3c53",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 77,
+      "height": 77,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/7066a19f-90be-4504-a415-7afa79dc3c53/image.png?v=1791426338723",
+      "path": "art/source/sprite-fusion/outputs/artillery-silhouette-v2/04.png",
+      "bytes": 6107,
+      "sha256": "1a86d0a91d2bf0a6e580c5eaf6f2db04c8e03e68a02b23218bae52d1c6546f3f"
+    },
+    {
+      "index": 5,
+      "assetId": "c5262219-7bed-43af-af02-1c47dacf624b",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 78,
+      "height": 78,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/c5262219-7bed-43af-af02-1c47dacf624b/image.png?v=1791426339245",
+      "path": "art/source/sprite-fusion/outputs/artillery-silhouette-v2/05.png",
+      "bytes": 5823,
+      "sha256": "492c0612c6f51a6bd28db42abee98791cfb18433f112eff36cb4c46e05b03f6e"
+    },
+    {
+      "index": 6,
+      "assetId": "30f3787e-cb88-4972-aa69-aa3e5d20aaaa",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 79,
+      "height": 79,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/30f3787e-cb88-4972-aa69-aa3e5d20aaaa/image.png?v=1791426339779",
+      "path": "art/source/sprite-fusion/outputs/artillery-silhouette-v2/06.png",
+      "bytes": 6694,
+      "sha256": "35bc14823ff7bb405030a156a7f2bf267204d34c73c1b60cb98ac0b62e42928e"
+    },
+    {
+      "index": 7,
+      "assetId": "2d4e60ba-e103-4731-99f0-5fa98c76cd63",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 80,
+      "height": 80,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/2d4e60ba-e103-4731-99f0-5fa98c76cd63/image.png?v=1791426340356",
+      "path": "art/source/sprite-fusion/outputs/artillery-silhouette-v2/07.png",
+      "bytes": 6312,
+      "sha256": "2619864afb80fdd7a898226673e7d52914c52834cf75b96a3d9f69a0faab153e"
+    },
+    {
+      "index": 8,
+      "assetId": "f79f3b0a-a2dd-4b54-8df2-56723fc6f5e6",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 80,
+      "height": 80,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/f79f3b0a-a2dd-4b54-8df2-56723fc6f5e6/image.png?v=1791426340866",
+      "path": "art/source/sprite-fusion/outputs/artillery-silhouette-v2/08.png",
+      "bytes": 6393,
+      "sha256": "6a8fe692e406452707d77221e263decf61be1dc71a7662ab987cb6f93f69f605"
+    },
+    {
+      "index": 9,
+      "assetId": "5960b5e7-7aa2-445c-9667-99fe803b234e",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 80,
+      "height": 80,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/5960b5e7-7aa2-445c-9667-99fe803b234e/image.png?v=1791426341371",
+      "path": "art/source/sprite-fusion/outputs/artillery-silhouette-v2/09.png",
+      "bytes": 7065,
+      "sha256": "7eb05b15286500a1f4559639ab3057a4e36486e566d704add1778d7b80b6e1b1"
+    },
+    {
+      "index": 10,
+      "assetId": "451f80d3-8eba-450f-b22e-65bef9f0ce0b",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 81,
+      "height": 81,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/451f80d3-8eba-450f-b22e-65bef9f0ce0b/image.png?v=1791426341899",
+      "path": "art/source/sprite-fusion/outputs/artillery-silhouette-v2/10.png",
+      "bytes": 6980,
+      "sha256": "37b1ded3ddb32432f6888df5c86046c36b15cd2dbb8bfb572d11d69a2cda695f"
+    },
+    {
+      "index": 11,
+      "assetId": "99113320-0f63-4f23-be84-8628db97de15",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 81,
+      "height": 81,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/99113320-0f63-4f23-be84-8628db97de15/image.png?v=1791426342412",
+      "path": "art/source/sprite-fusion/outputs/artillery-silhouette-v2/11.png",
+      "bytes": 6067,
+      "sha256": "b896cb48a668dbe85c32facf507d67632a970f785596f4b502d7776485ab56da"
+    }
+  ],
+  "credits": {
+    "remaining": 2655
+  }
+}

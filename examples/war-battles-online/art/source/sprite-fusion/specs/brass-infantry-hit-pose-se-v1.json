@@ -1,0 +1,6 @@
+{
+  "name": "brass-infantry-hit-pose-se-v1",
+  "operation": "edit",
+  "inputs": ["asset:40f0c359-ea92-4cf1-9e04-6a6d658f20a3"],
+  "prompt": "Brass takes a heavy impact while facing southeast: his stocky body recoils diagonally, knees buckle, one arm rises across his bearded face, and the sidearm hangs low. Keep both heavy boots planted on the same ground line. This must read as a staggered hit, not standing or firing, at tiny game scale. Preserve the same older driver, white beard, brown helmet and goggles, cream scarf, olive jacket, colors, outline weight, proportions, and isometric three-quarter perspective. No blood, projectile, flash, new prop, scenery, text, or other character."
+}

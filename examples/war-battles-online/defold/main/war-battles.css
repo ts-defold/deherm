@@ -1,0 +1,38 @@
+body,
+.canvas-app-container {
+  background: #1b2024;
+}
+
+.canvas-app-canvas {
+  background: #1b2024;
+  image-rendering: pixelated;
+}
+
+.buttons-background {
+  display: none;
+}
+
+@media (max-aspect-ratio: 1/1) and (max-width: 700px) {
+  #canvas-container {
+    visibility: hidden;
+  }
+
+  .canvas-app-container::after {
+    content: "ROTATE TO LANDSCAPE TO PLAY";
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    display: grid;
+    place-items: center;
+    padding: 2rem;
+    box-sizing: border-box;
+    background: radial-gradient(circle at center, #2f393b 0%, #151b20 75%);
+    color: #e8d9b0;
+    font:
+      700 clamp(1rem, 5vw, 1.5rem)/1.4 system-ui,
+      sans-serif;
+    letter-spacing: 0.12em;
+    text-align: center;
+    text-shadow: 0 2px #101519;
+  }
+}

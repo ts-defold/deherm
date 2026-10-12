@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_7d61bbc9-0c9a-474f-9182-9c164fa2a044",
+  "operation": "edit",
+  "prompt": "Isolate only this scout tank's small rotating turret, slim short gun and whip antenna as one detached weapon sprite. Remove the entire tracked hull and chassis underneath, leaving the turret in the same three-quarter isometric direction, palette and outline. The turret should retain a compact base that can sit on the matching scout hull's circular socket. One isolated turret, no hull.",
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/scout-silhouette-v2/05.png",
+      "bytes": 5060,
+      "sha256": "f22158b46cb622ebd8039e0425e3d303654a6befde98d98081656faefba1c370"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/scout-turret-v2.json",
+    "sha256": "b3e363e21e9d823bd89c3207a30203082be7fcb744db6783305808238eb10efb"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "3a39c048-44bc-44fa-ad04-74188e83680a",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 47,
+      "height": 54,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/3a39c048-44bc-44fa-ad04-74188e83680a/image.png?v=1791432260288",
+      "path": "art/source/sprite-fusion/outputs/scout-turret-v2/00.png",
+      "bytes": 3712,
+      "sha256": "d474a5943483b02f25e4687cb24ccd3f72465922efdfb265c259097033bb513b"
+    },
+    {
+      "index": 1,
+      "assetId": "f9139a12-b309-4e97-8a8d-57a9d8aeb1bc",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 35,
+      "height": 36,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/f9139a12-b309-4e97-8a8d-57a9d8aeb1bc/image.png?v=1791432261309",
+      "path": "art/source/sprite-fusion/outputs/scout-turret-v2/01.png",
+      "bytes": 2301,
+      "sha256": "81cedb2a41f1bb33e208f865e5737304dc54361ff6c9e282c6da3e857b2307d8"
+    }
+  ],
+  "credits": {
+    "remaining": 2475
+  }
+}

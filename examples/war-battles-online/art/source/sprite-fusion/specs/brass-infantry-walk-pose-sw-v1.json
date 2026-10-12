@@ -1,0 +1,6 @@
+{
+  "name": "brass-infantry-walk-pose-sw-v1",
+  "operation": "edit",
+  "inputs": ["asset:40075635-51ef-4225-9230-44ad80dedc1e"],
+  "prompt": "Change only Brass's body pose to a grounded walk mid-stride matching this source's southwest three-quarter viewing angle: one boot forward, the other planted, opposite arm swinging, compact sidearm low. Preserve his full white beard, brass-rimmed goggles, ochre leather cap, cream scarf, olive mechanic jacket, stocky build, palette, outlines, and exact perspective. No turn, extra person, platform, text, or scenery."
+}

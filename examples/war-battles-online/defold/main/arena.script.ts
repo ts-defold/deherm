@@ -19,6 +19,7 @@ import {
   BrowserWebSocketClient,
   WebTransportGameClient,
   DEFAULT_ARENA_SEED,
+  INITIAL_ONLINE_INPUT_LEAD_TICKS,
   EVENT_EXPLOSION,
   EVENT_FIRE,
   EVENT_COVER_CHANGED,
@@ -26,21 +27,27 @@ import {
   EVENT_HIT,
   EVENT_KILL,
   EVENT_PICKUP_TAKEN,
-  CELL_FLOOR,
+  INFANTRY_FIRE_COOLDOWN_TICKS,
+  INFANTRY_HEALTH,
   CELL_CRATE,
   CELL_SANDBAG,
-  CELL_WALL,
   MAX_PICKUPS,
   MAX_PROJECTILES,
   MAX_COVER_PANELS,
   MAP_WIDTH,
-  MAP_HEIGHT,
-  SPAWN_POINT_COUNT,
+  PLAYER_MODE_INFANTRY,
+  PLAYER_MODE_DEAD,
+  RESPAWN_TICKS,
   isometricDepth,
-  cellOfX,
-  cellOfY,
+  isometricSortZ,
+  hexReliefLiftAtSimulation,
+  deriveWorldPlanPropAnchors,
+  deriveTankDepotPresentationSites,
+  projectWorldPlanPropCoverage,
   cellCentreX,
   cellCentreY,
+  cellOfX,
+  cellOfY,
   WEAPON_MORTAR,
   createBattleEvent,
   type BattleEvent,
@@ -48,13 +55,12 @@ import {
   type TransportReceiver,
 } from "../src/generated-war-battles/index";
 import {
+  ARENA_GROUND_ROLE_BORDER_BASE,
   ARENA_GROUND_ROLE_WALL_BASE,
-  ARENA_MARK_ROLE_CRATE,
-  ARENA_MARK_ROLE_SANDBAG,
   ARENA_VISUAL_CELL_COUNT,
-  arenaGroundVariant,
   arenaThemeIndex,
   projectArenaVisualRoles,
+  visibleTankDepotMarkerSite,
 } from "../src/generated-war-battles/arena-visual";
 import { ArenaMap } from "../src/generated-war-battles/arena";
 import {
@@ -72,6 +78,7 @@ import {
   startArena,
   type ArenaMatch,
 } from "../src/arena-match";
+import { REMOTE_CUE_EJECT, REMOTE_CUE_REARM } from "../src/generated-war-battles/remote-lifecycle";
 
 interface WarBattlesRuntimeConfig {
   /** Browser-only development override; game.project remains authoritative. */
@@ -82,6 +89,17 @@ interface WarBattlesRuntimeConfig {
   serverCertificateSha256?: string;
   /** Browser-only visual QA mode: arrange every generated landmark around the local camera. */
   artGallery?: boolean;
+  /** Browser-only visual QA: show a selected chassis without changing the playable unlock economy. */
+  artGalleryChassis?: number;
+  /** Browser-only frozen pose fixture; indices use the generated eight-view direction order. */
+  artGalleryHullDirection?: number;
+  artGalleryTurretDirection?: number;
+  /** Browser-only infantry atlas fixture; the match remains frozen. */
+  artGalleryHeroDirection?: number;
+  artGalleryHeroMoving?: boolean;
+  artGalleryHeroFiring?: boolean;
+  artGalleryHeroHit?: boolean;
+  artGalleryHeroDead?: boolean;
 }
 
 interface WarBattlesRuntimeTelemetry {
@@ -100,6 +118,56 @@ interface WarBattlesRuntimeTelemetry {
   inputsDropped: number;
   lastServerTick: number;
   localTick: number;
+  onlineReportedElapsedMilliseconds: number;
+  onlineWallElapsedMilliseconds: number;
+  onlineMaximumWallDeltaMilliseconds: number;
+  /** Adaptive prediction lead currently used by this client, in 60 Hz ticks. */
+  inputLeadTicks: number;
+  /** Authoritative late-input feedback, independent of snapshot delivery age. */
+  inputFeedbackLeadTicks: number;
+  authoritativeInputsAccepted: number;
+  authoritativeInputsLate: number;
+  /** Measured session-channel round trip; zero until the first pong. */
+  roundTripMilliseconds: number;
+  pongsReceived: number;
+  /** Largest same-lifecycle local reconciliation in fixed world units (16 per pixel). */
+  maximumLocalCorrectionMagnitude: number;
+  /** Same-lifecycle local reconciliations larger than 32 world pixels. */
+  correctionsOverThirtyTwoPixels: number;
+  lastLargeCorrectionMagnitude: number;
+  lastLargeCorrectionPredictionErrorMagnitude: number;
+  lastLargeCorrectionPredictionComparable: boolean;
+  lastLargeCorrectionSnapshotTick: number;
+  lastLargeCorrectionLocalTick: number;
+  lastLargeCorrectionPredictedX: number;
+  lastLargeCorrectionPredictedY: number;
+  lastLargeCorrectionPresentedX: number;
+  lastLargeCorrectionPresentedY: number;
+  lastLargeCorrectionCorrectedX: number;
+  lastLargeCorrectionCorrectedY: number;
+  lastLargeCorrectionGeneration: number;
+  lastLargeCorrectionMode: number;
+  /** Remote rebase count and largest old-target-to-presented gap, in fixed world units. */
+  remoteInterpolationRebases: number;
+  maximumRemoteInterpolationRebaseDistance: number;
+  /** Generation/mode changes hard-snap by design; keep them separate from smooth rebases. */
+  remoteLifecycleHardSnaps: number;
+  /** Snapshot-derived remote transition effects actually created in Defold. */
+  remoteEjectEffects: number;
+  remoteRearmEffects: number;
+  /** Largest same-life displacement between two actually rendered remote poses. */
+  maximumRemotePresentedStepDistance: number;
+  remotePresentedStepsOverThirtyTwoPixels: number;
+  maximumLocalPresentedStepDistance: number;
+  localPresentedStepsOverThirtyTwoPixels: number;
+  /** Current predicted local pose, in fixed world units (16 per pixel). */
+  localWorldX: number;
+  localWorldY: number;
+  /** Changes on respawn; motion probes must not label a new life as a teleport. */
+  localGeneration: number;
+  localMode: number;
+  /** Remaining cooldown proves a sampled local fire input actually reached the simulation. */
+  localCooldownTicks: number;
 }
 
 interface WarBattlesBrowserGlobals {
@@ -123,11 +191,11 @@ interface WarBattlesBrowserGlobals {
 
 const ENGAGE = hashLiteral("#engage");
 const RESTART = hashLiteral("#restart");
+const REMOTE_LIFECYCLE_CUE = hashLiteral("#remote_lifecycle_cue");
 const CAMERA = "/camera#follow";
 const CAMERA_IMPACT = "camera_impact";
 const ARENA_TILEMAP = "/level#tilemap";
 const ARENA_FACE_TILEMAP = "/level#faces";
-const ARENA_GROUND_LAYER = "ground";
 const ARENA_DECOR_LAYER = "decor";
 const ARENA_WALL_LAYER = "walls";
 const ARENA_FACE_LAYER = "faces";
@@ -161,9 +229,11 @@ interface CameraImpactMessage {
   strength: number;
 }
 
-/** Part discriminator understood by `tank.script.ts`. */
-const PART_HULL = 0;
-const PART_TURRET = 1;
+interface RemoteLifecycleCueMessage {
+  x: number;
+  y: number;
+  cue: number;
+}
 
 interface ArenaSelf {
   /** Editor property: tanks in the match, local player included. */
@@ -182,20 +252,28 @@ interface ArenaSelf {
   eventCursor: number;
   spawnedProjectile: Uint16Array;
   spawnedPickup: Uint8Array;
-  /** 0 intact, 1 destroyed; fixed-width visual cache avoids engine calls on steady frames. */
-  coverVisualDestroyed?: Uint8Array;
+  /** Fixed-width, foot-sorted cover sprites; no engine calls on steady frames. */
+  coverIds?: Array<DefoldHash | undefined>;
+  coverMapSeed?: number;
   /** Seed/theme currently projected into Defold's three tilemap layers. */
   visualMapSeed?: number;
   visualTheme?: number;
-  visualGroundRoles?: Uint8Array;
+  visualGroundRoles?: Uint16Array;
   visualDecorRoles?: Uint8Array;
   visualMarkRoles?: Uint8Array;
-  visualGroundScratch?: Uint8Array;
+  visualPropCoverage?: Uint8Array;
+  visualGroundScratch?: Uint16Array;
   visualDecorScratch?: Uint8Array;
   visualMarkScratch?: Uint8Array;
+  visualPropScratch?: Uint8Array;
   /** Presentation-only world landmarks keyed to the authoritative map seed. */
   depotIds: DefoldHash[];
   depotMapSeed?: number;
+  /** Persistent pickup pads plus one contextual on-foot depot guide. */
+  markerIds?: DefoldHash[];
+  markerMapSeed?: number;
+  depotMarkerId?: DefoldHash;
+  depotMarkerSite?: number;
   landmarkIds: DefoldHash[];
   landmarkMapSeed?: number;
   visibleProjectiles: number;
@@ -217,6 +295,69 @@ function browserGlobals(): WarBattlesBrowserGlobals {
 
 function artGalleryEnabled(): boolean {
   return browserGlobals().__warBattlesConfigV1?.artGallery === true;
+}
+
+const GALLERY_SCREEN_DIRECTIONS = [
+  [1, -1],
+  [0, -1],
+  [-1, -1],
+  [-1, 0],
+  [1, 0],
+  [-1, 1],
+  [0, 1],
+  [1, 1],
+] as const;
+
+function galleryWorldDirection(index: number): readonly [number, number] {
+  const screen = GALLERY_SCREEN_DIRECTIONS[index];
+  if (screen === undefined || !Number.isInteger(index)) throw new RangeError("art gallery direction must be 0..7");
+  // This inverse projection is presentation-only and the gallery is frozen.
+  // Scaling both components equally keeps every direction in its authored
+  // sector without changing the authoritative world transform.
+  return [(screen[0] + screen[1]) * 128, (screen[1] - screen[0]) * 128];
+}
+
+function syncGalleryHeroPose(self: ArenaSelf): void {
+  if (!artGalleryEnabled()) return;
+  const config = browserGlobals().__warBattlesConfigV1;
+  if (config?.artGalleryHeroDirection === undefined) {
+    if (config?.artGalleryHeroMoving !== undefined) throw new RangeError("hero walk fixture requires a direction");
+    return;
+  }
+  if (config.artGalleryHeroMoving !== undefined && typeof config.artGalleryHeroMoving !== "boolean") {
+    throw new TypeError("art gallery hero moving flag must be boolean");
+  }
+  if (config.artGalleryHeroFiring !== undefined && typeof config.artGalleryHeroFiring !== "boolean") {
+    throw new TypeError("art gallery hero firing flag must be boolean");
+  }
+  if (config.artGalleryHeroHit !== undefined && typeof config.artGalleryHeroHit !== "boolean") {
+    throw new TypeError("art gallery hero hit flag must be boolean");
+  }
+  if (config.artGalleryHeroDead !== undefined && typeof config.artGalleryHeroDead !== "boolean") {
+    throw new TypeError("art gallery hero dead flag must be boolean");
+  }
+  const world = self.match.world;
+  if (world === undefined) throw new Error("art gallery has no offline world");
+  const [x, y] = galleryWorldDirection(config.artGalleryHeroDirection);
+  world.playerMode[0] = config.artGalleryHeroDead ? PLAYER_MODE_DEAD : PLAYER_MODE_INFANTRY;
+  world.playerHealth[0] = config.artGalleryHeroDead
+    ? 0
+    : config.artGalleryHeroHit
+      ? INFANTRY_HEALTH - 5
+      : INFANTRY_HEALTH;
+  world.playerRespawnTicks[0] = config.artGalleryHeroDead ? RESPAWN_TICKS : 0;
+  world.playerHullX[0] = x;
+  world.playerHullY[0] = y;
+  // The frozen match never integrates this velocity; it selects the real
+  // player component's walk atlas instead of inventing a separate renderer.
+  // Cardinal screen facings map to two 128-unit world components. Double
+  // them so every moving fixture crosses the player script's 256-unit
+  // walking threshold; this velocity is never integrated by the frozen match.
+  world.playerVelocityX[0] = config.artGalleryHeroMoving && !config.artGalleryHeroDead ? x * 2 : 0;
+  world.playerVelocityY[0] = config.artGalleryHeroMoving && !config.artGalleryHeroDead ? y * 2 : 0;
+  // A frozen cooldown exercises the production player component's firing
+  // animation selection without inventing a gallery-only sprite renderer.
+  world.playerCooldown[0] = config.artGalleryHeroFiring ? INFANTRY_FIRE_COOLDOWN_TICKS : 0;
 }
 
 function certificateHash(value: string): ArrayBuffer | undefined {
@@ -241,6 +382,53 @@ function updateTelemetry(self: ArenaSelf): void {
   telemetry.inputsDropped = client?.stats.inputsDropped ?? 0;
   telemetry.lastServerTick = client?.stats.lastServerTick ?? 0;
   telemetry.localTick = client?.world?.tick ?? self.match.world?.tick ?? 0;
+  telemetry.onlineReportedElapsedMilliseconds = self.match.onlineReportedElapsedMilliseconds;
+  telemetry.onlineWallElapsedMilliseconds = self.match.onlineWallElapsedMilliseconds;
+  telemetry.onlineMaximumWallDeltaMilliseconds = self.match.onlineMaximumWallDeltaMilliseconds;
+  telemetry.inputLeadTicks = client?.stats.inputLeadTicks ?? 0;
+  telemetry.inputFeedbackLeadTicks = client?.stats.inputFeedbackLeadTicks ?? 0;
+  telemetry.authoritativeInputsAccepted = client?.stats.authoritativeInputsAccepted ?? 0;
+  telemetry.authoritativeInputsLate = client?.stats.authoritativeInputsLate ?? 0;
+  telemetry.roundTripMilliseconds = client?.stats.lastRoundTripMilliseconds ?? 0;
+  telemetry.pongsReceived = client?.stats.pongsReceived ?? 0;
+  telemetry.maximumLocalCorrectionMagnitude = client?.stats.maximumLocalCorrectionMagnitude ?? 0;
+  telemetry.correctionsOverThirtyTwoPixels = client?.stats.localCorrectionBuckets[7] ?? 0;
+  telemetry.lastLargeCorrectionMagnitude = client?.stats.lastLargeCorrectionMagnitude ?? 0;
+  telemetry.lastLargeCorrectionPredictionErrorMagnitude =
+    client?.stats.lastLargeCorrectionPredictionErrorMagnitude ?? 0;
+  telemetry.lastLargeCorrectionPredictionComparable = client?.stats.lastLargeCorrectionPredictionComparable ?? false;
+  telemetry.lastLargeCorrectionSnapshotTick = client?.stats.lastLargeCorrectionSnapshotTick ?? 0;
+  telemetry.lastLargeCorrectionLocalTick = client?.stats.lastLargeCorrectionLocalTick ?? 0;
+  telemetry.lastLargeCorrectionPredictedX = client?.stats.lastLargeCorrectionPredictedX ?? 0;
+  telemetry.lastLargeCorrectionPredictedY = client?.stats.lastLargeCorrectionPredictedY ?? 0;
+  telemetry.lastLargeCorrectionPresentedX = client?.stats.lastLargeCorrectionPresentedX ?? 0;
+  telemetry.lastLargeCorrectionPresentedY = client?.stats.lastLargeCorrectionPresentedY ?? 0;
+  telemetry.lastLargeCorrectionCorrectedX = client?.stats.lastLargeCorrectionCorrectedX ?? 0;
+  telemetry.lastLargeCorrectionCorrectedY = client?.stats.lastLargeCorrectionCorrectedY ?? 0;
+  telemetry.lastLargeCorrectionGeneration = client?.stats.lastLargeCorrectionGeneration ?? 0;
+  telemetry.lastLargeCorrectionMode = client?.stats.lastLargeCorrectionMode ?? 0;
+  telemetry.remoteInterpolationRebases = client?.stats.remoteInterpolationRebases ?? 0;
+  telemetry.maximumRemoteInterpolationRebaseDistance = client?.stats.maximumRemoteInterpolationRebaseDistance ?? 0;
+  telemetry.remoteLifecycleHardSnaps = client?.stats.remoteLifecycleHardSnaps ?? 0;
+  telemetry.maximumRemotePresentedStepDistance = client?.stats.maximumRemotePresentedStepDistance ?? 0;
+  telemetry.remotePresentedStepsOverThirtyTwoPixels = client?.stats.remotePresentedStepsOverThirtyTwoPixels ?? 0;
+  telemetry.maximumLocalPresentedStepDistance = client?.stats.maximumLocalPresentedStepDistance ?? 0;
+  telemetry.localPresentedStepsOverThirtyTwoPixels = client?.stats.localPresentedStepsOverThirtyTwoPixels ?? 0;
+  const world = self.match.world;
+  const localSlot = self.match.localSlot;
+  if (world !== undefined && localSlot >= 0 && localSlot < world.playerX.length) {
+    telemetry.localWorldX = world.playerX[localSlot]!;
+    telemetry.localWorldY = world.playerY[localSlot]!;
+    telemetry.localGeneration = world.playerGeneration[localSlot]!;
+    telemetry.localMode = world.playerMode[localSlot]!;
+    telemetry.localCooldownTicks = world.playerCooldown[localSlot]!;
+  } else {
+    telemetry.localWorldX = 0;
+    telemetry.localWorldY = 0;
+    telemetry.localGeneration = 0;
+    telemetry.localMode = 0;
+    telemetry.localCooldownTicks = 0;
+  }
 }
 
 function attachOnlineTransport(
@@ -351,117 +539,114 @@ function spawnTankParts(self: ArenaSelf): void {
   for (let slot = 0; slot < self.players; slot += 1) {
     const worldX = world.playerX[slot]!;
     const worldY = world.playerY[slot]!;
-    const depth = 0.2 + isometricDepth(worldX, worldY) * 0.05;
+    const depth = isometricSortZ(worldX, worldY);
     const position = vmath.vector3(projectedX(worldX, worldY), projectedY(worldX, worldY), depth);
-    // The local hull is the authored `player` game object, so only its turret
-    // is spawned here; every other tank gets both parts.
+    // Hull and turret share one game object and one sampled pose. The local
+    // player's authored object owns both sprites; remote slots need one each.
     if (slot !== localSlot) {
-      factory.create(
-        "#tankfactory",
-        position,
-        undefined,
-        new Map<string, unknown>([
-          ["slot", slot],
-          ["part", PART_HULL],
-        ]),
-      );
+      factory.create("#tankfactory", position, undefined, new Map<string, unknown>([["slot", slot]]));
     }
-    factory.create(
-      "#tankfactory",
-      vmath.vector3(position.x, position.y, depth + 0.001),
-      undefined,
-      new Map<string, unknown>([
-        ["slot", slot],
-        ["part", PART_TURRET],
-      ]),
-    );
   }
 }
-
-const TANK_DEPOT_PRESENTATION_OFFSET_Y = 64;
 
 function syncTankDepots(self: ArenaSelf): void {
   const world = self.match.world;
   if (world === undefined || self.depotMapSeed === world.mapSeed) return;
   for (const id of self.depotIds) go.delete(id);
   self.depotIds.length = 0;
-  for (let index = 0; index < SPAWN_POINT_COUNT; index += 1) {
-    const worldX = world.map.spawnX[index]!;
-    const worldY = world.map.spawnY[index]!;
-    // The authoritative depot coordinate is the apron where pilots enter and
-    // tanks spawn. Present the building behind that apron instead of directly
-    // under the vehicle; overlapping the 1.4x depot art made a local hull read
-    // as part of the building.
+  for (const index of deriveTankDepotPresentationSites(world.map)) {
+    const facade = world.map.plan.depotFacadeCells[index]!;
+    const worldX = cellCentreX(facade % MAP_WIDTH);
+    const worldY = cellCentreY(Math.floor(facade / MAP_WIDTH));
+    // The facade foot and the immutable collider come from the same plan cell;
+    // the nearby spawn coordinate remains the separate pilot/tank apron.
     const id = factory.create(
       "#depotfactory",
-      vmath.vector3(
-        projectedX(worldX, worldY),
-        projectedY(worldX, worldY) + TANK_DEPOT_PRESENTATION_OFFSET_Y,
-        0.16 + isometricDepth(worldX, worldY) * 0.05,
-      ),
+      vmath.vector3(projectedX(worldX, worldY), projectedY(worldX, worldY), isometricSortZ(worldX, worldY, -0.02)),
     ) as DefoldHash | undefined;
     if (id !== undefined) self.depotIds.push(id);
   }
   self.depotMapSeed = world.mapSeed;
 }
 
-const LANDMARK_ANCHOR_X = [18, 59, 100, 28, 90, 45, 74, 18, 96] as const;
-const LANDMARK_ANCHOR_Y = [20, 18, 22, 44, 45, 68, 70, 70, 68] as const;
-const LANDMARK_REQUIRES_WALL = [true, true, true, false, true, true, true, true, false] as const;
-
-function nearestLandmarkCell(map: ArenaMap, preferredX: number, preferredY: number, wall: boolean): number {
-  for (let radius = 0; radius <= 12; radius += 1) {
-    for (let offsetY = -radius; offsetY <= radius; offsetY += 1) {
-      for (let offsetX = -radius; offsetX <= radius; offsetX += 1) {
-        if (Math.max(Math.abs(offsetX), Math.abs(offsetY)) !== radius) continue;
-        const x = preferredX + offsetX;
-        const y = preferredY + offsetY;
-        if (x < 2 || y < 2 || x >= MAP_WIDTH - 2 || y >= MAP_HEIGHT - 2) continue;
-        const cell = map.cellAt(x, y);
-        if (wall ? cell === CELL_WALL : cell === CELL_FLOOR) return y * MAP_WIDTH + x;
-      }
+function syncFloorMarkers(self: ArenaSelf): void {
+  const world = self.match.world;
+  if (world === undefined) return;
+  if (self.markerIds === undefined) self.markerIds = [];
+  if (self.markerMapSeed !== world.mapSeed) {
+    for (const id of self.markerIds) go.delete(id);
+    self.markerIds.length = 0;
+    if (self.depotMarkerId !== undefined) go.delete(self.depotMarkerId);
+    self.depotMarkerId = undefined;
+    self.depotMarkerSite = -1;
+    for (let site = 0; site < MAX_PICKUPS; site += 1) {
+      const worldX = world.map.pickupX[site]!;
+      const worldY = world.map.pickupY[site]!;
+      const id = factory.create(
+        "#pickupmarkerfactory",
+        vmath.vector3(projectedX(worldX, worldY), projectedY(worldX, worldY), isometricSortZ(worldX, worldY, -0.012)),
+      ) as DefoldHash | undefined;
+      if (id !== undefined) self.markerIds.push(id);
     }
+    self.markerMapSeed = world.mapSeed;
   }
-  throw new Error(`no ${wall ? "wall" : "floor"} cell near landmark anchor ${preferredX},${preferredY}`);
+  const site = visibleTankDepotMarkerSite(world, self.match.localSlot);
+  if (self.depotMarkerSite === site) return;
+  if (self.depotMarkerId !== undefined) go.delete(self.depotMarkerId);
+  self.depotMarkerId = undefined;
+  self.depotMarkerSite = site;
+  if (site < 0) return;
+  const worldX = world.map.spawnX[site]!;
+  const worldY = world.map.spawnY[site]!;
+  self.depotMarkerId = factory.create(
+    "#spawnmarkerfactory",
+    vmath.vector3(projectedX(worldX, worldY), projectedY(worldX, worldY), isometricSortZ(worldX, worldY, -0.012)),
+  ) as DefoldHash | undefined;
 }
 
+const LANDMARK_COUNT = 17;
 function syncWorldLandmarks(self: ArenaSelf): void {
   const world = self.match.world;
   if (world === undefined || self.landmarkMapSeed === world.mapSeed) return;
   for (const id of self.landmarkIds) go.delete(id);
   self.landmarkIds.length = 0;
-  for (let kind = 0; kind < LANDMARK_ANCHOR_X.length; kind += 1) {
-    let screenX: number;
-    let screenY: number;
-    let depth: number;
-    if (artGalleryEnabled()) {
+  if (artGalleryEnabled()) {
+    for (let kind = 0; kind < LANDMARK_COUNT; kind += 1) {
       const localX = world.playerX[0]!;
       const localY = world.playerY[0]!;
-      const column = kind % 3;
-      const row = Math.floor(kind / 3);
-      screenX = projectedX(localX, localY) + (column - 1) * 176;
-      screenY = projectedY(localX, localY) + (1 - row) * 104;
-      depth = 0.35 + row * 0.01;
-    } else {
-      const cell = nearestLandmarkCell(
-        world.map,
-        LANDMARK_ANCHOR_X[kind]!,
-        LANDMARK_ANCHOR_Y[kind]!,
-        LANDMARK_REQUIRES_WALL[kind]!,
-      );
-      const worldX = cellCentreX(cell % MAP_WIDTH);
-      const worldY = cellCentreY(Math.floor(cell / MAP_WIDTH));
-      screenX = projectedX(worldX, worldY);
-      screenY = projectedY(worldX, worldY);
-      depth = 0.17 + isometricDepth(worldX, worldY) * 0.05;
+      const column = kind % 4;
+      const row = Math.floor(kind / 4);
+      const id = factory.create(
+        "#landmarkfactory",
+        vmath.vector3(
+          projectedX(localX, localY) + (column - 1.5) * 176,
+          projectedY(localX, localY) + (1 - row) * 104,
+          0.35 + row * 0.01,
+        ),
+        undefined,
+        new Map<string, unknown>([["kind", kind]]),
+      ) as DefoldHash | undefined;
+      if (id !== undefined) self.landmarkIds.push(id);
     }
-    const id = factory.create(
-      "#landmarkfactory",
-      vmath.vector3(screenX, screenY, depth),
-      undefined,
-      new Map<string, unknown>([["kind", kind]]),
-    ) as DefoldHash | undefined;
-    if (id !== undefined) self.landmarkIds.push(id);
+  } else {
+    // The world-plan prop table is also the source of collision. Emit exactly
+    // one ground-seated sprite per accepted tree, rock, or building so no
+    // invisible obstacle can survive the island migration.
+    for (const anchor of deriveWorldPlanPropAnchors(world.map)) {
+      const id = factory.create(
+        "#landmarkfactory",
+        vmath.vector3(
+          projectedX(anchor.worldX, anchor.worldY),
+          projectedY(anchor.worldX, anchor.worldY),
+          isometricSortZ(anchor.worldX, anchor.worldY, 0.001),
+        ),
+        undefined,
+        new Map<string, unknown>([["kind", anchor.kind]]),
+      ) as DefoldHash | undefined;
+      if (id !== undefined) self.landmarkIds.push(id);
+    }
+    // The former mirrored square-wall landforms have no place in the seeded
+    // island. All blocking scenery above comes from the world-plan table.
   }
   self.landmarkMapSeed = world.mapSeed;
 }
@@ -483,8 +668,10 @@ function syncPickups(self: ArenaSelf): void {
       "#pickupfactory",
       vmath.vector3(
         projectedX(world.pickupX[index]!, world.pickupY[index]!),
-        projectedY(world.pickupX[index]!, world.pickupY[index]!),
-        0.1 + isometricDepth(world.pickupX[index]!, world.pickupY[index]!) * 0.05,
+        // The 40px raised pickup is bottom-anchored over its authoritative
+        // world position, rather than centered through the hex floor.
+        projectedY(world.pickupX[index]!, world.pickupY[index]!) + 18,
+        isometricSortZ(world.pickupX[index]!, world.pickupY[index]!, -0.002),
       ),
       undefined,
       new Map<string, unknown>([
@@ -519,7 +706,7 @@ function syncProjectiles(self: ArenaSelf): void {
       vmath.vector3(
         projectedX(world.projectileX[slot]!, world.projectileY[slot]!),
         projectedY(world.projectileX[slot]!, world.projectileY[slot]!),
-        0.4 + isometricDepth(world.projectileX[slot]!, world.projectileY[slot]!) * 0.05,
+        isometricSortZ(world.projectileX[slot]!, world.projectileY[slot]!, 0.003),
       ),
       undefined,
       new Map<string, unknown>([
@@ -532,23 +719,39 @@ function syncProjectiles(self: ArenaSelf): void {
   self.visibleProjectiles = visible;
 }
 
-function syncCoverTiles(self: ArenaSelf): void {
+function syncCoverSprites(self: ArenaSelf): void {
   const world = self.match.world;
   if (world === undefined) return;
-  // A compatible hot reload preserves `self`; initialize this newly-added
-  // field once for instances created by an older generation.
-  if (self.coverVisualDestroyed === undefined) self.coverVisualDestroyed = new Uint8Array(MAX_COVER_PANELS);
-  const visualDestroyed = self.coverVisualDestroyed;
+  // A compatible hot reload may preserve an older self without this field.
+  if (self.coverIds === undefined) self.coverIds = Array.from({ length: MAX_COVER_PANELS }, () => undefined);
+  if (self.coverMapSeed !== world.mapSeed) {
+    for (const id of self.coverIds) if (id !== undefined) go.delete(id);
+    self.coverIds.fill(undefined);
+    self.coverMapSeed = world.mapSeed;
+  }
   for (let panel = 0; panel < world.map.coverPanelCount; panel += 1) {
-    const destroyed = world.map.coverHealth[panel] === 0 ? 1 : 0;
-    if (visualDestroyed[panel] === destroyed) continue;
-    const cellX = cellOfX(world.map.coverX[panel]!);
-    const cellY = cellOfY(world.map.coverY[panel]!);
+    const id = self.coverIds[panel];
+    if (world.map.coverHealth[panel] === 0) {
+      if (id !== undefined) go.delete(id);
+      self.coverIds[panel] = undefined;
+      continue;
+    }
+    if (id !== undefined) continue;
+    const worldX = world.map.coverX[panel]!;
+    const worldY = world.map.coverY[panel]!;
+    const cellX = cellOfX(worldX);
+    const cellY = cellOfY(worldY);
     const cell = world.map.cellAt(cellX, cellY);
-    const role = cell === CELL_CRATE ? ARENA_MARK_ROLE_CRATE : cell === CELL_SANDBAG ? ARENA_MARK_ROLE_SANDBAG : 0;
-    const tile = destroyed === 1 ? 0 : arenaMarkTileId(self.visualTheme ?? 0, role);
-    tilemap.setTile(ARENA_TILEMAP, ARENA_MARKS_LAYER, cellX + 1, cellY + 1, tile);
-    visualDestroyed[panel] = destroyed;
+    const kind = cell === CELL_CRATE ? 0 : cell === CELL_SANDBAG ? 1 + (panel & 1) : -1;
+    if (kind < 0) continue;
+    self.coverIds[panel] = factory.create(
+      kind === 0 ? "#coverfactory" : kind === 1 ? "#sandbagafactory" : "#sandbagbfactory",
+      vmath.vector3(
+        projectedX(worldX, worldY),
+        projectedY(worldX, worldY) + (kind === 0 ? 17 : 13),
+        isometricSortZ(worldX, worldY, -0.001),
+      ),
+    ) as DefoldHash | undefined;
   }
 }
 
@@ -557,20 +760,24 @@ function ensureArenaVisualState(self: ArenaSelf): void {
     self.visualGroundRoles !== undefined &&
     self.visualDecorRoles !== undefined &&
     self.visualMarkRoles !== undefined &&
+    self.visualPropCoverage !== undefined &&
     self.visualGroundScratch !== undefined &&
     self.visualDecorScratch !== undefined &&
     self.visualMarkScratch !== undefined &&
+    self.visualPropScratch !== undefined &&
     self.visualMapSeed !== undefined &&
     self.visualTheme !== undefined
   ) {
     return;
   }
-  self.visualGroundRoles = new Uint8Array(ARENA_VISUAL_CELL_COUNT);
+  self.visualGroundRoles = new Uint16Array(ARENA_VISUAL_CELL_COUNT);
   self.visualDecorRoles = new Uint8Array(ARENA_VISUAL_CELL_COUNT);
   self.visualMarkRoles = new Uint8Array(ARENA_VISUAL_CELL_COUNT);
-  self.visualGroundScratch = new Uint8Array(ARENA_VISUAL_CELL_COUNT);
+  self.visualPropCoverage = new Uint8Array(ARENA_VISUAL_CELL_COUNT);
+  self.visualGroundScratch = new Uint16Array(ARENA_VISUAL_CELL_COUNT);
   self.visualDecorScratch = new Uint8Array(ARENA_VISUAL_CELL_COUNT);
   self.visualMarkScratch = new Uint8Array(ARENA_VISUAL_CELL_COUNT);
+  self.visualPropScratch = new Uint8Array(ARENA_VISUAL_CELL_COUNT);
   const baseline = new ArenaMap(DEFAULT_ARENA_SEED);
   projectArenaVisualRoles(
     baseline,
@@ -579,6 +786,7 @@ function ensureArenaVisualState(self: ArenaSelf): void {
     self.visualDecorRoles,
     self.visualMarkRoles,
   );
+  projectWorldPlanPropCoverage(baseline, self.visualPropCoverage);
   self.visualMapSeed = DEFAULT_ARENA_SEED;
   self.visualTheme = arenaThemeIndex(DEFAULT_ARENA_SEED, DEFAULT_ARENA_SEED, ARENA_ART_THEMES.length);
 }
@@ -598,12 +806,14 @@ function syncArenaVisualMap(self: ArenaSelf): void {
   const currentGround = self.visualGroundRoles!;
   const currentDecor = self.visualDecorRoles!;
   const currentMarks = self.visualMarkRoles!;
+  const currentProps = self.visualPropCoverage!;
   const nextGround = self.visualGroundScratch!;
   const nextDecor = self.visualDecorScratch!;
   const nextMarks = self.visualMarkScratch!;
+  const nextProps = self.visualPropScratch!;
   const priorTheme = self.visualTheme!;
-  const priorSeed = self.visualMapSeed!;
   projectArenaVisualRoles(world.map, seed, nextGround, nextDecor, nextMarks);
+  projectWorldPlanPropCoverage(world.map, nextProps);
   for (let index = 0; index < ARENA_VISUAL_CELL_COUNT; index += 1) {
     const cellX = index % MAP_WIDTH;
     const cellY = Math.floor(index / MAP_WIDTH);
@@ -611,21 +821,22 @@ function syncArenaVisualMap(self: ArenaSelf): void {
     const y = cellY + 1;
     const oldRole = currentGround[index]!;
     const newRole = nextGround[index]!;
-    const oldGround = arenaGroundTileId(priorTheme, arenaGroundVariant(priorSeed, cellX, cellY));
-    const newGround = arenaGroundTileId(theme, arenaGroundVariant(seed, cellX, cellY));
-    const oldWall = oldRole >= ARENA_GROUND_ROLE_WALL_BASE ? arenaGroundTileId(priorTheme, oldRole) : 0;
-    const newWall = newRole >= ARENA_GROUND_ROLE_WALL_BASE ? arenaGroundTileId(theme, newRole) : 0;
+    const oldWall =
+      oldRole >= ARENA_GROUND_ROLE_WALL_BASE && currentProps[index] === 0 ? arenaGroundTileId(priorTheme, oldRole) : 0;
+    const newWall =
+      newRole >= ARENA_GROUND_ROLE_WALL_BASE && nextProps[index] === 0 ? arenaGroundTileId(theme, newRole) : 0;
     const oldFace =
-      oldRole >= ARENA_GROUND_ROLE_WALL_BASE
+      oldRole >= ARENA_GROUND_ROLE_WALL_BASE && oldRole < ARENA_GROUND_ROLE_BORDER_BASE && currentProps[index] === 0
         ? arenaWallFaceTileId(priorTheme, oldRole - ARENA_GROUND_ROLE_WALL_BASE)
         : 0;
     const newFace =
-      newRole >= ARENA_GROUND_ROLE_WALL_BASE ? arenaWallFaceTileId(theme, newRole - ARENA_GROUND_ROLE_WALL_BASE) : 0;
+      newRole >= ARENA_GROUND_ROLE_WALL_BASE && newRole < ARENA_GROUND_ROLE_BORDER_BASE && nextProps[index] === 0
+        ? arenaWallFaceTileId(theme, newRole - ARENA_GROUND_ROLE_WALL_BASE)
+        : 0;
     const oldDecor = arenaDecorTileId(priorTheme, currentDecor[index]!);
     const newDecor = arenaDecorTileId(theme, nextDecor[index]!);
     const oldMark = arenaMarkTileId(priorTheme, currentMarks[index]!);
     const newMark = arenaMarkTileId(theme, nextMarks[index]!);
-    if (oldGround !== newGround) tilemap.setTile(ARENA_TILEMAP, ARENA_GROUND_LAYER, x, y, newGround);
     if (oldWall !== newWall) tilemap.setTile(ARENA_TILEMAP, ARENA_WALL_LAYER, x, y, newWall);
     if (oldFace !== newFace) tilemap.setTile(ARENA_FACE_TILEMAP, ARENA_FACE_LAYER, x, y, newFace);
     if (oldDecor !== newDecor) tilemap.setTile(ARENA_TILEMAP, ARENA_DECOR_LAYER, x, y, newDecor);
@@ -634,26 +845,32 @@ function syncArenaVisualMap(self: ArenaSelf): void {
   self.visualGroundRoles = nextGround;
   self.visualDecorRoles = nextDecor;
   self.visualMarkRoles = nextMarks;
+  self.visualPropCoverage = nextProps;
   self.visualGroundScratch = currentGround;
   self.visualDecorScratch = currentDecor;
   self.visualMarkScratch = currentMarks;
+  self.visualPropScratch = currentProps;
   self.visualMapSeed = seed;
   self.visualTheme = theme;
-  self.coverVisualDestroyed?.fill(0);
   defold.log("info", `war-battles:arena-theme:${ARENA_ART_THEMES[theme]!.id}:seed=${seed}`);
 }
 
-function spawnEffect(self: ArenaSelf, big: boolean, x: number, y: number): void {
-  if (self.effectIds.length >= MAX_EFFECTS) return;
+function spawnEffect(self: ArenaSelf, big: boolean, x: number, y: number): boolean {
+  if (self.effectIds.length >= MAX_EFFECTS) return false;
   // A dynamic factory can fail when the Defold gameobject buffer is full.
   // Do not retain an absent id: go.delete only accepts a real address.
   const id = factory.create(
     big ? "#boomfactory" : "#sparkfactory",
-    vmath.vector3(projectedX(x, y), projectedY(x, y), (big ? 0.6 : 0.5) + isometricDepth(x, y) * 0.05),
+    vmath.vector3(
+      projectedX(x, y),
+      projectedY(x, y) + hexReliefLiftAtSimulation(x, y),
+      (big ? 0.6 : 0.5) + isometricDepth(x, y) * 0.05,
+    ),
   ) as DefoldHash | undefined;
-  if (id === undefined) return;
+  if (id === undefined) return false;
   self.effectIds.push(id);
   self.effectTicks.push(big ? EXPLOSION_TICKS : SPARK_TICKS);
+  return true;
 }
 
 function spawnMuzzle(self: ArenaSelf, x: number, y: number, directionX: number, directionY: number): void {
@@ -662,7 +879,11 @@ function spawnMuzzle(self: ArenaSelf, x: number, y: number, directionX: number, 
   if (self.effectIds.length >= MAX_EFFECTS) return;
   const id = factory.create(
     "#muzzlefactory",
-    vmath.vector3(projectedX(x, y), projectedY(x, y), 0.55 + isometricDepth(x, y) * 0.05),
+    vmath.vector3(
+      projectedX(x, y),
+      projectedY(x, y) + hexReliefLiftAtSimulation(x, y),
+      0.55 + isometricDepth(x, y) * 0.05,
+    ),
     vmath.quatRotationZ(projectedDirectionRadians(directionX, directionY)),
   ) as DefoldHash | undefined;
   if (id === undefined) return;
@@ -744,6 +965,10 @@ function ageEffects(self: ArenaSelf): void {
 
 function engage(self: ArenaSelf): void {
   if (self.engaged) return;
+  // WELCOME proves admission, not the spawn pose. Keep the title on screen
+  // until the first authoritative keyframe is restored; otherwise the camera
+  // follows the locally guessed roster and visibly jumps on correction.
+  if (self.match.mode === "online" && self.match.client?.hasAuthoritativeSnapshot !== true) return;
   self.engaged = true;
   self.match.engaged = true;
   spawnTankParts(self);
@@ -846,6 +1071,7 @@ function connectOnline(self: ArenaSelf): boolean {
   };
   client = new BattleClient({
     name: "defold",
+    leadTicks: INITIAL_ONLINE_INPUT_LEAD_TICKS,
     onLog: (line: string) => defold.log("info", `war-battles:net:${line}`),
     onError: (error: unknown) => defold.log("info", `war-battles:net-error:${String(error)}`),
     onReject: (reject) => fallback(`reject:${reject.code}:${reject.reason}`),
@@ -854,11 +1080,10 @@ function connectOnline(self: ArenaSelf): boolean {
     },
     onWelcome: (welcome) => {
       // The authoritative roster is selected by the server. Adopt it before
-      // spawning presentation objects so native Defold renders every admitted
-      // network player rather than retaining the editor's offline default.
+      // presentation starts, but wait for a snapshot before showing any of its
+      // guessed spawn positions or moving the camera.
       self.players = Math.max(2, Math.min(32, Math.trunc(welcome.maximumPlayers)));
       self.match.mode = "online";
-      engage(self);
     },
   });
   self.match.client = client;
@@ -912,7 +1137,8 @@ function fallbackWebSocketUrl(httpUrl: string, config: WarBattlesRuntimeConfig |
 
 export default defineComponent({
   properties: {
-    players: property.number(8),
+    // Mirror DEFAULT_ROSTER_SIZE; Defold editor properties require literals.
+    players: property.number(16),
     botSkill: property.number(1),
     mapSeed: property.number(0),
     autoEngageSeconds: property.number(0),
@@ -925,11 +1151,13 @@ export default defineComponent({
     self.event = createBattleEvent();
     self.spawnedProjectile = new Uint16Array(MAX_PROJECTILES);
     self.spawnedPickup = new Uint8Array(MAX_PICKUPS);
-    self.coverVisualDestroyed = new Uint8Array(MAX_COVER_PANELS);
+    self.coverIds = Array.from({ length: MAX_COVER_PANELS }, () => undefined);
     self.visibleProjectiles = 0;
     self.effectIds = [];
     self.effectTicks = [];
     self.depotIds = [];
+    self.markerIds = [];
+    self.depotMarkerSite = -1;
     self.landmarkIds = [];
     self.impact = { x: 0, y: 0, strength: 0 };
     self.sfxMask = 0;
@@ -946,6 +1174,44 @@ export default defineComponent({
       inputsDropped: 0,
       lastServerTick: 0,
       localTick: 0,
+      onlineReportedElapsedMilliseconds: 0,
+      onlineWallElapsedMilliseconds: 0,
+      onlineMaximumWallDeltaMilliseconds: 0,
+      inputLeadTicks: 0,
+      inputFeedbackLeadTicks: 0,
+      authoritativeInputsAccepted: 0,
+      authoritativeInputsLate: 0,
+      roundTripMilliseconds: 0,
+      pongsReceived: 0,
+      maximumLocalCorrectionMagnitude: 0,
+      correctionsOverThirtyTwoPixels: 0,
+      lastLargeCorrectionMagnitude: 0,
+      lastLargeCorrectionPredictionErrorMagnitude: 0,
+      lastLargeCorrectionPredictionComparable: false,
+      lastLargeCorrectionSnapshotTick: 0,
+      lastLargeCorrectionLocalTick: 0,
+      lastLargeCorrectionPredictedX: 0,
+      lastLargeCorrectionPredictedY: 0,
+      lastLargeCorrectionPresentedX: 0,
+      lastLargeCorrectionPresentedY: 0,
+      lastLargeCorrectionCorrectedX: 0,
+      lastLargeCorrectionCorrectedY: 0,
+      lastLargeCorrectionGeneration: 0,
+      lastLargeCorrectionMode: 0,
+      remoteInterpolationRebases: 0,
+      maximumRemoteInterpolationRebaseDistance: 0,
+      remoteLifecycleHardSnaps: 0,
+      remoteEjectEffects: 0,
+      remoteRearmEffects: 0,
+      maximumRemotePresentedStepDistance: 0,
+      remotePresentedStepsOverThirtyTwoPixels: 0,
+      maximumLocalPresentedStepDistance: 0,
+      localPresentedStepsOverThirtyTwoPixels: 0,
+      localWorldX: 0,
+      localWorldY: 0,
+      localGeneration: 0,
+      localMode: 0,
+      localCooldownTicks: 0,
     };
     browserGlobals().__warBattlesTelemetryV1 = self.telemetry;
     const players = Math.max(2, Math.min(32, Math.trunc(self.players)));
@@ -955,8 +1221,42 @@ export default defineComponent({
       botSkill: Math.max(0, Math.min(3, Math.trunc(self.botSkill))),
       mapSeed: self.mapSeed > 0 ? Math.trunc(self.mapSeed) : 0,
     });
+    const galleryChassis = browserGlobals().__warBattlesConfigV1?.artGalleryChassis;
+    if (artGalleryEnabled() && galleryChassis !== undefined) {
+      if (!Number.isInteger(galleryChassis) || galleryChassis < 1 || galleryChassis > 4) {
+        throw new RangeError("art gallery chassis must be an integer from 1 to 4");
+      }
+      // This is a frozen visual fixture, not a player purchase. Use the
+      // world's administrative roster method so health/weapon compatibility
+      // follows the same chassis contract as a real match.
+      const galleryWorld = self.match.world;
+      if (galleryWorld === undefined) throw new Error("art gallery has no offline world");
+      galleryWorld.setChassis(1, galleryChassis);
+      defold.log("info", `war-battles:art-gallery-chassis:${galleryChassis}`);
+    }
+    if (artGalleryEnabled()) {
+      const galleryConfig = browserGlobals().__warBattlesConfigV1;
+      const hullIndex = galleryConfig?.artGalleryHullDirection;
+      const turretIndex = galleryConfig?.artGalleryTurretDirection ?? hullIndex;
+      if (hullIndex !== undefined || turretIndex !== undefined) {
+        const galleryWorld = self.match.world;
+        if (galleryWorld === undefined) throw new Error("art gallery has no offline world");
+        const [hullX, hullY] = galleryWorldDirection(hullIndex ?? turretIndex!);
+        const [turretX, turretY] = galleryWorldDirection(turretIndex ?? hullIndex!);
+        galleryWorld.playerHullX[0] = hullX;
+        galleryWorld.playerHullY[0] = hullY;
+        galleryWorld.playerTurretX[0] = turretX;
+        galleryWorld.playerTurretY[0] = turretY;
+        defold.log(
+          "info",
+          `war-battles:art-gallery-facing:hull=${hullIndex ?? turretIndex}:turret=${turretIndex ?? hullIndex}`,
+        );
+      }
+    }
+    syncGalleryHeroPose(self);
     syncArenaVisualMap(self);
     if (!artGalleryEnabled()) syncTankDepots(self);
+    if (!artGalleryEnabled()) syncFloorMarkers(self);
     syncWorldLandmarks(self);
     self.online = connectOnline(self);
     updateTelemetry(self);
@@ -964,9 +1264,17 @@ export default defineComponent({
     logHmrState(self, "initial");
   },
 
-  onMessage(self: ArenaSelf, messageId: DefoldHash): void {
+  onMessage(self: ArenaSelf, messageId: DefoldHash, message: RemoteLifecycleCueMessage): void {
     if (messageId === ENGAGE) engage(self);
     else if (messageId === RESTART) restart(self);
+    else if (messageId === REMOTE_LIFECYCLE_CUE) {
+      if (!Number.isFinite(message?.x) || !Number.isFinite(message?.y)) return;
+      if (message.cue === REMOTE_CUE_EJECT) {
+        if (spawnEffect(self, true, message.x, message.y)) self.telemetry.remoteEjectEffects += 1;
+      } else if (message.cue === REMOTE_CUE_REARM) {
+        if (spawnEffect(self, false, message.x, message.y)) self.telemetry.remoteRearmEffects += 1;
+      }
+    }
   },
 
   // This small marker is intentionally observable from the native dev session:
@@ -977,14 +1285,26 @@ export default defineComponent({
 
   update(self: ArenaSelf, dt: number): void {
     self.elapsed += dt;
+    syncGalleryHeroPose(self);
     syncArenaVisualMap(self);
     if (!artGalleryEnabled()) syncTankDepots(self);
+    if (!artGalleryEnabled()) syncFloorMarkers(self);
     syncWorldLandmarks(self);
     // Native transports are poll-driven because their worker threads may not
-    // call Hermes, Lua, or Defold. Pump before the engagement gate: receiving
-    // the welcome is what changes a dialing arena into an engaged online one.
+    // call Hermes, Lua, or Defold. Pump before the engagement gate: the first
+    // restored snapshot, not the welcome's guessed roster, begins presentation.
     if (!self.engaged) {
-      if (self.autoEngageSeconds > 0 && self.elapsed >= self.autoEngageSeconds) engage(self);
+      if (self.match.mode === "online") {
+        self.match.advanceOnline(dt);
+        if (self.match.client?.hasAuthoritativeSnapshot === true) engage(self);
+      } else if (self.autoEngageSeconds > 0 && self.elapsed >= self.autoEngageSeconds) engage(self);
+      updateTelemetry(self);
+      return;
+    }
+    // Gallery captures compare material frames at one fixed camera/world pose.
+    // Keep rendering (and the coast material's engine TIME constant) running,
+    // but do not let offline bots or combat move the reference pixels.
+    if (artGalleryEnabled()) {
       updateTelemetry(self);
       return;
     }
@@ -994,7 +1314,7 @@ export default defineComponent({
     }
     syncProjectiles(self);
     syncPickups(self);
-    syncCoverTiles(self);
+    syncCoverSprites(self);
     drainEvents(self);
     ageEffects(self);
     updateTelemetry(self);
@@ -1003,9 +1323,15 @@ export default defineComponent({
   final(self: ArenaSelf): void {
     for (const id of self.effectIds) go.delete(id);
     for (const id of self.depotIds) go.delete(id);
+    for (const id of self.markerIds ?? []) go.delete(id);
+    if (self.depotMarkerId !== undefined) go.delete(self.depotMarkerId);
     for (const id of self.landmarkIds) go.delete(id);
+    for (const id of self.coverIds ?? []) if (id !== undefined) go.delete(id);
     self.effectIds.length = 0;
     self.depotIds.length = 0;
+    if (self.markerIds !== undefined) self.markerIds.length = 0;
+    self.depotMarkerId = undefined;
+    self.depotMarkerSite = -1;
     self.landmarkIds.length = 0;
     self.effectTicks.length = 0;
     if (self.onlineAttempts !== undefined) invalidateOnlineAttempts(self.onlineAttempts);

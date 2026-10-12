@@ -1,0 +1,164 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_0d498c70-a674-46de-8264-67ace7df88cb",
+  "operation": "generate",
+  "prompt": "One isolated isometric six-sided terrain tile for a retro pixel-art tank strategy game. Broad flat olive-green meadow top with a few yellow grass tufts, short dark basalt cliff sides, warm sunset light, dramatic readable shape. Single tile centered on transparent background, no character, vehicle, building, text, border, or other tiles.",
+  "size": 64,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/frontier-hex-meadow-cliff-v1.json",
+    "sha256": "ab924484129f8844e26e469fcc7c5034b55c937065a7de5e56263acf98d63f61"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "41690abf-768f-4848-8606-07f54141ceaa",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/41690abf-768f-4848-8606-07f54141ceaa/image.png?v=1791407433904",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/00.png",
+      "bytes": 5767,
+      "sha256": "99588cb8ffb2ad77de9c352b0e76054d3d388923fc492117807186da4ca1e501"
+    },
+    {
+      "index": 1,
+      "assetId": "40448a46-f760-474c-bf8e-fceea6487cad",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/40448a46-f760-474c-bf8e-fceea6487cad/image.png?v=1791407434539",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/01.png",
+      "bytes": 7892,
+      "sha256": "0dbcea57d417502fa4237c314c7500afdafd19dad8ef92744dd637a9c849e6fe"
+    },
+    {
+      "index": 2,
+      "assetId": "43eadc63-cf1c-44b2-a325-7d8a1ad770f2",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/43eadc63-cf1c-44b2-a325-7d8a1ad770f2/image.png?v=1791407434992",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/02.png",
+      "bytes": 11223,
+      "sha256": "bd8a1b955c4a6c62e66bef0a2705728c6b53897a755224292ff40a2fec16228c"
+    },
+    {
+      "index": 3,
+      "assetId": "fa1c67c2-8118-4243-88d6-5e5289ca32e0",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/fa1c67c2-8118-4243-88d6-5e5289ca32e0/image.png?v=1791407435365",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/03.png",
+      "bytes": 8893,
+      "sha256": "bf8aa9d394e5410812deb8099dae92c6c380432cda1f00f13d57e23bb0766fd5"
+    },
+    {
+      "index": 4,
+      "assetId": "3dc545b3-e200-4c43-ae96-f20fc116cbf5",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/3dc545b3-e200-4c43-ae96-f20fc116cbf5/image.png?v=1791407435779",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/04.png",
+      "bytes": 7402,
+      "sha256": "e475f8f5c048798c01c722cd1efef78e8bd22d5e750fc5939b87dc5679d6e240"
+    },
+    {
+      "index": 5,
+      "assetId": "1ba50ae5-0bec-47cf-905a-1fb2549a66f1",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/1ba50ae5-0bec-47cf-905a-1fb2549a66f1/image.png?v=1791407436395",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/05.png",
+      "bytes": 7092,
+      "sha256": "030bb92323763b351d4cbf8c42c568596225df2c357d21e7e6224966591733da"
+    },
+    {
+      "index": 6,
+      "assetId": "5177d357-8d0b-444d-bd66-a371a6f6e562",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/5177d357-8d0b-444d-bd66-a371a6f6e562/image.png?v=1791407437073",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/06.png",
+      "bytes": 6581,
+      "sha256": "2328c5d326dbc5ebf9c2fd396795c49f446e73dc40b347f683512c9c1d96b66b"
+    },
+    {
+      "index": 7,
+      "assetId": "969fe6ee-9a0a-4a27-9084-7a023a6e2757",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/969fe6ee-9a0a-4a27-9084-7a023a6e2757/image.png?v=1791407437704",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/07.png",
+      "bytes": 5890,
+      "sha256": "f8058f8f02159071b4b6314488e4f69ced8eb7429c71dde54006f615255939f4"
+    },
+    {
+      "index": 8,
+      "assetId": "9e2c00ca-c173-49e4-9855-042bcbe96420",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/9e2c00ca-c173-49e4-9855-042bcbe96420/image.png?v=1791407438322",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/08.png",
+      "bytes": 6550,
+      "sha256": "ff9459c90dd9d92465fd0bdfa0506aa993d280b0a466b9d01c11adf54a1e26a1"
+    },
+    {
+      "index": 9,
+      "assetId": "9874760a-3c13-44b8-91b5-9f3a0ac0d485",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/9874760a-3c13-44b8-91b5-9f3a0ac0d485/image.png?v=1791407438999",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/09.png",
+      "bytes": 5954,
+      "sha256": "a6dd4567aeb14d5fdc3cb6721adeb25f828d6d6dff4601648d8989b95f33e8a8"
+    },
+    {
+      "index": 10,
+      "assetId": "f85a011e-723a-4d97-bcc0-ef3d84f8a11a",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/f85a011e-723a-4d97-bcc0-ef3d84f8a11a/image.png?v=1791407439609",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/10.png",
+      "bytes": 6054,
+      "sha256": "93e921fce6e88e6ddc16d5e4f255629643e7e30f6847187ae5e26b8e22efbef4"
+    },
+    {
+      "index": 11,
+      "assetId": "a80539a3-ad83-4701-9eb6-40d44a27a598",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/a80539a3-ad83-4701-9eb6-40d44a27a598/image.png?v=1791407440249",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/11.png",
+      "bytes": 5913,
+      "sha256": "5076d8c7dbb5f4d321a60823234ba887a1f26fb41ad63486af8fde687bbf6ce9"
+    }
+  ],
+  "credits": {
+    "remaining": 3015
+  }
+}

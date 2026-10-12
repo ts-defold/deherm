@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_36d144ad-7fe9-4afb-af1b-3d6dc0c448f3",
+  "operation": "animate",
+  "prompt": "A quick grounded left-facing side view, later flipped for east walk cycle with alternating boot contact and a small opposite-arm swing. Spark remains a young tan-skinned mechanic with short spiky black hair, orange headband, raised brass goggles, teal collar, olive jacket and compact sidearm held low. Keep his exact source perspective, palette, outline, proportions, and identity consistent. Seamless loop without turning, jumping, or adding objects.",
+  "size": null,
+  "outputFrames": 4,
+  "colors": 24,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "8817de62-a78c-4291-8fb0-8fa598af8611"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/spark-infantry-walk-e-v1.json",
+    "sha256": "8d6cb62483b2b27b8b33bcf971fb0d7a95fb53f2e070140ba5d7167980476604"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "f175b314-d879-4147-a890-14cb76d7001c",
+      "type": "animation",
+      "contentType": "image/webp",
+      "width": 28,
+      "height": 47,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/f175b314-d879-4147-a890-14cb76d7001c/animation.webp?v=1791526561626",
+      "path": "art/source/sprite-fusion/outputs/spark-infantry-walk-e-v1/00.webp",
+      "bytes": 2046,
+      "sha256": "ffeed7aa9c86409891bb8afd1145eef052baa127e419309e0fa0c7abe01df2b4",
+      "spritesheet": {
+        "url": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/f175b314-d879-4147-a890-14cb76d7001c/spritesheet.png?v=1791526561626",
+        "path": "art/source/sprite-fusion/outputs/spark-infantry-walk-e-v1/00-sheet.png",
+        "bytes": 1819,
+        "sha256": "6d810ff544d834927df838ed216073d715ae61cc9418cb4e34e0a9fb38da8e60"
+      },
+      "frameCount": 4,
+      "fps": 8
+    }
+  ],
+  "credits": {
+    "remaining": 1395
+  }
+}

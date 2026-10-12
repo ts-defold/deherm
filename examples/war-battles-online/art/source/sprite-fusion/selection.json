@@ -7,6 +7,36 @@
     "source": "art/source/sprite-fusion/outputs/driver-portrait-base-v1/03.png",
     "reason": "Closest match to the original goggled driver, clear three-quarter silhouette, transparent edges, and enough facial room for portrait animation."
   },
+  "driverFamilies": [
+    {
+      "name": "rook",
+      "request": "rook-driver-portrait-v1",
+      "selectedIndex": 0,
+      "assetId": "dc87d396-5988-4bc2-b20f-7e6c52213c4e",
+      "source": "art/source/sprite-fusion/outputs/rook-driver-portrait-v1/00.png"
+    },
+    {
+      "name": "brass",
+      "request": "driver-portrait-base-v1",
+      "selectedIndex": 3,
+      "assetId": "2c537204-68a9-47a8-a8b4-8d05335e912d",
+      "source": "art/source/sprite-fusion/outputs/driver-portrait-base-v1/03.png"
+    },
+    {
+      "name": "spark",
+      "request": "spark-driver-portrait-v1",
+      "selectedIndex": 0,
+      "assetId": "bd451900-477e-4522-a49d-15ac7e16beb6",
+      "source": "art/source/sprite-fusion/outputs/spark-driver-portrait-v1/00.png"
+    },
+    {
+      "name": "mud",
+      "request": "mud-driver-portrait-v1",
+      "selectedIndex": 0,
+      "assetId": "3b7369f9-d515-4ae7-b2b0-7b711f72ac2b",
+      "source": "art/source/sprite-fusion/outputs/mud-driver-portrait-v1/00.png"
+    }
+  ],
   "runtimePlan": {
     "nativeSize": [64, 64],
     "atlasCellSize": [68, 68],

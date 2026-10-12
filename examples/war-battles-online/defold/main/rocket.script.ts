@@ -15,7 +15,7 @@ import {
   MAX_PROJECTILES,
   WEAPON_MORTAR,
   isometricArcHeight,
-  isometricDepth,
+  isometricSortZ,
   weaponById,
   weaponUpgradeById,
 } from "../src/generated-war-battles/index";
@@ -126,7 +126,7 @@ export default defineComponent<ComponentDefinition>({
         vmath.vector3(
           projectedX(worldX, worldY),
           projectedY(worldX, worldY) + arc,
-          0.4 + isometricDepth(worldX, worldY) * 0.05,
+          isometricSortZ(worldX, worldY, 0.003),
         ),
       );
       go.setRotation(

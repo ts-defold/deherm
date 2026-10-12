@@ -1,0 +1,145 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_05956229-3c19-4fc9-9092-207f4f3904dd",
+  "operation": "style-reference",
+  "prompt": "One isometric six-sided battlefield terrain tile where compacted ochre earth meets fractured black volcanic basalt. Its driveable top blends dusty wheel-worn soil into rough dark stone, with a few pebbles and a short layered cliff side. Match the reference tiles' hex silhouette, warm highlights, dark outlines, and chunky military style. No vehicle, character, building, lettering, or multiple tiles.",
+  "size": 64,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "b04adb2b-5bed-4801-b7a5-73096d4c5345"
+    },
+    {
+      "kind": "asset",
+      "assetId": "c10cf40b-aea8-4702-b4f7-2bcf17419d7e"
+    },
+    {
+      "kind": "asset",
+      "assetId": "5eb59893-5c94-4d23-b34b-adfdc9320198"
+    },
+    {
+      "kind": "asset",
+      "assetId": "9df0ea78-425a-4f60-9fba-911e5aaf90b6"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/frontier-hex-earth-basalt-edge-v1.json",
+    "sha256": "9e2d87109241abf5d9c8918294a8189ce1e6b01d0aadd70ed3f940ecf617a07c"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "e642e8f0-d300-494d-aac7-53fd16cc21c7",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/e642e8f0-d300-494d-aac7-53fd16cc21c7/image.png?v=1791413223093",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-basalt-edge-v1/00.png",
+      "bytes": 8493,
+      "sha256": "486613b22886de9d7e053d1c2b0d6b1fc74ae731a784ebc554d9957203dea98a"
+    },
+    {
+      "index": 1,
+      "assetId": "6292e2d2-3422-4e2d-b372-a56310f16369",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/6292e2d2-3422-4e2d-b372-a56310f16369/image.png?v=1791413223870",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-basalt-edge-v1/01.png",
+      "bytes": 8460,
+      "sha256": "f3c737e2b22e48f62cf7e72030b449632e04ac58644a9be30a3c1f5c9d5d54dd"
+    },
+    {
+      "index": 2,
+      "assetId": "384ff128-61fb-4fdd-bd59-bec72f5828f4",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/384ff128-61fb-4fdd-bd59-bec72f5828f4/image.png?v=1791413224458",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-basalt-edge-v1/02.png",
+      "bytes": 8753,
+      "sha256": "08c8fc88a96596eecc32cf61682fc18e38aecd6be08509050deb7917f96de82f"
+    },
+    {
+      "index": 3,
+      "assetId": "b252784a-bcd0-4f9e-a767-15858f0d62d3",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/b252784a-bcd0-4f9e-a767-15858f0d62d3/image.png?v=1791413225135",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-basalt-edge-v1/03.png",
+      "bytes": 7870,
+      "sha256": "5a5d80791d2eb34e3465a8084d9cd6d54dbf811be393af4b97dbcba42f40caa8"
+    },
+    {
+      "index": 4,
+      "assetId": "8298785c-103c-4978-91c6-e6cf043ca676",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 65,
+      "height": 65,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/8298785c-103c-4978-91c6-e6cf043ca676/image.png?v=1791413225808",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-basalt-edge-v1/04.png",
+      "bytes": 8320,
+      "sha256": "c9df9e2e3afb07c85f87953c82c2052ff27401cfb9f11d63fd8cda67d5e80b7e"
+    },
+    {
+      "index": 5,
+      "assetId": "e77fee65-0b94-4e30-be17-d0637c5dbb43",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/e77fee65-0b94-4e30-be17-d0637c5dbb43/image.png?v=1791413226373",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-basalt-edge-v1/05.png",
+      "bytes": 8859,
+      "sha256": "cc1120f6d2f58a111ac547465305511e1e681136bba3fbf71e9a4607be91e98e"
+    },
+    {
+      "index": 6,
+      "assetId": "6196554a-e242-452f-aa93-d07946b01c23",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/6196554a-e242-452f-aa93-d07946b01c23/image.png?v=1791413227080",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-basalt-edge-v1/06.png",
+      "bytes": 7777,
+      "sha256": "df55f691ded750e51f4feb71933e5e86254467eb3470a347792909e2a65cf81c"
+    },
+    {
+      "index": 7,
+      "assetId": "78cc4193-560f-4f7e-a3c9-b6122dc44bf4",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/78cc4193-560f-4f7e-a3c9-b6122dc44bf4/image.png?v=1791413227719",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-basalt-edge-v1/07.png",
+      "bytes": 7901,
+      "sha256": "2529ed5a0578e6405ba52717a8287db7c7efef2b1882111c91d2fc5c297061d7"
+    },
+    {
+      "index": 8,
+      "assetId": "18265ab6-1a53-4022-bcc2-50fb04246b83",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 65,
+      "height": 65,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/18265ab6-1a53-4022-bcc2-50fb04246b83/image.png?v=1791413228320",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-basalt-edge-v1/08.png",
+      "bytes": 8408,
+      "sha256": "ab1cb18fb0d23c371b952299a1b610246433d0afb290b8af48d6e01e410d0a6f"
+    }
+  ],
+  "credits": {
+    "remaining": 2850
+  }
+}

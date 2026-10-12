@@ -1,0 +1,11 @@
+{
+  "name": "rook-driver-portrait-v1",
+  "operation": "style-reference",
+  "size": 64,
+  "inputs": [
+    "art/source/sprite-fusion/outputs/driver-portrait-base-v1/03.png",
+    "defold/assets/ui/faces/captain/angry.png",
+    "defold/assets/ui/faces/driver/happy.png"
+  ],
+  "prompt": "A communications portrait of Rook, a young Black woman scout driver with close-cropped hair, warm brown skin, a slim ochre flight helmet with one raised blue goggle lens, a cream scarf, and a confident half-smile. Head and shoulders fill the frame, three-quarter view facing right. Match the references' chunky military arcade pixel-art rendering and warm face lighting. Clearly a different person from the white-bearded driver reference. No portrait frame, text, vehicle, or background scene."
+}

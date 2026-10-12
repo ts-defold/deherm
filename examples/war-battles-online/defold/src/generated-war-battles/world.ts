@@ -11,6 +11,7 @@ import {
   INFANTRY_CRUSH_DAMAGE,
   INFANTRY_DRAG_SHIFT,
   INFANTRY_EJECT_LOCK_TICKS,
+  INFANTRY_EJECT_PROTECT_TICKS,
   INFANTRY_FIRE_COOLDOWN_TICKS,
   INFANTRY_FIRE_DAMAGE,
   INFANTRY_HEALTH,
@@ -284,13 +285,16 @@ export class BattleWorld {
   private readonly spawnPoint: WorldPoint = { x: 0, y: 0 };
   private readonly scratchDirection: Direction = createDirection();
   private readonly pelletDirection: Direction = createDirection();
+  /** Clients predict motion, not combat deaths or tank reacquisition. */
+  private readonly predictLifecycles: boolean;
 
-  constructor(matchId: number, mapSeed = 0x57_41_52_42) {
+  constructor(matchId: number, mapSeed = 0x57_41_52_42, predictLifecycles = true) {
     if (!Number.isInteger(matchId) || matchId < 0 || matchId > 0xffff_ffff) {
       throw new RangeError("matchId must be an unsigned 32-bit integer");
     }
     this.matchId = matchId;
     this.mapSeed = mapSeed >>> 0;
+    this.predictLifecycles = predictLifecycles;
     this.map = new ArenaMap(this.mapSeed);
     this.playerLastInputTick.fill(-1);
     for (let index = 0; index < MAX_PICKUPS; index += 1) {
@@ -324,7 +328,7 @@ export class BattleWorld {
     this.playerWeaponUpgradeUnlocks[slot] = 0;
     this.playerWeaponUpgradeSelections[slot] = 0;
     this.playerLastInputTick[slot] = -1;
-    this.spawn(slot, x, y);
+    this.spawn(slot, x, y, false);
     return entityId(ENTITY_KIND_PLAYER, slot, generation);
   }
 
@@ -669,15 +673,45 @@ export class BattleWorld {
     this.playerAmmo[index] = next > definition.maximumAmmo ? definition.maximumAmmo : next;
   }
 
-  private spawn(slot: number, x?: number, y?: number): void {
+  private spawn(slot: number, x?: number, y?: number, advanceGeneration = true): void {
+    // A respawn or replacement tank may be hidden between two snapshots. If
+    // both sampled endpoints are tanks, mode alone cannot identify the jump;
+    // a new generation makes local correction and remote interpolation snap to
+    // the new lifecycle instead of animating across the whole arena.
+    if (advanceGeneration) this.playerGeneration[slot] = nextGeneration(this.playerGeneration[slot]!);
     if (x === undefined || y === undefined) {
-      const spawnPoint = this.chooseSpawnPoint(slot);
-      this.playerX[slot] = this.map.spawnX[spawnPoint]!;
-      this.playerY[slot] = this.map.spawnY[spawnPoint]!;
+      // First admission uses the plan's 32 dispersed tank-clear starts.
+      // A late join may find its assigned start occupied, so fall back to
+      // the ordinary enemy-aware depot selector in that case. Respawns keep
+      // the latter behavior rather than returning to a predictable slot.
+      const plannedX = this.map.playerStartX[slot]!;
+      const plannedY = this.map.playerStartY[slot]!;
+      const clearance = PLAYER_RADIUS * 2 + TILE_UNITS / 4;
+      const clearanceSquared = clearance * clearance;
+      let plannedAvailable = !advanceGeneration;
+      if (plannedAvailable) {
+        for (let other = 0; other < MAX_PLAYERS; other += 1) {
+          if (other === slot || this.playerActive[other] === 0 || this.playerHealth[other]! <= 0) continue;
+          const dx = this.playerX[other]! - plannedX;
+          const dy = this.playerY[other]! - plannedY;
+          if (dx * dx + dy * dy < clearanceSquared) {
+            plannedAvailable = false;
+            break;
+          }
+        }
+      }
+      if (plannedAvailable) {
+        this.spawnPoint.x = plannedX;
+        this.spawnPoint.y = plannedY;
+      } else {
+        this.chooseSpawnLocation(slot, this.spawnPoint);
+      }
+      this.playerX[slot] = this.spawnPoint.x;
+      this.playerY[slot] = this.spawnPoint.y;
     } else {
       // A caller-chosen coordinate is snapped out of cover: a tank placed inside
       // a wall would otherwise have no way to push itself out.
-      this.map.nearestOpen(clampX(x), clampY(y), this.spawnPoint);
+      this.map.nearestOpen(clampX(x), clampY(y), this.spawnPoint, PLAYER_RADIUS);
       this.playerX[slot] = this.spawnPoint.x;
       this.playerY[slot] = this.spawnPoint.y;
     }
@@ -708,7 +742,78 @@ export class BattleWorld {
     for (let weapon = 0; weapon < WEAPON_COUNT; weapon += 1) this.playerAmmo[slot * WEAPON_COUNT + weapon] = 0;
   }
 
-  /** The spawn point furthest from the nearest living enemy. */
+  /**
+   * Farthest safe apron near a depot. Sixteen physical depots serve up to 32
+   * tanks, so a second wave must not pile onto occupied depot centers. The
+   * candidate set is fixed, bounded, and uses no heap storage on respawn.
+   */
+  private chooseSpawnLocation(slot: number, output: WorldPoint): void {
+    let found = false;
+    let foundClear = false;
+    let bestEnemyDistance = -1;
+    let bestAnyDistance = -1;
+    const clearance = PLAYER_RADIUS * 2 + TILE_UNITS / 4;
+    const clearanceSquared = clearance * clearance;
+    const preferred = this.chooseSpawnPoint(slot);
+    const preferredX = this.map.spawnX[preferred]!;
+    const preferredY = this.map.spawnY[preferred]!;
+    let preferredOccupied = false;
+    for (let other = 0; other < MAX_PLAYERS; other += 1) {
+      if (other === slot || this.playerActive[other] === 0 || this.playerHealth[other]! <= 0) continue;
+      const dx = this.playerX[other]! - preferredX;
+      const dy = this.playerY[other]! - preferredY;
+      if (dx * dx + dy * dy < clearanceSquared) {
+        preferredOccupied = true;
+        break;
+      }
+    }
+    // Preserve the established 2–16 player start and respawn path. Only a
+    // crowded depot needs the expanded apron search used by 32-player games.
+    this.map.resolveCircle(preferredX, preferredY, PLAYER_RADIUS, this.resolution);
+    if (!preferredOccupied && this.resolution.x === preferredX && this.resolution.y === preferredY) {
+      output.x = preferredX;
+      output.y = preferredY;
+      return;
+    }
+    for (let point = 0; point < SPAWN_POINT_COUNT; point += 1) {
+      const spawnX = this.map.spawnX[point]!;
+      const spawnY = this.map.spawnY[point]!;
+      const outward = spawnY < 0 ? -1 : 1;
+      for (let apron = 0; apron < 3; apron += 1) {
+        const candidateY = spawnY + (apron === 0 ? 0 : apron === 1 ? outward * 3 : -outward * 3) * TILE_UNITS;
+        if (this.map.solidAtWorld(spawnX, candidateY)) continue;
+        this.map.resolveCircle(spawnX, candidateY, PLAYER_RADIUS, this.resolution);
+        if (this.resolution.x !== spawnX || this.resolution.y !== candidateY) continue;
+        let nearestEnemy = Number.POSITIVE_INFINITY;
+        let nearestAny = Number.POSITIVE_INFINITY;
+        for (let other = 0; other < MAX_PLAYERS; other += 1) {
+          if (other === slot || this.playerActive[other] === 0 || this.playerHealth[other]! <= 0) continue;
+          const dx = this.playerX[other]! - spawnX;
+          const dy = this.playerY[other]! - candidateY;
+          const distance = dx * dx + dy * dy;
+          if (distance < nearestAny) nearestAny = distance;
+          if (!this.sameTeam(slot, other) && distance < nearestEnemy) nearestEnemy = distance;
+        }
+        const clear = nearestAny >= clearanceSquared;
+        if (
+          !found ||
+          (clear && !foundClear) ||
+          (clear === foundClear &&
+            (nearestEnemy > bestEnemyDistance || (nearestEnemy === bestEnemyDistance && nearestAny > bestAnyDistance)))
+        ) {
+          found = true;
+          foundClear = clear;
+          bestEnemyDistance = nearestEnemy;
+          bestAnyDistance = nearestAny;
+          output.x = spawnX;
+          output.y = candidateY;
+        }
+      }
+    }
+    if (!found) this.map.nearestOpen(this.map.spawnX[0]!, this.map.spawnY[0]!, output, PLAYER_RADIUS);
+  }
+
+  /** The established depot choice: farthest from the nearest living enemy. */
   private chooseSpawnPoint(slot: number): number {
     let best = 0;
     let bestScore = -1;
@@ -724,7 +829,6 @@ export class BattleWorld {
         const distance = dx * dx + dy * dy;
         if (distance < nearest) nearest = distance;
       }
-      // Ties break on the lower index, which keeps the choice deterministic.
       if (nearest > bestScore) {
         bestScore = nearest;
         best = point;
@@ -774,7 +878,7 @@ export class BattleWorld {
     if (this.playerOverdriveTicks[slot]! > 0) this.playerOverdriveTicks[slot] = this.playerOverdriveTicks[slot]! - 1;
     if (this.playerMode[slot] === PLAYER_MODE_DEAD) {
       if (this.playerRespawnTicks[slot]! > 0) this.playerRespawnTicks[slot] = this.playerRespawnTicks[slot]! - 1;
-      if (this.playerRespawnTicks[slot] === 0) {
+      if (this.playerRespawnTicks[slot] === 0 && this.predictLifecycles) {
         this.spawn(slot);
         this.events.push(EVENT_RESPAWN, slot + 1, 0, this.playerX[slot]!, this.playerY[slot]!, this.tick);
       }
@@ -863,18 +967,27 @@ export class BattleWorld {
     // Axis-separated integration. Sliding along a wall is what keeps a tank from
     // sticking on the seam between two cells at speed.
     let x = clampX(this.playerX[slot]! + stepX);
+    let y = this.playerY[slot]!;
     const radius = infantry ? INFANTRY_RADIUS : PLAYER_RADIUS;
-    this.map.resolveCircle(x, this.playerY[slot]!, radius, this.resolution);
-    if (this.resolution.hitX || this.resolution.hitY) {
-      x = this.resolution.x;
+    let hitX = false;
+    let hitY = false;
+    this.map.resolveCircle(x, y, radius, this.resolution);
+    x = this.resolution.x;
+    y = this.resolution.y;
+    hitX = this.resolution.hitX;
+    hitY = this.resolution.hitY;
+    y = clampY(y + stepY);
+    this.map.resolveCircle(x, y, radius, this.resolution);
+    x = this.resolution.x;
+    y = this.resolution.y;
+    hitX ||= this.resolution.hitX;
+    hitY ||= this.resolution.hitY;
+    if (hitX) {
       this.playerVelocityX[slot] = Math.trunc(
         (this.playerVelocityX[slot]! * -(infantry ? 32 : chassis.wallBounce)) / DIRECTION_SCALE,
       );
     }
-    let y = clampY(this.playerY[slot]! + stepY);
-    this.map.resolveCircle(x, y, radius, this.resolution);
-    if (this.resolution.hitX || this.resolution.hitY) {
-      y = this.resolution.y;
+    if (hitY) {
       this.playerVelocityY[slot] = Math.trunc(
         (this.playerVelocityY[slot]! * -(infantry ? 32 : chassis.wallBounce)) / DIRECTION_SCALE,
       );
@@ -1010,6 +1123,10 @@ export class BattleWorld {
   }
 
   private tryAcquireTank(slot: number): void {
+    // A local client does not own this lifecycle transition. An old snapshot
+    // can still have the pilot inside a depot after the server has moved them
+    // away; predicting the tank here makes the HUD and art flicker on replay.
+    if (!this.predictLifecycles) return;
     const depot = this.nearestTankDepot(slot + 1);
     const depotX = this.map.spawnX[depot]!;
     const depotY = this.map.spawnY[depot]!;
@@ -1060,18 +1177,53 @@ export class BattleWorld {
           // Exactly coincident actors are separated along +x, deterministically.
           this.playerX[a] = clampX(this.playerX[a]! - radiusA);
           this.playerX[b] = clampX(this.playerX[b]! + radiusB);
-          continue;
+        } else {
+          const distance = length(dx, dy);
+          const push = Math.trunc((minimum - distance) / 2) + 1;
+          const pushX = Math.trunc((dx * push) / distance);
+          const pushY = Math.trunc((dy * push) / distance);
+          this.playerX[a] = clampX(this.playerX[a]! - pushX);
+          this.playerY[a] = clampY(this.playerY[a]! - pushY);
+          this.playerX[b] = clampX(this.playerX[b]! + pushX);
+          this.playerY[b] = clampY(this.playerY[b]! + pushY);
         }
-        const distance = length(dx, dy);
-        const push = Math.trunc((minimum - distance) / 2) + 1;
-        const pushX = Math.trunc((dx * push) / distance);
-        const pushY = Math.trunc((dy * push) / distance);
-        this.playerX[a] = clampX(this.playerX[a]! - pushX);
-        this.playerY[a] = clampY(this.playerY[a]! - pushY);
-        this.playerX[b] = clampX(this.playerX[b]! + pushX);
-        this.playerY[b] = clampY(this.playerY[b]! + pushY);
+        // Body separation runs after wall-aware movement. Reproject both bodies
+        // against the static map or the pair solver can shove one into cover.
+        const pinnedA = this.resolvePlayerWallOverlap(a, radiusA);
+        const pinnedB = this.resolvePlayerWallOverlap(b, radiusB);
+        const remainingX = this.playerX[b]! - this.playerX[a]!;
+        const remainingY = this.playerY[b]! - this.playerY[a]!;
+        const remainingSquared = remainingX * remainingX + remainingY * remainingY;
+        if (remainingSquared < minimumSquared && (pinnedA || pinnedB)) {
+          // If one body hit cover, the open body takes the unsatisfied part of
+          // the separation. A bounded single retry avoids a per-tick solver.
+          const movable = pinnedA && !pinnedB ? b : pinnedB && !pinnedA ? a : b;
+          const directionX = remainingSquared === 0 ? 1 : remainingX;
+          const directionY = remainingSquared === 0 ? 0 : remainingY;
+          const distance = remainingSquared === 0 ? 1 : length(directionX, directionY);
+          const extra = minimum - (remainingSquared === 0 ? 0 : distance) + 1;
+          const sign = movable === b ? 1 : -1;
+          this.playerX[movable] = clampX(this.playerX[movable]! + sign * Math.trunc((directionX * extra) / distance));
+          this.playerY[movable] = clampY(this.playerY[movable]! + sign * Math.trunc((directionY * extra) / distance));
+          this.resolvePlayerWallOverlap(movable, movable === a ? radiusA : radiusB);
+        }
       }
     }
+  }
+
+  private resolvePlayerWallOverlap(slot: number, radius: number): boolean {
+    const x = this.playerX[slot]!;
+    const y = this.playerY[slot]!;
+    this.map.resolveCircle(x, y, radius, this.resolution);
+    const resolvedX = clampX(this.resolution.x);
+    const resolvedY = clampY(this.resolution.y);
+    const hitX = resolvedX !== x;
+    const hitY = resolvedY !== y;
+    this.playerX[slot] = resolvedX;
+    this.playerY[slot] = resolvedY;
+    if (hitX) this.playerVelocityX[slot] = 0;
+    if (hitY) this.playerVelocityY[slot] = 0;
+    return hitX || hitY;
   }
 
   private stepProjectiles(): void {
@@ -1212,6 +1364,12 @@ export class BattleWorld {
 
   /** Returns the damage actually taken after spawn protection and armour. */
   private applyDamage(target: number, damage: number, attackerSlot: number, x: number, y: number): number {
+    // Remote projectiles and actors are only sampled at snapshot cadence. A
+    // client that replays them as if their intervening inputs were known can
+    // falsely kill/eject the local player, then "resurrect" them on the next
+    // authoritative snapshot. Defer health, armour, and mode to the server;
+    // movement and aim remain locally predicted.
+    if (!this.predictLifecycles) return 0;
     if (this.playerHealth[target]! <= 0) return 0;
     let amount = damage;
     if (this.playerSpawnProtectTicks[target]! > 0) amount = Math.trunc(amount / 2);
@@ -1228,9 +1386,10 @@ export class BattleWorld {
       this.playerWeapon[target] = SPAWN_WEAPON;
       this.playerCooldown[target] = 0;
       this.playerRespawnTicks[target] = INFANTRY_EJECT_LOCK_TICKS;
-      // One tick prevents the direct-hit projectile from applying its own
-      // detonation to the newly ejected pilot in the same simulation step.
-      this.playerSpawnProtectTicks[target] = 1;
+      // Ejection is a playable second life, not a frame-long animation. This
+      // halves (but does not erase) follow-up damage while the pilot regains
+      // control; a hostile tank's crush damage still kills immediately.
+      this.playerSpawnProtectTicks[target] = INFANTRY_EJECT_PROTECT_TICKS;
       this.playerOverdriveTicks[target] = 0;
       this.playerBoostTicks[target] = 0;
       this.playerBoostCharge[target] = 0;

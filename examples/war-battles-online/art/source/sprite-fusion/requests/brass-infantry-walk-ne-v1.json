@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_b8c70df3-a434-4145-b3d2-04fe5bd48842",
+  "operation": "animate",
+  "prompt": "A quick grounded rear three-quarter walk cycle preserving this exact back-facing perspective, with alternating boot contact and a small opposite-arm swing. Brass remains an older stocky driver with an ochre cap, brass-rimmed goggles, cream scarf, olive mechanic jacket and compact sidearm held low. Keep palette, outline, proportions, and identity consistent. Seamless loop without turning toward the camera, jumping, or adding objects.",
+  "size": null,
+  "outputFrames": 4,
+  "colors": 24,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "f3582fe4-3750-4f05-9ec7-2a521ba5ecbc"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/brass-infantry-walk-ne-v1.json",
+    "sha256": "20d23432c4fd49c7d9f3ac48fd3901ea653ec49eec0759c987de7c9c0503266c"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "2c8bed33-316f-41ad-8f37-e7463fa0283c",
+      "type": "animation",
+      "contentType": "image/webp",
+      "width": 25,
+      "height": 39,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/2c8bed33-316f-41ad-8f37-e7463fa0283c/animation.webp?v=1791524378823",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-walk-ne-v1/00.webp",
+      "bytes": 1722,
+      "sha256": "6612ac69d663debcdef95f2aeea570d757decd4e3ed28c39aed901b44d77b1de",
+      "spritesheet": {
+        "url": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/2c8bed33-316f-41ad-8f37-e7463fa0283c/spritesheet.png?v=1791524378823",
+        "path": "art/source/sprite-fusion/outputs/brass-infantry-walk-ne-v1/00-sheet.png",
+        "bytes": 1327,
+        "sha256": "ef8601ff460e70b0c17057fe33a702324789fe6701ec88251e013a7492b9fb1f"
+      },
+      "frameCount": 4,
+      "fps": 8
+    }
+  ],
+  "credits": {
+    "remaining": 1650
+  }
+}

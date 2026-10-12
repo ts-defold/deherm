@@ -8,26 +8,47 @@ import {
   property,
   sys,
   vmath,
+  window,
   type DefoldHash,
   type OnInputAction,
   type Vector3,
 } from "@deherm/project";
 
-import { arenaMatch, projectedDirectionRadians, projectedX, projectedY } from "../src/arena-match";
+import { arenaMatch, projectedX, projectedY } from "../src/arena-match";
 import {
+  INFANTRY_FIRE_COOLDOWN_TICKS,
   PLAYER_MODE_DEAD,
   PLAYER_MODE_INFANTRY,
   PLAYER_MODE_TANK,
   VELOCITY_SCALE,
+  driverByPlayerId,
+  hexReliefLiftAtSimulation,
   isometricControlWorldX,
   isometricControlWorldY,
-  isometricDepth,
+  isometricSortZ,
   isometricDirectionX,
   isometricDirectionY,
   isometricDirectionIndex,
+  isometricDirectionIndexHysteretic,
+  createVirtualControls,
+  updateVirtualControls,
   type PlayerTransform,
+  type VirtualControls,
 } from "../src/generated-war-battles/index";
-import { tankHullAnimation, tankHullIdleAnimation, tankWreckAnimation } from "../src/generated-tank-art";
+import {
+  tankHullAnimation,
+  tankHullIdleAnimation,
+  tankTurretAnimation,
+  tankWreckAnimation,
+} from "../src/generated-tank-art";
+import {
+  HERO_FAMILY_COUNT,
+  heroAnimation,
+  heroDeathAnimation,
+  heroFireAnimation,
+  heroHitAnimation,
+} from "../src/generated-hero-art";
+import { nextHeroHitSeconds } from "../src/hero-presentation";
 
 const UP = hashLiteral("#up");
 const DOWN = hashLiteral("#down");
@@ -49,6 +70,7 @@ const UPGRADE_1 = hashLiteral("#upgrade1");
 const UPGRADE_2 = hashLiteral("#upgrade2");
 const RESTART = hashLiteral("#restart");
 const DEPLOY = hashLiteral("#deploy");
+const TOUCH = hashLiteral("#touch_multi");
 const UI = "/gui#ui";
 
 /**
@@ -60,7 +82,6 @@ const CAMERA = "/camera#follow";
 /** The arena director, which owns the match and every factory in the scene. */
 const ARENA = "/arena#arena";
 
-const HERO_ANIMATION = hashLiteral("#player-down");
 const SPEED = 180;
 
 interface PlayerSelf {
@@ -93,16 +114,37 @@ interface PlayerSelf {
   z: number;
   chassis: number;
   directionIndex: number;
+  turretDirectionIndex: number;
   moving: boolean;
+  heroDirectionIndex: number;
+  heroMoving: boolean;
+  heroFiring: boolean;
+  heroHitActive: boolean;
+  heroHitSeconds: number;
+  heroPreviousHealth: number;
+  heroDead: boolean;
   mode: number;
   generation: number;
   /** Snap the camera on the next authoritative transform sample. */
   cameraSnapPending: boolean;
   transform: PlayerTransform;
+  touch: VirtualControls;
+  touchSeen: boolean;
 }
 
 interface WarBattlesPlayerGlobals {
-  __warBattlesConfigV1?: { demo?: boolean };
+  __warBattlesConfigV1?: { demo?: boolean; artGallery?: boolean; artGalleryHeroVariant?: number };
+}
+
+function heroVariantForSlot(slot: number): number {
+  const ordinary = driverByPlayerId(slot + 1).variant;
+  const config = (globalThis as unknown as WarBattlesPlayerGlobals).__warBattlesConfigV1;
+  if (config?.artGallery !== true || config.artGalleryHeroVariant === undefined) return ordinary;
+  const variant = config.artGalleryHeroVariant;
+  if (!Number.isInteger(variant) || variant < 0 || variant >= HERO_FAMILY_COUNT) {
+    throw new RangeError("art gallery hero variant is not a selected family");
+  }
+  return variant;
 }
 
 function scriptedDemoEnabled(): boolean {
@@ -135,7 +177,8 @@ function isMappedPlayerAction(actionId: DefoldHash): boolean {
     actionId === CHASSIS_3 ||
     actionId === CHASSIS_4 ||
     actionId === UPGRADE_1 ||
-    actionId === UPGRADE_2
+    actionId === UPGRADE_2 ||
+    actionId === TOUCH
   );
 }
 
@@ -191,15 +234,23 @@ function engage(self: PlayerSelf): void {
 function pushControls(self: PlayerSelf): void {
   const match = arenaMatch();
   if (match === undefined) return;
-  const screenX = (self.right ? 1 : 0) - (self.left ? 1 : 0);
-  const screenY = (self.up ? 1 : 0) - (self.down ? 1 : 0);
+  const screenX = (self.right ? 1 : 0) - (self.left ? 1 : 0) + self.touch.moveX;
+  const screenY = (self.up ? 1 : 0) - (self.down ? 1 : 0) + self.touch.moveY;
   match.setControls(
     isometricControlWorldX(screenX, screenY),
     isometricControlWorldY(screenX, screenY),
-    self.firing,
-    self.boosting,
+    self.firing || self.touch.fire,
+    self.boosting || self.touch.boost,
     self.weapon,
   );
+  if (self.touch.hasAim) {
+    match.setAim(
+      isometricControlWorldX(self.touch.aimX, self.touch.aimY),
+      isometricControlWorldY(self.touch.aimX, self.touch.aimY),
+    );
+  } else {
+    match.clearAim();
+  }
   self.weapon = 0;
 }
 
@@ -236,17 +287,45 @@ export default defineComponent({
     self.firing = false;
     self.boosting = false;
     self.weapon = 0;
+    self.touch = createVirtualControls();
+    self.touchSeen = false;
     msg.post(".", "acquire_input_focus");
+    // Input reaches the most recently focused component first. The GUI owns
+    // the scoreboard ribbon hit area; all other actions pass through to this
+    // player script when its onInput returns false.
+    msg.post(UI, "acquire_input_focus");
     const position = go.getPosition();
     self.z = position.z;
     self.chassis = 0;
     self.directionIndex = -1;
+    self.turretDirectionIndex = -1;
     self.moving = false;
+    self.heroDirectionIndex = -1;
+    self.heroMoving = false;
+    self.heroFiring = false;
+    self.heroHitActive = false;
+    self.heroHitSeconds = 0;
+    self.heroPreviousHealth = 0;
+    self.heroDead = false;
     self.mode = -1;
     self.generation = -1;
     self.cameraSnapPending = false;
-    self.transform = { x: 0, y: 0, hullX: 0, hullY: 0, turretX: 0, turretY: 0 };
+    self.transform = {
+      x: 0,
+      y: 0,
+      hullX: 0,
+      hullY: 0,
+      turretX: 0,
+      turretY: 0,
+      active: 0,
+      generation: 0,
+      mode: PLAYER_MODE_DEAD,
+      chassis: 0,
+      velocityX: 0,
+      velocityY: 0,
+    };
     msg.post("#hero", "disable");
+    msg.post("#turret", "disable");
     msg.post("#sprite", "play_animation", { id: tankHullIdleAnimation(0, 1, 4) });
     defold.log("info", `war-battles:player-init:${position.x.toFixed(1)}:${position.y.toFixed(1)}`);
   },
@@ -268,50 +347,76 @@ export default defineComponent({
     // Online admission engages the arena before this component sees player
     // input. Follow that authoritative transition instead of continuing the
     // old scripted tour over the live networked tank.
-    if (!self.engaged && match?.engaged) engage(self);
+    if (!self.engaged && match?.engaged) {
+      engage(self);
+      // Online welcome has no keyboard press to send the normal deploy
+      // message. Hide the title on that same authoritative transition so the
+      // connected player actually sees and controls the match.
+      msg.post(UI, "deploy");
+    }
 
     if (self.engaged) {
       pushControls(self);
       const world = match?.world;
       const slot = match === undefined ? -1 : match.localSlot;
       if (world === undefined || slot < 0) return;
-      const chassis = world.playerChassis[slot]!;
+      if (!(match?.samplePlayerTransform(slot, self.transform) ?? false)) return;
+      const chassis = self.transform.chassis;
       const chassisChanged = chassis !== self.chassis;
       if (chassisChanged) {
         self.chassis = chassis;
       }
-      const mode = world.playerMode[slot]!;
+      const mode = self.transform.mode;
       const modeChanged = mode !== self.mode;
       if (modeChanged) {
+        const wasInfantry = self.mode === PLAYER_MODE_INFANTRY;
         self.mode = mode;
+        self.heroDead = mode === PLAYER_MODE_DEAD && wasInfantry;
         if (mode === PLAYER_MODE_INFANTRY) {
           msg.post("#sprite", "disable");
+          msg.post("#turret", "disable");
           msg.post("#hero", "enable");
-          msg.post("#hero", "play_animation", { id: HERO_ANIMATION });
+          self.heroDirectionIndex = -1;
+          self.heroFiring = false;
+          self.heroHitActive = false;
+          self.heroHitSeconds = 0;
+          self.heroPreviousHealth = world.playerHealth[slot]!;
+        } else if (self.heroDead) {
+          msg.post("#sprite", "disable");
+          msg.post("#turret", "disable");
+          msg.post("#hero", "enable");
+          const direction = self.heroDirectionIndex >= 0 ? self.heroDirectionIndex : 1;
+          msg.post("#hero", "play_animation", { id: heroDeathAnimation(direction, heroVariantForSlot(slot)) });
+          if ((globalThis as unknown as WarBattlesPlayerGlobals).__warBattlesConfigV1?.artGallery === true) {
+            defold.log("info", `war-battles:hero-pose:direction=${direction}:death=1`);
+          }
         } else {
           msg.post("#hero", "disable");
           msg.post("#sprite", "enable");
-          if (mode === PLAYER_MODE_DEAD) msg.post("#sprite", "play_animation", { id: tankWreckAnimation(0) });
-          else self.directionIndex = -1;
+          msg.post("#turret", mode === PLAYER_MODE_TANK ? "enable" : "disable");
+          if (mode === PLAYER_MODE_DEAD) msg.post("#sprite", "play_animation", { id: tankWreckAnimation(0, chassis) });
+          else {
+            self.directionIndex = -1;
+            self.turretDirectionIndex = -1;
+          }
         }
       }
-      if (!(match?.samplePlayerTransform(slot, self.transform) ?? false)) return;
-      const generation = world.playerGeneration[slot]!;
+      const generation = self.transform.generation;
       if (generation !== self.generation) {
         self.generation = generation;
         self.cameraSnapPending = true;
       }
       const x = projectedX(self.transform.x, self.transform.y);
       const y = projectedY(self.transform.x, self.transform.y);
-      const z = 0.2 + isometricDepth(self.transform.x, self.transform.y) * 0.05;
-      go.setPosition(vmath.vector3(x, y, z));
+      const z = isometricSortZ(self.transform.x, self.transform.y);
+      go.setPosition(vmath.vector3(x, y + hexReliefLiftAtSimulation(self.transform.x, self.transform.y), z));
       if (mode === PLAYER_MODE_TANK) {
         const moving =
-          Math.abs(world.playerVelocityX[slot]!) >= VELOCITY_SCALE ||
-          Math.abs(world.playerVelocityY[slot]!) >= VELOCITY_SCALE;
-        const directionIndex = isometricDirectionIndex(
+          Math.abs(self.transform.velocityX) >= VELOCITY_SCALE || Math.abs(self.transform.velocityY) >= VELOCITY_SCALE;
+        const directionIndex = isometricDirectionIndexHysteretic(
           isometricDirectionX(self.transform.hullX, self.transform.hullY),
           isometricDirectionY(self.transform.hullX, self.transform.hullY),
+          self.directionIndex,
         );
         if (directionIndex !== self.directionIndex || chassisChanged || modeChanged || moving !== self.moving) {
           self.directionIndex = directionIndex;
@@ -322,10 +427,57 @@ export default defineComponent({
               : tankHullIdleAnimation(0, chassis, directionIndex),
           });
         }
+        const turretDirectionIndex = isometricDirectionIndexHysteretic(
+          isometricDirectionX(self.transform.turretX, self.transform.turretY),
+          isometricDirectionY(self.transform.turretX, self.transform.turretY),
+          self.turretDirectionIndex,
+        );
+        if (turretDirectionIndex !== self.turretDirectionIndex || chassisChanged || modeChanged) {
+          self.turretDirectionIndex = turretDirectionIndex;
+          msg.post("#turret", "play_animation", { id: tankTurretAnimation(0, chassis, turretDirectionIndex) });
+        }
         go.setRotation(vmath.quatRotationZ(0));
       } else if (mode === PLAYER_MODE_INFANTRY) {
-        const facing = projectedDirectionRadians(self.transform.hullX, self.transform.hullY);
-        go.setRotation(vmath.quatRotationZ(facing + Math.PI / 2));
+        const health = world.playerHealth[slot]!;
+        self.heroHitSeconds = nextHeroHitSeconds(self.heroPreviousHealth, health, self.heroHitSeconds, dt, modeChanged);
+        self.heroPreviousHealth = health;
+        const heroHit = self.heroHitSeconds > 0;
+        const heroDirection = isometricDirectionIndexHysteretic(
+          isometricDirectionX(self.transform.hullX, self.transform.hullY),
+          isometricDirectionY(self.transform.hullX, self.transform.hullY),
+          self.heroDirectionIndex,
+        );
+        const heroMoving =
+          Math.abs(self.transform.velocityX) >= VELOCITY_SCALE || Math.abs(self.transform.velocityY) >= VELOCITY_SCALE;
+        // The first ten ticks of the authoritative infantry cooldown are a
+        // visible recoil window. Holding the button alone cannot fake a shot.
+        const heroFiring = world.playerCooldown[slot]! > INFANTRY_FIRE_COOLDOWN_TICKS - 10;
+        if (
+          heroDirection !== self.heroDirectionIndex ||
+          heroMoving !== self.heroMoving ||
+          heroFiring !== self.heroFiring ||
+          heroHit !== self.heroHitActive ||
+          modeChanged
+        ) {
+          self.heroDirectionIndex = heroDirection;
+          self.heroMoving = heroMoving;
+          self.heroFiring = heroFiring;
+          self.heroHitActive = heroHit;
+          msg.post("#hero", "play_animation", {
+            id: heroHit
+              ? heroHitAnimation(heroDirection, heroVariantForSlot(slot))
+              : heroFiring
+                ? heroFireAnimation(heroDirection, heroVariantForSlot(slot))
+                : heroAnimation(heroDirection, heroMoving, heroVariantForSlot(slot)),
+          });
+          if ((globalThis as unknown as WarBattlesPlayerGlobals).__warBattlesConfigV1?.artGallery === true) {
+            defold.log(
+              "info",
+              `war-battles:hero-pose:direction=${heroDirection}:cooldown=${world.playerCooldown[slot]}:fire=${heroFiring ? 1 : 0}:hit=${heroHit ? 1 : 0}`,
+            );
+          }
+        }
+        go.setRotation(vmath.quatRotationZ(0));
       }
       msg.post(CAMERA, "player_at", { x, y, snap: self.cameraSnapPending });
       self.cameraSnapPending = false;
@@ -374,6 +526,26 @@ export default defineComponent({
   },
 
   onInput(self: PlayerSelf, actionId: DefoldHash, action: OnInputAction): boolean {
+    // The opt-in packaged-runtime tour is an evidence fixture, not a playable
+    // attract mode. A key held when Defold focuses its new window must not
+    // cancel its deterministic shot and movement markers. Normal launches
+    // leave `demo` at zero and retain the regular input behavior below.
+    if (self.demo > 0 && !self.engaged) return true;
+    if (actionId === TOUCH && action.touch !== undefined) {
+      const [screenWidth] = window.getSize();
+      updateVirtualControls(self.touch, action.touch, screenWidth);
+      if (!self.touchSeen) {
+        self.touchSeen = true;
+        msg.post(UI, "touch_enabled");
+      }
+      if (action.touch.some((touch) => touch.pressed)) {
+        msg.post(UI, "deploy");
+        engage(self);
+      }
+      // The GUI may also own a touch on the leader ribbon. Its own hit test
+      // decides whether to consume it; normal drive/aim touches pass through.
+      return false;
+    }
     // The scripted tutorial may already be running behind the title. Only a
     // real player press dismisses that title, so launch evidence and an idle
     // attract loop do not impersonate user intent.
@@ -381,7 +553,9 @@ export default defineComponent({
       defold.log("info", `war-battles:user-input:${defold.hashToHex(actionId)}`);
       msg.post(UI, "deploy");
     }
-    if (actionId === DEPLOY) return action.pressed === true;
+    // A click still deploys through the message above, but it must continue to
+    // the GUI so the persistent leader ribbon can open the scoreboard.
+    if (actionId === DEPLOY) return false;
     if (actionId === RESTART) {
       if (action.pressed) {
         engage(self);

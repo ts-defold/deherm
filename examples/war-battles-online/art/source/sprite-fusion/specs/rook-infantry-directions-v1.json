@@ -1,0 +1,6 @@
+{
+  "name": "rook-infantry-directions-v1",
+  "operation": "direction-set",
+  "size": 32,
+  "inputs": ["asset:d62dd927-7809-4bd6-a18e-1c87fcf23e9f"]
+}

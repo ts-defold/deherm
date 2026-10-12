@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_ba5f956e-9fae-4bc6-b047-1ab2efdd31f9",
+  "operation": "style-reference",
+  "prompt": "A single explosive impact at the instant a tank shell detonates on volcanic ground in a colorful retro arcade action game. An irregular white-hot core, bold yellow and orange flame lobes, a few sharp sparks, and dark charcoal smoke curling around the outer rim. The blast reads clearly at small gameplay scale and has an energetic uneven silhouette. No vehicle, ground tile, text, UI, or enclosing ring.",
+  "size": 64,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "defold/assets/fx/explosion/4.png",
+      "bytes": 2169,
+      "sha256": "3d4296da8803d52e290cede24f927c086a105a36cc8a8611ff28c58ebb99f4ca"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/tank-detonation-core-v1.json",
+    "sha256": "2ed7ced09a7cf177091b524f8a426ef1c8f56f23979f71b1eda4b0f4b55e0572"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "25e55e6d-e803-407d-acdb-6836109c5882",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/25e55e6d-e803-407d-acdb-6836109c5882/image.png?v=1791426908664",
+      "path": "art/source/sprite-fusion/outputs/tank-detonation-core-v1/00.png",
+      "bytes": 2562,
+      "sha256": "a8c4135571f0bc19bebf3d0575034b194dcb7470bbc6d1bf398223bdb574944e"
+    },
+    {
+      "index": 1,
+      "assetId": "2053c185-a476-48ba-982c-7bae178da42a",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/2053c185-a476-48ba-982c-7bae178da42a/image.png?v=1791426909228",
+      "path": "art/source/sprite-fusion/outputs/tank-detonation-core-v1/01.png",
+      "bytes": 3235,
+      "sha256": "50b7be2bbc5a7d469aaed3b874928cc7becb486994d299d91c5a282ecd6214a1"
+    },
+    {
+      "index": 2,
+      "assetId": "08f66bb1-c111-4c00-b219-5cdb85b6a5b8",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/08f66bb1-c111-4c00-b219-5cdb85b6a5b8/image.png?v=1791426909760",
+      "path": "art/source/sprite-fusion/outputs/tank-detonation-core-v1/02.png",
+      "bytes": 2820,
+      "sha256": "4b0f99889e5b6cb4e495cb0fb5d4ccf6b66baae79966ff7d98d4aa1dfc87483d"
+    },
+    {
+      "index": 3,
+      "assetId": "f561b56b-a513-488c-a8c9-78d1445a02a8",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/f561b56b-a513-488c-a8c9-78d1445a02a8/image.png?v=1791426910435",
+      "path": "art/source/sprite-fusion/outputs/tank-detonation-core-v1/03.png",
+      "bytes": 2938,
+      "sha256": "60ced4d89a105440cabfc2684df3e90cb9a737ee1dad2f1c9706c7f18b6e374f"
+    },
+    {
+      "index": 4,
+      "assetId": "69533555-d168-4c1d-b45b-5cfc8d06bb58",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/69533555-d168-4c1d-b45b-5cfc8d06bb58/image.png?v=1791426911107",
+      "path": "art/source/sprite-fusion/outputs/tank-detonation-core-v1/04.png",
+      "bytes": 3843,
+      "sha256": "8329fc191dfb99e854c64c4b03acefca468ccf098fcedd4b5fe0bd70e72c798d"
+    },
+    {
+      "index": 5,
+      "assetId": "92871014-b25b-46bc-9ebd-d2df03a1d756",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/92871014-b25b-46bc-9ebd-d2df03a1d756/image.png?v=1791426911616",
+      "path": "art/source/sprite-fusion/outputs/tank-detonation-core-v1/05.png",
+      "bytes": 2726,
+      "sha256": "24f93ee4676817ac3d8c9d0046428ac45427608d337a8553c5cc822e709a5d8e"
+    },
+    {
+      "index": 6,
+      "assetId": "77217299-41d4-48ee-b193-ad07b9e66fc6",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/77217299-41d4-48ee-b193-ad07b9e66fc6/image.png?v=1791426912260",
+      "path": "art/source/sprite-fusion/outputs/tank-detonation-core-v1/06.png",
+      "bytes": 2997,
+      "sha256": "9729ef0c2636a7c51045ac2c897aa879d9c310bf1adf3b9123487d1b889f8784"
+    },
+    {
+      "index": 7,
+      "assetId": "ffaf326a-b69b-4f5a-af0e-6ad49772d33a",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/ffaf326a-b69b-4f5a-af0e-6ad49772d33a/image.png?v=1791426912863",
+      "path": "art/source/sprite-fusion/outputs/tank-detonation-core-v1/07.png",
+      "bytes": 3219,
+      "sha256": "dd5316f93f4fd70b87284398e412ac326dffe8776a20d286beea8f77d2ee60ff"
+    },
+    {
+      "index": 8,
+      "assetId": "6e96666c-5fd0-46c4-a8f6-a41eb7cd0915",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/6e96666c-5fd0-46c4-a8f6-a41eb7cd0915/image.png?v=1791426913455",
+      "path": "art/source/sprite-fusion/outputs/tank-detonation-core-v1/08.png",
+      "bytes": 3294,
+      "sha256": "8a8a663956387b5b213802a768e99e234b128362837893d4f6a4ba63f72c25f2"
+    }
+  ],
+  "credits": {
+    "remaining": 2595
+  }
+}

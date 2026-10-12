@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_d9a2460a-b9a5-4a47-b428-212d04b46b16",
+  "operation": "edit",
+  "prompt": "Isolate only this heavy bulwark tank's low broad rotating turret and short heavy cannon as one detached weapon sprite. Remove the entire tracked hull and chassis underneath, keeping the same three-quarter isometric direction, palette and dark outline. The wide low turret base should sit on the matching bulwark hull socket. One isolated turret, no hull.",
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/bulwark-silhouette-v2/00.png",
+      "bytes": 9817,
+      "sha256": "f680e9486ac5b1f68f9957f2904541569739b08909eec2d6fcae785abc7f4ddf"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/bulwark-turret-v2.json",
+    "sha256": "b0a54dc46b6cf754c37f7f335fb3d6babe3a78b53dc710085a0203bf52844e52"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "9e1f56fd-603a-4430-a05c-1f5788dd5f1c",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 59,
+      "height": 47,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/9e1f56fd-603a-4430-a05c-1f5788dd5f1c/image.png?v=1791432468525",
+      "path": "art/source/sprite-fusion/outputs/bulwark-turret-v2/00.png",
+      "bytes": 4650,
+      "sha256": "d4d8dc10e6446d7c8a51530e2a048582d2018c55475a87f36f066efd577a9187"
+    },
+    {
+      "index": 1,
+      "assetId": "94f3eb0b-1e2d-4f20-8260-d278ec819337",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 49,
+      "height": 31,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/94f3eb0b-1e2d-4f20-8260-d278ec819337/image.png?v=1791432469520",
+      "path": "art/source/sprite-fusion/outputs/bulwark-turret-v2/01.png",
+      "bytes": 2884,
+      "sha256": "68f316f96e1f03e788a55c16e92a33f98322da988b19fbd6431f6fdb92ac8d81"
+    }
+  ],
+  "credits": {
+    "remaining": 2415
+  }
+}

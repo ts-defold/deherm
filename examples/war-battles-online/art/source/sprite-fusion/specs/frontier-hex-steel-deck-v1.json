@@ -1,0 +1,10 @@
+{
+  "name": "frontier-hex-steel-deck-v1",
+  "operation": "style-reference",
+  "size": 64,
+  "prompt": "A single isometric six-sided industrial service-deck terrain tile fitted into a volcanic battlefield. Broad flat driveable slate steel top, subtle rivets and panel seams, a few amber hazard marks, and a short dark faceted side. Crisp hand-placed pixel-art clusters, same footprint and perspective as the reference hex. One isolated tile only, no tank, building, lettering, border, or second tile.",
+  "inputs": [
+    "asset:bd93b0e2-417d-4553-b8ab-8c4637ff088e",
+    "art/source/imagegen/hex-style-reference/steel.png"
+  ]
+}

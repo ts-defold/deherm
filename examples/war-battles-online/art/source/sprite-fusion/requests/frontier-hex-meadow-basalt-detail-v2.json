@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_0f2389bd-cabb-4a50-935b-ed5c57265367",
+  "operation": "style-reference",
+  "prompt": "A single walkable transition hex for a three-quarter-view volcanic frontier battlefield. Olive meadow grass and cream flower tufts yielding irregularly to dark fractured basalt across the broad level top; a short earth-and-basalt side face. Make the terrain transition natural and clustered, not a straight stripe. Match the reference tiles' six-sided footprint, upper-left light, chunky pixel clusters, and muted military palette. No character, vehicle, building, lettering, or other tile.",
+  "size": 64,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-basalt-edge-v1/04.png",
+      "bytes": 6985,
+      "sha256": "099b7dfd7500bf7251c4f0aadfc6e0250518bb522a9ace9312399c6ed8729718"
+    },
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-basalt-edge-v1/07.png",
+      "bytes": 6953,
+      "sha256": "ef38f37fbc5a2efe7f5ca3d957da70e28e93ba59b868cb2cf0733720d12aaa48"
+    },
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/04.png",
+      "bytes": 7402,
+      "sha256": "e475f8f5c048798c01c722cd1efef78e8bd22d5e750fc5939b87dc5679d6e240"
+    },
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-cliff-v1/04.png",
+      "bytes": 4098,
+      "sha256": "7e6b4cead2a0d5e17460e064d7fe971edb5324cebfbdb8c7dbfcf86c8fc8ed06"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/frontier-hex-meadow-basalt-detail-v2.json",
+    "sha256": "53bdaab6ecee9d14aaf2bd9d1a0c8bdbc7f268081e130a3298a78e48bbd624c3"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "6b74877c-dbbf-4648-963e-8baaa3614099",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 68,
+      "height": 68,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/6b74877c-dbbf-4648-963e-8baaa3614099/image.png?v=1791415055526",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-basalt-detail-v2/00.png",
+      "bytes": 9465,
+      "sha256": "b35e29f49c8883bd1838dc39d8548542f594078f28a9aef61a227204f231dd32"
+    },
+    {
+      "index": 1,
+      "assetId": "5f760ff7-2e37-4211-b8db-297d2c31c1c5",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 65,
+      "height": 65,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/5f760ff7-2e37-4211-b8db-297d2c31c1c5/image.png?v=1791415056162",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-basalt-detail-v2/01.png",
+      "bytes": 9302,
+      "sha256": "6f019974bfddcf306a47ab2b71f8466053c48a7229085d257c6483a8a23429e6"
+    },
+    {
+      "index": 2,
+      "assetId": "530e1df8-4994-40e1-ad35-cf981e4fc342",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 65,
+      "height": 65,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/530e1df8-4994-40e1-ad35-cf981e4fc342/image.png?v=1791415056767",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-basalt-detail-v2/02.png",
+      "bytes": 9147,
+      "sha256": "adf4cc170ddb3bfe3111e430e52044f182e13ad1cafeb86b1bd16a29b555a6f9"
+    },
+    {
+      "index": 3,
+      "assetId": "95321cac-3e4b-45f5-b6ba-9222bdb98ecc",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/95321cac-3e4b-45f5-b6ba-9222bdb98ecc/image.png?v=1791415057319",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-basalt-detail-v2/03.png",
+      "bytes": 9374,
+      "sha256": "5701ca094eb51d52551ddaac50cc8e6be3b6a75ea43050c1ab0a62db76fd13f4"
+    },
+    {
+      "index": 4,
+      "assetId": "8149a4fb-327e-4c84-9cfb-edf2784037ac",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/8149a4fb-327e-4c84-9cfb-edf2784037ac/image.png?v=1791415057880",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-basalt-detail-v2/04.png",
+      "bytes": 9214,
+      "sha256": "664a8f8eef20e6399c89b7652708fd70b0f210d8259845c2ba5256d098bc2594"
+    },
+    {
+      "index": 5,
+      "assetId": "a92b3a85-ba39-4e1e-a005-49b5f32cbfd4",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 67,
+      "height": 67,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/a92b3a85-ba39-4e1e-a005-49b5f32cbfd4/image.png?v=1791415058418",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-basalt-detail-v2/05.png",
+      "bytes": 10065,
+      "sha256": "5eca81470f3a30e267d07600e527cd38d54f5170607fbe7aba2e945f8e4fccef"
+    },
+    {
+      "index": 6,
+      "assetId": "3b627e71-1973-4259-ac30-d0645d6d89d6",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 69,
+      "height": 69,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/3b627e71-1973-4259-ac30-d0645d6d89d6/image.png?v=1791415059018",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-basalt-detail-v2/06.png",
+      "bytes": 10034,
+      "sha256": "3774125ca4bb03f889eb01a86002fc637bd3df0c056aee3f8c665d963bca5878"
+    },
+    {
+      "index": 7,
+      "assetId": "639cb586-9139-43f5-9198-1402f1640d52",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/639cb586-9139-43f5-9198-1402f1640d52/image.png?v=1791415059588",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-basalt-detail-v2/07.png",
+      "bytes": 9015,
+      "sha256": "9f780b9e3ef85f82cae9f09281ecdb755f86dbb5d06119f6d89d5b1e286ba77c"
+    },
+    {
+      "index": 8,
+      "assetId": "81584492-2136-47ec-a9a8-d2d39b990283",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 66,
+      "height": 66,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/81584492-2136-47ec-a9a8-d2d39b990283/image.png?v=1791415060145",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-basalt-detail-v2/08.png",
+      "bytes": 9658,
+      "sha256": "4b32ab720aed9b5cbd6f7d7103332be929799946a4507c473c8868129943bb5f"
+    }
+  ],
+  "credits": {
+    "remaining": 2745
+  }
+}

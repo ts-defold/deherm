@@ -40,7 +40,7 @@
       "main/ui.gui.ts",
       "reference/battle.gui.ts"
     ],
-    "authoredSourceTreeSha256": "5905949ce67e92b91c4ac4d7767c79d9899c53ba4cf72e2b5fa1762e651cb1ea",
+    "authoredSourceTreeSha256": "93c2becdf161d78c8cffbbd249e67c3b91a219aebad5a67f48495f45b6df31b8",
     "loweringPlan": "packages/bindings/generated/defold-binding-lowering-plan.json",
     "loweringPlanSha256": "219b28b3470488eb848187d60cb92d72f95e12b49bcc59009315ea47dae3025f",
     "typedNativeBridge": "packages/bindings/generated/defold-typed-native-bridge.json",
@@ -53,7 +53,7 @@
   "reachability": {
     "profile": "release",
     "dynamicAccess": false,
-    "reachableRouteCount": 32,
+    "reachableRouteCount": 36,
     "reachableRouteIds": [
       "script:camera.get_cameras",
       "script:camera.get_orthographic_auto_zoom",
@@ -64,6 +64,7 @@
       "script:go.set_position",
       "script:go.set_rotation",
       "script:gui.get_node",
+      "script:gui.pick_node",
       "script:gui.play_flipbook",
       "script:gui.set_color",
       "script:gui.set_enabled",
@@ -72,6 +73,8 @@
       "script:gui.set_size",
       "script:gui.set_text",
       "script:gui.set_texture",
+      "script:gui.set_xanchor",
+      "script:gui.set_yanchor",
       "script:hash",
       "script:hash_to_hex",
       "script:msg.post",
@@ -86,9 +89,10 @@
       "script:vmath.quat",
       "script:vmath.quat_rotation_z",
       "script:vmath.vector3",
-      "script:vmath.vector4"
+      "script:vmath.vector4",
+      "script:window.get_size"
     ],
-    "staticReachableRouteCount": 32,
+    "staticReachableRouteCount": 35,
     "staticReachableRouteIds": [
       "script:camera.get_cameras",
       "script:camera.get_orthographic_auto_zoom",
@@ -107,6 +111,8 @@
       "script:gui.set_size",
       "script:gui.set_text",
       "script:gui.set_texture",
+      "script:gui.set_xanchor",
+      "script:gui.set_yanchor",
       "script:hash",
       "script:hash_to_hex",
       "script:msg.post",
@@ -121,10 +127,21 @@
       "script:vmath.quat",
       "script:vmath.quat_rotation_z",
       "script:vmath.vector3",
-      "script:vmath.vector4"
+      "script:vmath.vector4",
+      "script:window.get_size"
     ],
-    "blockedReachableRouteCount": 0,
-    "blockedReachableRoutes": []
+    "blockedReachableRouteCount": 1,
+    "blockedReachableRoutes": [
+      {
+        "id": "script:gui.pick_node",
+        "stableId": 642239255,
+        "selection": "blocked-capability",
+        "blockers": [
+          "current-backend:projection-emitted-backend-policy-required",
+          "value-type:node"
+        ]
+      }
+    ]
   },
   "adapter": {
     "observedTypedNativeRouteCount": 14,
@@ -226,6 +243,8 @@
       "script:gui.set_size",
       "script:gui.set_text",
       "script:gui.set_texture",
+      "script:gui.set_xanchor",
+      "script:gui.set_yanchor",
       "script:hash",
       "script:hash_to_hex",
       "script:pprint",
@@ -233,7 +252,8 @@
       "script:sys.get_config_int",
       "script:sys.get_config_string",
       "script:tilemap.set_tile",
-      "script:vmath.vector4"
+      "script:vmath.vector4",
+      "script:window.get_size"
     ]
   },
   "evidenceBoundary": {
@@ -245,5 +265,5 @@
     "gameplay": "not-claimed; packaged gameplay belongs to the native Dynamic Hermes projection",
     "blockers": "blocked reachable routes remain explicit and fail closed"
   },
-  "recordSha256": "8ac31d0bd00fc5941b85ac8020d9d5f7845524f0f4dc41cb34673573f853c224"
+  "recordSha256": "1e9f1848241be313418a17f1096d0ad620e5c802bdf7e723d26cfe3cb2abfe96"
 }

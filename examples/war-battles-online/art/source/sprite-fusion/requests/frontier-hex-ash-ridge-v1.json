@@ -1,0 +1,164 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_d1bd63b3-122c-49f2-9c51-65f1338268be",
+  "operation": "generate",
+  "prompt": "One isolated isometric six-sided volcanic terrain tile for a retro pixel-art tank strategy game. Broad flat driveable charcoal basalt top dusted with cool grey ash, angular strata on a short rock cliff side, only a few restrained orange embers. High contrast readable shape and crisp hand-placed pixel clusters. Single tile centered on transparent background, no character, vehicle, building, text, border, or other tiles.",
+  "size": 64,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/frontier-hex-ash-ridge-v1.json",
+    "sha256": "d7931563a72059ca1b0348f47277aff3f61ad57e6046e6727c439d37f9dc8a57"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "814fdb71-9cac-43a9-87f9-0e89d8a1ad9e",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/814fdb71-9cac-43a9-87f9-0e89d8a1ad9e/image.png?v=1791407519462",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ash-ridge-v1/00.png",
+      "bytes": 6254,
+      "sha256": "506dc93ee0e52e6d299e45325133efcc6b88470e99b98808f6a52c1a2b02fe96"
+    },
+    {
+      "index": 1,
+      "assetId": "571d719d-f993-4ba1-8b2a-ce860a002636",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/571d719d-f993-4ba1-8b2a-ce860a002636/image.png?v=1791407520135",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ash-ridge-v1/01.png",
+      "bytes": 9301,
+      "sha256": "7b37a83b20f2fc7bb80a7acb3cccc1e002bffdaafbe933802cba466bb746a168"
+    },
+    {
+      "index": 2,
+      "assetId": "b90c649d-07cc-4ccf-b724-ee2ff6e2c3f7",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/b90c649d-07cc-4ccf-b724-ee2ff6e2c3f7/image.png?v=1791407520596",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ash-ridge-v1/02.png",
+      "bytes": 8997,
+      "sha256": "8737e89dad0385242a4a41169af6fd8274fa4f1bdd23e25ca72c78a012dcd2b9"
+    },
+    {
+      "index": 3,
+      "assetId": "24f4192b-4691-488e-8719-de0c41ad1b21",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/24f4192b-4691-488e-8719-de0c41ad1b21/image.png?v=1791407521047",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ash-ridge-v1/03.png",
+      "bytes": 8985,
+      "sha256": "0d9663ad07649d9124ce329445d153bad65d0e5edcef8482f81b11d7125a01b9"
+    },
+    {
+      "index": 4,
+      "assetId": "b5a63385-77cd-4dc1-88c9-dcfd52715a8f",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/b5a63385-77cd-4dc1-88c9-dcfd52715a8f/image.png?v=1791407521581",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ash-ridge-v1/04.png",
+      "bytes": 7448,
+      "sha256": "e5f149197c50feb78891b933cdf9895e0b27a4f8eb3d838e582132622d0a7394"
+    },
+    {
+      "index": 5,
+      "assetId": "8860ceb3-b976-48e1-a908-52ed8fe1bf2d",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/8860ceb3-b976-48e1-a908-52ed8fe1bf2d/image.png?v=1791407522278",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ash-ridge-v1/05.png",
+      "bytes": 7255,
+      "sha256": "9a1ee4b21812b71adf568e6a4ed647c367c2446d1bd19deafe86d47c6de601d7"
+    },
+    {
+      "index": 6,
+      "assetId": "dee8b02e-5436-4182-b562-c970d1ec5865",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/dee8b02e-5436-4182-b562-c970d1ec5865/image.png?v=1791407522900",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ash-ridge-v1/06.png",
+      "bytes": 7586,
+      "sha256": "a1e470f0dc10c452444fb1e5f8367aebdfe7950332a4c21e6c07dd8b3981f133"
+    },
+    {
+      "index": 7,
+      "assetId": "5f5951ee-8ac9-4c30-8367-3ee73f963804",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/5f5951ee-8ac9-4c30-8367-3ee73f963804/image.png?v=1791407523556",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ash-ridge-v1/07.png",
+      "bytes": 6217,
+      "sha256": "be729bfad43c75212e87f3beec406cf5b040df987da9a0ada860557478a2a69f"
+    },
+    {
+      "index": 8,
+      "assetId": "4a8ac770-0b95-452b-8cee-3db7df5f9743",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/4a8ac770-0b95-452b-8cee-3db7df5f9743/image.png?v=1791407524230",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ash-ridge-v1/08.png",
+      "bytes": 7419,
+      "sha256": "043f35b5bf734a126263a809a8274680fd4d065288c3d7bf41a2dfadf92d967a"
+    },
+    {
+      "index": 9,
+      "assetId": "5e759f7d-3569-4159-8fe7-376d93a9d222",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/5e759f7d-3569-4159-8fe7-376d93a9d222/image.png?v=1791407524850",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ash-ridge-v1/09.png",
+      "bytes": 6483,
+      "sha256": "e620e8ffdd49d5f52ae0d0991981289b322ffc3a685c9060f9d661c30695c8be"
+    },
+    {
+      "index": 10,
+      "assetId": "555aa4bb-6b80-48fe-b5ef-9ba701cf8b26",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/555aa4bb-6b80-48fe-b5ef-9ba701cf8b26/image.png?v=1791407525503",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ash-ridge-v1/10.png",
+      "bytes": 7181,
+      "sha256": "b9bbcccbc6bdcc6ba4a6e11a70e3f093ddb622cf4b41e49211f4349b4e4ffe0b"
+    },
+    {
+      "index": 11,
+      "assetId": "d03326ae-12a7-417c-837c-f12f19cfdc07",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/d03326ae-12a7-417c-837c-f12f19cfdc07/image.png?v=1791407526125",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ash-ridge-v1/11.png",
+      "bytes": 7858,
+      "sha256": "67d1a7beb2521a093c7930dc9d330bfe39dc6c075be3ebdd6bd71adc63d160da"
+    }
+  ],
+  "credits": {
+    "remaining": 3000
+  }
+}

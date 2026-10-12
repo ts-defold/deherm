@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_58ae5bd6-1dba-4b59-ba64-3bf3fe0db851",
+  "operation": "edit",
+  "prompt": "Change only Rook's southeast-facing body pose: he flinches from a hit, shoulders recoiling sharply, torso bent slightly backward, one arm drawn across the chest, compact sidearm lowered. Keep both boots visibly planted on the same ground line. Keep the same person, exact helmet, blue goggle lens, cream scarf, olive jacket, colors, outline, proportions, and three-quarter perspective. No blood, injury marks, projectile, flash, new prop, platform, text, scenery, or second person.",
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "b0168c9c-877f-46f1-8ee7-e12b93565d18"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/rook-infantry-hit-pose-se-v1.json",
+    "sha256": "314f39cc7a44797414928e418de66286c8f67681b9ddaa0fe592a8845be221d3"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "976ec085-3855-4264-86eb-4f200b96e21b",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 26,
+      "height": 46,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/976ec085-3855-4264-86eb-4f200b96e21b/image.png?v=1791533133840",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-hit-pose-se-v1/00.png",
+      "bytes": 2625,
+      "sha256": "74782406576ced2b9a2914de60ddc9fdc7cdaba8bb41fcd98afdc69e01383319"
+    },
+    {
+      "index": 1,
+      "assetId": "3067e0e9-6583-45d0-a16a-2a638af32256",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 26,
+      "height": 44,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/3067e0e9-6583-45d0-a16a-2a638af32256/image.png?v=1791533134810",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-hit-pose-se-v1/01.png",
+      "bytes": 2775,
+      "sha256": "f10ce8329f1339fb9c69495ae15c01a62f981250f4acb44ef16bdb064f054964"
+    }
+  ],
+  "credits": {
+    "remaining": 945
+  }
+}

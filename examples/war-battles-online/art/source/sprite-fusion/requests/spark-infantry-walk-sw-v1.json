@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_5ecab0fe-3fe8-4e69-bf20-e0be119d7d44",
+  "operation": "animate",
+  "prompt": "A quick grounded southwest-facing three-quarter front walk cycle with alternating boot contact and a small opposite-arm swing. Spark remains a young tan-skinned mechanic with short spiky black hair, orange headband, raised brass goggles, teal collar, olive jacket and compact sidearm held low. Keep his exact source perspective, palette, outline, proportions, and identity consistent. Seamless loop without turning, jumping, or adding objects.",
+  "size": null,
+  "outputFrames": 4,
+  "colors": 24,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "66a74439-ff50-4e57-a15a-87506b996806"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/spark-infantry-walk-sw-v1.json",
+    "sha256": "9163c5b2ce4db3fd7b0ae15dcd66a7372efb343684f61be7a216ab031d659055"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "6d71615a-fb98-4440-a888-3a13fa1b79ed",
+      "type": "animation",
+      "contentType": "image/webp",
+      "width": 31,
+      "height": 50,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/6d71615a-fb98-4440-a888-3a13fa1b79ed/animation.webp?v=1791526491388",
+      "path": "art/source/sprite-fusion/outputs/spark-infantry-walk-sw-v1/00.webp",
+      "bytes": 2292,
+      "sha256": "999885d17b58f257bb21446cf1a9b62a63301d5a97abe04f1cf24a63875fd234",
+      "spritesheet": {
+        "url": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/6d71615a-fb98-4440-a888-3a13fa1b79ed/spritesheet.png?v=1791526491388",
+        "path": "art/source/sprite-fusion/outputs/spark-infantry-walk-sw-v1/00-sheet.png",
+        "bytes": 2223,
+        "sha256": "b72ef21ace6a0fc1c20c980d8a581b4b773000db1fd5ada60aec24d497aa35cf"
+      },
+      "frameCount": 4,
+      "fps": 8
+    }
+  ],
+  "credits": {
+    "remaining": 1425
+  }
+}

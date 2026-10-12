@@ -80,7 +80,7 @@ export function digestAuthoritativeLoadSourceInputs(sourceInputs) {
 }
 
 export function assertAuthoritativeLoadEvidence(document, { sourceInputs } = {}) {
-  assert.equal(document?.schemaVersion, 2);
+  assert.equal(document?.schemaVersion, 3);
   assert.equal(document?.kind, "war-battles.authoritative-32-player-load");
   assert.equal(document?.owner, AUTHORITATIVE_LOAD_OWNER);
   assert.equal(document?.generator, AUTHORITATIVE_LOAD_OWNER);
@@ -155,7 +155,10 @@ export function assertAuthoritativeLoadEvidence(document, { sourceInputs } = {})
   assert.equal(document.server?.minimumInputAcceptanceRatio, document.config?.minimumInputAcceptanceRatio);
   assert.equal(document.config?.minimumInputAcceptanceRatio, 0.93);
   assert.ok(document.server?.inputAcceptanceRatio >= document.server.minimumInputAcceptanceRatio);
-  assert.ok(document.server?.inputsLate > 0, "deterministic impairment must exercise unique late-input accounting");
+  // Loss and reordering are observed above. A well-phased input lead may
+  // legitimately make the unique late count zero under that same impairment;
+  // the accounting identity below is the invariant, not a required failure.
+  assert.ok(Number.isInteger(document.server?.inputsLate) && document.server.inputsLate >= 0);
   assert.ok(document.server?.inputCommandsUnobserved >= 0);
   assert.equal(
     document.server?.inputsAccepted + document.server?.inputsLate + document.server?.inputCommandsUnobserved,
@@ -178,6 +181,22 @@ export function assertAuthoritativeLoadEvidence(document, { sourceInputs } = {})
   assert.ok(document.clients.totalInputLeadDecreases > 0, "impaired load must exercise lead recovery");
   assert.ok(Number.isInteger(document.clients?.maximumLocalCorrectionMagnitude));
   assert.ok(document.clients.maximumLocalCorrectionMagnitude > 0, "impaired load must exercise local reconciliation");
+  assert.deepEqual(document.clients.localCorrectionBucketUpperBounds, [0, 16, 32, 64, 128, 256, 512]);
+  assert.equal(document.clients.localCorrectionBuckets.length, 8);
+  assert.ok(document.clients.localCorrectionBuckets.reduce((sum, count) => sum + count, 0) > 0);
+  assert.equal(document.clients.workloadCorrections.localCorrectionBuckets.length, 8);
+  assert.ok(document.clients.workloadCorrections.maximumLocalCorrectionMagnitude > 0);
+  assert.ok(
+    document.clients.workloadCorrections.maximumLocalCorrectionMagnitude <=
+      document.clients.maximumLocalCorrectionMagnitude,
+  );
+  for (let bucket = 0; bucket < 8; bucket += 1) {
+    assert.ok(
+      document.clients.workloadCorrections.localCorrectionBuckets[bucket] <=
+        document.clients.localCorrectionBuckets[bucket],
+      "active-play correction counts cannot include the later convergence probe",
+    );
+  }
   assert.ok(Number.isInteger(document.clients?.totalRemoteInterpolationRebases));
   assert.ok(document.clients.totalRemoteInterpolationRebases > 0, "impaired load must exercise in-flight rebasing");
   assert.ok(Number.isInteger(document.clients?.maximumRemoteInterpolationRebaseDistance));
@@ -200,9 +219,14 @@ export function assertAuthoritativeLoadEvidence(document, { sourceInputs } = {})
           document.clients.inputSendIntervalTicks,
       ),
     );
-    assert.equal(row.inputLeadTicks, row.inputLeadIncreases - row.inputLeadDecreases + 2);
+    assert.equal(
+      row.inputLeadTicks,
+      row.inputLeadIncreases - row.inputLeadDecreases + document.config.initialLeadTicks,
+    );
     assert.ok(row.inputLeadCatchdownSkips <= row.inputLeadDecreases);
     assert.ok(Number.isInteger(row.maximumLocalCorrectionMagnitude) && row.maximumLocalCorrectionMagnitude >= 0);
+    assert.equal(row.localCorrectionBuckets.length, 8);
+    assert.ok(row.localCorrectionBuckets.every((count) => Number.isInteger(count) && count >= 0));
     assert.ok(Number.isInteger(row.remoteInterpolationRebases) && row.remoteInterpolationRebases >= 0);
     assert.ok(
       Number.isInteger(row.maximumRemoteInterpolationRebaseDistance) &&

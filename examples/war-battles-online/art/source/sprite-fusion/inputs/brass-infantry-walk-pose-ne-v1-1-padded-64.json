@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "sourceRequest": "brass-infantry-walk-pose-ne-v1",
+  "outputIndex": 1,
+  "sourceSha256": "bd78fd684f366d47cb08183a53aa640216b4473fb470ada2978b08bd9b092036",
+  "canvas": 64,
+  "footRow": 56,
+  "sourceBounds": [
+    0,
+    0,
+    24,
+    38
+  ],
+  "paddedBounds": [
+    19,
+    17,
+    43,
+    55
+  ],
+  "sha256": "3e2e96db8bdbf5d9cb81b306ae818b42bc0d686f09dabcbfde2e93b753a48c86"
+}

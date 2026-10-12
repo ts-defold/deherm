@@ -1,0 +1,12 @@
+{
+  "name": "frontier-hex-earth-steel-edge-v1",
+  "operation": "style-reference",
+  "size": 64,
+  "prompt": "A single walkable transition hex for a three-quarter-view volcanic refinery battlefield. Warm ochre compacted earth and tire-scarred soil meet a partly buried charcoal steel service deck across the broad level top; clustered dirt spills over recessed grating and small amber rivets. Short layered earth-and-metal side face. Match the reference tiles' six-sided footprint, upper-left light, chunky pixel clusters, and muted military palette. Keep it a natural transition rather than a straight half-and-half stripe. No character, tank, building, lettering, or other tile.",
+  "inputs": [
+    "art/source/sprite-fusion/outputs/frontier-hex-ochre-detail-v2/03.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-ochre-detail-v2/06.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-steel-detail-v2/01.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-refinery-grate-v1/06.png"
+  ]
+}

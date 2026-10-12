@@ -1,0 +1,6 @@
+{
+  "name": "rook-infantry-walk-pose-sw-v1",
+  "operation": "edit",
+  "inputs": ["asset:c4c082f9-d41e-497b-a38c-80520006f1d9"],
+  "prompt": "Change only Rook's body pose to a grounded southwest-facing three-quarter walk mid-stride: front boot stepping, rear boot planted, opposite arm swinging, compact sidearm still held low. Keep her exact helmet, blue goggle lens, cream scarf, face, olive jacket, colors, outline, proportions, and viewing angle. Do not turn her or add a prop, platform, text, scenery, or second person."
+}

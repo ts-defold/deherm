@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_47442814-2d49-4dda-9618-41350f841a98",
+  "operation": "style-reference",
+  "prompt": "A single walkable transition hex for a three-quarter-view volcanic refinery battlefield. Warm ochre compacted earth and tire-scarred soil meet a partly buried charcoal steel service deck across the broad level top; clustered dirt spills over recessed grating and small amber rivets. Short layered earth-and-metal side face. Match the reference tiles' six-sided footprint, upper-left light, chunky pixel clusters, and muted military palette. Keep it a natural transition rather than a straight half-and-half stripe. No character, tank, building, lettering, or other tile.",
+  "size": 64,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-detail-v2/03.png",
+      "bytes": 9940,
+      "sha256": "17662f835b72f191157e0e47c2c4a4fa28cc5d74721095580cb7169483bd9059"
+    },
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-detail-v2/06.png",
+      "bytes": 9515,
+      "sha256": "c58fc4b0c10f00090562653db1b71b41d292df01e563ddc7e7f344b3e6c32145"
+    },
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-steel-detail-v2/01.png",
+      "bytes": 6455,
+      "sha256": "c05055754d06523d88a45accd77cf1aa34e9555b1965477bbff78d3836ea60c1"
+    },
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-refinery-grate-v1/06.png",
+      "bytes": 7964,
+      "sha256": "cc8219b190361393c5cace70a0707315355c77a9994d32314a55b6a209394b9c"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/frontier-hex-earth-steel-edge-v1.json",
+    "sha256": "0e7e0b444cb3aa0cd4733bfb8ce6b78e8c6b5d421acfbdb540388c27bbd61d8f"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "e36c4324-f9eb-489d-8f21-2c12fc1028bf",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 78,
+      "height": 78,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/e36c4324-f9eb-489d-8f21-2c12fc1028bf/image.png?v=1791417525652",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-steel-edge-v1/00.png",
+      "bytes": 13248,
+      "sha256": "0d7e3807066ac8807240ccde039e3719932bbd1bb3822fbdcda896152f47665a"
+    },
+    {
+      "index": 1,
+      "assetId": "d1120eb9-4972-4a87-961a-937b10a1964f",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 74,
+      "height": 74,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/d1120eb9-4972-4a87-961a-937b10a1964f/image.png?v=1791417526301",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-steel-edge-v1/01.png",
+      "bytes": 9894,
+      "sha256": "820ac5ef16bcb139616a75bc7fa2fa4ea26a5fab6f8a0ef26b70c5e529f21d78"
+    },
+    {
+      "index": 2,
+      "assetId": "96612e5a-a77f-4469-a150-2b84a7be15f0",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 85,
+      "height": 85,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/96612e5a-a77f-4469-a150-2b84a7be15f0/image.png?v=1791417527042",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-steel-edge-v1/02.png",
+      "bytes": 13191,
+      "sha256": "0b8a8c14882fb3770b59056b8949f92b170c5a2f1cff44d07c3ad356d5f0b413"
+    },
+    {
+      "index": 3,
+      "assetId": "43da9719-2ae4-4576-a628-f329c7c8e286",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 73,
+      "height": 73,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/43da9719-2ae4-4576-a628-f329c7c8e286/image.png?v=1791417527706",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-steel-edge-v1/03.png",
+      "bytes": 10656,
+      "sha256": "54385029bfb94d90f06077cd558ae45538c3de6f4c63ca34f1d6b14de463da32"
+    },
+    {
+      "index": 4,
+      "assetId": "912b648a-0da0-4ae3-84a3-242f9fbaed6f",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 76,
+      "height": 76,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/912b648a-0da0-4ae3-84a3-242f9fbaed6f/image.png?v=1791417528334",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-steel-edge-v1/04.png",
+      "bytes": 11345,
+      "sha256": "409600afeb81db4984a58637d7a9a5228eceba4e3d2ce3d4d5530779f28d9dc2"
+    },
+    {
+      "index": 5,
+      "assetId": "b04773e8-eed2-49db-82a5-d50453ab8e3a",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 75,
+      "height": 75,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/b04773e8-eed2-49db-82a5-d50453ab8e3a/image.png?v=1791417528933",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-steel-edge-v1/05.png",
+      "bytes": 11912,
+      "sha256": "2cccb40b2e26bba968b23cf4823a40e72e8daf49cc08fa4ed6387b3d0236b640"
+    },
+    {
+      "index": 6,
+      "assetId": "6b9f7112-dc39-4b52-8f77-9902fc4c0ac4",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 77,
+      "height": 77,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/6b9f7112-dc39-4b52-8f77-9902fc4c0ac4/image.png?v=1791417529485",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-steel-edge-v1/06.png",
+      "bytes": 11711,
+      "sha256": "b30def5da9cec9d1e30067c7895de794de42a1be770a5536a7b16239af94994f"
+    },
+    {
+      "index": 7,
+      "assetId": "16b95d68-b6e7-4c03-ad1a-f43aea442b92",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 81,
+      "height": 81,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/16b95d68-b6e7-4c03-ad1a-f43aea442b92/image.png?v=1791417530032",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-steel-edge-v1/07.png",
+      "bytes": 11970,
+      "sha256": "e3f7bd8ef2d76d7e014b32063a8be0399a73f646c66f7adbec5f3206196a3b22"
+    },
+    {
+      "index": 8,
+      "assetId": "191e7ca0-e5f8-4b11-bcb8-bc40239bc94e",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 84,
+      "height": 84,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/191e7ca0-e5f8-4b11-bcb8-bc40239bc94e/image.png?v=1791417530596",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-earth-steel-edge-v1/08.png",
+      "bytes": 14477,
+      "sha256": "4ae92478675fd019a09a3d73d43e084ca1e48f8d5e09a3da736d97bf0a93b5ae"
+    }
+  ],
+  "credits": {
+    "remaining": 2715
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "name": "frontier-meadow-ridge-v1",
+  "operation": "style-reference",
+  "size": 128,
+  "inputs": [
+    "defold/assets/derived/arena/hex-cliff-9.png",
+    "defold/assets/derived/arena/hex-cliff-12.png",
+    "defold/assets/derived/arena/landmark-rock-outcrop.png",
+    "art/source/sprite-fusion/outputs/frontier-hex-wild-meadow-v1/00.png"
+  ],
+  "prompt": "One long irregular meadow escarpment for a three-quarter isometric arcade tank battlefield. A connected grassy plateau edge stretching left-to-right about three tank widths, with uneven lobes, shallow elevation steps, a rugged warm-brown basalt front, dark plum crevices, and sparse grass tufts. One continuous bottom contact line and upper-left light. This is a broad natural ridge, not a separate hexagon tile, round stump, or stack of little pedestals. No tank, character, tree, building, road, lettering, UI, or complete scene."
+}

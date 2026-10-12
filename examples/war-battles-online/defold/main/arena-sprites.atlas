@@ -6,6 +6,20 @@ animations {
   playback: PLAYBACK_NONE
 }
 animations {
+  id: "floor-marker-spawn"
+  images {
+    image: "/assets/derived/arena/floor-marker-spawn.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "floor-marker-pickup"
+  images {
+    image: "/assets/derived/arena/floor-marker-pickup.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
   id: "landmark-field-bunker"
   images {
     image: "/assets/derived/arena/landmark-field-bunker.png"
@@ -65,6 +79,209 @@ animations {
   id: "landmark-shell-crater"
   images {
     image: "/assets/derived/arena/landmark-shell-crater.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "landmark-conifer-tall"
+  images {
+    image: "/assets/derived/arena/landmark-conifer-tall.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "landmark-conifer-broad"
+  images {
+    image: "/assets/derived/arena/landmark-conifer-broad.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "landmark-conifer-leaning"
+  images {
+    image: "/assets/derived/arena/landmark-conifer-leaning.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "landmark-low-cover-earth"
+  images {
+    image: "/assets/derived/arena/landmark-low-cover-earth.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "landmark-low-cover-stone"
+  images {
+    image: "/assets/derived/arena/landmark-low-cover-stone.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "landmark-low-cover-timber"
+  images {
+    image: "/assets/derived/arena/landmark-low-cover-timber.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "landmark-low-cover-rubble"
+  images {
+    image: "/assets/derived/arena/landmark-low-cover-rubble.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "landmark-low-cover-neutral"
+  images {
+    image: "/assets/derived/arena/landmark-low-cover-neutral.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "cover-sandbag-a"
+  images {
+    image: "/assets/derived/arena/cover-sandbag-a.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "cover-sandbag-b"
+  images {
+    image: "/assets/derived/arena/cover-sandbag-b.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "cover-crate"
+  images {
+    image: "/assets/derived/arena/cover-crate.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "hex-cliff-0"
+  images {
+    image: "/assets/derived/arena/hex-cliff-0.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "hex-cliff-1"
+  images {
+    image: "/assets/derived/arena/hex-cliff-1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "hex-cliff-2"
+  images {
+    image: "/assets/derived/arena/hex-cliff-2.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "hex-cliff-3"
+  images {
+    image: "/assets/derived/arena/hex-cliff-3.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "hex-cliff-4"
+  images {
+    image: "/assets/derived/arena/hex-cliff-4.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "hex-cliff-5"
+  images {
+    image: "/assets/derived/arena/hex-cliff-5.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "hex-cliff-6"
+  images {
+    image: "/assets/derived/arena/hex-cliff-6.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "hex-cliff-7"
+  images {
+    image: "/assets/derived/arena/hex-cliff-7.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "hex-cliff-8"
+  images {
+    image: "/assets/derived/arena/hex-cliff-8.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "hex-cliff-9"
+  images {
+    image: "/assets/derived/arena/hex-cliff-9.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "hex-cliff-10"
+  images {
+    image: "/assets/derived/arena/hex-cliff-10.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "hex-cliff-11"
+  images {
+    image: "/assets/derived/arena/hex-cliff-11.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "hex-cliff-12"
+  images {
+    image: "/assets/derived/arena/hex-cliff-12.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "hex-cliff-13"
+  images {
+    image: "/assets/derived/arena/hex-cliff-13.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "hex-cliff-14"
+  images {
+    image: "/assets/derived/arena/hex-cliff-14.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "hex-cliff-15"
+  images {
+    image: "/assets/derived/arena/hex-cliff-15.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "hex-cliff-16"
+  images {
+    image: "/assets/derived/arena/hex-cliff-16.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "hex-cliff-17"
+  images {
+    image: "/assets/derived/arena/hex-cliff-17.png"
   }
   playback: PLAYBACK_NONE
 }
@@ -745,6 +962,13 @@ animations {
   playback: PLAYBACK_NONE
 }
 animations {
+  id: "chassis-blue-scout-wreck"
+  images {
+    image: "/assets/derived/arena/chassis-blue-scout-wreck.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
   id: "chassis-blue-scout"
   images {
     image: "/assets/derived/arena/chassis-blue-scout-1.png"
@@ -959,6 +1183,13 @@ animations {
   id: "chassis-blue-scout-turret-ne"
   images {
     image: "/assets/derived/arena/chassis-blue-scout-turret-ne.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-assault-wreck"
+  images {
+    image: "/assets/derived/arena/chassis-blue-assault-wreck.png"
   }
   playback: PLAYBACK_NONE
 }
@@ -1181,6 +1412,13 @@ animations {
   playback: PLAYBACK_NONE
 }
 animations {
+  id: "chassis-blue-bulwark-wreck"
+  images {
+    image: "/assets/derived/arena/chassis-blue-bulwark-wreck.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
   id: "chassis-blue-bulwark"
   images {
     image: "/assets/derived/arena/chassis-blue-bulwark-1.png"
@@ -1395,6 +1633,13 @@ animations {
   id: "chassis-blue-bulwark-turret-ne"
   images {
     image: "/assets/derived/arena/chassis-blue-bulwark-turret-ne.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-blue-artillery-wreck"
+  images {
+    image: "/assets/derived/arena/chassis-blue-artillery-wreck.png"
   }
   playback: PLAYBACK_NONE
 }
@@ -1617,6 +1862,13 @@ animations {
   playback: PLAYBACK_NONE
 }
 animations {
+  id: "chassis-red-scout-wreck"
+  images {
+    image: "/assets/derived/arena/chassis-red-scout-wreck.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
   id: "chassis-red-scout"
   images {
     image: "/assets/derived/arena/chassis-red-scout-1.png"
@@ -1831,6 +2083,13 @@ animations {
   id: "chassis-red-scout-turret-ne"
   images {
     image: "/assets/derived/arena/chassis-red-scout-turret-ne.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-assault-wreck"
+  images {
+    image: "/assets/derived/arena/chassis-red-assault-wreck.png"
   }
   playback: PLAYBACK_NONE
 }
@@ -2053,6 +2312,13 @@ animations {
   playback: PLAYBACK_NONE
 }
 animations {
+  id: "chassis-red-bulwark-wreck"
+  images {
+    image: "/assets/derived/arena/chassis-red-bulwark-wreck.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
   id: "chassis-red-bulwark"
   images {
     image: "/assets/derived/arena/chassis-red-bulwark-1.png"
@@ -2267,6 +2533,13 @@ animations {
   id: "chassis-red-bulwark-turret-ne"
   images {
     image: "/assets/derived/arena/chassis-red-bulwark-turret-ne.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-red-artillery-wreck"
+  images {
+    image: "/assets/derived/arena/chassis-red-artillery-wreck.png"
   }
   playback: PLAYBACK_NONE
 }
@@ -2489,6 +2762,13 @@ animations {
   playback: PLAYBACK_NONE
 }
 animations {
+  id: "chassis-green-scout-wreck"
+  images {
+    image: "/assets/derived/arena/chassis-green-scout-wreck.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
   id: "chassis-green-scout"
   images {
     image: "/assets/derived/arena/chassis-green-scout-1.png"
@@ -2703,6 +2983,13 @@ animations {
   id: "chassis-green-scout-turret-ne"
   images {
     image: "/assets/derived/arena/chassis-green-scout-turret-ne.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-assault-wreck"
+  images {
+    image: "/assets/derived/arena/chassis-green-assault-wreck.png"
   }
   playback: PLAYBACK_NONE
 }
@@ -2925,6 +3212,13 @@ animations {
   playback: PLAYBACK_NONE
 }
 animations {
+  id: "chassis-green-bulwark-wreck"
+  images {
+    image: "/assets/derived/arena/chassis-green-bulwark-wreck.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
   id: "chassis-green-bulwark"
   images {
     image: "/assets/derived/arena/chassis-green-bulwark-1.png"
@@ -3139,6 +3433,13 @@ animations {
   id: "chassis-green-bulwark-turret-ne"
   images {
     image: "/assets/derived/arena/chassis-green-bulwark-turret-ne.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-green-artillery-wreck"
+  images {
+    image: "/assets/derived/arena/chassis-green-artillery-wreck.png"
   }
   playback: PLAYBACK_NONE
 }
@@ -3361,6 +3662,13 @@ animations {
   playback: PLAYBACK_NONE
 }
 animations {
+  id: "chassis-sand-scout-wreck"
+  images {
+    image: "/assets/derived/arena/chassis-sand-scout-wreck.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
   id: "chassis-sand-scout"
   images {
     image: "/assets/derived/arena/chassis-sand-scout-1.png"
@@ -3575,6 +3883,13 @@ animations {
   id: "chassis-sand-scout-turret-ne"
   images {
     image: "/assets/derived/arena/chassis-sand-scout-turret-ne.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-assault-wreck"
+  images {
+    image: "/assets/derived/arena/chassis-sand-assault-wreck.png"
   }
   playback: PLAYBACK_NONE
 }
@@ -3797,6 +4112,13 @@ animations {
   playback: PLAYBACK_NONE
 }
 animations {
+  id: "chassis-sand-bulwark-wreck"
+  images {
+    image: "/assets/derived/arena/chassis-sand-bulwark-wreck.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
   id: "chassis-sand-bulwark"
   images {
     image: "/assets/derived/arena/chassis-sand-bulwark-1.png"
@@ -4011,6 +4333,13 @@ animations {
   id: "chassis-sand-bulwark-turret-ne"
   images {
     image: "/assets/derived/arena/chassis-sand-bulwark-turret-ne.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "chassis-sand-artillery-wreck"
+  images {
+    image: "/assets/derived/arena/chassis-sand-artillery-wreck.png"
   }
   playback: PLAYBACK_NONE
 }

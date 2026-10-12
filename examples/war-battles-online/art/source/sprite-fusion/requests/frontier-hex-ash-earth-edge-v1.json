@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_006016c0-6da7-445e-8916-9e1976327516",
+  "operation": "style-reference",
+  "prompt": "A single walkable transition hex for a three-quarter-view volcanic frontier battlefield. Dry ochre dirt is invaded by charcoal ash and fine black cinders across the broad level top, with one or two restrained ember fissures and layered dark rock-and-earth sides. Match the reference tiles' six-sided footprint, upper-left light, chunky pixel clusters, and muted military palette. The dark part has a dark perimeter, no pale silver fringe. No character, tank, building, lettering, or other tile.",
+  "size": 64,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-detail-v2/02.png",
+      "bytes": 9046,
+      "sha256": "95523f75f47cb0f13550c3fa344a3afb2bff76edb1439540d3f4b1f6354f9640"
+    },
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-detail-v2/07.png",
+      "bytes": 8774,
+      "sha256": "18a8d1996450fd79fc65bef10df984a27b344a0b0efdd4c6ed73276a9a2421c9"
+    },
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-dark-ash-v3/00.png",
+      "bytes": 7820,
+      "sha256": "11b046ecea5217ce882829feaec4d1cbe4aadafb01e70f122eb1d6f6ad8ef13a"
+    },
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-dark-ash-v3/05.png",
+      "bytes": 6939,
+      "sha256": "55abd81fea86fa9c992b4b18229bd6af13abce62b995102c85c1b6212df11323"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/frontier-hex-ash-earth-edge-v1.json",
+    "sha256": "079d75342bee61ff6b18cfa9c2af4e233fda0c16654c0984f6c6e851307974b1"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "9bef290e-fe16-44e2-ad6a-582a4f81afe7",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/9bef290e-fe16-44e2-ad6a-582a4f81afe7/image.png?v=1791417605571",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ash-earth-edge-v1/00.png",
+      "bytes": 5072,
+      "sha256": "a1719405edc2a823fb78f8e4e6f71d1c6395a18bd89b549400ba61f5f5446b23"
+    },
+    {
+      "index": 1,
+      "assetId": "3792c76e-db51-4066-ab9b-2686561d054f",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 163,
+      "height": 163,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/3792c76e-db51-4066-ab9b-2686561d054f/image.png?v=1791417606149",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ash-earth-edge-v1/01.png",
+      "bytes": 17215,
+      "sha256": "5a0c7522a678d6038cd0c8c579e9c985ee2a9bea478fa082e0d87b0f4524efd1"
+    },
+    {
+      "index": 2,
+      "assetId": "a1183795-6fca-4866-bc5f-b6ac2279a4ee",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/a1183795-6fca-4866-bc5f-b6ac2279a4ee/image.png?v=1791417606891",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ash-earth-edge-v1/02.png",
+      "bytes": 4457,
+      "sha256": "9545bbc495b425b6d1361142fc67f05f3d3a3ccd83b56b883364b082bc155a81"
+    },
+    {
+      "index": 3,
+      "assetId": "2dc52f6f-1d5e-4865-88ce-a202b17e7bc4",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 89,
+      "height": 89,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/2dc52f6f-1d5e-4865-88ce-a202b17e7bc4/image.png?v=1791417607411",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ash-earth-edge-v1/03.png",
+      "bytes": 9750,
+      "sha256": "cd38ec5a11d9e0a4a3588354e9fcbf240507b887b6c52810bf2ee54e5da207fa"
+    },
+    {
+      "index": 4,
+      "assetId": "2eecb769-42a2-4dea-8305-ab5ed31cf179",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 90,
+      "height": 90,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/2eecb769-42a2-4dea-8305-ab5ed31cf179/image.png?v=1791417608023",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ash-earth-edge-v1/04.png",
+      "bytes": 10199,
+      "sha256": "1c7be2f4b545713a2c7572bc2dca2bfcff9ad5d24907baf651cd8c2d81c9d4c4"
+    },
+    {
+      "index": 5,
+      "assetId": "16696913-b61e-4ffd-8654-ec4c2398c7fa",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 90,
+      "height": 90,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/16696913-b61e-4ffd-8654-ec4c2398c7fa/image.png?v=1791417608618",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ash-earth-edge-v1/05.png",
+      "bytes": 9795,
+      "sha256": "df1b4e25f68315b12494556d2ee885dc8103ebecee629b49690fd8b26285a9af"
+    },
+    {
+      "index": 6,
+      "assetId": "eda79924-c5d1-4ded-a38a-4e65826a103a",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 66,
+      "height": 66,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/eda79924-c5d1-4ded-a38a-4e65826a103a/image.png?v=1791417609232",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ash-earth-edge-v1/06.png",
+      "bytes": 9527,
+      "sha256": "0ad0a691ae025864906fcf3bef6115e3323f97c6b30be97e2d535d4ca7b192c8"
+    },
+    {
+      "index": 7,
+      "assetId": "819bdad8-62ed-43fd-8cd9-3ba613ffe816",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 83,
+      "height": 83,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/819bdad8-62ed-43fd-8cd9-3ba613ffe816/image.png?v=1791417610015",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ash-earth-edge-v1/07.png",
+      "bytes": 9314,
+      "sha256": "c5f8d82add10b158476cf89d235405aa8ed9316f9a7f506abb5c2920c003fde1"
+    },
+    {
+      "index": 8,
+      "assetId": "a5304a41-b899-468f-b6cd-85f8d79ef0e7",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 68,
+      "height": 68,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/a5304a41-b899-468f-b6cd-85f8d79ef0e7/image.png?v=1791417610727",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ash-earth-edge-v1/08.png",
+      "bytes": 9485,
+      "sha256": "8478a82f9df186d3cd687d413a8355736d33afe8f2648c3be21417c49a2eaf10"
+    }
+  ],
+  "credits": {
+    "remaining": 2700
+  }
+}

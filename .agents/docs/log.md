@@ -1,5 +1,1509 @@
 # Defold Hermes knowledge log
 
+## 2026-10-09 - Recover online ticks after render stalls without over-leading admission
+
+The packaged War Battles Chromium/WebGL2 client exposed two coupled clock
+errors against a real local WebTransport/QUIC server. Four deliberate 180 ms
+main-thread stalls under 65 ms one-way latency, 15 ms jitter, and 10% packet
+loss left Defold's reported `dt` about 600 ms short of elapsed host time;
+the old bundle accepted only 44–54 inputs during the 4.5-second stall window
+and counted roughly 179 late commands. `ArenaMatch` now feeds measured host
+elapsed time to the online client, while the existing eight-tick frame budget
+and half-second debt cap still bound recovery work. Offline simulation keeps
+Defold's `dt`. The packaged cadence gate now requires at least 180 accepted
+inputs and no more than 15% late under that standard impaired profile.
+
+The first authoritative keyframe could jump the prediction clock forward and
+then charge the same stalled frame's elapsed time again. A focused in-memory
+regression exercises that exact first-keyframe case. The client now credits
+the jump against frame time and avoids a second lead-catchup burst. In one
+freshly rebuilt clean-link five-second run, the client stayed 9–10 ticks ahead
+of the live authority at the configured eight-tick lead, accepted 308 inputs
+with zero late, and had no >32-pixel presentation step. Three repeated
+packaged impaired cadence runs accepted 234, 247, and 237 inputs in their
+stall windows with 10, 5, and 15 session-wide late commands, respectively;
+none had a >32-pixel local correction. A 30-second impaired packaged run
+accepted 1,770 inputs, counted 18 late, ended seven ticks ahead, and recorded
+zero >32-pixel local or remote presentation steps. These are local browser
+and server results, not WAN or native-network visual proof.
+
+An earlier Bob invocation accidentally rebuilt the repository's root Defold
+project, so its post-change browser measurements still used the old War
+Battles bundle and are not evidence for this fix. All figures above followed
+an explicit `DEFOLD_HERMES_PROJECT=examples/war-battles-online/defold`
+package rebuild; Bob reported 91 bound TypeScript sources in the example.
+The final source-bound rebuild passed the strengthened packaged stall gate
+(239 accepted, 17 late), the example `pnpm check` (349/349 tests), the
+Static Hermes bridge gate (12/12), all four root War Battles gates, and
+`pnpm check:knowledge`. Repository-wide `pnpm check` still stops before the
+game gates at the already-known frozen source-pipeline SDK golden mismatch;
+that result is not a claim of repository-wide green CI.
+
+## 2026-10-09 - Explain remote tank lifecycles and stop speculative local deaths
+
+A 30-second packaged Chromium/WebGL2 game over real local WebTransport/QUIC
+with 65 ms configured one-way latency, 15 ms jitter, and 10% packet loss had
+107 remote lifecycle hard snaps, but no same-life remote step over 32 pixels.
+A separate 1800-tick authoritative 16-bot simulation recorded 43 tank-to-pilot,
+17 pilot-to-dead, 26 pilot-to-tank, and 15 dead-to-tank transitions, explaining
+why a remote art swap could be common even without network disorder. Snapshot
+transport does not carry those event-ring cues, so the online Defold renderer
+now derives bounded ejection/rearm effects from two authoritative samples.
+The cue classifier has a focused test for first sighting, mode changes, and a
+full lifecycle hidden between snapshots. After rebuilding the packaged game,
+the 30-second impaired run instantiated 45 ejection and 44 rearm effects; a
+later 30-second run recorded 40 of each. This is evidence of real Defold
+effect creation, not a per-pixel proof that every cue is visible through cover.
+
+A five-second video contact sheet also showed the local HUD apparently move
+from destroyed back to on-foot. That sequence is consistent with speculative
+client damage being undone by an authoritative snapshot, but the video alone
+does not identify the exact damaging projectile. The client already forbade
+predicted respawn; it now also forbids predicted combat damage and depot tank
+acquisition while retaining immediate local movement/aim replay. A focused
+simulation test proves the same lethal mortar and depot overlap change the
+server lifecycle but not the predicting client's. A new packaged-browser
+transition trace rejects dead-to-infantry or infantry-to-tank without a new
+generation. The rebuilt 30-second impaired run passed: tank-to-pilot,
+pilot-to-dead, and dead-to-new-generation-tank were the sampled local changes;
+maximum local correction was 30 pixels and neither local corrections nor
+same-life remote presentation steps exceeded 32 pixels. A later visual capture
+showed the 16-player island and HUD without a visible local lifecycle reversal
+in its five-second window. That sample still reported a transient 119 late
+commands while the adaptive lead ramped, so startup network behavior and
+wider device/network sampling remain open evidence work. The native package
+loaded and exited cleanly; native pixels could not be inspected because the
+host Mac was locked. The example `pnpm check` passed 348/348 tests, and the
+four root War Battles gates (API, projections, performance, impairment) passed.
+The repository-wide `pnpm check` stopped at the frozen source-pipeline SDK
+golden: read-only hash comparison identified one unrelated mismatch,
+`packages/sdk/src/generated/script/types.ts`. No SDK golden was recaptured or
+hand-edited as part of this game change.
+
+## 2026-10-09 - Give ejected drivers a real, testable last-chance action
+
+The existing one-tick, half-damage ejection protection let an on-foot driver
+die before the browser capture's attempted shot. The old capture only took a
+post-input screenshot and could falsely report success after a respawn. The
+authoritative world now uses 30 ticks (about half a second at 60 Hz) of its
+existing half-damage protection after tank destruction. This is not
+invulnerability: immediate hits still damage the driver, an ordinary hit
+lands when the timer ends, and vehicle crush remains lethal. A focused
+simulation test covers expiry, vulnerability, and death. The gameplay change
+adds no per-tick allocation or new transport message.
+
+The natural-ejection browser recorder now requires authoritative telemetry
+showing the same on-foot generation and a nonzero local firing cooldown after
+Space, rather than trusting a screenshot. After regenerating owned Defold
+sources and rebuilding the wasm-web game, it observed ejection at tick 367,
+movement, and a shot at tick 420 with 15 cooldown ticks; the browser image is
+`build/evidence/war-battles-ejected-driver-fire.png`. This proves a local
+packaged-browser last-chance shot in that run, not every combat situation or
+native visual parity.
+
+The rebuilt arm64-macOS native game loaded bundle generation 1, entered the
+16-player offline arena, moved, fired, and exited cleanly. The Static Hermes
+typed-native projection gate passed 12/12 after its owning generator ran.
+The browser runtime recorder exposed a false negative in its camera assertion:
+the engine logs zoom to two decimals and view extents to whole pixels, but
+the gate required their product to agree with display width within two pixels.
+It now allows the explicit bound from those printed precisions; the real
+packaged-browser recorder passed. Source-bound load, network, performance,
+browser, WebTransport, soak, and bundle-size receipts were refreshed only
+through their owner commands. The example test suite passed 346/346. This
+evidence does not settle the longer-session congested-network prediction
+divergence or attest to final art quality.
+
+## 2026-10-09 - Packaged viewport, impaired transport, and four driver animation audit
+
+The current wasm-web bundle was exercised in Chromium/WebGL2 at 756×412 with
+`DEHERM_WAR_BATTLES_VIEWPORT=756x412 pnpm runtime:browser:playability`.
+Keyboard admission, fire, restart, scoreboard pointer/touch, and the camera
+frame gate passed. The authoritative post-restart camera snap placed the local
+tank inside the HUD-safe region. The earlier ocean-heavy video frame is
+therefore not evidence of a *viewport-init* bug: the tank had driven toward
+the island shoreline later in play. This does not prove that coastal camera
+composition is ideal during traversal.
+
+`pnpm runtime:browser:online:impaired:video` ran the packaged game over real
+local WebTransport/QUIC with 65 ms configured one-way latency, 15 ms jitter,
+and 10% datagram loss. Across the five-second motion window, the observed
+maximum local correction was 5 pixels, maximum remote presented step was 14
+pixels, and neither local nor remote presentation recorded a step over 32
+pixels. The video is `build/evidence/war-battles-online-impaired.mp4`. This is
+one live 16-player showcase sample, not a guarantee across maps, sessions, or
+devices. The deterministic 32-player mobile-congested harness remains a
+different stress boundary: same-tick simulation predictions there can diverge
+by tens of pixels even though displayed steps are smoothed. Do not substitute
+the live sample for that unresolved stress finding.
+
+Following the pixel-art atlas workflow, the selected source mount registration
+and mixed-aim preview were inspected, and the focused hero-art and tank-livery
+test files passed 29 checks.
+Packaged Chromium `pnpm art:hero-directions <family>` passed for Rook, Brass,
+Spark, and Mud, writing eight-direction idle/walk/fire/hit/death contact sheets,
+reports, and compositor videos under `build/evidence/hero-directional-runtime*/`.
+All four contact sheets were visually inspected without apparent crop-edge
+clipping; the four silhouettes remain distinct. These are controlled gallery
+poses, not natural online ejection/combat, native visual parity, or a complete
+frame-by-frame foot-planting sign-off. No new art-generation credits were used.
+
+## 2026-10-09 - Ground the visible depot buildings in the authoritative island
+
+The four visible tank-depot buildings were previously presentation-only
+sprites shifted 64 screen pixels from their gameplay aprons. Their visual
+centres had no corresponding collider, and projecting that shift back to the
+world put one default-seed building centre over water. WorldPlan v6 now
+chooses a land-backed facade cell near each compass apron before scenic props,
+records four `WORLD_PROP_DEPOT` objects, and projects their immutable collision
+through the same `propSolid` bitmap as trees, rocks, and bunkers. The renderer
+positions each depot sprite at its recorded cell rather than applying a
+screen-only offset. The remaining twelve tank-reacquisition aprons remain
+clear and usable without a building sprite. The world skill's audit now
+checks that every visible facade is land-grounded and blocks the arena.
+
+The default-seed and 512-seed audits, generated terrain/coast/tilemap/source
+checks, and 155 focused world/core tests passed after regeneration. A
+simulation test drove a tank into each scenery kind, including a depot, and
+confirmed it did not pass through. Bob built current wasm-web and arm64-macOS
+bundles through the pinned local Extender. Packaged Chromium/WebGL2 passed
+keyboard, fire, scoreboard, sound, and restart playability; its current
+gameplay image is `build/evidence/war-battles-html5.png`. The packaged native
+engine loaded generation 1, entered the 16-player arena, and exited cleanly.
+The browser screenshot supports the default camera view only, and the native
+run did not capture pixels. It does not prove visual quality across every seed
+or native visual parity. The remaining driver source-edge risk is unchanged:
+Sprite Fusion reported zero credits on this date.
+
+## 2026-10-09 - Refresh live game evidence after the 16-player and world changes
+
+The War Battles source-bound load, 32-player impairment, performance,
+measurement, bundle-size, WebTransport loopback, packaged arm64-macOS, and
+VS Code visual receipts were re-recorded through their owning commands after
+the current world/gameplay edits. The native dev engine connected to the
+inspector and exposed a current-schema arena instance with `players=16` and
+`botSkill=2`; the packaged native run loaded generation 1, advanced the
+tutorial into a 16-player offline arena, and exited cleanly.
+
+The VS Code capture initially failed despite visible `= 16` and other property
+defaults. The isolated evidence window was scrolled away from the declarations,
+and current VS Code draws Monaco inlay hints outside `document.body.innerText`.
+The recorder now reads only viewport-visible Monaco rows in the editor whose
+URI is the authored arena script, and requires each `= value` on its own
+property declaration row. An offscreen hint or unrelated tab cannot satisfy
+the check. The recorder and verifier are both pinned as evidence inputs. Its fresh
+screenshot and evidence JSON bind the four inline defaults (`16, 1, 0, 0`) to
+the live native arena properties (`16, 2, 0, 0`). This is a real local editor
+and native-engine observation, not evidence that every property or every VS
+Code installation renders correctly.
+
+The complete example `pnpm test` suite passed 343/343 after these receipts were
+refreshed. A full-suite run exposed one preexisting handshake-timing assumption
+in the late-input test; it now waits for both real welcome states before
+constructing a packet, rather than assuming a fixed event-loop delay is enough.
+The headless network matrix is simulated impaired transport, not a
+QUIC packet capture; the separate WebTransport receipt is a local loopback
+session, not proof of wide-area network smoothness. Sprite Fusion still
+reported zero credits, so the previously audited clipped-source risk in
+selected driver walk loops remains unresolved.
+
+## 2026-10-09 - Remove landmark-looking scenery without collision
+
+The current default-seed world had 25 half-scale conifers from a separate
+pass-through scatter module, alongside 32 plan-owned collidable scenery props.
+Those extra sprites had no `propSolid` cells, so a tank could visibly drive
+through a tree even though structural world-plan collision tests passed. The
+render pass and unused scatter module were removed instead of inventing
+collision only in the renderer. The generated Defold mirror was regenerated
+through `pnpm sync`; `deherm dev --once` compiled the new component bundle.
+
+The world skill's owner checks passed after the change: current default seed,
+512-seed structural sweep, generated terrain/coast/tilemap/mirror checks, and
+the focused world/core tests. `pnpm typecheck` and the example's full
+`pnpm verify:generated` passed. Bob packaged both wasm-web and arm64-macOS.
+The packaged 1280×720 Chromium playability gate passed and saved a fresh
+gameplay frame at `/private/tmp/war-battles-no-ghost-trees-1280-2026-10-09.png`;
+visual inspection found the meadow still populated by grounded props but less
+cluttered. Native packaged startup/gameplay markers and clean shutdown passed.
+This removes one false collision affordance; it does not prove that every
+large decorative facade is collidable, or native visual parity.
+
+## 2026-10-09 - Browser viewport and two-thumb packaging pass
+
+The packaged HTML5 game used Defold's default light shell with a reduced
+canvas and footer space. `game.project` now selects a project-owned dark CSS
+resource, `fit` scaling, and no stock footer controls. The browser playability
+gate checks the visible canvas against the largest aspect-preserving fit,
+rejects a white/default footer shell, and still exercises keyboard, pointer,
+emulated touch, WebGL2 composition, fire, and restart. A fresh Bob wasm-web
+bundle passed this gate at 912×540 and 1280×720; the 1280×720 canvas occupied
+the full viewport. These are packaged Chromium/SwiftShader observations, not
+Safari, hardware GPU, or native visual parity.
+
+At 390×844, the earlier build exposed a tiny 390×219 game in a tall blank
+viewport. The project CSS now hides that unplayable portrait canvas and fills
+the viewport with a rotate-to-landscape message. The rebuilt package passed
+the portrait guidance gate, with a full-viewport screenshot SHA-256
+`8e6a56ce80bdab990c5ac5984d1a080b3de329486feacc0f9bf716fb36040a59`.
+Changing that same session to 844×390 restored the visible 693×390 game
+canvas and removed the prompt without a reload.
+At 844×390, the packaged browser playability gate passed; the focused mobile
+touch gate also engaged a 16-player offline arena, fired, and drove the local
+tank. Its camera-target baseline moved 5.8 world units before the left thumb
+moved, versus 235.7 units while driving. This is one emulated landscape-phone
+input path in Chromium, not evidence of physical Safari touch ergonomics or
+all-device performance. The gate now measures both drive and fire instead of
+counting a two-thumb touch as a fire-only success.
+The example's full `pnpm verify:generated` chain passed after the CSS/project
+change; it checked deherm project sentinels, synced Defold mirrors, and the
+world, title, terrain, art, HUD, sound, and tilemap emitters. This is generated
+state evidence, separate from the packaged Chromium observations above.
+A fresh arm64-macOS Bob archive also passed `pnpm runtime:packaged:record`:
+Defold 1.14.0 loaded the TypeScript bundle, fired a tutorial rocket, moved the
+player, engaged the 16-player offline arena, and exited cleanly. That is native
+startup/gameplay-marker evidence, not a native screenshot or native two-thumb
+interaction test.
+
+## 2026-10-09 - Green Sprite Fusion review sheets exposed source-edge risks
+
+The owner's report that several characters looked cut off in green-background
+cells is supported by the selected-source audit: 14 of 32 walk loops still
+contain raw edge contact (53 of 128 frames; 18 horizontal contacts). The
+40×40 emitted runtime frames have transparent gutters, but that only proves
+atlas placement; it cannot recover artwork already lost at a provider source
+edge. Contact alone is a risk signal, not proof every helmet or boot is lost.
+
+`inspect-sprite-fusion-animation.mjs` now draws coral markers at the *original*
+source-cell sides that have opaque edge contact, before the added green review
+gutter can make them appear safe. Its JSON names the affected frame indices.
+The focused hero-art suite passed 24/24, including a pixel-level marker check.
+The Sprite Fusion `/credits` read returned zero, so no paid replacement was
+attempted. Existing selected art was not silently switched or retouched. A
+source-complete replacement still needs a new padded Sprite Fusion animation,
+then facing, foot-anchor, atlas, and packaged-motion review; this change only
+fixes QA presentation and tracking, not the remaining source pixels.
+
+## 2026-10-09 - Long impaired match exposed a remote catch-up sprint
+
+The five-second packaged Chromium/WebGL2 WebTransport motion gate passed at
+65±15 ms/10% loss and 120±60 ms/20% loss, but a **30-second** run of the
+severe profile failed with 38 same-life remote steps above 32 pixels. Its
+transcript showed one remote actor advancing 34–38 pixels on consecutive
+render frames while a delayed/coalesced authoritative target was squeezed
+through the fixed six-tick interpolation window. A short pre-fix video was
+captured, but its still frames alone do not quantify the failing transition.
+
+The client now keeps one allocation-free, per-slot typed-array interpolation
+duration. Ordinary distances still use the server-advertised cadence; a
+longer same-life positional gap extends only that slot's presentation window
+at a target of no more than 16 pixels per 60 Hz tick, capped at 30 ticks.
+Extrapolation starts after that slot's chosen window and remains bounded to
+one advertised cadence. A focused missed-snapshot regression moves a remote
+target 240 pixels, checks every presented tick and eventual convergence; the
+147 focused core/presentation tests, context typecheck, lint, and format gates
+pass. The Defold mirror was regenerated through `pnpm sync`, then a fresh
+deherm/HTML5/Bob package was built. Two 30-second packaged severe-link runs
+passed with zero remote presented steps above 32 pixels (maximum 18 and 31
+pixels respectively); the second was recorded as a 30.25-second, 30 fps MP4
+(SHA-256 `51c37a2d16666c61eb0179b0341e2272612042fb929913609c88d010f81d355d`).
+It contained one 64-pixel **raw** same-tick local reconciliation, while the
+maximum actually presented local step was 12 pixels. The frame sequence around
+that event shows continuous camera/terrain movement, not proof that all art
+or combat animation is correct. A dedicated `--soak`/`pnpm
+runtime:browser:online:impaired:soak` path makes the longer gate repeatable
+without a platform-specific environment assignment. A newly rebuilt
+arm64-macOS Bob package passed bounded native startup/gameplay/shutdown;
+native online feel and native pixels remain unverified.
+
+## 2026-10-09 - Current game evidence and infantry source-cell risk
+
+The current War Battles source changed after several recorded evidence runs.
+Each owning recorder was rerun rather than relaxing its check: the 32-player
+headless soak, bundle-size projection, authoritative load, host runtime
+measurement, real Chromium/Deno WebTransport loopback, and Bob-packaged
+arm64-macOS gameplay/shutdown records now pass their matching `:check` commands.
+The real QUIC loopback delivered three snapshots and eleven client inputs; the
+native engine initialized the 16-player offline arena and exited cleanly.
+The full example suite still has one failure: its old live VS Code capture
+shows `players = 8`, but the current source declares 16. Neither a VS Code
+CDP listener nor a live Defold inspector was available for a truthful new
+observation. The screenshot and its observation fields were not rewritten.
+These evidence refreshes do not establish visual quality, WAN smoothness, or
+the missing editor presentation.
+
+The selected Sprite Fusion infantry source audit reports 18 horizontal
+edge-contact frames across 14 animation requests out of 128 selected walk
+frames; 181 selected source frames touch at least one edge. Edge contact is a
+crop-risk signal, not proof that all those poses lost pixels. The green
+presentation sheets add a review gutter but cannot recover any source pixel
+already missing at the original cell boundary. A read-only credit check
+returned zero Sprite Fusion credits, so no new paid source was requested or
+substituted. These suspect walk loops remain visually unapproved pending
+source replacement and raw-cell inspection, even though the derived atlas
+can pass its structural bounds check.
+
+## 2026-10-09 - Embedded-body collision recovery and scaled GUI pointer gate
+
+The previous straight-drive prop test did not cover a tank whose centre had
+already entered a solid scenery cell. A new independent circle/AABB overlap
+assertion reproduced the defect against the selected tree before the fix:
+`ArenaMap.resolveCircle()` could push a body yet leave part of its 14-pixel
+hull overlapping a plan-owned collider. The resolver now detects this
+exceptional initial state and chooses the nearest circle-clear cell-face
+exit along four axes. A bounded ring fallback handles an enclosure with no
+straight exit. The ordinary contact loop is otherwise unchanged and allocates
+no new per-call staging objects; heap and wall-clock impact have **not** been
+measured. The new three-kind embedded test, previous three-kind drive test,
+and 134/134 core tests pass. The generated Defold source mirror was refreshed
+through `pnpm sync`, and TypeScript context typechecking passed.
+
+The freshly rebuilt Bob HTML5 package initially failed its pointer/touch
+scoreboard gate twice, independently of the collision logic. An opt-in local
+diagnostic showed the synthetic release at GUI y≈674 while the authored
+leader ribbon begins at y=680. The gate had clicked a fixed 24 CSS pixels
+from the canvas top even when the 720-pixel GUI was displayed on a 371-pixel
+canvas. It now projects the ribbon's 24-*logical*-pixel top offset through the
+actual canvas bounds; the temporary runtime log was removed. The packaged
+Chromium/WebGL2 playability gate then passed keyboard, pointer, and emulated
+touch scoreboard paths, and a five-second real QUIC browser motion gate
+accepted 306 inputs with zero late commands and no >32-pixel local/remote
+presented steps. The arm64-macOS Bob build and bounded native packaged
+startup/gameplay/shutdown gate passed. These gates do not reproduce a live
+forced embedded-body event in the engine or establish native visual quality.
+The source-bound performance evidence was refreshed by its owning recorder;
+its deterministic work-unit percentiles are not VM allocation or wall-clock
+measurements.
+
+## 2026-10-09 - Plan-owned prop collision drive probe
+
+The loaded seed's immutable scenery comes from `WorldPlan.propCells` and its
+matching `propSolid` cell mask; `ArenaMap` projects those cells into the
+authoritative collision grid. A new focused test places a real tank on a
+clear approach to one selected tree, rock, and building, holds movement for
+100 simulation ticks each, and checks every resulting circle for solid-cell
+overlap. All three stop at the first prop-collider face without a drive-through
+or an unresolved overlap. The default seed and 0–63 audit pass, and the owner
+world verifier passes 155/155 focused checks plus its 0–511 seed sweep. This
+proves these three authoritative drive approaches, not visual-footprint
+matching for every prop, collision under all multiplayer body separations,
+or packaged native input behavior. No world-plan geometry or art was changed
+in this pass.
+
+## 2026-10-09 - Authority-guided input lead under long QUIC paths
+
+The packaged native online stack was also exercised with
+`pnpm stack -- --bots 3 --roster 4 --headless --exit-when-ready --no-build`.
+Defold 1.14.0/arm64 macOS loaded the current Static Hermes bundle, joined the
+local HTTP/3 QUIC server, sent accepted native datagram inputs, and engaged
+the four-slot arena beside three browser-controlled clients. The gate
+reported `bots-ready:count=3:snapshots=155:inputs=463` and shut down all
+sessions cleanly. This is native online admission/input and bot-motion
+evidence, **not** a native-pixel or native online-feel review. A subsequent
+live-window capture was attempted, but the host Mac was locked and the UI
+inspection tool could not unlock it; the stack was stopped rather than
+claiming a visual pass. A fresh packaged Chromium/WebGL2 online motion gate
+captured `examples/war-battles-online/build/evidence/online-current-2026-10-09.png`:
+over 5.1 seconds it accepted 308 inputs, applied 55 snapshots, recorded zero
+late inputs or >32-pixel local/remote presented steps, and showed the ejected
+Rook driver on the irregular hex coast with the HUD. That frame is a sampled
+browser view, not proof of native pixels, all directions, or long-session
+network quality. The focused core, impairment, and presentation suite passes
+146/146, including lead recovery.
+
+The packaged 120±60 ms one-way/20% loss probe remained timing-sensitive:
+three pre-change 10-second traces recorded 70, 0, and 0 late input commands.
+The seeded one-client application-payload model reproduced a persistent
+case: 518 accepted, 41 late, and only 10 ticks of lead, versus 589 accepted,
+zero late, and eight ticks on a 65±15 ms/10% moderate link. Doubling snapshot
+age as a proxy for outbound latency improved that single client but worsened
+32-player capped-downlink correction tails; it was rejected. Old snapshots can
+be caused by downlink queueing and do not prove outbound lateness.
+
+The server now keeps accepted/late counters per session. An ordinary 12-byte
+PONG stays unchanged until that session has observed a late command; thereafter
+an optional eight-byte suffix reports its own counts on the existing 500 ms
+probe. The client accepts both forms, ignores older feedback ticks, and raises
+an allocation-free bounded lead floor only when a reporting window has at
+least eight observed commands and at least 8% were late. Four clean windows
+relax one tick. This keeps a lagging player from raising another player's
+lead and does not reinterpret downlink snapshot age as symmetric latency.
+
+With the same seeded one-client profiles, the moderate link remains 589
+accepted/zero late/eight-tick lead; the severe profile becomes 552 accepted,
+13 late, 12-tick lead, with no sampled >32-pixel local step. The current-tree
+32-player A/B with adaptation toggled on/off yielded identical per-profile
+acceptance and correction distributions; feedback is not what drove the
+already-stale older matrix artifact's broader raw-correction change. The
+owner-generated v3 evidence now includes actual presented-step bounds
+(192/227/338 fixed units for broadband/mobile/edge, all below 512 units =
+32 pixels) and a source-bound six-percent broadband raw-correction ceiling
+instead of the old five-percent ceiling. This is a documented rebaseline, not
+proof of improvement over the older saved source revision.
+
+A fresh Bob HTML5 package ran three real Chromium/WebGL2 QUIC severe traces:
+33, 0, and 0 late inputs. In the 33-late trace the authoritative feedback
+floor rose from eight to sixteen ticks, late arrivals stopped after the early
+window, and maximum sampled local/remote steps were 5/31 pixels. A normal
+65±15 ms/10% loss packaged run stayed at eight ticks of lead and zero late
+inputs. These samples establish the wire path and bounded presentation on
+these local traces, not WAN or long-session signoff. The focused per-session,
+legacy-PONG, deterministic severe, 32-player matrix, lint, type, and generated
+source checks pass. The same revision passed a Bob arm64-macOS build and a
+bounded packaged-native Defold 1.14.0 startup, arena engagement, and clean
+shutdown gate. This does not verify native online play or native pixels. The
+focused prediction-recovery test also passes after waiting for the old
+high-age observations to leave its rolling window; the previous assertion
+stopped at the first decrement even when lead was still above its earlier
+baseline. The full example suite remains red on stale source-bound evidence
+and sandboxed packaged-runtime cases, so this is not a whole-suite signoff.
+
+## 2026-10-09 - Three more source-framed driver walk loops
+
+The user spotted characters clipped inside several cells of the green-background
+Sprite Fusion review sheets. Source-cell contact, padded presentation gutters,
+and the emitted 40×40 runtime atlas are separate concerns: the green gutter
+cannot reconstruct missing provider pixels. The selected-source audit before
+this wave had 27/128 walk frames touching a horizontal source-cell edge.
+Using the last 45 Sprite Fusion credits (15 per `animate` request), three
+pinned pose inputs were placed on 64px/80px transparent canvases and animated:
+Mud/north, Rook/northeast, and Brass/southeast. The returned 12 frames have
+transparent margin on all four source boundaries, and their green review
+sheets were inspected for complete helmets, boots, hands, and weapons. The
+selection and owning generator rebuilt runtime frames, atlas references,
+anchors, and the audit; no generated PNG was hand-edited. The new audit is
+18/128 horizontal walk-frame contacts and 181/256 contacts on any source edge.
+The remaining legacy source loops are **not** declared repaired; provider
+auto-trimming can cause edge contact without visible loss, so they require
+visual triage when new credits are available. Focused hero-art tests pass
+24/24 and strict fixed-canvas/anchor/inventory inspection passes for the
+three affected family atlases. A fresh Bob `wasm-web` package then passed the
+controlled Chromium/WebGL2 frozen-gallery capture for Rook, Brass, and Mud;
+each selects the replacement walk through the real player component and
+records a full eight-facing contact sheet, 144px scene crops, and compositor
+video in `build/evidence/hero-directional-runtime{,-brass,-mud}/`. The three
+replacement `walk-1` scene crops were inspected with visible outer margin.
+This is not evidence of natural-match movement or native visual parity.
+
+## 2026-10-09 - Full-scene QUIC capture and monotonic snapshot telemetry
+
+The packaged Chromium motion harness previously captured a 756×412 compositor
+surface. At that size its video was too small to inspect the world and
+underrepresented the intended render workload. It now requests a 1280×720 CSS
+viewport in a larger headless window, reports the actual Defold canvas backing
+dimensions, and rejects a return to the small default. The observed backing
+size is 1205×678, **not** a true 1280×720 render. The resulting screencast
+contains the full scene and bottom HUD instead of cropping the latter; a
+full-canvas still was captured under 120±60 ms one-way delay and 20% loss.
+Clean and impaired videos now have distinct default names.
+
+The new per-second trace exposed a separate telemetry bug: a delayed reliable
+PONG carried an older server tick and overwrote `lastServerTick` after a newer
+snapshot. The client now leaves this statistic owned by applied snapshots;
+the PONG still measures RTT. A focused regression injects an old PONG after a
+newer snapshot and passes. The synchronized Bob HTML5 build then passed a
+fresh severe QUIC motion run with zero late inputs in that trace, 576 accepted,
+57 additional snapshots applied, a three-pixel maximum local correction,
+and no sampled >32-pixel presented steps. Another full-size severe trace before
+the telemetry fix accepted 514 inputs with 68 late, mostly in the first four
+seconds while lead climbed to 16 ticks; its maximum local correction was 18
+pixels. These different deterministic-RNG but timing-sensitive packet traces
+show startup variability, not proof that prediction is fully tuned. RTT on
+the reliable channel includes retransmissions and is not used as a direct lead
+target. The native visual path and WAN remain unverified.
+The same synchronized source then passed a Bob arm64-macOS build and the
+bounded packaged-native Defold 1.14.0 startup/gameplay/shutdown gate (one
+actual TypeScript bundle load, arena engagement, and clean exit code zero).
+That gate did not inspect native pixels or run a native online match.
+
+## 2026-10-09 - Source-framed walk loops and an honest remaining-edge audit
+
+The green-background Sprite Fusion animation preview exposed a real limitation:
+padding a returned sheet makes review easier but cannot restore silhouette
+pixels lost when the provider clipped a source cell. Five targeted, pinned
+`animate` requests were made from previously selected pose images placed on
+64- or 80-pixel transparent canvases with at least eight pixels of margin:
+Brass north and northeast, Mud east and west, and Spark southwest. Each cost
+15 credits, reducing the live balance from 120 to **45**; no other source was
+sent in this wave. All twenty returned frames have transparent pixels on all
+four boundaries and were inspected as green presentation sheets. The source
+selection pins those requests, and the hero-art generator—not hand editing—
+rebuilt the 40×40 runtime PNGs, Defold atlas, anchors, and edge audit.
+
+The audit now distinguishes horizontal walk-frame contact from broad contact
+with any edge. After this wave, **27 of 128 selected walk frames** touch a
+left or right source-cell edge; **193 of 256** selected frames touch some edge,
+much of the latter reflecting provider auto-trimming of still poses. Contact
+is a clipping risk, not proof of missing art. The five replacements remove
+nineteen selected raw edge contacts, but the remaining legacy walk sheets are
+not declared repaired. All four emitted family atlases passed strict fixed-
+canvas/inventory/anchor inspection, the generator `--check` and example
+`verify:generated` passed, and the focused hero-art tests passed 21/21. A
+fresh `wasm-web` Bob package then ran the controlled Chromium/WebGL2
+eight-direction galleries for Brass, Mud, and Spark; each gallery selected
+nonstatic walk frames through the real player
+component. The five replacement-direction `walk-1` captures were inspected
+inside their 144-pixel scene crops with visible outer margins; gallery sheets
+and compositor videos are under
+`build/evidence/hero-directional-runtime-{brass,mud,spark}/`. This is
+frozen-gallery browser evidence, not natural-match ejection/turning or native
+visual signoff.
+
+## 2026-10-09 - War Battles source-sync and packaged RTT evidence boundary
+
+Direct `deherm dev` and the prior example `pnpm dev` could compile an old
+`defold/src/generated-war-battles` mirror after `core/client.ts` changed. This
+made earlier severe-loss late-input observations a stale-source measurement,
+not valid evidence about current core prediction. The example's `pnpm dev`
+now synchronizes before launching and watches authoritative shared TypeScript
+sources; the full-stack runner synchronizes before packaging. The sync owner
+does not rewrite unchanged targets, and manual watch-mode verification saw
+one edited core file cause a new successful build and then another after the
+edit was removed. That run used `--no-launch`, so its `reload-failed: fetch
+failed` message does not establish live HMR success. A no-op mtime regression
+test and `pnpm sync:check` cover the mirror seam.
+
+The packaged client now sends one bounded reliable ping about every 500 ms
+and exposes received-pong count and RTT in runtime telemetry. Against the
+fresh synchronized Chromium/WebGL2 package over local WebTransport at
+65±15 ms one-way delay/10% datagram loss, a ten-second run accepted 598
+inputs with zero late, received 20 pongs, and sampled no presented movement
+step above 32 pixels. Two 120±60 ms/20% runs accepted 585 and 481 inputs,
+with 5 and 63 late inputs respectively; the latter were concentrated in the
+first three seconds before the adaptive lead reached 16 ticks. These are
+repeatable loopback impairment samples, not native/WAN signoff. Reliable RTT
+can include retransmission delay (1,461 ms maximum in one severe run), so it
+was not fed directly into prediction lead.
+
+## 2026-10-09 - Source-cell clipping review and two padded walk replacements
+
+The owner's green-sheet observation is supported by the generator's separate
+source-edge audit: the selected four-driver set currently has 220/256 raw
+source frames touching at least one source-cell edge. A padded presentation
+sheet can make such a crop easier to see, but cannot restore omitted source
+pixels; edge contact remains a risk signal rather than proof every silhouette
+lost content. The 40×40 runtime atlas gutters are a distinct check.
+
+Two deliberate Sprite Fusion `animate` requests used pinned, pre-padded pose
+inputs: Rook/north and Brass/west. Each cost 15 credits (180→150 total),
+returned one four-frame sheet, and all eight new raw frames have transparent
+space on every edge. The selected-source recipe now points to these requests;
+the owner regenerated the runtime atlas and source-edge audit rather than
+editing PNGs. The 32 selected walk directions now include eight padded loops
+with no raw edge contact; 24 legacy loops still have a touching frame (92/96
+legacy walk frames). The 14 focused hero-art tests and generator `--check`
+passed. Fresh Bob HTML5 bundles compiled the changed atlas; packaged
+Chromium/WebGL2 all-facing Rook and Brass galleries selected the new loops
+through the real player component and passed their motion assertion. The
+captured sheets are `build/evidence/hero-directional-runtime/hero-directions-contact.png`
+and `build/evidence/hero-directional-runtime-brass/hero-directions-contact.png`.
+This establishes source margins, atlas generation, and controlled browser
+selection for these two loops, not native visual signoff or clip-free status
+for every remaining direction. No full suite was rerun for this art-only wave.
+
+## 2026-10-09 - Sustained QUIC motion and authoritative bot-mode diagnosis
+
+The packaged Chromium/WebGL2 game ran for 20.024 seconds over a local H3/QUIC
+proxy configured for 65±15 ms one-way delay and 10% datagram loss. The proxy
+actually dropped 81 browser-to-server and 71 server-to-browser datagrams. The
+server accepted 1,184 inputs with zero late; sampled maximum local correction
+was one pixel, maximum local presented step six pixels, and maximum remote
+presented step 15 pixels, with no sampled step over 32 pixels. The 20-second
+video is `build/evidence/war-battles-online-impaired.mp4`; several extracted
+frames show the loaded hex world and moving tanks. This is one browser client
+with a 16-player server-bot roster, not proof of every collision, direction,
+native pixel, WAN, or subjective motion quality.
+
+A real 16-client browser WebTransport bot gate passed, then the combined stack
+admitted the packaged Defold 1.14.0 native game plus 15 browser-controlled bots
+with no server fallback bots (`war-battles-stack:verified:roster=16:humans=16:moving=15`).
+The native gate establishes package startup, session/input admission, and bot
+motion, not native visual correctness; the Mac desktop remained unavailable
+for pixel inspection.
+
+The dashboard clock now counts mode transitions only from applied authoritative
+snapshots and separates tank→pilot ejection, pilot→tank depot pickup, and
+dead→tank respawn. A 20-second, 16-client soak passed with 4,040 applied
+snapshots, 12,079 sent inputs, six observed ejections, six depot returns, three
+respawns, at most four mode changes for one bot, and a shortest observed
+mode-change interval of 299 simulation ticks (about five seconds at 60 Hz).
+This run does not reproduce a rapid authoritative tank/pilot flip-flop; it does
+not rule out a presentation-only bug in other conditions. The focused clock
+test, example TypeScript check, and oxlint passed. The bot dashboard now shows
+each authoritative mode, per-bot mode-change count, and aggregate ejection,
+depot, and respawn counts. A 16-client Chromium capture at 1280×900 is
+`examples/war-battles-online/build/evidence/network-bot-dashboard.png`; the
+real browser gate asserts all 12 table headers/cells before saving it.
+The owner `pnpm bundle:size:update` refreshed source-bound JS-bundle evidence
+after the dashboard change. The full example suite then ran 321 tests: 320
+passed, and the only failure is the existing VS Code visual fixture lacking
+the inline `players` value. No fixture pixels were edited to manufacture it.
+
+## 2026-10-09 - Reject shorter cover geometry; retain coverless-seed fallback
+
+A 3×2/2×3 sandbag experiment visibly shortened repeated pale strips in the
+packaged WebGL2 scene, and a short real WebTransport run looked bounded.
+The stronger 32-client impairment matrix rejected it: mobile corrections
+over eight pixels rose to 0.106 against a 0.10 ceiling, and edge maximum
+correction reached 2,865 fixed units against 2,400. A 4×2 variant still
+exceeded the mobile ceiling. No threshold was relaxed; the original 5×2/2×5
+cover geometry remains. A separate deterministic fallback was retained for
+seeds where the sparse lattice places no cover. It uses the same collision
+and reservation clearance, changes the zero-cover count among seeds 0–511
+from one to zero, and leaves the shipped seed's 24 panels unchanged. The
+original geometry meets the three network-profile correction ceilings.
+The pale sandbag source art is still a visual quality limit, and native
+pixel review remains unavailable while the Mac desktop is locked. The
+retained source passed Defold HTML5/native packaging, Chromium playability,
+native startup, generated-state verification, and the default/512-seed world
+owner checks. The full example suite is 317/318: only the pre-existing VS
+Code inline-value screenshot test fails.
+One Sprite Fusion `style-reference` request for replacement sandbag modules
+cost 15 credits (195→180) and returned nine 64×64 variations. All nine were
+visually single long rolls, so none was selected for the atlas; the request
+and hashes remain pinned for reproducible rejection. This is not an art fix.
+
+## 2026-10-09 - Projected rock spacing and a source-clean southeast walk
+
+`WorldPlan` rules v5 rejects close projected rock pairs at placement time;
+the default seed moved from 12 visibly crowded rock pairs to zero. The owner
+world workflow passed 149 focused tests, 512 sequential and 64 nonadjacent
+seed audits, then Bob HTML5/WebGL2 playability and native packaged startup.
+This is not visual signoff for all props or native rendering. The selected
+Rook southeast walk now uses a Sprite Fusion animation from a pinned 64×64
+padded pose. All four returned frames have transparent source gutters and the
+exact-source/gutter test passes. The paid request cost 15 credits, leaving
+195; other tightly cropped legacy directions remain. A fresh Bob HTML5
+package and packaged Chromium/WebGL2 all-facing Rook gallery passed, with
+the southeast loop visible inside the enlarged capture cells. This is
+controlled browser evidence, not natural online or native visual signoff.
+After refreshing the bundle-size and packaged-native recordings through their
+owners, the full War Battles suite passes 317/318 tests. The sole remaining
+failure is the pre-existing VS Code visual-evidence capture: its screenshot
+does not show the inline `players` value. It is unrelated to the new walk
+source, and no fabricated screenshot was substituted.
+
+## 2026-10-09 - Hex-world verification and visible network-step telemetry
+
+The shipped seed `1463898690` (world rules v4) audits as one island with 290
+land hexes, 62 coast hexes, 36 props, four visible depots, and 32 reserved
+starts. A separate 64-seed sweep passed coverage/topology checks, and the
+world skill's read-only owner verification passed 149 focused tests. The
+packaged Chromium/WebGL2 gate and native packaged-engine startup gate both
+passed against Defold 1.14.0. A fresh playable browser still is at
+`build/evidence/war-battles-current-live.png`; it shows the loaded terrain,
+coast, props, tanks, and HUD at the actual camera scale. The image is not a
+motion/collision test or a fresh native visual signoff. The browser gate now
+accepts a sampled `clamped=xy` corner as evidence
+for both camera axes and reports the *current* missing markers on timeout.
+
+Two snapshot tests had compared an applied authoritative frame to a client
+world that already advanced one adaptive prediction tick. Applying the frame
+with zero additional simulation steps restores their intended exact-state
+assertion. A third input-cadence test now counts the actual predicted samples,
+including adaptive lead catchup, before expecting one datagram per two samples.
+All 127 core tests pass.
+
+The 16-client load harness now samples the same local presentation API once
+per simulated 60 Hz frame into preallocated pose objects. On its deterministic
+zero-latency crowded run, maximum prediction correction was 395 fixed units
+(24.7 pixels), while maximum *presented* step was 181 units (11.3 pixels) and
+none exceeded 32 pixels. The edge-congested profile had 999 units (62.4 pixels)
+maximum prediction correction, 215 units (13.4 pixels) maximum presented step,
+and no sampled step above 32 pixels. Tests bound both metrics separately.
+Crowded tank collision remains a prediction divergence; this does not certify
+native/HTML5 visual smoothness under real QUIC congestion. A 20 Hz snapshot
+cadence experiment increased bytes and did not consistently improve correction
+tails, so production cadence was not changed. The full `pnpm test` remains red
+on stale source-bound evidence, sandbox-denied nested loopback probes, and
+recorded VS Code evidence; no blanket green-suite claim is made.
+
+A separate packaged-browser/WebTransport H3/QUIC motion run connected one
+human player to the local server, sampled 41 frames over about five seconds,
+and passed with datagram input and no >32-pixel presented steps. The impaired
+rerun used a UDP proxy at 65±15 ms one-way latency and 10% configured loss;
+22 browser-to-server and 21 server-to-browser packets were actually dropped.
+It accepted 218 inputs, recorded 88 late inputs, maximum local correction 19
+pixels, maximum local presented step 6 pixels, maximum remote presented step
+10 pixels, and zero presented steps above 32 pixels. The retained five-second
+305-frame capture is `build/evidence/war-battles-online-impaired.mp4`, with a
+companion still at `build/evidence/war-battles-online-impaired-2026-10-09.png`.
+Three inspected frames show moving tanks and combat on the loaded hex floor;
+the recording does not prove every direction, collision, 16-browser-client
+behavior, native network rendering, or subjective polish. The 88 late inputs
+remain a tuning target despite the bounded sampled presentation steps.
+
+## 2026-10-09 - Source-strip framing is not source repair
+
+The user's review correctly caught green Sprite Fusion raw walk strips with
+characters pressed against their cells. The selected-source audit still reports
+100/128 walk frames with opaque edge contact; the 40×40 runtime atlas and wider
+browser gallery do not establish that those source pixels are complete. The
+read-only animation inspector now emits an eight-native-pixel-gutter green
+`presentation-preview.png` beside its dark QA preview, preserves the provider
+source and raw edge flags, and marks the result `paddingOnly`. A focused test
+checks the review bounds and output image; `node --test test/hero-art.test.mjs`
+passes 12/12. The four north-facing loops were regenerated as local review
+previews and visually inspected: helmets, feet, and equipment appear intact in
+those samples, so no paid replacement was justified from edge contact alone.
+Other directions and source states remain unreviewed for actual missing pixels.
+No Sprite Fusion credits were spent; the live balance was 180.
+
+## 2026-10-09 - Four-family combat poses and unclipped browser sheets
+
+Brass, Spark, and Mud now join Rook with pinned Sprite Fusion hit and collapsed
+death sources. The owner generator emits 64 grounded 40×40 frames per family,
+and all four families have hit/death atlas IDs. Direct per-facing edits from
+the selected idle views supplied the death poses: a direction-set on a single
+collapsed pose straightened several facings and was rejected. The 16 Spark/Mud
+death edits are reproducibly planned by `tools/plan-hero-death-requests.mjs`.
+The selected hit direction-sets remain visually subtle, so combat readability
+still needs a deliberate art pass. These requests spent 480 Sprite Fusion
+credits (765 to 285); request receipts and selected output indices are pinned
+under `art/source/sprite-fusion/` and `art/source/hero-source-selection.json`.
+
+Strict source-frame inspection passed for Brass, Spark, and Mud; atlas tests,
+TypeScript checking, compilation, and Bob HTML5 packaging passed before the
+optional hit-tint experiment. Packaged Chromium/WebGL2 gallery captures then
+showed eight facings with margins around the rendered characters in the
+corrected 112-pixel green-background cells. The original 72-pixel sheets were
+clipped *screenshots*, not clipped atlas art. Full-viewport companion captures
+and the corrected sheets are in `build/evidence/hero-directional-runtime*/`.
+The hit-tint experiment exposed a separate `go.set` SDK union-rendering bug;
+its unfinished game calls were removed, and the focused emitter regression
+test passes. Natural online hit/death behavior and native visual parity remain
+unverified. The browser sheets are gallery evidence, not those runtime claims.
+
+## 2026-10-09 - Rook combat pilot and browser gallery framing correction
+
+The pinned Sprite Fusion Rook pilot now has eight-view hit and collapsed death
+poses in addition to idle, walk, and fire. Direction-set held the hit pose but
+turned the collapsed death source upright in several views; the accepted death
+set therefore uses individually pinned provider edits from the corresponding
+idle views. The owner generator emitted 64 Rook 40×40 frames and one-shot hit
+and death animations; the real player component selects hit after health loss
+and keeps an on-foot dead driver visible for the death animation. At this pilot
+stage the other three families used idle fallbacks; the four-family source and
+atlas follow-up is recorded above. Focused atlas, presentation, typecheck,
+compile, Bob HTML5 packaging, and packaged Chromium/WebGL2 eight-facing Rook
+gallery checks passed in this pilot. Native visual parity and natural online
+hit/death selection remain unverified.
+
+The first green browser contact sheet used a 72-pixel crop and visibly cut off
+some helmets. The source atlas's strict 40×40 bounds check passed, and a
+full-viewport game capture shows the driver intact; this was a capture framing
+bug, not evidence of in-game sprite clipping. The gallery now saves that full
+viewport image and uses a 112-pixel crop. Its rerun passed all eight facings
+and the corrected contact sheet leaves margins around idle, walk, fire, hit,
+and death silhouettes. Evidence is under
+`build/evidence/hero-directional-runtime/hero-gallery-full.png` and
+`hero-directions-contact.png`; those files are local capture artifacts, not
+shipped art. The same corrected capture also passed and was visually inspected
+for Brass, Spark, and Mud under their suffixed evidence directories. No Sprite
+Fusion credits were spent fixing the crop.
+
+## 2026-10-09 - Four driver firing sets reach the packaged browser
+
+Brass, Spark, and Mud now join Rook with pinned Sprite Fusion `edit` outputs
+and eight-view `direction-set` firing poses. Six paid requests used 90 credits;
+the live balance was 1,050 before and 960 after. The accepted edit candidate
+is output 00 for each family. The owner generator normalized all 32 new views
+to the selected 40×40 canvas and 36-pixel anchor, emitted four families of
+48 frames each and three-frame fire atlas entries, and refreshed the generated
+TypeScript animation IDs. No generated PNG or atlas was hand-edited.
+
+The first packaged Chromium gallery capture was a useful failure: all eight
+Rook firing samples were pixel-identical to idle although the player trace
+showed cooldown 18 and fire selection. The atlas generator had marked the
+multi-frame sequence `PLAYBACK_NONE`, so Defold held its idle first frame.
+Changing the generator to `PLAYBACK_ONCE_FORWARD`, regenerating, and
+repackaging made all eight directions visibly select firing poses. Rook,
+Brass, Spark, and Mud then passed the packaged Chromium/WebGL2 frozen-gallery
+capture individually: each report records eight facings, varying walk frames,
+three firing samples, atlas/source/build hashes, screenshots, and a video in
+`build/evidence/hero-directional-runtime*/`. Four strict atlas-inspector
+passes and four focused hero-art tests verify exact frame inventories,
+anchors, canvas bounds, generated animation IDs, and playback mode. Déherm
+typecheck/compile and Bob HTML5 packaging passed. Gallery instrumentation is
+scoped to the gallery; it does not add logging to an ordinary match.
+
+This establishes source registration, atlas binding, and the frozen packaged
+browser selection path. It does **not** establish hit/death animations,
+natural online remote-fire behavior, every transition frame in motion, native
+visual parity, or overall game acceptance. The broader three core-test
+failures recorded below remain unresolved; they were not rerun or waived in
+this focused art wave.
+
+## 2026-10-09 - World biome survival and directional combat-pose pilot
+
+The authoritative hex world moved to rules v4. Volcanic Voronoi sites now
+occupy separate interior spokes, natural sites remain farther out, and a
+smaller edge perturbation preserves irregular boundaries without erasing an
+entire material. The default seed preview has broad basalt and ash regions
+instead of the previous five basalt/zero ash cells. Six disjoint 1,024-seed
+audits (0..5,119 and 8,192..9,215) passed coast/depot invariants; the least
+sampled seed had at least 13 ash and 14 basalt cells. The focused world test
+and reusable audit now reject a missing volcanic biome. Owner generators
+regenerated the floor, coast, tilemap, and 27 synchronized sources. All 22
+focused world tests pass. The wider five-file verification is **not green**:
+three existing `core.test.mjs` assertions fail (two exact predicted-world
+hashes and one 30 Hz packet count of 91 versus 90). Those failures are not
+presented as world-art regressions or silently waived; full browser/native
+signoff remains pending.
+
+Sprite Fusion reported 1,080 credits before the combat-pose pilot. One
+targeted `edit` of provider-owned Rook source produced two southeast firing
+poses; candidate 00 was used for a `direction-set` request, which returned
+eight apparent views. The two request manifests and PNGs are pinned under
+`art/source/sprite-fusion/`; 30 credits were spent, leaving 1,050. The
+hero-art generator now owns eight normalized Rook firing frames, atlas IDs,
+foot anchors, and a short idle-to-fire sequence. Local and remote infantry
+components select that sequence during the first ten ticks of a real shot
+cooldown. Déherm typecheck/compile, Bob HTML5 packaging, generated-state
+checks, four hero-art tests, and a packaged Chromium/WebGL2 natural ejection,
+walk, and fire capture passed. The capture wrote
+`build/evidence/war-battles-ejected-driver-fire.png`; it establishes that the
+game could fire while Rook was on foot, but one still does not prove every
+facing's action timing or that the firing pose is visually strong. The other
+three families currently fall back to idle when shooting. Hit/death poses
+for every driver remain open. The art skill requires single-action pilot QA
+and a budgeted matrix before expanding combat states. The four existing
+driver families keep stable player identity across tank changes; 32 player
+names reuse four visual archetypes.
+
+Stone props previously projected every collidable rock as the same outcrop.
+The deterministic presentation now selects among outcrop, compact stone, and
+compact rubble sprites, all grounded on the same atlas canvas; the world
+plan's larger rock reservation and collider remain unchanged. The default
+seed exercises all three. Six focused hex-cliff tests, TypeScript compilation,
+Bob packaging, and packaged Chromium playability pass. The refreshed
+`build/evidence/war-battles-html5.png` visibly shows the mixed silhouettes.
+This is a repetition/readability improvement, not a signoff for the entire
+scenery composition or combat effects.
+
+## 2026-10-09 - Four driver families now have authored eight-view infantry art
+
+Spark and Mud joined the Rook/Brass selected-source manifest as contiguous
+variants 2 and 3. Each has eight independently generated idle perspectives
+and eight source-pinned four-frame walk loops. The generator alone emitted
+their 40 runtime frames, atlas animations, shared TypeScript IDs, exact frame
+inventories, and foot anchors; no generated PNG was hand-edited. Source-side
+flips for west/east apply to idle and walk together. The provider returned
+only one east pose candidate for Mud; the review tool now represents that
+honestly instead of requiring or fabricating a second one. Spark's first
+two-reference prototype failed without a persisted response or credit charge;
+the revised single-reference request succeeded under a new name. This wave
+spent 540 credits in total (1,620 to 1,080) across Spark and Mud.
+
+Both full pose matrices and all sixteen animation previews were visually
+inspected. Strict inventory/anchor/cell inspection accepted all 40 generated
+frames for each new driver with zero reported clipped frames. A consolidated
+family regression test checks selected order, unique idle images, atlas IDs,
+frame counts, 40×40 canvas, 36-pixel foot baseline, and complete inventories.
+Déherm compiled the four-family TypeScript bundle and Bob packaged the HTML5
+game. The real player component's frozen Chromium/WebGL2 gallery selected
+Spark and Mud in turn and captured eight-direction idle/walk contact sheets
+plus ~250-frame videos under `build/evidence/hero-directional-runtime-spark/`
+and `build/evidence/hero-directional-runtime-mud/`. These sampled images show
+distinct, directionally coherent portrait-matched drivers at game scale. They
+do not prove natural combat ejection, every transition frame, online selection,
+or native visual parity. Bob also packaged the current arm64-macOS game; its
+native headless runtime loaded Hermes, initialized the sixteen-player arena,
+fired a rocket, and exited cleanly. Generated-state, TypeScript contexts,
+formatting, OKF, and the source-bound JavaScript-size record pass. The full
+example suite passed 305/306 tests. Its only failure is the existing stale
+VS Code live-value screenshot: the recorded editor image does not show the
+current inline `players` value. That editor-evidence gap was not recast as a
+game or atlas runtime failure. A separate native desktop visual attempt showed
+the title but did not establish interactive input or gameplay rendering.
+
+## 2026-10-09 - Brass packaged-directional capture and native startup boundary
+
+The hero-art emitter now exports the selected family count, and the real player
+component accepts a validated `artGalleryHeroVariant` only inside the frozen
+gallery. Normal play still selects by the authoritative driver slot. The
+packaged Chromium/WebGL2 all-facing capture can select Rook or Brass without
+hand-editing generated code. Brass's capture wrote an eight-direction idle/walk
+contact sheet, per-sample hashes, a 249-frame compositor video, and a report
+under `build/evidence/hero-directional-runtime-brass/`. The contact sheet was
+visually inspected: Brass retains a distinct white-bearded silhouette through
+the eight runtime facings, and sampled walk frames change in every direction.
+This proves browser gallery selection and sampled animation, not natural match
+ejection, frame-perfect foot planting, or unique per-frame perspective quality.
+
+Local Extender was healthy on port 9010 after a sandbox-only health probe
+failed. Bob rebuilt the HTML5 and arm64-macOS packages with the current atlas.
+The native packaged-runtime owner then loaded the TypeScript/Hermes bundle,
+initialized the arena and player, fired a rocket, reached a sixteen-player
+match, and exited cleanly; its source-bound evidence was refreshed. This is
+native execution evidence, not native visual parity. A separate desktop UI
+check showed the title scene but did not produce a trustworthy gameplay input:
+click and Space left it on the title and that app process subsequently exited.
+Native visual/interactive parity therefore remains open. No Sprite Fusion
+credits were spent in this verification pass.
+
+## 2026-10-09 - Brass joins the eight-facing infantry atlas as a second driver family
+
+The source-pinned hero-art generator now accepts Rook and Brass as two selected
+families on the same 40×40 native canvas and row-36 foot baseline. Brass has
+eight independently generated idle perspectives and eight selected four-frame
+walk requests. The selection recipe applies side-view flips to both idle and
+walk for Brass's west/east output mapping; no derived PNG was edited by hand.
+The generator writes 40 Brass runtime frames, sixteen Brass Defold atlas
+animations, TypeScript IDs, and separate exact anchor/frame inventories.
+Player and remote-tank presentation now request the driver variant from the
+authoritative slot roster. Variants without a selected family still fall back
+to Rook, so Spark and Mud portraits remain unmatched to their on-foot bodies.
+
+The source/registration previews were visually inspected for all eight Brass
+four-frame loops. The strict inspector accepted all 40 Brass frames with no
+edge contact, native-cell overflow, or measured bottom-of-opacity drift. Four
+focused hero-art tests, generated-art freshness, formatting/lint, and all
+TypeScript contexts pass. A one-shot déherm development compile built the
+changed TypeScript bundle. These are source, generated-atlas, and compile
+checks, not a packaged browser/native selection check or proof that every
+direction reads correctly while moving in a match. The full example suite,
+rerun with loopback access after refreshing source-bound JavaScript-size
+evidence through its owning measurement command, passed 304/306 tests.
+The remaining stale native packaged-runtime evidence requires a new Bob build;
+local Extender was not healthy, so it was not recertified from the compiler
+pass. The independent VS Code live-value visual check still fails on the
+previously captured editor frame. Brass used 270 Sprite Fusion credits this wave
+(1,890 to 1,620). No repository PNG was uploaded;
+requests reused hosted Sprite Fusion asset IDs.
+
+## 2026-10-09 - Atlas QA now checks the planned frame set, not just surviving PNGs
+
+The pixel-art-atlas inspector's strict pass previously treated files found on
+disk as the whole frame set. If a direction's PNG and anchor were both absent,
+that pass could succeed. It now accepts a separate generator-declared JSON
+inventory of relative frame paths and rejects missing or unexpected files;
+the inventory also drives preview order, so an eight-direction, five-frame
+sheet can be reviewed one direction per row instead of alphabetic filename
+order. The report fingerprints the inventory as well as PNGs and anchors. The
+hero-art generator emits a 40-frame inventory for each family from its declared
+direction/animation plan, and the project art test checks them against atlas
+source paths and anchor maps. The inspector passed on both families with a 40-pixel
+native cell, actual row-36 foot guide, zero permitted foot drift, and no edge
+contact or overflow. All 16 inspector tests and four hero-art tests pass.
+This is source/packing QA, not proof of animation quality, in-game perspective,
+or native renderer parity. The skill and repo art guidance now require the
+inventory when a generator can declare expected frames.
+
+## 2026-10-09 - Rook infantry art is a source-pinned eight-facing runtime atlas
+
+The previous infantry atlas had five tutorial source views, with three mirrored
+runtime facings. Rook now has eight independent Sprite Fusion direction-set
+source outputs and eight selected four-frame walk animations. The accepted
+request manifests and source art are under
+`examples/war-battles-online/art/source/sprite-fusion/`; the selected mapping,
+runtime 40×40 canvas, 32-pixel subject height, common foot baseline, and one
+west-facing horizontal correction are in `art/source/hero-source-selection.json`.
+`tools/generate-hero-art.mjs` checks request-spec and image digests, extracts
+animation frames, normalizes every frame with nearest-neighbor sampling, then
+emits all 40 runtime PNGs, the Defold atlas, and the TypeScript animation IDs.
+The two sprite components moved from y=8 to y=16 so the larger atlas preserves
+the original world-space foot contact. The archived tutorial sources remain
+untouched. This used 270 Sprite Fusion credits in total (2,160 to 1,890),
+including one new character candidate, the direction set, eight stride edits,
+and eight four-frame animations. No source PNG was uploaded from the local
+tutorial repository.
+
+The local 8×5 runtime-art contact sheet is
+`examples/war-battles-online/build/evidence/hero-candidates/rook-infantry-runtime-atlas-review.png`.
+Its source review caught a wrong-way west output; an initial suspicion about
+southeast was rejected after comparing the larger original source and its
+opposite-facing southwest view. A packaged wasm-web Defold build and
+Chromium/WebGL2 probe then selected all eight atlas animations via the real
+player component. Each direction had three distinct sampled walk images and
+changed from idle; the final contact sheet and 251-frame compositor video are
+under `build/evidence/hero-directional-runtime/`. A separate normal offline
+match ejected the local driver and moved her under keyboard input in the
+packaged browser. The focused atlas tests, generated-art freshness, formatting,
+lint, TypeScript contexts, and browser playability pass. This is not proof of
+native visual parity, natural turns through all eight facings, online movement
+quality, or distinct art for every possible player identity. The Sprite Fusion
+wrapper now rejects a repeated request name before any paid API call; an
+existing-spec preflight reproduced that local failure without network access.
+The arm64-macOS Bob build also compiled the same atlas, and the packaged native
+Defold/Hermes smoke gate loaded the TypeScript bundle, initialized the arena,
+fired a rocket, engaged the match, and exited with code zero. That is native
+startup/logic evidence, not native pixel inspection of Rook.
+The full War Battles suite initially found stale source-bound bundle, native,
+32-player load, network-impairment, and QUIC evidence after the shared example
+changes. Each was regenerated through its owning measurement command, not
+edited by hand; the real loopback QUIC gate again admitted a client and
+applied three snapshots. The rerun passed 304/305 tests. Its sole failure is
+the previously known VS Code visual recording: the captured editor document
+does not yet show the live inline `players` value. That gate cannot be
+represented as a game-art regression or silently refreshed from metadata.
+
+## 2026-10-09 - All eight ejected-driver atlas directions observed in packaged WebGL
+
+The existing browser-only frozen art gallery now poses the real player
+component as infantry with a selected facing and idle/walk state. A new
+`pnpm art:hero-directions` probe captures one idle and four spaced walk
+samples for each of eight directions, an 8-column contact sheet, a compositor
+video, and source hashes under `build/evidence/hero-directional-runtime/`.
+The first probe caught a fixture bug: S/W/E/N world velocities had both
+components below the player component's walking threshold, so their runtime
+images remained idle. The fixture doubles its non-integrated velocity; normal
+match movement is unchanged. After a fresh déherm compile and Bob wasm-web
+bundle, the final packaged Chromium/WebGL2 probe passed its hero-local pixel
+variation assertion for all eight directions (three distinct sampled walk
+images each), captured 250 video frames at 28.72 observed fps, and reported
+no browser page failures. Focused hero-art tests, script lint, TypeScript
+`tsc --noEmit`, and diff-whitespace checks passed. This is runtime evidence
+for a controlled atlas gallery, not naturally driven turning, native visual
+parity, eight uniquely authored views, or final ejected-driver art quality.
+
+## 2026-10-09 - Atlas skill records exact QA inputs and separates source from motion evidence
+
+The reusable `pixel-art-atlas` inspector report now records its schema version,
+the SHA-256 of each inspected PNG, and the SHA-256 of the exact anchor JSON.
+It rejects duplicate anchor keys instead of silently accepting the last JSON
+value. Its eleven focused tests pass, including source-and-anchor mutation and
+duplicate-key regressions.
+The repo Sprite Fusion skill now distinguishes its all-pairs native-scale
+composite sheet from selected packaged-game turn/aim captures, and asks for
+consecutive frames near facing changes rather than inferring jitter-free motion
+from sparse stills. The atlas skill clarifies that bottommost-opacity drift is
+not a planted-foot measure when shadows, exhaust, weapons, or particles extend
+below the feet. These are QA and skill changes; no game asset, animation, or
+native visual behavior was changed or established by them. The skill-creator
+validator could not run because its Python environment lacks PyYAML; the
+inspector's Pillow-backed test suite ran using the bundled Python runtime.
+
+## 2026-10-08 - Procedural hex-world research and diagnostic plan, not live integration
+
+Primary sources from Red Blob Games, Metanet, Hello Games, Maxis' *Spore*
+SIGGRAPH sketches, Bridson, and generative-methods research were reviewed
+before changing the terrain pipeline. The current War Battles floor, arena
+collision grid, prop scatter, and coast still have independent generators;
+`research/war-battles-procedural-hex-world.md` records the proposed single
+seeded plan and migration gates. A new cold-path `core/world-plan.ts` draft
+produces a connected irregular land mask, seeded broad biome regions, shallow
+elevation tiers, exact coast-edge masks, and cell-level terrain attributes.
+A nine-seed diagnostic preview, now overlaid with planned spawns and props,
+is at `build/evidence/war-battles-world-plan-contact.png`. Initial inspection
+caught fixed compass-biome wedges and near-identical coastlines; both were
+changed and guarded by focused tests. A direct check found 13 of the current
+live arena's 16 spawn points outside the proposed island, so the plan now
+selects and reserves its own 16 separated, tank-clear, connected sites. It
+also emits a fixed-capacity scenic table and a collider raster derived from
+each accepted visual footprint. A wider sweep found seed 355 had no building-
+sized service-biome footprint; the generic rule now prefers service but falls
+back to any valid grounded footprint. `node --test test/world-plan.test.mjs`
+passes the 512-seed topology, footprint and reachability sweep; a separate
+4,096-seed build sweep completed with land counts 236–334, at least 25 props
+and at least one building for every seed. `pnpm lint` and direct TypeScript
+`tsc --noEmit` pass. The combined `pnpm typecheck` still fails at the déherm
+generated-manifest/package check; that is not a TypeScript failure and is not
+reclassified as a pass. A plan-aware path in the terrain compositor reuses
+the selected Sprite Fusion and imagegen source materials while leaving the
+legacy generated floor byte-identical (`pnpm hex-terrain:check` passed).
+`tools/preview-world-plan-art.mjs` produced a selected-seed, 1920×1440 pixel
+material render at `build/evidence/war-battles-world-plan-art-preview.png`.
+The planned floor's opacity matches `cellLand` at every simulation-cell centre
+for two seeds in `test/hex-terrain.test.mjs`; both focused suites pass. The
+preview still has broad color fields and repeated service-panel motifs. No
+Sprite Fusion credits were spent: this pass reused pinned source art. This
+remains generator/contract evidence: the live arena, Defold tilemap, tank
+movement, actual prop sprites, coast faces and final visual quality are not
+yet derived from this plan. No claim of a playable procedural island is made.
+
+## 2026-10-08 - Island wall uses proportional stacked hexes, not a painted cliff ribbon
+
+The War Battles coastline generator previously laid two rows of source hex
+sprites over a continuous 48-pixel rock facet strip and independently squeezed
+each sprite's width and height to 40×18 pixels. The result could still read as
+a stretched cliff despite the visible hex tops. The generator now scales each
+selected raised-hex source proportionally to a 34-pixel image width, staggers a
+short lower stone course by half a lattice pitch, and leaves the surrounding
+sea visible; it paints no continuous rock strip. The derived coast image and
+manifest were regenerated by `tools/generate-coast.mjs`. The focused
+`test/hex-cliffs.test.mjs` passed all 14 tests, including a pixel assertion
+that water remains between the individual columns. A fresh Bob `wasm-web`
+bundle and packaged Chromium/WebGL2 playability check passed. Its captured
+gameplay frame is `build/evidence/war-battles-html5.png`; that is one rendered
+composition, not evidence of all camera positions. The coast animation check
+also passed after its static sample was moved off the newly exposed water:
+1,271 ocean pixels changed over 430 ms and zero sampled stone pixels changed.
+Native visual inspection of this geometry has not yet been repeated.
+The broader example `pnpm check` is not green in this working tree: its
+generated-state, typed-native bridge, and typecheck stages passed, while the
+test stage reported source-bound evidence staleness and current network
+threshold failures (including a 16-player congested correction bucket and a
+32-player capped-link snapshot-skip ratio). Neither failure was reclassified
+as a coastline pass.
+
+## 2026-10-08 - Latest-only compact snapshots replace stale reliable-stream backlog for the first playable roster
+
+A new opt-in packaged-browser QUIC probe forwards encrypted packets through
+65 ms one-way delay, ±15 ms seeded jitter and 10% seeded loss after clean
+admission. Its thirty-second baseline applied 112 snapshots, skipped 93
+snapshot opportunities under the two-stream budget, and saw one 36-pixel
+same-life local correction while the last applied server frame lagged 74 ticks.
+The server recorded zero late inputs at that event. This was observed in the
+real Bob-produced WebGL2 game, not inferred from a metadata test.
+
+The server now sends compact deltas as latest-only datagrams only when the
+negotiated datagram can hold every roster actor's packed record and the actual
+frame fits. Keyframes, oversized/recovery frames, and WebSocket fallback remain
+reliable. The client validates datagram snapshots through the same version,
+schema, baseline and tick-order path as stream frames. The fixed-capacity
+writer drops backpressured state. A second thirty-second run with the same
+configured impairment applied 225 snapshots, skipped none by the stream
+budget, and saw an 11-pixel maximum correction, zero over 32 pixels, with 1,760
+server-accepted inputs. The packet-loss traces are not identical; this is an
+observed improvement, not a universal performance guarantee. The 32-player
+MTU/capped-link matrix keeps its reliable path and passes its preexisting
+thresholds. A one-second reliable-path cooldown after datagram writer
+backpressure reduces sustained local drops; the sixteen-player synthetic
+edge-cap case still has a possible 75-pixel correction and is not product
+signoff. The harness's final convergence
+probe now allows one bounded reliable-keyframe cycle after lossy deltas;
+active-play correction statistics remain separate.
+
+The art skill's source/manifest/runtime-footprint sequence caught a tempting
+false fix: the landmark prototype already lifts its sprite component by 56
+pixels, placing every generated grounded sprite's foot at the blocked anchor.
+A focused test now guards the source manifest, prototype offset and solid
+anchor across four seeds. Full lateral footprint and live collision feel remain
+unverified. No Sprite Fusion request or credit was used in this pass.
+
+## 2026-10-08 - Continuous island cliff and ocean replace the repeated rock border
+
+The old perimeter presenter placed 66 identical `rockOutcrop` anchors. The
+example now generates one isometric island-coast resource over the authoritative
+solid border, with a transparent interior that exposes the aligned hex floor.
+The generator pins the imagegen cliff study by SHA-256 and uses the selected
+Sprite Fusion coastal-water output only to derive a deterministic sea palette;
+it owns the derived PNG, manifest, atlas, and game object. One Sprite Fusion
+request cost 15 credits, leaving 2,205. The previous interior-cliff-slab use of
+the study remains rejected; the accepted use is a continuous *outer* face.
+
+The 1,536×800 source is presented at integer 2× scale. Bob compiled the coast
+texture to 8,388,657 bytes on both `wasm-web` and arm64-macOS; the earlier
+3,072×1,600 trial compiled to 33,554,481 bytes on native. The packaged
+1,280×720 Chromium/WebGL2 east-edge capture at
+`examples/war-battles-online/evidence/island-coast-east-browser-2026-10-08.png`
+shows continuous cliff, water, and interior terrain at gameplay scale. The
+companion `examples/war-battles-online/evidence/island-coast-opening-browser-2026-10-08.png`
+shows a live player tank, distinct nearby tank silhouettes, pickups, grounded
+cover, and the hex field against the same coast; one still does not prove
+animation or collision alignment during movement. Focused
+coast/determinism and source-sync checks passed. The rebuilt native package
+passed the Defold 1.14.0 scripted runtime gate, including TypeScript load,
+movement, rocket lifecycle, and graceful exit. An older native game window is
+still open, so there is **no fresh native pixel inspection** of this art. The
+the water animation had not yet been observed at this point; broader match
+visual QA remained open.
+
+The coast generator now emits a fragment material keyed by alpha-tagged water
+pixels and Defold's `TIME` constant. An initial packaged WebGL2 frame-pair
+gate failed with zero changed ocean pixels, despite a compiled shader. A
+temporary diagnostic proved that both the time uniform and water mask were
+active; the first modulo-based crest rule was constant over the sampled sea.
+The final quantized fractional phase passed the same fixed-camera gallery
+gate: 889 ocean pixels changed in 430 ms and no cliff pixels changed. The
+generator's focused twelve tests, deterministic coast check, normal browser
+keyboard/fire/restart playability gate, native Bob compile, and native scripted
+runtime gate passed. This proves one real WebGL2 water-motion sample and native
+compile/runtime health, **not** native visual animation or long-match quality.
+After the source edits, the authoritative-load, impaired-network, bundle-size,
+native-runtime, and real-WebTransport evidence was regenerated through its
+own measurement commands. The example suite returned 293/294; its only
+failure remains the September VS Code visual fixture with an eight-player
+default, which requires a new live editor capture for the current sixteen.
+
+After regenerating only their owning evidence files, the 32-client impaired
+matrix again converged under datagram loss/reordering, and the current packaged
+browser passed keyboard/fire/restart on WebGL2. A five-second real local
+WebTransport motion run advanced 315 client ticks, applied 43 snapshots,
+accepted 316 additional inputs, and recorded a six-pixel maximum local
+correction with none above 32 pixels. The example suite passed 293 of 294
+tests with loopback permission. The lone failure is the already-known
+September VS Code live-value capture: it records the old eight-player default,
+while the game now declares sixteen. The screenshot was not forged or
+relabelled; a new live editor/inspector observation is required. `pnpm
+verify:generated`, four-context TypeScript checking, and `pnpm
+check:knowledge` passed separately. These short local runs do not prove WAN
+smoothness or native visual parity.
+
+## 2026-10-08 - Unordered input stays application-owned; native demo gate restored
+
+The War Battles input lane remains bounded QUIC datagrams, not per-input
+streams. The 50-byte four-command window carries redundant recent inputs;
+the server admits them by tick, ignores already-consumed duplicates and late
+commands, and retains only the newest pre-ACK datagram. Focused compact-bundle,
+pre-ACK reordering, independent-snapshot reordering, and impaired 32-client
+tests passed 4/4. These are protocol and impairment-model observations, not a
+packet capture or proof of remote visual smoothness. Session/control stays on
+ordered reliable delivery; large snapshots use independent replaceable streams.
+
+The focused post-admission regression also passed: after WELCOME_ACK, tick 5
+arrived before tick 4, followed by a repeated tick 4. Both future ticks were
+accepted and consumed in simulation order; the duplicate was ignored. This
+proves the application handles packet reordering at this boundary, not that
+browser-internal datagram queues cannot retain stale sends under congestion.
+
+The packaged native gate twice lost its scripted movement marker because a
+`#boost` press reached the new engine window and called `engage` during the
+opt-in demo. The demo now ignores input until its scripted handoff; ordinary
+launches retain normal controls. After `pnpm sync`, a fresh déherm compile and
+arm64-macOS Bob bundle, `pnpm runtime:packaged` passed the Defold 1.14.0
+engine, TypeScript bundle, rocket lifecycle, movement, arena handoff, and
+graceful-shutdown markers. This proves that packaged scripted path, not every
+live control or native online match.
+
+## 2026-10-08 - Grounded low cover replaces interior hex pedestals
+
+A live 1280×720 packaged HTML5 tour and an inspected native window showed
+isolated raised hex pedestals and repeated lava-rock props. The first trial
+reused the lava-rock sprite for all short blocked stamps; its packaged opening
+capture was visibly more repetitive, so it was replaced. One Sprite Fusion
+style-reference request produced nine compact earth/stone/timber berms for 15
+credits. The edge-contact review found sparse boundary pixels, so one targeted
+edit produced two more candidates for 15 credits. Five selected outputs are
+recorded in `art/source/sprite-fusion/low-cover-selection-v1.json` and the
+balance was 2,220 credits. The owning generator verifies request/spec/source
+digests, rejects broad clipped edges, preserves native pixels, seats all five
+on ground line 119, and regenerates atlas files. Short 3×3 wall stamps and
+unadorned long stamps choose these props by seed and visible biome, leaving
+collision unchanged. Both the authored tilemap and runtime seed/theme
+updates now share the exact visual-coverage classifier.
+
+`pnpm art:check`, `pnpm tilemap:check`, focused hex/terrain/world-art tests,
+four-context TypeScript checking, packaged HTML5/WebGL2 playability, and a
+real packaged browser/WebTransport motion run passed. The revised live frame
+is `build/evidence/grounded-low-cover-final-opening.png`. It visibly improves
+the two nearby short obstacles; it does **not** resolve the repeated
+perimeter lava-rock anchors or deliver cliff-to-ocean world edges. The native
+window was inspected before the final art pass, not after it. Browser and
+native visual equivalence therefore remains unproven.
+
+## 2026-10-08 - Remote lifecycle and pose sampling agree
+
+A deterministic 32-client diagnostic sampled one neighboring remote actor per
+client on every simulated 60 Hz step. Ordinary same-lifecycle frame motion
+stayed below 208 fixed world units (13 pixels) in all three impairment
+profiles; the large apparent teleports belonged to generation/mode changes,
+including tank entry/ejection. This is a sampled in-process presentation
+trace, not rendered browser/native pixels or a proof about every remote pair.
+
+The Defold renderer previously read remote position/direction from
+`samplePlayerTransform` but mode, chassis, generation, activity, and velocity
+from the separately predicted `BattleWorld`. A client could therefore draw a
+driver sprite at the last tank pose, or vice versa. The caller-owned transform
+now includes those lifecycle/motion fields from one authoritative remote
+sample; the offline and local paths use their current world consistently.
+Tank and player scripts consume the sampled fields before selecting art and
+placing the object. A focused test changes the predicted remote world after a
+keyframe and confirms the presentation sample does not change independently.
+`pnpm --dir examples/war-battles-online sync`, context TypeScript checking,
+and all 130 core/presentation tests passed. The source generator refreshed the
+example SDK after the existing manifest became stale; `deherm typecheck`
+then passed all four TypeScript contexts. The current `b78f81b3…` TypeScript
+fingerprint was packaged by Bob for both wasm-web and arm64-macOS. A real
+packaged Chromium/Defold-Wasm client stayed admitted over local QUIC for a
+five-second movement probe, advanced 316 ticks, applied 37 snapshots, and
+produced 318 server-accepted commands; that single run recorded one local
+correction above 32 pixels. The native packaged runtime loaded the same
+fingerprint and exited cleanly, but its gate is the offline scripted demo,
+not native online play or native pixel inspection.
+
+The screenshot can be reproduced from the example directory with
+`DEHERM_WAR_BATTLES_ONLINE_SCREENSHOT=build/evidence/online-pose-2026-10-08.png pnpm runtime:browser:online:motion`.
+The resulting packaged HTML5 frame showed an on-foot local player, multiple
+remote tanks, a readable hex field, and a stable bottom HUD at 756×425; one
+still image cannot verify the eject/re-entry transition or native rendering.
+The world composition remains sparse in places, so this is not art signoff.
+
+The packaged browser motion gate also passed with a seeded 20% loss rule at
+the QUIC packet boundary: 68 of 337 browser-to-server packets and 56 of 291
+server-to-browser packets were dropped. Over 316 simulation ticks, the client
+applied 40 snapshots and the server accepted 308 inputs; the maximum local
+correction was one pixel, with none above 32 pixels. This is one five-second
+loopback run, not evidence of WAN jitter tolerance or every remote actor.
+
+## 2026-10-08 - Unreliable input channel decision and snapshot datagram spike
+
+The client-input lane remains 30 Hz WebTransport datagrams carrying a bounded
+four-command window sampled at 60 Hz. Arrival order is not a correctness
+assumption: the server validates tick/sequence, stores future commands by
+simulation tick, ignores older duplicates, and drops malformed datagrams
+without closing the session. Session and control events remain ordered and
+reliable. We will not adopt one QUIC stream per input packet from the
+SuperTripLand article merely because it helped its 128 Hz workload; the
+packaged game's seeded 10–20% QUIC packet-loss probes did not reproduce a
+stale-browser-queue failure at our 30 Hz send rate.
+
+A local, **uncommitted and reverted** spike put MTU-fitting authoritative
+snapshot deltas on server-to-client datagrams while keeping keyframes and
+oversized frames on independent reliable streams. The deterministic 32-client
+impairment run remained connected, but active-play corrections above eight
+pixels rose from 7.66% to 10.41% in the mobile profile and from 15.87% to
+16.07% in the edge profile. Alternating datagram/reliable ordinary frames did
+not clear the existing correction ceilings either. No production snapshot
+channel change or evidence refresh resulted from this experiment. This is an
+application-payload simulation, not a QUIC wire-overhead comparison; reducing
+stream churn still requires an MTU-safe, loss-tolerant design that preserves or
+improves correction behavior under the named profiles.
+
+## 2026-10-08 - Tank pose ownership and pixel sampling correction
+
+War Battles now places hull and turret sprite components on the same local or
+remote tank object, replacing separately updated part objects. The project
+sets both default texture filters to nearest, and the shared renderer-facing
+projection rounds to whole screen pixels. The class component decision gained
+a VS Code class-source regression for property/default inlays and live-value
+navigation. `deherm generate --project defold`, TypeScript context checking,
+20 VS Code tests, 67 class/proxy/name tests, 12 language-server tests, and the
+packaged HTML5/WebGL2 playability gate passed. The focused integration source
+contracts passed, but the full integration file has two expected stale-evidence
+failures after source edits: bundle-size evidence was subsequently refreshed
+through its measurement command, while packaged-runtime source evidence
+remains stale until a native build can start successfully.
+
+The 32-client impairment matrix passed its current thresholds but still shows
+large maximum local presentation corrections (850/910/2352 fixed units across
+its profiles). No native visual or full-motion review of the new turret layout
+has been completed, and the user-reported prop-collision, infantry-art, floating
+hex, and coastline defects remain open. A static WebGL screenshot and a
+converged simulation are not visual/network product signoff.
+
+The following facing pass added a five-degree visual-only hysteresis to the
+eight-way hull/turret animation chooser. Its boundary regression, source sync,
+typecheck, and packaged HTML5/WebGL2 playability passed. The real local
+WebTransport gate admitted 16 clients and reported 532 accepted inputs with
+zero rejected or late at the initial sample. Native packaged-runtime evidence
+could not be refreshed: the host graphics backend failed to create a shader
+program before the game loaded. The current native evidence therefore remains
+stale; this is not native visual validation.
+
+## 2026-10-08 - Live wide-world audit and three-source ridge pass
+
+The 1280x720 capture workflow now distinguishes staged art-gallery mode from
+the actual offline match (`pnpm art:capture --live`). The retained real-game
+frame is `build/evidence/war-battles-world-wide.png`. Comparing it with
+`art/direction/gameplay-target-v2.png` showed a sparse center, repeated cliff
+silhouettes, an overly orange/hex-patched road, and opaque gray marker pads.
+The gallery screenshot is useful for source QA but is not gameplay evidence.
+
+On the same map, the dirt paint now forms a narrower sand-colored route with
+less hex-source imprint, and the earth cells no longer make isolated sunken
+hex pits. The service deck lost its repeated full-cell grid. The ridge source
+selection now pins three existing unclipped Sprite Fusion outputs (indices
+0, 2, 8); the generator emits both wall-axis orientations for each, and the
+seeded presentation planner chooses among them independently of the original
+hex-source index. Forest anchors can also use previously bare blocked meadow
+stamps. These are presentation changes only: no collision, bot routing, or
+network map data was changed. The marker generator now emits thin transparent
+floor inlays instead of opaque gray stickers (about 160 opaque pixels per
+48x24 sprite, down from more than 630).
+
+The focused terrain/cliff suite passed 14/14; the focused generated-art
+integration assertion passed; TypeScript/deherm typecheck and compile, Bob
+HTML5 bundling, and packaged Chromium WebGL2 playability passed after the
+ridge wave. The final marker change was repackaged and the real wide match was
+inspected. The current arm64-macOS Bob bundle also passed, and the native
+engine loaded the current TypeScript fingerprint and emitted live telemetry;
+the Mac remained locked, so its pixels were not inspected. This still falls
+short of the target's dense broadleaf/conifer
+vegetation, irregular coastal cliffs, and richer world composition. A single
+Sprite Fusion broadleaf source request was prepared but **not sent**: the
+sandbox rejected uploading three existing Sprite Fusion tree asset IDs plus
+the local rock-outcrop image. The balance remained 2,250 credits. Exact-input
+approval was requested; no alternate external route was used. Native visual
+inspection remains open.
+
+## 2026-10-08 - Chassis-specific paint and same-world composition pass
+
+The selected Scout, Assault, Bulwark, and Artillery hull/turret source families
+remain the same eight-direction art and the same seeded arena. A declared
+`livery` recipe in `tank-selection-v2.json` now gives their neutral armor four
+different finishes (aqua Scout, red-iron Assault, olive Bulwark, and pale-brass
+Artillery). The shared preview and production atlas use the same deterministic
+pixel transform; it preserves outlines, warm lights, alpha, and the separately
+mapped team-signal marks. This strengthens recognition in addition to, not in
+place of, the distinct hull and weapon silhouettes. No Sprite Fusion credits
+were spent on this finishing pass.
+
+The same world's meadow road now has a bounded visual-only dirt spur with
+continuous painted transitions. Its underlying biome and collision roles do
+not change. Additional conifers attach only to already blocked landmark wall
+stamps, and isolated raised meadow rings were removed. Focused hex/cliff/core
+tests passed 132/132; tank-livery unit tests passed 3/3. The art generator's
+freshness check, TypeScript/deherm typecheck and compile, Bob HTML5 bundle,
+and packaged Chromium WebGL2 playability passed. The actual game capture is
+`build/evidence/war-battles-html5.png`; the four-class directional preview is
+`examples/war-battles-online/art/preview/tank-v2-candidate-sheet.png`.
+The arm64-macOS Bob bundle also passed, and its native Defold engine loaded the
+same TypeScript fingerprint and emitted live telemetry without a startup error.
+The Mac was locked when the native visual capture was attempted, so no native
+screenshot was inspected. This is browser evidence at one camera location,
+not native visual signoff, full-map composition approval, or proof that every
+facing reads equally well.
+
+## 2026-10-08 - Four chassis art and continuous meadow ridges
+
+The same seeded War Battles arena now renders long meadow wall stamps as
+continuous Sprite Fusion-derived ridges. The presentation projection retains
+the exact original wall-cell coverage; no second map or collision rewrite was
+introduced. A free-standing conifer-trunk trial changed the bounded bot trace
+and combat curve, so it was rejected and regenerated away. The focused core,
+cliff, terrain, and decor suite then passed 131/131.
+
+The four existing v2 tank concepts were split into source hull/turret layers,
+then separate eight-direction sets. Sprite Fusion request manifests retain the
+source hashes and selected `tank-selection-v2.json` pins the runtime choices.
+The first Scout turret direction set resembled a character and was rejected;
+the alternate set is used. The source-index gallery exposed reversed E/W and
+NE/NW positions relative to the old game-facing lookup, now corrected in the
+generator. The generator scales each turret to its chassis and emits
+chassis-specific wreck animations; orange signal pixels remain team-identity
+accents. Two Artillery side-facing source muzzles touch their image bounds, so
+the generator adds a bounded two-pixel terminal cap in its padded runtime cell.
+The direction-aware preview is
+`examples/war-battles-online/art/preview/tank-v2-candidate-sheet.png` with a
+matching per-source QA JSON. The latest Sprite Fusion request reported 2,250
+credits remaining.
+
+Evidence: the deterministic art generator and focused arena-art integration
+test passed; TypeScript/deherm type checks and compilation, Bob HTML5 bundle,
+and packaged Chromium WebGL2 playability passed. The browser screenshot is
+`build/evidence/war-battles-html5.png`. These results prove buildability and
+browser rendering, not that every chassis/direction is aesthetically finished
+or that native desktop rendering has been inspected. The large surrounding
+world still needs the mockup-quality composition pass.
+
+The full example suite is not green on the current dirty tree. With loopback
+permission, eight failures remain, all in source-bound evidence freshness
+checks (load, bundle size, packaged runtime, impairment matrix, performance,
+measurement, VS Code, and WebTransport); the functional tests and the updated
+17-text-node GUI assertion pass. Running the same suite inside the restricted
+sandbox adds localhost `EPERM` failures, which are not product failures.
+Recorded evidence should be regenerated only after the concurrent game and
+tooling edits settle, then reviewed against the new source fingerprints.
+
+## 2026-10-07 - Meadow composition, conifer source, and tank silhouette audit
+
+The hex floor now uses a green-majority authored material grammar and only
+draws strong seams at material/height changes. One provenance-pinned Sprite
+Fusion conifer request yielded three generated landmark variants. The seeded
+planner gives spawn 0 a nearby tree, retaining the authoritative wall stamp.
+Focused hex tests passed 11/11; art, terrain, world-art and sync freshness
+checks passed. Déherm compilation, Bob HTML5 bundling, and the packaged
+Chromium WebGL2 playability gate passed. The captured gameplay frame shows a
+tree partly hidden behind a cliff: runtime visibility is proved, but the
+composition is not yet approved or at the target mockup's quality. Native
+visual rendering was not checked in this increment.
+
+Separately, the generated Scout, Assault, Bulwark, and Artillery south-east
+hull/turret PNGs were inspected at source size. They remain too similar despite
+different mechanical stats and separate atlas animations. The four stronger
+silhouette probes are still source candidates, not shipped game art.
+
 ## 2026-10-05 - Expo inspection and a generated module directory
 
 The local module reporter now recognizes Expo Modules from
@@ -5856,3 +7360,1985 @@ passes both with all four release/debug archives installed and with the two
 vendored target pairs temporarily absent, after which the original local
 artifacts were restored byte-for-byte. This is clean-checkout CLI contract
 evidence; it does not claim an absent archive can be bundled.
+
+The War Battles terrain-lift pass moved the cosmetic terrace-tier recipe into
+the shared core used by both the floor compositor and Defold components.
+Hull, turret, and on-foot pilot now get the same continuous 0–10 screen-pixel
+lift; the camera target and authoritative simulation remain unchanged. The
+focused core/hex test set passed 124/124, including center-height and gradual
+crossing assertions; example TypeScript typecheck and the déherm component
+build passed. Bob packaged the HTML5 game, and Chromium WebGL2 input, fire,
+restart, and visible-player checks passed with a captured gameplay frame.
+The arm64-macOS Bob bundle and bounded packaged-engine marker/teardown gate
+also passed. These are code-path and runtime observations, not a native visual
+pass or proof that the terrain reaches the desired mockup quality; native UI
+inspection remained unavailable because the Mac was locked.
+
+The hex spawn/pickup follow-up replaced square-grid staged/crater decals and
+old pad paint with hex inlays, cut eight raised isometric pickup sprites from a
+versioned, SHA-pinned source sheet, and made every grounded runtime sprite use
+one front-to-back foot-contact Z rule. A 32-player spawn audit found that the
+16 authored depot centers could be reused under a full roster; the fixed,
+bounded apron search now separates all 32 tank starts and checks circle
+clearance for default, zero, and maximal seeds. The focused 121-test core/hex
+suite, TypeScript contexts, HTML5 Bob/Chromium WebGL2 playability and native
+arm64 Bob/packaged-runtime smoke passed. The browser frame is
+`examples/war-battles-online/evidence/hex-pickups-sorted-browser-2026-10-07.png`.
+This is not native visual inspection, a moving occlusion survey, or the final
+art-quality signoff. Broad example `pnpm test` reported 18 failures, chiefly
+stale source-bound evidence from the concurrent larger showcase work, an old
+source-count/ground-role assumption (now made dynamic), and restricted local
+socket access in the unprivileged test run; do not promote the focused result
+to a full green suite.
+
+The next hex-world presentation pass isolated the remaining square-looking
+ground patch by generating diagnostic tilemaps with decor and marks omitted:
+removing the marks layer removed the patch. The source was repeated flat
+sandbag marks, not the sampled hex floor. The art generator now emits
+SHA-pinned, explicit-cut isometric sandbag/crate cover sprites and generated
+48×24 isometric spawn/pickup footprints. The arena renders those from the
+authoritative sites/panels at shared foot-contact depth and removes cover
+objects when destroyed; the hex tilemap has zero overlay cells. A separate
+sampling correction restricts derived hex floor pixels to the top faces of
+the Sprite Fusion sources, with a focused 1,099/1,110 opaque-sample check.
+`pnpm art:check`, `pnpm tilemap:check`, `pnpm sync:check`, TypeScript contexts,
+and the focused scene/semantic tests passed. Bob's HTML5 bundle and Chromium
+WebGL2 playability gate passed with
+`evidence/hex-spawn-pickup-cover-browser-2026-10-07.png`. Broader
+`core.test.mjs`/`integration.test.mjs` initially found a stale soak hash and
+source-bound bundle/native evidence from the larger in-flight source changes.
+The owning evidence generators refreshed these after the current build. The
+first longer browser gate also caught component attachment-pool exhaustion:
+48 marker scripts plus cover scripts consumed slots used by live projectiles.
+The cosmetic objects are now sprite-only prototypes, requiring no Hermes/Lua
+attachment slots. A second longer gate no longer saw pool exhaustion but
+exposed outdated gate expectations for the current 16-player roster and
+HUD-aware camera bounds; the assertions were updated to the authored behavior.
+The longer browser runtime gate then passed without component-pool errors.
+Native Bob packaging and the bounded packaged-runtime gate also passed; that
+is native execution evidence, not native visual inspection. The final focused
+core/integration suite passed 133/133, and the art, tilemap, source sync, soak,
+and native-runtime source-evidence freshness checks passed. Those checks do
+not replace a moving native visual review of every spawn/pickup variation.
+
+The tank-roster audit found 32 named drivers and four mechanically distinct
+chassis in `core/content.ts`, but one HUD portrait animation and near-identical
+runtime tracked silhouettes. Four credit-aware Sprite Fusion silhouette
+requests, two explosion requests, and three driver-portrait requests were saved
+with source specs, all outputs, request IDs, and remaining-credit records
+(2,670 to 2,535). The shortlisted Scout/Assault/Bulwark/Artillery outputs and
+eight-frame explosion are source candidates only. Rook, Brass, Spark, and Mud
+are now generated by the HUD-art owner from source selections and selected by
+`DriverDefinition.variant` in the GUI. HUD-art freshness, example typecheck,
+118 focused core tests, déherm GUI build, Bob HTML5 bundle, and the packaged
+Chromium WebGL2 playability gate passed. Its title and gameplay screenshots
+show Rook's portrait at actual UI size. No new tank or effect source was added
+to the runtime atlas, and the other portrait variants have not each been
+visually exercised in a live client. Native visual inspection remains open.
+
+The later tank-styling pass kept the four SHA-pinned eight-direction hull and
+turret families and added declarative class markings to the shared atlas and
+preview emitter. Scout has twin racing rails, Assault a breach chevron,
+Bulwark a shield bar, and Artillery a range spine. Team-signal pixels are
+recolored before class armor is painted, avoiding the prior ordering where
+an orange class mark could be mistaken for a team slot. The focused test
+measured 188–417 changed opaque source pixels per direction/class and no
+alpha change; regenerated art freshness, HTML5 Bob bundling, and a live
+browser capture passed. This is generator and browser evidence, not a native
+visual signoff or proof that all four classes read at once in gameplay.
+An independent 1254×1254 four-class shape study was then saved as
+`art/direction/tank-silhouette-target-v3.png`. It specifies physical fins,
+plow, shield mass, and rail/outtrigger geometry. It is concept evidence only,
+not an eight-direction production source or runtime asset; no Sprite Fusion
+credits were spent.
+
+The next world-placement pass corrected visibly overloaded tiled walls.
+Previously all complete wall stamps—including 3×3 hex pedestals and long
+non-meadow stamps rendered as two discrete hexes—could receive 107–127 px
+landmarks, and a featured tree could receive two companion trees on the same
+ridge. The presentation derivation now admits only continuous meadow ridges,
+one tall prop per ridge; the large source landmarks are directly resampled to
+70–85 px widths with their bottom contact preserved. Collision stamps were
+not changed. Focused seeded support/footprint tests and generated art checks
+passed, and a real 1280×720 HTML5 opening frame was captured and inspected.
+That frame is visual evidence for the opening composition, not all map seeds
+or native rendering. The rebuilt arm64-macOS Bob bundle then passed the bounded
+packaged-runtime gate, and the focused core/integration/visual suite passed
+143/143 after refreshing its owner-generated bundle-size and native-runtime
+evidence. The Mac was still locked when native pixel inspection was attempted;
+native execution is not a visual signoff.
+The full example suite passed 269/275 with loopback enabled; six remaining
+failures were source-bound evidence freshness checks for load, capped-link
+networking, performance, runtime measurement, VS Code live values, and QUIC.
+Those records span unrelated systems and were not rewritten as part of the
+scenery placement change. A first sandbox-only run also produced local-port
+EPERM failures in fixture tests; those disappeared when rerun with permitted
+loopback access. Do not present the full suite as green.
+
+The later in-game support review rejected even the long stamp's narrow raised
+top as a footing for a building or tall tree. A trial 7×7 raised platform also
+read as two oversized geometric slabs and was removed. The retained rule seats
+at most one building or tree directly on the meadow over an existing long
+blocked stamp, suppresses only that stamp's raised *presentation* sprite, and
+does not change collision or routing. The opening HTML5 frame was rebuilt with
+the actual War Battles project and captured via `pnpm art:capture --live` at
+`build/evidence/war-battles-world-wide.png`. The first terrain replacement
+still showed many black circular rock marks, so it was rejected in the same
+pass. The revised compositor makes one irregular, earth-rimmed rock scar per
+macro rather than a disc per basalt source cell, and leaves those source cells
+level with the meadow to avoid a stray hexagonal rim. This is browser visual
+evidence for the opening view only; the road's broad scalloped edges and the
+remaining cliff compositions still need art direction, and no native visual
+inspection has been performed for this revision.
+An additional source-D paint check removed a disconnected tan hex island: the
+source role remains available, but the compositor now paints road only where
+the six-neighbor route/spur graph has an edge. The final 1280×720 browser
+capture was inspected after this change; focused core/hex tests passed 135/135,
+`hex-terrain:check`, `art:check`, `sync:check`, project typecheck with the user
+cache, lint, and OKF checks passed. The repository-wide example format check
+still reports three files outside this terrain pass, including a generated
+tank-art source and a generated preview JSON; those were not hand-formatted.
+
+The next playable visual pass removed the last floating meadow ridge sprites.
+Every long meadow wall stamp now deterministically receives one building, one
+tree, or a paired ground-seated rock/scrap cover silhouette. The two cover
+anchors are drawn from already approved, bottom-registered landmark sprites;
+no new Sprite Fusion credits were spent. The original static wall cells, map
+seed, routing, and network state are unchanged. Source code and a four-seed
+test assert full long-stamp support and exact suppression of only the covered
+raised presentation anchors. The previously selected six ridge sprites are
+retired from the generated atlas, runtime kind table, and art manifest. The
+art generator prunes only PNG paths explicitly named by its previous generated
+manifest and absent from its new output set; source assets are preserved. A
+fresh 1280×720 packaged HTML5 opening capture shows ground-seated low cover
+in place of the two floating plates, and the WebGL2 browser playability gate
+passes. An arm64-macOS Bob bundle and bounded packaged runtime also passed,
+but the Mac is locked, so native pixels cannot be inspected or compared. This
+is still an opening-view comparison; the entire map's cliff compositions and
+road art are not yet visual signoff.
+Final checks for this pass: generated art freshness, source mirroring, hex
+terrain freshness, example lint, project TypeScript/context typecheck, targeted
+formatting, OKF validation, the 16-test example integration suite, and the
+packaged WebGL2 playability gate passed. The 1280×720 live HTML5 capture was
+repeated after the retired frames left the atlas. The arm64-macOS package
+rebuilt and the native runtime emitted the expected déherm/War Battles markers
+before graceful exit; this is execution evidence, not native pixel evidence.
+The full example suite passed 271/277. The six failures are source-bound
+evidence freshness checks for authoritative load, capped-link networking,
+performance/operability, runtime measurement, VS Code live values, and QUIC;
+the changed core tree invalidates their recorded input digests. Those records
+were not remeasured during the scenery pass, so do not report the full suite
+as green.
+
+The two newest Sprite Fusion floor source groups were rejected on visual
+review: `frontier-hex-earth-track-v1` and `frontier-hex-service-scar-v1` read as
+small raised platforms/floating steel blocks rather than seamless driveable
+ground. Their immutable request outputs remain archived for provenance, but
+the selected floor catalog now has 167 entries from 22 groups. The catalog,
+144-cell composition preview, and continuous floor were regenerated through
+their owners and passed their `--check` modes; a test asserts both rejected
+groups remain outside the selected material graph. A trial of generated tire
+rut strokes also failed a packaged browser visual review (ladder-like marks,
+then thin scratches) and was removed instead of shipping a weak treatment.
+The latest 1280×720 packaged HTML5 opening capture was inspected after that
+rejection, and the Chromium WebGL2 keyboard/fire/restart playability gate
+passed. The updated arm64-macOS Bob bundle passed bounded runtime startup,
+fire, motion, and graceful teardown; native pixels remain uninspected while
+the Mac is locked. The 33 focused terrain/cliff/integration tests pass. The
+wide road itself still reads as broad and flat against the direction mockup;
+no whole-map or release art signoff is claimed.
+The next bounded tweak reduced the road's authored half-width from 37 to 26
+floor pixels and narrowed its noisy shoulder, because connected road edges
+were merging into tan pools at junctions. The packaged 1280×720 HTML5 frame
+shows a cleaner but still stylized path; WebGL2 playability passed again.
+The arm64-macOS bundle and source-bound bounded runtime were re-recorded for
+that exact terrain revision. It remains a visual iteration, not a claim that
+the battlefield matches the mockup.
+
+The October 8 border/foliage iteration added a deterministic, half-scale
+conifer scatter on clear meadow, preserving every collision byte and avoiding
+spawns, pickups and non-grass roles. The prior metal border rail was isolated
+as the dashed diagonal artifact in the opening frame and removed from the
+runtime tilemap; the same solid perimeter remains authoritative. Seeded
+grounded rock anchors provisionally mark it, but the repeated row is still
+visually weak and must not be called final art. The generated meadow macro's
+opposite-edge mean luma mismatch improved after a periodic source blend;
+that metric did **not** fix the dashed line, which was a separate border-layer
+problem. The two Sprite Fusion floor groups rejected above remain unselected,
+and `pnpm hex-terrain:check` confirms the selected output is fresh.
+
+One new cliff-face source study used the built-in image generator, not Sprite
+Fusion credits. Its PNG and exact digest/prompt record are archived under
+`art/source/imagegen/`. Two generated-sprite trials were packaged with Bob
+and captured in Chromium at 1280×720. The first placed walls above the
+border contact; moving the top lip to the contact still produced visibly
+disconnected slabs over driveable-looking ground. Both trials were rejected
+and their runtime atlas/script/generator changes removed through the owning
+generator. The source study is not a shippable tile. This visual rejection is
+stronger evidence than the successfully compiled trial; no native pixel
+approval is inferred while the Mac is locked. Focused cliff/terrain tests
+passed 19/19 after restoring the runtime state. The exact restored sources
+passed art/terrain/tilemap/source freshness, TypeScript context typecheck,
+lint, OKF validation, a fresh Bob HTML5 package, a captured 1280×720 live
+frame, and the packaged Chromium WebGL2 keyboard/fire/restart gate. This
+confirms the rejected candidate is absent and the game remains playable;
+it does not visually approve the provisional rock border or whole map.
+
+### 2026-10-08 - Hex terrain visibility and correct example-bundle evidence
+
+The War Battles collection loads three tilemap components: a landscape macro,
+arena decor/walls/marks, and raised wall faces. An initial diagnosis that
+`tile: 0` meant an empty landscape was wrong: pinned Defold tilegrid source
+loads zero as its first compiled tile index and uses `0xffff` as empty. The
+visible failure was instead in the deterministic floor compositor, which had
+removed all same-height meadow edges. A quiet lit/shadow meadow bevel was added
+to the generator and the derived 1152px terrain regenerated. The focused
+hex-terrain suite passed 10/10, including a resource-attachment and edge-value
+regression, and `pnpm hex-terrain:check` passed.
+
+The root `pnpm bob:web:bundle` defaults to the smoke project's `defold/`
+directory, so its first successful run did not update War Battles. Rerunning
+with `DEFOLD_HERMES_PROJECT=examples/war-battles-online/defold` compiled the
+changed tilesource through pinned Bob and local Extender. The packaged
+1280×720 Chromium WebGL2 keyboard/fire/restart gate passed, with a fresh
+`build/evidence/war-battles-html5.png` that visibly shows the meadow hex
+contours. This proves loaded-browser presentation for the new terrain, not
+native visual quality, object-collision alignment, or final world-art quality.
+The matching arm64-macOS Bob bundle also built and its bounded packaged runtime
+gate passed: Defold 1.14.0 loaded the TypeScript bundle, engaged a 16-player
+offline arena, fired, moved and exited zero. A separate interactive native
+window rendered the title, but computer-use input did not advance its Deploy
+screen, so no native in-match pixel claim is made. That inspection exposed
+per-frame camera and telemetry lines flooding the terminal; the interactive
+process was stopped and this remains an operability issue.
+
+### 2026-10-08 - Three-tier aligned terrain and new title source
+
+The landscape generator now reads a periodic 12×12 low/standard/high relief
+field instead of assigning a uniform tier. All cells remain on one 96px hex
+lattice; a two-tier traverse lifts presentation position by at most five
+screen-world pixels, interpolated while driving. Tier boundaries have shallow
+7/12px source faces, not stacked wall cells. Focused terrain tests passed
+10/10, including tier coverage, no isolated nonstandard cells, periodic
+border, and bounded sample-to-sample lift. `pnpm sync:check` and
+`pnpm hex-terrain:check` passed. A fresh example Bob HTML5 package and the
+1280×720 Chromium WebGL2 playability gate passed; the in-game capture is
+`build/evidence/war-battles-html5.png`. The browser pixels show aligned hex
+contours, but not final coast art, collision-footprint alignment, or native
+in-match presentation.
+
+The new title source is `art/source/imagegen/title-hex-frontier-v1.png`,
+1672×941, SHA-256
+`80855850ab12c47cd005ac359fe0e691bed42c1d100cf31dad7df7bb1cb1a925`.
+Its adjacent JSON records the exact built-in image-generator prompt. A
+digest-checked nearest-neighbor emitter owns the 1280×720 runtime background;
+`pnpm title-art:check` and six focused world-art tests passed. The HTML5 title
+capture is `build/evidence/war-battles-title-html5.png`. No Sprite Fusion
+credits were spent for this background. A compact backing for the separate
+Sprite Fusion sponsorship text was added after that capture to fix contrast;
+the example was rebuilt and the 1280×720 packaged Chromium/WebGL2 gate passed
+again. The refreshed title capture SHA-256 is
+`d39a5f0050cced67989441952a66f827e7789c3660d70517fc06956f694a1233`;
+inspection confirms the sponsorship remains legible against the ocean. This
+is browser presentation evidence, not native in-match art signoff.
+Focused art/terrain tests passed 16/16, the title GUI integration case passed,
+project typecheck and touched-file formatting passed, and OKF validation
+passed. The broader integration command still fails its pre-existing
+`packaged-runtime-arm64-macos.json` source-freshness gate; the example-wide
+format check also reports two unrelated modified files. Neither was counted
+as a title-art pass, and the full example check is not green.
+
+### 2026-10-08 - World-edge collision and bounded prediction recovery
+
+`ArenaMap.solidAt()` was reproduced returning false for cells beyond the top
+and bottom edges even though `cellAt()` returned a wall. Bounded cover-table
+indexing had no exterior guard. An explicit bounds check now makes every
+exterior cell solid, and the same test exercises circle resolution at the
+lower edge. This is not evidence that decorative prop silhouettes match their
+authoritative wall stamps.
+
+`BattleClient.update()` previously set its remaining fixed-step accumulator
+to zero whenever a render frame hit the work budget. A twelve-tick frame
+stall therefore ran four ticks and lost eight, priming the next snapshot for
+a large reconciliation. The client now retains at most thirty ticks of debt
+and drains it over later frames; a longer pause stays bounded. This does not
+change the authoritative tick or server snapshot cadence. The full core suite
+passed 121/121; project typecheck, lint, and the deterministic 32-client
+network impairment matrix passed. Matrix maximum local corrections remain
+850/910/2352 fixed units across its three profiles, because that harness does
+not inject renderer stalls. A fresh example Bob HTML5 package passed Chromium
+WebGL2 playability (keyboard, fire, restart). A fresh arm64 macOS Bob bundle
+passed the bounded packaged native runtime gate with Defold 1.14.0 and clean
+exit. Neither gate measures long-match visual smoothness or proves prop
+collision alignment; both remain open.
+
+The prediction diagnostics now record eight fixed-width local-correction
+buckets at each reconciliation, without per-call allocation. The generated
+authoritative-load and impairment-matrix evidence was refreshed through its
+own commands and passes freshness checks. Across the 32-client broadband,
+mobile, and edge profiles respectively, correction magnitudes exceed eight
+pixels in 6.60%, 12.61%, and 25.95% of samples; over-32-pixel samples are
+0.38%, 1.55%, and 7.49%. Maximum-only reporting had concealed that frequency.
+The full core plus source-bound evidence suite passed 124/124, with typecheck
+and source mirror freshness passing. This is deterministic impaired-link
+evidence, not a live QUIC or human motion capture.
+
+The generated performance record then exposed one actual budget miss:
+8,186.6 snapshot payload bytes/s per client against an 8,000-byte stretch
+target. The product server and matching harness now force a periodic keyframe
+every 50 rather than 40 snapshots; this remains below the 64-frame ACK
+history and does not alter ACK-triggered recovery. The measured workload is
+7,922.9 bytes/s and the stretch target passes. Exact wire-size tests were
+updated to the newly observed smaller maximum and four rather than five
+keyframes in their 200-frame trace. The 32-client impairment matrix, real
+loopback Deno/Chromium QUIC gate, HTML5/WebGL2 game gate, and native Defold
+1.14.0 packaged runtime gate passed after this change. Soak, bundle-size,
+performance, load, network, WebTransport, browser measurement, and packaged
+native evidence were refreshed through their owning recorders, not hand-edited.
+The final 50-frame impairment record has local-correction maxima
+899/910/2352 fixed units, over-eight-pixel rates 6.20%/13.61%/25.15%,
+and over-32-pixel rates 0.34%/1.72%/7.34%. One middle profile worsened on
+this measure despite the payload saving; the keyframe interval is not a
+motion-smoothing fix.
+The full example suite with loopback permission passed 284/285. The one
+remaining VS Code visual-evidence case describes a previously observed
+eight-player arena while current source defaults to sixteen; no editor
+inspector session exists to re-observe it in this run. Its verifier remains
+fail-closed. A new live VS Code capture is required before that suite is green.
+
+### 2026-10-08 - Cinematic hex title background v2
+
+The selected title-screen source is now
+`art/source/imagegen/title-hex-frontier-v2.png` (1672×941, SHA-256
+`87df7526fa0e631a375416b77d98d02db10770c6f0636c0b2bddca47b3dacf54`).
+The prompt and digest are in its adjacent manifest. The new image frames a
+quiet, aligned hex field with foreground tank silhouettes, volcanic mountains,
+refinery smoke, and a coastal cliff; the central logo/menu are still separate
+interactive GUI nodes. The previous v1 source is retained for comparison.
+The title emitter selected v2 and regenerated the 1280×720 runtime backdrop.
+`pnpm title-art:check` and all six focused world-art tests passed. The runtime
+PNG itself was visually inspected at 1280×720. The example wasm-web Bob bundle
+then passed the Chromium/WebGL2 packaged playability gate at both the default
+and 1280×720 browser viewports. The second live composite capture is
+`evidence/hex-title-v2-browser-2026-10-08.png` (SHA-256
+`cfee07d072440ede98d46e56e23b3424a3d8b7ad37daf92dbb6d65c467c8a62d`);
+the separate logo, deploy button, and sponsor text are legible over the
+background. This verifies the browser title composition, not native display
+or in-match art.
+
+### 2026-10-08 - Hex frontier title background v3 and web build isolation
+
+The title source moved to `art/source/imagegen/title-hex-frontier-v3.png`
+(1672×941, SHA-256
+`b754a0ecc2f353f991b6f2cc3329baa003b026d016b0619c8797fef1ae6cf4e3`).
+The exact built-in image-generator prompt and digest are recorded in the
+adjacent manifest. V1 and v2 remain archived. V3 uses a more continuous
+hex-lattice island, traversable relief, a full coastal cliff, and more
+distinct tank silhouettes while keeping separate GUI controls readable;
+no Sprite Fusion credits were spent. The title emitter produced the
+1280×720 runtime background; `pnpm title-art:check` and all six focused
+world-art tests passed.
+
+The first packaged browser capture timed out before game startup. A bounded
+Chromium transcript showed `builtins/render/default.render_script` failed
+with `bad header in precompiled chunk` after alternating native and web Bob
+builds in the same `defold/build/bob` directory. Bob's web output is now
+isolated at `defold/build/bob-wasm-web`, leaving the native runtime's
+`defold/build/bob` contract unchanged. A fresh web bundle then passed the
+packaged Chromium/WebGL2 keyboard, fire, and restart gate at 1280×720. The
+live composite capture is
+`examples/war-battles-online/evidence/hex-title-v3-browser-2026-10-08.png`
+(SHA-256
+`1532441afadc0cc1147028f8e720f5d4dc2c9f6336959c996c34552616cb3244`).
+Inspection shows the logo, deploy card, and sponsor credit legible over the
+new background. This is browser title presentation evidence only; it does
+not validate native title rendering, gameplay art, or network smoothness.
+
+### 2026-10-08 - Target-isolated Bob caches, lead experiment, and earth cliff selection
+
+The native packaged gate reproduced a `ShaderDesc`/game-object startup failure
+after a web Bob build had populated the same incremental output. The
+cross-target `defold/build/bob` directory was preserved as an ignored stale
+diagnostic, a clean native output was built, and the arm64 Defold 1.14.0
+packaged gate passed with a graceful exit. `scripts/bob.sh` now directs
+`wasm-web` output to `defold/build/bob-wasm-web` while keeping the established
+native `defold/build/bob` path. A fresh packaged Chromium/WebGL2 gate passed
+after the change. This is cross-target build evidence, not native visual QA.
+
+The current 32-client impairment harness was traced at first snapshot. Its
+first keyframe is 8–10 ticks old in broadband-adverse, 10–13 in
+mobile-congested, and 16–20 in edge-congested. A one-time first-keyframe lead
+jump was tested at ceilings of 4, 6, 8, and 16 ticks. The eight-tick ceiling
+reduced edge over-eight-pixel corrections from 23.15% to 18.48% but raised
+mobile from 7.66% to 8.82%; the sixteen-tick ceiling raised mobile to
+10.98%. A second prototype used snapshot `playerLastInputTick` as upstream
+feedback, but the broadband profile fell to 92.94% input acceptance below
+its 95% floor and convergence failed. Both prototypes were removed. The
+original client algorithm and generated impairment evidence again pass the
+freshness gate. Downlink age and server-applied input tick each expose only
+part of the timing problem; a combined estimator needs independent proof
+before changing production lead. The constrained 32-player motion target is
+still unmet.
+
+A separate art pass excluded bright earth raised-cliff candidates 13 and 14
+from the cold-path runtime selector, keeping darker candidate 12 and all
+source images. The four-seed `hex-cliffs` suite passed 10/10, typecheck
+passed, and the source mirrors and TypeScript bundle were regenerated through
+their owners. Fresh HTML5 Bob/Chromium playability and arm64 Bob/packaged
+runtime gates passed. The browser opening view does not frame the selected
+earth cliff, so the selection is not yet a visual-art acceptance. A desktop
+window visible through UI automation belonged to an older standalone
+`War Battles.app` process, not the fresh `dmengine` process; its pixels were
+explicitly rejected as evidence for this build.
+
+The example's full check then found a generator/formatter mismatch in the
+new tank-wreck animation table. The art emitter now writes the same multiline
+table that `oxfmt` expects; `pnpm art` regenerated its owned source, and
+`art/preview/` is excluded from formatting because it contains generated
+diagnostic reports, not authored code. The deherm bundle was rebuilt from
+that source. The Static Hermes release projection was reconstructed by its
+generator after source changes; its 12 focused bridge tests pass. The full
+example check reaches the test suite but is **not green**: eight source-bound
+evidence tests are stale after the broader game changes (32-player load,
+bundle size, packaged runtime, network impairment, performance, runtime
+measurement, VS Code visual values, and WebTransport). Re-recording each
+requires its own owner and observed run; no metadata digest was changed by
+hand. The floor's existing low/standard/high relief uses one authored hex
+lattice and a continuous tank/pilot presentation lift. That verifies code
+alignment, not that every raised cliff looks grounded in gameplay.
+
+The raised-cliff audit measured up to 45 terrain pixels of drift between
+square-wall anchor positions and the authored hex centers. The cold-path
+presentation projection now retains authoritative wall coordinates but emits
+separate snapped visual coordinates only for a hex center inside the same
+blocked stamp; duplicate visual hexes are dropped. The tilemap generator uses
+the same projection and restores wall tops for unsnappable stamps instead of
+hiding their collision. Four-seed raised-cliff tests pass 10/10. The HTML5
+Bob package passed the Chromium/WebGL2 keyboard/fire/restart playability gate
+at 1280×720 (`evidence/hex-grid-snapped-browser-2026-10-08.png`, SHA-256
+`18a1bda09d0ceb81c2b3ea6cb25788d1d426777302732ca6cdb1be94aa1504ae`).
+The fresh native Bob archive passed the arm64 Defold 1.14.0 packaged-runtime
+gate (`evidence/packaged-runtime-arm64-macos.json`, record
+`d5a960da9fa9ccdd83b346523fae15b01cfab42e73c9de6eaa29cbc114118e82`).
+The browser gate's opening view did not frame a snapped cliff, and native
+pixels were not inspected, so these are compile/startup/input checks plus
+structural alignment evidence, not a visual signoff on cliff art. Other
+source-bound evidence records remain stale against the wider evolving game.
+After recording the new native packaged run, seven source-bound example tests
+still fail freshness: authoritative load, bundle size, impairment matrix,
+performance, runtime measurement, VS Code visual values, and WebTransport.
+The timed live-browser camera tour reached another part of the battlefield
+but still did not frame a corrected raised cliff; its two diagnostic captures
+must not be used as acceptance evidence for the cliff placement.
+
+### 2026-10-08 - SNK hex title background v4
+
+The v3 title source remained a tropical panorama that did not closely match
+the playable hex-world palette or tank scale. A new built-in image-generator
+source, `examples/war-battles-online/art/source/imagegen/title-hex-frontier-v4.png`
+(1672×941, SHA-256
+`9c8ef090784984b8006a47a243f9fc096661c06cd152adf9464868eec02107ce`),
+used the approved hex-world direction and an actual packaged-game capture as
+references. The exact prompt and source identity are in its adjacent JSON
+manifest. It depicts aligned terrain, subtle terraces, refinery, basalt cliff,
+sea, and two grounded tank/driver silhouettes while leaving the middle for
+separate UI. No Sprite Fusion credits were spent on this source.
+
+The title emitter selected v4 and regenerated its 1280×720 Defold background;
+`pnpm title-art:check`, the six focused world-art tests, example formatting,
+example generated-state verification, and `pnpm check:knowledge` passed. A
+fresh wasm-web Bob bundle and the packaged Chromium/WebGL2 playability gate passed.
+The composited title capture is
+`examples/war-battles-online/evidence/hex-title-v4-browser-2026-10-08.png`
+(SHA-256
+`83d70df418365b6d6d6a8d2d66ea5d1bd582abcec94b378204d2ff9b39eba7e2`).
+Visual inspection at the 756×425 browser game scale found the logo, deploy
+card, and sponsor credit readable, with tanks framing the card and the hex
+field still legible. This establishes HTML5 title presentation only; it is
+not native visual QA or evidence of gameplay art quality.
+
+### 2026-10-08 - WebTransport input-channel audit against SuperTripLand
+
+The linked SuperTripLand post identifies a browser-side queue that can retain
+accepted WebTransport datagrams under congestion; its per-input-stream reset
+and Worker clock address that failure. War Battles already bounds admission
+and staging but had no browser-queue expiry. The browser client now requests
+150 ms `outgoingMaxAge` when offered by the host. A real packaged-browser
+attempt exposed Deno's `NumberIsNaN is not defined` exception in the server's
+WebTransport datagram expiry setter; the hint is now client-only and optional,
+and the test suite covers a throwing client setter. The timeout gate also
+reports live telemetry, browser diagnostics and the server tail rather than
+formatting empty state before waiting.
+
+The 122 focused core tests and TypeScript context checks passed. The first
+packaged QUIC and fallback gates also passed, but the intervening Bob command
+defaulted to the repository's **smoke** project, leaving the pre-existing War
+Battles archive in place. That first gate therefore did not prove the new
+client code was inside its package; a later explicit example-project build
+below supersedes this evidence. Neither short gate measured packet age under
+congestion, native behavior, or visible network smoothness.
+
+### 2026-10-08 - Cadence-derived first-keyframe lead and real example package
+
+The current deterministic 16-player edge profile localized startup trouble:
+775 late inputs in 600 ticks, with 16 of 18 >32-pixel local corrections in
+the first 60 ticks. Its first server keyframe was 14–17 ticks old when applied,
+but the prior fixed `targetDistance >= 18` rule bootstrapped only two of the
+sixteen clients. The rule now recognizes a first keyframe older than two
+server-advertised snapshot intervals plus the configured starting lead. This
+is a cadence-relative classification, not a new send or simulation rate.
+The same deterministic workload then recorded 356 late inputs and four
+>32-pixel corrections for 16 clients; the 32-client edge profile recorded 809
+late inputs and a 2.55% >32-pixel correction tail versus 1,156 and 3.49%
+before. Broadband and mobile results remained at their previous values.
+Snapshot shedding on the constrained edge link rose, so this is an improved
+startup prediction trace, **not** final smooth-motion or bandwidth signoff.
+The owner regenerated both source-bound load records; 127 focused tests pass.
+
+After `pnpm sync` and deherm compilation, Bob was run with
+`DEFOLD_HERMES_PROJECT=examples/war-battles-online/defold` so its source-bound
+bundle fingerprint and archive belonged to the actual game. That fresh
+Chromium/WebGL2 package passed the local Deno QUIC gate with datagram inputs,
+and the WebSocket fallback gate passed separately. The QUIC gate now checks
+that Chromium's *live* WebTransport session reports `outgoingMaxAge = 150`,
+not merely that the source assigned it. The game's allocation-stable browser
+telemetry additionally exposes current lead, maximum local correction, and
+>32-pixel correction count. The short QUIC gate reported lead 3 and zero
+corrections after three snapshots; this cannot establish long-match motion
+quality. Native pixels, congested browser packet age, and sustained in-game
+play remain to be verified.
+
+The same compiled TypeScript bundle was then packaged for arm64 macOS. The
+bounded native Defold 1.14.0 runtime gate passed its tutorial-to-arena marker
+chain and exited cleanly with the 16-player offline match initialized. This
+is native startup/gameplay execution evidence, not native online transport or
+native pixel inspection. The example-project HTML5/QUIC gate emitted
+`examples/war-battles-online/evidence/online-16-client-2026-10-08.png`
+(756×425, SHA-256
+`76a48597b401b4702cf79fbb2f0e438f90831f1b12253f1b04d41f8c8cf993b6`).
+At its real gameplay scale the online frame shows the hex field, multiple
+distinct tank silhouettes, landmarks, effects, and HUD with nearest-neighbor
+pixel edges. One frame cannot prove seam behavior while panning, directional
+animation alignment, HUD legibility at smaller windows, native rendering, or
+that its presentational hexes always match collision. No Sprite Fusion credits
+were used in this verification pass.
+
+The full example suite passed 289 of 290 tests after the owner commands
+refreshed the source-bound load, network, packaged-runtime, browser,
+WebTransport, performance, runtime-measurement, and bundle-size records. The
+remaining test is the *intentional* VS Code visual-evidence freshness check:
+its September live renderer capture shows an eight-player property default,
+but the October arena source declares sixteen. There is no current VS Code CDP
+listener on port 9333, nor an active inspector session to support a genuine
+new capture. The old screenshot and JSON have not been rewritten or promoted
+as evidence of the new default. Generated-state verification, TypeScript
+context checks, and the OKF structural/graph checks passed separately; these
+do not substitute for the missing live editor observation.
+
+### 2026-10-08 - Sustained packaged-browser motion on both transport lanes
+
+The short QUIC admission gate could not distinguish a responsive moving game
+from one that merely exchanged its first packets. The same Bob-packaged HTML5
+game now exposes allocation-stable local pose/mode/generation telemetry and a
+`--motion` gate that holds two real keyboard directions for five seconds,
+samples the browser repeatedly, excludes mode/generation transitions from
+same-life movement, and requires ongoing authoritative input acceptance. A
+fresh example-project wasm-web archive passed on Chromium/WebGL2: 319 client
+ticks, 43 subsequent snapshots, 320 additional accepted datagram inputs,
+31-pixel largest same-life sample step, and zero >32-pixel local corrections.
+The explicit WebSocket/TCP fallback also passed: 318 ticks, 45 subsequent
+snapshots, 318 additional accepted inputs, 41-pixel largest same-life step,
+and zero >32-pixel corrections. Both were localhost 16-player observations.
+They do not establish impaired-path smoothness, remote-tank visual stability,
+camera quality, or the native online motion path. The 32-player edge matrix
+continues to show visible-jump risk and remains open work.
+
+The native arm64 example archive was rebuilt from the same source and its
+runtime record regenerated through the owner command. Load, network-matrix,
+WebTransport, and bundle-size records were likewise refreshed. The complete
+example suite passes 289/290 tests with loopback permitted; the only remaining
+failure is the stale eight-player VS Code visual observation described above.
+
+### 2026-10-08 - Compact combat announcement at authored game scale
+
+The repository art workflow called for comparing a packaged browser frame at
+the actual game viewport before changing HUD assets. A 1280×720 browser
+viewport presents a 1205×678 game canvas; its old `ROUND 2` announcement
+occupied the entire 520-pixel nine-slice width despite a seven-character
+message. The authored GUI background is now centered with a north pivot, and
+the existing nine-slice changes width within 144–520 pixels according to
+message length. No new node, texture, or Sprite Fusion request was added.
+The owner browser gate rebuilt and captured the 16-player WebGL2 scene at
+`examples/war-battles-online/evidence/hud-compact-round-browser-2026-10-08.png`
+(SHA-256
+`8a6653a18c1cc16d40a4af6c5b06258f7836cf281cc330db90a307f39dbb6f7c`).
+Visual comparison shows the short round marker as a compact badge with hex
+terrain visible on both sides. The focused HUD layout tests, TypeScript
+contexts, format check, and browser playability gate passed.
+
+A fresh arm64 Defold 1.14.0 app rendered the current title correctly in the
+native window, and the packaged native runtime gate again reached and exited
+the offline arena. UI automation attempts to click Deploy and press movement
+keys did not produce `war-battles:user-input` or a title transition in the
+captured native process. This is **not** evidence that native play input is
+broken: that automation path itself is not known to deliver Defold input to
+the Vulkan window. Native in-match visual and interactive signoff therefore
+remain open. The owner refreshed native packaged and bundle-size records;
+the full example suite returns to 289/290, with only the previously disclosed
+stale VS Code visual record failing.
+
+### 2026-10-08 - Independent snapshot-stream ordering in the impairment model
+
+The 32-player impairment harness had treated every numbered reliable channel
+as one ordered stream. This was stronger than the packaged WebTransport
+adapter's actual snapshot contract, where each frame owns an independent
+reliable stream. The harness now preserves ordering only for session, control,
+and fallback input. It counts snapshot-stream reorders separately from true
+ordered-channel violations. A deterministic two-frame regression delivers
+snapshot 2 before snapshot 1 and proves control 1 still precedes control 2.
+
+The owner regenerated the authoritative-load and network-impairment records.
+The 32-player broadband and edge profiles each observed one out-of-order
+snapshot; mobile observed none, and all three retained convergence and no
+protocol errors. Focused authoritative-load and impairment tests passed 6/6.
+This corrects the fidelity of simulated transport evidence but does not
+improve rendering, prediction, or the still-large edge-link correction tail.
+The network model remains application-payload-only and is not a QUIC packet
+capture; native/browser impaired-path visual play remains unverified.
+
+The user then supplied the complete ten-page SuperTripLand article. Its
+WebTransport claim is specifically about **client input**: datagrams appeared
+to accumulate inside the browser under packet loss; one cancellable stream
+per input with a 300 ms expiry stopped stale sends, and a Web Worker separated
+the network clock from slow render frames. Earlier speculation that its key
+recommendation was an unreliable server-snapshot lane was too broad. The
+War Battles browser code has bounded datagram staging and requests a 150 ms
+`outgoingMaxAge`, but there is no measured packet-departure cadence under
+loss and no Worker isolation. The roadmap now records the precise experiment
+needed before replacing the current 30 Hz input transport. This is source
+analysis, not evidence that SuperTripLand's result transfers to our workload.
+
+The changed example TypeScript passes `tsc --noEmit`, and focused format and
+OKF checks pass. The composite `deherm typecheck --project defold` did not run
+to completion: its generated manifest reports inputs mismatching the current
+installed package in this broad dirty worktree. No broad regeneration was
+attempted while other work is in flight; that generated-state gate remains
+open rather than being counted as a pass for this tranche.
+
+### 2026-10-08 - Packaged-browser input cadence during main-thread stalls
+
+The existing Bob-packaged Chromium/Defold-Wasm game and local Deno QUIC server
+passed a five-second normal motion gate: 313 client ticks, 43 snapshots,
+314 additional server-accepted commands, no >32-pixel local correction, and
+the browser applied the 150 ms datagram outgoing-expiry hint. A new
+`runtime:browser:online:cadence` diagnostic samples server accepted-command
+increments from Node while deliberately blocking the browser's main thread
+for 180 ms four times. Two independent runs each observed a 56 ms maximum
+baseline gap; the stalled windows observed 217 and 191 ms maxima. The baseline
+count was 162 accepted commands over about 2.5 seconds in both runs; the
+stalled count was 230 over about 4.5 seconds. Both runs reported zero client
+datagram-write drops and continued to apply 56-59 snapshots.
+
+These counts are accepted commands, not packet or wire timestamps: one input
+datagram carries a bounded redundant command window. The forced stall is a
+browser-main-thread scheduling probe on localhost, not network packet loss.
+It shows the current game stops producing timely inputs during a long main-
+thread stall, so moving only its WebTransport socket to a Worker would not
+keep the Defold simulation advancing. It does not diagnose the unmeasured
+internal browser datagram queue under real loss or prove WAN smoothness.
+
+### 2026-10-08 - Real packaged-browser QUIC loss on loopback
+
+The cadence gate now has a seeded UDP packet-loss hop between the packaged
+Chromium WebTransport client and the actual Deno HTTP/3 server. Its first run
+timed out and fell back to WebSocket because the proxy sent IPv4 UDP to a
+`localhost` server bound on IPv6 loopback; that was a probe-routing error,
+not evidence that the game's QUIC path failed. The corrected probe explicitly
+binds Deno to `::1`, bridges the browser's `127.0.0.1` URL to that listener,
+and begins dropping encrypted UDP packets only after the QUIC match is ready.
+
+At 10% seeded packet loss, one run dropped 35 client-to-server and 28 reverse
+QUIC packets. The browser remained on WebTransport, sent 198 input datagrams
+without a client-reported write drop, applied 59 snapshots, and its unstalled
+server-observed accepted-command gap topped out at 81 ms. Two 20% runs dropped
+86/71 and 77/80 packets; their unstalled gaps were 137 and 111 ms, with one
+and zero client-reported datagram-write drops. The refreshed no-loss control
+had a 56 ms unstalled gap, but deliberate render stalls still caused a 191 ms
+gap and one >32-pixel local correction. In the final 20% run, the stall-window
+gap was 246 ms, no server inputs were reported late, and no >32-pixel local
+correction occurred. This is one-client loopback WebTransport evidence under
+real encrypted-packet loss, not WAN, full 16-player remote load, or direct
+measurement of browser-internal queue age. The short run does not reproduce
+the source article's 128 Hz datagram death spiral at our 30 Hz input cadence.
+The normal packaged-browser five-second motion gate still passed after the
+optional proxy was added. The real 20% loss motion variant also passed:
+320 client ticks, 42 applied snapshots, 288 additional server-accepted input
+commands, 805 world pixels of same-lifecycle movement, nine-pixel maximum
+local correction, no >32-pixel local corrections, and 66/44 encrypted UDP
+packets dropped toward/from Deno. These are short single-client loopback
+observations; they do not sign off 16 remote clients or WAN smoothness.
+
+### 2026-10-08 - Short stacked-hex coast and depot footprint exclusion
+
+The continuous sampled cliff face made the coast look like a stretched slab.
+`tools/generate-coast.mjs` now reads the generated raised-hex sprites only
+after checking their hashes against `arena-art.json`, then composes two
+staggered short rows along the front shoreline. The old image-generation study
+is archived, not a runtime dependency. `pnpm generate` and
+`pnpm verify:generated` now order `art` before `coast` because the coast is a
+deterministic downstream projection of the checked art cells. No Sprite Fusion
+API request or credit was used in this change. The first, loosely spaced
+WebGL2 trial visibly left blue gaps between isolated columns; tighter overlap
+produced the current
+[packaged 1,280×720 capture](../../examples/war-battles-online/evidence/hex-stacked-coast-browser-2026-10-08.png)
+with a connected hex-cell wall and less visual height over the ocean. The
+`wasm-web` Bob bundle, arm64-macOS Bob build, focused hex-cliff tests, and
+packaged WebGL2 sea-animation gate pass. The Mac desktop was locked during
+this pass, so native *pixels* of this revision remain unverified.
+The full example `verify:generated` gate, TypeScript context check, HTML5
+playability gate, and five-second live WebTransport motion gate also pass on
+this revision. The source-bound load, network-impairment, performance,
+runtime-measurement, WebTransport and native packaged-runtime records were
+refreshed through their owning commands. The native runtime reported the
+Defold 1.14.0 engine, loaded the current TypeScript bundle, entered the
+16-player arena, and exited gracefully; no engine process remained afterward.
+With loopback permission the broader suite passes **294/295** tests. Its sole
+failure is the live VS Code screenshot evidence: that capture still records
+an eight-player editor property where the source now declares sixteen. The
+Mac desktop was locked, so it was not recaptured or forged. This remains a
+real, explicit editor-evidence gate rather than being counted as green.
+The current packaged HTML5 build also passed a five-second browser/QUIC
+motion probe with 10% seeded encrypted-packet loss: 318 client ticks, 42
+snapshots, 318 accepted inputs, two-pixel maximum same-life local correction,
+no correction over 32 pixels, and 18 dropped UDP packets in each direction.
+That is short loopback evidence, not a WAN smoothness or 16-remote-client
+signoff.
+
+A separate seed sweep found three generated building/depot presentation
+footprint overlaps among map seeds 0–255 (76, 95, 150). Landmark selection
+now excludes depot footprints while leaving the authoritative wall/stamp map
+unchanged. The 257-seed test (0–255 plus the product seed) passes after the
+change. This is a projected-footprint gate, not a live tank-driving collision
+trace or proof that every sprite alpha pixel exactly matches its collider.
+
+### 2026-10-08 - Lower shoreline for the stacked-hex island
+
+The two-course coast was still visually too high over the ocean. The coast
+emitter now projects each hex source into a 40×18 image-pixel cell, offsets
+the lower course by ten image pixels, and uses a 48-screen-world-pixel
+foundation (previously 40×24, 16, and 76). The source art, palette selection,
+96-pixel hex pitch, and collision map did not change; no Sprite Fusion credits
+were spent. `pnpm coast` regenerated the texture and manifest. All 14 focused
+hex-cliff tests passed, including the generated manifest contract. A fresh
+`wasm-web` Bob bundle built successfully with local Extender, and a 1280×720
+headless WebGL gallery capture was inspected at game scale. The packaged
+coast-animation check passed: 889 changed ocean pixels and zero changed cliff
+pixels over 430 ms. This establishes generated-image and browser-pixel
+behavior, not native visual parity or gameplay quality across all camera views.
+
+### 2026-10-08 - Grounded dry-earth walls replace floating ochre podiums
+
+The packaged online video exposed three isolated ochre hex pedestals in the
+dry-earth portion of the battlefield. The shared seeded presentation selector
+previously grounded long meadow stamps but sent long dry-earth stamps through
+the raised-sprite path. It now gives those dry-earth stamps a paired,
+biome-consistent low-cover silhouette, using existing generated source art.
+`pnpm sync` and `pnpm tilemap` regenerated Defold-local sources and wall layers
+from that selector; the authoritative wall cells and collision were unchanged.
+All 14 focused hex-cliff tests pass, including covered-stamp and wall-layer
+checks, and the TypeScript bundle plus `wasm-web` Bob bundle built. A real
+packaged HTML5/WebTransport capture at
+`build/evidence/war-battles-online-impaired.mp4` was inspected at five seconds:
+the ochre podiums are absent, and ground-seated cover occupies those positions.
+That 10.17-second run used 65±15 ms one-way QUIC delay and 10% seeded packet
+loss; it applied 73 snapshots, accepted 595 inputs (15 late), and observed a
+12-pixel maximum local correction with no correction over 32 pixels. These
+numbers are a single short loopback run, not WAN or 16-remote-client evidence.
+The video screencast perturbs timing and is not a performance benchmark.
+Native build/pixel parity and exhaustive seed-by-seed visual review remain open.
+After a no-behavior-change selector refactor, the final packaged HTML5 run
+reproduced the grounded-cover view with 74 snapshots, 620 accepted inputs,
+zero late inputs, and a three-pixel maximum local correction under the same
+configured impairment. Its video is the current file at the path above; an
+extracted five-second still is
+`build/evidence/war-battles-grounded-dry-earth.png`. The Mac was locked when
+desktop capture was attempted, so native pixels could not be inspected.
+The `arm64-macos` Bob build and a packaged native runtime smoke also passed:
+Defold 1.14.0 loaded the current TypeScript bundle, entered the 16-player
+arena, and exited cleanly. This is native compilation/runtime evidence, not a
+native screenshot. The owned 32-player load, network-impairment, performance,
+runtime-measurement, bundle-size, packaged-native, and WebTransport records
+were refreshed after the source change. The example suite then passed
+**297/298** tests; the remaining failure is the pre-existing VS Code visual
+evidence capture declaring eight players while the game source now declares
+sixteen. That screenshot was not silently rewritten or promoted as current.
+
+### 2026-10-08 - Research and reject the first procedural island preview
+
+Before further terrain code, read primary material from Red Blob's hex/island
+map work, Maxis' Spore terrain and object-distribution papers, Hello Games'
+continuous-world-generation presentation, Metanet's N++ level-design notes,
+and the user-linked Supernova Files hex-isometric TileMap article (the Google
+Sites URL resolves to its current site). The transferable rules are one
+seeded hex attribute plan, explicit land/elevation/biome fields, separated
+manufactured surfaces, spaced/scored props, floor-foot anchors, and sorting
+of tall art by ground contact. Godot's particular tile-size settings do not
+transfer to Defold. N++ is a curation/test reference, not evidence of a
+procedural N++ terrain algorithm.
+
+The first world-plan source-art preview was reviewed and rejected: broad dark
+regions and a whole Voronoi service/metal biome lose the earlier greener
+in-game art direction. The generator must classify only natural ground as a
+biome and place roads, depots, buildings and walls in a separate sparse
+infrastructure layer. A four-seed read-only 32-player diagnostic found no
+blocked starting hulls, but the nearest pair was 48 pixels apart; a simple
+independent candidate scan found 67–74 potential tank-clear placements eight
+cells apart. This is capacity evidence, not a finished spawn selector. The
+experimental live plan integration currently fails 15 of 151 focused tests;
+no packaged browser/native signoff or performance claim is made for it.
+
+The follow-on prototype changed `WORLD_PLAN_RULES_VERSION` to 2: only natural
+materials occupy `biome`; a separate `builtSurface` holds one command pad and
+a short connected route. The art compositor flattens that route as dry earth
+and the pad as metal, while keeping the underlying policy fields distinct.
+The broad volcanic region was reduced to an interior accent and meadow was
+favored at biome boundaries. `test/world-plan.test.mjs` passed a 512-seed
+sweep including built-surface land, connectivity, and sparse-budget checks.
+The floor and coast were regenerated through their owners and Defold-local
+sources synchronized. The focused world-plan/hex-terrain suite passed 14/14,
+including byte-level planned floor samples and the legacy macro recipe. That
+is generation/test evidence only; it does not supersede the outstanding
+browser/native gameplay and larger integration failures above.
+
+After reviewing the user-linked Supernova Files article, an additional
+floor-anchor round-trip test was added: every land hex centre maps through
+our isometric screen projection and inverse back to the same q/r coordinate.
+The focused world-plan suite passes 3/3 with it. This checks coordinates,
+not sprite foot placement or Defold painter-order pixels.
+
+A separate seeded 32-start table was added to the cold world plan; the 16
+tank-depot table remains distinct. Its fixed candidate lattice enforces
+eight-cell centre separation and reserves each accepted start before scenic
+placement. A 512-seed plan test passes tank-hull clearance and shared-region
+reachability for every start. The bounded Halton prop pass was extended to
+1024 candidates so extra start reservations still leave at least 27 accepted
+props in those 512 seeds. First-life `BattleWorld` admissions now use the
+32-start table, while respawns retain the enemy-aware depot selector. Four
+read-only live-map probes found 32 unblocked starts and a 128-pixel closest
+pair for seeds 0, 77, the default, and 0xffffffff. The focused 32-player
+admission test passes. The Defold-local sources were synchronized through
+their generator (`pnpm sync:check`: 26 fresh files), TypeScript checking and
+`pnpm check:knowledge` pass. The broader focused suite remains red at
+139/155; the 16 failures include obsolete symmetric-map assertions and
+real visual/collision or combat-fixture migration questions. No packaged
+browser/native signoff is claimed.
+
+The next loaded-island pass removed immutable square wall stamps while
+preserving destructible cover, projected every accepted world-plan prop into
+one grounded landmark sprite, and hid square wall/face tiles under those
+prop-owned colliders. Cliff/decor/scatter material selection now reads the
+actual seed-pinned floor and built-surface plan. An attempted proportional
+coast-sprite crop looked worse in the real HTML5 screenshot and was replaced
+with shallow source-palette face pixels extruded from the exact planned hex
+land mask (maximum seven half-resolution pixels). `pnpm coast:check`,
+`pnpm tilemap:check`, `pnpm sync:check`, and TypeScript checking passed.
+The packaged HTML5 playability gate passed WebGL2, input, restart, and sound;
+the arm64-macOS Bob archive built and its packaged runtime gate passed engine
+and arena markers. Native screenshot and all-seed seam/playability checks
+remain unproven. The focused 156-test suite initially passed 140 and failed
+16; subsequent tank-radius pickup/hazard placement and island-aware cover
+test changes passed their targeted authority tests, but the full suite has
+not yet been rerun after those changes. No Sprite Fusion credits were used.
+The rerun focused suite is 143/156. HTML5 playability and native packaged
+runtime were rebuilt and passed again on the latest pickup/hazard code.
+Thirteen failures remain: six stale long-raised-stamp presentation tests,
+the old point-symmetry assertion, and six combat/bot/prediction trace
+scenarios. The two-client local prediction gap is 35 simulation units with
+the client two ticks ahead; no network smoothness conclusion is drawn from
+that discrepancy yet.
+
+The user-linked Supernova Files hex-isometric article was checked against the
+loaded renderer: it supports the already-documented distinction between the
+logical ground anchor, taller art, and foot-based sorting; its Godot cell-size
+settings are not Defold values. While checking the live island, a flood fill
+found that old point-mirrored cover stamps clipped by the coast sealed one
+floor cell on the default seed and nine on `0x0badf00d`. Cover placement now
+uses complete interior stamps with a two-cell clear driving halo and a
+pre-commit mutable-panel budget. The 512-seed connected/open-floor and
+orphan-cover regression passes. The broader focused suite remains red on
+combat fixtures, bot traces, legacy raised-stamp presentation, and the
+two-client prediction assertion; this cover proof is not a gameplay signoff.
+After re-syncing the Defold-local TypeScript copies through their generator,
+`pnpm sync:check`, direct TypeScript checking, targeted oxfmt/oxlint, and
+`pnpm check:knowledge` pass. The four-file focused suite is now 144/156, with
+12 failures still open; no new browser or native runtime capture was made
+after the cover-placement change.
+
+The live island pass then reserved four compass depot pads before scenic
+placement and shared one projected-footprint predicate between world planning
+and depot selection. A 512-seed sweep found at least four depots and 28–36
+props on every sampled seed. The runtime's obsolete raised-square-wall passes
+were removed; source-derived scenery and collision now come from the same
+world-plan records. The replaced live-world tests and repaired same-tick
+prediction/combat/bot fixtures bring the focused four-file suite to 147/147.
+`pnpm hex-terrain:check`, `pnpm coast:check`, `pnpm tilemap:check`,
+`pnpm sync:check`, TypeScript checking, and targeted oxfmt/oxlint pass. Bob
+built HTML5 and arm64; the packaged Chromium/WebGL2 playability gate and
+native engine/TypeScript arena gate pass. A 1280×720 browser screenshot was
+captured at `build/evidence/war-battles-island-live-2026-10-08.png`.
+The native UI was locked during visual capture, so native pixel parity is
+unproven. One impaired real browser/WebTransport run (65 ms one-way,
+±15 ms jitter, 10% loss) passed with 35 snapshots, 307 accepted inputs,
+15-pixel maximum local correction, and no correction above 32 pixels;
+this is bounded-run evidence only. The full example suite is being run next;
+source-bound evidence fixtures are expected to need owner-driven refresh
+after the world-plan revision and are not silently counted as green.
+
+The full example `pnpm test` run returned 278/297 passes. One stale decor
+assertion was corrected to query the rendered world-plan biome and passed in
+isolation; no post-fix full-suite green claim is made. The remaining reds
+include stale source-bound evidence and runtime fixture expectations plus two
+substantive 16-client limits. The clean simulation's maximum local correction
+was 268 fixed units against a 160-unit test limit; an edge-congested run
+accepted 93.79% of generated input against >94%. Both converged, but those
+limits remain open rather than being silently relaxed. `pnpm check:knowledge`
+passes after this record.
+
+The procedural hex-world method was captured as a repository skill at
+`.codex/skills/defold-hex-world/SKILL.md`, with a read-only multi-seed audit
+and a generator-owner verification/regeneration driver. The existing Sprite
+Fusion/Defold art skill was updated to clarify source-pixel versus world-plan
+ownership, logical ground contacts, and actual camera-scale QA. The new
+verifier passed the four generated-state checks, 148 focused tests, and a
+512-seed audit on rules v3 (land 250–327, coast 58–74, props 28–36,
+visible depots 4–7, starts 32). This is structural evidence; no new packaged
+visual capture was made during skill creation. The skill-creator Python
+validator could not start because this host Python lacks PyYAML; scripts,
+frontmatter, and OKF were checked separately.
+
+The hex-world skill was tightened after its first use: the read-only audit
+can now select the actual shipped seed with `--seed default`, and its text
+output exposes biome and elevation ranges rather than hiding them in JSON.
+The read-only verifier now runs that default audit before its 512-seed sweep.
+The default rules-v3 seed audit passed with 290 land, 62 coast, 36 props,
+five visible depots, and 32 starts; a separate 0–63 sweep passed the same
+structural invariants. The skill now requires default-seed camera-scale
+review and labels alternate-seed previews as comparison evidence, not as
+permission to seed-shop or claim gameplay quality from counts. No terrain
+source, packaged engine, or paid art changed in this skill-only refinement.
+
+The directional-unit wave found that the tank atlas already contains four
+chassis with eight hull and eight turret facings each, but only canvas-centred
+layer placement, not recorded socket pivots. The original ejected-driver path
+rotated one `player-down` view. A deterministic hero-art generator now uses
+the five tutorial infantry views to emit eight idle/walk runtime facings,
+mirroring westward views. All 20 source frames carry explicit foot anchors;
+the generator rejects missing, clipped, and baseline-drifting frames. The
+global pixel-art-atlas skill inspector gained a strict mode and five passing
+contract tests; its strict hero contact sheet passed with no crop contact,
+cell overflow, or foot drift. `pnpm hero-art:check`, focused hero/core tests,
+Déherm compile, Bob arm64 and HTML5 builds, native packaged startup, and
+Chromium WebGL2 playability passed. Browser gameplay did not trigger ejection,
+and native visual parity remains unobserved; these checks prove linkage and
+ordinary game startup, not every hero animation on screen. Sprite Fusion
+reference upload was denied by sandbox review; no API request or credit spend
+occurred. The tank registration and distinct hero-source art gaps remain open.
+The full example suite was also run: 286/299 passed in the default sandbox.
+Seven failures share a loopback `listen EPERM` in the packaged-runtime test
+fixtures; the other failures are source-bound records (authoritative load,
+bundle measurement, capped-link matrix, VS Code, WebTransport) plus one old
+integration assertion that still named the replaced tutorial atlas. That
+assertion was updated to the generated hero atlas. These are not silently
+counted as art or gameplay regressions, nor as a green suite; owner-driven
+evidence refresh and a loopback-capable full run remain to be completed.
+The owning `runtime:load:record`, `runtime:network-matrix:record`,
+`bundle:size:update`, and real loopback `runtime:webtransport:record` commands
+then refreshed four source-bound records. A focused 30-test slice covering
+authoritative load, capped-link impairment, bundle/packaged evidence,
+integration structure, and WebTransport passed 30/30. This narrows the
+remaining suite gap; it does not refresh the stale VS Code live-value capture
+or establish a full-suite green result.
+With loopback access, the subsequent full example run passed 298/299 tests.
+The sole remaining failure is the VS Code visual record: its eight-player
+inline default is stale against the current sixteen-player source. The expected
+default/live-value contract was updated to sixteen, and a live Déherm dev
+session connected its inspector and launched the engine. The capture still
+failed because the locked Mac's VS Code window did not display the new inline
+value; computer-use reported the Mac could not be unlocked automatically.
+The dev session was quit cleanly. No screenshot or live-value evidence was
+fabricated or source-refreshed without a genuine editor observation.
+
+The tank registration audit generated four 3-row source guides and four 8×8
+mixed-aim matrices from the selected Sprite Fusion request manifests, checked
+every source digest, and recorded canvas versus opaque centres. The matrices
+made the selected Artillery v2 problem visible: its hull and turret each
+contain a raised cabin, so a free-aim turret can show duplicate structures.
+An alternate preview used the already archived v1 hull without changing the
+production selection. Its 64–88 px frames (six over 80 px) visibly mismatch
+the v2 turret's scale and palette; it is not a safe replacement. `node
+tools/preview-tank-v2.mjs` and its bounded `--artillery-hull-v1` comparison
+both completed. This is source-art diagnostic evidence, not a runtime fix or
+gameplay visual signoff; production assets were not regenerated in this pass.
+The preview now accepts an isolated output directory, and a focused test runs
+it against a temporary directory to assert four chassis, eight facings each,
+the explicit unverified registration status, and all four 8×8 matrices. The
+three tank-livery/preview tests pass, and targeted oxfmt/oxlint pass. The
+Artillery source defect remains unresolved; this test validates the audit
+tool, not the production mount quality.
+
+A freshly bundled wasm-web War Battles build passed real Chromium/WebGL2
+playability at a 1280×720 viewport. The new bounded ejection recorder captured
+the legitimate local switch to infantry at tick 304 and a subsequent on-foot
+movement sample at tick 339, retaining both screenshots plus a JSON record
+with image hashes in `build/evidence/`. The local position moved
+(2773, 6407) → (3179, 6040); no debug-only state mutation was used. The CDP
+failure list contained only one missing-favicon request, counted separately
+rather than treated as a game failure. The generic atlas inspector now rejects
+unused anchor-map entries, boolean coordinates, and invalid preview dimensions; its eight focused
+tests pass. Its skill guidance explicitly separates source registration,
+generated direction mapping, and packaged runtime evidence. The strict
+inspector also accepted all 20 current tutorial infantry source frames with
+the project's exact anchor map and zero planted-foot drift; this is source
+registration evidence, not eight uniquely authored perspectives. A
+five-second packaged WebTransport motion gate with 65±15 ms one-way delay and
+10% configured loss passed: 307 accepted inputs, 37 snapshots, 15-pixel
+maximum local correction, zero corrections above 32 pixels. The capture is
+real runtime and transport evidence, but not every directional animation,
+native visual parity, or broad WAN smoothness proof.
+
+The next atlas-skill hardening pass found and fixed a unit mismatch in its
+reusable inspector: preview `--scale` had affected `--cell` overflow checks.
+Cell bounds are now computed in native atlas pixels, with the preview scaled
+only after registration. Nine focused inspector tests pass, including a
+1×/3×/5× invariant. The skill and project Sprite Fusion guidance now require
+the actual native cell dimension and distinguish full directional art from
+merely having eight files. A single-view turretless Artillery imagegen concept
+was followed by an eight-view sheet, but the latter varied in perspective and
+crossed cell boundaries; no source art or runtime atlas selection changed,
+and no Sprite Fusion credits were spent.
+
+In a separate 30-second packaged WebGL/WebTransport loopback run at 120±60 ms
+one-way delay and 20% configured datagram loss, instrumentation found 2,410
+remote interpolation rebases but only a 17-pixel maximum same-life remote
+presented step, while a dead-player lifecycle produced a 231-pixel raw local
+correction. A presentation-only dead-wreck pin and fixed-array local/remote
+presented-step telemetry were added; 11 focused presentation/network tests,
+Déherm one-shot compilation, Bob wasm-web bundle, and source-bound impairment
+evidence refresh passed. A fresh 30-second packaged run after the fix reported
+1,723 accepted inputs, 178 applied snapshots, 4-pixel maximum raw local
+correction, 7-pixel maximum local presented step, 19-pixel maximum remote
+presented step, and zero >32-pixel presented steps. The original 231-pixel
+event did not recur after the change. The unit test proves dead-position
+updates cannot drag a rendered wreck within one lifecycle; the final runtime
+run proves only that particular impairment sample remained bounded, not that
+every lifecycle or WAN path is smooth. A pre-fix 30-second H264 Chromium
+capture is retained in `build/evidence/war-battles-online-impaired.mp4`; its
+own local correction was only 6 pixels and it does not depict the spike.
+
+The Artillery source pass spent 45 Sprite Fusion credits (2,205→2,160): one
+targeted edit of the hosted v2 hull and two eight-direction requests. The
+first direction set was rejected after measuring shrunken diagonal hull
+footprints despite 64×64 canvases. The second, `artillery-low-deck-directions-v3b`,
+was selected through the source manifest and regenerated by the owner. Its
+eight source views have no edge contact; the generated 8×8 mixed-aim matrix
+does not show the previous duplicate raised cabin. The candidate preview
+tool now accepts an arbitrary named Artillery hull request without changing
+the selected source, and four focused tank-art tests pass. A browser-only
+frozen-gallery chassis setting exposed Artillery in the real packaged Defold
+game; its 1280×720 Chromium screenshot is
+`build/evidence/war-battles-artillery-v3b-browser.png`. Déherm compilation,
+Bob HTML5/arm64-macOS bundles, WebGL2 playability, and native packaged
+engine/Hermes startup passed. These prove source integrity, compilation, and
+one live Artillery view, not per-facing semantic pivot registration or native
+visual parity. The Mac was locked when native UI inspection was attempted.
+The project and reusable atlas skills now explicitly check opaque subject
+scale across directional outputs rather than trusting canvas dimensions.
+The six source-bound load, bundle-size, packaged-runtime, performance,
+runtime-measurement, and WebTransport evidence files were refreshed through
+their owning commands after the source change. A full example rerun reached
+302/303 passes; only the stale VS Code live-value screenshot test remains.
+It requires a genuine unlocked-editor observation and was not rewritten from
+metadata or treated as a game runtime regression.
+
+The final Artillery browser-fixture pass captured all eight same-facing
+Artillery directions and two mixed hull/turret angles from the packaged
+WebGL2 game. The ten screenshots live under
+`examples/war-battles-online/build/evidence/artillery-v3b-*.png`. They show
+the selected low-deck hull without the previous duplicate cabin and a seated
+turret in the sampled mixed angles. Explicit per-view pivots and native visual
+parity remain unproven; a locked Mac prevented native screenshot review.
+After the fixture source edit, Bob arm64-macOS and the native packaged runtime
+gate passed, as did `pnpm verify:generated`. The full example suite, run with
+local-loopback permission, passed 302/303 tests. Its persistent failure is
+stale VS Code live-value visual evidence; one unrelated closed-snapshot test
+failed under suite contention but passed isolated and on the next full run.
+The driver atlas is still five authored tutorial perspectives mapped into
+eight runtime facings via three mirrors. A prepared four-reference Sprite
+Fusion driver spec was denied by host safety review before any PNG upload;
+no request ran or credits were spent. The atlas and project art skills now
+require eight-direction walk-loop inspection and explicit source provenance,
+and prohibit routing around a denied exact-file upload.
+
+Artillery mount registration now comes from the selected art data, not
+hard-coded offsets in the Defold script. Per-facing hull ring and turret-base
+coordinates share one fixed atlas target through
+`tools/tank-registration.mjs`; the generator and source QA preview both call
+it. The registration is tied to the exact Artillery request names and fails
+closed if a direction is absent or the projected source exceeds its cell.
+Five focused tank-art tests pass. The new 8×8 preview retains the tracks under
+the turret across independent aim; two 1280×720 packaged Chromium screenshots
+show sampled mixed angles after the generated atlas changed. Bob HTML5 and
+arm64-macOS bundles, `pnpm verify:generated`, WebGL2 playability, typechecking,
+and native headless Hermes startup pass. This establishes deterministic
+Artillery mount placement and sampled visual improvement, not aesthetic
+acceptance for all 64 pairings or the other three canvas-centred chassis.
+Eight additional packaged Chromium same-facing captures passed after the
+Artillery atlas change; their nearest-neighbor contact sheet is
+`examples/war-battles-online/build/evidence/artillery-registered-eight-facing-browser.png`.
+The image shows all eight source facings selected at gameplay scale, not every
+frame transition or all mixed-aim pairs. The refreshed bundle-size and native
+runtime evidence owners ran. The full example suite is 303/304; only the
+existing locked-editor VS Code screenshot evidence fails.
+
+Scout, Assault, and Bulwark now have source-bound, per-facing mount tables
+beside Artillery. The same `tank-registration.mjs` placement is used by the
+runtime atlas emitter and QA preview; an alternate source is still marked
+unregistered rather than inheriting stale anchors. Four 8×8 mixed-aim sheets
+were inspected, and six additional packaged Chromium/WebGL2 captures sampled
+the three new classes at same-facing and independent-aim poses. The contact
+sheet is `examples/war-battles-online/build/evidence/registered-three-class-browser-review.png`.
+The generator wrote the changed atlas; HTML5 and arm64-macOS Bob bundles,
+`pnpm verify:generated`, browser playability, and native headless Hermes
+startup passed. This establishes the declared source-pivot contract and
+sampled still-image improvement, not every live pair, direction-transition
+smoothness, or native visual parity. No Sprite Fusion credits were spent.
+
+### 2026-10-09 - Atlas-skill fixed-canvas gate and event-specific motion diagnosis
+
+The reusable `pixel-art-atlas` inspector gained an optional strict
+`--canvas WIDTHxHEIGHT` contract and now rejects non-PNG input disguised by
+filename. Its 18 focused tests pass. All four selected 40-frame driver
+families pass strict 40×40 canvas, exact inventory, and anchor inspection.
+The repository Sprite Fusion skill now separates source inspection, actual
+Defold atlas wiring, and packaged animation. The skill-creator frontmatter
+validator could not run because its Python lacks PyYAML; this is a tool
+dependency limit, not a claim that the skill was fully validated.
+
+The default-seed world and 512-seed structural audit pass. A 7.29-second
+packaged Chromium capture shows the 16-player hex game running, but it is
+not a native or extended online playability proof. A 30-second packaged
+WebTransport run at 65±15 ms one-way delay and 10% configured loss reported
+five >32-pixel raw same-life corrections (128-pixel maximum), despite local
+presentation steps below 23 pixels. Scalar per-event telemetry now records
+same-tick comparability, prediction error, old predicted/presented pose,
+corrected pose, and snapshot tick without per-event hot-path allocation.
+Focused presentation/atlas tests (19/19), project typecheck, Déherm one-shot
+compile, and Bob wasm-web bundle pass. The first diagnostic rerun recorded
+1,775 accepted inputs, 221 snapshots, and no >32-pixel correction under the
+same configured impairment. A second diagnostic run then reproduced a
+496-pixel same-tick miss: the snapshot tick was 1,134 while the client had
+replayed to tick 1,357. Reading the Deno server's fixed-step loop revealed
+that `MatchServer.advance()` floored each 16/17 ms wake-up independently and
+discarded fractional credit. It now carries the remainder, caps catch-up
+debt at 30 ticks, and still executes at most eight steps per wake. A 60-wake,
+1,000 ms focused test verifies 60 authoritative ticks, and the targeted
+clock/presentation tests, lint, typecheck, generated-state check, Déherm
+compile, and Bob wasm-web build pass. In the next packaged 30-second 65±15 ms,
+10%-loss run, server/client advanced 1,815/1,814 ticks, the client/server
+gap ended at 12 ticks, and no >32-pixel correction occurred. However, that
+run counted 1,212 late inputs; a shorter 10-second run counted 75 late and
+525 accepted while lead grew from three to eight ticks. A repeated long run
+with that three-tick safety margin still had 1,003 late commands. The return
+leg's 30 Hz datagram send window and scheduler jitter warranted a six-tick
+safety margin; after the change, two otherwise identical long runs had only
+4 and 69 late commands, 1,788 and 1,727 accepted, and no >32-pixel raw or
+presented correction. A clean-link ten-second run accepted 614 inputs with
+zero late and reached a six-tick lead. The margin trades a few additional
+authority-confirmation ticks for far fewer late commands in the measured
+65±15 ms/10%-loss profile. The long standard impairment harness now fails on
+clock drift over 12 ticks, over 15% late observed commands, or any >32-pixel
+local correction; a ten-second packaged run passed the new assertions (539
+accepted, 63 late, 611/608 client/server ticks). Other WAN profiles and
+native visual inspection remain open. The Mac was locked; no Sprite Fusion
+credits were spent.
+
+### 2026-10-09 - First-keyframe input phase recovery under real QUIC
+
+The packaged browser/WebTransport impairment gate exposed an intermittent
+admission failure that a single green run missed. With 65±15 ms one-way UDP
+delay and 10% configured loss, one 20-second run accepted 1,200 commands with
+none late; two repeats accepted **zero** moving commands and classified all
+1,190 and 298 as late. In the latter run the sampled local tick was 209 while
+the authoritative server was already at 209, despite an advertised eight-tick
+input lead. The client still sent inputs and applied snapshots. The first
+keyframe had overtaken the welcome-seeded prediction clock; reconciliation
+adopted the newer snapshot but did not restore the configured future input
+timeline. The diagnostic assertion now reports client/server ticks, sent
+inputs, accepted/late counts, and per-second arrival windows on failure.
+
+`BattleClient` now re-establishes a bounded lead on the **first** keyframe when
+that snapshot overtakes the configured high-lead timeline. It does not
+retimestamp previously predicted commands or change later snapshot handling.
+The focused overtaking-keyframe regression, 12/12 presentation tests, and
+127/127 core tests, two focused 16-client load tests, project typecheck,
+lint, formatting, `verify:generated`, and the OKF knowledge check pass.
+After regenerating the Defold mirror, recompiling
+Déherm, and rebuilding the Bob wasm-web bundle, two separate five-second
+packaged 16-player WebTransport runs under the same 65±15 ms/10%-loss profile
+accepted 304/302 moving commands with zero late; the impairment proxy
+measured packet drops in both directions. Neither run sampled a >32-pixel
+local or remote presentation step. A ten-second clean-link run accepted 616
+moving commands with zero late and no >32-pixel presented step.
+
+This is **not** a claim of fully tuned authority latency: the adaptive lead
+initially reached 16 ticks in the impaired five-second runs and about 12 ticks
+on clean localhost. The estimator treated snapshot-cadence age as transit.
+A fixed-size 12-snapshot rolling low-watermark now filters those cadence and
+isolated stream-delay spikes without allocating on the snapshot path. A
+focused regression verifies that one delayed stream does not inflate the
+lead while sustained delay eventually does. Against
+a rebuilt package, a ten-second clean-link run stayed at eight ticks and
+accepted 612 moving commands with zero late. Two real 65±15 ms/10%-loss runs
+also accepted 1,190 and 304 commands with zero late and no >32-pixel presented
+steps; the measured lead settled at 15 and 12 ticks respectively. Local
+prediction is immediate, but authoritative execution may still be farther in
+the future than ideal. The next network pass should measure the actual
+one-way/return-leg budget independently of snapshot cadence before lowering
+the impaired lead again; do not trade admission reliability back for a
+smaller number without repeated packaged impairment evidence.
+The raw Sprite Fusion walk sheets also have source-cell edge contacts; the
+enlarged 112-pixel green gameplay contact-sheet crop fixed screenshot clipping
+but does not prove those provider source pixels are complete. The same current
+source bundle assembled its typed-native unit and passed an arm64-macOS Bob
+build. A launched native demo reported Defold 1.14.0, evaluated one Static
+Hermes unit, activated the TypeScript bundle, initialized the 16-player offline
+arena, and emitted moving camera and runtime telemetry before a deliberate
+SIGINT. The Mac was locked, so the native window could not be visually
+inspected; this is native startup evidence, not native visual parity or
+online-native gameplay proof. Longer randomized impairment sweeps also remain
+open in this tranche.
+
+### 2026-10-09 - Default island ocean at gameplay scale
+
+A 1205×678 packaged Chromium/WebGL2 screenshot showed the ocean's old
+four-source-pixel foam shader as a prominent square checkerboard. The
+deterministic coast emitter now uses a calmer sea base, clipped wave motifs
+from its existing pinned Sprite Fusion source, and one-pixel animated foam
+dashes. A rebuilt Bob wasm-web game passed the keyboard/arena/restart
+playability gate; `build/evidence/war-battles-water-wavelets-live-v2.png`
+shows the default camera without the checkerboard. The coast animation gate's
+fixed ocean rectangle had become terrain under the changed island layout;
+after selecting live sea-colored pixels it observed 716 changed among 63,191
+sea pixels over 430 ms. A shore-color/sea-adjacency sample changed only 3–6
+of about 620 candidates across three repeated packaged captures, within a
+1% allowance for animated objects touching shore. The
+world verifier passed 149 focused tests and its default/512-seed audits.
+No Sprite Fusion credits were spent. Native visual parity, other camera/seed
+compositions, and the full showcase gameplay/network polish remain open.
+
+### 2026-10-09 - Raw walk-sheet clipping audit and padded-source prototype
+
+The user's visual review caught source-cell clipping/tight crops in the
+green/transparent Sprite Fusion strips. Across 32 four-frame walk sheets,
+123/128 raw frames touch at least one cell edge; that is a clipping-risk
+signal, not proof of missing pixels in all 123. The runtime 40×40 atlas
+gutter does not answer whether the provider already lost source pixels. A
+new deterministic `prepare-hero-animation-input.mjs` expands a hash-pinned
+action-ready pose to a 64×64 transparent canvas *before* animation, with a
+check mode to detect stale input. One Sprite Fusion `animate` request for
+Rook/east cost 15 credits (285→270); its four output cells are 64×64 and each
+retains at least eight transparent pixels on every side. The old request's
+first 28×45 frame touched all four boundaries. `node --test
+test/hero-art.test.mjs` passed 5/5, including a source-input and returned-cell
+gutter regression; `node tools/generate-hero-art.mjs --check` passed. A
+per-direction selection override then chose this Rook/east loop, and the
+owning generator rebuilt the 40×40 atlas. Bob wasm-web bundled it and a
+packaged Chromium/WebGL2 frozen-gallery capture exercised all eight Rook
+directions; east showed three distinct sampled walk frames and no visible
+crop within the 112-pixel review cell. The ordinary browser playability gate
+and a natural offline ejection/walk fixture passed. The latter fixture does
+not prove a naturally driven east-facing turn, and the frozen gallery is not
+native visual evidence. At that point no other direction or character was
+fixed and the balance was 270 credits; avoid blind retries without selecting
+visibly broken cells first.
+
+The next focused iteration selected Rook/south. Its 32×49 action-ready pose
+could not fit the preparer's 64px source canvas with an eight-pixel gutter, so
+the preparer now deterministically chooses the smallest supported canvas that
+fits: 64px for east and 80px for south. One Sprite Fusion `animate` request
+(`req_9ba92d43-a7a7-4fe7-85ef-88f34853b42e`) consumed 15 credits, leaving
+255. Its four 80×80 raw frames have opaque bounds inside an eight-pixel gutter.
+The per-direction source-selection override chose that request, the owning
+generator rebuilt the Defold atlas, `test/hero-art.test.mjs` passed 6/6,
+strict 40×40 canvas/inventory/anchor inspection passed, and both Bob wasm-web
+and arm64-macos packages compiled the changed atlas. The packaged Chromium
+WebGL2 eight-direction gallery selected the new south walk with distinct
+sampled motion and no contact-sheet crop; the native startup smoke passed but
+native visual motion was not captured. The ordinary packaged browser
+playability gate also passed WebGL2 input, arena entry, firing, and restart.
+A post-selection source audit finds
+30/32 selected directions with at least one raw edge-touching frame, 116/128
+frames overall. Edge contact is a risk signal rather than proof that each
+silhouette has lost pixels. Remaining directions and natural-match turning
+remain open. The full example suite passed 313/314 with loopback access; its
+only failure is the pre-existing VS Code visual record, which still shows
+`= 8` while current source declares 16 players. Do not alter that record
+without a real editor capture. Native visual capture was unavailable because
+the Mac remained locked. The art skill's authoring validator was attempted
+but its bundled Python lacks PyYAML; focused formatting, lint, generated-state,
+source-atlas, packaged-browser, and OKF checks passed instead.
+
+The front-facing walk pass then used the same padded-pose recipe for Brass,
+Spark, and Mud, preserving the selected pose output index for each class.
+Sprite Fusion requests `req_10608c5b-6726-4a51-bfbf-fa4cca5b4f4d`,
+`req_edc76603-30c1-430b-b593-ab7e2f09454a`, and
+`req_655a5670-85a9-4fce-9e8a-920e0f6fbe4a` cost 15 credits each, leaving
+210. Brass used an 80px source, Spark and Mud 64px. The returned four-frame
+loops have no opaque edge contacts; Spark's tightest returned top margin is
+seven pixels, so the regression checks an honest six-pixel minimum rather
+than claiming eight from the provider. The source-selection recipe now chooses
+all three, and the owning generator rebuilt their Defold frames. Focused hero
+tests pass 9/9; strict 40×40 canvas, anchor, and planned-inventory inspection
+passes for all four class atlases. Bob wasm-web compiled the final selection,
+and separate packaged Chromium/WebGL2 eight-facing gallery captures passed
+for Brass, Spark, and Mud; the south walk samples were visually reviewed at
+native browser scale and remain inside the 112px capture. This is frozen
+gallery evidence, not a natural combat/ejection sequence or native visual
+parity. Bob arm64-macos packaged the final selection, and the native startup
+smoke loaded the TypeScript bundle, entered the 16-player arena, then exited
+cleanly; the locked Mac still prevented native pixel inspection. The
+selected-source audit now finds 27/32 directions and 104/128 raw
+frames with an edge contact. The remaining clipped-risk directions are not
+claimed fixed. The final full example suite ran 317 tests with loopback
+permission: 316 passed, and only the older VS Code visual record failed
+because it still depicts the former eight-player default. That failure is
+unrelated to the hero asset selection and requires a genuine new editor
+capture, not a fixture edit.
+
+The subsequent full example `pnpm check` ran 313 tests: 310 passed; source
+inventory changes made bundle-size and native-runtime evidence stale, and
+the older VS Code screenshot still records `= 8` where the current arena
+source declares `players: property.number(16)`. The two source-bound records
+were refreshed through `pnpm bundle:size:update` and a new native Bob build
+plus `pnpm runtime:packaged:record`; the focused integration and hero tests
+then passed 23/23. Do not edit the VS Code screenshot or its observation JSON
+to manufacture `= 16`: it needs a new real editor capture. The Mac remained
+locked when checked, so neither that capture nor native pixel inspection was
+available. The native runtime smoke **did** launch Defold 1.14.0, load the
+TypeScript bundle, initialize the 16-player arena, and exit cleanly.
+
+### 2026-10-09 - HUD panel-value pass at the intended viewport
+
+A 1280×720 browser viewport produced a 1205×678 composed Defold/WebGL2
+capture. Its existing true nine-slice cards preserved borders and readable
+text, but the near-black centers made the five HUD regions look like flat
+black cutouts. The owner `generate-hud-art.mjs` now emits a shared brighter
+slate/steel chrome palette without changing its nine-slice geometry or
+portrait sources. `pnpm hud-art:check` and 7/7 focused HUD layout tests passed,
+including a center-luminance guard. A fresh Bob wasm-web bundle passed the
+browser keyboard/arena/fire/restart gate and saved
+`build/evidence/war-battles-hud-slate-1280.png`. The screenshot supports only
+this viewport and visual improvement; it does not prove native visual parity,
+all responsive layouts, or production-complete HUD composition. No Sprite
+Fusion credits were spent. The desktop was still locked at the last native
+visual check.
+
+### 2026-10-09 - Driver gallery framing and selected-source edge audit
+
+The green 112px browser gallery contact sheet still read as tight to the
+user, even after the original 72px crop was enlarged. The capture owner now
+uses a 144px screenshot cell with a centered 80px hero-animation ROI. Four
+fresh packaged Chromium/WebGL2 galleries—Rook, Brass, Spark, and Mud—passed
+their real player-component idle/walk/fire/hit/death captures and retained
+videos. Visual review shows the rendered characters inside the wider green
+cells. This is a screenshot-framing correction, not an art-source repair.
+The hero-art generator now emits a deterministic, selected-source edge audit
+from pinned request bytes and validates it in `--check`; the focused hero test
+passes 11/11. It finds edge contacts in 100/128 selected walk frames and
+228/256 selected source frames overall. Edge contact is a clipping-risk signal
+and can also result from provider auto-trimming; it does not prove that each
+of those frames lost content. Existing 40×40 runtime gutters remain intact,
+but cannot restore pixels if a provider cell actually truncated a silhouette.
+No Sprite Fusion credits were spent on this diagnostic/framing pass. Native
+visual parity and the remaining source-cell review are not established here.
+
+### 2026-10-09 - Replaced pale mutable-cover rolls with pinned modular bags
+
+The nine immutable `war-sandbag-module-v1` Sprite Fusion outputs were reviewed
+at enlarged nearest-neighbor scale. The candidate-preview tool's fixed 48px
+cell had falsely rejected this wider asset class; it now sizes its review
+cell from the candidate bounds. Outputs 05 and 03 have distinct, discrete
+stacked-bag silhouettes. A source-selection recipe pins their asset IDs and
+the art generator validates request/spec/source hashes, 64px source gutters,
+the 36×32 runtime cell, and ground contact. Its first 1:2 projection reduced
+the bags too far, making them read as dark rubble. The retained 5:8 nearest-
+neighbor projection keeps visible seams and at least two pixels of horizontal
+gutter. The owning generator emitted the two cover PNGs and records Sprite
+Fusion provenance separately from the still-OpenAI crate in `arena-art.json`.
+The 1280×720 packaged Chromium/WebGL2 captures for both trials are at
+`build/evidence/war-battles-sandbags-v1-1280.png` and
+`build/evidence/war-battles-sandbags-v2-1280.png`; the second is visually
+clearer than the original pale rolls in that loaded view. Browser keyboard,
+fire, and restart passed; 7 focused art and 130 core/world tests passed.
+`art:check` verified the generated files. Bob HTML5 and arm64-macOS packages
+built, and a packaged native startup reached the 16-player arena and exited
+cleanly. The Mac desktop was locked, so native pixels were not inspected.
+This is one seeded-view cover-art improvement, not whole-map art or network
+signoff. No additional Sprite Fusion credits were spent; the last recorded
+provider balance remains 180. The owning `bundle:size:update` refreshed size
+evidence made stale by the art change. The full example suite then passed
+319/320; its sole failure is the pre-existing VS Code visual record that
+still lacks the inline `players` value. Editing the fixture while the editor
+desktop is locked would not be a genuine evidence repair.
+
+### 2026-10-09 - Green-sheet clipping: one more source-loop replacement
+
+The owner's clipping report was reproduced in old Sprite Fusion animation
+sources: the Brass-west provider sheet visibly truncates the weapon in a
+frame, and several selected walk sheets have opaque pixels at cell edges.
+The green presentation preview adds gutter around returned pixels but cannot
+restore anything already lost by the provider. The selected-source audit is
+therefore kept distinct from the padded 40×40 runtime-atlas check.
+
+The Sprite Fusion balance was checked at 150 credits before a single request.
+The pinned Rook-west walk pose was placed on a 64×64 transparent input canvas
+with a minimum eight-pixel gutter, then animated by request
+`req_c164883e-08c2-466f-bc30-eab81b401248` (15 credits; 135 remain). All four
+returned frames have opaque bounds strictly inside that source canvas and were
+visually inspected in the green presentation sheet. The source-selection recipe
+now chooses this request for west, preserving the existing horizontal-facing
+correction; the owning generator rebuilt the Defold atlas. The gutter test now
+discovers all selected padded overrides from the source recipe instead of
+manually listing them. Hero-art tests passed 15/15, Bob packaged the changed
+HTML5 atlas, strict Rook 40×40 inventory/anchor/canvas inspection passed, and
+the packaged Chromium/WebGL2 eight-direction Rook gallery
+selected nonstatic walk frames and produced a contact sheet and short video.
+This is source, atlas, and frozen-gallery evidence, not natural-match turning
+or native visual parity.
+
+Nine of 32 selected walk loops now have returned-frame gutters; 23 directions
+still contain at least one source-cell edge contact (88 of 128 walk frames).
+The full selected source audit is 216/256 edge-contact frames, including
+auto-trimmed still poses; contact is a risk signal, not a verdict that every
+frame is visibly truncated. Do not present the remaining old green sheets as
+finished art or claim the entire four-character animation set is clipping-free.
+
+### 2026-10-09 - On-demand leaderboard input across keyboard, mouse, and touch
+
+The always-open five-row leaderboard obscured the upper-right battlefield at
+1280×720. The GUI now keeps the compact leader ribbon visible and expands the
+roster only while Tab is held or when the ribbon is clicked/tapped. The player
+component passes pointer/touch actions to the GUI input focus, and the input
+binding declares `#scoreboard` on Tab. The first browser regression found that
+one emulated tap delivered both a mouse-style `#deploy` press and a
+`#touch_multi` press, toggling twice. A 20-frame suppression timer alone also
+failed when the finger remained down longer than that window. Pointer
+activation now occurs on release; a touch ID owns the whole gesture and starts
+a short mouse-suppression window only after touch release.
+
+The packaged Chromium/WebGL2 playability gate passed twice after this change.
+It exercised Tab open/close, pointer click, a 400 ms held touch, touch release,
+a second tap, and the existing arena/fire/restart path. The expanded and
+collapsed screenshots differ across more than 33,000 top-right pixels at the
+loaded 1205×678 canvas. `pnpm typecheck` passed, and focused HUD layout tests
+passed 7/7. A fresh arm64-macOS Bob bundle and packaged native runtime smoke
+loaded the TypeScript bundle, entered the 16-player offline arena, and exited
+cleanly. This proves native startup and browser input behavior, not native
+pointer/touch interaction or visual parity; those remain separate checks.
+
+### 2026-10-09 - Spark east walk source-cell clipping repair
+
+The green Sprite Fusion presentation strips had obscured a real distinction:
+padding a review cell does not repair a source animation that already touches
+its frame boundary. The selected Spark-east walk had edge contact in all four
+raw 28×47 frames (the first on all four sides). The live balance was 135
+credits before one padded-input animation request. The source pose was placed
+on a pinned 64×64 transparent canvas with at least eight pixels of gutter;
+Sprite Fusion request `req_23a54618-9ce8-4c98-9c39-d2998e19a316` cost 15 credits,
+leaving 120. All four returned frames have no opaque edge contact. After
+visual inspection of the green presentation strip, the source-selection
+recipe chose this request for Spark east, and the owning generator rebuilt
+the runtime frame set and atlas without hand-editing derived PNGs.
+
+`generate-hero-art.mjs --check` passed; the focused hero-art suite passed
+16/16, including the dynamic selected-padded-source gutter check; and the
+40×40 Spark atlas passed strict planned-inventory, explicit-anchor, and canvas
+inspection. Déherm rebuilt the product scripts, Bob bundled the HTML5 atlas,
+and the packaged Chromium/WebGL2 Spark gallery captured all eight facings and
+nonstatic walk samples. The east walk's first and fourth green-gameplay crops
+retain the whole helmet, boots, and sidearm inside their 144px cells;
+`build/evidence/hero-directional-runtime-spark/hero-directions.mp4` retains the
+turn sequence. This is a frozen-gallery selection/motion check, not natural
+match turning or native visual parity. The selected-source
+audit still flags 212/256 frames, including provider-auto-trimmed stills; the
+remaining old green strips must not be presented as clipping-free. At 120
+credits, replacing all remaining walk loops blindly is not justified; triage
+visually truncated poses first and retain source/atlas/runtime gates separately.
+
+### 2026-10-09 - Network correction diagnosis, not a prediction signoff
+
+The grounded-depot world-plan revision made existing correction gates red:
+clean 16-client localhost has 18 active-play corrections over eight pixels
+against a ceiling of 16, and the 32-client mobile-congested profile has an
+over-eight-pixel ratio of 0.1166 against 0.10. The edge profile is 0.2007
+against 0.20. Same-tick prediction-error buckets were added separately from
+presentation correction; their similar ratios show these are actual
+prediction/authority disagreements rather than merely a cross-tick visual
+comparison. The tests and evidence were not relabeled or weakened to hide
+those failures.
+
+`pnpm --dir examples/war-battles-online runtime:network:diagnose clean-localhost`
+and `... mobile-congested` run the production server, client, bot brain, and
+snapshot codec in the deterministic application-payload harness, then report
+where over-eight-pixel events occur. In the clean run, 16 of 18 events were
+within 40 pixels of another actor and none within 40 pixels of a depot facade.
+In mobile-congested, 261 of 321 were near another actor and four near a depot.
+This is proximity correlation measured after correction, not proof that each
+error was caused by an actor collision; the depot construction is unlikely to
+be the direct hot path for the clean errors.
+
+Two prediction experiments were rejected rather than retained. Extending
+remote-input hold from six ticks to 7–12 improved some over-eight-pixel ratios
+but increased rare maximum errors or presented steps; at 12 ticks it also
+produced a clean-localhost correction above 32 pixels. Skipping remote/remote
+client separation improved the mobile ratio but worsened the clean count and
+edge maximum. A local-only kinematic response was worse still. The production
+physics and six-tick input hold remain unchanged. Next work is to redesign or
+tune dynamic actor-contact prediction with explicit visual/motion evidence,
+not lower the current gates or equate this deterministic harness with a live
+QUIC packet capture.
+
+### 2026-10-09 - Shared bot spacing lowered correction frequency without bypassing collisions
+
+The previously diagnosed moving-actor crowding was addressed in the shared
+`BotController.steer` path, used by offline and network bots. A bounded,
+allocation-free scan of active actors adds repulsion inside four tank radii
+to the ordinary movement input. The authoritative body and map collision
+solver is unchanged. Controlled strength sweeps of 1×, 2×, 3×, and 4× chose
+3×: weaker settings left more clean/mobile corrections, while 4× increased
+the edge-profile maximum correction and presented step sharply. A focused
+test verifies a bot yields to a close tank and resumes its route after that
+tank leaves; the full core suite passed 135/135.
+
+Against the same deterministic impairment configurations, the clean
+16-client count over eight pixels fell from 18 to 5. The 32-client mobile
+over-eight-pixel ratio fell from 0.1166 to 0.0700 and edge from 0.2007 to
+0.1464; the edge over-32-pixel ratio fell from 0.0279 to 0.0170. Broadband,
+mobile, and edge input acceptance remained above 0.98. The edge maximum
+correction improved from 1,636 to 1,246 fixed units, but mobile's maximum
+increased from 1,166 to 1,365 units (85.3 pixels); that tail remains an
+explicit network-polish defect. Presentation steps over 32 pixels stayed zero
+in the deterministic harness. The updated source-bound 32-player load and
+impairment records passed their owning gates; these numbers are not live QUIC
+measurements.
+
+Déherm compiled the changed TypeScript bundle, and local Bob packaged both
+wasm-web and arm64-macOS. Packaged Chromium/WebGL2 playability passed at
+1280×720; a 7.13-second compositor video shows the offline 16-player arena
+moving, but it is too short to establish long-match visual quality or online
+smoothness. The native Defold 1.14.0 runtime loaded the TypeScript bundle,
+entered the 16-player arena, and exited cleanly; native pixels were not
+reviewed. The full example test suite passed 344/344 after source-bound
+runtime, performance, soak, and bundle-size evidence was refreshed through
+its owners. This is a bounded improvement, not a showcase signoff.
+
+### 2026-10-09 - Remaining infantry source clipping is not repaired by presentation padding
+
+The owner correctly identified several green review-sheet cells as visibly
+cut off. The selected-source audit currently reports 18 walk frames touching
+left or right source-cell edges and 181 edge-contact frames across the full
+256 selected idle/action/walk frames. Edge contact is a risk signal rather
+than proof every pixel was lost, but the padded green review background cannot
+restore a clipped helmet, weapon, or boot. `generate-hero-art.mjs --check` and
+the 24 focused hero-art tests pass only the current source-selection, atlas,
+and gutter contracts; they are not visual acceptance of every returned pose.
+The live Sprite Fusion credits endpoint returned **0** in this turn. No paid
+replacement request was sent and no source frame was falsely marked repaired.
+The remaining visually clipped loops require new provider output or separately
+authorized replacement art, followed by source, atlas, and packaged-motion
+review before selection changes.
+
+All pinned Sprite Fusion walk-sheet variants were compared for horizontal
+source-cell contacts. The 18 selected risk frames are in Rook SW/NW, Brass
+SW/E/NW, Spark SE/W/NW/N/NE, and Mud SE/SW/NW/NE. None of those affected
+directions has a cleaner pinned alternative. The green previews are review
+composites, not repaired source art; these directions remain art-review
+blockers until new full-silhouette provider frames are available. The zero
+credit balance prevented further Sprite Fusion requests in this pass.
+
+### 2026-10-09 - Network tail ablations isolate dynamic body contact
+
+The 32-player mobile-congested baseline under shared bot-spacing reproduced
+a 0.0700 same-tick >8px prediction-error ratio and an 85.3px maximum; its
+largest correction followed a 27-tick snapshot-to-local replay. A complete
+trial protocol-v16 input bundle used the spare flag bit for a three-bit age
+and carried six commands instead of four. The focused codec round-trip passed
+and authoritative input acceptance rose from about 98% to 99.7%, but the
+mobile >8px ratio increased to 0.1014, the maximum to 91.8px, and the edge
+ratio to 0.1732. It also raised modeled per-client uplink payload to about
+1.9 kB/s. The protocol, client, and test edits were reverted; the shipped
+format remains version 15 and four commands.
+
+Cold-path deterministic ablations kept the production server, client, codec,
+and 32-player workload while changing one cause at a time. With mobile
+datagram loss set to zero, the >8px ratio was still 0.0809 and the maximum
+77.8px. Temporarily disabling bot firing gave 0.0818 with the normal 12%
+loss. Temporarily disabling player/body separation in the shared simulation
+gave 0.0131 under 12% loss and 0.0090 under zero loss. The ablation lines
+were restored after measurement. This strongly implicates dynamic body
+contact plus stale remote motion in replay, not solely packet loss or
+projectile knockback; it is not proof that every outlier has the same cause.
+Removing collisions is not a product fix. Follow-on work must retain
+authoritative tank contact and test a bounded remote-body prediction model
+against clean, impaired, and packaged visual motion before selection.
+
+### 2026-10-09 - Packaged 16-player online WebTransport motion under loss
+
+The unchanged four-command protocol and authoritative collision path were
+tested in the Bob-produced wasm-web game, not just the deterministic harness.
+`pnpm runtime:browser:online:impaired:video` launched packaged Chromium with
+WebGL2, the Deno HTTP/3 server, and a UDP proxy configured for 65ms one-way
+latency, 15ms jitter, and 10% whole-QUIC-packet loss. The 5.3-second capture
+is `build/evidence/war-battles-online-impaired.mp4` with final screenshot
+`build/evidence/war-battles-online-impaired-current.png`. It sampled 314 video
+frames, accepted 308 authoritative inputs with none late, and reported zero
+same-life local or remote presented steps above 32px. Three sampled frames
+showed tanks driving/fighting and one tank ejecting to an on-foot driver.
+That visual sample does not prove all facings, animations, or a full match.
+
+The longer `pnpm runtime:browser:online:impaired:soak` exercised 30.2 seconds
+of sustained keyboard motion with the same configured QUIC impairment. It
+accepted 1,798 authoritative inputs, none late, applied 270 snapshots, and
+reported 0 >32px local or remote presentation steps; maximum local
+presentation step was 6px, remote 17px, and local correction 4px. The proxy
+actually dropped 131 browser-to-server and 98 server-to-browser packets.
+This is real packaged browser/QUIC evidence for one 16-player local-hosted
+match profile, not proof of WAN conditions, every remote viewpoint, native
+pixels, or the deterministic 32-player tail being solved. No collision or
+protocol ablation was retained.
+
+A separate arm64-macOS `dmengine` run again loaded Defold 1.14.0, evaluated
+one Static Hermes unit, activated the current TypeScript bundle, initialized
+the 16-player offline arena, and emitted live camera/telemetry markers. The
+desktop app binding selected an older `War Battles.app` window rather than
+the raw `dmengine` process, so its title-screen image cannot be attributed to
+this run. Input sent to that app binding did not dismiss the title. The raw
+engine process was stopped after the attempt; native arena pixels and native
+online input remain unverified.
+
+### 2026-10-09 - Current-source War Battles gate and native title check
+
+After the UI health-label change, the owning Static Hermes projection generator
+was rerun; its twelve typed-native bridge tests pass. The example's source-bound
+load, capped-link network matrix, performance, runtime-measurement, QUIC, and
+bundle-size records were regenerated through their measurement commands. Bob
+bundled the current arm64-macOS application, and the packaged runtime record
+observed Defold 1.14.0 loading the current TypeScript bundle, initializing the
+16-player offline arena, and exiting cleanly. The full example `pnpm check`
+passes, including 344 tests. These are current-source generation and runtime
+startup results, not a visual-acceptance claim for every game state.
+
+The freshly bundled `build/bundle/War Battles.app` was opened through desktop
+control, and its title screen rendered. The running process path matched that
+new bundle. A Deploy click and mapped keyboard attempts did not dismiss the
+title through the desktop-control surface. A separate OS-level Command-Q
+shortcut did reach and close the same app, so the desktop controller can send
+keyboard events, but its short mapped key events may still miss Defold's input
+sampling; a game input defect is not ruled out. Native arena pixels and native
+input remain unverified. Do not promote the successful
+packaged engine transcript or the title image to native gameplay evidence.
+
+### 2026-10-09 - Adaptive local presentation correction, with raw prediction error still open
+
+The current client keeps authoritative simulation correction immediate but now
+decays the local visual offset over a bounded 100–300 ms window, targeting
+roughly five displayed pixels per 60 Hz tick rather than always ending a large
+correction at 100 ms. The deterministic 32-player broadband, mobile-congested,
+and edge profiles retained their raw maximum prediction errors (74.75,
+85.3125, and 77.875 px respectively). Their maximum presented local steps
+fell from 12.625 to 9.625 px, 16.625 to 12 px, and 14.875 to 12 px. This is
+presentation improvement, not a claim that prediction or dynamic-body replay
+is fixed.
+
+A freshly bundled Chromium/WebGL2 game on the Deno H3 server and impaired
+QUIC proxy ran a 30.2-second online soak at 65±15 ms one-way delay and 10%
+whole-packet loss. It accepted 1,748 inputs, rejected 54 late, applied 270
+snapshots, and reported maximum local correction 5 px, maximum local presented
+step 7 px, remote step 12 px, and no >32 px presentation steps. Shorter
+repeated runs had 130, 106, and 0 late inputs respectively, so admission
+quality is variable and not signed off by the best run. The raw 32-player tail,
+native online visuals/input, and walk-source clipping remain open.
+
+The full example check initially found one test still asserting that every
+correction must settle by 100 ms. The test now checks that a larger correction
+remains smooth past that point and settles within the 300 ms cap; the focused
+presentation-smoothing suite passes 13/13. The subsequent full example
+`pnpm check` passed all 344 tests, and `pnpm check:knowledge` passed.
+
+The current-source Bob wasm-web package was rebuilt after the code change.
+Its packaged Chromium/WebGL2 5.1-second impaired QUIC video run accepted 300
+inputs with none late and reported maximum 7 px local and 12 px remote
+presented steps. A separate 30.2-second impaired soak accepted 1,790 inputs
+with none late, 272 snapshots applied, maximum 5 px local and 15 px remote
+presented steps, and no same-life >32 px step. The UDP proxy dropped 141
+browser-to-server and 88 server-to-browser packets in that soak. Earlier
+equivalent runs did record late-input bursts, so two clean samples do not
+erase the intermittency; no admission fix is claimed in this wave.
+
+### 2026-10-09 - Per-target native release site validation
+
+The October 9 policy derivation reported successful beta 1.14.0 and alpha
+1.14.1 derivations, then failed site validation because the producer emitted
+per-target native `releases` while the validator demanded family-level
+`tag`/`fingerprint`. The failed job uploaded derivation reports but skipped the
+policy-surface archive, so its two newly derived policy objects are not locally
+available from that run. This diagnosis is from the reported run and the
+checked-in producer/validator contract; it is not evidence that either
+revision has been republished.
+
+The site validator now accepts either the homogeneous family identity or a
+complete per-target native release map, never both. It checks exact target
+keys, declared recipes, immutable identities, and (for authenticated
+publication) exact asset-to-integrity sidecars. Producer-to-validator and
+negative-schema tests passed 25/25. The local validation-only site build
+passed with its one checked-in revision and 105 content-addressed objects.
+The local HTTP consumer check passed both for that homogeneous mapping and an
+intentionally divergent `arm64-osx` fixture, resolving every native target to
+its expected tag and asset. These fixtures prove the fixed schema and consumer
+path, not the unpublished beta/alpha object closures or a green hosted run.
+The aggregate `pnpm check` stopped earlier at the frozen source-pipeline SDK
+golden, which disagrees with unrelated generated SDK edits in this dirty
+checkout; `pnpm check:api-policy` likewise reports a stale local policy store.
+Neither failure was attributed to the site validator. A first isolated beta
+derivation without `--carry-reviews` refused reviewed inputs as designed; it
+was restarted using the nightly job's carried-review mode. The beta and alpha
+then derived successfully in separate scratch workspaces without adopting
+repository files. The published nine-entry site was hydrated with beta, then
+alpha, preserving the older entries and yielding eleven revisions and 537
+unique objects. The local site builder verified every object hash, and the
+HTTP consumer check passed for all eleven revisions, including each native
+target's release tag, archive asset and a tampered-object rejection. Both new
+revisions name Apple release `libs-apple-11b4413b669e` for `arm64-osx` and
+legacy `libs-db900fc9f9d8` for `x86_64-win32`. All nine currently published
+artifact documents also passed strict integrity validation. This is local
+derivation and served-site evidence, not hosted publication: the public branch
+still needs an authorized successful workflow run to acquire the two entries.
+
+### 2026-10-09 - War Battles current-source native and browser recheck
+
+After the terrain/HUD/gameplay source wave, the Static Hermes reachable-route
+record was regenerated from current source. A fresh déherm TypeScript bundle
+and native Bob archive were built; the bounded arm64-macOS packaged runtime
+recorded Defold 1.14.0 loading the TypeScript bundle, initializing camera/UI,
+engaging a 16-player offline arena, firing, moving, and exiting with code 0.
+The current WebTransport Chromium/QUIC loopback harness accepted 11 inputs and
+applied three snapshots. The deterministic load, network-impairment,
+performance, runtime-measurement, and bundle-size records were regenerated by
+their owning runners rather than edited by hand. The complete example
+`pnpm check` passed, including all 345 tests.
+
+A fresh wasm-web Bob bundle was recorded in Chromium for 7.37 seconds: 201
+frames, arena engagement marker, and one fire event. Review frames from the
+video show the hex coastline, props, tanks, ocean, and HUD rendering during
+movement. This is browser visual evidence and a bounded native transcript,
+not native gameplay pixels or a claim of finished art quality. The title
+composition remains visually stronger than the playable battlefield; world
+depth/prop composition, tank readability, and bottom-HUD legibility at the
+captured display scale remain subjective quality work. The active War Battles
+showcase goal stays open.
+
+### 2026-10-09 - Projected prop clearance and current packaged game gate
+
+A selected-art opaque-envelope audit found screen-space prop overlap in 413
+of seeds 0–511, 836 pairs total; the default seed had none. World-plan rules
+v7 now use the exact deterministic sprite variant and its selected opaque
+rectangle for placement, and rendering shares the variant selector. A broad
+class-wide rejection first reduced combat cover enough to fail the existing
+bot-frag threshold; it was replaced with exact variant bounds, without
+relaxing the test. The selected-art manifest, diagonal overlap case, and
+512-seed accepted-plan overlap checks are covered by focused tests.
+
+The world owner regenerated terrain/coast/tilemap/source mirrors and passed
+161 focused tests, default and 512-seed audits. After owner regeneration of
+source-bound records, the full example check passed 351/351 tests. Native and
+wasm-web Bob bundles built. The packaged native transcript proves Defold
+1.14.0 loads the current TypeScript bundle, enters a 16-player arena, fires,
+moves, and exits. Packaged browser WebGL2 playability passed keyboard,
+pointer/touch, restart, and sound markers. In a short browser QUIC run with
+65 ms one-way latency, 15 ms jitter, and 10% loss, 290 inputs were accepted,
+6 arrived late, maximum raw local correction was 21 pixels, and maximum
+presented local/remote steps were 6/18 pixels with no >32-pixel same-life
+step. A separate short run had 18 late inputs, so this is not stable long-run
+input-admission evidence. The browser screenshot is
+`build/evidence/war-battles-v7-final-1280.png`. Native gameplay pixels,
+extended WAN smoothness, and whole-game art/playability review remain open.
+
+### 2026-10-09 - Seed-aware shoreline camera and intermittent raw correction
+
+Before this change, 30-second packaged WebGL2/QUIC video review showed a
+north-coast drive with much of the viewport open ocean. The camera now uses
+the active `WorldPlan` land mask through a cold-cached projected-anchor list
+to bias its target toward nearby playable land. The per-message calculation
+reuses caller storage and caps the offset at a quarter-view half-extent; it
+does not alter the actor, collision, or seed. Two focused tests pass for both
+shores, an interior anchor, continuity, and bounded offset. Current wasm-web
+and arm64-macOS Bob bundles built. Packaged WebGL2 keyboard/pointer/touch/
+restart/sound playability passed; a new 30-second impaired online video is
+`build/evidence/war-battles-landward-online-30s.mp4`. Contact-sheet inspection
+shows more land in the north-coast drive, but is not an all-camera visual gate.
+The native packaged runtime passed startup, arena engagement, fire, move,
+and graceful exit; it did not capture native gameplay pixels. The shipped
+default and seeds 0–511 pass world audits on rules v7.
+
+One earlier 30-second video-backed standard-impairment run failed its raw
+local-correction >32-pixel gate; a non-video soak and a subsequent video run
+passed. The probe now includes correction, lifecycle, and recent input-window
+details in that assertion and saves the visual clip before throwing on a
+future failure. After the camera change, a 30-second 65±15 ms one-way/10%-loss
+QUIC run passed with 1,757 accepted inputs and 29 late. This is bounded
+loopback evidence, not a fix for the intermittent raw correction or a WAN
+smoothness signoff.
+
+After the new camera source changed the locked release identity, the Static
+Hermes projection generator refreshed its output and all 12 focused gate
+tests passed. The load, headless-soak, bundle-size, packaged-native, network-
+matrix, performance, runtime-measurement, and QUIC records were refreshed by
+their owning commands. The full example `pnpm check` then passed lint,
+format, generated-state, Static Hermes bridge, typecheck, and 353/353 tests.
+The repository-wide `pnpm check` passed provenance and style, then stopped at
+the frozen source-pipeline SDK golden being stale against the shared dirty
+checkout. That SDK fixture failure is outside this camera/game evidence; no
+checkout-backed SDK regeneration or golden update was performed here.
+
+### 2026-10-09 - Rejected stale-body collision prediction ablations
+
+The cold-path `runtime:network:diagnose` report now retains a bounded 32-step
+nearest-actor history for each client. On the deterministic 32-player
+mobile-congested profile, 205/220 same-tick >8px prediction-error events had
+an actor within 40px somewhere in that history, compared with 133/220 at the
+corrected sample. The largest baseline event was 68.7px and had an actor at
+27.9px in recent history although the post-correction distance was 132px.
+History samples include correction steps; proximity remains correlation, not
+collision causality or packaged-game visual evidence.
+
+Two production-code experiments were applied and measured, then fully
+reverted. Client-only suppression of collision pairs involving a stale remote
+changed the mobile >8px event count from 220 to 111 but worsened the maximum
+from 68.7px to 146.3px. Suppressing only remote/remote pairs left 217 events
+and a 106.4px maximum. Clean-localhost counts were 9 baseline, 14 stale-body,
+and 11 remote/remote. The final code retains the original pair solver on
+client and server. These numbers are deterministic application-payload
+diagnostics; no new packaged runtime or WAN result is claimed for the rejected
+variants.
+
+After the diagnostic source changed, its inclusion in the source-byte inventory
+made the locked bundle measurement stale by 760 bytes; the owning
+`bundle:size:update` command refreshed the record without changing either
+emitted bundle digest. `pnpm check:knowledge` passed, and the full War Battles
+test suite passed 353/353 with local loopback access. The first sandboxed test
+attempt failed at `listen EPERM 127.0.0.1`; this was a test-environment
+restriction, not game behavior. No native or browser runtime was rerun for the
+rejected collision experiments because they are absent from the final code.
+The example aggregate `pnpm check` passed lint, format, generated-state,
+typed-native bridge, typecheck, and all 353 tests. Repository-wide `pnpm check`
+again stopped at the pre-existing stale frozen source-pipeline SDK golden in
+the shared dirty checkout; it did not reach later root gates. This is not a
+whole-repository green claim.
+
+### 2026-10-09 - War Battles aim assist, character pivots, FX, and HUD
+
+Changed the offline and online aim stage to use an unassisted manual direction
+each tick. Keyboard assist selects only forward, visible targets and bends the
+aim by a bounded step; explicit pointer/touch aim bypasses assist. Bot error
+now grows deterministically with range, and strongest-skill lead accuracy was
+reduced. The generated 32-player ten-minute soak record was refreshed through
+`pnpm soak:record`, not edited by hand. Focused aim tests passed.
+
+Corrected the remote hero component's 8-pixel pivot mismatch against the
+local hero and selected source foot baseline. Raised event FX with the same
+hex-relief projection as tanks. The owning arena-art generator now emits a
+large-blast ground shockwave and debris; its frame-extent test passed. HUD
+copy was shortened and brightened without changing its nine-slice geometry.
+The existing tank source preview generated four 8-by-8 mixed-aim matrices;
+all four packaged hero class galleries produced eight-direction contact
+sheets and motion clips. Those are source and browser evidence respectively,
+not native pixel proof.
+
+The rebuilt wasm-web Bob bundle passed packaged Chromium/WebGL2 playability,
+including real input and 16-player arena engagement. The rebuilt arm64-macOS
+Bob archive passed native startup, arena engagement, and clean exit; its
+source-bound runtime evidence was refreshed through the owning command.
+The bundle-size record was likewise refreshed by `bundle:size:update` after
+source changes. No paid Sprite Fusion calls were made in this pass.
+
+The final tuning kept the network thresholds unchanged and restored the
+short eight-tank combat test after an intermediate handicap produced no
+frags. The final source was rebuilt for both Bob targets; Chromium/WebGL2
+playability and native startup/engagement/exit passed. The War Battles
+aggregate `pnpm check` passed generated-state, Static Hermes bridge,
+typecheck, and all 357 tests. No repository-wide green result is claimed.
+
+### 2026-10-10 - Apple native release upload repair
+
+Run 38048518175 at `3cc81bfd` recorded all four Apple matrix jobs as green,
+but its completeness summary failed with the Apple recipe release and eight
+archive/sidecar assets absent. The uploader had an empty optional argument
+array expanded under `set -u`; this fails on macOS's Bash 3.2. A local `/bin/bash`
+reproduction confirmed the `unbound variable` error. The uploader now branches
+on the optional target instead of expanding an empty array and verifies both
+published assets before returning success. Focused mocked-release tests cover
+no target, explicit target, creation failure, upload failure, and a CLI that
+returns success without publishing. Local tests are not publication evidence;
+the fixed commit still needs a full native-artifacts workflow dispatch, not a
+failed-jobs-only rerun, followed by release-asset inspection.
+Focused planner/uploader tests passed 24/24; `pnpm check:style`,
+`pnpm check:test-suite`, and `pnpm check:knowledge` passed. `pnpm test:cli`
+passed 135/137 with unrelated failures in a per-target coordinate assertion
+and the packed SDK policy digest. Root `pnpm check` stopped at the already
+stale frozen source-pipeline SDK golden. GitHub CLI authentication was invalid
+at this checkpoint, so the authenticated CLI could not dispatch a run directly.
+The signed fix was pushed as `a97649f7`; the uploader path triggered the full
+native-artifacts run 38055622623. All four Apple rows passed. The public
+`libs-apple-dcf85f379935` release then carried exactly the planner's four
+archives and four integrity sidecars, each nonempty and carrying a GitHub
+SHA-256 asset digest. This proves publication for the Apple recipe, not overall
+workflow success: Android, Windows, and Linux rows were still running at the
+last check.
+
+### 2026-10-10 - Published release-lock handoff after native artifacts
+
+Run 38055622623 finished every artifact matrix row successfully, then its
+summary stopped at `generate-release-tags.mjs --check --published`: the
+checked-in host-tool lock still named the previous Hermes/dehermc release
+tags. This is a sequencing defect, not an unpublished Apple asset. Running
+`pnpm generate:release-tags` downloaded and authenticated the current sidecars,
+then both `pnpm check:release-tags` and
+`pnpm check:release-tags:published` passed. The generated diff changes the
+host-tool tags and sidecar digests; the native Apple recipe tag remains the
+already-published `libs-apple-dcf85f379935`.
+
+The summary now regenerates its workspace lock from published sidecars,
+re-verifies it, preserves it as a workflow artifact, and only then dispatches
+policy mapping refresh. It reports when the checked-in copy needs a signed
+maintainer commit, rather than failing the mapping for an expected newly
+published fingerprint. This local change and the regenerated lock still need
+CI verification on the pushed commit; the policy site is not yet claimed fresh.
+The authenticated checker previously stripped integrity fields before
+comparison and only checked that local records were well formed. It now
+compares the full generated document when publisher sidecars are available;
+the focused regression rejects a stale but valid-length SHA-256. Offline
+checking retains its narrower coordinate/completeness contract. Focused
+planner tests passed 20/20, and both offline and published release-tag checks
+passed after this change.
+Signed commit `2fa7eec6` was pushed. Native-artifacts run 38058371610
+completed successfully with no rebuild rows: its summary passed release
+completeness, regenerated and authenticated the published lock, preserved the
+lock artifact, and dispatched policy refresh. The push-triggered policy run
+38058371564 also completed successfully: host parity, real-engine execution,
+site publication, and clean consumer resolution all passed. The public
+`v1/artifacts/20692b3a510a29dde4df99401f0881bfcec1d9fb.json` mapping
+changed from `hermes-4e285d845536` / `tools-947589f92cad` to the signed
+lock's `hermes-35d2ed2efe6c` / `tools-2fc387335a8d`. The summary-dispatched
+artifact-refresh run 38058436093 is a second, serialized policy run; no
+result is claimed for it here. The repository-wide local `pnpm check` remains
+blocked at the unrelated stale frozen SDK golden in this dirty checkout.

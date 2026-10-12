@@ -1,0 +1,6 @@
+{
+  "name": "mud-infantry-directions-v1",
+  "operation": "direction-set",
+  "inputs": ["asset:644767e7-52a3-4881-b179-ba87480f27af"],
+  "size": 32
+}

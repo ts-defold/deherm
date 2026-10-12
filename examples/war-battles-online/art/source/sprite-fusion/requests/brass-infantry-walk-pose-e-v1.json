@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_0770eb02-da35-4b2b-ac4a-02f887bf6693",
+  "operation": "edit",
+  "prompt": "Change only Brass's body pose to a grounded side-view walk mid-stride matching the input's exact camera angle: one boot forward, the other planted, opposite arm swinging, compact sidearm low. Preserve his full white beard, brass-rimmed goggles, ochre leather cap, cream scarf, olive mechanic jacket, stocky build, palette, outlines, and viewing angle. Do not turn or mirror him; no extra person, platform, text, or scenery.",
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "70f82057-5070-454b-a96f-67bee71794c5"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/brass-infantry-walk-pose-e-v1.json",
+    "sha256": "916c659004aea8e70a48f16811b61aff5acb40334ec4b6be7d7f9b7907a13f40"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "bb26da76-7445-402b-b852-b282768e54e5",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 34,
+      "height": 48,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/bb26da76-7445-402b-b852-b282768e54e5/image.png?v=1791524321636",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-walk-pose-e-v1/00.png",
+      "bytes": 3627,
+      "sha256": "3e1ef480a85e02c30edceeb045ff09c3405651c62381a95551f37b4f9dcaa5f4"
+    },
+    {
+      "index": 1,
+      "assetId": "618e8b68-6f42-46dc-b6c9-7c60aeae6cf8",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 28,
+      "height": 48,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/618e8b68-6f42-46dc-b6c9-7c60aeae6cf8/image.png?v=1791524322675",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-walk-pose-e-v1/01.png",
+      "bytes": 3562,
+      "sha256": "a02a0524aeba125c7dc4fe763c2f84d9c0bad082632f9a037097d3d90604176a"
+    }
+  ],
+  "credits": {
+    "remaining": 1680
+  }
+}

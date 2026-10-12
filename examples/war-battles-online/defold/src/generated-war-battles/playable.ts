@@ -8,6 +8,7 @@
 
 import {
   DIRECTION_SCALE,
+  DEFAULT_ROSTER_SIZE,
   INPUT_BUTTON_BOOST,
   INPUT_BUTTON_FIRE,
   MAX_PLAYERS,
@@ -27,8 +28,8 @@ import {
   isWeaponId,
   weaponById,
 } from "./content";
-import { BotController, botDifficulty, nearestEnemy } from "./bots";
-import { clamp, createDirection, length, normalizeInto, type Direction } from "./fixed";
+import { BotController, botDifficulty } from "./bots";
+import { clamp, createDirection, length, normalizeInto, slewInto, type Direction } from "./fixed";
 import { createInputCommand, type InputCommand } from "./protocol";
 import { BattleWorld } from "./world";
 import { tickNext } from "./ticks";
@@ -88,12 +89,15 @@ export class PlayableBattle {
   private localMoveY = 0;
   private localAimX = DIRECTION_SCALE;
   private localAimY = 0;
+  private manualAimX = DIRECTION_SCALE;
+  private manualAimY = 0;
+  private hasExplicitAim = false;
   private localFire = false;
   private localBoost = false;
   private localWeapon = 0;
 
   constructor(options: PlayableOptions = {}) {
-    this.playerCount = clamp(Math.trunc(options.players ?? 8), 2, MAX_PLAYERS);
+    this.playerCount = clamp(Math.trunc(options.players ?? DEFAULT_ROSTER_SIZE), 2, MAX_PLAYERS);
     this.botSkill = clamp(Math.trunc(options.botSkill ?? 1), 0, 3);
     this.teams = options.teams ?? false;
     this.fragLimit = Math.max(1, Math.trunc(options.fragLimit ?? DEFAULT_FRAG_LIMIT));
@@ -117,9 +121,16 @@ export class PlayableBattle {
   /** Aim the local turret explicitly, in world units relative to the tank. */
   setAim(x: number, y: number): void {
     if (normalizeInto(x, y, this.aim)) {
+      this.manualAimX = this.aim.x;
+      this.manualAimY = this.aim.y;
       this.localAimX = this.aim.x;
       this.localAimY = this.aim.y;
+      this.hasExplicitAim = true;
     }
+  }
+
+  clearAim(): void {
+    this.hasExplicitAim = false;
   }
 
   step(): void {
@@ -196,18 +207,19 @@ export class PlayableBattle {
 
   private stageLocalCommand(command: InputCommand, tick: number): void {
     const slot = LOCAL_PLAYER_ID - 1;
-    // Keyboard-only aiming: the turret tracks the best target the tank can
-    // actually see, and otherwise points where the tank is driving. `setAim`
-    // overrides this for a client that has a real pointing device.
-    if (assistedAim(this.world, slot, this.aim)) {
-      this.localAimX = this.aim.x;
-      this.localAimY = this.aim.y;
-    } else if (this.localMoveX !== 0 || this.localMoveY !== 0) {
+    // Movement selects the player's manual aim. Assist may bend that direction
+    // slightly, but it cannot become the stored aim and steer itself each tick.
+    if (!this.hasExplicitAim && (this.localMoveX !== 0 || this.localMoveY !== 0)) {
       if (normalizeInto(this.localMoveX, this.localMoveY, this.aim)) {
-        this.localAimX = this.aim.x;
-        this.localAimY = this.aim.y;
+        this.manualAimX = this.aim.x;
+        this.manualAimY = this.aim.y;
       }
     }
+    this.aim.x = this.manualAimX;
+    this.aim.y = this.manualAimY;
+    if (!this.hasExplicitAim) assistedAim(this.world, slot, this.aim);
+    this.localAimX = this.aim.x;
+    this.localAimY = this.aim.y;
     command.tick = tick;
     command.sequence = tick & 0xffff;
     command.moveX = axis(this.localMoveX);
@@ -224,28 +236,58 @@ export class PlayableBattle {
 }
 
 /**
- * Turret assist. Picks the closest enemy this tank can see inside its current
- * weapon's reach and leads it by the projectile's flight time. Returns false
- * when there is nothing worth tracking, which leaves the caller's own aim alone.
+ * Bounded turret assist. Only a visible enemy already within the player's
+ * forward cone can attract aim, and only partway toward a partial lead. The
+ * caller supplies the unassisted direction on every tick; no automatic target
+ * lock or per-tick accumulation is possible.
  */
 export function assistedAim(world: BattleWorld, slot: number, output: Direction): boolean {
   if (world.playerActive[slot] === 0 || world.playerHealth[slot]! <= 0) return false;
-  const enemy = nearestEnemy(world, slot);
-  if (enemy < 0) return false;
   const selfX = world.playerX[slot]!;
   const selfY = world.playerY[slot]!;
-  const targetX = world.playerX[enemy]!;
-  const targetY = world.playerY[enemy]!;
   const weapon = weaponById(world.playerWeapon[slot]!);
-  const distance = length(targetX - selfX, targetY - selfY);
-  if (distance > weapon.projectileSpeed * weapon.lifetimeTicks) return false;
-  if (weapon.bounces === 0 && !world.map.lineOfSight(selfX, selfY, targetX, targetY)) return false;
-  const flightTicks = weapon.projectileSpeed > 0 ? Math.trunc(distance / weapon.projectileSpeed) : 0;
-  return normalizeInto(
-    targetX - selfX + Math.trunc((world.playerVelocityX[enemy]! * flightTicks) / VELOCITY_SCALE),
-    targetY - selfY + Math.trunc((world.playerVelocityY[enemy]! * flightTicks) / VELOCITY_SCALE),
+  const reach = weapon.projectileSpeed * weapon.lifetimeTicks;
+  const team = world.playerTeam[slot]!;
+  let enemy = -1;
+  let bestDistance = reach + 1;
+  for (let target = 0; target < MAX_PLAYERS; target += 1) {
+    if (target === slot || world.playerActive[target] === 0 || world.playerHealth[target]! <= 0) continue;
+    if (team !== 0 && team === world.playerTeam[target]) continue;
+    const dx = world.playerX[target]! - selfX;
+    const dy = world.playerY[target]! - selfY;
+    const distanceSquared = dx * dx + dy * dy;
+    if (distanceSquared === 0 || distanceSquared >= bestDistance * bestDistance) continue;
+    const distance = length(dx, dy);
+    if (distance >= bestDistance) continue;
+    // Three-fifths cosine is a roughly 53-degree forward half-cone. A target
+    // behind the barrel, even if nearest, cannot spin the turret for free.
+    if (output.x * dx + output.y * dy < Math.trunc((distance * DIRECTION_SCALE * 3) / 5)) continue;
+    if (weapon.bounces === 0 && !world.map.lineOfSight(selfX, selfY, world.playerX[target]!, world.playerY[target]!))
+      continue;
+    enemy = target;
+    bestDistance = distance;
+  }
+  if (enemy < 0) return false;
+  const flightTicks = weapon.projectileSpeed > 0 ? Math.trunc(bestDistance / weapon.projectileSpeed) : 0;
+  const targetX =
+    world.playerX[enemy]! -
+    selfX +
+    Math.trunc((world.playerVelocityX[enemy]! * flightTicks * 2) / (5 * VELOCITY_SCALE));
+  const targetY =
+    world.playerY[enemy]! -
+    selfY +
+    Math.trunc((world.playerVelocityY[enemy]! * flightTicks * 2) / (5 * VELOCITY_SCALE));
+  const targetLength = length(targetX, targetY);
+  if (targetLength === 0) return false;
+  slewInto(
+    output.x,
+    output.y,
+    Math.trunc((targetX * DIRECTION_SCALE) / targetLength),
+    Math.trunc((targetY * DIRECTION_SCALE) / targetLength),
+    56,
     output,
   );
+  return true;
 }
 
 export function projectWorldToScreen(

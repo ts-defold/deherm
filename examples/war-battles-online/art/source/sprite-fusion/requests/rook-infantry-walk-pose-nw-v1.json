@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_9c5ec24b-2cba-4994-bc72-fb891b1f836b",
+  "operation": "edit",
+  "prompt": "Change only Rook's body pose to a grounded northwest-facing three-quarter rear walk mid-stride: front boot stepping, rear boot planted, opposite arm swinging, compact sidearm still held low. Keep her exact ochre helmet, cream scarf, olive jacket, colors, outline, proportions, and rear three-quarter perspective. Do not turn her toward the camera or add a prop, platform, text, scenery, or second person.",
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "d5826baf-410d-4551-a247-a925684e1304"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/rook-infantry-walk-pose-nw-v1.json",
+    "sha256": "41f9b319791e0a0550b0a42170373f620370d7a17a79c29c3a053e4cfa2bf40c"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "4f27851f-5003-4a7e-b225-804301c7df5e",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 25,
+      "height": 41,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/4f27851f-5003-4a7e-b225-804301c7df5e/image.png?v=1791522104749",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-walk-pose-nw-v1/00.png",
+      "bytes": 2111,
+      "sha256": "d6bb283891df62171748a0f8c505306ee6f7dd3103a29bcfd39cf842a7a242bc"
+    },
+    {
+      "index": 1,
+      "assetId": "aa160c1a-acbd-4ecf-9118-3536aafc7703",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 21,
+      "height": 40,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/aa160c1a-acbd-4ecf-9118-3536aafc7703/image.png?v=1791522105634",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-walk-pose-nw-v1/01.png",
+      "bytes": 2137,
+      "sha256": "893b46ab7e211d8a36d31e689d15d96cd9a33df492744f7bcb5a2b1e9319f8f0"
+    }
+  ],
+  "credits": {
+    "remaining": 2025
+  }
+}

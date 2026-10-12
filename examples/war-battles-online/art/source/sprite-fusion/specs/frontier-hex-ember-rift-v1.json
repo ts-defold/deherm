@@ -1,0 +1,10 @@
+{
+  "name": "frontier-hex-ember-rift-v1",
+  "operation": "style-reference",
+  "size": 64,
+  "prompt": "A single isometric six-sided volcanic basalt terrain tile with a broad flat charcoal top cut by two thin glowing orange magma fissures. A short layered rock cliff side, restrained hot highlights, crisp retro pixel-art clusters, same shape and perspective as the reference hex. One isolated tile only, no tank, building, lettering, border, or second tile.",
+  "inputs": [
+    "asset:e987b985-135f-48e7-8294-a804bec5481e",
+    "art/source/imagegen/hex-style-reference/basalt.png"
+  ]
+}

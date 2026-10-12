@@ -1,0 +1,6 @@
+{
+  "name": "brass-infantry-fire-pose-se-v1",
+  "operation": "edit",
+  "inputs": ["asset:40f0c359-ea92-4cf1-9e04-6a6d658f20a3"],
+  "prompt": "Change only Brass's southeast-facing body pose: brace his heavy boots and aim the compact sidearm forward at chest height with broad shoulders absorbing recoil. Keep the same older stocky driver, white beard, goggles, helmet, cream scarf, olive jacket, colors, outline, proportions, and three-quarter perspective. Keep the feet on the same ground line. No muzzle flash, projectile, new prop, platform, text, scenery, or second person."
+}

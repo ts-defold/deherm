@@ -1,0 +1,141 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_8d2f52df-b3d9-465b-a9e1-a51d48973858",
+  "operation": "style-reference",
+  "prompt": "A communications portrait of Mud, a broad-shouldered salvage driver with an olive armored tanker helmet, a dark half-face dust respirator, expressive dark eyes under a battered visor, and a bulky rust-red collar. Head and shoulders fill the frame, three-quarter view facing right. Match the reference portraits' chunky military arcade pixel-art rendering, dark outline, and warm face lighting. A rugged masked silhouette, clearly different from both reference drivers. No portrait frame, text, vehicle, or background scene.",
+  "size": 64,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/rook-driver-portrait-v1/00.png",
+      "bytes": 8752,
+      "sha256": "e996883fff8f3153d763f8e3ea50887991fb5a1aabb90c22012540c9875fe8e4"
+    },
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/driver-portrait-base-v1/03.png",
+      "bytes": 6988,
+      "sha256": "e7ba1ca42b3c55dcddd426d2bbb0051eb2f4aa35732538ba05a85663e21cec7e"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/mud-driver-portrait-v1.json",
+    "sha256": "2b2d70f157ac38b81b553bb5f1d074de2c37c3482a246ad010c2a2d96586ab8f"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "3b7369f9-d515-4ae7-b2b0-7b711f72ac2b",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 67,
+      "height": 67,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/3b7369f9-d515-4ae7-b2b0-7b711f72ac2b/image.png?v=1791427417382",
+      "path": "art/source/sprite-fusion/outputs/mud-driver-portrait-v1/00.png",
+      "bytes": 10083,
+      "sha256": "e4c331d121284b49de8d8087ec90c3737367b54675a864be1d49d551aa66a3f4"
+    },
+    {
+      "index": 1,
+      "assetId": "ad1f49c4-9964-4a67-b6bb-573a04d6ac7a",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 65,
+      "height": 65,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/ad1f49c4-9964-4a67-b6bb-573a04d6ac7a/image.png?v=1791427417927",
+      "path": "art/source/sprite-fusion/outputs/mud-driver-portrait-v1/01.png",
+      "bytes": 9801,
+      "sha256": "3961531db36c4b746a9e7b3b214241e3ca19db855f868f10d18dbacc0d1f21e9"
+    },
+    {
+      "index": 2,
+      "assetId": "754d95d3-d3e1-4dbf-a486-41c53cd7f3ad",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 69,
+      "height": 69,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/754d95d3-d3e1-4dbf-a486-41c53cd7f3ad/image.png?v=1791427418428",
+      "path": "art/source/sprite-fusion/outputs/mud-driver-portrait-v1/02.png",
+      "bytes": 10293,
+      "sha256": "62d528db8ed0e58b8ea79df7e6dfbeb93c55d449a859a65a1fafc875d48b01ea"
+    },
+    {
+      "index": 3,
+      "assetId": "d2e15eca-9d62-4dc6-8759-fda378008a21",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 68,
+      "height": 68,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/d2e15eca-9d62-4dc6-8759-fda378008a21/image.png?v=1791427418963",
+      "path": "art/source/sprite-fusion/outputs/mud-driver-portrait-v1/03.png",
+      "bytes": 10478,
+      "sha256": "120cdfa02779ec835c6a5704f0871b25a7072477725c49c426a2a2d48e77b9d4"
+    },
+    {
+      "index": 4,
+      "assetId": "f84a2b68-c63e-485f-a985-21f413a5cdf5",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 66,
+      "height": 66,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/f84a2b68-c63e-485f-a985-21f413a5cdf5/image.png?v=1791427419556",
+      "path": "art/source/sprite-fusion/outputs/mud-driver-portrait-v1/04.png",
+      "bytes": 10172,
+      "sha256": "5c0dbb1b8ad81fc9d26ddd3a9f8ef2aaa3b5e76dd025c500a53df411daf568e0"
+    },
+    {
+      "index": 5,
+      "assetId": "b3d13bfc-0fa8-4939-ab22-049933528f09",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 69,
+      "height": 69,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/b3d13bfc-0fa8-4939-ab22-049933528f09/image.png?v=1791427420180",
+      "path": "art/source/sprite-fusion/outputs/mud-driver-portrait-v1/05.png",
+      "bytes": 10364,
+      "sha256": "e2c426d51d7a4d244513df659d41c3476d64c4654407967d093d674f9b9d847a"
+    },
+    {
+      "index": 6,
+      "assetId": "40f9fc22-feda-4b15-baae-776913027932",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 69,
+      "height": 69,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/40f9fc22-feda-4b15-baae-776913027932/image.png?v=1791427420753",
+      "path": "art/source/sprite-fusion/outputs/mud-driver-portrait-v1/06.png",
+      "bytes": 9891,
+      "sha256": "6ed6a7b8d74aa93a141602087c2ed30d548c214ab4b4da03b6a0a0fa254764f9"
+    },
+    {
+      "index": 7,
+      "assetId": "554b41e4-3852-430b-ba54-085ad6cbf236",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 66,
+      "height": 66,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/554b41e4-3852-430b-ba54-085ad6cbf236/image.png?v=1791427421379",
+      "path": "art/source/sprite-fusion/outputs/mud-driver-portrait-v1/07.png",
+      "bytes": 10306,
+      "sha256": "22389f865917d0881c7b3e58ef3f6e364769502f94f7fb1022b258463bde655b"
+    },
+    {
+      "index": 8,
+      "assetId": "55c945c5-215f-4bea-ac9e-eeebb8627c56",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 69,
+      "height": 69,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/55c945c5-215f-4bea-ac9e-eeebb8627c56/image.png?v=1791427421984",
+      "path": "art/source/sprite-fusion/outputs/mud-driver-portrait-v1/08.png",
+      "bytes": 10540,
+      "sha256": "c7e8aecb7b1e3472eb437ab21bf03ed55621898290368b9d9f223df5e1fde5f9"
+    }
+  ],
+  "credits": {
+    "remaining": 2535
+  }
+}

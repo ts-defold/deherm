@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 2,
+  "kind": "war-battles.hex-tile-selection",
+  "reviewedAt": "2026-10-07",
+  "selectionPurpose": "Reproducible native-size hex source catalog for floor sampling and collision-aligned landforms",
+  "families": {
+    "G": {
+      "sources": [
+        { "request": "frontier-hex-meadow-cliff-v1", "indices": [4, 5, 6, 7, 9, 10, 11] },
+        { "request": "frontier-hex-wild-meadow-v1", "indices": [0, 1, 2, 3, 4, 5, 6, 7, 8] },
+        { "request": "frontier-hex-meadow-detail-v2", "indices": [0, 1, 2, 3, 4, 5, 6, 7, 8] }
+      ]
+    },
+    "D": {
+      "sources": [
+        { "request": "frontier-hex-ochre-cliff-v1", "indices": [6, 7, 8, 9, 10, 11] },
+        { "request": "frontier-hex-worn-route-v1", "indices": [1, 2, 3, 5] },
+        { "request": "frontier-hex-ochre-detail-v2", "indices": [0, 1, 2, 3, 4, 5, 6, 7, 8] }
+      ]
+    },
+    "B": {
+      "sources": [
+        { "request": "frontier-hex-basalt-cliff-v1", "indices": [0, 1, 2, 3, 4, 5, 6, 7, 8] },
+        { "request": "frontier-hex-basalt-detail-v2", "indices": [0, 1, 2, 3, 4, 5, 6, 7, 8] }
+      ]
+    },
+    "A": {
+      "sources": [
+        { "request": "frontier-hex-ash-ridge-v1", "indices": [0, 5, 9] },
+        { "request": "frontier-hex-lava-fracture-v1", "indices": [0, 1, 2, 6, 7, 8] },
+        { "request": "frontier-hex-dark-ash-v3", "indices": [0, 1, 4, 5, 6, 7, 8] }
+      ]
+    },
+    "M": {
+      "sources": [
+        { "request": "frontier-hex-service-deck-v1", "indices": [6, 7, 8, 9, 10, 11] },
+        { "request": "frontier-hex-refinery-grate-v1", "indices": [1, 2, 3, 5, 6, 7, 8] },
+        { "request": "frontier-hex-steel-detail-v2", "indices": [0, 1, 2, 3, 4, 5, 6, 7, 8] }
+      ]
+    },
+    "GD": {
+      "sources": [{ "request": "frontier-hex-meadow-earth-edge-v1", "indices": [0, 2, 3, 5, 6, 7, 8, 9, 10] }]
+    },
+    "GB": {
+      "sources": [
+        { "request": "frontier-hex-meadow-basalt-edge-v1", "indices": [0, 4, 5, 6, 7, 8, 9, 10, 11] },
+        { "request": "frontier-hex-meadow-basalt-detail-v2", "indices": [0, 1, 2, 3, 4, 5, 6, 7, 8] }
+      ]
+    },
+    "GM": {
+      "sources": [{ "request": "frontier-hex-meadow-steel-edge-v1", "indices": [0, 1, 2, 3, 4, 5, 6, 7, 8] }]
+    },
+    "DB": {
+      "sources": [{ "request": "frontier-hex-earth-basalt-edge-v1", "indices": [0, 1, 2, 3, 4, 5, 6, 7, 8] }]
+    },
+    "BA": {
+      "sources": [{ "request": "frontier-hex-basalt-ash-edge-v1", "indices": [0, 2, 3, 4, 5, 6, 7] }]
+    },
+    "DA": {
+      "sources": [{ "request": "frontier-hex-ash-earth-edge-v1", "indices": [3, 4, 5, 6, 7, 8] }]
+    },
+    "DM": {
+      "sources": [{ "request": "frontier-hex-earth-steel-edge-v1", "indices": [0, 1, 2, 3, 4, 5, 6, 7, 8] }]
+    }
+  },
+  "notes": "167 selected 64–96px square landforms across twelve material and transition families from twenty-two immutable request groups. The earth-track and service-scar groups remain archived as request provenance but are rejected for the floor: their raised platform silhouettes read as floating objects, not terrain. The floor normalizes and samples only top faces; raised wall-stamp sprites separately reject clipped opaque bounds."
+}

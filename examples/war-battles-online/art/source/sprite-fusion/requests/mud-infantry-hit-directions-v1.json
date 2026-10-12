@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_0e8aa7ff-1b0b-4ef9-b3ff-28b3b52621f6",
+  "operation": "direction-set",
+  "prompt": null,
+  "size": 32,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "12ba9c69-107e-4c36-8082-39298207c116"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/mud-infantry-hit-directions-v1.json",
+    "sha256": "f6b12cb486595446a309ab673e85b3c14f07675b84abb20a036938cf8c7a2d2d"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "e1d6e730-411f-46cd-8c3f-621ab36b991f",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 34,
+      "height": 34,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/e1d6e730-411f-46cd-8c3f-621ab36b991f/image.png?v=1791536137465",
+      "path": "art/source/sprite-fusion/outputs/mud-infantry-hit-directions-v1/00.png",
+      "bytes": 1862,
+      "sha256": "0acabba0e37ea8c292051e95e80981929cd22a848c643aa0c00725e14771234e"
+    },
+    {
+      "index": 1,
+      "assetId": "bd3dddc9-a537-45b3-84d4-9c3d8d96573b",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 32,
+      "height": 32,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/bd3dddc9-a537-45b3-84d4-9c3d8d96573b/image.png?v=1791536138059",
+      "path": "art/source/sprite-fusion/outputs/mud-infantry-hit-directions-v1/01.png",
+      "bytes": 1592,
+      "sha256": "a6dad3e1e05edbabdef1729cb5ccfb726632f9ea2d207759ac19ec6c5172253d"
+    },
+    {
+      "index": 2,
+      "assetId": "e9f67da3-021f-47e3-8013-c51ad1532b2e",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 34,
+      "height": 34,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/e9f67da3-021f-47e3-8013-c51ad1532b2e/image.png?v=1791536138760",
+      "path": "art/source/sprite-fusion/outputs/mud-infantry-hit-directions-v1/02.png",
+      "bytes": 1854,
+      "sha256": "fce4080f8a5aa8e698f32892694d98ef36604bf46a674ad12e74c40826074ac0"
+    },
+    {
+      "index": 3,
+      "assetId": "48ef0a31-00ad-4e7f-bb9f-9674201c56cd",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 38,
+      "height": 38,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/48ef0a31-00ad-4e7f-bb9f-9674201c56cd/image.png?v=1791536139384",
+      "path": "art/source/sprite-fusion/outputs/mud-infantry-hit-directions-v1/03.png",
+      "bytes": 1804,
+      "sha256": "bdef450cdf29509e57c2c6fa17006b7d989ba4858b6ee7861de7f40eb6ef52d1"
+    },
+    {
+      "index": 4,
+      "assetId": "baefe0f1-8920-445b-9a4c-a1bb977e532b",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 33,
+      "height": 33,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/baefe0f1-8920-445b-9a4c-a1bb977e532b/image.png?v=1791536139936",
+      "path": "art/source/sprite-fusion/outputs/mud-infantry-hit-directions-v1/04.png",
+      "bytes": 1572,
+      "sha256": "2b546f2f3047969630ab434b1465978951d6c94c3ce6132676ecfdb9cbaebd8e"
+    },
+    {
+      "index": 5,
+      "assetId": "f38b0b5d-f38d-4c2e-8f90-2bd9f0a8fdd4",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 32,
+      "height": 32,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/f38b0b5d-f38d-4c2e-8f90-2bd9f0a8fdd4/image.png?v=1791536140502",
+      "path": "art/source/sprite-fusion/outputs/mud-infantry-hit-directions-v1/05.png",
+      "bytes": 1647,
+      "sha256": "5469ace0f0558d1108f9fbbccdef563d5957cb77df0d1ac3c28d54994a32e46c"
+    },
+    {
+      "index": 6,
+      "assetId": "11c92080-c3bb-4737-997d-0fe5a82dc2ac",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 35,
+      "height": 35,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/11c92080-c3bb-4737-997d-0fe5a82dc2ac/image.png?v=1791536141076",
+      "path": "art/source/sprite-fusion/outputs/mud-infantry-hit-directions-v1/06.png",
+      "bytes": 1768,
+      "sha256": "9b18dfc5749743a72693a6411986862d0384b1bfb09484293c3d4ec4fb2a21ec"
+    },
+    {
+      "index": 7,
+      "assetId": "719a5691-ec09-4dfc-9c6b-f62f3a6b55c1",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 32,
+      "height": 32,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/719a5691-ec09-4dfc-9c6b-f62f3a6b55c1/image.png?v=1791536141726",
+      "path": "art/source/sprite-fusion/outputs/mud-infantry-hit-directions-v1/07.png",
+      "bytes": 1607,
+      "sha256": "03e7631638dc64268aafc9eaacc85a86f1bc800be7e86dc39633e6571f8e9a17"
+    }
+  ],
+  "credits": {
+    "remaining": 525
+  }
+}

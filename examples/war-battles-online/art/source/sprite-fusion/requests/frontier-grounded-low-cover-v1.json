@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_8c07c39c-44ed-4ca9-952d-2f8d32c9f950",
+  "operation": "style-reference",
+  "prompt": "One low, irregular earth-and-stone defensive berm for a three-quarter isometric arcade tank battlefield. A warm brown soil body with a few dark slate stones and small olive grass tufts, grounded on one continuous bottom contact line. Match the references' chunky outlined pixel clusters and muted military palette. A compact obstacle only, lower than a tank hull; no raised hex platform, glowing lava, tree, building, vehicle, lettering, UI, or scene background.",
+  "size": 64,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "defold/assets/derived/arena/landmark-tank-wreck.png",
+      "bytes": 8272,
+      "sha256": "3d19e722ddd767d2e9b91a3bcc43c68c56a4cd36c665dad7915cae39c211a806"
+    },
+    {
+      "kind": "file",
+      "path": "defold/assets/derived/arena/landmark-scrap-barricade.png",
+      "bytes": 6650,
+      "sha256": "6dd15b1ece09348b7395a3ac3af763ac0d528f2db0ced0f6c96670742f0d2cb0"
+    },
+    {
+      "kind": "file",
+      "path": "defold/assets/derived/arena/cover-sandbag-a.png",
+      "bytes": 1686,
+      "sha256": "30dbdf1faefbe70d371cae284bcacfe8417ab151ee10786908117cea6a2716ba"
+    },
+    {
+      "kind": "file",
+      "path": "defold/assets/derived/arena/landmark-conifer-broad.png",
+      "bytes": 6825,
+      "sha256": "db816727f8c031e1123391906003ec9a03b48e5a39084c410bdcb57ac1a64acf"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/frontier-grounded-low-cover-v1.json",
+    "sha256": "674bce7de6e0479a1dcd89262b2a62ea1bf5649693339a1b5c23db26d154b88d"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "ee94b30f-2584-4e4f-abb0-344a381580b2",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 71,
+      "height": 71,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/ee94b30f-2584-4e4f-abb0-344a381580b2/image.png?v=1791489714499",
+      "path": "art/source/sprite-fusion/outputs/frontier-grounded-low-cover-v1/00.png",
+      "bytes": 5898,
+      "sha256": "268ce6daa924b3b0dfc8e55093646c8f4db898cdc63a67ecafbc948d469fd724"
+    },
+    {
+      "index": 1,
+      "assetId": "77a0a61b-63bf-48ed-9290-111a4b1989dd",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 72,
+      "height": 72,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/77a0a61b-63bf-48ed-9290-111a4b1989dd/image.png?v=1791489715189",
+      "path": "art/source/sprite-fusion/outputs/frontier-grounded-low-cover-v1/01.png",
+      "bytes": 6600,
+      "sha256": "3333a638d2f4adc0f0685806a9a38656a12380a501b71443d729732894af2aa2"
+    },
+    {
+      "index": 2,
+      "assetId": "e94e72cd-9741-4d2e-9c4a-547290e10143",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 73,
+      "height": 73,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/e94e72cd-9741-4d2e-9c4a-547290e10143/image.png?v=1791489715872",
+      "path": "art/source/sprite-fusion/outputs/frontier-grounded-low-cover-v1/02.png",
+      "bytes": 6114,
+      "sha256": "33b66f3b5fb2b325ce2b74eaa3176f933e0fa317ed3c8b1cd4d1da19ed19ead0"
+    },
+    {
+      "index": 3,
+      "assetId": "7c23b2cd-ad2f-4938-b005-22560dc83a74",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 69,
+      "height": 69,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/7c23b2cd-ad2f-4938-b005-22560dc83a74/image.png?v=1791489716529",
+      "path": "art/source/sprite-fusion/outputs/frontier-grounded-low-cover-v1/03.png",
+      "bytes": 5811,
+      "sha256": "d4afa7d967c1a712f57d9af26bfd12eae59fc14f89f6694ff21ec4d569560125"
+    },
+    {
+      "index": 4,
+      "assetId": "f7fc3f42-8b19-432b-99f0-b2d3fab89170",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 76,
+      "height": 76,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/f7fc3f42-8b19-432b-99f0-b2d3fab89170/image.png?v=1791489717112",
+      "path": "art/source/sprite-fusion/outputs/frontier-grounded-low-cover-v1/04.png",
+      "bytes": 6682,
+      "sha256": "46a8babc03d33232257377d2c0ef3cbe41ca8f36f0da3b1fdffa86d5a535b132"
+    },
+    {
+      "index": 5,
+      "assetId": "fd903d58-0c23-455a-b59a-b5d51e0b1f81",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 68,
+      "height": 68,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/fd903d58-0c23-455a-b59a-b5d51e0b1f81/image.png?v=1791489717706",
+      "path": "art/source/sprite-fusion/outputs/frontier-grounded-low-cover-v1/05.png",
+      "bytes": 6042,
+      "sha256": "91c73b90a550cec7ca91cdf67de373501c798a02ae601d6a8326a72041472c19"
+    },
+    {
+      "index": 6,
+      "assetId": "b133ab84-9e0c-4338-8416-821407ddacb6",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 73,
+      "height": 73,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/b133ab84-9e0c-4338-8416-821407ddacb6/image.png?v=1791489718370",
+      "path": "art/source/sprite-fusion/outputs/frontier-grounded-low-cover-v1/06.png",
+      "bytes": 5812,
+      "sha256": "4cd39b33b3906c6a059d453d3554856d96bdee1e4117ad20f72a51cc7a4d9f99"
+    },
+    {
+      "index": 7,
+      "assetId": "c972be23-0ea7-4730-bb9b-301d88140cca",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 69,
+      "height": 69,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/c972be23-0ea7-4730-bb9b-301d88140cca/image.png?v=1791489718949",
+      "path": "art/source/sprite-fusion/outputs/frontier-grounded-low-cover-v1/07.png",
+      "bytes": 5216,
+      "sha256": "2948875891a54b5fab9c1a0608274cc09884bf8028e57bc4e446f815e2a83c92"
+    },
+    {
+      "index": 8,
+      "assetId": "d837acc3-adde-4bf1-afc8-4eaa059a9629",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 71,
+      "height": 71,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/d837acc3-adde-4bf1-afc8-4eaa059a9629/image.png?v=1791489719866",
+      "path": "art/source/sprite-fusion/outputs/frontier-grounded-low-cover-v1/08.png",
+      "bytes": 6240,
+      "sha256": "ab86ed8e2742fe537ec952f9534b76b65a8bcc17b4c9a30471c06ceff9a06956"
+    }
+  ],
+  "credits": {
+    "remaining": 2235
+  }
+}

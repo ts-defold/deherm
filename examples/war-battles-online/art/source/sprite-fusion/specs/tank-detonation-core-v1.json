@@ -1,0 +1,7 @@
+{
+  "name": "tank-detonation-core-v1",
+  "operation": "style-reference",
+  "size": 64,
+  "inputs": ["defold/assets/fx/explosion/4.png"],
+  "prompt": "A single explosive impact at the instant a tank shell detonates on volcanic ground in a colorful retro arcade action game. An irregular white-hot core, bold yellow and orange flame lobes, a few sharp sparks, and dark charcoal smoke curling around the outer rim. The blast reads clearly at small gameplay scale and has an energetic uneven silhouette. No vehicle, ground tile, text, UI, or enclosing ring."
+}

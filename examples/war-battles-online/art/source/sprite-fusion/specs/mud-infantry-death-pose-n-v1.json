@@ -1,0 +1,8 @@
+{
+  "name": "mud-infantry-death-pose-n-v1",
+  "operation": "edit",
+  "inputs": [
+    "asset:08ee79cb-44c5-428c-a51c-76feee4f025e"
+  ],
+  "prompt": "Keep mud viewed strictly from behind facing north. Change the body into a clearly defeated collapsed pose: one knee on the ground, torso and head bowed low forward, one hand braced on the ground, sidearm lowered, silhouette much shorter and wider than standing. Preserve the same rugged build, tan helmet, orange goggles, dark face covering, red scarf, and olive jacket, boots and knee on one ground line, colors, dark outlines, identity, and original perspective. Do not turn toward another direction. No blood, injury detail, explosion, extra prop, scenery, platform, text, or second person."
+}

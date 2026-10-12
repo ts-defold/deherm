@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_3af55c56-1694-4f2e-90b0-44603f0d92a1",
+  "operation": "style-reference",
+  "prompt": "A single walkable volcanic ash hex for a three-quarter-view tank battlefield. Dark graphite stone plates and charcoal cinders, with a few narrow molten orange fractures and chipped light-gray edges; short layered basalt side face. Heat stays in small cracks, with a large calm dark top that keeps tank silhouettes readable. Match the reference tiles' six-sided footprint, upper-left light, and chunky pixel clusters. No character, vehicle, building, lettering, or other tile.",
+  "size": 64,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ash-ridge-v1/00.png",
+      "bytes": 6254,
+      "sha256": "506dc93ee0e52e6d299e45325133efcc6b88470e99b98808f6a52c1a2b02fe96"
+    },
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-lava-fracture-v1/01.png",
+      "bytes": 6874,
+      "sha256": "7d3544111820cb212b1077e0ef491ed78081fd66b75001502fe232b8d34a14b8"
+    },
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-ash-edge-v1/03.png",
+      "bytes": 8564,
+      "sha256": "4f3bb6a12ea701f180edcba2ce46c42113bee86783d378d5047b18e0458d29da"
+    },
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-basalt-cliff-v1/04.png",
+      "bytes": 4098,
+      "sha256": "7e6b4cead2a0d5e17460e064d7fe971edb5324cebfbdb8c7dbfcf86c8fc8ed06"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/frontier-hex-ash-detail-v2.json",
+    "sha256": "a2dda6af6e532575e34d311d651d0dee85a05c717ffb6e41e57ee40c7202296f"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "ccc88c78-2f56-4423-9b97-5c0d1671a9f3",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/ccc88c78-2f56-4423-9b97-5c0d1671a9f3/image.png?v=1791414990829",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ash-detail-v2/00.png",
+      "bytes": 5655,
+      "sha256": "4e67e3c8f1452e478cdd23b976a5204d2d3bedbfcdb1422f811e4f051f2ec405"
+    },
+    {
+      "index": 1,
+      "assetId": "5f52b809-d958-470a-b6da-4039cbaf09fc",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 67,
+      "height": 67,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/5f52b809-d958-470a-b6da-4039cbaf09fc/image.png?v=1791414991363",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ash-detail-v2/01.png",
+      "bytes": 6341,
+      "sha256": "493b79f6e604199259b73db9b3f1c9bfd46a8a0784d990f26a8b147206b30faf"
+    },
+    {
+      "index": 2,
+      "assetId": "e8f5cf78-f3a5-44e1-87bf-22e8ef6fb6fe",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/e8f5cf78-f3a5-44e1-87bf-22e8ef6fb6fe/image.png?v=1791414991899",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ash-detail-v2/02.png",
+      "bytes": 6725,
+      "sha256": "4a6c8db162ad73c22027620a1e7637ac47635cf7ac263a5c0a4a7edc23e412a8"
+    },
+    {
+      "index": 3,
+      "assetId": "5422651f-fb8c-46c3-89cf-f55cfdb49cbb",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/5422651f-fb8c-46c3-89cf-f55cfdb49cbb/image.png?v=1791414992418",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ash-detail-v2/03.png",
+      "bytes": 6116,
+      "sha256": "646fa8b6e3987e372800718be8494b424821bfc1facc272e4be92457189b53ea"
+    },
+    {
+      "index": 4,
+      "assetId": "fb3cdc76-1987-4a7f-864a-4525b182e6b8",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/fb3cdc76-1987-4a7f-864a-4525b182e6b8/image.png?v=1791414992997",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ash-detail-v2/04.png",
+      "bytes": 6498,
+      "sha256": "a57a640e0bd9f848d958397c92774394ea147a195676f374255a25a3d8dc9e49"
+    },
+    {
+      "index": 5,
+      "assetId": "4800e12b-93dc-4e82-9a70-06fef0ae2d43",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/4800e12b-93dc-4e82-9a70-06fef0ae2d43/image.png?v=1791414993507",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ash-detail-v2/05.png",
+      "bytes": 6069,
+      "sha256": "4d789bb9c9b98f99d92c4654a388e856d4869f9a3881bf2715792112e44debb5"
+    },
+    {
+      "index": 6,
+      "assetId": "71d59033-84e6-4867-af4b-c30857956dc8",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/71d59033-84e6-4867-af4b-c30857956dc8/image.png?v=1791414994099",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ash-detail-v2/06.png",
+      "bytes": 7050,
+      "sha256": "53df51a815dd8a2b9a3351945b7806d2eb2348c1ab5dc09926ad8a3376aa6240"
+    },
+    {
+      "index": 7,
+      "assetId": "84df95e9-6a27-421a-ab39-b9be8cd19bf0",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 69,
+      "height": 69,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/84df95e9-6a27-421a-ab39-b9be8cd19bf0/image.png?v=1791414994696",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ash-detail-v2/07.png",
+      "bytes": 6520,
+      "sha256": "207faeb400f7f34ffe7ed43477cbe6341d3babfe8f1e2be1614c37c662c98101"
+    },
+    {
+      "index": 8,
+      "assetId": "61450127-ceec-43c6-9bc2-aa4a65471754",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/61450127-ceec-43c6-9bc2-aa4a65471754/image.png?v=1791414995272",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ash-detail-v2/08.png",
+      "bytes": 6900,
+      "sha256": "e69c71e9d469e849d43b3373ba94cd317f21e3acedd9d3039fe6868fdb1a54ce"
+    }
+  ],
+  "credits": {
+    "remaining": 2775
+  }
+}

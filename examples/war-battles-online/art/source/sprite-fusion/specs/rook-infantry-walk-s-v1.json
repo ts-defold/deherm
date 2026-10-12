@@ -1,0 +1,10 @@
+{
+  "name": "rook-infantry-walk-s-v1",
+  "operation": "animate",
+  "inputs": [
+    "asset:ee1d4941-ed51-4714-a4a3-7f239c620f8f"
+  ],
+  "prompt": "A quick grounded south-facing walk cycle, alternating boot contact and a small opposite-arm swing. Keep Rook's compact sidearm low and her helmet, goggles, scarf, proportions, colors, and viewing angle consistent. Seamless loop without turning or jumping.",
+  "outputFrames": 4,
+  "colors": 24
+}

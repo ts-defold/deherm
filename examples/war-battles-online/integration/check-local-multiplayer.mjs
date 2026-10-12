@@ -43,12 +43,13 @@ function option(name, fallback) {
   return index >= 0 ? process.argv[index + 1] : fallback;
 }
 
-const rosterSize = Number.parseInt(option("--roster", "8"), 10);
+const rosterSize = Number.parseInt(option("--roster", "16"), 10);
+const clientCount = Number.parseInt(option("--clients", "16"), 10);
 const quicPort = Number.parseInt(option("--quic-port", "0"), 10);
 const healthPort = Number.parseInt(option("--health-port", "0"), 10);
 for (const argument of argumentsSet) {
   if (
-    !["--external", "--roster", "--quic-port", "--health-port"].some(
+    !["--external", "--roster", "--clients", "--quic-port", "--health-port"].some(
       (name) => argument === name || argument.startsWith(`${name}=`),
     )
   ) {
@@ -56,6 +57,8 @@ for (const argument of argumentsSet) {
   }
 }
 if (!Number.isInteger(rosterSize) || rosterSize < 2 || rosterSize > 32) throw new Error("--roster must be 2..32");
+if (!Number.isInteger(clientCount) || clientCount < 1 || clientCount > rosterSize)
+  throw new Error("--clients must be 1..roster");
 
 function makeCertificate(directory) {
   const cert = join(directory, "localhost.crt");
@@ -93,7 +96,7 @@ function makeCertificate(directory) {
   return { cert, key, digest: createHash("sha256").update(der).digest() };
 }
 
-function browserEntry(url, digest) {
+function browserEntrySingle(url, digest) {
   return `
     import { BattleClient, WebTransportGameClient } from "./core/index.ts";
     const name = globalThis.__warBattlesClientName;
@@ -136,8 +139,64 @@ function browserEntry(url, digest) {
   `;
 }
 
+function browserEntryMany(url, digest, count) {
+  return `
+    import { BattleClient, WebTransportGameClient } from "./core/index.ts";
+    const address = ${JSON.stringify(url)};
+    const digest = Uint8Array.from(${JSON.stringify([...digest])});
+    const evidence = globalThis.__warBattlesMultiplayerEvidence = { clients: [] };
+    const clients = [];
+    const liveClients = [];
+    for (let index = 0; index < ${count}; index += 1) {
+      const observed = {
+        name: "client-" + (index + 1), state: "connecting", errors: [], playerId: 0,
+        rosterSize: 0, matchId: null, snapshotsApplied: 0, inputsSent: 0,
+        inputsDropped: 0, lastServerTick: 0, transport: null,
+      };
+      evidence.clients.push(observed);
+      clients.push(observed);
+      const client = new BattleClient({
+        name: observed.name,
+        onError: (error) => observed.errors.push(String(error)),
+        onReject: (reject) => observed.errors.push("rejected:" + reject.code + ":" + reject.reason),
+      });
+      liveClients.push(client);
+      WebTransportGameClient.connect(
+        address, client, undefined,
+        { serverCertificateHashes: [{ algorithm: "sha-256", value: digest.buffer }] },
+      ).then((transport) => {
+        observed.transport = { ...transport.capabilities };
+        client.attach(transport);
+      }, (error) => {
+        observed.state = "failed";
+        observed.errors.push(String(error));
+      });
+    }
+    globalThis.__warBattlesMultiplayerClose = () => liveClients.forEach((client) => client.close(1000, "acceptance complete"));
+    setInterval(() => {
+      for (let index = 0; index < clients.length; index += 1) {
+        const observed = clients[index];
+        const client = liveClients[index];
+        if (client?.state === "ready") {
+          const axis = (observed.playerId & 1) === 0 ? -1 : 1;
+          client.setControls({ moveX: axis, moveY: 0, fire: false, boost: false, weapon: 0 });
+          client.update(17, 2);
+        }
+        observed.state = client.state;
+        observed.playerId = client.playerId;
+        observed.rosterSize = client.rosterSize;
+        observed.matchId = client.world?.matchId ?? null;
+        observed.snapshotsApplied = client.stats.snapshotsApplied;
+        observed.inputsSent = client.stats.inputsSent;
+        observed.inputsDropped = client.stats.inputsDropped;
+        observed.lastServerTick = client.stats.lastServerTick;
+      }
+    }, 17);
+  `;
+}
+
 async function health(url) {
-  const response = await fetch(url);
+  const response = await fetch(url, { signal: AbortSignal.timeout(1_000) });
   const value = await response.json();
   return { response, value };
 }
@@ -151,6 +210,7 @@ async function run() {
   let healthUrl;
   let digest;
   try {
+    console.log(`war-battles-multiplayer:starting:clients=${clientCount}:roster=${rosterSize}`);
     if (external) {
       quic = quicPort || 4433;
       const healthPortValue = healthPort || 8080;
@@ -177,6 +237,7 @@ async function run() {
           "--unstable-net",
           "--allow-net",
           "--allow-read",
+          "--allow-env",
           resolve(exampleRoot, "server/deno-main.ts"),
           "--hostname",
           "localhost",
@@ -198,17 +259,23 @@ async function run() {
       const append = (chunk) => serverLines.push(...chunk.toString("utf8").split(/\r?\n/u).filter(Boolean));
       server.stdout.on("data", append);
       server.stderr.on("data", append);
+      server.on("error", (error) => serverLines.push(`spawn-error:${String(error)}`));
+      server.on("exit", (code, signal) => serverLines.push(`exit:${code}:${signal}`));
       await waitFor(async () => (await health(healthUrl)).response.ok, {
         timeoutMs: 15_000,
         intervalMs: 50,
-        what: "Deno WebTransport readiness",
+        what: `Deno WebTransport readiness (server=${serverLines.slice(-10).join(" | ")})`,
       });
     }
+    console.log("war-battles-multiplayer:server-ready");
 
     const transportHost = external ? "127.0.0.1" : "localhost";
     await build({
       stdin: {
-        contents: browserEntry(`https://${transportHost}:${quic}`, digest),
+        contents:
+          clientCount === 1
+            ? browserEntrySingle(`https://${transportHost}:${quic}`, digest)
+            : browserEntryMany(`https://${transportHost}:${quic}`, digest, clientCount),
         resolveDir: exampleRoot,
         sourcefile: "war-battles-multiplayer-client.ts",
         loader: "ts",
@@ -221,52 +288,55 @@ async function run() {
       sourcemap: "inline",
       logLevel: "silent",
     });
-    await Promise.all(
-      ["client-a", "client-b"].map((name) =>
-        writeFile(
-          join(scratch, `${name}.html`),
-          `<!doctype html><meta charset="utf-8"><title>${name}</title><script>globalThis.__warBattlesClientName=${JSON.stringify(name)}</script><script src="client.js"></script>\n`,
-        ),
-      ),
+    console.log("war-battles-multiplayer:browser-bundle-ready");
+    const singleton = clientCount === 1;
+    await writeFile(
+      join(scratch, "index.html"),
+      `<!doctype html><meta charset="utf-8"><title>War Battles multiplayer</title>${singleton ? '<script>globalThis.__warBattlesClientName="client-1"</script>' : ""}<script src="client.js"></script>\n`,
+    );
+    pages.push(
+      await openBundlePage({
+        bundleDirectory: scratch,
+        port: await freeLoopbackPort(),
+        debuggingPort: await freeLoopbackPort(),
+        chromeBinary,
+        retain: true,
+      }),
+    );
+    console.log("war-battles-multiplayer:browser-page-ready");
+
+    const observed = await waitFor(
+      async () => {
+        const result = await pages[0].client.send("Runtime.evaluate", {
+          expression:
+            "(() => { const value = globalThis.__warBattlesMultiplayerEvidence; return Array.isArray(value?.clients) ? value.clients : [value]; })()",
+          returnByValue: true,
+        });
+        const candidate = result.result.value;
+        if (candidate?.some((client) => client?.state === "failed" || client?.errors?.length)) {
+          throw new Error(`client failed: ${JSON.stringify(candidate)}`);
+        }
+        return candidate?.length === clientCount &&
+          candidate.every(
+            (client) => client?.state === "ready" && client.snapshotsApplied >= 3 && client.inputsSent >= 3,
+          )
+          ? candidate
+          : false;
+      },
+      { timeoutMs: 45_000, intervalMs: 100, what: `${clientCount} real WebTransport clients in one browser page` },
+    );
+    console.log("war-battles-multiplayer:clients-ready-and-snapshotting");
+    console.log(
+      `war-battles-multiplayer:initial-authority-stats:${JSON.stringify((await health(healthUrl)).value.stats)}`,
     );
 
-    for (const name of ["client-a", "client-b"]) {
-      pages.push(
-        await openBundlePage({
-          bundleDirectory: scratch,
-          index: `${name}.html`,
-          port: await freeLoopbackPort(),
-          debuggingPort: await freeLoopbackPort(),
-          chromeBinary,
-          retain: true,
-        }),
-      );
-    }
-
-    const observed = [];
-    for (const page of pages) {
-      const value = await waitFor(
-        async () => {
-          const result = await page.client.send("Runtime.evaluate", {
-            expression: "globalThis.__warBattlesMultiplayerEvidence ?? null",
-            returnByValue: true,
-          });
-          const candidate = result.result.value;
-          if (candidate?.state === "failed" || candidate?.state === "rejected" || candidate?.errors?.length) {
-            throw new Error(`client failed: ${JSON.stringify(candidate)}`);
-          }
-          return candidate?.state === "ready" && candidate.snapshotsApplied >= 3 && candidate.inputsSent >= 3
-            ? candidate
-            : false;
-        },
-        { timeoutMs: 30_000, intervalMs: 100, what: "two real WebTransport clients" },
-      );
-      observed.push(value);
-    }
-
-    assert.equal(observed.length, 2);
-    assert.notEqual(observed[0].playerId, observed[1].playerId, "clients must own distinct authoritative slots");
-    assert.equal(observed[0].matchId, observed[1].matchId, "clients must receive the same authoritative match id");
+    assert.equal(observed.length, clientCount);
+    assert.equal(
+      new Set(observed.map((client) => client.playerId)).size,
+      clientCount,
+      "clients must own distinct slots",
+    );
+    assert.equal(new Set(observed.map((client) => client.matchId)).size, 1, "clients must join the same match");
     for (const client of observed) {
       assert.equal(client.transport?.protocol, "webtransport-h3");
       assert.equal(client.transport?.reliableStreams, true);
@@ -278,17 +348,28 @@ async function run() {
       assert.deepEqual(client.errors, []);
     }
 
+    let lastStats;
     await waitFor(
       async () => {
         const observedHealth = await health(healthUrl);
-        return observedHealth.value.stats?.humans >= 2 ? observedHealth.value : false;
+        const stats = observedHealth.value.stats;
+        lastStats = stats;
+        return stats?.humans >= clientCount &&
+          stats?.bots === rosterSize - clientCount &&
+          stats?.inputsAccepted >= clientCount
+          ? observedHealth.value
+          : false;
       },
-      { timeoutMs: 5_000, intervalMs: 50, what: "authoritative two-player admission stats" },
+      {
+        timeoutMs: 10_000,
+        intervalMs: 50,
+        what: `authoritative ${clientCount}-player admission and input stats (${JSON.stringify(lastStats)})`,
+      },
     );
-    for (const page of pages)
-      await page.client.send("Runtime.evaluate", { expression: "globalThis.__warBattlesMultiplayerClose?.()" });
+    console.log("war-battles-multiplayer:authority-accepted-full-roster-input");
+    await pages[0].client.send("Runtime.evaluate", { expression: "globalThis.__warBattlesMultiplayerClose?.()" });
     console.log(
-      `war-battles-multiplayer:ok:clients=2:match=${observed[0].matchId}:players=${observed.map((client) => client.playerId).join(",")}:source=${external ? "external" : "local-deno"}`,
+      `war-battles-multiplayer:ok:clients=${clientCount}:match=${observed[0].matchId}:players=${observed.map((client) => client.playerId).join(",")}:source=${external ? "external" : "local-deno"}`,
     );
   } finally {
     for (const page of pages.reverse()) await page.close().catch(() => undefined);

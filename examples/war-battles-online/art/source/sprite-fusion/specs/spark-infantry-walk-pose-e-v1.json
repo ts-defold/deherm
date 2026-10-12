@@ -1,0 +1,8 @@
+{
+  "name": "spark-infantry-walk-pose-e-v1",
+  "operation": "edit",
+  "inputs": [
+    "asset:b790f264-3051-4526-84d6-aded5e73741e"
+  ],
+  "prompt": "Change only Spark's body pose to a grounded left-facing side view, to be flipped for the east runtime direction walk mid-stride: one boot forward, the other planted, opposite arm swinging, compact sidearm held low. Preserve his tan skin, short spiky black hair, orange headband, raised brass goggles, teal collar, olive jacket, youthful build, original colors, outline, scale, and exact source viewing angle. No turn, extra person, platform, text, or scenery."
+}

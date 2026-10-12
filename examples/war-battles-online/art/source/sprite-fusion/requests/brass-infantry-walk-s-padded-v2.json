@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_10608c5b-6726-4a51-bfbf-fa4cca5b4f4d",
+  "operation": "animate",
+  "prompt": "A grounded south-facing walk loop with alternating boots and opposite-arm swing. Preserve Brass's broad helmet, cream scarf, gloves, compact sidearm, proportions, palette, and front view. Keep the complete character inside the canvas through the motion.",
+  "size": null,
+  "outputFrames": 4,
+  "colors": 24,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/inputs/brass-infantry-walk-pose-s-v1-1-padded-80.png",
+      "bytes": 4410,
+      "sha256": "4e39243471fed2b0f4a584f3cd47a84ea5cef55d68a6f52ba36c34c64c914af9"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/brass-infantry-walk-s-padded-v2.json",
+    "sha256": "bc6630ffa23badaeac6deef8c4fdfbd927b255d1af7434653198f58ee3e4e520"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "5f7bb82a-5cca-412c-a65b-784a85be4906",
+      "type": "animation",
+      "contentType": "image/webp",
+      "width": 80,
+      "height": 80,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/5f7bb82a-5cca-412c-a65b-784a85be4906/animation.webp?v=1791548060524",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-walk-s-padded-v2/00.webp",
+      "bytes": 2932,
+      "sha256": "76c9975d8b177f549520894262be85143965b9e9789c6cbd722a46e0e8f71205",
+      "spritesheet": {
+        "url": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/5f7bb82a-5cca-412c-a65b-784a85be4906/spritesheet.png?v=1791548060524",
+        "path": "art/source/sprite-fusion/outputs/brass-infantry-walk-s-padded-v2/00-sheet.png",
+        "bytes": 3436,
+        "sha256": "1fb6e5c6ed9f782b9f5bac72ffa01df96f769ecf4f1b8dc670b8132feb5d69fd"
+      },
+      "frameCount": 4,
+      "fps": 8
+    }
+  ],
+  "credits": {
+    "remaining": 240
+  }
+}

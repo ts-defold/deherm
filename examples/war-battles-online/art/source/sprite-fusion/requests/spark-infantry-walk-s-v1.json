@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_e8a11a18-c965-4ae9-bcfe-e8513da25c5a",
+  "operation": "animate",
+  "prompt": "A quick grounded south-facing mostly frontal walk cycle with alternating boot contact and a small opposite-arm swing. Spark remains a young tan-skinned mechanic with short spiky black hair, orange headband, raised brass goggles, teal collar, olive jacket and compact sidearm held low. Keep his exact source perspective, palette, outline, proportions, and identity consistent. Seamless loop without turning, jumping, or adding objects.",
+  "size": null,
+  "outputFrames": 4,
+  "colors": 24,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "92a7b489-35fe-46fd-b04b-6d921bae0bb0"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/spark-infantry-walk-s-v1.json",
+    "sha256": "ffb2845bee7af5fa286680d815d56082741339b1ad905a34dfcb0b537eb729fd"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "1ed10dba-7722-4c38-8d76-f085b98a9055",
+      "type": "animation",
+      "contentType": "image/webp",
+      "width": 30,
+      "height": 48,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/1ed10dba-7722-4c38-8d76-f085b98a9055/animation.webp?v=1791526469265",
+      "path": "art/source/sprite-fusion/outputs/spark-infantry-walk-s-v1/00.webp",
+      "bytes": 2466,
+      "sha256": "dda9455567018e09da73ed110e6e86a7b4394e632534bd1de92bbc1a2f73ed8e",
+      "spritesheet": {
+        "url": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/1ed10dba-7722-4c38-8d76-f085b98a9055/spritesheet.png?v=1791526469265",
+        "path": "art/source/sprite-fusion/outputs/spark-infantry-walk-s-v1/00-sheet.png",
+        "bytes": 2215,
+        "sha256": "fa7d130ee1322147a3c5a73d4732d1dad3e249c511ce3f8ecfff93f6445f08d9"
+      },
+      "frameCount": 4,
+      "fps": 8
+    }
+  ],
+  "credits": {
+    "remaining": 1440
+  }
+}

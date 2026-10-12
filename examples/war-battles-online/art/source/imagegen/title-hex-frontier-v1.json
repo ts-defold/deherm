@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "tool": "built-in image generation",
+  "status": "selected source for title background; runtime crop and pixel scale are generator-owned",
+  "path": "art/source/imagegen/title-hex-frontier-v1.png",
+  "sha256": "80855850ab12c47cd005ac359fe0e691bed42c1d100cf31dad7df7bb1cb1a925",
+  "width": 1672,
+  "height": 941,
+  "prompt": "Create a new wide 16:9 isometric pixel-art battlefield title BACKGROUND with visible aligned flat-top hex terrain, subtle elevation tiers, grounded olive military refinery, cliffs meeting turquoise ocean, small varied tanks and warm orange flashes. 1990s arcade/SNK-quality chunky deliberate pixels, olive/ochre/slate palette, calm dark center reserved for overlay title card. No text, logo, interface, floating props, square tiles, or watermark."
+}

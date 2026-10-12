@@ -1,0 +1,2241 @@
+animations {
+  id: "hero-se-idle"
+  images {
+    image: "/assets/units/infantry-rook/se/idle.png"
+  }
+  playback: PLAYBACK_NONE
+  fps: 1
+}
+animations {
+  id: "hero-se-walk"
+  images {
+    image: "/assets/units/infantry-rook/se/walk-1.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/se/walk-2.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/se/walk-3.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/se/walk-4.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 8
+}
+animations {
+  id: "hero-se-fire"
+  images {
+    image: "/assets/units/infantry-rook/se/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/se/fire.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/se/fire.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 18
+}
+animations {
+  id: "hero-se-hit"
+  images {
+    image: "/assets/units/infantry-rook/se/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/se/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/se/idle.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-se-death"
+  images {
+    image: "/assets/units/infantry-rook/se/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/se/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/se/death.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/se/death.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-s-idle"
+  images {
+    image: "/assets/units/infantry-rook/s/idle.png"
+  }
+  playback: PLAYBACK_NONE
+  fps: 1
+}
+animations {
+  id: "hero-s-walk"
+  images {
+    image: "/assets/units/infantry-rook/s/walk-1.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/s/walk-2.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/s/walk-3.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/s/walk-4.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 8
+}
+animations {
+  id: "hero-s-fire"
+  images {
+    image: "/assets/units/infantry-rook/s/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/s/fire.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/s/fire.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 18
+}
+animations {
+  id: "hero-s-hit"
+  images {
+    image: "/assets/units/infantry-rook/s/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/s/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/s/idle.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-s-death"
+  images {
+    image: "/assets/units/infantry-rook/s/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/s/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/s/death.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/s/death.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-sw-idle"
+  images {
+    image: "/assets/units/infantry-rook/sw/idle.png"
+  }
+  playback: PLAYBACK_NONE
+  fps: 1
+}
+animations {
+  id: "hero-sw-walk"
+  images {
+    image: "/assets/units/infantry-rook/sw/walk-1.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/sw/walk-2.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/sw/walk-3.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/sw/walk-4.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 8
+}
+animations {
+  id: "hero-sw-fire"
+  images {
+    image: "/assets/units/infantry-rook/sw/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/sw/fire.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/sw/fire.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 18
+}
+animations {
+  id: "hero-sw-hit"
+  images {
+    image: "/assets/units/infantry-rook/sw/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/sw/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/sw/idle.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-sw-death"
+  images {
+    image: "/assets/units/infantry-rook/sw/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/sw/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/sw/death.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/sw/death.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-w-idle"
+  images {
+    image: "/assets/units/infantry-rook/w/idle.png"
+  }
+  playback: PLAYBACK_NONE
+  fps: 1
+}
+animations {
+  id: "hero-w-walk"
+  images {
+    image: "/assets/units/infantry-rook/w/walk-1.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/w/walk-2.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/w/walk-3.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/w/walk-4.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 8
+}
+animations {
+  id: "hero-w-fire"
+  images {
+    image: "/assets/units/infantry-rook/w/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/w/fire.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/w/fire.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 18
+}
+animations {
+  id: "hero-w-hit"
+  images {
+    image: "/assets/units/infantry-rook/w/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/w/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/w/idle.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-w-death"
+  images {
+    image: "/assets/units/infantry-rook/w/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/w/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/w/death.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/w/death.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-e-idle"
+  images {
+    image: "/assets/units/infantry-rook/e/idle.png"
+  }
+  playback: PLAYBACK_NONE
+  fps: 1
+}
+animations {
+  id: "hero-e-walk"
+  images {
+    image: "/assets/units/infantry-rook/e/walk-1.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/e/walk-2.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/e/walk-3.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/e/walk-4.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 8
+}
+animations {
+  id: "hero-e-fire"
+  images {
+    image: "/assets/units/infantry-rook/e/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/e/fire.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/e/fire.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 18
+}
+animations {
+  id: "hero-e-hit"
+  images {
+    image: "/assets/units/infantry-rook/e/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/e/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/e/idle.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-e-death"
+  images {
+    image: "/assets/units/infantry-rook/e/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/e/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/e/death.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/e/death.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-nw-idle"
+  images {
+    image: "/assets/units/infantry-rook/nw/idle.png"
+  }
+  playback: PLAYBACK_NONE
+  fps: 1
+}
+animations {
+  id: "hero-nw-walk"
+  images {
+    image: "/assets/units/infantry-rook/nw/walk-1.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/nw/walk-2.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/nw/walk-3.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/nw/walk-4.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 8
+}
+animations {
+  id: "hero-nw-fire"
+  images {
+    image: "/assets/units/infantry-rook/nw/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/nw/fire.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/nw/fire.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 18
+}
+animations {
+  id: "hero-nw-hit"
+  images {
+    image: "/assets/units/infantry-rook/nw/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/nw/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/nw/idle.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-nw-death"
+  images {
+    image: "/assets/units/infantry-rook/nw/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/nw/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/nw/death.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/nw/death.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-n-idle"
+  images {
+    image: "/assets/units/infantry-rook/n/idle.png"
+  }
+  playback: PLAYBACK_NONE
+  fps: 1
+}
+animations {
+  id: "hero-n-walk"
+  images {
+    image: "/assets/units/infantry-rook/n/walk-1.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/n/walk-2.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/n/walk-3.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/n/walk-4.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 8
+}
+animations {
+  id: "hero-n-fire"
+  images {
+    image: "/assets/units/infantry-rook/n/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/n/fire.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/n/fire.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 18
+}
+animations {
+  id: "hero-n-hit"
+  images {
+    image: "/assets/units/infantry-rook/n/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/n/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/n/idle.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-n-death"
+  images {
+    image: "/assets/units/infantry-rook/n/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/n/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/n/death.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/n/death.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-ne-idle"
+  images {
+    image: "/assets/units/infantry-rook/ne/idle.png"
+  }
+  playback: PLAYBACK_NONE
+  fps: 1
+}
+animations {
+  id: "hero-ne-walk"
+  images {
+    image: "/assets/units/infantry-rook/ne/walk-1.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/ne/walk-2.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/ne/walk-3.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/ne/walk-4.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 8
+}
+animations {
+  id: "hero-ne-fire"
+  images {
+    image: "/assets/units/infantry-rook/ne/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/ne/fire.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/ne/fire.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 18
+}
+animations {
+  id: "hero-ne-hit"
+  images {
+    image: "/assets/units/infantry-rook/ne/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/ne/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/ne/idle.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-ne-death"
+  images {
+    image: "/assets/units/infantry-rook/ne/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/ne/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/ne/death.png"
+  }
+  images {
+    image: "/assets/units/infantry-rook/ne/death.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-1-se-idle"
+  images {
+    image: "/assets/units/infantry-brass/se/idle.png"
+  }
+  playback: PLAYBACK_NONE
+  fps: 1
+}
+animations {
+  id: "hero-1-se-walk"
+  images {
+    image: "/assets/units/infantry-brass/se/walk-1.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/se/walk-2.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/se/walk-3.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/se/walk-4.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 8
+}
+animations {
+  id: "hero-1-se-fire"
+  images {
+    image: "/assets/units/infantry-brass/se/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/se/fire.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/se/fire.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 18
+}
+animations {
+  id: "hero-1-se-hit"
+  images {
+    image: "/assets/units/infantry-brass/se/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/se/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/se/idle.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-1-se-death"
+  images {
+    image: "/assets/units/infantry-brass/se/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/se/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/se/death.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/se/death.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-1-s-idle"
+  images {
+    image: "/assets/units/infantry-brass/s/idle.png"
+  }
+  playback: PLAYBACK_NONE
+  fps: 1
+}
+animations {
+  id: "hero-1-s-walk"
+  images {
+    image: "/assets/units/infantry-brass/s/walk-1.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/s/walk-2.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/s/walk-3.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/s/walk-4.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 8
+}
+animations {
+  id: "hero-1-s-fire"
+  images {
+    image: "/assets/units/infantry-brass/s/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/s/fire.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/s/fire.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 18
+}
+animations {
+  id: "hero-1-s-hit"
+  images {
+    image: "/assets/units/infantry-brass/s/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/s/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/s/idle.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-1-s-death"
+  images {
+    image: "/assets/units/infantry-brass/s/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/s/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/s/death.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/s/death.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-1-sw-idle"
+  images {
+    image: "/assets/units/infantry-brass/sw/idle.png"
+  }
+  playback: PLAYBACK_NONE
+  fps: 1
+}
+animations {
+  id: "hero-1-sw-walk"
+  images {
+    image: "/assets/units/infantry-brass/sw/walk-1.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/sw/walk-2.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/sw/walk-3.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/sw/walk-4.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 8
+}
+animations {
+  id: "hero-1-sw-fire"
+  images {
+    image: "/assets/units/infantry-brass/sw/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/sw/fire.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/sw/fire.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 18
+}
+animations {
+  id: "hero-1-sw-hit"
+  images {
+    image: "/assets/units/infantry-brass/sw/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/sw/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/sw/idle.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-1-sw-death"
+  images {
+    image: "/assets/units/infantry-brass/sw/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/sw/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/sw/death.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/sw/death.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-1-w-idle"
+  images {
+    image: "/assets/units/infantry-brass/w/idle.png"
+  }
+  playback: PLAYBACK_NONE
+  fps: 1
+}
+animations {
+  id: "hero-1-w-walk"
+  images {
+    image: "/assets/units/infantry-brass/w/walk-1.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/w/walk-2.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/w/walk-3.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/w/walk-4.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 8
+}
+animations {
+  id: "hero-1-w-fire"
+  images {
+    image: "/assets/units/infantry-brass/w/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/w/fire.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/w/fire.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 18
+}
+animations {
+  id: "hero-1-w-hit"
+  images {
+    image: "/assets/units/infantry-brass/w/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/w/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/w/idle.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-1-w-death"
+  images {
+    image: "/assets/units/infantry-brass/w/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/w/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/w/death.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/w/death.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-1-e-idle"
+  images {
+    image: "/assets/units/infantry-brass/e/idle.png"
+  }
+  playback: PLAYBACK_NONE
+  fps: 1
+}
+animations {
+  id: "hero-1-e-walk"
+  images {
+    image: "/assets/units/infantry-brass/e/walk-1.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/e/walk-2.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/e/walk-3.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/e/walk-4.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 8
+}
+animations {
+  id: "hero-1-e-fire"
+  images {
+    image: "/assets/units/infantry-brass/e/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/e/fire.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/e/fire.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 18
+}
+animations {
+  id: "hero-1-e-hit"
+  images {
+    image: "/assets/units/infantry-brass/e/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/e/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/e/idle.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-1-e-death"
+  images {
+    image: "/assets/units/infantry-brass/e/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/e/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/e/death.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/e/death.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-1-nw-idle"
+  images {
+    image: "/assets/units/infantry-brass/nw/idle.png"
+  }
+  playback: PLAYBACK_NONE
+  fps: 1
+}
+animations {
+  id: "hero-1-nw-walk"
+  images {
+    image: "/assets/units/infantry-brass/nw/walk-1.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/nw/walk-2.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/nw/walk-3.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/nw/walk-4.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 8
+}
+animations {
+  id: "hero-1-nw-fire"
+  images {
+    image: "/assets/units/infantry-brass/nw/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/nw/fire.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/nw/fire.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 18
+}
+animations {
+  id: "hero-1-nw-hit"
+  images {
+    image: "/assets/units/infantry-brass/nw/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/nw/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/nw/idle.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-1-nw-death"
+  images {
+    image: "/assets/units/infantry-brass/nw/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/nw/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/nw/death.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/nw/death.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-1-n-idle"
+  images {
+    image: "/assets/units/infantry-brass/n/idle.png"
+  }
+  playback: PLAYBACK_NONE
+  fps: 1
+}
+animations {
+  id: "hero-1-n-walk"
+  images {
+    image: "/assets/units/infantry-brass/n/walk-1.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/n/walk-2.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/n/walk-3.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/n/walk-4.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 8
+}
+animations {
+  id: "hero-1-n-fire"
+  images {
+    image: "/assets/units/infantry-brass/n/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/n/fire.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/n/fire.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 18
+}
+animations {
+  id: "hero-1-n-hit"
+  images {
+    image: "/assets/units/infantry-brass/n/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/n/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/n/idle.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-1-n-death"
+  images {
+    image: "/assets/units/infantry-brass/n/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/n/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/n/death.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/n/death.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-1-ne-idle"
+  images {
+    image: "/assets/units/infantry-brass/ne/idle.png"
+  }
+  playback: PLAYBACK_NONE
+  fps: 1
+}
+animations {
+  id: "hero-1-ne-walk"
+  images {
+    image: "/assets/units/infantry-brass/ne/walk-1.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/ne/walk-2.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/ne/walk-3.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/ne/walk-4.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 8
+}
+animations {
+  id: "hero-1-ne-fire"
+  images {
+    image: "/assets/units/infantry-brass/ne/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/ne/fire.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/ne/fire.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 18
+}
+animations {
+  id: "hero-1-ne-hit"
+  images {
+    image: "/assets/units/infantry-brass/ne/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/ne/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/ne/idle.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-1-ne-death"
+  images {
+    image: "/assets/units/infantry-brass/ne/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/ne/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/ne/death.png"
+  }
+  images {
+    image: "/assets/units/infantry-brass/ne/death.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-2-se-idle"
+  images {
+    image: "/assets/units/infantry-spark/se/idle.png"
+  }
+  playback: PLAYBACK_NONE
+  fps: 1
+}
+animations {
+  id: "hero-2-se-walk"
+  images {
+    image: "/assets/units/infantry-spark/se/walk-1.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/se/walk-2.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/se/walk-3.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/se/walk-4.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 8
+}
+animations {
+  id: "hero-2-se-fire"
+  images {
+    image: "/assets/units/infantry-spark/se/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/se/fire.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/se/fire.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 18
+}
+animations {
+  id: "hero-2-se-hit"
+  images {
+    image: "/assets/units/infantry-spark/se/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/se/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/se/idle.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-2-se-death"
+  images {
+    image: "/assets/units/infantry-spark/se/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/se/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/se/death.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/se/death.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-2-s-idle"
+  images {
+    image: "/assets/units/infantry-spark/s/idle.png"
+  }
+  playback: PLAYBACK_NONE
+  fps: 1
+}
+animations {
+  id: "hero-2-s-walk"
+  images {
+    image: "/assets/units/infantry-spark/s/walk-1.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/s/walk-2.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/s/walk-3.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/s/walk-4.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 8
+}
+animations {
+  id: "hero-2-s-fire"
+  images {
+    image: "/assets/units/infantry-spark/s/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/s/fire.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/s/fire.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 18
+}
+animations {
+  id: "hero-2-s-hit"
+  images {
+    image: "/assets/units/infantry-spark/s/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/s/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/s/idle.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-2-s-death"
+  images {
+    image: "/assets/units/infantry-spark/s/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/s/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/s/death.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/s/death.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-2-sw-idle"
+  images {
+    image: "/assets/units/infantry-spark/sw/idle.png"
+  }
+  playback: PLAYBACK_NONE
+  fps: 1
+}
+animations {
+  id: "hero-2-sw-walk"
+  images {
+    image: "/assets/units/infantry-spark/sw/walk-1.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/sw/walk-2.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/sw/walk-3.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/sw/walk-4.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 8
+}
+animations {
+  id: "hero-2-sw-fire"
+  images {
+    image: "/assets/units/infantry-spark/sw/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/sw/fire.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/sw/fire.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 18
+}
+animations {
+  id: "hero-2-sw-hit"
+  images {
+    image: "/assets/units/infantry-spark/sw/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/sw/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/sw/idle.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-2-sw-death"
+  images {
+    image: "/assets/units/infantry-spark/sw/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/sw/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/sw/death.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/sw/death.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-2-w-idle"
+  images {
+    image: "/assets/units/infantry-spark/w/idle.png"
+  }
+  playback: PLAYBACK_NONE
+  fps: 1
+}
+animations {
+  id: "hero-2-w-walk"
+  images {
+    image: "/assets/units/infantry-spark/w/walk-1.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/w/walk-2.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/w/walk-3.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/w/walk-4.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 8
+}
+animations {
+  id: "hero-2-w-fire"
+  images {
+    image: "/assets/units/infantry-spark/w/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/w/fire.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/w/fire.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 18
+}
+animations {
+  id: "hero-2-w-hit"
+  images {
+    image: "/assets/units/infantry-spark/w/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/w/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/w/idle.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-2-w-death"
+  images {
+    image: "/assets/units/infantry-spark/w/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/w/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/w/death.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/w/death.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-2-e-idle"
+  images {
+    image: "/assets/units/infantry-spark/e/idle.png"
+  }
+  playback: PLAYBACK_NONE
+  fps: 1
+}
+animations {
+  id: "hero-2-e-walk"
+  images {
+    image: "/assets/units/infantry-spark/e/walk-1.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/e/walk-2.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/e/walk-3.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/e/walk-4.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 8
+}
+animations {
+  id: "hero-2-e-fire"
+  images {
+    image: "/assets/units/infantry-spark/e/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/e/fire.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/e/fire.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 18
+}
+animations {
+  id: "hero-2-e-hit"
+  images {
+    image: "/assets/units/infantry-spark/e/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/e/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/e/idle.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-2-e-death"
+  images {
+    image: "/assets/units/infantry-spark/e/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/e/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/e/death.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/e/death.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-2-nw-idle"
+  images {
+    image: "/assets/units/infantry-spark/nw/idle.png"
+  }
+  playback: PLAYBACK_NONE
+  fps: 1
+}
+animations {
+  id: "hero-2-nw-walk"
+  images {
+    image: "/assets/units/infantry-spark/nw/walk-1.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/nw/walk-2.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/nw/walk-3.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/nw/walk-4.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 8
+}
+animations {
+  id: "hero-2-nw-fire"
+  images {
+    image: "/assets/units/infantry-spark/nw/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/nw/fire.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/nw/fire.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 18
+}
+animations {
+  id: "hero-2-nw-hit"
+  images {
+    image: "/assets/units/infantry-spark/nw/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/nw/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/nw/idle.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-2-nw-death"
+  images {
+    image: "/assets/units/infantry-spark/nw/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/nw/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/nw/death.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/nw/death.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-2-n-idle"
+  images {
+    image: "/assets/units/infantry-spark/n/idle.png"
+  }
+  playback: PLAYBACK_NONE
+  fps: 1
+}
+animations {
+  id: "hero-2-n-walk"
+  images {
+    image: "/assets/units/infantry-spark/n/walk-1.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/n/walk-2.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/n/walk-3.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/n/walk-4.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 8
+}
+animations {
+  id: "hero-2-n-fire"
+  images {
+    image: "/assets/units/infantry-spark/n/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/n/fire.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/n/fire.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 18
+}
+animations {
+  id: "hero-2-n-hit"
+  images {
+    image: "/assets/units/infantry-spark/n/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/n/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/n/idle.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-2-n-death"
+  images {
+    image: "/assets/units/infantry-spark/n/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/n/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/n/death.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/n/death.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-2-ne-idle"
+  images {
+    image: "/assets/units/infantry-spark/ne/idle.png"
+  }
+  playback: PLAYBACK_NONE
+  fps: 1
+}
+animations {
+  id: "hero-2-ne-walk"
+  images {
+    image: "/assets/units/infantry-spark/ne/walk-1.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/ne/walk-2.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/ne/walk-3.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/ne/walk-4.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 8
+}
+animations {
+  id: "hero-2-ne-fire"
+  images {
+    image: "/assets/units/infantry-spark/ne/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/ne/fire.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/ne/fire.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 18
+}
+animations {
+  id: "hero-2-ne-hit"
+  images {
+    image: "/assets/units/infantry-spark/ne/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/ne/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/ne/idle.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-2-ne-death"
+  images {
+    image: "/assets/units/infantry-spark/ne/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/ne/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/ne/death.png"
+  }
+  images {
+    image: "/assets/units/infantry-spark/ne/death.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-3-se-idle"
+  images {
+    image: "/assets/units/infantry-mud/se/idle.png"
+  }
+  playback: PLAYBACK_NONE
+  fps: 1
+}
+animations {
+  id: "hero-3-se-walk"
+  images {
+    image: "/assets/units/infantry-mud/se/walk-1.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/se/walk-2.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/se/walk-3.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/se/walk-4.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 8
+}
+animations {
+  id: "hero-3-se-fire"
+  images {
+    image: "/assets/units/infantry-mud/se/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/se/fire.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/se/fire.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 18
+}
+animations {
+  id: "hero-3-se-hit"
+  images {
+    image: "/assets/units/infantry-mud/se/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/se/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/se/idle.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-3-se-death"
+  images {
+    image: "/assets/units/infantry-mud/se/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/se/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/se/death.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/se/death.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-3-s-idle"
+  images {
+    image: "/assets/units/infantry-mud/s/idle.png"
+  }
+  playback: PLAYBACK_NONE
+  fps: 1
+}
+animations {
+  id: "hero-3-s-walk"
+  images {
+    image: "/assets/units/infantry-mud/s/walk-1.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/s/walk-2.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/s/walk-3.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/s/walk-4.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 8
+}
+animations {
+  id: "hero-3-s-fire"
+  images {
+    image: "/assets/units/infantry-mud/s/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/s/fire.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/s/fire.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 18
+}
+animations {
+  id: "hero-3-s-hit"
+  images {
+    image: "/assets/units/infantry-mud/s/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/s/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/s/idle.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-3-s-death"
+  images {
+    image: "/assets/units/infantry-mud/s/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/s/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/s/death.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/s/death.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-3-sw-idle"
+  images {
+    image: "/assets/units/infantry-mud/sw/idle.png"
+  }
+  playback: PLAYBACK_NONE
+  fps: 1
+}
+animations {
+  id: "hero-3-sw-walk"
+  images {
+    image: "/assets/units/infantry-mud/sw/walk-1.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/sw/walk-2.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/sw/walk-3.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/sw/walk-4.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 8
+}
+animations {
+  id: "hero-3-sw-fire"
+  images {
+    image: "/assets/units/infantry-mud/sw/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/sw/fire.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/sw/fire.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 18
+}
+animations {
+  id: "hero-3-sw-hit"
+  images {
+    image: "/assets/units/infantry-mud/sw/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/sw/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/sw/idle.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-3-sw-death"
+  images {
+    image: "/assets/units/infantry-mud/sw/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/sw/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/sw/death.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/sw/death.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-3-w-idle"
+  images {
+    image: "/assets/units/infantry-mud/w/idle.png"
+  }
+  playback: PLAYBACK_NONE
+  fps: 1
+}
+animations {
+  id: "hero-3-w-walk"
+  images {
+    image: "/assets/units/infantry-mud/w/walk-1.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/w/walk-2.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/w/walk-3.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/w/walk-4.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 8
+}
+animations {
+  id: "hero-3-w-fire"
+  images {
+    image: "/assets/units/infantry-mud/w/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/w/fire.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/w/fire.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 18
+}
+animations {
+  id: "hero-3-w-hit"
+  images {
+    image: "/assets/units/infantry-mud/w/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/w/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/w/idle.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-3-w-death"
+  images {
+    image: "/assets/units/infantry-mud/w/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/w/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/w/death.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/w/death.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-3-e-idle"
+  images {
+    image: "/assets/units/infantry-mud/e/idle.png"
+  }
+  playback: PLAYBACK_NONE
+  fps: 1
+}
+animations {
+  id: "hero-3-e-walk"
+  images {
+    image: "/assets/units/infantry-mud/e/walk-1.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/e/walk-2.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/e/walk-3.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/e/walk-4.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 8
+}
+animations {
+  id: "hero-3-e-fire"
+  images {
+    image: "/assets/units/infantry-mud/e/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/e/fire.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/e/fire.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 18
+}
+animations {
+  id: "hero-3-e-hit"
+  images {
+    image: "/assets/units/infantry-mud/e/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/e/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/e/idle.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-3-e-death"
+  images {
+    image: "/assets/units/infantry-mud/e/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/e/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/e/death.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/e/death.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-3-nw-idle"
+  images {
+    image: "/assets/units/infantry-mud/nw/idle.png"
+  }
+  playback: PLAYBACK_NONE
+  fps: 1
+}
+animations {
+  id: "hero-3-nw-walk"
+  images {
+    image: "/assets/units/infantry-mud/nw/walk-1.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/nw/walk-2.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/nw/walk-3.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/nw/walk-4.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 8
+}
+animations {
+  id: "hero-3-nw-fire"
+  images {
+    image: "/assets/units/infantry-mud/nw/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/nw/fire.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/nw/fire.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 18
+}
+animations {
+  id: "hero-3-nw-hit"
+  images {
+    image: "/assets/units/infantry-mud/nw/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/nw/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/nw/idle.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-3-nw-death"
+  images {
+    image: "/assets/units/infantry-mud/nw/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/nw/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/nw/death.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/nw/death.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-3-n-idle"
+  images {
+    image: "/assets/units/infantry-mud/n/idle.png"
+  }
+  playback: PLAYBACK_NONE
+  fps: 1
+}
+animations {
+  id: "hero-3-n-walk"
+  images {
+    image: "/assets/units/infantry-mud/n/walk-1.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/n/walk-2.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/n/walk-3.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/n/walk-4.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 8
+}
+animations {
+  id: "hero-3-n-fire"
+  images {
+    image: "/assets/units/infantry-mud/n/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/n/fire.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/n/fire.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 18
+}
+animations {
+  id: "hero-3-n-hit"
+  images {
+    image: "/assets/units/infantry-mud/n/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/n/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/n/idle.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-3-n-death"
+  images {
+    image: "/assets/units/infantry-mud/n/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/n/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/n/death.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/n/death.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-3-ne-idle"
+  images {
+    image: "/assets/units/infantry-mud/ne/idle.png"
+  }
+  playback: PLAYBACK_NONE
+  fps: 1
+}
+animations {
+  id: "hero-3-ne-walk"
+  images {
+    image: "/assets/units/infantry-mud/ne/walk-1.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/ne/walk-2.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/ne/walk-3.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/ne/walk-4.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 8
+}
+animations {
+  id: "hero-3-ne-fire"
+  images {
+    image: "/assets/units/infantry-mud/ne/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/ne/fire.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/ne/fire.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 18
+}
+animations {
+  id: "hero-3-ne-hit"
+  images {
+    image: "/assets/units/infantry-mud/ne/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/ne/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/ne/idle.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+animations {
+  id: "hero-3-ne-death"
+  images {
+    image: "/assets/units/infantry-mud/ne/idle.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/ne/hit.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/ne/death.png"
+  }
+  images {
+    image: "/assets/units/infantry-mud/ne/death.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 12
+}
+extrude_borders: 2

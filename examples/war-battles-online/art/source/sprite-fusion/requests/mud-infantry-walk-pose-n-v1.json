@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_b0788b26-2790-4565-8651-77081d93206b",
+  "operation": "edit",
+  "prompt": "Change only Mud's body pose to a grounded north-facing rear walk mid-stride: one boot forward, the other planted, opposite arm swinging, compact sidearm low. Preserve his respirator mask, ochre helmet, orange-rimmed goggles, rust-red scarf, dark olive jacket, rugged build, original colors, outline, scale, and exact source viewing angle. No turn, extra person, platform, text, or scenery.",
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "08ee79cb-44c5-428c-a51c-76feee4f025e"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/mud-infantry-walk-pose-n-v1.json",
+    "sha256": "7dbe2444b37bf79ea82fc7888497f3da1396cd8d54b3229004a7f03d5a92302f"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "41077da8-dccb-4b13-999d-803399bfdb83",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 22,
+      "height": 37,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/41077da8-dccb-4b13-999d-803399bfdb83/image.png?v=1791527417045",
+      "path": "art/source/sprite-fusion/outputs/mud-infantry-walk-pose-n-v1/00.png",
+      "bytes": 1637,
+      "sha256": "fd39fa14393742c6545367126eed18e0a114cea35a4e595d6431c6bc0c20ad74"
+    },
+    {
+      "index": 1,
+      "assetId": "f5001112-1ee6-4428-a0c2-b799698e257c",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 23,
+      "height": 37,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/f5001112-1ee6-4428-a0c2-b799698e257c/image.png?v=1791527418134",
+      "path": "art/source/sprite-fusion/outputs/mud-infantry-walk-pose-n-v1/01.png",
+      "bytes": 2173,
+      "sha256": "825bcdfca5737117f20cd2dae95e2725868717fcd4952f20cb869f54e05091d0"
+    }
+  ],
+  "credits": {
+    "remaining": 1215
+  }
+}

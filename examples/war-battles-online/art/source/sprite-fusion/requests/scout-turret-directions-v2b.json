@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_55bb7283-5c3d-4794-8e69-1d0ce157214e",
+  "operation": "direction-set",
+  "prompt": null,
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/scout-turret-v2/00.png",
+      "bytes": 3712,
+      "sha256": "d474a5943483b02f25e4687cb24ccd3f72465922efdfb265c259097033bb513b"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/scout-turret-directions-v2b.json",
+    "sha256": "63a00f4c8bc2ab78a6ba36c79c4f2255865141315ec5ec37661dd9083ad9e828"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "0a93abf1-b22c-4dfa-aea2-5a0f0dce409c",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/0a93abf1-b22c-4dfa-aea2-5a0f0dce409c/image.png?v=1791432625773",
+      "path": "art/source/sprite-fusion/outputs/scout-turret-directions-v2b/00.png",
+      "bytes": 2413,
+      "sha256": "f8e5c41a621b341674e3957d5875645d4dabf84b1f68b39ccc0aebf332c026d0"
+    },
+    {
+      "index": 1,
+      "assetId": "e6732ada-2529-4707-b446-8e925c5e4223",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/e6732ada-2529-4707-b446-8e925c5e4223/image.png?v=1791432626344",
+      "path": "art/source/sprite-fusion/outputs/scout-turret-directions-v2b/01.png",
+      "bytes": 2935,
+      "sha256": "1c8ccbd3e85b0e24fec543a596f01eb2684f52442d434fe9a9bc7bbbe65a7fee"
+    },
+    {
+      "index": 2,
+      "assetId": "a6c88bb7-1308-4740-9da8-f03d5aea1aae",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/a6c88bb7-1308-4740-9da8-f03d5aea1aae/image.png?v=1791432626918",
+      "path": "art/source/sprite-fusion/outputs/scout-turret-directions-v2b/02.png",
+      "bytes": 2487,
+      "sha256": "a367823e5097883a9a662c27e0d0e71fd9d0ec6bedf7e47fdb6d079b1d02a4c3"
+    },
+    {
+      "index": 3,
+      "assetId": "dd9ce8cd-a046-4494-a765-56f6196182c0",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/dd9ce8cd-a046-4494-a765-56f6196182c0/image.png?v=1791432627497",
+      "path": "art/source/sprite-fusion/outputs/scout-turret-directions-v2b/03.png",
+      "bytes": 2204,
+      "sha256": "0721ae09f316648e9a3f70a5c0dca5b96fb61d95081390b71e466add5116e97b"
+    },
+    {
+      "index": 4,
+      "assetId": "4730c0b2-8f88-4f0a-8d93-a1edb1cfc10e",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/4730c0b2-8f88-4f0a-8d93-a1edb1cfc10e/image.png?v=1791432628036",
+      "path": "art/source/sprite-fusion/outputs/scout-turret-directions-v2b/04.png",
+      "bytes": 2462,
+      "sha256": "c774130d0912a343d0a912cbcb5cfca8a7741d6ced593a7010f497efd554b28c"
+    },
+    {
+      "index": 5,
+      "assetId": "a30ea33b-1d57-44fc-bd50-b4f2755815b0",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/a30ea33b-1d57-44fc-bd50-b4f2755815b0/image.png?v=1791432628597",
+      "path": "art/source/sprite-fusion/outputs/scout-turret-directions-v2b/05.png",
+      "bytes": 2320,
+      "sha256": "bbc5a34037691735a78b9383f2c33c5410da62eeebac00bc678469cda40cb1a6"
+    },
+    {
+      "index": 6,
+      "assetId": "508feef1-c4f8-4f0d-b331-cbad1a532c08",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/508feef1-c4f8-4f0d-b331-cbad1a532c08/image.png?v=1791432629176",
+      "path": "art/source/sprite-fusion/outputs/scout-turret-directions-v2b/06.png",
+      "bytes": 2168,
+      "sha256": "7afb6c4d596d3f4845b063b80b757d6861eb0fd842646da1c25fed67fdc26106"
+    },
+    {
+      "index": 7,
+      "assetId": "b81c2784-8554-41d0-b7da-589e4cc92f9f",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/b81c2784-8554-41d0-b7da-589e4cc92f9f/image.png?v=1791432629732",
+      "path": "art/source/sprite-fusion/outputs/scout-turret-directions-v2b/07.png",
+      "bytes": 3102,
+      "sha256": "b82e94a3d30cce45ff82777352f09316e493bc7b6321f75dbddde325384b39fe"
+    }
+  ],
+  "credits": {
+    "remaining": 2310
+  }
+}

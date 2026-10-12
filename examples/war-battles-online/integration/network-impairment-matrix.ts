@@ -4,7 +4,7 @@ import {
   type LoadHarnessConfig,
 } from "./authoritative-load-harness.ts";
 
-export const NETWORK_IMPAIRMENT_MATRIX_SCHEMA_VERSION = 1;
+export const NETWORK_IMPAIRMENT_MATRIX_SCHEMA_VERSION = 3;
 
 interface NetworkProfile {
   readonly name: string;
@@ -78,6 +78,16 @@ export async function runNetworkImpairmentMatrix(): Promise<NetworkImpairmentMat
       }[];
       readonly maximumRemoteInterpolationDiscontinuity: number;
       readonly everyBotDroveTheProduct: boolean;
+      readonly localCorrectionBucketUpperBounds: readonly number[];
+      readonly localCorrectionBuckets: readonly number[];
+      readonly workloadCorrections: {
+        readonly maximumLocalCorrectionMagnitude: number;
+        readonly localCorrectionBuckets: readonly number[];
+        readonly maximumPredictionErrorMagnitude: number;
+        readonly predictionErrorBuckets: readonly number[];
+        readonly maximumLocalPresentedStepDistance: number;
+        readonly localPresentedStepsOverThirtyTwoPixels: number;
+      };
     };
     const server = evidence.server as Record<string, number>;
     const transport = evidence.transport as Record<string, unknown>;
@@ -102,6 +112,15 @@ export async function runNetworkImpairmentMatrix(): Promise<NetworkImpairmentMat
     const snapshotSkipRatio =
       server.snapshotFramesSkippedByBudget! / (server.snapshotsSent! + server.snapshotFramesSkippedByBudget!);
     const minimumSnapshotsApplied = Math.min(...clients.rows.map((row) => row.snapshotsApplied));
+    const correctionSamples = clients.workloadCorrections.localCorrectionBuckets.reduce((sum, count) => sum + count, 0);
+    const overEightPixels = clients.workloadCorrections.localCorrectionBuckets
+      .slice(5)
+      .reduce((sum, count) => sum + count, 0);
+    const overThirtyTwoPixels = clients.workloadCorrections.localCorrectionBuckets[7]!;
+    const sameTickSamples = clients.workloadCorrections.predictionErrorBuckets.reduce((sum, count) => sum + count, 0);
+    const sameTickOverEightPixels = clients.workloadCorrections.predictionErrorBuckets
+      .slice(5)
+      .reduce((sum, count) => sum + count, 0);
     rows.push(
       Object.freeze({
         name: profile.name,
@@ -123,6 +142,8 @@ export async function runNetworkImpairmentMatrix(): Promise<NetworkImpairmentMat
           droppedDatagrams: observed.droppedDatagrams,
           backpressuredDatagrams: observed.backpressuredDatagrams,
           reorderedDatagrams: observed.reorderedDatagrams,
+          reorderedSnapshotStreams: observed.reorderedSnapshotStreams,
+          reliableOrderViolations: observed.reliableOrderViolations,
           cancelledReliable: observed.cancelledReliable,
           peakQueue: observed.peakQueue,
           peakQueuedBytes: observed.peakQueuedBytes,
@@ -153,7 +174,21 @@ export async function runNetworkImpairmentMatrix(): Promise<NetworkImpairmentMat
           minimumSnapshotsApplied,
           minimumSnapshotsAppliedFloor: profile.minimumSnapshotsApplied,
           maximumSnapshotsApplied: Math.max(...clients.rows.map((row) => row.snapshotsApplied)),
-          maximumLocalCorrectionMagnitude: Math.max(...clients.rows.map((row) => row.maximumLocalCorrectionMagnitude)),
+          maximumLocalCorrectionMagnitude: clients.workloadCorrections.maximumLocalCorrectionMagnitude,
+          maximumLocalPresentedStepDistance: clients.workloadCorrections.maximumLocalPresentedStepDistance,
+          localPresentedStepsOverThirtyTwoPixels: clients.workloadCorrections.localPresentedStepsOverThirtyTwoPixels,
+          localCorrectionBucketUpperBounds: clients.localCorrectionBucketUpperBounds,
+          localCorrectionBuckets: clients.workloadCorrections.localCorrectionBuckets,
+          localCorrectionSamples: correctionSamples,
+          localCorrectionOverEightPixelRatio: correctionSamples > 0 ? overEightPixels / correctionSamples : 0,
+          localCorrectionOverThirtyTwoPixelRatio: correctionSamples > 0 ? overThirtyTwoPixels / correctionSamples : 0,
+          maximumPredictionErrorMagnitude: clients.workloadCorrections.maximumPredictionErrorMagnitude,
+          predictionErrorBuckets: clients.workloadCorrections.predictionErrorBuckets,
+          predictionErrorSamples: sameTickSamples,
+          predictionErrorOverEightPixelRatio: sameTickSamples > 0 ? sameTickOverEightPixels / sameTickSamples : 0,
+          convergenceProbeCorrectionBuckets: clients.localCorrectionBuckets.map(
+            (count, bucket) => count - clients.workloadCorrections.localCorrectionBuckets[bucket]!,
+          ),
           maximumRemoteInterpolationDiscontinuity: clients.maximumRemoteInterpolationDiscontinuity,
           everyBotDroveTheProduct: clients.everyBotDroveTheProduct,
           minimumBotCommandsStaged: Math.min(...clients.rows.map((row) => row.botCommandsStaged)),
@@ -169,6 +204,6 @@ export async function runNetworkImpairmentMatrix(): Promise<NetworkImpairmentMat
     kind: "war-battles.32-player-network-impairment-matrix",
     profiles: Object.freeze(rows),
     evidenceBoundary:
-      "The production MatchServer, BattleClient, shared NetworkBotDriver brain, prediction, reconciliation, snapshot and input codecs run for 32 clients through a deterministic per-link application-payload serializer with latency, jitter, loss, reordering, backpressure and speed caps. Demand fields count payload admitted during the exact workload window; serialization may finish or be cancelled after that window, so they are not delivered throughput or observed link utilization. This is not a QUIC packet capture and excludes HTTP/3, TLS, UDP, IP, link-layer and congestion-control overhead.",
+      "The production MatchServer, BattleClient, shared NetworkBotDriver brain, prediction, reconciliation, snapshot and input codecs run for 32 clients through a deterministic per-link application-payload serializer with latency, jitter, loss, reordering, backpressure and speed caps. Session/control/fallback-input streams are ordered, while independent reliable snapshot streams may reorder; the focused harness test forces that case even if these three profiles do not. Correction headlines measure only the active-input workload; forced final convergence has separate buckets. Same-tick prediction-error buckets exclude cross-tick visual deltas and are reported separately from local presentation correction. Demand fields count payload admitted during the exact workload window; serialization may finish or be cancelled after that window, so they are not delivered throughput or observed link utilization. This is not a QUIC packet capture and excludes HTTP/3, TLS, UDP, IP, link-layer and congestion-control overhead.",
   });
 }

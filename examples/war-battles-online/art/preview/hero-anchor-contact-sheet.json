@@ -1,0 +1,665 @@
+{
+  "frames": [
+    {
+      "file": "down/1.png",
+      "size": [
+        22,
+        22
+      ],
+      "opaqueBbox": [
+        3,
+        2,
+        18,
+        20
+      ],
+      "anchor": [
+        11,
+        20
+      ],
+      "explicitAnchor": true,
+      "cellOpaqueBounds": [
+        24,
+        18,
+        69,
+        72
+      ],
+      "cellOverflow": false,
+      "footDrift": 0,
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      },
+      "possibleClipping": false
+    },
+    {
+      "file": "down/2.png",
+      "size": [
+        22,
+        22
+      ],
+      "opaqueBbox": [
+        3,
+        3,
+        18,
+        20
+      ],
+      "anchor": [
+        11,
+        20
+      ],
+      "explicitAnchor": true,
+      "cellOpaqueBounds": [
+        24,
+        21,
+        69,
+        72
+      ],
+      "cellOverflow": false,
+      "footDrift": 0,
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      },
+      "possibleClipping": false
+    },
+    {
+      "file": "down/3.png",
+      "size": [
+        22,
+        22
+      ],
+      "opaqueBbox": [
+        3,
+        2,
+        18,
+        20
+      ],
+      "anchor": [
+        11,
+        20
+      ],
+      "explicitAnchor": true,
+      "cellOpaqueBounds": [
+        24,
+        18,
+        69,
+        72
+      ],
+      "cellOverflow": false,
+      "footDrift": 0,
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      },
+      "possibleClipping": false
+    },
+    {
+      "file": "down/4.png",
+      "size": [
+        22,
+        22
+      ],
+      "opaqueBbox": [
+        3,
+        3,
+        18,
+        20
+      ],
+      "anchor": [
+        11,
+        20
+      ],
+      "explicitAnchor": true,
+      "cellOpaqueBounds": [
+        24,
+        21,
+        69,
+        72
+      ],
+      "cellOverflow": false,
+      "footDrift": 0,
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      },
+      "possibleClipping": false
+    },
+    {
+      "file": "down-d/1.png",
+      "size": [
+        22,
+        22
+      ],
+      "opaqueBbox": [
+        2,
+        2,
+        17,
+        20
+      ],
+      "anchor": [
+        11,
+        20
+      ],
+      "explicitAnchor": true,
+      "cellOpaqueBounds": [
+        21,
+        18,
+        66,
+        72
+      ],
+      "cellOverflow": false,
+      "footDrift": 0,
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      },
+      "possibleClipping": false
+    },
+    {
+      "file": "down-d/2.png",
+      "size": [
+        22,
+        22
+      ],
+      "opaqueBbox": [
+        2,
+        3,
+        17,
+        20
+      ],
+      "anchor": [
+        11,
+        20
+      ],
+      "explicitAnchor": true,
+      "cellOpaqueBounds": [
+        21,
+        21,
+        66,
+        72
+      ],
+      "cellOverflow": false,
+      "footDrift": 0,
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      },
+      "possibleClipping": false
+    },
+    {
+      "file": "down-d/3.png",
+      "size": [
+        22,
+        22
+      ],
+      "opaqueBbox": [
+        2,
+        2,
+        17,
+        20
+      ],
+      "anchor": [
+        11,
+        20
+      ],
+      "explicitAnchor": true,
+      "cellOpaqueBounds": [
+        21,
+        18,
+        66,
+        72
+      ],
+      "cellOverflow": false,
+      "footDrift": 0,
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      },
+      "possibleClipping": false
+    },
+    {
+      "file": "down-d/4.png",
+      "size": [
+        22,
+        22
+      ],
+      "opaqueBbox": [
+        2,
+        3,
+        17,
+        20
+      ],
+      "anchor": [
+        11,
+        20
+      ],
+      "explicitAnchor": true,
+      "cellOpaqueBounds": [
+        21,
+        21,
+        66,
+        72
+      ],
+      "cellOverflow": false,
+      "footDrift": 0,
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      },
+      "possibleClipping": false
+    },
+    {
+      "file": "side/1.png",
+      "size": [
+        22,
+        22
+      ],
+      "opaqueBbox": [
+        2,
+        2,
+        17,
+        20
+      ],
+      "anchor": [
+        11,
+        20
+      ],
+      "explicitAnchor": true,
+      "cellOpaqueBounds": [
+        21,
+        18,
+        66,
+        72
+      ],
+      "cellOverflow": false,
+      "footDrift": 0,
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      },
+      "possibleClipping": false
+    },
+    {
+      "file": "side/2.png",
+      "size": [
+        22,
+        22
+      ],
+      "opaqueBbox": [
+        2,
+        3,
+        17,
+        20
+      ],
+      "anchor": [
+        11,
+        20
+      ],
+      "explicitAnchor": true,
+      "cellOpaqueBounds": [
+        21,
+        21,
+        66,
+        72
+      ],
+      "cellOverflow": false,
+      "footDrift": 0,
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      },
+      "possibleClipping": false
+    },
+    {
+      "file": "side/3.png",
+      "size": [
+        22,
+        22
+      ],
+      "opaqueBbox": [
+        2,
+        2,
+        17,
+        20
+      ],
+      "anchor": [
+        11,
+        20
+      ],
+      "explicitAnchor": true,
+      "cellOpaqueBounds": [
+        21,
+        18,
+        66,
+        72
+      ],
+      "cellOverflow": false,
+      "footDrift": 0,
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      },
+      "possibleClipping": false
+    },
+    {
+      "file": "side/4.png",
+      "size": [
+        22,
+        22
+      ],
+      "opaqueBbox": [
+        2,
+        3,
+        17,
+        20
+      ],
+      "anchor": [
+        11,
+        20
+      ],
+      "explicitAnchor": true,
+      "cellOpaqueBounds": [
+        21,
+        21,
+        66,
+        72
+      ],
+      "cellOverflow": false,
+      "footDrift": 0,
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      },
+      "possibleClipping": false
+    },
+    {
+      "file": "up/1.png",
+      "size": [
+        22,
+        22
+      ],
+      "opaqueBbox": [
+        3,
+        1,
+        18,
+        20
+      ],
+      "anchor": [
+        11,
+        20
+      ],
+      "explicitAnchor": true,
+      "cellOpaqueBounds": [
+        24,
+        15,
+        69,
+        72
+      ],
+      "cellOverflow": false,
+      "footDrift": 0,
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      },
+      "possibleClipping": false
+    },
+    {
+      "file": "up/2.png",
+      "size": [
+        22,
+        22
+      ],
+      "opaqueBbox": [
+        3,
+        2,
+        18,
+        20
+      ],
+      "anchor": [
+        11,
+        20
+      ],
+      "explicitAnchor": true,
+      "cellOpaqueBounds": [
+        24,
+        18,
+        69,
+        72
+      ],
+      "cellOverflow": false,
+      "footDrift": 0,
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      },
+      "possibleClipping": false
+    },
+    {
+      "file": "up/3.png",
+      "size": [
+        22,
+        22
+      ],
+      "opaqueBbox": [
+        3,
+        1,
+        18,
+        20
+      ],
+      "anchor": [
+        11,
+        20
+      ],
+      "explicitAnchor": true,
+      "cellOpaqueBounds": [
+        24,
+        15,
+        69,
+        72
+      ],
+      "cellOverflow": false,
+      "footDrift": 0,
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      },
+      "possibleClipping": false
+    },
+    {
+      "file": "up/4.png",
+      "size": [
+        22,
+        22
+      ],
+      "opaqueBbox": [
+        3,
+        2,
+        18,
+        20
+      ],
+      "anchor": [
+        11,
+        20
+      ],
+      "explicitAnchor": true,
+      "cellOpaqueBounds": [
+        24,
+        18,
+        69,
+        72
+      ],
+      "cellOverflow": false,
+      "footDrift": 0,
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      },
+      "possibleClipping": false
+    },
+    {
+      "file": "up-d/1.png",
+      "size": [
+        22,
+        22
+      ],
+      "opaqueBbox": [
+        4,
+        2,
+        19,
+        20
+      ],
+      "anchor": [
+        11,
+        20
+      ],
+      "explicitAnchor": true,
+      "cellOpaqueBounds": [
+        27,
+        18,
+        72,
+        72
+      ],
+      "cellOverflow": false,
+      "footDrift": 0,
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      },
+      "possibleClipping": false
+    },
+    {
+      "file": "up-d/2.png",
+      "size": [
+        22,
+        22
+      ],
+      "opaqueBbox": [
+        4,
+        3,
+        19,
+        20
+      ],
+      "anchor": [
+        11,
+        20
+      ],
+      "explicitAnchor": true,
+      "cellOpaqueBounds": [
+        27,
+        21,
+        72,
+        72
+      ],
+      "cellOverflow": false,
+      "footDrift": 0,
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      },
+      "possibleClipping": false
+    },
+    {
+      "file": "up-d/3.png",
+      "size": [
+        22,
+        22
+      ],
+      "opaqueBbox": [
+        4,
+        2,
+        19,
+        20
+      ],
+      "anchor": [
+        11,
+        20
+      ],
+      "explicitAnchor": true,
+      "cellOpaqueBounds": [
+        27,
+        18,
+        72,
+        72
+      ],
+      "cellOverflow": false,
+      "footDrift": 0,
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      },
+      "possibleClipping": false
+    },
+    {
+      "file": "up-d/4.png",
+      "size": [
+        22,
+        22
+      ],
+      "opaqueBbox": [
+        4,
+        3,
+        19,
+        20
+      ],
+      "anchor": [
+        11,
+        20
+      ],
+      "explicitAnchor": true,
+      "cellOpaqueBounds": [
+        27,
+        21,
+        72,
+        72
+      ],
+      "cellOverflow": false,
+      "footDrift": 0,
+      "edgeContacts": {
+        "left": false,
+        "top": false,
+        "right": false,
+        "bottom": false
+      },
+      "possibleClipping": false
+    }
+  ],
+  "failures": []
+}

@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_13fdb9ed-c21b-42bf-bac0-56b31003f20c",
+  "operation": "style-reference",
+  "prompt": "One six-sided walkable ochre earth landform in an isometric volcanic frontier battlefield. The broad flat top has two subtle parallel tank tread impressions, scattered gravel, and small olive grass tufts; the compact edge reveals layered sandstone and dark rock. Keep the same hex silhouette, three-quarter projection, upper-left light, muted military palette, and chunky pixel clusters as the references. No tank, building, lettering, or second tile.",
+  "size": 64,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-cliff-v1/07.png",
+      "bytes": 7054,
+      "sha256": "22fc9b62174d4459e7a64b591570915b2dfd14bceac49cfed0634c63f60b2aae"
+    },
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-ochre-cliff-v1/09.png",
+      "bytes": 5278,
+      "sha256": "28ab76381f8876b72d01f14fb729832b60a76b82337695a5e73047f6fa4ce2e8"
+    },
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-meadow-cliff-v1/04.png",
+      "bytes": 7402,
+      "sha256": "e475f8f5c048798c01c722cd1efef78e8bd22d5e750fc5939b87dc5679d6e240"
+    },
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-service-deck-v1/09.png",
+      "bytes": 8414,
+      "sha256": "a288fa5d2c07ceb85bca1924ed5bb719e220a1cfc5de5225b57b5c40f35a5b8b"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/frontier-hex-worn-route-v1.json",
+    "sha256": "ad2c9038def9cb49a68a205ba4ad0a6436b90567b4f3ffcb1e8115ef9e202102"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "406cf1e0-16df-4e8d-9ef1-5944412fa3d6",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 65,
+      "height": 65,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/406cf1e0-16df-4e8d-9ef1-5944412fa3d6/image.png?v=1791410240647",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-worn-route-v1/00.png",
+      "bytes": 8832,
+      "sha256": "23b5e6cd3c793e247272418511a4dce1cd462dfc73cdd8a1903a88e3011ae884"
+    },
+    {
+      "index": 1,
+      "assetId": "4a7fc3d2-704d-40ad-8c52-7312469a9e4b",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/4a7fc3d2-704d-40ad-8c52-7312469a9e4b/image.png?v=1791410241274",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-worn-route-v1/01.png",
+      "bytes": 9796,
+      "sha256": "a3492fccd8bdb99b3802e868ad8c5c7a534a99e3037b7298aaaa1e57970c418d"
+    },
+    {
+      "index": 2,
+      "assetId": "92d83993-c498-43bd-b594-83f5afb28ff8",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/92d83993-c498-43bd-b594-83f5afb28ff8/image.png?v=1791410241873",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-worn-route-v1/02.png",
+      "bytes": 9018,
+      "sha256": "a4c7bde1ac2d634fc4f9276e1199f9e36c3d3476a39befef0b3c45dd7e701743"
+    },
+    {
+      "index": 3,
+      "assetId": "5126f543-afe5-4e55-be51-448ae743ce23",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/5126f543-afe5-4e55-be51-448ae743ce23/image.png?v=1791410242450",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-worn-route-v1/03.png",
+      "bytes": 9062,
+      "sha256": "e408cf2d752be05e7ac040a9b2d033a97489645fe3496ee5e73d98dde460e71b"
+    },
+    {
+      "index": 4,
+      "assetId": "f4d998a2-c921-4c56-bada-e792051184c7",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 65,
+      "height": 65,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/f4d998a2-c921-4c56-bada-e792051184c7/image.png?v=1791410243084",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-worn-route-v1/04.png",
+      "bytes": 9185,
+      "sha256": "4e1ad774de19dd8298d7e9b04a11a9f32d152eb4da60802c98211827bbee782a"
+    },
+    {
+      "index": 5,
+      "assetId": "cca9cc5b-8979-4686-9b86-0fc15cdd80bc",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/cca9cc5b-8979-4686-9b86-0fc15cdd80bc/image.png?v=1791410243716",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-worn-route-v1/05.png",
+      "bytes": 9524,
+      "sha256": "e734f1a89eeb5d36f1dab1c43d4a3d3adbab70aa41174c060ea63058fa905213"
+    },
+    {
+      "index": 6,
+      "assetId": "b2764b60-2ce1-4385-a90b-b2ea30744eee",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 65,
+      "height": 65,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/b2764b60-2ce1-4385-a90b-b2ea30744eee/image.png?v=1791410244300",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-worn-route-v1/06.png",
+      "bytes": 9227,
+      "sha256": "bd12851a8d22b297bfc1abc595d55e55920778bf058a7637478a77b67f4088dc"
+    },
+    {
+      "index": 7,
+      "assetId": "c760d224-c675-4ad4-9f78-4de26a7c573a",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 66,
+      "height": 66,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/c760d224-c675-4ad4-9f78-4de26a7c573a/image.png?v=1791410244924",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-worn-route-v1/07.png",
+      "bytes": 9746,
+      "sha256": "1450200512586cb6b2c58bf4fdae567bc79dac6c043143016d550aa076f9312b"
+    },
+    {
+      "index": 8,
+      "assetId": "5ac2a01e-0679-4228-b4f4-cabc6f5de9ea",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 67,
+      "height": 67,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/5ac2a01e-0679-4228-b4f4-cabc6f5de9ea/image.png?v=1791410245514",
+      "path": "art/source/sprite-fusion/outputs/frontier-hex-worn-route-v1/08.png",
+      "bytes": 9938,
+      "sha256": "22113d83b43de9d38634ee377ac63f1c4603392400c9b672d7a1726d15894b22"
+    }
+  ],
+  "credits": {
+    "remaining": 2910
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_356a969b-e8ed-42de-91d9-9d0c81930083",
+  "operation": "animate",
+  "prompt": "A grounded north-facing walk loop with alternating boot contact and a small opposite-arm swing. Preserve Rook's brown helmet, blue goggles, cream scarf, sidearm, proportions, colors, and rear view. Keep the complete helmet, boots, sidearm, and arms inside the canvas throughout the motion.",
+  "size": null,
+  "outputFrames": 4,
+  "colors": 24,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "art/source/sprite-fusion/inputs/rook-infantry-walk-pose-n-v1-0-padded-64.png",
+      "bytes": 2654,
+      "sha256": "e7c5dc30124d7908382043206f4128766569fe7887a59347f54b44b27f438b2b"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/rook-infantry-walk-n-padded-v2.json",
+    "sha256": "b6225b80e5fc5ba236f534bca0ec633a93ecaf111516c9d269e93b2a660718f8"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "199f7919-6b90-4b23-9ea4-64ccba4807d5",
+      "type": "animation",
+      "contentType": "image/webp",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/199f7919-6b90-4b23-9ea4-64ccba4807d5/animation.webp?v=1791557223324",
+      "path": "art/source/sprite-fusion/outputs/rook-infantry-walk-n-padded-v2/00.webp",
+      "bytes": 2242,
+      "sha256": "aaf709ccf0e84e3defbef9a06ee7dbac1f844a35c4f0ac963a9f1e24ea34565b",
+      "spritesheet": {
+        "url": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/199f7919-6b90-4b23-9ea4-64ccba4807d5/spritesheet.png?v=1791557223324",
+        "path": "art/source/sprite-fusion/outputs/rook-infantry-walk-n-padded-v2/00-sheet.png",
+        "bytes": 2549,
+        "sha256": "7b85c2c9810499eb641d637320dbe5135f93f281adb219c6a2724c5efc06ce38"
+      },
+      "frameCount": 4,
+      "fps": 8
+    }
+  ],
+  "credits": {
+    "remaining": 165
+  }
+}

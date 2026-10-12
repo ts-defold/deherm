@@ -39,6 +39,96 @@ embedded_components {
   }
 }
 embedded_components {
+  id: "coverfactory"
+  type: "factory"
+  data: "prototype: \"/main/arena-cover.go\"\n"
+  "load_dynamically: false\n"
+  ""
+  position {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+}
+embedded_components {
+  id: "sandbagafactory"
+  type: "factory"
+  data: "prototype: \"/main/arena-sandbag-a.go\"\n"
+  "load_dynamically: false\n"
+  ""
+  position {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+}
+embedded_components {
+  id: "sandbagbfactory"
+  type: "factory"
+  data: "prototype: \"/main/arena-sandbag-b.go\"\n"
+  "load_dynamically: false\n"
+  ""
+  position {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+}
+embedded_components {
+  id: "spawnmarkerfactory"
+  type: "factory"
+  data: "prototype: \"/main/arena-floor-marker.go\"\n"
+  "load_dynamically: false\n"
+  ""
+  position {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+}
+embedded_components {
+  id: "pickupmarkerfactory"
+  type: "factory"
+  data: "prototype: \"/main/arena-pickup-marker.go\"\n"
+  "load_dynamically: false\n"
+  ""
+  position {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+}
+embedded_components {
   id: "tankfactory"
   type: "factory"
   data: "prototype: \"/main/arena-tank.go\"\n"

@@ -10,8 +10,10 @@
 // control-plane seams. They never participate in the fixed-step simulation.
 
 import {
+  DEFAULT_ROSTER_SIZE,
   INPUT_HISTORY_TICKS,
   MAX_PLAYERS,
+  NETWORK_PLAYER_SNAPSHOT_BYTES,
   NETWORK_SNAPSHOT_BYTES,
   SNAPSHOT_BASE_HISTORY_FRAMES,
   SNAPSHOT_BYTES,
@@ -36,6 +38,8 @@ import {
   REJECT_VERSION,
   RESUME_TOKEN_BYTES,
   NETWORK_SNAPSHOT_MESSAGE_BYTES,
+  PONG_FEEDBACK_BYTES,
+  PING_BYTES,
   SNAPSHOT_NORMAL_MAX_BYTES,
   SNAPSHOT_RECOVERY_INTERVAL_MILLISECONDS,
   SNAPSHOT_RECOVERY_MAX_BYTES,
@@ -48,6 +52,7 @@ import {
   readInputBundle,
   readPing,
   readWelcomeAck,
+  writePongFeedback,
   writePing,
   writeReject,
   writeWelcome,
@@ -122,6 +127,10 @@ export interface MatchServerStats {
   snapshotNormalFramesSent: number;
   snapshotRecoveryFramesSent: number;
   snapshotFramesSkippedByBudget: number;
+  /** Compact latest-state frames accepted by the unreliable transport writer. */
+  snapshotDatagramsSent: number;
+  /** Compact state frames dropped at the local writer instead of queued stale. */
+  snapshotDatagramsDropped: number;
   inputsAccepted: number;
   inputsRejected: number;
   /** Valid authoritative commands first observed after their simulation tick. */
@@ -129,6 +138,7 @@ export interface MatchServerStats {
 }
 
 const SNAPSHOT_IN_FLIGHT_STREAMS = 2;
+const SNAPSHOT_DATAGRAM_BACKPRESSURE_COOLDOWN_MILLISECONDS = 1_000;
 // Snapshot streams are bounded by count, so the stale watchdog protects
 // liveness rather than memory. Size it from the bytes already admitted ahead
 // of this frame at a deliberately low supported application-payload rate. A
@@ -182,6 +192,8 @@ export class MatchServer {
   private readonly onSessionStateChange: (reason: "commit" | "release", tick: number) => void;
   private nextSessionId = 1;
   private closed = false;
+  /** Millisecond × tick-rate credit retained across imprecise timer wake-ups. */
+  private advanceCredit = 0;
 
   readonly stats: MatchServerStats = {
     tick: 0,
@@ -195,6 +207,8 @@ export class MatchServer {
     snapshotNormalFramesSent: 0,
     snapshotRecoveryFramesSent: 0,
     snapshotFramesSkippedByBudget: 0,
+    snapshotDatagramsSent: 0,
+    snapshotDatagramsDropped: 0,
     inputsAccepted: 0,
     inputsRejected: 0,
     inputsLate: 0,
@@ -203,7 +217,7 @@ export class MatchServer {
   constructor(options: MatchServerOptions = {}) {
     const matchId = (options.matchId ?? 77) >>> 0;
     this.world = new BattleWorld(matchId, options.mapSeed);
-    this.rosterSize = clampInteger(options.rosterSize ?? 8, 2, MAX_PLAYERS);
+    this.rosterSize = clampInteger(options.rosterSize ?? DEFAULT_ROSTER_SIZE, 2, MAX_PLAYERS);
     this.snapshotIntervalTicks = clampInteger(options.snapshotIntervalTicks ?? 6, 1, 30);
     this.botSkill = clampInteger(options.botSkill ?? 2, 0, 3);
     this.fillVacantSlotsWithBots = options.fillVacantSlotsWithBots ?? true;
@@ -274,9 +288,19 @@ export class MatchServer {
     if (this.world.tick % this.snapshotIntervalTicks === 0) this.broadcastSnapshot();
   }
 
-  /** Steps as many whole ticks as `elapsedMilliseconds` has paid for. */
+  /** Steps paid whole ticks without losing fractional time at each timer wake-up. */
   advance(elapsedMilliseconds: number, maximumSteps = 8): number {
-    const steps = Math.min(maximumSteps, Math.max(0, Math.floor((elapsedMilliseconds * TICK_RATE) / 1000)));
+    if (!Number.isFinite(elapsedMilliseconds) || elapsedMilliseconds < 0) {
+      throw new RangeError("elapsedMilliseconds must be finite and nonnegative");
+    }
+    if (!Number.isSafeInteger(maximumSteps) || maximumSteps < 0) {
+      throw new RangeError("maximumSteps must be a nonnegative safe integer");
+    }
+    // Preserve at most half a second of catch-up after a long process pause.
+    // The per-wake-up step budget still bounds the work done synchronously.
+    this.advanceCredit = Math.min(this.advanceCredit + elapsedMilliseconds * TICK_RATE, 30_000);
+    const steps = Math.min(maximumSteps, Math.floor(this.advanceCredit / 1000));
+    this.advanceCredit -= steps * 1000;
     for (let step = 0; step < steps; step += 1) this.step();
     return steps;
   }
@@ -481,7 +505,10 @@ export class ServerSession implements TransportReceiver {
   private readonly lateInputTicks = new Float64Array(INPUT_HISTORY_TICKS);
   private readonly welcomeBuffer = new Uint8Array(WELCOME_BYTES);
   private readonly rejectBuffer = new Uint8Array(REJECT_MAXIMUM_BYTES);
-  private readonly pingBuffer = new Uint8Array(12);
+  private readonly pingBuffer = new Uint8Array(PONG_FEEDBACK_BYTES);
+  private readonly pingPrefix = this.pingBuffer.subarray(0, PING_BYTES);
+  private inputsAccepted = 0;
+  private inputsLate = 0;
   private readonly resumeToken = new Uint8Array(RESUME_TOKEN_BYTES);
   private readonly snapshotBaseline = new Uint8Array(NETWORK_SNAPSHOT_BYTES);
   private readonly snapshotCurrent = new Uint8Array(NETWORK_SNAPSHOT_BYTES);
@@ -493,6 +520,7 @@ export class ServerSession implements TransportReceiver {
     length: SNAPSHOT_IN_FLIGHT_STREAMS,
   });
   private snapshotSendCursor = 0;
+  private snapshotDatagramCooldownUntilMilliseconds = 0;
   private nextSnapshotRecoveryAtMilliseconds = 0;
   private inputBudget = 0;
   /** Closes the double-hello race while async HMAC verification is pending. */
@@ -655,23 +683,6 @@ export class ServerSession implements TransportReceiver {
     if (transport === undefined || this.closed) return false;
     const now = this.server.nowMilliseconds();
     this.expireStaleSnapshots(now);
-    // Keep at most two latest-state writes admitted to the transport per
-    // session. Two streams fill one bandwidth-delay product while the first
-    // crosses the path; a larger queue mostly retains obsolete state.
-    // Superseding a frame every snapshot tick can starve a capped
-    // link forever when serialization plus latency exceeds the snapshot
-    // interval: every stream is cancelled immediately before it completes.
-    // Skipping this candidate preserves a bounded queue and lets the admitted
-    // frame establish a usable acknowledgement base. The next cadence samples
-    // fresh authoritative state rather than retaining a pending copy.
-    let admittedSnapshotWrites = 0;
-    for (const send of this.snapshotSends) {
-      if (send !== undefined && !send.controller.signal.aborted) admittedSnapshotWrites += 1;
-    }
-    if (admittedSnapshotWrites >= SNAPSHOT_IN_FLIGHT_STREAMS) {
-      this.server.stats.snapshotFramesSkippedByBudget += 1;
-      return false;
-    }
     // The client retains the same fixed 64-frame history as the server. An
     // ACK may lag the newest send by more than the transport write window while
     // still remaining a valid delta base; throttling at eight frames created a
@@ -711,6 +722,56 @@ export class ServerSession implements TransportReceiver {
       return false;
     }
     const recovery = length > SNAPSHOT_NORMAL_MAX_BYTES;
+    // Frequent state deltas are disposable. Sending a compact delta on a
+    // reliable stream keeps retransmitting yesterday's position under loss,
+    // even while newer frames wait for the stream window. Datagram-capable
+    // transports take the latest-state lane; keyframes and oversized recovery
+    // frames retain the reliable path. Every delta names an acknowledged base,
+    // so losing one never makes the next delta depend on it.
+    // A mixed stream/datagram cadence at 32 actors proved worse than the
+    // reliable path on capped links: a few small deltas escape as datagrams,
+    // while most frames remain oversized and wait on streams. Require enough
+    // negotiated payload room for every actor's packed record before enabling
+    // the latest-only lane, then still check the actual encoded frame length.
+    if (
+      !keyframe &&
+      transport.capabilities.datagrams &&
+      now >= this.snapshotDatagramCooldownUntilMilliseconds &&
+      this.server.rosterSize * NETWORK_PLAYER_SNAPSHOT_BYTES <= transport.capabilities.maxDatagramBytes &&
+      length <= transport.capabilities.maxDatagramBytes
+    ) {
+      this.snapshotFramesSinceKeyframe += 1;
+      this.server.stats.snapshotNormalFramesSent += 1;
+      this.server.stats.snapshotBytesSent += length;
+      void transport.trySendDatagram(this.snapshotFrame.subarray(0, length)).then(
+        (disposition) => {
+          if (disposition === "sent") this.server.stats.snapshotDatagramsSent += 1;
+          else if (disposition === "closed") this.onClose(1_001, "transport closed");
+          else {
+            this.server.stats.snapshotDatagramsDropped += 1;
+            // A capped path may backpressure a small state frame even though
+            // the MTU admits it. Give that session's reliable, bounded lane
+            // time to recover rather than hammering the same datagram queue.
+            this.snapshotDatagramCooldownUntilMilliseconds = Math.max(
+              this.snapshotDatagramCooldownUntilMilliseconds,
+              this.server.nowMilliseconds() + SNAPSHOT_DATAGRAM_BACKPRESSURE_COOLDOWN_MILLISECONDS,
+            );
+          }
+        },
+        (error: unknown) => this.server.report(error),
+      );
+      return true;
+    }
+    // Reliable keyframes and larger recovery frames retain at most two
+    // in-flight writes. New state never grows an unbounded stream queue.
+    let admittedSnapshotWrites = 0;
+    for (const send of this.snapshotSends) {
+      if (send !== undefined && !send.controller.signal.aborted) admittedSnapshotWrites += 1;
+    }
+    if (admittedSnapshotWrites >= SNAPSHOT_IN_FLIGHT_STREAMS) {
+      this.server.stats.snapshotFramesSkippedByBudget += 1;
+      return false;
+    }
     if (recovery && now < this.nextSnapshotRecoveryAtMilliseconds) {
       this.server.stats.snapshotFramesSkippedByBudget += 1;
       if (keyframe) this.forceSnapshotKeyframe = true;
@@ -790,8 +851,13 @@ export class ServerSession implements TransportReceiver {
       if (!this.ready) throw new Error("session message before hello");
       readPing(payload, this.ping);
       this.ping.serverTick = this.server.world.tick;
-      writePing(this.pingBuffer, this.ping, true);
-      this.sendReliable(TRANSPORT_CHANNEL_SESSION, this.pingBuffer);
+      if (this.inputsLate === 0) {
+        writePing(this.pingPrefix, this.ping, true);
+        this.sendReliable(TRANSPORT_CHANNEL_SESSION, this.pingPrefix);
+      } else {
+        writePongFeedback(this.pingBuffer, this.ping, this.inputsAccepted, this.inputsLate);
+        this.sendReliable(TRANSPORT_CHANNEL_SESSION, this.pingBuffer);
+      }
       return;
     }
     if (kind === MESSAGE_WELCOME_ACK) {
@@ -972,12 +1038,14 @@ export class ServerSession implements TransportReceiver {
         ) {
           this.lateInputTicks[acceptedSlot] = command.tick;
           this.server.stats.inputsLate += 1;
+          this.inputsLate += 1;
         }
         continue;
       }
       if (this.server.world.submitInput(command)) {
         this.acceptedInputTicks[acceptedSlot] = command.tick;
         this.server.stats.inputsAccepted += 1;
+        this.inputsAccepted += 1;
       }
       // A false result after the explicit authority/time checks is an older
       // copy of a future command already staged by another redundant bundle.

@@ -11,15 +11,17 @@ export const VISUAL_EVIDENCE_SOURCE_PATHS = Object.freeze([
   "editors/vscode/src/extension.ts",
   "editors/vscode/src/live-values.ts",
   "packages/cli/src/dev/inspector-bridge.mjs",
+  "examples/war-battles-online/integration/check-vscode-visual.mjs",
+  "examples/war-battles-online/integration/vscode-visual-evidence.mjs",
 ]);
 export const EXPECTED_PROPERTY_DEFAULTS = Object.freeze({
-  players: 8,
+  players: 16,
   botSkill: 1,
   mapSeed: 0,
   autoEngageSeconds: 0,
 });
 export const EXPECTED_LIVE_PROPERTIES = Object.freeze({
-  players: 8,
+  players: 16,
   botSkill: 2,
   mapSeed: 0,
   autoEngageSeconds: 0,
@@ -72,6 +74,20 @@ export function requireInlineValueTexts(renderedText) {
   });
 }
 
+export function requireInlineValueRows(renderedText) {
+  const rows = renderedText.split(/\r?\n/u).map((row) => row.replace(/\s+/gu, " "));
+  for (const [name, value] of Object.entries(EXPECTED_PROPERTY_DEFAULTS)) {
+    const declaration = new RegExp(
+      `\\b${name}\\s*:\\s*property\\.number\\(\\s*${value}\\s*\\)\\s*,?\\s*=\\s*${value}(?!\\d)`,
+      "u",
+    );
+    if (!rows.some((row) => declaration.test(row))) {
+      throw new Error(`The rendered VS Code document does not contain the inline ${name} value on its declaration`);
+    }
+  }
+  return requireInlineValueTexts(renderedText);
+}
+
 export function projectArenaPropertyDefaults(source) {
   const declarations = [];
   for (const [name, value] of Object.entries(EXPECTED_PROPERTY_DEFAULTS)) {
@@ -112,7 +128,7 @@ export function buildVisualEvidence({
   arenaPropertyProjection,
 }) {
   const arena = requireArenaInstance(state);
-  const inlineValueTexts = requireInlineValueTexts(renderedText);
+  const inlineValueTexts = requireInlineValueRows(renderedText);
   const png = readPngSize(screenshot.bytes);
   const document = {
     schemaVersion: VISUAL_EVIDENCE_SCHEMA_VERSION,

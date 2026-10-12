@@ -1,0 +1,10 @@
+{
+  "name": "mud-infantry-walk-w-v1",
+  "operation": "animate",
+  "inputs": [
+    "asset:33f4bca4-3d71-4ee8-a9a2-bb210c157b5c"
+  ],
+  "prompt": "A quick grounded right-facing side view, later flipped for west walk cycle with alternating boot contact and a small opposite-arm swing. Mud remains a rugged driver with a dark respirator mask, ochre helmet, orange-rimmed goggles, rust-red scarf, heavy olive jacket and compact sidearm held low. Keep his exact source perspective, palette, outline, proportions, and identity consistent. Seamless loop without turning, jumping, or adding objects.",
+  "outputFrames": 4,
+  "colors": 24
+}

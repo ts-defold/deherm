@@ -1,0 +1,10 @@
+{
+  "name": "rook-infantry-walk-s-padded-v2",
+  "operation": "animate",
+  "inputs": [
+    "art/source/sprite-fusion/inputs/rook-infantry-walk-pose-s-v1-0-padded-80.png"
+  ],
+  "prompt": "A grounded south-facing walk loop with alternating boot contact and a small opposite-arm swing. Preserve Rook's helmet, blue goggles, cream scarf, sidearm, proportions, colors, and front view. Keep the complete character inside the canvas through the motion.",
+  "outputFrames": 4,
+  "colors": 24
+}

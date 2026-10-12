@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_e886d18d-af4a-4018-b5ff-180ba7af7d37",
+  "operation": "edit",
+  "prompt": "Brass takes a heavy impact while facing southeast: his stocky body recoils diagonally, knees buckle, one arm rises across his bearded face, and the sidearm hangs low. Keep both heavy boots planted on the same ground line. This must read as a staggered hit, not standing or firing, at tiny game scale. Preserve the same older driver, white beard, brown helmet and goggles, cream scarf, olive jacket, colors, outline weight, proportions, and isometric three-quarter perspective. No blood, projectile, flash, new prop, scenery, text, or other character.",
+  "size": null,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "40f0c359-ea92-4cf1-9e04-6a6d658f20a3"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/brass-infantry-hit-pose-se-v1.json",
+    "sha256": "4ff5e5c8048597b0c134b32879c7a0eba78cca1ffe6653d09cb6643bab38b607"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "e2341780-c543-4b84-a3ae-4dc871309e31",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 35,
+      "height": 50,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/e2341780-c543-4b84-a3ae-4dc871309e31/image.png?v=1791534943017",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-hit-pose-se-v1/00.png",
+      "bytes": 4168,
+      "sha256": "3e2e0778979fc996d220d1cc1575eeb139324e550b8f2e403ffa847ff1b8b5a4"
+    },
+    {
+      "index": 1,
+      "assetId": "e2f81e82-451e-42c6-94e1-af49071db1a8",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 45,
+      "height": 54,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/e2f81e82-451e-42c6-94e1-af49071db1a8/image.png?v=1791534944119",
+      "path": "art/source/sprite-fusion/outputs/brass-infantry-hit-pose-se-v1/01.png",
+      "bytes": 5092,
+      "sha256": "7850736257e3f5b58d281355314b61147d8d2487c062e2c75cd28fec4ae3f9a9"
+    }
+  ],
+  "credits": {
+    "remaining": 750
+  }
+}

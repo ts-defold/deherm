@@ -1,0 +1,6 @@
+{
+  "name": "brass-infantry-death-pose-ne-v1",
+  "operation": "edit",
+  "inputs": ["asset:076406b5-d0f8-4e25-8b83-abffa9c8d919"],
+  "prompt": "Keep Brass viewed strictly from behind at the same northeast three-quarter angle. Change his stocky body into a clearly defeated collapsed pose: one heavy knee on the ground, torso and brown helmet bowed low forward, one hand braced on the ground, sidearm lowered, silhouette shorter and wider than standing. Preserve his back-facing perspective, white scarf edge, olive jacket, boots and knee on one ground line, colors and dark outline. Do not turn his face toward the viewer. No blood, injury detail, explosion, extra prop, scenery, platform, text, or second person."
+}
