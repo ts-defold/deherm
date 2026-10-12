@@ -703,6 +703,12 @@ upload/build; the target stays failed if the worker remains unavailable. Local
 Extender failures, compile/link diagnostics, and unchanged/stale logs are never
 retried. Run `38274874382` established this need: all four Apple rows failed
 against the same refused staging worker while the other nine targets passed.
+The retry commit's full run `38278885486` instead received explicit
+`Platform '<target>' is not supported on the current server` responses for all
+four Apple targets from staging. That is not a transient connection refusal or
+an extension compile result; it remains a red external-service capability gate.
+Do not reclassify it as a passing target, retry it as a transport error, or
+quietly use production Extender for a beta SDK.
 
 For package-default artifact runs, the summary regenerates `release-tags.json`
 from every published host-tool sidecar, authenticates each sidecar against
