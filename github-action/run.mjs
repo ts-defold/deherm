@@ -136,11 +136,7 @@ async function runCli(cli, args, cwd) {
     child.on("error", reject);
     child.on("close", (code) => {
       if (code === 0) return resolve(stdout);
-      const diagnostic = stderrTail
-        .split(/\r?\n/u)
-        .map((line) => line.trim())
-        .filter(Boolean)
-        .at(-1);
+      const diagnostic = stderrTail.trim();
       reject(new Error(`deherm bundle exited ${code}${diagnostic ? `: ${diagnostic}` : ""}`));
     });
   });

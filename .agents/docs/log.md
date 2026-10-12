@@ -21,6 +21,15 @@ proves the cross-target build on this host, not yet the GitHub runner or game
 runtime. The normal one-shot development generator restored the example's
 checked-in bundle lock after the test.
 
+The next smoke (`38299154231`) again passed plan and `wasm-web` but failed
+Linux inside Bob. Its new public annotation narrowed the failure to Bob exit
+1, but the Bob process wrapper still replaced the underlying compiler output
+with that generic message. The wrapper now retains a bounded tail of the
+actual Bob output in its failure and a focused process test checks that a
+native-link diagnostic survives to the caller. The exact hosted Linux
+failure remains open until the next CI run exposes that diagnostic; no local
+macOS success is promoted to runner success.
+
 ## 2026-10-12 - Expose a three-mode consumer build workflow
 
 The repository now carries a single-target composite Action, a reusable

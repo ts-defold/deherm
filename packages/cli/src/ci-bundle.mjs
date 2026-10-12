@@ -69,12 +69,23 @@ export async function runBobProcess(plan, options = {}) {
       env: options.env ?? process.env,
       stdio: ["ignore", "pipe", "pipe"],
     });
-    child.stdout?.on("data", (data) => options.log?.(String(data)));
-    child.stderr?.on("data", (data) => options.log?.(String(data)));
+    let outputTail = "";
+    const record = (data) => {
+      const message = String(data);
+      options.log?.(message);
+      outputTail = (outputTail + message).slice(-4096);
+    };
+    child.stdout?.on("data", record);
+    child.stderr?.on("data", record);
     child.once("error", reject);
     child.once("close", (code, signal) => {
       if (code === 0) resolve();
-      else reject(new Error(`Bob bundle failed: java exited ${code ?? `with ${signal}`}`));
+      else
+        reject(
+          new Error(
+            `Bob bundle failed: java exited ${code ?? `with ${signal}`}${outputTail.trim() ? `\n${outputTail.trim()}` : ""}`,
+          ),
+        );
     });
   });
 }

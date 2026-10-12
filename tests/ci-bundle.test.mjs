@@ -1,10 +1,11 @@
 import assert from "node:assert/strict";
+import { spawn } from "node:child_process";
 import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 
-import { bundleProject, planBobBundle, validateBundleRequest } from "../packages/cli/src/ci-bundle.mjs";
+import { bundleProject, planBobBundle, runBobProcess, validateBundleRequest } from "../packages/cli/src/ci-bundle.mjs";
 import { parseArguments } from "../packages/cli/src/cli.mjs";
 import { resolveJava } from "../packages/cli/src/dev/defold-builder.mjs";
 
@@ -92,6 +93,21 @@ test("Bob plan preserves the target, omits absent build server, and includes rel
     privateBuild.args.slice(privateBuild.args.indexOf("--settings"), privateBuild.args.indexOf("--settings") + 2),
     ["--settings", "/game/.deherm/bob-release.settings"],
   );
+});
+
+test("failed Bob process reports its bounded native-link diagnostic", async () => {
+  const output = [];
+  await assert.rejects(
+    runBobProcess(
+      { command: process.execPath, args: [], cwd: process.cwd() },
+      {
+        spawn: () => spawn(process.execPath, ["-e", "console.error('ERROR: missing libexample.a'); process.exit(1)"]),
+        log: (message) => output.push(message),
+      },
+    ),
+    /Bob bundle failed: java exited 1\nERROR: missing libexample\.a/u,
+  );
+  assert.match(output.join(""), /missing libexample\.a/u);
 });
 
 test("one-shot bundle orders compilation, freshness, target projection, and Bob; reports absolute output", async () => {
