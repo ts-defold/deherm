@@ -34,16 +34,14 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Bootstrap pinned Hermes sources for npm prepack
         run: bash scripts/bootstrap-upstreams.sh hermes
-      - name: Verify package metadata and generated-state boundary
-        run: |
-          pnpm check:release-readiness
-          pnpm check:package-revision-boundary
-          pnpm check:knowledge
+      - name: Verify the full repository release gate
+        run: pnpm check
       - name: Prove tarball installation and Defold browser/native bundles
         run: node scripts/prove-npm-consumer.mjs
       - uses: actions/upload-artifact@v6
-        if: always()
         with:
           name: npm-consumer-proof
-          path: build/npm-consumer-proof.json
-          if-no-files-found: ignore
+          path: |
+            build/npm-consumer-proof.json
+            build/npm-release-candidate/*.tgz
+          if-no-files-found: error

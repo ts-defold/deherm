@@ -42,8 +42,10 @@ unpublished npm package. The Action's tag is not the first release gate.
 3. **Prove the release inputs.** Check package version/changelog/licensing,
    public artifact availability and integrity, package exports, and the
    publish workflow. Publish no npm version until the independent proof and
-   repository gates pass. A tag must reference the exact tested commit and
-   package version.
+   repository gates pass. The release-candidate gate retains the **exact
+   tested `.tgz`** beside a report naming its SHA-256 and clean source commit;
+   publish that archive, not a newly packed approximation. A tag must
+   reference the exact tested commit and package version.
 4. **Then release the Action.** Publish the npm package, use a full commit SHA
    for the first external consumer smoke, and create a semantic `v0.1.0` tag
    only after that smoke passes. Call the reusable workflow and its required
@@ -69,7 +71,11 @@ unpublished npm package. The Action's tag is not the first release gate.
   required installing the exact tarball because npm has no published version.
 - `node scripts/prove-npm-consumer.mjs` and the manual
   `.github/workflows/npm-release-candidate.yml` now encode that clean-consumer
-  sequence and also check a package export. The automated local rerun remains
+  sequence, check all declared exports/binaries against the tarball, retain the
+  candidate archive, and run the full repository gate before the consumer
+  proof. `node scripts/prove-npm-consumer.mjs --pack-only` checks inventory
+  locally without a policy fetch or Extender upload; it is **not** a consumer
+  build. The automated local rerun remains
   **unproven**: its networked browser/Linux Extender upload was rejected by the
   local approval guard because the prior upload approval covered an Apple test,
   not this payload. The workflow has not run in GitHub CI yet. Do not infer

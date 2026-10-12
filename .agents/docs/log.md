@@ -9517,3 +9517,23 @@ established that it restores the frozen inventory. `pnpm check` then passed
 through the complete repository gate. The clean-consumer CI workflow itself
 remains unrun, and its browser/Linux Extender upload still requires distinct
 authorization in this local environment.
+
+### 2026-10-12 - Retain the exact npm release candidate
+
+The candidate proof now checks every manifest export, declared type entry,
+and binary against the packed inventory. It retains the exact `.tgz` it
+tested, hashes the retained bytes again, and records the source commit and
+clean-checkout state. The manual CI gate runs the full `pnpm check` first and
+uploads the report **with that archive** only after the clean-consumer proof
+succeeds. A local `--pack-only` run passed at commit `6d33c8c1` with the same
+934,335-byte tarball and SHA-256
+`e3513cfa61452e841b161d652e1021a01418eeaff9d7085e48c1771eeb4e488d`.
+That mode proves inventory and retention only; it neither installs the package
+nor invokes Defold. The full workflow still needs an authorized hosted
+Extender run and must not be labeled green from this evidence.
+The final local repository `pnpm check` passed. A subsequent focused pass
+after the last inventory assertion passed `--pack-only`, `pnpm check:style`,
+`pnpm check:knowledge`, and `actionlint`. In the prior isolated tarball
+installation, all ten executable ESM exports imported successfully; this
+extra assertion is now in the full clean-consumer gate but its new CI run is
+still pending. No npm publication or external Action tag is claimed.
