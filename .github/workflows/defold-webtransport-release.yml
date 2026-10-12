@@ -131,6 +131,7 @@ jobs:
           tests/webtransport-artifacts.test.mjs
           tests/defold-webtransport-artifacts.test.mjs
           tests/defold-webtransport-package.test.mjs
+          tests/defold-webtransport-minimal-example.test.mjs
           tests/defold-webtransport-public-api.test.mjs
           tests/defold-webtransport-community-api.test.mjs
       - name: Verify generated community API surfaces and strict types
@@ -160,15 +161,14 @@ jobs:
           node scripts/package-defold-webtransport.mjs \
             --source build/defold-webtransport-release-source \
             --version "${{ steps.release.outputs.version }}" \
-            --output build/releases \
-            --stage build/defold-webtransport-dogfood
+            --output build/releases
       - name: Build the standalone Lua example with Bob for native and HTML5
         env:
           DEFOLD_BUILD_SERVER: https://build.defold.com
         run: |
           ./scripts/bootstrap-bob.sh
           node scripts/stage-defold-webtransport-minimal-example.mjs \
-            --extension build/defold-webtransport-dogfood \
+            --archive "build/releases/${{ steps.release.outputs.asset }}" \
             --output build/defold-webtransport-minimal
           java -jar build/tooling/bob.jar \
             --root build/defold-webtransport-minimal \
@@ -213,3 +213,17 @@ jobs:
               --title "Defold WebTransport v$VERSION" \
               --notes-file extensions/defold-webtransport/defold_webtransport/CHANGELOG.md
           fi
+      - name: Resolve the published dependency as a clean Defold consumer
+        env:
+          DEFOLD_BUILD_SERVER: https://build.defold.com
+        run: |
+          java -jar build/tooling/bob.jar \
+            --root examples/defold-webtransport-minimal \
+            --output build/defold-webtransport-published-linux \
+            --platform x86_64-linux --architectures x86_64-linux \
+            --variant release --build-server "$DEFOLD_BUILD_SERVER" --archive resolve build
+          java -jar build/tooling/bob.jar \
+            --root examples/defold-webtransport-minimal \
+            --output build/defold-webtransport-published-web \
+            --platform wasm-web --architectures wasm-web \
+            --variant release --build-server "$DEFOLD_BUILD_SERVER" --archive resolve build

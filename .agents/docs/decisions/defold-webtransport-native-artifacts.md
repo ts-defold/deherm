@@ -48,7 +48,14 @@ focused artifact suite before FetchContent is allowed to exercise it. This
 catches malformed hunk lengths deterministically on the host instead of
 failing every platform matrix row during dependency population; clean pinned
 source applicability and exact reverse applicability remain enforced by the
-FetchContent patch helper itself.
+FetchContent patch helper itself. The helper intentionally rejects a mixed or
+partially patched dependency cache: it accepts only a complete forward apply
+or a complete reverse check. When a patch changes after a previous local
+build, use a new CMake binary directory to get a clean pinned checkout rather
+than mutating an ambiguous cached source tree. A clean archive of pinned
+picotls revision `bfa67875982afc4c24f21e146cef4747fa189c2f` accepts the complete
+checked-in patch; the prior local failure was a partially patched cache, not
+pin/patch drift.
 Assets are uploaded through the repository's immutable release helper: an
 existing exact-name asset is retained and is never overwritten with
 `--clobber`. A partial failed release is repairable because planning schedules

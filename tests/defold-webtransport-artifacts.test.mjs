@@ -145,6 +145,46 @@ test("pinned dependency patches are idempotent but still fail closed on foreign 
   assert.throws(apply, /neither applicable nor already applied/u);
 });
 
+test("pinned dependency patch helper rejects a partially applied cache without mutating more files", async (t) => {
+  const root = await scratch(t);
+  const patch = path.join(root, "change.patch");
+  const partial = path.join(root, "partial.patch");
+  const helper = path.join(repositoryRoot, "native/webtransport-cpp/cmake/apply_patch.cmake");
+  await writeFile(path.join(root, "one.txt"), "before one\n");
+  await writeFile(path.join(root, "two.txt"), "before two\n");
+  const one = [
+    "diff --git a/one.txt b/one.txt",
+    "--- a/one.txt",
+    "+++ b/one.txt",
+    "@@ -1 +1 @@",
+    "-before one",
+    "+after one",
+    "",
+  ].join("\n");
+  const two = [
+    "diff --git a/two.txt b/two.txt",
+    "--- a/two.txt",
+    "+++ b/two.txt",
+    "@@ -1 +1 @@",
+    "-before two",
+    "+after two",
+    "",
+  ].join("\n");
+  await writeFile(partial, one);
+  await writeFile(patch, `${one}${two}`);
+  execFileSync("git", ["apply", partial], { cwd: root, stdio: "pipe" });
+  const apply = () =>
+    execFileSync("cmake", ["-DDEHERM_GIT=git", `-DDEHERM_PATCH=${patch}`, "-P", helper], {
+      cwd: root,
+      encoding: "utf8",
+      stdio: "pipe",
+    });
+
+  assert.throws(apply, /neither applicable nor already applied/u);
+  assert.equal(await readFile(path.join(root, "one.txt"), "utf8"), "after one\n");
+  assert.equal(await readFile(path.join(root, "two.txt"), "utf8"), "before two\n");
+});
+
 test("every pinned dependency patch is structurally valid before FetchContent runs", async () => {
   const patchRoot = path.join(repositoryRoot, "native/webtransport-cpp/patches");
   const patches = (await readdir(patchRoot)).filter((name) => name.endsWith(".patch")).sort();

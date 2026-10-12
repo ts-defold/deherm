@@ -3,27 +3,51 @@
 import { cp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { unzipSync } from "fflate";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 export async function stageMinimalWebTransportExample({
   exampleRoot = path.join(root, "examples/defold-webtransport-minimal"),
-  extensionRoot,
+  archive,
   outputRoot,
 }) {
-  if (!extensionRoot) throw new Error("extensionRoot is required");
+  if (!archive) throw new Error("archive is required");
   if (!outputRoot) throw new Error("outputRoot is required");
-  const sourceExtension = path.join(path.resolve(extensionRoot), "defold_webtransport");
+  const members = unzipSync(new Uint8Array(await readFile(path.resolve(archive))));
+  const names = Object.keys(members).sort();
+  const extensionPrefix = "defold_webtransport/";
+  const unexpected = names.filter((name) => name !== "game.project" && !name.startsWith(extensionPrefix));
+  if (unexpected.length) throw new Error(`archive has unexpected members: ${unexpected.join(", ")}`);
+  if (!members["game.project"]) throw new Error("archive has no root game.project");
+  for (const name of names) {
+    if (name.includes("\\") || name.startsWith("/") || name.split("/").includes("..")) {
+      throw new Error(`archive has unsafe member path: ${name}`);
+    }
+  }
+  const extensionMembers = names.filter((name) => name.startsWith(extensionPrefix));
+  if (!extensionMembers.includes(`${extensionPrefix}ext.manifest`)) {
+    throw new Error("archive has no defold_webtransport/ext.manifest");
+  }
   const destination = path.resolve(outputRoot);
   await rm(destination, { recursive: true, force: true });
   await mkdir(destination, { recursive: true });
   await cp(path.join(exampleRoot, "main"), path.join(destination, "main"), { recursive: true });
+  await cp(path.join(exampleRoot, "input"), path.join(destination, "input"), { recursive: true });
   const project = (await readFile(path.join(exampleRoot, "game.project"), "utf8"))
     .split(/\r?\n/u)
     .filter((line) => !/^dependencies#\d+\s*=/u.test(line))
     .join("\n");
   await writeFile(path.join(destination, "game.project"), project.endsWith("\n") ? project : `${project}\n`);
-  await cp(sourceExtension, path.join(destination, "defold_webtransport"), { recursive: true });
+  for (const member of extensionMembers) {
+    const relative = member.slice(extensionPrefix.length);
+    if (!relative || relative.split("/").some((segment) => !segment || segment === ".")) {
+      throw new Error(`archive has invalid extension member path: ${member}`);
+    }
+    const target = path.join(destination, "defold_webtransport", ...relative.split("/"));
+    await mkdir(path.dirname(target), { recursive: true });
+    await writeFile(target, members[member]);
+  }
   return destination;
 }
 
@@ -35,7 +59,7 @@ function argument(argv, name) {
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const destination = await stageMinimalWebTransportExample({
-    extensionRoot: argument(process.argv, "--extension"),
+    archive: argument(process.argv, "--archive"),
     outputRoot: argument(process.argv, "--output"),
   });
   console.log(destination);

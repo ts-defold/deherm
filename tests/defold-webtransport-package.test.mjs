@@ -247,5 +247,9 @@ test("release workflow keys the immutable asset to the extension version", async
   assert.doesNotMatch(workflow, /--clobber/u);
   assert.match(workflow, /git merge-base --is-ancestor "\$RELEASE_SHA" refs\/remotes\/origin\/main/u);
   assert.match(workflow, /tag_commit=.*git rev-parse/u);
-  assert.match(workflow, /--extension build\/defold-webtransport-dogfood/u);
+  assert.match(workflow, /--archive "build\/releases\/\$\{\{ steps\.release\.outputs\.asset \}\}"/u);
+  assert.doesNotMatch(workflow, /--extension build\/defold-webtransport-dogfood/u);
+  assert.match(workflow, /Resolve the published dependency as a clean Defold consumer/u);
+  assert.match(workflow, /--root examples\/defold-webtransport-minimal/u);
+  assert.match(workflow, /tests\/defold-webtransport-minimal-example\.test\.mjs/u);
 });

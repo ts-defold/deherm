@@ -81,10 +81,21 @@ tag-triggered run also requires the tag to point at that exact commit and match
 the extension's `VERSION`. It assembles all content-addressed native targets,
 runs the generic JSI and Static Hermes facades, executes the native
 fixed-storage core under ASan and UBSan, and packages the dependency ZIP. The
-workflow then stages the minimal Lua example from the package command's
-archive-derived dogfood tree and uses Bob to compile it for x86_64 Linux and
-HTML5 before attaching the ZIP. This verifies the release members are accepted
-by Bob through the ordinary Lua project layout.
+workflow then stages the minimal Lua example from the exact ZIP it will attach
+and uses Bob to compile it for x86_64 Linux and HTML5 before attaching the ZIP.
+The staging script accepts only the ZIP's root `game.project` and
+`defold_webtransport/` members, but deliberately takes the project files from
+the minimal example; the installed extension bytes therefore come exclusively
+from the exact release candidate. This verifies the archive is accepted by Bob
+through the ordinary Lua project layout.
+
+After attaching the immutable ZIP, the same release job runs Bob again from
+the unmodified minimal example, which declares the published release URL in
+`game.project` and has no vendored extension tree. This second native/HTML5
+build tests actual dependency resolution from GitHub; the pre-upload staged
+build alone cannot prove that URL works. A failed post-upload build leaves the
+workflow red even though the immutable asset has already been attached, and a
+retry must verify that the existing asset is byte-identical before proceeding.
 
 This compile gate is not a live echo smoke. The example's certificate hash is
 an editor-set script property with a deliberate placeholder, and this workflow
@@ -101,6 +112,58 @@ not prove either runtime exchange.
 
 The minimal example owns only a Lua client and Deno WebTransport echo server;
 it does not depend on déherm or any War Battles transport or protocol module.
+
+## 2026-10-12 release-candidate verification
+
+The published native release `defold-webtransport-native-23dffc55201c` was
+downloaded and verified against its immutable per-target metadata (10 targets,
+fingerprint `23dffc55201c53783e5c1aed9a35fd81e2ef62c7e5cfa9d4f2e89ec280fb8445`,
+ABI SHA-256 `f43dda649b3e44ff177666b62ac69a81ba420dc0764a0ed63b9de25e3546b8bc`).
+Packaging those artifacts with extension `VERSION` 0.1.0 produced
+`defold-webtransport-0.1.0.zip`, SHA-256
+`1d420b33ec47e638d5292f440ed1b0c5516e3c1f42794d0c04695fb8c6dabb62`.
+The exact ZIP was extracted through the release staging script into a fresh
+minimal project; its 138 extension members are archive bytes, and its project
+files are from the minimal example. This is a local candidate only: the
+`defold-webtransport-v0.1.0` release/tag does not exist yet, so the README's
+resolved dependency URL cannot currently succeed. No release was published
+as part of this verification.
+
+The native live echo and HTML5 browser echo remain explicit release gates, not
+passes. The previous host-prerequisite note was incorrect: this macOS arm64
+host has Java 25.0.4.1 at `/opt/homebrew/opt/openjdk@25/bin/java`, the Defold
+editor at `/Applications/Defold.app`, Bob at `build/tooling/bob.jar`, Deno, and
+Google Chrome 154.0.8037.99 at
+`/Applications/Google Chrome.app/Contents/MacOS/Google Chrome`. These tools
+are available for an arm64 macOS and browser attempt; their presence alone is
+not runtime evidence. Docker is installed, but its Colima daemon is inaccessible
+(`permission denied` on the Colima Docker socket), so the x86_64 Linux
+packaged-game/virtual-display route is unavailable here. The server requires
+Deno plus temporary OpenSSL-generated `cert.pem`/`key.pem`. A live test must
+stage the exact release ZIP, set the client certificate SHA-256 property,
+launch the Deno server, and observe both exact Lua echo lines before a bounded
+timeout. HTML5 also requires serving the package from a secure origin and
+observing the native browser WebTransport exchange. Record each of these as
+separate outcomes; Bob compilation, tool availability, and Deno typechecking
+are not live echo evidence. The 0.1.0 dependency URL remains unresolved until
+the independently versioned release is published, so local tests using the
+staged ZIP do not prove dependency-URL resolution.
+
+The corrected smoke attempt confirmed those are execution constraints rather
+than missing host tools. `deno task check` passes with Deno 2.9.7, but starting
+the loopback Deno echo server in this sandbox fails at `new QuicEndpoint(...)`
+with `PermissionDenied: Operation not permitted (os error 1)`. Java, Bob, and
+Chrome are installed, but the first Bob attempt also exposed that the minimal
+project was missing its default `/input/game.input_binding` resource. The
+example and ZIP staging now include that resource, and the staging test checks
+it resolves. Retrying Bob after adding the standard binding to the temporary
+staged project reached the native engine-build step and then required
+`build.defold.com`; the sandbox denied that request because Bob uploads the
+staged project and extension contents to the public build service. It was not
+retried through another route. Therefore
+neither the native Lua echo nor the HTML5 secure-origin browser echo was
+executed; Chrome is present, but the packaged HTML5 bundle cannot be produced
+within the approved boundary. These gates remain explicit and unpassed.
 
 The browser backend treats `datagrams.createWritable()` as the current
 WebTransport contract and retains `datagrams.writable` as an explicit legacy
