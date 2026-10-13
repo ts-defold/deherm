@@ -36,7 +36,4 @@
 /main/hud.gui.ts
 /main/snake.script.ts
 /src/snake.ts
-/deherm/app.dehermc.hbc
-/deherm/app.dehermc.map
-/deherm/app.release.dehermc
 # END deherm managed Bob exclusions

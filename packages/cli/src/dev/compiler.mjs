@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { mkdir, mkdtemp, readFile, readdir, rename, rm, stat, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, readdir, realpath, rename, rm, stat, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -72,7 +72,10 @@ async function loadMappedJavaScript(outputRoot) {
     if (sourceMap.version !== 3 || sourceMap.sources?.length !== 1) {
       throw new Error(`dehermc emitted unsupported source map ${mapFile}: expected one version-3 source`);
     }
-    const sourceFile = path.resolve(resolveMapSource(mapFile, sourceMap, sourceMap.sources[0]));
+    // The OS can spell the same file differently on each side of this seam
+    // (notably /var versus /private/var on macOS). A lexical key silently
+    // misses in that case and esbuild compiles the *untransformed* source.
+    const sourceFile = await realpath(resolveMapSource(mapFile, sourceMap, sourceMap.sources[0]));
     sourceMap.sourceRoot = "";
     sourceMap.sources = [path.basename(sourceFile)];
     const javaScriptFile = mapFile.slice(0, -4);
@@ -143,14 +146,28 @@ export async function createIncrementalCompiler(options) {
     throw new Error("The déherm transform compiler requires a generated tsconfig");
   }
   const transformOutputRoot = useTtsc ? await mkdtemp(path.join(tmpdir(), "deherm-mapped-transform-")) : null;
+  const projectRoot = tsconfig ? path.dirname(tsconfig) : null;
+  const realProjectRoot = projectRoot ? await realpath(projectRoot) : null;
   let transformedSources = new Map();
   let transformInputFiles = [];
   const transformedSourcePlugin = {
     name: "deherm-precompiled-transform",
     setup(build) {
-      build.onLoad({ filter: /\.[cm]?tsx?$/ }, (args) => {
-        const source = transformedSources.get(path.resolve(args.path));
-        if (source === undefined) return null;
+      build.onLoad({ filter: /\.[cm]?tsx?$/ }, async (args) => {
+        const resolved = await realpath(args.path);
+        const source = transformedSources.get(resolved);
+        if (source === undefined) {
+          // Never let an authored file silently bypass the TypeScript transform.
+          // That turns a required bigint hash into a string while leaving a
+          // syntactically valid bundle, which is worse than a build error.
+          if (
+            resolved.startsWith(`${realProjectRoot}${path.sep}`) &&
+            !resolved.includes(`${path.sep}node_modules${path.sep}`)
+          ) {
+            return { errors: [{ text: `dehermc did not emit transformed JavaScript for ${resolved}` }] };
+          }
+          return null;
+        }
         return {
           contents: source,
           loader: "js",
@@ -161,7 +178,6 @@ export async function createIncrementalCompiler(options) {
   };
   const refreshTransforms = async () => {
     if (!useTtsc) return;
-    const projectRoot = path.dirname(tsconfig);
     const config = await loadDehermPluginConfig(tsconfig);
     const envelope = await transformProject({
       tsconfig,

@@ -15,6 +15,8 @@ export default defineComponent({
   init(self: HudState): void {
     self.score = gui.getNode("score");
     self.hint = gui.getNode("hint");
+    // Show the attract instruction as soon as this GUI attaches.
+    gui.setText(self.hint, "DEMO PLAYING  /  PRESS ARROWS OR WASD TO START");
   },
   onMessage(self: HudState, messageId: DefoldHash, message: SnakeStateMessage): void {
     if (messageId !== SNAKE_STATE) return;

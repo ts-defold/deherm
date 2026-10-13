@@ -105,6 +105,22 @@ unpublished npm package. The Action's tag is not the first release gate.
   even an independent raw-Lua input probe, so manual player-input QA is still
   outstanding. This is visual/runtime evidence for attract movement, not a
   claim that end-user keyboard input was observed.
+- The follow-up on commit `b30e1613` exposed a genuine package-to-bundler
+  gap: `dehermc` lowered typed Defold hashes but esbuild missed the transformed
+  modules when macOS spelled the same temporary path as `/var` and
+  `/private/var`. The resulting native game moved sprites but its hash-gated
+  HUD never updated. The compiler now uses real paths on both sides of that
+  lookup. The independent installed-tarball proof asserts the *final bundle*
+  contains lowered hashes, then invokes the installed CLI's `bundle` command.
+  Repacked archive SHA-256
+  `9f9b97a98493d4444a8069ca832aa61a701657d1aec90fc5bea92eaeafd7a280`
+  generated, type-checked, compiled, verified, and Bob-bundled `wasm-web`
+  and `arm64-macos` release through local Extender. Both bundled games visibly
+  ran attract mode and advanced the HUD score. Synthetic keyboard input still
+  did not prove the first-direction handoff to player control. A regular
+  symlinked-project bundle test now protects the transform seam. The
+  release-candidate workflow requires installed-package browser and Linux
+  Bob bundles; that edited workflow itself has not yet run in CI.
 - CI run `38300168673` passed the caller-policy plan and hosted browser/Linux
   War Battles bundles. Local-runner and external-Extender modes still need
   their own consumer evidence; authored Static Hermes application mode remains

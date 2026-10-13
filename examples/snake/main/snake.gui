@@ -28,7 +28,7 @@ nodes {
   size { x: 900.0 y: 34.0 }
   color { x: 0.55 y: 0.69 z: 0.75 w: 1.0 }
   type: TYPE_TEXT
-  text: "ARROWS / WASD TO TURN    SPACE TO PAUSE    R TO RESTART"
+  text: "DEMO PLAYING  /  PRESS ARROWS OR WASD TO START"
   font: "default"
   id: "hint"
   pivot: PIVOT_CENTER

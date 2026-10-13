@@ -39,7 +39,12 @@ jobs:
       - name: Pack and inventory the candidate without a hosted build
         run: node scripts/prove-npm-consumer.mjs --pack-only
       - name: Compile a real Snake game from the installed npm tarball
-        run: node scripts/prove-npm-snake.mjs build/npm-release-candidate/ts-defold-deherm-0.1.0.tgz
+        run: >-
+          node scripts/prove-npm-snake.mjs
+          build/npm-release-candidate/ts-defold-deherm-0.1.0.tgz
+          build/npm-snake-proof.json
+          --bob-target=wasm-web
+          --bob-target=x86_64-linux
       - name: Prove tarball installation and Defold browser/native bundles
         run: node scripts/prove-npm-consumer.mjs
       - uses: actions/upload-artifact@v6

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
-import { copyFile, link, mkdir, mkdtemp, readFile, rm, stat, writeFile } from "node:fs/promises";
+import { copyFile, link, mkdir, mkdtemp, readFile, rm, stat, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -17,6 +17,7 @@ import {
   requireHostTool,
 } from "../packages/cli/src/host-compilers.mjs";
 import { resolveDefoldSurface } from "../packages/cli/src/defold-surface.mjs";
+import { createIncrementalCompiler } from "../packages/cli/src/dev/compiler.mjs";
 import {
   assertProjectNativeArtifact,
   ensureProjectNativeArtifact,
@@ -352,6 +353,42 @@ test("the transform compiler is driven by digest, or fails closed naming itself"
   // dmHashBufferNoReverse64("up"). If the transforms had not run, this would
   // still read `hashLiteral("#up")` and the compile would have succeeded.
   assert.match(entry[1], /export const up: DefoldHash<"up"> = 0x80356add32e752e9n;/);
+});
+
+test("the final bundle consumes transformed files through a symlinked project path", async (t) => {
+  const identity = await transformCompilerIdentity().catch(() => null);
+  if (!identity) {
+    t.skip("dehermc is not staged on this host");
+    return;
+  }
+  const temporary = await mkdtemp(path.join(tmpdir(), "deherm-bundle-alias-"));
+  t.after(() => rm(temporary, { recursive: true, force: true }));
+  const alias = path.join(temporary, "linked-repo");
+  try {
+    await symlink(repositoryRoot, alias, "dir");
+  } catch (error) {
+    if (error?.code === "EPERM" || error?.code === "EACCES") {
+      t.skip("this runner does not grant directory-symlink creation");
+      return;
+    }
+    throw error;
+  }
+  const compiler = await createIncrementalCompiler({
+    entryPoint: path.join(alias, "tests/fixtures/hash-literal/entry.ts"),
+    tsconfig: path.join(alias, "tests/fixtures/hash-literal/tsconfig.json"),
+    outputFile: path.join(temporary, "app.js"),
+    useTtsc: true,
+    sourcemap: false,
+    captureDiagnostics: false,
+  });
+  try {
+    await compiler.rebuild();
+    const bundle = await readFile(path.join(temporary, "app.js"), "utf8");
+    assert.match(bundle, /fire\s*=\s*0xfde875820cf4ae70n/u);
+    assert.doesNotMatch(bundle, /fire\s*=\s*"#fire"/u);
+  } finally {
+    await compiler.dispose();
+  }
 });
 
 test("the artifact report says what this package can bundle, per target", async () => {

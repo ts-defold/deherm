@@ -15,6 +15,15 @@ const archive = path.resolve(
   process.argv[2] ?? path.join(repositoryRoot, "build", "npm-release-candidate", "ts-defold-deherm-0.1.0.tgz"),
 );
 const output = path.resolve(process.argv[3] ?? path.join(repositoryRoot, "build", "npm-snake-proof.json"));
+const bobTargets = process.argv
+  .slice(4)
+  .filter((value) => value.startsWith("--bob-target="))
+  .map((value) => value.slice(13));
+const buildServer = process.argv
+  .slice(4)
+  .find((value) => value.startsWith("--build-server="))
+  ?.slice(15);
+const keepWorkdir = process.argv.includes("--keep-workdir");
 const example = path.join(repositoryRoot, "examples", "snake");
 const authoredFiles = [
   ".defignore",
@@ -127,6 +136,17 @@ try {
   }
   const resource = await stat(path.join(game, "deherm", "app.dehermc"));
   assert.ok(resource.size > 0, "Snake produced an empty runtime bundle");
+  const bundledSource = await readFile(path.join(game, "deherm", "app.dehermc"), "utf8");
+  assert.match(
+    bundledSource,
+    /SNAKE_STATE\s*=\s*0x93874e5c0f64bc27n/u,
+    "the installed compiler lost contextual DefoldHash lowering in the final bundle",
+  );
+  assert.match(
+    bundledSource,
+    /UP\s*=\s*0x80356add32e752e9n/u,
+    "the installed compiler left input hashes as strings in the final bundle",
+  );
   const native = JSON.parse(
     run(
       process.execPath,
@@ -151,6 +171,30 @@ try {
   );
   assert.ok(verified.checkedFiles > 0, "Snake generated SDK verification checked no files");
 
+  const bundles = [];
+  for (const target of bobTargets) {
+    const args = [
+      cli,
+      "bundle",
+      "--project",
+      game,
+      "--entry",
+      "main/snake.script.ts",
+      "--target",
+      target,
+      "--variant",
+      "release",
+      "--application-mode",
+      "dynamic",
+      "--json",
+    ];
+    if (buildServer) args.push("--build-server", buildServer);
+    const bundled = JSON.parse(run(process.execPath, args, { cwd: game, env: environment }));
+    assert.equal(bundled.target, target);
+    assert.ok((await stat(bundled.bundleOutput)).isDirectory(), `${target} produced no Defold bundle`);
+    bundles.push({ target, representation: bundled.representation, bundleOutput: bundled.bundleOutput });
+  }
+
   const report = {
     schemaVersion: 1,
     kind: "deherm.npm-snake-consumer-proof",
@@ -161,6 +205,7 @@ try {
     componentCount: generated.componentCount,
     bundleBytes: resource.size,
     nativeBytecodeBytes: native.compilation.outputBytes,
+    bundles,
     stages: [
       "tarball-installed",
       "rules-tested",
@@ -171,12 +216,17 @@ try {
       "native-hermes-bytecode-compiled",
       "browser-javascript-projected",
       "generated-verified",
+      ...(bundles.length > 0 ? ["bob-bundled"] : []),
     ],
-    limitation: "Compiler and resource proof only; no Defold engine or Bob runtime was executed.",
+    limitation:
+      bundles.length === 0
+        ? "Compiler and resource proof only; no Defold engine or Bob runtime was executed."
+        : "Bob bundled the installed-package game; packaged-game runtime and player input remain separate checks.",
   };
+  if (keepWorkdir) report.workdir = root;
   await mkdir(path.dirname(output), { recursive: true });
   await writeFile(output, `${JSON.stringify(report, null, 2)}\n`);
   console.log(JSON.stringify(report, null, 2));
 } finally {
-  await rm(root, { recursive: true, force: true });
+  if (!keepWorkdir) await rm(root, { recursive: true, force: true });
 }

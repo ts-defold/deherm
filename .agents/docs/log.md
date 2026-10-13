@@ -1,5 +1,33 @@
 # Defold Hermes knowledge log
 
+## 2026-10-13 - Close the Snake npm-package proof gap
+
+The first Snake attract-mode build used the workspace CLI. The same source
+was subsequently copied into a temporary project outside the monorepo and
+installed against the exact `npm pack` archive; no package symlink or
+contributor cache was used. The isolated proof started with an empty déherm
+cache and passed rule tests, policy resolution, generation, release typecheck,
+TypeScript compile, Linux Hermes bytecode projection, browser JavaScript
+projection, and generated-state verification. The proof now optionally calls
+the installed package's one-shot `bundle`; a local run completed both
+`wasm-web` and `arm64-macos` release Bob bundles through local Extender.
+The first native release executable moved sprites but left the HUD score at
+zero. Tracing the tarball build found that `dehermc` correctly lowered
+`const SNAKE_STATE: DefoldHash = "#snake_state"` to bigint, but the esbuild
+loader looked up transformed sources by a lexical path. macOS resolved
+`/var` to `/private/var` on the other side, silently compiling untransformed
+TypeScript instead. Both lookup sides now use real paths. A symlinked-project
+bundle regression and the installed-tarball proof assert actual bigint values
+in the final bundle, not just in the intermediate transform envelope.
+The repaired tarball is SHA-256
+`9f9b97a98493d4444a8069ca832aa61a701657d1aec90fc5bea92eaeafd7a280`.
+It Bob-bundled `wasm-web` and `arm64-macos` release through local Extender;
+the installed-package native and browser games visibly ran attract mode with
+the HUD score advancing. Synthetic key injection still did not prove player
+control. The release-candidate CI step now requests browser and Linux Snake
+bundles from this isolated installed-package proof; CI has not yet run that
+edited step.
+
 ## 2026-10-13 - Snake attract mode and visual runtime check
 
 Snake no longer starts with an automatic straight-line death or an idle black
