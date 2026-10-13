@@ -23,8 +23,11 @@ The repaired tarball is SHA-256
 `9f9b97a98493d4444a8069ca832aa61a701657d1aec90fc5bea92eaeafd7a280`.
 It Bob-bundled `wasm-web` and `arm64-macos` release through local Extender;
 the installed-package native and browser games visibly ran attract mode with
-the HUD score advancing. Synthetic key injection still did not prove player
-control. The release-candidate CI step now requests browser and Linux Snake
+the HUD score advancing. In the packaged browser game, pressing `W` transitioned
+from attract to player mode with a fresh score, and pressing `R` after game over
+returned to the ready state; this is live browser input evidence. Native-player
+keyboard input remains unverified because synthetic events did not reach even a
+raw-Lua probe. The release-candidate CI step now requests browser and Linux Snake
 bundles from this isolated installed-package proof; CI has not yet run that
 edited step.
 

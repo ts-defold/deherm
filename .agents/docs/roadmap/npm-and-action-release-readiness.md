@@ -116,8 +116,9 @@ unpublished npm package. The Action's tag is not the first release gate.
   `9f9b97a98493d4444a8069ca832aa61a701657d1aec90fc5bea92eaeafd7a280`
   generated, type-checked, compiled, verified, and Bob-bundled `wasm-web`
   and `arm64-macos` release through local Extender. Both bundled games visibly
-  ran attract mode and advanced the HUD score. Synthetic keyboard input still
-  did not prove the first-direction handoff to player control. A regular
+  ran attract mode and advanced the HUD score. In the packaged browser build,
+  `W` transitioned attract mode to a fresh player match and `R` returned from
+  game over to ready; native-player keyboard input remains unverified. A regular
   symlinked-project bundle test now protects the transform seam. The
   release-candidate workflow requires installed-package browser and Linux
   Bob bundles; that edited workflow itself has not yet run in CI.
