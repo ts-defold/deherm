@@ -10,6 +10,7 @@ import {
   buildGate,
   hostFamilyExpectedDigests,
   staticApplicationActivationObserved,
+  verifyLockedApplicationSources,
 } from "../scripts/check-war-battles-static-hermes-build-gate.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
@@ -89,6 +90,11 @@ test("root and example scripts name the typed-native bridge gate explicitly", as
     /check:war-battles-static-hermes-typed-native-bridge/,
   );
   assert.match(examplePackage.scripts.check, /check:typed-native-bridge/);
+});
+
+test("project lock application sources match the freshly generated project", async () => {
+  const lock = JSON.parse(await readFile(path.join(warBattlesProject, "deherm.lock"), "utf8"));
+  await verifyLockedApplicationSources(warBattlesProject, lock.buildArtifacts.artifacts["deherm/app.dehermc"]);
 });
 
 test("War Battles Static Hermes gate derives a closed release route set", async () => {

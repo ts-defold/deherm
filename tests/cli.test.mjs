@@ -1609,6 +1609,7 @@ test("custom generated roots still exclude the fixed Static Hermes staging lane"
   const inventory = await inspectDefoldProject({ project });
   await writeGeneratedProject(inventory, "generated-sdk", { force: true });
   const bundleConfig = JSON.parse(await readFile(path.join(project, "tsconfig.deherm.bundle.json"), "utf8"));
+  assert.ok(bundleConfig.include.includes(".deherm/generated/components/registry.ts"));
   assert.ok(bundleConfig.exclude.includes("generated-sdk/static-hermes/**/*.ts"));
   assert.ok(bundleConfig.exclude.includes(".deherm/build/generated/typed-native/**/*.ts"));
 });
@@ -2003,6 +2004,7 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   assert.deepEqual(guiConfig.compilerOptions.paths["@deherm/project"], ["./.deherm/sdk/contexts/gui.ts"]);
   const bundleConfig = JSON.parse(await readFile(path.join(project, "tsconfig.deherm.bundle.json"), "utf8"));
   assert.deepEqual(bundleConfig.compilerOptions.paths["@deherm/project"], ["./.deherm/sdk/index.ts"]);
+  assert.deepEqual(bundleConfig.include, ["**/*.ts", ".deherm/**/*.ts"]);
   assert.deepEqual(bundleConfig.exclude, [
     "node_modules/**",
     ".internal/**",

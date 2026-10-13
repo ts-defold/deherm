@@ -672,6 +672,12 @@ without a source-path allowlist: any change may affect the packaged CLI or its
 inputs, and a manually maintained path list silently loses coverage as files
 move. The full Bob target matrix remains scheduled or explicitly dispatched
 after artifact publication, so ordinary pushes do not load Defold's Extender.
+Release-readiness keeps its portable contract checks on pull requests, while
+the aggregate Linux suite runs on `main` pushes or explicit dispatch. A cheap
+post-generation lock/source preflight runs before aggregate bootstrap; it
+detects a stale Static Hermes application input immediately rather than ten
+minutes into the full suite. Aggregate failure remains red and must be fixed
+before tagging a release; skipping it on a PR is not a claim of full proof.
 `application-mode=dynamic` is the supported default. The one-shot command
 rejects authored static-application mode until the packaged compiler emits
 the authored Static Hermes unit, rather than silently publishing a dynamic

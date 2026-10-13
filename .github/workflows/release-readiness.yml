@@ -53,6 +53,9 @@ jobs:
         env:
           DEHERM_WEBTRANSPORT_ARTIFACT_TARGET: web
         run: node bin/deherm.mjs generate --project examples/war-battles-online/defold --force
+      - name: Preflight locked Static Hermes application sources
+        if: runner.os == 'Linux'
+        run: node --test --test-name-pattern 'project lock application sources match' tests/war-battles-static-hermes-build-gate.test.mjs
       - name: Cache aggregate upstream inputs
         if: runner.os == 'Linux'
         uses: actions/cache@v5
@@ -66,7 +69,7 @@ jobs:
         if: runner.os == 'Linux'
         run: ./scripts/bootstrap-upstreams.sh
       - name: Aggregate test gate
-        if: runner.os == 'Linux'
+        if: runner.os == 'Linux' && github.event_name != 'pull_request'
         run: node scripts/run-release-command.mjs pnpm test
       - name: Portable development tooling
         if: runner.os != 'Linux'

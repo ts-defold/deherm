@@ -53,7 +53,7 @@ function blocker(code, message, details = {}) {
   return { code, message, ...details };
 }
 
-async function verifyLockedApplicationSources(project, lockedApplication) {
+export async function verifyLockedApplicationSources(project, lockedApplication) {
   const files = lockedApplication?.sources?.files;
   if (!files || typeof files !== "object" || Array.isArray(files)) {
     throw new Error("project lock application record has no source digest table");

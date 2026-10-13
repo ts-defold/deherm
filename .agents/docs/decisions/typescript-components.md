@@ -143,6 +143,13 @@ source-relative path, source hash, schema fingerprint, and no user-owned
 regions. Generation refuses to overwrite a sibling that lacks the marker.
 Check mode fails on missing or stale proxies.
 
+The bundle TypeScript project must include the fixed
+`.deherm/generated/components/registry.ts` even when the SDK is generated into
+a custom root. Its default `.deherm/**/*.ts` include already covers that
+registry; generation does not add a redundant include, because changing a
+generated tsconfig's bytes invalidates a locked Static Hermes application
+source even when the selected files and emitted JavaScript are unchanged.
+
 VS Code owns source editing, TypeScript diagnostics, hovers, transforms, and
 debugging. Without a Defold editor plugin, the Defold editor indexes the
 generated `.script`, not the `.script.ts` source. A future editor plugin may
