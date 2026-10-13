@@ -1450,7 +1450,10 @@ function bundleProjectConfig(outputDirectory, compilerInputs = []) {
         "@deherm/project": [`./${generated}/sdk/index.ts`],
       },
     },
-    include: ["**/*.ts", `${generated}/**/*.ts`],
+    // TypeScript's implicit ** glob does not include dot-directories. The
+    // component registry always lives below .deherm, even when --out-dir
+    // moves the SDK elsewhere, and the bundle imports it unconditionally.
+    include: ["**/*.ts", `${generated}/**/*.ts`, ".deherm/generated/components/registry.ts"],
     exclude: [...ignoredAuthoredGlobs, ...generatedCompilerOnlyGlobs(generated), ...compilerInputs],
   };
 }

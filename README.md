@@ -79,6 +79,18 @@ application, watches source and assets, and coordinates launch and hot reload.
 The explicit `deherm generate` command is always available for CI and manual
 workflows.
 
+New projects track Defold's `stable` channel by default while recording the
+exact accepted engine SHA in `game.project`. `deherm dev` and `deherm generate`
+check for channel changes and offer an update in an interactive terminal;
+headless builds report it but keep using the accepted SHA. To check without
+changing files, run `pnpm exec deherm update --check`. To accept and regenerate
+in CI, run `pnpm exec deherm update --yes`. Use `--channel beta` or `--channel
+alpha` to opt into another channel. If you use an installed Editor, pass
+`--editor /path/to/Defold.app` (or set `DEHERM_EDITOR`) so déherm can read its
+engine revision without opening it. If that Editor differs from the accepted
+SHA, déherm asks before syncing and will not silently build against mismatched
+bindings. An independently supplied `--bob /path/to/bob.jar` works the same way.
+
 The package is not yet published to npm. Until the first preview release, use
 the [source checkout](#working-on-déherm) and the workspace examples below.
 

@@ -21,14 +21,14 @@ function projectTitle(value) {
   return title || "My déherm Game";
 }
 
-function templateFiles({ name, packageVersion, defoldRevision }) {
+function templateFiles({ name, packageVersion, defoldRevision, channel }) {
   const title = projectTitle(name);
   const packageName = projectSlug(title);
   const dependency = packageVersion === "0.0.0" ? "latest" : `^${packageVersion}`;
   return new Map([
     [
       "game.project",
-      `[project]\ntitle = ${title}\nversion = 0.1.0\ncustom_resources = /deherm\n\n[bootstrap]\nmain_collection = /main/main.collectionc\n\n[display]\nwidth = 960\nheight = 540\nhigh_dpi = 1\n\n[script]\nshared_state = 1\n\n[library]\ninclude_dirs = defold_hermes\n\n[defold_hermes]\napp = /deherm/app.dehermc\ndefold_sdk = ${defoldRevision}\n`,
+      `[project]\ntitle = ${title}\nversion = 0.1.0\ncustom_resources = /deherm\n\n[bootstrap]\nmain_collection = /main/main.collectionc\n\n[display]\nwidth = 960\nheight = 540\nhigh_dpi = 1\n\n[script]\nshared_state = 1\n\n[library]\ninclude_dirs = defold_hermes\n\n[defold_hermes]\napp = /deherm/app.dehermc\n${channel ? `channel = ${channel}\n` : ""}defold_sdk = ${defoldRevision}\n`,
     ],
     ["main/main.collection", `name: "main"\ninstances {\n  id: "controller"\n  prototype: "/main/controller.go"\n}\n`],
     ["main/controller.go", `components {\n  id: "script"\n  component: "/src/main.script"\n}\n`],
@@ -147,19 +147,20 @@ export async function createDefoldProject(options = {}) {
     throw new Error(`Refusing to scaffold into non-empty directory ${target}`);
   }
   const name = projectTitle(options.name ?? path.basename(target));
+  const channel = options.defoldRevision ? null : (options.channel ?? "stable");
   const defoldRevision = options.defoldRevision
     ? normalizeDefoldRevision(options.defoldRevision, "createDefoldProject defoldRevision")
     : (
-        await resolveDefoldChannelRevision(options.channel ?? "stable", {
+        await resolveDefoldChannelRevision(channel, {
           fetchImpl: options.fetchImpl,
           locator: options.policyLocator,
         })
       ).revision;
-  const files = templateFiles({ name, packageVersion: options.packageVersion ?? "0.0.0", defoldRevision });
+  const files = templateFiles({ name, packageVersion: options.packageVersion ?? "0.0.0", defoldRevision, channel });
   for (const [relative, source] of files) {
     const output = path.join(target, relative);
     await mkdir(path.dirname(output), { recursive: true });
     await writeFile(output, source, { flag: "wx" });
   }
-  return { projectRoot: target, name, defoldRevision, files: [...files.keys()] };
+  return { projectRoot: target, name, defoldRevision, channel, files: [...files.keys()] };
 }

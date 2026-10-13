@@ -336,7 +336,7 @@ test("one-shot dev session bundles mixed component contexts through the unfilter
       {
         extends: "./tsconfig.deherm.base.json",
         compilerOptions: { paths: { "@deherm/project": ["./.deherm/sdk/index.ts"] } },
-        include: ["**/*.ts"],
+        include: ["**/*.ts", ".deherm/generated/components/registry.ts"],
       },
       null,
       2,

@@ -179,3 +179,33 @@ Three properties that are load-bearing rather than incidental:
 anything, so it states the revision it can actually generate for - a declaration
 the project makes and that Bob or a real build then checks, not a default
 applied silently at generation time.
+
+# Channel updates and consent
+
+For a channel-created project, the scaffold also records
+`[defold_hermes] channel = stable|beta|alpha`. The `defold_sdk` SHA is the last
+**accepted** revision, not a promise that the channel can never move. `deherm
+update --check` compares it with Defold's channel `info.json` without editing
+the project. `deherm update` asks before changing it; `--yes` is the explicit
+non-interactive acceptance. Accepted updates regenerate the project surface.
+Interactive `dev` and `generate` offer the same choice on startup; headless
+commands report the available update and keep the accepted SHA. Offline work
+does not query the channel and remains reproducible from the accepted lock.
+
+A supplied `--bob`/`DEHERM_BOB` jar is interrogated with `--version`; supplied
+`DEHERM_DEFOLD_ENGINE_SHA1` is an independent live observation. `--editor
+<installed-app-or-config>` or `DEHERM_EDITOR` reads the prebuilt Editor's on-disk
+`[build] engine_sha1` without launching it; it conflicts rather than guessing
+if another live tool reports a different SHA. When the channel has advanced
+but that active tool has not, the channel is reported as
+ahead and déherm does **not** select an engine different from the tool that
+will build the project. This check never requires opening the Editor. The
+project pin is changed only after consent, so a later generation does not
+silently reinterpret old TypeScript against a new SDK. Projects made with an
+explicit `--defold-sdk` have no implicit moving channel; they can opt in with
+`deherm update --channel <name>`.
+An installed Editor can be older than the accepted project SHA, so an
+Editor/Bob mismatch is labeled a synchronization choice, not automatically an
+upgrade. Explicitly supplied live evidence that cannot be read fails closed;
+a temporarily unavailable channel check only warns and leaves the accepted
+revision unchanged.

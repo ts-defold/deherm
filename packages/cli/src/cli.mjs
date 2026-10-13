@@ -30,6 +30,7 @@ const help = `deherm <command> [options]
 Commands:
   (no command) Launch the interactive project/dev TUI
   create       Scaffold a Defold + TypeScript project and generate its SDK
+  update       Check the project's Defold channel/Bob and optionally adopt a new engine SHA
   doctor       Report host compilers, per-target Hermes archives, the project, and its extension APIs
   policy       Fetch, authenticate, and cache the Pages policy for the project's Defold revision
   cache        Report or reclaim old immutable policy surfaces (dry-run by default)
@@ -60,7 +61,10 @@ Options:
   --project <path>   Defold project directory or game.project
   --out-dir <path>   Generated directory relative to the project (default: .deherm)
   --defold-sdk <sha> Exact Defold engine SHA to generate for. Always wins over detection.
+  --channel <name>   Track stable, beta, or alpha for create/update
+  --yes              Accept an available Defold update without an interactive prompt
   --bob <path>       Bob jar interrogated for the project's engine SHA when nothing else names it
+  --editor <path>    Read an installed Defold Editor's engine SHA without opening it (or DEHERM_EDITOR)
   --output <path>    Conformance harness output directory
   --usage <path>     dmSDK usage (default: project .deherm/generated/dmsdk-usage.json)
   --catalog <path>   Resolved dmSDK policy catalog (defaults to project .deherm/ir)
@@ -150,7 +154,8 @@ export function parseArguments(argv) {
   while (args.length) {
     const value = args.shift();
     if (value === "--json") options.json = true;
-    else if (value === "--check" && options.command === "materialize-dmsdk") options.check = true;
+    else if (value === "--check" && ["materialize-dmsdk", "update"].includes(options.command)) options.check = true;
+    else if (value === "--yes" && options.command === "update") options.yes = true;
     else if (value === "--strict") options.strict = true;
     else if (value === "--directory" && options.command === "module") options.refreshDirectory = true;
     else if (value === "--release") options.release = true;
@@ -190,7 +195,9 @@ export function parseArguments(argv) {
     else if (value === "--name") options.name = args.shift();
     else if (value === "--out-dir") options.outDir = args.shift();
     else if (value === "--defold-sdk") options.defoldSdk = args.shift();
+    else if (value === "--channel") options.channel = args.shift();
     else if (value === "--bob") options.bob = args.shift();
+    else if (value === "--editor") options.editor = args.shift();
     else if (value === "--output") options.output = args.shift();
     else if (value === "--usage") options.usage = args.shift();
     else if (value === "--catalog") options.catalog = args.shift();
@@ -296,6 +303,7 @@ async function scaffoldProject(options) {
     name: options.name,
     packageVersion,
     defoldRevision: options.defoldSdk,
+    channel: options.channel,
   });
   const inventory = await inspectDefoldProject({ project: scaffold.projectRoot });
   const generated = await writeGeneratedProject(inventory, options.outDir, {
@@ -320,6 +328,82 @@ async function scaffoldProject(options) {
     nativeExtensionRoot: nativeExtension.root,
     componentCount: components.manifest.components.length,
   };
+}
+
+async function offerDefoldUpdate(projectRoot, options = {}) {
+  if (process.env.DEHERM_OFFLINE === "1") {
+    if (options.command === "update") throw new Error("Cannot check a moving Defold channel while DEHERM_OFFLINE=1");
+    return null;
+  }
+  if (options.defoldSdk) return null;
+  const { checkDefoldUpdate, acceptDefoldUpdate, formatDefoldUpdate } = await import("./defold-update.mjs");
+  let update;
+  try {
+    update = await checkDefoldUpdate({
+      projectRoot,
+      bob: options.bob,
+      editor: options.editor,
+      channel: options.channel,
+    });
+  } catch (error) {
+    if (
+      options.command === "update" ||
+      options.editor ||
+      options.bob ||
+      process.env.DEHERM_EDITOR ||
+      process.env.DEHERM_BOB ||
+      process.env.DEHERM_DEFOLD_ENGINE_SHA1
+    )
+      throw error;
+    console.error(`Defold update check unavailable: ${error.message}`);
+    return null;
+  }
+  if (options.command === "update" || update.updateAvailable || update.channelAheadOfTool) {
+    console.error(formatDefoldUpdate(update));
+  }
+  if ((!update.updateAvailable && !update.needsChannelDeclaration) || options.check) return update;
+  if (!options.yes && (!process.stdin.isTTY || options.json)) {
+    console.error("Run 'deherm update --yes' to adopt this revision, or 'deherm update' in a terminal to choose.");
+    if (update.live && options.command !== "update") {
+      throw new Error(
+        "The active Editor/Bob uses a different Defold revision; refusing to generate mismatched bindings",
+      );
+    }
+    return update;
+  }
+  let accepted = options.yes === true;
+  if (!accepted) {
+    const prompt = createInterface({ input: process.stdin, output: process.stderr });
+    try {
+      accepted = /^y(?:es)?$/iu.test(
+        (
+          await prompt.question(
+            update.changeKind === "active-tool-sync"
+              ? "Sync this project to the active Editor/Bob revision and regenerate its Defold SDK? [y/N] "
+              : "Update this project and regenerate its Defold SDK? [y/N] ",
+          )
+        ).trim(),
+      );
+    } finally {
+      prompt.close();
+    }
+  }
+  if (!accepted) {
+    if (update.live && update.updateAvailable && options.command !== "update") {
+      throw new Error(
+        "The active Editor/Bob uses a different Defold revision. Accept the update or use a matching tool.",
+      );
+    }
+    return update;
+  }
+  // A channel may move before its policy is published. Authenticate the new
+  // surface before changing the project's accepted revision, so an early OTA
+  // notification cannot strand the project with no usable bindings.
+  const { readPolicyLocator, resolvePublishedPolicy } = await import("./policy-client.mjs");
+  await resolvePublishedPolicy(update.candidate, { index: await readPolicyLocator() });
+  await acceptDefoldUpdate(update);
+  console.error(`Accepted Defold ${update.candidate}; generating the matching SDK.`);
+  return { ...update, accepted: true };
 }
 
 export async function installConfiguredProjectWebTransport(projectRoot, options = {}) {
@@ -600,6 +684,23 @@ export async function run(argv = process.argv.slice(2)) {
     }
     return 0;
   }
+  if (options.command === "update") {
+    const projectRoot = await findProjectRoot(process.cwd(), options.project);
+    const result = await offerDefoldUpdate(projectRoot, options);
+    if (result?.accepted) {
+      return await run([
+        "generate",
+        "--project",
+        projectRoot,
+        ...(options.editor ? ["--editor", options.editor] : []),
+        ...(options.bob ? ["--bob", options.bob] : []),
+        ...(options.outDir ? ["--out-dir", options.outDir] : []),
+        ...(options.json ? ["--json"] : []),
+      ]);
+    }
+    if (options.json) console.log(JSON.stringify(result, null, 2));
+    return 0;
+  }
   if (options.command === "assemble-typed-native") {
     const projectRoot = await findProjectRoot(process.cwd(), options.project);
     const { hostDefoldPlatform } = await import("./toolchains.mjs");
@@ -852,6 +953,7 @@ export async function run(argv = process.argv.slice(2)) {
     }
     options.project = await findProjectRoot(process.cwd(), options.project ?? options.entry);
     if (entryFromInvocation) options.entry = entryFromInvocation;
+    await offerDefoldUpdate(options.project, options);
     // `dev` owns generation freshness. It reconciles once before the first
     // compile and supplies the watcher with the same operation so an API input
     // can never reach TypeScript or Bob against stale generated bindings.
@@ -1122,6 +1224,7 @@ export async function run(argv = process.argv.slice(2)) {
     options.project = await findProjectRoot(process.cwd(), options.project, {
       select: !options.json && process.stdin.isTTY && process.stdout.isTTY ? selectProjectFromTerminal : undefined,
     });
+    await offerDefoldUpdate(options.project, options);
     // A generated project consumes a managed copy of the package extension;
     // it must never alias and mutate the package or contributor checkout.
     await installNativeExtension(options.project);

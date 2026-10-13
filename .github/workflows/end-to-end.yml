@@ -82,6 +82,9 @@ jobs:
       - uses: actions/setup-node@v7
         with: { node-version: '22', cache: 'pnpm' }
       - run: pnpm install --frozen-lockfile --ignore-scripts
+      # The gate compares hosted Extender routing with the pinned Editor
+      # source, so make that upstream prerequisite explicit in a clean runner.
+      - run: bash scripts/bootstrap-upstreams.sh defold
 
       # The ledger first, and on its own. A target Defold added and nothing here
       # builds for must fail before any stage runs, because the run would

@@ -49,7 +49,17 @@ import {
 import { createIncrementalCompiler } from "../packages/cli/src/dev/compiler.mjs";
 import { recordBundleBuild } from "../packages/cli/src/build-artifacts.mjs";
 import { nativeArtifactAbiSha256 } from "../packages/cli/src/webtransport-artifacts.mjs";
-import { installConfiguredProjectWebTransport } from "../packages/cli/src/cli.mjs";
+import { installConfiguredProjectWebTransport, parseArguments } from "../packages/cli/src/cli.mjs";
+
+test("update CLI accepts an explicit channel check and a consented non-interactive update", () => {
+  assert.deepEqual(
+    (({ command, channel, check, project }) => ({ command, channel, check, project }))(
+      parseArguments(["update", "--project", "game", "--channel", "beta", "--check"]),
+    ),
+    { command: "update", channel: "beta", check: true, project: "game" },
+  );
+  assert.equal(parseArguments(["update", "--yes"]).yes, true);
+});
 
 // Every fixture states the Defold revision it targets. Generation resolves the
 // revision from the project rather than assuming the packaged one, so a fixture
@@ -376,7 +386,7 @@ test("configured WebTransport selects the requested native bundle target, not th
   );
   await assert.rejects(
     installConfiguredProjectWebTransport(project, {
-      environment: {},
+      environment: { DEHERM_CACHE_HOME: path.join(project, ".deherm-cache") },
       artifactTarget: "x86_64-linux",
       fetchImpl: async () => ({
         ok: true,

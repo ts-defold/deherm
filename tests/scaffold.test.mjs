@@ -1,10 +1,11 @@
 import assert from "node:assert/strict";
-import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 
 import { createDefoldProject } from "../packages/cli/src/scaffold.mjs";
+import { acceptDefoldUpdate, checkDefoldUpdate } from "../packages/cli/src/defold-update.mjs";
 import {
   BOB_MANAGED_IGNORE_BEGIN,
   BOB_MANAGED_IGNORE_END,
@@ -46,12 +47,13 @@ test("scaffold resolves its default from Defold's moving stable channel, not a p
   assert.equal(created.defoldRevision, revision);
   assert.deepEqual(requests, ["https://example.invalid/stable/info.json"]);
   assert.match(await readFile(path.join(projectRoot, "game.project"), "utf8"), new RegExp(`defold_sdk = ${revision}`));
+  assert.match(await readFile(path.join(projectRoot, "game.project"), "utf8"), /channel = stable/u);
   const defignore = (await readFile(path.join(projectRoot, ".defignore"), "utf8")).trim().split("\n");
   assert.equal(defignore[0], BOB_MANAGED_IGNORE_BEGIN);
   assert.equal(defignore.at(-1), BOB_MANAGED_IGNORE_END);
   assert.deepEqual(defignore.slice(1, -1), [...BOB_TOOLING_IGNORE_ENTRIES, "/src/main.script.ts"]);
   const manifest = JSON.parse(await readFile(path.join(projectRoot, "package.json"), "utf8"));
-  assert.equal(manifest.scripts.lint, "oxlint .");
+  assert.equal(manifest.scripts.lint, "oxlint . --deny-warnings");
   assert.equal(manifest.scripts["format:check"], "oxfmt --check .");
   assert.equal(manifest.scripts.check, "pnpm lint && pnpm format:check && pnpm typecheck && pnpm verify");
   assert.equal(manifest.devDependencies.oxlint, "^1.85.0");
@@ -59,7 +61,6 @@ test("scaffold resolves its default from Defold's moving stable channel, not a p
   const lint = JSON.parse(await readFile(path.join(projectRoot, ".oxlintrc.json"), "utf8"));
   const format = JSON.parse(await readFile(path.join(projectRoot, ".oxfmtrc.json"), "utf8"));
   assert.equal(lint.categories.correctness, "error");
-  assert.equal(lint.options.denyWarnings, true);
   assert.ok(lint.ignorePatterns.includes("defold_webtransport/**"));
   assert.equal(format.printWidth, 120);
   assert.equal(format.sortPackageJson, false);
@@ -85,4 +86,68 @@ test("an explicit scaffold revision is authoritative and requires no channel loo
   assert.equal(created.defoldRevision, revision);
   assert.equal(fetched, false);
   assert.match(await readFile(path.join(projectRoot, "game.project"), "utf8"), new RegExp(`defold_sdk = ${revision}`));
+  assert.doesNotMatch(await readFile(path.join(projectRoot, "game.project"), "utf8"), /channel =/u);
+});
+
+test("channel checks do not edit a project until an update is accepted", async (t) => {
+  const root = await scratch(t);
+  const projectRoot = path.join(root, "game");
+  await createDefoldProject({
+    directory: projectRoot,
+    policyLocator: locator,
+    fetchImpl: async () => ({
+      ok: true,
+      json: async () => ({ sha1: revision }),
+    }),
+  });
+  const file = path.join(projectRoot, "game.project");
+  const before = await readFile(file, "utf8");
+  const next = "b".repeat(40);
+  const update = await checkDefoldUpdate({
+    projectRoot,
+    locator,
+    fetchImpl: async () => ({ ok: true, json: async () => ({ sha1: next, version: "1.14.0" }) }),
+    env: {},
+  });
+  assert.equal(update.updateAvailable, true);
+  assert.equal(await readFile(file, "utf8"), before);
+  await acceptDefoldUpdate(update);
+  assert.equal(await readFile(file, "utf8"), before.replace(revision, next));
+});
+
+test("supplied Bob and on-disk Editor evidence take precedence over an ahead channel", async (t) => {
+  const root = await scratch(t);
+  const projectRoot = path.join(root, "game");
+  await createDefoldProject({
+    directory: projectRoot,
+    policyLocator: locator,
+    fetchImpl: async () => ({
+      ok: true,
+      json: async () => ({ sha1: revision }),
+    }),
+  });
+  const jar = path.join(projectRoot, "bob.jar");
+  await writeFile(jar, "fixture");
+  const latest = async () => ({ ok: true, json: async () => ({ sha1: "b".repeat(40) }) });
+  const bob = await checkDefoldUpdate({
+    projectRoot,
+    bob: jar,
+    locator,
+    fetchImpl: latest,
+    env: {},
+    runBobVersion: async () => ({ ok: true, stdout: `bob.jar version: 1.13.2 sha1: ${revision}`, stderr: "" }),
+  });
+  assert.equal(bob.channelAheadOfTool, true);
+  assert.equal(bob.updateAvailable, false);
+
+  const editor = path.join(root, "Defold.app");
+  await mkdir(path.join(editor, "Contents", "Resources"), { recursive: true });
+  await writeFile(
+    path.join(editor, "Contents", "Resources", "config"),
+    `[build]\nversion = 1.14.0\nengine_sha1 = ${"b".repeat(40)}\nchannel = stable\n`,
+  );
+  const installed = await checkDefoldUpdate({ projectRoot, editor, locator, fetchImpl: latest, env: {} });
+  assert.equal(installed.live.source, "installed-editor");
+  assert.equal(installed.updateAvailable, true);
+  assert.equal(installed.changeKind, "active-tool-sync");
 });
