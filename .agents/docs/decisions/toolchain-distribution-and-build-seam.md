@@ -667,6 +667,11 @@ Docker image tags and runner toolchains are recorded at build time but are not
 presently an immutable SDK distribution contract. A green static Action test
 or a healthy local Extender is not evidence that an arbitrary project linked;
 the consumer matrix must run Bob and retain its per-target log and bundle.
+The repository's cheap end-to-end consumer proof runs on every `main` push,
+without a source-path allowlist: any change may affect the packaged CLI or its
+inputs, and a manually maintained path list silently loses coverage as files
+move. The full Bob target matrix remains scheduled or explicitly dispatched
+after artifact publication, so ordinary pushes do not load Defold's Extender.
 `application-mode=dynamic` is the supported default. The one-shot command
 rejects authored static-application mode until the packaged compiler emits
 the authored Static Hermes unit, rather than silently publishing a dynamic

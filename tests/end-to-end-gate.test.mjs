@@ -49,6 +49,15 @@ test("the scaffold is pinned to the policy revision instead of racing Defold lat
   );
 });
 
+test("the cheap consumer proof runs on every main push without a maintained path allowlist", async () => {
+  const workflow = await readFile(new URL("../.github/workflows/end-to-end.yml", import.meta.url), "utf8");
+  const push = /^  push:\s*\n([\s\S]*?)(?=^  [a-z_]+:|^permissions:)/mu.exec(workflow)?.[1];
+  assert.ok(push, "the end-to-end workflow must run on push");
+  assert.match(push, /^    branches: \[main\]$/mu);
+  assert.doesNotMatch(push, /^    paths(?:-ignore)?:/mu);
+  assert.match(workflow, /if: github\.event_name != 'push'/u, "the expensive matrix stays off the push lane");
+});
+
 test("a bundle target Defold adds is a failure, not a missing row", () => {
   const { rows, problems } = buildLedger({
     bundleTargets: { targets: [{ target: "riscv64-linux", group: "linux", architecture: "riscv64" }] },
