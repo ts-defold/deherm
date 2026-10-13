@@ -1,0 +1,23 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "printWidth": 120,
+  "tabWidth": 2,
+  "useTabs": false,
+  "semi": true,
+  "singleQuote": false,
+  "trailingComma": "all",
+  "proseWrap": "preserve",
+  "sortPackageJson": false,
+  "ignorePatterns": [
+    ".deherm/**",
+    ".internal/**",
+    "build/**",
+    "tsconfig.deherm*.json",
+    "deherm.lock",
+    ".vscode/**",
+    "defold_hermes/**",
+    "defold_hermes_typed_native/**",
+    "defold_webtransport/**",
+    "deherm_project_native_modules/**"
+  ]
+}

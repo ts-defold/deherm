@@ -114,6 +114,15 @@ try {
 
   const retainedArchive = path.join(path.dirname(output), "npm-release-candidate", archives[0]);
   await mkdir(path.dirname(retainedArchive), { recursive: true });
+  try {
+    const previousSha256 = createHash("sha256")
+      .update(await readFile(retainedArchive))
+      .digest("hex");
+    if (!packOnly)
+      assert.equal(previousSha256, archiveSha256, "repacked candidate differs from the archive tested by Snake");
+  } catch (error) {
+    if (error?.code !== "ENOENT") throw error;
+  }
   await copyFile(archive, retainedArchive);
   assert.equal(
     createHash("sha256")

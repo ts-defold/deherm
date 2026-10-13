@@ -36,6 +36,10 @@ jobs:
         run: bash scripts/bootstrap-upstreams.sh hermes
       - name: Verify the full repository release gate
         run: pnpm check
+      - name: Pack and inventory the candidate without a hosted build
+        run: node scripts/prove-npm-consumer.mjs --pack-only
+      - name: Compile a real Snake game from the installed npm tarball
+        run: node scripts/prove-npm-snake.mjs build/npm-release-candidate/ts-defold-deherm-0.1.0.tgz
       - name: Prove tarball installation and Defold browser/native bundles
         run: node scripts/prove-npm-consumer.mjs
       - uses: actions/upload-artifact@v6
@@ -43,5 +47,6 @@ jobs:
           name: npm-consumer-proof
           path: |
             build/npm-consumer-proof.json
+            build/npm-snake-proof.json
             build/npm-release-candidate/*.tgz
           if-no-files-found: error

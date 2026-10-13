@@ -1,0 +1,23 @@
+{
+  "name": "@deherm/example-snake",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "deherm dev --entry main/snake.script.ts",
+    "compile": "deherm dev --entry main/snake.script.ts --once --headless --no-launch",
+    "generate": "deherm generate",
+    "lint": "oxlint . --deny-warnings",
+    "format": "oxfmt --write .",
+    "format:check": "oxfmt --check .",
+    "check": "pnpm test && pnpm lint && pnpm format:check && pnpm typecheck && pnpm verify",
+    "test": "node --experimental-strip-types --test test/*.test.mjs",
+    "typecheck": "deherm typecheck",
+    "verify": "deherm verify-generated"
+  },
+  "devDependencies": {
+    "@ts-defold/deherm": "workspace:*",
+    "oxfmt": "^0.70.0",
+    "oxlint": "^1.85.0"
+  }
+}

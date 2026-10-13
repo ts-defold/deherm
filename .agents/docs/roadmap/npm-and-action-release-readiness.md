@@ -80,6 +80,22 @@ unpublished npm package. The Action's tag is not the first release gate.
   local approval guard because the prior upload approval covered an Apple test,
   not this payload. The workflow has not run in GitHub CI yet. Do not infer
   CI success or runtime success from the earlier manual builds.
+- `node scripts/prove-npm-snake.mjs` copies only Snake's authored files to a
+  temporary directory, installs the exact tarball without a workspace link,
+  starts from an empty isolated déherm cache, resolves the policy/artifacts,
+  generates its game-object script and HUD GUI proxies, release-type-checks,
+  compiles the game resource, locally lowers native release Hermes bytecode,
+  projects browser release JavaScript, and verifies generated files. The
+  game-object script drives Defold sprite factories and sends status to the HUD
+  via `msg.post`; GUI is not the board renderer. The 2026-10-12 isolated proof
+  passed against tarball SHA-256
+  `f35020aae07c0f531cd31a3e1e727055591b674896fc7ecef6e0109546db461f`
+  (32,704-byte development bundle; 46,529-byte native release bytecode). A
+  separate local Bob arm64-macOS debug bundle and engine launch activated both
+  component instances without script errors. The Mac remained locked, so that
+  launch is runtime-log evidence, **not visual/play-input QA**. The manual CI
+  workflow runs the isolated proof before any hosted Bob build, then requires
+  the Bob proof to repack to identical candidate bytes.
 - CI run `38300168673` passed the caller-policy plan and hosted browser/Linux
   War Battles bundles. Local-runner and external-Extender modes still need
   their own consumer evidence; authored Static Hermes application mode remains

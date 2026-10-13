@@ -1,0 +1,9 @@
+name: "main"
+instances {
+  id: "controller"
+  prototype: "/main/controller.go"
+}
+instances {
+  id: "hud"
+  prototype: "/main/hud.go"
+}

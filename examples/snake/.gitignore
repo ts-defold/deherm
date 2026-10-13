@@ -1,0 +1,14 @@
+.deherm/
+.internal/
+build/
+node_modules/
+defold_hermes/
+defold_hermes_typed_native/
+defold_webtransport/
+deherm_project_native_modules/
+deherm/
+deherm.lock
+tsconfig*.json
+.vscode/
+main/*.gui_script
+main/*.script

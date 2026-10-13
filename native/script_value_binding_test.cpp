@@ -101,6 +101,7 @@ uint64_t gDeleteCalls = 0;
 uint64_t gGuiLookupCalls = 0;
 uint64_t gGuiTextCalls = 0;
 uint64_t gGuiSetterCalls = 0;
+uint64_t gGuiColorCalls = 0;
 int gNodeToken = 0;
 bool gTupleWrongArity = false;
 bool gTupleWrongTag = false;
@@ -173,6 +174,24 @@ int MockGuiGetNode(lua_State* state) {
   *static_cast<int*>(lua_newuserdata(state, sizeof(int))) = gNodeToken;
   ++gGuiLookupCalls;
   return 1;
+}
+
+int MockGuiNewBoxNode(lua_State* state) {
+  if (!HasExpectedLuaInstance(state) || lua_gettop(state) != 2 ||
+      !lua_isuserdata(state, 1) || !lua_isuserdata(state, 2)) {
+    return luaL_error(state, "dynamic GUI node arguments differ");
+  }
+  *static_cast<int*>(lua_newuserdata(state, sizeof(int))) = gNodeToken;
+  return 1;
+}
+
+int MockGuiSetColor(lua_State* state) {
+  if (!HasExpectedLuaInstance(state) || lua_gettop(state) != 2 ||
+      !lua_isuserdata(state, 1) || !dmScript::ToVector4(state, 2)) {
+    return luaL_error(state, "dynamic GUI color arguments differ");
+  }
+  ++gGuiColorCalls;
+  return 0;
 }
 
 int MockGuiNumberSetter(lua_State* state) {
@@ -1050,6 +1069,8 @@ int main() {
   RegisterLuaFunction(lua, "factory", "create", MockFactoryCreate);
   RegisterLuaFunction(lua, "go", "delete", MockGoDelete);
   RegisterLuaFunction(lua, "gui", "get_node", MockGuiGetNode);
+  RegisterLuaFunction(lua, "gui", "new_box_node", MockGuiNewBoxNode);
+  RegisterLuaFunction(lua, "gui", "set_color", MockGuiSetColor);
   RegisterLuaFunction(lua, "gui", "set_text", MockGuiSetText);
   RegisterLuaFunction(lua, "gui", "set_alpha", MockGuiNumberSetter);
   RegisterLuaFunction(lua, "gui", "set_enabled", MockGuiBooleanSetter);
@@ -1256,6 +1277,30 @@ int main() {
   Expect(AdapterDispatch(adapter, value::BindingId::GuiSetParent, parentSetter, 2, nullptr), adapter.lastError());
   Expect(AdapterDispatch(adapter, value::BindingId::GuiSetParent, parentSetter, 3, nullptr), adapter.lastError());
   Expect(gGuiSetterCalls == 9, "generated GUI setter family did not preserve representative codec shapes");
+
+  ScriptValue boxArguments[] = {
+    Value(ScriptDefoldValueKind::kVector3, 10, 20, 0),
+    Value(ScriptDefoldValueKind::kVector3, 16, 16, 0),
+  };
+  ScriptValue dynamicNode;
+  uint32_t dynamicCount = 0;
+  lua_pushlightuserdata(lua, gExpectedLuaInstance);
+  SetLuaInstance(lua);
+  Expect(AdapterDispatchTuple(adapter, UINT32_C(0xfdb31d1e), boxArguments, 2,
+      &dynamicNode, 1, &dynamicCount), adapter.lastError());
+  Expect(dynamicCount == 1 && dynamicNode.tag == ScriptValueTag::kHandle &&
+      dynamicNode.handleKind == ScriptHandleKind::kLuaSemanticHandle,
+      "dynamic GUI node did not preserve its semantic registry handle");
+  ScriptValue colorArguments[] = {dynamicNode, Value(ScriptDefoldValueKind::kVector4, 1, 0, 0, 1)};
+  Expect(AdapterDispatch(adapter, value::BindingId::GuiSetColor, colorArguments, 2, nullptr),
+      adapter.lastError());
+  Expect(gGuiColorCalls == 1, "dynamic GUI node did not reach the generated universal color setter");
+  colorArguments[0].reserved = 0;
+  Expect(!AdapterDispatch(adapter, value::BindingId::GuiSetColor, colorArguments, 2, nullptr),
+      "GUI color setter accepted a semantic handle without the GUI-node kind");
+  Expect(gGuiColorCalls == 1, "wrong-kind GUI node reached the engine color setter");
+  lua_pushnil(lua);
+  SetLuaInstance(lua);
 
   // The same generation-checked node token must not become a different handle
   // kind or cross a runtime boundary.  Both failures stay on the bounded Lua

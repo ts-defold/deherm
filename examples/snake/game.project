@@ -1,0 +1,25 @@
+[project]
+title = Snake
+version = 0.1.0
+custom_resources = /deherm
+
+[bootstrap]
+main_collection = /main/main.collectionc
+
+[input]
+game_binding = /input/game.input_bindingc
+
+[display]
+width = 960
+height = 540
+high_dpi = 1
+
+[script]
+shared_state = 1
+
+[library]
+include_dirs = defold_hermes
+
+[defold_hermes]
+app = /deherm/app.dehermc
+defold_sdk = 7f0f554f41f9dce1e0ddff99bf08200657d1ee05

@@ -89,6 +89,18 @@ importers:
         specifier: 7.0.2
         version: 7.0.2
 
+  examples/snake:
+    devDependencies:
+      '@ts-defold/deherm':
+        specifier: workspace:*
+        version: link:../..
+      oxfmt:
+        specifier: ^0.70.0
+        version: 0.70.0
+      oxlint:
+        specifier: ^1.85.0
+        version: 1.85.0
+
   examples/war-battles-online:
     dependencies:
       '@ts-defold/deherm':

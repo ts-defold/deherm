@@ -1,0 +1,23 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "categories": {
+    "correctness": "error",
+    "suspicious": "error",
+    "perf": "warn"
+  },
+  "rules": {
+    "eslint/no-console": "off",
+    "eslint/no-debugger": "error",
+    "eslint/no-duplicate-imports": "error",
+    "eslint/no-eval": "error"
+  },
+  "ignorePatterns": [
+    ".deherm/**",
+    ".internal/**",
+    "build/**",
+    "defold_hermes/**",
+    "defold_hermes_typed_native/**",
+    "defold_webtransport/**",
+    "deherm_project_native_modules/**"
+  ]
+}

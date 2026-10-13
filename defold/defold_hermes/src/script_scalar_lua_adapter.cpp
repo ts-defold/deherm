@@ -579,7 +579,27 @@ bool ScriptAdapter::dispatchUnsafe(ScriptCallFrame* frame) noexcept {
   const auto valueStatus = value_binding::dispatch(
       frame, adapterError_, sizeof(adapterError_), &structuredLuaApi_);
   if (valueStatus == value_binding::DispatchStatus::kSuccess) return true;
-  if (valueStatus == value_binding::DispatchStatus::kError) return false;
+  if (valueStatus == value_binding::DispatchStatus::kError) {
+    // The fast value setter accepts the legacy GUI-node pool. A constructor
+    // lowered through the semantic handle router returns the same Defold node
+    // through that router's generation-checked registry instead. Only a call
+    // shape rejection involving this exact handle representation may continue
+    // to the generated universal Lua route; actual setter failures must not be
+    // retried because that could execute an engine side effect twice.
+    constexpr char kShapeMismatch[] = "Defold value arguments do not match a generated call shape";
+    bool semanticGuiNode = false;
+    for (uint32_t index = 0; frame->arguments && index < frame->argumentCount; ++index) {
+      const ScriptValue& value = frame->arguments[index];
+      semanticGuiNode = semanticGuiNode ||
+          (value.tag == ScriptValueTag::kHandle &&
+           value.handleKind == ScriptHandleKind::kLuaSemanticHandle &&
+           value.reserved == static_cast<uint8_t>(script_handle_lowering::SemanticHandleKind::kGuiNode));
+    }
+    if (!semanticGuiNode || std::strncmp(adapterError_, kShapeMismatch, sizeof(kShapeMismatch) - 1) != 0) {
+      return false;
+    }
+    adapterError_[0] = '\0';
+  }
 
   const auto tupleStatus = fixed_tuple::dispatch(
       frame, adapterError_, sizeof(adapterError_), &fixedTupleLuaApi_);
@@ -2476,7 +2496,10 @@ bool ScriptAdapter::readUniversalSemanticHandleResult(
     *ok = fail("Universal-value semantic handle result is not a userdata");
     return true;
   }
-  if (!handleRouter_->captureHandle(stackIndex, kind, output)) {
+  const bool captured = kind == ::defold_hermes::script_handle_lowering::SemanticHandleKind::kGuiNode
+      ? captureGuiNode(stackIndex, output)
+      : handleRouter_->captureHandle(stackIndex, kind, output);
+  if (!captured) {
     *ok = fail("Universal-value semantic handle registry is exhausted");
     return true;
   }
@@ -2511,7 +2534,10 @@ bool ScriptAdapter::readUniversalSemanticHandle(
     *ok = fail("Universal-value nested semantic handle is not userdata");
     return true;
   }
-  if (!handleRouter_->captureHandle(stackIndex, kind, output)) {
+  const bool captured = kind == ::defold_hermes::script_handle_lowering::SemanticHandleKind::kGuiNode
+      ? captureGuiNode(stackIndex, output)
+      : handleRouter_->captureHandle(stackIndex, kind, output);
+  if (!captured) {
     *ok = fail("Universal-value nested semantic handle registry is exhausted");
     return true;
   }

@@ -1,0 +1,35 @@
+script: "/main/hud.gui_script"
+fonts {
+  name: "default"
+  font: "/builtins/fonts/default.font"
+}
+nodes {
+  position { x: 480.0 y: 488.0 z: 0.1 }
+  size { x: 800.0 y: 42.0 }
+  color { x: 0.48 y: 0.94 z: 0.67 w: 1.0 }
+  type: TYPE_TEXT
+  text: "SNAKE  /  DEHERM"
+  font: "default"
+  id: "title"
+  pivot: PIVOT_CENTER
+}
+nodes {
+  position { x: 480.0 y: 445.0 z: 0.1 }
+  size { x: 800.0 y: 34.0 }
+  color { x: 0.95 y: 0.95 z: 0.8 w: 1.0 }
+  type: TYPE_TEXT
+  text: "SCORE 000"
+  font: "default"
+  id: "score"
+  pivot: PIVOT_CENTER
+}
+nodes {
+  position { x: 480.0 y: 56.0 z: 0.1 }
+  size { x: 900.0 y: 34.0 }
+  color { x: 0.55 y: 0.69 z: 0.75 w: 1.0 }
+  type: TYPE_TEXT
+  text: "ARROWS / WASD TO TURN    SPACE TO PAUSE    R TO RESTART"
+  font: "default"
+  id: "hint"
+  pivot: PIVOT_CENTER
+}

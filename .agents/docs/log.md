@@ -9537,3 +9537,67 @@ after the last inventory assertion passed `--pack-only`, `pnpm check:style`,
 installation, all ten executable ESM exports imported successfully; this
 extra assertion is now in the full clean-consumer gate but its new CI run is
 still pending. No npm publication or external Action tag is claimed.
+
+### 2026-10-12 - Snake as an independent npm compiler consumer
+
+The new `examples/snake` is an authored TypeScript GUI game with a generated
+`.gui_script` proxy and pure deterministic game rules. Its four rule tests,
+source-workspace type-check, and one-shot development compile passed. That
+workspace compile linked ten reachable Defold API routes and emitted a
+27,214-byte application resource; it was not an engine run.
+
+More importantly, `scripts/prove-npm-snake.mjs` copied **only authored files**
+to a temporary project, installed the current `@ts-defold/deherm@0.1.0`
+tarball without a workspace symlink, resolved the pinned policy using an
+isolated cache, generated one GUI proxy, release-type-checked, compiled the
+game, and verified the generated surface. The resulting resource was 27,030
+bytes. The tested tarball SHA-256 was
+`7d0f8197233437aa1d68af756091aef04920194000d2513ceda2ff50ec348a1e`.
+The report's `user-cache` surface layer describes the materialized result;
+an isolated-cache assertion confirms that directory did not exist before
+generation and was populated afterward. The installed package then invoked
+its signed Hermes compiler artifact to emit 37,945 bytes of native release
+bytecode and projected browser release JavaScript. The latest tarball tested
+after the scaffold formatter fix had SHA-256
+`5fdbe9e1a2a3a9eb9579c200974182ee788703a1185ffc9b9963bf3e735a5e8b`.
+The new CI workflow runs Snake before the hosted Bob stage. None of this
+proves Defold loaded the `.gui` scene or executed its input callbacks; that
+still requires a packaged browser/native engine run.
+
+The monorepo workspace addition changed `pnpm-lock.yaml`, invalidating War
+Battles' browser WebTransport evidence source inventory. Its owning Deno +
+headless-Chrome loopback producer was rerun and observed a joined client, three
+snapshots, eight sent inputs, and the server's bounded input-acceptance marker. The projection evidence gate passed
+after regeneration. Snake's own `pnpm check` passed after a fresh generated
+config and bundle. The scaffold formatter template now excludes generated
+tsconfig/lock/editor files; its invalid nested oxlint `denyWarnings` option
+was moved to the package's lint command. The repository-wide gate is pending.
+
+### 2026-10-12 - Snake engine architecture and local runtime boundary
+
+Snake's board now uses factory-created Defold sprite game objects: separate
+head, body, and food prototypes share a three-frame atlas. A `.script.ts`
+controller owns deterministic rules and sprite positions; a `.gui.ts` component
+renders only score and instructions from a `msg.post("/hud#hud", "snake_state", …)`
+message. Reproducible 20×20 pixel assets come from the example's art generator.
+The installed-tarball proof resolved an empty policy cache, generated both
+component proxies, type-checked, compiled JS, compiled native Hermes release
+bytecode, projected the web target, and verified generated output. The tarball
+SHA-256 was `f35020aae07c0f531cd31a3e1e727055591b674896fc7ecef6e0109546db461f`.
+
+Bob built and bundled the updated arm64-macOS game through the local Extender;
+the native Defold 1.14.0 engine loaded the TypeScript bundle and reported two
+component instances with no script error during a short launch. Because the
+host screen was locked, visual positioning and live keyboard input remain
+unverified. The macOS build used an already-running **local** Extender; no
+hosted Defold Extender upload was performed for Snake.
+The repository-wide `CI=true pnpm check` passed after the sprite/message
+change, including generated-state, type, release, docs, and OKF gates.
+
+Before the architecture pivot, the GUI-only trial exposed a core runtime
+adapter mismatch: `gui.newBoxNode` yielded a semantic GUI-node handle while
+`gui.setColor`'s value route expected the legacy GUI-node handle. The native
+adapter now falls through to the universal Lua route only for the reserved
+GUI-node semantic-handle kind after a value-route call-shape mismatch; all
+other value errors still fail closed. A native regression exercises accepted
+GUI-node dispatch and wrong-kind rejection, with zero counted allocations.

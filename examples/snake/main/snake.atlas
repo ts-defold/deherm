@@ -1,0 +1,13 @@
+animations {
+  id: "head"
+  images { image: "/assets/head.png" }
+}
+animations {
+  id: "body"
+  images { image: "/assets/body.png" }
+}
+animations {
+  id: "food"
+  images { image: "/assets/food.png" }
+}
+extrude_borders: 2
