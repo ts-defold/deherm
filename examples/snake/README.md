@@ -17,9 +17,11 @@ pnpm check
 pnpm dev
 ```
 
-Use arrow keys or WASD to steer, Space to pause, and R to restart. Eat the red
-food sprite; touching a wall or your body ends the run. The three pixel sprites
-are reproducible from `node scripts/generate-art.mjs`.
+Snake plays itself in attract mode until you press an arrow key or WASD. Your
+first direction starts a fresh match. Use those keys to steer, Space to pause,
+and R to restart. Eat the red food sprite; touching
+a wall or your body ends the run. The board and three pixel sprites are
+reproducible from `node scripts/generate-art.mjs`.
 
 For the independent npm-tarball release proof, the candidate test copies this
 example outside the monorepo, installs the candidate `.tgz` in place of the

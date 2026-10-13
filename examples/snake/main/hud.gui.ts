@@ -21,13 +21,17 @@ export default defineComponent({
     gui.setText(self.score, `SCORE ${String(message.score).padStart(3, "0")}`);
     gui.setText(
       self.hint,
-      message.status === "lost"
-        ? "GAME OVER  /  PRESS R TO RESTART"
-        : message.status === "won"
-          ? "BOARD CLEARED  /  PRESS R TO RESTART"
-          : message.status === "paused"
-            ? "PAUSED  /  PRESS SPACE TO RESUME"
-            : "ARROWS / WASD TO TURN    SPACE TO PAUSE    R TO RESTART",
+      message.status === "attract"
+        ? "DEMO PLAYING  /  PRESS ARROWS OR WASD TO START"
+        : message.status === "lost"
+          ? "GAME OVER  /  PRESS R TO RESTART"
+          : message.status === "won"
+            ? "BOARD CLEARED  /  PRESS R TO RESTART"
+            : message.status === "paused"
+              ? "PAUSED  /  PRESS SPACE TO RESUME"
+              : message.status === "ready"
+                ? "PRESS ARROWS / WASD TO START    SPACE TO PAUSE"
+                : "ARROWS / WASD TO TURN    SPACE TO PAUSE    R TO RESTART",
     );
   },
 });

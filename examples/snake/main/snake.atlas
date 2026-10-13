@@ -10,4 +10,8 @@ animations {
   id: "food"
   images { image: "/assets/food.png" }
 }
+animations {
+  id: "board"
+  images { image: "/assets/board.png" }
+}
 extrude_borders: 2

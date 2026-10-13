@@ -4,7 +4,7 @@ export const HEIGHT = 14;
 export const CELL_COUNT = WIDTH * HEIGHT;
 
 export type Direction = 0 | 1 | 2 | 3;
-export type Status = "playing" | "paused" | "lost" | "won";
+export type Status = "ready" | "playing" | "paused" | "lost" | "won";
 
 export interface SnakeState {
   readonly body: Uint16Array;
@@ -59,15 +59,43 @@ export function newSnake(seed = 1): SnakeState {
     food: -1,
     score: 0,
     seed: seed >>> 0,
-    status: "playing",
+    status: "ready",
   };
   placeFood(state);
   return state;
 }
 
 export function turnSnake(state: SnakeState, direction: Direction): void {
-  if (state.status !== "playing") return;
-  if ((direction + 2) % 4 !== state.direction) state.pendingDirection = direction;
+  if (state.status !== "ready" && state.status !== "playing") return;
+  if ((direction + 2) % 4 === state.direction) return;
+  state.pendingDirection = direction;
+  if (state.status === "ready") state.status = "playing";
+}
+
+/** Deterministic, allocation-free steering for the title-screen demo. */
+export function attractDirection(state: SnakeState): Direction {
+  const head = state.body[0]!;
+  const x = head % WIDTH;
+  const y = Math.floor(head / WIDTH);
+  let best = state.direction;
+  let bestScore = Number.NEGATIVE_INFINITY;
+  for (let direction = 0 as Direction; direction < 4; direction = (direction + 1) as Direction) {
+    if ((direction + 2) % 4 === state.direction) continue;
+    const nextX = x + (direction === 1 ? 1 : direction === 3 ? -1 : 0);
+    const nextY = y + (direction === 0 ? 1 : direction === 2 ? -1 : 0);
+    if (nextX < 0 || nextX >= WIDTH || nextY < 0 || nextY >= HEIGHT) continue;
+    const next = nextY * WIDTH + nextX;
+    if (occupies(state, next, next === state.food ? state.length : state.length - 1)) continue;
+    const foodX = state.food % WIDTH;
+    const foodY = Math.floor(state.food / WIDTH);
+    const distance = Math.abs(nextX - foodX) + Math.abs(nextY - foodY);
+    const score = -distance * 4 + (direction === state.direction ? 1 : 0);
+    if (score > bestScore) {
+      bestScore = score;
+      best = direction;
+    }
+  }
+  return best;
 }
 
 export function stepSnake(state: SnakeState): void {

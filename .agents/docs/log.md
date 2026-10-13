@@ -1,5 +1,21 @@
 # Defold Hermes knowledge log
 
+## 2026-10-13 - Snake attract mode and visual runtime check
+
+Snake no longer starts with an automatic straight-line death or an idle black
+screen. Its reproducible sprite board renders behind the game-object sprites;
+the title state now runs deterministic, allocation-free steering and resets
+after a trapped run. The first direction is handled as a fresh player-match
+start. The native arm64-macOS debug bundle built through local Extender, and
+native screenshots showed score and sprite positions changing during attract
+play. A local wasm-web Bob bundle also completed and loaded the new bundle in
+the browser without console errors; browser screenshot capture was unavailable.
+Snake's full package check passed (six pure-rule tests, lint, format, typecheck,
+generated-state verification), as did release TypeScript typecheck and a
+one-shot déherm compile. Synthetic keyboard delivery did not reach either the TypeScript
+script or an independent raw-Lua probe in browser automation; manual input
+QA remains unproven and should not be inferred from the attract screenshot.
+
 ## 2026-10-12 - Cross-target consumer bundle and first GitHub smoke
 
 The first public-workflow smoke (`38296983292`) passed its caller-policy plan and

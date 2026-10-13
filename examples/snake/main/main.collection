@@ -1,5 +1,10 @@
 name: "main"
 instances {
+  id: "board"
+  prototype: "/main/board.go"
+  position { x: 480.0 y: 270.0 z: -0.5 }
+}
+instances {
   id: "controller"
   prototype: "/main/controller.go"
 }

@@ -96,6 +96,15 @@ unpublished npm package. The Action's tag is not the first release gate.
   launch is runtime-log evidence, **not visual/play-input QA**. The manual CI
   workflow runs the isolated proof before any hosted Bob build, then requires
   the Bob proof to repack to identical candidate bytes.
+- On 2026-10-13, native Snake was visually inspected after a fresh local
+  arm64-macOS Bob bundle. Its sprite board, head, body, food, HUD, and
+  self-playing attract mode rendered; score advanced as the demo collected
+  food. A first direction is coded to reset the demo into a fresh player
+  match, with pure-rule tests for steering and wall avoidance. Synthetic
+  keyboard events sent through the current computer-use surface did not reach
+  even an independent raw-Lua input probe, so manual player-input QA is still
+  outstanding. This is visual/runtime evidence for attract movement, not a
+  claim that end-user keyboard input was observed.
 - CI run `38300168673` passed the caller-policy plan and hosted browser/Linux
   War Battles bundles. Local-runner and external-Extender modes still need
   their own consumer evidence; authored Static Hermes application mode remains

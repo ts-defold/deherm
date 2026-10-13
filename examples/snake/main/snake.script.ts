@@ -2,6 +2,7 @@ import { defineComponent, factory, go, msg, vmath, type DefoldHash, type OnInput
 import {
   HEIGHT,
   WIDTH,
+  attractDirection,
   newSnake,
   stepSnake,
   turnSnake,
@@ -22,12 +23,14 @@ const BOTTOM_EDGE = 258 - (HEIGHT * CELL) / 2 + CELL / 2;
 
 interface SnakeSelf {
   state: SnakeState;
+  mode: "attract" | "player";
+  attractSeed: number;
   head: DefoldHash;
   body: DefoldHash[];
   food: DefoldHash;
   elapsed: number;
   lastScore: number;
-  lastStatus: Status | "";
+  lastStatus: Status | "attract" | "";
 }
 
 function position(cell: number): ReturnType<typeof vmath.vector3> {
@@ -44,17 +47,20 @@ function syncSprites(self: SnakeSelf): void {
   }
   if (self.state.food >= 0) go.setPosition(position(self.state.food), self.food);
   else msg.post(self.food, "disable");
-  if (self.lastScore === self.state.score && self.lastStatus === self.state.status) return;
+  const status = self.mode === "attract" ? "attract" : self.state.status;
+  if (self.lastScore === self.state.score && self.lastStatus === status) return;
   self.lastScore = self.state.score;
-  self.lastStatus = self.state.status;
-  msg.post("/hud#hud", "snake_state", { score: self.state.score, status: self.state.status });
+  self.lastStatus = status;
+  msg.post("/hud#hud", "snake_state", { score: self.state.score, status });
 }
 
-function reset(self: SnakeSelf): void {
+function reset(self: SnakeSelf, mode: "attract" | "player"): void {
   if (self.head !== undefined) go.delete(self.head);
   if (self.food !== undefined) go.delete(self.food);
   if (self.body !== undefined) for (const id of self.body) go.delete(id);
-  self.state = newSnake(0x5eedd00d);
+  self.mode = mode;
+  self.state = newSnake(mode === "attract" ? self.attractSeed : 0x5eedd00d);
+  if (mode === "attract") self.state.status = "playing";
   self.head = factory.create("#head_factory", position(self.state.body[0]!));
   self.body = [];
   self.food = factory.create("#food_factory", position(self.state.food));
@@ -66,32 +72,45 @@ function reset(self: SnakeSelf): void {
 
 export default defineComponent({
   init(self: SnakeSelf): void {
-    reset(self);
+    self.attractSeed = 0x5eedd00d;
+    reset(self, "attract");
     msg.post(".", "acquire_input_focus");
   },
   update(self: SnakeSelf, dt: number): void {
+    if (self.state.status !== "playing") return;
     self.elapsed += dt;
     if (self.elapsed < 0.13) return;
     self.elapsed = 0;
+    if (self.mode === "attract") turnSnake(self.state, attractDirection(self.state));
     stepSnake(self.state);
+    if (self.mode === "attract" && self.state.status !== "playing") {
+      self.attractSeed = (self.attractSeed + 0x9e3779b9) >>> 0;
+      reset(self, "attract");
+      return;
+    }
     syncSprites(self);
   },
   onInput(self: SnakeSelf, actionId: DefoldHash, action: OnInputAction): boolean {
     if (!action.pressed) return false;
     if (actionId === RESTART) {
-      reset(self);
+      reset(self, "player");
       return true;
     }
     if (actionId === PAUSE) {
+      if (self.mode === "attract") return false;
       self.state.status =
         self.state.status === "paused" ? "playing" : self.state.status === "playing" ? "paused" : self.state.status;
+      self.elapsed = 0;
       syncSprites(self);
       return true;
     }
     const direction: Direction | undefined =
       actionId === UP ? 0 : actionId === RIGHT ? 1 : actionId === DOWN ? 2 : actionId === LEFT ? 3 : undefined;
     if (direction === undefined) return false;
+    if (self.mode === "attract") reset(self, "player");
     turnSnake(self.state, direction);
+    self.elapsed = 0;
+    syncSprites(self);
     return true;
   },
 });
