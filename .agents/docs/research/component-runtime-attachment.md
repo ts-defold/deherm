@@ -86,6 +86,14 @@ against both the pinned SDK and the alpha SDK above. These are compile and
 local runtime tests, not a completed alpha engine run; a CI rerun is required
 for that claim.
 
+The dynamic-Hermes component harness also implements the terminal API with
+these opaque handle bits. Release-readiness exposed its old pointer-shaped fake
+signatures after the alpha fix; the harness now encodes its test object and
+collection handles and decodes them at the fake terminal boundary. The focused
+component-runtime test compiles and runs this harness, including attach,
+dispatch, reload, and telemetry; it does not by itself prove a packaged Defold
+build.
+
 ## Remaining capability gates
 
 1. Bundle registry and component-only bootstrap: the dynamic-Hermes harness supplies `__defoldComponentsV1`, but the compiler does not emit that registry yet. Native bundle activation and generated script-bridge initialization also still begin at the singleton bootstrap attachment. A project containing only generated component proxies cannot yet initialize the runtime honestly.

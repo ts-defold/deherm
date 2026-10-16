@@ -18,6 +18,7 @@ extern "C" {
 }
 
 namespace component = defold_hermes::component_proxy;
+namespace game_object = defold_hermes::game_object;
 namespace dmScript { void PushHash(lua_State*, dmhash_t); }
 namespace {
 
@@ -46,8 +47,8 @@ bool BuildCurrentGameObject(
     defold_hermes::game_object::ActiveContext* out) noexcept {
   if (!luaState || !out) return false;
   *out = {
-    &gGameObject,
-    &gCollection,
+    game_object::encodeHandle(&gGameObject),
+    game_object::encodeHandle(&gCollection),
     gGameObject.identifier,
     gGameObject.generation,
     {&gGameObject, 0, gGameObject.generation, IsGameObjectAttachmentLive}
@@ -55,27 +56,29 @@ bool BuildCurrentGameObject(
   return true;
 }
 
-uint32_t GameObjectGeneration(void*, void* instance) noexcept {
-  return static_cast<TestGameObject*>(instance)->generation;
+uint32_t GameObjectGeneration(void*, game_object::HandleBits instance) noexcept {
+  return game_object::decodeHandle<TestGameObject*>(instance)->generation;
 }
 
-void* GameObjectCollection(void*, void*) noexcept { return &gCollection; }
-
-uint64_t GameObjectIdentifier(void*, void* instance) noexcept {
-  return static_cast<TestGameObject*>(instance)->identifier;
+game_object::HandleBits GameObjectCollection(void*, game_object::HandleBits) noexcept {
+  return game_object::encodeHandle(&gCollection);
 }
 
-void GameObjectPosition(void*, void* instance, float* xyz) noexcept {
-  auto* object = static_cast<TestGameObject*>(instance);
+uint64_t GameObjectIdentifier(void*, game_object::HandleBits instance) noexcept {
+  return game_object::decodeHandle<TestGameObject*>(instance)->identifier;
+}
+
+void GameObjectPosition(void*, game_object::HandleBits instance, float* xyz) noexcept {
+  auto* object = game_object::decodeHandle<TestGameObject*>(instance);
   for (size_t lane = 0; lane < 3; ++lane) xyz[lane] = object->position[lane];
 }
 
-void SetGameObjectPosition(void*, void* instance, const float* xyz) noexcept {
-  auto* object = static_cast<TestGameObject*>(instance);
+void SetGameObjectPosition(void*, game_object::HandleBits instance, const float* xyz) noexcept {
+  auto* object = game_object::decodeHandle<TestGameObject*>(instance);
   for (size_t lane = 0; lane < 3; ++lane) object->position[lane] = xyz[lane];
 }
 
-void SetGameObjectRotation(void*, void*, const float*) noexcept {}
+void SetGameObjectRotation(void*, game_object::HandleBits, const float*) noexcept {}
 
 [[noreturn]] void Fail(const char* message) {
   std::fprintf(stderr, "component-runtime-hermes-e2e:error:%s\n", message);

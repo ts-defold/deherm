@@ -137,7 +137,7 @@
     },
     "dynamicHermesHarness": {
       "path": "native/component_runtime_hermes_e2e.cpp",
-      "sha256": "d34d5592d3d9acb81f739cd6621ce7a07f21be03dcf4caa7e1f08c5ae23260d6"
+      "sha256": "b9dc5edb08d3cd98f973f2d02220e6e31fa29e1c75a1f520fccbb1008cab444a"
     }
   }
 }
