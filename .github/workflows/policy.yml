@@ -509,12 +509,12 @@ jobs:
       - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v7
         with: { node-version: '22', cache: 'pnpm' }
+      - run: pnpm install --frozen-lockfile --ignore-scripts
       - name: Recover valid native mappings for older Defold revisions
         run: >-
           node scripts/collect-policy-artifact-history.mjs
           --site build/published-policy-site
           --out "$RUNNER_TEMP/artifact-history.json"
-      - run: pnpm install --frozen-lockfile --ignore-scripts
       - run: bash scripts/bootstrap-upstreams.sh defold
       - run: node scripts/generate-api-policy.mjs --check
       - id: artifact-map

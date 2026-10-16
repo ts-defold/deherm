@@ -123,6 +123,11 @@ test("policy host parity materializes every authoritative generator input", asyn
   }
   assert.match(publish, /needs: \[derive, host-parity\]/u);
   assert.match(publish, /needs\.host-parity\.result == 'success'/u);
+  assert.ok(
+    publish.indexOf("pnpm install --frozen-lockfile --ignore-scripts") <
+      publish.indexOf("node scripts/collect-policy-artifact-history.mjs"),
+    "artifact-history recovery imports package dependencies and must run after pnpm install",
+  );
   assert.match(publish, /Select only a completely published artifact mapping/u);
   assert.match(publish, /project-artifact-references\.mjs --out/u);
   assert.doesNotMatch(
