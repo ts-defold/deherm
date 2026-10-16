@@ -109,3 +109,21 @@ These tests prove generated bridge identity, family selection, native argument
 ordering, result transfer, descriptor agreement, and JSI-to-C decoding. They do
 not claim Defold implementation semantics, packaged-engine behavior, or a JSI
 transport for the twelve families that do not emit one.
+
+The 2026-10-16 alpha revision `4c84ed49b0d0c9005dd278c6caa371866b3a88dc`
+made `dmStrEq` a `static inline` header function. A verifier-owned fake of that
+symbol would redefine Defold's source body, so the exact corpus now derives
+static-inline identity from the revision IR and, for the read-only two-C-string
+boolean shape, compares the production dispatcher against direct calls to the
+SDK header body with equal and unequal inputs. Unsupported inline shapes still
+fail closed rather than silently receiving weaker evidence. The generated
+alpha corpus compiled, linked, and ran locally against the SDK archive with
+SHA-256 `2df1d6f380c5aedc47e2ff056cca3472244e2d8fd28e008bc718aae397d4b426`.
+That direct-reference check proves the wrapper agrees with the header for the
+two probes; it does not assert a fake-callee invocation count or all semantics.
+
+The same revision deprecated, but did not remove, `dmGameObject::GetGeneration`.
+Exact-call C++ tests retain `-Werror` for other warnings while allowing only
+`deprecated-declarations` as a warning. A removed or incompatible symbol still
+fails compile/link. This is a local focused test result; the scheduled CI lane
+has not yet rerun this change.

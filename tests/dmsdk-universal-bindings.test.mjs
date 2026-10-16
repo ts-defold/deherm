@@ -8,7 +8,10 @@ import test from "node:test";
 
 import { materializeDmSdkUsages } from "../packages/compiler/src/dmsdk-universal-materializer.mjs";
 import { buildDmSdkCallSymbolIndex } from "../packages/compiler/src/dmsdk-call-symbol-index.mjs";
-import { dmSdkGeneratedAdapterCorpusArtifacts } from "../packages/compiler/src/dmsdk-generated-adapter-corpus.mjs";
+import {
+  dmSdkGeneratedAdapterCorpusArtifacts,
+  renderInlineCStringReferenceCheck,
+} from "../packages/compiler/src/dmsdk-generated-adapter-corpus.mjs";
 import {
   materializationFromDmSdkConcreteCallPlan,
   materializeDmSdkGeneratedAdapterUsages,
@@ -86,6 +89,40 @@ function recipe(report, symbol, predicate = () => true) {
   assert.equal(matches.length, 1, `expected one recipe for ${symbol}, got ${matches.length}`);
   return matches[0];
 }
+
+test("source-defined static inline cstring adapter uses the header body instead of redefining it", () => {
+  const vector = {
+    declarationId: "dmsdk:example-static-inline",
+    adapterId: 9,
+    exactCallee: "dmStrEq",
+    abi: {
+      resultShape: { kind: "scalar", name: "bool" },
+      parameters: [0, 1].map(() => ({
+        shape: { kind: "cstring", mutable: false },
+        direction: "in",
+      })),
+    },
+  };
+  const source = renderInlineCStringReferenceCheck(vector, 42);
+  assert.match(source, /dmStrEq\("exact_9_0","exact_9_1"\)/u);
+  assert.match(source, /dmStrEq\("exact_9_0","exact_9_0"\)/u);
+  assert.match(source, /deherm_dmsdk_cstring_value_dispatch\(UINT16_C\(9\)/u);
+  assert.doesNotMatch(source, /bool dmStrEq\(/u);
+  assert.throws(
+    () =>
+      renderInlineCStringReferenceCheck(
+        {
+          ...vector,
+          abi: {
+            ...vector.abi,
+            parameters: [{ ...vector.abi.parameters[0], direction: "out" }, vector.abi.parameters[1]],
+          },
+        },
+        42,
+      ),
+    /without a supported read-only exact-call probe/u,
+  );
+});
 
 test("universal dmSDK recipes cover every declaration and every target", async () => {
   const [report, sdkIr] = await Promise.all([
@@ -360,6 +397,9 @@ test("all callable generated adapters own same-recipe C ABI and emitted-JSI exac
       "-Wall",
       "-Wextra",
       "-Werror",
+      // A pinned Defold revision may deprecate a still-public call. The
+      // generated route remains callable; deprecation is not an ABI failure.
+      "-Wno-error=deprecated-declarations",
       "-pedantic",
       "-DDEHERM_ENABLE_PRIVATE_DMSDK_CSTRING_VALUE=1",
       `-I${path.join(root, "defold/defold_hermes/include")}`,
@@ -685,6 +725,7 @@ test("every declaration-only universal-ready recipe compiles and executes its ex
       "-Wall",
       "-Wextra",
       "-Werror",
+      "-Wno-error=deprecated-declarations",
       "-pedantic",
       ...includeArgs,
       "-c",
@@ -697,6 +738,7 @@ test("every declaration-only universal-ready recipe compiles and executes its ex
       "-Wall",
       "-Wextra",
       "-Werror",
+      "-Wno-error=deprecated-declarations",
       "-pedantic",
       ...includeArgs,
       "defold/defold_hermes/src/generated_dmsdk_universal.cpp",

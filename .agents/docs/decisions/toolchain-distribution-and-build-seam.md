@@ -756,7 +756,7 @@ API rate limiting previously made an otherwise valid Linux Bob row fail during
 `target-archives`. The end-to-end gate asserts both jobs retain the token.
 
 The hosted Bob stage retries at most twice only when a new Extender log reports
-its build worker refused a connection. Each attempt remains an actual Bob
+its build worker refused a connection or has no route to the worker. Each attempt remains an actual Bob
 upload/build; the target stays failed if the worker remains unavailable. Local
 Extender failures, compile/link diagnostics, and unchanged/stale logs are never
 retried. Run `38274874382` established this need: all four Apple rows failed
@@ -779,6 +779,15 @@ compilation and link; the four local Bob stages returned success. This is
 hosted build evidence for these four targets, not device-runtime evidence.
 Do not reclassify the failed staging rows as passing, retry them as transport
 errors, or quietly use production Extender for an `alpha`/`beta` SDK.
+
+The 2026-10-15 `armv7-android` consumer run `38732084841` failed with
+`java.net.NoRouteToHostException: No route to host` inside Extender's worker
+connection; the 2026-10-16 scheduled run `38896762710` passed that target on
+the same repository SHA. The narrow retry predicate now recognizes both
+observed worker-transport signatures, requires a fresh Bob log, remains capped
+at two retries, and never retries source compile/link failures. The focused
+predicate test passes locally; a post-change hosted run is still required to
+establish CI behavior.
 
 The same local consumer attempt exposed an independent archive-cache bug:
 `pull --target arm64-osx` found four old `libhermes.a` candidates because the

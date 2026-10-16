@@ -143,7 +143,7 @@ test("hosted Extender defaults mirror the pinned Defold Editor channel rule", as
   assert.doesNotMatch(source, /"dev" "https:\/\/build-stage\.defold\.com"/u);
 });
 
-test("hosted Bob retries only a fresh Extender worker connection refusal, at most twice", () => {
+test("hosted Bob retries only fresh observed Extender worker transport failures, at most twice", () => {
   const refusal =
     "Job id: new Failed to communicate with Extender service.org.apache.http.conn.HttpHostConnectException: Connection refused";
   const baseline = { buildServer: "https://build-stage.defold.com", priorLog: "", currentLog: refusal };
@@ -155,6 +155,14 @@ test("hosted Bob retries only a fresh Extender worker connection refusal, at mos
     false,
   );
   assert.equal(shouldRetryHostedExtenderFailure({ ...baseline, priorLog: refusal, attempt: 1 }), false);
+  const noRoute =
+    "Job id: new Failed to communicate with Extender service.java.net.NoRouteToHostException: No route to host";
+  assert.equal(shouldRetryHostedExtenderFailure({ ...baseline, currentLog: noRoute, attempt: 1 }), true);
+  assert.equal(shouldRetryHostedExtenderFailure({ ...baseline, currentLog: noRoute, attempt: 3 }), false);
+  assert.equal(
+    shouldRetryHostedExtenderFailure({ ...baseline, currentLog: noRoute, priorLog: noRoute, attempt: 1 }),
+    false,
+  );
   assert.equal(
     shouldRetryHostedExtenderFailure({ ...baseline, currentLog: "error: undefined symbol in libhermes.a", attempt: 1 }),
     false,

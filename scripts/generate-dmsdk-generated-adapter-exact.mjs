@@ -175,7 +175,12 @@ export async function buildDmSdkGeneratedAdapterExact({
     recipes,
   };
   const index = buildDmSdkCallSymbolIndex(ir, exactCatalog);
-  const corpus = materializeDmSdkGeneratedAdapterCorpus(index, exactCatalog);
+  const staticInlineDeclarations = new Set(
+    ir.declarations
+      .filter((declaration) => declaration.inline === true && declaration.storageClass === "static")
+      .map((declaration) => declaration.id),
+  );
+  const corpus = materializeDmSdkGeneratedAdapterCorpus(index, exactCatalog, { staticInlineDeclarations });
   const { corpusSha256: _derivedCorpusSha256, ...corpusBody } = corpus.report;
   const reportBody = {
     ...corpusBody,

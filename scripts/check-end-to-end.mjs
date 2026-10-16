@@ -103,17 +103,17 @@ export const scratchProject = "build/end-to-end/project";
 
 export const stageNames = Object.freeze(["policy", "host-tools", "target-archives", "scaffold", "generate", "bob"]);
 
-// A refused connection to Extender's own build worker is neither an extension
-// diagnostic nor a successful compile. Retry only this observed transport
-// failure, and only when Bob wrote a fresh log for the failed attempt.
+// Extender build-worker connection failures are neither extension diagnostics
+// nor successful compiles. Retry only observed transport failures, and only
+// when Bob wrote a fresh log for the failed attempt.
 export function shouldRetryHostedExtenderFailure({ buildServer, priorLog, currentLog, attempt }) {
   return (
     buildServer.startsWith("https://") &&
     attempt < 3 &&
     currentLog !== priorLog &&
     currentLog.includes("Failed to communicate with Extender service") &&
-    currentLog.includes("HttpHostConnectException") &&
-    currentLog.includes("Connection refused")
+    ((currentLog.includes("HttpHostConnectException") && currentLog.includes("Connection refused")) ||
+      (currentLog.includes("NoRouteToHostException") && currentLog.includes("No route to host")))
   );
 }
 
@@ -339,7 +339,7 @@ const stages = {
           ) {
             const delaySeconds = attempt === 1 ? 5 : 15;
             console.error(
-              `${row.target}: Extender build worker refused connection; retrying Bob ${attempt + 1}/3 in ${delaySeconds}s`,
+              `${row.target}: Extender build worker transport failure; retrying Bob ${attempt + 1}/3 in ${delaySeconds}s`,
             );
             await delay(delaySeconds * 1000);
             continue;
