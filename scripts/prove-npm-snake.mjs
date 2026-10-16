@@ -11,8 +11,10 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const packageVersion = JSON.parse(await readFile(path.join(repositoryRoot, "package.json"), "utf8")).version;
 const archive = path.resolve(
-  process.argv[2] ?? path.join(repositoryRoot, "build", "npm-release-candidate", "ts-defold-deherm-0.1.0.tgz"),
+  process.argv[2] ??
+    path.join(repositoryRoot, "build", "npm-release-candidate", `ts-defold-deherm-${packageVersion}.tgz`),
 );
 const output = path.resolve(process.argv[3] ?? path.join(repositoryRoot, "build", "npm-snake-proof.json"));
 const bobTargets = process.argv

@@ -4,7 +4,7 @@ title: Prove the npm package before tagging the consumer Action
 description: An ordered release gate for an independent npm install, packaged Defold builds, and only then a tagged reusable workflow.
 tags: [roadmap, npm, package, github-actions, release, consumer]
 status: active
-generated: { by: codex, at: 2026-10-12T16:00:00-04:00 }
+generated: { by: codex/gpt-6.1-sol, at: 2026-10-16T12:41:00-04:00 }
 sources:
   - id: package-smoke
     resource: ../../../tests/package-smoke.test.mjs
@@ -17,6 +17,14 @@ sources:
   - id: package-manifest
     resource: ../../../package.json
     title: npm package manifest and prepack contract
+    author: project:deherm
+  - id: release-candidate-workflow
+    resource: ../../../.github/workflows/npm-release-candidate.yml
+    title: npm release candidate workflow
+    author: project:deherm
+  - id: release-evidence
+    resource: ../../../scripts/check-npm-release-candidate.mjs
+    title: Exact tarball evidence reconciliation
     author: project:deherm
 ---
 
@@ -94,8 +102,9 @@ unpublished npm package. The Action's tag is not the first release gate.
   separate local Bob arm64-macOS debug bundle and engine launch activated both
   component instances without script errors. The Mac remained locked, so that
   launch is runtime-log evidence, **not visual/play-input QA**. The manual CI
-  workflow runs the isolated proof before any hosted Bob build, then requires
-  the Bob proof to repack to identical candidate bytes.
+  workflow runs the isolated proof before any hosted Bob build. The later
+  candidate lane now reuses the retained archive directly and compares both
+  installed-package reports against its SHA-256.
 - On 2026-10-13, native Snake was visually inspected after a fresh local
   arm64-macOS Bob bundle. Its sprite board, head, body, food, HUD, and
   self-playing attract mode rendered; score advanced as the demo collected
@@ -122,6 +131,14 @@ unpublished npm package. The Action's tag is not the first release gate.
   symlinked-project bundle test now protects the transform seam. The
   release-candidate workflow requires installed-package browser and Linux
   Bob bundles; that edited workflow itself has not yet run in CI.
+- The 2026-10-16 hardening pass changed candidate flow from "pack again and
+  compare" to "use the retained archive". The Snake and clean-consumer steps
+  now read the path from the pack-only report. The consumer rejects a different
+  source commit, archive path, or SHA-256; a final evidence check requires both
+  isolated proofs to name the same digest and both Bob targets. Focused local
+  tests pass; the updated release-candidate GitHub workflow has not yet run.
+  This is still build/link evidence, not packaged-game runtime evidence.
+  [^release-candidate-workflow][^release-evidence]
 - CI run `38300168673` passed the caller-policy plan and hosted browser/Linux
   War Battles bundles. Local-runner and external-Extender modes still need
   their own consumer evidence; authored Static Hermes application mode remains

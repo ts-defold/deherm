@@ -76,6 +76,9 @@ on:
       policy_run_id:
         description: Policy run whose derived bundle-target inputs should be built
         required: false
+      policy_source_sha:
+        description: Exact commit that produced policy_run_id
+        required: false
   push:
     branches: [main]
     paths:
@@ -163,6 +166,8 @@ jobs:
       registry_credential: ${{ steps.credential.outputs.available }}
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.policy_source_sha || github.sha }}
       - name: Download policy-derived artifact inputs
         if: inputs.policy_run_id != ''
         uses: actions/download-artifact@v7
@@ -174,10 +179,17 @@ jobs:
           repository: ${{ github.repository }}
       - name: Install policy-derived artifact inputs
         if: inputs.policy_run_id != ''
-        run: >-
-          node scripts/policy-surface.mjs extract
-          --archive "$RUNNER_TEMP/policy-source/policy-surface.tar.gz"
-          --path packages/toolchains/defold-bundle-targets.json
+        env:
+          POLICY_RUN_ID: ${{ inputs.policy_run_id }}
+          POLICY_SOURCE_SHA: ${{ inputs.policy_source_sha }}
+        run: |
+          node scripts/policy-surface-identity.mjs verify \
+            --archive "$RUNNER_TEMP/policy-source/policy-surface.tar.gz" \
+            --identity "$RUNNER_TEMP/policy-source/policy-surface-identity.json" \
+            --source-sha "$POLICY_SOURCE_SHA" --run-id "$POLICY_RUN_ID"
+          node scripts/policy-surface.mjs extract \
+            --archive "$RUNNER_TEMP/policy-source/policy-surface.tar.gz" \
+            --path packages/toolchains/defold-bundle-targets.json
       - name: Pack the resolved artifact inputs
         run: |
           mkdir -p "$RUNNER_TEMP/native-artifact-inputs/packages/toolchains"
@@ -283,6 +295,8 @@ jobs:
         row: ${{ fromJSON(needs.plan.outputs.dehermc_rows) }}
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.policy_source_sha || github.sha }}
       - uses: actions/setup-node@v7
         with: { node-version: '22' }
       - name: Resolve the canonical build row
@@ -351,7 +365,7 @@ jobs:
     runs-on: ${{ fromJSON('["ubuntu-24.04","ubuntu-24.04-arm"]')[matrix.row] }}
     steps:
       - uses: actions/checkout@v7
-        with: { submodules: recursive }
+        with: { submodules: recursive, ref: "${{ inputs.policy_source_sha || github.sha }}" }
       - uses: actions/download-artifact@v7
         with:
           name: native-artifact-inputs
@@ -404,7 +418,7 @@ jobs:
         row: ${{ fromJSON(needs.plan.outputs.windows_rows) }}
     steps:
       - uses: actions/checkout@v7
-        with: { submodules: recursive }
+        with: { submodules: recursive, ref: "${{ inputs.policy_source_sha || github.sha }}" }
       - uses: actions/download-artifact@v7
         with:
           name: native-artifact-inputs
@@ -455,7 +469,7 @@ jobs:
         shell: bash
     steps:
       - uses: actions/checkout@v7
-        with: { submodules: recursive }
+        with: { submodules: recursive, ref: "${{ inputs.policy_source_sha || github.sha }}" }
       - uses: actions/download-artifact@v7
         with:
           name: native-artifact-inputs
@@ -512,7 +526,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
-        with: { submodules: recursive }
+        with: { submodules: recursive, ref: "${{ inputs.policy_source_sha || github.sha }}" }
       - uses: actions/download-artifact@v7
         with:
           name: native-artifact-inputs
@@ -564,7 +578,7 @@ jobs:
       DEFOLD_IPHONEOS_VERSION_MIN: ${{ needs.plan.outputs.iphoneos_version_min }}
     steps:
       - uses: actions/checkout@v7
-        with: { submodules: recursive }
+        with: { submodules: recursive, ref: "${{ inputs.policy_source_sha || github.sha }}" }
       - uses: actions/download-artifact@v7
         with:
           name: native-artifact-inputs
@@ -610,7 +624,7 @@ jobs:
         shell: bash
     steps:
       - uses: actions/checkout@v7
-        with: { submodules: recursive }
+        with: { submodules: recursive, ref: "${{ inputs.policy_source_sha || github.sha }}" }
       - uses: actions/setup-node@v7
         with: { node-version: '22' }
       - name: Resolve the canonical build row
@@ -659,6 +673,8 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.policy_source_sha || github.sha }}
       - uses: actions/download-artifact@v7
         with:
           name: native-artifact-inputs

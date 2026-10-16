@@ -397,6 +397,42 @@ test("policy publication can retain a previously complete artifact mapping", asy
   );
 });
 
+test("a pending native release preserves the previous mapping until an authenticated replacement is ready", async () => {
+  const directory = await mkdtemp(path.join(tmpdir(), "deherm-policy-release-transition-"));
+  const site = await readSiteConfig();
+  const previous = addFixtureIntegrity(divergentNativeReferences(await buildArtifactReferences()));
+  const current = structuredClone(previous);
+  current["native-artifacts"].releases["arm64-osx"] = {
+    ...current["native-artifacts"].releases["arm64-osx"],
+    tag: "libs-fixture-apple-next",
+    fingerprint: "d".repeat(64),
+  };
+  const outputs = ["previous", "pending", "ready"].map((name) => path.join(directory, name));
+  const states = [];
+  for (const [output, references] of [
+    [outputs[0], previous],
+    [outputs[1], previous], // Desired current release is incomplete; retain last complete.
+    [outputs[2], current],
+  ]) {
+    const result = await buildPolicySite({ output, artifactReferences: references, requireIntegrity: true });
+    await verifyEmittedTree({ output, site: result.site });
+    const revision = result.entries[0].defoldRevision;
+    states.push({
+      pointer: JSON.parse(await readFile(path.join(output, site.layoutVersion, "index", `${revision}.json`), "utf8")),
+      artifacts: JSON.parse(
+        await readFile(path.join(output, site.layoutVersion, "artifacts", `${revision}.json`), "utf8"),
+      ),
+    });
+  }
+  assert.equal(states[0].pointer.policyRoot, states[1].pointer.policyRoot);
+  assert.equal(states[1].pointer.policyRoot, states[2].pointer.policyRoot);
+  assert.equal(states[0].pointer.artifactsSha256, states[1].pointer.artifactsSha256);
+  assert.notEqual(states[1].pointer.artifactsSha256, states[2].pointer.artifactsSha256);
+  assert.deepEqual(states[1].artifacts.artifacts, previous);
+  assert.deepEqual(states[2].artifacts.artifacts, current);
+  validateArtifactReferences(states[2].artifacts, "ready", { requireIntegrity: true });
+});
+
 test("policy publication preserves revision-compatible native artifacts without pinning host tools", async () => {
   const current = addFixtureIntegrity(await buildArtifactReferences());
   const previous = structuredClone(current);

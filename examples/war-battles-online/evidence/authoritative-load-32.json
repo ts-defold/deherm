@@ -1809,8 +1809,8 @@
     {
       "path": "examples/war-battles-online/integration/authoritative-load-evidence.mjs",
       "kind": "file",
-      "bytes": 11779,
-      "sha256": "a70ca0b77fe1e4fdff939da2e52e0a4eeb7fc6eb4b4157688a30b10a4e183afb"
+      "bytes": 11898,
+      "sha256": "1f388c0a58ea6eabfb8df2461740c534197f5fa84e78e356553c94cb3ddca583"
     },
     {
       "path": "examples/war-battles-online/integration/check-authoritative-load.mjs",
@@ -1825,17 +1825,11 @@
       "sha256": "24b44214b2e865b0b76310a3d3d3efaf604d6e522eeca129c9ede78739f74462"
     },
     {
-      "path": "package.json",
-      "kind": "file",
-      "bytes": 57037,
-      "sha256": "4d73e90e78f7d326d486d14cc373df5516cb919e165b18fb2a1106d3ed25f12b"
-    },
-    {
       "path": "pnpm-lock.yaml",
       "kind": "file",
-      "bytes": 105409,
-      "sha256": "ffe932f2e731fb9fbe05f21cf7558bf938fd4e34b668537e3bd496b0bdd07df3"
+      "bytes": 105664,
+      "sha256": "82e1a9f9457c5d792528c5eba49574ca24e4e2f6424d877a2941da1ad87255e3"
     }
   ],
-  "sourceKey": "af80695efae2eaf98a855515f05f20b165f02a4691ba26a77bede139fc9f6361"
+  "sourceKey": "c57cc57f42249f1c8f2f14f4fbba5542115cbe0cbea14466b3a4b91019a3718f"
 }

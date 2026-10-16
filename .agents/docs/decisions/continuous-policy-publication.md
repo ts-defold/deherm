@@ -4,7 +4,7 @@ title: Continuous policy generation, engine evidence, and publication
 description: One nightly policy workflow derives every tracked Defold revision, emits every mechanically representable API, records verification without gating publication, and publishes the accumulated policy store directly to the website.
 tags: [decision, generator, policy, ci, conformance, pages]
 status: accepted
-generated: { by: codex/gpt-5, at: 2026-09-19T12:00:00-04:00 }
+generated: { by: codex/gpt-6.1-sol, at: 2026-10-16T12:41:00-04:00 }
 sources:
   - id: generate-report
     resource: ./generate-report-never-gate.md
@@ -17,6 +17,18 @@ sources:
   - id: revision-derivation
     resource: ./revision-parametric-derivation.md
     title: Revision-parametric derivation
+    author: project:deherm
+  - id: policy-workflow
+    resource: ../../../.github/workflows/policy.yml
+    title: Policy publication workflow
+    author: project:deherm
+  - id: native-workflow
+    resource: ../../../.github/workflows/native-artifacts.yml
+    title: Native artifact workflow
+    author: project:deherm
+  - id: surface-identity
+    resource: ../../../scripts/policy-surface-identity.mjs
+    title: Policy surface handoff identity
     author: project:deherm
 ---
 
@@ -115,6 +127,18 @@ the accumulated store but deliberately derives no channel revision: release
 availability changed, Defold source did not. Nightly and ordinary manual runs
 retain channel discovery. This keeps an artifact retry proportional to the
 mutable mapping it advances instead of repeating three source derivations.
+
+The policy plan runs the package-owned release preflight before derivation. The
+derived policy-surface artifact carries a separate identity document naming
+the producer commit, policy run ID, and SHA-256 of the exact archive. A
+cross-workflow native-artifact dispatch supplies that commit and run ID; every
+native-artifact checkout uses the producer commit, and the plan verifies the
+identity before extracting the target list. An advanced `main` therefore
+cannot silently pair an older policy surface with newer artifact recipe code.
+The archive identity protects the handoff, not the authenticity of public
+release assets; those retain their independent integrity-sidecar checks.
+Local mutation and mismatch tests cover this contract. Its first GitHub CI
+execution remains separate evidence.[^policy-workflow][^native-workflow][^surface-identity]
 
 The derivation job also builds a disposable site to exercise the site emitter
 before host-parity and publication. That build uses `--validation-only`: its

@@ -103,8 +103,8 @@
     {
       "path": "examples/war-battles-online/integration/webtransport-evidence.mjs",
       "kind": "file",
-      "bytes": 7927,
-      "sha256": "f3a0d2294e700383f85a58a87c172608d813854290687db606938117ca0cece9"
+      "bytes": 8050,
+      "sha256": "67a07bc20c025c6ae18f706408436d6e39df5ea231124cad85034297502f8748"
     },
     {
       "path": "examples/war-battles-online/package.json",
@@ -119,12 +119,6 @@
       "sha256": "c9ae27bf83756b831647e8cf67e0f4bfa6b9ea71b3b7d53a63d5924f2dfcf665"
     },
     {
-      "path": "package.json",
-      "kind": "file",
-      "bytes": 57122,
-      "sha256": "8c7b93c77b2bbf3bffa20cb67d4aa8207d4419b9d7703aaec2e7e93eb18e8701"
-    },
-    {
       "path": "pnpm-lock.yaml",
       "kind": "file",
       "bytes": 105664,
@@ -137,6 +131,11 @@
       "sha256": "31fdeff053927fb67441d9dc9435af6a0cb60d279e3113dd8f6399962290143c"
     }
   ],
-  "sourceKey": "6a920156d778d485795f01968af7f02217dfb07a9c22a4b63e0efd1f4bedae5a",
-  "evidenceBoundary": "Real loopback Chrome-to-Deno HTTP/3/WebTransport transport, authoritative welcome/snapshot/input and scalar client-presentation telemetry; server input acceptance is observed from MatchServer stats; the telemetry describes this bounded loopback trace and is not a visual-quality, WAN, ingress, native Defold, allocation, or reliable-lane-persistence claim."
+  "sourceKey": "3389417ff7e7628217b7ddd604994b7d871f9987c5b67f426fe84be13d4971fe",
+  "evidenceBoundary": "Real loopback Chrome-to-Deno HTTP/3/WebTransport transport, authoritative welcome/snapshot/input and scalar client-presentation telemetry; server input acceptance is observed from MatchServer stats; the telemetry describes this bounded loopback trace and is not a visual-quality, WAN, ingress, native Defold, allocation, or reliable-lane-persistence claim.",
+  "sourceMetadataRekey": {
+    "baseCommit": "6151f80ba7faabc5603ebeb1cb6d828954200b38",
+    "previousKey": "6a920156d778d485795f01968af7f02217dfb07a9c22a4b63e0efd1f4bedae5a",
+    "scope": "provenance-only: root task scripts removed; browser/server observations unchanged"
+  }
 }

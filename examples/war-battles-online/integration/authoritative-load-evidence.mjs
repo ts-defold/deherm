@@ -16,7 +16,8 @@ export const AUTHORITATIVE_LOAD_SOURCE_PATHS = Object.freeze([
   "examples/war-battles-online/integration/authoritative-load-evidence.mjs",
   "examples/war-battles-online/integration/check-authoritative-load.mjs",
   "examples/war-battles-online/package.json",
-  "package.json",
+  // Root task scripts are not part of the deterministic match workload.
+  // pnpm-lock.yaml retains the dependency-resolution boundary.
   "pnpm-lock.yaml",
 ]);
 

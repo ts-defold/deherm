@@ -21,7 +21,8 @@ export const WEBTRANSPORT_SOURCE_PATHS = Object.freeze([
   "examples/war-battles-online/integration/webtransport-evidence.mjs",
   "examples/war-battles-online/package.json",
   "examples/war-battles-online/server/deno-main.ts",
-  "package.json",
+  // Root CLI script changes do not affect this game/transport observation;
+  // dependency resolution remains pinned by the lockfile below.
   "pnpm-lock.yaml",
   "packages/cli/src/dev/browser-host.mjs",
 ]);

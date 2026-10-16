@@ -8,9 +8,25 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { assertRetainedNpmCandidate } from "./lib/npm-candidate.mjs";
+
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const packOnly = process.argv.includes("--pack-only");
-const outputArgument = process.argv.slice(2).find((argument) => argument !== "--pack-only");
+const arguments_ = process.argv.slice(2);
+const packOnly = arguments_.includes("--pack-only");
+const candidateIndex = arguments_.indexOf("--candidate");
+const candidate = candidateIndex < 0 ? null : arguments_[candidateIndex + 1];
+if (candidateIndex >= 0 && (!candidate || candidate.startsWith("--"))) {
+  throw new Error("--candidate requires the retained npm tarball path");
+}
+if (packOnly && candidate) throw new Error("--pack-only cannot consume an existing candidate");
+const positional = arguments_.filter(
+  (argument, index) =>
+    argument !== "--pack-only" && (candidateIndex < 0 || (index !== candidateIndex && index !== candidateIndex + 1)),
+);
+if (positional.length > 1 || positional.some((argument) => argument.startsWith("--"))) {
+  throw new Error("Usage: prove-npm-consumer.mjs [--pack-only | --candidate <tarball>] [report.json]");
+}
+const outputArgument = positional[0];
 const output = path.resolve(outputArgument ?? path.join(repositoryRoot, "build", "npm-consumer-proof.json"));
 const targets = [
   { target: "wasm-web", representation: "javascript" },
@@ -84,10 +100,23 @@ try {
     assert.equal(sourceClean, true, "release-candidate proof requires a clean checkout");
   }
 
-  run("npm", ["pack", "--silent", "--pack-destination", root, "--cache", npmCache]);
-  const archives = (await readdir(root)).filter((name) => name.endsWith(".tgz"));
+  if (!candidate) run("npm", ["pack", "--silent", "--pack-destination", root, "--cache", npmCache]);
+  const archives = candidate
+    ? [path.basename(candidate)]
+    : (await readdir(root)).filter((name) => name.endsWith(".tgz"));
   assert.equal(archives.length, 1, "npm pack must produce exactly one tarball");
-  const archive = path.join(root, archives[0]);
+  const archive = candidate ? path.resolve(candidate) : path.join(root, archives[0]);
+  if (candidate) {
+    const packed = JSON.parse(await readFile(output, "utf8"));
+    assertRetainedNpmCandidate(packed, {
+      archive,
+      commit,
+      digest: createHash("sha256")
+        .update(await readFile(archive))
+        .digest("hex"),
+      repositoryRoot,
+    });
+  }
   const manifest = JSON.parse(run("tar", ["-xOzf", archive, "package/package.json"]));
   assert.equal(manifest.name, "@ts-defold/deherm");
   const archiveSha256 = createHash("sha256")
@@ -112,7 +141,7 @@ try {
   );
   assert.equal(members.includes("package/defold/defold_hermes/include/libhermesvm-config.h"), false);
 
-  const retainedArchive = path.join(path.dirname(output), "npm-release-candidate", archives[0]);
+  const retainedArchive = candidate ?? path.join(path.dirname(output), "npm-release-candidate", archives[0]);
   await mkdir(path.dirname(retainedArchive), { recursive: true });
   try {
     const previousSha256 = createHash("sha256")
@@ -123,7 +152,7 @@ try {
   } catch (error) {
     if (error?.code !== "ENOENT") throw error;
   }
-  await copyFile(archive, retainedArchive);
+  if (!candidate) await copyFile(archive, retainedArchive);
   assert.equal(
     createHash("sha256")
       .update(await readFile(retainedArchive))

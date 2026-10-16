@@ -39,19 +39,22 @@ jobs:
       - name: Pack and inventory the candidate without a hosted build
         run: node scripts/prove-npm-consumer.mjs --pack-only
       - name: Compile a real Snake game from the installed npm tarball
-        run: >-
-          node scripts/prove-npm-snake.mjs
-          build/npm-release-candidate/ts-defold-deherm-0.1.0.tgz
-          build/npm-snake-proof.json
-          --bob-target=wasm-web
-          --bob-target=x86_64-linux
+        run: |
+          archive="$(node -p 'require("./build/npm-consumer-proof.json").tarball')"
+          node scripts/prove-npm-snake.mjs "$archive" build/npm-snake-proof.json \
+            --bob-target=wasm-web --bob-target=x86_64-linux
       - name: Prove tarball installation and Defold browser/native bundles
-        run: node scripts/prove-npm-consumer.mjs
+        run: |
+          archive="$(node -p 'require("./build/npm-consumer-proof.json").tarball')"
+          node scripts/prove-npm-consumer.mjs --candidate "$archive"
+      - name: Reconcile one candidate across both installed-package proofs
+        run: node scripts/check-npm-release-candidate.mjs
       - uses: actions/upload-artifact@v6
         with:
           name: npm-consumer-proof
           path: |
             build/npm-consumer-proof.json
             build/npm-snake-proof.json
+            build/npm-release-evidence.json
             build/npm-release-candidate/*.tgz
           if-no-files-found: error

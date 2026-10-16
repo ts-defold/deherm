@@ -15,8 +15,22 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  preflight:
+    name: Fast release preflight
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: pnpm check:release-preflight
+
   portable-tooling:
     name: TUI, VS Code, and release contract (${{ matrix.os }})
+    needs: preflight
     env:
       # Product downloads remain usable without GitHub auth, but the matrix
       # intentionally exercises several release-integrity lookups in parallel.
@@ -68,6 +82,12 @@ jobs:
       - name: Bootstrap aggregate upstream inputs
         if: runner.os == 'Linux'
         run: ./scripts/bootstrap-upstreams.sh
+      - name: Compile native component ABI fixture before aggregate tests
+        if: runner.os == 'Linux'
+        run: pnpm check:release-preflight --native
+      - name: Regress stale native ABI at the preflight boundary
+        if: runner.os == 'Linux'
+        run: node --test tests/release-preflight.test.mjs
       - name: Aggregate test gate
         if: runner.os == 'Linux' && github.event_name != 'pull_request'
         run: node scripts/run-release-command.mjs pnpm test

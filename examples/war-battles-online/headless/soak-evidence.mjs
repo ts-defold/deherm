@@ -29,7 +29,8 @@ export const HEADLESS_SOAK_SOURCE_PATHS = Object.freeze([
   HEADLESS_SOAK_OWNER,
   "examples/war-battles-online/headless/soak-evidence.mjs",
   "examples/war-battles-online/package.json",
-  "package.json",
+  // The root task manifest does not enter this replay; dependency versions
+  // are still covered by the lockfile below.
   "pnpm-lock.yaml",
 ]);
 
