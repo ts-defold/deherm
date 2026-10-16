@@ -4,6 +4,17 @@
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "functions": [
     {
+      "id": "script:gui.set_texture_data",
+      "binaryParameters": [
+        {
+          "index": 4,
+          "name": "buffer",
+          "carrier": "Uint8Array | ArrayBuffer",
+          "note": "Lua strings are counted byte arrays here; the TypeScript surface must not UTF-8 transcode texture payloads."
+        }
+      ]
+    },
+    {
       "id": "script:label.get_text",
       "deprecated": "This function is deprecated. Use `go.get(\"#label\", \"text\")` instead."
     },

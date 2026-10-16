@@ -103,6 +103,14 @@ export function validateRevisionMatrix(manifest) {
   return manifest;
 }
 
+export function currentRevisionMatrix(revision) {
+  return validateRevisionMatrix({
+    schemaVersion: 1,
+    kind: "deherm.defold-revision-matrix",
+    lanes: [{ id: "current", label: "derived revision", revision, workspace: ".", cadence: "blocking" }],
+  });
+}
+
 export async function loadResolvedPolicy(workspace) {
   const generated = path.join(workspace, "packages", "bindings", "generated");
   const manifestPath = path.join(generated, "defold-api-policy.json");
@@ -535,8 +543,16 @@ function markdownReport(report) {
 async function main() {
   const argv = process.argv.slice(2);
   const valueAfter = (name) => (argv.includes(name) ? argv[argv.indexOf(name) + 1] : null);
-  const manifestPath = path.resolve(valueAfter("--manifest") ?? defaultManifest);
-  const manifest = validateRevisionMatrix(JSON.parse(await readFile(manifestPath, "utf8")));
+  if (argv.includes("--current") && argv.includes("--manifest")) {
+    throw new Error("--current and --manifest are mutually exclusive");
+  }
+  const manifest = argv.includes("--current")
+    ? currentRevisionMatrix(
+        /^DEFOLD_REV=([a-f0-9]{40})$/mu.exec(await readFile(path.join(repositoryRoot, "upstream.lock"), "utf8"))?.[1],
+      )
+    : validateRevisionMatrix(
+        JSON.parse(await readFile(path.resolve(valueAfter("--manifest") ?? defaultManifest), "utf8")),
+      );
   const selected = valueAfter("--lanes")?.split(",").filter(Boolean) ?? manifest.lanes.map(({ id }) => id);
   const unknown = selected.filter((id) => !manifest.lanes.some((lane) => lane.id === id));
   if (unknown.length > 0) throw new Error(`Unknown matrix lanes: ${unknown.join(", ")}`);

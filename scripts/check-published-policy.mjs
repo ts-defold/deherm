@@ -30,6 +30,18 @@ export function missingPublishedEntries(expected, observed) {
   });
 }
 
+/** A partial derivation may publish older usable entries, but must not pass the nightly. */
+export function missingPlannedRevisions(planned, expected) {
+  if (!Array.isArray(planned)) throw new Error("Planned Defold revisions must be an array");
+  const emitted = new Set((expected.entries ?? []).map((entry) => entry.defoldRevision));
+  return planned.filter((row) => {
+    if (!/^[0-9a-f]{40}$/u.test(row?.sha1 ?? "")) {
+      throw new Error(`Invalid planned Defold revision: ${JSON.stringify(row)}`);
+    }
+    return !emitted.has(row.sha1);
+  });
+}
+
 const delay = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
 export async function waitForPublishedPolicy({ expected, fetchImpl = fetch, timeoutMs = 300_000, intervalMs = 5_000 }) {
@@ -67,6 +79,14 @@ async function main(argv = process.argv.slice(2)) {
   if (!Number.isFinite(timeoutMs) || timeoutMs < 1) throw new Error("--timeout-ms must be a positive number");
 
   const expected = JSON.parse(await readFile(shippedIndexPath, "utf8"));
+  const planned = JSON.parse(process.env.PLANNED_REVISIONS ?? "[]");
+  const missing = missingPlannedRevisions(planned, expected);
+  if (missing.length) {
+    throw new Error(
+      `Policy derivation omitted ${missing.length} planned Defold revision(s): ` +
+        missing.map(({ channel, sha1, version }) => `${channel}@${version ?? "unknown"} (${sha1})`).join(", "),
+    );
+  }
   const { url, observed } = await waitForPublishedPolicy({ expected, timeoutMs });
   // Resolve only the entries this derivation asserts. The accumulated public
   // manifest may legitimately contain policies newer than an older checkout.

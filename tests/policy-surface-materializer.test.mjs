@@ -9,6 +9,7 @@ import {
   materializePolicySurface,
   projectArtifactsForToolchain,
   policySurfaceRealizationIdentity,
+  renderScriptSdk,
   renderScriptUrlTargetSupportRecipe,
 } from "../packages/compiler/src/policy-surface-materializer.mjs";
 import { nativeArtifactCompatibility } from "../packages/compiler/src/defold-toolchain-pins.mjs";
@@ -62,6 +63,31 @@ const oldPipelineFixture = JSON.parse(
 function sha256(bytes) {
   return createHash("sha256").update(bytes).digest("hex");
 }
+
+test("script binary type facts survive withdrawal of their optimized Lua route", async () => {
+  const generated = path.join(repositoryRoot, "packages", "bindings", "generated");
+  const document = async (name) => JSON.parse(await readFile(path.join(generated, name), "utf8"));
+  const [ir, documentation, handles, constants, valueTail] = await Promise.all(
+    [
+      "defold-script-api-ir.json",
+      "defold-script-sdk-documentation.json",
+      "defold-script-handle-lowering.json",
+      "defold-script-constant-lowering.json",
+      "defold-script-value-tail-bindings.json",
+    ].map(document),
+  );
+  const withoutSpecialization = {
+    ...valueTail,
+    bindings: valueTail.bindings.filter(({ id }) => id !== "script:gui.set_texture_data"),
+  };
+  const realized = renderScriptSdk(ir, documentation, handles, constants, withoutSpecialization)["script/types.ts"];
+  const generatedTypes = await readFile(
+    path.join(repositoryRoot, "packages/sdk/src/generated/script/types.ts"),
+    "utf8",
+  );
+  assert.equal(realized, generatedTypes);
+  assert.match(realized, /buffer: Uint8Array \| ArrayBuffer/u);
+});
 
 test("published URL target-support recipes remain byte-compatible across recipe versions", async () => {
   const report = JSON.parse(

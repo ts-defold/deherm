@@ -24,7 +24,7 @@ import {
 } from "../scripts/lib/revision-audit.mjs";
 import { auditReviewedEvidence, evidencePath, reviewedClaims } from "../scripts/lib/reviewed-evidence.mjs";
 import { crossRevisionGenerationSteps } from "../scripts/check-cross-revision-derivation.mjs";
-import { validateRevisionMatrix } from "../scripts/check-defold-revision-matrix.mjs";
+import { currentRevisionMatrix, validateRevisionMatrix } from "../scripts/check-defold-revision-matrix.mjs";
 import { documentedSurface, resolveDocumentedDuplication } from "../scripts/lib/documented-route-duplication.mjs";
 import { targetEnvironment } from "../scripts/generate-dmsdk-target-conditionals.mjs";
 import {
@@ -71,6 +71,19 @@ test("the historical matrix is immutable, unique, and data-driven", async () => 
       }),
     /Invalid or duplicate/u,
   );
+});
+
+test("a newly derived revision has a package-local compile and materialization lane", () => {
+  const matrix = currentRevisionMatrix(other);
+  assert.equal(matrix.lanes.length, 1);
+  assert.deepEqual(matrix.lanes[0], {
+    id: "current",
+    label: "derived revision",
+    revision: other,
+    workspace: ".",
+    cadence: "blocking",
+  });
+  assert.throws(() => currentRevisionMatrix("not-a-revision"), /Invalid or duplicate Defold revision matrix lane/u);
 });
 
 test("historical editor documentation cannot shadow a game-runtime route", () => {

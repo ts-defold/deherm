@@ -1,5 +1,31 @@
 # Defold Hermes knowledge log
 
+## 2026-10-16 - Prove each new revision before adoption
+
+The scheduled policy workflow could previously return green after a discovered
+revision failed derivation: it published the older usable store, and the
+consumer checked only entries that had been emitted. The consumer now compares
+the planner's exact SHA list to the derived index before accepting publication.
+Each revision also runs the existing policy materialization, deterministic
+replay, generated TypeScript SDK compile, and C/C++ exact-call twins in its own
+scratch workspace before adoption. This is a per-revision compile/ABI proof,
+not a claim that every game-context behavior was executed.
+
+That new gate passed on pinned `7f0f554f41f9` and caught a real mismatch on
+historical Defold `574678c7d44b`: the generator retained the byte-buffer type
+for `gui.set_texture_data`, but the policy materializer lost it when the
+value-tail optimization withdrew. Binary parameter typing now travels as an
+independent per-revision SDK semantic fact. Regenerating the historical SDK
+and policy in the scratch workspace, then running `check-defold-revision-matrix
+--current`, passed: 807 script functions, 1,336 dmSDK declarations, byte-equal
+materialization, TypeScript compile, and C/C++ exact-call twins. This does not
+prove future unknown syntax or all runtime contexts; the nightly will now fail
+visibly and keep the previous site usable if one of those contracts breaks.
+The final regenerated pinned policy root is `58d5fdaa8158`; `pnpm check`, the
+focused policy/API tests, style, and OKF checks passed after source edits
+stopped. No hosted workflow run from this commit is claimed yet.
+
+
 ## 2026-10-16 - Harden release preflight and candidate identity
 
 Release readiness and the local aggregate `pnpm check` now check package-owned

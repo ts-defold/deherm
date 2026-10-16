@@ -442,6 +442,7 @@ export async function deriveRevision(options) {
     carryReviews = false,
     auditOnly = false,
     adopt = false,
+    verifyCurrent = false,
     onProgress = () => {},
   } = options;
   if (!isDefoldRevision(revision)) throw new Error(`Not a Defold revision: ${revision}`);
@@ -573,6 +574,26 @@ export async function deriveRevision(options) {
     );
   }
 
+  if (!blocker && !auditOnly && verifyCurrent) {
+    const label = "scripts/check-defold-revision-matrix.mjs --current";
+    onProgress(label);
+    const started = Date.now();
+    try {
+      const { stdout, stderr } = await run(
+        process.execPath,
+        ["scripts/check-defold-revision-matrix.mjs", "--current"],
+        {
+          cwd: workspace,
+          env,
+        },
+      );
+      steps.push({ step: label, seconds: Math.round((Date.now() - started) / 100) / 10, stdout, stderr });
+    } catch (error) {
+      steps.push({ step: label, seconds: Math.round((Date.now() - started) / 100) / 10, failed: true });
+      blocker = { kind: "realization", step: label, message: error.message };
+    }
+  }
+
   const adopted = [];
   if (adopt && blocker) throw new Error(`Refusing to adopt a blocked derivation of ${revision}: ${blocker.message}`);
   if (adopt) {
@@ -639,6 +660,7 @@ function parseArguments(argv) {
     carryReviews: false,
     auditOnly: false,
     adopt: false,
+    verifyCurrent: false,
     clean: false,
     json: false,
   };
@@ -656,6 +678,7 @@ function parseArguments(argv) {
     else if (argument === "--carry-reviews") options.carryReviews = true;
     else if (argument === "--audit-only") options.auditOnly = true;
     else if (argument === "--adopt") options.adopt = true;
+    else if (argument === "--verify-current") options.verifyCurrent = true;
     else if (argument === "--clean") options.clean = true;
     else if (argument === "--json") options.json = true;
     else throw new Error(`Unknown argument: ${argument}`);
@@ -663,7 +686,7 @@ function parseArguments(argv) {
   if (!options.revision) {
     throw new Error(
       "Usage: derive-revision.mjs --revision <sha> [--workspace <dir>] [--upstream-from <dir>] " +
-        "[--carry-reviews] [--audit-only] [--adopt] [--clean] [--json]",
+        "[--carry-reviews] [--audit-only] [--verify-current] [--adopt] [--clean] [--json]",
     );
   }
   return options;

@@ -150,7 +150,7 @@ jobs:
             workspace="$RUNNER_TEMP/derive-$revision"
             audit="$RUNNER_TEMP/policy-reports/$revision.audit.ndjson"
             log="$RUNNER_TEMP/policy-reports/$revision.log"
-            args=(--revision "$revision" --workspace "$workspace" --adopt)
+            args=(--revision "$revision" --workspace "$workspace" --verify-current --adopt)
             if [ "$CARRY_REVIEWS" = true ]; then args+=(--carry-reviews); fi
             set +e
             DEHERM_REVISION_AUDIT="$audit" node scripts/derive-revision.mjs "${args[@]}" 2>&1 | tee "$log"
@@ -626,7 +626,7 @@ jobs:
 
   consumer-smoke:
     name: Resolve published policy and generate a clean project
-    needs: [derive, publish-site]
+    needs: [plan, derive, publish-site]
     if: needs.publish-site.result == 'success'
     runs-on: ubuntu-24.04
     steps:
@@ -642,6 +642,8 @@ jobs:
         with: { node-version: '22', cache: 'pnpm' }
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - name: Wait for Pages and resolve the public content-addressed store
+        env:
+          PLANNED_REVISIONS: ${{ needs.plan.outputs.derive }}
         run: node scripts/check-published-policy.mjs
       - name: Scaffold, generate and typecheck as an npm consumer
         run: node scripts/check-end-to-end.mjs --stage scaffold --stage generate

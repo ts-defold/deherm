@@ -33,7 +33,7 @@ import {
 import { buildToolchainPins, parseSdkPins } from "../packages/compiler/src/defold-toolchain-pins.mjs";
 import { canonicalGeneratedText, generatedTextMatches } from "../packages/compiler/src/generated-text.mjs";
 import { isRevisionOutput, REVISION_OUTPUT_ROOTS } from "../packages/compiler/src/revision-output-layout.mjs";
-import { manifestUrl, missingPublishedEntries } from "../scripts/check-published-policy.mjs";
+import { manifestUrl, missingPlannedRevisions, missingPublishedEntries } from "../scripts/check-published-policy.mjs";
 import { fetchPolicyText, validateRebuiltHandshake } from "../scripts/check-policy-site-resolution.mjs";
 import { buildShippedIndex, canonicalizePolicyText, generatorRevision } from "../scripts/generate-api-policy.mjs";
 import { apiPolicyGenerator } from "../scripts/lib/script-generator-pipeline.mjs";
@@ -76,6 +76,7 @@ test("policy host parity materializes every authoritative generator input", asyn
   const engine = workflow.slice(workflow.indexOf("  engine-conformance:"), workflow.indexOf("  publish-site:"));
   const publish = workflow.slice(workflow.indexOf("  publish-site:"));
   const derive = workflow.slice(workflow.indexOf("  derive:"), workflow.indexOf("  host-parity:"));
+  assert.match(derive, /args=\(--revision "\$revision" --workspace "\$workspace" --verify-current --adopt\)/u);
   assert.match(parity, /role: Linux canonical bytes/u);
   assert.match(parity, /role: macOS reproduces Linux/u);
   assert.match(parity, /role: Windows reproduces Linux/u);
@@ -189,7 +190,8 @@ test("policy host parity materializes every authoritative generator input", asyn
     engine,
     /Enforce engine-lane infrastructure health[\s\S]*steps\.engine\.outcome != 'success'[\s\S]*exit 1/u,
   );
-  assert.match(workflow, /consumer-smoke:[\s\S]*needs: \[derive, publish-site\]/u);
+  assert.match(workflow, /consumer-smoke:[\s\S]*needs: \[plan, derive, publish-site\]/u);
+  assert.match(workflow, /consumer-smoke:[\s\S]*PLANNED_REVISIONS: \$\{\{ needs\.plan\.outputs\.derive \}\}/u);
   assert.match(workflow, /check-published-policy\.mjs/u);
   assert.match(
     workflow,
@@ -438,6 +440,24 @@ test("published smoke waits for the exact derived entries at the configured site
       entries: [{ defoldRevision: "a", policyRoot: "wrong", generator: "gen-a" }],
     }),
     expected.entries,
+  );
+});
+
+test("published smoke rejects a planned revision omitted by a partial derivation", () => {
+  const planned = [
+    { channel: "beta", sha1: "a".repeat(40), version: "1.14.0" },
+    { channel: "alpha", sha1: "b".repeat(40), version: "1.14.1" },
+  ];
+  const expected = { entries: [{ defoldRevision: planned[0].sha1 }] };
+  assert.deepEqual(missingPlannedRevisions(planned, expected), [planned[1]]);
+  assert.deepEqual(
+    missingPlannedRevisions(planned, { entries: planned.map((row) => ({ defoldRevision: row.sha1 })) }),
+    [],
+  );
+  assert.deepEqual(missingPlannedRevisions([], expected), []);
+  assert.throws(
+    () => missingPlannedRevisions([{ channel: "beta", sha1: "invalid" }], expected),
+    /Invalid planned Defold revision/u,
   );
 });
 

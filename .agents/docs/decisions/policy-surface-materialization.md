@@ -359,8 +359,9 @@ outputs locally: the native runtime table and browser direct-memory library.
 The existing twenty SDK renderers consume the two primary IR documents, two
 small documentation augmentations, the handle-lowering report, and the
 script/dmSDK universal recipe catalogs. The documentation augmentations are
-keyed by the same declaration IDs as the runtime IR and carry only fields that
-affect generated TSDoc. Keeping them separate prevents an upstream prose change
+keyed by the same declaration IDs as the runtime IR and carry SDK-only fields:
+TSDoc, deprecation, and semantic TypeScript parameter projections. Keeping
+them separate prevents an upstream prose change
 from invalidating bridge descriptors or runtime evidence while still making a
 policy-only client reproduce the exact SDK bytes and manifest digest. Six
 support emitters now live in `packages/compiler/src/sdk/support-sdk.mjs`:
@@ -384,6 +385,18 @@ recipe facts and use package-owned emitters. The Lua bridge likewise consumes a
 policy fact projected from the selected revision's Lua compatibility schema;
 the packed compiler owns only the renderer and does not embed Defold function
 names or signatures.
+
+Script binary-parameter typing is a semantic SDK fact, not a reward for a
+selected value-tail optimization. The per-revision SDK documentation recipe
+records the validated parameter index, name, byte carrier, and hover note. The
+materializer applies that fact even when the optimized Lua route withdraws and
+the universal route remains. It validates the recorded parameter against the
+source-derived IR before rendering, and retains the value-tail document as a
+compatibility fallback for older published policies. A historical 1.13.1
+derivation exposed this seam: the old generator emitted `gui.set_texture_data`
+with a byte buffer, but policy realization had rendered it as a string after
+the optimization withdrew. The repaired historical policy materialized and
+compiled with the same package.
 
 Thirteen compact dmSDK family documents occupy 110,989 authenticated policy
 bytes. Package-owned emitters reconstruct scalar, named-scalar, enum/value,

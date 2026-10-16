@@ -61,6 +61,7 @@ const handleClassificationPath = path.join(
 const check = process.argv.includes("--check");
 let loadScriptSemanticOverrides;
 let assertReviewedRevision;
+let declaredDerivation;
 let deriveSemanticHandleTypes;
 let VOID;
 let recordAudit;
@@ -640,7 +641,9 @@ export async function runScriptSdkGenerator({ semanticOnly = false } = {}) {
   ({ loadScriptSemanticOverrides } = await import(
     pathToFileURL(path.join(root, "scripts/lib/script-semantic-overrides.mjs"))
   ));
-  ({ assertReviewedRevision } = await import(pathToFileURL(path.join(root, "scripts/lib/reviewed-revision.mjs"))));
+  ({ assertReviewedRevision, declaredDerivation } = await import(
+    pathToFileURL(path.join(root, "scripts/lib/reviewed-revision.mjs"))
+  ));
   ({ deriveSemanticHandleTypes } = await import(
     pathToFileURL(path.join(root, "scripts/generate-borrowed-handle-classification.mjs"))
   ));
@@ -738,6 +741,7 @@ export async function runScriptSdkGenerator({ semanticOnly = false } = {}) {
   }
   const typeModel = structuredClone(model);
   const typeFunctionsById = new Map(typeModel.functions.map((fn) => [fn.id, fn]));
+  const binaryParametersById = new Map();
   const valueTailPolicy = JSON.parse(await readFile(valueTailPolicyPath, "utf8"));
   for (const family of valueTailPolicy.families ?? []) {
     const binaryParameters = family.codecEvidence?.binaryParameters ?? [];
@@ -745,7 +749,9 @@ export async function runScriptSdkGenerator({ semanticOnly = false } = {}) {
     const ids = (family.sourceRoutes ?? []).flatMap(({ ids }) => ids);
     for (const id of ids) {
       const fn = typeFunctionsById.get(id);
+      if (!fn && declaredDerivation() === defoldRevision) continue;
       assert.ok(fn, `${id}: binary parameter policy does not match the imported script API`);
+      assert.equal(binaryParametersById.has(id), false, `${id}: duplicate binary parameter policy`);
       for (const binary of binaryParameters) {
         const parameter = fn.parameters[binary.index];
         assert.equal(parameter?.rawName, binary.name, `${id}: binary parameter name is stale`);
@@ -754,6 +760,10 @@ export async function runScriptSdkGenerator({ semanticOnly = false } = {}) {
         parameter.rawType = "bytes";
         parameter.description = `${parameter.description ?? ""}${parameter.description ? " " : ""}${binary.note}`;
       }
+      binaryParametersById.set(
+        id,
+        binaryParameters.map(({ index, name, carrier, note }) => ({ index, name, carrier, note })),
+      );
     }
   }
   const renderer = createTypeRenderer(typeModel);
@@ -845,8 +855,12 @@ export async function runScriptSdkGenerator({ semanticOnly = false } = {}) {
     kind: "deherm.script-sdk-documentation",
     defoldRevision,
     functions: model.functions
-      .filter(({ deprecated }) => deprecated)
-      .map(({ id, deprecated }) => ({ id, deprecated }))
+      .filter(({ id, deprecated }) => deprecated || binaryParametersById.has(id))
+      .map(({ id, deprecated }) => ({
+        id,
+        ...(deprecated ? { deprecated } : {}),
+        ...(binaryParametersById.has(id) ? { binaryParameters: binaryParametersById.get(id) } : {}),
+      }))
       .sort((left, right) => left.id.localeCompare(right.id)),
   };
   await output(irPath, `${JSON.stringify(ir, null, 2)}\n`);

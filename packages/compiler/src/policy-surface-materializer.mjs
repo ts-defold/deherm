@@ -278,7 +278,9 @@ function documentationEntries(ir, documentation, { kind, collection }) {
     throw new Error(`${collection}: invalid SDK documentation recipe input`);
   }
   const known = new Set((collection === "functions" ? ir.functions : ir.declarations).map(({ id }) => id));
-  const allowed = new Set(collection === "functions" ? ["id", "deprecated"] : ["id", "deprecated", "notes"]);
+  const allowed = new Set(
+    collection === "functions" ? ["id", "deprecated", "binaryParameters"] : ["id", "deprecated", "notes"],
+  );
   const entries = new Map();
   for (const record of documentation[collection]) {
     if (!record || typeof record.id !== "string" || !known.has(record.id) || entries.has(record.id)) {
@@ -287,6 +289,17 @@ function documentationEntries(ir, documentation, { kind, collection }) {
     if (
       Object.keys(record).some((key) => !allowed.has(key)) ||
       (record.deprecated !== undefined && typeof record.deprecated !== "string") ||
+      (record.binaryParameters !== undefined &&
+        (collection !== "functions" ||
+          !Array.isArray(record.binaryParameters) ||
+          record.binaryParameters.some(
+            ({ index, name, carrier, note }) =>
+              !Number.isSafeInteger(index) ||
+              index < 0 ||
+              typeof name !== "string" ||
+              carrier !== "Uint8Array | ArrayBuffer" ||
+              typeof note !== "string",
+          ))) ||
       (record.notes !== undefined &&
         (!Array.isArray(record.notes) || record.notes.some((note) => typeof note !== "string")))
     ) {
@@ -308,18 +321,32 @@ function scriptModel(ir, documentation, valueTailBindings) {
     aliases: ir.types.filter(({ kind }) => kind === "alias"),
     enums: ir.types.filter(({ kind }) => kind === "enum"),
     functions: ir.functions.map((fn) => {
-      const binaryParameters = valueTailBindings.bindings.find(({ id }) => id === fn.id)?.binaryParameters ?? [];
+      const documentationRecord = docs.get(fn.id);
+      const binaryParameters =
+        documentationRecord?.binaryParameters ??
+        valueTailBindings.bindings.find(({ id }) => id === fn.id)?.binaryParameters ??
+        [];
       const binaryByIndex = new Map(binaryParameters.map((parameter) => [parameter.index, parameter]));
+      if (
+        binaryByIndex.size !== binaryParameters.length ||
+        [...binaryByIndex.keys()].some((index) => index >= fn.parameters.length)
+      ) {
+        throw new Error(`${fn.id}: invalid or duplicate binary parameter index`);
+      }
       const parameters = fn.parameters.map((parameter, index) => {
         const binary = binaryByIndex.get(index);
         if (!binary) return parameter;
+        if (parameter.rawName !== binary.name || parameter.rawType !== "string") {
+          throw new Error(`${fn.id}: binary parameter policy no longer matches the source-derived API`);
+        }
         return {
           ...parameter,
           rawType: "bytes",
           description: `${parameter.description ?? ""}${parameter.description ? " " : ""}${binary.note}`,
         };
       });
-      return { ...fn, ...docs.get(fn.id), parameters, stableId: stableBindingId(fn.id) };
+      const { binaryParameters: _binaryParameters, ...documentationFields } = documentationRecord ?? {};
+      return { ...fn, ...documentationFields, parameters, stableId: stableBindingId(fn.id) };
     }),
     globals: [],
     duplication: [],
@@ -334,7 +361,7 @@ function semanticHandleTypes(handleLowering) {
   return result;
 }
 
-function renderScriptSdk(scriptIr, documentation, handleLowering, constantLowering, valueTailBindings) {
+export function renderScriptSdk(scriptIr, documentation, handleLowering, constantLowering, valueTailBindings) {
   const model = scriptModel(scriptIr, documentation, valueTailBindings);
   const renderer = createScriptTypeRenderer(model);
   const trees = buildApiTrees(model);

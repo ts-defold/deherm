@@ -150,6 +150,14 @@ mapping or the last complete mapping from the published site. Keeping those two
 inputs explicit prevents an artifact race from turning a public revision entry
 into a pointer with no `artifactsSha256`.
 
+The published-policy consumer also compares the planner's exact revision SHAs
+with the derived index before accepting a run. A failed revision can leave the
+older, valid site available, but it cannot make the nightly green merely because
+the consumer verified only entries that happened to be emitted. This is a
+pipeline-completeness check, not a per-route semantic gate: a universal route
+that compiled and passed its generated contract remains publishable while a
+missing optimization recipe is reported separately.
+
 # Per-revision algorithm
 
 For each revision not already in the website index:
@@ -163,7 +171,13 @@ For each revision not already in the website index:
    paths are preferred; the universal/default transport is the fallback.
 5. Emit types, TSDoc, runtime descriptors, native/Static-Hermes/browser glue,
    compile probes, and runtime probes from the same unit.
-6. Compile and link what the current runner can build.
+6. In that revision's scratch workspace, materialize the policy twice, compare
+   it byte-for-byte with the independently generated SDK and output tree, then
+   compile the generated TypeScript SDK and C/C++ exact-call twins. This check
+   runs before adoption, for **each** discovered revision; a later revision
+   cannot stand in for an earlier one in a multi-revision wave. It proves the
+   package's realization and compile contracts, not every game-context runtime
+   behavior.
 7. Exercise generated probes in a real Defold engine wherever the harness can
    construct the required context.
 8. Record evidence, update issues for contradictions or missing generator
