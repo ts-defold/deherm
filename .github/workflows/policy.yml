@@ -500,6 +500,7 @@ jobs:
           repository: ts-defold/deherm
           ref: deherm-policy-site
           path: build/published-policy-site
+          fetch-depth: 0
       - uses: actions/download-artifact@v7
         with:
           name: policy-surface
@@ -508,6 +509,11 @@ jobs:
       - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v7
         with: { node-version: '22', cache: 'pnpm' }
+      - name: Recover valid native mappings for older Defold revisions
+        run: >-
+          node scripts/collect-policy-artifact-history.mjs
+          --site build/published-policy-site
+          --out "$RUNNER_TEMP/artifact-history.json"
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - run: bash scripts/bootstrap-upstreams.sh defold
       - run: node scripts/generate-api-policy.mjs --check
@@ -573,6 +579,7 @@ jobs:
         run: |
           set -euo pipefail
           args=(--out build/policy-site)
+          args+=(--artifact-history "$RUNNER_TEMP/artifact-history.json")
           if [ -n "$FALLBACK_ARTIFACTS" ]; then
             args+=(--artifact-references "$FALLBACK_ARTIFACTS")
           else
@@ -642,7 +649,18 @@ jobs:
       actions: write
       contents: read
     steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with: { node-version: '22', cache: 'pnpm' }
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - id: artifacts
+        name: Wait for a compatible native mapping
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/check-published-native-artifacts.mjs --github-output "$GITHUB_OUTPUT"
       - name: Dispatch the full Bob target matrix
+        if: steps.artifacts.outputs.ready == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh workflow run end-to-end.yml --repo "${{ github.repository }}" --ref "${{ github.ref_name }}"

@@ -4,7 +4,12 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 
-import { buildPolicySite, validateArtifactReferences, verifyEmittedTree } from "../scripts/build-policy-site.mjs";
+import {
+  buildPolicySite,
+  selectArtifactReferencesForRevision,
+  validateArtifactReferences,
+  verifyEmittedTree,
+} from "../scripts/build-policy-site.mjs";
 import {
   artifactFamilyNames,
   artifactReleaseForRow,
@@ -21,6 +26,8 @@ import {
   storeRoot,
 } from "../scripts/generate-api-policy.mjs";
 import { hydratePolicySite } from "../scripts/hydrate-policy-site.mjs";
+import { collectArtifactHistory } from "../scripts/collect-policy-artifact-history.mjs";
+import { ARTIFACTS_DOCUMENT_KIND, hashBytes } from "../packages/compiler/src/api-policy.mjs";
 
 function divergentNativeReferences(references) {
   const divergent = structuredClone(references);
@@ -388,4 +395,63 @@ test("policy publication can retain a previously complete artifact mapping", asy
     buildPolicySite({ output: directory, artifactReferences: unauthenticated, requireIntegrity: true }),
     /mismatched native-artifacts asset and integrity indexes/u,
   );
+});
+
+test("policy publication preserves revision-compatible native artifacts without pinning host tools", async () => {
+  const current = addFixtureIntegrity(await buildArtifactReferences());
+  const previous = structuredClone(current);
+  current["native-artifacts"].compatibility = { kind: "defold-native-artifacts-v1", sha256: "a".repeat(64) };
+  previous["native-artifacts"].compatibility = { kind: "defold-native-artifacts-v1", sha256: "b".repeat(64) };
+  current["hermes-host"].tag = "current-host";
+  previous["hermes-host"].tag = "old-host";
+  validateArtifactReferences(current, "current", { requireIntegrity: true });
+  validateArtifactReferences(previous, "previous", { requireIntegrity: true });
+
+  assert.equal(
+    selectArtifactReferencesForRevision(current, [previous], current["native-artifacts"].compatibility),
+    current,
+  );
+  const selected = selectArtifactReferencesForRevision(current, [previous], previous["native-artifacts"].compatibility);
+  assert.deepEqual(selected["native-artifacts"], previous["native-artifacts"]);
+  assert.equal(selected["hermes-host"].tag, "current-host");
+  assert.deepEqual(
+    selectArtifactReferencesForRevision(current, [previous], {
+      kind: "defold-native-artifacts-v1",
+      sha256: "c".repeat(64),
+    }),
+    current,
+    "unavailable compatibility remains pending for the client instead of fabricating a release",
+  );
+});
+
+test("historical native mapping recovery requires a pointer-bound, complete artifact document", async () => {
+  const revision = "a".repeat(40);
+  const references = addFixtureIntegrity(await buildArtifactReferences());
+  const compatibility = references["native-artifacts"].compatibility.sha256;
+  const filename = `v1/artifacts/${revision}.json`;
+  const pointerFilename = `v1/index/${revision}.json`;
+  const bytes = `${JSON.stringify({ kind: ARTIFACTS_DOCUMENT_KIND, defoldRevision: revision, artifacts: references })}\n`;
+  const pointer = JSON.stringify({ defoldRevision: revision, artifactsSha256: hashBytes(Buffer.from(bytes)) });
+  const entries = new Map([
+    ["git -C /site log --format=%H -- v1/artifacts", "commit\n"],
+    ["git -C /site ls-tree -r --name-only commit -- v1/artifacts", `${filename}\n`],
+    [`git -C /site show commit:${filename}`, bytes],
+    [`git -C /site show commit:${pointerFilename}`, pointer],
+  ]);
+  const git = (_binary, args) => {
+    const value = entries.get(`git ${args.join(" ")}`);
+    if (value === undefined) throw new Error("missing mock git entry");
+    return value;
+  };
+  const recover = () =>
+    collectArtifactHistory({ siteRoot: "/site", revisions: [revision], needed: new Set([compatibility]), git });
+  assert.deepEqual(recover(), [references]);
+  entries.set(
+    `git -C /site show commit:${pointerFilename}`,
+    JSON.stringify({
+      defoldRevision: revision,
+      artifactsSha256: "0".repeat(64),
+    }),
+  );
+  assert.deepEqual(recover(), [], "an unbound historical document cannot supply a native release");
 });

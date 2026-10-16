@@ -28,7 +28,16 @@ import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import { ARTIFACTS_DOCUMENT_KIND, artifactsPath, hashBytes, indexPath } from "../packages/compiler/src/api-policy.mjs";
+import {
+  ARTIFACTS_DOCUMENT_KIND,
+  artifactsPath,
+  hashBytes,
+  indexPath,
+  objectPath,
+  policyPath,
+  restoreDefoldRevision,
+} from "../packages/compiler/src/api-policy.mjs";
+import { nativeArtifactCompatibility } from "../packages/compiler/src/defold-toolchain-pins.mjs";
 import { releaseIntegrityAssetName } from "../packages/cli/src/release-integrity-name.mjs";
 import {
   buildArtifactReferences,
@@ -41,6 +50,26 @@ import { artifactFamilyNames, familyArchiveName, nativeArtifactRecipeForTarget }
 
 export const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 export const defaultOutputDirectory = path.join(root, "build", "policy-site");
+
+export function selectArtifactReferencesForRevision(current, historical, expectedCompatibility) {
+  const matches = (references) =>
+    references?.["native-artifacts"]?.compatibility?.kind === expectedCompatibility.kind &&
+    references["native-artifacts"].compatibility.sha256 === expectedCompatibility.sha256;
+  if (matches(current)) return current;
+  const previous = historical.find(matches);
+  return previous ? { ...current, "native-artifacts": previous["native-artifacts"] } : current;
+}
+
+export async function expectedNativeCompatibility(storeDirectory, layoutVersion, entry) {
+  const policy = JSON.parse(
+    await readFile(path.join(storeDirectory, policyPath(layoutVersion, entry.policyRoot)), "utf8"),
+  );
+  const hash = policy.subtrees?.["@toolchain"];
+  if (!/^[a-f0-9]{64}$/u.test(hash ?? "")) throw new Error(`${entry.defoldRevision} has no toolchain subtree`);
+  const object = JSON.parse(await readFile(path.join(storeDirectory, objectPath(layoutVersion, hash)), "utf8"));
+  if (object.kind !== "deherm.policy.toolchain") throw new Error(`${entry.defoldRevision} has no toolchain facts`);
+  return nativeArtifactCompatibility(restoreDefoldRevision(object, entry.defoldRevision));
+}
 
 const releaseTagPattern = /^[A-Za-z0-9][A-Za-z0-9._-]*$/u;
 const fingerprintPattern = /^[0-9a-f]{64}$/u;
@@ -346,21 +375,32 @@ export async function buildPolicySite(options = {}) {
   // an index entry stay a pure, write-once function of its Defold revision, and
   // stops a build-script edit invalidating a policy derived months earlier.
   //
-  // Every indexed revision gets one, naming the tags this publish is current
-  // for. Its exact digest is bound into the replaceable revision pointer below;
-  // release metadata can move without entering the immutable policy graph, but
-  // the client never accepts an unbound mapping.
+  // Every indexed revision gets its newest known compatible native release,
+  // not necessarily the release from this publish. Its exact digest is bound
+  // into the replaceable revision pointer below; release metadata can move
+  // without entering the immutable policy graph, but the client never accepts
+  // an unbound mapping.
   const artifactReferences = validateArtifactReferences(
     options.artifactReferences ?? (await buildArtifactReferences({ integrityRoot: options.artifactIntegrityRoot })),
     "artifact references",
     { requireIntegrity: Boolean(options.artifactIntegrityRoot || options.requireIntegrity) },
   );
+  const historical = options.artifactHistory ?? [];
+  if (!Array.isArray(historical)) throw new Error("Artifact history must be an array of complete mappings");
+  for (const [index, references] of historical.entries()) {
+    validateArtifactReferences(references, `historical artifact mapping ${index}`, { requireIntegrity: true });
+  }
   for (const entry of store.entries) {
+    const expected = await expectedNativeCompatibility(options.storeRoot ?? storeRoot, site.layoutVersion, entry);
+    const selected = selectArtifactReferencesForRevision(artifactReferences, historical, expected);
+    validateArtifactReferences(selected, `${entry.defoldRevision} artifact mapping`, {
+      requireIntegrity: Boolean(options.artifactIntegrityRoot || options.requireIntegrity),
+    });
     const document = {
       schemaVersion: 2,
       kind: ARTIFACTS_DOCUMENT_KIND,
       defoldRevision: entry.defoldRevision,
-      artifacts: artifactReferences,
+      artifacts: selected,
     };
     const documentBytes = Buffer.from(`${JSON.stringify(document, null, 2)}\n`);
     files.set([...prefix, artifactsPath(site.layoutVersion, entry.defoldRevision)].join("/"), documentBytes);
@@ -456,6 +496,8 @@ async function main(argv = process.argv.slice(2)) {
         { requireIntegrity: true },
       );
       options.requireIntegrity = true;
+    } else if (argument === "--artifact-history") {
+      options.artifactHistory = JSON.parse(await readFile(path.resolve(argv[++index]), "utf8"));
     } else throw new Error(`Unknown argument: ${argument}`);
   }
   if (options.validationOnly && (options.artifactReferences || options.artifactIntegrityRoot)) {

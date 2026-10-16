@@ -117,6 +117,26 @@ export function shouldRetryHostedExtenderFailure({ buildServer, priorLog, curren
   );
 }
 
+export function publishedNativeArtifactState(native) {
+  const targets = Object.keys(native?.assets ?? {});
+  if (native?.availability?.status === "pending-compatible-build" && targets.length === 0) {
+    return "pending-compatible-build";
+  }
+  const coordinates = targets.map((target) => native.releases?.[target] ?? native);
+  if (
+    native?.indexedBy !== "bundleTarget" ||
+    targets.length === 0 ||
+    coordinates.some(
+      (release) =>
+        !/^[A-Za-z0-9][A-Za-z0-9._-]*$/u.test(release?.tag ?? "") ||
+        !/^[a-f0-9]{64}$/u.test(release?.fingerprint ?? ""),
+    )
+  ) {
+    throw new Error("Published policy carries no usable native-artifacts mapping");
+  }
+  return "ready";
+}
+
 export function scaffoldArguments({ project, defoldRevision, name = "deherm end to end" }) {
   if (!/^[a-f0-9]{40}$/u.test(defoldRevision ?? "")) {
     throw new Error(
@@ -225,19 +245,11 @@ const stages = {
       index: await readPolicyLocator(),
     });
     const native = resolved.artifacts?.artifacts?.["native-artifacts"];
+    if (publishedNativeArtifactState(native) !== "ready") {
+      throw new Error(`${context.defoldRevision}: published policy awaits compatible native-artifacts`);
+    }
     const targets = Object.keys(native?.assets ?? {});
     const coordinates = targets.map((target) => native.releases?.[target] ?? native);
-    if (
-      native?.indexedBy !== "bundleTarget" ||
-      targets.length === 0 ||
-      coordinates.some(
-        (release) =>
-          !/^[A-Za-z0-9][A-Za-z0-9._-]*$/u.test(release?.tag ?? "") ||
-          !/^[a-f0-9]{64}$/u.test(release?.fingerprint ?? ""),
-      )
-    ) {
-      throw new Error(`${context.defoldRevision}: published policy carries no usable native-artifacts mapping`);
-    }
     const tags = new Set(coordinates.map(({ tag }) => tag));
     return {
       detail: `resolved ${resolved.entry.policyRoot.slice(0, 12)} and materialized ${tags.size} immutable native release(s) for ${targets.length} target(s)`,

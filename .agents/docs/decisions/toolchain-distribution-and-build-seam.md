@@ -744,6 +744,17 @@ workflow on the same ref. Policy advances the authenticated artifact mapping,
 waits for the public-site consumer smoke to resolve it, and only then dispatches
 the full end-to-end workflow. The two dispatches cannot be siblings: doing so
 races Pages and makes a healthy publication window look like a broken consumer.
+The publisher must also retain a native release compatible with each older
+indexed Defold revision. It recovers pointer-bound, integrity-complete mappings
+from the published site's Git history, then selects native coordinates by the
+revision's toolchain compatibility fingerprint; current host-tool coordinates
+remain current. Replacing every older pointer with the newest native release
+made a pinned end-to-end consumer see `pending-compatible-build` despite its
+older archive still being published. If no compatible native release exists,
+the policy may publish with that explicit pending state, but the full Bob
+matrix waits until the native-artifacts refresh publishes one. This preserves
+the immutable policy roots and makes a pending artifact a named availability
+state, not an unrelated policy-generation failure.
 A toolchain fingerprint no longer triggers end-to-end directly on the original
 push either; that raced artifact publication itself. Script-only end-to-end
 changes still run their cheap local stage directly; nightlies and the ordered

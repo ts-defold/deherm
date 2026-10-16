@@ -5,11 +5,44 @@ import { test } from "node:test";
 import {
   buildLedger,
   buildServerForDefoldRef,
+  publishedNativeArtifactState,
   readLedger,
   scaffoldArguments,
   shouldRetryHostedExtenderFailure,
   stageNames,
 } from "../scripts/check-end-to-end.mjs";
+
+test("published native mapping distinguishes a pending build from a malformed release", () => {
+  assert.equal(
+    publishedNativeArtifactState({
+      indexedBy: "bundleTarget",
+      assets: {},
+      availability: { status: "pending-compatible-build" },
+    }),
+    "pending-compatible-build",
+  );
+  assert.equal(
+    publishedNativeArtifactState({
+      indexedBy: "bundleTarget",
+      assets: { "x86_64-linux": "libhermes-x86_64-linux.tar.gz" },
+      releases: { "x86_64-linux": { tag: "libs-test", fingerprint: "a".repeat(64) } },
+    }),
+    "ready",
+  );
+  assert.throws(() => publishedNativeArtifactState({ indexedBy: "bundleTarget", assets: {} }), /no usable/u);
+  assert.throws(
+    () => publishedNativeArtifactState({ indexedBy: "bundleTarget", assets: { "x86_64-linux": "archive" } }),
+    /no usable/u,
+  );
+});
+
+test("policy publication gates full end-to-end dispatch on a compatible published native mapping", async () => {
+  const workflow = await readFile(new URL("../.github/workflows/policy.yml", import.meta.url), "utf8");
+  const dispatch = workflow.slice(workflow.indexOf("  dispatch-end-to-end:"));
+  assert.match(dispatch, /needs: consumer-smoke/u);
+  assert.match(dispatch, /check-published-native-artifacts\.mjs --github-output/u);
+  assert.match(dispatch, /if: steps\.artifacts\.outputs\.ready == 'true'/u);
+});
 
 // The property that makes the gate worth having: it cannot silently omit a
 // target. Every check in this file is about that, not about whether any
