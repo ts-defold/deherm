@@ -76,6 +76,7 @@ test("policy host parity materializes every authoritative generator input", asyn
   const engine = workflow.slice(workflow.indexOf("  engine-conformance:"), workflow.indexOf("  publish-site:"));
   const publish = workflow.slice(workflow.indexOf("  publish-site:"));
   const derive = workflow.slice(workflow.indexOf("  derive:"), workflow.indexOf("  host-parity:"));
+  assert.match(derive, /sudo apt-get install -y --no-install-recommends llvm clang/u);
   assert.match(derive, /args=\(--revision "\$revision" --workspace "\$workspace" --verify-current --adopt\)/u);
   assert.match(parity, /role: Linux canonical bytes/u);
   assert.match(parity, /role: macOS reproduces Linux/u);

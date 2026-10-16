@@ -111,10 +111,10 @@ jobs:
         with: { python-version: '3.13' }
       - run: pnpm install --frozen-lockfile --ignore-scripts
 
-      - name: Install deterministic cross-target archive inspection
+      - name: Install archive inspection and exact-call compiler
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends llvm
+          sudo apt-get install -y --no-install-recommends llvm clang
           command -v llvm-nm
           command -v llvm-cxxfilt
           llvm-nm --version
