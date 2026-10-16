@@ -318,32 +318,32 @@ void RegisterNestedLuaFunction(lua_State* state, const char* root, const char* n
 void Expect(bool condition, const char* message) { if (!condition) Fail(message); }
 bool Near(float left, float right, float epsilon = 0.00001f) { return std::fabs(left - right) <= epsilon; }
 
-uint32_t GetGeneration(void* userData, void* instance) noexcept {
+uint32_t GetGeneration(void* userData, game_object::HandleBits instance) noexcept {
   ++static_cast<TerminalCounters*>(userData)->pointerReads;
-  return static_cast<FakeInstance*>(instance)->generation;
+  return game_object::decodeHandle<FakeInstance*>(instance)->generation;
 }
-void* GetCollection(void* userData, void* instance) noexcept {
+game_object::HandleBits GetCollection(void* userData, game_object::HandleBits instance) noexcept {
   ++static_cast<TerminalCounters*>(userData)->pointerReads;
-  return static_cast<FakeInstance*>(instance)->collection;
+  return game_object::encodeHandle(game_object::decodeHandle<FakeInstance*>(instance)->collection);
 }
-uint64_t GetIdentifier(void* userData, void* instance) noexcept {
+uint64_t GetIdentifier(void* userData, game_object::HandleBits instance) noexcept {
   ++static_cast<TerminalCounters*>(userData)->pointerReads;
-  return static_cast<FakeInstance*>(instance)->identifier;
+  return game_object::decodeHandle<FakeInstance*>(instance)->identifier;
 }
-void GetPosition(void* userData, void* instance, float* xyz) noexcept {
+void GetPosition(void* userData, game_object::HandleBits instance, float* xyz) noexcept {
   auto* counters = static_cast<TerminalCounters*>(userData);
   ++counters->gets;
-  const auto* value = static_cast<FakeInstance*>(instance);
+  const auto* value = game_object::decodeHandle<FakeInstance*>(instance);
   for (size_t index = 0; index < 3; ++index) xyz[index] = value->position[index];
 }
-void SetPosition(void* userData, void* instance, const float* xyz) noexcept {
+void SetPosition(void* userData, game_object::HandleBits instance, const float* xyz) noexcept {
   ++static_cast<TerminalCounters*>(userData)->positionSets;
-  auto* value = static_cast<FakeInstance*>(instance);
+  auto* value = game_object::decodeHandle<FakeInstance*>(instance);
   for (size_t index = 0; index < 3; ++index) value->position[index] = xyz[index];
 }
-void SetRotation(void* userData, void* instance, const float* xyzw) noexcept {
+void SetRotation(void* userData, game_object::HandleBits instance, const float* xyzw) noexcept {
   ++static_cast<TerminalCounters*>(userData)->rotationSets;
-  auto* value = static_cast<FakeInstance*>(instance);
+  auto* value = game_object::decodeHandle<FakeInstance*>(instance);
   for (size_t index = 0; index < 4; ++index) value->rotation[index] = xyzw[index];
 }
 bool IsAttachmentLive(void* owner, uint32_t slot, uint32_t generation) noexcept {
@@ -356,8 +356,8 @@ game_object::ActiveContext Context(
     AttachmentTable& attachments,
     uint32_t slot) {
   game_object::ActiveContext context;
-  context.instance = &instance;
-  context.collection = instance.collection;
+  context.instance = game_object::encodeHandle(&instance);
+  context.collection = game_object::encodeHandle(instance.collection);
   context.identifier = instance.identifier;
   context.instanceGeneration = instance.generation;
   context.attachment = {&attachments, slot, attachments.generations[slot], IsAttachmentLive};
@@ -985,6 +985,13 @@ int main() {
   int collection = 0;
   FakeInstance instanceA{&collection, UINT64_C(0x1111), 3, {1, 2, 3}, {0, 0, 0, 1}};
   FakeInstance instanceB{&collection, UINT64_C(0x2222), 9, {10, 20, 30}, {0, 0, 1, 0}};
+  Expect(game_object::decodeHandle<FakeInstance*>(game_object::encodeHandle(&instanceA)) == &instanceA,
+      "pointer-shaped game-object handle did not round-trip");
+  constexpr uint64_t kWideInstanceHandle = UINT64_C(0xfedcba9876543210);
+  Expect(game_object::decodeHandle<uint64_t>(game_object::encodeHandle(kWideInstanceHandle)) == kWideInstanceHandle,
+      "integer game-object handle was truncated");
+  Expect(game_object::decodeHandle<uint32_t>(game_object::encodeHandle(uint32_t{0x87654321})) == UINT32_C(0x87654321),
+      "integer collection handle did not round-trip");
   const auto contextA = Context(instanceA, attachments, 0);
   const auto contextB = Context(instanceB, attachments, 1);
 

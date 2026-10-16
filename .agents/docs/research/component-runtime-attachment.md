@@ -65,6 +65,27 @@ thunks.
 
 Both fixes are provider-wide, not per-route or per-game.
 
+## Revision-varying game-object handles
+
+Defold alpha revision `4c84ed49b0d0c9005dd278c6caa371866b3a88dc`
+changed `HInstance`/`HGameObject` to `uint64_t` and `HCollection` to
+`uint32_t`; the pinned earlier SDK exposes pointer-shaped handles. The first
+alpha policy engine lane passed generated exact calls but failed to compile
+`extension.cpp`, which stored both handles as `void*` in the active component
+context. The internal terminal/context ABI now carries opaque `uint64_t`
+handle bits and encodes/decodes the actual SDK typedef at the extension edge.
+This preserves pointer-shaped handles and full-width integer handles, including
+on 32-bit browser builds, without making Defold-specific typedefs part of the
+generated script API. Generation, collection, and identifier are still checked
+before a borrowed handle is used; no handle escapes the call scope.
+
+The native script-value runtime and sanitizer tests exercise pointer and
+32-/64-bit integer round trips, the existing reentrant/stale-context cases,
+and zero warmed allocations. The extension source passes C++ syntax checks
+against both the pinned SDK and the alpha SDK above. These are compile and
+local runtime tests, not a completed alpha engine run; a CI rerun is required
+for that claim.
+
 ## Remaining capability gates
 
 1. Bundle registry and component-only bootstrap: the dynamic-Hermes harness supplies `__defoldComponentsV1`, but the compiler does not emit that registry yet. Native bundle activation and generated script-bridge initialization also still begin at the singleton bootstrap attachment. A project containing only generated component proxies cannot yet initialize the runtime honestly.

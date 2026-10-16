@@ -78,7 +78,7 @@ void ScriptSetInstance(lua_State* state) {
 }
 
 struct BootstrapAttachment {
-  dmGameObject::HCollection collection = nullptr;
+  dmGameObject::HCollection collection{};
   dmhash_t identifier = 0;
   uint32_t instanceGeneration = 0;
   uint32_t attachmentGeneration = 0;
@@ -131,8 +131,8 @@ bool BuildComponentInstanceContext(
   if (!dmScript::IsInstanceValid(state)) return false;
   dmGameObject::HInstance instance = dmScript::CheckGOInstance(state);
   if (!instance) return false;
-  out->instance = instance;
-  out->collection = dmGameObject::GetCollection(instance);
+  out->instance = defold_hermes::game_object::encodeHandle(instance);
+  out->collection = defold_hermes::game_object::encodeHandle(dmGameObject::GetCollection(instance));
   out->identifier = dmGameObject::GetIdentifier(instance);
   out->instanceGeneration = dmGameObject::GetGeneration(instance);
   out->attachment = {
@@ -151,8 +151,8 @@ bool BuildBootstrapContext(defold_hermes::game_object::ActiveContext* out) {
   if (!instance || dmGameObject::GetGeneration(instance) != gBootstrapAttachment.instanceGeneration) {
     return false;
   }
-  out->instance = instance;
-  out->collection = gBootstrapAttachment.collection;
+  out->instance = defold_hermes::game_object::encodeHandle(instance);
+  out->collection = defold_hermes::game_object::encodeHandle(gBootstrapAttachment.collection);
   out->identifier = gBootstrapAttachment.identifier;
   out->instanceGeneration = gBootstrapAttachment.instanceGeneration;
   out->attachment = {
@@ -164,35 +164,37 @@ bool BuildBootstrapContext(defold_hermes::game_object::ActiveContext* out) {
   return true;
 }
 
-uint32_t TerminalGetGeneration(void*, void* instance) noexcept {
-  return dmGameObject::GetGeneration(static_cast<dmGameObject::HInstance>(instance));
+uint32_t TerminalGetGeneration(void*, defold_hermes::game_object::HandleBits instance) noexcept {
+  return dmGameObject::GetGeneration(defold_hermes::game_object::decodeHandle<dmGameObject::HInstance>(instance));
 }
 
-void* TerminalGetCollection(void*, void* instance) noexcept {
-  return dmGameObject::GetCollection(static_cast<dmGameObject::HInstance>(instance));
+defold_hermes::game_object::HandleBits TerminalGetCollection(
+    void*, defold_hermes::game_object::HandleBits instance) noexcept {
+  return defold_hermes::game_object::encodeHandle(
+      dmGameObject::GetCollection(defold_hermes::game_object::decodeHandle<dmGameObject::HInstance>(instance)));
 }
 
-uint64_t TerminalGetIdentifier(void*, void* instance) noexcept {
-  return dmGameObject::GetIdentifier(static_cast<dmGameObject::HInstance>(instance));
+uint64_t TerminalGetIdentifier(void*, defold_hermes::game_object::HandleBits instance) noexcept {
+  return dmGameObject::GetIdentifier(defold_hermes::game_object::decodeHandle<dmGameObject::HInstance>(instance));
 }
 
-void TerminalGetPosition(void*, void* instance, float* xyz) noexcept {
+void TerminalGetPosition(void*, defold_hermes::game_object::HandleBits instance, float* xyz) noexcept {
   const dmVMath::Point3 value = dmGameObject::GetPosition(
-      static_cast<dmGameObject::HInstance>(instance));
+      defold_hermes::game_object::decodeHandle<dmGameObject::HInstance>(instance));
   xyz[0] = value.getX();
   xyz[1] = value.getY();
   xyz[2] = value.getZ();
 }
 
-void TerminalSetPosition(void*, void* instance, const float* xyz) noexcept {
+void TerminalSetPosition(void*, defold_hermes::game_object::HandleBits instance, const float* xyz) noexcept {
   dmGameObject::SetPosition(
-      static_cast<dmGameObject::HInstance>(instance),
+      defold_hermes::game_object::decodeHandle<dmGameObject::HInstance>(instance),
       dmVMath::Point3(xyz[0], xyz[1], xyz[2]));
 }
 
-void TerminalSetRotation(void*, void* instance, const float* xyzw) noexcept {
+void TerminalSetRotation(void*, defold_hermes::game_object::HandleBits instance, const float* xyzw) noexcept {
   dmGameObject::SetRotation(
-      static_cast<dmGameObject::HInstance>(instance),
+      defold_hermes::game_object::decodeHandle<dmGameObject::HInstance>(instance),
       dmVMath::Quat(xyzw[0], xyzw[1], xyzw[2], xyzw[3]));
 }
 
@@ -258,7 +260,7 @@ void InvalidateBootstrapAttachment() noexcept {
   gBootstrapAttachment.live = false;
   ++gBootstrapAttachment.attachmentGeneration;
   if (gBootstrapAttachment.attachmentGeneration == 0) ++gBootstrapAttachment.attachmentGeneration;
-  gBootstrapAttachment.collection = nullptr;
+  gBootstrapAttachment.collection = {};
   gBootstrapAttachment.identifier = 0;
   gBootstrapAttachment.instanceGeneration = 0;
 }

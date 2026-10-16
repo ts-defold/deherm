@@ -4,8 +4,34 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>
+#include <type_traits>
 
 namespace defold_hermes::game_object {
+
+using HandleBits = uint64_t;
+
+/** Preserve either pointer-shaped or integer Defold handles across the context ABI. */
+template <typename Handle>
+HandleBits encodeHandle(Handle handle) noexcept {
+  static_assert(sizeof(Handle) <= sizeof(HandleBits), "Defold handle exceeds the context ABI");
+  static_assert(std::is_pointer_v<Handle> || std::is_integral_v<Handle>, "Unsupported Defold handle shape");
+  if constexpr (std::is_pointer_v<Handle>) {
+    return static_cast<HandleBits>(reinterpret_cast<uintptr_t>(handle));
+  } else {
+    return static_cast<HandleBits>(handle);
+  }
+}
+
+template <typename Handle>
+Handle decodeHandle(HandleBits bits) noexcept {
+  static_assert(sizeof(Handle) <= sizeof(HandleBits), "Defold handle exceeds the context ABI");
+  static_assert(std::is_pointer_v<Handle> || std::is_integral_v<Handle>, "Unsupported Defold handle shape");
+  if constexpr (std::is_pointer_v<Handle>) {
+    return reinterpret_cast<Handle>(static_cast<uintptr_t>(bits));
+  } else {
+    return static_cast<Handle>(bits);
+  }
+}
 
 /**
  * Engine calls used by generated context-bound GO thunks. The extension
@@ -15,12 +41,12 @@ namespace defold_hermes::game_object {
  */
 struct TerminalApi {
   void* userData = nullptr;
-  uint32_t (*getGeneration)(void* userData, void* instance) noexcept = nullptr;
-  void* (*getCollection)(void* userData, void* instance) noexcept = nullptr;
-  uint64_t (*getIdentifier)(void* userData, void* instance) noexcept = nullptr;
-  void (*getPosition)(void* userData, void* instance, float* xyz) noexcept = nullptr;
-  void (*setPosition)(void* userData, void* instance, const float* xyz) noexcept = nullptr;
-  void (*setRotation)(void* userData, void* instance, const float* xyzw) noexcept = nullptr;
+  uint32_t (*getGeneration)(void* userData, HandleBits instance) noexcept = nullptr;
+  HandleBits (*getCollection)(void* userData, HandleBits instance) noexcept = nullptr;
+  uint64_t (*getIdentifier)(void* userData, HandleBits instance) noexcept = nullptr;
+  void (*getPosition)(void* userData, HandleBits instance, float* xyz) noexcept = nullptr;
+  void (*setPosition)(void* userData, HandleBits instance, const float* xyz) noexcept = nullptr;
+  void (*setRotation)(void* userData, HandleBits instance, const float* xyzw) noexcept = nullptr;
 };
 
 /** Persistent attachment identity checked before a borrowed HInstance is read. */
@@ -31,10 +57,10 @@ struct AttachmentToken {
   bool (*isLive)(void* owner, uint32_t slot, uint32_t generation) noexcept = nullptr;
 };
 
-/** Call-scoped snapshot. No pointer in this record may escape the scope. */
+/** Call-scoped snapshot. No borrowed handle in this record may escape the scope. */
 struct ActiveContext {
-  void* instance = nullptr;
-  void* collection = nullptr;
+  HandleBits instance = 0;
+  HandleBits collection = 0;
   uint64_t identifier = 0;
   uint32_t instanceGeneration = 0;
   AttachmentToken attachment{};
@@ -42,7 +68,7 @@ struct ActiveContext {
 
 struct ResolvedCurrent {
   const TerminalApi* api = nullptr;
-  void* instance = nullptr;
+  HandleBits instance = 0;
 };
 
 /**
